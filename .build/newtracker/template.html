@@ -456,7 +456,7 @@ body {
 }
 .dl-close:hover { color: var(--ink); background: var(--surface-2); }
 
-.dl-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.dl-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .dl-svg { width: min(420px, 94%); height: auto; overflow: visible; display: block; }
 .dl-arc { fill: none; stroke-width: 1.4; opacity: 0.5; transition: none; }
 .dl-bar { stroke-width: 3.4; stroke-linecap: butt; }
@@ -470,8 +470,14 @@ body {
 /* everywhere the needle has been so far — the term's swing, accumulated */
 .dl-envelope { fill: none; stroke: var(--ink-3); stroke-width: 0.9; opacity: 0.32; }
 .dl-envelope line { stroke: var(--ink-3); stroke-width: 0.9; }
-.dl-flash line { stroke: var(--ink-3); stroke-width: 0.7; }
-.dl-flash text { font-family: var(--sans); font-size: 2.7px; font-weight: 700; fill: var(--ink-2); }
+/* the event line above the dial — fixed height so it never shifts layout */
+.dl-event {
+  height: 20px; display: flex; align-items: center; justify-content: center;
+  font-family: var(--sans); font-size: 12px; font-weight: 600;
+  letter-spacing: 0.04em; color: var(--ink-2);
+}
+.dl-event span { display: inline-flex; align-items: center; gap: 7px; }
+.dl-event-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ink-3); }
 
 .dl-cap { text-align: center; }
 .dl-month {

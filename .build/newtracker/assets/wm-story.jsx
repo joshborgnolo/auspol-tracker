@@ -8,10 +8,11 @@
    Everything here is the same monthly aggregate the charts draw. Two liberties,
    both deliberate:
 
-   - BAR ORDER is pinned to election-day standing rather than sorted
-     tallest-first as the resting glyph does. One Nation climbing past the
-     Coalition is the movement worth seeing, and re-sorting every month would
-     hide it behind shuffling bars.
+   - BAR ORDER re-ranks live: each month's tallest bar holds the leftmost
+     slot, and the slot assignment is interpolated between months, so a party
+     overtaking another arrives as two bars visibly trading places. One
+     Nation's climb past the Greens and then the Coalition is the point of
+     the replay, and a swap of position carries it better than height alone.
    - BAR HEIGHT is on an absolute 0-40% scale, not normalised per month. The
      resting glyph normalises because it only ever shows one month; here that
      would flatten the very growth being replayed.
@@ -46,27 +47,31 @@ const smooth = (t) => t * t * t * (t * (t * 6 - 15) + 10);
 function buildDialStory(D) {
   const primBy = new Map(D.aggPrimary.map((p) => [p.ym, p]));
   const onBy = new Map((D.alt2pp.alp_on || []).map((p) => [p.ym, p]));
-  const first = D.aggPrimary[0];
-  const order = ["alp", "lnp", "grn", "onp"]
-    .sort((a, b) => (first[b] || 0) - (first[a] || 0));      // election-day standing
+  const IDS = ["alp", "lnp", "grn", "onp"];
   return D.agg2pp.map((m) => {
     const on = onBy.get(m.ym);
     const cands = [{ id: "lnp", abbr: "Coalition", color: "var(--lnp)", lab: m.alp, opp: m.lnp }];
     if (on) cands.push({ id: "onp", abbr: "One Nation", color: "var(--onp)", lab: on.a, opp: on.b });
     const top = cands.slice().sort((x, y) => y.opp - x.opp)[0];
     const prim = primBy.get(m.ym) || null;
+    const vals = {};
+    IDS.forEach((id) => { vals[id] = prim ? (prim[id] ?? null) : null; });
+    // this month's standing decides which slot each bar occupies
+    const slots = {};
+    IDS.slice().sort((a, b) => (vals[b] ?? -1) - (vals[a] ?? -1))
+       .forEach((id, k) => { slots[id] = k; });
     return {
       ym: m.ym, election: !!m.election,
       lab: top.lab, opp: top.opp, margin: +(top.lab - top.opp).toFixed(1),
       oppId: top.id, oppName: top.abbr, oppColor: top.color,
-      bars: order.map((id) => ({ id, v: prim ? prim[id] : null })),
+      vals, slots,
     };
   });
 }
 
 /* The dial itself, drawn at an arbitrary FLOAT position in the story so the
    same function serves the replay, the scrub and the resting state. */
-function DialFigure({ story, f, envelope, trail, flash }) {
+function DialFigure({ story, f, envelope, trail }) {
   const D = window.AP.D;
   const i0 = Math.max(0, Math.min(story.length - 1, Math.floor(f)));
   const i1 = Math.min(story.length - 1, i0 + 1);
@@ -81,11 +86,18 @@ function DialFigure({ story, f, envelope, trail, flash }) {
   const oppMix = A.oppId === B.oppId ? 0 : t;
   const needleColor = labLeads ? "var(--alp)" : (oppMix > 0.5 ? B.oppColor : A.oppColor);
 
-  const bars = A.bars.map((bar, k) => ({
-    id: bar.id,
-    v: bar.v == null ? null : lerp(bar.v, B.bars[k].v == null ? bar.v : B.bars[k].v, t),
-    deg: WM_SLOT_DEG[k],
-  }));
+  /* Bars interpolate BOTH height and slot. The slot lerp is what makes an
+     overtake legible: for the month it happens, the two bars swing past each
+     other on the arc and settle swapped. */
+  const bars = ["alp", "lnp", "grn", "onp"].map((id) => {
+    const vA = A.vals[id], vB = B.vals[id];
+    if (vA == null && vB == null) return null;
+    return {
+      id,
+      v: lerp(vA == null ? vB : vA, vB == null ? vA : vB, t),
+      deg: lerp(WM_SLOT_DEG[A.slots[id]], WM_SLOT_DEG[B.slots[id]], t),
+    };
+  }).filter(Boolean);
 
   return (
     <g className="dl-fig">
@@ -136,16 +148,6 @@ function DialFigure({ story, f, envelope, trail, flash }) {
               x2={wmPolar(tr, 8.6).x} y2={wmPolar(tr, 8.6).y}
               style={{ opacity: ((k + 1) / trail.length) * 0.22 }} />
       ))}
-
-      {/* a key event, flashed on the rim as the playhead passes its month */}
-      {flash && (
-        <g className="dl-flash" style={{ opacity: flash.op }}>
-          <line x1={wmPolar(flash.deg, WM_GC.r - 3).x} y1={wmPolar(flash.deg, WM_GC.r - 3).y}
-                x2={wmPolar(flash.deg, WM_GC.r + 1).x} y2={wmPolar(flash.deg, WM_GC.r + 1).y} />
-          <text x={wmPolar(flash.deg, WM_GC.r - 5.4).x} y={wmPolar(flash.deg, WM_GC.r - 5.4).y}
-                textAnchor="middle" dominantBaseline="middle">{flash.short}</text>
-        </g>
-      )}
 
       {/* the needle */}
       <g transform={`translate(${WM_GC.cx}, ${WM_GC.cy}) rotate(${deg.toFixed(2)})`}>
@@ -294,11 +296,13 @@ function DialStory({ originRect, onClose }) {
   const [yy, mm] = cur.ym.split("-").map(Number);
   const monthLabel = D.monthNameFull(mm) + " " + yy;
 
-  // rim flash for an event in the month being shown
-  const near = evs.find((e) => Math.abs(e.i - f) < 0.55);
-  const flash = near
-    ? { deg: -WM_SWING_DEG - 12, short: near.short, op: 1 - Math.abs(near.i - f) / 0.55 }
-    : null;
+  /* Event text lives in a reserved HTML line above the dial, not inside the
+     SVG: the old rim label sat at a fixed angle the needle swept straight
+     through, at 2.7 SVG units — neither anchored to anything nor readable.
+     The line's height is fixed so its appearance never shifts layout; a short
+     plateau then fade keeps it readable while the playhead crosses the month. */
+  const near = evs.find((e) => Math.abs(e.i - f) < 0.7);
+  const evOp = near ? Math.min(1, (0.7 - Math.abs(near.i - f)) / 0.35) : 0;
 
   const replay = () => {
     trailRef.current = [];
@@ -314,9 +318,16 @@ function DialStory({ originRect, onClose }) {
         <button className="dl-close" onClick={onClose} ref={closeRef} aria-label="Close">×</button>
 
         <figure className="dl-figure">
+          <div className="dl-event" aria-live="polite">
+            {near && (
+              <span style={{ opacity: evOp }}>
+                <i className="dl-event-dot" aria-hidden="true"></i>{near.short}
+              </span>
+            )}
+          </div>
           <svg viewBox="-9 -11 62 48" className="dl-svg" role="img"
                aria-label={`Dial for ${monthLabel}: Labor ${cur.lab.toFixed(1)} versus ${cur.oppName} ${cur.opp.toFixed(1)} two-party preferred`}>
-            <DialFigure story={story} f={f} envelope={envRef.current} trail={trailRef.current} flash={flash} />
+            <DialFigure story={story} f={f} envelope={envRef.current} trail={trailRef.current} />
           </svg>
 
           <figcaption className="dl-cap">
@@ -347,8 +358,8 @@ function DialStory({ originRect, onClose }) {
 
         <div className="dl-foot">
           <span className="dl-legend">
-            Bars are the primary vote, tallest to shortest at the election. The right of the arc
-            takes the colour of Labor’s strongest challenger that month.
+            Bars are the primary vote and reorder as parties overtake one another. The right of
+            the arc takes the colour of Labor’s strongest challenger that month.
           </span>
           <button className="dl-replay" onClick={replay} disabled={playing}>
             {playing ? "Playing…" : "Replay"}
