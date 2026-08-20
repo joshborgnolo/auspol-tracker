@@ -1,0 +1,147 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "auspol canonical dataset",
+  "description": "Single source of truth for the auspol tracker. Edit this file to add a poll, then run: node .build/newtracker/build.mjs (which validates before it builds).",
+  "type": "object",
+  "required": ["metricRules", "elections", "events", "direction", "polls", "ppm", "approval", "ppmHeadToHead", "altTpp", "cyclePolls", "cycleApproval"],
+  "properties": {
+    "metricRules": {
+      "description": "Which question a house asks about a leader. Approval = approve minus disapprove; favourability = positive minus negative. Never blended, because they are different questions.",
+      "type": "object",
+      "properties": {
+        "favFirms": { "type": "array", "items": { "type": "string" }, "description": "Canonical lower-case firm names that publish favourability for every leader." },
+        "overrides": {
+          "type": "object",
+          "description": "Keyed 'firm|leaderKey'. Date-bounded, because what a house asks can change mid-cycle.",
+          "additionalProperties": {
+            "type": "object",
+            "properties": { "metric": { "enum": ["fav", "approval"] }, "before": { "type": "string", "format": "date" } }
+          }
+        }
+      }
+    },
+    "pollsterRules": {
+      "description": "House quirks the validator must know about, so a deliberate oddity is not reported as an error every run.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "tppIncludesUndecided": { "type": "boolean", "description": "The house's published 2PP pair sums to under 100 because undecideds are included." },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "elections": { "type": "object", "description": "Keyed e2010, e2013, ... Each holds the election-day result used as a series baseline." },
+    "events": { "type": "array", "description": "Cycle events annotated on the charts.", "items": { "type": "object", "required": ["date", "label"] } },
+    "direction": {
+      "type": "array",
+      "description": "Right-direction / wrong-track readings, one row per poll wave. unsure is the remainder and the three must sum to 100.",
+      "items": {
+        "type": "object",
+        "required": ["date", "pollster", "right", "wrong", "unsure"],
+        "properties": {
+          "date": { "type": "string", "description": "Fieldwork END date. Essential publishes by report date — re-key it onto the matching wave's fieldwork end." },
+          "dateStart": { "type": "string" },
+          "pollster": { "type": "string" },
+          "right": { "type": "number" }, "wrong": { "type": "number" }, "unsure": { "type": "number" }
+        }
+      }
+    },
+    "polls": {
+      "type": "array",
+      "description": "Voting-intention polls, oldest first. One row per published national poll, plus the election baseline (isElection).",
+      "items": {
+        "type": "object",
+        "required": ["date", "pollster"],
+        "properties": {
+          "date": { "type": "string", "description": "Fieldwork END date (ISO). The join key for every other dataset, together with pollster." },
+          "dateStart": { "type": "string", "description": "Fieldwork start date." },
+          "pollster": { "type": "string" },
+          "client": { "type": ["string", "null"], "description": "Commissioning outlet. Resolve = 'SMH / Age', Newspoll = 'The Australian', YouGov = 'Sky News', Roy Morgan = '—'." },
+          "sample": { "type": ["number", "null"] },
+          "alp": { "type": ["number", "null"] }, "lnp": { "type": ["number", "null"] },
+          "grn": { "type": ["number", "null"] }, "onp": { "type": ["number", "null"] },
+          "ind": { "type": ["number", "null"], "description": "Some houses (Roy Morgan) publish one combined Independent/Other figure — put it here and leave oth null." },
+          "oth": { "type": ["number", "null"] },
+          "tpp_alp": { "type": ["number", "null"], "description": "Headline 2PP. Null where the house published none (Newspoll and Resolve often do not). For Roy Morgan store the RESPONDENT-ALLOCATED figure, not the previous-election-flow one." },
+          "tpp_lnp": { "type": ["number", "null"] },
+          "lnpSplit": { "type": "object", "properties": { "Lib": { "type": "number" }, "Nat": { "type": "number" } } },
+          "url": { "type": "string", "description": "The published release this row was taken from. Link the article, not a paywall wrapper." },
+          "isElection": { "type": "boolean" },
+          "sumNote": { "type": "string", "description": "Documents a deliberate reason this row's shares do not sum to ~100. Presence exempts the row from the sum checks, so only use it for an adjudicated case." }
+        }
+      }
+    },
+    "ppm": {
+      "type": "array",
+      "description": "Preferred prime minister. alb vs opp is the main contest; han only in a genuine three-way.",
+      "items": {
+        "type": "object",
+        "required": ["date", "firm"],
+        "properties": {
+          "date": { "type": "string" }, "firm": { "type": "string" },
+          "alb": { "type": ["number", "null"] }, "opp": { "type": ["number", "null"] },
+          "oppName": { "type": ["string", "null"], "description": "Opposition leader at the time — Ley before the 12 Feb 2026 handover, Taylor after." },
+          "han": { "type": ["number", "null"], "description": "Hanson's share in a THREE-way question only. A two-way Alb-v-Hanson goes in ppmHeadToHead." },
+          "extra": { "type": ["array", "null"], "description": "Additional contests polled the same wave." }
+        }
+      }
+    },
+    "approval": {
+      "type": "array",
+      "description": "Leader net ratings. Each net is that leader's PRIMARY metric at that firm (see metricRules).",
+      "items": {
+        "type": "object",
+        "required": ["date", "firm"],
+        "properties": {
+          "date": { "type": "string" }, "firm": { "type": "string" },
+          "alb": { "type": ["number", "null"] }, "opp": { "type": ["number", "null"] },
+          "oppName": { "type": ["string", "null"] }, "han": { "type": ["number", "null"] },
+          "detail": {
+            "type": ["object", "null"],
+            "description": "Optional. { alb|opp|han: {app,dis} } = the published split behind the primary net — always record it when the pollster gave one. { fav: {...} } = a SECOND measure, when a firm published both for one leader."
+          }
+        }
+      }
+    },
+    "ppmHeadToHead": {
+      "type": "array",
+      "description": "Two-way Albanese-v-Hanson preferred-PM matchups, kept apart from the main contest because a two-way share is not comparable with a three-way one.",
+      "items": { "type": "object", "required": ["date", "firm", "alb", "han"] }
+    },
+    "altTpp": {
+      "type": "array",
+      "description": "Two-party head-to-heads other than ALP v L/NP.",
+      "items": {
+        "type": "object",
+        "required": ["date", "firm"],
+        "properties": {
+          "date": { "type": "string" }, "firm": { "type": "string" },
+          "alpVsOnp_alp": { "type": ["number", "null"], "description": "Labor's share against One Nation." },
+          "lnpVsOnp_lnp": { "type": ["number", "null"], "description": "Coalition's share against One Nation. Null where the house did not ask it (Roy Morgan does not)." }
+        }
+      }
+    },
+    "cyclePolls": {
+      "type": "object",
+      "description": "Past-cycle voting intention, keyed by the year of the election that ENDED the term. Frozen history; not hand-edited.",
+      "additionalProperties": { "type": "array", "items": { "type": "object" } }
+    },
+    "cycleApproval": {
+      "type": "object",
+      "description": "Past-cycle leader nets, keyed by the year the term BEGAN. Rows may name their metric; absent, metricRules decides.",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["date", "firm"],
+          "properties": {
+            "date": { "type": "string" }, "firm": { "type": "string" },
+            "pmNet": { "type": ["number", "null"] }, "oppNet": { "type": ["number", "null"] },
+            "metric": { "enum": ["fav", "approval"] }
+          }
+        }
+      }
+    }
+  }
+}

@@ -11,68 +11,25 @@ import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
-const SRC = fs.readFileSync(path.join(ROOT, "auspol-polling.html"), "utf8");
+const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
 const DATA_ASSET = path.join(HERE, "assets", "9f09dca2-bd46-49a8-8ae1-51847608cf92.js");
 
-/* ---- extraction helpers ------------------------------------------------ */
-function arrLit(name) {
-  const start = SRC.indexOf("const " + name + " = [");
-  if (start < 0) throw new Error("not found: " + name);
-  let i = SRC.indexOf("[", start), depth = 0, inStr = null, end = -1;
-  for (; i < SRC.length; i++) {
-    const c = SRC[i], prev = SRC[i - 1];
-    if (inStr) { if (c === inStr && prev !== "\\") inStr = null; continue; }
-    // skip // line comments — an apostrophe in one would otherwise open a
-    // phantom string and derail the bracket count
-    if (c === "/" && SRC[i + 1] === "/") { i = SRC.indexOf("\n", i); if (i < 0) break; continue; }
-    if (c === "'" || c === '"' || c === "`") { inStr = c; continue; }
-    if (c === "[") depth++;
-    else if (c === "]") { depth--; if (depth === 0) { end = i; break; } }
-  }
-  const text = SRC.slice(SRC.indexOf("[", start), end + 1);
-  return (0, eval)("(" + text + ")");
-}
-
-const jsonText = SRC.slice(
-  SRC.indexOf(">", SRC.indexOf('id="poll-data"')) + 1,
-  SRC.indexOf("</script>", SRC.indexOf('id="poll-data"'))
-);
-const DATA = JSON.parse(jsonText);
-const ELECTIONS = DATA.elections;
-const EVENTS = DATA.events;
-const POLLS = DATA.polls.filter((p) => !p.isElection);
-
-const ppmRaw = arrLit("ppmData");          // [date, firm, alb, opp, oppName, han]
-/* [date, firm, albNet, oppNet, oppName, hanNet, watNet, detail?]
-   The positional nets are the leader's PRIMARY metric at that firm (see
-   metricOf).  The optional 8th `detail` object carries everything else:
-     { alb|opp|han: {app,dis} }   approve/disapprove split for that primary net
-     { fav: {alb?,opp?,han?} }    the SECOND measure, when a firm publishes both
-   e.g. Resolve rates the majors on performance AND likeability in some waves —
-   those are different questions, so the second one is carried alongside rather
-   than replacing the first. */
-const apprRaw = arrLit("approvalData");
-const ppmH2 = arrLit("PPM_H2_RAW");        // ['date|firm', albShare, hansonShare]
-const altRaw = arrLit("altTppRaw");        // [date, firm, alpVsOnp_alp, lnpVsOnp_lnp]
-const FIELDS = ["date", "firm", "lnp", "alp", "grn", "onp", "oth", "tpp_lnp", "tpp_alp"];
-const toPoll = (r) => Object.fromEntries(r.map((v, i) => [FIELDS[i], v]));
-const cyclePolls = {
-  2013: arrLit("raw2013").map(toPoll), 2016: arrLit("raw2016").map(toPoll),
-  2019: arrLit("raw2019").map(toPoll), 2022: arrLit("raw2022").map(toPoll),
-  2025: arrLit("raw2025").map(toPoll),
-};
-const cycleAppr = {                        // [date, firm, pmNet, oppNet]
-  2010: arrLit("approval2010Raw"), 2013: arrLit("approval2013Raw"),
-  2016: arrLit("approval2016Raw"), 2019: arrLit("approval2019Raw"),
-  2022: arrLit("approvalAlb1Raw"),
-};
+/* ---- canonical dataset ------------------------------------------------
+   data/polls.json is the single source of truth. It used to be scraped out of
+   auspol-polling.html with a bracket-counting scanner and eval(); that file is
+   now a frozen historical artefact and nothing reads it. */
+const ELECTIONS = D.elections;
+const EVENTS = D.events;
+const POLLS = D.polls.filter((p) => !p.isElection);
+const ppm = D.ppm;
+const appr = D.approval.map((r) => ({ ...r, splits: r.detail ?? null }));
+const cyclePolls = D.cyclePolls;
+const cycleAppr = D.cycleApproval;
 
 /* ---- per-poll join maps ------------------------------------------------ */
 // 7th element (optional) = additional preferred-PM contests polled the same
 // wave (a two-way alongside a three-way, etc.) — different measures, kept whole
-const ppm = ppmRaw.map(([date, firm, alb, opp, oppName, han, extra]) => ({ date, firm, alb, opp, oppName, han, extra: extra || null }));
 // 8th element (optional) = published splits {app,dis} per leader
-const appr = apprRaw.map(([date, firm, alb, opp, oppName, han, wat, splits]) => ({ date, firm, alb, opp, oppName, han, splits: splits || null }));
 
 /* ---- approval vs favourability — different questions, never blended ----
    Mirrors the source file's LEADER_NET_METRIC (keyed by canonical firm):
@@ -84,14 +41,14 @@ const appr = apprRaw.map(([date, firm, alb, opp, oppName, han, wat, splits]) => 
 // likeability = favourability). Performance ≡ approval; likeability ≡ fav.
 // fav for every leader. Spectre added Jul 2026: its release labels the question
 // favourable / unfavourable, not approve / disapprove.
-const FAV_FIRMS = new Set(["redbridge", "demosau", "freshwater", "spectre strategy"]);
+const FAV_FIRMS = new Set(D.metricRules.favFirms);
 /* Per (firm|leaderKey), and DATE-BOUNDED — what a house asks about a leader can
    change mid-cycle. Resolve rated Hanson on likeability alone until it added
    her to its performance question in the 6–11 Jul 2026 wave ("included for the
    first time in this question", SMH 12 Jul). From that wave her positional net
    is performance, i.e. approval; before it, likeability. An unbounded override
    plotted her July and August performance nets on the favourability line. */
-const METRIC_OVERRIDE = { "resolve|han": { metric: "fav", before: "2026-07-06" } };
+const METRIC_OVERRIDE = D.metricRules.overrides;
 const canonFirm = (firm) => (firm || "").replace(/\s*\(.*\)\s*$/, "").replace(/\s*\/.*$/, "").trim().toLowerCase();
 const metricOf = (firm, leaderKey, date) => {
   const c = canonFirm(firm);
@@ -104,8 +61,8 @@ const metricOf = (firm, leaderKey, date) => {
 };
 const PPM_BY = new Map(ppm.map((p) => [p.date + "|" + p.firm, p]));
 const APPR_BY = new Map(appr.map((p) => [p.date + "|" + p.firm, p]));
-const H2_BY = new Map(ppmH2.map(([k, alb, han]) => [k, { alb, han }]));
-const ALT_BY = new Map(altRaw.map(([date, firm, ao, lo]) => [date + "|" + firm, { ao, lo }]));
+const H2_BY = new Map(D.ppmHeadToHead.map((r) => [r.date + "|" + r.firm, { alb: r.alb, han: r.han }]));
+const ALT_BY = new Map(D.altTpp.map((r) => [r.date + "|" + r.firm, { ao: r.alpVsOnp_alp, lo: r.lnpVsOnp_lnp }]));
 
 /* ---- calendar helpers -------------------------------------------------- */
 const MN = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -405,7 +362,7 @@ const leaderMonths = MONTHS.map((ym) => {
    eyeballed.)
    `unsure` is taken as the remainder so the three shares always total 100
    and the readout bar can't leave a gap. */
-const DIR = DATA.direction || [];
+const DIR = D.direction || [];
 const dirSample = (d) => {
   const p = POLL_BY_KEY.get(d.date + "|" + d.pollster);
   return Math.min((p && p.sample) || 1200, SAMPLE_CAP);
@@ -711,9 +668,9 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     // favourability net never enters them. Historical rows may name the metric
     // in a 5th element; otherwise the firm decides. Matters most for the 2022
     // cycle, where Freshwater and RedBridge report favourability.
-    const apprRows = as.filter(([, firm, , , metric]) => (metric || metricOf(firm, "alb")) !== "fav");
-    netPts = apprRows.map(([d, , pm]) => ({ m: monthsSince(d, c.eDate), v: pm }));
-    oppPts = apprRows.map(([d, , , op]) => ({ m: monthsSince(d, c.eDate), v: op }));
+    const apprRows = as.filter((r) => (r.metric || metricOf(r.firm, "alb")) !== "fav");
+    netPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.pmNet }));
+    oppPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.oppNet }));
   }
   const cap = c.current ? Math.max(1, Math.round(monthsSince(LATEST_ISO, c.eDate))) : 36;
   const prim = cycleSeries(primPts, c.ePrim, cap);
