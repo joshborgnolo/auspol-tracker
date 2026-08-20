@@ -731,6 +731,97 @@ const CYCLE_DEFS = CYC_META.map((c) => {
   };
 });
 
+/* ---- publication cadence, for "next expected polls" ---------------------
+   Two quantities per house, both measured rather than assumed:
+
+   cadence — the median gap between its own consecutive fieldwork-end dates
+     over the last 8 waves. The regulars are extremely regular: Roy Morgan's
+     last eight gaps are 7,7,7,7,7,7,7,7 and YouGov's are 14 except one 13.
+
+   lag — days from fieldwork close to publication, read out of the release URLs
+     that carry their own date (roymorgan.com/findings/...-august-17-2026,
+     essentialreport.com.au/reports/25-march-2026). 38 Roy Morgan releases give
+     a median of 1 day, range 0-2, which is where the global default comes from.
+     Houses whose URLs carry no date fall back to that default.
+
+   Only houses on a genuine cadence are published: at least 4 waves, a spread
+   small relative to the interval (MAD/median <= 0.35), and still active. A
+   house that has broken its own pattern is not "expected" and is left out
+   rather than given a made-up date. */
+const CAD_DEFAULT_LAG = 1;
+const CAD_MIN_POLLS = 4;
+const CAD_MAX_REL_MAD = 0.35;
+/* Two further gates, both learned the hard way from Fox & Hedgehog, which
+   sailed through the first version: 86 days silent on a 44-day cycle, and a
+   window of ±15 days — and it still sorted ABOVE metronomic Roy Morgan,
+   because a wide window can centre on an early date. So:
+     ACTIVE — a house must be inside 1.5 of its own intervals, not 2. Past
+       that it has stopped, and "expected" is the wrong word for it.
+     USABLE — the window must be tight relative to the interval. "Some time
+       in a 30-day range" is not a forecast, and printing one next to a house
+       that really is weekly devalues both. */
+const CAD_MAX_SILENT = 1.5;
+const CAD_MAX_REL_SPREAD = 0.30;
+const MONTH_NAMES_L = { january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+                        july: 7, august: 8, september: 9, october: 10, november: 11, december: 12 };
+const medianOf = (a) => {
+  const v = [...a].sort((x, y) => x - y);
+  if (!v.length) return null;
+  return v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;
+};
+
+function pubDateFromUrl(url) {
+  if (!url) return null;
+  let m = url.match(/([a-z]+)-(\d{1,2})-(\d{4})/i);                    // ...-august-17-2026
+  if (m && MONTH_NAMES_L[m[1].toLowerCase()])
+    return `${m[3]}-${String(MONTH_NAMES_L[m[1].toLowerCase()]).padStart(2, "0")}-${String(m[2]).padStart(2, "0")}`;
+  m = url.match(/\/(\d{1,2})-([a-z]+)-(\d{4})/i);                      // .../25-march-2026
+  if (m && MONTH_NAMES_L[m[2].toLowerCase()])
+    return `${m[3]}-${String(MONTH_NAMES_L[m[2].toLowerCase()]).padStart(2, "0")}-${String(m[1]).padStart(2, "0")}`;
+  return null;
+}
+
+const lagSamples = {};
+for (const p of POLLS) {
+  const pub = pubDateFromUrl(p.url);
+  if (!pub) continue;
+  const d = Math.round((Date.parse(pub) - Date.parse(p.date)) / 86400000);
+  // a shared or rolling release URL (Roy Morgan covers 3 waves in one post,
+  // Essential cites a report index) produces a nonsense gap — drop those
+  if (d < 0 || d > 30) continue;
+  (lagSamples[p.pollster] ||= []).push(d);
+}
+
+const byHouse = {};
+for (const p of POLLS) (byHouse[p.pollster] ||= []).push(p.date);
+const pollCadence = [];
+for (const [firm, dates] of Object.entries(byHouse)) {
+  dates.sort();
+  if (dates.length < CAD_MIN_POLLS) continue;
+  const gaps = dates.slice(1).map((d, i) => Math.round((Date.parse(d) - Date.parse(dates[i])) / 86400000)).slice(-8);
+  const cadence = medianOf(gaps);
+  if (!cadence || cadence <= 0) continue;
+  const mad = medianOf(gaps.map((g) => Math.abs(g - cadence)));
+  if (mad / cadence > CAD_MAX_REL_MAD) continue;                       // not on a pattern
+  const last = dates[dates.length - 1];
+  if ((Date.parse(LATEST_ISO) - Date.parse(last)) / 86400000 > CAD_MAX_SILENT * cadence) continue;
+  const spread = Math.max(1, Math.round(1.4826 * mad));
+  if (spread / cadence > CAD_MAX_REL_SPREAD) continue;                 // window too loose to be a forecast
+  const ls = lagSamples[firm] || [];
+  pollCadence.push({
+    pollster: firm,
+    last,
+    cadence,
+    // MAD -> robust SD, floored at 1 day: even Roy Morgan's perfect 7-day
+    // cadence still moves a day either side on publication
+    spread,
+    lag: ls.length >= 5 ? medianOf(ls) : CAD_DEFAULT_LAG,
+    lagMeasured: ls.length >= 5 ? ls.length : 0,
+    waves: dates.length,
+  });
+}
+pollCadence.sort((a, b) => a.cadence - b.cadence);
+
 /* ---- per-cycle source rows, for the Past-cycles download ----------------
    The charts are monthly aggregates; these are the individual readings behind
    them, so the aggregation can actually be checked. Keyed by CYCLE year (the
@@ -815,6 +906,10 @@ window.AUSPOL = (function () {
   /* Individual readings behind each past cycle's lines — powers the Past-cycles
      download, so the charts are checkable rather than just assertions. */
   const cycleSource = ${JSON.stringify(cycleSource)};
+  /* Measured publication rhythm per house — drives "Next expected polls".
+     The dates themselves are computed in the browser against the real current
+     date, so the panel stays honest as the page ages. */
+  const pollCadence = ${JSON.stringify(pollCadence)};
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,
@@ -834,7 +929,7 @@ window.AUSPOL = (function () {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, adjusted, houseEffects, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls,
     individualPolls, pollsterTable, latest, cycles, events,
-    cycleSource,
+    cycleSource, pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },
   };
 })();
@@ -857,6 +952,8 @@ console.log("individualPolls:", individualPolls.length, "| no 2PP:", individualP
 console.log("pollsterTable:", pollsterTable.length, "→", pollsterTable.map((r) => `${r.pollster} ${r.releasedLabel}${r.alp2pp == null ? " (no 2PP)" : ""}`).join(" | "));
 console.log("houseEffects (2PP):", Object.entries(houseEffect).sort((a, b) => b[1].v - a[1].v).map(([f, h]) => `${f} ${h.v > 0 ? "+" : ""}${h.v}(n=${h.n})`).join(", "));
 console.log("headline 2PP:", hlNow, "| 1mo ago:", hl1mo);
+console.log("pollCadence:", pollCadence.length, "houses on a pattern →",
+  pollCadence.map((c) => `${c.pollster} ${c.cadence}d±${c.spread} lag${c.lag}${c.lagMeasured ? "(n=" + c.lagMeasured + ")" : ""}`).join(" | "));
 console.log("events:", events.length, "(major:", events.filter((e) => e.major).length + ")");
 console.log("cycles:", CYCLE_DEFS.map((c) => `${c.year} m0..${c.months.at(-1)} tpp ${c.tpp[0]}→${c.tpp.at(-1)} prim ${c.primary[0]}→${c.primary.at(-1)} net ${c.net[0]}→${c.net.at(-1)} opp ${c.oppnet[0]}→${c.oppnet.at(-1)}`).join("\n        "));
 console.log("cycle ranges: tpp", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.tpp); return [Math.min(...v), Math.max(...v)]; })(), "| prim", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.primary); return [Math.min(...v), Math.max(...v)]; })(), "| net", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.net); return [Math.min(...v), Math.max(...v)]; })(), "| oppnet", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.oppnet); return [Math.min(...v), Math.max(...v)]; })());

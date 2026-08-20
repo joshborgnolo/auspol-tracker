@@ -481,6 +481,7 @@ function SnapshotView({ rangeId, setRangeId, showScatter }) {
       <LeadershipSection rangeId={rangeId} />
       <DirectionPanel rangeId={rangeId} />
       <PollsterTable />
+      <NextPollsPanel />
     </>
   );
 }
