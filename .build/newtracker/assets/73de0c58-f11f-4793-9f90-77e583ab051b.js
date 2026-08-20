@@ -79,6 +79,11 @@ function Header({ isDark, onToggleTheme }) {
   // Needle points UP from the pivot, so the sign flips vs the old hanging
   // pendulum: NEGATIVE rotation swings the tip left (Labor side).
   const needleDeg = pendSettled ? -pendDeg : 0;
+  /* The graduations settle with the needle rather than arriving already
+     correct: all four start at one neutral length, then some grow and some
+     shrink into their real share. Half the instrument animating while the
+     other half sat finished read as unfinished. */
+  const SETTLE_H = (MIN_H + MAX_H) / 2;
 
   // ---- integrated glyph geometry: one dial – party columns are radial
   // graduations on the arc, the 2PP needle swings from the same pivot ----
@@ -104,19 +109,25 @@ function Header({ isDark, onToggleTheme }) {
           <button className="wm-glyph" ref={glyphRef} onClick={openStory}
                   title="Wind the dial back through the term"
                   aria-label="Wind the dial back: replay the term on the masthead dial">
-            <svg className="wm-dial" viewBox="0 0 44 28" width="47" height="29.9" aria-hidden="true">
+            <svg className="wm-dial" viewBox="0 0 44 28" width="54" height="34.4" aria-hidden="true">
               <title>{glyphTitle + " · " + pendTitle}</title>
               {/* half-circle two-tone swing arc: Labor left, strongest challenger right */}
               <path d={arcPath(-90, 0)} className="wm-arc" stroke="var(--alp)"></path>
               <path d={arcPath(0, 90)} className="wm-arc" stroke={oppColor}></path>
-              {/* party columns as radial graduations, heights = primary vote */}
+              {/* Party columns as radial graduations, heights = primary vote.
+                  Each line is drawn at FULL length and revealed by its dash,
+                  because stroke-dasharray transitions everywhere while the SVG
+                  geometry attributes (x2/y2) do not. */}
               {glyph.map((p, i) => {
                 const a = BAR_ANGLES[i];
                 const inner = polar(a, GC.r + 2);
-                const outer = polar(a, GC.r + 2 + p.h);
+                const outerMax = polar(a, GC.r + 2 + MAX_H);
+                const shown = pendSettled ? p.h : SETTLE_H;
                 return (
-                  <line key={p.id} x1={inner.x} y1={inner.y} x2={outer.x} y2={outer.y}
-                        stroke={p.color} strokeWidth="3.4" strokeLinecap="butt"></line>
+                  <line key={p.id} className="wm-bar"
+                        x1={inner.x} y1={inner.y} x2={outerMax.x} y2={outerMax.y}
+                        stroke={p.color} strokeWidth="3.4" strokeLinecap="butt"
+                        style={{ strokeDasharray: shown.toFixed(2) + " " + MAX_H }}></line>
                 );
               })}
               {/* 2PP needle – swings toward the leader of the top contest.

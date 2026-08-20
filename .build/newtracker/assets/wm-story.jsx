@@ -31,6 +31,13 @@ const WM_NEEDLE_R = 8.6;        // needle length
 const WM_ENV_R = 10.75;         // swept-range arc: clear of the needle, inside the dial
 const WM_LABEL_R = 29;          // labels sit on one ring, like numerals on a bezel
 const WM_LABEL_SEP = 21;        // min degrees between labels before they push apart
+/* Slot 0 always holds the month's TALLEST bar, and at 54 degrees off vertical
+   that bar reaches far enough out that a reading centred on the ring sits on
+   top of it — the value line hangs below the ring point, i.e. straight into
+   the oncoming bar. Lift the outer readings clear. Applied by slot ANGLE, not
+   by party, so it stays symmetric as the bars re-rank, and eased by the square
+   of the angle so a label crossing slots doesn't jump. */
+const WM_OUTER_LIFT = 3.4;
 const WM_BAR_SEP = 11;          // min degrees between bars, so a swap passes rather than merges
 
 /* Push items apart along the dial until none are closer than `sep`. Used for
@@ -180,6 +187,7 @@ function DialFigure({ story, f, envelope, trail }) {
           and naming the party matters now that the bars reorder. */}
       {labelRing.map((b) => {
         const p = wmPolar(b.a, WM_LABEL_R);
+        p.y -= WM_OUTER_LIFT * Math.pow(Math.min(1, Math.abs(b.a) / 54), 2);
         return (
           <g key={b.id} className="dl-read">
             <text className="dl-read-party" x={p.x} y={p.y - 1.9} textAnchor="middle"

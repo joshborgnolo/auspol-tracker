@@ -382,7 +382,10 @@ body {
 .wm-arc { fill: none; stroke-width: 1.4; opacity: 0.5; }
 .wm-pivot { fill: var(--ink-3); }
 .wm-needle-g { transition: transform .75s cubic-bezier(.34,1.3,.5,1); }
-@media (prefers-reduced-motion: reduce) { .wm-needle-g { transition: none; } }
+/* settles alongside the needle; no overshoot, since a graduation running past
+   its own value and back reads as an error rather than as momentum */
+.wm-bar { transition: stroke-dasharray .75s cubic-bezier(.22,.9,.24,1); }
+@media (prefers-reduced-motion: reduce) { .wm-needle-g, .wm-bar { transition: none; } }
 .tagline {
   margin: 7px 0 0; font-family: var(--serif); font-style: italic;
   font-size: 15px; color: var(--ink-3); text-wrap: balance;
@@ -7608,6 +7611,13 @@ const WM_NEEDLE_R = 8.6; // needle length
 const WM_ENV_R = 10.75; // swept-range arc: clear of the needle, inside the dial
 const WM_LABEL_R = 29; // labels sit on one ring, like numerals on a bezel
 const WM_LABEL_SEP = 21; // min degrees between labels before they push apart
+/* Slot 0 always holds the month's TALLEST bar, and at 54 degrees off vertical
+   that bar reaches far enough out that a reading centred on the ring sits on
+   top of it — the value line hangs below the ring point, i.e. straight into
+   the oncoming bar. Lift the outer readings clear. Applied by slot ANGLE, not
+   by party, so it stays symmetric as the bars re-rank, and eased by the square
+   of the angle so a label crossing slots doesn't jump. */
+const WM_OUTER_LIFT = 3.4;
 const WM_BAR_SEP = 11; // min degrees between bars, so a swap passes rather than merges
 
 /* Push items apart along the dial until none are closer than `sep`. Used for
@@ -7788,6 +7798,7 @@ function DialFigure({
     });
   }), labelRing.map(b => {
     const p = wmPolar(b.a, WM_LABEL_R);
+    p.y -= WM_OUTER_LIFT * Math.pow(Math.min(1, Math.abs(b.a) / 54), 2);
     return /*#__PURE__*/React.createElement("g", {
       key: b.id,
       className: "dl-read"
@@ -8215,6 +8226,11 @@ function Header({
   // Needle points UP from the pivot, so the sign flips vs the old hanging
   // pendulum: NEGATIVE rotation swings the tip left (Labor side).
   const needleDeg = pendSettled ? -pendDeg : 0;
+  /* The graduations settle with the needle rather than arriving already
+     correct: all four start at one neutral length, then some grow and some
+     shrink into their real share. Half the instrument animating while the
+     other half sat finished read as unfinished. */
+  const SETTLE_H = (MIN_H + MAX_H) / 2;
 
   // ---- integrated glyph geometry: one dial – party columns are radial
   // graduations on the arc, the 2PP needle swings from the same pivot ----
@@ -8258,8 +8274,8 @@ function Header({
   }, /*#__PURE__*/React.createElement("svg", {
     className: "wm-dial",
     viewBox: "0 0 44 28",
-    width: "47",
-    height: "29.9",
+    width: "54",
+    height: "34.4",
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("title", null, glyphTitle + " · " + pendTitle), /*#__PURE__*/React.createElement("path", {
     d: arcPath(-90, 0),
@@ -8272,16 +8288,21 @@ function Header({
   }), glyph.map((p, i) => {
     const a = BAR_ANGLES[i];
     const inner = polar(a, GC.r + 2);
-    const outer = polar(a, GC.r + 2 + p.h);
+    const outerMax = polar(a, GC.r + 2 + MAX_H);
+    const shown = pendSettled ? p.h : SETTLE_H;
     return /*#__PURE__*/React.createElement("line", {
       key: p.id,
+      className: "wm-bar",
       x1: inner.x,
       y1: inner.y,
-      x2: outer.x,
-      y2: outer.y,
+      x2: outerMax.x,
+      y2: outerMax.y,
       stroke: p.color,
       strokeWidth: "3.4",
-      strokeLinecap: "butt"
+      strokeLinecap: "butt",
+      style: {
+        strokeDasharray: shown.toFixed(2) + " " + MAX_H
+      }
     });
   }), /*#__PURE__*/React.createElement("g", {
     transform: `translate(${GC.cx}, ${GC.cy})`

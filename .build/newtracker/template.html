@@ -543,7 +543,10 @@ body {
 .wm-arc { fill: none; stroke-width: 1.4; opacity: 0.5; }
 .wm-pivot { fill: var(--ink-3); }
 .wm-needle-g { transition: transform .75s cubic-bezier(.34,1.3,.5,1); }
-@media (prefers-reduced-motion: reduce) { .wm-needle-g { transition: none; } }
+/* settles alongside the needle; no overshoot, since a graduation running past
+   its own value and back reads as an error rather than as momentum */
+.wm-bar { transition: stroke-dasharray .75s cubic-bezier(.22,.9,.24,1); }
+@media (prefers-reduced-motion: reduce) { .wm-needle-g, .wm-bar { transition: none; } }
 .tagline {
   margin: 7px 0 0; font-family: var(--serif); font-style: italic;
   font-size: 15px; color: var(--ink-3); text-wrap: balance;
