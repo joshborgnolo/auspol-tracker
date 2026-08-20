@@ -167,15 +167,42 @@ function monthlyAdj(rows, he) {
   }).filter(Boolean);
 }
 // trailing recency-weighted nowcast (same window/half-life as the headline 2PP)
+/* Design effect for a live national sample — the same 1.6 the discord engine
+   uses for its sampling-error floor, so the two agree. */
+const HL_DEFF = 1.6;
+
+/* Weighted nowcast over the trailing window, WITH its uncertainty. Two
+   estimates, larger wins:
+     seSpread — how far the polls in the window disagree about the weighted
+                mean. Var(mean) = sigma^2/nEff with nEff = Kish's effective
+                count; the weighted DOF correction reduces it to
+                sqrt(wVar / (nEff - 1)).
+     seFloor  — what sampling error alone would give even if every house
+                agreed exactly. Carries the estimate when nEff <= 1.
+   seSpread already contains sampling noise, house residue and real movement
+   inside the window, so it is usually the binding one. Neither can see error
+   shared across the whole industry — no aggregate can measure that about
+   itself, which is why the copy says so rather than implying otherwise. */
 function nowcastAdj(rows, he, ref) {
-  let sw = 0, swx = 0, n = 0;
+  let sw = 0, sw2 = 0, swx = 0, n = 0;
+  const pts = [];
   for (const a of rows) {
     const d = ddays(ref, a.mid);
     if (d < 0 || d > HL_WINDOW) continue;
     const w = a.n * Math.exp(-LN2 * d / HL_HALF);
-    sw += w; swx += w * (a.x - heV(he, a.firm)); n++;
+    const x = a.x - heV(he, a.firm);
+    sw += w; sw2 += w * w; swx += w * x; n++;
+    pts.push({ w, x, n: a.n });
   }
-  return sw ? { v: r1(swx / sw), n } : null;
+  if (!sw) return null;
+  const mean = swx / sw;
+  const nEff = (sw * sw) / sw2;
+  const wVar = pts.reduce((t, p) => t + p.w * (p.x - mean) ** 2, 0) / sw;
+  const seSpread = nEff > 1 ? Math.sqrt(wVar / (nEff - 1)) : Infinity;
+  const pq = (mean / 100) * (1 - mean / 100) * 1e4;             // percentage points
+  const seFloor = Math.sqrt(pts.reduce((t, p) => t + p.w * p.w * HL_DEFF * pq / p.n, 0)) / sw;
+  const se = Math.max(Number.isFinite(seSpread) ? seSpread : 0, seFloor);
+  return { v: r1(mean), n, se: Math.round(se * 100) / 100, nEff: r1(nEff), ci95: r1(1.96 * se) };
 }
 
 const houseEffect = houseEffectsFor(tppRows);
@@ -583,14 +610,8 @@ const pollsterTable = [...perHouse.values()].map((p) => {
 
 /* ---- 7b. headline 2PP — trailing 21d, 7d half-life, debiased ----------- */
 const headlineTpp = (ref) => {
-  let sw = 0, swx = 0, n = 0;
-  for (const a of tppRows) {
-    const d = ddays(ref, a.mid);
-    if (d < 0 || d > HL_WINDOW) continue;
-    const w = a.n * Math.exp(-LN2 * d / HL_HALF);
-    sw += w; swx += w * (a.x - hOf(a.firm)); n++;
-  }
-  return sw ? { alp: r1(swx / sw), n } : null;
+  const r = nowcastAdj(tppRows, houseEffect, ref);
+  return r ? { alp: r.v, n: r.n, se: r.se, nEff: r.nEff, ci95: r.ci95 } : null;
 };
 const refNow = new Date(LATEST_ISO).getTime();
 const hlNow = headlineTpp(refNow) || { alp: agg2pp[agg2pp.length - 1].alp, n: 0 };
@@ -603,7 +624,13 @@ function altNowcast(s) {
   if (!s.adjusted) return null;                       // no house effects ⇒ too thin to nowcast
   const now = nowcastAdj(s.rows, s.he, refNow), prev = nowcastAdj(s.rows, s.he, refNow - 30 * 86400000);
   if (!now) return null;
-  return { a: now.v, b: r1(100 - now.v), n: now.n, aPrev: prev ? prev.v : null };
+  const out = { a: now.v, b: r1(100 - now.v), n: now.n, aPrev: prev ? prev.v : null, se: now.se, ci95: now.ci95, nEff: now.nEff };
+  if (prev) {
+    const seChg = Math.sqrt(now.se ** 2 + prev.se ** 2);
+    out.changeCi95 = r1(1.96 * seChg);
+    out.changeSig = Math.abs(now.v - prev.v) > 1.96 * seChg;
+  }
+  return out;
 }
 const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
 
@@ -613,6 +640,18 @@ const fmtDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return 
 const latest = {
   alp2pp: hlNow.alp, lnp2pp: r1(100 - hlNow.alp),
   alp2ppPrev: hl1mo ? hl1mo.alp : agg2pp[agg2pp.length - 2].alp,
+  /* Uncertainty on the headline, and on the month-on-month change. The change
+     is a difference of two independent windows (21d apart, no shared polls),
+     so its SE is the root-sum-square. changeSig says whether the movement
+     clears its own 95% interval — the arrow is qualified when it doesn't. */
+  alp2ppSe: hlNow.se ?? null,
+  alp2ppCi95: hlNow.ci95 ?? null,
+  alp2ppNEff: hlNow.nEff ?? null,
+  ...(hl1mo && hlNow.se != null ? (() => {
+    const seChg = Math.sqrt(hlNow.se ** 2 + hl1mo.se ** 2);
+    const chg = hlNow.alp - hl1mo.alp;
+    return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(chg) > 1.96 * seChg };
+  })() : {}),
   updated: fmtDate(LATEST_ISO), updatedISO: LATEST_ISO,
   nextElectionDue: "By May 2028", pollsTracked: individualPolls.length, housesTracked: houses.size,
   method: { kind: "weighted house-effect-adjusted mean", windowDays: HL_WINDOW, halfLifeDays: HL_HALF, shrinkK: SHRINK_K, nPolls: hlNow.n },

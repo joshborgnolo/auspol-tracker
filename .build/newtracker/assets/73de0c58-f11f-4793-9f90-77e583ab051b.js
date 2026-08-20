@@ -301,6 +301,18 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   for (let v = yDomain[0]; v <= yDomain[1]; v += 5) if (v > yDomain[0] && v < yDomain[1]) yTicks.push(v);
   const lead = +(latest.a - latest.b).toFixed(1);
   const leadName = lead >= 0 ? m.a.name : m.b.name;
+  /* Uncertainty for whichever matchup is showing. Every nowcast on this hero
+     is a weighted mean of a handful of polls, so none of them is exact — a
+     matchup that switched from an interval to a bare number would read as the
+     precise one. Null only where the series is too thin to nowcast at all,
+     in which case the readout is a plain monthly point and says so. */
+  const unc = m.real
+    ? (D.latest.alp2ppCi95 != null
+        ? { ci95: D.latest.alp2ppCi95, n: D.latest.method.nPolls, changeSig: D.latest.changeSig }
+        : null)
+    : (altL && altL.ci95 != null
+        ? { ci95: altL.ci95, n: altL.n, changeSig: altL.changeSig }
+        : null);
   const monthDelta = m.real ? +(D.latest.alp2pp - D.latest.alp2ppPrev).toFixed(1)
     : (altL && altL.aPrev != null) ? +(altL.a - altL.aPrev).toFixed(1)
     : +(latest.a - m.data[m.data.length - 2].a).toFixed(1);
@@ -330,10 +342,30 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
               <span className="ro-dot" style={{ background: m.b.color }}></span>
             </div>
           </div>
+          {/* An aggregate of five polls is not known to a tenth of a point, so
+              the interval sits with the number rather than in a footnote. It
+              covers how far the polls in the window disagree plus their
+              sampling error; it cannot cover bias shared across the industry,
+              which no aggregate can measure about itself. */}
+          {unc && (
+            <div className="hero-interval">
+              <span className="hi-range">± {unc.ci95.toFixed(1)} pts</span>
+              <span className="hi-note">
+                95% interval · {unc.n} poll{unc.n === 1 ? "" : "s"} in {D.latest.method.windowDays} days
+              </span>
+            </div>
+          )}
           <div className="hero-sub" key={"sub-" + matchup}>
             <span className="lead-tag">{leadName} leads by {Math.abs(lead).toFixed(1)} pts</span>
             <Delta value={monthDelta} suffix=" pt" small />
-            <span className="hero-sub-note">{(m.real || (altL && altL.aPrev != null)) ? "vs. one month ago" : "vs. previous reading"}</span>
+            <span className="hero-sub-note">
+              {(m.real || (altL && altL.aPrev != null)) ? "vs. one month ago" : "vs. previous reading"}
+              {/* A month-on-month move smaller than its own interval is not a
+                  finding. Say so next to the arrow, not three scrolls down. */}
+              {unc && unc.changeSig === false && (
+                <span className="hero-caveat"> · within the margin</span>
+              )}
+            </span>
           </div>
         </div>
         <div className="hero-controls">
@@ -401,6 +433,14 @@ function MethodNote() {
              same way on a primary share or an ALP-v-One Nation head-to-head — and a matchup too few
              houses ask is left as a plain monthly average rather than adjusted on guesswork.
              Pollsters that publish no 2PP contribute to the primary-vote and leadership series only.</p>
+          <p>The headline carries a 95% interval, built from how far the polls in the window disagree
+             with each other and from their own sampling error, whichever is larger. It currently runs
+             to about ±{(D.latest.alp2ppCi95 ?? 0).toFixed(1)} points on a
+             {" "}{D.latest.method.windowDays}-day window holding {D.latest.method.nPolls} polls
+             (effective sample of {D.latest.alp2ppNEff} after weighting). What it cannot cover is error
+             shared across the whole industry — if every house is leaning the same way, no aggregate of
+             them can detect it. Treat a month-on-month move smaller than that interval as noise; the
+             page labels one when it happens.</p>
         </div>
         <div>
           <h3 className="method-h">Reading the charts</h3>

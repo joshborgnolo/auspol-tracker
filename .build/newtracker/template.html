@@ -632,6 +632,15 @@ body {
 .hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hero-sub-note { font-size: 13px; color: var(--ink-faint); white-space: nowrap; }
+/* The interval sits directly under the headline pair, quieter than the numbers
+   but above the lead/delta line — it qualifies the figure, so it reads before
+   the movement does. */
+.hero-interval { display: flex; align-items: baseline; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hi-note { font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
+/* Movement smaller than its own interval — stated, not colour-coded, so it
+   reads as a qualification rather than a warning. */
+.hero-caveat { color: var(--ink-faint); font-style: italic; }
 .hero-hypo {
   font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
   color: var(--onp); border: 1px solid var(--onp); border-radius: 999px; padding: 3px 9px;

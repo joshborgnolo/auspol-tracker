@@ -845,7 +845,9 @@ function AllPollsView() {
 
   const total = rows.length;
   const clearAll = () => { setQ(""); setSel(new Set()); setLead("all"); setMeasure("lnp"); setRange("all"); setTagSel(new Set()); };
-  const anyFilter = ql || sel.size || lead !== "all" || range !== "all" || tagSel.size;
+  // Boolean(): the chain ends on a Set size, so with no filters this was the
+  // NUMBER 0 — and {0 && <button/>} renders a literal 0 next to the poll count.
+  const anyFilter = Boolean(ql || sel.size || lead !== "all" || range !== "all" || tagSel.size);
 
   // ---- CSV export of the CURRENTLY filtered + sorted rows -----------------
   // A flat, analysis-friendly schema (one row per poll), independent of the
