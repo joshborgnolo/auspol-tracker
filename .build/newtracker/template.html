@@ -841,6 +841,9 @@ body {
   paint-order: stroke; stroke: var(--chart-bg);
   stroke-linejoin: round; stroke-linecap: round;
 }
+/* invisible, generous hover target over the hairline rule */
+.evt-hit { stroke: transparent; stroke-width: 9; }
+.evt { cursor: default; }
 .evt:hover .evt-line { opacity: 0.9; }
 .evt:hover .evt-label { fill: var(--ink); }
 .hover-marker {
@@ -889,6 +892,18 @@ body {
 .tip-swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
 .tip-label { color: var(--ink-3); }
 .tip-val { margin-left: auto; font-weight: 700; color: var(--ink); padding-left: 10px; }
+/* event readout: the date sits under the name in the serif, the description
+   below it as prose — an annotation is a sentence, not a table of figures */
+.tip-evt { max-width: 240px; min-width: 0; }
+.tip-date {
+  font-family: var(--sans); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint);
+  margin-top: 2px;
+}
+.tip-desc {
+  margin-top: 6px; font-size: 12px; line-height: 1.45; color: var(--ink-2);
+  text-wrap: pretty;
+}
 .tip-sub { font-size: 11px; color: var(--ink-faint); margin-top: 5px; }
 
 /* ---------- docked 2PP score (lives in the sticky tab bar) ---------- */

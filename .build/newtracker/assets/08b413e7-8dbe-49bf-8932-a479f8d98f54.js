@@ -31,6 +31,16 @@ function textWidth(str, size, weight) {
 // viewBox geometry (scales to container width, aspect preserved)
 const VB = { W: 1000 };
 
+const EVT_MONTHS = ["January", "February", "March", "April", "May", "June",
+                    "July", "August", "September", "October", "November", "December"];
+/* "14 December 2025" — an annotation on a chart of months deserves its exact
+   day spelled out, not the ISO string that sits in the data. */
+function fmtEventDate(iso) {
+  if (!iso) return "";
+  const [y, m, d] = iso.split("-").map(Number);
+  return d + " " + EVT_MONTHS[m - 1] + " " + y;
+}
+
 function makeScales({ height, xDomain, yDomain, pad }) {
   const W = VB.W, H = height;
   const [x0, x1] = xDomain, [y0, y1] = yDomain;
@@ -95,6 +105,7 @@ function TrendChart(props) {
   const { sx, sy, W, H } = makeScales({ height, xDomain, yDomain, pad });
   const [hover, setHover] = useState(null);     // {index, clientX}
   const [dot, setDot] = useState(null);         // hovered scatter point
+  const [evt, setEvt] = useState(null);         // hovered key event {e, x, y}
   const ref = useRef(null);
   const clipId = "clip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
 
@@ -132,7 +143,7 @@ function TrendChart(props) {
   };
 
   const handleLeave = () => {
-    setHover(null); setDot(null); onHoverIndex && onHoverIndex(null);
+    setHover(null); setDot(null); setEvt(null); onHoverIndex && onHoverIndex(null);
   };
 
   // clamp a possibly-stale hover index (range/matchup can shrink the spine
@@ -140,9 +151,17 @@ function TrendChart(props) {
   const hi = hover ? Math.min(hover.index, spinePts.length - 1) : null;
   const hoverX = hi != null && spinePts[hi] ? sx(spinePts[hi].x) : null;
 
-  // tooltip content
+  // tooltip content. Precedence: a hovered EVENT, then a scatter dot, then the
+  // guide. Without the first case the svg's own onMouseMove kept firing while
+  // the pointer sat on an event label, so the month readout covered the very
+  // annotation being pointed at.
   let tip = null;
-  if (dot) {
+  if (evt) {
+    tip = {
+      left: (evt.x / W) * 100, top: (evt.y / H) * 100,
+      title: evt.e.label, date: fmtEventDate(evt.e.date), desc: evt.e.desc, rows: [],
+    };
+  } else if (dot) {
     tip = {
       left: (sx(dot.x) / W) * 100, top: (sy(dot.y) / H) * 100,
       title: dot.meta.pollster, rows: [
@@ -281,19 +300,28 @@ function TrendChart(props) {
 
           return placed.map((p, i) => {
             const { e, ex, w, row, x, flip } = p;
-            const title = <title>{e.label + (e.desc ? " – " + e.desc : "")}</title>;
+            /* aria-label rather than <title>: a <title> child also produces the
+               browser's own delayed tooltip, which would surface a second,
+               unstyled copy on top of ours. */
+            const aria = e.label + (e.desc ? " – " + e.desc : "") + " · " + fmtEventDate(e.date);
+            const on = (px, py) => ({
+              onMouseEnter: () => setEvt({ e, x: px, y: py }),
+              onMouseLeave: () => setEvt(null),
+            });
             // no room for a label: the reference line still earns its place
             if (row == null) return (
-              <g key={"ev" + i} className="evt">
-                {title}
+              <g key={"ev" + i} className="evt" role="img" aria-label={aria} {...on(ex, pad.t + 4)}>
+                {/* a 1px dashed rule is a poor hover target; an invisible wide
+                    line over it makes the annotation reachable */}
+                <line x1={ex} x2={ex} y1={pad.t + 4} y2={H - pad.b} className="evt-hit" />
                 <line x1={ex} x2={ex} y1={pad.t + 4} y2={H - pad.b} className="evt-line" />
               </g>
             );
             const yRow = pad.t + 3 + row * ROW_H;
             const connTo = flip ? x + w + LEAD * 0.4 : x - LEAD * 0.4;
             return (
-              <g key={"ev" + i} className="evt">
-                {title}
+              <g key={"ev" + i} className="evt" role="img" aria-label={aria} {...on(ex, yRow)}>
+                <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-hit" />
                 <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-line" />
                 {/* elbow: reads as a lead-in rule at the label's baseline */}
                 <line x1={ex} x2={connTo} y1={yRow} y2={yRow} className="evt-conn" />
@@ -310,7 +338,7 @@ function TrendChart(props) {
           <line x1={0} x2={0} y1={pad.t} y2={H - pad.b} className="guide"
                 style={{
                   transform: `translateX(${(hoverX != null ? hoverX : sx(spinePts[spinePts.length - 1].x)).toFixed(2)}px)`,
-                  opacity: hoverX != null && !dot ? 0.7 : 0,
+                  opacity: hoverX != null && !dot && !evt ? 0.7 : 0,
                 }} />
         )}
         {/* scatter */}
@@ -335,7 +363,7 @@ function TrendChart(props) {
         {/* hover markers – one per series, kept mounted so they glide along the line */}
         {series.map((s) => {
           if (s.opacity === 0) return null;
-          const spx = hi != null && !dot && spinePts[hi] ? spinePts[hi].x : null;
+          const spx = hi != null && !dot && !evt && spinePts[hi] ? spinePts[hi].x : null;
           const p = spx != null ? ptAtX(s, spx) : null;
           const last = s.points[s.points.length - 1];
           const at = p || last;
@@ -398,8 +426,10 @@ function TrendChart(props) {
       </svg>
 
       {tip && (
-        <div className={"tip " + (dot ? "tip-dot" : "tip-guide")} style={{ left: tip.left + "%", top: tip.top + "%" }}>
+        <div className={"tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide")}
+             style={{ left: tip.left + "%", top: tip.top + "%" }}>
           {tip.title && <div className="tip-title">{tip.title}</div>}
+          {tip.date && <div className="tip-date">{tip.date}</div>}
           {tip.rows.map((r, i) => (
             <div className="tip-row" key={i}>
               {r.color && <span className="tip-swatch" style={{ background: r.color }}></span>}
@@ -408,6 +438,7 @@ function TrendChart(props) {
               <span className="tip-val">{r.value}</span>
             </div>
           ))}
+          {tip.desc && <div className="tip-desc">{tip.desc}</div>}
           {tip.sub && <div className="tip-sub">{tip.sub}</div>}
         </div>
       )}
