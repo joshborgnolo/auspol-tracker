@@ -1135,6 +1135,8 @@ function HouseFx({ he, firm, pos, neg, unit = "pp" }) {
    ==================================================================== */
 const DAY_MS = 86400000;
 const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const NP_HORIZON_DAYS = 28;   // one month of schedule
+const NP_MAX_ROWS = 10;       // a busy fortnight shouldn't run off the page
 
 // name the rhythm in the words people actually use for it
 function cadenceLabel(d) {
@@ -1154,14 +1156,35 @@ function NextPollsPanel() {
   const today = new Date(); today.setHours(0, 0, 0, 0);
   const t0 = today.getTime();
 
-  const rows = cad.map((c) => {
+  /* A four-week horizon rather than a fixed count: it answers "what lands this
+     month" and sizes itself to how busy the field actually is. A weekly house
+     appears four times, a monthly one once — which is the honest shape of the
+     schedule, not a repetition bug. */
+  const rows = [];
+  cad.forEach((c) => {
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
     let release = field + c.lag * DAY_MS;
     let missed = 0;
     // page older than the prediction — roll on, counting the waves we've missed
     while (release < t0 && missed < 60) { field += c.cadence * DAY_MS; release = field + c.lag * DAY_MS; missed++; }
-    return { ...c, field, release, missed, inDays: Math.round((release - t0) / DAY_MS) };
-  }).sort((a, b) => a.release - b.release).slice(0, 3);
+    for (let i = 0; release <= t0 + NP_HORIZON_DAYS * DAY_MS && i < 12; i++) {
+      rows.push({
+        ...c, field, release,
+        missed: i === 0 ? missed : 0,
+        ahead: i,
+        /* Each further wave is one more interval of drift, so the window widens
+           as sqrt(waves) — the second Essential is a looser bet than the first.
+           A house on a fixed weekly schedule barely moves; an erratic one
+           visibly fans out, which is the point. */
+        spread: Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))),
+        inDays: Math.round((release - t0) / DAY_MS),
+      });
+      field += c.cadence * DAY_MS;
+      release = field + c.lag * DAY_MS;
+    }
+  });
+  rows.sort((a, b) => a.release - b.release);
+  rows.length = Math.min(rows.length, NP_MAX_ROWS);
 
   const behind = rows.some((r) => r.missed > 0);
   const fmt = (ms) => {
@@ -1175,13 +1198,13 @@ function NextPollsPanel() {
       <div className="np-head">
         <h2 className="card-title">Next expected polls</h2>
         <p className="card-sub">
-          Estimated from each pollster’s own recent rhythm — not announced schedules.
+          The next four weeks, estimated from each pollster’s own recent rhythm — not announced schedules.
         </p>
       </div>
 
       <ol className="np-list">
         {rows.map((r) => (
-          <li className="np-row" key={r.pollster}>
+          <li className="np-row" key={r.pollster + "-" + r.release}>
             <span className="np-firm">{r.pollster}</span>
             <span className="np-date">
               {fmt(r.release)}
@@ -1189,7 +1212,10 @@ function NextPollsPanel() {
             </span>
             <span className="np-when">{when(r.inDays)}</span>
             <span className="np-cadence">
-              {cadenceLabel(r.cadence)} · {r.waves} waves
+              {cadenceLabel(r.cadence)}
+              {/* the wave count is the evidence for the estimate — worth stating
+                  once per house, not four times for a weekly one */}
+              {r.ahead === 0 && <> · {r.waves} waves</>}
               {r.missed > 0 && <span className="np-missed"> · {r.missed} since this data</span>}
             </span>
           </li>
@@ -1203,7 +1229,8 @@ function NextPollsPanel() {
         read from release URLs that carry their own date — 38 Roy Morgan releases put it at a
         median of one day after fieldwork closes, which is the default applied to houses whose
         URLs don’t say. Only houses currently holding a pattern appear; one that has broken its
-        own rhythm is left out rather than given an invented date.
+        own rhythm is left out rather than given an invented date. Waves further out carry a wider
+        window, since each one adds an interval of drift to the estimate.
         {behind && " Some dates have already passed — those waves are out but not yet in this archive."}
       </p>
     </section>

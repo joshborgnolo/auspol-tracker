@@ -5075,6 +5075,8 @@ function HouseFx({
    ==================================================================== */
 const DAY_MS = 86400000;
 const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+const NP_HORIZON_DAYS = 28; // one month of schedule
+const NP_MAX_ROWS = 10; // a busy fortnight shouldn't run off the page
 
 // name the rhythm in the words people actually use for it
 function cadenceLabel(d) {
@@ -5094,7 +5096,13 @@ function NextPollsPanel() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const t0 = today.getTime();
-  const rows = cad.map(c => {
+
+  /* A four-week horizon rather than a fixed count: it answers "what lands this
+     month" and sizes itself to how busy the field actually is. A weekly house
+     appears four times, a monthly one once — which is the honest shape of the
+     schedule, not a repetition bug. */
+  const rows = [];
+  cad.forEach(c => {
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
     let release = field + c.lag * DAY_MS;
     let missed = 0;
@@ -5104,14 +5112,26 @@ function NextPollsPanel() {
       release = field + c.lag * DAY_MS;
       missed++;
     }
-    return {
-      ...c,
-      field,
-      release,
-      missed,
-      inDays: Math.round((release - t0) / DAY_MS)
-    };
-  }).sort((a, b) => a.release - b.release).slice(0, 3);
+    for (let i = 0; release <= t0 + NP_HORIZON_DAYS * DAY_MS && i < 12; i++) {
+      rows.push({
+        ...c,
+        field,
+        release,
+        missed: i === 0 ? missed : 0,
+        ahead: i,
+        /* Each further wave is one more interval of drift, so the window widens
+           as sqrt(waves) — the second Essential is a looser bet than the first.
+           A house on a fixed weekly schedule barely moves; an erratic one
+           visibly fans out, which is the point. */
+        spread: Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))),
+        inDays: Math.round((release - t0) / DAY_MS)
+      });
+      field += c.cadence * DAY_MS;
+      release = field + c.lag * DAY_MS;
+    }
+  });
+  rows.sort((a, b) => a.release - b.release);
+  rows.length = Math.min(rows.length, NP_MAX_ROWS);
   const behind = rows.some(r => r.missed > 0);
   const fmt = ms => {
     const d = new Date(ms);
@@ -5126,11 +5146,11 @@ function NextPollsPanel() {
     className: "card-title"
   }, "Next expected polls"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, "Estimated from each pollster\u2019s own recent rhythm \u2014 not announced schedules.")), /*#__PURE__*/React.createElement("ol", {
+  }, "The next four weeks, estimated from each pollster\u2019s own recent rhythm \u2014 not announced schedules.")), /*#__PURE__*/React.createElement("ol", {
     className: "np-list"
   }, rows.map(r => /*#__PURE__*/React.createElement("li", {
     className: "np-row",
-    key: r.pollster
+    key: r.pollster + "-" + r.release
   }, /*#__PURE__*/React.createElement("span", {
     className: "np-firm"
   }, r.pollster), /*#__PURE__*/React.createElement("span", {
@@ -5141,11 +5161,11 @@ function NextPollsPanel() {
     className: "np-when"
   }, when(r.inDays)), /*#__PURE__*/React.createElement("span", {
     className: "np-cadence"
-  }, cadenceLabel(r.cadence), " \xB7 ", r.waves, " waves", r.missed > 0 && /*#__PURE__*/React.createElement("span", {
+  }, cadenceLabel(r.cadence), r.ahead === 0 && /*#__PURE__*/React.createElement(React.Fragment, null, " \xB7 ", r.waves, " waves"), r.missed > 0 && /*#__PURE__*/React.createElement("span", {
     className: "np-missed"
   }, " \xB7 ", r.missed, " since this data"))))), /*#__PURE__*/React.createElement("p", {
     className: "np-foot"
-  }, "Each estimate is the house\u2019s median gap between fieldwork-end dates over its last eight waves, plus the time it takes to publish. The \xB1 is how much that gap actually moves, so a metronomic house shows a tight window and an erratic one a loose one. Publication lag is read from release URLs that carry their own date \u2014 38 Roy Morgan releases put it at a median of one day after fieldwork closes, which is the default applied to houses whose URLs don\u2019t say. Only houses currently holding a pattern appear; one that has broken its own rhythm is left out rather than given an invented date.", behind && " Some dates have already passed — those waves are out but not yet in this archive."));
+  }, "Each estimate is the house\u2019s median gap between fieldwork-end dates over its last eight waves, plus the time it takes to publish. The \xB1 is how much that gap actually moves, so a metronomic house shows a tight window and an erratic one a loose one. Publication lag is read from release URLs that carry their own date \u2014 38 Roy Morgan releases put it at a median of one day after fieldwork closes, which is the default applied to houses whose URLs don\u2019t say. Only houses currently holding a pattern appear; one that has broken its own rhythm is left out rather than given an invented date. Waves further out carry a wider window, since each one adds an interval of drift to the estimate.", behind && " Some dates have already passed — those waves are out but not yet in this archive."));
 }
 function PollsterTable() {
   const {
