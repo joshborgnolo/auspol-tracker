@@ -433,14 +433,13 @@ function MethodNote() {
              same way on a primary share or an ALP-v-One Nation head-to-head — and a matchup too few
              houses ask is left as a plain monthly average rather than adjusted on guesswork.
              Pollsters that publish no 2PP contribute to the primary-vote and leadership series only.</p>
-          <p>The headline carries a 95% interval, built from how far the polls in the window disagree
-             with each other and from their own sampling error, whichever is larger. It currently runs
-             to about ±{(D.latest.alp2ppCi95 ?? 0).toFixed(1)} points on a
-             {" "}{D.latest.method.windowDays}-day window holding {D.latest.method.nPolls} polls
-             (effective sample of {D.latest.alp2ppNEff} after weighting). What it cannot cover is error
-             shared across the whole industry — if every house is leaning the same way, no aggregate of
-             them can detect it. Treat a month-on-month move smaller than that interval as noise; the
-             page labels one when it happens.</p>
+          <p>The headline carries a 95% interval, taken as the greater of the spread among polls in
+             the window and their sampling error: currently about
+             {" "}±{(D.latest.alp2ppCi95 ?? 0).toFixed(1)} points, on {D.latest.method.nPolls} polls
+             across {D.latest.method.windowDays} days (effective sample {D.latest.alp2ppNEff} after
+             weighting). It does not cover error common to the whole industry: an aggregate cannot
+             detect a lean its constituent polls share. Month-on-month movement smaller than the
+             interval is marked as such.</p>
         </div>
         <div>
           <h3 className="method-h">Reading the charts</h3>

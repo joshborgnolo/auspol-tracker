@@ -413,11 +413,11 @@ function PastCyclesView() {
           <div className="cyc-export">
             <span className="cyc-export-label">Download</span>
             <button className="ap-export" onClick={exportSeries}
-              title="The monthly values plotted on these four charts, one row per cycle per month">
+              title="The monthly values plotted on these charts, one row per cycle per month">
               <DownloadIcon />Chart series
             </button>
             <button className="ap-export" onClick={exportSource}
-              title="Every individual poll behind these lines — the readings the monthly averages are built from">
+              title="The individual polls the monthly averages are built from">
               <DownloadIcon />Source polls
             </button>
           </div>
@@ -434,8 +434,7 @@ function PastCyclesView() {
       </div>
 
       <p className="cyc-foot">
-        Every figure on these charts is downloadable above — the plotted monthly series, and the
-        individual polls each line is averaged from.{" "}
+        The plotted series and the individual polls behind it are both downloadable above.{" "}
         Past cycles run the full ~3-year term to the next election; the current cycle stops at the
         latest reading. {mode === "chg"
           ? "Lines show movement relative to each party’s own election result."

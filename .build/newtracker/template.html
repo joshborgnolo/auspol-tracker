@@ -694,6 +694,11 @@ body {
 }
 /* key-event markers (wide charts only — gated in TrendChart by measured px) */
 .evt-line { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 2 5; opacity: 0.5; }
+/* The elbow that ties a label to its own line. Solid where the reference line
+   is dashed, so it reads as a connector rather than more grid — it is the only
+   thing making a displaced label legible in a tight cluster. */
+.evt-conn { stroke: var(--ink-faint); stroke-width: 1; opacity: 0.55; }
+.evt:hover .evt-conn { opacity: 0.95; }
 .evt-label {
   font-family: var(--sans); font-weight: 600; fill: var(--ink-3);
   paint-order: stroke; stroke: var(--chart-bg);

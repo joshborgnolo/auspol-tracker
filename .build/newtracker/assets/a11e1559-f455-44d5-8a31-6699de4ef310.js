@@ -181,6 +181,10 @@ function PrimaryVotePanel({ rangeId }) {
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={chartSeries} spine={series(pts, "alp")}
         scatter={primaryScatter}
+        /* The same majors the hero carries. They arguably matter more here:
+           the One Nation surge is this chart's whole story, and Joyce joining
+           One Nation and Farrer are two of its causes. */
+        events={majorEvents()}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={(v) => v.toFixed(1)}
       />
@@ -196,6 +200,11 @@ function PrimaryVotePanel({ rangeId }) {
 // opposition-leader handover: Angus Taylor replaced Sussan Ley on 12 Feb 2026.
 // The opp-leader line splices the two, so both leadership charts mark the point
 // (x = decimal year, same convention as the data's event markers).
+/* Pull one event out of the dataset by date rather than restating its
+   coordinates here, so a chart marker can't drift from the event rail. */
+const eventOn = (iso) => (window.AP.D.events || []).find((e) => e.date === iso) || null;
+const majorEvents = () => (window.AP.D.events || []).filter((e) => e.major);
+
 const OPP_HANDOVER = (() => {
   const doy = (Date.UTC(2026, 1, 12) - Date.UTC(2026, 0, 1)) / 86400000;
   return { x: 2026 + doy / 365, short: "Ley → Taylor",
@@ -636,6 +645,12 @@ function DirectionPanel({ rangeId }) {
         ]}
         spine={series(pts, "right")}
         scatter={dirScatter}
+        /* Bondi alone, not the full major set. Direction is a mood measure and
+           this is the one event in the cycle that plausibly moved it on its own;
+           hanging the Coalition splits and the Budget off it too would imply a
+           reading of each that the data doesn't support. A single marker also
+           renders at any chart width, unlike a busy set. */
+        events={[eventOn("2025-12-14")].filter(Boolean)}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={dirFmt}
       />
@@ -1198,7 +1213,7 @@ function NextPollsPanel() {
       <div className="np-head">
         <h2 className="card-title">Next expected polls</h2>
         <p className="card-sub">
-          The next four weeks, estimated from each pollster’s own recent rhythm — not announced schedules.
+          Projected from each house’s recent publication intervals.
         </p>
       </div>
 
@@ -1223,15 +1238,12 @@ function NextPollsPanel() {
       </ol>
 
       <p className="np-foot">
-        Each estimate is the house’s median gap between fieldwork-end dates over its last eight
-        waves, plus the time it takes to publish. The ± is how much that gap actually moves, so a
-        metronomic house shows a tight window and an erratic one a loose one. Publication lag is
-        read from release URLs that carry their own date — 38 Roy Morgan releases put it at a
-        median of one day after fieldwork closes, which is the default applied to houses whose
-        URLs don’t say. Only houses currently holding a pattern appear; one that has broken its
-        own rhythm is left out rather than given an invented date. Waves further out carry a wider
-        window, since each one adds an interval of drift to the estimate.
-        {behind && " Some dates have already passed — those waves are out but not yet in this archive."}
+        Each date is the house’s median interval between fieldwork-end dates across its last
+        eight waves, plus its publication lag. The ± is the observed variation in that interval,
+        widening for waves further out. Lag is read from release URLs that carry a date: 38 Roy
+        Morgan releases give a median of one day. Houses not currently holding a pattern are
+        omitted. These are estimates, not announced dates.
+        {behind && " Where a date has passed, that wave is out but not yet in this archive."}
       </p>
     </section>
   );

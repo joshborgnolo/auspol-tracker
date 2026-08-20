@@ -1,4 +1,31 @@
 /* auspol — SVG chart toolkit (no libraries) */
+
+/* Text measurement for label layout. The old estimate was
+   chars * refUnits * 0.72, which over-reserved by 51-87% on the real event
+   strings — enough that labels with room to spare were being dropped as
+   collisions. Canvas measureText with the page's own font gets within a unit
+   or two. Measured at 100px and scaled, so rounding at ~8px doesn't bite.
+   Memoised: the same dozen strings are re-measured on every render. */
+const _measCtx = typeof document !== "undefined" && document.createElement("canvas").getContext("2d");
+const _measCache = new Map();
+let _measFam = null;
+function textWidth(str, size, weight) {
+  weight = weight || 600;
+  const key = weight + "|" + size.toFixed(2) + "|" + str;
+  const hit = _measCache.get(key);
+  if (hit !== undefined) return hit;
+  let w;
+  if (_measCtx) {
+    if (_measFam == null)
+      _measFam = getComputedStyle(document.body).getPropertyValue("--sans").trim() || "system-ui, sans-serif";
+    _measCtx.font = weight + " 100px " + _measFam;
+    w = (_measCtx.measureText(str).width / 100) * size;
+  } else {
+    w = str.length * size * 0.55;   // headless fallback
+  }
+  _measCache.set(key, w);
+  return w;
+}
 /* bare hooks (useState, useRef, …) come from the window aliases set in utils.js */
 
 // viewBox geometry (scales to container width, aspect preserved)
@@ -192,33 +219,88 @@ function TrendChart(props) {
         {xTicks.map((t, i) => (
           <text key={"x" + i} x={sx(t.x)} y={H - 10} className="axis-label x" style={{ fontSize: axisUnits }} textAnchor="middle">{t.label}</text>
         ))}
-        {/* key events — a busy set (the hero's history) shows only when the
-            chart is genuinely wide ON SCREEN (measured px, so phones and narrow
-            columns stay uncluttered); one or two markers (e.g. the leadership
-            handover) are never clutter, so they show at any width. Labels
-            alternate two rows, and a colliding label is dropped (line stays). */}
+        {/* Key events. A busy set (the hero's history) shows only when the chart
+            is genuinely wide ON SCREEN (measured px, so phones and narrow columns
+            stay uncluttered); one or two markers are never clutter and show at
+            any width.
+
+            Clustered events were the hard part: Farrer and the 2026 Budget sit
+            5.6 units apart in a 1000-unit viewBox while their labels are ~60
+            wide, so no arrangement puts each label above its own line. Three
+            things fix it together:
+              - labels are DISPLACED along their row rather than dropped, so a
+                crowded one slides right until it fits;
+              - every label is tied to its line by an elbow — the line rises to
+                the label's baseline and runs across to meet the text, so a
+                displaced label still reads unambiguously as belonging to its
+                own line;
+              - rows are packed first-fit rather than by index parity, which
+                previously sent alternate events to alternate rows regardless of
+                whether they were anywhere near each other. */}
         {(events.length <= 2 || cw >= 640) && (() => {
-          const evs = events.filter((e) => e.x >= xDomain[0] && e.x <= xDomain[1]);
-          const rowEnd = [-Infinity, -Infinity];
-          return evs.map((e, i) => {
+          const evs = events
+            .filter((e) => e.x >= xDomain[0] && e.x <= xDomain[1])
+            .sort((a, b) => a.x - b.x);
+          const fsz = refUnits * 0.92;
+          const ROWS = 3;
+          const ROW_H = refUnits * 1.4;
+          const LEAD = refUnits * 0.55;   // shortest elbow, line to text
+          const SEP = refUnits * 0.85;    // clear air between labels in a row
+          const rowEnd = new Array(ROWS).fill(-Infinity);
+          const rightEdge = W - pad.r;
+
+          const placed = evs.map((e) => {
             const ex = sx(e.x);
-            const row = i % 2;
-            const wEst = e.short.length * refUnits * 0.72 + 14;
-            const flip = ex > W - pad.r - wEst;
-            const start = flip ? ex - wEst : ex;
-            const showLabel = start >= rowEnd[row];
-            if (showLabel) rowEnd[row] = start + wEst;
+            const w = textWidth(e.short, fsz);
+            /* Pick the row where the label sits CLOSEST to its own line, not
+               simply the first row it fits in. First-fit looks right until you
+               realise displacement always succeeds in row 0 — so row 0 took
+               every label and the connectors stretched to 76 units, dragging
+               "2026 Budget" three-quarters of the way across its neighbour.
+               Choosing by displacement instead sends the second member of a
+               cluster down a row, where it sits directly over its own line.
+               ROW_PEN keeps things in the top row unless dropping down buys a
+               real reduction, so we don't scatter over three rows to save a
+               unit or two. */
+            const ROW_PEN = refUnits * 0.3;
+            let best = null;
+            for (let r = 0; r < ROWS; r++) {
+              const x = Math.max(ex + LEAD, rowEnd[r] + SEP);
+              if (x + w > rightEdge) continue;
+              const cost = (x - (ex + LEAD)) + r * ROW_PEN;
+              if (best === null || cost < best.cost) best = { r, x, cost };
+            }
+            if (best) { rowEnd[best.r] = best.x + w; return { e, ex, w, row: best.r, x: best.x, flip: false }; }
+            // out of room on the right — hang it to the left of its own line
+            for (let r = 0; r < ROWS; r++) {
+              const x = ex - LEAD - w;
+              if (x >= rowEnd[r] + SEP) { rowEnd[r] = ex; return { e, ex, w, row: r, x, flip: true }; }
+            }
+            return { e, ex, w, row: null };   // genuinely nowhere to put it
+          });
+
+          return placed.map((p, i) => {
+            const { e, ex, w, row, x, flip } = p;
+            const title = <title>{e.label + (e.desc ? " — " + e.desc : "")}</title>;
+            // no room for a label: the reference line still earns its place
+            if (row == null) return (
+              <g key={"ev" + i} className="evt">
+                {title}
+                <line x1={ex} x2={ex} y1={pad.t + 4} y2={H - pad.b} className="evt-line" />
+              </g>
+            );
+            const yRow = pad.t + 3 + row * ROW_H;
+            const connTo = flip ? x + w + LEAD * 0.4 : x - LEAD * 0.4;
             return (
               <g key={"ev" + i} className="evt">
-                <title>{e.label + (e.desc ? " — " + e.desc : "")}</title>
-                <line x1={ex} x2={ex} y1={pad.t + 8 + row * 14} y2={H - pad.b} className="evt-line" />
-                {showLabel && (
-                  <text x={ex + (flip ? -5 : 5)} y={pad.t + 4 + row * 14}
-                        className="evt-label" textAnchor={flip ? "end" : "start"}
-                        style={{ fontSize: refUnits * 0.92, strokeWidth: refUnits * 0.34 }}>
-                    {e.short}
-                  </text>
-                )}
+                {title}
+                <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-line" />
+                {/* elbow: reads as a lead-in rule at the label's baseline */}
+                <line x1={ex} x2={connTo} y1={yRow} y2={yRow} className="evt-conn" />
+                <text x={x} y={yRow} className="evt-label" textAnchor="start"
+                      style={{ fontSize: fsz, strokeWidth: refUnits * 0.34 }}>
+                  {e.short}
+                </text>
               </g>
             );
           });
