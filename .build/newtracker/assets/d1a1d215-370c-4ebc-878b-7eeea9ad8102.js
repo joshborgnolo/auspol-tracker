@@ -1008,7 +1008,7 @@ function AllPollsView() {
             {" "}{(() => {  // span computed from the data, so it stays honest as polls are added
               const f = D.individualPolls[0], l = D.individualPolls[D.individualPolls.length - 1];
               const lab = (p) => { const [y, m] = p.ym.split("-").map(Number); return D.monthNameFull(m) + " " + y; };
-              return lab(f) + " – " + lab(l);
+              return lab(f) + "–" + lab(l);   // range: tight en dash, never spaced
             })()}
           </p>
         </div>

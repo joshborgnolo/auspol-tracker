@@ -7167,7 +7167,7 @@ function AllPollsView() {
       const [y, m] = p.ym.split("-").map(Number);
       return D.monthNameFull(m) + " " + y;
     };
-    return lab(f) + " – " + lab(l);
+    return lab(f) + "–" + lab(l); // range: tight en dash, never spaced
   })())), /*#__PURE__*/React.createElement(TextToggle, {
     value: facet,
     onChange: onFacet,
