@@ -104,7 +104,7 @@ function Header({ isDark, onToggleTheme }) {
           <button className="wm-glyph" ref={glyphRef} onClick={openStory}
                   title="Wind the dial back through the term"
                   aria-label="Wind the dial back: replay the term on the masthead dial">
-            <svg className="wm-dial" viewBox="0 0 44 28" width="40" height="25.5" aria-hidden="true">
+            <svg className="wm-dial" viewBox="0 0 44 28" width="47" height="29.9" aria-hidden="true">
               <title>{glyphTitle + " · " + pendTitle}</title>
               {/* half-circle two-tone swing arc: Labor left, strongest challenger right */}
               <path d={arcPath(-90, 0)} className="wm-arc" stroke="var(--alp)"></path>
