@@ -1,4 +1,4 @@
-/* auspol — header, hero, page assembly */
+/* auspol tracker — header, hero, page assembly */
 
 // relative freshness for the "last updated" stamp
 function freshness(iso) {
@@ -131,7 +131,7 @@ function Header({ isDark, onToggleTheme }) {
               <circle cx={GC.cx} cy={GC.cy} r="1.7" className="wm-pivot"></circle>
             </svg>
           </button>
-          <span className="wm-sr">— Australian federal polling tracker</span>
+          <span className="wm-sr">— Australian federal polling</span>
         </h1>
         <p className="tagline">Aggregated opinion polling for the 2028 Australian federal election</p>
         <div className="head-meta-compact" aria-hidden="true">
@@ -453,7 +453,7 @@ function MethodNote() {
       <div className="method-grid">
         <div>
           <h3 className="method-h">About this tracker</h3>
-          <p>auspol pools every published national voting-intention poll since the May 2025 federal
+          <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
              election. The two-party and primary-vote aggregates are weighted means: recent and
              larger-sample polls count for more, and each pollster’s figure is adjusted for its own
              house lean against the cross-house consensus. House leans are measured separately for

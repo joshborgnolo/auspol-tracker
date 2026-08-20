@@ -1,4 +1,4 @@
-/* auspol — REAL Australian federal polling data.
+/* auspol tracker — REAL Australian federal polling data.
    Generated from data/polls.json by .build/newtracker/gen-data.mjs — do
    not edit by hand.  Spine: 2025 federal election (3 May 2025) → 16 August 2026.
    2PP aggregate: sample- & recency-weighted, house-effect-adjusted mean.

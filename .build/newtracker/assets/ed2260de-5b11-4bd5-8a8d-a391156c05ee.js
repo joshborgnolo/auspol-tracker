@@ -1,4 +1,4 @@
-/* auspol — shared helpers */
+/* auspol tracker — shared helpers */
 
 /* React hook aliases — assigned to window HERE (this plain script loads before
    every component script) so no JSX file depends on another's load order for

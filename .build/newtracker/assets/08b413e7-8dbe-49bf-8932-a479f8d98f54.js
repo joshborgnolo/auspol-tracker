@@ -1,4 +1,4 @@
-/* auspol — SVG chart toolkit (no libraries) */
+/* auspol tracker — SVG chart toolkit (no libraries) */
 
 /* Text measurement for label layout. The old estimate was
    chars * refUnits * 0.72, which over-reserved by 51-87% on the real event

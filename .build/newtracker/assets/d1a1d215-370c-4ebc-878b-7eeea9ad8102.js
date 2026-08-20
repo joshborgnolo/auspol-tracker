@@ -1,4 +1,4 @@
-/* auspol — tabbed views: Tabs nav (with docked 2PP score), Past cycles overlay, All polls archive */
+/* auspol tracker — tabbed views: Tabs nav (with docked 2PP score), Past cycles overlay, All polls archive */
 
 // ---- CSV export plumbing, shared by the archive and the past-cycles download ----
 const csvCell = (v) => {
@@ -393,9 +393,9 @@ function PastCyclesView() {
   const showAll = () => setHidden(new Set());
 
   const exportSeries = () => downloadCsv(
-    `auspol-cycles-series-${D.latest.updatedISO}.csv`, cycleSeriesRows(cycles));
+    `auspol-tracker-cycles-series-${D.latest.updatedISO}.csv`, cycleSeriesRows(cycles));
   const exportSource = () => downloadCsv(
-    `auspol-cycles-source-polls-${D.latest.updatedISO}.csv`, cycleSourceRows(cycles, D));
+    `auspol-tracker-cycles-source-polls-${D.latest.updatedISO}.csv`, cycleSourceRows(cycles, D));
 
   return (
     <div className="view view-cycles">
@@ -995,7 +995,7 @@ function AllPollsView() {
     ["Contains", (p) => p.tags.join(" ")],
   ];
   const exportCsv = () => downloadCsv(
-    `auspol-polls-${D.latest.updatedISO}.csv`,
+    `auspol-tracker-polls-${D.latest.updatedISO}.csv`,
     [CSV_COLS.map((c) => c[0]), ...sorted.map((p) => CSV_COLS.map((c) => c[1](p)))]);
 
   return (

@@ -1,4 +1,4 @@
-/* auspol — lower panels: primary vote, leaders, pollster table */
+/* auspol tracker — lower panels: primary vote, leaders, pollster table */
 
 // ---- small shared UI ------------------------------------------------
 function Segmented({ options, value, onChange, size }) {

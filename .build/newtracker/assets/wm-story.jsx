@@ -1,4 +1,4 @@
-/* auspol — "wind the dial back": the masthead mark, replayed across the term.
+/* auspol tracker — "wind the dial back": the masthead mark, replayed across the term.
 
    The mark is not decoration. Its graduation bars are the primary-vote
    aggregate, its needle is two-party preferred, and the right half of its arc
@@ -359,7 +359,7 @@ function DialStory({ originRect, onClose }) {
   };
 
   return (
-    <div className="dl-backdrop" role="dialog" aria-modal="true" aria-label="The auspol dial, replayed across the term"
+    <div className="dl-backdrop" role="dialog" aria-modal="true" aria-label="The auspol tracker dial, replayed across the term"
          onMouseDown={(e) => { if (e.target === e.currentTarget) onClose(); }}>
       <div className="dl-shell" ref={shellRef}>
         <button className="dl-close" onClick={onClose} ref={closeRef} aria-label="Close">×</button>
