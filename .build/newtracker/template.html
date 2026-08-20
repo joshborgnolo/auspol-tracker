@@ -460,16 +460,21 @@ body {
 .dl-svg { width: min(420px, 94%); height: auto; overflow: visible; display: block; }
 .dl-arc { fill: none; stroke-width: 1.4; opacity: 0.5; transition: none; }
 .dl-bar { stroke-width: 3.4; stroke-linecap: butt; }
-.dl-bar-val {
-  font-family: var(--sans); font-size: 2.6px; font-weight: 700; fill: var(--ink-faint);
-  letter-spacing: 0.02em;
+.dl-read-party {
+  font-family: var(--sans); font-size: 2.15px; font-weight: 800;
+  letter-spacing: 0.10em; opacity: 0.95;
+}
+.dl-read-val {
+  font-family: var(--sans); font-size: 3.3px; font-weight: 700; fill: var(--ink-2);
+  font-variant-numeric: tabular-nums;
 }
 .dl-needle { stroke-width: 1.7; stroke-linecap: round; }
-.dl-pivot { fill: var(--ink-3); }
+/* a bearing, not a blob — the solid grey disc sat heavier than the needle */
+.dl-pivot { fill: var(--surface); stroke: var(--ink-3); stroke-width: 0.7; }
 .dl-trail { stroke: var(--ink-3); stroke-width: 1.1; stroke-linecap: round; }
 /* everywhere the needle has been so far — the term's swing, accumulated */
-.dl-envelope { fill: none; stroke: var(--ink-3); stroke-width: 0.9; opacity: 0.32; }
-.dl-envelope line { stroke: var(--ink-3); stroke-width: 0.9; }
+.dl-envelope { fill: none; stroke: var(--ink-faint); stroke-width: 0.75; opacity: 0.5; }
+.dl-envelope line { stroke: var(--ink-faint); stroke-width: 0.75; }
 /* the event line above the dial — fixed height so it never shifts layout */
 .dl-event {
   height: 20px; display: flex; align-items: center; justify-content: center;

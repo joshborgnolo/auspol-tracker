@@ -27,6 +27,29 @@ const WM_MAX_PCT = 40;          // absolute domain for bar heights
 const WM_BAR_MAX = 13;          // units of bar at 40%
 const WM_SWING_PTS = 12;        // margin that deflects the needle fully
 const WM_SWING_DEG = 34;
+const WM_NEEDLE_R = 8.6;        // needle length
+const WM_ENV_R = 10.75;         // swept-range arc: clear of the needle, inside the dial
+const WM_LABEL_R = 29;          // labels sit on one ring, like numerals on a bezel
+const WM_LABEL_SEP = 21;        // min degrees between labels before they push apart
+const WM_BAR_SEP = 11;          // min degrees between bars, so a swap passes rather than merges
+
+/* Push items apart along the dial until none are closer than `sep`. Used for
+   both bars and their labels; at rest the four slots are 36 degrees apart so
+   it engages only while two are trading places. */
+function separate(items, sep) {
+  const a = items.map((o) => ({ ...o })).sort((x, y) => x.a - y.a);
+  for (let pass = 0; pass < 3; pass++) {
+    for (let k = 0; k < a.length - 1; k++) {
+      const gap = a[k + 1].a - a[k].a;
+      if (gap < sep) {
+        const push = (sep - gap) / 2;
+        a[k].a -= push;
+        a[k + 1].a += push;
+      }
+    }
+  }
+  return a;
+}
 
 const wmPolar = (deg, r) => ({
   x: WM_GC.cx + Math.sin((deg * Math.PI) / 180) * r,
@@ -36,6 +59,7 @@ const wmArc = (d1, d2, r) => {
   const a = wmPolar(d1, r), b = wmPolar(d2, r);
   return `M ${a.x.toFixed(2)} ${a.y.toFixed(2)} A ${r} ${r} 0 0 1 ${b.x.toFixed(2)} ${b.y.toFixed(2)}`;
 };
+const PARTY_ABBR = { alp: "ALP", lnp: "L/NP", grn: "GRN", onp: "ON" };
 const wmDeg = (margin) =>
   -Math.max(-1, Math.min(1, margin / WM_SWING_PTS)) * WM_SWING_DEG;   // negative = Labor side
 const lerp = (a, b, t) => a + (b - a) * t;
@@ -99,6 +123,14 @@ function DialFigure({ story, f, envelope, trail }) {
     };
   }).filter(Boolean);
 
+  /* Two bars mid-overtake land on the same angle and the front one simply
+     hides the back one — the swap's whole point vanishes at the moment it
+     happens. Holding them a few degrees apart lets them slide visibly past
+     each other. Only the transition angle is eased here; both heights stay
+     exactly what the month reported. */
+  const barRing = separate(bars.map((b) => ({ ...b, a: b.deg })), WM_BAR_SEP);
+  const labelRing = separate(barRing, WM_LABEL_SEP);
+
   return (
     <g className="dl-fig">
       {/* envelope of everywhere the needle has been */}
@@ -106,12 +138,17 @@ function DialFigure({ story, f, envelope, trail }) {
           rather than a wedge from the pivot: it reads as an arc the needle has
           swept, which is what it is, and survives being faint. End ticks mark
           the extremes of the term. */}
-      {envelope && envelope.max > envelope.min + 0.4 && (
+      {/* Everywhere the needle has been. This used to sit at radius 8.6 — the
+          needle's exact length — so the arc hid under the needle and its end
+          ticks read as a stray grey hook crossing the sweep. It now occupies
+          its own band between the needle tip and the dial face, where it reads
+          as a range rather than debris. */}
+      {envelope && envelope.max > envelope.min + 2 && (
         <g className="dl-envelope">
-          <path d={wmArc(envelope.min, envelope.max, 8.6)} />
+          <path d={wmArc(envelope.min, envelope.max, WM_ENV_R)} />
           {[envelope.min, envelope.max].map((d, k) => (
-            <line key={k} x1={wmPolar(d, 7.6).x} y1={wmPolar(d, 7.6).y}
-                  x2={wmPolar(d, 9.6).x} y2={wmPolar(d, 9.6).y} />
+            <line key={k} x1={wmPolar(d, WM_ENV_R - 0.85).x} y1={wmPolar(d, WM_ENV_R - 0.85).y}
+                  x2={wmPolar(d, WM_ENV_R + 0.85).x} y2={wmPolar(d, WM_ENV_R + 0.85).y} />
           ))}
         </g>
       )}
@@ -125,19 +162,29 @@ function DialFigure({ story, f, envelope, trail }) {
               style={{ opacity: oppMix }} />
       )}
 
-      {/* graduation bars — primary vote, absolute scale, fixed slots */}
-      {bars.map((b) => {
-        if (b.v == null) return null;
+      {/* graduation bars — primary vote, absolute scale */}
+      {barRing.map((b) => {
         const h = Math.max(0.6, (b.v / WM_MAX_PCT) * WM_BAR_MAX);
-        const inner = wmPolar(b.deg, WM_GC.r + 2);
-        const outer = wmPolar(b.deg, WM_GC.r + 2 + h);
+        const inner = wmPolar(b.a, WM_GC.r + 2);
+        const outer = wmPolar(b.a, WM_GC.r + 2 + h);
         return (
-          <g key={b.id}>
-            <line className="dl-bar" x1={inner.x} y1={inner.y} x2={outer.x} y2={outer.y}
-                  stroke={`var(--${b.id})`} />
-            <text className="dl-bar-val" x={wmPolar(b.deg, WM_GC.r + 4.4 + h).x}
-                  y={wmPolar(b.deg, WM_GC.r + 4.4 + h).y}
-                  textAnchor="middle" dominantBaseline="middle">{b.v.toFixed(1)}</text>
+          <line key={b.id} className="dl-bar" x1={inner.x} y1={inner.y} x2={outer.x} y2={outer.y}
+                stroke={`var(--${b.id})`} />
+        );
+      })}
+
+      {/* Readings on a single ring, like numerals on a bezel. Previously each
+          label hung a fixed gap beyond its own bar tip, so their radii ranged
+          over seven units — they scattered, and horizontal text beside a steep
+          bar landed on top of it. A common ring keeps them level and clear,
+          and naming the party matters now that the bars reorder. */}
+      {labelRing.map((b) => {
+        const p = wmPolar(b.a, WM_LABEL_R);
+        return (
+          <g key={b.id} className="dl-read">
+            <text className="dl-read-party" x={p.x} y={p.y - 1.9} textAnchor="middle"
+                  fill={`var(--${b.id})`}>{PARTY_ABBR[b.id]}</text>
+            <text className="dl-read-val" x={p.x} y={p.y + 1.9} textAnchor="middle">{b.v.toFixed(1)}</text>
           </g>
         );
       })}
@@ -222,7 +269,7 @@ function DialStory({ originRect, onClose }) {
   // ---- the replay ----
   useEffect(() => {
     if (!playing) return;
-    const per = Math.max(190, Math.min(430, 5000 / Math.max(1, n - 1)));
+    const per = Math.max(285, Math.min(645, 7500 / Math.max(1, n - 1)));
     /* Accumulate elapsed time from clamped frame deltas rather than reading the
        wall clock. requestAnimationFrame stops in a hidden tab, so a wall-clock
        timeline would bank all that stalled time and snap the needle to the end
