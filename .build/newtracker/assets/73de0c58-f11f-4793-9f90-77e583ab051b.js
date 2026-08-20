@@ -129,7 +129,7 @@ function Header({ isDark, onToggleTheme }) {
       <div className="head-right">
         <div className="head-meta">
           <div className="meta-item meta-updated">
-            <span className="meta-k">Last updated</span>
+            <span className="meta-k">Last poll</span>
             <span className="meta-v">
               <span className={"fresh-dot " + fresh.state} aria-hidden="true"></span>
               {D.latest.updated}
@@ -213,10 +213,23 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
     },
   };
 
-  // The REAL published measure (ALP v L/NP) always leads and is the default;
-  // the modelled head-to-heads follow, strongest challenger first. Matchups
-  // whose source series is too thin to draw (< 2 points) are dropped.
-  const hasData = (id) => MATCHUPS[id].data.length >= 2;
+  /* The REAL published measure (ALP v L/NP) always leads and is the default;
+     the modelled head-to-heads follow, strongest challenger first.
+
+     A modelled matchup has to earn its place: enough months to show a trend
+     rather than a few scattered points, and a recent enough last reading to be
+     describing the present. Two points cleared the old bar, which let L/NP v ON
+     offer a tab built on four months ending in May — a stale line with no
+     nowcast behind the headline. Both tests read off the data, so the matchup
+     reappears by itself once the houses start asking it again. */
+  const MIN_ALT_MONTHS = 6;
+  const MAX_ALT_STALE = 0.26;                      // ~3 months, in decimal years
+  const spineEnd = D.agg2pp[D.agg2pp.length - 1].x;
+  const hasData = (id) => {
+    const d = MATCHUPS[id].data;
+    if (MATCHUPS[id].real) return d.length >= 2;
+    return d.length >= MIN_ALT_MONTHS && spineEnd - d[d.length - 1].x <= MAX_ALT_STALE;
+  };
   const oppVsLabor = (id) => {
     const last = MATCHUPS[id].data[MATCHUPS[id].data.length - 1];
     return last.b; // opponent's share in the Labor head-to-head
