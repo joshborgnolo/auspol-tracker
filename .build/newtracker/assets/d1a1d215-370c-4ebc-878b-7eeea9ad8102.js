@@ -1,5 +1,30 @@
 /* auspol — tabbed views: Tabs nav (with docked 2PP score), Past cycles overlay, All polls archive */
 
+// ---- CSV export plumbing, shared by the archive and the past-cycles download ----
+const csvCell = (v) => {
+  if (v == null) return "";
+  const s = String(v);
+  return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+};
+// rows = array of arrays, first row the header. Leading BOM so Excel opens
+// UTF-8 without mangling the en dashes in fieldwork labels.
+const csvText = (rows) => "\uFEFF" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
+const downloadCsv = (filename, rows) => {
+  const blob = new Blob([csvText(rows)], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+};
+const DownloadIcon = () => (
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+       strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <path d="M12 3v12M12 15l-4-4M12 15l4-4M4 19h16"></path>
+  </svg>
+);
+
 // ====================================================================
 // TabScore — compact 2PP readout docked at the right of the tab bar.
 // Appears once the bar pins to the viewport top, on EVERY tab — the
@@ -284,6 +309,73 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll }) {
   );
 }
 
+/* ---- Past-cycles downloads --------------------------------------------
+   The charts here are monthly aggregates of polls taken up to sixteen years
+   ago, and until now nothing on the page let you see the readings underneath
+   them or check the alignment. Two files rather than one, because they answer
+   different questions: the series is what is plotted, the source rows are
+   where it came from.
+
+   Both are keyed by CYCLE year — the election that STARTED the term, which is
+   what the legend calls each line. That matters: internally the voting-intention
+   rows are stored under the election that ENDED the term. Exporting the storage
+   keys would misalign the two halves by a full parliament. */
+function cycleSeriesRows(cycles) {
+  const rows = [[
+    "cycle", "government", "prime_minister", "opposition_leader", "is_current",
+    "months_since_election", "govt_primary_pct", "govt_2pp_pct",
+    "pm_net_approval", "opp_leader_net_approval",
+  ]];
+  cycles.forEach((c) => {
+    const r = c.raw;
+    r.months.forEach((m, i) => rows.push([
+      c.year, c.gov === "alp" ? "Labor" : "Coalition", c.pm, c.oppLead, c.current ? "yes" : "no",
+      m, r.primary[i], r.tpp[i], r.net[i], r.oppnet[i],
+    ]));
+  });
+  return rows;
+}
+
+function cycleSourceRows(cycles, D) {
+  const rows = [[
+    "cycle", "series", "date", "months_since_election", "pollster",
+    "primary_alp", "primary_lnp", "primary_grn", "primary_onp", "primary_oth",
+    "tpp_alp", "tpp_lnp", "pm_net", "opp_leader_net", "leader_metric",
+  ]];
+  const byYear = new Map(cycles.map((c) => [c.year, c]));
+  Object.entries(D.cycleSource || {}).forEach(([year, src]) => {
+    const c = byYear.get(Number(year));
+    if (!c) return;
+    src.polls.forEach((p) => rows.push([
+      year, "voting_intention", p.date, p.m, p.firm,
+      p.alp, p.lnp, p.grn, p.onp, p.oth, p.tpp_alp, p.tpp_lnp, null, null, null,
+    ]));
+    src.approval.forEach((a) => rows.push([
+      year, "leader_rating", a.date, a.m, a.firm,
+      null, null, null, null, null, null, null, a.pmNet, a.oppNet,
+      a.metric === "fav" ? "net favourability" : "net approval",
+    ]));
+  });
+  /* The current cycle's source rows are individualPolls, already in the payload
+     — read them from there rather than shipping a second copy. */
+  const cur = cycles.find((c) => c.current);
+  if (cur) {
+    const eDate = Date.parse(cur.eDate);
+    const mo = (iso) => Math.round(((Date.parse(iso) - eDate) / 86400000 / 30.436875) * 10) / 10;
+    D.individualPolls.forEach((p) => {
+      rows.push([cur.year, "voting_intention", p.released, mo(p.released), p.pollster,
+        p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null]);
+      const a = p.appr;
+      if (a && (a.albNet != null || a.taylorNet != null))
+        rows.push([cur.year, "leader_rating", p.released, mo(p.released), p.pollster,
+          null, null, null, null, null, null, null, a.albNet, a.taylorNet,
+          a.metric === "fav" ? "net favourability" : "net approval"]);
+    });
+  }
+  return rows.slice(0, 1).concat(
+    rows.slice(1).sort((x, y) => (x[0] - y[0]) || String(x[2]).localeCompare(String(y[2]))));
+}
+
 function PastCyclesView() {
   const { D } = window.AP;
   const cycles = D.cycles;
@@ -300,6 +392,11 @@ function PastCyclesView() {
   });
   const showAll = () => setHidden(new Set());
 
+  const exportSeries = () => downloadCsv(
+    `auspol-cycles-series-${D.latest.updatedISO}.csv`, cycleSeriesRows(cycles));
+  const exportSource = () => downloadCsv(
+    `auspol-cycles-source-polls-${D.latest.updatedISO}.csv`, cycleSourceRows(cycles, D));
+
   return (
     <div className="view view-cycles">
       <div className="view-intro">
@@ -313,6 +410,17 @@ function PastCyclesView() {
         <div className="cyc-controls">
           <TextToggle value={mode} onChange={setMode} ariaLabel="Measure"
             options={[{ id: "abs", label: "Absolute level" }, { id: "chg", label: "Change since election" }]} />
+          <div className="cyc-export">
+            <span className="cyc-export-label">Download</span>
+            <button className="ap-export" onClick={exportSeries}
+              title="The monthly values plotted on these four charts, one row per cycle per month">
+              <DownloadIcon />Chart series
+            </button>
+            <button className="ap-export" onClick={exportSource}
+              title="Every individual poll behind these lines — the readings the monthly averages are built from">
+              <DownloadIcon />Source polls
+            </button>
+          </div>
         </div>
       </div>
 
@@ -326,6 +434,8 @@ function PastCyclesView() {
       </div>
 
       <p className="cyc-foot">
+        Every figure on these charts is downloadable above — the plotted monthly series, and the
+        individual polls each line is averaged from.{" "}
         Past cycles run the full ~3-year term to the next election; the current cycle stops at the
         latest reading. {mode === "chg"
           ? "Lines show movement relative to each party’s own election result."
@@ -853,11 +963,6 @@ function AllPollsView() {
   // A flat, analysis-friendly schema (one row per poll), independent of the
   // active facet — so the download always carries every measure, for exactly
   // the rows the filters left on screen, in the order they're shown.
-  const csvCell = (v) => {
-    if (v == null) return "";
-    const s = String(v);
-    return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
-  };
   const CSV_COLS = [
     ["Pollster", (p) => p.pollster],
     ["Fieldwork", (p) => p.field],
@@ -890,17 +995,9 @@ function AllPollsView() {
     ["Direction net", (p) => (p.dir ? p.dir.net : "")],
     ["Contains", (p) => p.tags.join(" ")],
   ];
-  const exportCsv = () => {
-    const head = CSV_COLS.map((c) => csvCell(c[0])).join(",");
-    const body = sorted.map((p) => CSV_COLS.map((c) => csvCell(c[1](p))).join(",")).join("\r\n");
-    const blob = new Blob(["﻿" + head + "\r\n" + body], { type: "text/csv;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `auspol-polls-${D.latest.updatedISO}.csv`;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-  };
+  const exportCsv = () => downloadCsv(
+    `auspol-polls-${D.latest.updatedISO}.csv`,
+    [CSV_COLS.map((c) => c[0]), ...sorted.map((p) => CSV_COLS.map((c) => c[1](p)))]);
 
   return (
     <div className="view view-allpolls">

@@ -726,13 +726,41 @@ const CYCLE_DEFS = CYC_META.map((c) => {
   });
   return {
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: !!c.current,
+    eDate: c.eDate,
     months, primary: prim.vals, tpp: tpp.vals, net: align(net), oppnet: align(opp),
   };
 });
 
+/* ---- per-cycle source rows, for the Past-cycles download ----------------
+   The charts are monthly aggregates; these are the individual readings behind
+   them, so the aggregation can actually be checked. Keyed by CYCLE year (the
+   election that STARTED the term, i.e. what the legend calls it) — cyclePolls
+   is stored under the election that ENDED the term and cycleApproval under the
+   one that began it, and exporting those raw keys would silently misalign the
+   two halves. The current cycle is omitted: its source rows are individualPolls,
+   already in the payload, and the export reads them from there. */
+const cycleSource = {};
+for (const c of CYC_META) {
+  if (c.current) continue;
+  const mo = (d) => Math.round(monthsSince(d, c.eDate) * 10) / 10;
+  cycleSource[c.year] = {
+    polls: (cyclePolls[c.src] || []).map((p) => ({
+      date: p.date, firm: p.firm, m: mo(p.date),
+      alp: p.alp ?? null, lnp: p.lnp ?? null, grn: p.grn ?? null,
+      onp: p.onp ?? null, oth: p.oth ?? null,
+      tpp_alp: p.tpp_alp ?? null, tpp_lnp: p.tpp_lnp ?? null,
+    })),
+    approval: (cycleAppr[c.appr] || []).map((r) => ({
+      date: r.date, firm: r.firm, m: mo(r.date),
+      pmNet: r.pmNet ?? null, oppNet: r.oppNet ?? null,
+      metric: r.metric || metricOf(r.firm, "alb"),
+    })),
+  };
+}
+
 /* ---- emit the dataset asset -------------------------------------------- */
 const out = `/* auspol — REAL Australian federal polling data.
-   Generated from auspol-polling.html by .build/newtracker/gen-data.mjs — do
+   Generated from data/polls.json by .build/newtracker/gen-data.mjs — do
    not edit by hand.  Spine: 2025 federal election (3 May 2025) → ${latest.updated}.
    2PP aggregate: sample- & recency-weighted, house-effect-adjusted mean.
    Opposition-leader figures splice Sussan Ley → Angus Taylor (13 Feb 2026);
@@ -784,8 +812,12 @@ window.AUSPOL = (function () {
   const events = ${JSON.stringify(events)};
 
   const CYCLE_DEFS = ${JSON.stringify(CYCLE_DEFS)};
+  /* Individual readings behind each past cycle's lines — powers the Past-cycles
+     download, so the charts are checkable rather than just assertions. */
+  const cycleSource = ${JSON.stringify(cycleSource)};
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
+    eDate: c.eDate,
     color: PARTIES[c.gov].color, span: c.months[c.months.length - 1],
     base: { tpp: c.tpp[0], primary: c.primary[0], net: c.net[0], oppnet: c.oppnet[0] },
     end: { tpp: c.tpp[c.tpp.length - 1], primary: c.primary[c.primary.length - 1], net: c.net[c.net.length - 1], oppnet: c.oppnet[c.oppnet.length - 1] },
@@ -802,6 +834,7 @@ window.AUSPOL = (function () {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, adjusted, houseEffects, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls,
     individualPolls, pollsterTable, latest, cycles, events,
+    cycleSource,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },
   };
 })();

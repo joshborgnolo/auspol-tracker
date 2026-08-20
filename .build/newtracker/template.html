@@ -1432,6 +1432,16 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 
 /* ---------- Past cycles ---------- */
 .cyc-controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+/* Download pair. .ap-export carries margin-left:auto for the archive's own
+   layout, so it is reset here — inside this group the buttons sit together and
+   the GROUP is what gets pushed right. */
+.cyc-export { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+.cyc-export .ap-export { margin-left: 0; }
+.cyc-export-label {
+  font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-faint); margin-right: 2px;
+}
+@media (max-width: 1000px) { .cyc-export { display: none; } }
 
 .cyc-legend { margin: 20px 0 6px; }
 .cyc-legend-row { display: flex; flex-wrap: wrap; gap: 7px; }
