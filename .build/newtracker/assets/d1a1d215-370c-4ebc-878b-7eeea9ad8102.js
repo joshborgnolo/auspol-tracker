@@ -1,4 +1,4 @@
-/* auspol tracker — tabbed views: Tabs nav (with docked 2PP score), Past cycles overlay, All polls archive */
+/* auspol tracker – tabbed views: Tabs nav (with docked 2PP score), Past cycles overlay, All polls archive */
 
 // ---- CSV export plumbing, shared by the archive and the past-cycles download ----
 const csvCell = (v) => {
@@ -26,8 +26,8 @@ const DownloadIcon = () => (
 );
 
 // ====================================================================
-// TabScore — compact 2PP readout docked at the right of the tab bar.
-// Appears once the bar pins to the viewport top, on EVERY tab — the
+// TabScore – compact 2PP readout docked at the right of the tab bar.
+// Appears once the bar pins to the viewport top, on EVERY tab – the
 // national score travels with you. Click = jump to the Snapshot hero.
 // ====================================================================
 function TabScore({ onGoHero }) {
@@ -35,7 +35,7 @@ function TabScore({ onGoHero }) {
   const { alp2pp, lnp2pp } = D.latest;
   return (
     <button className="tab-score" onClick={onGoHero}
-            title="Latest 2PP aggregate — go to Snapshot">
+            title="Latest 2PP aggregate – go to Snapshot">
       <span className="ts-eyebrow">2PP</span>
       <span className="ts-party">
         <span className="ts-abbr">ALP</span>
@@ -51,11 +51,11 @@ function TabScore({ onGoHero }) {
 }
 
 // ====================================================================
-// Tabs — editorial underlined nav beneath the header
+// Tabs – editorial underlined nav beneath the header
 // ====================================================================
 function Tabs({ tabs, active, onChange }) {
   // Sticky on every view. Once pinned, a compact 2PP score docks into the
-  // right side of the bar — the headline number stays visible on every tab.
+  // right side of the bar – the headline number stays visible on every tab.
   const [pinned, setPinned] = React.useState(false);
   const sentRef = React.useRef(null);
   // The docked score is a shortcut home: switch to Snapshot (where the 2PP
@@ -65,7 +65,7 @@ function Tabs({ tabs, active, onChange }) {
     else window.scrollTo({ top: 0, behavior: "smooth" });
   };
   // A zero-height sentinel sits at the tab bar's natural flow position. When it
-  // scrolls above the viewport top, the sticky bar has caught the top edge —
+  // scrolls above the viewport top, the sticky bar has caught the top edge –
   // flip pinned so it can condense and lift off the content.
   React.useEffect(() => {
     const el = sentRef.current;
@@ -101,9 +101,9 @@ function Tabs({ tabs, active, onChange }) {
 }
 
 // ====================================================================
-// PAST CYCLES — every term aligned to its election day
+// PAST CYCLES – every term aligned to its election day
 // ====================================================================
-// y-windows are fitted to the real data per metric+mode (see cycDomain) —
+// y-windows are fitted to the real data per metric+mode (see cycDomain) –
 // fixed windows clip real history (e.g. net approval spans −44…+41)
 const CYC_METRICS = [
   { key: "net", title: "Leader net approval", sub: "Sitting prime minister · approve minus disapprove",
@@ -117,13 +117,13 @@ const CYC_METRICS = [
     step: 5, refAbs: null },
   { key: "tpp", title: "Government two-party preferred", sub: "Governing party 2PP",
     unit: "%", fmt: (v) => v.toFixed(1),
-    step: 5, refAbs: 50, refAbsLabel: "50 — tie" },
+    step: 5, refAbs: 50, refAbsLabel: "50 – tie" },
 ];
 
 // domain over ALL cycles (not just visible ones) so toggling a cycle off
 // never rescales the chart under the pointer
 // a cycle's baseline for "change since" mode: its election-day anchor where it
-// has one, else its first actual reading — measures that start late (leader
+// has one, else its first actual reading – measures that start late (leader
 // approval) have no month-0 value to subtract
 const cycBase = (c, key) => {
   const v = c.base[key];
@@ -193,7 +193,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi }) {
 
   // build a monthly series per visible cycle. Past cycles are tinted by the
   // governing party (red Labor / blue Coalition terms) at reduced opacity and
-  // carry a year label at the line's end — identifiable at rest, not only on
+  // carry a year label at the line's end – identifiable at rest, not only on
   // hover, which uniform grey reference lines couldn't manage with real data.
   const built = cycles.filter((c) => !hidden.has(c.year)).map((c) => {
     const base = cycBase(c, M.key);
@@ -227,7 +227,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi }) {
   if (cur) {
     const mNow = cur.span;
     const curVal = chg ? cur.end[M.key] - cycBase(cur, M.key) : cur.end[M.key];
-    // a peer only counts if it was actually measured at this month — comparing
+    // a peer only counts if it was actually measured at this month – comparing
     // against a cycle whose approval series hadn't started yet is comparing
     // against nothing
     const peers = cycles.filter((c) => !c.current && c.span >= mNow).map((c) => {
@@ -316,7 +316,7 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll }) {
    different questions: the series is what is plotted, the source rows are
    where it came from.
 
-   Both are keyed by CYCLE year — the election that STARTED the term, which is
+   Both are keyed by CYCLE year – the election that STARTED the term, which is
    what the legend calls each line. That matters: internally the voting-intention
    rows are stored under the election that ENDED the term. Exporting the storage
    keys would misalign the two halves by a full parliament. */
@@ -357,7 +357,7 @@ function cycleSourceRows(cycles, D) {
     ]));
   });
   /* The current cycle's source rows are individualPolls, already in the payload
-     — read them from there rather than shipping a second copy. */
+     – read them from there rather than shipping a second copy. */
   const cur = cycles.find((c) => c.current);
   if (cur) {
     const eDate = Date.parse(cur.eDate);
@@ -401,10 +401,10 @@ function PastCyclesView() {
     <div className="view view-cycles">
       <div className="view-intro">
         <p className="view-lede">
-          Every federal term since 2010, aligned to its election day — so each government’s
+          Every federal term since 2010, aligned to its election day – so each government’s
           trajectory can be read off a shared clock. The current Albanese government is drawn
-          <strong> bold</strong>; past governments sit behind, tinted by the party in power —
-          red for Labor terms, blue for Coalition — with the year marked where each line ends.
+          <strong> bold</strong>; past governments sit behind, tinted by the party in power –
+          red for Labor terms, blue for Coalition – with the year marked where each line ends.
           Hover a cycle below to bring it forward.
         </p>
         <div className="cyc-controls">
@@ -438,20 +438,20 @@ function PastCyclesView() {
         Past cycles run the full ~3-year term to the next election; the current cycle stops at the
         latest reading. {mode === "chg"
           ? "Lines show movement relative to each party’s own election result."
-          : "Approval lines splice the sitting prime minister — and opposition leader — where a term changed leaders mid-stream."}
+          : "Approval lines splice the sitting prime minister – and opposition leader – where a term changed leaders mid-stream."}
       </p>
     </div>
   );
 }
 
 // ====================================================================
-// ALL POLLS — full sortable / filterable archive
+// ALL POLLS – full sortable / filterable archive
 // ====================================================================
 // archive sortable header = the shared SortTh (panels.jsx), via its `k` alias
 const ArchSortTh = window.SortTh;
 
 // archive facet helpers ----------------------------------------------
-// leadership facet cell — the sortable net stays the headline figure, with
+// leadership facet cell – the sortable net stays the headline figure, with
 // the same approve / don't-know / disapprove split the snapshot's approval
 // bars use rendered at micro scale beneath it. Ragged-tolerant: a leader the
 // pollster didn't ask about shows a dash; a net-only reading shows just the net.
@@ -493,14 +493,14 @@ function ArchApprCell({ s, net, metric }) {
   );
 }
 
-// "As published" — the poll's headline figures exactly as the pollster released
+// "As published" – the poll's headline figures exactly as the pollster released
 // them, as plain numerals (dot-coded by party) with any shape-flags inline.
 // Numerals, not a 0–100 bar: at archive scale every 53/47 bar looks identical,
-// so the ink carries nothing — the figures themselves are the record.
+// so the ink carries nothing – the figures themselves are the record.
 function ArchPublished({ p }) {
   const { tppContests, tppFlag } = window;
   const c0 = tppContests(p)[0];
-  if (!c0) return <span className="dash" title="No two-party or head-to-head figure published — primaries only">—</span>;
+  if (!c0) return <span className="dash" title="No two-party or head-to-head figure published – primaries only">—</span>;
   const flag = tppFlag(p);
   return (
     <div className="apub" aria-label={c0.segs.map((s) => `${s.label} ${s.value}`).join(", ")}>
@@ -571,7 +571,7 @@ function ArchLead({ p, measure }) {
     </div>
   );
 }
-// full per-poll breakdown for an ARCHIVE poll — mirrors the Latest-polls
+// full per-poll breakdown for an ARCHIVE poll – mirrors the Latest-polls
 // detail, but driven off the archive row shape (alp/lnp 2PP, p primary, ppm,
 // appr) which carries no commissioning client / method / direction fields.
 function ArchPollDetail({ p }) {
@@ -621,7 +621,7 @@ function ArchPollDetail({ p }) {
           <div className="pd-k">{window.apprHeading(p.appr)}</div>
           <ApprBlock appr={p.appr} chg={p.chg} />
         </div>
-        {/* seat projection spans the full grid — it is a chamber, not a
+        {/* seat projection spans the full grid – it is a chamber, not a
             per-poll measure, and needs the width to read at 150 seats */}
         {p.dir && (
           <div className="pd-block">
@@ -646,18 +646,18 @@ function ArchPollDetail({ p }) {
   );
 }
 
-// data-content tags — shown on each archive row and used as filters, so you can
+// data-content tags – shown on each archive row and used as filters, so you can
 // see (and select for) what a poll actually measures without expanding it.
 const POLL_TAGS = [
-  { id: "2pp",   label: "2PP",   title: "Two-party preferred — one matchup (ALP v L/NP)" },
-  { id: "2x2pp", label: "2×2PP", title: "Two 2PP matchups — e.g. ALP v L/NP and ALP v ON" },
-  { id: "3x2pp", label: "3×2PP", title: "Three 2PP matchups — ALP v L/NP, ALP v ON and L/NP v ON" },
-  { id: "3pp",   label: "3PP",   title: "Three-way party-preferred — ALP / L/NP / ON in one distribution" },
+  { id: "2pp",   label: "2PP",   title: "Two-party preferred – one matchup (ALP v L/NP)" },
+  { id: "2x2pp", label: "2×2PP", title: "Two 2PP matchups – e.g. ALP v L/NP and ALP v ON" },
+  { id: "3x2pp", label: "3×2PP", title: "Three 2PP matchups – ALP v L/NP, ALP v ON and L/NP v ON" },
+  { id: "3pp",   label: "3PP",   title: "Three-way party-preferred – ALP / L/NP / ON in one distribution" },
   { id: "ppm",   label: "PPM",   title: "Preferred prime minister" },
   { id: "aprv",  label: "Aprv",  title: "Leader approval (approve − disapprove)" },
   { id: "fav",   label: "Fav",   title: "Leader favourability (positive − negative)" },
-  { id: "seats", label: "Seats", title: "Modelled seat projection with range — MRP polls only" },
-  { id: "dir",   label: "Dir",   title: "National direction — right direction / wrong track" },
+  { id: "seats", label: "Seats", title: "Modelled seat projection with range – MRP polls only" },
+  { id: "dir",   label: "Dir",   title: "National direction – right direction / wrong track" },
 ];
 const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map((t) => [t.id, t]));
 function pollTagIds(p) {
@@ -691,7 +691,7 @@ function pollTagIds(p) {
 }
 
 // ====================================================================
-// VariancePanel — how far apart the polls sit, against the spread that
+// VariancePanel – how far apart the polls sit, against the spread that
 // sampling error alone would produce.  One panel per archive facet, so
 // the measures on screen are the ones the table below is showing.
 //
@@ -724,7 +724,7 @@ function VariancePanel({ facet, rangeId }) {
   })).filter((s) => s.points.length > 1);
 
   // Within a facet every measure's sampling floor is near enough the same
-  // curve (similar shares, similar samples), so ONE band carries it — a line
+  // curve (similar shares, similar samples), so ONE band carries it – a line
   // dipping into the shaded region is tighter than chance allows.
   const floorPts = D.MONTHS.map((ym, i) => {
     const fs = vis.map((r) => r.pts[i]).filter((d) => d && d.floor != null).map((d) => d.floor);
@@ -740,7 +740,7 @@ function VariancePanel({ facet, rangeId }) {
   const step = Math.max(...vals) > 6 ? 2 : 1;
   const { domain, ticks } = fitDomain(vals.length ? vals : [0, 1], step, 0);
 
-  // latest computable reading per measure — the pollsters' current standing
+  // latest computable reading per measure – the pollsters' current standing
   const latest = rows.map((r) => {
     const pts = r.pts.filter((d) => d.sigma != null);
     return { m: r.m, d: pts[pts.length - 1] };
@@ -755,7 +755,7 @@ function VariancePanel({ facet, rangeId }) {
           <p className="card-sub">
             How far apart the polls sit, against the spread sampling error alone would produce.
             Shaded = that chance floor; a line inside it means the houses are running tighter than
-            random sampling permits. Measured across all {D.individualPolls.length} polls — the filters
+            random sampling permits. Measured across all {D.individualPolls.length} polls – the filters
             above don’t narrow it.
           </p>
         </div>
@@ -766,7 +766,7 @@ function VariancePanel({ facet, rangeId }) {
               <button key={m.id} type="button"
                       className={"legend-chip" + (hidden[m.id] ? " off" : "")}
                       aria-pressed={!hidden[m.id]}
-                      title={m.label + " — " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label}
+                      title={m.label + " – " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label}
                       onClick={() => setHidden((h) => ({ ...h, [m.id]: !h[m.id] }))}>
                 <span className="legend-swatch" style={{ background: m.color }}></span>
                 <span className="legend-name">{m.label}</span>
@@ -811,7 +811,7 @@ function VariancePanel({ facet, rangeId }) {
 
       <p className="table-hint ap-var-note">
         Spread is the recency-weighted standard deviation of each poll’s distance from a local trend,
-        in {unitNote} — recency-weighted only, because weighting by sample size would mute exactly the
+        in {unitNote} – recency-weighted only, because weighting by sample size would mute exactly the
         small divergent polls being measured. The floor is what a design effect of {window.AP.DISC.DEFF} and
         each poll’s own sample size predict. Their ratio reads: under 0.80× herded · around 1× as close as
         sampling allows · over 1.20× the houses genuinely differ.
@@ -847,7 +847,7 @@ function AllPollsView() {
   ];
   const onFacet = (f) => {
     setFacet(f); setSort({ key: "date", dir: -1 }); setOpen(null);
-    // the matchup/ahead pair describes the 2PP lead column — it is hidden
+    // the matchup/ahead pair describes the 2PP lead column – it is hidden
     // outside that facet, so its filter must not keep biting invisibly
     if (f !== "twopp") { setLead("all"); setMeasure("lnp"); }
   };
@@ -865,7 +865,7 @@ function AllPollsView() {
     // house lean uses the NORMALISED share (alpN) so undecided-inclusive
     // pairs compare fairly with the aggregate; null when no 2PP published
     const lean = p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null;
-    // searchable haystack — everything a row knows, so the search box matches
+    // searchable haystack – everything a row knows, so the search box matches
     // fieldwork dates, samples, 2PP / primary / matchup figures, nets, flags
     const f1 = (v) => (v != null ? v.toFixed(1) : null);
     const hayParts = [
@@ -955,12 +955,12 @@ function AllPollsView() {
   const total = rows.length;
   const clearAll = () => { setQ(""); setSel(new Set()); setLead("all"); setMeasure("lnp"); setRange("all"); setTagSel(new Set()); };
   // Boolean(): the chain ends on a Set size, so with no filters this was the
-  // NUMBER 0 — and {0 && <button/>} renders a literal 0 next to the poll count.
+  // NUMBER 0 – and {0 && <button/>} renders a literal 0 next to the poll count.
   const anyFilter = Boolean(ql || sel.size || lead !== "all" || range !== "all" || tagSel.size);
 
   // ---- CSV export of the CURRENTLY filtered + sorted rows -----------------
   // A flat, analysis-friendly schema (one row per poll), independent of the
-  // active facet — so the download always carries every measure, for exactly
+  // active facet – so the download always carries every measure, for exactly
   // the rows the filters left on screen, in the order they're shown.
   const CSV_COLS = [
     ["Pollster", (p) => p.pollster],
@@ -1023,7 +1023,7 @@ function AllPollsView() {
             <circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path>
           </svg>
           <input type="text" value={q} onChange={(e) => setQ(e.target.value)}
-                 placeholder="Search anything — pollster, date, figure…" aria-label="Search polls" />
+                 placeholder="Search anything – pollster, date, figure…" aria-label="Search polls" />
           {q && <button className="ap-search-x" onClick={() => setQ("")} aria-label="Clear search">×</button>}
         </div>
 
@@ -1082,10 +1082,10 @@ function AllPollsView() {
           })()}
         </span>
         {anyFilter && <button className="ap-clear" onClick={clearAll}>Clear filters</button>}
-        {/* big screens only — a spreadsheet export is a desktop task, and the
+        {/* big screens only – a spreadsheet export is a desktop task, and the
             button would crowd the narrow filter stack on phones */}
         <button className="ap-export" onClick={exportCsv}
-                title="Download these rows as CSV — exactly the current filters and order"
+                title="Download these rows as CSV – exactly the current filters and order"
                 aria-label={"Export " + sorted.length + " polls as CSV"}>
           <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
                strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -1106,7 +1106,7 @@ function AllPollsView() {
 
               {facet === "twopp" && (<>
                 <th scope="col" className="ta-l apub-col hide-md"
-                    title="What the pollster published — a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
+                    title="What the pollster published – a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
                 <ArchSortTh label={({ lnp: "Lead · ALP v L/NP", onp: "Lead · ALP v ON", lnponp: "Lead · L/NP v ON", "3cp": "Lead · 3-cornered" })[measure]} short="Lead" k="alp" sort={sort} onSort={onSort} />
                 <ArchSortTh label="House lean" short="Lean" k="lean" sort={sort} onSort={onSort} />
               </>)}

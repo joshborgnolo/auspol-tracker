@@ -1,4 +1,4 @@
-/* auspol tracker — lower panels: primary vote, leaders, pollster table */
+/* auspol tracker – lower panels: primary vote, leaders, pollster table */
 
 // ---- small shared UI ------------------------------------------------
 function Segmented({ options, value, onChange, size }) {
@@ -13,7 +13,7 @@ function Segmented({ options, value, onChange, size }) {
   );
 }
 
-// quiet, editorial control — reads as type, not a widget
+// quiet, editorial control – reads as type, not a widget
 // Render a matchup label ("ALP v L/NP") as shared party tokens + a quiet
 // "v" connective, so party abbreviations share one vocabulary with the
 // sticky scoreboard. Non-matchup labels (3M, Leadership…) pass through plain.
@@ -71,7 +71,7 @@ function seriesNN(pts, key) {
   return pts.map((d) => ({ x: d.x, y: d[key] })).filter((p) => p.y != null);
 }
 // last two published readings for a key → { v, ym, prev, prevYm } (or null).
-// prevYm is carried so a delta can name the month it measures from — these are
+// prevYm is carried so a delta can name the month it measures from – these are
 // PUBLISHED readings, so the gap is often more than one month.
 function lastReadings(rows, key) {
   const nn = rows.filter((r) => r[key] != null);
@@ -79,13 +79,13 @@ function lastReadings(rows, key) {
   const last = nn[nn.length - 1], prev = nn[nn.length - 2];
   return { v: last[key], ym: last.ym, prev: prev ? prev[key] : null, prevYm: prev ? prev.ym : null };
 }
-// what a snapshot-panel delta is measured against, spelled out — these compare
+// what a snapshot-panel delta is measured against, spelled out – these compare
 // monthly AGGREGATE readings, unlike the archive's ChgTag which compares a
 // single pollster with its own previous poll
 function readoutDeltaTitle(r) {
   if (!r || r.prevYm == null) return undefined;
   return "Change since " + window.AP.monthLabelFull(r.prevYm)
-       + " — this leader's previous published monthly reading across all pollsters,"
+       + " – this leader's previous published monthly reading across all pollsters,"
        + " not one pollster's own last poll";
 }
 // short month tag ("May") for a reading older than the latest row
@@ -142,7 +142,7 @@ function PrimaryVotePanel({ rangeId }) {
   }));
 
   // The published readings behind each line. This chart needs them MORE than
-  // the 2PP one does — the houses diverge further on primary shares than on
+  // the 2PP one does – the houses diverge further on primary shares than on
   // two-party (One Nation's spread runs beyond sampling error), so smooth
   // lines alone overstate how settled the picture is. Five clouds at once
   // would be a mess, so a dot is drawn only while its party is un-hidden:
@@ -242,7 +242,7 @@ function LeaderSelector({ leaders, sel, onToggle }) {
 }
 
 /* Expand / switch / minimise for the leadership pair. Rendered inside each
-   card head, and only while the panels actually share a row — below the
+   card head, and only while the panels actually share a row – below the
    two-column breakpoint they're already full width, so the control would
    promise something it can't do. */
 const PZ_ICON = {
@@ -273,10 +273,10 @@ function PanelZoom({ expanded, onExpand, onSwap, onClose, label, otherLabel }) {
 function LeadershipSection({ rangeId }) {
   const { D } = window.AP;
   const [sel, setSel] = useState(["alb", "taylor", "hanson"]);
-  /* pair  — preferred PM | net rating (default)
-     ppm   — preferred PM full width
-     appr  — net rating full width
-     both  — approval | favourability, the two net measures side by side */
+  /* pair  – preferred PM | net rating (default)
+     ppm   – preferred PM full width
+     appr  – net rating full width
+     both  – approval | favourability, the two net measures side by side */
   const [view, setView] = useState("pair");
   const order = D.LEADERS.map((L) => L.id);
   const toggle = (id) =>
@@ -292,7 +292,7 @@ function LeadershipSection({ rangeId }) {
         <LeaderSelector leaders={D.LEADERS} sel={sel} onToggle={toggle} />
       </div>
       <p className="leadership-note">
-        The Coalition line splices leaders — <strong>Ley</strong> led to February 2026, <strong>Taylor</strong> since.
+        The Coalition line splices leaders – <strong>Ley</strong> led to February 2026, <strong>Taylor</strong> since.
         Leadership questions run irregularly, so lines connect published readings.
       </p>
       {/* Both children stay mounted while a column collapses to 0fr, so the
@@ -331,7 +331,7 @@ function PreferredPMPanel({ rangeId, leaders, chrome }) {
   // Houses leave anywhere from 16% to 50% uncommitted on this question, so a
   // published share says as much about the format as about the leader. The
   // second basis divides by the people who named someone, which makes the
-  // houses comparable — but it is a different quantity, so it is a labelled
+  // houses comparable – but it is a different quantity, so it is a labelled
   // choice rather than a silent correction.
   const [basis, setBasis] = useState("pub");
   const suf = basis === "pub" ? "_pref" : "_prefN";
@@ -374,8 +374,8 @@ function PreferredPMPanel({ rangeId, leaders, chrome }) {
           <h3 className="card-title">Preferred prime minister</h3>
           <p className="card-sub">
             {basis === "pub"
-              ? "“Who would make the better PM?” · as published — houses leave 16–50% uncommitted, so shares aren’t directly comparable"
-              : "“Who would make the better PM?” · share of those who named someone — comparable across houses, but a three-way contest still divides further than a two-way"}
+              ? "“Who would make the better PM?” · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable"
+              : "“Who would make the better PM?” · share of those who named someone – comparable across houses, but a three-way contest still divides further than a two-way"}
           </p>
         </div>
         <div className="card-head-tools">
@@ -423,7 +423,7 @@ function PreferredPMPanel({ rangeId, leaders, chrome }) {
 function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetric, onBoth }) {
   const { D, rangeDomain, filterPts, buildXTicks } = window.AP;
   // approval (approve − disapprove) and favourability (positive − negative)
-  // are DIFFERENT questions from different pollsters — a toggle, never a blend
+  // are DIFFERENT questions from different pollsters – a toggle, never a blend
   const [own, setOwn] = useState("net");
   // controlled when the section pins this panel to one measure (the side-by-side
   // "both" view), self-managed otherwise
@@ -443,7 +443,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   });
   // Published readings behind the lines, for the ACTIVE metric only. A net is a
   // difference of two proportions, so it carries more sampling noise than a
-  // single share — the monthly line hides more here than on any other chart.
+  // single share – the monthly line hides more here than on any other chart.
   // The metric filter is not optional: approval and favourability are different
   // questions, and blending their clouds would undo the same separation the
   // aggregate takes care to keep.
@@ -477,7 +477,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
           </p>
         </div>
         <div className="card-head-tools">
-          {/* "Both" is a layout, not a third metric — it splits the panel in
+          {/* "Both" is a layout, not a third metric – it splits the panel in
               two rather than blending the measures, which is the one thing
               this toggle exists to prevent. Hidden when the section has
               already pinned this panel to a single measure. */}
@@ -503,11 +503,11 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
                 {net == null
                   ? <span className="net dash">—</span>
                   : <span className={"net " + (net >= 0 ? "pos" : "neg")}>{net > 0 ? "+" : ""}{net}</span>}
-                {/* same movement indicator the preferred-PM readout carries —
+                {/* same movement indicator the preferred-PM readout carries –
                     a net that moved is as much news as a share that moved */}
                 {r && r.prev != null && <Delta value={r.v - r.prev} suffix="" small title={readoutDeltaTitle(r)} />}
               </div>
-              {/* diverging net bar — the source publishes nets only, no
+              {/* diverging net bar – the source publishes nets only, no
                   approve/disapprove split to stack */}
               <div className="appr-netbar" aria-hidden="true">
                 <span className="anb-mid"></span>
@@ -541,10 +541,10 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   );
 }
 
-// "Roy Morgan, Essential and Freshwater" — a plain English list, capped so a
+// "Roy Morgan, Essential and Freshwater" – a plain English list, capped so a
 // long roster degrades to "and others" rather than swallowing the subtitle.
 // Roy Morgan reports this question in half-points, and the chart's formatter
-// also writes the tooltip — rounding an individual poll's 61.5 to 62 would
+// also writes the tooltip – rounding an individual poll's 61.5 to 62 would
 // misstate it. Axis ticks land on whole numbers, so they stay clean.
 const dirFmt = (v) => (v % 1 ? v.toFixed(1) : v.toFixed(0));
 
@@ -560,7 +560,7 @@ function DirectionPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const asked = houseList(D.directionHouses);
   const question = "“Is the country heading in the right direction, or on the wrong track?”";
-  // no right-track / wrong-track series in the dataset yet — keep the panel
+  // no right-track / wrong-track series in the dataset yet – keep the panel
   // as an honest empty state so the question has a home when it's polled
   if (!D.direction.length) {
     return (
@@ -571,7 +571,7 @@ function DirectionPanel({ rangeId }) {
             <p className="card-sub">{question}</p>
           </div>
         </div>
-        <p className="pd-absent">No national direction series yet — none of the tracked pollsters currently
+        <p className="pd-absent">No national direction series yet – none of the tracked pollsters currently
            publish a right-direction / wrong-track question. It will appear here when one does.</p>
       </section>
     );
@@ -582,9 +582,9 @@ function DirectionPanel({ rangeId }) {
   const prev = D.direction[D.direction.length - 2];
   const netDelta = prev ? latest.net - prev.net : null;
 
-  // y-window fitted to the data — a fixed one clipped the real range the
+  // y-window fitted to the data – a fixed one clipped the real range the
   // moment wrong-track climbed past 60
-  // the published readings behind the two lines — this series leans on three
+  // the published readings behind the two lines – this series leans on three
   // houses and some months carry a single poll, so the spread is the point
   const dirScatter = (D.directionPolls || [])
     .filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1])
@@ -657,22 +657,22 @@ function DirectionPanel({ rangeId }) {
       <p className="table-hint">
         Each dot is one published reading; the lines are house-effect-adjusted
         monthly averages. Only {asked ? D.directionHouses.length : 0} houses ask
-        this question, so some months rest on a single poll — the dots show which.
+        this question, so some months rest on a single poll – the dots show which.
       </p>
     </section>
   );
 }
 
-// ---- Latest polls — faceted, ragged-tolerant ledger ----------------
+// ---- Latest polls – faceted, ragged-tolerant ledger ----------------
 const PARTY_C = {
   alp: "var(--alp)", lnp: "var(--lnp)", grn: "var(--grn)",
   onp: "var(--onp)", oth: "var(--oth)", unc: "var(--line-2)",
 };
 
-// segment builders — each returns a list the ShareBar can render at ANY arity
-// A poll may publish SEVERAL headline voting-intention figures — a
+// segment builders – each returns a list the ShareBar can render at ANY arity
+// A poll may publish SEVERAL headline voting-intention figures – a
 // conventional 2PP, a three-cornered preferred (ALP / L‑NP / ON), an
-// ALP v ON head-to-head — or a combination. Normalise them into a list of
+// ALP v ON head-to-head – or a combination. Normalise them into a list of
 // contests, exactly the way ppmContests does for preferred PM:
 //   [{ kind, lab, flag, segs: [{label, value, color}] }]
 // contests[0] is the row's headline bar; the rest surface as facet-flags in
@@ -720,7 +720,7 @@ function tppFlag(r) {
   const f = tppContests(r).map((c) => c.flag).filter(Boolean);
   return f.length ? f.join(" · ") : null;
 }
-// heading for the detail block — names the single measure, counts several
+// heading for the detail block – names the single measure, counts several
 function tppHeading(cs) {
   if (cs.length > 1) return "After preferences · " + cs.length + " measures";
   if (cs.length === 1 && cs[0].kind === "3cp") return "Three-cornered preferred";
@@ -746,7 +746,7 @@ const LEADER_META = {
 const PPM_ORDER = ["alb", "ley", "taylor", "bandt", "hanson"];
 
 // segments for ONE preferred-PM contest object, e.g. {alb, taylor, unc}.
-// `chg` is passed only for a poll's MAIN contest — extra matchups are a
+// `chg` is passed only for a poll's MAIN contest – extra matchups are a
 // different question, so a change vs last poll wouldn't be like-for-like.
 const PPM_CHG_KEY = { alb: "ppmAlb", ley: "ppmOpp", taylor: "ppmOpp", hanson: "ppmHan" };
 function ppmContestSegs(c, chg) {
@@ -787,7 +787,7 @@ function dirSegs(r) {
 
 /* The pollster's name in a poll table (Latest polls AND the All-polls
    archive). Where the row knows which published release it came from, the
-   name IS the link to it — an archive like this is meant to be checked
+   name IS the link to it – an archive like this is meant to be checked
    against its sources, and the firm's name is the thing you'd reach for.
    Rows are click-to-expand, so the anchor swallows the click rather than
    toggling the row open on its way out. Falls back to plain text for the
@@ -806,7 +806,7 @@ function PollsterName({ name, url }) {
   );
 }
 
-// arity-agnostic stacked share bar — renders however many segments it is given.
+// arity-agnostic stacked share bar – renders however many segments it is given.
 // `flag` renders inline at the end of the key row (never a second line, so
 // flagged rows keep the same height as plain ones).
 function ShareBar({ segs, compact, flag }) {
@@ -826,7 +826,7 @@ function ShareBar({ segs, compact, flag }) {
             <span className="skey-dot" style={{ background: s.color }}></span>
             <span className="skey-lab">{s.label}</span>
             <span className="skey-val">{s.value}</span>
-            {/* change vs the pollster's last poll — detail only; the compact
+            {/* change vs the pollster's last poll – detail only; the compact
                 table cells stay clean */}
             {!compact && s.delta && <ChgTag v={s.delta.v} refDate={s.delta.refDate} />}
           </span>
@@ -841,7 +841,7 @@ function NetVal({ v }) {
   return <span className={"netv " + (v >= 0 ? "pos" : "neg")}>{v > 0 ? "+" : ""}{v}</span>;
 }
 
-// Seat projection — MRP polls only. A seat count is a different animal from a
+// Seat projection – MRP polls only. A seat count is a different animal from a
 // vote share: it is a count out of the chamber, and the number that decides
 // government is the majority line, not the leader. So the bar is drawn to
 // scale in SEATS with the majority marked, and each party carries the
@@ -865,7 +865,7 @@ function SeatProjection({ seats }) {
   if (!seats || !seats.p) return null;
   const total = seats.total || 150;
   const majority = seats.majority || Math.floor(total / 2) + 1;
-  // largest first — an MRP's story is who leads the chamber, not ballot order
+  // largest first – an MRP's story is who leads the chamber, not ballot order
   const rows = Object.keys(seats.p).filter((id) => seats.p[id] && seats.p[id].est != null)
     .map((id) => { const m = SEAT_META[id] || { name: id.toUpperCase(), color: "var(--oth)" };
                    return { id, ...seats.p[id], name: m.name, color: m.color }; })
@@ -887,7 +887,7 @@ function SeatProjection({ seats }) {
       <div className="seatbar-note">
         <span className="seat-majlab">{majority} for majority</span>
         {lead.est < majority && (
-          <span className="seat-hung">no party at a majority — {lead.name} short by {majority - lead.est}</span>
+          <span className="seat-hung">no party at a majority – {lead.name} short by {majority - lead.est}</span>
         )}
       </div>
       <div className="seat-rows">
@@ -918,11 +918,11 @@ function SeatProjection({ seats }) {
 // Resolve's good/poor performance rating (good − poor).
 function FavMark({ metric }) {
   if (metric !== "fav") return null;
-  return <span className="fav-mark" title="Net favourability / likeability (positive minus negative) — a different question from approval, not directly comparable">fav</span>;
+  return <span className="fav-mark" title="Net favourability / likeability (positive minus negative) – a different question from approval, not directly comparable">fav</span>;
 }
 
 // block heading for a poll's leader ratings. A poll can mix metrics per leader
-// (Resolve: approval for the majors, likeability for Hanson) — name the measure
+// (Resolve: approval for the majors, likeability for Hanson) – name the measure
 // when they agree, fall back to the neutral "Leader ratings" when they don't.
 function apprHeading(appr) {
   const mb = appr.metricBy || {};
@@ -936,7 +936,7 @@ function apprHeading(appr) {
 }
 
 // change indicator vs the SAME pollster's previous poll that reported this
-// measure. Direction only (▲ up / ▼ down / – no change) in neutral ink — no
+// measure. Direction only (▲ up / ▼ down / – no change) in neutral ink – no
 // green/red, because "up" isn't inherently good in a party-neutral tracker.
 // ref = ISO date of the poll compared against (surfaced in the tooltip).
 function ChgTag({ v, refDate }) {
@@ -957,7 +957,7 @@ function segDelta(chg, key) {
   return { v: chg.d[key], refDate: chg.r[key] };
 }
 
-// leader approval — approve / don't-know / disapprove split per leader,
+// leader approval – approve / don't-know / disapprove split per leader,
 // mirroring the snapshot panel's bars, with the net at right. Ragged-
 // tolerant: a leader the pollster didn't poll shows a dash, and a net-only
 // reading (no published split) shows just the net.
@@ -971,17 +971,17 @@ function ApprBlock({ appr, chg }) {
       {["alb", "taylor", "hanson"].map((id) => {
         const s = appr[id], net = appr[id + "Net"];
         const dk = s ? Math.max(0, 100 - s.app - s.dis) : 0;
-        // metric is PER LEADER — one poll can ask approval of the majors and
+        // metric is PER LEADER – one poll can ask approval of the majors and
         // favourability (likeability) of a minor-party leader
         const mt = (appr.metricBy && appr.metricBy[id]) || "approval";
         const segNames = mt === "fav" ? ["Positive", "Neutral", "Negative"]
           : ["Approve", "Don't know / never heard of", "Disapprove"];
-        // the opposition slot is an office — label it by who held it (Ley →
+        // the opposition slot is an office – label it by who held it (Ley →
         // Taylor, spliced Feb 2026) when the poll records that
         const label = id === "taylor" && appr.oppName ? appr.oppName : LEADER_META[id].label;
         // some waves publish BOTH measures for the same leader (Resolve rates
         // the majors on performance and likeability). They answer different
-        // questions, so the second one sits beside the first — never averaged
+        // questions, so the second one sits beside the first – never averaged
         // into it, never shown as a correction of it.
         const alt = appr.alt && appr.alt[id];
         return (
@@ -1005,7 +1005,7 @@ function ApprBlock({ appr, chg }) {
             )}
             {alt && (
               <div className="pd-appr-alt"
-                   title="This pollster asked both questions of this leader in the same wave — favourability (positive minus negative) is not directly comparable with approval">
+                   title="This pollster asked both questions of this leader in the same wave – favourability (positive minus negative) is not directly comparable with approval">
                 <span className="pd-appr-alt-k">
                   also {alt.metric === "fav" ? "favourability" : "approval"}
                 </span>
@@ -1019,7 +1019,7 @@ function ApprBlock({ appr, chg }) {
   );
 }
 
-// Direction net — dashed when the poll didn't ask the question.
+// Direction net – dashed when the poll didn't ask the question.
 // Lives in the expanded detail only: it isn't part of any facet's question,
 // so it earns no permanent column in the compact table.
 function DirCell({ r }) {
@@ -1028,11 +1028,11 @@ function DirCell({ r }) {
   return <NetVal v={net} />;
 }
 
-// sortable column header — shared by the latest-polls AND archive tables.
+// sortable column header – shared by the latest-polls AND archive tables.
 // `sortKey` (or its archive alias `k`) names the column; an optional `short`
 // label swaps in at narrow widths (.lbl-l / .lbl-s), full label as tooltip.
 // The header stays a columnheader. It previously carried role="button", which
-// overrode the implicit role — that both invalidated aria-sort and cost
+// overrode the implicit role – that both invalidated aria-sort and cost
 // screen-reader users the column association on every sortable column.
 // Keyboard activation is handled by tabIndex + onKeyDown instead.
 function SortTh({ label, short, sortKey, k, sort, onSort, className }) {
@@ -1055,7 +1055,7 @@ function SortTh({ label, short, sortKey, k, sort, onSort, className }) {
   );
 }
 
-// full per-poll breakdown — shows EVERYTHING the poll measured, ragged set and all
+// full per-poll breakdown – shows EVERYTHING the poll measured, ragged set and all
 function PollDetail({ r }) {
   return (
     <div className="poll-detail">
@@ -1100,7 +1100,7 @@ function PollDetail({ r }) {
           <div className="pd-k">{apprHeading(r.appr)}</div>
           <ApprBlock appr={r.appr} chg={r.chg} />
         </div>
-        {/* only when the poll actually asked it — Roy Morgan asks every week,
+        {/* only when the poll actually asked it – Roy Morgan asks every week,
             Essential most waves, and nobody else, so a permanent "not asked"
             row would be noise on most pollsters */}
         {r.dir && (
@@ -1116,7 +1116,7 @@ function PollDetail({ r }) {
 
 /* House effect cell. Distinct from the archive's "house lean", which is one
    poll minus that month's aggregate; this is the pollster's SYSTEMATIC shrunk
-   mean deviation on a measure, constant across their polls — which is why it
+   mean deviation on a measure, constant across their polls – which is why it
    belongs in Latest polls, where each house appears exactly once.
    A firm with too few readings shows "—", never 0. */
 function HouseFx({ he, firm, pos, neg, unit = "pp" }) {
@@ -1128,9 +1128,9 @@ function HouseFx({ he, firm, pos, neg, unit = "pp" }) {
     <span className={"hfx" + (flat ? " flat" : "")}
           style={!flat && toward ? { color: toward.color } : null}
           title={flat
-            ? `No measurable lean — sits on the cross-house consensus (from ${h.n} poll${h.n === 1 ? "" : "s"})`
+            ? `No measurable lean – sits on the cross-house consensus (from ${h.n} poll${h.n === 1 ? "" : "s"})`
             : `Runs ${Math.abs(h.v).toFixed(1)}${unit} ${h.v > 0 ? "above" : "below"} the cross-house consensus`
-              + (toward ? `, i.e. leans ${toward.name}` : "") + ` — estimated from ${h.n} poll${h.n === 1 ? "" : "s"}, shrunk toward zero`}>
+              + (toward ? `, i.e. leans ${toward.name}` : "") + ` – estimated from ${h.n} poll${h.n === 1 ? "" : "s"}, shrunk toward zero`}>
       {flat ? "0.0" : (h.v > 0 ? "+" : "−") + Math.abs(h.v).toFixed(1)}
       {toward && !flat && <span className="hfx-who">{toward.short}</span>}
     </span>
@@ -1140,7 +1140,7 @@ function HouseFx({ he, firm, pos, neg, unit = "pp" }) {
 /* ====================================================================
    NEXT EXPECTED POLLS
    Sits under Latest polls and answers the obvious next question: when does
-   the next one land? Each house's own recent rhythm drives it — see
+   the next one land? Each house's own recent rhythm drives it – see
    pollCadence in gen-data for how cadence and publication lag are measured.
 
    Dates are computed here rather than at build time so the panel stays right
@@ -1173,14 +1173,14 @@ function NextPollsPanel() {
 
   /* A four-week horizon rather than a fixed count: it answers "what lands this
      month" and sizes itself to how busy the field actually is. A weekly house
-     appears four times, a monthly one once — which is the honest shape of the
+     appears four times, a monthly one once – which is the honest shape of the
      schedule, not a repetition bug. */
   const rows = [];
   cad.forEach((c) => {
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
     let release = field + c.lag * DAY_MS;
     let missed = 0;
-    // page older than the prediction — roll on, counting the waves we've missed
+    // page older than the prediction – roll on, counting the waves we've missed
     while (release < t0 && missed < 60) { field += c.cadence * DAY_MS; release = field + c.lag * DAY_MS; missed++; }
     for (let i = 0; release <= t0 + NP_HORIZON_DAYS * DAY_MS && i < 12; i++) {
       rows.push({
@@ -1188,7 +1188,7 @@ function NextPollsPanel() {
         missed: i === 0 ? missed : 0,
         ahead: i,
         /* Each further wave is one more interval of drift, so the window widens
-           as sqrt(waves) — the second Essential is a looser bet than the first.
+           as sqrt(waves) – the second Essential is a looser bet than the first.
            A house on a fixed weekly schedule barely moves; an erratic one
            visibly fans out, which is the point. */
         spread: Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))),
@@ -1228,7 +1228,7 @@ function NextPollsPanel() {
             <span className="np-when">{when(r.inDays)}</span>
             <span className="np-cadence">
               {cadenceLabel(r.cadence)}
-              {/* the wave count is the evidence for the estimate — worth stating
+              {/* the wave count is the evidence for the estimate – worth stating
                   once per house, not four times for a weekly one */}
               {r.ahead === 0 && <> · {r.waves} waves</>}
               {r.missed > 0 && <span className="np-missed"> · {r.missed} since this data</span>}
@@ -1364,20 +1364,20 @@ function PollsterTable() {
                         {/* Several houses (Newspoll, Resolve, the MRPs) publish no
                             headline 2PP. Rather than spend the row's widest column
                             on a dash, fall back to the first preferences they DID
-                            publish — flagged, because a primary-vote bar must never
+                            publish – flagged, because a primary-vote bar must never
                             be mistaken for a two-party one. */}
                         {tppContests(r)[0]
                           ? <ShareBar segs={tppContests(r)[0].segs} compact flag={tppFlag(r)} />
                           : primarySegs(r).length
                             ? <div className="tpp-fallback"
-                                   title="This pollster published no two-party-preferred figure — showing first preferences instead">
+                                   title="This pollster published no two-party-preferred figure – showing first preferences instead">
                                 <ShareBar segs={primarySegs(r)} compact flag="first preferences · no 2PP" />
                               </div>
                             : <span className="dash" title="No two-party figure published with this poll">—</span>}
                       </td>
                       <td className="num">
                         {/* sign maps to a party here, because the 2PP measure IS
-                            an ALP share — positive means it runs Labor-high.
+                            an ALP share – positive means it runs Labor-high.
                             The column carries one row per matchup the house
                             publishes, matching the 2PP cell beside it: a lean on
                             ALP v L/NP says nothing about a lean on ALP v ON, so
@@ -1396,7 +1396,7 @@ function PollsterTable() {
                       </td>
                     </>)}
                     {facet === "primary" && (<>
-                      {/* each party's lean sits under its OWN figure — the effects
+                      {/* each party's lean sits under its OWN figure – the effects
                           are per party, so one column couldn't carry them without
                           arbitrarily picking a party. Neutral ink: here the sign
                           means "more/less of this party", already named by the
@@ -1419,7 +1419,7 @@ function PollsterTable() {
                       </td>
                       {/* net ratings ARE debiased, so each carries its house effect.
                           Preferred PM is not (its house effects are format
-                          artefacts, not lean) — see the footnote. */}
+                          artefacts, not lean) – see the footnote. */}
                       {[["alb", "albNet", "alb"], ["taylor", "taylorNet", "opp"], ["hanson", "hansonNet", "han"]].map(([id, nk, hk]) => (
                         <td className="num" key={id}>
                           {r.appr[nk] == null
@@ -1447,7 +1447,7 @@ function PollsterTable() {
       <p className="table-hint">
         Tap any poll to see its full breakdown · click a column heading to sort · “—” means the pollster didn’t ask that question.
         {" "}<strong>House effect</strong> is how far that pollster systematically sits from the cross-house
-        consensus on this measure — its own average lean across every poll it has published, shrunk toward
+        consensus on this measure – its own average lean across every poll it has published, shrunk toward
         zero when it has published few. The aggregates subtract it. It is a property of the pollster, not of
         this one poll, and it is measured separately for every measure.
         {facet === "leadership" && " Preferred PM carries no house effect: the gaps between houses there track how many respondents each leaves uncommitted rather than which leader they favour, so a flat correction would shift the level without making the numbers comparable."}

@@ -1,4 +1,4 @@
-/* gen-data.mjs — extract REAL data from auspol-polling.html and emit the
+/* gen-data.mjs – extract REAL data from auspol-polling.html and emit the
    dataset asset for "NEW Auspol Tracker (Standalone).html" (window.AUSPOL).
    Methodology matches the established aggregate (see transform.mjs):
    2PP = sample- & recency-weighted, house-effect-adjusted mean; primaries =
@@ -28,21 +28,21 @@ const cycleAppr = D.cycleApproval;
 
 /* ---- per-poll join maps ------------------------------------------------ */
 // 7th element (optional) = additional preferred-PM contests polled the same
-// wave (a two-way alongside a three-way, etc.) — different measures, kept whole
+// wave (a two-way alongside a three-way, etc.) – different measures, kept whole
 // 8th element (optional) = published splits {app,dis} per leader
 
-/* ---- approval vs favourability — different questions, never blended ----
+/* ---- approval vs favourability – different questions, never blended ----
    Mirrors the source file's LEADER_NET_METRIC (keyed by canonical firm):
    Redbridge, DemosAU and Freshwater publish net FAVOURABILITY (positive −
    negative); everyone else publishes net APPROVAL (approve − disapprove). */
 // metric is per-(firm, leader): a firm can ask APPROVAL of some leaders and
 // FAVOURABILITY of others in the SAME poll (Resolve rates the majors on
-// approval — its "good/poor job" is an approval measure — but Hanson on
+// approval – its "good/poor job" is an approval measure – but Hanson on
 // likeability = favourability). Performance ≡ approval; likeability ≡ fav.
 // fav for every leader. Spectre added Jul 2026: its release labels the question
 // favourable / unfavourable, not approve / disapprove.
 const FAV_FIRMS = new Set(D.metricRules.favFirms);
-/* Per (firm|leaderKey), and DATE-BOUNDED — what a house asks about a leader can
+/* Per (firm|leaderKey), and DATE-BOUNDED – what a house asks about a leader can
    change mid-cycle. Resolve rated Hanson on likeability alone until it added
    her to its performance question in the 6–11 Jul 2026 wave ("included for the
    first time in this question", SMH 12 Jul). From that wave her positional net
@@ -125,7 +125,7 @@ const HL_WINDOW = 21, HL_HALF = 7;
 const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: Math.min(p.sample || 1200, SAMPLE_CAP), firm: p.pollster }));
 
 /* A house effect is that pollster's mean deviation from the cross-house
-   consensus ON THAT MEASURE — never borrowed between measures, because a firm
+   consensus ON THAT MEASURE – never borrowed between measures, because a firm
    that leans Labor on the classic 2PP has no reason to lean the same way on an
    ALP-v-ON head-to-head or on a primary share. Shrunk toward zero by SHRINK_K
    so a house with one or two readings barely moves. Returns {} when nothing is
@@ -155,7 +155,7 @@ function houseEffectsFor(rows) {
 }
 const heV = (he, firm) => (he[firm] ? he[firm].v : 0);
 const houseEffectsStrat = houseEffectsFor;   // same estimator; rows carry `strat`
-const OPP_SPLICE_ISO = "2026-02-13";         // Taylor replaces Ley — a different person
+const OPP_SPLICE_ISO = "2026-02-13";         // Taylor replaces Ley – a different person
 // sample-weighted, house-effect-adjusted monthly mean of a row set
 function monthlyAdj(rows, he) {
   return MONTHS.map((ym) => {
@@ -167,21 +167,21 @@ function monthlyAdj(rows, he) {
   }).filter(Boolean);
 }
 // trailing recency-weighted nowcast (same window/half-life as the headline 2PP)
-/* Design effect for a live national sample — the same 1.6 the discord engine
+/* Design effect for a live national sample – the same 1.6 the discord engine
    uses for its sampling-error floor, so the two agree. */
 const HL_DEFF = 1.6;
 
 /* Weighted nowcast over the trailing window, WITH its uncertainty. Two
    estimates, larger wins:
-     seSpread — how far the polls in the window disagree about the weighted
+     seSpread – how far the polls in the window disagree about the weighted
                 mean. Var(mean) = sigma^2/nEff with nEff = Kish's effective
                 count; the weighted DOF correction reduces it to
                 sqrt(wVar / (nEff - 1)).
-     seFloor  — what sampling error alone would give even if every house
+     seFloor  – what sampling error alone would give even if every house
                 agreed exactly. Carries the estimate when nEff <= 1.
    seSpread already contains sampling noise, house residue and real movement
    inside the window, so it is usually the binding one. Neither can see error
-   shared across the whole industry — no aggregate can measure that about
+   shared across the whole industry – no aggregate can measure that about
    itself, which is why the copy says so rather than implying otherwise. */
 function nowcastAdj(rows, he, ref) {
   let sw = 0, sw2 = 0, swx = 0, n = 0;
@@ -219,7 +219,7 @@ const agg2pp = MONTHS.map((ym) => {
 agg2pp.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: ELECTION.tpp_alp, lnp: ELECTION.tpp_lnp, election: true });
 
 /* ---- 2. monthly primary vote + election-day anchor --------------------- */
-/* Primaries get the SAME treatment as the headline 2PP — sample-weighted and
+/* Primaries get the SAME treatment as the headline 2PP – sample-weighted and
    house-effect-adjusted, per party. This matters more here than on the 2PP:
    the houses diverge measurably further on primary shares (One Nation's spread
    is ~2pp beyond sampling error), so a plain mean of houses that disagree
@@ -264,7 +264,7 @@ aggPrimary.unshift({
 /* ---- 3. alt head-to-head 2PP (ALP v ON, L/NP v ON) --------------------- */
 /* The ON head-to-heads are published figures, so they get the same weighted,
    debiased treatment as the classic 2PP WHEREVER it's estimable. It is for
-   ALP v ON (40 polls, 9 houses); it is not for L/NP v ON (5 polls, 2 houses —
+   ALP v ON (40 polls, 9 houses); it is not for L/NP v ON (5 polls, 2 houses –
    no reading has 3 neighbours, so houseEffectsFor returns {} and no poll falls
    in the nowcast window). That series therefore stays an honest plain mean and
    reports no nowcast, rather than pretending to a precision it can't support. */
@@ -297,13 +297,13 @@ function altSeries(field) {
 const altAON = altSeries("ao"), altLON = altSeries("lo");
 const alt2pp = { alp_on: altAON.monthly, lnp_on: altLON.monthly };
 
-/* ---- 4. leadership monthly — gap-aware (no interpolation) --------------
+/* ---- 4. leadership monthly – gap-aware (no interpolation) --------------
    Rows exist only for months with at least one published leadership reading;
    a leader not polled that month carries null. The panels filter nulls, so
    lines connect real readings instead of inventing a monthly path across
    the source data's gaps (e.g. Jan–Mar 2026). */
 const rnd = (v) => (v == null ? null : Math.round(v));
-/* House effects on leader NET ratings. Estimated within strata — a firm's
+/* House effects on leader NET ratings. Estimated within strata – a firm's
    neighbours must share its metric (approval vs favourability are different
    questions) and, for the opposition slot, its leader era (Ley and Taylor are
    different people). Without that stratification the Feb 2026 handover and the
@@ -312,7 +312,7 @@ const rnd = (v) => (v == null ? null : Math.round(v));
    These are the largest house effects in the archive: Resolve runs +7.8 on the
    opposition leader where Newspoll runs −7.0, a ~15pp span. Applying them is
    defensible because a net is a difference of two proportions and so already
-   scale-free — unlike preferred PM, which is deliberately NOT adjusted (see
+   scale-free – unlike preferred PM, which is deliberately NOT adjusted (see
    the note there). */
 const APPR_SLOTS = [["alb", "alb"], ["opp", "opp"], ["han", "han"]];
 const apprHE = {};
@@ -327,7 +327,7 @@ for (const [prop, lk] of APPR_SLOTS) {
 
 /* A preferred-PM reading as a share of those who NAMED someone, rather than of
    all respondents. The denominator is that poll's own contest, so a two-way is
-   divided by two names and a three-way by three — which is what makes houses
+   divided by two names and a three-way by three – which is what makes houses
    with very different "uncommitted" shares (16% to 50% here) comparable at all. */
 const prefShare = (p, k) => {
   const den = (p.alb || 0) + (p.opp || 0) + (p.han || 0);
@@ -338,7 +338,7 @@ const leaderMonths = MONTHS.map((ym) => {
   const pp = ppm.filter((p) => ymOf(p.date) === ym);
   const rows = appr.filter((p) => ymOf(p.date) === ym);
   if (!pp.length && !rows.length) return null;
-  // approval and favourability are different questions — routed PER LEADER by
+  // approval and favourability are different questions – routed PER LEADER by
   // that leader's metric at the firm, never pooled into one mean
   const split = (prop, lk) => {
     const ap = [], fv = [];
@@ -357,7 +357,7 @@ const leaderMonths = MONTHS.map((ym) => {
     ym, x: mx(ym),
     /* Preferred PM is deliberately NOT house-effect-adjusted. Its apparent
        house effects are large (Newspoll +4.1 on Albanese, Resolve −4.6) but
-       they are SAME-SIGNED across both leaders in 7 of 8 houses — a house that
+       they are SAME-SIGNED across both leaders in 7 of 8 houses – a house that
        runs Albanese high runs the opposition leader high too. That is the
        signature of a format difference, not partisan lean: Resolve leaves ~35%
        uncommitted where Newspoll leaves ~16%, so every share it reports is
@@ -367,7 +367,7 @@ const leaderMonths = MONTHS.map((ym) => {
        So it is offered as a SECOND series (…_prefN) behind a labelled toggle,
        never as a replacement: _pref stays exactly what pollsters published.
        Note the normalised view removes the undecided-share difference but NOT
-       the contest-size one — a leader's share among the decided is naturally
+       the contest-size one – a leader's share among the decided is naturally
        lower in a three-way than a two-way. */
     alb_pref: rnd(meanOf(pp, (p) => p.alb)), taylor_pref: rnd(meanOf(pp, (p) => p.opp)), hanson_pref: rnd(meanOf(pp, (p) => p.han)),
     alb_prefN: rnd(meanOf(pp, (p) => prefShare(p, "alb"))),
@@ -378,14 +378,14 @@ const leaderMonths = MONTHS.map((ym) => {
   };
 }).filter(Boolean);
 
-/* ---- 5. national direction — right track / wrong track ------------------
+/* ---- 5. national direction – right track / wrong track ------------------
    Given the SAME treatment as the 2PP and the primaries: sample-weighted,
    house-effect-adjusted monthly means. The houses asking this question are
    not the ones publishing a 2PP, and they don't all poll every month, so a
    plain mean would step with WHO polled rather than with what people think.
    (The raw spread between Roy Morgan and Essential looks enormous, but most
    of it is the trend, not the house: measured against a local consensus the
-   two sit ~1.5pp apart — which is exactly why this is estimated rather than
+   two sit ~1.5pp apart – which is exactly why this is estimated rather than
    eyeballed.)
    `unsure` is taken as the remainder so the three shares always total 100
    and the readout bar can't leave a gap. */
@@ -398,7 +398,7 @@ const dirRows = (field) => DIR.filter((d) => d[field] != null).map((d) => ({
   ym: ymOf(d.date), mid: midMs(d), x: d[field], n: dirSample(d), firm: d.pollster,
 }));
 const dirHe = { right: houseEffectsFor(dirRows("right")), wrong: houseEffectsFor(dirRows("wrong")) };
-// Who actually asks this question, most-active first — derived rather than
+// Who actually asks this question, most-active first – derived rather than
 // written into the copy, so the panel can't claim a house that has stopped
 // polling it (or miss one that has started). Scoped to the months the chart
 // covers, for the same reason.
@@ -413,12 +413,12 @@ const directionHouses = Object.keys(dirHouseCount)
 // Every published reading behind the monthly line, for the panel's scatter.
 // Taken from the direction series rather than from the poll rows, because a
 // few waves asked this question without publishing voting intention and so
-// have no poll row to hang on — plotting only the joined ones would quietly
+// have no poll row to hang on – plotting only the joined ones would quietly
 // drop them from a chart that DOES average them.
 // Field names match what the chart tooltip reads off a scatter point
 // (pollster / dateLabel / sample), so a direction dot identifies its poll the
 // same way a 2PP or primary dot does. Sample is joined from the voting-intention
-// poll where there is one — the few direction-only waves simply have none.
+// poll where there is one – the few direction-only waves simply have none.
 const directionPolls = DIR
   .filter((d) => MONTH_SET.has(ymOf(d.date)))
   .map((d) => {
@@ -438,8 +438,8 @@ const dirWrongBy = new Map(dirWrong.map((m) => [m.ym, m]));
    table can show the rows the monthly line above is built from, each with the
    firm's movement on its OWN previous reading (houses differ enough that a
    cross-house change would be noise). Readings from waves that published no
-   voting intention have no row to key onto — the archive's row set is polls
-   that measured voting intention — so those show up only in the series. */
+   voting intention have no row to key onto – the archive's row set is polls
+   that measured voting intention – so those show up only in the series. */
 const DIR_BY = new Map();
 {
   const last = {};
@@ -468,7 +468,7 @@ const oppKey = (name) => (name === "Ley" ? "ley" : "taylor");
 function buildPpm(date, firm) {
   const k = date + "|" + firm, p = PPM_BY.get(k);
   if (!p) return {};
-  // every preferred-PM contest this poll published, as its own set — the main
+  // every preferred-PM contest this poll published, as its own set – the main
   // row, any extra contests (7th element), then the Albanese-v-Hanson H2. Each
   // is a distinct MEASURE (two-way vs three-way etc.), never merged.
   const contest = (alb, opp, han) => {
@@ -507,7 +507,7 @@ function buildAppr(date, firm) {
     alb: sp.alb || null, taylor: sp.opp || null, hanson: sp.han || null,
     albNet: a.alb, taylorNet: a.opp ?? null, hansonNet: a.han ?? null,
     oppName: a.oppName || null,
-    // per-leader metric — a poll can be approval for some, favourability for others
+    // per-leader metric – a poll can be approval for some, favourability for others
     metricBy: { alb: metricOf(firm, "alb", date), taylor: metricOf(firm, "opp", date), hanson: metricOf(firm, "han", date) },
     ...(anyAlt ? { alt } : {}),
   };
@@ -521,11 +521,11 @@ function buildAlt(date, firm) {
 function primaryOf(p) {
   return { alp: p.alp, lnp: p.lnp, grn: p.grn, onp: p.onp, oth: (p.ind == null && p.oth == null) ? null : r1((p.ind ?? 0) + (p.oth ?? 0)) };
 }
-// normalised ALP 2PP share (pairs that don't sum to 100 — e.g. an
-// undecided-inclusive 48/47 — are rescaled) for scatter / lean maths
+// normalised ALP 2PP share (pairs that don't sum to 100 – e.g. an
+// undecided-inclusive 48/47 – are rescaled) for scatter / lean maths
 const alpNOf = (p) => (p.tpp_alp == null ? null : r1(share2pp(p)));
 
-/* ---- 5b. change indicators — each measure vs the SAME pollster's previous
+/* ---- 5b. change indicators – each measure vs the SAME pollster's previous
    poll that reported it. Tracks the last non-null value per pollster+measure
    over date-sorted polls, so a delta compares like-for-like even when a firm
    skips a measure some waves (this is how a pollster's own "+6, best since
@@ -543,7 +543,7 @@ const CHG_MEASURES = {
   // 2nd/3rd matchups get their own change vs the pollster's last publication
   altAlpOn:  (p, a, pm, alt) => (alt ? alt.ao ?? null : null),
   altLnpOn:  (p, a, pm, alt) => (alt ? alt.lo ?? null : null),
-  // preferred PM — the MAIN contest only (extra matchups aren't comparable)
+  // preferred PM – the MAIN contest only (extra matchups aren't comparable)
   ppmAlb:    (p, a, pm) => (pm ? pm.alb ?? null : null),
   ppmOpp:    (p, a, pm) => (pm ? pm.opp ?? null : null),
   ppmHan:    (p, a, pm) => (pm ? pm.han ?? null : null),
@@ -581,14 +581,14 @@ const individualPolls = POLLS.map((p) => {
     ...(p.url ? { url: p.url } : {}),
     // right-track / wrong-track, where this poll asked it
     ...(DIR_BY.has(p.date + "|" + p.pollster) ? { dir: DIR_BY.get(p.date + "|" + p.pollster) } : {}),
-    // seat projections — MRPs only. Carried verbatim; their change basis is the
+    // seat projections – MRPs only. Carried verbatim; their change basis is the
     // last ELECTION, not the pollster's previous poll, so it travels with the
     // data rather than being inferred by the views.
     ...(p.seats ? { seats: p.seats } : {}),
   };
 }).sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
 
-/* ---- 7. latest polls — most recent reading per house (last 3 weeks) ---- */
+/* ---- 7. latest polls – most recent reading per house (last 3 weeks) ---- */
 const canon = (n) => n.replace(/\s*\(.*?\)\s*/g, "").replace(/\s*\/\s*Accent.*$/i, "").trim();
 const cutoff = new Date(LATEST_ISO); cutoff.setDate(cutoff.getDate() - 21);
 const recent = POLLS.filter((p) => new Date(p.date) >= cutoff);
@@ -608,7 +608,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
   };
 }).sort((a, b) => b.released.localeCompare(a.released));
 
-/* ---- 7b. headline 2PP — trailing 21d, 7d half-life, debiased ----------- */
+/* ---- 7b. headline 2PP – trailing 21d, 7d half-life, debiased ----------- */
 const headlineTpp = (ref) => {
   const r = nowcastAdj(tppRows, houseEffect, ref);
   return r ? { alp: r.v, n: r.n, se: r.se, nEff: r.nEff, ci95: r.ci95 } : null;
@@ -643,7 +643,7 @@ const latest = {
   /* Uncertainty on the headline, and on the month-on-month change. The change
      is a difference of two independent windows (21d apart, no shared polls),
      so its SE is the root-sum-square. changeSig says whether the movement
-     clears its own 95% interval — the arrow is qualified when it doesn't. */
+     clears its own 95% interval – the arrow is qualified when it doesn't. */
   alp2ppSe: hlNow.se ?? null,
   alp2ppCi95: hlNow.ci95 ?? null,
   alp2ppNEff: hlNow.nEff ?? null,
@@ -694,7 +694,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
   if (c.current) {
     primPts = aggPrimary.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.alp }));
     tppPts = agg2pp.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.alp }));
-    // approval-metric readings only — the historical cycle series are
+    // approval-metric readings only – the historical cycle series are
     // approve−disapprove, so favourability rows would contaminate them
     const apprOnly = appr.filter((a) => metricOf(a.firm, "alb") !== "fav");   // PM approval only, not favourability
     netPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.alb }));
@@ -734,11 +734,11 @@ const CYCLE_DEFS = CYC_META.map((c) => {
 /* ---- publication cadence, for "next expected polls" ---------------------
    Two quantities per house, both measured rather than assumed:
 
-   cadence — the median gap between its own consecutive fieldwork-end dates
+   cadence – the median gap between its own consecutive fieldwork-end dates
      over the last 8 waves. The regulars are extremely regular: Roy Morgan's
      last eight gaps are 7,7,7,7,7,7,7,7 and YouGov's are 14 except one 13.
 
-   lag — days from fieldwork close to publication, read out of the release URLs
+   lag – days from fieldwork close to publication, read out of the release URLs
      that carry their own date (roymorgan.com/findings/...-august-17-2026,
      essentialreport.com.au/reports/25-march-2026). 38 Roy Morgan releases give
      a median of 1 day, range 0-2, which is where the global default comes from.
@@ -753,11 +753,11 @@ const CAD_MIN_POLLS = 4;
 const CAD_MAX_REL_MAD = 0.35;
 /* Two further gates, both learned the hard way from Fox & Hedgehog, which
    sailed through the first version: 86 days silent on a 44-day cycle, and a
-   window of ±15 days — and it still sorted ABOVE metronomic Roy Morgan,
+   window of ±15 days – and it still sorted ABOVE metronomic Roy Morgan,
    because a wide window can centre on an early date. So:
-     ACTIVE — a house must be inside 1.5 of its own intervals, not 2. Past
+     ACTIVE – a house must be inside 1.5 of its own intervals, not 2. Past
        that it has stopped, and "expected" is the wrong word for it.
-     USABLE — the window must be tight relative to the interval. "Some time
+     USABLE – the window must be tight relative to the interval. "Some time
        in a 30-day range" is not a forecast, and printing one next to a house
        that really is weekly devalues both. */
 const CAD_MAX_SILENT = 1.5;
@@ -787,7 +787,7 @@ for (const p of POLLS) {
   if (!pub) continue;
   const d = Math.round((Date.parse(pub) - Date.parse(p.date)) / 86400000);
   // a shared or rolling release URL (Roy Morgan covers 3 waves in one post,
-  // Essential cites a report index) produces a nonsense gap — drop those
+  // Essential cites a report index) produces a nonsense gap – drop those
   if (d < 0 || d > 30) continue;
   (lagSamples[p.pollster] ||= []).push(d);
 }
@@ -825,7 +825,7 @@ pollCadence.sort((a, b) => a.cadence - b.cadence);
 /* ---- per-cycle source rows, for the Past-cycles download ----------------
    The charts are monthly aggregates; these are the individual readings behind
    them, so the aggregation can actually be checked. Keyed by CYCLE year (the
-   election that STARTED the term, i.e. what the legend calls it) — cyclePolls
+   election that STARTED the term, i.e. what the legend calls it) – cyclePolls
    is stored under the election that ENDED the term and cycleApproval under the
    one that began it, and exporting those raw keys would silently misalign the
    two halves. The current cycle is omitted: its source rows are individualPolls,
@@ -850,8 +850,8 @@ for (const c of CYC_META) {
 }
 
 /* ---- emit the dataset asset -------------------------------------------- */
-const out = `/* auspol tracker — REAL Australian federal polling data.
-   Generated from data/polls.json by .build/newtracker/gen-data.mjs — do
+const out = `/* auspol tracker – REAL Australian federal polling data.
+   Generated from data/polls.json by .build/newtracker/gen-data.mjs – do
    not edit by hand.  Spine: 2025 federal election (3 May 2025) → ${latest.updated}.
    2PP aggregate: sample- & recency-weighted, house-effect-adjusted mean.
    Opposition-leader figures splice Sussan Ley → Angus Taylor (13 Feb 2026);
@@ -882,13 +882,13 @@ window.AUSPOL = (function () {
   const agg2pp = ${JSON.stringify(agg2pp)};
   const aggPrimary = ${JSON.stringify(aggPrimary)};
   const alt2pp = ${JSON.stringify(alt2pp)};
-  // nowcast per alternative matchup — null where the series is too thin
+  // nowcast per alternative matchup – null where the series is too thin
   const altLatest = ${JSON.stringify(altLatest)};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true })};
   /* Per-measure house effects, {firm: {v, n}}. v = pp that firm runs above the
      cross-house consensus on THAT measure; n = readings behind the estimate.
-     A firm absent from a map has too few readings to estimate — which the UI
+     A firm absent from a map has too few readings to estimate – which the UI
      must show as "—", never as 0. */
   const houseEffects = ${JSON.stringify({ tpp: houseEffect, primary: primaryHE, alp_on: altAON.he, appr: apprHE })};
   const leaderMonths = ${JSON.stringify(leaderMonths)};
@@ -903,10 +903,10 @@ window.AUSPOL = (function () {
   const events = ${JSON.stringify(events)};
 
   const CYCLE_DEFS = ${JSON.stringify(CYCLE_DEFS)};
-  /* Individual readings behind each past cycle's lines — powers the Past-cycles
+  /* Individual readings behind each past cycle's lines – powers the Past-cycles
      download, so the charts are checkable rather than just assertions. */
   const cycleSource = ${JSON.stringify(cycleSource)};
-  /* Measured publication rhythm per house — drives "Next expected polls".
+  /* Measured publication rhythm per house – drives "Next expected polls".
      The dates themselves are computed in the browser against the real current
      date, so the panel stays honest as the page ages. */
   const pollCadence = ${JSON.stringify(pollCadence)};

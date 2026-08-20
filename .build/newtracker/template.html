@@ -2,10 +2,10 @@
 <html lang="en-AU"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>auspol tracker — Australian federal polling</title>
-  <meta name="description" content="auspol tracker — an aggregate of Australian federal voting intention: two-party-preferred, primary vote, preferred prime minister and leader approval, pooled across published national polls.">
+  <title>auspol tracker – Australian federal polling</title>
+  <meta name="description" content="auspol tracker – an aggregate of Australian federal voting intention: two-party-preferred, primary vote, preferred prime minister and leader approval, pooled across published national polls.">
   <meta name="color-scheme" content="light dark">
-  <meta property="og:title" content="auspol tracker — Australian federal polling">
+  <meta property="og:title" content="auspol tracker – Australian federal polling">
   <meta property="og:description" content="Aggregate two-party-preferred, primary vote and leadership polling for federal Australia.">
   <meta property="og:type" content="website">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -201,15 +201,15 @@
 }
 </style>
   <style>/* ============================================================
-   auspol tracker — design tokens & styles
+   auspol tracker – design tokens & styles
    ============================================================ */
 :root {
-  /* surfaces — warm paper */
+  /* surfaces – warm paper */
   --bg:        oklch(0.970 0.008 78);
   --surface:   oklch(0.992 0.004 85);
   --surface-2: oklch(0.980 0.006 80);
 
-  /* ink — warm near-black */
+  /* ink – warm near-black */
   --ink:       oklch(0.27 0.012 55);
   --ink-2:     oklch(0.44 0.012 55);
   /* --ink-3 is the lightest ink that still carries TEXT (card subtitles, muted
@@ -222,7 +222,7 @@
   --line:   oklch(0.895 0.008 75);
   --line-2: oklch(0.935 0.006 78);
 
-  /* party colours — muted, shared chroma family */
+  /* party colours – muted, shared chroma family */
   --alp: oklch(0.55 0.150 27);   /* Labor red    */
   --lnp: oklch(0.50 0.095 250);  /* Coalition blue */
   --grn: oklch(0.60 0.120 150);  /* Greens       */
@@ -231,18 +231,18 @@
 
   --accent: oklch(0.50 0.070 205);
 
-  /* backdrop the charts actually sit on — used as the halo behind reference
+  /* backdrop the charts actually sit on – used as the halo behind reference
      labels. Card surface in panelled mode, page paper in editorial. */
   --chart-bg: var(--surface);
 
-  /* national-mood colours — distinct from party palette.
+  /* national-mood colours – distinct from party palette.
      mood-neg is a muted brick/clay (darker + duller than One Nation's
      bright orange, browner than Labor red) so the right/wrong-track axis
      never reads as a party hue. */
   --mood-pos: oklch(0.52 0.085 200);
   --mood-neg: oklch(0.505 0.092 36);
 
-  /* past-cycle overlay lines — neutral graphite so the metric (not the party)
+  /* past-cycle overlay lines – neutral graphite so the metric (not the party)
      leads; the current cycle and any highlighted cycle override with party hue */
   --cycle-line:  oklch(0.55 0.012 60 / 0.42);
   --cycle-faint: oklch(0.60 0.010 60 / 0.15);
@@ -258,7 +258,7 @@
   --appr-app-bg: oklch(0.62 0.10 150 / 0.22);
   --appr-dis-bg: oklch(0.60 0.13 28 / 0.18);
   --tip-shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
-  /* shared frosted-glass material — one recipe for every floating readout,
+  /* shared frosted-glass material – one recipe for every floating readout,
      pill toggle and the pinned nav, so translucency reads as one language.
      Only visible over content (charts, scrolled page); inert on flat paper. */
   --glass-bg: color-mix(in oklch, var(--surface) 58%, transparent);
@@ -266,7 +266,7 @@
   --glass-blur: blur(9px) saturate(1.2);
 }
 
-/* cool paper (light) — accent tone shift, party colours untouched */
+/* cool paper (light) – accent tone shift, party colours untouched */
 body.cool {
   --bg:        oklch(0.972 0.006 235);
   --surface:   oklch(0.993 0.003 235);
@@ -276,7 +276,7 @@ body.cool {
 }
 
 /* ============================================================
-   DARK MODE — warm near-black "newsprint at night"
+   DARK MODE – warm near-black "newsprint at night"
    ============================================================ */
 body.dark {
   --bg:        oklch(0.215 0.010 65);
@@ -291,7 +291,7 @@ body.dark {
   --line:   oklch(0.355 0.011 66);
   --line-2: oklch(0.312 0.010 66);
 
-  /* party colours — lifted for luminance on dark, same hues */
+  /* party colours – lifted for luminance on dark, same hues */
   --alp: oklch(0.660 0.165 28);
   --lnp: oklch(0.680 0.130 252);
   --grn: oklch(0.720 0.135 152);
@@ -300,7 +300,7 @@ body.dark {
 
   --accent: oklch(0.70 0.080 205);
 
-  /* national-mood colours — lifted for dark (brick stays browner/duller than ON) */
+  /* national-mood colours – lifted for dark (brick stays browner/duller than ON) */
   --mood-pos: oklch(0.70 0.105 200);
   --mood-neg: oklch(0.685 0.105 38);
 
@@ -317,7 +317,7 @@ body.dark {
   --glass-blur: blur(10px) saturate(1.35);
 }
 
-/* dark + cool — shift the warmth toward slate */
+/* dark + cool – shift the warmth toward slate */
 body.dark.cool {
   --bg:        oklch(0.210 0.012 248);
   --surface:   oklch(0.248 0.013 248);
@@ -333,7 +333,7 @@ body.dark.editorial.cool { --bg: oklch(0.200 0.012 248); }
 * { box-sizing: border-box; }
 html, body { margin: 0; }
 body {
-  /* re-declare at body level so it resolves against the THEME's surface —
+  /* re-declare at body level so it resolves against the THEME's surface –
      custom properties substitute where they're defined, and .dark/.editorial
      live on body, not :root */
   --chart-bg: var(--surface);
@@ -469,13 +469,13 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .dl-needle { stroke-width: 1.7; stroke-linecap: round; }
-/* a bearing, not a blob — the solid grey disc sat heavier than the needle */
+/* a bearing, not a blob – the solid grey disc sat heavier than the needle */
 .dl-pivot { fill: var(--surface); stroke: var(--ink-3); stroke-width: 0.7; }
 .dl-trail { stroke: var(--ink-3); stroke-width: 1.1; stroke-linecap: round; }
-/* everywhere the needle has been so far — the term's swing, accumulated */
+/* everywhere the needle has been so far – the term's swing, accumulated */
 .dl-envelope { fill: none; stroke: var(--ink-faint); stroke-width: 0.75; opacity: 0.5; }
 .dl-envelope line { stroke: var(--ink-faint); stroke-width: 0.75; }
-/* the event line above the dial — fixed height so it never shifts layout */
+/* the event line above the dial – fixed height so it never shifts layout */
 .dl-event {
   height: 20px; display: flex; align-items: center; justify-content: center;
   font-family: var(--sans); font-size: 12px; font-weight: 600;
@@ -548,7 +548,7 @@ body {
   margin: 7px 0 0; font-family: var(--serif); font-style: italic;
   font-size: 15px; color: var(--ink-3); text-wrap: balance;
 }
-/* compact freshness line — only surfaced on small screens, where the full
+/* compact freshness line – only surfaced on small screens, where the full
    meta block is hidden (see the 560px breakpoint) */
 .head-meta-compact { display: none; }
 .head-right { display: flex; align-items: center; gap: 18px; }
@@ -599,7 +599,7 @@ body {
   top: 50%; transform: translateY(-50%);
   height: 44px;
 }
-/* the search-clear × lives inside the input — inflate more conservatively so
+/* the search-clear × lives inside the input – inflate more conservatively so
    it can't steal caret-placement taps at the field's right end */
 .ap-search-x::after {
   content: ""; position: absolute; left: -4px; right: -4px;
@@ -617,7 +617,7 @@ body {
    content, and overflow:hidden stops the collapsing panel spilling out. */
 /* Flex rather than grid, deliberately. Collapsing a grid track means animating
    `grid-template-columns` from 1fr to 0fr, and an `fr` inside minmax() does not
-   interpolate here — the transition holds the start value and the panel never
+   interpolate here – the transition holds the start value and the panel never
    moves. `flex-grow` is a plain number, so 1 → 0 animates everywhere. */
 .lead-grid {
   display: flex; align-items: flex-start;
@@ -632,7 +632,7 @@ body {
 .lead-grid.lg-ppm  > :last-child,
 .lead-grid.lg-appr > :first-child {
   flex-grow: 0; overflow: hidden; opacity: 0; pointer-events: none;
-  /* delayed to the end of the fade, then instant on the way back — this is
+  /* delayed to the end of the fade, then instant on the way back – this is
      what takes the collapsed panel out of the tab order and the accessibility
      tree, which opacity alone does not */
   visibility: hidden;
@@ -655,7 +655,7 @@ body {
   .lead-grid, .lead-grid > * { transition: none; }
 }
 /* Below the two-column breakpoint the panels are already full width, so there
-   is nothing to expand INTO — but minimise and swap stay, otherwise anyone who
+   is nothing to expand INTO – but minimise and swap stay, otherwise anyone who
    expands on a wide screen and then narrows the window is stranded. */
 @media (max-width: 1200px) {
   .pz-expand { display: none; }
@@ -710,7 +710,7 @@ body {
 .tt-div { width: 1px; height: 13px; background: var(--line); align-self: center; }
 .tt-dots { display: inline-flex; gap: 2.5px; margin-right: 6px; vertical-align: middle; position: relative; top: -1px; }
 .tt-dot { width: 6px; height: 6px; border-radius: 50%; }
-/* flanking dots: left dot keys to the first party, right dot to the second —
+/* flanking dots: left dot keys to the first party, right dot to the second –
    mirrors the sticky scoreboard's "• ALP … L/NP •" heraldic layout.
    inline-block so width/height apply even though .tt-opt is display:block. */
 .tt-dot-l, .tt-dot-r { display: inline-block; width: 6px; height: 6px; border-radius: 50%; vertical-align: middle; }
@@ -718,7 +718,7 @@ body {
 .tt-dot-r { margin-left: 7px; position: relative; top: -1px; }
 .tt-opt:not(.active) .tt-dot-l,
 .tt-opt:not(.active) .tt-dot-r { opacity: 0.78; }
-/* shared party-token vocabulary — used by the matchup selector AND the sticky
+/* shared party-token vocabulary – used by the matchup selector AND the sticky
    scoreboard so "ALP" / "L/NP" read as the same tracked-caps token everywhere. */
 .party-tok { letter-spacing: 0.04em; font-weight: 600; }
 .tt-opt.active .party-tok { font-weight: 700; }
@@ -750,12 +750,12 @@ body {
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hero-sub-note { font-size: 13px; color: var(--ink-faint); white-space: nowrap; }
 /* The interval sits directly under the headline pair, quieter than the numbers
-   but above the lead/delta line — it qualifies the figure, so it reads before
+   but above the lead/delta line – it qualifies the figure, so it reads before
    the movement does. */
 .hero-interval { display: flex; align-items: baseline; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hi-note { font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
-/* Movement smaller than its own interval — stated, not colour-coded, so it
+/* Movement smaller than its own interval – stated, not colour-coded, so it
    reads as a qualification rather than a warning. */
 .hero-caveat { color: var(--ink-faint); font-style: italic; }
 .hero-hypo {
@@ -772,7 +772,7 @@ body {
 .hl-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink-faint); opacity: 0.6; }
 /* party swatch as a dot, for a matchup drawn as readings with no trend line */
 .hl-swatch-dot { width: 9px; height: 9px; border-radius: 50%; opacity: 0.75; }
-/* "limited data" caveat inside the hero eyebrow — same size, quieter weight,
+/* "limited data" caveat inside the hero eyebrow – same size, quieter weight,
    so it reads as a qualifier on the method rather than a separate label */
 .eyebrow-warn { color: var(--ink-faint); font-weight: 600; }
 .hero-caption { margin: 0; font-size: 12.5px; color: var(--ink-faint); }
@@ -802,17 +802,17 @@ body {
   pointer-events: none;
   transition: transform .15s cubic-bezier(.3,.7,.3,1), opacity .18s ease;
 }
-/* direct end-of-line labels (cycle years) — party-coloured, paper halo */
+/* direct end-of-line labels (cycle years) – party-coloured, paper halo */
 .end-label {
   font-family: var(--sans); font-weight: 700;
   paint-order: stroke; stroke: var(--chart-bg);
   stroke-linejoin: round; stroke-linecap: round;
   transition: opacity .2s ease;
 }
-/* key-event markers (wide charts only — gated in TrendChart by measured px) */
+/* key-event markers (wide charts only – gated in TrendChart by measured px) */
 .evt-line { stroke: var(--ink-faint); stroke-width: 1; stroke-dasharray: 2 5; opacity: 0.5; }
 /* The elbow that ties a label to its own line. Solid where the reference line
-   is dashed, so it reads as a connector rather than more grid — it is the only
+   is dashed, so it reads as a connector rather than more grid – it is the only
    thing making a displaced label legible in a tight cluster. */
 .evt-conn { stroke: var(--ink-faint); stroke-width: 1; opacity: 0.55; }
 .evt:hover .evt-conn { opacity: 0.95; }
@@ -855,7 +855,7 @@ body {
     backdrop-filter: var(--glass-blur);
   }
   /* the guide readout sits right on the plot, so make it MORE see-through than
-     the shared glass — a thin tint + light blur lets the actual trend lines
+     the shared glass – a thin tint + light blur lets the actual trend lines
      read through it; the bold ink figures still carry over the softened lines */
   .tip.tip-guide {
     background: color-mix(in oklch, var(--surface) 38%, transparent);
@@ -872,7 +872,7 @@ body {
 .tip-sub { font-size: 11px; color: var(--ink-faint); margin-top: 5px; }
 
 /* ---------- docked 2PP score (lives in the sticky tab bar) ---------- */
-/* absolutely seated on the underline at the row's right edge — it occupies no
+/* absolutely seated on the underline at the row's right edge – it occupies no
    flex space, so its arrival never relayouts the tab row; it simply fades into
    the area the scaling tab set vacates */
 .tab-score {
@@ -927,7 +927,7 @@ body {
 .legend-val { font-size: 12.5px; font-weight: 700; color: var(--ink); }
 .legend-chip.off .legend-val { color: var(--ink-faint); }
 
-/* residual aggregate ("Others / Ind.") — not a party. Its swatch becomes a
+/* residual aggregate ("Others / Ind.") – not a party. Its swatch becomes a
    dashed rule echoing the dashed chart line, and the label is dimmed so it
    reads as a remainder rather than a fourth contender. */
 .legend-chip.residual .legend-swatch {
@@ -945,7 +945,7 @@ body {
   display: flex; align-items: flex-end; justify-content: space-between;
   gap: 20px 28px; flex-wrap: wrap;
 }
-/* section header — a true PEER of the other top-level section titles
+/* section header – a true PEER of the other top-level section titles
    (Primary vote / National direction), so it reads as the PARENT of the two
    cards below rather than a smaller sibling. */
 .section-h {
@@ -959,7 +959,7 @@ body.editorial .section-h { font-size: 30px; font-weight: 500; letter-spacing: -
 }
 .leadership-note strong { font-style: normal; font-weight: 700; color: var(--ink-2); }
 .leadership .two-col { margin-top: 20px; }
-/* the two panel titles SETTLE DOWN a level below the section header — clearly
+/* the two panel titles SETTLE DOWN a level below the section header – clearly
    subheadings, not peers of "Leadership". Out-specifies the editorial bump. */
 .leadership .card-title,
 body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; letter-spacing: -0.012em; white-space: nowrap; }
@@ -1015,13 +1015,13 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .appr-dk  { background: transparent; color: var(--ink-3); display: flex; align-items: center; justify-content: center; }
 /* compact split bar inside the poll-detail blocks */
 .pd-appr-bar { height: 16px; font-size: 10px; border: 1px solid var(--line-2); }
-/* favourability marker — flags nets that are positive−negative, a different
+/* favourability marker – flags nets that are positive−negative, a different
    question from approval and not directly comparable */
 .fav-mark {
   font-size: 8px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--ink-faint); vertical-align: super; margin-left: 3px; cursor: help;
 }
-/* change indicator vs the pollster's previous poll — neutral ink, direction by
+/* change indicator vs the pollster's previous poll – neutral ink, direction by
    the ▲/▼ glyph (no good/bad colour). Sits quietly after the figure. */
 .chg {
   margin-left: 5px; font-size: 10.5px; font-weight: 700; color: var(--ink-faint);
@@ -1031,7 +1031,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .chg.flat { color: var(--ink-faint); opacity: 0.7; }
 .chg .chg-x { font-size: 8px; }
 
-/* diverging net bar — the live source publishes nets only (no approve /
+/* diverging net bar – the live source publishes nets only (no approve /
    disapprove split), so the snapshot readout shows net vs the "even" midline */
 .appr-netbar { position: relative; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
 .anb-mid { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--ink-faint); opacity: 0.6; }
@@ -1040,7 +1040,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 /* a reading older than the latest month carries a quiet month tag */
 .stale-tag { color: var(--ink-faint); font-weight: 500; font-size: 0.85em; }
 
-/* archive leadership cells — net figure with a micro approve / don't-know /
+/* archive leadership cells – net figure with a micro approve / don't-know /
    disapprove split beneath, same coding as the snapshot approval bars but at
    table scale (solid chips; the pale tints vanish at this height) */
 .arch-appr { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 3px; }
@@ -1065,7 +1065,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .dir-readout { display: flex; align-items: flex-end; gap: 16px; margin: 4px 0 14px; }
 .dir-side { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
 .dir-side.ta-r { text-align: right; margin-left: auto; }
-/* labels never wrap onto their own value, and the bar yields width instead —
+/* labels never wrap onto their own value, and the bar yields width instead –
    keeps the right/wrong readout collision-proof at every width */
 .dir-k { font-size: 13px; font-weight: 700; white-space: nowrap; }
 .dir-v { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
@@ -1105,7 +1105,7 @@ a.pollster-link:focus-visible { outline: 2px solid var(--accent, currentColor); 
 a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { color: var(--ink-2); }
 
 /* data-content tags: at-a-glance chips showing what a poll measures. Kept
-   neutral monochrome on purpose — the party palette (red/blue/orange) is
+   neutral monochrome on purpose – the party palette (red/blue/orange) is
    reserved for parties, so it must not leak onto data-type labels. They read
    as type by their TEXT, and light up solid ink only when their filter is on */
 .poll-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
@@ -1156,7 +1156,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .exp-btn.open { transform: rotate(90deg); color: var(--ink); }
 .poll-row.open { background: var(--surface-2); }
 
-/* share column — arity-agnostic bar + keys */
+/* share column – arity-agnostic bar + keys */
 .share-col { min-width: 210px; }
 .poll-table td.share-col { vertical-align: middle; }
 .share { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
@@ -1186,7 +1186,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 
 /* 2PP column falling back to first preferences. The bar keeps full-strength
    colour (the data is good, just a different measure) at slightly reduced
-   opacity; the dashed flag carries the substitution. No leading rule — it read
+   opacity; the dashed flag carries the substitution. No leading rule – it read
    as a stray grey sliver at the start of every bar. */
 .tpp-fallback .sbar { opacity: 0.82; }
 .tpp-fallback .facet-flag {
@@ -1199,7 +1199,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   color: var(--ink-2); white-space: nowrap;
 }
 .hfx.flat { color: var(--ink-faint); font-weight: 600; }
-/* which side the lean runs toward — smaller and quieter than the figure */
+/* which side the lean runs toward – smaller and quieter than the figure */
 .hfx-who {
   margin-left: 3px; font-size: 9.5px; font-weight: 800; letter-spacing: 0.04em;
   opacity: 0.75; text-transform: uppercase;
@@ -1241,7 +1241,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   gap: 18px 34px;
 }
 .pd-block { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-/* a seat projection is a whole chamber — it needs both columns to read */
+/* a seat projection is a whole chamber – it needs both columns to read */
 .pd-block-wide { grid-column: 1 / -1; }
 
 /* ---------- Seat projection (MRP polls) ---------- */
@@ -1251,7 +1251,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   overflow: hidden; background: var(--surface-2); border: 1px solid var(--line-2);
 }
 .seatbar-seg { height: 100%; }
-/* the majority line is the number that decides government — it sits ON TOP of
+/* the majority line is the number that decides government – it sits ON TOP of
    the segments, as a hard notch rather than a colour change */
 .seatbar-maj {
   position: absolute; top: -3px; bottom: -3px; width: 2px;
@@ -1270,7 +1270,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .seat-est { font-size: 15px; font-weight: 800; color: var(--ink); }
 .seat-range { font-size: 11.5px; color: var(--ink-faint); }
 /* seat change is vs the last ELECTION, so it takes neutral ink like every
-   other change indicator — no good/bad colour in a party-neutral tracker */
+   other change indicator – no good/bad colour in a party-neutral tracker */
 .seat-chg { font-size: 11.5px; font-weight: 700; color: var(--ink-3); }
 .seat-chg.flat { color: var(--ink-faint); font-weight: 600; }
 .seat-basis { margin: 2px 0 0; font-size: 11px; color: var(--ink-faint); text-wrap: pretty; }
@@ -1278,13 +1278,13 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   .seat-rows { gap: 6px 16px; }
   .seat-est { font-size: 14px; }
 }
-/* leader-approval rows in the detail block — net-only readings from the live
+/* leader-approval rows in the detail block – net-only readings from the live
    source, so each row is name left, net right */
 .pd-apprs { display: flex; flex-direction: column; gap: 7px; }
 .pd-appr-top { display: flex; align-items: center; gap: 7px; }
 .pd-appr-name { font-weight: 600; font-size: 13px; }
 .pd-appr-net { margin-left: auto; font-variant-numeric: tabular-nums; }
-/* the second measure, when a wave published both for one leader — indented and
+/* the second measure, when a wave published both for one leader – indented and
    quieter than the primary net, so it reads as an addition, not a correction */
 .pd-appr-alt {
   display: flex; align-items: baseline; gap: 7px; margin-top: 4px; padding-left: 15px;
@@ -1329,8 +1329,8 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 /* ---------- responsive ---------- */
 /* The leadership pair carries a scatter cloud in each panel now, and ~120 dots
    in a 250px-tall chart need width to stay legible. Side by side is worth
-   keeping — comparing a leader's preferred-PM standing with their net approval
-   is the point — but only on a screen genuinely wide enough for two of them. */
+   keeping – comparing a leader's preferred-PM standing with their net approval
+   is the point – but only on a screen genuinely wide enough for two of them. */
 @media (max-width: 1200px) {
   .two-col { grid-template-columns: 1fr; }
 }
@@ -1355,7 +1355,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   /* stack header; pin the theme toggle to the top-right corner so it never
      wraps down beside the meta on narrow screens */
   .site-head { flex-direction: column; align-items: flex-start; gap: 13px; }
-  /* reserve toggle space on the wordmark row only — not the brand wrapper —
+  /* reserve toggle space on the wordmark row only – not the brand wrapper –
      so the tagline below the (top-pinned) toggle can use the full width */
   .brand { padding-right: 0; }
   .wordmark { padding-right: 92px; }
@@ -1373,7 +1373,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 
 /* ============================================================
-   EDITORIAL MODE — broadsheet / ruled layout
+   EDITORIAL MODE – broadsheet / ruled layout
    Drops card chrome; separates sections with hairline rules and
    stronger serif headings. Charts breathe edge-to-edge on paper.
    ============================================================ */
@@ -1397,12 +1397,12 @@ body.editorial .card-title { font-size: 30px; font-weight: 500; letter-spacing: 
 body.editorial .card-sub { font-size: 14px; margin-top: 5px; }
 body.editorial .card-head { margin-bottom: 22px; }
 
-/* leadership is a top-level section — give it the same divider + rhythm as a
+/* leadership is a top-level section – give it the same divider + rhythm as a
    .card so it sits as a peer of Primary vote / National direction */
 body.editorial .leadership { border-top: 1px solid var(--line); padding: 38px 0 34px; }
 
 /* two-column becomes two columns split by a VERTICAL rule, no card frames.
-   No horizontal top rule — the section divider above "Leadership" already
+   No horizontal top rule – the section divider above "Leadership" already
    marks the boundary; an internal rule here would read as a false section break. */
 body.editorial .two-col {
   gap: 0; padding: 0;
@@ -1412,7 +1412,7 @@ body.editorial .two-col .card:first-child {
   padding-right: 40px; border-right: 1px solid var(--line);
 }
 body.editorial .two-col .card:last-child { padding-left: 40px; }
-/* the vertical rule and its gutter belong to a SHARED row — once one side is
+/* the vertical rule and its gutter belong to a SHARED row – once one side is
    collapsed the survivor is full-bleed and must not keep either */
 body.editorial .lead-grid.lg-ppm .card:first-child { padding-right: 0; border-right: 0; }
 body.editorial .lead-grid.lg-appr .card:last-child { padding-left: 0; }
@@ -1445,7 +1445,7 @@ body.editorial .hero-eyebrow { color: var(--ink-3); }
    vertical rule beside already-stacked cards from 901px to 1200px. */
 @media (max-width: 1200px) {
   /* stacked: the two panels are SIBLINGS under Leadership, so their separator
-     uses the lighter --line-2 hairline + tighter air — clearly subordinate to
+     uses the lighter --line-2 hairline + tighter air – clearly subordinate to
      the full-strength --line section divider that sits above "Leadership". */
   body.editorial .two-col .card:first-child {
     padding-right: 0; border-right: 0; border-bottom: 1px solid var(--line-2); padding-bottom: 24px;
@@ -1454,13 +1454,13 @@ body.editorial .hero-eyebrow { color: var(--ink-3); }
 }
 
 /* ============================================================
-   TABS — editorial section nav beneath the header
+   TABS – editorial section nav beneath the header
    ============================================================ */
 .tabs-sentinel { height: 0; margin: 0; padding: 0; pointer-events: none; }
 .tabs {
   position: relative;
   /* flush under the masthead rule: the nav + its underline read as one banded
-     unit with the masthead — labels sit equidistant between the two rules */
+     unit with the masthead – labels sit equidistant between the two rules */
   margin: -26px -4px 26px;
   padding-inline: 4px;
   background: var(--bg);
@@ -1476,7 +1476,7 @@ body.editorial .hero-eyebrow { color: var(--ink-3); }
   z-index: 0;
 }
 /* the pinned lift-off shadow lives on its OWN full-bleed layer and fades via
-   opacity — compositor-only; animating box-shadow itself repaints every frame */
+   opacity – compositor-only; animating box-shadow itself repaints every frame */
 .tabs::after {
   content: "";
   position: absolute; top: 0; bottom: 0;
@@ -1489,8 +1489,8 @@ body.editorial .hero-eyebrow { color: var(--ink-3); }
 .tabs-inner { position: relative; z-index: 1; }
 /* sticky on every view */
 .tabs.sticky { position: sticky; top: 0; z-index: 41; }
-/* "caught the top" — lift the bar off the scrolling content.
-   NOTE: the pinned state must NEVER change the bar's layout — the bar is
+/* "caught the top" – lift the bar off the scrolling content.
+   NOTE: the pinned state must NEVER change the bar's layout – the bar is
    sticky (in-flow), so any layout delta shifts the page under the scroll
    position and the pin oscillates. Condensing is therefore done ENTIRELY with
    a composited transform on .tabs-set: no reflow per frame (smooth on any
@@ -1501,7 +1501,7 @@ body.editorial .hero-eyebrow { color: var(--ink-3); }
   border-bottom: 1px solid var(--line);
   overflow: hidden;
 }
-/* the tab set condenses as ONE unit — a single transform: scale() seated on
+/* the tab set condenses as ONE unit – a single transform: scale() seated on
    the underline (origin left bottom), GPU-composited end to end */
 .tabs-set {
   display: flex; gap: 30px; align-items: flex-end;
@@ -1555,7 +1555,7 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 /* ---------- Past cycles ---------- */
 .cyc-controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
 /* Download pair. .ap-export carries margin-left:auto for the archive's own
-   layout, so it is reset here — inside this group the buttons sit together and
+   layout, so it is reset here – inside this group the buttons sit together and
    the GROUP is what gets pushed right. */
 .cyc-export { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .cyc-export .ap-export { margin-left: 0; }
@@ -1599,7 +1599,7 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 
 .cyc-charts { display: flex; flex-direction: column; }
 /* title block flexes to fill; the insight wraps below it (not behind it) once
-   the two can no longer share a row — the title can never overlap the insight */
+   the two can no longer share a row – the title can never overlap the insight */
 .cycle-head { align-items: baseline; }
 .cycle-head > div { flex: 1 1 26ch; min-width: 0; }
 .cycle-insight {
@@ -1675,7 +1675,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   font-size: 12.5px; font-weight: 600; color: var(--accent); padding: 0;
 }
 .ap-clear:hover { text-decoration: underline; }
-/* CSV export — pushed to the right, desktop only (hidden ≤1000px below) */
+/* CSV export – pushed to the right, desktop only (hidden ≤1000px below) */
 .ap-export {
   margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
@@ -1687,7 +1687,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-export svg { stroke: currentColor; }
 
 /* ---------- Next expected polls ---------- */
-/* A forecast, not a record — so it is deliberately quieter than the tables
+/* A forecast, not a record – so it is deliberately quieter than the tables
    above it: no rules between rows, no numerals competing with real figures. */
 .next-polls { }
 .np-head { margin-bottom: 16px; }
@@ -1717,7 +1717,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 }
 
 /* ---------- Poll disagreement (variance) panel ---------- */
-/* sits below the archive table, so it takes air ABOVE and a single top rule —
+/* sits below the archive table, so it takes air ABOVE and a single top rule –
    a closing section wants no trailing border under it */
 .ap-var {
   border-top: 1px solid var(--line);
@@ -1733,7 +1733,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   letter-spacing: -0.01em; color: var(--ink); line-height: 1.2;
 }
 /* The ratio, not the spread, is the number that carries the verdict, so it is
-   the one that takes colour — on a cool → neutral → warm ramp matching the
+   the one that takes colour – on a cool → neutral → warm ramp matching the
    underlying axis (tighter than chance → normal → spread out). Deliberately
    NOT party colours: a verdict on the L/NP row must not render in Coalition
    blue, or it reads as branding rather than a finding. */
@@ -1784,13 +1784,13 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 }
 
 /* archive ledger flows with the page; header pins just below the tab bar.
-   overflow must stay visible here — any overflow on the wrapper turns it into
+   overflow must stay visible here – any overflow on the wrapper turns it into
    the sticky containing block and the thead can never pin to the viewport. */
 .ap-wrap { border-bottom: 1px solid var(--line-2); overflow: visible; }
 .poll-table.archive { font-size: 13.5px; }
 .poll-table.archive thead th {
   position: sticky; top: 39px; z-index: 2; background: var(--bg);
-  /* generous topside padding — the th background paints this gap, so the
+  /* generous topside padding – the th background paints this gap, so the
      pinned header keeps clear air below the tab bar without rows peeking
      through */
   padding-top: 20px; padding-bottom: 10px;
@@ -1801,9 +1801,9 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 
 /* narrow screens: rather than wrapping the table in a horizontal scroller
    (which breaks viewport-sticky and forces laggy JS pinning), slim the table
-   to FIT the viewport: drop the secondary columns (.hide-md — sample, inline
+   to FIT the viewport: drop the secondary columns (.hide-md – sample, inline
    bars, OTH). The expandable row detail still carries everything. The header
-   keeps native CSS sticky — buttery on every thread. */
+   keeps native CSS sticky – buttery on every thread. */
 @media (max-width: 1000px) {
   .poll-table.archive .hide-md { display: none; }
   .poll-table.archive .lbl-l { display: none; }
@@ -1818,7 +1818,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
 .two-pp-col { min-width: 180px; }
 .poll-table.archive td.two-pp-col { vertical-align: middle; }
 
-/* archive "as published" — plain dot-coded numerals; the figures are the
+/* archive "as published" – plain dot-coded numerals; the figures are the
    record, so no bar ink (65 near-identical 53/47 bars carry nothing) */
 .apub {
   display: inline-flex; align-items: center; gap: 12px;
@@ -1828,7 +1828,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
 .apub-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
 .apub-col { min-width: 150px; }
 
-/* archive lead — diverging bar from the 50–50 line, ALP left / L/NP right
+/* archive lead – diverging bar from the 50–50 line, ALP left / L/NP right
    (mirrors the topline meter), zoomed so ±14 pts fills a half-bar */
 .arch-lead { display: inline-flex; align-items: center; gap: 9px; }
 .arch-lead-bar {
@@ -1862,7 +1862,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
 }
 
 /* ============================================================
-   MOTION — view transitions & micro-interactions
+   MOTION – view transitions & micro-interactions
    All entrance motion is FROM-hidden over a visible base state,
    and fully gated on prefers-reduced-motion.
    ============================================================ */
@@ -1904,7 +1904,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
   .guide, .hover-marker, .tip { transition: none; animation: none; }
 }
 
-/* one-shot, whole-page colour crossfade while the theme flips — the class is
+/* one-shot, whole-page colour crossfade while the theme flips – the class is
    added just before the body theme class changes and removed ~450ms later */
 @media (prefers-reduced-motion: no-preference) {
   body.theme-xfade, body.theme-xfade *,
@@ -1920,7 +1920,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
    background (same specificity → later wins); active/selected states carry
    higher specificity and keep their own solid fills. On flat paper the frost
    is near-invisible (nothing behind to blur); it comes alive where a control
-   sits over content — above all the pinned tab bar as the page scrolls under. */
+   sits over content – above all the pinned tab bar as the page scrolls under. */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .segmented, .legend-chip, .ls-chip, .cyc-chip, .ap-chip, .ap-export {
     background: var(--glass-bg);

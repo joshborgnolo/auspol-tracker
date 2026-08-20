@@ -1,8 +1,8 @@
-/* auspol tracker — SVG chart toolkit (no libraries) */
+/* auspol tracker – SVG chart toolkit (no libraries) */
 
 /* Text measurement for label layout. The old estimate was
    chars * refUnits * 0.72, which over-reserved by 51-87% on the real event
-   strings — enough that labels with room to spare were being dropped as
+   strings – enough that labels with room to spare were being dropped as
    collisions. Canvas measureText with the page's own font gets within a unit
    or two. Measured at 100px and scaled, so rounding at ~8px doesn't bite.
    Memoised: the same dozen strings are re-measured on every render. */
@@ -64,14 +64,14 @@ function straightPath(pts, sx, sy) {
 }
 
 /* ------------------------------------------------------------------ *
- * TrendChart — the workhorse
+ * TrendChart – the workhorse
  *  series:  [{ id, label, color, points:[{x,y}], width?, dashed?, smooth? }]
  *  scatter: [{ x, y, color, meta }]
  *  yTicks:  [numbers]   xTicks: [{x,label}]   refLines:[{y,label?,color?}]
  *  fmt:     (y) => string  for tooltip/axis
  *  bands:   [{y0,y1,color}]  shaded horizontal regions (optional)
  *  areas:   [{id,color,opacity?,points:[{x,y0,y1}]}]  shaded region whose
- *           edges VARY with x — e.g. a sampling-error floor that moves as the
+ *           edges VARY with x – e.g. a sampling-error floor that moves as the
  *           polls behind it change size (bands can't, they're rectangles)
  *  extraRows: (i) => [{label,value,color?}]  rows appended to the tooltip
  *           below the series rows; a point may also carry `note` for a
@@ -98,7 +98,7 @@ function TrendChart(props) {
   const ref = useRef(null);
   const clipId = "clip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
 
-  // axis text in real on-screen px — normalise by measured width so every
+  // axis text in real on-screen px – normalise by measured width so every
   // chart's labels match regardless of column width / responsive stacking
   const [cw, setCw] = useState(VB.W);
   React.useEffect(() => {
@@ -136,7 +136,7 @@ function TrendChart(props) {
   };
 
   // clamp a possibly-stale hover index (range/matchup can shrink the spine
-  // while the pointer rests on the chart — e.g. keyboard range switching)
+  // while the pointer rests on the chart – e.g. keyboard range switching)
   const hi = hover ? Math.min(hover.index, spinePts.length - 1) : null;
   const hoverX = hi != null && spinePts[hi] ? sx(spinePts[hi].x) : null;
 
@@ -190,7 +190,7 @@ function TrendChart(props) {
           <rect key={"b" + i} x={pad.l} y={sy(b.y1)} width={W - pad.l - pad.r}
                 height={Math.abs(sy(b.y0) - sy(b.y1))} fill={b.color} />
         ))}
-        {/* x-varying shaded areas — drawn under everything, clipped to the plot */}
+        {/* x-varying shaded areas – drawn under everything, clipped to the plot */}
         {areas.map((a) => {
           if (!a.points || a.points.length < 2) return null;
           const top = a.points.map((d, i) => `${i ? "L" : "M"} ${sx(d.x).toFixed(2)} ${sy(d.y1).toFixed(2)}`).join(" ");
@@ -210,7 +210,7 @@ function TrendChart(props) {
             <text x={pad.l - 10} y={sy(t)} className="axis-label y" style={{ fontSize: axisUnits }} dominantBaseline="middle">{t}{unit}</text>
           </g>
         ))}
-        {/* reference lines (e.g. 50% / 0 net) — labels drawn last, on top */}
+        {/* reference lines (e.g. 50% / 0 net) – labels drawn last, on top */}
         {refLines.map((r, i) => (
           <line key={"r" + i} x1={pad.l} x2={W - pad.r} y1={sy(r.y)} y2={sy(r.y)}
                 className="refline" stroke={r.color || "currentColor"} />
@@ -230,7 +230,7 @@ function TrendChart(props) {
             things fix it together:
               - labels are DISPLACED along their row rather than dropped, so a
                 crowded one slides right until it fits;
-              - every label is tied to its line by an elbow — the line rises to
+              - every label is tied to its line by an elbow – the line rises to
                 the label's baseline and runs across to meet the text, so a
                 displaced label still reads unambiguously as belonging to its
                 own line;
@@ -254,7 +254,7 @@ function TrendChart(props) {
             const w = textWidth(e.short, fsz);
             /* Pick the row where the label sits CLOSEST to its own line, not
                simply the first row it fits in. First-fit looks right until you
-               realise displacement always succeeds in row 0 — so row 0 took
+               realise displacement always succeeds in row 0 – so row 0 took
                every label and the connectors stretched to 76 units, dragging
                "2026 Budget" three-quarters of the way across its neighbour.
                Choosing by displacement instead sends the second member of a
@@ -271,7 +271,7 @@ function TrendChart(props) {
               if (best === null || cost < best.cost) best = { r, x, cost };
             }
             if (best) { rowEnd[best.r] = best.x + w; return { e, ex, w, row: best.r, x: best.x, flip: false }; }
-            // out of room on the right — hang it to the left of its own line
+            // out of room on the right – hang it to the left of its own line
             for (let r = 0; r < ROWS; r++) {
               const x = ex - LEAD - w;
               if (x >= rowEnd[r] + SEP) { rowEnd[r] = ex; return { e, ex, w, row: r, x, flip: true }; }
@@ -281,7 +281,7 @@ function TrendChart(props) {
 
           return placed.map((p, i) => {
             const { e, ex, w, row, x, flip } = p;
-            const title = <title>{e.label + (e.desc ? " — " + e.desc : "")}</title>;
+            const title = <title>{e.label + (e.desc ? " – " + e.desc : "")}</title>;
             // no room for a label: the reference line still earns its place
             if (row == null) return (
               <g key={"ev" + i} className="evt">
@@ -305,7 +305,7 @@ function TrendChart(props) {
             );
           });
         })()}
-        {/* hover guide — kept mounted; glides between months on transform */}
+        {/* hover guide – kept mounted; glides between months on transform */}
         {spinePts.length > 0 && (
           <line x1={0} x2={0} y1={pad.t} y2={H - pad.b} className="guide"
                 style={{
@@ -332,7 +332,7 @@ function TrendChart(props) {
                   strokeLinejoin="round" strokeLinecap="round" />
           ))}
         </g>
-        {/* hover markers — one per series, kept mounted so they glide along the line */}
+        {/* hover markers – one per series, kept mounted so they glide along the line */}
         {series.map((s) => {
           if (s.opacity === 0) return null;
           const spx = hi != null && !dot && spinePts[hi] ? spinePts[hi].x : null;
@@ -357,7 +357,7 @@ function TrendChart(props) {
           return <circle key={"e" + s.id} className="end-cap" cx={sx(last.x)} cy={sy(last.y)} r={4.5}
                          fill={s.color} style={s.opacity != null ? { opacity: s.opacity } : null} />;
         })}
-        {/* direct end-of-line labels (series with an endLabel — e.g. cycle
+        {/* direct end-of-line labels (series with an endLabel – e.g. cycle
             years) so lines are identifiable at rest, without hover; labels
             that finish at similar values are nudged apart */}
         {(() => {
@@ -383,7 +383,7 @@ function TrendChart(props) {
                   fill={l.color}>{l.text}</text>
           ));
         })()}
-        {/* reference-line labels drawn LAST, with a paper halo — so they read
+        {/* reference-line labels drawn LAST, with a paper halo – so they read
            cleanly where data lines cross the 50%/even line (esp. small screens).
            align:"left" moves a label to the left edge, clear of end-of-line
            year labels on the cycle charts */}

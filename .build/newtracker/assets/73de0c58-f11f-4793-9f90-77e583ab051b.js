@@ -1,4 +1,4 @@
-/* auspol tracker — header, hero, page assembly */
+/* auspol tracker – header, hero, page assembly */
 
 // relative freshness for the "last updated" stamp
 function freshness(iso) {
@@ -20,7 +20,7 @@ function Header({ isDark, onToggleTheme }) {
   const fresh = freshness(D.latest.updatedISO);
 
   /* The mark is the whole tracker at 44x28 units, so clicking it opens the
-     thing it abbreviates rather than anything decorative — see wm-story.jsx.
+     thing it abbreviates rather than anything decorative – see wm-story.jsx.
      The origin rect is handed over so the overlay can fly out of the masthead
      instead of appearing on top of it. */
   const [story, setStory] = useState(null);
@@ -48,7 +48,7 @@ function Header({ isDark, onToggleTheme }) {
   const glyphTitle = "Primary vote aggregate · " +
     glyph.map((p) => `${D.PARTIES[p.id].short} ${p.v.toFixed(1)}`).join(", ");
 
-  // pendulum = the head-to-head against Labor's STRONGEST challenger — the same
+  // pendulum = the head-to-head against Labor's STRONGEST challenger – the same
   // pick the hero makes: whichever opponent polls the highest 2PP against Labor.
   // The needle swings toward whoever leads THAT contest (Labor left, challenger right).
   const g2 = D.agg2pp[D.agg2pp.length - 1];
@@ -63,7 +63,7 @@ function Header({ isDark, onToggleTheme }) {
   const pendColor = labLeads ? "var(--alp)" : topOpp.color;
   const oppColor = topOpp.color;
   // ±12 pts → full ±34° deflection. Labor (positive margin) swings LEFT,
-  // the challenger swings RIGHT — matching the hero's Labor-left / opp-right order.
+  // the challenger swings RIGHT – matching the hero's Labor-left / opp-right order.
   const pendDeg = Math.max(-1, Math.min(1, pMargin / 12)) * 34;
   const pendTitle = `2PP swing · ALP v ${topOpp.abbr} · ` +
     (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
@@ -80,7 +80,7 @@ function Header({ isDark, onToggleTheme }) {
   // pendulum: NEGATIVE rotation swings the tip left (Labor side).
   const needleDeg = pendSettled ? -pendDeg : 0;
 
-  // ---- integrated glyph geometry: one dial — party columns are radial
+  // ---- integrated glyph geometry: one dial – party columns are radial
   // graduations on the arc, the 2PP needle swings from the same pivot ----
   const GC = { cx: 22, cy: 24.5, r: 12 };
   const polar = (deg, r) => ({
@@ -119,7 +119,7 @@ function Header({ isDark, onToggleTheme }) {
                         stroke={p.color} strokeWidth="3.4" strokeLinecap="butt"></line>
                 );
               })}
-              {/* 2PP needle — swings toward the leader of the top contest.
+              {/* 2PP needle – swings toward the leader of the top contest.
                   Wrapped in a translate so rotation happens about local (0,0). */}
               <g transform={`translate(${GC.cx}, ${GC.cy})`}>
                 <g className="wm-needle-g" style={{ transform: `rotate(${needleDeg}deg)` }}>
@@ -131,7 +131,7 @@ function Header({ isDark, onToggleTheme }) {
               <circle cx={GC.cx} cy={GC.cy} r="1.7" className="wm-pivot"></circle>
             </svg>
           </button>
-          <span className="wm-sr">— Australian federal polling</span>
+          <span className="wm-sr">– Australian federal polling</span>
         </h1>
         <p className="tagline">Aggregated opinion polling for the 2028 Australian federal election</p>
         <div className="head-meta-compact" aria-hidden="true">
@@ -190,12 +190,12 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const xDomain = rangeDomain(rangeId);
 
-  // matchup config — each is a mirrored head-to-head 2PP.
+  // matchup config – each is a mirrored head-to-head 2PP.
   //   `real`    = the headline measure, which carries the weighted nowcast
   //   `scatter` = per-poll accessor. EVERY matchup here is built from figures
   //               pollsters actually published (the ALP v ON and L/NP v ON
   //               head-to-heads come from altTppRaw and their aggregate line is
-  //               a mean of them), so all three plot their own readings — the
+  //               a mean of them), so all three plot their own readings – the
   //               only difference is how many houses ask the question.
   const MATCHUPS = {
     alp_lnp: {
@@ -234,7 +234,7 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
      A modelled matchup has to earn its place: enough months to show a trend
      rather than a few scattered points, and a recent enough last reading to be
      describing the present. Two points cleared the old bar, which let L/NP v ON
-     offer a tab built on four months ending in May — a stale line with no
+     offer a tab built on four months ending in May – a stale line with no
      nowcast behind the headline. Both tests read off the data, so the matchup
      reappears by itself once the houses start asking it again. */
   const MIN_ALT_MONTHS = 6;
@@ -263,8 +263,8 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   const m = MATCHUPS[matchup];
   const pts = filterPts(m.data, xDomain[0]);
   // Headline readout: for the REAL ALP v L/NP measure this is the trailing
-  // recency- + sample-weighted, house-effect-adjusted nowcast (D.latest) —
-  // the same figure docked in the sticky tab bar — NOT the last monthly-mean
+  // recency- + sample-weighted, house-effect-adjusted nowcast (D.latest) –
+  // the same figure docked in the sticky tab bar – NOT the last monthly-mean
   // dot, so the two never disagree. The smoothed chart line stays the monthly
   // trend; a small gap between the line's end and this number is expected (a
   // nowcast leads the monthly mean). Modelled matchups have no separate
@@ -279,7 +279,7 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
     : altL || m.data[m.data.length - 1];
 
   // mirrored pairs, so each trend line sits inside its own cloud of readings.
-  // Driven by the active matchup's own accessor — a poll that didn't publish
+  // Driven by the active matchup's own accessor – a poll that didn't publish
   // THIS head-to-head is simply skipped, which is why the ON matchups show
   // fewer dots rather than none.
   const scatter = !showScatter ? [] : D.individualPolls
@@ -288,12 +288,12 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
       const pair = m.scatter(p);
       return pair ? pair.map((s) => ({ x: p.x, y: s.y, color: s.color, label: s.label, meta: p })) : [];
     });
-  // how many polls are actually behind the cloud — stated in the caption, since
+  // how many polls are actually behind the cloud – stated in the caption, since
   // "9 houses ask this" is the honest caveat on a thinner matchup
   const scatterPolls = scatter.length / 2;
 
   // A trend line through four monthly means built on five polls from two houses
-  // is a shape the data can't support — it reads as a trajectory when it's
+  // is a shape the data can't support – it reads as a trajectory when it's
   // really noise. Where the series is too thin to weight, plot the readings
   // only and let the reader see the scatter for what it is.
   const heroSeries = !adjusted ? [] : [
@@ -317,9 +317,9 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   // The majority line is labelled at the LEFT edge: the right edge is where both
   // trend lines terminate and their end-cap dots sit, so a label there landed in
   // the busiest part of the chart. The left edge is empty in every matchup.
-  const heroRefLines = [{ y: 50, label: "50% — majority line", color: "var(--ink-faint)", align: "left" }];
+  const heroRefLines = [{ y: 50, label: "50% – majority line", color: "var(--ink-faint)", align: "left" }];
 
-  // y-window auto-fits the matchup spread — min/max taken across BOTH series
+  // y-window auto-fits the matchup spread – min/max taken across BOTH series
   // so the domain stays correct even if the challenger ever takes the lead
   const heroVals = m.data.flatMap((d) => [d.a, d.b]);
   const lo = Math.min(...heroVals), hi = Math.max(...heroVals);
@@ -330,7 +330,7 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   const lead = +(latest.a - latest.b).toFixed(1);
   const leadName = lead >= 0 ? m.a.name : m.b.name;
   /* Uncertainty for whichever matchup is showing. Every nowcast on this hero
-     is a weighted mean of a handful of polls, so none of them is exact — a
+     is a weighted mean of a handful of polls, so none of them is exact – a
      matchup that switched from an interval to a bare number would read as the
      precise one. Null only where the series is too thin to nowcast at all,
      in which case the readout is a plain monthly point and says so. */
@@ -418,7 +418,7 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
       />
       <div className="hero-foot">
         <div className="hero-legend">
-          {/* swatch matches what is actually drawn — a line where there is a
+          {/* swatch matches what is actually drawn – a line where there is a
               trend, a dot where the series is only its readings */}
           <span className="hl-item">
             <span className={heroSeries.length ? "hl-line" : "hl-swatch-dot"} style={{ background: m.a.color }}></span>{m.a.name}
@@ -434,7 +434,7 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
             : `Each dot is one pollster’s published ${m.label} head-to-head` +
               (adjusted
                 ? ", adjusted for each house's lean on this matchup like the headline 2PP."
-                : ", averaged monthly — too few houses ask it to weight or debias.") +
+                : ", averaged monthly – too few houses ask it to weight or debias.") +
               (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : "")}
         </p>
       </div>
@@ -457,8 +457,8 @@ function MethodNote() {
              election. The two-party and primary-vote aggregates are weighted means: recent and
              larger-sample polls count for more, and each pollster’s figure is adjusted for its own
              house lean against the cross-house consensus. House leans are measured separately for
-             every measure — a firm that leans one way on the classic 2PP is not assumed to lean the
-             same way on a primary share or an ALP-v-One Nation head-to-head — and a matchup too few
+             every measure – a firm that leans one way on the classic 2PP is not assumed to lean the
+             same way on a primary share or an ALP-v-One Nation head-to-head – and a matchup too few
              houses ask is left as a plain monthly average rather than adjusted on guesswork.
              Pollsters that publish no 2PP contribute to the primary-vote and leadership series only.</p>
           <p>The headline carries a 95% interval, taken as the greater of the spread among polls in
@@ -474,7 +474,7 @@ function MethodNote() {
           <p>Each dot is one published poll; lines are monthly aggregates. The spread of dots around the
              line is a useful reminder of sampling uncertainty. Leadership questions are polled
              irregularly and framed differently between pollsters, so those lines connect published readings
-             — a “—” anywhere in the tables means the pollster didn’t ask that question.</p>
+             – a “—” anywhere in the tables means the pollster didn’t ask that question.</p>
         </div>
         <div>
           <h3 className="method-h">Sources</h3>
@@ -483,15 +483,15 @@ function MethodNote() {
       </div>
       <div className="disclaimer">
         Unofficial aggregate of published national polling. Aggregate figures are estimates, not
-        measurements — treat decimal places gently.
+        measurements – treat decimal places gently.
       </div>
     </footer>
   );
 }
 
-// Sticky score anchor — RETIRED: the 2PP readout now docks into the sticky
+// Sticky score anchor – RETIRED: the 2PP readout now docks into the sticky
 // tab bar (TabScore in views.jsx) so it travels across every tab. ScoreBar
-// removed rather than left dead — see git/file history if it's ever wanted.
+// removed rather than left dead – see git/file history if it's ever wanted.
 
 const TABS = [
   { id: "snapshot", label: "Snapshot" },
@@ -551,7 +551,7 @@ function App() {
   }, []);
   const isDark = t.theme === "dark" || (t.theme === "auto" && sysDark);
 
-  // theme / layout / accent classes — each flip runs through a brief
+  // theme / layout / accent classes – each flip runs through a brief
   // whole-page colour crossfade (see body.theme-xfade in styles.css)
   const xfadeTimer = useRef(null);
   const withXfade = (apply) => {
@@ -607,8 +607,8 @@ function App() {
           onChange={(v) => setTweak("layout", v)} />
         <p className="tweak-note">
           {t.layout === "editorial"
-            ? "Broadsheet — hairline rules, no card chrome."
-            : "Dashboard — each view in its own bordered card."}
+            ? "Broadsheet – hairline rules, no card chrome."
+            : "Dashboard – each view in its own bordered card."}
         </p>
         <TweakSection label="Paper" />
         <TweakRadio label="Tone" value={t.accent}

@@ -1,4 +1,4 @@
-/* validate.mjs — integrity gate over data/polls.json, run as the first step of
+/* validate.mjs – integrity gate over data/polls.json, run as the first step of
    every build. Replaces the old runtime console check in auspol-polling.html,
    which reported the same 7 known-good rows on every page load and had
    therefore stopped being read.
@@ -36,7 +36,7 @@ export function validate(D) {
         (p.sumNote ? excuse : fail)("primary-sum", `Σ shares = ${sum.toFixed(1)} (expected ~100)`);
     }
     // 2. a reported 2PP pair totals ~100, unless the house publishes an
-    //    undecided-inclusive 2PP (Essential does — declared in pollsterRules)
+    //    undecided-inclusive 2PP (Essential does – declared in pollsterRules)
     if (p.tpp_alp != null && p.tpp_lnp != null) {
       const t = p.tpp_alp + p.tpp_lnp;
       if (Math.abs(t - 100) > 1) {
@@ -56,7 +56,7 @@ export function validate(D) {
       if (isNaN(ds)) fail("bad-date", `unparseable dateStart "${p.dateStart}"`);
       else if (!isNaN(ts) && ds > ts) fail("date-range", `dateStart ${p.dateStart} is after date ${p.date}`);
     }
-    // 4. duplicate date+pollster — usually an accidental paste
+    // 4. duplicate date+pollster – usually an accidental paste
     const key = p.date + "|" + p.pollster;
     if (seen.has(key)) fail("duplicate", "same date + pollster already present");
     seen.add(key);
@@ -72,7 +72,7 @@ export function validate(D) {
   });
 
   // 7. every leadership row should key onto a poll's fieldwork-end date, or it
-  //    is a leadership-only wave — flagged as info, since a drifted date looks
+  //    is a leadership-only wave – flagged as info, since a drifted date looks
   //    exactly like one (the Essential Dec-2025 / Mar-2026 bug)
   const pollKeys = new Set(D.polls.map((p) => p.date + "|" + p.pollster));
   const orphans = [...D.ppm, ...D.approval]
@@ -86,7 +86,7 @@ if (fileURLToPath(import.meta.url) === path.resolve(process.argv[1])) {
   const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
   const { errors, exempted, orphans } = validate(D);
   console.log(`polls ${D.polls.length} · errors ${errors.length} · documented exceptions ${exempted.length} · leadership-only rows ${orphans.length}`);
-  if (errors.length) { console.error("\nERRORS:"); errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} — ${e.detail}`)); }
-  if (exempted.length) { console.log("\nDocumented exceptions (expected, not problems):"); exempted.forEach((e) => console.log(`  ${e.type.padEnd(13)} ${e.poll} — ${e.detail}`)); }
+  if (errors.length) { console.error("\nERRORS:"); errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
+  if (exempted.length) { console.log("\nDocumented exceptions (expected, not problems):"); exempted.forEach((e) => console.log(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`)); }
   process.exit(errors.length ? 1 : 0);
 }

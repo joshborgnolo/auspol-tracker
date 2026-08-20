@@ -1,4 +1,4 @@
-/* auspol tracker — "wind the dial back": the masthead mark, replayed across the term.
+/* auspol tracker – "wind the dial back": the masthead mark, replayed across the term.
 
    The mark is not decoration. Its graduation bars are the primary-vote
    aggregate, its needle is two-party preferred, and the right half of its arc
@@ -18,7 +18,7 @@
      would flatten the very growth being replayed.
 
    The arc wavers between blue and orange over the closing months. That is not
-   a glitch — the challenger genuinely changes hands from month to month once
+   a glitch – the challenger genuinely changes hands from month to month once
    One Nation and the Coalition converge. */
 
 const WM_GC = { cx: 22, cy: 24.5, r: 12 };
@@ -124,7 +124,7 @@ function DialFigure({ story, f, envelope, trail }) {
   }).filter(Boolean);
 
   /* Two bars mid-overtake land on the same angle and the front one simply
-     hides the back one — the swap's whole point vanishes at the moment it
+     hides the back one – the swap's whole point vanishes at the moment it
      happens. Holding them a few degrees apart lets them slide visibly past
      each other. Only the transition angle is eased here; both heights stay
      exactly what the month reported. */
@@ -138,8 +138,8 @@ function DialFigure({ story, f, envelope, trail }) {
           rather than a wedge from the pivot: it reads as an arc the needle has
           swept, which is what it is, and survives being faint. End ticks mark
           the extremes of the term. */}
-      {/* Everywhere the needle has been. This used to sit at radius 8.6 — the
-          needle's exact length — so the arc hid under the needle and its end
+      {/* Everywhere the needle has been. This used to sit at radius 8.6 – the
+          needle's exact length – so the arc hid under the needle and its end
           ticks read as a stray grey hook crossing the sweep. It now occupies
           its own band between the needle tip and the dial face, where it reads
           as a range rather than debris. */}
@@ -162,7 +162,7 @@ function DialFigure({ story, f, envelope, trail }) {
               style={{ opacity: oppMix }} />
       )}
 
-      {/* graduation bars — primary vote, absolute scale */}
+      {/* graduation bars – primary vote, absolute scale */}
       {barRing.map((b) => {
         const h = Math.max(0.6, (b.v / WM_MAX_PCT) * WM_BAR_MAX);
         const inner = wmPolar(b.a, WM_GC.r + 2);
@@ -175,7 +175,7 @@ function DialFigure({ story, f, envelope, trail }) {
 
       {/* Readings on a single ring, like numerals on a bezel. Previously each
           label hung a fixed gap beyond its own bar tip, so their radii ranged
-          over seven units — they scattered, and horizontal text beside a steep
+          over seven units – they scattered, and horizontal text beside a steep
           bar landed on top of it. A common ring keeps them level and clear,
           and naming the party matters now that the bars reorder. */}
       {labelRing.map((b) => {
@@ -189,7 +189,7 @@ function DialFigure({ story, f, envelope, trail }) {
         );
       })}
 
-      {/* needle trail — recent positions, fading behind the needle */}
+      {/* needle trail – recent positions, fading behind the needle */}
       {trail && trail.map((tr, k) => (
         <line key={"t" + k} className="dl-trail" x1={WM_GC.cx} y1={WM_GC.cy}
               x2={wmPolar(tr, 8.6).x} y2={wmPolar(tr, 8.6).y}
@@ -227,7 +227,7 @@ function DialStory({ originRect, onClose }) {
 
   const [f, setF] = useState(reduce ? n - 1 : 0);
   /* Starts NOT playing. The dial opens wound back to the election and holds
-     there while it flies out of the masthead — otherwise the replay runs behind
+     there while it flies out of the masthead – otherwise the replay runs behind
      the fly-in and the whole thing is over before it has arrived. */
   const [playing, setPlaying] = useState(false);
   const [lifted, setLifted] = useState(false);
@@ -345,7 +345,7 @@ function DialStory({ originRect, onClose }) {
 
   /* Event text lives in a reserved HTML line above the dial, not inside the
      SVG: the old rim label sat at a fixed angle the needle swept straight
-     through, at 2.7 SVG units — neither anchored to anything nor readable.
+     through, at 2.7 SVG units – neither anchored to anything nor readable.
      The line's height is fixed so its appearance never shifts layout; a short
      plateau then fade keeps it readable while the playhead crosses the month. */
   const near = evs.find((e) => Math.abs(e.i - f) < 0.7);

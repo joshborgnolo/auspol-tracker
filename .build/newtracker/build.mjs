@@ -1,4 +1,4 @@
-/* build.mjs — build "NEW Auspol Tracker (Standalone).html" from source.
+/* build.mjs – build "NEW Auspol Tracker (Standalone).html" from source.
    One command, reproducible from the repo alone:
        node .build/newtracker/build.mjs
 
@@ -30,8 +30,8 @@ const A = (f) => path.join(HERE, "assets", f);
 const DATA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
 const { errors, exempted, orphans } = validate(DATA);
 if (errors.length) {
-  console.error(`\ndata/polls.json — ${errors.length} problem(s), build stopped:`);
-  errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} — ${e.detail}`));
+  console.error(`\ndata/polls.json – ${errors.length} problem(s), build stopped:`);
+  errors.forEach((e) => console.error(`  ${e.type.padEnd(13)} ${e.poll} – ${e.detail}`));
   process.exit(1);
 }
 console.log(`validated ${DATA.polls.length} polls · ${exempted.length} documented exceptions · ${orphans.length} leadership-only rows`);
@@ -56,7 +56,7 @@ const transpile = (code, name) =>
   Babel.transform(code, { presets: [["react", { runtime: "classic" }]], filename: name, compact: false }).code;
 
 /* An inline <script> ends at the first literal "</script", wherever it appears
-   — including inside a JS string. Escaping the slash is inert in JS. */
+   – including inside a JS string. Escaping the slash is inert in JS. */
 const inlineJs = (code) => code.replace(/<\/script/gi, "<\\/script");
 
 /* ---- 4. template ------------------------------------------------------- */

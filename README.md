@@ -1,12 +1,12 @@
 # auspol tracker
 
-`NEW Auspol Tracker (Standalone).html` — a single self-contained page aggregating
+`NEW Auspol Tracker (Standalone).html` – a single self-contained page aggregating
 published Australian federal voting-intention polling. Open it directly or serve
 it anywhere; it has no runtime dependencies and works offline.
 
 ## Adding a poll
 
-1. Edit **`data/polls.json`** — the canonical dataset. Field meanings are in
+1. Edit **`data/polls.json`** – the canonical dataset. Field meanings are in
    `data/polls.schema.json`.
    - the poll itself → `polls[]` (`date` = fieldwork END, `dateStart` = start)
    - an ALP-v-One-Nation 2PP → `altTpp[]`
@@ -29,7 +29,7 @@ new and worth looking at.
 - **Roy Morgan** publishes two ALP-v-L/NP 2PPs. Store the **respondent-allocated**
   one, not the "previous election preference flows" one. Its combined
   "Independents/Other" goes in `ind` with `oth: null`.
-- **Newspoll** and **Resolve** often publish no headline 2PP — leave `tpp_*` null
+- **Newspoll** and **Resolve** often publish no headline 2PP – leave `tpp_*` null
   rather than deriving one.
 - Leadership rows must key to **fieldwork end**, matching their poll. An
   unexplained "leadership-only" row in the build output usually means a date has
@@ -56,6 +56,6 @@ auspol-polling.html      frozen predecessor, kept for history. Nothing reads it.
 The 2PP aggregate is a sample- and recency-weighted, house-effect-adjusted mean
 (21-day window, 7-day half-life). The headline carries a 95% interval taken as
 the larger of how far the polls in the window disagree and their own sampling
-error — and the page labels a month-on-month move that doesn't clear it. No
+error – and the page labels a month-on-month move that doesn't clear it. No
 aggregate can measure error shared across the whole industry, and this one
 doesn't claim to.

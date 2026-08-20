@@ -1,6 +1,6 @@
-/* auspol tracker — shared helpers */
+/* auspol tracker – shared helpers */
 
-/* React hook aliases — assigned to window HERE (this plain script loads before
+/* React hook aliases – assigned to window HERE (this plain script loads before
    every component script) so no JSX file depends on another's load order for
    bare useState / useRef / etc. */
 ["useState", "useRef", "useMemo", "useCallback", "useEffect", "useId"]
@@ -50,13 +50,13 @@ window.AP = (function () {
     return `${D.monthName(m)} ${y}`;
   }
 
-  /* ---- Poll discord — "how much do the polls disagree?" ----------------
+  /* ---- Poll discord – "how much do the polls disagree?" ----------------
      Raw spread between polls is not the interesting quantity: even
      perfectly-agreeing houses scatter, because each one is a sample.  So
      every measure reports three numbers at each point in time:
 
        sigma   weighted SD of poll residuals about a LOCAL LINEAR trend
-               through the window (pp).  Linear rather than a flat mean —
+               through the window (pp).  Linear rather than a flat mean –
                otherwise genuine movement during the window is booked as
                "disagreement".
        floor   the spread sampling error ALONE would produce:
@@ -74,11 +74,11 @@ window.AP = (function () {
        pollsters disagreeing with each other. */
   const DISC = {
     BW: 45,          // Gaussian bandwidth, days
-    DEFF: 1.6,       // design effect — weighted online panels aren't simple random samples
+    DEFF: 1.6,       // design effect – weighted online panels aren't simple random samples
     ENGAGED: 0.90,   // assumed approve+disapprove share when a poll publishes only the net
     MIN_NEFF: 4, MIN_HOUSES: 3, MIN_STRAT: 3,
   };
-  const OPP_SPLICE = "2026-02-13";   // Taylor replaces Ley — a different person, not a moved number
+  const OPP_SPLICE = "2026-02-13";   // Taylor replaces Ley – a different person, not a moved number
   const dayOf = (iso) => +new Date(iso) / 864e5;
   const metricOf = (p, id) => (p.appr && p.appr.metricBy && p.appr.metricBy[id]) || "approval";
 
@@ -111,7 +111,7 @@ window.AP = (function () {
       if (y == null) return;
       const n = p.sample || 1000;
       // a net is a DIFFERENCE of two proportions, so its sampling variance is
-      // (approve + disapprove − net²)/n — wider than a single share's
+      // (approve + disapprove − net²)/n – wider than a single share's
       const sv = m.net
         ? (DISC.DEFF * (DISC.ENGAGED - (y / 100) * (y / 100)) / n) * 1e4
         : (DISC.DEFF * (m.share(p) / 100) * (1 - m.share(p) / 100) / n) * 1e4;
@@ -150,7 +150,7 @@ window.AP = (function () {
 
       if (!Sw) return { ym, x, sigma: null };
       const neff = (Sw * Sw) / Sw2;
-      // a window that thin can't tell disagreement from luck — leave a gap
+      // a window that thin can't tell disagreement from luck – leave a gap
       if (neff < DISC.MIN_NEFF || houses.size < DISC.MIN_HOUSES || neff - dofUsed < 1) return { ym, x, sigma: null };
       const sigma = Math.sqrt((Se / Sw) * (neff / (neff - dofUsed)));
       const floor = Math.sqrt(Sfl / Sw);
@@ -173,7 +173,7 @@ window.AP = (function () {
   }
   const discordFacet = (facet) => DISCORD_MEASURES.filter((m) => m.facet === facet);
 
-  // the ratio's plain-English read — band edges live here, once
+  // the ratio's plain-English read – band edges live here, once
   function discordRead(R) {
     if (R == null) return { id: "na", label: "not enough polls", verb: "—" };
     if (R < 0.8) return { id: "herded", label: "herded", verb: "tighter than chance allows" };
