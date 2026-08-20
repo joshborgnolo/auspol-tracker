@@ -755,7 +755,24 @@ body {
 /* The interval sits directly under the headline pair, quieter than the numbers
    but above the lead/delta line – it qualifies the figure, so it reads before
    the movement does. */
+/* the hero's subhead now matches the other panels; the method label that used
+   to sit beside it in small caps has moved down to the interval line, where it
+   reads as the first clause of how the figure was made and how well it is known */
+.hero-title { margin-bottom: 12px; }
 .hero-interval { display: flex; align-items: baseline; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.hi-method { font-size: 13px; font-weight: 600; color: var(--ink-3); white-space: nowrap; }
+/* Separators hang off the END of each clause, not the start of the next: as
+   a ::before they belonged to the following flex item, so a wrap carried the
+   dot down to open the next line on its own. */
+.hero-interval > *:not(:last-child)::after {
+  content: "·"; color: var(--ink-faint); font-weight: 400; margin-left: 8px;
+}
+@media (max-width: 620px) {
+  /* give the note its own line rather than letting it break mid-clause, and
+     drop the dot that would then be left dangling at the end of the first */
+  .hi-note { flex-basis: 100%; margin-top: 1px; }
+  .hero-interval > .hi-range:not(:last-child)::after { content: none; }
+}
 .hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hi-note { font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
 /* Movement smaller than its own interval – stated, not colour-coded, so it

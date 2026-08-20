@@ -364,10 +364,7 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
             matchup earns "weighted aggregate" when its own house effects are
             estimable (ALP v L/NP and ALP v ON both are); one that only two
             houses ask can't be debiased or nowcast, so it says so. */}
-        <h2 className="hero-eyebrow">
-          Two-party preferred · {adjusted ? "weighted aggregate" : "monthly average"}
-          {!adjusted && <span className="eyebrow-warn"> • limited data</span>}
-        </h2>
+        <h2 className="card-title hero-title">Two-party preferred</h2>
           <div className="hero-readout" key={"ro-" + matchup}>
             <div className="ro-party alp-side">
               <span className="ro-dot" style={{ background: m.a.color }}></span>
@@ -386,14 +383,22 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
               covers how far the polls in the window disagree plus their
               sampling error; it cannot cover bias shared across the industry,
               which no aggregate can measure about itself. */}
-          {unc && (
-            <div className="hero-interval">
-              <span className="hi-range">± {unc.ci95.toFixed(1)} pts</span>
+          {/* How the figure was built, then how well it is known. An aggregate
+              of five polls is not known to a tenth of a point, so the interval
+              sits with the number rather than in a footnote. It covers how far
+              the polls in the window disagree plus their sampling error; it
+              cannot cover bias shared across the industry, which no aggregate
+              can measure about itself. */}
+          <div className="hero-interval">
+            <span className="hi-method">{adjusted ? "Weighted aggregate" : "Monthly average"}</span>
+            {!adjusted && <span className="eyebrow-warn">limited data</span>}
+            {unc && <span className="hi-range">± {unc.ci95.toFixed(1)} pts</span>}
+            {unc && (
               <span className="hi-note">
                 95% interval · {unc.n} poll{unc.n === 1 ? "" : "s"} in {D.latest.method.windowDays} days
               </span>
-            </div>
-          )}
+            )}
+          </div>
           <div className="hero-sub" key={"sub-" + matchup}>
             <span className="lead-tag">{leadName} leads by {Math.abs(lead).toFixed(1)} pts</span>
             <Delta value={monthDelta} suffix=" pt" small />
