@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e ' *)",
+      "Bash(awk '/^const ppmData = \\\\[/,/^];/' /Users/joshuaborgnolo/polling/auspol-polling.html)",
+      "Bash(grep -n \"function setCycleVisible\\\\|declineChart.update\\('none'\\);\\\\s*$\\\\|^}\\\\|#decline-cycle-filter .f-chip'\\).forEach\\\\|bias-adjust-toggle'\\)?.addEventListener\" \"/Users/joshuaborgnolo/Documents/4. auspol/auspol-polling.html\")",
+      "Bash(awk -F: '$1>7050 && $1<7120')",
+      "mcp__Claude_in_Chrome__navigate",
+      "mcp__Claude_in_Chrome__javascript_tool",
+      "mcp__Claude_Preview__preview_start"
+    ]
+  }
+}
