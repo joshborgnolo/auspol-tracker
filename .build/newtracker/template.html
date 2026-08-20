@@ -420,7 +420,113 @@ body {
 }
 /* glyph = one dial: live primary-vote columns as radial graduations on a
    two-tone 2PP swing arc, needle from the shared pivot */
-.wm-glyph { display: inline-flex; align-items: center; margin-left: 0; align-self: center; transform: translateY(4px); }
+.wm-glyph {
+  display: inline-flex; align-items: center; margin-left: 0; align-self: center;
+  transform: translateY(4px);
+  background: none; border: 0; padding: 3px; margin: -3px; cursor: pointer;
+  border-radius: 8px; transition: transform .28s cubic-bezier(.3,1.2,.5,1), background-color .2s ease;
+}
+.wm-glyph:hover { background: color-mix(in oklch, var(--ink) 6%, transparent); transform: translateY(4px) scale(1.06); }
+.wm-glyph:active { transform: translateY(4px) scale(0.97); }
+.wm-glyph:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
+
+/* ---------- the dial, wound back ---------- */
+/* Paper, not a lightbox: this is a printed instrument being demonstrated, so
+   the backdrop is the page's own stock rather than a black scrim. */
+.dl-backdrop {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: color-mix(in oklch, var(--surface) 88%, transparent);
+  backdrop-filter: blur(7px) saturate(1.05);
+  animation: dl-in .3s ease both;
+}
+@keyframes dl-in { from { opacity: 0 } to { opacity: 1 } }
+.dl-shell {
+  position: relative; width: min(560px, 100%); max-height: 100%;
+  display: flex; flex-direction: column; gap: 18px;
+  padding: 30px 30px 24px; border-radius: 16px;
+  background: var(--surface); border: 1px solid var(--line);
+  box-shadow: 0 30px 80px -30px color-mix(in oklch, var(--ink) 40%, transparent);
+  transform-origin: center center;
+}
+.dl-close {
+  position: absolute; top: 10px; right: 12px; width: 30px; height: 30px;
+  border: 0; background: none; color: var(--ink-faint); cursor: pointer;
+  font: 400 24px/1 var(--sans); border-radius: 8px;
+}
+.dl-close:hover { color: var(--ink); background: var(--surface-2); }
+
+.dl-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+.dl-svg { width: min(420px, 94%); height: auto; overflow: visible; display: block; }
+.dl-arc { fill: none; stroke-width: 1.4; opacity: 0.5; transition: none; }
+.dl-bar { stroke-width: 3.4; stroke-linecap: butt; }
+.dl-bar-val {
+  font-family: var(--sans); font-size: 2.6px; font-weight: 700; fill: var(--ink-faint);
+  letter-spacing: 0.02em;
+}
+.dl-needle { stroke-width: 1.7; stroke-linecap: round; }
+.dl-pivot { fill: var(--ink-3); }
+.dl-trail { stroke: var(--ink-3); stroke-width: 1.1; stroke-linecap: round; }
+/* everywhere the needle has been so far — the term's swing, accumulated */
+.dl-envelope { fill: none; stroke: var(--ink-3); stroke-width: 0.9; opacity: 0.32; }
+.dl-envelope line { stroke: var(--ink-3); stroke-width: 0.9; }
+.dl-flash line { stroke: var(--ink-3); stroke-width: 0.7; }
+.dl-flash text { font-family: var(--sans); font-size: 2.7px; font-weight: 700; fill: var(--ink-2); }
+
+.dl-cap { text-align: center; }
+.dl-month {
+  font-family: var(--serif, var(--sans)); font-size: 25px; font-weight: 500; color: var(--ink);
+  letter-spacing: -0.01em; display: flex; align-items: baseline; justify-content: center; gap: 9px;
+}
+.dl-tag {
+  font-family: var(--sans); font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--ink-faint); border: 1px solid var(--line);
+  border-radius: 999px; padding: 2px 7px;
+}
+.dl-contest {
+  margin-top: 5px; font-family: var(--sans); font-size: 15px; font-weight: 700;
+  font-variant-numeric: tabular-nums; display: flex; gap: 9px; justify-content: center;
+}
+.dl-v { color: var(--ink-faint); font-weight: 500; font-style: italic; }
+.dl-note { margin-top: 5px; font-size: 12px; color: var(--ink-faint); }
+
+.dl-track { position: relative; height: 26px; cursor: default; touch-action: none; }
+.dl-track:not(.playing) { cursor: ew-resize; }
+.dl-track:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 3px; border-radius: 6px; }
+.dl-track-line {
+  position: absolute; left: 0; right: 0; top: 12px; height: 2px; border-radius: 2px;
+  background: var(--line);
+}
+.dl-tick {
+  position: absolute; top: 7px; width: 1px; height: 12px; background: var(--ink-faint);
+  opacity: 0.65; transform: translateX(-0.5px);
+}
+.dl-head {
+  position: absolute; top: 6px; width: 3px; height: 14px; border-radius: 2px;
+  background: var(--ink); transform: translateX(-1.5px);
+}
+.dl-track.playing .dl-head { transition: none; }
+
+.dl-foot { display: flex; align-items: flex-end; gap: 16px; }
+.dl-legend { flex: 1; font-size: 11.5px; line-height: 1.5; color: var(--ink-faint); }
+.dl-replay {
+  flex: none; border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
+  padding: 6px 14px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  color: var(--ink-2); cursor: pointer;
+}
+.dl-replay:hover:not(:disabled) { color: var(--ink); border-color: var(--ink-3); }
+.dl-replay:disabled { opacity: 0.5; cursor: default; }
+
+@media (max-width: 560px) {
+  .dl-shell { padding: 26px 18px 18px; }
+  .dl-svg { width: 96%; }
+  .dl-month { font-size: 21px; }
+  .dl-foot { flex-direction: column; align-items: stretch; gap: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dl-backdrop { animation: none; }
+  .wm-glyph, .wm-glyph:hover, .wm-glyph:active { transition: none; transform: translateY(4px); }
+}
 .wordmark.stacked .wm-glyph { align-self: center; }
 .wm-dial { display: block; overflow: visible; }
 .wm-arc { fill: none; stroke-width: 1.4; opacity: 0.5; }

@@ -47,6 +47,7 @@ const JSX = [
   "052e810c-b1c8-4847-a954-426d3af38e6d.jsx", // tweaks panel
   "a11e1559-f455-44d5-8a31-6699de4ef310.js",  // panels
   "d1a1d215-370c-4ebc-878b-7eeea9ad8102.js",  // tabbed views
+  "wm-story.jsx",                             // the wordmark dial, replayed
   "73de0c58-f11f-4793-9f90-77e583ab051b.js",  // header, hero, mount
 ];
 

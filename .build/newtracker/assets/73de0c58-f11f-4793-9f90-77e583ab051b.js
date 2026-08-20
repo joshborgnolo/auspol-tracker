@@ -19,6 +19,17 @@ function Header({ isDark, onToggleTheme }) {
   const { D } = window.AP;
   const fresh = freshness(D.latest.updatedISO);
 
+  /* The mark is the whole tracker at 44x28 units, so clicking it opens the
+     thing it abbreviates rather than anything decorative — see wm-story.jsx.
+     The origin rect is handed over so the overlay can fly out of the masthead
+     instead of appearing on top of it. */
+  const [story, setStory] = useState(null);
+  const glyphRef = useRef(null);
+  const openStory = () => {
+    const el = glyphRef.current;
+    setStory({ rect: el ? el.getBoundingClientRect() : null });
+  };
+
   // wordmark glyph = live primary-vote aggregate: one bar per party,
   // sorted tallest-first, height scaled to each party's latest share
   const lp = D.aggPrimary[D.aggPrimary.length - 1];
@@ -90,8 +101,10 @@ function Header({ isDark, onToggleTheme }) {
             <span className="wm-name"><span className="wm-aus">aus</span><span className="wm-poll">pol</span></span>
             <span className="wm-track">tracker</span>
           </span>
-          <span className="wm-glyph" aria-hidden="true">
-            <svg className="wm-dial" viewBox="0 0 44 28" width="40" height="25.5">
+          <button className="wm-glyph" ref={glyphRef} onClick={openStory}
+                  title="Wind the dial back through the term"
+                  aria-label="Wind the dial back: replay the term on the masthead dial">
+            <svg className="wm-dial" viewBox="0 0 44 28" width="40" height="25.5" aria-hidden="true">
               <title>{glyphTitle + " · " + pendTitle}</title>
               {/* half-circle two-tone swing arc: Labor left, strongest challenger right */}
               <path d={arcPath(-90, 0)} className="wm-arc" stroke="var(--alp)"></path>
@@ -117,7 +130,7 @@ function Header({ isDark, onToggleTheme }) {
               </g>
               <circle cx={GC.cx} cy={GC.cy} r="1.7" className="wm-pivot"></circle>
             </svg>
-          </span>
+          </button>
           <span className="wm-sr">— Australian federal polling tracker</span>
         </h1>
         <p className="tagline">Aggregated opinion polling for the 2028 Australian federal election</p>
@@ -167,6 +180,8 @@ function Header({ isDark, onToggleTheme }) {
           </button>
         </div>
       </div>
+      {story && <DialStory originRect={story.rect}
+        onClose={() => { setStory(null); requestAnimationFrame(() => glyphRef.current && glyphRef.current.focus()); }} />}
     </header>
   );
 }
