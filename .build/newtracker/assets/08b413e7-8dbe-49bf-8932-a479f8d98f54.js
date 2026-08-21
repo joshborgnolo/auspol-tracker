@@ -151,6 +151,24 @@ function TrendChart(props) {
   const hi = hover ? Math.min(hover.index, spinePts.length - 1) : null;
   const hoverX = hi != null && spinePts[hi] ? sx(spinePts[hi].x) : null;
 
+  /* Which y ticks get a label. The axis font is sized to render ~11px on
+     screen whatever the chart's width, so on a phone it occupies far more
+     viewBox space than it does on a laptop — and a tick list that is
+     comfortable at 1100px runs its labels into each other at 340px. Keep every
+     GRIDLINE, since the grid is what makes the chart readable, and label only
+     the ticks with room. Greedy from the bottom, measured in real pixels. */
+  const yLabelled = (() => {
+    if (!cw || yTicks.length < 2) return new Set(yTicks);
+    const NEED = 15;                      // px between label centres
+    const keep = new Set();
+    let lastPx = null;
+    for (const t of yTicks.slice().sort((a, b) => b - a)) {
+      const px = sy(t) * scale;
+      if (lastPx == null || Math.abs(px - lastPx) >= NEED) { keep.add(t); lastPx = px; }
+    }
+    return keep;
+  })();
+
   // tooltip content. Precedence: a hovered EVENT, then a scatter dot, then the
   // guide. Without the first case the svg's own onMouseMove kept firing while
   // the pointer sat on an event label, so the month readout covered the very
@@ -226,7 +244,9 @@ function TrendChart(props) {
         {yTicks.map((t) => (
           <g key={"y" + t}>
             <line x1={pad.l} x2={W - pad.r} y1={sy(t)} y2={sy(t)} className="grid" />
-            <text x={pad.l - 10} y={sy(t)} className="axis-label y" style={{ fontSize: axisUnits }} dominantBaseline="middle">{t}{unit}</text>
+            {yLabelled.has(t) && (
+              <text x={pad.l - 10} y={sy(t)} className="axis-label y" style={{ fontSize: axisUnits }} dominantBaseline="middle">{t}{unit}</text>
+            )}
           </g>
         ))}
         {/* reference lines (e.g. 50% / 0 net) – labels drawn last, on top */}

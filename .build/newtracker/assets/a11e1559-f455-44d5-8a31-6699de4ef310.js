@@ -472,8 +472,8 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
           <h3 className="card-title">{metric === "net" ? "Leader net approval" : "Leader net favourability"}</h3>
           <p className="card-sub">
             {metric === "net"
-              ? "Approve minus disapprove · Newspoll, YouGov, Resolve, Essential and others"
-              : "Positive minus negative · Redbridge, DemosAU and Freshwater ask favourability, not approval"}
+              ? "Approve minus disapprove – a verdict on the job they are doing · Newspoll, YouGov, Resolve, Essential and others"
+              : "Positive minus negative – a verdict on them as a person, not the job · Redbridge, DemosAU and Freshwater ask favourability, not approval"}
           </p>
         </div>
         <div className="card-head-tools">
