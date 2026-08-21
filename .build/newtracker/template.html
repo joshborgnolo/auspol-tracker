@@ -548,7 +548,7 @@ body {
 .wm-bar { transition: stroke-dasharray .75s cubic-bezier(.22,.9,.24,1); }
 @media (prefers-reduced-motion: reduce) { .wm-needle-g, .wm-bar { transition: none; } }
 .tagline {
-  margin: 7px 0 0; font-family: var(--serif); font-style: italic;
+  margin: 7px 0 0; font-family: var(--serif);
   font-size: 15px; color: var(--ink-3); text-wrap: balance;
 }
 /* compact freshness line – only surfaced on small screens, where the full
@@ -1631,6 +1631,28 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
   font-size: 12.5px; font-weight: 600; color: var(--accent); padding: 2px 0;
 }
 .cyc-showall:hover { text-decoration: underline; }
+/* Deliberately quiet: an optional fifth line on one of four charts, off by
+   default. It sits under that chart's standfirst rather than in the shared
+   controls, because it changes nothing anywhere else on the page. */
+.cyc-han {
+  display: inline-flex; align-items: center; gap: 6px; margin: 7px 0 0;
+  font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-faint);
+  cursor: pointer; user-select: none;
+}
+.cyc-han:hover { color: var(--ink-3); }
+.cyc-han input {
+  appearance: none; -webkit-appearance: none; margin: 0; flex: none;
+  width: 12px; height: 12px; border: 1px solid var(--ink-faint); border-radius: 3px;
+  background: var(--surface); cursor: pointer; position: relative;
+}
+.cyc-han input:checked { background: var(--onp); border-color: var(--onp); }
+.cyc-han input:checked::after {
+  content: ""; position: absolute; left: 3.5px; top: 0.5px;
+  width: 3px; height: 7px; border: solid var(--chart-bg);
+  border-width: 0 2px 2px 0; transform: rotate(42deg);
+}
+.cyc-han input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.cyc-han.on { color: var(--onp); }
 
 .cyc-charts { display: flex; flex-direction: column; }
 /* title block flexes to fill; the insight wraps below it (not behind it) once

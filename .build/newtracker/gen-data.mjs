@@ -1,5 +1,5 @@
 /* gen-data.mjs – extract REAL data from auspol-polling.html and emit the
-   dataset asset for "NEW Auspol Tracker (Standalone).html" (window.AUSPOL).
+   dataset asset for index.html (window.AUSPOL).
    Methodology matches the established aggregate (see transform.mjs):
    2PP = sample- & recency-weighted, house-effect-adjusted mean; primaries =
    monthly means; leadership = monthly means of published readings, with the
@@ -704,8 +704,23 @@ const CYC_META = [
   { year: 2022, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Dutton", eDate: "2022-05-21", ePrim: 32.6, eTpp: 52.1, src: 2025, appr: 2022 },
   { year: 2025, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Ley → Taylor", current: true, eDate: "2025-05-03", ePrim: 34.6, eTpp: 55.2 },
 ];
+/* Hanson rides on the opposition-leader chart behind a toggle. Built WITHOUT
+   fillSeries, unlike every other cycle series: she has seven approval-metric
+   readings across part of one term, and interpolating between them would make
+   most of the line invention rather than measurement. Months nobody asked the
+   question stay null, and the chart simply spans the gap. */
+function sparseSeries(points, months, cap) {
+  const b = {};
+  for (const { m, v } of points) {
+    if (v == null) continue;
+    const k = Math.round(m);
+    if (k < 0 || k > cap) continue;
+    (b[k] ||= []).push(v);
+  }
+  return months.map((m) => (b[m] ? r1(mean(b[m])) : null));
+}
 const CYCLE_DEFS = CYC_META.map((c) => {
-  let primPts, tppPts, netPts, oppPts;
+  let primPts, tppPts, netPts, oppPts, hanPts;
   if (c.current) {
     primPts = aggPrimary.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.alp }));
     tppPts = agg2pp.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.alp }));
@@ -714,6 +729,11 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     const apprOnly = appr.filter((a) => metricOf(a.firm, "alb") !== "fav");   // PM approval only, not favourability
     netPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.alb }));
     oppPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.opp }));
+    // Hanson's metric is filtered per row and per DATE – Resolve rated her on
+    // likeability until the 6-11 Jul 2026 wave and on performance after it, so
+    // an unbounded firm test would put favourability on an approval line.
+    hanPts = appr.filter((a) => metricOf(a.firm, "han", a.date) !== "fav")
+                 .map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.han }));
   } else {
     const ps = cyclePolls[c.src], as = cycleAppr[c.appr];
     primPts = ps.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p[c.gov] }));
@@ -725,6 +745,8 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     const apprRows = as.filter((r) => (r.metric || metricOf(r.firm, "alb")) !== "fav");
     netPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.pmNet }));
     oppPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.oppNet }));
+    // no past cycle rated Hanson: cycleApproval carries pmNet and oppNet only
+    hanPts = [];
   }
   const cap = c.current ? Math.max(1, Math.round(monthsSince(LATEST_ISO, c.eDate))) : 36;
   const prim = cycleSeries(primPts, c.ePrim, cap);
@@ -743,6 +765,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: !!c.current,
     eDate: c.eDate,
     months, primary: prim.vals, tpp: tpp.vals, net: align(net), oppnet: align(opp),
+    han: sparseSeries(hanPts, months, cap),
   };
 });
 
@@ -929,15 +952,17 @@ window.AUSPOL = (function () {
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,
     color: PARTIES[c.gov].color, span: c.months[c.months.length - 1],
-    base: { tpp: c.tpp[0], primary: c.primary[0], net: c.net[0], oppnet: c.oppnet[0] },
-    end: { tpp: c.tpp[c.tpp.length - 1], primary: c.primary[c.primary.length - 1], net: c.net[c.net.length - 1], oppnet: c.oppnet[c.oppnet.length - 1] },
+    base: { tpp: c.tpp[0], primary: c.primary[0], net: c.net[0], oppnet: c.oppnet[0], han: c.han[0] },
+    // han is sparse, so "end" is its last READING, not its last slot
+    end: { tpp: c.tpp[c.tpp.length - 1], primary: c.primary[c.primary.length - 1], net: c.net[c.net.length - 1], oppnet: c.oppnet[c.oppnet.length - 1], han: [...c.han].reverse().find((v) => v != null) ?? null },
     points: {
       tpp: c.months.map((m, i) => ({ x: m, y: c.tpp[i] })),
       primary: c.months.map((m, i) => ({ x: m, y: c.primary[i] })),
       net: c.months.map((m, i) => ({ x: m, y: c.net[i] })),
       oppnet: c.months.map((m, i) => ({ x: m, y: c.oppnet[i] })),
+      han: c.months.map((m, i) => ({ x: m, y: c.han[i] })),
     },
-    raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, months: c.months },
+    raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, han: c.han, months: c.months },
   }));
 
   return {

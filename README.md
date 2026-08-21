@@ -1,6 +1,6 @@
 # auspol tracker
 
-`NEW Auspol Tracker (Standalone).html` – a single self-contained page aggregating
+`index.html` – a single self-contained page aggregating
 published Australian federal voting-intention polling. Open it directly or serve
 it anywhere; it has no runtime dependencies and works offline.
 
@@ -38,6 +38,7 @@ new and worth looking at.
 ## Layout
 
 ```
+index.html               the built page (generated – do not hand-edit)
 data/polls.json          canonical dataset (edit this)
 data/polls.schema.json   field documentation
 .build/newtracker/

@@ -111,7 +111,7 @@ const CYC_METRICS = [
     step: 20, refAbs: 0, refAbsLabel: "even" },
   { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader · approve minus disapprove",
     leader: "opp", unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
-    step: 10, refAbs: 0, refAbsLabel: "even" },
+    step: 10, refAbs: 0, refAbsLabel: "even", han: true },
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
     unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: null },
@@ -136,6 +136,12 @@ function cycDomain(cycles, M, chg) {
   const vals = cycles.flatMap((c) => c.raw[M.key]
     .filter((v) => v != null)
     .map((v) => (chg ? v - cycBase(c, M.key) : v)));
+  // Hanson joins the domain whether or not her box is ticked, for the same
+  // reason hidden cycles do: ticking a box should reveal a line, not rescale
+  // the axis under the pointer.
+  if (M.han) vals.push(...cycles.flatMap((c) => (c.raw.han || [])
+    .filter((v) => v != null)
+    .map((v) => (chg ? v - cycBase(c, "han") : v))));
   const ref = chg ? 0 : M.refAbs;
   let lo = Math.min(...vals), hi = Math.max(...vals);
   if (ref != null) { lo = Math.min(lo, ref); hi = Math.max(hi, ref); }
@@ -185,11 +191,35 @@ function toMonthly(months, vals, maxM) {
   return out;
 }
 
-function CycleChart({ metric, cycles, mode, hidden, hi }) {
+function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
   const { D } = window.AP;
   const M = metric;
   const chg = mode === "chg";
   const isOpp = M.leader === "opp";
+
+  /* Hanson is available only where the data is: the current cycle, and only
+     from rows whose metric is approval. hanAvail gates both the line and the
+     tickbox, so if the readings are ever removed the control disappears with
+     them rather than offering an empty line. */
+  const HAN_COLOR = D.PARTIES.onp.color;
+  const hanCycle = M.han ? cycles.find((c) => c.current) : null;
+  const hanRaw = (hanCycle && hanCycle.raw.han) || null;
+  const hanAvail = !!(hanRaw && hanRaw.some((v) => v != null));
+  /* Name the first READING, not the first month bucket it lands in: the
+     earliest rating is 19 Feb 2026, which rounds into the month-10 bucket
+     centred on early March, and a provenance note that says "March" about a
+     February poll is exactly the kind of small lie this page tries not to
+     tell. */
+  const hanFrom = hanAvail ? (() => {
+    const dates = D.individualPolls
+      .filter((p) => p.appr && p.appr.hansonNet != null &&
+                     (!p.appr.metricBy || p.appr.metricBy.hanson !== "fav"))
+      .map((p) => p.released)
+      .sort();
+    if (!dates.length) return null;
+    return new Date(dates[0] + "T00:00:00")
+      .toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
+  })() : null;
 
   // build a monthly series per visible cycle. Past cycles are tinted by the
   // governing party (red Labor / blue Coalition terms) at reduced opacity and
@@ -213,6 +243,28 @@ function CycleChart({ metric, cycles, mode, hidden, hi }) {
              points: pts, weight, current: c.current, opacity,
              endLabel: "’" + String(c.year).slice(2), endLabelOpacity: labOp };
   });
+  /* Hanson – one line, not one per cycle. She has been rated for part of the
+     current term and in no term before it, so there is no past-cycle
+     counterpart to draw and nothing to align her against. Points come straight
+     off the sparse series: a month with no reading contributes no vertex, so
+     the line spans the gap without the tooltip claiming a value there. Straight
+     segments rather than the usual spline – with this few readings a curve
+     invents motion between them. */
+  if (M.han && showHan && hanAvail && !hidden.has(hanCycle.year)) {
+    const hBase = cycBase(hanCycle, "han");
+    const pts = hanCycle.raw.months
+      .map((m, i) => ({ x: m, y: hanRaw[i] }))
+      .filter((p) => p.y != null)
+      .map((p) => ({ x: p.x, y: chg ? +(p.y - hBase).toFixed(2) : p.y }));
+    const dimmed = hi != null && !hanCycle.current;
+    built.push({
+      id: "cyc-han", label: "Hanson · One Nation", color: HAN_COLOR,
+      width: 2.2, points: pts, weight: 2.5, smooth: false, dashed: true,
+      opacity: dimmed ? 0.2 : 0.9,
+      endLabel: "PH", endLabelOpacity: dimmed ? 0.2 : 0.85,
+    });
+  }
+
   // draw muted first, highlighted, current last (on top)
   built.sort((a, b) => a.weight - b.weight);
 
@@ -251,6 +303,16 @@ function CycleChart({ metric, cycles, mode, hidden, hi }) {
         <div>
           <h3 className="card-title">{M.title}</h3>
           <p className="card-sub">{M.sub}</p>
+          {M.han && hanAvail && (
+            <label className={"cyc-han" + (showHan ? " on" : "")}
+                   title={"Pauline Hanson, on the same approve-minus-disapprove basis. " +
+                          "Rated in the current term only, from " + hanFrom + " – no past cycle asked about her, " +
+                          "and favourability ratings are left out, so the line is short."}>
+              <input type="checkbox" checked={!!showHan}
+                     onChange={(e) => setHan(e.target.checked)} />
+              Hanson
+            </label>
+          )}
         </div>
         {insight && (
           <p className="cycle-insight">
@@ -324,23 +386,42 @@ function cycleSeriesRows(cycles) {
   const rows = [[
     "cycle", "government", "prime_minister", "opposition_leader", "is_current",
     "months_since_election", "govt_primary_pct", "govt_2pp_pct",
-    "pm_net_approval", "opp_leader_net_approval",
+    "pm_net_approval", "opp_leader_net_approval", "hanson_net_approval",
   ]];
   cycles.forEach((c) => {
     const r = c.raw;
     r.months.forEach((m, i) => rows.push([
       c.year, c.gov === "alp" ? "Labor" : "Coalition", c.pm, c.oppLead, c.current ? "yes" : "no",
       m, r.primary[i], r.tpp[i], r.net[i], r.oppnet[i],
+      // blank for every past cycle and for months of this one where nobody
+      // asked – the series is sparse and the download says so
+      r.han ? r.han[i] : null,
     ]));
   });
   return rows;
+}
+
+/* One label for a row that can carry two or three leaders on two different
+   questions. Collapses to the plain metric name when they agree, which is the
+   usual case, and names the exception when they do not. */
+function apprMetricLabel(a) {
+  const by = a.metricBy || {};
+  const parts = [];
+  if (a.albNet != null) parts.push(["Albanese", by.alb]);
+  if (a.taylorNet != null) parts.push(["opposition leader", by.taylor]);
+  if (a.hansonNet != null) parts.push(["Hanson", by.hanson]);
+  const name = (m) => (m === "fav" ? "net favourability" : "net approval");
+  if (!parts.length) return null;
+  const kinds = new Set(parts.map(([, m]) => m));
+  if (kinds.size === 1) return name(parts[0][1]);
+  return parts.map(([who, m]) => who + ": " + name(m)).join("; ");
 }
 
 function cycleSourceRows(cycles, D) {
   const rows = [[
     "cycle", "series", "date", "months_since_election", "pollster",
     "primary_alp", "primary_lnp", "primary_grn", "primary_onp", "primary_oth",
-    "tpp_alp", "tpp_lnp", "pm_net", "opp_leader_net", "leader_metric",
+    "tpp_alp", "tpp_lnp", "pm_net", "opp_leader_net", "hanson_net", "leader_metric",
   ]];
   const byYear = new Map(cycles.map((c) => [c.year, c]));
   Object.entries(D.cycleSource || {}).forEach(([year, src]) => {
@@ -348,11 +429,11 @@ function cycleSourceRows(cycles, D) {
     if (!c) return;
     src.polls.forEach((p) => rows.push([
       year, "voting_intention", p.date, p.m, p.firm,
-      p.alp, p.lnp, p.grn, p.onp, p.oth, p.tpp_alp, p.tpp_lnp, null, null, null,
+      p.alp, p.lnp, p.grn, p.onp, p.oth, p.tpp_alp, p.tpp_lnp, null, null, null, null,
     ]));
     src.approval.forEach((a) => rows.push([
       year, "leader_rating", a.date, a.m, a.firm,
-      null, null, null, null, null, null, null, a.pmNet, a.oppNet,
+      null, null, null, null, null, null, null, a.pmNet, a.oppNet, null,
       a.metric === "fav" ? "net favourability" : "net approval",
     ]));
   });
@@ -364,12 +445,18 @@ function cycleSourceRows(cycles, D) {
     const mo = (iso) => Math.round(((Date.parse(iso) - eDate) / 86400000 / 30.436875) * 10) / 10;
     D.individualPolls.forEach((p) => {
       rows.push([cur.year, "voting_intention", p.released, mo(p.released), p.pollster,
-        p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null]);
+        p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null]);
       const a = p.appr;
-      if (a && (a.albNet != null || a.taylorNet != null))
+      if (a && (a.albNet != null || a.taylorNet != null || a.hansonNet != null))
         rows.push([cur.year, "leader_rating", p.released, mo(p.released), p.pollster,
-          null, null, null, null, null, null, null, a.albNet, a.taylorNet,
-          a.metric === "fav" ? "net favourability" : "net approval"]);
+          null, null, null, null, null, null, null, a.albNet, a.taylorNet, a.hansonNet ?? null,
+          /* buildAppr reports a metric PER LEADER (metricBy), never a single
+             row-level one – a house can ask approval about the PM and
+             favourability about Hanson in the same wave. This column read a
+             non-existent a.metric and so labelled every row "net approval",
+             including the favourability rows the charts deliberately exclude.
+             Name the leaders separately where they disagree. */
+          apprMetricLabel(a)]);
     });
   }
   return rows.slice(0, 1).concat(
@@ -382,6 +469,7 @@ function PastCyclesView() {
   const [mode, setMode] = useState("abs");
   const [hidden, setHidden] = useState(new Set());
   const [hi, setHi] = useState(null);
+  const [showHan, setShowHan] = useState(false);
 
   const toggle = (year) => setHidden((h) => {
     const n = new Set(h);
@@ -429,14 +517,24 @@ function PastCyclesView() {
 
       <div className="cyc-charts">
         {CYC_METRICS.map((m) => (
-          <CycleChart key={m.key} metric={m} cycles={cycles} mode={mode} hidden={hidden} hi={hi} />
+          <CycleChart key={m.key} metric={m} cycles={cycles} mode={mode} hidden={hidden} hi={hi}
+                      showHan={showHan} setHan={setShowHan} />
         ))}
       </div>
 
       <p className="cyc-foot">
         The plotted series and the individual polls behind it are both downloadable above.{" "}
         Past cycles run the full ~3-year term to the next election; the current cycle stops at the
-        latest reading. {mode === "chg"
+        latest reading.{" "}
+        {showHan && (
+          <span>
+            Hanson is drawn on the opposition chart from {"“"}approve minus disapprove{"”"} readings only,
+            which is why her line is short: most houses rate her on favourability, a different
+            question that is never blended into these lines, and no past cycle asked about her
+            at all.{" "}
+          </span>
+        )}
+        {mode === "chg"
           ? "Lines show movement relative to each party’s own election result."
           : "Approval lines splice the sitting prime minister – and opposition leader – where a term changed leaders mid-stream."}
       </p>

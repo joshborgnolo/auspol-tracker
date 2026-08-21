@@ -1,4 +1,4 @@
-/* build.mjs – build "NEW Auspol Tracker (Standalone).html" from source.
+/* build.mjs – build index.html from source.
    One command, reproducible from the repo alone:
        node .build/newtracker/build.mjs
 
@@ -23,7 +23,9 @@ import { validate } from "./validate.mjs";
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
-const OUT = path.join(ROOT, "NEW Auspol Tracker (Standalone).html");
+/* index.html, so a static host serves it at the site root with no config and
+   no redirect. The name is the deploy contract, not a description. */
+const OUT = path.join(ROOT, "index.html");
 const A = (f) => path.join(HERE, "assets", f);
 
 /* ---- 1. the data must be sound before anything is built ---------------- */
