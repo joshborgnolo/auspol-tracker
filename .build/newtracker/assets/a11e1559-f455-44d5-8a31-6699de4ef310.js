@@ -326,7 +326,7 @@ function LeadershipSection({ rangeId }) {
 }
 
 // ---- Preferred PM ---------------------------------------------------
-function PreferredPMPanel({ rangeId, leaders, chrome }) {
+function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome }) {
   const { D, rangeDomain, filterPts, buildXTicks } = window.AP;
   // Houses leave anywhere from 16% to 50% uncommitted on this question, so a
   // published share says as much about the format as about the leader. The
@@ -334,7 +334,14 @@ function PreferredPMPanel({ rangeId, leaders, chrome }) {
   // houses comparable – but it is a different quantity, so it is a labelled
   // choice rather than a silent correction.
   const [basis, setBasis] = useState("pub");
-  const suf = basis === "pub" ? "_pref" : "_prefN";
+  /* Two-way is the default because it is the whole cycle: 54 polls across all
+     14 months, against 15 three-way polls in 7. Mixing them was putting a
+     false trough in the line wherever three-way polls happened to land. */
+  const [fmt, setFmt] = useState("2");
+  const suf = (basis === "pub" ? "_pref" : "_prefN") + (fmt === "3" ? "3" : "");
+  // Hanson is only ever named in the three-way prompt; offering her chip on the
+  // two-way view would promise a line that cannot exist
+  const leaders = allLeaders.filter((L) => (L.id === "hanson" ? fmt === "3" : true));
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.leaderMonths, xDomain[0]);
   const latestYm = D.leaderMonths[D.leaderMonths.length - 1].ym;
@@ -350,6 +357,8 @@ function PreferredPMPanel({ rangeId, leaders, chrome }) {
   // the published readings behind the line, on whichever basis is showing
   const ppmScatter = D.individualPolls
     .filter((p) => p.ppm && p.x >= xDomain[0] && p.x <= xDomain[1])
+    // the dots must obey the same question filter as the line above them
+    .filter((p) => (p.ppm.hanson != null) === (fmt === "3"))
     .flatMap((p) => {
       const c = p.ppm;
       const den = (c.alb || 0) + (c.taylor || 0) + (c.ley || 0) + (c.hanson || 0);
@@ -373,12 +382,18 @@ function PreferredPMPanel({ rangeId, leaders, chrome }) {
         <div>
           <h3 className="card-title">Preferred prime minister</h3>
           <p className="card-sub">
+            {fmt === "3" ? "“Who would make the better PM?” asked as a three-way, including Hanson"
+                         : "“Who would make the better PM?” asked as a two-way"}
             {basis === "pub"
-              ? "“Who would make the better PM?” · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable"
-              : "“Who would make the better PM?” · share of those who named someone – comparable across houses, but a three-way contest still divides further than a two-way"}
+              ? " · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable"
+              : " · share of those who named someone – comparable across houses"}
           </p>
         </div>
         <div className="card-head-tools">
+          {/* Question first: it decides WHICH polls are in view, where the
+              basis only decides how they are expressed. */}
+          <TextToggle caps value={fmt} onChange={setFmt} ariaLabel="Preferred-PM question"
+            options={[{ id: "2", label: "Two-way" }, { id: "3", label: "Three-way" }]} />
           <TextToggle caps value={basis} onChange={setBasis} ariaLabel="Preferred-PM basis"
             options={[{ id: "pub", label: "As published" }, { id: "dec", label: "Share of decided" }]} />
           {chrome}

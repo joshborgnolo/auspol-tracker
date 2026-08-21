@@ -93,18 +93,107 @@ html = html.slice(0, faceStart) + faceCss + html.slice(faceEnd);
 //    and give it a tab icon + a share card --
 html = html.replace(/\s*<link rel="preconnect" href="https:\/\/fonts\.(googleapis|gstatic)\.com"[^>]*>/g, "");
 
-// Tab icon: a static echo of the wordmark dial. Single-quoted and
-// percent-encoded so the markup survives being an href value.
-const faviconSvg = [
-  "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 44 28'>",
-  "<path d='M6 24 A16 16 0 0 1 22 8' fill='none' stroke='#c4433a' stroke-width='3.2'/>",
-  "<path d='M22 8 A16 16 0 0 1 38 24' fill='none' stroke='#2d5d8f' stroke-width='3.2'/>",
-  "<line x1='12.9' y1='13.5' x2='10.5' y2='10.4' stroke='#c4433a' stroke-width='3.2'/>",
-  "<line x1='22' y1='6' x2='22' y2='2' stroke='#e0a33c' stroke-width='3.2'/>",
-  "<line x1='31.1' y1='13.5' x2='33.5' y2='10.4' stroke='#2d5d8f' stroke-width='3.2'/>",
-  "<circle cx='22' cy='24' r='2.4' fill='#1d1b18'/></svg>",
-].join("");
-const favicon = encodeURIComponent(faviconSvg);
+/* Tab icon: the masthead glyph itself, drawn from the same aggregates and the
+   same geometry, so it re-draws with the data instead of drifting away from it.
+   The old icon was a freehand approximation - wrong radius, three invented
+   graduations, no needle, eyeballed hex.
+
+   Two deliberate departures, both forced by 16px:
+     - strokes are ~2.4x the on-page weights, or the 1.4-unit arc renders at
+       half a pixel and disappears;
+     - the pivot dot is dropped. It is illegible at this size, and its dark ink
+       would vanish against a dark tab bar anyway.
+   Colours are converted from the page's own oklch tokens rather than guessed. */
+function oklchHex(L, C, Hdeg) {
+  const h = (Hdeg * Math.PI) / 180, a = C * Math.cos(h), b = C * Math.sin(h);
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = L - 0.0894841775 * a - 1.2914855480 * b;
+  const l = l_ ** 3, m = m_ ** 3, sp = s_ ** 3;
+  const lin = [ 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * sp,
+               -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * sp,
+               -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * sp];
+  return "#" + lin.map((c) => {
+    c = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
+    return Math.round(Math.max(0, Math.min(1, c)) * 255).toString(16).padStart(2, "0");
+  }).join("");
+}
+const PARTY_HEX = {
+  alp: oklchHex(0.55, 0.150, 27), lnp: oklchHex(0.50, 0.095, 250),
+  grn: oklchHex(0.60, 0.120, 150), onp: oklchHex(0.66, 0.130, 58),
+};
+
+function buildFavicon() {
+  // pull the derived series straight out of the asset gen-data just wrote
+  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const grab = (name) => {
+    const i = src.indexOf("const " + name + " = ");
+    if (i < 0) throw new Error("favicon: " + name + " not found in dataset");
+    return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
+  };
+  const aggPrimary = grab("aggPrimary"), agg2pp = grab("agg2pp"), alt2pp = grab("alt2pp");
+
+  // --- graduations: latest primary aggregate, tallest first (as on the page) ---
+  const lp = aggPrimary[aggPrimary.length - 1];
+  const glyph = ["alp", "lnp", "grn", "onp"].map((id) => ({ id, v: lp[id] }))
+    .sort((a, b) => b.v - a.v);
+  const vs = glyph.map((p) => p.v), gmin = Math.min(...vs), gmax = Math.max(...vs);
+  const MIN_H = 5, MAX_H = 10.5;
+  glyph.forEach((p) => { p.h = gmax === gmin ? MAX_H : MIN_H + ((p.v - gmin) / (gmax - gmin)) * (MAX_H - MIN_H); });
+
+  // --- needle: 2PP against Labor's strongest challenger ---
+  const g2 = agg2pp[agg2pp.length - 1];
+  const gon = alt2pp.alp_on && alt2pp.alp_on[alt2pp.alp_on.length - 1];
+  const cands = [{ id: "lnp", lab: g2.alp, opp: g2.lnp }];
+  if (gon) cands.push({ id: "onp", lab: gon.a, opp: gon.b });
+  const top = cands.slice().sort((x, y) => y.opp - x.opp)[0];
+  const margin = top.lab - top.opp;
+  const needleDeg = -Math.max(-1, Math.min(1, margin / 12)) * 34;
+  const needleHex = margin >= 0 ? PARTY_HEX.alp : PARTY_HEX[top.id];
+
+  // --- geometry, identical to the masthead ---
+  const GC = { cx: 22, cy: 24.5, r: 12 }, BAR_ANGLES = [-54, -18, 18, 54];
+  const polar = (deg, r) => ({
+    x: +(GC.cx + Math.sin((deg * Math.PI) / 180) * r).toFixed(2),
+    y: +(GC.cy - Math.cos((deg * Math.PI) / 180) * r).toFixed(2),
+  });
+  const arc = (d1, d2) => {
+    const a = polar(d1, GC.r), b = polar(d2, GC.r);
+    return `M ${a.x} ${a.y} A ${GC.r} ${GC.r} 0 0 1 ${b.x} ${b.y}`;
+  };
+  const pts = [];   // every drawn endpoint, for a bbox that can't clip
+  const parts = [
+    `<path d='${arc(-90, 0)}' fill='none' stroke='${PARTY_HEX.alp}' stroke-width='3.4' stroke-linecap='round'/>`,
+    `<path d='${arc(0, 90)}' fill='none' stroke='${PARTY_HEX[top.id]}' stroke-width='3.4' stroke-linecap='round'/>`,
+  ];
+  for (let d = -90; d <= 90; d += 15) pts.push(polar(d, GC.r));
+  glyph.forEach((p, i) => {
+    const a = BAR_ANGLES[i], inner = polar(a, GC.r + 2.4), outer = polar(a, GC.r + 2.4 + p.h);
+    pts.push(inner, outer);
+    parts.push(`<line x1='${inner.x}' y1='${inner.y}' x2='${outer.x}' y2='${outer.y}' stroke='${PARTY_HEX[p.id]}' stroke-width='4.6' stroke-linecap='butt'/>`);
+  });
+  const tip = polar(needleDeg, 8.6);
+  pts.push(tip, { x: GC.cx, y: GC.cy });
+  parts.push(`<line x1='${GC.cx}' y1='${GC.cy}' x2='${tip.x}' y2='${tip.y}' stroke='${needleHex}' stroke-width='3' stroke-linecap='round'/>`);
+
+  /* Square viewBox derived from what is actually drawn, padded by the widest
+     stroke's half-width. Hardcoding it clipped the longest graduation: the
+     favicon's heavier 4.6-unit stroke reaches ~1.9 units further out than the
+     centreline, which a bbox of the endpoints alone does not see. */
+  const HALF = 4.6 / 2 + 0.6;
+  const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
+  const x0 = Math.min(...xs) - HALF, x1 = Math.max(...xs) + HALF;
+  const y0 = Math.min(...ys) - HALF, y1 = Math.max(...ys) + HALF;
+  const side = Math.max(x1 - x0, y1 - y0);
+  const vb = [ ((x0 + x1) / 2 - side / 2).toFixed(2), ((y0 + y1) / 2 - side / 2).toFixed(2),
+               side.toFixed(2), side.toFixed(2) ].join(" ");
+  return { svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${vb}'>${parts.join("")}</svg>`,
+           note: `${glyph.map((p) => p.id + " " + p.v.toFixed(1)).join(", ")} · needle ${needleDeg.toFixed(1)}deg vs ${top.id}` };
+}
+
+const fav = buildFavicon();
+console.log("  favicon:", fav.note);
+const favicon = encodeURIComponent(fav.svg);
 
 html = html.replace('<meta property="og:type" content="website">',
   `<meta property="og:type" content="website">

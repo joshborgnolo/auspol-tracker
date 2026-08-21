@@ -336,6 +336,9 @@ const prefShare = (p, k) => {
 
 const leaderMonths = MONTHS.map((ym) => {
   const pp = ppm.filter((p) => ymOf(p.date) === ym);
+  // a three-way prompt is a different question, never averaged with a two-way
+  const pp2 = pp.filter((p) => p.han == null);
+  const pp3 = pp.filter((p) => p.han != null);
   const rows = appr.filter((p) => ymOf(p.date) === ym);
   if (!pp.length && !rows.length) return null;
   // approval and favourability are different questions – routed PER LEADER by
@@ -369,10 +372,22 @@ const leaderMonths = MONTHS.map((ym) => {
        Note the normalised view removes the undecided-share difference but NOT
        the contest-size one – a leader's share among the decided is naturally
        lower in a three-way than a two-way. */
-    alb_pref: rnd(meanOf(pp, (p) => p.alb)), taylor_pref: rnd(meanOf(pp, (p) => p.opp)), hanson_pref: rnd(meanOf(pp, (p) => p.han)),
-    alb_prefN: rnd(meanOf(pp, (p) => prefShare(p, "alb"))),
-    taylor_prefN: rnd(meanOf(pp, (p) => prefShare(p, "opp"))),
-    hanson_prefN: rnd(meanOf(pp, (p) => prefShare(p, "han"))),
+    /* …and split by QUESTION FORMAT, because a three-way question mechanically
+       depresses both majors: a leader's share is naturally lower when the
+       prompt offers three names. Blending the two put a hole in the line
+       exactly where three-way polling arrived — June 2026 reads 37.3 blended
+       against 42.5 among two-way polls alone, a trough that is question design
+       rather than opinion, and about 2pp of the cycle's apparent decline is
+       the same artefact. Two-way runs the whole cycle (54 polls, all 14
+       months); three-way is recent and partial (15 polls, 7 months). */
+    alb_pref: rnd(meanOf(pp2, (p) => p.alb)), taylor_pref: rnd(meanOf(pp2, (p) => p.opp)), hanson_pref: null,
+    alb_prefN: rnd(meanOf(pp2, (p) => prefShare(p, "alb"))),
+    taylor_prefN: rnd(meanOf(pp2, (p) => prefShare(p, "opp"))),
+    hanson_prefN: null,
+    alb_pref3: rnd(meanOf(pp3, (p) => p.alb)), taylor_pref3: rnd(meanOf(pp3, (p) => p.opp)), hanson_pref3: rnd(meanOf(pp3, (p) => p.han)),
+    alb_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "alb"))),
+    taylor_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "opp"))),
+    hanson_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "han"))),
     alb_net: A.net, taylor_net: O.net, hanson_net: H.net,
     alb_fav: A.fav, taylor_fav: O.fav, hanson_fav: H.fav,
   };
