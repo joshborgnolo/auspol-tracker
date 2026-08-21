@@ -276,7 +276,8 @@ function LeadershipSection({ rangeId }) {
   /* pair  – preferred PM | net rating (default)
      ppm   – preferred PM full width
      appr  – net rating full width
-     both  – approval | favourability, the two net measures side by side */
+     both  – approval | favourability, the two net measures side by side
+     ppmboth – preferred PM two-way | three-way, the two questions side by side */
   const [view, setView] = useState("pair");
   const order = D.LEADERS.map((L) => L.id);
   const toggle = (id) =>
@@ -304,41 +305,59 @@ function LeadershipSection({ rangeId }) {
             metric="net" lockMetric
             chrome={<PanelZoom expanded label="approval" onClose={() => setView("pair")} />} />
         ) : (
-          <PreferredPMPanel rangeId={rangeId} leaders={selLeaders}
-            chrome={<PanelZoom expanded={view === "ppm"} label="preferred prime minister"
-              otherLabel="net rating"
-              onExpand={() => setView("ppm")} onSwap={() => setView("appr")}
-              onClose={() => setView("pair")} />} />
+          <PreferredPMPanel key={view === "ppmboth" ? "ppm-2" : "ppm"}
+            rangeId={rangeId} leaders={selLeaders}
+            {...(view === "ppmboth" ? { fmt: "2", lockFmt: true } : { onBoth: () => setView("ppmboth") })}
+            chrome={view === "ppmboth"
+              ? <PanelZoom expanded label="two-way" onClose={() => setView("pair")} />
+              : <PanelZoom expanded={view === "ppm"} label="preferred prime minister"
+                  otherLabel="net rating"
+                  onExpand={() => setView("ppm")} onSwap={() => setView("appr")}
+                  onClose={() => setView("pair")} />} />
         )}
-        <ApprovalPanel key={view === "both" ? "appr-fav" : "appr"}
-          rangeId={rangeId} leaders={selLeaders}
-          {...(view === "both" ? { metric: "fav", lockMetric: true } : {})}
-          onBoth={() => setView("both")}
-          chrome={view === "both"
-            ? <PanelZoom expanded label="favourability" onClose={() => setView("pair")} />
-            : <PanelZoom expanded={view === "appr"} label="net rating"
-                otherLabel="preferred prime minister"
-                onExpand={() => setView("appr")} onSwap={() => setView("ppm")}
-                onClose={() => setView("pair")} />} />
+        {view === "ppmboth" ? (
+          <PreferredPMPanel key="ppm-3" rangeId={rangeId} leaders={selLeaders}
+            fmt="3" lockFmt
+            chrome={<PanelZoom expanded label="three-way" onClose={() => setView("pair")} />} />
+        ) : (
+          <ApprovalPanel key={view === "both" ? "appr-fav" : "appr"}
+            rangeId={rangeId} leaders={selLeaders}
+            {...(view === "both" ? { metric: "fav", lockMetric: true } : {})}
+            onBoth={() => setView("both")}
+            chrome={view === "both"
+              ? <PanelZoom expanded label="favourability" onClose={() => setView("pair")} />
+              : <PanelZoom expanded={view === "appr"} label="net rating"
+                  otherLabel="preferred prime minister"
+                  onExpand={() => setView("appr")} onSwap={() => setView("ppm")}
+                  onClose={() => setView("pair")} />} />
+        )}
       </div>
     </section>
   );
 }
 
 // ---- Preferred PM ---------------------------------------------------
-function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome }) {
+function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, lockFmt, onBoth }) {
   const { D, rangeDomain, filterPts, buildXTicks } = window.AP;
-  // Houses leave anywhere from 16% to 50% uncommitted on this question, so a
-  // published share says as much about the format as about the leader. The
-  // second basis divides by the people who named someone, which makes the
-  // houses comparable – but it is a different quantity, so it is a labelled
-  // choice rather than a silent correction.
-  const [basis, setBasis] = useState("pub");
-  /* Two-way is the default because it is the whole cycle: 54 polls across all
-     14 months, against 15 three-way polls in 7. Mixing them was putting a
-     false trough in the line wherever three-way polls happened to land. */
-  const [fmt, setFmt] = useState("2");
-  const suf = (basis === "pub" ? "_pref" : "_prefN") + (fmt === "3" ? "3" : "");
+  /* Only the published figure is plotted. A "share of decided" basis used to
+     sit here, on the reasoning that dividing by the people who named someone
+     makes houses comparable. Measured against the archive it does the
+     opposite: holding question format constant, normalising RAISES the
+     between-house spread (4.41 -> 6.98pp) and the within-house spread over
+     time (2.83 -> 5.62pp), because it divides by a small and moving
+     denominator — uncommitted runs 16% at Newspoll against 37% at Redbridge,
+     and has drifted from 35% to 14% across the cycle. It was correcting the
+     smaller distortion and adding a larger one.
+
+     Question format is the split that earns a toggle: two-way is the whole
+     cycle (54 polls, all 14 months), three-way is recent and partial (15
+     polls, 7 months), and blending them put a false trough in the line. */
+  const [ownFmt, setOwnFmt] = useState("2");
+  const fmt = fmtProp || ownFmt;
+  // "Both" is a layout, not a third question — it hands the section a request
+  // to show the two formats side by side rather than averaging them
+  const setFmt = (v) => (v === "both" ? onBoth && onBoth() : setOwnFmt(v));
+  const suf = fmt === "3" ? "_pref3" : "_pref";
   // Hanson is only ever named in the three-way prompt; offering her chip on the
   // two-way view would promise a line that cannot exist
   const leaders = allLeaders.filter((L) => (L.id === "hanson" ? fmt === "3" : true));
@@ -354,21 +373,19 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome }) {
     if (b.id === "alb") return 1;
     return ((reads[b.id] || {}).v ?? -1) - ((reads[a.id] || {}).v ?? -1);
   });
-  // the published readings behind the line, on whichever basis is showing
+  // the published readings behind the line
   const ppmScatter = D.individualPolls
     .filter((p) => p.ppm && p.x >= xDomain[0] && p.x <= xDomain[1])
     // the dots must obey the same question filter as the line above them
     .filter((p) => (p.ppm.hanson != null) === (fmt === "3"))
     .flatMap((p) => {
       const c = p.ppm;
-      const den = (c.alb || 0) + (c.taylor || 0) + (c.ley || 0) + (c.hanson || 0);
       return leaders.map((L) => {
         // the opposition slot is an office: Ley's readings belong to the same
         // line as Taylor's, exactly as the trend splices them
         const raw = L.id === "taylor" ? (c.taylor != null ? c.taylor : c.ley) : c[L.id];
         if (raw == null) return null;
-        const y = basis === "pub" ? raw : (den > 0 ? (raw / den) * 100 : null);
-        return y == null ? null : { x: p.x, y, color: L.color, label: L.short, meta: p };
+        return { x: p.x, y: raw, color: L.color, label: L.short, meta: p };
       }).filter(Boolean);
     });
 
@@ -384,18 +401,15 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome }) {
           <p className="card-sub">
             {fmt === "3" ? "“Who would make the better PM?” asked as a three-way, including Hanson"
                          : "“Who would make the better PM?” asked as a two-way"}
-            {basis === "pub"
-              ? " · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable"
-              : " · share of those who named someone – comparable across houses"}
+            {" · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable"}
           </p>
         </div>
         <div className="card-head-tools">
-          {/* Question first: it decides WHICH polls are in view, where the
-              basis only decides how they are expressed. */}
-          <TextToggle caps value={fmt} onChange={setFmt} ariaLabel="Preferred-PM question"
-            options={[{ id: "2", label: "Two-way" }, { id: "3", label: "Three-way" }]} />
-          <TextToggle caps value={basis} onChange={setBasis} ariaLabel="Preferred-PM basis"
-            options={[{ id: "pub", label: "As published" }, { id: "dec", label: "Share of decided" }]} />
+          {!lockFmt && (
+            <TextToggle caps value={fmt} onChange={setFmt} ariaLabel="Preferred-PM question"
+              options={[{ id: "2", label: "Two-way" }, { id: "3", label: "Three-way" },
+                        ...(onBoth ? [{ id: "both", label: "Both" }] : [])]} />
+          )}
           {chrome}
         </div>
       </div>
@@ -416,7 +430,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome }) {
         })}
       </div>
       <TrendChart
-        key={"ppm-" + basis + "-" + rangeId + "-" + leaders.map((L) => L.id).join(".")}
+        key={"ppm-" + fmt + "-" + rangeId + "-" + leaders.map((L) => L.id).join(".")}
         height={250} xDomain={xDomain} yDomain={domain}
         yTicks={ticks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
