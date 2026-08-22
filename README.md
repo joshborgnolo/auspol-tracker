@@ -83,14 +83,33 @@ module: the Snapshot scatter plots it on load.
 
 ### Share card
 
-`assets/auspol-card.png` (1200x630) is the `og:image`. It carries no live
-figures on purpose – a card with numbers would be stale the moment a new poll
-landed, and scrapers cache it regardless – so it is NOT rebuilt by `build.mjs`.
-Regenerate it only when the branding changes, using
-`.build/newtracker/make-card.js` (instructions in its header). It draws on a
-canvas inside the live page so it picks up the site's real typefaces; the
-previous card was rasterised separately and had drifted onto the predecessor's
-wording and system fonts.
+`assets/auspol-card.png` (1200x630) is the `og:image`, and it carries the live
+reading: the 2PP figures, the margin and its interval, and the whole term's
+trend with the lead shaded down to the majority line. Every value is read from
+the same `window.AUSPOL` the page renders from, so the card cannot contradict
+the page it previews. It states the uncertainty, and says so when a
+month-on-month move does not clear it — the page refuses to call such a move
+real, and a card that dropped that caveat would quote the site against itself.
+
+Because it carries figures it can be **wrong**, which the previous generic card
+could not be. Two things guard that:
+
+- `assets/auspol-card.json` records the data date the card was drawn for.
+  `build.mjs` compares it against the current data and prints a loud notice
+  when they diverge. It does not fail the build — the card is not load-bearing
+  — but it will not let a stale one pass unremarked.
+- `og:image` carries `?v=<that date>`. Scrapers key their caches on the full
+  URL, so a redraw is a new URL and they refetch instead of serving the old
+  card.
+
+`build.mjs` cannot draw it: there is no rasteriser in the toolchain, and the
+card needs the page's own webfonts — canvas text picks those up only from a
+document that has already loaded them, and rasterising an SVG instead falls
+back to system fonts, which is how the previous card drifted off-brand
+unnoticed. So regeneration is a hand step, documented in the header of
+`.build/newtracker/make-card.js`: serve the repo, open `index.html`, paste the
+file into the console, move the download into `assets/`, and update the date in
+`assets/auspol-card.json`.
 
 ### Fonts
 

@@ -203,6 +203,16 @@ function buildFavicon() {
            note: `${glyph.map((p) => p.id + " " + p.v.toFixed(1)).join(", ")} · needle ${needleDeg.toFixed(1)}deg vs ${top.id}` };
 }
 
+/* Pull the derived headline straight out of the dataset gen-data just wrote,
+   so the card's stamp check and its alt text quote the same numbers the page
+   does rather than a second, drifting copy. */
+function grabLatest() {
+  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const i = src.indexOf("const latest = ");
+  if (i < 0) throw new Error("latest not found in dataset");
+  return JSON.parse(src.slice(i + 15, src.indexOf("\n", i)).replace(/;$/, ""));
+}
+
 const fav = buildFavicon();
 console.log("  favicon:", fav.note);
 const favicon = encodeURIComponent(fav.svg);
@@ -279,15 +289,42 @@ function buildStaticSummary() {
 if (!html.includes("<!--STATIC_SUMMARY-->")) throw new Error("STATIC_SUMMARY marker not found in template");
 html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + buildStaticSummary() + "\n  ");
 
+/* The share card carries live figures, so it can be WRONG in a way the old
+   generic one could not. build.mjs cannot draw it - no rasteriser here, and it
+   needs the page's own webfonts (see make-card.js) - but it can refuse to let
+   a stale one pass unremarked, and it can stop scrapers serving a cached old
+   card once a new one exists. The date the card was drawn for is recorded
+   beside it; ?v= makes every redraw a new URL as far as a scraper is
+   concerned, because they key their caches on the full URL. */
+let cardStamp = null;
+try {
+  cardStamp = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-card.json"), "utf8")).updatedISO;
+} catch (_) { /* no stamp: reported below */ }
+const dataStamp = grabLatest().updatedISO;
+if (cardStamp !== dataStamp) {
+  console.warn(`\n  ! share card is drawn for ${cardStamp || "an unrecorded date"}, data is ${dataStamp}`);
+  console.warn(`    it will preview figures that are not the ones on the page.`);
+  console.warn(`    regenerate: see .build/newtracker/make-card.js, then update assets/auspol-card.json\n`);
+} else {
+  console.log(`  share card: current (${cardStamp})`);
+}
+const cardUrl = `${SITE_URL}assets/auspol-card.png?v=${cardStamp || dataStamp}`;
+/* The card is now a chart with figures on it, so its alt says them. Someone
+   who cannot see the preview should get the same reading from it. */
+const cl = grabLatest();
+const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, Coalition ${cl.lnp2pp.toFixed(1)} `
+  + `two-party preferred, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
+  + `with the trend since the 2025 election`;
+
 html = html.replace('<meta property="og:type" content="website">',
   `<meta property="og:type" content="website">
   <meta property="og:site_name" content="auspol tracker">
   <meta property="og:locale" content="en_AU">
   <meta property="og:url" content="${SITE_URL}">
-  <meta property="og:image" content="${SITE_URL}assets/auspol-card.png">
+  <meta property="og:image" content="${cardUrl}">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="auspol tracker – an aggregate of Australian federal voting intention">
+  <meta property="og:image:alt" content="${cardAlt}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#14110d" media="(prefers-color-scheme: dark)">
