@@ -1,11 +1,47 @@
 /* auspol tracker – lower panels: primary vote, leaders, pollster table */
 
 // ---- small shared UI ------------------------------------------------
-function Segmented({ options, value, onChange, size }) {
+
+/* Keyboard behaviour for a role="radiogroup" of role="radio" buttons.
+
+   The markup already claimed the radio pattern; this supplies the half of it a
+   screen-reader user is entitled to expect. A radio group is ONE tab stop
+   (roving tabindex) and the arrows move within it, selecting as they go —
+   otherwise Tab walks every option and the arrows, which is what the
+   announcement tells you to press, do nothing at all. */
+function useRadioGroup(options, value, onChange) {
+  const refs = useRef({});
+  const ids = options.map((o) => o.id);
+  const onKeyDown = (e) => {
+    const i = ids.indexOf(value);
+    let next = null;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = ids[(i + 1) % ids.length];
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = ids[(i - 1 + ids.length) % ids.length];
+    else if (e.key === "Home") next = ids[0];
+    else if (e.key === "End") next = ids[ids.length - 1];
+    if (next == null) return;
+    e.preventDefault();
+    onChange(next);
+    const el = refs.current[next];
+    if (el) el.focus();
+  };
+  return {
+    onKeyDown,
+    // the checked option holds the tab stop; an empty selection falls back to
+    // the first, so the group is always reachable
+    tabIndexFor: (id) => (id === value || (ids.indexOf(value) < 0 && id === ids[0]) ? 0 : -1),
+    refFor: (id) => (el) => { refs.current[id] = el; },
+  };
+}
+
+function Segmented({ options, value, onChange, size, ariaLabel }) {
+  const rg = useRadioGroup(options, value, onChange);
   return (
-    <div className={"segmented" + (size === "sm" ? " segmented-sm" : "")} role="radiogroup">
+    <div className={"segmented" + (size === "sm" ? " segmented-sm" : "")}
+         role="radiogroup" aria-label={ariaLabel} onKeyDown={rg.onKeyDown}>
       {options.map((o) => (
         <button key={o.id} role="radio" aria-checked={value === o.id}
+                tabIndex={rg.tabIndexFor(o.id)} ref={rg.refFor(o.id)}
                 className={"seg-btn" + (value === o.id ? " active" : "")}
                 onClick={() => onChange(o.id)}>{o.label}</button>
       ))}
@@ -32,12 +68,15 @@ function toggleLabel(label) {
 }
 
 function TextToggle({ options, value, onChange, caps, ariaLabel }) {
+  const rg = useRadioGroup(options, value, onChange);
   return (
-    <div className={"text-toggle" + (caps ? " tt-caps" : "")} role="radiogroup" aria-label={ariaLabel}>
+    <div className={"text-toggle" + (caps ? " tt-caps" : "")} role="radiogroup"
+         aria-label={ariaLabel} onKeyDown={rg.onKeyDown}>
       {options.map((o, i) => (
         <React.Fragment key={o.id}>
           {i > 0 && <span className="tt-div" aria-hidden="true"></span>}
           <button role="radio" aria-checked={value === o.id}
+                  tabIndex={rg.tabIndexFor(o.id)} ref={rg.refFor(o.id)}
                   className={"tt-opt" + (value === o.id ? " active" : "")}
                   onClick={() => onChange(o.id)}>
             {o.dots && o.dots.length === 2 ? (
@@ -1155,7 +1194,7 @@ function HouseFx({ he, firm, pos, neg, unit = "pp" }) {
   const toward = h.v > 0 ? pos : neg;
   return (
     <span className={"hfx" + (flat ? " flat" : "")}
-          style={!flat && toward ? { color: toward.color } : null}
+          style={!flat && toward ? { color: inkOf(toward.color) } : null}
           title={flat
             ? `No measurable lean – sits on the cross-house consensus (from ${h.n} poll${h.n === 1 ? "" : "s"})`
             : `Runs ${Math.abs(h.v).toFixed(1)}${unit} ${h.v > 0 ? "above" : "below"} the cross-house consensus`

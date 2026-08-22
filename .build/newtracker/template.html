@@ -213,9 +213,12 @@
   --ink:       oklch(0.27 0.012 55);
   --ink-2:     oklch(0.44 0.012 55);
   /* --ink-3 is the lightest ink that still carries TEXT (card subtitles, muted
-     table cells), so it is pinned to 4.5:1 on --bg. --ink-faint sits below the
-     text threshold by design and is for rules, ticks and glyphs only. */
-  --ink-3:     oklch(0.54 0.010 58);
+     table cells). --ink-faint sits below the text threshold by design and is
+     for rules, ticks and glyphs only.
+     Pinned at 5.1:1 on --bg rather than exactly 4.5, because several of the
+     things it labels sit on a TINTED pill rather than on paper (.vr-pill,
+     .cyc-lead), which costs ~0.5 – at 0.54 those landed at 4.2-4.5. */
+  --ink-3:     oklch(0.52 0.010 58);
   --ink-faint: oklch(0.70 0.008 65);
 
   /* hairlines */
@@ -228,6 +231,18 @@
   --grn: oklch(0.60 0.120 150);  /* Greens       */
   --onp: oklch(0.66 0.130 58);   /* One Nation orange */
   --oth: oklch(0.64 0.018 70);   /* Others grey  */
+
+  /* The party colours above are MARK colours – tuned for dots, lines and bars,
+     where luminance carries no legibility burden. Set the same hue as 10px
+     type and Greens lands at 3.5:1 and One Nation at 3.0:1 on paper. These are
+     the same hues held to the text threshold, and every party colour that
+     paints a GLYPH uses them (see inkOf() in the shared helpers). Labor and the
+     Coalition are already dark enough, so they alias and nothing shifts. */
+  --alp-text: var(--alp);
+  --lnp-text: var(--lnp);
+  --grn-text: oklch(0.52 0.120 150);
+  --onp-text: oklch(0.52 0.130 58);
+  --oth-text: oklch(0.50 0.018 70);
 
   --accent: oklch(0.50 0.070 205);
 
@@ -298,6 +313,15 @@ body.dark {
   --onp: oklch(0.760 0.135 64);
   --oth: oklch(0.700 0.018 72);
 
+  /* On dark the marks are already lifted well past the text threshold, so the
+     text variants alias straight through – the split still has to EXIST here
+     or inkOf() would resolve to nothing in dark mode. */
+  --alp-text: var(--alp);
+  --lnp-text: var(--lnp);
+  --grn-text: var(--grn);
+  --onp-text: var(--onp);
+  --oth-text: var(--oth);
+
   --accent: oklch(0.70 0.080 205);
 
   /* national-mood colours – lifted for dark (brick stays browner/duller than ON) */
@@ -347,32 +371,47 @@ body {
   line-height: 1.45;
 }
 
-/* ---------- boot / no-JS states ---------- */
-.boot {
-  min-height: 100vh; display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 18px;
-  opacity: 0; animation: boot-in .4s ease .25s forwards;
+/* ---------- pre-script / no-JS state ----------
+   What the document shows before React mounts. This used to be an animated
+   placeholder set to opacity:0 for 250ms while React mounted in ~160ms, i.e. a
+   spinner nobody ever saw sitting where the content should have been. It is
+   now the real headline aggregate as text (see buildStaticSummary in
+   build.mjs), styled well enough to stand on its own for a reader whose script
+   never ran, and cleared by createRoot() for everyone else. */
+.static-summary {
+  max-width: 680px; margin: 0 auto; padding: 40px 28px 24px;
+  font-family: var(--sans); color: var(--ink);
 }
-@keyframes boot-in { to { opacity: 1; } }
-.boot-bars { display: inline-flex; align-items: flex-end; gap: 4px; height: 30px; }
-.boot-bars i {
-  width: 7px; border-radius: 2px; background: var(--ink-faint);
-  animation: boot-bounce 1.05s ease-in-out infinite;
+.static-summary h1 {
+  font-family: var(--serif); font-size: 34px; font-weight: 600;
+  letter-spacing: -0.01em; margin: 0 0 6px;
 }
-.boot-bars i:nth-child(1) { height: 14px; background: var(--alp); animation-delay: 0s; }
-.boot-bars i:nth-child(2) { height: 26px; background: var(--lnp); animation-delay: .12s; }
-.boot-bars i:nth-child(3) { height: 18px; background: var(--grn); animation-delay: .24s; }
-.boot-bars i:nth-child(4) { height: 10px; background: var(--onp); animation-delay: .36s; }
-@keyframes boot-bounce { 0%, 100% { transform: scaleY(0.55); opacity: .55; } 50% { transform: scaleY(1); opacity: 1; } }
-.boot-bars i { transform-origin: bottom; }
-.boot-text { font-family: var(--sans); font-size: 13px; color: var(--ink-faint); letter-spacing: .02em; margin: 0; }
-@media (prefers-reduced-motion: reduce) {
-  .boot { animation: none; opacity: 1; }
-  .boot-bars i { animation: none; }
+.static-summary h2 {
+  font-family: var(--serif); font-size: 20px; font-weight: 600;
+  margin: 28px 0 8px; padding-top: 14px; border-top: 1px solid var(--line);
 }
+.ss-sub { margin: 0 0 4px; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+.ss-lead { font-size: 22px; margin: 0 0 8px; font-variant-numeric: tabular-nums; }
+.static-summary p { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+.ss-primary { margin: 0; padding: 0; list-style: none; font-size: 15px; }
+.ss-primary li {
+  display: flex; justify-content: space-between; max-width: 320px;
+  padding: 5px 0; border-bottom: 1px solid var(--line-2);
+  font-variant-numeric: tabular-nums;
+}
+.ss-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.ss-table caption { text-align: left; padding-bottom: 8px; font-size: 12.5px; color: var(--ink-3); }
+.ss-table th, .ss-table td {
+  text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line-2);
+  font-variant-numeric: tabular-nums;
+}
+.ss-table thead th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.ss-table th[scope="row"], .ss-table thead th:first-child { text-align: left; font-weight: 600; }
+.ss-table td:nth-child(2) { text-align: left; }
+.ss-note { margin-top: 20px; font-size: 12.5px; color: var(--ink-3); }
 .boot-noscript {
-  max-width: 540px; margin: 12vh auto; padding: 22px 26px;
-  font-family: var(--sans); font-size: 15px; line-height: 1.5; color: var(--ink-2);
+  max-width: 680px; margin: 0 auto 12vh; padding: 16px 26px;
+  font-family: var(--sans); font-size: 14px; line-height: 1.5; color: var(--ink-2);
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
 }
 .boot-noscript strong { color: var(--ink); }
@@ -393,8 +432,9 @@ body {
   font-weight: 800; font-size: 30px; letter-spacing: -0.025em; line-height: 1;
   margin: 0;
 }
-/* visually-hidden expansion of the wordmark for screen readers / document outline */
-.wm-sr {
+/* visually-hidden: the wordmark's expansion for screen readers / document
+   outline, and the charts' live readout (see .chart-svg below) */
+.wm-sr, .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
@@ -451,7 +491,7 @@ body {
 }
 .dl-close {
   position: absolute; top: 10px; right: 12px; width: 30px; height: 30px;
-  border: 0; background: none; color: var(--ink-faint); cursor: pointer;
+  border: 0; background: none; color: var(--ink-3); cursor: pointer;
   font: 400 24px/1 var(--sans); border-radius: 8px;
 }
 .dl-close:hover { color: var(--ink); background: var(--surface-2); }
@@ -491,15 +531,15 @@ body {
 }
 .dl-tag {
   font-family: var(--sans); font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em;
-  text-transform: uppercase; color: var(--ink-faint); border: 1px solid var(--line);
+  text-transform: uppercase; color: var(--ink-3); border: 1px solid var(--line);
   border-radius: 999px; padding: 2px 7px;
 }
 .dl-contest {
   margin-top: 5px; font-family: var(--sans); font-size: 15px; font-weight: 700;
   font-variant-numeric: tabular-nums; display: flex; gap: 9px; justify-content: center;
 }
-.dl-v { color: var(--ink-faint); font-weight: 500; font-style: italic; }
-.dl-note { margin-top: 5px; font-size: 12px; color: var(--ink-faint); }
+.dl-v { color: var(--ink-3); font-weight: 500; font-style: italic; }
+.dl-note { margin-top: 5px; font-size: 12px; color: var(--ink-3); }
 
 .dl-track { position: relative; height: 26px; cursor: default; touch-action: none; }
 .dl-track:not(.playing) { cursor: ew-resize; }
@@ -519,7 +559,7 @@ body {
 .dl-track.playing .dl-head { transition: none; }
 
 .dl-foot { display: flex; align-items: flex-end; gap: 16px; }
-.dl-legend { flex: 1; font-size: 11.5px; line-height: 1.5; color: var(--ink-faint); }
+.dl-legend { flex: 1; font-size: 11.5px; line-height: 1.5; color: var(--ink-3); }
 .dl-replay {
   flex: none; border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
   padding: 6px 14px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
@@ -557,7 +597,7 @@ body {
 .head-right { display: flex; align-items: center; gap: 18px; }
 .head-meta { display: flex; align-items: center; gap: 18px; }
 .meta-item { display: flex; flex-direction: column; gap: 2px; }
-.meta-k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint); font-weight: 600; white-space: nowrap; }
+.meta-k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); font-weight: 600; white-space: nowrap; }
 .meta-v { font-size: 14px; color: var(--ink); font-weight: 600; white-space: nowrap; }
 .fresh-dot {
   display: inline-block; vertical-align: middle; position: relative; top: -1px;
@@ -566,11 +606,11 @@ body {
 .fresh-dot.fresh { background: var(--mood-pos); }
 .fresh-dot.aging { background: var(--ink-3); }
 .fresh-dot.stale { background: var(--mood-neg); }
-.fresh-rel { margin-left: 6px; color: var(--ink-faint); font-weight: 500; }
+.fresh-rel { margin-left: 6px; color: var(--ink-3); font-weight: 500; }
 .meta-divide { width: 1px; height: 30px; background: var(--line); }
 .theme-cell {
   padding: 7px 10px; display: inline-flex; align-items: center; justify-content: center;
-  color: var(--ink-faint);
+  color: var(--ink-3);
 }
 .theme-cell:hover { color: var(--ink-2); }
 .theme-cell.active { color: var(--ink); }
@@ -705,7 +745,7 @@ body {
 .tt-opt {
   border: 0; background: transparent; cursor: pointer; padding: 2px 0;
   font-family: var(--sans); font-size: 14px; font-weight: 500;
-  color: var(--ink-faint); letter-spacing: -0.005em;
+  color: var(--ink-3); letter-spacing: -0.005em;
   border-bottom: 1.5px solid transparent; transition: color .15s ease; white-space: nowrap;
 }
 .tt-opt:hover { color: var(--ink-2); }
@@ -725,11 +765,11 @@ body {
    scoreboard so "ALP" / "L/NP" read as the same tracked-caps token everywhere. */
 .party-tok { letter-spacing: 0.04em; font-weight: 600; }
 .tt-opt.active .party-tok { font-weight: 700; }
-.tt-vs { font-style: italic; font-weight: 400; color: var(--ink-faint); margin: 0 4px; }
+.tt-vs { font-style: italic; font-weight: 400; color: var(--ink-3); margin: 0 4px; }
 .tt-opt:not(.active) .tt-dots { opacity: 0.78; }
 .tt-caps .tt-opt {
   font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--ink-faint);
+  color: var(--ink-3);
 }
 .tt-caps .tt-opt.active { color: var(--ink); font-weight: 700; }
 .tt-caps .tt-div { height: 10px; }
@@ -739,19 +779,19 @@ body {
 .hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; margin-bottom: 6px; }
 .hero-eyebrow {
   font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--ink-faint); font-weight: 700; margin: 0 0 10px;
+  color: var(--ink-3); font-weight: 700; margin: 0 0 10px;
 }
 .hero-readout { display: flex; align-items: baseline; gap: 16px; }
 .ro-party { display: flex; align-items: baseline; gap: 11px; }
 .ro-dot { width: 13px; height: 13px; border-radius: 50%; align-self: center; }
 .ro-name { font-size: 17px; font-weight: 700; color: var(--ink-2); letter-spacing: -0.01em; white-space: nowrap; }
 .ro-num { font-size: 62px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
-.alp-side .ro-num { color: var(--alp); }
-.lnp-side .ro-num { color: var(--lnp); }
+.alp-side .ro-num { color: var(--alp-text); }
+.lnp-side .ro-num { color: var(--lnp-text); }
 .ro-sep { width: 2px; height: 44px; border-radius: 1px; background: var(--line); align-self: center; }
 .hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
-.hero-sub-note { font-size: 13px; color: var(--ink-faint); white-space: nowrap; }
+.hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 /* The interval sits directly under the headline pair, quieter than the numbers
    but above the lead/delta line – it qualifies the figure, so it reads before
    the movement does. */
@@ -765,7 +805,7 @@ body {
    a ::before they belonged to the following flex item, so a wrap carried the
    dot down to open the next line on its own. */
 .hero-interval > *:not(:last-child)::after {
-  content: "·"; color: var(--ink-faint); font-weight: 400; margin-left: 8px;
+  content: "·"; color: var(--ink-3); font-weight: 400; margin-left: 8px;
 }
 @media (max-width: 620px) {
   /* give the note its own line rather than letting it break mid-clause, and
@@ -774,13 +814,13 @@ body {
   .hero-interval > .hi-range:not(:last-child)::after { content: none; }
 }
 .hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.hi-note { font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
+.hi-note { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
 /* Movement smaller than its own interval – stated, not colour-coded, so it
    reads as a qualification rather than a warning. */
-.hero-caveat { color: var(--ink-faint); font-style: italic; }
+.hero-caveat { color: var(--ink-3); font-style: italic; }
 .hero-hypo {
   font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--onp); border: 1px solid var(--onp); border-radius: 999px; padding: 3px 9px;
+  color: var(--onp-text); border: 1px solid var(--onp); border-radius: 999px; padding: 3px 9px;
   opacity: 0.9;
 }
 .hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
@@ -794,8 +834,8 @@ body {
 .hl-swatch-dot { width: 9px; height: 9px; border-radius: 50%; opacity: 0.75; }
 /* "limited data" caveat inside the hero eyebrow – same size, quieter weight,
    so it reads as a qualifier on the method rather than a separate label */
-.eyebrow-warn { color: var(--ink-faint); font-weight: 600; }
-.hero-caption { margin: 0; font-size: 12.5px; color: var(--ink-faint); }
+.eyebrow-warn { color: var(--ink-3); font-weight: 600; }
+.hero-caption { margin: 0; font-size: 12.5px; color: var(--ink-3); }
 
 /* ---------- delta ---------- */
 .delta { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; white-space: nowrap; }
@@ -805,11 +845,16 @@ body {
    by a party colour, so a falling Labor figure no longer renders in Labor red */
 .delta.up { color: var(--ink-2); }
 .delta.down { color: var(--ink-2); }
-.delta.flat { color: var(--ink-faint); font-weight: 600; }
+.delta.flat { color: var(--ink-3); font-weight: 600; }
 
 /* ---------- chart ---------- */
 .chart { position: relative; width: 100%; margin-top: 4px; }
-.chart-svg { width: 100%; height: auto; display: block; overflow: visible; }
+/* pan-y keeps vertical page scrolling with the browser while horizontal drags
+   belong to the chart, so scrubbing the guide on a phone never fights the page.
+   The chart is a tab stop (arrow keys step the guide), so it needs the ring —
+   inset, because overflow:visible would push an offset ring under the card edge. */
+.chart-svg { width: 100%; height: auto; display: block; overflow: visible; touch-action: pan-y; }
+.chart-svg:focus-visible { outline: 2.5px solid var(--accent); outline-offset: -3px; border-radius: 4px; }
 .grid { stroke: var(--line-2); stroke-width: 1; }
 .refline { stroke-width: 1.4; stroke-dasharray: 2 5; opacity: 0.85; }
 .refline-label {
@@ -897,14 +942,14 @@ body {
 .tip-evt { max-width: 240px; min-width: 0; }
 .tip-date {
   font-family: var(--sans); font-size: 11px; font-weight: 600;
-  letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-faint);
+  letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3);
   margin-top: 2px;
 }
 .tip-desc {
   margin-top: 6px; font-size: 12px; line-height: 1.45; color: var(--ink-2);
   text-wrap: pretty;
 }
-.tip-sub { font-size: 11px; color: var(--ink-faint); margin-top: 5px; }
+.tip-sub { font-size: 11px; color: var(--ink-3); margin-top: 5px; }
 
 /* ---------- docked 2PP score (lives in the sticky tab bar) ---------- */
 /* absolutely seated on the underline at the row's right edge – it occupies no
@@ -921,7 +966,7 @@ body {
 .tabs.pinned .tab-score { opacity: 1; transform: none; pointer-events: auto; }
 .ts-eyebrow {
   font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink-faint); margin-right: 2px;
+  color: var(--ink-3); margin-right: 2px;
 }
 .ts-party { display: inline-flex; align-items: baseline; gap: 5px; }
 .ts-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; align-self: center; }
@@ -960,7 +1005,7 @@ body {
 .legend-swatch { width: 9px; height: 9px; border-radius: 2px; }
 .legend-name { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
 .legend-val { font-size: 12.5px; font-weight: 700; color: var(--ink); }
-.legend-chip.off .legend-val { color: var(--ink-faint); }
+.legend-chip.off .legend-val { color: var(--ink-3); }
 
 /* residual aggregate ("Others / Ind.") – not a party. Its swatch becomes a
    dashed rule echoing the dashed chart line, and the label is dimmed so it
@@ -971,7 +1016,7 @@ body {
   border-top: 2px dashed var(--oth);
   align-self: center;
 }
-.legend-chip.residual .legend-name { color: var(--ink-faint); font-weight: 500; }
+.legend-chip.residual .legend-name { color: var(--ink-3); font-weight: 500; }
 .legend-chip.residual .legend-val { color: var(--ink-3); font-weight: 600; }
 
 /* ---------- leadership section (shared selector + two panels) ---------- */
@@ -1002,7 +1047,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .leader-select { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .ls-label {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
-  color: var(--ink-faint); font-weight: 700; white-space: nowrap;
+  color: var(--ink-3); font-weight: 700; white-space: nowrap;
 }
 .ls-chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .ls-chip {
@@ -1021,7 +1066,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .ls-chip:not(.on) .ls-dot { opacity: 0.4; }
 .ls-chip:disabled { cursor: default; }
 .ls-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
-.ls-cur { color: var(--ink-faint); font-weight: 600; }
+.ls-cur { color: var(--ink-3); font-weight: 600; }
 .ls-chip.on .ls-cur { color: var(--ink-3); }
 
 /* ---------- leaders ---------- */
@@ -1032,15 +1077,15 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .leader-num { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
 .leader-num .pct { font-size: 16px; font-weight: 700; color: var(--ink-3); margin-left: 1px; }
 .leader-num.muted { color: var(--ink-3); }
-.leader-vs { font-family: var(--serif); font-style: italic; color: var(--ink-faint); font-size: 15px; }
+.leader-vs { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 15px; }
 .leader.undecided { margin-left: auto; text-align: right; flex-direction: column; align-items: flex-end; gap: 0; }
 
 .approval-readout { display: flex; flex-direction: column; gap: 11px; margin-bottom: 12px; }
 .appr-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 .appr-top .leader-name { font-size: 13.5px; }
 .net { margin-left: auto; font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; }
-.net.pos { color: var(--grn); }
-.net.neg { color: var(--alp); }
+.net.pos { color: var(--grn-text); }
+.net.neg { color: var(--alp-text); }
 .appr-bar { display: flex; height: 22px; border-radius: 5px; overflow: hidden; font-size: 11.5px; font-weight: 700; }
 /* inline figures use full-strength ink so they stay legible on the pale
    approve/disapprove tints in both light and dark themes (the bar colour
@@ -1054,16 +1099,16 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
    question from approval and not directly comparable */
 .fav-mark {
   font-size: 8px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
-  color: var(--ink-faint); vertical-align: super; margin-left: 3px; cursor: help;
+  color: var(--ink-3); vertical-align: super; margin-left: 3px; cursor: help;
 }
 /* change indicator vs the pollster's previous poll – neutral ink, direction by
    the ▲/▼ glyph (no good/bad colour). Sits quietly after the figure. */
 .chg {
-  margin-left: 5px; font-size: 10.5px; font-weight: 700; color: var(--ink-faint);
+  margin-left: 5px; font-size: 10.5px; font-weight: 700; color: var(--ink-3);
   font-variant-numeric: tabular-nums; white-space: nowrap; cursor: help;
   letter-spacing: -0.01em;
 }
-.chg.flat { color: var(--ink-faint); opacity: 0.7; }
+.chg.flat { color: var(--ink-3); opacity: 0.7; }
 .chg .chg-x { font-size: 8px; }
 
 /* diverging net bar – the live source publishes nets only (no approve /
@@ -1073,7 +1118,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .anb-fill { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
 
 /* a reading older than the latest month carries a quiet month tag */
-.stale-tag { color: var(--ink-faint); font-weight: 500; font-size: 0.85em; }
+.stale-tag { color: var(--ink-3); font-weight: 500; font-size: 0.85em; }
 
 /* archive leadership cells – net figure with a micro approve / don't-know /
    disapprove split beneath, same coding as the snapshot approval bars but at
@@ -1093,7 +1138,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 
 /* ---------- national direction ---------- */
 .dir-net { display: flex; align-items: center; gap: 9px; }
-.dir-net-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-faint); font-weight: 700; }
+.dir-net-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); font-weight: 700; }
 .dir-net-val { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .dir-net-val.pos { color: var(--mood-pos); }
 .dir-net-val.neg { color: var(--mood-neg); }
@@ -1115,7 +1160,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .poll-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .poll-table th {
   text-align: center; font-weight: 600; font-size: 11px; text-transform: uppercase;
-  letter-spacing: 0.05em; color: var(--ink-faint); padding: 0 12px 10px;
+  letter-spacing: 0.05em; color: var(--ink-3); padding: 0 12px 10px;
   border-bottom: 1px solid var(--line); white-space: nowrap;
 }
 .poll-table th.ta-l, .poll-table td.ta-l { text-align: left; }
@@ -1205,7 +1250,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
 }
 .skey { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
-.skey.muted { color: var(--ink-faint); }
+.skey.muted { color: var(--ink-3); }
 .skey-dot { width: 7px; height: 7px; border-radius: 50%; flex: none; }
 .skey-lab { color: inherit; }
 .skey-val { font-weight: 700; color: var(--ink); }
@@ -1214,7 +1259,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 
 .facet-flag {
   display: inline-block; font-size: 9.5px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-faint);
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3);
   border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px;
   white-space: nowrap;
 }
@@ -1233,20 +1278,23 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px;
   color: var(--ink-2); white-space: nowrap;
 }
-.hfx.flat { color: var(--ink-faint); font-weight: 600; }
-/* which side the lean runs toward – smaller and quieter than the figure */
+.hfx.flat { color: var(--ink-3); font-weight: 600; }
+/* which side the lean runs toward – smaller and quieter than the figure.
+   Quieter is carried by size, case and tracking, NOT by opacity: at 9.5px an
+   opacity of .75 dropped these party labels to ~3.2:1, and they name which
+   way a house leans, which is the whole point of the figure beside them. */
 .hfx-who {
   margin-left: 3px; font-size: 9.5px; font-weight: 800; letter-spacing: 0.04em;
-  opacity: 0.75; text-transform: uppercase;
+  text-transform: uppercase;
 }
 /* the per-party / per-leader variant, tucked under the figure it modifies */
 .hfx-sub { display: block; margin-top: 1px; line-height: 1.2; }
-.hfx-sub .hfx { font-size: 10px; font-weight: 600; color: var(--ink-faint); }
+.hfx-sub .hfx { font-size: 10px; font-weight: 600; color: var(--ink-3); }
 .hfx-sub .dash { font-size: 10px; }
 /* names the matchup a secondary house effect belongs to, e.g. "v ON" */
 .hfx-tag {
   font-size: 9px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
-  color: var(--ink-faint); margin-right: 4px; opacity: 0.8;
+  color: var(--ink-3); margin-right: 4px;
 }
 /* a secondary lean keeps its party tint but stays quieter than the headline one */
 .hfx-sub .hfx-who { font-size: 9px; }
@@ -1255,7 +1303,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .netv { font-weight: 800; font-variant-numeric: tabular-nums; }
 .netv.pos { color: var(--mood-pos); }
 .netv.neg { color: var(--mood-neg); }
-.dash { color: var(--ink-faint); font-weight: 600; }
+.dash { color: var(--ink-3); font-weight: 600; }
 
 /* expanded per-poll breakdown */
 .detail-row > td { padding: 0 !important; border-bottom: 1px solid var(--line-2); }
@@ -1269,7 +1317,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-meta-i { white-space: nowrap; }
 .pd-meta-k {
   font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em;
-  color: var(--ink-faint); font-weight: 700; margin-right: 5px;
+  color: var(--ink-3); font-weight: 700; margin-right: 5px;
 }
 .pd-grid {
   display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1295,7 +1343,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 .seatbar-note {
   display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap;
-  font-size: 11.5px; color: var(--ink-faint);
+  font-size: 11.5px; color: var(--ink-3);
 }
 .seat-majlab { font-weight: 600; }
 .seat-hung { color: var(--ink-2); font-weight: 600; }
@@ -1303,12 +1351,12 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .seat-row { display: inline-flex; align-items: baseline; gap: 7px; font-variant-numeric: tabular-nums; }
 .seat-name { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
 .seat-est { font-size: 15px; font-weight: 800; color: var(--ink); }
-.seat-range { font-size: 11.5px; color: var(--ink-faint); }
+.seat-range { font-size: 11.5px; color: var(--ink-3); }
 /* seat change is vs the last ELECTION, so it takes neutral ink like every
    other change indicator – no good/bad colour in a party-neutral tracker */
 .seat-chg { font-size: 11.5px; font-weight: 700; color: var(--ink-3); }
-.seat-chg.flat { color: var(--ink-faint); font-weight: 600; }
-.seat-basis { margin: 2px 0 0; font-size: 11px; color: var(--ink-faint); text-wrap: pretty; }
+.seat-chg.flat { color: var(--ink-3); font-weight: 600; }
+.seat-basis { margin: 2px 0 0; font-size: 11px; color: var(--ink-3); text-wrap: pretty; }
 @media (max-width: 700px) {
   .seat-rows { gap: 6px 16px; }
   .seat-est { font-size: 14px; }
@@ -1326,13 +1374,13 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-variant-numeric: tabular-nums;
 }
 .pd-appr-alt-k {
-  font-size: 11px; color: var(--ink-faint); letter-spacing: 0.01em;
+  font-size: 11px; color: var(--ink-3); letter-spacing: 0.01em;
 }
 .pd-appr-alt .netv { margin-left: auto; font-size: 12.5px; opacity: 0.85; }
 .pd-wide { grid-column: 1 / -1; max-width: 520px; }
 .pd-k {
   font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-  color: var(--ink-faint);
+  color: var(--ink-3);
 }
 .pd-leaders { display: flex; gap: 22px; flex-wrap: wrap; }
 .pd-lead { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-2); }
@@ -1342,7 +1390,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-size: 12px; font-weight: 700; color: var(--ink-2);
   font-family: var(--serif); font-style: italic; letter-spacing: 0;
 }
-.pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-faint); font-size: 13.5px; }
+.pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13.5px; }
 .table-hint { margin: 12px 2px 0; font-size: 12px; color: var(--ink-3); }
 
 @media (max-width: 720px) {
@@ -1465,14 +1513,14 @@ body.editorial .poll-table tbody tr:hover { background: var(--surface-2); }
 
 /* legend / segmented keep a hairline so controls stay legible without cards */
 body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; padding-top: 30px; }
-body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 16px 0 0; text-align: left; font-size: 11.5px; color: var(--ink-faint); }
+body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 16px 0 0; text-align: left; font-size: 11.5px; color: var(--ink-3); }
 
 /* hero readout gets a hair more presence in editorial */
 body.editorial .hero-eyebrow { color: var(--ink-3); }
 
 .tweak-note {
   margin: -2px 0 4px; font-size: 11.5px; line-height: 1.45;
-  color: var(--ink-faint); font-family: var(--sans);
+  color: var(--ink-3); font-family: var(--sans);
 }
 
 /* Must track the .two-col grid breakpoint above (1200px): the divider is
@@ -1559,7 +1607,7 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.79); } /* 19 → 15 *
   font-size: 16px; font-weight: 600; letter-spacing: -0.005em;
   line-height: 19px;
 }
-.tab-note { font-size: 12px; font-weight: 600; color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+.tab-note { font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .tab:hover { color: var(--ink-2); }
 .tab.active { color: var(--ink); }
 .tab::after {
@@ -1596,7 +1644,7 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 .cyc-export .ap-export { margin-left: 0; }
 .cyc-export-label {
   font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--ink-faint); margin-right: 2px;
+  text-transform: uppercase; color: var(--ink-3); margin-right: 2px;
 }
 @media (max-width: 1000px) { .cyc-export { display: none; } }
 
@@ -1623,8 +1671,13 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 .cyc-chip:hover .cyc-swatch { transform: scale(1.18); }
 .cyc-now {
   font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
-  color: var(--cyc); border: 1px solid color-mix(in oklch, var(--cyc) 40%, var(--line));
+  color: var(--cyc-text, var(--cyc)); border: 1px solid color-mix(in oklch, var(--cyc) 40%, var(--line));
   border-radius: 4px; padding: 1px 5px;
+  /* Its own ground, not the chip's. The chip tints its background 8% toward
+     the cycle's party, which on dark cost this badge ~1 point of contrast
+     (4.3:1) even though the party colour itself clears the bar on plain
+     surface. The badge is small, high-tracked type – it needs the headroom. */
+  background: var(--surface);
 }
 .cyc-showall {
   margin-top: 10px; border: 0; background: none; cursor: pointer; font-family: var(--sans);
@@ -1636,7 +1689,7 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
    controls, because it changes nothing anywhere else on the page. */
 .cyc-han {
   display: inline-flex; align-items: center; gap: 6px; margin: 7px 0 0;
-  font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-faint);
+  font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3);
   cursor: pointer; user-select: none;
 }
 .cyc-han:hover { color: var(--ink-3); }
@@ -1652,7 +1705,7 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
   border-width: 0 2px 2px 0; transform: rotate(42deg);
 }
 .cyc-han input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.cyc-han.on { color: var(--onp); }
+.cyc-han.on { color: var(--onp-text); }
 
 .cyc-charts { display: flex; flex-direction: column; }
 /* title block flexes to fill; the insight wraps below it (not behind it) once
@@ -1667,7 +1720,7 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 .ci-delta.pos { color: var(--mood-pos); }
 .ci-delta.neg { color: var(--mood-neg); }
 .cyc-foot {
-  margin: 22px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--ink-faint);
+  margin: 22px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--ink-3);
   font-family: var(--sans); max-width: 70ch; text-wrap: pretty;
 }
 /* in editorial mode the cycle charts divide like snapshot panels; first one
@@ -1683,7 +1736,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 
 .ap-search {
   position: relative; display: inline-flex; align-items: center; max-width: 320px;
-  color: var(--ink-faint);
+  color: var(--ink-3);
 }
 .ap-search svg { position: absolute; left: 12px; pointer-events: none; }
 .ap-search input {
@@ -1691,11 +1744,11 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px;
   padding: 9px 30px 9px 34px; transition: border-color .15s ease;
 }
-.ap-search input::placeholder { color: var(--ink-faint); }
+.ap-search input::placeholder { color: var(--ink-3); }
 .ap-search input:focus { outline: none; border-color: var(--accent); }
 .ap-search-x {
   position: absolute; right: 8px; border: 0; background: none; cursor: pointer;
-  font-size: 18px; line-height: 1; color: var(--ink-faint); padding: 2px 4px;
+  font-size: 18px; line-height: 1; color: var(--ink-3); padding: 2px 4px;
 }
 .ap-search-x:hover { color: var(--ink); }
 
@@ -1715,11 +1768,11 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-segs { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
 .ap-seg-group { display: inline-flex; align-items: center; gap: 9px; flex-wrap: wrap; }
 /* the lead group reads as one sentence: Lead [matchup] held by [leader] */
-.ap-seg-join { font-size: 11.5px; color: var(--ink-faint); white-space: nowrap; }
-.ap-resultnote { color: var(--ink-faint); font-weight: 400; }
+.ap-seg-join { font-size: 11.5px; color: var(--ink-3); white-space: nowrap; }
+.ap-resultnote { color: var(--ink-3); font-weight: 400; }
 .ap-seg-label {
   font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-  color: var(--ink-faint);
+  color: var(--ink-3);
 }
 
 .ap-resultline {
@@ -1757,12 +1810,12 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .np-row:nth-child(odd) { background: color-mix(in oklch, var(--ink) 3.5%, var(--surface)); }
 .np-firm { font-family: var(--sans); font-size: 14.5px; font-weight: 700; color: var(--ink); }
 .np-date { font-family: var(--sans); font-size: 14.5px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.np-pm { color: var(--ink-faint); font-size: 12.5px; font-weight: 500; }
+.np-pm { color: var(--ink-3); font-size: 12.5px; font-weight: 500; }
 .np-when { font-family: var(--sans); font-size: 13px; color: var(--ink-2); white-space: nowrap; }
-.np-cadence { font-family: var(--sans); font-size: 12.5px; color: var(--ink-faint); }
+.np-cadence { font-family: var(--sans); font-size: 12.5px; color: var(--ink-3); }
 .np-missed { color: var(--mood-neg); }
 .np-foot {
-  margin-top: 14px; font-size: 12.5px; line-height: 1.55; color: var(--ink-faint);
+  margin-top: 14px; font-size: 12.5px; line-height: 1.55; color: var(--ink-3);
   max-width: 74ch;
 }
 @media (max-width: 720px) {
@@ -1815,7 +1868,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   font-family: var(--serif); font-size: 24px; font-weight: 540; color: var(--ink);
   font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
 }
-.vr-sigma em { font-style: normal; font-size: 13px; color: var(--ink-faint); margin-left: 1px; }
+.vr-sigma em { font-style: normal; font-size: 13px; color: var(--ink-3); margin-left: 1px; }
 .vr-pill {
   justify-self: start; align-self: center;
   font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
@@ -1827,13 +1880,13 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .vr-pill.vr-mild   { color: var(--ink-2);    background: color-mix(in oklch, var(--ink) 9%, transparent); }
 .vr-pill.vr-wide   { color: var(--mood-neg); background: color-mix(in oklch, var(--mood-neg) 11%, transparent); }
 .vr-sub {
-  grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-faint);
+  grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-3);
   font-variant-numeric: tabular-nums;
 }
 .ap-var-note { margin-top: 14px; }
 /* tooltip secondary value (the ratio, beside each series' spread) */
 .tip-note {
-  font-size: 11px; color: var(--ink-faint); font-variant-numeric: tabular-nums;
+  font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums;
 }
 @media (max-width: 700px) {
   .ap-var-read { gap: 14px 20px; }
@@ -1902,9 +1955,9 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
   min-width: 38px; text-align: right;
 }
 .arch-lean { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px; }
-.arch-lean.alp { color: var(--alp); }
-.arch-lean.lnp { color: var(--lnp); }
-.arch-lean.flat { color: var(--ink-faint); font-weight: 600; }
+.arch-lean.alp { color: var(--alp-text); }
+.arch-lean.lnp { color: var(--lnp-text); }
+.arch-lean.flat { color: var(--ink-3); font-weight: 600; }
 .arch-empty td {
   text-align: center !important; color: var(--ink-3); padding: 40px 12px !important;
   font-family: var(--sans); font-size: 14px;
@@ -1993,36 +2046,49 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
     backdrop-filter: var(--glass-blur);
   }
 }
+
+/* ---------- archive ledger at phone widths ----------
+   The wrapper cannot scroll: .ap-wrap keeps overflow visible on purpose, so the
+   sticky thead can pin to the VIEWPORT rather than to a scroll container. That
+   trade is fine until the table is wider than the screen, at which point the
+   rightmost column is simply clipped and unreachable - there is no scrollbar to
+   reach it with. The ledger already sheds columns at 1000px; below ~480px the
+   lead column's 180px floor alone is half the viewport, so give the bar and the
+   cells a narrow-screen size instead of letting the table overflow. */
+@media (max-width: 480px) {
+  .two-pp-col { min-width: 118px; }
+  .arch-lead { gap: 6px; }
+  .arch-lead-bar { width: 58px; }
+  .arch-lead-val { min-width: 32px; font-size: 12.5px; }
+  .arch-lean { font-size: 12.5px; }
+  .poll-table.archive { font-size: 12px; }
+  .poll-table.archive th, .poll-table.archive td { padding-left: 4px; padding-right: 4px; }
+}
+
 </style>
   
 </head>
 <body>
-  <div id="root">
-    <div class="boot" aria-hidden="true">
-      <div class="boot-mark">
-        <span class="boot-bars"><i></i><i></i><i></i><i></i></span>
-      </div>
-      <p class="boot-text">Loading the latest aggregate…</p>
-    </div>
-  </div>
+  <!-- build.mjs replaces this marker with the static summary: the headline
+       aggregate as real text, so the document says something to a crawler, a
+       link-preview scraper, reader mode, or a reader whose script never ran.
+       React's createRoot() clears it on mount. -->
+  <div id="root"><!--STATIC_SUMMARY--></div>
   <noscript>
     <div class="boot-noscript">
-      <strong>auspol tracker</strong> needs JavaScript to chart the polling aggregate.
-      Please enable it to view two-party-preferred, primary vote and leadership trends.
+      <strong>The figures above are the current aggregate</strong>, generated when this page
+      was last built. The interactive charts &#8211; trend lines, individual polls,
+      leadership ratings and the full archive &#8211; need JavaScript.
     </div>
   </noscript>
 
-  <script src="a505706e-6e08-4185-acce-2c9167dda9a3" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
-  <script src="9e25084b-76d4-4c62-8497-c5d49f5b0bd6" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
-  <script src="5f8d68a2-01c5-42ce-a261-41f4f895d38e" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
-
-  <script src="9f09dca2-bd46-49a8-8ae1-51847608cf92"></script>
-  <script src="ed2260de-5b11-4bd5-8a8d-a391156c05ee"></script>
-  <script type="text/babel" src="08b413e7-8dbe-49bf-8932-a479f8d98f54"></script>
-  <script type="text/babel" src="052e810c-b1c8-4847-a954-426d3af38e6d"></script>
-  <script type="text/babel" src="a11e1559-f455-44d5-8a31-6699de4ef310"></script>
-  <script type="text/babel" src="d1a1d215-370c-4ebc-878b-7eeea9ad8102"></script>
-  <script type="text/babel" src="73de0c58-f11f-4793-9f90-77e583ab051b"></script>
+  <!-- build.mjs replaces this marker with the inlined scripts, in this order:
+       React production, the generated dataset, the shared helpers, then each
+       component transpiled at build time. Nothing is fetched at runtime and the
+       built page ships no toolchain. The order lives in build.mjs (PLAIN, then
+       JSX) because the plain scripts define the window aliases the components
+       rely on; it is not expressed here. -->
+  <!--SCRIPTS-->
 
 
 </body></html>

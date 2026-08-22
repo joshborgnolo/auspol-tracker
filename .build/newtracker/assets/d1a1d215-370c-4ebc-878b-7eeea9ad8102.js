@@ -39,11 +39,11 @@ function TabScore({ onGoHero }) {
       <span className="ts-eyebrow">2PP</span>
       <span className="ts-party">
         <span className="ts-abbr">ALP</span>
-        <span className="ts-num" style={{ color: "var(--alp)" }}>{alp2pp.toFixed(1)}</span>
+        <span className="ts-num" style={{ color: "var(--alp-text)" }}>{alp2pp.toFixed(1)}</span>
       </span>
       <span className="ts-sep" aria-hidden="true"></span>
       <span className="ts-party">
-        <span className="ts-num" style={{ color: "var(--lnp)" }}>{lnp2pp.toFixed(1)}</span>
+        <span className="ts-num" style={{ color: "var(--lnp-text)" }}>{lnp2pp.toFixed(1)}</span>
         <span className="ts-abbr">L/NP</span>
       </span>
     </button>
@@ -58,6 +58,28 @@ function Tabs({ tabs, active, onChange }) {
   // right side of the bar – the headline number stays visible on every tab.
   const [pinned, setPinned] = React.useState(false);
   const sentRef = React.useRef(null);
+  const btnRefs = React.useRef({});
+
+  /* Arrow-key navigation. Without it the role="tab" markup was a promise the
+     widget didn't keep: a screen reader announced "tab, 1 of 3" and then the
+     arrow keys – the only way the pattern says to move between tabs – did
+     nothing. Selection follows focus, which is the right call here because
+     switching views is instant and has no side effects. */
+  const onTabKeyDown = (e) => {
+    const ids = tabs.map((t) => t.id);
+    const i = ids.indexOf(active);
+    let next = null;
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") next = ids[(i + 1) % ids.length];
+    else if (e.key === "ArrowLeft" || e.key === "ArrowUp") next = ids[(i - 1 + ids.length) % ids.length];
+    else if (e.key === "Home") next = ids[0];
+    else if (e.key === "End") next = ids[ids.length - 1];
+    if (next == null) return;
+    e.preventDefault();
+    onChange(next);
+    const el = btnRefs.current[next];
+    if (el) el.focus();
+  };
+
   // The docked score is a shortcut home: switch to Snapshot (where the 2PP
   // hero lives) and ride to the top. If already on Snapshot, just glide up.
   const goHero = () => {
@@ -80,12 +102,20 @@ function Tabs({ tabs, active, onChange }) {
   return (
     <React.Fragment>
       <div ref={sentRef} className="tabs-sentinel" aria-hidden="true"></div>
-      <nav className={"tabs sticky" + (pinned ? " pinned" : "")}
-           role="tablist" aria-label="Views">
+      {/* role="tablist" belongs on the element that actually OWNS the tabs. It
+          used to sit on the <nav>, two wrappers up, which both broke the
+          ownership the pattern requires and overwrote the nav's landmark. */}
+      <nav className={"tabs sticky" + (pinned ? " pinned" : "")} aria-label="Views">
         <div className="tabs-inner">
-          <div className="tabs-set">
+          <div className="tabs-set" role="tablist" aria-label="Views"
+               onKeyDown={onTabKeyDown}>
             {tabs.map((t) => (
               <button key={t.id} role="tab" aria-selected={active === t.id}
+                      id={"tab-" + t.id} aria-controls={"panel-" + t.id}
+                      /* roving tabindex: the tab strip is ONE tab stop and the
+                         arrow keys move within it, per the ARIA tabs pattern */
+                      tabIndex={active === t.id ? 0 : -1}
+                      ref={(el) => { btnRefs.current[t.id] = el; }}
                       className={"tab" + (active === t.id ? " active" : "")}
                       onClick={() => onChange(t.id)}>
                 <span className="tab-label">{t.label}</span>
@@ -352,7 +382,9 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll }) {
           return (
             <button key={c.year} type="button"
                     className={"cyc-chip" + (off ? " off" : "") + (c.current ? " current" : "")}
-                    style={{ "--cyc": c.color }}
+                    /* --cyc paints the chip border and tint; --cyc-text is the
+                       same party at the text threshold, for the "now" badge */
+                    style={{ "--cyc": c.color, "--cyc-text": inkOf(c.color) }}
                     aria-pressed={!off}
                     onMouseEnter={() => setHi(c.year)} onFocus={() => setHi(c.year)}
                     onClick={() => toggle(c.year)}>
@@ -663,7 +695,7 @@ function ArchLead({ p, measure }) {
                 : { left: "50%", width: w + "%", background: li.color, borderRadius: "0 3px 3px 0" }}></span>
         <span className="arch-lead-mid"></span>
       </div>
-      <span className="arch-lead-val" style={{ color: li.color }}>
+      <span className="arch-lead-val" style={{ color: inkOf(li.color) }}>
         {li.m > 0 ? "+" : ""}{li.m.toFixed(1)}
       </span>
     </div>
@@ -895,7 +927,7 @@ function VariancePanel({ facet, rangeId }) {
           const read = discordRead(d.R);
           return (
             <div key={m.id} className={"vr-tile" + (hidden[m.id] ? " off" : "")}>
-              <span className="vr-name" style={{ color: m.color }}>{m.label}</span>
+              <span className="vr-name" style={{ color: inkOf(m.color) }}>{m.label}</span>
               <span className="vr-sigma">{d.sigma.toFixed(2)}<em>pp</em></span>
               <span className={"vr-pill vr-" + read.id}>{read.label}</span>
               <span className="vr-sub">
@@ -1136,7 +1168,7 @@ function AllPollsView() {
         <div className="ap-segs">
           <div className="ap-seg-group">
             <span className="ap-seg-label">Since</span>
-            <Segmented size="sm" value={range} onChange={setRange}
+            <Segmented size="sm" value={range} onChange={setRange} ariaLabel="Since"
               options={[{ id: "all", label: "All" }, { id: "12", label: "12m" }, { id: "6", label: "6m" }, { id: "3", label: "3m" }]} />
           </div>
           <div className="ap-seg-group ap-tag-group" role="group" aria-label="Filter by data contained">
@@ -1154,14 +1186,14 @@ function AllPollsView() {
               {/* matchups on offer = what the pollsters actually publish; no
                   tracked pollster releases a 3-cornered preferred, so that
                   option is gone until one appears in the data */}
-              <Segmented size="sm" value={measure} onChange={onMeasure}
+              <Segmented size="sm" value={measure} onChange={onMeasure} ariaLabel="Lead column matchup"
                 options={[
                   { id: "lnp", label: "ALP v L/NP" },
                   { id: "onp", label: "ALP v ON" },
                   { id: "lnponp", label: "L/NP v ON" },
                 ]} />
               <span className="ap-seg-join">held by</span>
-              <Segmented size="sm" value={lead} onChange={setLead}
+              <Segmented size="sm" value={lead} onChange={setLead} ariaLabel="Lead held by"
                 options={[{ id: "all", label: "Any" }].concat(
                   ({ lnp: ["alp", "lnp"], onp: ["alp", "onp"], lnponp: ["lnp", "onp"] })[measure]
                     .map((id) => ({ id, label: { alp: "ALP", lnp: "L/NP", onp: "ON" }[id] })))} />
@@ -1273,10 +1305,10 @@ function AllPollsView() {
                   </td>
                   </>)}
                   {facet === "primary" && (<>
-                  <td className="num" style={{ color: "var(--alp)", fontWeight: 600 }}>{p.p.alp != null ? p.p.alp.toFixed(1) : "—"}</td>
-                  <td className="num" style={{ color: "var(--lnp)", fontWeight: 600 }}>{p.p.lnp != null ? p.p.lnp.toFixed(1) : "—"}</td>
-                  <td className="num" style={{ color: "var(--grn)" }}>{p.p.grn != null ? p.p.grn.toFixed(1) : "—"}</td>
-                  <td className="num" style={{ color: "var(--onp)" }}>{p.p.onp != null ? p.p.onp.toFixed(1) : "—"}</td>
+                  <td className="num" style={{ color: "var(--alp-text)", fontWeight: 600 }}>{p.p.alp != null ? p.p.alp.toFixed(1) : "—"}</td>
+                  <td className="num" style={{ color: "var(--lnp-text)", fontWeight: 600 }}>{p.p.lnp != null ? p.p.lnp.toFixed(1) : "—"}</td>
+                  <td className="num" style={{ color: "var(--grn-text)" }}>{p.p.grn != null ? p.p.grn.toFixed(1) : "—"}</td>
+                  <td className="num" style={{ color: "var(--onp-text)" }}>{p.p.onp != null ? p.p.onp.toFixed(1) : "—"}</td>
                   <td className="num muted hide-md">{p.p.oth != null ? p.p.oth.toFixed(1) : "—"}</td>
                   </>)}
                   {facet === "leadership" && (<>

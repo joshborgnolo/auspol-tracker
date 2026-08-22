@@ -369,11 +369,11 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
             <div className="ro-party alp-side">
               <span className="ro-dot" style={{ background: m.a.color }}></span>
               <span className="ro-name">{m.a.name}</span>
-              <span className="ro-num" style={{ color: m.a.color }}>{latest.a.toFixed(1)}</span>
+              <span className="ro-num" style={{ color: inkOf(m.a.color) }}>{latest.a.toFixed(1)}</span>
             </div>
             <span className="ro-sep" aria-hidden="true"></span>
             <div className="ro-party lnp-side">
-              <span className="ro-num" style={{ color: m.b.color }}>{latest.b.toFixed(1)}</span>
+              <span className="ro-num" style={{ color: inkOf(m.b.color) }}>{latest.b.toFixed(1)}</span>
               <span className="ro-name">{m.b.name}</span>
               <span className="ro-dot" style={{ background: m.b.color }}></span>
             </div>
@@ -599,7 +599,14 @@ function App() {
       <Header isDark={isDark} onToggleTheme={cycleTheme} />
       <Tabs tabs={TABS} active={tab} onChange={goTab} />
       <main className="content">
-        <div className="view-enter content" key={tab}>
+        {/* The panel the tab strip points at. There was no role="tabpanel" on
+            the page at all, so aria-controls had no target and a screen reader
+            that moved to the "tab panel" landed nowhere. tabIndex=0 makes the
+            panel itself focusable, which is what the pattern asks for when the
+            panel's first child isn't. */}
+        <div className="view-enter content" key={tab}
+             role="tabpanel" id={"panel-" + tab} aria-labelledby={"tab-" + tab}
+             tabIndex={0}>
           {tab === "snapshot" && (
             <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter} />
           )}

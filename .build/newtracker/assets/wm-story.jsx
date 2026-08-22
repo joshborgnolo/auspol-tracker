@@ -388,9 +388,9 @@ function DialStory({ originRect, onClose }) {
           <figcaption className="dl-cap">
             <div className="dl-month">{monthLabel}{cur.election && <span className="dl-tag">election</span>}</div>
             <div className="dl-contest">
-              <span style={{ color: "var(--alp)" }}>Labor {cur.lab.toFixed(1)}</span>
+              <span style={{ color: "var(--alp-text)" }}>Labor {cur.lab.toFixed(1)}</span>
               <span className="dl-v">v</span>
-              <span style={{ color: cur.oppColor }}>{cur.oppName} {cur.opp.toFixed(1)}</span>
+              <span style={{ color: inkOf(cur.oppColor) }}>{cur.oppName} {cur.opp.toFixed(1)}</span>
             </div>
             <div className="dl-note">
               two-party preferred · needle leans to whoever leads

@@ -3,7 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AusPol Tracker · Australian federal polling archive</title>
+<title>AusPol Tracker (frozen 17 Aug 2026) · superseded by auspol tracker</title>
+<!-- FROZEN PREDECESSOR. Superseded by index.html, which is built from
+     data/polls.json and is the page that gets updated. This file is kept for
+     history only and is never rebuilt, so its numbers stop at the day it was
+     frozen while the live page moves on. noindex keeps the two out of the same
+     search results; the banner below keeps a human from mistaking one for the
+     other. -->
+<meta name="robots" content="noindex, nofollow">
 <meta name="description" content="A continuing archive of Australian federal voting-intention polling – primary vote, two-party-preferred, leadership ratings, pollster house effects, and historical comparisons across election cycles.">
 <meta name="theme-color" content="#0b1d2c">
 <!-- Social / sharing cards. A 1200×630 share image ships in ./assets so links
@@ -2739,6 +2746,21 @@ try { var _t = localStorage.getItem('auspol-theme'); if (_t === 'dark' || _t ===
 </script>
 </head>
 <body>
+<div id="frozen-banner" role="alert">
+  <strong>This is a frozen snapshot.</strong>
+  Polling data here stops at 16 August 2026 and is never updated.
+  <a href="./index.html">Go to the current auspol tracker &#8594;</a>
+</div>
+<style>
+#frozen-banner {
+  position: sticky; top: 0; z-index: 99999;
+  padding: 12px 20px; text-align: center;
+  font: 500 14px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #1c1200; background: #f4c752; border-bottom: 1px solid #c99a22;
+}
+#frozen-banner strong { font-weight: 700; }
+#frozen-banner a { color: #1c1200; font-weight: 700; margin-left: 6px; }
+</style>
 
 <a class="skip-link" href="#main">Skip to content</a>
 

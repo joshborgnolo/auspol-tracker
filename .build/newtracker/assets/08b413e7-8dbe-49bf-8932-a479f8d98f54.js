@@ -77,7 +77,9 @@ function straightPath(pts, sx, sy) {
  * TrendChart – the workhorse
  *  series:  [{ id, label, color, points:[{x,y}], width?, dashed?, smooth? }]
  *  scatter: [{ x, y, color, meta }]
- *  yTicks:  [numbers]   xTicks: [{x,label}]   refLines:[{y,label?,color?}]
+ *  yTicks:  [numbers]   xTicks: [{x,label}]
+ *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
+ *           labelColor the text (defaults to --ink-3 – see the label below)
  *  fmt:     (y) => string  for tooltip/axis
  *  bands:   [{y0,y1,color}]  shaded horizontal regions (optional)
  *  areas:   [{id,color,opacity?,points:[{x,y0,y1}]}]  shaded region whose
@@ -92,7 +94,7 @@ function TrendChart(props) {
     height = 360, xDomain, yDomain, pad = { l: 46, r: 20, t: 18, b: 34 },
     series = [], scatter = [], yTicks = [], xTicks = [], refLines = [],
     bands = [], areas = [], fmt = (v) => v.toFixed(1), unit = "", tooltipTitle,
-    onHoverIndex, spine, axisFont = 15, events = [], extraRows,
+    onHoverIndex, spine, axisFont = 15, events = [], extraRows, ariaLabel,
   } = props;
 
   // series may be ragged (a leader not polled every month), so points are
@@ -128,22 +130,117 @@ function TrendChart(props) {
   // shared x spine for guide-line hover (monthly)
   const spinePts = spine || (series[0] ? series[0].points : []);
 
-  const handleMove = (e) => {
-    if (dot) return;
+  // client px -> viewBox units
+  const toVB = (e) => {
     const rect = ref.current.getBoundingClientRect();
-    const px = ((e.clientX - rect.left) / rect.width) * W;
-    if (!spinePts.length) return;
+    return {
+      x: ((e.clientX - rect.left) / rect.width) * W,
+      y: ((e.clientY - rect.top) / rect.height) * H,
+      rect,
+    };
+  };
+
+  const nearestSpine = (px) => {
     let best = 0, bestD = Infinity;
     spinePts.forEach((d, i) => {
       const dx = Math.abs(sx(d.x) - px);
       if (dx < bestD) { bestD = dx; best = i; }
     });
-    setHover({ index: best });
-    onHoverIndex && onHoverIndex(best);
+    return best;
+  };
+
+  const showSpine = (i) => { setDotFrom(null, null); setEvt(null); setHover({ index: i }); onHoverIndex && onHoverIndex(i); };
+
+  /* Which input selected the current dot. A touch-picked dot has to SURVIVE the
+     finger lifting – that is the only way a phone can hold a poll on screen to
+     read it – but on a hybrid machine that same sticky dot would otherwise sit
+     in front of the mouse forever, because a hovered dot suppresses the guide. */
+  const dotSrc = useRef(null);
+  const setDotFrom = (src, d) => { dotSrc.current = d ? src : null; setDot(d); };
+
+  const handleMove = (e) => {
+    if (dot) {
+      if (dotSrc.current !== "touch") return;   // genuine mouse hover, leave it
+      setDotFrom(null, null);                   // stale touch pick: the mouse takes over
+    }
+    if (!spinePts.length) return;
+    showSpine(nearestSpine(toVB(e).x));
   };
 
   const handleLeave = () => {
-    setHover(null); setDot(null); setEvt(null); onHoverIndex && onHoverIndex(null);
+    setHover(null); setDotFrom(null, null); setEvt(null); onHoverIndex && onHoverIndex(null);
+  };
+
+  /* ---- touch --------------------------------------------------------------
+     A finger has no hover, and a 4.2-unit dot is a ~5px target on a phone, so
+     touch cannot use the mouse path: it would be able to read neither an
+     individual poll nor the month guide. Instead a tap (and any drag after it)
+     picks the NEAREST scatter dot within a finger's width, and falls back to
+     the month readout when no poll is close. The threshold is defined in real
+     px and converted to user units, so it stays a finger regardless of how
+     wide the chart is rendering.
+
+     Mouse keeps its existing enter/leave behaviour untouched – snapping the
+     pointer to whichever dot happened to be nearest would fight the guide. */
+  const TOUCH_PICK_PX = 22;
+
+  const pickTouch = (e) => {
+    if (!ref.current) return;
+    const p = toVB(e);
+    const rPx = TOUCH_PICK_PX / Math.max(scale, 0.0001);   // px -> user units
+    let near = null, nearD = Infinity;
+    scatter.forEach((d) => {
+      const dx = sx(d.x) - p.x, dy = sy(d.y) - p.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < nearD) { nearD = dist; near = d; }
+    });
+    if (near && nearD <= rPx) {
+      // tapping the poll that is already open closes it, so a finger can put
+      // the chart back to its resting state without hunting for empty space
+      if (e.type === "pointerdown" && dot === near) { setDotFrom(null, null); return; }
+      setHover(null); setEvt(null); setDotFrom("touch", near); onHoverIndex && onHoverIndex(null);
+    } else if (spinePts.length) {
+      showSpine(nearestSpine(p.x));
+    }
+  };
+
+  const onPointerDown = (e) => {
+    if (e.pointerType === "mouse") return;
+    // keep the gesture coming to this element even if the finger drifts off it
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
+    pickTouch(e);
+  };
+  const onPointerMove = (e) => {
+    if (e.pointerType === "mouse") { handleMove(e); return; }
+    if (e.buttons === 0 && e.pressure === 0) return;   // not an active drag
+    pickTouch(e);
+  };
+  const onPointerUp = (e) => {
+    if (e.pointerType === "mouse") return;
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) {}
+  };
+
+  /* ---- keyboard -----------------------------------------------------------
+     The chart is one tab stop that steps the month guide, which is the same
+     granularity the mouse guide reads. Stepping all 242 individual polls
+     instead would be a tab trap, and the archive tab already lists them. */
+  const stepBy = (delta) => {
+    if (!spinePts.length) return;
+    const from = hi != null ? hi : spinePts.length - 1;
+    const next = Math.max(0, Math.min(spinePts.length - 1, from + delta));
+    showSpine(next);
+  };
+
+  const handleKeyDown = (e) => {
+    switch (e.key) {
+      case "ArrowLeft":  stepBy(-1); break;
+      case "ArrowRight": stepBy(1); break;
+      case "Home":       showSpine(0); break;
+      case "End":        showSpine(spinePts.length - 1); break;
+      case "Escape":     handleLeave(); return;   // no preventDefault: let Esc bubble to close a panel
+      default: return;
+    }
+    e.preventDefault();
   };
 
   // clamp a possibly-stale hover index (range/matchup can shrink the spine
@@ -212,11 +309,42 @@ function TrendChart(props) {
     tip.left = Math.min(100 - halfPct, Math.max(halfPct, tip.left));
   }
 
+  /* ---- accessible name ----------------------------------------------------
+     Every chart used to be "Polling trend chart", so a screen reader met five
+     identical, contentless images. Name what is actually plotted and over what
+     span, and say the thing is operable – it is the only cue that arrow keys
+     do anything here. */
+  const namedSeries = series.filter((s) => s.label && s.opacity !== 0).map((s) => s.label);
+  const spanFrom = tooltipTitle && spinePts.length ? tooltipTitle(0) : "";
+  const spanTo = tooltipTitle && spinePts.length ? tooltipTitle(spinePts.length - 1) : "";
+  const a11yLabel = ariaLabel || [
+    namedSeries.length ? namedSeries.join(", ") : "Polling trend",
+    spanFrom && spanTo ? `${spanFrom} to ${spanTo}` : "",
+    scatter.length ? `${scatter.length} individual polls plotted` : "",
+    spinePts.length > 1 ? "Use arrow keys to read each point" : "",
+  ].filter(Boolean)
+    // a series label may already end in a full stop ("Others / Ind."), and
+    // "Ind.." is read aloud as a stumble rather than a sentence break
+    .map((s) => s.replace(/\.$/, ""))
+    .join(". ") + ".";
+
+  /* What the live region says as the guide moves. Mirrors the visual tooltip,
+     because the tooltip is positioned graphics a screen reader cannot follow. */
+  const liveText = !tip ? "" : [
+    tip.title,
+    tip.date || "",
+    ...(tip.rows || []).map((r) => `${r.label} ${r.value}`),
+    tip.sub || "",
+  ].filter(Boolean).join(", ");
+
   return (
     <div className="chart" ref={ref}>
       <svg viewBox={`0 0 ${W} ${H}`} className="chart-svg"
-           onMouseMove={handleMove} onMouseLeave={handleLeave}
-           role="img" aria-label="Polling trend chart">
+           onPointerMove={onPointerMove} onPointerDown={onPointerDown}
+           onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
+           onMouseLeave={handleLeave}
+           onKeyDown={handleKeyDown} onBlur={handleLeave}
+           tabIndex={0} role="img" aria-label={a11yLabel}>
         <defs>
           <clipPath id={clipId}>
             <rect x={pad.l} y="0" width={W - pad.l - pad.r} height={H} />
@@ -324,9 +452,18 @@ function TrendChart(props) {
                browser's own delayed tooltip, which would surface a second,
                unstyled copy on top of ours. */
             const aria = e.label + (e.desc ? " – " + e.desc : "") + " · " + fmtEventDate(e.date);
+            /* Hover for a mouse, tap for a finger. Without the pointerdown an
+               event annotation was mouse-only – the one thing on the chart a
+               phone could see but never read. Tapping one twice dismisses it. */
             const on = (px, py) => ({
-              onMouseEnter: () => setEvt({ e, x: px, y: py }),
-              onMouseLeave: () => setEvt(null),
+              onPointerEnter: (ev) => { if (ev.pointerType === "mouse") setEvt({ e, x: px, y: py }); },
+              onPointerLeave: (ev) => { if (ev.pointerType === "mouse") setEvt(null); },
+              onPointerDown: (ev) => {
+                if (ev.pointerType === "mouse") return;
+                ev.stopPropagation();   // don't let the svg's pick overwrite it
+                setHover(null); setDotFrom(null, null);
+                setEvt((cur) => (cur && cur.e === e ? null : { e, x: px, y: py }));
+              },
             });
             // no room for a label: the reference line still earns its place
             if (row == null) return (
@@ -366,7 +503,11 @@ function TrendChart(props) {
           <circle key={"s" + i} cx={sx(d.x)} cy={sy(d.y)} r={dot === d ? 6.5 : 4.2}
                   className="scatter-dot" fill={d.color}
                   opacity={dot && dot !== d ? 0.25 : 0.6}
-                  onMouseEnter={() => setDot(d)} onMouseLeave={() => setDot(null)} />
+                  /* mouse only: touch is handled by the svg's nearest-dot pick,
+                     and the compatibility mouseenter a tap fires afterwards
+                     would otherwise select whatever the finger came to rest on */
+                  onPointerEnter={(e) => { if (e.pointerType === "mouse") setDotFrom("mouse", d); }}
+                  onPointerLeave={(e) => { if (e.pointerType === "mouse") setDotFrom(null, null); }} />
         ))}
         {/* series lines (clipped to the plot area so windowed views
             don't draw the entering segment past the y-axis) */}
@@ -441,7 +582,12 @@ function TrendChart(props) {
                 y={sy(r.y) - 8}
                 className="refline-label" textAnchor={r.align === "left" ? "start" : "end"}
                 style={{ fontSize: refUnits, strokeWidth: refUnits * 0.34 }}
-                fill={r.color || "currentColor"}>{r.label}</text>
+                /* The label is TEXT and the rule is a hairline, so they cannot
+                   share one colour: r.color is a rules token (--ink-faint) that
+                   sits below the contrast threshold on purpose. Labels default
+                   to the lightest ink that still carries text; labelColor is
+                   the escape hatch for a party-coloured one. */
+                fill={r.labelColor || "var(--ink-3)"}>{r.label}</text>
         ))}
       </svg>
 
@@ -462,6 +608,10 @@ function TrendChart(props) {
           {tip.sub && <div className="tip-sub">{tip.sub}</div>}
         </div>
       )}
+      {/* The tooltip is absolutely-positioned graphics keyed to a pointer, so a
+          screen reader never reaches it. This says the same thing out loud as
+          the guide moves under the arrow keys. */}
+      <p className="sr-only" aria-live="polite" aria-atomic="true">{liveText}</p>
     </div>
   );
 }

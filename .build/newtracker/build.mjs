@@ -26,6 +26,16 @@ const ROOT = path.resolve(HERE, "..", "..");
 /* index.html, so a static host serves it at the site root with no config and
    no redirect. The name is the deploy contract, not a description. */
 const OUT = path.join(ROOT, "index.html");
+
+/* Where this page is published. Open Graph requires og:image and og:url to be
+   ABSOLUTE – a relative path is invalid per the spec and Facebook, LinkedIn,
+   Slack and Discord all decline to resolve one, which is why the share card
+   never appeared. Nothing else in the build needs to know the origin, so it
+   lives here as one constant.
+   Change it if the site moves, or set SITE_URL= in the environment. Adding a
+   CNAME to the repo root means changing this too. */
+const SITE_URL = (process.env.SITE_URL || "https://joshborgnolo.github.io/auspol-tracker/")
+  .replace(/\/*$/, "/");
 const A = (f) => path.join(HERE, "assets", f);
 
 /* ---- 1. the data must be sound before anything is built ---------------- */
@@ -197,16 +207,104 @@ const fav = buildFavicon();
 console.log("  favicon:", fav.note);
 const favicon = encodeURIComponent(fav.svg);
 
+/* ---- 4b. a page that says something before React runs -------------------
+   #root held a loading placeholder that was `opacity: 0` with a .25s delay
+   while React mounted in ~160ms – so it was never actually seen – and the
+   whole document carried 499 bytes of markup. That left nothing for a crawler,
+   a link-preview scraper, reader mode, or a reader whose JS failed.
+
+   This writes the headline aggregate into the document as real text. React's
+   createRoot() clears the container on its first render, so it costs the
+   interactive page nothing; it is simply what the page SAYS when no script has
+   run yet. Derived from the same generated dataset as everything else, so it
+   cannot drift from the chart above it. */
+function buildStaticSummary() {
+  const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
+  const grab = (name) => {
+    const i = src.indexOf("const " + name + " = ");
+    if (i < 0) throw new Error("static summary: " + name + " not found");
+    return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
+  };
+  const L = grab("latest"), prim = grab("aggPrimary").slice(-1)[0];
+  const table = grab("pollsterTable");
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const lead = (L.alp2pp - L.lnp2pp).toFixed(1);
+  const who = L.alp2pp >= L.lnp2pp ? "Labor" : "the Coalition";
+  const PARTY = { alp: "Labor", lnp: "Coalition", grn: "Greens", onp: "One Nation", oth: "Others" };
+
+  const rows = table.slice(0, 6).map((r) => `
+        <tr>
+          <th scope="row">${esc(r.pollster)}</th>
+          <td>${esc(r.field)}</td>
+          <td>${r.sample ? r.sample.toLocaleString("en-AU") : "&#8211;"}</td>
+          <td>${r.alp2pp != null ? r.alp2pp.toFixed(1) + "%" : "&#8211;"}</td>
+          <td>${r.lnp2pp != null ? r.lnp2pp.toFixed(1) + "%" : "&#8211;"}</td>
+        </tr>`).join("");
+
+  const primary = ["alp", "lnp", "grn", "onp", "oth"]
+    .filter((k) => prim[k] != null)
+    .map((k) => `<li><b>${PARTY[k]}</b> ${prim[k].toFixed(1)}%</li>`).join("\n        ");
+
+  return `<div class="static-summary">
+      <h1>auspol tracker</h1>
+      <p class="ss-sub">Aggregated opinion polling for the 2028 Australian federal election.
+        Updated ${esc(L.updated)} from ${L.pollsTracked} published polls across ${L.housesTracked} polling houses.</p>
+
+      <h2>Two-party preferred</h2>
+      <p class="ss-lead"><b>Labor ${L.alp2pp.toFixed(1)}%</b> &#183; <b>Coalition ${L.lnp2pp.toFixed(1)}%</b></p>
+      <p>${who} leads by ${Math.abs(lead)} points. The aggregate is a sample- and recency-weighted,
+        house-effect-adjusted mean over a ${L.method.windowDays}-day window
+        (${L.method.halfLifeDays}-day half-life), carrying a 95% interval of
+        &#177;${L.alp2ppCi95.toFixed(1)} points from ${L.method.nPolls} polls.</p>
+
+      <h2>Primary vote</h2>
+      <ul class="ss-primary">
+        ${primary}
+      </ul>
+
+      <h2>Latest polls</h2>
+      <table class="ss-table">
+        <caption>Most recent published national polls</caption>
+        <thead><tr><th scope="col">Pollster</th><th scope="col">Fieldwork</th><th scope="col">Sample</th><th scope="col">ALP 2PP</th><th scope="col">L/NP 2PP</th></tr></thead>
+        <tbody>${rows}
+        </tbody>
+      </table>
+
+      <p class="ss-note">This is the summary a browser sees before the interactive charts load.
+        Next election due ${esc(L.nextElectionDue)}. Unofficial aggregate of published national
+        polling; it cannot measure error shared across the whole industry.</p>
+    </div>`;
+}
+
+if (!html.includes("<!--STATIC_SUMMARY-->")) throw new Error("STATIC_SUMMARY marker not found in template");
+html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + buildStaticSummary() + "\n  ");
+
 html = html.replace('<meta property="og:type" content="website">',
   `<meta property="og:type" content="website">
-  <meta property="og:image" content="assets/auspol-card.png">
+  <meta property="og:site_name" content="auspol tracker">
+  <meta property="og:locale" content="en_AU">
+  <meta property="og:url" content="${SITE_URL}">
+  <meta property="og:image" content="${SITE_URL}assets/auspol-card.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="auspol tracker – an aggregate of Australian federal voting intention">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#14110d" media="(prefers-color-scheme: dark)">
+  <link rel="canonical" href="${SITE_URL}">
   <link rel="icon" href="data:image/svg+xml,${favicon}">`);
 
 /* ---- 5. inline every script ------------------------------------------- */
 const parts = [];
+/* The cycle-source rows go in FIRST, as an inert application/json block. The
+   HTML parser skips its contents (no JS compilation, no evaluation) and the
+   data module JSON.parses it only if someone asks for the Past-cycles CSV.
+   It must precede the module that reads it only in the sense of being in the
+   document – the read is lazy, so order is not load-bearing.
+   "</script" cannot appear in JSON-encoded data (the "/" would have to be
+   escaped as \/ or the "<" as \u003c), but escape defensively anyway. */
+const cycleSourceJson = fs.readFileSync(A("cycle-source.json"), "utf8");
+parts.push(`<script type="application/json" id="ap-cycle-source">${inlineJs(cycleSourceJson)}</script>`);
 for (const f of ["react.production.min.js", "react-dom.production.min.js"])
   parts.push(`<script>${inlineJs(fs.readFileSync(path.join(HERE, "vendor", f), "utf8"))}</script>`);
 for (const f of PLAIN)
@@ -214,11 +312,12 @@ for (const f of PLAIN)
 for (const f of JSX)
   parts.push(`<script>${inlineJs(transpile(fs.readFileSync(A(f), "utf8"), f))}</script>`);
 
-// replace the whole run of old <script src="uuid"> tags with the inlined set
-const firstTag = html.search(/[ \t]*<script src="[0-9a-f-]{36}"/);
-const lastTagEnd = html.lastIndexOf("</script>") + "</script>".length;
-if (firstTag < 0) throw new Error("script tags not found in template");
-html = html.slice(0, firstTag) + parts.join("\n  ") + html.slice(lastTagEnd);
+/* Splice the inlined scripts in at an explicit marker.
+   This used to find the first <script src="{uuid}"> and cut to the LAST
+   </script> in the file, which silently depended on every script tag being
+   uuid-named and on none of them being the last tag for any other reason. */
+if (!html.includes("<!--SCRIPTS-->")) throw new Error("SCRIPTS marker not found in template");
+html = html.replace("<!--SCRIPTS-->", parts.join("\n  "));
 
 fs.writeFileSync(OUT, html);
 

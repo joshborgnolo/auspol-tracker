@@ -6,6 +6,18 @@
 ["useState", "useRef", "useMemo", "useCallback", "useEffect", "useId"]
   .forEach((h) => { window[h] = React[h]; });
 
+/* Mark colour -> text colour. The party tokens are tuned for dots and lines;
+   at 10px Greens sits at 3.5:1 and One Nation at 3.0:1 on paper, so the same
+   value cannot also paint a numeral. Component data carries ONE colour per
+   party (it feeds both a swatch and its label), so rather than fork every
+   record, wrap it at the point it becomes text: style={{ color: inkOf(c) }}.
+   Non-party colours and anything that isn't a var() pass straight through. */
+window.inkOf = function inkOf(c) {
+  return typeof c === "string"
+    ? c.replace(/var\(--(alp|lnp|grn|onp|oth)\)/g, "var(--$1-text)")
+    : c;
+};
+
 window.AP = (function () {
   const D = window.AUSPOL;
 

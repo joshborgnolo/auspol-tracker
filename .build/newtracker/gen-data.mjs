@@ -13,6 +13,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
 const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
 const DATA_ASSET = path.join(HERE, "assets", "9f09dca2-bd46-49a8-8ae1-51847608cf92.js");
+const CYCLE_SOURCE_ASSET = path.join(HERE, "assets", "cycle-source.json");
 
 /* ---- canonical dataset ------------------------------------------------
    data/polls.json is the single source of truth. It used to be scraped out of
@@ -942,8 +943,26 @@ window.AUSPOL = (function () {
 
   const CYCLE_DEFS = ${JSON.stringify(CYCLE_DEFS)};
   /* Individual readings behind each past cycle's lines – powers the Past-cycles
-     download, so the charts are checkable rather than just assertions. */
-  const cycleSource = ${JSON.stringify(cycleSource)};
+     download, so the charts are checkable rather than just assertions.
+
+     It is also, at ~200KB, the single largest thing in the payload, and it
+     serves exactly one caller: the "source polls" CSV button. As an inline
+     object literal every visitor paid to PARSE it before the first chart could
+     paint, whether or not they ever opened Past cycles, let alone pressed
+     download. It now sits in a <script type="application/json"> block, which
+     the HTML parser skips entirely, and is JSON.parsed on first access. */
+  let _cycleSource = null;
+  const readCycleSource = () => {
+    if (_cycleSource) return _cycleSource;
+    const el = document.getElementById("ap-cycle-source");
+    try {
+      _cycleSource = el ? JSON.parse(el.textContent) : {};
+    } catch (e) {
+      console.error("cycle source data failed to parse", e);
+      _cycleSource = {};      // the CSV comes out short rather than the tab dying
+    }
+    return _cycleSource;
+  };
   /* Measured publication rhythm per house – drives "Next expected polls".
      The dates themselves are computed in the browser against the real current
      date, so the panel stays honest as the page ages. */
@@ -969,12 +988,17 @@ window.AUSPOL = (function () {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, adjusted, houseEffects, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls,
     individualPolls, pollsterTable, latest, cycles, events,
-    cycleSource, pollCadence,
+    // a getter, so existing callers keep reading D.cycleSource unchanged
+    get cycleSource() { return readCycleSource(); },
+    pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },
   };
 })();
 `;
 fs.writeFileSync(DATA_ASSET, out);
+/* Sidecar, inlined by build.mjs as an application/json block. Kept out of the
+   JS module on purpose – see the note beside readCycleSource above. */
+fs.writeFileSync(CYCLE_SOURCE_ASSET, JSON.stringify(cycleSource));
 
 /* ---- sanity summary ---------------------------------------------------- */
 console.log("MONTHS:", MONTHS.length, MONTHS[0], "→", MONTHS[MONTHS.length - 1]);
