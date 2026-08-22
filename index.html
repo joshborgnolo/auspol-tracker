@@ -8762,9 +8762,17 @@ function DialStory({
       elapsed = 0;
     let raf;
     const step = now => {
-      elapsed += Math.min(100, now - last);
+      /* Clamped at BOTH ends. The upper clamp is the background-tab guard
+         above; the lower one is because a rAF timestamp is the start of the
+         frame, which can predate the performance.now() taken when this effect
+         ran a moment into that same frame. That made the first delta negative,
+         elapsed negative, and Math.floor(v) equal to -1 - and story[-1].margin
+         threw, killing the replay on its opening frame before it moved. It
+         depended on where in the frame the effect landed, so it struck
+         intermittently and left the dial sitting at the election. */
+      elapsed += Math.max(0, Math.min(100, now - last));
       last = now;
-      const v = Math.min(n - 1, elapsed / per);
+      const v = Math.max(0, Math.min(n - 1, elapsed / per));
       setF(v);
       const d = wmDeg(lerp(story[Math.floor(v)].margin, story[Math.min(n - 1, Math.floor(v) + 1)].margin, smooth(v - Math.floor(v))));
       const tr = trailRef.current;
