@@ -217,6 +217,102 @@ function DialFigure({ story, f, envelope, trail }) {
 Object.assign(window, { buildDialStory, DialFigure, WM_GC, wmPolar, wmDeg, WM_SWING_DEG });
 
 /* ====================================================================
+   The timeline, as a line graph rather than a rule.
+
+   It used to be a flat 2px line with event ticks on it: a scrub bar that
+   happened to sit under a chart, carrying no reading of its own. The playhead
+   travelled left to right and told you only where in the term you were.
+
+   It now traces Labor's two-party-preferred against WHICHEVER CHALLENGER LED
+   that month - story[i].lab, the same figure the caption and the needle use -
+   so the term reads as a shape while it plays, and the dial has a second,
+   slower account of itself running underneath.
+
+   Two things it can show that the dial cannot:
+
+   - The line is coloured by the CHALLENGER, run by run. The file's own opening
+     note says the arc "wavers between blue and orange over the closing months"
+     because the challenger genuinely changes hands once One Nation and the
+     Coalition converge. On the dial that is a flicker you have to be told is
+     real; here the trace itself goes orange and back, in place, against the
+     months either side of it.
+   - The 50 line. The needle only ever says who leads; the graph says how close
+     to level it has come, which over this term is the whole movement.
+
+   The path ahead of the playhead is drawn faint and the trace fills in behind
+   it, so the shape is foreshadowed rather than sprung - and once the replay
+   ends the whole term is simply there to scrub.
+
+   preserveAspectRatio="none" lets month position map straight to track width
+   with no letterboxing; non-scaling-stroke keeps the strokes honest under that
+   distortion. The playhead and the event ticks stay HTML - a circle in a
+   stretched viewBox would render as an ellipse. */
+function DialTrack({ story, f, evs, playing }) {
+  const n = story.length;
+  const VB = 100;
+  const { lo, hi } = useMemo(() => {
+    const vals = story.map((s) => s.lab);
+    // 50 is always in frame: "how near level" is the reading, and a domain that
+    // floated with the data would silently rescale that away
+    return { lo: Math.min(50, ...vals) - 1.4, hi: Math.max(50, ...vals) + 0.8 };
+  }, [story]);
+  const sx = (i) => (n < 2 ? 0 : (i / (n - 1)) * VB);
+  const sy = (v) => ((hi - v) / (hi - lo)) * VB;
+
+  const fi = Math.max(0, Math.min(n - 1, Math.floor(f)));
+  const ft = Math.max(0, Math.min(1, f - fi));
+  /* The SAME easing the needle uses, applied to x AND y. Easing only y would
+     lift the playhead off its own line; easing both keeps it on the segment
+     and keeps the dot and the needle telling one story about a month. */
+  const et = smooth(ft);
+  const headI = fi + et * (fi < n - 1 ? 1 : 0);
+  const headV = lerp(story[fi].lab, story[Math.min(n - 1, fi + 1)].lab, et);
+
+  const pt = (i, v) => `${sx(i).toFixed(2)},${sy(v).toFixed(2)}`;
+  const ghost = story.map((s, i) => pt(i, s.lab)).join(" ");
+
+  /* Traced points up to the playhead, then split into runs of one challenger.
+     A run starts from the previous month's point so the line stays continuous
+     across a handover: the segment INTO a month takes that month's colour. */
+  const traced = [];
+  for (let i = 0; i <= fi; i++) traced.push({ i, v: story[i].lab, id: story[i].oppId });
+  if (fi < n - 1 && ft > 0) traced.push({ i: headI, v: headV, id: story[fi + 1].oppId });
+  const runs = [];
+  traced.forEach((p, k) => {
+    const last = runs[runs.length - 1];
+    if (!last || last.id !== p.id) runs.push({ id: p.id, pts: k ? [traced[k - 1], p] : [p] });
+    else last.pts.push(p);
+  });
+
+  const y50 = sy(50);
+  const headPct = { left: (headI / Math.max(1, n - 1)) * 100, top: (sy(headV) / VB) * 100 };
+
+  return (
+    <React.Fragment>
+      <svg className="dl-spark" viewBox={`0 0 ${VB} ${VB}`} preserveAspectRatio="none" aria-hidden="true">
+        {/* the majority line */}
+        <line className="dl-spark-50" x1="0" x2={VB} y1={y50} y2={y50} vectorEffect="non-scaling-stroke" />
+        {/* the term ahead, faint */}
+        <polyline className="dl-spark-ghost" points={ghost} vectorEffect="non-scaling-stroke" />
+        {/* the term so far, in the colour of who was challenging */}
+        {runs.map((r, k) => (
+          <polyline key={k} className="dl-spark-run" stroke={`var(--${r.id})`} vectorEffect="non-scaling-stroke"
+                    points={r.pts.map((p) => pt(p.i, p.v)).join(" ")} />
+        ))}
+      </svg>
+      {evs.map((e) => (
+        <span key={e.i} className={"dl-tick" + (Math.abs(e.i - f) < 0.5 ? " on" : "")}
+              style={{ left: `${(e.i / Math.max(1, n - 1)) * 100}%` }} title={e.label} />
+      ))}
+      <span className="dl-head-rule" style={{ left: `${headPct.left}%` }} />
+      <span className={"dl-head" + (playing ? " playing" : "")}
+            style={{ left: `${headPct.left}%`, top: `${headPct.top}%`,
+                     background: `var(--${story[fi].oppId})` }} />
+    </React.Fragment>
+  );
+}
+
+/* ====================================================================
    The overlay. Opens by flying out of the masthead (FLIP), replays the
    term, then hands the timeline over to be scrubbed.
    ==================================================================== */
@@ -406,23 +502,24 @@ function DialStory({ originRect, onClose }) {
           </figcaption>
         </figure>
 
-        {/* timeline: progress while playing, scrubbable once it has run */}
+        {/* timeline: Labor's 2PP against that month's challenger, traced as it
+            plays and scrubbable once it has run. aria-valuetext carries the
+            reading, because the graph is now the point of the control and a
+            bare month index would describe none of it. */}
         <div className={"dl-track" + (playing ? " playing" : "")} ref={scrubRef}
              onPointerDown={onScrubDown}
              role={playing ? undefined : "slider"}
              aria-valuemin={0} aria-valuemax={n - 1} aria-valuenow={i}
+             aria-valuetext={`${monthLabel}: Labor ${cur.lab.toFixed(1)} against ${cur.oppName} ${cur.opp.toFixed(1)}`}
              aria-label="Month" tabIndex={playing ? -1 : 0}>
-          <div className="dl-track-line" />
-          {evs.map((e) => (
-            <span key={e.i} className="dl-tick" style={{ left: `${(e.i / (n - 1)) * 100}%` }} title={e.label} />
-          ))}
-          <div className="dl-head" style={{ left: `${(f / (n - 1)) * 100}%` }} />
+          <DialTrack story={story} f={f} evs={evs} playing={playing} />
         </div>
 
         <div className="dl-foot">
           <span className="dl-legend">
             Bars are the primary vote and reorder as parties overtake one another. The right of
-            the arc takes the colour of Labor’s strongest challenger that month.
+            the arc — and the line below — take the colour of Labor’s strongest challenger that
+            month; the line is Labor’s two-party preferred against them, against 50.
           </span>
           <button className="dl-replay" onClick={replay} disabled={playing}>
             {playing ? "Playing…" : "Replay"}
