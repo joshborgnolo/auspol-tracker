@@ -244,11 +244,22 @@ function PrimaryVotePanel({ rangeId }) {
 const eventOn = (iso) => (window.AP.D.events || []).find((e) => e.date === iso) || null;
 const majorEvents = () => (window.AP.D.events || []).filter((e) => e.major);
 
+/* The opposition-leader handover is ALREADY in the dataset - 2026-02-12,
+   "Angus Taylor takes the Liberal leadership" - so take it from there rather
+   than restating it. It used to be hand-rolled here with its own wording and
+   no `date` at all, which is why its click panel came out differently from
+   every other event's: with nothing to put in the tooltip's date row, the date
+   had been folded into `desc` and rendered as body copy, while Bondi and the
+   rest show it in the date row above the description. Same shape now, so the
+   same panel, and the two can no longer drift apart.
+
+   `short` is the one thing overridden. It is the label drawn against the line,
+   and on these two charts the point is the SPLICE of Ley's series into
+   Taylor's, which "Ley → Taylor" names and the dataset's Liberal-leadership
+   framing does not. */
 const OPP_HANDOVER = (() => {
-  const doy = (Date.UTC(2026, 1, 12) - Date.UTC(2026, 0, 1)) / 86400000;
-  return { x: 2026 + doy / 365, short: "Ley → Taylor",
-           label: "Angus Taylor becomes Opposition Leader",
-           desc: "Replaces Sussan Ley · 12 February 2026" };
+  const e = eventOn("2026-02-12");
+  return e ? { ...e, short: "Ley → Taylor" } : null;
 })();
 
 // ---- Leadership: shared leader selector over two panels -------------
@@ -475,7 +486,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         yTicks={ticks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
-        events={leaders.some((L) => L.id === "taylor") ? [OPP_HANDOVER] : []}
+        events={leaders.some((L) => L.id === "taylor") ? [OPP_HANDOVER].filter(Boolean) : []}
         series={ordered.map((L) => (
           { id: L.id, label: L.short, color: L.color, points: seriesNN(pts, L.id + suf) }
         ))}
@@ -597,7 +608,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         refLines={[{ y: 0, label: "even", color: "var(--ink-faint)" }]}
-        events={leaders.some((L) => L.id === "taylor") ? [OPP_HANDOVER] : []}
+        events={leaders.some((L) => L.id === "taylor") ? [OPP_HANDOVER].filter(Boolean) : []}
         series={ordered.map((L) => (
           { id: L.id, label: L.short + " net", color: L.color, points: seriesNN(pts, L.id + suf) }
         ))}

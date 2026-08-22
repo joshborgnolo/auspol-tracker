@@ -451,7 +451,11 @@ function TrendChart(props) {
             /* aria-label rather than <title>: a <title> child also produces the
                browser's own delayed tooltip, which would surface a second,
                unstyled copy on top of ours. */
-            const aria = e.label + (e.desc ? " – " + e.desc : "") + " · " + fmtEventDate(e.date);
+            /* an event with no date formatted to "", leaving the name ending in a
+               dangling " · " - only reachable when an event is built by hand
+               rather than taken from the dataset, which is no longer done */
+            const aDate = fmtEventDate(e.date);
+            const aria = e.label + (e.desc ? " – " + e.desc : "") + (aDate ? " · " + aDate : "");
             /* Hover for a mouse, tap for a finger. Without the pointerdown an
                event annotation was mouse-only – the one thing on the chart a
                phone could see but never read. Tapping one twice dismisses it. */
