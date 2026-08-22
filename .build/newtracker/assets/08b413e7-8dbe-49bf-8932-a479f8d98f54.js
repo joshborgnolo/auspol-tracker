@@ -302,10 +302,15 @@ function TrendChart(props) {
     };
   }
 
-  // clamp the tooltip so it never spills past the card edge on end-of-range hovers
+  /* Clamp the tooltip so it never spills past the card edge on end-of-range
+     hovers. The half-width has to match the readout being drawn: one hardcoded
+     "~half a typical tip" was measured off the guide readout, so the event
+     panel - which is much wider - was allowed to sit up to 40px past the edge.
+     240 is .tip-evt's max-width and 156 the guide/dot readouts' working width;
+     both are capped in CSS, so clamping by them contains the element itself. */
   if (tip) {
-    const halfPx = 78;                      // ~half a typical tip width
-    const halfPct = (halfPx / Math.max(cw, 1)) * 100;
+    const tipMax = Math.min(evt ? 240 : 156, cw);
+    const halfPct = (tipMax / 2 / Math.max(cw, 1)) * 100;
     tip.left = Math.min(100 - halfPct, Math.max(halfPct, tip.left));
   }
 

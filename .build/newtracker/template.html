@@ -946,6 +946,13 @@ body {
 /* event readout: the date sits under the name in the serif, the description
    below it as prose — an annotation is a sentence, not a table of figures */
 .tip-evt { max-width: 240px; min-width: 0; }
+/* A guide readout's title is a short label ("Dec 2025") that must not wrap, so
+   .tip-title is nowrap. An EVENT's title is a sentence - "Angus Taylor becomes
+   Liberal leader" - and nowrap made it run straight out of the 240px panel,
+   past a border that does not clip, so the last letters simply sat on the
+   chart. Let it wrap, and break a word that is somehow longer than the panel
+   rather than let anything escape again. */
+.tip-evt .tip-title { white-space: normal; overflow-wrap: anywhere; }
 .tip-date {
   font-family: var(--sans); font-size: 11px; font-weight: 600;
   letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3);
