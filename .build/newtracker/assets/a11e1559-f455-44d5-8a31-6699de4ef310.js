@@ -244,9 +244,11 @@ function PrimaryVotePanel({ rangeId }) {
 const eventOn = (iso) => (window.AP.D.events || []).find((e) => e.date === iso) || null;
 const majorEvents = () => (window.AP.D.events || []).filter((e) => e.major);
 
-/* The opposition-leader handover is ALREADY in the dataset - 2026-02-12,
-   "Angus Taylor takes the Liberal leadership" - so take it from there rather
-   than restating it. It used to be hand-rolled here with its own wording and
+/* The opposition-leader handover is ALREADY in the dataset, dated 2026-02-12,
+   so take it from there rather than restating it. Referenced by date and not
+   by title: a title is copy and can be reworded in data/polls.json, and a
+   comment quoting one is just the same duplication this removes, one level
+   down. It used to be hand-rolled here with its own wording and
    no `date` at all, which is why its click panel came out differently from
    every other event's: with nothing to put in the tooltip's date row, the date
    had been folded into `desc` and rendered as body copy, while Bondi and the
