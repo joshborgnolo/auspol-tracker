@@ -1076,12 +1076,70 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .ls-chip.on .ls-cur { color: var(--ink-3); }
 
 /* ---------- leaders ---------- */
-.leader-readout { display: flex; align-items: center; gap: 20px; margin-bottom: 6px; flex-wrap: wrap; }
-.leader { display: flex; align-items: center; gap: 9px; }
-.leader-dot { width: 11px; height: 11px; border-radius: 50%; }
-.leader-name { font-size: 13px; font-weight: 600; color: var(--ink-2); }
-.leader-num { font-size: 30px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); }
-.leader-num .pct { font-size: 16px; font-weight: 700; color: var(--ink-3); margin-left: 1px; }
+/* The readout carries two leaders in the two-way question and THREE in the
+   three-way one, so its widest case is 50% more content in the same column.
+   At fixed sizes the third leader wrapped onto its own line on a phone: three
+   125px items plus two 20px gaps wanted 415px of a 343px column, and the
+   figures stopped reading as one comparison.
+
+   Everything contributing to an item's width is therefore sized off the
+   READOUT'S OWN WIDTH, via cqi, rather than off the viewport. The distinction
+   matters: this panel sits in a column, so at a 1280px viewport the readout is
+   532px - 42% of it - and vw units would be pricing space the row does not
+   have. The ceilings are the original desktop values, so nothing changes where
+   there was already room.
+
+   flex-wrap stays on as a safety net: something unforeseen should drop to a
+   second line rather than overflow the card. */
+.leader-readout {
+  container-type: inline-size;
+  display: flex; align-items: center; margin-bottom: 6px; flex-wrap: wrap;
+  gap: clamp(9px, 3.8cqi, 20px);
+}
+.leader { display: flex; align-items: center; gap: clamp(4px, 1.7cqi, 9px); min-width: 0; }
+.leader-dot {
+  width: clamp(7px, 2.1cqi, 11px); height: clamp(7px, 2.1cqi, 11px);
+  border-radius: 50%; flex: none;
+}
+/* the NAME sets the column width here, not the figure - "Albanese" at 13px is
+   wider than "39%" at 30px - so it has to scale too or the rest is wasted */
+.leader-name { font-size: clamp(11px, 4cqi, 13px); font-weight: 600; color: var(--ink-2); }
+.leader-num {
+  font-size: clamp(25px, 9cqi, 30px);
+  font-weight: 800; letter-spacing: -0.02em; color: var(--ink);
+}
+.leader-num .pct { font-size: clamp(14px, 4.8cqi, 16px); font-weight: 700; color: var(--ink-3); margin-left: 1px; }
+/* the change chip is a third of an item's width at full size; it keeps its
+   place beside the figure, just proportionally smaller */
+.leader-readout .delta { font-size: clamp(10px, 3.5cqi, 12px); gap: clamp(2px, 1cqi, 4px); }
+.leader-readout .delta-arrow { font-size: clamp(8px, 2.6cqi, 9px); }
+
+/* Where the row is genuinely too narrow for three items with the chip beside
+   the figure, the chip drops beneath the figure it belongs to. That takes it
+   out of the width calculation - an item is then as wide as its NAME - which
+   is what buys room for a third leader and for a longer surname than today's
+   (the opposition slot is an office, not a person).
+
+   Grid, not flex-wrap: giving the chip flex-basis:100% did move it to its own
+   line, but a flex item's max-content contribution is computed FROM its
+   flex-basis, so each item then reported itself full-width and the three still
+   did not fit - 103px where the content needed 63. Two auto columns size to
+   their contents. */
+/* 480, not 430: at a 438px container the side-by-side layout fitted with 7px
+   to spare, which is not a margin, it is a coincidence. Hand over only once
+   the wider layout has real room. */
+@container (max-width: 480px) {
+  .leader {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    justify-content: start;
+    row-gap: 0;
+  }
+  .leader-dot  { grid-column: 1; grid-row: 1; }
+  .leader-vals { grid-column: 2; grid-row: 1; }
+  .leader-readout .delta { grid-column: 2; grid-row: 2; justify-self: start; margin-top: -1px; }
+}
 .leader-num.muted { color: var(--ink-3); }
 .leader-vs { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 15px; }
 .leader.undecided { margin-left: auto; text-align: right; flex-direction: column; align-items: flex-end; gap: 0; }

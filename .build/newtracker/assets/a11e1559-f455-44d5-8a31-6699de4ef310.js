@@ -459,7 +459,8 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           return (
             <div className="leader" key={L.id}>
               <div className="leader-dot" style={{ background: L.color }}></div>
-              <div>
+              {/* named so the narrow-screen grid can place it – see .leader-vals */}
+              <div className="leader-vals">
                 <div className="leader-name">{L.short}{tag && <span className="stale-tag" title={"Latest published reading · " + tag}> {tag}</span>}</div>
                 <div className="leader-num">{r ? r.v : "—"}{r && <span className="pct">%</span>}</div>
               </div>
