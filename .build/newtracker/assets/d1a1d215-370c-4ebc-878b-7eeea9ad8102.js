@@ -720,7 +720,7 @@ function ArchLead({ p, measure }) {
 // full per-poll breakdown for an ARCHIVE poll – mirrors the Latest-polls
 // detail, but driven off the archive row shape (alp/lnp 2PP, p primary, ppm,
 // appr) which carries no commissioning client / method / direction fields.
-function ArchPollDetail({ p }) {
+function ArchPollDetail({ p, onBack }) {
   const { ShareBar, NetVal, ApprBlock, primarySegs, tppContests, tppHeading, ppmContests, ppmContestSegs, ppmLabel, ppmKind, LEADER_META } = window;
   const contests = ppmContests(p);
   const tcs = tppContests(p);
@@ -731,6 +731,17 @@ function ArchPollDetail({ p }) {
         <span className="pd-meta-i"><span className="pd-meta-k">Published</span> {p.fullDate}</span>
         <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>
         {p.lean != null && <span className="pd-meta-i"><span className="pd-meta-k">House lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>}
+        {/* the way back rides the line that already describes this poll, rather
+            than inventing a band of its own above the panel */}
+        {onBack && (
+          <button className="back-to-chart" onClick={(e) => { e.stopPropagation(); onBack(); }}>
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                 strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5M11 18l-6-6 6-6" />
+            </svg>
+            Back to the chart
+          </button>
+        )}
       </div>
       <div className="pd-grid">
         <div className="pd-block">
@@ -1540,16 +1551,7 @@ function AllPollsView({ focus, onBack }) {
                 {isOpen && (
                   <tr className="detail-row">
                     <td colSpan={colCount}>
-                      {arrived && onBack && (
-                        <button className="back-to-chart" onClick={(e) => { e.stopPropagation(); onBack(); }}>
-                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
-                               strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                            <path d="M19 12H5M11 18l-6-6 6-6" />
-                          </svg>
-                          Back to the chart
-                        </button>
-                      )}
-                      <ArchPollDetail p={p} />
+                      <ArchPollDetail p={p} onBack={arrived ? onBack : null} />
                     </td>
                   </tr>
                 )}

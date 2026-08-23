@@ -1432,16 +1432,20 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 /* expanded per-poll breakdown */
 .detail-row > td { padding: 0 !important; border-bottom: 1px solid var(--line-2); }
 /* the way back to the chart the reader came from */
+/* Sits at the end of the detail's own meta line - so it needs no space of its
+   own, lands inside the panel's tint rather than on a pale band above it, and
+   aligns with the panel's content instead of with the table cell behind it. */
 .back-to-chart {
-  /* centred on its own terms: the cell's text-align happens to agree today,
-     and a button that moves when a table style changes is a button that moves */
-  display: flex; width: fit-content; align-items: center; gap: 6px; margin: 14px auto -2px;
-  border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
-  padding: 6px 14px 6px 11px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-left: auto; align-self: center;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 5px 13px 5px 10px; font-family: var(--sans); font-size: 12px; font-weight: 600;
   color: var(--ink-2); cursor: pointer; white-space: nowrap;
   transition: color .15s ease, border-color .15s ease, background-color .15s ease;
 }
 .back-to-chart:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
+/* the meta line carries text and now a control, so centre what sits in it */
+.pd-meta { align-items: center; }
 /* a poll arrived at from a chart gets one quiet pulse, so the eye finds it
    after the scroll instead of hunting the row that just opened */
 @media (prefers-reduced-motion: no-preference) {
