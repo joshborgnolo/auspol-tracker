@@ -537,7 +537,7 @@ function PastCyclesView() {
     <div className="view view-cycles">
       <div className="view-intro">
         <p className="view-lede">
-          Every federal term since 2010, aligned to its election day – so each government’s
+          Every federal term since 2010, aligned to its election day so that each government’s
           trajectory can be read off a shared clock. The current Albanese government is drawn
           <strong> bold</strong>; past governments sit behind, tinted by the party in power –
           red for Labor terms, blue for Coalition – with the year marked where each line ends.

@@ -197,6 +197,55 @@ function Header({ isDark, onToggleTheme }) {
   );
 }
 
+/* A headline figure that ROLLS to its new value instead of being replaced by
+   it. Every digit is a reel: 1 to 3 slides through 2, 4 to 8 through 5, 6 and
+   7, which is what makes a matchup switch read as one number moving rather
+   than another number arriving.
+
+   The value in the DOM is the FINAL one from the first frame - the reel is
+   decoration over a number that is already correct, never a delay in front of
+   one - so a screen reader, a copy-paste and the accessibility tree all get
+   53.8 the instant it is true, while the eye watches it arrive.
+
+   The baseline is the fiddly part: a box with overflow:hidden takes its bottom
+   edge as its baseline, which would drop the 17px party name by a fifth of a
+   62px em. The zero-width anchor is a real, invisible line of text at the head
+   of the row, so the whole figure keeps an ordinary text baseline and the
+   clipped digit boxes align to its top edge. */
+const ROLL_DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+function RollNum({ value, className, style }) {
+  const text = String(value);
+  return (
+    <span className={"roll" + (className ? " " + className : "")} style={style}>
+      <span className="roll-anchor" aria-hidden="true">0</span>
+      <span className="sr-only">{text}</span>
+      {text.split("").map((ch, i) => (
+        /[0-9]/.test(ch) ? (
+          <span className="roll-d" key={i} aria-hidden="true">
+            <span className="roll-reel" style={{ "--d": Number(ch) }}>
+              {ROLL_DIGITS.map((d) => <span key={d}>{d}</span>)}
+            </span>
+          </span>
+        ) : (
+          <span className="roll-sep" key={i} aria-hidden="true">{ch}</span>
+        )
+      ))}
+    </span>
+  );
+}
+
+/* Blend two party colours the long way round the wheel. `shorter hue` from
+   L/NP blue (250deg) to One Nation orange (58deg) is 172deg the OTHER way, so
+   the rival travels blue - indigo - magenta - red - orange rather than sliding
+   through grey, which is what an oklab mix of the two would do. Left as a CSS
+   function rather than computed here so it keeps resolving against whichever
+   palette the theme is currently using. */
+function mixC(c1, c2, t) {
+  if (t <= 0 || c1 === c2) return c1;
+  if (t >= 1) return c2;
+  return "color-mix(in oklch shorter hue, " + c1 + ", " + c2 + " " + (t * 100).toFixed(1) + "%)";
+}
+
 function Hero({ rangeId, setRangeId, showScatter = true }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const xDomain = rangeDomain(rangeId);
@@ -271,8 +320,65 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   }));
 
   const [matchup, setMatchup] = useState(orderedMatchups[0]);
+  /* Switching matchup is a MORPH, not a swap. The same two lines reshape into
+     the other pair, the rival's colour travels round the hue circle, the
+     headline digits roll, and the two dot clouds cross over - so the second
+     matchup reads as the first one rearranged, and switching back rearranges
+     it home. 320ms with an ease-out: far enough to follow, short enough that
+     nobody is kept waiting for a number they can already read, since the value
+     itself is correct from the first frame and only its digits are in motion. */
+  const MORPH_MS = 320;
+  const [morph, setMorph] = useState(null);        // { from, to, t }
+  const morphRaf = useRef(0);
+  React.useEffect(() => () => cancelAnimationFrame(morphRaf.current), []);
+  const chooseMatchup = (id) => {
+    const from = matchup;
+    setMatchup(id);
+    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (id === from || still || !MATCHUPS[from] || !MATCHUPS[id]) { setMorph(null); return; }
+    cancelAnimationFrame(morphRaf.current);
+    const t0 = performance.now();
+    setMorph({ from, to: id, t: 0 });
+    const step = (now) => {
+      const raw = Math.min(1, (now - t0) / MORPH_MS);
+      if (raw >= 1) { setMorph(null); return; }          // land on the real thing
+      setMorph({ from, to: id, t: 1 - Math.pow(1 - raw, 3) });
+      morphRaf.current = requestAnimationFrame(step);
+    };
+    morphRaf.current = requestAnimationFrame(step);
+  };
+
   const m = MATCHUPS[matchup];
-  const pts = filterPts(m.data, xDomain[0]);
+  const ptsOf = (id) => filterPts(MATCHUPS[id].data, xDomain[0]);
+  const pts = ptsOf(matchup);
+  /* Both matchups on ONE grid of months, each holding its own end value across
+     the months the other one runs for - so the two paths carry the same shape
+     of command and can be interpolated point for point. The stretch a matchup
+     was never asked in is never SEEN: the clip window travels with the morph,
+     so the line retreats to where the question was actually put, and grows
+     back out when you switch away. */
+  const blend = (() => {
+    if (!morph) return null;
+    const A = ptsOf(morph.from), B = ptsOf(morph.to);
+    if (!A.length || !B.length) return null;
+    const t = morph.t, lerp = (p, q) => p + (q - p) * t;
+    const index = (arr) => { const o = {}; arr.forEach((d) => (o[d.ym] = d)); return o; };
+    const ia = index(A), ib = index(B);
+    const hold = (idx, arr, ym) => idx[ym] || (ym < arr[0].ym ? arr[0] : arr[arr.length - 1]);
+    const yms = [...new Set(A.concat(B).map((d) => d.ym))].sort();
+    return {
+      pts: yms.map((ym) => {
+        const da = hold(ia, A, ym), db = hold(ib, B, ym);
+        return { ym, x: (ia[ym] || ib[ym]).x, a: lerp(da.a, db.a), b: lerp(da.b, db.b) };
+      }),
+      clip: [lerp(A[0].x, B[0].x), lerp(A[A.length - 1].x, B[B.length - 1].x)],
+      a: mixC(MATCHUPS[morph.from].a.color, MATCHUPS[morph.to].a.color, t),
+      b: mixC(MATCHUPS[morph.from].b.color, MATCHUPS[morph.to].b.color, t),
+    };
+  })();
+  const drawPts = blend ? blend.pts : pts;
+  const colA = blend ? blend.a : m.a.color;
+  const colB = blend ? blend.b : m.b.color;
   // Headline readout: for the REAL ALP v L/NP measure this is the trailing
   // recency- + sample-weighted, house-effect-adjusted nowcast (D.latest) –
   // the same figure docked in the sticky tab bar – NOT the last monthly-mean
@@ -293,12 +399,17 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   // Driven by the active matchup's own accessor – a poll that didn't publish
   // THIS head-to-head is simply skipped, which is why the ON matchups show
   // fewer dots rather than none.
-  const scatter = !showScatter ? [] : D.individualPolls
+  const cloudFor = (id) => (!showScatter ? [] : D.individualPolls
     .filter((p) => p.x >= xDomain[0] && p.x <= xDomain[1])
     .flatMap((p) => {
-      const pair = m.scatter(p);
+      const pair = MATCHUPS[id].scatter(p);
       return pair ? pair.map((s) => ({ x: p.x, y: s.y, color: s.color, label: s.label, meta: p })) : [];
-    });
+    }));
+  // memoised on what actually changes them: a morph frame must not rebuild
+  // 240 dots sixty times a second (see the chart's own memo on the same arrays)
+  const scatter = React.useMemo(() => cloudFor(matchup), [matchup, rangeId, showScatter]);
+  const scatterOut = React.useMemo(() => (morph ? cloudFor(morph.from) : []),
+                                   [morph ? morph.from : null, rangeId, showScatter]);
   // how many polls are actually behind the cloud – stated in the caption, since
   // "9 houses ask this" is the honest caveat on a thinner matchup
   const scatterPolls = scatter.length / 2;
@@ -308,12 +419,12 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   // really noise. Where the series is too thin to weight, plot the readings
   // only and let the reader see the scatter for what it is.
   const heroSeries = !adjusted ? [] : [
-    { id: "a", label: m.a.name, color: m.a.color, points: series(pts, "a"), width: 3.6 },
-    { id: "b", label: m.b.name, color: m.b.color, points: series(pts, "b"), width: 3.6 },
+    { id: "a", label: m.a.name, color: colA, points: series(drawPts, "a"), width: 3.6 },
+    { id: "b", label: m.b.name, color: colB, points: series(drawPts, "b"), width: 3.6 },
   ];
   // with no line there is nothing for a month-guide tooltip to report, so the
   // guide is switched off and the dots carry their own hovers
-  const heroSpine = heroSeries.length ? series(pts, "a") : [];
+  const heroSpine = heroSeries.length ? series(drawPts, "a") : [];
 
   // Major events, clipped to the span this matchup actually plots. The headline
   // 2PP runs the whole archive so it keeps all of them; ALP v ON only begins
@@ -332,12 +443,20 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
 
   // y-window auto-fits the matchup spread – min/max taken across BOTH series
   // so the domain stays correct even if the challenger ever takes the lead
-  const heroVals = m.data.flatMap((d) => [d.a, d.b]);
-  const lo = Math.min(...heroVals), hi = Math.max(...heroVals);
-  const pad6 = 6;
-  const yDomain = [Math.floor((lo - pad6) / 5) * 5, Math.ceil((hi + pad6) / 5) * 5];
+  const domainOf = (id) => {
+    const v = MATCHUPS[id].data.flatMap((d) => [d.a, d.b]);
+    const lo = Math.min(...v), hi = Math.max(...v), pad6 = 6;
+    return [Math.floor((lo - pad6) / 5) * 5, Math.ceil((hi + pad6) / 5) * 5];
+  };
+  const yTarget = domainOf(matchup);
+  // ticks come from the TARGET window so their number holds still while the
+  // window itself slides; today both matchups share 35–65 and nothing moves
+  const yDomain = blend
+    ? (() => { const f = domainOf(morph.from), t = morph.t;
+               return [f[0] + (yTarget[0] - f[0]) * t, f[1] + (yTarget[1] - f[1]) * t]; })()
+    : yTarget;
   const yTicks = [];
-  for (let v = yDomain[0]; v <= yDomain[1]; v += 5) if (v > yDomain[0] && v < yDomain[1]) yTicks.push(v);
+  for (let v = yTarget[0]; v <= yTarget[1]; v += 5) if (v > yTarget[0] && v < yTarget[1]) yTicks.push(v);
   const lead = +(latest.a - latest.b).toFixed(1);
   const leadName = lead >= 0 ? m.a.name : m.b.name;
   /* Uncertainty for whichever matchup is showing. Every nowcast on this hero
@@ -365,17 +484,21 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
             estimable (ALP v L/NP and ALP v ON both are); one that only two
             houses ask can't be debiased or nowcast, so it says so. */}
         <h2 className="card-title hero-title">Two-party preferred</h2>
-          <div className="hero-readout" key={"ro-" + matchup}>
+          {/* NOT keyed on the matchup any more: a remount would replace these
+              figures, and the whole point is that they travel. The old
+              readout-in fade lives on where it still belongs, on the lead line
+              below, whose words genuinely are replaced. */}
+          <div className="hero-readout">
             <div className="ro-party alp-side">
-              <span className="ro-dot" style={{ background: m.a.color }}></span>
+              <span className="ro-dot" style={{ background: colA }}></span>
               <span className="ro-name">{m.a.name}</span>
-              <span className="ro-num" style={{ color: inkOf(m.a.color) }}>{latest.a.toFixed(1)}</span>
+              <RollNum className="ro-num" value={latest.a.toFixed(1)} style={{ color: inkOf(colA) }} />
             </div>
             <span className="ro-sep" aria-hidden="true"></span>
             <div className="ro-party lnp-side">
-              <span className="ro-num" style={{ color: inkOf(m.b.color) }}>{latest.b.toFixed(1)}</span>
+              <RollNum className="ro-num" value={latest.b.toFixed(1)} style={{ color: inkOf(colB) }} />
               <span className="ro-name">{m.b.name}</span>
-              <span className="ro-dot" style={{ background: m.b.color }}></span>
+              <span className="ro-dot" style={{ background: colB }}></span>
             </div>
           </div>
           {/* An aggregate of five polls is not known to a tenth of a point, so
@@ -413,15 +536,18 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
           </div>
         </div>
         <div className="hero-controls">
-          <TextToggle value={matchup} onChange={setMatchup} ariaLabel="Matchup"
+          <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
             options={matchupOptions} />
           <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
             options={[{ id: "3", label: "3M" }, { id: "12", label: "12M" }, { id: "all", label: "All" }]} />
         </div>
       </div>
 
+      {/* The key deliberately does NOT carry the matchup: remounting the chart
+          would throw away the very thing being morphed (and both memoised dot
+          clouds with it). A stale hover index is already clamped inside. */}
       <TrendChart
-        key={"hero-" + matchup + "-" + rangeId}
+        key={"hero-" + rangeId}
         height={420} xDomain={xDomain} yDomain={yDomain} yTicks={yTicks} unit="%"
         axisFont={22}
         pad={{ l: 58, r: 22, t: 30, b: 42 }}
@@ -429,7 +555,8 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
         refLines={heroRefLines}
         events={heroEvents}
         scatter={scatter} series={heroSeries} spine={heroSpine}
-        tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
+        scatterOut={scatterOut} fade={blend ? morph.t : 1} clipX={blend ? blend.clip : null}
+        tooltipTitle={(i) => window.AP.monthLabelFull((drawPts[i] || drawPts[drawPts.length - 1]).ym)}
         fmt={(v) => v.toFixed(1)}
       />
       <div className="hero-foot">

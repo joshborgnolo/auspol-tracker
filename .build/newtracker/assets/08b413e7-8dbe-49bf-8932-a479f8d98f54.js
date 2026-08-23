@@ -95,6 +95,12 @@ function TrendChart(props) {
     series = [], scatter = [], yTicks = [], xTicks = [], refLines = [],
     bands = [], areas = [], fmt = (v) => v.toFixed(1), unit = "", tooltipTitle,
     onHoverIndex, spine, axisFont = 15, events = [], extraRows, ariaLabel,
+    /* A chart can be mid-MORPH between two versions of itself (the hero's
+       matchup switch). `scatterOut` is the cloud on its way out and `fade` how
+       far the crossfade has run; `clipX` is the x window the lines are allowed
+       to draw in, which travels with the morph so a series is never drawn over
+       months it was never asked in. */
+    scatterOut = [], fade = 1, clipX,
   } = props;
 
   // series may be ragged (a leader not polled every month), so points are
@@ -399,6 +405,21 @@ function TrendChart(props) {
     tip.sub || "",
   ].filter(Boolean).join(", ");
 
+  /* Dot clouds, memoised: identity is what lets React skip them entirely on a
+     morph frame. `geom` covers everything that would move a dot – the scales
+     are rebuilt every render but produce the same pixels while it holds. */
+  const geom = [W, H, pad.l, pad.r, pad.t, pad.b, xDomain[0], xDomain[1], yDomain[0], yDomain[1]].join("|");
+  const dotEls = (arr, live) => arr.map((d, i) => (
+    <circle key={"s" + i} cx={sx(d.x)} cy={sy(d.y)} r={live && dot === d ? 6.5 : 4.2}
+            className="scatter-dot" fill={d.color}
+            opacity={live && dot && dot !== d ? 0.25 : 0.6}
+            /* no per-dot pointer listeners: both inputs pick from the
+               svg root, so nothing here depends on a browser firing
+               enter/leave on an SVG child */ />
+  ));
+  const dots = React.useMemo(() => dotEls(scatter, true), [scatter, dot, geom]);
+  const outDots = React.useMemo(() => dotEls(scatterOut, false), [scatterOut, geom]);
+
   /* ---- key events ---------------------------------------------------------
      A busy set (the hero's history) shows only when the chart is genuinely
      wide ON SCREEN (measured px, so phones and narrow columns stay
@@ -474,7 +495,13 @@ function TrendChart(props) {
            tabIndex={0} role="img" aria-label={a11yLabel}>
         <defs>
           <clipPath id={clipId}>
-            <rect x={pad.l} y="0" width={W - pad.l - pad.r} height={H} />
+            {/* the right edge carries a little slack so a rounded line cap at
+                the last reading isn't shaved off by its own clip */}
+            <rect x={clipX ? Math.max(pad.l, sx(clipX[0])) : pad.l} y="0"
+                  width={clipX
+                    ? Math.max(0, Math.min(W - pad.r, sx(clipX[1]) + 5) - Math.max(pad.l, sx(clipX[0])))
+                    : W - pad.l - pad.r}
+                  height={H} />
           </clipPath>
         </defs>
         {/* shaded bands */}
@@ -560,15 +587,14 @@ function TrendChart(props) {
                   opacity: hoverX != null && !dot && !evt ? 0.7 : 0,
                 }} />
         )}
-        {/* scatter */}
-        {scatter.map((d, i) => (
-          <circle key={"s" + i} cx={sx(d.x)} cy={sy(d.y)} r={dot === d ? 6.5 : 4.2}
-                  className="scatter-dot" fill={d.color}
-                  opacity={dot && dot !== d ? 0.25 : 0.6}
-                  /* no per-dot pointer listeners: both inputs pick from the
-                     svg root, so nothing here depends on a browser firing
-                     enter/leave on an SVG child */ />
-        ))}
+        {/* scatter – the heaviest thing on the chart at up to 240 circles, and
+            it holds still while a morph runs, so both clouds are memoised
+            against the geometry that actually moves them. A morphing frame
+            then reconciles two <g> opacities instead of hundreds of dots. */}
+        {scatterOut.length > 0 && fade < 1 && (
+          <g style={{ opacity: 1 - fade }}>{outDots}</g>
+        )}
+        <g style={fade < 1 ? { opacity: fade } : null}>{dots}</g>
         {/* series lines (clipped to the plot area so windowed views
             don't draw the entering segment past the y-axis) */}
         <g clipPath={`url(#${clipId})`}>

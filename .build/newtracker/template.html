@@ -818,6 +818,24 @@ body {
 .alp-side .ro-num { color: var(--alp-text); }
 .lnp-side .ro-num { color: var(--lnp-text); }
 .ro-sep { width: 2px; height: 44px; border-radius: 1px; background: var(--line); align-self: center; }
+
+/* ---- rolling figures ----
+   Each digit is a reel of 0-9 in a one-em window, moved by transform alone, so
+   the whole headline animates on the compositor however large the type is.
+   Tabular figures keep the columns from breathing as they pass through 1 and
+   7, and `.roll-anchor` is a zero-width invisible line of text that hands the
+   flex row an ordinary text baseline - without it the clipped digit boxes
+   would report their bottom edge as the baseline and drop the party name by a
+   fifth of a 62px em. */
+.roll { display: inline-flex; align-items: flex-start; line-height: 1; font-variant-numeric: tabular-nums; }
+.roll-anchor { display: block; width: 0; height: 1em; line-height: 1em; visibility: hidden; }
+.roll-d { display: block; height: 1em; overflow: hidden; }
+.roll-reel {
+  display: block;
+  transform: translateY(calc(var(--d) * -1em));
+  transition: transform .34s cubic-bezier(.2, .74, .24, 1);
+}
+.roll-reel > span, .roll-sep { display: block; height: 1em; line-height: 1em; }
 .hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
@@ -2175,6 +2193,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
 }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
+  .roll-reel { transition: none; }
 }
 
 /* The theme flip crossfades as ONE composited picture – see applyChrome() in
