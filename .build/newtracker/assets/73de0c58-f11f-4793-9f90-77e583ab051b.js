@@ -471,10 +471,19 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
     return (D.events || []).filter((e) => e.major && e.x >= x0 && e.x <= x1);
   })();
 
-  // The majority line is labelled at the LEFT edge: the right edge is where both
-  // trend lines terminate and their end-cap dots sit, so a label there landed in
-  // the busiest part of the chart. The left edge is empty in every matchup.
-  const heroRefLines = [{ y: 50, label: "50% – majority line", color: "var(--ink-faint)", align: "left" }];
+  /* One word, and not "50% – majority line". The axis already prints 50% 18px
+     to the left, so the number was said twice in adjacent space; and 50 is a
+     tie in the national two-party vote, NOT the point at which a party wins a
+     majority of seats - Labor took 51.0% of the 2PP in 1998 and lost. This
+     tracker keeps vote share and seats apart everywhere else (it carries its
+     own seat projection), so the label shouldn't quietly read one off the
+     other. "tie" is also what the past-cycles 2PP chart calls the same line,
+     and what the approval charts mean by "even".
+
+     Labelled at the LEFT edge: the right edge is where both trend lines
+     terminate and their end-cap dots sit, so a label there landed in the
+     busiest part of the chart. The left edge is empty in every matchup. */
+  const heroRefLines = [{ y: 50, label: "tie", color: "var(--ink-faint)", align: "left" }];
 
   // y-window auto-fits the matchup spread – min/max taken across BOTH series
   // so the domain stays correct even if the challenger ever takes the lead
