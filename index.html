@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="en-AU"><head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- viewport-fit=cover: without it the page simply stops below the notch and
+       iOS fills that strip from theme-color, so the frosted bar had nothing to
+       reach into and the band above it stayed flat. With it the layout viewport
+       covers the whole screen and every inset below is honoured. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <!-- Kept to the bare name. Safari centre-crops tab titles when the strip is
        crowded, which trims from the FRONT: at 43 characters this read as
        "tracker – Australian federal polling" and the masthead disappeared. A
@@ -269,7 +273,17 @@ body {
 .boot-noscript strong { color: var(--ink); }
 .legend-val, .appr-bar span, .tip-val { font-variant-numeric: tabular-nums; }
 
-.page { max-width: var(--maxw); margin: 0 auto; padding: 28px 28px 64px; }
+/* Insets, not guesses. viewport-fit=cover means the page now owns the notch
+   strip and the home-indicator strip, so the padding has to give them back -
+   including left/right, which are nonzero in landscape on a notched phone.
+   env() falls back to 0px everywhere that has no insets. */
+.page {
+  max-width: var(--maxw); margin: 0 auto;
+  padding: calc(28px + env(safe-area-inset-top, 0px))
+           calc(28px + env(safe-area-inset-right, 0px))
+           calc(64px + env(safe-area-inset-bottom, 0px))
+           calc(28px + env(safe-area-inset-left, 0px));
+}
 
 /* ---------- header ---------- */
 .site-head {
@@ -1508,7 +1522,10 @@ body.editorial .hero-eyebrow { color: var(--ink-3); }
 /* keep the tab row painting above the full-bleed backdrop */
 .tabs-inner { position: relative; z-index: 1; }
 /* sticky on every view */
-.tabs.sticky { position: sticky; top: 0; z-index: 41; }
+/* Pins below the notch so the labels stay readable, while its backdrop reaches
+   up through the notch (see .tabs.pinned::before) - so the strip above the bar
+   is the same frosted material rather than a flat band. */
+.tabs.sticky { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 41; }
 /* "caught the top" – lift the bar off the scrolling content.
    NOTE: the pinned state must NEVER change the bar's layout – the bar is
    sticky (in-flow), so any layout delta shifts the page under the scroll
@@ -1981,6 +1998,12 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
     background: var(--glass-bg);
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
+    /* Up through the notch. Only while pinned: unpinned, this pseudo sits
+       mid-page under the masthead, and a 47px overhang there would paint over
+       it. Safe to switch on .pinned because the pseudo is absolutely
+       positioned - it changes paint, never layout, so it cannot reintroduce
+       the sticky oscillation the bar is carefully built to avoid. */
+    top: calc(-1 * env(safe-area-inset-top, 0px));
   }
 }
 
