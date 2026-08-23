@@ -230,7 +230,7 @@ function PrimaryVotePanel({ rangeId }) {
         pad={{ l: 58, r: 20, t: 18, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={chartSeries} spine={series(pts, "alp")}
-        scatter={primaryScatter}
+        scatter={primaryScatter} pollFacet="primary"
         /* The same majors the hero carries. They arguably matter more here:
            the One Nation surge is this chart's whole story, and Joyce joining
            One Nation and Farrer are two of its causes. */
@@ -553,7 +553,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           dashed: r.dashed, points: seriesNN(pts, r.L.id + r.suf),
         }))}
         spine={pts.map((d) => ({ x: d.x }))}
-        scatter={ppmScatter}
+        scatter={ppmScatter} pollFacet="leadership"
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={(v) => v.toFixed(0)}
       />
@@ -675,7 +675,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
           { id: L.id, label: L.short + " net", color: L.color, points: seriesNN(pts, L.id + suf) }
         ))}
         spine={pts.map((d) => ({ x: d.x }))}
-        scatter={apprScatter}
+        scatter={apprScatter} pollFacet="leadership"
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(0)}
       />
@@ -786,7 +786,7 @@ function DirectionPanel({ rangeId }) {
           { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong") },
         ]}
         spine={series(pts, "right")}
-        scatter={dirScatter}
+        scatter={dirScatter} pollFacet="direction"
         /* Bondi alone, not the full major set. Direction is a mood measure and
            this is the one event in the cycle that plausibly moved it on its own;
            hanging the Coalition splits and the Budget off it too would imply a

@@ -101,6 +101,9 @@ function TrendChart(props) {
        to draw in, which travels with the morph so a series is never drawn over
        months it was never asked in. */
     scatterOut = [], fade = 1, clipX,
+    /* Which archive view a dot from THIS chart should land in. The chart has no
+       idea what it is plotting; the panel does. */
+    pollFacet,
   } = props;
 
   // series may be ragged (a leader not polled every month), so points are
@@ -183,6 +186,18 @@ function TrendChart(props) {
 
   const handleLeave = () => {
     setHover(null); setDotFrom(null, null); setEvt(null); onHoverIndex && onHoverIndex(null);
+  };
+
+  /* A dot is a poll, and the whole poll is in the archive – so on a mouse, the
+     dot you are already hovering is a link to it. Deliberately mouse-only: a
+     finger's tap is how a phone READS a dot at all (the tooltip has nowhere
+     else to come from), and turning that same tap into a navigation would take
+     the tooltip away from the only input that needs it. */
+  const rowKey = dot && window.AP.pollRowKey ? window.AP.pollRowKey(dot.meta) : null;
+  const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll);
+  const handleClick = () => {
+    if (!openable) return;
+    window.AP.openPoll(rowKey, pollFacet);
   };
 
   /* ---- picking a poll -----------------------------------------------------
@@ -347,6 +362,7 @@ function TrendChart(props) {
         { label: dot.meta.dateLabel ? "Field" : "", value: dot.meta.dateLabel || "" },
       ].filter((r) => r.label),
       sub: dot.meta.sample ? `n = ${dot.meta.sample.toLocaleString()}` : "",
+      hint: openable ? "Click to open this poll in All polls" : "",
     };
   } else if (hover && hoverX != null) {
     const i = hi;
@@ -490,7 +506,8 @@ function TrendChart(props) {
       <svg viewBox={`0 0 ${W} ${H}`} className="chart-svg"
            onPointerMove={onPointerMove} onPointerDown={onPointerDown}
            onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
-           onMouseLeave={handleLeave}
+           onMouseLeave={handleLeave} onClick={handleClick}
+           style={openable ? { cursor: "pointer" } : null}
            onKeyDown={handleKeyDown} onBlur={handleLeave}
            tabIndex={0} role="img" aria-label={a11yLabel}>
         <defs>
@@ -692,6 +709,7 @@ function TrendChart(props) {
           ))}
           {tip.desc && <div className="tip-desc">{tip.desc}</div>}
           {tip.sub && <div className="tip-sub">{tip.sub}</div>}
+          {tip.hint && <div className="tip-hint">{tip.hint}</div>}
         </div>
       )}
       {/* The tooltip is absolutely-positioned graphics keyed to a pointer, so a

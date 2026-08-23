@@ -194,6 +194,24 @@ window.AP = (function () {
     return { id: "wide", label: "real disagreement", verb: "far beyond sampling error" };
   }
 
+  /* A poll's identity, shared by everything that plots one. House plus
+     fieldwork-end date, because that is the pair EVERY source carries: the
+     archive rows, the preferred-PM and approval clouds (which plot the poll
+     object itself) and the direction readings, which are a different record
+     shape with no `day` on them at all - keying on the day quietly matched
+     nothing for a whole panel's worth of dots.
+
+     Returns null when the archive has no such row: three Essential waves
+     published a direction reading and no voting intention, so they are dots
+     with nowhere to go, and a chart can ask before it offers the trip. */
+  const ROW_KEYS = new Set(D.individualPolls.map((p) => p.pollster + "|" + p.released));
+  const pollRowKey = (m) => {
+    if (!m || !m.pollster || !m.released) return null;
+    const k = m.pollster + "|" + m.released;
+    return ROW_KEYS.has(k) ? k : null;
+  };
+
   return { D, rangeDomain, filterPts, buildXTicks, series, monthLabelFull, latestX,
+           pollRowKey,
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();

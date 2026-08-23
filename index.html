@@ -838,6 +838,9 @@ body {
 .tip-val { margin-left: auto; font-weight: 700; color: var(--ink); padding-left: 10px; }
 /* event readout: the date sits under the name in the serif, the description
    below it as prose — an annotation is a sentence, not a table of figures */
+/* the dot readout says what a click will do – an affordance nobody can see
+   is not one, and the cursor alone only shows up once you are already on it */
+.tip-hint { margin-top: 5px; font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap; }
 .tip-evt { max-width: 240px; min-width: 0; }
 /* A guide readout's title is a short label ("Dec 2025") that must not wrap, so
    .tip-title is nowrap. An EVENT's title is a sentence - "Angus Taylor becomes
@@ -1272,6 +1275,26 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 
 /* expanded per-poll breakdown */
 .detail-row > td { padding: 0 !important; border-bottom: 1px solid var(--line-2); }
+/* the way back to the chart the reader came from */
+.back-to-chart {
+  /* centred on its own terms: the cell's text-align happens to agree today,
+     and a button that moves when a table style changes is a button that moves */
+  display: flex; width: fit-content; align-items: center; gap: 6px; margin: 14px auto -2px;
+  border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
+  padding: 6px 14px 6px 11px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.back-to-chart:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
+/* a poll arrived at from a chart gets one quiet pulse, so the eye finds it
+   after the scroll instead of hunting the row that just opened */
+@media (prefers-reduced-motion: no-preference) {
+  .arch-row.arrived > td { animation: arrived-flash 1.4s ease-out both; }
+  @keyframes arrived-flash {
+    from { background: color-mix(in oklch, var(--accent) 22%, transparent); }
+    to   { background: transparent; }
+  }
+}
 .detail-row:hover { background: transparent !important; }
 .poll-detail { padding: 6px 14px 20px 42px; background: var(--surface-2); text-align: left; }
 .pd-meta {
@@ -2829,7 +2852,25 @@ window.AP = (function () {
     return { id: "wide", label: "real disagreement", verb: "far beyond sampling error" };
   }
 
+  /* A poll's identity, shared by everything that plots one. House plus
+     fieldwork-end date, because that is the pair EVERY source carries: the
+     archive rows, the preferred-PM and approval clouds (which plot the poll
+     object itself) and the direction readings, which are a different record
+     shape with no `day` on them at all - keying on the day quietly matched
+     nothing for a whole panel's worth of dots.
+
+     Returns null when the archive has no such row: three Essential waves
+     published a direction reading and no voting intention, so they are dots
+     with nowhere to go, and a chart can ask before it offers the trip. */
+  const ROW_KEYS = new Set(D.individualPolls.map((p) => p.pollster + "|" + p.released));
+  const pollRowKey = (m) => {
+    if (!m || !m.pollster || !m.released) return null;
+    const k = m.pollster + "|" + m.released;
+    return ROW_KEYS.has(k) ? k : null;
+  };
+
   return { D, rangeDomain, filterPts, buildXTicks, series, monthLabelFull, latestX,
+           pollRowKey,
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();
 </script>
@@ -2972,7 +3013,10 @@ function TrendChart(props) {
        months it was never asked in. */
     scatterOut = [],
     fade = 1,
-    clipX
+    clipX,
+    /* Which archive view a dot from THIS chart should land in. The chart has no
+       idea what it is plotting; the panel does. */
+    pollFacet
   } = props;
 
   // series may be ragged (a leader not polled every month), so points are
@@ -3085,6 +3129,18 @@ function TrendChart(props) {
     setDotFrom(null, null);
     setEvt(null);
     onHoverIndex && onHoverIndex(null);
+  };
+
+  /* A dot is a poll, and the whole poll is in the archive – so on a mouse, the
+     dot you are already hovering is a link to it. Deliberately mouse-only: a
+     finger's tap is how a phone READS a dot at all (the tooltip has nowhere
+     else to come from), and turning that same tap into a navigation would take
+     the tooltip away from the only input that needs it. */
+  const rowKey = dot && window.AP.pollRowKey ? window.AP.pollRowKey(dot.meta) : null;
+  const openable = !!(dot && dotSrc.current === "mouse" && rowKey && window.AP.openPoll);
+  const handleClick = () => {
+    if (!openable) return;
+    window.AP.openPoll(rowKey, pollFacet);
   };
 
   /* ---- picking a poll -----------------------------------------------------
@@ -3299,7 +3355,8 @@ function TrendChart(props) {
         label: dot.meta.dateLabel ? "Field" : "",
         value: dot.meta.dateLabel || ""
       }].filter(r => r.label),
-      sub: dot.meta.sample ? `n = ${dot.meta.sample.toLocaleString()}` : ""
+      sub: dot.meta.sample ? `n = ${dot.meta.sample.toLocaleString()}` : "",
+      hint: openable ? "Click to open this poll in All polls" : ""
     };
   } else if (hover && hoverX != null) {
     const i = hi;
@@ -3477,6 +3534,10 @@ function TrendChart(props) {
     onPointerUp: onPointerUp,
     onPointerCancel: onPointerUp,
     onMouseLeave: handleLeave,
+    onClick: handleClick,
+    style: openable ? {
+      cursor: "pointer"
+    } : null,
     onKeyDown: handleKeyDown,
     onBlur: handleLeave,
     tabIndex: 0,
@@ -3769,7 +3830,9 @@ function TrendChart(props) {
     className: "tip-desc"
   }, tip.desc), tip.sub && /*#__PURE__*/React.createElement("div", {
     className: "tip-sub"
-  }, tip.sub)), /*#__PURE__*/React.createElement("p", {
+  }, tip.sub), tip.hint && /*#__PURE__*/React.createElement("div", {
+    className: "tip-hint"
+  }, tip.hint)), /*#__PURE__*/React.createElement("p", {
     className: "sr-only",
     "aria-live": "polite",
     "aria-atomic": "true"
@@ -4754,7 +4817,8 @@ function PrimaryVotePanel({
     xTicks: buildXTicks(xDomain[0], xDomain[1]),
     series: chartSeries,
     spine: series(pts, "alp"),
-    scatter: primaryScatter
+    scatter: primaryScatter,
+    pollFacet: "primary"
     /* The same majors the hero carries. They arguably matter more here:
        the One Nation surge is this chart's whole story, and Joyce joining
        One Nation and Farrer are two of its causes. */,
@@ -5212,6 +5276,7 @@ function PreferredPMPanel({
       x: d.x
     })),
     scatter: ppmScatter,
+    pollFacet: "leadership",
     tooltipTitle: i => window.AP.monthLabelFull(pts[i].ym),
     fmt: v => v.toFixed(0)
   }));
@@ -5387,6 +5452,7 @@ function ApprovalPanel({
       x: d.x
     })),
     scatter: apprScatter,
+    pollFacet: "leadership",
     tooltipTitle: i => window.AP.monthLabelFull(pts[i].ym),
     fmt: v => (v > 0 ? "+" : "") + v.toFixed(0)
   }));
@@ -5549,7 +5615,8 @@ function DirectionPanel({
       points: series(pts, "wrong")
     }],
     spine: series(pts, "right"),
-    scatter: dirScatter
+    scatter: dirScatter,
+    pollFacet: "direction"
     /* Bondi alone, not the full major set. Direction is a mood measure and
        this is the one event in the cycle that plausibly moved it on its own;
        hanging the Coalition splits and the Budget off it too would imply a
@@ -8198,7 +8265,10 @@ function VariancePanel({
     className: "table-hint ap-var-note"
   }, "Spread is the recency-weighted standard deviation of each poll\u2019s distance from a local trend, in ", unitNote, " \u2013 recency-weighted only, because weighting by sample size would mute exactly the small divergent polls being measured. The floor is what a design effect of ", window.AP.DISC.DEFF, " and each poll\u2019s own sample size predict. Their ratio reads: under 0.80\xD7 herded \xB7 around 1\xD7 as close as sampling allows \xB7 over 1.20\xD7 the houses genuinely differ.", facet === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."));
 }
-function AllPollsView() {
+function AllPollsView({
+  focus,
+  onBack
+}) {
   const {
     D
   } = window.AP;
@@ -8235,6 +8305,29 @@ function AllPollsView() {
      reader to discover the Contains filter. So the view arms that filter
      itself – as a visible, removable pill, not a hidden default. */
   const [scope, setScope] = useState(true);
+
+  /* Arriving from a dot on a chart. The view is remounted on every tab change,
+     so its filters are already at their defaults - the only one that could
+     hide the poll being asked for is the view's own scope, which is dropped.
+     The facet comes from the chart that was clicked, so a leadership dot lands
+     on the leadership columns rather than on 2PP. */
+  React.useEffect(() => {
+    if (!focus) return;
+    setScope(false);
+    if (focus.facet) setFacet(focus.facet);
+    setOpen(focus.key);
+  }, [focus]);
+  // …and once the row is actually on the page, put it under the reader's eye.
+  // Centred, because a row scrolled to the top would sit under the pinned bar.
+  const bodyRef = useRef(null);
+  React.useEffect(() => {
+    if (!focus || open !== focus.key || !bodyRef.current) return;
+    const row = bodyRef.current.querySelector("tr.arch-row.open");
+    if (row) row.scrollIntoView({
+      block: "center",
+      behavior: "auto"
+    });
+  }, [focus, open, facet]);
   const toggleTag = id => setTagSel(s => {
     const n = new Set(s);
     n.has(id) ? n.delete(id) : n.add(id);
@@ -8832,15 +8925,22 @@ function AllPollsView() {
     k: "dir.net",
     sort: sort,
     onSort: onSort
-  })))), /*#__PURE__*/React.createElement("tbody", null, sorted.map((p, i) => {
+  })))), /*#__PURE__*/React.createElement("tbody", {
+    ref: bodyRef
+  }, sorted.map((p, i) => {
     const alpLead = p.alp >= 50;
-    const rowId = p.pollster + p.ym + p.day + i;
+    /* Identity, not position: this used to carry the row's index,
+       so re-sorting the table silently closed whatever was open -
+       and nothing outside could ask for a particular poll. House
+       plus fieldwork end is the same key AP.pollRowKey hands out. */
+    const rowId = p.pollster + "|" + p.released;
+    const arrived = !!focus && focus.key === rowId;
     const isOpen = open === rowId;
     const colCount = facet === "primary" ? 9 : facet === "leadership" ? 8 : facet === "direction" ? 8 : 7;
     return /*#__PURE__*/React.createElement(React.Fragment, {
       key: rowId
     }, /*#__PURE__*/React.createElement("tr", {
-      className: "poll-row arch-row" + (isOpen ? " open" : ""),
+      className: "poll-row arch-row" + (isOpen ? " open" : "") + (arrived ? " arrived" : ""),
       onClick: () => setOpen(isOpen ? null : rowId)
     }, /*#__PURE__*/React.createElement("td", {
       className: "exp-col"
@@ -8964,7 +9064,25 @@ function AllPollsView() {
       className: "detail-row"
     }, /*#__PURE__*/React.createElement("td", {
       colSpan: colCount
-    }, /*#__PURE__*/React.createElement(ArchPollDetail, {
+    }, arrived && onBack && /*#__PURE__*/React.createElement("button", {
+      className: "back-to-chart",
+      onClick: e => {
+        e.stopPropagation();
+        onBack();
+      }
+    }, /*#__PURE__*/React.createElement("svg", {
+      viewBox: "0 0 24 24",
+      width: "13",
+      height: "13",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: "2.2",
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      "aria-hidden": "true"
+    }, /*#__PURE__*/React.createElement("path", {
+      d: "M19 12H5M11 18l-6-6 6-6"
+    })), "Back to the chart"), /*#__PURE__*/React.createElement(ArchPollDetail, {
       p: p
     }))));
   }), sorted.length === 0 && /*#__PURE__*/React.createElement("tr", {
@@ -10476,6 +10594,7 @@ function Hero({
     scatter: scatter,
     series: heroSeries,
     spine: heroSpine,
+    pollFacet: "twopp",
     scatterOut: scatterOut,
     fade: blend ? morph.t : 1,
     clipX: blend ? blend.clip : null,
@@ -10582,6 +10701,7 @@ function App() {
     return TAB_IDS.includes(h) ? h : "snapshot";
   };
   const [tab, setTab] = useState(readHash);
+  const [focusPoll, setFocusPoll] = useState(null); // the poll a chart dot sent us to
   React.useEffect(() => {
     const fn = () => setTab(readHash());
     window.addEventListener("hashchange", fn);
@@ -10594,7 +10714,63 @@ function App() {
       top: 0,
       behavior: "auto"
     });
+    // walking off with the tabs ends the trip: coming back to the archive later
+    // should not still be holding a row open with a way back to a chart the
+    // reader has long since left
+    setFocusPoll(null);
   };
+
+  /* Clicking a dot on any chart crosses to that poll in the archive, opened.
+     The charts are six components deep in two different views, so the entry
+     point is registered on window.AP - the namespace this app already uses to
+     share things across its scripts - rather than threaded through as a prop
+     nine panels would have to forward. `back` is where the reader was standing
+     when they clicked, so the return trip puts them back on the same pixel
+     rather than at the top of a tab. */
+  React.useEffect(() => {
+    window.AP.openPoll = (key, facet) => {
+      if (!key) return;
+      setFocusPoll({
+        key,
+        facet: facet || null,
+        back: {
+          tab: readHash(),
+          y: window.scrollY
+        }
+      });
+      setTab("allpolls");
+      if (readHash() !== "allpolls") window.location.hash = "allpolls";
+    };
+    return () => {
+      delete window.AP.openPoll;
+    };
+  }, []);
+  /* The return trip puts the reader back on the pixel they left from. The
+     scroll is handed to a layout effect rather than to requestAnimationFrame:
+     the view has to be in the DOM before the document is tall enough to take
+     the scroll, and rAF does not run at all in a tab nobody is looking at - so
+     a frame-scheduled restore silently does nothing, which is precisely the
+     kind of "works on my machine" this file has been bitten by before. */
+  const restoreY = useRef(null);
+  const backFromPoll = () => {
+    const b = focusPoll && focusPoll.back || {
+      tab: "snapshot",
+      y: 0
+    };
+    setFocusPoll(null);
+    restoreY.current = b.y;
+    setTab(b.tab);
+    if (readHash() !== b.tab) window.location.hash = b.tab;
+  };
+  React.useLayoutEffect(() => {
+    if (restoreY.current == null) return;
+    const y = restoreY.current;
+    restoreY.current = null;
+    window.scrollTo({
+      top: y,
+      behavior: "auto"
+    });
+  }, [tab]);
 
   // resolve 'auto' against the OS preference, and keep it live
   const prefersDark = () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -10680,7 +10856,10 @@ function App() {
     rangeId: rangeId,
     setRangeId: setRangeId,
     showScatter: t.showScatter
-  }), tab === "cycles" && /*#__PURE__*/React.createElement(PastCyclesView, null), tab === "allpolls" && /*#__PURE__*/React.createElement(AllPollsView, null)), /*#__PURE__*/React.createElement(MethodNote, null)), /*#__PURE__*/React.createElement(TweaksPanel, null, /*#__PURE__*/React.createElement(TweakSection, {
+  }), tab === "cycles" && /*#__PURE__*/React.createElement(PastCyclesView, null), tab === "allpolls" && /*#__PURE__*/React.createElement(AllPollsView, {
+    focus: focusPoll,
+    onBack: focusPoll ? backFromPoll : null
+  })), /*#__PURE__*/React.createElement(MethodNote, null)), /*#__PURE__*/React.createElement(TweaksPanel, null, /*#__PURE__*/React.createElement(TweakSection, {
     label: "Appearance"
   }), /*#__PURE__*/React.createElement(TweakRadio, {
     label: "Theme",

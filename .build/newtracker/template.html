@@ -992,6 +992,9 @@ body {
 .tip-val { margin-left: auto; font-weight: 700; color: var(--ink); padding-left: 10px; }
 /* event readout: the date sits under the name in the serif, the description
    below it as prose — an annotation is a sentence, not a table of figures */
+/* the dot readout says what a click will do – an affordance nobody can see
+   is not one, and the cursor alone only shows up once you are already on it */
+.tip-hint { margin-top: 5px; font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap; }
 .tip-evt { max-width: 240px; min-width: 0; }
 /* A guide readout's title is a short label ("Dec 2025") that must not wrap, so
    .tip-title is nowrap. An EVENT's title is a sentence - "Angus Taylor becomes
@@ -1426,6 +1429,26 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 
 /* expanded per-poll breakdown */
 .detail-row > td { padding: 0 !important; border-bottom: 1px solid var(--line-2); }
+/* the way back to the chart the reader came from */
+.back-to-chart {
+  /* centred on its own terms: the cell's text-align happens to agree today,
+     and a button that moves when a table style changes is a button that moves */
+  display: flex; width: fit-content; align-items: center; gap: 6px; margin: 14px auto -2px;
+  border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
+  padding: 6px 14px 6px 11px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.back-to-chart:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
+/* a poll arrived at from a chart gets one quiet pulse, so the eye finds it
+   after the scroll instead of hunting the row that just opened */
+@media (prefers-reduced-motion: no-preference) {
+  .arch-row.arrived > td { animation: arrived-flash 1.4s ease-out both; }
+  @keyframes arrived-flash {
+    from { background: color-mix(in oklch, var(--accent) 22%, transparent); }
+    to   { background: transparent; }
+  }
+}
 .detail-row:hover { background: transparent !important; }
 .poll-detail { padding: 6px 14px 20px 42px; background: var(--surface-2); text-align: left; }
 .pd-meta {

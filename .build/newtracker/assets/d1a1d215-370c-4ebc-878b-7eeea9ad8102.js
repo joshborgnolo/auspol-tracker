@@ -1040,7 +1040,7 @@ function VariancePanel({ facet, rangeId }) {
   );
 }
 
-function AllPollsView() {
+function AllPollsView({ focus, onBack }) {
   const { D } = window.AP;
   const { ShareBar, NetVal, tppContests, tppFlag, ppmContests, ppmContestSegs, ppmFlag } = window;
   const houses = [];
@@ -1063,6 +1063,26 @@ function AllPollsView() {
      reader to discover the Contains filter. So the view arms that filter
      itself – as a visible, removable pill, not a hidden default. */
   const [scope, setScope] = useState(true);
+
+  /* Arriving from a dot on a chart. The view is remounted on every tab change,
+     so its filters are already at their defaults - the only one that could
+     hide the poll being asked for is the view's own scope, which is dropped.
+     The facet comes from the chart that was clicked, so a leadership dot lands
+     on the leadership columns rather than on 2PP. */
+  React.useEffect(() => {
+    if (!focus) return;
+    setScope(false);
+    if (focus.facet) setFacet(focus.facet);
+    setOpen(focus.key);
+  }, [focus]);
+  // …and once the row is actually on the page, put it under the reader's eye.
+  // Centred, because a row scrolled to the top would sit under the pinned bar.
+  const bodyRef = useRef(null);
+  React.useEffect(() => {
+    if (!focus || open !== focus.key || !bodyRef.current) return;
+    const row = bodyRef.current.querySelector("tr.arch-row.open");
+    if (row) row.scrollIntoView({ block: "center", behavior: "auto" });
+  }, [focus, open, facet]);
   const toggleTag = (id) => setTagSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const onMeasure = (mv) => { setMeasure(mv); setLead("all"); };
   /* What each view needs a poll to have published. Primary vote is on every
@@ -1443,15 +1463,20 @@ function AllPollsView() {
               </>)}
             </tr>
           </thead>
-          <tbody>
+          <tbody ref={bodyRef}>
             {sorted.map((p, i) => {
               const alpLead = p.alp >= 50;
-              const rowId = p.pollster + p.ym + p.day + i;
+              /* Identity, not position: this used to carry the row's index,
+                 so re-sorting the table silently closed whatever was open -
+                 and nothing outside could ask for a particular poll. House
+                 plus fieldwork end is the same key AP.pollRowKey hands out. */
+              const rowId = p.pollster + "|" + p.released;
+              const arrived = !!focus && focus.key === rowId;
               const isOpen = open === rowId;
               const colCount = facet === "primary" ? 9 : facet === "leadership" ? 8 : facet === "direction" ? 8 : 7;
               return (
                 <React.Fragment key={rowId}>
-                <tr className={"poll-row arch-row" + (isOpen ? " open" : "")}
+                <tr className={"poll-row arch-row" + (isOpen ? " open" : "") + (arrived ? " arrived" : "")}
                     onClick={() => setOpen(isOpen ? null : rowId)}>
                   <td className="exp-col">
                     <button className={"exp-btn" + (isOpen ? " open" : "")}
@@ -1514,7 +1539,18 @@ function AllPollsView() {
                 </tr>
                 {isOpen && (
                   <tr className="detail-row">
-                    <td colSpan={colCount}><ArchPollDetail p={p} /></td>
+                    <td colSpan={colCount}>
+                      {arrived && onBack && (
+                        <button className="back-to-chart" onClick={(e) => { e.stopPropagation(); onBack(); }}>
+                          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                               strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                            <path d="M19 12H5M11 18l-6-6 6-6" />
+                          </svg>
+                          Back to the chart
+                        </button>
+                      )}
+                      <ArchPollDetail p={p} />
+                    </td>
                   </tr>
                 )}
                 </React.Fragment>

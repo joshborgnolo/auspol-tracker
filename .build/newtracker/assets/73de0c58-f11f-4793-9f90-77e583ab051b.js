@@ -562,7 +562,7 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         refLines={heroRefLines}
         events={heroEvents}
-        scatter={scatter} series={heroSeries} spine={heroSpine}
+        scatter={scatter} series={heroSeries} spine={heroSpine} pollFacet="twopp"
         scatterOut={scatterOut} fade={blend ? morph.t : 1} clipX={blend ? blend.clip : null}
         tooltipTitle={(i) => window.AP.monthLabelFull((drawPts[i] || drawPts[drawPts.length - 1]).ym)}
         fmt={(v) => v.toFixed(1)}
@@ -683,6 +683,7 @@ function App() {
     return TAB_IDS.includes(h) ? h : "snapshot";
   };
   const [tab, setTab] = useState(readHash);
+  const [focusPoll, setFocusPoll] = useState(null);   // the poll a chart dot sent us to
   React.useEffect(() => {
     const fn = () => setTab(readHash());
     window.addEventListener("hashchange", fn);
@@ -692,7 +693,48 @@ function App() {
     setTab(id);
     if (id !== readHash()) window.location.hash = id;
     window.scrollTo({ top: 0, behavior: "auto" });
+    // walking off with the tabs ends the trip: coming back to the archive later
+    // should not still be holding a row open with a way back to a chart the
+    // reader has long since left
+    setFocusPoll(null);
   };
+
+  /* Clicking a dot on any chart crosses to that poll in the archive, opened.
+     The charts are six components deep in two different views, so the entry
+     point is registered on window.AP - the namespace this app already uses to
+     share things across its scripts - rather than threaded through as a prop
+     nine panels would have to forward. `back` is where the reader was standing
+     when they clicked, so the return trip puts them back on the same pixel
+     rather than at the top of a tab. */
+  React.useEffect(() => {
+    window.AP.openPoll = (key, facet) => {
+      if (!key) return;
+      setFocusPoll({ key, facet: facet || null, back: { tab: readHash(), y: window.scrollY } });
+      setTab("allpolls");
+      if (readHash() !== "allpolls") window.location.hash = "allpolls";
+    };
+    return () => { delete window.AP.openPoll; };
+  }, []);
+  /* The return trip puts the reader back on the pixel they left from. The
+     scroll is handed to a layout effect rather than to requestAnimationFrame:
+     the view has to be in the DOM before the document is tall enough to take
+     the scroll, and rAF does not run at all in a tab nobody is looking at - so
+     a frame-scheduled restore silently does nothing, which is precisely the
+     kind of "works on my machine" this file has been bitten by before. */
+  const restoreY = useRef(null);
+  const backFromPoll = () => {
+    const b = (focusPoll && focusPoll.back) || { tab: "snapshot", y: 0 };
+    setFocusPoll(null);
+    restoreY.current = b.y;
+    setTab(b.tab);
+    if (readHash() !== b.tab) window.location.hash = b.tab;
+  };
+  React.useLayoutEffect(() => {
+    if (restoreY.current == null) return;
+    const y = restoreY.current;
+    restoreY.current = null;
+    window.scrollTo({ top: y, behavior: "auto" });
+  }, [tab]);
 
   // resolve 'auto' against the OS preference, and keep it live
   const prefersDark = () => window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -771,7 +813,7 @@ function App() {
             <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter} />
           )}
           {tab === "cycles" && <PastCyclesView />}
-          {tab === "allpolls" && <AllPollsView />}
+          {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null} />}
         </div>
         <MethodNote />
       </main>
