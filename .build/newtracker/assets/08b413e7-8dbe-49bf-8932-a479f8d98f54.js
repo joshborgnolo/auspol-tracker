@@ -536,7 +536,7 @@ function TrendChart(props) {
      drawing below, and the pointer pick above – an annotation is now picked
      from the svg root like everything else on this chart, which needs its
      geometry in hand before an event arrives. */
-  const evPlaced = (events.length <= 2 || cw >= 640) ? (() => {
+  const evPlaced = (() => {
     const evs = events
       .filter((e) => e.x >= win[0] && e.x <= win[1])
       .sort((a, b) => a.x - b.x);
@@ -548,6 +548,17 @@ function TrendChart(props) {
     const rowEnd = new Array(ROWS).fill(-Infinity);
     const rightEdge = W - pad.r;
     const rowY = (r) => (r == null ? pad.t + 4 : pad.t + 3 + r * ROW_H);
+
+    /* What needs room on a narrow chart is the LABELS, not the marks. This
+       used to drop the annotation entirely below 640px unless there were two
+       or fewer of them, which on a phone meant the reader saw markers in
+       whichever window happened to hold two events and none in any other - a
+       cliff rather than a degradation, and it took the rules with it. Keep the
+       rules, which are a hairline each and stay tappable, and drop only the
+       text: "something happened here, tap to read it" survives at any width. */
+    if (evs.length > 2 && cw < 640) {
+      return evs.map((e) => ({ e, ex: sx(e.x), w: 0, fsz, row: null, y: rowY(null) }));
+    }
 
     return evs.map((e) => {
       const ex = sx(e.x);
@@ -577,7 +588,7 @@ function TrendChart(props) {
       }
       return { e, ex, w, fsz, row: null, y: rowY(null) };   // genuinely nowhere to put it
     });
-  })() : [];
+  })();
 
   return (
     <div className="chart" ref={ref}>
