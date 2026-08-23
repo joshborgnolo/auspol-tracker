@@ -2145,20 +2145,26 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
   }
-  /* pinned bar goes transparent so its full-bleed backdrop can frost the page
-     scrolling beneath it (an opaque bar would leave the blur nothing to see) */
-  .tabs.pinned { background: transparent; }
-  .tabs.pinned::before {
-    background: var(--glass-bg);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-    /* Up through the notch. Only while pinned: unpinned, this pseudo sits
-       mid-page under the masthead, and a 47px overhang there would paint over
-       it. Safe to switch on .pinned because the pseudo is absolutely
-       positioned - it changes paint, never layout, so it cannot reintroduce
-       the sticky oscillation the bar is carefully built to avoid. */
-    top: calc(-1 * env(safe-area-inset-top, 0px));
-  }
+}
+
+/* The pinned bar is OPAQUE, and deliberately so. It used to frost the page
+   scrolling under it, which looked right on its own but not in place: on iOS
+   the strip immediately above it is Safari's status-bar chrome, which no CSS
+   can reach and which cannot be translucent outside standalone mode. A frosted
+   bar under a flat band reads as a seam - the eye goes to the join rather than
+   to either surface. Opaque, and with theme-color set to the same value (see
+   build.mjs), the status bar, the bar and the page are one continuous colour
+   and there is no join to notice.
+
+   The frosted-glass recipe above still applies to the floating pill controls,
+   which sit over content and have nothing above them to disagree with. */
+.tabs.pinned::before {
+  /* Up through the notch, for standalone mode where the page does own that
+     strip. Only while pinned: unpinned, this pseudo sits mid-page under the
+     masthead and an overhang would paint over it. Safe to switch on .pinned
+     because the pseudo is absolutely positioned - it changes paint, never
+     layout, so it cannot reintroduce the sticky oscillation the bar avoids. */
+  top: calc(-1 * env(safe-area-inset-top, 0px));
 }
 
 /* ---------- archive ledger at phone widths ----------

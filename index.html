@@ -26,8 +26,8 @@
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="auspol tracker: Labor 51.4, Coalition 48.6 two-party preferred, ±1.6 points, updated 16 August 2026, with the trend since the 2025 election">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#fbf9f5" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#221e1a" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="https://joshborgnolo.github.io/auspol-tracker/">
   <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'-1.04%20-7.88%2041.63%2041.63'%3E%3Cpath%20d%3D'M%2010%2024.5%20A%2012%2012%200%200%201%2022%2012.5'%20fill%3D'none'%20stroke%3D'%23b9463f'%20stroke-width%3D'3.4'%20stroke-linecap%3D'round'%2F%3E%3Cpath%20d%3D'M%2022%2012.5%20A%2012%2012%200%200%201%2034%2024.5'%20fill%3D'none'%20stroke%3D'%23356697'%20stroke-width%3D'3.4'%20stroke-linecap%3D'round'%2F%3E%3Cline%20x1%3D'10.35'%20y1%3D'16.04'%20x2%3D'1.86'%20y2%3D'9.86'%20stroke%3D'%23b9463f'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'17.55'%20y1%3D'10.8'%20x2%3D'14.48'%20y2%3D'1.36'%20stroke%3D'%23cc7c37'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'26.45'%20y1%3D'10.8'%20x2%3D'29.02'%20y2%3D'2.9'%20stroke%3D'%23356697'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'33.65'%20y1%3D'16.04'%20x2%3D'37.69'%20y2%3D'13.1'%20stroke%3D'%23439458'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'22'%20y1%3D'24.5'%20x2%3D'20.56'%20y2%3D'16.02'%20stroke%3D'%23b9463f'%20stroke-width%3D'3'%20stroke-linecap%3D'round'%2F%3E%3C%2Fsvg%3E">
   <style>/* vietnamese */
@@ -1991,20 +1991,26 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
   }
-  /* pinned bar goes transparent so its full-bleed backdrop can frost the page
-     scrolling beneath it (an opaque bar would leave the blur nothing to see) */
-  .tabs.pinned { background: transparent; }
-  .tabs.pinned::before {
-    background: var(--glass-bg);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-    /* Up through the notch. Only while pinned: unpinned, this pseudo sits
-       mid-page under the masthead, and a 47px overhang there would paint over
-       it. Safe to switch on .pinned because the pseudo is absolutely
-       positioned - it changes paint, never layout, so it cannot reintroduce
-       the sticky oscillation the bar is carefully built to avoid. */
-    top: calc(-1 * env(safe-area-inset-top, 0px));
-  }
+}
+
+/* The pinned bar is OPAQUE, and deliberately so. It used to frost the page
+   scrolling under it, which looked right on its own but not in place: on iOS
+   the strip immediately above it is Safari's status-bar chrome, which no CSS
+   can reach and which cannot be translucent outside standalone mode. A frosted
+   bar under a flat band reads as a seam - the eye goes to the join rather than
+   to either surface. Opaque, and with theme-color set to the same value (see
+   build.mjs), the status bar, the bar and the page are one continuous colour
+   and there is no join to notice.
+
+   The frosted-glass recipe above still applies to the floating pill controls,
+   which sit over content and have nothing above them to disagree with. */
+.tabs.pinned::before {
+  /* Up through the notch, for standalone mode where the page does own that
+     strip. Only while pinned: unpinned, this pseudo sits mid-page under the
+     masthead and an overhang would paint over it. Safe to switch on .pinned
+     because the pseudo is absolutely positioned - it changes paint, never
+     layout, so it cannot reintroduce the sticky oscillation the bar avoids. */
+  top: calc(-1 * env(safe-area-inset-top, 0px));
 }
 
 /* ---------- archive ledger at phone widths ----------

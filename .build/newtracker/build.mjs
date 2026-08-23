@@ -145,18 +145,19 @@ function oklchHex(L, C, Hdeg) { return rgbHex(oklchRgb(L, C, Hdeg)); }
    and a worse one in dark. Derived now, the same way PARTY_HEX above is, so a
    palette change carries through instead of leaving this behind.
 
-   The bar is --glass-bg (--surface at the glass alpha) over the blurred page,
-   which at the bar's top edge is --bg. Compositing happens in sRGB, so blend
-   there rather than in oklch. Values mirror the tokens in template.html. */
-const THEME = {
-  light: { surface: [0.992, 0.004, 85], bg: [0.970, 0.008, 78], alpha: 0.58 },
-  dark:  { surface: [0.252, 0.011, 66], bg: [0.215, 0.010, 65], alpha: 0.62 },
-};
-const themeColor = (t) => {
-  const s = oklchRgb(...t.surface), b = oklchRgb(...t.bg);
-  return rgbHex([0, 1, 2].map((i) => t.alpha * s[i] + (1 - t.alpha) * b[i]));
-};
-const THEME_LIGHT = themeColor(THEME.light), THEME_DARK = themeColor(THEME.dark);
+   The bar is opaque --bg (it was briefly frosted; a frosted bar under a flat
+   status band read as a seam, so it went back to opaque - see template.html).
+   So the strip, the bar and the page can all be one value.
+
+   These are the EDITORIAL --bg values, from `body.editorial` / `body.dark
+   .editorial`, not the ones on :root. Editorial is the default layout, so
+   :root's pair only ever applies once someone switches to panelled - deriving
+   from them put the status bar 2/255 off the page it sits above, which is the
+   whole failure this meta is here to avoid. A static meta cannot follow a
+   runtime toggle, so panelled keeps that 2/255; it is imperceptible, and the
+   default is the one worth being exact about. */
+const THEME = { light: [0.975, 0.009, 80], dark: [0.205, 0.010, 65] };
+const THEME_LIGHT = oklchHex(...THEME.light), THEME_DARK = oklchHex(...THEME.dark);
 const PARTY_HEX = {
   alp: oklchHex(0.55, 0.150, 27), lnp: oklchHex(0.50, 0.095, 250),
   grn: oklchHex(0.60, 0.120, 150), onp: oklchHex(0.66, 0.130, 58),
@@ -242,7 +243,7 @@ function grabLatest() {
 
 const fav = buildFavicon();
 console.log("  favicon:", fav.note);
-console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches the pinned bar)`);
+console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches --bg / the pinned bar)`);
 const favicon = encodeURIComponent(fav.svg);
 
 /* ---- 4b. a page that says something before React runs -------------------
