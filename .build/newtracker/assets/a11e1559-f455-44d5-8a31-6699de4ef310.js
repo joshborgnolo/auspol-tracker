@@ -224,7 +224,7 @@ function PrimaryVotePanel({ rangeId }) {
         </div>
       </div>
       <TrendChart
-        key={"pv-" + rangeId}
+        key="pv"
         height={340} xDomain={xDomain} yDomain={[0, 40]}
         yTicks={[10, 20, 30, 40]} unit="%" axisFont={20}
         pad={{ l: 58, r: 20, t: 18, b: 42 }}
@@ -541,7 +541,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         </div>
       )}
       <TrendChart
-        key={"ppm-" + fmt + "-" + rangeId}
+        key={"ppm-" + fmt}
         height={250} xDomain={xDomain} yDomain={domain}
         yTicks={ticks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
@@ -664,7 +664,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         })}
       </div>
       <TrendChart
-        key={"appr-" + metric + "-" + rangeId + "-" + leaders.map((L) => L.id).join(".")}
+        key={"appr-" + metric + "-" + leaders.map((L) => L.id).join(".")}
         height={250} xDomain={xDomain} yDomain={domain}
         yTicks={ticks} unit="" axisFont={20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
@@ -776,7 +776,7 @@ function DirectionPanel({ rangeId }) {
       </div>
 
       <TrendChart
-        key={"dir-" + rangeId}
+        key="dir"
         height={250} xDomain={xDomain} yDomain={[lo, hi]}
         yTicks={yTicks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 16, b: 42 }}

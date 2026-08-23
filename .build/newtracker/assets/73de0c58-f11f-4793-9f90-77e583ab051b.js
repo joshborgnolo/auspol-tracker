@@ -241,30 +241,10 @@ function RollNum({ value, className, style }) {
    through grey, which is what an oklab mix of the two would do. Left as a CSS
    function rather than computed here so it keeps resolving against whichever
    palette the theme is currently using. */
-/* ONE motion curve, shared by every part of a matchup switch: the digit reels
-   animate it in CSS, the colours, lines, clip window and travelling dots are
-   sampled from it here. They used to run on two different ease-outs, and both
-   were far too front-loaded - the reels' old curve was 63% done a fifth of the
-   way in and 88% two fifths in, so a reel with four digits to travel flung
-   through them and then crept the last few pixels for a quarter of a second,
-   leaving a glyph sitting half-shown between two others. That is what "gets
-   stuck on the way" looks like. This one accelerates, holds a real middle, and
-   settles without a tail: 16% / 37% / 60% / 77% at the same marks. */
-const MORPH_EASE = (() => {
-  const [p1x, p1y, p2x, p2y] = [0.4, 0.1, 0.25, 1];
-  const A = (a, b) => 1 - 3 * b + 3 * a, B = (a, b) => 3 * b - 6 * a, C = (a) => 3 * a;
-  const f = (t, a, b) => ((A(a, b) * t + B(a, b)) * t + C(a)) * t;
-  const df = (t, a, b) => 3 * A(a, b) * t * t + 2 * B(a, b) * t + C(a);
-  return (x) => {
-    let t = x;
-    for (let i = 0; i < 8; i++) {
-      const d = df(t, p1x, p2x);
-      if (Math.abs(d) < 1e-6) break;
-      t -= (f(t, p1x, p2x) - x) / d;
-    }
-    return f(t, p1y, p2y);
-  };
-})();
+/* The one motion curve every moving-data transition shares – defined in
+   AP (helpers.js) so the chart's travelling window samples the same one, and
+   mirrored as a cubic-bezier on .roll-reel so the digits do too. */
+const MORPH_EASE = (x) => window.AP.morphEase(x);
 
 function mixC(c1, c2, t) {
   if (t <= 0 || c1 === c2) return c1;
@@ -353,7 +333,7 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
      it home. 320ms with an ease-out: far enough to follow, short enough that
      nobody is kept waiting for a number they can already read, since the value
      itself is correct from the first frame and only its digits are in motion. */
-  const MORPH_MS = 320;
+  const MORPH_MS = window.AP.MORPH_MS;
   const [morph, setMorph] = useState(null);        // { from, to, t }
   const morphRaf = useRef(0);
   React.useEffect(() => () => cancelAnimationFrame(morphRaf.current), []);
@@ -601,15 +581,20 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
           <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
             options={matchupOptions} />
           <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
-            options={[{ id: "3", label: "3M" }, { id: "12", label: "12M" }, { id: "all", label: "All" }]} />
+            /* rangeDomain takes any month count, and buildXTicks already labels
+               every month once the span is under a year, so six months arrives
+               with its own tick per month rather than every second one */
+            options={[{ id: "3", label: "3M" }, { id: "6", label: "6M" },
+                      { id: "12", label: "12M" }, { id: "all", label: "All" }]} />
         </div>
       </div>
 
-      {/* The key deliberately does NOT carry the matchup: remounting the chart
-          would throw away the very thing being morphed (and both memoised dot
-          clouds with it). A stale hover index is already clamped inside. */}
+      {/* The key carries NEITHER the matchup nor the range: remounting would
+          throw away the very thing being animated - the morph in one case, the
+          travelling window in the other - along with both memoised dot clouds.
+          A stale hover index is already clamped inside. */}
       <TrendChart
-        key={"hero-" + rangeId}
+        key="hero"
         height={420} xDomain={xDomain} yDomain={yDomain} yTicks={yTicks} unit="%"
         axisFont={22}
         pad={{ l: 58, r: 22, t: 30, b: 42 }}

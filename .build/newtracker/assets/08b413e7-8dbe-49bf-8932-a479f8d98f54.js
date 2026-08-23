@@ -92,15 +92,15 @@ function straightPath(pts, sx, sy) {
 function TrendChart(props) {
   const {
     height = 360, xDomain, yDomain, pad = { l: 46, r: 20, t: 18, b: 34 },
-    series = [], scatter = [], yTicks = [], xTicks = [], refLines = [],
-    bands = [], areas = [], fmt = (v) => v.toFixed(1), unit = "", tooltipTitle,
-    onHoverIndex, spine, axisFont = 15, events = [], extraRows, ariaLabel,
+    series: seriesProp = [], scatter: scatterProp = [], yTicks = [], xTicks = [], refLines = [],
+    bands = [], areas = [], fmt = (v) => v.toFixed(1), unit = "", tooltipTitle: tooltipTitleProp,
+    onHoverIndex, spine: spineProp, axisFont = 15, events = [], extraRows: extraRowsProp, ariaLabel,
     /* A chart can be mid-MORPH between two versions of itself (the hero's
        matchup switch). `scatterOut` is the cloud on its way out and `fade` how
        far the crossfade has run; `clipX` is the x window the lines are allowed
        to draw in, which travels with the morph so a series is never drawn over
        months it was never asked in. */
-    scatterOut = [], scatterMove = [], fade = 1, clipX,
+    scatterOut: scatterOutProp = [], scatterMove = [], fade = 1, clipX,
     /* Which archive view a dot from THIS chart should land in. The chart has no
        idea what it is plotting; the panel does. */
     pollFacet,
@@ -113,12 +113,82 @@ function TrendChart(props) {
     return null;
   };
 
-  const { sx, sy, W, H } = makeScales({ height, xDomain, yDomain, pad });
+  /* ---- the x window travels ------------------------------------------------
+     Switching 3M / 12M / All used to be a cut: every chart was keyed on the
+     range and remounted. It is a ZOOM, so it animates like one. The window
+     itself travels and everything positioned by it follows without being told
+     - lines, dots, annotations, the axis ticks sliding out to their new
+     spacing - which is the matchup morph's travelling clip one level up.
+
+     What gets drawn on the way is whichever set is WIDER. Zooming in, the
+     panel has already filtered to the narrow range, so the previous set is the
+     one still covering the ground the window is leaving; zooming out, the new
+     set already covers where it is going. Either way nothing pops in at an
+     edge, and the held copy is only refreshed on a settled render. */
+  const [win, setWin] = useState(xDomain);
+  const winRef = useRef(xDomain);
+  const winRaf = useRef(0);
+  const prev = useRef(null);                 // the props of the last SETTLED render
+  const travelling = useRef(false);
+  React.useEffect(() => () => cancelAnimationFrame(winRaf.current), []);
+  React.useEffect(() => {
+    const from = winRef.current, to = xDomain;
+    if (from[0] === to[0] && from[1] === to[1]) return;
+    /* Snap where an animation would be a lie, a trap, or a waste: the reader
+       asked for less motion; the tab is hidden, where rAF does not run at all
+       and a frame-driven tween would park the window half way; or this chart
+       is off screen. The range control lives in the hero, so a click animates
+       the chart being looked at while the four panels below it - 1,100 of the
+       page's 1,357 dots - simply arrive already zoomed. Animating all five at
+       once measured 21-30ms a frame, which is a dropped frame in exchange for
+       motion nobody is in a position to see. */
+    const box = ref.current && ref.current.getBoundingClientRect();
+    const onScreen = !!box && box.bottom > 0 && box.top < (window.innerHeight || 0);
+    const still = (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches)
+      || document.visibilityState === "hidden" || !onScreen;
+    if (still) { winRef.current = to; travelling.current = false; setWin(to); return; }
+    cancelAnimationFrame(winRaf.current);
+    travelling.current = true;
+    const a = from.slice(), t0 = performance.now();
+    const step = (now) => {
+      const raw = Math.min(1, (now - t0) / window.AP.MORPH_MS);
+      if (raw >= 1) { winRef.current = to; travelling.current = false; setWin(to); return; }
+      const e = window.AP.morphEase(raw);
+      winRef.current = [a[0] + (to[0] - a[0]) * e, a[1] + (to[1] - a[1]) * e];
+      setWin(winRef.current);
+      winRaf.current = requestAnimationFrame(step);
+    };
+    winRaf.current = requestAnimationFrame(step);
+  }, [xDomain[0], xDomain[1]]);
+
+  /* tooltipTitle and extraRows read the panel's OWN points by index, so they
+     belong to the same bundle: holding a 16-month spine while the readout had
+     already been rebuilt for a 3-month one indexed past the end of it, and the
+     accessible name - which calls tooltipTitle at render time, not on hover -
+     brought the whole page down the moment the range changed. */
+  const fresh = { series: seriesProp, scatter: scatterProp, spine: spineProp, scatterOut: scatterOutProp,
+                  tooltipTitle: tooltipTitleProp, extraRows: extraRowsProp };
+  /* Zooming IN, the panel has already filtered to the narrow range, so the
+     previous render's data is the one still covering the ground the window is
+     leaving. It has to be the PREVIOUS render's: by the time this one runs the
+     props are already the narrow set, and the effect that starts the travel
+     has not run yet - which is also why the test is on the domain rather than
+     on the travelling flag, or the first frame would flash the new data inside
+     the old window. */
+  const moved = xDomain[0] !== winRef.current[0] || xDomain[1] !== winRef.current[1];
+  const drawn = (travelling.current || moved) && xDomain[0] > winRef.current[0] && prev.current
+    ? prev.current : fresh;
+  const series = drawn.series, scatter = drawn.scatter, spine = drawn.spine, scatterOut = drawn.scatterOut;
+  const tooltipTitle = drawn.tooltipTitle, extraRows = drawn.extraRows;
+  React.useEffect(() => { if (!travelling.current) prev.current = fresh; });
+
+  const { sx, sy, W, H } = makeScales({ height, xDomain: win, yDomain, pad });
   const [hover, setHover] = useState(null);     // {index, clientX}
   const [dot, setDot] = useState(null);         // hovered scatter point
   const [evt, setEvt] = useState(null);         // hovered key event {e, x, y}
   const ref = useRef(null);
   const clipId = "clip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const plotId = clipId + "p";      // the plot area itself, which never travels
 
   // axis text in real on-screen px – normalise by measured width so every
   // chart's labels match regardless of column width / responsive stacking
@@ -424,7 +494,7 @@ function TrendChart(props) {
   /* Dot clouds, memoised: identity is what lets React skip them entirely on a
      morph frame. `geom` covers everything that would move a dot – the scales
      are rebuilt every render but produce the same pixels while it holds. */
-  const geom = [W, H, pad.l, pad.r, pad.t, pad.b, xDomain[0], xDomain[1], yDomain[0], yDomain[1]].join("|");
+  const geom = [W, H, pad.l, pad.r, pad.t, pad.b, win[0], win[1], yDomain[0], yDomain[1]].join("|");
   const dotEls = (arr, live) => arr.map((d, i) => (
     <circle key={"s" + i} cx={sx(d.x)} cy={sy(d.y)} r={live && dot === d ? 6.5 : 4.2}
             className="scatter-dot" fill={d.color}
@@ -468,7 +538,7 @@ function TrendChart(props) {
      geometry in hand before an event arrives. */
   const evPlaced = (events.length <= 2 || cw >= 640) ? (() => {
     const evs = events
-      .filter((e) => e.x >= xDomain[0] && e.x <= xDomain[1])
+      .filter((e) => e.x >= win[0] && e.x <= win[1])
       .sort((a, b) => a.x - b.x);
     const fsz = refUnits * 0.92;
     const ROWS = 3;
@@ -527,6 +597,13 @@ function TrendChart(props) {
                     ? Math.max(0, Math.min(W - pad.r, sx(clipX[1]) + 5) - Math.max(pad.l, sx(clipX[0])))
                     : W - pad.l - pad.r}
                   height={H} />
+          </clipPath>
+          {/* A second, fixed clip for the dots. The one above travels with a
+              matchup morph, which is right for the lines and wrong for the
+              cloud; this one only ever means "inside the plot", which is what
+              keeps dots off the axis labels as the window zooms past them. */}
+          <clipPath id={plotId}>
+            <rect x={pad.l} y="0" width={W - pad.l - pad.r} height={H} />
           </clipPath>
         </defs>
         {/* shaded bands */}
@@ -616,11 +693,13 @@ function TrendChart(props) {
             it holds still while a morph runs, so both clouds are memoised
             against the geometry that actually moves them. A morphing frame
             then reconciles two <g> opacities instead of hundreds of dots. */}
-        {scatterOut.length > 0 && fade < 1 && (
-          <g style={{ opacity: 1 - fade }}>{outDots}</g>
-        )}
-        <g style={fade < 1 ? { opacity: fade } : null}>{dots}</g>
-        {moveDots.length > 0 && <g>{moveDots}</g>}
+        <g clipPath={`url(#${plotId})`}>
+          {scatterOut.length > 0 && fade < 1 && (
+            <g style={{ opacity: 1 - fade }}>{outDots}</g>
+          )}
+          <g style={fade < 1 ? { opacity: fade } : null}>{dots}</g>
+          {moveDots.length > 0 && <g>{moveDots}</g>}
+        </g>
         {/* series lines (clipped to the plot area so windowed views
             don't draw the entering segment past the y-axis) */}
         <g clipPath={`url(#${clipId})`}>

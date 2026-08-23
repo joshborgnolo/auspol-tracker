@@ -2875,8 +2875,34 @@ window.AP = (function () {
     return ROW_KEYS.has(k) ? k : null;
   };
 
+  /* ONE motion curve and ONE duration for every transition that moves data
+     rather than chrome: the matchup morph in the hero, the digit reels (which
+     animate it in CSS - keep the cubic-bezier in template.html the same), and
+     the chart's own travelling x window. They were on separate curves once and
+     it showed: a figure whose colour crawled on one ease while its digits
+     crawled on another read as sticking.
+
+     Accelerates, holds a real middle, settles without a tail: 16% / 37% / 60%
+     / 77% at a fifth, a third, two fifths and half the duration. */
+  const MORPH_MS = 320;
+  const morphEase = (() => {
+    const [p1x, p1y, p2x, p2y] = [0.4, 0.1, 0.25, 1];
+    const A = (a, b) => 1 - 3 * b + 3 * a, B = (a, b) => 3 * b - 6 * a, C = (a) => 3 * a;
+    const f = (t, a, b) => ((A(a, b) * t + B(a, b)) * t + C(a)) * t;
+    const df = (t, a, b) => 3 * A(a, b) * t * t + 2 * B(a, b) * t + C(a);
+    return (x) => {
+      let t = x;
+      for (let i = 0; i < 8; i++) {
+        const d = df(t, p1x, p2x);
+        if (Math.abs(d) < 1e-6) break;
+        t -= (f(t, p1x, p2x) - x) / d;
+      }
+      return f(t, p1y, p2y);
+    };
+  })();
+
   return { D, rangeDomain, filterPts, buildXTicks, series, monthLabelFull, latestX,
-           pollRowKey,
+           pollRowKey, morphEase, MORPH_MS,
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();
 </script>
@@ -2996,8 +3022,8 @@ function TrendChart(props) {
       t: 18,
       b: 34
     },
-    series = [],
-    scatter = [],
+    series: seriesProp = [],
+    scatter: scatterProp = [],
     yTicks = [],
     xTicks = [],
     refLines = [],
@@ -3005,19 +3031,19 @@ function TrendChart(props) {
     areas = [],
     fmt = v => v.toFixed(1),
     unit = "",
-    tooltipTitle,
+    tooltipTitle: tooltipTitleProp,
     onHoverIndex,
-    spine,
+    spine: spineProp,
     axisFont = 15,
     events = [],
-    extraRows,
+    extraRows: extraRowsProp,
     ariaLabel,
     /* A chart can be mid-MORPH between two versions of itself (the hero's
        matchup switch). `scatterOut` is the cloud on its way out and `fade` how
        far the crossfade has run; `clipX` is the x window the lines are allowed
        to draw in, which travels with the morph so a series is never drawn over
        months it was never asked in. */
-    scatterOut = [],
+    scatterOut: scatterOutProp = [],
     scatterMove = [],
     fade = 1,
     clipX,
@@ -3032,6 +3058,96 @@ function TrendChart(props) {
     for (let i = 0; i < s.points.length; i++) if (s.points[i].x === x) return s.points[i];
     return null;
   };
+
+  /* ---- the x window travels ------------------------------------------------
+     Switching 3M / 12M / All used to be a cut: every chart was keyed on the
+     range and remounted. It is a ZOOM, so it animates like one. The window
+     itself travels and everything positioned by it follows without being told
+     - lines, dots, annotations, the axis ticks sliding out to their new
+     spacing - which is the matchup morph's travelling clip one level up.
+      What gets drawn on the way is whichever set is WIDER. Zooming in, the
+     panel has already filtered to the narrow range, so the previous set is the
+     one still covering the ground the window is leaving; zooming out, the new
+     set already covers where it is going. Either way nothing pops in at an
+     edge, and the held copy is only refreshed on a settled render. */
+  const [win, setWin] = useState(xDomain);
+  const winRef = useRef(xDomain);
+  const winRaf = useRef(0);
+  const prev = useRef(null); // the props of the last SETTLED render
+  const travelling = useRef(false);
+  React.useEffect(() => () => cancelAnimationFrame(winRaf.current), []);
+  React.useEffect(() => {
+    const from = winRef.current,
+      to = xDomain;
+    if (from[0] === to[0] && from[1] === to[1]) return;
+    /* Snap where an animation would be a lie, a trap, or a waste: the reader
+       asked for less motion; the tab is hidden, where rAF does not run at all
+       and a frame-driven tween would park the window half way; or this chart
+       is off screen. The range control lives in the hero, so a click animates
+       the chart being looked at while the four panels below it - 1,100 of the
+       page's 1,357 dots - simply arrive already zoomed. Animating all five at
+       once measured 21-30ms a frame, which is a dropped frame in exchange for
+       motion nobody is in a position to see. */
+    const box = ref.current && ref.current.getBoundingClientRect();
+    const onScreen = !!box && box.bottom > 0 && box.top < (window.innerHeight || 0);
+    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches || document.visibilityState === "hidden" || !onScreen;
+    if (still) {
+      winRef.current = to;
+      travelling.current = false;
+      setWin(to);
+      return;
+    }
+    cancelAnimationFrame(winRaf.current);
+    travelling.current = true;
+    const a = from.slice(),
+      t0 = performance.now();
+    const step = now => {
+      const raw = Math.min(1, (now - t0) / window.AP.MORPH_MS);
+      if (raw >= 1) {
+        winRef.current = to;
+        travelling.current = false;
+        setWin(to);
+        return;
+      }
+      const e = window.AP.morphEase(raw);
+      winRef.current = [a[0] + (to[0] - a[0]) * e, a[1] + (to[1] - a[1]) * e];
+      setWin(winRef.current);
+      winRaf.current = requestAnimationFrame(step);
+    };
+    winRaf.current = requestAnimationFrame(step);
+  }, [xDomain[0], xDomain[1]]);
+
+  /* tooltipTitle and extraRows read the panel's OWN points by index, so they
+     belong to the same bundle: holding a 16-month spine while the readout had
+     already been rebuilt for a 3-month one indexed past the end of it, and the
+     accessible name - which calls tooltipTitle at render time, not on hover -
+     brought the whole page down the moment the range changed. */
+  const fresh = {
+    series: seriesProp,
+    scatter: scatterProp,
+    spine: spineProp,
+    scatterOut: scatterOutProp,
+    tooltipTitle: tooltipTitleProp,
+    extraRows: extraRowsProp
+  };
+  /* Zooming IN, the panel has already filtered to the narrow range, so the
+     previous render's data is the one still covering the ground the window is
+     leaving. It has to be the PREVIOUS render's: by the time this one runs the
+     props are already the narrow set, and the effect that starts the travel
+     has not run yet - which is also why the test is on the domain rather than
+     on the travelling flag, or the first frame would flash the new data inside
+     the old window. */
+  const moved = xDomain[0] !== winRef.current[0] || xDomain[1] !== winRef.current[1];
+  const drawn = (travelling.current || moved) && xDomain[0] > winRef.current[0] && prev.current ? prev.current : fresh;
+  const series = drawn.series,
+    scatter = drawn.scatter,
+    spine = drawn.spine,
+    scatterOut = drawn.scatterOut;
+  const tooltipTitle = drawn.tooltipTitle,
+    extraRows = drawn.extraRows;
+  React.useEffect(() => {
+    if (!travelling.current) prev.current = fresh;
+  });
   const {
     sx,
     sy,
@@ -3039,7 +3155,7 @@ function TrendChart(props) {
     H
   } = makeScales({
     height,
-    xDomain,
+    xDomain: win,
     yDomain,
     pad
   });
@@ -3048,6 +3164,7 @@ function TrendChart(props) {
   const [evt, setEvt] = useState(null); // hovered key event {e, x, y}
   const ref = useRef(null);
   const clipId = "clip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
+  const plotId = clipId + "p"; // the plot area itself, which never travels
 
   // axis text in real on-screen px – normalise by measured width so every
   // chart's labels match regardless of column width / responsive stacking
@@ -3420,7 +3537,7 @@ function TrendChart(props) {
   /* Dot clouds, memoised: identity is what lets React skip them entirely on a
      morph frame. `geom` covers everything that would move a dot – the scales
      are rebuilt every render but produce the same pixels while it holds. */
-  const geom = [W, H, pad.l, pad.r, pad.t, pad.b, xDomain[0], xDomain[1], yDomain[0], yDomain[1]].join("|");
+  const geom = [W, H, pad.l, pad.r, pad.t, pad.b, win[0], win[1], yDomain[0], yDomain[1]].join("|");
   const dotEls = (arr, live) => arr.map((d, i) => /*#__PURE__*/React.createElement("circle", {
     key: "s" + i,
     cx: sx(d.x),
@@ -3470,7 +3587,7 @@ function TrendChart(props) {
      from the svg root like everything else on this chart, which needs its
      geometry in hand before an event arrives. */
   const evPlaced = events.length <= 2 || cw >= 640 ? (() => {
-    const evs = events.filter(e => e.x >= xDomain[0] && e.x <= xDomain[1]).sort((a, b) => a.x - b.x);
+    const evs = events.filter(e => e.x >= win[0] && e.x <= win[1]).sort((a, b) => a.x - b.x);
     const fsz = refUnits * 0.92;
     const ROWS = 3;
     const ROW_H = refUnits * 1.4;
@@ -3569,6 +3686,13 @@ function TrendChart(props) {
     x: clipX ? Math.max(pad.l, sx(clipX[0])) : pad.l,
     y: "0",
     width: clipX ? Math.max(0, Math.min(W - pad.r, sx(clipX[1]) + 5) - Math.max(pad.l, sx(clipX[0]))) : W - pad.l - pad.r,
+    height: H
+  })), /*#__PURE__*/React.createElement("clipPath", {
+    id: plotId
+  }, /*#__PURE__*/React.createElement("rect", {
+    x: pad.l,
+    y: "0",
+    width: W - pad.l - pad.r,
     height: H
   }))), bands.map((b, i) => /*#__PURE__*/React.createElement("rect", {
     key: "b" + i,
@@ -3716,7 +3840,9 @@ function TrendChart(props) {
       transform: `translateX(${(hoverX != null ? hoverX : sx(spinePts[spinePts.length - 1].x)).toFixed(2)}px)`,
       opacity: hoverX != null && !dot && !evt ? 0.7 : 0
     }
-  }), scatterOut.length > 0 && fade < 1 && /*#__PURE__*/React.createElement("g", {
+  }), /*#__PURE__*/React.createElement("g", {
+    clipPath: `url(#${plotId})`
+  }, scatterOut.length > 0 && fade < 1 && /*#__PURE__*/React.createElement("g", {
     style: {
       opacity: 1 - fade
     }
@@ -3724,7 +3850,7 @@ function TrendChart(props) {
     style: fade < 1 ? {
       opacity: fade
     } : null
-  }, dots), moveDots.length > 0 && /*#__PURE__*/React.createElement("g", null, moveDots), /*#__PURE__*/React.createElement("g", {
+  }, dots), moveDots.length > 0 && /*#__PURE__*/React.createElement("g", null, moveDots)), /*#__PURE__*/React.createElement("g", {
     clipPath: `url(#${clipId})`
   }, series.map(s => /*#__PURE__*/React.createElement("path", {
     key: s.id,
@@ -4821,7 +4947,7 @@ function PrimaryVotePanel({
   }, p.name), /*#__PURE__*/React.createElement("span", {
     className: "legend-val"
   }, latest[p.id].toFixed(1), "%"))))), /*#__PURE__*/React.createElement(TrendChart, {
-    key: "pv-" + rangeId,
+    key: "pv",
     height: 340,
     xDomain: xDomain,
     yDomain: [0, 40],
@@ -5269,7 +5395,7 @@ function PreferredPMPanel({
   }, leadOf(pr))), /*#__PURE__*/React.createElement("div", {
     className: "leader-readout"
   }, tiles(rows.filter(r => r.pair === pr)))))), /*#__PURE__*/React.createElement(TrendChart, {
-    key: "ppm-" + fmt + "-" + rangeId,
+    key: "ppm-" + fmt,
     height: 250,
     xDomain: xDomain,
     yDomain: domain,
@@ -5442,7 +5568,7 @@ function ApprovalPanel({
       }
     })));
   })), /*#__PURE__*/React.createElement(TrendChart, {
-    key: "appr-" + metric + "-" + rangeId + "-" + leaders.map(L => L.id).join("."),
+    key: "appr-" + metric + "-" + leaders.map(L => L.id).join("."),
     height: 250,
     xDomain: xDomain,
     yDomain: domain,
@@ -5609,7 +5735,7 @@ function DirectionPanel({
   }, latest.wrong, /*#__PURE__*/React.createElement("span", {
     className: "pct"
   }, "%")))), /*#__PURE__*/React.createElement(TrendChart, {
-    key: "dir-" + rangeId,
+    key: "dir",
     height: 250,
     xDomain: xDomain,
     yDomain: [lo, hi],
@@ -10168,32 +10294,10 @@ function RollNum({
    through grey, which is what an oklab mix of the two would do. Left as a CSS
    function rather than computed here so it keeps resolving against whichever
    palette the theme is currently using. */
-/* ONE motion curve, shared by every part of a matchup switch: the digit reels
-   animate it in CSS, the colours, lines, clip window and travelling dots are
-   sampled from it here. They used to run on two different ease-outs, and both
-   were far too front-loaded - the reels' old curve was 63% done a fifth of the
-   way in and 88% two fifths in, so a reel with four digits to travel flung
-   through them and then crept the last few pixels for a quarter of a second,
-   leaving a glyph sitting half-shown between two others. That is what "gets
-   stuck on the way" looks like. This one accelerates, holds a real middle, and
-   settles without a tail: 16% / 37% / 60% / 77% at the same marks. */
-const MORPH_EASE = (() => {
-  const [p1x, p1y, p2x, p2y] = [0.4, 0.1, 0.25, 1];
-  const A = (a, b) => 1 - 3 * b + 3 * a,
-    B = (a, b) => 3 * b - 6 * a,
-    C = a => 3 * a;
-  const f = (t, a, b) => ((A(a, b) * t + B(a, b)) * t + C(a)) * t;
-  const df = (t, a, b) => 3 * A(a, b) * t * t + 2 * B(a, b) * t + C(a);
-  return x => {
-    let t = x;
-    for (let i = 0; i < 8; i++) {
-      const d = df(t, p1x, p2x);
-      if (Math.abs(d) < 1e-6) break;
-      t -= (f(t, p1x, p2x) - x) / d;
-    }
-    return f(t, p1y, p2y);
-  };
-})();
+/* The one motion curve every moving-data transition shares – defined in
+   AP (helpers.js) so the chart's travelling window samples the same one, and
+   mirrored as a cubic-bezier on .roll-reel so the digits do too. */
+const MORPH_EASE = x => window.AP.morphEase(x);
 function mixC(c1, c2, t) {
   if (t <= 0 || c1 === c2) return c1;
   if (t >= 1) return c2;
@@ -10337,7 +10441,7 @@ function Hero({
      it home. 320ms with an ease-out: far enough to follow, short enough that
      nobody is kept waiting for a number they can already read, since the value
      itself is correct from the first frame and only its digits are in motion. */
-  const MORPH_MS = 320;
+  const MORPH_MS = window.AP.MORPH_MS;
   const [morph, setMorph] = useState(null); // { from, to, t }
   const morphRaf = useRef(0);
   React.useEffect(() => () => cancelAnimationFrame(morphRaf.current), []);
@@ -10653,10 +10757,16 @@ function Hero({
     caps: true,
     value: rangeId,
     onChange: setRangeId,
-    ariaLabel: "Time range",
+    ariaLabel: "Time range"
+    /* rangeDomain takes any month count, and buildXTicks already labels
+       every month once the span is under a year, so six months arrives
+       with its own tick per month rather than every second one */,
     options: [{
       id: "3",
       label: "3M"
+    }, {
+      id: "6",
+      label: "6M"
     }, {
       id: "12",
       label: "12M"
@@ -10665,7 +10775,7 @@ function Hero({
       label: "All"
     }]
   }))), /*#__PURE__*/React.createElement(TrendChart, {
-    key: "hero-" + rangeId,
+    key: "hero",
     height: 420,
     xDomain: xDomain,
     yDomain: yDomain,

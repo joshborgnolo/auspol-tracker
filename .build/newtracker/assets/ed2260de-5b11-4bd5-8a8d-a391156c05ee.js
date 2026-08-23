@@ -211,7 +211,33 @@ window.AP = (function () {
     return ROW_KEYS.has(k) ? k : null;
   };
 
+  /* ONE motion curve and ONE duration for every transition that moves data
+     rather than chrome: the matchup morph in the hero, the digit reels (which
+     animate it in CSS - keep the cubic-bezier in template.html the same), and
+     the chart's own travelling x window. They were on separate curves once and
+     it showed: a figure whose colour crawled on one ease while its digits
+     crawled on another read as sticking.
+
+     Accelerates, holds a real middle, settles without a tail: 16% / 37% / 60%
+     / 77% at a fifth, a third, two fifths and half the duration. */
+  const MORPH_MS = 320;
+  const morphEase = (() => {
+    const [p1x, p1y, p2x, p2y] = [0.4, 0.1, 0.25, 1];
+    const A = (a, b) => 1 - 3 * b + 3 * a, B = (a, b) => 3 * b - 6 * a, C = (a) => 3 * a;
+    const f = (t, a, b) => ((A(a, b) * t + B(a, b)) * t + C(a)) * t;
+    const df = (t, a, b) => 3 * A(a, b) * t * t + 2 * B(a, b) * t + C(a);
+    return (x) => {
+      let t = x;
+      for (let i = 0; i < 8; i++) {
+        const d = df(t, p1x, p2x);
+        if (Math.abs(d) < 1e-6) break;
+        t -= (f(t, p1x, p2x) - x) / d;
+      }
+      return f(t, p1y, p2y);
+    };
+  })();
+
   return { D, rangeDomain, filterPts, buildXTicks, series, monthLabelFull, latestX,
-           pollRowKey,
+           pollRowKey, morphEase, MORPH_MS,
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();
