@@ -116,7 +116,7 @@ html = html.replace(/\s*<link rel="preconnect" href="https:\/\/fonts\.(googleapi
      - the pivot dot is dropped. It is illegible at this size, and its dark ink
        would vanish against a dark tab bar anyway.
    Colours are converted from the page's own oklch tokens rather than guessed. */
-function oklchHex(L, C, Hdeg) {
+function oklchRgb(L, C, Hdeg) {
   const h = (Hdeg * Math.PI) / 180, a = C * Math.cos(h), b = C * Math.sin(h);
   const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
   const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
@@ -125,11 +125,38 @@ function oklchHex(L, C, Hdeg) {
   const lin = [ 4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * sp,
                -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * sp,
                -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * sp];
-  return "#" + lin.map((c) => {
+  return lin.map((c) => {
     c = c <= 0.0031308 ? 12.92 * c : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
-    return Math.round(Math.max(0, Math.min(1, c)) * 255).toString(16).padStart(2, "0");
-  }).join("");
+    return Math.max(0, Math.min(1, c)) * 255;
+  });
 }
+const rgbHex = (a) => "#" + a.map((c) => Math.round(c).toString(16).padStart(2, "0")).join("");
+function oklchHex(L, C, Hdeg) { return rgbHex(oklchRgb(L, C, Hdeg)); }
+
+/* ---- theme-color: what iOS paints BEHIND the status bar -----------------
+   That strip is Safari's own chrome, not the page: no CSS reaches it, and it
+   cannot be made translucent outside standalone mode. All the page controls is
+   its TINT, via this meta - so the least jarring thing it can be is the colour
+   of whatever it sits directly above, which on a scrolled page is the pinned
+   tab bar.
+
+   These were hand-picked before and had drifted badly: #f6f1e7 against a bar
+   that renders #fbf9f5, and #14110d against #231e1a - a visible step in light
+   and a worse one in dark. Derived now, the same way PARTY_HEX above is, so a
+   palette change carries through instead of leaving this behind.
+
+   The bar is --glass-bg (--surface at the glass alpha) over the blurred page,
+   which at the bar's top edge is --bg. Compositing happens in sRGB, so blend
+   there rather than in oklch. Values mirror the tokens in template.html. */
+const THEME = {
+  light: { surface: [0.992, 0.004, 85], bg: [0.970, 0.008, 78], alpha: 0.58 },
+  dark:  { surface: [0.252, 0.011, 66], bg: [0.215, 0.010, 65], alpha: 0.62 },
+};
+const themeColor = (t) => {
+  const s = oklchRgb(...t.surface), b = oklchRgb(...t.bg);
+  return rgbHex([0, 1, 2].map((i) => t.alpha * s[i] + (1 - t.alpha) * b[i]));
+};
+const THEME_LIGHT = themeColor(THEME.light), THEME_DARK = themeColor(THEME.dark);
 const PARTY_HEX = {
   alp: oklchHex(0.55, 0.150, 27), lnp: oklchHex(0.50, 0.095, 250),
   grn: oklchHex(0.60, 0.120, 150), onp: oklchHex(0.66, 0.130, 58),
@@ -215,6 +242,7 @@ function grabLatest() {
 
 const fav = buildFavicon();
 console.log("  favicon:", fav.note);
+console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches the pinned bar)`);
 const favicon = encodeURIComponent(fav.svg);
 
 /* ---- 4b. a page that says something before React runs -------------------
@@ -326,8 +354,8 @@ html = html.replace('<meta property="og:type" content="website">',
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${cardAlt}">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#14110d" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="${THEME_LIGHT}" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="${SITE_URL}">
   <link rel="icon" href="data:image/svg+xml,${favicon}">`);
 
