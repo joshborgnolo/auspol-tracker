@@ -2942,12 +2942,21 @@ function TrendChart(props) {
     setDot(d);
   };
   const handleMove = e => {
-    if (dot) {
-      if (dotSrc.current !== "touch") return; // genuine mouse hover, leave it
-      setDotFrom(null, null); // stale touch pick: the mouse takes over
+    if (dotSrc.current === "touch") setDotFrom(null, null); // mouse takes over a stale touch pick
+    const p = toVB(e);
+    const near = nearestDot(p, MOUSE_PICK_PX);
+    if (near) {
+      if (near !== dot) {
+        setHover(null);
+        setEvt(null);
+        setDotFrom("mouse", near);
+        onHoverIndex && onHoverIndex(null);
+      }
+      return;
     }
+    if (dot) setDotFrom(null, null);
     if (!spinePts.length) return;
-    showSpine(nearestSpine(toVB(e).x));
+    showSpine(nearestSpine(p.x));
   };
   const handleLeave = () => {
     setHover(null);
@@ -2956,21 +2965,26 @@ function TrendChart(props) {
     onHoverIndex && onHoverIndex(null);
   };
 
-  /* ---- touch --------------------------------------------------------------
-     A finger has no hover, and a 4.2-unit dot is a ~5px target on a phone, so
-     touch cannot use the mouse path: it would be able to read neither an
-     individual poll nor the month guide. Instead a tap (and any drag after it)
-     picks the NEAREST scatter dot within a finger's width, and falls back to
-     the month readout when no poll is close. The threshold is defined in real
-     px and converted to user units, so it stays a finger regardless of how
-     wide the chart is rendering.
-      Mouse keeps its existing enter/leave behaviour untouched – snapping the
-     pointer to whichever dot happened to be nearest would fight the guide. */
-  const TOUCH_PICK_PX = 22;
-  const pickTouch = e => {
-    if (!ref.current) return;
-    const p = toVB(e);
-    const rPx = TOUCH_PICK_PX / Math.max(scale, 0.0001); // px -> user units
+  /* ---- picking a poll -----------------------------------------------------
+     Both inputs find the nearest scatter dot within a catchment, measured in
+     real px and converted to user units so it stays the same physical size
+     however wide the chart renders. Only the catchment differs: a finger is
+     blunt, a pointer is precise.
+      The mouse used to rely on onPointerEnter/onPointerLeave bound to each
+     <circle> instead. That put 242 per-element pointer listeners between the
+     reader and the data and made the whole feature contingent on a browser
+     firing enter/leave on SVG children, which is exactly the kind of thing
+     Safari has historically got wrong - and when it does, the dots go dead
+     while touch carries on working, because touch listens on the <svg> root.
+     One code path on the root, for both, cannot fail that way. It is also a
+     kinder target: a 4.2-unit dot is about 5px on screen, and asking a mouse
+     to land inside that was never generous. */
+  const TOUCH_PICK_PX = 22; // a fingertip
+  const MOUSE_PICK_PX = 11; // near enough to mean it, small enough to leave the guide alone
+
+  const nearestDot = (p, radiusPx) => {
+    if (!scatter.length) return null;
+    const rPx = radiusPx / Math.max(scale, 0.0001); // px -> user units
     let near = null,
       nearD = Infinity;
     scatter.forEach(d => {
@@ -2982,7 +2996,13 @@ function TrendChart(props) {
         near = d;
       }
     });
-    if (near && nearD <= rPx) {
+    return near && nearD <= rPx ? near : null;
+  };
+  const pickTouch = e => {
+    if (!ref.current) return;
+    const p = toVB(e);
+    const near = nearestDot(p, TOUCH_PICK_PX);
+    if (near) {
       // tapping the poll that is already open closes it, so a finger can put
       // the chart back to its resting state without hunting for empty space
       if (e.type === "pointerdown" && dot === near) {
@@ -3328,18 +3348,21 @@ function TrendChart(props) {
       const aria = e.label + (e.desc ? " – " + e.desc : "") + (aDate ? " · " + aDate : "");
       /* Hover for a mouse, tap for a finger. Without the pointerdown an
          event annotation was mouse-only – the one thing on the chart a
-         phone could see but never read. Tapping one twice dismisses it. */
+         phone could see but never read. Tapping one twice dismisses it.
+          The hover half stays on MOUSE enter/leave rather than the pointer
+         equivalents. These are the last per-element listeners on an SVG
+         child in this file, and enter/leave on SVG children is the exact
+         thing that appears to have gone dead on a laptop while touch kept
+         working. mouseenter/mouseleave predate the problem and every
+         browser fires them; there is nothing to gain here by using the
+         newer pair, since a finger is served by pointerdown below. */
       const on = (px, py) => ({
-        onPointerEnter: ev => {
-          if (ev.pointerType === "mouse") setEvt({
-            e,
-            x: px,
-            y: py
-          });
-        },
-        onPointerLeave: ev => {
-          if (ev.pointerType === "mouse") setEvt(null);
-        },
+        onMouseEnter: () => setEvt({
+          e,
+          x: px,
+          y: py
+        }),
+        onMouseLeave: () => setEvt(null),
         onPointerDown: ev => {
           if (ev.pointerType === "mouse") return;
           ev.stopPropagation(); // don't let the svg's pick overwrite it
@@ -3425,15 +3448,9 @@ function TrendChart(props) {
     className: "scatter-dot",
     fill: d.color,
     opacity: dot && dot !== d ? 0.25 : 0.6
-    /* mouse only: touch is handled by the svg's nearest-dot pick,
-       and the compatibility mouseenter a tap fires afterwards
-       would otherwise select whatever the finger came to rest on */,
-    onPointerEnter: e => {
-      if (e.pointerType === "mouse") setDotFrom("mouse", d);
-    },
-    onPointerLeave: e => {
-      if (e.pointerType === "mouse") setDotFrom(null, null);
-    }
+    /* no per-dot pointer listeners: both inputs pick from the
+       svg root, so nothing here depends on a browser firing
+       enter/leave on an SVG child */
   })), /*#__PURE__*/React.createElement("g", {
     clipPath: `url(#${clipId})`
   }, series.map(s => /*#__PURE__*/React.createElement("path", {
