@@ -167,6 +167,10 @@ function TrendChart(props) {
       return;
     }
     if (dot) setDotFrom(null, null);
+    // an annotation outranks the guide: the guide can be read anywhere along
+    // the month, the annotation only here
+    const ev = nearestEvent(p, EVT_PICK_PX);
+    if (ev) { showEvent(ev); return; }
     if (!spinePts.length) return;
     showSpine(nearestSpine(p.x));
   };
@@ -192,6 +196,37 @@ function TrendChart(props) {
      to land inside that was never generous. */
   const TOUCH_PICK_PX = 22;   // a fingertip
   const MOUSE_PICK_PX = 11;   // near enough to mean it, small enough to leave the guide alone
+  const EVT_PICK_PX = 9;      // the dashed rule; the label carries its own box
+
+  /* The same treatment for a key event, and for the same reason twice over.
+     It hung off onMouseEnter on the <g>, which put it behind the one browser
+     behaviour this file no longer trusts – and, worse, the root's own
+     pointermove ran on the way in and called showSpine(), which clears the
+     annotation. Enter set it, the next tremor of the mouse cleared it, so on a
+     laptop the panel could not be made to stay. Picked from the root there is
+     one code path and no race: an event under the pointer simply outranks the
+     month guide. */
+  const nearestEvent = (p, radiusPx) => {
+    if (!evPlaced.length) return null;
+    const rU = radiusPx / Math.max(scale, 0.0001);
+    let near = null, nearD = Infinity;
+    for (const q of evPlaced) {
+      // the rule, from the label's baseline down to the axis
+      let d = (p.y >= q.y - rU && p.y <= H - pad.b + rU) ? Math.abs(p.x - q.ex) : Infinity;
+      // …and the label itself, a far bigger and more obvious target
+      if (q.row != null) {
+        const dx = p.x < q.x ? q.x - p.x : p.x > q.x + q.w ? p.x - (q.x + q.w) : 0;
+        const dy = p.y < q.y - q.fsz ? (q.y - q.fsz) - p.y : p.y > q.y + q.fsz * 0.3 ? p.y - (q.y + q.fsz * 0.3) : 0;
+        d = Math.min(d, Math.hypot(dx, dy));
+      }
+      if (d < nearD) { nearD = d; near = q; }
+    }
+    return near && nearD <= rU ? near : null;
+  };
+  const showEvent = (q) => {
+    setHover(null); setDotFrom(null, null); onHoverIndex && onHoverIndex(null);
+    setEvt((cur) => (cur && cur.e === q.e ? cur : { e: q.e, x: q.ex, y: q.y }));
+  };
 
   const nearestDot = (p, radiusPx) => {
     if (!scatter.length) return null;
@@ -214,9 +249,16 @@ function TrendChart(props) {
       // the chart back to its resting state without hunting for empty space
       if (e.type === "pointerdown" && dot === near) { setDotFrom(null, null); return; }
       setHover(null); setEvt(null); setDotFrom("touch", near); onHoverIndex && onHoverIndex(null);
-    } else if (spinePts.length) {
-      showSpine(nearestSpine(p.x));
+      return;
     }
+    const ev = nearestEvent(p, TOUCH_PICK_PX);
+    if (ev) {
+      // tapping the open annotation closes it, exactly as tapping its poll does
+      if (e.type === "pointerdown" && evt && evt.e === ev.e) { setEvt(null); return; }
+      showEvent(ev);
+      return;
+    }
+    if (spinePts.length) showSpine(nearestSpine(p.x));
   };
 
   const onPointerDown = (e) => {
@@ -357,6 +399,71 @@ function TrendChart(props) {
     tip.sub || "",
   ].filter(Boolean).join(", ");
 
+  /* ---- key events ---------------------------------------------------------
+     A busy set (the hero's history) shows only when the chart is genuinely
+     wide ON SCREEN (measured px, so phones and narrow columns stay
+     uncluttered); one or two markers are never clutter and show at any width.
+
+     Clustered events were the hard part: Farrer and the 2026 Budget sit 5.6
+     units apart in a 1000-unit viewBox while their labels are ~60 wide, so no
+     arrangement puts each label above its own line. Three things fix it
+     together:
+       - labels are DISPLACED along their row rather than dropped, so a
+         crowded one slides right until it fits;
+       - every label is tied to its line by an elbow – the line rises to the
+         label's baseline and runs across to meet the text, so a displaced
+         label still reads unambiguously as belonging to its own line;
+       - rows are packed first-fit rather than by index parity, which
+         previously sent alternate events to alternate rows regardless of
+         whether they were anywhere near each other.
+
+     Placed HERE rather than inside the JSX because two things read it: the
+     drawing below, and the pointer pick above – an annotation is now picked
+     from the svg root like everything else on this chart, which needs its
+     geometry in hand before an event arrives. */
+  const evPlaced = (events.length <= 2 || cw >= 640) ? (() => {
+    const evs = events
+      .filter((e) => e.x >= xDomain[0] && e.x <= xDomain[1])
+      .sort((a, b) => a.x - b.x);
+    const fsz = refUnits * 0.92;
+    const ROWS = 3;
+    const ROW_H = refUnits * 1.4;
+    const LEAD = refUnits * 0.55;   // shortest elbow, line to text
+    const SEP = refUnits * 0.85;    // clear air between labels in a row
+    const rowEnd = new Array(ROWS).fill(-Infinity);
+    const rightEdge = W - pad.r;
+    const rowY = (r) => (r == null ? pad.t + 4 : pad.t + 3 + r * ROW_H);
+
+    return evs.map((e) => {
+      const ex = sx(e.x);
+      const w = textWidth(e.short, fsz);
+      /* Pick the row where the label sits CLOSEST to its own line, not simply
+         the first row it fits in. First-fit looks right until you realise
+         displacement always succeeds in row 0 – so row 0 took every label and
+         the connectors stretched to 76 units, dragging "2026 Budget"
+         three-quarters of the way across its neighbour. Choosing by
+         displacement instead sends the second member of a cluster down a row,
+         where it sits directly over its own line. ROW_PEN keeps things in the
+         top row unless dropping down buys a real reduction, so we don't
+         scatter over three rows to save a unit or two. */
+      const ROW_PEN = refUnits * 0.3;
+      let best = null;
+      for (let r = 0; r < ROWS; r++) {
+        const x = Math.max(ex + LEAD, rowEnd[r] + SEP);
+        if (x + w > rightEdge) continue;
+        const cost = (x - (ex + LEAD)) + r * ROW_PEN;
+        if (best === null || cost < best.cost) best = { r, x, cost };
+      }
+      if (best) { rowEnd[best.r] = best.x + w; return { e, ex, w, fsz, row: best.r, y: rowY(best.r), x: best.x, flip: false }; }
+      // out of room on the right – hang it to the left of its own line
+      for (let r = 0; r < ROWS; r++) {
+        const x = ex - LEAD - w;
+        if (x >= rowEnd[r] + SEP) { rowEnd[r] = ex; return { e, ex, w, fsz, row: r, y: rowY(r), x, flip: true }; }
+      }
+      return { e, ex, w, fsz, row: null, y: rowY(null) };   // genuinely nowhere to put it
+    });
+  })() : [];
+
   return (
     <div className="chart" ref={ref}>
       <svg viewBox={`0 0 ${W} ${H}`} className="chart-svg"
@@ -406,122 +513,45 @@ function TrendChart(props) {
         {xTicks.map((t, i) => (
           <text key={"x" + i} x={sx(t.x)} y={H - 10} className="axis-label x" style={{ fontSize: axisUnits }} textAnchor="middle">{t.label}</text>
         ))}
-        {/* Key events. A busy set (the hero's history) shows only when the chart
-            is genuinely wide ON SCREEN (measured px, so phones and narrow columns
-            stay uncluttered); one or two markers are never clutter and show at
-            any width.
-
-            Clustered events were the hard part: Farrer and the 2026 Budget sit
-            5.6 units apart in a 1000-unit viewBox while their labels are ~60
-            wide, so no arrangement puts each label above its own line. Three
-            things fix it together:
-              - labels are DISPLACED along their row rather than dropped, so a
-                crowded one slides right until it fits;
-              - every label is tied to its line by an elbow – the line rises to
-                the label's baseline and runs across to meet the text, so a
-                displaced label still reads unambiguously as belonging to its
-                own line;
-              - rows are packed first-fit rather than by index parity, which
-                previously sent alternate events to alternate rows regardless of
-                whether they were anywhere near each other. */}
-        {(events.length <= 2 || cw >= 640) && (() => {
-          const evs = events
-            .filter((e) => e.x >= xDomain[0] && e.x <= xDomain[1])
-            .sort((a, b) => a.x - b.x);
-          const fsz = refUnits * 0.92;
-          const ROWS = 3;
-          const ROW_H = refUnits * 1.4;
-          const LEAD = refUnits * 0.55;   // shortest elbow, line to text
-          const SEP = refUnits * 0.85;    // clear air between labels in a row
-          const rowEnd = new Array(ROWS).fill(-Infinity);
-          const rightEdge = W - pad.r;
-
-          const placed = evs.map((e) => {
-            const ex = sx(e.x);
-            const w = textWidth(e.short, fsz);
-            /* Pick the row where the label sits CLOSEST to its own line, not
-               simply the first row it fits in. First-fit looks right until you
-               realise displacement always succeeds in row 0 – so row 0 took
-               every label and the connectors stretched to 76 units, dragging
-               "2026 Budget" three-quarters of the way across its neighbour.
-               Choosing by displacement instead sends the second member of a
-               cluster down a row, where it sits directly over its own line.
-               ROW_PEN keeps things in the top row unless dropping down buys a
-               real reduction, so we don't scatter over three rows to save a
-               unit or two. */
-            const ROW_PEN = refUnits * 0.3;
-            let best = null;
-            for (let r = 0; r < ROWS; r++) {
-              const x = Math.max(ex + LEAD, rowEnd[r] + SEP);
-              if (x + w > rightEdge) continue;
-              const cost = (x - (ex + LEAD)) + r * ROW_PEN;
-              if (best === null || cost < best.cost) best = { r, x, cost };
-            }
-            if (best) { rowEnd[best.r] = best.x + w; return { e, ex, w, row: best.r, x: best.x, flip: false }; }
-            // out of room on the right – hang it to the left of its own line
-            for (let r = 0; r < ROWS; r++) {
-              const x = ex - LEAD - w;
-              if (x >= rowEnd[r] + SEP) { rowEnd[r] = ex; return { e, ex, w, row: r, x, flip: true }; }
-            }
-            return { e, ex, w, row: null };   // genuinely nowhere to put it
-          });
-
-          return placed.map((p, i) => {
-            const { e, ex, w, row, x, flip } = p;
-            /* aria-label rather than <title>: a <title> child also produces the
-               browser's own delayed tooltip, which would surface a second,
-               unstyled copy on top of ours. */
-            /* an event with no date formatted to "", leaving the name ending in a
-               dangling " · " - only reachable when an event is built by hand
-               rather than taken from the dataset, which is no longer done */
-            const aDate = fmtEventDate(e.date);
-            const aria = e.label + (e.desc ? " – " + e.desc : "") + (aDate ? " · " + aDate : "");
-            /* Hover for a mouse, tap for a finger. Without the pointerdown an
-               event annotation was mouse-only – the one thing on the chart a
-               phone could see but never read. Tapping one twice dismisses it.
-
-               The hover half stays on MOUSE enter/leave rather than the pointer
-               equivalents. These are the last per-element listeners on an SVG
-               child in this file, and enter/leave on SVG children is the exact
-               thing that appears to have gone dead on a laptop while touch kept
-               working. mouseenter/mouseleave predate the problem and every
-               browser fires them; there is nothing to gain here by using the
-               newer pair, since a finger is served by pointerdown below. */
-            const on = (px, py) => ({
-              onMouseEnter: () => setEvt({ e, x: px, y: py }),
-              onMouseLeave: () => setEvt(null),
-              onPointerDown: (ev) => {
-                if (ev.pointerType === "mouse") return;
-                ev.stopPropagation();   // don't let the svg's pick overwrite it
-                setHover(null); setDotFrom(null, null);
-                setEvt((cur) => (cur && cur.e === e ? null : { e, x: px, y: py }));
-              },
-            });
-            // no room for a label: the reference line still earns its place
-            if (row == null) return (
-              <g key={"ev" + i} className="evt" role="img" aria-label={aria} {...on(ex, pad.t + 4)}>
-                {/* a 1px dashed rule is a poor hover target; an invisible wide
-                    line over it makes the annotation reachable */}
-                <line x1={ex} x2={ex} y1={pad.t + 4} y2={H - pad.b} className="evt-hit" />
-                <line x1={ex} x2={ex} y1={pad.t + 4} y2={H - pad.b} className="evt-line" />
-              </g>
-            );
-            const yRow = pad.t + 3 + row * ROW_H;
-            const connTo = flip ? x + w + LEAD * 0.4 : x - LEAD * 0.4;
-            return (
-              <g key={"ev" + i} className="evt" role="img" aria-label={aria} {...on(ex, yRow)}>
-                <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-hit" />
-                <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-line" />
-                {/* elbow: reads as a lead-in rule at the label's baseline */}
-                <line x1={ex} x2={connTo} y1={yRow} y2={yRow} className="evt-conn" />
-                <text x={x} y={yRow} className="evt-label" textAnchor="start"
-                      style={{ fontSize: fsz, strokeWidth: refUnits * 0.34 }}>
-                  {e.short}
-                </text>
-              </g>
-            );
-          });
-        })()}
+        {/* Key events – geometry from evPlaced above; this only draws it. */}
+        {evPlaced.map((p, i) => {
+          const { e, ex, w, fsz, row, y: yRow, x, flip } = p;
+          /* aria-label rather than <title>: a <title> child also produces the
+             browser's own delayed tooltip, which would surface a second,
+             unstyled copy on top of ours. */
+          /* an event with no date formatted to "", leaving the name ending in a
+             dangling " · " - only reachable when an event is built by hand
+             rather than taken from the dataset, which is no longer done */
+          const aDate = fmtEventDate(e.date);
+          const aria = e.label + (e.desc ? " – " + e.desc : "") + (aDate ? " · " + aDate : "");
+          /* No pointer listeners of its own. Hover and tap are both picked
+             from the svg root, so the open annotation is state, and `on` is
+             what marks it – CSS :hover no longer has to agree with the pick to
+             keep the label lit. */
+          const cls = "evt" + (evt && evt.e === e ? " on" : "");
+          // no room for a label: the reference line still earns its place
+          if (row == null) return (
+            <g key={"ev" + i} className={cls} role="img" aria-label={aria}>
+              {/* a 1px dashed rule is a poor hover target; an invisible wide
+                  line over it makes the annotation reachable */}
+              <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-hit" />
+              <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-line" />
+            </g>
+          );
+          const connTo = flip ? x + w + fsz * 0.24 : x - fsz * 0.24;
+          return (
+            <g key={"ev" + i} className={cls} role="img" aria-label={aria}>
+              <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-hit" />
+              <line x1={ex} x2={ex} y1={yRow} y2={H - pad.b} className="evt-line" />
+              {/* elbow: reads as a lead-in rule at the label's baseline */}
+              <line x1={ex} x2={connTo} y1={yRow} y2={yRow} className="evt-conn" />
+              <text x={x} y={yRow} className="evt-label" textAnchor="start"
+                    style={{ fontSize: fsz, strokeWidth: refUnits * 0.34 }}>
+                {e.short}
+              </text>
+            </g>
+          );
+        })}
         {/* hover guide – kept mounted; glides between months on transform */}
         {spinePts.length > 0 && (
           <line x1={0} x2={0} y1={pad.t} y2={H - pad.b} className="guide"

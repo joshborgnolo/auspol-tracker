@@ -508,7 +508,7 @@ body {
 :focus { outline: none; }
 :focus-visible,
 .seg-btn:focus-visible, .tt-opt:focus-visible, .theme-cell:focus-visible,
-.legend-chip:focus-visible, .ls-chip:focus-visible, .exp-btn:focus-visible,
+.legend-chip:focus-visible, .ap-popbtn:focus-visible, .ap-check:focus-visible, .exp-btn:focus-visible,
 .poll-row:focus-visible, th.sortable:focus-visible, a:focus-visible {
   outline: 2.5px solid var(--accent);
   outline-offset: 2px;
@@ -520,9 +520,9 @@ body {
 /* keep the tight editorial sizing visually, but extend the *hit* area to a
    44px-tall invisible overlay so the controls are comfortable on touch. */
 .tt-opt, .theme-cell, .legend-chip, .seg-btn,
-.ls-chip, .cyc-chip, .ap-chip, .tab-score, .cyc-showall, .ap-clear { position: relative; }
+.cyc-chip, .ap-popbtn, .tab-score, .cyc-showall, .ap-clear { position: relative; }
 .tt-opt::after, .theme-cell::after, .legend-chip::after, .seg-btn::after,
-.ls-chip::after, .cyc-chip::after, .ap-chip::after, .tab-score::after,
+.cyc-chip::after, .ap-popbtn::after, .tab-score::after,
 .cyc-showall::after, .ap-clear::after {
   content: ""; position: absolute; left: 0; right: 0;
   top: 50%; transform: translateY(-50%);
@@ -766,7 +766,12 @@ body {
    is dashed, so it reads as a connector rather than more grid – it is the only
    thing making a displaced label legible in a tight cluster. */
 .evt-conn { stroke: var(--ink-faint); stroke-width: 1; opacity: 0.55; }
-.evt:hover .evt-conn { opacity: 0.95; }
+/* `.on` is the annotation the chart has actually opened – the pick happens on
+   the svg root, so :hover alone would light a label the pointer is over
+   without the panel that goes with it, and miss the one it has just opened
+   from a few px away. Both are kept: they agree, and :hover still answers the
+   moment the pointer crosses the rule. */
+.evt:hover .evt-conn, .evt.on .evt-conn { opacity: 0.95; }
 .evt-label {
   font-family: var(--sans); font-weight: 600; fill: var(--ink-3);
   paint-order: stroke; stroke: var(--chart-bg);
@@ -775,8 +780,8 @@ body {
 /* invisible, generous hover target over the hairline rule */
 .evt-hit { stroke: transparent; stroke-width: 9; }
 .evt { cursor: default; }
-.evt:hover .evt-line { opacity: 0.9; }
-.evt:hover .evt-label { fill: var(--ink); }
+.evt:hover .evt-line, .evt.on .evt-line { opacity: 0.9; }
+.evt:hover .evt-label, .evt.on .evt-label { fill: var(--ink); }
 .hover-marker {
   pointer-events: none;
   transition: transform .15s cubic-bezier(.3,.7,.3,1), opacity .14s ease;
@@ -937,30 +942,37 @@ body.editorial .section-h { font-size: 30px; font-weight: 500; letter-spacing: -
 .leadership .card-title,
 body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; letter-spacing: -0.012em; white-space: nowrap; }
 
-.leader-select { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.ls-label {
+/* Preferred PM shows two contests at once, so each pair of tiles is captioned
+   – and captioned by the rule that draws it, which is what makes solid v
+   dashed legible without a legend the chart has no room for. */
+.ppm-pairs { display: flex; flex-direction: column; gap: 8px; margin-bottom: 6px; }
+.ppm-pair-lab {
+  display: flex; align-items: center; gap: 8px;
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
-  color: var(--ink-3); font-weight: 700; white-space: nowrap;
+  color: var(--ink-3); font-weight: 700;
 }
-.ls-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.ls-chip {
-  display: inline-flex; align-items: center; gap: 7px; white-space: nowrap;
-  background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
-  padding: 5px 12px 5px 10px; cursor: pointer;
-  font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3);
-  transition: color .15s ease, border-color .15s ease, background-color .15s ease, opacity .15s ease;
+.ppm-rule { width: 18px; border-top: 2px solid currentColor; opacity: 0.7; flex: none; }
+.ppm-pair.dashed .ppm-rule { border-top: 0; border-top: 2px dashed currentColor; }
+/* Kept beside the contest it belongs to rather than pushed to the far side of
+   the row: at full width margin-left:auto stranded it a thousand pixels from
+   the caption, which is a different fact from the one it is annotating. */
+.ppm-lead::before { content: "·"; margin-right: 7px; color: var(--ink-faint); }
+.ppm-lead {
+  text-transform: none; letter-spacing: 0;
+  font-size: 12px; font-weight: 700; color: var(--ink-2);
+  font-variant-numeric: tabular-nums; white-space: nowrap;
 }
-.ls-chip:hover:not(:disabled) { border-color: var(--ink-faint); color: var(--ink-2); }
-.ls-chip.on {
-  color: var(--ink); border-color: var(--chip, var(--ink-faint));
-  background: color-mix(in oklch, var(--chip, var(--ink)) 9%, var(--surface));
+.ppm-pairs .leader-readout { margin-bottom: 0; }
+/* four figures where the three-way has three: a step down in size keeps two
+   contests inside the same card without the readout crowding the chart */
+.ppm-pairs .leader-num { font-size: clamp(21px, 7.6cqi, 26px); }
+/* A pair is TWO tiles where the three-way readout has three, so it keeps the
+   chip beside the figure much further down than the 480px handover the wider
+   readout needs – on a phone that is the difference between two rows and four. */
+@container (min-width: 300px) {
+  .ppm-pairs .leader { display: flex; align-items: center; }
+  .ppm-pairs .leader-readout .delta { grid-column: auto; grid-row: auto; margin-top: 0; }
 }
-.ls-chip:not(.on) { opacity: 0.62; }
-.ls-chip:not(.on) .ls-dot { opacity: 0.4; }
-.ls-chip:disabled { cursor: default; }
-.ls-dot { width: 9px; height: 9px; border-radius: 50%; flex: none; }
-.ls-cur { color: var(--ink-3); font-weight: 600; }
-.ls-chip.on .ls-cur { color: var(--ink-3); }
 
 /* ---------- leaders ---------- */
 /* The readout carries two leaders in the two-way question and THREE in the
@@ -1149,8 +1161,6 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 .ptag.hit { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
-/* the "Contains" filter chips reuse .ap-chip; just tighten to a tag look */
-.ptag-chip { text-transform: uppercase; letter-spacing: 0.03em; font-size: 11px; font-weight: 700; padding: 5px 11px; }
 .pollster-mode { display: block; margin-top: 1px; font-size: 11.5px; color: var(--ink-3); }
 .released-pill {
   display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
@@ -1686,7 +1696,17 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   display: flex; justify-content: space-between; align-items: flex-start;
   gap: 18px; flex-wrap: wrap; margin-bottom: 18px;
 }
-.ap-filters { display: flex; flex-direction: column; gap: 14px; margin-bottom: 16px; }
+/* ---------- archive filter bar ---------- */
+/* One row at rest. Search stays visible because it cuts across every facet;
+   everything else is a button that names its own state and opens a panel of
+   options with counts. What's on shows as pills underneath, so the bar never
+   has to be read backwards to find out what is being applied. */
+.ap-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.ap-bar .ap-search { flex: 1 1 190px; max-width: 300px; }
+.ap-bar-end { margin-left: auto; display: inline-flex; align-items: center; gap: 14px; }
+.ap-bar .ap-export { margin-left: 0; }
+.ap-count { font-family: var(--sans); font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+.ap-count strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
 .ap-search {
   position: relative; display: inline-flex; align-items: center; max-width: 320px;
@@ -1695,7 +1715,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-search svg { position: absolute; left: 12px; pointer-events: none; }
 .ap-search input {
   width: 100%; font-family: var(--sans); font-size: 14px; color: var(--ink);
-  background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px;
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
   padding: 9px 30px 9px 34px; transition: border-color .15s ease;
 }
 .ap-search input::placeholder { color: var(--ink-3); }
@@ -1706,40 +1726,98 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 }
 .ap-search-x:hover { color: var(--ink); }
 
-.ap-chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.ap-chip {
+.ap-pop { position: relative; }
+.ap-popbtn {
+  display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
-  padding: 6px 13px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  padding: 8px 12px 8px 14px; font-family: var(--sans); font-size: 13px; font-weight: 600;
   color: var(--ink-3); cursor: pointer; white-space: nowrap;
   transition: color .15s ease, border-color .15s ease, background-color .15s ease;
 }
-.ap-chip:hover { border-color: var(--ink-faint); color: var(--ink-2); }
-.ap-chip.on {
+.ap-popbtn:hover { border-color: var(--ink-faint); color: var(--ink-2); }
+.ap-popbtn.open { border-color: var(--ink-3); color: var(--ink); }
+.ap-popbtn.on {
   color: var(--ink); border-color: var(--ink-3);
   background: color-mix(in oklch, var(--ink) 7%, var(--surface));
 }
+.ap-popbtn-val { font-weight: 700; }
+.ap-popbtn-val::before { content: "·"; margin-right: 6px; color: var(--ink-faint); font-weight: 600; }
+.ap-caret { opacity: 0.55; transition: transform .15s ease; }
+.ap-popbtn.open .ap-caret { transform: rotate(180deg); }
 
-.ap-segs { display: flex; flex-wrap: wrap; gap: 14px 22px; align-items: center; }
-.ap-seg-group { display: inline-flex; align-items: center; gap: 9px; flex-wrap: wrap; }
-/* the lead group reads as one sentence: Lead [matchup] held by [leader] */
-.ap-seg-join { font-size: 11.5px; color: var(--ink-3); white-space: nowrap; }
-.ap-resultnote { color: var(--ink-3); font-weight: 400; }
-.ap-seg-label {
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-  color: var(--ink-3);
+.ap-panel {
+  position: absolute; top: calc(100% + 7px); left: 0; z-index: 30;
+  min-width: 234px; max-width: min(330px, 86vw);
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: 13px;
+  box-shadow: 0 1px 2px rgba(0,0,0,.05), 0 14px 30px -10px rgba(0,0,0,.25);
+  padding: 6px;
+}
+/* a panel that would run off the right edge hangs from its button's right */
+.ap-panel.flip { left: auto; right: 0; }
+.ap-pop-head {
+  display: flex; align-items: baseline; gap: 10px; padding: 6px 9px 7px;
+  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3);
+}
+.ap-pop-head .ap-clear { margin-left: auto; text-transform: none; letter-spacing: 0; font-size: 12px; }
+.ap-pop-head.bordered { border-top: 1px solid var(--line-2); margin-top: 6px; padding-top: 12px; }
+.ap-poplist { max-height: 270px; overflow-y: auto; display: flex; flex-direction: column; }
+.ap-pop-foot { margin: 7px 9px 3px; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); }
+
+.ap-check {
+  display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
+  border: 0; background: none; cursor: pointer; border-radius: 8px; padding: 7px 9px;
+  font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-2);
+}
+.ap-check:hover { background: var(--surface-2); }
+.ap-check.on { color: var(--ink); }
+.ap-tick {
+  width: 15px; height: 15px; flex: none; position: relative;
+  border: 1.5px solid var(--line-2); border-radius: 4px;
+}
+.ap-check.radio .ap-tick { border-radius: 50%; }
+.ap-check.on .ap-tick { background: var(--accent); border-color: var(--accent); }
+.ap-check.on .ap-tick::after {
+  content: ""; position: absolute; left: 4.4px; top: 1.2px; width: 3.6px; height: 8px;
+  border: solid var(--bg); border-width: 0 2px 2px 0; transform: rotate(42deg);
+}
+.ap-check.radio.on .ap-tick::after {
+  left: 3.8px; top: 3.8px; width: 5px; height: 5px;
+  border: 0; border-radius: 50%; background: var(--bg); transform: none;
+}
+.ap-check-lab { min-width: 0; }
+/* the tag panel explains itself: a data type is only obvious once named */
+.ap-check-note {
+  display: block; font-weight: 500; font-size: 11px; color: var(--ink-3);
+  line-height: 1.35; margin-top: 1px; white-space: normal;
+}
+.ap-check-n {
+  margin-left: auto; padding-left: 10px; font-size: 12px; font-weight: 600;
+  color: var(--ink-3); font-variant-numeric: tabular-nums;
 }
 
-.ap-resultline {
-  display: flex; align-items: baseline; gap: 14px; margin-bottom: 10px;
-  font-family: var(--sans); font-size: 13px; color: var(--ink-3);
+.ap-active { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 14px; }
+.ap-pill {
+  display: inline-flex; align-items: center; gap: 3px;
+  border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
+  padding: 4px 5px 4px 11px; font-family: var(--sans); font-size: 12.5px;
+  font-weight: 600; color: var(--ink-2);
 }
-.ap-resultline strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+/* dashed: the view set this one, not the reader */
+.ap-pill.auto { border-style: dashed; background: none; color: var(--ink-3); }
+.ap-pill button {
+  border: 0; background: none; cursor: pointer; color: var(--ink-3);
+  font-size: 15px; line-height: 1; padding: 0 5px 1px; border-radius: 50%;
+}
+.ap-pill button:hover { color: var(--ink); }
+.ap-active .ap-clear { margin-left: 6px; }
+
 .ap-clear {
   border: 0; background: none; cursor: pointer; font-family: var(--sans);
   font-size: 12.5px; font-weight: 600; color: var(--accent); padding: 0;
 }
 .ap-clear:hover { text-decoration: underline; }
-/* CSV export – pushed to the right, desktop only (hidden ≤1000px below) */
+/* CSV export – desktop only (hidden ≤1000px below) */
 .ap-export {
   margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
@@ -1922,7 +2000,6 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
   .tabs-inner { gap: 22px; }
   .cycle-insight { display: none; }
   .view-lede { font-size: 15.5px; }
-  .ap-segs { gap: 12px 18px; }
 }
 
 /* ============================================================
@@ -1959,8 +2036,8 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
   }
 
   /* quiet press acknowledgement on chip-like controls */
-  .legend-chip, .ls-chip, .cyc-chip, .ap-chip, .seg-btn { transition-property: color, border-color, background-color, opacity, transform; }
-  .legend-chip:active, .ls-chip:active, .cyc-chip:active, .ap-chip:active,
+  .legend-chip, .cyc-chip, .ap-popbtn, .seg-btn { transition-property: color, border-color, background-color, opacity, transform; }
+  .legend-chip:active, .cyc-chip:active, .ap-popbtn:active,
   .seg-btn:active, .exp-btn:active { transform: scale(0.965); }
   .exp-btn.open:active { transform: rotate(90deg) scale(0.965); }
 }
@@ -1986,7 +2063,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
    is near-invisible (nothing behind to blur); it comes alive where a control
    sits over content – above all the pinned tab bar as the page scrolls under. */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .segmented, .legend-chip, .ls-chip, .cyc-chip, .ap-chip, .ap-export {
+  .segmented, .legend-chip, .cyc-chip, .ap-popbtn, .ap-export {
     background: var(--glass-bg);
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
@@ -2754,8 +2831,7 @@ window.AP = (function () {
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();
 </script>
-  <script>function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
-/* auspol tracker – SVG chart toolkit (no libraries) */
+  <script>/* auspol tracker – SVG chart toolkit (no libraries) */
 
 /* Text measurement for label layout. The old estimate was
    chars * refUnits * 0.72, which over-reserved by 51-87% on the real event
@@ -2984,6 +3060,13 @@ function TrendChart(props) {
       return;
     }
     if (dot) setDotFrom(null, null);
+    // an annotation outranks the guide: the guide can be read anywhere along
+    // the month, the annotation only here
+    const ev = nearestEvent(p, EVT_PICK_PX);
+    if (ev) {
+      showEvent(ev);
+      return;
+    }
     if (!spinePts.length) return;
     showSpine(nearestSpine(p.x));
   };
@@ -3010,7 +3093,47 @@ function TrendChart(props) {
      to land inside that was never generous. */
   const TOUCH_PICK_PX = 22; // a fingertip
   const MOUSE_PICK_PX = 11; // near enough to mean it, small enough to leave the guide alone
+  const EVT_PICK_PX = 9; // the dashed rule; the label carries its own box
 
+  /* The same treatment for a key event, and for the same reason twice over.
+     It hung off onMouseEnter on the <g>, which put it behind the one browser
+     behaviour this file no longer trusts – and, worse, the root's own
+     pointermove ran on the way in and called showSpine(), which clears the
+     annotation. Enter set it, the next tremor of the mouse cleared it, so on a
+     laptop the panel could not be made to stay. Picked from the root there is
+     one code path and no race: an event under the pointer simply outranks the
+     month guide. */
+  const nearestEvent = (p, radiusPx) => {
+    if (!evPlaced.length) return null;
+    const rU = radiusPx / Math.max(scale, 0.0001);
+    let near = null,
+      nearD = Infinity;
+    for (const q of evPlaced) {
+      // the rule, from the label's baseline down to the axis
+      let d = p.y >= q.y - rU && p.y <= H - pad.b + rU ? Math.abs(p.x - q.ex) : Infinity;
+      // …and the label itself, a far bigger and more obvious target
+      if (q.row != null) {
+        const dx = p.x < q.x ? q.x - p.x : p.x > q.x + q.w ? p.x - (q.x + q.w) : 0;
+        const dy = p.y < q.y - q.fsz ? q.y - q.fsz - p.y : p.y > q.y + q.fsz * 0.3 ? p.y - (q.y + q.fsz * 0.3) : 0;
+        d = Math.min(d, Math.hypot(dx, dy));
+      }
+      if (d < nearD) {
+        nearD = d;
+        near = q;
+      }
+    }
+    return near && nearD <= rU ? near : null;
+  };
+  const showEvent = q => {
+    setHover(null);
+    setDotFrom(null, null);
+    onHoverIndex && onHoverIndex(null);
+    setEvt(cur => cur && cur.e === q.e ? cur : {
+      e: q.e,
+      x: q.ex,
+      y: q.y
+    });
+  };
   const nearestDot = (p, radiusPx) => {
     if (!scatter.length) return null;
     const rPx = radiusPx / Math.max(scale, 0.0001); // px -> user units
@@ -3042,9 +3165,19 @@ function TrendChart(props) {
       setEvt(null);
       setDotFrom("touch", near);
       onHoverIndex && onHoverIndex(null);
-    } else if (spinePts.length) {
-      showSpine(nearestSpine(p.x));
+      return;
     }
+    const ev = nearestEvent(p, TOUCH_PICK_PX);
+    if (ev) {
+      // tapping the open annotation closes it, exactly as tapping its poll does
+      if (e.type === "pointerdown" && evt && evt.e === ev.e) {
+        setEvt(null);
+        return;
+      }
+      showEvent(ev);
+      return;
+    }
+    if (spinePts.length) showSpine(nearestSpine(p.x));
   };
   const onPointerDown = e => {
     if (e.pointerType === "mouse") return;
@@ -3209,6 +3342,101 @@ function TrendChart(props) {
   /* What the live region says as the guide moves. Mirrors the visual tooltip,
      because the tooltip is positioned graphics a screen reader cannot follow. */
   const liveText = !tip ? "" : [tip.title, tip.date || "", ...(tip.rows || []).map(r => `${r.label} ${r.value}`), tip.sub || ""].filter(Boolean).join(", ");
+
+  /* ---- key events ---------------------------------------------------------
+     A busy set (the hero's history) shows only when the chart is genuinely
+     wide ON SCREEN (measured px, so phones and narrow columns stay
+     uncluttered); one or two markers are never clutter and show at any width.
+      Clustered events were the hard part: Farrer and the 2026 Budget sit 5.6
+     units apart in a 1000-unit viewBox while their labels are ~60 wide, so no
+     arrangement puts each label above its own line. Three things fix it
+     together:
+       - labels are DISPLACED along their row rather than dropped, so a
+         crowded one slides right until it fits;
+       - every label is tied to its line by an elbow – the line rises to the
+         label's baseline and runs across to meet the text, so a displaced
+         label still reads unambiguously as belonging to its own line;
+       - rows are packed first-fit rather than by index parity, which
+         previously sent alternate events to alternate rows regardless of
+         whether they were anywhere near each other.
+      Placed HERE rather than inside the JSX because two things read it: the
+     drawing below, and the pointer pick above – an annotation is now picked
+     from the svg root like everything else on this chart, which needs its
+     geometry in hand before an event arrives. */
+  const evPlaced = events.length <= 2 || cw >= 640 ? (() => {
+    const evs = events.filter(e => e.x >= xDomain[0] && e.x <= xDomain[1]).sort((a, b) => a.x - b.x);
+    const fsz = refUnits * 0.92;
+    const ROWS = 3;
+    const ROW_H = refUnits * 1.4;
+    const LEAD = refUnits * 0.55; // shortest elbow, line to text
+    const SEP = refUnits * 0.85; // clear air between labels in a row
+    const rowEnd = new Array(ROWS).fill(-Infinity);
+    const rightEdge = W - pad.r;
+    const rowY = r => r == null ? pad.t + 4 : pad.t + 3 + r * ROW_H;
+    return evs.map(e => {
+      const ex = sx(e.x);
+      const w = textWidth(e.short, fsz);
+      /* Pick the row where the label sits CLOSEST to its own line, not simply
+         the first row it fits in. First-fit looks right until you realise
+         displacement always succeeds in row 0 – so row 0 took every label and
+         the connectors stretched to 76 units, dragging "2026 Budget"
+         three-quarters of the way across its neighbour. Choosing by
+         displacement instead sends the second member of a cluster down a row,
+         where it sits directly over its own line. ROW_PEN keeps things in the
+         top row unless dropping down buys a real reduction, so we don't
+         scatter over three rows to save a unit or two. */
+      const ROW_PEN = refUnits * 0.3;
+      let best = null;
+      for (let r = 0; r < ROWS; r++) {
+        const x = Math.max(ex + LEAD, rowEnd[r] + SEP);
+        if (x + w > rightEdge) continue;
+        const cost = x - (ex + LEAD) + r * ROW_PEN;
+        if (best === null || cost < best.cost) best = {
+          r,
+          x,
+          cost
+        };
+      }
+      if (best) {
+        rowEnd[best.r] = best.x + w;
+        return {
+          e,
+          ex,
+          w,
+          fsz,
+          row: best.r,
+          y: rowY(best.r),
+          x: best.x,
+          flip: false
+        };
+      }
+      // out of room on the right – hang it to the left of its own line
+      for (let r = 0; r < ROWS; r++) {
+        const x = ex - LEAD - w;
+        if (x >= rowEnd[r] + SEP) {
+          rowEnd[r] = ex;
+          return {
+            e,
+            ex,
+            w,
+            fsz,
+            row: r,
+            y: rowY(r),
+            x,
+            flip: true
+          };
+        }
+      }
+      return {
+        e,
+        ex,
+        w,
+        fsz,
+        row: null,
+        y: rowY(null)
+      }; // genuinely nowhere to put it
+    });
+  })() : [];
   return /*#__PURE__*/React.createElement("div", {
     className: "chart",
     ref: ref
@@ -3291,175 +3519,84 @@ function TrendChart(props) {
       fontSize: axisUnits
     },
     textAnchor: "middle"
-  }, t.label)), (events.length <= 2 || cw >= 640) && (() => {
-    const evs = events.filter(e => e.x >= xDomain[0] && e.x <= xDomain[1]).sort((a, b) => a.x - b.x);
-    const fsz = refUnits * 0.92;
-    const ROWS = 3;
-    const ROW_H = refUnits * 1.4;
-    const LEAD = refUnits * 0.55; // shortest elbow, line to text
-    const SEP = refUnits * 0.85; // clear air between labels in a row
-    const rowEnd = new Array(ROWS).fill(-Infinity);
-    const rightEdge = W - pad.r;
-    const placed = evs.map(e => {
-      const ex = sx(e.x);
-      const w = textWidth(e.short, fsz);
-      /* Pick the row where the label sits CLOSEST to its own line, not
-         simply the first row it fits in. First-fit looks right until you
-         realise displacement always succeeds in row 0 – so row 0 took
-         every label and the connectors stretched to 76 units, dragging
-         "2026 Budget" three-quarters of the way across its neighbour.
-         Choosing by displacement instead sends the second member of a
-         cluster down a row, where it sits directly over its own line.
-         ROW_PEN keeps things in the top row unless dropping down buys a
-         real reduction, so we don't scatter over three rows to save a
-         unit or two. */
-      const ROW_PEN = refUnits * 0.3;
-      let best = null;
-      for (let r = 0; r < ROWS; r++) {
-        const x = Math.max(ex + LEAD, rowEnd[r] + SEP);
-        if (x + w > rightEdge) continue;
-        const cost = x - (ex + LEAD) + r * ROW_PEN;
-        if (best === null || cost < best.cost) best = {
-          r,
-          x,
-          cost
-        };
+  }, t.label)), evPlaced.map((p, i) => {
+    const {
+      e,
+      ex,
+      w,
+      fsz,
+      row,
+      y: yRow,
+      x,
+      flip
+    } = p;
+    /* aria-label rather than <title>: a <title> child also produces the
+       browser's own delayed tooltip, which would surface a second,
+       unstyled copy on top of ours. */
+    /* an event with no date formatted to "", leaving the name ending in a
+       dangling " · " - only reachable when an event is built by hand
+       rather than taken from the dataset, which is no longer done */
+    const aDate = fmtEventDate(e.date);
+    const aria = e.label + (e.desc ? " – " + e.desc : "") + (aDate ? " · " + aDate : "");
+    /* No pointer listeners of its own. Hover and tap are both picked
+       from the svg root, so the open annotation is state, and `on` is
+       what marks it – CSS :hover no longer has to agree with the pick to
+       keep the label lit. */
+    const cls = "evt" + (evt && evt.e === e ? " on" : "");
+    // no room for a label: the reference line still earns its place
+    if (row == null) return /*#__PURE__*/React.createElement("g", {
+      key: "ev" + i,
+      className: cls,
+      role: "img",
+      "aria-label": aria
+    }, /*#__PURE__*/React.createElement("line", {
+      x1: ex,
+      x2: ex,
+      y1: yRow,
+      y2: H - pad.b,
+      className: "evt-hit"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: ex,
+      x2: ex,
+      y1: yRow,
+      y2: H - pad.b,
+      className: "evt-line"
+    }));
+    const connTo = flip ? x + w + fsz * 0.24 : x - fsz * 0.24;
+    return /*#__PURE__*/React.createElement("g", {
+      key: "ev" + i,
+      className: cls,
+      role: "img",
+      "aria-label": aria
+    }, /*#__PURE__*/React.createElement("line", {
+      x1: ex,
+      x2: ex,
+      y1: yRow,
+      y2: H - pad.b,
+      className: "evt-hit"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: ex,
+      x2: ex,
+      y1: yRow,
+      y2: H - pad.b,
+      className: "evt-line"
+    }), /*#__PURE__*/React.createElement("line", {
+      x1: ex,
+      x2: connTo,
+      y1: yRow,
+      y2: yRow,
+      className: "evt-conn"
+    }), /*#__PURE__*/React.createElement("text", {
+      x: x,
+      y: yRow,
+      className: "evt-label",
+      textAnchor: "start",
+      style: {
+        fontSize: fsz,
+        strokeWidth: refUnits * 0.34
       }
-      if (best) {
-        rowEnd[best.r] = best.x + w;
-        return {
-          e,
-          ex,
-          w,
-          row: best.r,
-          x: best.x,
-          flip: false
-        };
-      }
-      // out of room on the right – hang it to the left of its own line
-      for (let r = 0; r < ROWS; r++) {
-        const x = ex - LEAD - w;
-        if (x >= rowEnd[r] + SEP) {
-          rowEnd[r] = ex;
-          return {
-            e,
-            ex,
-            w,
-            row: r,
-            x,
-            flip: true
-          };
-        }
-      }
-      return {
-        e,
-        ex,
-        w,
-        row: null
-      }; // genuinely nowhere to put it
-    });
-    return placed.map((p, i) => {
-      const {
-        e,
-        ex,
-        w,
-        row,
-        x,
-        flip
-      } = p;
-      /* aria-label rather than <title>: a <title> child also produces the
-         browser's own delayed tooltip, which would surface a second,
-         unstyled copy on top of ours. */
-      /* an event with no date formatted to "", leaving the name ending in a
-         dangling " · " - only reachable when an event is built by hand
-         rather than taken from the dataset, which is no longer done */
-      const aDate = fmtEventDate(e.date);
-      const aria = e.label + (e.desc ? " – " + e.desc : "") + (aDate ? " · " + aDate : "");
-      /* Hover for a mouse, tap for a finger. Without the pointerdown an
-         event annotation was mouse-only – the one thing on the chart a
-         phone could see but never read. Tapping one twice dismisses it.
-          The hover half stays on MOUSE enter/leave rather than the pointer
-         equivalents. These are the last per-element listeners on an SVG
-         child in this file, and enter/leave on SVG children is the exact
-         thing that appears to have gone dead on a laptop while touch kept
-         working. mouseenter/mouseleave predate the problem and every
-         browser fires them; there is nothing to gain here by using the
-         newer pair, since a finger is served by pointerdown below. */
-      const on = (px, py) => ({
-        onMouseEnter: () => setEvt({
-          e,
-          x: px,
-          y: py
-        }),
-        onMouseLeave: () => setEvt(null),
-        onPointerDown: ev => {
-          if (ev.pointerType === "mouse") return;
-          ev.stopPropagation(); // don't let the svg's pick overwrite it
-          setHover(null);
-          setDotFrom(null, null);
-          setEvt(cur => cur && cur.e === e ? null : {
-            e,
-            x: px,
-            y: py
-          });
-        }
-      });
-      // no room for a label: the reference line still earns its place
-      if (row == null) return /*#__PURE__*/React.createElement("g", _extends({
-        key: "ev" + i,
-        className: "evt",
-        role: "img",
-        "aria-label": aria
-      }, on(ex, pad.t + 4)), /*#__PURE__*/React.createElement("line", {
-        x1: ex,
-        x2: ex,
-        y1: pad.t + 4,
-        y2: H - pad.b,
-        className: "evt-hit"
-      }), /*#__PURE__*/React.createElement("line", {
-        x1: ex,
-        x2: ex,
-        y1: pad.t + 4,
-        y2: H - pad.b,
-        className: "evt-line"
-      }));
-      const yRow = pad.t + 3 + row * ROW_H;
-      const connTo = flip ? x + w + LEAD * 0.4 : x - LEAD * 0.4;
-      return /*#__PURE__*/React.createElement("g", _extends({
-        key: "ev" + i,
-        className: "evt",
-        role: "img",
-        "aria-label": aria
-      }, on(ex, yRow)), /*#__PURE__*/React.createElement("line", {
-        x1: ex,
-        x2: ex,
-        y1: yRow,
-        y2: H - pad.b,
-        className: "evt-hit"
-      }), /*#__PURE__*/React.createElement("line", {
-        x1: ex,
-        x2: ex,
-        y1: yRow,
-        y2: H - pad.b,
-        className: "evt-line"
-      }), /*#__PURE__*/React.createElement("line", {
-        x1: ex,
-        x2: connTo,
-        y1: yRow,
-        y2: yRow,
-        className: "evt-conn"
-      }), /*#__PURE__*/React.createElement("text", {
-        x: x,
-        y: yRow,
-        className: "evt-label",
-        textAnchor: "start",
-        style: {
-          fontSize: fsz,
-          strokeWidth: refUnits * 0.34
-        }
-      }, e.short));
-    });
-  })(), spinePts.length > 0 && /*#__PURE__*/React.createElement("line", {
+    }, e.short));
+  }), spinePts.length > 0 && /*#__PURE__*/React.createElement("line", {
     x1: 0,
     x2: 0,
     y1: pad.t,
@@ -4621,51 +4758,6 @@ const OPP_HANDOVER = (() => {
   } : null;
 })();
 
-// ---- Leadership: shared leader selector over two panels -------------
-// One control picks which leaders are in view; Preferred-PM and Net-approval
-// both reflect that set. The Coalition slot is an OFFICE ("Opposition leader")
-// because its series splices Ley → Taylor; Albanese and Hanson are named
-// because they are continuous individuals.
-function LeaderSelector({
-  leaders,
-  sel,
-  onToggle
-}) {
-  return /*#__PURE__*/React.createElement("div", {
-    className: "leader-select"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "ls-label"
-  }, "Leaders in view"), /*#__PURE__*/React.createElement("div", {
-    className: "ls-chips"
-  }, leaders.map(L => {
-    const on = sel.includes(L.id);
-    const last = on && sel.length === 1;
-    // Taylor and Hanson stand in for each other: picking one drops the
-    // other, because no poll puts the two of them against each other
-    const rival = L.id === "hanson" ? "taylor" : L.id === "taylor" ? "hanson" : null;
-    const swaps = !on && rival && sel.includes(rival);
-    return /*#__PURE__*/React.createElement("button", {
-      key: L.id,
-      type: "button",
-      className: "ls-chip" + (on ? " on" : ""),
-      style: on ? {
-        "--chip": L.color
-      } : null,
-      "aria-pressed": on,
-      disabled: last,
-      title: last ? "Keep at least one leader in view" : swaps ? "Taylor and Hanson are never polled against each other – this switches the preferred-PM matchup" : undefined,
-      onClick: () => onToggle(L.id)
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "ls-dot",
-      style: {
-        background: L.color
-      }
-    }), L.name, L.current ? /*#__PURE__*/React.createElement("span", {
-      className: "ls-cur"
-    }, " \xB7 ", L.current) : null);
-  })));
-}
-
 /* Expand / switch / minimise for the leadership pair. Rendered inside each
    card head, and only while the panels actually share a row – below the
    two-column breakpoint they're already full width, so the control would
@@ -4731,49 +4823,33 @@ function LeadershipSection({
   const {
     D
   } = window.AP;
-  // Albanese v Taylor is the question the whole cycle asks, so it opens here
-  const [sel, setSel] = useState(["alb", "taylor"]);
   /* pair  – preferred PM | net rating (default)
      ppm   – preferred PM full width
      appr  – net rating full width
      both  – approval | favourability, the two net measures side by side
      ppmboth – preferred PM two-way | three-way, the two questions side by side */
   const [view, setView] = useState("pair");
-  const order = D.LEADERS.map(L => L.id);
-  /* Turning a chip on picks a MATCHUP, not just another line. Hanson is only
-     ever polled against Albanese alone – nobody has asked Taylor v Hanson – so
-     selecting her drops Taylor, and selecting Taylor drops her. The three-way
-     contest is a third question again: it is entered from the panel's own
-     toggle, which names all three. */
-  const toggle = id => setSel(s => {
-    if (s.includes(id)) return s.length === 1 ? s : s.filter(x => x !== id);
-    const rival = id === "hanson" ? "taylor" : id === "taylor" ? "hanson" : null;
-    return order.filter(x => x !== rival && s.includes(x) || x === id);
-  });
-  const nameAll = () => setSel(order.slice()); // the three-way prompt
-  const namePair = () => setSel(["alb", "taylor"]);
-  // whichever two-way the chips currently describe – it is the left panel of
-  // the side-by-side view, where the format is fixed but the matchup is not
-  const twoWay = sel.includes("hanson") && !sel.includes("taylor") ? "ah" : "at";
-  const selLeaders = D.LEADERS.filter(L => sel.includes(L.id));
+  /* Both panels show every leader. A "leaders in view" chip row used to sit
+     here and gate them: it was a control for a problem the panels don't have –
+     three lines is not clutter, and the one thing it was really being asked to
+     express, WHICH preferred-PM contest is on screen, is a property of the
+     question rather than of who you feel like looking at. The panel states
+     that itself now. */
+  const leaders = D.LEADERS;
   return /*#__PURE__*/React.createElement("section", {
     className: "leadership"
   }, /*#__PURE__*/React.createElement("div", {
     className: "leadership-head"
   }, /*#__PURE__*/React.createElement("h2", {
     className: "section-h"
-  }, "Leadership"), /*#__PURE__*/React.createElement(LeaderSelector, {
-    leaders: D.LEADERS,
-    sel: sel,
-    onToggle: toggle
-  })), /*#__PURE__*/React.createElement("p", {
+  }, "Leadership")), /*#__PURE__*/React.createElement("p", {
     className: "leadership-note"
-  }, "The Coalition line splices leaders \u2013 ", /*#__PURE__*/React.createElement("strong", null, "Ley"), " led to February 2026, ", /*#__PURE__*/React.createElement("strong", null, "Taylor"), " since. Leadership questions run irregularly, so lines connect published readings."), /*#__PURE__*/React.createElement("div", {
+  }, "The Coalition line splices leaders \u2013 ", /*#__PURE__*/React.createElement("strong", null, "Ley"), " led to February 2026, ", /*#__PURE__*/React.createElement("strong", null, "Taylor"), " since. Leadership questions run irregularly, so lines connect published readings. Preferred PM is put to voters as two separate two-way contests \u2013 against the opposition leader, and against Hanson head to head \u2013 so both are drawn, the head-to-head dashed."), /*#__PURE__*/React.createElement("div", {
     className: "two-col lead-grid lg-" + view
   }, view === "both" ? /*#__PURE__*/React.createElement(ApprovalPanel, {
     key: "appr-net",
     rangeId: rangeId,
-    leaders: selLeaders,
+    leaders: leaders,
     metric: "net",
     lockMetric: true,
     chrome: /*#__PURE__*/React.createElement(PanelZoom, {
@@ -4784,17 +4860,12 @@ function LeadershipSection({
   }) : /*#__PURE__*/React.createElement(PreferredPMPanel, _extends({
     key: view === "ppmboth" ? "ppm-2" : "ppm",
     rangeId: rangeId,
-    leaders: selLeaders
+    leaders: leaders
   }, view === "ppmboth" ? {
-    mode: twoWay,
+    fmt: "2",
     lockFmt: true
   } : {
-    onBoth: () => {
-      nameAll();
-      setView("ppmboth");
-    },
-    onThreeWay: nameAll,
-    onTwoWay: namePair
+    onBoth: () => setView("ppmboth")
   }, {
     chrome: view === "ppmboth" ? /*#__PURE__*/React.createElement(PanelZoom, {
       expanded: true,
@@ -4811,8 +4882,8 @@ function LeadershipSection({
   })), view === "ppmboth" ? /*#__PURE__*/React.createElement(PreferredPMPanel, {
     key: "ppm-3",
     rangeId: rangeId,
-    leaders: selLeaders,
-    mode: "3",
+    leaders: leaders,
+    fmt: "3",
     lockFmt: true,
     chrome: /*#__PURE__*/React.createElement(PanelZoom, {
       expanded: true,
@@ -4822,7 +4893,7 @@ function LeadershipSection({
   }) : /*#__PURE__*/React.createElement(ApprovalPanel, _extends({
     key: view === "both" ? "appr-fav" : "appr",
     rangeId: rangeId,
-    leaders: selLeaders
+    leaders: leaders
   }, view === "both" ? {
     metric: "fav",
     lockMetric: true
@@ -4844,15 +4915,39 @@ function LeadershipSection({
 }
 
 // ---- Preferred PM ---------------------------------------------------
+/* The two-way question is not ONE contest. Pollsters put two of them to
+   voters – Albanese against the opposition leader (the whole cycle, 54 polls)
+   and Albanese against Hanson head to head (11 polls, Apr 2026 on) – and
+   Albanese runs ~7pp higher in the second. They cannot be averaged and they
+   cannot be alternated behind a control either, because the interesting thing
+   IS the pair: he leads Taylor by 4 and Hanson by 13.
+
+   So each contest is drawn as a CHANNEL: its two lines, with the gap between
+   them tinted in the opponent's colour. The gap is the lead, which is the one
+   quantity the two contests can honestly be compared on – a house that leaves
+   35% uncommitted depresses both of its shares, and that cancels in a margin.
+   Four lines would tangle; two channels don't, because the eye reads the band
+   rather than the strands. Albanese appears in both, so the head-to-head pair
+   is dashed: colour says who, dash says which contest. */
+const PPM_PAIRS = [{
+  id: "at",
+  suf: "_pref",
+  ids: ["alb", "taylor"],
+  lab: "Albanese v the opposition leader"
+}, {
+  id: "ah",
+  suf: "_prefH",
+  ids: ["alb", "hanson"],
+  lab: "Albanese v Hanson, head to head",
+  dashed: true
+}];
 function PreferredPMPanel({
   rangeId,
   leaders: allLeaders,
   chrome,
-  mode: modeProp,
+  fmt: fmtProp,
   lockFmt,
-  onBoth,
-  onThreeWay,
-  onTwoWay
+  onBoth
 }) {
   const {
     D,
@@ -4869,71 +4964,142 @@ function PreferredPMPanel({
      denominator — uncommitted runs 16% at Newspoll against 37% at Redbridge,
      and has drifted from 35% to 14% across the cycle. It was correcting the
      smaller distortion and adding a larger one.
-      Question format is the split that earns a toggle: two-way is the whole
-     cycle (54 polls, all 14 months), three-way is recent and partial (15
-     polls, 7 months), and blending them put a false trough in the line.
-      Three questions, then, not two – "at" Albanese v the opposition leader,
-     "ah" Albanese v Hanson head to head (11 polls, Apr 2026 on, and Albanese
-     runs far higher in it), "3" the three-way. Which one is on screen follows
-     the leaders in view, because the chips ARE the matchup; the toggle picks
-     the format and hands the selection back to the section. */
-  const ids = allLeaders.map(L => L.id);
-  const mode = modeProp || (ids.includes("hanson") ? ids.includes("taylor") ? "3" : "ah" : "at");
-  const fmt = mode === "3" ? "3" : "2";
-  // "Both" is a layout, not a fourth question — it hands the section a request
+      Question format is the split that earns a toggle: the two-way contests run
+     the whole cycle, three-way is recent and partial (15 polls, 7 months), and
+     blending them put a false trough in the line — June 2026 reads 37.3
+     blended against 42.5 among two-way polls alone, a trough that is question
+     design rather than opinion. */
+  const [ownFmt, setOwnFmt] = useState("2");
+  const fmt = fmtProp || ownFmt;
+  // "Both" is a layout, not a third question — it hands the section a request
   // to show the two formats side by side rather than averaging them
-  const setFmt = v => v === fmt ? null // "Two-way" is already the head-to-head
-  : v === "both" ? onBoth && onBoth() : v === "3" ? onThreeWay && onThreeWay() : onTwoWay && onTwoWay();
-  const suf = mode === "3" ? "_pref3" : mode === "ah" ? "_prefH" : "_pref";
-  // a name that isn't in the matchup would promise a line that cannot exist:
-  // Hanson outside the three-way and the head-to-head, Taylor inside it
-  const leaders = allLeaders.filter(L => mode === "3" ? true : mode === "ah" ? L.id !== "taylor" : L.id !== "hanson");
+  const setFmt = v => v === "both" ? onBoth && onBoth() : setOwnFmt(v);
+  const three = fmt === "3";
+  const byId = {};
+  allLeaders.forEach(L => {
+    byId[L.id] = L;
+  });
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.leaderMonths, xDomain[0]);
   const latestYm = D.leaderMonths[D.leaderMonths.length - 1].ym;
-  // each leader's latest published reading (pollsters skip leaders some months)
-  const reads = {};
-  leaders.forEach(L => {
-    reads[L.id] = lastReadings(D.leaderMonths, L.id + suf);
+
+  /* One row per line, in draw and read order. The three-way is a single
+     contest of three names; the two-way is two contests of two. */
+  const rows = three ? allLeaders.map(L => ({
+    pair: null,
+    L,
+    suf: "_pref3",
+    label: L.short
+  })) : PPM_PAIRS.flatMap(pr => pr.ids.map(id => ({
+    pair: pr,
+    L: byId[id],
+    suf: pr.suf,
+    dashed: !!pr.dashed,
+    // the tooltip lists every line at once, so the two Albaneses have to
+    // name their own contest there
+    label: id === "alb" && pr.id === "ah" ? "Albanese v Hanson" : byId[id].short
+  })));
+  rows.forEach(r => {
+    r.read = lastReadings(D.leaderMonths, r.L.id + r.suf);
   });
   // sitting PM (Albanese) is always shown first; the rest descend by preference
-  const ordered = [...leaders].sort((a, b) => {
-    if (a.id === "alb") return -1;
-    if (b.id === "alb") return 1;
-    return ((reads[b.id] || {}).v ?? -1) - ((reads[a.id] || {}).v ?? -1);
-  });
-  // the published readings behind the line
-  const ppmScatter = D.individualPolls.filter(p => p.x >= xDomain[0] && p.x <= xDomain[1])
-  // the dots must obey the same question filter as the line above them, and a
-  // poll that asked several contests contributes only the matching one
-  .map(p => ({
-    p,
-    c: ppmMatch(p, mode)
-  })).filter(d => d.c).flatMap(({
-    p,
-    c
-  }) => {
-    return leaders.map(L => {
+  const ordered = three ? [...rows].sort((a, b) => a.L.id === "alb" ? -1 : b.L.id === "alb" ? 1 : ((b.read || {}).v ?? -1) - ((a.read || {}).v ?? -1)) : rows;
+
+  // the published readings behind the lines, each dot from the contest it
+  // belongs to – a poll that asked two of them publishes both
+  const ppmScatter = D.individualPolls.filter(p => p.x >= xDomain[0] && p.x <= xDomain[1]).flatMap(p => (three ? [["3", allLeaders]] : PPM_PAIRS.map(pr => [pr.id, pr.ids.map(id => byId[id]), pr])).flatMap(([m, ls, pr]) => {
+    const c = ppmMatch(p, m);
+    if (!c) return [];
+    return ls.map(L => {
       // the opposition slot is an office: Ley's readings belong to the same
       // line as Taylor's, exactly as the trend splices them
       const raw = L.id === "taylor" ? c.taylor != null ? c.taylor : c.ley : c[L.id];
       if (raw == null) return null;
+      const lab = pr && pr.id === "ah" && L.id === "alb" ? "Albanese v Hanson" : L.short;
       return {
         x: p.x,
         y: raw,
         color: L.color,
-        label: L.short,
+        label: lab,
         meta: p
       };
     }).filter(Boolean);
-  });
+  }));
+
+  // the tinted gap between each contest's two lines: its lead, month by month
+  const areas = three ? [] : PPM_PAIRS.map(pr => {
+    const [a, b] = pr.ids;
+    const points = pts.map(d => {
+      const hi = d[a + pr.suf],
+        lo = d[b + pr.suf];
+      return hi == null || lo == null ? null : {
+        x: d.x,
+        y0: Math.min(hi, lo),
+        y1: Math.max(hi, lo)
+      };
+    }).filter(Boolean);
+    /* Tinted in the OPPONENT's colour, at an opacity low enough that it
+       reads as a gap rather than as an area chart of his share – which is the
+       one way this band could be misread, since the tint sits under his line. */
+    return points.length > 1 ? {
+      id: pr.id,
+      points,
+      color: byId[b].color,
+      opacity: 0.085,
+      edge: false
+    } : null;
+  }).filter(Boolean);
 
   // y-window fitted to the readings in view, scatter included
-  const prefVals = leaders.flatMap(L => D.leaderMonths.map(r => r[L.id + suf]).filter(v => v != null)).concat(ppmScatter.map(d => d.y));
+  const prefVals = rows.flatMap(r => D.leaderMonths.map(m => m[r.L.id + r.suf]).filter(v => v != null)).concat(ppmScatter.map(d => d.y));
   const {
     domain,
     ticks
   } = fitDomain(prefVals.length ? prefVals : [30, 50], 10);
+  const tiles = list => list.map(r => {
+    const rd = r.read;
+    const tag = rd && staleTag(rd.ym, latestYm);
+    return /*#__PURE__*/React.createElement("div", {
+      className: "leader",
+      key: (r.pair ? r.pair.id + "-" : "") + r.L.id
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "leader-dot",
+      style: {
+        background: r.L.color
+      }
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "leader-vals"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "leader-name"
+    }, r.L.short, tag && /*#__PURE__*/React.createElement("span", {
+      className: "stale-tag",
+      title: "Latest published reading · " + tag
+    }, " ", tag)), /*#__PURE__*/React.createElement("div", {
+      className: "leader-num"
+    }, rd ? rd.v : "—", rd && /*#__PURE__*/React.createElement("span", {
+      className: "pct"
+    }, "%"))), rd && rd.prev != null && /*#__PURE__*/React.createElement(Delta, {
+      value: rd.v - rd.prev,
+      suffix: "",
+      small: true,
+      title: readoutDeltaTitle(rd)
+    }));
+  });
+
+  /* The lead, taken from the last month BOTH names were asked in that contest
+     – which is not always the latest month, since the head-to-head is asked by
+     fewer houses. Stating it is the point of showing two contests at once. */
+  const leadOf = pr => {
+    for (let i = D.leaderMonths.length - 1; i >= 0; i--) {
+      const m = D.leaderMonths[i],
+        a = m[pr.ids[0] + pr.suf],
+        b = m[pr.ids[1] + pr.suf];
+      if (a == null || b == null) continue;
+      const d = Math.round(Math.abs(a - b));
+      return d === 0 ? "level" : byId[a > b ? pr.ids[0] : pr.ids[1]].short + " +" + d;
+    }
+    return null;
+  };
   return /*#__PURE__*/React.createElement("section", {
     className: "card"
   }, /*#__PURE__*/React.createElement("div", {
@@ -4942,7 +5108,7 @@ function PreferredPMPanel({
     className: "card-title"
   }, "Preferred prime minister"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, mode === "3" ? "“Who would make the better PM?” asked as a three-way, including Hanson" : mode === "ah" ? "“Who would make the better PM?” asked head to head, Albanese against Hanson" : "“Who would make the better PM?” asked as a two-way, Albanese against the opposition leader", mode === "ah" ? " · as published – Newspoll forces a choice where others leave up to a fifth uncommitted, so shares aren’t directly comparable" : " · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable")), /*#__PURE__*/React.createElement("div", {
+  }, three ? "“Who would make the better PM?” asked as a three-way, including Hanson" : "“Who would make the better PM?” asked as a two-way – both of the contests pollsters run", three ? " · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable" : " · as published – uncommitted runs from none, in Newspoll’s head-to-head, to half the sample, so shares aren’t directly comparable")), /*#__PURE__*/React.createElement("div", {
     className: "card-head-tools"
   }, !lockFmt && /*#__PURE__*/React.createElement(TextToggle, {
     caps: true,
@@ -4959,38 +5125,28 @@ function PreferredPMPanel({
       id: "both",
       label: "Both"
     }] : [])]
-  }), chrome)), /*#__PURE__*/React.createElement("div", {
+  }), chrome)), three ? /*#__PURE__*/React.createElement("div", {
     className: "leader-readout"
-  }, ordered.map(L => {
-    const r = reads[L.id];
-    const tag = r && staleTag(r.ym, latestYm);
-    return /*#__PURE__*/React.createElement("div", {
-      className: "leader",
-      key: L.id
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "leader-dot",
-      style: {
-        background: L.color
-      }
-    }), /*#__PURE__*/React.createElement("div", {
-      className: "leader-vals"
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "leader-name"
-    }, L.short, tag && /*#__PURE__*/React.createElement("span", {
-      className: "stale-tag",
-      title: "Latest published reading · " + tag
-    }, " ", tag)), /*#__PURE__*/React.createElement("div", {
-      className: "leader-num"
-    }, r ? r.v : "—", r && /*#__PURE__*/React.createElement("span", {
-      className: "pct"
-    }, "%"))), r && r.prev != null && /*#__PURE__*/React.createElement(Delta, {
-      value: r.v - r.prev,
-      suffix: "",
-      small: true,
-      title: readoutDeltaTitle(r)
-    }));
-  })), /*#__PURE__*/React.createElement(TrendChart, {
-    key: "ppm-" + mode + "-" + rangeId + "-" + leaders.map(L => L.id).join("."),
+  }, tiles(ordered)) :
+  /*#__PURE__*/
+  /* grouped by contest, because four tiles in one row would read as one
+     four-cornered race and two of them are the same man */
+  React.createElement("div", {
+    className: "ppm-pairs"
+  }, PPM_PAIRS.map(pr => /*#__PURE__*/React.createElement("div", {
+    className: "ppm-pair" + (pr.dashed ? " dashed" : ""),
+    key: pr.id
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ppm-pair-lab"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "ppm-rule",
+    "aria-hidden": "true"
+  }), pr.lab, leadOf(pr) && /*#__PURE__*/React.createElement("span", {
+    className: "ppm-lead"
+  }, leadOf(pr))), /*#__PURE__*/React.createElement("div", {
+    className: "leader-readout"
+  }, tiles(rows.filter(r => r.pair === pr)))))), /*#__PURE__*/React.createElement(TrendChart, {
+    key: "ppm-" + fmt + "-" + rangeId,
     height: 250,
     xDomain: xDomain,
     yDomain: domain,
@@ -5004,12 +5160,14 @@ function PreferredPMPanel({
       b: 42
     },
     xTicks: buildXTicks(xDomain[0], xDomain[1]),
-    events: leaders.some(L => L.id === "taylor") ? [OPP_HANDOVER].filter(Boolean) : [],
-    series: ordered.map(L => ({
-      id: L.id,
-      label: L.short,
-      color: L.color,
-      points: seriesNN(pts, L.id + suf)
+    events: [OPP_HANDOVER].filter(Boolean),
+    areas: areas,
+    series: ordered.map(r => ({
+      id: (r.pair ? r.pair.id + "-" : "") + r.L.id,
+      label: r.label,
+      color: r.L.color,
+      dashed: r.dashed,
+      points: seriesNN(pts, r.L.id + r.suf)
     })),
     spine: pts.map(d => ({
       x: d.x
@@ -7682,6 +7840,127 @@ function pollTagIds(p) {
   return t;
 }
 
+/* ---- filter bar ----------------------------------------------------------
+   The archive is the most multifaceted thing here: 149 polls from 17 houses,
+   each publishing a different subset of nine measures. The controls for that
+   used to sit on screen ALL AT ONCE – a search box, seventeen pollster chips
+   over two rows, four time buttons, nine data-type chips, three matchups and
+   three lead-holders: thirty-six controls stacked four rows deep before the
+   first poll. Everything was reachable and nothing was findable, and the one
+   thing you could never see was which of the thirty-six were actually on.
+
+   So the surface is inverted. One row at rest – search, and a button per
+   FACET of the question ("who ran it", "when", "what's in it"). Each opens a
+   panel with the options and, beside each option, how many polls it would
+   leave given everything else already set. What IS on shows underneath as
+   removable pills, which is the only state a reader has to keep in their head.
+
+   A popover is a listbox, not a dialog: click outside or press Escape to
+   close, and focus goes back to the button that opened it. */
+function FilterPop({
+  id,
+  label,
+  summary,
+  open,
+  setOpen,
+  children
+}) {
+  const box = useRef(null),
+    panel = useRef(null);
+  const isOpen = open === id;
+  const [flip, setFlip] = useState(false);
+  React.useEffect(() => {
+    if (!isOpen) {
+      setFlip(false);
+      return;
+    }
+    const onDown = e => {
+      if (box.current && !box.current.contains(e.target)) setOpen(null);
+    };
+    const onKey = e => {
+      if (e.key !== "Escape") return;
+      e.stopPropagation();
+      setOpen(null);
+      const b = box.current && box.current.querySelector(".ap-popbtn");
+      if (b) b.focus();
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [isOpen]);
+  // a panel that would hang off the right edge hangs off its button's right
+  // edge instead – measured, because which button that is depends on the width
+  React.useLayoutEffect(() => {
+    if (!isOpen || !panel.current) return;
+    const r = panel.current.getBoundingClientRect();
+    if (r.right > window.innerWidth - 8) setFlip(true);
+  }, [isOpen]);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "ap-pop",
+    ref: box
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "ap-popbtn" + (summary ? " on" : "") + (isOpen ? " open" : ""),
+    "aria-expanded": isOpen,
+    "aria-haspopup": "true",
+    onClick: () => setOpen(isOpen ? null : id)
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "ap-popbtn-lab"
+  }, label), summary && /*#__PURE__*/React.createElement("span", {
+    className: "ap-popbtn-val"
+  }, summary), /*#__PURE__*/React.createElement("svg", {
+    className: "ap-caret",
+    viewBox: "0 0 24 24",
+    width: "11",
+    height: "11",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2.5",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M6 9l6 6 6-6"
+  }))), isOpen && /*#__PURE__*/React.createElement("div", {
+    className: "ap-panel" + (flip ? " flip" : ""),
+    ref: panel,
+    role: "group",
+    "aria-label": label
+  }, children));
+}
+/* One option row, whether it behaves as a checkbox (pollsters, data types) or
+   a radio (time). The count is what makes the panel worth opening: it is
+   computed against every OTHER active filter, so it answers "how many polls
+   would this leave", not "how many exist somewhere". */
+function PopRow({
+  on,
+  radio,
+  label,
+  note,
+  n,
+  onClick
+}) {
+  return /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "ap-check" + (on ? " on" : "") + (radio ? " radio" : ""),
+    role: radio ? "radio" : "checkbox",
+    "aria-checked": on,
+    onClick: onClick
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "ap-tick",
+    "aria-hidden": "true"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "ap-check-lab"
+  }, label, note && /*#__PURE__*/React.createElement("span", {
+    className: "ap-check-note"
+  }, note)), n != null && /*#__PURE__*/React.createElement("span", {
+    className: "ap-check-n"
+  }, n));
+}
+
 // ====================================================================
 // VariancePanel – how far apart the polls sit, against the spread that
 // sampling error alone would produce.  One panel per archive facet, so
@@ -7891,7 +8170,14 @@ function AllPollsView() {
     dir: -1
   });
   const [facet, setFacet] = useState("twopp");
-  const [open, setOpen] = useState(null);
+  const [open, setOpen] = useState(null); // expanded ROW
+  const [pop, setPop] = useState(null); // open filter popover
+  /* Each view hides the columns it can't fill; it should hide the ROWS it
+     can't fill too. Two thirds of the archive publishes no direction reading,
+     and the old table answered "Direction" with 95 rows of dashes and left the
+     reader to discover the Contains filter. So the view arms that filter
+     itself – as a visible, removable pill, not a hidden default. */
+  const [scope, setScope] = useState(true);
   const toggleTag = id => setTagSel(s => {
     const n = new Set(s);
     n.has(id) ? n.delete(id) : n.add(id);
@@ -7900,6 +8186,23 @@ function AllPollsView() {
   const onMeasure = mv => {
     setMeasure(mv);
     setLead("all");
+  };
+  /* What each view needs a poll to have published. Primary vote is on every
+     poll in the archive, so it has nothing to scope and gets no pill. */
+  const FACET_SCOPE = {
+    twopp: {
+      has: p => p.alp != null || p.tppAlt || p.tppAlt2 || p.tpp3,
+      label: "With a 2PP"
+    },
+    primary: null,
+    leadership: {
+      has: p => window.ppmContests(p).length > 0 || p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null),
+      label: "With leadership numbers"
+    },
+    direction: {
+      has: p => !!p.dir,
+      label: "With a direction reading"
+    }
   };
   const FACETS = [{
     id: "twopp",
@@ -7921,6 +8224,8 @@ function AllPollsView() {
       dir: -1
     });
     setOpen(null);
+    setPop(null);
+    setScope(true);
     // the matchup/ahead pair describes the 2PP lead column – it is hidden
     // outside that facet, so its filter must not keep biting invisibly
     if (f !== "twopp") {
@@ -7989,18 +8294,43 @@ function AllPollsView() {
   const latestX = D.mx(D.MONTHS[D.MONTHS.length - 1]);
   const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
   const ql = q.trim().toLowerCase();
-  const filtered = rows.filter(p => {
-    if (sel.size && !sel.has(p.pollster)) return false;
-    // tag filter: a row must contain EVERY selected data type (AND)
-    if (tagSel.size && ![...tagSel].every(tg => p.tags.includes(tg))) return false;
-    if (lead !== "all") {
-      const li = archLeadInfo(p, measure);
-      if (!li || li.who !== lead) return false;
-    }
-    if (range !== "all" && p.x < x0) return false;
-    if (ql && !ql.split(/\s+/).every(t => p.hay.includes(t))) return false;
-    return true;
+
+  /* One predicate per filter, kept as a list rather than inlined, so the
+     panels can ask the question the numbers beside each option answer: how
+     many polls would this leave, given everything else already set. That means
+     counting with exactly one predicate lifted out – `without(f)`. */
+  const scoping = scope && FACET_SCOPE[facet];
+  const TESTS = [["who", p => !sel.size || sel.has(p.pollster)],
+  // a row must contain EVERY selected data type (AND)
+  ["has", p => !tagSel.size || [...tagSel].every(tg => p.tags.includes(tg))], ["lead", p => {
+    if (lead === "all") return true;
+    const li = archLeadInfo(p, measure);
+    return !!li && li.who === lead;
+  }], ["when", p => range === "all" || p.x >= x0], ["q", p => !ql || ql.split(/\s+/).every(t => p.hay.includes(t))], ["scope", p => !scoping || scoping.has(p)]];
+  const passing = (p, skip) => TESTS.every(([k, f]) => k === skip || f(p));
+  const filtered = rows.filter(p => passing(p, null));
+  const without = skip => rows.filter(p => passing(p, skip));
+
+  // option counts, each against every other filter
+  const houseRows = without("who");
+  const houseN = {};
+  houseRows.forEach(p => {
+    houseN[p.pollster] = (houseN[p.pollster] || 0) + 1;
   });
+  const tagRows = without("has");
+  const tagN = {};
+  tagRows.forEach(p => p.tags.forEach(t => {
+    tagN[t] = (tagN[t] || 0) + 1;
+  }));
+  const whenRows = without("when");
+  const rangeN = r => r === "all" ? whenRows.length : whenRows.filter(p => p.x >= latestX - Number(r) / 12 - 0.06).length;
+  /* Ranked by how much a house polls, not alphabetically: Roy Morgan has 42
+     waves here and Agenda C Synesis one, and an A–Z list buries the names a
+     reader is looking for among the ones they have never heard of. Ranked by
+     the count IN VIEW, which doesn't reshuffle under the reader's hand –
+     selecting a pollster can't change a number computed with the pollster
+     filter lifted out, so the order only moves when another panel does. */
+  const houseRank = [...houses].sort((a, b) => (houseN[b] || 0) - (houseN[a] || 0) || a.localeCompare(b));
   const getVal = (p, key) => {
     switch (key) {
       case "date":
@@ -8061,10 +8391,62 @@ function AllPollsView() {
     setMeasure("lnp");
     setRange("all");
     setTagSel(new Set());
+    setScope(false);
+    setPop(null);
   };
   // Boolean(): the chain ends on a Set size, so with no filters this was the
   // NUMBER 0 – and {0 && <button/>} renders a literal 0 next to the poll count.
   const anyFilter = Boolean(ql || sel.size || lead !== "all" || range !== "all" || tagSel.size);
+
+  /* What is currently on, as removable pills. The scope pill is marked `auto`
+     – dashed, quieter – because the view set it, not the reader. */
+  const RANGE_LAB = {
+    "12": "Last 12 months",
+    "6": "Last 6 months",
+    "3": "Last 3 months"
+  };
+  const MEASURE_LAB = {
+    lnp: "ALP v L/NP",
+    onp: "ALP v ON",
+    lnponp: "L/NP v ON"
+  };
+  const HOLDER_LAB = {
+    alp: "ALP",
+    lnp: "L/NP",
+    onp: "ON"
+  };
+  const pills = [];
+  if (ql) pills.push({
+    k: "q",
+    lab: "“" + q.trim() + "”",
+    off: () => setQ("")
+  });
+  [...sel].forEach(h => pills.push({
+    k: "h" + h,
+    lab: h,
+    off: () => toggleHouse(h)
+  }));
+  if (range !== "all") pills.push({
+    k: "r",
+    lab: RANGE_LAB[range],
+    off: () => setRange("all")
+  });
+  [...tagSel].forEach(t => pills.push({
+    k: "t" + t,
+    lab: (POLL_TAG_META[t] || {}).label || t,
+    off: () => toggleTag(t)
+  }));
+  if (lead !== "all") pills.push({
+    k: "l",
+    lab: HOLDER_LAB[lead] + " ahead",
+    off: () => setLead("all")
+  });
+  if (scoping) pills.push({
+    k: "s",
+    lab: scoping.label,
+    auto: true,
+    off: () => setScope(false)
+  });
 
   // ---- CSV export of the CURRENTLY filtered + sorted rows -----------------
   // A flat, analysis-friendly schema (one row per poll), independent of the
@@ -8107,7 +8489,7 @@ function AllPollsView() {
     ariaLabel: "Archive table view",
     caps: true
   })), /*#__PURE__*/React.createElement("div", {
-    className: "ap-filters"
+    className: "ap-bar"
   }, /*#__PURE__*/React.createElement("div", {
     className: "ap-search"
   }, /*#__PURE__*/React.createElement("svg", {
@@ -8129,118 +8511,114 @@ function AllPollsView() {
     type: "text",
     value: q,
     onChange: e => setQ(e.target.value),
-    placeholder: "Search anything \u2013 pollster, date, figure\u2026",
+    placeholder: "Search anything\u2026",
     "aria-label": "Search polls"
   }), q && /*#__PURE__*/React.createElement("button", {
     className: "ap-search-x",
     onClick: () => setQ(""),
     "aria-label": "Clear search"
-  }, "\xD7")), /*#__PURE__*/React.createElement("div", {
-    className: "ap-chips",
-    role: "group",
-    "aria-label": "Filter by pollster"
-  }, houses.map(h => /*#__PURE__*/React.createElement("button", {
-    key: h,
-    type: "button",
-    className: "ap-chip" + (sel.has(h) ? " on" : ""),
-    "aria-pressed": sel.has(h),
-    onClick: () => toggleHouse(h)
-  }, h))), /*#__PURE__*/React.createElement("div", {
-    className: "ap-segs"
+  }, "\xD7")), /*#__PURE__*/React.createElement(FilterPop, {
+    id: "who",
+    label: "Pollster",
+    open: pop,
+    setOpen: setPop,
+    summary: sel.size === 0 ? null : sel.size === 1 ? [...sel][0] : sel.size + " selected"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "ap-seg-group"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "ap-seg-label"
-  }, "Since"), /*#__PURE__*/React.createElement(Segmented, {
-    size: "sm",
-    value: range,
-    onChange: setRange,
-    ariaLabel: "Since",
-    options: [{
-      id: "all",
-      label: "All"
-    }, {
-      id: "12",
-      label: "12m"
-    }, {
-      id: "6",
-      label: "6m"
-    }, {
-      id: "3",
-      label: "3m"
-    }]
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "ap-seg-group ap-tag-group",
-    role: "group",
-    "aria-label": "Filter by data contained"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "ap-seg-label"
-  }, "Contains"), shownTags.map(t => /*#__PURE__*/React.createElement("button", {
-    key: t.id,
-    type: "button",
-    className: "ap-chip ptag-chip t-" + t.id + (tagSel.has(t.id) ? " on" : ""),
-    "aria-pressed": tagSel.has(t.id),
-    title: t.title,
-    onClick: () => toggleTag(t.id)
-  }, t.label))), facet === "twopp" && /*#__PURE__*/React.createElement("div", {
-    className: "ap-seg-group ap-lead-group",
-    role: "group",
-    "aria-label": "Lead column matchup and leader"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "ap-seg-label"
-  }, "Lead"), /*#__PURE__*/React.createElement(Segmented, {
-    size: "sm",
-    value: measure,
-    onChange: onMeasure,
-    ariaLabel: "Lead column matchup",
-    options: [{
-      id: "lnp",
-      label: "ALP v L/NP"
-    }, {
-      id: "onp",
-      label: "ALP v ON"
-    }, {
-      id: "lnponp",
-      label: "L/NP v ON"
-    }]
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "ap-seg-join"
-  }, "held by"), /*#__PURE__*/React.createElement(Segmented, {
-    size: "sm",
-    value: lead,
-    onChange: setLead,
-    ariaLabel: "Lead held by",
-    options: [{
-      id: "all",
-      label: "Any"
-    }].concat({
-      lnp: ["alp", "lnp"],
-      onp: ["alp", "onp"],
-      lnponp: ["lnp", "onp"]
-    }[measure].map(id => ({
-      id,
-      label: {
-        alp: "ALP",
-        lnp: "L/NP",
-        onp: "ON"
-      }[id]
-    })))
-  })))), /*#__PURE__*/React.createElement("div", {
-    className: "ap-resultline"
-  }, /*#__PURE__*/React.createElement("span", null, /*#__PURE__*/React.createElement("strong", null, sorted.length), " ", sorted.length === 1 ? "poll" : "polls", anyFilter ? " match" : "", measure !== "lnp" && facet === "twopp" && (() => {
-    const names = {
-      onp: "ALP v One Nation matchup",
-      lnponp: "L/NP v One Nation matchup",
-      "3cp": "3-cornered preferred"
-    };
-    const n = rows.filter(r => archLeadInfo(r, measure)).length;
-    return /*#__PURE__*/React.createElement("span", {
-      className: "ap-resultnote"
-    }, " \xB7 lead column shows the ", names[measure], " (", n, " polls published one)");
-  })()), anyFilter && /*#__PURE__*/React.createElement("button", {
+    className: "ap-pop-head"
+  }, /*#__PURE__*/React.createElement("span", null, houses.length, " pollsters"), sel.size > 0 && /*#__PURE__*/React.createElement("button", {
     className: "ap-clear",
-    onClick: clearAll
-  }, "Clear filters"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setSel(new Set())
+  }, "Clear")), /*#__PURE__*/React.createElement("div", {
+    className: "ap-poplist"
+  }, houseRank.map(h => /*#__PURE__*/React.createElement(PopRow, {
+    key: h,
+    on: sel.has(h),
+    label: h,
+    n: houseN[h] || 0,
+    onClick: () => toggleHouse(h)
+  })))), /*#__PURE__*/React.createElement(FilterPop, {
+    id: "when",
+    label: "Time",
+    open: pop,
+    setOpen: setPop,
+    summary: range === "all" ? null : RANGE_LAB[range]
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ap-poplist"
+  }, [["all", "Any time"], ["12", "Last 12 months"], ["6", "Last 6 months"], ["3", "Last 3 months"]].map(([id, lab]) => /*#__PURE__*/React.createElement(PopRow, {
+    key: id,
+    radio: true,
+    on: range === id,
+    label: lab,
+    n: rangeN(id),
+    onClick: () => setRange(id)
+  })))), /*#__PURE__*/React.createElement(FilterPop, {
+    id: "has",
+    label: "Contains",
+    open: pop,
+    setOpen: setPop,
+    summary: tagSel.size === 0 ? null : tagSel.size === 1 ? (POLL_TAG_META[[...tagSel][0]] || {}).label : tagSel.size + " measures"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ap-pop-head"
+  }, /*#__PURE__*/React.createElement("span", null, "What the poll published"), tagSel.size > 0 && /*#__PURE__*/React.createElement("button", {
+    className: "ap-clear",
+    onClick: () => setTagSel(new Set())
+  }, "Clear")), /*#__PURE__*/React.createElement("div", {
+    className: "ap-poplist"
+  }, shownTags.map(t => /*#__PURE__*/React.createElement(PopRow, {
+    key: t.id,
+    on: tagSel.has(t.id),
+    label: t.label,
+    note: t.title,
+    n: tagN[t.id] || 0,
+    onClick: () => toggleTag(t.id)
+  }))), /*#__PURE__*/React.createElement("p", {
+    className: "ap-pop-foot"
+  }, "Selecting two asks for polls carrying both.")), facet === "twopp" && /*#__PURE__*/React.createElement(FilterPop, {
+    id: "lead",
+    label: "Lead",
+    open: pop,
+    setOpen: setPop,
+    summary: [measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ap-pop-head"
+  }, /*#__PURE__*/React.createElement("span", null, "Show the lead in")), /*#__PURE__*/React.createElement("div", {
+    className: "ap-poplist"
+  }, ["lnp", "onp", "lnponp"].map(m => /*#__PURE__*/React.createElement(PopRow, {
+    key: m,
+    radio: true,
+    on: measure === m,
+    label: MEASURE_LAB[m],
+    n: rows.filter(r => archLeadInfo(r, m)).length,
+    onClick: () => onMeasure(m)
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "ap-pop-head bordered"
+  }, /*#__PURE__*/React.createElement("span", null, "Held by")), /*#__PURE__*/React.createElement("div", {
+    className: "ap-poplist"
+  }, [{
+    id: "all",
+    label: "Either"
+  }].concat({
+    lnp: ["alp", "lnp"],
+    onp: ["alp", "onp"],
+    lnponp: ["lnp", "onp"]
+  }[measure].map(id => ({
+    id,
+    label: HOLDER_LAB[id]
+  }))).map(o => /*#__PURE__*/React.createElement(PopRow, {
+    key: o.id,
+    radio: true,
+    on: lead === o.id,
+    label: o.label,
+    n: o.id === "all" ? without("lead").length : without("lead").filter(r => {
+      const li = archLeadInfo(r, measure);
+      return li && li.who === o.id;
+    }).length,
+    onClick: () => setLead(o.id)
+  })))), /*#__PURE__*/React.createElement("div", {
+    className: "ap-bar-end"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "ap-count"
+  }, /*#__PURE__*/React.createElement("strong", null, sorted.length), sorted.length !== total ? " of " + total : "", " ", sorted.length === 1 ? "poll" : "polls"), /*#__PURE__*/React.createElement("button", {
     className: "ap-export",
     onClick: exportCsv,
     title: "Download these rows as CSV \u2013 exactly the current filters and order",
@@ -8257,7 +8635,19 @@ function AllPollsView() {
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("path", {
     d: "M12 3v12M12 15l-4-4M12 15l4-4M4 19h16"
-  })), "Export CSV")), /*#__PURE__*/React.createElement("div", {
+  })), "Export CSV"))), pills.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "ap-active"
+  }, pills.map(f => /*#__PURE__*/React.createElement("span", {
+    key: f.k,
+    className: "ap-pill" + (f.auto ? " auto" : "")
+  }, f.lab, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: f.off,
+    "aria-label": "Remove filter: " + f.lab
+  }, "\xD7"))), pills.length > 1 && /*#__PURE__*/React.createElement("button", {
+    className: "ap-clear",
+    onClick: clearAll
+  }, "Clear all")), /*#__PURE__*/React.createElement("div", {
     className: "table-wrap ap-wrap"
   }, /*#__PURE__*/React.createElement("table", {
     className: "poll-table archive"

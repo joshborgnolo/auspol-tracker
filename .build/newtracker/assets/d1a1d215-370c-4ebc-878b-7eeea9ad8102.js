@@ -820,6 +820,79 @@ function pollTagIds(p) {
   return t;
 }
 
+/* ---- filter bar ----------------------------------------------------------
+   The archive is the most multifaceted thing here: 149 polls from 17 houses,
+   each publishing a different subset of nine measures. The controls for that
+   used to sit on screen ALL AT ONCE – a search box, seventeen pollster chips
+   over two rows, four time buttons, nine data-type chips, three matchups and
+   three lead-holders: thirty-six controls stacked four rows deep before the
+   first poll. Everything was reachable and nothing was findable, and the one
+   thing you could never see was which of the thirty-six were actually on.
+
+   So the surface is inverted. One row at rest – search, and a button per
+   FACET of the question ("who ran it", "when", "what's in it"). Each opens a
+   panel with the options and, beside each option, how many polls it would
+   leave given everything else already set. What IS on shows underneath as
+   removable pills, which is the only state a reader has to keep in their head.
+
+   A popover is a listbox, not a dialog: click outside or press Escape to
+   close, and focus goes back to the button that opened it. */
+function FilterPop({ id, label, summary, open, setOpen, children }) {
+  const box = useRef(null), panel = useRef(null);
+  const isOpen = open === id;
+  const [flip, setFlip] = useState(false);
+  React.useEffect(() => {
+    if (!isOpen) { setFlip(false); return; }
+    const onDown = (e) => { if (box.current && !box.current.contains(e.target)) setOpen(null); };
+    const onKey = (e) => {
+      if (e.key !== "Escape") return;
+      e.stopPropagation();
+      setOpen(null);
+      const b = box.current && box.current.querySelector(".ap-popbtn");
+      if (b) b.focus();
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
+  }, [isOpen]);
+  // a panel that would hang off the right edge hangs off its button's right
+  // edge instead – measured, because which button that is depends on the width
+  React.useLayoutEffect(() => {
+    if (!isOpen || !panel.current) return;
+    const r = panel.current.getBoundingClientRect();
+    if (r.right > window.innerWidth - 8) setFlip(true);
+  }, [isOpen]);
+  return (
+    <div className="ap-pop" ref={box}>
+      <button type="button" className={"ap-popbtn" + (summary ? " on" : "") + (isOpen ? " open" : "")}
+              aria-expanded={isOpen} aria-haspopup="true"
+              onClick={() => setOpen(isOpen ? null : id)}>
+        <span className="ap-popbtn-lab">{label}</span>
+        {summary && <span className="ap-popbtn-val">{summary}</span>}
+        <svg className="ap-caret" viewBox="0 0 24 24" width="11" height="11" fill="none"
+             stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </button>
+      {isOpen && <div className={"ap-panel" + (flip ? " flip" : "")} ref={panel} role="group" aria-label={label}>{children}</div>}
+    </div>
+  );
+}
+/* One option row, whether it behaves as a checkbox (pollsters, data types) or
+   a radio (time). The count is what makes the panel worth opening: it is
+   computed against every OTHER active filter, so it answers "how many polls
+   would this leave", not "how many exist somewhere". */
+function PopRow({ on, radio, label, note, n, onClick }) {
+  return (
+    <button type="button" className={"ap-check" + (on ? " on" : "") + (radio ? " radio" : "")}
+            role={radio ? "radio" : "checkbox"} aria-checked={on} onClick={onClick}>
+      <span className="ap-tick" aria-hidden="true"></span>
+      <span className="ap-check-lab">{label}{note && <span className="ap-check-note">{note}</span>}</span>
+      {n != null && <span className="ap-check-n">{n}</span>}
+    </button>
+  );
+}
+
 // ====================================================================
 // VariancePanel – how far apart the polls sit, against the spread that
 // sampling error alone would produce.  One panel per archive facet, so
@@ -966,9 +1039,24 @@ function AllPollsView() {
   const [tagSel, setTagSel] = useState(new Set()); // data-content tags; empty = all
   const [sort, setSort] = useState({ key: "date", dir: -1 });
   const [facet, setFacet] = useState("twopp");
-  const [open, setOpen] = useState(null);
+  const [open, setOpen] = useState(null);     // expanded ROW
+  const [pop, setPop] = useState(null);       // open filter popover
+  /* Each view hides the columns it can't fill; it should hide the ROWS it
+     can't fill too. Two thirds of the archive publishes no direction reading,
+     and the old table answered "Direction" with 95 rows of dashes and left the
+     reader to discover the Contains filter. So the view arms that filter
+     itself – as a visible, removable pill, not a hidden default. */
+  const [scope, setScope] = useState(true);
   const toggleTag = (id) => setTagSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const onMeasure = (mv) => { setMeasure(mv); setLead("all"); };
+  /* What each view needs a poll to have published. Primary vote is on every
+     poll in the archive, so it has nothing to scope and gets no pill. */
+  const FACET_SCOPE = {
+    twopp: { has: (p) => p.alp != null || p.tppAlt || p.tppAlt2 || p.tpp3, label: "With a 2PP" },
+    primary: null,
+    leadership: { has: (p) => window.ppmContests(p).length > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null)), label: "With leadership numbers" },
+    direction: { has: (p) => !!p.dir, label: "With a direction reading" },
+  };
   const FACETS = [
     { id: "twopp", label: "2PP" },
     { id: "primary", label: "Primary" },
@@ -976,7 +1064,7 @@ function AllPollsView() {
     { id: "direction", label: "Direction" },
   ];
   const onFacet = (f) => {
-    setFacet(f); setSort({ key: "date", dir: -1 }); setOpen(null);
+    setFacet(f); setSort({ key: "date", dir: -1 }); setOpen(null); setPop(null); setScope(true);
     // the matchup/ahead pair describes the 2PP lead column – it is hidden
     // outside that facet, so its filter must not keep biting invisibly
     if (f !== "twopp") { setLead("all"); setMeasure("lnp"); }
@@ -1037,18 +1125,41 @@ function AllPollsView() {
   const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
   const ql = q.trim().toLowerCase();
 
-  const filtered = rows.filter((p) => {
-    if (sel.size && !sel.has(p.pollster)) return false;
-    // tag filter: a row must contain EVERY selected data type (AND)
-    if (tagSel.size && ![...tagSel].every((tg) => p.tags.includes(tg))) return false;
-    if (lead !== "all") {
-      const li = archLeadInfo(p, measure);
-      if (!li || li.who !== lead) return false;
-    }
-    if (range !== "all" && p.x < x0) return false;
-    if (ql && !ql.split(/\s+/).every((t) => p.hay.includes(t))) return false;
-    return true;
-  });
+  /* One predicate per filter, kept as a list rather than inlined, so the
+     panels can ask the question the numbers beside each option answer: how
+     many polls would this leave, given everything else already set. That means
+     counting with exactly one predicate lifted out – `without(f)`. */
+  const scoping = scope && FACET_SCOPE[facet];
+  const TESTS = [
+    ["who", (p) => !sel.size || sel.has(p.pollster)],
+    // a row must contain EVERY selected data type (AND)
+    ["has", (p) => !tagSel.size || [...tagSel].every((tg) => p.tags.includes(tg))],
+    ["lead", (p) => { if (lead === "all") return true; const li = archLeadInfo(p, measure); return !!li && li.who === lead; }],
+    ["when", (p) => range === "all" || p.x >= x0],
+    ["q", (p) => !ql || ql.split(/\s+/).every((t) => p.hay.includes(t))],
+    ["scope", (p) => !scoping || scoping.has(p)],
+  ];
+  const passing = (p, skip) => TESTS.every(([k, f]) => k === skip || f(p));
+  const filtered = rows.filter((p) => passing(p, null));
+  const without = (skip) => rows.filter((p) => passing(p, skip));
+
+  // option counts, each against every other filter
+  const houseRows = without("who");
+  const houseN = {};
+  houseRows.forEach((p) => { houseN[p.pollster] = (houseN[p.pollster] || 0) + 1; });
+  const tagRows = without("has");
+  const tagN = {};
+  tagRows.forEach((p) => p.tags.forEach((t) => { tagN[t] = (tagN[t] || 0) + 1; }));
+  const whenRows = without("when");
+  const rangeN = (r) => (r === "all" ? whenRows.length
+    : whenRows.filter((p) => p.x >= latestX - Number(r) / 12 - 0.06).length);
+  /* Ranked by how much a house polls, not alphabetically: Roy Morgan has 42
+     waves here and Agenda C Synesis one, and an A–Z list buries the names a
+     reader is looking for among the ones they have never heard of. Ranked by
+     the count IN VIEW, which doesn't reshuffle under the reader's hand –
+     selecting a pollster can't change a number computed with the pollster
+     filter lifted out, so the order only moves when another panel does. */
+  const houseRank = [...houses].sort((a, b) => (houseN[b] || 0) - (houseN[a] || 0) || a.localeCompare(b));
 
   const getVal = (p, key) => {
     switch (key) {
@@ -1083,10 +1194,26 @@ function AllPollsView() {
   });
 
   const total = rows.length;
-  const clearAll = () => { setQ(""); setSel(new Set()); setLead("all"); setMeasure("lnp"); setRange("all"); setTagSel(new Set()); };
+  const clearAll = () => {
+    setQ(""); setSel(new Set()); setLead("all"); setMeasure("lnp"); setRange("all");
+    setTagSel(new Set()); setScope(false); setPop(null);
+  };
   // Boolean(): the chain ends on a Set size, so with no filters this was the
   // NUMBER 0 – and {0 && <button/>} renders a literal 0 next to the poll count.
   const anyFilter = Boolean(ql || sel.size || lead !== "all" || range !== "all" || tagSel.size);
+
+  /* What is currently on, as removable pills. The scope pill is marked `auto`
+     – dashed, quieter – because the view set it, not the reader. */
+  const RANGE_LAB = { "12": "Last 12 months", "6": "Last 6 months", "3": "Last 3 months" };
+  const MEASURE_LAB = { lnp: "ALP v L/NP", onp: "ALP v ON", lnponp: "L/NP v ON" };
+  const HOLDER_LAB = { alp: "ALP", lnp: "L/NP", onp: "ON" };
+  const pills = [];
+  if (ql) pills.push({ k: "q", lab: "“" + q.trim() + "”", off: () => setQ("") });
+  [...sel].forEach((h) => pills.push({ k: "h" + h, lab: h, off: () => toggleHouse(h) }));
+  if (range !== "all") pills.push({ k: "r", lab: RANGE_LAB[range], off: () => setRange("all") });
+  [...tagSel].forEach((t) => pills.push({ k: "t" + t, lab: (POLL_TAG_META[t] || {}).label || t, off: () => toggleTag(t) }));
+  if (lead !== "all") pills.push({ k: "l", lab: HOLDER_LAB[lead] + " ahead", off: () => setLead("all") });
+  if (scoping) pills.push({ k: "s", lab: scoping.label, auto: true, off: () => setScope(false) });
 
   // ---- CSV export of the CURRENTLY filtered + sorted rows -----------------
   // A flat, analysis-friendly schema (one row per poll), independent of the
@@ -1146,84 +1273,110 @@ function AllPollsView() {
           ariaLabel="Archive table view" caps />
       </div>
 
-      <div className="ap-filters">
+      <div className="ap-bar">
         <div className="ap-search">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
                strokeWidth="2" strokeLinecap="round" aria-hidden="true">
             <circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path>
           </svg>
           <input type="text" value={q} onChange={(e) => setQ(e.target.value)}
-                 placeholder="Search anything – pollster, date, figure…" aria-label="Search polls" />
+                 placeholder="Search anything…" aria-label="Search polls" />
           {q && <button className="ap-search-x" onClick={() => setQ("")} aria-label="Clear search">×</button>}
         </div>
 
-        <div className="ap-chips" role="group" aria-label="Filter by pollster">
-          {houses.map((h) => (
-            <button key={h} type="button"
-                    className={"ap-chip" + (sel.has(h) ? " on" : "")}
-                    aria-pressed={sel.has(h)} onClick={() => toggleHouse(h)}>{h}</button>
-          ))}
-        </div>
-
-        <div className="ap-segs">
-          <div className="ap-seg-group">
-            <span className="ap-seg-label">Since</span>
-            <Segmented size="sm" value={range} onChange={setRange} ariaLabel="Since"
-              options={[{ id: "all", label: "All" }, { id: "12", label: "12m" }, { id: "6", label: "6m" }, { id: "3", label: "3m" }]} />
+        <FilterPop id="who" label="Pollster" open={pop} setOpen={setPop}
+          summary={sel.size === 0 ? null : sel.size === 1 ? [...sel][0] : sel.size + " selected"}>
+          <div className="ap-pop-head">
+            <span>{houses.length} pollsters</span>
+            {sel.size > 0 && <button className="ap-clear" onClick={() => setSel(new Set())}>Clear</button>}
           </div>
-          <div className="ap-seg-group ap-tag-group" role="group" aria-label="Filter by data contained">
-            <span className="ap-seg-label">Contains</span>
-            {shownTags.map((t) => (
-              <button key={t.id} type="button"
-                      className={"ap-chip ptag-chip t-" + t.id + (tagSel.has(t.id) ? " on" : "")}
-                      aria-pressed={tagSel.has(t.id)} title={t.title}
-                      onClick={() => toggleTag(t.id)}>{t.label}</button>
+          <div className="ap-poplist">
+            {houseRank.map((h) => (
+              <PopRow key={h} on={sel.has(h)} label={h} n={houseN[h] || 0} onClick={() => toggleHouse(h)} />
             ))}
           </div>
-          {facet === "twopp" && (
-            <div className="ap-seg-group ap-lead-group" role="group" aria-label="Lead column matchup and leader">
-              <span className="ap-seg-label">Lead</span>
-              {/* matchups on offer = what the pollsters actually publish; no
-                  tracked pollster releases a 3-cornered preferred, so that
-                  option is gone until one appears in the data */}
-              <Segmented size="sm" value={measure} onChange={onMeasure} ariaLabel="Lead column matchup"
-                options={[
-                  { id: "lnp", label: "ALP v L/NP" },
-                  { id: "onp", label: "ALP v ON" },
-                  { id: "lnponp", label: "L/NP v ON" },
-                ]} />
-              <span className="ap-seg-join">held by</span>
-              <Segmented size="sm" value={lead} onChange={setLead} ariaLabel="Lead held by"
-                options={[{ id: "all", label: "Any" }].concat(
-                  ({ lnp: ["alp", "lnp"], onp: ["alp", "onp"], lnponp: ["lnp", "onp"] })[measure]
-                    .map((id) => ({ id, label: { alp: "ALP", lnp: "L/NP", onp: "ON" }[id] })))} />
+        </FilterPop>
+
+        <FilterPop id="when" label="Time" open={pop} setOpen={setPop}
+          summary={range === "all" ? null : RANGE_LAB[range]}>
+          <div className="ap-poplist">
+            {[["all", "Any time"], ["12", "Last 12 months"], ["6", "Last 6 months"], ["3", "Last 3 months"]].map(([id, lab]) => (
+              <PopRow key={id} radio on={range === id} label={lab} n={rangeN(id)} onClick={() => setRange(id)} />
+            ))}
+          </div>
+        </FilterPop>
+
+        <FilterPop id="has" label="Contains" open={pop} setOpen={setPop}
+          summary={tagSel.size === 0 ? null : tagSel.size === 1 ? (POLL_TAG_META[[...tagSel][0]] || {}).label : tagSel.size + " measures"}>
+          <div className="ap-pop-head">
+            <span>What the poll published</span>
+            {tagSel.size > 0 && <button className="ap-clear" onClick={() => setTagSel(new Set())}>Clear</button>}
+          </div>
+          <div className="ap-poplist">
+            {shownTags.map((t) => (
+              <PopRow key={t.id} on={tagSel.has(t.id)} label={t.label} note={t.title}
+                      n={tagN[t.id] || 0} onClick={() => toggleTag(t.id)} />
+            ))}
+          </div>
+          <p className="ap-pop-foot">Selecting two asks for polls carrying both.</p>
+        </FilterPop>
+
+        {/* The lead column is a 2PP idea, so its controls live and die with
+            that view – and they are one button, because choosing the matchup
+            and filtering by who holds it are the same thought. */}
+        {facet === "twopp" && (
+          <FilterPop id="lead" label="Lead" open={pop} setOpen={setPop}
+            summary={[measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
+            <div className="ap-pop-head"><span>Show the lead in</span></div>
+            <div className="ap-poplist">
+              {["lnp", "onp", "lnponp"].map((m) => (
+                <PopRow key={m} radio on={measure === m} label={MEASURE_LAB[m]}
+                        n={rows.filter((r) => archLeadInfo(r, m)).length} onClick={() => onMeasure(m)} />
+              ))}
             </div>
-          )}
+            <div className="ap-pop-head bordered"><span>Held by</span></div>
+            <div className="ap-poplist">
+              {[{ id: "all", label: "Either" }].concat(
+                ({ lnp: ["alp", "lnp"], onp: ["alp", "onp"], lnponp: ["lnp", "onp"] })[measure]
+                  .map((id) => ({ id, label: HOLDER_LAB[id] }))).map((o) => (
+                <PopRow key={o.id} radio on={lead === o.id} label={o.label}
+                        n={o.id === "all" ? without("lead").length
+                           : without("lead").filter((r) => { const li = archLeadInfo(r, measure); return li && li.who === o.id; }).length}
+                        onClick={() => setLead(o.id)} />
+              ))}
+            </div>
+          </FilterPop>
+        )}
+
+        <div className="ap-bar-end">
+          <span className="ap-count">
+            <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + total : ""} {sorted.length === 1 ? "poll" : "polls"}
+          </span>
+          {/* big screens only – a spreadsheet export is a desktop task, and the
+              button would crowd the narrow filter stack on phones */}
+          <button className="ap-export" onClick={exportCsv}
+                  title="Download these rows as CSV – exactly the current filters and order"
+                  aria-label={"Export " + sorted.length + " polls as CSV"}>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 3v12M12 15l-4-4M12 15l4-4M4 19h16"></path>
+            </svg>
+            Export CSV
+          </button>
         </div>
       </div>
 
-      <div className="ap-resultline">
-        <span>
-          <strong>{sorted.length}</strong> {sorted.length === 1 ? "poll" : "polls"}{anyFilter ? " match" : ""}
-          {measure !== "lnp" && facet === "twopp" && (() => {
-            const names = { onp: "ALP v One Nation matchup", lnponp: "L/NP v One Nation matchup", "3cp": "3-cornered preferred" };
-            const n = rows.filter((r) => archLeadInfo(r, measure)).length;
-            return <span className="ap-resultnote"> · lead column shows the {names[measure]} ({n} polls published one)</span>;
-          })()}
-        </span>
-        {anyFilter && <button className="ap-clear" onClick={clearAll}>Clear filters</button>}
-        {/* big screens only – a spreadsheet export is a desktop task, and the
-            button would crowd the narrow filter stack on phones */}
-        <button className="ap-export" onClick={exportCsv}
-                title="Download these rows as CSV – exactly the current filters and order"
-                aria-label={"Export " + sorted.length + " polls as CSV"}>
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
-               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M12 3v12M12 15l-4-4M12 15l4-4M4 19h16"></path>
-          </svg>
-          Export CSV
-        </button>
-      </div>
+      {pills.length > 0 && (
+        <div className="ap-active">
+          {pills.map((f) => (
+            <span key={f.k} className={"ap-pill" + (f.auto ? " auto" : "")}>
+              {f.lab}
+              <button type="button" onClick={f.off} aria-label={"Remove filter: " + f.lab}>×</button>
+            </span>
+          ))}
+          {pills.length > 1 && <button className="ap-clear" onClick={clearAll}>Clear all</button>}
+        </div>
+      )}
 
       <div className="table-wrap ap-wrap">
         <table className="poll-table archive">

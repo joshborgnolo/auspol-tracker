@@ -264,42 +264,6 @@ const OPP_HANDOVER = (() => {
   return e ? { ...e, short: "Ley → Taylor" } : null;
 })();
 
-// ---- Leadership: shared leader selector over two panels -------------
-// One control picks which leaders are in view; Preferred-PM and Net-approval
-// both reflect that set. The Coalition slot is an OFFICE ("Opposition leader")
-// because its series splices Ley → Taylor; Albanese and Hanson are named
-// because they are continuous individuals.
-function LeaderSelector({ leaders, sel, onToggle }) {
-  return (
-    <div className="leader-select">
-      <span className="ls-label">Leaders in view</span>
-      <div className="ls-chips">
-        {leaders.map((L) => {
-          const on = sel.includes(L.id);
-          const last = on && sel.length === 1;
-          // Taylor and Hanson stand in for each other: picking one drops the
-          // other, because no poll puts the two of them against each other
-          const rival = L.id === "hanson" ? "taylor" : L.id === "taylor" ? "hanson" : null;
-          const swaps = !on && rival && sel.includes(rival);
-          return (
-            <button key={L.id} type="button"
-                    className={"ls-chip" + (on ? " on" : "")}
-                    style={on ? { "--chip": L.color } : null}
-                    aria-pressed={on} disabled={last}
-                    title={last ? "Keep at least one leader in view"
-                         : swaps ? "Taylor and Hanson are never polled against each other – this switches the preferred-PM matchup"
-                                 : undefined}
-                    onClick={() => onToggle(L.id)}>
-              <span className="ls-dot" style={{ background: L.color }}></span>
-              {L.name}{L.current ? <span className="ls-cur"> · {L.current}</span> : null}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 /* Expand / switch / minimise for the leadership pair. Rendered inside each
    card head, and only while the panels actually share a row – below the
    two-column breakpoint they're already full width, so the control would
@@ -331,57 +295,42 @@ function PanelZoom({ expanded, onExpand, onSwap, onClose, label, otherLabel }) {
 
 function LeadershipSection({ rangeId }) {
   const { D } = window.AP;
-  // Albanese v Taylor is the question the whole cycle asks, so it opens here
-  const [sel, setSel] = useState(["alb", "taylor"]);
   /* pair  – preferred PM | net rating (default)
      ppm   – preferred PM full width
      appr  – net rating full width
      both  – approval | favourability, the two net measures side by side
      ppmboth – preferred PM two-way | three-way, the two questions side by side */
   const [view, setView] = useState("pair");
-  const order = D.LEADERS.map((L) => L.id);
-  /* Turning a chip on picks a MATCHUP, not just another line. Hanson is only
-     ever polled against Albanese alone – nobody has asked Taylor v Hanson – so
-     selecting her drops Taylor, and selecting Taylor drops her. The three-way
-     contest is a third question again: it is entered from the panel's own
-     toggle, which names all three. */
-  const toggle = (id) =>
-    setSel((s) => {
-      if (s.includes(id)) return s.length === 1 ? s : s.filter((x) => x !== id);
-      const rival = id === "hanson" ? "taylor" : id === "taylor" ? "hanson" : null;
-      return order.filter((x) => (x !== rival && s.includes(x)) || x === id);
-    });
-  const nameAll = () => setSel(order.slice());        // the three-way prompt
-  const namePair = () => setSel(["alb", "taylor"]);
-  // whichever two-way the chips currently describe – it is the left panel of
-  // the side-by-side view, where the format is fixed but the matchup is not
-  const twoWay = sel.includes("hanson") && !sel.includes("taylor") ? "ah" : "at";
-  const selLeaders = D.LEADERS.filter((L) => sel.includes(L.id));
+  /* Both panels show every leader. A "leaders in view" chip row used to sit
+     here and gate them: it was a control for a problem the panels don't have –
+     three lines is not clutter, and the one thing it was really being asked to
+     express, WHICH preferred-PM contest is on screen, is a property of the
+     question rather than of who you feel like looking at. The panel states
+     that itself now. */
+  const leaders = D.LEADERS;
   return (
     <section className="leadership">
       <div className="leadership-head">
         <h2 className="section-h">Leadership</h2>
-        <LeaderSelector leaders={D.LEADERS} sel={sel} onToggle={toggle} />
       </div>
       <p className="leadership-note">
         The Coalition line splices leaders – <strong>Ley</strong> led to February 2026, <strong>Taylor</strong> since.
         Leadership questions run irregularly, so lines connect published readings.
+        Preferred PM is put to voters as two separate two-way contests – against the opposition
+        leader, and against Hanson head to head – so both are drawn, the head-to-head dashed.
       </p>
       {/* Both children stay mounted while a column collapses to 0fr, so the
           grid can animate rather than the panel popping out of existence.
           `both` swaps the left child for a second net-rating panel. */}
       <div className={"two-col lead-grid lg-" + view}>
         {view === "both" ? (
-          <ApprovalPanel key="appr-net" rangeId={rangeId} leaders={selLeaders}
+          <ApprovalPanel key="appr-net" rangeId={rangeId} leaders={leaders}
             metric="net" lockMetric
             chrome={<PanelZoom expanded label="approval" onClose={() => setView("pair")} />} />
         ) : (
           <PreferredPMPanel key={view === "ppmboth" ? "ppm-2" : "ppm"}
-            rangeId={rangeId} leaders={selLeaders}
-            {...(view === "ppmboth"
-                  ? { mode: twoWay, lockFmt: true }
-                  : { onBoth: () => { nameAll(); setView("ppmboth"); },
-                      onThreeWay: nameAll, onTwoWay: namePair })}
+            rangeId={rangeId} leaders={leaders}
+            {...(view === "ppmboth" ? { fmt: "2", lockFmt: true } : { onBoth: () => setView("ppmboth") })}
             chrome={view === "ppmboth"
               ? <PanelZoom expanded label="two-way" onClose={() => setView("pair")} />
               : <PanelZoom expanded={view === "ppm"} label="preferred prime minister"
@@ -390,12 +339,12 @@ function LeadershipSection({ rangeId }) {
                   onClose={() => setView("pair")} />} />
         )}
         {view === "ppmboth" ? (
-          <PreferredPMPanel key="ppm-3" rangeId={rangeId} leaders={selLeaders}
-            mode="3" lockFmt
+          <PreferredPMPanel key="ppm-3" rangeId={rangeId} leaders={leaders}
+            fmt="3" lockFmt
             chrome={<PanelZoom expanded label="three-way" onClose={() => setView("pair")} />} />
         ) : (
           <ApprovalPanel key={view === "both" ? "appr-fav" : "appr"}
-            rangeId={rangeId} leaders={selLeaders}
+            rangeId={rangeId} leaders={leaders}
             {...(view === "both" ? { metric: "fav", lockMetric: true } : {})}
             onBoth={() => setView("both")}
             chrome={view === "both"
@@ -411,7 +360,26 @@ function LeadershipSection({ rangeId }) {
 }
 
 // ---- Preferred PM ---------------------------------------------------
-function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, mode: modeProp, lockFmt, onBoth, onThreeWay, onTwoWay }) {
+/* The two-way question is not ONE contest. Pollsters put two of them to
+   voters – Albanese against the opposition leader (the whole cycle, 54 polls)
+   and Albanese against Hanson head to head (11 polls, Apr 2026 on) – and
+   Albanese runs ~7pp higher in the second. They cannot be averaged and they
+   cannot be alternated behind a control either, because the interesting thing
+   IS the pair: he leads Taylor by 4 and Hanson by 13.
+
+   So each contest is drawn as a CHANNEL: its two lines, with the gap between
+   them tinted in the opponent's colour. The gap is the lead, which is the one
+   quantity the two contests can honestly be compared on – a house that leaves
+   35% uncommitted depresses both of its shares, and that cancels in a margin.
+   Four lines would tangle; two channels don't, because the eye reads the band
+   rather than the strands. Albanese appears in both, so the head-to-head pair
+   is dashed: colour says who, dash says which contest. */
+const PPM_PAIRS = [
+  { id: "at", suf: "_pref",  ids: ["alb", "taylor"], lab: "Albanese v the opposition leader" },
+  { id: "ah", suf: "_prefH", ids: ["alb", "hanson"], lab: "Albanese v Hanson, head to head", dashed: true },
+];
+
+function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, lockFmt, onBoth }) {
   const { D, rangeDomain, filterPts, buildXTicks } = window.AP;
   /* Only the published figure is plotted. A "share of decided" basis used to
      sit here, on the reasoning that dividing by the people who named someone
@@ -423,73 +391,115 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, mode: modeProp
      and has drifted from 35% to 14% across the cycle. It was correcting the
      smaller distortion and adding a larger one.
 
-     Question format is the split that earns a toggle: two-way is the whole
-     cycle (54 polls, all 14 months), three-way is recent and partial (15
-     polls, 7 months), and blending them put a false trough in the line.
-
-     Three questions, then, not two – "at" Albanese v the opposition leader,
-     "ah" Albanese v Hanson head to head (11 polls, Apr 2026 on, and Albanese
-     runs far higher in it), "3" the three-way. Which one is on screen follows
-     the leaders in view, because the chips ARE the matchup; the toggle picks
-     the format and hands the selection back to the section. */
-  const ids = allLeaders.map((L) => L.id);
-  const mode = modeProp || (ids.includes("hanson") ? (ids.includes("taylor") ? "3" : "ah") : "at");
-  const fmt = mode === "3" ? "3" : "2";
-  // "Both" is a layout, not a fourth question — it hands the section a request
+     Question format is the split that earns a toggle: the two-way contests run
+     the whole cycle, three-way is recent and partial (15 polls, 7 months), and
+     blending them put a false trough in the line — June 2026 reads 37.3
+     blended against 42.5 among two-way polls alone, a trough that is question
+     design rather than opinion. */
+  const [ownFmt, setOwnFmt] = useState("2");
+  const fmt = fmtProp || ownFmt;
+  // "Both" is a layout, not a third question — it hands the section a request
   // to show the two formats side by side rather than averaging them
-  const setFmt = (v) => (v === fmt ? null                    // "Two-way" is already the head-to-head
-                       : v === "both" ? onBoth && onBoth()
-                       : v === "3" ? onThreeWay && onThreeWay()
-                       : onTwoWay && onTwoWay());
-  const suf = mode === "3" ? "_pref3" : mode === "ah" ? "_prefH" : "_pref";
-  // a name that isn't in the matchup would promise a line that cannot exist:
-  // Hanson outside the three-way and the head-to-head, Taylor inside it
-  const leaders = allLeaders.filter((L) => (mode === "3" ? true : mode === "ah" ? L.id !== "taylor" : L.id !== "hanson"));
+  const setFmt = (v) => (v === "both" ? onBoth && onBoth() : setOwnFmt(v));
+  const three = fmt === "3";
+  const byId = {};
+  allLeaders.forEach((L) => { byId[L.id] = L; });
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.leaderMonths, xDomain[0]);
   const latestYm = D.leaderMonths[D.leaderMonths.length - 1].ym;
-  // each leader's latest published reading (pollsters skip leaders some months)
-  const reads = {};
-  leaders.forEach((L) => { reads[L.id] = lastReadings(D.leaderMonths, L.id + suf); });
+
+  /* One row per line, in draw and read order. The three-way is a single
+     contest of three names; the two-way is two contests of two. */
+  const rows = three
+    ? allLeaders.map((L) => ({ pair: null, L, suf: "_pref3", label: L.short }))
+    : PPM_PAIRS.flatMap((pr) => pr.ids.map((id) => ({
+        pair: pr, L: byId[id], suf: pr.suf, dashed: !!pr.dashed,
+        // the tooltip lists every line at once, so the two Albaneses have to
+        // name their own contest there
+        label: id === "alb" && pr.id === "ah" ? "Albanese v Hanson" : byId[id].short,
+      })));
+  rows.forEach((r) => { r.read = lastReadings(D.leaderMonths, r.L.id + r.suf); });
   // sitting PM (Albanese) is always shown first; the rest descend by preference
-  const ordered = [...leaders].sort((a, b) => {
-    if (a.id === "alb") return -1;
-    if (b.id === "alb") return 1;
-    return ((reads[b.id] || {}).v ?? -1) - ((reads[a.id] || {}).v ?? -1);
-  });
-  // the published readings behind the line
+  const ordered = three
+    ? [...rows].sort((a, b) => (a.L.id === "alb" ? -1 : b.L.id === "alb" ? 1 : ((b.read || {}).v ?? -1) - ((a.read || {}).v ?? -1)))
+    : rows;
+
+  // the published readings behind the lines, each dot from the contest it
+  // belongs to – a poll that asked two of them publishes both
   const ppmScatter = D.individualPolls
     .filter((p) => p.x >= xDomain[0] && p.x <= xDomain[1])
-    // the dots must obey the same question filter as the line above them, and a
-    // poll that asked several contests contributes only the matching one
-    .map((p) => ({ p, c: ppmMatch(p, mode) }))
-    .filter((d) => d.c)
-    .flatMap(({ p, c }) => {
-      return leaders.map((L) => {
-        // the opposition slot is an office: Ley's readings belong to the same
-        // line as Taylor's, exactly as the trend splices them
-        const raw = L.id === "taylor" ? (c.taylor != null ? c.taylor : c.ley) : c[L.id];
-        if (raw == null) return null;
-        return { x: p.x, y: raw, color: L.color, label: L.short, meta: p };
-      }).filter(Boolean);
-    });
+    .flatMap((p) => (three ? [["3", allLeaders]] : PPM_PAIRS.map((pr) => [pr.id, pr.ids.map((id) => byId[id]), pr]))
+      .flatMap(([m, ls, pr]) => {
+        const c = ppmMatch(p, m);
+        if (!c) return [];
+        return ls.map((L) => {
+          // the opposition slot is an office: Ley's readings belong to the same
+          // line as Taylor's, exactly as the trend splices them
+          const raw = L.id === "taylor" ? (c.taylor != null ? c.taylor : c.ley) : c[L.id];
+          if (raw == null) return null;
+          const lab = pr && pr.id === "ah" && L.id === "alb" ? "Albanese v Hanson" : L.short;
+          return { x: p.x, y: raw, color: L.color, label: lab, meta: p };
+        }).filter(Boolean);
+      }));
+
+  // the tinted gap between each contest's two lines: its lead, month by month
+  const areas = three ? [] : PPM_PAIRS.map((pr) => {
+    const [a, b] = pr.ids;
+    const points = pts.map((d) => {
+      const hi = d[a + pr.suf], lo = d[b + pr.suf];
+      return hi == null || lo == null ? null : { x: d.x, y0: Math.min(hi, lo), y1: Math.max(hi, lo) };
+    }).filter(Boolean);
+    /* Tinted in the OPPONENT's colour, at an opacity low enough that it
+       reads as a gap rather than as an area chart of his share – which is the
+       one way this band could be misread, since the tint sits under his line. */
+    return points.length > 1 ? { id: pr.id, points, color: byId[b].color, opacity: 0.085, edge: false } : null;
+  }).filter(Boolean);
 
   // y-window fitted to the readings in view, scatter included
-  const prefVals = leaders.flatMap((L) => D.leaderMonths.map((r) => r[L.id + suf]).filter((v) => v != null))
+  const prefVals = rows.flatMap((r) => D.leaderMonths.map((m) => m[r.L.id + r.suf]).filter((v) => v != null))
     .concat(ppmScatter.map((d) => d.y));
   const { domain, ticks } = fitDomain(prefVals.length ? prefVals : [30, 50], 10);
+
+  const tiles = (list) => list.map((r) => {
+    const rd = r.read;
+    const tag = rd && staleTag(rd.ym, latestYm);
+    return (
+      <div className="leader" key={(r.pair ? r.pair.id + "-" : "") + r.L.id}>
+        <div className="leader-dot" style={{ background: r.L.color }}></div>
+        {/* named so the narrow-screen grid can place it – see .leader-vals */}
+        <div className="leader-vals">
+          <div className="leader-name">{r.L.short}{tag && <span className="stale-tag" title={"Latest published reading · " + tag}> {tag}</span>}</div>
+          <div className="leader-num">{rd ? rd.v : "—"}{rd && <span className="pct">%</span>}</div>
+        </div>
+        {rd && rd.prev != null && <Delta value={rd.v - rd.prev} suffix="" small title={readoutDeltaTitle(rd)} />}
+      </div>
+    );
+  });
+
+  /* The lead, taken from the last month BOTH names were asked in that contest
+     – which is not always the latest month, since the head-to-head is asked by
+     fewer houses. Stating it is the point of showing two contests at once. */
+  const leadOf = (pr) => {
+    for (let i = D.leaderMonths.length - 1; i >= 0; i--) {
+      const m = D.leaderMonths[i], a = m[pr.ids[0] + pr.suf], b = m[pr.ids[1] + pr.suf];
+      if (a == null || b == null) continue;
+      const d = Math.round(Math.abs(a - b));
+      return d === 0 ? "level" : byId[a > b ? pr.ids[0] : pr.ids[1]].short + " +" + d;
+    }
+    return null;
+  };
+
   return (
     <section className="card">
       <div className="card-head">
         <div>
           <h3 className="card-title">Preferred prime minister</h3>
           <p className="card-sub">
-            {mode === "3" ? "“Who would make the better PM?” asked as a three-way, including Hanson"
-             : mode === "ah" ? "“Who would make the better PM?” asked head to head, Albanese against Hanson"
-                             : "“Who would make the better PM?” asked as a two-way, Albanese against the opposition leader"}
-            {mode === "ah"
-              ? " · as published – Newspoll forces a choice where others leave up to a fifth uncommitted, so shares aren’t directly comparable"
-              : " · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable"}
+            {three ? "“Who would make the better PM?” asked as a three-way, including Hanson"
+                   : "“Who would make the better PM?” asked as a two-way – both of the contests pollsters run"}
+            {three
+              ? " · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable"
+              : " · as published – uncommitted runs from none, in Newspoll’s head-to-head, to half the sample, so shares aren’t directly comparable"}
           </p>
         </div>
         <div className="card-head-tools">
@@ -501,33 +511,36 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, mode: modeProp
           {chrome}
         </div>
       </div>
-      <div className="leader-readout">
-        {ordered.map((L) => {
-          const r = reads[L.id];
-          const tag = r && staleTag(r.ym, latestYm);
-          return (
-            <div className="leader" key={L.id}>
-              <div className="leader-dot" style={{ background: L.color }}></div>
-              {/* named so the narrow-screen grid can place it – see .leader-vals */}
-              <div className="leader-vals">
-                <div className="leader-name">{L.short}{tag && <span className="stale-tag" title={"Latest published reading · " + tag}> {tag}</span>}</div>
-                <div className="leader-num">{r ? r.v : "—"}{r && <span className="pct">%</span>}</div>
+      {three ? (
+        <div className="leader-readout">{tiles(ordered)}</div>
+      ) : (
+        /* grouped by contest, because four tiles in one row would read as one
+           four-cornered race and two of them are the same man */
+        <div className="ppm-pairs">
+          {PPM_PAIRS.map((pr) => (
+            <div className={"ppm-pair" + (pr.dashed ? " dashed" : "")} key={pr.id}>
+              <div className="ppm-pair-lab">
+                <span className="ppm-rule" aria-hidden="true"></span>
+                {pr.lab}
+                {leadOf(pr) && <span className="ppm-lead">{leadOf(pr)}</span>}
               </div>
-              {r && r.prev != null && <Delta value={r.v - r.prev} suffix="" small title={readoutDeltaTitle(r)} />}
+              <div className="leader-readout">{tiles(rows.filter((r) => r.pair === pr))}</div>
             </div>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
       <TrendChart
-        key={"ppm-" + mode + "-" + rangeId + "-" + leaders.map((L) => L.id).join(".")}
+        key={"ppm-" + fmt + "-" + rangeId}
         height={250} xDomain={xDomain} yDomain={domain}
         yTicks={ticks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
-        events={leaders.some((L) => L.id === "taylor") ? [OPP_HANDOVER].filter(Boolean) : []}
-        series={ordered.map((L) => (
-          { id: L.id, label: L.short, color: L.color, points: seriesNN(pts, L.id + suf) }
-        ))}
+        events={[OPP_HANDOVER].filter(Boolean)}
+        areas={areas}
+        series={ordered.map((r) => ({
+          id: (r.pair ? r.pair.id + "-" : "") + r.L.id, label: r.label, color: r.L.color,
+          dashed: r.dashed, points: seriesNN(pts, r.L.id + r.suf),
+        }))}
         spine={pts.map((d) => ({ x: d.x }))}
         scatter={ppmScatter}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
