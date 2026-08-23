@@ -836,6 +836,12 @@ body {
   transition: transform .34s cubic-bezier(.2, .74, .24, 1);
 }
 .roll-reel > span, .roll-sep { display: block; height: 1em; line-height: 1em; }
+/* The reel is nine digits the reader never sees, and aria-hidden keeps them out
+   of the accessibility tree – but a SELECTION doesn't consult aria, so without
+   this, copying "Labor leads by 7.6 pts" would paste every digit on every reel.
+   The value is carried by the .sr-only span, which stays selectable, so the
+   line copies as the sentence it looks like. */
+.roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
 .hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }

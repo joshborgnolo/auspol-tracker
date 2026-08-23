@@ -143,15 +143,26 @@ function fitDomain(vals, step, include) {
   return { domain: [d0, d1], ticks };
 }
 
-function Delta({ value, suffix = "", goodUp = true, small, title }) {
+/* `roll` is opt-in, and only the hero asks for it: there the movement sits
+   beside three other figures that travel between matchups, so a chip that
+   simply changed under them would be the one still thing in a moving readout.
+   Everywhere else a delta labels a panel that isn't going anywhere, and a reel
+   would be motion for its own sake. RollNum is defined by the header script,
+   which loads after this one - resolved at render, and guarded so a reordering
+   degrades to a plain figure rather than a blank panel. */
+function Delta({ value, suffix = "", goodUp = true, small, title, roll }) {
   if (value == null) return null;
   const up = value > 0, flat = Math.abs(value) < 0.05;
   const cls = flat ? "flat" : (up === goodUp ? "up" : "down");
   const arrow = flat ? "→" : up ? "▲" : "▼";
+  const figure = `${up ? "+" : ""}${value.toFixed(1)}`;
+  const Roll = window.RollNum;
   return (
     <span className={"delta " + cls + (small ? " delta-sm" : "")} title={title}>
       <span className="delta-arrow">{arrow}</span>
-      {flat ? "no change" : `${up ? "+" : ""}${value.toFixed(1)}${suffix}`}
+      {flat ? "no change"
+        : roll && Roll ? <><Roll value={figure} />{suffix}</>
+        : figure + suffix}
     </span>
   );
 }

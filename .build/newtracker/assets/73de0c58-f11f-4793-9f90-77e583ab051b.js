@@ -213,6 +213,7 @@ function Header({ isDark, onToggleTheme }) {
    of the row, so the whole figure keeps an ordinary text baseline and the
    clipped digit boxes align to its top edge. */
 const ROLL_DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+window.RollNum = RollNum;      // the hero's Delta reads it off the window (see Delta)
 function RollNum({ value, className, style }) {
   const text = String(value);
   return (
@@ -522,9 +523,16 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
               </span>
             )}
           </div>
-          <div className="hero-sub" key={"sub-" + matchup}>
-            <span className="lead-tag">{leadName} leads by {Math.abs(lead).toFixed(1)} pts</span>
-            <Delta value={monthDelta} suffix=" pt" small />
+          {/* Not keyed on the matchup either, for the same reason the readout
+              above isn't: the margin is a figure that travels between the two
+              questions - 2.8 points against the Coalition, 7.6 against One
+              Nation - so it rolls rather than being replaced. The words around
+              it swap outright, as the party names above them do. */}
+          <div className="hero-sub">
+            <span className="lead-tag">
+              {leadName} leads by <RollNum value={Math.abs(lead).toFixed(1)} /> pts
+            </span>
+            <Delta value={monthDelta} suffix=" pt" small roll />
             <span className="hero-sub-note">
               {(m.real || (altL && altL.aPrev != null)) ? "vs. one month ago" : "vs. previous reading"}
               {/* A month-on-month move smaller than its own interval is not a

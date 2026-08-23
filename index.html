@@ -682,6 +682,12 @@ body {
   transition: transform .34s cubic-bezier(.2, .74, .24, 1);
 }
 .roll-reel > span, .roll-sep { display: block; height: 1em; line-height: 1em; }
+/* The reel is nine digits the reader never sees, and aria-hidden keeps them out
+   of the accessibility tree – but a SELECTION doesn't consult aria, so without
+   this, copying "Labor leads by 7.6 pts" would paste every digit on every reel.
+   The value is carried by the .sr-only span, which stays selectable, so the
+   line copies as the sentence it looks like. */
+.roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
 .hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
@@ -4615,24 +4621,37 @@ function fitDomain(vals, step, include) {
     ticks
   };
 }
+
+/* `roll` is opt-in, and only the hero asks for it: there the movement sits
+   beside three other figures that travel between matchups, so a chip that
+   simply changed under them would be the one still thing in a moving readout.
+   Everywhere else a delta labels a panel that isn't going anywhere, and a reel
+   would be motion for its own sake. RollNum is defined by the header script,
+   which loads after this one - resolved at render, and guarded so a reordering
+   degrades to a plain figure rather than a blank panel. */
 function Delta({
   value,
   suffix = "",
   goodUp = true,
   small,
-  title
+  title,
+  roll
 }) {
   if (value == null) return null;
   const up = value > 0,
     flat = Math.abs(value) < 0.05;
   const cls = flat ? "flat" : up === goodUp ? "up" : "down";
   const arrow = flat ? "→" : up ? "▲" : "▼";
+  const figure = `${up ? "+" : ""}${value.toFixed(1)}`;
+  const Roll = window.RollNum;
   return /*#__PURE__*/React.createElement("span", {
     className: "delta " + cls + (small ? " delta-sm" : ""),
     title: title
   }, /*#__PURE__*/React.createElement("span", {
     className: "delta-arrow"
-  }, arrow), flat ? "no change" : `${up ? "+" : ""}${value.toFixed(1)}${suffix}`);
+  }, arrow), flat ? "no change" : roll && Roll ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Roll, {
+    value: figure
+  }), suffix) : figure + suffix);
 }
 
 // ---- Primary vote ---------------------------------------------------
@@ -9970,6 +9989,7 @@ function Header({
    of the row, so the whole figure keeps an ordinary text baseline and the
    clipped digit boxes align to its top edge. */
 const ROLL_DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+window.RollNum = RollNum; // the hero's Delta reads it off the window (see Delta)
 function RollNum({
   value,
   className,
@@ -10400,14 +10420,16 @@ function Hero({
   }, "\xB1 ", unc.ci95.toFixed(1), " pts"), unc && /*#__PURE__*/React.createElement("span", {
     className: "hi-note"
   }, "95% interval \xB7 ", unc.n, " poll", unc.n === 1 ? "" : "s", " in ", D.latest.method.windowDays, " days")), /*#__PURE__*/React.createElement("div", {
-    className: "hero-sub",
-    key: "sub-" + matchup
+    className: "hero-sub"
   }, /*#__PURE__*/React.createElement("span", {
     className: "lead-tag"
-  }, leadName, " leads by ", Math.abs(lead).toFixed(1), " pts"), /*#__PURE__*/React.createElement(Delta, {
+  }, leadName, " leads by ", /*#__PURE__*/React.createElement(RollNum, {
+    value: Math.abs(lead).toFixed(1)
+  }), " pts"), /*#__PURE__*/React.createElement(Delta, {
     value: monthDelta,
     suffix: " pt",
-    small: true
+    small: true,
+    roll: true
   }), /*#__PURE__*/React.createElement("span", {
     className: "hero-sub-note"
   }, m.real || altL && altL.aPrev != null ? "vs. one month ago" : "vs. previous reading", unc && unc.changeSig === false && /*#__PURE__*/React.createElement("span", {
