@@ -679,7 +679,9 @@ body {
 .roll-reel {
   display: block;
   transform: translateY(calc(var(--d) * -1em));
-  transition: transform .34s cubic-bezier(.2, .74, .24, 1);
+  /* the same curve and duration MORPH_EASE samples in views.jsx – digits,
+     colour, lines and dots all move as one thing or they look like four */
+  transition: transform .32s cubic-bezier(.4, .1, .25, 1);
 }
 .roll-reel > span, .roll-sep { display: block; height: 1em; line-height: 1em; }
 /* The reel is nine digits the reader never sees, and aria-hidden keeps them out
@@ -3012,6 +3014,7 @@ function TrendChart(props) {
        to draw in, which travels with the morph so a series is never drawn over
        months it was never asked in. */
     scatterOut = [],
+    scatterMove = [],
     fade = 1,
     clipX,
     /* Which archive view a dot from THIS chart should land in. The chart has no
@@ -3428,6 +3431,19 @@ function TrendChart(props) {
   }));
   const dots = React.useMemo(() => dotEls(scatter, true), [scatter, dot, geom]);
   const outDots = React.useMemo(() => dotEls(scatterOut, false), [scatterOut, geom]);
+  /* The dots that TRAVEL are the one group that cannot be memoised - they hold
+     a different position and colour on every frame. Deliberately the small
+     group: only the polls that published both matchups move, so this is ~90
+     circles a frame rather than the ~330 on the chart. */
+  const moveDots = scatterMove.map((d, i) => /*#__PURE__*/React.createElement("circle", {
+    key: "m" + i,
+    cx: sx(d.x),
+    cy: sy(d.y),
+    r: 4.2,
+    className: "scatter-dot",
+    fill: d.color,
+    opacity: 0.6 * (d.op != null ? d.op : 1)
+  }));
 
   /* ---- key events ---------------------------------------------------------
      A busy set (the hero's history) shows only when the chart is genuinely
@@ -3704,7 +3720,7 @@ function TrendChart(props) {
     style: fade < 1 ? {
       opacity: fade
     } : null
-  }, dots), /*#__PURE__*/React.createElement("g", {
+  }, dots), moveDots.length > 0 && /*#__PURE__*/React.createElement("g", null, moveDots), /*#__PURE__*/React.createElement("g", {
     clipPath: `url(#${clipId})`
   }, series.map(s => /*#__PURE__*/React.createElement("path", {
     key: s.id,
@@ -10146,6 +10162,32 @@ function RollNum({
    through grey, which is what an oklab mix of the two would do. Left as a CSS
    function rather than computed here so it keeps resolving against whichever
    palette the theme is currently using. */
+/* ONE motion curve, shared by every part of a matchup switch: the digit reels
+   animate it in CSS, the colours, lines, clip window and travelling dots are
+   sampled from it here. They used to run on two different ease-outs, and both
+   were far too front-loaded - the reels' old curve was 63% done a fifth of the
+   way in and 88% two fifths in, so a reel with four digits to travel flung
+   through them and then crept the last few pixels for a quarter of a second,
+   leaving a glyph sitting half-shown between two others. That is what "gets
+   stuck on the way" looks like. This one accelerates, holds a real middle, and
+   settles without a tail: 16% / 37% / 60% / 77% at the same marks. */
+const MORPH_EASE = (() => {
+  const [p1x, p1y, p2x, p2y] = [0.4, 0.1, 0.25, 1];
+  const A = (a, b) => 1 - 3 * b + 3 * a,
+    B = (a, b) => 3 * b - 6 * a,
+    C = a => 3 * a;
+  const f = (t, a, b) => ((A(a, b) * t + B(a, b)) * t + C(a)) * t;
+  const df = (t, a, b) => 3 * A(a, b) * t * t + 2 * B(a, b) * t + C(a);
+  return x => {
+    let t = x;
+    for (let i = 0; i < 8; i++) {
+      const d = df(t, p1x, p2x);
+      if (Math.abs(d) < 1e-6) break;
+      t -= (f(t, p1x, p2x) - x) / d;
+    }
+    return f(t, p1y, p2y);
+  };
+})();
 function mixC(c1, c2, t) {
   if (t <= 0 || c1 === c2) return c1;
   if (t >= 1) return c2;
@@ -10317,7 +10359,7 @@ function Hero({
       setMorph({
         from,
         to: id,
-        t: 1 - Math.pow(1 - raw, 3)
+        t: MORPH_EASE(raw)
       });
       morphRaf.current = requestAnimationFrame(step);
     };
@@ -10390,21 +10432,63 @@ function Hero({
   // fewer dots rather than none.
   const cloudFor = id => !showScatter ? [] : D.individualPolls.filter(p => p.x >= xDomain[0] && p.x <= xDomain[1]).flatMap(p => {
     const pair = MATCHUPS[id].scatter(p);
-    return pair ? pair.map(s => ({
+    // `side` 0 is the Labor-side reading and 1 the rival's – with the poll's
+    // own identity, that is how a dot recognises itself in the other matchup
+    return pair ? pair.map((s, side) => ({
       x: p.x,
       y: s.y,
       color: s.color,
       label: s.label,
-      meta: p
+      meta: p,
+      side
     })) : [];
   });
   // memoised on what actually changes them: a morph frame must not rebuild
   // 240 dots sixty times a second (see the chart's own memo on the same arrays)
-  const scatter = React.useMemo(() => cloudFor(matchup), [matchup, rangeId, showScatter]);
-  const scatterOut = React.useMemo(() => morph ? cloudFor(morph.from) : [], [morph ? morph.from : null, rangeId, showScatter]);
+  const settledCloud = React.useMemo(() => cloudFor(matchup), [matchup, rangeId, showScatter]);
+
+  /* The cloud morphs the way the lines do. A poll that published BOTH matchups
+     is one reading of the same fieldwork asked two ways – Newspoll's 51.4
+     against the Coalition and 53.8 against One Nation are the same poll – so
+     its dot travels between them and its colour goes round the hue circle with
+     the line above it. A poll that only ever answered one of the questions has
+     nowhere to travel to, so it fades: 74 of the 119 two-party polls never had
+     the One Nation matchup put to them, and inventing a position for them
+     would be drawing data nobody collected.
+      Split three ways so only the travelling group is rebuilt per frame. */
+  const morphClouds = React.useMemo(() => {
+    if (!morph) return null;
+    const key = d => d.meta.pollster + "|" + d.meta.released + "|" + d.side;
+    const A = cloudFor(morph.from),
+      B = cloudFor(morph.to);
+    const ia = new Map(A.map(d => [key(d), d])),
+      ib = new Map(B.map(d => [key(d), d]));
+    const travel = [],
+      leaving = [],
+      arriving = [];
+    ia.forEach((d, k) => ib.has(k) ? travel.push([d, ib.get(k)]) : leaving.push(d));
+    ib.forEach((d, k) => {
+      if (!ia.has(k)) arriving.push(d);
+    });
+    return {
+      travel,
+      leaving,
+      arriving
+    };
+  }, [morph ? morph.from : null, morph ? morph.to : null, rangeId, showScatter]);
+  const scatter = morphClouds ? morphClouds.arriving : settledCloud;
+  const scatterOut = morphClouds ? morphClouds.leaving : [];
+  const scatterMove = !morphClouds ? [] : morphClouds.travel.map(([a, b]) => ({
+    // same poll, same fieldwork, so only the reading and its colour move
+    x: a.x,
+    y: a.y + (b.y - a.y) * morph.t,
+    color: mixC(a.color, b.color, morph.t),
+    label: b.label,
+    meta: b.meta
+  }));
   // how many polls are actually behind the cloud – stated in the caption, since
   // "9 houses ask this" is the honest caveat on a thinner matchup
-  const scatterPolls = scatter.length / 2;
+  const scatterPolls = settledCloud.length / 2;
 
   // A trend line through four monthly means built on five polls from two houses
   // is a shape the data can't support – it reads as a trajectory when it's
@@ -10596,6 +10680,7 @@ function Hero({
     spine: heroSpine,
     pollFacet: "twopp",
     scatterOut: scatterOut,
+    scatterMove: scatterMove,
     fade: blend ? morph.t : 1,
     clipX: blend ? blend.clip : null,
     tooltipTitle: i => window.AP.monthLabelFull((drawPts[i] || drawPts[drawPts.length - 1]).ym),

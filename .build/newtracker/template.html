@@ -833,7 +833,9 @@ body {
 .roll-reel {
   display: block;
   transform: translateY(calc(var(--d) * -1em));
-  transition: transform .34s cubic-bezier(.2, .74, .24, 1);
+  /* the same curve and duration MORPH_EASE samples in views.jsx – digits,
+     colour, lines and dots all move as one thing or they look like four */
+  transition: transform .32s cubic-bezier(.4, .1, .25, 1);
 }
 .roll-reel > span, .roll-sep { display: block; height: 1em; line-height: 1em; }
 /* The reel is nine digits the reader never sees, and aria-hidden keeps them out

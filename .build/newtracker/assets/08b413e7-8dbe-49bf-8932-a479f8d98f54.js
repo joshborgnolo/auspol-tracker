@@ -100,7 +100,7 @@ function TrendChart(props) {
        far the crossfade has run; `clipX` is the x window the lines are allowed
        to draw in, which travels with the morph so a series is never drawn over
        months it was never asked in. */
-    scatterOut = [], fade = 1, clipX,
+    scatterOut = [], scatterMove = [], fade = 1, clipX,
     /* Which archive view a dot from THIS chart should land in. The chart has no
        idea what it is plotting; the panel does. */
     pollFacet,
@@ -435,6 +435,14 @@ function TrendChart(props) {
   ));
   const dots = React.useMemo(() => dotEls(scatter, true), [scatter, dot, geom]);
   const outDots = React.useMemo(() => dotEls(scatterOut, false), [scatterOut, geom]);
+  /* The dots that TRAVEL are the one group that cannot be memoised - they hold
+     a different position and colour on every frame. Deliberately the small
+     group: only the polls that published both matchups move, so this is ~90
+     circles a frame rather than the ~330 on the chart. */
+  const moveDots = scatterMove.map((d, i) => (
+    <circle key={"m" + i} cx={sx(d.x)} cy={sy(d.y)} r={4.2}
+            className="scatter-dot" fill={d.color} opacity={0.6 * (d.op != null ? d.op : 1)} />
+  ));
 
   /* ---- key events ---------------------------------------------------------
      A busy set (the hero's history) shows only when the chart is genuinely
@@ -612,6 +620,7 @@ function TrendChart(props) {
           <g style={{ opacity: 1 - fade }}>{outDots}</g>
         )}
         <g style={fade < 1 ? { opacity: fade } : null}>{dots}</g>
+        {moveDots.length > 0 && <g>{moveDots}</g>}
         {/* series lines (clipped to the plot area so windowed views
             don't draw the entering segment past the y-axis) */}
         <g clipPath={`url(#${clipId})`}>
