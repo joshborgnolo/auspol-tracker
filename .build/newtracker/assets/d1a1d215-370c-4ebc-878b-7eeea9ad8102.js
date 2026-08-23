@@ -344,19 +344,35 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
             </label>
           )}
         </div>
-        {insight && (
-          <p className="cycle-insight">
-            {cycMonthLabel(insight.mNow)}, {insight.subjLabel} sits{" "}
-            {/* Prose, not a table cell: a gap of exactly nine points reads as
-                "9%", not "9.0%", and the sign is dropped because the
-                "above"/"below" that follows already carries the direction
-                (M.fmt keeps its decimal for the chart's tooltips). */}
-            <span className={"ci-delta " + (insight.better ? "pos" : "neg")}>
-              {M.fmt(insight.d).replace(/^[+−-]/, "").replace(/\.0+$/, "")}{M.unit}
-            </span>{" "}
-            {insight.better ? "above" : "below"} the average {insight.peerNoun} at this point.
-          </p>
-        )}
+        {insight && (() => {
+          /* Prose, not a table cell: a gap of exactly nine points reads as
+             "9%", not "9.0%", and the sign is dropped because the
+             "above"/"below" that follows already carries the direction
+             (M.fmt keeps its decimal for the chart's tooltips). */
+          const shown = M.fmt(insight.d).replace(/^[+−-]/, "").replace(/\.0+$/, "");
+          /* A gap that ROUNDS AWAY has to change the sentence, not just the
+             number: "sits 0 above the average" states a difference and denies
+             it in the same breath. Tested on the rendered string rather than
+             on d, because rounding is what the reader sees – 0.4 points prints
+             as 0, and "in line with" is what 0.4 points means. */
+          const level = parseFloat(shown) === 0;
+          if (level) return (
+            <p className="cycle-insight">
+              {cycMonthLabel(insight.mNow)}, {insight.subjLabel} is{" "}
+              <span className="ci-delta level">in line with</span>{" "}
+              the average {insight.peerNoun} at this point.
+            </p>
+          );
+          return (
+            <p className="cycle-insight">
+              {cycMonthLabel(insight.mNow)}, {insight.subjLabel} sits{" "}
+              <span className={"ci-delta " + (insight.better ? "pos" : "neg")}>
+                {shown}{M.unit}
+              </span>{" "}
+              {insight.better ? "above" : "below"} the average {insight.peerNoun} at this point.
+            </p>
+          );
+        })()}
       </div>
       <TrendChart
         key={"cyc-" + M.key + "-" + mode}
@@ -1290,7 +1306,7 @@ function AllPollsView() {
             <span>{houses.length} pollsters</span>
             {sel.size > 0 && <button className="ap-clear" onClick={() => setSel(new Set())}>Clear</button>}
           </div>
-          <div className="ap-poplist">
+          <div className="ap-poplist" role="group" aria-label="Pollsters">
             {houseRank.map((h) => (
               <PopRow key={h} on={sel.has(h)} label={h} n={houseN[h] || 0} onClick={() => toggleHouse(h)} />
             ))}
@@ -1299,7 +1315,9 @@ function AllPollsView() {
 
         <FilterPop id="when" label="Time" open={pop} setOpen={setPop}
           summary={range === "all" ? null : RANGE_LAB[range]}>
-          <div className="ap-poplist">
+          {/* a set of role="radio" rows is only a choice to a screen reader if a
+              radiogroup says so – otherwise each one reads as a stray control */}
+          <div className="ap-poplist" role="radiogroup" aria-label="Time span">
             {[["all", "Any time"], ["12", "Last 12 months"], ["6", "Last 6 months"], ["3", "Last 3 months"]].map(([id, lab]) => (
               <PopRow key={id} radio on={range === id} label={lab} n={rangeN(id)} onClick={() => setRange(id)} />
             ))}
@@ -1312,7 +1330,7 @@ function AllPollsView() {
             <span>What the poll published</span>
             {tagSel.size > 0 && <button className="ap-clear" onClick={() => setTagSel(new Set())}>Clear</button>}
           </div>
-          <div className="ap-poplist">
+          <div className="ap-poplist" role="group" aria-label="Measures published">
             {shownTags.map((t) => (
               <PopRow key={t.id} on={tagSel.has(t.id)} label={t.label} note={t.title}
                       n={tagN[t.id] || 0} onClick={() => toggleTag(t.id)} />
@@ -1328,14 +1346,14 @@ function AllPollsView() {
           <FilterPop id="lead" label="Lead" open={pop} setOpen={setPop}
             summary={[measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
             <div className="ap-pop-head"><span>Show the lead in</span></div>
-            <div className="ap-poplist">
+            <div className="ap-poplist" role="radiogroup" aria-label="Lead column matchup">
               {["lnp", "onp", "lnponp"].map((m) => (
                 <PopRow key={m} radio on={measure === m} label={MEASURE_LAB[m]}
                         n={rows.filter((r) => archLeadInfo(r, m)).length} onClick={() => onMeasure(m)} />
               ))}
             </div>
             <div className="ap-pop-head bordered"><span>Held by</span></div>
-            <div className="ap-poplist">
+            <div className="ap-poplist" role="radiogroup" aria-label="Lead held by">
               {[{ id: "all", label: "Either" }].concat(
                 ({ lnp: ["alp", "lnp"], onp: ["alp", "onp"], lnponp: ["lnp", "onp"] })[measure]
                   .map((id) => ({ id, label: HOLDER_LAB[id] }))).map((o) => (

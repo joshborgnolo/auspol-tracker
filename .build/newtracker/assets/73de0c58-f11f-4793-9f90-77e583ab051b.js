@@ -144,7 +144,7 @@ function Header({ isDark, onToggleTheme }) {
           </button>
           <span className="wm-sr">– Australian federal polling</span>
         </h1>
-        <p className="tagline">Aggregated opinion polling for the 2028 Australian federal election</p>
+        <p className="tagline">Aggregated opinion polling for the next Australian federal election</p>
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot " + fresh.state}></span>
           Updated {D.latest.updated} · {D.latest.pollsTracked} polls
@@ -509,6 +509,9 @@ function MethodNote() {
 // tab bar (TabScore in views.jsx) so it travels across every tab. ScoreBar
 // removed rather than left dead – see git/file history if it's ever wanted.
 
+// set once the body first carries its theme classes – see the effect below
+let chromeSettled = false;
+
 const TABS = [
   { id: "snapshot", label: "Snapshot" },
   { id: "cycles", label: "Past cycles" },
@@ -567,30 +570,52 @@ function App() {
   }, []);
   const isDark = t.theme === "dark" || (t.theme === "auto" && sysDark);
 
-  // theme / layout / accent classes – each flip runs through a brief
-  // whole-page colour crossfade (see body.theme-xfade in styles.css)
-  const xfadeTimer = useRef(null);
-  const withXfade = (apply) => {
-    document.body.classList.add("theme-xfade");
-    apply();
-    clearTimeout(xfadeTimer.current);
-    xfadeTimer.current = setTimeout(() => document.body.classList.remove("theme-xfade"), 450);
+  /* Theme, layout and accent are three switches on ONE appearance, so they
+     are applied together, in one place. Three separate effects meant three DOM
+     writes, and a change that moved two of them at once (theme carries its own
+     accent) ran two crossfades over each other.
+
+     The crossfade itself is now the browser's. It used to be a CSS rule –
+     `body.theme-xfade *` with a transition on background-color, color,
+     border-color, fill, stroke, box-shadow and opacity – which is a transition
+     on EVERY element: 3,300 of them on the archive tab, seven paint properties
+     each, none of them anything the compositor can do on its own. Every frame
+     of the 380ms repainted the whole page, and the flip visibly stepped
+     instead of fading. A view transition takes one picture of the page before
+     and one after and crossfades the two textures on the GPU, so the cost no
+     longer scales with how much is on screen. Where the API is missing, or the
+     reader asked for less motion, the theme simply flips – a clean cut reads
+     as intent, a janky fade reads as a bug. */
+  const want = { editorial: t.layout === "editorial", cool: t.accent === "cool", dark: isDark };
+  const applyChrome = () => {
+    for (const c in want) document.body.classList.toggle(c, want[c]);
   };
-  const mounted = useRef(false);
   React.useEffect(() => {
-    if (!mounted.current) { document.body.classList.toggle("editorial", t.layout === "editorial"); return; }
-    withXfade(() => document.body.classList.toggle("editorial", t.layout === "editorial"));
-  }, [t.layout]);
-  React.useEffect(() => {
-    if (!mounted.current) { document.body.classList.toggle("cool", t.accent === "cool"); return; }
-    withXfade(() => document.body.classList.toggle("cool", t.accent === "cool"));
-  }, [t.accent]);
-  React.useEffect(() => {
-    if (!mounted.current) { document.body.classList.toggle("dark", isDark); return; }
-    withXfade(() => document.body.classList.toggle("dark", isDark));
-  }, [isDark]);
-  React.useEffect(() => { mounted.current = true; }, []);
-  React.useEffect(() => () => clearTimeout(xfadeTimer.current), []);
+    // nothing to change – a re-render that re-runs this effect must not animate
+    if (!Object.keys(want).some((c) => document.body.classList.contains(c) !== want[c])) return;
+    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    /* The FIRST application is the page dressing itself and must not fade in
+       from the default palette. The flag lives at module scope on purpose: as
+       a component ref it was reset by a remount during start-up, which quietly
+       spent the "no animation" pass on the reader's first theme flip instead
+       of on the load. */
+    if (!chromeSettled || still || document.visibilityState === "hidden"
+        || typeof document.startViewTransition !== "function") {
+      chromeSettled = true;
+      applyChrome();
+      return;
+    }
+    /* A skipped transition – a backgrounded tab, or a second flip landing on
+       top of this one – rejects `ready`, and a rejection nobody reads is
+       reported to the console as an uncaught error. The class change has
+       already been applied by then either way, so there is nothing to recover
+       from and nothing to report: swallow both promises deliberately. */
+    const vt = document.startViewTransition(applyChrome);
+    if (vt) {
+      if (vt.ready && vt.ready.catch) vt.ready.catch(() => {});
+      if (vt.finished && vt.finished.catch) vt.finished.catch(() => {});
+    }
+  }, [t.layout, t.accent, isDark]);
 
   const cycleTheme = () => setTweak("theme", isDark ? "light" : "dark");
 

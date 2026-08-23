@@ -1837,6 +1837,9 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 .ci-delta { font-weight: 700; font-variant-numeric: tabular-nums; }
 .ci-delta.pos { color: var(--mood-pos); }
 .ci-delta.neg { color: var(--mood-neg); }
+/* "in line with" is not a good or bad reading, so it takes the ink rather than
+   the mood colours – emphasised, because it is still the finding */
+.ci-delta.level { color: var(--ink); }
 .cyc-foot {
   margin: 22px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--ink-3);
   font-family: var(--sans); max-width: 70ch; text-wrap: pretty;
@@ -2199,15 +2202,14 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
   .guide, .hover-marker, .tip { transition: none; animation: none; }
 }
 
-/* one-shot, whole-page colour crossfade while the theme flips – the class is
-   added just before the body theme class changes and removed ~450ms later */
-@media (prefers-reduced-motion: no-preference) {
-  body.theme-xfade, body.theme-xfade *,
-  body.theme-xfade *::before, body.theme-xfade *::after {
-    transition: background-color .38s ease, color .38s ease, border-color .38s ease,
-                fill .38s ease, stroke .38s ease, box-shadow .38s ease, opacity .38s ease !important;
-  }
-}
+/* The theme flip crossfades as ONE composited picture – see applyChrome() in
+   views.jsx, which runs the class change inside document.startViewTransition().
+   What used to be here was `body.theme-xfade *`: a colour transition on every
+   element on the page, which on the archive tab is 3,300 of them and repainted
+   the lot on every frame. The browser now animates two snapshots instead, so
+   the only thing left to say is how long it should take. */
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: .34s; animation-timing-function: ease; }
 
 /* ---------- shared frosted glass across the floating chrome ----------
    One material for every interactive pill toggle and the pinned nav, matching

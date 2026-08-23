@@ -286,7 +286,7 @@ function buildStaticSummary() {
 
   return `<div class="static-summary">
       <h1>auspol tracker</h1>
-      <p class="ss-sub">Aggregated opinion polling for the 2028 Australian federal election.
+      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election.
         Updated ${esc(L.updated)} from ${L.pollsTracked} published polls across ${L.housesTracked} polling houses.</p>
 
       <h2>Two-party preferred</h2>

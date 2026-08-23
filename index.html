@@ -1683,6 +1683,9 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 .ci-delta { font-weight: 700; font-variant-numeric: tabular-nums; }
 .ci-delta.pos { color: var(--mood-pos); }
 .ci-delta.neg { color: var(--mood-neg); }
+/* "in line with" is not a good or bad reading, so it takes the ink rather than
+   the mood colours – emphasised, because it is still the finding */
+.ci-delta.level { color: var(--ink); }
 .cyc-foot {
   margin: 22px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--ink-3);
   font-family: var(--sans); max-width: 70ch; text-wrap: pretty;
@@ -2045,15 +2048,14 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
   .guide, .hover-marker, .tip { transition: none; animation: none; }
 }
 
-/* one-shot, whole-page colour crossfade while the theme flips – the class is
-   added just before the body theme class changes and removed ~450ms later */
-@media (prefers-reduced-motion: no-preference) {
-  body.theme-xfade, body.theme-xfade *,
-  body.theme-xfade *::before, body.theme-xfade *::after {
-    transition: background-color .38s ease, color .38s ease, border-color .38s ease,
-                fill .38s ease, stroke .38s ease, box-shadow .38s ease, opacity .38s ease !important;
-  }
-}
+/* The theme flip crossfades as ONE composited picture – see applyChrome() in
+   views.jsx, which runs the class change inside document.startViewTransition().
+   What used to be here was `body.theme-xfade *`: a colour transition on every
+   element on the page, which on the archive tab is 3,300 of them and repainted
+   the lot on every frame. The browser now animates two snapshots instead, so
+   the only thing left to say is how long it should take. */
+::view-transition-old(root),
+::view-transition-new(root) { animation-duration: .34s; animation-timing-function: ease; }
 
 /* ---------- shared frosted glass across the floating chrome ----------
    One material for every interactive pill toggle and the pinned nav, matching
@@ -2136,7 +2138,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
   <div id="root">
     <div class="static-summary">
       <h1>auspol tracker</h1>
-      <p class="ss-sub">Aggregated opinion polling for the 2028 Australian federal election.
+      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election.
         Updated 16 August 2026 from 149 published polls across 17 polling houses.</p>
 
       <h2>Two-party preferred</h2>
@@ -7210,11 +7212,29 @@ function CycleChart({
     type: "checkbox",
     checked: !!showHan,
     onChange: e => setHan(e.target.checked)
-  }), "Hanson")), insight && /*#__PURE__*/React.createElement("p", {
-    className: "cycle-insight"
-  }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " sits", " ", /*#__PURE__*/React.createElement("span", {
-    className: "ci-delta " + (insight.better ? "pos" : "neg")
-  }, M.fmt(insight.d).replace(/^[+−-]/, "").replace(/\.0+$/, ""), M.unit), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.")), /*#__PURE__*/React.createElement(TrendChart, {
+  }), "Hanson")), insight && (() => {
+    /* Prose, not a table cell: a gap of exactly nine points reads as
+       "9%", not "9.0%", and the sign is dropped because the
+       "above"/"below" that follows already carries the direction
+       (M.fmt keeps its decimal for the chart's tooltips). */
+    const shown = M.fmt(insight.d).replace(/^[+−-]/, "").replace(/\.0+$/, "");
+    /* A gap that ROUNDS AWAY has to change the sentence, not just the
+       number: "sits 0 above the average" states a difference and denies
+       it in the same breath. Tested on the rendered string rather than
+       on d, because rounding is what the reader sees – 0.4 points prints
+       as 0, and "in line with" is what 0.4 points means. */
+    const level = parseFloat(shown) === 0;
+    if (level) return /*#__PURE__*/React.createElement("p", {
+      className: "cycle-insight"
+    }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " is", " ", /*#__PURE__*/React.createElement("span", {
+      className: "ci-delta level"
+    }, "in line with"), " ", "the average ", insight.peerNoun, " at this point.");
+    return /*#__PURE__*/React.createElement("p", {
+      className: "cycle-insight"
+    }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " sits", " ", /*#__PURE__*/React.createElement("span", {
+      className: "ci-delta " + (insight.better ? "pos" : "neg")
+    }, shown, M.unit), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.");
+  })()), /*#__PURE__*/React.createElement(TrendChart, {
     key: "cyc-" + M.key + "-" + mode,
     height: 300,
     xDomain: CYC_XDOMAIN,
@@ -8529,7 +8549,9 @@ function AllPollsView() {
     className: "ap-clear",
     onClick: () => setSel(new Set())
   }, "Clear")), /*#__PURE__*/React.createElement("div", {
-    className: "ap-poplist"
+    className: "ap-poplist",
+    role: "group",
+    "aria-label": "Pollsters"
   }, houseRank.map(h => /*#__PURE__*/React.createElement(PopRow, {
     key: h,
     on: sel.has(h),
@@ -8543,7 +8565,9 @@ function AllPollsView() {
     setOpen: setPop,
     summary: range === "all" ? null : RANGE_LAB[range]
   }, /*#__PURE__*/React.createElement("div", {
-    className: "ap-poplist"
+    className: "ap-poplist",
+    role: "radiogroup",
+    "aria-label": "Time span"
   }, [["all", "Any time"], ["12", "Last 12 months"], ["6", "Last 6 months"], ["3", "Last 3 months"]].map(([id, lab]) => /*#__PURE__*/React.createElement(PopRow, {
     key: id,
     radio: true,
@@ -8563,7 +8587,9 @@ function AllPollsView() {
     className: "ap-clear",
     onClick: () => setTagSel(new Set())
   }, "Clear")), /*#__PURE__*/React.createElement("div", {
-    className: "ap-poplist"
+    className: "ap-poplist",
+    role: "group",
+    "aria-label": "Measures published"
   }, shownTags.map(t => /*#__PURE__*/React.createElement(PopRow, {
     key: t.id,
     on: tagSel.has(t.id),
@@ -8582,7 +8608,9 @@ function AllPollsView() {
   }, /*#__PURE__*/React.createElement("div", {
     className: "ap-pop-head"
   }, /*#__PURE__*/React.createElement("span", null, "Show the lead in")), /*#__PURE__*/React.createElement("div", {
-    className: "ap-poplist"
+    className: "ap-poplist",
+    role: "radiogroup",
+    "aria-label": "Lead column matchup"
   }, ["lnp", "onp", "lnponp"].map(m => /*#__PURE__*/React.createElement(PopRow, {
     key: m,
     radio: true,
@@ -8593,7 +8621,9 @@ function AllPollsView() {
   }))), /*#__PURE__*/React.createElement("div", {
     className: "ap-pop-head bordered"
   }, /*#__PURE__*/React.createElement("span", null, "Held by")), /*#__PURE__*/React.createElement("div", {
-    className: "ap-poplist"
+    className: "ap-poplist",
+    role: "radiogroup",
+    "aria-label": "Lead held by"
   }, [{
     id: "all",
     label: "Either"
@@ -9811,7 +9841,7 @@ function Header({
     className: "wm-sr"
   }, "\u2013 Australian federal polling")), /*#__PURE__*/React.createElement("p", {
     className: "tagline"
-  }, "Aggregated opinion polling for the 2028 Australian federal election"), /*#__PURE__*/React.createElement("div", {
+  }, "Aggregated opinion polling for the next Australian federal election"), /*#__PURE__*/React.createElement("div", {
     className: "head-meta-compact",
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("span", {
@@ -10303,6 +10333,8 @@ function MethodNote() {
 // tab bar (TabScore in views.jsx) so it travels across every tab. ScoreBar
 // removed rather than left dead – see git/file history if it's ever wanted.
 
+// set once the body first carries its theme classes – see the effect below
+let chromeSettled = false;
 const TABS = [{
   id: "snapshot",
   label: "Snapshot"
@@ -10374,41 +10406,54 @@ function App() {
   }, []);
   const isDark = t.theme === "dark" || t.theme === "auto" && sysDark;
 
-  // theme / layout / accent classes – each flip runs through a brief
-  // whole-page colour crossfade (see body.theme-xfade in styles.css)
-  const xfadeTimer = useRef(null);
-  const withXfade = apply => {
-    document.body.classList.add("theme-xfade");
-    apply();
-    clearTimeout(xfadeTimer.current);
-    xfadeTimer.current = setTimeout(() => document.body.classList.remove("theme-xfade"), 450);
+  /* Theme, layout and accent are three switches on ONE appearance, so they
+     are applied together, in one place. Three separate effects meant three DOM
+     writes, and a change that moved two of them at once (theme carries its own
+     accent) ran two crossfades over each other.
+      The crossfade itself is now the browser's. It used to be a CSS rule –
+     `body.theme-xfade *` with a transition on background-color, color,
+     border-color, fill, stroke, box-shadow and opacity – which is a transition
+     on EVERY element: 3,300 of them on the archive tab, seven paint properties
+     each, none of them anything the compositor can do on its own. Every frame
+     of the 380ms repainted the whole page, and the flip visibly stepped
+     instead of fading. A view transition takes one picture of the page before
+     and one after and crossfades the two textures on the GPU, so the cost no
+     longer scales with how much is on screen. Where the API is missing, or the
+     reader asked for less motion, the theme simply flips – a clean cut reads
+     as intent, a janky fade reads as a bug. */
+  const want = {
+    editorial: t.layout === "editorial",
+    cool: t.accent === "cool",
+    dark: isDark
   };
-  const mounted = useRef(false);
+  const applyChrome = () => {
+    for (const c in want) document.body.classList.toggle(c, want[c]);
+  };
   React.useEffect(() => {
-    if (!mounted.current) {
-      document.body.classList.toggle("editorial", t.layout === "editorial");
+    // nothing to change – a re-render that re-runs this effect must not animate
+    if (!Object.keys(want).some(c => document.body.classList.contains(c) !== want[c])) return;
+    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    /* The FIRST application is the page dressing itself and must not fade in
+       from the default palette. The flag lives at module scope on purpose: as
+       a component ref it was reset by a remount during start-up, which quietly
+       spent the "no animation" pass on the reader's first theme flip instead
+       of on the load. */
+    if (!chromeSettled || still || document.visibilityState === "hidden" || typeof document.startViewTransition !== "function") {
+      chromeSettled = true;
+      applyChrome();
       return;
     }
-    withXfade(() => document.body.classList.toggle("editorial", t.layout === "editorial"));
-  }, [t.layout]);
-  React.useEffect(() => {
-    if (!mounted.current) {
-      document.body.classList.toggle("cool", t.accent === "cool");
-      return;
+    /* A skipped transition – a backgrounded tab, or a second flip landing on
+       top of this one – rejects `ready`, and a rejection nobody reads is
+       reported to the console as an uncaught error. The class change has
+       already been applied by then either way, so there is nothing to recover
+       from and nothing to report: swallow both promises deliberately. */
+    const vt = document.startViewTransition(applyChrome);
+    if (vt) {
+      if (vt.ready && vt.ready.catch) vt.ready.catch(() => {});
+      if (vt.finished && vt.finished.catch) vt.finished.catch(() => {});
     }
-    withXfade(() => document.body.classList.toggle("cool", t.accent === "cool"));
-  }, [t.accent]);
-  React.useEffect(() => {
-    if (!mounted.current) {
-      document.body.classList.toggle("dark", isDark);
-      return;
-    }
-    withXfade(() => document.body.classList.toggle("dark", isDark));
-  }, [isDark]);
-  React.useEffect(() => {
-    mounted.current = true;
-  }, []);
-  React.useEffect(() => () => clearTimeout(xfadeTimer.current), []);
+  }, [t.layout, t.accent, isDark]);
   const cycleTheme = () => setTweak("theme", isDark ? "light" : "dark");
   return /*#__PURE__*/React.createElement("div", {
     className: "page"
