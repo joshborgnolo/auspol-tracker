@@ -2483,7 +2483,7 @@ window.AUSPOL = (function () {
      A firm absent from a map has too few readings to estimate – which the UI
      must show as "—", never as 0. */
   const houseEffects = {"tpp":{"Roy Morgan":{"v":0.8,"n":41},"Redbridge":{"v":-0.2,"n":10},"Spectre Strategy":{"v":-0.6,"n":4},"DemosAU":{"v":0,"n":2},"Newspoll":{"v":0.6,"n":8},"Resolve":{"v":0,"n":11},"Wolf & Smith":{"v":0,"n":1},"Essential":{"v":-1.8,"n":10},"YouGov":{"v":0,"n":17},"Freshwater":{"v":-0.7,"n":5},"DemosAU (MRP)":{"v":0.1,"n":1},"Fox & Hedgehog":{"v":-1.1,"n":4},"Roy Morgan (SMS)":{"v":0.2,"n":1},"RedBridge / Accent":{"v":-0.6,"n":3}},"primary":{"alp":{"Roy Morgan":{"v":-0.4,"n":41},"Redbridge":{"v":1.1,"n":11},"Spectre Strategy":{"v":-0.3,"n":4},"DemosAU":{"v":-0.9,"n":8},"Newspoll":{"v":1.2,"n":16},"Resolve":{"v":0.2,"n":16},"Wolf & Smith":{"v":0.1,"n":2},"Essential":{"v":0.7,"n":11},"YouGov":{"v":-0.5,"n":20},"Freshwater":{"v":0.5,"n":5},"DemosAU (MRP)":{"v":-0.5,"n":3},"YouGov (MRP)":{"v":0,"n":1},"Fox & Hedgehog":{"v":-0.1,"n":4},"RedBridge / Accent (MRP)":{"v":0.2,"n":1},"Roy Morgan (SMS)":{"v":-0.1,"n":1},"Agenda C Synesis":{"v":0.1,"n":1},"RedBridge / Accent":{"v":0.3,"n":3}},"lnp":{"Roy Morgan":{"v":0.7,"n":41},"Redbridge":{"v":-0.7,"n":11},"Spectre Strategy":{"v":0.3,"n":4},"DemosAU":{"v":-0.4,"n":8},"Newspoll":{"v":-1.2,"n":16},"Resolve":{"v":0.6,"n":16},"Wolf & Smith":{"v":0.3,"n":2},"Essential":{"v":0.9,"n":11},"YouGov":{"v":-0.8,"n":20},"Freshwater":{"v":1.2,"n":5},"DemosAU (MRP)":{"v":-0.3,"n":3},"YouGov (MRP)":{"v":0,"n":1},"Fox & Hedgehog":{"v":0.7,"n":4},"RedBridge / Accent (MRP)":{"v":-0.1,"n":1},"Roy Morgan (SMS)":{"v":-0.6,"n":1},"Agenda C Synesis":{"v":-0.3,"n":1},"RedBridge / Accent":{"v":-0.3,"n":3}},"grn":{"Roy Morgan":{"v":0.6,"n":41},"Redbridge":{"v":-0.4,"n":11},"Spectre Strategy":{"v":0,"n":4},"DemosAU":{"v":0.3,"n":8},"Newspoll":{"v":-0.1,"n":16},"Resolve":{"v":-0.4,"n":16},"Essential":{"v":-1.1,"n":11},"YouGov":{"v":0.3,"n":20},"Freshwater":{"v":-0.1,"n":5},"DemosAU (MRP)":{"v":0.1,"n":3},"YouGov (MRP)":{"v":0,"n":1},"Fox & Hedgehog":{"v":0,"n":4},"Wolf & Smith":{"v":-0.1,"n":1},"RedBridge / Accent (MRP)":{"v":-0.1,"n":1},"Roy Morgan (SMS)":{"v":-0.1,"n":1},"Agenda C Synesis":{"v":-0.3,"n":1},"RedBridge / Accent":{"v":-0.2,"n":3}},"onp":{"Roy Morgan":{"v":-1.2,"n":41},"Redbridge":{"v":1.3,"n":11},"Spectre Strategy":{"v":0.3,"n":4},"DemosAU":{"v":0.9,"n":8},"Newspoll":{"v":0.5,"n":16},"Resolve":{"v":-1,"n":16},"Essential":{"v":-0.4,"n":11},"YouGov":{"v":0.4,"n":20},"Freshwater":{"v":-0.7,"n":5},"DemosAU (MRP)":{"v":0.7,"n":3},"YouGov (MRP)":{"v":0.3,"n":1},"Fox & Hedgehog":{"v":-0.1,"n":4},"Wolf & Smith":{"v":-0.5,"n":1},"RedBridge / Accent (MRP)":{"v":0.3,"n":1},"Roy Morgan (SMS)":{"v":0.7,"n":1},"Agenda C Synesis":{"v":-0.4,"n":1},"RedBridge / Accent":{"v":0.9,"n":3}},"oth":{"Roy Morgan":{"v":0.2,"n":41},"Redbridge":{"v":-1.2,"n":11},"Spectre Strategy":{"v":-0.2,"n":4},"DemosAU":{"v":0.1,"n":8},"Newspoll":{"v":-0.5,"n":16},"Resolve":{"v":0.7,"n":16},"Essential":{"v":-0.3,"n":11},"YouGov":{"v":1,"n":20},"Freshwater":{"v":-1,"n":5},"DemosAU (MRP)":{"v":-0.2,"n":3},"YouGov (MRP)":{"v":-0.3,"n":1},"Fox & Hedgehog":{"v":-0.5,"n":4},"Wolf & Smith":{"v":0.2,"n":1},"RedBridge / Accent (MRP)":{"v":-0.2,"n":1},"Roy Morgan (SMS)":{"v":0.1,"n":1},"Agenda C Synesis":{"v":0.9,"n":1},"RedBridge / Accent":{"v":-0.7,"n":3}}},"alp_on":{"DemosAU":{"v":-0.7,"n":1},"Fox & Hedgehog":{"v":0.2,"n":4},"Freshwater":{"v":0.1,"n":3},"YouGov":{"v":0.4,"n":15},"Redbridge":{"v":0,"n":3},"Spectre Strategy":{"v":-0.3,"n":2},"Roy Morgan (SMS)":{"v":-0.3,"n":1},"Roy Morgan":{"v":-0.2,"n":13},"RedBridge / Accent":{"v":-0.1,"n":3}},"appr":{"alb":{"Morning Consult":{"v":1.7,"n":1},"Newspoll":{"v":-0.5,"n":15},"Resolve":{"v":-0.6,"n":15},"Essential":{"v":2.5,"n":13},"YouGov":{"v":-0.7,"n":15},"Fox & Hedgehog":{"v":-0.3,"n":4},"Redbridge":{"v":0.8,"n":2},"Spectre Strategy":{"v":-0.7,"n":1},"DemosAU":{"v":-1.5,"n":3},"Freshwater":{"v":0.5,"n":2},"Roy Morgan (SMS)":{"v":0.1,"n":1},"RedBridge / Accent":{"v":-0.2,"n":1}},"opp":{"Newspoll":{"v":-6.8,"n":14},"Resolve":{"v":8.2,"n":15},"Essential":{"v":0.6,"n":12},"YouGov":{"v":-3.3,"n":13},"Fox & Hedgehog":{"v":-0.4,"n":4},"Spectre Strategy":{"v":-0.1,"n":1},"DemosAU":{"v":-1.2,"n":2},"Redbridge":{"v":-0.5,"n":1},"Freshwater":{"v":1.7,"n":2},"RedBridge / Accent":{"v":-0.7,"n":1}},"han":{"Freshwater":{"v":0.9,"n":2},"DemosAU":{"v":-2.1,"n":5},"Redbridge":{"v":-0.7,"n":2},"Resolve":{"v":2,"n":2},"Spectre Strategy":{"v":0.1,"n":1},"RedBridge / Accent":{"v":-1.1,"n":1},"Newspoll":{"v":-0.7,"n":1}}}};
-  const leaderMonths = [{"ym":"2025-05","x":2025.375,"alb_pref":null,"taylor_pref":null,"hanson_pref":null,"alb_prefN":null,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_net":15,"taylor_net":null,"hanson_net":null,"alb_fav":null,"taylor_fav":null,"hanson_fav":null},{"ym":"2025-06","x":2025.4583333333333,"alb_pref":null,"taylor_pref":null,"hanson_pref":null,"alb_prefN":null,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_net":15,"taylor_net":null,"hanson_net":null,"alb_fav":null,"taylor_fav":null,"hanson_fav":null},{"ym":"2025-07","x":2025.5416666666667,"alb_pref":46,"taylor_pref":30,"hanson_pref":null,"alb_prefN":61,"taylor_prefN":39,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_net":7,"taylor_net":-1,"hanson_net":null,"alb_fav":null,"taylor_fav":null,"hanson_fav":null},{"ym":"2025-08","x":2025.625,"alb_pref":46,"taylor_pref":29,"hanson_pref":null,"alb_prefN":62,"taylor_prefN":38,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_net":2,"taylor_net":-1,"hanson_net":null,"alb_fav":null,"taylor_fav":null,"hanson_fav":null},{"ym":"2025-09","x":2025.7083333333333,"alb_pref":46,"taylor_pref":28,"hanson_pref":null,"alb_prefN":62,"taylor_prefN":38,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_net":-3,"taylor_net":-9,"hanson_net":null,"alb_fav":null,"taylor_fav":null,"hanson_fav":null},{"ym":"2025-10","x":2025.7916666666667,"alb_pref":49,"taylor_pref":27,"hanson_pref":null,"alb_prefN":64,"taylor_prefN":36,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_net":-3,"taylor_net":-17,"hanson_net":null,"alb_fav":-7,"taylor_fav":-7,"hanson_fav":null},{"ym":"2025-11","x":2025.875,"alb_pref":44,"taylor_pref":21,"hanson_pref":null,"alb_prefN":69,"taylor_prefN":31,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_net":1,"taylor_net":-17,"hanson_net":null,"alb_fav":-3,"taylor_fav":-20,"hanson_fav":-11},{"ym":"2025-12","x":2025.9583333333333,"alb_pref":40,"taylor_pref":23,"hanson_pref":null,"alb_prefN":65,"taylor_prefN":35,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_net":-2,"taylor_net":-9,"hanson_net":null,"alb_fav":2,"taylor_fav":-9,"hanson_fav":null},{"ym":"2026-01","x":2026.0416666666667,"alb_pref":43,"taylor_pref":31,"hanson_pref":null,"alb_prefN":58,"taylor_prefN":42,"hanson_prefN":null,"alb_pref3":39,"taylor_pref3":16,"hanson_pref3":26,"alb_prefN3":48,"taylor_prefN3":20,"hanson_prefN3":32,"alb_net":-15,"taylor_net":-21,"hanson_net":null,"alb_fav":-12,"taylor_fav":-11,"hanson_fav":0},{"ym":"2026-02","x":2026.125,"alb_pref":44,"taylor_pref":32,"hanson_pref":null,"alb_prefN":65,"taylor_prefN":42,"hanson_prefN":null,"alb_pref3":35,"taylor_pref3":17,"hanson_pref3":24,"alb_prefN3":46,"taylor_prefN3":22,"hanson_prefN3":32,"alb_net":-13,"taylor_net":-11,"hanson_net":9,"alb_fav":-15,"taylor_fav":-7,"hanson_fav":1},{"ym":"2026-03","x":2026.2083333333333,"alb_pref":41,"taylor_pref":35,"hanson_pref":null,"alb_prefN":54,"taylor_prefN":46,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_net":-16,"taylor_net":1,"hanson_net":5,"alb_fav":-17,"taylor_fav":12,"hanson_fav":9},{"ym":"2026-04","x":2026.2916666666667,"alb_pref":42,"taylor_pref":36,"hanson_pref":null,"alb_prefN":54,"taylor_prefN":46,"hanson_prefN":null,"alb_pref3":35,"taylor_pref3":18,"hanson_pref3":24,"alb_prefN3":46,"taylor_prefN3":23,"hanson_prefN3":31,"alb_net":-15,"taylor_net":0,"hanson_net":null,"alb_fav":-15,"taylor_fav":2,"hanson_fav":1},{"ym":"2026-05","x":2026.375,"alb_pref":40,"taylor_pref":37,"hanson_pref":null,"alb_prefN":51,"taylor_prefN":49,"hanson_prefN":null,"alb_pref3":33,"taylor_pref3":19,"hanson_pref3":26,"alb_prefN3":42,"taylor_prefN3":24,"hanson_prefN3":34,"alb_net":-18,"taylor_net":-2,"hanson_net":8,"alb_fav":-17,"taylor_fav":2,"hanson_fav":3},{"ym":"2026-06","x":2026.4583333333333,"alb_pref":43,"taylor_pref":37,"hanson_pref":null,"alb_prefN":53,"taylor_prefN":47,"hanson_prefN":null,"alb_pref3":32,"taylor_pref3":18,"hanson_pref3":31,"alb_prefN3":40,"taylor_prefN3":22,"hanson_prefN3":38,"alb_net":-21,"taylor_net":-4,"hanson_net":null,"alb_fav":-21,"taylor_fav":-5,"hanson_fav":-1},{"ym":"2026-07","x":2026.5416666666667,"alb_pref":44,"taylor_pref":36,"hanson_pref":null,"alb_prefN":55,"taylor_prefN":45,"hanson_prefN":null,"alb_pref3":37,"taylor_pref3":20,"hanson_pref3":27,"alb_prefN3":44,"taylor_prefN3":24,"hanson_prefN3":32,"alb_net":-16,"taylor_net":-10,"hanson_net":1,"alb_fav":-18,"taylor_fav":-6,"hanson_fav":-6},{"ym":"2026-08","x":2026.625,"alb_pref":42,"taylor_pref":38,"hanson_pref":null,"alb_prefN":53,"taylor_prefN":48,"hanson_prefN":null,"alb_pref3":39,"taylor_pref3":21,"hanson_pref3":29,"alb_prefN3":44,"taylor_prefN3":24,"hanson_prefN3":32,"alb_net":-19,"taylor_net":-5,"hanson_net":0,"alb_fav":-13,"taylor_fav":-1,"hanson_fav":2}];
+  const leaderMonths = [{"ym":"2025-05","x":2025.375,"alb_pref":null,"taylor_pref":null,"hanson_pref":null,"alb_prefN":null,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":15,"taylor_net":null,"hanson_net":null,"alb_fav":null,"taylor_fav":null,"hanson_fav":null},{"ym":"2025-06","x":2025.4583333333333,"alb_pref":null,"taylor_pref":null,"hanson_pref":null,"alb_prefN":null,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":15,"taylor_net":null,"hanson_net":null,"alb_fav":null,"taylor_fav":null,"hanson_fav":null},{"ym":"2025-07","x":2025.5416666666667,"alb_pref":46,"taylor_pref":30,"hanson_pref":null,"alb_prefN":61,"taylor_prefN":39,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":7,"taylor_net":-1,"hanson_net":null,"alb_fav":null,"taylor_fav":null,"hanson_fav":null},{"ym":"2025-08","x":2025.625,"alb_pref":46,"taylor_pref":29,"hanson_pref":null,"alb_prefN":62,"taylor_prefN":38,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":2,"taylor_net":-1,"hanson_net":null,"alb_fav":null,"taylor_fav":null,"hanson_fav":null},{"ym":"2025-09","x":2025.7083333333333,"alb_pref":46,"taylor_pref":28,"hanson_pref":null,"alb_prefN":62,"taylor_prefN":38,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":-3,"taylor_net":-9,"hanson_net":null,"alb_fav":null,"taylor_fav":null,"hanson_fav":null},{"ym":"2025-10","x":2025.7916666666667,"alb_pref":49,"taylor_pref":27,"hanson_pref":null,"alb_prefN":64,"taylor_prefN":36,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":-3,"taylor_net":-17,"hanson_net":null,"alb_fav":-7,"taylor_fav":-7,"hanson_fav":null},{"ym":"2025-11","x":2025.875,"alb_pref":44,"taylor_pref":21,"hanson_pref":null,"alb_prefN":69,"taylor_prefN":31,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":1,"taylor_net":-17,"hanson_net":null,"alb_fav":-3,"taylor_fav":-20,"hanson_fav":-11},{"ym":"2025-12","x":2025.9583333333333,"alb_pref":40,"taylor_pref":23,"hanson_pref":null,"alb_prefN":65,"taylor_prefN":35,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":-2,"taylor_net":-9,"hanson_net":null,"alb_fav":2,"taylor_fav":-9,"hanson_fav":null},{"ym":"2026-01","x":2026.0416666666667,"alb_pref":43,"taylor_pref":31,"hanson_pref":null,"alb_prefN":58,"taylor_prefN":42,"hanson_prefN":null,"alb_pref3":39,"taylor_pref3":16,"hanson_pref3":26,"alb_prefN3":48,"taylor_prefN3":20,"hanson_prefN3":32,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":-15,"taylor_net":-21,"hanson_net":null,"alb_fav":-12,"taylor_fav":-11,"hanson_fav":0},{"ym":"2026-02","x":2026.125,"alb_pref":44,"taylor_pref":32,"hanson_pref":null,"alb_prefN":65,"taylor_prefN":42,"hanson_prefN":null,"alb_pref3":35,"taylor_pref3":17,"hanson_pref3":24,"alb_prefN3":46,"taylor_prefN3":22,"hanson_prefN3":32,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":-13,"taylor_net":-11,"hanson_net":9,"alb_fav":-15,"taylor_fav":-7,"hanson_fav":1},{"ym":"2026-03","x":2026.2083333333333,"alb_pref":41,"taylor_pref":35,"hanson_pref":null,"alb_prefN":54,"taylor_prefN":46,"hanson_prefN":null,"alb_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"alb_net":-16,"taylor_net":1,"hanson_net":5,"alb_fav":-17,"taylor_fav":12,"hanson_fav":9},{"ym":"2026-04","x":2026.2916666666667,"alb_pref":42,"taylor_pref":36,"hanson_pref":null,"alb_prefN":54,"taylor_prefN":46,"hanson_prefN":null,"alb_pref3":35,"taylor_pref3":18,"hanson_pref3":24,"alb_prefN3":46,"taylor_prefN3":23,"hanson_prefN3":31,"alb_prefH":47,"hanson_prefH":39,"taylor_prefH":null,"alb_net":-15,"taylor_net":0,"hanson_net":null,"alb_fav":-15,"taylor_fav":2,"hanson_fav":1},{"ym":"2026-05","x":2026.375,"alb_pref":40,"taylor_pref":37,"hanson_pref":null,"alb_prefN":51,"taylor_prefN":49,"hanson_prefN":null,"alb_pref3":33,"taylor_pref3":19,"hanson_pref3":26,"alb_prefN3":42,"taylor_prefN3":24,"hanson_prefN3":34,"alb_prefH":51,"hanson_prefH":37,"taylor_prefH":null,"alb_net":-18,"taylor_net":-2,"hanson_net":8,"alb_fav":-17,"taylor_fav":2,"hanson_fav":3},{"ym":"2026-06","x":2026.4583333333333,"alb_pref":43,"taylor_pref":37,"hanson_pref":null,"alb_prefN":53,"taylor_prefN":47,"hanson_prefN":null,"alb_pref3":32,"taylor_pref3":18,"hanson_pref3":31,"alb_prefN3":40,"taylor_prefN3":22,"hanson_prefN3":38,"alb_prefH":47,"hanson_prefH":41,"taylor_prefH":null,"alb_net":-21,"taylor_net":-4,"hanson_net":null,"alb_fav":-21,"taylor_fav":-5,"hanson_fav":-1},{"ym":"2026-07","x":2026.5416666666667,"alb_pref":44,"taylor_pref":36,"hanson_pref":null,"alb_prefN":55,"taylor_prefN":45,"hanson_prefN":null,"alb_pref3":37,"taylor_pref3":20,"hanson_pref3":27,"alb_prefN3":44,"taylor_prefN3":24,"hanson_prefN3":32,"alb_prefH":49,"hanson_prefH":36,"taylor_prefH":null,"alb_net":-16,"taylor_net":-10,"hanson_net":1,"alb_fav":-18,"taylor_fav":-6,"hanson_fav":-6},{"ym":"2026-08","x":2026.625,"alb_pref":42,"taylor_pref":38,"hanson_pref":null,"alb_prefN":53,"taylor_prefN":48,"hanson_prefN":null,"alb_pref3":39,"taylor_pref3":21,"hanson_pref3":29,"alb_prefN3":44,"taylor_prefN3":24,"hanson_prefN3":32,"alb_prefH":54,"hanson_prefH":41,"taylor_prefH":null,"alb_net":-19,"taylor_net":-5,"hanson_net":0,"alb_fav":-13,"taylor_fav":-1,"hanson_fav":2}];
   const direction = [{"ym":"2025-05","x":2025.375,"right":36,"wrong":43.9,"unsure":20.1,"net":-7.9,"n":1},{"ym":"2025-06","x":2025.4583333333333,"right":41.6,"wrong":42.8,"unsure":15.6,"net":-1.2,"n":3},{"ym":"2025-07","x":2025.5416666666667,"right":37.2,"wrong":46.2,"unsure":16.6,"net":-9,"n":2},{"ym":"2025-08","x":2025.625,"right":36.5,"wrong":49.6,"unsure":13.9,"net":-13.1,"n":2},{"ym":"2025-09","x":2025.7083333333333,"right":32.9,"wrong":52.3,"unsure":14.8,"net":-19.4,"n":2},{"ym":"2025-10","x":2025.7916666666667,"right":33.8,"wrong":51.4,"unsure":14.8,"net":-17.6,"n":3},{"ym":"2025-11","x":2025.875,"right":33.9,"wrong":50.4,"unsure":15.7,"net":-16.5,"n":2},{"ym":"2025-12","x":2025.9583333333333,"right":34.1,"wrong":50.7,"unsure":15.2,"net":-16.6,"n":2},{"ym":"2026-01","x":2026.0416666666667,"right":27.1,"wrong":53.2,"unsure":19.7,"net":-26.1,"n":4},{"ym":"2026-02","x":2026.125,"right":30.1,"wrong":55.7,"unsure":14.2,"net":-25.6,"n":6},{"ym":"2026-03","x":2026.2083333333333,"right":26.9,"wrong":58.3,"unsure":14.8,"net":-31.4,"n":6},{"ym":"2026-04","x":2026.2916666666667,"right":26.1,"wrong":59.4,"unsure":14.5,"net":-33.3,"n":5},{"ym":"2026-05","x":2026.375,"right":26.6,"wrong":58.8,"unsure":14.6,"net":-32.2,"n":6},{"ym":"2026-06","x":2026.4583333333333,"right":26.3,"wrong":60.4,"unsure":13.3,"net":-34.1,"n":5},{"ym":"2026-07","x":2026.5416666666667,"right":26.2,"wrong":58.5,"unsure":15.3,"net":-32.3,"n":5},{"ym":"2026-08","x":2026.625,"right":25.9,"wrong":59.9,"unsure":14.2,"net":-34,"n":3}];
   const directionHouseEffects = {"right":{"Essential":{"v":1,"n":20},"Roy Morgan":{"v":-0.3,"n":40},"Freshwater":{"v":0.2,"n":1}},"wrong":{"Essential":{"v":-1.9,"n":20},"Roy Morgan":{"v":0.6,"n":40},"Freshwater":{"v":0.1,"n":1}}};
   const directionHouses = ["Roy Morgan","Essential","Freshwater"];
@@ -4634,6 +4634,10 @@ function LeaderSelector({
   }, leaders.map(L => {
     const on = sel.includes(L.id);
     const last = on && sel.length === 1;
+    // Taylor and Hanson stand in for each other: picking one drops the
+    // other, because no poll puts the two of them against each other
+    const rival = L.id === "hanson" ? "taylor" : L.id === "taylor" ? "hanson" : null;
+    const swaps = !on && rival && sel.includes(rival);
     return /*#__PURE__*/React.createElement("button", {
       key: L.id,
       type: "button",
@@ -4643,7 +4647,7 @@ function LeaderSelector({
       } : null,
       "aria-pressed": on,
       disabled: last,
-      title: last ? "Keep at least one leader in view" : undefined,
+      title: last ? "Keep at least one leader in view" : swaps ? "Taylor and Hanson are never polled against each other – this switches the preferred-PM matchup" : undefined,
       onClick: () => onToggle(L.id)
     }, /*#__PURE__*/React.createElement("span", {
       className: "ls-dot",
@@ -4721,7 +4725,8 @@ function LeadershipSection({
   const {
     D
   } = window.AP;
-  const [sel, setSel] = useState(["alb", "taylor", "hanson"]);
+  // Albanese v Taylor is the question the whole cycle asks, so it opens here
+  const [sel, setSel] = useState(["alb", "taylor"]);
   /* pair  – preferred PM | net rating (default)
      ppm   – preferred PM full width
      appr  – net rating full width
@@ -4729,10 +4734,21 @@ function LeadershipSection({
      ppmboth – preferred PM two-way | three-way, the two questions side by side */
   const [view, setView] = useState("pair");
   const order = D.LEADERS.map(L => L.id);
+  /* Turning a chip on picks a MATCHUP, not just another line. Hanson is only
+     ever polled against Albanese alone – nobody has asked Taylor v Hanson – so
+     selecting her drops Taylor, and selecting Taylor drops her. The three-way
+     contest is a third question again: it is entered from the panel's own
+     toggle, which names all three. */
   const toggle = id => setSel(s => {
     if (s.includes(id)) return s.length === 1 ? s : s.filter(x => x !== id);
-    return order.filter(x => s.includes(x) || x === id);
+    const rival = id === "hanson" ? "taylor" : id === "taylor" ? "hanson" : null;
+    return order.filter(x => x !== rival && s.includes(x) || x === id);
   });
+  const nameAll = () => setSel(order.slice()); // the three-way prompt
+  const namePair = () => setSel(["alb", "taylor"]);
+  // whichever two-way the chips currently describe – it is the left panel of
+  // the side-by-side view, where the format is fixed but the matchup is not
+  const twoWay = sel.includes("hanson") && !sel.includes("taylor") ? "ah" : "at";
   const selLeaders = D.LEADERS.filter(L => sel.includes(L.id));
   return /*#__PURE__*/React.createElement("section", {
     className: "leadership"
@@ -4764,10 +4780,15 @@ function LeadershipSection({
     rangeId: rangeId,
     leaders: selLeaders
   }, view === "ppmboth" ? {
-    fmt: "2",
+    mode: twoWay,
     lockFmt: true
   } : {
-    onBoth: () => setView("ppmboth")
+    onBoth: () => {
+      nameAll();
+      setView("ppmboth");
+    },
+    onThreeWay: nameAll,
+    onTwoWay: namePair
   }, {
     chrome: view === "ppmboth" ? /*#__PURE__*/React.createElement(PanelZoom, {
       expanded: true,
@@ -4785,7 +4806,7 @@ function LeadershipSection({
     key: "ppm-3",
     rangeId: rangeId,
     leaders: selLeaders,
-    fmt: "3",
+    mode: "3",
     lockFmt: true,
     chrome: /*#__PURE__*/React.createElement(PanelZoom, {
       expanded: true,
@@ -4821,9 +4842,11 @@ function PreferredPMPanel({
   rangeId,
   leaders: allLeaders,
   chrome,
-  fmt: fmtProp,
+  mode: modeProp,
   lockFmt,
-  onBoth
+  onBoth,
+  onThreeWay,
+  onTwoWay
 }) {
   const {
     D,
@@ -4842,16 +4865,23 @@ function PreferredPMPanel({
      smaller distortion and adding a larger one.
       Question format is the split that earns a toggle: two-way is the whole
      cycle (54 polls, all 14 months), three-way is recent and partial (15
-     polls, 7 months), and blending them put a false trough in the line. */
-  const [ownFmt, setOwnFmt] = useState("2");
-  const fmt = fmtProp || ownFmt;
-  // "Both" is a layout, not a third question — it hands the section a request
+     polls, 7 months), and blending them put a false trough in the line.
+      Three questions, then, not two – "at" Albanese v the opposition leader,
+     "ah" Albanese v Hanson head to head (11 polls, Apr 2026 on, and Albanese
+     runs far higher in it), "3" the three-way. Which one is on screen follows
+     the leaders in view, because the chips ARE the matchup; the toggle picks
+     the format and hands the selection back to the section. */
+  const ids = allLeaders.map(L => L.id);
+  const mode = modeProp || (ids.includes("hanson") ? ids.includes("taylor") ? "3" : "ah" : "at");
+  const fmt = mode === "3" ? "3" : "2";
+  // "Both" is a layout, not a fourth question — it hands the section a request
   // to show the two formats side by side rather than averaging them
-  const setFmt = v => v === "both" ? onBoth && onBoth() : setOwnFmt(v);
-  const suf = fmt === "3" ? "_pref3" : "_pref";
-  // Hanson is only ever named in the three-way prompt; offering her chip on the
-  // two-way view would promise a line that cannot exist
-  const leaders = allLeaders.filter(L => L.id === "hanson" ? fmt === "3" : true);
+  const setFmt = v => v === fmt ? null // "Two-way" is already the head-to-head
+  : v === "both" ? onBoth && onBoth() : v === "3" ? onThreeWay && onThreeWay() : onTwoWay && onTwoWay();
+  const suf = mode === "3" ? "_pref3" : mode === "ah" ? "_prefH" : "_pref";
+  // a name that isn't in the matchup would promise a line that cannot exist:
+  // Hanson outside the three-way and the head-to-head, Taylor inside it
+  const leaders = allLeaders.filter(L => mode === "3" ? true : mode === "ah" ? L.id !== "taylor" : L.id !== "hanson");
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.leaderMonths, xDomain[0]);
   const latestYm = D.leaderMonths[D.leaderMonths.length - 1].ym;
@@ -4867,10 +4897,16 @@ function PreferredPMPanel({
     return ((reads[b.id] || {}).v ?? -1) - ((reads[a.id] || {}).v ?? -1);
   });
   // the published readings behind the line
-  const ppmScatter = D.individualPolls.filter(p => p.ppm && p.x >= xDomain[0] && p.x <= xDomain[1])
-  // the dots must obey the same question filter as the line above them
-  .filter(p => p.ppm.hanson != null === (fmt === "3")).flatMap(p => {
-    const c = p.ppm;
+  const ppmScatter = D.individualPolls.filter(p => p.x >= xDomain[0] && p.x <= xDomain[1])
+  // the dots must obey the same question filter as the line above them, and a
+  // poll that asked several contests contributes only the matching one
+  .map(p => ({
+    p,
+    c: ppmMatch(p, mode)
+  })).filter(d => d.c).flatMap(({
+    p,
+    c
+  }) => {
     return leaders.map(L => {
       // the opposition slot is an office: Ley's readings belong to the same
       // line as Taylor's, exactly as the trend splices them
@@ -4900,7 +4936,7 @@ function PreferredPMPanel({
     className: "card-title"
   }, "Preferred prime minister"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, fmt === "3" ? "“Who would make the better PM?” asked as a three-way, including Hanson" : "“Who would make the better PM?” asked as a two-way", " · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable")), /*#__PURE__*/React.createElement("div", {
+  }, mode === "3" ? "“Who would make the better PM?” asked as a three-way, including Hanson" : mode === "ah" ? "“Who would make the better PM?” asked head to head, Albanese against Hanson" : "“Who would make the better PM?” asked as a two-way, Albanese against the opposition leader", mode === "ah" ? " · as published – Newspoll forces a choice where others leave up to a fifth uncommitted, so shares aren’t directly comparable" : " · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable")), /*#__PURE__*/React.createElement("div", {
     className: "card-head-tools"
   }, !lockFmt && /*#__PURE__*/React.createElement(TextToggle, {
     caps: true,
@@ -4948,7 +4984,7 @@ function PreferredPMPanel({
       title: readoutDeltaTitle(r)
     }));
   })), /*#__PURE__*/React.createElement(TrendChart, {
-    key: "ppm-" + fmt + "-" + rangeId + "-" + leaders.map(L => L.id).join("."),
+    key: "ppm-" + mode + "-" + rangeId + "-" + leaders.map(L => L.id).join("."),
     height: 250,
     xDomain: xDomain,
     yDomain: domain,
@@ -5542,6 +5578,15 @@ function ppmContests(r) {
   if (Array.isArray(r.ppmSets)) return r.ppmSets;
   if (r.ppm) return [r.ppm];
   return [];
+}
+
+/* The one contest in a poll that answers a given matchup – "at" Albanese v the
+   opposition leader, "ah" Albanese v Hanson head to head, "3" the three-way.
+   A poll that asked two of them publishes both, and plotting them as one cloud
+   would put two different questions on the same axis. */
+function ppmMatch(r, mode) {
+  const named = c => c.taylor != null || c.ley != null;
+  return ppmContests(r).find(c => mode === "3" ? c.hanson != null && named(c) : mode === "ah" ? c.hanson != null && !named(c) : c.hanson == null) || null;
 }
 function ppmLabel(c) {
   if (c.label) return c.label;
@@ -6509,6 +6554,7 @@ Object.assign(window, {
   primarySegs,
   dirSegs,
   ppmContests,
+  ppmMatch,
   ppmContestSegs,
   ppmLabel,
   ppmKind,

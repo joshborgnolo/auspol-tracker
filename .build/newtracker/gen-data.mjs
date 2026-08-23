@@ -340,8 +340,11 @@ const leaderMonths = MONTHS.map((ym) => {
   // a three-way prompt is a different question, never averaged with a two-way
   const pp2 = pp.filter((p) => p.han == null);
   const pp3 = pp.filter((p) => p.han != null);
+  // …and Albanese v Hanson is a third question again, asked with the opposition
+  // leader's name absent, so it lives in its own array and its own series
+  const ppH = D.ppmHeadToHead.filter((r) => ymOf(r.date) === ym);
   const rows = appr.filter((p) => ymOf(p.date) === ym);
-  if (!pp.length && !rows.length) return null;
+  if (!pp.length && !rows.length && !ppH.length) return null;
   // approval and favourability are different questions – routed PER LEADER by
   // that leader's metric at the firm, never pooled into one mean
   const split = (prop, lk) => {
@@ -389,6 +392,11 @@ const leaderMonths = MONTHS.map((ym) => {
     alb_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "alb"))),
     taylor_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "opp"))),
     hanson_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "han"))),
+    /* Albanese v Hanson, head to head. Not a slice of either line above: it is
+       asked as its own contest, Albanese runs ~7pp higher against Hanson than
+       against the opposition leader, and only some houses ask it (11 polls,
+       Apr 2026 on), so it is a third series rather than a filter on the first. */
+    alb_prefH: rnd(meanOf(ppH, (r) => r.alb)), hanson_prefH: rnd(meanOf(ppH, (r) => r.han)), taylor_prefH: null,
     alb_net: A.net, taylor_net: O.net, hanson_net: H.net,
     alb_fav: A.fav, taylor_fav: O.fav, hanson_fav: H.fav,
   };

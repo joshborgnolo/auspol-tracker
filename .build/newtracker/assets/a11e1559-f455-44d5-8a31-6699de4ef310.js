@@ -277,11 +277,18 @@ function LeaderSelector({ leaders, sel, onToggle }) {
         {leaders.map((L) => {
           const on = sel.includes(L.id);
           const last = on && sel.length === 1;
+          // Taylor and Hanson stand in for each other: picking one drops the
+          // other, because no poll puts the two of them against each other
+          const rival = L.id === "hanson" ? "taylor" : L.id === "taylor" ? "hanson" : null;
+          const swaps = !on && rival && sel.includes(rival);
           return (
             <button key={L.id} type="button"
                     className={"ls-chip" + (on ? " on" : "")}
                     style={on ? { "--chip": L.color } : null}
-                    aria-pressed={on} disabled={last} title={last ? "Keep at least one leader in view" : undefined}
+                    aria-pressed={on} disabled={last}
+                    title={last ? "Keep at least one leader in view"
+                         : swaps ? "Taylor and Hanson are never polled against each other – this switches the preferred-PM matchup"
+                                 : undefined}
                     onClick={() => onToggle(L.id)}>
               <span className="ls-dot" style={{ background: L.color }}></span>
               {L.name}{L.current ? <span className="ls-cur"> · {L.current}</span> : null}
@@ -324,7 +331,8 @@ function PanelZoom({ expanded, onExpand, onSwap, onClose, label, otherLabel }) {
 
 function LeadershipSection({ rangeId }) {
   const { D } = window.AP;
-  const [sel, setSel] = useState(["alb", "taylor", "hanson"]);
+  // Albanese v Taylor is the question the whole cycle asks, so it opens here
+  const [sel, setSel] = useState(["alb", "taylor"]);
   /* pair  – preferred PM | net rating (default)
      ppm   – preferred PM full width
      appr  – net rating full width
@@ -332,11 +340,22 @@ function LeadershipSection({ rangeId }) {
      ppmboth – preferred PM two-way | three-way, the two questions side by side */
   const [view, setView] = useState("pair");
   const order = D.LEADERS.map((L) => L.id);
+  /* Turning a chip on picks a MATCHUP, not just another line. Hanson is only
+     ever polled against Albanese alone – nobody has asked Taylor v Hanson – so
+     selecting her drops Taylor, and selecting Taylor drops her. The three-way
+     contest is a third question again: it is entered from the panel's own
+     toggle, which names all three. */
   const toggle = (id) =>
     setSel((s) => {
       if (s.includes(id)) return s.length === 1 ? s : s.filter((x) => x !== id);
-      return order.filter((x) => s.includes(x) || x === id);
+      const rival = id === "hanson" ? "taylor" : id === "taylor" ? "hanson" : null;
+      return order.filter((x) => (x !== rival && s.includes(x)) || x === id);
     });
+  const nameAll = () => setSel(order.slice());        // the three-way prompt
+  const namePair = () => setSel(["alb", "taylor"]);
+  // whichever two-way the chips currently describe – it is the left panel of
+  // the side-by-side view, where the format is fixed but the matchup is not
+  const twoWay = sel.includes("hanson") && !sel.includes("taylor") ? "ah" : "at";
   const selLeaders = D.LEADERS.filter((L) => sel.includes(L.id));
   return (
     <section className="leadership">
@@ -359,7 +378,10 @@ function LeadershipSection({ rangeId }) {
         ) : (
           <PreferredPMPanel key={view === "ppmboth" ? "ppm-2" : "ppm"}
             rangeId={rangeId} leaders={selLeaders}
-            {...(view === "ppmboth" ? { fmt: "2", lockFmt: true } : { onBoth: () => setView("ppmboth") })}
+            {...(view === "ppmboth"
+                  ? { mode: twoWay, lockFmt: true }
+                  : { onBoth: () => { nameAll(); setView("ppmboth"); },
+                      onThreeWay: nameAll, onTwoWay: namePair })}
             chrome={view === "ppmboth"
               ? <PanelZoom expanded label="two-way" onClose={() => setView("pair")} />
               : <PanelZoom expanded={view === "ppm"} label="preferred prime minister"
@@ -369,7 +391,7 @@ function LeadershipSection({ rangeId }) {
         )}
         {view === "ppmboth" ? (
           <PreferredPMPanel key="ppm-3" rangeId={rangeId} leaders={selLeaders}
-            fmt="3" lockFmt
+            mode="3" lockFmt
             chrome={<PanelZoom expanded label="three-way" onClose={() => setView("pair")} />} />
         ) : (
           <ApprovalPanel key={view === "both" ? "appr-fav" : "appr"}
@@ -389,7 +411,7 @@ function LeadershipSection({ rangeId }) {
 }
 
 // ---- Preferred PM ---------------------------------------------------
-function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, lockFmt, onBoth }) {
+function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, mode: modeProp, lockFmt, onBoth, onThreeWay, onTwoWay }) {
   const { D, rangeDomain, filterPts, buildXTicks } = window.AP;
   /* Only the published figure is plotted. A "share of decided" basis used to
      sit here, on the reasoning that dividing by the people who named someone
@@ -403,16 +425,26 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
 
      Question format is the split that earns a toggle: two-way is the whole
      cycle (54 polls, all 14 months), three-way is recent and partial (15
-     polls, 7 months), and blending them put a false trough in the line. */
-  const [ownFmt, setOwnFmt] = useState("2");
-  const fmt = fmtProp || ownFmt;
-  // "Both" is a layout, not a third question — it hands the section a request
+     polls, 7 months), and blending them put a false trough in the line.
+
+     Three questions, then, not two – "at" Albanese v the opposition leader,
+     "ah" Albanese v Hanson head to head (11 polls, Apr 2026 on, and Albanese
+     runs far higher in it), "3" the three-way. Which one is on screen follows
+     the leaders in view, because the chips ARE the matchup; the toggle picks
+     the format and hands the selection back to the section. */
+  const ids = allLeaders.map((L) => L.id);
+  const mode = modeProp || (ids.includes("hanson") ? (ids.includes("taylor") ? "3" : "ah") : "at");
+  const fmt = mode === "3" ? "3" : "2";
+  // "Both" is a layout, not a fourth question — it hands the section a request
   // to show the two formats side by side rather than averaging them
-  const setFmt = (v) => (v === "both" ? onBoth && onBoth() : setOwnFmt(v));
-  const suf = fmt === "3" ? "_pref3" : "_pref";
-  // Hanson is only ever named in the three-way prompt; offering her chip on the
-  // two-way view would promise a line that cannot exist
-  const leaders = allLeaders.filter((L) => (L.id === "hanson" ? fmt === "3" : true));
+  const setFmt = (v) => (v === fmt ? null                    // "Two-way" is already the head-to-head
+                       : v === "both" ? onBoth && onBoth()
+                       : v === "3" ? onThreeWay && onThreeWay()
+                       : onTwoWay && onTwoWay());
+  const suf = mode === "3" ? "_pref3" : mode === "ah" ? "_prefH" : "_pref";
+  // a name that isn't in the matchup would promise a line that cannot exist:
+  // Hanson outside the three-way and the head-to-head, Taylor inside it
+  const leaders = allLeaders.filter((L) => (mode === "3" ? true : mode === "ah" ? L.id !== "taylor" : L.id !== "hanson"));
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.leaderMonths, xDomain[0]);
   const latestYm = D.leaderMonths[D.leaderMonths.length - 1].ym;
@@ -427,11 +459,12 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
   });
   // the published readings behind the line
   const ppmScatter = D.individualPolls
-    .filter((p) => p.ppm && p.x >= xDomain[0] && p.x <= xDomain[1])
-    // the dots must obey the same question filter as the line above them
-    .filter((p) => (p.ppm.hanson != null) === (fmt === "3"))
-    .flatMap((p) => {
-      const c = p.ppm;
+    .filter((p) => p.x >= xDomain[0] && p.x <= xDomain[1])
+    // the dots must obey the same question filter as the line above them, and a
+    // poll that asked several contests contributes only the matching one
+    .map((p) => ({ p, c: ppmMatch(p, mode) }))
+    .filter((d) => d.c)
+    .flatMap(({ p, c }) => {
       return leaders.map((L) => {
         // the opposition slot is an office: Ley's readings belong to the same
         // line as Taylor's, exactly as the trend splices them
@@ -451,9 +484,12 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         <div>
           <h3 className="card-title">Preferred prime minister</h3>
           <p className="card-sub">
-            {fmt === "3" ? "“Who would make the better PM?” asked as a three-way, including Hanson"
-                         : "“Who would make the better PM?” asked as a two-way"}
-            {" · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable"}
+            {mode === "3" ? "“Who would make the better PM?” asked as a three-way, including Hanson"
+             : mode === "ah" ? "“Who would make the better PM?” asked head to head, Albanese against Hanson"
+                             : "“Who would make the better PM?” asked as a two-way, Albanese against the opposition leader"}
+            {mode === "ah"
+              ? " · as published – Newspoll forces a choice where others leave up to a fifth uncommitted, so shares aren’t directly comparable"
+              : " · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable"}
           </p>
         </div>
         <div className="card-head-tools">
@@ -483,7 +519,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         })}
       </div>
       <TrendChart
-        key={"ppm-" + fmt + "-" + rangeId + "-" + leaders.map((L) => L.id).join(".")}
+        key={"ppm-" + mode + "-" + rangeId + "-" + leaders.map((L) => L.id).join(".")}
         height={250} xDomain={xDomain} yDomain={domain}
         yTicks={ticks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
@@ -844,6 +880,17 @@ function ppmContests(r) {
   if (Array.isArray(r.ppmSets)) return r.ppmSets;
   if (r.ppm) return [r.ppm];
   return [];
+}
+
+/* The one contest in a poll that answers a given matchup – "at" Albanese v the
+   opposition leader, "ah" Albanese v Hanson head to head, "3" the three-way.
+   A poll that asked two of them publishes both, and plotting them as one cloud
+   would put two different questions on the same axis. */
+function ppmMatch(r, mode) {
+  const named = (c) => c.taylor != null || c.ley != null;
+  return ppmContests(r).find((c) => (mode === "3" ? c.hanson != null && named(c)
+                                   : mode === "ah" ? c.hanson != null && !named(c)
+                                                   : c.hanson == null)) || null;
 }
 function ppmLabel(c) {
   if (c.label) return c.label;
@@ -1540,4 +1587,4 @@ function PollsterTable() {
 
 Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
-  ShareBar, NetVal, FavMark, ChgTag, ApprBlock, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C });
+  ShareBar, NetVal, FavMark, ChgTag, ApprBlock, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C });
