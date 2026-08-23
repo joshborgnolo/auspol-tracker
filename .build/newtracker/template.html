@@ -252,7 +252,6 @@
   --lnp-text: var(--lnp);
   --grn-text: oklch(0.52 0.120 150);
   --onp-text: oklch(0.52 0.130 58);
-  --oth-text: oklch(0.50 0.018 70);
 
   --accent: oklch(0.50 0.070 205);
 
@@ -269,8 +268,6 @@
 
   /* past-cycle overlay lines – neutral graphite so the metric (not the party)
      leads; the current cycle and any highlighted cycle override with party hue */
-  --cycle-line:  oklch(0.55 0.012 60 / 0.42);
-  --cycle-faint: oklch(0.60 0.010 60 / 0.15);
 
   --serif: "Newsreader", Georgia, "Times New Roman", serif;
   --sans: "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -330,7 +327,6 @@ body.dark {
   --lnp-text: var(--lnp);
   --grn-text: var(--grn);
   --onp-text: var(--onp);
-  --oth-text: var(--oth);
 
   --accent: oklch(0.70 0.080 205);
 
@@ -338,8 +334,6 @@ body.dark {
   --mood-pos: oklch(0.70 0.105 200);
   --mood-neg: oklch(0.685 0.105 38);
 
-  --cycle-line:  oklch(0.74 0.012 72 / 0.42);
-  --cycle-faint: oklch(0.70 0.010 72 / 0.15);
 
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
   --tip-shadow: 0 1px 2px oklch(0 0 0 / 0.35), 0 10px 30px oklch(0 0 0 / 0.50);
@@ -460,7 +454,6 @@ body {
 }
 .wordmark.stacked { flex-direction: row; align-items: center; gap: 7px; }
 .wm-textcol { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 5px; }
-.wm-top { display: inline-flex; align-items: center; gap: 9px; }
 .wm-name {
   display: inline-flex; font-weight: 800; font-size: 30px;
   letter-spacing: -0.025em; line-height: 1;
@@ -817,10 +810,6 @@ body {
 /* ---------- hero ---------- */
 .hero { padding: 26px 28px 22px; }
 .hero-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; flex-wrap: wrap; margin-bottom: 6px; }
-.hero-eyebrow {
-  font-size: 12px; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--ink-3); font-weight: 700; margin: 0 0 10px;
-}
 .hero-readout { display: flex; align-items: baseline; gap: 16px; }
 .ro-party { display: flex; align-items: baseline; gap: 11px; }
 .ro-dot { width: 13px; height: 13px; border-radius: 50%; align-self: center; }
@@ -858,11 +847,6 @@ body {
 /* Movement smaller than its own interval – stated, not colour-coded, so it
    reads as a qualification rather than a warning. */
 .hero-caveat { color: var(--ink-3); font-style: italic; }
-.hero-hypo {
-  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--onp-text); border: 1px solid var(--onp); border-radius: 999px; padding: 3px 9px;
-  opacity: 0.9;
-}
 .hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
@@ -1021,7 +1005,6 @@ body {
   color: var(--ink-3); margin-right: 2px;
 }
 .ts-party { display: inline-flex; align-items: baseline; gap: 5px; }
-.ts-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; align-self: center; }
 .ts-abbr {
   font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
   color: var(--ink-3);
@@ -1194,8 +1177,6 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
   .leader-readout .delta { grid-column: 2; grid-row: 2; justify-self: start; margin-top: -1px; }
 }
 .leader-num.muted { color: var(--ink-3); }
-.leader-vs { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 15px; }
-.leader.undecided { margin-left: auto; text-align: right; flex-direction: column; align-items: flex-end; gap: 0; }
 
 .approval-readout { display: flex; flex-direction: column; gap: 11px; margin-bottom: 12px; }
 .appr-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
@@ -1226,7 +1207,6 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
   letter-spacing: -0.01em;
 }
 .chg.flat { color: var(--ink-3); opacity: 0.7; }
-.chg .chg-x { font-size: 8px; }
 
 /* diverging net bar – the live source publishes nets only (no approve /
    disapprove split), so the snapshot readout shows net vs the "even" midline */
@@ -1497,8 +1477,6 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
   color: var(--ink-3);
 }
-.pd-leaders { display: flex; gap: 22px; flex-wrap: wrap; }
-.pd-lead { display: inline-flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--ink-2); }
 .pd-contests { display: flex; flex-direction: column; gap: 12px; }
 .pd-contest { display: flex; flex-direction: column; gap: 6px; }
 .pd-contest-lab {
@@ -1630,9 +1608,6 @@ body.editorial .poll-table tbody tr:hover { background: var(--surface-2); }
 body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; padding-top: 30px; }
 body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 16px 0 0; text-align: left; font-size: 11.5px; color: var(--ink-3); }
 
-/* hero readout gets a hair more presence in editorial */
-body.editorial .hero-eyebrow { color: var(--ink-3); }
-
 .tweak-note {
   margin: -2px 0 4px; font-size: 11.5px; line-height: 1.45;
   color: var(--ink-3); font-family: var(--sans);
@@ -1683,8 +1658,6 @@ body.editorial .hero-eyebrow { color: var(--ink-3); }
   opacity: 0; transition: opacity .3s ease;
   pointer-events: none; z-index: 0;
 }
-/* keep the tab row painting above the full-bleed backdrop */
-.tabs-inner { position: relative; z-index: 1; }
 /* sticky on every view */
 /* Pins below the notch so the labels stay readable, while its backdrop reaches
    up through the notch (see .tabs.pinned::before) - so the strip above the bar
@@ -1697,7 +1670,10 @@ body.editorial .hero-eyebrow { color: var(--ink-3); }
    a composited transform on .tabs-set: no reflow per frame (smooth on any
    thread), and no layout change at all (no oscillation risk). */
 .tabs.pinned::after { opacity: 1; }
+/* position/z-index keep the row painting above the full-bleed backdrop;
+   overflow hides the docked score until the bar pins (see .tab-score) */
 .tabs-inner {
+  position: relative; z-index: 1;
   display: flex; align-items: flex-end;
   border-bottom: 1px solid var(--line);
   overflow: hidden;
@@ -1714,7 +1690,6 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.79); } /* 19 → 15 *
 @media (prefers-reduced-motion: reduce) {
   .tabs-set, .tabs::after, .tab-score { transition: none; }
 }
-.tabs-inner::-webkit-scrollbar { display: none; }
 .tab {
   position: relative; border: 0; background: none; cursor: pointer;
   padding: 12px 1px 12px; font-family: var(--sans);

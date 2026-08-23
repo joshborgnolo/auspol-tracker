@@ -331,7 +331,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
     <section className="card cycle-card">
       <div className="card-head cycle-head">
         <div>
-          <h3 className="card-title">{M.title}</h3>
+          <h2 className="card-title">{M.title}</h2>
           <p className="card-sub">{M.sub}</p>
           {M.han && hanAvail && (
             <label className={"cyc-han" + (showHan ? " on" : "")}
@@ -970,7 +970,7 @@ function VariancePanel({ facet, rangeId }) {
     <section className="ap-var">
       <div className="ap-var-head">
         <div>
-          <h4 className="ap-var-title">Poll disagreement</h4>
+          <h3 className="ap-var-title">Poll disagreement</h3>
           <p className="card-sub">
             How far apart the polls sit, against the spread sampling error alone would produce.
             Shaded = that chance floor; a line inside it means the houses are running tighter than
@@ -1275,7 +1275,7 @@ function AllPollsView() {
     <div className="view view-allpolls">
       <div className="ap-head">
         <div>
-          <h3 className="card-title">All polls</h3>
+          <h2 className="card-title">All polls</h2>
           <p className="card-sub">
             Every individual national poll in the archive · {total} polls from {houses.length} pollsters,
             {" "}{(() => {  // span computed from the data, so it stays honest as polls are added
@@ -1398,6 +1398,13 @@ function AllPollsView() {
 
       <div className="table-wrap ap-wrap">
         <table className="poll-table archive">
+          {/* 149 rows whose only name was a heading three elements away. Said
+              once, out of sight, so a screen reader meets the table already
+              knowing what it is and how much of it the filters left. */}
+          <caption className="sr-only">
+            All polls, {(FACETS.find((f) => f.id === facet) || {}).label} columns –
+            {" "}{sorted.length} of {total} polls
+          </caption>
           <thead>
             <tr>
               <th scope="col" className="exp-col" aria-hidden="true"></th>

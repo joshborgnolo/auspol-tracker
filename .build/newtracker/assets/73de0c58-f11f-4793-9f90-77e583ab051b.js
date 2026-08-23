@@ -468,7 +468,7 @@ function MethodNote() {
     <footer className="method">
       <div className="method-grid">
         <div>
-          <h3 className="method-h">About this tracker</h3>
+          <h2 className="method-h">About this tracker</h2>
           <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
              election. The two-party and primary-vote aggregates are weighted means: recent and
              larger-sample polls count for more, and each pollster’s figure is adjusted for its own
@@ -486,14 +486,14 @@ function MethodNote() {
              interval is marked as such.</p>
         </div>
         <div>
-          <h3 className="method-h">Reading the charts</h3>
+          <h2 className="method-h">Reading the charts</h2>
           <p>Each dot is one published poll; lines are monthly aggregates. The spread of dots around the
              line is a useful reminder of sampling uncertainty. Leadership questions are polled
              irregularly and framed differently between pollsters, so those lines connect published readings
              – a “—” anywhere in the tables means the pollster didn’t ask that question.</p>
         </div>
         <div>
-          <h3 className="method-h">Sources</h3>
+          <h2 className="method-h">Sources</h2>
           <p>{sources}. Field dates and sample sizes are listed per poll in the archive.</p>
         </div>
       </div>
