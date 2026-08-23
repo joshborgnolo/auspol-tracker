@@ -1238,7 +1238,9 @@ function AllPollsView() {
                 <th scope="col" className="ta-l apub-col hide-md"
                     title="What the pollster published – a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
                 <ArchSortTh label={({ lnp: "Lead · ALP v L/NP", onp: "Lead · ALP v ON", lnponp: "Lead · L/NP v ON", "3cp": "Lead · 3-cornered" })[measure]} short="Lead" k="alp" sort={sort} onSort={onSort} />
-                <ArchSortTh label="House lean" short="Lean" k="lean" sort={sort} onSort={onSort} />
+                {/* hide-sm: the last column to go on a phone – see the .hide-sm
+                    note in the stylesheet. The row detail carries "House lean". */}
+                <ArchSortTh label="House lean" short="Lean" k="lean" sort={sort} onSort={onSort} className="hide-sm" />
               </>)}
               {facet === "primary" && (<>
                 <ArchSortTh label="ALP" k="p.alp" sort={sort} onSort={onSort} />
@@ -1295,7 +1297,7 @@ function AllPollsView() {
                   {facet === "twopp" && (<>
                   <td className="ta-l apub-col hide-md"><ArchPublished p={p} /></td>
                   <td className="num"><ArchLead p={p} measure={measure} /></td>
-                  <td className="num">
+                  <td className="num hide-sm">
                     {p.lean == null
                       ? <span className="dash" title="No published 2PP to compare with the aggregate">—</span>
                       : <span className={"arch-lean " + (p.lean > 0.05 ? "alp" : p.lean < -0.05 ? "lnp" : "flat")}

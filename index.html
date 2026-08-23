@@ -1992,6 +1992,23 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
    reach it with. The ledger already sheds columns at 1000px; below ~480px the
    lead column's 180px floor alone is half the viewport, so give the bar and the
    cells a narrow-screen size instead of letting the table overflow. */
+/* One tier below .hide-md, on the same principle: the table has to FIT, because
+   .ap-wrap cannot scroll without becoming the sticky thead's containing block.
+   .hide-md got it down to five columns, which fits at 375px exactly - and then
+   stops. Below ~350px the five have no compression left and the rightmost is
+   simply clipped, with no scrollbar to reach it: I verified the 375px case and
+   wrongly took it for the whole range. (Not a font question - measured at 33px
+   over with Public Sans and 29px with a humanist alternative.)
+
+   House lean is the one to drop. It is a derived comparison rather than
+   something the pollster published, the Snapshot tab carries house effects in
+   full, and the row detail here prints "House lean +0.3 vs aggregate" one tap
+   away - so nothing is actually lost, which is the same bargain .hide-md
+   already strikes. */
+@media (max-width: 430px) {
+  .poll-table.archive .hide-sm { display: none; }
+}
+
 @media (max-width: 480px) {
   .two-pp-col { min-width: 118px; }
   .arch-lead { gap: 6px; }
@@ -8195,7 +8212,8 @@ function AllPollsView() {
     short: "Lean",
     k: "lean",
     sort: sort,
-    onSort: onSort
+    onSort: onSort,
+    className: "hide-sm"
   })), facet === "primary" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ArchSortTh, {
     label: "ALP",
     k: "p.alp",
@@ -8305,7 +8323,7 @@ function AllPollsView() {
       p: p,
       measure: measure
     })), /*#__PURE__*/React.createElement("td", {
-      className: "num"
+      className: "num hide-sm"
     }, p.lean == null ? /*#__PURE__*/React.createElement("span", {
       className: "dash",
       title: "No published 2PP to compare with the aggregate"
