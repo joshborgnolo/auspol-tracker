@@ -495,7 +495,8 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
       const m = D.leaderMonths[i], a = m[pr.ids[0] + pr.suf], b = m[pr.ids[1] + pr.suf];
       if (a == null || b == null) continue;
       const d = Math.round(Math.abs(a - b));
-      return d === 0 ? "level" : byId[a > b ? pr.ids[0] : pr.ids[1]].short + " +" + d;
+      const who = byId[a > b ? pr.ids[0] : pr.ids[1]];
+      return { m: d, name: who.short, color: inkOf(who.color), level: d === 0 };
     }
     return null;
   };
@@ -525,19 +526,36 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
       {three ? (
         <div className="leader-readout">{tiles(ordered)}</div>
       ) : (
-        /* grouped by contest, because four tiles in one row would read as one
-           four-cornered race and two of them are the same man */
+        /* One line per contest, and every name printed ONCE. Grouping is still
+           the point - four tiles in a row would read as one four-cornered race
+           when two of them are the same man - but the group used to be titled
+           "Albanese v the opposition leader" above tiles labelled Albanese and
+           Taylor, so the caption and the tiles were both naming the players
+           and Albanese appeared four times in six lines. The tiles do the
+           naming, because that is where the numbers are; the row does the
+           grouping. What is left of the caption is the rule that ties the pair
+           to its lines on the chart, and the margin, which is the one thing
+           two contests side by side are FOR - 4 points against the opposition
+           leader, 13 against Hanson - and the one thing neither tile states.
+           It takes the leader's own ink, so it needs no name to say whose. */
         <div className="ppm-pairs">
-          {PPM_PAIRS.map((pr) => (
-            <div className={"ppm-pair" + (pr.dashed ? " dashed" : "")} key={pr.id}>
-              <div className="ppm-pair-lab">
+          {PPM_PAIRS.map((pr) => {
+            const lead = leadOf(pr);
+            return (
+              <div className={"ppm-pair" + (pr.dashed ? " dashed" : "")} key={pr.id}>
                 <span className="ppm-rule" aria-hidden="true"></span>
-                {pr.lab}
-                {leadOf(pr) && <span className="ppm-lead">{leadOf(pr)}</span>}
+                {/* the contest still has a name for a screen reader, which
+                    cannot see that these two tiles are one matchup */}
+                <span className="sr-only">{pr.lab}</span>
+                <div className="leader-readout">{tiles(rows.filter((r) => r.pair === pr))}</div>
+                {lead && (
+                  <span className="ppm-lead" style={lead.level ? null : { color: lead.color }}>
+                    {lead.level ? "level" : <><span className="sr-only">{lead.name} leads by </span>+{lead.m}</>}
+                  </span>
+                )}
               </div>
-              <div className="leader-readout">{tiles(rows.filter((r) => r.pair === pr))}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
       <TrendChart
