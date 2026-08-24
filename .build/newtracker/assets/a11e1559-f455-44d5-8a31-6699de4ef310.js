@@ -109,6 +109,10 @@ function TextToggle({ options, value, onChange, caps, ariaLabel }) {
 function seriesNN(pts, key) {
   return pts.map((d) => ({ x: d.x, y: d[key] })).filter((p) => p.y != null);
 }
+// the same, keeping the month – blendRows matches two versions of a line by ym
+function seriesYm(pts, key) {
+  return pts.map((d) => ({ ym: d.ym, x: d.x, y: d[key] })).filter((p) => p.y != null);
+}
 // last two published readings for a key → { v, ym, prev, prevYm } (or null).
 // prevYm is carried so a delta can name the month it measures from – these are
 // PUBLISHED readings, so the gap is often more than one month.
@@ -425,9 +429,17 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
      design rather than opinion. */
   const [ownFmt, setOwnFmt] = useState("2");
   const fmt = fmtProp || ownFmt;
-  // "Both" is a layout, not a third question — it hands the section a request
-  // to show the two formats side by side rather than averaging them
-  const setFmt = (v) => (v === "both" ? onBoth && onBoth() : setOwnFmt(v));
+  /* "Both" is a layout, not a third question — it hands the section a request
+     to show the two formats side by side rather than averaging them, and it is
+     the one destination that doesn't morph, because the panel itself splits.
+     The other switch is the same gesture as the hero's: the same people, asked
+     a differently shaped question, so the lines reshape and the clouds cross
+     over rather than the chart being replaced. */
+  const [morph, chooseFmt] = window.AP.useMorph(
+    fmt,
+    (v) => (v === "both" ? onBoth && onBoth() : setOwnFmt(v)),
+    (from, to) => from !== "both" && to !== "both");
+  const setFmt = chooseFmt;
   const three = fmt === "3";
   const byId = {};
   allLeaders.forEach((L) => { byId[L.id] = L; });
@@ -437,14 +449,21 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
 
   /* One row per line, in draw and read order. The three-way is a single
      contest of three names; the two-way is two contests of two. */
-  const rows = three
-    ? allLeaders.map((L) => ({ pair: null, L, suf: "_pref3", label: L.short }))
+  /* One row per line, for either question, so a morph can build both sides.
+     `mk` is what a line is matched BY across the switch: a leader keeps his
+     line through the change of question. The head-to-head Albanese has no
+     counterpart in a three-way that already contains him once, so it is the
+     one line with nowhere to go, and it fades instead of travelling. */
+  const rowsFor = (f) => f === "3"
+    ? allLeaders.map((L) => ({ pair: null, L, suf: "_pref3", label: L.short, mk: L.id }))
     : PPM_PAIRS.flatMap((pr) => pr.ids.map((id) => ({
         pair: pr, L: byId[id], suf: pr.suf, dashed: !!pr.dashed,
         // the tooltip lists every line at once, so the two Albaneses have to
         // name their own contest there
         label: id === "alb" && pr.id === "ah" ? "Albanese v Hanson" : byId[id].short,
+        mk: id === "alb" && pr.id === "ah" ? "alb-h2h" : id,
       })));
+  const rows = rowsFor(fmt);
   rows.forEach((r) => { r.read = lastReadings(D.leaderMonths, r.L.id + r.suf); });
   // sitting PM (Albanese) is always shown first; the rest descend by preference
   const ordered = three
@@ -453,9 +472,9 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
 
   // the published readings behind the lines, each dot from the contest it
   // belongs to – a poll that asked two of them publishes both
-  const ppmScatter = D.individualPolls
+  const cloudFor = (f) => D.individualPolls
     .filter((p) => p.x >= xDomain[0] && p.x <= xDomain[1])
-    .flatMap((p) => (three ? [["3", allLeaders]] : PPM_PAIRS.map((pr) => [pr.id, pr.ids.map((id) => byId[id]), pr]))
+    .flatMap((p) => (f === "3" ? [["3", allLeaders]] : PPM_PAIRS.map((pr) => [pr.id, pr.ids.map((id) => byId[id]), pr]))
       .flatMap(([m, ls, pr]) => {
         const c = ppmMatch(p, m);
         if (!c) return [];
@@ -465,12 +484,25 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           const raw = L.id === "taylor" ? (c.taylor != null ? c.taylor : c.ley) : c[L.id];
           if (raw == null) return null;
           const lab = pr && pr.id === "ah" && L.id === "alb" ? "Albanese v Hanson" : L.short;
-          return { x: p.x, y: raw, color: L.color, label: lab, meta: p };
+          return { x: p.x, y: raw, color: L.color, label: lab, meta: p, leader: L.id };
         }).filter(Boolean);
       }));
+  const ppmScatter = cloudFor(fmt);
+  /* A poll that put BOTH questions to the same sample is one reading answering
+     two of them, so its dot travels; a poll asked only one has nowhere to go
+     and fades. Keyed on poll + leader — the first dot to claim a leader keeps
+     him, which is what sends the two-way pair's Albanese to the three-way
+     rather than the head-to-head's. */
+  const cross = morph
+    ? window.AP.crossClouds(cloudFor(morph.from), cloudFor(morph.to), morph.t,
+        (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.leader)
+    : null;
 
-  // the tinted gap between each contest's two lines: its lead, month by month
-  const areas = three ? [] : PPM_PAIRS.map((pr) => {
+  /* The tinted lead bands belong to the two-way question only, so on the way
+     to a three-way they fade rather than vanish under the lines that are still
+     moving (and fade back in on the way home). */
+  const areaFade = !morph ? 1 : (morph.to === "3" ? 1 - morph.t : morph.t);
+  const areas = (three && !morph) || areaFade <= 0.01 ? [] : PPM_PAIRS.map((pr) => {
     const [a, b] = pr.ids;
     const points = pts.map((d) => {
       const hi = d[a + pr.suf], lo = d[b + pr.suf];
@@ -479,13 +511,47 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
     /* Tinted in the OPPONENT's colour, at an opacity low enough that it
        reads as a gap rather than as an area chart of his share – which is the
        one way this band could be misread, since the tint sits under his line. */
-    return points.length > 1 ? { id: pr.id, points, color: byId[b].color, opacity: 0.085, edge: false } : null;
+    return points.length > 1
+      ? { id: pr.id, points, color: byId[b].color, opacity: 0.085 * areaFade, edge: false }
+      : null;
   }).filter(Boolean);
 
-  // y-window fitted to the readings in view, scatter included
-  const prefVals = rows.flatMap((r) => D.leaderMonths.map((m) => m[r.L.id + r.suf]).filter((v) => v != null))
-    .concat(ppmScatter.map((d) => d.y));
-  const { domain, ticks } = fitDomain(prefVals.length ? prefVals : [30, 50], 10);
+  /* Each line, on its own months, for either question – and put on one grid
+     and interpolated while the switch is running. */
+  const lineFor = (r) => pts.filter((d) => d[r.L.id + r.suf] != null)
+    .map((d) => ({ ym: d.ym, x: d.x, v: d[r.L.id + r.suf] }));
+  const fromRows = morph ? rowsFor(morph.from) : null;
+  const toRows = morph ? rowsFor(morph.to) : null;
+  const byMk = (list) => { const m = {}; (list || []).forEach((r) => (m[r.mk] = r)); return m; };
+  const fromBy = byMk(fromRows), toBy = byMk(toRows);
+  /* Every line either side of the switch, once. A line present on both sides
+     travels; one present on only one side holds its own shape and fades. */
+  const drawRows = !morph ? rows.map((r) => ({ r, pts: lineFor(r), opacity: 1 })) :
+    [...new Set([...fromRows, ...toRows].map((r) => r.mk))].map((mk) => {
+      const a = fromBy[mk], b = toBy[mk];
+      if (a && b) {
+        const bl = window.AP.blendRows(lineFor(a), lineFor(b), morph.t, ["v"]);
+        // dash says WHICH contest, so it changes with the line's allegiance
+        const r = morph.t < 0.5 ? a : b;
+        return { r, pts: bl ? bl.rows : lineFor(r), opacity: 1, clip: bl ? bl.clip : null };
+      }
+      const only = a || b;
+      return { r: only, pts: lineFor(only), opacity: a ? 1 - morph.t : morph.t };
+    }).filter((d) => d.pts.length);
+  const clipX = morph ? (drawRows.map((d) => d.clip).filter(Boolean)[0] || null) : null;
+
+  // y-window fitted to the readings in view, scatter included – and taken
+  // across both questions while morphing, so the axis holds still under lines
+  // that are still moving
+  const valsFor = (f) => rowsFor(f)
+    .flatMap((r) => D.leaderMonths.map((m) => m[r.L.id + r.suf]).filter((v) => v != null))
+    .concat(cloudFor(f).map((d) => d.y));
+  const fitFor = (f) => { const v = valsFor(f); return fitDomain(v.length ? v : [30, 50], 10); };
+  const target = fitFor(fmt);
+  const ticks = target.ticks;
+  const domain = morph
+    ? window.AP.blendDomain(fitFor(morph.from).domain, fitFor(morph.to).domain, morph.t)
+    : target.domain;
 
   const tiles = (list) => list.map((r) => {
     const rd = r.read;
@@ -575,19 +641,24 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         </div>
       )}
       <TrendChart
-        key={"ppm-" + fmt}
+        /* NOT keyed on the question: a remount would throw away the morph
+           itself, along with both memoised dot clouds. */
+        key="ppm"
         height={250} xDomain={xDomain} yDomain={domain}
         yTicks={ticks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         events={[OPP_HANDOVER].filter(Boolean)}
         areas={areas}
-        series={ordered.map((r) => ({
-          id: (r.pair ? r.pair.id + "-" : "") + r.L.id, label: r.label, color: r.L.color,
-          dashed: r.dashed, points: seriesNN(pts, r.L.id + r.suf),
+        series={drawRows.map((d) => ({
+          id: d.r.mk, label: d.r.label, color: d.r.L.color, dashed: d.r.dashed,
+          opacity: d.opacity, points: d.pts.map((p) => ({ x: p.x, y: p.v })),
         }))}
         spine={pts.map((d) => ({ x: d.x }))}
-        scatter={ppmScatter} pollFacet="leadership"
+        scatter={cross ? cross.scatter : ppmScatter} pollFacet="leadership"
+        scatterOut={cross ? cross.scatterOut : []}
+        scatterMove={cross ? cross.scatterMove : []}
+        fade={morph ? morph.t : 1} clipX={clipX}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={(v) => v.toFixed(0)}
       />
@@ -604,7 +675,15 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   // controlled when the section pins this panel to one measure (the side-by-side
   // "both" view), self-managed otherwise
   const metric = metricProp != null ? metricProp : own;
-  const setMetric = (v) => (v === "both" ? onBoth && onBoth() : setOwn(v));
+  /* Approval and favourability are different questions of the same three
+     people, so switching between them is a rearrangement, not a replacement:
+     the lines reshape and the clouds cross over. "Both" is a LAYOUT change –
+     the panel splits in two – so it is the one destination that doesn't morph. */
+  const [morph, chooseMetric] = window.AP.useMorph(
+    metric,
+    (v) => (v === "both" ? onBoth && onBoth() : setOwn(v)),
+    (from, to) => from !== "both" && to !== "both");
+  const setMetric = chooseMetric;
   const suf = "_" + metric;                       // _net | _fav
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.leaderMonths, xDomain[0]);
@@ -623,19 +702,29 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   // The metric filter is not optional: approval and favourability are different
   // questions, and blending their clouds would undo the same separation the
   // aggregate takes care to keep.
-  const wantFav = metric === "fav";
-  const apprScatter = D.individualPolls
-    .filter((p) => p.appr && p.x >= xDomain[0] && p.x <= xDomain[1])
-    .flatMap((p) => leaders.flatMap((L) => {
-      const a = p.appr, out = [];
-      const isFav = ((a.metricBy || {})[L.id] === "fav");
-      if (a[L.id + "Net"] != null && isFav === wantFav) out.push(a[L.id + "Net"]);
-      // a house can publish BOTH measures for one leader in a wave; the second
-      // lives in `alt` and belongs on the other tab
-      const alt = a.alt && a.alt[L.id];
-      if (alt && alt.net != null && (alt.metric === "fav") === wantFav) out.push(alt.net);
-      return out.map((y) => ({ x: p.x, y, color: L.color, label: L.short, meta: p }));
-    }));
+  const cloudFor = (mt) => {
+    const wantFav = mt === "fav";
+    return D.individualPolls
+      .filter((p) => p.appr && p.x >= xDomain[0] && p.x <= xDomain[1])
+      .flatMap((p) => leaders.flatMap((L) => {
+        const a = p.appr, out = [];
+        const isFav = ((a.metricBy || {})[L.id] === "fav");
+        if (a[L.id + "Net"] != null && isFav === wantFav) out.push(a[L.id + "Net"]);
+        // a house can publish BOTH measures for one leader in a wave; the second
+        // lives in `alt` and belongs on the other tab
+        const alt = a.alt && a.alt[L.id];
+        if (alt && alt.net != null && (alt.metric === "fav") === wantFav) out.push(alt.net);
+        return out.map((y) => ({ x: p.x, y, color: L.color, label: L.short, meta: p, leader: L.id }));
+      }));
+  };
+  const apprScatter = cloudFor(metric);
+  /* A house that rated a leader on BOTH measures in one wave is the same
+     fieldwork answering two questions, so that dot travels; everyone else
+     fades. Keyed on poll + leader, which is the pair both clouds carry. */
+  const cloudKey = (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.leader;
+  const cross = morph
+    ? window.AP.crossClouds(cloudFor(morph.from), cloudFor(morph.to), morph.t, cloudKey)
+    : null;
 
   /* A net is a difference of two proportions from one sample, so its interval
      is close to twice a share's – which is exactly the panel's own warning
@@ -643,19 +732,46 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
      rather than written. The leaders' bands overlap where the leaders do,
      which is the reading: three lines within a few points of each other are
      not three distinguishable positions. */
-  const apprBand = (L) => pts
-    .filter((d) => d[L.id + suf] != null && d[L.id + suf + "Ci"] != null)
-    .map((d) => ({ x: d.x, y0: d[L.id + suf] - d[L.id + suf + "Ci"],
-                             y1: d[L.id + suf] + d[L.id + suf + "Ci"] }));
+  /* One leader's line and its interval for a given metric, month by month.
+     During a morph the two metrics' versions are put on a single grid of
+     months and interpolated, so a leader's line reshapes into its other
+     answer instead of being swapped for it. */
+  const lineFor = (L, mt) => {
+    const k = L.id + "_" + mt;
+    return pts.filter((d) => d[k] != null)
+      .map((d) => ({ ym: d.ym, x: d.x, v: d[k], ci: d[k + "Ci"] != null ? d[k + "Ci"] : null }));
+  };
+  const drawLine = (L) => {
+    const now = lineFor(L, metric);
+    if (!morph) return { rows: now, clip: null };
+    const b = window.AP.blendRows(lineFor(L, morph.from), lineFor(L, morph.to), morph.t, ["v", "ci"]);
+    return b ? { rows: b.rows, clip: b.clip } : { rows: now, clip: null };
+  };
+  const drawn = {};
+  leaders.forEach((L) => { drawn[L.id] = drawLine(L); });
+  const clipX = morph
+    ? (leaders.map((L) => drawn[L.id].clip).filter(Boolean)[0] || null)
+    : null;
+
   const apprAreas = leaders
-    .map((L) => ({ id: "ci-" + L.id, color: L.color, className: "ci-band", edge: false,
-                   smooth: true, points: apprBand(L) }))
+    .map((L) => ({ id: "ci-" + L.id, color: L.color, className: "ci-band", edge: false, smooth: true,
+                   points: drawn[L.id].rows.filter((d) => d.ci != null)
+                     .map((d) => ({ x: d.x, y0: d.v - d.ci, y1: d.v + d.ci })) }))
     .filter((a) => a.points.length >= 2);
 
-  const netVals = leaders.flatMap((L) => D.leaderMonths.map((r) => r[L.id + suf]).filter((v) => v != null))
-    .concat(apprScatter.map((d) => d.y))
-    .concat(apprAreas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
-  const { domain, ticks } = fitDomain(netVals.length ? netVals : [-20, 20], 10, 0);
+  /* The y window travels too. Taken across BOTH metrics while morphing, so
+     the axis isn't re-fitted under a line that is still moving. */
+  const valsFor = (mt) => leaders
+    .flatMap((L) => D.leaderMonths.map((r) => r[L.id + "_" + mt]).filter((v) => v != null))
+    .concat(cloudFor(mt).map((d) => d.y))
+    .concat(leaders.flatMap((L) => lineFor(L, mt).filter((d) => d.ci != null)
+      .flatMap((d) => [d.v - d.ci, d.v + d.ci])));
+  const fitFor = (mt) => { const v = valsFor(mt); return fitDomain(v.length ? v : [-20, 20], 10, 0); };
+  const target = fitFor(metric);
+  const ticks = target.ticks;
+  const domain = morph
+    ? window.AP.blendDomain(fitFor(morph.from).domain, fitFor(morph.to).domain, morph.t)
+    : target.domain;
   const NET_MAX = Math.max(Math.abs(domain[0]), Math.abs(domain[1]));
   return (
     <section className="card">
@@ -714,7 +830,9 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         })}
       </div>
       <TrendChart
-        key={"appr-" + metric + "-" + leaders.map((L) => L.id).join(".")}
+        /* NOT keyed on the metric: a remount would replace the very thing
+           being animated, along with both memoised dot clouds. */
+        key={"appr-" + leaders.map((L) => L.id).join(".")}
         height={250} xDomain={xDomain} yDomain={domain}
         yTicks={ticks} unit="" axisFont={20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
@@ -722,11 +840,15 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         refLines={[{ y: 0, label: "even", color: "var(--ink-faint)" }]}
         events={leaders.some((L) => L.id === "taylor") ? [OPP_HANDOVER].filter(Boolean) : []}
         series={ordered.map((L) => (
-          { id: L.id, label: L.short + " net", color: L.color, points: seriesNN(pts, L.id + suf) }
+          { id: L.id, label: L.short + " net", color: L.color,
+            points: drawn[L.id].rows.map((d) => ({ x: d.x, y: d.v })) }
         ))}
         spine={pts.map((d) => ({ x: d.x }))}
         areas={apprAreas}
-        scatter={apprScatter} pollFacet="leadership"
+        scatter={cross ? cross.scatter : apprScatter} pollFacet="leadership"
+        scatterOut={cross ? cross.scatterOut : []}
+        scatterMove={cross ? cross.scatterMove : []}
+        fade={morph ? morph.t : 1} clipX={clipX}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(0)}
       />
@@ -875,7 +997,7 @@ function DirectionPanel({ rangeId }) {
 /* One line in a poll's breakdown: the share this wave could not place, and
    how it moved on the same house's last wave. Stated next to the primaries
    because it is the denominator they were taken out of. */
-function UndecidedLine({ v, chg }) {
+function UndecidedLine({ v, chg, basis }) {
   const d = segDelta(chg, "und");
   return (
     <div className="pd-block">
@@ -885,7 +1007,13 @@ function UndecidedLine({ v, chg }) {
         {/* the same change tag the primary shares carry, so it reads as one
             more figure from this wave rather than a separate claim */}
         <ChgTag v={d ? d.v : null} refDate={d ? d.refDate : null} />
-        <span className="pd-und-note">can’t say – excluded from the shares above</span>
+        {/* where the figure SITS is the whole difference between the two
+            questions, and it decides how the shares above should be read */}
+        <span className="pd-und-note">
+          {basis === "tpp"
+            ? "won’t pick a side – inside the two-party pair above, which is why it sums to under 100"
+            : "can’t say – excluded from the shares above"}
+        </span>
       </div>
     </div>
   );
@@ -906,25 +1034,27 @@ function UndecidedLine({ v, chg }) {
 function UndecidedPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const U = D.undecided;
-  if (!U || !U.monthly || U.monthly.length < 2) return null;
+  if (!U || !U.series.length) return null;
   const xDomain = rangeDomain(rangeId);
-  const pts = filterPts(U.monthly, xDomain[0]);
-  if (pts.length < 2) return null;
-  /* Not a party colour, and not --line-2 either: that token is a hairline
-     tint, which in dark sits BELOW the card it would be drawn on. --ink-2 is
-     the one neutral that stays legible in both themes, which is what a line
-     meaning "none of the above" wants. */
+  /* Not a party colour: --ink-2 is the one neutral legible in both themes,
+     which is what a line meaning "none of the above" wants. The two questions
+     are told apart by the dash, the same way the preferred-PM panel tells its
+     two contests apart — never by being averaged into one line. */
   const COL = "var(--ink-2)";
-  const scatter = U.polls
-    .filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1])
-    .map((d) => ({ x: d.x, y: d.v, color: COL, label: "Undecided", meta: d }));
-  const vals = pts.map((d) => d.v).concat(scatter.map((d) => d.y));
+  const drawn = U.series.map((sr) => {
+    const pts = filterPts(sr.monthly, xDomain[0]);
+    const dots = sr.polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1])
+      .map((d) => ({ x: d.x, y: d.v, color: COL, label: sr.label, meta: d }));
+    return { sr, pts, dots };
+  }).filter((d) => d.pts.length >= 2);
+  if (!drawn.length) return null;
+
+  const vals = drawn.flatMap((d) => d.pts.map((p) => p.v).concat(d.dots.map((p) => p.y)));
   const lo = Math.max(0, Math.floor((Math.min(...vals) - 1.5) / 2) * 2);
   const hi = Math.ceil((Math.max(...vals) + 1.5) / 2) * 2;
   const yTicks = [];
   for (let v = lo + 2; v < hi; v += 2) yTicks.push(v);
-  const L = U.latest;
-  const asked = houseList(U.houses);
+  const spine = drawn[0].pts;
 
   return (
     <section className="card">
@@ -932,18 +1062,28 @@ function UndecidedPanel({ rangeId }) {
         <div>
           <h2 className="card-title">Undecided</h2>
           <p className="card-sub">
-            “Can’t say who they would vote for” – published beside the primary
-            vote, not inside it{asked ? " · " + asked : ""}
+            Electors who won’t name a choice · {houseList(U.houses)}
           </p>
         </div>
-        <div className="dir-net">
-          <span className="dir-net-label">Latest</span>
-          <span className="dir-net-val">{L.v}<span className="pct">%</span></span>
-          {/* rising undecided is not good news for anyone, so neither arrow is
-              coloured as a gain - goodUp false only flips which way is red, and
-              here the honest reading is "more people are not saying" */}
-          {L.chg != null && <Delta value={L.chg} goodUp={false} small />}
-        </div>
+      </div>
+      {/* One tile per question, because they ARE different questions and the
+          panel would otherwise imply a single measure with two sources. */}
+      <div className="und-reads">
+        {U.series.map((sr) => (
+          <div className="und-read" key={sr.id}>
+            <span className={"und-swatch" + (sr.dashed ? " dashed" : "")} aria-hidden="true"></span>
+            <div className="und-read-body">
+              <div className="und-read-top">
+                <span className="und-read-lab">{sr.label}</span>
+                <span className="und-read-v">{sr.latest.v}<span className="pct">%</span></span>
+                {/* rising undecided is not good news for anyone – neither arrow
+                    is coloured as a gain */}
+                {sr.latest.chg != null && <Delta value={sr.latest.chg} goodUp={false} small />}
+              </div>
+              <p className="und-read-note">{sr.note} · {houseList(sr.houses)}</p>
+            </div>
+          </div>
+        ))}
       </div>
       <TrendChart
         key="und"
@@ -951,17 +1091,20 @@ function UndecidedPanel({ rangeId }) {
         yTicks={yTicks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
-        series={[{ id: "und", label: "Undecided", color: COL, points: series(pts, "v") }]}
-        spine={series(pts, "v")}
-        scatter={scatter} pollFacet="twopp"
-        tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
+        series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: COL,
+                                    dashed: d.sr.dashed, points: series(d.pts, "v") }))}
+        spine={series(spine, "v")}
+        scatter={drawn.flatMap((d) => d.dots)} pollFacet="twopp"
+        tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}
         fmt={(v) => v.toFixed(1)}
       />
       <p className="table-hint">
-        Each dot is one published wave; the line is their monthly average.
-        {" "}{U.n} readings, {U.lo}% to {U.hi}% across the term. These electors are
-        excluded from the shares above, so a rising line means the primaries are
-        being read off a smaller pool of decided voters – not that support moved.
+        Each dot is one published reading; the lines are their monthly averages.
+        The two are never averaged together: one counts people who can’t name a
+        party, the other people who won’t pick a side once preferences are
+        applied, and only the first is excluded from the shares elsewhere on
+        this page. A rising line means those figures are being read off a
+        smaller pool of decided voters – not that support moved.
       </p>
     </section>
   );
@@ -1424,7 +1567,7 @@ function PollDetail({ r }) {
             <ShareBar segs={dirSegs(r)} />
           </div>
         )}
-        {r.undecided != null && <UndecidedLine v={r.undecided} chg={r.chg} />}
+        {r.undecided != null && <UndecidedLine v={r.undecided} chg={r.chg} basis={r.undecidedBasis} />}
       </div>
     </div>
   );

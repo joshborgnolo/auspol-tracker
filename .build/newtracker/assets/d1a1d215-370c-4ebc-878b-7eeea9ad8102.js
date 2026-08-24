@@ -905,7 +905,7 @@ function ArchPollDetail({ p, onBack }) {
             ]} />
           </div>
         )}
-        {p.undecided != null && <window.UndecidedLine v={p.undecided} chg={p.chg} />}
+        {p.undecided != null && <window.UndecidedLine v={p.undecided} chg={p.chg} basis={p.undecidedBasis} />}
         {p.seats && (
           <div className="pd-block pd-block-wide">
             <div className="pd-k">Seat projection</div>

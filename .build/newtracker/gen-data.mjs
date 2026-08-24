@@ -622,6 +622,27 @@ function primaryOf(p) {
 // undecided-inclusive 48/47 – are rescaled) for scatter / lean maths
 const alpNOf = (p) => (p.tpp_alp == null ? null : r1(share2pp(p)));
 
+/* TWO questions, and they are not the same one. Roy Morgan asks who you would
+   vote for and reports the share who can't say — undecided on FIRST
+   preferences, set aside before its primaries are reported, which is why they
+   sum to 100. Essential's undecided is downstream of that: its published
+   two-party pair sums to under 100 because the people who wouldn't nominate a
+   side are still in it, so the shortfall IS the undecided share, after
+   preferences. That is already recorded once, as pollsterRules — so it is
+   derived here rather than typed in again, and it is drawn as its own line
+   rather than averaged into the other, exactly as approval and favourability
+   are kept apart. */
+const TPP_UNDECIDED = new Set(Object.entries(D.pollsterRules || {})
+  .filter(([, r]) => r && r.tppIncludesUndecided).map(([firm]) => firm));
+const undecidedOf = (p) => {
+  if (p.undecided != null) return { v: p.undecided, basis: "first" };
+  if (TPP_UNDECIDED.has(p.pollster) && p.tpp_alp != null && p.tpp_lnp != null) {
+    const gap = r1(100 - (p.tpp_alp + p.tpp_lnp));
+    // a pair that does sum to 100 is a normalised one, not a nil reading
+    if (gap > 0.5) return { v: gap, basis: "tpp" };
+  }
+  return null;
+};
 /* ---- 5b. change indicators – each measure vs the SAME pollster's previous
    poll that reported it. Tracks the last non-null value per pollster+measure
    over date-sorted polls, so a delta compares like-for-like even when a firm
@@ -633,8 +654,10 @@ const CHG_MEASURES = {
   pLnp:      (p, a, pm) => p.lnp ?? null,
   pGrn:      (p, a, pm) => p.grn ?? null,
   pOnp:      (p, a, pm) => p.onp ?? null,
-  // "can't say" – published beside the primaries, not inside them
-  und:       (p, a, pm) => p.undecided ?? null,
+  // "can't say" – published beside the primaries by one house and inside the
+  // two-party pair by another; either way it is that house's own series, so a
+  // delta compares like with like
+  und:       (p, a, pm) => (undecidedOf(p) || {}).v ?? null,
   albNet:    (p, a, pm) => (a ? a.alb ?? null : null),
   taylorNet: (p, a, pm) => (a ? a.opp ?? null : null),
   hansonNet: (p, a, pm) => (a ? a.han ?? null : null),
@@ -676,33 +699,45 @@ for (const p of [...POLLS].sort((a, b) => a.date.localeCompare(b.date) || a.poll
    effect is estimable against a single publisher, so this is a plain monthly
    mean of published readings and the panel says whose. A wave that published
    no figure is absent rather than zero. */
-const undecidedRows = POLLS.filter((p) => p.undecided != null);
-const undecidedHouses = [...new Set(undecidedRows.map((p) => p.pollster))];
-const undecidedPolls = undecidedRows.map((p) => ({
-  x: dx(p.date), ym: ymOf(p.date), pollster: p.pollster,
-  dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
-  sample: p.sample ?? null, v: p.undecided,
-})).sort((a, b) => a.x - b.x);
-const undecidedMonthly = MONTHS.map((ym) => {
-  const rs = undecidedRows.filter((p) => ymOf(p.date) === ym);
+const UNDECIDED_BASES = [
+  { id: "first", label: "First preference", dashed: false,
+    note: "can’t say who they would vote for – set aside before the shares are reported" },
+  { id: "tpp", label: "After preferences", dashed: true,
+    note: "won’t nominate a side – still inside the published two-party pair, which is why it sums to under 100" },
+];
+const undecidedRows = POLLS.map((p) => ({ p, u: undecidedOf(p) })).filter((r) => r.u);
+const undecidedSeries = UNDECIDED_BASES.map((b) => {
+  const rs = undecidedRows.filter((r) => r.u.basis === b.id);
   if (!rs.length) return null;
-  let sw = 0, swx = 0;
-  for (const r of rs) { const n = Math.min(r.sample || 1200, SAMPLE_CAP); sw += n; swx += n * r.undecided; }
-  return { ym, x: mx(ym), v: r1(swx / sw), k: rs.length };
-}).filter(Boolean);
-const undecided = (() => {
-  if (!undecidedPolls.length) return null;
-  const last = undecidedPolls[undecidedPolls.length - 1];
-  const prev = [...undecidedPolls].reverse().find((d) => d.pollster === last.pollster && d.x < last.x);
-  // a term high/low is the kind of claim the reader can check against the dots
-  const vals = undecidedPolls.map((d) => d.v);
+  const polls = rs.map(({ p, u }) => ({
+    x: dx(p.date), ym: ymOf(p.date), pollster: p.pollster,
+    dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
+    sample: p.sample ?? null, v: u.v, basis: b.id,
+  })).sort((a, b2) => a.x - b2.x);
+  const monthly = MONTHS.map((ym) => {
+    const m = polls.filter((d) => d.ym === ym);
+    if (!m.length) return null;
+    let sw = 0, swx = 0;
+    for (const r of m) { const n = Math.min(r.sample || 1200, SAMPLE_CAP); sw += n; swx += n * r.v; }
+    return { ym, x: mx(ym), v: r1(swx / sw), k: m.length };
+  }).filter(Boolean);
+  const last = polls[polls.length - 1];
+  const prev = [...polls].reverse().find((d) => d.pollster === last.pollster && d.x < last.x);
+  const vals = polls.map((d) => d.v);
   return {
-    polls: undecidedPolls, monthly: undecidedMonthly, houses: undecidedHouses,
+    id: b.id, label: b.label, note: b.note, dashed: b.dashed,
+    houses: [...new Set(polls.map((d) => d.pollster))],
+    polls, monthly, n: polls.length,
+    lo: Math.min(...vals), hi: Math.max(...vals),
     latest: { v: last.v, firm: last.pollster, released: last.released, field: last.dateLabel,
               chg: prev ? r1(last.v - prev.v) : null, refDate: prev ? prev.released : null },
-    lo: Math.min(...vals), hi: Math.max(...vals), n: undecidedPolls.length,
   };
-})();
+}).filter(Boolean);
+const undecided = undecidedSeries.length ? {
+  series: undecidedSeries,
+  n: undecidedRows.length,
+  houses: [...new Set(undecidedRows.map((r) => r.p.pollster))],
+} : null;
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
 const individualPolls = POLLS.map((p) => {
@@ -711,7 +746,7 @@ const individualPolls = POLLS.map((p) => {
   return {
     ym, x: mx(ym) + (day - 15) / 365, day, pollster: p.pollster,
     field, dateLabel: field, released: p.date, sample: p.sample ?? null,
-    ...(p.undecided != null ? { undecided: p.undecided } : {}),
+    ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
@@ -740,7 +775,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     pollster: p.pollster, client: p.client && p.client !== "—" ? p.client : "Self-published",
     field: fwLabel(p.dateStart, p.date), released: p.date, releasedLabel: `${day} ${monthName(m)}`,
     sample: p.sample ?? null,
-    ...(p.undecided != null ? { undecided: p.undecided } : {}),
+    ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],

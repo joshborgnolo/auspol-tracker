@@ -237,7 +237,116 @@ window.AP = (function () {
     };
   })();
 
+  /* ---- one switch, three things in motion --------------------------------
+     A control that changes the QUESTION a chart is asking is the same gesture
+     wherever it appears: the hero's matchup chips, preferred PM's two-way /
+     three-way, approval's approval / favourability. In each the chart keeps
+     its identity and changes its subject, so the lines should reshape, the
+     dots cross over and the x window travel — the second view reading as the
+     first one rearranged, and switching back rearranging it home. Written once
+     here, because a switch that animates in one panel and cuts in the next
+     reads as two different kinds of control.
+
+     Honours prefers-reduced-motion by landing on the new view immediately. */
+  function useMorph(value, apply, canMorph) {
+    const [morph, setMorph] = React.useState(null);      // { from, to, t }
+    const raf = React.useRef(0);
+    const land = React.useRef(0);
+    React.useEffect(() => () => { cancelAnimationFrame(raf.current); clearTimeout(land.current); }, []);
+    const choose = (next) => {
+      const from = value;
+      apply(next);
+      const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (next === from || still || (canMorph && !canMorph(from, next))) { setMorph(null); return; }
+      cancelAnimationFrame(raf.current); clearTimeout(land.current);
+      const t0 = performance.now();
+      setMorph({ from, to: next, t: 0 });
+      const step = (now) => {
+        const raw = Math.min(1, (now - t0) / MORPH_MS);
+        if (raw >= 1) { setMorph(null); return; }         // land on the real thing
+        setMorph({ from, to: next, t: morphEase(raw) });
+        raf.current = requestAnimationFrame(step);
+      };
+      raf.current = requestAnimationFrame(step);
+      /* A backstop, because frames are not guaranteed: a browser stops serving
+         them to a hidden tab, and a morph whose driver stopped would leave the
+         chart holding a half-interpolated shape that is not either answer.
+         Whatever happens to the frames, the view lands on the truth. */
+      land.current = setTimeout(() => { cancelAnimationFrame(raf.current); setMorph(null); },
+                                MORPH_MS + 200);
+    };
+    return [morph, choose];
+  }
+
+  /* Two versions of one set of rows on ONE grid of months, so the paths carry
+     the same shape of command and can be interpolated point for point. A month
+     only one side runs in holds that side's nearest end value, and the clip
+     window travels with the morph — so a line retreats to the months its new
+     question was actually asked in rather than being drawn across months
+     nobody polled. Rows are {ym, x, ...}; `keys` are the numeric fields to
+     interpolate, and a key null on either side stays null. */
+  function blendRows(A, B, t, keys) {
+    if (!A.length || !B.length) return null;
+    const lerp = (p, q) => p + (q - p) * t;
+    const index = (arr) => { const o = {}; arr.forEach((d) => (o[d.ym] = d)); return o; };
+    const ia = index(A), ib = index(B);
+    const hold = (idx, arr, ym) => idx[ym] || (ym < arr[0].ym ? arr[0] : arr[arr.length - 1]);
+    const yms = [...new Set(A.concat(B).map((d) => d.ym))].sort();
+    return {
+      rows: yms.map((ym) => {
+        const da = hold(ia, A, ym), db = hold(ib, B, ym);
+        const o = { ym, x: (ia[ym] || ib[ym]).x };
+        keys.forEach((k) => {
+          o[k] = (da[k] == null || db[k] == null) ? null : lerp(da[k], db[k]);
+        });
+        return o;
+      }),
+      clip: [lerp(A[0].x, B[0].x), lerp(A[A.length - 1].x, B[B.length - 1].x)],
+    };
+  }
+
+  /* The dot clouds cross over. A reading that exists in BOTH views is one poll
+     answering two questions — the same fieldwork asked differently — so its dot
+     travels between the two positions and its colour goes with it. A reading
+     with nowhere to travel to fades: most polls only ever answered one of the
+     questions, and inventing a position for them would be drawing data nobody
+     collected. Split three ways so only the travelling group is rebuilt per
+     frame. `keyOf` decides what counts as the same reading; the first dot to
+     claim a key keeps it. */
+  function crossClouds(A, B, t, keyOf) {
+    const claim = (arr) => {
+      const m = new Map();
+      arr.forEach((d) => { const k = keyOf(d); if (!m.has(k)) m.set(k, d); });
+      return m;
+    };
+    const ia = claim(A), ib = claim(B);
+    const travel = [], leaving = [], arriving = [];
+    ia.forEach((d, k) => (ib.has(k) ? travel.push([d, ib.get(k)]) : leaving.push(d)));
+    ib.forEach((d, k) => { if (!ia.has(k)) arriving.push(d); });
+    return {
+      scatter: arriving, scatterOut: leaving,
+      scatterMove: travel.map(([a, b]) => ({
+        x: a.x, y: a.y + (b.y - a.y) * t,
+        color: mixC(a.color, b.color, t), label: b.label, meta: b.meta,
+      })),
+    };
+  }
+
+  /* Colour travel, in CSS rather than here, so it keeps resolving against
+     whichever palette the theme is currently using — and round the hue circle
+     rather than through grey, which is what an oklab mix of two party colours
+     would do. */
+  function mixC(c1, c2, t) {
+    if (t <= 0 || c1 === c2) return c1;
+    if (t >= 1) return c2;
+    return "color-mix(in oklch shorter hue, " + c1 + ", " + c2 + " " + (t * 100).toFixed(1) + "%)";
+  }
+
+  // a [lo, hi] window on its way to another one
+  const blendDomain = (from, to, t) => [from[0] + (to[0] - from[0]) * t,
+                                        from[1] + (to[1] - from[1]) * t];
+
   return { D, rangeDomain, filterPts, buildXTicks, series, monthLabelFull, latestX,
-           pollRowKey, morphEase, MORPH_MS,
+           pollRowKey, morphEase, MORPH_MS, useMorph, blendRows, crossClouds, mixC, blendDomain,
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();
