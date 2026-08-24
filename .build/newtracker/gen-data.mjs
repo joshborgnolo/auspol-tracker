@@ -198,8 +198,12 @@ function weightedWithSe(pts) {                 // pts: [{ w, x, n }]
   const nEff = (sw * sw) / sw2;
   const wVar = pts.reduce((t, p) => t + p.w * (p.x - mean) ** 2, 0) / sw;
   const seSpread = nEff > 1 ? Math.sqrt(wVar / (nEff - 1)) : Infinity;
-  const pq = (mean / 100) * (1 - mean / 100) * 1e4;             // percentage points
-  const seFloor = Math.sqrt(pts.reduce((t, p) => t + p.w * p.w * HL_DEFF * pq / p.n, 0)) / sw;
+  /* Sampling variance of ONE reading, in points², before dividing by its
+     sample. A share carries p(1−p); a measure that is not a share carries its
+     own `pq` and says so at the point it is built (see the leader nets, where
+     a difference of two proportions has a different variance entirely). */
+  const pqOf = (p) => (p.pq != null ? p.pq : (mean / 100) * (1 - mean / 100) * 1e4);
+  const seFloor = Math.sqrt(pts.reduce((t, p) => t + p.w * p.w * HL_DEFF * pqOf(p) / p.n, 0)) / sw;
   const se = Math.max(Number.isFinite(seSpread) ? seSpread : 0, seFloor);
   return { v: mean, n: pts.length, se, nEff };
 }
@@ -260,7 +264,10 @@ for (const k of PRIMARY_KEYS) {
 const aggPrimary = MONTHS.map((ym) => {
   const rows = POLLS.filter((p) => ymOf(p.date) === ym);
   if (!rows.length) return null;
-  const o = { ym, x: mx(ym) };
+  // per party, since the houses disagree by different amounts about different
+  // parties – One Nation's spread is the widest on the board and the reason
+  // this chart needed intervals more than the 2PP did
+  const o = { ym, x: mx(ym), ci: {} };
   let plainTotal = 0;
   for (const k of PRIMARY_KEYS) {
     const rs = primaryRows[k].filter((r) => r.ym === ym);
@@ -268,6 +275,8 @@ const aggPrimary = MONTHS.map((ym) => {
     let sw = 0, swx = 0;
     for (const r of rs) { sw += r.n; swx += r.n * (r.x - heV(primaryHE[k], r.firm)); }
     o[k] = swx / sw;
+    const est = monthWithSe(primaryRows[k], primaryHE[k], ym);
+    if (est) o.ci[k] = r1(1.96 * est.se);
     plainTotal += mean(rs.map((r) => r.x));
   }
   const adjTotal = PRIMARY_KEYS.reduce((s, k) => s + o[k], 0);
@@ -278,7 +287,7 @@ const aggPrimary = MONTHS.map((ym) => {
   return o;
 }).filter(Boolean);
 aggPrimary.unshift({
-  ym: ymOf(ELECTION.date), x: dx(ELECTION.date), election: true,
+  ym: ymOf(ELECTION.date), x: dx(ELECTION.date), election: true, ci: {},
   alp: ELECTION.alp, lnp: ELECTION.lnp, grn: ELECTION.grn,
   onp: ELECTION.onp ?? 0, oth: r1(ELECTION.oth ?? 0),
 });
@@ -374,17 +383,42 @@ const leaderMonths = MONTHS.map((ym) => {
   if (!pp.length && !rows.length && !ppH.length) return null;
   // approval and favourability are different questions – routed PER LEADER by
   // that leader's metric at the firm, never pooled into one mean
+  /* Sampling variance of ONE net reading, in points². A net is a DIFFERENCE of
+     two proportions drawn from the same sample, so it does not carry p(1−p):
+       Var(a − d) = (a + d − (a−d)²) / n,  i.e. pq = 100·(app+dis) − net²
+     which is why this cannot reuse the share floor the 2PP and the primaries
+     use – on a −19 net with a 36/57 split it is roughly twice as wide.
+     Where the house published no split we assume no don't-knows, the widest
+     that floor can be: an interval too generous is the smaller sin. */
+  const netPq = (net, sp) => {
+    const sum = (sp && sp.app != null && sp.dis != null) ? sp.app + sp.dis : 100;
+    return Math.max(0, 100 * sum - net * net);
+  };
+  const apprN = (p) => Math.min((POLL_BY_KEY.get(p.date + "|" + p.firm) || {}).sample || 1200, SAMPLE_CAP);
   const split = (prop, lk) => {
     const ap = [], fv = [];
     const deb = (p, v) => v - heV(apprHE[lk] || {}, p.firm);   // debias on this leader's own house effects
     rows.forEach((p) => {
-      if (p[prop] != null) (metricOf(p.firm, lk, p.date) === "fav" ? fv : ap).push(deb(p, p[prop]));
+      const n = apprN(p);
+      if (p[prop] != null) {
+        // readings are equally weighted here, as the mean below is: this is a
+        // handful of houses answering the same question, not one pooled sample
+        const pt = { w: 1, x: deb(p, p[prop]), n, pq: netPq(p[prop], p.splits ? p.splits[lk] : null) };
+        (metricOf(p.firm, lk, p.date) === "fav" ? fv : ap).push(pt);
+      }
       // a firm that published BOTH measures contributes its second reading to
       // the other line, rather than having it quietly dropped
       const alt = p.splits && p.splits.fav ? p.splits.fav[lk] : null;
-      if (alt != null && metricOf(p.firm, lk, p.date) !== "fav") fv.push(deb(p, alt));
+      if (alt != null && metricOf(p.firm, lk, p.date) !== "fav")
+        fv.push({ w: 1, x: deb(p, alt), n, pq: netPq(alt, null) });
     });
-    return { net: ap.length ? rnd(mean(ap)) : null, fav: fv.length ? rnd(mean(fv)) : null };
+    const est = (arr) => {
+      if (!arr.length) return { v: null, ci: null };
+      const r = weightedWithSe(arr);
+      return { v: rnd(r.v), ci: r1(1.96 * r.se) };
+    };
+    const a = est(ap), f = est(fv);
+    return { net: a.v, fav: f.v, netCi: a.ci, favCi: f.ci };
   };
   const A = split("alb", "alb"), O = split("opp", "opp"), H = split("han", "han");
   return {
@@ -426,6 +460,8 @@ const leaderMonths = MONTHS.map((ym) => {
     alb_prefH: rnd(meanOf(ppH, (r) => r.alb)), hanson_prefH: rnd(meanOf(ppH, (r) => r.han)), taylor_prefH: null,
     alb_net: A.net, taylor_net: O.net, hanson_net: H.net,
     alb_fav: A.fav, taylor_fav: O.fav, hanson_fav: H.fav,
+    alb_netCi: A.netCi, taylor_netCi: O.netCi, hanson_netCi: H.netCi,
+    alb_favCi: A.favCi, taylor_favCi: O.favCi, hanson_favCi: H.favCi,
   };
 }).filter(Boolean);
 
@@ -506,12 +542,22 @@ const DIR_BY = new Map();
   }
 }
 
+/* Both lines carry their interval, on the same terms as the 2PP: the spread
+   between the houses that asked, floored by sampling error. Three houses ask
+   this question and some months rest on one of them, so these are the widest
+   bands on the site – which is the honest shape of a series this thin, and
+   was previously only said in the caption. */
+const dirRightRows = dirRows("right"), dirWrongRows = dirRows("wrong");
 const direction = dirRight.map((m) => {
   const w = dirWrongBy.get(m.ym);
   if (!w) return null;
   const right = r1(m.v), wrong = r1(w.v);
+  const rSe = monthWithSe(dirRightRows, dirHe.right, m.ym);
+  const wSe = monthWithSe(dirWrongRows, dirHe.wrong, m.ym);
   return { ym: m.ym, x: m.x, right, wrong, unsure: r1(100 - right - wrong),
-           net: r1(right - wrong), n: m.k };
+           net: r1(right - wrong), n: m.k,
+           rightCi: rSe ? r1(1.96 * rSe.se) : null,
+           wrongCi: wSe ? r1(1.96 * wSe.se) : null };
 }).filter(Boolean);
 
 /* ---- per-poll leadership / alt builders -------------------------------- */

@@ -204,6 +204,20 @@ function PrimaryVotePanel({ rangeId }) {
       .map((party) => ({ x: p.x, y: p.p[party.id], color: party.color,
                          label: party.name, meta: p })));
 
+  /* Five mirrored bands over a chart already carrying six hundred dots is a
+     smear, not a reading – so the interval belongs to the party the reader has
+     ASKED for. Turn the other chips off and the survivor gets its band, which
+     is the same isolate gesture the caption already teaches for the dots. */
+  const visible = parts.filter((p) => !hidden[p.id]);
+  const solo = visible.length === 1 ? visible[0] : null;
+  const soloBand = !solo ? [] : pts
+    .filter((d) => d.ci && d.ci[solo.id] != null && d[solo.id] != null)
+    .map((d) => ({ x: d.x, y0: d[solo.id] - d.ci[solo.id], y1: d[solo.id] + d.ci[solo.id] }));
+  const primaryAreas = soloBand.length >= 2
+    ? [{ id: "ci-" + solo.id, color: solo.color, className: "ci-band", edge: false,
+         smooth: true, points: soloBand }]
+    : [];
+
   return (
     <section className="card">
       <div className="card-head">
@@ -230,6 +244,7 @@ function PrimaryVotePanel({ rangeId }) {
         pad={{ l: 58, r: 20, t: 18, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={chartSeries} spine={series(pts, "alp")}
+        areas={primaryAreas}
         scatter={primaryScatter} pollFacet="primary"
         /* The same majors the hero carries. They arguably matter more here:
            the One Nation surge is this chart's whole story, and Joyce joining
@@ -241,7 +256,8 @@ function PrimaryVotePanel({ rangeId }) {
       <p className="table-hint">
         Each dot is one published poll’s first-preference figure; the lines are
         sample-weighted, house-effect-adjusted monthly averages. Use the party
-        chips above to isolate one party’s readings.
+        chips above to isolate one party’s readings – on its own, a party’s line
+        is drawn with the 95% interval around it{solo ? ", shaded here" : ""}.
       </p>
     </section>
   );
@@ -621,8 +637,24 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
       return out.map((y) => ({ x: p.x, y, color: L.color, label: L.short, meta: p }));
     }));
 
+  /* A net is a difference of two proportions from one sample, so its interval
+     is close to twice a share's – which is exactly the panel's own warning
+     above ("the monthly line hides more here than on any other chart"), drawn
+     rather than written. The leaders' bands overlap where the leaders do,
+     which is the reading: three lines within a few points of each other are
+     not three distinguishable positions. */
+  const apprBand = (L) => pts
+    .filter((d) => d[L.id + suf] != null && d[L.id + suf + "Ci"] != null)
+    .map((d) => ({ x: d.x, y0: d[L.id + suf] - d[L.id + suf + "Ci"],
+                             y1: d[L.id + suf] + d[L.id + suf + "Ci"] }));
+  const apprAreas = leaders
+    .map((L) => ({ id: "ci-" + L.id, color: L.color, className: "ci-band", edge: false,
+                   smooth: true, points: apprBand(L) }))
+    .filter((a) => a.points.length >= 2);
+
   const netVals = leaders.flatMap((L) => D.leaderMonths.map((r) => r[L.id + suf]).filter((v) => v != null))
-    .concat(apprScatter.map((d) => d.y));
+    .concat(apprScatter.map((d) => d.y))
+    .concat(apprAreas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
   const { domain, ticks } = fitDomain(netVals.length ? netVals : [-20, 20], 10, 0);
   const NET_MAX = Math.max(Math.abs(domain[0]), Math.abs(domain[1]));
   return (
@@ -693,6 +725,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
           { id: L.id, label: L.short + " net", color: L.color, points: seriesNN(pts, L.id + suf) }
         ))}
         spine={pts.map((d) => ({ x: d.x }))}
+        areas={apprAreas}
         scatter={apprScatter} pollFacet="leadership"
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(0)}
@@ -753,9 +786,23 @@ function DirectionPanel({ rangeId }) {
       { x: d.x, y: d.wrong, color: "var(--mood-neg)", label: "Wrong track", meta: d },
     ]);
 
+  /* The widest bands on the site, and correctly so: three houses ask this
+     question and some months rest on one of them. The caption has always said
+     that; now the chart shows it. */
+  const dirBand = (k, ck) => pts
+    .filter((d) => d[ck] != null)
+    .map((d) => ({ x: d.x, y0: d[k] - d[ck], y1: d[k] + d[ck] }));
+  const dirAreas = [
+    { id: "ci-right", color: "var(--mood-pos)", ck: "rightCi", k: "right" },
+    { id: "ci-wrong", color: "var(--mood-neg)", ck: "wrongCi", k: "wrong" },
+  ].map((a) => ({ id: a.id, color: a.color, className: "ci-band", edge: false,
+                  smooth: true, points: dirBand(a.k, a.ck) }))
+   .filter((a) => a.points.length >= 2);
+
   // domain has to cover the raw readings too, not just the smoothed means
   const vals = pts.flatMap((p) => [p.right, p.wrong])
-    .concat(dirScatter.map((d) => d.y));
+    .concat(dirScatter.map((d) => d.y))
+    .concat(dirAreas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
   const lo = Math.floor((Math.min(...vals) - 3) / 5) * 5;
   const hi = Math.ceil((Math.max(...vals) + 3) / 5) * 5;
   const yTicks = [];
@@ -804,6 +851,7 @@ function DirectionPanel({ rangeId }) {
           { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong") },
         ]}
         spine={series(pts, "right")}
+        areas={dirAreas}
         scatter={dirScatter} pollFacet="direction"
         /* Bondi alone, not the full major set. Direction is a mood measure and
            this is the one event in the cycle that plausibly moved it on its own;
@@ -816,8 +864,9 @@ function DirectionPanel({ rangeId }) {
       />
       <p className="table-hint">
         Each dot is one published reading; the lines are house-effect-adjusted
-        monthly averages. Only {asked ? D.directionHouses.length : 0} houses ask
-        this question, so some months rest on a single poll – the dots show which.
+        monthly averages, shaded with their 95% intervals. Only {asked ? D.directionHouses.length : 0} houses ask
+        this question, so some months rest on a single poll – the dots show which,
+        and the shading shows what that costs in confidence.
       </p>
     </section>
   );
