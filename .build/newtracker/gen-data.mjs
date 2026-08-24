@@ -809,6 +809,11 @@ const CAD_MAX_REL_MAD = 0.35;
        that really is weekly devalues both. */
 const CAD_MAX_SILENT = 1.5;
 const CAD_MAX_REL_SPREAD = 0.30;
+/* …and beyond THIS there is no rhythm to state at all: a window wider than
+   three quarters of the interval says only "some time in the next couple of
+   cycles", which is not worth a reader's attention. Between the two, a house
+   gets a window instead of a day. */
+const CAD_LOOSE_MAX_REL_SPREAD = 0.75;
 const MONTH_NAMES_L = { january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
                         july: 7, august: 8, september: 9, october: 10, november: 11, december: 12 };
 const medianOf = (a) => {
@@ -849,16 +854,33 @@ for (const [firm, dates] of Object.entries(byHouse)) {
   const cadence = medianOf(gaps);
   if (!cadence || cadence <= 0) continue;
   const mad = medianOf(gaps.map((g) => Math.abs(g - cadence)));
-  if (mad / cadence > CAD_MAX_REL_MAD) continue;                       // not on a pattern
   const last = dates[dates.length - 1];
+  // a house that has stopped is not "expected" in any form
   if ((Date.parse(LATEST_ISO) - Date.parse(last)) / 86400000 > CAD_MAX_SILENT * cadence) continue;
   const spread = Math.max(1, Math.round(1.4826 * mad));
-  if (spread / cadence > CAD_MAX_REL_SPREAD) continue;                 // window too loose to be a forecast
+  /* Tight enough to name a DAY, or only a window?
+
+     This used to be one test with one outcome: fail it and the house vanished
+     from the panel entirely. DemosAU is why that was wrong. It had polled nine
+     times, was active, and its own record projected the next fieldwork ending
+     7 Aug ± 15 days - a window that contained the wave it actually filed on 20
+     Aug. The panel knew, and threw the house away for being ±15 rather than
+     ±3, so a reader saw a list that silently claimed to be the whole field.
+
+     So the strict test now decides the FORM of the entry, not whether there is
+     one. Inside it, a date. Outside it but still on a rhythm, the window the
+     data actually supports - which is a real forecast, just a wider one. Past
+     LOOSE_MAX there is no rhythm left to state and the house is dropped, which
+     is where "we don't know" is the honest answer. */
+  const rel = spread / cadence;
+  const dated = mad / cadence <= CAD_MAX_REL_MAD && rel <= CAD_MAX_REL_SPREAD;
+  if (!dated && rel > CAD_LOOSE_MAX_REL_SPREAD) continue;
   const ls = lagSamples[firm] || [];
   pollCadence.push({
     pollster: firm,
     last,
     cadence,
+    loose: !dated,
     // MAD -> robust SD, floored at 1 day: even Roy Morgan's perfect 7-day
     // cadence still moves a day either side on publication
     spread,

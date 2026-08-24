@@ -2019,6 +2019,9 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .next-polls { }
 .np-head { margin-bottom: 16px; }
 .np-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+/* a window rather than a day: quieter, because it is a looser claim */
+.np-loose .np-date, .np-loose .np-when { color: var(--ink-3); }
+.np-loose .np-when { font-style: italic; }
 .np-row {
   display: grid;
   grid-template-columns: minmax(120px, 1.1fr) minmax(150px, 1.2fr) minmax(80px, 0.7fr) minmax(150px, 1.4fr);

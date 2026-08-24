@@ -1329,13 +1329,19 @@ function NextPollsPanel() {
      appears four times, a monthly one once – which is the honest shape of the
      schedule, not a repetition bug. */
   const rows = [];
+  const horizon = t0 + NP_HORIZON_DAYS * DAY_MS;
   cad.forEach((c) => {
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
     let release = field + c.lag * DAY_MS;
     let missed = 0;
     // page older than the prediction – roll on, counting the waves we've missed
     while (release < t0 && missed < 60) { field += c.cadence * DAY_MS; release = field + c.lag * DAY_MS; missed++; }
-    for (let i = 0; release <= t0 + NP_HORIZON_DAYS * DAY_MS && i < 12; i++) {
+    /* A loose house earns its place when its WINDOW opens inside the horizon,
+       not when its centre falls inside it: DemosAU's next centre is 30 days
+       out and its window opens in 13, so testing the centre would hide a house
+       that may well file next week. */
+    const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
+    for (let i = 0; reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)))) && i < 12; i++) {
       rows.push({
         ...c, field, release,
         missed: i === 0 ? missed : 0,
@@ -1346,12 +1352,17 @@ function NextPollsPanel() {
            visibly fans out, which is the point. */
         spread: Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))),
         inDays: Math.round((release - t0) / DAY_MS),
+        opensIn: Math.round((release - Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))) * DAY_MS - t0) / DAY_MS),
       });
       field += c.cadence * DAY_MS;
       release = field + c.lag * DAY_MS;
+      if (c.loose) break;          // one window per house; a second is a guess about a guess
     }
   });
-  rows.sort((a, b) => a.release - b.release);
+  // ordered by when each entry first becomes possible – for a dated row that is
+  // the date, for a window it is the day the window opens
+  const first = (r) => (r.loose ? r.release - r.spread * DAY_MS : r.release);
+  rows.sort((a, b) => first(a) - first(b));
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
 
   const behind = rows.some((r) => r.missed > 0);
@@ -1372,13 +1383,22 @@ function NextPollsPanel() {
 
       <ol className="np-list">
         {rows.map((r) => (
-          <li className="np-row" key={r.pollster + "-" + r.release}>
+          <li className={"np-row" + (r.loose ? " np-loose" : "")} key={r.pollster + "-" + r.release}>
             <span className="np-firm">{r.pollster}</span>
             <span className="np-date">
-              {fmt(r.release)}
-              <span className="np-pm"> ± {r.spread} day{r.spread === 1 ? "" : "s"}</span>
+              {r.loose
+                /* The ± IS the forecast here, so state it as the span it is
+                   rather than as a day with a disclaimer bolted on. */
+                ? <>{fmt(r.release - r.spread * DAY_MS)}<span className="np-pm"> – </span>{fmt(r.release + r.spread * DAY_MS)}</>
+                : <>{fmt(r.release)}<span className="np-pm"> ± {r.spread} day{r.spread === 1 ? "" : "s"}</span></>}
             </span>
-            <span className="np-when">{when(r.inDays)}</span>
+            {/* the column answers "when", so a window answers it too – with the
+                day it opens, which is the first date the wave is possible */}
+            <span className="np-when">
+              {r.loose
+                ? (r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn))
+                : when(r.inDays)}
+            </span>
             <span className="np-cadence">
               {cadenceLabel(r.cadence)}
               {/* the wave count is the evidence for the estimate – worth stating
@@ -1394,7 +1414,9 @@ function NextPollsPanel() {
         Each date is the house’s median interval between fieldwork-end dates across its last
         eight waves, plus its publication lag. The ± is the observed variation in that interval,
         widening for waves further out. Lag is read from release URLs that carry a date: 38 Roy
-        Morgan releases give a median of one day. Houses not currently holding a pattern are
+        Morgan releases give a median of one day. A house whose interval is too variable to name
+        a day gets the window its own record supports instead of being left out – DemosAU polls
+        about monthly, but anywhere in a five-week span. Houses that have stopped publishing are
         omitted. These are estimates, not announced dates.
         {behind && " Where a date has passed, that wave is out but not yet in this archive."}
       </p>

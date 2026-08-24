@@ -1865,6 +1865,9 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .next-polls { }
 .np-head { margin-bottom: 16px; }
 .np-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+/* a window rather than a day: quieter, because it is a looser claim */
+.np-loose .np-date, .np-loose .np-when { color: var(--ink-3); }
+.np-loose .np-when { font-style: italic; }
 .np-row {
   display: grid;
   grid-template-columns: minmax(120px, 1.1fr) minmax(150px, 1.2fr) minmax(80px, 0.7fr) minmax(150px, 1.4fr);
@@ -2633,7 +2636,7 @@ window.AUSPOL = (function () {
   /* Measured publication rhythm per house – drives "Next expected polls".
      The dates themselves are computed in the browser against the real current
      date, so the panel stays honest as the page ages. */
-  const pollCadence = [{"pollster":"Roy Morgan","last":"2026-08-16","cadence":7,"spread":1,"lag":1,"lagMeasured":38,"waves":42},{"pollster":"YouGov","last":"2026-08-10","cadence":14,"spread":1,"lag":1,"lagMeasured":0,"waves":20},{"pollster":"Newspoll","last":"2026-08-07","cadence":21,"spread":3,"lag":1,"lagMeasured":0,"waves":16},{"pollster":"Resolve","last":"2026-08-15","cadence":28,"spread":1,"lag":1,"lagMeasured":0,"waves":16},{"pollster":"Essential","last":"2026-07-27","cadence":29.5,"spread":6,"lag":1,"lagMeasured":0,"waves":11},{"pollster":"Spectre Strategy","last":"2026-07-23","cadence":139,"spread":4,"lag":1,"lagMeasured":0,"waves":4}];
+  const pollCadence = [{"pollster":"Roy Morgan","last":"2026-08-16","cadence":7,"loose":false,"spread":1,"lag":1,"lagMeasured":38,"waves":42},{"pollster":"YouGov","last":"2026-08-10","cadence":14,"loose":false,"spread":1,"lag":1,"lagMeasured":0,"waves":20},{"pollster":"Newspoll","last":"2026-08-07","cadence":21,"loose":false,"spread":3,"lag":1,"lagMeasured":0,"waves":16},{"pollster":"Resolve","last":"2026-08-15","cadence":28,"loose":false,"spread":1,"lag":1,"lagMeasured":0,"waves":16},{"pollster":"Essential","last":"2026-07-27","cadence":29.5,"loose":false,"spread":6,"lag":1,"lagMeasured":0,"waves":11},{"pollster":"DemosAU","last":"2026-08-20","cadence":33,"loose":true,"spread":17,"lag":1,"lagMeasured":0,"waves":9},{"pollster":"Spectre Strategy","last":"2026-07-23","cadence":139,"loose":false,"spread":4,"lag":1,"lagMeasured":0,"waves":4}];
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,
@@ -6598,6 +6601,7 @@ function NextPollsPanel() {
      appears four times, a monthly one once – which is the honest shape of the
      schedule, not a repetition bug. */
   const rows = [];
+  const horizon = t0 + NP_HORIZON_DAYS * DAY_MS;
   cad.forEach(c => {
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
     let release = field + c.lag * DAY_MS;
@@ -6608,7 +6612,12 @@ function NextPollsPanel() {
       release = field + c.lag * DAY_MS;
       missed++;
     }
-    for (let i = 0; release <= t0 + NP_HORIZON_DAYS * DAY_MS && i < 12; i++) {
+    /* A loose house earns its place when its WINDOW opens inside the horizon,
+       not when its centre falls inside it: DemosAU's next centre is 30 days
+       out and its window opens in 13, so testing the centre would hide a house
+       that may well file next week. */
+    const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
+    for (let i = 0; reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)))) && i < 12; i++) {
       rows.push({
         ...c,
         field,
@@ -6620,13 +6629,18 @@ function NextPollsPanel() {
            A house on a fixed weekly schedule barely moves; an erratic one
            visibly fans out, which is the point. */
         spread: Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))),
-        inDays: Math.round((release - t0) / DAY_MS)
+        inDays: Math.round((release - t0) / DAY_MS),
+        opensIn: Math.round((release - Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))) * DAY_MS - t0) / DAY_MS)
       });
       field += c.cadence * DAY_MS;
       release = field + c.lag * DAY_MS;
+      if (c.loose) break; // one window per house; a second is a guess about a guess
     }
   });
-  rows.sort((a, b) => a.release - b.release);
+  // ordered by when each entry first becomes possible – for a dated row that is
+  // the date, for a window it is the day the window opens
+  const first = r => r.loose ? r.release - r.spread * DAY_MS : r.release;
+  rows.sort((a, b) => first(a) - first(b));
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
   const behind = rows.some(r => r.missed > 0);
   const fmt = ms => {
@@ -6645,23 +6659,27 @@ function NextPollsPanel() {
   }, "Projected from each house\u2019s recent publication intervals.")), /*#__PURE__*/React.createElement("ol", {
     className: "np-list"
   }, rows.map(r => /*#__PURE__*/React.createElement("li", {
-    className: "np-row",
+    className: "np-row" + (r.loose ? " np-loose" : ""),
     key: r.pollster + "-" + r.release
   }, /*#__PURE__*/React.createElement("span", {
     className: "np-firm"
   }, r.pollster), /*#__PURE__*/React.createElement("span", {
     className: "np-date"
-  }, fmt(r.release), /*#__PURE__*/React.createElement("span", {
+  }, r.loose
+  /* The ± IS the forecast here, so state it as the span it is
+     rather than as a day with a disclaimer bolted on. */ ? /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release - r.spread * DAY_MS), /*#__PURE__*/React.createElement("span", {
     className: "np-pm"
-  }, " \xB1 ", r.spread, " day", r.spread === 1 ? "" : "s")), /*#__PURE__*/React.createElement("span", {
+  }, " \u2013 "), fmt(r.release + r.spread * DAY_MS)) : /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release), /*#__PURE__*/React.createElement("span", {
+    className: "np-pm"
+  }, " \xB1 ", r.spread, " day", r.spread === 1 ? "" : "s"))), /*#__PURE__*/React.createElement("span", {
     className: "np-when"
-  }, when(r.inDays)), /*#__PURE__*/React.createElement("span", {
+  }, r.loose ? r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn) : when(r.inDays)), /*#__PURE__*/React.createElement("span", {
     className: "np-cadence"
   }, cadenceLabel(r.cadence), r.ahead === 0 && /*#__PURE__*/React.createElement(React.Fragment, null, " \xB7 ", r.waves, " waves"), r.missed > 0 && /*#__PURE__*/React.createElement("span", {
     className: "np-missed"
   }, " \xB7 ", r.missed, " since this data"))))), /*#__PURE__*/React.createElement("p", {
     className: "np-foot"
-  }, "Each date is the house\u2019s median interval between fieldwork-end dates across its last eight waves, plus its publication lag. The \xB1 is the observed variation in that interval, widening for waves further out. Lag is read from release URLs that carry a date: 38 Roy Morgan releases give a median of one day. Houses not currently holding a pattern are omitted. These are estimates, not announced dates.", behind && " Where a date has passed, that wave is out but not yet in this archive."));
+  }, "Each date is the house\u2019s median interval between fieldwork-end dates across its last eight waves, plus its publication lag. The \xB1 is the observed variation in that interval, widening for waves further out. Lag is read from release URLs that carry a date: 38 Roy Morgan releases give a median of one day. A house whose interval is too variable to name a day gets the window its own record supports instead of being left out \u2013 DemosAU polls about monthly, but anywhere in a five-week span. Houses that have stopped publishing are omitted. These are estimates, not announced dates.", behind && " Where a date has passed, that wave is out but not yet in this archive."));
 }
 function PollsterTable() {
   const {
