@@ -19,7 +19,7 @@
    told a reader nothing the link text had not already. For most people a link
    preview IS the article, so this one carries the actual reading: the 2PP
    figures, the margin, the interval around it, and the whole term's trend with
-   the lead shaded from the leader's line down to the majority line. Every
+   the lead shaded from the leader's line down to the tie line. Every
    value is read from window.AUSPOL, the same object the page renders from, so
    the card cannot contradict the page it previews.
 
@@ -156,7 +156,9 @@
   c.setLineDash([3, 6]); c.strokeStyle = T.ink3; c.lineWidth = 1.4; c.globalAlpha = 0.7;
   c.beginPath(); c.moveTo(CX0, sy(50)); c.lineTo(CX1, sy(50)); c.stroke();
   c.setLineDash([]); c.globalAlpha = 1;
-  caps("50% — MAJORITY", CX0, sy(50) + 21, 12, 1.3, T.ink3, 700);
+  // "tie", not "majority" – 50% 2PP is a tied national vote, not a
+  // majority of seats, and the page label says the same thing
+  caps("50% — TIE", CX0, sy(50) + 21, 12, 1.3, T.ink3, 700);
 
   [[lPts, T.lnp], [aPts, T.alp]].forEach(([pts, col]) => {
     c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); curve(pts);

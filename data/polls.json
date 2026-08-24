@@ -3577,6 +3577,22 @@
         "Nat": 2.5
       },
       "url": "https://www.roymorgan.com/findings/10311-federal-voting-intention-august-17-2026"
+    },
+    {
+      "date": "2026-08-20",
+      "dateStart": "2026-08-18",
+      "pollster": "DemosAU",
+      "client": "Capital Brief",
+      "sample": 1562,
+      "alp": 26,
+      "lnp": 25,
+      "grn": 12,
+      "onp": 24,
+      "ind": 13,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/"
     }
   ],
   "ppm": [
