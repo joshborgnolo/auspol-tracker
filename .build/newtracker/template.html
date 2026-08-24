@@ -876,16 +876,43 @@ body {
 .hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
-.hero-legend { display: flex; gap: 18px; }
+/* wraps: the interval swatch made this a four-item legend, which runs off
+   the right edge of a phone if the items are held on one line */
+.hero-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .hl-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-3); font-weight: 500; white-space: nowrap; }
 .hl-line { width: 18px; height: 3px; border-radius: 2px; }
 .hl-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink-faint); opacity: 0.6; }
 /* party swatch as a dot, for a matchup drawn as readings with no trend line */
 .hl-swatch-dot { width: 9px; height: 9px; border-radius: 50%; opacity: 0.75; }
+/* the interval ribbon: both party bands at the opacity they are drawn with,
+   stacked, so the swatch shows the overlap the chart is asking to be read */
+/* The interval ribbon. Dark needs more of it: a 13% tint of a light party
+   colour reads on paper and disappears against the dark ground. */
+.ci-band { opacity: 0.13; }
+body.dark .ci-band { opacity: 0.22; }
+.hl-band { width: 18px; height: 11px; border-radius: 2px;
+  background: linear-gradient(to bottom,
+    color-mix(in oklch, var(--alp) 13%, transparent) 0 55%,
+    color-mix(in oklch, var(--lnp) 13%, transparent) 45% 100%); }
 /* "limited data" caveat inside the hero eyebrow – same size, quieter weight,
    so it reads as a qualifier on the method rather than a separate label */
 .eyebrow-warn { color: var(--ink-3); font-weight: 600; }
 .hero-caption { margin: 0; font-size: 12.5px; color: var(--ink-3); }
+
+/* the contests that are not on the chart, each carrying its own figure. A
+   button, not a tab: pressing one makes it the headline and morphs the chart. */
+.hero-alt { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+.ha-lab { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-3); }
+.ha-chip { display: inline-flex; align-items: baseline; gap: 8px; cursor: pointer;
+  background: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px;
+  font: inherit; color: var(--ink-2); transition: border-color 120ms ease, background 120ms ease; }
+.ha-chip:hover { border-color: var(--line-2); background: var(--surface-2, transparent); }
+.ha-vs { font-size: 11.5px; font-weight: 600; }
+.ha-fig { font-family: var(--serif); font-size: 16px; font-weight: 600;
+  font-variant-numeric: tabular-nums; }
+.ha-dash { color: var(--ink-3); margin: 0 3px; }
+.ha-ci { font-size: 10.5px; color: var(--ink-3); }
 
 /* ---------- delta ---------- */
 .delta { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; white-space: nowrap; }
@@ -1534,8 +1561,59 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-size: 12px; font-weight: 700; color: var(--ink-2);
   font-family: var(--serif); font-style: italic; letter-spacing: 0;
 }
+/* undecided, one line inside a poll's breakdown: the figure, its change, and
+   what it means, on the same baseline so it reads as a stated share */
+.pd-und { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
+.pd-und-v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
+.pd-und-note { font-size: 12px; color: var(--ink-3); }
 .pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13.5px; }
 .table-hint { margin: 12px 2px 0; font-size: 12px; color: var(--ink-3); }
+
+/* ---------- how the final polls did (past cycles) ---------- */
+/* A row per election on one shared scale, so five elections' worth of error can
+   be compared by eye. The track is centred on the RESULT, not on zero polling
+   error, because the result is the thing every dot is being measured against. */
+.acc-card { margin-top: 22px; }
+.acc-scale { display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline;
+  margin: 4px 0 2px; padding-left: 108px; font-size: 11px; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+.acc-scale-c { text-align: center; }
+.acc-scale-r { text-align: right; }
+.acc-rows { display: flex; flex-direction: column; gap: 2px; }
+.acc-row { display: grid; grid-template-columns: 100px 1fr 52px 86px; align-items: center;
+  gap: 8px; padding: 7px 0; border-top: 1px solid var(--line); }
+.acc-label { display: flex; flex-direction: column; }
+.acc-year { font-family: var(--serif); font-size: 19px; font-weight: 600; color: var(--ink); }
+.acc-detail { font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.acc-track { position: relative; height: 26px; }
+.acc-zero { position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px;
+  background: var(--ink-3); opacity: 0.55; }
+.acc-tick { position: absolute; top: 6px; bottom: 6px; width: 1px; background: var(--line-2); }
+.acc-dot, .acc-mean { position: absolute; top: 50%; border-radius: 50%; }
+.acc-dot { width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; opacity: 0.5; }
+.acc-mean { width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px;
+  box-shadow: 0 0 0 2.5px var(--surface); }
+.acc-err { font-family: var(--serif); font-size: 19px; font-weight: 600; text-align: right;
+  font-variant-numeric: tabular-nums; }
+.acc-note { font-size: 11px; color: var(--ink-3); display: flex; gap: 6px; align-items: baseline;
+  justify-content: flex-end; flex-wrap: wrap; }
+.acc-flag { font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; font-size: 9.5px;
+  color: var(--ink-2); border: 1px solid var(--line-2); border-radius: 3px; padding: 1px 4px; }
+.acc-firms { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
+.acc-firms-h { font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.06em; color: var(--ink-3); margin-bottom: 8px; }
+.acc-firms-grid { display: grid; gap: 8px 18px;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); }
+.acc-firm { display: flex; flex-direction: column; gap: 1px; }
+.acc-firm-n { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.acc-firm-v { font-family: var(--serif); font-size: 17px; color: var(--ink);
+  font-variant-numeric: tabular-nums; }
+.acc-firm-c { font-size: 11px; color: var(--ink-3); }
+@media (max-width: 720px) {
+  .acc-scale { padding-left: 0; }
+  .acc-row { grid-template-columns: 74px 1fr 46px; }
+  .acc-note { grid-column: 2 / -1; justify-content: flex-start; }
+}
 
 @media (max-width: 720px) {
   .pd-grid { grid-template-columns: 1fr; }

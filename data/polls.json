@@ -905,6 +905,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 5128,
+      "undecided": 6,
       "alp": 37,
       "lnp": 31,
       "grn": 11.5,
@@ -921,6 +922,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 3957,
+      "undecided": 7,
       "alp": 37.5,
       "lnp": 31,
       "grn": 12,
@@ -937,6 +939,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1522,
+      "undecided": 9.5,
       "alp": 36.5,
       "lnp": 30.5,
       "grn": 12,
@@ -1033,6 +1036,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 5159,
+      "undecided": 6,
       "alp": 36.5,
       "lnp": 31,
       "grn": 12,
@@ -1097,6 +1101,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 5001,
+      "undecided": 5.5,
       "alp": 34,
       "lnp": 30,
       "grn": 12,
@@ -1161,6 +1166,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 5084,
+      "undecided": 5,
       "alp": 34,
       "lnp": 30,
       "grn": 12,
@@ -1257,6 +1263,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 4908,
+      "undecided": 5.5,
       "alp": 35,
       "lnp": 27,
       "grn": 13,
@@ -1427,6 +1434,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 5248,
+      "undecided": 6,
       "alp": 33,
       "lnp": 27,
       "grn": 12.5,
@@ -1587,6 +1595,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1574,
+      "undecided": 5,
       "alp": 30.5,
       "lnp": 27.5,
       "grn": 13,
@@ -1849,6 +1858,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1401,
+      "undecided": 6.5,
       "alp": 30.5,
       "lnp": 20.5,
       "grn": 12.5,
@@ -1889,6 +1899,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1584,
+      "undecided": 6.5,
       "alp": 28.5,
       "lnp": 22.5,
       "grn": 13.5,
@@ -1958,6 +1969,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1216,
+      "undecided": 7,
       "alp": 30.5,
       "lnp": 20,
       "grn": 13,
@@ -1990,6 +2002,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 526,
+      "undecided": 7,
       "alp": 32,
       "lnp": 23.5,
       "grn": 12.5,
@@ -2038,6 +2051,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1649,
+      "undecided": 6,
       "alp": 31,
       "lnp": 24,
       "grn": 12.5,
@@ -2128,6 +2142,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1554,
+      "undecided": 6,
       "alp": 30.5,
       "lnp": 23.5,
       "grn": 11.5,
@@ -2204,6 +2219,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1532,
+      "undecided": 6,
       "alp": 26.5,
       "lnp": 22.5,
       "grn": 14.5,
@@ -2251,7 +2267,8 @@
       "dateStart": "2026-03-09",
       "pollster": "Roy Morgan",
       "client": "—",
-      "sample": 1649,
+      "sample": 1654,
+      "undecided": 6,
       "alp": 28.5,
       "lnp": 24,
       "grn": 12.5,
@@ -2288,6 +2305,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1664,
+      "undecided": 5.5,
       "alp": 27,
       "lnp": 25.5,
       "grn": 13.5,
@@ -2404,6 +2422,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1562,
+      "undecided": 5.5,
       "alp": 30,
       "lnp": 22.5,
       "grn": 13.5,
@@ -2424,6 +2443,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1411,
+      "undecided": 7,
       "alp": 30.5,
       "lnp": 24,
       "grn": 12,
@@ -2476,6 +2496,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1512,
+      "undecided": 6.5,
       "alp": 30,
       "lnp": 22.5,
       "grn": 12.5,
@@ -2544,6 +2565,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1620,
+      "undecided": 5,
       "alp": 30.5,
       "lnp": 23,
       "grn": 13.5,
@@ -2580,6 +2602,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1587,
+      "undecided": 5.5,
       "alp": 30,
       "lnp": 22.5,
       "grn": 14,
@@ -2648,6 +2671,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1681,
+      "undecided": 5,
       "alp": 29.5,
       "lnp": 24,
       "grn": 13,
@@ -2684,6 +2708,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1605,
+      "undecided": 6.5,
       "alp": 30.5,
       "lnp": 25,
       "grn": 11.5,
@@ -3067,6 +3092,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1583,
+      "undecided": 4,
       "alp": 28,
       "lnp": 17,
       "grn": 14,
@@ -3119,6 +3145,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1575,
+      "undecided": 5,
       "alp": 27,
       "lnp": 17.5,
       "grn": 13.5,
@@ -3171,6 +3198,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1639,
+      "undecided": 6.5,
       "alp": 28,
       "lnp": 21.5,
       "grn": 13,
@@ -3223,6 +3251,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1584,
+      "undecided": 5,
       "alp": 28,
       "lnp": 21.5,
       "grn": 14,
@@ -3327,6 +3356,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1612,
+      "undecided": 6.5,
       "alp": 27.5,
       "lnp": 20,
       "grn": 12.5,
@@ -3379,6 +3409,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1679,
+      "undecided": 5,
       "alp": 27.5,
       "lnp": 23,
       "grn": 14,
@@ -3415,6 +3446,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1643,
+      "undecided": 6,
       "alp": 27.5,
       "lnp": 22,
       "grn": 14,
@@ -3484,6 +3516,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1531,
+      "undecided": 8.5,
       "alp": 27.5,
       "lnp": 23.5,
       "grn": 15,
@@ -3520,6 +3553,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1647,
+      "undecided": 6,
       "alp": 25.5,
       "lnp": 22,
       "grn": 15.5,
@@ -3572,6 +3606,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1576,
+      "undecided": 4,
       "alp": 28.5,
       "lnp": 23.5,
       "grn": 12.5,
@@ -3608,6 +3643,7 @@
       "pollster": "Roy Morgan",
       "client": "—",
       "sample": 1508,
+      "undecided": 6.5,
       "alp": 27,
       "lnp": 21,
       "grn": 14,
@@ -17001,8 +17037,8 @@
         "grn": 12,
         "onp": 4,
         "oth": 11,
-        "tpp_lnp": 52.2,
-        "tpp_alp": 47.8
+        "tpp_lnp": 47.8,
+        "tpp_alp": 52.2
       },
       {
         "date": "2022-06-19",
@@ -17012,8 +17048,8 @@
         "grn": 11,
         "onp": 4,
         "oth": 12,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2022-07-30",
@@ -17023,8 +17059,8 @@
         "grn": 12,
         "onp": 6,
         "oth": 12,
-        "tpp_lnp": 56,
-        "tpp_alp": 44
+        "tpp_lnp": 44,
+        "tpp_alp": 56
       },
       {
         "date": "2022-08-21",
@@ -17034,8 +17070,8 @@
         "grn": 12,
         "onp": 5,
         "oth": 13,
-        "tpp_lnp": 61,
-        "tpp_alp": 39
+        "tpp_lnp": 39,
+        "tpp_alp": 61
       },
       {
         "date": "2022-09-03",
@@ -17045,8 +17081,8 @@
         "grn": 13.5,
         "onp": 7,
         "oth": 12,
-        "tpp_lnp": 57,
-        "tpp_alp": 43
+        "tpp_lnp": 43,
+        "tpp_alp": 57
       },
       {
         "date": "2022-09-18",
@@ -17056,8 +17092,8 @@
         "grn": 10,
         "onp": 6,
         "oth": 13,
-        "tpp_lnp": 56.5,
-        "tpp_alp": 43.5
+        "tpp_lnp": 43.5,
+        "tpp_alp": 56.5
       },
       {
         "date": "2022-10-09",
@@ -17067,8 +17103,8 @@
         "grn": 12,
         "onp": 5,
         "oth": 14,
-        "tpp_lnp": 58.5,
-        "tpp_alp": 41.5
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
       },
       {
         "date": "2022-10-30",
@@ -17078,8 +17114,8 @@
         "grn": 13,
         "onp": 4,
         "oth": 12,
-        "tpp_lnp": 58,
-        "tpp_alp": 42
+        "tpp_lnp": 42,
+        "tpp_alp": 58
       },
       {
         "date": "2022-10-30",
@@ -17089,8 +17125,8 @@
         "grn": 11,
         "onp": 6,
         "oth": 10,
-        "tpp_lnp": 55,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2022-11-27",
@@ -17100,8 +17136,8 @@
         "grn": 13,
         "onp": null,
         "oth": 17,
-        "tpp_lnp": 51,
-        "tpp_alp": 43
+        "tpp_lnp": 43,
+        "tpp_alp": 51
       },
       {
         "date": "2022-12-03",
@@ -17111,8 +17147,8 @@
         "grn": 11,
         "onp": 6,
         "oth": 10,
-        "tpp_lnp": 55,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2022-12-04",
@@ -17122,8 +17158,8 @@
         "grn": 11,
         "onp": 4,
         "oth": 10,
-        "tpp_lnp": 60,
-        "tpp_alp": 40
+        "tpp_lnp": 40,
+        "tpp_alp": 60
       },
       {
         "date": "2022-12-11",
@@ -17133,8 +17169,8 @@
         "grn": 13,
         "onp": 6,
         "oth": 11,
-        "tpp_lnp": 51,
-        "tpp_alp": 44
+        "tpp_lnp": 44,
+        "tpp_alp": 51
       },
       {
         "date": "2022-12-18",
@@ -17144,8 +17180,8 @@
         "grn": 12,
         "onp": 4,
         "oth": 10,
-        "tpp_lnp": 54,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 54
       },
       {
         "date": "2023-01-22",
@@ -17155,8 +17191,8 @@
         "grn": 11,
         "onp": 6,
         "oth": 13,
-        "tpp_lnp": 60,
-        "tpp_alp": 40
+        "tpp_lnp": 40,
+        "tpp_alp": 60
       },
       {
         "date": "2023-01-22",
@@ -17166,8 +17202,8 @@
         "grn": 14,
         "onp": 8,
         "oth": 8,
-        "tpp_lnp": 53,
-        "tpp_alp": 42
+        "tpp_lnp": 42,
+        "tpp_alp": 53
       },
       {
         "date": "2023-01-29",
@@ -17177,8 +17213,8 @@
         "grn": 11.5,
         "onp": null,
         "oth": 17.5,
-        "tpp_lnp": 57,
-        "tpp_alp": 43
+        "tpp_lnp": 43,
+        "tpp_alp": 57
       },
       {
         "date": "2023-02-04",
@@ -17188,8 +17224,8 @@
         "grn": 11,
         "onp": 6,
         "oth": 11,
-        "tpp_lnp": 55,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2023-02-06",
@@ -17199,8 +17235,8 @@
         "grn": 17,
         "onp": 6,
         "oth": 16,
-        "tpp_lnp": 55,
-        "tpp_alp": 40
+        "tpp_lnp": 40,
+        "tpp_alp": 55
       },
       {
         "date": "2023-02-19",
@@ -17210,8 +17246,8 @@
         "grn": 13,
         "onp": null,
         "oth": 17,
-        "tpp_lnp": 58.5,
-        "tpp_alp": 41.5
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
       },
       {
         "date": "2023-02-19",
@@ -17221,8 +17257,8 @@
         "grn": 10,
         "onp": 5,
         "oth": 12,
-        "tpp_lnp": 58,
-        "tpp_alp": 42
+        "tpp_lnp": 42,
+        "tpp_alp": 58
       },
       {
         "date": "2023-02-19",
@@ -17232,8 +17268,8 @@
         "grn": 14,
         "onp": 6,
         "oth": 11,
-        "tpp_lnp": 51,
-        "tpp_alp": 42
+        "tpp_lnp": 42,
+        "tpp_alp": 51
       },
       {
         "date": "2023-02-26",
@@ -17243,8 +17279,8 @@
         "grn": 13.5,
         "onp": null,
         "oth": 15,
-        "tpp_lnp": 56.5,
-        "tpp_alp": 43.5
+        "tpp_lnp": 43.5,
+        "tpp_alp": 56.5
       },
       {
         "date": "2023-03-04",
@@ -17254,8 +17290,8 @@
         "grn": 10,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 54,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 54
       },
       {
         "date": "2023-03-05",
@@ -17265,8 +17301,8 @@
         "grn": 11.5,
         "onp": null,
         "oth": 17,
-        "tpp_lnp": 54.5,
-        "tpp_alp": 45.5
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
       },
       {
         "date": "2023-03-05",
@@ -17276,8 +17312,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 12,
-        "tpp_lnp": 49,
-        "tpp_alp": 44
+        "tpp_lnp": 44,
+        "tpp_alp": 49
       },
       {
         "date": "2023-03-16",
@@ -17287,8 +17323,8 @@
         "grn": 13,
         "onp": 5,
         "oth": 12,
-        "tpp_lnp": 60,
-        "tpp_alp": 40
+        "tpp_lnp": 40,
+        "tpp_alp": 60
       },
       {
         "date": "2023-03-20",
@@ -17298,8 +17334,8 @@
         "grn": 14,
         "onp": 5,
         "oth": 11,
-        "tpp_lnp": 52,
-        "tpp_alp": 43
+        "tpp_lnp": 43,
+        "tpp_alp": 52
       },
       {
         "date": "2023-04-01",
@@ -17309,8 +17345,8 @@
         "grn": 10,
         "onp": 8,
         "oth": 11,
-        "tpp_lnp": 55,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2023-04-02",
@@ -17320,8 +17356,8 @@
         "grn": 14,
         "onp": 6,
         "oth": 12,
-        "tpp_lnp": 53,
-        "tpp_alp": 42
+        "tpp_lnp": 42,
+        "tpp_alp": 53
       },
       {
         "date": "2023-04-16",
@@ -17331,8 +17367,8 @@
         "grn": 12,
         "onp": 6,
         "oth": 12,
-        "tpp_lnp": 61.5,
-        "tpp_alp": 38.5
+        "tpp_lnp": 38.5,
+        "tpp_alp": 61.5
       },
       {
         "date": "2023-04-16",
@@ -17342,8 +17378,8 @@
         "grn": 14,
         "onp": 6,
         "oth": 12,
-        "tpp_lnp": 52,
-        "tpp_alp": 43
+        "tpp_lnp": 43,
+        "tpp_alp": 52
       },
       {
         "date": "2023-04-22",
@@ -17353,8 +17389,8 @@
         "grn": 11,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 56,
-        "tpp_alp": 44
+        "tpp_lnp": 44,
+        "tpp_alp": 56
       },
       {
         "date": "2023-04-30",
@@ -17364,8 +17400,8 @@
         "grn": 14,
         "onp": 5,
         "oth": 10,
-        "tpp_lnp": 53,
-        "tpp_alp": 41
+        "tpp_lnp": 41,
+        "tpp_alp": 53
       },
       {
         "date": "2023-05-13",
@@ -17375,8 +17411,8 @@
         "grn": 12,
         "onp": 5,
         "oth": 10,
-        "tpp_lnp": 61,
-        "tpp_alp": 39
+        "tpp_lnp": 39,
+        "tpp_alp": 61
       },
       {
         "date": "2023-05-13",
@@ -17386,8 +17422,8 @@
         "grn": 11,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 55,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2023-05-14",
@@ -17397,8 +17433,8 @@
         "grn": 14,
         "onp": 5,
         "oth": 9,
-        "tpp_lnp": 53,
-        "tpp_alp": 42
+        "tpp_lnp": 42,
+        "tpp_alp": 53
       },
       {
         "date": "2023-05-17",
@@ -17408,8 +17444,8 @@
         "grn": 12,
         "onp": null,
         "oth": 17,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2023-05-28",
@@ -17419,8 +17455,8 @@
         "grn": 15,
         "onp": 6,
         "oth": 9,
-        "tpp_lnp": 52,
-        "tpp_alp": 43
+        "tpp_lnp": 43,
+        "tpp_alp": 52
       },
       {
         "date": "2023-06-03",
@@ -17430,8 +17466,8 @@
         "grn": 12,
         "onp": 6,
         "oth": 10,
-        "tpp_lnp": 55,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2023-06-11",
@@ -17441,8 +17477,8 @@
         "grn": 12,
         "onp": 6,
         "oth": 12,
-        "tpp_lnp": 60,
-        "tpp_alp": 40
+        "tpp_lnp": 40,
+        "tpp_alp": 60
       },
       {
         "date": "2023-06-11",
@@ -17452,8 +17488,8 @@
         "grn": 16,
         "onp": 5,
         "oth": 10,
-        "tpp_lnp": 52,
-        "tpp_alp": 42
+        "tpp_lnp": 42,
+        "tpp_alp": 52
       },
       {
         "date": "2023-06-24",
@@ -17463,8 +17499,8 @@
         "grn": 11,
         "onp": 6,
         "oth": 10,
-        "tpp_lnp": 54,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 54
       },
       {
         "date": "2023-06-25",
@@ -17474,8 +17510,8 @@
         "grn": 14,
         "onp": 7,
         "oth": 13,
-        "tpp_lnp": 52,
-        "tpp_alp": 42
+        "tpp_lnp": 42,
+        "tpp_alp": 52
       },
       {
         "date": "2023-07-09",
@@ -17485,8 +17521,8 @@
         "grn": 14,
         "onp": 8,
         "oth": 9,
-        "tpp_lnp": 51,
-        "tpp_alp": 44
+        "tpp_lnp": 44,
+        "tpp_alp": 51
       },
       {
         "date": "2023-07-15",
@@ -17496,8 +17532,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 55,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2023-07-15",
@@ -17507,8 +17543,8 @@
         "grn": 11,
         "onp": 6,
         "oth": 12,
-        "tpp_lnp": 59,
-        "tpp_alp": 41
+        "tpp_lnp": 41,
+        "tpp_alp": 59
       },
       {
         "date": "2023-07-23",
@@ -17518,8 +17554,8 @@
         "grn": 14,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 50,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 50
       },
       {
         "date": "2023-08-06",
@@ -17529,8 +17565,8 @@
         "grn": 12,
         "onp": 8,
         "oth": 10,
-        "tpp_lnp": 52,
-        "tpp_alp": 42
+        "tpp_lnp": 42,
+        "tpp_alp": 52
       },
       {
         "date": "2023-08-13",
@@ -17540,8 +17576,8 @@
         "grn": 11,
         "onp": 5,
         "oth": 14,
-        "tpp_lnp": 56,
-        "tpp_alp": 44
+        "tpp_lnp": 44,
+        "tpp_alp": 56
       },
       {
         "date": "2023-08-14",
@@ -17551,8 +17587,8 @@
         "grn": 10,
         "onp": null,
         "oth": 21,
-        "tpp_lnp": 55.6,
-        "tpp_alp": 44.4
+        "tpp_lnp": 44.4,
+        "tpp_alp": 55.6
       },
       {
         "date": "2023-08-20",
@@ -17562,8 +17598,8 @@
         "grn": 14,
         "onp": 5,
         "oth": 10,
-        "tpp_lnp": 51,
-        "tpp_alp": 43
+        "tpp_lnp": 43,
+        "tpp_alp": 51
       },
       {
         "date": "2023-09-01",
@@ -17573,8 +17609,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 8,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2023-09-03",
@@ -17584,8 +17620,8 @@
         "grn": 13,
         "onp": null,
         "oth": 16,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2023-09-03",
@@ -17595,8 +17631,8 @@
         "grn": 15,
         "onp": 7,
         "oth": 9,
-        "tpp_lnp": 51,
-        "tpp_alp": 43
+        "tpp_lnp": 43,
+        "tpp_alp": 51
       },
       {
         "date": "2023-09-04",
@@ -17606,8 +17642,8 @@
         "grn": 13,
         "onp": null,
         "oth": 14,
-        "tpp_lnp": 54.1,
-        "tpp_alp": 45.9
+        "tpp_lnp": 45.9,
+        "tpp_alp": 54.1
       },
       {
         "date": "2023-09-09",
@@ -17617,8 +17653,8 @@
         "grn": 12,
         "onp": 5,
         "oth": 13,
-        "tpp_lnp": 55.5,
-        "tpp_alp": 44.5
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
       },
       {
         "date": "2023-09-10",
@@ -17628,8 +17664,8 @@
         "grn": 13.5,
         "onp": null,
         "oth": 17.5,
-        "tpp_lnp": 52.5,
-        "tpp_alp": 47.5
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
       },
       {
         "date": "2023-09-17",
@@ -17639,8 +17675,8 @@
         "grn": 13,
         "onp": 8,
         "oth": 10,
-        "tpp_lnp": 49,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 49
       },
       {
         "date": "2023-09-22",
@@ -17650,8 +17686,8 @@
         "grn": 11,
         "onp": 6,
         "oth": 11,
-        "tpp_lnp": 54,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 54
       },
       {
         "date": "2023-09-24",
@@ -17661,8 +17697,8 @@
         "grn": 13,
         "onp": null,
         "oth": 17,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2023-09-29",
@@ -17672,8 +17708,8 @@
         "grn": 13,
         "onp": null,
         "oth": 19,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2023-10-01",
@@ -17683,8 +17719,8 @@
         "grn": 14,
         "onp": 6,
         "oth": 9,
-        "tpp_lnp": 50,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 50
       },
       {
         "date": "2023-10-04",
@@ -17694,8 +17730,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 13,
-        "tpp_lnp": 57,
-        "tpp_alp": 43
+        "tpp_lnp": 43,
+        "tpp_alp": 57
       },
       {
         "date": "2023-10-06",
@@ -17705,8 +17741,8 @@
         "grn": 12,
         "onp": 5,
         "oth": 13,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2023-10-10",
@@ -17716,8 +17752,8 @@
         "grn": 14,
         "onp": 6,
         "oth": 11,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2023-10-12",
@@ -17727,8 +17763,8 @@
         "grn": 12,
         "onp": 6,
         "oth": 11,
-        "tpp_lnp": 54,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 54
       },
       {
         "date": "2023-10-22",
@@ -17738,8 +17774,8 @@
         "grn": 14,
         "onp": 4.5,
         "oth": 13.5,
-        "tpp_lnp": 49.5,
-        "tpp_alp": 50.5
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
       },
       {
         "date": "2023-10-29",
@@ -17749,8 +17785,8 @@
         "grn": 15,
         "onp": null,
         "oth": 17.5,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2023-10-29",
@@ -17760,8 +17796,8 @@
         "grn": 10,
         "onp": 7,
         "oth": 12,
-        "tpp_lnp": 48,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 48
       },
       {
         "date": "2023-11-02",
@@ -17771,8 +17807,8 @@
         "grn": 14,
         "onp": null,
         "oth": 17,
-        "tpp_lnp": 53.5,
-        "tpp_alp": 46.5
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
       },
       {
         "date": "2023-11-03",
@@ -17782,8 +17818,8 @@
         "grn": 12,
         "onp": 6,
         "oth": 10,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2023-11-05",
@@ -17793,8 +17829,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 15,
-        "tpp_lnp": 57,
-        "tpp_alp": 43
+        "tpp_lnp": 43,
+        "tpp_alp": 57
       },
       {
         "date": "2023-11-12",
@@ -17815,8 +17851,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 49,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 49
       },
       {
         "date": "2023-11-14",
@@ -17826,8 +17862,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 13,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2023-11-19",
@@ -17837,8 +17873,8 @@
         "grn": 13.5,
         "onp": 6.5,
         "oth": 13,
-        "tpp_lnp": 49.5,
-        "tpp_alp": 50.5
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
       },
       {
         "date": "2023-11-24",
@@ -17859,8 +17895,8 @@
         "grn": 13.5,
         "onp": 5,
         "oth": 14.5,
-        "tpp_lnp": 52.5,
-        "tpp_alp": 47.5
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
       },
       {
         "date": "2023-11-26",
@@ -17870,8 +17906,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 9,
-        "tpp_lnp": 48,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 48
       },
       {
         "date": "2023-12-03",
@@ -17881,8 +17917,8 @@
         "grn": 12.5,
         "onp": 5,
         "oth": 12.5,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2023-12-03",
@@ -17892,8 +17928,8 @@
         "grn": 12,
         "onp": 5,
         "oth": 13,
-        "tpp_lnp": 55,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2023-12-05",
@@ -17903,8 +17939,8 @@
         "grn": 15,
         "onp": 7,
         "oth": 13,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2023-12-11",
@@ -17914,8 +17950,8 @@
         "grn": 13,
         "onp": null,
         "oth": 19,
-        "tpp_lnp": 52.8,
-        "tpp_alp": 47.2
+        "tpp_lnp": 47.2,
+        "tpp_alp": 52.8
       },
       {
         "date": "2023-12-11",
@@ -17925,8 +17961,8 @@
         "grn": 13,
         "onp": 6,
         "oth": 11,
-        "tpp_lnp": 49,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 49
       },
       {
         "date": "2023-12-15",
@@ -17936,8 +17972,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2023-12-17",
@@ -17969,8 +18005,8 @@
         "grn": 13,
         "onp": 5,
         "oth": 14,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-01-11",
@@ -17991,8 +18027,8 @@
         "grn": 12,
         "onp": 4.5,
         "oth": 15,
-        "tpp_lnp": 51.5,
-        "tpp_alp": 48.5
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
       },
       {
         "date": "2024-01-17",
@@ -18002,8 +18038,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-01-21",
@@ -18013,8 +18049,8 @@
         "grn": 12.5,
         "onp": 5,
         "oth": 14,
-        "tpp_lnp": 52.5,
-        "tpp_alp": 47.5
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
       },
       {
         "date": "2024-01-28",
@@ -18024,8 +18060,8 @@
         "grn": 13,
         "onp": 5.5,
         "oth": 13,
-        "tpp_lnp": 50.5,
-        "tpp_alp": 49.5
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
       },
       {
         "date": "2024-01-28",
@@ -18035,8 +18071,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 9,
-        "tpp_lnp": 48,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 48
       },
       {
         "date": "2024-02-03",
@@ -18046,8 +18082,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-02-04",
@@ -18057,8 +18093,8 @@
         "grn": 12,
         "onp": 5,
         "oth": 13,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2024-02-07",
@@ -18068,8 +18104,8 @@
         "grn": 13,
         "onp": null,
         "oth": 16,
-        "tpp_lnp": 51.2,
-        "tpp_alp": 48.8
+        "tpp_lnp": 48.8,
+        "tpp_alp": 51.2
       },
       {
         "date": "2024-02-07",
@@ -18079,8 +18115,8 @@
         "grn": 14,
         "onp": 8,
         "oth": 10,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-02-11",
@@ -18090,8 +18126,8 @@
         "grn": 12,
         "onp": 4.5,
         "oth": 12,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-02-11",
@@ -18101,8 +18137,8 @@
         "grn": 14,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 50,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 50
       },
       {
         "date": "2024-02-18",
@@ -18112,8 +18148,8 @@
         "grn": 13,
         "onp": 4,
         "oth": 12,
-        "tpp_lnp": 52.5,
-        "tpp_alp": 47.5
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
       },
       {
         "date": "2024-02-18",
@@ -18123,8 +18159,8 @@
         "grn": 14,
         "onp": null,
         "oth": 17,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-02-23",
@@ -18134,8 +18170,8 @@
         "grn": 12,
         "onp": 6,
         "oth": 13,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-02-24",
@@ -18145,8 +18181,8 @@
         "grn": 11,
         "onp": 6,
         "oth": 12,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-02-25",
@@ -18167,8 +18203,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 47,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 47
       },
       {
         "date": "2024-03-03",
@@ -18178,8 +18214,8 @@
         "grn": 13.5,
         "onp": 3.5,
         "oth": 12.5,
-        "tpp_lnp": 53.5,
-        "tpp_alp": 46.5
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
       },
       {
         "date": "2024-03-05",
@@ -18189,8 +18225,8 @@
         "grn": 15,
         "onp": 6,
         "oth": 10,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-03-09",
@@ -18200,8 +18236,8 @@
         "grn": 11,
         "onp": 8,
         "oth": 10,
-        "tpp_lnp": 48,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 48
       },
       {
         "date": "2024-03-10",
@@ -18211,8 +18247,8 @@
         "grn": 13,
         "onp": 4,
         "oth": 13,
-        "tpp_lnp": 51.5,
-        "tpp_alp": 48.5
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
       },
       {
         "date": "2024-03-10",
@@ -18222,8 +18258,8 @@
         "grn": 14,
         "onp": null,
         "oth": 16,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-03-17",
@@ -18233,8 +18269,8 @@
         "grn": 12.5,
         "onp": 5.5,
         "oth": 13.5,
-        "tpp_lnp": 51.5,
-        "tpp_alp": 48.5
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
       },
       {
         "date": "2024-03-22",
@@ -18244,8 +18280,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-03-24",
@@ -18266,8 +18302,8 @@
         "grn": 11,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 44,
-        "tpp_alp": 50
+        "tpp_lnp": 50,
+        "tpp_alp": 44
       },
       {
         "date": "2024-03-24",
@@ -18277,8 +18313,8 @@
         "grn": 13,
         "onp": 5,
         "oth": 13,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2024-03-27",
@@ -18288,8 +18324,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-03-31",
@@ -18299,8 +18335,8 @@
         "grn": 15.5,
         "onp": 3.5,
         "oth": 13.5,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-04-07",
@@ -18310,8 +18346,8 @@
         "grn": 13.5,
         "onp": 6,
         "oth": 13,
-        "tpp_lnp": 49.5,
-        "tpp_alp": 50.5
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
       },
       {
         "date": "2024-04-07",
@@ -18321,8 +18357,8 @@
         "grn": 14,
         "onp": 6,
         "oth": 10,
-        "tpp_lnp": 48,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 48
       },
       {
         "date": "2024-04-14",
@@ -18332,8 +18368,8 @@
         "grn": 13.5,
         "onp": 5.5,
         "oth": 12.5,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-04-14",
@@ -18354,8 +18390,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-04-21",
@@ -18365,8 +18401,8 @@
         "grn": 16,
         "onp": 5.5,
         "oth": 12.5,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-04-21",
@@ -18376,8 +18412,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-04-21",
@@ -18387,8 +18423,8 @@
         "grn": 11,
         "onp": 9,
         "oth": 10,
-        "tpp_lnp": 47,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 47
       },
       {
         "date": "2024-04-21",
@@ -18409,8 +18445,8 @@
         "grn": 13,
         "onp": 8,
         "oth": 10,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-04-28",
@@ -18420,8 +18456,8 @@
         "grn": 14,
         "onp": 5.5,
         "oth": 12.5,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-05-05",
@@ -18431,8 +18467,8 @@
         "grn": 13,
         "onp": 6,
         "oth": 14,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-05-05",
@@ -18442,8 +18478,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 8,
-        "tpp_lnp": 46,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 46
       },
       {
         "date": "2024-05-12",
@@ -18453,8 +18489,8 @@
         "grn": 13.5,
         "onp": 5.5,
         "oth": 12,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-05-14",
@@ -18475,8 +18511,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 9,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-05-19",
@@ -18486,8 +18522,8 @@
         "grn": 14.5,
         "onp": 5.5,
         "oth": 12.5,
-        "tpp_lnp": 50.5,
-        "tpp_alp": 49.5
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
       },
       {
         "date": "2024-05-19",
@@ -18508,8 +18544,8 @@
         "grn": 10,
         "onp": 8,
         "oth": 9,
-        "tpp_lnp": 46,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 46
       },
       {
         "date": "2024-05-19",
@@ -18530,8 +18566,8 @@
         "grn": 15,
         "onp": 6,
         "oth": 13.5,
-        "tpp_lnp": 48.5,
-        "tpp_alp": 51.5
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
       },
       {
         "date": "2024-06-02",
@@ -18541,8 +18577,8 @@
         "grn": 14,
         "onp": 4.5,
         "oth": 14.5,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-06-02",
@@ -18585,8 +18621,8 @@
         "grn": 15.5,
         "onp": 5.5,
         "oth": 13.5,
-        "tpp_lnp": 53.5,
-        "tpp_alp": 46.5
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
       },
       {
         "date": "2024-06-15",
@@ -18596,8 +18632,8 @@
         "grn": 14,
         "onp": 6,
         "oth": 16,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-06-16",
@@ -18618,8 +18654,8 @@
         "grn": 13,
         "onp": 8,
         "oth": 10,
-        "tpp_lnp": 48,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 48
       },
       {
         "date": "2024-06-16",
@@ -18640,8 +18676,8 @@
         "grn": 13,
         "onp": 6,
         "oth": 12.5,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-06-28",
@@ -18651,8 +18687,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 12,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-06-30",
@@ -18662,8 +18698,8 @@
         "grn": 13,
         "onp": 4.5,
         "oth": 14.5,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-06-30",
@@ -18673,8 +18709,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 46,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 46
       },
       {
         "date": "2024-07-07",
@@ -18684,8 +18720,8 @@
         "grn": 13.5,
         "onp": 5,
         "oth": 13.5,
-        "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_lnp": 52,
+        "tpp_alp": 48
       },
       {
         "date": "2024-07-13",
@@ -18706,8 +18742,8 @@
         "grn": 12.5,
         "onp": 5,
         "oth": 14,
-        "tpp_lnp": 49.5,
-        "tpp_alp": 50.5
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
       },
       {
         "date": "2024-07-14",
@@ -18717,8 +18753,8 @@
         "grn": 13,
         "onp": 8,
         "oth": 12,
-        "tpp_lnp": 46,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 46
       },
       {
         "date": "2024-07-17",
@@ -18728,8 +18764,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-07-19",
@@ -18739,8 +18775,8 @@
         "grn": 11,
         "onp": null,
         "oth": 16,
-        "tpp_lnp": 48.5,
-        "tpp_alp": 51.5
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
       },
       {
         "date": "2024-07-19",
@@ -18750,8 +18786,8 @@
         "grn": 13,
         "onp": 6,
         "oth": 10,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-07-21",
@@ -18761,8 +18797,8 @@
         "grn": 13,
         "onp": 5,
         "oth": 11,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-07-21",
@@ -18772,8 +18808,8 @@
         "grn": 13,
         "onp": null,
         "oth": 16,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-07-28",
@@ -18783,8 +18819,8 @@
         "grn": 13,
         "onp": 6.5,
         "oth": 12.5,
-        "tpp_lnp": 50.5,
-        "tpp_alp": 49.5
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
       },
       {
         "date": "2024-07-28",
@@ -18794,8 +18830,8 @@
         "grn": 11,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 47,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 47
       },
       {
         "date": "2024-08-04",
@@ -18805,8 +18841,8 @@
         "grn": 12,
         "onp": 5.5,
         "oth": 15,
-        "tpp_lnp": 51.5,
-        "tpp_alp": 48.5
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
       },
       {
         "date": "2024-08-09",
@@ -18860,8 +18896,8 @@
         "grn": 13.5,
         "onp": 4,
         "oth": 13.5,
-        "tpp_lnp": 50.5,
-        "tpp_alp": 49.5
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
       },
       {
         "date": "2024-08-18",
@@ -18871,8 +18907,8 @@
         "grn": 12,
         "onp": null,
         "oth": 15,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-08-24",
@@ -18882,8 +18918,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 12,
-        "tpp_lnp": 48,
-        "tpp_alp": 46
+        "tpp_lnp": 46,
+        "tpp_alp": 48
       },
       {
         "date": "2024-08-25",
@@ -18893,8 +18929,8 @@
         "grn": 13,
         "onp": 4,
         "oth": 14,
-        "tpp_lnp": 49.5,
-        "tpp_alp": 50.5
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
       },
       {
         "date": "2024-08-27",
@@ -18904,8 +18940,8 @@
         "grn": 12,
         "onp": null,
         "oth": 17,
-        "tpp_lnp": 50.5,
-        "tpp_alp": 49.5
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
       },
       {
         "date": "2024-08-28",
@@ -18926,8 +18962,8 @@
         "grn": 13,
         "onp": 6,
         "oth": 15,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-08-30",
@@ -18948,8 +18984,8 @@
         "grn": 13,
         "onp": 6,
         "oth": 14.5,
-        "tpp_lnp": 50.5,
-        "tpp_alp": 49.5
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
       },
       {
         "date": "2024-09-07",
@@ -18981,8 +19017,8 @@
         "grn": 14.5,
         "onp": 6,
         "oth": 13,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-09-15",
@@ -18992,8 +19028,8 @@
         "grn": 12.5,
         "onp": 5.5,
         "oth": 14,
-        "tpp_lnp": 50.5,
-        "tpp_alp": 49.5
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
       },
       {
         "date": "2024-09-15",
@@ -19003,8 +19039,8 @@
         "grn": 13,
         "onp": null,
         "oth": 15,
-        "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_lnp": 52,
+        "tpp_alp": 48
       },
       {
         "date": "2024-09-19",
@@ -19036,8 +19072,8 @@
         "grn": 12.5,
         "onp": 5,
         "oth": 13,
-        "tpp_lnp": 50.5,
-        "tpp_alp": 49.5
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
       },
       {
         "date": "2024-09-22",
@@ -19047,8 +19083,8 @@
         "grn": 12,
         "onp": 8,
         "oth": 11,
-        "tpp_lnp": 47,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 47
       },
       {
         "date": "2024-09-29",
@@ -19058,8 +19094,8 @@
         "grn": 13.5,
         "onp": 4.5,
         "oth": 14,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-10-05",
@@ -19091,8 +19127,8 @@
         "grn": 12,
         "onp": 8,
         "oth": 10,
-        "tpp_lnp": 49,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 49
       },
       {
         "date": "2024-10-11",
@@ -19102,8 +19138,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 12,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-10-13",
@@ -19124,8 +19160,8 @@
         "grn": 13.5,
         "onp": 5.5,
         "oth": 12.5,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2024-10-20",
@@ -19135,8 +19171,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 46,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 46
       },
       {
         "date": "2024-10-20",
@@ -19146,8 +19182,8 @@
         "grn": 13,
         "onp": null,
         "oth": 16,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-10-25",
@@ -19168,8 +19204,8 @@
         "grn": 14,
         "onp": 5.5,
         "oth": 13,
-        "tpp_lnp": 50.5,
-        "tpp_alp": 49.5
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
       },
       {
         "date": "2024-11-03",
@@ -19179,8 +19215,8 @@
         "grn": 14,
         "onp": 6,
         "oth": 11.5,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-11-03",
@@ -19190,8 +19226,8 @@
         "grn": 12,
         "onp": 9,
         "oth": 10,
-        "tpp_lnp": 47,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 47
       },
       {
         "date": "2024-11-08",
@@ -19201,8 +19237,8 @@
         "grn": 11,
         "onp": 5,
         "oth": 11,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-11-10",
@@ -19212,8 +19248,8 @@
         "grn": 12.5,
         "onp": 6.5,
         "oth": 13,
-        "tpp_lnp": 49.5,
-        "tpp_alp": 50.5
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
       },
       {
         "date": "2024-11-10",
@@ -19223,8 +19259,8 @@
         "grn": 11,
         "onp": 5,
         "oth": 15,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-11-13",
@@ -19245,8 +19281,8 @@
         "grn": 13.5,
         "onp": 6.5,
         "oth": 12,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-11-17",
@@ -19256,8 +19292,8 @@
         "grn": 14,
         "onp": null,
         "oth": 16,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-11-18",
@@ -19267,8 +19303,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 48,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 48
       },
       {
         "date": "2024-11-20",
@@ -19278,8 +19314,8 @@
         "grn": 11,
         "onp": null,
         "oth": 19,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-11-21",
@@ -19311,8 +19347,8 @@
         "grn": 12.5,
         "onp": 6.5,
         "oth": 12.5,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2024-12-01",
@@ -19322,8 +19358,8 @@
         "grn": 12.5,
         "onp": 6.5,
         "oth": 12.5,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-12-01",
@@ -19333,8 +19369,8 @@
         "grn": 11,
         "onp": 8,
         "oth": 10,
-        "tpp_lnp": 47,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 47
       },
       {
         "date": "2024-12-06",
@@ -19355,8 +19391,8 @@
         "grn": 13,
         "onp": 6.5,
         "oth": 14.5,
-        "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_lnp": 52,
+        "tpp_alp": 48
       },
       {
         "date": "2024-12-08",
@@ -19366,8 +19402,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 16,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2024-12-15",
@@ -19377,8 +19413,8 @@
         "grn": 12.5,
         "onp": 5,
         "oth": 14,
-        "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_lnp": 52,
+        "tpp_alp": 48
       },
       {
         "date": "2024-12-15",
@@ -19388,8 +19424,8 @@
         "grn": 13,
         "onp": 6,
         "oth": 12,
-        "tpp_lnp": 47,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 47
       },
       {
         "date": "2024-12-15",
@@ -19399,8 +19435,8 @@
         "grn": 14,
         "onp": null,
         "oth": 16,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2025-01-05",
@@ -19410,8 +19446,8 @@
         "grn": 12,
         "onp": 3.5,
         "oth": 13,
-        "tpp_lnp": 47,
-        "tpp_alp": 53
+        "tpp_lnp": 53,
+        "tpp_alp": 47
       },
       {
         "date": "2025-01-12",
@@ -19421,8 +19457,8 @@
         "grn": 12.5,
         "onp": 4.5,
         "oth": 12.5,
-        "tpp_lnp": 48.5,
-        "tpp_alp": 51.5
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
       },
       {
         "date": "2025-01-15",
@@ -19432,8 +19468,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2025-01-19",
@@ -19443,8 +19479,8 @@
         "grn": 13,
         "onp": 4,
         "oth": 12.5,
-        "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_lnp": 52,
+        "tpp_alp": 48
       },
       {
         "date": "2025-01-19",
@@ -19454,8 +19490,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 9,
-        "tpp_lnp": 47,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 47
       },
       {
         "date": "2025-01-19",
@@ -19465,8 +19501,8 @@
         "grn": 13,
         "onp": null,
         "oth": 15,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2025-01-21",
@@ -19476,8 +19512,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 16,
-        "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_lnp": 52,
+        "tpp_alp": 48
       },
       {
         "date": "2025-01-24",
@@ -19487,8 +19523,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 11,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2025-01-26",
@@ -19498,8 +19534,8 @@
         "grn": 11.5,
         "onp": 6,
         "oth": 12.5,
-        "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_lnp": 52,
+        "tpp_alp": 48
       },
       {
         "date": "2025-02-01",
@@ -19520,8 +19556,8 @@
         "grn": 12,
         "onp": 8,
         "oth": 10,
-        "tpp_lnp": 47,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 47
       },
       {
         "date": "2025-02-02",
@@ -19542,8 +19578,8 @@
         "grn": 11,
         "onp": null,
         "oth": 18,
-        "tpp_lnp": 48.5,
-        "tpp_alp": 51.5
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
       },
       {
         "date": "2025-02-09",
@@ -19553,8 +19589,8 @@
         "grn": 11,
         "onp": 4,
         "oth": 15.5,
-        "tpp_lnp": 48.5,
-        "tpp_alp": 51.5
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
       },
       {
         "date": "2025-02-11",
@@ -19564,8 +19600,8 @@
         "grn": 12,
         "onp": null,
         "oth": 12,
-        "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_lnp": 52,
+        "tpp_alp": 48
       },
       {
         "date": "2025-02-12",
@@ -19575,8 +19611,8 @@
         "grn": 12.7,
         "onp": 9.1,
         "oth": 11.7,
-        "tpp_lnp": 48.9,
-        "tpp_alp": 51.1
+        "tpp_lnp": 51.1,
+        "tpp_alp": 48.9
       },
       {
         "date": "2025-02-14",
@@ -19586,8 +19622,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 12,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2025-02-16",
@@ -19597,8 +19633,8 @@
         "grn": 12.5,
         "onp": 5.5,
         "oth": 14.5,
-        "tpp_lnp": 48.5,
-        "tpp_alp": 51.5
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
       },
       {
         "date": "2025-02-16",
@@ -19619,8 +19655,8 @@
         "grn": 13.5,
         "onp": 5,
         "oth": 13.5,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2025-02-23",
@@ -19630,8 +19666,8 @@
         "grn": 13,
         "onp": 9,
         "oth": 13,
-        "tpp_lnp": 45,
-        "tpp_alp": 55
+        "tpp_lnp": 55,
+        "tpp_alp": 45
       },
       {
         "date": "2025-02-23",
@@ -19641,8 +19677,8 @@
         "grn": 13,
         "onp": null,
         "oth": 15,
-        "tpp_lnp": 48,
-        "tpp_alp": 52
+        "tpp_lnp": 52,
+        "tpp_alp": 48
       },
       {
         "date": "2025-02-25",
@@ -19652,8 +19688,8 @@
         "grn": 12,
         "onp": null,
         "oth": 13,
-        "tpp_lnp": 49.5,
-        "tpp_alp": 50.5
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
       },
       {
         "date": "2025-02-27",
@@ -19663,8 +19699,8 @@
         "grn": 14,
         "onp": 8,
         "oth": 13,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2025-03-02",
@@ -19674,8 +19710,8 @@
         "grn": 13.5,
         "onp": 4,
         "oth": 14,
-        "tpp_lnp": 49.5,
-        "tpp_alp": 50.5
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
       },
       {
         "date": "2025-03-02",
@@ -19685,8 +19721,8 @@
         "grn": 13,
         "onp": 8,
         "oth": 11,
-        "tpp_lnp": 47,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 47
       },
       {
         "date": "2025-03-06",
@@ -19696,8 +19732,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 13,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2025-03-07",
@@ -19707,8 +19743,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 10,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2025-03-09",
@@ -19718,8 +19754,8 @@
         "grn": 13.5,
         "onp": 5,
         "oth": 14.5,
-        "tpp_lnp": 51.5,
-        "tpp_alp": 48.5
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
       },
       {
         "date": "2025-03-11",
@@ -19729,8 +19765,8 @@
         "grn": 12,
         "onp": null,
         "oth": 19,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2025-03-13",
@@ -19740,8 +19776,8 @@
         "grn": 13.5,
         "onp": 7.5,
         "oth": 12,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2025-03-15",
@@ -19751,8 +19787,8 @@
         "grn": 14,
         "onp": null,
         "oth": 16,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2025-03-16",
@@ -19762,8 +19798,8 @@
         "grn": 13.5,
         "onp": 5,
         "oth": 15,
-        "tpp_lnp": 54.5,
-        "tpp_alp": 45.5
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
       },
       {
         "date": "2025-03-16",
@@ -19795,8 +19831,8 @@
         "grn": 12.5,
         "onp": 4,
         "oth": 14.5,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2025-03-24",
@@ -19806,8 +19842,8 @@
         "grn": 11,
         "onp": null,
         "oth": 17,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2025-03-26",
@@ -19817,8 +19853,8 @@
         "grn": 13.2,
         "onp": 9.3,
         "oth": 12.2,
-        "tpp_lnp": 50.2,
-        "tpp_alp": 49.8
+        "tpp_lnp": 49.8,
+        "tpp_alp": 50.2
       },
       {
         "date": "2025-03-29",
@@ -19828,8 +19864,8 @@
         "grn": 12,
         "onp": 6,
         "oth": 12,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2025-03-30",
@@ -19839,8 +19875,8 @@
         "grn": 13,
         "onp": 5.5,
         "oth": 14.5,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2025-03-30",
@@ -19850,8 +19886,8 @@
         "grn": 12,
         "onp": 9,
         "oth": 10,
-        "tpp_lnp": 48,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 48
       },
       {
         "date": "2025-03-30",
@@ -19872,8 +19908,8 @@
         "grn": 12,
         "onp": null,
         "oth": 17,
-        "tpp_lnp": 49,
-        "tpp_alp": 51
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2025-04-01",
@@ -19883,8 +19919,8 @@
         "grn": 12,
         "onp": null,
         "oth": 19,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2025-04-03",
@@ -19894,8 +19930,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 15,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2025-04-04",
@@ -19905,8 +19941,8 @@
         "grn": 13.5,
         "onp": 6,
         "oth": 15,
-        "tpp_lnp": 53.5,
-        "tpp_alp": 46.5
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
       },
       {
         "date": "2025-04-04",
@@ -19916,8 +19952,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 12,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2025-04-10",
@@ -19927,8 +19963,8 @@
         "grn": 13,
         "onp": 8.5,
         "oth": 13,
-        "tpp_lnp": 52.5,
-        "tpp_alp": 47.5
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
       },
       {
         "date": "2025-04-10",
@@ -19938,8 +19974,8 @@
         "grn": 12,
         "onp": 8,
         "oth": 12,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2025-04-13",
@@ -19949,8 +19985,8 @@
         "grn": 14.5,
         "onp": 6,
         "oth": 14,
-        "tpp_lnp": 54.5,
-        "tpp_alp": 45.5
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
       },
       {
         "date": "2025-04-13",
@@ -19960,8 +19996,8 @@
         "grn": 13,
         "onp": 6,
         "oth": 17,
-        "tpp_lnp": 53.5,
-        "tpp_alp": 46.5
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
       },
       {
         "date": "2025-04-14",
@@ -19971,8 +20007,8 @@
         "grn": 13,
         "onp": 9,
         "oth": 11,
-        "tpp_lnp": 50,
-        "tpp_alp": 45
+        "tpp_lnp": 45,
+        "tpp_alp": 50
       },
       {
         "date": "2025-04-15",
@@ -19982,8 +20018,8 @@
         "grn": 13,
         "onp": 7,
         "oth": 14,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2025-04-16",
@@ -20004,8 +20040,8 @@
         "grn": 12,
         "onp": 7,
         "oth": 12,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2025-04-20",
@@ -20015,8 +20051,8 @@
         "grn": 14.5,
         "onp": 6,
         "oth": 11.5,
-        "tpp_lnp": 55.5,
-        "tpp_alp": 44.5
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
       },
       {
         "date": "2025-04-22",
@@ -20026,8 +20062,8 @@
         "grn": 14,
         "onp": 10.5,
         "oth": 11,
-        "tpp_lnp": 53.5,
-        "tpp_alp": 46.5
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
       },
       {
         "date": "2025-04-23",
@@ -20037,8 +20073,8 @@
         "grn": 14,
         "onp": 9,
         "oth": 17,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2025-04-25",
@@ -20048,8 +20084,8 @@
         "grn": 12.6,
         "onp": 9.1,
         "oth": 15.7,
-        "tpp_lnp": 52.9,
-        "tpp_alp": 47.1
+        "tpp_lnp": 47.1,
+        "tpp_alp": 52.9
       },
       {
         "date": "2025-04-25",
@@ -20059,8 +20095,8 @@
         "grn": 11,
         "onp": 8,
         "oth": 12,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2025-04-27",
@@ -20070,8 +20106,8 @@
         "grn": 13,
         "onp": 7.5,
         "oth": 11,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2025-04-27",
@@ -20081,8 +20117,8 @@
         "grn": 13,
         "onp": 10,
         "oth": 11,
-        "tpp_lnp": 52.1,
-        "tpp_alp": 47.9
+        "tpp_lnp": 47.9,
+        "tpp_alp": 52.1
       },
       {
         "date": "2025-04-28",
@@ -20092,8 +20128,8 @@
         "grn": 14,
         "onp": 7,
         "oth": 13,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2025-04-28",
@@ -20103,8 +20139,8 @@
         "grn": 14.5,
         "onp": 9.5,
         "oth": 11,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2025-04-29",
@@ -20114,8 +20150,8 @@
         "grn": 12,
         "onp": 8,
         "oth": 12,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2025-04-29",
@@ -20125,8 +20161,8 @@
         "grn": 12,
         "onp": 9,
         "oth": 18,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2025-04-30",
@@ -20136,8 +20172,8 @@
         "grn": 12,
         "onp": 9,
         "oth": 15,
-        "tpp_lnp": 52,
-        "tpp_alp": 48
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2025-05-01",
@@ -20147,8 +20183,8 @@
         "grn": 14.6,
         "onp": 8.5,
         "oth": 14.4,
-        "tpp_lnp": 52.2,
-        "tpp_alp": 47.8
+        "tpp_lnp": 47.8,
+        "tpp_alp": 52.2
       },
       {
         "date": "2025-05-01",
@@ -20158,8 +20194,8 @@
         "grn": 13,
         "onp": 8,
         "oth": 12,
-        "tpp_lnp": 52.5,
-        "tpp_alp": 47.5
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
       },
       {
         "date": "2025-05-01",
@@ -20169,8 +20205,8 @@
         "grn": 12,
         "onp": 8,
         "oth": 10,
-        "tpp_lnp": 51.5,
-        "tpp_alp": 48.5
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
       },
       {
         "date": "2025-05-01",
@@ -20180,8 +20216,8 @@
         "grn": 12,
         "onp": 8,
         "oth": 14,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2025-05-02",
@@ -20191,8 +20227,8 @@
         "grn": 13.5,
         "onp": 6.5,
         "oth": 12.5,
-        "tpp_lnp": 53,
-        "tpp_alp": 47
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2025-05-03",

@@ -1,0 +1,291 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>auspol tracker – new polls</title>
+    <link>https://joshborgnolo.github.io/auspol-tracker/</link>
+    <atom:link href="https://joshborgnolo.github.io/auspol-tracker/feed.xml" rel="self" type="application/rss+xml"/>
+    <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
+    <language>en-AU</language>
+    <lastBuildDate>Sun, 23 Aug 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Roy Morgan, 17–23 Aug 2026 — 2PP ALP 52 – L/NP 48</title>
+      <link>https://www.roymorgan.com/findings/10321-federal-voting-intention-august-24-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-23|Roy Morgan</guid>
+      <pubDate>Sun, 23 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27, L/NP 21, GRN 14, ON 27, Ind/Oth 11. Two-party preferred: ALP 52 – L/NP 48. Undecided 6.5%. Sample 1,508. Fieldwork 17–23 Aug 2026.</description>
+    </item>
+    <item>
+      <title>DemosAU, 18–20 Aug 2026 — ALP 26, L/NP 25, GRN 12, ON 24, Ind/Oth 13</title>
+      <link>https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-20|DemosAU</guid>
+      <pubDate>Thu, 20 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 26, L/NP 25, GRN 12, ON 24, Ind/Oth 13. No two-party figure published. Sample 1,562. Fieldwork 18–20 Aug 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 10–16 Aug 2026 — 2PP ALP 52 – L/NP 48</title>
+      <link>https://www.roymorgan.com/findings/10311-federal-voting-intention-august-17-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-16|Roy Morgan</guid>
+      <pubDate>Sun, 16 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28.5, L/NP 23.5, GRN 12.5, ON 25, Ind/Oth 10.5. Two-party preferred: ALP 52 – L/NP 48. Undecided 4%. Sample 1,576. Fieldwork 10–16 Aug 2026.</description>
+    </item>
+    <item>
+      <title>Resolve, 9–15 Aug 2026 — ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11</title>
+      <link>https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-15|Resolve</guid>
+      <pubDate>Sat, 15 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11. No two-party figure published. Sample 2,256. Fieldwork 9–15 Aug 2026.</description>
+    </item>
+    <item>
+      <title>YouGov, 4–10 Aug 2026 — 2PP ALP 52 – L/NP 48</title>
+      <link>https://www.news24.com.au/politics/australian-politics/coalition-and-one-nation-face-vote-consolidation-battle-to-oust-albanese-as-formal-alliance-ruled-out/news-story/647c039e1efc5027e63a509879724195</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-10|YouGov</guid>
+      <pubDate>Mon, 10 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 22, GRN 12, ON 24, Ind/Oth 14. Two-party preferred: ALP 52 – L/NP 48. Sample 1,500. Fieldwork 4–10 Aug 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 3–9 Aug 2026 — 2PP ALP 53 – L/NP 47</title>
+      <link>https://www.roymorgan.com/findings/10307-federal-voting-intention-august-10-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-09|Roy Morgan</guid>
+      <pubDate>Sun, 09 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 25.5, L/NP 22, GRN 15.5, ON 26, Ind/Oth 11. Two-party preferred: ALP 53 – L/NP 47. Undecided 6%. Sample 1,647. Fieldwork 3–9 Aug 2026.</description>
+    </item>
+    <item>
+      <title>Newspoll, 3–7 Aug 2026 — ALP 29, L/NP 18, GRN 14, ON 29, Ind/Oth 10</title>
+      <link>https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albaneses-labor-hits-a-julia-gillardlevel-low-primary-vote-after-winter-break/news-story/ca81774a347a1fd299e48ce0361d1a8a</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-07|Newspoll</guid>
+      <pubDate>Fri, 07 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 29, L/NP 18, GRN 14, ON 29, Ind/Oth 10. No two-party figure published. Sample 1,242. Fieldwork 3–7 Aug 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 27 Jul – 2 Aug 2026 — 2PP ALP 52 – L/NP 48</title>
+      <link>https://www.roymorgan.com/findings/10297-federal-voting-intention-august-3-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-02|Roy Morgan</guid>
+      <pubDate>Sun, 02 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27.5, L/NP 23.5, GRN 15, ON 24, Ind/Oth 10. Two-party preferred: ALP 52 – L/NP 48. Undecided 8.5%. Sample 1,531. Fieldwork 27 Jul – 2 Aug 2026.</description>
+    </item>
+    <item>
+      <title>RedBridge / Accent, 27–30 Jul 2026 — 2PP ALP 48 – L/NP 52</title>
+      <link>https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-30|RedBridge / Accent</guid>
+      <pubDate>Thu, 30 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 29, L/NP 22, GRN 10, ON 31, Ind/Oth 8. Two-party preferred: ALP 48 – L/NP 52. Sample 1,001. Fieldwork 27–30 Jul 2026.</description>
+    </item>
+    <item>
+      <title>YouGov, 21–28 Jul 2026 — 2PP ALP 53 – L/NP 47</title>
+      <link>https://www.news24.com.au/politics/australian-politics/labor-on-lowest-majoritywinning-vote-since-federation-as-voters-turn-on-major-parties-news24-pulse/news-story/30abb89ce081815670d1a05c4517f90e</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-28|YouGov</guid>
+      <pubDate>Tue, 28 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 22, GRN 13, ON 25, Ind/Oth 12. Two-party preferred: ALP 53 – L/NP 47. Sample 1,500. Fieldwork 21–28 Jul 2026.</description>
+    </item>
+    <item>
+      <title>Essential, 22–27 Jul 2026 — 2PP ALP 48 – L/NP 47</title>
+      <link>https://www.theguardian.com/australia-news/2026/jul/29/guardian-essential-poll-angus-taylors-approval-rating-crashes-and-one-nation-support-plateaus</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-27|Essential</guid>
+      <pubDate>Mon, 27 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 31, L/NP 22, GRN 12, ON 25, Ind/Oth 6. Two-party preferred: ALP 48 – L/NP 47. Sample 1,060. Fieldwork 22–27 Jul 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 20–26 Jul 2026 — 2PP ALP 54 – L/NP 46</title>
+      <link>https://www.roymorgan.com/findings/10293-federal-voting-intention-july-27-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-26|Roy Morgan</guid>
+      <pubDate>Sun, 26 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27.5, L/NP 22, GRN 14, ON 25.5, Ind/Oth 11. Two-party preferred: ALP 54 – L/NP 46. Undecided 6%. Sample 1,643. Fieldwork 20–26 Jul 2026.</description>
+    </item>
+    <item>
+      <title>Spectre Strategy, 11–23 Jul 2026 — 2PP ALP 51 – L/NP 49</title>
+      <link>https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026-lrxjw</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-23|Spectre Strategy</guid>
+      <pubDate>Thu, 23 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11. Two-party preferred: ALP 51 – L/NP 49. Sample 1,434. Fieldwork 11–23 Jul 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 13–19 Jul 2026 — 2PP ALP 56 – L/NP 44</title>
+      <link>https://www.roymorgan.com/findings/10291-federal-voting-intention-july-20-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-19|Roy Morgan</guid>
+      <pubDate>Sun, 19 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27.5, L/NP 23, GRN 14, ON 22.5, Ind/Oth 13. Two-party preferred: ALP 56 – L/NP 44. Undecided 5%. Sample 1,679. Fieldwork 13–19 Jul 2026.</description>
+    </item>
+    <item>
+      <title>Newspoll, 13–16 Jul 2026 — ALP 30, L/NP 19, GRN 12, ON 30, Ind/Oth 9</title>
+      <link>https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hanson-regains-ground-and-liberals-rise-as-labor-falls-to-equal-lowest-point-since-2022/news-story/da8374ff67e3769478b13867909a1074</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-16|Newspoll</guid>
+      <pubDate>Thu, 16 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 30, L/NP 19, GRN 12, ON 30, Ind/Oth 9. No two-party figure published. Sample 1,238. Fieldwork 13–16 Jul 2026.</description>
+    </item>
+    <item>
+      <title>YouGov, 7–14 Jul 2026 — 2PP ALP 53 – L/NP 47</title>
+      <link>https://www.skynews.com.au/australia-news/politics/pauline-hansons-monoculture-call-sees-one-nation-support-slide-as-labor-regains-poll-lead-in-sky-news-pulse/news-story/ff02004ef7e9634e18b54b227fba984b</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-14|YouGov</guid>
+      <pubDate>Tue, 14 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 20, GRN 12, ON 26, Ind/Oth 14. Two-party preferred: ALP 53 – L/NP 47. Sample 1,500. Fieldwork 7–14 Jul 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 6–12 Jul 2026 — 2PP ALP 54 – L/NP 46</title>
+      <link>https://www.roymorgan.com/findings/10283-federal-voting-intention-july-13-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-12|Roy Morgan</guid>
+      <pubDate>Sun, 12 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27.5, L/NP 20, GRN 12.5, ON 28, Ind/Oth 12. Two-party preferred: ALP 54 – L/NP 46. Undecided 6.5%. Sample 1,612. Fieldwork 6–12 Jul 2026.</description>
+    </item>
+    <item>
+      <title>DemosAU (MRP), 27 May – 11 Jul 2026 — ALP 26, L/NP 21, GRN 13, ON 30, Ind/Oth 10</title>
+      <link>https://demosau.com/news/new-mrp-model-points-to-hung-parliament/</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-11|DemosAU (MRP)</guid>
+      <pubDate>Sat, 11 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 26, L/NP 21, GRN 13, ON 30, Ind/Oth 10. No two-party figure published. Sample 9,343. Fieldwork 27 May – 11 Jul 2026.</description>
+    </item>
+    <item>
+      <title>Resolve, 6–11 Jul 2026 — ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11</title>
+      <link>https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-11|Resolve</guid>
+      <pubDate>Sat, 11 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 23, GRN 12, ON 26, Ind/Oth 11. No two-party figure published. Sample 2,252. Fieldwork 6–11 Jul 2026.</description>
+    </item>
+    <item>
+      <title>DemosAU, 3–8 Jul 2026 — ALP 26, L/NP 21, GRN 14, ON 29, Ind/Oth 10</title>
+      <link>https://demosau.com/wp-content/uploads/2026/07/Capital-BriefDemosAU-Federal-Poll-July-2026.pdf</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-08|DemosAU</guid>
+      <pubDate>Wed, 08 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 26, L/NP 21, GRN 14, ON 29, Ind/Oth 10. No two-party figure published. Sample 2,694. Fieldwork 3–8 Jul 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 28 Jun – 5 Jul 2026 — 2PP ALP 55 – L/NP 45</title>
+      <link>https://www.roymorgan.com/findings/10276-federal-voting-intention-july-6-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-07-05|Roy Morgan</guid>
+      <pubDate>Sun, 05 Jul 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 21.5, GRN 14, ON 22.5, Ind/Oth 14. Two-party preferred: ALP 55 – L/NP 45. Undecided 5%. Sample 1,584. Fieldwork 28 Jun – 5 Jul 2026.</description>
+    </item>
+    <item>
+      <title>YouGov, 23–30 Jun 2026 — 2PP ALP 54 – L/NP 46</title>
+      <link>https://www.skynews.com.au/australia-news/politics/one-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense/news-story/3ecdbeb123199de72a7c12b4fb9efbd2</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-30|YouGov</guid>
+      <pubDate>Tue, 30 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 29, L/NP 17, GRN 13, ON 30, Ind/Oth 11. Two-party preferred: ALP 54 – L/NP 46. Sample 1,502. Fieldwork 23–30 Jun 2026.</description>
+    </item>
+    <item>
+      <title>Essential, 24–29 Jun 2026 — 2PP ALP 46 – L/NP 48</title>
+      <link>https://www.theguardian.com/australia-news/2026/jun/30/guardian-essential-poll-voters-reject-key-one-nation-policies-as-support-drops</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-29|Essential</guid>
+      <pubDate>Mon, 29 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 30, L/NP 23, GRN 10, ON 26, Ind/Oth 10. Two-party preferred: ALP 46 – L/NP 48. Sample 1,017. Fieldwork 24–29 Jun 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 22–28 Jun 2026 — 2PP ALP 53.5 – L/NP 46.5</title>
+      <link>https://www.roymorgan.com/findings/10266-federal-voting-intention-june-29-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-28|Roy Morgan</guid>
+      <pubDate>Sun, 28 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 21.5, GRN 13, ON 26, Ind/Oth 11.5. Two-party preferred: ALP 53.5 – L/NP 46.5. Undecided 6.5%. Sample 1,639. Fieldwork 22–28 Jun 2026.</description>
+    </item>
+    <item>
+      <title>RedBridge / Accent, 22–26 Jun 2026 — 2PP ALP 54 – L/NP 46</title>
+      <link>https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-26|RedBridge / Accent</guid>
+      <pubDate>Fri, 26 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 30, L/NP 18, GRN 14, ON 29, Ind/Oth 9. Two-party preferred: ALP 54 – L/NP 46. Sample 1,006. Fieldwork 22–26 Jun 2026.</description>
+    </item>
+    <item>
+      <title>Newspoll, 22–25 Jun 2026 — ALP 33, L/NP 17, GRN 13, ON 29, Ind/Oth 8</title>
+      <link>https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albanese-and-labor-bounce-back-after-budget-tax-backflips-take-primary-vote-lead-from-one-nation/news-story/3c57c1c54f74b697324f5b5917e74337</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-25|Newspoll</guid>
+      <pubDate>Thu, 25 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 33, L/NP 17, GRN 13, ON 29, Ind/Oth 8. No two-party figure published. Sample 1,235. Fieldwork 22–25 Jun 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 15–21 Jun 2026 — 2PP ALP 54 – L/NP 46</title>
+      <link>https://www.roymorgan.com/findings/10261-federal-voting-intention-june-22-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-21|Roy Morgan</guid>
+      <pubDate>Sun, 21 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27, L/NP 17.5, GRN 13.5, ON 31.5, Ind/Oth 10.5. Two-party preferred: ALP 54 – L/NP 46. Undecided 5%. Sample 1,575. Fieldwork 15–21 Jun 2026.</description>
+    </item>
+    <item>
+      <title>DemosAU, 16–18 Jun 2026 — ALP 27, L/NP 18, GRN 13, ON 30, Ind/Oth 12</title>
+      <link>https://demosau.com/news/one-nation-lead-grows-as-l-np-primary-sinks-to-18/</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-18|DemosAU</guid>
+      <pubDate>Thu, 18 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27, L/NP 18, GRN 13, ON 30, Ind/Oth 12. No two-party figure published. Sample 1,497. Fieldwork 16–18 Jun 2026.</description>
+    </item>
+    <item>
+      <title>YouGov, 9–16 Jun 2026 — 2PP ALP 52 – L/NP 48</title>
+      <link>https://www.skynews.com.au/australia-news/politics/one-nation-leads-primary-vote-as-80-per-cent-of-voters-say-party-ready-to-govern-by-2028-sky-news-pulse-yougov-poll/news-story/0943b53d79d1e4fb27860c4020be7642</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-16|YouGov</guid>
+      <pubDate>Tue, 16 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 26, L/NP 21, GRN 13, ON 28, Ind/Oth 12. Two-party preferred: ALP 52 – L/NP 48. Sample 1,500. Fieldwork 9–16 Jun 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 8–14 Jun 2026 — 2PP ALP 54.5 – L/NP 45.5</title>
+      <link>https://www.roymorgan.com/findings/10253-federal-voting-intention-june-15-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-14|Roy Morgan</guid>
+      <pubDate>Sun, 14 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 17, GRN 14, ON 29.5, Ind/Oth 11.5. Two-party preferred: ALP 54.5 – L/NP 45.5. Undecided 4%. Sample 1,583. Fieldwork 8–14 Jun 2026.</description>
+    </item>
+    <item>
+      <title>Resolve, 8–13 Jun 2026 — ALP 28, L/NP 20, GRN 12, ON 29, Ind/Oth 12</title>
+      <link>https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-13|Resolve</guid>
+      <pubDate>Sat, 13 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 20, GRN 12, ON 29, Ind/Oth 12. No two-party figure published. Sample 1,801. Fieldwork 8–13 Jun 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 1–7 Jun 2026 — 2PP ALP 56 – L/NP 44</title>
+      <link>https://www.roymorgan.com/findings/10246-federal-voting-intention-june-9-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-07|Roy Morgan</guid>
+      <pubDate>Sun, 07 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 26, L/NP 17.5, GRN 15.5, ON 29.5, Ind/Oth 11.5. Two-party preferred: ALP 56 – L/NP 44. Sample 1,631. Fieldwork 1–7 Jun 2026.</description>
+    </item>
+    <item>
+      <title>Newspoll, 1–4 Jun 2026 — ALP 30, L/NP 18, GRN 11, ON 31, Ind/Oth 10</title>
+      <link>https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-in-front-of-labor-anthony-albanese-gets-worst-ever-rating/news-story/f4e47be80091b678d835cb9334fc8b0a</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-04|Newspoll</guid>
+      <pubDate>Thu, 04 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 30, L/NP 18, GRN 11, ON 31, Ind/Oth 10. No two-party figure published. Sample 1,240. Fieldwork 1–4 Jun 2026.</description>
+    </item>
+    <item>
+      <title>YouGov, 26 May – 2 Jun 2026 — 2PP ALP 51.5 – L/NP 48.5</title>
+      <link>https://www.skynews.com.au/australia-news/politics/one-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling/news-story/0fe9ddf8797b5e529436557d7ce63897</link>
+      <guid isPermaLink="false">auspol-tracker:2026-06-02|YouGov</guid>
+      <pubDate>Tue, 02 Jun 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 26, L/NP 20, GRN 13, ON 29, Ind/Oth 12. Two-party preferred: ALP 51.5 – L/NP 48.5. Sample 1,471. Fieldwork 26 May – 2 Jun 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 25–31 May 2026 — 2PP ALP 55.5 – L/NP 44.5</title>
+      <link>https://www.roymorgan.com/findings/10242-federal-voting-intention-june-1-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-05-31|Roy Morgan</guid>
+      <pubDate>Sun, 31 May 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27, L/NP 20, GRN 13.5, ON 27, Ind/Oth 12.5. Two-party preferred: ALP 55.5 – L/NP 44.5. Sample 1,542. Fieldwork 25–31 May 2026.</description>
+    </item>
+    <item>
+      <title>RedBridge / Accent, 25–28 May 2026 — 2PP ALP 51 – L/NP 49</title>
+      <link>https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9</link>
+      <guid isPermaLink="false">auspol-tracker:2026-05-28|RedBridge / Accent</guid>
+      <pubDate>Thu, 28 May 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 20, GRN 12, ON 31, Ind/Oth 9. Two-party preferred: ALP 51 – L/NP 49. Sample 1,005. Fieldwork 25–28 May 2026.</description>
+    </item>
+    <item>
+      <title>Fox &amp; Hedgehog, 25–26 May 2026 — 2PP ALP 49 – L/NP 51</title>
+      <link>https://drive.google.com/file/d/13CXxW2Ojuq8E7pJRVEEh9fO80SIiEikp/view</link>
+      <guid isPermaLink="false">auspol-tracker:2026-05-26|Fox &amp; Hedgehog</guid>
+      <pubDate>Tue, 26 May 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 29, L/NP 25, GRN 10, ON 27, Ind/Oth 9. Two-party preferred: ALP 49 – L/NP 51. Sample 1,700. Fieldwork 25–26 May 2026.</description>
+    </item>
+    <item>
+      <title>Agenda C Synesis, 22–26 May 2026 — ALP 29, L/NP 18, GRN 10, ON 24, Ind/Oth 19</title>
+      <link>https://www.news.com.au/finance/money/tax/no-basis-labor-frontbencher-mark-butler-warns-landlords-over-500-a-year-rent-hikes-linked-to-cgt/news-story/0c74b51fc1b0b5704d9b4a0adf2df699</link>
+      <guid isPermaLink="false">auspol-tracker:2026-05-26|Agenda C Synesis</guid>
+      <pubDate>Tue, 26 May 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 29, L/NP 18, GRN 10, ON 24, Ind/Oth 19. No two-party figure published. Sample 1,232. Fieldwork 22–26 May 2026.</description>
+    </item>
+    <item>
+      <title>Essential, 20–24 May 2026 — 2PP ALP 48 – L/NP 47</title>
+      <link>https://www.theguardian.com/australia-news/2026/may/27/guardian-essential-poll-labors-housing-and-tax-changes-fail-to-win-over-voters-as-support-for-one-nation-swells</link>
+      <guid isPermaLink="false">auspol-tracker:2026-05-24|Essential</guid>
+      <pubDate>Sun, 24 May 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 29, L/NP 23, GRN 11, ON 28, Ind/Oth 9. Two-party preferred: ALP 48 – L/NP 47. Sample 1,027. Fieldwork 20–24 May 2026.</description>
+    </item>
+    <item>
+      <title>Roy Morgan, 18–24 May 2026 — 2PP ALP 53 – L/NP 47</title>
+      <link>https://www.roymorgan.com/findings/10231-federal-voting-intention-may-25-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-05-24|Roy Morgan</guid>
+      <pubDate>Sun, 24 May 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27.5, L/NP 23, GRN 13.5, ON 25.5, Ind/Oth 10.5. Two-party preferred: ALP 53 – L/NP 47. Sample 1,613. Fieldwork 18–24 May 2026.</description>
+    </item>
+  </channel>
+</rss>

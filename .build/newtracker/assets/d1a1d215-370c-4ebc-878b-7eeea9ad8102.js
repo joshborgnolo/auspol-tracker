@@ -511,6 +511,117 @@ function cycleSourceRows(cycles, D) {
     rows.slice(1).sort((x, y) => (x[0] - y[0]) || String(x[2]).localeCompare(String(y[2]))));
 }
 
+/* ---- How the final polls did ------------------------------------------
+   Everywhere else the page can only describe how far the polls disagree with
+   EACH OTHER. Five past elections are the one place a poll can be checked
+   against the thing it was estimating, so this is the only honest answer to
+   "should I believe the number at the top of this page".
+
+   The measure is one poll per house - its last with a 2PP inside the window -
+   equally weighted, because what matters is how many separate attempts missed
+   the same way, not how many people each rang. */
+function AccuracyPanel() {
+  const { D } = window.AP;
+  const A = D.accuracy;
+  if (!A || !A.cycles.length) return null;
+  const SPAN = 5;                                   // points either side of the result
+  const pct = (err) => 50 + (Math.max(-SPAN, Math.min(SPAN, err)) / SPAN) * 50;
+  const col = (err) => (err > 0 ? "var(--alp)" : "var(--lnp)");
+  const oneSided = A.cycles.filter((c) => c.sameSide);
+  const bothWays = oneSided.length > 1
+    && oneSided.some((c) => c.err > 0) && oneSided.some((c) => c.err < 0);
+
+  return (
+    <section className="card acc-card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">How the final polls did</h2>
+          <p className="card-sub">
+            Each house’s last two-party figure in the {A.windowDays} days before polling day,
+            against the result · one row per election
+          </p>
+        </div>
+        <div className="dir-net">
+          <span className="dir-net-label">Average miss</span>
+          <span className="dir-net-val">{A.meanAbs}<span className="pct"> pts</span></span>
+        </div>
+      </div>
+
+      <div className="acc-scale" aria-hidden="true">
+        <span className="acc-scale-l" style={{ color: "var(--lnp)" }}>← Labor understated</span>
+        <span className="acc-scale-c">result</span>
+        <span className="acc-scale-r" style={{ color: "var(--alp)" }}>Labor overstated →</span>
+      </div>
+
+      <div className="acc-rows">
+        {A.cycles.map((c) => (
+          <div className="acc-row" key={c.year}>
+            <div className="acc-label">
+              <span className="acc-year">{c.year}</span>
+              {/* results are carried at the precision the AEC published them
+                  (2019 is 48.47); one decimal is the precision every other
+                  figure on the page is read at */}
+              <span className="acc-detail">{c.mean.toFixed(1)} v {c.result.toFixed(1)}</span>
+            </div>
+            <div className="acc-track">
+              <span className="acc-zero"></span>
+              {[-SPAN / 2, SPAN / 2].map((t) => (
+                <span key={t} className="acc-tick" style={{ left: pct(t) + "%" }}></span>
+              ))}
+              {c.houses.map((h) => (
+                <span key={h.firm} className="acc-dot"
+                      style={{ left: pct(h.err) + "%", background: col(h.err) }}
+                      title={`${h.firm} (${h.date}): ALP ${h.alp2pp} · ${h.err > 0 ? "+" : ""}${h.err} vs the result`}></span>
+              ))}
+              <span className="acc-mean" style={{ left: pct(c.err) + "%", background: col(c.err) }}
+                    title={`Average of the ${c.n} final polls: ${c.err > 0 ? "+" : ""}${c.err}`}></span>
+            </div>
+            <div className="acc-err" style={{ color: col(c.err) }}>
+              {c.err > 0 ? "+" : ""}{c.err}
+            </div>
+            <div className="acc-note">
+              {c.n} house{c.n === 1 ? "" : "s"}
+              {c.sameSide && <span className="acc-flag" title="Every house missed the same way – the signature of an industry-wide problem rather than one firm's noise">all one way</span>}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p className="table-hint">
+        Big dots are the average of that election’s final polls; small dots are the individual
+        houses – hover one for its figure. Exit polls are excluded, and a house that publishes an
+        undecided-inclusive pair is normalised first, so its arithmetic isn’t scored as a miss.
+        {bothWays && (
+          <> The two elections where every house missed the same way, {oneSided.map((c) => c.year).join(" and ")},
+          {" "}missed in <strong>opposite directions</strong> – so this is not a standing lean that
+          today’s figures could be corrected for. It is the size of the error, not its direction,
+          that carries.</>
+        )}
+      </p>
+
+      <div className="acc-firms">
+        <div className="acc-firms-h">By house, where there is more than one election to judge on</div>
+        <div className="acc-firms-grid">
+          {A.firms.filter((f) => f.n > 1).map((f) => (
+            <div className="acc-firm" key={f.firm}>
+              <span className="acc-firm-n">{f.firm}</span>
+              <span className="acc-firm-v" title="Average size of the miss, ignoring direction">
+                {f.meanAbs}<span className="pct"> pts</span>
+              </span>
+              <span className="acc-firm-c">{f.n} elections</span>
+            </div>
+          ))}
+        </div>
+        <p className="table-hint">
+          Average miss ignoring direction. Houses are not merged across renames of
+          different operations, so a firm only appears against the elections it
+          actually published a final poll for.
+        </p>
+      </div>
+    </section>
+  );
+}
+
 function PastCyclesView() {
   const { D } = window.AP;
   const cycles = D.cycles;
@@ -569,6 +680,8 @@ function PastCyclesView() {
                       showHan={showHan} setHan={setShowHan} />
         ))}
       </div>
+
+      <AccuracyPanel />
 
       <p className="cyc-foot">
         The plotted series and the individual polls behind it are both downloadable above.{" "}
@@ -792,6 +905,7 @@ function ArchPollDetail({ p, onBack }) {
             ]} />
           </div>
         )}
+        {p.undecided != null && <window.UndecidedLine v={p.undecided} chg={p.chg} />}
         {p.seats && (
           <div className="pd-block pd-block-wide">
             <div className="pd-k">Seat projection</div>

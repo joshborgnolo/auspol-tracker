@@ -266,7 +266,7 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   const MATCHUPS = {
     alp_lnp: {
       a: { name: "Labor", color: "var(--alp)" }, b: { name: "Coalition", color: "var(--lnp)" },
-      data: D.agg2pp.map((d) => ({ ym: d.ym, x: d.x, a: d.alp, b: d.lnp })), real: true,
+      data: D.agg2pp.map((d) => ({ ym: d.ym, x: d.x, a: d.alp, b: d.lnp, ci95: d.ci95, k: d.k })), real: true,
       label: "ALP v L/NP", dots: ["var(--alp)", "var(--lnp)"], vsLabor: true,
       // pairs that don't sum to 100 (undecided-inclusive) plot at alpN
       scatter: (p) => (p.alpN == null ? null : [
@@ -375,7 +375,10 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
     return {
       pts: yms.map((ym) => {
         const da = hold(ia, A, ym), db = hold(ib, B, ym);
-        return { ym, x: (ia[ym] || ib[ym]).x, a: lerp(da.a, db.a), b: lerp(da.b, db.b) };
+        return { ym, x: (ia[ym] || ib[ym]).x, a: lerp(da.a, db.a), b: lerp(da.b, db.b),
+                 // a ribbon that vanished mid-morph would read as the switch
+                 // having made the estimate certain for 320ms
+                 ci95: (da.ci95 == null || db.ci95 == null) ? null : lerp(da.ci95, db.ci95) };
       }),
       clip: [lerp(A[0].x, B[0].x), lerp(A[A.length - 1].x, B[B.length - 1].x)],
       a: mixC(MATCHUPS[morph.from].a.color, MATCHUPS[morph.to].a.color, t),
@@ -395,6 +398,24 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   // An alternative matchup gets a nowcast too WHERE the series supports one
   // (D.altLatest is null for a matchup too thin to weight). Otherwise it reads
   // its last monthly point, as before.
+  /* The current figure for ANY matchup, headline or not – one accessor, so a
+     chip below can never disagree with the readout above when it is that
+     matchup's turn to be the headline. */
+  const latestOf = (id) => {
+    const M = MATCHUPS[id];
+    if (M.real) return { a: D.latest.alp2pp, b: D.latest.lnp2pp, ci95: D.latest.alp2ppCi95 };
+    const al = D.altLatest ? D.altLatest[M.altKey] : null;
+    if (al) return { a: al.a, b: al.b, ci95: al.ci95 };
+    const last = M.data[M.data.length - 1];
+    return last ? { a: last.a, b: last.b, ci95: null } : null;
+  };
+  /* Every contest that isn't the one on the chart, in the same order the tabs
+     use, and only where there is a current figure to print – a chip with no
+     number would be the bare tab it is replacing. */
+  const otherContests = orderedMatchups
+    .filter((id) => id !== matchup)
+    .map((id) => ({ id, v: latestOf(id) }))
+    .filter((o) => o.v && o.v.a != null);
   const altL = (m.altKey && D.altLatest) ? D.altLatest[m.altKey] : null;
   const adjusted = m.real || !!(D.adjusted && m.altKey && D.adjusted[m.altKey]);
   const latest = m.real
@@ -460,6 +481,23 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   // with no line there is nothing for a month-guide tooltip to report, so the
   // guide is switched off and the dots carry their own hovers
   const heroSpine = heroSeries.length ? series(drawPts, "a") : [];
+
+  /* The interval, drawn. The headline above says +/- 1.8 points and refuses to
+     call a month-on-month move real unless it clears that; the chart used to
+     answer with a 3.6px line placed to a tenth of a point, which is the more
+     persuasive object and was making the weaker claim look like the settled
+     one. Both series get a ribbon: they are exact complements, so the two are
+     mirror images, and where they OVERLAP the interval covers 50 - the months
+     in which the lead cannot be told apart from a tie. That overlap is the
+     single most useful thing on this chart and it is not otherwise drawn.
+     No ribbon where there is no line, for the same reason there is no line. */
+  const bandPts = (key) => drawPts
+    .filter((d) => d.ci95 != null)
+    .map((d) => ({ x: d.x, y0: d[key] - d.ci95, y1: d[key] + d.ci95 }));
+  const heroAreas = !heroSeries.length ? [] : [
+    { id: "ci-a", color: colA, className: "ci-band", edge: false, smooth: true, points: bandPts("a") },
+    { id: "ci-b", color: colB, className: "ci-band", edge: false, smooth: true, points: bandPts("b") },
+  ].filter((a) => a.points.length >= 2);
 
   // Major events, clipped to the span this matchup actually plots. The headline
   // 2PP runs the whole archive so it keeps all of them; ALP v ON only begins
@@ -585,6 +623,29 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
               )}
             </span>
           </div>
+        {/* The OTHER contests, carrying their figures rather than just their
+            names. One Nation sits level with Labor on the primary vote, so in
+            a good many seats the final two are not Labor and the Coalition and
+            "the 2PP" is doing less work than a single headline implies. These
+            were previously a bare tab you had to press to find out what was
+            behind it; the number is the reason to press it. */}
+        {otherContests.length > 0 && (
+          <div className="hero-alt">
+            <span className="ha-lab">Also asked</span>
+            {otherContests.map((o) => (
+              <button key={o.id} type="button" className="ha-chip" onClick={() => chooseMatchup(o.id)}
+                      title={"Show " + MATCHUPS[o.id].a.name + " v " + MATCHUPS[o.id].b.name}>
+                <span className="ha-vs">{MATCHUPS[o.id].a.name} v {MATCHUPS[o.id].b.name}</span>
+                <span className="ha-fig">
+                  <span style={{ color: inkOf(MATCHUPS[o.id].a.color) }}>{o.v.a.toFixed(1)}</span>
+                  <span className="ha-dash">–</span>
+                  <span style={{ color: inkOf(MATCHUPS[o.id].b.color) }}>{o.v.b.toFixed(1)}</span>
+                </span>
+                {o.v.ci95 != null && <span className="ha-ci">± {o.v.ci95.toFixed(1)}</span>}
+              </button>
+            ))}
+          </div>
+        )}
         </div>
         <div className="hero-controls">
           <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
@@ -612,8 +673,18 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
         events={heroEvents}
         scatter={scatter} series={heroSeries} spine={heroSpine} pollFacet="twopp"
         scatterOut={scatterOut} scatterMove={scatterMove}
+        areas={heroAreas}
         fade={blend ? morph.t : 1} clipX={blend ? blend.clip : null}
         tooltipTitle={(i) => window.AP.monthLabelFull((drawPts[i] || drawPts[drawPts.length - 1]).ym)}
+        /* A month's figures and how well that month is known, in the same
+           tooltip – the election anchor is a count, so it reports no interval
+           rather than an interval of zero, which would read as a claim. */
+        extraRows={(i) => {
+          const d = drawPts[i];
+          if (!d || d.ci95 == null || !d.ci95) return [];
+          return [{ label: "95% interval", value: "± " + d.ci95.toFixed(1) + " pts"
+                    + (d.k ? " · " + d.k + " poll" + (d.k === 1 ? "" : "s") : "") }];
+        }}
         fmt={(v) => v.toFixed(1)}
       />
       <div className="hero-foot">
@@ -627,10 +698,15 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
             <span className={heroSeries.length ? "hl-line" : "hl-swatch-dot"} style={{ background: m.b.color }}></span>{m.b.name}
           </span>
           {scatterPolls > 0 && heroSeries.length > 0 && <span className="hl-item"><span className="hl-dot"></span>Individual poll</span>}
+          {heroAreas.length > 0 && (
+            <span className="hl-item"><span className="hl-band"></span>95% interval</span>
+          )}
         </div>
         <p className="hero-caption">
           {m.real
-            ? "Each dot is one published poll; the line is a smoothed average across all pollsters."
+            ? "Each dot is one published poll; the line is a smoothed average across all pollsters, "
+              + "shaded with the interval around it. Where the two shaded bands overlap, the lead is "
+              + "inside its own margin of error \u2013 the polls cannot separate the two parties that month."
             : `Each dot is one pollster’s published ${m.label} head-to-head` +
               (adjusted
                 ? ", adjusted for each house's lean on this matchup like the headline 2PP."
@@ -668,13 +744,36 @@ function MethodNote() {
              weighting). It does not cover error common to the whole industry: an aggregate cannot
              detect a lean its constituent polls share. Month-on-month movement smaller than the
              interval is marked as such.</p>
+          {/* The industry-wide error the paragraph above says an aggregate
+              cannot see about itself IS measurable after the fact, and the
+              page now measures it. Saying so here, where the caveat is made,
+              is the difference between a disclaimer and an answer. */}
+          {D.accuracy && (
+            <p>That last caveat is not idle: across the {D.accuracy.cycles.length} elections from
+               {" "}{D.accuracy.cycles[0].year} to {D.accuracy.cycles[D.accuracy.cycles.length - 1].year},
+               the final polls have missed the two-party result by
+               {" "}{D.accuracy.meanAbs} points on average, and at {D.accuracy.worstCycle.year} by
+               {" "}{Math.abs(D.accuracy.worstCycle.err)} with every house on the same side of it.
+               Past cycles carries the full record, house by house.</p>
+          )}
         </div>
         <div>
           <h2 className="method-h">Reading the charts</h2>
-          <p>Each dot is one published poll; lines are monthly aggregates. The spread of dots around the
-             line is a useful reminder of sampling uncertainty. Leadership questions are polled
+          <p>Each dot is one published poll; lines are monthly aggregates, shaded with the 95%
+             interval around them – where the two shaded bands meet, that month's lead is inside
+             its own margin of error. Leadership questions are polled
              irregularly and framed differently between pollsters, so those lines connect published readings
              – a “—” anywhere in the tables means the pollster didn’t ask that question.</p>
+          {/* The single most-requested number this page does not carry. Better
+              to say why once, plainly, than to keep declining to say it. */}
+          <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
+             figure into a seat count assumes a uniform swing, and with One Nation near
+             {" "}{Math.round(D.aggPrimary[D.aggPrimary.length - 1].onp)}% of the primary vote the
+             assumption fails in exactly the seats that would decide the election: a large minor
+             party wins seats where its vote is concentrated and none where it is not, and no
+             national number knows the difference. Seat figures appear on this page only where a
+             pollster modelled them seat by seat and published the result, which is what the MRP
+             tag in the archive marks.</p>
         </div>
         <div>
           <h2 className="method-h">Sources</h2>
@@ -710,6 +809,10 @@ function SnapshotView({ rangeId, setRangeId, showScatter }) {
       <PrimaryVotePanel rangeId={rangeId} />
       <LeadershipSection rangeId={rangeId} />
       <DirectionPanel rangeId={rangeId} />
+      {/* directly under direction: both are questions about the electorate's
+          mood rather than its party choice, and both come from the houses that
+          bother to publish more than a headline */}
+      <UndecidedPanel rangeId={rangeId} />
       <PollsterTable />
       <NextPollsPanel />
     </>

@@ -358,6 +358,7 @@ html = html.replace('<meta property="og:type" content="website">',
   <meta name="theme-color" content="${THEME_LIGHT}" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="${SITE_URL}">
+  <link rel="alternate" type="application/rss+xml" title="auspol tracker – new polls" href="${SITE_URL}feed.xml">
   <link rel="icon" href="data:image/svg+xml,${favicon}">`);
 
 /* ---- 5. inline every script ------------------------------------------- */
@@ -387,9 +388,74 @@ html = html.replace("<!--SCRIPTS-->", parts.join("\n  "));
 
 fs.writeFileSync(OUT, html);
 
+/* ---- 5b. feed.xml – one item per poll ----------------------------------
+   The page is a single document that changes in place, so there was no way to
+   follow it except by checking. A feed is the cheapest possible answer: it
+   costs one file at build time, needs no server, and lets a reader (or another
+   tracker) find out that a poll landed without opening anything.
+
+   An item is a POLL, not a site update, because that is the unit people
+   actually want to hear about, and it links to the pollster's own release
+   where there is one - the tracker has no per-poll page to link to, and
+   sending a reader to the primary source is the better answer anyway. */
+const XML_ESC = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" };
+const xesc = (v) => String(v).replace(/[&<>"']/g, (c) => XML_ESC[c]);
+const MONTHS_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const fieldLabel = (p) => {
+  const [, em, ed] = p.date.split("-").map(Number);
+  if (!p.dateStart) return `${ed} ${MONTHS_SHORT[em - 1]}`;
+  const [, sm, sd] = p.dateStart.split("-").map(Number);
+  return sm === em ? `${sd}–${ed} ${MONTHS_SHORT[em - 1]}`
+                   : `${sd} ${MONTHS_SHORT[sm - 1]} – ${ed} ${MONTHS_SHORT[em - 1]}`;
+};
+// noon UTC: a date-only fieldwork end has no time of day, and midnight would
+// land readers in the previous day west of Greenwich
+const rfc822 = (iso) => new Date(iso + "T12:00:00Z").toUTCString();
+const feedPolls = DATA.polls.filter((p) => !p.isElection).slice(-40).reverse();
+const shareLine = (p) => {
+  const bits = [["ALP", p.alp], ["L/NP", p.lnp], ["GRN", p.grn], ["ON", p.onp],
+                ["Ind/Oth", (p.ind ?? 0) + (p.oth ?? 0) || null]]
+    .filter(([, v]) => v != null).map(([k, v]) => `${k} ${v}`);
+  return bits.join(", ");
+};
+const items = feedPolls.map((p) => {
+  const year = p.date.slice(0, 4);
+  const tpp = p.tpp_alp != null ? `ALP ${p.tpp_alp} – L/NP ${p.tpp_lnp}` : null;
+  const title = `${p.pollster}, ${fieldLabel(p)} ${year}` + (tpp ? ` — 2PP ${tpp}` : ` — ${shareLine(p)}`);
+  const desc = [
+    `Primary vote: ${shareLine(p)}.`,
+    tpp ? `Two-party preferred: ${tpp}.` : "No two-party figure published.",
+    p.undecided != null ? `Undecided ${p.undecided}%.` : null,
+    p.sample ? `Sample ${p.sample.toLocaleString("en-AU")}.` : null,
+    `Fieldwork ${fieldLabel(p)} ${year}.`,
+  ].filter(Boolean).join(" ");
+  return `    <item>
+      <title>${xesc(title)}</title>
+      <link>${xesc(p.url || SITE_URL)}</link>
+      <guid isPermaLink="false">auspol-tracker:${xesc(p.date + "|" + p.pollster)}</guid>
+      <pubDate>${rfc822(p.date)}</pubDate>
+      <description>${xesc(desc)}</description>
+    </item>`;
+}).join("\n");
+const feed = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>auspol tracker – new polls</title>
+    <link>${SITE_URL}</link>
+    <atom:link href="${SITE_URL}feed.xml" rel="self" type="application/rss+xml"/>
+    <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
+    <language>en-AU</language>
+    <lastBuildDate>${rfc822(grabLatest().updatedISO)}</lastBuildDate>
+${items}
+  </channel>
+</rss>
+`;
+fs.writeFileSync(path.join(ROOT, "feed.xml"), feed);
+
 /* ---- 6. report --------------------------------------------------------- */
 import zlib from "node:zlib";
 const size = fs.statSync(OUT).size;
 const gz = zlib.gzipSync(fs.readFileSync(OUT), { level: 9 }).length;
 console.log(`built ${path.basename(OUT)}`);
 console.log(`  ${(size / 1024 / 1024).toFixed(2)} MB raw · ${(gz / 1024).toFixed(0)} KB over the wire (gzipped)`);
+console.log(`built feed.xml · ${feedPolls.length} polls, newest ${feedPolls[0].date} ${feedPolls[0].pollster}`);

@@ -71,7 +71,41 @@ export function validate(D) {
       errors.push({ type: "direction-sum", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `Σ = ${sum.toFixed(1)}` });
   });
 
-  // 7. every leadership row should key onto a poll's fieldwork-end date, or it
+  /* 7. a 2PP column has to agree with the primaries printed beside it.
+     Preferences are not free: a party on 37 primary with the Greens on 12
+     cannot also be on 44 two-party preferred. Checked as a MEAN over a whole
+     series rather than per poll, because the flow constants below are rough
+     (a single poll can sit 3-4 points off them for real reasons); a whole
+     series sitting on the wrong side of them is an inverted column, not
+     preference drift.
+
+     This is here because the 2022-25 term's cycle polls had exactly that: the
+     L/NP figure was stored in tpp_alp for all 291 rows, and the Past-cycles
+     chart drew Labor's last term as a slide from 52.1 to 47.7 through a term
+     it won 55.2. Nothing in the build noticed for as long as the file existed. */
+  const FLOW = { grn: 0.82, onp: 0.35, oth: 0.50 };
+  const impliedAlp = (p) => {
+    if (p.alp == null) return null;
+    const oth = n0(p.ind) + n0(p.oth);
+    return p.alp + FLOW.grn * n0(p.grn) + FLOW.onp * n0(p.onp) + FLOW.oth * oth;
+  };
+  const orientation = (rows, label, alpKey, tppKey) => {
+    const ds = rows.map((p) => {
+      const im = impliedAlp({ ...p, alp: p[alpKey] });
+      return im == null || p[tppKey] == null ? null : p[tppKey] - im;
+    }).filter((v) => v != null);
+    if (ds.length < 20) return;                       // too few to judge a series
+    const m = ds.reduce((a, b) => a + b, 0) / ds.length;
+    if (Math.abs(m) > 3)
+      errors.push({ type: "2pp-flip", poll: label,
+        detail: `2PP averages ${m > 0 ? "+" : ""}${m.toFixed(1)} vs what its own primaries imply `
+              + `over ${ds.length} rows – the ALP/L-NP pair is probably swapped` });
+  };
+  orientation(D.polls.filter((p) => !p.isElection), "polls[] (current term)", "alp", "tpp_alp");
+  for (const [cycle, rows] of Object.entries(D.cyclePolls || {}))
+    orientation(rows.filter((p) => p.firm !== "Election"), `cyclePolls.${cycle}`, "alp", "tpp_alp");
+
+  // 8. every leadership row should key onto a poll's fieldwork-end date, or it
   //    is a leadership-only wave – flagged as info, since a drifted date looks
   //    exactly like one (the Essential Dec-2025 / Mar-2026 bug)
   const pollKeys = new Set(D.polls.map((p) => p.date + "|" + p.pollster));

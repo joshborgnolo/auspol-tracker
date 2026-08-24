@@ -79,6 +79,7 @@ const dx = (iso) => {
 const ymOf = (d) => d.slice(0, 7);
 const dayOf = (d) => Number(d.slice(8, 10));
 const r1 = (v) => Math.round(v * 10) / 10;
+const r2 = (v) => Math.round(v * 100) / 100;
 const mean = (a) => a.reduce((s, v) => s + v, 0) / a.length;
 const meanOf = (rows, f) => { const v = rows.map(f).filter((x) => x != null); return v.length ? mean(v) : null; };
 
@@ -184,17 +185,14 @@ const HL_DEFF = 1.6;
    inside the window, so it is usually the binding one. Neither can see error
    shared across the whole industry – no aggregate can measure that about
    itself, which is why the copy says so rather than implying otherwise. */
-function nowcastAdj(rows, he, ref) {
-  let sw = 0, sw2 = 0, swx = 0, n = 0;
-  const pts = [];
-  for (const a of rows) {
-    const d = ddays(ref, a.mid);
-    if (d < 0 || d > HL_WINDOW) continue;
-    const w = a.n * Math.exp(-LN2 * d / HL_HALF);
-    const x = a.x - heV(he, a.firm);
-    sw += w; sw2 += w * w; swx += w * x; n++;
-    pts.push({ w, x, n: a.n });
-  }
+/* The estimator itself, over an already-weighted set of readings. ONE
+   implementation, because the headline nowcast and the monthly points on the
+   chart behind it must not disagree about what an interval means: the nowcast
+   weights by recency as well as sample size, a monthly mean weights by sample
+   size alone, and from there the two are the same arithmetic. */
+function weightedWithSe(pts) {                 // pts: [{ w, x, n }]
+  let sw = 0, sw2 = 0, swx = 0;
+  for (const p of pts) { sw += p.w; sw2 += p.w * p.w; swx += p.w * p.x; }
   if (!sw) return null;
   const mean = swx / sw;
   const nEff = (sw * sw) / sw2;
@@ -203,21 +201,44 @@ function nowcastAdj(rows, he, ref) {
   const pq = (mean / 100) * (1 - mean / 100) * 1e4;             // percentage points
   const seFloor = Math.sqrt(pts.reduce((t, p) => t + p.w * p.w * HL_DEFF * pq / p.n, 0)) / sw;
   const se = Math.max(Number.isFinite(seSpread) ? seSpread : 0, seFloor);
-  return { v: r1(mean), n, se: Math.round(se * 100) / 100, nEff: r1(nEff), ci95: r1(1.96 * se) };
+  return { v: mean, n: pts.length, se, nEff };
+}
+function nowcastAdj(rows, he, ref) {
+  const pts = [];
+  for (const a of rows) {
+    const d = ddays(ref, a.mid);
+    if (d < 0 || d > HL_WINDOW) continue;
+    pts.push({ w: a.n * Math.exp(-LN2 * d / HL_HALF), x: a.x - heV(he, a.firm), n: a.n });
+  }
+  const r = weightedWithSe(pts);
+  return r && { v: r1(r.v), n: r.n, se: r2(r.se), nEff: r1(r.nEff), ci95: r1(1.96 * r.se) };
+}
+/* The same estimate for ONE calendar month, weighted by sample size only.
+   This is what the trend line is drawn from, so it is also what the shaded
+   interval behind the trend line has to be drawn from. A month carried by a
+   single poll has no spread to measure, so its floor - sampling error alone -
+   is what shows, which is the honest answer rather than a hairline. */
+function monthWithSe(rows, he, ym) {
+  return weightedWithSe(rows.filter((r) => r.ym === ym)
+    .map((r) => ({ w: r.n, x: r.x - heV(he, r.firm), n: r.n })));
 }
 
 const houseEffect = houseEffectsFor(tppRows);
 const hOf = (firm) => heV(houseEffect, firm);
 
 /* ---- 1. monthly 2PP (weighted, debiased) + election-day anchor --------- */
+/* Each month carries its own 95% interval. The hero draws it as a ribbon
+   around the line: the headline already refuses to call a move real unless it
+   clears its interval, and a chart that drew a hairline under that sentence
+   was contradicting it. `k` is how many polls the month rests on. */
 const agg2pp = MONTHS.map((ym) => {
-  const rows = tppRows.filter((r) => r.ym === ym);
-  if (!rows.length) return null;
-  let sw = 0, swx = 0;
-  for (const r of rows) { sw += r.n; swx += r.n * (r.x - hOf(r.firm)); }
-  return { ym, x: mx(ym), alp: r1(swx / sw), lnp: r1(100 - swx / sw) };
+  const r = monthWithSe(tppRows, houseEffect, ym);
+  if (!r) return null;
+  return { ym, x: mx(ym), alp: r1(r.v), lnp: r1(100 - r.v), ci95: r1(1.96 * r.se), k: r.n };
 }).filter(Boolean);
-agg2pp.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: ELECTION.tpp_alp, lnp: ELECTION.tpp_lnp, election: true });
+// the election is a COUNT, not an estimate, so its interval is zero and the
+// ribbon pinches shut on it - the one point on the chart that is simply known
+agg2pp.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: ELECTION.tpp_alp, lnp: ELECTION.tpp_lnp, ci95: 0, k: 0, election: true });
 
 /* ---- 2. monthly primary vote + election-day anchor --------------------- */
 /* Primaries get the SAME treatment as the headline 2PP – sample-weighted and
@@ -285,8 +306,14 @@ function altSeries(field) {
   const rows = altRowsFor(field);
   const he = houseEffectsFor(rows);
   const adjusted = Object.keys(he).length > 0;
+  /* Only the adjusted branch carries an interval, for the same reason it is
+     the only branch that gets a trend line at all: a series too thin to
+     debias is too thin to say how well it is known. */
   const monthly = adjusted
-    ? monthlyAdj(rows, he).map((d) => ({ ym: d.ym, x: d.x, a: r1(d.v), b: r1(100 - d.v) }))
+    ? monthlyAdj(rows, he).map((d) => {
+        const r = monthWithSe(rows, he, d.ym);
+        return { ym: d.ym, x: d.x, a: r1(d.v), b: r1(100 - d.v), ci95: r1(1.96 * r.se), k: r.n };
+      })
     : MONTHS.map((ym) => {
         const rs = rows.filter((r) => r.ym === ym);
         if (!rs.length) return null;
@@ -560,6 +587,8 @@ const CHG_MEASURES = {
   pLnp:      (p, a, pm) => p.lnp ?? null,
   pGrn:      (p, a, pm) => p.grn ?? null,
   pOnp:      (p, a, pm) => p.onp ?? null,
+  // "can't say" – published beside the primaries, not inside them
+  und:       (p, a, pm) => p.undecided ?? null,
   albNet:    (p, a, pm) => (a ? a.alb ?? null : null),
   taylorNet: (p, a, pm) => (a ? a.opp ?? null : null),
   hansonNet: (p, a, pm) => (a ? a.han ?? null : null),
@@ -589,6 +618,46 @@ for (const p of [...POLLS].sort((a, b) => a.date.localeCompare(b.date) || a.poll
   chgByKey[p.date + "|" + p.pollster] = Object.keys(d).length ? { d, r } : null;
 }
 
+/* ---- 5c. undecided ------------------------------------------------------
+   The share who say they can't say who they'd vote for. It is published
+   BESIDE the primaries, not inside them – a Roy Morgan wave reading 27/27/21
+   has already set these people aside, which is why its shares sum to 100 –
+   so the tracker was dropping the one number that says how much of the
+   electorate is not yet in the figures above. Soft support is what a third
+   party surging is made of, so this is worth its own line.
+
+   One house asks it weekly, which is a series, not an aggregate: no house
+   effect is estimable against a single publisher, so this is a plain monthly
+   mean of published readings and the panel says whose. A wave that published
+   no figure is absent rather than zero. */
+const undecidedRows = POLLS.filter((p) => p.undecided != null);
+const undecidedHouses = [...new Set(undecidedRows.map((p) => p.pollster))];
+const undecidedPolls = undecidedRows.map((p) => ({
+  x: dx(p.date), ym: ymOf(p.date), pollster: p.pollster,
+  dateLabel: fwLabel(p.dateStart, p.date), released: p.date,
+  sample: p.sample ?? null, v: p.undecided,
+})).sort((a, b) => a.x - b.x);
+const undecidedMonthly = MONTHS.map((ym) => {
+  const rs = undecidedRows.filter((p) => ymOf(p.date) === ym);
+  if (!rs.length) return null;
+  let sw = 0, swx = 0;
+  for (const r of rs) { const n = Math.min(r.sample || 1200, SAMPLE_CAP); sw += n; swx += n * r.undecided; }
+  return { ym, x: mx(ym), v: r1(swx / sw), k: rs.length };
+}).filter(Boolean);
+const undecided = (() => {
+  if (!undecidedPolls.length) return null;
+  const last = undecidedPolls[undecidedPolls.length - 1];
+  const prev = [...undecidedPolls].reverse().find((d) => d.pollster === last.pollster && d.x < last.x);
+  // a term high/low is the kind of claim the reader can check against the dots
+  const vals = undecidedPolls.map((d) => d.v);
+  return {
+    polls: undecidedPolls, monthly: undecidedMonthly, houses: undecidedHouses,
+    latest: { v: last.v, firm: last.pollster, released: last.released, field: last.dateLabel,
+              chg: prev ? r1(last.v - prev.v) : null, refDate: prev ? prev.released : null },
+    lo: Math.min(...vals), hi: Math.max(...vals), n: undecidedPolls.length,
+  };
+})();
+
 /* ---- 6. individual polls (full archive) -------------------------------- */
 const individualPolls = POLLS.map((p) => {
   const ym = ymOf(p.date), day = dayOf(p.date);
@@ -596,6 +665,7 @@ const individualPolls = POLLS.map((p) => {
   return {
     ym, x: mx(ym) + (day - 15) / 365, day, pollster: p.pollster,
     field, dateLabel: field, released: p.date, sample: p.sample ?? null,
+    ...(p.undecided != null ? { undecided: p.undecided } : {}),
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
@@ -624,6 +694,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     pollster: p.pollster, client: p.client && p.client !== "—" ? p.client : "Self-published",
     field: fwLabel(p.dateStart, p.date), released: p.date, releasedLabel: `${day} ${monthName(m)}`,
     sample: p.sample ?? null,
+    ...(p.undecided != null ? { undecided: p.undecided } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
@@ -728,6 +799,83 @@ function sparseSeries(points, months, cap) {
   }
   return months.map((m) => (b[m] ? r1(mean(b[m])) : null));
 }
+/* ---- how the final polls did, cycle by cycle --------------------------
+   The page's own caveat is that no aggregate can measure error shared across
+   the whole industry about ITSELF. This is the only place that error is
+   visible: five past elections, each with a result to check the final polls
+   against, and the honest answer of how far out they were.
+
+   The rule, stated once here so the number is reproducible: every house's LAST
+   poll with a 2PP in the 14 days before polling day, one per house, equally
+   weighted. Not sample-weighted - each house is a separate attempt at the same
+   question and the interesting quantity is how many of them missed the same
+   way, not how many people they rang. Exit polls are excluded: they measure
+   voters leaving a booth, not an electorate deciding, and would flatter the
+   record they belong to. Essential's undecided-inclusive pair is normalised
+   first, the same way the trend series normalises it, or its 48/47 would score
+   as a 4-point miss that is really an arithmetic difference. */
+const ACC_WINDOW_DAYS = 14;
+/* Same operation, renamed on the letterhead. Only renames go in here - Galaxy
+   and YouGov are NOT merged, because merging houses to build one longer record
+   is a claim about continuity of method that this table is in no position to
+   make. */
+const ACC_CANON = {
+  "Morgan": "Roy Morgan", "Newspoll-YouGov": "Newspoll",
+  "Resolve Strategic": "Resolve", "Freshwater Strategy": "Freshwater",
+  "Redbridge/Accent": "RedBridge", "Spectre Strategy": "Spectre",
+};
+const accCanon = (f) => ACC_CANON[f] || f;
+const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
+  const e = ELECTIONS["e" + c.src];
+  const eMs = new Date(e.date).getTime();
+  const inWindow = (cyclePolls[c.src] || []).filter((p) => {
+    if (p.firm === "Election" || /exit/i.test(p.firm)) return false;
+    if (p.tpp_alp == null) return false;
+    const d = ddays(eMs, new Date(p.date).getTime());
+    return d >= 0 && d <= ACC_WINDOW_DAYS;
+  });
+  const byHouse = new Map();
+  for (const p of [...inWindow].sort((a, b) => a.date.localeCompare(b.date)))
+    byHouse.set(accCanon(p.firm), p);
+  const houses = [...byHouse.entries()].map(([firm, p]) => ({
+    firm, date: p.date, alp2pp: r1(share2pp(p)), err: r1(share2pp(p) - e.tpp_alp),
+  })).sort((a, b) => Math.abs(a.err) - Math.abs(b.err));
+  if (!houses.length) return null;
+  const meanPoll = houses.reduce((t, h) => t + h.alp2pp, 0) / houses.length;
+  const err = meanPoll - e.tpp_alp;
+  return {
+    // labelled by the election being CALLED, which is the one a reader
+    // remembers – not the election that started the term
+    year: c.src, eDate: e.date, result: e.tpp_alp,
+    mean: r1(meanPoll), err: r1(err), absErr: r1(Math.abs(err)),
+    houses, n: houses.length,
+    // did they all miss the same way? one-sided error is the signature of a
+    // problem in the industry rather than noise in a house
+    sameSide: houses.every((h) => h.err > 0) || houses.every((h) => h.err < 0),
+    worst: r1(Math.max(...houses.map((h) => Math.abs(h.err)))),
+  };
+}).filter(Boolean);
+const accuracy = accuracyCycles.length ? (() => {
+  const byFirm = new Map();
+  for (const c of accuracyCycles)
+    for (const h of c.houses) {
+      const e = byFirm.get(h.firm) || { firm: h.firm, cycles: [] };
+      e.cycles.push({ year: c.year, err: h.err });
+      byFirm.set(h.firm, e);
+    }
+  const firms = [...byFirm.values()].map((f) => ({
+    firm: f.firm, n: f.cycles.length, cycles: f.cycles,
+    meanErr: r1(f.cycles.reduce((t, c) => t + c.err, 0) / f.cycles.length),
+    meanAbs: r1(f.cycles.reduce((t, c) => t + Math.abs(c.err), 0) / f.cycles.length),
+  })).sort((a, b) => b.n - a.n || a.meanAbs - b.meanAbs);
+  const abs = accuracyCycles.map((c) => c.absErr);
+  return {
+    windowDays: ACC_WINDOW_DAYS, cycles: accuracyCycles, firms,
+    meanAbs: r1(abs.reduce((t, v) => t + v, 0) / abs.length),
+    worstCycle: accuracyCycles.reduce((w, c) => (c.absErr > w.absErr ? c : w)),
+  };
+})() : null;
+
 const CYCLE_DEFS = CYC_META.map((c) => {
   let primPts, tppPts, netPts, oppPts, hanPts;
   if (c.current) {
@@ -966,6 +1114,8 @@ window.AUSPOL = (function () {
   const directionHouses = ${JSON.stringify(directionHouses)};
   const directionPolls = ${JSON.stringify(directionPolls)};
   const directionAvailable = ${direction.length > 0};
+  const undecided = ${JSON.stringify(undecided)};
+  const accuracy = ${JSON.stringify(accuracy)};
   const individualPolls = ${JSON.stringify(individualPolls)};
   const pollsterTable = ${JSON.stringify(pollsterTable)};
   const latest = ${JSON.stringify(latest)};
@@ -1016,7 +1166,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, adjusted, houseEffects, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, adjusted, houseEffects, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
     individualPolls, pollsterTable, latest, cycles, events,
     // a getter, so existing callers keep reading D.cycleSource unchanged
     get cycleSource() { return readCycleSource(); },

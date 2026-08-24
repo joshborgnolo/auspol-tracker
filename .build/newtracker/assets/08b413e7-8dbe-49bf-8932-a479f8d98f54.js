@@ -82,9 +82,13 @@ function straightPath(pts, sx, sy) {
  *           labelColor the text (defaults to --ink-3 – see the label below)
  *  fmt:     (y) => string  for tooltip/axis
  *  bands:   [{y0,y1,color}]  shaded horizontal regions (optional)
- *  areas:   [{id,color,opacity?,points:[{x,y0,y1}]}]  shaded region whose
- *           edges VARY with x – e.g. a sampling-error floor that moves as the
- *           polls behind it change size (bands can't, they're rectangles)
+ *  areas:   [{id,color,opacity?,smooth?,edge?,points:[{x,y0,y1}]}]  shaded
+ *           region whose edges VARY with x – e.g. a sampling-error floor that
+ *           moves as the polls behind it change size, or the interval around a
+ *           trend line (bands can't do either, they're rectangles). `smooth`
+ *           curves the edges like a trend line; `edge:false` drops the dashed
+ *           outline, which an interval ribbon does not want; `className` lands
+ *           on the fill so CSS can theme it.
  *  extraRows: (i) => [{label,value,color?}]  rows appended to the tooltip
  *           below the series rows; a point may also carry `note` for a
  *           secondary value shown beside its own row
@@ -625,11 +629,22 @@ function TrendChart(props) {
         {/* x-varying shaded areas – drawn under everything, clipped to the plot */}
         {areas.map((a) => {
           if (!a.points || a.points.length < 2) return null;
-          const top = a.points.map((d, i) => `${i ? "L" : "M"} ${sx(d.x).toFixed(2)} ${sy(d.y1).toFixed(2)}`).join(" ");
-          const bot = a.points.slice().reverse().map((d) => `L ${sx(d.x).toFixed(2)} ${sy(d.y0).toFixed(2)}`).join(" ");
+          /* `smooth` follows the same Catmull-Rom the trend lines use. An
+             interval ribbon has to be drawn with the curve it belongs to –
+             straight edges under a smoothed line pull away from it mid-month
+             and read as a second, disagreeing series. */
+          const edgePath = (pts, key, lead) => a.smooth
+            ? smoothPath(pts.map((d) => ({ x: d.x, y: d[key] })), sx, sy).replace(/^M/, lead)
+            : pts.map((d, i) => `${i ? "L" : lead} ${sx(d.x).toFixed(2)} ${sy(d[key]).toFixed(2)}`).join(" ");
+          const top = edgePath(a.points, "y1", "M");
+          const bot = edgePath(a.points.slice().reverse(), "y0", "L");
           return (
             <g key={"a" + a.id} clipPath={`url(#${clipId})`}>
-              <path d={`${top} ${bot} Z`} fill={a.color} opacity={a.opacity != null ? a.opacity : 1} />
+              {/* `opacity` is a presentation ATTRIBUTE, so a class rule beats
+                  it – which is how a themed area gets a different weight in
+                  dark without the component knowing the theme */}
+              <path className={a.className} d={`${top} ${bot} Z`} fill={a.color}
+                    opacity={a.opacity != null ? a.opacity : 1} />
               {a.edge !== false && <path d={top} fill="none" stroke={a.color} strokeWidth={1.6}
                                          strokeDasharray="4 4" opacity={0.85} />}
             </g>

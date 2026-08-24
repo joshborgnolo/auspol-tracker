@@ -823,6 +823,101 @@ function DirectionPanel({ rangeId }) {
   );
 }
 
+/* One line in a poll's breakdown: the share this wave could not place, and
+   how it moved on the same house's last wave. Stated next to the primaries
+   because it is the denominator they were taken out of. */
+function UndecidedLine({ v, chg }) {
+  const d = segDelta(chg, "und");
+  return (
+    <div className="pd-block">
+      <div className="pd-k">Undecided</div>
+      <div className="pd-und">
+        <span className="pd-und-v">{v}<span className="pct">%</span></span>
+        {/* the same change tag the primary shares carry, so it reads as one
+            more figure from this wave rather than a separate claim */}
+        <ChgTag v={d ? d.v : null} refDate={d ? d.refDate : null} />
+        <span className="pd-und-note">can’t say – excluded from the shares above</span>
+      </div>
+    </div>
+  );
+}
+
+// ---- Undecided ("can't say who they would vote for") -----------------
+/* The people the primaries have already set aside. Roy Morgan publishes this
+   figure beside its shares - which is WHY a Roy Morgan wave sums to 100 - and
+   the tracker used to drop it on the way in, so nothing on the page said how
+   much of the electorate was not yet in the numbers above it.
+
+   One publisher, so this is a plain sample-weighted monthly mean of what that
+   house printed, not an aggregate: there is no second house to estimate a
+   lean against, and the panel names the house rather than implying a market
+   consensus. Waves that published no figure are absent, not zero - January's
+   three weeks came in one combined release whose single figure cannot be
+   attributed to a wave, so they are not attributed to one. */
+function UndecidedPanel({ rangeId }) {
+  const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
+  const U = D.undecided;
+  if (!U || !U.monthly || U.monthly.length < 2) return null;
+  const xDomain = rangeDomain(rangeId);
+  const pts = filterPts(U.monthly, xDomain[0]);
+  if (pts.length < 2) return null;
+  /* Not a party colour, and not --line-2 either: that token is a hairline
+     tint, which in dark sits BELOW the card it would be drawn on. --ink-2 is
+     the one neutral that stays legible in both themes, which is what a line
+     meaning "none of the above" wants. */
+  const COL = "var(--ink-2)";
+  const scatter = U.polls
+    .filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1])
+    .map((d) => ({ x: d.x, y: d.v, color: COL, label: "Undecided", meta: d }));
+  const vals = pts.map((d) => d.v).concat(scatter.map((d) => d.y));
+  const lo = Math.max(0, Math.floor((Math.min(...vals) - 1.5) / 2) * 2);
+  const hi = Math.ceil((Math.max(...vals) + 1.5) / 2) * 2;
+  const yTicks = [];
+  for (let v = lo + 2; v < hi; v += 2) yTicks.push(v);
+  const L = U.latest;
+  const asked = houseList(U.houses);
+
+  return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">Undecided</h2>
+          <p className="card-sub">
+            “Can’t say who they would vote for” – published beside the primary
+            vote, not inside it{asked ? " · " + asked : ""}
+          </p>
+        </div>
+        <div className="dir-net">
+          <span className="dir-net-label">Latest</span>
+          <span className="dir-net-val">{L.v}<span className="pct">%</span></span>
+          {/* rising undecided is not good news for anyone, so neither arrow is
+              coloured as a gain - goodUp false only flips which way is red, and
+              here the honest reading is "more people are not saying" */}
+          {L.chg != null && <Delta value={L.chg} goodUp={false} small />}
+        </div>
+      </div>
+      <TrendChart
+        key="und"
+        height={210} xDomain={xDomain} yDomain={[lo, hi]}
+        yTicks={yTicks} unit="%" axisFont={20}
+        pad={{ l: 58, r: 22, t: 16, b: 42 }}
+        xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        series={[{ id: "und", label: "Undecided", color: COL, points: series(pts, "v") }]}
+        spine={series(pts, "v")}
+        scatter={scatter} pollFacet="twopp"
+        tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
+        fmt={(v) => v.toFixed(1)}
+      />
+      <p className="table-hint">
+        Each dot is one published wave; the line is their monthly average.
+        {" "}{U.n} readings, {U.lo}% to {U.hi}% across the term. These electors are
+        excluded from the shares above, so a rising line means the primaries are
+        being read off a smaller pool of decided voters – not that support moved.
+      </p>
+    </section>
+  );
+}
+
 // ---- Latest polls – faceted, ragged-tolerant ledger ----------------
 const PARTY_C = {
   alp: "var(--alp)", lnp: "var(--lnp)", grn: "var(--grn)",
@@ -1280,6 +1375,7 @@ function PollDetail({ r }) {
             <ShareBar segs={dirSegs(r)} />
           </div>
         )}
+        {r.undecided != null && <UndecidedLine v={r.undecided} chg={r.chg} />}
       </div>
     </div>
   );
@@ -1649,6 +1745,6 @@ function PollsterTable() {
   );
 }
 
-Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, PollsterTable, NextPollsPanel,
+Object.assign(window, { UndecidedLine, Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, ApprBlock, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C });
