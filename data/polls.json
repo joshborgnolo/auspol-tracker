@@ -873,6 +873,14 @@
       "right": 26,
       "wrong": 60.5,
       "unsure": 13.5
+    },
+    {
+      "date": "2026-08-23",
+      "dateStart": "2026-08-17",
+      "pollster": "Roy Morgan",
+      "right": 27,
+      "wrong": 58.5,
+      "unsure": 14.5
     }
   ],
   "polls": [
@@ -3593,6 +3601,26 @@
       "tpp_alp": null,
       "tpp_lnp": null,
       "url": "https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/"
+    },
+    {
+      "date": "2026-08-23",
+      "dateStart": "2026-08-17",
+      "pollster": "Roy Morgan",
+      "client": "—",
+      "sample": 1508,
+      "alp": 27,
+      "lnp": 21,
+      "grn": 14,
+      "onp": 27,
+      "ind": 11,
+      "oth": null,
+      "tpp_alp": 52,
+      "tpp_lnp": 48,
+      "lnpSplit": {
+        "Lib": 18.5,
+        "Nat": 2.5
+      },
+      "url": "https://www.roymorgan.com/findings/10321-federal-voting-intention-august-24-2026"
     }
   ],
   "ppm": [
@@ -5790,6 +5818,12 @@
     },
     {
       "date": "2026-08-16",
+      "firm": "Roy Morgan",
+      "alpVsOnp_alp": 53,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-08-23",
       "firm": "Roy Morgan",
       "alpVsOnp_alp": 53,
       "lnpVsOnp_lnp": null
