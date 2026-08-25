@@ -825,8 +825,8 @@ function ReportError() {
     return (
       <div className="fb">
         <p className="fb-thanks">
-          <strong>Thank you – that's arrived.</strong> Anything reported is checked against the
-          pollster's own release before a figure moves here, so a correction shows up at the next
+          <strong>Thank you – that’s arrived.</strong> Anything reported is checked against the
+          pollster’s own release before a figure moves here, so a correction shows up at the next
           build rather than straight away.{" "}
           <button type="button" className="fb-link" onClick={() => setStatus("idle")}>
             Send another
@@ -839,10 +839,14 @@ function ReportError() {
   return (
     <div className="fb">
       <p className="fb-lede">
-        Every figure here is transcribed by hand from a pollster's published release, and some of
-        them will be wrong. If you have found one – or a poll that belongs in the archive and is
-        not in it –{" "}
-        <button type="button" className="fb-link" onClick={() => setOpen(true)} aria-expanded={open}>
+        Every figure here is transcribed from a pollster’s published release, from Wikipedia,
+        PollBludger, or another secondary source, and some of them may be wrong. If you have found
+        one – or a poll that belongs in the archive and is not in it –{" "}
+        {/* A toggle both ways: the thing that opened the form is the only
+            thing in the sentence that looks like a control, so it is where a
+            reader who has changed their mind will click. What is typed stays
+            in state, so closing it is not the same as discarding it. */}
+        <button type="button" className="fb-link" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
           say so
         </button>{open ? "." : " and it gets checked against the source."}
       </p>
@@ -850,7 +854,7 @@ function ReportError() {
       {open && (
         <form className="fb-form" ref={formRef} onSubmit={submit}>
           <div className="fb-row">
-            <span className="fb-label" id={uid + "-kindlab"}>What's this about?</span>
+            <span className="fb-label" id={uid + "-kindlab"}>What’s this about?</span>
             <div className="fb-chips" role="group" aria-labelledby={uid + "-kindlab"}>
               {FB_KINDS.map((k) => (
                 <button key={k} type="button" aria-pressed={k === kind}
@@ -867,7 +871,7 @@ function ReportError() {
             </label>
             <textarea id={uid + "-msg"} name="message" required ref={boxRef}
               value={msg} onChange={(e) => setMsg(e.target.value)}
-              placeholder="e.g. Resolve, fielded 12–15 Aug — Labor's primary is 27.9 here, the release says 28.9" />
+              placeholder="e.g. Resolve, fielded 12–15 Aug — Labor’s primary is 27.9 here, the release says 28.9" />
           </div>
 
           <div className="fb-row">

@@ -12364,7 +12364,7 @@ function ReportError() {
       className: "fb"
     }, /*#__PURE__*/React.createElement("p", {
       className: "fb-thanks"
-    }, /*#__PURE__*/React.createElement("strong", null, "Thank you \u2013 that's arrived."), " Anything reported is checked against the pollster's own release before a figure moves here, so a correction shows up at the next build rather than straight away.", " ", /*#__PURE__*/React.createElement("button", {
+    }, /*#__PURE__*/React.createElement("strong", null, "Thank you \u2013 that\u2019s arrived."), " Anything reported is checked against the pollster\u2019s own release before a figure moves here, so a correction shows up at the next build rather than straight away.", " ", /*#__PURE__*/React.createElement("button", {
       type: "button",
       className: "fb-link",
       onClick: () => setStatus("idle")
@@ -12374,10 +12374,10 @@ function ReportError() {
     className: "fb"
   }, /*#__PURE__*/React.createElement("p", {
     className: "fb-lede"
-  }, "Every figure here is transcribed by hand from a pollster's published release, and some of them will be wrong. If you have found one \u2013 or a poll that belongs in the archive and is not in it \u2013", " ", /*#__PURE__*/React.createElement("button", {
+  }, "Every figure here is transcribed from a pollster\u2019s published release, from Wikipedia, PollBludger, or another secondary source, and some of them may be wrong. If you have found one \u2013 or a poll that belongs in the archive and is not in it \u2013", " ", /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "fb-link",
-    onClick: () => setOpen(true),
+    onClick: () => setOpen(v => !v),
     "aria-expanded": open
   }, "say so"), open ? "." : " and it gets checked against the source."), open && /*#__PURE__*/React.createElement("form", {
     className: "fb-form",
@@ -12388,7 +12388,7 @@ function ReportError() {
   }, /*#__PURE__*/React.createElement("span", {
     className: "fb-label",
     id: uid + "-kindlab"
-  }, "What's this about?"), /*#__PURE__*/React.createElement("div", {
+  }, "What\u2019s this about?"), /*#__PURE__*/React.createElement("div", {
     className: "fb-chips",
     role: "group",
     "aria-labelledby": uid + "-kindlab"
@@ -12414,7 +12414,7 @@ function ReportError() {
     ref: boxRef,
     value: msg,
     onChange: e => setMsg(e.target.value),
-    placeholder: "e.g. Resolve, fielded 12\u201315 Aug \u2014 Labor's primary is 27.9 here, the release says 28.9"
+    placeholder: "e.g. Resolve, fielded 12\u201315 Aug \u2014 Labor\u2019s primary is 27.9 here, the release says 28.9"
   })), /*#__PURE__*/React.createElement("div", {
     className: "fb-row"
   }, /*#__PURE__*/React.createElement("label", {
