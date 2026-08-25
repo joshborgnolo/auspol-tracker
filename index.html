@@ -3200,7 +3200,10 @@ function straightPath(pts, sx, sy) {
 
 /* ------------------------------------------------------------------ *
  * TrendChart – the workhorse
- *  series:  [{ id, label, color, points:[{x,y}], width?, dashed?, smooth? }]
+ *  series:  [{ id, label, color, points:[{x,y}], width?, dashed?, smooth?,
+ *            opacity?, wipe? }]  `wipe` is how much of the line has been
+ *            ERASED from the left, 0..1 – a line that has nowhere to travel to
+ *            when the chart changes question is rubbed out rather than dimmed
  *  scatter: [{ x, y, color, meta }]
  *  yTicks:  [numbers]   xTicks: [{x,label}]
  *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
@@ -3372,6 +3375,7 @@ function TrendChart(props) {
   const ref = useRef(null);
   const clipId = "clip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const plotId = clipId + "p"; // the plot area itself, which never travels
+  const wipeId = clipId + "w"; // + the series id, for a line being erased
 
   // axis text in real on-screen px – normalise by measured width so every
   // chart's labels match regardless of column width / responsive stacking
@@ -3919,7 +3923,41 @@ function TrendChart(props) {
     y: "0",
     width: W - pad.l - pad.r,
     height: H
-  }))), bands.map((b, i) => /*#__PURE__*/React.createElement("rect", {
+  })), series.filter(s => s.wipe != null && s.wipe > 0).map(s => {
+    const SOFT = 0.09; // edge width, as a fraction
+    const edge = s.wipe * (1 + 2 * SOFT) - SOFT;
+    const cl = v => Math.max(0, Math.min(1, v));
+    const lo = cl(edge - SOFT),
+      hi2 = cl(edge + SOFT);
+    return /*#__PURE__*/React.createElement("mask", {
+      key: "w" + s.id,
+      id: wipeId + s.id,
+      maskUnits: "userSpaceOnUse",
+      x: pad.l,
+      y: "0",
+      width: W - pad.l - pad.r,
+      height: H
+    }, /*#__PURE__*/React.createElement("linearGradient", {
+      id: wipeId + s.id + "g",
+      gradientUnits: "userSpaceOnUse",
+      x1: pad.l,
+      y1: "0",
+      x2: W - pad.r,
+      y2: "0"
+    }, /*#__PURE__*/React.createElement("stop", {
+      offset: lo,
+      stopColor: "#000"
+    }), /*#__PURE__*/React.createElement("stop", {
+      offset: hi2,
+      stopColor: "#fff"
+    })), /*#__PURE__*/React.createElement("rect", {
+      x: pad.l,
+      y: "0",
+      width: W - pad.l - pad.r,
+      height: H,
+      fill: `url(#${wipeId + s.id}g)`
+    }));
+  })), bands.map((b, i) => /*#__PURE__*/React.createElement("rect", {
     key: "b" + i,
     x: pad.l,
     y: sy(b.y1),
@@ -4086,7 +4124,7 @@ function TrendChart(props) {
     } : null
   }, dots), moveDots.length > 0 && /*#__PURE__*/React.createElement("g", null, moveDots)), /*#__PURE__*/React.createElement("g", {
     clipPath: `url(#${clipId})`
-  }, series.map(s => /*#__PURE__*/React.createElement("path", {
+  }, series.map(s => s.wipe != null && s.wipe >= 1 ? null : /*#__PURE__*/React.createElement("path", {
     key: s.id,
     className: "series-line",
     d: (s.smooth === false ? straightPath : smoothPath)(s.points, sx, sy),
@@ -4094,13 +4132,15 @@ function TrendChart(props) {
     stroke: s.color,
     strokeWidth: s.width || 3.4,
     strokeDasharray: s.dashed ? "6 6" : "none",
+    mask: s.wipe != null && s.wipe > 0 ? `url(#${wipeId + s.id})` : undefined,
     style: s.opacity != null ? {
       opacity: s.opacity
     } : null,
     strokeLinejoin: "round",
     strokeLinecap: "round"
   }))), series.map(s => {
-    if (s.opacity === 0) return null;
+    // a line that is gone, or rubbed out, has no marker to glide along
+    if (s.opacity === 0 || s.wipe != null && s.wipe >= 1) return null;
     const spx = hi != null && !dot && !evt && spinePts[hi] ? spinePts[hi].x : null;
     const p = spx != null ? ptAtX(s, spx) : null;
     const last = s.points[s.points.length - 1];
@@ -5622,11 +5662,17 @@ function PreferredPMPanel({
         clip: bl ? bl.clip : null
       };
     }
+    /* A line with nowhere to travel to is ERASED rather than dimmed: rubbed
+       out from the left as the switch runs, and drawn back in the same way
+       when the switch is reversed. Fading the whole line at once read as it
+       blinking out of existence — the head-to-head Albanese is the one this
+       happens to, and a dashed line vanishing wholesale looks like a
+       rendering fault rather than a departure. */
     const only = a || b;
     return {
       r: only,
       pts: lineFor(only),
-      opacity: a ? 1 - morph.t : morph.t
+      wipe: a ? morph.t : 1 - morph.t
     };
   }).filter(d => d.pts.length);
   const clipX = morph ? drawRows.map(d => d.clip).filter(Boolean)[0] || null : null;
@@ -5780,6 +5826,7 @@ function PreferredPMPanel({
       color: d.r.L.color,
       dashed: d.r.dashed,
       opacity: d.opacity,
+      wipe: d.wipe,
       points: d.pts.map(p => ({
         x: p.x,
         y: p.v

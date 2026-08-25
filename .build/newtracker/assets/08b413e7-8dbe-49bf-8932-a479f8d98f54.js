@@ -75,7 +75,10 @@ function straightPath(pts, sx, sy) {
 
 /* ------------------------------------------------------------------ *
  * TrendChart – the workhorse
- *  series:  [{ id, label, color, points:[{x,y}], width?, dashed?, smooth? }]
+ *  series:  [{ id, label, color, points:[{x,y}], width?, dashed?, smooth?,
+ *            opacity?, wipe? }]  `wipe` is how much of the line has been
+ *            ERASED from the left, 0..1 – a line that has nowhere to travel to
+ *            when the chart changes question is rubbed out rather than dimmed
  *  scatter: [{ x, y, color, meta }]
  *  yTicks:  [numbers]   xTicks: [{x,label}]
  *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
@@ -193,6 +196,7 @@ function TrendChart(props) {
   const ref = useRef(null);
   const clipId = "clip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const plotId = clipId + "p";      // the plot area itself, which never travels
+  const wipeId = clipId + "w";      // + the series id, for a line being erased
 
   // axis text in real on-screen px – normalise by measured width so every
   // chart's labels match regardless of column width / responsive stacking
@@ -620,6 +624,30 @@ function TrendChart(props) {
           <clipPath id={plotId}>
             <rect x={pad.l} y="0" width={W - pad.l - pad.r} height={H} />
           </clipPath>
+          {/* An eraser, one per wiping line. A line with no counterpart in the
+              question being switched to used to fade out everywhere at once,
+              which reads as a rendering glitch rather than a departure. Rubbing
+              it out from the left – soft edge, so it is an eraser and not a
+              shutter – gives the eye something to follow, and the same mask run
+              backwards draws the line back in when the switch is reversed. */}
+          {series.filter((s) => s.wipe != null && s.wipe > 0).map((s) => {
+            const SOFT = 0.09;                       // edge width, as a fraction
+            const edge = s.wipe * (1 + 2 * SOFT) - SOFT;
+            const cl = (v) => Math.max(0, Math.min(1, v));
+            const lo = cl(edge - SOFT), hi2 = cl(edge + SOFT);
+            return (
+              <mask key={"w" + s.id} id={wipeId + s.id} maskUnits="userSpaceOnUse"
+                    x={pad.l} y="0" width={W - pad.l - pad.r} height={H}>
+                <linearGradient id={wipeId + s.id + "g"} gradientUnits="userSpaceOnUse"
+                                x1={pad.l} y1="0" x2={W - pad.r} y2="0">
+                  <stop offset={lo} stopColor="#000" />
+                  <stop offset={hi2} stopColor="#fff" />
+                </linearGradient>
+                <rect x={pad.l} y="0" width={W - pad.l - pad.r} height={H}
+                      fill={`url(#${wipeId + s.id}g)`} />
+              </mask>
+            );
+          })}
         </defs>
         {/* shaded bands */}
         {bands.map((b, i) => (
@@ -729,18 +757,20 @@ function TrendChart(props) {
         {/* series lines (clipped to the plot area so windowed views
             don't draw the entering segment past the y-axis) */}
         <g clipPath={`url(#${clipId})`}>
-          {series.map((s) => (
+          {series.map((s) => (s.wipe != null && s.wipe >= 1 ? null : (
             <path key={s.id} className="series-line"
                   d={(s.smooth === false ? straightPath : smoothPath)(s.points, sx, sy)}
                   fill="none" stroke={s.color} strokeWidth={s.width || 3.4}
                   strokeDasharray={s.dashed ? "6 6" : "none"}
+                  mask={s.wipe != null && s.wipe > 0 ? `url(#${wipeId + s.id})` : undefined}
                   style={s.opacity != null ? { opacity: s.opacity } : null}
                   strokeLinejoin="round" strokeLinecap="round" />
-          ))}
+          )))}
         </g>
         {/* hover markers – one per series, kept mounted so they glide along the line */}
         {series.map((s) => {
-          if (s.opacity === 0) return null;
+          // a line that is gone, or rubbed out, has no marker to glide along
+          if (s.opacity === 0 || (s.wipe != null && s.wipe >= 1)) return null;
           const spx = hi != null && !dot && !evt && spinePts[hi] ? spinePts[hi].x : null;
           const p = spx != null ? ptAtX(s, spx) : null;
           const last = s.points[s.points.length - 1];

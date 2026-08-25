@@ -535,8 +535,14 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         const r = morph.t < 0.5 ? a : b;
         return { r, pts: bl ? bl.rows : lineFor(r), opacity: 1, clip: bl ? bl.clip : null };
       }
+      /* A line with nowhere to travel to is ERASED rather than dimmed: rubbed
+         out from the left as the switch runs, and drawn back in the same way
+         when the switch is reversed. Fading the whole line at once read as it
+         blinking out of existence — the head-to-head Albanese is the one this
+         happens to, and a dashed line vanishing wholesale looks like a
+         rendering fault rather than a departure. */
       const only = a || b;
-      return { r: only, pts: lineFor(only), opacity: a ? 1 - morph.t : morph.t };
+      return { r: only, pts: lineFor(only), wipe: a ? morph.t : 1 - morph.t };
     }).filter((d) => d.pts.length);
   const clipX = morph ? (drawRows.map((d) => d.clip).filter(Boolean)[0] || null) : null;
 
@@ -652,7 +658,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         areas={areas}
         series={drawRows.map((d) => ({
           id: d.r.mk, label: d.r.label, color: d.r.L.color, dashed: d.r.dashed,
-          opacity: d.opacity, points: d.pts.map((p) => ({ x: p.x, y: p.v })),
+          opacity: d.opacity, wipe: d.wipe, points: d.pts.map((p) => ({ x: p.x, y: p.v })),
         }))}
         spine={pts.map((d) => ({ x: d.x }))}
         scatter={cross ? cross.scatter : ppmScatter} pollFacet="leadership"
