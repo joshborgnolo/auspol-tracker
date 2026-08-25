@@ -871,7 +871,14 @@ function cycleSeries(points, base, cap = 36) {
   // Essential ratings from Jul 2019 on have since been entered, and the 2019
   // cycle now starts at m2. The rule stands regardless of who is missing.)
   const firstKnown = Math.min(...Object.keys(known).map(Number));
-  return { months: idxs, vals: idxs.map((i) => (i < firstKnown ? null : r1(filled[i]))) };
+  /* `obs` marks the months a reading actually landed in, as opposed to the
+     ones fillSeries drew a line across. The values either side of a gap are
+     measured; the value IN it is the interpolation's own invention, and the
+     chart dashes those segments rather than let a solid line assert a month
+     nobody polled. `in known` and not a truthiness test: a net approval of
+     exactly 0 is a real reading. */
+  return { months: idxs, vals: idxs.map((i) => (i < firstKnown ? null : r1(filled[i]))),
+           obs: idxs.map((i) => i >= firstKnown && i in known) };
 }
 const CYC_META = [
   { year: 2010, gov: "alp", opp: "lnp", pm: "Gillard", lead: "Gillard", oppLead: "Abbott", eDate: "2010-08-21", ePrim: 38.0, eTpp: 50.1, src: 2013, appr: 2010 },
@@ -1015,10 +1022,18 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     if (i >= 0) return s.vals[i];
     return m < s.months[0] ? null : s.vals[s.vals.length - 1];
   });
+  /* Same alignment for the observed flags, with one difference: `align` HOLDS
+     a measure's last value across months past its range, and a held value is
+     not a reading. Anything outside the measure's own months is false. */
+  const alignObs = (s) => months.map((m) => {
+    const i = s.months.indexOf(m);
+    return i >= 0 ? s.obs[i] : false;
+  });
   return {
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: !!c.current,
     eDate: c.eDate,
     months, primary: prim.vals, tpp: tpp.vals, net: align(net), oppnet: align(opp),
+    obs: { primary: prim.obs, tpp: tpp.obs, net: alignObs(net), oppnet: alignObs(opp) },
     han: sparseSeries(hanPts, months, cap),
   };
 });
@@ -1262,7 +1277,7 @@ window.AUSPOL = (function () {
       oppnet: c.months.map((m, i) => ({ x: m, y: c.oppnet[i] })),
       han: c.months.map((m, i) => ({ x: m, y: c.han[i] })),
     },
-    raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, han: c.han, months: c.months },
+    raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, han: c.han, months: c.months, obs: c.obs },
   }));
 
   return {

@@ -277,6 +277,34 @@ function cycleReadings(c, M, D) {
   return out;
 }
 
+/* ---- where the line runs between readings, not through them -------------
+   cycleSeries interpolates a month nothing was polled in, and a solid line
+   through that point claims a measurement that was never taken. Rare - four
+   single months across every past cycle and metric - which is exactly why it
+   is worth marking: a dash here is a real signal about those four months,
+   not a caveat smeared over the whole chart.
+
+   The line is split into runs and handed over as several series, because
+   `dashed` applies to a whole stroke. Consecutive runs SHARE their boundary
+   point so the line stays visually continuous across the change, and every
+   run keeps the cycle's own label - the tooltip collapses them back into the
+   one row the reader thinks they are hovering.
+
+   A segment is dashed when EITHER end is an unpolled month: both the approach
+   to an invented point and the departure from it are drawn between readings,
+   and dashing only one side would point at the wrong half. */
+function obsRuns(pts, observed) {
+  if (pts.length < 2) return [{ dashed: false, points: pts }];
+  const runs = [];
+  for (let i = 0; i < pts.length - 1; i++) {
+    const dashed = !(observed(pts[i].x) && observed(pts[i + 1].x));
+    const last = runs[runs.length - 1];
+    if (last && last.dashed === dashed) last.points.push(pts[i + 1]);
+    else runs.push({ dashed, points: [pts[i], pts[i + 1]] });
+  }
+  return runs;
+}
+
 /* Shape is assigned WITHIN a colour, not across the board: the point is to
    separate two Coalition terms from each other, and giving the lone Labor
    term beside them a triangle would be decoration standing in for a
@@ -362,7 +390,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
      a distinction against nothing, so the row keeps the leader alone and the
      title takes the calendar month instead. */
   const solo = shown.length === 1 ? shown[0] : null;
-  const built = shown.map((c) => {
+  const built = shown.flatMap((c) => {
     const base = cycBase(c, M.key);
     const monthly = toMonthly(c.raw.months, c.raw[M.key], c.span);
     // months with no reading are dropped, so the line begins where the polling
@@ -376,9 +404,32 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
     else if (isHi) { width = 3; weight = 2; opacity = 1; labOp = 1; }
     else { width = 1.7; weight = dim ? 0 : 1; opacity = dim ? 0.13 : 0.42; labOp = dim ? 0.2 : 0.75; }
     const leadName = isOpp ? c.oppLead : c.lead;
-    return { id: "c" + c.year, label: solo ? leadName : c.year + " · " + leadName, color: c.color, width,
-             points: pts, weight, current: c.current, opacity,
-             endLabel: "’" + String(c.year).slice(2), endLabelOpacity: labOp };
+    const label = solo ? leadName : c.year + " · " + leadName;
+    /* Months are the x values, and `months` is 0..n, but look the index up
+       rather than assume it: the flags have to describe the same month the
+       point does or the dash lands on the wrong segment. Absent obs data
+       (an older payload) marks nothing, so the line just stays solid. */
+    const flags = (c.raw.obs || {})[M.key];
+    const observed = (m) => {
+      if (!flags) return true;
+      const i = c.raw.months.indexOf(m);
+      return i < 0 ? true : !!flags[i];
+    };
+    /* The dash says the line is crossing a gap; this says what the number in
+       the readout is. Without it the tooltip hands back a flat figure for a
+       month nobody polled, which is the whole thing being marked. Only the
+       unpolled month itself is annotated - the readings either side of it are
+       real, and the dedupe hands each boundary month to its solid run first. */
+    if (flags) pts.forEach((p) => { if (!observed(p.x)) p.note = "no poll · interpolated"; });
+    const runs = obsRuns(pts, observed);
+    return runs.map((run, i) => ({
+      id: "c" + c.year + (i ? "-" + i : ""), label, color: c.color, width,
+      points: run.points, weight, current: c.current, opacity, dashed: run.dashed,
+      // the end label belongs to the line, so only its last run carries one
+      ...(i === runs.length - 1
+        ? { endLabel: "’" + String(c.year).slice(2), endLabelOpacity: labOp }
+        : {}),
+    }));
   });
   /* The polls the lines are averages of, once the board is narrow enough to
      read them. Each cloud takes its line's colour and shape, and follows it

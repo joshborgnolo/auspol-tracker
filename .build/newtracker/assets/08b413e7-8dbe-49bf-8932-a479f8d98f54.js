@@ -76,6 +76,9 @@ function straightPath(pts, sx, sy) {
 /* ------------------------------------------------------------------ *
  * TrendChart – the workhorse
  *  series:  [{ id, label, color, points:[{x,y}], width?, dashed?, smooth?,
+ *            // `dashed` is per-STROKE, so a line that is only partly dashed
+ *            // is passed as several series sharing one label; the tooltip and
+ *            // the accessible name collapse them back to one entry each
  *            opacity?, wipe?, clipX? }]  `clipX` is the x window THIS line may
  *            draw in – lines that grow and retreat by different amounts during
  *            a question switch each need their own, since one chart-wide
@@ -457,12 +460,26 @@ function TrendChart(props) {
       title: tooltipTitle ? tooltipTitle(i) : "",
       // rows sorted by value, so the readout order matches the lines'
       // top-to-bottom order at the hovered point
-      rows: series.map((s) => {
-        if (s.opacity === 0 || spx == null) return null;
-        const p = ptAtX(s, spx);
-        return p ? { label: s.label, value: fmt(p.y) + unit, color: s.color, y: p.y, note: p.note } : null;
-      }).filter(Boolean).sort((a, b) => b.y - a.y)
-        .concat(extraRows ? extraRows(i).filter(Boolean) : []),
+      /* One LINE may arrive as several series – a cycle line is split at the
+         months it interpolates so the gap can be dashed, and the runs share
+         both their label and their boundary points. The reader is hovering
+         one line and wants one row, so the first series to answer for a
+         label answers for all of them. Series without a label (unnamed
+         helpers) are left alone. */
+      rows: (() => {
+        const claimed = new Set();
+        return series.map((s) => {
+          if (s.opacity === 0 || spx == null) return null;
+          const p = ptAtX(s, spx);
+          if (!p) return null;
+          if (s.label != null) {
+            if (claimed.has(s.label)) return null;
+            claimed.add(s.label);
+          }
+          return { label: s.label, value: fmt(p.y) + unit, color: s.color, y: p.y, note: p.note };
+        }).filter(Boolean).sort((a, b) => b.y - a.y)
+          .concat(extraRows ? extraRows(i).filter(Boolean) : []);
+      })(),
     };
   }
 
@@ -483,7 +500,7 @@ function TrendChart(props) {
      identical, contentless images. Name what is actually plotted and over what
      span, and say the thing is operable – it is the only cue that arrow keys
      do anything here. */
-  const namedSeries = series.filter((s) => s.label && s.opacity !== 0).map((s) => s.label);
+  const namedSeries = [...new Set(series.filter((s) => s.label && s.opacity !== 0).map((s) => s.label))];
   const spanFrom = tooltipTitle && spinePts.length ? tooltipTitle(0) : "";
   const spanTo = tooltipTitle && spinePts.length ? tooltipTitle(spinePts.length - 1) : "";
   const a11yLabel = ariaLabel || [
