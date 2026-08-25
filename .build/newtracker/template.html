@@ -453,18 +453,25 @@ body {
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
 .wordmark.stacked { flex-direction: row; align-items: center; gap: 7px; }
-.wm-textcol { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 5px; }
+/* Both words at ONE size, told apart by weight alone. At 30px `auspol` at 800
+   measures 93.6px and `tracker` at 400 measures 95px, so the block squares
+   itself off on its own - no tracking, no size step, no indent to force it.
+   The old second line bought that same width with 0.46em of letter-spacing,
+   which is enough air to stop the word reading as a word; and the 0.23em
+   indent it needed to re-centre pushed the T 2.8px right of the a, so the
+   lockup had no shared left edge. Weight contrast also survives what the old
+   grey/black split did not: small sizes, greyscale, and dark, where --ink-3
+   on a dark ground reads as switched off rather than as secondary. */
+.wm-textcol { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1px; }
 .wm-name {
   display: inline-flex; font-weight: 800; font-size: 30px;
-  letter-spacing: -0.025em; line-height: 1;
+  letter-spacing: -0.025em; line-height: 0.95; color: var(--ink);
 }
-.wm-aus { color: var(--ink-3); }
-.wm-poll { color: var(--ink); }
 .wordmark.stacked .wm-track {
   align-self: flex-start; margin-left: 0; padding-bottom: 0;
-  display: inline-block; text-indent: 0.23em;
-  font-size: 12px; font-weight: 600; letter-spacing: 0.46em;
-  text-transform: uppercase; color: var(--ink-3);
+  display: inline-block; text-indent: 0;
+  font-size: 30px; font-weight: 400; letter-spacing: -0.03em;
+  text-transform: none; line-height: 0.95; color: var(--ink-3);
 }
 .wm-track {
   align-self: flex-end; margin-left: 9px; padding-bottom: 3px;
@@ -475,12 +482,11 @@ body {
    two-tone 2PP swing arc, needle from the shared pivot */
 .wm-glyph {
   display: inline-flex; align-items: center; margin-left: 0; align-self: center;
-  transform: translateY(4px);
   background: none; border: 0; padding: 3px; margin: -3px; cursor: pointer;
   border-radius: 8px; transition: transform .28s cubic-bezier(.3,1.2,.5,1), background-color .2s ease;
 }
-.wm-glyph:hover { background: color-mix(in oklch, var(--ink) 6%, transparent); transform: translateY(4px) scale(1.06); }
-.wm-glyph:active { transform: translateY(4px) scale(0.97); }
+.wm-glyph:hover { background: color-mix(in oklch, var(--ink) 6%, transparent); transform: scale(1.06); }
+.wm-glyph:active { transform: scale(0.97); }
 .wm-glyph:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
 
 /* ---------- the dial, wound back ---------- */
@@ -609,7 +615,7 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .dl-backdrop { animation: none; }
-  .wm-glyph, .wm-glyph:hover, .wm-glyph:active { transition: none; transform: translateY(4px); }
+  .wm-glyph, .wm-glyph:hover, .wm-glyph:active { transition: none; transform: none; }
 }
 .wordmark.stacked .wm-glyph { align-self: center; }
 .wm-dial { display: block; overflow: visible; }

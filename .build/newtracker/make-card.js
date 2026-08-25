@@ -65,10 +65,21 @@
   };
 
   /* ---- masthead --------------------------------------------------------- */
-  c.font = '700 30px "Public Sans", sans-serif';
-  c.fillStyle = T.ink3; c.fillText("aus", PAD, 92); const wA = c.measureText("aus").width;
-  c.fillStyle = T.ink;  c.fillText("pol", PAD + wA, 92); const wP = c.measureText("pol").width;
-  caps("TRACKER", PAD + 1, 112, 13, 4.5, T.ink3, 600);
+  /* One lockup, drawn from the site's spec - see .wm-name / .wm-track in
+     template.html: both words at 30px, told apart by weight alone. The card
+     used to set its own, 700 weight over 13px tracked caps, which made it a
+     third version of a wordmark that only has one. The offsets are the
+     header's own, read off the rendered lockup: the second baseline sits
+     29.5px under the first, and the dial's arc centre 34px right of the text
+     block and 16.85px under the first baseline. */
+  const BL1 = 92, BL2 = BL1 + 29.5;
+  c.font = '800 30px "Public Sans", sans-serif'; c.letterSpacing = "-0.75px";
+  c.fillStyle = T.ink; c.fillText("auspol", PAD, BL1);
+  const wN = c.measureText("auspol").width;
+  c.font = '400 30px "Public Sans", sans-serif'; c.letterSpacing = "-0.9px";
+  c.fillStyle = T.ink3; c.fillText("tracker", PAD, BL2);
+  const wMark = Math.max(wN, c.measureText("tracker").width);
+  c.letterSpacing = "0px";
 
   /* the masthead dial, same geometry and same data as the favicon in build.mjs:
      graduation bars are the latest primary aggregate sorted tallest first, the
@@ -96,13 +107,14 @@
     c.strokeStyle = m >= 0 ? T.alp : T.lnp; c.lineWidth = 2.8 * k;
     c.lineCap = "round"; c.stroke();
     c.beginPath(); c.arc(cx, cy, 2.2 * k, 0, 7); c.fillStyle = T.ink; c.fill();
-  })(PAD + wA + wP + 42, 92, 1.25);
+  })(PAD + wMark + 34, BL1 + 16.85, 1.25);
 
+  // on the name's baseline, not floating between the two lines
   c.textAlign = "right";
-  caps("UPDATED " + L.updated.toUpperCase(), W - PAD, 100, 14, 2.2, T.ink3, 700);
+  caps("UPDATED " + L.updated.toUpperCase(), W - PAD, BL1, 14, 2.2, T.ink3, 700);
   c.textAlign = "left";
   c.strokeStyle = T.line; c.lineWidth = 1;
-  c.beginPath(); c.moveTo(PAD, 133.5); c.lineTo(W - PAD, 133.5); c.stroke();
+  c.beginPath(); c.moveTo(PAD, 143.5); c.lineTo(W - PAD, 143.5); c.stroke();
 
   /* ---- the figures ------------------------------------------------------ */
   caps("TWO-PARTY PREFERRED", PAD, 180, 15, 2.6, T.ink3, 700);

@@ -103,7 +103,7 @@ function Header({ isDark, onToggleTheme }) {
       <div className="brand">
         <h1 className="wordmark stacked">
           <span className="wm-textcol">
-            <span className="wm-name"><span className="wm-aus">aus</span><span className="wm-poll">pol</span></span>
+            <span className="wm-name">auspol</span>
             <span className="wm-track">tracker</span>
           </span>
           <button className="wm-glyph" ref={glyphRef} onClick={openStory}
