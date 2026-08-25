@@ -58,6 +58,7 @@
           "dateStart": { "type": "string", "description": "Fieldwork start date." },
           "pollster": { "type": "string" },
           "client": { "type": ["string", "null"], "description": "Commissioning outlet. Resolve = 'SMH / Age', Newspoll = 'The Australian', YouGov = 'Sky News', Roy Morgan = '—'." },
+          "published": { "type": "string", "description": "ISO date the poll was PUBLISHED, read off the cited source (a release header, an article's published_time). Distinct from `date`, which is the last day of fieldwork - the two differ by a day or more for most houses. Optional: where it isn't recorded the table falls back to the fieldwork end and says so." },
           "sample": { "type": ["number", "null"] },
           "undecided": { "type": ["number", "null"], "description": "Share who can't say who they'd vote for, where the house publishes one. It sits BESIDE the primaries, not inside them - Roy Morgan sets these electors aside before reporting shares, which is why its shares still sum to 100. Record only a figure the release prints for THAT wave: a combined release covering several waves prints one figure belonging to no single wave, and those rows carry none." },
           "alp": { "type": ["number", "null"] }, "lnp": { "type": ["number", "null"] },

@@ -1797,7 +1797,7 @@ function PollsterTable() {
   const { D } = window.AP;
   const HE = D.houseEffects || {};
   const [facet, setFacet] = useState("twopp");
-  const [sort, setSort] = useState({ key: "released", dir: -1 });
+  const [sort, setSort] = useState({ key: "pubSort", dir: -1 });
   const [open, setOpen] = useState(null);
 
   const onSort = (key) =>
@@ -1806,6 +1806,9 @@ function PollsterTable() {
   const getVal = (r, key) => {
     switch (key) {
       case "released": return r.released;
+      // publication date where the source gave one, fieldwork end where it
+      // didn't – the same value the column displays, so the order matches it
+      case "pubSort": return r.pubSort;
       case "sample": return r.sample ?? -Infinity;
       case "hfx.tpp": { const h = (HE.tpp || {})[r.pollster]; return h ? h.v : -Infinity; }
       case "hfx.alb": { const h = ((HE.appr || {}).alb || {})[r.pollster]; return h ? h.v : -Infinity; }
@@ -1860,7 +1863,7 @@ function PollsterTable() {
             <tr>
               <th scope="col" className="exp-col" aria-hidden="true"></th>
               <th scope="col" className="ta-l">Pollster</th>
-              <SortTh label="Published" sortKey="released" sort={sort} onSort={onSort} className="ta-l" />
+              <SortTh label="Published" sortKey="pubSort" sort={sort} onSort={onSort} className="ta-l" />
               <th scope="col" className="ta-l">Field dates</th>
               <SortTh label="Sample" sortKey="sample" sort={sort} onSort={onSort} />
 
@@ -1899,7 +1902,19 @@ function PollsterTable() {
                       <PollsterName name={r.pollster} url={r.url} />
                       <span className="pollster-mode">{r.client}</span>
                     </td>
-                    <td className="ta-l"><span className="released-pill">{r.releasedLabel}</span></td>
+                    {/* The date the poll was PUBLISHED where the source says so.
+                        Where it doesn't, this falls back to the last day of
+                        fieldwork and marks itself as a fallback rather than
+                        quietly presenting one date as the other — which is what
+                        the column did for every row until now. */}
+                    <td className="ta-l">
+                      <span className={"released-pill" + (r.publishedLabel ? "" : " est")}
+                            title={r.publishedLabel
+                              ? undefined
+                              : "Publication date not recorded for this poll – showing the last day of fieldwork"}>
+                        {r.publishedLabel || r.releasedLabel}
+                      </span>
+                    </td>
                     <td className="ta-l muted">{r.field}</td>
                     <td className="num muted">{r.sample != null ? r.sample.toLocaleString() : "—"}</td>
 
@@ -1990,6 +2005,9 @@ function PollsterTable() {
       </div>
       <p className="table-hint">
         Tap any poll to see its full breakdown · click a column heading to sort · “—” means the pollster didn’t ask that question.
+        {" "}<strong>Published</strong> is the date the poll was released, taken from the source each row links
+        to – not the last day of its fieldwork, which is the next column. A dashed date is a fallback: that
+        poll’s publication date isn’t recorded, so the column shows its fieldwork end instead.
         {" "}<strong>House effect</strong> is how far that pollster systematically sits from the cross-house
         consensus on this measure – its own average lean across every poll it has published, shrunk toward
         zero when it has published few. The aggregates subtract it. It is a property of the pollster, not of

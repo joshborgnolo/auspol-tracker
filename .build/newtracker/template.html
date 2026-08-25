@@ -1355,6 +1355,10 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
   padding: 2px 9px; white-space: nowrap; font-variant-numeric: tabular-nums;
 }
+/* a fallback date: the last day of fieldwork standing in for a publication
+   date nobody recorded. Dashed, so the column doesn't pass it off as the
+   thing its heading promises. */
+.released-pill.est { font-weight: 600; color: var(--ink-3); border-style: dashed; background: none; }
 .poll-table .muted { color: var(--ink-3); }
 .poll-table .num { font-weight: 600; font-variant-numeric: tabular-nums; }
 

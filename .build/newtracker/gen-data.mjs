@@ -774,6 +774,16 @@ const pollsterTable = [...perHouse.values()].map((p) => {
   return {
     pollster: p.pollster, client: p.client && p.client !== "—" ? p.client : "Self-published",
     field: fwLabel(p.dateStart, p.date), released: p.date, releasedLabel: `${day} ${monthName(m)}`,
+    /* When the poll was PUBLISHED, where the cited source says so. `released`
+       above is the last day of fieldwork, which is not the same thing and is
+       what the "Published" column had been showing for want of anything else.
+       `pubSort` is what that column sorts on, so the ordering means the same
+       thing the heading does. */
+    ...(p.published ? {
+      published: p.published,
+      publishedLabel: `${dayOf(p.published)} ${monthName(Number(p.published.slice(5, 7)))}`,
+    } : {}),
+    pubSort: p.published || p.date,
     sample: p.sample ?? null,
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
