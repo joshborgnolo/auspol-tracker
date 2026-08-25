@@ -864,9 +864,12 @@ function cycleSeries(points, base, cap = 36) {
   const filled = fillSeries(known, idxs);
   // Gaps BEFORE the first reading are not interpolation, they're invention:
   // fillSeries carries the earliest known value backwards, which drew Morrison
-  // at +40 from the 2019 election when that is his April-2020 COVID rally and
-  // no leader approval was published for the first eleven months of the term.
+  // at +40 from the 2019 election when that is his April-2020 COVID rally – the
+  // file then held one approval row for the whole first year of the term.
   // Leave them null so the line starts where the polling does.
+  // (That hole was a gap in the DATA, not in the polling: the Newspoll and
+  // Essential ratings from Jul 2019 on have since been entered, and the 2019
+  // cycle now starts at m2. The rule stands regardless of who is missing.)
   const firstKnown = Math.min(...Object.keys(known).map(Number));
   return { months: idxs, vals: idxs.map((i) => (i < firstKnown ? null : r1(filled[i]))) };
 }

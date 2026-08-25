@@ -21760,6 +21760,126 @@
     ],
     "2019": [
       {
+        "date": "2019-07-28",
+        "firm": "Newspoll",
+        "pmNet": 15,
+        "oppNet": 3
+      },
+      {
+        "date": "2019-08-18",
+        "firm": "Newspoll",
+        "pmNet": 6,
+        "oppNet": 7
+      },
+      {
+        "date": "2019-09-07",
+        "firm": "Newspoll",
+        "pmNet": 10,
+        "oppNet": -5
+      },
+      {
+        "date": "2019-09-16",
+        "firm": "Essential",
+        "pmNet": 13,
+        "oppNet": 5
+      },
+      {
+        "date": "2019-09-29",
+        "firm": "Newspoll",
+        "pmNet": 4,
+        "oppNet": -1
+      },
+      {
+        "date": "2019-10-16",
+        "firm": "Essential",
+        "pmNet": 9,
+        "oppNet": 11
+      },
+      {
+        "date": "2019-10-20",
+        "firm": "Newspoll",
+        "pmNet": 2,
+        "oppNet": -7
+      },
+      {
+        "date": "2019-11-10",
+        "firm": "Newspoll",
+        "pmNet": 3,
+        "oppNet": 5
+      },
+      {
+        "date": "2019-11-12",
+        "firm": "Essential",
+        "pmNet": 4,
+        "oppNet": 3
+      },
+      {
+        "date": "2019-11-23",
+        "firm": "Newspoll",
+        "pmNet": -9,
+        "oppNet": -4
+      },
+      {
+        "date": "2019-12-08",
+        "firm": "Newspoll",
+        "pmNet": -3,
+        "oppNet": -1
+      },
+      {
+        "date": "2019-12-10",
+        "firm": "Essential",
+        "pmNet": 2,
+        "oppNet": 11
+      },
+      {
+        "date": "2020-01-11",
+        "firm": "Newspoll",
+        "pmNet": -22,
+        "oppNet": 9
+      },
+      {
+        "date": "2020-01-11",
+        "firm": "Essential",
+        "pmNet": -20,
+        "oppNet": null
+      },
+      {
+        "date": "2020-02-01",
+        "firm": "Newspoll",
+        "pmNet": -22,
+        "oppNet": 3
+      },
+      {
+        "date": "2020-02-10",
+        "firm": "Essential",
+        "pmNet": -13,
+        "oppNet": 10
+      },
+      {
+        "date": "2020-02-22",
+        "firm": "Newspoll",
+        "pmNet": -20,
+        "oppNet": -5
+      },
+      {
+        "date": "2020-03-11",
+        "firm": "Essential",
+        "pmNet": -8,
+        "oppNet": 8
+      },
+      {
+        "date": "2020-03-14",
+        "firm": "Newspoll",
+        "pmNet": -12,
+        "oppNet": 0
+      },
+      {
+        "date": "2020-04-06",
+        "firm": "Essential",
+        "pmNet": 28,
+        "oppNet": 15
+      },
+      {
         "date": "2020-04-25",
         "firm": "Newspoll",
         "pmNet": 40,
