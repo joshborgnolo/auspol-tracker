@@ -71,8 +71,10 @@
      used to set its own, 700 weight over 13px tracked caps, which made it a
      third version of a wordmark that only has one. The offsets are the
      header's own, read off the rendered lockup: the second baseline sits
-     29.5px under the first, and the dial's arc centre 34px right of the text
-     block and 16.85px under the first baseline. */
+     29.5px under the first, and the dial's arc centre 43.8px right of the text
+     block and 20.33px under it - which is where the pivot has to sit for the
+     dial's painted extent to centre on the wordmark's, since the pivot is 11
+     units below the middle of what gets drawn. */
   const BL1 = 92, BL2 = BL1 + 29.5;
   c.font = '800 30px "Public Sans", sans-serif'; c.letterSpacing = "-0.75px";
   c.fillStyle = T.ink; c.fillText("auspol", PAD, BL1);
@@ -108,7 +110,7 @@
     c.strokeStyle = m >= 0 ? T.alp : T.lnp; c.lineWidth = 2.8 * k;
     c.lineCap = "round"; c.stroke();
     c.beginPath(); c.arc(cx, cy, 2.2 * k, 0, 7); c.fillStyle = T.ink; c.fill();
-  })(PAD + wMark + 34, BL1 + 16.85, 1.25);
+  })(PAD + wMark + 43.8, BL1 + 20.33, 1.485);
 
   /* The reading rides in the masthead band, right-aligned under the date.
      The band was 143px tall carrying one 14px line; the figures below need

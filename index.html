@@ -299,7 +299,11 @@ body {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
-.wordmark.stacked { flex-direction: row; align-items: center; gap: 7px; }
+/* 12px, not 7: the dial's nearest ink is the tallest graduation's tip, which
+   reaches to within 0.9px of the box edge, so the clear space a reader sees is
+   the gap plus almost nothing. 12px puts it at 12.9px - a third of the mark's
+   own height, and it opens to 25px beside the letters themselves. */
+.wordmark.stacked { flex-direction: row; align-items: center; gap: 12px; }
 /* Both words at ONE size, told apart by weight alone. At 30px `auspol` at 800
    measures 93.6px and `tracker` at 400 measures 95px, so the block squares
    itself off on its own - no tracking, no size step, no indent to force it.
@@ -329,6 +333,13 @@ body {
    two-tone 2PP swing arc, needle from the shared pivot */
 .wm-glyph {
   display: inline-flex; align-items: center; margin-left: 0; align-self: center;
+  /* No vertical nudge, and none needed: once the viewBox bounds what is
+     actually drawn, centring the box centres the INK - 0.05px off the
+     wordmark's own ink centre. The old translateY was compensating for a
+     viewBox with all its slack on one side. The dial's own foot cannot help
+     here: standing it on either visible baseline throws it 10px clear of the
+     block at one end or 2.5px past it at the other, and the midpoint between
+     them is a construction line nobody can see. */
   background: none; border: 0; padding: 3px; margin: -3px; cursor: pointer;
   border-radius: 8px; transition: transform .28s cubic-bezier(.3,1.2,.5,1), background-color .2s ease;
 }
@@ -11024,9 +11035,9 @@ function Header({
     "aria-label": "Wind the dial back: replay the term on the masthead dial"
   }, /*#__PURE__*/React.createElement("svg", {
     className: "wm-dial",
-    viewBox: "0 0 44 28",
-    width: "54",
-    height: "34.4",
+    viewBox: "0.58 0.07 38.39 26.73",
+    width: "57",
+    height: "39.7",
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("title", null, glyphTitle + " · " + pendTitle), /*#__PURE__*/React.createElement("path", {
     d: arcPath(-90, 0),

@@ -109,7 +109,16 @@ function Header({ isDark, onToggleTheme }) {
           <button className="wm-glyph" ref={glyphRef} onClick={openStory}
                   title="Wind the dial back through the term"
                   aria-label="Wind the dial back: replay the term on the masthead dial">
-            <svg className="wm-dial" viewBox="0 0 44 28" width="54" height="34.4" aria-hidden="true">
+            {/* viewBox bounds what is actually drawn, the way the favicon's does in
+                build.mjs, rather than the old hardcoded 0 0 44 28 - which held the
+                ink hard against its left edge and carried 5.6 units of dead space
+                on the right, so the CSS gap never meant what it said. The extremes
+                are fixed, not data-driven: the sort pins the longest graduation to
+                -54° and the shortest to +54°, so only the two middle bars vary and
+                they cannot reach past the top edge. 57px sizes the ink to 74% of
+                the wordmark's height, the proportion the lockup was drawn with
+                before both words went to 30px. */}
+            <svg className="wm-dial" viewBox="0.58 0.07 38.39 26.73" width="57" height="39.7" aria-hidden="true">
               <title>{glyphTitle + " · " + pendTitle}</title>
               {/* half-circle two-tone swing arc: Labor left, strongest challenger right */}
               <path d={arcPath(-90, 0)} className="wm-arc" stroke="var(--alp)"></path>
