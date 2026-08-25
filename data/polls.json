@@ -2,7 +2,12 @@
   "$comment": "Canonical dataset for the auspol tracker. See polls.schema.json for field meanings. Edit this file to add a poll, then run: node .build/newtracker/build.mjs",
   "meta": {
     "migratedFrom": "auspol-polling.html",
-    "migratedOn": "2026-08-20"
+    "migratedOn": "2026-08-20",
+    "essentialBackfill": {
+      "on": "2026-08-26",
+      "source": "essential_voting_intention_2007-2019.csv, essential_leader_ratings_2007-2019_1.csv",
+      "note": "Essential 2007-2019 backfill. CSV report dates re-keyed onto the preceding Sunday (fieldwork end); `oth` reconstructed as the 100-minus-residual the CSVs omitted; waves already in the file were skipped, not overwritten. cyclePolls.2010 / cycleApproval.2007 hold the 2007-2010 term, which no CYC_META entry charts - stored so one can be."
+    }
   },
   "metricRules": {
     "favFirms": [
@@ -5946,7 +5951,1461 @@
     }
   ],
   "cyclePolls": {
+    "2010": [
+      {
+        "date": "2007-12-09",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 49,
+        "grn": 6,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2007-12-16",
+        "firm": "Essential",
+        "lnp": 31,
+        "alp": 52,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
+      },
+      {
+        "date": "2007-12-21",
+        "firm": "Essential",
+        "lnp": 32,
+        "alp": 50,
+        "grn": 12,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
+      },
+      {
+        "date": "2008-01-13",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 48,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-01-20",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 49,
+        "grn": 7,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-01-27",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 50,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2008-02-03",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 47,
+        "grn": 7,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2008-02-10",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-02-17",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2008-02-24",
+        "firm": "Essential",
+        "lnp": 29,
+        "alp": 54,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 36,
+        "tpp_alp": 64
+      },
+      {
+        "date": "2008-03-02",
+        "firm": "Essential",
+        "lnp": 30,
+        "alp": 55,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 36,
+        "tpp_alp": 64
+      },
+      {
+        "date": "2008-03-09",
+        "firm": "Essential",
+        "lnp": 32,
+        "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2008-03-16",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 46,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2008-03-23",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 49,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-04-06",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 51,
+        "grn": 7,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2008-04-13",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 53,
+        "grn": 7,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2008-04-20",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 45,
+        "grn": 6,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2008-04-27",
+        "firm": "Essential",
+        "lnp": 32,
+        "alp": 53,
+        "grn": 6,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2008-05-04",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 51,
+        "grn": 7,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2008-05-11",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 50,
+        "grn": 7,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2008-05-18",
+        "firm": "Essential",
+        "lnp": 32,
+        "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2008-05-25",
+        "firm": "Essential",
+        "lnp": 32,
+        "alp": 50,
+        "grn": 8,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2008-06-01",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 46,
+        "grn": 7,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2008-06-08",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-06-15",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 50,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2008-06-22",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 49,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-06-29",
+        "firm": "Essential",
+        "lnp": 31,
+        "alp": 48,
+        "grn": 10,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2008-07-06",
+        "firm": "Essential",
+        "lnp": 31,
+        "alp": 50,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
+      },
+      {
+        "date": "2008-07-13",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-07-20",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 45,
+        "grn": 9,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2008-07-27",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-08-03",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-08-10",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 46,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-08-17",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 45,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-08-24",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-08-31",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 48,
+        "grn": 7,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-09-07",
+        "firm": "Essential",
+        "lnp": 33,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-09-14",
+        "firm": "Essential",
+        "lnp": 33,
+        "alp": 45,
+        "grn": 10,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-09-21",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 44,
+        "grn": 11,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2008-09-28",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-10-05",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-10-12",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 44,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2008-10-26",
+        "firm": "Essential",
+        "lnp": 33,
+        "alp": 50,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2008-11-02",
+        "firm": "Essential",
+        "lnp": 33,
+        "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2008-11-09",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 49,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-11-16",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 44,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2008-11-23",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 45,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2008-11-30",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-12-07",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 50,
+        "grn": 7,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-12-14",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-01-11",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 49,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2009-01-18",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 50,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2009-01-25",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 50,
+        "grn": 9,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2009-02-01",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 50,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2009-02-08",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2009-02-15",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2009-02-22",
+        "firm": "Essential",
+        "lnp": 32,
+        "alp": 52,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
+      },
+      {
+        "date": "2009-03-01",
+        "firm": "Essential",
+        "lnp": 32,
+        "alp": 52,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
+      },
+      {
+        "date": "2009-03-08",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 50,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2009-03-15",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 49,
+        "grn": 6,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-03-22",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 50,
+        "grn": 7,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2009-03-29",
+        "firm": "Essential",
+        "lnp": 31,
+        "alp": 53,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 37,
+        "tpp_alp": 63
+      },
+      {
+        "date": "2009-04-05",
+        "firm": "Essential",
+        "lnp": 32,
+        "alp": 54,
+        "grn": 9,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 37,
+        "tpp_alp": 63
+      },
+      {
+        "date": "2009-04-12",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2009-04-19",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 50,
+        "grn": 7,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2009-04-26",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-05-03",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2009-05-10",
+        "firm": "Essential",
+        "lnp": 33,
+        "alp": 50,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2009-05-17",
+        "firm": "Essential",
+        "lnp": 32,
+        "alp": 52,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
+      },
+      {
+        "date": "2009-05-24",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 49,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2009-05-31",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 45,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2009-06-07",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 47,
+        "grn": 7,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2009-06-14",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2009-06-21",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2009-06-28",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-07-05",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 49,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2009-07-12",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2009-07-19",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 46,
+        "grn": 7,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2009-07-26",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 48,
+        "grn": 7,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2009-08-02",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 50,
+        "grn": 7,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2009-08-09",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 50,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2009-08-16",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-08-23",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-08-30",
+        "firm": "Essential",
+        "lnp": 33,
+        "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2009-09-06",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2009-09-13",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 49,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2009-09-20",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-09-27",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 49,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2009-10-04",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 50,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2009-10-11",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-10-18",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 49,
+        "grn": 7,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-10-25",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 50,
+        "grn": 7,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2009-11-01",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 49,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2009-11-08",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 48,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2009-11-15",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 45,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2009-11-22",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 45,
+        "grn": 7,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2009-11-29",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-12-06",
+        "firm": "Essential",
+        "lnp": 34,
+        "alp": 46,
+        "grn": 9,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-12-13",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 46,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-12-20",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2010-01-17",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 45,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2010-01-24",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 46,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2010-01-31",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 45,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2010-02-07",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 44,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2010-02-14",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 44,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2010-02-21",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 43,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-02-28",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 42,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2010-03-07",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 43,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-03-14",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 45,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2010-03-21",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 45,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2010-03-28",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 43,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-04-04",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 43,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-04-11",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 41,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-04-18",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 42,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-04-25",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 42,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-05-02",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 40,
+        "grn": 11,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2010-05-09",
+        "firm": "Essential",
+        "lnp": 42,
+        "alp": 37,
+        "grn": 11,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2010-05-16",
+        "firm": "Essential",
+        "lnp": 43,
+        "alp": 38,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2010-05-23",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 40,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-05-30",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 9,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2010-06-06",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 37,
+        "grn": 12,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-06-13",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 35,
+        "grn": 14,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2010-06-20",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 38,
+        "grn": 11,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-06-27",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 42,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-07-04",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 42,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-07-11",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 41,
+        "grn": 13,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2010-07-18",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 41,
+        "grn": 13,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2010-07-25",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 41,
+        "grn": 13,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2010-08-01",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 40,
+        "grn": 13,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-08-08",
+        "firm": "Essential",
+        "lnp": 42,
+        "alp": 41,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-08-15",
+        "firm": "Essential",
+        "lnp": 44,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      }
+    ],
     "2013": [
+      {
+        "date": "2010-08-22",
+        "firm": "Essential",
+        "lnp": 45,
+        "alp": 38,
+        "grn": 11,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
       {
         "date": "2010-08-26",
         "firm": "Morgan",
@@ -7466,6 +8925,17 @@
         "tpp_alp": 45
       },
       {
+        "date": "2011-10-23",
+        "firm": "Essential",
+        "lnp": 48,
+        "alp": 32,
+        "grn": 11,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 55,
+        "tpp_alp": 45
+      },
+      {
         "date": "2011-10-30",
         "firm": "Morgan",
         "lnp": 46.5,
@@ -8650,6 +10120,17 @@
         "grn": 9,
         "onp": null,
         "oth": 9,
+        "tpp_lnp": 55,
+        "tpp_alp": 45
+      },
+      {
+        "date": "2012-09-09",
+        "firm": "Essential",
+        "lnp": 47,
+        "alp": 34,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
         "tpp_lnp": 55,
         "tpp_alp": 45
       },
@@ -10416,6 +11897,17 @@
         "tpp_alp": 46.5
       },
       {
+        "date": "2013-09-08",
+        "firm": "Essential",
+        "lnp": 45,
+        "alp": 35,
+        "grn": 9,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
         "date": "2013-09-15",
         "firm": "Essential",
         "lnp": 44,
@@ -10449,6 +11941,39 @@
         "tpp_alp": 49.5
       },
       {
+        "date": "2013-09-29",
+        "firm": "Essential",
+        "lnp": 43,
+        "alp": 36,
+        "grn": 9,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2013-10-06",
+        "firm": "Essential",
+        "lnp": 43,
+        "alp": 35,
+        "grn": 9,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2013-10-13",
+        "firm": "Essential",
+        "lnp": 43,
+        "alp": 35,
+        "grn": 10,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
         "date": "2013-10-20",
         "firm": "Morgan",
         "lnp": 43.5,
@@ -10458,6 +11983,17 @@
         "oth": 12,
         "tpp_lnp": 51.5,
         "tpp_alp": 48.5
+      },
+      {
+        "date": "2013-10-20",
+        "firm": "Essential",
+        "lnp": 44,
+        "alp": 34,
+        "grn": 10,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
       },
       {
         "date": "2013-10-27",
@@ -10471,6 +12007,28 @@
         "tpp_alp": 44
       },
       {
+        "date": "2013-10-27",
+        "firm": "Essential",
+        "lnp": 45,
+        "alp": 35,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2013-11-03",
+        "firm": "Essential",
+        "lnp": 45,
+        "alp": 36,
+        "grn": 8,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
         "date": "2013-11-10",
         "firm": "Newspoll",
         "lnp": 45,
@@ -10478,6 +12036,28 @@
         "grn": 12,
         "onp": null,
         "oth": 11,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2013-11-10",
+        "firm": "Essential",
+        "lnp": 44,
+        "alp": 35,
+        "grn": 9,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2013-11-17",
+        "firm": "Essential",
+        "lnp": 44,
+        "alp": 35,
+        "grn": 9,
+        "onp": null,
+        "oth": 12,
         "tpp_lnp": 53,
         "tpp_alp": 47
       },
@@ -10502,6 +12082,17 @@
         "oth": 12,
         "tpp_lnp": 52,
         "tpp_alp": 48
+      },
+      {
+        "date": "2013-11-24",
+        "firm": "Essential",
+        "lnp": 45,
+        "alp": 36,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
       },
       {
         "date": "2013-12-01",
@@ -10537,6 +12128,17 @@
         "tpp_alp": 52
       },
       {
+        "date": "2013-12-08",
+        "firm": "Essential",
+        "lnp": 44,
+        "alp": 37,
+        "grn": 8,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
         "date": "2013-12-15",
         "firm": "ReachTEL",
         "lnp": 41.4,
@@ -10548,6 +12150,17 @@
         "tpp_alp": 52
       },
       {
+        "date": "2013-12-15",
+        "firm": "Essential",
+        "lnp": 44,
+        "alp": 37,
+        "grn": 7,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
         "date": "2013-12-16",
         "firm": "Morgan",
         "lnp": 40.5,
@@ -10557,6 +12170,17 @@
         "oth": 11,
         "tpp_lnp": 47.5,
         "tpp_alp": 52.5
+      },
+      {
+        "date": "2014-01-12",
+        "firm": "Essential",
+        "lnp": 44,
+        "alp": 38,
+        "grn": 7,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2014-01-13",
@@ -10592,6 +12216,17 @@
         "tpp_alp": 53
       },
       {
+        "date": "2014-01-26",
+        "firm": "Essential",
+        "lnp": 42,
+        "alp": 36,
+        "grn": 9,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
         "date": "2014-01-28",
         "firm": "Morgan",
         "lnp": 39.5,
@@ -10601,6 +12236,17 @@
         "oth": 12,
         "tpp_lnp": 47,
         "tpp_alp": 53
+      },
+      {
+        "date": "2014-02-02",
+        "firm": "Essential",
+        "lnp": 43,
+        "alp": 38,
+        "grn": 8,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
       },
       {
         "date": "2014-02-09",
@@ -10614,6 +12260,17 @@
         "tpp_alp": 51
       },
       {
+        "date": "2014-02-09",
+        "firm": "Essential",
+        "lnp": 43,
+        "alp": 39,
+        "grn": 8,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
         "date": "2014-02-15",
         "firm": "Nielsen",
         "lnp": 44,
@@ -10623,6 +12280,17 @@
         "oth": 11,
         "tpp_lnp": 52,
         "tpp_alp": 48
+      },
+      {
+        "date": "2014-02-16",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 40,
+        "grn": 8,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2014-02-23",
@@ -10647,6 +12315,17 @@
         "tpp_alp": 50.5
       },
       {
+        "date": "2014-02-23",
+        "firm": "Essential",
+        "lnp": 42,
+        "alp": 39,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
         "date": "2014-03-05",
         "firm": "Essential",
         "lnp": 44,
@@ -10667,6 +12346,17 @@
         "oth": 13,
         "tpp_lnp": 49,
         "tpp_alp": 51
+      },
+      {
+        "date": "2014-03-09",
+        "firm": "Essential",
+        "lnp": 42,
+        "alp": 38,
+        "grn": 8,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
       },
       {
         "date": "2014-03-15",
@@ -10724,6 +12414,17 @@
         "tpp_alp": 54.5
       },
       {
+        "date": "2014-03-30",
+        "firm": "Essential",
+        "lnp": 42,
+        "alp": 39,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
         "date": "2014-04-06",
         "firm": "Newspoll",
         "lnp": 43,
@@ -10779,6 +12480,17 @@
         "tpp_alp": 50
       },
       {
+        "date": "2014-04-20",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 37,
+        "grn": 11,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
         "date": "2014-04-22",
         "firm": "Morgan",
         "lnp": 38.5,
@@ -10819,6 +12531,28 @@
         "grn": 11,
         "onp": null,
         "oth": 13,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2014-05-04",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 38,
+        "grn": 10,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2014-05-11",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 39,
+        "grn": 9,
+        "onp": null,
+        "oth": 12,
         "tpp_lnp": 48,
         "tpp_alp": 52
       },
@@ -10889,6 +12623,28 @@
         "tpp_alp": 54
       },
       {
+        "date": "2014-06-01",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2014-06-08",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 40,
+        "grn": 9,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
         "date": "2014-06-15",
         "firm": "Newspoll",
         "lnp": 37,
@@ -10898,6 +12654,28 @@
         "oth": 17,
         "tpp_lnp": 47,
         "tpp_alp": 53
+      },
+      {
+        "date": "2014-06-15",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 41,
+        "grn": 9,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2014-06-22",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 38,
+        "grn": 9,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2014-06-29",
@@ -10933,6 +12711,17 @@
         "tpp_alp": 52
       },
       {
+        "date": "2014-07-06",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 40,
+        "grn": 9,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
         "date": "2014-07-13",
         "firm": "Newspoll",
         "lnp": 36,
@@ -10944,6 +12733,28 @@
         "tpp_alp": 54
       },
       {
+        "date": "2014-07-13",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 40,
+        "grn": 9,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2014-07-20",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 39,
+        "grn": 9,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2014-07-27",
         "firm": "Newspoll",
         "lnp": 36,
@@ -10953,6 +12764,28 @@
         "oth": 16,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2014-07-27",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 38,
+        "grn": 9,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2014-08-03",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 9,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2014-08-10",
@@ -10975,6 +12808,17 @@
         "oth": 13.5,
         "tpp_lnp": 44,
         "tpp_alp": 56
+      },
+      {
+        "date": "2014-08-10",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 8,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2014-08-19",
@@ -11010,6 +12854,28 @@
         "tpp_alp": 51
       },
       {
+        "date": "2014-08-24",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 37,
+        "grn": 10,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2014-08-31",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 38,
+        "grn": 9,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2014-09-07",
         "firm": "Newspoll",
         "lnp": 39,
@@ -11030,6 +12896,28 @@
         "oth": 14.5,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2014-09-07",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 38,
+        "grn": 10,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2014-09-14",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 38,
+        "grn": 11,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2014-09-18",
@@ -11054,6 +12942,17 @@
         "tpp_alp": 54.5
       },
       {
+        "date": "2014-09-21",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
         "date": "2014-09-23",
         "firm": "Newspoll",
         "lnp": 41,
@@ -11063,6 +12962,17 @@
         "oth": 14,
         "tpp_lnp": 49,
         "tpp_alp": 51
+      },
+      {
+        "date": "2014-09-28",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2014-10-05",
@@ -11329,6 +13239,17 @@
         "tpp_alp": 52
       },
       {
+        "date": "2014-12-07",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
         "date": "2014-12-14",
         "firm": "Morgan",
         "lnp": 35,
@@ -11439,6 +13360,17 @@
         "tpp_alp": 57
       },
       {
+        "date": "2015-02-01",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 41,
+        "grn": 9,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
         "date": "2015-02-05",
         "firm": "Galaxy",
         "lnp": 36,
@@ -11483,6 +13415,28 @@
         "tpp_alp": 57.5
       },
       {
+        "date": "2015-02-08",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 41,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2015-02-15",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 41,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
         "date": "2015-02-22",
         "firm": "Newspoll",
         "lnp": 38,
@@ -11514,6 +13468,17 @@
         "oth": 10,
         "tpp_lnp": 49,
         "tpp_alp": 51
+      },
+      {
+        "date": "2015-03-01",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 41,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2015-03-08",
@@ -11582,6 +13547,17 @@
         "tpp_alp": 51
       },
       {
+        "date": "2015-03-22",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 41,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
         "date": "2015-03-29",
         "firm": "ReachTEL",
         "lnp": 39.6,
@@ -11591,6 +13567,28 @@
         "oth": 8.5,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2015-03-29",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 40,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2015-04-05",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2015-04-06",
@@ -11670,6 +13668,17 @@
         "tpp_alp": 53
       },
       {
+        "date": "2015-05-03",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
         "date": "2015-05-04",
         "firm": "Morgan",
         "lnp": 40,
@@ -11734,6 +13743,17 @@
         "oth": 9,
         "tpp_lnp": 50,
         "tpp_alp": 50
+      },
+      {
+        "date": "2015-05-17",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 40,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2015-05-18",
@@ -11846,6 +13866,17 @@
         "tpp_alp": 52
       },
       {
+        "date": "2015-06-21",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2015-06-28",
         "firm": "Morgan",
         "lnp": 39,
@@ -11855,6 +13886,17 @@
         "oth": 11,
         "tpp_lnp": 46.5,
         "tpp_alp": 53.5
+      },
+      {
+        "date": "2015-06-28",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 11,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2015-07-04",
@@ -11873,6 +13915,17 @@
         "lnp": 40,
         "alp": 37,
         "grn": 13,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2015-07-05",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 10,
         "onp": null,
         "oth": 10,
         "tpp_lnp": 48,
@@ -12033,6 +14086,17 @@
         "tpp_alp": 54.5
       },
       {
+        "date": "2015-08-23",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 37,
+        "grn": 10,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
         "date": "2015-08-27",
         "firm": "ReachTEL",
         "lnp": 40.3,
@@ -12077,6 +14141,17 @@
         "tpp_alp": 55
       },
       {
+        "date": "2015-09-06",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 38,
+        "grn": 11,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2015-09-13",
         "firm": "Morgan",
         "lnp": 35,
@@ -12086,6 +14161,17 @@
         "oth": 12.5,
         "tpp_lnp": 43,
         "tpp_alp": 57
+      },
+      {
+        "date": "2015-09-13",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 38,
+        "grn": 11,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2015-09-15",
@@ -12330,6 +14416,17 @@
         "tpp_alp": 44
       },
       {
+        "date": "2015-11-15",
+        "firm": "Essential",
+        "lnp": 45,
+        "alp": 36,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
         "date": "2015-11-22",
         "firm": "Newspoll",
         "lnp": 46,
@@ -12473,6 +14570,17 @@
         "tpp_alp": 45
       },
       {
+        "date": "2016-01-24",
+        "firm": "Essential",
+        "lnp": 44,
+        "alp": 35,
+        "grn": 10,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
         "date": "2016-01-31",
         "firm": "Newspoll",
         "lnp": 46,
@@ -12482,6 +14590,17 @@
         "oth": 9,
         "tpp_lnp": 53,
         "tpp_alp": 47
+      },
+      {
+        "date": "2016-01-31",
+        "firm": "Essential",
+        "lnp": 44,
+        "alp": 35,
+        "grn": 11,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
       },
       {
         "date": "2016-02-07",
@@ -12524,6 +14643,17 @@
         "grn": 15,
         "onp": null,
         "oth": 10,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2016-02-14",
+        "firm": "Essential",
+        "lnp": 43,
+        "alp": 33,
+        "grn": 11,
+        "onp": null,
+        "oth": 13,
         "tpp_lnp": 52,
         "tpp_alp": 48
       },
@@ -12616,6 +14746,17 @@
         "tpp_alp": 47
       },
       {
+        "date": "2016-03-13",
+        "firm": "Essential",
+        "lnp": 42,
+        "alp": 36,
+        "grn": 11,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
         "date": "2016-03-20",
         "firm": "Morgan",
         "lnp": 40,
@@ -12660,6 +14801,17 @@
         "tpp_alp": 48
       },
       {
+        "date": "2016-03-27",
+        "firm": "Essential",
+        "lnp": 43,
+        "alp": 38,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
         "date": "2016-04-03",
         "firm": "Morgan",
         "lnp": 42,
@@ -12680,6 +14832,17 @@
         "oth": 12,
         "tpp_lnp": 49,
         "tpp_alp": 51
+      },
+      {
+        "date": "2016-04-03",
+        "firm": "Essential",
+        "lnp": 42,
+        "alp": 37,
+        "grn": 10,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
       },
       {
         "date": "2016-04-10",
@@ -13111,6 +15274,17 @@
         "tpp_alp": 50
       },
       {
+        "date": "2016-06-29",
+        "firm": "Galaxy",
+        "lnp": 43,
+        "alp": 36,
+        "grn": 10,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
         "date": "2016-06-30",
         "firm": "Essential",
         "lnp": 42.5,
@@ -13129,17 +15303,6 @@
         "grn": 10.7,
         "onp": null,
         "oth": 12,
-        "tpp_lnp": 51,
-        "tpp_alp": 49
-      },
-      {
-        "date": "2016-06-29",
-        "firm": "Galaxy",
-        "lnp": 43,
-        "alp": 36,
-        "grn": 10,
-        "onp": null,
-        "oth": 11,
         "tpp_lnp": 51,
         "tpp_alp": 49
       },
@@ -13344,6 +15507,17 @@
         "tpp_alp": 51
       },
       {
+        "date": "2016-09-04",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 37,
+        "grn": 10,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2016-09-11",
         "firm": "Newspoll",
         "lnp": 41,
@@ -13366,6 +15540,17 @@
         "tpp_alp": 52
       },
       {
+        "date": "2016-09-18",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 37,
+        "grn": 10,
+        "onp": 6,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2016-09-25",
         "firm": "Newspoll",
         "lnp": 38,
@@ -13375,6 +15560,28 @@
         "oth": 15,
         "tpp_lnp": 48,
         "tpp_alp": 52
+      },
+      {
+        "date": "2016-09-25",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 36,
+        "grn": 9,
+        "onp": 6,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2016-10-02",
+        "firm": "Essential",
+        "lnp": 40,
+        "alp": 36,
+        "grn": 8,
+        "onp": 6,
+        "oth": 10,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
       },
       {
         "date": "2016-10-09",
@@ -13421,6 +15628,28 @@
         "tpp_alp": 52
       },
       {
+        "date": "2016-10-23",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 37,
+        "grn": 10,
+        "onp": 6,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2016-10-30",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 37,
+        "grn": 10,
+        "onp": 6,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2016-11-06",
         "firm": "Newspoll",
         "lnp": 39,
@@ -13428,6 +15657,17 @@
         "grn": 10,
         "onp": null,
         "oth": 13,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2016-11-06",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 37,
+        "grn": 10,
+        "onp": 6,
+        "oth": 9,
         "tpp_lnp": 47,
         "tpp_alp": 53
       },
@@ -13452,6 +15692,17 @@
         "oth": 10,
         "tpp_lnp": 47,
         "tpp_alp": 53
+      },
+      {
+        "date": "2016-11-20",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 37,
+        "grn": 10,
+        "onp": 6,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2016-11-26",
@@ -13487,6 +15738,17 @@
         "tpp_alp": 52
       },
       {
+        "date": "2016-12-04",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 36,
+        "grn": 9,
+        "onp": 8,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2016-12-12",
         "firm": "Essential",
         "lnp": 37,
@@ -13494,6 +15756,17 @@
         "grn": 9,
         "onp": 7,
         "oth": 9,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2016-12-18",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 37,
+        "grn": 10,
+        "onp": 8,
+        "oth": 8,
         "tpp_lnp": 47,
         "tpp_alp": 53
       },
@@ -13531,6 +15804,17 @@
         "tpp_alp": 54
       },
       {
+        "date": "2017-01-29",
+        "firm": "Essential",
+        "lnp": 35,
+        "alp": 37,
+        "grn": 9,
+        "onp": 10,
+        "oth": 9,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
         "date": "2017-02-05",
         "firm": "Newspoll",
         "lnp": 35,
@@ -13540,6 +15824,17 @@
         "oth": 11,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2017-02-05",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 37,
+        "grn": 8,
+        "onp": 10,
+        "oth": 9,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2017-02-12",
@@ -13573,6 +15868,17 @@
         "oth": 9,
         "tpp_lnp": 45,
         "tpp_alp": 55
+      },
+      {
+        "date": "2017-02-26",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 37,
+        "grn": 9,
+        "onp": 9,
+        "oth": 8,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2017-03-06",
@@ -13696,6 +16002,17 @@
         "tpp_alp": 52
       },
       {
+        "date": "2017-04-23",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 36,
+        "grn": 10,
+        "onp": 8,
+        "oth": 9,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
         "date": "2017-04-30",
         "firm": "Essential",
         "lnp": 38,
@@ -13705,6 +16022,17 @@
         "oth": 9,
         "tpp_lnp": 47,
         "tpp_alp": 53
+      },
+      {
+        "date": "2017-05-07",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 38,
+        "grn": 10,
+        "onp": 6,
+        "oth": 9,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
       },
       {
         "date": "2017-05-11",
@@ -13729,6 +16057,17 @@
         "tpp_alp": 53
       },
       {
+        "date": "2017-05-14",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 38,
+        "grn": 10,
+        "onp": 6,
+        "oth": 9,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
         "date": "2017-05-15",
         "firm": "Newspoll",
         "lnp": 36,
@@ -13751,6 +16090,17 @@
         "tpp_alp": 54
       },
       {
+        "date": "2017-05-28",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 36,
+        "grn": 11,
+        "onp": 5,
+        "oth": 10,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
         "date": "2017-05-29",
         "firm": "Newspoll",
         "lnp": 36,
@@ -13760,6 +16110,17 @@
         "oth": 9,
         "tpp_lnp": 47,
         "tpp_alp": 53
+      },
+      {
+        "date": "2017-06-04",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 37,
+        "grn": 10,
+        "onp": 6,
+        "oth": 8,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2017-06-14",
@@ -13784,6 +16145,28 @@
         "tpp_alp": 53
       },
       {
+        "date": "2017-06-18",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 35,
+        "grn": 9,
+        "onp": 9,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2017-06-25",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 36,
+        "grn": 10,
+        "onp": 7,
+        "oth": 8,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2017-06-27",
         "firm": "YouGov",
         "lnp": 33,
@@ -13806,6 +16189,17 @@
         "tpp_alp": 52
       },
       {
+        "date": "2017-07-02",
+        "firm": "Essential",
+        "lnp": 38,
+        "alp": 36,
+        "grn": 11,
+        "onp": 7,
+        "oth": 8,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
         "date": "2017-07-09",
         "firm": "Newspoll",
         "lnp": 35,
@@ -13815,6 +16209,17 @@
         "oth": 8,
         "tpp_lnp": 47,
         "tpp_alp": 53
+      },
+      {
+        "date": "2017-07-09",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 36,
+        "grn": 11,
+        "onp": 7,
+        "oth": 10,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
       },
       {
         "date": "2017-07-11",
@@ -14103,6 +16508,17 @@
         "tpp_alp": 54
       },
       {
+        "date": "2017-10-08",
+        "firm": "Essential",
+        "lnp": 36,
+        "alp": 38,
+        "grn": 10,
+        "onp": 7,
+        "oth": 9,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
         "date": "2017-10-15",
         "firm": "Newspoll",
         "lnp": 36,
@@ -14112,6 +16528,17 @@
         "oth": 8,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2017-10-15",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 36,
+        "grn": 9,
+        "onp": 8,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2017-10-24",
@@ -14145,6 +16572,17 @@
         "oth": 9,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2017-11-05",
+        "firm": "Essential",
+        "lnp": 37,
+        "alp": 37,
+        "grn": 10,
+        "onp": 8,
+        "oth": 8,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2017-11-13",
@@ -14708,6 +17146,17 @@
         "tpp_alp": 51
       },
       {
+        "date": "2018-07-29",
+        "firm": "Essential",
+        "lnp": 41,
+        "alp": 36,
+        "grn": 10,
+        "onp": 6,
+        "oth": 7,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
         "date": "2018-08-02",
         "firm": "ReachTEL",
         "lnp": 37,
@@ -14728,6 +17177,17 @@
         "oth": 9,
         "tpp_lnp": 49,
         "tpp_alp": 51
+      },
+      {
+        "date": "2018-08-12",
+        "firm": "Essential",
+        "lnp": 39,
+        "alp": 37,
+        "grn": 10,
+        "onp": 6,
+        "oth": 8,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2018-08-18",
@@ -20324,6 +22784,358 @@
     ]
   },
   "cycleApproval": {
+    "2007": [
+      {
+        "date": "2007-12-09",
+        "firm": "Essential",
+        "pmNet": 49,
+        "oppNet": null
+      },
+      {
+        "date": "2007-12-16",
+        "firm": "Essential",
+        "pmNet": 55,
+        "oppNet": null
+      },
+      {
+        "date": "2007-12-21",
+        "firm": "Essential",
+        "pmNet": 46,
+        "oppNet": null
+      },
+      {
+        "date": "2008-01-13",
+        "firm": "Essential",
+        "pmNet": 49,
+        "oppNet": null
+      },
+      {
+        "date": "2008-01-20",
+        "firm": "Essential",
+        "pmNet": 41,
+        "oppNet": null
+      },
+      {
+        "date": "2008-01-27",
+        "firm": "Essential",
+        "pmNet": 44,
+        "oppNet": null
+      },
+      {
+        "date": "2008-02-03",
+        "firm": "Essential",
+        "pmNet": 43,
+        "oppNet": null
+      },
+      {
+        "date": "2008-02-10",
+        "firm": "Essential",
+        "pmNet": 35,
+        "oppNet": null
+      },
+      {
+        "date": "2008-02-17",
+        "firm": "Essential",
+        "pmNet": 42,
+        "oppNet": null
+      },
+      {
+        "date": "2008-02-24",
+        "firm": "Essential",
+        "pmNet": 49,
+        "oppNet": null
+      },
+      {
+        "date": "2008-03-02",
+        "firm": "Essential",
+        "pmNet": 43,
+        "oppNet": null
+      },
+      {
+        "date": "2008-03-09",
+        "firm": "Essential",
+        "pmNet": 45,
+        "oppNet": null
+      },
+      {
+        "date": "2008-03-23",
+        "firm": "Essential",
+        "pmNet": 40,
+        "oppNet": null
+      },
+      {
+        "date": "2008-04-06",
+        "firm": "Essential",
+        "pmNet": 44,
+        "oppNet": null
+      },
+      {
+        "date": "2008-04-13",
+        "firm": "Essential",
+        "pmNet": 48,
+        "oppNet": null
+      },
+      {
+        "date": "2008-04-27",
+        "firm": "Essential",
+        "pmNet": 44,
+        "oppNet": null
+      },
+      {
+        "date": "2008-05-04",
+        "firm": "Essential",
+        "pmNet": 46,
+        "oppNet": null
+      },
+      {
+        "date": "2008-07-20",
+        "firm": "Essential",
+        "pmNet": 23,
+        "oppNet": -35
+      },
+      {
+        "date": "2008-08-31",
+        "firm": "Essential",
+        "pmNet": 23,
+        "oppNet": -27
+      },
+      {
+        "date": "2008-09-14",
+        "firm": "Essential",
+        "pmNet": 17,
+        "oppNet": null
+      },
+      {
+        "date": "2008-09-21",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 45,
+        "oppPpm": 25
+      },
+      {
+        "date": "2008-09-28",
+        "firm": "Essential",
+        "pmNet": 28,
+        "oppNet": 6
+      },
+      {
+        "date": "2008-10-05",
+        "firm": "Essential",
+        "pmNet": 25,
+        "oppNet": null
+      },
+      {
+        "date": "2008-10-19",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 55,
+        "oppPpm": 20
+      },
+      {
+        "date": "2008-10-26",
+        "firm": "Essential",
+        "pmNet": 44,
+        "oppNet": 4,
+        "pmPpm": 60,
+        "oppPpm": 19
+      },
+      {
+        "date": "2008-11-02",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 56,
+        "oppPpm": 21
+      },
+      {
+        "date": "2008-11-23",
+        "firm": "Essential",
+        "pmNet": 42,
+        "oppNet": 5,
+        "pmPpm": 57,
+        "oppPpm": 21
+      },
+      {
+        "date": "2009-01-11",
+        "firm": "Essential",
+        "pmNet": 44,
+        "oppNet": 11
+      },
+      {
+        "date": "2009-01-18",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 56,
+        "oppPpm": 20
+      },
+      {
+        "date": "2009-02-08",
+        "firm": "Essential",
+        "pmNet": 44,
+        "oppNet": -11
+      },
+      {
+        "date": "2009-03-29",
+        "firm": "Essential",
+        "pmNet": 50,
+        "oppNet": -20
+      },
+      {
+        "date": "2009-05-17",
+        "firm": "Essential",
+        "pmNet": 33,
+        "oppNet": -19
+      },
+      {
+        "date": "2009-06-28",
+        "firm": "Essential",
+        "pmNet": 33,
+        "oppNet": -33
+      },
+      {
+        "date": "2009-08-09",
+        "firm": "Essential",
+        "pmNet": 33,
+        "oppNet": -36
+      },
+      {
+        "date": "2009-09-27",
+        "firm": "Essential",
+        "pmNet": 43,
+        "oppNet": -26
+      },
+      {
+        "date": "2009-11-08",
+        "firm": "Essential",
+        "pmNet": 29,
+        "oppNet": -21
+      },
+      {
+        "date": "2009-11-29",
+        "firm": "Essential",
+        "pmNet": 21,
+        "oppNet": -30
+      },
+      {
+        "date": "2009-12-13",
+        "firm": "Essential",
+        "pmNet": 25,
+        "oppNet": -2
+      },
+      {
+        "date": "2009-12-20",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 51,
+        "oppPpm": 25
+      },
+      {
+        "date": "2010-01-17",
+        "firm": "Essential",
+        "pmNet": 22,
+        "oppNet": 0
+      },
+      {
+        "date": "2010-02-21",
+        "firm": "Essential",
+        "pmNet": 15,
+        "oppNet": 9
+      },
+      {
+        "date": "2010-03-21",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 50,
+        "oppPpm": 30
+      },
+      {
+        "date": "2010-03-28",
+        "firm": "Essential",
+        "pmNet": 17,
+        "oppNet": -17
+      },
+      {
+        "date": "2010-05-02",
+        "firm": "Essential",
+        "pmNet": 4,
+        "oppNet": -4
+      },
+      {
+        "date": "2010-05-30",
+        "firm": "Essential",
+        "pmNet": -6,
+        "oppNet": -15
+      },
+      {
+        "date": "2010-06-20",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 50,
+        "oppPpm": 32
+      },
+      {
+        "date": "2010-06-27",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 49,
+        "oppPpm": 29
+      },
+      {
+        "date": "2010-07-04",
+        "firm": "Essential",
+        "pmNet": 21,
+        "oppNet": -10,
+        "pmPpm": 53,
+        "oppPpm": 26
+      },
+      {
+        "date": "2010-07-18",
+        "firm": "Essential",
+        "pmNet": 22,
+        "oppNet": -4,
+        "pmPpm": 50,
+        "oppPpm": 27
+      },
+      {
+        "date": "2010-07-25",
+        "firm": "Essential",
+        "pmNet": 16,
+        "oppNet": -11,
+        "pmPpm": 51,
+        "oppPpm": 26
+      },
+      {
+        "date": "2010-08-01",
+        "firm": "Essential",
+        "pmNet": 8,
+        "oppNet": -10,
+        "pmPpm": 48,
+        "oppPpm": 30
+      },
+      {
+        "date": "2010-08-08",
+        "firm": "Essential",
+        "pmNet": 5,
+        "oppNet": -5,
+        "pmPpm": 45,
+        "oppPpm": 33
+      },
+      {
+        "date": "2010-08-15",
+        "firm": "Essential",
+        "pmNet": 6,
+        "oppNet": -3,
+        "pmPpm": 46,
+        "oppPpm": 35
+      }
+    ],
     "2010": [
       {
         "date": "2010-09-12",
@@ -20332,10 +23144,26 @@
         "oppNet": 10
       },
       {
+        "date": "2010-09-19",
+        "firm": "Essential",
+        "pmNet": 8,
+        "oppNet": 6,
+        "pmPpm": 47,
+        "oppPpm": 35
+      },
+      {
         "date": "2010-10-10",
         "firm": "Newspoll",
         "pmNet": 15,
         "oppNet": -8
+      },
+      {
+        "date": "2010-10-17",
+        "firm": "Essential",
+        "pmNet": 8,
+        "oppNet": -6,
+        "pmPpm": 49,
+        "oppPpm": 33
       },
       {
         "date": "2010-10-23",
@@ -20368,10 +23196,34 @@
         "oppNet": -3
       },
       {
+        "date": "2010-11-21",
+        "firm": "Essential",
+        "pmNet": 5,
+        "oppNet": 0,
+        "pmPpm": 45,
+        "oppPpm": 34
+      },
+      {
         "date": "2010-12-05",
         "firm": "Newspoll",
         "pmNet": 7,
         "oppNet": -1
+      },
+      {
+        "date": "2010-12-19",
+        "firm": "Essential",
+        "pmNet": 3,
+        "oppNet": 0,
+        "pmPpm": 45,
+        "oppPpm": 34
+      },
+      {
+        "date": "2011-01-16",
+        "firm": "Essential",
+        "pmNet": 15,
+        "oppNet": 5,
+        "pmPpm": 47,
+        "oppPpm": 32
       },
       {
         "date": "2011-02-06",
@@ -20384,6 +23236,14 @@
         "firm": "Nielsen",
         "pmNet": 9,
         "oppNet": -3
+      },
+      {
+        "date": "2011-02-13",
+        "firm": "Essential",
+        "pmNet": 7,
+        "oppNet": -8,
+        "pmPpm": 48,
+        "oppPpm": 31
       },
       {
         "date": "2011-02-20",
@@ -20404,6 +23264,14 @@
         "oppNet": -9
       },
       {
+        "date": "2011-03-13",
+        "firm": "Essential",
+        "pmNet": -5,
+        "oppNet": -9,
+        "pmPpm": 44,
+        "oppPpm": 33
+      },
+      {
         "date": "2011-03-20",
         "firm": "Newspoll",
         "pmNet": -7,
@@ -20416,6 +23284,14 @@
         "oppNet": -17
       },
       {
+        "date": "2011-04-10",
+        "firm": "Essential",
+        "pmNet": -13,
+        "oppNet": -12,
+        "pmPpm": 42,
+        "oppPpm": 33
+      },
+      {
         "date": "2011-04-16",
         "firm": "Nielsen",
         "pmNet": -5,
@@ -20426,6 +23302,14 @@
         "firm": "Newspoll",
         "pmNet": -11,
         "oppNet": -6
+      },
+      {
+        "date": "2011-05-08",
+        "firm": "Essential",
+        "pmNet": -7,
+        "oppNet": -2,
+        "pmPpm": 43,
+        "oppPpm": 35
       },
       {
         "date": "2011-05-14",
@@ -20452,6 +23336,14 @@
         "oppNet": -17
       },
       {
+        "date": "2011-06-12",
+        "firm": "Essential",
+        "pmNet": -20,
+        "oppNet": -10,
+        "pmPpm": 41,
+        "oppPpm": 36
+      },
+      {
         "date": "2011-06-16",
         "firm": "Nielsen",
         "pmNet": -22,
@@ -20468,6 +23360,14 @@
         "firm": "Newspoll",
         "pmNet": -29,
         "oppNet": -7
+      },
+      {
+        "date": "2011-07-10",
+        "firm": "Essential",
+        "pmNet": -33,
+        "oppNet": -10,
+        "pmPpm": 37,
+        "oppPpm": 39
       },
       {
         "date": "2011-07-16",
@@ -20494,6 +23394,14 @@
         "oppNet": -9
       },
       {
+        "date": "2011-08-14",
+        "firm": "Essential",
+        "pmNet": -20,
+        "oppNet": -13,
+        "pmPpm": 38,
+        "oppPpm": 36
+      },
+      {
         "date": "2011-08-21",
         "firm": "Newspoll",
         "pmNet": -32,
@@ -20510,6 +23418,14 @@
         "firm": "Nielsen",
         "pmNet": -30,
         "oppNet": -9
+      },
+      {
+        "date": "2011-09-11",
+        "firm": "Essential",
+        "pmNet": -36,
+        "oppNet": -11,
+        "pmPpm": 36,
+        "oppPpm": 40
       },
       {
         "date": "2011-09-18",
@@ -20530,6 +23446,14 @@
         "oppNet": -13
       },
       {
+        "date": "2011-10-16",
+        "firm": "Essential",
+        "pmNet": -25,
+        "oppNet": -11,
+        "pmPpm": 38,
+        "oppPpm": 39
+      },
+      {
         "date": "2011-10-23",
         "firm": "Newspoll",
         "pmNet": -30,
@@ -20546,6 +23470,14 @@
         "firm": "Nielsen",
         "pmNet": -18,
         "oppNet": -13
+      },
+      {
+        "date": "2011-11-13",
+        "firm": "Essential",
+        "pmNet": -18,
+        "oppNet": -16,
+        "pmPpm": 41,
+        "oppPpm": 36
       },
       {
         "date": "2011-11-20",
@@ -20566,6 +23498,22 @@
         "oppNet": -12
       },
       {
+        "date": "2011-12-11",
+        "firm": "Essential",
+        "pmNet": -20,
+        "oppNet": -21,
+        "pmPpm": 39,
+        "oppPpm": 35
+      },
+      {
+        "date": "2012-01-15",
+        "firm": "Essential",
+        "pmNet": -15,
+        "oppNet": -16,
+        "pmPpm": 39,
+        "oppPpm": 36
+      },
+      {
         "date": "2012-01-29",
         "firm": "Newspoll",
         "pmNet": -22,
@@ -20582,6 +23530,14 @@
         "firm": "Newspoll",
         "pmNet": -25,
         "oppNet": -16
+      },
+      {
+        "date": "2012-02-12",
+        "firm": "Essential",
+        "pmNet": -17,
+        "oppNet": -18,
+        "pmPpm": 41,
+        "oppPpm": 34
       },
       {
         "date": "2012-02-23",
@@ -20602,6 +23558,14 @@
         "oppNet": -26
       },
       {
+        "date": "2012-03-11",
+        "firm": "Essential",
+        "pmNet": -29,
+        "oppNet": -16,
+        "pmPpm": 40,
+        "oppPpm": 37
+      },
+      {
         "date": "2012-03-25",
         "firm": "Newspoll",
         "pmNet": -27,
@@ -20618,6 +23582,14 @@
         "firm": "Newspoll",
         "pmNet": -34,
         "oppNet": -19
+      },
+      {
+        "date": "2012-04-15",
+        "firm": "Essential",
+        "pmNet": -26,
+        "oppNet": -12,
+        "pmPpm": 38,
+        "oppPpm": 36
       },
       {
         "date": "2012-04-29",
@@ -20638,6 +23610,14 @@
         "oppNet": -22
       },
       {
+        "date": "2012-05-13",
+        "firm": "Essential",
+        "pmNet": -29,
+        "oppNet": -17,
+        "pmPpm": 38,
+        "oppPpm": 37
+      },
+      {
         "date": "2012-05-27",
         "firm": "Newspoll",
         "pmNet": -30,
@@ -20656,6 +23636,14 @@
         "oppNet": -27
       },
       {
+        "date": "2012-06-10",
+        "firm": "Essential",
+        "pmNet": -24,
+        "oppNet": -22,
+        "pmPpm": 37,
+        "oppPpm": 37
+      },
+      {
         "date": "2012-06-24",
         "firm": "Newspoll",
         "pmNet": -29,
@@ -20666,6 +23654,14 @@
         "firm": "Newspoll",
         "pmNet": -34,
         "oppNet": -25
+      },
+      {
+        "date": "2012-07-15",
+        "firm": "Essential",
+        "pmNet": -26,
+        "oppNet": -18,
+        "pmPpm": 37,
+        "oppPpm": 38
       },
       {
         "date": "2012-07-22",
@@ -20686,6 +23682,14 @@
         "oppNet": -24
       },
       {
+        "date": "2012-08-12",
+        "firm": "Essential",
+        "pmNet": -26,
+        "oppNet": -15,
+        "pmPpm": 36,
+        "oppPpm": 38
+      },
+      {
         "date": "2012-08-19",
         "firm": "Newspoll",
         "pmNet": -33,
@@ -20702,6 +23706,14 @@
         "firm": "Newspoll",
         "pmNet": -26,
         "oppNet": -28
+      },
+      {
+        "date": "2012-09-09",
+        "firm": "Essential",
+        "pmNet": -19,
+        "oppNet": -23,
+        "pmPpm": 40,
+        "oppPpm": 37
       },
       {
         "date": "2012-09-15",
@@ -20722,6 +23734,14 @@
         "oppNet": -22
       },
       {
+        "date": "2012-10-14",
+        "firm": "Essential",
+        "pmNet": -10,
+        "oppNet": -17,
+        "pmPpm": 43,
+        "oppPpm": 36
+      },
+      {
         "date": "2012-10-20",
         "firm": "Nielsen",
         "pmNet": -1,
@@ -20738,6 +23758,14 @@
         "firm": "Newspoll",
         "pmNet": -15,
         "oppNet": -36
+      },
+      {
+        "date": "2012-11-11",
+        "firm": "Essential",
+        "pmNet": -8,
+        "oppNet": -25,
+        "pmPpm": 45,
+        "oppPpm": 32
       },
       {
         "date": "2012-11-17",
@@ -20758,6 +23786,14 @@
         "oppNet": -31
       },
       {
+        "date": "2012-12-09",
+        "firm": "Essential",
+        "pmNet": -16,
+        "oppNet": -23,
+        "pmPpm": 43,
+        "oppPpm": 34
+      },
+      {
         "date": "2012-12-15",
         "firm": "Nielsen",
         "pmNet": -4,
@@ -20770,10 +23806,26 @@
         "oppNet": -29
       },
       {
+        "date": "2013-01-13",
+        "firm": "Essential",
+        "pmNet": -8,
+        "oppNet": -24,
+        "pmPpm": 42,
+        "oppPpm": 33
+      },
+      {
         "date": "2013-02-03",
         "firm": "Newspoll",
         "pmNet": -16,
         "oppNet": -23
+      },
+      {
+        "date": "2013-02-10",
+        "firm": "Essential",
+        "pmNet": -19,
+        "oppNet": -17,
+        "pmPpm": 39,
+        "oppPpm": 37
       },
       {
         "date": "2013-02-16",
@@ -20792,6 +23844,14 @@
         "firm": "Newspoll",
         "pmNet": -25,
         "oppNet": -19
+      },
+      {
+        "date": "2013-03-10",
+        "firm": "Essential",
+        "pmNet": -20,
+        "oppNet": -14,
+        "pmPpm": 39,
+        "oppPpm": 39
       },
       {
         "date": "2013-03-16",
@@ -20818,6 +23878,14 @@
         "oppNet": -10
       },
       {
+        "date": "2013-04-14",
+        "firm": "Essential",
+        "pmNet": -22,
+        "oppNet": -15,
+        "pmPpm": 37,
+        "oppPpm": 39
+      },
+      {
         "date": "2013-04-21",
         "firm": "Newspoll",
         "pmNet": -30,
@@ -20828,6 +23896,14 @@
         "firm": "Newspoll",
         "pmNet": -32,
         "oppNet": -15
+      },
+      {
+        "date": "2013-05-12",
+        "firm": "Essential",
+        "pmNet": -16,
+        "oppNet": -10,
+        "pmPpm": 39,
+        "oppPpm": 41
       },
       {
         "date": "2013-05-18",
@@ -20846,6 +23922,14 @@
         "firm": "Newspoll",
         "pmNet": -34,
         "oppNet": -16
+      },
+      {
+        "date": "2013-06-09",
+        "firm": "Essential",
+        "pmNet": -17,
+        "oppNet": -9,
+        "pmPpm": 39,
+        "oppPpm": 40
       },
       {
         "date": "2013-06-15",
@@ -20878,6 +23962,14 @@
         "oppNet": -21
       },
       {
+        "date": "2013-07-14",
+        "firm": "Essential",
+        "pmNet": 15,
+        "oppNet": -12,
+        "pmPpm": 50,
+        "oppPpm": 35
+      },
+      {
         "date": "2013-07-21",
         "firm": "Newspoll",
         "pmNet": 1,
@@ -20902,6 +23994,14 @@
         "oppNet": -14
       },
       {
+        "date": "2013-08-11",
+        "firm": "Essential",
+        "pmNet": 2,
+        "oppNet": -14,
+        "pmPpm": 47,
+        "oppPpm": 35
+      },
+      {
         "date": "2013-08-18",
         "firm": "Newspoll",
         "pmNet": -19,
@@ -20920,10 +24020,26 @@
         "oppNet": -7
       },
       {
+        "date": "2013-08-25",
+        "firm": "Essential",
+        "pmNet": -4,
+        "oppNet": -15,
+        "pmPpm": 43,
+        "oppPpm": 34
+      },
+      {
         "date": "2013-09-01",
         "firm": "Newspoll",
         "pmNet": -26,
         "oppNet": -10
+      },
+      {
+        "date": "2013-09-01",
+        "firm": "Essential",
+        "pmNet": -5,
+        "oppNet": -9,
+        "pmPpm": 44,
+        "oppPpm": 38
       },
       {
         "date": "2013-09-05",
@@ -20933,6 +24049,20 @@
       }
     ],
     "2013": [
+      {
+        "date": "2013-09-22",
+        "firm": "Essential",
+        "pmNet": 5,
+        "oppNet": null
+      },
+      {
+        "date": "2013-10-20",
+        "firm": "Essential",
+        "pmNet": 11,
+        "oppNet": null,
+        "pmPpm": 41,
+        "oppPpm": 22
+      },
       {
         "date": "2013-10-27",
         "firm": "Newspoll",
@@ -20944,6 +24074,14 @@
         "firm": "Newspoll",
         "pmNet": 7,
         "oppNet": 13
+      },
+      {
+        "date": "2013-11-10",
+        "firm": "Essential",
+        "pmNet": 5,
+        "oppNet": 4,
+        "pmPpm": 42,
+        "oppPpm": 27
       },
       {
         "date": "2013-11-23",
@@ -20964,10 +24102,34 @@
         "oppNet": 17
       },
       {
+        "date": "2013-12-08",
+        "firm": "Essential",
+        "pmNet": -1,
+        "oppNet": 8,
+        "pmPpm": 43,
+        "oppPpm": 33
+      },
+      {
+        "date": "2014-01-05",
+        "firm": "Essential",
+        "pmNet": 4,
+        "oppNet": 3,
+        "pmPpm": 42,
+        "oppPpm": 31
+      },
+      {
         "date": "2014-02-09",
         "firm": "Newspoll",
         "pmNet": -5,
         "oppNet": 0
+      },
+      {
+        "date": "2014-02-09",
+        "firm": "Essential",
+        "pmNet": -6,
+        "oppNet": -4,
+        "pmPpm": 40,
+        "oppPpm": 30
       },
       {
         "date": "2014-02-15",
@@ -20986,6 +24148,14 @@
         "firm": "Newspoll",
         "pmNet": -12,
         "oppNet": -10
+      },
+      {
+        "date": "2014-03-09",
+        "firm": "Essential",
+        "pmNet": -7,
+        "oppNet": -7,
+        "pmPpm": 39,
+        "oppPpm": 33
       },
       {
         "date": "2014-03-15",
@@ -21024,6 +24194,14 @@
         "oppNet": -6
       },
       {
+        "date": "2014-05-11",
+        "firm": "Essential",
+        "pmNet": -20,
+        "oppNet": -2,
+        "pmPpm": 36,
+        "oppPpm": 37
+      },
+      {
         "date": "2014-05-17",
         "firm": "Nielsen",
         "pmNet": -28,
@@ -21042,6 +24220,14 @@
         "oppNet": -5
       },
       {
+        "date": "2014-06-08",
+        "firm": "Essential",
+        "pmNet": -23,
+        "oppNet": -2,
+        "pmPpm": 36,
+        "oppPpm": 40
+      },
+      {
         "date": "2014-06-15",
         "firm": "Newspoll",
         "pmNet": -31,
@@ -21052,6 +24238,14 @@
         "firm": "Newspoll",
         "pmNet": -31,
         "oppNet": -7
+      },
+      {
+        "date": "2014-07-06",
+        "firm": "Essential",
+        "pmNet": -24,
+        "oppNet": -3,
+        "pmPpm": 34,
+        "oppPpm": 37
       },
       {
         "date": "2014-07-13",
@@ -21072,6 +24266,14 @@
         "oppNet": -8
       },
       {
+        "date": "2014-08-10",
+        "firm": "Essential",
+        "pmNet": -17,
+        "oppNet": -6,
+        "pmPpm": 37,
+        "oppPpm": 36
+      },
+      {
         "date": "2014-08-24",
         "firm": "Newspoll",
         "pmNet": -19,
@@ -21082,6 +24284,14 @@
         "firm": "Newspoll",
         "pmNet": -19,
         "oppNet": -7
+      },
+      {
+        "date": "2014-09-07",
+        "firm": "Essential",
+        "pmNet": -17,
+        "oppNet": -1,
+        "pmPpm": 35,
+        "oppPpm": 36
       },
       {
         "date": "2014-09-23",
@@ -21132,6 +24342,14 @@
         "oppNet": -4
       },
       {
+        "date": "2014-12-07",
+        "firm": "Essential",
+        "pmNet": -23,
+        "oppNet": -4,
+        "pmPpm": 31,
+        "oppPpm": 36
+      },
+      {
         "date": "2015-01-13",
         "firm": "Essential",
         "pmNet": -16,
@@ -21150,6 +24368,14 @@
         "oppNet": 2
       },
       {
+        "date": "2015-02-08",
+        "firm": "Essential",
+        "pmNet": -33,
+        "oppNet": -5,
+        "pmPpm": 31,
+        "oppPpm": 39
+      },
+      {
         "date": "2015-02-22",
         "firm": "Newspoll",
         "pmNet": -43,
@@ -21166,6 +24392,14 @@
         "firm": "Newspoll",
         "pmNet": -35,
         "oppNet": -3
+      },
+      {
+        "date": "2015-03-08",
+        "firm": "Essential",
+        "pmNet": -25,
+        "oppNet": -5,
+        "pmPpm": 33,
+        "oppPpm": 37
       },
       {
         "date": "2015-03-22",
@@ -21210,6 +24444,14 @@
         "oppNet": -14
       },
       {
+        "date": "2015-05-10",
+        "firm": "Essential",
+        "pmNet": -18,
+        "oppNet": -9,
+        "pmPpm": 35,
+        "oppPpm": 32
+      },
+      {
         "date": "2015-05-17",
         "firm": "Newspoll",
         "pmNet": -13,
@@ -21234,6 +24476,14 @@
         "oppNet": -13
       },
       {
+        "date": "2015-06-07",
+        "firm": "Essential",
+        "pmNet": -11,
+        "oppNet": -13,
+        "pmPpm": 38,
+        "oppPpm": 33
+      },
+      {
         "date": "2015-06-13",
         "firm": "Newspoll",
         "pmNet": -22,
@@ -21250,6 +24500,14 @@
         "firm": "Essential",
         "pmNet": -16,
         "oppNet": -25
+      },
+      {
+        "date": "2015-07-12",
+        "firm": "Essential",
+        "pmNet": -16,
+        "oppNet": -25,
+        "pmPpm": 37,
+        "oppPpm": 30
       },
       {
         "date": "2015-07-19",
@@ -21288,10 +24546,26 @@
         "oppNet": -28
       },
       {
+        "date": "2015-09-06",
+        "firm": "Essential",
+        "pmNet": -24,
+        "oppNet": -21,
+        "pmPpm": 32,
+        "oppPpm": 35
+      },
+      {
         "date": "2015-09-20",
         "firm": "Newspoll",
         "pmNet": 18,
         "oppNet": -25
+      },
+      {
+        "date": "2015-10-04",
+        "firm": "Essential",
+        "pmNet": 30,
+        "oppNet": -12,
+        "pmPpm": 48,
+        "oppPpm": 19
       },
       {
         "date": "2015-10-11",
@@ -21330,6 +24604,14 @@
         "oppNet": -20
       },
       {
+        "date": "2015-11-08",
+        "firm": "Essential",
+        "pmNet": 36,
+        "oppNet": -20,
+        "pmPpm": 55,
+        "oppPpm": 14
+      },
+      {
         "date": "2015-11-14",
         "firm": "Ipsos",
         "pmNet": 53,
@@ -21354,10 +24636,26 @@
         "oppNet": -38
       },
       {
+        "date": "2015-12-06",
+        "firm": "Essential",
+        "pmNet": 33,
+        "oppNet": -20,
+        "pmPpm": 54,
+        "oppPpm": 15
+      },
+      {
         "date": "2015-12-31",
         "firm": "Essential",
         "pmNet": 33,
         "oppNet": -20
+      },
+      {
+        "date": "2016-01-17",
+        "firm": "Essential",
+        "pmNet": 26,
+        "oppNet": -20,
+        "pmPpm": 51,
+        "oppPpm": 18
       },
       {
         "date": "2016-01-31",
@@ -21370,6 +24668,14 @@
         "firm": "Essential",
         "pmNet": 26,
         "oppNet": -20
+      },
+      {
+        "date": "2016-02-07",
+        "firm": "Essential",
+        "pmNet": 24,
+        "oppNet": -21,
+        "pmPpm": 52,
+        "oppPpm": 15
       },
       {
         "date": "2016-02-13",
@@ -21396,6 +24702,14 @@
         "oppNet": -25
       },
       {
+        "date": "2016-03-06",
+        "firm": "Essential",
+        "pmNet": 10,
+        "oppNet": -20,
+        "pmPpm": 48,
+        "oppPpm": 19
+      },
+      {
         "date": "2016-03-12",
         "firm": "Ipsos",
         "pmNet": 23,
@@ -21412,6 +24726,14 @@
         "firm": "Newspoll",
         "pmNet": -10,
         "oppNet": -21
+      },
+      {
+        "date": "2016-04-10",
+        "firm": "Essential",
+        "pmNet": 0,
+        "oppNet": -14,
+        "pmPpm": 44,
+        "oppPpm": 22
       },
       {
         "date": "2016-04-16",
@@ -21566,6 +24888,14 @@
         "oppNet": -16
       },
       {
+        "date": "2016-10-09",
+        "firm": "Essential",
+        "pmNet": -3,
+        "oppNet": -3,
+        "pmPpm": 41,
+        "oppPpm": 28
+      },
+      {
         "date": "2016-10-23",
         "firm": "Newspoll",
         "pmNet": -28,
@@ -21576,6 +24906,14 @@
         "firm": "Newspoll",
         "pmNet": -28,
         "oppNet": -15
+      },
+      {
+        "date": "2016-11-06",
+        "firm": "Essential",
+        "pmNet": -8,
+        "oppNet": -9,
+        "pmPpm": 40,
+        "oppPpm": 28
       },
       {
         "date": "2016-11-20",
@@ -21596,10 +24934,34 @@
         "oppNet": -17
       },
       {
+        "date": "2016-12-11",
+        "firm": "Essential",
+        "pmNet": -12,
+        "oppNet": -3,
+        "pmPpm": 39,
+        "oppPpm": 28
+      },
+      {
+        "date": "2017-01-15",
+        "firm": "Essential",
+        "pmNet": -11,
+        "oppNet": -7,
+        "pmPpm": 39,
+        "oppPpm": 28
+      },
+      {
         "date": "2017-02-05",
         "firm": "Newspoll",
         "pmNet": -19,
         "oppNet": -22
+      },
+      {
+        "date": "2017-02-12",
+        "firm": "Essential",
+        "pmNet": -15,
+        "oppNet": -17,
+        "pmPpm": 39,
+        "oppPpm": 25
       },
       {
         "date": "2017-02-26",
@@ -21626,6 +24988,14 @@
         "oppNet": -22
       },
       {
+        "date": "2017-04-09",
+        "firm": "Essential",
+        "pmNet": -12,
+        "oppNet": -13,
+        "pmPpm": 39,
+        "oppPpm": 28
+      },
+      {
         "date": "2017-04-23",
         "firm": "Newspoll",
         "pmNet": -25,
@@ -21638,6 +25008,102 @@
         "oppNet": -14
       },
       {
+        "date": "2017-05-07",
+        "firm": "Essential",
+        "pmNet": -11,
+        "oppNet": -11,
+        "pmPpm": 39,
+        "oppPpm": 31
+      },
+      {
+        "date": "2017-06-18",
+        "firm": "Essential",
+        "pmNet": -9,
+        "oppNet": -9,
+        "pmPpm": 39,
+        "oppPpm": 26
+      },
+      {
+        "date": "2017-07-09",
+        "firm": "Essential",
+        "pmNet": -12,
+        "oppNet": -8,
+        "pmPpm": 41,
+        "oppPpm": 27
+      },
+      {
+        "date": "2017-08-06",
+        "firm": "Essential",
+        "pmNet": -8,
+        "oppNet": -7,
+        "pmPpm": 41,
+        "oppPpm": 27
+      },
+      {
+        "date": "2017-09-10",
+        "firm": "Essential",
+        "pmNet": -5,
+        "oppNet": -11,
+        "pmPpm": 43,
+        "oppPpm": 29
+      },
+      {
+        "date": "2017-10-08",
+        "firm": "Essential",
+        "pmNet": -1,
+        "oppNet": -7,
+        "pmPpm": 42,
+        "oppPpm": 28
+      },
+      {
+        "date": "2017-11-12",
+        "firm": "Essential",
+        "pmNet": -12,
+        "oppNet": -13,
+        "pmPpm": 40,
+        "oppPpm": 28
+      },
+      {
+        "date": "2017-12-10",
+        "firm": "Essential",
+        "pmNet": -3,
+        "oppNet": -9,
+        "pmPpm": 42,
+        "oppPpm": 28
+      },
+      {
+        "date": "2018-01-14",
+        "firm": "Essential",
+        "pmNet": -7,
+        "oppNet": -17,
+        "pmPpm": 42,
+        "oppPpm": 25
+      },
+      {
+        "date": "2018-02-11",
+        "firm": "Essential",
+        "pmNet": -3,
+        "oppNet": -13,
+        "pmPpm": 42,
+        "oppPpm": 27
+      },
+      {
+        "date": "2018-03-11",
+        "firm": "Essential",
+        "pmNet": -2,
+        "oppNet": -7,
+        "pmPpm": 41,
+        "oppPpm": 26
+      },
+      {
+        "date": "2018-04-08",
+        "firm": "Essential",
+        "pmNet": -3,
+        "oppNet": -8,
+        "pmPpm": 41,
+        "oppPpm": 26
+      },
+      {
         "date": "2018-05-06",
         "firm": "Essential",
         "pmNet": -2,
@@ -21648,6 +25114,22 @@
         "firm": "Newspoll",
         "pmNet": -8,
         "oppNet": -24
+      },
+      {
+        "date": "2018-06-03",
+        "firm": "Essential",
+        "pmNet": 0,
+        "oppNet": -13,
+        "pmPpm": 41,
+        "oppPpm": 27
+      },
+      {
+        "date": "2018-07-01",
+        "firm": "Essential",
+        "pmNet": 3,
+        "oppNet": -16,
+        "pmPpm": 42,
+        "oppPpm": 25
       },
       {
         "date": "2018-07-16",
@@ -21674,6 +25156,22 @@
         "oppNet": -24
       },
       {
+        "date": "2018-08-12",
+        "firm": "Essential",
+        "pmNet": 0,
+        "oppNet": -10,
+        "pmPpm": 41,
+        "oppPpm": 27
+      },
+      {
+        "date": "2018-08-26",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 39,
+        "oppPpm": 29
+      },
+      {
         "date": "2018-09-09",
         "firm": "Newspoll",
         "pmNet": 2,
@@ -21698,6 +25196,14 @@
         "oppNet": 4
       },
       {
+        "date": "2018-10-07",
+        "firm": "Essential",
+        "pmNet": 15,
+        "oppNet": -12,
+        "pmPpm": 42,
+        "oppPpm": 27
+      },
+      {
         "date": "2018-10-21",
         "firm": "Essential",
         "pmNet": 15,
@@ -21710,16 +25216,40 @@
         "oppNet": -13
       },
       {
+        "date": "2018-11-04",
+        "firm": "Essential",
+        "pmNet": 4,
+        "oppNet": -6,
+        "pmPpm": 41,
+        "oppPpm": 29
+      },
+      {
         "date": "2018-11-11",
         "firm": "Newspoll",
         "pmNet": -8,
         "oppNet": -15
       },
       {
+        "date": "2018-12-02",
+        "firm": "Essential",
+        "pmNet": 8,
+        "oppNet": -8,
+        "pmPpm": 40,
+        "oppPpm": 29
+      },
+      {
         "date": "2018-12-15",
         "firm": "Ipsos",
         "pmNet": 8,
         "oppNet": -9
+      },
+      {
+        "date": "2019-01-13",
+        "firm": "Essential",
+        "pmNet": 4,
+        "oppNet": -12,
+        "pmPpm": 42,
+        "oppPpm": 30
       },
       {
         "date": "2019-02-10",
@@ -21734,6 +25264,14 @@
         "oppNet": -12
       },
       {
+        "date": "2019-03-10",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 44,
+        "oppPpm": 31
+      },
+      {
         "date": "2019-04-04",
         "firm": "Ipsos",
         "pmNet": 3,
@@ -21744,6 +25282,30 @@
         "firm": "Ipsos",
         "pmNet": 9,
         "oppNet": -15
+      },
+      {
+        "date": "2019-04-28",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 40,
+        "oppPpm": 31
+      },
+      {
+        "date": "2019-05-05",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 42,
+        "oppPpm": 31
+      },
+      {
+        "date": "2019-05-12",
+        "firm": "Essential",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 39,
+        "oppPpm": 32
       },
       {
         "date": "2019-05-15",
