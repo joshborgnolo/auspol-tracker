@@ -1757,7 +1757,11 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
   padding: 5px 1px; transition: border-color .15s ease;
 }
-.fb-form textarea { min-height: 74px; resize: vertical; }
+/* No min-height and no drag handle: the box is sized from its own content by
+   fbAutosize, so it opens as one line - the same height as the email field
+   under it - and grows a line at a time. The cap is about seven lines, past
+   which it scrolls instead of pushing the send button off the screen. */
+.fb-form textarea { min-height: 0; max-height: 164px; resize: none; overflow-y: hidden; }
 .fb-form input::placeholder, .fb-form textarea::placeholder { color: var(--ink-3); opacity: 0.72; }
 .fb-form input:focus, .fb-form textarea:focus { outline: none; border-bottom-color: var(--accent); }
 /* The theme here is a manual toggle and can disagree with the OS, so pin the

@@ -1604,7 +1604,11 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
   padding: 5px 1px; transition: border-color .15s ease;
 }
-.fb-form textarea { min-height: 74px; resize: vertical; }
+/* No min-height and no drag handle: the box is sized from its own content by
+   fbAutosize, so it opens as one line - the same height as the email field
+   under it - and grows a line at a time. The cap is about seven lines, past
+   which it scrolls instead of pushing the send button off the screen. */
+.fb-form textarea { min-height: 0; max-height: 164px; resize: none; overflow-y: hidden; }
 .fb-form input::placeholder, .fb-form textarea::placeholder { color: var(--ink-3); opacity: 0.72; }
 .fb-form input:focus, .fb-form textarea:focus { outline: none; border-bottom-color: var(--accent); }
 /* The theme here is a manual toggle and can disagree with the OS, so pin the
@@ -12375,6 +12379,37 @@ function Hero({
    the shared namespace for the same reason openPoll is, the archive row being
    several components away from the footer with no prop path between them. */
 const FB_KINDS = ["Wrong figure", "Missing poll", "Site bug", "Something else"];
+
+/* The details box sizes itself to what has been typed. It used to open as a
+   74px slab with a drag handle in the corner - more than twice the height of
+   the email field beneath it, all of it empty, on a page that otherwise draws
+   a field as a line and some text. One line to start, grown a line at a time,
+   and the corner grabber taken away because there is nothing left to drag it
+   for.
+
+   Two things the obvious version gets wrong. `scrollHeight` leaves the
+   PLACEHOLDER out, so an empty box collapses under its own example text -
+   fine at 540px where the hint is one line, wrong on a phone where it wraps -
+   so an empty box is measured with the placeholder standing in for the value.
+   That swap is a synchronous read-and-restore inside one frame, never
+   painted, and React is not involved because the value is only borrowed while
+   it is already "". And under border-box the height covers the border while
+   scrollHeight does not, so the border is added back rather than costing a
+   pixel on every grow. */
+function fbAutosize(box) {
+  if (!box) return;
+  const cs = getComputedStyle(box);
+  const border = parseFloat(cs.borderTopWidth || 0) + parseFloat(cs.borderBottomWidth || 0);
+  const max = parseFloat(cs.maxHeight) || Infinity;
+  const borrow = !box.value && box.placeholder;
+  if (borrow) box.value = box.placeholder;
+  box.style.height = "auto";
+  const want = box.scrollHeight + (cs.boxSizing === "border-box" ? border : 0);
+  if (borrow) box.value = "";
+  box.style.height = Math.min(want, max) + "px";
+  // only past the cap does it become a scrolling box rather than a growing one
+  box.style.overflowY = want > max ? "auto" : "hidden";
+}
 function ReportError() {
   const endpoint = window.AP_FEEDBACK;
   const {
@@ -12427,6 +12462,21 @@ function ReportError() {
     });
     box.setSelectionRange(box.value.length, box.value.length);
   }, [arrival]);
+
+  /* Runs on open and on every change, because `msg` is also set from outside
+     (an archive row seeds it) and that text has to be measured too. The width
+     matters as well - the same sentence wraps to more lines on a narrower
+     card - so a resize re-measures rather than leaving a stale height behind
+     after a rotation. */
+  React.useLayoutEffect(() => {
+    // before paint: no first frame at the wrong height
+    if (!open) return;
+    const box = boxRef.current;
+    fbAutosize(box);
+    const onResize = () => fbAutosize(boxRef.current);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [open, msg]);
   if (!endpoint) return null;
   const submit = async e => {
     e.preventDefault();
@@ -12521,6 +12571,7 @@ function ReportError() {
     name: "message",
     required: true,
     ref: boxRef,
+    rows: 1,
     value: msg,
     onChange: e => setMsg(e.target.value),
     placeholder: "e.g. Resolve, fielded 12\u201315 Aug \u2014 Labor\u2019s primary is 27.9 here, the release says 28.9"

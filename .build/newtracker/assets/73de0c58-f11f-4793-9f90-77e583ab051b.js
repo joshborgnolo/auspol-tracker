@@ -746,6 +746,37 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
    several components away from the footer with no prop path between them. */
 const FB_KINDS = ["Wrong figure", "Missing poll", "Site bug", "Something else"];
 
+/* The details box sizes itself to what has been typed. It used to open as a
+   74px slab with a drag handle in the corner - more than twice the height of
+   the email field beneath it, all of it empty, on a page that otherwise draws
+   a field as a line and some text. One line to start, grown a line at a time,
+   and the corner grabber taken away because there is nothing left to drag it
+   for.
+
+   Two things the obvious version gets wrong. `scrollHeight` leaves the
+   PLACEHOLDER out, so an empty box collapses under its own example text -
+   fine at 540px where the hint is one line, wrong on a phone where it wraps -
+   so an empty box is measured with the placeholder standing in for the value.
+   That swap is a synchronous read-and-restore inside one frame, never
+   painted, and React is not involved because the value is only borrowed while
+   it is already "". And under border-box the height covers the border while
+   scrollHeight does not, so the border is added back rather than costing a
+   pixel on every grow. */
+function fbAutosize(box) {
+  if (!box) return;
+  const cs = getComputedStyle(box);
+  const border = parseFloat(cs.borderTopWidth || 0) + parseFloat(cs.borderBottomWidth || 0);
+  const max = parseFloat(cs.maxHeight) || Infinity;
+  const borrow = !box.value && box.placeholder;
+  if (borrow) box.value = box.placeholder;
+  box.style.height = "auto";
+  const want = box.scrollHeight + (cs.boxSizing === "border-box" ? border : 0);
+  if (borrow) box.value = "";
+  box.style.height = Math.min(want, max) + "px";
+  // only past the cap does it become a scrolling box rather than a growing one
+  box.style.overflowY = want > max ? "auto" : "hidden";
+}
+
 function ReportError() {
   const endpoint = window.AP_FEEDBACK;
   const { D } = window.AP;
@@ -789,6 +820,20 @@ function ReportError() {
     box.focus({ preventScroll: true });
     box.setSelectionRange(box.value.length, box.value.length);
   }, [arrival]);
+
+  /* Runs on open and on every change, because `msg` is also set from outside
+     (an archive row seeds it) and that text has to be measured too. The width
+     matters as well - the same sentence wraps to more lines on a narrower
+     card - so a resize re-measures rather than leaving a stale height behind
+     after a rotation. */
+  React.useLayoutEffect(() => {   // before paint: no first frame at the wrong height
+    if (!open) return;
+    const box = boxRef.current;
+    fbAutosize(box);
+    const onResize = () => fbAutosize(boxRef.current);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [open, msg]);
 
   if (!endpoint) return null;
 
@@ -869,7 +914,7 @@ function ReportError() {
             <label className="fb-label" htmlFor={uid + "-msg"}>
               Details <span>– the pollster and field dates help most</span>
             </label>
-            <textarea id={uid + "-msg"} name="message" required ref={boxRef}
+            <textarea id={uid + "-msg"} name="message" required ref={boxRef} rows={1}
               value={msg} onChange={(e) => setMsg(e.target.value)}
               placeholder="e.g. Resolve, fielded 12–15 Aug — Labor’s primary is 27.9 here, the release says 28.9" />
           </div>
