@@ -1159,6 +1159,10 @@ for (const c of CYC_META) {
       date: r.date, firm: r.firm, m: mo(r.date),
       pmNet: r.pmNet ?? null, oppNet: r.oppNet ?? null,
       metric: r.metric || metricOf(r.firm, "alb"),
+      // preferred PM travels with the wave that asked it. Nothing charts it
+      // for a past cycle yet; it rides out to the download so that when the
+      // history is thick enough to plot, the data is already here.
+      pmPpm: r.pmPpm ?? null, oppPpm: r.oppPpm ?? null,
     })),
   };
 }

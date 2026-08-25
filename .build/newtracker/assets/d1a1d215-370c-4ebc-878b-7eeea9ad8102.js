@@ -595,7 +595,21 @@ function cycleSourceRows(cycles, D) {
     "cycle", "series", "date", "months_since_election", "pollster",
     "primary_alp", "primary_lnp", "primary_grn", "primary_onp", "primary_oth",
     "tpp_alp", "tpp_lnp", "pm_net", "opp_leader_net", "hanson_net", "leader_metric",
+    "pm_preferred", "opp_leader_preferred",
   ]];
+  /* Preferred PM is its own series rather than two more columns on the
+     leader-rating row: it is a different question, asked of the same wave,
+     and one row per question is what lets a reader filter the file by
+     `series` and get a clean set. Shares only - the uncommitted remainder is
+     the rest of 100 and is not stored either side of the split.
+     The opposition leader's key inside a ppm set is that leader's own name
+     ("ley" before the February 2026 handover, "taylor" after), so it is found
+     by elimination rather than looked up. */
+  const ppmOpp = (s) => {
+    const k = Object.keys(s).find((x) => x !== "alb" && x !== "hanson" && x !== "unc");
+    return k ? s[k] : null;
+  };
+  const mainPpm = (p) => p.ppm || (p.ppmSets && p.ppmSets[0]) || null;
   const byYear = new Map(cycles.map((c) => [c.year, c]));
   Object.entries(D.cycleSource || {}).forEach(([year, src]) => {
     const c = byYear.get(Number(year));
@@ -603,12 +617,20 @@ function cycleSourceRows(cycles, D) {
     src.polls.forEach((p) => rows.push([
       year, "voting_intention", p.date, p.m, p.firm,
       p.alp, p.lnp, p.grn, p.onp, p.oth, p.tpp_alp, p.tpp_lnp, null, null, null, null,
+      null, null,
     ]));
-    src.approval.forEach((a) => rows.push([
-      year, "leader_rating", a.date, a.m, a.firm,
-      null, null, null, null, null, null, null, a.pmNet, a.oppNet, null,
-      a.metric === "fav" ? "net favourability" : "net approval",
-    ]));
+    src.approval.forEach((a) => {
+      if (a.pmNet != null || a.oppNet != null) rows.push([
+        year, "leader_rating", a.date, a.m, a.firm,
+        null, null, null, null, null, null, null, a.pmNet, a.oppNet, null,
+        a.metric === "fav" ? "net favourability" : "net approval", null, null,
+      ]);
+      if (a.pmPpm != null || a.oppPpm != null) rows.push([
+        year, "preferred_pm", a.date, a.m, a.firm,
+        null, null, null, null, null, null, null, null, null, null, null,
+        a.pmPpm ?? null, a.oppPpm ?? null,
+      ]);
+    });
   });
   /* The current cycle's source rows are individualPolls, already in the payload
      – read them from there rather than shipping a second copy. */
@@ -618,7 +640,16 @@ function cycleSourceRows(cycles, D) {
     const mo = (iso) => Math.round(((Date.parse(iso) - eDate) / 86400000 / 30.436875) * 10) / 10;
     D.individualPolls.forEach((p) => {
       rows.push([cur.year, "voting_intention", p.released, mo(p.released), p.pollster,
-        p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null]);
+        p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null,
+        null, null]);
+      /* The MAIN contest only. A wave may also publish a two-way where the
+         headline is three-way, and those are separate measures that would be
+         nonsense stacked in one column - they stay in the payload for the
+         charts that keep them apart. */
+      const mp = mainPpm(p);
+      if (mp) rows.push([cur.year, "preferred_pm", p.released, mo(p.released), p.pollster,
+        null, null, null, null, null, null, null, null, null, null, null,
+        mp.alb ?? null, ppmOpp(mp)]);
       const a = p.appr;
       if (a && (a.albNet != null || a.taylorNet != null || a.hansonNet != null))
         rows.push([cur.year, "leader_rating", p.released, mo(p.released), p.pollster,
@@ -629,7 +660,7 @@ function cycleSourceRows(cycles, D) {
              non-existent a.metric and so labelled every row "net approval",
              including the favourability rows the charts deliberately exclude.
              Name the leaders separately where they disagree. */
-          apprMetricLabel(a)]);
+          apprMetricLabel(a), null, null]);
     });
   }
   return rows.slice(0, 1).concat(

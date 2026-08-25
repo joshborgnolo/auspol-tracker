@@ -131,7 +131,7 @@
     },
     "cycleApproval": {
       "type": "object",
-      "description": "Past-cycle leader nets, keyed by the year the term BEGAN. Rows may name their metric; absent, metricRules decides.",
+      "description": "Past-cycle leader ratings, keyed by the year the term BEGAN. One row per wave that rated the leaders. Rows may name their metric; absent, metricRules decides. Preferred PM rides on the same row because it is the same wave asking a second question — a wave that published one and not the other simply leaves the other pair null.",
       "additionalProperties": {
         "type": "array",
         "items": {
@@ -140,7 +140,9 @@
           "properties": {
             "date": { "type": "string" }, "firm": { "type": "string" },
             "pmNet": { "type": ["number", "null"] }, "oppNet": { "type": ["number", "null"] },
-            "metric": { "enum": ["fav", "approval"] }
+            "metric": { "enum": ["fav", "approval"] },
+            "pmPpm": { "type": ["number", "null"], "description": "Preferred-PM share for the sitting PM. Shares only — the uncommitted remainder is not stored, matching ppm[] for the current term. No past cycle is charted on this yet; it is stored so one can be." },
+            "oppPpm": { "type": ["number", "null"], "description": "Preferred-PM share for the opposition leader." }
           }
         }
       }
