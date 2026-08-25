@@ -1529,6 +1529,10 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
    other change indicator – no good/bad colour in a party-neutral tracker */
 .seat-chg { font-size: 11.5px; font-weight: 700; color: var(--ink-3); }
 .seat-chg.flat { color: var(--ink-3); font-weight: 600; }
+/* a projection published as a range only: the figure column carries the range
+   itself, and a party can note what it is made of */
+.seat-est.range { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.seat-note { font-size: 11px; color: var(--ink-3); }
 .seat-basis { margin: 2px 0 0; font-size: 11px; color: var(--ink-3); text-wrap: pretty; }
 @media (max-width: 700px) {
   .seat-rows { gap: 6px 16px; }

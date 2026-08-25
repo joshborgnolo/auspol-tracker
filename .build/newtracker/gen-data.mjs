@@ -781,6 +781,9 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     ...(p.url ? { url: p.url } : {}),
     ...(DIR_BY.has(p.date + "|" + p.pollster) ? { dir: DIR_BY.get(p.date + "|" + p.pollster) } : {}),
+    // a modelled chamber travels with the poll here too, not only into the
+    // archive – a projection published this week belongs in Latest polls
+    ...(p.seats ? { seats: p.seats } : {}),
   };
 }).sort((a, b) => b.released.localeCompare(a.released));
 

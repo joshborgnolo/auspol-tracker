@@ -1323,12 +1323,52 @@ function SeatProjection({ seats }) {
   if (!seats || !seats.p) return null;
   const total = seats.total || 150;
   const majority = seats.majority || Math.floor(total / 2) + 1;
+  /* Some projections are published as a RANGE and nothing else – DemosAU's
+     Monte Carlo gives each party a bottom and a top and no central figure.
+     There is no honest point estimate to derive from that (a midpoint would be
+     one this pollster declined to state), so the chamber bar is skipped and
+     the ranges are shown as ranges. The ranges also overlap and sum past the
+     chamber, which is exactly why they cannot be stacked. */
+  const rangeOnly = Object.keys(seats.p).every((id) => !seats.p[id] || seats.p[id].est == null);
   // largest first – an MRP's story is who leads the chamber, not ballot order
-  const rows = Object.keys(seats.p).filter((id) => seats.p[id] && seats.p[id].est != null)
+  const mid = (r) => (r.est != null ? r.est : ((r.lo + r.hi) / 2));
+  const rows = Object.keys(seats.p)
+    .filter((id) => seats.p[id] && (seats.p[id].est != null || (seats.p[id].lo != null && seats.p[id].hi != null)))
     .map((id) => { const m = SEAT_META[id] || { name: id.toUpperCase(), color: "var(--oth)" };
                    return { id, ...seats.p[id], name: m.name, color: m.color }; })
-    .sort((a, b) => b.est - a.est);
+    .sort((a, b) => mid(b) - mid(a));
   if (!rows.length) return null;
+  if (rangeOnly) {
+    // can anyone govern in their own right at the TOP of their range?
+    const best = rows[0];
+    const reach = rows.filter((r) => r.hi >= majority);
+    return (
+      <div className="seatproj">
+        <div className="seat-rows">
+          {rows.map((r) => (
+            <div className="seat-row" key={r.id}>
+              <span className="skey-dot" style={{ background: r.color }}></span>
+              <span className="seat-name">{r.name}</span>
+              <span className="seat-est range">{r.lo}–{r.hi}</span>
+              {r.note && <span className="seat-note">{r.note}</span>}
+            </div>
+          ))}
+        </div>
+        <div className="seatbar-note">
+          <span className="seat-majlab">{majority} for majority</span>
+          {!reach.length && (
+            <span className="seat-hung">
+              no party reaches it – {best.name} tops out {majority - best.hi} short
+            </span>
+          )}
+        </div>
+        <p className="seat-basis">
+          Published as a range, with no central estimate
+          {seats.method ? " · " + seats.method : ""}
+        </p>
+      </div>
+    );
+  }
   const sum = rows.reduce((s, r) => s + r.est, 0);
   const lead = rows[0];
   return (
@@ -1568,6 +1608,16 @@ function PollDetail({ r }) {
           </div>
         )}
         {r.undecided != null && <UndecidedLine v={r.undecided} chg={r.chg} basis={r.undecidedBasis} />}
+        {/* a modelled chamber is not a per-poll measure, so it takes the full
+            width – and it belongs HERE as well as in the archive: a projection
+            published this week is exactly what someone reading the latest
+            polls came for */}
+        {r.seats && (
+          <div className="pd-block pd-wide">
+            <div className="pd-k">Seat projection</div>
+            <SeatProjection seats={r.seats} />
+          </div>
+        )}
       </div>
     </div>
   );

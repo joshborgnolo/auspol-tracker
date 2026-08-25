@@ -3627,6 +3627,7 @@
       "pollster": "DemosAU",
       "client": "Capital Brief",
       "sample": 1562,
+      "undecided": 5,
       "alp": 26,
       "lnp": 25,
       "grn": 12,
@@ -3635,7 +3636,35 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/"
+      "seats": {
+        "total": 150,
+        "rangeOnly": true,
+        "method": "20,000-simulation Monte Carlo on uniform national swings since the May–July 2026 MRP",
+        "p": {
+          "alp": {
+            "lo": 61,
+            "hi": 73
+          },
+          "lnp": {
+            "lo": 32,
+            "hi": 50,
+            "note": "Lib 29–41, Nat 3–9"
+          },
+          "onp": {
+            "lo": 26,
+            "hi": 39
+          },
+          "oth": {
+            "lo": 5,
+            "hi": 10
+          },
+          "grn": {
+            "lo": 0,
+            "hi": 5
+          }
+        }
+      },
+      "url": "https://demosau.com/wp-content/uploads/2026/08/Capital-BriefDemosAU-Federal-Poll-August-2026.pdf"
     },
     {
       "date": "2026-08-23",
@@ -4309,6 +4338,20 @@
       "oppName": "Taylor",
       "han": 26,
       "extra": null
+    },
+    {
+      "date": "2026-08-20",
+      "firm": "DemosAU",
+      "alb": 35,
+      "opp": 23,
+      "oppName": "Taylor",
+      "han": 22,
+      "extra": [
+        {
+          "alb": 38,
+          "opp": 36
+        }
+      ]
     }
   ],
   "approval": [
@@ -5307,13 +5350,17 @@
       "date": "2026-07-08",
       "firm": "DemosAU",
       "alb": -23,
-      "opp": null,
+      "opp": -3,
       "oppName": "Taylor",
       "han": -9,
       "detail": {
         "alb": {
           "app": 25,
           "dis": 48
+        },
+        "opp": {
+          "app": 24,
+          "dis": 27
         },
         "han": {
           "app": 34,
@@ -5517,6 +5564,28 @@
           "han": 4
         }
       }
+    },
+    {
+      "date": "2026-08-20",
+      "firm": "DemosAU",
+      "alb": -19,
+      "opp": -4,
+      "oppName": "Taylor",
+      "han": -17,
+      "detail": {
+        "alb": {
+          "app": 28,
+          "dis": 47
+        },
+        "opp": {
+          "app": 23,
+          "dis": 27
+        },
+        "han": {
+          "app": 30,
+          "dis": 47
+        }
+      }
     }
   ],
   "ppmHeadToHead": [
@@ -5585,6 +5654,12 @@
       "firm": "YouGov",
       "alb": 51,
       "han": 38
+    },
+    {
+      "date": "2026-08-20",
+      "firm": "DemosAU",
+      "alb": 43,
+      "han": 32
     }
   ],
   "altTpp": [
