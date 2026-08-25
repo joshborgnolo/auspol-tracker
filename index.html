@@ -1012,9 +1012,18 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 /* takes the row's spare width, or its container query reads the shrunken box
    and stacks every tile's change chip under its figure */
 .ppm-pair .leader-readout { margin-bottom: 0; flex: 1 1 auto; min-width: 0; }
-/* the margin wears the leader's own ink, so it needs no name to say whose */
+/* the margin wears the leader's own ink, so it needs no name to say whose.
+
+   The reserved WIDTH is what keeps the two rows in step. Each row's readout is
+   its own container, sized by what this label leaves it, so a two-digit margin
+   took ten pixels off one row and not the other - enough, at a 402px phone, to
+   put one readout at 300.4 and the other at 289.9 either side of the handover
+   below, and the two rows laid their chips out differently. A common minimum
+   makes both readouts the same width, so they hand over together whatever the
+   figures happen to be. 2.9em also covers "level". */
 .ppm-lead {
   margin-left: auto; padding-left: 10px;
+  min-width: 2.9em; text-align: right;
   font-size: clamp(13px, 4.6cqi, 15px); font-weight: 800;
   font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink-3);
 }
@@ -1023,8 +1032,13 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .ppm-pairs .leader-num { font-size: clamp(21px, 7.6cqi, 26px); }
 /* A pair is TWO tiles where the three-way readout has three, so it keeps the
    chip beside the figure much further down than the 480px handover the wider
-   readout needs – on a phone that is the difference between two rows and four. */
-@container (min-width: 300px) {
+   readout needs – on a phone that is the difference between two rows and four.
+
+   250, not 300: the pair inherited the three-tile threshold, and it is far too
+   cautious for two. Measured with the chip forced beside the figure, the pair
+   wants 213px of the 300 it has at a 402px viewport, and still fits at 320px
+   with room to spare. 300 was buying nothing and costing the phone layout. */
+@container (min-width: 250px) {
   .ppm-pairs .leader { display: flex; align-items: center; }
   .ppm-pairs .leader-readout .delta { grid-column: auto; grid-row: auto; margin-top: 0; }
 }
