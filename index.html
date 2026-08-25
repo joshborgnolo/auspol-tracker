@@ -8216,7 +8216,7 @@ function CycleChart({
   // insight: current government vs the average past government at the same month
   const cur = cycles.find(c => c.current);
   let insight = null;
-  if (cur) {
+  if (cur && !hidden.has(cur.year)) {
     const mNow = cur.span;
     const curVal = chg ? cur.end[M.key] - cycBase(cur, M.key) : cur.end[M.key];
     // a peer only counts if it was actually measured at this month – comparing
@@ -8307,7 +8307,8 @@ function CycleLegend({
   hi,
   setHi,
   toggle,
-  showAll
+  showAll,
+  hideAll
 }) {
   const anyHidden = hidden.size > 0;
   return /*#__PURE__*/React.createElement("div", {
@@ -8343,11 +8344,11 @@ function CycleLegend({
     }, c.lead), c.current && /*#__PURE__*/React.createElement("span", {
       className: "cyc-now"
     }, "now"));
-  })), anyHidden && /*#__PURE__*/React.createElement("button", {
+  })), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "cyc-showall",
-    onClick: showAll
-  }, "Show all cycles"));
+    onClick: anyHidden ? showAll : hideAll
+  }, anyHidden ? "Show all cycles" : "Remove all cycles"));
 }
 
 /* ---- Past-cycles downloads --------------------------------------------
@@ -8549,14 +8550,18 @@ function PastCyclesView() {
   const [hidden, setHidden] = useState(new Set());
   const [hi, setHi] = useState(null);
   const [showHan, setShowHan] = useState(false);
+
+  /* A chip may now turn off the last line. It used to refuse, on the grounds
+     that an empty chart is useless – but the way back is one button away and
+     sits right under the chips, and refusing a click that was plainly meant
+     reads as the page being broken rather than careful. */
   const toggle = year => setHidden(h => {
     const n = new Set(h);
     n.has(year) ? n.delete(year) : n.add(year);
-    // never hide them all
-    if (n.size >= cycles.length) return h;
     return n;
   });
   const showAll = () => setHidden(new Set());
+  const hideAll = () => setHidden(new Set(cycles.map(c => c.year)));
   const exportSeries = () => downloadCsv(`auspol-tracker-cycles-series-${D.latest.updatedISO}.csv`, cycleSeriesRows(cycles));
   const exportSource = () => downloadCsv(`auspol-tracker-cycles-source-polls-${D.latest.updatedISO}.csv`, cycleSourceRows(cycles, D));
   return /*#__PURE__*/React.createElement("div", {
@@ -8596,7 +8601,8 @@ function PastCyclesView() {
     hi: hi,
     setHi: setHi,
     toggle: toggle,
-    showAll: showAll
+    showAll: showAll,
+    hideAll: hideAll
   }), /*#__PURE__*/React.createElement("div", {
     className: "cyc-charts"
   }, CYC_METRICS.map(m => /*#__PURE__*/React.createElement(CycleChart, {

@@ -306,7 +306,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
   // insight: current government vs the average past government at the same month
   const cur = cycles.find((c) => c.current);
   let insight = null;
-  if (cur) {
+  if (cur && !hidden.has(cur.year)) {
     const mNow = cur.span;
     const curVal = chg ? cur.end[M.key] - cycBase(cur, M.key) : cur.end[M.key];
     // a peer only counts if it was actually measured at this month – comparing
@@ -388,7 +388,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
   );
 }
 
-function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll }) {
+function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll }) {
   const anyHidden = hidden.size > 0;
   return (
     <div className="cyc-legend" onMouseLeave={() => setHi(null)}>
@@ -412,9 +412,14 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll }) {
           );
         })}
       </div>
-      {anyHidden && (
-        <button type="button" className="cyc-showall" onClick={showAll}>Show all cycles</button>
-      )}
+      {/* One control, both directions. "Show all" existed on its own, so
+          clearing the board meant unpicking six chips one at a time – and the
+          reason to clear it is the same reason the chips exist: to compare two
+          terms without the other four behind them. */}
+      <button type="button" className="cyc-showall"
+              onClick={anyHidden ? showAll : hideAll}>
+        {anyHidden ? "Show all cycles" : "Remove all cycles"}
+      </button>
     </div>
   );
 }
@@ -630,14 +635,17 @@ function PastCyclesView() {
   const [hi, setHi] = useState(null);
   const [showHan, setShowHan] = useState(false);
 
+  /* A chip may now turn off the last line. It used to refuse, on the grounds
+     that an empty chart is useless – but the way back is one button away and
+     sits right under the chips, and refusing a click that was plainly meant
+     reads as the page being broken rather than careful. */
   const toggle = (year) => setHidden((h) => {
     const n = new Set(h);
     n.has(year) ? n.delete(year) : n.add(year);
-    // never hide them all
-    if (n.size >= cycles.length) return h;
     return n;
   });
   const showAll = () => setHidden(new Set());
+  const hideAll = () => setHidden(new Set(cycles.map((c) => c.year)));
 
   const exportSeries = () => downloadCsv(
     `auspol-tracker-cycles-series-${D.latest.updatedISO}.csv`, cycleSeriesRows(cycles));
@@ -672,7 +680,7 @@ function PastCyclesView() {
       </div>
 
       <CycleLegend cycles={cycles} hidden={hidden} hi={hi} setHi={setHi}
-        toggle={toggle} showAll={showAll} />
+        toggle={toggle} showAll={showAll} hideAll={hideAll} />
 
       <div className="cyc-charts">
         {CYC_METRICS.map((m) => (
