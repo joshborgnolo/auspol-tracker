@@ -3237,13 +3237,15 @@ function straightPath(pts, sx, sy) {
  *           labelColor the text (defaults to --ink-3 – see the label below)
  *  fmt:     (y) => string  for tooltip/axis
  *  bands:   [{y0,y1,color}]  shaded horizontal regions (optional)
- *  areas:   [{id,color,opacity?,smooth?,edge?,points:[{x,y0,y1}]}]  shaded
+ *  areas:   [{id,color,opacity?,smooth?,edge?,clipX?,points:[{x,y0,y1}]}]  shaded
  *           region whose edges VARY with x – e.g. a sampling-error floor that
  *           moves as the polls behind it change size, or the interval around a
  *           trend line (bands can't do either, they're rectangles). `smooth`
  *           curves the edges like a trend line; `edge:false` drops the dashed
  *           outline, which an interval ribbon does not want; `className` lands
- *           on the fill so CSS can theme it.
+ *           on the fill so CSS can theme it; `clipX` is its own travelling
+ *           window, which an interval belonging to ONE line needs for the same
+ *           reason the line does.
  *  extraRows: (i) => [{label,value,color?}]  rows appended to the tooltip
  *           below the series rows; a point may also carry `note` for a
  *           secondary value shown beside its own row
@@ -3950,13 +3952,13 @@ function TrendChart(props) {
     y: "0",
     width: W - pad.l - pad.r,
     height: H
-  })), series.filter(s => s.clipX).map(s => {
-    const x0 = Math.max(pad.l, sx(s.clipX[0]));
+  })), [...series.filter(s => s.clipX).map(s => ["s", s]), ...areas.filter(a => a.clipX).map(a => ["a", a])].map(([kind, e]) => {
+    const x0 = Math.max(pad.l, sx(e.clipX[0]));
     // a little slack on the right so a rounded cap isn't shaved off
-    const x1 = Math.min(W - pad.r, sx(s.clipX[1]) + 5);
+    const x1 = Math.min(W - pad.r, sx(e.clipX[1]) + 5);
     return /*#__PURE__*/React.createElement("clipPath", {
-      key: "sc" + s.id,
-      id: clipId + "s" + s.id
+      key: kind + "c" + e.id,
+      id: clipId + kind + e.id
     }, /*#__PURE__*/React.createElement("rect", {
       x: x0,
       y: "0",
@@ -4016,22 +4018,30 @@ function TrendChart(props) {
     })), sx, sy).replace(/^M/, lead) : pts.map((d, i) => `${i ? "L" : lead} ${sx(d.x).toFixed(2)} ${sy(d[key]).toFixed(2)}`).join(" ");
     const top = edgePath(a.points, "y1", "M");
     const bot = edgePath(a.points.slice().reverse(), "y0", "L");
-    return /*#__PURE__*/React.createElement("g", {
-      key: "a" + a.id,
-      clipPath: `url(#${clipId})`
-    }, /*#__PURE__*/React.createElement("path", {
-      className: a.className,
-      d: `${top} ${bot} Z`,
-      fill: a.color,
-      opacity: a.opacity != null ? a.opacity : 1
-    }), a.edge !== false && /*#__PURE__*/React.createElement("path", {
-      d: top,
-      fill: "none",
-      stroke: a.color,
-      strokeWidth: 1.6,
-      strokeDasharray: "4 4",
-      opacity: 0.85
-    }));
+    return (
+      /*#__PURE__*/
+      /* the chart's window outside, the area's own inside: an interval
+         that belongs to one line has to grow and retreat with it, or it
+         arrives at full width while the line is still travelling */
+      React.createElement("g", {
+        key: "a" + a.id,
+        clipPath: `url(#${clipId})`
+      }, /*#__PURE__*/React.createElement("g", {
+        clipPath: a.clipX ? `url(#${clipId + "a" + a.id})` : undefined
+      }, /*#__PURE__*/React.createElement("path", {
+        className: a.className,
+        d: `${top} ${bot} Z`,
+        fill: a.color,
+        opacity: a.opacity != null ? a.opacity : 1
+      }), a.edge !== false && /*#__PURE__*/React.createElement("path", {
+        d: top,
+        fill: "none",
+        stroke: a.color,
+        strokeWidth: 1.6,
+        strokeDasharray: "4 4",
+        opacity: 0.85
+      })))
+    );
   }), yTicks.map(t => /*#__PURE__*/React.createElement("g", {
     key: "y" + t
   }, /*#__PURE__*/React.createElement("line", {
@@ -6008,6 +6018,8 @@ function ApprovalPanel({
     className: "ci-band",
     edge: false,
     smooth: true,
+    // the interval travels with the line it belongs to
+    clipX: drawn[L.id].clip,
     points: drawn[L.id].rows.filter(d => d.ci != null).map(d => ({
       x: d.x,
       y0: d.v - d.ci,

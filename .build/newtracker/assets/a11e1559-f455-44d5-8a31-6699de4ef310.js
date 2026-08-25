@@ -762,6 +762,8 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
 
   const apprAreas = leaders
     .map((L) => ({ id: "ci-" + L.id, color: L.color, className: "ci-band", edge: false, smooth: true,
+                   // the interval travels with the line it belongs to
+                   clipX: drawn[L.id].clip,
                    points: drawn[L.id].rows.filter((d) => d.ci != null)
                      .map((d) => ({ x: d.x, y0: d.v - d.ci, y1: d.v + d.ci })) }))
     .filter((a) => a.points.length >= 2);

@@ -88,13 +88,15 @@ function straightPath(pts, sx, sy) {
  *           labelColor the text (defaults to --ink-3 – see the label below)
  *  fmt:     (y) => string  for tooltip/axis
  *  bands:   [{y0,y1,color}]  shaded horizontal regions (optional)
- *  areas:   [{id,color,opacity?,smooth?,edge?,points:[{x,y0,y1}]}]  shaded
+ *  areas:   [{id,color,opacity?,smooth?,edge?,clipX?,points:[{x,y0,y1}]}]  shaded
  *           region whose edges VARY with x – e.g. a sampling-error floor that
  *           moves as the polls behind it change size, or the interval around a
  *           trend line (bands can't do either, they're rectangles). `smooth`
  *           curves the edges like a trend line; `edge:false` drops the dashed
  *           outline, which an interval ribbon does not want; `className` lands
- *           on the fill so CSS can theme it.
+ *           on the fill so CSS can theme it; `clipX` is its own travelling
+ *           window, which an interval belonging to ONE line needs for the same
+ *           reason the line does.
  *  extraRows: (i) => [{label,value,color?}]  rows appended to the tooltip
  *           below the series rows; a point may also carry `note` for a
  *           secondary value shown beside its own row
@@ -629,12 +631,13 @@ function TrendChart(props) {
           </clipPath>
           {/* One travelling window per line that asked for one. The <g> below
               still carries the chart-wide clip; these intersect with it. */}
-          {series.filter((s) => s.clipX).map((s) => {
-            const x0 = Math.max(pad.l, sx(s.clipX[0]));
+          {[...series.filter((s) => s.clipX).map((s) => ["s", s]),
+            ...areas.filter((a) => a.clipX).map((a) => ["a", a])].map(([kind, e]) => {
+            const x0 = Math.max(pad.l, sx(e.clipX[0]));
             // a little slack on the right so a rounded cap isn't shaved off
-            const x1 = Math.min(W - pad.r, sx(s.clipX[1]) + 5);
+            const x1 = Math.min(W - pad.r, sx(e.clipX[1]) + 5);
             return (
-              <clipPath key={"sc" + s.id} id={clipId + "s" + s.id}>
+              <clipPath key={kind + "c" + e.id} id={clipId + kind + e.id}>
                 <rect x={x0} y="0" width={Math.max(0, x1 - x0)} height={H} />
               </clipPath>
             );
@@ -682,7 +685,11 @@ function TrendChart(props) {
           const top = edgePath(a.points, "y1", "M");
           const bot = edgePath(a.points.slice().reverse(), "y0", "L");
           return (
+            /* the chart's window outside, the area's own inside: an interval
+               that belongs to one line has to grow and retreat with it, or it
+               arrives at full width while the line is still travelling */
             <g key={"a" + a.id} clipPath={`url(#${clipId})`}>
+             <g clipPath={a.clipX ? `url(#${clipId + "a" + a.id})` : undefined}>
               {/* `opacity` is a presentation ATTRIBUTE, so a class rule beats
                   it – which is how a themed area gets a different weight in
                   dark without the component knowing the theme */}
@@ -690,6 +697,7 @@ function TrendChart(props) {
                     opacity={a.opacity != null ? a.opacity : 1} />
               {a.edge !== false && <path d={top} fill="none" stroke={a.color} strokeWidth={1.6}
                                          strokeDasharray="4 4" opacity={0.85} />}
+             </g>
             </g>
           );
         })}
