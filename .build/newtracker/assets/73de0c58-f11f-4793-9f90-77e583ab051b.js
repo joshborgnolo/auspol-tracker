@@ -739,23 +739,56 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
    Posted with fetch + Accept: application/json rather than as a plain form.
    A bare form POST hands the reader to Formspree's own thank-you page, which
    means leaving the tracker to be told the message arrived; the whole page
-   needs JavaScript anyway, so there is nothing to lose by asking for it here. */
-const FB_KINDS = [
-  "A poll figure is wrong",
-  "A poll is missing",
-  "Something on the page is broken",
-  "A question about the method",
-  "Something else",
-];
+   needs JavaScript anyway, so there is nothing to lose by asking for it here.
+
+   window.AP.reportPoll opens it already filled in for one poll - registered on
+   the shared namespace for the same reason openPoll is, the archive row being
+   several components away from the footer with no prop path between them. */
+const FB_KINDS = ["Wrong figure", "Missing poll", "Site bug", "Something else"];
 
 function ReportError() {
   const endpoint = window.AP_FEEDBACK;
   const { D } = window.AP;
   const [open, setOpen] = useState(false);
+  const [kind, setKind] = useState(FB_KINDS[0]);
+  const [msg, setMsg] = useState("");
   const [status, setStatus] = useState("idle");     // idle | sending | sent | error
   const [error, setError] = useState("");
   const formRef = useRef(null);
+  const boxRef = useRef(null);
   const uid = useId();
+
+  /* Arriving from an archive row: open, seeded, and with the caret sitting
+     after the poll's name so the reader types the one thing the page cannot
+     fill in for them. */
+  const [arrival, setArrival] = useState(0);
+  React.useEffect(() => {
+    if (!endpoint) return;
+    window.AP.reportPoll = (poll) => {
+      if (!poll) return;
+      const when = poll.field ? `fielded ${poll.field}` : poll.fullDate ? `published ${poll.fullDate}` : "";
+      setKind(FB_KINDS[0]);
+      setMsg(`${poll.pollster}${when ? ", " + when : ""} — `);
+      setStatus("idle");
+      setOpen(true);
+      setArrival((n) => n + 1);   // drives the scroll+focus effect below
+    };
+    return () => { delete window.AP.reportPoll; };
+  }, [endpoint]);
+
+  /* The move to the form is an EFFECT, not a callback on the click: the
+     textarea does not exist until the state above has rendered, and an effect
+     is the only point that is guaranteed to be after the commit that creates
+     it and attaches the ref. A counter rather than a boolean, so a second
+     report from a second row re-runs it. */
+  React.useEffect(() => {
+    if (!arrival) return;
+    const box = boxRef.current;
+    if (!box) return;
+    box.scrollIntoView({ block: "center", behavior: "smooth" });
+    box.focus({ preventScroll: true });
+    box.setSelectionRange(box.value.length, box.value.length);
+  }, [arrival]);
 
   if (!endpoint) return null;
 
@@ -769,18 +802,18 @@ function ReportError() {
     // inbox list; the context fields say which page state it was sent from
     // and which build of the data the reader was looking at, both of which
     // are the first two things worth knowing about a reported figure.
-    body.set("_subject", `auspol tracker – ${body.get("kind") || "report"}`);
+    body.set("_subject", `auspol tracker – ${kind}`);
     body.set("page", (window.location.hash || "#snapshot").replace(/^#/, ""));
     body.set("data_updated", D.latest.updatedISO);
     try {
       const res = await fetch(endpoint, { method: "POST", body, headers: { Accept: "application/json" } });
-      if (res.ok) { setStatus("sent"); return; }
+      if (res.ok) { setStatus("sent"); setMsg(""); return; }
       // Formspree answers a rejected submission with {errors:[{message}]};
       // anything else (rate limit, outage, a mistyped id) has no body worth
       // showing, so fall back to a line that points somewhere useful.
-      let msg = "";
-      try { msg = ((await res.json()).errors || []).map((x) => x.message).join(", "); } catch (_) {}
-      setError(msg || `The form service returned an error (${res.status}). Please try again shortly.`);
+      let detail = "";
+      try { detail = ((await res.json()).errors || []).map((x) => x.message).join(", "); } catch (_) {}
+      setError(detail || `The form service returned an error (${res.status}). Please try again shortly.`);
       setStatus("error");
     } catch (_) {
       setError("Could not reach the form service – check your connection and try again.");
@@ -791,48 +824,50 @@ function ReportError() {
   if (status === "sent") {
     return (
       <div className="fb">
-        <div className="fb-thanks">
-          <strong>Thank you – that's arrived.</strong> Corrections are checked against the
-          pollster's own release before anything changes here, so a fix shows up at the next
+        <p className="fb-thanks">
+          <strong>Thank you – that's arrived.</strong> Anything reported is checked against the
+          pollster's own release before a figure moves here, so a correction shows up at the next
           build rather than straight away.{" "}
-          <button type="button" className="fb-toggle" onClick={() => { setStatus("idle"); }}>
+          <button type="button" className="fb-link" onClick={() => setStatus("idle")}>
             Send another
           </button>
-        </div>
+        </p>
       </div>
     );
   }
 
   return (
     <div className="fb">
-      <div className="fb-head">
-        <p className="fb-lede">
-          Every figure here is transcribed from a pollster's published release, and some of
-          them will be wrong. If you've spotted one – or a poll that should be in the archive
-          and isn't – say so and it gets checked against the source.
-        </p>
-        {!open && (
-          <button type="button" className="fb-toggle" onClick={() => setOpen(true)} aria-expanded="false">
-            Report an error
-          </button>
-        )}
-      </div>
+      <p className="fb-lede">
+        Every figure here is transcribed by hand from a pollster's published release, and some of
+        them will be wrong. If you have found one – or a poll that belongs in the archive and is
+        not in it –{" "}
+        <button type="button" className="fb-link" onClick={() => setOpen(true)} aria-expanded={open}>
+          say so
+        </button>{open ? "." : " and it gets checked against the source."}
+      </p>
 
       {open && (
         <form className="fb-form" ref={formRef} onSubmit={submit}>
           <div className="fb-row">
-            <label className="fb-label" htmlFor={uid + "-kind"}>What's this about?</label>
-            <select id={uid + "-kind"} name="kind" defaultValue={FB_KINDS[0]}>
-              {FB_KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
-            </select>
+            <span className="fb-label" id={uid + "-kindlab"}>What's this about?</span>
+            <div className="fb-chips" role="group" aria-labelledby={uid + "-kindlab"}>
+              {FB_KINDS.map((k) => (
+                <button key={k} type="button" aria-pressed={k === kind}
+                        className={"fb-chip" + (k === kind ? " active" : "")}
+                        onClick={() => setKind(k)}>{k}</button>
+              ))}
+            </div>
+            <input type="hidden" name="kind" value={kind} />
           </div>
 
           <div className="fb-row">
             <label className="fb-label" htmlFor={uid + "-msg"}>
               Details <span>– the pollster and field dates help most</span>
             </label>
-            <textarea id={uid + "-msg"} name="message" required
-              placeholder="e.g. the Resolve poll of 12 August has Labor's primary at 27.9, the release says 28.9" />
+            <textarea id={uid + "-msg"} name="message" required ref={boxRef}
+              value={msg} onChange={(e) => setMsg(e.target.value)}
+              placeholder="e.g. Resolve, fielded 12–15 Aug — Labor's primary is 27.9 here, the release says 28.9" />
           </div>
 
           <div className="fb-row">
@@ -843,8 +878,6 @@ function ReportError() {
               placeholder="you@example.com" />
           </div>
 
-          {/* the honeypot: invisible to a reader, filled in by naive bots,
-              and Formspree drops any submission that arrives with it set */}
           <div className="fb-gotcha" aria-hidden="true">
             <label htmlFor={uid + "-gotcha"}>Leave this field empty</label>
             <input id={uid + "-gotcha"} name="_gotcha" type="text" tabIndex={-1} autoComplete="off" />
@@ -854,10 +887,9 @@ function ReportError() {
             <button type="submit" className="fb-send" disabled={status === "sending"}>
               {status === "sending" ? "Sending…" : "Send report"}
             </button>
-            <p className={"fb-note" + (status === "error" ? " is-error" : "")} role={status === "error" ? "alert" : undefined}>
-              {status === "error"
-                ? error
-                : "Sent to the tracker's inbox via Formspree. Nothing is published, and the page records nothing about you."}
+            <p className={"fb-note" + (status === "error" ? " is-error" : "")}
+               role={status === "error" ? "alert" : undefined}>
+              {status === "error" ? error : "Goes to my inbox via Formspree. Nothing is published."}
             </p>
           </div>
         </form>

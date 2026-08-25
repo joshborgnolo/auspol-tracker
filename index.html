@@ -1351,6 +1351,11 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   transition: color .15s ease, border-color .15s ease, background-color .15s ease;
 }
 .back-to-chart:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
+/* Both controls in the line are the same kind of thing - a way out of the row
+   - so they read as a pair. Only the first claims the free space; without
+   this the second takes its own margin-left:auto and the two split apart. */
+.back-to-chart + .pd-report { margin-left: 0; }
+.pd-report svg { opacity: 0.75; }
 /* the meta line carries text and now a control, so centre what sits in it */
 .pd-meta { align-items: center; }
 /* a poll arrived at from a chart gets one quiet pulse, so the eye finds it
@@ -1536,61 +1541,84 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 /* ---------- report an error ----------
    The page is static – GitHub Pages serves files and cannot process a POST –
    so the form hands the submission to Formspree and only has to send the
-   request. Collapsed to a single line by default: the footer's job is to
-   explain the method, not to solicit, and a form sitting open under the
-   method notes reads as the page asking for something rather than offering
-   somewhere to put a correction. */
-.fb { margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line-2); }
-.fb-head { display: flex; align-items: baseline; gap: 8px 16px; flex-wrap: wrap; }
-.fb-lede { margin: 0; flex: 1 1 340px; font-size: 13px; line-height: 1.6; color: var(--ink-3); }
-.fb-toggle {
-  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
-  border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
-  padding: 5px 13px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
-  color: var(--ink-2); cursor: pointer; white-space: nowrap;
-  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
-}
-.fb-toggle:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
+   request.
 
-.fb-form { margin: 16px 0 0; max-width: 560px; display: grid; gap: 13px; }
-.fb-row { display: grid; gap: 5px; }
-.fb-label { font-size: 12px; font-weight: 600; color: var(--ink-2); }
-.fb-label span { font-weight: 400; color: var(--ink-3); }
+   Built out of the page's own parts rather than a form's: a rule, tracked
+   caps, chips, and fields carrying one hairline underneath instead of a box
+   on four sides. A boxed input was the only shape in the document that
+   belonged to a form rather than to a page of type, and four of them stacked
+   under the method notes turned the quietest part of the page into the
+   busiest. Collapsed to a sentence until it is wanted, for the same reason:
+   the footer's job is to explain the method, not to solicit. */
+.fb { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line-2); }
+.fb-lede { margin: 0; max-width: 62ch; font-size: 13px; line-height: 1.65; color: var(--ink-3); }
+/* The trigger sits INSIDE the sentence rather than beside it: the offer and
+   the way to take it up are one thought, and a pill parked at the end of the
+   paragraph read as a second one competing with it. */
+.fb-link {
+  border: 0; border-bottom: 1px solid var(--ink-faint); background: none;
+  padding: 0; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer;
+  transition: border-color .15s ease;
+}
+.fb-link:hover { border-bottom-color: var(--ink); }
+
+.fb-form { margin: 20px 0 0; max-width: 540px; display: grid; gap: 19px; }
+.fb-form, .fb-thanks { animation: fb-in .22s ease both; }
+@keyframes fb-in { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .fb-form, .fb-thanks { animation: none; } }
+
+.fb-row { display: grid; gap: 8px; }
+.fb-label {
+  font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+/* the parenthetical half of a label is prose, not a heading – it drops the
+   caps treatment so the label above the field stays one short token */
+.fb-label span { text-transform: none; letter-spacing: 0; font-weight: 400; }
+
+.fb-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.fb-chip {
+  border: 1px solid var(--line); background: transparent; border-radius: 999px;
+  padding: 5px 12px; cursor: pointer; white-space: nowrap;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 500; color: var(--ink-3);
+  transition: color .15s ease, border-color .15s ease;
+}
+.fb-chip:hover { color: var(--ink-2); border-color: var(--ink-faint); }
+.fb-chip.active { color: var(--ink); border-color: var(--ink); font-weight: 600; }
+
+.fb-form input, .fb-form textarea {
+  width: 100%; font-family: var(--sans); font-size: 14px; line-height: 1.55;
+  color: var(--ink); background: transparent;
+  border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
+  padding: 5px 1px; transition: border-color .15s ease;
+}
+.fb-form textarea { min-height: 74px; resize: vertical; }
+.fb-form input::placeholder, .fb-form textarea::placeholder { color: var(--ink-3); opacity: 0.72; }
+.fb-form input:focus, .fb-form textarea:focus { outline: none; border-bottom-color: var(--accent); }
 /* The theme here is a manual toggle and can disagree with the OS, so pin the
-   native widgets (dropdown list, caret, autofill) to the page's own theme
-   rather than letting them follow prefers-color-scheme into the wrong one. */
+   native furniture (caret, selection, autofill) to the page's own theme
+   rather than letting it follow prefers-color-scheme into the wrong one. */
 .fb-form { color-scheme: light; }
 body.dark .fb-form { color-scheme: dark; }
-.fb-form select, .fb-form input, .fb-form textarea {
-  width: 100%; font-family: var(--sans); font-size: 14px; color: var(--ink);
-  background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
-  padding: 9px 12px; transition: border-color .15s ease;
-}
-.fb-form textarea { min-height: 100px; resize: vertical; line-height: 1.55; }
-.fb-form select:focus, .fb-form input:focus, .fb-form textarea:focus { outline: none; border-color: var(--accent); }
-/* Formspree discards anything arriving with _gotcha filled – a field no
-   human sees and every naive bot completes. Off-screen rather than
-   display:none, which the same bots know to skip. */
+/* Formspree discards anything arriving with _gotcha filled – a field no human
+   sees and every naive bot completes. Off-screen rather than display:none,
+   which the same bots know to skip. */
 .fb-gotcha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-.fb-actions { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; }
+
+.fb-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
 .fb-send {
-  border: 1px solid transparent; border-radius: 999px; padding: 8px 18px;
-  font-family: var(--sans); font-size: 13px; font-weight: 640;
-  background: var(--ink); color: var(--bg); cursor: pointer;
-  transition: opacity .15s ease;
+  border: 1px solid var(--ink); background: transparent; color: var(--ink);
+  border-radius: 999px; padding: 7px 18px; cursor: pointer; white-space: nowrap;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  transition: background-color .15s ease, color .15s ease, opacity .15s ease;
 }
-.fb-send:hover { opacity: 0.86; }
-.fb-send[disabled] { opacity: 0.5; cursor: default; }
-.fb-note { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+.fb-send:hover { background: var(--ink); color: var(--bg); }
+.fb-send[disabled] { opacity: 0.45; cursor: default; background: transparent; color: var(--ink); }
+.fb-note { margin: 0; flex: 1 1 210px; font-size: 12px; line-height: 1.5; color: var(--ink-3); }
 .fb-note.is-error { color: var(--mood-neg); }
-.fb-thanks {
-  margin: 16px 0 0; max-width: 560px; padding: 12px 15px; border-radius: 10px;
-  background: var(--surface-2); border: 1px solid var(--line);
-  font-size: 13px; line-height: 1.6; color: var(--ink-2);
-}
-@media (max-width: 560px) {
-  .fb-form, .fb-thanks { max-width: none; }
-}
+.fb-thanks { margin: 20px 0 0; max-width: 540px; font-size: 13px; line-height: 1.65; color: var(--ink-2); }
+
+@media (max-width: 560px) { .fb-form, .fb-thanks { max-width: none; } }
 
 /* ---------- responsive ---------- */
 /* The leadership pair carries a scatter cloud in each panel now, and ~120 dots
@@ -9234,7 +9262,25 @@ function ArchPollDetail({
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("path", {
     d: "M19 12H5M11 18l-6-6 6-6"
-  })), "Back to the chart")), /*#__PURE__*/React.createElement("div", {
+  })), "Back to the chart"), window.AP_FEEDBACK && /*#__PURE__*/React.createElement("button", {
+    className: "back-to-chart pd-report",
+    onClick: e => {
+      e.stopPropagation();
+      window.AP.reportPoll && window.AP.reportPoll(p);
+    }
+  }, /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    width: "13",
+    height: "13",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2.2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
+  })), "Report an error")), /*#__PURE__*/React.createElement("div", {
     className: "pd-grid"
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-block"
@@ -12214,18 +12260,64 @@ function Hero({
    Posted with fetch + Accept: application/json rather than as a plain form.
    A bare form POST hands the reader to Formspree's own thank-you page, which
    means leaving the tracker to be told the message arrived; the whole page
-   needs JavaScript anyway, so there is nothing to lose by asking for it here. */
-const FB_KINDS = ["A poll figure is wrong", "A poll is missing", "Something on the page is broken", "A question about the method", "Something else"];
+   needs JavaScript anyway, so there is nothing to lose by asking for it here.
+
+   window.AP.reportPoll opens it already filled in for one poll - registered on
+   the shared namespace for the same reason openPoll is, the archive row being
+   several components away from the footer with no prop path between them. */
+const FB_KINDS = ["Wrong figure", "Missing poll", "Site bug", "Something else"];
 function ReportError() {
   const endpoint = window.AP_FEEDBACK;
   const {
     D
   } = window.AP;
   const [open, setOpen] = useState(false);
+  const [kind, setKind] = useState(FB_KINDS[0]);
+  const [msg, setMsg] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | sent | error
   const [error, setError] = useState("");
   const formRef = useRef(null);
+  const boxRef = useRef(null);
   const uid = useId();
+
+  /* Arriving from an archive row: open, seeded, and with the caret sitting
+     after the poll's name so the reader types the one thing the page cannot
+     fill in for them. */
+  const [arrival, setArrival] = useState(0);
+  React.useEffect(() => {
+    if (!endpoint) return;
+    window.AP.reportPoll = poll => {
+      if (!poll) return;
+      const when = poll.field ? `fielded ${poll.field}` : poll.fullDate ? `published ${poll.fullDate}` : "";
+      setKind(FB_KINDS[0]);
+      setMsg(`${poll.pollster}${when ? ", " + when : ""} — `);
+      setStatus("idle");
+      setOpen(true);
+      setArrival(n => n + 1); // drives the scroll+focus effect below
+    };
+    return () => {
+      delete window.AP.reportPoll;
+    };
+  }, [endpoint]);
+
+  /* The move to the form is an EFFECT, not a callback on the click: the
+     textarea does not exist until the state above has rendered, and an effect
+     is the only point that is guaranteed to be after the commit that creates
+     it and attaches the ref. A counter rather than a boolean, so a second
+     report from a second row re-runs it. */
+  React.useEffect(() => {
+    if (!arrival) return;
+    const box = boxRef.current;
+    if (!box) return;
+    box.scrollIntoView({
+      block: "center",
+      behavior: "smooth"
+    });
+    box.focus({
+      preventScroll: true
+    });
+    box.setSelectionRange(box.value.length, box.value.length);
+  }, [arrival]);
   if (!endpoint) return null;
   const submit = async e => {
     e.preventDefault();
@@ -12237,7 +12329,7 @@ function ReportError() {
     // inbox list; the context fields say which page state it was sent from
     // and which build of the data the reader was looking at, both of which
     // are the first two things worth knowing about a reported figure.
-    body.set("_subject", `auspol tracker – ${body.get("kind") || "report"}`);
+    body.set("_subject", `auspol tracker – ${kind}`);
     body.set("page", (window.location.hash || "#snapshot").replace(/^#/, ""));
     body.set("data_updated", D.latest.updatedISO);
     try {
@@ -12250,16 +12342,17 @@ function ReportError() {
       });
       if (res.ok) {
         setStatus("sent");
+        setMsg("");
         return;
       }
       // Formspree answers a rejected submission with {errors:[{message}]};
       // anything else (rate limit, outage, a mistyped id) has no body worth
       // showing, so fall back to a line that points somewhere useful.
-      let msg = "";
+      let detail = "";
       try {
-        msg = ((await res.json()).errors || []).map(x => x.message).join(", ");
+        detail = ((await res.json()).errors || []).map(x => x.message).join(", ");
       } catch (_) {}
-      setError(msg || `The form service returned an error (${res.status}). Please try again shortly.`);
+      setError(detail || `The form service returned an error (${res.status}). Please try again shortly.`);
       setStatus("error");
     } catch (_) {
       setError("Could not reach the form service – check your connection and try again.");
@@ -12269,44 +12362,47 @@ function ReportError() {
   if (status === "sent") {
     return /*#__PURE__*/React.createElement("div", {
       className: "fb"
-    }, /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement("p", {
       className: "fb-thanks"
-    }, /*#__PURE__*/React.createElement("strong", null, "Thank you \u2013 that's arrived."), " Corrections are checked against the pollster's own release before anything changes here, so a fix shows up at the next build rather than straight away.", " ", /*#__PURE__*/React.createElement("button", {
+    }, /*#__PURE__*/React.createElement("strong", null, "Thank you \u2013 that's arrived."), " Anything reported is checked against the pollster's own release before a figure moves here, so a correction shows up at the next build rather than straight away.", " ", /*#__PURE__*/React.createElement("button", {
       type: "button",
-      className: "fb-toggle",
-      onClick: () => {
-        setStatus("idle");
-      }
+      className: "fb-link",
+      onClick: () => setStatus("idle")
     }, "Send another")));
   }
   return /*#__PURE__*/React.createElement("div", {
     className: "fb"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "fb-head"
   }, /*#__PURE__*/React.createElement("p", {
     className: "fb-lede"
-  }, "Every figure here is transcribed from a pollster's published release, and some of them will be wrong. If you've spotted one \u2013 or a poll that should be in the archive and isn't \u2013 say so and it gets checked against the source."), !open && /*#__PURE__*/React.createElement("button", {
+  }, "Every figure here is transcribed by hand from a pollster's published release, and some of them will be wrong. If you have found one \u2013 or a poll that belongs in the archive and is not in it \u2013", " ", /*#__PURE__*/React.createElement("button", {
     type: "button",
-    className: "fb-toggle",
+    className: "fb-link",
     onClick: () => setOpen(true),
-    "aria-expanded": "false"
-  }, "Report an error")), open && /*#__PURE__*/React.createElement("form", {
+    "aria-expanded": open
+  }, "say so"), open ? "." : " and it gets checked against the source."), open && /*#__PURE__*/React.createElement("form", {
     className: "fb-form",
     ref: formRef,
     onSubmit: submit
   }, /*#__PURE__*/React.createElement("div", {
     className: "fb-row"
-  }, /*#__PURE__*/React.createElement("label", {
+  }, /*#__PURE__*/React.createElement("span", {
     className: "fb-label",
-    htmlFor: uid + "-kind"
-  }, "What's this about?"), /*#__PURE__*/React.createElement("select", {
-    id: uid + "-kind",
-    name: "kind",
-    defaultValue: FB_KINDS[0]
-  }, FB_KINDS.map(k => /*#__PURE__*/React.createElement("option", {
+    id: uid + "-kindlab"
+  }, "What's this about?"), /*#__PURE__*/React.createElement("div", {
+    className: "fb-chips",
+    role: "group",
+    "aria-labelledby": uid + "-kindlab"
+  }, FB_KINDS.map(k => /*#__PURE__*/React.createElement("button", {
     key: k,
-    value: k
-  }, k)))), /*#__PURE__*/React.createElement("div", {
+    type: "button",
+    "aria-pressed": k === kind,
+    className: "fb-chip" + (k === kind ? " active" : ""),
+    onClick: () => setKind(k)
+  }, k))), /*#__PURE__*/React.createElement("input", {
+    type: "hidden",
+    name: "kind",
+    value: kind
+  })), /*#__PURE__*/React.createElement("div", {
     className: "fb-row"
   }, /*#__PURE__*/React.createElement("label", {
     className: "fb-label",
@@ -12315,7 +12411,10 @@ function ReportError() {
     id: uid + "-msg",
     name: "message",
     required: true,
-    placeholder: "e.g. the Resolve poll of 12 August has Labor's primary at 27.9, the release says 28.9"
+    ref: boxRef,
+    value: msg,
+    onChange: e => setMsg(e.target.value),
+    placeholder: "e.g. Resolve, fielded 12\u201315 Aug \u2014 Labor's primary is 27.9 here, the release says 28.9"
   })), /*#__PURE__*/React.createElement("div", {
     className: "fb-row"
   }, /*#__PURE__*/React.createElement("label", {
@@ -12347,7 +12446,7 @@ function ReportError() {
   }, status === "sending" ? "Sending…" : "Send report"), /*#__PURE__*/React.createElement("p", {
     className: "fb-note" + (status === "error" ? " is-error" : ""),
     role: status === "error" ? "alert" : undefined
-  }, status === "error" ? error : "Sent to the tracker's inbox via Formspree. Nothing is published, and the page records nothing about you."))));
+  }, status === "error" ? error : "Goes to my inbox via Formspree. Nothing is published."))));
 }
 function MethodNote() {
   const {

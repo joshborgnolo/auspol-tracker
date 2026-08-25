@@ -1038,6 +1038,22 @@ function ArchPollDetail({ p, onBack }) {
             Back to the chart
           </button>
         )}
+        {/* Corrections are nearly always about ONE poll, and the reader who
+            has a row open is looking at the figure they doubt. Seeding the
+            footer's form from here means the pollster and field dates - the
+            two things that identify a row in data/polls.json - arrive already
+            written, rather than being retyped from memory after scrolling
+            away from them. Only rendered when a form exists to seed. */}
+        {window.AP_FEEDBACK && (
+          <button className="back-to-chart pd-report"
+                  onClick={(e) => { e.stopPropagation(); window.AP.reportPoll && window.AP.reportPoll(p); }}>
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                 strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+            </svg>
+            Report an error
+          </button>
+        )}
       </div>
       <div className="pd-grid">
         <div className="pd-block">
