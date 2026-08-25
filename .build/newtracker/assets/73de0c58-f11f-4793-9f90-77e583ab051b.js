@@ -848,7 +848,7 @@ function ReportError() {
             in state, so closing it is not the same as discarding it. */}
         <button type="button" className="fb-link" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
           say so
-        </button>{open ? "." : " and it gets checked against the source."}
+        </button>{open ? "." : " and I’ll check it against the source."}
       </p>
 
       {open && (
