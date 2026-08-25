@@ -8915,23 +8915,23 @@
       },
       {
         "date": "2011-10-23",
-        "firm": "Morgan",
-        "lnp": 47,
-        "alp": 31,
-        "grn": 12.5,
-        "onp": null,
-        "oth": 9.6,
-        "tpp_lnp": 55,
-        "tpp_alp": 45
-      },
-      {
-        "date": "2011-10-23",
         "firm": "Essential",
         "lnp": 48,
         "alp": 32,
         "grn": 11,
         "onp": null,
         "oth": 9,
+        "tpp_lnp": 55,
+        "tpp_alp": 45
+      },
+      {
+        "date": "2011-10-26",
+        "firm": "Morgan",
+        "lnp": 47,
+        "alp": 31,
+        "grn": 12.5,
+        "onp": null,
+        "oth": 9.6,
         "tpp_lnp": 55,
         "tpp_alp": 45
       },

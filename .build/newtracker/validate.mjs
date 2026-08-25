@@ -105,7 +105,31 @@ export function validate(D) {
   for (const [cycle, rows] of Object.entries(D.cyclePolls || {}))
     orientation(rows.filter((p) => p.firm !== "Election"), `cyclePolls.${cycle}`, "alp", "tpp_alp");
 
-  // 8. every leadership row should key onto a poll's fieldwork-end date, or it
+  /* 8. one house, one reading, one date – in the cycle arrays too. Check 4
+     covers polls[] alone, which is why two different Morgan waves sat on
+     2011-10-23 for as long as the file existed: the 25-26 Oct phone poll had
+     been keyed to the 22-23 Oct face-to-face poll's date. Nothing looks wrong
+     on the page, which is the problem – a stacked pair is invisible on a chart
+     that means the month it falls in, and silently double-weights one house in
+     that month's mean. Two DIFFERENT readings on one date are always either a
+     mis-keyed date or a house that needs naming apart; they are never both
+     right, so this is an error rather than something `sumNote` can excuse. */
+  const cycleDupes = (obj, label) => {
+    for (const [cycle, rows] of Object.entries(obj || {})) {
+      const seenHere = new Set();
+      for (const r of rows) {
+        const key = r.date + "|" + r.firm;
+        if (seenHere.has(key))
+          errors.push({ type: "duplicate", poll: `${label}.${cycle} ${r.date} · ${r.firm}`,
+                        detail: "same date + firm already present in this cycle" });
+        seenHere.add(key);
+      }
+    }
+  };
+  cycleDupes(D.cyclePolls, "cyclePolls");
+  cycleDupes(D.cycleApproval, "cycleApproval");
+
+  // 9. every leadership row should key onto a poll's fieldwork-end date, or it
   //    is a leadership-only wave – flagged as info, since a drifted date looks
   //    exactly like one (the Essential Dec-2025 / Mar-2026 bug)
   const pollKeys = new Set(D.polls.map((p) => p.date + "|" + p.pollster));
