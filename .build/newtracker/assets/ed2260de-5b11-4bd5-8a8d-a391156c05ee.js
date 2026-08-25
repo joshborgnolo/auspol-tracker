@@ -290,17 +290,41 @@ window.AP = (function () {
     const lerp = (p, q) => p + (q - p) * t;
     const index = (arr) => { const o = {}; arr.forEach((d) => (o[d.ym] = d)); return o; };
     const ia = index(A), ib = index(B);
-    const hold = (idx, arr, ym) => idx[ym] || (ym < arr[0].ym ? arr[0] : arr[arr.length - 1]);
+    /* What one side reads at a month it doesn't have a reading for. OUTSIDE its
+       span it holds its nearest end — those months are clipped away anyway, and
+       the clip is what makes the line grow and retreat. INSIDE its span it is
+       interpolated between the readings either side: leadership series are
+       gap-aware, so a month one question skipped is common, and holding the
+       series' final value there put a spike in the middle of a line that was
+       supposed to be bending into shape. */
+    const readAt = (idx, arr, ym, x) => {
+      const hit = idx[ym];
+      if (hit) return hit;
+      if (x <= arr[0].x) return arr[0];
+      if (x >= arr[arr.length - 1].x) return arr[arr.length - 1];
+      let i = 0;
+      while (i < arr.length - 2 && arr[i + 1].x < x) i++;
+      const a = arr[i], b = arr[i + 1], f = (x - a.x) / (b.x - a.x);
+      const o = { ym, x };
+      keys.forEach((k) => { o[k] = (a[k] == null || b[k] == null) ? null : a[k] + (b[k] - a[k]) * f; });
+      return o;
+    };
     const yms = [...new Set(A.concat(B).map((d) => d.ym))].sort();
     return {
       rows: yms.map((ym) => {
-        const da = hold(ia, A, ym), db = hold(ib, B, ym);
-        const o = { ym, x: (ia[ym] || ib[ym]).x };
+        const x = (ia[ym] || ib[ym]).x;
+        const da = readAt(ia, A, ym, x), db = readAt(ib, B, ym, x);
+        const o = { ym, x };
         keys.forEach((k) => {
           o[k] = (da[k] == null || db[k] == null) ? null : lerp(da[k], db[k]);
         });
         return o;
       }),
+      /* The window this ONE line is allowed to draw in, travelling from its own
+         span to its own. Per line, not per chart: Hanson is rated on
+         favourability months before anyone asked about approving of her, and a
+         single chart-wide window cannot express three different retreats — the
+         lines whose span it did not describe simply appeared at full length. */
       clip: [lerp(A[0].x, B[0].x), lerp(A[A.length - 1].x, B[B.length - 1].x)],
     };
   }

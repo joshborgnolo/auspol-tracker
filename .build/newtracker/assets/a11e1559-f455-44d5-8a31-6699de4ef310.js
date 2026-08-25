@@ -544,7 +544,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
       const only = a || b;
       return { r: only, pts: lineFor(only), wipe: a ? morph.t : 1 - morph.t };
     }).filter((d) => d.pts.length);
-  const clipX = morph ? (drawRows.map((d) => d.clip).filter(Boolean)[0] || null) : null;
+
 
   // y-window fitted to the readings in view, scatter included – and taken
   // across both questions while morphing, so the axis holds still under lines
@@ -658,13 +658,17 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         areas={areas}
         series={drawRows.map((d) => ({
           id: d.r.mk, label: d.r.label, color: d.r.L.color, dashed: d.r.dashed,
-          opacity: d.opacity, wipe: d.wipe, points: d.pts.map((p) => ({ x: p.x, y: p.v })),
+          /* The three-way is seven months against the two-way's fourteen, so
+             every line here retreats by a different amount – each needs its own
+             window or the shorter ones arrive at full length and snap. */
+          clipX: d.clip, opacity: d.opacity, wipe: d.wipe,
+          points: d.pts.map((p) => ({ x: p.x, y: p.v })),
         }))}
         spine={pts.map((d) => ({ x: d.x }))}
         scatter={cross ? cross.scatter : ppmScatter} pollFacet="leadership"
         scatterOut={cross ? cross.scatterOut : []}
         scatterMove={cross ? cross.scatterMove : []}
-        fade={morph ? morph.t : 1} clipX={clipX}
+        fade={morph ? morph.t : 1}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={(v) => v.toFixed(0)}
       />
@@ -755,9 +759,6 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   };
   const drawn = {};
   leaders.forEach((L) => { drawn[L.id] = drawLine(L); });
-  const clipX = morph
-    ? (leaders.map((L) => drawn[L.id].clip).filter(Boolean)[0] || null)
-    : null;
 
   const apprAreas = leaders
     .map((L) => ({ id: "ci-" + L.id, color: L.color, className: "ci-band", edge: false, smooth: true,
@@ -847,6 +848,10 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         events={leaders.some((L) => L.id === "taylor") ? [OPP_HANDOVER].filter(Boolean) : []}
         series={ordered.map((L) => (
           { id: L.id, label: L.short + " net", color: L.color,
+            /* Hanson has nine months of favourability against five of
+               approval, so her line has to shorten while the other two barely
+               move. Each carries its own window for that reason. */
+            clipX: drawn[L.id].clip,
             points: drawn[L.id].rows.map((d) => ({ x: d.x, y: d.v })) }
         ))}
         spine={pts.map((d) => ({ x: d.x }))}
@@ -854,7 +859,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         scatter={cross ? cross.scatter : apprScatter} pollFacet="leadership"
         scatterOut={cross ? cross.scatterOut : []}
         scatterMove={cross ? cross.scatterMove : []}
-        fade={morph ? morph.t : 1} clipX={clipX}
+        fade={morph ? morph.t : 1}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
         fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(0)}
       />

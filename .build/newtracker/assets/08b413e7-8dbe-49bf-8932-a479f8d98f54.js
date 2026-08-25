@@ -76,7 +76,10 @@ function straightPath(pts, sx, sy) {
 /* ------------------------------------------------------------------ *
  * TrendChart – the workhorse
  *  series:  [{ id, label, color, points:[{x,y}], width?, dashed?, smooth?,
- *            opacity?, wipe? }]  `wipe` is how much of the line has been
+ *            opacity?, wipe?, clipX? }]  `clipX` is the x window THIS line may
+ *            draw in – lines that grow and retreat by different amounts during
+ *            a question switch each need their own, since one chart-wide
+ *            window can only describe one of them. `wipe` is how much of the line has been
  *            ERASED from the left, 0..1 – a line that has nowhere to travel to
  *            when the chart changes question is rubbed out rather than dimmed
  *  scatter: [{ x, y, color, meta }]
@@ -624,6 +627,18 @@ function TrendChart(props) {
           <clipPath id={plotId}>
             <rect x={pad.l} y="0" width={W - pad.l - pad.r} height={H} />
           </clipPath>
+          {/* One travelling window per line that asked for one. The <g> below
+              still carries the chart-wide clip; these intersect with it. */}
+          {series.filter((s) => s.clipX).map((s) => {
+            const x0 = Math.max(pad.l, sx(s.clipX[0]));
+            // a little slack on the right so a rounded cap isn't shaved off
+            const x1 = Math.min(W - pad.r, sx(s.clipX[1]) + 5);
+            return (
+              <clipPath key={"sc" + s.id} id={clipId + "s" + s.id}>
+                <rect x={x0} y="0" width={Math.max(0, x1 - x0)} height={H} />
+              </clipPath>
+            );
+          })}
           {/* An eraser, one per wiping line. A line with no counterpart in the
               question being switched to used to fade out everywhere at once,
               which reads as a rendering glitch rather than a departure. Rubbing
@@ -762,6 +777,7 @@ function TrendChart(props) {
                   d={(s.smooth === false ? straightPath : smoothPath)(s.points, sx, sy)}
                   fill="none" stroke={s.color} strokeWidth={s.width || 3.4}
                   strokeDasharray={s.dashed ? "6 6" : "none"}
+                  clipPath={s.clipX ? `url(#${clipId + "s" + s.id})` : undefined}
                   mask={s.wipe != null && s.wipe > 0 ? `url(#${wipeId + s.id})` : undefined}
                   style={s.opacity != null ? { opacity: s.opacity } : null}
                   strokeLinejoin="round" strokeLinecap="round" />
