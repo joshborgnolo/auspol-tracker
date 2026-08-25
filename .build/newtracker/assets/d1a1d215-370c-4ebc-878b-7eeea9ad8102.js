@@ -197,10 +197,25 @@ function cycMonthLabel(m) {
   return m + " months in";
 }
 
+/* The calendar month a cycle month lands on. Only ever shown when a single
+   cycle is on the chart: with six terms overlaid, "month 11" is the whole
+   point of the alignment and a date would belong to only one of them. Alone,
+   the reader is looking at one term and counting forward from an election date
+   they have to remember is work the tooltip can just do.
+   Named from the election month rather than by adding days, because the
+   buckets behind the line are averaged months (365.25/12) - this is the month
+   the bucket sits in, not an exact date. */
+function cycMonthOf(eDate, m) {
+  const [y, mo] = eDate.split("-").map(Number);
+  const t = (mo - 1) + Math.max(0, m);
+  return window.AP.D.monthNameFull((t % 12) + 1) + " " + (y + Math.floor(t / 12));
+}
+
 // linear-interpolate quarterly (or monthly) anchors onto a 0..maxM month grid.
-// Only KNOWN anchors are interpolated between: a measure can start late (no
-// leader approval was published for the first eleven months of the Morrison
-// term), and those months stay null rather than borrowing the first reading.
+// Only KNOWN anchors are interpolated between: a measure can start late (the
+// Morrison term's first reading is month 2, and its 2016 predecessor's opens
+// on the election), and those months stay null rather than borrowing the
+// first reading.
 function toMonthly(months, vals, maxM) {
   const anchors = [];
   for (let i = 0; i < months.length; i++) {
@@ -255,7 +270,12 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
   // governing party (red Labor / blue Coalition terms) at reduced opacity and
   // carry a year label at the line's end – identifiable at rest, not only on
   // hover, which uniform grey reference lines couldn't manage with real data.
-  const built = cycles.filter((c) => !hidden.has(c.year)).map((c) => {
+  const shown = cycles.filter((c) => !hidden.has(c.year));
+  /* One cycle left on the chart: the year on every readout row is then drawing
+     a distinction against nothing, so the row keeps the leader alone and the
+     title takes the calendar month instead. */
+  const solo = shown.length === 1 ? shown[0] : null;
+  const built = shown.map((c) => {
     const base = cycBase(c, M.key);
     const monthly = toMonthly(c.raw.months, c.raw[M.key], c.span);
     // months with no reading are dropped, so the line begins where the polling
@@ -269,7 +289,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
     else if (isHi) { width = 3; weight = 2; opacity = 1; labOp = 1; }
     else { width = 1.7; weight = dim ? 0 : 1; opacity = dim ? 0.13 : 0.42; labOp = dim ? 0.2 : 0.75; }
     const leadName = isOpp ? c.oppLead : c.lead;
-    return { id: "c" + c.year, label: c.year + " · " + leadName, color: c.color, width,
+    return { id: "c" + c.year, label: solo ? leadName : c.year + " · " + leadName, color: c.color, width,
              points: pts, weight, current: c.current, opacity,
              endLabel: "’" + String(c.year).slice(2), endLabelOpacity: labOp };
   });
@@ -381,7 +401,8 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
         pad={{ l: 56, r: 44, t: 16, b: 40 }}
         xTicks={CYC_XTICKS} refLines={refLines}
         series={built} spine={CYC_SPINE}
-        tooltipTitle={(i) => cycMonthLabel(CYC_SPINE[i].x)}
+        tooltipTitle={(i) => cycMonthLabel(CYC_SPINE[i].x)
+                             + (solo ? " – " + cycMonthOf(solo.eDate, CYC_SPINE[i].x) : "")}
         fmt={M.fmt}
       />
     </section>
