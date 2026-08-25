@@ -52,8 +52,9 @@
     lnp: R("oklch(0.50 0.095 250)"), grn: R("oklch(0.60 0.120 150)"),
     onp: R("oklch(0.66 0.130 58)"),
   };
-  const lead = L.alp2pp >= L.lnp2pp ? "alp" : "lnp";
-  T.fill = R(lead === "alp" ? "oklch(0.55 0.150 27 / 0.13)" : "oklch(0.50 0.095 250 / 0.13)");
+  T.panel = R("oklch(0.988 0.005 80)");
+  T.alpFill = R("oklch(0.55 0.150 27 / 0.13)");
+  T.lnpFill = R("oklch(0.50 0.095 250 / 0.13)");
 
   c.fillStyle = T.bg; c.fillRect(0, 0, W, H);
   const PAD = 70;
@@ -109,42 +110,72 @@
     c.beginPath(); c.arc(cx, cy, 2.2 * k, 0, 7); c.fillStyle = T.ink; c.fill();
   })(PAD + wMark + 34, BL1 + 16.85, 1.25);
 
-  // on the name's baseline, not floating between the two lines
-  c.textAlign = "right";
-  caps("UPDATED " + L.updated.toUpperCase(), W - PAD, BL1, 14, 2.2, T.ink3, 700);
-  c.textAlign = "left";
-  c.strokeStyle = T.line; c.lineWidth = 1;
-  c.beginPath(); c.moveTo(PAD, 143.5); c.lineTo(W - PAD, 143.5); c.stroke();
-
-  /* ---- the figures ------------------------------------------------------ */
-  caps("TWO-PARTY PREFERRED", PAD, 180, 15, 2.6, T.ink3, 700);
-  const FIG_Y = 290, LAB_Y = 324;
-  const fig = (x, label, val, col) => {
-    c.font = "600 112px Newsreader, Georgia, serif"; c.fillStyle = col;
-    c.fillText(val.toFixed(1), x, FIG_Y);
-    const w = c.measureText(val.toFixed(1)).width;
-    // label BELOW the figure: beside it, the ascenders collided with the caps
-    c.beginPath(); c.arc(x + 6, LAB_Y - 6, 6, 0, 7); c.fillStyle = col; c.fill();
-    caps(label, x + 21, LAB_Y, 17, 1.6, T.ink2, 700);
-    return w;
-  };
-  const wL = fig(PAD, "LABOR", L.alp2pp, T.alp);
-  fig(PAD + wL + 96, "COALITION", L.lnp2pp, T.lnp);
-
+  /* The reading rides in the masthead band, right-aligned under the date.
+     The band was 143px tall carrying one 14px line; the figures below need
+     the whole middle of the card, and this is the only place the standfirst
+     fits without taking it from them. */
   const marg = L.alp2pp - L.lnp2pp, chg = L.alp2pp - L.alp2ppPrev;
   c.textAlign = "right";
-  c.font = "600 33px Newsreader, Georgia, serif"; c.fillStyle = T.ink;
-  c.fillText((marg >= 0 ? "Labor" : "Coalition") + " leads by " + Math.abs(marg).toFixed(1), W - PAD, 248);
-  c.font = '400 18px "Public Sans", sans-serif'; c.fillStyle = T.ink3;
+  caps("UPDATED " + L.updated.toUpperCase(), W - PAD, 74, 13, 2.2, T.ink3, 700);
+  c.font = "600 40px Newsreader, Georgia, serif"; c.fillStyle = T.ink;
+  c.fillText((marg >= 0 ? "Labor" : "Coalition") + " leads by " + Math.abs(marg).toFixed(1), W - PAD, 116);
+  // one line, not two: the caveats belong beside the sentence they qualify.
+  // The page will not call a move real unless it clears its own interval.
+  c.font = '400 15px "Public Sans", sans-serif'; c.fillStyle = T.ink3;
   c.fillText("95% interval ±" + L.alp2ppCi95.toFixed(1) + " pts · "
-             + L.method.nPolls + " polls in " + L.method.windowDays + " days", W - PAD, 282);
-  // the page will not call a move real unless it clears its own interval
-  c.fillText((chg > 0 ? "+" : "−") + Math.abs(chg).toFixed(1) + " on a month ago"
-             + (L.changeSig ? "" : " — within the margin"), W - PAD, 310);
+             + L.method.nPolls + " polls in " + L.method.windowDays + " days · "
+             + (chg > 0 ? "+" : "−") + Math.abs(chg).toFixed(1) + " on a month ago"
+             + (L.changeSig ? "" : ", within the margin"), W - PAD, 142);
   c.textAlign = "left";
+  c.strokeStyle = T.line; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(PAD, 162.5); c.lineTo(W - PAD, 162.5); c.stroke();
+
+  /* ---- the figures ------------------------------------------------------ */
+  /* 150px and centred on the card, arranged the way the page's own hero
+     arranges them - LABOR 51.4 | 48.6 COALITION - so the labels sit inline
+     and no separate label row is needed. They are the only element that
+     survives a 360px thumbnail, so they get the middle. */
+  caps("TWO-PARTY PREFERRED", PAD, 190, 15, 2.6, T.ink3, 700);
+  const FIG_Y = 312, FIG_PX = 150, GAP = 22, DOT = 4.5;
+  const figFont = "600 " + FIG_PX + 'px Newsreader, Georgia, serif';
+  const measCaps = (t) => { c.font = '700 20px "Public Sans", sans-serif';
+    c.letterSpacing = "1.8px"; const w = c.measureText(t).width;
+    c.letterSpacing = "0px"; return w; };
+  const measFig = (v) => { c.font = figFont; return c.measureText(v.toFixed(1)).width; };
+
+  const wLabTxt = measCaps("LABOR"), wCoaTxt = measCaps("COALITION");
+  const wAlp = measFig(L.alp2pp), wLnp = measFig(L.lnp2pp);
+  const rowW = DOT * 2 + 10 + wLabTxt + GAP + wAlp + GAP + 1 + GAP + wLnp
+             + GAP + wCoaTxt + 10 + DOT * 2;
+  let x = (W - rowW) / 2;
+
+  // centred on the label's cap height (20px caps ≈ 14.5 tall), not floating above it
+  const dot = (cx, col) => { c.beginPath(); c.arc(cx, FIG_Y - 7, DOT, 0, 7);
+    c.fillStyle = col; c.fill(); };
+  const figure = (v, col) => { c.font = figFont; c.fillStyle = col;
+    c.fillText(v.toFixed(1), x, FIG_Y); x += c.measureText(v.toFixed(1)).width; };
+
+  dot(x + DOT, T.alp); x += DOT * 2 + 10;
+  caps("LABOR", x, FIG_Y, 20, 1.8, T.ink2, 700); x += wLabTxt + GAP;
+  figure(L.alp2pp, T.alp); x += GAP;
+  c.strokeStyle = T.line; c.lineWidth = 1;
+  c.beginPath(); c.moveTo(x + 0.5, FIG_Y - 104); c.lineTo(x + 0.5, FIG_Y); c.stroke();
+  x += 1 + GAP;
+  figure(L.lnp2pp, T.lnp); x += GAP;
+  caps("COALITION", x, FIG_Y, 20, 1.8, T.ink2, 700); x += wCoaTxt + 10;
+  dot(x + DOT, T.lnp);
 
   /* ---- the term's trend -------------------------------------------------- */
-  const CX0 = PAD, CX1 = W - PAD, CY0 = 366, CY1 = 540;
+  /* The plot sits on its own, lighter panel running the full width and bled
+     off the bottom edge. The panel is what makes the bleed read as deliberate
+     rather than as a forgotten margin, and the footer sits inside it, so no
+     rule is needed to close it off.
+
+     It bleeds LEFT but stops at the right margin: the past runs off the edge,
+     the present - the end dots, which are what the card is about - keeps its
+     70px of air. */
+  c.fillStyle = T.panel; c.fillRect(0, 342, W, H - 342);
+  const CX0 = 0, CX1 = W - PAD, CY0 = 364, CY1 = 554;
   const xs = D.agg2pp.map((d) => d.x), x0 = Math.min(...xs), x1 = Math.max(...xs);
   const y0 = 43, y1 = 57;
   const sx = (x) => CX0 + ((x - x0) / (x1 - x0)) * (CX1 - CX0);
@@ -159,37 +190,52 @@
   /* Shade the LEAD - the leader's line down to 50% - not the gap between the
      two lines. The lines are exact complements, so the gap is twice the margin
      and reads as a heavier claim than the data makes; the lead is the margin
-     itself, and watching it thin out from the election to now is the story. */
-  const ldPts = lead === "alp" ? aPts : lPts;
-  c.beginPath(); c.moveTo(ldPts[0][0], ldPts[0][1]); curve(ldPts);
-  c.lineTo(CX1, sy(50)); c.lineTo(CX0, sy(50)); c.closePath();
-  c.fillStyle = T.fill; c.fill();
+     itself, and watching it thin out from the election to now is the story.
+
+     Both lines are shaded, each in its own tint, and the whole thing is
+     clipped to ABOVE the tie line. That is what makes a mid-term change of
+     lead render correctly: a line only encloses area above 50 while it is
+     actually ahead, and the stretch where it trails is clipped away. Shading
+     one line for the whole term instead - whoever happens to lead today -
+     drew a self-intersecting polygon that filled inverted for the period they
+     were behind. Today Labor leads throughout, so this changes nothing yet. */
+  c.save();
+  c.beginPath(); c.rect(0, CY0 - 40, W, sy(50) - (CY0 - 40)); c.clip();
+  [[aPts, T.alpFill], [lPts, T.lnpFill]].forEach(([pts, fill]) => {
+    c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); curve(pts);
+    c.lineTo(CX1, sy(50)); c.lineTo(CX0, sy(50)); c.closePath();
+    c.fillStyle = fill; c.fill();
+  });
+  c.restore();
 
   c.setLineDash([3, 6]); c.strokeStyle = T.ink3; c.lineWidth = 1.4; c.globalAlpha = 0.7;
   c.beginPath(); c.moveTo(CX0, sy(50)); c.lineTo(CX1, sy(50)); c.stroke();
   c.setLineDash([]); c.globalAlpha = 1;
   // "tie", not "majority" – 50% 2PP is a tied national vote, not a
   // majority of seats, and the page label says the same thing
-  caps("50% — TIE", CX0, sy(50) + 21, 12, 1.3, T.ink3, 700);
+  caps("50% — TIE", PAD, sy(50) + 21, 12, 1.3, T.ink3, 700);
 
   [[lPts, T.lnp], [aPts, T.alp]].forEach(([pts, col]) => {
     c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); curve(pts);
     c.strokeStyle = col; c.lineWidth = 5; c.lineCap = "round"; c.lineJoin = "round"; c.stroke();
     const e = pts[pts.length - 1];
-    c.beginPath(); c.arc(e[0], e[1], 8, 0, 7); c.fillStyle = T.bg; c.fill();
+    c.beginPath(); c.arc(e[0], e[1], 8, 0, 7); c.fillStyle = T.panel; c.fill();
     c.beginPath(); c.arc(e[0], e[1], 5, 0, 7); c.fillStyle = col; c.fill();
   });
   // the term's two ends, so the trend is anchored rather than floating
-  caps("2025 ELECTION · LABOR " + D.agg2pp[0].alp.toFixed(1), CX0, CY1 + 32, 13, 1.4, T.ink3, 700);
-  c.textAlign = "right"; caps("AUG 2026", CX1, CY1 + 32, 13, 1.4, T.ink3, 700); c.textAlign = "left";
+  caps("2025 ELECTION · LABOR " + D.agg2pp[0].alp.toFixed(1), PAD, 580, 13, 1.4, T.ink3, 700);
+  c.textAlign = "right"; caps("AUG 2026", W - PAD, 580, 13, 1.4, T.ink3, 700); c.textAlign = "left";
 
   /* ---- footer ------------------------------------------------------------ */
-  c.strokeStyle = T.line; c.beginPath(); c.moveTo(PAD, 592.5); c.lineTo(W - PAD, 592.5); c.stroke();
+  /* No rule: the footer sits inside the plot's panel, and the panel's own top
+     edge already divides it from the reading above. The old bottom ran 32px
+     from the plot to these labels and then 24px to the provenance with 13px
+     left under it, which read as cramped; it is 26 / 28 / 22 now. */
   c.font = '400 17px "Public Sans", sans-serif'; c.fillStyle = T.ink3;
   c.fillText(L.pollsTracked + " polls · " + L.housesTracked
-             + " pollsters · house-effect-adjusted aggregate", PAD, 617);
+             + " pollsters · house-effect-adjusted aggregate", PAD, 608);
   c.textAlign = "right"; c.font = '600 17px "Public Sans", sans-serif'; c.fillStyle = T.ink2;
-  c.fillText("joshborgnolo.github.io/auspol-tracker", W - PAD, 617); c.textAlign = "left";
+  c.fillText("joshborgnolo.github.io/auspol-tracker", W - PAD, 608); c.textAlign = "left";
 
   /* ---- export at exactly 1200x630, supersampled from the 2x draw --------- */
   const out = document.createElement("canvas"); out.width = W; out.height = H;
