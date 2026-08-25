@@ -727,6 +727,145 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
   );
 }
 
+/* ---- report an error ----------------------------------------------------
+   A tracker of other people's numbers is going to carry some of them wrong,
+   and until now a reader who noticed had nowhere to say so. The page is
+   static - GitHub Pages serves files and will not process a POST - so the
+   submission goes to Formspree, which does own a server and forwards it on.
+   window.AP_FEEDBACK is the endpoint, set in build.mjs (FORMSPREE_ID); when it
+   is empty this renders nothing at all, so a build without an id shows no form
+   rather than one that quietly discards what someone typed.
+
+   Posted with fetch + Accept: application/json rather than as a plain form.
+   A bare form POST hands the reader to Formspree's own thank-you page, which
+   means leaving the tracker to be told the message arrived; the whole page
+   needs JavaScript anyway, so there is nothing to lose by asking for it here. */
+const FB_KINDS = [
+  "A poll figure is wrong",
+  "A poll is missing",
+  "Something on the page is broken",
+  "A question about the method",
+  "Something else",
+];
+
+function ReportError() {
+  const endpoint = window.AP_FEEDBACK;
+  const { D } = window.AP;
+  const [open, setOpen] = useState(false);
+  const [status, setStatus] = useState("idle");     // idle | sending | sent | error
+  const [error, setError] = useState("");
+  const formRef = useRef(null);
+  const uid = useId();
+
+  if (!endpoint) return null;
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (status === "sending") return;
+    setStatus("sending");
+    setError("");
+    const body = new FormData(formRef.current);
+    // Subject carries the category so a correction is triageable from the
+    // inbox list; the context fields say which page state it was sent from
+    // and which build of the data the reader was looking at, both of which
+    // are the first two things worth knowing about a reported figure.
+    body.set("_subject", `auspol tracker – ${body.get("kind") || "report"}`);
+    body.set("page", (window.location.hash || "#snapshot").replace(/^#/, ""));
+    body.set("data_updated", D.latest.updatedISO);
+    try {
+      const res = await fetch(endpoint, { method: "POST", body, headers: { Accept: "application/json" } });
+      if (res.ok) { setStatus("sent"); return; }
+      // Formspree answers a rejected submission with {errors:[{message}]};
+      // anything else (rate limit, outage, a mistyped id) has no body worth
+      // showing, so fall back to a line that points somewhere useful.
+      let msg = "";
+      try { msg = ((await res.json()).errors || []).map((x) => x.message).join(", "); } catch (_) {}
+      setError(msg || `The form service returned an error (${res.status}). Please try again shortly.`);
+      setStatus("error");
+    } catch (_) {
+      setError("Could not reach the form service – check your connection and try again.");
+      setStatus("error");
+    }
+  };
+
+  if (status === "sent") {
+    return (
+      <div className="fb">
+        <div className="fb-thanks">
+          <strong>Thank you – that's arrived.</strong> Corrections are checked against the
+          pollster's own release before anything changes here, so a fix shows up at the next
+          build rather than straight away.{" "}
+          <button type="button" className="fb-toggle" onClick={() => { setStatus("idle"); }}>
+            Send another
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="fb">
+      <div className="fb-head">
+        <p className="fb-lede">
+          Every figure here is transcribed from a pollster's published release, and some of
+          them will be wrong. If you've spotted one – or a poll that should be in the archive
+          and isn't – say so and it gets checked against the source.
+        </p>
+        {!open && (
+          <button type="button" className="fb-toggle" onClick={() => setOpen(true)} aria-expanded="false">
+            Report an error
+          </button>
+        )}
+      </div>
+
+      {open && (
+        <form className="fb-form" ref={formRef} onSubmit={submit}>
+          <div className="fb-row">
+            <label className="fb-label" htmlFor={uid + "-kind"}>What's this about?</label>
+            <select id={uid + "-kind"} name="kind" defaultValue={FB_KINDS[0]}>
+              {FB_KINDS.map((k) => <option key={k} value={k}>{k}</option>)}
+            </select>
+          </div>
+
+          <div className="fb-row">
+            <label className="fb-label" htmlFor={uid + "-msg"}>
+              Details <span>– the pollster and field dates help most</span>
+            </label>
+            <textarea id={uid + "-msg"} name="message" required
+              placeholder="e.g. the Resolve poll of 12 August has Labor's primary at 27.9, the release says 28.9" />
+          </div>
+
+          <div className="fb-row">
+            <label className="fb-label" htmlFor={uid + "-email"}>
+              Email <span>– optional, only used to reply to you</span>
+            </label>
+            <input id={uid + "-email"} name="email" type="email" autoComplete="email"
+              placeholder="you@example.com" />
+          </div>
+
+          {/* the honeypot: invisible to a reader, filled in by naive bots,
+              and Formspree drops any submission that arrives with it set */}
+          <div className="fb-gotcha" aria-hidden="true">
+            <label htmlFor={uid + "-gotcha"}>Leave this field empty</label>
+            <input id={uid + "-gotcha"} name="_gotcha" type="text" tabIndex={-1} autoComplete="off" />
+          </div>
+
+          <div className="fb-actions">
+            <button type="submit" className="fb-send" disabled={status === "sending"}>
+              {status === "sending" ? "Sending…" : "Send report"}
+            </button>
+            <p className={"fb-note" + (status === "error" ? " is-error" : "")} role={status === "error" ? "alert" : undefined}>
+              {status === "error"
+                ? error
+                : "Sent to the tracker's inbox via Formspree. Nothing is published, and the page records nothing about you."}
+            </p>
+          </div>
+        </form>
+      )}
+    </div>
+  );
+}
+
 function MethodNote() {
   const { D } = window.AP;
   // pollster list straight from the archive, busiest first
@@ -789,6 +928,7 @@ function MethodNote() {
           <p>{sources}. Field dates and sample sizes are listed per poll in the archive.</p>
         </div>
       </div>
+      <ReportError />
       <div className="disclaimer">
         Unofficial aggregate of published national polling. Aggregate figures are estimates, not
         measurements – treat decimal places gently.

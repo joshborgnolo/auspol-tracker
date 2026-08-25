@@ -1685,6 +1685,66 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   background: var(--surface-2); border: 1px solid var(--line);
   font-size: 12px; color: var(--ink-3); text-align: center;
 }
+
+/* ---------- report an error ----------
+   The page is static – GitHub Pages serves files and cannot process a POST –
+   so the form hands the submission to Formspree and only has to send the
+   request. Collapsed to a single line by default: the footer's job is to
+   explain the method, not to solicit, and a form sitting open under the
+   method notes reads as the page asking for something rather than offering
+   somewhere to put a correction. */
+.fb { margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line-2); }
+.fb-head { display: flex; align-items: baseline; gap: 8px 16px; flex-wrap: wrap; }
+.fb-lede { margin: 0; flex: 1 1 340px; font-size: 13px; line-height: 1.6; color: var(--ink-3); }
+.fb-toggle {
+  flex: 0 0 auto; display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
+  padding: 5px 13px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.fb-toggle:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
+
+.fb-form { margin: 16px 0 0; max-width: 560px; display: grid; gap: 13px; }
+.fb-row { display: grid; gap: 5px; }
+.fb-label { font-size: 12px; font-weight: 600; color: var(--ink-2); }
+.fb-label span { font-weight: 400; color: var(--ink-3); }
+/* The theme here is a manual toggle and can disagree with the OS, so pin the
+   native widgets (dropdown list, caret, autofill) to the page's own theme
+   rather than letting them follow prefers-color-scheme into the wrong one. */
+.fb-form { color-scheme: light; }
+body.dark .fb-form { color-scheme: dark; }
+.fb-form select, .fb-form input, .fb-form textarea {
+  width: 100%; font-family: var(--sans); font-size: 14px; color: var(--ink);
+  background: var(--surface-2); border: 1px solid var(--line); border-radius: 10px;
+  padding: 9px 12px; transition: border-color .15s ease;
+}
+.fb-form textarea { min-height: 100px; resize: vertical; line-height: 1.55; }
+.fb-form select:focus, .fb-form input:focus, .fb-form textarea:focus { outline: none; border-color: var(--accent); }
+/* Formspree discards anything arriving with _gotcha filled – a field no
+   human sees and every naive bot completes. Off-screen rather than
+   display:none, which the same bots know to skip. */
+.fb-gotcha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.fb-actions { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; }
+.fb-send {
+  border: 1px solid transparent; border-radius: 999px; padding: 8px 18px;
+  font-family: var(--sans); font-size: 13px; font-weight: 640;
+  background: var(--ink); color: var(--bg); cursor: pointer;
+  transition: opacity .15s ease;
+}
+.fb-send:hover { opacity: 0.86; }
+.fb-send[disabled] { opacity: 0.5; cursor: default; }
+.fb-note { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--ink-3); }
+.fb-note.is-error { color: var(--mood-neg); }
+.fb-thanks {
+  margin: 16px 0 0; max-width: 560px; padding: 12px 15px; border-radius: 10px;
+  background: var(--surface-2); border: 1px solid var(--line);
+  font-size: 13px; line-height: 1.6; color: var(--ink-2);
+}
+@media (max-width: 560px) {
+  .fb-form, .fb-thanks { max-width: none; }
+}
+
 /* ---------- responsive ---------- */
 /* The leadership pair carries a scatter cloud in each panel now, and ~120 dots
    in a 250px-tall chart need width to stay legible. Side by side is worth
