@@ -213,17 +213,28 @@ function cycMonthOf(eDate, m) {
 
 /* ---- the readings behind a cycle's line --------------------------------
    These charts are monthly averages, and an average is a claim about polls
-   the reader cannot see. Up to three cycles they can be shown: the cloud
-   under a line is what the line is made of, and how much it is scattering is
-   half of what a term's trajectory means. Past six clouds it is soup, which
-   is why the line-only view is the default and this only wakes up once the
-   board has been narrowed.
+   the reader cannot see. Narrow the board to ONE term and they appear: the
+   cloud under a line is what the line is made of, and how much it is
+   scattering is half of what a term's trajectory means.
 
-   Same rule as the lines they sit under, in both directions: a favourability
+   One and not a handful, because a cloud is a much heavier mark than a line.
+   Two lines cross and stay legible; two clouds occupy the same space and
+   become one, and the reader has to decode which points belong to which term
+   before they can read either. A single term has nothing to disentangle, and
+   is also the moment the reader has said they want to look closely.
+
+   Same rule as the line it sits under, in both directions: a favourability
    net never joins an approve-minus-disapprove cloud, and the election-day row
    is not a poll, so neither is a dot. */
-const CYC_DOT_MAX = 3;
+const CYC_DOT_MAX = 1;
 const MS_MONTH_C = 365.25 / 12;
+
+/* The same month-bucket test cycleSeries applies when it builds the line, not
+   a lookalike: the cloud is meant to BE what the line is made of, so a poll
+   the line counts and the dot drops (or the reverse) is a contradiction on
+   one chart. No row disagrees today; expressing it twice is how that stops
+   being true later. */
+const inCycleRange = (m) => { const k = Math.round(m); return k >= 0 && k <= 36; };
 
 function cycDotDate(iso) {
   const [y, m, d] = iso.split("-").map(Number);
@@ -253,13 +264,13 @@ function cycleReadings(c, M, D) {
   if (key === "primary" || key === "tpp") {
     const f = key === "tpp" ? "tpp_" + c.gov : c.gov;
     for (const p of src.polls) {
-      if (p[f] == null || p.firm === "Election" || p.m < -1 || p.m > 36.4) continue;
+      if (p[f] == null || p.firm === "Election" || !inCycleRange(p.m)) continue;
       out.push({ x: p.m, y: p[f], meta: { pollster: p.firm, dateLabel: cycDotDate(p.date) } });
     }
   } else {
     const f = isOpp ? "oppNet" : "pmNet";
     for (const r of src.approval) {
-      if (r[f] == null || r.metric === "fav" || r.m < -1 || r.m > 36.4) continue;
+      if (r[f] == null || r.metric === "fav" || !inCycleRange(r.m)) continue;
       out.push({ x: r.m, y: r[f], meta: { pollster: r.firm, dateLabel: cycDotDate(r.date) } });
     }
   }
@@ -270,7 +281,13 @@ function cycleReadings(c, M, D) {
    separate two Coalition terms from each other, and giving the lone Labor
    term beside them a triangle would be decoration standing in for a
    distinction that colour already makes. So the first term of each party
-   keeps circles and only a second and third need a shape of their own. */
+   keeps circles and only a second and third need a shape of their own.
+
+   DORMANT at CYC_DOT_MAX = 1: one term on the board is one colour, so every
+   cloud drawn today is circles. Kept because the rule is the hard part and
+   the threshold is one number - raise it and two same-coloured terms are
+   still told apart, in the legend and on the chart, without rediscovering
+   why colour alone could not do it. */
 const CYC_SHAPES = ["circle", "triangle", "diamond"];
 function cycShapes(shown) {
   const seen = {}, out = {};
@@ -370,13 +387,13 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
      its dots down with it, or a faded line ends up with a louder cloud than
      the one being pointed at. */
   const dotsOn = !!shapes && shown.length > 0 && shown.length <= CYC_DOT_MAX;
-  /* Memoised on the things that actually move a dot. Three terms of primary
-     vote is 600 points on one chart, well past the ~240 this scatter was
-     built for, and a fresh array on every unrelated render - a tooltip
-     opening, a sibling chart re-rendering - hands React 600 new elements to
-     reconcile each time. The key is the shown years rather than the array,
-     since `shown`, `shapes` and `solo` are all rebuilt every render and all
-     three are decided by exactly that list. */
+  /* Memoised on the things that actually move a dot. The 2010 term alone is
+     402 points of primary vote on one chart, still well past the ~240 this
+     scatter was built for, and a fresh array on every unrelated render - a
+     tooltip opening, a sibling chart re-rendering - hands React 402 new
+     elements to reconcile each time. The key is the shown years rather than
+     the array, since `shown`, `shapes` and `solo` are all rebuilt every
+     render and all three are decided by exactly that list. */
   const shownKey = shown.map((c) => c.year).join(",");
   const scatter = React.useMemo(() => (!dotsOn ? [] : shown.flatMap((c) => {
     const base = cycBase(c, M.key);
@@ -818,7 +835,7 @@ function PastCyclesView() {
           trajectory can be read off a shared clock. The current Albanese government is drawn
           <strong> bold</strong>; past governments sit behind, tinted by the party in power –
           red for Labor terms, blue for Coalition – with the year marked where each line ends.
-          Hover a cycle below to bring it forward.
+          Hover a cycle below to bring it forward, and select just one to see more details.
         </p>
         <div className="cyc-controls">
           <TextToggle value={mode} onChange={setMode} ariaLabel="Measure"
