@@ -631,7 +631,7 @@ function Hero({ rangeId, setRangeId, showScatter = true }) {
             behind it; the number is the reason to press it. */}
         {otherContests.length > 0 && (
           <div className="hero-alt">
-            <span className="ha-lab">Alt. 2PP</span>
+            <span className="ha-lab">Switch 2PP</span>
             {otherContests.map((o) => (
               <button key={o.id} type="button" className="ha-chip" onClick={() => chooseMatchup(o.id)}
                       title={"Show " + MATCHUPS[o.id].a.name + " v " + MATCHUPS[o.id].b.name}>
