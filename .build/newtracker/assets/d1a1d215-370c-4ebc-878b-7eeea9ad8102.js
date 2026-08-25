@@ -425,10 +425,12 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
     return runs.map((run, i) => ({
       id: "c" + c.year + (i ? "-" + i : ""), label, color: c.color, width,
       points: run.points, weight, current: c.current, opacity, dashed: run.dashed,
-      // the end label belongs to the line, so only its last run carries one
+      // the end label and the end-cap dot belong to the LINE, so only its
+      // last run carries them – otherwise a split line grows a dot and a
+      // year at every run boundary
       ...(i === runs.length - 1
         ? { endLabel: "’" + String(c.year).slice(2), endLabelOpacity: labOp }
-        : {}),
+        : { endCap: false }),
     }));
   });
   /* The polls the lines are averages of, once the board is narrow enough to

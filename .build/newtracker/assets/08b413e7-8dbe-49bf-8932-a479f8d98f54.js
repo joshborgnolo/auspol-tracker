@@ -850,10 +850,13 @@ function TrendChart(props) {
                     fill="var(--chart-bg)" stroke={s.color} strokeWidth={3} />
           );
         })}
-        {/* end-cap dots on latest reading */}
+        {/* end-cap dots on latest reading. `endCap:false` is how a line that
+            arrives as several series says "this run is not my end" - without
+            it a cycle line split at an interpolated month grew a cap at each
+            run boundary, i.e. a dot in the middle of the line. */}
         {series.map((s) => {
           const last = s.points[s.points.length - 1];
-          if (!last) return null;
+          if (!last || s.endCap === false) return null;
           return <circle key={"e" + s.id} className="end-cap" cx={sx(last.x)} cy={sy(last.y)} r={4.5}
                          fill={s.color} style={s.opacity != null ? { opacity: s.opacity } : null} />;
         })}
@@ -865,12 +868,32 @@ function TrendChart(props) {
             .filter((s) => s.endLabel && s.points.length && s.opacity !== 0)
             .map((s) => {
               const last = s.points[s.points.length - 1];
-              return { text: s.endLabel, x: sx(last.x) + 7, y: sy(last.y),
+              return { text: s.endLabel, x: sx(last.x) + 7 / scale, y: sy(last.y),
                        color: s.color, op: s.endLabelOpacity != null ? s.endLabelOpacity : 1 };
             })
             .sort((a, b) => a.y - b.y);
           if (!labs.length) return null;
-          const gap = refUnits * 1.15;
+          /* 1.15 was the text's own height, so a nudged stack came out with
+             about half a pixel of daylight between rows – legible on a laptop
+             only because the labels rarely collided there. */
+          const gap = refUnits * 1.45;
+          /* Can these be placed at all? Nudging spreads a collision downwards,
+             and past a point it stops being a nudge: every label joins one
+             evenly spaced stack that points at nobody's line. A phone does
+             exactly that to this chart – the viewBox stays 300 units tall
+             however narrow the screen gets, while the text holds its size on
+             screen, so a gap costing 13 units on a laptop costs 44 on a phone
+             and six labels want 91% of the plot. The stack that came out had
+             the current term's year nowhere near the current term's line.
+
+             So it is decided for the chart, not per label: either they fit
+             where they belong or none are drawn, because half a set of year
+             labels reads as a rendering fault rather than a choice. When they
+             are dropped nothing is lost – the legend chips above the chart
+             already name every cycle in its own colour – and narrowing to a
+             few cycles, which is how this chart is read on a phone anyway,
+             brings them straight back. */
+          if ((labs.length - 1) * gap > (H - pad.t - pad.b) * 0.55) return null;
           for (let i = 1; i < labs.length; i++) {
             if (labs[i].y - labs[i - 1].y < gap) labs[i].y = labs[i - 1].y + gap;
           }
