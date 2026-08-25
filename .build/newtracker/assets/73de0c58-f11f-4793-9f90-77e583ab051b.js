@@ -841,14 +841,14 @@ function ReportError() {
       <p className="fb-lede">
         Every figure here is transcribed from a pollster’s published release, from Wikipedia,
         PollBludger, or another secondary source, and some of them may be wrong. If you have found
-        one, found a missing poll, or have any other pieces of feedback, please{" "}
+        one, found a missing poll, or have any other piece of feedback, please{" "}
         {/* A toggle both ways: the thing that opened the form is the only
             thing in the sentence that looks like a control, so it is where a
             reader who has changed their mind will click. What is typed stays
             in state, so closing it is not the same as discarding it. */}
         <button type="button" className="fb-link" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
           let me know
-        </button>{open ? "." : " and I’ll check it against the source."}
+        </button>{open ? "." : " and I’ll take a look."}
       </p>
 
       {open && (
