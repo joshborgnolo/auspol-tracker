@@ -1479,15 +1479,25 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 /* A row per election on one shared scale, so five elections' worth of error can
    be compared by eye. The track is centred on the RESULT, not on zero polling
    error, because the result is the thing every dot is being measured against. */
-.acc-card { margin-top: 22px; }
+/* The row's geometry, defined once. The scale is only a scale while its
+   centre label sits over the line every dot is measured from, and that held
+   for the left edge (a hardcoded 108px = label + gap) but never the right:
+   nothing subtracted the error and house columns, so "result" sat 76px right
+   of the line it names. Deriving both edges from the same four numbers is
+   what stops that drifting apart again the next time a column is resized. */
+.acc-card { margin-top: 22px;
+  --acc-gap: 8px; --acc-lab: 100px; --acc-err: 52px; --acc-note: 86px; }
 .acc-scale { display: grid; grid-template-columns: 1fr auto 1fr; align-items: baseline;
-  margin: 4px 0 2px; padding-left: 108px; font-size: 11px; font-weight: 600;
+  margin: 4px 0 2px; font-size: 11px; font-weight: 600;
+  padding-left: calc(var(--acc-lab) + var(--acc-gap));
+  padding-right: calc(var(--acc-err) + var(--acc-note) + var(--acc-gap) * 2);
   letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
 .acc-scale-c { text-align: center; }
 .acc-scale-r { text-align: right; }
 .acc-rows { display: flex; flex-direction: column; gap: 2px; }
-.acc-row { display: grid; grid-template-columns: 100px 1fr 52px 86px; align-items: center;
-  gap: 8px; padding: 7px 0; border-top: 1px solid var(--line); }
+.acc-row { display: grid; align-items: center;
+  grid-template-columns: var(--acc-lab) 1fr var(--acc-err) var(--acc-note);
+  gap: var(--acc-gap); padding: 7px 0; border-top: 1px solid var(--line); }
 .acc-label { display: flex; flex-direction: column; }
 .acc-year { font-family: var(--serif); font-size: 19px; font-weight: 600; color: var(--ink); }
 .acc-detail { font-size: 11px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
@@ -1516,7 +1526,9 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-variant-numeric: tabular-nums; }
 .acc-firm-c { font-size: 11px; color: var(--ink-3); }
 @media (max-width: 720px) {
-  .acc-scale { padding-left: 0; }
+  /* deliberately NOT aligned here: the three labels do not fit between the
+     insets at this width, so the scale reads as a legend instead */
+  .acc-scale { padding-left: 0; padding-right: 0; }
   .acc-row { grid-template-columns: 74px 1fr 46px; }
   .acc-note { grid-column: 2 / -1; justify-content: flex-start; }
 }
