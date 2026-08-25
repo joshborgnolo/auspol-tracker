@@ -1921,6 +1921,17 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 }
 .cyc-chip:hover { border-color: var(--ink-faint); }
 .cyc-chip .cyc-swatch { width: 11px; height: 11px; border-radius: 50%; flex: none; transition: transform .15s ease; }
+/* A swatch borrows the shape of the term's dots when the chart is drawing
+   them, so two Coalition terms in the same blue are told apart in the legend
+   the same way they are told apart on the chart. clip-path over a second
+   element: the swatch keeps one box, one colour and one transition, and the
+   circle stays the default nothing has to opt into. The triangle is sized a
+   little past the box for the same reason the dot is - inscribed, it reads
+   smaller than the circle beside it. */
+.cyc-chip .cyc-swatch.sw-triangle { border-radius: 0; width: 12px; height: 12px;
+  clip-path: polygon(50% 2%, 100% 96%, 0 96%); }
+.cyc-chip .cyc-swatch.sw-diamond { border-radius: 0; width: 12px; height: 12px;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 .cyc-chip .cyc-year { font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .cyc-chip .cyc-lead { font-size: 13px; font-weight: 500; color: var(--ink-3); }
 .cyc-chip.off { opacity: 0.4; }

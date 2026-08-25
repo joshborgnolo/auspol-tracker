@@ -82,7 +82,9 @@ function straightPath(pts, sx, sy) {
  *            window can only describe one of them. `wipe` is how much of the line has been
  *            ERASED from the left, 0..1 – a line that has nowhere to travel to
  *            when the chart changes question is rubbed out rather than dimmed
- *  scatter: [{ x, y, color, meta }]
+ *  scatter: [{ x, y, color, meta, shape?, label? }]  shape is "triangle" or
+ *           "diamond"; anything else (or absent) is a circle. Only reach for
+ *           one when two clouds on the same chart share a colour.
  *  yTicks:  [numbers]   xTicks: [{x,label}]
  *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
  *           labelColor the text (defaults to --ink-3 – see the label below)
@@ -508,14 +510,35 @@ function TrendChart(props) {
      morph frame. `geom` covers everything that would move a dot – the scales
      are rebuilt every render but produce the same pixels while it holds. */
   const geom = [W, H, pad.l, pad.r, pad.t, pad.b, win[0], win[1], yDomain[0], yDomain[1]].join("|");
-  const dotEls = (arr, live) => arr.map((d, i) => (
-    <circle key={"s" + i} cx={sx(d.x)} cy={sy(d.y)} r={live && dot === d ? 6.5 : 4.2}
-            className="scatter-dot" fill={d.color}
-            opacity={live && dot && dot !== d ? 0.25 : 0.6}
-            /* no per-dot pointer listeners: both inputs pick from the
-               svg root, so nothing here depends on a browser firing
-               enter/leave on an SVG child */ />
-  ));
+  /* A dot's SHAPE carries what its colour cannot. Two Coalition terms on the
+     Past-cycles chart are the same blue, so their clouds are one cloud until
+     something other than colour separates them. Circle stays the default and
+     is every other caller's only shape, so a scatter that asks for nothing
+     renders exactly as before.
+     The sizes are matched by eye rather than by radius: a triangle inscribed
+     in r reads noticeably smaller than the circle beside it, so it is drawn
+     past r and the diamond slightly so. */
+  const dotPath = (shape, cx, cy, r) => {
+    if (shape === "triangle") {
+      const s = r * 1.35;
+      return `M ${cx} ${cy - s} L ${cx + s * 0.87} ${cy + s * 0.62} L ${cx - s * 0.87} ${cy + s * 0.62} Z`;
+    }
+    if (shape === "diamond") {
+      const s = r * 1.3;
+      return `M ${cx} ${cy - s} L ${cx + s} ${cy} L ${cx} ${cy + s} L ${cx - s} ${cy} Z`;
+    }
+    return null;
+  };
+  const dotEls = (arr, live) => arr.map((d, i) => {
+    const cx = sx(d.x), cy = sy(d.y), r = live && dot === d ? 6.5 : 4.2;
+    /* no per-dot pointer listeners: both inputs pick from the svg root, so
+       nothing here depends on a browser firing enter/leave on an SVG child */
+    const common = { className: "scatter-dot", fill: d.color,
+                     opacity: (live && dot && dot !== d ? 0.25 : 0.6) * (d.op != null ? d.op : 1) };
+    const p = dotPath(d.shape, cx, cy, r);
+    return p ? <path key={"s" + i} d={p} {...common} />
+             : <circle key={"s" + i} cx={cx} cy={cy} r={r} {...common} />;
+  });
   const dots = React.useMemo(() => dotEls(scatter, true), [scatter, dot, geom]);
   const outDots = React.useMemo(() => dotEls(scatterOut, false), [scatterOut, geom]);
   /* The dots that TRAVEL are the one group that cannot be memoised - they hold

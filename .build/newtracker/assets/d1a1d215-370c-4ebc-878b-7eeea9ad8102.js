@@ -211,6 +211,76 @@ function cycMonthOf(eDate, m) {
   return window.AP.D.monthNameFull((t % 12) + 1) + " " + (y + Math.floor(t / 12));
 }
 
+/* ---- the readings behind a cycle's line --------------------------------
+   These charts are monthly averages, and an average is a claim about polls
+   the reader cannot see. Up to three cycles they can be shown: the cloud
+   under a line is what the line is made of, and how much it is scattering is
+   half of what a term's trajectory means. Past six clouds it is soup, which
+   is why the line-only view is the default and this only wakes up once the
+   board has been narrowed.
+
+   Same rule as the lines they sit under, in both directions: a favourability
+   net never joins an approve-minus-disapprove cloud, and the election-day row
+   is not a poll, so neither is a dot. */
+const CYC_DOT_MAX = 3;
+const MS_MONTH_C = 365.25 / 12;
+
+function cycDotDate(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return d + " " + window.AP.D.monthName(m) + " " + y;
+}
+
+function cycleReadings(c, M, D) {
+  const out = [];
+  const key = M.key, isOpp = M.leader === "opp";
+  if (c.current) {
+    const mOf = (iso) => (Date.parse(iso) - Date.parse(c.eDate)) / 86400000 / MS_MONTH_C;
+    for (const p of D.individualPolls) {
+      const mb = (p.appr && p.appr.metricBy) || {};
+      let y = null;
+      if (key === "primary") y = p.p ? p.p[c.gov] : null;
+      else if (key === "tpp") y = p[c.gov];
+      else if (key === "net") y = (mb.alb || "approval") === "fav" ? null : (p.appr ? p.appr.albNet : null);
+      else if (key === "oppnet") y = (mb.taylor || "approval") === "fav" ? null : (p.appr ? p.appr.taylorNet : null);
+      if (y == null) continue;
+      out.push({ x: mOf(p.released), y,
+                 meta: { pollster: p.pollster, dateLabel: p.dateLabel, sample: p.sample, released: p.released } });
+    }
+    return out;
+  }
+  const src = (D.cycleSource || {})[c.year];
+  if (!src) return out;
+  if (key === "primary" || key === "tpp") {
+    const f = key === "tpp" ? "tpp_" + c.gov : c.gov;
+    for (const p of src.polls) {
+      if (p[f] == null || p.firm === "Election" || p.m < -1 || p.m > 36.4) continue;
+      out.push({ x: p.m, y: p[f], meta: { pollster: p.firm, dateLabel: cycDotDate(p.date) } });
+    }
+  } else {
+    const f = isOpp ? "oppNet" : "pmNet";
+    for (const r of src.approval) {
+      if (r[f] == null || r.metric === "fav" || r.m < -1 || r.m > 36.4) continue;
+      out.push({ x: r.m, y: r[f], meta: { pollster: r.firm, dateLabel: cycDotDate(r.date) } });
+    }
+  }
+  return out;
+}
+
+/* Shape is assigned WITHIN a colour, not across the board: the point is to
+   separate two Coalition terms from each other, and giving the lone Labor
+   term beside them a triangle would be decoration standing in for a
+   distinction that colour already makes. So the first term of each party
+   keeps circles and only a second and third need a shape of their own. */
+const CYC_SHAPES = ["circle", "triangle", "diamond"];
+function cycShapes(shown) {
+  const seen = {}, out = {};
+  for (const c of shown) {
+    const n = (seen[c.color] = (seen[c.color] || 0) + 1);
+    out[c.year] = CYC_SHAPES[n - 1] || "circle";
+  }
+  return out;
+}
+
 // linear-interpolate quarterly (or monthly) anchors onto a 0..maxM month grid.
 // Only KNOWN anchors are interpolated between: a measure can start late (the
 // Morrison term's first reading is month 2, and its 2016 predecessor's opens
@@ -236,7 +306,7 @@ function toMonthly(months, vals, maxM) {
   return out;
 }
 
-function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
+function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes }) {
   const { D } = window.AP;
   const M = metric;
   const chg = mode === "chg";
@@ -293,6 +363,31 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
              points: pts, weight, current: c.current, opacity,
              endLabel: "’" + String(c.year).slice(2), endLabelOpacity: labOp };
   });
+  /* The polls the lines are averages of, once the board is narrow enough to
+     read them. Each cloud takes its line's colour and shape, and follows it
+     into "change since election" mode - a cloud left on absolute levels under
+     a line drawn as change would agree with it nowhere. Dimming a cycle takes
+     its dots down with it, or a faded line ends up with a louder cloud than
+     the one being pointed at. */
+  const dotsOn = !!shapes && shown.length > 0 && shown.length <= CYC_DOT_MAX;
+  /* Memoised on the things that actually move a dot. Three terms of primary
+     vote is 600 points on one chart, well past the ~240 this scatter was
+     built for, and a fresh array on every unrelated render - a tooltip
+     opening, a sibling chart re-rendering - hands React 600 new elements to
+     reconcile each time. The key is the shown years rather than the array,
+     since `shown`, `shapes` and `solo` are all rebuilt every render and all
+     three are decided by exactly that list. */
+  const shownKey = shown.map((c) => c.year).join(",");
+  const scatter = React.useMemo(() => (!dotsOn ? [] : shown.flatMap((c) => {
+    const base = cycBase(c, M.key);
+    const leadName = isOpp ? c.oppLead : c.lead;
+    const label = solo ? leadName : c.year + " · " + leadName;
+    const dim = hi != null && hi !== c.year && !c.current;
+    return cycleReadings(c, M, D).map((p) => ({
+      x: p.x, y: chg ? +(p.y - base).toFixed(2) : p.y,
+      color: c.color, shape: shapes[c.year], label, meta: p.meta, op: dim ? 0.3 : 1,
+    }));
+  })), [dotsOn, shownKey, M.key, isOpp, chg, hi]);
   /* Hanson – one line, not one per cycle. She has been rated for part of the
      current term and in no term before it, so there is no past-cycle
      counterpart to draw and nothing to align her against. Points come straight
@@ -400,7 +495,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
         unit={M.unit} axisFont={20}
         pad={{ l: 56, r: 44, t: 16, b: 40 }}
         xTicks={CYC_XTICKS} refLines={refLines}
-        series={built} spine={CYC_SPINE}
+        series={built} spine={CYC_SPINE} scatter={scatter}
         tooltipTitle={(i) => cycMonthLabel(CYC_SPINE[i].x)
                              + (solo ? " – " + cycMonthOf(solo.eDate, CYC_SPINE[i].x) : "")}
         fmt={M.fmt}
@@ -409,7 +504,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan }) {
   );
 }
 
-function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll }) {
+function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll, shapes }) {
   const anyHidden = hidden.size > 0;
   return (
     <div className="cyc-legend" onMouseLeave={() => setHi(null)}>
@@ -425,7 +520,11 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll }) {
                     aria-pressed={!off}
                     onMouseEnter={() => setHi(c.year)} onFocus={() => setHi(c.year)}
                     onClick={() => toggle(c.year)}>
-              <span className="cyc-swatch" style={{ background: c.color }}></span>
+              {/* the swatch takes the same shape as the term's dots, or the
+                  cloud under two same-coloured lines is undecodable */}
+              <span className={"cyc-swatch" + (shapes && shapes[c.year] && shapes[c.year] !== "circle"
+                                               ? " sw-" + shapes[c.year] : "")}
+                    style={{ background: c.color }}></span>
               <span className="cyc-year">{c.year}</span>
               <span className="cyc-lead">{c.lead}</span>
               {c.current && <span className="cyc-now">now</span>}
@@ -665,6 +764,13 @@ function PastCyclesView() {
     n.has(year) ? n.delete(year) : n.add(year);
     return n;
   });
+  /* Shapes are a property of what is CURRENTLY on the board, so they are
+     worked out once here and handed to the legend and all four charts – a
+     chip and the dots it explains must never disagree about which term is
+     the triangle. */
+  const shownCycles = cycles.filter((c) => !hidden.has(c.year));
+  const shapes = shownCycles.length <= CYC_DOT_MAX ? cycShapes(shownCycles) : null;
+
   const showAll = () => setHidden(new Set());
   const hideAll = () => setHidden(new Set(cycles.map((c) => c.year)));
 
@@ -701,12 +807,12 @@ function PastCyclesView() {
       </div>
 
       <CycleLegend cycles={cycles} hidden={hidden} hi={hi} setHi={setHi}
-        toggle={toggle} showAll={showAll} hideAll={hideAll} />
+        toggle={toggle} showAll={showAll} hideAll={hideAll} shapes={shapes} />
 
       <div className="cyc-charts">
         {CYC_METRICS.map((m) => (
           <CycleChart key={m.key} metric={m} cycles={cycles} mode={mode} hidden={hidden} hi={hi}
-                      showHan={showHan} setHan={setShowHan} />
+                      showHan={showHan} setHan={setShowHan} shapes={shapes} />
         ))}
       </div>
 

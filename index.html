@@ -1768,6 +1768,17 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 }
 .cyc-chip:hover { border-color: var(--ink-faint); }
 .cyc-chip .cyc-swatch { width: 11px; height: 11px; border-radius: 50%; flex: none; transition: transform .15s ease; }
+/* A swatch borrows the shape of the term's dots when the chart is drawing
+   them, so two Coalition terms in the same blue are told apart in the legend
+   the same way they are told apart on the chart. clip-path over a second
+   element: the swatch keeps one box, one colour and one transition, and the
+   circle stays the default nothing has to opt into. The triangle is sized a
+   little past the box for the same reason the dot is - inscribed, it reads
+   smaller than the circle beside it. */
+.cyc-chip .cyc-swatch.sw-triangle { border-radius: 0; width: 12px; height: 12px;
+  clip-path: polygon(50% 2%, 100% 96%, 0 96%); }
+.cyc-chip .cyc-swatch.sw-diamond { border-radius: 0; width: 12px; height: 12px;
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 .cyc-chip .cyc-year { font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .cyc-chip .cyc-lead { font-size: 13px; font-weight: 500; color: var(--ink-3); }
 .cyc-chip.off { opacity: 0.4; }
@@ -3154,7 +3165,8 @@ window.AP = (function () {
            discord, discordFacet, discordRead, DISCORD_MEASURES, DISC };
 })();
 </script>
-  <script>/* auspol tracker – SVG chart toolkit (no libraries) */
+  <script>function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
+/* auspol tracker – SVG chart toolkit (no libraries) */
 
 /* Text measurement for label layout. The old estimate was
    chars * refUnits * 0.72, which over-reserved by 51-87% on the real event
@@ -3252,7 +3264,9 @@ function straightPath(pts, sx, sy) {
  *            window can only describe one of them. `wipe` is how much of the line has been
  *            ERASED from the left, 0..1 – a line that has nowhere to travel to
  *            when the chart changes question is rubbed out rather than dimmed
- *  scatter: [{ x, y, color, meta }]
+ *  scatter: [{ x, y, color, meta, shape?, label? }]  shape is "triangle" or
+ *           "diamond"; anything else (or absent) is a circle. Only reach for
+ *           one when two clouds on the same chart share a colour.
  *  yTicks:  [numbers]   xTicks: [{x,label}]
  *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
  *           labelColor the text (defaults to --ink-3 – see the label below)
@@ -3799,18 +3813,47 @@ function TrendChart(props) {
      morph frame. `geom` covers everything that would move a dot – the scales
      are rebuilt every render but produce the same pixels while it holds. */
   const geom = [W, H, pad.l, pad.r, pad.t, pad.b, win[0], win[1], yDomain[0], yDomain[1]].join("|");
-  const dotEls = (arr, live) => arr.map((d, i) => /*#__PURE__*/React.createElement("circle", {
-    key: "s" + i,
-    cx: sx(d.x),
-    cy: sy(d.y),
-    r: live && dot === d ? 6.5 : 4.2,
-    className: "scatter-dot",
-    fill: d.color,
-    opacity: live && dot && dot !== d ? 0.25 : 0.6
-    /* no per-dot pointer listeners: both inputs pick from the
-       svg root, so nothing here depends on a browser firing
-       enter/leave on an SVG child */
-  }));
+  /* A dot's SHAPE carries what its colour cannot. Two Coalition terms on the
+     Past-cycles chart are the same blue, so their clouds are one cloud until
+     something other than colour separates them. Circle stays the default and
+     is every other caller's only shape, so a scatter that asks for nothing
+     renders exactly as before.
+     The sizes are matched by eye rather than by radius: a triangle inscribed
+     in r reads noticeably smaller than the circle beside it, so it is drawn
+     past r and the diamond slightly so. */
+  const dotPath = (shape, cx, cy, r) => {
+    if (shape === "triangle") {
+      const s = r * 1.35;
+      return `M ${cx} ${cy - s} L ${cx + s * 0.87} ${cy + s * 0.62} L ${cx - s * 0.87} ${cy + s * 0.62} Z`;
+    }
+    if (shape === "diamond") {
+      const s = r * 1.3;
+      return `M ${cx} ${cy - s} L ${cx + s} ${cy} L ${cx} ${cy + s} L ${cx - s} ${cy} Z`;
+    }
+    return null;
+  };
+  const dotEls = (arr, live) => arr.map((d, i) => {
+    const cx = sx(d.x),
+      cy = sy(d.y),
+      r = live && dot === d ? 6.5 : 4.2;
+    /* no per-dot pointer listeners: both inputs pick from the svg root, so
+       nothing here depends on a browser firing enter/leave on an SVG child */
+    const common = {
+      className: "scatter-dot",
+      fill: d.color,
+      opacity: (live && dot && dot !== d ? 0.25 : 0.6) * (d.op != null ? d.op : 1)
+    };
+    const p = dotPath(d.shape, cx, cy, r);
+    return p ? /*#__PURE__*/React.createElement("path", _extends({
+      key: "s" + i,
+      d: p
+    }, common)) : /*#__PURE__*/React.createElement("circle", _extends({
+      key: "s" + i,
+      cx: cx,
+      cy: cy,
+      r: r
+    }, common));
+  });
   const dots = React.useMemo(() => dotEls(scatter, true), [scatter, dot, geom]);
   const outDots = React.useMemo(() => dotEls(scatterOut, false), [scatterOut, geom]);
   /* The dots that TRAVEL are the one group that cannot be memoised - they hold
@@ -8088,6 +8131,95 @@ function cycMonthOf(eDate, m) {
   return window.AP.D.monthNameFull(t % 12 + 1) + " " + (y + Math.floor(t / 12));
 }
 
+/* ---- the readings behind a cycle's line --------------------------------
+   These charts are monthly averages, and an average is a claim about polls
+   the reader cannot see. Up to three cycles they can be shown: the cloud
+   under a line is what the line is made of, and how much it is scattering is
+   half of what a term's trajectory means. Past six clouds it is soup, which
+   is why the line-only view is the default and this only wakes up once the
+   board has been narrowed.
+
+   Same rule as the lines they sit under, in both directions: a favourability
+   net never joins an approve-minus-disapprove cloud, and the election-day row
+   is not a poll, so neither is a dot. */
+const CYC_DOT_MAX = 3;
+const MS_MONTH_C = 365.25 / 12;
+function cycDotDate(iso) {
+  const [y, m, d] = iso.split("-").map(Number);
+  return d + " " + window.AP.D.monthName(m) + " " + y;
+}
+function cycleReadings(c, M, D) {
+  const out = [];
+  const key = M.key,
+    isOpp = M.leader === "opp";
+  if (c.current) {
+    const mOf = iso => (Date.parse(iso) - Date.parse(c.eDate)) / 86400000 / MS_MONTH_C;
+    for (const p of D.individualPolls) {
+      const mb = p.appr && p.appr.metricBy || {};
+      let y = null;
+      if (key === "primary") y = p.p ? p.p[c.gov] : null;else if (key === "tpp") y = p[c.gov];else if (key === "net") y = (mb.alb || "approval") === "fav" ? null : p.appr ? p.appr.albNet : null;else if (key === "oppnet") y = (mb.taylor || "approval") === "fav" ? null : p.appr ? p.appr.taylorNet : null;
+      if (y == null) continue;
+      out.push({
+        x: mOf(p.released),
+        y,
+        meta: {
+          pollster: p.pollster,
+          dateLabel: p.dateLabel,
+          sample: p.sample,
+          released: p.released
+        }
+      });
+    }
+    return out;
+  }
+  const src = (D.cycleSource || {})[c.year];
+  if (!src) return out;
+  if (key === "primary" || key === "tpp") {
+    const f = key === "tpp" ? "tpp_" + c.gov : c.gov;
+    for (const p of src.polls) {
+      if (p[f] == null || p.firm === "Election" || p.m < -1 || p.m > 36.4) continue;
+      out.push({
+        x: p.m,
+        y: p[f],
+        meta: {
+          pollster: p.firm,
+          dateLabel: cycDotDate(p.date)
+        }
+      });
+    }
+  } else {
+    const f = isOpp ? "oppNet" : "pmNet";
+    for (const r of src.approval) {
+      if (r[f] == null || r.metric === "fav" || r.m < -1 || r.m > 36.4) continue;
+      out.push({
+        x: r.m,
+        y: r[f],
+        meta: {
+          pollster: r.firm,
+          dateLabel: cycDotDate(r.date)
+        }
+      });
+    }
+  }
+  return out;
+}
+
+/* Shape is assigned WITHIN a colour, not across the board: the point is to
+   separate two Coalition terms from each other, and giving the lone Labor
+   term beside them a triangle would be decoration standing in for a
+   distinction that colour already makes. So the first term of each party
+   keeps circles and only a second and third need a shape of their own. */
+const CYC_SHAPES = ["circle", "triangle", "diamond"];
+function cycShapes(shown) {
+  const seen = {},
+    out = {};
+  for (const c of shown) {
+    const n = seen[c.color] = (seen[c.color] || 0) + 1;
+    out[c.year] = CYC_SHAPES[n - 1] || "circle";
+  }
+  return out;
+}
+
 // linear-interpolate quarterly (or monthly) anchors onto a 0..maxM month grid.
 // Only KNOWN anchors are interpolated between: a measure can start late (the
 // Morrison term's first reading is month 2, and its 2016 predecessor's opens
@@ -8129,7 +8261,8 @@ function CycleChart({
   hidden,
   hi,
   showHan,
-  setHan
+  setHan,
+  shapes
 }) {
   const {
     D
@@ -8212,6 +8345,36 @@ function CycleChart({
       endLabelOpacity: labOp
     };
   });
+  /* The polls the lines are averages of, once the board is narrow enough to
+     read them. Each cloud takes its line's colour and shape, and follows it
+     into "change since election" mode - a cloud left on absolute levels under
+     a line drawn as change would agree with it nowhere. Dimming a cycle takes
+     its dots down with it, or a faded line ends up with a louder cloud than
+     the one being pointed at. */
+  const dotsOn = !!shapes && shown.length > 0 && shown.length <= CYC_DOT_MAX;
+  /* Memoised on the things that actually move a dot. Three terms of primary
+     vote is 600 points on one chart, well past the ~240 this scatter was
+     built for, and a fresh array on every unrelated render - a tooltip
+     opening, a sibling chart re-rendering - hands React 600 new elements to
+     reconcile each time. The key is the shown years rather than the array,
+     since `shown`, `shapes` and `solo` are all rebuilt every render and all
+     three are decided by exactly that list. */
+  const shownKey = shown.map(c => c.year).join(",");
+  const scatter = React.useMemo(() => !dotsOn ? [] : shown.flatMap(c => {
+    const base = cycBase(c, M.key);
+    const leadName = isOpp ? c.oppLead : c.lead;
+    const label = solo ? leadName : c.year + " · " + leadName;
+    const dim = hi != null && hi !== c.year && !c.current;
+    return cycleReadings(c, M, D).map(p => ({
+      x: p.x,
+      y: chg ? +(p.y - base).toFixed(2) : p.y,
+      color: c.color,
+      shape: shapes[c.year],
+      label,
+      meta: p.meta,
+      op: dim ? 0.3 : 1
+    }));
+  }), [dotsOn, shownKey, M.key, isOpp, chg, hi]);
   /* Hanson – one line, not one per cycle. She has been rated for part of the
      current term and in no term before it, so there is no past-cycle
      counterpart to draw and nothing to align her against. Points come straight
@@ -8343,6 +8506,7 @@ function CycleChart({
     refLines: refLines,
     series: built,
     spine: CYC_SPINE,
+    scatter: scatter,
     tooltipTitle: i => cycMonthLabel(CYC_SPINE[i].x) + (solo ? " – " + cycMonthOf(solo.eDate, CYC_SPINE[i].x) : ""),
     fmt: M.fmt
   }));
@@ -8354,7 +8518,8 @@ function CycleLegend({
   setHi,
   toggle,
   showAll,
-  hideAll
+  hideAll,
+  shapes
 }) {
   const anyHidden = hidden.size > 0;
   return /*#__PURE__*/React.createElement("div", {
@@ -8379,7 +8544,7 @@ function CycleLegend({
       onFocus: () => setHi(c.year),
       onClick: () => toggle(c.year)
     }, /*#__PURE__*/React.createElement("span", {
-      className: "cyc-swatch",
+      className: "cyc-swatch" + (shapes && shapes[c.year] && shapes[c.year] !== "circle" ? " sw-" + shapes[c.year] : ""),
       style: {
         background: c.color
       }
@@ -8606,6 +8771,12 @@ function PastCyclesView() {
     n.has(year) ? n.delete(year) : n.add(year);
     return n;
   });
+  /* Shapes are a property of what is CURRENTLY on the board, so they are
+     worked out once here and handed to the legend and all four charts – a
+     chip and the dots it explains must never disagree about which term is
+     the triangle. */
+  const shownCycles = cycles.filter(c => !hidden.has(c.year));
+  const shapes = shownCycles.length <= CYC_DOT_MAX ? cycShapes(shownCycles) : null;
   const showAll = () => setHidden(new Set());
   const hideAll = () => setHidden(new Set(cycles.map(c => c.year)));
   const exportSeries = () => downloadCsv(`auspol-tracker-cycles-series-${D.latest.updatedISO}.csv`, cycleSeriesRows(cycles));
@@ -8648,7 +8819,8 @@ function PastCyclesView() {
     setHi: setHi,
     toggle: toggle,
     showAll: showAll,
-    hideAll: hideAll
+    hideAll: hideAll,
+    shapes: shapes
   }), /*#__PURE__*/React.createElement("div", {
     className: "cyc-charts"
   }, CYC_METRICS.map(m => /*#__PURE__*/React.createElement(CycleChart, {
@@ -8659,7 +8831,8 @@ function PastCyclesView() {
     hidden: hidden,
     hi: hi,
     showHan: showHan,
-    setHan: setShowHan
+    setHan: setShowHan,
+    shapes: shapes
   }))), /*#__PURE__*/React.createElement(AccuracyPanel, null), /*#__PURE__*/React.createElement("p", {
     className: "cyc-foot"
   }, "The plotted series and the individual polls behind it are both downloadable above.", " ", "Past cycles run the full ~3-year term to the next election; the current cycle stops at the latest reading.", " ", showHan && /*#__PURE__*/React.createElement("span", null, "Hanson is drawn on the opposition chart from ", "“", "approve minus disapprove", "”", " readings only, which is why her line is short: most houses rate her on favourability, a different question that is never blended into these lines, and no past cycle asked about her at all.", " "), mode === "chg" ? "Lines show movement relative to each party’s own election result." : "Approval lines splice the sitting prime minister – and opposition leader – where a term changed leaders mid-stream."));
