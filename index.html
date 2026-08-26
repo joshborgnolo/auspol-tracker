@@ -5435,13 +5435,18 @@ function fitDomain(vals, step, include) {
   };
 }
 
-/* `roll` is opt-in, and only the hero asks for it: there the movement sits
-   beside three other figures that travel between matchups, so a chip that
-   simply changed under them would be the one still thing in a moving readout.
-   Everywhere else a delta labels a panel that isn't going anywhere, and a reel
-   would be motion for its own sake. RollNum is defined by the header script,
-   which loads after this one - resolved at render, and guarded so a reordering
-   degrades to a plain figure rather than a blank panel. */
+/* `roll` is opt-in, and the test is whether the delta sits in a readout that
+   MOVES. The hero was the only one for a while: three other figures travel
+   between matchups there, so a chip that simply changed under them would be
+   the one still thing in a moving readout. That is now equally true of the
+   leader readouts - the preferred-PM tiles travel between the two questions,
+   the approval nets roll under their own toggle - so those ask for it too. The
+   direction and undecided panels still do not: nothing there is going
+   anywhere, and a reel would be motion for its own sake.
+
+   RollNum is defined by the header script, which loads after this one -
+   resolved at render, and guarded so a reordering degrades to a plain figure
+   rather than a blank panel. */
 function Delta({
   value,
   suffix = "",
@@ -6097,13 +6102,23 @@ function PreferredPMPanel({
       });
     }
     const rootR = root.getBoundingClientRect();
+    /* The digits are recorded with the position. A reel rolls because its --d
+       CHANGES on an element that was already there, and across this switch
+       nothing was: the two layouts are different shapes, so React builds the
+       tiles afresh and every reel mounts already holding its answer. The
+       figures were snapping to 38 while the tile they sit in floated across
+       the card. Carrying the old digits over gives each reel something to roll
+       FROM, on the same curve and the same 320ms as the float. */
+    const digitsIn = (n, sel) => [...n.querySelectorAll(sel + " .roll-reel")].map(r => r.style.getPropertyValue("--d"));
     const now = {};
     nodes.forEach(n => {
       const r = n.getBoundingClientRect();
       now[n.dataset.mk] = {
         x: r.left - rootR.left,
         y: r.top - rootR.top,
-        html: n.outerHTML
+        html: n.outerHTML,
+        num: digitsIn(n, ".leader-num"),
+        delta: digitsIn(n, ".delta")
       };
     });
     const prev = homeRef.current;
@@ -6113,33 +6128,69 @@ function PreferredPMPanel({
     if (still) return;
     const MS = window.AP && window.AP.MORPH_MS || 320;
     const EASE = "cubic-bezier(.4, .1, .25, 1)";
-    /* Set the start state, force it to be committed, then set the end state -
-       all in this one synchronous pass. The usual FLIP waits a frame before
+    /* Every start state is set, then committed ONCE, then every end state -
+       rather than a reflow per element. The usual FLIP waits a frame before
        releasing, and a frame is exactly what a hidden tab never gets: the
        tiles then sat holding their inverse transform indefinitely. Reading
-       offsetWidth commits the start state instead, so the transition has
-       something to run FROM without anyone having to be shown a frame first. */
-    const flip = (n, startTransform, startOpacity) => {
-      n.style.transition = "none";
-      if (startTransform) n.style.transform = startTransform;
-      if (startOpacity != null) n.style.opacity = startOpacity;
-      void n.offsetWidth; // commit the start state
-      n.style.transition = "transform " + MS + "ms " + EASE + ", opacity " + MS + "ms " + EASE;
-      n.style.transform = "";
-      n.style.opacity = "";
+       offsetWidth commits the start state instead, so the transitions have
+       something to run FROM without anyone having to be shown a frame first.
+       One read for the whole readout, because a tile and its digits have to
+       start together or they arrive apart. */
+    const release = [];
+    /* Digits are paired from the RIGHT, the way an odometer lines up: units
+       under units. It matters where a figure changes width - 8 becoming 44
+       should roll the 8 into the 4 it is now beside, not into the tens column
+       it has never occupied - and a reel with no counterpart keeps its answer
+       and stays put rather than rolling from nowhere. */
+    const seed = (n, sel, was) => {
+      if (!was || !was.length) return;
+      const cur = [...n.querySelectorAll(sel + " .roll-reel")];
+      const offset = cur.length - was.length;
+      cur.forEach((reel, i) => {
+        const from = was[i - offset],
+          to = reel.style.getPropertyValue("--d");
+        if (from == null || from === "" || from === to) return;
+        reel.style.transition = "none";
+        reel.style.setProperty("--d", from);
+        // "" hands it back to .roll-reel's own transition, which is already
+        // the shared curve at the shared duration
+        release.push(() => {
+          reel.style.transition = "";
+          reel.style.setProperty("--d", to);
+        });
+      });
     };
     nodes.forEach(n => {
       const a = prev[n.dataset.mk],
         b = now[n.dataset.mk];
       /* Nobody to travel from - the head-to-head Albanese, back again when the
          two-way is chosen. He arrives rather than slides, because there is no
-         honest place to slide him from. */
-      if (!a) return flip(n, null, "0");
+         honest place to slide him from, and his digits have nothing to roll
+         from either. */
+      if (!a) {
+        n.style.transition = "none";
+        n.style.opacity = "0";
+        release.push(() => {
+          n.style.transition = "opacity " + MS + "ms " + EASE;
+          n.style.opacity = "";
+        });
+        return;
+      }
+      seed(n, ".leader-num", a.num);
+      seed(n, ".delta", a.delta);
       const dx = a.x - b.x,
         dy = a.y - b.y;
       if (!dx && !dy) return;
-      flip(n, "translate(" + dx + "px, " + dy + "px)", null);
+      n.style.transition = "none";
+      n.style.transform = "translate(" + dx + "px, " + dy + "px)";
+      release.push(() => {
+        n.style.transition = "transform " + MS + "ms " + EASE + ", opacity " + MS + "ms " + EASE;
+        n.style.transform = "";
+        n.style.opacity = "";
+      });
     });
+    void root.offsetWidth; // commit every start state together
+    release.forEach(f => f());
     /* A tile with nowhere to go is the second Albanese, and the three-way
        already contains him once. React has removed it, so what fades is a
        still copy left at the spot it occupied - the same departure the chart
@@ -6167,6 +6218,10 @@ function PreferredPMPanel({
         n.style.transition = "";
         n.style.transform = "";
         n.style.opacity = "";
+        // --d is already the answer by now; only the inline transition is ours
+        n.querySelectorAll(".roll-reel").forEach(r => {
+          r.style.transition = "";
+        });
       });
     }, MS + 80);
   }, [fmt]);
@@ -6199,6 +6254,7 @@ function PreferredPMPanel({
       value: rd.v - rd.prev,
       suffix: "",
       small: true,
+      roll: true,
       title: readoutDeltaTitle(rd)
     }));
   });
@@ -6529,6 +6585,7 @@ function ApprovalPanel({
       value: r.v - r.prev,
       suffix: "",
       small: true,
+      roll: true,
       title: readoutDeltaTitle(r)
     })), /*#__PURE__*/React.createElement("div", {
       className: "appr-netbar",
