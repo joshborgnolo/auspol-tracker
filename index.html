@@ -6191,12 +6191,44 @@ function ApprovalPanel({
   leaders.forEach(L => {
     reads[L.id] = lastReadings(D.leaderMonths, L.id + suf);
   });
-  // sitting PM (Albanese) is always shown first; the rest descend by net reading
-  const ordered = [...leaders].sort((a, b) => {
-    if (a.id === "alb") return -1;
-    if (b.id === "alb") return 1;
-    return ((reads[b.id] || {}).v ?? -99) - ((reads[a.id] || {}).v ?? -99);
-  });
+  /* Fixed order: prime minister, opposition leader, One Nation. It used to be
+     the PM followed by whoever rated higher, and the two questions do not rank
+     the other two the same way - so toggling Approval/Favourability reshuffled
+     the row as well as changing the figures, and a reader tracking one leader
+     had to find them again. A row that holds still is what lets the numbers be
+     compared across the toggle at all.
+      Party, not name: a leadership change inside a party (Ley to Taylor, and
+     this file has already been through one) should not need an edit here. The
+     two party tokens DO swap if government changes, which is the one thing
+     that would. */
+  const PM_PARTY = "ALP",
+    OPP_PARTY = "L/NP";
+  /* The exception the order is worth breaking for: One Nation ahead of the
+     opposition when it would actually run Labor CLOSER than the Coalition
+     does. Ranking second is a claim about who the contest is with, and if the
+     2PP says that is Hanson then leading with the opposition leader is the
+     page arguing with its own headline.
+      Tested the way the hero tests a month-on-month move, and for the same
+     reason - two aggregates a point apart are not a fact about the electorate.
+     Significant means the gap clears the two intervals added in quadrature.
+     Today Labor takes 53.5 against One Nation and 51.4 against the Coalition,
+     so One Nation runs it 2.1 points FURTHER behind and the exception is a
+     long way from firing; it is here for a term that might look different. */
+  const onpIsTheRival = (() => {
+    const on = D.altLatest && D.altLatest.alp_on;
+    if (!on || on.a == null || D.latest.alp2pp == null) return false;
+    const closer = D.latest.alp2pp - on.a; // >0: Labor does WORSE against ON
+    return closer > Math.hypot(D.latest.alp2ppCi95 || 0, on.ci95 || 0);
+  })();
+  const ORDER = [PM_PARTY, ...(onpIsTheRival ? ["ON", OPP_PARTY] : [OPP_PARTY, "ON"])];
+  // an unlisted party sorts last rather than first, which is what indexOf's -1
+  // would have done
+  const rankOf = L => {
+    const i = ORDER.indexOf(L.party);
+    return i < 0 ? ORDER.length : i;
+  };
+  const ordered = [...leaders].sort((a, b) => rankOf(a) - rankOf(b));
+  const Roll = window.RollNum;
   // Published readings behind the lines, for the ACTIVE metric only. A net is a
   // difference of two proportions, so it carries more sampling noise than a
   // single share – the monthly line hides more here than on any other chart.
@@ -6346,7 +6378,9 @@ function ApprovalPanel({
       className: "net dash"
     }, "\u2014") : /*#__PURE__*/React.createElement("span", {
       className: "net " + (net >= 0 ? "pos" : "neg")
-    }, net > 0 ? "+" : "", net), r && r.prev != null && /*#__PURE__*/React.createElement(Delta, {
+    }, Roll ? /*#__PURE__*/React.createElement(Roll, {
+      value: (net > 0 ? "+" : "") + net
+    }) : /*#__PURE__*/React.createElement(React.Fragment, null, net > 0 ? "+" : "", net)), r && r.prev != null && /*#__PURE__*/React.createElement(Delta, {
       value: r.v - r.prev,
       suffix: "",
       small: true,

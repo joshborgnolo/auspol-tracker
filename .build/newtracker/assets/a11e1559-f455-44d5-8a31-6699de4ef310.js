@@ -700,12 +700,42 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   const latestYm = D.leaderMonths[D.leaderMonths.length - 1].ym;
   const reads = {};
   leaders.forEach((L) => { reads[L.id] = lastReadings(D.leaderMonths, L.id + suf); });
-  // sitting PM (Albanese) is always shown first; the rest descend by net reading
-  const ordered = [...leaders].sort((a, b) => {
-    if (a.id === "alb") return -1;
-    if (b.id === "alb") return 1;
-    return ((reads[b.id] || {}).v ?? -99) - ((reads[a.id] || {}).v ?? -99);
-  });
+  /* Fixed order: prime minister, opposition leader, One Nation. It used to be
+     the PM followed by whoever rated higher, and the two questions do not rank
+     the other two the same way - so toggling Approval/Favourability reshuffled
+     the row as well as changing the figures, and a reader tracking one leader
+     had to find them again. A row that holds still is what lets the numbers be
+     compared across the toggle at all.
+
+     Party, not name: a leadership change inside a party (Ley to Taylor, and
+     this file has already been through one) should not need an edit here. The
+     two party tokens DO swap if government changes, which is the one thing
+     that would. */
+  const PM_PARTY = "ALP", OPP_PARTY = "L/NP";
+  /* The exception the order is worth breaking for: One Nation ahead of the
+     opposition when it would actually run Labor CLOSER than the Coalition
+     does. Ranking second is a claim about who the contest is with, and if the
+     2PP says that is Hanson then leading with the opposition leader is the
+     page arguing with its own headline.
+
+     Tested the way the hero tests a month-on-month move, and for the same
+     reason - two aggregates a point apart are not a fact about the electorate.
+     Significant means the gap clears the two intervals added in quadrature.
+     Today Labor takes 53.5 against One Nation and 51.4 against the Coalition,
+     so One Nation runs it 2.1 points FURTHER behind and the exception is a
+     long way from firing; it is here for a term that might look different. */
+  const onpIsTheRival = (() => {
+    const on = D.altLatest && D.altLatest.alp_on;
+    if (!on || on.a == null || D.latest.alp2pp == null) return false;
+    const closer = D.latest.alp2pp - on.a;      // >0: Labor does WORSE against ON
+    return closer > Math.hypot(D.latest.alp2ppCi95 || 0, on.ci95 || 0);
+  })();
+  const ORDER = [PM_PARTY, ...(onpIsTheRival ? ["ON", OPP_PARTY] : [OPP_PARTY, "ON"])];
+  // an unlisted party sorts last rather than first, which is what indexOf's -1
+  // would have done
+  const rankOf = (L) => { const i = ORDER.indexOf(L.party); return i < 0 ? ORDER.length : i; };
+  const ordered = [...leaders].sort((a, b) => rankOf(a) - rankOf(b));
+  const Roll = window.RollNum;
   // Published readings behind the lines, for the ACTIVE metric only. A net is a
   // difference of two proportions, so it carries more sampling noise than a
   // single share – the monthly line hides more here than on any other chart.
@@ -817,9 +847,22 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
               <div className="appr-top">
                 <span className="leader-dot" style={{ background: L.color }}></span>
                 <span className="leader-name">{L.short}{tag && <span className="stale-tag" title={"Latest published reading · " + tag}> {tag}</span>}</span>
+                {/* Rolls to its new value, the way the hero's 2PP pair does.
+                    Earned here for the hero's own reason: Approval and
+                    Favourability are the same three people asked a different
+                    question, so the toggle moves every figure at once and a
+                    number that simply swapped would be the one still thing in
+                    a moving readout. The sign rides along as a separator - the
+                    digits reel, the + or − does not.
+                    Guarded like Delta's: RollNum comes from the header script,
+                    which loads after this one, so a reordering degrades to a
+                    plain figure rather than a blank panel. */}
                 {net == null
                   ? <span className="net dash">—</span>
-                  : <span className={"net " + (net >= 0 ? "pos" : "neg")}>{net > 0 ? "+" : ""}{net}</span>}
+                  : <span className={"net " + (net >= 0 ? "pos" : "neg")}>
+                      {Roll ? <Roll value={(net > 0 ? "+" : "") + net} />
+                            : <>{net > 0 ? "+" : ""}{net}</>}
+                    </span>}
                 {/* same movement indicator the preferred-PM readout carries –
                     a net that moved is as much news as a share that moved */}
                 {r && r.prev != null && <Delta value={r.v - r.prev} suffix="" small title={readoutDeltaTitle(r)} />}
