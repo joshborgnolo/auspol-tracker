@@ -1961,6 +1961,38 @@ const DAY_MS = 86400000;
 const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const NP_HORIZON_DAYS = 28;   // one month of schedule
 const NP_MAX_ROWS = 10;       // a busy fortnight shouldn't run off the page
+/* A house nobody has timed keeps its whole day: with no hour recorded there is
+   no moment to say has passed, so the row stays "today" until today is over
+   rather than being rolled off the list by an hour we invented for it. */
+const NP_UNTIMED_MINS = 24 * 60;
+// prose counts, so a footnote reads as a sentence rather than a readout
+const NUMWORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+const spellNum = (n) => (Number.isInteger(n) && n >= 0 && n < 10 ? NUMWORDS[n] : String(n));
+
+/* "Now", in the frame this schedule is written in.
+
+   Every date on this page is an Australian calendar date and every release
+   hour is an eastern one, so "today" has to be Sydney's today - not the
+   reader's. A reader in London at 11pm on the 25th is looking at a schedule
+   that is already on the 26th, and was being told a poll due in four hours
+   was "tomorrow". The day comes back as UTC midnight, which is the frame
+   Date.parse("YYYY-MM-DD") produces and the frame everything here compares
+   in, and the clock as minutes past it. */
+function easternNow() {
+  const d = new Date();
+  try {
+    const p = {};
+    for (const x of new Intl.DateTimeFormat("en-AU", {
+      timeZone: "Australia/Sydney", year: "numeric", month: "2-digit",
+      day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23",
+    }).formatToParts(d)) p[x.type] = x.value;
+    // some engines still render midnight as hour 24 rather than 0
+    return { day: Date.UTC(+p.year, +p.month - 1, +p.day), mins: (+p.hour % 24) * 60 + +p.minute };
+  } catch (e) {
+    return { day: Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()),
+             mins: d.getHours() * 60 + d.getMinutes() };
+  }
+}
 
 /* The hour a house files, written the way a clock is read here: "5am",
    "5.30am", and a span as "5-6am" rather than "5am-6am" when both ends share
@@ -2032,17 +2064,23 @@ function NextPollsPanel() {
 
   /* Every date in here comes from Date.parse("YYYY-MM-DD"), which is UTC
      midnight, so "today" has to be the same thing or the comparison measures
-     the reader's timezone as well as the gap. It used to be LOCAL midnight,
-     which in Sydney sits 10 hours the other side of it.
+     the reader's timezone as well as the gap - see easternNow.
 
      And the projection is floored to its own calendar day, because that is
      what the row prints. Essential's cadence is a median of 29.5 days, so its
      release landed at noon; against a midnight "today" that rounded to one day
      out, and the row said "tomorrow" underneath a date that was today. A
      half-day is not a fact about when a poll lands - it is a fact about
-     medians of an odd number of days. */
-  const now = new Date();
-  const t0 = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+     medians of an odd number of days.
+
+     The CLOCK matters too, and used not to be looked at at all. Essential is
+     expected at 1am on a Wednesday; read at 3pm on that Wednesday the panel
+     still said "today", naming a moment fourteen hours gone as the next thing
+     to happen. So a projection is a moment, not a date, and it is spent once
+     that moment passes. */
+  const eNow = easternNow();
+  const t0 = eNow.day;
+  const nowMs = t0 + eNow.mins * 60000;
   const dayFloor = (ms) => {
     const d = new Date(ms);
     return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
@@ -2072,11 +2110,48 @@ function NextPollsPanel() {
       if (d < -3) d += 7;
       return ms + d * DAY_MS;
     };
+    // the moment a projected release is expected, which is the date plus the
+    // hour the house keeps – the thing that is compared against now
+    const due = (rel) => rel + (c.releaseMins == null ? NP_UNTIMED_MINS : c.releaseMins) * 60000;
+    const relOf = (f) => dayFloor(snap(f + c.lag * DAY_MS));
+
+    /* Bringing the projection up to the present. A slot whose moment has gone
+       by is spent – but WHY it is spent is two different things, and they want
+       two different answers.
+
+       If the archive is several intervals behind, those waves were published
+       and simply are not in here: the house kept its rhythm, and the next one
+       is another interval along. That is the roll this has always done.
+
+       If the archive is current and only the most recent slot has gone by –
+       Essential's 1am Wednesday, read at 3pm the same Wednesday – we cannot
+       tell whether the wave is out or is running late, and assuming it is out
+       costs a month: it names the Wednesday four weeks off when the honest
+       answer, and the one Essential's own record supports (its gaps run 27 to
+       36 days), is next Wednesday. So the last step is taken on the house's
+       own grid instead – a week for a house pinned to a weekday, since that is
+       the only step its date can take, and a day for one that is not.
+
+       Which step applies is decided by whether anything ELSE is missing. One
+       slot gone by and nothing behind it means the archive is being kept up,
+       so the absence is evidence; four slots gone by means it is not, so it
+       is not. */
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
-    let release = dayFloor(snap(field + c.lag * DAY_MS));
-    let missed = 0;
-    // page older than the prediction – roll on, counting the waves we've missed
-    while (release < t0 && missed < 60) { field += c.cadence * DAY_MS; release = dayFloor(snap(field + c.lag * DAY_MS)); missed++; }
+    let release = relOf(field);
+    let k = 0;
+    while (due(release) <= nowMs && k < 200) { field += c.cadence * DAY_MS; release = relOf(field); k++; }
+    // k intervals were rolled; the last of them is the ambiguous slot, so only
+    // the k-1 before it are waves this archive has plainly not recorded
+    const missed = Math.max(0, k - 1);
+    const slipFrom = k === 1 ? relOf(field - c.cadence * DAY_MS) : null;
+    if (k === 1) {
+      field -= c.cadence * DAY_MS;
+      const step = (c.releaseDow == null ? 1 : 7) * DAY_MS;
+      release = relOf(field);
+      // the wave slipped, so what follows it slips with it – `field` carries
+      // the step, and the next row is projected from where this one landed
+      for (let g = 0; due(release) <= nowMs && g < 400; g++) { field += step; release = relOf(field); }
+    }
     /* A loose house earns its place when its WINDOW opens inside the horizon,
        not when its centre falls inside it: DemosAU's next centre is 30 days
        out and its window opens in 13, so testing the centre would hide a house
@@ -2086,6 +2161,7 @@ function NextPollsPanel() {
       rows.push({
         ...c, field, release,
         missed: i === 0 ? missed : 0,
+        slipFrom: i === 0 ? slipFrom : null,
         ahead: i,
         /* Each further wave is one more interval of drift, so the window widens
            as sqrt(waves) – the second Essential is a looser bet than the first.
@@ -2107,11 +2183,21 @@ function NextPollsPanel() {
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
 
   const behind = rows.some((r) => r.missed > 0);
+  const slipped = rows.some((r) => r.slipFrom);
+  // which houses are running on a schedule that was stated rather than measured
+  const stated = [...new Set(rows.filter((r) => (r.declared || []).length).map((r) => r.pollster))];
+  // and which have measured their own publication lag rather than taking the default
+  const lagged = cad.filter((c) => c.lagMeasured).sort((a, b) => b.lagMeasured - a.lagMeasured);
   // UTC accessors, matching the frame the dates were parsed and compared in –
   // local ones would name the day before for any reader west of Greenwich
   const fmt = (ms) => {
     const d = new Date(ms);
     return `${WD[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
+  };
+  // without the weekday, for the one place it sits inside a longer clause
+  const fmtDM = (ms) => {
+    const d = new Date(ms);
+    return `${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
   };
   const when = (n) => (n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`);
 
@@ -2152,7 +2238,11 @@ function NextPollsPanel() {
               {/* the wave count is the evidence for the estimate – worth stating
                   once per house, not four times for a weekly one */}
               {r.ahead === 0 && <> · {r.waves} waves</>}
-              {r.missed > 0 && <span className="np-missed"> · {r.missed} since this data</span>}
+              {r.missed > 0 && <span className="np-missed"> · {r.missed} not in this archive</span>}
+              {/* the slot the panel would have named an hour ago: it went by
+                  without a poll, and saying nothing would hide that */}
+              {r.missed === 0 && r.slipFrom &&
+                <span className="np-missed"> · {fmtDM(r.slipFrom)} slot passed</span>}
             </span>
           </li>
         ))}
@@ -2160,22 +2250,30 @@ function NextPollsPanel() {
 
       <p className="np-foot">
         Each date is the house’s median interval between fieldwork-end dates across its last
-        eight waves, plus its publication lag. The ± is the observed variation in that interval,
-        widening for waves further out — in whole weeks for a house pinned to a weekday, since
-        that is the only step its date can take, and dropped entirely where its interval is too
-        regular to reach the Wednesday either side. Lag is measured from the publication dates recorded
-        against each poll, or read from a release URL that carries one: 39 Roy Morgan releases
-        and 8 YouGov ones each give a median of one day. Where a house has been timed often
-        enough, the hour it files is shown too, in eastern time — the span its releases have
-        covered where that is tight, and otherwise the hour it usually keeps, so one late
-        morning doesn’t speak for a house that is normally punctual. A house that has kept to one weekday across its dated releases —
-        Essential and YouGov both publish on Wednesdays — is nudged onto it, by at most three
-        days, since a median interval carries the drift of fieldwork that has moved about.
-        A house whose interval is too variable to name
-        a day gets the window its own record supports instead of being left out – DemosAU polls
-        about monthly, but anywhere in a five-week span. Houses that have stopped publishing are
-        omitted. These are estimates, not announced dates.
-        {behind && " Where a date has passed, that wave is out but not yet in this archive."}
+        eight waves, plus its publication lag, nudged onto the weekday it keeps. The ± is half
+        the range of those intervals with the longest and shortest set aside, widening for waves
+        further out — in whole weeks for a house pinned to a weekday, since that is the only step
+        its date can take, and dropped where the interval never reaches the day either side. Lag is
+        measured from the publication dates recorded against each poll, or read from a release
+        URL that carries one.
+        {lagged[0] && (lagged.length === cad.length
+          ? ` Every house here has enough of them to measure its own, ${lagged[0].pollster}’s ${spellNum(lagged[0].lag)}-day median off ${lagged[0].lagMeasured} releases.`
+          : ` Most of these houses have enough of them to measure their own — ${lagged[0].pollster}’s ${spellNum(lagged[0].lag)}-day median comes off ${lagged[0].lagMeasured} releases — and the rest fall back to a day, which is the field’s.`)}
+        {" "}Where a house
+        has been timed often enough the hour it files is shown too, in eastern time — the span
+        its releases have covered where that is tight, and otherwise the hour it usually keeps,
+        so one late morning doesn’t speak for a house that is normally punctual. Weekday and
+        hour are read off recent releases rather than the whole record, because a schedule is a
+        current fact about a house and its first year is often a different house. A house whose
+        interval is too variable to name a day gets the window its own record supports instead
+        of being left out — DemosAU polls about monthly, but anywhere in a five-week span.
+        {stated.length > 0 && ` ${stated.join(" and ")} ${stated.length > 1 ? "run" : "runs"} on a schedule stated by hand rather than measured, because the recorded releases don’t measure the one the house plainly keeps.`}
+        {" "}A projection is a moment, not a date: once the hour passes it is spent, and the row
+        moves on rather than naming a time that has already gone.
+        {slipped && " Where only the latest slot has gone by and nothing else is missing, the next date is the next slot the house’s own schedule allows — a week on for a house pinned to a weekday — since a wave that hasn’t appeared may be late rather than published."}
+        {behind && " Where several have gone by, those waves are out but not yet in this archive, and the projection carries on at the house’s own interval."}
+        {" "}Houses that have stopped publishing are omitted. “Today” is Sydney’s. These are
+        estimates, not announced dates.
       </p>
     </section>
   );

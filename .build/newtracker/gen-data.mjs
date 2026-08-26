@@ -1055,14 +1055,22 @@ const CYCLE_DEFS = CYC_META.map((c) => {
      `published` on its polls.
 
    Only houses on a genuine cadence are published: at least 4 waves, a spread
-   small relative to the interval (MAD/median <= 0.35), and still active. A
-   house that has broken its own pattern is not "expected" and is left out
-   rather than given a made-up date. */
+   small relative to the interval, and still active. A house that has broken
+   its own pattern is not "expected" and is left out rather than given a
+   made-up date. */
 const CAD_DEFAULT_LAG = 1;
+/* The weekday, the hour and the spread are all read off a RECENT window, not
+   the whole record - the same eight-wave window the cadence itself uses, plus
+   a little slack so a house does not lose its habit to one sample. A house's
+   schedule is a current fact about it, and its early record is often a
+   different house: Roy Morgan's release slugs are Monday in only two thirds of
+   the full run, because the 2025 ones are named for the fieldwork end, and
+   Monday in eleven of the last twelve. Judging it on all 39 hid the schedule
+   it actually keeps. */
+const CAD_RECENT = 12;
 const CAD_DOW_MIN = 5;         // dated releases before a weekday can be a habit
 const CAD_DOW_SHARE = 0.8;     // and the share of them that must share it
 const CAD_MIN_POLLS = 4;
-const CAD_MAX_REL_MAD = 0.35;
 /* Two further gates, both learned the hard way from Fox & Hedgehog, which
    sailed through the first version: 86 days silent on a 44-day cycle, and a
    window of ±15 days – and it still sorted ABOVE metronomic Roy Morgan,
@@ -1074,6 +1082,22 @@ const CAD_MAX_REL_MAD = 0.35;
        that really is weekly devalues both. */
 const CAD_MAX_SILENT = 1.5;
 const CAD_MAX_REL_SPREAD = 0.30;
+/* The spread is half the RANGE of a house's recent intervals with the single
+   most extreme at each end set aside - not a robust SD off the MAD, which is
+   what this used to be. The MAD is zero whenever more than half the gaps are
+   identical, and more than half of them ARE identical here, because these
+   houses are on schedules. Newspoll's last eight gaps are 18,28,21,31,18,21,
+   21,22: six sit within a day of three weeks and two are a month, and the MAD
+   read that as +/- 3 days, which the weekday snap then rounded away to a flat
+   date. A house that goes an extra week between polls a quarter of the time
+   does not have a flat date - and Newspoll, Resolve and Essential all do.
+
+   The trim is what keeps it from being the plain range, which any single freak
+   gap would own: DemosAU took six months off between its first two federal
+   waves, and untrimmed that one 184-day gap alone made its window wider than
+   its own interval and dropped it off the panel. Set aside one value at each
+   end and its remaining six gaps run 20 to 53 days, which is the house. */
+const CAD_SPREAD_TRIM = 4;     // gaps needed before an end value can be spared
 /* …and beyond THIS there is no rhythm to state at all: a window wider than
    three quarters of the interval says only "some time in the next couple of
    cycles", which is not worth a reader's attention. Between the two, a house
@@ -1124,36 +1148,51 @@ for (const p of POLLS) {
   (lagSamples[p.pollster] ||= []).push(d);
 }
 
+/* One RELEASE per entry, not one row. Two Resolve rows carry the same
+   fieldwork start, the same sample, the same 2PP, the same story URL and the
+   same publication minute, differing only in a fieldwork end two days apart -
+   one release recorded twice. Left in, it put a 2-day gap in a house that
+   polls every four weeks and dragged the spread with it. So rows that share a
+   publication date are collapsed to the last of them: a house's interval is
+   the gap between the things it PUBLISHED. */
 const byHouse = {};
-for (const p of POLLS) (byHouse[p.pollster] ||= []).push(p.date);
+for (const p of POLLS) {
+  const r = (byHouse[p.pollster] ||= []);
+  const pub = (p.published || "").slice(0, 10) || null;
+  if (pub && r.length && r[r.length - 1].pub === pub) r[r.length - 1].date = p.date;
+  else r.push({ date: p.date, pub });
+}
 const pollCadence = [];
-for (const [firm, dates] of Object.entries(byHouse)) {
-  dates.sort();
+for (const [firm, rows] of Object.entries(byHouse)) {
+  const dates = rows.map((r) => r.date).sort();
   if (dates.length < CAD_MIN_POLLS) continue;
   const gaps = dates.slice(1).map((d, i) => Math.round((Date.parse(d) - Date.parse(dates[i])) / 86400000)).slice(-8);
   const cadence = medianOf(gaps);
   if (!cadence || cadence <= 0) continue;
-  const mad = medianOf(gaps.map((g) => Math.abs(g - cadence)));
   const last = dates[dates.length - 1];
   // a house that has stopped is not "expected" in any form
   if ((Date.parse(LATEST_ISO) - Date.parse(last)) / 86400000 > CAD_MAX_SILENT * cadence) continue;
-  const ts = timeSamples[firm] || [];
-  /* Some houses keep a weekday, not just an interval. Essential has published
-     on a Wednesday all six times it has been dated and YouGov seven times in
-     eight, while Roy Morgan - which has by far the most dated releases - lands
-     on a Monday only two thirds of the time and otherwise anywhere from Sunday
-     to Friday. So this is recorded only where it is a habit rather than a
-     tendency: a weekday that has taken at least four fifths of a house's dated
-     releases, over at least five of them. Roy Morgan fails that on 67% and
-     keeps being projected from its interval alone, which is right - its
-     publication day genuinely wanders. */
-  const ds = dowSamples[firm] || [];
+  const ts = (timeSamples[firm] || []).slice(-CAD_RECENT);
+  /* Some houses keep a weekday, not just an interval. Newspoll and Resolve
+     have published on a Sunday evening every one of the nine times each has
+     been dated, Essential and YouGov on a Wednesday. So this is recorded where
+     it is a habit rather than a tendency: a weekday that has taken at least
+     four fifths of the house's recent dated releases, over at least five of
+     them. A house that fails it is projected from its interval alone, which is
+     right - DemosAU has published on a Monday, a Friday and a Tuesday, and no
+     weekday it keeps is a thing that exists to be found. */
+  const ds = (dowSamples[firm] || []).slice(-CAD_RECENT);
   const dowTally = {};
   ds.forEach((v) => (dowTally[v] = (dowTally[v] || 0) + 1));
   const dowTop = Object.entries(dowTally).sort((a, b) => b[1] - a[1])[0];
   const dowHabit = ds.length >= CAD_DOW_MIN && dowTop && dowTop[1] / ds.length >= CAD_DOW_SHARE
     ? Number(dowTop[0]) : null;
-  const spread = Math.max(1, Math.round(1.4826 * mad));
+  /* Half the range of the recent gaps, least and greatest set aside - see
+     CAD_SPREAD_TRIM. Floored at a day: even Roy Morgan's perfect 7-day cadence
+     still moves a day either side on publication. */
+  const trimmed = [...gaps].sort((a, b) => a - b);
+  if (trimmed.length >= CAD_SPREAD_TRIM) { trimmed.pop(); trimmed.shift(); }
+  const spread = Math.max(1, Math.round((trimmed[trimmed.length - 1] - trimmed[0]) / 2));
   /* Tight enough to name a DAY, or only a window?
 
      This used to be one test with one outcome: fail it and the house vanished
@@ -1169,16 +1208,23 @@ for (const [firm, dates] of Object.entries(byHouse)) {
      LOOSE_MAX there is no rhythm left to state and the house is dropped, which
      is where "we don't know" is the honest answer. */
   const rel = spread / cadence;
-  const dated = mad / cadence <= CAD_MAX_REL_MAD && rel <= CAD_MAX_REL_SPREAD;
+  const dated = rel <= CAD_MAX_REL_SPREAD;
   if (!dated && rel > CAD_LOOSE_MAX_REL_SPREAD) continue;
   const ls = lagSamples[firm] || [];
+  /* A DECLARED schedule, where the data cannot measure one the house plainly
+     keeps. It is not a nicer default - it is a claim entered by hand in
+     pollsterRules, carried through labelled, and meant to be deleted once
+     enough `published` values exist to measure the same thing. */
+  const decl = (D.pollsterRules?.[firm] || {}).release || null;
+  const declMins = decl && /^\d{1,2}:\d{2}$/.test(decl.time || "")
+    ? Number(decl.time.split(":")[0]) * 60 + Number(decl.time.split(":")[1]) : null;
+  const releaseDow = decl && decl.dow != null ? decl.dow : dowHabit;
+  const timed = ts.length >= 5;
   pollCadence.push({
     pollster: firm,
     last,
     cadence,
     loose: !dated,
-    // MAD -> robust SD, floored at 1 day: even Roy Morgan's perfect 7-day
-    // cadence still moves a day either side on publication
     spread,
     lag: ls.length >= 5 ? medianOf(ls) : CAD_DEFAULT_LAG,
     lagMeasured: ls.length >= 5 ? ls.length : 0,
@@ -1190,14 +1236,21 @@ for (const [firm, dates] of Object.entries(byHouse)) {
        of different kinds. Minutes past midnight, house local time - which is
        eastern, and is not converted for the reader's own zone because the
        release schedule is a fact about the publisher, not about the reader. */
-    releaseFrom: ts.length >= 5 ? Math.min(...ts) : null,
-    releaseTo: ts.length >= 5 ? Math.max(...ts) : null,
+    releaseFrom: timed ? Math.min(...ts) : declMins,
+    releaseTo: timed ? Math.max(...ts) : declMins,
     // the middle as well as the ends: one late release should not be allowed
     // to widen a house's stated hour into something it almost never does
-    releaseMid: ts.length >= 5 ? medianOf(ts) : null,
-    releaseTimed: ts.length >= 5 ? ts.length : 0,
-    releaseDow: dowHabit,
-    releaseDowN: dowHabit == null ? 0 : dowTop[1],
+    releaseMid: timed ? medianOf(ts) : declMins,
+    releaseTimed: timed ? ts.length : 0,
+    /* The one clock reading the panel decides ON, as opposed to the ones it
+       prints: minutes past midnight, eastern, of the moment a wave is expected
+       to be out. Null where the house has never been timed, and the panel then
+       gives it the whole day rather than inventing an hour for it. */
+    releaseMins: timed ? medianOf(ts) : declMins,
+    releaseDow,
+    releaseDowN: releaseDow == null ? 0 : (decl && decl.dow != null ? 0 : dowTop[1]),
+    // which parts of this are stated rather than measured, so the panel can say so
+    declared: decl ? [decl.dow != null && "day", declMins != null && !timed && "hour"].filter(Boolean) : [],
     waves: dates.length,
   });
 }
@@ -1365,7 +1418,13 @@ console.log("pollsterTable:", pollsterTable.length, "→", pollsterTable.map((r)
 console.log("houseEffects (2PP):", Object.entries(houseEffect).sort((a, b) => b[1].v - a[1].v).map(([f, h]) => `${f} ${h.v > 0 ? "+" : ""}${h.v}(n=${h.n})`).join(", "));
 console.log("headline 2PP:", hlNow, "| 1mo ago:", hl1mo);
 console.log("pollCadence:", pollCadence.length, "houses on a pattern →",
-  pollCadence.map((c) => `${c.pollster} ${c.cadence}d±${c.spread} lag${c.lag}${c.lagMeasured ? "(n=" + c.lagMeasured + ")" : ""}`).join(" | "));
+  pollCadence.map((c) => {
+    const WDS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const hh = c.releaseMins == null ? "" : ` @${String(Math.floor(c.releaseMins / 60)).padStart(2, "0")}:${String(c.releaseMins % 60).padStart(2, "0")}`;
+    return `${c.pollster} ${c.cadence}d±${c.spread} lag${c.lag}${c.lagMeasured ? "(n=" + c.lagMeasured + ")" : ""}`
+      + (c.releaseDow == null ? "" : ` ${WDS[c.releaseDow]}${c.releaseDowN ? "(" + c.releaseDowN + "/" + Math.min(CAD_RECENT, (dowSamples[c.pollster] || []).length) + ")" : ""}`)
+      + hh + (c.declared.length ? ` [declared ${c.declared.join("+")}]` : "") + (c.loose ? " LOOSE" : "");
+  }).join(" | "));
 console.log("events:", events.length, "(major:", events.filter((e) => e.major).length + ")");
 console.log("cycles:", CYCLE_DEFS.map((c) => `${c.year} m0..${c.months.at(-1)} tpp ${c.tpp[0]}→${c.tpp.at(-1)} prim ${c.primary[0]}→${c.primary.at(-1)} net ${c.net[0]}→${c.net.at(-1)} opp ${c.oppnet[0]}→${c.oppnet.at(-1)}`).join("\n        "));
 console.log("cycle ranges: tpp", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.tpp); return [Math.min(...v), Math.max(...v)]; })(), "| prim", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.primary); return [Math.min(...v), Math.max(...v)]; })(), "| net", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.net); return [Math.min(...v), Math.max(...v)]; })(), "| oppnet", ...(() => { const v = CYCLE_DEFS.flatMap((c) => c.oppnet); return [Math.min(...v), Math.max(...v)]; })());

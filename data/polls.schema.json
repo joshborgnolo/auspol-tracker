@@ -21,12 +21,21 @@
       }
     },
     "pollsterRules": {
-      "description": "House quirks the validator must know about, so a deliberate oddity is not reported as an error every run.",
+      "description": "House facts the build must know about: a deliberate oddity the validator would otherwise report every run, and a release schedule that is known rather than inferred.",
       "type": "object",
       "additionalProperties": {
         "type": "object",
         "properties": {
           "tppIncludesUndecided": { "type": "boolean", "description": "The house's published 2PP pair sums to under 100 because undecideds are included." },
+          "release": {
+            "type": "object",
+            "description": "A DECLARED publication schedule, for a house whose rhythm is known but whose recorded releases do not measure it - too few of them, or dated from something other than the post. It overrides the measured habit in \"Next expected polls\" and is labelled there as stated rather than measured, so a reader can tell the two apart. Delete it once enough `published` values exist to measure the same thing.",
+            "properties": {
+              "dow": { "type": "integer", "minimum": 0, "maximum": 6, "description": "Weekday the house publishes on, 0 = Sunday, matching Date#getDay()." },
+              "time": { "type": "string", "pattern": "^[0-2][0-9]:[0-5][0-9]$", "description": "Hour it files, 24-hour, eastern - the same frame as a `published` clock time." },
+              "note": { "type": "string", "description": "Where the claim comes from, and why the measurement is not trusted instead." }
+            }
+          },
           "note": { "type": "string" }
         }
       }
@@ -58,7 +67,7 @@
           "dateStart": { "type": "string", "description": "Fieldwork start date." },
           "pollster": { "type": "string" },
           "client": { "type": ["string", "null"], "description": "Commissioning outlet. Resolve = 'SMH / Age', Newspoll = 'The Australian', YouGov = 'Sky News', Roy Morgan = '—'." },
-          "published": { "type": "string", "description": "ISO date the poll was PUBLISHED, read off the cited source (a release header, an article's published_time). Distinct from `date`, which is the last day of fieldwork - the two differ by a day or more for most houses. Optional: where it isn't recorded the table falls back to the fieldwork end and says so. May carry a clock time as '2026-07-15T05:00' (house local time, i.e. eastern). Both halves are used: the date measures the house's publication lag, and enough timed releases let "Next expected polls" state the hour it files as well as the day. Never hand the whole string to Date.parse beside a bare date - a datetime parses as local and a date as UTC." },
+          "published": { "type": "string", "description": "ISO date the poll was PUBLISHED, read off the cited source (a release header, an article's published_time). Distinct from `date`, which is the last day of fieldwork - the two differ by a day or more for most houses. Optional: where it isn't recorded the table falls back to the fieldwork end and says so. May carry a clock time as '2026-07-15T05:00' (house local time, i.e. eastern). Both halves are used: the date measures the house's publication lag, and enough timed releases let \"Next expected polls\" state the hour it files as well as the day. Never hand the whole string to Date.parse beside a bare date - a datetime parses as local and a date as UTC." },
           "sample": { "type": ["number", "null"] },
           "undecided": { "type": ["number", "null"], "description": "Share who can't say who they'd vote for, where the house publishes one. It sits BESIDE the primaries, not inside them - Roy Morgan sets these electors aside before reporting shares, which is why its shares still sum to 100. Record only a figure the release prints for THAT wave: a combined release covering several waves prints one figure belonging to no single wave, and those rows carry none." },
           "alp": { "type": ["number", "null"] }, "lnp": { "type": ["number", "null"] },

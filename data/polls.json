@@ -27,6 +27,13 @@
     "Essential": {
       "tppIncludesUndecided": true,
       "note": "Essential's published 2PP is undecided-inclusive, so the pair sums to <100 rather than 100. The build reads that shortfall as the poll's undecided share after preferences, so it is a fact with a consumer now, not just an exemption."
+    },
+    "Roy Morgan": {
+      "release": {
+        "dow": 1,
+        "time": "16:30",
+        "note": "Roy Morgan files its weekly federal voting-intention release on a Monday, about 4.30pm eastern. Stated from the house’s schedule rather than measured, because its release URLs are an unreliable witness: the early ones are named for the fieldwork end (a Sunday) rather than the post, so the slug weekday reads Monday in only two thirds of the full record while the last twelve are Monday eleven times."
+      }
     }
   },
   "elections": {
@@ -1645,6 +1652,7 @@
     },
     {
       "date": "2026-01-06",
+      "published": "2026-01-09T05:00",
       "dateStart": "2026-01-05",
       "pollster": "DemosAU",
       "client": "Capital Brief",
@@ -1713,6 +1721,7 @@
     },
     {
       "date": "2026-01-16",
+      "published": "2026-01-18T18:00",
       "dateStart": "2026-01-12",
       "pollster": "Resolve",
       "client": "SMH / Age",
@@ -1765,6 +1774,7 @@
     },
     {
       "date": "2026-01-21",
+      "published": "2026-01-27T00:00",
       "dateStart": "2026-01-13",
       "pollster": "DemosAU",
       "client": "Capital Brief",
@@ -1781,6 +1791,7 @@
     },
     {
       "date": "2026-01-23",
+      "published": "2026-01-28T01:00",
       "dateStart": "2026-01-20",
       "pollster": "Essential",
       "client": "The Guardian",
@@ -1880,6 +1891,7 @@
     },
     {
       "date": "2026-02-08",
+      "published": "2026-02-08T20:30",
       "dateStart": "2026-02-05",
       "pollster": "Newspoll",
       "client": "The Australian",
@@ -1954,6 +1966,7 @@
     },
     {
       "date": "2026-02-12",
+      "published": "2026-02-15T17:59",
       "dateStart": "2026-02-08",
       "pollster": "Resolve",
       "client": "SMH / Age",
@@ -1987,6 +2000,7 @@
     },
     {
       "date": "2026-02-14",
+      "published": "2026-02-15T17:59",
       "dateStart": "2026-02-08",
       "pollster": "Resolve",
       "client": "SMH / Age",
@@ -2036,6 +2050,7 @@
     },
     {
       "date": "2026-02-20",
+      "published": "2026-02-23T20:30",
       "dateStart": "2026-02-16",
       "pollster": "DemosAU",
       "client": "Capital Brief",
@@ -2107,6 +2122,7 @@
     },
     {
       "date": "2026-02-26",
+      "published": "2026-03-01T19:00",
       "dateStart": "2026-02-23",
       "pollster": "Newspoll",
       "client": "The Australian",
@@ -2254,6 +2270,7 @@
     },
     {
       "date": "2026-03-14",
+      "published": "2026-03-15T18:00",
       "dateStart": "2026-03-09",
       "pollster": "Resolve",
       "client": "SMH / Age",
@@ -2377,6 +2394,7 @@
     },
     {
       "date": "2026-03-26",
+      "published": "2026-03-29T20:30",
       "dateStart": "2026-03-23",
       "pollster": "Newspoll",
       "client": "The Australian",
@@ -2520,6 +2538,7 @@
     },
     {
       "date": "2026-04-14",
+      "published": "2026-04-17T05:00",
       "dateStart": "2026-04-09",
       "pollster": "DemosAU",
       "client": "Capital Brief",
@@ -2536,6 +2555,7 @@
     },
     {
       "date": "2026-04-16",
+      "published": "2026-04-19T20:00",
       "dateStart": "2026-04-13",
       "pollster": "Newspoll",
       "client": "The Australian",
@@ -2552,6 +2572,7 @@
     },
     {
       "date": "2026-04-18",
+      "published": "2026-04-19T18:00",
       "dateStart": "2026-04-13",
       "pollster": "Resolve",
       "client": "SMH / Age",
@@ -2844,6 +2865,7 @@
     },
     {
       "date": "2026-05-16",
+      "published": "2026-05-17T18:00",
       "dateStart": "2026-05-13",
       "pollster": "Resolve",
       "client": "SMH / Age",
@@ -2880,6 +2902,7 @@
     },
     {
       "date": "2026-05-17",
+      "published": "2026-05-17T21:00",
       "dateStart": "2026-05-14",
       "pollster": "Newspoll",
       "client": "The Australian",
@@ -2913,6 +2936,7 @@
     },
     {
       "date": "2026-05-20",
+      "published": "2026-05-22T05:00",
       "dateStart": "2026-05-15",
       "pollster": "DemosAU",
       "client": "Capital Brief",
@@ -3047,6 +3071,7 @@
     },
     {
       "date": "2026-06-04",
+      "published": "2026-06-07T20:00",
       "dateStart": "2026-06-01",
       "pollster": "Newspoll",
       "client": "The Australian",
@@ -3083,6 +3108,7 @@
     },
     {
       "date": "2026-06-13",
+      "published": "2026-06-14T18:00",
       "dateStart": "2026-06-08",
       "pollster": "Resolve",
       "client": "SMH / Age",
@@ -3137,6 +3163,7 @@
     },
     {
       "date": "2026-06-18",
+      "published": "2026-06-22T08:50",
       "dateStart": "2026-06-16",
       "pollster": "DemosAU",
       "client": "Capital Brief",
@@ -3174,6 +3201,7 @@
     },
     {
       "date": "2026-06-25",
+      "published": "2026-06-28T20:00",
       "dateStart": "2026-06-22",
       "pollster": "Newspoll",
       "client": "The Australian",
@@ -3282,6 +3310,7 @@
     },
     {
       "date": "2026-07-08",
+      "published": "2026-07-13T08:44",
       "dateStart": "2026-07-03",
       "pollster": "DemosAU",
       "client": "Capital Brief",
@@ -3298,6 +3327,7 @@
     },
     {
       "date": "2026-07-11",
+      "published": "2026-07-12T17:50",
       "dateStart": "2026-07-06",
       "pollster": "Resolve",
       "client": "SMH / Age",
@@ -3404,6 +3434,7 @@
     },
     {
       "date": "2026-07-16",
+      "published": "2026-07-19T20:00",
       "dateStart": "2026-07-13",
       "pollster": "Newspoll",
       "client": "The Australian",
@@ -3550,7 +3581,7 @@
     },
     {
       "date": "2026-08-07",
-      "published": "2026-08-09",
+      "published": "2026-08-09T20:00",
       "dateStart": "2026-08-03",
       "pollster": "Newspoll",
       "client": "The Australian",
@@ -3605,7 +3636,7 @@
     },
     {
       "date": "2026-08-15",
-      "published": "2026-08-16",
+      "published": "2026-08-16T17:59",
       "dateStart": "2026-08-09",
       "pollster": "Resolve",
       "client": "SMH / Age",
@@ -3643,7 +3674,7 @@
     },
     {
       "date": "2026-08-20",
-      "published": "2026-08-21",
+      "published": "2026-08-24T08:51",
       "dateStart": "2026-08-18",
       "pollster": "DemosAU",
       "client": "Capital Brief",
