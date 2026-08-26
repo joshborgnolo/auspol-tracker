@@ -1084,11 +1084,23 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
                   approve/disapprove split to stack */}
               <div className="appr-netbar" aria-hidden="true">
                 <span className="anb-mid"></span>
-                {net != null && (
-                  <span className="anb-fill" style={net >= 0
-                    ? { left: "50%", width: w + "%", background: "var(--mood-pos)" }
-                    : { right: "50%", width: w + "%", background: "var(--mood-neg)" }}></span>
-                )}
+                {/* One bar per side, both always present, each owning only its
+                    own width. It used to be a single bar that swapped which
+                    edge it hung from and what colour it was - and the swap is
+                    instant while the width is still travelling, so a reading
+                    landing on zero from below flipped a part-width bar to the
+                    positive side and turned it green on the way out. Hanson
+                    does exactly that: -6 on favourability, 0 on approval, and
+                    a green bar appeared for the length of the contraction.
+
+                    Apart, each side simply grows from the midline or falls
+                    back to it, and a reading that genuinely crosses zero is
+                    one bar emptying as the other fills - which is what
+                    crossing the midline looks like. */}
+                <span className="anb-fill anb-pos"
+                      style={{ width: (net != null && net > 0 ? w : 0) + "%" }}></span>
+                <span className="anb-fill anb-neg"
+                      style={{ width: (net != null && net < 0 ? w : 0) + "%" }}></span>
               </div>
             </div>
           );

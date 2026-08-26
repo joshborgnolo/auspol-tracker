@@ -1178,6 +1178,11 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
    at that moment it has no width to see the swap happen in. */
 .anb-fill { position: absolute; top: 0; bottom: 0; border-radius: 4px;
   transition: width .32s cubic-bezier(.4, .1, .25, 1); }
+/* Side and colour belong to the ELEMENT, not to the reading: a bar that had to
+   change both mid-transition showed the wrong colour on the wrong side of the
+   midline for as long as the contraction lasted. */
+.anb-pos { left: 50%; background: var(--mood-pos); }
+.anb-neg { right: 50%; background: var(--mood-neg); }
 @media (prefers-reduced-motion: reduce) { .anb-fill { transition: none; } }
 
 /* a reading older than the latest month carries a quiet month tag */
@@ -6652,16 +6657,15 @@ function ApprovalPanel({
       "aria-hidden": "true"
     }, /*#__PURE__*/React.createElement("span", {
       className: "anb-mid"
-    }), net != null && /*#__PURE__*/React.createElement("span", {
-      className: "anb-fill",
-      style: net >= 0 ? {
-        left: "50%",
-        width: w + "%",
-        background: "var(--mood-pos)"
-      } : {
-        right: "50%",
-        width: w + "%",
-        background: "var(--mood-neg)"
+    }), /*#__PURE__*/React.createElement("span", {
+      className: "anb-fill anb-pos",
+      style: {
+        width: (net != null && net > 0 ? w : 0) + "%"
+      }
+    }), /*#__PURE__*/React.createElement("span", {
+      className: "anb-fill anb-neg",
+      style: {
+        width: (net != null && net < 0 ? w : 0) + "%"
       }
     })));
   })), /*#__PURE__*/React.createElement(TrendChart
