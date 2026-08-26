@@ -1096,15 +1096,24 @@ function pubDateFromUrl(url) {
   return null;
 }
 
-const lagSamples = {};
+const lagSamples = {}, timeSamples = {};
 for (const p of POLLS) {
   /* A RECORDED publication date beats one parsed out of a URL slug, and until
      now only the slug was read - so the lag was measured for exactly the two
      houses whose URLs happen to carry a date, and every other house fell back
      to the global default having contributed nothing to it. `published` is in
      the schema, was being entered, and was reaching nothing. */
-  const pub = p.published || pubDateFromUrl(p.url);
-  if (!pub) continue;
+  const pubRaw = p.published || pubDateFromUrl(p.url);
+  if (!pubRaw) continue;
+  /* `published` may carry a clock time - "2026-07-15T05:00". Take the DATE
+     half for the lag and never hand the whole string to Date.parse beside a
+     bare date: "2026-07-15T05:00" parses as local midnight-plus-five and
+     "2026-07-14" as UTC midnight, so subtracting one from the other measures
+     the timezone as well as the gap. Slicing keeps both operands in the same
+     frame, which is the only reason the lag stays a whole number of days. */
+  const pub = pubRaw.slice(0, 10);
+  const clock = /T(\d{2}):(\d{2})/.exec(pubRaw);
+  if (clock) (timeSamples[p.pollster] ||= []).push(+clock[1] * 60 + +clock[2]);
   const d = Math.round((Date.parse(pub) - Date.parse(p.date)) / 86400000);
   // a shared or rolling release URL (Roy Morgan covers 3 waves in one post,
   // Essential cites a report index) produces a nonsense gap – drop those
@@ -1125,6 +1134,7 @@ for (const [firm, dates] of Object.entries(byHouse)) {
   const last = dates[dates.length - 1];
   // a house that has stopped is not "expected" in any form
   if ((Date.parse(LATEST_ISO) - Date.parse(last)) / 86400000 > CAD_MAX_SILENT * cadence) continue;
+  const ts = timeSamples[firm] || [];
   const spread = Math.max(1, Math.round(1.4826 * mad));
   /* Tight enough to name a DAY, or only a window?
 
@@ -1154,6 +1164,17 @@ for (const [firm, dates] of Object.entries(byHouse)) {
     spread,
     lag: ls.length >= 5 ? medianOf(ls) : CAD_DEFAULT_LAG,
     lagMeasured: ls.length >= 5 ? ls.length : 0,
+    /* What time of day the house actually files, where enough releases have
+       been timed to call it a habit - same five-sample gate the lag uses, for
+       the same reason. Reported as the observed SPAN rather than an average:
+       YouGov has filed at 5am five times and 6am once, and "5-6am" is the
+       precise statement about that while "5am" and "5.10am" are both fictions
+       of different kinds. Minutes past midnight, house local time - which is
+       eastern, and is not converted for the reader's own zone because the
+       release schedule is a fact about the publisher, not about the reader. */
+    releaseFrom: ts.length >= 5 ? Math.min(...ts) : null,
+    releaseTo: ts.length >= 5 ? Math.max(...ts) : null,
+    releaseTimed: ts.length >= 5 ? ts.length : 0,
     waves: dates.length,
   });
 }

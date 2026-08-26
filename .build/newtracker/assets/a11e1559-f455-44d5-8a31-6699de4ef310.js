@@ -1835,6 +1835,26 @@ const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 const NP_HORIZON_DAYS = 28;   // one month of schedule
 const NP_MAX_ROWS = 10;       // a busy fortnight shouldn't run off the page
 
+/* The hour a house files, written the way a clock is read here: "5am",
+   "5.30am", and a span as "5-6am" rather than "5am-6am" when both ends share
+   a meridiem. House local time, which is eastern - not converted to the
+   reader's zone, because when a publisher files is a fact about the publisher.
+   The span is the observed one, so it stays honest about a house that is not
+   quite punctual instead of averaging its way to a minute nobody has seen. */
+function clockLabel(mins) {
+  const h = Math.floor(mins / 60), mi = mins % 60;
+  const ap = h < 12 ? "am" : "pm";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return mi ? `${h12}.${String(mi).padStart(2, "0")}${ap}` : `${h12}${ap}`;
+}
+function releaseLabel(from, to) {
+  if (from == null || to == null) return null;
+  if (from === to) return clockLabel(from);
+  const sameHalf = (Math.floor(from / 60) < 12) === (Math.floor(to / 60) < 12);
+  return sameHalf ? clockLabel(from).replace(/[ap]m$/, "") + "–" + clockLabel(to)
+                  : clockLabel(from) + "–" + clockLabel(to);
+}
+
 // name the rhythm in the words people actually use for it
 function cadenceLabel(d) {
   if (d >= 6.5 && d <= 7.5) return "weekly";
@@ -1919,7 +1939,12 @@ function NextPollsPanel() {
                 /* The ± IS the forecast here, so state it as the span it is
                    rather than as a day with a disclaimer bolted on. */
                 ? <>{fmt(r.release - r.spread * DAY_MS)}<span className="np-pm"> – </span>{fmt(r.release + r.spread * DAY_MS)}</>
-                : <>{fmt(r.release)}<span className="np-pm"> ± {r.spread} day{r.spread === 1 ? "" : "s"}</span></>}
+                : <>{fmt(r.release)}
+                    {/* the hour qualifies the DAY, so it sits with it rather
+                        than in the cadence column with the rhythm */}
+                    {releaseLabel(r.releaseFrom, r.releaseTo) &&
+                      <span className="np-time">, {releaseLabel(r.releaseFrom, r.releaseTo)}</span>}
+                    <span className="np-pm"> ± {r.spread} day{r.spread === 1 ? "" : "s"}</span></>}
             </span>
             {/* the column answers "when", so a window answers it too – with the
                 day it opens, which is the first date the wave is possible */}
@@ -1942,8 +1967,11 @@ function NextPollsPanel() {
       <p className="np-foot">
         Each date is the house’s median interval between fieldwork-end dates across its last
         eight waves, plus its publication lag. The ± is the observed variation in that interval,
-        widening for waves further out. Lag is read from release URLs that carry a date: 38 Roy
-        Morgan releases give a median of one day. A house whose interval is too variable to name
+        widening for waves further out. Lag is measured from the publication dates recorded
+        against each poll, or read from a release URL that carries one: 39 Roy Morgan releases
+        and 8 YouGov ones each give a median of one day. Where a house has been timed often
+        enough, the hour it files is shown too — the span its own releases have actually
+        covered, in eastern time. A house whose interval is too variable to name
         a day gets the window its own record supports instead of being left out – DemosAU polls
         about monthly, but anywhere in a five-week span. Houses that have stopped publishing are
         omitted. These are estimates, not announced dates.

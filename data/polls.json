@@ -2893,6 +2893,7 @@
     },
     {
       "date": "2026-05-19",
+      "published": "2026-05-20T05:00",
       "dateStart": "2026-05-12",
       "pollster": "YouGov",
       "client": "News24",
@@ -3025,6 +3026,7 @@
     },
     {
       "date": "2026-06-02",
+      "published": "2026-06-03T06:00",
       "dateStart": "2026-05-26",
       "pollster": "YouGov",
       "client": "News24",
@@ -3114,6 +3116,7 @@
     },
     {
       "date": "2026-06-16",
+      "published": "2026-06-17T05:00",
       "dateStart": "2026-06-09",
       "pollster": "YouGov",
       "client": "News24",
@@ -3236,6 +3239,7 @@
     },
     {
       "date": "2026-06-30",
+      "published": "2026-07-01T05:00",
       "dateStart": "2026-06-23",
       "pollster": "YouGov",
       "client": "News24",
@@ -3378,6 +3382,7 @@
     },
     {
       "date": "2026-07-14",
+      "published": "2026-07-15T05:00",
       "dateStart": "2026-07-07",
       "pollster": "YouGov",
       "client": "News24",
@@ -3485,6 +3490,7 @@
     },
     {
       "date": "2026-07-28",
+      "published": "2026-07-29T05:00",
       "dateStart": "2026-07-21",
       "pollster": "YouGov",
       "client": "News24",

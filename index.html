@@ -2172,6 +2172,8 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .np-row:nth-child(odd) { background: color-mix(in oklch, var(--ink) 3.5%, var(--surface)); }
 .np-firm { font-family: var(--sans); font-size: 14.5px; font-weight: 700; color: var(--ink); }
 .np-date { font-family: var(--sans); font-size: 14.5px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* the hour reads as part of the date, one step quieter than it */
+.np-time { color: var(--ink-2); }
 .np-pm { color: var(--ink-3); font-size: 12.5px; font-weight: 500; }
 .np-when { font-family: var(--sans); font-size: 13px; color: var(--ink-2); white-space: nowrap; }
 .np-cadence { font-family: var(--sans); font-size: 12.5px; color: var(--ink-3); }
@@ -2928,7 +2930,7 @@ window.AUSPOL = (function () {
   /* Measured publication rhythm per house – drives "Next expected polls".
      The dates themselves are computed in the browser against the real current
      date, so the panel stays honest as the page ages. */
-  const pollCadence = [{"pollster":"Roy Morgan","last":"2026-08-23","cadence":7,"loose":false,"spread":1,"lag":1,"lagMeasured":39,"waves":43},{"pollster":"YouGov","last":"2026-08-24","cadence":14,"loose":false,"spread":1,"lag":1,"lagMeasured":0,"waves":21},{"pollster":"Newspoll","last":"2026-08-07","cadence":21,"loose":false,"spread":3,"lag":1,"lagMeasured":0,"waves":16},{"pollster":"Resolve","last":"2026-08-15","cadence":28,"loose":false,"spread":1,"lag":1,"lagMeasured":0,"waves":16},{"pollster":"Essential","last":"2026-07-27","cadence":29.5,"loose":false,"spread":6,"lag":1,"lagMeasured":0,"waves":11},{"pollster":"DemosAU","last":"2026-08-20","cadence":33,"loose":true,"spread":17,"lag":1,"lagMeasured":0,"waves":9},{"pollster":"Spectre Strategy","last":"2026-07-23","cadence":139,"loose":false,"spread":4,"lag":1,"lagMeasured":0,"waves":4}];
+  const pollCadence = [{"pollster":"Roy Morgan","last":"2026-08-23","cadence":7,"loose":false,"spread":1,"lag":1,"lagMeasured":39,"releaseFrom":null,"releaseTo":null,"releaseTimed":0,"waves":43},{"pollster":"YouGov","last":"2026-08-24","cadence":14,"loose":false,"spread":1,"lag":1,"lagMeasured":8,"releaseFrom":300,"releaseTo":360,"releaseTimed":6,"waves":21},{"pollster":"Newspoll","last":"2026-08-07","cadence":21,"loose":false,"spread":3,"lag":1,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseTimed":0,"waves":16},{"pollster":"Resolve","last":"2026-08-15","cadence":28,"loose":false,"spread":1,"lag":1,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseTimed":0,"waves":16},{"pollster":"Essential","last":"2026-07-27","cadence":29.5,"loose":false,"spread":6,"lag":1,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseTimed":0,"waves":11},{"pollster":"DemosAU","last":"2026-08-20","cadence":33,"loose":true,"spread":17,"lag":1,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseTimed":0,"waves":9},{"pollster":"Spectre Strategy","last":"2026-07-23","cadence":139,"loose":false,"spread":4,"lag":1,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseTimed":0,"waves":4}];
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,
@@ -7768,6 +7770,26 @@ const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 const NP_HORIZON_DAYS = 28; // one month of schedule
 const NP_MAX_ROWS = 10; // a busy fortnight shouldn't run off the page
 
+/* The hour a house files, written the way a clock is read here: "5am",
+   "5.30am", and a span as "5-6am" rather than "5am-6am" when both ends share
+   a meridiem. House local time, which is eastern - not converted to the
+   reader's zone, because when a publisher files is a fact about the publisher.
+   The span is the observed one, so it stays honest about a house that is not
+   quite punctual instead of averaging its way to a minute nobody has seen. */
+function clockLabel(mins) {
+  const h = Math.floor(mins / 60),
+    mi = mins % 60;
+  const ap = h < 12 ? "am" : "pm";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return mi ? `${h12}.${String(mi).padStart(2, "0")}${ap}` : `${h12}${ap}`;
+}
+function releaseLabel(from, to) {
+  if (from == null || to == null) return null;
+  if (from === to) return clockLabel(from);
+  const sameHalf = Math.floor(from / 60) < 12 === Math.floor(to / 60) < 12;
+  return sameHalf ? clockLabel(from).replace(/[ap]m$/, "") + "–" + clockLabel(to) : clockLabel(from) + "–" + clockLabel(to);
+}
+
 // name the rhythm in the words people actually use for it
 function cadenceLabel(d) {
   if (d >= 6.5 && d <= 7.5) return "weekly";
@@ -7860,7 +7882,9 @@ function NextPollsPanel() {
   /* The ± IS the forecast here, so state it as the span it is
      rather than as a day with a disclaimer bolted on. */ ? /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release - r.spread * DAY_MS), /*#__PURE__*/React.createElement("span", {
     className: "np-pm"
-  }, " \u2013 "), fmt(r.release + r.spread * DAY_MS)) : /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release), /*#__PURE__*/React.createElement("span", {
+  }, " \u2013 "), fmt(r.release + r.spread * DAY_MS)) : /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release), releaseLabel(r.releaseFrom, r.releaseTo) && /*#__PURE__*/React.createElement("span", {
+    className: "np-time"
+  }, ", ", releaseLabel(r.releaseFrom, r.releaseTo)), /*#__PURE__*/React.createElement("span", {
     className: "np-pm"
   }, " \xB1 ", r.spread, " day", r.spread === 1 ? "" : "s"))), /*#__PURE__*/React.createElement("span", {
     className: "np-when"
@@ -7870,7 +7894,7 @@ function NextPollsPanel() {
     className: "np-missed"
   }, " \xB7 ", r.missed, " since this data"))))), /*#__PURE__*/React.createElement("p", {
     className: "np-foot"
-  }, "Each date is the house\u2019s median interval between fieldwork-end dates across its last eight waves, plus its publication lag. The \xB1 is the observed variation in that interval, widening for waves further out. Lag is read from release URLs that carry a date: 38 Roy Morgan releases give a median of one day. A house whose interval is too variable to name a day gets the window its own record supports instead of being left out \u2013 DemosAU polls about monthly, but anywhere in a five-week span. Houses that have stopped publishing are omitted. These are estimates, not announced dates.", behind && " Where a date has passed, that wave is out but not yet in this archive."));
+  }, "Each date is the house\u2019s median interval between fieldwork-end dates across its last eight waves, plus its publication lag. The \xB1 is the observed variation in that interval, widening for waves further out. Lag is measured from the publication dates recorded against each poll, or read from a release URL that carries one: 39 Roy Morgan releases and 8 YouGov ones each give a median of one day. Where a house has been timed often enough, the hour it files is shown too \u2014 the span its own releases have actually covered, in eastern time. A house whose interval is too variable to name a day gets the window its own record supports instead of being left out \u2013 DemosAU polls about monthly, but anywhere in a five-week span. Houses that have stopped publishing are omitted. These are estimates, not announced dates.", behind && " Where a date has passed, that wave is out but not yet in this archive."));
 }
 function PollsterTable() {
   const {
