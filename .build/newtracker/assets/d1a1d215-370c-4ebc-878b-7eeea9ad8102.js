@@ -749,11 +749,35 @@ function cycleSourceRows(cycles, D) {
 function AccuracyPanel() {
   const { D } = window.AP;
   const A = D.accuracy;
+  /* The dots used to carry a title="" – the browser's own tooltip, which
+     arrives a second late, in a font that appears nowhere else on the page,
+     and cannot say "+1.2" in the colour that means Labor. Every other hover
+     on this page is the chart readout, so these dots get it too. Declared
+     above the early return: a hook that runs only on some renders is a hook
+     React cannot keep in order. */
+  const [hov, setHov] = useState(null);
   if (!A || !A.cycles.length) return null;
   const SPAN = 5;                                   // points either side of the result
   const pct = (err) => 50 + (Math.max(-SPAN, Math.min(SPAN, err)) / SPAN) * 50;
   const col = (err) => (err > 0 ? "var(--alp)" : "var(--lnp)");
   const oneSided = A.cycles.filter((c) => c.sameSide);
+
+  const TIP_W = 184;                                // matches .acc-tip's width
+  const sgn = (v) => (v > 0 ? "+" : "") + v.toFixed(1);
+  const lean = (err) => (err > 0 ? "Labor overstated" :
+                         err < 0 ? "Labor understated" : "Exactly on the result");
+  const fmtDay = (iso) => new Date(iso + "T00:00:00")
+    .toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
+  /* Clamp to the dot's OWN track, the way the chart clamps its readout to the
+     plot: a house four points out sits against the rail, and an unclamped
+     panel would hang over the error column beside it. The flip is for the
+     first row only, whose upward readout would otherwise leave the card. */
+  const open = (e, raw, tip) => {
+    const w = (e.currentTarget.parentElement || {}).clientWidth || 1;
+    const half = (Math.min(TIP_W, w) / 2 / w) * 100;
+    setHov({ ...tip, left: Math.min(100 - half, Math.max(half, raw)) });
+  };
+  const close = () => setHov(null);
   const bothWays = oneSided.length > 1
     && oneSided.some((c) => c.err > 0) && oneSided.some((c) => c.err < 0);
 
@@ -780,7 +804,7 @@ function AccuracyPanel() {
       </div>
 
       <div className="acc-rows">
-        {A.cycles.map((c) => (
+        {A.cycles.map((c, ri) => (
           <div className="acc-row" key={c.year}>
             <div className="acc-label">
               <span className="acc-year">{c.year}</span>
@@ -795,12 +819,53 @@ function AccuracyPanel() {
                 <span key={t} className="acc-tick" style={{ left: pct(t) + "%" }}></span>
               ))}
               {c.houses.map((h) => (
-                <span key={h.firm} className="acc-dot"
+                <span key={h.firm} className="acc-dot" role="img"
                       style={{ left: pct(h.err) + "%", background: col(h.err) }}
-                      title={`${h.firm} (${h.date}): ALP ${h.alp2pp} · ${h.err > 0 ? "+" : ""}${h.err} vs the result`}></span>
+                      aria-label={`${h.firm}, ${fmtDay(h.date)}: Labor ${h.alp2pp.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(h.err)}`}
+                      onMouseEnter={(e) => open(e, pct(h.err), {
+                        year: c.year, flip: ri === 0, title: h.firm, date: fmtDay(h.date),
+                        rows: [
+                          { label: "Poll", value: h.alp2pp.toFixed(1), color: col(h.err) },
+                          { label: "Result", value: c.result.toFixed(1) },
+                          { label: "Miss", value: sgn(h.err), strong: col(h.err) },
+                        ],
+                        sub: lean(h.err),
+                      })}
+                      onMouseLeave={close}></span>
               ))}
-              <span className="acc-mean" style={{ left: pct(c.err) + "%", background: col(c.err) }}
-                    title={`Average of the ${c.n} final polls: ${c.err > 0 ? "+" : ""}${c.err}`}></span>
+              <span className="acc-mean" role="img"
+                    style={{ left: pct(c.err) + "%", background: col(c.err) }}
+                    aria-label={`Average of the ${c.n} final polls of ${c.year}: ${c.mean.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(c.err)}`}
+                    onMouseEnter={(e) => open(e, pct(c.err), {
+                      year: c.year, flip: ri === 0,
+                      title: `Average of ${c.n} final poll${c.n === 1 ? "" : "s"}`,
+                      date: fmtDay(c.eDate),
+                      rows: [
+                        { label: "Poll average", value: c.mean.toFixed(1), color: col(c.err) },
+                        { label: "Result", value: c.result.toFixed(1) },
+                        { label: "Miss", value: sgn(c.err), strong: col(c.err) },
+                      ],
+                      sub: lean(c.err),
+                    })}
+                    onMouseLeave={close}></span>
+              {hov && hov.year === c.year && (
+                <div className={"tip acc-tip" + (hov.flip ? " acc-tip-below" : "")}
+                     style={{ left: hov.left + "%" }}>
+                  <div className="tip-title">{hov.title}</div>
+                  <div className="tip-date">{hov.date}</div>
+                  {hov.rows.map((r, i) => (
+                    <div className="tip-row" key={i}>
+                      {/* every row carries a swatch, the unswatched ones an
+                          invisible one, so three short labels start on one
+                          left edge instead of stepping in and out */}
+                      <span className="tip-swatch" style={{ background: r.color || "transparent" }}></span>
+                      <span className="tip-label">{r.label}</span>
+                      <span className="tip-val" style={r.strong ? { color: r.strong } : null}>{r.value}</span>
+                    </div>
+                  ))}
+                  <div className="tip-sub">{hov.sub}</div>
+                </div>
+              )}
             </div>
             <div className="acc-err" style={{ color: col(c.err) }}>
               {c.err > 0 ? "+" : ""}{c.err}

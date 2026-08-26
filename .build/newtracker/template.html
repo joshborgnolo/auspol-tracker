@@ -1697,10 +1697,32 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .acc-zero { position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px;
   background: var(--ink-3); opacity: 0.55; }
 .acc-tick { position: absolute; top: 6px; bottom: 6px; width: 1px; background: var(--line-2); }
-.acc-dot, .acc-mean { position: absolute; top: 50%; border-radius: 50%; }
+.acc-dot, .acc-mean { position: absolute; top: 50%; border-radius: 50%;
+  transition: transform .12s ease, opacity .12s ease; }
 .acc-dot { width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; opacity: 0.5; }
 .acc-mean { width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px;
   box-shadow: 0 0 0 2.5px var(--surface); }
+/* A 9px dot is a hard thing to keep a pointer on, and the whole readout hangs
+   off doing so, so each dot claims a 24px target it does not draw. */
+.acc-dot::before, .acc-mean::before {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 24px; height: 24px; transform: translate(-50%, -50%);
+}
+/* the dot answers the pointer before the panel does – on a row of overlapping
+   dots, growing is the only cue saying WHICH one the readout is about */
+.acc-dot:hover { opacity: 1; transform: scale(1.45); z-index: 3; }
+.acc-mean:hover { transform: scale(1.15); z-index: 3; }
+/* the chart's readout, seated on the track instead of the plot. It is the same
+   .tip panel, so it inherits the frosted glass and the fade; only the width
+   (fixed, so the JS can clamp against a known number) and the seat differ. */
+.tip.acc-tip {
+  width: 184px; max-width: 100%; min-width: 0; top: 50%;
+  transform: translate(-50%, calc(-100% - 13px));
+}
+/* the top row has nothing above it inside the card, so its readout drops */
+.tip.acc-tip-below { transform: translate(-50%, 13px); }
+.acc-tip .tip-date { margin: -2px 0 5px; }
+.acc-tip .tip-sub { margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--line); }
 .acc-err { font-family: var(--serif); font-size: 19px; font-weight: 600; text-align: right;
   font-variant-numeric: tabular-nums; }
 .acc-note { font-size: 11px; color: var(--ink-3); display: flex; gap: 6px; align-items: baseline;
@@ -2542,6 +2564,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
 }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
+  .acc-dot, .acc-mean { transition: none; }
   .roll-reel { transition: none; }
 }
 

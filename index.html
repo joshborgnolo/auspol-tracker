@@ -1544,10 +1544,32 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .acc-zero { position: absolute; left: 50%; top: 0; bottom: 0; width: 1.5px;
   background: var(--ink-3); opacity: 0.55; }
 .acc-tick { position: absolute; top: 6px; bottom: 6px; width: 1px; background: var(--line-2); }
-.acc-dot, .acc-mean { position: absolute; top: 50%; border-radius: 50%; }
+.acc-dot, .acc-mean { position: absolute; top: 50%; border-radius: 50%;
+  transition: transform .12s ease, opacity .12s ease; }
 .acc-dot { width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; opacity: 0.5; }
 .acc-mean { width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px;
   box-shadow: 0 0 0 2.5px var(--surface); }
+/* A 9px dot is a hard thing to keep a pointer on, and the whole readout hangs
+   off doing so, so each dot claims a 24px target it does not draw. */
+.acc-dot::before, .acc-mean::before {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 24px; height: 24px; transform: translate(-50%, -50%);
+}
+/* the dot answers the pointer before the panel does – on a row of overlapping
+   dots, growing is the only cue saying WHICH one the readout is about */
+.acc-dot:hover { opacity: 1; transform: scale(1.45); z-index: 3; }
+.acc-mean:hover { transform: scale(1.15); z-index: 3; }
+/* the chart's readout, seated on the track instead of the plot. It is the same
+   .tip panel, so it inherits the frosted glass and the fade; only the width
+   (fixed, so the JS can clamp against a known number) and the seat differ. */
+.tip.acc-tip {
+  width: 184px; max-width: 100%; min-width: 0; top: 50%;
+  transform: translate(-50%, calc(-100% - 13px));
+}
+/* the top row has nothing above it inside the card, so its readout drops */
+.tip.acc-tip-below { transform: translate(-50%, 13px); }
+.acc-tip .tip-date { margin: -2px 0 5px; }
+.acc-tip .tip-sub { margin-top: 6px; padding-top: 5px; border-top: 1px solid var(--line); }
 .acc-err { font-family: var(--serif); font-size: 19px; font-weight: 600; text-align: right;
   font-variant-numeric: tabular-nums; }
 .acc-note { font-size: 11px; color: var(--ink-3); display: flex; gap: 6px; align-items: baseline;
@@ -2389,6 +2411,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
 }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
+  .acc-dot, .acc-mean { transition: none; }
   .roll-reel { transition: none; }
 }
 
@@ -9447,11 +9470,39 @@ function AccuracyPanel() {
     D
   } = window.AP;
   const A = D.accuracy;
+  /* The dots used to carry a title="" – the browser's own tooltip, which
+     arrives a second late, in a font that appears nowhere else on the page,
+     and cannot say "+1.2" in the colour that means Labor. Every other hover
+     on this page is the chart readout, so these dots get it too. Declared
+     above the early return: a hook that runs only on some renders is a hook
+     React cannot keep in order. */
+  const [hov, setHov] = useState(null);
   if (!A || !A.cycles.length) return null;
   const SPAN = 5; // points either side of the result
   const pct = err => 50 + Math.max(-SPAN, Math.min(SPAN, err)) / SPAN * 50;
   const col = err => err > 0 ? "var(--alp)" : "var(--lnp)";
   const oneSided = A.cycles.filter(c => c.sameSide);
+  const TIP_W = 184; // matches .acc-tip's width
+  const sgn = v => (v > 0 ? "+" : "") + v.toFixed(1);
+  const lean = err => err > 0 ? "Labor overstated" : err < 0 ? "Labor understated" : "Exactly on the result";
+  const fmtDay = iso => new Date(iso + "T00:00:00").toLocaleDateString("en-AU", {
+    day: "numeric",
+    month: "long",
+    year: "numeric"
+  });
+  /* Clamp to the dot's OWN track, the way the chart clamps its readout to the
+     plot: a house four points out sits against the rail, and an unclamped
+     panel would hang over the error column beside it. The flip is for the
+     first row only, whose upward readout would otherwise leave the card. */
+  const open = (e, raw, tip) => {
+    const w = (e.currentTarget.parentElement || {}).clientWidth || 1;
+    const half = Math.min(TIP_W, w) / 2 / w * 100;
+    setHov({
+      ...tip,
+      left: Math.min(100 - half, Math.max(half, raw))
+    });
+  };
+  const close = () => setHov(null);
   const bothWays = oneSided.length > 1 && oneSided.some(c => c.err > 0) && oneSided.some(c => c.err < 0);
   return /*#__PURE__*/React.createElement("section", {
     className: "card acc-card"
@@ -9486,7 +9537,7 @@ function AccuracyPanel() {
     }
   }, "Labor overstated \u2192")), /*#__PURE__*/React.createElement("div", {
     className: "acc-rows"
-  }, A.cycles.map(c => /*#__PURE__*/React.createElement("div", {
+  }, A.cycles.map((c, ri) => /*#__PURE__*/React.createElement("div", {
     className: "acc-row",
     key: c.year
   }, /*#__PURE__*/React.createElement("div", {
@@ -9508,19 +9559,87 @@ function AccuracyPanel() {
   })), c.houses.map(h => /*#__PURE__*/React.createElement("span", {
     key: h.firm,
     className: "acc-dot",
+    role: "img",
     style: {
       left: pct(h.err) + "%",
       background: col(h.err)
     },
-    title: `${h.firm} (${h.date}): ALP ${h.alp2pp} · ${h.err > 0 ? "+" : ""}${h.err} vs the result`
+    "aria-label": `${h.firm}, ${fmtDay(h.date)}: Labor ${h.alp2pp.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(h.err)}`,
+    onMouseEnter: e => open(e, pct(h.err), {
+      year: c.year,
+      flip: ri === 0,
+      title: h.firm,
+      date: fmtDay(h.date),
+      rows: [{
+        label: "Poll",
+        value: h.alp2pp.toFixed(1),
+        color: col(h.err)
+      }, {
+        label: "Result",
+        value: c.result.toFixed(1)
+      }, {
+        label: "Miss",
+        value: sgn(h.err),
+        strong: col(h.err)
+      }],
+      sub: lean(h.err)
+    }),
+    onMouseLeave: close
   })), /*#__PURE__*/React.createElement("span", {
     className: "acc-mean",
+    role: "img",
     style: {
       left: pct(c.err) + "%",
       background: col(c.err)
     },
-    title: `Average of the ${c.n} final polls: ${c.err > 0 ? "+" : ""}${c.err}`
-  })), /*#__PURE__*/React.createElement("div", {
+    "aria-label": `Average of the ${c.n} final polls of ${c.year}: ${c.mean.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(c.err)}`,
+    onMouseEnter: e => open(e, pct(c.err), {
+      year: c.year,
+      flip: ri === 0,
+      title: `Average of ${c.n} final poll${c.n === 1 ? "" : "s"}`,
+      date: fmtDay(c.eDate),
+      rows: [{
+        label: "Poll average",
+        value: c.mean.toFixed(1),
+        color: col(c.err)
+      }, {
+        label: "Result",
+        value: c.result.toFixed(1)
+      }, {
+        label: "Miss",
+        value: sgn(c.err),
+        strong: col(c.err)
+      }],
+      sub: lean(c.err)
+    }),
+    onMouseLeave: close
+  }), hov && hov.year === c.year && /*#__PURE__*/React.createElement("div", {
+    className: "tip acc-tip" + (hov.flip ? " acc-tip-below" : ""),
+    style: {
+      left: hov.left + "%"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "tip-title"
+  }, hov.title), /*#__PURE__*/React.createElement("div", {
+    className: "tip-date"
+  }, hov.date), hov.rows.map((r, i) => /*#__PURE__*/React.createElement("div", {
+    className: "tip-row",
+    key: i
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "tip-swatch",
+    style: {
+      background: r.color || "transparent"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "tip-label"
+  }, r.label), /*#__PURE__*/React.createElement("span", {
+    className: "tip-val",
+    style: r.strong ? {
+      color: r.strong
+    } : null
+  }, r.value))), /*#__PURE__*/React.createElement("div", {
+    className: "tip-sub"
+  }, hov.sub))), /*#__PURE__*/React.createElement("div", {
     className: "acc-err",
     style: {
       color: col(c.err)
