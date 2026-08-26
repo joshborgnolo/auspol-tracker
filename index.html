@@ -5900,18 +5900,21 @@ function PreferredPMPanel({
      two-way as its own choice - which keeps the return trip continuous, since
      minimising leaves the reader looking at the question they were just shown
      rather than snapping back to the one they left. */
+  const BOTH_KEEPS = "2"; // the half this panel becomes; three-way is the new one
   const [rawMorph, chooseFmt] = window.AP.useMorph(fmt, v => {
     if (v === "both") {
-      setOwnFmt("2");
+      setOwnFmt(BOTH_KEEPS);
       onBoth && onBoth();
     } else setOwnFmt(v);
-  }, from => from !== "both");
+  },
+  // already on the question "both" lands this panel on: nothing to animate
+  (from, to) => (to === "both" ? BOTH_KEEPS : to) !== from);
   /* Downstream, "both" is not a question anyone can draw: rowsFor, cloudFor
      and fitFor all key off this value. Normalised at the boundary so none of
      them has to know the word exists. */
   const morph = rawMorph && rawMorph.to === "both" ? {
     ...rawMorph,
-    to: "2"
+    to: BOTH_KEEPS
   } : rawMorph;
   const setFmt = chooseFmt;
   const three = fmt === "3";
@@ -6436,18 +6439,28 @@ function ApprovalPanel({
   /* Approval and favourability are different questions of the same three
      people, so switching between them is a rearrangement, not a replacement:
      the lines reshape and the clouds cross over. "Both" splits the panel in
-     two, but what this one does is move to approval - so it morphs there like
-     any other switch, and the split is the panel arriving beside it. */
+     two, and the half THIS one becomes is the favourability panel on the
+     right - approval is the new panel arriving on its left. So choosing it is
+     the same move as choosing Favourability outright, and it animates like
+     one.
+      Which half survives is the whole thing, and getting it backwards is
+     visible: landing this panel on approval made it morph towards a metric it
+     was not going to show and snap back when the morph ended, which is the
+     bars contracting and then suddenly elongating. From favourability there is
+     now nothing to do at all - the destination IS the current metric, so the
+     morph is refused rather than run empty, and the reader sees the second
+     panel appear beside an unchanged one. */
+  const BOTH_KEEPS = "fav";
   const [rawMorph, chooseMetric] = window.AP.useMorph(metric, v => {
     if (v === "both") {
-      setOwn("net");
+      setOwn(BOTH_KEEPS);
       onBoth && onBoth();
     } else setOwn(v);
-  }, from => from !== "both");
+  }, (from, to) => (to === "both" ? BOTH_KEEPS : to) !== from);
   // "_both" is not a suffix any series has – normalised before anything reads it
   const morph = rawMorph && rawMorph.to === "both" ? {
     ...rawMorph,
-    to: "net"
+    to: BOTH_KEEPS
   } : rawMorph;
   const setMetric = chooseMetric;
   const suf = "_" + metric; // _net | _fav
