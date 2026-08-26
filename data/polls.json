@@ -3696,6 +3696,23 @@
         "Nat": 2.5
       },
       "url": "https://www.roymorgan.com/findings/10321-federal-voting-intention-august-24-2026"
+    },
+    {
+      "date": "2026-08-24",
+      "published": "2026-08-26",
+      "dateStart": "2026-08-18",
+      "pollster": "YouGov",
+      "client": "News24",
+      "sample": 1510,
+      "alp": 29,
+      "lnp": 21,
+      "grn": 12,
+      "onp": 26,
+      "ind": 5,
+      "oth": 7,
+      "tpp_alp": 53,
+      "tpp_lnp": 47,
+      "url": "https://www.news24.com.au/politics/australian-politics/one-nation-trails-labor-by-three-points-following-a-difficult-parliamentary-fortnight-for-albanese/news-story/d04bde51f5545775296ce13f7e15515e"
     }
   ],
   "ppm": [
@@ -4362,6 +4379,15 @@
           "opp": 36
         }
       ]
+    },
+    {
+      "date": "2026-08-24",
+      "firm": "YouGov",
+      "alb": 44,
+      "opp": 37,
+      "oppName": "Taylor",
+      "han": null,
+      "extra": null
     }
   ],
   "approval": [
@@ -5596,6 +5622,24 @@
           "dis": 47
         }
       }
+    },
+    {
+      "date": "2026-08-24",
+      "firm": "YouGov",
+      "alb": -24,
+      "opp": -16,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 35,
+          "dis": 59
+        },
+        "opp": {
+          "app": 33,
+          "dis": 49
+        }
+      }
     }
   ],
   "ppmHeadToHead": [
@@ -5670,6 +5714,12 @@
       "firm": "DemosAU",
       "alb": 43,
       "han": 32
+    },
+    {
+      "date": "2026-08-24",
+      "firm": "YouGov",
+      "alb": 52,
+      "han": 37
     }
   ],
   "altTpp": [
@@ -5947,6 +5997,12 @@
       "date": "2026-08-23",
       "firm": "Roy Morgan",
       "alpVsOnp_alp": 53,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-08-24",
+      "firm": "YouGov",
+      "alpVsOnp_alp": 56,
       "lnpVsOnp_lnp": null
     }
   ],
