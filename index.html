@@ -1172,7 +1172,13 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
    disapprove split), so the snapshot readout shows net vs the "even" midline */
 .appr-netbar { position: relative; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
 .anb-mid { position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--ink-faint); opacity: 0.6; }
-.anb-fill { position: absolute; top: 0; bottom: 0; border-radius: 4px; }
+/* Reshapes rather than redraws, on the shared curve at the shared duration -
+   the same move the chart lines make when the question changes. Width only:
+   a bar that crosses zero swaps which side of the midline it hangs from, and
+   at that moment it has no width to see the swap happen in. */
+.anb-fill { position: absolute; top: 0; bottom: 0; border-radius: 4px;
+  transition: width .32s cubic-bezier(.4, .1, .25, 1); }
+@media (prefers-reduced-motion: reduce) { .anb-fill { transition: none; } }
 
 /* a reading older than the latest month carries a quiet month tag */
 .stale-tag { color: var(--ink-3); font-weight: 500; font-size: 0.85em; }
@@ -6573,7 +6579,15 @@ function ApprovalPanel({
   const target = fitFor(metric);
   const ticks = target.ticks;
   const domain = morph ? window.AP.blendDomain(fitFor(morph.from).domain, fitFor(morph.to).domain, morph.t) : target.domain;
-  const NET_MAX = Math.max(Math.abs(domain[0]), Math.abs(domain[1]));
+  /* The bar's scale comes from the DESTINATION domain, not the blended one the
+     chart is drawing to. Both ends of a bar were moving at different speeds:
+     the value it measures changes the instant the metric does, while `domain`
+     eases across over the morph - so the bar snapped to a new length against
+     the old scale and then eased to a different one, which is the bounce.
+      Held still, the two changes become one: the length changes once, and CSS
+     carries it there on the curve everything else moves on. The chart keeps
+     the blended domain, because there the axis genuinely is travelling. */
+  const NET_MAX = Math.max(Math.abs(target.domain[0]), Math.abs(target.domain[1]));
   return /*#__PURE__*/React.createElement("section", {
     className: "card"
   }, /*#__PURE__*/React.createElement("div", {

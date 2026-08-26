@@ -1015,7 +1015,16 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   const domain = morph
     ? window.AP.blendDomain(fitFor(morph.from).domain, fitFor(morph.to).domain, morph.t)
     : target.domain;
-  const NET_MAX = Math.max(Math.abs(domain[0]), Math.abs(domain[1]));
+  /* The bar's scale comes from the DESTINATION domain, not the blended one the
+     chart is drawing to. Both ends of a bar were moving at different speeds:
+     the value it measures changes the instant the metric does, while `domain`
+     eases across over the morph - so the bar snapped to a new length against
+     the old scale and then eased to a different one, which is the bounce.
+
+     Held still, the two changes become one: the length changes once, and CSS
+     carries it there on the curve everything else moves on. The chart keeps
+     the blended domain, because there the axis genuinely is travelling. */
+  const NET_MAX = Math.max(Math.abs(target.domain[0]), Math.abs(target.domain[1]));
   return (
     <section className="card">
       <div className="card-head">
