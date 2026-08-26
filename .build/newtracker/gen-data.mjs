@@ -1045,11 +1045,14 @@ const CYCLE_DEFS = CYC_META.map((c) => {
      over the last 8 waves. The regulars are extremely regular: Roy Morgan's
      last eight gaps are 7,7,7,7,7,7,7,7 and YouGov's are 14 except one 13.
 
-   lag – days from fieldwork close to publication, read out of the release URLs
-     that carry their own date (roymorgan.com/findings/...-august-17-2026,
+   lag – days from fieldwork close to publication, taken from the poll's own
+     `published` date where one is recorded, and otherwise read out of release
+     URLs that carry their own date (roymorgan.com/findings/...-august-17-2026,
      essentialreport.com.au/reports/25-march-2026). 38 Roy Morgan releases give
      a median of 1 day, range 0-2, which is where the global default comes from.
-     Houses whose URLs carry no date fall back to that default.
+     A house with neither still falls back to that default - so the way to make
+     a house's prediction its own rather than the field's average is to record
+     `published` on its polls.
 
    Only houses on a genuine cadence are published: at least 4 waves, a spread
    small relative to the interval (MAD/median <= 0.35), and still active. A
@@ -1095,7 +1098,12 @@ function pubDateFromUrl(url) {
 
 const lagSamples = {};
 for (const p of POLLS) {
-  const pub = pubDateFromUrl(p.url);
+  /* A RECORDED publication date beats one parsed out of a URL slug, and until
+     now only the slug was read - so the lag was measured for exactly the two
+     houses whose URLs happen to carry a date, and every other house fell back
+     to the global default having contributed nothing to it. `published` is in
+     the schema, was being entered, and was reaching nothing. */
+  const pub = p.published || pubDateFromUrl(p.url);
   if (!pub) continue;
   const d = Math.round((Date.parse(pub) - Date.parse(p.date)) / 86400000);
   // a shared or rolling release URL (Roy Morgan covers 3 waves in one post,
