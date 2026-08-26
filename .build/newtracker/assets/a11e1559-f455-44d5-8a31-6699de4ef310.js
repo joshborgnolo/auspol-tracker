@@ -1994,25 +1994,26 @@ function easternNow() {
   }
 }
 
-/* The hour a house files, written the way a clock is read here: "5am",
-   "5.30am", and a span as "5-6am" rather than "5am-6am" when both ends share
-   a meridiem. House local time, which is eastern - not converted to the
-   reader's zone, because when a publisher files is a fact about the publisher.
-   The span is the observed one, so it stays honest about a house that is not
-   quite punctual instead of averaging its way to a minute nobody has seen. */
+/* The hour a house files: "5 am", "5:30 am", and a span as "5-6 am" rather
+   than "5 am-6 am" when both ends share a meridiem. Colon, not the full stop
+   this used to print - a time is written 4:30 here. House local time, which
+   is eastern - not converted to the reader's zone, because when a publisher
+   files is a fact about the publisher. The span is the observed one, so it
+   stays honest about a house that is not quite punctual instead of averaging
+   its way to a minute nobody has seen. */
 function clockParts(mins) {
   const h = Math.floor(mins / 60), mi = mins % 60;
   const ap = h < 12 ? "am" : "pm";
   const h12 = h % 12 === 0 ? 12 : h % 12;
-  return { num: mi ? `${h12}.${String(mi).padStart(2, "0")}` : `${h12}`, ap };
+  return { num: mi ? `${h12}:${String(mi).padStart(2, "0")}` : `${h12}`, ap };
 }
 function clockLabel(mins) {
   const c = clockParts(mins);
   return `${c.num} ${c.ap}`;
 }
 /* A span is only worth printing while it IS the habit. YouGov has filed at 5am
-   five times and 6am once, so "5-6am" describes it. Essential has filed at 1am
-   four times and 4.36am once, and "1-4.36am" would let a single late morning
+   five times and 6am once, so "5-6 am" describes it. Essential has filed at 1am
+   four times and 4:36am once, and "1-4:36 am" would let a single late morning
    speak for a house that is otherwise punctual to the minute - so past an hour
    and a half the usual time is stated instead, and the outlier is left to the
    ± on the day. */
