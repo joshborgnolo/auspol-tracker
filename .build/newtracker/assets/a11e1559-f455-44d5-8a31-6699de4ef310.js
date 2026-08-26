@@ -357,14 +357,23 @@ function LeadershipSection({ rangeId }) {
       </p>
       {/* Both children stay mounted while a column collapses to 0fr, so the
           grid can animate rather than the panel popping out of existence.
-          `both` swaps the left child for a second net-rating panel. */}
+          `both` swaps the left child for a second net-rating panel.
+
+          The left child keeps ONE key across that swap, deliberately. It used
+          to be re-keyed when the view split, which threw away the very things
+          that animate the change: the refs holding where its tiles were and
+          which question they were showing, so it rebuilt itself instead of
+          moving. Choosing "both" leaves that panel on the two-way question -
+          exactly the move it makes for "Two-way" - so it should look exactly
+          like it, and it cannot while React is tearing it down. The panel that
+          is genuinely new is the one arriving beside it. */}
       <div className={"two-col lead-grid lg-" + view}>
         {view === "both" ? (
           <ApprovalPanel key="appr-net" rangeId={rangeId} leaders={leaders}
             metric="net" lockMetric
             chrome={<PanelZoom expanded label="approval" onClose={() => setView("pair")} />} />
         ) : (
-          <PreferredPMPanel key={view === "ppmboth" ? "ppm-2" : "ppm"}
+          <PreferredPMPanel key="ppm"
             rangeId={rangeId} leaders={leaders}
             {...(view === "ppmboth" ? { fmt: "2", lockFmt: true } : { onBoth: () => setView("ppmboth") })}
             chrome={view === "ppmboth"
@@ -379,7 +388,7 @@ function LeadershipSection({ rangeId }) {
             fmt="3" lockFmt
             chrome={<PanelZoom expanded label="three-way" onClose={() => setView("pair")} />} />
         ) : (
-          <ApprovalPanel key={view === "both" ? "appr-fav" : "appr"}
+          <ApprovalPanel key="appr"
             rangeId={rangeId} leaders={leaders}
             {...(view === "both" ? { metric: "fav", lockMetric: true } : {})}
             onBoth={() => setView("both")}
@@ -473,10 +482,21 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
      The other switch is the same gesture as the hero's: the same people, asked
      a differently shaped question, so the lines reshape and the clouds cross
      over rather than the chart being replaced. */
-  const [morph, chooseFmt] = window.AP.useMorph(
+  /* Choosing "both" is not a third question, and it used to be refused a morph
+     on the grounds that the panel splits. But the SPLIT is the other panel
+     arriving; this one simply moves to the two-way question, which is the move
+     it already animates for "Two-way". So it morphs, and it also records the
+     two-way as its own choice - which keeps the return trip continuous, since
+     minimising leaves the reader looking at the question they were just shown
+     rather than snapping back to the one they left. */
+  const [rawMorph, chooseFmt] = window.AP.useMorph(
     fmt,
-    (v) => (v === "both" ? onBoth && onBoth() : setOwnFmt(v)),
-    (from, to) => from !== "both" && to !== "both");
+    (v) => { if (v === "both") { setOwnFmt("2"); onBoth && onBoth(); } else setOwnFmt(v); },
+    (from) => from !== "both");
+  /* Downstream, "both" is not a question anyone can draw: rowsFor, cloudFor
+     and fitFor all key off this value. Normalised at the boundary so none of
+     them has to know the word exists. */
+  const morph = rawMorph && rawMorph.to === "both" ? { ...rawMorph, to: "2" } : rawMorph;
   const setFmt = chooseFmt;
   const three = fmt === "3";
   const byId = {};
@@ -889,12 +909,15 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   const metric = metricProp != null ? metricProp : own;
   /* Approval and favourability are different questions of the same three
      people, so switching between them is a rearrangement, not a replacement:
-     the lines reshape and the clouds cross over. "Both" is a LAYOUT change –
-     the panel splits in two – so it is the one destination that doesn't morph. */
-  const [morph, chooseMetric] = window.AP.useMorph(
+     the lines reshape and the clouds cross over. "Both" splits the panel in
+     two, but what this one does is move to approval - so it morphs there like
+     any other switch, and the split is the panel arriving beside it. */
+  const [rawMorph, chooseMetric] = window.AP.useMorph(
     metric,
-    (v) => (v === "both" ? onBoth && onBoth() : setOwn(v)),
-    (from, to) => from !== "both" && to !== "both");
+    (v) => { if (v === "both") { setOwn("net"); onBoth && onBoth(); } else setOwn(v); },
+    (from) => from !== "both");
+  // "_both" is not a suffix any series has – normalised before anything reads it
+  const morph = rawMorph && rawMorph.to === "both" ? { ...rawMorph, to: "net" } : rawMorph;
   const setMetric = chooseMetric;
   const suf = "_" + metric;                       // _net | _fav
   const xDomain = rangeDomain(rangeId);
