@@ -2069,6 +2069,7 @@
     },
     {
       "date": "2026-02-23",
+      "published": "2026-02-25T01:00",
       "dateStart": "2026-02-18",
       "pollster": "Essential",
       "client": "The Guardian",
@@ -2327,6 +2328,7 @@
     },
     {
       "date": "2026-03-23",
+      "published": "2026-03-25",
       "dateStart": "2026-03-18",
       "pollster": "Essential",
       "client": "The Guardian",
@@ -2624,6 +2626,7 @@
     },
     {
       "date": "2026-04-27",
+      "published": "2026-04-29T01:00",
       "dateStart": "2026-04-22",
       "pollster": "Essential",
       "client": "The Guardian",
@@ -2946,6 +2949,7 @@
     },
     {
       "date": "2026-05-24",
+      "published": "2026-05-27T01:00",
       "dateStart": "2026-05-20",
       "pollster": "Essential",
       "client": "The Guardian",
@@ -3223,6 +3227,7 @@
     },
     {
       "date": "2026-06-29",
+      "published": "2026-07-01T04:36",
       "dateStart": "2026-06-24",
       "pollster": "Essential",
       "client": "The Guardian",
@@ -3473,6 +3478,7 @@
     },
     {
       "date": "2026-07-27",
+      "published": "2026-07-29T01:00",
       "dateStart": "2026-07-22",
       "pollster": "Essential",
       "client": "The Guardian",

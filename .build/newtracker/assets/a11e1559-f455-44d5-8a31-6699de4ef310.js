@@ -1847,9 +1847,17 @@ function clockLabel(mins) {
   const h12 = h % 12 === 0 ? 12 : h % 12;
   return mi ? `${h12}.${String(mi).padStart(2, "0")}${ap}` : `${h12}${ap}`;
 }
-function releaseLabel(from, to) {
+/* A span is only worth printing while it IS the habit. YouGov has filed at 5am
+   five times and 6am once, so "5-6am" describes it. Essential has filed at 1am
+   four times and 4.36am once, and "1-4.36am" would let a single late morning
+   speak for a house that is otherwise punctual to the minute - so past an hour
+   and a half the usual time is stated instead, and the outlier is left to the
+   ± on the day. */
+const RELEASE_TIGHT_MINS = 90;
+function releaseLabel(from, to, mid) {
   if (from == null || to == null) return null;
   if (from === to) return clockLabel(from);
+  if (to - from > RELEASE_TIGHT_MINS) return clockLabel(Math.round(mid != null ? mid : (from + to) / 2));
   const sameHalf = (Math.floor(from / 60) < 12) === (Math.floor(to / 60) < 12);
   return sameHalf ? clockLabel(from).replace(/[ap]m$/, "") + "–" + clockLabel(to)
                   : clockLabel(from) + "–" + clockLabel(to);
@@ -1880,11 +1888,28 @@ function NextPollsPanel() {
   const rows = [];
   const horizon = t0 + NP_HORIZON_DAYS * DAY_MS;
   cad.forEach((c) => {
+    /* A house that keeps a weekday is projected onto it. Interval alone put
+       Essential on a Thursday and YouGov on a Tuesday, when between them they
+       have published on a Wednesday thirteen times out of fourteen dated
+       releases - the interval is a median over waves whose fieldwork has
+       shifted by a day or two, and it carries that drift into the answer.
+       Nudged to the NEAREST matching weekday, never more than three days, so
+       this corrects a rounding error rather than overriding the cadence: a
+       house whose interval says three weeks does not get moved a fortnight to
+       land on a Wednesday. Uses the same getDay() the row is printed with, so
+       the date shown always falls on the weekday claimed for it. */
+    const snap = (ms) => {
+      if (c.releaseDow == null) return ms;
+      let d = c.releaseDow - new Date(ms).getDay();
+      if (d > 3) d -= 7;
+      if (d < -3) d += 7;
+      return ms + d * DAY_MS;
+    };
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
-    let release = field + c.lag * DAY_MS;
+    let release = snap(field + c.lag * DAY_MS);
     let missed = 0;
     // page older than the prediction – roll on, counting the waves we've missed
-    while (release < t0 && missed < 60) { field += c.cadence * DAY_MS; release = field + c.lag * DAY_MS; missed++; }
+    while (release < t0 && missed < 60) { field += c.cadence * DAY_MS; release = snap(field + c.lag * DAY_MS); missed++; }
     /* A loose house earns its place when its WINDOW opens inside the horizon,
        not when its centre falls inside it: DemosAU's next centre is 30 days
        out and its window opens in 13, so testing the centre would hide a house
@@ -1904,7 +1929,7 @@ function NextPollsPanel() {
         opensIn: Math.round((release - Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))) * DAY_MS - t0) / DAY_MS),
       });
       field += c.cadence * DAY_MS;
-      release = field + c.lag * DAY_MS;
+      release = snap(field + c.lag * DAY_MS);
       if (c.loose) break;          // one window per house; a second is a guess about a guess
     }
   });
@@ -1942,8 +1967,8 @@ function NextPollsPanel() {
                 : <>{fmt(r.release)}
                     {/* the hour qualifies the DAY, so it sits with it rather
                         than in the cadence column with the rhythm */}
-                    {releaseLabel(r.releaseFrom, r.releaseTo) &&
-                      <span className="np-time">, {releaseLabel(r.releaseFrom, r.releaseTo)}</span>}
+                    {releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid) &&
+                      <span className="np-time">, {releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid)}</span>}
                     <span className="np-pm"> ± {r.spread} day{r.spread === 1 ? "" : "s"}</span></>}
             </span>
             {/* the column answers "when", so a window answers it too – with the
@@ -1970,8 +1995,12 @@ function NextPollsPanel() {
         widening for waves further out. Lag is measured from the publication dates recorded
         against each poll, or read from a release URL that carries one: 39 Roy Morgan releases
         and 8 YouGov ones each give a median of one day. Where a house has been timed often
-        enough, the hour it files is shown too — the span its own releases have actually
-        covered, in eastern time. A house whose interval is too variable to name
+        enough, the hour it files is shown too, in eastern time — the span its releases have
+        covered where that is tight, and otherwise the hour it usually keeps, so one late
+        morning doesn’t speak for a house that is normally punctual. A house that has kept to one weekday across its dated releases —
+        Essential and YouGov both publish on Wednesdays — is nudged onto it, by at most three
+        days, since a median interval carries the drift of fieldwork that has moved about.
+        A house whose interval is too variable to name
         a day gets the window its own record supports instead of being left out – DemosAU polls
         about monthly, but anywhere in a five-week span. Houses that have stopped publishing are
         omitted. These are estimates, not announced dates.

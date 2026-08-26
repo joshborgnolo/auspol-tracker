@@ -1059,6 +1059,8 @@ const CYCLE_DEFS = CYC_META.map((c) => {
    house that has broken its own pattern is not "expected" and is left out
    rather than given a made-up date. */
 const CAD_DEFAULT_LAG = 1;
+const CAD_DOW_MIN = 5;         // dated releases before a weekday can be a habit
+const CAD_DOW_SHARE = 0.8;     // and the share of them that must share it
 const CAD_MIN_POLLS = 4;
 const CAD_MAX_REL_MAD = 0.35;
 /* Two further gates, both learned the hard way from Fox & Hedgehog, which
@@ -1096,7 +1098,7 @@ function pubDateFromUrl(url) {
   return null;
 }
 
-const lagSamples = {}, timeSamples = {};
+const lagSamples = {}, timeSamples = {}, dowSamples = {};
 for (const p of POLLS) {
   /* A RECORDED publication date beats one parsed out of a URL slug, and until
      now only the slug was read - so the lag was measured for exactly the two
@@ -1114,6 +1116,7 @@ for (const p of POLLS) {
   const pub = pubRaw.slice(0, 10);
   const clock = /T(\d{2}):(\d{2})/.exec(pubRaw);
   if (clock) (timeSamples[p.pollster] ||= []).push(+clock[1] * 60 + +clock[2]);
+  (dowSamples[p.pollster] ||= []).push(new Date(pub + "T00:00:00Z").getUTCDay());
   const d = Math.round((Date.parse(pub) - Date.parse(p.date)) / 86400000);
   // a shared or rolling release URL (Roy Morgan covers 3 waves in one post,
   // Essential cites a report index) produces a nonsense gap – drop those
@@ -1135,6 +1138,21 @@ for (const [firm, dates] of Object.entries(byHouse)) {
   // a house that has stopped is not "expected" in any form
   if ((Date.parse(LATEST_ISO) - Date.parse(last)) / 86400000 > CAD_MAX_SILENT * cadence) continue;
   const ts = timeSamples[firm] || [];
+  /* Some houses keep a weekday, not just an interval. Essential has published
+     on a Wednesday all six times it has been dated and YouGov seven times in
+     eight, while Roy Morgan - which has by far the most dated releases - lands
+     on a Monday only two thirds of the time and otherwise anywhere from Sunday
+     to Friday. So this is recorded only where it is a habit rather than a
+     tendency: a weekday that has taken at least four fifths of a house's dated
+     releases, over at least five of them. Roy Morgan fails that on 67% and
+     keeps being projected from its interval alone, which is right - its
+     publication day genuinely wanders. */
+  const ds = dowSamples[firm] || [];
+  const dowTally = {};
+  ds.forEach((v) => (dowTally[v] = (dowTally[v] || 0) + 1));
+  const dowTop = Object.entries(dowTally).sort((a, b) => b[1] - a[1])[0];
+  const dowHabit = ds.length >= CAD_DOW_MIN && dowTop && dowTop[1] / ds.length >= CAD_DOW_SHARE
+    ? Number(dowTop[0]) : null;
   const spread = Math.max(1, Math.round(1.4826 * mad));
   /* Tight enough to name a DAY, or only a window?
 
@@ -1174,7 +1192,12 @@ for (const [firm, dates] of Object.entries(byHouse)) {
        release schedule is a fact about the publisher, not about the reader. */
     releaseFrom: ts.length >= 5 ? Math.min(...ts) : null,
     releaseTo: ts.length >= 5 ? Math.max(...ts) : null,
+    // the middle as well as the ends: one late release should not be allowed
+    // to widen a house's stated hour into something it almost never does
+    releaseMid: ts.length >= 5 ? medianOf(ts) : null,
     releaseTimed: ts.length >= 5 ? ts.length : 0,
+    releaseDow: dowHabit,
+    releaseDowN: dowHabit == null ? 0 : dowTop[1],
     waves: dates.length,
   });
 }
