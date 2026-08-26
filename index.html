@@ -2003,6 +2003,28 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 }
 .ap-search-x:hover { color: var(--ink); }
 
+/* iOS Safari zooms the page IN when a form field is focused whose text is
+   under 16px, and having zoomed it does not zoom back out - so tapping the
+   search box left the whole site magnified until the reader pinched their way
+   back out of it.
+
+   The other way to stop this is maximum-scale=1 / user-scalable=no in the
+   viewport tag, and it is the wrong one: it takes pinch-zoom away from
+   everybody, permanently, to fix a wobble. This page deliberately does not
+   carry it (see the viewport meta). Two points of type on three fields is the
+   cheaper thing to give up.
+
+   Keyed on `pointer: coarse`, not a width. The zoom follows the field's font
+   size on any touch device at any size, so a phone held in landscape or an
+   iPad sits well past a phone-sized breakpoint and would have been missed by
+   a max-width query. Placed after both rules it overrides, since it matches
+   their specificity exactly and only source order separates them. */
+@media (pointer: coarse) {
+  .ap-search input,
+  .fb-form input,
+  .fb-form textarea { font-size: 16px; }
+}
+
 .ap-pop { position: relative; }
 .ap-popbtn {
   display: inline-flex; align-items: center; gap: 6px;
