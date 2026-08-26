@@ -1158,6 +1158,18 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
    the opposition leader, dashed the head-to-head - and the figure at the end
    is the margin, which is the only thing two contests side by side are for and
    the only thing the tiles don't say. */
+/* The box the readout travels inside. Position only - it exists so a tile
+   put back where it was, and a ghost left where one used to be, are placed
+   against the readout rather than against the page. */
+.ppm-readout { position: relative; }
+/* A still copy of a tile that has no counterpart in the other question, left
+   at its old spot to fade. Out of the layout and out of the way of every
+   pointer, since the thing it is a picture of no longer exists. */
+.ppm-ghost {
+  position: absolute; pointer-events: none; opacity: 1;
+  transition: opacity .32s cubic-bezier(.4, .1, .25, 1);
+}
+@media (prefers-reduced-motion: reduce) { .ppm-ghost { display: none; } }
 .ppm-pairs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
 .ppm-pair { display: flex; align-items: center; gap: 12px; }
 .ppm-rule { width: 16px; border-top: 2px solid var(--ink-faint); flex: none; }

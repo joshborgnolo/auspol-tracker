@@ -391,6 +391,39 @@ function LeadershipSection({ rangeId }) {
 }
 
 // ---- Preferred PM ---------------------------------------------------
+/* ---- one order, both readouts -------------------------------------------
+   Prime minister, opposition leader, One Nation. The approval and preferred-PM
+   readouts are the same three people, so a reader who has learned the row in
+   one should not have to relearn it in the other - and inside a panel the
+   order has to survive its own toggle, or switching question reshuffles the
+   row as well as changing the figures and a reader tracking one leader has to
+   find them again.
+
+   Party, not name: a leadership change inside a party (Ley to Taylor, which
+   this file has already been through) needs no edit here. The two party tokens
+   DO swap if government changes, which is the one thing that would.
+
+   The exception is One Nation ahead of the opposition when it would run Labor
+   CLOSER than the Coalition does. Second place is a claim about who the
+   contest is with, and if the 2PP says that is Hanson then leading with the
+   opposition leader has the page arguing with its own headline. Tested the way
+   the hero tests a month-on-month move, and for the same reason - two
+   aggregates a point apart are not a fact about the electorate - so it fires
+   only when the gap clears both intervals added in quadrature. */
+const PM_PARTY = "ALP", OPP_PARTY = "L/NP", ONP_PARTY = "ON";
+function leaderOrder(D) {
+  const on = D.altLatest && D.altLatest.alp_on;
+  const rival = !!on && on.a != null && D.latest.alp2pp != null
+    && (D.latest.alp2pp - on.a) > Math.hypot(D.latest.alp2ppCi95 || 0, on.ci95 || 0);
+  return [PM_PARTY, ...(rival ? [ONP_PARTY, OPP_PARTY] : [OPP_PARTY, ONP_PARTY])];
+}
+/* an unlisted party sorts last rather than first, which is what indexOf's -1
+   would have done */
+function byLeaderOrder(order) {
+  const rank = (party) => { const i = order.indexOf(party); return i < 0 ? order.length : i; };
+  return (a, b) => rank(a) - rank(b);
+}
+
 /* The two-way question is not ONE contest. Pollsters put two of them to
    voters – Albanese against the opposition leader (the whole cycle, 54 polls)
    and Albanese against Hanson head to head (11 polls, Apr 2026 on) – and
@@ -465,9 +498,13 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
       })));
   const rows = rowsFor(fmt);
   rows.forEach((r) => { r.read = lastReadings(D.leaderMonths, r.L.id + r.suf); });
-  // sitting PM (Albanese) is always shown first; the rest descend by preference
+  /* Same fixed order as the approval readout - see leaderOrder. It used to
+     descend by preference after the PM, which put Hanson second here while she
+     sat third over there on identical people, and moved her between the two
+     PPM questions as well. The two-way keeps its own order: those rows are
+     contests, and a contest reads left to right. */
   const ordered = three
-    ? [...rows].sort((a, b) => (a.L.id === "alb" ? -1 : b.L.id === "alb" ? 1 : ((b.read || {}).v ?? -1) - ((a.read || {}).v ?? -1)))
+    ? [...rows].sort((a, b) => byLeaderOrder(leaderOrder(D))(a.L.party, b.L.party))
     : rows;
 
   // the published readings behind the lines, each dot from the contest it
@@ -559,16 +596,128 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
     ? window.AP.blendDomain(fitFor(morph.from).domain, fitFor(morph.to).domain, morph.t)
     : target.domain;
 
+  const Roll = window.RollNum;
+  /* `data-mk` is the same identity the LINES are matched by across the switch,
+     put on the tile so the readout can be matched the same way. It is why the
+     Albanese of the two-way's first contest is the Albanese of the three-way,
+     and why the head-to-head one is not anybody. */
+  /* ---- the readout travels between the two questions ---------------------
+     Same idea the lines and the dot clouds already use, applied to the tiles:
+     a leader present in both questions keeps his tile and MOVES to where the
+     other question puts him, rather than the row being torn down and a new one
+     built in its place. The two layouts are not the same shape - two-way is
+     two contests of two on their own rows, three-way is one row of three - so
+     nothing can be matched by DOM position. It is matched by `data-mk`, the
+     same key the lines are matched by, which is what makes the tile and the
+     line agree about who travelled where.
+
+     FLIP, because React has already replaced the DOM by the time this runs:
+     read where each tile ended up, put it back where it was with a transform,
+     then release it on the next frame and let the transition carry it. The
+     transform is decoration over a tile that is already in its final place, so
+     nothing downstream - hit testing, screen readers, copy - sees the journey.
+
+     Only on a change of question. Between switches the morph re-renders this
+     panel about twenty times as the chart interpolates, and re-measuring on
+     each of those would both cost a forced layout per tile and read positions
+     that are mid-transform. Transforms are cleared before measuring so a fast
+     double-toggle measures the truth rather than a tile in flight. */
+  const readoutRef = useRef(null);
+  const homeRef = useRef(null);
+  const lastFmtRef = useRef(fmt);
+  const landRef = useRef(0);
+  React.useEffect(() => () => clearTimeout(landRef.current), []);
+  React.useLayoutEffect(() => {
+    const root = readoutRef.current;
+    if (!root) return;
+    const changed = lastFmtRef.current !== fmt;
+    lastFmtRef.current = fmt;
+    /* Ghosts carry a copy of the tile they are a picture of, `data-mk` and all,
+       so a leftover one would be measured as if it were the real thing. */
+    const nodes = [...root.querySelectorAll("[data-mk]")].filter((n) => !n.closest(".ppm-ghost"));
+    if (changed) {
+      clearTimeout(landRef.current);
+      root.querySelectorAll(".ppm-ghost").forEach((g) => g.remove());
+      nodes.forEach((n) => { n.style.transition = "none"; n.style.transform = ""; n.style.opacity = ""; });
+    }
+    const rootR = root.getBoundingClientRect();
+    const now = {};
+    nodes.forEach((n) => {
+      const r = n.getBoundingClientRect();
+      now[n.dataset.mk] = { x: r.left - rootR.left, y: r.top - rootR.top, html: n.outerHTML };
+    });
+    const prev = homeRef.current;
+    homeRef.current = now;
+    if (!changed || !prev) return;
+    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (still) return;
+    const MS = (window.AP && window.AP.MORPH_MS) || 320;
+    const EASE = "cubic-bezier(.4, .1, .25, 1)";
+    /* Set the start state, force it to be committed, then set the end state -
+       all in this one synchronous pass. The usual FLIP waits a frame before
+       releasing, and a frame is exactly what a hidden tab never gets: the
+       tiles then sat holding their inverse transform indefinitely. Reading
+       offsetWidth commits the start state instead, so the transition has
+       something to run FROM without anyone having to be shown a frame first. */
+    const flip = (n, startTransform, startOpacity) => {
+      n.style.transition = "none";
+      if (startTransform) n.style.transform = startTransform;
+      if (startOpacity != null) n.style.opacity = startOpacity;
+      void n.offsetWidth;                                  // commit the start state
+      n.style.transition = "transform " + MS + "ms " + EASE + ", opacity " + MS + "ms " + EASE;
+      n.style.transform = "";
+      n.style.opacity = "";
+    };
+    nodes.forEach((n) => {
+      const a = prev[n.dataset.mk], b = now[n.dataset.mk];
+      /* Nobody to travel from - the head-to-head Albanese, back again when the
+         two-way is chosen. He arrives rather than slides, because there is no
+         honest place to slide him from. */
+      if (!a) return flip(n, null, "0");
+      const dx = a.x - b.x, dy = a.y - b.y;
+      if (!dx && !dy) return;
+      flip(n, "translate(" + dx + "px, " + dy + "px)", null);
+    });
+    /* A tile with nowhere to go is the second Albanese, and the three-way
+       already contains him once. React has removed it, so what fades is a
+       still copy left at the spot it occupied - the same departure the chart
+       gives his line, which is wiped rather than blinked out. */
+    Object.keys(prev).forEach((mk) => {
+      if (now[mk]) return;
+      const ghost = document.createElement("div");
+      ghost.className = "ppm-ghost";
+      ghost.innerHTML = prev[mk].html;
+      ghost.style.left = prev[mk].x + "px";
+      ghost.style.top = prev[mk].y + "px";
+      root.appendChild(ghost);
+      void ghost.offsetWidth;                              // same reason as flip()
+      ghost.style.opacity = "0";
+      setTimeout(() => ghost.remove(), MS + 60);
+    });
+    /* Frames are not guaranteed - a hidden tab is served none - and a tile left
+       holding its inverse transform is stranded somewhere it never belonged,
+       which is a worse failure than the chart's half-interpolated shape that
+       useMorph keeps its own backstop for. Whatever happens to the frames, the
+       readout lands where the layout put it. */
+    landRef.current = setTimeout(() => {
+      root.querySelectorAll(".ppm-ghost").forEach((g) => g.remove());
+      nodes.forEach((n) => { n.style.transition = ""; n.style.transform = ""; n.style.opacity = ""; });
+    }, MS + 80);
+  }, [fmt]);
+
   const tiles = (list) => list.map((r) => {
     const rd = r.read;
     const tag = rd && staleTag(rd.ym, latestYm);
     return (
-      <div className="leader" key={(r.pair ? r.pair.id + "-" : "") + r.L.id}>
+      <div className="leader" key={r.mk} data-mk={r.mk}>
         <div className="leader-dot" style={{ background: r.L.color }}></div>
         {/* named so the narrow-screen grid can place it – see .leader-vals */}
         <div className="leader-vals">
           <div className="leader-name">{r.L.short}{tag && <span className="stale-tag" title={"Latest published reading · " + tag}> {tag}</span>}</div>
-          <div className="leader-num">{rd ? rd.v : "—"}{rd && <span className="pct">%</span>}</div>
+          <div className="leader-num">
+            {rd ? (Roll ? <Roll value={String(rd.v)} /> : rd.v) : "—"}
+            {rd && <span className="pct">%</span>}
+          </div>
         </div>
         {rd && rd.prev != null && <Delta value={rd.v - rd.prev} suffix="" small title={readoutDeltaTitle(rd)} />}
       </div>
@@ -611,6 +760,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           {chrome}
         </div>
       </div>
+      <div className="ppm-readout" ref={readoutRef}>
       {three ? (
         <div className="leader-readout">{tiles(ordered)}</div>
       ) : (
@@ -646,6 +796,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           })}
         </div>
       )}
+      </div>
       <TrendChart
         /* NOT keyed on the question: a remount would throw away the morph
            itself, along with both memoised dot clouds. */
@@ -700,41 +851,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   const latestYm = D.leaderMonths[D.leaderMonths.length - 1].ym;
   const reads = {};
   leaders.forEach((L) => { reads[L.id] = lastReadings(D.leaderMonths, L.id + suf); });
-  /* Fixed order: prime minister, opposition leader, One Nation. It used to be
-     the PM followed by whoever rated higher, and the two questions do not rank
-     the other two the same way - so toggling Approval/Favourability reshuffled
-     the row as well as changing the figures, and a reader tracking one leader
-     had to find them again. A row that holds still is what lets the numbers be
-     compared across the toggle at all.
-
-     Party, not name: a leadership change inside a party (Ley to Taylor, and
-     this file has already been through one) should not need an edit here. The
-     two party tokens DO swap if government changes, which is the one thing
-     that would. */
-  const PM_PARTY = "ALP", OPP_PARTY = "L/NP";
-  /* The exception the order is worth breaking for: One Nation ahead of the
-     opposition when it would actually run Labor CLOSER than the Coalition
-     does. Ranking second is a claim about who the contest is with, and if the
-     2PP says that is Hanson then leading with the opposition leader is the
-     page arguing with its own headline.
-
-     Tested the way the hero tests a month-on-month move, and for the same
-     reason - two aggregates a point apart are not a fact about the electorate.
-     Significant means the gap clears the two intervals added in quadrature.
-     Today Labor takes 53.5 against One Nation and 51.4 against the Coalition,
-     so One Nation runs it 2.1 points FURTHER behind and the exception is a
-     long way from firing; it is here for a term that might look different. */
-  const onpIsTheRival = (() => {
-    const on = D.altLatest && D.altLatest.alp_on;
-    if (!on || on.a == null || D.latest.alp2pp == null) return false;
-    const closer = D.latest.alp2pp - on.a;      // >0: Labor does WORSE against ON
-    return closer > Math.hypot(D.latest.alp2ppCi95 || 0, on.ci95 || 0);
-  })();
-  const ORDER = [PM_PARTY, ...(onpIsTheRival ? ["ON", OPP_PARTY] : [OPP_PARTY, "ON"])];
-  // an unlisted party sorts last rather than first, which is what indexOf's -1
-  // would have done
-  const rankOf = (L) => { const i = ORDER.indexOf(L.party); return i < 0 ? ORDER.length : i; };
-  const ordered = [...leaders].sort((a, b) => rankOf(a) - rankOf(b));
+  const ordered = [...leaders].sort((a, b) => byLeaderOrder(leaderOrder(D))(a.party, b.party));
   const Roll = window.RollNum;
   // Published readings behind the lines, for the ACTIVE metric only. A net is a
   // difference of two proportions, so it carries more sampling noise than a
