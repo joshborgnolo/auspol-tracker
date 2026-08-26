@@ -1180,9 +1180,25 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
   font-size: clamp(13px, 4.6cqi, 15px); font-weight: 800;
   font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink-3);
 }
-/* four figures where the three-way has three: a step down in size keeps two
-   contests inside the same card without the readout crowding the chart */
-.ppm-pairs .leader-num { font-size: clamp(21px, 7.6cqi, 26px); }
+/* The two-way figures were a step smaller than the three-way's, on the grounds
+   that four figures in two rows would crowd the chart. Measured, that step buys
+   11px of card height - and the two-way row had MORE room to spare than the
+   three-way it was deferring to, 215px against 161px, because two tiles in a
+   row is a looser fit than three whatever the row count. So they match now.
+
+   The coefficient is LARGER rather than equal, and that is the point. cqi
+   measures the readout, and the two-way's readout is narrower than the
+   three-way's - 260px against 343px on a phone - because the rule and the
+   margin figure take their share of the row. Handing both the same 9cqi would
+   still have left the two-way smaller, 25px against 30px, which is the thing
+   being fixed. 11.5cqi reaches the same 30px ceiling from the narrower box.
+
+   Sized off the readout, NOT off .ppm-pairs - which is the tempting shortcut,
+   since that block is the same width as the three-way's container. The tiles
+   live in the readout, so pricing them off the wider block sizes them for room
+   they do not have: tried, and they wrapped at 320px. The 21px floor stays, so
+   below about 350px the figures go on shrinking for the reason that is real. */
+.ppm-pairs .leader-num { font-size: clamp(21px, 11.5cqi, 30px); }
 /* A pair is TWO tiles where the three-way readout has three, so it keeps the
    chip beside the figure much further down than the 480px handover the wider
    readout needs – on a phone that is the difference between two rows and four.
