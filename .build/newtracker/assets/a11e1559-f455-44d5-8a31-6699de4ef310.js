@@ -1854,6 +1854,25 @@ function clockLabel(mins) {
    and a half the usual time is stated instead, and the outlier is left to the
    ± on the day. */
 const RELEASE_TIGHT_MINS = 90;
+/* What the ± is allowed to say once a date has been pinned to a weekday.
+   The spread is measured off the gaps between fieldwork-end dates, and quoting
+   it in days after the snap describes a date that cannot happen: YouGov's
+   interval varies by about a day, but its release cannot slip to a Tuesday or
+   a Thursday - the nearest release it could actually be is the Wednesday
+   seven days away, and a day of drift does not reach it. So the answer moves
+   in whole weeks, and the count is how many other Wednesdays the spread
+   actually reaches (+3 because the snap itself may have moved up to 3 days).
+
+   YouGov comes out at none: 14,14,14,14,14,14,13,14 between waves, so it is
+   that Wednesday. Essential comes out at one: 14,46,31,28,35,27,36,28 is a
+   real spread, so it is a Wednesday but possibly the next. Which is the whole
+   difference between the two houses, and the ± in days was hiding it behind
+   two numbers that looked like the same kind of claim. */
+function spreadLabel(r) {
+  if (r.releaseDow == null) return ` ± ${r.spread} day${r.spread === 1 ? "" : "s"}`;
+  const weeks = Math.floor((r.spread + 3) / 7);
+  return weeks === 0 ? "" : ` ± ${weeks} week${weeks === 1 ? "" : "s"}`;
+}
 function releaseLabel(from, to, mid) {
   if (from == null || to == null) return null;
   if (from === to) return clockLabel(from);
@@ -1969,7 +1988,7 @@ function NextPollsPanel() {
                         than in the cadence column with the rhythm */}
                     {releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid) &&
                       <span className="np-time">, {releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid)}</span>}
-                    <span className="np-pm"> ± {r.spread} day{r.spread === 1 ? "" : "s"}</span></>}
+                    <span className="np-pm">{spreadLabel(r)}</span></>}
             </span>
             {/* the column answers "when", so a window answers it too – with the
                 day it opens, which is the first date the wave is possible */}
@@ -1992,7 +2011,9 @@ function NextPollsPanel() {
       <p className="np-foot">
         Each date is the house’s median interval between fieldwork-end dates across its last
         eight waves, plus its publication lag. The ± is the observed variation in that interval,
-        widening for waves further out. Lag is measured from the publication dates recorded
+        widening for waves further out — in whole weeks for a house pinned to a weekday, since
+        that is the only step its date can take, and dropped entirely where its interval is too
+        regular to reach the Wednesday either side. Lag is measured from the publication dates recorded
         against each poll, or read from a release URL that carries one: 39 Roy Morgan releases
         and 8 YouGov ones each give a median of one day. Where a house has been timed often
         enough, the hour it files is shown too, in eastern time — the span its releases have
