@@ -85,6 +85,19 @@ const meanOf = (rows, f) => { const v = rows.map(f).filter((x) => x != null); re
 
 const ELECTION = ELECTIONS.e2025;                       // 3 May 2025 baseline
 const LATEST_ISO = POLLS.reduce((m, p) => (p.date > m ? p.date : m), "0000");
+/* The last poll's PUBLICATION date, which is what the header stamp means by
+   "last poll" - a reader wants to know when the newest number became public,
+   not when its fieldwork closed, and the two are a day or three apart for
+   every house here. Deliberately NOT LATEST_ISO: that one is the aggregate's
+   own reference point (the 21-day nowcast window, the recency half-life, the
+   month spine, the has-this-house-stopped gate) and all of those are properly
+   measured in fieldwork time. This is the display stamp and nothing else.
+   Where a poll has no `published` it falls back to its fieldwork end, the
+   same fallback the polls table uses. */
+const LATEST_PUB_ISO = POLLS.reduce((m, p) => {
+  const d = (p.published || "").slice(0, 10) || p.date;
+  return d > m ? d : m;
+}, "0000");
 
 // month spine: election month → month of the latest poll (rolling)
 const MONTHS = [];
@@ -842,6 +855,7 @@ const latest = {
     return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(chg) > 1.96 * seChg };
   })() : {}),
   updated: fmtDate(LATEST_ISO), updatedISO: LATEST_ISO,
+  published: fmtDate(LATEST_PUB_ISO), publishedISO: LATEST_PUB_ISO,
   nextElectionDue: "By May 2028", pollsTracked: individualPolls.length, housesTracked: houses.size,
   method: { kind: "weighted house-effect-adjusted mean", windowDays: HL_WINDOW, halfLifeDays: HL_HALF, shrinkK: SHRINK_K, nPolls: hlNow.n },
 };

@@ -1,10 +1,18 @@
 /* auspol tracker – header, hero, page assembly */
 
-// relative freshness for the "last updated" stamp
+// relative freshness for the "last poll" stamp, which is measured off the
+// date that stamp SHOWS - the last publication, not the last fieldwork end,
+// or the page would read "26 Aug 2026 · 2 days ago" on 26 August
 function freshness(iso) {
-  const then = new Date(iso + "T00:00:00");
-  const now = new Date();
-  const days = Math.max(0, Math.round((now - then) / 86400000));
+  /* Whole calendar days, both ends in the frame the stamp is written in -
+     these are Australian dates, so the comparison is against Sydney's today
+     (easternNow, shared with "Next expected polls"). It used to round the
+     elapsed MILLISECONDS between local midnight and now, which called a poll
+     published this morning "yesterday" from noon onward - invisible while the
+     stamp was a fieldwork end a few days back, and wrong every afternoon now
+     that it is a publication date. */
+  const then = Date.parse(iso);                 // a bare ISO date parses as UTC midnight
+  const days = Math.max(0, Math.round((easternNow().day - then) / 86400000));
   let label;
   if (days === 0) label = "today";
   else if (days === 1) label = "yesterday";
@@ -17,7 +25,7 @@ function freshness(iso) {
 
 function Header({ isDark, onToggleTheme }) {
   const { D } = window.AP;
-  const fresh = freshness(D.latest.updatedISO);
+  const fresh = freshness(D.latest.publishedISO);
 
   /* The mark is the whole tracker at 44x28 units, so clicking it opens the
      thing it abbreviates rather than anything decorative – see wm-story.jsx.
@@ -156,7 +164,7 @@ function Header({ isDark, onToggleTheme }) {
         <p className="tagline">Aggregated opinion polling for the next Australian federal election</p>
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot " + fresh.state}></span>
-          Updated {D.latest.updated} · {D.latest.pollsTracked} polls
+          Updated {D.latest.published} · {D.latest.pollsTracked} polls
         </div>
       </div>
       <div className="head-right">
@@ -165,7 +173,7 @@ function Header({ isDark, onToggleTheme }) {
             <span className="meta-k">Last poll</span>
             <span className="meta-v">
               <span className={"fresh-dot " + fresh.state} aria-hidden="true"></span>
-              {D.latest.updated}
+              {D.latest.published}
               <span className="fresh-rel">· {fresh.label}</span>
             </span>
           </div>
