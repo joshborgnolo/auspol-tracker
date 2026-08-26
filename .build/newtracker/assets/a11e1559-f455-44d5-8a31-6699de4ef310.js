@@ -1947,11 +1947,15 @@ const NP_MAX_ROWS = 10;       // a busy fortnight shouldn't run off the page
    reader's zone, because when a publisher files is a fact about the publisher.
    The span is the observed one, so it stays honest about a house that is not
    quite punctual instead of averaging its way to a minute nobody has seen. */
-function clockLabel(mins) {
+function clockParts(mins) {
   const h = Math.floor(mins / 60), mi = mins % 60;
   const ap = h < 12 ? "am" : "pm";
   const h12 = h % 12 === 0 ? 12 : h % 12;
-  return mi ? `${h12}.${String(mi).padStart(2, "0")}${ap}` : `${h12}${ap}`;
+  return { num: mi ? `${h12}.${String(mi).padStart(2, "0")}` : `${h12}`, ap };
+}
+function clockLabel(mins) {
+  const c = clockParts(mins);
+  return `${c.num} ${c.ap}`;
 }
 /* A span is only worth printing while it IS the habit. YouGov has filed at 5am
    five times and 6am once, so "5-6am" describes it. Essential has filed at 1am
@@ -1983,9 +1987,11 @@ function releaseLabel(from, to, mid) {
   if (from == null || to == null) return null;
   if (from === to) return clockLabel(from);
   if (to - from > RELEASE_TIGHT_MINS) return clockLabel(Math.round(mid != null ? mid : (from + to) / 2));
-  const sameHalf = (Math.floor(from / 60) < 12) === (Math.floor(to / 60) < 12);
-  return sameHalf ? clockLabel(from).replace(/[ap]m$/, "") + "–" + clockLabel(to)
-                  : clockLabel(from) + "–" + clockLabel(to);
+  /* "5–6 am", not "5 am–6 am": one meridiem serves a span inside it, and the
+     dash is the tight unspaced one every other range on the page uses. */
+  const a = clockParts(from), b = clockParts(to);
+  return a.ap === b.ap ? `${a.num}–${b.num} ${b.ap}`
+                       : `${clockLabel(from)}–${clockLabel(to)}`;
 }
 
 // name the rhythm in the words people actually use for it
@@ -2003,8 +2009,23 @@ function NextPollsPanel() {
   const cad = D.pollCadence || [];
   if (!cad.length) return null;
 
-  const today = new Date(); today.setHours(0, 0, 0, 0);
-  const t0 = today.getTime();
+  /* Every date in here comes from Date.parse("YYYY-MM-DD"), which is UTC
+     midnight, so "today" has to be the same thing or the comparison measures
+     the reader's timezone as well as the gap. It used to be LOCAL midnight,
+     which in Sydney sits 10 hours the other side of it.
+
+     And the projection is floored to its own calendar day, because that is
+     what the row prints. Essential's cadence is a median of 29.5 days, so its
+     release landed at noon; against a midnight "today" that rounded to one day
+     out, and the row said "tomorrow" underneath a date that was today. A
+     half-day is not a fact about when a poll lands - it is a fact about
+     medians of an odd number of days. */
+  const now = new Date();
+  const t0 = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
+  const dayFloor = (ms) => {
+    const d = new Date(ms);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  };
 
   /* A four-week horizon rather than a fixed count: it answers "what lands this
      month" and sizes itself to how busy the field actually is. A weekly house
@@ -2025,16 +2046,16 @@ function NextPollsPanel() {
        the date shown always falls on the weekday claimed for it. */
     const snap = (ms) => {
       if (c.releaseDow == null) return ms;
-      let d = c.releaseDow - new Date(ms).getDay();
+      let d = c.releaseDow - new Date(ms).getUTCDay();
       if (d > 3) d -= 7;
       if (d < -3) d += 7;
       return ms + d * DAY_MS;
     };
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
-    let release = snap(field + c.lag * DAY_MS);
+    let release = dayFloor(snap(field + c.lag * DAY_MS));
     let missed = 0;
     // page older than the prediction – roll on, counting the waves we've missed
-    while (release < t0 && missed < 60) { field += c.cadence * DAY_MS; release = snap(field + c.lag * DAY_MS); missed++; }
+    while (release < t0 && missed < 60) { field += c.cadence * DAY_MS; release = dayFloor(snap(field + c.lag * DAY_MS)); missed++; }
     /* A loose house earns its place when its WINDOW opens inside the horizon,
        not when its centre falls inside it: DemosAU's next centre is 30 days
        out and its window opens in 13, so testing the centre would hide a house
@@ -2054,7 +2075,7 @@ function NextPollsPanel() {
         opensIn: Math.round((release - Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))) * DAY_MS - t0) / DAY_MS),
       });
       field += c.cadence * DAY_MS;
-      release = snap(field + c.lag * DAY_MS);
+      release = dayFloor(snap(field + c.lag * DAY_MS));
       if (c.loose) break;          // one window per house; a second is a guess about a guess
     }
   });
@@ -2065,9 +2086,11 @@ function NextPollsPanel() {
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
 
   const behind = rows.some((r) => r.missed > 0);
+  // UTC accessors, matching the frame the dates were parsed and compared in –
+  // local ones would name the day before for any reader west of Greenwich
   const fmt = (ms) => {
     const d = new Date(ms);
-    return `${WD[d.getDay()].slice(0, 3)} ${d.getDate()} ${D.monthName(d.getMonth() + 1)}`;
+    return `${WD[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
   };
   const when = (n) => (n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`);
 
@@ -2088,7 +2111,7 @@ function NextPollsPanel() {
               {r.loose
                 /* The ± IS the forecast here, so state it as the span it is
                    rather than as a day with a disclaimer bolted on. */
-                ? <>{fmt(r.release - r.spread * DAY_MS)}<span className="np-pm"> – </span>{fmt(r.release + r.spread * DAY_MS)}</>
+                ? <>{fmt(r.release - r.spread * DAY_MS)}–{fmt(r.release + r.spread * DAY_MS)}</>
                 : <>{fmt(r.release)}
                     {/* the hour qualifies the DAY, so it sits with it rather
                         than in the cadence column with the rhythm */}
