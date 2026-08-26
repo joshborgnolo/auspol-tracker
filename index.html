@@ -12820,9 +12820,20 @@ function ReportError() {
     if (!endpoint) return;
     window.AP.reportPoll = poll => {
       if (!poll) return;
-      const when = poll.field ? `fielded ${poll.field}` : poll.fullDate ? `published ${poll.fullDate}` : "";
+      /* "YouGov, 18-24 Aug 2026 – ". The year is the point of the difference:
+         the seeded line is what identifies a row in data/polls.json, and a
+         fieldwork range without one stops doing that the moment the archive
+         holds a second August. Taken from the row's own year where it carries
+         one, and off the ISO fieldwork-end date otherwise, because the two
+         tables this is opened from have different row shapes and only one of
+         them names the year.
+          "fielded" is dropped: everything after the comma is a date, so the
+         word was only telling the reader which kind, and the form's own label
+         already asks for the pollster and field dates. */
+      const yr = poll.year != null ? poll.year : /^\d{4}-/.test(poll.released || "") ? Number(poll.released.slice(0, 4)) : null;
+      const when = poll.field ? poll.field + (yr ? " " + yr : "") : poll.fullDate ? poll.fullDate : "";
       setKind(FB_KINDS[0]);
-      setMsg(`${poll.pollster}${when ? ", " + when : ""} — `);
+      setMsg(`${poll.pollster}${when ? ", " + when : ""} – `);
       setStatus("idle");
       setOpen(true);
       setArrival(n => n + 1); // drives the scroll+focus effect below
