@@ -2399,7 +2399,11 @@ function NextPollsPanel() {
                               : <span className="npd-pub">{stamp}</span>;
                           })()
                         : <span className="npd-pub none" title="No publication date recorded for this wave">—</span>}
-                      <span className="npd-gap">
+                      {/* the bottom line's interval is measured from a release
+                          one row further back than the list prints, so every
+                          line says what it was measured from */}
+                      <span className="npd-gap"
+                            title={x.since ? `Since the previous wave, ${fmtDay(x.since)}` : undefined}>
                         {x.gap != null ? `${x.gap} days` : ""}
                       </span>
                     </li>

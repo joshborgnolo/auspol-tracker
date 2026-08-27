@@ -1361,10 +1361,24 @@ for (const [firm, rows] of Object.entries(byHouse)) {
        gap between FIELDWORK ends - the same quantity the median is taken over
        - and the publication date and hour are carried beside it where the
        release recorded one. */
-    recent: rows.slice(-CAD_SHOW).map((r, i, a) => ({
-      field: r.date, pub: r.pub, mins: r.mins, url: r.url,
-      gap: i ? Math.round((Date.parse(r.date) - Date.parse(a[i - 1].date)) / 86400000) : null,
-    })),
+    recent: (() => {
+      /* The interval is measured against the release BEFORE this one in the
+         house's record, not the one below it in this list. Taken within the
+         slice, the oldest line had no predecessor to measure from and showed
+         nothing - so a list of five releases reported four intervals when a
+         fifth was sitting right there, one row further back than the panel
+         happens to print. `since` carries what each was measured from, which
+         is the only way the bottom line's interval can be checked at all. */
+      const start = Math.max(0, rows.length - CAD_SHOW);
+      return rows.slice(start).map((r, i) => {
+        const prev = rows[start + i - 1];
+        return {
+          field: r.date, pub: r.pub, mins: r.mins, url: r.url,
+          since: prev ? prev.date : null,
+          gap: prev ? Math.round((Date.parse(r.date) - Date.parse(prev.date)) / 86400000) : null,
+        };
+      });
+    })(),
     // how many intervals the median and the spread were actually taken over,
     // which is more than the panel shows and should not be implied otherwise
     gapsUsed: gaps.length,
