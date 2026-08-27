@@ -1129,7 +1129,7 @@ function PastCyclesView() {
           trajectory can be read off a shared clock. The current Albanese government is drawn
           <strong> bold</strong>; past governments sit behind, tinted by the party in power –
           red for Labor terms, blue for Coalition – with the year marked where each line ends.
-          Hover a cycle below to bring it forward, and select just one to see more details.
+          Hover over a cycle below to bring it forward, and select just one to see more details.
         </p>
         <div className="cyc-controls">
           <TextToggle value={mode} onChange={setMode} ariaLabel="Measure"
