@@ -704,8 +704,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             /* rangeDomain takes any month count, and buildXTicks already labels
                every month once the span is under a year, so six months arrives
                with its own tick per month rather than every second one */
-            options={[{ id: "3", label: "3M" }, { id: "6", label: "6M" },
-                      { id: "12", label: "12M" }, { id: "all", label: "All" }]} />
+            options={[{ id: "3", label: "3mo" }, { id: "6", label: "6mo" },
+                      { id: "12", label: "12mo" }, { id: "all", label: "All" }]} />
         </div>
       </div>
 
