@@ -1319,6 +1319,15 @@ for (const [firm, rows] of Object.entries(byHouse)) {
   const trimmed = [...gaps].sort((a, b) => a - b);
   if (trimmed.length >= CAD_SPREAD_TRIM) { trimmed.pop(); trimmed.shift(); }
   const spread = Math.max(1, Math.round((trimmed[trimmed.length - 1] - trimmed[0]) / 2));
+  /* The misses don't fall equally either side of the interval. A house slips
+     a wave LATE far more readily than it brings one forward, and in the
+     current record literally so: every weekday house's off-median intervals
+     are long ones, none short. Half the range cannot say that, so the two
+     sides are booked separately too - the panel can then state "or the
+     Sunday after" instead of pretending an early Sunday has any precedent.
+     NOT floored like spread: a zero is exactly the signal being carried. */
+  const spreadEarly = Math.max(0, cadence - trimmed[0]);
+  const spreadLate = Math.max(0, trimmed[trimmed.length - 1] - cadence);
   /* Tight enough to name a DAY, or only a window?
 
      This used to be one test with one outcome: fail it and the house vanished
@@ -1352,6 +1361,8 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     cadence,
     loose: !dated,
     spread,
+    spreadEarly,
+    spreadLate,
     basis,
     /* A publication-based projection is anchored on the last publication and
        steps a whole interval to the next one, so there is no lag left to add -

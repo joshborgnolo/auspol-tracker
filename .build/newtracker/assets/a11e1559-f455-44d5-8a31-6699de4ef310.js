@@ -2246,6 +2246,25 @@ function NextPollsPanel() {
      too: "in 6 days (or yesterday)". */
   const ago = (n) => (n === 0 ? "earlier today"
     : n === 1 ? "yesterday" : `${n} days ago`);
+  /* A one-sided schedule names its real alternative instead of mirroring it.
+     A symmetric ± pretends the wave can arrive a week EARLY, and in the
+     current record no weekday house ever has - every miss is a week late.
+     So where the measured early side is zero and the late side reaches
+     another release day, the row names that day: "Sun 30 Aug (or Sun 6
+     Sep)". A date, not "+ 1 week", because the alternative IS one specific
+     Sunday, and "+ 1 week" reads like an arrival time rather than a
+     tolerance. Both sides are possible in principle - an early-only record
+     names the earlier day the same way. */
+  const pmLabel = (r) => {
+    if (r.releaseDow != null && r.spreadEarly != null) {
+      const widen = Math.sqrt(r.ahead + 1);
+      const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
+      const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
+      if (earlyW === 0 && lateW >= 1) return ` (or ${fmt(r.release + lateW * 7 * DAY_MS)})`;
+      if (lateW === 0 && earlyW >= 1) return ` (or ${fmt(r.release - earlyW * 7 * DAY_MS)})`;
+    }
+    return spreadLabel(r);
+  };
   /* The releases list spans months and sometimes a new year, so unlike the
      projection column it carries one. The weekday rides on the PUBLICATION
      date only: a weekday is a fact about when a house files, and putting one
@@ -2301,7 +2320,7 @@ function NextPollsPanel() {
                         carries the clock it is read on, since AEST and AEDT
                         are an hour apart and "8 pm" alone names both */}
                     {hour && <span className="np-time">, {zoned(hour, r.release)}</span>}
-                    <span className="np-pm">{spreadLabel(r)}</span></>}
+                    <span className="np-pm">{pmLabel(r)}</span></>}
             </span>
             {/* the column answers "when", so a window answers it too – with the
                 day it opens, which is the first date the wave is possible. An
@@ -2409,7 +2428,9 @@ function NextPollsPanel() {
                   Median {r.cadence} days between{" "}
                   {r.basis === "published" ? "publications" : "fieldwork ends"} across the
                   last {r.gapsUsed} intervals
-                  {r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : ""}.
+                  {r.spreadEarly != null && r.spreadEarly !== r.spreadLate
+                    ? `, –${r.spreadEarly}/+${r.spreadLate} days`
+                    : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : ""}.
                   {/* a publication-based projection steps from one publication
                       to the next, so the lag is already inside the interval and
                       there is nothing left to add */}
