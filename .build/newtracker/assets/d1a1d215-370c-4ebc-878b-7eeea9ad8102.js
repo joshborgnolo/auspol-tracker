@@ -247,7 +247,7 @@ const CYC_EVENTS = {
     {
       date: "2019-11-09", short: "Bushfire emergency",
       label: "Queensland declares a state of emergency",
-      desc: "Queensland declares a state of emergency amid catastrophic bushfire conditions - two days before NSW follows.",
+      desc: "Queensland declares a state of emergency amid catastrophic bushfire conditions – two days before NSW follows.",
       major: true,
     },
     {
