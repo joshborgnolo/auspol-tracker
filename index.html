@@ -10131,9 +10131,37 @@ function PastCyclesView() {
   } = window.AP;
   const cycles = D.cycles;
   const [mode, setMode] = useState("abs");
-  const [hidden, setHidden] = useState(new Set());
+  /* Which terms are hidden rides in the URL too, so "the 2019 term" stays
+     comparable when the link is passed around. Hidden years – not shown
+     ones, since "Show all" is the ordinary state and keeps the bar clean –
+     sit in one param as two-digit years joined by dots: ?c=10.19 hides
+     2010 and 2019. Four-digit years are read as well for whoever types
+     them; tokens that name no known term are dropped, never trusted. */
+  const [hidden, setHidden] = useState(() => {
+    const raw = new URLSearchParams(window.location.search).get("c");
+    const years = new Set(cycles.map(c => c.year));
+    if (!raw) return new Set();
+    return new Set(raw.split(/[.,]/).map(t => {
+      if (/^\d{4}$/.test(t)) return +t;
+      if (/^\d{2}$/.test(t)) return 2000 + +t;
+      return null;
+    }).filter(y => y != null && years.has(y)));
+  });
   const [hi, setHi] = useState(null);
   const [showHan, setShowHan] = useState(false);
+
+  /* Same contract as the archive writer: replaceState, foreign params
+     (the archive's q/w/t/…) parsed out and left alone, vanished when the
+     board is back to every term. */
+  React.useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    p.delete("c");
+    if (hidden.size) p.set("c", [...hidden].sort((a, b) => a - b).map(y => String(y).slice(2)).join("."));
+    const qs = p.toString();
+    const L = window.location;
+    const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
+    if (next !== L.pathname + L.search + L.hash) window.history.replaceState(null, "", next);
+  }, [hidden]);
 
   /* A chip may now turn off the last line. It used to refuse, on the grounds
      that an empty chart is useless – but the way back is one button away and
@@ -11069,26 +11097,62 @@ function AllPollsView({
   }];
   /* The filtered table is a page in its own right, so its filters ride in
      the URL: every non-default selection sits in the query string beside
-     the #allpolls hash (?who=Newspoll&when=12#allpolls), and "Newspoll's
-     year" becomes a link one reader can paste to another – who lands on
-     exactly that table, not on the raw archive. Restored here, once per
-     mount (the view remounts on every tab switch); the write-back further
-     down keeps the address bar current as the filters change. Values that
-     have gone stale – a pollster no longer in the archive, a tag that
-     never existed – are dropped, never trusted. */
+     the #allpolls hash (?w=Newspoll&t=12#allpolls), and "Newspoll's year"
+     becomes a link one reader can paste to another – who lands on exactly
+     that table, not on the raw archive. Keys are one letter and enum VALUES
+     one letter or two (the maps below), so a fully-dressed link stays short
+     enough to survive a chat window; names that ARE the vocabulary – the
+     pollsters, the tag slugs – stay words. Restored here, once per mount
+     (the view remounts on every tab switch); the write-back further down
+     keeps the address bar current as the filters change. Values that have
+     gone stale – a pollster no longer in the archive, a tag that never
+     existed – are dropped, never trusted.
+      Backwards compatibility: links written before the short scheme used
+     verbose keys (who=/when=/has=/vs=/lead=/view=/scope=) and long enum
+     values. Both spellings are still read here, the short one winning if
+     a hand-edited URL carries both; only the short one is ever written. */
+  const FACET_BY_URL = {
+    p: "primary",
+    l: "leadership",
+    d: "direction",
+    primary: "primary",
+    leadership: "leadership",
+    direction: "direction"
+  };
+  const MEAS_BY_URL = {
+    o: "onp",
+    lo: "lnponp",
+    onp: "onp",
+    lnponp: "lnponp"
+  };
+  const LEAD_BY_URL = {
+    a: "alp",
+    l: "lnp",
+    o: "onp",
+    alp: "alp",
+    lnp: "lnp",
+    onp: "onp"
+  };
   const urlInit = (() => {
     const p = new URLSearchParams(window.location.search);
-    const ok = (v, ids) => v && ids.includes(v) ? v : null;
-    const view = ok(p.get("view"), FACETS.map(f => f.id).slice(1)) || "twopp";
+    /* new short key first, then each legacy key the value once had */
+    const get = (...keys) => {
+      for (const k of keys) {
+        const v = p.get(k);
+        if (v != null) return v;
+      }
+      return null;
+    };
+    const view = FACET_BY_URL[get("f", "view")] || "twopp";
     return {
-      q: p.get("q") || "",
-      who: (p.get("who") || "").split(",").filter(h => houses.includes(h)),
-      has: (p.get("has") || "").split(",").filter(t => POLL_TAGS.some(pt => pt.id === t)),
-      lead: ok(p.get("lead"), ["alp", "lnp", "onp"]) || "all",
-      measure: ok(p.get("vs"), ["onp", "lnponp"]) || "lnp",
-      range: ok(p.get("when"), ["12", "6", "3"]) || "all",
+      q: get("q") || "",
+      who: (get("w", "who") || "").split(",").filter(h => houses.includes(h)),
+      has: (get("h", "has") || "").split(",").filter(t => POLL_TAGS.some(pt => pt.id === t)),
+      lead: LEAD_BY_URL[get("l", "lead")] || "all",
+      measure: MEAS_BY_URL[get("v", "vs")] || "lnp",
+      range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
-      scope: p.get("scope") !== "off" || !FACET_SCOPE[view]
+      scope: get("s") !== "0" && get("s", "scope") !== "off" || !FACET_SCOPE[view]
     };
   })();
   const [q, setQ] = useState(urlInit.q);
@@ -11389,22 +11453,42 @@ function AllPollsView({
 
   /* …and back the other way: every non-default filter is written to the
      query string, so the address bar at any moment IS the link to this
-     exact table. replaceState, never pushState – the back button should
-     leave the page, not uncheck one box at a time. Only departures from
-     the defaults are written, so the plain archive keeps its plain URL.
-     The guard against a no-op write matters: without it the URL was
-     normalised every render, and this effect also runs for the reader who
-     typed a stale or partial query by hand. */
+     exact table – in the short scheme the restore above reads. replaceState,
+     never pushState: the back button should leave the page, not uncheck one
+     box at a time. Only departures from the defaults are written, so the
+     plain archive keeps its plain URL. Params the view OWNS (its own keys
+     and every legacy spelling, so old links normalise on first write) are
+     deleted and re-set; params owned by other views (the cycles view's "c")
+     are parsed out of the live URL and left untouched, so the two writers
+     can never clobber each other. The guard against a no-op write matters:
+     without it the URL was normalised every render, and this effect also
+     runs for the reader who typed a stale or partial query by hand. */
+  const FACET_BY_ID = {
+    primary: "p",
+    leadership: "l",
+    direction: "d"
+  }; // facet → URL letter (inverse of the restore map)
+  const MEAS_BY_ID = {
+    onp: "o",
+    lnponp: "lo"
+  }; // matchup → URL letter; "lnp" is the omitted default
+  const LEAD_BY_ID = {
+    alp: "a",
+    lnp: "l",
+    onp: "o"
+  }; // holder → URL letter; "all" is the omitted default
   React.useEffect(() => {
-    const p = new URLSearchParams();
+    const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "who", "when", "has", "vs", "lead", "view", "scope"];
+    const p = new URLSearchParams(window.location.search);
+    OWNED.forEach(k => p.delete(k));
     if (ql) p.set("q", q.trim());
-    if (sel.size) p.set("who", houses.filter(h => sel.has(h)).join(","));
-    if (range !== "all") p.set("when", range);
-    if (tagSel.size) p.set("has", POLL_TAGS.map(t => t.id).filter(t => tagSel.has(t)).join(","));
-    if (measure !== "lnp") p.set("vs", measure);
-    if (lead !== "all") p.set("lead", lead);
-    if (facet !== "twopp") p.set("view", facet);
-    if (!scope && FACET_SCOPE[facet]) p.set("scope", "off");
+    if (sel.size) p.set("w", houses.filter(h => sel.has(h)).join(","));
+    if (range !== "all") p.set("t", range);
+    if (tagSel.size) p.set("h", POLL_TAGS.map(t => t.id).filter(t => tagSel.has(t)).join(","));
+    if (measure !== "lnp") p.set("v", MEAS_BY_ID[measure]);
+    if (lead !== "all") p.set("l", LEAD_BY_ID[lead]);
+    if (facet !== "twopp") p.set("f", FACET_BY_ID[facet]);
+    if (!scope && FACET_SCOPE[facet]) p.set("s", "0");
     const qs = p.toString();
     const L = window.location;
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
