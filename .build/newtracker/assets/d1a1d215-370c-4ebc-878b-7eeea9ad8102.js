@@ -283,6 +283,12 @@ const CYC_EVENTS = {
       desc: "The RBA board hikes the cash rate 25 basis points to 4.35% – the central bank’s 13th rate rise since May 2022, widely anticipated by economists.",
       major: true,
     },
+    {
+      date: "2025-03-28", short: "Election called",
+      label: "Albanese announces the federal election",
+      desc: "Albanese announces the federal election, kicking off a campaign that produced a dramatic rise in Labor support.",
+      major: true,
+    },
   ],
   2025: [
     {
