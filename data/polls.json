@@ -26,14 +26,43 @@
   "pollsterRules": {
     "Essential": {
       "tppIncludesUndecided": true,
-      "note": "Essential's published 2PP is undecided-inclusive, so the pair sums to <100 rather than 100. The build reads that shortfall as the poll's undecided share after preferences, so it is a fact with a consumer now, not just an exemption."
+      "note": "Essential's published 2PP is undecided-inclusive, so the pair sums to <100 rather than 100. The build reads that shortfall as the poll's undecided share after preferences, so it is a fact with a consumer now, not just an exemption.",
+      "site": "https://essentialreport.com.au"
     },
     "Roy Morgan": {
       "release": {
         "dow": 1,
         "time": "16:30",
         "note": "Roy Morgan files its weekly federal voting-intention release on a Monday, about 4.30pm eastern. Stated from the house’s schedule rather than measured, because its release URLs are an unreliable witness: the early ones are named for the fieldwork end (a Sunday) rather than the post, so the slug weekday reads Monday in only two thirds of the full record while the last twelve are Monday eleven times."
-      }
+      },
+      "site": "https://www.roymorgan.com/findings"
+    },
+    "Newspoll": {
+      "site": "https://www.theaustralian.com.au/topics/newspoll?eafs_enabled=false"
+    },
+    "DemosAU": {
+      "site": "https://demosau.com/methodology-statements/"
+    },
+    "DemosAU (MRP)": {
+      "site": "https://demosau.com/methodology-statements/"
+    },
+    "Resolve": {
+      "site": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html"
+    },
+    "Redbridge": {
+      "site": "https://www.accent-research.com/projects"
+    },
+    "RedBridge / Accent": {
+      "site": "https://www.accent-research.com/projects"
+    },
+    "RedBridge / Accent (MRP)": {
+      "site": "https://www.accent-research.com/projects"
+    },
+    "YouGov": {
+      "site": "https://www.news24.com.au/politics/australian-politics"
+    },
+    "YouGov (MRP)": {
+      "site": "https://www.news24.com.au/politics/australian-politics"
     }
   },
   "elections": {
@@ -2139,6 +2168,7 @@
     },
     {
       "date": "2026-02-27",
+      "published": "2026-03-01T20:00",
       "dateStart": "2026-02-23",
       "pollster": "Redbridge",
       "client": "AFR",
@@ -2411,6 +2441,7 @@
     },
     {
       "date": "2026-03-27",
+      "published": "2026-03-29T18:00",
       "dateStart": "2026-03-23",
       "pollster": "Redbridge",
       "client": "AFR",
@@ -2664,6 +2695,7 @@
     },
     {
       "date": "2026-04-30",
+      "published": "2026-05-03T18:00",
       "dateStart": "2026-04-24",
       "pollster": "Redbridge",
       "client": "AFR",
@@ -2769,6 +2801,7 @@
     },
     {
       "date": "2026-05-14",
+      "published": "2026-05-22T20:00",
       "dateStart": "2026-04-29",
       "pollster": "RedBridge / Accent (MRP)",
       "client": "AFR",
@@ -3544,6 +3577,7 @@
     },
     {
       "date": "2026-07-30",
+      "published": "2026-08-02T18:00",
       "dateStart": "2026-07-27",
       "pollster": "RedBridge / Accent",
       "client": "AFR",

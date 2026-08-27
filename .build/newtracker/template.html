@@ -1294,7 +1294,14 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .approval-readout { display: flex; flex-direction: column; gap: 11px; margin-bottom: 12px; }
 .appr-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 .appr-top .leader-name { font-size: 13.5px; }
-.net { margin-left: auto; font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; }
+.net { margin-left: auto; font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums;
+  /* Approval and favourability are the same three people answering a
+     different question, so the toggle is a rearrangement and the figure rolls
+     to its new value. The COLOUR was the one part still swapping: Hanson is -6
+     on one and 0 on the other, and the red became green in a single frame
+     while her digits were still turning. Same curve and duration as the reel,
+     so the number and its verdict arrive together. */
+  transition: color .32s cubic-bezier(.4, .1, .25, 1); }
 .net.pos { color: var(--grn-text); }
 .net.neg { color: var(--alp-text); }
 .appr-bar { display: flex; height: 22px; border-radius: 5px; overflow: hidden; font-size: 11.5px; font-weight: 700; }
@@ -2358,8 +2365,55 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   grid-template-columns: minmax(120px, 1.1fr) minmax(150px, 1.2fr) minmax(80px, 0.7fr) minmax(150px, 1.4fr);
   align-items: baseline; gap: 12px; padding: 11px 12px; border-radius: 8px;
 }
-.np-row:nth-child(odd) { background: color-mix(in oklch, var(--ink) 3.5%, var(--surface)); }
-.np-firm { font-family: var(--sans); font-size: 14.5px; font-weight: 700; color: var(--ink); }
+/* the stripe belongs to the ITEM now, not the row: the item is what alternates
+   in the list, and an open one carries its detail inside the same tint */
+.np-item { border-radius: 8px; }
+.np-item:nth-child(odd) { background: color-mix(in oklch, var(--ink) 3.5%, var(--surface)); }
+.np-item.open { background: var(--surface-2); }
+.np-row { cursor: pointer; }
+.np-row:hover .exp-btn { color: var(--ink-2); }
+.np-firm { font-family: var(--sans); font-size: 14.5px; font-weight: 700; color: var(--ink);
+  display: flex; align-items: baseline; gap: 4px; min-width: 0; }
+/* the chevron sits on the text baseline of the name beside it, not on the
+   middle of a flex line that a 44px hit area would otherwise stretch */
+.np-firm .exp-btn { align-self: center; margin-left: -4px; flex: none; }
+a.np-link { color: inherit; text-decoration: none; cursor: pointer; }
+a.np-link:hover, a.np-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+a.np-link:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
+a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--ink-2); }
+
+/* ---- the working behind one row ----
+   A quieter register than the row above it: this is the evidence, and it reads
+   as a note rather than as a second list of forecasts. */
+/* Held to a reading width rather than the card's. Stretched across 1100px the
+   three columns land at opposite ends of the panel and stop being one line
+   about one release. */
+.np-detail { padding: 2px 12px 12px 30px; max-width: 560px; animation: np-open .18s ease both; }
+@keyframes np-open { from { opacity: 0; transform: translateY(-3px); } }
+.npd-h {
+  display: flex; align-items: baseline; gap: 8px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-3); padding-bottom: 5px; border-bottom: 1px solid var(--line);
+}
+.npd-site { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 600;
+  color: var(--ink-3); text-decoration: none; }
+.npd-site:hover { color: var(--ink-2); text-decoration: underline; text-underline-offset: 2px; }
+.npd-list { list-style: none; margin: 0; padding: 0; }
+.npd-row {
+  display: grid; grid-template-columns: minmax(120px, 1fr) minmax(90px, 0.8fr) auto;
+  gap: 10px; align-items: baseline; padding: 5px 0;
+  font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+}
+.npd-row + .npd-row { border-top: 1px solid var(--line-2); }
+.npd-date { color: var(--ink); font-weight: 600; }
+/* a fieldwork end standing in for a publication date nobody recorded – marked
+   the same dashed way the archive table marks the same substitution */
+.npd-date.est { font-weight: 500; color: var(--ink-3);
+  border-bottom: 1px dashed var(--line-2); }
+.npd-time { color: var(--ink-3); }
+.npd-gap { margin-left: auto; color: var(--ink-3); white-space: nowrap; }
+.npd-foot { margin: 8px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ink-3); max-width: 62ch; }
+@media (prefers-reduced-motion: reduce) { .np-detail { animation: none; } }
 .np-date { font-family: var(--sans); font-size: 14.5px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* the hour reads as part of the date, one step quieter than it */
 .np-time { color: var(--ink-2); }
@@ -2377,6 +2431,16 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   .np-when { grid-column: 2; text-align: right; }
   .np-date { grid-column: 1; }
   .np-cadence { grid-column: 1 / -1; }
+  .np-detail { padding: 0 10px 10px 26px; }
+  /* the hour drops under the date rather than squeezing three columns into a
+     phone's width, and the interval keeps the right-hand edge across both
+     lines. Placed by AREA, not by auto-flow: two children carrying a column
+     hint and a third carrying margin-left:auto put the date on the right and
+     the hour on a line of its own. */
+  .npd-row { grid-template-columns: 1fr auto; grid-template-areas: "date gap" "time gap"; row-gap: 1px; }
+  .npd-date { grid-area: date; }
+  .npd-time { grid-area: time; }
+  .npd-gap { grid-area: gap; align-self: center; }
 }
 
 /* ---------- Poll disagreement (variance) panel ---------- */
@@ -2565,7 +2629,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
   .acc-dot, .acc-mean { transition: none; }
-  .roll-reel { transition: none; }
+  .roll-reel, .net { transition: none; }
 }
 
 /* The theme flip crossfades as ONE composited picture – see applyChrome() in

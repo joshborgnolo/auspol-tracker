@@ -1082,6 +1082,11 @@ const CAD_DEFAULT_LAG = 1;
    Monday in eleven of the last twelve. Judging it on all 39 hid the schedule
    it actually keeps. */
 const CAD_RECENT = 12;
+/* How many recent releases the panel LISTS when a row is opened. Deliberately
+   fewer than the window the estimate is taken over: five is what a reader will
+   actually read down, and the row says how many intervals the median really
+   covers rather than letting the list imply it. */
+const CAD_SHOW = 5;
 const CAD_DOW_MIN = 5;         // dated releases before a weekday can be a habit
 const CAD_DOW_SHARE = 0.8;     // and the share of them that must share it
 const CAD_MIN_POLLS = 4;
@@ -1173,8 +1178,15 @@ const byHouse = {};
 for (const p of POLLS) {
   const r = (byHouse[p.pollster] ||= []);
   const pub = (p.published || "").slice(0, 10) || null;
+  /* the clock rides along with the date, because the panel now SHOWS the
+     releases it projects from and an hour is half of what a release time is.
+     Recorded values only - never one parsed out of a URL slug, which is a
+     date at best and, for the house that publishes three waves in one post,
+     not even that */
+  const cl = /T(\d{2}):(\d{2})/.exec(p.published || "");
+  const mins = cl ? +cl[1] * 60 + +cl[2] : null;
   if (pub && r.length && r[r.length - 1].pub === pub) r[r.length - 1].date = p.date;
-  else r.push({ date: p.date, pub });
+  else r.push({ date: p.date, pub, mins });
 }
 const pollCadence = [];
 for (const [firm, rows] of Object.entries(byHouse)) {
@@ -1266,6 +1278,20 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     // which parts of this are stated rather than measured, so the panel can say so
     declared: decl ? [decl.dow != null && "day", declMins != null && !timed && "hour"].filter(Boolean) : [],
     waves: dates.length,
+    // the house's own release index, so a reader can go and check
+    site: (D.pollsterRules?.[firm] || {}).site || null,
+    /* The releases behind the projection, most recent last, so the panel can
+       show its working rather than asking to be believed. The interval is the
+       gap between FIELDWORK ends - the same quantity the median is taken over
+       - and the publication date and hour are carried beside it where the
+       release recorded one. */
+    recent: rows.slice(-CAD_SHOW).map((r, i, a) => ({
+      field: r.date, pub: r.pub, mins: r.mins,
+      gap: i ? Math.round((Date.parse(r.date) - Date.parse(a[i - 1].date)) / 86400000) : null,
+    })),
+    // how many intervals the median and the spread were actually taken over,
+    // which is more than the panel shows and should not be implied otherwise
+    gapsUsed: gaps.length,
   });
 }
 pollCadence.sort((a, b) => a.cadence - b.cadence);

@@ -233,19 +233,27 @@ const ROLL_DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 window.RollNum = RollNum;      // the hero's Delta reads it off the window (see Delta)
 function RollNum({ value, className, style }) {
   const text = String(value);
+  /* Keyed by PLACE VALUE - distance from the right end - not by position from
+     the left. A figure that loses a character has every reel to the left of it
+     renumbered under an index key, so React sees a different element at each
+     slot and mounts a fresh one: Hanson going -6 -> 0 handed slot 0 a digit
+     where a minus sign had been, and the number that was meant to roll simply
+     appeared. From the right, the 6 and the 0 are both the units digit, they
+     are the same element, and it reels; the minus sign is what leaves. */
+  const n = text.length;
   return (
     <span className={"roll" + (className ? " " + className : "")} style={style}>
       <span className="roll-anchor" aria-hidden="true">0</span>
       <span className="sr-only">{text}</span>
       {text.split("").map((ch, i) => (
         /[0-9]/.test(ch) ? (
-          <span className="roll-d" key={i} aria-hidden="true">
+          <span className="roll-d" key={n - 1 - i} aria-hidden="true">
             <span className="roll-reel" style={{ "--d": Number(ch) }}>
               {ROLL_DIGITS.map((d) => <span key={d}>{d}</span>)}
             </span>
           </span>
         ) : (
-          <span className="roll-sep" key={i} aria-hidden="true">{ch}</span>
+          <span className="roll-sep" key={n - 1 - i} aria-hidden="true">{ch}</span>
         )
       ))}
     </span>
@@ -909,7 +917,7 @@ function ReportError() {
       <p className="fb-lede">
         Every figure here is transcribed from a pollster’s published release, from Wikipedia,
         PollBludger, or another secondary source, and some of them may be wrong. If you have found
-        one, found a missing poll, or have any other piece of feedback, please{" "}
+        an error, found a missing poll, or have any other piece of feedback, please{" "}
         {/* A toggle both ways: the thing that opened the form is the only
             thing in the sentence that looks like a control, so it is where a
             reader who has changed their mind will click. What is typed stays

@@ -2011,6 +2011,30 @@ function clockLabel(mins) {
   const c = clockParts(mins);
   return `${c.num} ${c.ap}`;
 }
+/* AEST or AEDT, for the DATE in question. Every hour on this panel is the
+   publisher's own clock, and half the year that clock is an hour ahead of the
+   other half - so "8 pm" alone names two different moments depending on when
+   you read it. Resolved through Intl rather than by hardcoding the first
+   Sundays of October and April, so it keeps being right if the rule moves. */
+const EASTERN_TZ = (() => {
+  try {
+    return new Intl.DateTimeFormat("en-AU",
+      { timeZone: "Australia/Sydney", timeZoneName: "short" });
+  } catch (e) { return null; }
+})();
+function easternAbbr(ms) {
+  if (!EASTERN_TZ || ms == null || !isFinite(ms)) return "AEST";
+  try {
+    // dates here are UTC midnight; +2h lands at midday in Sydney on the same
+    // calendar day, which is the day whose offset is wanted
+    const z = EASTERN_TZ.formatToParts(new Date(ms + 2 * 3600000))
+      .find((x) => x.type === "timeZoneName");
+    return z && /^AE[SD]T$/.test(z.value) ? z.value : "AEST";
+  } catch (e) { return "AEST"; }
+}
+// an hour with the clock it is read on, which is the only form of it that
+// names a moment rather than a habit
+const zoned = (label, ms) => (label ? `${label} ${easternAbbr(ms)}` : label);
 /* A span is only worth printing while it IS the habit. YouGov has filed at 5am
    five times and 6am once, so "5-6 am" describes it. Essential has filed at 1am
    four times and 4:36am once, and "1-4:36 am" would let a single late morning
@@ -2061,6 +2085,11 @@ function cadenceLabel(d) {
 function NextPollsPanel() {
   const { D } = window.AP;
   const cad = D.pollCadence || [];
+  /* Which row is showing its working. A date arrived at by a median of
+     intervals is a claim, and the releases it was taken over are the evidence
+     for it - kept folded away because the panel's job is the answer, one
+     click from the reason. */
+  const [open, setOpen] = useState(null);
   if (!cad.length) return null;
 
   /* Every date in here comes from Date.parse("YYYY-MM-DD"), which is UTC
@@ -2201,20 +2230,46 @@ function NextPollsPanel() {
     return `${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
   };
   const when = (n) => (n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`);
+  /* The releases list spans months and sometimes a new year, so unlike the
+     projection column it carries one. */
+  const fmtYear = (iso) => {
+    const d = new Date(iso + "T00:00:00Z");
+    return `${WD[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)} ${d.getUTCFullYear()}`;
+  };
 
   return (
     <section className="card next-polls">
       <div className="np-head">
         <h2 className="card-title">Next expected polls</h2>
         <p className="card-sub">
-          Projected from each house’s recent publication intervals.
+          Projected from each house’s recent publication intervals · open a row for the releases behind it
         </p>
       </div>
 
       <ol className="np-list">
-        {rows.map((r) => (
-          <li className={"np-row" + (r.loose ? " np-loose" : "")} key={r.pollster + "-" + r.release}>
-            <span className="np-firm">{r.pollster}</span>
+        {rows.map((r) => {
+          const key = r.pollster + "-" + r.release;
+          const isOpen = open === key;
+          const hour = releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid);
+          const recent = r.recent || [];
+          return (
+          <li className={"np-item" + (isOpen ? " open" : "")} key={key}>
+            <div className={"np-row" + (r.loose ? " np-loose" : "") + (isOpen ? " open" : "")}
+                 onClick={() => setOpen(isOpen ? null : key)}>
+            <span className="np-firm">
+              {/* the same disclosure control the archive table uses, so the
+                  two lists open the same way */}
+              <button className={"exp-btn" + (isOpen ? " open" : "")} aria-expanded={isOpen}
+                      aria-label={isOpen ? "Hide the releases this is projected from"
+                                         : `The releases ${r.pollster} is projected from`}>▸</button>
+              {r.site
+                ? <a className="np-link" href={r.site} target="_blank" rel="noopener noreferrer"
+                     onClick={(e) => e.stopPropagation()}
+                     title={`Where ${r.pollster} publishes`}>
+                    {r.pollster}<span className="plink-mark" aria-hidden="true">↗</span>
+                  </a>
+                : r.pollster}
+            </span>
             <span className="np-date">
               {r.loose
                 /* The ± IS the forecast here, so state it as the span it is
@@ -2222,9 +2277,10 @@ function NextPollsPanel() {
                 ? <>{fmt(r.release - r.spread * DAY_MS)}–{fmt(r.release + r.spread * DAY_MS)}</>
                 : <>{fmt(r.release)}
                     {/* the hour qualifies the DAY, so it sits with it rather
-                        than in the cadence column with the rhythm */}
-                    {releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid) &&
-                      <span className="np-time">, {releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid)}</span>}
+                        than in the cadence column with the rhythm - and it
+                        carries the clock it is read on, since AEST and AEDT
+                        are an hour apart and "8 pm" alone names both */}
+                    {hour && <span className="np-time">, {zoned(hour, r.release)}</span>}
                     <span className="np-pm">{spreadLabel(r)}</span></>}
             </span>
             {/* the column answers "when", so a window answers it too – with the
@@ -2245,8 +2301,70 @@ function NextPollsPanel() {
               {r.missed === 0 && r.slipFrom &&
                 <span className="np-missed"> · {fmtDM(r.slipFrom)} slot passed</span>}
             </span>
+            </div>
+
+            {/* ---- the working ----------------------------------------------
+                Newest first, because "when did they last publish" is the
+                question a reader opens this to answer. The interval on each
+                line is the gap to the release BELOW it, which is the quantity
+                the median is taken over. */}
+            {isOpen && (
+              <div className="np-detail">
+                <div className="npd-h">
+                  Last {recent.length} releases
+                  {r.site && <a className="npd-site" href={r.site} target="_blank" rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}>
+                    {(() => { try { return new URL(r.site).hostname.replace(/^www\./, ""); }
+                              catch (e) { return "the house"; } })()}
+                    <span className="plink-mark" aria-hidden="true">↗</span>
+                  </a>}
+                </div>
+                <ol className="npd-list">
+                  {[...recent].reverse().map((x) => (
+                    <li className="npd-row" key={x.field}>
+                      {/* the publication date where the release recorded one.
+                          Where it did not, the last day of FIELDWORK stands in
+                          and says so - the two are days apart, and quietly
+                          printing one as the other is the thing the archive
+                          table refuses to do either. */}
+                      <span className={"npd-date" + (x.pub ? "" : " est")}
+                            title={x.pub ? undefined
+                                         : "No publication date recorded — this is the last day of fieldwork"}>
+                        {fmtYear(x.pub || x.field)}
+                      </span>
+                      <span className="npd-time">
+                        {x.mins != null ? zoned(clockLabel(x.mins), Date.parse(x.pub)) : "—"}
+                      </span>
+                      <span className="npd-gap">
+                        {x.gap != null ? `${x.gap} days` : ""}
+                      </span>
+                    </li>
+                  ))}
+                </ol>
+                <p className="npd-foot">
+                  {/* what the projection is ACTUALLY taken over, which is more
+                      intervals than are listed here - the list is the recent
+                      shape of the schedule, not the whole sample */}
+                  Median {r.cadence} days across the last {r.gapsUsed} intervals
+                  {r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : ""}, plus{" "}
+                  {r.lagMeasured
+                    ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases`
+                    : "the field’s one-day publication lag"}.
+                  {/* The weekday and the hour are two separate corrections and
+                      only some houses have either. Run together they made a
+                      house with no weekday - DemosAU - read as though its
+                      publication lag happened at 6:52 in the morning. */}
+                  {r.releaseDow != null &&
+                    ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`}
+                  {r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`}
+                  {(r.declared || []).length > 0 &&
+                    ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`}
+                </p>
+              </div>
+            )}
           </li>
-        ))}
+          );
+        })}
       </ol>
 
       <p className="np-foot">
@@ -2261,9 +2379,11 @@ function NextPollsPanel() {
           ? ` Every house here has enough of them to measure its own, ${lagged[0].pollster}’s ${spellNum(lagged[0].lag)}-day median off ${lagged[0].lagMeasured} releases.`
           : ` Most of these houses have enough of them to measure their own — ${lagged[0].pollster}’s ${spellNum(lagged[0].lag)}-day median comes off ${lagged[0].lagMeasured} releases — and the rest fall back to a day, which is the field’s.`)}
         {" "}Where a house
-        has been timed often enough the hour it files is shown too, in eastern time — the span
-        its releases have covered where that is tight, and otherwise the hour it usually keeps,
-        so one late morning doesn’t speak for a house that is normally punctual. Weekday and
+        has been timed often enough the hour it files is shown too — the span its releases have
+        covered where that is tight, and otherwise the hour it usually keeps, so one late morning
+        doesn’t speak for a house that is normally punctual. Every hour here is the publisher’s
+        own clock and is labelled with it, AEDT through the summer and AEST the rest of the year,
+        because the two are an hour apart and “8 pm” alone names both. Weekday and
         hour are read off recent releases rather than the whole record, because a schedule is a
         current fact about a house and its first year is often a different house. A house whose
         interval is too variable to name a day gets the window its own record supports instead
@@ -2273,6 +2393,9 @@ function NextPollsPanel() {
         moves on rather than naming a time that has already gone.
         {slipped && " Where only the latest slot has gone by and nothing else is missing, the next date is the next slot the house’s own schedule allows — a week on for a house pinned to a weekday — since a wave that hasn’t appeared may be late rather than published."}
         {behind && " Where several have gone by, those waves are out but not yet in this archive, and the projection carries on at the house’s own interval."}
+        {" "}Opening a row lists that house’s five most recent releases with the interval between
+        each, and names the house’s own release page, so the estimate can be checked against the
+        thing it was taken from rather than taken on trust.
         {" "}Houses that have stopped publishing are omitted. “Today” is Sydney’s. These are
         estimates, not announced dates.
       </p>

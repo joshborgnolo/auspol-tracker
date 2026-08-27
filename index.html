@@ -1141,7 +1141,14 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .approval-readout { display: flex; flex-direction: column; gap: 11px; margin-bottom: 12px; }
 .appr-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
 .appr-top .leader-name { font-size: 13.5px; }
-.net { margin-left: auto; font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums; }
+.net { margin-left: auto; font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums;
+  /* Approval and favourability are the same three people answering a
+     different question, so the toggle is a rearrangement and the figure rolls
+     to its new value. The COLOUR was the one part still swapping: Hanson is -6
+     on one and 0 on the other, and the red became green in a single frame
+     while her digits were still turning. Same curve and duration as the reel,
+     so the number and its verdict arrive together. */
+  transition: color .32s cubic-bezier(.4, .1, .25, 1); }
 .net.pos { color: var(--grn-text); }
 .net.neg { color: var(--alp-text); }
 .appr-bar { display: flex; height: 22px; border-radius: 5px; overflow: hidden; font-size: 11.5px; font-weight: 700; }
@@ -2205,8 +2212,55 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   grid-template-columns: minmax(120px, 1.1fr) minmax(150px, 1.2fr) minmax(80px, 0.7fr) minmax(150px, 1.4fr);
   align-items: baseline; gap: 12px; padding: 11px 12px; border-radius: 8px;
 }
-.np-row:nth-child(odd) { background: color-mix(in oklch, var(--ink) 3.5%, var(--surface)); }
-.np-firm { font-family: var(--sans); font-size: 14.5px; font-weight: 700; color: var(--ink); }
+/* the stripe belongs to the ITEM now, not the row: the item is what alternates
+   in the list, and an open one carries its detail inside the same tint */
+.np-item { border-radius: 8px; }
+.np-item:nth-child(odd) { background: color-mix(in oklch, var(--ink) 3.5%, var(--surface)); }
+.np-item.open { background: var(--surface-2); }
+.np-row { cursor: pointer; }
+.np-row:hover .exp-btn { color: var(--ink-2); }
+.np-firm { font-family: var(--sans); font-size: 14.5px; font-weight: 700; color: var(--ink);
+  display: flex; align-items: baseline; gap: 4px; min-width: 0; }
+/* the chevron sits on the text baseline of the name beside it, not on the
+   middle of a flex line that a 44px hit area would otherwise stretch */
+.np-firm .exp-btn { align-self: center; margin-left: -4px; flex: none; }
+a.np-link { color: inherit; text-decoration: none; cursor: pointer; }
+a.np-link:hover, a.np-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+a.np-link:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
+a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--ink-2); }
+
+/* ---- the working behind one row ----
+   A quieter register than the row above it: this is the evidence, and it reads
+   as a note rather than as a second list of forecasts. */
+/* Held to a reading width rather than the card's. Stretched across 1100px the
+   three columns land at opposite ends of the panel and stop being one line
+   about one release. */
+.np-detail { padding: 2px 12px 12px 30px; max-width: 560px; animation: np-open .18s ease both; }
+@keyframes np-open { from { opacity: 0; transform: translateY(-3px); } }
+.npd-h {
+  display: flex; align-items: baseline; gap: 8px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-3); padding-bottom: 5px; border-bottom: 1px solid var(--line);
+}
+.npd-site { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 600;
+  color: var(--ink-3); text-decoration: none; }
+.npd-site:hover { color: var(--ink-2); text-decoration: underline; text-underline-offset: 2px; }
+.npd-list { list-style: none; margin: 0; padding: 0; }
+.npd-row {
+  display: grid; grid-template-columns: minmax(120px, 1fr) minmax(90px, 0.8fr) auto;
+  gap: 10px; align-items: baseline; padding: 5px 0;
+  font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+}
+.npd-row + .npd-row { border-top: 1px solid var(--line-2); }
+.npd-date { color: var(--ink); font-weight: 600; }
+/* a fieldwork end standing in for a publication date nobody recorded – marked
+   the same dashed way the archive table marks the same substitution */
+.npd-date.est { font-weight: 500; color: var(--ink-3);
+  border-bottom: 1px dashed var(--line-2); }
+.npd-time { color: var(--ink-3); }
+.npd-gap { margin-left: auto; color: var(--ink-3); white-space: nowrap; }
+.npd-foot { margin: 8px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ink-3); max-width: 62ch; }
+@media (prefers-reduced-motion: reduce) { .np-detail { animation: none; } }
 .np-date { font-family: var(--sans); font-size: 14.5px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* the hour reads as part of the date, one step quieter than it */
 .np-time { color: var(--ink-2); }
@@ -2224,6 +2278,16 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   .np-when { grid-column: 2; text-align: right; }
   .np-date { grid-column: 1; }
   .np-cadence { grid-column: 1 / -1; }
+  .np-detail { padding: 0 10px 10px 26px; }
+  /* the hour drops under the date rather than squeezing three columns into a
+     phone's width, and the interval keeps the right-hand edge across both
+     lines. Placed by AREA, not by auto-flow: two children carrying a column
+     hint and a third carrying margin-left:auto put the date on the right and
+     the hour on a line of its own. */
+  .npd-row { grid-template-columns: 1fr auto; grid-template-areas: "date gap" "time gap"; row-gap: 1px; }
+  .npd-date { grid-area: date; }
+  .npd-time { grid-area: time; }
+  .npd-gap { grid-area: gap; align-self: center; }
 }
 
 /* ---------- Poll disagreement (variance) panel ---------- */
@@ -2412,7 +2476,7 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
   .acc-dot, .acc-mean { transition: none; }
-  .roll-reel { transition: none; }
+  .roll-reel, .net { transition: none; }
 }
 
 /* The theme flip crossfades as ONE composited picture – see applyChrome() in
@@ -2967,7 +3031,7 @@ window.AUSPOL = (function () {
   /* Measured publication rhythm per house – drives "Next expected polls".
      The dates themselves are computed in the browser against the real current
      date, so the panel stays honest as the page ages. */
-  const pollCadence = [{"pollster":"Roy Morgan","last":"2026-08-23","cadence":7,"loose":false,"spread":1,"lag":1,"lagMeasured":39,"releaseFrom":990,"releaseTo":990,"releaseMid":990,"releaseTimed":0,"releaseMins":990,"releaseDow":1,"releaseDowN":0,"declared":["day","hour"],"waves":43},{"pollster":"YouGov","last":"2026-08-24","cadence":14,"loose":false,"spread":1,"lag":1,"lagMeasured":8,"releaseFrom":300,"releaseTo":360,"releaseMid":300,"releaseTimed":6,"releaseMins":300,"releaseDow":3,"releaseDowN":7,"declared":[],"waves":21},{"pollster":"Newspoll","last":"2026-08-07","cadence":21,"loose":false,"spread":5,"lag":3,"lagMeasured":9,"releaseFrom":1140,"releaseTo":1260,"releaseMid":1200,"releaseTimed":9,"releaseMins":1200,"releaseDow":0,"releaseDowN":9,"declared":[],"waves":16},{"pollster":"Resolve","last":"2026-08-15","cadence":28,"loose":false,"spread":4,"lag":1,"lagMeasured":9,"releaseFrom":1070,"releaseTo":1080,"releaseMid":1080,"releaseTimed":9,"releaseMins":1080,"releaseDow":0,"releaseDowN":9,"declared":[],"waves":15},{"pollster":"Essential","last":"2026-07-27","cadence":29.5,"loose":false,"spread":5,"lag":2,"lagMeasured":7,"releaseFrom":60,"releaseTo":276,"releaseMid":60,"releaseTimed":6,"releaseMins":60,"releaseDow":3,"releaseDowN":7,"declared":[],"waves":11},{"pollster":"DemosAU","last":"2026-08-20","cadence":33,"loose":true,"spread":17,"lag":3.5,"lagMeasured":8,"releaseFrom":0,"releaseTo":1230,"releaseMid":412,"releaseTimed":8,"releaseMins":412,"releaseDow":null,"releaseDowN":0,"declared":[],"waves":9},{"pollster":"Spectre Strategy","last":"2026-07-23","cadence":139,"loose":false,"spread":18,"lag":1,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseMid":null,"releaseTimed":0,"releaseMins":null,"releaseDow":null,"releaseDowN":0,"declared":[],"waves":4}];
+  const pollCadence = [{"pollster":"Roy Morgan","last":"2026-08-23","cadence":7,"loose":false,"spread":1,"lag":1,"lagMeasured":39,"releaseFrom":990,"releaseTo":990,"releaseMid":990,"releaseTimed":0,"releaseMins":990,"releaseDow":1,"releaseDowN":0,"declared":["day","hour"],"waves":43,"site":"https://www.roymorgan.com/findings","recent":[{"field":"2026-07-26","pub":null,"mins":null,"gap":null},{"field":"2026-08-02","pub":null,"mins":null,"gap":7},{"field":"2026-08-09","pub":null,"mins":null,"gap":7},{"field":"2026-08-16","pub":null,"mins":null,"gap":7},{"field":"2026-08-23","pub":"2026-08-24","mins":null,"gap":7}],"gapsUsed":8},{"pollster":"YouGov","last":"2026-08-24","cadence":14,"loose":false,"spread":1,"lag":1,"lagMeasured":8,"releaseFrom":300,"releaseTo":360,"releaseMid":300,"releaseTimed":6,"releaseMins":300,"releaseDow":3,"releaseDowN":7,"declared":[],"waves":21,"site":"https://www.news24.com.au/politics/australian-politics","recent":[{"field":"2026-06-30","pub":"2026-07-01","mins":300,"gap":null},{"field":"2026-07-14","pub":"2026-07-15","mins":300,"gap":14},{"field":"2026-07-28","pub":"2026-07-29","mins":300,"gap":14},{"field":"2026-08-10","pub":"2026-08-11","mins":null,"gap":13},{"field":"2026-08-24","pub":"2026-08-26","mins":null,"gap":14}],"gapsUsed":8},{"pollster":"Newspoll","last":"2026-08-07","cadence":21,"loose":false,"spread":5,"lag":3,"lagMeasured":9,"releaseFrom":1140,"releaseTo":1260,"releaseMid":1200,"releaseTimed":9,"releaseMins":1200,"releaseDow":0,"releaseDowN":9,"declared":[],"waves":16,"site":"https://www.theaustralian.com.au/topics/newspoll?eafs_enabled=false","recent":[{"field":"2026-05-17","pub":"2026-05-17","mins":1260,"gap":null},{"field":"2026-06-04","pub":"2026-06-07","mins":1200,"gap":18},{"field":"2026-06-25","pub":"2026-06-28","mins":1200,"gap":21},{"field":"2026-07-16","pub":"2026-07-19","mins":1200,"gap":21},{"field":"2026-08-07","pub":"2026-08-09","mins":1200,"gap":22}],"gapsUsed":8},{"pollster":"Resolve","last":"2026-08-15","cadence":28,"loose":false,"spread":4,"lag":1,"lagMeasured":9,"releaseFrom":1070,"releaseTo":1080,"releaseMid":1080,"releaseTimed":9,"releaseMins":1080,"releaseDow":0,"releaseDowN":9,"declared":[],"waves":15,"site":"https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html","recent":[{"field":"2026-04-18","pub":"2026-04-19","mins":1080,"gap":null},{"field":"2026-05-16","pub":"2026-05-17","mins":1080,"gap":28},{"field":"2026-06-13","pub":"2026-06-14","mins":1080,"gap":28},{"field":"2026-07-11","pub":"2026-07-12","mins":1070,"gap":28},{"field":"2026-08-15","pub":"2026-08-16","mins":1079,"gap":35}],"gapsUsed":8},{"pollster":"Essential","last":"2026-07-27","cadence":29.5,"loose":false,"spread":5,"lag":2,"lagMeasured":7,"releaseFrom":60,"releaseTo":276,"releaseMid":60,"releaseTimed":6,"releaseMins":60,"releaseDow":3,"releaseDowN":7,"declared":[],"waves":11,"site":"https://essentialreport.com.au","recent":[{"field":"2026-03-23","pub":"2026-03-25","mins":null,"gap":null},{"field":"2026-04-27","pub":"2026-04-29","mins":60,"gap":35},{"field":"2026-05-24","pub":"2026-05-27","mins":60,"gap":27},{"field":"2026-06-29","pub":"2026-07-01","mins":276,"gap":36},{"field":"2026-07-27","pub":"2026-07-29","mins":60,"gap":28}],"gapsUsed":8},{"pollster":"DemosAU","last":"2026-08-20","cadence":33,"loose":true,"spread":17,"lag":3.5,"lagMeasured":8,"releaseFrom":0,"releaseTo":1230,"releaseMid":412,"releaseTimed":8,"releaseMins":412,"releaseDow":null,"releaseDowN":0,"declared":[],"waves":9,"site":"https://demosau.com/methodology-statements/","recent":[{"field":"2026-04-14","pub":"2026-04-17","mins":300,"gap":null},{"field":"2026-05-20","pub":"2026-05-22","mins":300,"gap":36},{"field":"2026-06-18","pub":"2026-06-22","mins":530,"gap":29},{"field":"2026-07-08","pub":"2026-07-13","mins":524,"gap":20},{"field":"2026-08-20","pub":"2026-08-24","mins":531,"gap":43}],"gapsUsed":8},{"pollster":"Spectre Strategy","last":"2026-07-23","cadence":139,"loose":false,"spread":18,"lag":1,"lagMeasured":0,"releaseFrom":null,"releaseTo":null,"releaseMid":null,"releaseTimed":0,"releaseMins":null,"releaseDow":null,"releaseDowN":0,"declared":[],"waves":4,"site":null,"recent":[{"field":"2025-07-01","pub":null,"mins":null,"gap":null},{"field":"2025-11-17","pub":null,"mins":null,"gap":139},{"field":"2026-04-08","pub":null,"mins":null,"gap":142},{"field":"2026-07-23","pub":null,"mins":null,"gap":106}],"gapsUsed":3}];
   const cycles = CYCLE_DEFS.map((c) => ({
     year: c.year, gov: c.gov, opp: c.opp, pm: c.pm, lead: c.lead, oppLead: c.oppLead, current: c.current,
     eDate: c.eDate,
@@ -7995,6 +8059,35 @@ function clockLabel(mins) {
   const c = clockParts(mins);
   return `${c.num} ${c.ap}`;
 }
+/* AEST or AEDT, for the DATE in question. Every hour on this panel is the
+   publisher's own clock, and half the year that clock is an hour ahead of the
+   other half - so "8 pm" alone names two different moments depending on when
+   you read it. Resolved through Intl rather than by hardcoding the first
+   Sundays of October and April, so it keeps being right if the rule moves. */
+const EASTERN_TZ = (() => {
+  try {
+    return new Intl.DateTimeFormat("en-AU", {
+      timeZone: "Australia/Sydney",
+      timeZoneName: "short"
+    });
+  } catch (e) {
+    return null;
+  }
+})();
+function easternAbbr(ms) {
+  if (!EASTERN_TZ || ms == null || !isFinite(ms)) return "AEST";
+  try {
+    // dates here are UTC midnight; +2h lands at midday in Sydney on the same
+    // calendar day, which is the day whose offset is wanted
+    const z = EASTERN_TZ.formatToParts(new Date(ms + 2 * 3600000)).find(x => x.type === "timeZoneName");
+    return z && /^AE[SD]T$/.test(z.value) ? z.value : "AEST";
+  } catch (e) {
+    return "AEST";
+  }
+}
+// an hour with the clock it is read on, which is the only form of it that
+// names a moment rather than a habit
+const zoned = (label, ms) => label ? `${label} ${easternAbbr(ms)}` : label;
 /* A span is only worth printing while it IS the habit. YouGov has filed at 5am
    five times and 6am once, so "5-6 am" describes it. Essential has filed at 1am
    four times and 4:36am once, and "1-4:36 am" would let a single late morning
@@ -8046,6 +8139,11 @@ function NextPollsPanel() {
     D
   } = window.AP;
   const cad = D.pollCadence || [];
+  /* Which row is showing its working. A date arrived at by a median of
+     intervals is a claim, and the releases it was taken over are the evidence
+     for it - kept folded away because the panel's job is the answer, one
+     click from the reason. */
+  const [open, setOpen] = useState(null);
   if (!cad.length) return null;
 
   /* Every date in here comes from Date.parse("YYYY-MM-DD"), which is UTC
@@ -8189,6 +8287,12 @@ function NextPollsPanel() {
     return `${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
   };
   const when = n => n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`;
+  /* The releases list spans months and sometimes a new year, so unlike the
+     projection column it carries one. */
+  const fmtYear = iso => {
+    const d = new Date(iso + "T00:00:00Z");
+    return `${WD[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)} ${d.getUTCFullYear()}`;
+  };
   return /*#__PURE__*/React.createElement("section", {
     className: "card next-polls"
   }, /*#__PURE__*/React.createElement("div", {
@@ -8197,32 +8301,88 @@ function NextPollsPanel() {
     className: "card-title"
   }, "Next expected polls"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, "Projected from each house\u2019s recent publication intervals.")), /*#__PURE__*/React.createElement("ol", {
+  }, "Projected from each house\u2019s recent publication intervals \xB7 open a row for the releases behind it")), /*#__PURE__*/React.createElement("ol", {
     className: "np-list"
-  }, rows.map(r => /*#__PURE__*/React.createElement("li", {
-    className: "np-row" + (r.loose ? " np-loose" : ""),
-    key: r.pollster + "-" + r.release
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "np-firm"
-  }, r.pollster), /*#__PURE__*/React.createElement("span", {
-    className: "np-date"
-  }, r.loose
-  /* The ± IS the forecast here, so state it as the span it is
-     rather than as a day with a disclaimer bolted on. */ ? /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release - r.spread * DAY_MS), "\u2013", fmt(r.release + r.spread * DAY_MS)) : /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release), releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid) && /*#__PURE__*/React.createElement("span", {
-    className: "np-time"
-  }, ", ", releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid)), /*#__PURE__*/React.createElement("span", {
-    className: "np-pm"
-  }, spreadLabel(r)))), /*#__PURE__*/React.createElement("span", {
-    className: "np-when"
-  }, r.loose ? r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn) : when(r.inDays)), /*#__PURE__*/React.createElement("span", {
-    className: "np-cadence"
-  }, cadenceLabel(r.cadence), r.ahead === 0 && /*#__PURE__*/React.createElement(React.Fragment, null, " \xB7 ", r.waves, " waves"), r.missed > 0 && /*#__PURE__*/React.createElement("span", {
-    className: "np-missed"
-  }, " \xB7 ", r.missed, " not in this archive"), r.missed === 0 && r.slipFrom && /*#__PURE__*/React.createElement("span", {
-    className: "np-missed"
-  }, " \xB7 ", fmtDM(r.slipFrom), " slot passed"))))), /*#__PURE__*/React.createElement("p", {
+  }, rows.map(r => {
+    const key = r.pollster + "-" + r.release;
+    const isOpen = open === key;
+    const hour = releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid);
+    const recent = r.recent || [];
+    return /*#__PURE__*/React.createElement("li", {
+      className: "np-item" + (isOpen ? " open" : ""),
+      key: key
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "np-row" + (r.loose ? " np-loose" : "") + (isOpen ? " open" : ""),
+      onClick: () => setOpen(isOpen ? null : key)
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "np-firm"
+    }, /*#__PURE__*/React.createElement("button", {
+      className: "exp-btn" + (isOpen ? " open" : ""),
+      "aria-expanded": isOpen,
+      "aria-label": isOpen ? "Hide the releases this is projected from" : `The releases ${r.pollster} is projected from`
+    }, "\u25B8"), r.site ? /*#__PURE__*/React.createElement("a", {
+      className: "np-link",
+      href: r.site,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      onClick: e => e.stopPropagation(),
+      title: `Where ${r.pollster} publishes`
+    }, r.pollster, /*#__PURE__*/React.createElement("span", {
+      className: "plink-mark",
+      "aria-hidden": "true"
+    }, "\u2197")) : r.pollster), /*#__PURE__*/React.createElement("span", {
+      className: "np-date"
+    }, r.loose
+    /* The ± IS the forecast here, so state it as the span it is
+       rather than as a day with a disclaimer bolted on. */ ? /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release - r.spread * DAY_MS), "\u2013", fmt(r.release + r.spread * DAY_MS)) : /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release), hour && /*#__PURE__*/React.createElement("span", {
+      className: "np-time"
+    }, ", ", zoned(hour, r.release)), /*#__PURE__*/React.createElement("span", {
+      className: "np-pm"
+    }, spreadLabel(r)))), /*#__PURE__*/React.createElement("span", {
+      className: "np-when"
+    }, r.loose ? r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn) : when(r.inDays)), /*#__PURE__*/React.createElement("span", {
+      className: "np-cadence"
+    }, cadenceLabel(r.cadence), r.ahead === 0 && /*#__PURE__*/React.createElement(React.Fragment, null, " \xB7 ", r.waves, " waves"), r.missed > 0 && /*#__PURE__*/React.createElement("span", {
+      className: "np-missed"
+    }, " \xB7 ", r.missed, " not in this archive"), r.missed === 0 && r.slipFrom && /*#__PURE__*/React.createElement("span", {
+      className: "np-missed"
+    }, " \xB7 ", fmtDM(r.slipFrom), " slot passed"))), isOpen && /*#__PURE__*/React.createElement("div", {
+      className: "np-detail"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "npd-h"
+    }, "Last ", recent.length, " releases", r.site && /*#__PURE__*/React.createElement("a", {
+      className: "npd-site",
+      href: r.site,
+      target: "_blank",
+      rel: "noopener noreferrer",
+      onClick: e => e.stopPropagation()
+    }, (() => {
+      try {
+        return new URL(r.site).hostname.replace(/^www\./, "");
+      } catch (e) {
+        return "the house";
+      }
+    })(), /*#__PURE__*/React.createElement("span", {
+      className: "plink-mark",
+      "aria-hidden": "true"
+    }, "\u2197"))), /*#__PURE__*/React.createElement("ol", {
+      className: "npd-list"
+    }, [...recent].reverse().map(x => /*#__PURE__*/React.createElement("li", {
+      className: "npd-row",
+      key: x.field
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "npd-date" + (x.pub ? "" : " est"),
+      title: x.pub ? undefined : "No publication date recorded — this is the last day of fieldwork"
+    }, fmtYear(x.pub || x.field)), /*#__PURE__*/React.createElement("span", {
+      className: "npd-time"
+    }, x.mins != null ? zoned(clockLabel(x.mins), Date.parse(x.pub)) : "—"), /*#__PURE__*/React.createElement("span", {
+      className: "npd-gap"
+    }, x.gap != null ? `${x.gap} days` : "")))), /*#__PURE__*/React.createElement("p", {
+      className: "npd-foot"
+    }, "Median ", r.cadence, " days across the last ", r.gapsUsed, " intervals", r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : "", ", plus", " ", r.lagMeasured ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases` : "the field’s one-day publication lag", ".", r.releaseDow != null && ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`, r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`, (r.declared || []).length > 0 && ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`)));
+  })), /*#__PURE__*/React.createElement("p", {
     className: "np-foot"
-  }, "Each date is the house\u2019s median interval between fieldwork-end dates across its last eight waves, plus its publication lag, nudged onto the weekday it keeps. The \xB1 is half the range of those intervals with the longest and shortest set aside, widening for waves further out \u2014 in whole weeks for a house pinned to a weekday, since that is the only step its date can take, and dropped where the interval never reaches the day either side. Lag is measured from the publication dates recorded against each poll, or read from a release URL that carries one.", lagged[0] && (lagged.length === cad.length ? ` Every house here has enough of them to measure its own, ${lagged[0].pollster}’s ${spellNum(lagged[0].lag)}-day median off ${lagged[0].lagMeasured} releases.` : ` Most of these houses have enough of them to measure their own — ${lagged[0].pollster}’s ${spellNum(lagged[0].lag)}-day median comes off ${lagged[0].lagMeasured} releases — and the rest fall back to a day, which is the field’s.`), " ", "Where a house has been timed often enough the hour it files is shown too, in eastern time \u2014 the span its releases have covered where that is tight, and otherwise the hour it usually keeps, so one late morning doesn\u2019t speak for a house that is normally punctual. Weekday and hour are read off recent releases rather than the whole record, because a schedule is a current fact about a house and its first year is often a different house. A house whose interval is too variable to name a day gets the window its own record supports instead of being left out \u2014 DemosAU polls about monthly, but anywhere in a five-week span.", stated.length > 0 && ` ${stated.join(" and ")} ${stated.length > 1 ? "run" : "runs"} on a schedule stated by hand rather than measured, because the recorded releases don’t measure the one the house plainly keeps.`, " ", "A projection is a moment, not a date: once the hour passes it is spent, and the row moves on rather than naming a time that has already gone.", slipped && " Where only the latest slot has gone by and nothing else is missing, the next date is the next slot the house’s own schedule allows — a week on for a house pinned to a weekday — since a wave that hasn’t appeared may be late rather than published.", behind && " Where several have gone by, those waves are out but not yet in this archive, and the projection carries on at the house’s own interval.", " ", "Houses that have stopped publishing are omitted. \u201CToday\u201D is Sydney\u2019s. These are estimates, not announced dates."));
+  }, "Each date is the house\u2019s median interval between fieldwork-end dates across its last eight waves, plus its publication lag, nudged onto the weekday it keeps. The \xB1 is half the range of those intervals with the longest and shortest set aside, widening for waves further out \u2014 in whole weeks for a house pinned to a weekday, since that is the only step its date can take, and dropped where the interval never reaches the day either side. Lag is measured from the publication dates recorded against each poll, or read from a release URL that carries one.", lagged[0] && (lagged.length === cad.length ? ` Every house here has enough of them to measure its own, ${lagged[0].pollster}’s ${spellNum(lagged[0].lag)}-day median off ${lagged[0].lagMeasured} releases.` : ` Most of these houses have enough of them to measure their own — ${lagged[0].pollster}’s ${spellNum(lagged[0].lag)}-day median comes off ${lagged[0].lagMeasured} releases — and the rest fall back to a day, which is the field’s.`), " ", "Where a house has been timed often enough the hour it files is shown too \u2014 the span its releases have covered where that is tight, and otherwise the hour it usually keeps, so one late morning doesn\u2019t speak for a house that is normally punctual. Every hour here is the publisher\u2019s own clock and is labelled with it, AEDT through the summer and AEST the rest of the year, because the two are an hour apart and \u201C8 pm\u201D alone names both. Weekday and hour are read off recent releases rather than the whole record, because a schedule is a current fact about a house and its first year is often a different house. A house whose interval is too variable to name a day gets the window its own record supports instead of being left out \u2014 DemosAU polls about monthly, but anywhere in a five-week span.", stated.length > 0 && ` ${stated.join(" and ")} ${stated.length > 1 ? "run" : "runs"} on a schedule stated by hand rather than measured, because the recorded releases don’t measure the one the house plainly keeps.`, " ", "A projection is a moment, not a date: once the hour passes it is spent, and the row moves on rather than naming a time that has already gone.", slipped && " Where only the latest slot has gone by and nothing else is missing, the next date is the next slot the house’s own schedule allows — a week on for a house pinned to a weekday — since a wave that hasn’t appeared may be late rather than published.", behind && " Where several have gone by, those waves are out but not yet in this archive, and the projection carries on at the house’s own interval.", " ", "Opening a row lists that house\u2019s five most recent releases with the interval between each, and names the house\u2019s own release page, so the estimate can be checked against the thing it was taken from rather than taken on trust.", " ", "Houses that have stopped publishing are omitted. \u201CToday\u201D is Sydney\u2019s. These are estimates, not announced dates."));
 }
 function PollsterTable() {
   const {
@@ -12351,6 +12511,14 @@ function RollNum({
   style
 }) {
   const text = String(value);
+  /* Keyed by PLACE VALUE - distance from the right end - not by position from
+     the left. A figure that loses a character has every reel to the left of it
+     renumbered under an index key, so React sees a different element at each
+     slot and mounts a fresh one: Hanson going -6 -> 0 handed slot 0 a digit
+     where a minus sign had been, and the number that was meant to roll simply
+     appeared. From the right, the 6 and the 0 are both the units digit, they
+     are the same element, and it reels; the minus sign is what leaves. */
+  const n = text.length;
   return /*#__PURE__*/React.createElement("span", {
     className: "roll" + (className ? " " + className : ""),
     style: style
@@ -12361,7 +12529,7 @@ function RollNum({
     className: "sr-only"
   }, text), text.split("").map((ch, i) => /[0-9]/.test(ch) ? /*#__PURE__*/React.createElement("span", {
     className: "roll-d",
-    key: i,
+    key: n - 1 - i,
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("span", {
     className: "roll-reel",
@@ -12372,7 +12540,7 @@ function RollNum({
     key: d
   }, d)))) : /*#__PURE__*/React.createElement("span", {
     className: "roll-sep",
-    key: i,
+    key: n - 1 - i,
     "aria-hidden": "true"
   }, ch)));
 }
@@ -13215,7 +13383,7 @@ function ReportError() {
     className: "fb"
   }, /*#__PURE__*/React.createElement("p", {
     className: "fb-lede"
-  }, "Every figure here is transcribed from a pollster\u2019s published release, from Wikipedia, PollBludger, or another secondary source, and some of them may be wrong. If you have found one, found a missing poll, or have any other piece of feedback, please", " ", /*#__PURE__*/React.createElement("button", {
+  }, "Every figure here is transcribed from a pollster\u2019s published release, from Wikipedia, PollBludger, or another secondary source, and some of them may be wrong. If you have found an error, found a missing poll, or have any other piece of feedback, please", " ", /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "fb-link",
     onClick: () => setOpen(v => !v),
