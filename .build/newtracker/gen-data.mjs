@@ -1141,6 +1141,24 @@ function pubDateFromUrl(url) {
   return null;
 }
 
+/* Renames, for the SCHEDULE only. A house that changes its letterhead does not
+   change the day it files, and keeping the two names apart cost RedBridge its
+   place on the panel entirely: eleven waves under the old name went silent in
+   April, three under the new one fall short of the four-wave minimum, and a
+   house that has published every month for a year appeared nowhere.
+
+   Deliberately narrower than it looks. This merges publication RHYTHM across a
+   rename and nothing else - house effects, the archive table and the accuracy
+   panel all still key on the name each poll was published under, because those
+   are claims about method and merging them would assert a continuity this file
+   is in no position to assert. A press schedule is a fact about the shop, not
+   about the questionnaire.
+
+   Products, not just names, stay apart: the (MRP) variants are a different
+   piece of work on their own timetable and are not folded into the tracking
+   poll that shares their masthead. */
+const CAD_CANON = { "Redbridge": "RedBridge / Accent" };
+const cadFirm = (name) => CAD_CANON[name] || name;
 const lagSamples = {}, timeSamples = {}, dowSamples = {};
 for (const p of POLLS) {
   /* A RECORDED publication date beats one parsed out of a URL slug, and until
@@ -1158,13 +1176,13 @@ for (const p of POLLS) {
      frame, which is the only reason the lag stays a whole number of days. */
   const pub = pubRaw.slice(0, 10);
   const clock = /T(\d{2}):(\d{2})/.exec(pubRaw);
-  if (clock) (timeSamples[p.pollster] ||= []).push(+clock[1] * 60 + +clock[2]);
-  (dowSamples[p.pollster] ||= []).push(new Date(pub + "T00:00:00Z").getUTCDay());
+  if (clock) (timeSamples[cadFirm(p.pollster)] ||= []).push(+clock[1] * 60 + +clock[2]);
+  (dowSamples[cadFirm(p.pollster)] ||= []).push(new Date(pub + "T00:00:00Z").getUTCDay());
   const d = Math.round((Date.parse(pub) - Date.parse(p.date)) / 86400000);
   // a shared or rolling release URL (Roy Morgan covers 3 waves in one post,
   // Essential cites a report index) produces a nonsense gap – drop those
   if (d < 0 || d > 30) continue;
-  (lagSamples[p.pollster] ||= []).push(d);
+  (lagSamples[cadFirm(p.pollster)] ||= []).push(d);
 }
 
 /* One RELEASE per entry, not one row. Two Resolve rows carry the same
@@ -1176,7 +1194,7 @@ for (const p of POLLS) {
    the gap between the things it PUBLISHED. */
 const byHouse = {};
 for (const p of POLLS) {
-  const r = (byHouse[p.pollster] ||= []);
+  const r = (byHouse[cadFirm(p.pollster)] ||= []);
   const pub = (p.published || "").slice(0, 10) || null;
   /* the clock rides along with the date, because the panel now SHOWS the
      releases it projects from and an hour is half of what a release time is.
