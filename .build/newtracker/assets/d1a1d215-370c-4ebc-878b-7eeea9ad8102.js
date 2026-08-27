@@ -233,7 +233,7 @@ const CYC_EVENTS = {
     {
       date: "2014-05-13", short: "Hockey’s first budget",
       label: "Joe Hockey delivers the 2014 federal budget",
-      desc: "Treasurer Joe Hockey delivers the Abbott government’s first federal budget with deep cuts to health, education and welfare.",
+      desc: "Treasurer Joe Hockey delivers the Abbott government’s first federal budget with deep cuts to health, education, and welfare.",
       major: true,
     },
     {
