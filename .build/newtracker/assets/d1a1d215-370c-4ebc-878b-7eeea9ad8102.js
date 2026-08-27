@@ -603,7 +603,7 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll, shap
                     style={{ background: c.color }}></span>
               <span className="cyc-year">{c.year}</span>
               <span className="cyc-lead">{c.lead}</span>
-              {c.current && <span className="cyc-now">now</span>}
+              {c.current && <span className="cyc-now">Now</span>}
             </button>
           );
         })}
@@ -805,7 +805,7 @@ function AccuracyPanel() {
 
       <div className="acc-scale" aria-hidden="true">
         <span className="acc-scale-l" style={{ color: "var(--lnp)" }}>← Labor understated</span>
-        <span className="acc-scale-c">result</span>
+        <span className="acc-scale-c">Result</span>
         <span className="acc-scale-r" style={{ color: "var(--alp)" }}>Labor overstated →</span>
       </div>
 
@@ -878,7 +878,7 @@ function AccuracyPanel() {
             </div>
             <div className="acc-note">
               {c.n} house{c.n === 1 ? "" : "s"}
-              {c.sameSide && <span className="acc-flag" title="Every house missed the same way – the signature of an industry-wide problem rather than one firm's noise">all one way</span>}
+              {c.sameSide && <span className="acc-flag" title="Every house missed the same way – the signature of an industry-wide problem rather than one firm's noise">All one way</span>}
             </div>
           </div>
         ))}

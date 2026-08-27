@@ -646,7 +646,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               can measure about itself. */}
           <div className="hero-interval">
             <span className="hi-method">{adjusted ? "Weighted aggregate" : "Monthly average"}</span>
-            {!adjusted && <span className="eyebrow-warn">limited data</span>}
+            {!adjusted && <span className="eyebrow-warn">Limited data</span>}
             {unc && <span className="hi-range">± {unc.ci95.toFixed(1)} pts</span>}
             {unc && (
               <span className="hi-note">

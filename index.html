@@ -256,7 +256,7 @@ body {
   text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line-2);
   font-variant-numeric: tabular-nums;
 }
-.ss-table thead th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3); }
+.ss-table thead th { font-size: 11px; color: var(--ink-3); }
 .ss-table th[scope="row"], .ss-table thead th:first-child { text-align: left; font-weight: 600; }
 .ss-table td:nth-child(2) { text-align: left; }
 .ss-note { margin-top: 20px; font-size: 12.5px; color: var(--ink-3); }
@@ -407,8 +407,8 @@ body {
   letter-spacing: -0.01em; display: flex; align-items: baseline; justify-content: center; gap: 9px;
 }
 .dl-tag {
-  font-family: var(--sans); font-size: 9.5px; font-weight: 700; letter-spacing: 0.09em;
-  text-transform: uppercase; color: var(--ink-3); border: 1px solid var(--line);
+  font-family: var(--sans); font-size: 9.5px; font-weight: 700;
+  color: var(--ink-3); border: 1px solid var(--line);
   border-radius: 999px; padding: 2px 7px;
 }
 .dl-contest {
@@ -494,7 +494,7 @@ body {
 .head-right { display: flex; align-items: center; gap: 18px; }
 .head-meta { display: flex; align-items: center; gap: 18px; }
 .meta-item { display: flex; flex-direction: column; gap: 2px; }
-.meta-k { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); font-weight: 600; white-space: nowrap; }
+.meta-k { font-size: 11px; color: var(--ink-3); font-weight: 600; white-space: nowrap; }
 .meta-v { font-size: 14px; color: var(--ink); font-weight: 600; white-space: nowrap; }
 .fresh-dot {
   display: inline-block; vertical-align: middle; position: relative; top: -1px;
@@ -665,7 +665,7 @@ body {
 .tt-vs { font-style: italic; font-weight: 400; color: var(--ink-3); margin: 0 4px; }
 .tt-opt:not(.active) .tt-dots { opacity: 0.78; }
 .tt-caps .tt-opt {
-  font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+  font-size: 12px; font-weight: 600;
   color: var(--ink-3);
 }
 .tt-caps .tt-opt.active { color: var(--ink); font-weight: 700; }
@@ -766,7 +766,7 @@ body.dark .ci-band { opacity: 0.22; }
 /* the contests that are not on the chart, each carrying its own figure. A
    button, not a tab: pressing one makes it the headline and morphs the chart. */
 .hero-alt { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
-.ha-lab { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+.ha-lab { font-size: 10.5px; font-weight: 700;
   color: var(--ink-3); }
 .ha-chip { display: inline-flex; align-items: baseline; gap: 8px; cursor: pointer;
   background: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px;
@@ -898,7 +898,7 @@ body.dark .ci-band { opacity: 0.22; }
 .tip-evt .tip-title { white-space: normal; overflow-wrap: anywhere; }
 .tip-date {
   font-family: var(--sans); font-size: 11px; font-weight: 600;
-  letter-spacing: 0.05em; text-transform: uppercase; color: var(--ink-3);
+  color: var(--ink-3);
   margin-top: 2px;
 }
 .tip-desc {
@@ -1213,7 +1213,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 
 /* ---------- national direction ---------- */
 .dir-net { display: flex; align-items: center; gap: 9px; }
-.dir-net-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--ink-3); font-weight: 700; }
+.dir-net-label { font-size: 11px; color: var(--ink-3); font-weight: 700; }
 .dir-net-val { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .dir-net-val.pos { color: var(--mood-pos); }
 .dir-net-val.neg { color: var(--mood-neg); }
@@ -1234,8 +1234,8 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .table-wrap { overflow-x: auto; margin: 0 -4px; }
 .poll-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .poll-table th {
-  text-align: center; font-weight: 600; font-size: 11px; text-transform: uppercase;
-  letter-spacing: 0.05em; color: var(--ink-3); padding: 0 12px 10px;
+  text-align: center; font-weight: 600; font-size: 11px;
+  color: var(--ink-3); padding: 0 12px 10px;
   border-bottom: 1px solid var(--line); white-space: nowrap;
 }
 .poll-table th.ta-l, .poll-table td.ta-l { text-align: left; }
@@ -1336,7 +1336,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 
 .facet-flag {
   display: inline-block; font-size: 9.5px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3);
+  color: var(--ink-3);
   border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px;
   white-space: nowrap;
 }
@@ -1422,7 +1422,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 .pd-meta-i { white-space: nowrap; }
 .pd-meta-k {
-  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.06em;
+  font-size: 10.5px;
   color: var(--ink-3); font-weight: 700; margin-right: 5px;
 }
 .pd-grid {
@@ -1489,7 +1489,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-appr-alt .netv { margin-left: auto; font-size: 12.5px; opacity: 0.85; }
 .pd-wide { grid-column: 1 / -1; max-width: 520px; }
 .pd-k {
-  font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  font-size: 11px; font-weight: 700;
   color: var(--ink-3);
 }
 .pd-contests { display: flex; flex-direction: column; gap: 12px; }
@@ -1540,7 +1540,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   margin: 4px 0 2px; font-size: 11px; font-weight: 600;
   padding-left: calc(var(--acc-lab) + var(--acc-gap));
   padding-right: calc(var(--acc-err) + var(--acc-note) + var(--acc-gap) * 2);
-  letter-spacing: 0.04em; text-transform: uppercase; color: var(--ink-3); }
+  color: var(--ink-3); }
 .acc-scale-c { text-align: center; }
 .acc-scale-r { text-align: right; }
 .acc-rows { display: flex; flex-direction: column; gap: 2px; }
@@ -1584,11 +1584,11 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-variant-numeric: tabular-nums; }
 .acc-note { font-size: 11px; color: var(--ink-3); display: flex; gap: 6px; align-items: baseline;
   justify-content: flex-end; flex-wrap: wrap; }
-.acc-flag { font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; font-size: 9.5px;
+.acc-flag { font-weight: 700; font-size: 9.5px;
   color: var(--ink-2); border: 1px solid var(--line-2); border-radius: 3px; padding: 1px 4px; }
 .acc-firms { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
-.acc-firms-h { font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.06em; color: var(--ink-3); margin-bottom: 8px; }
+.acc-firms-h { font-size: 11px; font-weight: 700;
+  color: var(--ink-3); margin-bottom: 8px; }
 .acc-firms-grid { display: grid; gap: 8px 18px;
   grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); }
 .acc-firm { display: flex; flex-direction: column; gap: 1px; }
@@ -1652,12 +1652,10 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 
 .fb-row { display: grid; gap: 8px; }
 .fb-label {
-  font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--ink-3);
+  font-size: 11px; font-weight: 600; color: var(--ink-3);
 }
-/* the parenthetical half of a label is prose, not a heading – it drops the
-   caps treatment so the label above the field stays one short token */
-.fb-label span { text-transform: none; letter-spacing: 0; font-weight: 400; }
+/* the parenthetical half of a label is prose, not a heading */
+.fb-label span { font-weight: 400; }
 
 .fb-chips { display: flex; flex-wrap: wrap; gap: 7px; }
 .fb-chip {
@@ -1947,8 +1945,8 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 .cyc-export { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 .cyc-export .ap-export { margin-left: 0; }
 .cyc-export-label {
-  font-family: var(--sans); font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--ink-3); margin-right: 2px;
+  font-family: var(--sans); font-size: 11px; font-weight: 700;
+  color: var(--ink-3); margin-right: 2px;
 }
 @media (max-width: 1000px) { .cyc-export { display: none; } }
 
@@ -1985,7 +1983,7 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
 .cyc-chip.current:hover .cyc-swatch,
 .cyc-chip:hover .cyc-swatch { transform: scale(1.18); }
 .cyc-now {
-  font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.07em;
+  font-size: 10px; font-weight: 800;
   color: var(--cyc-text, var(--cyc)); border: 1px solid color-mix(in oklch, var(--cyc) 40%, var(--line));
   border-radius: 4px; padding: 1px 5px;
   /* Its own ground, not the chip's. The chip tints its background 8% toward
@@ -2133,9 +2131,9 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-pop-head {
   display: flex; align-items: baseline; gap: 10px; padding: 6px 9px 7px;
   font-family: var(--sans); font-size: 10.5px; font-weight: 700;
-  text-transform: uppercase; letter-spacing: 0.06em; color: var(--ink-3);
+  color: var(--ink-3);
 }
-.ap-pop-head .ap-clear { margin-left: auto; text-transform: none; letter-spacing: 0; font-size: 12px; }
+.ap-pop-head .ap-clear { margin-left: auto; font-size: 12px; }
 .ap-pop-head.bordered { border-top: 1px solid var(--line-2); margin-top: 6px; padding-top: 12px; }
 .ap-poplist { max-height: 270px; overflow-y: auto; display: flex; flex-direction: column; }
 .ap-pop-foot { margin: 7px 9px 3px; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); }
@@ -2248,10 +2246,10 @@ a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--
 @keyframes np-open { from { opacity: 0; transform: translateY(-3px); } }
 .npd-h {
   display: flex; align-items: baseline; gap: 8px;
-  font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
+  font-size: 11px; font-weight: 700;
   color: var(--ink-3); padding-bottom: 5px; border-bottom: 1px solid var(--line);
 }
-.npd-site { margin-left: auto; text-transform: none; letter-spacing: 0; font-weight: 600;
+.npd-site { margin-left: auto; font-weight: 600;
   color: var(--ink-3); text-decoration: none; }
 .npd-site:hover { color: var(--ink-2); text-decoration: underline; text-underline-offset: 2px; }
 .npd-list { list-style: none; margin: 0; padding: 0; }
@@ -2269,7 +2267,7 @@ a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--
 .npd-list .npd-row + .npd-row { border-top: 1px solid var(--line-2); }
 /* the column heads: the quietest thing in the panel, since they are read once */
 .npd-cols { padding: 6px 0 3px; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); }
+  color: var(--ink-faint); }
 .npd-cols span:last-child { margin-left: auto; }
 /* the fieldwork end is what the interval beside it is measured between, so it
    leads; the publication date is the one carrying a weekday and an hour */
@@ -2368,8 +2366,8 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 }
 .vr-tile.off { opacity: 0.35; }
 .vr-name {
-  font-size: 11.5px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.06em; grid-column: 1 / -1;
+  font-size: 11.5px; font-weight: 700;
+  grid-column: 1 / -1;
 }
 .vr-sigma {
   font-family: var(--serif); font-size: 24px; font-weight: 540; color: var(--ink);
@@ -4828,7 +4826,7 @@ const __TWEAKS_STYLE = `
   .twk-lbl>span:first-child{font-weight:500}
   .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
 
-  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  .twk-sect{font-size:10px;font-weight:600;
     color:rgba(41,38,27,.45);padding:10px 0 0}
   .twk-sect:first-child{padding-top:0}
 
@@ -8729,7 +8727,7 @@ function PollsterTable() {
     }, /*#__PURE__*/React.createElement(ShareBar, {
       segs: primarySegs(r),
       compact: true,
-      flag: "first preferences \xB7 no 2PP"
+      flag: "First preferences \xB7 no 2PP"
     })) : /*#__PURE__*/React.createElement("span", {
       className: "dash",
       title: "No two-party figure published with this poll"
@@ -9649,7 +9647,7 @@ function CycleLegend({
       className: "cyc-lead"
     }, c.lead), c.current && /*#__PURE__*/React.createElement("span", {
       className: "cyc-now"
-    }, "now"));
+    }, "Now"));
   })), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "cyc-showall",
@@ -9822,7 +9820,7 @@ function AccuracyPanel() {
     }
   }, "\u2190 Labor understated"), /*#__PURE__*/React.createElement("span", {
     className: "acc-scale-c"
-  }, "result"), /*#__PURE__*/React.createElement("span", {
+  }, "Result"), /*#__PURE__*/React.createElement("span", {
     className: "acc-scale-r",
     style: {
       color: "var(--alp)"
@@ -9941,7 +9939,7 @@ function AccuracyPanel() {
   }, c.n, " house", c.n === 1 ? "" : "s", c.sameSide && /*#__PURE__*/React.createElement("span", {
     className: "acc-flag",
     title: "Every house missed the same way \u2013 the signature of an industry-wide problem rather than one firm's noise"
-  }, "all one way"))))), /*#__PURE__*/React.createElement("p", {
+  }, "All one way"))))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
   }, "Big dots are the average of that election\u2019s final polls; small dots are the individual houses \u2013 hover one for its figure. Exit polls are excluded, and a house that publishes an undecided-inclusive pair is normalised first, so its arithmetic isn\u2019t scored as a miss.", bothWays && /*#__PURE__*/React.createElement(React.Fragment, null, " The two elections where every house missed the same way, ", oneSided.map(c => c.year).join(" and "), ",", " ", "missed in ", /*#__PURE__*/React.createElement("strong", null, "opposite directions"), " \u2013 so this is not a standing lean that today\u2019s figures could be corrected for. It is the size of the error, not its direction, that carries.")), /*#__PURE__*/React.createElement("div", {
     className: "acc-firms"
@@ -12278,7 +12276,7 @@ function DialStory({
     className: "dl-month"
   }, monthLabel, cur.election && /*#__PURE__*/React.createElement("span", {
     className: "dl-tag"
-  }, "election")), /*#__PURE__*/React.createElement("div", {
+  }, "Election")), /*#__PURE__*/React.createElement("div", {
     className: "dl-contest"
   }, /*#__PURE__*/React.createElement("span", {
     style: {
@@ -13230,7 +13228,7 @@ function Hero({
     className: "hi-method"
   }, adjusted ? "Weighted aggregate" : "Monthly average"), !adjusted && /*#__PURE__*/React.createElement("span", {
     className: "eyebrow-warn"
-  }, "limited data"), unc && /*#__PURE__*/React.createElement("span", {
+  }, "Limited data"), unc && /*#__PURE__*/React.createElement("span", {
     className: "hi-range"
   }, "\xB1 ", unc.ci95.toFixed(1), " pts"), unc && /*#__PURE__*/React.createElement("span", {
     className: "hi-note"

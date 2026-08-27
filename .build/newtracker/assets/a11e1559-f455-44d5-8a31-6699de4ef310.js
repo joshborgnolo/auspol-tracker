@@ -2633,7 +2633,7 @@ function PollsterTable() {
                           : primarySegs(r).length
                             ? <div className="tpp-fallback"
                                    title="This pollster published no two-party-preferred figure – showing first preferences instead">
-                                <ShareBar segs={primarySegs(r)} compact flag="first preferences · no 2PP" />
+                                <ShareBar segs={primarySegs(r)} compact flag="First preferences · no 2PP" />
                               </div>
                             : <span className="dash" title="No two-party figure published with this poll">—</span>}
                       </td>

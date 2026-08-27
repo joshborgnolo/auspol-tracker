@@ -88,7 +88,7 @@ const __TWEAKS_STYLE = `
   .twk-lbl>span:first-child{font-weight:500}
   .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
 
-  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  .twk-sect{font-size:10px;font-weight:600;
     color:rgba(41,38,27,.45);padding:10px 0 0}
   .twk-sect:first-child{padding-top:0}
 

@@ -490,7 +490,7 @@ function DialStory({ originRect, onClose }) {
           </svg>
 
           <figcaption className="dl-cap">
-            <div className="dl-month">{monthLabel}{cur.election && <span className="dl-tag">election</span>}</div>
+            <div className="dl-month">{monthLabel}{cur.election && <span className="dl-tag">Election</span>}</div>
             <div className="dl-contest">
               <span style={{ color: "var(--alp-text)" }}>Labor {cur.lab.toFixed(1)}</span>
               <span className="dl-v">v</span>
