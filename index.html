@@ -2310,7 +2310,12 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 @media (max-width: 720px) {
   .np-row { grid-template-columns: 1fr auto; row-gap: 3px; padding: 10px; }
   .np-firm { grid-column: 1; }
-  .np-when { grid-column: 2; text-align: right; }
+  /* the "when" text must be allowed to fold under itself rather than hold
+     its line: on a 360px phone "in 3 days (or yesterday)" nowrap, beside a
+     date that is also nowrap, forces the row's minimum past the row's width
+     and the overdue text butts against the screen's right edge. The column
+     still hugs the right, so where the full line fits nothing changes. */
+  .np-when { grid-column: 2; text-align: right; white-space: normal; }
   .np-date { grid-column: 1; }
   .np-cadence { grid-column: 1 / -1; }
   .np-detail { padding: 0 10px 10px 26px; }
