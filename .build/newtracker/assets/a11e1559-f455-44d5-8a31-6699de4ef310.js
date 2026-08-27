@@ -1923,29 +1923,6 @@ function PollDetail({ r }) {
   );
 }
 
-/* House effect cell. Distinct from the archive's "house lean", which is one
-   poll minus that month's aggregate; this is the pollster's SYSTEMATIC shrunk
-   mean deviation on a measure, constant across their polls – which is why it
-   belongs in Latest polls, where each house appears exactly once.
-   A firm with too few readings shows "—", never 0. */
-function HouseFx({ he, firm, pos, neg, unit = "pp" }) {
-  const h = he ? he[firm] : null;
-  if (!h) return <span className="dash" title="Too few polls from this house on this measure to estimate a lean">—</span>;
-  const flat = Math.abs(h.v) < 0.05;
-  const toward = h.v > 0 ? pos : neg;
-  return (
-    <span className={"hfx" + (flat ? " flat" : "")}
-          style={!flat && toward ? { color: inkOf(toward.color) } : null}
-          title={flat
-            ? `No measurable lean – sits on the cross-house consensus (from ${h.n} poll${h.n === 1 ? "" : "s"})`
-            : `Runs ${Math.abs(h.v).toFixed(1)}${unit} ${h.v > 0 ? "above" : "below"} the cross-house consensus`
-              + (toward ? `, i.e. leans ${toward.name}` : "") + ` – estimated from ${h.n} poll${h.n === 1 ? "" : "s"}, shrunk toward zero`}>
-      {flat ? "0.0" : (h.v > 0 ? "+" : "−") + Math.abs(h.v).toFixed(1)}
-      {toward && !flat && <span className="hfx-who">{toward.short}</span>}
-    </span>
-  );
-}
-
 /* ====================================================================
    NEXT EXPECTED POLLS
    Sits under Latest polls and answers the obvious next question: when does
@@ -2498,7 +2475,9 @@ function NextPollsPanel() {
 
 function PollsterTable() {
   const { D } = window.AP;
-  const HE = D.houseEffects || {};
+  // ledger look shared with the All-polls archive – its cell renderers are
+  // defined in the archive script and arrive on window once both assets load
+  const { ArchPublished, ArchLead, ArchApprCell, archLeadInfo } = window;
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({ key: "pubSort", dir: -1 });
   const [open, setOpen] = useState(null);
@@ -2508,14 +2487,16 @@ function PollsterTable() {
 
   const getVal = (r, key) => {
     switch (key) {
+      case "pollster": return r.pollster;
       case "released": return r.released;
       // publication date where the source gave one, fieldwork end where it
       // didn't – the same value the column displays, so the order matches it
       case "pubSort": return r.pubSort;
       case "sample": return r.sample ?? -Infinity;
-      case "hfx.tpp": { const h = (HE.tpp || {})[r.pollster]; return h ? h.v : -Infinity; }
-      case "hfx.alb": { const h = ((HE.appr || {}).alb || {})[r.pollster]; return h ? h.v : -Infinity; }
-      case "alp2pp": return r.alp2pp ?? -Infinity;
+      case "alp": {
+        const li = archLeadInfo(r, "lnp");
+        return li ? li.m : -Infinity;
+      }
       case "p.alp": return r.p.alp ?? -Infinity;
       case "p.lnp": return r.p.lnp ?? -Infinity;
       case "p.grn": return r.p.grn ?? -Infinity;
@@ -2560,32 +2541,42 @@ function PollsterTable() {
           ariaLabel="Poll table view" caps />
       </div>
 
-      <div className="table-wrap">
-        <table className="poll-table faceted">
+      {/* ap-wrap keeps the wrapper's overflow visible so the archive-style
+          thead can pin to the viewport – overflow-x on table-wrap would
+          silently turn it into the sticky containing block */}
+      <div className="table-wrap ap-wrap">
+        <table className="poll-table archive">
+          <caption className="sr-only">
+            Latest poll from each active pollster, {(FACETS.find((f) => f.id === facet) || {}).label}
+            {" "}columns – {rows.length} pollsters
+          </caption>
           <thead>
             <tr>
               <th scope="col" className="exp-col" aria-hidden="true"></th>
-              <th scope="col" className="ta-l">Pollster</th>
+              <SortTh label="Pollster" sortKey="pollster" sort={sort} onSort={onSort} className="ta-l" />
               <SortTh label="Published" sortKey="pubSort" sort={sort} onSort={onSort} className="ta-l" />
-              <th scope="col" className="ta-l">Field dates</th>
-              <SortTh label="Sample" sortKey="sample" sort={sort} onSort={onSort} />
+              <SortTh label="Fieldwork" short="Field" sortKey="released" sort={sort} onSort={onSort} className="ta-l" />
+              <SortTh label="Sample" sortKey="sample" sort={sort} onSort={onSort} className="hide-md" />
 
               {facet === "twopp" && (<>
-                <SortTh label="Two-party preferred" sortKey="alp2pp" sort={sort} onSort={onSort} className="share-col ta-l" />
-                <SortTh label="House effect" short="H/fx" sortKey="hfx.tpp" sort={sort} onSort={onSort} />
+                <th scope="col" className="ta-l apub-col hide-md"
+                    title="What the pollster published – a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
+                <SortTh label="Lead · ALP v L/NP" short="Lead" sortKey="alp" sort={sort} onSort={onSort} />
               </>)}
               {facet === "primary" && (<>
                 <SortTh label="ALP" sortKey="p.alp" sort={sort} onSort={onSort} />
                 <SortTh label="L/NP" sortKey="p.lnp" sort={sort} onSort={onSort} />
                 <SortTh label="GRN" sortKey="p.grn" sort={sort} onSort={onSort} />
                 <SortTh label="ON" sortKey="p.onp" sort={sort} onSort={onSort} />
-                <th scope="col">OTH</th>
+                <th scope="col" className="hide-md">OTH</th>
               </>)}
               {facet === "leadership" && (<>
-                <SortTh label="Preferred PM" sortKey="ppm.alb" sort={sort} onSort={onSort} className="share-col ta-l" />
-                <SortTh label="Alb net" sortKey="appr.albNet" sort={sort} onSort={onSort} />
-                <SortTh label="Taylor net" sortKey="appr.taylorNet" sort={sort} onSort={onSort} />
-                <SortTh label="Hanson net" sortKey="appr.hansonNet" sort={sort} onSort={onSort} />
+                <SortTh label="Preferred PM" sortKey="ppm.alb" sort={sort} onSort={onSort} className="ta-l two-pp-col hide-md" />
+                <SortTh label="Alb net" short="Alb" sortKey="appr.albNet" sort={sort} onSort={onSort} />
+                {/* the office, not the name – the column outlives any one
+                    opposition leader (matches the archive) */}
+                <SortTh label="Opp. ldr net" short="Opp" sortKey="appr.taylorNet" sort={sort} onSort={onSort} />
+                <SortTh label="Hanson net" short="Han" sortKey="appr.hansonNet" sort={sort} onSort={onSort} />
               </>)}
             </tr>
           </thead>
@@ -2608,8 +2599,7 @@ function PollsterTable() {
                     {/* The date the poll was PUBLISHED where the source says so.
                         Where it doesn't, this falls back to the last day of
                         fieldwork and marks itself as a fallback rather than
-                        quietly presenting one date as the other — which is what
-                        the column did for every row until now. */}
+                        quietly presenting one date as the other. */}
                     <td className="ta-l">
                       <span className={"released-pill" + (r.publishedLabel ? "" : " est")}
                             title={r.publishedLabel
@@ -2619,84 +2609,33 @@ function PollsterTable() {
                       </span>
                     </td>
                     <td className="ta-l muted">{r.field}</td>
-                    <td className="num muted">{r.sample != null ? r.sample.toLocaleString() : "—"}</td>
+                    <td className="num muted hide-md">{r.sample != null ? r.sample.toLocaleString() : "—"}</td>
 
                     {facet === "twopp" && (<>
-                      <td className="share-col">
-                        {/* Several houses (Newspoll, Resolve, the MRPs) publish no
-                            headline 2PP. Rather than spend the row's widest column
-                            on a dash, fall back to the first preferences they DID
-                            publish – flagged, because a primary-vote bar must never
-                            be mistaken for a two-party one. */}
-                        {tppContests(r)[0]
-                          ? <ShareBar segs={tppContests(r)[0].segs} compact flag={tppFlag(r)} />
-                          : primarySegs(r).length
-                            ? <div className="tpp-fallback"
-                                   title="This pollster published no two-party-preferred figure – showing first preferences instead">
-                                <ShareBar segs={primarySegs(r)} compact flag="First preferences · no 2PP" />
-                              </div>
-                            : <span className="dash" title="No two-party figure published with this poll">—</span>}
-                      </td>
-                      <td className="num">
-                        {/* sign maps to a party here, because the 2PP measure IS
-                            an ALP share – positive means it runs Labor-high.
-                            The column carries one row per matchup the house
-                            publishes, matching the 2PP cell beside it: a lean on
-                            ALP v L/NP says nothing about a lean on ALP v ON, so
-                            they are estimated and shown separately. */}
-                        <HouseFx he={HE.tpp} firm={r.pollster}
-                                 pos={{ name: "Labor", short: "ALP", color: PARTY_C.alp }}
-                                 neg={{ name: "the Coalition", short: "L/NP", color: PARTY_C.lnp }} />
-                        {(HE.alp_on || {})[r.pollster] && (
-                          <span className="hfx-sub">
-                            <span className="hfx-tag">v ON</span>
-                            <HouseFx he={HE.alp_on} firm={r.pollster}
-                                     pos={{ name: "Labor", short: "ALP", color: PARTY_C.alp }}
-                                     neg={{ name: "One Nation", short: "ON", color: PARTY_C.onp }} />
-                          </span>
-                        )}
-                      </td>
+                      <td className="ta-l apub-col hide-md"><ArchPublished p={r} /></td>
+                      <td className="num"><ArchLead p={r} measure="lnp" /></td>
                     </>)}
                     {facet === "primary" && (<>
-                      {/* each party's lean sits under its OWN figure – the effects
-                          are per party, so one column couldn't carry them without
-                          arbitrarily picking a party. Neutral ink: here the sign
-                          means "more/less of this party", already named by the
-                          column, so a colour would add nothing. */}
-                      {["alp", "lnp", "grn", "onp", "oth"].map((k) => (
-                        <td className={"num" + (k === "oth" ? " muted" : "")} key={k}
-                            style={k === "oth" ? null : { color: PARTY_C[k] }}>
-                          {r.p[k] ?? "—"}
-                          <span className="hfx-sub">
-                            <HouseFx he={(HE.primary || {})[k]} firm={r.pollster} />
-                          </span>
-                        </td>
-                      ))}
+                      <td className="num" style={{ color: "var(--alp-text)", fontWeight: 600 }}>{r.p.alp != null ? r.p.alp.toFixed(1) : "—"}</td>
+                      <td className="num" style={{ color: "var(--lnp-text)", fontWeight: 600 }}>{r.p.lnp != null ? r.p.lnp.toFixed(1) : "—"}</td>
+                      <td className="num" style={{ color: "var(--grn-text)" }}>{r.p.grn != null ? r.p.grn.toFixed(1) : "—"}</td>
+                      <td className="num" style={{ color: "var(--onp-text)" }}>{r.p.onp != null ? r.p.onp.toFixed(1) : "—"}</td>
+                      <td className="num muted hide-md">{r.p.oth != null ? r.p.oth.toFixed(1) : "—"}</td>
                     </>)}
                     {facet === "leadership" && (<>
-                      <td className="share-col">
+                      <td className="two-pp-col share-col hide-md">
                         {ppmContests(r).length === 0
                           ? <span className="dash" title="No preferred-PM question this wave">—</span>
                           : <ShareBar segs={ppmContestSegs(ppmContests(r)[0])} compact flag={ppmFlag(ppmContests(r))} />}
                       </td>
-                      {/* net ratings ARE debiased, so each carries its house effect.
-                          Preferred PM is not (its house effects are format
-                          artefacts, not lean) – see the footnote. */}
-                      {[["alb", "albNet", "alb"], ["taylor", "taylorNet", "opp"], ["hanson", "hansonNet", "han"]].map(([id, nk, hk]) => (
-                        <td className="num" key={id}>
-                          {r.appr[nk] == null
-                            ? <span className="dash" title="Not asked by this pollster">—</span>
-                            : <><NetVal v={r.appr[nk]} /><FavMark metric={r.appr.metricBy && r.appr.metricBy[id]} /></>}
-                          <span className="hfx-sub">
-                            <HouseFx he={(HE.appr || {})[hk]} firm={r.pollster} unit=" pts" />
-                          </span>
-                        </td>
-                      ))}
+                      <td className="num"><ArchApprCell s={r.appr.alb} net={r.appr.albNet} metric={r.appr.metricBy && r.appr.metricBy.alb} /></td>
+                      <td className="num"><ArchApprCell s={r.appr.taylor} net={r.appr.taylorNet} metric={r.appr.metricBy && r.appr.metricBy.taylor} /></td>
+                      <td className="num"><ArchApprCell s={r.appr.hanson} net={r.appr.hansonNet} metric={r.appr.metricBy && r.appr.metricBy.hanson} /></td>
                     </>)}
                   </tr>
                   {isOpen && (
                     <tr className="detail-row">
-                      {/* 5 base cols + facet cols (twopp gained a house-effect column) */}
+                      {/* 5 base cols + facet cols */}
                       <td colSpan={facet === "primary" ? 10 : facet === "leadership" ? 9 : 7}><PollDetail r={r} /></td>
                     </tr>
                   )}
@@ -2711,11 +2650,7 @@ function PollsterTable() {
         {" "}<strong>Published</strong> is the date the poll was released, taken from the source each row links
         to – not the last day of its fieldwork, which is the next column. A dashed date is a fallback: that
         poll’s publication date isn’t recorded, so the column shows its fieldwork end instead.
-        {" "}<strong>House effect</strong> is how far that pollster systematically sits from the cross-house
-        consensus on this measure – its own average lean across every poll it has published, shrunk toward
-        zero when it has published few. The aggregates subtract it. It is a property of the pollster, not of
-        this one poll, and it is measured separately for every measure.
-        {facet === "leadership" && " Preferred PM carries no house effect: the gaps between houses there track how many respondents each leaves uncommitted rather than which leader they favour, so a flat correction would shift the level without making the numbers comparable."}
+        {" "}Each house’s systematic lean (its house effect) now sits beside house lean in the All polls archive.
       </p>
     </section>
   );

@@ -1341,41 +1341,6 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   white-space: nowrap;
 }
 
-/* 2PP column falling back to first preferences. The bar keeps full-strength
-   colour (the data is good, just a different measure) at slightly reduced
-   opacity; the dashed flag carries the substitution. No leading rule – it read
-   as a stray grey sliver at the start of every bar. */
-.tpp-fallback .sbar { opacity: 0.82; }
-.tpp-fallback .facet-flag {
-  border-style: dashed; color: var(--ink-3);
-}
-
-/* ---------- House effect (systematic pollster lean) ---------- */
-.hfx {
-  font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px;
-  color: var(--ink-2); white-space: nowrap;
-}
-.hfx.flat { color: var(--ink-3); font-weight: 600; }
-/* which side the lean runs toward – smaller and quieter than the figure.
-   Quieter is carried by size, case and tracking, NOT by opacity: at 9.5px an
-   opacity of .75 dropped these party labels to ~3.2:1, and they name which
-   way a house leans, which is the whole point of the figure beside them. */
-.hfx-who {
-  margin-left: 3px; font-size: 9.5px; font-weight: 800; letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-/* the per-party / per-leader variant, tucked under the figure it modifies */
-.hfx-sub { display: block; margin-top: 1px; line-height: 1.2; }
-.hfx-sub .hfx { font-size: 10px; font-weight: 600; color: var(--ink-3); }
-.hfx-sub .dash { font-size: 10px; }
-/* names the matchup a secondary house effect belongs to, e.g. "v ON" */
-.hfx-tag {
-  font-size: 9px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
-  color: var(--ink-3); margin-right: 4px;
-}
-/* a secondary lean keeps its party tint but stays quieter than the headline one */
-.hfx-sub .hfx-who { font-size: 9px; }
-
 /* net / direction value */
 .netv { font-weight: 800; font-variant-numeric: tabular-nums; }
 .netv.pos { color: var(--mood-pos); }
@@ -2429,6 +2394,11 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   .poll-table.archive .pollster-cell { white-space: normal; }
 }
 body.editorial .poll-table.archive thead th { background: var(--bg); }
+/* the latest-polls ledger sits inside a card – when its header pins it must
+   paint the card surface, not the page, or the header flashes a different
+   paper colour against the card around it */
+.card .poll-table.archive thead th { background: var(--surface); }
+body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 .poll-table.archive td { padding-top: 11px; padding-bottom: 11px; }
 .two-pp-col { min-width: 180px; }
 .poll-table.archive td.two-pp-col { vertical-align: middle; }
@@ -2580,11 +2550,11 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
    wrongly took it for the whole range. (Not a font question - measured at 33px
    over with Public Sans and 29px with a humanist alternative.)
 
-   House lean is the one to drop. It is a derived comparison rather than
-   something the pollster published, the Snapshot tab carries house effects in
-   full, and the row detail here prints "House lean +0.3 vs aggregate" one tap
-   away - so nothing is actually lost, which is the same bargain .hide-md
-   already strikes. */
+   House lean (and its new neighbour House effect) is the one to drop. It is a
+   derived comparison rather than something the pollster published, and the
+   row detail here prints "House lean +0.3 vs aggregate" one tap away - so
+   nothing is actually lost, which is the same bargain .hide-md already
+   strikes. */
 @media (max-width: 430px) {
   .poll-table.archive .hide-sm { display: none; }
 }
@@ -7998,36 +7968,6 @@ function PollDetail({
   }))));
 }
 
-/* House effect cell. Distinct from the archive's "house lean", which is one
-   poll minus that month's aggregate; this is the pollster's SYSTEMATIC shrunk
-   mean deviation on a measure, constant across their polls – which is why it
-   belongs in Latest polls, where each house appears exactly once.
-   A firm with too few readings shows "—", never 0. */
-function HouseFx({
-  he,
-  firm,
-  pos,
-  neg,
-  unit = "pp"
-}) {
-  const h = he ? he[firm] : null;
-  if (!h) return /*#__PURE__*/React.createElement("span", {
-    className: "dash",
-    title: "Too few polls from this house on this measure to estimate a lean"
-  }, "\u2014");
-  const flat = Math.abs(h.v) < 0.05;
-  const toward = h.v > 0 ? pos : neg;
-  return /*#__PURE__*/React.createElement("span", {
-    className: "hfx" + (flat ? " flat" : ""),
-    style: !flat && toward ? {
-      color: inkOf(toward.color)
-    } : null,
-    title: flat ? `No measurable lean – sits on the cross-house consensus (from ${h.n} poll${h.n === 1 ? "" : "s"})` : `Runs ${Math.abs(h.v).toFixed(1)}${unit} ${h.v > 0 ? "above" : "below"} the cross-house consensus` + (toward ? `, i.e. leans ${toward.name}` : "") + ` – estimated from ${h.n} poll${h.n === 1 ? "" : "s"}, shrunk toward zero`
-  }, flat ? "0.0" : (h.v > 0 ? "+" : "−") + Math.abs(h.v).toFixed(1), toward && !flat && /*#__PURE__*/React.createElement("span", {
-    className: "hfx-who"
-  }, toward.short));
-}
-
 /* ====================================================================
    NEXT EXPECTED POLLS
    Sits under Latest polls and answers the obvious next question: when does
@@ -8510,7 +8450,14 @@ function PollsterTable() {
   const {
     D
   } = window.AP;
-  const HE = D.houseEffects || {};
+  // ledger look shared with the All-polls archive – its cell renderers are
+  // defined in the archive script and arrive on window once both assets load
+  const {
+    ArchPublished,
+    ArchLead,
+    ArchApprCell,
+    archLeadInfo
+  } = window;
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({
     key: "pubSort",
@@ -8526,6 +8473,8 @@ function PollsterTable() {
   });
   const getVal = (r, key) => {
     switch (key) {
+      case "pollster":
+        return r.pollster;
       case "released":
         return r.released;
       // publication date where the source gave one, fieldwork end where it
@@ -8534,18 +8483,11 @@ function PollsterTable() {
         return r.pubSort;
       case "sample":
         return r.sample ?? -Infinity;
-      case "hfx.tpp":
+      case "alp":
         {
-          const h = (HE.tpp || {})[r.pollster];
-          return h ? h.v : -Infinity;
+          const li = archLeadInfo(r, "lnp");
+          return li ? li.m : -Infinity;
         }
-      case "hfx.alb":
-        {
-          const h = ((HE.appr || {}).alb || {})[r.pollster];
-          return h ? h.v : -Infinity;
-        }
-      case "alp2pp":
-        return r.alp2pp ?? -Infinity;
       case "p.alp":
         return r.p.alp ?? -Infinity;
       case "p.lnp":
@@ -8607,40 +8549,48 @@ function PollsterTable() {
     ariaLabel: "Poll table view",
     caps: true
   })), /*#__PURE__*/React.createElement("div", {
-    className: "table-wrap"
+    className: "table-wrap ap-wrap"
   }, /*#__PURE__*/React.createElement("table", {
-    className: "poll-table faceted"
-  }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
+    className: "poll-table archive"
+  }, /*#__PURE__*/React.createElement("caption", {
+    className: "sr-only"
+  }, "Latest poll from each active pollster, ", (FACETS.find(f => f.id === facet) || {}).label, " ", "columns \u2013 ", rows.length, " pollsters"), /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
     scope: "col",
     className: "exp-col",
     "aria-hidden": "true"
-  }), /*#__PURE__*/React.createElement("th", {
-    scope: "col",
+  }), /*#__PURE__*/React.createElement(SortTh, {
+    label: "Pollster",
+    sortKey: "pollster",
+    sort: sort,
+    onSort: onSort,
     className: "ta-l"
-  }, "Pollster"), /*#__PURE__*/React.createElement(SortTh, {
+  }), /*#__PURE__*/React.createElement(SortTh, {
     label: "Published",
     sortKey: "pubSort",
     sort: sort,
     onSort: onSort,
     className: "ta-l"
-  }), /*#__PURE__*/React.createElement("th", {
-    scope: "col",
+  }), /*#__PURE__*/React.createElement(SortTh, {
+    label: "Fieldwork",
+    short: "Field",
+    sortKey: "released",
+    sort: sort,
+    onSort: onSort,
     className: "ta-l"
-  }, "Field dates"), /*#__PURE__*/React.createElement(SortTh, {
+  }), /*#__PURE__*/React.createElement(SortTh, {
     label: "Sample",
     sortKey: "sample",
     sort: sort,
-    onSort: onSort
-  }), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SortTh, {
-    label: "Two-party preferred",
-    sortKey: "alp2pp",
-    sort: sort,
     onSort: onSort,
-    className: "share-col ta-l"
-  }), /*#__PURE__*/React.createElement(SortTh, {
-    label: "House effect",
-    short: "H/fx",
-    sortKey: "hfx.tpp",
+    className: "hide-md"
+  }), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("th", {
+    scope: "col",
+    className: "ta-l apub-col hide-md",
+    title: "What the pollster published \u2013 a conventional 2PP, a 3-cornered preferred, or extra matchups"
+  }, "As published"), /*#__PURE__*/React.createElement(SortTh, {
+    label: "Lead \xB7 ALP v L/NP",
+    short: "Lead",
+    sortKey: "alp",
     sort: sort,
     onSort: onSort
   })), facet === "primary" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SortTh, {
@@ -8664,25 +8614,29 @@ function PollsterTable() {
     sort: sort,
     onSort: onSort
   }), /*#__PURE__*/React.createElement("th", {
-    scope: "col"
+    scope: "col",
+    className: "hide-md"
   }, "OTH")), facet === "leadership" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(SortTh, {
     label: "Preferred PM",
     sortKey: "ppm.alb",
     sort: sort,
     onSort: onSort,
-    className: "share-col ta-l"
+    className: "ta-l two-pp-col hide-md"
   }), /*#__PURE__*/React.createElement(SortTh, {
     label: "Alb net",
+    short: "Alb",
     sortKey: "appr.albNet",
     sort: sort,
     onSort: onSort
   }), /*#__PURE__*/React.createElement(SortTh, {
-    label: "Taylor net",
+    label: "Opp. ldr net",
+    short: "Opp",
     sortKey: "appr.taylorNet",
     sort: sort,
     onSort: onSort
   }), /*#__PURE__*/React.createElement(SortTh, {
     label: "Hanson net",
+    short: "Han",
     sortKey: "appr.hansonNet",
     sort: sort,
     onSort: onSort
@@ -8714,68 +8668,42 @@ function PollsterTable() {
     }, r.publishedLabel || r.releasedLabel)), /*#__PURE__*/React.createElement("td", {
       className: "ta-l muted"
     }, r.field), /*#__PURE__*/React.createElement("td", {
-      className: "num muted"
+      className: "num muted hide-md"
     }, r.sample != null ? r.sample.toLocaleString() : "—"), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
-      className: "share-col"
-    }, tppContests(r)[0] ? /*#__PURE__*/React.createElement(ShareBar, {
-      segs: tppContests(r)[0].segs,
-      compact: true,
-      flag: tppFlag(r)
-    }) : primarySegs(r).length ? /*#__PURE__*/React.createElement("div", {
-      className: "tpp-fallback",
-      title: "This pollster published no two-party-preferred figure \u2013 showing first preferences instead"
-    }, /*#__PURE__*/React.createElement(ShareBar, {
-      segs: primarySegs(r),
-      compact: true,
-      flag: "First preferences \xB7 no 2PP"
-    })) : /*#__PURE__*/React.createElement("span", {
-      className: "dash",
-      title: "No two-party figure published with this poll"
-    }, "\u2014")), /*#__PURE__*/React.createElement("td", {
+      className: "ta-l apub-col hide-md"
+    }, /*#__PURE__*/React.createElement(ArchPublished, {
+      p: r
+    })), /*#__PURE__*/React.createElement("td", {
       className: "num"
-    }, /*#__PURE__*/React.createElement(HouseFx, {
-      he: HE.tpp,
-      firm: r.pollster,
-      pos: {
-        name: "Labor",
-        short: "ALP",
-        color: PARTY_C.alp
-      },
-      neg: {
-        name: "the Coalition",
-        short: "L/NP",
-        color: PARTY_C.lnp
+    }, /*#__PURE__*/React.createElement(ArchLead, {
+      p: r,
+      measure: "lnp"
+    }))), facet === "primary" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
+      className: "num",
+      style: {
+        color: "var(--alp-text)",
+        fontWeight: 600
       }
-    }), (HE.alp_on || {})[r.pollster] && /*#__PURE__*/React.createElement("span", {
-      className: "hfx-sub"
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "hfx-tag"
-    }, "v ON"), /*#__PURE__*/React.createElement(HouseFx, {
-      he: HE.alp_on,
-      firm: r.pollster,
-      pos: {
-        name: "Labor",
-        short: "ALP",
-        color: PARTY_C.alp
-      },
-      neg: {
-        name: "One Nation",
-        short: "ON",
-        color: PARTY_C.onp
+    }, r.p.alp != null ? r.p.alp.toFixed(1) : "—"), /*#__PURE__*/React.createElement("td", {
+      className: "num",
+      style: {
+        color: "var(--lnp-text)",
+        fontWeight: 600
       }
-    })))), facet === "primary" && /*#__PURE__*/React.createElement(React.Fragment, null, ["alp", "lnp", "grn", "onp", "oth"].map(k => /*#__PURE__*/React.createElement("td", {
-      className: "num" + (k === "oth" ? " muted" : ""),
-      key: k,
-      style: k === "oth" ? null : {
-        color: PARTY_C[k]
+    }, r.p.lnp != null ? r.p.lnp.toFixed(1) : "—"), /*#__PURE__*/React.createElement("td", {
+      className: "num",
+      style: {
+        color: "var(--grn-text)"
       }
-    }, r.p[k] ?? "—", /*#__PURE__*/React.createElement("span", {
-      className: "hfx-sub"
-    }, /*#__PURE__*/React.createElement(HouseFx, {
-      he: (HE.primary || {})[k],
-      firm: r.pollster
-    }))))), facet === "leadership" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
-      className: "share-col"
+    }, r.p.grn != null ? r.p.grn.toFixed(1) : "—"), /*#__PURE__*/React.createElement("td", {
+      className: "num",
+      style: {
+        color: "var(--onp-text)"
+      }
+    }, r.p.onp != null ? r.p.onp.toFixed(1) : "—"), /*#__PURE__*/React.createElement("td", {
+      className: "num muted hide-md"
+    }, r.p.oth != null ? r.p.oth.toFixed(1) : "—")), facet === "leadership" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
+      className: "two-pp-col share-col hide-md"
     }, ppmContests(r).length === 0 ? /*#__PURE__*/React.createElement("span", {
       className: "dash",
       title: "No preferred-PM question this wave"
@@ -8783,23 +8711,25 @@ function PollsterTable() {
       segs: ppmContestSegs(ppmContests(r)[0]),
       compact: true,
       flag: ppmFlag(ppmContests(r))
-    })), [["alb", "albNet", "alb"], ["taylor", "taylorNet", "opp"], ["hanson", "hansonNet", "han"]].map(([id, nk, hk]) => /*#__PURE__*/React.createElement("td", {
-      className: "num",
-      key: id
-    }, r.appr[nk] == null ? /*#__PURE__*/React.createElement("span", {
-      className: "dash",
-      title: "Not asked by this pollster"
-    }, "\u2014") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(NetVal, {
-      v: r.appr[nk]
-    }), /*#__PURE__*/React.createElement(FavMark, {
-      metric: r.appr.metricBy && r.appr.metricBy[id]
-    })), /*#__PURE__*/React.createElement("span", {
-      className: "hfx-sub"
-    }, /*#__PURE__*/React.createElement(HouseFx, {
-      he: (HE.appr || {})[hk],
-      firm: r.pollster,
-      unit: " pts"
-    })))))), isOpen && /*#__PURE__*/React.createElement("tr", {
+    })), /*#__PURE__*/React.createElement("td", {
+      className: "num"
+    }, /*#__PURE__*/React.createElement(ArchApprCell, {
+      s: r.appr.alb,
+      net: r.appr.albNet,
+      metric: r.appr.metricBy && r.appr.metricBy.alb
+    })), /*#__PURE__*/React.createElement("td", {
+      className: "num"
+    }, /*#__PURE__*/React.createElement(ArchApprCell, {
+      s: r.appr.taylor,
+      net: r.appr.taylorNet,
+      metric: r.appr.metricBy && r.appr.metricBy.taylor
+    })), /*#__PURE__*/React.createElement("td", {
+      className: "num"
+    }, /*#__PURE__*/React.createElement(ArchApprCell, {
+      s: r.appr.hanson,
+      net: r.appr.hansonNet,
+      metric: r.appr.metricBy && r.appr.metricBy.hanson
+    })))), isOpen && /*#__PURE__*/React.createElement("tr", {
       className: "detail-row"
     }, /*#__PURE__*/React.createElement("td", {
       colSpan: facet === "primary" ? 10 : facet === "leadership" ? 9 : 7
@@ -8808,7 +8738,7 @@ function PollsterTable() {
     }))));
   })))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll to see its full breakdown \xB7 click a column heading to sort \xB7 \u201C\u2014\u201D means the pollster didn\u2019t ask that question.", " ", /*#__PURE__*/React.createElement("strong", null, "Published"), " is the date the poll was released, taken from the source each row links to \u2013 not the last day of its fieldwork, which is the next column. A dashed date is a fallback: that poll\u2019s publication date isn\u2019t recorded, so the column shows its fieldwork end instead.", " ", /*#__PURE__*/React.createElement("strong", null, "House effect"), " is how far that pollster systematically sits from the cross-house consensus on this measure \u2013 its own average lean across every poll it has published, shrunk toward zero when it has published few. The aggregates subtract it. It is a property of the pollster, not of this one poll, and it is measured separately for every measure.", facet === "leadership" && " Preferred PM carries no house effect: the gaps between houses there track how many respondents each leaves uncommitted rather than which leader they favour, so a flat correction would shift the level without making the numbers comparable."));
+  }, "Tap any poll to see its full breakdown \xB7 click a column heading to sort \xB7 \u201C\u2014\u201D means the pollster didn\u2019t ask that question.", " ", /*#__PURE__*/React.createElement("strong", null, "Published"), " is the date the poll was released, taken from the source each row links to \u2013 not the last day of its fieldwork, which is the next column. A dashed date is a fallback: that poll\u2019s publication date isn\u2019t recorded, so the column shows its fieldwork end instead.", " ", "Each house\u2019s systematic lean (its house effect) now sits beside house lean in the All polls archive."));
 }
 Object.assign(window, {
   UndecidedLine,
@@ -10238,9 +10168,12 @@ function archLeadInfo(p, measure) {
       note: ` over ${e[1][1]} on the published 3-cornered figures`
     };
   }
-  if (p.alp == null) return null; // no published 2PP this wave
-  // margin from the published pair (undecided-inclusive pairs don't sum 100)
-  const m = +(p.alp - (p.lnp != null ? p.lnp : 100 - p.alp)).toFixed(1);
+  if (p.alp == null && p.alp2pp == null) return null; // no published 2PP this wave
+  // margin from the published pair (undecided-inclusive pairs don't sum 100);
+  // latest-table rows name the same fields alp2pp/lnp2pp
+  const alp = p.alp2pp != null ? p.alp2pp : p.alp;
+  const lnp = p.lnp2pp != null ? p.lnp2pp : p.lnp;
+  const m = +(alp - (lnp != null ? lnp : 100 - alp)).toFixed(1);
   return {
     m,
     who: m >= 0 ? "alp" : "lnp",
@@ -10980,6 +10913,9 @@ function AllPollsView({
     // house lean uses the NORMALISED share (alpN) so undecided-inclusive
     // pairs compare fairly with the aggregate; null when no 2PP published
     const lean = p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null;
+    // house effect is fixed per pollster (built over the whole sample), so the
+    // same value rides on every row that pollster owns; null when unmeasured
+    const hfx = ((D.houseEffects || {}).tpp || {})[p.pollster] || null;
     // searchable haystack – everything a row knows, so the search box matches
     // fieldwork dates, samples, 2PP / primary / matchup figures, nets, flags
     const f1 = v => v != null ? v.toFixed(1) : null;
@@ -11005,6 +10941,7 @@ function AllPollsView({
       mo,
       fullDate,
       lean,
+      hfx,
       tags,
       hay: hay + " " + hay.replace(/–/g, "-") // hyphen typed in search matches the en dash
     };
@@ -11070,6 +11007,8 @@ function AllPollsView({
         }
       case "lean":
         return p.lean ?? -Infinity;
+      case "hfx":
+        return p.hfx ? p.hfx.v : -Infinity;
       case "p.alp":
         return p.p.alp;
       case "p.lnp":
@@ -11176,7 +11115,7 @@ function AllPollsView({
   // A flat, analysis-friendly schema (one row per poll), independent of the
   // active facet – so the download always carries every measure, for exactly
   // the rows the filters left on screen, in the order they're shown.
-  const CSV_COLS = [["Pollster", p => p.pollster], ["Fieldwork", p => p.field], ["Fieldwork end", p => p.released], ["Sample", p => p.sample], ["Primary ALP", p => p.p.alp], ["Primary L/NP", p => p.p.lnp], ["Primary GRN", p => p.p.grn], ["Primary ON", p => p.p.onp], ["Primary OTH", p => p.p.oth], ["2PP ALP", p => p.alp], ["2PP L/NP", p => p.lnp], ["ALP v ON", p => p.tppAlt ? p.tppAlt.alp : ""], ["L/NP v ON", p => p.tppAlt2 ? p.tppAlt2.lnp : ""], ["House lean", p => p.lean], ["PPM Albanese", p => {
+  const CSV_COLS = [["Pollster", p => p.pollster], ["Fieldwork", p => p.field], ["Fieldwork end", p => p.released], ["Sample", p => p.sample], ["Primary ALP", p => p.p.alp], ["Primary L/NP", p => p.p.lnp], ["Primary GRN", p => p.p.grn], ["Primary ON", p => p.p.onp], ["Primary OTH", p => p.p.oth], ["2PP ALP", p => p.alp], ["2PP L/NP", p => p.lnp], ["ALP v ON", p => p.tppAlt ? p.tppAlt.alp : ""], ["L/NP v ON", p => p.tppAlt2 ? p.tppAlt2.lnp : ""], ["House lean", p => p.lean], ["House effect", p => p.hfx ? p.hfx.v : ""], ["PPM Albanese", p => {
     const c = ppmContests(p)[0];
     return c ? c.alb ?? "" : "";
   }], ["PPM Opp. ldr", p => {
@@ -11432,6 +11371,13 @@ function AllPollsView({
     sort: sort,
     onSort: onSort,
     className: "hide-sm"
+  }), /*#__PURE__*/React.createElement(ArchSortTh, {
+    label: "House effect",
+    short: "H/fx",
+    k: "hfx",
+    sort: sort,
+    onSort: onSort,
+    className: "hide-sm"
   })), facet === "primary" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(ArchSortTh, {
     label: "ALP",
     k: "p.alp",
@@ -11510,7 +11456,7 @@ function AllPollsView({
     const rowId = p.pollster + "|" + p.released;
     const arrived = !!focus && focus.key === rowId;
     const isOpen = open === rowId;
-    const colCount = facet === "primary" ? 9 : facet === "leadership" ? 8 : facet === "direction" ? 8 : 7;
+    const colCount = facet === "primary" ? 9 : facet === "leadership" ? 8 : facet === "direction" ? 8 : 8;
     return /*#__PURE__*/React.createElement(React.Fragment, {
       key: rowId
     }, /*#__PURE__*/React.createElement("tr", {
@@ -11555,7 +11501,15 @@ function AllPollsView({
     }, "\u2014") : /*#__PURE__*/React.createElement("span", {
       className: "arch-lean " + (p.lean > 0.05 ? "alp" : p.lean < -0.05 ? "lnp" : "flat"),
       title: "Difference from the aggregate that month"
-    }, p.lean > 0 ? "+" : "", p.lean.toFixed(1)))), facet === "primary" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
+    }, p.lean > 0 ? "+" : "", p.lean.toFixed(1))), /*#__PURE__*/React.createElement("td", {
+      className: "num hide-sm"
+    }, p.hfx == null ? /*#__PURE__*/React.createElement("span", {
+      className: "dash",
+      title: "Not enough published polls to measure a house effect"
+    }, "\u2014") : /*#__PURE__*/React.createElement("span", {
+      className: "arch-lean " + (p.hfx.v > 0.05 ? "alp" : p.hfx.v < -0.05 ? "lnp" : "flat"),
+      title: `House effect: this pollster's 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus (n=${p.hfx.n})`
+    }, p.hfx.v > 0 ? "+" : "", p.hfx.v.toFixed(1)))), facet === "primary" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
       className: "num",
       style: {
         color: "var(--alp-text)",
@@ -11646,13 +11600,13 @@ function AllPollsView({
   }), sorted.length === 0 && /*#__PURE__*/React.createElement("tr", {
     className: "arch-empty"
   }, /*#__PURE__*/React.createElement("td", {
-    colSpan: facet === "primary" ? 9 : facet === "leadership" ? 8 : 7
+    colSpan: facet === "primary" ? 9 : facet === "leadership" ? 8 : 8
   }, "No polls match these filters. ", /*#__PURE__*/React.createElement("button", {
     className: "ap-clear",
     onClick: clearAll
   }, "Clear filters")))))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll for its full breakdown \xB7 dates are fieldwork windows (publication dates sit in the breakdown) \xB7 \u201Cas published\u201D lists each poll\u2019s headline figures exactly as the pollster released them \xB7 the lead bar shows the selected matchup where a pollster published it \xB7 \u201Chouse lean\u201D is the poll minus the aggregate for that month \xB7 \u201C\u2014\u201D means the pollster didn\u2019t publish that measure \xB7 search matches anything in a row \xB7 click any column heading to sort."), /*#__PURE__*/React.createElement(VariancePanel, {
+  }, "Tap any poll for its full breakdown \xB7 dates are fieldwork windows (publication dates sit in the breakdown) \xB7 \u201Cas published\u201D lists each poll\u2019s headline figures exactly as the pollster released them \xB7 the lead bar shows the selected matchup where a pollster published it \xB7 \u201Chouse lean\u201D is the poll minus the aggregate for that month \xB7 ", /*#__PURE__*/React.createElement("strong", null, "house effect"), " is how far that pollster systematically sits from the cross-house consensus on 2PP \u2013 its own average lean across every poll it has published, shrunk toward zero when it has published few; the aggregates subtract it, and it is a property of the pollster, not of this one poll \xB7 \u201C\u2014\u201D means the pollster didn\u2019t publish that measure \xB7 search matches anything in a row \xB7 click any column heading to sort."), /*#__PURE__*/React.createElement(VariancePanel, {
     facet: facet,
     rangeId: range
   }));
@@ -11660,7 +11614,14 @@ function AllPollsView({
 Object.assign(window, {
   Tabs,
   PastCyclesView,
-  AllPollsView
+  AllPollsView,
+  // shared cell renderers reused by the latest-polls table
+  ArchSortTh,
+  ArchPublished,
+  ArchLead,
+  ArchApprCell,
+  ArchDirCell,
+  archLeadInfo
 });</script>
   <script>/* auspol tracker – "wind the dial back": the masthead mark, replayed across the term.
 

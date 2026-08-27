@@ -1132,9 +1132,12 @@ function archLeadInfo(p, measure) {
     return { m: e[0][0] === "alp" ? margin : -margin, who: e[0][0], lab: e[0][1], color: e[0][3],
              note: ` over ${e[1][1]} on the published 3-cornered figures` };
   }
-  if (p.alp == null) return null;               // no published 2PP this wave
-  // margin from the published pair (undecided-inclusive pairs don't sum 100)
-  const m = +(p.alp - (p.lnp != null ? p.lnp : 100 - p.alp)).toFixed(1);
+  if (p.alp == null && p.alp2pp == null) return null;   // no published 2PP this wave
+  // margin from the published pair (undecided-inclusive pairs don't sum 100);
+  // latest-table rows name the same fields alp2pp/lnp2pp
+  const alp = p.alp2pp != null ? p.alp2pp : p.alp;
+  const lnp = p.lnp2pp != null ? p.lnp2pp : p.lnp;
+  const m = +(alp - (lnp != null ? lnp : 100 - alp)).toFixed(1);
   return { m, who: m >= 0 ? "alp" : "lnp", lab: m >= 0 ? "ALP" : "L/NP",
            color: m >= 0 ? "var(--alp)" : "var(--lnp)",
            note: " on the two-party ALP v L/NP measure" +
@@ -1604,6 +1607,9 @@ function AllPollsView({ focus, onBack, backLabel }) {
     // house lean uses the NORMALISED share (alpN) so undecided-inclusive
     // pairs compare fairly with the aggregate; null when no 2PP published
     const lean = p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null;
+    // house effect is fixed per pollster (built over the whole sample), so the
+    // same value rides on every row that pollster owns; null when unmeasured
+    const hfx = (((D.houseEffects || {}).tpp || {})[p.pollster]) || null;
     // searchable haystack – everything a row knows, so the search box matches
     // fieldwork dates, samples, 2PP / primary / matchup figures, nets, flags
     const f1 = (v) => (v != null ? v.toFixed(1) : null);
@@ -1631,7 +1637,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
     hayParts.push(...tags);   // so "fav", "ppm" etc. match in the search box too
     const hay = hayParts.join(" ").toLowerCase();
     return {
-      ...p, year: y, mo, fullDate, lean, tags,
+      ...p, year: y, mo, fullDate, lean, hfx, tags,
       hay: hay + " " + hay.replace(/–/g, "-"),   // hyphen typed in search matches the en dash
     };
   });
@@ -1692,6 +1698,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
         return li ? li.m : -Infinity;
       }
       case "lean": return p.lean ?? -Infinity;
+      case "hfx": return p.hfx ? p.hfx.v : -Infinity;
       case "p.alp": return p.p.alp;
       case "p.lnp": return p.p.lnp;
       case "p.grn": return p.p.grn;
@@ -1751,6 +1758,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
     ["ALP v ON", (p) => (p.tppAlt ? p.tppAlt.alp : "")],
     ["L/NP v ON", (p) => (p.tppAlt2 ? p.tppAlt2.lnp : "")],
     ["House lean", (p) => p.lean],
+    ["House effect", (p) => (p.hfx ? p.hfx.v : "")],
     ["PPM Albanese", (p) => { const c = ppmContests(p)[0]; return c ? c.alb ?? "" : ""; }],
     ["PPM Opp. ldr", (p) => { const c = ppmContests(p)[0]; return c ? (c.taylor ?? c.ley ?? "") : ""; }],
     ["PPM Hanson", (p) => { const c = ppmContests(p)[0]; return c ? (c.hanson ?? "") : ""; }],
@@ -1924,6 +1932,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
                 {/* hide-sm: the last column to go on a phone – see the .hide-sm
                     note in the stylesheet. The row detail carries "House lean". */}
                 <ArchSortTh label="House lean" short="Lean" k="lean" sort={sort} onSort={onSort} className="hide-sm" />
+                <ArchSortTh label="House effect" short="H/fx" k="hfx" sort={sort} onSort={onSort} className="hide-sm" />
               </>)}
               {facet === "primary" && (<>
                 <ArchSortTh label="ALP" k="p.alp" sort={sort} onSort={onSort} />
@@ -1958,7 +1967,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
               const rowId = p.pollster + "|" + p.released;
               const arrived = !!focus && focus.key === rowId;
               const isOpen = open === rowId;
-              const colCount = facet === "primary" ? 9 : facet === "leadership" ? 8 : facet === "direction" ? 8 : 7;
+              const colCount = facet === "primary" ? 9 : facet === "leadership" ? 8 : facet === "direction" ? 8 : 8;
               return (
                 <React.Fragment key={rowId}>
                 <tr className={"poll-row arch-row" + (isOpen ? " open" : "") + (arrived ? " arrived" : "")}
@@ -1991,6 +2000,14 @@ function AllPollsView({ focus, onBack, backLabel }) {
                       : <span className={"arch-lean " + (p.lean > 0.05 ? "alp" : p.lean < -0.05 ? "lnp" : "flat")}
                               title="Difference from the aggregate that month">
                           {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)}
+                        </span>}
+                  </td>
+                  <td className="num hide-sm">
+                    {p.hfx == null
+                      ? <span className="dash" title="Not enough published polls to measure a house effect">—</span>
+                      : <span className={"arch-lean " + (p.hfx.v > 0.05 ? "alp" : p.hfx.v < -0.05 ? "lnp" : "flat")}
+                              title={`House effect: this pollster's 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus (n=${p.hfx.n})`}>
+                          {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)}
                         </span>}
                   </td>
                   </>)}
@@ -2034,7 +2051,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
             })}
             {sorted.length === 0 && (
               <tr className="arch-empty">
-                <td colSpan={facet === "primary" ? 9 : facet === "leadership" ? 8 : 7}>
+                <td colSpan={facet === "primary" ? 9 : facet === "leadership" ? 8 : 8}>
                   No polls match these filters. <button className="ap-clear" onClick={clearAll}>Clear filters</button>
                 </td>
               </tr>
@@ -2046,7 +2063,10 @@ function AllPollsView({ focus, onBack, backLabel }) {
         Tap any poll for its full breakdown · dates are fieldwork windows (publication dates sit in the
         breakdown) · “as published” lists each poll’s headline figures exactly as the pollster released them ·
         the lead bar shows the selected matchup where a pollster published it · “house lean” is the poll minus
-        the aggregate for that month · “—” means the pollster didn’t publish that measure · search matches
+        the aggregate for that month · <strong>house effect</strong> is how far that pollster systematically
+        sits from the cross-house consensus on 2PP – its own average lean across every poll it has published,
+        shrunk toward zero when it has published few; the aggregates subtract it, and it is a property of the
+        pollster, not of this one poll · “—” means the pollster didn’t publish that measure · search matches
         anything in a row · click any column heading to sort.
       </p>
 
@@ -2055,4 +2075,6 @@ function AllPollsView({ focus, onBack, backLabel }) {
   );
 }
 
-Object.assign(window, { Tabs, PastCyclesView, AllPollsView });
+Object.assign(window, { Tabs, PastCyclesView, AllPollsView,
+  // shared cell renderers reused by the latest-polls table
+  ArchSortTh, ArchPublished, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo });

@@ -1494,41 +1494,6 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   white-space: nowrap;
 }
 
-/* 2PP column falling back to first preferences. The bar keeps full-strength
-   colour (the data is good, just a different measure) at slightly reduced
-   opacity; the dashed flag carries the substitution. No leading rule – it read
-   as a stray grey sliver at the start of every bar. */
-.tpp-fallback .sbar { opacity: 0.82; }
-.tpp-fallback .facet-flag {
-  border-style: dashed; color: var(--ink-3);
-}
-
-/* ---------- House effect (systematic pollster lean) ---------- */
-.hfx {
-  font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px;
-  color: var(--ink-2); white-space: nowrap;
-}
-.hfx.flat { color: var(--ink-3); font-weight: 600; }
-/* which side the lean runs toward – smaller and quieter than the figure.
-   Quieter is carried by size, case and tracking, NOT by opacity: at 9.5px an
-   opacity of .75 dropped these party labels to ~3.2:1, and they name which
-   way a house leans, which is the whole point of the figure beside them. */
-.hfx-who {
-  margin-left: 3px; font-size: 9.5px; font-weight: 800; letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-/* the per-party / per-leader variant, tucked under the figure it modifies */
-.hfx-sub { display: block; margin-top: 1px; line-height: 1.2; }
-.hfx-sub .hfx { font-size: 10px; font-weight: 600; color: var(--ink-3); }
-.hfx-sub .dash { font-size: 10px; }
-/* names the matchup a secondary house effect belongs to, e.g. "v ON" */
-.hfx-tag {
-  font-size: 9px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
-  color: var(--ink-3); margin-right: 4px;
-}
-/* a secondary lean keeps its party tint but stays quieter than the headline one */
-.hfx-sub .hfx-who { font-size: 9px; }
-
 /* net / direction value */
 .netv { font-weight: 800; font-variant-numeric: tabular-nums; }
 .netv.pos { color: var(--mood-pos); }
@@ -2582,6 +2547,11 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   .poll-table.archive .pollster-cell { white-space: normal; }
 }
 body.editorial .poll-table.archive thead th { background: var(--bg); }
+/* the latest-polls ledger sits inside a card – when its header pins it must
+   paint the card surface, not the page, or the header flashes a different
+   paper colour against the card around it */
+.card .poll-table.archive thead th { background: var(--surface); }
+body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 .poll-table.archive td { padding-top: 11px; padding-bottom: 11px; }
 .two-pp-col { min-width: 180px; }
 .poll-table.archive td.two-pp-col { vertical-align: middle; }
@@ -2733,11 +2703,11 @@ body.editorial .poll-table.archive thead th { background: var(--bg); }
    wrongly took it for the whole range. (Not a font question - measured at 33px
    over with Public Sans and 29px with a humanist alternative.)
 
-   House lean is the one to drop. It is a derived comparison rather than
-   something the pollster published, the Snapshot tab carries house effects in
-   full, and the row detail here prints "House lean +0.3 vs aggregate" one tap
-   away - so nothing is actually lost, which is the same bargain .hide-md
-   already strikes. */
+   House lean (and its new neighbour House effect) is the one to drop. It is a
+   derived comparison rather than something the pollster published, and the
+   row detail here prints "House lean +0.3 vs aggregate" one tap away - so
+   nothing is actually lost, which is the same bargain .hide-md already
+   strikes. */
 @media (max-width: 430px) {
   .poll-table.archive .hide-sm { display: none; }
 }
