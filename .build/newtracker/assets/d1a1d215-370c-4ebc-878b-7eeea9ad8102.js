@@ -258,6 +258,12 @@ const CYC_EVENTS = {
       major: true,
     },
     {
+      date: "2018-07-28", short: "Super Saturday by-elections",
+      label: "Super Saturday by-elections return every incumbent",
+      desc: "Five federal by-elections return every incumbent – Labor holds Braddon, Fremantle, Longman and Perth, and Centre Alliance holds Mayo, with the Coalition winning none.",
+      major: true,
+    },
+    {
       date: "2018-08-21", short: "Dutton challenges Turnbull",
       label: "Dutton mounts a leadership challenge",
       desc: "Home Affairs minister Peter Dutton challenges Malcolm Turnbull for the Liberal leadership, losing the spill 48 votes to 35.",
