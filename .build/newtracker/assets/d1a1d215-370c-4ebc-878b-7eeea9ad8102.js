@@ -237,6 +237,12 @@ const CYC_EVENTS = {
       desc: "To combat climate change, Gillard announced a plan to legislate for the introduction of a fixed price to be imposed on carbon pollution from 1 July 2012. The Clean Energy Act 2011 was enacted on 18 November.",
       major: true,
     },
+    {
+      date: "2013-06-27", short: "Gillard → Rudd",
+      label: "Rudd replaces Gillard as prime minister",
+      desc: "Kevin Rudd defeats Julia Gillard in a Labor leadership spill and is sworn in as prime minister.",
+      major: true,
+    },
   ],
   2013: [
     {
