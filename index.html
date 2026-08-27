@@ -888,7 +888,11 @@ body.dark .ci-band { opacity: 0.22; }
 /* the dot readout says what a click will do – an affordance nobody can see
    is not one, and the cursor alone only shows up once you are already on it */
 .tip-hint { margin-top: 5px; font-size: 11px; font-weight: 600; color: var(--accent); white-space: nowrap; }
-.tip-evt { max-width: 240px; min-width: 0; }
+/* width: max-content sizes the panel by its content alone. Shrink-to-fit
+   measures against the space right of the anchor (the centering translate is
+   invisible to layout), so the right-edge clamp squeezed the panel narrower
+   than every other event's; pinned, the clamp shifts it left at full width. */
+.tip-evt { width: max-content; max-width: 240px; min-width: 0; }
 /* A guide readout's title is a short label ("Dec 2025") that must not wrap, so
    .tip-title is nowrap. An EVENT's title is a sentence - "Angus Taylor becomes
    Liberal leader" - and nowrap made it run straight out of the 240px panel,
