@@ -669,7 +669,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               {/* A month-on-month move smaller than its own interval is not a
                   finding. Say so next to the arrow, not three scrolls down. */}
               {unc && unc.changeSig === false && (
-                <span className="hero-caveat"> · within the margin</span>
+                <span className="hero-caveat"> (within the margin)</span>
               )}
             </span>
           </div>

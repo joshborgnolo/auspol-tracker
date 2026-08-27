@@ -736,7 +736,7 @@ body {
 .hi-note { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
 /* Movement smaller than its own interval – stated, not colour-coded, so it
    reads as a qualification rather than a warning. */
-.hero-caveat { color: var(--ink-3); font-style: italic; }
+.hero-caveat { color: var(--ink-3); }
 .hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
@@ -13605,7 +13605,7 @@ function Hero({
     className: "hero-sub-note"
   }, m.real || altL && altL.aPrev != null ? "vs. one month ago" : "vs. previous reading", unc && unc.changeSig === false && /*#__PURE__*/React.createElement("span", {
     className: "hero-caveat"
-  }, " \xB7 within the margin"))), otherContests.length > 0 && /*#__PURE__*/React.createElement("div", {
+  }, " (within the margin)"))), otherContests.length > 0 && /*#__PURE__*/React.createElement("div", {
     className: "hero-alt"
   }, /*#__PURE__*/React.createElement("span", {
     className: "ha-lab"
