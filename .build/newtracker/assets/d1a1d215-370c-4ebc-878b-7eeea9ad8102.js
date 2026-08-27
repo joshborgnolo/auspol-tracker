@@ -1146,8 +1146,13 @@ function PastCyclesView() {
 
   const exportSeries = () => downloadCsv(
     `auspol-tracker-cycles-series-${D.latest.updatedISO}.csv`, cycleSeriesRows(cycles));
+  /* The source-polls file respects the chips: it is built from the terms on
+     the board, so a hidden term's polls stay out of the download just as
+     its line is out of the chart. (The row-fetch inside cycleSourceRows
+     already skips any term not in the list it is given.) The chart-series
+     file still carries every term – it is the page's reference data. */
   const exportSource = () => downloadCsv(
-    `auspol-tracker-cycles-source-polls-${D.latest.updatedISO}.csv`, cycleSourceRows(cycles, D));
+    `auspol-tracker-cycles-source-polls-${D.latest.updatedISO}.csv`, cycleSourceRows(shownCycles, D));
 
   return (
     <div className="view view-cycles">
@@ -1169,7 +1174,9 @@ function PastCyclesView() {
               <DownloadIcon />Chart series
             </button>
             <button className="ap-export" onClick={exportSource}
-              title="The individual polls the monthly averages are built from">
+              title={hidden.size
+                ? "The individual polls the monthly averages are built from – hidden terms left out, to match the board"
+                : "The individual polls the monthly averages are built from"}>
               <DownloadIcon />Source polls
             </button>
           </div>
@@ -1189,7 +1196,8 @@ function PastCyclesView() {
       <AccuracyPanel />
 
       <p className="cyc-foot">
-        The plotted series and the individual polls behind it are both downloadable above.{" "}
+        The plotted series and the individual polls behind it are both downloadable above
+        {hidden.size > 0 && ", the source file leaving the hidden terms out just as the charts do"}.{" "}
         Past cycles run the full ~3-year term to the next election; the current cycle stops at the
         latest reading.{" "}
         {showHan && (
