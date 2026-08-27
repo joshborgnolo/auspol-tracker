@@ -8883,33 +8883,36 @@ const DownloadIcon = () => /*#__PURE__*/React.createElement("svg", {
 // TabScore – compact 2PP readout docked at the right of the tab bar.
 // Appears once the bar pins to the viewport top, on EVERY tab – the
 // national score travels with you. Click = jump to the Snapshot hero.
+// The contest shown FOLLOWS the hero's 2PP switch (App owns that state and
+// hands it down): the same definitions and the same nowcast accessor as the
+// hero readout, so the two figures can never disagree.
 // ====================================================================
 function TabScore({
-  onGoHero
+  onGoHero,
+  matchup
 }) {
-  const {
-    D
-  } = window.AP;
-  const {
-    alp2pp,
-    lnp2pp
-  } = D.latest;
+  const MM = window.AP.tppMatchups;
+  // anything unrecognised (or a matchup with no current figure) falls back
+  // to the headline contest – the hero itself never offers one without data
+  const id = MM && MM[matchup] && window.AP.tppLatest(matchup) ? matchup : "alp_lnp";
+  const M = MM[id],
+    v = window.AP.tppLatest(id);
   return /*#__PURE__*/React.createElement("button", {
     className: "tab-score",
     onClick: onGoHero,
-    title: "Latest 2PP aggregate \u2013 go to Snapshot"
+    title: "Latest " + M.label + " two-party preferred – go to Snapshot"
   }, /*#__PURE__*/React.createElement("span", {
     className: "ts-eyebrow"
   }, "2PP"), /*#__PURE__*/React.createElement("span", {
     className: "ts-party"
   }, /*#__PURE__*/React.createElement("span", {
     className: "ts-abbr"
-  }, "ALP"), /*#__PURE__*/React.createElement("span", {
+  }, M.a.abbr), /*#__PURE__*/React.createElement("span", {
     className: "ts-num",
     style: {
-      color: "var(--alp-text)"
+      color: inkOf(M.a.color)
     }
-  }, alp2pp.toFixed(1))), /*#__PURE__*/React.createElement("span", {
+  }, v.a.toFixed(1))), /*#__PURE__*/React.createElement("span", {
     className: "ts-sep",
     "aria-hidden": "true"
   }), /*#__PURE__*/React.createElement("span", {
@@ -8917,11 +8920,11 @@ function TabScore({
   }, /*#__PURE__*/React.createElement("span", {
     className: "ts-num",
     style: {
-      color: "var(--lnp-text)"
+      color: inkOf(M.b.color)
     }
-  }, lnp2pp.toFixed(1)), /*#__PURE__*/React.createElement("span", {
+  }, v.b.toFixed(1)), /*#__PURE__*/React.createElement("span", {
     className: "ts-abbr"
-  }, "L/NP")));
+  }, M.b.abbr)));
 }
 
 // ====================================================================
@@ -8930,7 +8933,8 @@ function TabScore({
 function Tabs({
   tabs,
   active,
-  onChange
+  onChange,
+  tppMatchup
 }) {
   // Sticky on every view. Once pinned, a compact 2PP score docks into the
   // right side of the bar – the headline number stays visible on every tab.
@@ -9009,7 +9013,8 @@ function Tabs({
   }, t.label), t.note != null && /*#__PURE__*/React.createElement("span", {
     className: "tab-note"
   }, t.note)))), /*#__PURE__*/React.createElement(TabScore, {
-    onGoHero: goHero
+    onGoHero: goHero,
+    matchup: tppMatchup
   }))));
 }
 
@@ -12685,36 +12690,30 @@ function mixC(c1, c2, t) {
   if (t >= 1) return c2;
   return "color-mix(in oklch shorter hue, " + c1 + ", " + c2 + " " + (t * 100).toFixed(1) + "%)";
 }
-function Hero({
-  rangeId,
-  setRangeId,
-  showScatter = true
-}) {
-  const {
-    D,
-    rangeDomain,
-    filterPts,
-    buildXTicks,
-    series
-  } = window.AP;
-  const xDomain = rangeDomain(rangeId);
 
-  // matchup config – each is a mirrored head-to-head 2PP.
-  //   `real`    = the headline measure, which carries the weighted nowcast
-  //   `scatter` = per-poll accessor. EVERY matchup here is built from figures
-  //               pollsters actually published (the ALP v ON and L/NP v ON
-  //               head-to-heads come from altTppRaw and their aggregate line is
-  //               a mean of them), so all three plot their own readings – the
-  //               only difference is how many houses ask the question.
-  const MATCHUPS = {
+/* Two-party matchup config – each is a mirrored head-to-head 2PP.
+     `real`    = the headline measure, which carries the weighted nowcast
+     `scatter` = per-poll accessor. EVERY matchup here is built from figures
+                 pollsters actually published (the ALP v ON and L/NP v ON
+                 head-to-heads come from altTppRaw and their aggregate line is
+                 a mean of them), so all three plot their own readings – the
+                 only difference is how many houses ask the question.
+
+   At module scope, and on window.AP, so the tab bar's docked score can read
+   the same definitions and follow whichever matchup the hero is switched to. */
+const MATCHUPS = (() => {
+  const D = window.AUSPOL;
+  return {
     alp_lnp: {
       a: {
         name: "Labor",
-        color: "var(--alp)"
+        color: "var(--alp)",
+        abbr: "ALP"
       },
       b: {
         name: "Coalition",
-        color: "var(--lnp)"
+        color: "var(--lnp)",
+        abbr: "L/NP"
       },
       data: D.agg2pp.map(d => ({
         ym: d.ym,
@@ -12742,11 +12741,13 @@ function Hero({
     alp_on: {
       a: {
         name: "Labor",
-        color: "var(--alp)"
+        color: "var(--alp)",
+        abbr: "ALP"
       },
       b: {
         name: "One Nation",
-        color: "var(--onp)"
+        color: "var(--onp)",
+        abbr: "ON"
       },
       data: D.alt2pp.alp_on,
       real: false,
@@ -12767,11 +12768,13 @@ function Hero({
     lnp_on: {
       a: {
         name: "Coalition",
-        color: "var(--lnp)"
+        color: "var(--lnp)",
+        abbr: "L/NP"
       },
       b: {
         name: "One Nation",
-        color: "var(--onp)"
+        color: "var(--onp)",
+        abbr: "ON"
       },
       data: D.alt2pp.lnp_on,
       real: false,
@@ -12790,6 +12793,54 @@ function Hero({
       }]
     }
   };
+})();
+
+/* The current figure for ANY matchup, headline or not – one accessor, so the
+   hero readout, its switcher chips and the docked tab-bar score can never
+   disagree. The REAL ALP v L/NP measure reads the trailing recency- +
+   sample-weighted, house-effect-adjusted nowcast (D.latest) – NOT the last
+   monthly-mean dot. An alternative matchup gets a nowcast too WHERE the
+   series supports one (D.altLatest is null for a matchup too thin to
+   weight); otherwise its last monthly point. */
+function tppLatest(id) {
+  const D = window.AUSPOL,
+    M = MATCHUPS[id];
+  if (!M) return null;
+  if (M.real) return {
+    a: D.latest.alp2pp,
+    b: D.latest.lnp2pp,
+    ci95: D.latest.alp2ppCi95
+  };
+  const al = D.altLatest ? D.altLatest[M.altKey] : null;
+  if (al) return {
+    a: al.a,
+    b: al.b,
+    ci95: al.ci95
+  };
+  const last = M.data[M.data.length - 1];
+  return last ? {
+    a: last.a,
+    b: last.b,
+    ci95: null
+  } : null;
+}
+window.AP.tppMatchups = MATCHUPS;
+window.AP.tppLatest = tppLatest;
+function Hero({
+  rangeId,
+  setRangeId,
+  showScatter = true,
+  matchup,
+  setMatchup
+}) {
+  const {
+    D,
+    rangeDomain,
+    filterPts,
+    buildXTicks,
+    series
+  } = window.AP;
+  const xDomain = rangeDomain(rangeId);
 
   /* The REAL published measure (ALP v L/NP) always leads and is the default;
      the modelled head-to-heads follow, strongest challenger first.
@@ -12817,7 +12868,11 @@ function Hero({
     label: MATCHUPS[id].label,
     dots: MATCHUPS[id].dots
   }));
-  const [matchup, setMatchup] = useState(orderedMatchups[0]);
+
+  /* The selected matchup arrives as a prop: App owns it, so the docked
+     tab-bar score can follow it and it survives the Snapshot tab unmounting
+     this hero entirely. `matchup` / `setMatchup` are used below exactly as
+     the old local state was. */
   /* Switching matchup is a MORPH, not a swap. The same two lines reshape into
      the other pair, the rival's colour travels round the hue circle, the
      headline digits roll, and the two dot clouds cross over - so the second
@@ -12918,27 +12973,9 @@ function Hero({
   // its last monthly point, as before.
   /* The current figure for ANY matchup, headline or not – one accessor, so a
      chip below can never disagree with the readout above when it is that
-     matchup's turn to be the headline. */
-  const latestOf = id => {
-    const M = MATCHUPS[id];
-    if (M.real) return {
-      a: D.latest.alp2pp,
-      b: D.latest.lnp2pp,
-      ci95: D.latest.alp2ppCi95
-    };
-    const al = D.altLatest ? D.altLatest[M.altKey] : null;
-    if (al) return {
-      a: al.a,
-      b: al.b,
-      ci95: al.ci95
-    };
-    const last = M.data[M.data.length - 1];
-    return last ? {
-      a: last.a,
-      b: last.b,
-      ci95: null
-    } : null;
-  };
+     matchup's turn to be the headline. Lives at module scope (tppLatest) so
+     the docked tab-bar score reads it too. */
+  const latestOf = tppLatest;
   /* Every contest that isn't the one on the chart, in the same order the tabs
      use, and only where there is a current figure to print – a chip with no
      number would be the bare tab it is replacing. */
@@ -13628,12 +13665,16 @@ const TAB_IDS = TABS.map(t => t.id);
 function SnapshotView({
   rangeId,
   setRangeId,
-  showScatter
+  showScatter,
+  tppMatchup,
+  setTppMatchup
 }) {
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Hero, {
     rangeId: rangeId,
     setRangeId: setRangeId,
-    showScatter: showScatter
+    showScatter: showScatter,
+    matchup: tppMatchup,
+    setMatchup: setTppMatchup
   }), /*#__PURE__*/React.createElement(PrimaryVotePanel, {
     rangeId: rangeId
   }), /*#__PURE__*/React.createElement(LeadershipSection, {
@@ -13653,6 +13694,12 @@ function App() {
   } /*EDITMODE-END*/;
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [rangeId, setRangeId] = useState("all");
+
+  /* Which two-party contest the hero is showing. Owned here, not inside Hero,
+     for two reasons that are the same one: the docked 2PP score in the tab
+     bar must follow it, and the hero unmounts whenever the reader walks off
+     the Snapshot tab – the score travels on. */
+  const [tppMatchup, setTppMatchup] = useState("alp_lnp");
 
   // active tab, persisted in the URL hash so a refresh / share keeps the view
   const readHash = () => {
@@ -13806,7 +13853,8 @@ function App() {
   }), /*#__PURE__*/React.createElement(Tabs, {
     tabs: TABS,
     active: tab,
-    onChange: goTab
+    onChange: goTab,
+    tppMatchup: tppMatchup
   }), /*#__PURE__*/React.createElement("main", {
     className: "content"
   }, /*#__PURE__*/React.createElement("div", {
@@ -13819,7 +13867,9 @@ function App() {
   }, tab === "snapshot" && /*#__PURE__*/React.createElement(SnapshotView, {
     rangeId: rangeId,
     setRangeId: setRangeId,
-    showScatter: t.showScatter
+    showScatter: t.showScatter,
+    tppMatchup: tppMatchup,
+    setTppMatchup: setTppMatchup
   }), tab === "cycles" && /*#__PURE__*/React.createElement(PastCyclesView, null), tab === "allpolls" && /*#__PURE__*/React.createElement(AllPollsView, {
     focus: focusPoll,
     onBack: focusPoll ? backFromPoll : null,

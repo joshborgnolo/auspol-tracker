@@ -29,22 +29,28 @@ const DownloadIcon = () => (
 // TabScore – compact 2PP readout docked at the right of the tab bar.
 // Appears once the bar pins to the viewport top, on EVERY tab – the
 // national score travels with you. Click = jump to the Snapshot hero.
+// The contest shown FOLLOWS the hero's 2PP switch (App owns that state and
+// hands it down): the same definitions and the same nowcast accessor as the
+// hero readout, so the two figures can never disagree.
 // ====================================================================
-function TabScore({ onGoHero }) {
-  const { D } = window.AP;
-  const { alp2pp, lnp2pp } = D.latest;
+function TabScore({ onGoHero, matchup }) {
+  const MM = window.AP.tppMatchups;
+  // anything unrecognised (or a matchup with no current figure) falls back
+  // to the headline contest – the hero itself never offers one without data
+  const id = MM && MM[matchup] && window.AP.tppLatest(matchup) ? matchup : "alp_lnp";
+  const M = MM[id], v = window.AP.tppLatest(id);
   return (
     <button className="tab-score" onClick={onGoHero}
-            title="Latest 2PP aggregate – go to Snapshot">
+            title={"Latest " + M.label + " two-party preferred – go to Snapshot"}>
       <span className="ts-eyebrow">2PP</span>
       <span className="ts-party">
-        <span className="ts-abbr">ALP</span>
-        <span className="ts-num" style={{ color: "var(--alp-text)" }}>{alp2pp.toFixed(1)}</span>
+        <span className="ts-abbr">{M.a.abbr}</span>
+        <span className="ts-num" style={{ color: inkOf(M.a.color) }}>{v.a.toFixed(1)}</span>
       </span>
       <span className="ts-sep" aria-hidden="true"></span>
       <span className="ts-party">
-        <span className="ts-num" style={{ color: "var(--lnp-text)" }}>{lnp2pp.toFixed(1)}</span>
-        <span className="ts-abbr">L/NP</span>
+        <span className="ts-num" style={{ color: inkOf(M.b.color) }}>{v.b.toFixed(1)}</span>
+        <span className="ts-abbr">{M.b.abbr}</span>
       </span>
     </button>
   );
@@ -53,7 +59,7 @@ function TabScore({ onGoHero }) {
 // ====================================================================
 // Tabs – editorial underlined nav beneath the header
 // ====================================================================
-function Tabs({ tabs, active, onChange }) {
+function Tabs({ tabs, active, onChange, tppMatchup }) {
   // Sticky on every view. Once pinned, a compact 2PP score docks into the
   // right side of the bar – the headline number stays visible on every tab.
   const [pinned, setPinned] = React.useState(false);
@@ -123,7 +129,7 @@ function Tabs({ tabs, active, onChange }) {
               </button>
             ))}
           </div>
-          <TabScore onGoHero={goHero} />
+          <TabScore onGoHero={goHero} matchup={tppMatchup} />
         </div>
       </nav>
     </React.Fragment>
