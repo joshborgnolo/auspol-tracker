@@ -8026,9 +8026,10 @@ function HouseFx({
    pollCadence in gen-data for how cadence and publication lag are measured.
 
    Dates are computed here rather than at build time so the panel stays right
-   as the page ages: if a predicted release has already passed, that wave has
-   presumably been published and simply isn't in this archive, so the estimate
-   rolls forward and the panel says the data is behind.
+   as the page ages: a slot whose moment has passed without that release being
+   added is left exactly where it is and marked overdue, rather than rolled
+   forward onto a date nobody has published – the row isn't removed until the
+   data for it is.
    ==================================================================== */
 const DAY_MS = 86400000;
 const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -8259,59 +8260,28 @@ function NextPollsPanel() {
     const due = rel => rel + (c.releaseMins == null ? NP_UNTIMED_MINS : c.releaseMins) * 60000;
     const relOf = f => dayFloor(snap(f + c.lag * DAY_MS));
 
-    /* Bringing the projection up to the present. A slot whose moment has gone
-       by is spent – but WHY it is spent is two different things, and they want
-       two different answers.
-        If the archive is several intervals behind, those waves were published
-       and simply are not in here: the house kept its rhythm, and the next one
-       is another interval along. That is the roll this has always done.
-        If the archive is current and only the most recent slot has gone by –
-       Essential's 1am Wednesday, read at 3pm the same Wednesday – we cannot
-       tell whether the wave is out or is running late, and assuming it is out
-       costs a month: it names the Wednesday four weeks off when the honest
-       answer, and the one Essential's own record supports (its gaps run 27 to
-       36 days), is next Wednesday. So the last step is taken on the house's
-       own grid instead – a week for a house pinned to a weekday, since that is
-       the only step its date can take, and a day for one that is not.
-        Which step applies is decided by whether anything ELSE is missing. One
-       slot gone by and nothing behind it means the archive is being kept up,
-       so the absence is evidence; four slots gone by means it is not, so it
-       is not. */
+    /* The next slot after the last recorded release – never rolled forward on
+       a guess. A slot whose moment has passed without that release being
+       added is overdue, not wrong: the wave may already be out and simply not
+       entered yet, or it may be running late, and this page cannot tell
+       which. Either way the honest row is the one the data on record actually
+       supports, left where it is and marked overdue – it leaves the list only
+       once a new release moves `c.last` past it, at which point this slot is
+       what got confirmed and the row after it is the fresh guess. */
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
     let release = relOf(field);
-    let k = 0;
-    while (due(release) <= nowMs && k < 200) {
-      field += c.cadence * DAY_MS;
-      release = relOf(field);
-      k++;
-    }
-    // k intervals were rolled; the last of them is the ambiguous slot, so only
-    // the k-1 before it are waves this archive has plainly not recorded
-    const missed = Math.max(0, k - 1);
-    const slipFrom = k === 1 ? relOf(field - c.cadence * DAY_MS) : null;
-    if (k === 1) {
-      field -= c.cadence * DAY_MS;
-      const step = (c.releaseDow == null ? 1 : 7) * DAY_MS;
-      release = relOf(field);
-      // the wave slipped, so what follows it slips with it – `field` carries
-      // the step, and the next row is projected from where this one landed
-      for (let g = 0; due(release) <= nowMs && g < 400; g++) {
-        field += step;
-        release = relOf(field);
-      }
-    }
     /* A loose house earns its place when its WINDOW opens inside the horizon,
        not when its centre falls inside it: DemosAU's next centre is 30 days
        out and its window opens in 13, so testing the centre would hide a house
        that may well file next week. */
     const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
     for (let i = 0; reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)))) && i < 12; i++) {
+      const overdue = due(release) <= nowMs;
       rows.push({
         ...c,
         field,
         release,
-        missed: i === 0 ? missed : 0,
-        slipFrom: i === 0 ? slipFrom : null,
+        overdue,
         ahead: i,
         /* Each further wave is one more interval of drift, so the window widens
            as sqrt(waves) – the second Essential is a looser bet than the first.
@@ -8321,9 +8291,11 @@ function NextPollsPanel() {
         inDays: Math.round((release - t0) / DAY_MS),
         opensIn: Math.round((release - Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))) * DAY_MS - t0) / DAY_MS)
       });
+      // an overdue slot isn't a base to project the next one from – that
+      // would stack a guess on a slot nothing has confirmed yet
+      if (overdue || c.loose) break; // loose: one window per house, same reason
       field += c.cadence * DAY_MS;
       release = dayFloor(snap(field + c.lag * DAY_MS));
-      if (c.loose) break; // one window per house; a second is a guess about a guess
     }
   });
   // ordered by when each entry first becomes possible – for a dated row that is
@@ -8331,8 +8303,7 @@ function NextPollsPanel() {
   const first = r => r.loose ? r.release - r.spread * DAY_MS : r.release;
   rows.sort((a, b) => first(a) - first(b));
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
-  const behind = rows.some(r => r.missed > 0);
-  const slipped = rows.some(r => r.slipFrom);
+  const overdue = rows.some(r => r.overdue);
   // which houses are running on a schedule that was stated rather than measured
   const stated = [...new Set(rows.filter(r => (r.declared || []).length).map(r => r.pollster))];
   /* Which houses are projected from their PUBLICATION dates and which fall back
@@ -8350,12 +8321,10 @@ function NextPollsPanel() {
     const d = new Date(ms);
     return `${WD[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
   };
-  // without the weekday, for the one place it sits inside a longer clause
-  const fmtDM = ms => {
-    const d = new Date(ms);
-    return `${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
-  };
-  const when = n => n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`;
+  /* n goes negative for an overdue row now that one can sit past its own
+     moment instead of rolling forward – "in -1 days" named nothing a reader
+     would recognise, so a past slot counts the days the other way. */
+  const when = n => n < 0 ? `${-n} day${-n === 1 ? "" : "s"} overdue` : n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`;
   /* The releases list spans months and sometimes a new year, so unlike the
      projection column it carries one. The weekday rides on the PUBLICATION
      date only: a weekday is a fact about when a house files, and putting one
@@ -8412,14 +8381,10 @@ function NextPollsPanel() {
     }, ", ", zoned(hour, r.release)), /*#__PURE__*/React.createElement("span", {
       className: "np-pm"
     }, spreadLabel(r)))), /*#__PURE__*/React.createElement("span", {
-      className: "np-when"
+      className: "np-when" + (r.overdue ? " np-missed" : "")
     }, r.loose ? r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn) : when(r.inDays)), /*#__PURE__*/React.createElement("span", {
       className: "np-cadence"
-    }, cadenceLabel(r.cadence), r.ahead === 0 && /*#__PURE__*/React.createElement(React.Fragment, null, " \xB7 ", r.waves, " waves"), r.missed > 0 && /*#__PURE__*/React.createElement("span", {
-      className: "np-missed"
-    }, " \xB7 ", r.missed, " not in this archive"), r.missed === 0 && r.slipFrom && /*#__PURE__*/React.createElement("span", {
-      className: "np-missed"
-    }, " \xB7 ", fmtDM(r.slipFrom), " slot passed"))), isOpen && /*#__PURE__*/React.createElement("div", {
+    }, cadenceLabel(r.cadence), r.ahead === 0 && /*#__PURE__*/React.createElement(React.Fragment, null, " \xB7 ", r.waves, " waves"))), isOpen && /*#__PURE__*/React.createElement("div", {
       className: "np-detail"
     }, /*#__PURE__*/React.createElement("div", {
       className: "npd-h"
@@ -8495,7 +8460,7 @@ function NextPollsPanel() {
     }, "Median ", r.cadence, " days between", " ", r.basis === "published" ? "publications" : "fieldwork ends", " across the last ", r.gapsUsed, " intervals", r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : "", ".", r.basis !== "published" && /*#__PURE__*/React.createElement(React.Fragment, null, " ", "Plus", " ", r.lagMeasured ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases` : "the field’s one-day publication lag", "."), r.releaseDow != null && ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`, r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`, (r.declared || []).length > 0 && ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`)));
   })), /*#__PURE__*/React.createElement("p", {
     className: "np-foot"
-  }, "Each date is the house\u2019s median interval between its last eight releases, nudged onto the weekday it keeps. What the interval is measured BETWEEN depends on what the house has recorded. Where its recent releases carry publication dates in an unbroken run, it is the gaps between those \u2014 which is the thing being forecast, and much the steadier measure: Newspoll\u2019s last eight fieldwork gaps run from 18 days to 31, while it has published exactly three weeks apart six times in eight, all the wobble being in when its fieldwork happened to close.", byPub.length > 0 && ` ${listOf(byPub)} ${byPub.length > 1 ? "are" : "is"} projected that way.`, byField.length > 0 && ` ${listOf(byField)}, which ${byField.length > 1 ? "have" : "has"} too few recorded publication dates to measure one, ${byField.length > 1 ? "fall" : "falls"} back to the gaps between fieldwork ends plus a publication lag — measured from the dates recorded against each poll, or read from a release URL that carries one, and otherwise a day, which is the field’s.`, " ", "The \xB1 is half the range of those intervals with the longest and shortest set aside, widening for waves further out \u2014 in whole weeks for a house pinned to a weekday, since that is the only step its date can take, and dropped where the interval never reaches the day either side.", " ", "Where a house has been timed often enough the hour it files is shown too \u2014 the span its releases have covered where that is tight, and otherwise the hour it usually keeps, so one late morning doesn\u2019t speak for a house that is normally punctual. Every hour here is the publisher\u2019s own clock and is labelled with it, AEDT through the summer and AEST the rest of the year, because the two are an hour apart and \u201C8 pm\u201D alone names both. Weekday and hour are read off recent releases rather than the whole record, because a schedule is a current fact about a house and its first year is often a different house. A house whose interval is too variable to name a day gets the window its own record supports instead of being left out \u2014 DemosAU polls about monthly, but anywhere in a five-week span.", stated.length > 0 && ` ${stated.join(" and ")} ${stated.length > 1 ? "run" : "runs"} on a schedule stated by hand rather than measured, because the recorded releases don’t measure the one the house plainly keeps.`, " ", "A projection is a moment, not a date: once the hour passes it is spent, and the row moves on rather than naming a time that has already gone.", slipped && " Where only the latest slot has gone by and nothing else is missing, the next date is the next slot the house’s own schedule allows — a week on for a house pinned to a weekday — since a wave that hasn’t appeared may be late rather than published.", behind && " Where several have gone by, those waves are out but not yet in this archive, and the projection carries on at the house’s own interval.", " ", "Opening a row lists that house\u2019s five most recent releases with the interval between each, and names the house\u2019s own release page, so the estimate can be checked against the thing it was taken from rather than taken on trust.", " ", "Houses that have stopped publishing are omitted. \u201CToday\u201D is Sydney\u2019s. These are estimates, not announced dates."));
+  }, "Each date is the house\u2019s median interval between its last eight releases, nudged onto the weekday it keeps. What the interval is measured BETWEEN depends on what the house has recorded. Where its recent releases carry publication dates in an unbroken run, it is the gaps between those \u2014 which is the thing being forecast, and much the steadier measure: Newspoll\u2019s last eight fieldwork gaps run from 18 days to 31, while it has published exactly three weeks apart six times in eight, all the wobble being in when its fieldwork happened to close.", byPub.length > 0 && ` ${listOf(byPub)} ${byPub.length > 1 ? "are" : "is"} projected that way.`, byField.length > 0 && ` ${listOf(byField)}, which ${byField.length > 1 ? "have" : "has"} too few recorded publication dates to measure one, ${byField.length > 1 ? "fall" : "falls"} back to the gaps between fieldwork ends plus a publication lag — measured from the dates recorded against each poll, or read from a release URL that carries one, and otherwise a day, which is the field’s.`, " ", "The \xB1 is half the range of those intervals with the longest and shortest set aside, widening for waves further out \u2014 in whole weeks for a house pinned to a weekday, since that is the only step its date can take, and dropped where the interval never reaches the day either side.", " ", "Where a house has been timed often enough the hour it files is shown too \u2014 the span its releases have covered where that is tight, and otherwise the hour it usually keeps, so one late morning doesn\u2019t speak for a house that is normally punctual. Every hour here is the publisher\u2019s own clock and is labelled with it, AEDT through the summer and AEST the rest of the year, because the two are an hour apart and \u201C8 pm\u201D alone names both. Weekday and hour are read off recent releases rather than the whole record, because a schedule is a current fact about a house and its first year is often a different house. A house whose interval is too variable to name a day gets the window its own record supports instead of being left out \u2014 DemosAU polls about monthly, but anywhere in a five-week span.", stated.length > 0 && ` ${stated.join(" and ")} ${stated.length > 1 ? "run" : "runs"} on a schedule stated by hand rather than measured, because the recorded releases don’t measure the one the house plainly keeps.`, " ", "A projection is a moment, not a guess: once the hour passes without that release, the row stays exactly where it is and says so, rather than rolling forward onto a date nobody has published.", overdue && " A row marked overdue leaves this list only once that release is added, not on a date guessed in its place.", " ", "Opening a row lists that house\u2019s five most recent releases with the interval between each, and names the house\u2019s own release page, so the estimate can be checked against the thing it was taken from rather than taken on trust.", " ", "Houses that have stopped publishing are omitted. \u201CToday\u201D is Sydney\u2019s. These are estimates, not announced dates."));
 }
 function PollsterTable() {
   const {

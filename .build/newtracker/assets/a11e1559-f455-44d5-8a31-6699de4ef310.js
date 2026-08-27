@@ -1953,9 +1953,10 @@ function HouseFx({ he, firm, pos, neg, unit = "pp" }) {
    pollCadence in gen-data for how cadence and publication lag are measured.
 
    Dates are computed here rather than at build time so the panel stays right
-   as the page ages: if a predicted release has already passed, that wave has
-   presumably been published and simply isn't in this archive, so the estimate
-   rolls forward and the panel says the data is behind.
+   as the page ages: a slot whose moment has passed without that release being
+   added is left exactly where it is and marked overdue, rather than rolled
+   forward onto a date nobody has published – the row isn't removed until the
+   data for it is.
    ==================================================================== */
 const DAY_MS = 86400000;
 const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -2166,54 +2167,25 @@ function NextPollsPanel() {
     const due = (rel) => rel + (c.releaseMins == null ? NP_UNTIMED_MINS : c.releaseMins) * 60000;
     const relOf = (f) => dayFloor(snap(f + c.lag * DAY_MS));
 
-    /* Bringing the projection up to the present. A slot whose moment has gone
-       by is spent – but WHY it is spent is two different things, and they want
-       two different answers.
-
-       If the archive is several intervals behind, those waves were published
-       and simply are not in here: the house kept its rhythm, and the next one
-       is another interval along. That is the roll this has always done.
-
-       If the archive is current and only the most recent slot has gone by –
-       Essential's 1am Wednesday, read at 3pm the same Wednesday – we cannot
-       tell whether the wave is out or is running late, and assuming it is out
-       costs a month: it names the Wednesday four weeks off when the honest
-       answer, and the one Essential's own record supports (its gaps run 27 to
-       36 days), is next Wednesday. So the last step is taken on the house's
-       own grid instead – a week for a house pinned to a weekday, since that is
-       the only step its date can take, and a day for one that is not.
-
-       Which step applies is decided by whether anything ELSE is missing. One
-       slot gone by and nothing behind it means the archive is being kept up,
-       so the absence is evidence; four slots gone by means it is not, so it
-       is not. */
+    /* The next slot after the last recorded release – never rolled forward on
+       a guess. A slot whose moment has passed without that release being
+       added is overdue, not wrong: the wave may already be out and simply not
+       entered yet, or it may be running late, and this page cannot tell
+       which. Either way the honest row is the one the data on record actually
+       supports, left where it is and marked overdue – it leaves the list only
+       once a new release moves `c.last` past it, at which point this slot is
+       what got confirmed and the row after it is the fresh guess. */
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
     let release = relOf(field);
-    let k = 0;
-    while (due(release) <= nowMs && k < 200) { field += c.cadence * DAY_MS; release = relOf(field); k++; }
-    // k intervals were rolled; the last of them is the ambiguous slot, so only
-    // the k-1 before it are waves this archive has plainly not recorded
-    const missed = Math.max(0, k - 1);
-    const slipFrom = k === 1 ? relOf(field - c.cadence * DAY_MS) : null;
-    if (k === 1) {
-      field -= c.cadence * DAY_MS;
-      const step = (c.releaseDow == null ? 1 : 7) * DAY_MS;
-      release = relOf(field);
-      // the wave slipped, so what follows it slips with it – `field` carries
-      // the step, and the next row is projected from where this one landed
-      for (let g = 0; due(release) <= nowMs && g < 400; g++) { field += step; release = relOf(field); }
-    }
     /* A loose house earns its place when its WINDOW opens inside the horizon,
        not when its centre falls inside it: DemosAU's next centre is 30 days
        out and its window opens in 13, so testing the centre would hide a house
        that may well file next week. */
     const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
     for (let i = 0; reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)))) && i < 12; i++) {
+      const overdue = due(release) <= nowMs;
       rows.push({
-        ...c, field, release,
-        missed: i === 0 ? missed : 0,
-        slipFrom: i === 0 ? slipFrom : null,
-        ahead: i,
+        ...c, field, release, overdue, ahead: i,
         /* Each further wave is one more interval of drift, so the window widens
            as sqrt(waves) – the second Essential is a looser bet than the first.
            A house on a fixed weekly schedule barely moves; an erratic one
@@ -2222,9 +2194,11 @@ function NextPollsPanel() {
         inDays: Math.round((release - t0) / DAY_MS),
         opensIn: Math.round((release - Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))) * DAY_MS - t0) / DAY_MS),
       });
+      // an overdue slot isn't a base to project the next one from – that
+      // would stack a guess on a slot nothing has confirmed yet
+      if (overdue || c.loose) break;   // loose: one window per house, same reason
       field += c.cadence * DAY_MS;
       release = dayFloor(snap(field + c.lag * DAY_MS));
-      if (c.loose) break;          // one window per house; a second is a guess about a guess
     }
   });
   // ordered by when each entry first becomes possible – for a dated row that is
@@ -2233,8 +2207,7 @@ function NextPollsPanel() {
   rows.sort((a, b) => first(a) - first(b));
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
 
-  const behind = rows.some((r) => r.missed > 0);
-  const slipped = rows.some((r) => r.slipFrom);
+  const overdue = rows.some((r) => r.overdue);
   // which houses are running on a schedule that was stated rather than measured
   const stated = [...new Set(rows.filter((r) => (r.declared || []).length).map((r) => r.pollster))];
   /* Which houses are projected from their PUBLICATION dates and which fall back
@@ -2252,12 +2225,11 @@ function NextPollsPanel() {
     const d = new Date(ms);
     return `${WD[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
   };
-  // without the weekday, for the one place it sits inside a longer clause
-  const fmtDM = (ms) => {
-    const d = new Date(ms);
-    return `${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
-  };
-  const when = (n) => (n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`);
+  /* n goes negative for an overdue row now that one can sit past its own
+     moment instead of rolling forward – "in -1 days" named nothing a reader
+     would recognise, so a past slot counts the days the other way. */
+  const when = (n) => (n < 0 ? `${-n} day${-n === 1 ? "" : "s"} overdue`
+    : n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`);
   /* The releases list spans months and sometimes a new year, so unlike the
      projection column it carries one. The weekday rides on the PUBLICATION
      date only: a weekday is a fact about when a house files, and putting one
@@ -2317,7 +2289,7 @@ function NextPollsPanel() {
             </span>
             {/* the column answers "when", so a window answers it too – with the
                 day it opens, which is the first date the wave is possible */}
-            <span className="np-when">
+            <span className={"np-when" + (r.overdue ? " np-missed" : "")}>
               {r.loose
                 ? (r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn))
                 : when(r.inDays)}
@@ -2327,11 +2299,6 @@ function NextPollsPanel() {
               {/* the wave count is the evidence for the estimate – worth stating
                   once per house, not four times for a weekly one */}
               {r.ahead === 0 && <> · {r.waves} waves</>}
-              {r.missed > 0 && <span className="np-missed"> · {r.missed} not in this archive</span>}
-              {/* the slot the panel would have named an hour ago: it went by
-                  without a poll, and saying nothing would hide that */}
-              {r.missed === 0 && r.slipFrom &&
-                <span className="np-missed"> · {fmtDM(r.slipFrom)} slot passed</span>}
             </span>
             </div>
 
@@ -2471,10 +2438,10 @@ function NextPollsPanel() {
         interval is too variable to name a day gets the window its own record supports instead
         of being left out — DemosAU polls about monthly, but anywhere in a five-week span.
         {stated.length > 0 && ` ${stated.join(" and ")} ${stated.length > 1 ? "run" : "runs"} on a schedule stated by hand rather than measured, because the recorded releases don’t measure the one the house plainly keeps.`}
-        {" "}A projection is a moment, not a date: once the hour passes it is spent, and the row
-        moves on rather than naming a time that has already gone.
-        {slipped && " Where only the latest slot has gone by and nothing else is missing, the next date is the next slot the house’s own schedule allows — a week on for a house pinned to a weekday — since a wave that hasn’t appeared may be late rather than published."}
-        {behind && " Where several have gone by, those waves are out but not yet in this archive, and the projection carries on at the house’s own interval."}
+        {" "}A projection is a moment, not a guess: once the hour passes without that release, the
+        row stays exactly where it is and says so, rather than rolling forward onto a date nobody
+        has published.
+        {overdue && " A row marked overdue leaves this list only once that release is added, not on a date guessed in its place."}
         {" "}Opening a row lists that house’s five most recent releases with the interval between
         each, and names the house’s own release page, so the estimate can be checked against the
         thing it was taken from rather than taken on trust.
