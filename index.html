@@ -9781,28 +9781,13 @@ function CycleLegend({
   }, anyHidden ? "Show all cycles" : "Remove all cycles"));
 }
 
-/* ---- Past-cycles downloads --------------------------------------------
+/* ---- Past-cycles download ---------------------------------------------
    The charts here are monthly aggregates of polls taken up to sixteen years
-   ago, and until now nothing on the page let you see the readings underneath
-   them or check the alignment. Two files rather than one, because they answer
-   different questions: the series is what is plotted, the source rows are
-   where it came from.
-
-   Both are keyed by CYCLE year – the election that STARTED the term, which is
-   what the legend calls each line. That matters: internally the voting-intention
-   rows are stored under the election that ENDED the term. Exporting the storage
-   keys would misalign the two halves by a full parliament. */
-function cycleSeriesRows(cycles) {
-  const rows = [["cycle", "government", "prime_minister", "opposition_leader", "is_current", "months_since_election", "govt_primary_pct", "govt_2pp_pct", "pm_net_approval", "opp_leader_net_approval", "hanson_net_approval"]];
-  cycles.forEach(c => {
-    const r = c.raw;
-    r.months.forEach((m, i) => rows.push([c.year, c.gov === "alp" ? "Labor" : "Coalition", c.pm, c.oppLead, c.current ? "yes" : "no", m, r.primary[i], r.tpp[i], r.net[i], r.oppnet[i],
-    // blank for every past cycle and for months of this one where nobody
-    // asked – the series is sparse and the download says so
-    r.han ? r.han[i] : null]));
-  });
-  return rows;
-}
+   ago; this is the file of readings underneath them. Keyed by CYCLE year –
+   the election that STARTED the term, which is what the legend calls each
+   line. That matters: internally the voting-intention rows are stored under
+   the election that ENDED the term, so exporting the storage keys would
+   misalign the two halves by a full parliament. */
 
 /* One label for a row that can carry two or three leaders on two different
    questions. Collapses to the plain metric name when they agree, which is the
@@ -10144,12 +10129,11 @@ function PastCyclesView() {
   const shapes = shownCycles.length <= CYC_DOT_MAX ? cycShapes(shownCycles) : null;
   const showAll = () => setHidden(new Set());
   const hideAll = () => setHidden(new Set(cycles.map(c => c.year)));
-  const exportSeries = () => downloadCsv(`auspol-tracker-cycles-series-${D.latest.updatedISO}.csv`, cycleSeriesRows(cycles));
+
   /* The source-polls file respects the chips: it is built from the terms on
      the board, so a hidden term's polls stay out of the download just as
      its line is out of the chart. (The row-fetch inside cycleSourceRows
-     already skips any term not in the list it is given.) The chart-series
-     file still carries every term – it is the page's reference data. */
+     already skips any term not in the list it is given.) */
   const exportSource = () => downloadCsv(`auspol-tracker-cycles-source-polls-${D.latest.updatedISO}.csv`, cycleSourceRows(shownCycles, D));
   return /*#__PURE__*/React.createElement("div", {
     className: "view view-cycles"
@@ -10176,10 +10160,6 @@ function PastCyclesView() {
     className: "cyc-export-label"
   }, "Download"), /*#__PURE__*/React.createElement("button", {
     className: "ap-export",
-    onClick: exportSeries,
-    title: "The monthly values plotted on these charts, one row per cycle per month"
-  }, /*#__PURE__*/React.createElement(DownloadIcon, null), "Chart series"), /*#__PURE__*/React.createElement("button", {
-    className: "ap-export",
     onClick: exportSource,
     title: hidden.size ? "The individual polls the monthly averages are built from – hidden terms left out, to match the board" : "The individual polls the monthly averages are built from"
   }, /*#__PURE__*/React.createElement(DownloadIcon, null), "Source polls")))), /*#__PURE__*/React.createElement(CycleLegend, {
@@ -10205,7 +10185,7 @@ function PastCyclesView() {
     shapes: shapes
   }))), /*#__PURE__*/React.createElement(AccuracyPanel, null), /*#__PURE__*/React.createElement("p", {
     className: "cyc-foot"
-  }, "The plotted series and the individual polls behind it are both downloadable above", hidden.size > 0 && ", the source file leaving the hidden terms out just as the charts do", ".", " ", "Past cycles run the full ~3-year term to the next election; the current cycle stops at the latest reading.", " ", showHan && /*#__PURE__*/React.createElement("span", null, "Hanson is drawn on the opposition chart from ", "“", "approve minus disapprove", "”", " readings only, which is why her line is short: most houses rate her on favourability, a different question that is never blended into these lines, and no past cycle asked about her at all.", " "), mode === "chg" ? "Lines show movement relative to each party’s own election result." : "Approval lines splice the sitting prime minister – and opposition leader – where a term changed leaders mid-stream."));
+  }, "The individual polls behind the plotted series are downloadable above", hidden.size > 0 && ", the file leaving the hidden terms out just as the charts do", ".", " ", "Past cycles run the full ~3-year term to the next election; the current cycle stops at the latest reading.", " ", showHan && /*#__PURE__*/React.createElement("span", null, "Hanson is drawn on the opposition chart from ", "“", "approve minus disapprove", "”", " readings only, which is why her line is short: most houses rate her on favourability, a different question that is never blended into these lines, and no past cycle asked about her at all.", " "), mode === "chg" ? "Lines show movement relative to each party’s own election result." : "Approval lines splice the sitting prime minister – and opposition leader – where a term changed leaders mid-stream."));
 }
 
 // ====================================================================
