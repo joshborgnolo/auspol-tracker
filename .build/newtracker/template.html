@@ -1872,7 +1872,13 @@ body.dark .fb-form { color-scheme: dark; }
   .method-grid { grid-template-columns: 1fr; }
   .head-meta { gap: 12px; }
   .ro-num { font-size: 48px; }
-  .hero-controls { align-items: flex-start; flex-direction: row; }
+  /* Never one row of six small targets: at this width the controls have the
+     headline's full line to themselves, so the matchup toggle sits above the
+     range toggle (the desktop arrangement, left-aligned) and both get real
+     touch padding – this is exactly the control a one-handed thumb comes to. */
+  .hero-controls { align-items: flex-start; }
+  .hero-controls .tt-opt { padding: 11px 4px; }
+  .hero-controls .tt-div { height: 16px; }
 }
 @media (max-width: 560px) {
   .page { padding: 20px 16px 48px; }
