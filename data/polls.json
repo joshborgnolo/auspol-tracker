@@ -3652,7 +3652,7 @@
     },
     {
       "date": "2026-08-10",
-      "published": "2026-08-11",
+      "published": "2026-08-12T05:00",
       "dateStart": "2026-08-04",
       "pollster": "YouGov",
       "client": "News24",
@@ -3775,7 +3775,7 @@
     },
     {
       "date": "2026-08-24",
-      "published": "2026-08-26",
+      "published": "2026-08-26T05:00",
       "dateStart": "2026-08-18",
       "pollster": "YouGov",
       "client": "News24",

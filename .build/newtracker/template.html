@@ -2402,8 +2402,14 @@ a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--
   color: var(--ink-3); text-decoration: none; }
 .npd-site:hover { color: var(--ink-2); text-decoration: underline; text-underline-offset: 2px; }
 .npd-list { list-style: none; margin: 0; padding: 0; }
+/* Each line is its OWN grid, so any track sized to its contents is sized by
+   that line alone. The interval column was `auto`, and the oldest release has
+   no interval to report — an empty cell, a zero-width third track, and the two
+   fr columns beside it quietly taking the slack, which put the last line's
+   publication date 17px right of every other one. A fixed track holds all six
+   lines to the same rule: 4.5rem clears both "Interval" and "999 days". */
 .npd-row {
-  display: grid; grid-template-columns: minmax(96px, 0.8fr) minmax(150px, 1.4fr) auto;
+  display: grid; grid-template-columns: minmax(96px, 0.8fr) minmax(150px, 1.4fr) 4.5rem;
   gap: 12px; align-items: baseline; padding: 5px 0;
   font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
 }
@@ -2460,7 +2466,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
      edge across both lines. Placed by AREA, not by auto-flow: two children
      carrying a column hint and a third carrying margin-left:auto put the dates
      in the wrong order and the hour on a line of its own. */
-  .npd-row { grid-template-columns: 1fr auto; grid-template-areas: "field gap" "pub gap"; row-gap: 1px; }
+  .npd-row { grid-template-columns: 1fr 4.5rem; grid-template-areas: "field gap" "pub gap"; row-gap: 1px; }
   .npd-field { grid-area: field; }
   .npd-pub { grid-area: pub; }
   .npd-gap { grid-area: gap; align-self: center; }
