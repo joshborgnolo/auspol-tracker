@@ -242,6 +242,12 @@ const CYC_EVENTS = {
       desc: "Prime Minister Tony Abbott awards Prince Philip a knighthood in the Order of Australia, drawing widespread ridicule.",
       major: true,
     },
+    {
+      date: "2015-09-15", short: "Abbott → Turnbull",
+      label: "Turnbull replaces Abbott as prime minister",
+      desc: "Malcolm Turnbull defeats Tony Abbott in a Liberal leadership spill and is sworn in as prime minister.",
+      major: true,
+    },
   ],
   2019: [
     {
