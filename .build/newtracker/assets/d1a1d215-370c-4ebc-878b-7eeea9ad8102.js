@@ -1828,6 +1828,10 @@ function AllPollsView({ focus, onBack, backLabel }) {
     const f1 = (v) => (v != null ? v.toFixed(1) : null);
     const hayParts = [
       p.pollster, p.field, fullDate, p.sample != null ? String(p.sample) : null,
+      // the month the row is filed under, spelt for the search box: "Feb 26"
+      // shows the year as two digits, so "feb 2026" / "february 2026" would
+      // otherwise miss every poll they name
+      D.monthName(mo) + " " + y, D.monthNameFull(mo) + " " + y,
       f1(p.alp), f1(p.lnp),
       lean != null ? (lean > 0 ? "+" : "") + lean.toFixed(1) : null,
       f1(p.p.alp), f1(p.p.lnp), f1(p.p.grn), f1(p.p.onp), f1(p.p.oth),
