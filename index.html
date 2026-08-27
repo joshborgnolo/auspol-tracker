@@ -1415,6 +1415,10 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-meta .meta-dup { display: none; }
 @media (min-width: 1001px) {
   .pd-meta .meta-md { display: none; }
+  /* the latest detail's own band exists only where the table has dropped
+     its sample column – above 1000px it would be a divider with nothing
+     left to say, so the whole band (padding and rule included) goes away */
+  .pd-meta-sm { display: none; }
 }
 /* the second column (first preferences, approval) carries the wider legends,
    so it takes the slightly larger share of the row */
@@ -7918,6 +7922,16 @@ function PollDetail({
   return /*#__PURE__*/React.createElement("div", {
     className: "poll-detail"
   }, /*#__PURE__*/React.createElement("div", {
+    className: "pd-meta pd-meta-sm"
+  }, r.mode && /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-k"
+  }, "Method"), " ", r.mode), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-k"
+  }, "Sample"), " ", r.sample ? "n = " + r.sample.toLocaleString() : "—")), /*#__PURE__*/React.createElement("div", {
     className: "pd-grid"
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-block pd-head"

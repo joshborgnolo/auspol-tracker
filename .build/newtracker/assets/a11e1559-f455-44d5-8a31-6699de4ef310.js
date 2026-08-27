@@ -1851,6 +1851,15 @@ function SortTh({ label, short, sortKey, k, sort, onSort, className }) {
 function PollDetail({ r }) {
   return (
     <div className="poll-detail">
+      {/* The band only earns its space below 1000px, where the table drops
+          its sample column and this is the one place that figure survives;
+          .pd-meta-sm hides the whole band (divider included) on wider
+          screens, where every value is already in the row. Client/field are
+          said by the row at every width, so they never come back. */}
+      <div className="pd-meta pd-meta-sm">
+        {r.mode && <span className="pd-meta-i"><span className="pd-meta-k">Method</span> {r.mode}</span>}
+        <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {r.sample ? "n = " + r.sample.toLocaleString() : "—"}</span>
+      </div>
       <div className="pd-grid">
         <div className="pd-block pd-head">
           <div className="pd-k">{tppHeading(tppContests(r))}</div>
