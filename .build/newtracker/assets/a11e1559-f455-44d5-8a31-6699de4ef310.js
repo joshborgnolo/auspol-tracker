@@ -544,10 +544,12 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         if (!c) return [];
         return ls.map((L) => {
           // the opposition slot is an office: Ley's polls and Taylor's belong
-          // to the same colour, which the trend draws as each leader's run
-          const raw = L.id === "taylor" ? (c.taylor != null ? c.taylor : c.ley) : c[L.id];
+          // to the same colour, which the trend draws as each leader's run.
+          // Which key held the reading is which person the dot names.
+          const fromLey = L.id === "taylor" && c.taylor == null;
+          const raw = L.id === "taylor" ? (fromLey ? c.ley : c.taylor) : c[L.id];
           if (raw == null) return null;
-          const lab = pr && pr.id === "ah" && L.id === "alb" ? "Albanese v Hanson" : L.short;
+          const lab = pr && pr.id === "ah" && L.id === "alb" ? "Albanese v Hanson" : (fromLey ? "Ley" : L.short);
           return { x: p.x, y: raw, color: L.color, label: lab, meta: p, leader: L.id };
         }).filter(Boolean);
       }));
@@ -979,7 +981,9 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         // lives in `alt` and belongs on the other tab
         const alt = a.alt && a.alt[L.id];
         if (alt && alt.net != null && (alt.metric === "fav") === wantFav) out.push(alt.net);
-        return out.map((y) => ({ x: p.x, y, color: L.color, label: L.short, meta: p, leader: L.id }));
+        // the opposition slot names its holder: Ley's dots say Ley
+        const lab = L.id === "taylor" ? (a.oppName || L.short) : L.short;
+        return out.map((y) => ({ x: p.x, y, color: L.color, label: lab, meta: p, leader: L.id }));
       }));
   };
   const apprScatter = cloudFor(metric);

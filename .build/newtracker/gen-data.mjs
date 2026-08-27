@@ -1007,13 +1007,34 @@ function cycleSeries(points, base, cap = 36) {
            obs: idxs.map((i) => i >= firstKnown && i in known) };
 }
 const CYC_META = [
-  { year: 2010, gov: "alp", opp: "lnp", pm: "Gillard", lead: "Gillard", oppLead: "Abbott", eDate: "2010-08-21", ePrim: 38.0, eTpp: 50.1, src: 2013, appr: 2010 },
-  { year: 2013, gov: "lnp", opp: "alp", pm: "Abbott → Turnbull", lead: "Abbott", oppLead: "Shorten", eDate: "2013-09-07", ePrim: 45.6, eTpp: 53.5, src: 2016, appr: 2013 },
-  { year: 2016, gov: "lnp", opp: "alp", pm: "Turnbull → Morrison", lead: "Turnbull", oppLead: "Shorten", eDate: "2016-07-02", ePrim: 42.0, eTpp: 50.4, src: 2019, appr: 2016 },
+  { year: 2010, gov: "alp", opp: "lnp", pm: "Gillard → Rudd", lead: "Gillard", oppLead: "Abbott", eDate: "2010-08-21", ePrim: 38.0, eTpp: 50.1, src: 2013, appr: 2010,
+    pmSpl: { iso: "2013-06-27", names: ["Gillard", "Rudd"] } },
+  { year: 2013, gov: "lnp", opp: "alp", pm: "Abbott → Turnbull", lead: "Abbott", oppLead: "Shorten", eDate: "2013-09-07", ePrim: 45.6, eTpp: 53.5, src: 2016, appr: 2013,
+    pmSpl: { iso: "2015-09-15", names: ["Abbott", "Turnbull"] } },
+  { year: 2016, gov: "lnp", opp: "alp", pm: "Turnbull → Morrison", lead: "Turnbull", oppLead: "Shorten", eDate: "2016-07-02", ePrim: 42.0, eTpp: 50.4, src: 2019, appr: 2016,
+    pmSpl: { iso: "2018-08-24", names: ["Turnbull", "Morrison"] },
+    oppSpl: { iso: "2019-05-27", names: ["Shorten", "Albanese"] } },
   { year: 2019, gov: "lnp", opp: "alp", pm: "Morrison", lead: "Morrison", oppLead: "Shorten → Albanese", eDate: "2019-05-18", ePrim: 41.44, eTpp: 51.53, src: 2022, appr: 2019 },
   { year: 2022, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Dutton", eDate: "2022-05-21", ePrim: 32.6, eTpp: 52.1, src: 2025, appr: 2022 },
-  { year: 2025, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Ley → Taylor", current: true, eDate: "2025-05-03", ePrim: 34.6, eTpp: 55.2 },
+  { year: 2025, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Ley → Taylor", current: true, eDate: "2025-05-03", ePrim: 34.6, eTpp: 55.2,
+    oppSpl: { iso: OPP_SPLICE_ISO, names: ["Ley", "Taylor"] } },
 ];
+/* A term that changed leaders mid-stream is not one line. The pooled net /
+   oppnet series stay (they fit the domain, the change-since base and the
+   peer average), and beside them each person gets his own monthly run, built
+   from his own readings alone: the handover month – where both men's polls
+   land in one bucket – then holds both readings instead of averaging two
+   people into one. Null when the splice has only one side measured (e.g.
+   Shorten resigned days after the 2016 term's last rating, so no Albanese
+   run exists to draw there), and the chart falls back to the pooled line. */
+function eraSeries(points, spl, cap) {
+  if (!spl) return null;
+  const eras = spl.names.map((name, i) => {
+    const pts = points.filter((p) => (i === 0 ? p.iso < spl.iso : p.iso >= spl.iso));
+    return pts.length ? { name, from: i === 0 ? null : spl.iso, ...cycleSeries(pts, null, cap) } : null;
+  }).filter(Boolean);
+  return eras.length > 1 ? eras : null;
+}
 /* Hanson rides on the opposition-leader chart behind a toggle. Built WITHOUT
    fillSeries, unlike every other cycle series: she has seven approval-metric
    readings across part of one term, and interpolating between them would make
@@ -1114,8 +1135,8 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     // approval-metric readings only – the historical cycle series are
     // approve−disapprove, so favourability rows would contaminate them
     const apprOnly = appr.filter((a) => metricOf(a.firm, "alb") !== "fav");   // PM approval only, not favourability
-    netPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.alb }));
-    oppPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.opp }));
+    netPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.alb, iso: a.date }));
+    oppPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.opp, iso: a.date }));
     // Hanson's metric is filtered per row and per DATE – Resolve rated her on
     // likeability until the 6-11 Jul 2026 wave and on performance after it, so
     // an unbounded firm test would put favourability on an approval line.
@@ -1130,8 +1151,8 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     // in a 5th element; otherwise the firm decides. Matters most for the 2022
     // cycle, where Freshwater and RedBridge report favourability.
     const apprRows = as.filter((r) => (r.metric || metricOf(r.firm, "alb")) !== "fav");
-    netPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.pmNet }));
-    oppPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.oppNet }));
+    netPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.pmNet, iso: r.date }));
+    oppPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.oppNet, iso: r.date }));
     // no past cycle rated Hanson: cycleApproval carries pmNet and oppNet only
     hanPts = [];
   }
@@ -1161,6 +1182,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     months, primary: prim.vals, tpp: tpp.vals, net: align(net), oppnet: align(opp),
     obs: { primary: prim.obs, tpp: tpp.obs, net: alignObs(net), oppnet: alignObs(opp) },
     han: sparseSeries(hanPts, months, cap),
+    netEras: eraSeries(netPts, c.pmSpl, cap), oppEras: eraSeries(oppPts, c.oppSpl, cap),
   };
 });
 
@@ -1588,7 +1610,8 @@ window.AUSPOL = (function () {
       oppnet: c.months.map((m, i) => ({ x: m, y: c.oppnet[i] })),
       han: c.months.map((m, i) => ({ x: m, y: c.han[i] })),
     },
-    raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, han: c.han, months: c.months, obs: c.obs },
+    raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, han: c.han, months: c.months, obs: c.obs,
+           ...(c.netEras ? { netEras: c.netEras } : {}), ...(c.oppEras ? { oppEras: c.oppEras } : {}) },
   }));
 
   return {
@@ -1608,6 +1631,12 @@ fs.writeFileSync(DATA_ASSET, out);
 fs.writeFileSync(CYCLE_SOURCE_ASSET, JSON.stringify(cycleSource));
 
 /* ---- sanity summary ---------------------------------------------------- */
+console.log("cycle leader splits:", CYCLE_DEFS.map((c) => {
+  const parts = [];
+  if (c.netEras) parts.push("pm: " + c.netEras.map((e) => `${e.name} m${e.months[0]}–${e.months[e.months.length - 1]}`).join(" | "));
+  if (c.oppEras) parts.push("opp: " + c.oppEras.map((e) => `${e.name} m${e.months[0]}–${e.months[e.months.length - 1]}`).join(" | "));
+  return parts.length ? `${c.year}(${parts.join("; ")})` : null;
+}).filter(Boolean).join(" "));
 console.log("MONTHS:", MONTHS.length, MONTHS[0], "→", MONTHS[MONTHS.length - 1]);
 console.log("agg2pp:", agg2pp.length, "pts | first:", agg2pp[0], "| last:", agg2pp[agg2pp.length - 1]);
 console.log("aggPrimary last:", aggPrimary[aggPrimary.length - 1]);

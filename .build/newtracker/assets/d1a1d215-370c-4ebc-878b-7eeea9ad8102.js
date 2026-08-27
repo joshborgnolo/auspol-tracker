@@ -301,6 +301,13 @@ const CYC_EVENTS = {
       desc: "Malcolm Turnbull resigns and Scott Morrison defeats Peter Dutton in the Liberal leadership spill, becoming prime minister.",
       major: true,
     },
+    {
+      date: "2019-05-27", short: "Shorten → Albanese",
+      label: "Albanese replaces Shorten as opposition leader",
+      desc: "Anthony Albanese is elected unopposed as Labor leader, after Bill Shorten resigns in the wake of the 2019 federal election defeat.",
+      major: true,
+      metrics: ["oppnet"],
+    },
   ],
   2019: [
     {
@@ -420,7 +427,7 @@ function cycleReadings(c, M, D) {
       else if (key === "net") y = (mb.alb || "approval") === "fav" ? null : (p.appr ? p.appr.albNet : null);
       else if (key === "oppnet") y = (mb.taylor || "approval") === "fav" ? null : (p.appr ? p.appr.taylorNet : null);
       if (y == null) continue;
-      out.push({ x: mOf(p.released), y,
+      out.push({ x: mOf(p.released), y, iso: p.released,
                  meta: { pollster: p.pollster, dateLabel: p.dateLabel, sample: p.sample, released: p.released } });
     }
     return out;
@@ -431,13 +438,13 @@ function cycleReadings(c, M, D) {
     const f = key === "tpp" ? "tpp_" + c.gov : c.gov;
     for (const p of src.polls) {
       if (p[f] == null || p.firm === "Election" || !inCycleRange(p.m)) continue;
-      out.push({ x: p.m, y: p[f], meta: { pollster: p.firm, dateLabel: cycDotDate(p.date) } });
+      out.push({ x: p.m, y: p[f], iso: p.date, meta: { pollster: p.firm, dateLabel: cycDotDate(p.date) } });
     }
   } else {
     const f = isOpp ? "oppNet" : "pmNet";
     for (const r of src.approval) {
       if (r[f] == null || r.metric === "fav" || !inCycleRange(r.m)) continue;
-      out.push({ x: r.m, y: r[f], meta: { pollster: r.firm, dateLabel: cycDotDate(r.date) } });
+      out.push({ x: r.m, y: r[f], iso: r.date, meta: { pollster: r.firm, dateLabel: cycDotDate(r.date) } });
     }
   }
   return out;
@@ -568,46 +575,58 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
   const hanCtl = M.han && hanAvail && solo === hanCycle;
   const built = shown.flatMap((c) => {
     const base = cycBase(c, M.key);
-    const monthly = toMonthly(c.raw.months, c.raw[M.key], c.span);
-    // months with no reading are dropped, so the line begins where the polling
-    // does instead of running flat out of a value that was never measured
-    const pts = monthly.filter((p) => p.y != null)
-      .map((p) => ({ x: p.x, y: chg ? +(p.y - base).toFixed(2) : p.y }));
+    /* An office that changed hands mid-term draws one run per person, in the
+       cycle's single colour: the spliced-out leader's run ends uncapped and
+       answers to its own name, so the handover month lists both readings
+       rather than letting one office row average two people. The pooled
+       series still carries terms that never changed leaders. */
+    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || null;
+    const seriesIn = eras
+      ? eras.map((e) => ({ name: e.name, months: e.months, vals: e.vals, obs: e.obs }))
+      : [{ name: null, months: c.raw.months, vals: c.raw[M.key], obs: (c.raw.obs || {})[M.key] }];
     const isHi = hi === c.year;
     const dim = hi != null && !isHi && !c.current;
     let width, weight, opacity, labOp;
     if (c.current) { width = isHi ? 4 : 3.6; weight = 3; opacity = 1; labOp = 1; }
     else if (isHi) { width = 3; weight = 2; opacity = 1; labOp = 1; }
     else { width = 1.7; weight = dim ? 0 : 1; opacity = dim ? 0.13 : 0.42; labOp = dim ? 0.2 : 0.75; }
-    const leadName = isOpp ? c.oppLead : c.lead;
-    const label = solo ? leadName : c.year + " · " + leadName;
-    /* Months are the x values, and `months` is 0..n, but look the index up
-       rather than assume it: the flags have to describe the same month the
-       point does or the dash lands on the wrong segment. Absent obs data
-       (an older payload) marks nothing, so the line just stays solid. */
-    const flags = (c.raw.obs || {})[M.key];
-    const observed = (m) => {
-      if (!flags) return true;
-      const i = c.raw.months.indexOf(m);
-      return i < 0 ? true : !!flags[i];
-    };
-    /* The dash says the line is crossing a gap; this says what the number in
-       the readout is. Without it the tooltip hands back a flat figure for a
-       month nobody polled, which is the whole thing being marked. Only the
-       unpolled month itself is annotated - the readings either side of it are
-       real, and the dedupe hands each boundary month to its solid run first. */
-    if (flags) pts.forEach((p) => { if (!observed(p.x)) p.note = "no poll · interpolated"; });
-    const runs = obsRuns(pts, observed);
-    return runs.map((run, i) => ({
-      id: "c" + c.year + (i ? "-" + i : ""), label, color: c.color, width,
-      points: run.points, weight, current: c.current, opacity, dashed: run.dashed,
-      // the end label and the end-cap dot belong to the LINE, so only its
-      // last run carries them – otherwise a split line grows a dot and a
-      // year at every run boundary
-      ...(i === runs.length - 1
-        ? { endLabel: "’" + String(c.year).slice(2), endLabelOpacity: labOp }
-        : { endCap: false }),
-    }));
+    return seriesIn.flatMap((s, si) => {
+      const monthly = toMonthly(s.months, s.vals, c.span);
+      // months with no reading are dropped, so the line begins where the polling
+      // does instead of running flat out of a value that was never measured
+      const pts = monthly.filter((p) => p.y != null)
+        .map((p) => ({ x: p.x, y: chg ? +(p.y - base).toFixed(2) : p.y }));
+      const leadName = s.name || (isOpp ? c.oppLead : c.lead);
+      const label = solo ? leadName : c.year + " · " + leadName;
+      /* Months are the x values, and `months` is 0..n, but look the index up
+         rather than assume it: the flags have to describe the same month the
+         point does or the dash lands on the wrong segment. Absent obs data
+         (an older payload) marks nothing, so the line just stays solid. */
+      const flags = s.obs;
+      const observed = (m) => {
+        if (!flags) return true;
+        const i = s.months.indexOf(m);
+        return i < 0 ? true : !!flags[i];
+      };
+      /* The dash says the line is crossing a gap; this says what the number in
+         the readout is. Without it the tooltip hands back a flat figure for a
+         month nobody polled, which is the whole thing being marked. Only the
+         unpolled month itself is annotated - the readings either side of it are
+         real, and the dedupe hands each boundary month to its solid run first. */
+      if (flags) pts.forEach((p) => { if (!observed(p.x)) p.note = "no poll · interpolated"; });
+      const runs = obsRuns(pts, observed);
+      const termEnd = si === seriesIn.length - 1;
+      return runs.map((run, i) => ({
+        id: "c" + c.year + (si ? "-e" + si : "") + (i ? "-" + i : ""), label, color: c.color, width,
+        points: run.points, weight, current: c.current, opacity, dashed: run.dashed,
+        // the end label and the end-cap dot belong to the LINE, so only the
+        // final era's last run carries them – otherwise a split line grows a
+        // dot and a year at every run boundary
+        ...(termEnd && i === runs.length - 1
+          ? { endLabel: "’" + String(c.year).slice(2), endLabelOpacity: labOp }
+          : { endCap: false }),
+      }));
+    });
   });
   /* The polls the lines are averages of, once the board is narrow enough to
      read them. Each cloud takes its line's colour and shape, and follows it
@@ -628,11 +647,24 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
     const base = cycBase(c, M.key);
     const leadName = isOpp ? c.oppLead : c.lead;
     const label = solo ? leadName : c.year + " · " + leadName;
+    // a term that changed holders names the holder at the dot's own date,
+    // matching the per-person runs drawn under it
+    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || null;
+    const nameAt = (iso) => {
+      if (!eras || !iso) return null;
+      let n = eras[0].name;
+      for (const e of eras) if (e.from && iso >= e.from) n = e.name;
+      return n;
+    };
     const dim = hi != null && hi !== c.year && !c.current;
-    return cycleReadings(c, M, D).map((p) => ({
-      x: p.x, y: chg ? +(p.y - base).toFixed(2) : p.y,
-      color: c.color, shape: shapes[c.year], label, meta: p.meta, op: dim ? 0.3 : 1,
-    }));
+    return cycleReadings(c, M, D).map((p) => {
+      const n = nameAt(p.iso);
+      return {
+        x: p.x, y: chg ? +(p.y - base).toFixed(2) : p.y,
+        color: c.color, shape: shapes[c.year],
+        label: n ? (solo ? n : c.year + " · " + n) : label, meta: p.meta, op: dim ? 0.3 : 1,
+      };
+    });
   })), [dotsOn, shownKey, M.key, isOpp, chg, hi]);
   /* Hanson – one line, not one per cycle. She has been rated for part of the
      current term and in no term before it, so there is no past-cycle
