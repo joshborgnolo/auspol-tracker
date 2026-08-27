@@ -797,9 +797,16 @@ const undecided = undecidedSeries.length ? {
 /* ---- 6. individual polls (full archive) -------------------------------- */
 const individualPolls = POLLS.map((p) => {
   const ym = ymOf(p.date), day = dayOf(p.date);
+  const fym = p.dateStart ? ymOf(p.dateStart) : null;
   const field = fwLabel(p.dateStart, p.date);
   return {
     ym, x: mx(ym) + (day - 15) / 365, day, pollster: p.pollster,
+    /* Fieldwork's start month, when it spanned a boundary. Roy Morgan's
+       first wave of the term closed 1 June but ran 5 May–1 Jun, and a span
+       label read off the ym bucket loudly opened the archive in June while
+       every row said its fieldwork began in May. Only carried when it
+       differs from ym, so the byte cost lands only on straddling waves. */
+    ...(fym !== ym ? { fym } : {}),
     field, dateLabel: field, released: p.date, sample: p.sample ?? null,
     /* When the wave was PUBLISHED, where the cited release says so. The
        archive's row detail has always had a line labelled "Published" and has

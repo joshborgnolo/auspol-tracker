@@ -1990,8 +1990,12 @@ function AllPollsView({ focus, onBack, backLabel }) {
             Every individual national poll in the archive · {total} polls from {houses.length} pollsters,
             {" "}{(() => {  // span computed from the data, so it stays honest as polls are added
               const f = D.individualPolls[0], l = D.individualPolls[D.individualPolls.length - 1];
-              const lab = (p) => { const [y, m] = p.ym.split("-").map(Number); return D.monthNameFull(m) + " " + y; };
-              return lab(f) + "–" + lab(l);   // range: tight en dash, never spaced
+              const lab = (ym) => { const [y, m] = ym.split("-").map(Number); return D.monthNameFull(m) + " " + y; };
+              /* the start is the first fieldwork's OPENING month (fym), not
+                 the close-month the ym bucket is named for: the term's first
+                 wave ran 5 May–1 Jun, and this span read "June 2025" until
+                 the opening month was admitted */
+              return lab(f.fym || f.ym) + "–" + lab(l.ym);   // range: tight en dash, never spaced
             })()}
           </p>
         </div>
