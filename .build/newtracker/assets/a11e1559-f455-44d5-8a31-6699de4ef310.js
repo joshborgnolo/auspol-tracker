@@ -2184,15 +2184,21 @@ function NextPollsPanel() {
     const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
     for (let i = 0; reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)))) && i < 12; i++) {
       const overdue = due(release) <= nowMs;
+      /* Each further wave is one more interval of drift, so the window widens
+         as sqrt(waves) – the second Essential is a looser bet than the first.
+         A house on a fixed weekly schedule barely moves; an erratic one
+         visibly fans out, which is the point. */
+      const sp = Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)));
       rows.push({
         ...c, field, release, overdue, ahead: i,
-        /* Each further wave is one more interval of drift, so the window widens
-           as sqrt(waves) – the second Essential is a looser bet than the first.
-           A house on a fixed weekly schedule barely moves; an erratic one
-           visibly fans out, which is the point. */
-        spread: Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))),
+        spread: sp,
         inDays: Math.round((release - t0) / DAY_MS),
-        opensIn: Math.round((release - Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))) * DAY_MS - t0) / DAY_MS),
+        opensIn: Math.round((release - sp * DAY_MS - t0) / DAY_MS),
+        /* Overdue is not missed while the ± window is still open: the row
+           counts on toward the far edge of it, and is only red once that too
+           has passed. */
+        closesIn: Math.round((release + sp * DAY_MS - t0) / DAY_MS),
+        missed: overdue && release + sp * DAY_MS < t0,
       });
       // an overdue slot isn't a base to project the next one from – that
       // would stack a guess on a slot nothing has confirmed yet
@@ -2227,9 +2233,17 @@ function NextPollsPanel() {
   };
   /* n goes negative for an overdue row now that one can sit past its own
      moment instead of rolling forward – "in -1 days" named nothing a reader
-     would recognise, so a past slot counts the days the other way. */
-  const when = (n) => (n < 0 ? `${-n} day${-n === 1 ? "" : "s"} overdue`
+     would recognise, so a past slot counts the days the other way. -1 is
+     "yesterday": "1 day overdue" says how late, when the column everywhere
+     else answers when. */
+  const when = (n) => (n === -1 ? "yesterday"
+    : n < 0 ? `${-n} days overdue`
     : n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`);
+  /* The fallback after "or" on an overdue row whose window is still open –
+     how far back the date itself fell, phrased so 0 and 1 read as English
+     too: "in 6 days (or yesterday)". */
+  const ago = (n) => (n === 0 ? "earlier today"
+    : n === 1 ? "yesterday" : `${n} days ago`);
   /* The releases list spans months and sometimes a new year, so unlike the
      projection column it carries one. The weekday rides on the PUBLICATION
      date only: a weekday is a fact about when a house files, and putting one
@@ -2288,11 +2302,16 @@ function NextPollsPanel() {
                     <span className="np-pm">{spreadLabel(r)}</span></>}
             </span>
             {/* the column answers "when", so a window answers it too – with the
-                day it opens, which is the first date the wave is possible */}
-            <span className={"np-when" + (r.overdue ? " np-missed" : "")}>
+                day it opens, which is the first date the wave is possible. An
+                overdue row whose window is still OPEN answers with its far edge
+                plus when the slot itself fell – the red is reserved for a wave
+                that can no longer land inside its own span */}
+            <span className={"np-when" + (r.missed ? " np-missed" : "")}>
               {r.loose
                 ? (r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn))
-                : when(r.inDays)}
+                : r.overdue && !r.missed
+                  ? `${when(r.closesIn)} (or ${ago(-r.inDays)})`
+                  : when(r.inDays)}
             </span>
             <span className="np-cadence">
               {cadenceLabel(r.cadence)}
@@ -2441,7 +2460,7 @@ function NextPollsPanel() {
         {" "}A projection is a moment, not a guess: once the hour passes without that release, the
         row stays exactly where it is and says so, rather than rolling forward onto a date nobody
         has published.
-        {overdue && " A row marked overdue leaves this list only once that release is added, not on a date guessed in its place."}
+        {overdue && " A row past its moment counts on to the far edge of its own window while the wave can still land inside it, and only reads as missed, in red, once that edge has passed too. It leaves this list only once that release is added, not on a date guessed in its place."}
         {" "}Opening a row lists that house’s five most recent releases with the interval between
         each, and names the house’s own release page, so the estimate can be checked against the
         thing it was taken from rather than taken on trust.
