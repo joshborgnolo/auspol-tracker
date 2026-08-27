@@ -225,9 +225,9 @@ const cycEventMonth = (iso, eDate) => (Date.parse(iso) - Date.parse(eDate)) / 86
 const CYC_EVENTS = {
   2019: [
     {
-      date: "2019-11-11", short: "Bushfire emergency",
-      label: "Berejiklian declares NSW state of emergency",
-      desc: "State of emergency declared in NSW amid catastrophic bushfire conditions.",
+      date: "2019-11-09", short: "Bushfire emergency",
+      label: "Queensland declares a state of emergency",
+      desc: "Queensland declares a state of emergency amid catastrophic bushfire conditions - two days before NSW follows.",
       major: true,
     },
     {
