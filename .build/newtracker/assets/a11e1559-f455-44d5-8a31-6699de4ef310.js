@@ -2207,7 +2207,7 @@ function NextPollsPanel() {
       const winHalf = spreadDays(c, sp);
       rows.push({
         ...c, field, release, overdue, ahead: i,
-        spread: sp,
+        spread: sp, winHalf,
         inDays: Math.round((release - t0) / DAY_MS),
         opensIn: Math.round((release - winHalf * DAY_MS - t0) / DAY_MS),
         /* Overdue is not missed while the ± window is still open: the row
@@ -2223,9 +2223,18 @@ function NextPollsPanel() {
       release = dayFloor(snap(field + c.lag * DAY_MS));
     }
   });
-  // ordered by when each entry first becomes possible – for a dated row that is
-  // the date, for a window it is the day the window opens
-  const first = (r) => (r.loose ? r.release - r.spread * DAY_MS : r.release);
+  /* Ordered by when each entry's wave is assumed to land – for a dated row
+     that is the date, for a window the day it opens. An overdue row whose
+     window is still open sorts at the FAR edge, not the date just missed:
+     the assumption is that its poll has not been published, and while the
+     window stays open the soonest it can land is that edge – so Essential
+     sits under "in 3 days" and "in 5 days", at its own "in 6 days", instead
+     of claiming the top of the list with yesterday's slot. A missed row
+     (edge also past) drops to the foot: there is no date left to give it. */
+  const first = (r) => (r.loose ? r.release - r.spread * DAY_MS
+    : r.missed ? Infinity
+    : r.overdue ? r.release + (r.winHalf != null ? r.winHalf : r.spread) * DAY_MS
+    : r.release);
   rows.sort((a, b) => first(a) - first(b));
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
 
@@ -2474,9 +2483,9 @@ function NextPollsPanel() {
         of being left out — DemosAU polls about monthly, but anywhere in a five-week span.
         {stated.length > 0 && ` ${stated.join(" and ")} ${stated.length > 1 ? "run" : "runs"} on a schedule stated by hand rather than measured, because the recorded releases don’t measure the one the house plainly keeps.`}
         {" "}A projection is a moment, not a guess: once the hour passes without that release, the
-        row stays exactly where it is and says so, rather than rolling forward onto a date nobody
+        date stays exactly where it is and says so, rather than rolling forward onto a date nobody
         has published.
-        {overdue && " A row past its moment counts on to the far edge of its own window while the wave can still land inside it, and only reads as missed, in red, once that edge has passed too. It leaves this list only once that release is added, not on a date guessed in its place."}
+        {overdue && " A row past its moment is taken to be a poll not yet published: it counts on to the far edge of its own window, and sorts there too, while the wave can still land inside it, and only reads as missed, in red at the foot of the list, once that edge has passed too. It leaves this list only once that release is added, not on a date guessed in its place."}
         {" "}Opening a row lists that house’s five most recent releases with the interval between
         each, and names the house’s own release page, so the estimate can be checked against the
         thing it was taken from rather than taken on trust.
