@@ -12,6 +12,43 @@ import { fileURLToPath } from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
 const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
+
+/* ---- one house, one name ----------------------------------------------
+   A pollster that changes its letterhead is still the same pollster. Left
+   apart, RedBridge was two houses that each looked like a fraction of one:
+   eleven waves under the name it used until April 2026 that appeared to have
+   stopped, and three under the name it has used since that were too few to
+   measure anything. Neither could describe a shop that has published every
+   few weeks for a year — it had no house effect worth the name, no schedule,
+   and no place in a table of the latest polls.
+
+   Applied to the source arrays before anything reads them, so there is one
+   rename in one place rather than a canonical-name helper at every join. It
+   deliberately does NOT touch data/polls.json: each poll stays transcribed
+   under the name it was actually published as, and this is the one declared,
+   revertible decision to treat two of those names as one shop.
+
+   Only the CURRENT cycle. Past-cycle firm strings are canonicalised
+   separately, by ACC_CANON, where the rules are stricter — see the comment
+   there on why Galaxy and YouGov are not merged.
+
+   Products are not names: the (MRP) variants are a different piece of work on
+   their own schedule and are not folded into the tracking poll. */
+const HOUSE_RENAMES = { "Redbridge": "RedBridge / Accent" };
+for (const [key, field] of [["polls", "pollster"], ["ppm", "firm"], ["approval", "firm"],
+                            ["altTpp", "firm"], ["ppmHeadToHead", "firm"], ["direction", "pollster"]]) {
+  if (!Array.isArray(D[key])) continue;
+  D[key] = D[key].map((r) => (HOUSE_RENAMES[r[field]] ? { ...r, [field]: HOUSE_RENAMES[r[field]] } : r));
+}
+/* pollsterRules is keyed by the name too, so a renamed house would leave its
+   rules stranded under a name no poll carries any more. Folded rather than
+   overwritten: anything already stated against the current name wins. */
+for (const [from, to] of Object.entries(HOUSE_RENAMES)) {
+  const r = D.pollsterRules && D.pollsterRules[from];
+  if (!r) continue;
+  D.pollsterRules[to] = { ...r, ...(D.pollsterRules[to] || {}) };
+  delete D.pollsterRules[from];
+}
 const DATA_ASSET = path.join(HERE, "assets", "9f09dca2-bd46-49a8-8ae1-51847608cf92.js");
 const CYCLE_SOURCE_ASSET = path.join(HERE, "assets", "cycle-source.json");
 
@@ -34,7 +71,7 @@ const cycleAppr = D.cycleApproval;
 
 /* ---- approval vs favourability – different questions, never blended ----
    Mirrors the source file's LEADER_NET_METRIC (keyed by canonical firm):
-   Redbridge, DemosAU and Freshwater publish net FAVOURABILITY (positive −
+   RedBridge, DemosAU and Freshwater publish net FAVOURABILITY (positive −
    negative); everyone else publishes net APPROVAL (approve − disapprove). */
 // metric is per-(firm, leader): a firm can ask APPROVAL of some leaders and
 // FAVOURABILITY of others in the SAME poll (Resolve rates the majors on
@@ -81,6 +118,11 @@ const dayOf = (d) => Number(d.slice(8, 10));
 const r1 = (v) => Math.round(v * 10) / 10;
 const r2 = (v) => Math.round(v * 100) / 100;
 const mean = (a) => a.reduce((s, v) => s + v, 0) / a.length;
+const medianOf = (a) => {
+  const v = [...a].sort((x, y) => x - y);
+  if (!v.length) return null;
+  return v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;
+};
 const meanOf = (rows, f) => { const v = rows.map(f).filter((x) => x != null); return v.length ? mean(v) : null; };
 
 const ELECTION = ELECTIONS.e2025;                       // 3 May 2025 baseline
@@ -776,10 +818,40 @@ const individualPolls = POLLS.map((p) => {
   };
 }).sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
 
-/* ---- 7. latest polls – most recent reading per house (last 3 weeks) ---- */
+/* ---- 7. latest polls – the most recent reading from each ACTIVE house ----
+   This was a flat three-week window, which is a rule about weekly houses. It
+   silently dropped every monthly one: Essential and RedBridge/Accent were both
+   missing from a table headed "the most recent poll from each active pollster"
+   for the crime of polling monthly, and no reader could tell whether that meant
+   they had stopped or that the table did not go back far enough.
+
+   A house is kept while it is inside half again its OWN median interval — the
+   same test the projections panel uses to decide a house has stopped, so the
+   two panels now agree about which houses still exist. Three weeks stays as
+   the floor, for houses too new to have measured an interval and so that no
+   house that used to qualify has lost its place. */
+const LATEST_MIN_DAYS = 21;
+const LATEST_SILENT = 1.5;      // intervals of silence before a house has stopped
+const LATEST_MIN_WAVES = 4;     // before an interval is worth measuring at all
+const houseInterval = (() => {
+  const by = {}, out = new Map();
+  for (const p of POLLS) (by[p.pollster] ||= []).push(p.date);
+  for (const [firm, ds] of Object.entries(by)) {
+    if (ds.length < LATEST_MIN_WAVES) continue;
+    const gaps = ds.slice(1)
+      .map((d, i) => Math.round((Date.parse(d) - Date.parse(ds[i])) / 86400000)).slice(-8);
+    const m = medianOf(gaps);
+    if (m > 0) out.set(firm, m);
+  }
+  return out;
+})();
 const canon = (n) => n.replace(/\s*\(.*?\)\s*/g, "").replace(/\s*\/\s*Accent.*$/i, "").trim();
-const cutoff = new Date(LATEST_ISO); cutoff.setDate(cutoff.getDate() - 21);
-const recent = POLLS.filter((p) => new Date(p.date) >= cutoff);
+const latestMs = Date.parse(LATEST_ISO);
+const recent = POLLS.filter((p) => {
+  const quiet = (latestMs - Date.parse(p.date)) / 86400000;
+  const allowed = Math.max(LATEST_MIN_DAYS, LATEST_SILENT * (houseInterval.get(p.pollster) || 0));
+  return quiet <= allowed;
+});
 const perHouse = new Map();
 for (const p of recent.sort((a, b) => a.date.localeCompare(b.date))) perHouse.set(canon(p.pollster), p);
 const pollsterTable = [...perHouse.values()].map((p) => {
@@ -1124,12 +1196,6 @@ const CAD_SPREAD_TRIM = 4;     // gaps needed before an end value can be spared
 const CAD_LOOSE_MAX_REL_SPREAD = 0.75;
 const MONTH_NAMES_L = { january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
                         july: 7, august: 8, september: 9, october: 10, november: 11, december: 12 };
-const medianOf = (a) => {
-  const v = [...a].sort((x, y) => x - y);
-  if (!v.length) return null;
-  return v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;
-};
-
 function pubDateFromUrl(url) {
   if (!url) return null;
   let m = url.match(/([a-z]+)-(\d{1,2})-(\d{4})/i);                    // ...-august-17-2026
@@ -1141,24 +1207,6 @@ function pubDateFromUrl(url) {
   return null;
 }
 
-/* Renames, for the SCHEDULE only. A house that changes its letterhead does not
-   change the day it files, and keeping the two names apart cost RedBridge its
-   place on the panel entirely: eleven waves under the old name went silent in
-   April, three under the new one fall short of the four-wave minimum, and a
-   house that has published every month for a year appeared nowhere.
-
-   Deliberately narrower than it looks. This merges publication RHYTHM across a
-   rename and nothing else - house effects, the archive table and the accuracy
-   panel all still key on the name each poll was published under, because those
-   are claims about method and merging them would assert a continuity this file
-   is in no position to assert. A press schedule is a fact about the shop, not
-   about the questionnaire.
-
-   Products, not just names, stay apart: the (MRP) variants are a different
-   piece of work on their own timetable and are not folded into the tracking
-   poll that shares their masthead. */
-const CAD_CANON = { "Redbridge": "RedBridge / Accent" };
-const cadFirm = (name) => CAD_CANON[name] || name;
 const lagSamples = {}, timeSamples = {}, dowSamples = {};
 for (const p of POLLS) {
   /* A RECORDED publication date beats one parsed out of a URL slug, and until
@@ -1176,13 +1224,13 @@ for (const p of POLLS) {
      frame, which is the only reason the lag stays a whole number of days. */
   const pub = pubRaw.slice(0, 10);
   const clock = /T(\d{2}):(\d{2})/.exec(pubRaw);
-  if (clock) (timeSamples[cadFirm(p.pollster)] ||= []).push(+clock[1] * 60 + +clock[2]);
-  (dowSamples[cadFirm(p.pollster)] ||= []).push(new Date(pub + "T00:00:00Z").getUTCDay());
+  if (clock) (timeSamples[p.pollster] ||= []).push(+clock[1] * 60 + +clock[2]);
+  (dowSamples[p.pollster] ||= []).push(new Date(pub + "T00:00:00Z").getUTCDay());
   const d = Math.round((Date.parse(pub) - Date.parse(p.date)) / 86400000);
   // a shared or rolling release URL (Roy Morgan covers 3 waves in one post,
   // Essential cites a report index) produces a nonsense gap – drop those
   if (d < 0 || d > 30) continue;
-  (lagSamples[cadFirm(p.pollster)] ||= []).push(d);
+  (lagSamples[p.pollster] ||= []).push(d);
 }
 
 /* One RELEASE per entry, not one row. Two Resolve rows carry the same
@@ -1194,7 +1242,7 @@ for (const p of POLLS) {
    the gap between the things it PUBLISHED. */
 const byHouse = {};
 for (const p of POLLS) {
-  const r = (byHouse[cadFirm(p.pollster)] ||= []);
+  const r = (byHouse[p.pollster] ||= []);
   const pub = (p.published || "").slice(0, 10) || null;
   /* the clock rides along with the date, because the panel now SHOWS the
      releases it projects from and an hour is half of what a release time is.

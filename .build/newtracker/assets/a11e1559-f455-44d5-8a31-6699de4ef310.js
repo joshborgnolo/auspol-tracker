@@ -465,7 +465,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
      opposite: holding question format constant, normalising RAISES the
      between-house spread (4.41 -> 6.98pp) and the within-house spread over
      time (2.83 -> 5.62pp), because it divides by a small and moving
-     denominator — uncommitted runs 16% at Newspoll against 37% at Redbridge,
+     denominator — uncommitted runs 16% at Newspoll against 37% at RedBridge,
      and has drifted from 35% to 14% across the cycle. It was correcting the
      smaller distortion and adding a larger one.
 
@@ -1033,7 +1033,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
           <p className="card-sub">
             {metric === "net"
               ? "Approve minus disapprove – a verdict on the job they are doing · Newspoll, YouGov, Resolve, Essential and others"
-              : "Positive minus negative – a verdict on them as a person, not the job · Redbridge, DemosAU and Freshwater ask favourability, not approval"}
+              : "Positive minus negative – a verdict on them as a person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"}
           </p>
         </div>
         <div className="card-head-tools">
@@ -2231,11 +2231,15 @@ function NextPollsPanel() {
   };
   const when = (n) => (n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`);
   /* The releases list spans months and sometimes a new year, so unlike the
-     projection column it carries one. */
-  const fmtYear = (iso) => {
+     projection column it carries one. The weekday rides on the PUBLICATION
+     date only: a weekday is a fact about when a house files, and putting one
+     on a fieldwork end as well would give two dates on a line equal billing
+     when only one of them has a habit. */
+  const fmtDay = (iso) => {
     const d = new Date(iso + "T00:00:00Z");
-    return `${WD[d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)} ${d.getUTCFullYear()}`;
+    return `${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)} ${d.getUTCFullYear()}`;
   };
+  const fmtDow = (iso) => `${WD[new Date(iso + "T00:00:00Z").getUTCDay()].slice(0, 3)} ${fmtDay(iso)}`;
 
   return (
     <section className="card next-polls">
@@ -2319,22 +2323,26 @@ function NextPollsPanel() {
                     <span className="plink-mark" aria-hidden="true">↗</span>
                   </a>}
                 </div>
+                {/* Two dates, so they are labelled. A single column could stand
+                    unheaded; a fieldwork end beside a publication date cannot,
+                    and the interval is measured between the first of them. */}
+                <div className="npd-row npd-cols" aria-hidden="true">
+                  <span>Field to</span><span>Published</span><span>Interval</span>
+                </div>
                 <ol className="npd-list">
                   {[...recent].reverse().map((x) => (
                     <li className="npd-row" key={x.field}>
-                      {/* the publication date where the release recorded one.
-                          Where it did not, the last day of FIELDWORK stands in
-                          and says so - the two are days apart, and quietly
-                          printing one as the other is the thing the archive
-                          table refuses to do either. */}
-                      <span className={"npd-date" + (x.pub ? "" : " est")}
-                            title={x.pub ? undefined
-                                         : "No publication date recorded — this is the last day of fieldwork"}>
-                        {fmtYear(x.pub || x.field)}
-                      </span>
-                      <span className="npd-time">
-                        {x.mins != null ? zoned(clockLabel(x.mins), Date.parse(x.pub)) : "—"}
-                      </span>
+                      <span className="npd-field">{fmtDay(x.field)}</span>
+                      {/* The publication date and hour where the release
+                          recorded them. Where it did not, the cell says so
+                          rather than letting the fieldwork end stand in for a
+                          date nobody published on — the two are days apart. */}
+                      {x.pub
+                        ? <span className="npd-pub">
+                            {fmtDow(x.pub)}
+                            {x.mins != null && <>, {zoned(clockLabel(x.mins), Date.parse(x.pub))}</>}
+                          </span>
+                        : <span className="npd-pub none" title="No publication date recorded for this wave">—</span>}
                       <span className="npd-gap">
                         {x.gap != null ? `${x.gap} days` : ""}
                       </span>

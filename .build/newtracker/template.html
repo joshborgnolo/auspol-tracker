@@ -2388,7 +2388,7 @@ a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--
 /* Held to a reading width rather than the card's. Stretched across 1100px the
    three columns land at opposite ends of the panel and stop being one line
    about one release. */
-.np-detail { padding: 2px 12px 12px 30px; max-width: 560px; animation: np-open .18s ease both; }
+.np-detail { padding: 2px 12px 12px 30px; max-width: 620px; animation: np-open .18s ease both; }
 @keyframes np-open { from { opacity: 0; transform: translateY(-3px); } }
 .npd-h {
   display: flex; align-items: baseline; gap: 8px;
@@ -2400,17 +2400,20 @@ a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--
 .npd-site:hover { color: var(--ink-2); text-decoration: underline; text-underline-offset: 2px; }
 .npd-list { list-style: none; margin: 0; padding: 0; }
 .npd-row {
-  display: grid; grid-template-columns: minmax(120px, 1fr) minmax(90px, 0.8fr) auto;
-  gap: 10px; align-items: baseline; padding: 5px 0;
+  display: grid; grid-template-columns: minmax(96px, 0.8fr) minmax(150px, 1.4fr) auto;
+  gap: 12px; align-items: baseline; padding: 5px 0;
   font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
 }
-.npd-row + .npd-row { border-top: 1px solid var(--line-2); }
-.npd-date { color: var(--ink); font-weight: 600; }
-/* a fieldwork end standing in for a publication date nobody recorded – marked
-   the same dashed way the archive table marks the same substitution */
-.npd-date.est { font-weight: 500; color: var(--ink-3);
-  border-bottom: 1px dashed var(--line-2); }
-.npd-time { color: var(--ink-3); }
+.npd-list .npd-row + .npd-row { border-top: 1px solid var(--line-2); }
+/* the column heads: the quietest thing in the panel, since they are read once */
+.npd-cols { padding: 6px 0 3px; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-faint); }
+.npd-cols span:last-child { margin-left: auto; }
+/* the fieldwork end is what the interval beside it is measured between, so it
+   leads; the publication date is the one carrying a weekday and an hour */
+.npd-field { color: var(--ink-2); }
+.npd-pub { color: var(--ink); font-weight: 600; }
+.npd-pub.none { color: var(--ink-faint); font-weight: 500; }
 .npd-gap { margin-left: auto; color: var(--ink-3); white-space: nowrap; }
 .npd-foot { margin: 8px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ink-3); max-width: 62ch; }
 @media (prefers-reduced-motion: reduce) { .np-detail { animation: none; } }
@@ -2432,15 +2435,18 @@ a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--
   .np-date { grid-column: 1; }
   .np-cadence { grid-column: 1 / -1; }
   .np-detail { padding: 0 10px 10px 26px; }
-  /* the hour drops under the date rather than squeezing three columns into a
-     phone's width, and the interval keeps the right-hand edge across both
-     lines. Placed by AREA, not by auto-flow: two children carrying a column
-     hint and a third carrying margin-left:auto put the date on the right and
-     the hour on a line of its own. */
-  .npd-row { grid-template-columns: 1fr auto; grid-template-areas: "date gap" "time gap"; row-gap: 1px; }
-  .npd-date { grid-area: date; }
-  .npd-time { grid-area: time; }
+  /* the publication date drops under the fieldwork end rather than squeezing
+     three columns into a phone's width, and the interval keeps the right-hand
+     edge across both lines. Placed by AREA, not by auto-flow: two children
+     carrying a column hint and a third carrying margin-left:auto put the dates
+     in the wrong order and the hour on a line of its own. */
+  .npd-row { grid-template-columns: 1fr auto; grid-template-areas: "field gap" "pub gap"; row-gap: 1px; }
+  .npd-field { grid-area: field; }
+  .npd-pub { grid-area: pub; }
   .npd-gap { grid-area: gap; align-self: center; }
+  /* three labels over two stacked columns names the wrong thing – the rows
+     read plainly enough at this width without them */
+  .npd-cols { display: none; }
 }
 
 /* ---------- Poll disagreement (variance) panel ---------- */

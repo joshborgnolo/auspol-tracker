@@ -49,9 +49,6 @@
     "Resolve": {
       "site": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html"
     },
-    "Redbridge": {
-      "site": "https://www.accent-research.com/projects"
-    },
     "RedBridge / Accent": {
       "site": "https://www.accent-research.com/projects"
     },
@@ -3055,6 +3052,7 @@
     },
     {
       "date": "2026-05-28",
+      "published": "2026-05-31T18:00",
       "dateStart": "2026-05-25",
       "pollster": "RedBridge / Accent",
       "client": "AFR",
@@ -3251,6 +3249,7 @@
     },
     {
       "date": "2026-06-26",
+      "published": "2026-06-28T18:00",
       "dateStart": "2026-06-22",
       "pollster": "RedBridge / Accent",
       "client": "AFR",
