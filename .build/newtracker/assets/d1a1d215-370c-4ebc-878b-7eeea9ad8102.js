@@ -1320,21 +1320,21 @@ function ArchPollDetail({ p, onBack, backLabel }) {
   return (
     <div className="poll-detail">
       <div className="pd-meta">
-        <span className="pd-meta-i"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>
+        <span className="pd-meta-i meta-fld"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>
         {/* The date the poll came OUT, and the hour where the release recorded
             one. This line has always been labelled "Published" and has always
             printed `fullDate`, which is the last day of FIELDWORK - the same
             substitution the Latest-polls column was corrected for, still being
             made one tab across. Where no publication date was recorded the
             fieldwork end still stands in, but now says that it is doing so. */}
-        <span className="pd-meta-i"><span className="pd-meta-k">Published</span>{" "}
+        <span className="pd-meta-i meta-md"><span className="pd-meta-k">Published</span>{" "}
           {pubStamp(p.published, { year: true })
             || <span className="pd-est"
                      title="Publication date not recorded for this poll – showing the last day of fieldwork">
                  {p.fullDate}
                </span>}
         </span>
-        <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>
+        <span className="pd-meta-i meta-md"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>
         {p.lean != null && <span className="pd-meta-i"><span className="pd-meta-k">Poll lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>}
         {p.hfx != null && <span className="pd-meta-i"><span className="pd-meta-k">House effect</span> {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)} vs consensus</span>}
         {/* the way back rides the line that already describes this poll, rather
@@ -1366,13 +1366,13 @@ function ArchPollDetail({ p, onBack, backLabel }) {
         )}
       </div>
       <div className="pd-grid">
-        <div className="pd-block">
+        <div className="pd-block pd-head">
           <div className="pd-k">{tppHeading(tcs)}</div>
           {tcs.length === 0
             ? <div className="pd-absent">No two-party figure published with this poll</div>
             : <div className="pd-contests">
                 {tcs.map((c, i) => (
-                  <div className="pd-contest" key={i}>
+                  <div className={"pd-contest" + (i > 0 ? " pd-contest-minor" : "")} key={i}>
                     {tcs.length > 1 && <div className="pd-contest-lab">{c.lab}</div>}
                     <ShareBar segs={c.segs} />
                   </div>

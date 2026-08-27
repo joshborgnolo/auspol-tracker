@@ -1337,6 +1337,12 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .skey-val { font-weight: 700; color: var(--ink); }
 .skey.muted .skey-val { color: var(--ink-3); }
 .share-compact .share-keys { font-size: 11px; gap: 3px 9px; }
+/* in an expanded row the figures ARE the block, not a column cell, so they
+   step up from the compact rows; the two-party block – the number the poll
+   is published for – steps up once more */
+.poll-detail .skey-val { font-size: 13px; }
+.pd-head .share-keys { font-size: 12.5px; }
+.pd-head .skey-val { font-size: 15px; }
 
 .facet-flag {
   display: inline-block; font-size: 9.5px; font-weight: 700;
@@ -1371,6 +1377,11 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
    this the second takes its own margin-left:auto and the two split apart. */
 .back-to-chart + .pd-report { margin-left: 0; }
 .pd-report svg { opacity: 0.75; }
+/* but the report button is not a peer of the way back - it exists for the
+   reader who already doubts a figure, not as a call to action - so it wears
+   the pill shape at a lower voice */
+.pd-report { font-size: 11.5px; font-weight: 500; color: var(--ink-3); padding: 4px 11px 4px 9px; }
+.pd-report:hover { color: var(--ink); }
 /* the meta line carries text and now a control, so centre what sits in it */
 .pd-meta { align-items: center; }
 /* a poll arrived at from a chart gets one quiet pulse, so the eye finds it
@@ -1394,8 +1405,18 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-size: 10.5px;
   color: var(--ink-3); font-weight: 700; margin-right: 5px;
 }
+/* the row above already prints these as columns: fieldwork is visible at
+   every width, while Sample (and, in the archive, As published) only drop
+   away with .hide-md below 1000px – so the meta line carries its copies only
+   where the columns aren't there to say it */
+.pd-meta .meta-fld { display: none; }
+@media (min-width: 1001px) {
+  .pd-meta .meta-md { display: none; }
+}
+/* the second column (first preferences, approval) carries the wider legends,
+   so it takes the slightly larger share of the row */
 .pd-grid {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
   gap: 18px 34px;
 }
 .pd-block { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
@@ -1446,6 +1467,13 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-appr-top { display: flex; align-items: center; gap: 7px; }
 .pd-appr-name { font-weight: 600; font-size: 13px; }
 .pd-appr-net { margin-left: auto; font-variant-numeric: tabular-nums; }
+/* the three-way split stated as words – the figures step out of the cramped
+   16px bar segments into a muted legend line beneath it */
+.pd-appr-key {
+  margin-top: 4px; font-size: 11.5px; color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.pd-appr-key b { color: var(--ink); font-weight: 700; }
 /* the second measure, when a wave published both for one leader – indented and
    quieter than the primary net, so it reads as an addition, not a correction */
 .pd-appr-alt {
@@ -1467,6 +1495,15 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-size: 12px; font-weight: 700; color: var(--ink-2);
   font-family: var(--serif); font-style: italic; letter-spacing: 0;
 }
+/* a second matchup (e.g. ALP v ON) answers the same question as the headline
+   contest, not a new one – narrower bar, quieter keys, so it reads as the
+   aside it is. Comes AFTER the pd-head sizing so the demotion survives
+   sitting inside the headline block. */
+.pd-contest-minor { max-width: 78%; }
+.pd-contest-minor .pd-contest-lab { color: var(--ink-3); }
+.pd-contest-minor .sbar { height: 6px; }
+.pd-contest-minor .share-keys { font-size: 11px; color: var(--ink-3); }
+.pd-contest-minor .skey-val { font-size: 12px; color: var(--ink-2); }
 /* undecided: one readout per question, because the panel carries two of them
    and they must not read as one measure with two sources */
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
@@ -7749,6 +7786,10 @@ function ApprBlock({
     // favourability (likeability) of a minor-party leader
     const mt = appr.metricBy && appr.metricBy[id] || "approval";
     const segNames = mt === "fav" ? ["Positive", "Neutral", "Negative"] : ["Approve", "Don't know / never heard of", "Disapprove"];
+    // short lowercase forms for the legend under the bar – the full phrase
+    // (“Don't know / never heard of”) stays in the tooltip, but the legend
+    // has to fit beside its figures at 11.5px
+    const segLeg = mt === "fav" ? ["positive", "neutral", "negative"] : ["approve", "don’t know", "disapprove"];
     // the opposition slot is an office – label it by who held it (Ley →
     // Taylor, spliced Feb 2026) when the poll records that
     const label = id === "taylor" && appr.oppName ? appr.oppName : LEADER_META[id].label;
@@ -7781,7 +7822,7 @@ function ApprBlock({
     }), /*#__PURE__*/React.createElement(ChgTag, {
       v: chg && chg.d[id + "Net"] != null ? chg.d[id + "Net"] : null,
       refDate: chg && chg.r[id + "Net"]
-    })))), s && /*#__PURE__*/React.createElement("div", {
+    })))), s && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
       className: "appr-bar pd-appr-bar",
       title: `${segNames[0]} ${s.app} · ${segNames[1]} ${dk} · ${segNames[2]} ${s.dis}`
     }, /*#__PURE__*/React.createElement("span", {
@@ -7789,17 +7830,19 @@ function ApprBlock({
       style: {
         width: s.app + "%"
       }
-    }, s.app), /*#__PURE__*/React.createElement("span", {
+    }), /*#__PURE__*/React.createElement("span", {
       className: "appr-dk",
       style: {
         width: dk + "%"
       }
-    }, dk), /*#__PURE__*/React.createElement("span", {
+    }), /*#__PURE__*/React.createElement("span", {
       className: "appr-dis",
       style: {
         width: s.dis + "%"
       }
-    }, s.dis)), alt && /*#__PURE__*/React.createElement("div", {
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "pd-appr-key"
+    }, /*#__PURE__*/React.createElement("b", null, s.app), " ", segLeg[0], " \xB7 ", /*#__PURE__*/React.createElement("b", null, dk), " ", segLeg[1], " \xB7 ", /*#__PURE__*/React.createElement("b", null, s.dis), " ", segLeg[2])), alt && /*#__PURE__*/React.createElement("div", {
       className: "pd-appr-alt",
       title: "This pollster asked both questions of this leader in the same wave \u2013 favourability (positive minus negative) is not directly comparable with approval"
     }, /*#__PURE__*/React.createElement("span", {
@@ -7886,11 +7929,11 @@ function PollDetail({
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Method"), " ", r.mode), /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i"
+    className: "pd-meta-i meta-md"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Sample"), " ", r.sample ? "n = " + r.sample.toLocaleString() : "—"), /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i"
+    className: "pd-meta-i meta-fld"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Field"), " ", r.field), window.AP_FEEDBACK && /*#__PURE__*/React.createElement("button", {
@@ -7914,7 +7957,7 @@ function PollDetail({
   })), "Report an error")), /*#__PURE__*/React.createElement("div", {
     className: "pd-grid"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
+    className: "pd-block pd-head"
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-k"
   }, tppHeading(tppContests(r))), tppContests(r).length === 0 ? /*#__PURE__*/React.createElement("div", {
@@ -7922,7 +7965,7 @@ function PollDetail({
   }, "No two-party figure published with this poll") : /*#__PURE__*/React.createElement("div", {
     className: "pd-contests"
   }, tppContests(r).map((c, i) => /*#__PURE__*/React.createElement("div", {
-    className: "pd-contest",
+    className: "pd-contest" + (i > 0 ? " pd-contest-minor" : ""),
     key: i
   }, tppContests(r).length > 1 && /*#__PURE__*/React.createElement("div", {
     className: "pd-contest-lab"
@@ -10420,11 +10463,11 @@ function ArchPollDetail({
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-meta"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i"
+    className: "pd-meta-i meta-fld"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Fieldwork"), " ", p.field), /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i"
+    className: "pd-meta-i meta-md"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Published"), " ", pubStamp(p.published, {
@@ -10433,7 +10476,7 @@ function ArchPollDetail({
     className: "pd-est",
     title: "Publication date not recorded for this poll \u2013 showing the last day of fieldwork"
   }, p.fullDate)), /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i"
+    className: "pd-meta-i meta-md"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Sample"), " ", p.sample != null ? "n = " + p.sample.toLocaleString() : "—"), p.lean != null && /*#__PURE__*/React.createElement("span", {
@@ -10483,7 +10526,7 @@ function ArchPollDetail({
   })), "Report an error")), /*#__PURE__*/React.createElement("div", {
     className: "pd-grid"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
+    className: "pd-block pd-head"
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-k"
   }, tppHeading(tcs)), tcs.length === 0 ? /*#__PURE__*/React.createElement("div", {
@@ -10491,7 +10534,7 @@ function ArchPollDetail({
   }, "No two-party figure published with this poll") : /*#__PURE__*/React.createElement("div", {
     className: "pd-contests"
   }, tcs.map((c, i) => /*#__PURE__*/React.createElement("div", {
-    className: "pd-contest",
+    className: "pd-contest" + (i > 0 ? " pd-contest-minor" : ""),
     key: i
   }, tcs.length > 1 && /*#__PURE__*/React.createElement("div", {
     className: "pd-contest-lab"

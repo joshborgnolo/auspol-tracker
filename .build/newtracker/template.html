@@ -1490,6 +1490,12 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .skey-val { font-weight: 700; color: var(--ink); }
 .skey.muted .skey-val { color: var(--ink-3); }
 .share-compact .share-keys { font-size: 11px; gap: 3px 9px; }
+/* in an expanded row the figures ARE the block, not a column cell, so they
+   step up from the compact rows; the two-party block – the number the poll
+   is published for – steps up once more */
+.poll-detail .skey-val { font-size: 13px; }
+.pd-head .share-keys { font-size: 12.5px; }
+.pd-head .skey-val { font-size: 15px; }
 
 .facet-flag {
   display: inline-block; font-size: 9.5px; font-weight: 700;
@@ -1524,6 +1530,11 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
    this the second takes its own margin-left:auto and the two split apart. */
 .back-to-chart + .pd-report { margin-left: 0; }
 .pd-report svg { opacity: 0.75; }
+/* but the report button is not a peer of the way back - it exists for the
+   reader who already doubts a figure, not as a call to action - so it wears
+   the pill shape at a lower voice */
+.pd-report { font-size: 11.5px; font-weight: 500; color: var(--ink-3); padding: 4px 11px 4px 9px; }
+.pd-report:hover { color: var(--ink); }
 /* the meta line carries text and now a control, so centre what sits in it */
 .pd-meta { align-items: center; }
 /* a poll arrived at from a chart gets one quiet pulse, so the eye finds it
@@ -1547,8 +1558,18 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-size: 10.5px;
   color: var(--ink-3); font-weight: 700; margin-right: 5px;
 }
+/* the row above already prints these as columns: fieldwork is visible at
+   every width, while Sample (and, in the archive, As published) only drop
+   away with .hide-md below 1000px – so the meta line carries its copies only
+   where the columns aren't there to say it */
+.pd-meta .meta-fld { display: none; }
+@media (min-width: 1001px) {
+  .pd-meta .meta-md { display: none; }
+}
+/* the second column (first preferences, approval) carries the wider legends,
+   so it takes the slightly larger share of the row */
 .pd-grid {
-  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
   gap: 18px 34px;
 }
 .pd-block { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
@@ -1599,6 +1620,13 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-appr-top { display: flex; align-items: center; gap: 7px; }
 .pd-appr-name { font-weight: 600; font-size: 13px; }
 .pd-appr-net { margin-left: auto; font-variant-numeric: tabular-nums; }
+/* the three-way split stated as words – the figures step out of the cramped
+   16px bar segments into a muted legend line beneath it */
+.pd-appr-key {
+  margin-top: 4px; font-size: 11.5px; color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+.pd-appr-key b { color: var(--ink); font-weight: 700; }
 /* the second measure, when a wave published both for one leader – indented and
    quieter than the primary net, so it reads as an addition, not a correction */
 .pd-appr-alt {
@@ -1620,6 +1648,15 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-size: 12px; font-weight: 700; color: var(--ink-2);
   font-family: var(--serif); font-style: italic; letter-spacing: 0;
 }
+/* a second matchup (e.g. ALP v ON) answers the same question as the headline
+   contest, not a new one – narrower bar, quieter keys, so it reads as the
+   aside it is. Comes AFTER the pd-head sizing so the demotion survives
+   sitting inside the headline block. */
+.pd-contest-minor { max-width: 78%; }
+.pd-contest-minor .pd-contest-lab { color: var(--ink-3); }
+.pd-contest-minor .sbar { height: 6px; }
+.pd-contest-minor .share-keys { font-size: 11px; color: var(--ink-3); }
+.pd-contest-minor .skey-val { font-size: 12px; color: var(--ink-2); }
 /* undecided: one readout per question, because the panel carries two of them
    and they must not read as one measure with two sources */
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;

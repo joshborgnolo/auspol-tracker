@@ -1755,6 +1755,11 @@ function ApprBlock({ appr, chg }) {
         const mt = (appr.metricBy && appr.metricBy[id]) || "approval";
         const segNames = mt === "fav" ? ["Positive", "Neutral", "Negative"]
           : ["Approve", "Don't know / never heard of", "Disapprove"];
+        // short lowercase forms for the legend under the bar – the full phrase
+        // (“Don't know / never heard of”) stays in the tooltip, but the legend
+        // has to fit beside its figures at 11.5px
+        const segLeg = mt === "fav" ? ["positive", "neutral", "negative"]
+          : ["approve", "don’t know", "disapprove"];
         // the opposition slot is an office – label it by who held it (Ley →
         // Taylor, spliced Feb 2026) when the poll records that
         const label = id === "taylor" && appr.oppName ? appr.oppName : LEADER_META[id].label;
@@ -1775,12 +1780,20 @@ function ApprBlock({ appr, chg }) {
               </span>
             </div>
             {s && (
-              <div className="appr-bar pd-appr-bar"
-                   title={`${segNames[0]} ${s.app} · ${segNames[1]} ${dk} · ${segNames[2]} ${s.dis}`}>
-                <span className="appr-app" style={{ width: s.app + "%" }}>{s.app}</span>
-                <span className="appr-dk" style={{ width: dk + "%" }}>{dk}</span>
-                <span className="appr-dis" style={{ width: s.dis + "%" }}>{s.dis}</span>
-              </div>
+              <React.Fragment>
+                <div className="appr-bar pd-appr-bar"
+                     title={`${segNames[0]} ${s.app} · ${segNames[1]} ${dk} · ${segNames[2]} ${s.dis}`}>
+                  <span className="appr-app" style={{ width: s.app + "%" }}></span>
+                  <span className="appr-dk" style={{ width: dk + "%" }}></span>
+                  <span className="appr-dis" style={{ width: s.dis + "%" }}></span>
+                </div>
+                {/* The middle segment of three tints was unguessable, so the
+                    split is now stated: a line of labelled figures under the
+                    bar instead of bare numbers crammed inside 10px segments. */}
+                <div className="pd-appr-key">
+                  <b>{s.app}</b> {segLeg[0]} · <b>{dk}</b> {segLeg[1]} · <b>{s.dis}</b> {segLeg[2]}
+                </div>
+              </React.Fragment>
             )}
             {alt && (
               <div className="pd-appr-alt"
@@ -1841,8 +1854,8 @@ function PollDetail({ r }) {
       <div className="pd-meta">
         <span className="pd-meta-i"><span className="pd-meta-k">Commissioned by</span> {r.client}</span>
         {r.mode && <span className="pd-meta-i"><span className="pd-meta-k">Method</span> {r.mode}</span>}
-        <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {r.sample ? "n = " + r.sample.toLocaleString() : "—"}</span>
-        <span className="pd-meta-i"><span className="pd-meta-k">Field</span> {r.field}</span>
+        <span className="pd-meta-i meta-md"><span className="pd-meta-k">Sample</span> {r.sample ? "n = " + r.sample.toLocaleString() : "—"}</span>
+        <span className="pd-meta-i meta-fld"><span className="pd-meta-k">Field</span> {r.field}</span>
         {/* The same offer the archive row carries, for the same reason: a
             correction is nearly always about ONE poll, and the reader who has
             a row open is looking at the figure they doubt. Seeding the
@@ -1864,13 +1877,13 @@ function PollDetail({ r }) {
         )}
       </div>
       <div className="pd-grid">
-        <div className="pd-block">
+        <div className="pd-block pd-head">
           <div className="pd-k">{tppHeading(tppContests(r))}</div>
           {tppContests(r).length === 0
             ? <div className="pd-absent">No two-party figure published with this poll</div>
             : <div className="pd-contests">
                 {tppContests(r).map((c, i) => (
-                  <div className="pd-contest" key={i}>
+                  <div className={"pd-contest" + (i > 0 ? " pd-contest-minor" : "")} key={i}>
                     {tppContests(r).length > 1 && <div className="pd-contest-lab">{c.lab}</div>}
                     <ShareBar segs={c.segs} />
                   </div>
