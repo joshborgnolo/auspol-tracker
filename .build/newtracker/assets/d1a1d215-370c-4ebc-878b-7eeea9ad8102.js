@@ -1696,8 +1696,13 @@ function VariancePanel({ facet, rangeId }) {
 function AllPollsView({ focus, onBack, backLabel }) {
   const { D } = window.AP;
   const { ShareBar, NetVal, tppContests, tppFlag, ppmContests, ppmContestSegs, ppmFlag } = window;
+  /* "YouGov (MRP)" is YouGov: a parenthetical method tag names a product,
+     never another pollster, and both the filter panel and the pollster
+     count speak in houses. The table rows themselves keep the full name, so
+     an MRP or SMS release is still labelled as one. */
+  const baseHouse = (h) => h.replace(/ \((MRP|SMS)\)$/, "");
   const houses = [];
-  D.individualPolls.forEach((p) => { if (!houses.includes(p.pollster)) houses.push(p.pollster); });
+  D.individualPolls.forEach((p) => { const b = baseHouse(p.pollster); if (!houses.includes(b)) houses.push(b); });
   houses.sort();
 
   /* What each view needs a poll to have published. Primary vote is on every
@@ -1742,7 +1747,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
     const view = FACET_BY_URL[get("f", "view")] || "twopp";
     return {
       q: get("q") || "",
-      who: (get("w", "who") || "").split(",").filter((h) => houses.includes(h)),
+      who: (get("w", "who") || "").split(",").map(baseHouse).filter((h) => houses.includes(h)),
       has: (get("h", "has") || "").split(",").filter((t) => POLL_TAGS.some((pt) => pt.id === t)),
       lead: LEAD_BY_URL[get("l", "lead")] || "all",
       measure: MEAS_BY_URL[get("v", "vs")] || "lnp",
@@ -1862,7 +1867,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
      counting with exactly one predicate lifted out – `without(f)`. */
   const scoping = scope && FACET_SCOPE[facet];
   const TESTS = [
-    ["who", (p) => !sel.size || sel.has(p.pollster)],
+    ["who", (p) => !sel.size || sel.has(baseHouse(p.pollster))],
     // a row must contain EVERY selected data type (AND)
     ["has", (p) => !tagSel.size || [...tagSel].every((tg) => p.tags.includes(tg))],
     ["lead", (p) => { if (lead === "all") return true; const li = archLeadInfo(p, measure); return !!li && li.who === lead; }],
@@ -1877,7 +1882,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
   // option counts, each against every other filter
   const houseRows = without("who");
   const houseN = {};
-  houseRows.forEach((p) => { houseN[p.pollster] = (houseN[p.pollster] || 0) + 1; });
+  houseRows.forEach((p) => { const b = baseHouse(p.pollster); houseN[b] = (houseN[b] || 0) + 1; });
   const tagRows = without("has");
   const tagN = {};
   tagRows.forEach((p) => p.tags.forEach((t) => { tagN[t] = (tagN[t] || 0) + 1; }));

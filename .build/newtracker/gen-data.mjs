@@ -923,7 +923,10 @@ function altNowcast(s) {
 const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
 
 /* ---- 8. headline readings ---------------------------------------------- */
-const houses = new Set(POLLS.map((p) => p.pollster));
+/* The reader-facing count. Products stay distinct series everywhere above –
+   an (MRP) release is its own schedule, its own house effect – but this
+   number says POLLSTERS, and "YouGov (MRP)" is YouGov. */
+const houses = new Set(POLLS.map((p) => p.pollster.replace(/ \((MRP|SMS)\)$/, "")));
 const fmtDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return `${d} ${MNF[m - 1]} ${y}`; };
 const latest = {
   alp2pp: hlNow.alp, lnp2pp: r1(100 - hlNow.alp),
