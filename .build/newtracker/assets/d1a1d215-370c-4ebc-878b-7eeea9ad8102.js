@@ -1499,7 +1499,7 @@ function pollTagIds(p) {
 
    A popover is a listbox, not a dialog: click outside or press Escape to
    close, and focus goes back to the button that opened it. */
-function FilterPop({ id, label, summary, open, setOpen, cls, children }) {
+function FilterPop({ id, label, summary, open, setOpen, children }) {
   const box = useRef(null), panel = useRef(null);
   const isOpen = open === id;
   const [flip, setFlip] = useState(false);
@@ -1525,7 +1525,7 @@ function FilterPop({ id, label, summary, open, setOpen, cls, children }) {
     if (r.right > window.innerWidth - 8) setFlip(true);
   }, [isOpen]);
   return (
-    <div className={"ap-pop" + (cls ? " " + cls : "")} ref={box}>
+    <div className="ap-pop" ref={box}>
       <button type="button" className={"ap-popbtn" + (summary ? " on" : "") + (isOpen ? " open" : "")}
               aria-expanded={isOpen} aria-haspopup="true"
               onClick={() => setOpen(isOpen ? null : id)}>
@@ -1916,7 +1916,9 @@ function AllPollsView({ focus, onBack, backLabel }) {
   const anyFilter = Boolean(ql || sel.size || lead !== "all" || range !== "all" || tagSel.size);
 
   /* What is currently on, as removable pills. The scope pill is marked `auto`
-     – dashed, quieter – because the view set it, not the reader. */
+     – dashed, quieter – because the view set it, not the reader. In the 2PP
+     view it lives elsewhere: beside the lead control in the ap-2line wrapper
+     below, so a phone sees the pair share one line. */
   const RANGE_LAB = { "12": "Last 12 months", "6": "Last 6 months", "3": "Last 3 months" };
   const MEASURE_LAB = { lnp: "ALP v L/NP", onp: "ALP v ON", lnponp: "L/NP v ON" };
   const HOLDER_LAB = { alp: "ALP", lnp: "L/NP", onp: "ON" };
@@ -1926,7 +1928,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
   if (range !== "all") pills.push({ k: "r", lab: RANGE_LAB[range], off: () => setRange("all") });
   [...tagSel].forEach((t) => pills.push({ k: "t" + t, lab: (POLL_TAG_META[t] || {}).label || t, off: () => toggleTag(t) }));
   if (lead !== "all") pills.push({ k: "l", lab: HOLDER_LAB[lead] + " ahead", off: () => setLead("all") });
-  if (scoping) pills.push({ k: "s", lab: scoping.label, auto: true, off: () => setScope(false) });
+  if (scoping && facet !== "twopp") pills.push({ k: "s", lab: scoping.label, auto: true, off: () => setScope(false) });
 
   /* …and back the other way: every non-default filter is written to the
      query string, so the address bar at any moment IS the link to this
@@ -2067,10 +2069,14 @@ function AllPollsView({ focus, onBack, backLabel }) {
 
         {/* The lead column is a 2PP idea, so its controls live and die with
             that view – and they are one button, because choosing the matchup
-            and filtering by who holds it are the same thought. */}
+            and filtering by who holds it are the same thought. The button and
+            the view's "With a 2PP" scope pill share the ap-2line wrapper: on
+            big screens it unfolds into the bar's row in place; on a phone it
+            becomes a line of its own, the pair side by side. */}
         {facet === "twopp" && (
-          <FilterPop id="lead" label="Lead" open={pop} setOpen={setPop} cls="ap-lead"
-            summary={[measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
+          <div className="ap-2line">
+            <FilterPop id="lead" label="Lead" open={pop} setOpen={setPop}
+              summary={[measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
             <div className="ap-pop-head"><span>Show the lead in</span></div>
             <div className="ap-poplist" role="radiogroup" aria-label="Lead column matchup">
               {["lnp", "onp", "lnponp"].map((m) => (
@@ -2090,6 +2096,13 @@ function AllPollsView({ focus, onBack, backLabel }) {
               ))}
             </div>
           </FilterPop>
+            {scoping && (
+              <span className="ap-pill auto">
+                {scoping.label}
+                <button type="button" onClick={() => setScope(false)} aria-label={"Remove filter: " + scoping.label}>×</button>
+              </span>
+            )}
+          </div>
         )}
 
         <div className="ap-bar-end">

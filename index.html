@@ -2072,13 +2072,15 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-count { font-family: var(--sans); font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 .ap-count strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
-/* On a phone the lead button drops to a line of its own at the END of the
-   bar, right above the active-filter pills (where the "With a 2PP" scope pill
-   sits) – left to natural flex order it squeezed the poll count onto a ragged
-   line of its own instead. The button keeps natural width inside the
-   full-width row. */
+/* 2PP's own pair: the lead control and the view's "With a 2PP" scope pill
+   share one wrapper. Big screens unfold it (display: contents) so the pair
+   joins the bar's flex row in place; under 560px the wrapper becomes a full-
+   width line of its own at the END of the bar, the phone showing the lead
+   toggle beside what it scopes instead of shoving the count onto a ragged
+   line alone. */
+.ap-bar .ap-2line { display: contents; }
 @media (max-width: 560px) {
-  .ap-bar .ap-pop.ap-lead { order: 1; flex: 0 0 100%; }
+  .ap-bar .ap-2line { display: flex; align-items: center; gap: 8px; flex: 0 0 100%; order: 1; }
 }
 
 .ap-search {
@@ -10733,7 +10735,6 @@ function FilterPop({
   summary,
   open,
   setOpen,
-  cls,
   children
 }) {
   const box = useRef(null),
@@ -10770,7 +10771,7 @@ function FilterPop({
     if (r.right > window.innerWidth - 8) setFlip(true);
   }, [isOpen]);
   return /*#__PURE__*/React.createElement("div", {
-    className: "ap-pop" + (cls ? " " + cls : ""),
+    className: "ap-pop",
     ref: box
   }, /*#__PURE__*/React.createElement("button", {
     type: "button",
@@ -11335,7 +11336,9 @@ function AllPollsView({
   const anyFilter = Boolean(ql || sel.size || lead !== "all" || range !== "all" || tagSel.size);
 
   /* What is currently on, as removable pills. The scope pill is marked `auto`
-     – dashed, quieter – because the view set it, not the reader. */
+     – dashed, quieter – because the view set it, not the reader. In the 2PP
+     view it lives elsewhere: beside the lead control in the ap-2line wrapper
+     below, so a phone sees the pair share one line. */
   const RANGE_LAB = {
     "12": "Last 12 months",
     "6": "Last 6 months",
@@ -11377,7 +11380,7 @@ function AllPollsView({
     lab: HOLDER_LAB[lead] + " ahead",
     off: () => setLead("all")
   });
-  if (scoping) pills.push({
+  if (scoping && facet !== "twopp") pills.push({
     k: "s",
     lab: scoping.label,
     auto: true,
@@ -11543,12 +11546,13 @@ function AllPollsView({
     onClick: () => toggleTag(t.id)
   }))), /*#__PURE__*/React.createElement("p", {
     className: "ap-pop-foot"
-  }, "Selecting two asks for polls carrying both.")), facet === "twopp" && /*#__PURE__*/React.createElement(FilterPop, {
+  }, "Selecting two asks for polls carrying both.")), facet === "twopp" && /*#__PURE__*/React.createElement("div", {
+    className: "ap-2line"
+  }, /*#__PURE__*/React.createElement(FilterPop, {
     id: "lead",
     label: "Lead",
     open: pop,
     setOpen: setPop,
-    cls: "ap-lead",
     summary: [measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null
   }, /*#__PURE__*/React.createElement("div", {
     className: "ap-pop-head"
@@ -11589,7 +11593,13 @@ function AllPollsView({
       return li && li.who === o.id;
     }).length,
     onClick: () => setLead(o.id)
-  })))), /*#__PURE__*/React.createElement("div", {
+  })))), scoping && /*#__PURE__*/React.createElement("span", {
+    className: "ap-pill auto"
+  }, scoping.label, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    onClick: () => setScope(false),
+    "aria-label": "Remove filter: " + scoping.label
+  }, "\xD7"))), /*#__PURE__*/React.createElement("div", {
     className: "ap-bar-end"
   }, /*#__PURE__*/React.createElement("span", {
     className: "ap-count"
