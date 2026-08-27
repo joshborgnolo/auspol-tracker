@@ -270,6 +270,20 @@ const CYC_EVENTS = {
       major: true,
     },
   ],
+  2022: [
+    {
+      date: "2023-10-14", short: "Voice referendum defeated",
+      label: "Voice to Parliament referendum defeated",
+      desc: "Australians vote No to enshrining an Aboriginal and Torres Strait Islander Voice to Parliament in the Constitution – the proposal fails nationally and in every state.",
+      major: true,
+    },
+    {
+      date: "2023-11-07", short: "RBA cash rate hits 4.35%",
+      label: "RBA hikes the cash rate to a 12-year high",
+      desc: "The RBA board hikes the cash rate 25 basis points to 4.35% – the central bank’s 13th rate rise since May 2022, widely anticipated by economists.",
+      major: true,
+    },
+  ],
   2025: [
     {
       date: "2026-02-12", short: "Ley → Taylor",
