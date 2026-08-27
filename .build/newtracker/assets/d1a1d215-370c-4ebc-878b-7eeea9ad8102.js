@@ -1499,7 +1499,7 @@ function pollTagIds(p) {
 
    A popover is a listbox, not a dialog: click outside or press Escape to
    close, and focus goes back to the button that opened it. */
-function FilterPop({ id, label, summary, open, setOpen, children }) {
+function FilterPop({ id, label, summary, open, setOpen, cls, children }) {
   const box = useRef(null), panel = useRef(null);
   const isOpen = open === id;
   const [flip, setFlip] = useState(false);
@@ -1525,7 +1525,7 @@ function FilterPop({ id, label, summary, open, setOpen, children }) {
     if (r.right > window.innerWidth - 8) setFlip(true);
   }, [isOpen]);
   return (
-    <div className="ap-pop" ref={box}>
+    <div className={"ap-pop" + (cls ? " " + cls : "")} ref={box}>
       <button type="button" className={"ap-popbtn" + (summary ? " on" : "") + (isOpen ? " open" : "")}
               aria-expanded={isOpen} aria-haspopup="true"
               onClick={() => setOpen(isOpen ? null : id)}>
@@ -2069,7 +2069,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
             that view – and they are one button, because choosing the matchup
             and filtering by who holds it are the same thought. */}
         {facet === "twopp" && (
-          <FilterPop id="lead" label="Lead" open={pop} setOpen={setPop}
+          <FilterPop id="lead" label="Lead" open={pop} setOpen={setPop} cls="ap-lead"
             summary={[measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
             <div className="ap-pop-head"><span>Show the lead in</span></div>
             <div className="ap-poplist" role="radiogroup" aria-label="Lead column matchup">

@@ -2225,6 +2225,15 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-count { font-family: var(--sans); font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 .ap-count strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
+/* On a phone the lead button drops to a line of its own at the END of the
+   bar, right above the active-filter pills (where the "With a 2PP" scope pill
+   sits) – left to natural flex order it squeezed the poll count onto a ragged
+   line of its own instead. The button keeps natural width inside the
+   full-width row. */
+@media (max-width: 560px) {
+  .ap-bar .ap-pop.ap-lead { order: 1; flex: 0 0 100%; }
+}
+
 .ap-search {
   position: relative; display: inline-flex; align-items: center; max-width: 320px;
   color: var(--ink-3);
