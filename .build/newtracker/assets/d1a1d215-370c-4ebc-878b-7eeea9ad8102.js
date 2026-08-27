@@ -220,7 +220,8 @@ function cycMonthOf(eDate, m) {
 /* Events pinned to one term, drawn only while that term stands alone on the
    chart: overlaid with five other cycles a date belongs to no single line.
    x is derived from the cycle's election date at render, in the same
-   months-since-election units as the cycles themselves. */
+   months-since-election units as the cycles themselves. An optional metrics
+   whitelist pins the event to those chart measures alone. */
 const cycEventMonth = (iso, eDate) => (Date.parse(iso) - Date.parse(eDate)) / 86400000 / MS_MONTH_C;
 const CYC_EVENTS = {
   2013: [
@@ -267,6 +268,15 @@ const CYC_EVENTS = {
       label: "Brittany Higgins goes public",
       desc: "Former Liberal staffer Brittany Higgins goes public with allegations that she was raped inside Parliament House.",
       major: true,
+    },
+  ],
+  2025: [
+    {
+      date: "2026-02-12", short: "Ley → Taylor",
+      label: "Taylor replaces Ley as opposition leader",
+      desc: "Angus Taylor replaces Sussan Ley as Leader of the Liberal Party and Opposition Leader.",
+      major: true,
+      metrics: ["oppnet"],
     },
   ],
 };
@@ -451,7 +461,9 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
      title takes the calendar month instead. */
   const solo = shown.length === 1 ? shown[0] : null;
   const soloEvents = solo
-    ? (CYC_EVENTS[solo.year] || []).map((e) => ({ ...e, x: cycEventMonth(e.date, solo.eDate) }))
+    ? (CYC_EVENTS[solo.year] || [])
+        .filter((e) => !e.metrics || e.metrics.includes(M.key))
+        .map((e) => ({ ...e, x: cycEventMonth(e.date, solo.eDate) }))
     : [];
   const built = shown.flatMap((c) => {
     const base = cycBase(c, M.key);
