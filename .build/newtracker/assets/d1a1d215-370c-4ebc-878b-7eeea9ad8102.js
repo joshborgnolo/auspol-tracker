@@ -236,6 +236,12 @@ const CYC_EVENTS = {
       desc: "The World Health Organization declares the COVID-19 outbreak a pandemic.",
       major: true,
     },
+    {
+      date: "2021-02-15", short: "Higgins allegations",
+      label: "Brittany Higgins goes public",
+      desc: "Former Liberal staffer Brittany Higgins goes public with allegations that she was raped inside Parliament House.",
+      major: true,
+    },
   ],
 };
 
