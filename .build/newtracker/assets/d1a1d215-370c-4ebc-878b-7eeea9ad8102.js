@@ -1134,15 +1134,27 @@ function ArchLead({ p, measure }) {
 // full per-poll breakdown for an ARCHIVE poll – mirrors the Latest-polls
 // detail, but driven off the archive row shape (alp/lnp 2PP, p primary, ppm,
 // appr) which carries no commissioning client / method / direction fields.
-function ArchPollDetail({ p, onBack }) {
-  const { ShareBar, NetVal, ApprBlock, primarySegs, tppContests, tppHeading, ppmContests, ppmContestSegs, ppmLabel, ppmKind, LEADER_META } = window;
+function ArchPollDetail({ p, onBack, backLabel }) {
+  const { ShareBar, NetVal, ApprBlock, primarySegs, tppContests, tppHeading, ppmContests, ppmContestSegs, ppmLabel, ppmKind, LEADER_META, pubStamp } = window;
   const contests = ppmContests(p);
   const tcs = tppContests(p);
   return (
     <div className="poll-detail">
       <div className="pd-meta">
         <span className="pd-meta-i"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>
-        <span className="pd-meta-i"><span className="pd-meta-k">Published</span> {p.fullDate}</span>
+        {/* The date the poll came OUT, and the hour where the release recorded
+            one. This line has always been labelled "Published" and has always
+            printed `fullDate`, which is the last day of FIELDWORK - the same
+            substitution the Latest-polls column was corrected for, still being
+            made one tab across. Where no publication date was recorded the
+            fieldwork end still stands in, but now says that it is doing so. */}
+        <span className="pd-meta-i"><span className="pd-meta-k">Published</span>{" "}
+          {pubStamp(p.published, { year: true })
+            || <span className="pd-est"
+                     title="Publication date not recorded for this poll – showing the last day of fieldwork">
+                 {p.fullDate}
+               </span>}
+        </span>
         <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>
         {p.lean != null && <span className="pd-meta-i"><span className="pd-meta-k">House lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>}
         {/* the way back rides the line that already describes this poll, rather
@@ -1153,7 +1165,7 @@ function ArchPollDetail({ p, onBack }) {
                  strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M19 12H5M11 18l-6-6 6-6" />
             </svg>
-            Back to the chart
+            Back to {backLabel || "the chart"}
           </button>
         )}
         {/* Corrections are nearly always about ONE poll, and the reader who
@@ -1482,7 +1494,7 @@ function VariancePanel({ facet, rangeId }) {
   );
 }
 
-function AllPollsView({ focus, onBack }) {
+function AllPollsView({ focus, onBack, backLabel }) {
   const { D } = window.AP;
   const { ShareBar, NetVal, tppContests, tppFlag, ppmContests, ppmContestSegs, ppmFlag } = window;
   const houses = [];
@@ -1982,7 +1994,7 @@ function AllPollsView({ focus, onBack }) {
                 {isOpen && (
                   <tr className="detail-row">
                     <td colSpan={colCount}>
-                      <ArchPollDetail p={p} onBack={arrived ? onBack : null} />
+                      <ArchPollDetail p={p} onBack={arrived ? onBack : null} backLabel={backLabel} />
                     </td>
                   </tr>
                 )}

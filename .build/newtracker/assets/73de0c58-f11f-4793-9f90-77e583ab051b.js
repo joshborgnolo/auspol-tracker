@@ -1120,9 +1120,14 @@ function App() {
      when they clicked, so the return trip puts them back on the same pixel
      rather than at the top of a tab. */
   React.useEffect(() => {
-    window.AP.openPoll = (key, facet) => {
+    /* `from` names the place being left, in the words the return button will
+       use. It used to be assumed - every trip started at a chart, so the way
+       back could say so - and "Back to the chart" is simply wrong for a reader
+       who arrived from the list of releases behind a projection. */
+    window.AP.openPoll = (key, facet, from) => {
       if (!key) return;
-      setFocusPoll({ key, facet: facet || null, back: { tab: readHash(), y: window.scrollY } });
+      setFocusPoll({ key, facet: facet || null,
+                     back: { tab: readHash(), y: window.scrollY, from: from || "the chart" } });
       setTab("allpolls");
       if (readHash() !== "allpolls") window.location.hash = "allpolls";
     };
@@ -1226,7 +1231,8 @@ function App() {
             <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter} />
           )}
           {tab === "cycles" && <PastCyclesView />}
-          {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null} />}
+          {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
+            backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null} />}
         </div>
         <MethodNote />
       </main>

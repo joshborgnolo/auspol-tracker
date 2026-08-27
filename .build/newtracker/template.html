@@ -1672,6 +1672,9 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-und-v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
 .pd-und-note { font-size: 12px; color: var(--ink-3); }
 .pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13.5px; }
+/* a fieldwork end standing in for a publication date nobody recorded, marked
+   the dashed way the Latest-polls pill marks the same substitution */
+.pd-est { border-bottom: 1px dashed var(--line-2); color: var(--ink-3); }
 .table-hint { margin: 12px 2px 0; font-size: 12px; color: var(--ink-3); }
 
 /* ---------- how the final polls did (past cycles) ---------- */
@@ -2412,7 +2415,24 @@ a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--
 /* the fieldwork end is what the interval beside it is measured between, so it
    leads; the publication date is the one carrying a weekday and an hour */
 .npd-field { color: var(--ink-2); }
+/* a jump INSIDE the page, so it takes an arrow rather than the ↗ that means
+   leaving – and stays a button, since it is not a URL anyone can open */
+button.npd-field-link {
+  border: 0; background: none; padding: 0; margin: 0; font: inherit;
+  font-variant-numeric: tabular-nums; text-align: left; cursor: pointer;
+  color: var(--ink-2); transition: color .15s ease;
+}
+button.npd-field-link:hover, button.npd-field-link:focus-visible {
+  color: var(--ink); text-decoration: underline; text-underline-offset: 2px;
+}
+button.npd-field-link:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
+button.npd-field-link .plink-mark { font-size: 10px; vertical-align: 0; }
+button.npd-field-link:hover .plink-mark, button.npd-field-link:focus-visible .plink-mark { color: var(--ink-2); }
 .npd-pub { color: var(--ink); font-weight: 600; }
+a.npd-pub-link { text-decoration: none; cursor: pointer; }
+a.npd-pub-link:hover, a.npd-pub-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+a.npd-pub-link:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
+a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { color: var(--ink-2); }
 .npd-pub.none { color: var(--ink-faint); font-weight: 500; }
 .npd-gap { margin-left: auto; color: var(--ink-3); white-space: nowrap; }
 .npd-foot { margin: 8px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ink-3); max-width: 62ch; }

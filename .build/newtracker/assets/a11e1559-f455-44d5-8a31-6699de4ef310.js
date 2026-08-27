@@ -2035,6 +2035,22 @@ function easternAbbr(ms) {
 // an hour with the clock it is read on, which is the only form of it that
 // names a moment rather than a habit
 const zoned = (label, ms) => (label ? `${label} ${easternAbbr(ms)}` : label);
+/* "24 Aug, 8:51 am AEST" - one publication stamp, printed the same way
+   wherever one appears, so the archive and the projections panel cannot drift
+   into two house styles for the same fact. The hour rides along only where a
+   release recorded one; the DATE is never invented, so this returns null when
+   there is no publication date and each caller says so in its own words rather
+   than being handed a fieldwork end wearing the wrong label. */
+function pubStamp(published, opts) {
+  if (!published) return null;
+  const iso = published.slice(0, 10);
+  const d = new Date(iso + "T00:00:00Z");
+  const mon = window.AP.D.monthName(d.getUTCMonth() + 1);
+  const date = `${d.getUTCDate()} ${mon}`
+    + (opts && opts.year ? " " + String(d.getUTCFullYear()).slice(2) : "");
+  const cl = /T(\d{2}):(\d{2})/.exec(published);
+  return cl ? `${date}, ${zoned(clockLabel(+cl[1] * 60 + +cl[2]), Date.parse(iso))}` : date;
+}
 /* A span is only worth printing while it IS the habit. YouGov has filed at 5am
    five times and 6am once, so "5-6 am" describes it. Essential has filed at 1am
    four times and 4:36am once, and "1-4:36 am" would let a single late morning
@@ -2082,14 +2098,23 @@ function cadenceLabel(d) {
   return `every ${Math.round(d)} days`;
 }
 
+// survives the panel being unmounted by a tab change – see the note in the
+// component on why an open row has to outlive the trip to the archive
+let npOpenRow = null;
 function NextPollsPanel() {
   const { D } = window.AP;
   const cad = D.pollCadence || [];
   /* Which row is showing its working. A date arrived at by a median of
      intervals is a claim, and the releases it was taken over are the evidence
      for it - kept folded away because the panel's job is the answer, one
-     click from the reason. */
-  const [open, setOpen] = useState(null);
+     click from the reason.
+
+     Held outside the component as well as in it. Opening a release in the
+     archive leaves this tab, which unmounts the panel, and the return trip
+     lands on the same pixel in front of a row that had closed itself while the
+     reader was away - the one thing they were looking at. */
+  const [open, setOpenState] = useState(npOpenRow);
+  const setOpen = (v) => { npOpenRow = v; setOpenState(v); };
   if (!cad.length) return null;
 
   /* Every date in here comes from Date.parse("YYYY-MM-DD"), which is UTC
@@ -2332,16 +2357,47 @@ function NextPollsPanel() {
                 <ol className="npd-list">
                   {[...recent].reverse().map((x) => (
                     <li className="npd-row" key={x.field}>
-                      <span className="npd-field">{fmtDay(x.field)}</span>
+                      {/* Two destinations, one per date, which is what each
+                          date IS: the fieldwork end is this site's record of
+                          the wave and opens its archive row; the publication
+                          date is the publisher's, and leaves. */}
+                      {(() => {
+                        const key = window.AP.pollRowKey
+                          && window.AP.pollRowKey({ pollster: r.pollster, released: x.field });
+                        if (!key || !window.AP.openPoll)
+                          return <span className="npd-field">{fmtDay(x.field)}</span>;
+                        return (
+                          <button className="npd-field npd-field-link"
+                                  onClick={(e) => { e.stopPropagation();
+                                    window.AP.openPoll(key, "twopp", "next expected polls"); }}
+                                  title="Open this poll in All polls">
+                            {fmtDay(x.field)}<span className="plink-mark" aria-hidden="true">→</span>
+                          </button>
+                        );
+                      })()}
                       {/* The publication date and hour where the release
                           recorded them. Where it did not, the cell says so
                           rather than letting the fieldwork end stand in for a
                           date nobody published on — the two are days apart. */}
                       {x.pub
-                        ? <span className="npd-pub">
-                            {fmtDow(x.pub)}
-                            {x.mins != null && <>, {zoned(clockLabel(x.mins), Date.parse(x.pub))}</>}
-                          </span>
+                        ? (() => {
+                            const stamp = <>
+                              {fmtDow(x.pub)}
+                              {x.mins != null && <>, {zoned(clockLabel(x.mins), Date.parse(x.pub))}</>}
+                            </>;
+                            /* the date IS the release, so it is the way to it -
+                               a reader checking a projection against its evidence
+                               wants the thing that was published, not a second
+                               link somewhere else on the line */
+                            return x.url
+                              ? <a className="npd-pub npd-pub-link" href={x.url}
+                                   target="_blank" rel="noopener noreferrer"
+                                   onClick={(e) => e.stopPropagation()}
+                                   title="Read this release">
+                                  {stamp}<span className="plink-mark" aria-hidden="true">↗</span>
+                                </a>
+                              : <span className="npd-pub">{stamp}</span>;
+                          })()
                         : <span className="npd-pub none" title="No publication date recorded for this wave">—</span>}
                       <span className="npd-gap">
                         {x.gap != null ? `${x.gap} days` : ""}
@@ -2638,4 +2694,7 @@ function PollsterTable() {
 
 Object.assign(window, { UndecidedLine, Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
-  ShareBar, NetVal, FavMark, ChgTag, ApprBlock, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C });
+  ShareBar, NetVal, FavMark, ChgTag, ApprBlock, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
+  // the archive prints publication stamps too, and there is only one way to
+  // write one
+  pubStamp });

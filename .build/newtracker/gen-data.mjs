@@ -801,6 +801,13 @@ const individualPolls = POLLS.map((p) => {
   return {
     ym, x: mx(ym) + (day - 15) / 365, day, pollster: p.pollster,
     field, dateLabel: field, released: p.date, sample: p.sample ?? null,
+    /* When the wave was PUBLISHED, where the cited release says so. The
+       archive's row detail has always had a line labelled "Published" and has
+       always filled it with `released`, which is the last day of FIELDWORK -
+       the same substitution the Latest-polls column was corrected for. Carried
+       whole, clock and all, so the view can print the hour beside the date and
+       fall back honestly where no release recorded one. */
+    ...(p.published ? { published: p.published } : {}),
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
@@ -1252,7 +1259,10 @@ for (const p of POLLS) {
   const cl = /T(\d{2}):(\d{2})/.exec(p.published || "");
   const mins = cl ? +cl[1] * 60 + +cl[2] : null;
   if (pub && r.length && r[r.length - 1].pub === pub) r[r.length - 1].date = p.date;
-  else r.push({ date: p.date, pub, mins });
+  // the release itself, so the date in the list can be the way to it. Rows
+  // that collapse into one release share its URL, which is what identified
+  // them as one release in the first place.
+  else r.push({ date: p.date, pub, mins, url: p.url || null });
 }
 const pollCadence = [];
 for (const [firm, rows] of Object.entries(byHouse)) {
@@ -1352,7 +1362,7 @@ for (const [firm, rows] of Object.entries(byHouse)) {
        - and the publication date and hour are carried beside it where the
        release recorded one. */
     recent: rows.slice(-CAD_SHOW).map((r, i, a) => ({
-      field: r.date, pub: r.pub, mins: r.mins,
+      field: r.date, pub: r.pub, mins: r.mins, url: r.url,
       gap: i ? Math.round((Date.parse(r.date) - Date.parse(a[i - 1].date)) / 86400000) : null,
     })),
     // how many intervals the median and the spread were actually taken over,
