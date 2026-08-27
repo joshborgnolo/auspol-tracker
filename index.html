@@ -10307,7 +10307,11 @@ function ArchPollDetail({
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "House lean"), " ", p.lean > 0 ? "+" : "", p.lean.toFixed(1), " vs aggregate"), onBack && /*#__PURE__*/React.createElement("button", {
+  }, "House lean"), " ", p.lean > 0 ? "+" : "", p.lean.toFixed(1), " vs aggregate"), p.hfx != null && /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-k"
+  }, "House effect"), " ", p.hfx.v > 0 ? "+" : "", p.hfx.v.toFixed(1), " vs consensus"), onBack && /*#__PURE__*/React.createElement("button", {
     className: "back-to-chart",
     onClick: e => {
       e.stopPropagation();

@@ -1223,6 +1223,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
         </span>
         <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>
         {p.lean != null && <span className="pd-meta-i"><span className="pd-meta-k">House lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>}
+        {p.hfx != null && <span className="pd-meta-i"><span className="pd-meta-k">House effect</span> {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)} vs consensus</span>}
         {/* the way back rides the line that already describes this poll, rather
             than inventing a band of its own above the panel */}
         {onBack && (
