@@ -250,6 +250,26 @@ const CYC_EVENTS = {
       major: true,
     },
   ],
+  2016: [
+    {
+      date: "2017-11-15", short: "Marriage survey Yes vote",
+      label: "Marriage postal survey returns a Yes vote",
+      desc: "The Australian Marriage Law Postal Survey delivers a national Yes vote for same-sex marriage.",
+      major: true,
+    },
+    {
+      date: "2018-08-21", short: "Dutton challenges Turnbull",
+      label: "Dutton mounts a leadership challenge",
+      desc: "Home Affairs minister Peter Dutton challenges Malcolm Turnbull for the Liberal leadership, losing the spill 48 votes to 35.",
+      major: true,
+    },
+    {
+      date: "2018-08-24", short: "Turnbull → Morrison",
+      label: "Morrison replaces Turnbull as prime minister",
+      desc: "Malcolm Turnbull resigns and Scott Morrison defeats Peter Dutton in the Liberal leadership spill, becoming prime minister.",
+      major: true,
+    },
+  ],
   2019: [
     {
       date: "2019-11-09", short: "Bushfire emergency",
