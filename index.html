@@ -9084,6 +9084,19 @@ function cycMonthOf(eDate, m) {
    whitelist pins the event to those chart measures alone. */
 const cycEventMonth = (iso, eDate) => (Date.parse(iso) - Date.parse(eDate)) / 86400000 / MS_MONTH_C;
 const CYC_EVENTS = {
+  2010: [{
+    date: "2010-12-15",
+    short: "Refugee tragedy",
+    label: "Boat sinks off Christmas Island",
+    desc: "A boat loaded with refugees sinks off Christmas Island, killing 48 people aboard. The tragedy provoked criticism of the Gillard government’s refugee policy.",
+    major: true
+  }, {
+    date: "2011-02-24",
+    short: "Carbon pricing scheme",
+    label: "Gillard announces a carbon pricing scheme",
+    desc: "To combat climate change, Gillard announced a plan to legislate for the introduction of a fixed price to be imposed on carbon pollution from 1 July 2012. The Clean Energy Act 2011 was enacted on 18 November.",
+    major: true
+  }],
   2013: [{
     date: "2013-11-18",
     short: "Indonesia spy row",
