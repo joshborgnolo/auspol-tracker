@@ -939,6 +939,7 @@
     },
     {
       "date": "2025-06-01",
+      "published": "2025-06-03T15:15",
       "dateStart": "2025-05-05",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -956,6 +957,7 @@
     },
     {
       "date": "2025-06-22",
+      "published": "2025-06-24T15:24",
       "dateStart": "2025-06-02",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -973,6 +975,7 @@
     },
     {
       "date": "2025-06-29",
+      "published": "2025-06-30T16:44",
       "dateStart": "2025-06-23",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -1070,6 +1073,7 @@
     },
     {
       "date": "2025-07-27",
+      "published": "2025-07-28T17:09",
       "dateStart": "2025-06-30",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -1135,6 +1139,7 @@
     },
     {
       "date": "2025-08-24",
+      "published": "2025-08-25T18:24",
       "dateStart": "2025-07-28",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -1200,6 +1205,7 @@
     },
     {
       "date": "2025-09-21",
+      "published": "2025-09-23T14:03",
       "dateStart": "2025-08-25",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -1297,6 +1303,7 @@
     },
     {
       "date": "2025-10-19",
+      "published": "2025-10-21T15:19",
       "dateStart": "2025-09-22",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -1468,6 +1475,7 @@
     },
     {
       "date": "2025-11-16",
+      "published": "2025-11-18T16:22",
       "dateStart": "2025-10-20",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -1629,6 +1637,7 @@
     },
     {
       "date": "2025-12-14",
+      "published": "2025-12-16T17:33",
       "dateStart": "2025-12-08",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -1896,6 +1905,7 @@
     },
     {
       "date": "2026-02-01",
+      "published": "2026-02-02T16:16",
       "dateStart": "2026-01-26",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -1938,6 +1948,7 @@
     },
     {
       "date": "2026-02-08",
+      "published": "2026-02-09T17:13",
       "dateStart": "2026-02-02",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2009,6 +2020,7 @@
     },
     {
       "date": "2026-02-13",
+      "published": "2026-02-13T16:36",
       "dateStart": "2026-02-09",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2043,6 +2055,7 @@
     },
     {
       "date": "2026-02-16",
+      "published": "2026-02-16T17:47",
       "dateStart": "2026-02-13",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2093,6 +2106,7 @@
     },
     {
       "date": "2026-02-22",
+      "published": "2026-02-24T15:23",
       "dateStart": "2026-02-16",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2187,6 +2201,7 @@
     },
     {
       "date": "2026-03-01",
+      "published": "2026-03-02T17:21",
       "dateStart": "2026-02-23",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2264,6 +2279,7 @@
     },
     {
       "date": "2026-03-08",
+      "published": "2026-03-10T15:23",
       "dateStart": "2026-03-02",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2314,6 +2330,7 @@
     },
     {
       "date": "2026-03-15",
+      "published": "2026-03-16T16:05",
       "dateStart": "2026-03-09",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2351,6 +2368,7 @@
     },
     {
       "date": "2026-03-22",
+      "published": "2026-03-23T17:23",
       "dateStart": "2026-03-16",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2471,6 +2489,7 @@
     },
     {
       "date": "2026-03-29",
+      "published": "2026-03-30T17:11",
       "dateStart": "2026-03-23",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2492,6 +2511,7 @@
     },
     {
       "date": "2026-04-05",
+      "published": "2026-04-07T17:44",
       "dateStart": "2026-03-30",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2545,6 +2565,7 @@
     },
     {
       "date": "2026-04-12",
+      "published": "2026-04-13T17:30",
       "dateStart": "2026-04-06",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2617,6 +2638,7 @@
     },
     {
       "date": "2026-04-19",
+      "published": "2026-04-20T16:39",
       "dateStart": "2026-04-13",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2654,6 +2676,7 @@
     },
     {
       "date": "2026-04-26",
+      "published": "2026-04-28T12:26",
       "dateStart": "2026-04-20",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2725,6 +2748,7 @@
     },
     {
       "date": "2026-05-03",
+      "published": "2026-05-04T17:17",
       "dateStart": "2026-04-27",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2762,6 +2786,7 @@
     },
     {
       "date": "2026-05-10",
+      "published": "2026-05-11T17:18",
       "dateStart": "2026-05-04",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2912,6 +2937,7 @@
     },
     {
       "date": "2026-05-17",
+      "published": "2026-05-18T17:03",
       "dateStart": "2026-05-11",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -2983,6 +3009,7 @@
     },
     {
       "date": "2026-05-24",
+      "published": "2026-05-25T16:44",
       "dateStart": "2026-05-18",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3069,6 +3096,7 @@
     },
     {
       "date": "2026-05-31",
+      "published": "2026-06-01T17:15",
       "dateStart": "2026-05-25",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3119,6 +3147,7 @@
     },
     {
       "date": "2026-06-07",
+      "published": "2026-06-09T17:00",
       "dateStart": "2026-06-01",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3156,6 +3185,7 @@
     },
     {
       "date": "2026-06-14",
+      "published": "2026-06-15T16:13",
       "dateStart": "2026-06-08",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3211,6 +3241,7 @@
     },
     {
       "date": "2026-06-21",
+      "published": "2026-06-22T15:47",
       "dateStart": "2026-06-15",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3266,6 +3297,7 @@
     },
     {
       "date": "2026-06-28",
+      "published": "2026-06-29T16:38",
       "dateStart": "2026-06-22",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3321,6 +3353,7 @@
     },
     {
       "date": "2026-07-05",
+      "published": "2026-07-06T15:50",
       "dateStart": "2026-06-28",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3428,6 +3461,7 @@
     },
     {
       "date": "2026-07-12",
+      "published": "2026-07-13T16:05",
       "dateStart": "2026-07-06",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3483,6 +3517,7 @@
     },
     {
       "date": "2026-07-19",
+      "published": "2026-07-20T16:15",
       "dateStart": "2026-07-13",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3520,6 +3555,7 @@
     },
     {
       "date": "2026-07-26",
+      "published": "2026-07-27T16:20",
       "dateStart": "2026-07-20",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3593,6 +3629,7 @@
     },
     {
       "date": "2026-08-02",
+      "published": "2026-08-03T16:25",
       "dateStart": "2026-07-27",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3631,6 +3668,7 @@
     },
     {
       "date": "2026-08-09",
+      "published": "2026-08-10T16:17",
       "dateStart": "2026-08-03",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3686,6 +3724,7 @@
     },
     {
       "date": "2026-08-16",
+      "published": "2026-08-17T16:22",
       "dateStart": "2026-08-10",
       "pollster": "Roy Morgan",
       "client": "—",
@@ -3753,7 +3792,7 @@
     },
     {
       "date": "2026-08-23",
-      "published": "2026-08-24",
+      "published": "2026-08-24T16:30",
       "dateStart": "2026-08-17",
       "pollster": "Roy Morgan",
       "client": "—",
