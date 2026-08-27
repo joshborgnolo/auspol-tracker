@@ -1797,7 +1797,11 @@ function AllPollsView({ focus, onBack, backLabel }) {
   const toggleTag = (id) => setTagSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const onMeasure = (mv) => { setMeasure(mv); setLead("all"); };
   const onFacet = (f) => {
-    setFacet(f); setSort({ key: "date", dir: -1 }); setOpen(null); setPop(null); setScope(true);
+    setFacet(f); setSort({ key: "date", dir: -1 }); setPop(null); setScope(true);
+    // the expanded row STAYS expanded: `open` keys the poll itself, and the
+    // detail panel shows every measure whatever the facet. If the new facet's
+    // scope hides that poll it simply isn't rendered, and it resurfaces –
+    // still open – where the poll is listed again.
     // the matchup/ahead pair describes the 2PP lead column – it is hidden
     // outside that facet, so its filter must not keep biting invisibly
     if (f !== "twopp") { setLead("all"); setMeasure("lnp"); }

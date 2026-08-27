@@ -11187,9 +11187,12 @@ function AllPollsView({
       key: "date",
       dir: -1
     });
-    setOpen(null);
     setPop(null);
     setScope(true);
+    // the expanded row STAYS expanded: `open` keys the poll itself, and the
+    // detail panel shows every measure whatever the facet. If the new facet's
+    // scope hides that poll it simply isn't rendered, and it resurfaces –
+    // still open – where the poll is listed again.
     // the matchup/ahead pair describes the 2PP lead column – it is hidden
     // outside that facet, so its filter must not keep biting invisibly
     if (f !== "twopp") {
