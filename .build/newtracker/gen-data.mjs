@@ -1166,6 +1166,23 @@ const CAD_RECENT = 12;
    actually read down, and the row says how many intervals the median really
    covers rather than letting the list imply it. */
 const CAD_SHOW = 5;
+/* Intervals are measured between RELEASES where a house has recorded enough of
+   them, and between fieldwork ends only where it has not.
+
+   The panel forecasts a publication, so a publication is the thing whose
+   rhythm it should be extrapolating - and fieldwork ends are a much noisier
+   proxy for it than they look. Newspoll's last eight fieldwork gaps run
+   18,28,21,31,18,21,21,22, which reads as a house that wanders between two
+   and four and a half weeks; its last eight PUBLICATION gaps are
+   21,28,21,28,21,21,21,21. It goes out three weeks apart, six times in eight,
+   and the wobble was entirely in when its fieldwork happened to close. That
+   noise was being carried into the projection and then into a ± that called a
+   metronomic house give-or-take a week.
+
+   The run has to be UNBROKEN back from the newest release, not merely long: an
+   undated release between two dated ones makes a "gap" two waves wide, which
+   would poison the median far worse than the fieldwork dates ever did. */
+const CAD_PUB_MIN = 4;         // publication intervals before that basis is used
 const CAD_DOW_MIN = 5;         // dated releases before a weekday can be a habit
 const CAD_DOW_SHARE = 0.8;     // and the share of them that must share it
 const CAD_MIN_POLLS = 4;
@@ -1268,10 +1285,17 @@ const pollCadence = [];
 for (const [firm, rows] of Object.entries(byHouse)) {
   const dates = rows.map((r) => r.date).sort();
   if (dates.length < CAD_MIN_POLLS) continue;
-  const gaps = dates.slice(1).map((d, i) => Math.round((Date.parse(d) - Date.parse(dates[i])) / 86400000)).slice(-8);
+  // the unbroken dated tail – see CAD_PUB_MIN
+  let tail = 0;
+  while (tail < rows.length && rows[rows.length - 1 - tail].pub) tail++;
+  const pubDates = tail > CAD_PUB_MIN ? rows.slice(rows.length - tail).map((r) => r.pub) : null;
+  const basis = pubDates ? "published" : "fieldwork";
+  // the sequence the interval is measured along, and the date it is projected from
+  const seq = pubDates || dates;
+  const gaps = seq.slice(1).map((d, i) => Math.round((Date.parse(d) - Date.parse(seq[i])) / 86400000)).slice(-8);
   const cadence = medianOf(gaps);
   if (!cadence || cadence <= 0) continue;
-  const last = dates[dates.length - 1];
+  const last = seq[seq.length - 1];
   // a house that has stopped is not "expected" in any form
   if ((Date.parse(LATEST_ISO) - Date.parse(last)) / 86400000 > CAD_MAX_SILENT * cadence) continue;
   const ts = (timeSamples[firm] || []).slice(-CAD_RECENT);
@@ -1328,8 +1352,13 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     cadence,
     loose: !dated,
     spread,
-    lag: ls.length >= 5 ? medianOf(ls) : CAD_DEFAULT_LAG,
-    lagMeasured: ls.length >= 5 ? ls.length : 0,
+    basis,
+    /* A publication-based projection is anchored on the last publication and
+       steps a whole interval to the next one, so there is no lag left to add -
+       it is already inside the number. Zeroed rather than special-cased in the
+       view, which does the same arithmetic either way. */
+    lag: basis === "published" ? 0 : (ls.length >= 5 ? medianOf(ls) : CAD_DEFAULT_LAG),
+    lagMeasured: basis === "published" ? 0 : (ls.length >= 5 ? ls.length : 0),
     /* What time of day the house actually files, where enough releases have
        been timed to call it a habit - same five-sample gate the lag uses, for
        the same reason. Reported as the observed SPAN rather than an average:
@@ -1370,12 +1399,15 @@ for (const [firm, rows] of Object.entries(byHouse)) {
          happens to print. `since` carries what each was measured from, which
          is the only way the bottom line's interval can be checked at all. */
       const start = Math.max(0, rows.length - CAD_SHOW);
+      // measured along the same sequence the median was taken over, or the
+      // column would quietly disagree with the line underneath it
+      const at = (r) => (r && (basis === "published" ? r.pub : r.date)) || null;
       return rows.slice(start).map((r, i) => {
-        const prev = rows[start + i - 1];
+        const from = at(rows[start + i - 1]), to = at(r);
         return {
           field: r.date, pub: r.pub, mins: r.mins, url: r.url,
-          since: prev ? prev.date : null,
-          gap: prev ? Math.round((Date.parse(r.date) - Date.parse(prev.date)) / 86400000) : null,
+          since: from,
+          gap: from && to ? Math.round((Date.parse(to) - Date.parse(from)) / 86400000) : null,
         };
       });
     })(),
@@ -1553,7 +1585,7 @@ console.log("pollCadence:", pollCadence.length, "houses on a pattern →",
     const hh = c.releaseMins == null ? "" : ` @${String(Math.floor(c.releaseMins / 60)).padStart(2, "0")}:${String(c.releaseMins % 60).padStart(2, "0")}`;
     return `${c.pollster} ${c.cadence}d±${c.spread} lag${c.lag}${c.lagMeasured ? "(n=" + c.lagMeasured + ")" : ""}`
       + (c.releaseDow == null ? "" : ` ${WDS[c.releaseDow]}${c.releaseDowN ? "(" + c.releaseDowN + "/" + Math.min(CAD_RECENT, (dowSamples[c.pollster] || []).length) + ")" : ""}`)
-      + hh + (c.declared.length ? ` [declared ${c.declared.join("+")}]` : "") + (c.loose ? " LOOSE" : "");
+      + hh + ` <${c.basis}>` + (c.declared.length ? ` [declared ${c.declared.join("+")}]` : "") + (c.loose ? " LOOSE" : "");
   }).join(" | "));
 console.log("events:", events.length, "(major:", events.filter((e) => e.major).length + ")");
 console.log("cycles:", CYCLE_DEFS.map((c) => `${c.year} m0..${c.months.at(-1)} tpp ${c.tpp[0]}→${c.tpp.at(-1)} prim ${c.primary[0]}→${c.primary.at(-1)} net ${c.net[0]}→${c.net.at(-1)} opp ${c.oppnet[0]}→${c.oppnet.at(-1)}`).join("\n        "));

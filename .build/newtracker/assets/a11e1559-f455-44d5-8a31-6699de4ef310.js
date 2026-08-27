@@ -1965,10 +1965,6 @@ const NP_MAX_ROWS = 10;       // a busy fortnight shouldn't run off the page
    no moment to say has passed, so the row stays "today" until today is over
    rather than being rolled off the list by an hour we invented for it. */
 const NP_UNTIMED_MINS = 24 * 60;
-// prose counts, so a footnote reads as a sentence rather than a readout
-const NUMWORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
-const spellNum = (n) => (Number.isInteger(n) && n >= 0 && n < 10 ? NUMWORDS[n] : String(n));
-
 /* "Now", in the frame this schedule is written in.
 
    Every date on this page is an Australian calendar date and every release
@@ -2241,8 +2237,15 @@ function NextPollsPanel() {
   const slipped = rows.some((r) => r.slipFrom);
   // which houses are running on a schedule that was stated rather than measured
   const stated = [...new Set(rows.filter((r) => (r.declared || []).length).map((r) => r.pollster))];
-  // and which have measured their own publication lag rather than taking the default
-  const lagged = cad.filter((c) => c.lagMeasured).sort((a, b) => b.lagMeasured - a.lagMeasured);
+  /* Which houses are projected from their PUBLICATION dates and which fall back
+     to fieldwork ends. Named rather than described in the abstract: a reader
+     comparing two rows should be able to tell which of them rests on the
+     steadier measure. */
+  const shownHouses = [...new Set(rows.map((r) => r.pollster))];
+  const basisOf = (b) => shownHouses.filter((h) => (cad.find((c) => c.pollster === h) || {}).basis === b);
+  const byPub = basisOf("published"), byField = basisOf("fieldwork");
+  const listOf = (a) => (a.length === 1 ? a[0]
+    : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]);
   // UTC accessors, matching the frame the dates were parsed and compared in –
   // local ones would name the day before for any reader west of Greenwich
   const fmt = (ms) => {
@@ -2403,7 +2406,9 @@ function NextPollsPanel() {
                           one row further back than the list prints, so every
                           line says what it was measured from */}
                       <span className="npd-gap"
-                            title={x.since ? `Since the previous wave, ${fmtDay(x.since)}` : undefined}>
+                            title={x.since
+                              ? `Since the previous ${r.basis === "published" ? "publication" : "fieldwork end"}, ${fmtDay(x.since)}`
+                              : undefined}>
                         {x.gap != null ? `${x.gap} days` : ""}
                       </span>
                     </li>
@@ -2413,11 +2418,17 @@ function NextPollsPanel() {
                   {/* what the projection is ACTUALLY taken over, which is more
                       intervals than are listed here - the list is the recent
                       shape of the schedule, not the whole sample */}
-                  Median {r.cadence} days across the last {r.gapsUsed} intervals
-                  {r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : ""}, plus{" "}
-                  {r.lagMeasured
-                    ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases`
-                    : "the field’s one-day publication lag"}.
+                  Median {r.cadence} days between{" "}
+                  {r.basis === "published" ? "publications" : "fieldwork ends"} across the
+                  last {r.gapsUsed} intervals
+                  {r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : ""}.
+                  {/* a publication-based projection steps from one publication
+                      to the next, so the lag is already inside the interval and
+                      there is nothing left to add */}
+                  {r.basis !== "published" && <>{" "}Plus{" "}
+                    {r.lagMeasured
+                      ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases`
+                      : "the field’s one-day publication lag"}.</>}
                   {/* The weekday and the hour are two separate corrections and
                       only some houses have either. Run together they made a
                       house with no weekday - DemosAU - read as though its
@@ -2436,16 +2447,19 @@ function NextPollsPanel() {
       </ol>
 
       <p className="np-foot">
-        Each date is the house’s median interval between fieldwork-end dates across its last
-        eight waves, plus its publication lag, nudged onto the weekday it keeps. The ± is half
+        Each date is the house’s median interval between its last eight releases, nudged onto
+        the weekday it keeps. What the interval is measured BETWEEN depends on what the house
+        has recorded. Where its recent releases carry publication dates in an unbroken run, it
+        is the gaps between those — which is the thing being forecast, and much the steadier
+        measure: Newspoll’s last eight fieldwork gaps run from 18 days to 31, while it has
+        published exactly three weeks apart six times in eight, all the wobble being in when
+        its fieldwork happened to close.
+        {byPub.length > 0 && ` ${listOf(byPub)} ${byPub.length > 1 ? "are" : "is"} projected that way.`}
+        {byField.length > 0 && ` ${listOf(byField)}, which ${byField.length > 1 ? "have" : "has"} too few recorded publication dates to measure one, ${byField.length > 1 ? "fall" : "falls"} back to the gaps between fieldwork ends plus a publication lag — measured from the dates recorded against each poll, or read from a release URL that carries one, and otherwise a day, which is the field’s.`}
+        {" "}The ± is half
         the range of those intervals with the longest and shortest set aside, widening for waves
         further out — in whole weeks for a house pinned to a weekday, since that is the only step
-        its date can take, and dropped where the interval never reaches the day either side. Lag is
-        measured from the publication dates recorded against each poll, or read from a release
-        URL that carries one.
-        {lagged[0] && (lagged.length === cad.length
-          ? ` Every house here has enough of them to measure its own, ${lagged[0].pollster}’s ${spellNum(lagged[0].lag)}-day median off ${lagged[0].lagMeasured} releases.`
-          : ` Most of these houses have enough of them to measure their own — ${lagged[0].pollster}’s ${spellNum(lagged[0].lag)}-day median comes off ${lagged[0].lagMeasured} releases — and the rest fall back to a day, which is the field’s.`)}
+        its date can take, and dropped where the interval never reaches the day either side.
         {" "}Where a house
         has been timed often enough the hour it files is shown too — the span its releases have
         covered where that is tight, and otherwise the hour it usually keeps, so one late morning
