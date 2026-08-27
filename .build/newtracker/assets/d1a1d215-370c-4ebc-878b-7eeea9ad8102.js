@@ -1681,14 +1681,54 @@ function AllPollsView({ focus, onBack, backLabel }) {
   D.individualPolls.forEach((p) => { if (!houses.includes(p.pollster)) houses.push(p.pollster); });
   houses.sort();
 
-  const [q, setQ] = useState("");
-  const [sel, setSel] = useState(new Set());     // pollster filter; empty = all
-  const [lead, setLead] = useState("all");        // all | alp | lnp/onp (per matchup)
-  const [measure, setMeasure] = useState("lnp");  // lead matchup: lnp = ALP v L/NP · onp = ALP v ON
-  const [range, setRange] = useState("all");      // all | 12 | 6 | 3
-  const [tagSel, setTagSel] = useState(new Set()); // data-content tags; empty = all
+  /* What each view needs a poll to have published. Primary vote is on every
+     poll in the archive, so it has nothing to scope and gets no pill. It sits
+     ABOVE the state declarations because the URL restore consults it. */
+  const FACET_SCOPE = {
+    twopp: { has: (p) => p.alp != null || p.tppAlt || p.tppAlt2 || p.tpp3, label: "With a 2PP" },
+    primary: null,
+    leadership: { has: (p) => window.ppmContests(p).length > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null)), label: "With leadership numbers" },
+    direction: { has: (p) => !!p.dir, label: "With a direction reading" },
+  };
+  const FACETS = [
+    { id: "twopp", label: "2PP" },
+    { id: "primary", label: "Primary" },
+    { id: "leadership", label: "Leadership" },
+    { id: "direction", label: "Direction" },
+  ];
+  /* The filtered table is a page in its own right, so its filters ride in
+     the URL: every non-default selection sits in the query string beside
+     the #allpolls hash (?who=Newspoll&when=12#allpolls), and "Newspoll's
+     year" becomes a link one reader can paste to another – who lands on
+     exactly that table, not on the raw archive. Restored here, once per
+     mount (the view remounts on every tab switch); the write-back further
+     down keeps the address bar current as the filters change. Values that
+     have gone stale – a pollster no longer in the archive, a tag that
+     never existed – are dropped, never trusted. */
+  const urlInit = (() => {
+    const p = new URLSearchParams(window.location.search);
+    const ok = (v, ids) => (v && ids.includes(v) ? v : null);
+    const view = ok(p.get("view"), FACETS.map((f) => f.id).slice(1)) || "twopp";
+    return {
+      q: p.get("q") || "",
+      who: (p.get("who") || "").split(",").filter((h) => houses.includes(h)),
+      has: (p.get("has") || "").split(",").filter((t) => POLL_TAGS.some((pt) => pt.id === t)),
+      lead: ok(p.get("lead"), ["alp", "lnp", "onp"]) || "all",
+      measure: ok(p.get("vs"), ["onp", "lnponp"]) || "lnp",
+      range: ok(p.get("when"), ["12", "6", "3"]) || "all",
+      facet: view,
+      scope: p.get("scope") !== "off" || !FACET_SCOPE[view],
+    };
+  })();
+
+  const [q, setQ] = useState(urlInit.q);
+  const [sel, setSel] = useState(new Set(urlInit.who)); // pollster filter; empty = all
+  const [lead, setLead] = useState(urlInit.lead);        // all | alp | lnp/onp (per matchup)
+  const [measure, setMeasure] = useState(urlInit.measure); // lead matchup: lnp = ALP v L/NP · onp = ALP v ON
+  const [range, setRange] = useState(urlInit.range);    // all | 12 | 6 | 3
+  const [tagSel, setTagSel] = useState(new Set(urlInit.has)); // data-content tags; empty = all
   const [sort, setSort] = useState({ key: "date", dir: -1 });
-  const [facet, setFacet] = useState("twopp");
+  const [facet, setFacet] = useState(urlInit.facet);
   const [open, setOpen] = useState(null);     // expanded ROW
   const [pop, setPop] = useState(null);       // open filter popover
   /* Each view hides the columns it can't fill; it should hide the ROWS it
@@ -1696,16 +1736,17 @@ function AllPollsView({ focus, onBack, backLabel }) {
      and the old table answered "Direction" with 95 rows of dashes and left the
      reader to discover the Contains filter. So the view arms that filter
      itself – as a visible, removable pill, not a hidden default. */
-  const [scope, setScope] = useState(true);
+  const [scope, setScope] = useState(urlInit.scope);
 
-  /* Arriving from a dot on a chart. The view is remounted on every tab change,
-     so its filters are already at their defaults - the only one that could
-     hide the poll being asked for is the view's own scope, which is dropped.
-     The facet comes from the chart that was clicked, so a leadership dot lands
-     on the leadership columns rather than on 2PP. */
+  /* Arriving from a dot on a chart. The filters ride in the URL now, so they
+     survive the remount this trip causes - and any of them could hide the
+     poll being asked for, not just the scope, so ALL of them go. The facet
+     comes from the chart that was clicked, so a leadership dot lands on the
+     leadership columns rather than on 2PP. */
   React.useEffect(() => {
     if (!focus) return;
-    setScope(false);
+    setScope(false); setQ(""); setSel(new Set()); setLead("all"); setMeasure("lnp");
+    setRange("all"); setTagSel(new Set());
     if (focus.facet) setFacet(focus.facet);
     setOpen(focus.key);
   }, [focus]);
@@ -1719,20 +1760,6 @@ function AllPollsView({ focus, onBack, backLabel }) {
   }, [focus, open, facet]);
   const toggleTag = (id) => setTagSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const onMeasure = (mv) => { setMeasure(mv); setLead("all"); };
-  /* What each view needs a poll to have published. Primary vote is on every
-     poll in the archive, so it has nothing to scope and gets no pill. */
-  const FACET_SCOPE = {
-    twopp: { has: (p) => p.alp != null || p.tppAlt || p.tppAlt2 || p.tpp3, label: "With a 2PP" },
-    primary: null,
-    leadership: { has: (p) => window.ppmContests(p).length > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null)), label: "With leadership numbers" },
-    direction: { has: (p) => !!p.dir, label: "With a direction reading" },
-  };
-  const FACETS = [
-    { id: "twopp", label: "2PP" },
-    { id: "primary", label: "Primary" },
-    { id: "leadership", label: "Leadership" },
-    { id: "direction", label: "Direction" },
-  ];
   const onFacet = (f) => {
     setFacet(f); setSort({ key: "date", dir: -1 }); setOpen(null); setPop(null); setScope(true);
     // the matchup/ahead pair describes the 2PP lead column – it is hidden
@@ -1888,6 +1915,30 @@ function AllPollsView({ focus, onBack, backLabel }) {
   [...tagSel].forEach((t) => pills.push({ k: "t" + t, lab: (POLL_TAG_META[t] || {}).label || t, off: () => toggleTag(t) }));
   if (lead !== "all") pills.push({ k: "l", lab: HOLDER_LAB[lead] + " ahead", off: () => setLead("all") });
   if (scoping) pills.push({ k: "s", lab: scoping.label, auto: true, off: () => setScope(false) });
+
+  /* …and back the other way: every non-default filter is written to the
+     query string, so the address bar at any moment IS the link to this
+     exact table. replaceState, never pushState – the back button should
+     leave the page, not uncheck one box at a time. Only departures from
+     the defaults are written, so the plain archive keeps its plain URL.
+     The guard against a no-op write matters: without it the URL was
+     normalised every render, and this effect also runs for the reader who
+     typed a stale or partial query by hand. */
+  React.useEffect(() => {
+    const p = new URLSearchParams();
+    if (ql) p.set("q", q.trim());
+    if (sel.size) p.set("who", houses.filter((h) => sel.has(h)).join(","));
+    if (range !== "all") p.set("when", range);
+    if (tagSel.size) p.set("has", POLL_TAGS.map((t) => t.id).filter((t) => tagSel.has(t)).join(","));
+    if (measure !== "lnp") p.set("vs", measure);
+    if (lead !== "all") p.set("lead", lead);
+    if (facet !== "twopp") p.set("view", facet);
+    if (!scope && FACET_SCOPE[facet]) p.set("scope", "off");
+    const qs = p.toString();
+    const L = window.location;
+    const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
+    if (next !== L.pathname + L.search + L.hash) window.history.replaceState(null, "", next);
+  });
 
   // ---- CSV export of the CURRENTLY filtered + sorted rows -----------------
   // A flat, analysis-friendly schema (one row per poll), independent of the
