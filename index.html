@@ -2554,9 +2554,9 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    wrongly took it for the whole range. (Not a font question - measured at 33px
    over with Public Sans and 29px with a humanist alternative.)
 
-   House lean (and its new neighbour House effect) is the one to drop. It is a
+   Poll lean (and its new neighbour House effect) is the one to drop. It is a
    derived comparison rather than something the pollster published, and the
-   row detail here prints "House lean +0.3 vs aggregate" one tap away - so
+   row detail here prints "Poll lean +0.3 vs aggregate" one tap away - so
    nothing is actually lost, which is the same bargain .hide-md already
    strikes. */
 @media (max-width: 430px) {
@@ -8742,7 +8742,7 @@ function PollsterTable() {
     }))));
   })))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll to see its full breakdown \xB7 click a column heading to sort \xB7 \u201C\u2014\u201D means the pollster didn\u2019t ask that question.", " ", /*#__PURE__*/React.createElement("strong", null, "Published"), " is the date the poll was released, taken from the source each row links to \u2013 not the last day of its fieldwork, which is the next column. A dashed date is a fallback: that poll\u2019s publication date isn\u2019t recorded, so the column shows its fieldwork end instead.", " ", "Each house\u2019s systematic lean (its house effect) now sits beside house lean in the All polls archive."));
+  }, "Tap any poll to see its full breakdown \xB7 click a column heading to sort \xB7 \u201C\u2014\u201D means the pollster didn\u2019t ask that question.", " ", /*#__PURE__*/React.createElement("strong", null, "Published"), " is the date the poll was released, taken from the source each row links to \u2013 not the last day of its fieldwork, which is the next column. A dashed date is a fallback: that poll\u2019s publication date isn\u2019t recorded, so the column shows its fieldwork end instead.", " ", "Each house\u2019s systematic lean (its house effect) now sits beside poll lean in the All polls archive."));
 }
 Object.assign(window, {
   UndecidedLine,
@@ -10418,7 +10418,7 @@ function ArchPollDetail({
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "House lean"), " ", p.lean > 0 ? "+" : "", p.lean.toFixed(1), " vs aggregate"), p.hfx != null && /*#__PURE__*/React.createElement("span", {
+  }, "Poll lean"), " ", p.lean > 0 ? "+" : "", p.lean.toFixed(1), " vs aggregate"), p.hfx != null && /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
@@ -11261,7 +11261,7 @@ function AllPollsView({
   // A flat, analysis-friendly schema (one row per poll), independent of the
   // active facet – so the download always carries every measure, for exactly
   // the rows the filters left on screen, in the order they're shown.
-  const CSV_COLS = [["Pollster", p => p.pollster], ["Fieldwork", p => p.field], ["Fieldwork end", p => p.released], ["Sample", p => p.sample], ["Primary ALP", p => p.p.alp], ["Primary L/NP", p => p.p.lnp], ["Primary GRN", p => p.p.grn], ["Primary ON", p => p.p.onp], ["Primary OTH", p => p.p.oth], ["2PP ALP", p => p.alp], ["2PP L/NP", p => p.lnp], ["ALP v ON", p => p.tppAlt ? p.tppAlt.alp : ""], ["L/NP v ON", p => p.tppAlt2 ? p.tppAlt2.lnp : ""], ["House lean", p => p.lean], ["House effect", p => p.hfx ? p.hfx.v : ""], ["PPM Albanese", p => {
+  const CSV_COLS = [["Pollster", p => p.pollster], ["Fieldwork", p => p.field], ["Fieldwork end", p => p.released], ["Sample", p => p.sample], ["Primary ALP", p => p.p.alp], ["Primary L/NP", p => p.p.lnp], ["Primary GRN", p => p.p.grn], ["Primary ON", p => p.p.onp], ["Primary OTH", p => p.p.oth], ["2PP ALP", p => p.alp], ["2PP L/NP", p => p.lnp], ["ALP v ON", p => p.tppAlt ? p.tppAlt.alp : ""], ["L/NP v ON", p => p.tppAlt2 ? p.tppAlt2.lnp : ""], ["Poll lean", p => p.lean], ["House effect", p => p.hfx ? p.hfx.v : ""], ["PPM Albanese", p => {
     const c = ppmContests(p)[0];
     return c ? c.alb ?? "" : "";
   }], ["PPM Opp. ldr", p => {
@@ -11511,7 +11511,7 @@ function AllPollsView({
     sort: sort,
     onSort: onSort
   }), /*#__PURE__*/React.createElement(ArchSortTh, {
-    label: "House lean",
+    label: "Poll lean",
     short: "Lean",
     k: "lean",
     sort: sort,
@@ -11752,7 +11752,7 @@ function AllPollsView({
     onClick: clearAll
   }, "Clear filters")))))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll for its full breakdown \xB7 dates are fieldwork windows (publication dates sit in the breakdown) \xB7 \u201Cas published\u201D lists each poll\u2019s headline figures exactly as the pollster released them \xB7 the lead bar shows the selected matchup where a pollster published it \xB7 \u201Chouse lean\u201D is the poll minus the aggregate for that month \xB7 ", /*#__PURE__*/React.createElement("strong", null, "house effect"), " is how far that pollster systematically sits from the cross-house consensus on 2PP \u2013 its own average lean across every poll it has published, shrunk toward zero when it has published few; the aggregates subtract it, and it is a property of the pollster, not of this one poll \xB7 \u201C\u2014\u201D means the pollster didn\u2019t publish that measure \xB7 search matches anything in a row \xB7 click any column heading to sort."), /*#__PURE__*/React.createElement(VariancePanel, {
+  }, "Tap any poll for its full breakdown \xB7 dates are fieldwork windows (publication dates sit in the breakdown) \xB7 \u201Cas published\u201D lists each poll\u2019s headline figures exactly as the pollster released them \xB7 the lead bar shows the selected matchup where a pollster published it \xB7 \u201Cpoll lean\u201D is the poll minus the aggregate for that month \xB7 ", /*#__PURE__*/React.createElement("strong", null, "house effect"), " is how far that pollster systematically sits from the cross-house consensus on 2PP \u2013 its own average lean across every poll it has published, shrunk toward zero when it has published few; the aggregates subtract it, and it is a property of the pollster, not of this one poll \xB7 \u201C\u2014\u201D means the pollster didn\u2019t publish that measure \xB7 search matches anything in a row \xB7 click any column heading to sort."), /*#__PURE__*/React.createElement(VariancePanel, {
     facet: facet,
     rangeId: range
   }));

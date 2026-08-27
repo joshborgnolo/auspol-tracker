@@ -1335,7 +1335,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
                </span>}
         </span>
         <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>
-        {p.lean != null && <span className="pd-meta-i"><span className="pd-meta-k">House lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>}
+        {p.lean != null && <span className="pd-meta-i"><span className="pd-meta-k">Poll lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>}
         {p.hfx != null && <span className="pd-meta-i"><span className="pd-meta-k">House effect</span> {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)} vs consensus</span>}
         {/* the way back rides the line that already describes this poll, rather
             than inventing a band of its own above the panel */}
@@ -1903,7 +1903,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
     ["2PP ALP", (p) => p.alp], ["2PP L/NP", (p) => p.lnp],
     ["ALP v ON", (p) => (p.tppAlt ? p.tppAlt.alp : "")],
     ["L/NP v ON", (p) => (p.tppAlt2 ? p.tppAlt2.lnp : "")],
-    ["House lean", (p) => p.lean],
+    ["Poll lean", (p) => p.lean],
     ["House effect", (p) => (p.hfx ? p.hfx.v : "")],
     ["PPM Albanese", (p) => { const c = ppmContests(p)[0]; return c ? c.alb ?? "" : ""; }],
     ["PPM Opp. ldr", (p) => { const c = ppmContests(p)[0]; return c ? (c.taylor ?? c.ley ?? "") : ""; }],
@@ -2076,8 +2076,8 @@ function AllPollsView({ focus, onBack, backLabel }) {
                     title="What the pollster published – a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
                 <ArchSortTh label={({ lnp: "Lead · ALP v L/NP", onp: "Lead · ALP v ON", lnponp: "Lead · L/NP v ON", "3cp": "Lead · 3-cornered" })[measure]} short="Lead" k="alp" sort={sort} onSort={onSort} />
                 {/* hide-sm: the last column to go on a phone – see the .hide-sm
-                    note in the stylesheet. The row detail carries "House lean". */}
-                <ArchSortTh label="House lean" short="Lean" k="lean" sort={sort} onSort={onSort} className="hide-sm" />
+                    note in the stylesheet. The row detail carries "Poll lean". */}
+                <ArchSortTh label="Poll lean" short="Lean" k="lean" sort={sort} onSort={onSort} className="hide-sm" />
                 <ArchSortTh label="House effect" short="H/fx" k="hfx" sort={sort} onSort={onSort} className="hide-sm" />
               </>)}
               {facet === "primary" && (<>
@@ -2208,7 +2208,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
       <p className="table-hint">
         Tap any poll for its full breakdown · dates are fieldwork windows (publication dates sit in the
         breakdown) · “as published” lists each poll’s headline figures exactly as the pollster released them ·
-        the lead bar shows the selected matchup where a pollster published it · “house lean” is the poll minus
+        the lead bar shows the selected matchup where a pollster published it · “poll lean” is the poll minus
         the aggregate for that month · <strong>house effect</strong> is how far that pollster systematically
         sits from the cross-house consensus on 2PP – its own average lean across every poll it has published,
         shrunk toward zero when it has published few; the aggregates subtract it, and it is a property of the

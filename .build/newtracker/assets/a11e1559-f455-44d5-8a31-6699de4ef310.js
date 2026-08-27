@@ -2650,7 +2650,7 @@ function PollsterTable() {
         {" "}<strong>Published</strong> is the date the poll was released, taken from the source each row links
         to – not the last day of its fieldwork, which is the next column. A dashed date is a fallback: that
         poll’s publication date isn’t recorded, so the column shows its fieldwork end instead.
-        {" "}Each house’s systematic lean (its house effect) now sits beside house lean in the All polls archive.
+        {" "}Each house’s systematic lean (its house effect) now sits beside poll lean in the All polls archive.
       </p>
     </section>
   );
