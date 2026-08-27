@@ -485,6 +485,11 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
         .filter((e) => !e.metrics || e.metrics.includes(M.key))
         .map((e) => ({ ...e, x: cycEventMonth(e.date, solo.eDate) }))
     : [];
+  /* Hanson's control belongs to HER cycle alone: no past term rated her, so
+     the tickbox appears only when the current term stands solo, and the line
+     follows the same gate – widening back to every cycle drops her line with
+     the control instead of leaving a line nothing on screen can switch off. */
+  const hanCtl = M.han && hanAvail && solo === hanCycle;
   const built = shown.flatMap((c) => {
     const base = cycBase(c, M.key);
     const monthly = toMonthly(c.raw.months, c.raw[M.key], c.span);
@@ -560,7 +565,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
      the line spans the gap without the tooltip claiming a value there. Straight
      segments rather than the usual spline – with this few readings a curve
      invents motion between them. */
-  if (M.han && showHan && hanAvail && !hidden.has(hanCycle.year)) {
+  if (hanCtl && showHan) {
     const hBase = cycBase(hanCycle, "han");
     const pts = hanCycle.raw.months
       .map((m, i) => ({ x: m, y: hanRaw[i] }))
@@ -613,7 +618,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
         <div>
           <h2 className="card-title">{M.title}</h2>
           <p className="card-sub">{M.sub}</p>
-          {M.han && hanAvail && (
+          {hanCtl && (
             <label className={"cyc-han" + (showHan ? " on" : "")}
                    title={"Pauline Hanson, on the same approve-minus-disapprove basis. " +
                           "Rated in the current term only, from " + hanFrom + " – no past cycle asked about her, " +
