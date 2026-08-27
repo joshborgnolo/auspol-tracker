@@ -217,6 +217,28 @@ function cycMonthOf(eDate, m) {
   return window.AP.D.monthNameFull((t % 12) + 1) + " " + (y + Math.floor(t / 12));
 }
 
+/* Events pinned to one term, drawn only while that term stands alone on the
+   chart: overlaid with five other cycles a date belongs to no single line.
+   x is derived from the cycle's election date at render, in the same
+   months-since-election units as the cycles themselves. */
+const cycEventMonth = (iso, eDate) => (Date.parse(iso) - Date.parse(eDate)) / 86400000 / MS_MONTH_C;
+const CYC_EVENTS = {
+  2019: [
+    {
+      date: "2019-11-11", short: "Bushfire emergency",
+      label: "Berejiklian declares NSW state of emergency",
+      desc: "State of emergency declared in NSW amid catastrophic bushfire conditions.",
+      major: true,
+    },
+    {
+      date: "2020-03-11", short: "COVID-19 pandemic",
+      label: "WHO declares COVID-19 a pandemic",
+      desc: "The World Health Organization declares the COVID-19 outbreak a pandemic.",
+      major: true,
+    },
+  ],
+};
+
 /* ---- the readings behind a cycle's line --------------------------------
    These charts are monthly averages, and an average is a claim about polls
    the reader cannot see. Narrow the board to ONE term and they appear: the
@@ -396,6 +418,9 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
      a distinction against nothing, so the row keeps the leader alone and the
      title takes the calendar month instead. */
   const solo = shown.length === 1 ? shown[0] : null;
+  const soloEvents = solo
+    ? (CYC_EVENTS[solo.year] || []).map((e) => ({ ...e, x: cycEventMonth(e.date, solo.eDate) }))
+    : [];
   const built = shown.flatMap((c) => {
     const base = cycBase(c, M.key);
     const monthly = toMonthly(c.raw.months, c.raw[M.key], c.span);
@@ -571,7 +596,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
         unit={M.unit} axisFont={20}
         pad={{ l: 56, r: 44, t: 16, b: 40 }}
         xTicks={CYC_XTICKS} refLines={refLines}
-        series={built} spine={CYC_SPINE} scatter={scatter}
+        series={built} spine={CYC_SPINE} scatter={scatter} events={soloEvents}
         tooltipTitle={(i) => cycMonthLabel(CYC_SPINE[i].x)
                              + (solo ? " – " + cycMonthOf(solo.eDate, CYC_SPINE[i].x) : "")}
         fmt={M.fmt}
