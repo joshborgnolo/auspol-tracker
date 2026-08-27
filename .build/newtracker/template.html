@@ -2610,22 +2610,10 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 .apub-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
 .apub-col { min-width: 150px; }
 
-/* archive lead – diverging bar from the 50–50 line, ALP left / L/NP right
-   (mirrors the topline meter), zoomed so ±14 pts fills a half-bar */
-.arch-lead { display: inline-flex; align-items: center; gap: 9px; }
-.arch-lead-bar {
-  position: relative; width: 92px; height: 8px; border-radius: 3px;
-  background: var(--surface-2); overflow: hidden; flex: none;
-}
-.arch-lead-fill { position: absolute; top: 0; bottom: 0; }
-.arch-lead-mid {
-  position: absolute; left: 50%; top: -1px; bottom: -1px; width: 1.5px;
-  background: var(--bg); transform: translateX(-50%);
-}
-.arch-lead-val {
-  font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px;
-  min-width: 38px; text-align: right;
-}
+/* the archive lead cell (after preferences) shares .arch-appr's
+   figure-over-split geometry with the approval and direction cells around
+   it – the bar and headline rules live there; see ArchLead in the archive
+   asset for why one shape won */
 .arch-lean { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px; }
 .arch-lean.alp { color: var(--alp-text); }
 .arch-lean.lnp { color: var(--lnp-text); }
@@ -2758,9 +2746,6 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 
 @media (max-width: 480px) {
   .two-pp-col { min-width: 118px; }
-  .arch-lead { gap: 6px; }
-  .arch-lead-bar { width: 58px; }
-  .arch-lead-val { min-width: 32px; font-size: 12.5px; }
   .arch-lean { font-size: 12.5px; }
   .poll-table.archive { font-size: 12px; }
   .poll-table.archive th, .poll-table.archive td { padding-left: 4px; padding-right: 4px; }

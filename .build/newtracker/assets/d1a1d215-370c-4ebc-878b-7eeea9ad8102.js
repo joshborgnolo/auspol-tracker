@@ -1251,15 +1251,19 @@ function ArchPublished({ p }) {
   );
 }
 
-// One lead-info helper drives the bar, the held-by filter and the sort, so
+// One lead-info helper drives the cell, the held-by filter and the sort, so
 // they can never disagree. Returns null when the poll didn't publish the
 // selected measure. m is signed: + = first-named party of the matchup leads.
+// segs hold the matchup's shares in a FIXED party order for the split bar –
+// deliberately not sorted by leader, so a row-to-row scan never has the
+// colours swapping places.
 function archLeadInfo(p, measure) {
   if (measure === "onp") {
     if (!p.tppAlt) return null;
     const m = +(p.tppAlt.alp - p.tppAlt.onp).toFixed(1);
     return { m, who: m >= 0 ? "alp" : "onp", lab: m >= 0 ? "ALP" : "ON",
              color: m >= 0 ? "var(--alp)" : "var(--onp)",
+             segs: [{ v: p.tppAlt.alp, color: "var(--alp)" }, { v: p.tppAlt.onp, color: "var(--onp)" }],
              note: " on the published ALP v One Nation matchup" };
   }
   if (measure === "lnponp") {
@@ -1267,6 +1271,7 @@ function archLeadInfo(p, measure) {
     const m = +(p.tppAlt2.lnp - p.tppAlt2.onp).toFixed(1);
     return { m, who: m >= 0 ? "lnp" : "onp", lab: m >= 0 ? "L/NP" : "ON",
              color: m >= 0 ? "var(--lnp)" : "var(--onp)",
+             segs: [{ v: p.tppAlt2.lnp, color: "var(--lnp)" }, { v: p.tppAlt2.onp, color: "var(--onp)" }],
              note: " on the published L/NP v One Nation matchup" };
   }
   if (measure === "3cp") {
@@ -1275,6 +1280,7 @@ function archLeadInfo(p, measure) {
       .sort((a, b) => b[2] - a[2]);
     const margin = +(e[0][2] - e[1][2]).toFixed(1);
     return { m: e[0][0] === "alp" ? margin : -margin, who: e[0][0], lab: e[0][1], color: e[0][3],
+             segs: [{ v: p.tpp3.alp, color: "var(--alp)" }, { v: p.tpp3.lnp, color: "var(--lnp)" }, { v: p.tpp3.onp, color: "var(--onp)" }],
              note: ` over ${e[1][1]} on the published 3-cornered figures` };
   }
   if (p.alp == null && p.alp2pp == null) return null;   // no published 2PP this wave
@@ -1282,31 +1288,34 @@ function archLeadInfo(p, measure) {
   // latest-table rows name the same fields alp2pp/lnp2pp
   const alp = p.alp2pp != null ? p.alp2pp : p.alp;
   const lnp = p.lnp2pp != null ? p.lnp2pp : p.lnp;
-  const m = +(alp - (lnp != null ? lnp : 100 - alp)).toFixed(1);
+  const lnpV = lnp != null ? lnp : 100 - alp;   // a missing half completes the pair; it doesn't leave a gap
+  const m = +(alp - lnpV).toFixed(1);
   return { m, who: m >= 0 ? "alp" : "lnp", lab: m >= 0 ? "ALP" : "L/NP",
            color: m >= 0 ? "var(--alp)" : "var(--lnp)",
+           segs: [{ v: alp, color: "var(--alp)" }, { v: lnpV, color: "var(--lnp)" }],
            note: " on the two-party ALP v L/NP measure" +
                  (p.tppKind === "3cp" ? " · derived from the published 3-cornered figures" : "") };
 }
 
-const LEAD_MAX = { lnp: 14, onp: 32, lnponp: 32, "3cp": 14 }; // pts of lead that fill a half-bar
+// the table's after-preferences cell, in the shape the direction and approval
+// cells set: the signed margin (inked in the leader's party colour) over a
+// micro split bar of the matchup shares, so the row reads figure-over-split
+// whatever the measure. The wrapper and bar reuse .arch-appr's geometry
+// rather than a parallel set of lead rules. A pair published
+// undecided-inclusive doesn't sum to 100 – the bar's base shows through as
+// the remainder, exactly like an approval cell's don't-know gap.
 function ArchLead({ p, measure }) {
   const li = archLeadInfo(p, measure);
   if (!li) return <span className="dash" title="This pollster didn’t publish the selected matchup this wave">—</span>;
-  const max = LEAD_MAX[measure] || LEAD_MAX.lnp;
-  const w = Math.min(Math.abs(li.m), max) / max * 50;
   return (
-    <div className="arch-lead" title={`${li.lab} leads by ${Math.abs(li.m).toFixed(1)}${li.note}`}>
-      <div className="arch-lead-bar" aria-hidden="true">
-        <span className="arch-lead-fill"
-              style={li.m >= 0
-                ? { right: "50%", width: w + "%", background: li.color, borderRadius: "3px 0 0 3px" }
-                : { left: "50%", width: w + "%", background: li.color, borderRadius: "0 3px 3px 0" }}></span>
-        <span className="arch-lead-mid"></span>
-      </div>
-      <span className="arch-lead-val" style={{ color: inkOf(li.color) }}>
+    <div className="arch-appr"
+         title={`${li.lab} leads by ${Math.abs(li.m).toFixed(1)}${li.note}`}>
+      <span className="netv" style={{ color: inkOf(li.color) }}>
         {li.m > 0 ? "+" : ""}{li.m.toFixed(1)}
       </span>
+      <div className="arch-appr-bar" aria-hidden="true">
+        {li.segs.map((s, i) => <span key={i} style={{ width: s.v + "%", background: s.color }}></span>)}
+      </div>
     </div>
   );
 }

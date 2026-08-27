@@ -2457,22 +2457,10 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 .apub-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
 .apub-col { min-width: 150px; }
 
-/* archive lead – diverging bar from the 50–50 line, ALP left / L/NP right
-   (mirrors the topline meter), zoomed so ±14 pts fills a half-bar */
-.arch-lead { display: inline-flex; align-items: center; gap: 9px; }
-.arch-lead-bar {
-  position: relative; width: 92px; height: 8px; border-radius: 3px;
-  background: var(--surface-2); overflow: hidden; flex: none;
-}
-.arch-lead-fill { position: absolute; top: 0; bottom: 0; }
-.arch-lead-mid {
-  position: absolute; left: 50%; top: -1px; bottom: -1px; width: 1.5px;
-  background: var(--bg); transform: translateX(-50%);
-}
-.arch-lead-val {
-  font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px;
-  min-width: 38px; text-align: right;
-}
+/* the archive lead cell (after preferences) shares .arch-appr's
+   figure-over-split geometry with the approval and direction cells around
+   it – the bar and headline rules live there; see ArchLead in the archive
+   asset for why one shape won */
 .arch-lean { font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px; }
 .arch-lean.alp { color: var(--alp-text); }
 .arch-lean.lnp { color: var(--lnp-text); }
@@ -2605,9 +2593,6 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 
 @media (max-width: 480px) {
   .two-pp-col { min-width: 118px; }
-  .arch-lead { gap: 6px; }
-  .arch-lead-bar { width: 58px; }
-  .arch-lead-val { min-width: 32px; font-size: 12.5px; }
   .arch-lean { font-size: 12.5px; }
   .poll-table.archive { font-size: 12px; }
   .poll-table.archive th, .poll-table.archive td { padding-left: 4px; padding-right: 4px; }
@@ -10337,9 +10322,12 @@ function ArchPublished({
   }, flag));
 }
 
-// One lead-info helper drives the bar, the held-by filter and the sort, so
+// One lead-info helper drives the cell, the held-by filter and the sort, so
 // they can never disagree. Returns null when the poll didn't publish the
 // selected measure. m is signed: + = first-named party of the matchup leads.
+// segs hold the matchup's shares in a FIXED party order for the split bar –
+// deliberately not sorted by leader, so a row-to-row scan never has the
+// colours swapping places.
 function archLeadInfo(p, measure) {
   if (measure === "onp") {
     if (!p.tppAlt) return null;
@@ -10349,6 +10337,13 @@ function archLeadInfo(p, measure) {
       who: m >= 0 ? "alp" : "onp",
       lab: m >= 0 ? "ALP" : "ON",
       color: m >= 0 ? "var(--alp)" : "var(--onp)",
+      segs: [{
+        v: p.tppAlt.alp,
+        color: "var(--alp)"
+      }, {
+        v: p.tppAlt.onp,
+        color: "var(--onp)"
+      }],
       note: " on the published ALP v One Nation matchup"
     };
   }
@@ -10360,6 +10355,13 @@ function archLeadInfo(p, measure) {
       who: m >= 0 ? "lnp" : "onp",
       lab: m >= 0 ? "L/NP" : "ON",
       color: m >= 0 ? "var(--lnp)" : "var(--onp)",
+      segs: [{
+        v: p.tppAlt2.lnp,
+        color: "var(--lnp)"
+      }, {
+        v: p.tppAlt2.onp,
+        color: "var(--onp)"
+      }],
       note: " on the published L/NP v One Nation matchup"
     };
   }
@@ -10372,6 +10374,16 @@ function archLeadInfo(p, measure) {
       who: e[0][0],
       lab: e[0][1],
       color: e[0][3],
+      segs: [{
+        v: p.tpp3.alp,
+        color: "var(--alp)"
+      }, {
+        v: p.tpp3.lnp,
+        color: "var(--lnp)"
+      }, {
+        v: p.tpp3.onp,
+        color: "var(--onp)"
+      }],
       note: ` over ${e[1][1]} on the published 3-cornered figures`
     };
   }
@@ -10380,21 +10392,31 @@ function archLeadInfo(p, measure) {
   // latest-table rows name the same fields alp2pp/lnp2pp
   const alp = p.alp2pp != null ? p.alp2pp : p.alp;
   const lnp = p.lnp2pp != null ? p.lnp2pp : p.lnp;
-  const m = +(alp - (lnp != null ? lnp : 100 - alp)).toFixed(1);
+  const lnpV = lnp != null ? lnp : 100 - alp; // a missing half completes the pair; it doesn't leave a gap
+  const m = +(alp - lnpV).toFixed(1);
   return {
     m,
     who: m >= 0 ? "alp" : "lnp",
     lab: m >= 0 ? "ALP" : "L/NP",
     color: m >= 0 ? "var(--alp)" : "var(--lnp)",
+    segs: [{
+      v: alp,
+      color: "var(--alp)"
+    }, {
+      v: lnpV,
+      color: "var(--lnp)"
+    }],
     note: " on the two-party ALP v L/NP measure" + (p.tppKind === "3cp" ? " · derived from the published 3-cornered figures" : "")
   };
 }
-const LEAD_MAX = {
-  lnp: 14,
-  onp: 32,
-  lnponp: 32,
-  "3cp": 14
-}; // pts of lead that fill a half-bar
+
+// the table's after-preferences cell, in the shape the direction and approval
+// cells set: the signed margin (inked in the leader's party colour) over a
+// micro split bar of the matchup shares, so the row reads figure-over-split
+// whatever the measure. The wrapper and bar reuse .arch-appr's geometry
+// rather than a parallel set of lead rules. A pair published
+// undecided-inclusive doesn't sum to 100 – the bar's base shows through as
+// the remainder, exactly like an approval cell's don't-know gap.
 function ArchLead({
   p,
   measure
@@ -10404,35 +10426,24 @@ function ArchLead({
     className: "dash",
     title: "This pollster didn\u2019t publish the selected matchup this wave"
   }, "\u2014");
-  const max = LEAD_MAX[measure] || LEAD_MAX.lnp;
-  const w = Math.min(Math.abs(li.m), max) / max * 50;
   return /*#__PURE__*/React.createElement("div", {
-    className: "arch-lead",
+    className: "arch-appr",
     title: `${li.lab} leads by ${Math.abs(li.m).toFixed(1)}${li.note}`
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "arch-lead-bar",
-    "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "arch-lead-fill",
-    style: li.m >= 0 ? {
-      right: "50%",
-      width: w + "%",
-      background: li.color,
-      borderRadius: "3px 0 0 3px"
-    } : {
-      left: "50%",
-      width: w + "%",
-      background: li.color,
-      borderRadius: "0 3px 3px 0"
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "arch-lead-mid"
-  })), /*#__PURE__*/React.createElement("span", {
-    className: "arch-lead-val",
+    className: "netv",
     style: {
       color: inkOf(li.color)
     }
-  }, li.m > 0 ? "+" : "", li.m.toFixed(1)));
+  }, li.m > 0 ? "+" : "", li.m.toFixed(1)), /*#__PURE__*/React.createElement("div", {
+    className: "arch-appr-bar",
+    "aria-hidden": "true"
+  }, li.segs.map((s, i) => /*#__PURE__*/React.createElement("span", {
+    key: i,
+    style: {
+      width: s.v + "%",
+      background: s.color
+    }
+  }))));
 }
 // full per-poll breakdown for an ARCHIVE poll – mirrors the Latest-polls
 // detail, but driven off the archive row shape (alp/lnp 2PP, p primary, ppm,
