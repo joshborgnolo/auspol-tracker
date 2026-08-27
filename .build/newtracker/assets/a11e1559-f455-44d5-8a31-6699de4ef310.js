@@ -1851,15 +1851,6 @@ function SortTh({ label, short, sortKey, k, sort, onSort, className }) {
 function PollDetail({ r }) {
   return (
     <div className="poll-detail">
-      <div className="pd-meta">
-        {/* the row's pollster cell already prints the client under the name,
-            at every width – meta-dup keeps the meta line from saying it
-            twice */}
-        <span className="pd-meta-i meta-dup"><span className="pd-meta-k">Commissioned by</span> {r.client}</span>
-        {r.mode && <span className="pd-meta-i"><span className="pd-meta-k">Method</span> {r.mode}</span>}
-        <span className="pd-meta-i meta-md"><span className="pd-meta-k">Sample</span> {r.sample ? "n = " + r.sample.toLocaleString() : "—"}</span>
-        <span className="pd-meta-i meta-dup"><span className="pd-meta-k">Field</span> {r.field}</span>
-      </div>
       <div className="pd-grid">
         <div className="pd-block pd-head">
           <div className="pd-k">{tppHeading(tppContests(r))}</div>
