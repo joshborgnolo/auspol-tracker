@@ -543,8 +543,8 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         const c = ppmMatch(p, m);
         if (!c) return [];
         return ls.map((L) => {
-          // the opposition slot is an office: Ley's readings belong to the same
-          // line as Taylor's, exactly as the trend splices them
+          // the opposition slot is an office: Ley's polls and Taylor's belong
+          // to the same colour, which the trend draws as each leader's run
           const raw = L.id === "taylor" ? (c.taylor != null ? c.taylor : c.ley) : c[L.id];
           if (raw == null) return null;
           const lab = pr && pr.id === "ah" && L.id === "alb" ? "Albanese v Hanson" : L.short;
@@ -569,7 +569,8 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
   const areas = (three && !morph) || areaFade <= 0.01 ? [] : PPM_PAIRS.map((pr) => {
     const [a, b] = pr.ids;
     const points = pts.map((d) => {
-      const hi = d[a + pr.suf], lo = d[b + pr.suf];
+      // the band spans the office, not the person: Ley's months count too
+      const hi = d[a + pr.suf], lo = d[b + pr.suf] != null ? d[b + pr.suf] : (b === "taylor" ? d["ley" + pr.suf] : null);
       return hi == null || lo == null ? null : { x: d.x, y0: Math.min(hi, lo), y1: Math.max(hi, lo) };
     }).filter(Boolean);
     /* Tinted in the OPPONENT's colour, at an opacity low enough that it
@@ -581,40 +582,54 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
   }).filter(Boolean);
 
   /* Each line, on its own months, for either question – and put on one grid
-     and interpolated while the switch is running. */
-  const lineFor = (r) => pts.filter((d) => d[r.L.id + r.suf] != null)
-    .map((d) => ({ ym: d.ym, x: d.x, v: d[r.L.id + r.suf] }));
+     and interpolated while the switch is running. The opposition office is
+     one colour but two people: Ley's readings live in ley_* and Taylor's in
+     taylor_*, so the office draws as two runs spliced at the February 2026
+     handover (its readings straddle the month, which is why both runs have a
+     point there). `era` is null for every line that is one person
+     throughout. */
+  const erasOf = (r) => (r.L.id === "taylor" ? ["ley", "taylor"] : [null]);
+  const lineFor = (r, era) => {
+    const k = (era || r.L.id) + r.suf;
+    return pts.filter((d) => d[k] != null).map((d) => ({ ym: d.ym, x: d.x, v: d[k] }));
+  };
   const fromRows = morph ? rowsFor(morph.from) : null;
   const toRows = morph ? rowsFor(morph.to) : null;
   const byMk = (list) => { const m = {}; (list || []).forEach((r) => (m[r.mk] = r)); return m; };
   const fromBy = byMk(fromRows), toBy = byMk(toRows);
+  // a run is one line's piece of one era – matched across the switch by
+  // mk|era so Ley's piece never blends into Taylor's ("|" appears in no mk)
+  const runKeys = (list) => (list || []).flatMap((r) => erasOf(r).map((era) => r.mk + "|" + (era || "")));
   /* Every line either side of the switch, once. A line present on both sides
      travels; one present on only one side holds its own shape and fades. */
-  const drawRows = !morph ? rows.map((r) => ({ r, pts: lineFor(r), opacity: 1 })) :
-    [...new Set([...fromRows, ...toRows].map((r) => r.mk))].map((mk) => {
-      const a = fromBy[mk], b = toBy[mk];
-      if (a && b) {
-        const bl = window.AP.blendRows(lineFor(a), lineFor(b), morph.t, ["v"]);
-        // dash says WHICH contest, so it changes with the line's allegiance
-        const r = morph.t < 0.5 ? a : b;
-        return { r, pts: bl ? bl.rows : lineFor(r), opacity: 1, clip: bl ? bl.clip : null };
-      }
-      /* A line with nowhere to travel to is ERASED rather than dimmed: rubbed
-         out from the left as the switch runs, and drawn back in the same way
-         when the switch is reversed. Fading the whole line at once read as it
-         blinking out of existence — the head-to-head Albanese is the one this
-         happens to, and a dashed line vanishing wholesale looks like a
-         rendering fault rather than a departure. */
-      const only = a || b;
-      return { r: only, pts: lineFor(only), wipe: a ? morph.t : 1 - morph.t };
-    }).filter((d) => d.pts.length);
+  const drawRows = !morph
+    ? rows.flatMap((r) => erasOf(r).map((era) => ({ r, era, pts: lineFor(r, era), opacity: 1 }))).filter((d) => d.pts.length)
+    : [...new Set([...runKeys(fromRows), ...runKeys(toRows)])].map((k) => {
+        const [mk, eraS] = k.split("|"), era = eraS || null;
+        const a = fromBy[mk], b = toBy[mk];
+        if (a && b) {
+          const bl = window.AP.blendRows(lineFor(a, era), lineFor(b, era), morph.t, ["v"]);
+          // dash says WHICH contest, so it changes with the line's allegiance
+          const r = morph.t < 0.5 ? a : b;
+          return { r, era, pts: bl ? bl.rows : lineFor(r, era), opacity: 1, clip: bl ? bl.clip : null };
+        }
+        /* A line with nowhere to travel to is ERASED rather than dimmed: rubbed
+           out from the left as the switch runs, and drawn back in the same way
+           when the switch is reversed. Fading the whole line at once read as it
+           blinking out of existence — the head-to-head Albanese is the one this
+           happens to, and a dashed line vanishing wholesale looks like a
+           rendering fault rather than a departure. */
+        const only = a || b;
+        return { r: only, era, pts: lineFor(only, era), wipe: a ? morph.t : 1 - morph.t };
+      }).filter((d) => d.pts.length);
 
 
   // y-window fitted to the readings in view, scatter included – and taken
   // across both questions while morphing, so the axis holds still under lines
   // that are still moving
   const valsFor = (f) => rowsFor(f)
-    .flatMap((r) => D.leaderMonths.map((m) => m[r.L.id + r.suf]).filter((v) => v != null))
+    .flatMap((r) => D.leaderMonths.flatMap((m) =>
+      [m[r.L.id + r.suf], r.L.id === "taylor" ? m["ley" + r.suf] : null]).filter((v) => v != null))
     .concat(cloudFor(f).map((d) => d.y));
   const fitFor = (f) => { const v = valsFor(f); return fitDomain(v.length ? v : [30, 50], 10); };
   const target = fitFor(fmt);
@@ -881,7 +896,13 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         events={[OPP_HANDOVER].filter(Boolean)}
         areas={areas}
         series={drawRows.map((d) => ({
-          id: d.r.mk, label: d.r.label, color: d.r.L.color, dashed: d.r.dashed,
+          /* An era's run is its own series: Ley's ends at the handover (no
+             end-cap – nothing continues from it) and answers to her name in
+             the tooltip, so the month both runs carry (Feb 2026) lists both
+             readings rather than one office row hiding the other leader's. */
+          id: d.era ? d.r.mk + "-" + d.era : d.r.mk,
+          label: d.era === "ley" ? "Ley" : d.r.label, color: d.r.L.color, dashed: d.r.dashed,
+          endCap: d.era === "ley" ? false : undefined,
           /* The three-way is seven months against the two-way's fourteen, so
              every line here retreats by a different amount – each needs its own
              window or the shorter ones arrive at full length and snap. */
@@ -980,34 +1001,39 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
      During a morph the two metrics' versions are put on a single grid of
      months and interpolated, so a leader's line reshapes into its other
      answer instead of being swapped for it. */
-  const lineFor = (L, mt) => {
-    const k = L.id + "_" + mt;
+  /* As on the preferred-PM chart, the opposition office is two people's
+     runs: Ley's readings are ley_* and Taylor's are taylor_*, spliced at the
+     February 2026 handover. `era` is null for everyone else. */
+  const erasOf = (L) => (L.id === "taylor" ? ["ley", "taylor"] : [null]);
+  const lineFor = (L, mt, era) => {
+    const k = (era || L.id) + "_" + mt;
     return pts.filter((d) => d[k] != null)
       .map((d) => ({ ym: d.ym, x: d.x, v: d[k], ci: d[k + "Ci"] != null ? d[k + "Ci"] : null }));
   };
-  const drawLine = (L) => {
-    const now = lineFor(L, metric);
-    if (!morph) return { rows: now, clip: null };
-    const b = window.AP.blendRows(lineFor(L, morph.from), lineFor(L, morph.to), morph.t, ["v", "ci"]);
-    return b ? { rows: b.rows, clip: b.clip } : { rows: now, clip: null };
-  };
+  const drawRuns = (L) => erasOf(L).map((era) => {
+    if (!morph) return { era, rows: lineFor(L, metric, era), clip: null };
+    const b = window.AP.blendRows(lineFor(L, morph.from, era), lineFor(L, morph.to, era), morph.t, ["v", "ci"]);
+    return b ? { era, rows: b.rows, clip: b.clip } : { era, rows: lineFor(L, metric, era), clip: null };
+  }).filter((d) => d.rows.length);
   const drawn = {};
-  leaders.forEach((L) => { drawn[L.id] = drawLine(L); });
+  leaders.forEach((L) => { drawn[L.id] = drawRuns(L); });
 
   const apprAreas = leaders
-    .map((L) => ({ id: "ci-" + L.id, color: L.color, className: "ci-band", edge: false, smooth: true,
+    .flatMap((L) => drawn[L.id].map((d) => ({ id: "ci-" + L.id + (d.era ? "-" + d.era : ""),
+                   color: L.color, className: "ci-band", edge: false, smooth: true,
                    // the interval travels with the line it belongs to
-                   clipX: drawn[L.id].clip,
-                   points: drawn[L.id].rows.filter((d) => d.ci != null)
-                     .map((d) => ({ x: d.x, y0: d.v - d.ci, y1: d.v + d.ci })) }))
+                   clipX: d.clip,
+                   points: d.rows.filter((r) => r.ci != null)
+                     .map((r) => ({ x: r.x, y0: r.v - r.ci, y1: r.v + r.ci })) })))
     .filter((a) => a.points.length >= 2);
 
   /* The y window travels too. Taken across BOTH metrics while morphing, so
      the axis isn't re-fitted under a line that is still moving. */
   const valsFor = (mt) => leaders
-    .flatMap((L) => D.leaderMonths.map((r) => r[L.id + "_" + mt]).filter((v) => v != null))
+    .flatMap((L) => D.leaderMonths.flatMap((r) =>
+      [r[L.id + "_" + mt], L.id === "taylor" ? r["ley_" + mt] : null]).filter((v) => v != null))
     .concat(cloudFor(mt).map((d) => d.y))
-    .concat(leaders.flatMap((L) => lineFor(L, mt).filter((d) => d.ci != null)
+    .concat(leaders.flatMap((L) => erasOf(L).flatMap((era) => lineFor(L, mt, era)).filter((d) => d.ci != null)
       .flatMap((d) => [d.v - d.ci, d.v + d.ci])));
   const fitFor = (mt) => { const v = valsFor(mt); return fitDomain(v.length ? v : [-20, 20], 10, 0); };
   const target = fitFor(metric);
@@ -1116,14 +1142,18 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         refLines={[{ y: 0, label: "even", color: "var(--ink-faint)" }]}
         events={leaders.some((L) => L.id === "taylor") ? [OPP_HANDOVER].filter(Boolean) : []}
-        series={ordered.map((L) => (
-          { id: L.id, label: L.short + " net", color: L.color,
+        series={ordered.flatMap((L) => drawn[L.id].map((d) => (
+          { /* Ley's run ends at the handover (no end-cap) and answers to her
+               name, so the month both runs carry (Feb 2026) lists both. */
+            id: d.era ? L.id + "-" + d.era : L.id,
+            label: (d.era === "ley" ? "Ley" : L.short) + " net", color: L.color,
+            endCap: d.era === "ley" ? false : undefined,
             /* Hanson has nine months of favourability against five of
                approval, so her line has to shorten while the other two barely
                move. Each carries its own window for that reason. */
-            clipX: drawn[L.id].clip,
-            points: drawn[L.id].rows.map((d) => ({ x: d.x, y: d.v })) }
-        ))}
+            clipX: d.clip,
+            points: d.rows.map((r) => ({ x: r.x, y: r.v })) }
+        )))}
         spine={pts.map((d) => ({ x: d.x }))}
         areas={apprAreas}
         scatter={cross ? cross.scatter : apprScatter} pollFacet="leadership"

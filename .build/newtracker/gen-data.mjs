@@ -213,6 +213,10 @@ function houseEffectsFor(rows) {
 const heV = (he, firm) => (he[firm] ? he[firm].v : 0);
 const houseEffectsStrat = houseEffectsFor;   // same estimator; rows carry `strat`
 const OPP_SPLICE_ISO = "2026-02-13";         // Taylor replaces Ley – a different person
+/* Which opposition-leader era a reading belongs to. Ley's last published
+   reading is Resolve's 8–12 Feb 2026 poll; Taylor's first is 14 Feb – so the
+   13th is the first Taylor-only day, and every date falls one side of it. */
+const eraOf = (iso) => (iso < OPP_SPLICE_ISO ? "ley" : "taylor");
 // sample-weighted, house-effect-adjusted monthly mean of a row set
 function monthlyAdj(rows, he) {
   return MONTHS.map((ym) => {
@@ -412,7 +416,7 @@ for (const [prop, lk] of APPR_SLOTS) {
   const rows = appr.filter((p) => p[prop] != null).map((p) => ({
     firm: p.firm, mid: midMs({ date: p.date }), n: Math.min((POLL_BY_KEY.get(p.date + "|" + p.firm) || {}).sample || 1200, SAMPLE_CAP),
     x: p[prop],
-    strat: metricOf(p.firm, lk, p.date) + "|" + (lk === "opp" ? (p.date < OPP_SPLICE_ISO ? "ley" : "taylor") : "-"),
+    strat: metricOf(p.firm, lk, p.date) + "|" + (lk === "opp" ? eraOf(p.date) : "-"),
   }));
   apprHE[lk] = houseEffectsStrat(rows);
 }
@@ -431,6 +435,11 @@ const leaderMonths = MONTHS.map((ym) => {
   // a three-way prompt is a different question, never averaged with a two-way
   const pp2 = pp.filter((p) => p.han == null);
   const pp3 = pp.filter((p) => p.han != null);
+  // …and the opposition slot is two PEOPLE: Ley's readings and Taylor's never
+  // share a mean, or the Feb 2026 handover reads as a move in one man's
+  // numbers. Feb 2026 holds both, so that month carries both key families.
+  const pp2L = pp2.filter((p) => eraOf(p.date) === "ley"), pp2T = pp2.filter((p) => eraOf(p.date) === "taylor");
+  const pp3L = pp3.filter((p) => eraOf(p.date) === "ley"), pp3T = pp3.filter((p) => eraOf(p.date) === "taylor");
   // …and Albanese v Hanson is a third question again, asked with the opposition
   // leader's name absent, so it lives in its own array and its own series
   const ppH = D.ppmHeadToHead.filter((r) => ymOf(r.date) === ym);
@@ -450,10 +459,10 @@ const leaderMonths = MONTHS.map((ym) => {
     return Math.max(0, 100 * sum - net * net);
   };
   const apprN = (p) => Math.min((POLL_BY_KEY.get(p.date + "|" + p.firm) || {}).sample || 1200, SAMPLE_CAP);
-  const split = (prop, lk) => {
+  const split = (prop, lk, pool = rows) => {
     const ap = [], fv = [];
     const deb = (p, v) => v - heV(apprHE[lk] || {}, p.firm);   // debias on this leader's own house effects
-    rows.forEach((p) => {
+    pool.forEach((p) => {
       const n = apprN(p);
       if (p[prop] != null) {
         // readings are equally weighted here, as the mean below is: this is a
@@ -475,7 +484,11 @@ const leaderMonths = MONTHS.map((ym) => {
     const a = est(ap), f = est(fv);
     return { net: a.v, fav: f.v, netCi: a.ci, favCi: f.ci };
   };
-  const A = split("alb", "alb"), O = split("opp", "opp"), H = split("han", "han");
+  const A = split("alb", "alb"), H = split("han", "han");
+  // the opposition office, per era – the same measurement, run once over the
+  // readings of each person who held it
+  const OL = split("opp", "opp", rows.filter((p) => eraOf(p.date) === "ley"));
+  const OT = split("opp", "opp", rows.filter((p) => eraOf(p.date) === "taylor"));
   return {
     ym, x: mx(ym),
     /* Preferred PM is deliberately NOT house-effect-adjusted. Its apparent
@@ -500,23 +513,33 @@ const leaderMonths = MONTHS.map((ym) => {
        rather than opinion, and about 2pp of the cycle's apparent decline is
        the same artefact. Two-way runs the whole cycle (54 polls, all 14
        months); three-way is recent and partial (15 polls, 7 months). */
-    alb_pref: rnd(meanOf(pp2, (p) => p.alb)), taylor_pref: rnd(meanOf(pp2, (p) => p.opp)), hanson_pref: null,
+    alb_pref: rnd(meanOf(pp2, (p) => p.alb)),
+    /* ley_* / taylor_*: the one opposition series keyed by who was asked. A
+       pre-handover month carries ley_* only, a month since carries taylor_*,
+       and Feb 2026 – where both were measured – carries both, so neither
+       person's line borrows the other's readings. */
+    ley_pref: rnd(meanOf(pp2L, (p) => p.opp)), taylor_pref: rnd(meanOf(pp2T, (p) => p.opp)),
+    hanson_pref: null,
     alb_prefN: rnd(meanOf(pp2, (p) => prefShare(p, "alb"))),
-    taylor_prefN: rnd(meanOf(pp2, (p) => prefShare(p, "opp"))),
+    ley_prefN: rnd(meanOf(pp2L, (p) => prefShare(p, "opp"))),
+    taylor_prefN: rnd(meanOf(pp2T, (p) => prefShare(p, "opp"))),
     hanson_prefN: null,
-    alb_pref3: rnd(meanOf(pp3, (p) => p.alb)), taylor_pref3: rnd(meanOf(pp3, (p) => p.opp)), hanson_pref3: rnd(meanOf(pp3, (p) => p.han)),
+    alb_pref3: rnd(meanOf(pp3, (p) => p.alb)),
+    ley_pref3: rnd(meanOf(pp3L, (p) => p.opp)), taylor_pref3: rnd(meanOf(pp3T, (p) => p.opp)),
+    hanson_pref3: rnd(meanOf(pp3, (p) => p.han)),
     alb_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "alb"))),
-    taylor_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "opp"))),
+    ley_prefN3: rnd(meanOf(pp3L, (p) => prefShare(p, "opp"))),
+    taylor_prefN3: rnd(meanOf(pp3T, (p) => prefShare(p, "opp"))),
     hanson_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "han"))),
     /* Albanese v Hanson, head to head. Not a slice of either line above: it is
        asked as its own contest, Albanese runs ~7pp higher against Hanson than
        against the opposition leader, and only some houses ask it (11 polls,
        Apr 2026 on), so it is a third series rather than a filter on the first. */
-    alb_prefH: rnd(meanOf(ppH, (r) => r.alb)), hanson_prefH: rnd(meanOf(ppH, (r) => r.han)), taylor_prefH: null,
-    alb_net: A.net, taylor_net: O.net, hanson_net: H.net,
-    alb_fav: A.fav, taylor_fav: O.fav, hanson_fav: H.fav,
-    alb_netCi: A.netCi, taylor_netCi: O.netCi, hanson_netCi: H.netCi,
-    alb_favCi: A.favCi, taylor_favCi: O.favCi, hanson_favCi: H.favCi,
+    alb_prefH: rnd(meanOf(ppH, (r) => r.alb)), hanson_prefH: rnd(meanOf(ppH, (r) => r.han)), taylor_prefH: null, ley_prefH: null,
+    alb_net: A.net, ley_net: OL.net, taylor_net: OT.net, hanson_net: H.net,
+    alb_fav: A.fav, ley_fav: OL.fav, taylor_fav: OT.fav, hanson_fav: H.fav,
+    alb_netCi: A.netCi, ley_netCi: OL.netCi, taylor_netCi: OT.netCi, hanson_netCi: H.netCi,
+    alb_favCi: A.favCi, ley_favCi: OL.favCi, taylor_favCi: OT.favCi, hanson_favCi: H.favCi,
   };
 }).filter(Boolean);
 
@@ -1591,9 +1614,9 @@ console.log("aggPrimary last:", aggPrimary[aggPrimary.length - 1]);
 console.log("alt2pp alp_on:", alt2pp.alp_on.length, "pts (last", alt2pp.alp_on.at(-1)?.ym, ") | lnp_on:", alt2pp.lnp_on.length, "pts (last", alt2pp.lnp_on.at(-1)?.ym, ")");
 console.log("leaderMonths:", leaderMonths.length, "rows:", leaderMonths.map((r) => r.ym).join(","));
 console.log("  last:", JSON.stringify(leaderMonths[leaderMonths.length - 1]));
-console.log("  pref ranges alb/tay/han:", ["alb", "taylor", "hanson"].map((k) => { const v = leaderMonths.map((r) => r[k + "_pref"]).filter((x) => x != null); return v.length ? Math.min(...v) + ".." + Math.max(...v) : "none"; }).join(" | "));
-console.log("  net ranges alb/tay/han:", ["alb", "taylor", "hanson"].map((k) => { const v = leaderMonths.map((r) => r[k + "_net"]).filter((x) => x != null); return v.length ? Math.min(...v) + ".." + Math.max(...v) : "none"; }).join(" | "));
-console.log("  fav ranges alb/tay/han:", ["alb", "taylor", "hanson"].map((k) => { const v = leaderMonths.map((r) => r[k + "_fav"]).filter((x) => x != null); return v.length ? Math.min(...v) + ".." + Math.max(...v) : "none"; }).join(" | "));
+console.log("  pref ranges alb/ley/tay/han:", ["alb", "ley", "taylor", "hanson"].map((k) => { const v = leaderMonths.map((r) => r[k + "_pref"]).filter((x) => x != null); return v.length ? Math.min(...v) + ".." + Math.max(...v) : "none"; }).join(" | "));
+console.log("  net ranges alb/ley/tay/han:", ["alb", "ley", "taylor", "hanson"].map((k) => { const v = leaderMonths.map((r) => r[k + "_net"]).filter((x) => x != null); return v.length ? Math.min(...v) + ".." + Math.max(...v) : "none"; }).join(" | "));
+console.log("  fav ranges alb/ley/tay/han:", ["alb", "ley", "taylor", "hanson"].map((k) => { const v = leaderMonths.map((r) => r[k + "_fav"]).filter((x) => x != null); return v.length ? Math.min(...v) + ".." + Math.max(...v) : "none"; }).join(" | "));
 console.log("  fav months:", leaderMonths.filter((r) => r.alb_fav != null || r.taylor_fav != null || r.hanson_fav != null).map((r) => r.ym).join(","));
 console.log("  approval months:", leaderMonths.filter((r) => r.alb_net != null).map((r) => r.ym).join(","));
 console.log("individualPolls:", individualPolls.length, "| no 2PP:", individualPolls.filter((p) => p.alp == null).length, "| with ppm:", individualPolls.filter((p) => p.ppm || p.ppmSets).length, "| with appr:", individualPolls.filter((p) => p.appr.albNet != null).length);
