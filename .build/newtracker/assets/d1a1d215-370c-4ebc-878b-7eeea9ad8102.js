@@ -223,6 +223,26 @@ function cycMonthOf(eDate, m) {
    months-since-election units as the cycles themselves. */
 const cycEventMonth = (iso, eDate) => (Date.parse(iso) - Date.parse(eDate)) / 86400000 / MS_MONTH_C;
 const CYC_EVENTS = {
+  2013: [
+    {
+      date: "2013-11-18", short: "Indonesia spy row",
+      label: "Indonesia recalls ambassador over spying revelations",
+      desc: "Indonesia recalls its ambassador after leaked documents reveal Australia spied on president Susilo Bambang Yudhoyono.",
+      major: true,
+    },
+    {
+      date: "2014-05-13", short: "Hockey's first budget",
+      label: "Joe Hockey delivers the 2014 federal budget",
+      desc: "Treasurer Joe Hockey delivers the Abbott government's first federal budget, with deep cuts to health, education and welfare.",
+      major: true,
+    },
+    {
+      date: "2015-01-26", short: "Prince Philip knighted",
+      label: "Abbott announces knighthood for Prince Philip",
+      desc: "Prime Minister Tony Abbott awards Prince Philip a knighthood in the Order of Australia, drawing widespread ridicule.",
+      major: true,
+    },
+  ],
   2019: [
     {
       date: "2019-11-09", short: "Bushfire emergency",
