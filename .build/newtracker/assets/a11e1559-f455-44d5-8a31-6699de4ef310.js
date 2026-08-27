@@ -1852,10 +1852,13 @@ function PollDetail({ r }) {
   return (
     <div className="poll-detail">
       <div className="pd-meta">
-        <span className="pd-meta-i"><span className="pd-meta-k">Commissioned by</span> {r.client}</span>
+        {/* the row's pollster cell already prints the client under the name,
+            at every width – meta-dup keeps the meta line from saying it
+            twice */}
+        <span className="pd-meta-i meta-dup"><span className="pd-meta-k">Commissioned by</span> {r.client}</span>
         {r.mode && <span className="pd-meta-i"><span className="pd-meta-k">Method</span> {r.mode}</span>}
         <span className="pd-meta-i meta-md"><span className="pd-meta-k">Sample</span> {r.sample ? "n = " + r.sample.toLocaleString() : "—"}</span>
-        <span className="pd-meta-i meta-fld"><span className="pd-meta-k">Field</span> {r.field}</span>
+        <span className="pd-meta-i meta-dup"><span className="pd-meta-k">Field</span> {r.field}</span>
         {/* The same offer the archive row carries, for the same reason: a
             correction is nearly always about ONE poll, and the reader who has
             a row open is looking at the figure they doubt. Seeding the

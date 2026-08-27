@@ -1405,11 +1405,14 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-size: 10.5px;
   color: var(--ink-3); font-weight: 700; margin-right: 5px;
 }
-/* the row above already prints these as columns: fieldwork is visible at
-   every width, while Sample (and, in the archive, As published) only drop
-   away with .hide-md below 1000px – so the meta line carries its copies only
-   where the columns aren't there to say it */
-.pd-meta .meta-fld { display: none; }
+/* the meta line never repeats what the row says at every width – Fieldwork/
+   Field in both tables, "Commissioned by" under the pollster name in the
+   latest table – and it carries a width-dependent column (Sample) only where
+   .hide-md has dropped it, below 1000px. What no column ever prints (the
+   archive's client and published DATE) stays in the meta untagged, at every
+   width – the earlier version hid it on the strength of the As-published
+   figures column, which is a different thing with a similar name. */
+.pd-meta .meta-dup { display: none; }
 @media (min-width: 1001px) {
   .pd-meta .meta-md { display: none; }
 }
@@ -7906,7 +7909,7 @@ function PollDetail({
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-meta"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i"
+    className: "pd-meta-i meta-dup"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Commissioned by"), " ", r.client), r.mode && /*#__PURE__*/React.createElement("span", {
@@ -7918,7 +7921,7 @@ function PollDetail({
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Sample"), " ", r.sample ? "n = " + r.sample.toLocaleString() : "—"), /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i meta-fld"
+    className: "pd-meta-i meta-dup"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Field"), " ", r.field), window.AP_FEEDBACK && /*#__PURE__*/React.createElement("button", {
@@ -10447,7 +10450,9 @@ function ArchLead({
 }
 // full per-poll breakdown for an ARCHIVE poll – mirrors the Latest-polls
 // detail, but driven off the archive row shape (alp/lnp 2PP, p primary, ppm,
-// appr) which carries no commissioning client / method / direction fields.
+// appr). The archive row prints no client and no published DATE in any
+// column at any width, so the meta line owns both outright – left untagged,
+// never width-hidden.
 function ArchPollDetail({
   p,
   onBack,
@@ -10473,12 +10478,16 @@ function ArchPollDetail({
     className: "poll-detail"
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-meta"
+  }, p.client && /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i meta-fld"
+    className: "pd-meta-k"
+  }, "Commissioned by"), " ", p.client), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i meta-dup"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Fieldwork"), " ", p.field), /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i meta-md"
+    className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Published"), " ", pubStamp(p.published, {

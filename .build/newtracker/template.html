@@ -1558,11 +1558,14 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-size: 10.5px;
   color: var(--ink-3); font-weight: 700; margin-right: 5px;
 }
-/* the row above already prints these as columns: fieldwork is visible at
-   every width, while Sample (and, in the archive, As published) only drop
-   away with .hide-md below 1000px – so the meta line carries its copies only
-   where the columns aren't there to say it */
-.pd-meta .meta-fld { display: none; }
+/* the meta line never repeats what the row says at every width – Fieldwork/
+   Field in both tables, "Commissioned by" under the pollster name in the
+   latest table – and it carries a width-dependent column (Sample) only where
+   .hide-md has dropped it, below 1000px. What no column ever prints (the
+   archive's client and published DATE) stays in the meta untagged, at every
+   width – the earlier version hid it on the strength of the As-published
+   figures column, which is a different thing with a similar name. */
+.pd-meta .meta-dup { display: none; }
 @media (min-width: 1001px) {
   .pd-meta .meta-md { display: none; }
 }

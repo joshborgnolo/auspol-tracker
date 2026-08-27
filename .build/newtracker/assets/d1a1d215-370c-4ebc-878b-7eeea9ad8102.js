@@ -1321,7 +1321,9 @@ function ArchLead({ p, measure }) {
 }
 // full per-poll breakdown for an ARCHIVE poll – mirrors the Latest-polls
 // detail, but driven off the archive row shape (alp/lnp 2PP, p primary, ppm,
-// appr) which carries no commissioning client / method / direction fields.
+// appr). The archive row prints no client and no published DATE in any
+// column at any width, so the meta line owns both outright – left untagged,
+// never width-hidden.
 function ArchPollDetail({ p, onBack, backLabel }) {
   const { ShareBar, NetVal, ApprBlock, primarySegs, tppContests, tppHeading, ppmContests, ppmContestSegs, ppmLabel, ppmKind, LEADER_META, pubStamp } = window;
   const contests = ppmContests(p);
@@ -1329,14 +1331,15 @@ function ArchPollDetail({ p, onBack, backLabel }) {
   return (
     <div className="poll-detail">
       <div className="pd-meta">
-        <span className="pd-meta-i meta-fld"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>
+        {p.client && <span className="pd-meta-i"><span className="pd-meta-k">Commissioned by</span> {p.client}</span>}
+        <span className="pd-meta-i meta-dup"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>
         {/* The date the poll came OUT, and the hour where the release recorded
             one. This line has always been labelled "Published" and has always
             printed `fullDate`, which is the last day of FIELDWORK - the same
             substitution the Latest-polls column was corrected for, still being
             made one tab across. Where no publication date was recorded the
             fieldwork end still stands in, but now says that it is doing so. */}
-        <span className="pd-meta-i meta-md"><span className="pd-meta-k">Published</span>{" "}
+        <span className="pd-meta-i"><span className="pd-meta-k">Published</span>{" "}
           {pubStamp(p.published, { year: true })
             || <span className="pd-est"
                      title="Publication date not recorded for this poll – showing the last day of fieldwork">
