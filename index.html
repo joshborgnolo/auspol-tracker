@@ -1699,6 +1699,9 @@ body.dark .fb-form { color-scheme: dark; }
   /* tagline now carries the election context, so drop the whole meta block
      (incl. the Next election anchor) on small screens */
   .head-meta { display: none; }
+  /* …and with the meta gone the tagline has the full width again, so its
+     tail flows on the same line rather than taking the forced break */
+  .tagline-br { display: none; }
   /* …and surface a single compact freshness line in its place */
   .head-meta-compact {
     display: flex; align-items: center; gap: 8px;
@@ -12746,7 +12749,9 @@ function Header({
     className: "wm-sr"
   }, "\u2013 Australian federal polling")), /*#__PURE__*/React.createElement("p", {
     className: "tagline"
-  }, "Aggregated opinion polling for the next Australian federal election, set against the last five"), /*#__PURE__*/React.createElement("div", {
+  }, "Aggregated opinion polling for the next Australian federal election, ", /*#__PURE__*/React.createElement("br", {
+    className: "tagline-br"
+  }), "set against the last five"), /*#__PURE__*/React.createElement("div", {
     className: "head-meta-compact",
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("span", {

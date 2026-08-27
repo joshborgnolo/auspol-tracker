@@ -1852,6 +1852,9 @@ body.dark .fb-form { color-scheme: dark; }
   /* tagline now carries the election context, so drop the whole meta block
      (incl. the Next election anchor) on small screens */
   .head-meta { display: none; }
+  /* …and with the meta gone the tagline has the full width again, so its
+     tail flows on the same line rather than taking the forced break */
+  .tagline-br { display: none; }
   /* …and surface a single compact freshness line in its place */
   .head-meta-compact {
     display: flex; align-items: center; gap: 8px;
