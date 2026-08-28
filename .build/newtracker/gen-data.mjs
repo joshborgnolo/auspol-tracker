@@ -700,8 +700,8 @@ function primaryOf(p) {
 // undecided-inclusive 48/47 – are rescaled) for scatter / lean maths
 const alpNOf = (p) => (p.tpp_alp == null ? null : r1(share2pp(p)));
 
-/* TWO questions, and they are not the same one. Roy Morgan asks who you would
-   vote for and reports the share who can't say — undecided on FIRST
+/* THREE questions, and they are not the same one. Roy Morgan asks who you
+   would vote for and reports the share who can't say — undecided on FIRST
    preferences, set aside before its primaries are reported, which is why they
    sum to 100. Essential's undecided is downstream of that: its published
    two-party pair sums to under 100 because the people who wouldn't nominate a
@@ -709,11 +709,17 @@ const alpNOf = (p) => (p.tpp_alp == null ? null : r1(share2pp(p)));
    preferences. That is already recorded once, as pollsterRules — so it is
    derived here rather than typed in again, and it is drawn as its own line
    rather than averaged into the other, exactly as approval and favourability
-   are kept apart. */
+   are kept apart. Resolve's is the mirror question: respondents HAVE named a
+   party, but when asked "How firm are you with your vote?" not all are
+   firm — TOTAL SOFT is the share who might still move. It rides the same
+   `undecided` row field with its own basis, because it belongs to the same
+   panel (the movable share of the electorate) and no wave carries two of
+   these bases at once. */
 const TPP_UNDECIDED = new Set(Object.entries(D.pollsterRules || {})
   .filter(([, r]) => r && r.tppIncludesUndecided).map(([firm]) => firm));
 const undecidedOf = (p) => {
   if (p.undecided != null) return { v: p.undecided, basis: "first" };
+  if (p.soft != null) return { v: p.soft, basis: "soft" };
   if (TPP_UNDECIDED.has(p.pollster) && p.tpp_alp != null && p.tpp_lnp != null) {
     const gap = r1(100 - (p.tpp_alp + p.tpp_lnp));
     // a pair that does sum to 100 is a normalised one, not a nil reading
@@ -732,9 +738,10 @@ const CHG_MEASURES = {
   pLnp:      (p, a, pm) => p.lnp ?? null,
   pGrn:      (p, a, pm) => p.grn ?? null,
   pOnp:      (p, a, pm) => p.onp ?? null,
-  // "can't say" – published beside the primaries by one house and inside the
-  // two-party pair by another; either way it is that house's own series, so a
-  // delta compares like with like
+  // the movable share – "can't say" beside the primaries (Roy Morgan), the
+  // shortfall inside the two-party pair (Essential), and the not-firm share
+  // of the decided (Resolve). Each is that house's own series, so a delta
+  // compares like with like
   und:       (p, a, pm) => (undecidedOf(p) || {}).v ?? null,
   albNet:    (p, a, pm) => (a ? a.alb ?? null : null),
   taylorNet: (p, a, pm) => (a ? a.opp ?? null : null),
@@ -782,6 +789,8 @@ const UNDECIDED_BASES = [
     note: "can’t say who they would vote for – set aside before the shares are reported" },
   { id: "tpp", label: "After preferences", dashed: true,
     note: "won’t nominate a side – still inside the published two-party pair, which is why it sums to under 100" },
+  { id: "soft", label: "Not firm", dash: "1 3",
+    note: "named a party but might still move – the soft share of the decided, Resolve’s “how firm are you”" },
 ];
 const undecidedRows = POLLS.map((p) => ({ p, u: undecidedOf(p) })).filter((r) => r.u);
 const undecidedSeries = UNDECIDED_BASES.map((b) => {
@@ -803,7 +812,7 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
   const prev = [...polls].reverse().find((d) => d.pollster === last.pollster && d.x < last.x);
   const vals = polls.map((d) => d.v);
   return {
-    id: b.id, label: b.label, note: b.note, dashed: b.dashed,
+    id: b.id, label: b.label, note: b.note, dashed: b.dashed, dash: b.dash,
     houses: [...new Set(polls.map((d) => d.pollster))],
     polls, monthly, n: polls.length,
     lo: Math.min(...vals), hi: Math.max(...vals),

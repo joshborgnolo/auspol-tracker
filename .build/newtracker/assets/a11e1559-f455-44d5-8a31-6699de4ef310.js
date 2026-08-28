@@ -1330,7 +1330,9 @@ function UndecidedLine({ v, chg, basis }) {
         <span className="pd-und-note">
           {basis === "tpp"
             ? "won’t pick a side – inside the two-party pair above, which is why it sums to under 100"
-            : "can’t say – excluded from the shares above"}
+            : basis === "soft"
+              ? `named a party, but not firm – the other side of this wave’s ${100 - v}% committed`
+              : "can’t say – excluded from the shares above"}
         </span>
       </div>
     </div>
@@ -1380,7 +1382,7 @@ function UndecidedPanel({ rangeId }) {
         <div>
           <h2 className="card-title">Undecided</h2>
           <p className="card-sub">
-            Electors who won’t name a choice · {houseList(U.houses)}
+            Electors who won’t name a choice, or won’t call theirs firm · {houseList(U.houses)}
           </p>
         </div>
       </div>
@@ -1389,7 +1391,7 @@ function UndecidedPanel({ rangeId }) {
       <div className="und-reads">
         {U.series.map((sr) => (
           <div className="und-read" key={sr.id}>
-            <span className={"und-swatch" + (sr.dashed ? " dashed" : "")} aria-hidden="true"></span>
+            <span className={"und-swatch" + (sr.dashed ? " dashed" : sr.dash ? " dotted" : "")} aria-hidden="true"></span>
             <div className="und-read-body">
               <div className="und-read-top">
                 <span className="und-read-lab">{sr.label}</span>
@@ -1410,7 +1412,7 @@ function UndecidedPanel({ rangeId }) {
         pad={{ l: 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: COL,
-                                    dashed: d.sr.dashed, points: series(d.pts, "v") }))}
+                                    dashed: d.sr.dashed, dash: d.sr.dash, points: series(d.pts, "v") }))}
         spine={series(spine, "v")}
         scatter={drawn.flatMap((d) => d.dots)} pollFacet="twopp"
         tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}

@@ -824,7 +824,7 @@ function TrendChart(props) {
             <path key={s.id} className="series-line"
                   d={(s.smooth === false ? straightPath : smoothPath)(s.points, sx, sy)}
                   fill="none" stroke={s.color} strokeWidth={s.width || 3.4}
-                  strokeDasharray={s.dashed ? "6 6" : "none"}
+                  strokeDasharray={s.dash || (s.dashed ? "6 6" : "none")}
                   clipPath={s.clipX ? `url(#${clipId + "s" + s.id})` : undefined}
                   mask={s.wipe != null && s.wipe > 0 ? `url(#${wipeId + s.id})` : undefined}
                   style={s.opacity != null ? { opacity: s.opacity } : null}
