@@ -16,6 +16,19 @@
 //   Q29VIC primary_vote_vic      VIC state primary vote
 //   Q32VIC preferred_premier_vic VIC premier vs opposition leader
 //
+// Nested subSections (answers carry their own timeseries under the parent's id):
+//   Q5  vote_firmness            "How firm are you with your vote?" —
+//                                TOTAL HARD = Committed, TOTAL SOFT = Uncommitted
+//                                (plus Coalition/Labor/Other breakdowns)
+//   Q5  election_2025_results    actual 2025 federal election result baseline;
+//                                its points are dated "election 2025" in the
+//                                source and stored here as 2025-05-03 (polling day)
+//   Q25NSW vote_firmness_nsw     ^ state equivalents
+//   Q29VIC vote_firmness_vic
+//
+// Free-text respondent verbatims (customAnswers arrays) are not series data
+// and are counted + skipped, not extracted.
+//
 // Known source-data defects the extractor repairs or works around (each fix
 // prints to the log as it runs; the CSV carries no annotations):
 //
@@ -159,14 +172,23 @@ const parseLine = (line) => {
   return Object.fromEntries(cells.map((v, i) => [ROW_KEYS[i], v]));
 };
 
+const SUB_DATASETS = {
+  Q5: [[/actual .*election results/i, "election_2025_results"], [/firm are you/i, "vote_firmness"]],
+  Q25NSW: [[/firm are you/i, "vote_firmness_nsw"]],
+  Q29VIC: [[/firm are you/i, "vote_firmness_vic"]],
+};
+
 const rowsOut = [];
-let wiwCorrupt2021 = 0, wiwZeroSecond = 0;
+let wiwCorrupt2021 = 0, wiwZeroSecond = 0, electionPoints = 0, verbatimCount = 0;
 
 function pushSeries(dataset, q, answer, dim, key, series) {
   for (const p of series || []) {
     const value = num(p.value);
     if (value === "") continue;
-    const date = isoDate(p.date);
+    // election-results baseline points are dated "election 2025" upstream;
+    // store as polling day (only the election_2025_results dataset hits this).
+    const date = p.date === "election 2025" ? "2025-05-03" : isoDate(p.date);
+    if (dataset === "election_2025_results") electionPoints++;
     // (4) live Q22 rows for the 2021 waves overlap the Q444 archive and are
     // corrupt upstream; the archive stays authoritative for that stretch.
     if (dataset === "who_will_win" && date <= "2021-07-18") { wiwCorrupt2021++; continue; }
@@ -177,16 +199,36 @@ function pushSeries(dataset, q, answer, dim, key, series) {
   }
 }
 
+const pushAnswers = (dataset, meta, answers) => {
+  for (const ans of answers || []) {
+    for (const [dim, segs] of [["region", ans.states], ["age", ans.age], ["gender", ans.gender], ["category", ans.categories]])
+      for (const seg of segs || []) pushSeries(dataset, meta, ans.answer, dim, seg.key, seg.timeseries);
+  }
+};
+
+const walkSubs = (sec, subs) => {
+  verbatimCount += (sec.customAnswers || []).length;
+  for (const sub of subs || []) {
+    verbatimCount += (sub.customAnswers || []).length;
+    const question = stripTags(decrypt(sub.question) || "");
+    const match = (SUB_DATASETS[sec.id] || []).find(([re]) => re.test(question));
+    if ((sub.answers || []).length) {
+      if (!match) throw new Error(`unmapped subSection "${question}" under ${sec.id}`);
+      pushAnswers(match[1], { id: sec.id, question, visual: sub.visual || "" }, sub.answers);
+    }
+    if (match && !(sub.answers || []).length) throw new Error(`subSection "${question}" under ${sec.id} mapped but has no answers`);
+    walkSubs({ id: sec.id }, sub.subSections);
+  }
+};
+
 const data = await loadSource(SRC);
 for (const sec of data.sections || []) {
   const dataset = DATASETS[sec.id];
   if (!dataset) throw new Error(`unknown section id ${sec.id}`);
   const question = stripTags(decrypt(sec.question) || "");
   const meta = { id: sec.id, question, visual: sec.visual || "" };
-  for (const ans of sec.answers || []) {
-    for (const [dim, segs] of [["region", ans.states], ["age", ans.age], ["gender", ans.gender], ["category", ans.categories]])
-      for (const seg of segs || []) pushSeries(dataset, meta, ans.answer, dim, seg.key, seg.timeseries);
-  }
+  pushAnswers(dataset, meta, sec.answers);
+  walkSubs(sec, sec.subSections);
 }
 
 // (5) Feb 2026 scenario pair: move the Ley counterfactual out of primary_vote.
@@ -264,6 +306,7 @@ writeFileSync(OUT, [header, ...merged.map(rowToLine)].join("\n") + "\n");
 
 console.log(`updated ${OUT}: kept ${existingRows.length} existing rows, added ${rowsOut.length}, wrote ${merged.length} total (${legacyFixed.length + rowsOut.length - merged.length} dupes)`);
 console.log(`drops/renames: wiw-corrupt-2021=${wiwCorrupt2021} wiw-existing-dropped=${wiwExistingDropped} legacy-relabelled=${legacyRenamed} legacy-dropped=${legacyDropped} ley-scenario=${leyScenario} wiw-zero-second-warn=${wiwZeroSecond}`);
+console.log(`subsections: election-2025-points=${electionPoints} verbatim-comments-skipped=${verbatimCount}`);
 console.log(`net rows corrected: ${netFixes.length}`);
 for (const f of netFixes) console.log("  ~", f);
 const dates = [...new Set(rowsOut.map((r) => r.date))].sort();
