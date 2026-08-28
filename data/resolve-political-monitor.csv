@@ -1,0 +1,363 @@
+dataset,question_id,question,visual,answer,dimension,key,date,value_pct,parties
+leader_performance,,,,Very good,overall,National,2021-04-16,5,
+leader_performance,,,,Very good,overall,National,2021-05-16,4,
+leader_performance,,,,Very good,overall,National,2021-06-13,4,
+leader_performance,,,,Very good,overall,National,2021-07-18,4,
+leader_performance,,,,Very good,overall,National,2021-08-22,4,
+leader_performance,,,,Very good,overall,National,2021-09-19,3.79,
+leader_performance,,,,Very good,overall,National,2021-10-24,5.24,
+leader_performance,,,,Very good,overall,National,2021-11-20,5.36,
+leader_performance,,,,Very good,overall,National,2022-01-15,6.91,
+leader_performance,,,,Very good,overall,National,2022-02-20,5.89,
+leader_performance,,,,Very good,overall,National,2022-04-03,7.08,
+leader_performance,,,,Very good,overall,National,2022-04-16,7.44,
+leader_performance,,,,Very good,overall,National,2022-04-30,6.46,
+leader_performance,,,,Very good,overall,National,2022-05-17,6.36,
+leader_performance,,,,Very good,overall,National,2022-08-21,20.88,
+leader_performance,,,,Very good,overall,National,2022-09-18,17.84,
+leader_performance,,,,Very good,overall,National,2022-10-09,17.86,
+leader_performance,,,,Very good,overall,National,2022-10-30,16.62,
+leader_performance,,,,Very good,overall,National,2022-12-04,20.09,
+leader_performance,,,,Very good,overall,National,2023-01-22,17.15,
+leader_performance,,,,Very good,overall,National,2023-02-19,15.23,
+leader_performance,,,,Very good,overall,National,2023-03-16,15.98,
+leader_performance,,,,Very good,overall,National,2023-04-16,16.37,
+leader_performance,,,,Very good,overall,National,2023-05-14,15.37,
+leader_performance,,,,Very good,overall,National,2023-06-11,12.63,
+leader_performance,,,,Very good,overall,National,2023-07-16,12.54,
+leader_performance,,,,Very good,overall,National,2023-08-13,10.72,
+leader_performance,,,,Very good,overall,National,2023-09-10,8.74,
+leader_performance,,,,Very good,overall,National,2023-10-05,11.54,
+leader_performance,,,,Very good,overall,National,2023-11-05,8.96,
+leader_performance,,,,Very good,overall,National,2023-12-03,6.47,
+leader_performance,,,,Very good,overall,National,2024-02-25,9.29,
+leader_performance,,,,Very good,overall,National,2024-03-24,7.96,
+leader_performance,,,,Very good,overall,National,2024-04-21,8.77,
+leader_performance,,,,Very good,overall,National,2024-05-19,7.69,
+leader_performance,,,,Very good,overall,National,2024-06-16,6.55,
+leader_performance,,,,Very good,overall,National,2024-07-14,6.24,
+leader_performance,,,,Very good,overall,National,2024-08-11,6.72,
+leader_performance,,,,Very good,overall,National,2024-09-07,5.65,
+leader_performance,,,,Very good,overall,National,2024-10-06,5.9,
+leader_performance,,,,Very good,overall,National,2024-11-10,7.28,
+leader_performance,,,,Very good,overall,National,2024-12-08,4.95,
+leader_performance,,,,Very good,overall,National,2025-01-21,6.07,
+leader_performance,,,,Very good,age,18-34,2025-01-21,5.48,
+leader_performance,,,,Very good,age,35-54,2025-01-21,5.94,
+leader_performance,,,,Very good,age,55+,2025-01-21,6.65,
+leader_performance,,,,Good,overall,National,2021-04-16,30,
+leader_performance,,,,Good,overall,National,2021-05-16,28,
+leader_performance,,,,Good,overall,National,2021-06-13,27,
+leader_performance,,,,Good,overall,National,2021-07-18,26,
+leader_performance,,,,Good,overall,National,2021-08-22,24.32,
+leader_performance,,,,Good,overall,National,2021-09-19,26.96,
+leader_performance,,,,Good,overall,National,2021-10-24,25.37,
+leader_performance,,,,Good,overall,National,2021-11-20,25.97,
+leader_performance,,,,Good,overall,National,2022-01-15,27.23,
+leader_performance,,,,Good,overall,National,2022-02-20,30.32,
+leader_performance,,,,Good,overall,National,2022-04-03,31.17,
+leader_performance,,,,Good,overall,National,2022-04-16,27.14,
+leader_performance,,,,Good,overall,National,2022-04-30,30.8,
+leader_performance,,,,Good,overall,National,2022-05-17,33.64,
+leader_performance,,,,Good,overall,National,2022-08-21,40.03,
+leader_performance,,,,Good,overall,National,2022-09-18,41.96,
+leader_performance,,,,Good,overall,National,2022-10-09,42.48,
+leader_performance,,,,Good,overall,National,2022-10-30,39.89,
+leader_performance,,,,Good,overall,National,2022-12-04,39.62,
+leader_performance,,,,Good,overall,National,2023-01-22,43.06,
+leader_performance,,,,Good,overall,National,2023-02-19,40.58,
+leader_performance,,,,Good,overall,National,2023-03-16,39.28,
+leader_performance,,,,Good,overall,National,2023-04-16,39.84,
+leader_performance,,,,Good,overall,National,2023-05-14,41.2,
+leader_performance,,,,Good,overall,National,2023-06-11,39.97,
+leader_performance,,,,Good,overall,National,2023-07-16,38.29,
+leader_performance,,,,Good,overall,National,2023-08-13,33.13,
+leader_performance,,,,Good,overall,National,2023-09-10,31.12,
+leader_performance,,,,Good,overall,National,2023-10-05,31.69,
+leader_performance,,,,Good,overall,National,2023-11-05,30.49,
+leader_performance,,,,Good,overall,National,2023-12-03,30.46,
+leader_performance,,,,Good,overall,National,2024-02-25,31.54,
+leader_performance,,,,Good,overall,National,2024-03-24,29.98,
+leader_performance,,,,Good,overall,National,2024-04-21,33.75,
+leader_performance,,,,Good,overall,National,2024-05-19,30.64,
+leader_performance,,,,Good,overall,National,2024-06-16,29.73,
+leader_performance,,,,Good,overall,National,2024-07-14,26.32,
+leader_performance,,,,Good,overall,National,2024-08-11,27.28,
+leader_performance,,,,Good,overall,National,2024-09-07,28.92,
+leader_performance,,,,Good,overall,National,2024-10-06,28.77,
+leader_performance,,,,Good,overall,National,2024-11-10,30.33,
+leader_performance,,,,Good,overall,National,2024-12-08,26.08,
+leader_performance,,,,Good,overall,National,2025-01-21,26.51,
+leader_performance,,,,Good,age,18-34,2025-01-21,33.07,
+leader_performance,,,,Good,age,35-54,2025-01-21,27.97,
+leader_performance,,,,Good,age,55+,2025-01-21,20.05,
+leader_performance,,,,Poor,overall,National,2021-04-16,25,
+leader_performance,,,,Poor,overall,National,2021-05-16,27,
+leader_performance,,,,Poor,overall,National,2021-06-13,27,
+leader_performance,,,,Poor,overall,National,2021-07-18,27,
+leader_performance,,,,Poor,overall,National,2021-08-22,26.67,
+leader_performance,,,,Poor,overall,National,2021-09-19,26.41,
+leader_performance,,,,Poor,overall,National,2021-10-24,24,
+leader_performance,,,,Poor,overall,National,2021-11-20,25.07,
+leader_performance,,,,Poor,overall,National,2022-01-15,23.86,
+leader_performance,,,,Poor,overall,National,2022-02-20,21.85,
+leader_performance,,,,Poor,overall,National,2022-04-03,24.58,
+leader_performance,,,,Poor,overall,National,2022-04-16,24.96,
+leader_performance,,,,Poor,overall,National,2022-04-30,25.9,
+leader_performance,,,,Poor,overall,National,2022-05-17,29.31,
+leader_performance,,,,Poor,overall,National,2022-08-21,12.94,
+leader_performance,,,,Poor,overall,National,2022-09-18,13.02,
+leader_performance,,,,Poor,overall,National,2022-10-09,13.5,
+leader_performance,,,,Poor,overall,National,2022-10-30,16.09,
+leader_performance,,,,Poor,overall,National,2022-12-04,13.8,
+leader_performance,,,,Poor,overall,National,2023-01-22,14.42,
+leader_performance,,,,Poor,overall,National,2023-02-19,15.4,
+leader_performance,,,,Poor,overall,National,2023-03-16,17.22,
+leader_performance,,,,Poor,overall,National,2023-04-16,14.24,
+leader_performance,,,,Poor,overall,National,2023-05-14,15.25,
+leader_performance,,,,Poor,overall,National,2023-06-11,16.79,
+leader_performance,,,,Poor,overall,National,2023-07-16,17.32,
+leader_performance,,,,Poor,overall,National,2023-08-13,20.22,
+leader_performance,,,,Poor,overall,National,2023-09-10,22.28,
+leader_performance,,,,Poor,overall,National,2023-10-05,19.57,
+leader_performance,,,,Poor,overall,National,2023-11-05,21.93,
+leader_performance,,,,Poor,overall,National,2023-12-03,21.11,
+leader_performance,,,,Poor,overall,National,2024-02-25,18.62,
+leader_performance,,,,Poor,overall,National,2024-03-24,21.65,
+leader_performance,,,,Poor,overall,National,2024-04-21,18.88,
+leader_performance,,,,Poor,overall,National,2024-05-19,20.42,
+leader_performance,,,,Poor,overall,National,2024-06-16,20.69,
+leader_performance,,,,Poor,overall,National,2024-07-14,27.97,
+leader_performance,,,,Poor,overall,National,2024-08-11,22.3,
+leader_performance,,,,Poor,overall,National,2024-09-07,22.81,
+leader_performance,,,,Poor,overall,National,2024-10-06,24.24,
+leader_performance,,,,Poor,overall,National,2024-11-10,22.29,
+leader_performance,,,,Poor,overall,National,2024-12-08,23.42,
+leader_performance,,,,Poor,overall,National,2025-01-21,23.65,
+leader_performance,,,,Poor,age,18-34,2025-01-21,27.16,
+leader_performance,,,,Poor,age,35-54,2025-01-21,22.13,
+leader_performance,,,,Poor,age,55+,2025-01-21,22.28,
+leader_performance,,,,Very poor,overall,National,2021-04-16,16,
+leader_performance,,,,Very poor,overall,National,2021-05-16,18,
+leader_performance,,,,Very poor,overall,National,2021-06-13,17,
+leader_performance,,,,Very poor,overall,National,2021-07-18,19,
+leader_performance,,,,Very poor,overall,National,2021-08-22,20.23,
+leader_performance,,,,Very poor,overall,National,2021-09-19,20.1,
+leader_performance,,,,Very poor,overall,National,2021-10-24,16.64,
+leader_performance,,,,Very poor,overall,National,2021-11-20,20.27,
+leader_performance,,,,Very poor,overall,National,2022-01-15,17.21,
+leader_performance,,,,Very poor,overall,National,2022-02-20,19.72,
+leader_performance,,,,Very poor,overall,National,2022-04-03,17.43,
+leader_performance,,,,Very poor,overall,National,2022-04-16,19.21,
+leader_performance,,,,Very poor,overall,National,2022-04-30,22.06,
+leader_performance,,,,Very poor,overall,National,2022-05-17,18.91,
+leader_performance,,,,Very poor,overall,National,2022-08-21,8.89,
+leader_performance,,,,Very poor,overall,National,2022-09-18,11.29,
+leader_performance,,,,Very poor,overall,National,2022-10-09,10.9,
+leader_performance,,,,Very poor,overall,National,2022-10-30,11.8,
+leader_performance,,,,Very poor,overall,National,2022-12-04,10.07,
+leader_performance,,,,Very poor,overall,National,2023-01-22,10.81,
+leader_performance,,,,Very poor,overall,National,2023-02-19,15.46,
+leader_performance,,,,Very poor,overall,National,2023-03-16,14.06,
+leader_performance,,,,Very poor,overall,National,2023-04-16,15.36,
+leader_performance,,,,Very poor,overall,National,2023-05-14,14.49,
+leader_performance,,,,Very poor,overall,National,2023-06-11,17.77,
+leader_performance,,,,Very poor,overall,National,2023-07-16,17.2,
+leader_performance,,,,Very poor,overall,National,2023-08-13,21.53,
+leader_performance,,,,Very poor,overall,National,2023-09-10,24.93,
+leader_performance,,,,Very poor,overall,National,2023-10-05,22.99,
+leader_performance,,,,Very poor,overall,National,2023-11-05,23.75,
+leader_performance,,,,Very poor,overall,National,2023-12-03,27.33,
+leader_performance,,,,Very poor,overall,National,2024-02-25,28.07,
+leader_performance,,,,Very poor,overall,National,2024-03-24,27.36,
+leader_performance,,,,Very poor,overall,National,2024-04-21,26.39,
+leader_performance,,,,Very poor,overall,National,2024-05-19,29.14,
+leader_performance,,,,Very poor,overall,National,2024-06-16,29.79,
+leader_performance,,,,Very poor,overall,National,2024-07-14,25.77,
+leader_performance,,,,Very poor,overall,National,2024-08-11,29.11,
+leader_performance,,,,Very poor,overall,National,2024-09-07,30.08,
+leader_performance,,,,Very poor,overall,National,2024-10-06,28.3,
+leader_performance,,,,Very poor,overall,National,2024-11-10,28.87,
+leader_performance,,,,Very poor,overall,National,2024-12-08,33.62,
+leader_performance,,,,Very poor,overall,National,2025-01-21,31.04,
+leader_performance,,,,Very poor,age,18-34,2025-01-21,17.03,
+leader_performance,,,,Very poor,age,35-54,2025-01-21,30.91,
+leader_performance,,,,Very poor,age,55+,2025-01-21,42.1,
+leader_performance,,,,Undecided,overall,National,2021-04-16,25,
+leader_performance,,,,Undecided,overall,National,2021-05-16,24,
+leader_performance,,,,Undecided,overall,National,2021-06-13,25,
+leader_performance,,,,Undecided,overall,National,2021-07-18,25,
+leader_performance,,,,Undecided,overall,National,2021-08-22,24.78,
+leader_performance,,,,Undecided,overall,National,2021-09-19,22.74,
+leader_performance,,,,Undecided,overall,National,2021-10-24,28.75,
+leader_performance,,,,Undecided,overall,National,2021-11-20,23.33,
+leader_performance,,,,Undecided,overall,National,2022-01-15,24.79,
+leader_performance,,,,Undecided,overall,National,2022-02-20,22.22,
+leader_performance,,,,Undecided,overall,National,2022-04-03,19.74,
+leader_performance,,,,Undecided,overall,National,2022-04-16,21.26,
+leader_performance,,,,Undecided,overall,National,2022-04-30,14.78,
+leader_performance,,,,Undecided,overall,National,2022-05-17,11.78,
+leader_performance,,,,Undecided,overall,National,2022-08-21,17.27,
+leader_performance,,,,Undecided,overall,National,2022-09-18,15.9,
+leader_performance,,,,Undecided,overall,National,2022-10-09,15.26,
+leader_performance,,,,Undecided,overall,National,2022-10-30,15.6,
+leader_performance,,,,Undecided,overall,National,2022-12-04,16.41,
+leader_performance,,,,Undecided,overall,National,2023-01-22,14.56,
+leader_performance,,,,Undecided,overall,National,2023-02-19,13.33,
+leader_performance,,,,Undecided,overall,National,2023-03-16,13.47,
+leader_performance,,,,Undecided,overall,National,2023-04-16,14.2,
+leader_performance,,,,Undecided,overall,National,2023-05-14,13.69,
+leader_performance,,,,Undecided,overall,National,2023-06-11,12.84,
+leader_performance,,,,Undecided,overall,National,2023-07-16,14.65,
+leader_performance,,,,Undecided,overall,National,2023-08-13,14.4,
+leader_performance,,,,Undecided,overall,National,2023-09-10,12.93,
+leader_performance,,,,Undecided,overall,National,2023-10-05,14.21,
+leader_performance,,,,Undecided,overall,National,2023-11-05,14.87,
+leader_performance,,,,Undecided,overall,National,2023-12-03,14.63,
+leader_performance,,,,Undecided,overall,National,2024-02-25,12.48,
+leader_performance,,,,Undecided,overall,National,2024-03-24,13.05,
+leader_performance,,,,Undecided,overall,National,2024-04-21,12.21,
+leader_performance,,,,Undecided,overall,National,2024-05-19,12.11,
+leader_performance,,,,Undecided,overall,National,2024-06-16,13.24,
+leader_performance,,,,Undecided,overall,National,2024-07-14,13.7,
+leader_performance,,,,Undecided,overall,National,2024-08-11,14.6,
+leader_performance,,,,Undecided,overall,National,2024-09-07,12.54,
+leader_performance,,,,Undecided,overall,National,2024-10-06,12.79,
+leader_performance,,,,Undecided,overall,National,2024-11-10,11.23,
+leader_performance,,,,Undecided,overall,National,2024-12-08,11.93,
+leader_performance,,,,Undecided,overall,National,2025-01-21,12.74,
+leader_performance,,,,Undecided,age,18-34,2025-01-21,17.26,
+leader_performance,,,,Undecided,age,35-54,2025-01-21,13.05,
+leader_performance,,,,Undecided,age,55+,2025-01-21,8.92,
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,National,2021-04-16,44,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,National,2021-05-16,46,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,National,2021-06-13,46,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,National,2021-07-18,44,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,NSW,2021-04-16,49,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,NSW,2021-05-16,52,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,NSW,2021-06-13,52,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,NSW,2021-07-18,46,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Vic,2021-04-16,38,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Vic,2021-05-16,45,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Vic,2021-06-13,46,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Vic,2021-07-18,40,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Qld,2021-04-16,45,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Qld,2021-05-16,43,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Qld,2021-06-13,41,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Qld,2021-07-18,45,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Rest of Australia,2021-04-16,41,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Rest of Australia,2021-05-16,39,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Rest of Australia,2021-06-13,44,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,region,Rest of Australia,2021-07-18,46,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-18-34,2021-04-16,22,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-18-34,2021-05-16,38,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-18-34,2021-06-13,34,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-18-34,2021-07-18,38,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-35-54,2021-04-16,39,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-35-54,2021-05-16,44,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-35-54,2021-06-13,43,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-35-54,2021-07-18,40,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-55+,2021-04-16,51,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-55+,2021-05-16,54,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-55+,2021-06-13,60,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,age,age-55+,2021-07-18,55,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,National,2021-04-16,44,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,National,2021-05-16,46,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,National,2021-06-13,46,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,National,2021-07-18,44,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,Male,2021-04-16,49,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,Male,2021-05-16,50,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,Male,2021-06-13,49,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,Male,2021-07-18,49,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,Female,2021-04-16,33,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,Female,2021-05-16,41,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,Female,2021-06-13,43,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerFirst,gender,Female,2021-07-18,40,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,National,2021-04-16,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,National,2021-05-16,21,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,National,2021-06-13,22,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,National,2021-07-18,26,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,NSW,2021-04-16,25,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,NSW,2021-05-16,20,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,NSW,2021-06-13,22,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,NSW,2021-07-18,26,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Vic,2021-04-16,33,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Vic,2021-05-16,18,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Vic,2021-06-13,23,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Vic,2021-07-18,31,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Qld,2021-04-16,27,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Qld,2021-05-16,22,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Qld,2021-06-13,20,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Qld,2021-07-18,21,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Rest of Australia,2021-04-16,29,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Rest of Australia,2021-05-16,27,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Rest of Australia,2021-06-13,25,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,region,Rest of Australia,2021-07-18,25,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-18-34,2021-04-16,35,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-18-34,2021-05-16,29,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-18-34,2021-06-13,36,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-18-34,2021-07-18,35,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-35-54,2021-04-16,29,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-35-54,2021-05-16,21,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-35-54,2021-06-13,21,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-35-54,2021-07-18,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-55+,2021-04-16,22,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-55+,2021-05-16,16,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-55+,2021-06-13,12,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,age,age-55+,2021-07-18,17,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,National,2021-04-16,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,National,2021-05-16,21,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,National,2021-06-13,22,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,National,2021-07-18,26,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,Male,2021-04-16,29,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,Male,2021-05-16,22,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,Male,2021-06-13,24,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,Male,2021-07-18,25,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,Female,2021-04-16,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,Female,2021-05-16,21,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,Female,2021-06-13,21,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerUndecided,gender,Female,2021-07-18,27,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,National,2021-04-16,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,National,2021-05-16,33,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,National,2021-06-13,31,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,National,2021-07-18,30,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,NSW,2021-04-16,26,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,NSW,2021-05-16,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,NSW,2021-06-13,26,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,NSW,2021-07-18,27,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Vic,2021-04-16,29,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Vic,2021-05-16,36,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Vic,2021-06-13,32,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Vic,2021-07-18,30,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Qld,2021-04-16,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Qld,2021-05-16,35,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Qld,2021-06-13,39,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Qld,2021-07-18,34,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Rest of Australia,2021-04-16,30,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Rest of Australia,2021-05-16,34,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Rest of Australia,2021-06-13,31,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,region,Rest of Australia,2021-07-18,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-18-34,2021-04-16,26,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-18-34,2021-05-16,33,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-18-34,2021-06-13,30,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-18-34,2021-07-18,27,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-35-54,2021-04-16,32,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-35-54,2021-05-16,35,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-35-54,2021-06-13,36,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-35-54,2021-07-18,33,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-55+,2021-04-16,26,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-55+,2021-05-16,31,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-55+,2021-06-13,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,age,age-55+,2021-07-18,29,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,National,2021-04-16,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,National,2021-05-16,33,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,National,2021-06-13,31,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,National,2021-07-18,30,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,Male,2021-04-16,22,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,Male,2021-05-16,28,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,Male,2021-06-13,26,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,Male,2021-07-18,26,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,Female,2021-04-16,34,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,Female,2021-05-16,37,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,Female,2021-06-13,36,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
+Q444_two group preffered bar,Q444,(AES-encrypted in source),two group preffered bar,answerSecond,gender,Female,2021-07-18,33,The Liberal-National Coalition; The Labor Party; Undecided / Too close to call
