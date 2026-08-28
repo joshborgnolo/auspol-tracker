@@ -24124,7 +24124,7 @@
         "date": "2013-07-07",
         "firm": "Newspoll",
         "pmNet": 7,
-        "oppNet": -15
+        "oppNet": -21
       },
       {
         "date": "2013-07-13",
@@ -24448,7 +24448,7 @@
         "date": "2014-08-24",
         "firm": "Newspoll",
         "pmNet": -19,
-        "oppNet": 1
+        "oppNet": -1
       },
       {
         "date": "2014-09-07",
@@ -24771,8 +24771,8 @@
       {
         "date": "2015-11-08",
         "firm": "Newspoll",
-        "pmNet": 36,
-        "oppNet": -20
+        "pmNet": 32,
+        "oppNet": -30
       },
       {
         "date": "2015-11-08",
@@ -25123,7 +25123,7 @@
       {
         "date": "2017-02-05",
         "firm": "Newspoll",
-        "pmNet": -19,
+        "pmNet": -21,
         "oppNet": -22
       },
       {
@@ -25283,8 +25283,8 @@
       {
         "date": "2018-05-13",
         "firm": "Newspoll",
-        "pmNet": -8,
-        "oppNet": -24
+        "pmNet": -11,
+        "oppNet": -22
       },
       {
         "date": "2018-06-03",
@@ -25305,8 +25305,8 @@
       {
         "date": "2018-07-16",
         "firm": "Newspoll",
-        "pmNet": -11,
-        "oppNet": -22
+        "pmNet": -8,
+        "oppNet": -24
       },
       {
         "date": "2018-07-21",
