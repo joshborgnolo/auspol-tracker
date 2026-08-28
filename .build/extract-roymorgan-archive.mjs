@@ -24,6 +24,37 @@
    - mode column normalises the (Multi-mode)/(Face : Face)/(Phone)/(SMS ...) label suffixes
    - the 2025-04-27 wave prints a COMBINED Independents & Other Parties figure of 18.5* (includes One
      Nation 7.5% per RM's footnote) in both columns; transcribed verbatim into both cells (flagged in log)
+
+   Known divergences between this archive and data/polls.json (all DELIBERATE —
+   the archive is a verbatim RM transcript; polls.json is AEC-authoritative for
+   elections and release-sourced for 2025+ waves):
+   - election primaries: RM's own election table occasionally departs from AEC —
+     2010 L-NP 43.6 / others 6.4 (tracker AEC-based 43.3 / 7.0); 2013 L-NP 45.5
+     vs 45.6, others 12.2 vs 12.3; 2016 NXT printed separately (1.9) so others
+     9.9 vs tracker's combined 11.8 (same content, different presentation);
+     2019 printed to 1dp vs tracker's full AEC precision; 2022 GRN 12.3 vs
+     AEC 12.25 (-> tracker 12.2), others 14.1 vs 14.5
+   - election TPP: 2016 RM prints 50.3/49.7 (AEC 50.36/49.64 -> tracker 50.4/49.6);
+     2025 RM prints 55.3/44.7 (AEC 55.27/44.73 -> tracker 55.2/44.8)
+   - boundary wave: archive 2025-05-31 is the SAME four-week wave as tracker's
+     2025-06-01 poll (RM release #9901: n=5,128, field period "May 5 - June 1,
+     2025"). RM's table label truncates the end date to the month's last day;
+     the tracker uses the true Sunday field end. The minor-party split differs
+     identifiably too: RM's printed row (Ind 8.5, OtherParties 14.5) does not
+     sum to RM's own "Total Others" 32.0; the tracker's split (onp 6 / ind
+     14.5, undec 6) comes from the release text and sums to 100.
+
+   Known source quirks kept verbatim (each also warned/noted at runtime):
+   - TPP rows not summing to 100: 1996-06-22, 1996-10-10, 1998-09-06 (all 101,
+     lt table); 2024-04-14 (102), 2024-07-07 (101), 2023-01-29 (115.8 — an RM
+     typo in the weekly table; intended components unverifiable)
+   - duplicated row labels in the tpp-current weekly table: "May 14" (2023,
+     twice with different values — first 57/43 kept, second was 58.4/41.6) and
+     "December 11" (2022, twice — first 56.6/43.4 kept, second 58.5/41.5)
+   - cur-latest "Total Others" column != GRN+IND+OTH parts on ~80 rows (RM's
+     TotalOthers there is "Others ex-Greens"; not transcribed as a CSV column)
+   - 2022-12-04 cur-latest row: components Lib+Nat = 37.5 vs printed Total
+     L-NP 33.5 (printed total kept; components unverifiable)
 */
 import fs from "node:fs";
 import path from "node:path";
