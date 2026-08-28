@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://joshborgnolo.github.io/auspol-tracker/sitemap.xml

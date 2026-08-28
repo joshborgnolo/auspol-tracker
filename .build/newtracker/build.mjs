@@ -465,6 +465,27 @@ ${items}
 `;
 fs.writeFileSync(path.join(ROOT, "feed.xml"), feed);
 
+/* ---- 5c. robots.txt + sitemap.xml – be findable -------------------------
+   A single-page site is trivially mappable, but a crawler still has to learn
+   the page exists and when it last changed. The sitemap carries the one
+   canonical URL with the data date as lastmod; robots.txt points crawlers at
+   it. auspol-polling.html belongs in neither: its noindex meta is the honest
+   signal, and a Disallow would hide that meta from the crawler. Both files
+   key off SITE_URL, so a future CNAME moves them for free – and robots.txt
+   is inert at a github.io project path (only the host-root file is honoured)
+   precisely until one exists. */
+const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>${SITE_URL}</loc>
+    <lastmod>${dataStamp}</lastmod>
+  </url>
+</urlset>
+`;
+fs.writeFileSync(path.join(ROOT, "sitemap.xml"), sitemapXml);
+fs.writeFileSync(path.join(ROOT, "robots.txt"),
+  `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
+
 /* ---- 6. report --------------------------------------------------------- */
 import zlib from "node:zlib";
 const size = fs.statSync(OUT).size;
@@ -472,3 +493,5 @@ const gz = zlib.gzipSync(fs.readFileSync(OUT), { level: 9 }).length;
 console.log(`built ${path.basename(OUT)}`);
 console.log(`  ${(size / 1024 / 1024).toFixed(2)} MB raw · ${(gz / 1024).toFixed(0)} KB over the wire (gzipped)`);
 console.log(`built feed.xml · ${feedPolls.length} polls, newest ${feedPolls[0].date} ${feedPolls[0].pollster}`);
+console.log(`built sitemap.xml · lastmod ${dataStamp}`);
+console.log("built robots.txt");
