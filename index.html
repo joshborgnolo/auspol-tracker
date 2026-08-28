@@ -2454,6 +2454,18 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   .ap-export { display: none; }   /* CSV export is a big-screen affordance */
   .poll-table.archive th, .poll-table.archive td { padding-left: 6px; padding-right: 6px; }
   .poll-table.archive .pollster-cell { white-space: normal; }
+  /* the Published pill is chrome, not data - at the width where columns
+     shed, shed the chrome too. Plain text keeps the date; the fallback
+     date keeps its identity as a dashed underline, so "dashed = last
+     fieldwork day standing in" still reads true. */
+  .poll-table.archive .released-pill {
+    padding: 0; border: 0; border-radius: 0; background: none;
+    font-weight: 600; font-size: inherit;
+  }
+  .poll-table.archive .released-pill.est {
+    color: var(--ink-3); font-weight: 500;
+    border-bottom: 1px dashed var(--line-2);
+  }
 }
 body.editorial .poll-table.archive thead th { background: var(--bg); }
 /* the latest-polls ledger sits inside a card – when its header pins it must
@@ -2614,6 +2626,10 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   .arch-lean { font-size: 12.5px; }
   .poll-table.archive { font-size: 12px; }
   .poll-table.archive th, .poll-table.archive td { padding-left: 4px; padding-right: 4px; }
+  /* the micro split bar is a cell's widest element, so it sets the column:
+     52px to 40 takes ~12px off each leadership/approval column while the
+     approve / don't-know / disapprove shape still reads at table scale */
+  .arch-appr-bar { width: 40px; }
 }
 
 </style>
