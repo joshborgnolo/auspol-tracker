@@ -1,8 +1,0 @@
-Size the small-label species at 12px to match the caps toggles
-
-.meta-k (Last poll / Next election / Polls tracked) and the table
-column headings (.poll-table th, .ss-table thead th) were 11px while
-the caps TextToggle options (2PP / Primary / Leadership, Two-way /
-Three-way / Both) sit at 12px with the same ink-3 semibold tracked-cut
-look. Bring the labels up to the toggle size so the whole small-caps
-species reads at one scale.
