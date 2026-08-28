@@ -63,7 +63,11 @@ execFileSync(process.execPath, [path.join(HERE, "gen-data.mjs")], { stdio: ["ign
 
 /* ---- 3. source modules, in load order ---------------------------------- */
 // plain scripts first (they define the window aliases every component needs)
-const PLAIN = ["9f09dca2-bd46-49a8-8ae1-51847608cf92.js", "ed2260de-5b11-4bd5-8a8d-a391156c05ee.js"];
+const PLAIN = [
+  "9f09dca2-bd46-49a8-8ae1-51847608cf92.js",
+  "ed2260de-5b11-4bd5-8a8d-a391156c05ee.js",
+  "copy-chart.js", // per-chart copy-as-image button
+];
 const JSX = [
   "08b413e7-8dbe-49bf-8932-a479f8d98f54.js",  // chart toolkit
   "052e810c-b1c8-4847-a954-426d3af38e6d.jsx", // tweaks panel
