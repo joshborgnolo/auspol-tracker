@@ -5914,7 +5914,12 @@ function PrimaryVotePanel({
     series
   } = window.AP;
   const [xDomain] = [rangeDomain(rangeId)];
-  const [hidden, setHidden] = useState({});
+  /* Others/Ind. ships hidden: it's a residual aggregate, not a party, and
+     with the majors' three-way contest crowded it went from context to
+     crossings. One chip-tap brings it back. */
+  const [hidden, setHidden] = useState({
+    oth: true
+  });
   const latest = D.aggPrimary[D.aggPrimary.length - 1];
   // labels & series ordered by descending latest primary-vote share
   const parts = [{
