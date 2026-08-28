@@ -2439,8 +2439,14 @@ td.ppm-3w { background: rgba(236,122,8,.07); }
   }
   /* Slightly larger touch targets for the chip controls on phones. */
   .f-chip { padding-top: 7px; padding-bottom: 7px; }
-  /* Decline-cycle chips wrap properly */
-  #decline-cycle-filter .f-chip { font-size: 11px; padding: 7px 9px; }
+  /* Decline-cycle rows wrap instead of scrolling sideways on phones: inside a
+     horizontal scroll strip, iOS eats taps (scroll capture, momentum scroll)
+     and the row's sticky × Reset overlay covers chips at the right edge. */
+  #decline-cycle-filter, #decline-cycle-filter-tpp {
+    flex-wrap: wrap;
+    overflow-x: visible;
+  }
+  #decline-cycle-filter .f-chip, #decline-cycle-filter-tpp .f-chip { font-size: 11px; padding: 7px 9px; }
 }
 @media (max-width: 480px) {
   .masthead .branding { font-size: 11px; }
