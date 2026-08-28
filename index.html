@@ -8417,6 +8417,17 @@ function NextPollsPanel() {
     const isOpen = open === key;
     const hour = releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid);
     const recent = r.recent || [];
+    /* The two columns of an overdue row whose window is still open must
+       answer with the SAME day. The when column counts to the window's
+       far edge ("in 5 days (or 2 days ago)") and the list sorts by it,
+       so the date column leads with that edge too and names the passed
+       slot after "or". Leading with the slot instead - "Wed 26 Aug (or
+       Wed 2 Sep)  in 5 days (or 2 days ago)" - paired each date with
+       the other's countdown, and read as if the poll were due on a day
+       already gone. The slot itself is not rolled forward: it stays on
+       the row, in the "or", and nothing projects from it (see above). */
+    const winOpen = !r.loose && r.overdue && !r.missed;
+    const edge = r.release + r.winHalf * DAY_MS;
     return /*#__PURE__*/React.createElement("li", {
       className: "np-item" + (isOpen ? " open" : ""),
       key: key
@@ -8443,11 +8454,11 @@ function NextPollsPanel() {
       className: "np-date"
     }, r.loose
     /* The ± IS the forecast here, so state it as the span it is
-       rather than as a day with a disclaimer bolted on. */ ? /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release - r.spread * DAY_MS), "\u2013", fmt(r.release + r.spread * DAY_MS)) : /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release), hour && /*#__PURE__*/React.createElement("span", {
+       rather than as a day with a disclaimer bolted on. */ ? /*#__PURE__*/React.createElement(React.Fragment, null, fmt(r.release - r.spread * DAY_MS), "\u2013", fmt(r.release + r.spread * DAY_MS)) : /*#__PURE__*/React.createElement(React.Fragment, null, fmt(winOpen ? edge : r.release), hour && /*#__PURE__*/React.createElement("span", {
       className: "np-time"
-    }, ", ", zoned(hour, r.release)), /*#__PURE__*/React.createElement("span", {
+    }, ", ", zoned(hour, winOpen ? edge : r.release)), /*#__PURE__*/React.createElement("span", {
       className: "np-pm"
-    }, pmLabel(r)))), /*#__PURE__*/React.createElement("span", {
+    }, winOpen ? ` (or ${fmt(r.release)})` : pmLabel(r)))), /*#__PURE__*/React.createElement("span", {
       className: "np-when" + (r.missed ? " np-missed" : "")
     }, r.loose ? r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn) : r.overdue && !r.missed ? `${when(r.closesIn)} (or ${ago(-r.inDays)})` : when(r.inDays)), /*#__PURE__*/React.createElement("span", {
       className: "np-cadence"

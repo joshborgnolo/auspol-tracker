@@ -2322,6 +2322,17 @@ function NextPollsPanel() {
           const isOpen = open === key;
           const hour = releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid);
           const recent = r.recent || [];
+          /* The two columns of an overdue row whose window is still open must
+             answer with the SAME day. The when column counts to the window's
+             far edge ("in 5 days (or 2 days ago)") and the list sorts by it,
+             so the date column leads with that edge too and names the passed
+             slot after "or". Leading with the slot instead - "Wed 26 Aug (or
+             Wed 2 Sep)  in 5 days (or 2 days ago)" - paired each date with
+             the other's countdown, and read as if the poll were due on a day
+             already gone. The slot itself is not rolled forward: it stays on
+             the row, in the "or", and nothing projects from it (see above). */
+          const winOpen = !r.loose && r.overdue && !r.missed;
+          const edge = r.release + r.winHalf * DAY_MS;
           return (
           <li className={"np-item" + (isOpen ? " open" : "")} key={key}>
             <div className={"np-row" + (r.loose ? " np-loose" : "") + (isOpen ? " open" : "")}
@@ -2345,13 +2356,13 @@ function NextPollsPanel() {
                 /* The ± IS the forecast here, so state it as the span it is
                    rather than as a day with a disclaimer bolted on. */
                 ? <>{fmt(r.release - r.spread * DAY_MS)}–{fmt(r.release + r.spread * DAY_MS)}</>
-                : <>{fmt(r.release)}
+                : <>{fmt(winOpen ? edge : r.release)}
                     {/* the hour qualifies the DAY, so it sits with it rather
                         than in the cadence column with the rhythm - and it
                         carries the clock it is read on, since AEST and AEDT
                         are an hour apart and "8 pm" alone names both */}
-                    {hour && <span className="np-time">, {zoned(hour, r.release)}</span>}
-                    <span className="np-pm">{pmLabel(r)}</span></>}
+                    {hour && <span className="np-time">, {zoned(hour, winOpen ? edge : r.release)}</span>}
+                    <span className="np-pm">{winOpen ? ` (or ${fmt(r.release)})` : pmLabel(r)}</span></>}
             </span>
             {/* the column answers "when", so a window answers it too – with the
                 day it opens, which is the first date the wave is possible. An
