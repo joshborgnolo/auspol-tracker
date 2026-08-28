@@ -164,7 +164,7 @@ function Header({ isDark, onToggleTheme }) {
         <p className="tagline">Aggregated opinion polling for the next Australian federal election, <br className="tagline-br"></br>set against the last five</p>
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot " + fresh.state}></span>
-          Updated {D.latest.published} · {D.latest.pollsTracked} polls
+          Updated {D.latest.published} · {D.latest.pollsTracked} polls, and counting
         </div>
       </div>
       <div className="head-right">
