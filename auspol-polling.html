@@ -1356,12 +1356,14 @@ section[data-tab].is-active { display: block; animation: tabFadeIn 0.4s ease; }
   transition: all 0.15s ease;
   user-select: none;
   font-family: 'Inter', sans-serif;
+  touch-action: manipulation;  /* no double-tap zoom while tapping chips quickly */
 }
 .f-chip:hover {
   background: var(--surface);
   color: var(--ink);
   border-color: var(--ink-mute);
 }
+.f-chip:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .f-chip.active {
   /* Filled/selected state. Using --surface for the text (not a literal white)
      keeps it readable in dark mode, where --ink becomes light and --surface
@@ -3418,25 +3420,25 @@ try { var _t = localStorage.getItem('auspol-theme'); if (_t === 'dark' || _t ===
       </div>
       <div class="filter-row js-decline-cycle-filter" id="decline-cycle-filter">
         <span class="filter-label">Compare</span>
-        <span class="f-chip active" data-cycle="current" style="--clr:#d62828">
+        <span class="f-chip active" data-cycle="current" style="--clr:#d62828" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Labor · Post-2025 (current)
         </span>
-        <span class="f-chip active" data-cycle="2019" style="--clr:#1d3b73">
+        <span class="f-chip active" data-cycle="2019" style="--clr:#1d3b73" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Coalition · Post-2019 (Morrison)
         </span>
-        <span class="f-chip active" data-cycle="2022" style="--clr:#d88a8a">
+        <span class="f-chip active" data-cycle="2022" style="--clr:#d88a8a" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Labor · Post-2022 (Albanese I)
         </span>
-        <span class="f-chip active" data-cycle="2016" style="--clr:#7a93b8">
+        <span class="f-chip active" data-cycle="2016" style="--clr:#7a93b8" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Coalition · Post-2016 (Turnbull → Morrison)
         </span>
-        <span class="f-chip active" data-cycle="2013" style="--clr:#4a6daa">
+        <span class="f-chip active" data-cycle="2013" style="--clr:#4a6daa" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Coalition · Post-2013 (Abbott → Turnbull)
         </span>
-        <span class="f-chip active" data-cycle="2010" style="--clr:#b06464">
+        <span class="f-chip active" data-cycle="2010" style="--clr:#b06464" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Labor · Post-2010 (Gillard → Rudd)
         </span>
-        <span class="f-chip active" data-cycle="2007" style="--clr:#c89090">
+        <span class="f-chip active" data-cycle="2007" style="--clr:#c89090" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Labor · Post-2007 (Rudd → Gillard)
         </span>
       </div>
@@ -3469,25 +3471,25 @@ try { var _t = localStorage.getItem('auspol-theme'); if (_t === 'dark' || _t ===
       </div>
       <div class="filter-row js-decline-cycle-filter" id="decline-cycle-filter-tpp">
         <span class="filter-label">Compare</span>
-        <span class="f-chip active" data-cycle="current" style="--clr:#d62828">
+        <span class="f-chip active" data-cycle="current" style="--clr:#d62828" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Labor · Post-2025 (current)
         </span>
-        <span class="f-chip active" data-cycle="2019" style="--clr:#1d3b73">
+        <span class="f-chip active" data-cycle="2019" style="--clr:#1d3b73" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Coalition · Post-2019 (Morrison)
         </span>
-        <span class="f-chip active" data-cycle="2022" style="--clr:#d88a8a">
+        <span class="f-chip active" data-cycle="2022" style="--clr:#d88a8a" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Labor · Post-2022 (Albanese I)
         </span>
-        <span class="f-chip active" data-cycle="2016" style="--clr:#7a93b8">
+        <span class="f-chip active" data-cycle="2016" style="--clr:#7a93b8" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Coalition · Post-2016 (Turnbull → Morrison)
         </span>
-        <span class="f-chip active" data-cycle="2013" style="--clr:#4a6daa">
+        <span class="f-chip active" data-cycle="2013" style="--clr:#4a6daa" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Coalition · Post-2013 (Abbott → Turnbull)
         </span>
-        <span class="f-chip active" data-cycle="2010" style="--clr:#b06464">
+        <span class="f-chip active" data-cycle="2010" style="--clr:#b06464" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Labor · Post-2010 (Gillard → Rudd)
         </span>
-        <span class="f-chip active" data-cycle="2007" style="--clr:#c89090">
+        <span class="f-chip active" data-cycle="2007" style="--clr:#c89090" role="button" tabindex="0" aria-pressed="true">
           <span class="dot"></span>Labor · Post-2007 (Rudd → Gillard)
         </span>
       </div>
@@ -10545,8 +10547,10 @@ function setCycleVisible(cycleKey, visible) {
 // Sync state across BOTH compare rows (primary + 2PP). Clicking either row's
 // chip flips both, calls setCycleVisible once, and refreshes the bias summaries.
 function syncCycleChips(cycleKey, active) {
-  document.querySelectorAll(`.js-decline-cycle-filter .f-chip[data-cycle="${cycleKey}"]`).forEach(c =>
-    c.classList.toggle('active', active));
+  document.querySelectorAll(`.js-decline-cycle-filter .f-chip[data-cycle="${cycleKey}"]`).forEach(c => {
+    c.classList.toggle('active', active);
+    c.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
 }
 document.querySelectorAll('.js-decline-cycle-filter .f-chip').forEach(chip => {
   chip.addEventListener('click', () => {
@@ -10556,6 +10560,13 @@ document.querySelectorAll('.js-decline-cycle-filter .f-chip').forEach(chip => {
     // Keep the bias-shift chip lists in sync with what's actually plotted
     if (_biasAdjusted) updateBiasSummary();
     if (_bias2ppAdjusted) updateBiasSummaryTpp();
+  });
+  // Chips are spans styled as buttons, so wire keyboard activation by hand.
+  chip.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      chip.click();
+    }
   });
 });
 // Apply initial state – hide cycles whose chips aren't active (primary row drives)
@@ -10583,6 +10594,10 @@ function setDeclineTppMode(mode) {
   ds.borderColor = clr;
   ds.backgroundColor = clr + '12';
   ds.borderDash = mode === 'onp' ? [6, 4] : cyc.dash;
+  // Keep nearestLineHover's cached "original" skin in step, or the next
+  // hover-restore paints the PREVIOUS mode's colour back over this line.
+  ds._origColor = clr;
+  ds._origBg = clr + '12';
   const ann = declineTppChart.options.plugins.annotation.annotations['end_' + idx];
   if (ann) ann.backgroundColor = clr;
   // Note line under the mode chips
@@ -10594,7 +10609,7 @@ function setDeclineTppMode(mode) {
   // Re-anchor the endpoint pill's xAdjust now that its x may have changed
   if (ann) {
     const last = ds.data[ds.data.length - 1];
-    if (last) ann.xAdjust = last.x > 30 ? -42 : 44;
+    if (last) ann.xAdjust = last.x > 30 ? -66 : 66;
   }
   declineTppChart.update();
 }
