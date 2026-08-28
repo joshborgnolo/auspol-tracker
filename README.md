@@ -57,8 +57,10 @@ auspol-polling.html      frozen predecessor. Not rebuilt; carries noindex and an
 ```
 
 Two markers in `template.html` are load-bearing – `build.mjs` throws if either
-goes missing: `<!--STATIC_SUMMARY-->` (replaced by the pre-script summary) and
-`<!--SCRIPTS-->` (replaced by every inlined script).
+goes missing: `<!--STATIC_SUMMARY-->` (replaced by the article version of the
+page: headline figures, methodology and sources as real text, outside `#root`,
+clipped by `body.js` once the app mounts – it is what reader mode and assistive
+tech read) and `<!--SCRIPTS-->` (replaced by every inlined script).
 
 ### Where it's published
 

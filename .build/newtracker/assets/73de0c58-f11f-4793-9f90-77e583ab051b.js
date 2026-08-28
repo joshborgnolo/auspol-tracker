@@ -1299,4 +1299,10 @@ function App() {
   );
 }
 
+/* Signal that the app has mounted: body.js clips the static <article> version
+   of the page out of the visual layout (the .wm-sr rule in the template). It
+   stays in the DOM – reader engines (Safari Reader / Firefox Reader View judge
+   the post-script DOM) and assistive tech are exactly who it is for. Must be
+   set even if render throws later, or the page would show both versions. */
+document.body.classList.add("js");
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);

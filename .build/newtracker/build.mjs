@@ -260,17 +260,20 @@ console.log("  favicon:", fav.note);
 console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches --bg / the pinned bar)`);
 const favicon = encodeURIComponent(fav.svg);
 
-/* ---- 4b. a page that says something before React runs -------------------
+/* ---- 4b. the article version of the page ---------------------------------
    #root held a loading placeholder that was `opacity: 0` with a .25s delay
    while React mounted in ~160ms – so it was never actually seen – and the
    whole document carried 499 bytes of markup. That left nothing for a crawler,
    a link-preview scraper, reader mode, or a reader whose JS failed.
 
-   This writes the headline aggregate into the document as real text. React's
-   createRoot() clears the container on its first render, so it costs the
-   interactive page nothing; it is simply what the page SAYS when no script has
-   run yet. Derived from the same generated dataset as everything else, so it
-   cannot drift from the chart above it. */
+   This emits the editorial equivalent of the whole page – headline figures,
+   latest polls, the full methodology and sources – as one semantic <article>.
+   It lives OUTSIDE #root, so createRoot() cannot clear it; once the app
+   mounts it is clipped by body.js (see the .wm-sr rule in the template) and
+   stays in the DOM as the text assistive tech reads and the article reader
+   engines (Safari Reader, Firefox Reader View – both judge the POST-script
+   DOM, and both skip display:none content) extract. Derived from the same
+   generated dataset as everything else, so it cannot drift from the charts. */
 function buildStaticSummary() {
   const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
   const grab = (name) => {
@@ -279,7 +282,8 @@ function buildStaticSummary() {
     return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
   };
   const L = grab("latest"), prim = grab("aggPrimary").slice(-1)[0];
-  const table = grab("pollsterTable");
+  const table = grab("pollsterTable"), acc = grab("accuracy");
+  const polls = grab("individualPolls");
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const lead = (L.alp2pp - L.lnp2pp).toFixed(1);
   const who = L.alp2pp >= L.lnp2pp ? "Labor" : "the Coalition";
@@ -298,10 +302,17 @@ function buildStaticSummary() {
     .filter((k) => prim[k] != null)
     .map((k) => `<li><b>${PARTY[k]}</b> ${prim[k].toFixed(1)}%</li>`).join("\n        ");
 
-  return `<div class="static-summary">
+  /* Same pollster list as MethodNote: straight from the archive, busiest
+     first. It is part of the sourcing, not a footer to drop. */
+  const counts = {};
+  polls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
+  const sources = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).join(", ");
+
+  return `<article class="static-summary">
       <h1>auspol tracker</h1>
-      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last five.
-        Updated ${esc(L.updated)} from ${L.pollsTracked} published polls across ${L.housesTracked} polling houses.</p>
+      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last five.</p>
+      <p class="ss-sub">Updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
+        ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Next election due ${esc(L.nextElectionDue)}.</p>
 
       <h2>Two-party preferred</h2>
       <p class="ss-lead"><b>Labor ${L.alp2pp.toFixed(1)}%</b> &#183; <b>Coalition ${L.lnp2pp.toFixed(1)}%</b></p>
@@ -323,10 +334,47 @@ function buildStaticSummary() {
         </tbody>
       </table>
 
-      <p class="ss-note">This is the summary a browser sees before the interactive charts load.
-        Next election due ${esc(L.nextElectionDue)}. Unofficial aggregate of published national
-        polling; it cannot measure error shared across the whole industry.</p>
-    </div>`;
+      <h2>About this tracker</h2>
+      <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
+        election. The two-party and primary-vote aggregates are weighted means: recent and
+        larger-sample polls count for more, and each pollster&#8217;s figure is adjusted for its own
+        house lean against the cross-house consensus. House leans are measured separately for
+        every measure &#8211; a firm that leans one way on the classic 2PP is not assumed to lean the
+        same way on a primary share or an ALP-v-One Nation head-to-head &#8211; and a matchup too few
+        houses ask is left as a plain monthly average rather than adjusted on guesswork.
+        Pollsters that publish no 2PP contribute to the primary-vote and leadership series only.</p>
+      <p>The headline carries a 95% interval, taken as the greater of the spread among polls in
+        the window and their sampling error: currently about &#177;${L.alp2ppCi95.toFixed(1)} points,
+        on ${L.method.nPolls} polls across ${L.method.windowDays} days (effective sample
+        ${L.alp2ppNEff} after weighting). It does not cover error common to the whole industry: an
+        aggregate cannot detect a lean its constituent polls share. Month-on-month movement smaller
+        than the interval is marked as such.</p>${acc ? `
+      <p>That last caveat is not idle: across the ${acc.cycles.length} elections from
+        ${acc.cycles[0].year} to ${acc.cycles[acc.cycles.length - 1].year},
+        the final polls have missed the two-party result by ${acc.meanAbs} points on average, and
+        at ${acc.worstCycle.year} by ${Math.abs(acc.worstCycle.err)} with every house on the same
+        side of it. Past cycles carries the full record, house by house.</p>` : ""}
+
+      <h2>Reading the charts</h2>
+      <p>Each dot is one published poll; lines are monthly aggregates, shaded with the 95%
+        interval around them &#8211; where the two shaded bands meet, that month&#8217;s lead is inside
+        its own margin of error. Leadership questions are polled irregularly and framed differently
+        between pollsters, so those lines connect published readings &#8211; a &#8220;&#8211;&#8221; anywhere in the
+        tables means the pollster didn&#8217;t ask that question.</p>
+      <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
+        figure into a seat count assumes a uniform swing, and with One Nation near
+        ${Math.round(prim.onp)}% of the primary vote the assumption fails in exactly the seats that
+        would decide the election: a large minor party wins seats where its vote is concentrated and
+        none where it is not, and no national number knows the difference. Seat figures appear on
+        this page only where a pollster modelled them seat by seat and published the result, which
+        is what the MRP tag in the archive marks.</p>
+
+      <h2>Sources</h2>
+      <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
+
+      <p class="ss-note">Unofficial aggregate of published national polling. Aggregate figures are
+        estimates, not measurements &#8211; treat decimal places gently.</p>
+    </article>`;
 }
 
 if (!html.includes("<!--STATIC_SUMMARY-->")) throw new Error("STATIC_SUMMARY marker not found in template");
