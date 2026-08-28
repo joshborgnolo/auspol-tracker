@@ -834,6 +834,13 @@ section + section { border-top: 1px solid var(--rule); }
   font-size: 12px;
   color: var(--ink-mute);
 }
+/* Input-aware guidance: cursor-only wording is hidden on devices that can't
+   hover (phones/tablets); .touch-only wording is swapped in there instead. */
+.touch-only { display: none; }
+@media (hover: none) {
+  .hover-only { display: none; }
+  .touch-only { display: inline; }
+}
 .chart-wrap { position: relative; height: 480px; }
 @media (max-width: 720px) { .chart-wrap { height: 380px; } }
 /* Per-chart "so what" takeaway – one data-driven line beneath a deep chart. */
@@ -2827,7 +2834,7 @@ try { var _t = localStorage.getItem('auspol-theme'); if (_t === 'dark' || _t ===
   <div class="container-wide">
     <div class="section-head events-rail-head">
       <span class="kicker">This cycle · The moments behind the numbers</span>
-      <span class="events-rail-hint">Oldest to newest · Hover for detail · Red marks a major event</span>
+      <span class="events-rail-hint">Oldest to newest · <span class="hover-only">Hover for detail · </span>Red marks a major event</span>
     </div>
     <div class="event-rail" id="event-rail"></div>
   </div>
@@ -2997,7 +3004,7 @@ try { var _t = localStorage.getItem('auspol-theme'); if (_t === 'dark' || _t ===
     <div class="chart-card" style="margin-top:24px;">
       <div class="chart-toolbar">
         <h3>Preferred prime minister (%)</h3>
-        <div class="hint">Hover for poll details · Switch the 2-way / 3-way question format · Ley → Taylor marked</div>
+        <div class="hint"><span class="hover-only">Hover for poll details</span><span class="touch-only">Tap a dot for poll details</span> · Switch the 2-way / 3-way question format · Ley → Taylor marked</div>
       </div>
       <div class="filter-row" id="ppm-mode-filter">
         <span class="filter-label">Question</span>
