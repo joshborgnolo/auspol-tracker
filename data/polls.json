@@ -18815,7 +18815,7 @@
         "tpp_alp": 53
       },
       {
-        "date": "2021-07-17",
+        "date": "2021-07-18",
         "firm": "Resolve Strategic",
         "lnp": 38,
         "alp": 35,
@@ -18903,7 +18903,7 @@
         "tpp_alp": 47
       },
       {
-        "date": "2021-08-21",
+        "date": "2021-08-22",
         "firm": "Resolve Strategic",
         "lnp": 40,
         "alp": 32,
@@ -19134,7 +19134,7 @@
         "tpp_alp": 55.5
       },
       {
-        "date": "2021-11-21",
+        "date": "2021-11-20",
         "firm": "Resolve Strategic",
         "lnp": 39,
         "alp": 32,
@@ -20115,7 +20115,7 @@
         "tpp_alp": 53
       },
       {
-        "date": "2023-05-13",
+        "date": "2023-05-14",
         "firm": "Resolve Strategic",
         "lnp": 30,
         "alp": 42,
@@ -20247,7 +20247,7 @@
         "tpp_alp": 55
       },
       {
-        "date": "2023-07-15",
+        "date": "2023-07-16",
         "firm": "Resolve Strategic",
         "lnp": 30,
         "alp": 39,
@@ -20357,7 +20357,7 @@
         "tpp_alp": 54.1
       },
       {
-        "date": "2023-09-09",
+        "date": "2023-09-10",
         "firm": "Resolve Strategic",
         "lnp": 34,
         "alp": 36,
@@ -20434,7 +20434,7 @@
         "tpp_alp": 50
       },
       {
-        "date": "2023-10-04",
+        "date": "2023-10-05",
         "firm": "Resolve Strategic",
         "lnp": 31,
         "alp": 37,
@@ -20885,7 +20885,7 @@
         "tpp_alp": 52
       },
       {
-        "date": "2024-02-24",
+        "date": "2024-02-25",
         "firm": "Resolve Strategic",
         "lnp": 37,
         "alp": 34,
@@ -21336,7 +21336,7 @@
         "tpp_alp": 53.5
       },
       {
-        "date": "2024-06-15",
+        "date": "2024-06-16",
         "firm": "Resolve Strategic",
         "lnp": 36,
         "alp": 28,
@@ -21435,7 +21435,7 @@
         "tpp_alp": 48
       },
       {
-        "date": "2024-07-13",
+        "date": "2024-07-14",
         "firm": "Resolve Strategic",
         "lnp": 38,
         "alp": 28,
@@ -21809,7 +21809,7 @@
         "tpp_alp": 49
       },
       {
-        "date": "2024-10-05",
+        "date": "2024-10-06",
         "firm": "Resolve Strategic",
         "lnp": 38,
         "alp": 30,
@@ -22700,7 +22700,7 @@
         "tpp_alp": 54.5
       },
       {
-        "date": "2025-04-13",
+        "date": "2025-04-14",
         "firm": "Resolve Strategic",
         "lnp": 34,
         "alp": 31,
@@ -26891,6 +26891,12 @@
         "oppNet": 5
       },
       {
+        "date": "2021-04-16",
+        "firm": "Resolve",
+        "pmNet": null,
+        "oppNet": -6
+      },
+      {
         "date": "2021-04-24",
         "firm": "Newspoll",
         "pmNet": 22,
@@ -26905,6 +26911,12 @@
         "oppNet": -7,
         "pmPpm": 55,
         "oppPpm": 30
+      },
+      {
+        "date": "2021-05-16",
+        "firm": "Resolve",
+        "pmNet": null,
+        "oppNet": -13
       },
       {
         "date": "2021-06-05",
@@ -26942,17 +26954,17 @@
       },
       {
         "date": "2021-07-17",
-        "firm": "Resolve",
-        "pmNet": -1,
-        "oppNet": -16
-      },
-      {
-        "date": "2021-07-17",
         "firm": "Newspoll",
         "pmNet": 6,
         "oppNet": -8,
         "pmPpm": 51,
         "oppPpm": 33
+      },
+      {
+        "date": "2021-07-18",
+        "firm": "Resolve",
+        "pmNet": -1,
+        "oppNet": -16
       },
       {
         "date": "2021-08-07",
@@ -26961,6 +26973,12 @@
         "oppNet": -8,
         "pmPpm": 49,
         "oppPpm": 36
+      },
+      {
+        "date": "2021-08-22",
+        "firm": "Resolve",
+        "pmNet": null,
+        "oppNet": -19
       },
       {
         "date": "2021-08-28",
@@ -26979,6 +26997,12 @@
         "oppPpm": 35
       },
       {
+        "date": "2021-09-19",
+        "firm": "Resolve",
+        "pmNet": null,
+        "oppNet": -16
+      },
+      {
         "date": "2021-10-02",
         "firm": "Newspoll",
         "pmNet": -1,
@@ -26995,12 +27019,24 @@
         "oppPpm": 34
       },
       {
+        "date": "2021-10-24",
+        "firm": "Resolve",
+        "pmNet": null,
+        "oppNet": -10
+      },
+      {
         "date": "2021-11-13",
         "firm": "Newspoll",
         "pmNet": -8,
         "oppNet": -11,
         "pmPpm": 46,
         "oppPpm": 38
+      },
+      {
+        "date": "2021-11-20",
+        "firm": "Resolve",
+        "pmNet": null,
+        "oppNet": -14
       },
       {
         "date": "2021-12-04",
@@ -27043,6 +27079,12 @@
         "firm": "Essential",
         "pmNet": -5,
         "oppNet": 3
+      },
+      {
+        "date": "2022-02-20",
+        "firm": "Resolve",
+        "pmNet": null,
+        "oppNet": -5
       },
       {
         "date": "2022-02-26",
@@ -27123,6 +27165,12 @@
         "oppNet": -9
       },
       {
+        "date": "2022-04-30",
+        "firm": "Resolve",
+        "pmNet": null,
+        "oppNet": -11
+      },
+      {
         "date": "2022-05-07",
         "firm": "Ipsos",
         "pmNet": -19,
@@ -27139,6 +27187,12 @@
         "firm": "Newspoll",
         "pmNet": -11,
         "oppNet": -11
+      },
+      {
+        "date": "2022-05-17",
+        "firm": "Resolve",
+        "pmNet": null,
+        "oppNet": -8
       },
       {
         "date": "2022-05-18",
@@ -27347,7 +27401,7 @@
         "oppNet": -15
       },
       {
-        "date": "2023-05-13",
+        "date": "2023-05-14",
         "firm": "Resolve",
         "pmNet": 27,
         "oppNet": -21
@@ -27395,7 +27449,7 @@
         "oppNet": -13
       },
       {
-        "date": "2023-07-15",
+        "date": "2023-07-16",
         "firm": "Resolve",
         "pmNet": 17,
         "oppNet": -16
@@ -27425,7 +27479,7 @@
         "oppNet": -5
       },
       {
-        "date": "2023-09-09",
+        "date": "2023-09-10",
         "firm": "Resolve",
         "pmNet": -7,
         "oppNet": -8
@@ -27443,7 +27497,7 @@
         "oppNet": -10
       },
       {
-        "date": "2023-10-04",
+        "date": "2023-10-05",
         "firm": "Resolve",
         "pmNet": 0,
         "oppNet": -15
@@ -27569,7 +27623,7 @@
         "oppNet": -14
       },
       {
-        "date": "2024-02-24",
+        "date": "2024-02-25",
         "firm": "Resolve",
         "pmNet": -6,
         "oppNet": -10
@@ -27677,7 +27731,7 @@
         "oppNet": -10
       },
       {
-        "date": "2024-06-15",
+        "date": "2024-06-16",
         "firm": "Resolve",
         "pmNet": -14,
         "oppNet": 2
@@ -27701,7 +27755,7 @@
         "oppNet": -1
       },
       {
-        "date": "2024-07-13",
+        "date": "2024-07-14",
         "firm": "Resolve",
         "pmNet": -22,
         "oppNet": -1
@@ -27797,7 +27851,7 @@
         "oppNet": 0
       },
       {
-        "date": "2024-10-05",
+        "date": "2024-10-06",
         "firm": "Resolve",
         "pmNet": -17,
         "oppNet": 0
@@ -28043,7 +28097,7 @@
         "oppNet": -19
       },
       {
-        "date": "2025-04-13",
+        "date": "2025-04-14",
         "firm": "Resolve",
         "pmNet": 2,
         "oppNet": -19

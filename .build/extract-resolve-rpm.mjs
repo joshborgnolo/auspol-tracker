@@ -16,10 +16,51 @@
 //   Q29VIC primary_vote_vic      VIC state primary vote
 //   Q32VIC preferred_premier_vic VIC premier vs opposition leader
 //
-// Existing CSV rows are kept verbatim: `leader_performance` carries the PM
-// series back to Apr 2021 with finer precision, and `Q444_*` whom-would-win
-// rows come from a newer app generation whose answer slots do not line up
-// numerically with the legacy Q22 slots.
+// Known source-data defects the extractor repairs or works around (each fix
+// prints to the log as it runs; the CSV carries no annotations):
+//
+// 1. Legacy `leader_performance` rows (kept from an earlier app generation)
+//    track ANTHONY ALBANESE throughout, not "the sitting PM": their net
+//    matches the published opposition-leader nets on every Morrison-era wave
+//    (e.g. June 2021: Albanese -13, while Morrison's published net was +8).
+//    Rows dated before the 2022 term ends are relabelled
+//    `opp_leader_performance`; rows from 2022-08-21 onward duplicate Q17 and
+//    are dropped.
+// 2. `Net (Coalition - Labor)` rows in the primary-vote datasets are
+//    sometimes stored with the sign flipped (on waves where Labor led):
+//    2023-10-05, 2025-12-20, 2026-02-14 federal; 2026-03/05/07 NSW;
+//    2021-08-22 VIC. A stored Net that diverges from LNP-ALP by more than
+//    component-rounding slop (>1.5pp) is replaced with LNP-ALP.
+// 3. `Net (Good - Poor)` on 2025-07-18 (both Q17 and Q15) contradicts that
+//    wave's own TOTAL GOOD - TOTAL POOR AND its components (PM stored 8 vs
+//    3; Opp stored -6 vs +9, while the paper called Ley's rating its bright
+//    spot). Stored Net is replaced with TOTAL GOOD - TOTAL POOR.
+// 4. Live Q22 rows for the four waves of 2021-04-16..2021-07-18 are corrupt
+//    upstream (Labor expected to win 26-30% in Morrison's mid-2021 heyday)
+//    and dropped; the CSV's Q444_* archive rows (kept verbatim; their
+//    `parties` column documents answerFirst=Coalition) are authoritative for
+//    that stretch.
+// 5. Feb 2026 polled TWO primary-vote scenarios in one wave (Ley retains vs
+//    Taylor takes over; headline = Taylor, published 15 Feb 2026). The Ley
+//    counterfactual (dated 12/02/2026 in the source) moves to dataset
+//    `primary_vote_ley_scenario`; the Taylor headline (14/02/2026) stays in
+//    `primary_vote`. Note the source holds only one Feb-2026 approval wave.
+//
+// Left UNREPAIRED (internally consistent, contradicts only the publication):
+// the source stores 2024-02-25 federal LNP = 36 (Lib 32 + Nat 4), but the
+// SMH/Age report of that wave printed "Coalition primary vote 37 per cent".
+// The CSV mirrors the source at 36; the tracker keeps the published 37
+// (see LNP_OK in .build/backfill-resolve-approval.mjs).
+//
+// 6. Q22 answerSecond = 0 upstream from 2026-04-18 (Nine stopped keying the
+//    second option after the Hanson-era question changes). Extracted as-is;
+//    a warning is printed.
+//
+// `Total Others` = 100 - LNP - ALP and therefore INCLUDES the undecided
+// share; it is NOT comparable with the tracker's `oth` (IND + OTH).
+// Totals/components are rounded independently by Nine: TOTAL GOOD need not
+// equal Very good + Good to the integer, so reconciled nets are to the
+// nearest half point at best.
 //
 // Values/questions are CryptoJS passphrase format ("!e!...!e!", passphrase
 // "sacho", from the interactive's own bundle), decrypted here with node:crypto.
@@ -97,15 +138,42 @@ const csvCell = (x) => {
 
 const stripTags = (s) => s.replace(/<[^>]*>/g, "").trim();
 
+// Rows stay objects until the end so the repair passes can rewrite values and
+// labels; stringified only at write time.
+const ROW_KEYS = ["dataset", "question_id", "question", "visual", "answer", "dimension", "key", "date", "value_pct", "parties"];
+const rowToLine = (r) => ROW_KEYS.map((k) => csvCell(r[k] ?? "")).join(",");
+const parseLine = (line) => {
+  const cells = [];
+  let cell = "", inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (inQ) {
+      if (c === '"' && line[i + 1] === '"') { cell += '"'; i++; }
+      else if (c === '"') inQ = false;
+      else cell += c;
+    } else if (c === '"') inQ = true;
+    else if (c === ",") { cells.push(cell); cell = ""; }
+    else cell += c;
+  }
+  cells.push(cell);
+  return Object.fromEntries(cells.map((v, i) => [ROW_KEYS[i], v]));
+};
+
 const rowsOut = [];
-const push = (r) => rowsOut.push(r.map(csvCell).join(","));
+let wiwCorrupt2021 = 0, wiwZeroSecond = 0;
 
 function pushSeries(dataset, q, answer, dim, key, series) {
   for (const p of series || []) {
     const value = num(p.value);
     if (value === "") continue;
+    const date = isoDate(p.date);
+    // (4) live Q22 rows for the 2021 waves overlap the Q444 archive and are
+    // corrupt upstream; the archive stays authoritative for that stretch.
+    if (dataset === "who_will_win" && date <= "2021-07-18") { wiwCorrupt2021++; continue; }
+    // (6) Coalition series reads 0 upstream from Apr 2026.
+    if (dataset === "who_will_win" && answer === "answerSecond" && date >= "2026-04-01" && value === 0) wiwZeroSecond++;
     const parties = (p.parties || []).map((x) => String(x).trim()).join("; ");
-    push([dataset, q.id, stripTags(decrypt(q.question) || ""), q.visual || "", answer, dim, key.trim(), isoDate(p.date), value, parties]);
+    rowsOut.push({ dataset, question_id: q.id, question: q.question, visual: q.visual, answer, dimension: dim, key: key.trim(), date, value_pct: value, parties });
   }
 }
 
@@ -121,20 +189,83 @@ for (const sec of data.sections || []) {
   }
 }
 
+// (5) Feb 2026 scenario pair: move the Ley counterfactual out of primary_vote.
+let leyScenario = 0;
+for (const r of rowsOut) {
+  if (r.dataset === "primary_vote" && r.date === "2026-02-12") { r.dataset = "primary_vote_ley_scenario"; leyScenario++; }
+}
+
 // Merge: existing CSV rows (previous extractions) stay on top, new rows beneath.
 const header = "dataset,question_id,question,visual,answer,dimension,key,date,value_pct,parties";
 const existing = existsSync(OUT) ? readFileSync(OUT, "utf8").trim().split("\n") : [];
 const existingBody = existing[0] && existing[0].startsWith("dataset,") ? existing.slice(1) : [];
-const all = new Set([...existingBody, ...rowsOut]);
-writeFileSync(OUT, [header, ...all].join("\n") + "\n");
-console.log(`updated ${OUT}: kept ${existingBody.length} existing rows, added ${rowsOut.length}, wrote ${all.size} total`);
+const existingRows = existingBody.filter(Boolean).map(parseLine);
 
-const counts = {};
-for (const r of rowsOut) {
-  const ds = r.split(",")[0];
-  counts[ds] = (counts[ds] || 0) + 1;
+// (1) legacy leader_performance: relabel Morrison-era rows as the opposition
+// leader's; drop the post-2022-08 overlap with Q17. (4) drop previously
+// committed corrupt Q22 rows for the 2021 waves, same as for fresh rows.
+let legacyRenamed = 0, legacyDropped = 0, wiwExistingDropped = 0;
+const legacyFixed = [];
+for (const r of existingRows) {
+  if (r.dataset === "who_will_win" && r.date <= "2021-07-18") { wiwExistingDropped++; continue; }
+  if (r.dataset !== "leader_performance") { legacyFixed.push(r); continue; }
+  if (r.date >= "2022-08-21") { legacyDropped++; continue; }
+  r.dataset = "opp_leader_performance";
+  legacyRenamed++;
+  legacyFixed.push(r);
 }
-console.log("new rows per dataset:", counts);
-const dates = [...new Set(rowsOut.map((r) => r.split(",")[7]))].sort();
-console.log("dates:", dates[0], "->", dates.at(-1));
+
+const seen = new Set();
+const merged = [];
+const combined = [...legacyFixed, ...rowsOut];
+
+// (2)(3) Net reconciliation: a stored "Net" that contradicts the same wave's
+// own totals is rewritten from the totals, with each rewrite logged. Runs on
+// the combined set BEFORE dedupe so corrected rows collapse onto (or replace)
+// rows written by earlier runs of this script.
+const group = new Map();
+for (const r of combined) {
+  const g = `${r.dataset}|${r.dimension}|${r.key}|${r.date}`;
+  if (!group.has(g)) group.set(g, new Map());
+  const byAns = group.get(g);
+  if (!byAns.has(r.answer)) byAns.set(r.answer, []);
+  byAns.get(r.answer).push(r);
+}
+const netFixes = [];
+const canonical = (byAns, answer) => (byAns.get(answer) || []).at(-1);
+const reconcile = (dsNames, netAnswer, refAnswers, refLabel) => {
+  for (const [g, byAns] of group) {
+    if (!dsNames.includes(g.split("|")[0])) continue;
+    const net = canonical(byAns, netAnswer);
+    if (!net) continue;
+    const refParts = refAnswers.map((a) => canonical(byAns, a)).map((x) => x && Number(x.value_pct));
+    if (refParts.some((x) => x == null || !Number.isFinite(x))) continue;
+    const ref = Math.round(refParts.reduce((acc, v, i) => acc + (i === 0 ? v : -v), 0) * 100) / 100;
+    for (const row of byAns.get(netAnswer) || []) {
+      if (Math.abs(Number(row.value_pct) - ref) > 1.5) {
+        netFixes.push(`${g}: ${row.value_pct} -> ${ref} (${refLabel})`);
+        row.value_pct = ref;
+      }
+    }
+  }
+};
+const PRIMARY_DS = ["primary_vote", "primary_vote_nsw", "primary_vote_vic", "primary_vote_ley_scenario"];
+reconcile(PRIMARY_DS, "Net (Coalition - Labor)", ["LNP", "ALP"], "LNP-ALP");
+reconcile(["pm_performance", "opp_leader_performance"], "Net (Good - Poor)", ["TOTAL GOOD", "TOTAL POOR"], "TOTAL GOOD-TOTAL POOR");
+
+for (const r of combined) {
+  const line = rowToLine(r);
+  if (seen.has(line)) continue;
+  seen.add(line);
+  merged.push(r);
+}
+
+writeFileSync(OUT, [header, ...merged.map(rowToLine)].join("\n") + "\n");
+
+console.log(`updated ${OUT}: kept ${existingRows.length} existing rows, added ${rowsOut.length}, wrote ${merged.length} total (${legacyFixed.length + rowsOut.length - merged.length} dupes)`);
+console.log(`drops/renames: wiw-corrupt-2021=${wiwCorrupt2021} wiw-existing-dropped=${wiwExistingDropped} legacy-relabelled=${legacyRenamed} legacy-dropped=${legacyDropped} ley-scenario=${leyScenario} wiw-zero-second-warn=${wiwZeroSecond}`);
+console.log(`net rows corrected: ${netFixes.length}`);
+for (const f of netFixes) console.log("  ~", f);
+const dates = [...new Set(rowsOut.map((r) => r.date))].sort();
+console.log("fresh dates:", dates[0], "->", dates.at(-1));
 console.log("source updated:", data.updated);
