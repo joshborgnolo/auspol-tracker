@@ -2617,7 +2617,11 @@ function PollsterTable() {
             <tr>
               <th scope="col" className="exp-col" aria-hidden="true"></th>
               <SortTh label="Pollster" sortKey="pollster" sort={sort} onSort={onSort} className="ta-l" />
-              <SortTh label="Published" sortKey="pubSort" sort={sort} onSort={onSort} className="ta-l" />
+              {/* "Published" is the widest header in the base set - on
+                  narrow screens the column is header-bound, ~30px wider
+                  than any date it prints. "Pub" lets the data set the
+                  width; the full word survives as the header's tooltip. */}
+              <SortTh label="Published" short="Pub" sortKey="pubSort" sort={sort} onSort={onSort} className="ta-l" />
               <SortTh label="Fieldwork" short="Field" sortKey="released" sort={sort} onSort={onSort} className="ta-l" />
               <SortTh label="Sample" sortKey="sample" sort={sort} onSort={onSort} className="hide-md" />
 
@@ -2639,7 +2643,12 @@ function PollsterTable() {
                 {/* the office, not the name – the column outlives any one
                     opposition leader (matches the archive) */}
                 <SortTh label="Opp. ldr net" short="Opp" sortKey="appr.taylorNet" sort={sort} onSort={onSort} />
-                <SortTh label="Hanson net" short="Han" sortKey="appr.hansonNet" sort={sort} onSort={onSort} />
+                {/* leadership's shed at hide-sm width: Hanson net is dashes
+                    for YouGov, Newspoll, Roy Morgan and Essential - the
+                    fewest real figures of the three net columns - and the
+                    row detail carries it one tap away like everything else
+                    the tier drops */}
+                <SortTh label="Hanson net" short="Han" sortKey="appr.hansonNet" sort={sort} onSort={onSort} className="hide-sm" />
               </>)}
             </tr>
           </thead>
@@ -2693,7 +2702,7 @@ function PollsterTable() {
                       </td>
                       <td className="num"><ArchApprCell s={r.appr.alb} net={r.appr.albNet} metric={r.appr.metricBy && r.appr.metricBy.alb} /></td>
                       <td className="num"><ArchApprCell s={r.appr.taylor} net={r.appr.taylorNet} metric={r.appr.metricBy && r.appr.metricBy.taylor} /></td>
-                      <td className="num"><ArchApprCell s={r.appr.hanson} net={r.appr.hansonNet} metric={r.appr.metricBy && r.appr.metricBy.hanson} /></td>
+                      <td className="num hide-sm"><ArchApprCell s={r.appr.hanson} net={r.appr.hansonNet} metric={r.appr.metricBy && r.appr.metricBy.hanson} /></td>
                     </>)}
                   </tr>
                   {isOpen && (

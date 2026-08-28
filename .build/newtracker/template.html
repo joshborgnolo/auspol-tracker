@@ -1395,6 +1395,8 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
   text-align: center; font-weight: 600; font-size: 11px;
   color: var(--ink-3); padding: 0 12px 10px;
   border-bottom: 1px solid var(--line); white-space: nowrap;
+  /* the same 11px semibold ink-3 label as .meta-k: track them alike */
+  letter-spacing: 0.02em;
 }
 .poll-table th.ta-l, .poll-table td.ta-l { text-align: left; }
 .poll-table td { padding: 13px 12px; border-bottom: 1px solid var(--line-2); text-align: center; }
@@ -2773,6 +2775,18 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    strikes. */
 @media (max-width: 430px) {
   .poll-table.archive .hide-sm { display: none; }
+  /* …then the headers themselves shed: the gap plus the caret is ~13px on
+     every sortable column, so at this width it survives only on the column
+     actually ordering the table. The tap-any-heading note below the table
+     still advertises the affordance. `display` would give the column back
+     to the text as well; `visibility` holds the width it already owed the
+     sortable STATE's caret, and the difference is spent on the cells. */
+  .poll-table.archive th.sortable:not(.sorted) .caret { visibility: hidden; }
+  .poll-table.archive th.sortable:not(.sorted) .th-in { gap: 2px; }
+  /* …and the cells close up the last pixel of padding and a half-point of
+     numeral size each, the smallest coins left on the table */
+  .poll-table.archive th, .poll-table.archive td { padding-left: 3px; padding-right: 3px; }
+  .poll-table.archive .num { font-size: 11.5px; }
 }
 
 @media (max-width: 480px) {
@@ -2784,6 +2798,16 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
      52px to 40 takes ~12px off each leadership/approval column while the
      approve / don't-know / disapprove shape still reads at table scale */
   .arch-appr-bar { width: 40px; }
+  /* phone width: the ledger takes the card's full width. The wrapper
+     already bleeds 4px past the card's text column at every width; here
+     the 28px page and 24px card gutters aside are a third of a 375px
+     viewport, which is where the overflow was coming from */
+  .card .table-wrap.ap-wrap { margin-left: -20px; margin-right: -20px; }
+  /* the pollster is a cell like any other at phone width: the name steps
+     off its display size, and the client line under it, both into the
+     table's own scale */
+  .poll-table.archive .pollster-name { font-size: 12.5px; }
+  .poll-table.archive .pollster-mode { font-size: 10.5px; }
 }
 
 </style>
