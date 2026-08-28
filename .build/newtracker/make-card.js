@@ -237,7 +237,7 @@
   c.fillText(L.pollsTracked + " polls · " + L.housesTracked
              + " pollsters · house-effect-adjusted aggregate", PAD, 608);
   c.textAlign = "right"; c.font = '600 17px "Public Sans", sans-serif'; c.fillStyle = T.ink2;
-  c.fillText("joshborgnolo.github.io/auspol-tracker", W - PAD, 608); c.textAlign = "left";
+  c.fillText("auspoltracker.com", W - PAD, 608); c.textAlign = "left";
 
   /* ---- export at exactly 1200x630, supersampled from the 2x draw --------- */
   const out = document.createElement("canvas"); out.width = W; out.height = H;
