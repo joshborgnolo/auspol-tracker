@@ -392,6 +392,14 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
   const MORPH_MS = window.AP.MORPH_MS;
   const [morph, setMorph] = useState(null);        // { from, to, t }
   const morphRaf = useRef(0);
+  /* The synthetic 2PP overlay: "what would these polls' PRIMARIES imply if
+     2025's preference flows still held?" – a diagnostic shown on request
+     only, against the real ALP v L/NP series, and never framed as a
+     correction to it. It is not a matchup (no house published it), so it
+     does not belong in MATCHUPS: local state, one dashed ALP-side line (the
+     L/NP side is its exact complement), and it steps aside during a matchup
+     morph, where there is nothing honest for it to reshape into. */
+  const [showSynth, setShowSynth] = useState(false);
   React.useEffect(() => () => cancelAnimationFrame(morphRaf.current), []);
   const chooseMatchup = (id) => {
     const from = matchup;
@@ -528,6 +536,19 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
     { id: "a", label: m.a.name, color: colA, points: series(drawPts, "a"), width: 3.6 },
     { id: "b", label: m.b.name, color: colB, points: series(drawPts, "b"), width: 3.6 },
   ];
+  /* The implied-2PP overlay. Same red as the published Labor line – colour
+     still says who; the dash says this one is computed from primaries, not
+     measured – because the visible GAP to the solid line is the whole point
+     of the diagnostic. Its election-month point is the flow table read back
+     onto the count's own primaries (54.2), so it departs from the published
+     anchor (55.2) on purpose, showing the table's miss at the one point it
+     can be checked. */
+  const synthOverlay = (showSynth && matchup === "alp_lnp" && !morph && D.synth2pp && D.synth2pp.length > 1)
+    ? [{ id: "synth", label: "Implied ALP (fixed 2025 flows)", color: "var(--alp)",
+         points: filterPts(D.synth2pp.map((d) => ({ x: d.x, y: d.alp })), xDomain[0]),
+         width: 2.2, dashed: true, opacity: 0.8 }]
+    : [];
+  const heroSeriesAll = synthOverlay.length ? heroSeries.concat(synthOverlay) : heroSeries;
   // with no line there is nothing for a month-guide tooltip to report, so the
   // guide is switched off and the dots carry their own hovers
   const heroSpine = heroSeries.length ? series(drawPts, "a") : [];
@@ -706,6 +727,15 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                with its own tick per month rather than every second one */
             options={[{ id: "3", label: "3mo" }, { id: "6", label: "6mo" },
                       { id: "12", label: "12mo" }, { id: "all", label: "All" }]} />
+          {/* The synthetic overlay is only meaningfully comparable against the
+              published ALP v L/NP series, so the control only exists there.
+              Off by default: it is a diagnostic, not a third headline. */}
+          {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && (
+            <label className="hero-synth" title="Also draw what the same polls' primary votes imply when run through one fixed preference-flow table (the 2025 election's actual flows). A diagnostic, not a correction.">
+              <input type="checkbox" checked={showSynth} onChange={(e) => setShowSynth(e.target.checked)} />
+              Compare implied 2PP
+            </label>
+          )}
         </div>
       </div>
 
@@ -721,7 +751,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         refLines={heroRefLines}
         events={heroEvents}
-        scatter={scatter} series={heroSeries} spine={heroSpine} pollFacet="twopp"
+        scatter={scatter} series={heroSeriesAll} spine={heroSpine} pollFacet="twopp"
         scatterOut={scatterOut} scatterMove={scatterMove}
         areas={heroAreas}
         fade={blend ? morph.t : 1} clipX={blend ? blend.clip : null}
@@ -751,12 +781,18 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           {heroAreas.length > 0 && (
             <span className="hl-item"><span className="hl-band"></span>95% interval</span>
           )}
+          {synthOverlay.length > 0 && (
+            <span className="hl-item"><span className="hl-dashed" style={{ borderColor: "var(--alp)" }}></span>Implied by primaries</span>
+          )}
         </div>
         <p className="hero-caption">
           {m.real
-            ? "Each dot is one published poll; the line is a smoothed average across all pollsters, "
+            ? ("Each dot is one published poll; the line is a smoothed average across all pollsters, "
               + "shaded with the interval around it. Where the two bands overlap, the lead is "
-              + "inside its own margin of error – the polls cannot separate the parties that month."
+              + "inside its own margin of error – the polls cannot separate the parties that month.")
+              + (synthOverlay.length
+                ? " The dashed line reads the same polls' primaries through the 2025 election's actual preference flows – a diagnostic, not a correction (see the method note below)."
+                : "")
             : `Each dot is one pollster’s published ${m.label} head-to-head` +
               (adjusted
                 ? ", adjusted for each house's lean on this matchup as the headline two-party is."
@@ -1041,6 +1077,27 @@ function MethodNote() {
                {" "}{D.accuracy.meanAbs} points on average – at {D.accuracy.worstCycle.year} by
                {" "}{Math.abs(D.accuracy.worstCycle.err)}, every house on the same side of it.
                Past cycles carries the full record, house by house.</p>
+          )}
+          {/* The diagnostic lives here rather than nowhere: if the site is
+              going to compute a flow-table 2PP at all, it says so with its
+              measured miss against the election attached, next to the
+              guarantee that the headline never uses it. The "on request"
+              pointer keeps the hero control (its legend and caption say the
+              rest) from needing to carry the full explanation. */}
+          {D.synthLatest && D.synth2pp && D.synth2pp.length > 1 && (
+            <p><strong>What the primaries imply.</strong> An optional dashed line on the two-party
+               chart ("Compare implied 2PP") draws what the same polls’ own primary votes add up to
+               under one fixed preference-flow table – the flows as they actually ran at the 2025
+               election (Greens 86.8%, One Nation 27.1%, all others 48.5% to Labor). Read back onto
+               the election’s own primaries that table gives {D.synth2pp[0].alp.toFixed(1)} against
+               Labor’s actual 55.2, and at One Nation’s current
+               {" "}{Math.round(D.aggPrimary[D.aggPrimary.length - 1].onp)}% primary, five points of
+               doubt about their flow rate is
+               {" "}{(D.aggPrimary[D.aggPrimary.length - 1].onp * 0.05).toFixed(1)} points of
+               two-party either way. Today the table reads {D.synthLatest.alp.toFixed(1)} against
+               the aggregate’s {D.latest.alp2pp.toFixed(1)} – a gap, not a verdict: pollsters’ own
+               allocations answer a live question a fixed table cannot, so the headline stays the
+               published aggregate.</p>
           )}
         </div>
         <div>

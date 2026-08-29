@@ -926,6 +926,10 @@ body.js #root {
    reads as a qualification rather than a warning. */
 .hero-caveat { color: var(--ink-3); }
 .hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
+/* quiet inline checkbox alongside the matchup/range switches – stripped from
+   chart copies with the rest of .hero-controls */
+.hero-synth { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 500; color: var(--ink-3); cursor: pointer; user-select: none; }
+.hero-synth input { accent-color: var(--alp); }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
 /* wraps: the interval swatch made this a four-item legend, which runs off
@@ -933,6 +937,9 @@ body.js #root {
 .hero-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .hl-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-3); font-weight: 500; white-space: nowrap; }
 .hl-line { width: 18px; height: 3px; border-radius: 2px; }
+/* dashed swatch for a computed (not measured) overlay line – the fixed-flow
+   implied-2PP diagnostic's legend entry */
+.hl-dashed { width: 18px; height: 0; border-top: 3px dashed; }
 .hl-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--ink-faint); opacity: 0.6; }
 /* party swatch as a dot, for a matchup drawn as readings with no trend line */
 .hl-swatch-dot { width: 9px; height: 9px; border-radius: 50%; opacity: 0.75; }
