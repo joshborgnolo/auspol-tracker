@@ -336,44 +336,44 @@ function buildStaticSummary() {
 
       <h2>About this tracker</h2>
       <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
-        election. The two-party and primary-vote aggregates are weighted means: recent and
-        larger-sample polls count for more, and each pollster&#8217;s figure is adjusted for its own
-        house lean against the cross-house consensus. House leans are measured separately for
-        every measure &#8211; a firm that leans one way on the classic 2PP is not assumed to lean the
-        same way on a primary share or an ALP-v-One Nation head-to-head &#8211; and a matchup too few
-        houses ask is left as a plain monthly average rather than adjusted on guesswork.
-        Pollsters that publish no 2PP contribute to the primary-vote and leadership series only.</p>
-      <p>The headline carries a 95% interval, taken as the greater of the spread among polls in
-        the window and their sampling error: currently about &#177;${L.alp2ppCi95.toFixed(1)} points,
+        election. The two-party and primary-vote aggregates are weighted means: recent and larger
+        polls count for more, and each pollster&#8217;s figure is adjusted for its own lean against
+        the consensus of all houses. The lean is measured separately for every measure &#8212; a firm
+        that leans one way on the classic two-party is not assumed to lean the same way on a primary
+        share or an ALP-v-One Nation head-to-head &#8212; and a matchup too few houses ask is left as
+        a plain monthly average rather than adjusted on guesswork. Houses that publish no two-party
+        figure feed the primary-vote and leadership series only.</p>
+      <p>The headline carries a 95% interval &#8212; the greater of the spread among polls in the
+        window and their sampling error &#8212; currently about &#177;${L.alp2ppCi95.toFixed(1)} points
         on ${L.method.nPolls} polls across ${L.method.windowDays} days (effective sample
-        ${L.alp2ppNEff} after weighting). It does not cover error common to the whole industry: an
-        aggregate cannot detect a lean its constituent polls share. Month-on-month movement smaller
-        than the interval is marked as such.</p>${acc ? `
-      <p>That last caveat is not idle: across the ${acc.cycles.length} elections from
-        ${acc.cycles[0].year} to ${acc.cycles[acc.cycles.length - 1].year},
-        the final polls have missed the two-party result by ${acc.meanAbs} points on average, and
-        at ${acc.worstCycle.year} by ${Math.abs(acc.worstCycle.err)} with every house on the same
-        side of it. Past cycles carries the full record, house by house.</p>` : ""}
+        ${L.alp2ppNEff} after weighting). It cannot cover error the whole industry shares: an
+        aggregate has no way to see a lean every poll in it carries. Movement smaller than the
+        interval is marked as such.</p>${acc ? `
+      <p>That caveat is not idle. Across the ${acc.cycles.length} elections from
+        ${acc.cycles[0].year} to ${acc.cycles[acc.cycles.length - 1].year} the final polls missed
+        the two-party result by ${acc.meanAbs} points on average &#8212; at ${acc.worstCycle.year} by
+        ${Math.abs(acc.worstCycle.err)}, every house on the same side of it.
+        Past cycles carries the full record, house by house.</p>` : ""}
 
       <h2>Reading the charts</h2>
-      <p>Each dot is one published poll; lines are monthly aggregates, shaded with the 95%
-        interval around them &#8211; where the two shaded bands meet, that month&#8217;s lead is inside
-        its own margin of error. Leadership questions are polled irregularly and framed differently
-        between pollsters, so those lines connect published readings &#8211; a &#8220;&#8211;&#8221; anywhere in the
-        tables means the pollster didn&#8217;t ask that question.</p>
+      <p>Each dot is one published poll; the lines are monthly aggregates, shaded with the 95%
+        interval around them. Where the two bands meet, that month&#8217;s lead is inside its own
+        margin of error. Leadership questions are asked irregularly and worded differently from
+        house to house, so those lines simply join published readings. A &#8220;&#8212;&#8221; in any
+        table means the pollster didn&#8217;t ask that question.</p>
       <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
         figure into a seat count assumes a uniform swing, and with One Nation near
         ${Math.round(prim.onp)}% of the primary vote the assumption fails in exactly the seats that
         would decide the election: a large minor party wins seats where its vote is concentrated and
-        none where it is not, and no national number knows the difference. Seat figures appear on
-        this page only where a pollster modelled them seat by seat and published the result, which
+        none where it is not &#8212; and no national number knows the difference. Seat figures appear
+        on this page only where a pollster modelled them seat by seat and published the result, which
         is what the MRP tag in the archive marks.</p>
 
       <h2>Sources</h2>
       <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
 
       <p class="ss-note">Unofficial aggregate of published national polling. Aggregate figures are
-        estimates, not measurements &#8211; treat decimal places gently.</p>
+        estimates, not measurements &#8212; treat decimal places gently.</p>
     </article>`;
 }
 

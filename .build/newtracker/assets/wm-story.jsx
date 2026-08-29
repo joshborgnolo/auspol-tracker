@@ -517,9 +517,9 @@ function DialStory({ originRect, onClose }) {
 
         <div className="dl-foot">
           <span className="dl-legend">
-            Bars are the primary vote and reorder as parties overtake one another. The right of
+            Bars are the primary vote, reordering as parties overtake one another. The right of
             the arc — and the line below — take the colour of Labor’s strongest challenger that
-            month; the line is Labor’s two-party preferred against them, against 50.
+            month; the line is Labor’s two-party preferred against them, measured from 50.
           </span>
           <button className="dl-replay" onClick={replay} disabled={playing}>
             {playing ? "Playing…" : "Replay"}

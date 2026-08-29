@@ -267,9 +267,9 @@ function PrimaryVotePanel({ rangeId }) {
       />
       <p className="table-hint">
         Each dot is one published poll’s first-preference figure; the lines are
-        sample-weighted, house-effect-adjusted monthly averages. Use the party
-        chips above to isolate one party’s readings – on its own, a party’s line
-        is drawn with the 95% interval around it{solo ? ", shaded here" : ""}.
+        monthly averages, weighted by sample and adjusted for each house’s lean.
+        Use the party chips above to isolate one party — on its own its line
+        draws with the 95% interval around it{solo ? ", shaded here" : ""}.
       </p>
     </section>
   );
@@ -353,10 +353,10 @@ function LeadershipSection({ rangeId }) {
         <h2 className="section-h">Leadership</h2>
       </div>
       <p className="leadership-note">
-        The Coalition line splices leaders – <strong>Ley</strong> led to February 2026, <strong>Taylor</strong> since.
-        Leadership questions run irregularly, so lines connect published readings.
-        Preferred PM is put to voters as two separate two-way contests – against the opposition
-        leader, and against Hanson head to head – so both are drawn, the head-to-head dashed.
+        The Coalition line splices leaders — <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.
+        Leadership questions are asked irregularly, so the lines simply join published readings.
+        Preferred PM is put to voters as two separate two-way contests — against the opposition
+        leader, and against Hanson head to head — so both are drawn, the head-to-head dashed.
       </p>
       {/* Both children stay mounted while a column collapses to 0fr, so the
           grid can animate rather than the panel popping out of existence.
@@ -837,11 +837,11 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         <div>
           <h3 className="card-title">Preferred prime minister</h3>
           <p className="card-sub">
-            {three ? "“Who would make the better PM?” asked as a three-way, including Hanson"
-                   : "“Who would make the better PM?” asked as a two-way – both of the contests pollsters run"}
+            {three ? "“Who would make the better PM?”, asked as a three-way including Hanson"
+                   : "“Who would make the better PM?”, asked as a two-way — both of the contests pollsters run"}
             {three
-              ? " · as published – houses leave 16–50% uncommitted, so shares aren’t directly comparable"
-              : " · as published – uncommitted runs from none, in Newspoll’s head-to-head, to half the sample, so shares aren’t directly comparable"}
+              ? " · as published — houses leave 16–50% uncommitted, so shares aren’t directly comparable"
+              : " · as published — uncommitted runs from none (Newspoll’s head-to-head) to half the sample, so shares aren’t directly comparable"}
           </p>
         </div>
         <div className="card-head-tools">
@@ -1065,8 +1065,8 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
           <h3 className="card-title">{metric === "net" ? "Leader net approval" : "Leader net favourability"}</h3>
           <p className="card-sub">
             {metric === "net"
-              ? "Approve minus disapprove – a verdict on the job they are doing · Newspoll, YouGov, Resolve, Essential and others"
-              : "Positive minus negative – a verdict on them as a person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"}
+              ? "Approve minus disapprove — a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential and others"
+              : "Positive minus negative — the person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"}
           </p>
         </div>
         <div className="card-head-tools">
@@ -1204,7 +1204,7 @@ function DirectionPanel({ rangeId }) {
             <p className="card-sub">{question}</p>
           </div>
         </div>
-        <p className="pd-absent">No national direction series yet – none of the tracked pollsters currently
+        <p className="pd-absent">No national direction series yet — none of the tracked pollsters currently
            publish a right-direction / wrong-track question. It will appear here when one does.</p>
       </section>
     );
@@ -1303,9 +1303,9 @@ function DirectionPanel({ rangeId }) {
         fmt={dirFmt}
       />
       <p className="table-hint">
-        Each dot is one published reading; the lines are house-effect-adjusted
-        monthly averages, shaded with their 95% intervals. Only {asked ? D.directionHouses.length : 0} houses ask
-        this question, so some months rest on a single poll – the dots show which,
+        Each dot is one published reading; the lines are monthly averages
+        adjusted for house effects, shaded with their 95% intervals. Only {asked ? D.directionHouses.length : 0} houses ask
+        this question, so some months rest on a single poll — the dots show which,
         and the shading shows what that costs in confidence.
       </p>
     </section>
@@ -1329,10 +1329,10 @@ function UndecidedLine({ v, chg, basis }) {
             questions, and it decides how the shares above should be read */}
         <span className="pd-und-note">
           {basis === "tpp"
-            ? "won’t pick a side – inside the two-party pair above, which is why it sums to under 100"
+            ? "won’t pick a side — counted inside the two-party pair above, which is why it sums to under 100"
             : basis === "soft"
-              ? `named a party, but not firm – the other side of this wave’s ${100 - v}% committed`
-              : "can’t say – excluded from the shares above"}
+              ? `named a party, but not firmly — the flip side of this wave’s ${100 - v}% committed`
+              : "can’t say — excluded from the shares above"}
         </span>
       </div>
     </div>
@@ -1419,12 +1419,12 @@ function UndecidedPanel({ rangeId }) {
         fmt={(v) => v.toFixed(1)}
       />
       <p className="table-hint">
-        Each dot is one published reading; the lines are their monthly averages.
-        The two are never averaged together: one counts people who can’t name a
-        party, the other people who won’t pick a side once preferences are
-        applied, and only the first is excluded from the shares elsewhere on
-        this page. A rising line means those figures are being read off a
-        smaller pool of decided voters – not that support moved.
+        Each dot is one published reading; the lines are monthly averages.
+        The two are never averaged together — one counts people who can’t name
+        a party, the other people who won’t pick a side once preferences are
+        applied. Only the first is left out of the shares elsewhere on this
+        page, so a rising line means the share is being read off a smaller
+        pool of decided voters, not that support has moved.
       </p>
     </section>
   );
@@ -1678,7 +1678,7 @@ function SeatProjection({ seats }) {
           <span className="seat-majlab">{majority} for majority</span>
           {!reach.length && (
             <span className="seat-hung">
-              no party reaches it – {best.name} tops out {majority - best.hi} short
+              no party reaches it — {best.name} tops out {majority - best.hi} short
             </span>
           )}
         </div>
@@ -1705,7 +1705,7 @@ function SeatProjection({ seats }) {
       <div className="seatbar-note">
         <span className="seat-majlab">{majority} for majority</span>
         {lead.est < majority && (
-          <span className="seat-hung">no party at a majority – {lead.name} short by {majority - lead.est}</span>
+          <span className="seat-hung">no party at a majority — {lead.name} short by {majority - lead.est}</span>
         )}
       </div>
       <div className="seat-rows">
@@ -1736,7 +1736,7 @@ function SeatProjection({ seats }) {
 // Resolve's good/poor performance rating (good − poor).
 function FavMark({ metric }) {
   if (metric !== "fav") return null;
-  return <span className="fav-mark" title="Net favourability / likeability (positive minus negative) – a different question from approval, not directly comparable">fav</span>;
+  return <span className="fav-mark" title="Net favourability / likeability (positive minus negative) — a different question from approval, not directly comparable">fav</span>;
 }
 
 // block heading for a poll's leader ratings. A poll can mix metrics per leader
@@ -1836,7 +1836,7 @@ function ApprBlock({ appr, chg }) {
             )}
             {alt && (
               <div className="pd-appr-alt"
-                   title="This pollster asked both questions of this leader in the same wave – favourability (positive minus negative) is not directly comparable with approval">
+                   title="This pollster asked both questions of this leader in the same wave — favourability (positive minus negative) is not directly comparable with approval">
                 <span className="pd-appr-alt-k">
                   also {alt.metric === "fav" ? "favourability" : "approval"}
                 </span>
@@ -2504,8 +2504,8 @@ function NextPollsPanel() {
 
       <p className="np-foot">
         Each date is the house’s median interval between its last eight releases, nudged onto
-        the weekday it keeps. What the interval is measured BETWEEN depends on what the house
-        has recorded. Where its recent releases carry publication dates in an unbroken run, it
+        the weekday it keeps. What an interval is measured between depends on what the house
+        has on record. Where its recent releases carry publication dates in an unbroken run, it
         is the gaps between those — which is the thing being forecast, and much the steadier
         measure: Newspoll’s last eight fieldwork gaps run from 18 days to 31, while it has
         published exactly three weeks apart six times in eight, all the wobble being in when
@@ -2616,7 +2616,7 @@ function PollsterTable() {
         <table className="poll-table archive">
           <caption className="sr-only">
             Latest poll from each active pollster, {(FACETS.find((f) => f.id === facet) || {}).label}
-            {" "}columns – {rows.length} pollsters
+            {" "}columns — {rows.length} pollsters
           </caption>
           <thead>
             <tr>
@@ -2632,7 +2632,7 @@ function PollsterTable() {
 
               {facet === "twopp" && (<>
                 <th scope="col" className="ta-l apub-col hide-md"
-                    title="What the pollster published – a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
+                    title="What the pollster published — a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
                 <SortTh label="Lead · ALP v L/NP" short="Lead" sortKey="alp" sort={sort} onSort={onSort} />
               </>)}
               {facet === "primary" && (<>
@@ -2681,7 +2681,7 @@ function PollsterTable() {
                       <span className={"released-pill" + (r.publishedLabel ? "" : " est")}
                             title={r.publishedLabel
                               ? undefined
-                              : "Publication date not recorded for this poll – showing the last day of fieldwork"}>
+                              : "Publication date not recorded for this poll — showing the last day of fieldwork"}>
                         {r.publishedLabel || r.releasedLabel}
                       </span>
                     </td>
@@ -2724,10 +2724,10 @@ function PollsterTable() {
       </div>
       <p className="table-hint">
         Tap any poll to see its full breakdown · click a column heading to sort · “—” means the pollster didn’t ask that question.
-        {" "}<strong>Published</strong> is the date the poll was released, taken from the source each row links
-        to – not the last day of its fieldwork, which is the next column. A dashed date is a fallback: that
-        poll’s publication date isn’t recorded, so the column shows its fieldwork end instead.
-        {" "}Each house’s systematic lean (its house effect) now sits beside poll lean in the All polls archive.
+        {" "}<strong>Published</strong> is the day the poll was released, taken from the source each row links
+        to — not the last day of fieldwork, which is the next column. A dashed date is a fallback: publication
+        day isn’t recorded for that poll, so the column shows its fieldwork end instead.
+        {" "}Each house’s systematic lean — its house effect — sits beside poll lean in the All polls archive.
       </p>
     </section>
   );
