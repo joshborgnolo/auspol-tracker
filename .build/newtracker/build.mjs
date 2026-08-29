@@ -343,20 +343,20 @@ function buildStaticSummary() {
       <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
         election. The two-party and primary-vote aggregates are weighted means: recent and larger
         polls count for more, and each pollster&#8217;s figure is adjusted for its own lean against
-        the consensus of all houses. The lean is measured separately for every measure &#8212; a firm
+        the consensus of all houses. The lean is measured separately for every measure &#8211; a firm
         that leans one way on the classic two-party is not assumed to lean the same way on a primary
-        share or an ALP-v-One Nation head-to-head &#8212; and a matchup too few houses ask is left as
+        share or an ALP-v-One Nation head-to-head &#8211; and a matchup too few houses ask is left as
         a plain monthly average rather than adjusted on guesswork. Houses that publish no two-party
         figure feed the primary-vote and leadership series only.</p>
-      <p>The headline carries a 95% interval &#8212; the greater of the spread among polls in the
-        window and their sampling error &#8212; currently about &#177;${L.alp2ppCi95.toFixed(1)} points
+      <p>The headline carries a 95% interval &#8211; the greater of the spread among polls in the
+        window and their sampling error &#8211; currently about &#177;${L.alp2ppCi95.toFixed(1)} points
         on ${L.method.nPolls} polls across ${L.method.windowDays} days (effective sample
         ${L.alp2ppNEff} after weighting). It cannot cover error the whole industry shares: an
         aggregate has no way to see a lean every poll in it carries. Movement smaller than the
         interval is marked as such.</p>${acc ? `
       <p>That caveat is not idle. Across the ${acc.cycles.length} elections from
         ${acc.cycles[0].year} to ${acc.cycles[acc.cycles.length - 1].year} the final polls missed
-        the two-party result by ${acc.meanAbs} points on average &#8212; at ${acc.worstCycle.year} by
+        the two-party result by ${acc.meanAbs} points on average &#8211; at ${acc.worstCycle.year} by
         ${Math.abs(acc.worstCycle.err)}, every house on the same side of it.
         Past cycles carries the full record, house by house.</p>` : ""}
 
@@ -370,7 +370,7 @@ function buildStaticSummary() {
         figure into a seat count assumes a uniform swing, and with One Nation near
         ${Math.round(prim.onp)}% of the primary vote the assumption fails in exactly the seats that
         would decide the election: a large minor party wins seats where its vote is concentrated and
-        none where it is not &#8212; and no national number knows the difference. Seat figures appear
+        none where it is not &#8211; and no national number knows the difference. Seat figures appear
         on this page only where a pollster modelled them seat by seat and published the result, which
         is what the MRP tag in the archive marks.</p>
 
@@ -378,7 +378,7 @@ function buildStaticSummary() {
       <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
 
       <p class="ss-note">Unofficial aggregate of published national polling. Aggregate figures are
-        estimates, not measurements &#8212; treat decimal places gently.</p>
+        estimates, not measurements &#8211; treat decimal places gently.</p>
     </article>`;
 }
 
@@ -496,7 +496,7 @@ const shareLine = (p) => {
 const items = feedPolls.map((p) => {
   const year = p.date.slice(0, 4);
   const tpp = p.tpp_alp != null ? `ALP ${p.tpp_alp} – L/NP ${p.tpp_lnp}` : null;
-  const title = `${p.pollster}, ${fieldLabel(p)} ${year}` + (tpp ? ` — 2PP ${tpp}` : ` — ${shareLine(p)}`);
+  const title = `${p.pollster}, ${fieldLabel(p)} ${year}` + (tpp ? ` – 2PP ${tpp}` : ` – ${shareLine(p)}`);
   const desc = [
     `Primary vote: ${shareLine(p)}.`,
     tpp ? `Two-party preferred: ${tpp}.` : "No two-party figure published.",

@@ -215,7 +215,7 @@
   c.setLineDash([]); c.globalAlpha = 1;
   // "tie", not "majority" – 50% 2PP is a tied national vote, not a
   // majority of seats, and the page label says the same thing
-  caps("50% — TIE", PAD, sy(50) + 21, 12, 1.3, T.ink3, 700);
+  caps("50% – TIE", PAD, sy(50) + 21, 12, 1.3, T.ink3, 700);
 
   [[lPts, T.lnp], [aPts, T.alp]].forEach(([pts, col]) => {
     c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); curve(pts);

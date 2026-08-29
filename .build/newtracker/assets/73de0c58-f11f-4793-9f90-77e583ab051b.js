@@ -756,11 +756,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           {m.real
             ? "Each dot is one published poll; the line is a smoothed average across all pollsters, "
               + "shaded with the interval around it. Where the two bands overlap, the lead is "
-              + "inside its own margin of error — the polls cannot separate the parties that month."
+              + "inside its own margin of error – the polls cannot separate the parties that month."
             : `Each dot is one pollster’s published ${m.label} head-to-head` +
               (adjusted
                 ? ", adjusted for each house's lean on this matchup as the headline two-party is."
-                : ", averaged monthly — too few houses ask it to weight or correct.") +
+                : ", averaged monthly – too few houses ask it to weight or correct.") +
               (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : "")}
         </p>
       </div>
@@ -917,7 +917,7 @@ function ReportError() {
       setError(detail || `The form service returned an error (${res.status}). Please try again shortly.`);
       setStatus("error");
     } catch (_) {
-      setError("Could not reach the form service — check your connection and try again.");
+      setError("Could not reach the form service – check your connection and try again.");
       setStatus("error");
     }
   };
@@ -926,7 +926,7 @@ function ReportError() {
     return (
       <div className="fb">
         <p className="fb-thanks">
-          <strong>Thank you — that’s arrived.</strong> Reports are checked against the
+          <strong>Thank you – that’s arrived.</strong> Reports are checked against the
           pollster’s own release before a figure moves, so a correction lands at the next
           build rather than straight away.{" "}
           <button type="button" className="fb-link" onClick={() => setStatus("idle")}>
@@ -940,8 +940,8 @@ function ReportError() {
   return (
     <div className="fb">
       <p className="fb-lede">
-        Every figure here is transcribed from a pollster’s published release — sometimes via
-        Wikipedia, PollBludger or another secondary source — and some of them may be wrong. Spotted
+        Every figure here is transcribed from a pollster’s published release – sometimes via
+        Wikipedia, PollBludger or another secondary source – and some of them may be wrong. Spotted
         an error, a missing poll, or anything else worth saying? Please{" "}
         {/* A toggle both ways: the thing that opened the form is the only
             thing in the sentence that looks like a control, so it is where a
@@ -968,16 +968,16 @@ function ReportError() {
 
           <div className="fb-row">
             <label className="fb-label" htmlFor={uid + "-msg"}>
-              Details <span>— the pollster and field dates help most</span>
+              Details <span>– the pollster and field dates help most</span>
             </label>
             <textarea id={uid + "-msg"} name="message" required ref={boxRef} rows={1}
               value={msg} onChange={(e) => setMsg(e.target.value)}
-              placeholder="e.g. Resolve, fielded 12–15 Aug — Labor’s primary is 27.9 here, the release says 28.9" />
+              placeholder="e.g. Resolve, fielded 12–15 Aug – Labor’s primary is 27.9 here, the release says 28.9" />
           </div>
 
           <div className="fb-row">
             <label className="fb-label" htmlFor={uid + "-email"}>
-              Email <span>— optional, only used to reply to you</span>
+              Email <span>– optional, only used to reply to you</span>
             </label>
             <input id={uid + "-email"} name="email" type="email" autoComplete="email"
               placeholder="you@example.com" />
@@ -1018,13 +1018,13 @@ function MethodNote() {
              election. The two-party and primary-vote aggregates are weighted means: recent and
              larger polls count for more, and each pollster’s figure is adjusted for its own
              lean against the consensus of all houses. The lean is measured separately for
-             every measure — a firm that leans one way on the classic two-party is not assumed
-             to lean the same way on a primary share or an ALP-v-One Nation head-to-head — and
+             every measure – a firm that leans one way on the classic two-party is not assumed
+             to lean the same way on a primary share or an ALP-v-One Nation head-to-head – and
              a matchup too few houses ask is left as a plain monthly average rather than adjusted
              on guesswork. Houses that publish no two-party figure feed the primary-vote and
              leadership series only.</p>
-          <p>The headline carries a 95% interval — the greater of the spread among polls in
-             the window and their sampling error — currently about
+          <p>The headline carries a 95% interval – the greater of the spread among polls in
+             the window and their sampling error – currently about
              {" "}±{(D.latest.alp2ppCi95 ?? 0).toFixed(1)} points on {D.latest.method.nPolls} polls
              across {D.latest.method.windowDays} days (effective sample {D.latest.alp2ppNEff} after
              weighting). It cannot cover error the whole industry shares: an aggregate has no way
@@ -1038,7 +1038,7 @@ function MethodNote() {
             <p>That caveat is not idle. Across the {D.accuracy.cycles.length} elections from
                {" "}{D.accuracy.cycles[0].year} to {D.accuracy.cycles[D.accuracy.cycles.length - 1].year}{" "}
                the final polls missed the two-party result by
-               {" "}{D.accuracy.meanAbs} points on average — at {D.accuracy.worstCycle.year} by
+               {" "}{D.accuracy.meanAbs} points on average – at {D.accuracy.worstCycle.year} by
                {" "}{Math.abs(D.accuracy.worstCycle.err)}, every house on the same side of it.
                Past cycles carries the full record, house by house.</p>
           )}
@@ -1056,7 +1056,7 @@ function MethodNote() {
              figure into a seat count assumes a uniform swing, and with One Nation near
              {" "}{Math.round(D.aggPrimary[D.aggPrimary.length - 1].onp)}% of the primary vote the
              assumption fails in exactly the seats that would decide the election: a large minor
-             party wins seats where its vote is concentrated and none where it is not — and no
+             party wins seats where its vote is concentrated and none where it is not – and no
              national number knows the difference. Seat figures appear on this page only where a
              pollster modelled them seat by seat and published the result, which is what the MRP
              tag in the archive marks.</p>
@@ -1069,7 +1069,7 @@ function MethodNote() {
       <ReportError />
       <div className="disclaimer">
         Unofficial aggregate of published national polling. Aggregate figures are estimates, not
-        measurements — treat decimal places gently.
+        measurements – treat decimal places gently.
       </div>
     </footer>
   );

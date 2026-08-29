@@ -268,7 +268,7 @@ function PrimaryVotePanel({ rangeId }) {
       <p className="table-hint">
         Each dot is one published poll’s first-preference figure; the lines are
         monthly averages, weighted by sample and adjusted for each house’s lean.
-        Use the party chips above to isolate one party — on its own its line
+        Use the party chips above to isolate one party – on its own its line
         draws with the 95% interval around it{solo ? ", shaded here" : ""}.
       </p>
     </section>
@@ -353,10 +353,10 @@ function LeadershipSection({ rangeId }) {
         <h2 className="section-h">Leadership</h2>
       </div>
       <p className="leadership-note">
-        The Coalition line splices leaders — <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.
+        The Coalition line splices leaders – <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.
         Leadership questions are asked irregularly, so the lines simply join published readings.
-        Preferred PM is put to voters as two separate two-way contests — against the opposition
-        leader, and against Hanson head to head — so both are drawn, the head-to-head dashed.
+        Preferred PM is put to voters as two separate two-way contests – against the opposition
+        leader, and against Hanson head to head – so both are drawn, the head-to-head dashed.
       </p>
       {/* Both children stay mounted while a column collapses to 0fr, so the
           grid can animate rather than the panel popping out of existence.
@@ -838,10 +838,10 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           <h3 className="card-title">Preferred prime minister</h3>
           <p className="card-sub">
             {three ? "“Who would make the better PM?”, asked as a three-way including Hanson"
-                   : "“Who would make the better PM?”, asked head to head — in both of the contests pollsters run"}
+                   : "“Who would make the better PM?”, asked head to head – in both of the contests pollsters run"}
             {three
-              ? " · As published: houses leave 16–50% uncommitted, so levels aren’t comparable across houses — the gaps and the trend are"
-              : " · As published: uncommitted runs from none (Newspoll) to half the sample, so levels aren’t comparable across houses — the tinted gaps are"}
+              ? " · As published: houses leave 16–50% uncommitted, so levels aren’t comparable across houses – the gaps and the trend are"
+              : " · As published: uncommitted runs from none (Newspoll) to half the sample, so levels aren’t comparable across houses – the tinted gaps are"}
           </p>
         </div>
         <div className="card-head-tools">
@@ -1065,8 +1065,8 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
           <h3 className="card-title">{metric === "net" ? "Leader net approval" : "Leader net favourability"}</h3>
           <p className="card-sub">
             {metric === "net"
-              ? "Approve minus disapprove — a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential and others"
-              : "Positive minus negative — the person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"}
+              ? "Approve minus disapprove – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential and others"
+              : "Positive minus negative – the person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"}
           </p>
         </div>
         <div className="card-head-tools">
@@ -1204,7 +1204,7 @@ function DirectionPanel({ rangeId }) {
             <p className="card-sub">{question}</p>
           </div>
         </div>
-        <p className="pd-absent">No national direction series yet — none of the tracked pollsters currently
+        <p className="pd-absent">No national direction series yet – none of the tracked pollsters currently
            publish a right-direction / wrong-track question. It will appear here when one does.</p>
       </section>
     );
@@ -1305,7 +1305,7 @@ function DirectionPanel({ rangeId }) {
       <p className="table-hint">
         Each dot is one published reading; the lines are monthly averages
         adjusted for house effects, shaded with their 95% intervals. Only {asked ? D.directionHouses.length : 0} houses ask
-        this question, so some months rest on a single poll — the dots show which,
+        this question, so some months rest on a single poll – the dots show which,
         and the shading shows what that costs in confidence.
       </p>
     </section>
@@ -1329,10 +1329,10 @@ function UndecidedLine({ v, chg, basis }) {
             questions, and it decides how the shares above should be read */}
         <span className="pd-und-note">
           {basis === "tpp"
-            ? "won’t pick a side — counted inside the two-party pair above, which is why it sums to under 100"
+            ? "won’t pick a side – counted inside the two-party pair above, which is why it sums to under 100"
             : basis === "soft"
-              ? `named a party, but not firmly — the flip side of this wave’s ${100 - v}% committed`
-              : "can’t say — excluded from the shares above"}
+              ? `named a party, but not firmly – the flip side of this wave’s ${100 - v}% committed`
+              : "can’t say – excluded from the shares above"}
         </span>
       </div>
     </div>
@@ -1420,7 +1420,7 @@ function UndecidedPanel({ rangeId }) {
       />
       <p className="table-hint">
         Each dot is one published reading; the lines are monthly averages.
-        The two are never averaged together — one counts people who can’t name
+        The two are never averaged together – one counts people who can’t name
         a party, the other people who won’t pick a side once preferences are
         applied. Only the first is left out of the shares elsewhere on this
         page, so a rising line means the share is being read off a smaller
@@ -1678,7 +1678,7 @@ function SeatProjection({ seats }) {
           <span className="seat-majlab">{majority} for majority</span>
           {!reach.length && (
             <span className="seat-hung">
-              no party reaches it — {best.name} tops out {majority - best.hi} short
+              no party reaches it – {best.name} tops out {majority - best.hi} short
             </span>
           )}
         </div>
@@ -1705,7 +1705,7 @@ function SeatProjection({ seats }) {
       <div className="seatbar-note">
         <span className="seat-majlab">{majority} for majority</span>
         {lead.est < majority && (
-          <span className="seat-hung">no party at a majority — {lead.name} short by {majority - lead.est}</span>
+          <span className="seat-hung">no party at a majority – {lead.name} short by {majority - lead.est}</span>
         )}
       </div>
       <div className="seat-rows">
@@ -1736,7 +1736,7 @@ function SeatProjection({ seats }) {
 // Resolve's good/poor performance rating (good − poor).
 function FavMark({ metric }) {
   if (metric !== "fav") return null;
-  return <span className="fav-mark" title="Net favourability / likeability (positive minus negative) — a different question from approval, not directly comparable">fav</span>;
+  return <span className="fav-mark" title="Net favourability / likeability (positive minus negative) – a different question from approval, not directly comparable">fav</span>;
 }
 
 // block heading for a poll's leader ratings. A poll can mix metrics per leader
@@ -1836,7 +1836,7 @@ function ApprBlock({ appr, chg }) {
             )}
             {alt && (
               <div className="pd-appr-alt"
-                   title="This pollster asked both questions of this leader in the same wave — favourability (positive minus negative) is not directly comparable with approval">
+                   title="This pollster asked both questions of this leader in the same wave – favourability (positive minus negative) is not directly comparable with approval">
                 <span className="pd-appr-alt-k">
                   also {alt.metric === "fav" ? "favourability" : "approval"}
                 </span>
@@ -2506,18 +2506,18 @@ function NextPollsPanel() {
         Each date is the house’s median interval between its last eight releases, nudged onto
         the weekday it keeps. What an interval is measured between depends on what the house
         has on record. Where its recent releases carry publication dates in an unbroken run, it
-        is the gaps between those — which is the thing being forecast, and much the steadier
+        is the gaps between those – which is the thing being forecast, and much the steadier
         measure: Newspoll’s last eight fieldwork gaps run from 18 days to 31, while it has
         published exactly three weeks apart six times in eight, all the wobble being in when
         its fieldwork happened to close.
         {byPub.length > 0 && ` ${listOf(byPub)} ${byPub.length > 1 ? "are" : "is"} projected that way.`}
-        {byField.length > 0 && ` ${listOf(byField)}, which ${byField.length > 1 ? "have" : "has"} too few recorded publication dates to measure one, ${byField.length > 1 ? "fall" : "falls"} back to the gaps between fieldwork ends plus a publication lag — measured from the dates recorded against each poll, or read from a release URL that carries one, and otherwise a day, which is the field’s.`}
+        {byField.length > 0 && ` ${listOf(byField)}, which ${byField.length > 1 ? "have" : "has"} too few recorded publication dates to measure one, ${byField.length > 1 ? "fall" : "falls"} back to the gaps between fieldwork ends plus a publication lag – measured from the dates recorded against each poll, or read from a release URL that carries one, and otherwise a day, which is the field’s.`}
         {" "}The ± is half
         the range of those intervals with the longest and shortest set aside, widening for waves
-        further out — in whole weeks for a house pinned to a weekday, since that is the only step
+        further out – in whole weeks for a house pinned to a weekday, since that is the only step
         its date can take, and dropped where the interval never reaches the day either side.
         {" "}Where a house
-        has been timed often enough the hour it files is shown too — the span its releases have
+        has been timed often enough the hour it files is shown too – the span its releases have
         covered where that is tight, and otherwise the hour it usually keeps, so one late morning
         doesn’t speak for a house that is normally punctual. Every hour here is the publisher’s
         own clock and is labelled with it, AEDT through the summer and AEST the rest of the year,
@@ -2525,7 +2525,7 @@ function NextPollsPanel() {
         hour are read off recent releases rather than the whole record, because a schedule is a
         current fact about a house and its first year is often a different house. A house whose
         interval is too variable to name a day gets the window its own record supports instead
-        of being left out — DemosAU polls about monthly, but anywhere in a five-week span.
+        of being left out – DemosAU polls about monthly, but anywhere in a five-week span.
         {stated.length > 0 && ` ${stated.join(" and ")} ${stated.length > 1 ? "run" : "runs"} on a schedule stated by hand rather than measured, because the recorded releases don’t measure the one the house plainly keeps.`}
         {" "}A projection is a moment, not a guess: once the hour passes without that release, the
         date stays exactly where it is and says so, rather than rolling forward onto a date nobody
@@ -2616,7 +2616,7 @@ function PollsterTable() {
         <table className="poll-table archive">
           <caption className="sr-only">
             Latest poll from each active pollster, {(FACETS.find((f) => f.id === facet) || {}).label}
-            {" "}columns — {rows.length} pollsters
+            {" "}columns – {rows.length} pollsters
           </caption>
           <thead>
             <tr>
@@ -2632,7 +2632,7 @@ function PollsterTable() {
 
               {facet === "twopp" && (<>
                 <th scope="col" className="ta-l apub-col hide-md"
-                    title="What the pollster published — a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
+                    title="What the pollster published – a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
                 <SortTh label="Lead · ALP v L/NP" short="Lead" sortKey="alp" sort={sort} onSort={onSort} />
               </>)}
               {facet === "primary" && (<>
@@ -2681,7 +2681,7 @@ function PollsterTable() {
                       <span className={"released-pill" + (r.publishedLabel ? "" : " est")}
                             title={r.publishedLabel
                               ? undefined
-                              : "Publication date not recorded for this poll — showing the last day of fieldwork"}>
+                              : "Publication date not recorded for this poll – showing the last day of fieldwork"}>
                         {r.publishedLabel || r.releasedLabel}
                       </span>
                     </td>
@@ -2725,9 +2725,9 @@ function PollsterTable() {
       <p className="table-hint">
         Tap any poll to see its full breakdown · Click a column heading to sort · “—” Means the pollster didn’t ask that question.
         {" "}<strong>Published</strong> is the day the poll was released, taken from the source each row links
-        to — not the last day of fieldwork, which is the next column. A dashed date is a fallback: publication
+        to – not the last day of fieldwork, which is the next column. A dashed date is a fallback: publication
         day isn’t recorded for that poll, so the column shows its fieldwork end instead.
-        {" "}Each house’s systematic lean — its house effect — sits beside poll lean in the All polls archive.
+        {" "}Each house’s systematic lean – its house effect – sits beside poll lean in the All polls archive.
       </p>
     </section>
   );

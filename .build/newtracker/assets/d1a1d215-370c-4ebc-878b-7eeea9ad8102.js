@@ -41,7 +41,7 @@ function TabScore({ onGoHero, matchup }) {
   const M = MM[id], v = window.AP.tppLatest(id);
   return (
     <button className="tab-score" onClick={onGoHero}
-            title={"Latest " + M.label + " two-party preferred — go to Snapshot"}>
+            title={"Latest " + M.label + " two-party preferred – go to Snapshot"}>
       <span className="ts-eyebrow">2PP</span>
       <span className="ts-party">
         <span className="ts-abbr">{M.a.abbr}</span>
@@ -153,7 +153,7 @@ const CYC_METRICS = [
     step: 5, refAbs: null },
   { key: "tpp", title: "Government two-party preferred", sub: "Governing party 2PP",
     unit: "%", fmt: (v) => v.toFixed(1),
-    step: 5, refAbs: 50, refAbsLabel: "50 — tie" },
+    step: 5, refAbs: 50, refAbsLabel: "50 – tie" },
 ];
 
 // domain over ALL cycles (not just visible ones) so toggling a cycle off
@@ -729,7 +729,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
           {hanCtl && (
             <label className={"cyc-han" + (showHan ? " on" : "")}
                    title={"Pauline Hanson, on the same approve-minus-disapprove basis. " +
-                          "Rated in the current term only, from " + hanFrom + " — no past cycle asked about her, " +
+                          "Rated in the current term only, from " + hanFrom + " – no past cycle asked about her, " +
                           "and favourability ratings are left out, so the line is short."}>
               <input type="checkbox" checked={!!showHan}
                      onChange={(e) => setHan(e.target.checked)} />
@@ -1058,7 +1058,7 @@ function AccuracyPanel() {
             </div>
             <div className="acc-note">
               {c.n} house{c.n === 1 ? "" : "s"}
-              {c.sameSide && <span className="acc-flag" title="Every house missed the same way — the signature of an industry-wide problem rather than one firm's noise">All one way</span>}
+              {c.sameSide && <span className="acc-flag" title="Every house missed the same way – the signature of an industry-wide problem rather than one firm's noise">All one way</span>}
             </div>
           </div>
         ))}
@@ -1066,12 +1066,12 @@ function AccuracyPanel() {
 
       <p className="table-hint">
         Big dots are the average of that election’s final polls; small dots are the individual
-        houses — {CANT_HOVER ? "tap" : "hover"} one for its figure. Exit polls are excluded, and a
+        houses – {CANT_HOVER ? "tap" : "hover"} one for its figure. Exit polls are excluded, and a
         house that publishes an undecided-inclusive pair is normalised first, so its arithmetic
         isn’t scored as a miss.
         {bothWays && (
           <> The two elections where every house missed the same way, {oneSided.map((c) => c.year).join(" and ")},
-          {" "}missed in <strong>opposite directions</strong> — so this is not a standing lean that
+          {" "}missed in <strong>opposite directions</strong> – so this is not a standing lean that
           today’s figures could be corrected for. It is the size of the error, not its direction,
           that carries.</>
         )}
@@ -1176,7 +1176,7 @@ function PastCyclesView() {
         <p className="view-lede">
           Every federal term since 2010, lined up on its election day so each government’s
           run can be read off the same clock. Past terms sit behind in their party’s
-          colour — red for Labor, blue for the Coalition — with the year marked at the
+          colour – red for Labor, blue for the Coalition – with the year marked at the
           end of each line.{" "}
           {CANT_HOVER
             ? "Tap a cycle below to hide or restore its line, and leave just one visible to see more details."
@@ -1189,7 +1189,7 @@ function PastCyclesView() {
             <span className="cyc-export-label">Download</span>
             <button className="ap-export" onClick={exportSource}
               title={hidden.size
-                ? "The individual polls the monthly averages are built from — hidden terms left out, to match the board"
+                ? "The individual polls the monthly averages are built from – hidden terms left out, to match the board"
                 : "The individual polls the monthly averages are built from"}>
               <DownloadIcon />Source polls
             </button>
@@ -1224,7 +1224,7 @@ function PastCyclesView() {
         )}
         {mode === "chg"
           ? "Lines show movement relative to each party’s own election result."
-          : "Approval lines splice the sitting prime minister — and opposition leader — where a term changed leaders mid-stream."}
+          : "Approval lines splice the sitting prime minister – and opposition leader – where a term changed leaders mid-stream."}
       </p>
     </div>
   );
@@ -1286,7 +1286,7 @@ function ArchApprCell({ s, net, metric }) {
 function ArchPublished({ p }) {
   const { tppContests, tppFlag } = window;
   const c0 = tppContests(p)[0];
-  if (!c0) return <span className="dash" title="No two-party or head-to-head figure published — primaries only">—</span>;
+  if (!c0) return <span className="dash" title="No two-party or head-to-head figure published – primaries only">—</span>;
   const flag = tppFlag(p);
   return (
     <div className="apub" aria-label={c0.segs.map((s) => `${s.label} ${s.value}`).join(", ")}>
@@ -1392,7 +1392,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
         <span className="pd-meta-i"><span className="pd-meta-k">Published</span>{" "}
           {pubStamp(p.published, { year: true })
             || <span className="pd-est"
-                     title="Publication date not recorded for this poll — showing the last day of fieldwork">
+                     title="Publication date not recorded for this poll – showing the last day of fieldwork">
                  {p.fullDate}
                </span>}
         </span>
@@ -1491,15 +1491,15 @@ function ArchPollDetail({ p, onBack, backLabel }) {
 // data-content tags – shown on each archive row and used as filters, so you can
 // see (and select for) what a poll actually measures without expanding it.
 const POLL_TAGS = [
-  { id: "2pp",   label: "2PP",   title: "Two-party preferred — one matchup (ALP v L/NP)" },
-  { id: "2x2pp", label: "2×2PP", title: "Two 2PP matchups — e.g. ALP v L/NP and ALP v ON" },
-  { id: "3x2pp", label: "3×2PP", title: "Three 2PP matchups — ALP v L/NP, ALP v ON and L/NP v ON" },
-  { id: "3pp",   label: "3PP",   title: "Three-way party-preferred — ALP / L/NP / ON in one distribution" },
+  { id: "2pp",   label: "2PP",   title: "Two-party preferred – one matchup (ALP v L/NP)" },
+  { id: "2x2pp", label: "2×2PP", title: "Two 2PP matchups – e.g. ALP v L/NP and ALP v ON" },
+  { id: "3x2pp", label: "3×2PP", title: "Three 2PP matchups – ALP v L/NP, ALP v ON and L/NP v ON" },
+  { id: "3pp",   label: "3PP",   title: "Three-way party-preferred – ALP / L/NP / ON in one distribution" },
   { id: "ppm",   label: "PPM",   title: "Preferred prime minister" },
   { id: "aprv",  label: "Aprv",  title: "Leader approval (approve − disapprove)" },
   { id: "fav",   label: "Fav",   title: "Leader favourability (positive − negative)" },
-  { id: "seats", label: "Seats", title: "Modelled seat projection with range — MRP polls only" },
-  { id: "dir",   label: "Dir",   title: "National direction — right direction / wrong track" },
+  { id: "seats", label: "Seats", title: "Modelled seat projection with range – MRP polls only" },
+  { id: "dir",   label: "Dir",   title: "National direction – right direction / wrong track" },
 ];
 const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map((t) => [t.id, t]));
 function pollTagIds(p) {
@@ -1669,7 +1669,7 @@ function VariancePanel({ facet, rangeId }) {
           <h3 className="ap-var-title">Poll disagreement</h3>
           <p className="card-sub">
             How far apart the polls sit, against the spread sampling error alone would produce.
-            The shading is that chance floor — a line inside it means the houses are running tighter
+            The shading is that chance floor – a line inside it means the houses are running tighter
             than random sampling permits. Measured across all {D.individualPolls.length} polls; the filters
             above don’t narrow it.
           </p>
@@ -1681,7 +1681,7 @@ function VariancePanel({ facet, rangeId }) {
               <button key={m.id} type="button"
                       className={"legend-chip" + (hidden[m.id] ? " off" : "")}
                       aria-pressed={!hidden[m.id]}
-                      title={m.label + " — " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label.replace(/^./, (ch) => ch.toUpperCase())}
+                      title={m.label + " – " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label.replace(/^./, (ch) => ch.toUpperCase())}
                       onClick={() => setHidden((h) => ({ ...h, [m.id]: !h[m.id] }))}>
                 <span className="legend-swatch" style={{ background: m.color }}></span>
                 <span className="legend-name">{m.label}</span>
@@ -1726,7 +1726,7 @@ function VariancePanel({ facet, rangeId }) {
 
       <p className="table-hint ap-var-note">
         Spread is the recency-weighted standard deviation of each poll’s distance from a local trend,
-        in {unitNote} — recency-weighted only, because weighting by sample size would mute exactly the
+        in {unitNote} – recency-weighted only, because weighting by sample size would mute exactly the
         small divergent polls being measured. The floor is what a design effect of {window.AP.DISC.DEFF} and
         each poll’s own sample size predict. Their ratio reads: under 0.80× herded · Around 1× as close as
         sampling allows · Over 1.20× genuinely apart.
@@ -2196,7 +2196,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
           {/* big screens only – a spreadsheet export is a desktop task, and the
               button would crowd the narrow filter stack on phones */}
           <button className="ap-export" onClick={exportCsv}
-                  title="Download these rows as CSV — exactly the current filters and order"
+                  title="Download these rows as CSV – exactly the current filters and order"
                   aria-label={"Export " + sorted.length + " polls as CSV"}>
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -2237,7 +2237,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
 
               {facet === "twopp" && (<>
                 <th scope="col" className="ta-l apub-col hide-md"
-                    title="What the pollster published — a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
+                    title="What the pollster published – a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
                 <ArchSortTh label={({ lnp: "Lead · ALP v L/NP", onp: "Lead · ALP v ON", lnponp: "Lead · L/NP v ON", "3cp": "Lead · 3-cornered" })[measure]} short="Lead" k="alp" sort={sort} onSort={onSort} />
                 {/* hide-sm: the last column to go on a phone – see the .hide-sm
                     note in the stylesheet. The row detail carries "Poll lean". */}
@@ -2376,7 +2376,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
         the aggregate for that month · “—” Means the pollster didn’t publish that measure · Search matches
         anything in a row · Click any column heading to sort.{" "}
         <strong>House effect</strong> is how far a pollster systematically sits from the cross-house consensus
-        on 2PP — its own average lean across every poll it has published, shrunk toward zero when it has
+        on 2PP – its own average lean across every poll it has published, shrunk toward zero when it has
         published few. The aggregates subtract it, and it is a property of the pollster, not of this one poll.
       </p>
 
