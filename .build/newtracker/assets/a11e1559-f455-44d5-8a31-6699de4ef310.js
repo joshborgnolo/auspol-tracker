@@ -840,8 +840,8 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
             {three ? "“Who would make the better PM?”, asked as a three-way including Hanson"
                    : "“Who would make the better PM?”, asked head to head — in both of the contests pollsters run"}
             {three
-              ? " · As published: houses leave 16–50% uncommitted, so shares aren’t directly comparable"
-              : " · As published: uncommitted runs from none (Newspoll’s head-to-head) to half the sample, so shares aren’t directly comparable"}
+              ? " · As published: houses leave 16–50% uncommitted, so levels aren’t comparable across houses — the gaps and the trend are"
+              : " · As published: uncommitted runs from none (Newspoll) to half the sample, so levels aren’t comparable across houses — the tinted gaps are"}
           </p>
         </div>
         <div className="card-head-tools">
