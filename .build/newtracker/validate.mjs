@@ -84,8 +84,22 @@ export function validate(D) {
      This is here because the 2022-25 term's cycle polls had exactly that: the
      L/NP figure was stored in tpp_alp for all 291 rows, and the Past-cycles
      chart drew Labor's last term as a slide from 52.1 to 47.7 through a term
-     it won 55.2. Nothing in the build noticed for as long as the file existed. */
-  const FLOW = { grn: 0.82, onp: 0.35, oth: 0.50 };
+     it won 55.2. Nothing in the build noticed for as long as the file existed.
+
+     Constants come from the AEC 2022 TCP flow file (Event 27966,
+     HouseTcpFlowByPartyDownload-27966.txt), aggregated from per-party flows:
+       GRN → ALP 83.71% / L·NP 16.29%        (1,199,015 vs 233,317 votes)
+       ON  → ALP 35.33% / L·NP 64.67%        (  243,683 vs 446,107)
+       IND → ALP 58.32% / L·NP 41.68%        (  174,234 vs 124,523)
+       (ind+oth lumped) → ALP 44.30%         (  661,807 vs 832,212)
+     The lumped figure is what runs here: polls that split IND from OTH don't
+     all publish both series, and using only the lumped bucket keeps the check
+     uniform across houses. An attempted split-IND variant sits FURTHER off
+     published 2PP (mean |house bias| 1.80 vs 1.14 for lumped vs 1.32 for the
+     old {0.82,0.35,0.50} placeholders) – poll-house 2PPs are themselves
+     respondent-allocated and don't match raw AEC flows. Slack of ±3 keeps
+     this an inversion check rather than a flow check. */
+  const FLOW = { grn: 0.837, onp: 0.353, oth: 0.443 };
   const impliedAlp = (p) => {
     if (p.alp == null) return null;
     const oth = n0(p.ind) + n0(p.oth);
