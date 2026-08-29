@@ -19,6 +19,13 @@
 
   const BTN_CLASS = "chart-copy-btn";
 
+  /* a static image cannot be operated, so controls are stripped from the
+     clone: the copy button itself and the 2PP hero's interactive switches
+     (matchup/range toggles + "Switch 2PP" chips) - the matchup and window
+     shown are already described by its title, legend and axis labels */
+  const STRIP_SEL =
+    "." + BTN_CLASS + ", .hero-controls, .hero-alt";
+
   const COPY_ICON =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
   const TICK_ICON =
@@ -125,7 +132,7 @@
     const dKids = dstEl.children;
     let j = 0;
     for (let i = 0; i < sKids.length; i++) {
-      if (sKids[i].classList && sKids[i].classList.contains(BTN_CLASS)) continue;
+      if (sKids[i].matches && sKids[i].matches(STRIP_SEL)) continue;
       bake(sKids[i], dKids[j++]);
     }
     if (!VOID_TAGS.has(srcEl.tagName) && srcEl.namespaceURI.indexOf("svg") === -1) {
@@ -174,7 +181,7 @@
     const H = Math.max(1, Math.round(rect.height * dpr));
 
     const clone = target.cloneNode(true);
-    clone.querySelectorAll("." + BTN_CLASS).forEach((b) => b.remove());
+    clone.querySelectorAll(STRIP_SEL).forEach((b) => b.remove());
     bake(target, clone);
     /* the rect is what was on screen: the clone's own frame (margin, root
        transform, document flow position) must not shift it a second time */
