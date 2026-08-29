@@ -1,0 +1,13 @@
+{
+  "slug": "afr,-redbridge-group-and-accent-research-federal-poll",
+  "sample": 1012,
+  "table2Error": "no wave rows parsed under the vote-intention table",
+  "dateStart": "2025-12-05",
+  "date": "2025-12-12",
+  "ppmError": "'All voters' row not found in PPM table",
+  "favError": "favourability wave table (Table 5) not found",
+  "pubIso": "2025-12-14",
+  "pdfUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_4df02b5e2ec545b3b4faf83f1d87c7eb.pdf",
+  "afrUrl": null,
+  "extractedAt": "2026-08-29T07:05:14.917Z"
+}

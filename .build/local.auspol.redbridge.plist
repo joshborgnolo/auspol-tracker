@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>Label</key>
+        <string>local.auspol.redbridge</string>
+        <key>ProgramArguments</key>
+        <array>
+                <string>/bin/bash</string>
+                <string>/Users/joshuaborgnolo/Documents/4. auspol/.build/redbridge-updater.sh</string>
+        </array>
+        <key>EnvironmentVariables</key>
+        <dict>
+                <key>PATH</key>
+                <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        </dict>
+        <key>StartCalendarInterval</key>
+        <array>
+                <!-- AFR/RedBridge/Accent file a federal poll roughly monthly:
+                     fieldwork Mon-Thu in the last week, release Sun on or
+                     just after the first weekend of the next month (2026:
+                     May wave rel Sun 3 May, Jun wave rel Sun 31 May,
+                     Jul wave rel Sun 2 Aug, plus a late-Nov/Dec pair).
+                     Weekly Sunday sweep, then a daily sweep across the
+                     month-end release window (28th-4th). The extractor
+                     caches parsed PDF text under .build/redbridge-src, so
+                     routine runs only re-check the newest waves (the
+                     re-peer-from-page bit costs a headless-Chrome round
+                     per uncached wave, which is why we don't run daily
+                     all month). -->
+                <dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>28</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>29</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>30</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>31</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>1</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>2</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>3</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>4</integer><key>Hour</key><integer>6</integer></dict>
+        </array>
+        <key>StandardOutPath</key>
+        <string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-redbridge-stdout.log</string>
+        <key>StandardErrorPath</key>
+        <string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-redbridge-stderr.log</string>
+</dict>
+</plist>

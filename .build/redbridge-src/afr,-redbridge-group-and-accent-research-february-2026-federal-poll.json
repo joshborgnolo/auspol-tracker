@@ -1,0 +1,18 @@
+{
+  "slug": "afr,-redbridge-group-and-accent-research-february-2026-federal-poll",
+  "sample": 1006,
+  "table2Error": "no wave rows parsed under the vote-intention table",
+  "dateStart": "2026-02-23",
+  "date": "2026-02-27",
+  "ppm": {
+    "alb": 34,
+    "opp": 10,
+    "han": 23
+  },
+  "oppName": "Taylor",
+  "favError": "favourability wave table (Table 5) not found",
+  "pubIso": "2026-03-01",
+  "pdfUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
+  "afrUrl": null,
+  "extractedAt": "2026-08-29T07:04:51.414Z"
+}

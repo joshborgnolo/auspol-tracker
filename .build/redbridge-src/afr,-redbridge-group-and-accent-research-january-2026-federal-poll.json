@@ -1,0 +1,13 @@
+{
+  "slug": "afr,-redbridge-group-and-accent-research-january-2026-federal-poll",
+  "sample": 1003,
+  "table2Error": "no wave rows parsed under the vote-intention table",
+  "dateStart": "2026-01-22",
+  "date": "2026-01-29",
+  "ppmError": "'All voters' row not found in PPM table",
+  "favError": "favourability wave table (Table 5) not found",
+  "pubIso": "2026-02-01",
+  "pdfUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_a04c3282929c4378a2f96d0134bfd344.pdf",
+  "afrUrl": null,
+  "extractedAt": "2026-08-29T07:05:08.065Z"
+}

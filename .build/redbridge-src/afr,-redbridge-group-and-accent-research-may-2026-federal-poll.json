@@ -1,0 +1,47 @@
+{
+  "slug": "afr,-redbridge-group-and-accent-research-may-2026-federal-poll",
+  "sample": 1005,
+  "label": "May 2026",
+  "year": 2026,
+  "month": 4,
+  "alp": 28,
+  "lnp": 20,
+  "onp": 31,
+  "grn": 12,
+  "ind": 9,
+  "tppHist": 52,
+  "tppResp": 51,
+  "tppVsOn": 51,
+  "waveRows": 14,
+  "dateStart": "2026-05-25",
+  "date": "2026-05-28",
+  "ppm": {
+    "alb": 31,
+    "opp": 14,
+    "han": 25
+  },
+  "oppName": "Taylor",
+  "nets": {
+    "alb": -19,
+    "opp": -4,
+    "han": 0
+  },
+  "detail": {
+    "alb": {
+      "app": 29,
+      "dis": 48
+    },
+    "opp": {
+      "app": 21,
+      "dis": 25
+    },
+    "han": {
+      "app": 40,
+      "dis": 40
+    }
+  },
+  "pubIso": "2026-05-31",
+  "pdfUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_c99eef2ffb4242f3b2d0da6311abf61e.pdf",
+  "afrUrl": null,
+  "extractedAt": "2026-08-29T07:04:41.526Z"
+}

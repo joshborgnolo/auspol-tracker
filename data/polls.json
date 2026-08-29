@@ -4392,6 +4392,15 @@
       "extra": null
     },
     {
+      "date": "2026-06-26",
+      "firm": "RedBridge / Accent",
+      "alb": 33,
+      "opp": 11,
+      "oppName": "Taylor",
+      "han": 23,
+      "extra": null
+    },
+    {
       "date": "2026-06-30",
       "firm": "YouGov",
       "alb": 44,
@@ -5391,7 +5400,7 @@
       "alb": -19,
       "opp": -4,
       "oppName": "Taylor",
-      "han": -6,
+      "han": 0,
       "detail": null
     },
     {
@@ -5473,6 +5482,28 @@
         "han": {
           "app": 37,
           "dis": 40
+        }
+      }
+    },
+    {
+      "date": "2026-06-26",
+      "firm": "RedBridge / Accent",
+      "alb": -18,
+      "opp": -9,
+      "oppName": "Taylor",
+      "han": -10,
+      "detail": {
+        "alb": {
+          "app": 31,
+          "dis": 49
+        },
+        "opp": {
+          "app": 17,
+          "dis": 26
+        },
+        "han": {
+          "app": 37,
+          "dis": 47
         }
       }
     },
@@ -5659,16 +5690,16 @@
       "han": -10,
       "detail": {
         "alb": {
-          "app": 40,
-          "dis": 59
+          "app": 30,
+          "dis": 49
         },
         "opp": {
-          "app": 30,
-          "dis": 36
+          "app": 20,
+          "dis": 26
         },
         "han": {
-          "app": 40,
-          "dis": 50
+          "app": 36,
+          "dis": 46
         }
       }
     },

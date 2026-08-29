@@ -1,0 +1,47 @@
+{
+  "slug": "afr,-redbridge-group-and-accent-research-july-2026-federal-poll",
+  "sample": 1001,
+  "label": "Jul 2026",
+  "year": 2026,
+  "month": 6,
+  "alp": 29,
+  "lnp": 22,
+  "onp": 31,
+  "grn": 10,
+  "ind": 8,
+  "tppHist": 50,
+  "tppResp": 48,
+  "tppVsOn": 53,
+  "waveRows": 16,
+  "dateStart": "2026-07-27",
+  "date": "2026-07-30",
+  "ppm": {
+    "alb": 32,
+    "opp": 15,
+    "han": 24
+  },
+  "oppName": "Taylor",
+  "nets": {
+    "alb": -19,
+    "opp": -6,
+    "han": -10
+  },
+  "detail": {
+    "alb": {
+      "app": 30,
+      "dis": 49
+    },
+    "opp": {
+      "app": 20,
+      "dis": 26
+    },
+    "han": {
+      "app": 36,
+      "dis": 46
+    }
+  },
+  "pubIso": "2026-08-02",
+  "pdfUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_e09c2025b9df424e98b0f2737e7ae4ca.pdf",
+  "afrUrl": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6?gift=RA2P0BbRnosy14BIOh17fcip3S-JV5xUIcbOzKltJ3ZVwwefreyE8g4LixypMpqOuYEKNK1A5ir2JdMM4Yx2VPJmZ2OnTRG-81RftTXR1zME5saqYgOW_H98NNEpmohJdvw3&utm_source=afr-app&utm_medium=article_gifting&utm_term=product_feature&utm_campaign=politics&utm_content=afralldigital",
+  "extractedAt": "2026-08-29T07:04:32.667Z"
+}
