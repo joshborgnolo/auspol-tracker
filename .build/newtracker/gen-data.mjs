@@ -1,9 +1,13 @@
 /* gen-data.mjs – extract REAL data from auspol-polling.html and emit the
    dataset asset for index.html (window.AUSPOL).
    Methodology matches the established aggregate (see transform.mjs):
-   2PP = sample- & recency-weighted, house-effect-adjusted mean; primaries =
-   monthly means; leadership = monthly means of published readings, with the
-   opposition slot spliced Ley → Taylor (handover 13 Feb 2026).
+   2PP headline = sample- & recency-weighted, house-effect-adjusted nowcast;
+   every monthly estimate (2PP, primaries, synthetic, alt head-to-heads,
+   direction) = sample-weighted, house-effect-adjusted monthly mean from ONE
+   construction, with a house's repeat waves in a window or month deflated
+   to the square root of their number; leadership = monthly means of
+   published readings, with the opposition slot spliced Ley → Taylor
+   (handover 13 Feb 2026).
    Run: node .build/newtracker/gen-data.mjs */
 import fs from "node:fs";
 import path from "node:path";
@@ -230,14 +234,13 @@ const OPP_SPLICE_ISO = "2026-02-13";         // Taylor replaces Ley – a differ
    reading is Resolve's 8–12 Feb 2026 poll; Taylor's first is 14 Feb – so the
    13th is the first Taylor-only day, and every date falls one side of it. */
 const eraOf = (iso) => (iso < OPP_SPLICE_ISO ? "ley" : "taylor");
-// sample-weighted, house-effect-adjusted monthly mean of a row set
+// sample-weighted, house-effect-adjusted monthly mean of a row set - the
+// plain-value twin of monthWithSe, so one construction carries both and no
+// series can drift onto its own weighting rule again
 function monthlyAdj(rows, he) {
   return MONTHS.map((ym) => {
-    const rs = rows.filter((r) => r.ym === ym);
-    if (!rs.length) return null;
-    let sw = 0, swx = 0;
-    for (const r of rs) { sw += r.n; swx += r.n * (r.x - heV(he, r.firm)); }
-    return { ym, x: mx(ym), v: swx / sw, k: rs.length };
+    const r = monthWithSe(rows, he, ym);
+    return r && { ym, x: mx(ym), v: r.v, k: r.n };
   }).filter(Boolean);
 }
 // trailing recency-weighted nowcast (same window/half-life as the headline 2PP)
@@ -260,8 +263,9 @@ const HL_DEFF = 1.6;
 /* The estimator itself, over an already-weighted set of readings. ONE
    implementation, because the headline nowcast and the monthly points on the
    chart behind it must not disagree about what an interval means: the nowcast
-   weights by recency as well as sample size, a monthly mean weights by sample
-   size alone, and from there the two are the same arithmetic. */
+   weights by recency as well as sample size, a monthly mean drops the recency
+   term, and both deflate a house's repeat waves to the square root of their
+   number - from there the two are the same arithmetic. */
 function weightedWithSe(pts) {                 // pts: [{ w, x, n }]
   let sw = 0, sw2 = 0, swx = 0;
   for (const p of pts) { sw += p.w; sw2 += p.w * p.w; swx += p.w * p.x; }
@@ -302,10 +306,18 @@ function nowcastAdj(rows, he, ref) {
    This is what the trend line is drawn from, so it is also what the shaded
    interval behind the trend line has to be drawn from. A month carried by a
    single poll has no spread to measure, so its floor - sampling error alone -
-   is what shows, which is the honest answer rather than a hairline. */
+   is what shows, which is the honest answer rather than a hairline.
+   One deflation is shared with the nowcast, not optional: a house with m
+   waves in the month has not measured the electorate m independent times -
+   same method, same residue - so its waves count for sqrt(m), here exactly
+   as in the window (see nowcastAdj). The point weights deflate; the raw n
+   still feeds the sampling-error floor, again mirroring the nowcast. */
 function monthWithSe(rows, he, ym) {
-  return weightedWithSe(rows.filter((r) => r.ym === ym)
-    .map((r) => ({ w: r.n, x: r.x - heV(he, r.firm), n: r.n })));
+  const rs = rows.filter((r) => r.ym === ym);
+  const waves = new Map();
+  for (const r of rs) waves.set(r.firm, (waves.get(r.firm) || 0) + 1);
+  return weightedWithSe(rs.map((r) => ({ w: r.n / Math.sqrt(waves.get(r.firm)),
+                                         x: r.x - heV(he, r.firm), n: r.n })));
 }
 
 const houseEffect = houseEffectsFor(tppRows);
@@ -348,8 +360,9 @@ const agg2ppSynth = MONTHS.map((ym) => {
 agg2ppSynth.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: r1(impliedAlp2pp(ELECTION)), lnp: r1(100 - impliedAlp2pp(ELECTION)), ci95: 0, k: 0, election: true });
 
 /* ---- 2. monthly primary vote + election-day anchor --------------------- */
-/* Primaries get the SAME treatment as the headline 2PP – sample-weighted and
-   house-effect-adjusted, per party. This matters more here than on the 2PP:
+/* Primaries get the SAME treatment as the monthly 2PP – sample-weighted and
+   house-effect-adjusted, per party, through the same monthWithSe
+   construction. This matters more here than on the 2PP:
    the houses diverge measurably further on primary shares (One Nation's spread
    is ~2pp beyond sampling error), so a plain mean of houses that disagree
    inherits whichever houses happened to poll that month. Each party is debiased
@@ -375,11 +388,9 @@ const aggPrimary = MONTHS.map((ym) => {
   for (const k of PRIMARY_KEYS) {
     const rs = primaryRows[k].filter((r) => r.ym === ym);
     if (!rs.length) { o[k] = 0; continue; }
-    let sw = 0, swx = 0;
-    for (const r of rs) { sw += r.n; swx += r.n * (r.x - heV(primaryHE[k], r.firm)); }
-    o[k] = swx / sw;
     const est = monthWithSe(primaryRows[k], primaryHE[k], ym);
-    if (est) o.ci[k] = r1(1.96 * est.se);
+    o[k] = est.v;
+    o.ci[k] = r1(1.96 * est.se);
     plainTotal += mean(rs.map((r) => r.x));
   }
   const adjTotal = PRIMARY_KEYS.reduce((s, k) => s + o[k], 0);
@@ -509,19 +520,24 @@ const leaderMonths = MONTHS.map((ym) => {
     pool.forEach((p) => {
       const n = apprN(p);
       if (p[prop] != null) {
-        // readings are equally weighted here, as the mean below is: this is a
-        // handful of houses answering the same question, not one pooled sample
-        const pt = { w: 1, x: deb(p, p[prop]), n, pq: netPq(p[prop], p.splits ? p.splits[lk] : null) };
+        // houses are equally weighted here, not samples: this is a handful of
+        // houses answering the same question, not one pooled sample
+        const pt = { w: 1, x: deb(p, p[prop]), n, pq: netPq(p[prop], p.splits ? p.splits[lk] : null), firm: p.firm };
         (metricOf(p.firm, lk, p.date) === "fav" ? fv : ap).push(pt);
       }
       // a firm that published BOTH measures contributes its second reading to
       // the other line, rather than having it quietly dropped
       const alt = p.splits && p.splits.fav ? p.splits.fav[lk] : null;
       if (alt != null && metricOf(p.firm, lk, p.date) !== "fav")
-        fv.push({ w: 1, x: deb(p, alt), n, pq: netPq(alt, null) });
+        fv.push({ w: 1, x: deb(p, alt), n, pq: netPq(alt, null), firm: p.firm });
     });
     const est = (arr) => {
       if (!arr.length) return { v: null, ci: null };
+      // ...and a house that answered m times this month counts for sqrt(m),
+      // not m - the same deflation the monthly vote estimates apply
+      const waves = new Map();
+      for (const p of arr) waves.set(p.firm, (waves.get(p.firm) || 0) + 1);
+      for (const p of arr) p.w /= Math.sqrt(waves.get(p.firm));
       const r = weightedWithSe(arr);
       return { v: rnd(r.v), ci: r1(1.96 * r.se) };
     };
@@ -1616,7 +1632,9 @@ for (const c of CYC_META) {
 const out = `/* auspol tracker – REAL Australian federal polling data.
    Generated from data/polls.json by .build/newtracker/gen-data.mjs – do
    not edit by hand.  Spine: 2025 federal election (3 May 2025) → ${latest.updated}.
-   2PP aggregate: sample- & recency-weighted, house-effect-adjusted mean.
+   2PP aggregate: sample- & recency-weighted, house-effect-adjusted mean;
+   every monthly estimate deflates a house's repeat waves in the month to
+   the square root of their number, the same rule the nowcast window applies.
    Opposition-leader figures splice Sussan Ley → Angus Taylor (13 Feb 2026);
    the opposition slot is an office, not a person.  "National direction"
    carries no source series yet and renders an empty state. */
