@@ -97,8 +97,18 @@ export function validate(D) {
      uniform across houses. An attempted split-IND variant sits FURTHER off
      published 2PP (mean |house bias| 1.80 vs 1.14 for lumped vs 1.32 for the
      old {0.82,0.35,0.50} placeholders) – poll-house 2PPs are themselves
-     respondent-allocated and don't match raw AEC flows. Slack of ±3 keeps
-     this an inversion check rather than a flow check. */
+     respondent-allocated and don't match raw AEC flows.
+
+     SA's 2026 election independently confirms these constants have to stay
+     coarse. The Tally Room's 3CP analysis of that count (tallyroom.com.au/
+     64676) found the same party's preferences redistributing by contest AND
+     by seat: Greens → Labor ~80% in ALP–One Nation contests (and stronger
+     against the Liberals), but only ~67% in Elizabeth, a donkey-vote seat
+     where ON made the final two; Liberal → ON ranging 53 to 73.5% across
+     seats. No election-wide constant – fresh or stale – survives that
+     variance, which is why synthetic-2PP was rejected as a shipped series
+     in favour of the published-poll aggregate plus the altTpp matchups.
+     Slack of ±3 keeps this an inversion check rather than a flow check. */
   const FLOW = { grn: 0.837, onp: 0.353, oth: 0.443 };
   const impliedAlp = (p) => {
     if (p.alp == null) return null;
