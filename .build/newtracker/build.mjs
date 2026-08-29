@@ -32,9 +32,11 @@ const OUT = path.join(ROOT, "index.html");
    Slack and Discord all decline to resolve one, which is why the share card
    never appeared. Nothing else in the build needs to know the origin, so it
    lives here as one constant.
-   Change it if the site moves, or set SITE_URL= in the environment. Adding a
-   CNAME to the repo root means changing this too. */
-const SITE_URL = (process.env.SITE_URL || "https://joshborgnolo.github.io/auspol-tracker/")
+   It must match the CNAME in the repo root. GitHub Pages redirects the
+   github.io address to the custom domain, and a card whose og:url pointed at
+   the redirect would be shared under the old name. Change it if the site
+   moves, or set SITE_URL= in the environment. */
+const SITE_URL = (process.env.SITE_URL || "https://auspoltracker.com/")
   .replace(/\/*$/, "/");
 const A = (f) => path.join(HERE, "assets", f);
 

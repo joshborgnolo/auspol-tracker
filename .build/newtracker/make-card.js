@@ -28,11 +28,17 @@
    card that dropped that caveat would be quoting the site against itself.
 
    TO REGENERATE
-     1. node .claude/serve.js
-     2. open index.html in a browser
-     3. paste this whole file into the console; it downloads auspol-card.png
-     4. move it to assets/ and update assets/auspol-card.json to the new
-        `updatedISO` (the script prints it)
+     node .build/newtracker/render-card.mjs
+
+   That runs this file in real headless Chrome and writes both the png and the
+   date in assets/auspol-card.json; rebuild afterwards so og:image is stamped
+   with it. Everything about the drawing still lives here - render-card.mjs
+   only drives it.
+
+   By hand, if that machine has no Chrome or no puppeteer-core: node
+   .claude/serve.js, open index.html, paste this whole file into the console,
+   move the download into assets/, and put the printed `updatedISO` into
+   assets/auspol-card.json.
 */
 (async () => {
   await document.fonts.ready;

@@ -67,9 +67,10 @@ tech read) and `<!--SCRIPTS-->` (replaced by every inlined script).
 ### Where it's published
 
 `build.mjs` writes absolute `og:url`, `og:image` and `<link rel="canonical">`
-from one constant, `SITE_URL`. Open Graph requires absolute URLs – a relative
-`og:image` is invalid and most scrapers decline it. If the site moves, or you
-add a `CNAME`, change `SITE_URL` (or set it in the environment):
+from one constant, `SITE_URL`, currently `https://auspoltracker.com/` – the
+custom domain in `CNAME`, which the two must agree on. Open Graph requires
+absolute URLs – a relative `og:image` is invalid and most scrapers decline it.
+If the site moves, change `SITE_URL` (or set it in the environment):
 
 ```
 SITE_URL=https://example.org/ node .build/newtracker/build.mjs
@@ -101,7 +102,10 @@ could not be. Two things guard that:
 - `assets/auspol-card.json` records the data date the card was drawn for.
   `build.mjs` compares it against the current data and prints a loud notice
   when they diverge. It does not fail the build — the card is not load-bearing
-  — but it will not let a stale one pass unremarked.
+  — but it will not let a stale one pass unremarked. The check is only date
+  deep, though: revising a poll without moving the newest date leaves the card
+  passing and its figures wrong, so redraw after any edit to `data/polls.json`,
+  not only after a new poll arrives.
 - `og:image` carries `?v=<that date>`. Scrapers key their caches on the full
   URL, so a redraw is a new URL and they refetch instead of serving the old
   card.
@@ -110,10 +114,19 @@ could not be. Two things guard that:
 card needs the page's own webfonts — canvas text picks those up only from a
 document that has already loaded them, and rasterising an SVG instead falls
 back to system fonts, which is how the previous card drifted off-brand
-unnoticed. So regeneration is a hand step, documented in the header of
-`.build/newtracker/make-card.js`: serve the repo, open `index.html`, paste the
-file into the console, move the download into `assets/`, and update the date in
-`assets/auspol-card.json`.
+unnoticed. So the card is drawn by `.build/newtracker/make-card.js`, which runs
+inside the built page, and `.build/newtracker/render-card.mjs` drives it there:
+
+```
+node .build/newtracker/render-card.mjs   # rewrites the png and the date
+node .build/newtracker/build.mjs         # re-stamps og:image with that date
+```
+
+It serves the repo on an ephemeral port, opens the page in headless Chrome, and
+refuses to draw if either webface is missing rather than quietly shipping
+system fonts. Chrome and `puppeteer-core` are all it needs and neither is a
+build dependency — `build.mjs` never imports it — so on a machine without them
+the console steps in the `make-card.js` header still work.
 
 ### Fonts
 

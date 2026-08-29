@@ -2,8 +2,8 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>auspol tracker – new polls</title>
-    <link>https://joshborgnolo.github.io/auspol-tracker/</link>
-    <atom:link href="https://joshborgnolo.github.io/auspol-tracker/feed.xml" rel="self" type="application/rss+xml"/>
+    <link>https://auspoltracker.com/</link>
+    <atom:link href="https://auspoltracker.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
     <language>en-AU</language>
     <lastBuildDate>Mon, 24 Aug 2026 12:00:00 GMT</lastBuildDate>
