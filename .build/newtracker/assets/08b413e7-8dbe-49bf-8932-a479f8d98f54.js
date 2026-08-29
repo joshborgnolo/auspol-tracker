@@ -873,19 +873,22 @@ function TrendChart(props) {
             })
             .sort((a, b) => a.y - b.y);
           if (!labs.length) return null;
-          /* 1.15 was the text's own height, so a nudged stack came out with
-             about half a pixel of daylight between rows – legible on a laptop
-             only because the labels rarely collided there. */
-          const gap = refUnits * 1.45;
+          /* 1.15 is one set-height (0.95 font) plus the halo either side
+             (0.34 stroke × 2), so a dodged row clears its neighbour with
+             room to spare. 1.45 was an earlier extra-cautious choice; it
+             let a daylight-having label get swept into a neighbour's
+             cluster and pushed a line-height off its own line end. */
+          const gap = refUnits * 1.15;
           /* Can these be placed at all? Spreading buys room by moving labels
              off their line ends, and past a point it stops being a dodge:
              every label joins one evenly spaced stack that points at
              nobody's line. A phone does exactly that to this chart – the
              viewBox stays 300 units tall however narrow the screen gets,
-             while the text holds its size on screen, so a gap costing 13
-             units on a laptop costs 44 on a phone and six labels want 91% of
-             the plot. The stack that came out had the current term's year
-             nowhere near the current term's line.
+             while the text holds its size on screen, so a gap that costs a
+             laptop one plot-unit in twenty costs a phone more than twice
+             that, and six labels stop fitting at all. The stack that came
+             out had the current term's year nowhere near the current
+             term's line.
 
              So it is decided for the chart, not per label: either they fit
              where they belong or none are drawn, because half a set of year
