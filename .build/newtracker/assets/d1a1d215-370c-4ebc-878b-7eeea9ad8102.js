@@ -1179,7 +1179,7 @@ function PastCyclesView() {
           end of each line.{" "}
           {CANT_HOVER
             ? "Tap a cycle below to hide or restore its line, and leave just one visible to see more details."
-            : "Hover a cycle below to bring its line forward, and leave just one visible to see more details."}
+            : "Hover over a cycle below to bring its line forward, and leave just one visible to see more details."}
         </p>
         <div className="cyc-controls">
           <TextToggle value={mode} onChange={setMode} ariaLabel="Measure"
