@@ -731,7 +731,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               published ALP v L/NP series, so the control only exists there.
               Off by default: it is a diagnostic, not a third headline. */}
           {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && (
-            <label className={"pg-check" + (showSynth ? " on" : "")} title="Also draw what the same polls' primary votes imply when run through one fixed preference-flow table (the 2025 election's actual flows). A diagnostic, not a correction.">
+            <label className={"pg-check" + (showSynth ? " on" : "")} title="Also draw what the same polls’ primary votes imply when run through one fixed preference-flow table (the 2025 election’s actual flows). A diagnostic, not a correction.">
               <input type="checkbox" checked={showSynth} onChange={(e) => setShowSynth(e.target.checked)} />
               Compare implied 2PP
             </label>
@@ -791,11 +791,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               + "shaded with the interval around it. Where the two bands overlap, the lead is "
               + "inside its own margin of error – the polls cannot separate the parties that month.")
               + (synthOverlay.length
-                ? " The dashed line reads the same polls' primaries through the 2025 election's actual preference flows – a diagnostic, not a correction (see the method note below)."
+                ? " The dashed line reads the same polls’ primaries through the 2025 election’s actual preference flows – a diagnostic, not a correction (see the method note below)."
                 : "")
             : `Each dot is one pollster’s published ${m.label} head-to-head` +
               (adjusted
-                ? ", adjusted for each house's lean on this matchup as the headline two-party is."
+                ? ", adjusted for each house’s lean on this matchup as the headline two-party is."
                 : ", averaged monthly – too few houses ask it to weight or correct.") +
               (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : "")}
         </p>
