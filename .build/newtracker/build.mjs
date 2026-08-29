@@ -417,6 +417,7 @@ html = html.replace('<meta property="og:type" content="website">',
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="${cardAlt}">
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="google-site-verification" content="sUMvJK3smMtuRAQNZiu9yW3FPS5rD4XI_eod7Dc6k5g">
   <meta name="theme-color" content="${THEME_LIGHT}" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="${SITE_URL}">
