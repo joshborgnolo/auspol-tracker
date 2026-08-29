@@ -501,7 +501,9 @@ body.js .static-summary {
 .wm-bar { transition: stroke-dasharray .75s cubic-bezier(.22,.9,.24,1); }
 @media (prefers-reduced-motion: reduce) { .wm-needle-g, .wm-bar { transition: none; } }
 .tagline {
-  margin: 7px 0 0; font-family: var(--serif);
+  /* negative bottom margin drops Newsreader's last line ~1.5px so the tagline
+     text baseline-to-bottom edge optically matches the head-meta values */
+  margin: 7px 0 -1.5px; font-family: var(--serif);
   font-size: 15px; color: var(--ink-3); text-wrap: balance;
 }
 /* compact freshness line – only surfaced on small screens, where the full

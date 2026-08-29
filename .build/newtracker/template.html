@@ -457,15 +457,19 @@ body {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
 }
-/* The article does not take the 1px clip above: Safari's reader treats
-   zero-size-clipped content as invisible, skips it and extracts the mounted
-   app's chart chrome (toggle labels, axis digits, legends) instead. Parking
-   it far off-screen at full size keeps the text rendered and extractable -
-   the classic screen-reader pattern - and cannot create scrollbars, because
-   overflow beyond the top/left page origin is never scrollable. */
+/* Post-mount the article hides in plain sight: it keeps its natural in-flow
+   box - real size, real position, every "is this content" property a reader
+   engine checks - but fully transparent, with the app pulled up over the gap
+   it leaves (--ss-h comes from the mount script). Harder hides both failed
+   Safari Reader: a 1px clip read as invisible, and parking it at
+   left:-10000px did too - it only extracts text that visibly renders inside
+   the document's box. opacity is the hiding axis it does not consult. */
 body.js .static-summary {
-  position: absolute; top: -40000px; left: -10000px;
-  width: 680px; margin: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+body.js #root {
+  margin-top: calc(-1 * var(--ss-h, 0px));
 }
 /* 12px, not 7: the dial's nearest ink is the tallest graduation's tip, which
    reaches to within 0.9px of the box edge, so the clear space a reader sees is
@@ -653,7 +657,9 @@ body.js .static-summary {
 .wm-bar { transition: stroke-dasharray .75s cubic-bezier(.22,.9,.24,1); }
 @media (prefers-reduced-motion: reduce) { .wm-needle-g, .wm-bar { transition: none; } }
 .tagline {
-  margin: 7px 0 0; font-family: var(--serif);
+  /* negative bottom margin drops Newsreader's last line ~1.5px so the tagline
+     text baseline-to-bottom edge optically matches the head-meta values */
+  margin: 7px 0 -1.5px; font-family: var(--serif);
   font-size: 15px; color: var(--ink-3); text-wrap: balance;
 }
 /* compact freshness line – only surfaced on small screens, where the full
