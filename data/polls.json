@@ -989,6 +989,7 @@
       "oth": null,
       "tpp_alp": 57.5,
       "tpp_lnp": 42.5,
+      "tpp_flows": 56.5,
       "url": "https://www.roymorgan.com/findings/9927-federal-voting-intention-june-30-2025"
     },
     {
@@ -1088,6 +1089,7 @@
       "oth": null,
       "tpp_alp": 57,
       "tpp_lnp": 43,
+      "tpp_flows": 55.2,
       "url": "https://www.roymorgan.com/findings/9932-federal-voting-intention-july-27-2025"
     },
     {
@@ -1155,6 +1157,7 @@
       "oth": null,
       "tpp_alp": 56.5,
       "tpp_lnp": 43.5,
+      "tpp_flows": 55.2,
       "url": "https://www.roymorgan.com/findings/9941-federal-voting-intention-august-25-2025"
     },
     {
@@ -1222,6 +1225,7 @@
       "oth": null,
       "tpp_alp": 55.5,
       "tpp_lnp": 44.5,
+      "tpp_flows": 55.2,
       "url": "https://www.roymorgan.com/findings/9947-federal-voting-intention-september-21-2025"
     },
     {
@@ -1322,6 +1326,7 @@
       "oth": null,
       "tpp_alp": 57,
       "tpp_lnp": 43,
+      "tpp_flows": 55.2,
       "url": "https://www.roymorgan.com/findings/9948-federal-voting-intention-october-2025"
     },
     {
@@ -1495,6 +1500,7 @@
       "oth": null,
       "tpp_alp": 56.5,
       "tpp_lnp": 43.5,
+      "tpp_flows": 55.2,
       "url": "https://www.roymorgan.com/findings/9951-federal-voting-intention-november-16-2025"
     },
     {
@@ -1658,6 +1664,7 @@
       "oth": null,
       "tpp_alp": 54.5,
       "tpp_lnp": 45.5,
+      "tpp_flows": 55,
       "url": "https://www.roymorgan.com/findings/9956-federal-voting-intention-december-14-2025"
     },
     {
@@ -1928,6 +1935,7 @@
       "oth": null,
       "tpp_alp": 56,
       "tpp_lnp": 44,
+      "tpp_flows": 54.5,
       "lnpSplit": {
         "Lib": 18,
         "Nat": 2.5
@@ -1971,6 +1979,7 @@
       "oth": null,
       "tpp_alp": 53.5,
       "tpp_lnp": 46.5,
+      "tpp_flows": 53,
       "url": "https://www.roymorgan.com/findings/10103-federal-voting-intention-february-8-2026"
     },
     {
@@ -2044,6 +2053,7 @@
       "oth": null,
       "tpp_alp": 58.5,
       "tpp_lnp": 41.5,
+      "tpp_flows": 55,
       "url": "https://www.roymorgan.com/findings/10113-federal-voting-intention-february-13-2026"
     },
     {
@@ -2131,6 +2141,7 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "tpp_flows": 54,
       "url": "https://www.roymorgan.com/findings/10126-federal-voting-intention-february-24-2026"
     },
     {
@@ -2226,6 +2237,7 @@
       "oth": null,
       "tpp_alp": 56,
       "tpp_lnp": 44,
+      "tpp_flows": 53.5,
       "url": "https://www.roymorgan.com/findings/10148-federal-voting-intention-march-2-2026"
     },
     {
@@ -2304,6 +2316,7 @@
       "oth": null,
       "tpp_alp": 54.5,
       "tpp_lnp": 45.5,
+      "tpp_flows": 53,
       "url": "https://www.roymorgan.com/findings/10151-federal-voting-intention-march-10-2026"
     },
     {
@@ -2356,6 +2369,7 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "tpp_flows": 52,
       "lnpSplit": {
         "Lib": 20.5,
         "Nat": 3.5
@@ -2394,6 +2408,7 @@
       "oth": null,
       "tpp_alp": 52.5,
       "tpp_lnp": 47.5,
+      "tpp_flows": 51,
       "lnpSplit": {
         "Lib": 21.5,
         "Nat": 4
@@ -2515,6 +2530,7 @@
       "oth": null,
       "tpp_alp": 56.5,
       "tpp_lnp": 43.5,
+      "tpp_flows": 54.5,
       "lnpSplit": {
         "Lib": 19.5,
         "Nat": 3
@@ -2537,6 +2553,7 @@
       "oth": null,
       "tpp_alp": 56,
       "tpp_lnp": 44,
+      "tpp_flows": 53.5,
       "lnpSplit": {
         "Lib": 20,
         "Nat": 4
@@ -2591,6 +2608,7 @@
       "oth": null,
       "tpp_alp": 56,
       "tpp_lnp": 44,
+      "tpp_flows": 54,
       "lnpSplit": {
         "Lib": 19.5,
         "Nat": 3
@@ -2665,6 +2683,7 @@
       "oth": null,
       "tpp_alp": 55.5,
       "tpp_lnp": 44.5,
+      "tpp_flows": 54.5,
       "lnpSplit": {
         "Lib": 19.5,
         "Nat": 3.5
@@ -2703,6 +2722,7 @@
       "oth": null,
       "tpp_alp": 54.5,
       "tpp_lnp": 45.5,
+      "tpp_flows": 54,
       "lnpSplit": {
         "Lib": 19,
         "Nat": 3.5
@@ -2775,6 +2795,7 @@
       "oth": null,
       "tpp_alp": 54.5,
       "tpp_lnp": 45.5,
+      "tpp_flows": 53,
       "lnpSplit": {
         "Lib": 21,
         "Nat": 3
@@ -2813,6 +2834,7 @@
       "oth": null,
       "tpp_alp": 53.5,
       "tpp_lnp": 46.5,
+      "tpp_flows": 52.5,
       "lnpSplit": {
         "Lib": 21,
         "Nat": 4
@@ -2964,6 +2986,7 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "tpp_flows": 52.5,
       "lnpSplit": {
         "Lib": 21,
         "Nat": 3
@@ -3036,6 +3059,7 @@
       "oth": null,
       "tpp_alp": 53,
       "tpp_lnp": 47,
+      "tpp_flows": 52,
       "lnpSplit": {
         "Lib": 21,
         "Nat": 2
@@ -3123,6 +3147,7 @@
       "oth": null,
       "tpp_alp": 55.5,
       "tpp_lnp": 44.5,
+      "tpp_flows": 53.5,
       "url": "https://www.roymorgan.com/findings/10242-federal-voting-intention-june-1-2026"
     },
     {
@@ -3174,6 +3199,7 @@
       "oth": null,
       "tpp_alp": 56,
       "tpp_lnp": 44,
+      "tpp_flows": 54,
       "lnpSplit": {
         "Lib": 14.5,
         "Nat": 3
@@ -3214,6 +3240,7 @@
       "oth": null,
       "tpp_alp": 54.5,
       "tpp_lnp": 45.5,
+      "tpp_flows": 54.5,
       "lnpSplit": {
         "Lib": 15,
         "Nat": 2
@@ -3270,6 +3297,7 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "tpp_flows": 52.5,
       "lnpSplit": {
         "Lib": 15,
         "Nat": 2.5
@@ -3326,6 +3354,7 @@
       "oth": null,
       "tpp_alp": 53.5,
       "tpp_lnp": 46.5,
+      "tpp_flows": 52.5,
       "lnpSplit": {
         "Lib": 19,
         "Nat": 2.5
@@ -3382,6 +3411,7 @@
       "oth": null,
       "tpp_alp": 55,
       "tpp_lnp": 45,
+      "tpp_flows": 54,
       "lnpSplit": {
         "Lib": 19,
         "Nat": 2.5
@@ -3491,6 +3521,7 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "tpp_flows": 52.5,
       "lnpSplit": {
         "Lib": 17.5,
         "Nat": 2.5
@@ -3547,6 +3578,7 @@
       "oth": null,
       "tpp_alp": 56,
       "tpp_lnp": 44,
+      "tpp_flows": 53,
       "lnpSplit": {
         "Lib": 20.5,
         "Nat": 2.5
@@ -3585,6 +3617,7 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "tpp_flows": 52.5,
       "lnpSplit": {
         "Lib": 18.5,
         "Nat": 3.5
@@ -3659,6 +3692,7 @@
       "oth": null,
       "tpp_alp": 52,
       "tpp_lnp": 48,
+      "tpp_flows": 52.5,
       "lnpSplit": {
         "Lib": 20,
         "Nat": 3.5
@@ -3698,6 +3732,7 @@
       "oth": null,
       "tpp_alp": 53,
       "tpp_lnp": 47,
+      "tpp_flows": 52,
       "lnpSplit": {
         "Lib": 18.5,
         "Nat": 3.5
@@ -3754,6 +3789,7 @@
       "oth": null,
       "tpp_alp": 52,
       "tpp_lnp": 48,
+      "tpp_flows": 51.5,
       "lnpSplit": {
         "Lib": 21,
         "Nat": 2.5
@@ -3822,6 +3858,7 @@
       "oth": null,
       "tpp_alp": 52,
       "tpp_lnp": 48,
+      "tpp_flows": 52.5,
       "lnpSplit": {
         "Lib": 18.5,
         "Nat": 2.5

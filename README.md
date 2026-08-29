@@ -26,9 +26,11 @@ new and worth looking at.
 
 ### Pollster conventions worth knowing
 
-- **Roy Morgan** publishes two ALP-v-L/NP 2PPs. Store the **respondent-allocated**
-  one, not the "previous election preference flows" one. Its combined
-  "Independents/Other" goes in `ind` with `oth: null`.
+- **Roy Morgan** publishes two ALP-v-L/NP 2PPs. The **respondent-allocated** one is
+  the headline `tpp_alp`/`tpp_lnp`; the one **allocated on 2025-election preference
+  flows** is stored beside it as `tpp_flows` (ALP share only). A release whose prose
+  prints no flows pair simply leaves it off — absent, not zero, like `undecided`.
+  Its combined "Independents/Other" goes in `ind` with `oth: null`.
 - **Newspoll** and **Resolve** often publish no headline 2PP – leave `tpp_*` null
   rather than deriving one.
 - Leadership rows must key to **fieldwork end**, matching their poll. An

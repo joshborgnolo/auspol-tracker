@@ -1562,6 +1562,9 @@ function ArchPollDetail({ p, onBack, backLabel }) {
           </div>
         )}
         {p.undecided != null && <window.UndecidedLine v={p.undecided} chg={p.chg} basis={p.undecidedBasis} />}
+        {/* Roy Morgan's second 2PP – absent, not zero, on waves whose
+            release printed no flows pair */}
+        {p.tppFlows != null && <window.FlowsLine v={p.tppFlows} chg={p.chg} />}
         {p.seats && (
           <div className="pd-block pd-block-wide">
             <div className="pd-k">Seat projection</div>

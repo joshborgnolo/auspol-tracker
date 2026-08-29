@@ -45,6 +45,13 @@ export function validate(D) {
         (ok ? excuse : fail)("2pp-sum", `2PP ${p.tpp_alp} + ${p.tpp_lnp} = ${t.toFixed(1)} (expected ~100)`);
       }
     }
+    // 2b. tpp_flows (Roy Morgan's 2025-election-flows 2PP) is the ALP share
+    //     alone; the L-NP half is its complement and is never stored. A value
+    //     outside 40–65 means a misparse, not an electorate.
+    if (p.tpp_flows != null && !(p.tpp_flows >= 40 && p.tpp_flows <= 65))
+      fail("flows-range", `tpp_flows = ${p.tpp_flows}`);
+    if (p.tpp_flows != null && p.pollster !== "Roy Morgan")
+      fail("flows-pollster", `tpp_flows on a non-Roy Morgan row (${p.pollster})`);
     // 3. dates parse, run oldest→newest, and fieldwork starts before it ends
     const ts = Date.parse(p.date);
     if (isNaN(ts)) fail("bad-date", `unparseable date "${p.date}"`);

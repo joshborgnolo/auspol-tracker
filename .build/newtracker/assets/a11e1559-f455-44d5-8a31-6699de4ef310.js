@@ -1339,6 +1339,30 @@ function UndecidedLine({ v, chg, basis }) {
   );
 }
 
+/* Roy Morgan publishes TWO ALP–L/NP 2PPs per wave: the headline pair is
+   respondent-allocated, and this one applies the preference flows of the
+   2025 election. Only the ALP share travels – the L-NP share is the
+   complement, said in the note rather than with a second figure. */
+function FlowsLine({ v, chg }) {
+  const d = segDelta(chg, "flows");
+  return (
+    <div className="pd-block">
+      <div className="pd-k">2PP · 2025-election flows</div>
+      <div className="pd-und">
+        <span className="pd-und-v">{v}<span className="pct">%</span></span>
+        {/* the same change tag the primary shares carry, so it reads as one
+            more figure from this wave rather than a separate claim */}
+        <ChgTag v={d ? d.v : null} refDate={d ? d.refDate : null} />
+        <span className="pd-und-note">
+          ALP (L/NP {Math.round((100 - v) * 10) / 10}%) – last election’s
+          preference flows applied to these primaries; the 2PP above is
+          respondent-allocated
+        </span>
+      </div>
+    </div>
+  );
+}
+
 // ---- Undecided ("can't say who they would vote for") -----------------
 /* The people the primaries have already set aside. Roy Morgan publishes this
    figure beside its shares - which is WHY a Roy Morgan wave sums to 100 - and
@@ -1944,6 +1968,9 @@ function PollDetail({ r }) {
           </div>
         )}
         {r.undecided != null && <UndecidedLine v={r.undecided} chg={r.chg} basis={r.undecidedBasis} />}
+        {/* Roy Morgan's second 2PP – absent, not zero, on waves whose
+            release printed no flows pair */}
+        {r.tppFlows != null && <FlowsLine v={r.tppFlows} chg={r.chg} />}
         {/* a modelled chamber is not a per-poll measure, so it takes the full
             width – and it belongs HERE as well as in the archive: a projection
             published this week is exactly what someone reading the latest
@@ -2733,7 +2760,7 @@ function PollsterTable() {
   );
 }
 
-Object.assign(window, { UndecidedLine, Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, PollsterTable, NextPollsPanel,
+Object.assign(window, { UndecidedLine, FlowsLine, Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, ApprBlock, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
   // the archive prints publication stamps too, and there is only one way to

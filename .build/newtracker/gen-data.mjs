@@ -788,6 +788,10 @@ const CHG_MEASURES = {
   // of the decided (Resolve). Each is that house's own series, so a delta
   // compares like with like
   und:       (p, a, pm) => (undecidedOf(p) || {}).v ?? null,
+  // Roy Morgan's other published 2PP – the pair allocated on 2025-election
+  // preference flows. Only Morgan rows carry it, so the series is that
+  // house's own and the delta keys to its previous wave automatically
+  flows:     (p, a, pm) => p.tpp_flows ?? null,
   albNet:    (p, a, pm) => (a ? a.alb ?? null : null),
   taylorNet: (p, a, pm) => (a ? a.opp ?? null : null),
   hansonNet: (p, a, pm) => (a ? a.han ?? null : null),
@@ -893,6 +897,9 @@ const individualPolls = POLLS.map((p) => {
        fall back honestly where no release recorded one. */
     ...(p.published ? { published: p.published } : {}),
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
+    // Roy Morgan's election-flows 2PP, ALP share – absent, not zero, on the
+    // waves its release printed no flows pair for (as with undecided)
+    ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
@@ -962,6 +969,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     pubSort: p.published || p.date,
     sample: p.sample ?? null,
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
+    ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],

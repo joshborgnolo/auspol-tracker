@@ -21,7 +21,16 @@
 //   - stated-preference 2PP: the first "ALP x%" … "L-NP y%" pair after the
 //     "vote their preferences" anchor (the ALP-vs-One-Nation pair and the
 //     2025-election preference-flow pair also appear in the text and are NOT
-//     what the tracker series stores).
+//     what the tracker series' tpp_alp/tpp_lnp store).
+//   - election-flows 2PP: releases also print an ALP/L-NP pair "allocated
+//     based on how Australians voted at the 2025 Federal Election" — a
+//     clause can intervene ("…marginally closer … Allocating the preference
+//     flows … shows the ALP on 55% …"), so the window is generous and "the
+//     ALP on x%" phrasing is accepted. Stored as tpp_flows (ALP share only;
+//     L-NP is its complement). Eras that never print the pair have no such
+//     phrase at all and the pair stays null — an anchor WITHOUT a pair is
+//     only a warning, but a parsed pair that fails the plausibility guards
+//     aborts the run.
 //   - fieldwork period "conducted from Month D – Month D, YYYY", sample
 //     "cross-section of N electors", and (when present) the "can't say" share,
 //     which is undecided BESIDE the primaries, not inside them.
@@ -176,6 +185,16 @@ function parseRelease(post) {
     else { tpp_alp = parseFloat(pa[1]); tpp_lnp = parseFloat(pl[1]); }
   }
 
+  let tpp_flows = null, tpp_flows_lnp = null, flowsPairMissing = false;
+  const fi = t.search(/2025 Federal Election/i);
+  if (fi !== -1) {
+    const w = t.slice(fi, fi + 700);
+    const pa = w.match(/ALP\s+(?:on\s+)?([\d.]+)\s*%/i);
+    const pl = pa && w.slice(w.indexOf(pa[0]) + pa[0].length).match(/L-NP(?:\s+Coalition)?\s+(?:on\s+)?([\d.]+)\s*%/i);
+    if (pa && pl) { tpp_flows = parseFloat(pa[1]); tpp_flows_lnp = parseFloat(pl[1]); }
+    else flowsPairMissing = true;
+  }
+
   // CMS post datetime (UTC) → Australia/Melbourne local, "YYYY-MM-DDTHH:MM"
   let published = null;
   const pd = post.date;
@@ -193,7 +212,8 @@ function parseRelease(post) {
 
   return {
     date, dateStart, published, alp, lnp, grn, onp, ind, undecided, lib, nat,
-    tpp_alp, tpp_lnp, sample: sampleM ? +sampleM[1].replace(/,/g, "") : null,
+    tpp_alp, tpp_lnp, tpp_flows, tpp_flows_lnp, flowsPairMissing,
+    sample: sampleM ? +sampleM[1].replace(/,/g, "") : null,
     missing,
   };
 }
@@ -224,13 +244,17 @@ function guardRelease(r, slug, releaseDate) {
     check(`lib+nat=${(r.lib + r.nat).toFixed(1)} ≈ lnp=${r.lnp}`, Math.abs(r.lib + r.nat - r.lnp) <= 0.75);
   if (r.tpp_alp != null && r.tpp_lnp != null)
     check(`2pp Σ=${r.tpp_alp + r.tpp_lnp} ~100`, Math.abs(r.tpp_alp + r.tpp_lnp - 100) <= 1.0);
+  if (r.tpp_flows != null && r.tpp_flows_lnp != null) {
+    check(`flows 2pp Σ=${r.tpp_flows + r.tpp_flows_lnp} ~100`, Math.abs(r.tpp_flows + r.tpp_flows_lnp - 100) <= 1.0);
+    check(`flows alp=${r.tpp_flows} in 40–65`, r.tpp_flows >= 40 && r.tpp_flows <= 65);
+  }
   if (r.undecided != null) check(`undecided=${r.undecided} in 0–25`, r.undecided > 0 && r.undecided <= 25);
   if (r.sample != null) check(`sample=${r.sample} in 500–10000`, r.sample >= 500 && r.sample <= 10000);
   return errs.map((e) => `${slug}: ${e}`);
 }
 
 // -------------------------------------------------------------------- main
-const status = { changed: false, check: CHECK, added: [], skipped_existing: [], feed: FEED_URL };
+const status = { changed: false, check: CHECK, added: [], skipped_existing: [], warnings: [], feed: FEED_URL };
 try {
   const orig = readFileSync(OUT, "utf8");
   const D = JSON.parse(orig);
@@ -252,6 +276,7 @@ try {
       ?.props?.pageProps?.findingData?.postBy;
     if (!post?.content) { guardFails.push(`${c.slug}: no findingData.postBy.content`); continue; }
     const r = parseRelease(post);
+    if (r.flowsPairMissing) status.warnings.push(`${c.slug}: "2025 Federal Election" anchor present but no flows pair parsed`);
     if (r.date && rmDates.has(r.date)) { status.skipped_existing.push(r.date); continue; }
     const rd = post.findings?.releaseDate?.split("/").reverse().join("-"); // "24/08/2026" → 2026-08-24
     guardFails.push(...guardRelease(r, c.slug, rd && /^\d{4}-\d{2}-\d{2}$/.test(rd) ? rd : null));
@@ -266,12 +291,14 @@ try {
       ...(r.undecided != null ? { undecided: r.undecided } : {}),
       alp: r.alp, lnp: r.lnp, grn: r.grn, onp: r.onp, ind: r.ind, oth: null,
       tpp_alp: r.tpp_alp, tpp_lnp: r.tpp_lnp,
+      ...(r.tpp_flows != null ? { tpp_flows: r.tpp_flows } : {}),
       lnpSplit: { Lib: r.lib, Nat: r.nat },
       url: `https://www.roymorgan.com/findings/${c.slug}`,
     });
     sources.push({ slug: c.slug, json: JSON.stringify(post, null, 2) + "\n" });
-    status.added.push({ date: r.date, slug: c.slug, alp: r.alp, lnp: r.lnp, onp: r.onp, tpp: `${r.tpp_alp}/${r.tpp_lnp}` });
+    status.added.push({ date: r.date, slug: c.slug, alp: r.alp, lnp: r.lnp, onp: r.onp, tpp: `${r.tpp_alp}/${r.tpp_lnp}`, flows: r.tpp_flows });
   }
+  for (const w of status.warnings) console.warn("RM_WARN " + w);
   if (guardFails.length) {
     console.error("RM_GUARD " + guardFails.join(" | "));
     status.guard = guardFails;
