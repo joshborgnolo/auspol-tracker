@@ -333,13 +333,12 @@ agg2pp.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: ELECTION.tp
 /* ---- 1b. monthly synthetic 2PP (same estimator, flows.mjs table) ---------
    Same monthly machinery as the published series above, run on the synthetic
    rows and their own house effects. Its election "anchor" is the IMPLIED
-   value – the flow table read back onto the election's own primaries comes
-   back short of the count (54.2 vs 55.2: lumping IND+OTH blurs the split
-   between the independents and the rest, and teal independents' actual flows
-   ran well ahead of any single bucket constant). That shortfall is kept
-   visible on purpose: it is the clearest single demonstration of what a
-   fixed-flow read-through can never carry, and anchoring the series to the
-   count instead would launder the bias it exists to expose. */
+   value – with the TPP table that is the count itself by construction (the
+   table was built from that count: every ballot redistributed ALP v
+   Coalition), so the anchor matching 55.2 proves internal consistency only,
+   not current-term accuracy. The kept-visible shortfall the old TCP-anchor
+   comment described (implied 54.2 vs count 55.2) was a property of the TCP
+   majors-only renormalisation, not of flow tables in general. */
 const agg2ppSynth = MONTHS.map((ym) => {
   const r = monthWithSe(tppRowsSynth, synthEffect, ym);
   if (!r) return null;
