@@ -17,6 +17,13 @@ log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
 
 EXTRACT_OUT="$(node .build/extract-redbridge.mjs 2>&1)"
 CODE=$?
+if [ $CODE -eq 1 ]; then
+  # transient fetch click failures happen; retry the whole run once
+  log "extract failed (exit 1); retrying in 5 min"
+  sleep 300
+  EXTRACT_OUT="$(node .build/extract-redbridge.mjs 2>&1)"
+  CODE=$?
+fi
 LAST_LINE="$(echo "$EXTRACT_OUT" | tail -1)"
 if [ $CODE -ne 0 ]; then
   # exit 1 = fetch/parse, exit 2 = safety guard; either way stop before write-up
