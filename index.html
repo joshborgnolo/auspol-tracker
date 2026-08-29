@@ -3804,7 +3804,15 @@ window.AP = (function () {
     clone.style.width = w + "px";
     clone.style.height = h + "px";
 
+    /* WebKit lays foreignObject XHTML out in the img's device-pixel viewport
+       and ignores a viewBox transform, which parked the whole card compressed
+       in the top-left corner - so the dpr scale rides on a CSS transform
+       inside and the svg keeps a 1:1 device-pixel size with no viewBox */
     const wrap = document.createElement("div");
+    wrap.style.width = w + "px";
+    wrap.style.height = h + "px";
+    wrap.style.transform = "scale(" + dpr + ")";
+    wrap.style.transformOrigin = "0 0";
     const fonts = document.createElement("style");
     fonts.textContent = collectFontCss();
     wrap.appendChild(fonts);
@@ -3812,8 +3820,7 @@ window.AP = (function () {
     const xhtml = new XMLSerializer().serializeToString(wrap);
 
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + W + '" height="' + H +
-      '" viewBox="0 0 ' + w + " " + h + '">' +
-      '<foreignObject width="100%" height="100%">' + xhtml + "</foreignObject></svg>";
+      '"><foreignObject width="100%" height="100%">' + xhtml + "</foreignObject></svg>";
 
     const img = new Image();
     img.onload = () => {
