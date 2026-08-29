@@ -18,7 +18,9 @@
 	<array>
 		<!-- Roy Morgan weekly federal-voting releases land Monday late afternoon
 		     AEST (published timestamps 16:17-16:30, CMS lag to ~17:45); check
-		     at 17:00 and 18:00, again late evening, then next-day and daily sweeps -->
+		     at 16:35, 17:00 and 18:00, again late evening, then next-day
+		     and daily sweeps -->
+		<dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>16</integer><key>Minute</key><integer>35</integer></dict>
 		<dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>17</integer></dict>
 		<dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>18</integer></dict>
 		<dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>22</integer><key>Minute</key><integer>30</integer></dict>
