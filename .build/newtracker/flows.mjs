@@ -10,9 +10,10 @@
 
    Which cut: the AEC publishes one election's flows three ways. These are
    the TCP download's majors-only renormalisation — the TCP WEB table
-   (HouseStateTcpFlow-31496-NAT.htm) shows 79.93/18.43 because its rows sum
+   (HouseStateTcpFlow-31496-NAT.htm) shows 79.93/25.39 because its rows sum
    across all final-two destinations (incl. IND/GRN/ON/KAP/CA), and the TPP
-   download (~88.2/~25) redistributes every ballot ALP v Coalition. The
+   download (88.19/25.50 — the cut Roy Morgan's "2025 election" 2PP tracks)
+   redistributes every ballot ALP v Coalition. The
    three-cuts explanation lives in the project skill
    auto-skill-aec-preference-flow-constants; re-derive from the SAME cut so
    constants stay comparable across refreshes. */

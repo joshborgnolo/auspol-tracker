@@ -98,16 +98,23 @@ questions. For 2025 (Event 31496):
 
 | cut | source | GRN→ALP | ON→ALP | what it measures |
 |---|---|---|---|---|
-| TCP web table | `HouseStateTcpFlow-31496-NAT.htm` | 79.93% | 18.43% | shares across ALL final-two destinations — ALP, Coalition AND GRN/IND/ON/KAP/CA columns |
+| TCP web table | `HouseStateTcpFlow-31496-NAT.htm` | 79.93% | 25.39% | shares across ALL final-two destinations — ALP, Coalition AND GRN/IND/ON/KAP/CA columns |
 | TCP download, majors-only renorm (SHIPPED) | `HouseTcpFlowByPartyDownload-31496.txt` via `aec-flows.py` | 86.83% | 27.10% | destinations collapsed to the two majors, then renormalised |
-| TPP download | `HouseTppFlowByStateByPartyDownload-31496.txt` | ~88.2% | ~25% | every ballot redistributed ALP v Coalition in all 150 seats — the cut media quote |
+| TPP download | `HouseTppFlowByStateByPartyDownload-31496.txt` | 88.19% (1,666,851 v 223,126) | 25.50% (252,917 v 738,897) | every ballot redistributed ALP v Coalition in all 150 seats — the cut Roy Morgan and the media quote |
 
 The shipped numbers reconcile EXACTLY with the web table, not contradict
 it: 86.83 = 79.93 / (79.93 + ~12.1 coalition share) and likewise
-27.10 = 18.43 / (18.43 + ~49.6). The web-table percentages look lower
+27.10 = 25.39 / (25.39 + 68.31). The web-table percentages look lower
 because their denominators include flows to non-major finals — ~8% of
-flowed GRN votes and ~32% of flowed ON votes in 2025 landed on
-independent/KAP/CA final candidates.
+flowed GRN votes and ~6% of flowed ON votes in 2025 landed on non-major
+final candidates (ON's non-major share: IND 4.1%, GRN 1.1%, KAP 0.6%,
+CA 0.6%).
+
+Correction (2026-08-29): an earlier draft of this section quoted the ON
+web-table figure as 18.43%. Fetching and parsing the live NAT page shows
+25.39% (244,177 of 961,785 flowed ON votes); 79.93% for GRN is
+confirmed. 18.43 reproduces nowhere in Event 31496's national TCP or TPP
+products — treat it as a misreading, not a fourth cut.
 
 The shipped cut sits below the TPP cut (86.83 vs ~88.2 on GRN) for two
 structural reasons: seats where the from-party was never excluded
@@ -115,8 +122,11 @@ contribute no TCP flow rows (GRN in Melbourne 2025), and flows landing on
 IND/minor finals drop out of the majors-only denominator, implicitly
 treated as neutral between the majors.
 
-Quick recognition: **~80/18 = TCP page · 86.8/27.1 = this codebase ·
-~88/25 = TPP file.**
+Quick recognition: **~80/25 = TCP page · 86.8/27.1 = this codebase ·
+88.2/25.5 = TPP file.** ON barely separates TCP-page from TPP file
+(25.39 v 25.50 — only ~6% of ON flows leave the majors); the cuts are
+discriminated by GRN (79.9 / 86.8 / 88.2) and by the lumped IND+OTH
+bucket (43.7 / 48.5 / 54.6 across the same three cuts).
 
 Refresh rule: always re-derive from the SAME cut (TCP download,
 majors-only) so constants stay comparable across elections. The TPP file
@@ -125,6 +135,37 @@ it is a deliberate change that must go through the `flow-validate.mjs`
 competition in the refresh procedure above — never a straight swap. A
 cross-project write-up of the three cuts also lives in the user-level
 skill `aec-flow-cuts`.
+
+### Which cut does Roy Morgan use? — the TPP cut
+
+Roy Morgan publishes a respondent-allocated 2PP (the table figure that
+feeds `tpp_alp` in polls.json) plus a second series in release prose:
+"preferences ... allocated based on how Australians voted at the 2025
+Federal Election". Verified 2026-08-29 by scraping the 42 release pages
+linked from polls.json (38 waves, Jun 2025 – Aug 2026, carried the flow
+sentence; each wave matched its release date, the 3-wave late-Jan page
+assigned to its nearest wave):
+
+| constant set | MAE vs RM's flow-2PP |
+|---|---|
+| TCP web table (0.7993 / 0.2539 / 0.4373) | 2.79 — impossible (all 38 waves off by >1) |
+| shipped renorm (0.8683 / 0.2710 / 0.4849) | 0.94 — systematically low |
+| TPP file, exact (0.8819 / 0.2550 / 0.5455) | **0.43** — best |
+
+A free least-squares fit of (flow-2PP − ALP primary) onto (GRN, ON,
+IND+OTH) lands on ≈ (0.88, 0.24, 0.51) with a +1.3 intercept — RM sits
+on the TPP cut plus a small level offset, consistent with allocating
+within-state (and off decided voters only, ~6.5% undecided set aside)
+rather than applying one national triple. One wave deviates −2.15
+(2025-12-14, a month-aggregated release); no action.
+
+Consequences: RM's flow-2PP is NOT reproducible from national constants
+alone and has no polls.json column — `tpp_alp` stays respondent-
+allocated. And the raw web-page numbers would under-cook any
+election-flow 2PP by ~3pts, a useful armchair check whenever a house
+claims "election-flow" allocation. The tracker keeps its OWN constants
+on the TCP-download cut — comparability across elections beats matching
+one house's exact cut (see refresh rule).
 
 ## Validation findings (121 current-term polls, 7 houses, n≥5; mean |house bias|)
 
