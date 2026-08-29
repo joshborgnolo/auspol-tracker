@@ -7,7 +7,7 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/resolve-rpm-updater.sh</string>
+		<string>/Users/joshuaborgnolo/Library/Application Support/auspol-agents/resolve-rpm.sh</string>
 	</array>
 	<key>EnvironmentVariables</key>
 	<dict>

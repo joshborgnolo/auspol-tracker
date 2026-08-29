@@ -7,7 +7,7 @@
         <key>ProgramArguments</key>
         <array>
                 <string>/bin/bash</string>
-                <string>/Users/joshuaborgnolo/Documents/4. auspol/.build/redbridge-updater.sh</string>
+                <string>/Users/joshuaborgnolo/Library/Application Support/auspol-agents/redbridge.sh</string>
         </array>
         <key>EnvironmentVariables</key>
         <dict>

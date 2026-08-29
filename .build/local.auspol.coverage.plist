@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>local.auspol.coverage</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>/Users/joshuaborgnolo/Library/Application Support/auspol-agents/coverage.sh</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>StartCalendarInterval</key>
+	<array>
+		<!-- Twice a day, deliberately offset from every extractor slot. This is
+		     the job that notices when the others have stopped working, so it
+		     must not run alongside them: 08:30 is after the 06:00 sweeps have
+		     had their turn, and 20:30 is after the Sunday/Monday evening
+		     release windows (Resolve, Newspoll, Roy Morgan) have closed. A
+		     missing wave therefore surfaces within about twelve hours. -->
+		<dict><key>Hour</key><integer>8</integer><key>Minute</key><integer>30</integer></dict>
+		<dict><key>Hour</key><integer>20</integer><key>Minute</key><integer>30</integer></dict>
+	</array>
+	<key>StandardOutPath</key>
+	<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-coverage-stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-coverage-stderr.log</string>
+</dict>
+</plist>

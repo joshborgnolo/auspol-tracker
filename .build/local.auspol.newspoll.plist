@@ -7,7 +7,7 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/newspoll-updater.sh</string>
+		<string>/Users/joshuaborgnolo/Library/Application Support/auspol-agents/newspoll.sh</string>
 	</array>
 	<key>EnvironmentVariables</key>
 	<dict>

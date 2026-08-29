@@ -7,7 +7,7 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/bash</string>
-		<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/news24-updater.sh</string>
+		<string>/Users/joshuaborgnolo/Library/Application Support/auspol-agents/news24.sh</string>
 	</array>
 	<key>EnvironmentVariables</key>
 	<dict>
