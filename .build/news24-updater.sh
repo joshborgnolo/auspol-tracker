@@ -6,12 +6,23 @@
 # .build/logs/news24.log; any failure exits non-zero before any commit,
 # leaving the working tree for manual review.
 #
-# The extractor's NEWSIE_CHROME=1 News24-session enrichment (drives the
-# user's logged-in Chrome via AppleScript to read news24.com.au articles) is
-# intentionally NOT enabled here: it needs Chrome running/logged in, the
-# "Allow JavaScript from Apple Events" toggle, and a one-time macOS
-# Automation consent prompt — interactive rescue only. After a News24 wave
-# appears, run `NEWSIE_CHROME=1 node .build/extract-news24.mjs` manually.
+# NEWSIE_CHROME=1 IS enabled here, deliberately. It was held back on the
+# assumption that driving the user's Chrome needed an interactive Automation
+# consent prompt no scheduled job could answer. Probed from a launchd job on
+# 2026-08-30: chrome-article.mjs returned the full 999KB article, exit 0, no
+# stderr — the consent is already granted and persists, so that was wrong.
+#
+# It matters because Wikipedia alone yields a VI row and nothing else. News24
+# carries the leadership numbers, and its Infogram embeds hold them as data
+# rather than prose. With Chrome the 2026-08-24 wave reproduces the
+# hand-entered rows exactly — polls 15/15 fields, ppm 7/7, approval 7/7 —
+# against 14/15 and no leadership rows at all without it.
+#
+# Safe when Chrome is closed or logged out: the extractor degrades to the
+# Wikipedia-only path rather than failing, and because that path leaves
+# `published` empty, a later run with Chrome available UPGRADES the row it
+# already wrote instead of skipping it. A wave captured during an outage
+# therefore fills itself in on a subsequent run.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -22,7 +33,7 @@ LOG="$LOG_DIR/news24.log"
 mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
 
-EXTRACT_OUT="$(node .build/extract-news24.mjs 2>&1)"
+EXTRACT_OUT="$(NEWSIE_CHROME=1 node .build/extract-news24.mjs 2>&1)"
 CODE=$?
 LAST_LINE="$(echo "$EXTRACT_OUT" | tail -1)"
 if [ $CODE -ne 0 ]; then

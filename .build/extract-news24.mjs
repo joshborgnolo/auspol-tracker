@@ -656,7 +656,18 @@ function parseWikiYouGov(text) {
   }
   const seen = new Set(), waves = [];
   for (const w of out) if (!seen.has(w.date)) { seen.add(w.date); waves.push(w); }
-  return { waves, unparsed };
+  // The page repeats each house across subpopulation tables (by gender, age,
+  // generation, language) that carry no sample column, so a wave read
+  // perfectly from the voting-intention table also lands here as "no sample
+  // cell" from half a dozen others. Reporting those as failures buries a real
+  // one: every recent wave sat in `unparsed` while every recent wave had in
+  // fact been parsed correctly. Keep only dates we genuinely never got.
+  const got = new Set(waves.map((w) => w.date));
+  const realFails = unparsed.filter((u) => {
+    const d = /^(\d{4}-\d{2}-\d{2}):/.exec(u);
+    return !d || !got.has(d[1]);
+  });
+  return { waves, unparsed: realFails };
 }
 
 // --------------------------------------------------------------- entry
