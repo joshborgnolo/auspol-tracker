@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>local.auspol.essential</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/essential-updater.sh</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>StartCalendarInterval</key>
+	<array>
+		<!-- Essential releases cluster around month end (2026: Apr 26-29, May 1,
+		     May 26-27, Jun 1, Jun 30, Jul 27-28): weekly Monday sweep, then a
+		     daily sweep across the month-boundary window. Each run is a full
+		     polite crawl (~13 min), so intervals stay sparse. -->
+		<dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>5</integer></dict>
+		<dict><key>Day</key><integer>26</integer><key>Hour</key><integer>5</integer></dict>
+		<dict><key>Day</key><integer>27</integer><key>Hour</key><integer>5</integer></dict>
+		<dict><key>Day</key><integer>28</integer><key>Hour</key><integer>5</integer></dict>
+		<dict><key>Day</key><integer>29</integer><key>Hour</key><integer>5</integer></dict>
+		<dict><key>Day</key><integer>30</integer><key>Hour</key><integer>5</integer></dict>
+		<dict><key>Day</key><integer>1</integer><key>Hour</key><integer>5</integer></dict>
+		<dict><key>Day</key><integer>2</integer><key>Hour</key><integer>5</integer></dict>
+	</array>
+	<key>StandardOutPath</key>
+	<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-essential-stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-essential-stderr.log</string>
+</dict>
+</plist>
