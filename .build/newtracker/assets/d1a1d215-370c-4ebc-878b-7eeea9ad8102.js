@@ -1099,6 +1099,14 @@ function AccuracyPanel() {
   );
 }
 
+/* Hover-to-highlight needs a mouse. On a touch-only device the lede must
+   not promise it – the chips there toggle, they do not hover. Checked as a
+   media query (the primary input), not a touchscreen sniff, so a phone with
+   a paired pointer gets the mouse wording it can actually use. */
+const CANT_HOVER = typeof window !== "undefined" && window.matchMedia
+  ? window.matchMedia("(hover: none)").matches
+  : false;
+
 function PastCyclesView() {
   const { D } = window.AP;
   const cycles = D.cycles;
@@ -1169,7 +1177,9 @@ function PastCyclesView() {
           trajectory can be read off a shared clock. The current Albanese government is drawn
           <strong> bold</strong>; past governments sit behind, tinted by the party in power –
           red for Labor terms, blue for Coalition – with the year marked where each line ends.
-          Hover over a cycle below to bring it forward, and select just one to see more details.
+          {CANT_HOVER
+            ? "Tap a cycle below to take its line out and bring it in again, and leave just one in to see more details."
+            : "Hover over a cycle below to bring it forward, and select just one to see more details."}
         </p>
         <div className="cyc-controls">
           <TextToggle value={mode} onChange={setMode} ariaLabel="Measure"

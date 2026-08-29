@@ -10614,6 +10614,12 @@ function AccuracyPanel() {
     className: "table-hint"
   }, "Average miss ignoring direction. Houses are not merged across renames of different operations, so a firm only appears against the elections it actually published a final poll for.")));
 }
+
+/* Hover-to-highlight needs a mouse. On a touch-only device the lede must
+   not promise it – the chips there toggle, they do not hover. Checked as a
+   media query (the primary input), not a touchscreen sniff, so a phone with
+   a paired pointer gets the mouse wording it can actually use. */
+const CANT_HOVER = typeof window !== "undefined" && window.matchMedia ? window.matchMedia("(hover: none)").matches : false;
 function PastCyclesView() {
   const {
     D
@@ -10681,7 +10687,7 @@ function PastCyclesView() {
     className: "view-intro"
   }, /*#__PURE__*/React.createElement("p", {
     className: "view-lede"
-  }, "Every federal term since 2010, aligned to its election day so that each government\u2019s trajectory can be read off a shared clock. The current Albanese government is drawn", /*#__PURE__*/React.createElement("strong", null, " bold"), "; past governments sit behind, tinted by the party in power \u2013 red for Labor terms, blue for Coalition \u2013 with the year marked where each line ends. Hover over a cycle below to bring it forward, and select just one to see more details."), /*#__PURE__*/React.createElement("div", {
+  }, "Every federal term since 2010, aligned to its election day so that each government\u2019s trajectory can be read off a shared clock. The current Albanese government is drawn", /*#__PURE__*/React.createElement("strong", null, " bold"), "; past governments sit behind, tinted by the party in power \u2013 red for Labor terms, blue for Coalition \u2013 with the year marked where each line ends.", CANT_HOVER ? "Tap a cycle below to take its line out and bring it in again, and leave just one in to see more details." : "Hover over a cycle below to bring it forward, and select just one to see more details."), /*#__PURE__*/React.createElement("div", {
     className: "cyc-controls"
   }, /*#__PURE__*/React.createElement(TextToggle, {
     value: mode,
