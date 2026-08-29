@@ -5153,6 +5153,7 @@ function TrendChart(props) {
       return {
         text: s.endLabel,
         x: sx(last.x) + 7 / scale,
+        ideal: sy(last.y),
         y: sy(last.y),
         color: s.color,
         op: s.endLabelOpacity != null ? s.endLabelOpacity : 1
@@ -5183,6 +5184,35 @@ function TrendChart(props) {
        few cycles, which is how this chart is read on a phone anyway,
        brings them straight back. */
     if ((labs.length - 1) * gap > (H - pad.t - pad.b) * 0.55) return null;
+    /* Labels only visually collide – and so only need spacing – where
+       their text boxes x-overlap. Chain every x-overlapping pair whose
+       ideal rows sit within a line-height of each other into a
+       collision domain, and run the dodge per domain: a label is never
+       moved for a neighbour its text can't actually touch. The y-only
+       version of this swept the whole opposition-primary stack into
+       one cluster – those cycles end in different month columns at
+       near-identical values, so years that never visually met were
+       pushed a line height or more off their own line ends. */
+    const adv = ch => ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : ch === "’" ? 0.25 : 0.72;
+    for (const l of labs) l.w = [...l.text].reduce((t, ch) => t + adv(ch), 0) * refUnits * 0.95;
+    const xOverlap = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w;
+    const comp = labs.map(() => -1);
+    let nComp = 0;
+    for (let i = 0; i < labs.length; i++) {
+      if (comp[i] >= 0) continue;
+      const stack = [i];
+      comp[i] = nComp;
+      while (stack.length) {
+        const a = stack.pop();
+        for (let j = 0; j < labs.length; j++) if (comp[j] < 0 && xOverlap(labs[a], labs[j]) && Math.abs(labs[a].ideal - labs[j].ideal) < gap) {
+          comp[j] = nComp;
+          stack.push(j);
+        }
+      }
+      nComp++;
+    }
+    const groups = [];
+    for (let c = 0; c < nComp; c++) groups.push(labs.filter((_, j) => comp[j] === c).sort((a, b) => a.y - b.y));
     /* The dodge places CLUSTERS about their own centre rather than
        cascading: the old pass pushed only the lower label of a
        colliding pair down, so a close finish pinned the top year and
@@ -5192,9 +5222,9 @@ function TrendChart(props) {
        each other are re-spaced evenly about their shared mean, so the
        group straddles where the lines actually ended, and a label with
        daylight of its own keeps its spot exactly. */
-    const dodge = () => {
+    const dodge = g => {
       const clusters = [];
-      for (const l of labs) {
+      for (const l of g) {
         const top = clusters[clusters.length - 1];
         if (top && l.y - top[top.length - 1].y < gap) top.push(l);else clusters.push([l]);
       }
@@ -5205,33 +5235,60 @@ function TrendChart(props) {
         });
       }
     };
-    dodge();
+    /* Bring a spilled group back inside the plot as ONE piece – the
+       fit check above guarantees room, so serving the floor never
+       pushes anything off the top. The opposite-edge bound keeps a
+       group taller than the plot spread inside the frame instead of
+       stacking every label on one edge. */
+    const yLo = pad.t + gap * 0.4,
+      yHi = H - pad.b - gap * 0.4;
+    const clampGroup = g => {
+      const under = yLo - g[0].y;
+      if (under > 0) for (const l of g) l.y = Math.min(l.y + under, yHi);
+      const over = g[g.length - 1].y - yHi;
+      if (over > 0) for (const l of g) l.y = Math.max(l.y - over, yLo);
+    };
     /* Centring keeps a cluster's mean but can squeeze it back inside a
        neighbour's gap; refolding there merges the two into one centred
        group. Clusters only ever merge, so this settles in a handful of
        folds, and the mean it settles on is the mean of the line ends
        themselves. */
-    for (let fold = 0; fold < 10; fold++) {
-      let collided = false;
-      for (let i = 1; i < labs.length; i++) {
-        if (labs[i].y - labs[i - 1].y < gap - 0.01) {
-          collided = true;
-          break;
+    const settle = () => {
+      for (const g of groups) {
+        g.sort((a, b) => a.y - b.y);
+        dodge(g);
+        for (let fold = 0; fold < 10; fold++) {
+          let collided = false;
+          for (let i = 1; i < g.length; i++) if (g[i].y - g[i - 1].y < gap - 0.01 && xOverlap(g[i], g[i - 1])) {
+            collided = true;
+            break;
+          }
+          if (!collided) break;
+          dodge(g);
+        }
+        clampGroup(g);
+      }
+    };
+    settle();
+    /* Frame-edge clamps can push an independent group onto its
+       x-overlapping neighbour (phone-width year columns sit closer
+       than a label is wide). When that happens, weld the two groups
+       and re-settle them as one, to a fixed point. */
+    for (let pass = 0; pass < labs.length; pass++) {
+      let merged = false;
+      outer: for (let i = 0; i < groups.length; i++) for (let j = i + 1; j < groups.length; j++) {
+        const hit = groups[i].some(a => groups[j].some(b => xOverlap(a, b) && Math.abs(a.y - b.y) < gap - 0.01));
+        if (hit) {
+          groups[j].push(...groups[i]);
+          groups.splice(i, 1);
+          merged = true;
+          break outer;
         }
       }
-      if (!collided) break;
-      dodge();
+      if (!merged) break;
+      settle();
     }
-    /* Bring a spilled stack back inside the plot as ONE piece – the
-       fit check above guarantees room, so serving the floor never
-       pushes anything off the top. */
-    const yLo = pad.t + gap * 0.4,
-      yHi = H - pad.b - gap * 0.4;
-    const under = yLo - labs[0].y;
-    if (under > 0) for (const l of labs) l.y += under;
-    const over = labs[labs.length - 1].y - yHi;
-    if (over > 0) for (const l of labs) l.y -= over;
-    return labs.map((l, i) => /*#__PURE__*/React.createElement("text", {
+    return groups.flat().map((l, i) => /*#__PURE__*/React.createElement("text", {
       key: "el" + i,
       x: l.x,
       y: l.y,
