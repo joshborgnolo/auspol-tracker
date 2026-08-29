@@ -27,7 +27,7 @@
     "Essential": {
       "tppIncludesUndecided": true,
       "note": "Essential's published 2PP is undecided-inclusive, so the pair sums to <100 rather than 100. The build reads that shortfall as the poll's undecided share after preferences, so it is a fact with a consumer now, not just an exemption.",
-      "site": "https://essentialreport.com.au"
+      "site": "https://essentialreport.com.au/#latest-reports"
     },
     "Roy Morgan": {
       "release": {
