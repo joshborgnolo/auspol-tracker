@@ -408,9 +408,13 @@ const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, Coalition ${cl.l
   + `two-party preferred, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
   + `with the trend since the 2025 election`;
 
+/* og:site_name must NOT equal the masthead h1 text: Safari Reader skips any
+   title candidate whose text equals og:site_name when og:title exists (its
+   site-name de-dup), so "auspol tracker" here disqualified the h1 and let
+   "Two-party preferred" win. The domain keeps the two distinct. */
 html = html.replace('<meta property="og:type" content="website">',
   `<meta property="og:type" content="website">
-  <meta property="og:site_name" content="auspol tracker">
+  <meta property="og:site_name" content="auspoltracker.com">
   <meta property="og:locale" content="en_AU">
   <meta property="og:url" content="${SITE_URL}">
   <meta property="og:image" content="${cardUrl}">
