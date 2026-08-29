@@ -406,12 +406,15 @@ body {
 .ss-sub { margin: 0 0 4px; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
 .ss-lead { font-size: 22px; margin: 0 0 8px; font-variant-numeric: tabular-nums; }
 .static-summary p { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
-.ss-primary { margin: 0; padding: 0; list-style: none; font-size: 15px; }
-.ss-primary li {
-  display: flex; justify-content: space-between; max-width: 320px;
+/* a table, not a flex list: reader engines keep a table's two columns but
+   throw flexbox away, which would leave one space between party and share. */
+.ss-primary { border-collapse: collapse; width: 100%; max-width: 320px; font-size: 15px; }
+.ss-primary th, .ss-primary td {
   padding: 5px 0; border-bottom: 1px solid var(--line-2);
   font-variant-numeric: tabular-nums;
 }
+.ss-primary th { text-align: left; font-weight: 600; }
+.ss-primary td { text-align: right; }
 .ss-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 /* the table's label is a paragraph, not a <caption>: reader engines render a
    caption inside their own table chrome with an odd indent, while a plain

@@ -299,9 +299,11 @@ function buildStaticSummary() {
           <td>${r.lnp2pp != null ? r.lnp2pp.toFixed(1) + "%" : "&#8211;"}</td>
         </tr>`).join("");
 
+  /* A table, not a flex list: reader engines honour table columns but drop
+     flexbox, which left one space between the party and its share. */
   const primary = ["alp", "lnp", "grn", "onp", "oth"]
     .filter((k) => prim[k] != null)
-    .map((k) => `<li><b>${PARTY[k]}</b> ${prim[k].toFixed(1)}%</li>`).join("\n        ");
+    .map((k) => `<tr><th scope="row">${PARTY[k]}</th><td>${prim[k].toFixed(1)}%</td></tr>`).join("\n          ");
 
   /* Same pollster list as MethodNote: straight from the archive, busiest
      first. It is part of the sourcing, not a footer to drop. */
@@ -323,9 +325,11 @@ function buildStaticSummary() {
         &#177;${L.alp2ppCi95.toFixed(1)} points from ${L.method.nPolls} polls.</p>
 
       <h2>Primary vote</h2>
-      <ul class="ss-primary">
-        ${primary}
-      </ul>
+      <table class="ss-primary">
+        <tbody>
+          ${primary}
+        </tbody>
+      </table>
 
       <h2>Latest polls</h2>
       <p class="ss-cap" id="ss-polls-cap">Most recent published national polls</p>
