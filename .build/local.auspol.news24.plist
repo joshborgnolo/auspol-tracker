@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>local.auspol.news24</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/news24-updater.sh</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>StartCalendarInterval</key>
+	<array>
+		<!-- YouGov publishes the fortnightly News24 "Public Data" poll around
+		     05:00 AEST on Wednesday (canon published values cluster at Wed
+		     05:00); sweep on Wednesday after release, again at midday and
+		     evening, then Thursday and Saturday morning catch-ups. Off-week
+		     runs are cheap no-ops (extractor prints changed:false) -->
+		<dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>6</integer></dict>
+		<dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>12</integer></dict>
+		<dict><key>Weekday</key><integer>3</integer><key>Hour</key><integer>19</integer></dict>
+		<dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>6</integer></dict>
+		<dict><key>Weekday</key><integer>6</integer><key>Hour</key><integer>6</integer></dict>
+	</array>
+	<key>StandardOutPath</key>
+	<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-news24-stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-news24-stderr.log</string>
+</dict>
+</plist>
