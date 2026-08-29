@@ -1054,7 +1054,7 @@ function MethodNote() {
              election. The two-party and primary-vote aggregates are weighted means: recent and
              larger polls count for more, and each pollster’s figure is adjusted for its own
              lean against the consensus of all houses. Where one house publishes more than once
-             inside the window – Morgan polls weekly – its repeat waves count for sqrt(m), not m
+             inside the window – Morgan polls weekly – its repeat waves count for √m, not m
              independent readings: a busy house still outweighs a quiet one, but it can’t flood
              the average. The lean is measured separately for
              every measure – a firm that leans one way on the classic two-party is not assumed
