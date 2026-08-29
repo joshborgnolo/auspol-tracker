@@ -79,6 +79,7 @@
           "lnpSplit": { "type": "object", "properties": { "Lib": { "type": "number" }, "Nat": { "type": "number" } } },
           "url": { "type": "string", "description": "The published release this row was taken from. Link the article, not a paywall wrapper." },
           "isElection": { "type": "boolean" },
+          "assimilated": { "type": "boolean", "description": "Row was added by an updater's assimilator from the house's own published dataset (see .build/assimilate-*.mjs), not hand-curated from a release. Such rows carry sample:null and no url — the feeds don't publish either — and are exempt from the sample-size check. Any later hand-edit that fills in the missing metadata should drop the flag with them." },
           "sumNote": { "type": "string", "description": "Documents a deliberate reason this row's shares do not sum to ~100. Presence exempts the row from the sum checks, so only use it for an adjudicated case." }
         }
       }

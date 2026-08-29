@@ -60,8 +60,10 @@ export function validate(D) {
     const key = p.date + "|" + p.pollster;
     if (seen.has(key)) fail("duplicate", "same date + pollster already present");
     seen.add(key);
-    // 5. real polls carry a sample size
-    if (!p.isElection && !(p.sample > 0)) fail("sample", `sample = ${p.sample}`);
+    // 5. real polls carry a sample size. Rows the updaters assimilate from a
+    //    house's published dataset legitimately have none (the feed doesn't
+    //    carry one) and declare themselves via `assimilated` instead.
+    if (!p.isElection && !p.assimilated && !(p.sample > 0)) fail("sample", `sample = ${p.sample}`);
   });
 
   // 6. direction rows are a proportion split

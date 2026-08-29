@@ -32,7 +32,11 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   exit 0
 fi
 
-log "changed rows detected; running validate/build/commit/push"
+log "changed rows detected; assimilating new VI waves into polls.json"
+if ! node .build/assimilate-essential-vi.mjs --apply >> "$LOG" 2>&1; then
+  log "FAIL assimilate (errors above); no commit made"
+  exit 1
+fi
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
@@ -42,7 +46,7 @@ if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
   exit 1
 fi
 
-git add data/essential-report.csv index.html feed.xml sitemap.xml robots.txt || { log "FAIL git add"; exit 1; }
+git add data/essential-report.csv data/polls.json .build/essential-src/ index.html feed.xml sitemap.xml robots.txt || { log "FAIL git add"; exit 1; }
 MSG="Update Essential Report data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
