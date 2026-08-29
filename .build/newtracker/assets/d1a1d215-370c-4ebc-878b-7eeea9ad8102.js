@@ -142,10 +142,10 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
 // y-windows are fitted to the real data per metric+mode (see cycDomain) –
 // fixed windows clip real history (e.g. net approval spans −44…+41)
 const CYC_METRICS = [
-  { key: "net", title: "Leader net approval", sub: "Sitting prime minister · approve minus disapprove",
+  { key: "net", title: "Leader net approval", sub: "Sitting prime minister · Approve minus disapprove",
     unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
     step: 20, refAbs: 0, refAbsLabel: "even" },
-  { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader · approve minus disapprove",
+  { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader · Approve minus disapprove",
     leader: "opp", unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
     step: 10, refAbs: 0, refAbsLabel: "even", han: true },
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
@@ -613,7 +613,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, shapes 
          month nobody polled, which is the whole thing being marked. Only the
          unpolled month itself is annotated - the readings either side of it are
          real, and the dedupe hands each boundary month to its solid run first. */
-      if (flags) pts.forEach((p) => { if (!observed(p.x)) p.note = "no poll · interpolated"; });
+      if (flags) pts.forEach((p) => { if (!observed(p.x)) p.note = "no poll · Interpolated"; });
       const runs = obsRuns(pts, observed);
       const termEnd = si === seriesIn.length - 1;
       return runs.map((run, i) => ({
@@ -974,7 +974,7 @@ function AccuracyPanel() {
           <h2 className="card-title">How the final polls did</h2>
           <p className="card-sub">
             Each house’s last two-party figure in the {A.windowDays} days before polling day,
-            against the result · one row per election
+            against the result · One row per election
           </p>
         </div>
         <div className="dir-net">
@@ -1344,7 +1344,7 @@ function archLeadInfo(p, measure) {
            color: m >= 0 ? "var(--alp)" : "var(--lnp)",
            segs: [{ v: alp, color: "var(--alp)" }, { v: lnpV, color: "var(--lnp)" }],
            note: " on the two-party ALP v L/NP measure" +
-                 (p.tppKind === "3cp" ? " · derived from the published 3-cornered figures" : "") };
+                 (p.tppKind === "3cp" ? " · Derived from the published 3-cornered figures" : "") };
 }
 
 // the table's after-preferences cell, in the shape the direction and approval
@@ -1446,7 +1446,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
           <ShareBar segs={primarySegs(p)} />
         </div>
         <div className="pd-block">
-          <div className="pd-k">Preferred PM{contests.length > 1 ? " · " + contests.length + " matchups" : contests.length === 1 && ppmKind(contests[0]) === "three-way" ? " · three-way" : ""}</div>
+          <div className="pd-k">Preferred PM{contests.length > 1 ? " · " + contests.length + " matchups" : contests.length === 1 && ppmKind(contests[0]) === "three-way" ? " · Three-way" : ""}</div>
           {contests.length === 0
             ? <div className="pd-absent">No preferred-PM question this wave</div>
             : <div className="pd-contests">
@@ -1681,7 +1681,7 @@ function VariancePanel({ facet, rangeId }) {
               <button key={m.id} type="button"
                       className={"legend-chip" + (hidden[m.id] ? " off" : "")}
                       aria-pressed={!hidden[m.id]}
-                      title={m.label + " — " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label}
+                      title={m.label + " — " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label.replace(/^./, (ch) => ch.toUpperCase())}
                       onClick={() => setHidden((h) => ({ ...h, [m.id]: !h[m.id] }))}>
                 <span className="legend-swatch" style={{ background: m.color }}></span>
                 <span className="legend-name">{m.label}</span>
@@ -1728,8 +1728,8 @@ function VariancePanel({ facet, rangeId }) {
         Spread is the recency-weighted standard deviation of each poll’s distance from a local trend,
         in {unitNote} — recency-weighted only, because weighting by sample size would mute exactly the
         small divergent polls being measured. The floor is what a design effect of {window.AP.DISC.DEFF} and
-        each poll’s own sample size predict. Their ratio reads: under 0.80× herded · around 1× as close as
-        sampling allows · over 1.20× genuinely apart.
+        each poll’s own sample size predict. Their ratio reads: under 0.80× herded · Around 1× as close as
+        sampling allows · Over 1.20× genuinely apart.
         {facet === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."}
       </p>
     </section>
@@ -2370,11 +2370,11 @@ function AllPollsView({ focus, onBack, backLabel }) {
         </table>
       </div>
       <p className="table-hint">
-        Tap any poll for its full breakdown · dates are fieldwork windows (publication dates sit in the
-        breakdown) · “as published” lists each poll’s headline figures exactly as the pollster released them ·
-        the lead bar shows the selected matchup where a pollster published it · “poll lean” is the poll minus
-        the aggregate for that month · “—” means the pollster didn’t publish that measure · search matches
-        anything in a row · click any column heading to sort.{" "}
+        Tap any poll for its full breakdown · Dates are fieldwork windows (publication dates sit in the
+        breakdown) · “As published” lists each poll’s headline figures exactly as the pollster released them ·
+        The lead bar shows the selected matchup where a pollster published it · “Poll lean” is the poll minus
+        the aggregate for that month · “—” Means the pollster didn’t publish that measure · Search matches
+        anything in a row · Click any column heading to sort.{" "}
         <strong>House effect</strong> is how far a pollster systematically sits from the cross-house consensus
         on 2PP — its own average lean across every poll it has published, shrunk toward zero when it has
         published few. The aggregates subtract it, and it is a property of the pollster, not of this one poll.

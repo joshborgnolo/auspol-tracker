@@ -840,8 +840,8 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
             {three ? "“Who would make the better PM?”, asked as a three-way including Hanson"
                    : "“Who would make the better PM?”, asked head to head — in both of the contests pollsters run"}
             {three
-              ? " · as published: houses leave 16–50% uncommitted, so shares aren’t directly comparable"
-              : " · as published: uncommitted runs from none (Newspoll’s head-to-head) to half the sample, so shares aren’t directly comparable"}
+              ? " · As published: houses leave 16–50% uncommitted, so shares aren’t directly comparable"
+              : " · As published: uncommitted runs from none (Newspoll’s head-to-head) to half the sample, so shares aren’t directly comparable"}
           </p>
         </div>
         <div className="card-head-tools">
@@ -1457,7 +1457,7 @@ function tppContests(r) {
       { label: "L/NP", value: r.tpp3.lnp, color: PARTY_C.lnp },
       { label: "ON", value: r.tpp3.onp, color: PARTY_C.onp },
     ] });
-    if (alp != null) out.push({ kind: "2pp", lab: "2PP · ALP v L/NP · derived", derived: true, flag: null, segs: [
+    if (alp != null) out.push({ kind: "2pp", lab: "2PP · ALP v L/NP · Derived", derived: true, flag: null, segs: [
       { label: "ALP", value: alp, color: PARTY_C.alp, delta: dAlp },
       { label: "L/NP", value: lnp, color: PARTY_C.lnp, delta: dLnp },
     ] });
@@ -1725,7 +1725,7 @@ function SeatProjection({ seats }) {
       </div>
       <p className="seat-basis">
         Modelled seat estimate with range · {sum} of {total} seats allocated
-        {seats.basis ? ` · change vs the ${seats.basis}, not this pollster’s previous poll` : ""}
+        {seats.basis ? ` · Change vs the ${seats.basis}, not this pollster’s previous poll` : ""}
       </p>
     </div>
   );
@@ -1918,7 +1918,7 @@ function PollDetail({ r }) {
           <ShareBar segs={primarySegs(r)} />
         </div>
         <div className="pd-block">
-          <div className="pd-k">Preferred PM{ppmContests(r).length > 1 ? " · " + ppmContests(r).length + " matchups" : ppmContests(r).length === 1 && ppmKind(ppmContests(r)[0]) === "three-way" ? " · three-way" : ""}</div>
+          <div className="pd-k">Preferred PM{ppmContests(r).length > 1 ? " · " + ppmContests(r).length + " matchups" : ppmContests(r).length === 1 && ppmKind(ppmContests(r)[0]) === "three-way" ? " · Three-way" : ""}</div>
           {ppmContests(r).length === 0
             ? <div className="pd-absent">No preferred-PM question this wave</div>
             : <div className="pd-contests">
@@ -2317,7 +2317,7 @@ function NextPollsPanel() {
       <div className="np-head">
         <h2 className="card-title">Next expected polls</h2>
         <p className="card-sub">
-          Projected from each house’s recent publication intervals · open a row for the releases behind it
+          Projected from each house’s recent publication intervals · Open a row for the releases behind it
         </p>
       </div>
 
@@ -2723,7 +2723,7 @@ function PollsterTable() {
         </table>
       </div>
       <p className="table-hint">
-        Tap any poll to see its full breakdown · click a column heading to sort · “—” means the pollster didn’t ask that question.
+        Tap any poll to see its full breakdown · Click a column heading to sort · “—” Means the pollster didn’t ask that question.
         {" "}<strong>Published</strong> is the day the poll was released, taken from the source each row links
         to — not the last day of fieldwork, which is the next column. A dashed date is a fallback: publication
         day isn’t recorded for that poll, so the column shows its fieldwork end instead.

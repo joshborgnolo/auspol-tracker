@@ -6929,7 +6929,7 @@ function PreferredPMPanel({
     className: "card-title"
   }, "Preferred prime minister"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, three ? "“Who would make the better PM?”, asked as a three-way including Hanson" : "“Who would make the better PM?”, asked head to head — in both of the contests pollsters run", three ? " · as published: houses leave 16–50% uncommitted, so shares aren’t directly comparable" : " · as published: uncommitted runs from none (Newspoll’s head-to-head) to half the sample, so shares aren’t directly comparable")), /*#__PURE__*/React.createElement("div", {
+  }, three ? "“Who would make the better PM?”, asked as a three-way including Hanson" : "“Who would make the better PM?”, asked head to head — in both of the contests pollsters run", three ? " · As published: houses leave 16–50% uncommitted, so shares aren’t directly comparable" : " · As published: uncommitted runs from none (Newspoll’s head-to-head) to half the sample, so shares aren’t directly comparable")), /*#__PURE__*/React.createElement("div", {
     className: "card-head-tools"
   }, !lockFmt && /*#__PURE__*/React.createElement(TextToggle, {
     caps: true,
@@ -7733,7 +7733,7 @@ function tppContests(r) {
     });
     if (alp != null) out.push({
       kind: "2pp",
-      lab: "2PP · ALP v L/NP · derived",
+      lab: "2PP · ALP v L/NP · Derived",
       derived: true,
       flag: null,
       segs: [{
@@ -8177,7 +8177,7 @@ function SeatProjection({
     className: "seat-chg " + (r.chg > 0 ? "up" : r.chg < 0 ? "down" : "flat")
   }, r.chg === 0 ? "–" : (r.chg > 0 ? "▲" : "▼") + Math.abs(r.chg))))), /*#__PURE__*/React.createElement("p", {
     className: "seat-basis"
-  }, "Modelled seat estimate with range \xB7 ", sum, " of ", total, " seats allocated", seats.basis ? ` · change vs the ${seats.basis}, not this pollster’s previous poll` : ""));
+  }, "Modelled seat estimate with range \xB7 ", sum, " of ", total, " seats allocated", seats.basis ? ` · Change vs the ${seats.basis}, not this pollster’s previous poll` : ""));
 }
 
 // tiny tag beside a net that ISN'T plain approval, so it's never mistaken for
@@ -8429,7 +8429,7 @@ function PollDetail({
     className: "pd-block"
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-k"
-  }, "Preferred PM", ppmContests(r).length > 1 ? " · " + ppmContests(r).length + " matchups" : ppmContests(r).length === 1 && ppmKind(ppmContests(r)[0]) === "three-way" ? " · three-way" : ""), ppmContests(r).length === 0 ? /*#__PURE__*/React.createElement("div", {
+  }, "Preferred PM", ppmContests(r).length > 1 ? " · " + ppmContests(r).length + " matchups" : ppmContests(r).length === 1 && ppmKind(ppmContests(r)[0]) === "three-way" ? " · Three-way" : ""), ppmContests(r).length === 0 ? /*#__PURE__*/React.createElement("div", {
     className: "pd-absent"
   }, "No preferred-PM question this wave") : /*#__PURE__*/React.createElement("div", {
     className: "pd-contests"
@@ -8844,7 +8844,7 @@ function NextPollsPanel() {
     className: "card-title"
   }, "Next expected polls"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, "Projected from each house\u2019s recent publication intervals \xB7 open a row for the releases behind it")), /*#__PURE__*/React.createElement("ol", {
+  }, "Projected from each house\u2019s recent publication intervals \xB7 Open a row for the releases behind it")), /*#__PURE__*/React.createElement("ol", {
     className: "np-list"
   }, rows.map(r => {
     const key = r.pollster + "-" + r.release;
@@ -9268,7 +9268,7 @@ function PollsterTable() {
     }))));
   })))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll to see its full breakdown \xB7 click a column heading to sort \xB7 \u201C\u2014\u201D means the pollster didn\u2019t ask that question.", " ", /*#__PURE__*/React.createElement("strong", null, "Published"), " is the day the poll was released, taken from the source each row links to \u2014 not the last day of fieldwork, which is the next column. A dashed date is a fallback: publication day isn\u2019t recorded for that poll, so the column shows its fieldwork end instead.", " ", "Each house\u2019s systematic lean \u2014 its house effect \u2014 sits beside poll lean in the All polls archive."));
+  }, "Tap any poll to see its full breakdown \xB7 Click a column heading to sort \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t ask that question.", " ", /*#__PURE__*/React.createElement("strong", null, "Published"), " is the day the poll was released, taken from the source each row links to \u2014 not the last day of fieldwork, which is the next column. A dashed date is a fallback: publication day isn\u2019t recorded for that poll, so the column shows its fieldwork end instead.", " ", "Each house\u2019s systematic lean \u2014 its house effect \u2014 sits beside poll lean in the All polls archive."));
 }
 Object.assign(window, {
   UndecidedLine,
@@ -9495,7 +9495,7 @@ function Tabs({
 const CYC_METRICS = [{
   key: "net",
   title: "Leader net approval",
-  sub: "Sitting prime minister · approve minus disapprove",
+  sub: "Sitting prime minister · Approve minus disapprove",
   unit: "",
   fmt: v => (v > 0 ? "+" : "") + Math.round(v),
   step: 20,
@@ -9504,7 +9504,7 @@ const CYC_METRICS = [{
 }, {
   key: "oppnet",
   title: "Opposition leader net approval",
-  sub: "Sitting opposition leader · approve minus disapprove",
+  sub: "Sitting opposition leader · Approve minus disapprove",
   leader: "opp",
   unit: "",
   fmt: v => (v > 0 ? "+" : "") + Math.round(v),
@@ -10065,7 +10065,7 @@ function CycleChart({
          unpolled month itself is annotated - the readings either side of it are
          real, and the dedupe hands each boundary month to its solid run first. */
       if (flags) pts.forEach(p => {
-        if (!observed(p.x)) p.note = "no poll · interpolated";
+        if (!observed(p.x)) p.note = "no poll · Interpolated";
       });
       const runs = obsRuns(pts, observed);
       const termEnd = si === seriesIn.length - 1;
@@ -10453,7 +10453,7 @@ function AccuracyPanel() {
     className: "card-title"
   }, "How the final polls did"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, "Each house\u2019s last two-party figure in the ", A.windowDays, " days before polling day, against the result \xB7 one row per election")), /*#__PURE__*/React.createElement("div", {
+  }, "Each house\u2019s last two-party figure in the ", A.windowDays, " days before polling day, against the result \xB7 One row per election")), /*#__PURE__*/React.createElement("div", {
     className: "dir-net"
   }, /*#__PURE__*/React.createElement("span", {
     className: "dir-net-label"
@@ -10943,7 +10943,7 @@ function archLeadInfo(p, measure) {
       v: lnpV,
       color: "var(--lnp)"
     }],
-    note: " on the two-party ALP v L/NP measure" + (p.tppKind === "3cp" ? " · derived from the published 3-cornered figures" : "")
+    note: " on the two-party ALP v L/NP measure" + (p.tppKind === "3cp" ? " · Derived from the published 3-cornered figures" : "")
   };
 }
 
@@ -11104,7 +11104,7 @@ function ArchPollDetail({
     className: "pd-block"
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-k"
-  }, "Preferred PM", contests.length > 1 ? " · " + contests.length + " matchups" : contests.length === 1 && ppmKind(contests[0]) === "three-way" ? " · three-way" : ""), contests.length === 0 ? /*#__PURE__*/React.createElement("div", {
+  }, "Preferred PM", contests.length > 1 ? " · " + contests.length + " matchups" : contests.length === 1 && ppmKind(contests[0]) === "three-way" ? " · Three-way" : ""), contests.length === 0 ? /*#__PURE__*/React.createElement("div", {
     className: "pd-absent"
   }, "No preferred-PM question this wave") : /*#__PURE__*/React.createElement("div", {
     className: "pd-contests"
@@ -11464,7 +11464,7 @@ function VariancePanel({
       type: "button",
       className: "legend-chip" + (hidden[m.id] ? " off" : ""),
       "aria-pressed": !hidden[m.id],
-      title: m.label + " — " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label,
+      title: m.label + " — " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label.replace(/^./, ch => ch.toUpperCase()),
       onClick: () => setHidden(h => ({
         ...h,
         [m.id]: !h[m.id]
@@ -11534,7 +11534,7 @@ function VariancePanel({
     }, d.R.toFixed(2), "\xD7 the ", d.floor.toFixed(2), "pp floor", d.excess > 0.05 && /*#__PURE__*/React.createElement(React.Fragment, null, " \xB7 ", d.excess.toFixed(2), "pp unexplained")));
   })), /*#__PURE__*/React.createElement("p", {
     className: "table-hint ap-var-note"
-  }, "Spread is the recency-weighted standard deviation of each poll\u2019s distance from a local trend, in ", unitNote, " \u2014 recency-weighted only, because weighting by sample size would mute exactly the small divergent polls being measured. The floor is what a design effect of ", window.AP.DISC.DEFF, " and each poll\u2019s own sample size predict. Their ratio reads: under 0.80\xD7 herded \xB7 around 1\xD7 as close as sampling allows \xB7 over 1.20\xD7 genuinely apart.", facet === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."));
+  }, "Spread is the recency-weighted standard deviation of each poll\u2019s distance from a local trend, in ", unitNote, " \u2014 recency-weighted only, because weighting by sample size would mute exactly the small divergent polls being measured. The floor is what a design effect of ", window.AP.DISC.DEFF, " and each poll\u2019s own sample size predict. Their ratio reads: under 0.80\xD7 herded \xB7 Around 1\xD7 as close as sampling allows \xB7 Over 1.20\xD7 genuinely apart.", facet === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."));
 }
 function AllPollsView({
   focus,
@@ -12511,7 +12511,7 @@ function AllPollsView({
     onClick: clearAll
   }, "Clear filters")))))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll for its full breakdown \xB7 dates are fieldwork windows (publication dates sit in the breakdown) \xB7 \u201Cas published\u201D lists each poll\u2019s headline figures exactly as the pollster released them \xB7 the lead bar shows the selected matchup where a pollster published it \xB7 \u201Cpoll lean\u201D is the poll minus the aggregate for that month \xB7 \u201C\u2014\u201D means the pollster didn\u2019t publish that measure \xB7 search matches anything in a row \xB7 click any column heading to sort.", " ", /*#__PURE__*/React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on 2PP \u2014 its own average lean across every poll it has published, shrunk toward zero when it has published few. The aggregates subtract it, and it is a property of the pollster, not of this one poll."), /*#__PURE__*/React.createElement(VariancePanel, {
+  }, "Tap any poll for its full breakdown \xB7 Dates are fieldwork windows (publication dates sit in the breakdown) \xB7 \u201CAs published\u201D lists each poll\u2019s headline figures exactly as the pollster released them \xB7 The lead bar shows the selected matchup where a pollster published it \xB7 \u201CPoll lean\u201D is the poll minus the aggregate for that month \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t publish that measure \xB7 Search matches anything in a row \xB7 Click any column heading to sort.", " ", /*#__PURE__*/React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on 2PP \u2014 its own average lean across every poll it has published, shrunk toward zero when it has published few. The aggregates subtract it, and it is a property of the pollster, not of this one poll."), /*#__PURE__*/React.createElement(VariancePanel, {
     facet: facet,
     rangeId: range
   }));
@@ -13182,7 +13182,7 @@ function DialStory({
     }
   }, cur.oppName, " ", cur.opp.toFixed(1))), /*#__PURE__*/React.createElement("div", {
     className: "dl-note"
-  }, "two-party preferred \xB7 needle leans to whoever leads"))), /*#__PURE__*/React.createElement("div", {
+  }, "two-party preferred \xB7 Needle leans to whoever leads"))), /*#__PURE__*/React.createElement("div", {
     className: "dl-track" + (playing ? " playing" : ""),
     ref: scrubRef,
     onPointerDown: onScrubDown,
@@ -13227,7 +13227,7 @@ function freshness(iso) {
   const then = Date.parse(iso); // a bare ISO date parses as UTC midnight
   const days = Math.max(0, Math.round((easternNow().day - then) / 86400000));
   let label;
-  if (days === 0) label = "today";else if (days === 1) label = "yesterday";else if (days < 14) label = days + " days ago";else if (days < 56) label = Math.round(days / 7) + " weeks ago";else label = Math.round(days / 30) + " months ago";
+  if (days === 0) label = "Today";else if (days === 1) label = "Yesterday";else if (days < 14) label = days + " days ago";else if (days < 56) label = Math.round(days / 7) + " weeks ago";else label = Math.round(days / 30) + " months ago";
   const state = days <= 7 ? "fresh" : days <= 21 ? "aging" : "stale";
   return {
     label,

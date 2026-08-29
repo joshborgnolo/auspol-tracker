@@ -235,7 +235,7 @@
      left under it, which read as cramped; it is 26 / 28 / 22 now. */
   c.font = '400 17px "Public Sans", sans-serif'; c.fillStyle = T.ink3;
   c.fillText(L.pollsTracked + " polls · " + L.housesTracked
-             + " pollsters · house-effect-adjusted aggregate", PAD, 608);
+             + " pollsters · House-effect-adjusted aggregate", PAD, 608);
   c.textAlign = "right"; c.font = '600 17px "Public Sans", sans-serif'; c.fillStyle = T.ink2;
   c.fillText("auspoltracker.com", W - PAD, 608); c.textAlign = "left";
 

@@ -14,8 +14,8 @@ function freshness(iso) {
   const then = Date.parse(iso);                 // a bare ISO date parses as UTC midnight
   const days = Math.max(0, Math.round((easternNow().day - then) / 86400000));
   let label;
-  if (days === 0) label = "today";
-  else if (days === 1) label = "yesterday";
+  if (days === 0) label = "Today";
+  else if (days === 1) label = "Yesterday";
   else if (days < 14) label = days + " days ago";
   else if (days < 56) label = Math.round(days / 7) + " weeks ago";
   else label = Math.round(days / 30) + " months ago";
