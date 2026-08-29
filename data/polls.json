@@ -1254,7 +1254,8 @@
       "oth": 14,
       "tpp_alp": 56,
       "tpp_lnp": 44,
-      "sumNote": "Primaries sum to 107: the published OTH of 14% includes 7% undecided. Faithful to the release."
+      "sumNote": "Primaries sum to 107: the published OTH of 14% includes 7% undecided. Faithful to the release.",
+      "url": "https://x.com/AnalyseDis/status/1972808459134620007"
     },
     {
       "date": "2025-10-02",
@@ -3502,7 +3503,7 @@
       "dateStart": "2026-07-07",
       "pollster": "YouGov",
       "client": "News24",
-      "sample": 1500,
+      "sample": 1468,
       "alp": 28,
       "lnp": 20,
       "grn": 12,
