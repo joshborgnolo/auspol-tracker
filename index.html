@@ -5158,14 +5158,15 @@ function TrendChart(props) {
        about half a pixel of daylight between rows – legible on a laptop
        only because the labels rarely collided there. */
     const gap = refUnits * 1.45;
-    /* Can these be placed at all? Nudging spreads a collision downwards,
-       and past a point it stops being a nudge: every label joins one
-       evenly spaced stack that points at nobody's line. A phone does
-       exactly that to this chart – the viewBox stays 300 units tall
-       however narrow the screen gets, while the text holds its size on
-       screen, so a gap costing 13 units on a laptop costs 44 on a phone
-       and six labels want 91% of the plot. The stack that came out had
-       the current term's year nowhere near the current term's line.
+    /* Can these be placed at all? Spreading buys room by moving labels
+       off their line ends, and past a point it stops being a dodge:
+       every label joins one evenly spaced stack that points at
+       nobody's line. A phone does exactly that to this chart – the
+       viewBox stays 300 units tall however narrow the screen gets,
+       while the text holds its size on screen, so a gap costing 13
+       units on a laptop costs 44 on a phone and six labels want 91% of
+       the plot. The stack that came out had the current term's year
+       nowhere near the current term's line.
         So it is decided for the chart, not per label: either they fit
        where they belong or none are drawn, because half a set of year
        labels reads as a rendering fault rather than a choice. When they
@@ -5174,11 +5175,53 @@ function TrendChart(props) {
        few cycles, which is how this chart is read on a phone anyway,
        brings them straight back. */
     if ((labs.length - 1) * gap > (H - pad.t - pad.b) * 0.55) return null;
-    for (let i = 1; i < labs.length; i++) {
-      if (labs[i].y - labs[i - 1].y < gap) labs[i].y = labs[i - 1].y + gap;
+    /* The dodge places CLUSTERS about their own centre rather than
+       cascading: the old pass pushed only the lower label of a
+       colliding pair down, so a close finish pinned the top year and
+       strung the rest out beneath it in order – a run of three
+       near-equal endings put the last one a line height or more from
+       the line it names. Instead, labels finishing within a gap of
+       each other are re-spaced evenly about their shared mean, so the
+       group straddles where the lines actually ended, and a label with
+       daylight of its own keeps its spot exactly. */
+    const dodge = () => {
+      const clusters = [];
+      for (const l of labs) {
+        const top = clusters[clusters.length - 1];
+        if (top && l.y - top[top.length - 1].y < gap) top.push(l);else clusters.push([l]);
+      }
+      for (const c of clusters) {
+        const m = c.reduce((t, l) => t + l.y, 0) / c.length;
+        c.forEach((l, j) => {
+          l.y = m + (j - (c.length - 1) / 2) * gap;
+        });
+      }
+    };
+    dodge();
+    /* Centring keeps a cluster's mean but can squeeze it back inside a
+       neighbour's gap; refolding there merges the two into one centred
+       group. Clusters only ever merge, so this settles in a handful of
+       folds, and the mean it settles on is the mean of the line ends
+       themselves. */
+    for (let fold = 0; fold < 10; fold++) {
+      let collided = false;
+      for (let i = 1; i < labs.length; i++) {
+        if (labs[i].y - labs[i - 1].y < gap - 0.01) {
+          collided = true;
+          break;
+        }
+      }
+      if (!collided) break;
+      dodge();
     }
-    // if nudging pushed the stack past the plot floor, lift it back up
-    const over = labs[labs.length - 1].y - (H - pad.b - 2);
+    /* Bring a spilled stack back inside the plot as ONE piece – the
+       fit check above guarantees room, so serving the floor never
+       pushes anything off the top. */
+    const yLo = pad.t + gap * 0.4,
+      yHi = H - pad.b - gap * 0.4;
+    const under = yLo - labs[0].y;
+    if (under > 0) for (const l of labs) l.y += under;
+    const over = labs[labs.length - 1].y - yHi;
     if (over > 0) for (const l of labs) l.y -= over;
     return labs.map((l, i) => /*#__PURE__*/React.createElement("text", {
       key: "el" + i,
