@@ -45,8 +45,8 @@
 // Australian row are the regression oracles (see --url).
 //
 // Row shapes mirror the existing Newspoll entries: polls
-// {date,dateStart,pollster,client,sample,alp,lnp,grn,onp,ind,oth,tpp_alp,
-// tpp_lnp,url}; ppm {date,firm,alb,opp,oppName,han:null,extra:null};
+// {date,published,dateStart,pollster,client,sample,alp,lnp,grn,onp,ind,oth,
+// tpp_alp,tpp_lnp,url}; ppm {date,firm,alb,opp,oppName,han:null,extra:null};
 // approval {date,firm,alb,opp,oppName,han:null,detail} (detail carries
 // {app,dis} per leader only when BOTH were explicitly stated). Leadership
 // rows are Albanese-era only (pm/opp slots are hardcoded downstream in
@@ -641,8 +641,25 @@ try {
     // the story); otherwise the outlet the figures were actually read from.
     const ausHits = failedAus.filter((f) => f.pubIso >= date && (new Date(f.pubIso) - new Date(date)) / DAY <= 10);
     const ausUrl = new Set(ausHits.map((f) => f.url)).size === 1 ? ausHits[0].url : null;
+    // `client` travels with that URL. The figures are read from whichever free
+    // outlet carried them, and `best.client` is that outlet's name - often a
+    // syndication brand like "NewsWire" rather than a masthead. When the
+    // publisher of record has been identified well enough to cite, the row
+    // should say so in both fields: a row citing theaustralian.com while
+    // naming its client "NewsWire" reads as a different poll from the one a
+    // hand-entered row records, and the curated Newspoll rows say
+    // "The Australian" whenever the URL does.
+    const client = ausUrl ? "The Australian" : best.client;
+    // `published` = the night the release landed. Newspoll files Sunday evening
+    // about 20:00 AEST and the curated rows pin that hour rather than pretend
+    // to a precision the coverage does not carry; the DATE is the publisher of
+    // record's own when we identified it, else the earliest outlet to run the
+    // figures, which is the same evening. Left null when nothing in the cluster
+    // is dated - an invented timestamp is worse than an absent one.
+    const pubDates = [...(ausHits.map((f) => f.pubIso)), ...cl.map((c) => c.pubIso)].filter(Boolean).sort();
+    const published = pubDates.length ? `${ausHits[0]?.pubIso ?? pubDates[0]}T20:00` : null;
     newPolls.push({
-      date, dateStart: m.dateStart, pollster: "Newspoll", client: best.client, sample: m.sample,
+      date, published, dateStart: m.dateStart, pollster: "Newspoll", client, sample: m.sample,
       alp: m.alp, lnp: m.lnp, grn: m.grn, onp: m.onp, ind: m.ind, oth: m.oth,
       tpp_alp: m.tpp_alp ?? null, tpp_lnp: m.tpp_lnp ?? null, url: ausUrl ?? best.url,
     });
@@ -660,7 +677,7 @@ try {
         merged: m,
       }, null, 2) + "\n",
     });
-    status.added.push({ date, client: best.client, primaries: `${m.alp}/${m.lnp}/${m.grn}/${m.onp}/${m.ind ?? m.oth}`, tpp: m.tpp_alp == null ? null : `${m.tpp_alp}/${m.tpp_lnp}`, pmNet: m.pmNet, oppNet: m.oppNet, hanNet: m.hanNet ?? null, ppm: m.ppmA == null ? null : `${m.ppmA}/${m.ppmO}${m.ppmH != null ? `/${m.ppmH}` : ""}` });
+    status.added.push({ date, client, primaries: `${m.alp}/${m.lnp}/${m.grn}/${m.onp}/${m.ind ?? m.oth}`, tpp: m.tpp_alp == null ? null : `${m.tpp_alp}/${m.tpp_lnp}`, pmNet: m.pmNet, oppNet: m.oppNet, hanNet: m.hanNet ?? null, ppm: m.ppmA == null ? null : `${m.ppmA}/${m.ppmO}${m.ppmH != null ? `/${m.ppmH}` : ""}` });
   }
   if (guardFails.length) {
     console.error("NP_GUARD " + guardFails.join(" || "));
