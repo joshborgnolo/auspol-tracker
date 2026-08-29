@@ -782,7 +782,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             <span className="hl-item"><span className="hl-band"></span>95% interval</span>
           )}
           {synthOverlay.length > 0 && (
-            <span className="hl-item"><span className="hl-dashed" style={{ borderColor: "var(--alp)" }}></span>Implied by primaries{D.synthLatest && D.synthLatest.alp != null ? ` · ${D.synthLatest.alp.toFixed(1)}` : ""}</span>
+            <span className="hl-item"><span className="hl-dashed" style={{ borderColor: "var(--alp)" }}></span>Implied from primaries at 2025 flows{D.synthLatest && D.synthLatest.alp != null ? ` · ${D.synthLatest.alp.toFixed(1)}` : ""}</span>
           )}
         </div>
         <p className="hero-caption">
