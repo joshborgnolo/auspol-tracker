@@ -313,7 +313,7 @@ function buildStaticSummary() {
 
   return `<article class="static-summary">
       <h1>auspol tracker</h1>
-      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last five.<br>
+      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last five.
         Updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
         ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Next election due ${esc(L.nextElectionDue[0].toLowerCase() + L.nextElectionDue.slice(1))}.</p>
 
