@@ -311,8 +311,8 @@ function buildStaticSummary() {
 
   return `<article class="static-summary">
       <h1>auspol tracker</h1>
-      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last five.</p>
-      <p class="ss-sub">Updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
+      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last five.<br>
+        Updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
         ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Next election due ${esc(L.nextElectionDue)}.</p>
 
       <h2>Two-party preferred</h2>
@@ -328,8 +328,8 @@ function buildStaticSummary() {
       </ul>
 
       <h2>Latest polls</h2>
-      <table class="ss-table">
-        <caption>Most recent published national polls</caption>
+      <p class="ss-cap" id="ss-polls-cap">Most recent published national polls</p>
+      <table class="ss-table" aria-labelledby="ss-polls-cap">
         <thead><tr><th scope="col">Pollster</th><th scope="col">Fieldwork</th><th scope="col">Sample</th><th scope="col">ALP 2PP</th><th scope="col">L/NP 2PP</th></tr></thead>
         <tbody>${rows}
         </tbody>

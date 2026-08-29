@@ -6,13 +6,19 @@
        reach into and the band above it stayed flat. With it the layout viewport
        covers the whole screen and every inset below is honoured. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <!-- Kept to the bare name. Safari centre-crops tab titles when the strip is
-       crowded, which trims from the FRONT: at 43 characters this read as
-       "tracker – Australian federal polling" and the masthead disappeared. A
-       14-character title cannot be cropped in any browser. The descriptive
-       phrasing still reaches every surface that has room for it – og:title for
-       link previews, meta description for search snippets. -->
-  <title>auspol tracker</title>
+  <!-- Full descriptive title again (og:title shares it). It WAS "auspol
+       tracker" alone: Safari centre-crops tab titles when the strip is
+       crowded, trimming from the front, so at 43 characters the tab read
+       "tracker – Australian federal polling". That crop is accepted now,
+       because the exact match with the static-summary <h1> had a worse cost:
+       Safari Reader discards a heading whose text equals document.title, so
+       it promoted the article's first <h2> ("Two-party preferred") to the
+       Reader title. With the h1 a strict prefix of document.title instead
+       of equal to it, the h1 stays a candidate and the proper masthead
+       survives into reader mode. The descriptive phrasing still reaches
+       every surface that has room for it – meta description for search
+       snippets. -->
+  <title>auspol tracker – Australian federal polling</title>
   <meta name="description" content="auspol tracker — aggregated opinion polling for the next Australian federal election, set against the last five: two-party preferred, primary vote, preferred prime minister and leader approval, pooled across every published national poll.">
   <meta name="color-scheme" content="light dark">
   <meta property="og:title" content="auspol tracker – Australian federal polling">
@@ -255,7 +261,11 @@ body {
   font-variant-numeric: tabular-nums;
 }
 .ss-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-.ss-table caption { text-align: left; padding-bottom: 8px; font-size: 12.5px; color: var(--ink-3); }
+/* the table's label is a paragraph, not a <caption>: reader engines render a
+   caption inside their own table chrome with an odd indent, while a plain
+   paragraph above the table inherits their body-text rhythm. The p wins over
+   .static-summary p via the extra class. */
+.static-summary p.ss-cap { margin: 0 0 8px; font-size: 12.5px; color: var(--ink-3); }
 .ss-table th, .ss-table td {
   text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line-2);
   font-variant-numeric: tabular-nums;
@@ -2709,8 +2719,8 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   
     <article class="static-summary">
       <h1>auspol tracker</h1>
-      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last five.</p>
-      <p class="ss-sub">Updated <time datetime="2026-08-24">24 August 2026</time> from
+      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last five.<br>
+        Updated <time datetime="2026-08-24">24 August 2026</time> from
         152 published polls across 12 polling houses. Next election due By May 2028.</p>
 
       <h2>Two-party preferred</h2>
@@ -2730,8 +2740,8 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
       </ul>
 
       <h2>Latest polls</h2>
-      <table class="ss-table">
-        <caption>Most recent published national polls</caption>
+      <p class="ss-cap" id="ss-polls-cap">Most recent published national polls</p>
+      <table class="ss-table" aria-labelledby="ss-polls-cap">
         <thead><tr><th scope="col">Pollster</th><th scope="col">Fieldwork</th><th scope="col">Sample</th><th scope="col">ALP 2PP</th><th scope="col">L/NP 2PP</th></tr></thead>
         <tbody>
         <tr>
