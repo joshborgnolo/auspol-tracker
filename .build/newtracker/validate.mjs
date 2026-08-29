@@ -86,18 +86,25 @@ export function validate(D) {
      chart drew Labor's last term as a slide from 52.1 to 47.7 through a term
      it won 55.2. Nothing in the build noticed for as long as the file existed.
 
-     Constants come from the AEC 2022 TCP flow file (Event 27966,
-     HouseTcpFlowByPartyDownload-27966.txt), aggregated from per-party flows:
-       GRN → ALP 83.71% / L·NP 16.29%        (1,199,015 vs 233,317 votes)
-       ON  → ALP 35.33% / L·NP 64.67%        (  243,683 vs 446,107)
-       IND → ALP 58.32% / L·NP 41.68%        (  174,234 vs 124,523)
-       (ind+oth lumped) → ALP 44.30%         (  661,807 vs 832,212)
-     The lumped figure is what runs here: polls that split IND from OTH don't
-     all publish both series, and using only the lumped bucket keeps the check
-     uniform across houses. An attempted split-IND variant sits FURTHER off
-     published 2PP (mean |house bias| 1.80 vs 1.14 for lumped vs 1.32 for the
-     old {0.82,0.35,0.50} placeholders) – poll-house 2PPs are themselves
-     respondent-allocated and don't match raw AEC flows.
+     Constants come from the AEC TCP flow-by-party downloads, aggregated by
+     .build/aec-flows.py:
+       2022 (Event 27966): GRN→ALP 83.71% (1,199,015 v 233,317) · ON 35.33%
+         (243,683 v 446,107) · IND 58.32% (174,234 v 124,523) · ind+oth
+         lumped 44.30% (661,807 v 832,212)
+       2025 (Event 31496): GRN→ALP 86.83% (1,279,081 v 194,050) · ON 27.10%
+         (244,177 v 656,962) · IND 63.56% (294,426 v 168,775) · ind+oth
+         lumped 48.49% (711,699 v 756,292)
+     The 2025 set runs below. Measured against the 121 current-term polls
+     that publish 2PP (mean |per-house bias|, .build/flow-validate.mjs):
+     2025-lumped 1.01 < 2022-lumped 1.14 ≈ the old {0.82,0.35,0.50}
+     placeholders < 2025-split 1.24 < 2022-split 1.80. Current-term houses
+     allocate off the 2025 election, so the freshest flows are also the
+     fairest anchor. Lumping IND+OTH beats splitting in BOTH elections (not
+     all houses publish an IND series, and poll-house 2PPs are respondent-
+     allocated, not raw-flow reconstructions). 2025's ON→ALP share collapsed
+     8pts on 2022 (35.3→27.1%) while GRN (83.7→86.8%) and IND (58.3→63.6%)
+     drifted Labor's way – election-level movement no single constant set
+     carries. Re-derive after the next federal election.
 
      SA's 2026 election independently confirms these constants have to stay
      coarse. The Tally Room's 3CP analysis of that count (tallyroom.com.au/
@@ -109,7 +116,7 @@ export function validate(D) {
      variance, which is why synthetic-2PP was rejected as a shipped series
      in favour of the published-poll aggregate plus the altTpp matchups.
      Slack of ±3 keeps this an inversion check rather than a flow check. */
-  const FLOW = { grn: 0.837, onp: 0.353, oth: 0.443 };
+  const FLOW = { grn: 0.868, onp: 0.271, oth: 0.485 };
   const impliedAlp = (p) => {
     if (p.alp == null) return null;
     const oth = n0(p.ind) + n0(p.oth);
