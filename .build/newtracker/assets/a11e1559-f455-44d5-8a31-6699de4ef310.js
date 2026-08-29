@@ -894,7 +894,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         /* NOT keyed on the question: a remount would throw away the morph
            itself, along with both memoised dot clouds. */
         key="ppm"
-        height={250} xDomain={xDomain} yDomain={domain}
+        height={340} xDomain={xDomain} yDomain={domain}
         yTicks={ticks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
@@ -1143,7 +1143,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         /* NOT keyed on the metric: a remount would replace the very thing
            being animated, along with both memoised dot clouds. */
         key={"appr-" + leaders.map((L) => L.id).join(".")}
-        height={250} xDomain={xDomain} yDomain={domain}
+        height={340} xDomain={xDomain} yDomain={domain}
         yTicks={ticks} unit="" axisFont={20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
@@ -1282,7 +1282,7 @@ function DirectionPanel({ rangeId }) {
 
       <TrendChart
         key="dir"
-        height={250} xDomain={xDomain} yDomain={[lo, hi]}
+        height={340} xDomain={xDomain} yDomain={[lo, hi]}
         yTicks={yTicks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}

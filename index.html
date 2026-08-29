@@ -6991,7 +6991,7 @@ function PreferredPMPanel({
   /* NOT keyed on the question: a remount would throw away the morph
      itself, along with both memoised dot clouds. */, {
     key: "ppm",
-    height: 250,
+    height: 340,
     xDomain: xDomain,
     yDomain: domain,
     yTicks: ticks,
@@ -7291,7 +7291,7 @@ function ApprovalPanel({
   /* NOT keyed on the metric: a remount would replace the very thing
      being animated, along with both memoised dot clouds. */, {
     key: "appr-" + leaders.map(L => L.id).join("."),
-    height: 250,
+    height: 340,
     xDomain: xDomain,
     yDomain: domain,
     yTicks: ticks,
@@ -7499,7 +7499,7 @@ function DirectionPanel({
     className: "pct"
   }, "%")))), /*#__PURE__*/React.createElement(TrendChart, {
     key: "dir",
-    height: 250,
+    height: 340,
     xDomain: xDomain,
     yDomain: [lo, hi],
     yTicks: yTicks,
