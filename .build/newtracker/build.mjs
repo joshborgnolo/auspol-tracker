@@ -323,8 +323,8 @@ function buildStaticSummary() {
         house-effect-adjusted mean over a ${L.method.windowDays}-day window
         (${L.method.halfLifeDays}-day half-life), carrying a 95% interval of
         &#177;${L.alp2ppCi95.toFixed(1)} points from ${L.method.nPolls} polls. Repeat waves from
-        one house inside the window count for &#8730;<em>m</em>, not <em>m</em> independent
-        readings, so a busy house cannot flood the average.</p>
+        one house inside the window count for the square root of their number, so three weekly
+        waves count as 1.7, not 3.</p>
 
       <h2>Primary vote</h2>
       <table class="ss-primary">
