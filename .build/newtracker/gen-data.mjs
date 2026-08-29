@@ -8,6 +8,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { impliedAlp2pp } from "./flows.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -180,6 +181,18 @@ const share2pp = (p) => (p.tpp_lnp != null && p.tpp_alp + p.tpp_lnp > 0) ? (p.tp
 const ddays = (a, b) => (a - b) / 86400000;
 const HL_WINDOW = 21, HL_HALF = 7;
 const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: Math.min(p.sample || 1200, SAMPLE_CAP), firm: p.pollster }));
+/* Synthetic 2PP rows: each poll's primaries read through the single measured
+   flow table in flows.mjs (AEC 2025, Event 31496). This series answers a
+   different, narrower question than the published 2PP above – "what would
+   these primaries mean if 2025's preference flows still held?" – and it is a
+   diagnostic ONLY: houses' own allocations (respondent-allocated, previous-
+   election, proprietary) move with real preference behaviour, a fixed table
+   cannot, so the synthetic series can never become the headline. Rows need a
+   full primary set with no documented anomaly (sumNote) – a set that doesn't
+   total ~100 can't be read through a 100-point flow table. */
+const tppRowsSynth = POLLS
+  .filter((p) => p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
+  .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: Math.min(p.sample || 1200, SAMPLE_CAP), firm: p.pollster }));
 
 /* A house effect is that pollster's mean deviation from the cross-house
    consensus ON THAT MEASURE – never borrowed between measures, because a firm
@@ -297,6 +310,11 @@ function monthWithSe(rows, he, ym) {
 
 const houseEffect = houseEffectsFor(tppRows);
 const hOf = (firm) => heV(houseEffect, firm);
+/* The synthetic series gets its OWN house effects, measured against its own
+   consensus – a house whose primaries run ALP-high is a different bias from
+   the same house's published-2PP lean, and the comment on houseEffectsFor
+   (never borrow between measures) applies doubly here. */
+const synthEffect = houseEffectsFor(tppRowsSynth);
 
 /* ---- 1. monthly 2PP (weighted, debiased) + election-day anchor --------- */
 /* Each month carries its own 95% interval. The hero draws it as a ribbon
@@ -311,6 +329,24 @@ const agg2pp = MONTHS.map((ym) => {
 // the election is a COUNT, not an estimate, so its interval is zero and the
 // ribbon pinches shut on it - the one point on the chart that is simply known
 agg2pp.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: ELECTION.tpp_alp, lnp: ELECTION.tpp_lnp, ci95: 0, k: 0, election: true });
+
+/* ---- 1b. monthly synthetic 2PP (same estimator, flows.mjs table) ---------
+   Same monthly machinery as the published series above, run on the synthetic
+   rows and their own house effects. Its election "anchor" is the IMPLIED
+   value – the flow table read back onto the election's own primaries comes
+   back short of the count (54.2 vs 55.2: lumping IND+OTH blurs the split
+   between the independents and the rest, and teal independents' actual flows
+   ran well ahead of any single bucket constant). That shortfall is kept
+   visible on purpose: it is the clearest single demonstration of what a
+   fixed-flow read-through can never carry, and anchoring the series to the
+   count instead would launder the bias it exists to expose. */
+const agg2ppSynth = MONTHS.map((ym) => {
+  const r = monthWithSe(tppRowsSynth, synthEffect, ym);
+  if (!r) return null;
+  return { ym, x: mx(ym), alp: r1(r.v), lnp: r1(100 - r.v), ci95: r1(1.96 * r.se), k: r.n };
+}).filter(Boolean);
+// computed from the data, never hardcoded – flows.mjs changes, this moves
+agg2ppSynth.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: r1(impliedAlp2pp(ELECTION)), lnp: r1(100 - impliedAlp2pp(ELECTION)), ci95: 0, k: 0, election: true });
 
 /* ---- 2. monthly primary vote + election-day anchor --------------------- */
 /* Primaries get the SAME treatment as the headline 2PP – sample-weighted and
@@ -946,6 +982,19 @@ const refNow = new Date(LATEST_ISO).getTime();
 const hlNow = headlineTpp(refNow) || { alp: agg2pp[agg2pp.length - 1].alp, n: 0 };
 const hl1mo = headlineTpp(refNow - 30 * 86400000);
 
+/* The synthetic series' nowcast, on the identical window/half-life/house-
+   effect machinery as the headline. Kept next to it in the payload so the
+   comparison the diagnostic makes (published vs flow-table-implied) is two
+   numbers estimated the same way at the same instant – the only thing that
+   differs is WHAT the rows measure. No fallback synthesis: if the window is
+   empty the diagnostic has nothing to say this week. */
+const synthHeadline = (ref) => {
+  const r = nowcastAdj(tppRowsSynth, synthEffect, ref);
+  return r ? { alp: r.v, n: r.n, se: r.se, nEff: r.nEff, ci95: r.ci95 } : null;
+};
+const synthNow = synthHeadline(refNow);
+const synth1mo = synthHeadline(refNow - 30 * 86400000);
+
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null
    where the series can't support one (no reading inside the trailing window),
    which the hero reads as "fall back to the last monthly point". */
@@ -1568,13 +1617,23 @@ window.AUSPOL = (function () {
   const alt2pp = ${JSON.stringify(alt2pp)};
   // nowcast per alternative matchup – null where the series is too thin
   const altLatest = ${JSON.stringify(altLatest)};
+  /* Synthetic 2PP diagnostic: the polls' primaries read through the single
+     AEC-2025 flow table in flows.mjs, on the SAME estimator (house effects,
+     window, half-life) as the published series above. A diagnostic, not a
+     shadow headline: its election "anchor" is the table read back onto the
+     count's own primaries (54.2 vs the actual 55.2), and its nowcast will
+     sit ~0.7pt under the published blend for as long as houses' own
+     allocations run ALP-side of a fixed 2025 table. The UI shows it as a
+     non-default overlay / method-page comparison, never as a correction. */
+  const synth2pp = ${JSON.stringify(agg2ppSynth)};
+  const synthLatest = ${JSON.stringify(synthNow ? { ...synthNow, lnp: r1(100 - synthNow.alp), prev: synth1mo ? synth1mo.alp : null } : null)};
   // which measures carry a house-effect adjustment (drives the method labels)
-  const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true })};
+  const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: Object.keys(synthEffect).length > 0 })};
   /* Per-measure house effects, {firm: {v, n}}. v = pp that firm runs above the
      cross-house consensus on THAT measure; n = readings behind the estimate.
      A firm absent from a map has too few readings to estimate – which the UI
      must show as "—", never as 0. */
-  const houseEffects = ${JSON.stringify({ tpp: houseEffect, primary: primaryHE, alp_on: altAON.he, appr: apprHE })};
+  const houseEffects = ${JSON.stringify({ tpp: houseEffect, primary: primaryHE, alp_on: altAON.he, appr: apprHE, synth: synthEffect })};
   const leaderMonths = ${JSON.stringify(leaderMonths)};
   const direction = ${JSON.stringify(direction)};
   const directionHouseEffects = ${JSON.stringify({ right: dirHe.right, wrong: dirHe.wrong })};
@@ -1634,7 +1693,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, adjusted, houseEffects, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, adjusted, houseEffects, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
     individualPolls, pollsterTable, latest, cycles, events,
     // a getter, so existing callers keep reading D.cycleSource unchanged
     get cycleSource() { return readCycleSource(); },
@@ -1657,6 +1716,8 @@ console.log("cycle leader splits:", CYCLE_DEFS.map((c) => {
 }).filter(Boolean).join(" "));
 console.log("MONTHS:", MONTHS.length, MONTHS[0], "→", MONTHS[MONTHS.length - 1]);
 console.log("agg2pp:", agg2pp.length, "pts | first:", agg2pp[0], "| last:", agg2pp[agg2pp.length - 1]);
+console.log("synth2pp:", agg2ppSynth.length, "pts | anchor(implied):", agg2ppSynth[0].alp, "vs count 55.2 | last:", agg2ppSynth[agg2ppSynth.length - 1]);
+console.log("synthLatest:", synthNow ? `ALP ${synthNow.alp} (n=${synthNow.n}, se=${synthNow.se.toFixed(2)}) vs published ${hlNow.alp} → Δ${r1(synthNow.alp - hlNow.alp)}` : "none (window empty)");
 console.log("aggPrimary last:", aggPrimary[aggPrimary.length - 1]);
 console.log("alt2pp alp_on:", alt2pp.alp_on.length, "pts (last", alt2pp.alp_on.at(-1)?.ym, ") | lnp_on:", alt2pp.lnp_on.length, "pts (last", alt2pp.lnp_on.at(-1)?.ym, ")");
 console.log("leaderMonths:", leaderMonths.length, "rows:", leaderMonths.map((r) => r.ym).join(","));

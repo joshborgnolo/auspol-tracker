@@ -10,6 +10,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { impliedAlp2pp } from "./flows.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -94,8 +95,8 @@ export function validate(D) {
        2025 (Event 31496): GRN→ALP 86.83% (1,279,081 v 194,050) · ON 27.10%
          (244,177 v 656,962) · IND 63.56% (294,426 v 168,775) · ind+oth
          lumped 48.49% (711,699 v 756,292)
-     The 2025 set runs below. Measured against the 121 current-term polls
-     that publish 2PP (mean |per-house bias|, .build/flow-validate.mjs):
+     The 2025 set is the one in force. Measured against the 121 current-term
+     polls that publish 2PP (mean |per-house bias|, .build/flow-validate.mjs):
      2025-lumped 1.01 < 2022-lumped 1.14 ≈ the old {0.82,0.35,0.50}
      placeholders < 2025-split 1.24 < 2022-split 1.80. Current-term houses
      allocate off the 2025 election, so the freshest flows are also the
@@ -115,16 +116,14 @@ export function validate(D) {
      seats. No election-wide constant – fresh or stale – survives that
      variance, which is why synthetic-2PP was rejected as a shipped series
      in favour of the published-poll aggregate plus the altTpp matchups.
-     Slack of ±3 keeps this an inversion check rather than a flow check. */
-  const FLOW = { grn: 0.868, onp: 0.271, oth: 0.485 };
-  const impliedAlp = (p) => {
-    if (p.alp == null) return null;
-    const oth = n0(p.ind) + n0(p.oth);
-    return p.alp + FLOW.grn * n0(p.grn) + FLOW.onp * n0(p.onp) + FLOW.oth * oth;
-  };
+     Slack of ±3 keeps this an inversion check rather than a flow check.
+
+     The constants themselves live in flows.mjs, imported here and by
+     gen-data.mjs so this gate and the synthetic-2PP diagnostic on the site
+     always share one definition. */
   const orientation = (rows, label, alpKey, tppKey) => {
     const ds = rows.map((p) => {
-      const im = impliedAlp({ ...p, alp: p[alpKey] });
+      const im = impliedAlp2pp({ ...p, alp: p[alpKey] });
       return im == null || p[tppKey] == null ? null : p[tppKey] - im;
     }).filter((v) => v != null);
     if (ds.length < 20) return;                       // too few to judge a series
