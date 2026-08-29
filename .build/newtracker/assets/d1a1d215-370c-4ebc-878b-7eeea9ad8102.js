@@ -1173,13 +1173,13 @@ function PastCyclesView() {
     <div className="view view-cycles">
       <div className="view-intro">
         <p className="view-lede">
-          Every federal term since 2010, aligned to its election day so that each government’s
-          trajectory can be read off a shared clock. The current Albanese government is drawn
-          <strong> bold</strong>; past governments sit behind, tinted by the party in power –
-          red for Labor terms, blue for Coalition – with the year marked where each line ends.
+          Every federal term since 2010, lined up on its election day so each government’s
+          run can be read off the one clock. The current Albanese government is drawn
+          <strong> bold</strong>; past terms sit behind in their party’s colour – red for
+          Labor, blue for Coalition – with the year marked where each line ends.{" "}
           {CANT_HOVER
-            ? "Tap a cycle below to take its line out and bring it in again, and leave just one in to see more details."
-            : "Hover over a cycle below to bring it forward, and select just one to see more details."}
+            ? "Tap a cycle below to take its line out and bring it back again, and leave just one in to see more details."
+            : "Hover over a cycle below to bring its line forward, and leave just one in to see more details."}
         </p>
         <div className="cyc-controls">
           <TextToggle value={mode} onChange={setMode} ariaLabel="Measure"
