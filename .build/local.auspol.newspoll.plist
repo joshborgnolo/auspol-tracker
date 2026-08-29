@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>local.auspol.newspoll</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/bash</string>
+		<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/newspoll-updater.sh</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+	</dict>
+	<key>StartCalendarInterval</key>
+	<array>
+		<!-- Newspoll publishes roughly every 3 weeks on Sunday evening AEST
+		     (canonical rows show published ~20:00 Sun); sweep after release
+		     time, again late evening, then next-morning and further catch-ups -->
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>19</integer></dict>
+		<dict><key>Weekday</key><integer>0</integer><key>Hour</key><integer>22</integer><key>Minute</key><integer>30</integer></dict>
+		<dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>6</integer></dict>
+		<dict><key>Weekday</key><integer>2</integer><key>Hour</key><integer>6</integer></dict>
+		<dict><key>Weekday</key><integer>4</integer><key>Hour</key><integer>6</integer></dict>
+	</array>
+	<key>StandardOutPath</key>
+	<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-newspoll-stdout.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-newspoll-stderr.log</string>
+</dict>
+</plist>
