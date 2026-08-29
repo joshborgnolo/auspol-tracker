@@ -1300,10 +1300,24 @@ function App() {
   );
 }
 
-/* Signal that the app has mounted: body.js clips the static <article> version
-   of the page out of the visual layout (the .wm-sr rule in the template). It
-   stays in the DOM – reader engines (Safari Reader / Firefox Reader View judge
-   the post-script DOM) and assistive tech are exactly who it is for. Must be
-   set even if render throws later, or the page would show both versions. */
+/* Signal that the app has mounted. body.js fades the static <article>
+   version of the page to full transparency and pulls the app up over the
+   gap it leaves (--ss-h set below) - so the swap happens on one class
+   change, with no blank article-height seam opening at the top. The text
+   stays in the DOM at full size: that version is exactly what reader engines
+   and assistive tech are for, and Safari's reader rejects every harder hide
+   (clip, off-screen position, display:none). */
+const staticSummary = document.querySelector(".static-summary");
+if (staticSummary) {
+  const setStaticSummaryHeight = () =>
+    document.documentElement.style.setProperty(
+      "--ss-h",
+      staticSummary.offsetHeight + "px"
+    );
+  setStaticSummaryHeight();
+  /* webfonts swap in after mount and re-lay the article out; the pull-up
+     must follow its height or a seam opens where it stood */
+  new ResizeObserver(setStaticSummaryHeight).observe(staticSummary);
+}
 document.body.classList.add("js");
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
