@@ -731,7 +731,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               published ALP v L/NP series, so the control only exists there.
               Off by default: it is a diagnostic, not a third headline. */}
           {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && (
-            <label className="hero-synth" title="Also draw what the same polls' primary votes imply when run through one fixed preference-flow table (the 2025 election's actual flows). A diagnostic, not a correction.">
+            <label className={"pg-check" + (showSynth ? " on" : "")} title="Also draw what the same polls' primary votes imply when run through one fixed preference-flow table (the 2025 election's actual flows). A diagnostic, not a correction.">
               <input type="checkbox" checked={showSynth} onChange={(e) => setShowSynth(e.target.checked)} />
               Compare implied 2PP
             </label>

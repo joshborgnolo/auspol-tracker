@@ -927,9 +927,9 @@ body.js #root {
 .hero-caveat { color: var(--ink-3); }
 .hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
 /* quiet inline checkbox alongside the matchup/range switches – stripped from
-   chart copies with the rest of .hero-controls */
-.hero-synth { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 500; color: var(--ink-3); cursor: pointer; user-select: none; }
-.hero-synth input { accent-color: var(--alp); }
+   chart copies with the rest of .hero-controls. The column gap already
+   spaces it, so the shared checkbox's top margin is dropped here. */
+.hero-controls .pg-check { margin: 0; }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
 /* wraps: the interval swatch made this a four-item legend, which runs off
@@ -2227,27 +2227,31 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
   font-size: 12.5px; font-weight: 600; color: var(--accent); padding: 2px 0;
 }
 .cyc-showall:hover { text-decoration: underline; }
-/* Deliberately quiet: an optional extra line on a cycle chart, off by
-   default. Each sits under that chart's standfirst rather than in the shared
-   controls, because it changes nothing anywhere else on the page. */
-.cyc-han, .cyc-onp {
+/* One shared checkbox style for every optional overlay toggle: the hero's
+   implied-2PP diagnostic and the past-cycles Hanson/One Nation lines. A
+   page should never show two checkbox designs side by side. Deliberately
+   quiet – an extra line on a chart, off by default. */
+.pg-check {
   display: inline-flex; align-items: center; gap: 6px; margin: 7px 12px 0 0;
   font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3);
   cursor: pointer; user-select: none;
 }
-.cyc-han:hover, .cyc-onp:hover { color: var(--ink-3); }
-.cyc-han input, .cyc-onp input {
+.pg-check:hover { color: var(--ink-3); }
+.pg-check input {
   appearance: none; -webkit-appearance: none; margin: 0; flex: none;
-  width: 12px; height: 12px; border: 1px solid var(--ink-faint); border-radius: 3px;
+  width: 13px; height: 13px; border: 1px solid var(--ink-faint); border-radius: 4px;
   background: var(--surface); cursor: pointer; position: relative;
+  transition: background 0.12s ease, border-color 0.12s ease;
 }
-.cyc-han input:checked, .cyc-onp input:checked { background: var(--onp); border-color: var(--onp); }
-.cyc-han input:checked::after, .cyc-onp input:checked::after {
-  content: ""; position: absolute; left: 3.5px; top: 0.5px;
+.pg-check input:checked { background: var(--accent); border-color: var(--accent); }
+.pg-check input:checked::after {
+  content: ""; position: absolute; left: 4px; top: 1px;
   width: 3px; height: 7px; border: solid var(--chart-bg);
-  border-width: 0 2px 2px 0; transform: rotate(42deg);
+  border-width: 0 2px 2px 0; transform: rotate(45deg);
 }
-.cyc-han input:focus-visible, .cyc-onp input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pg-check input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* cycle-chart checkboxes colour their label to the party once switched on;
+   the hero diagnostic leaves its label neutral */
 .cyc-han.on, .cyc-onp.on { color: var(--onp-text); }
 
 .cyc-charts { display: flex; flex-direction: column; }

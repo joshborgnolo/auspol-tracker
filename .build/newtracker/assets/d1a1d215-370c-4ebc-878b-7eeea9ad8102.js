@@ -154,16 +154,15 @@ const CYC_METRICS = [
   { key: "tpp", title: "Government two-party preferred", sub: "Governing party 2PP",
     unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: 50, refAbsLabel: "50 – tie" },
-  /* The opposition pair reads the same terms from the losing side of them:
-     the opposition party's primary and 2PP lines. leader:"opp" makes the line
-     and dot labels name the opposition leader; the insight sentence keys its
-     subject off M.key, so these get "the Coalition … the average opposition". */
+  /* The opposition chart reads the same terms from the losing side of them:
+     the opposition party's own primary line. leader:"opp" makes the line and
+     dot labels name the opposition leader; the insight sentence keys its
+     subject off M.key, so this gets "the Coalition … the average opposition".
+     There is no opposition-2PP chart – 2PP sums to 100, so it would be an
+     exact mirror of the government 2PP chart above. */
   { key: "oppr", title: "Opposition primary vote", sub: "First-preference support for the opposition party",
     leader: "opp", onp: true, unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: null },
-  { key: "oppt", title: "Opposition two-party preferred", sub: "Opposition party 2PP",
-    leader: "opp", unit: "%", fmt: (v) => v.toFixed(1),
-    step: 5, refAbs: 50, refAbsLabel: "50 – tie" },
 ];
 
 // domain over ALL cycles (not just visible ones) so toggling a cycle off
@@ -439,7 +438,6 @@ function cycleReadings(c, M, D) {
       if (key === "primary") y = p.p ? p.p[c.gov] : null;
       else if (key === "oppr") y = p.p ? p.p[c.opp] : null;
       else if (key === "tpp") y = p[c.gov];
-      else if (key === "oppt") y = p[c.opp];
       else if (key === "net") y = (mb.alb || "approval") === "fav" ? null : (p.appr ? p.appr.albNet : null);
       else if (key === "oppnet") y = (mb.taylor || "approval") === "fav" ? null : (p.appr ? p.appr.taylorNet : null);
       if (y == null) continue;
@@ -450,9 +448,8 @@ function cycleReadings(c, M, D) {
   }
   const src = (D.cycleSource || {})[c.year];
   if (!src) return out;
-  if (key === "primary" || key === "oppr" || key === "tpp" || key === "oppt") {
+  if (key === "primary" || key === "oppr" || key === "tpp") {
     const f = key === "tpp" ? "tpp_" + c.gov
-            : key === "oppt" ? "tpp_" + c.opp
             : key === "oppr" ? c.opp
             : c.gov;
     for (const p of src.polls) {
@@ -715,30 +712,31 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
     });
   }
 
-  /* One Nation – one dotted line per cycle, each in the party colour. Unlike
-     Hanson there IS a history to draw, back to 2016; 2010 and 2013 emit an
-     all-null raw.onp grid, so their forEach turn adds nothing and those terms
-     simply have no dotted line (the footnote says why). Points skip null
-     months as Hanson's do, and the line stays thin and light – an overlay on
-     the opposition chart, not a rival to its own lines. */
+  /* One Nation – a single dotted line tracking the party's first-
+     preference vote over the CURRENT term only. Past terms carried one
+     dotted line each, but they crowded the chart without adding context,
+     so only the current cycle is drawn. Points skip null months as
+     Hanson's do, and the line stays thin and light – an overlay on the
+     opposition chart, not a rival to its own lines. */
   if (M.onp && showOnp) {
-    shown.forEach((c) => {
+    const c = shown.find((x) => x.current);
+    if (c) {
       const oBase = cycBase(c, "onp");
       const pts = c.raw.months
         .map((m, i) => ({ x: m, y: c.raw.onp[i] }))
         .filter((p) => p.y != null)
         .map((p) => ({ x: p.x, y: chg ? +(p.y - oBase).toFixed(2) : p.y }));
-      if (!pts.length) return;
-      const dimmed = hi != null && hi !== c.year && !c.current;
-      built.push({
-        id: "cyc-onp-" + c.year, label: c.year + " · One Nation",
-        color: HAN_COLOR, width: 2.2, points: pts, weight: 2.5,
-        smooth: false, dash: "1 3",
-        opacity: dimmed ? 0.2 : 0.85,
-        endLabel: "ON ’" + String(c.year).slice(2),
-        endLabelOpacity: dimmed ? 0.2 : 0.8,
-      });
-    });
+      if (pts.length) {
+        built.push({
+          id: "cyc-onp", label: "One Nation",
+          color: HAN_COLOR, width: 2.2, points: pts, weight: 2.5,
+          smooth: false, dash: "1 3",
+          opacity: 0.85,
+          endLabel: "ON ’" + String(c.year).slice(2),
+          endLabelOpacity: 0.8,
+        });
+      }
+    }
   }
 
   // draw muted first, highlighted, current last (on top)
@@ -773,9 +771,10 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
          primary/2PP charts measure the party machine itself, so they keep
          the party name – "Labor … the average government", "the Coalition …
          the average opposition". */
+      const subjParty = M.key === "net" || M.key === "oppnet" ? null : (isOpp ? cur.opp : cur.gov);
       const subjLabel = M.key === "net" ? sitting(cur.pm)
         : M.key === "oppnet" ? sitting(cur.oppLead)
-        : isOpp ? D.PARTIES[cur.opp].name : D.PARTIES[cur.gov].name;
+        : (subjParty === "lnp" ? "the " : "") + D.PARTIES[subjParty].name;
       const peerNoun = M.key === "net" ? "prime minister"
         : M.key === "oppnet" ? "opposition leader"
         : isOpp ? "opposition" : "government";
@@ -790,7 +789,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
           <h2 className="card-title">{M.title}</h2>
           <p className="card-sub">{M.sub}</p>
           {hanCtl && (
-            <label className={"cyc-han" + (showHan ? " on" : "")}
+            <label className={"pg-check cyc-han" + (showHan ? " on" : "")}
                    title={"Pauline Hanson, on the same approve-minus-disapprove basis. " +
                           "Rated in the current term only, from " + hanFrom + " – no past cycle asked about her, " +
                           "and favourability ratings are left out, so the line is short."}>
@@ -800,10 +799,10 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
             </label>
           )}
           {M.onp && (
-            <label className={"cyc-onp" + (showOnp ? " on" : "")}
-                   title={"One Nation first-preference support, one dotted line per cycle. " +
-                          "Polling houses have only reported the party separately since 2016, " +
-                          "so the two earliest terms have no line."}>
+            <label className={"pg-check cyc-onp" + (showOnp ? " on" : "")}
+                   title={"One Nation first-preference support, drawn as one dotted line " +
+                          "over the current term only. The party's past terms are left off – " +
+                          "they crowd the chart without adding context."}>
               <input type="checkbox" checked={!!showOnp}
                      onChange={(e) => setOnp(e.target.checked)} />
               One Nation
@@ -1299,8 +1298,8 @@ function PastCyclesView() {
         )}
         {showOnp && (
           <span>
-            One Nation votes are reported separately by the polling houses from 2016 onward,
-            so the 2010 and 2013 terms carry no dotted line.{" "}
+            The One Nation line tracks the party’s first-preference vote over
+            the current term only; past cycles are left undrawn.{" "}
           </span>
         )}
         {mode === "chg"
