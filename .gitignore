@@ -3,3 +3,6 @@ node_modules/
 
 # machine-local Claude Code settings (contains absolute paths)
 .claude/settings.local.json
+
+# scheduled-job logs
+.build/logs/

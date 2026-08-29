@@ -77,13 +77,38 @@
 //
 // Values/questions are CryptoJS passphrase format ("!e!...!e!", passphrase
 // "sacho", from the interactive's own bundle), decrypted here with node:crypto.
-// Usage: node .build/extract-resolve-rpm.mjs [url-or-file]
+//
+// Usage: node .build/extract-resolve-rpm.mjs [--check] [--force] [url-or-file]
+//
+// Automation contract (safe to schedule in cron/launchd):
+//   - idempotent: re-running with unchanged upstream data writes nothing and
+//     produces byte-identical output; a no-change run skips the write entirely
+//   - exit 0 = success (changed or not); the final stdout line is
+//     `RPM_STATUS {json}` with changed, row counts, repair counters, new_dates,
+//     source_updated — machine-greppable in schedules
+//   - exit 1 = fetch/parse error; exit 2 = a safety guard tripped
+//     (an expected section id vanished upstream, or the merge would SHRINK the
+//     committed row set — legit only on a first structural-repair run;
+//     re-run with --force after review)
+//   - --check computes the full extraction and prints RPM_STATUS with
+//     would-change info but never writes
+//   - the CSV write is atomic (write to .tmp + rename over it)
+// Fails loudly on unknown section ids / unmapped subSections — an upstream
+// restructure is meant to surface as a non-zero exit, not silent data loss.
 import { createHash, createDecipheriv } from "node:crypto";
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, renameSync, existsSync } from "node:fs";
 import { gunzipSync } from "node:zlib";
 
-const SRC = process.argv[2] || "https://www.smh.com.au/interactive/2021/political-monitor/data/data.json";
+const argv = process.argv.slice(2);
+const CHECK = argv.includes("--check");
+const FORCE = argv.includes("--force");
+const SRC = argv.find((a) => !a.startsWith("--")) || "https://www.smh.com.au/interactive/2021/political-monitor/data/data.json";
 const OUT = "data/resolve-political-monitor.csv";
+const FETCH_TIMEOUT_MS = 30_000;
+const FETCH_TRIES = 3;
+
+// Fetch/parse errors (and any unexpected throw) exit 1 with a clean message:
+// the main flow below runs inside a try/catch.
 
 const DATASETS = {
   Q5: "primary_vote",
@@ -103,12 +128,26 @@ async function loadSource(src) {
   let buf;
   if (existsSync(src)) buf = readFileSync(src);
   else {
-    const res = await fetch(src);
-    if (!res.ok) throw new Error(`fetch ${src}: HTTP ${res.status}`);
-    buf = Buffer.from(await res.arrayBuffer());
+    for (let attempt = 1; ; attempt++) {
+      try {
+        const res = await fetch(src, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        buf = Buffer.from(await res.arrayBuffer());
+        break;
+      } catch (err) {
+        if (attempt >= FETCH_TRIES) throw new Error(`fetch ${src} failed after ${FETCH_TRIES} tries: ${err.message}`);
+        console.warn(`fetch attempt ${attempt} failed (${err.message}); retrying`);
+        await new Promise((r) => setTimeout(r, 2000 * attempt));
+      }
+    }
   }
   if (buf[0] === 0x1f && buf[1] === 0x8b) buf = gunzipSync(buf);
-  return JSON.parse(buf.toString("utf8"));
+  let data;
+  try { data = JSON.parse(buf.toString("utf8")); }
+  catch (err) { throw new Error(`fetch ${src}: invalid JSON (${err.message})`); }
+  if (!Array.isArray(data.sections) || !data.sections.length)
+    throw new Error(`fetch ${src}: payload has no sections (upstream restructure?)`);
+  return data;
 }
 
 // CryptoJS open-file format: base64("Salted__"<8-byte salt><ciphertext>),
@@ -221,7 +260,14 @@ const walkSubs = (sec, subs) => {
   }
 };
 
+try {
 const data = await loadSource(SRC);
+const seenIds = new Set(data.sections.map((s) => s.id));
+const missing = Object.keys(DATASETS).filter((id) => !seenIds.has(id));
+if (missing.length) {
+  console.error(`RPM_GUARD missing expected sections from source: ${missing.join(", ")}`);
+  process.exit(2);
+}
 for (const sec of data.sections || []) {
   const dataset = DATASETS[sec.id];
   if (!dataset) throw new Error(`unknown section id ${sec.id}`);
@@ -302,9 +348,26 @@ for (const r of combined) {
   merged.push(r);
 }
 
-writeFileSync(OUT, [header, ...merged.map(rowToLine)].join("\n") + "\n");
+const output = [header, ...merged.map(rowToLine)].join("\n") + "\n";
+const previous = existsSync(OUT) ? readFileSync(OUT, "utf8") : null;
+const changed = previous !== output;
 
-console.log(`updated ${OUT}: kept ${existingRows.length} existing rows, added ${rowsOut.length}, wrote ${merged.length} total (${legacyFixed.length + rowsOut.length - merged.length} dupes)`);
+// Safety guard: a run that would shrink the committed row set indicates an
+// upstream loss or a broken extraction, never a routine update. The one legit
+// case is the first structural-repair run after this guard was introduced
+// (and any deliberate future drop); review, then re-run with --force.
+if (changed && merged.length < existingRows.length && !FORCE) {
+  console.error(`RPM_GUARD merge would shrink ${OUT}: ${existingRows.length} -> ${merged.length} rows. Aborting (re-run with --force after review).`);
+  process.exit(2);
+}
+
+if (CHECK) console.log(`--check: ${OUT} ${changed ? "would be updated" : "is already up to date"}`);
+else if (changed) {
+  writeFileSync(OUT + ".tmp", output);
+  renameSync(OUT + ".tmp", OUT);
+  console.log(`updated ${OUT}: kept ${existingRows.length} existing rows, added ${rowsOut.length}, wrote ${merged.length} total (${legacyFixed.length + rowsOut.length - merged.length} dupes)`);
+} else console.log(`no change: ${OUT} unchanged (${merged.length} rows)`);
+
 console.log(`drops/renames: wiw-corrupt-2021=${wiwCorrupt2021} wiw-existing-dropped=${wiwExistingDropped} legacy-relabelled=${legacyRenamed} legacy-dropped=${legacyDropped} ley-scenario=${leyScenario} wiw-zero-second-warn=${wiwZeroSecond}`);
 console.log(`subsections: election-2025-points=${electionPoints} verbatim-comments-skipped=${verbatimCount}`);
 console.log(`net rows corrected: ${netFixes.length}`);
@@ -312,3 +375,27 @@ for (const f of netFixes) console.log("  ~", f);
 const dates = [...new Set(rowsOut.map((r) => r.date))].sort();
 console.log("fresh dates:", dates[0], "->", dates.at(-1));
 console.log("source updated:", data.updated);
+
+// Machine-readable single-line status for scheduled runs (see header comment).
+const newDates = previous === null ? dates : dates.filter((d) => !existingBody.some((l) => l.includes(`,${d},`)));
+console.log(`RPM_STATUS ${JSON.stringify({
+  changed: changed && !CHECK,
+  check: CHECK,
+  rows_kept: legacyFixed.length,
+  rows_fresh: rowsOut.length,
+  rows_total: merged.length,
+  net_fixes: netFixes.length,
+  dropped_corrupt_2021: wiwCorrupt2021 + wiwExistingDropped,
+  legacy_relabelled: legacyRenamed,
+  legacy_dropped: legacyDropped,
+  ley_scenario_rows: leyScenario,
+  wiw_zero_second_warn: wiwZeroSecond,
+  election_points: electionPoints,
+  verbatim_comments_skipped: verbatimCount,
+  new_dates: newDates,
+  source_updated: data.updated ?? null,
+})}`);
+} catch (err) {
+  console.error(`RPM_ERROR ${err.message}`);
+  process.exit(1);
+}
