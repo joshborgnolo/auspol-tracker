@@ -3,15 +3,23 @@
 // Reads polls.json, computes implied 2PP by applying each constant set to
 // the primary-vote columns, then measures per-house mean residual.
 //
-// Constant sets (both derived by .build/aec-flows.py from the AEC TCP
-// flow-by-party download):
-//   AEC 2022 (Event 27966): grn 0.8371  onp→ALP 0.3533  ind 0.5832
-//                           oth-no-IND 0.4079  ind+oth lumped 0.4430
-//   AEC 2025 (Event 31496): grn 0.8683  onp→ALP 0.2710  ind 0.6356
-//                           oth-no-IND 0.4155  ind+oth lumped 0.4849
-// 2025's PHON preferences hardened noticeably against Labor (27.1% ALP share,
-// down from 35.3%) while Greens (86.8%) and independents (63.6%) moved
-// further Labor's way.
+// Constant sets (derived by .build/aec-flows.py from the AEC TCP
+// flow-by-party download, and .build/aec-tpp-flows.py from the TPP
+// download):
+//   AEC 2022 (Event 27966, TCP): grn 0.8371  onp→ALP 0.3533  ind 0.5832
+//                                oth-no-IND 0.4079  ind+oth lumped 0.4430
+//   AEC 2025 (Event 31496, TCP): grn 0.8683  onp→ALP 0.2710  ind 0.6356
+//                                oth-no-IND 0.4155  ind+oth lumped 0.4849
+//   AEC 2025 (Event 31496, TPP): grn 0.8819  onp→ALP 0.2550  ind 0.6715
+//                                oth-no-IND 0.4271  ind+oth lumped 0.5455
+// The AEC publishes one election's flows three ways (TCP web table,
+// TCP download, TPP download) — the three-cuts explanation and the vote
+// counts live in the check-7 comment of newtracker/validate.mjs.
+// 2025's PHON preferences hardened noticeably against Labor (27.1% ALP
+// share on the TCP cut, 25.5% on the TPP cut; down from 35.3% in 2022).
+// The TPP-lumped set is now the shipped anchor (flows.mjs): it won this
+// competition on 2026-08-29 (mean |house bias| 0.774 v 1.008 for
+// TCP-lumped) and it is the cut Roy Morgan's "2025 election" 2PP tracks.
 //
 // Question: which set minimises |mean implied-vs-published| over the houses
 // that publish 2PP for the CURRENT term?
@@ -24,8 +32,10 @@ const SETS = {
   "placeholder {0.82/0.35/0.50}": { grn: 0.82,   onp: 0.35,   ind: 0.50,   oth: 0.50   },
   "AEC-2022 split":               { grn: 0.8371, onp: 0.3533, ind: 0.5832, oth: 0.4079 },
   "AEC-2022 lumped":              { grn: 0.8371, onp: 0.3533, ind: 0.4430, oth: 0.4430 },
-  "AEC-2025 split":               { grn: 0.8683, onp: 0.2710, ind: 0.6356, oth: 0.4155 },
-  "AEC-2025 lumped":              { grn: 0.8683, onp: 0.2710, ind: 0.4849, oth: 0.4849 },
+  "AEC-2025 TCP split":           { grn: 0.8683, onp: 0.2710, ind: 0.6356, oth: 0.4155 },
+  "AEC-2025 TCP lumped":          { grn: 0.8683, onp: 0.2710, ind: 0.4849, oth: 0.4849 },
+  "AEC-2025 TPP split":           { grn: 0.8819, onp: 0.2550, ind: 0.6715, oth: 0.4271 },
+  "AEC-2025 TPP lumped (shipped)":{ grn: 0.8819, onp: 0.2550, ind: 0.5455, oth: 0.5455 },
 };
 
 const n0 = (v) => (v == null ? 0 : v);

@@ -782,7 +782,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             <span className="hl-item"><span className="hl-band"></span>95% interval</span>
           )}
           {synthOverlay.length > 0 && (
-            <span className="hl-item"><span className="hl-dashed" style={{ borderColor: "var(--alp)" }}></span>Implied by primaries</span>
+            <span className="hl-item"><span className="hl-dashed" style={{ borderColor: "var(--alp)" }}></span>Implied by primaries{D.synthLatest && D.synthLatest.alp != null ? ` · ${D.synthLatest.alp.toFixed(1)}` : ""}</span>
           )}
         </div>
         <p className="hero-caption">
@@ -1088,9 +1088,11 @@ function MethodNote() {
             <p><strong>What the primaries imply.</strong> An optional dashed line on the two-party
                chart ("Compare implied 2PP") draws what the same polls’ own primary votes add up to
                under one fixed preference-flow table – the flows as they actually ran at the 2025
-               election (Greens 86.8%, One Nation 27.1%, all others 48.5% to Labor). Read back onto
-               the election’s own primaries that table gives {D.synth2pp[0].alp.toFixed(1)} against
-               Labor’s actual 55.2, and at One Nation’s current
+               election (<a href="https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm"
+               target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5%, all others
+               54.6% to Labor</a>) – every formal ballot redistributed
+               Labor v Coalition, so run back over the election’s own primaries that table returns
+               the {D.synth2pp[0].alp.toFixed(1)} it was built from. At One Nation’s current
                {" "}{Math.round(D.aggPrimary[D.aggPrimary.length - 1].onp)}% primary, five points of
                doubt about their flow rate is
                {" "}{(D.aggPrimary[D.aggPrimary.length - 1].onp * 0.05).toFixed(1)} points of

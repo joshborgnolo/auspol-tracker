@@ -1,20 +1,26 @@
 ---
 name: aec-preference-flow-constants
-description: Derive/refresh national preference-flow constants (GRN/ONP/IND+OTH ALP shares) from any AEC TCP flow-by-party download, compete candidate constant sets against published 2PP, and lock the winner into validate.mjs with provenance. Anchor to the MOST RECENT federal election — current-term pollsters allocate off it. Includes parsing traps and the settled conclusion that global-constant synthetic 2PP is NOT viable as a shipped series.
+description: Derive/refresh national preference-flow constants (GRN/ONP/IND+OTH ALP shares) from the AEC's TCP or TPP flow downloads, compete candidate constant sets against published 2PP, and lock the winner into validate.mjs with provenance. Anchor to the MOST RECENT federal election — current-term pollsters allocate off it. Shipped anchor since 2026-08-29: the 2025 TPP cut {0.8819/0.2550/0.5455}. Includes parsing traps and the settled conclusion that global-constant synthetic 2PP is viable only as an opt-in diagnostic, never a headline.
 source: auto-skill
 extracted_at: '2026-08-29T10:14:07.173Z'
 ---
 
 # AEC preference-flow constants — derive, validate, lock in (auspol tracker)
 
-Current shipped state (commits 0d1b264 + c158a89, 2026-08-29): **2025-anchored**
-constants now live in `.build/newtracker/flows.mjs` — the SINGLE source,
-imported by **both** `validate.mjs` (inversion check) and `gen-data.mjs`
-(synth2pp diagnostic series). Values unchanged: `{ grn: 0.868, onp: 0.271,
-oth: 0.485 }` (commit 56936b8 chose them). `onp` is the ALP-side share of
-One Nation preferences — `impliedAlp()` ADDS `FLOW.onp * p.onp`. Never
-"fix" it to the LNP-side value (0.729 in 2025, 0.647 in 2022); that
-inverts the check. Refreshes edit flows.mjs ONLY — both consumers follow.
+Current shipped state (re-anchored 2026-08-29): **2025 TPP-cut** constants
+live in `.build/newtracker/flows.mjs` — the SINGLE source, imported by
+**both** `validate.mjs` (inversion check) and `gen-data.mjs` (synth2pp
+diagnostic series): `{ grn: 0.8819, onp: 0.2550, oth: 0.5455 }`, measured
+from the AEC 2025 TPP flow download (HouseTppFlowByStateByPartyDownload-
+31496.txt) by `.build/aec-tpp-flows.py`. History: commits 0d1b264 + c158a89
+centralised a 2025 TCP majors-only renormalised set {0.8683/0.2710/0.4849}
+(commit 56936b8 chose those values); the TPP-lumped set replaced it on
+2026-08-29 after winning the flow-validate competition (0.774 v 1.008 mean
+|house bias|) and after learning Roy Morgan's election-flow 2PP tracks the
+TPP cut. `onp` is the ALP-side share of One Nation preferences —
+`impliedAlp2pp()` ADDS `FLOW.onp * p.onp`. Never "fix" it to the LNP-side
+value; that inverts the check. Refreshes edit flows.mjs ONLY — both
+consumers follow.
 
 History: 80718de anchored 2022 constants → e4d3861 added SA-2026 evidence →
 56936b8 re-anchored to 2025 after the user asked "why not the 2025 flows?"
@@ -23,19 +29,23 @@ and ON→ALP had collapsed 8pts between elections, so 2022 constants were
 genuinely stale.) If a newer federal election than the anchored one exists,
 expect the same question; refreshing is the correct response.
 
-Evidence trail in-repo: `.build/aec-flows.py` (parser — takes any event file
-as argv[1], prints validate.mjs-ready buckets) + `.build/flow-validate.mjs`
-(competes candidate sets against data/polls.json). Both committed
+Evidence trail in-repo: `.build/aec-flows.py` (TCP-download parser),
+`.build/aec-tpp-flows.py` (TPP-download parser — both take the event file as
+argv[1] and print validate.mjs-ready buckets) + `.build/flow-validate.mjs`
+(competes candidate sets against data/polls.json). All committed
 deliberately as reproducible provenance.
 
 ## Refresh procedure (after every federal election)
 
-1. `curl -sL -o /tmp/aec-flow/tcp-flow-<yr>.txt https://results.aec.gov.au/<EVENT>/Website/Downloads/HouseTcpFlowByPartyDownload-<EVENT>.txt`
-   — uniform URL pattern (2022 = 27966, 2025 = 31496). Plain curl works, no
-   UA spoofing needed for AEC.
-2. `python3 .build/aec-flows.py /tmp/aec-flow/tcp-flow-<yr>.txt` — raw
-   per-party table, then bucket constants. The bucketing skips the `First`
-   aggregate row and major-party self-flows itself.
+1. `curl -sL -o /tmp/aec-flow/tpp-flow-<yr>.txt https://results.aec.gov.au/<EVENT>/Website/Downloads/HouseTppFlowByStateByPartyDownload-<EVENT>.txt`
+   — uniform URL pattern (2025 = 31496; the TCP equivalents are
+   HouseTcpFlowByPartyDownload-). Plain curl works, no UA spoofing needed
+   for AEC.
+2. `python3 .build/aec-tpp-flows.py /tmp/aec-flow/tpp-flow-<yr>.txt` — raw
+   per-party national table (state rows summed), then bucket constants. The
+   bucketing skips the `First Preferences` aggregate rows and major-party
+   self-flow rows itself. (For the TCP cut instead:
+   `python3 .build/aec-flows.py` on HouseTcpFlowByPartyDownload-.)
 3. Add the new set to the SETS dict in `.build/flow-validate.mjs` and run it.
    Metric: mean |per-house mean residual| vs published 2PP over current-term
    polls with tpp_alp, houses with n≥5.
@@ -75,16 +85,21 @@ deliberately as reproducible provenance.
 - `write_file` refuses `/tmp` under BOGAN approval — keep analysis scripts in
   `.build/` (they're committed as provenance anyway); curl the data files to
   /tmp instead.
+- TPP download file differs from the TCP download: TAB-separated (the TCP
+  parse regex misfire was splitting on 2+ spaces — the file only LOOKS
+  space-aligned in a browser paste), an EMPTY party-ab cell marks the
+  state-level `First Preferences` aggregates, and there is NO NAT block —
+  sum the eight state rows. All handled by `.build/aec-tpp-flows.py`.
 
 ## Measured flows (ALP share of each bucket, votes ALP v L·NP)
 
-| bucket | 2022 (Event 27966) | 2025 (Event 31496) | move |
-|---|---|---|---|
-| GRN → ALP | 83.71% (1,199,015 v 233,317) | 86.83% (1,279,081 v 194,050) | +3.1 |
-| ON → ALP  | 35.33% (243,683 v 446,107)   | 27.10% (244,177 v 656,962)   | **−8.2** |
-| IND → ALP | 58.32% (174,234 v 124,523)   | 63.56% (294,426 v 168,775)   | +5.2 |
-| IND+OTH lumped | 44.30% (661,807 v 832,212) | 48.49% (711,699 v 756,292) | +4.2 |
-| OTH excl IND | 40.79% | 41.55% | +0.8 |
+| bucket | 2022 TCP (Event 27966) | 2025 TCP (Event 31496) | move | 2025 TPP (31496, shipped) |
+|---|---|---|---|---|
+| GRN → ALP | 83.71% (1,199,015 v 233,317) | 86.83% (1,279,081 v 194,050) | +3.1 | 88.19% (1,666,851 v 223,126) |
+| ON → ALP  | 35.33% (243,683 v 446,107)   | 27.10% (244,177 v 656,962)   | **−8.2** | 25.50% (252,917 v 738,897) |
+| IND → ALP | 58.32% (174,234 v 124,523)   | 63.56% (294,426 v 168,775)   | +5.2 | 67.15% (756,196 v 369,855) |
+| IND+OTH lumped | 44.30% (661,807 v 832,212) | 48.49% (711,699 v 756,292) | +4.2 | 54.55% (1,268,209 v 1,056,696) |
+| OTH excl IND | 40.79% | 41.55% | +0.8 | 42.71% (512,013 v 686,841) |
 
 Movement this large between elections is exactly why constants are
 re-derived per election and only ever back a coarse check, never a series.
@@ -99,11 +114,11 @@ questions. For 2025 (Event 31496):
 | cut | source | GRN→ALP | ON→ALP | what it measures |
 |---|---|---|---|---|
 | TCP web table | `HouseStateTcpFlow-31496-NAT.htm` | 79.93% | 25.39% | shares across ALL final-two destinations — ALP, Coalition AND GRN/IND/ON/KAP/CA columns |
-| TCP download, majors-only renorm (SHIPPED) | `HouseTcpFlowByPartyDownload-31496.txt` via `aec-flows.py` | 86.83% | 27.10% | destinations collapsed to the two majors, then renormalised |
-| TPP download | `HouseTppFlowByStateByPartyDownload-31496.txt` | 88.19% (1,666,851 v 223,126) | 25.50% (252,917 v 738,897) | every ballot redistributed ALP v Coalition in all 150 seats — the cut Roy Morgan and the media quote |
+| TCP download, majors-only renorm (shipped until 2026-08-29) | `HouseTcpFlowByPartyDownload-31496.txt` via `aec-flows.py` | 86.83% | 27.10% | destinations collapsed to the two majors, then renormalised |
+| TPP download (SHIPPED since 2026-08-29) | `HouseTppFlowByStateByPartyDownload-31496.txt` via `aec-tpp-flows.py` | 88.19% (1,666,851 v 223,126) | 25.50% (252,917 v 738,897) | every ballot redistributed ALP v Coalition in all 150 seats — the cut Roy Morgan and the media quote |
 
-The shipped numbers reconcile EXACTLY with the web table, not contradict
-it: 86.83 = 79.93 / (79.93 + ~12.1 coalition share) and likewise
+The TCP-download numbers reconcile EXACTLY with the web table, not
+contradict it: 86.83 = 79.93 / (79.93 + ~12.1 coalition share) and likewise
 27.10 = 25.39 / (25.39 + 68.31). The web-table percentages look lower
 because their denominators include flows to non-major finals — ~8% of
 flowed GRN votes and ~6% of flowed ON votes in 2025 landed on non-major
@@ -116,25 +131,30 @@ web-table figure as 18.43%. Fetching and parsing the live NAT page shows
 confirmed. 18.43 reproduces nowhere in Event 31496's national TCP or TPP
 products — treat it as a misreading, not a fourth cut.
 
-The shipped cut sits below the TPP cut (86.83 vs ~88.2 on GRN) for two
-structural reasons: seats where the from-party was never excluded
-contribute no TCP flow rows (GRN in Melbourne 2025), and flows landing on
-IND/minor finals drop out of the majors-only denominator, implicitly
-treated as neutral between the majors.
+The TCP majors-only renorm cut sits below the TPP cut (86.83 vs ~88.2 on
+GRN) for two structural reasons: seats where the from-party was never
+excluded contribute no TCP flow rows (GRN in Melbourne 2025), and flows
+landing on IND/minor finals drop out of the majors-only denominator,
+implicitly treated as neutral between the majors.
 
-Quick recognition: **~80/25 = TCP page · 86.8/27.1 = this codebase ·
-88.2/25.5 = TPP file.** ON barely separates TCP-page from TPP file
-(25.39 v 25.50 — only ~6% of ON flows leave the majors); the cuts are
-discriminated by GRN (79.9 / 86.8 / 88.2) and by the lumped IND+OTH
-bucket (43.7 / 48.5 / 54.6 across the same three cuts).
+Quick recognition: **~80/25 = TCP page · 86.8/27.1 = TCP renorm (this
+codebase until 2026-08-29) · 88.2/25.5 = TPP file (shipped now).** ON
+barely separates TCP-page from TPP file (25.39 v 25.50 — only ~6% of ON
+flows leave the majors); the cuts are discriminated by GRN
+(79.9 / 86.8 / 88.2) and by the lumped IND+OTH bucket
+(43.7 / 48.5 / 54.6 across the same three cuts).
 
-Refresh rule: always re-derive from the SAME cut (TCP download,
-majors-only) so constants stay comparable across elections. The TPP file
-would be the conceptually purest synthetic-2PP input, but re-anchoring to
-it is a deliberate change that must go through the `flow-validate.mjs`
-competition in the refresh procedure above — never a straight swap. A
-cross-project write-up of the three cuts also lives in the user-level
-skill `aec-flow-cuts`.
+Refresh rule: always re-derive from the SAME cut so constants stay
+comparable across elections. The original anchor was the TCP download's
+majors-only renormalisation; on 2026-08-29 the tracker re-anchored to the
+**TPP download** through the `flow-validate.mjs` competition — never a
+straight swap — because (i) the TPP set won on current-term data (0.774 v
+1.008 mean |house bias|) and (ii) it is the cut the polling industry
+quotes (Roy Morgan's election-flow 2PP tracks it, MAE 0.43 v 0.94 — see
+below). Future refreshes parse
+`HouseTppFlowByStateByPartyDownload-<EVENT>.txt` with
+`.build/aec-tpp-flows.py`. A cross-project write-up of the three cuts also
+lives in the user-level skill `aec-flow-cuts`.
 
 ### Which cut does Roy Morgan use? — the TPP cut
 
@@ -163,18 +183,21 @@ Consequences: RM's flow-2PP is NOT reproducible from national constants
 alone and has no polls.json column — `tpp_alp` stays respondent-
 allocated. And the raw web-page numbers would under-cook any
 election-flow 2PP by ~3pts, a useful armchair check whenever a house
-claims "election-flow" allocation. The tracker keeps its OWN constants
-on the TCP-download cut — comparability across elections beats matching
-one house's exact cut (see refresh rule).
+claims "election-flow" allocation. As of 2026-08-29 the tracker's OWN
+constants also ship the TPP cut — the flow-validate competition (0.774 v
+1.008) carried that decision, not RM-matching; RM agreement is
+corroboration (see refresh rule).
 
 ## Validation findings (121 current-term polls, 7 houses, n≥5; mean |house bias|)
 
 | candidate set | bias |
 |---|---|
-| AEC-2025 lumped {0.868, 0.271, 0.485} | **1.01** ← shipped |
+| AEC-2025 TPP lumped {0.8819, 0.2550, 0.5455} | **0.77** ← shipped |
+| AEC-2025 TCP lumped {0.868, 0.271, 0.485}    | 1.01 (shipped until 2026-08-29) |
 | old placeholder {0.82, 0.35, 0.50}    | 1.14 |
 | AEC-2022 lumped {0.837, 0.353, 0.443} | 1.14 |
-| AEC-2025 split-IND                    | 1.24 |
+| AEC-2025 TCP split-IND                | 1.24 |
+| AEC-2025 TPP split-IND                | 1.33 |
 | AEC-2022 split-IND                    | 1.80 |
 | unconstrained least-squares fit       | 0.89, but needs GRN→ALP 1.15 — never ship |
 
