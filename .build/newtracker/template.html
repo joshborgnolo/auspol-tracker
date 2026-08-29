@@ -382,9 +382,9 @@ body {
    ~160ms, i.e. a spinner nobody ever saw sitting where the content should
    have been. Now it stands on its own for a reader whose script never ran,
    and once the app does mount it steps out of the visual page via body.js
-   (parked off-screen by the rule near .wm-sr below) but stays in the DOM at
-   full size - it IS the reader-mode article and the text equivalent
-   assistive tech reads, which is why it is parked rather than removed. */
+   (transparent under the app, rule near .wm-sr below) but stays in the DOM
+   at full size - it IS the reader-mode article and the text equivalent
+   assistive tech reads, which is why it is faded rather than removed. */
 .static-summary {
   max-width: 680px; margin: 0 auto; padding: 40px 28px 24px;
   font-family: var(--sans); color: var(--ink);
@@ -2856,8 +2856,8 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
        every headline figure and the methodology, as real text, for a crawler,
        a link-preview scraper, reader mode, assistive tech, or a reader whose
        script never ran. It sits OUTSIDE #root so createRoot() does not clear
-       it; once the app mounts, body.js parks it off-screen (see the rule near
-       .wm-sr) while reader engines and screen readers still find it. -->
+       it; once the app mounts, body.js makes it transparent (see the rule
+       near .wm-sr) while reader engines and screen readers still find it. -->
   <!--STATIC_SUMMARY-->
   <!-- "supplemental" is a reader-engine signal, not styling: Mozilla
        Readability (and Safari Reader's sibling heuristics) drops subtrees

@@ -269,11 +269,12 @@ const favicon = encodeURIComponent(fav.svg);
    This emits the editorial equivalent of the whole page – headline figures,
    latest polls, the full methodology and sources – as one semantic <article>.
    It lives OUTSIDE #root, so createRoot() cannot clear it; once the app
-   mounts it is clipped by body.js (see the .wm-sr rule in the template) and
-   stays in the DOM as the text assistive tech reads and the article reader
-   engines (Safari Reader, Firefox Reader View – both judge the POST-script
-   DOM, and both skip display:none content) extract. Derived from the same
-   generated dataset as everything else, so it cannot drift from the charts. */
+   mounts body.js makes it transparent (see the rule near .wm-sr in the
+   template) and it stays in the DOM as the text assistive tech reads and
+   the article reader engines (Safari Reader, Firefox Reader View – both
+   judge the POST-script DOM, and both skip display:none content) extract.
+   Derived from the same generated dataset as everything else, so it cannot
+   drift from the charts. */
 function buildStaticSummary() {
   const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
   const grab = (name) => {
