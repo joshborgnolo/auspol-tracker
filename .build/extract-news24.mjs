@@ -4,9 +4,7 @@
 // `approval`.
 //
 // Canonical source = YouGov's own editorial releases on yougov.com (the
-// user chose these over MSN-mirrored news24.com.au copies, which are
-// bot-walled and robots-prohibited; primaries/TPP were verified identical
-// between the two). Discovery is the global YouGov RSS feed
+// series News24 Pulse reports). Discovery is the global YouGov RSS feed
 // (yougov.com/en/rss — regional feeds 404; the global feed's ~200 items
 // include every AU federal poll article). Candidate titles are pre-screened,
 // then each article is verified against the series' distinctive methodology
@@ -43,23 +41,28 @@
 // han:null,extra:null}; approval {date,firm,alb,opp,oppName,han:null,
 // detail{alb:{app,dis},opp:{app,dis}}}.
 //
-// Fallback source: the Wikipedia poll-table wikitext, used only for waves
-// with no yougov.com release — historically most of them (an Aug 2026 audit
-// found releases for 2 of 18 waves since Dec 2025). The VI-table [[YouGov]]
-// rows give fieldwork dates, sample, primaries and optional 2PP; the row's
-// citation URL becomes the row's `url`. Fallback rows carry no `published`,
-// ppm or approval data. At most 4 fallback waves per run; more trips the
-// safety guard. A Wikipedia fetch failure degrades to RSS-only, not exit 1.
+// Fallback source: NEWSIE_CHROME=1 reads news24.com.au through the user's
+// logged-in Chrome (.build/chrome-article.mjs) for waves YouGov never
+// self-releases. The Wikipedia poll table supplies the News24 candidate URLs
+// plus independents/others, which News24 prose omits. News24 supplies prose
+// leadership metrics, published time and Coalition/One Nation preference
+// pairs; either failure degrades to the older Wikipedia-only path, not exit 1.
+// Chrome is manual-only because macOS Automation consent is a GUI prompt.
+// Fallback rows can now also populate `altTpp` and `ppmHeadToHead` when the
+// News24 article names them. At most 4 fallback waves per run; more trips the
+// safety guard.
 //
 // Provenance: parsed figures per wave are saved to .build/news24-src/
-// release-<dateIso>.json (yougov.com) or wiki-<dateIso>.json (fallback) and
-// committed alongside.
+// release-<dateIso>.json (yougov.com), news24-<dateIso>.json (news24.com.au
+// + Wikipedia gap-fill) or wiki-<dateIso>.json (Wikipedia only) and committed
+// alongside.
 //
-// Usage: node .build/extract-news24.mjs [--check] [--url <article-url>]
+// Usage: node .build/extract-news24.mjs [--check] [--url <yougov-url>]
 //   --url parses one YouGov article and prints the record without touching
 //   polls.json – development/regression hook (oracle: article 55192,
 //   fieldwork end 2026-07-14, expects sample 1468, 28/20/12/26/6/8, TPP
-//   53/47, nets -18/-16, ppm 44/35).
+//   53/47, nets -18/-16, ppm 44/35). --news24 parses one News24 URL through
+//   Chrome with NEWSIE_CHROME=1 (or N24_NEWS24_FILE for a saved page).
 //
 // Automation contract (safe to schedule in launchd):
 //   - idempotent: re-running with unchanged upstream data writes nothing
@@ -69,15 +72,18 @@
 //     upstream layout changed; nothing is written
 //   - --check computes everything, prints N24_STATUS, never writes
 //   - writes are atomic (.tmp + rename)
-//   - test hooks: N24_OUT redirects the write target; N24_WIKI_FILE parses
-//     local wikitext; N24_WIKI_DEBUG prints parsed fallback waves
+//   - test hooks: N24_OUT redirects the write target; N24_SRC_DIR redirects
+//     provenance; N24_WIKI_FILE parses local wikitext; N24_WIKI_DEBUG prints
+//     parsed fallback waves; N24_NEWS24_FILE parses a saved News24 page
 import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
 const URL_OF = (i => i >= 0 ? argv[i + 1] : null)(argv.indexOf("--url"));
+const NEWS24_OF = (i => i >= 0 ? argv[i + 1] : null)(argv.indexOf("--news24"));
 const OUT = process.env.N24_OUT || "data/polls.json"; // N24_OUT: test hook only
-const SRC_DIR = ".build/news24-src";
+const SRC_DIR = process.env.N24_SRC_DIR || ".build/news24-src";
 const FETCH_TIMEOUT_MS = 30_000;
 const FETCH_TRIES = 3;
 const RSS = "https://yougov.com/en/rss";
@@ -97,6 +103,7 @@ const WIKI_RAW = `https://en.wikipedia.org/w/index.php?title=${WIKI_TITLE}&actio
 const WIKI_FILE = process.env.N24_WIKI_FILE ?? null;
 const WIKI_DEBUG = !!process.env.N24_WIKI_DEBUG;
 const MAX_WIKI_ADDS = 4; // fortnightly series: >4 new fallback waves in one run = upstream layout shift
+const NEWS24_FILE = process.env.N24_NEWS24_FILE ?? null;
 
 // Candidate-title pre-screen (cheap; the methodology sentence is the gate).
 const TITLE_HIT = /yougov public data poll|primary vote|albanese|coalition|one nation|\blabor\b/i;
@@ -134,6 +141,20 @@ async function fetchText(url) {
   throw lastErr;
 }
 
+function fetchNews24Chrome(url) {
+  if (NEWS24_FILE) return readFileSync(NEWS24_FILE, "utf8");
+  if (!process.env.NEWSIE_CHROME) return null;
+  let host;
+  try { host = new URL(url).hostname.toLowerCase(); } catch { return null; }
+  if (!/(^|\.)news24\.com\.au$/.test(host)) return null;
+  try {
+    return execFileSync("node", [".build/chrome-article.mjs", url],
+      { encoding: "utf8", timeout: 180_000, maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "inherit"] });
+  } catch {
+    return null;
+  }
+}
+
 // ------------------------------------------------------------ text helpers
 const MONTHS = { january: 0, jan: 0, february: 1, feb: 1, march: 2, mar: 2, april: 3, apr: 3,
   may: 4, june: 5, jun: 5, july: 6, jul: 6, august: 7, aug: 7, september: 8, sep: 8, sept: 8,
@@ -160,9 +181,157 @@ function clean(html) {
     .replace(/\s+/g, " ")
     .trim();
 }
-// Datawrapper pages carry the cell HTML inside JSON strings; \\u003C is the
+// Datawrapper pages carry the cell HTML inside JSON strings; \u003C is the
 // escaped '<' that clean() can't see otherwise.
 const unescapeJson = (s) => s.replace(/\\u003C/gi, "<").replace(/\\u003E/gi, ">").replace(/\\u0026/gi, "&");
+
+// ------------------------------------------------------------- News24 parse
+// News24 articles are prose-only. They omit independents/others, which the
+// Wikipedia wave record fills after these figures are overlaid.
+const N24_PCT = "(\\d{1,2}(?:\\.\\d+)?)";
+const N24_PAIR = `${N24_PCT}\\s*[-–]\\s*${N24_PCT}`;
+
+function normaliseNews24(t) {
+  return t
+    .replace(/(\d[\d.]*)\s*per\s*cent\b/gi, "$1%")
+    .replace(/minus-\s*(\d+(?:\.\d+)?)/gi, "-$1")
+    .replace(/\b(?:up|down|rose|fell|climbed|increased|decreased)\s+(?:by\s+)?[\d.]+\s*(?:%|percentage points|points)\s+(?=to\b)/gi, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function news24Published(html) {
+  const byline = html.match(/id="publish-date"[^>]*>\s*([^<]+?)\s*<\/div>/i)?.[1];
+  const display = byline?.match(/([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})\s+-\s+(\d{1,2}):(\d{2})(AM|PM)/i);
+  if (display) {
+    const mo = MONTHS[display[1].toLowerCase()];
+    let hour = +display[4];
+    if (/pm/i.test(display[6]) && hour < 12) hour += 12;
+    if (/am/i.test(display[6]) && hour === 12) hour = 0;
+    if (mo != null) {
+      const date = iso(+display[3], mo, +display[2]);
+      return { published: `${date}T${String(hour).padStart(2, "0")}:${display[5]}`, pubIso: date };
+    }
+  }
+  const raw = html.match(/"datePublished"\s*:\s*"([^"]+)"/i)?.[1];
+  const t = raw ? new Date(raw) : null;
+  if (!t || isNaN(t)) return { published: null, pubIso: null };
+  const a = new Date(t.getTime() + AEST_MS);
+  return {
+    published: `${dateIso(a)}T${String(a.getUTCHours()).padStart(2, "0")}:${String(a.getUTCMinutes()).padStart(2, "0")}`,
+    pubIso: dateIso(a),
+  };
+}
+
+function news24Window(t, pubIso) {
+  const m = t.match(/(?:poll|polling|survey)[^.]{0,160}?conducted(?:\s+online)?\s+(?:between|from)\s+([A-Za-z]+)\.?\s+(\d{1,2})\s*(?:and|to|[-–])\s*(?:([A-Za-z]+)\.?\s+)?(\d{1,2})(?:\s+(\d{4}))?/i);
+  if (!m) return { date: null, dateStart: null };
+  const y = m[5] ? +m[5] : pubIso ? +pubIso.slice(0, 4) : new Date().getUTCFullYear();
+  const m1 = MONTHS[m[1].toLowerCase().replace(/\.$/, "")];
+  const m2 = m[3] ? MONTHS[m[3].toLowerCase().replace(/\.$/, "")] : m1;
+  if (m1 == null || m2 == null) return { date: null, dateStart: null };
+  return {
+    date: iso(y, m2, +m[4]),
+    dateStart: iso(m1 > m2 ? y - 1 : y, m1, +m[2]),
+  };
+}
+
+function news24Percentage(scope, names) {
+  const m = scope.match(new RegExp(`\\b(?:${names})(?:'s)?\\b[^%.]{0,180}?${N24_PCT}\\s*%`, "i"));
+  return m ? parseFloat(m[1]) : null;
+}
+
+function news24Sat(s) {
+  if (!s) return null;
+  const net = s.match(/net(?:\s+(?:approval|satisfaction)(?:\s+rating)?)?\s*(?:of\s+)?\s*(-?\d+(?:\.\d+)?)/i)?.[1];
+  const app = s.match(/(\d+(?:\.\d+)?)\s*%\s+satisfied\b/i)?.[1];
+  const dis = s.match(/(\d+(?:\.\d+)?)\s*%\s+dissatisfied\b/i)?.[1];
+  const pm = {
+    app: app == null ? null : +app,
+    dis: dis == null ? null : +dis,
+    net: net == null ? null : +net,
+  };
+  if (pm.net == null && pm.app != null && pm.dis != null)
+    pm.net = Math.round((pm.app - pm.dis) * 10) / 10;
+  return pm;
+}
+
+function parseNews24Article(html, url) {
+  const { published, pubIso } = news24Published(html);
+  const t = normaliseNews24(clean(html));
+  const gate = t.match(/news24(?:\.com\.au)?\s+Pulse\s*\/\s*YouGov\s+poll/i);
+  if (!gate) return null;
+
+  const block = t.slice(gate.index, gate.index + 2200);
+  const fw = news24Window(t, pubIso);
+  const sample = t.match(/(?:poll|survey)\s+of\s+([\d,]+)\s+voters\b/i)?.[1];
+  const tpp = t.match(new RegExp(`Labor[^%.]{0,140}?Coalition\\s+${N24_PAIR}`, "i"));
+  const alt = t.match(new RegExp(`(?:and|beat)\\s+One Nation(?:,?\\s+with a result of)?\\s+${N24_PAIR}`, "i"));
+  const S = t.split(/(?<=[.!?])\s+/);
+
+  const era = olFor(fw.date ?? pubIso ?? today()) ?? LEADERS.ols[LEADERS.ols.length - 1];
+  const pmS = S.find((s) => /\balbanese\b/i.test(s) && /satisfied|satisfaction|approval/i.test(s));
+  const oppRe = new RegExp(`\\b${era.surname}\\b`, "i");
+  const oppS = S.find((s) => oppRe.test(s) && /satisfied|satisfaction|approval|negative rating/i.test(s));
+  const pm = news24Sat(pmS), opp = news24Sat(oppS);
+
+  const ppmS = S.find((s) => /preferred prime minister/i.test(s) && /\balbanese\b/i.test(s));
+  const ppmPair = ppmS?.match(new RegExp(`(?:moving to|leading(?:\\s+(?:mr\\s+)?${era.surname})?\\s+)?${N24_PCT}\\s*%\\s*(?:compared with|to)\\s+${N24_PCT}\\s*%`, "i"));
+  const ppmH = t.match(new RegExp(`led\\s+(?:One Nation leader\\s+)?Pauline Hanson\\s+${N24_PAIR}`, "i"))
+    ?? t.match(new RegExp(`Pauline Hanson[^.]{0,180}?led\\s+${N24_PCT}\\s*%\\s+to\\s+${N24_PCT}\\s*%`, "i"));
+
+  return {
+    url, date: fw.date, dateStart: fw.dateStart,
+    sample: sample ? parseInt(sample.replace(/,/g, ""), 10) : null,
+    published,
+    vi: {
+      alp: news24Percentage(block, "labor|the alp|alp"),
+      lnp: news24Percentage(block, "the coalition|coalition"),
+      grn: news24Percentage(block, "the greens|greens"),
+      onp: news24Percentage(block, "one nation"),
+      ind: null, oth: null,
+      tpp_alp: tpp ? parseFloat(tpp[1]) : null,
+      tpp_lnp: tpp ? parseFloat(tpp[2]) : null,
+    },
+    sat: (pm || opp) ? {
+      pmApp: pm?.app ?? null, pmDis: pm?.dis ?? null, pmNet: pm?.net ?? null,
+      oppApp: opp?.app ?? null, oppDis: opp?.dis ?? null, oppNet: opp?.net ?? null,
+    } : null,
+    ppmA: ppmPair ? parseFloat(ppmPair[1]) : null,
+    ppmO: ppmPair ? parseFloat(ppmPair[2]) : null,
+    ppmHan: ppmH ? parseFloat(ppmH[1]) : null,
+    ppmHanOpp: ppmH ? parseFloat(ppmH[2]) : null,
+    altAlp: alt ? parseFloat(alt[1]) : null,
+    altOnp: alt ? parseFloat(alt[2]) : null,
+  };
+}
+
+function mergeNews24Wave(w, n) {
+  if (!n) return { wave: w, news24: null, problems: [] };
+  const problems = [];
+  if (!n.date || n.date !== w.date) problems.push(`News24 date ${n.date ?? "missing"} != Wikipedia ${w.date}`);
+  if (n.dateStart && w.dateStart && n.dateStart !== w.dateStart)
+    problems.push(`News24 dateStart ${n.dateStart} != Wikipedia ${w.dateStart}`);
+  if (!n.published) problems.push("missing News24 published timestamp");
+  if (n.sample != null && w.sample != null && n.sample !== w.sample)
+    problems.push(`News24 sample ${n.sample} != Wikipedia ${w.sample}`);
+  for (const k of ["alp", "lnp", "grn", "onp"]) {
+    if (n.vi[k] != null && w.vi[k] != null && Math.abs(n.vi[k] - w.vi[k]) > 0.75)
+      problems.push(`News24 ${k} ${n.vi[k]} != Wikipedia ${w.vi[k]}`);
+  }
+  const vi = { ...w.vi };
+  for (const [k, v] of Object.entries(n.vi ?? {})) if (v != null) vi[k] = v;
+  const wave = {
+    ...w,
+    dateStart: n.dateStart ?? w.dateStart,
+    sample: n.sample ?? w.sample,
+    published: n.published ?? null,
+    client: "News24", url: n.url ?? w.url, vi,
+    sat: n.sat, ppmA: n.ppmA, ppmO: n.ppmO, ppmHan: n.ppmHan,
+    altAlp: n.altAlp, altOnp: n.altOnp, news24: n,
+  };
+  return { wave, news24: n, problems };
+}
 
 // ------------------------------------------------- Datawrapper chart parse
 // Fetch and classify each embedded chart's public dataset. Returns rows as
@@ -323,8 +492,8 @@ async function parseArticle(url, id) {
 }
 
 // ---------------------------------------------------------------- guard
-// requirePublished/requireTpp hold for yougov.com releases; Wikipedia
-// fallback waves legitimately lack a publish timestamp and (pre-2026) a 2PP.
+// requirePublished/requireTpp hold for yougov.com releases; fallback waves
+// may legitimately lack a publish timestamp (Wikipedia-only) or a 2PP.
 function guard(rec, { requirePublished = true, requireTpp = true, spanMin = 1 } = {}) {
   const errs = [];
   const check = (n, ok) => { if (!ok) errs.push(n); };
@@ -349,8 +518,14 @@ function guard(rec, { requirePublished = true, requireTpp = true, spanMin = 1 } 
   if (rec.ppmA != null) check(`ppmA=${rec.ppmA} in 15–80`, rec.ppmA >= 15 && rec.ppmA <= 80);
   if (rec.ppmO != null) check(`ppmO=${rec.ppmO} in 5–70`, rec.ppmO >= 5 && rec.ppmO <= 70);
   if (rec.ppmA != null && rec.ppmA === rec.ppmO) errs.push(`ppm tie ${rec.ppmA}/${rec.ppmO} — parse suspect`);
+  if (rec.ppmHan != null) check(`ppmHan=${rec.ppmHan} in 15–90`, rec.ppmHan >= 15 && rec.ppmHan <= 90);
+  if (rec.ppmHanOpp != null) check(`ppmHan other=${rec.ppmHanOpp} in 5–70`, rec.ppmHanOpp >= 5 && rec.ppmHanOpp <= 70);
+  if (rec.altAlp != null) check(`alt TPP ALP=${rec.altAlp} in 25–90`, rec.altAlp >= 25 && rec.altAlp <= 90);
+  if (rec.altOnp != null) check(`alt TPP ONP=${rec.altOnp} in 10–75`, rec.altOnp >= 10 && rec.altOnp <= 75);
+  if (rec.altAlp != null && rec.altOnp != null)
+    check(`alt TPP Σ=${(rec.altAlp + rec.altOnp).toFixed(1)} ~100`, Math.abs(rec.altAlp + rec.altOnp - 100) <= 1.5);
   if (sat) {
-    for (const [k, v] of Object.entries({ pmNet: sat.pmNet, oppNet: sat.oppNet })) check(`${k}=${v} in −80..80`, v >= -80 && v <= 80);
+    for (const [k, v] of Object.entries({ pmNet: sat.pmNet, oppNet: sat.oppNet })) if (v != null) check(`${k}=${v} in −80..80`, v >= -80 && v <= 80);
   }
   check(`date ${rec.date} not future`, rec.date <= today());
   const span = (new Date(rec.date) - new Date(rec.dateStart)) / DAY;
@@ -487,6 +662,20 @@ function parseWikiYouGov(text) {
 // --------------------------------------------------------------- entry
 const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [] };
 
+if (NEWS24_OF) { // dev oracle: parse one News24 article, print the record, exit
+  const html = fetchNews24Chrome(NEWS24_OF);
+  if (!html) { console.error("News24 fetch failed: set NEWSIE_CHROME=1 or N24_NEWS24_FILE"); process.exit(1); }
+  const rec = parseNews24Article(html, NEWS24_OF);
+  if (!rec) { console.error("not a News24 Pulse / YouGov federal-poll article"); process.exit(1); }
+  console.log(JSON.stringify({
+    url: rec.url, date: rec.date, dateStart: rec.dateStart, sample: rec.sample,
+    published: rec.published, vi: rec.vi, sat: rec.sat,
+    ppmA: rec.ppmA, ppmO: rec.ppmO, ppmHan: rec.ppmHan, ppmHanOpp: rec.ppmHanOpp,
+    altAlp: rec.altAlp, altOnp: rec.altOnp,
+  }, null, 2));
+  process.exit(0);
+}
+
 if (URL_OF) { // dev oracle: parse one article, print the record, exit
   const id = +(URL_OF.match(/articles\/(\d+)/) ?? [])[1];
   const rec = await parseArticle(URL_OF, id || 0);
@@ -532,7 +721,7 @@ try {
   }
 
   const guardFails = [];
-  const newPolls = [], newPpm = [], newAppr = [], sources = [];
+  const newPolls = [], newPpm = [], newAppr = [], newAlt = [], newPpmH = [], sources = [];
   for (const rec of recs.sort((a, b) => (a.date < b.date ? -1 : 1))) {
     if (ygDates.has(rec.date)) { status.skipped_existing.push(rec.date); continue; }
     const errs = guard(rec);
@@ -568,38 +757,120 @@ try {
     status.added.push({ date: rec.date, primaries: `${rec.vi.alp}/${rec.vi.lnp}/${rec.vi.grn}/${rec.vi.onp}/${rec.vi.ind}`, tpp: `${rec.vi.tpp_alp}/${rec.vi.tpp_lnp}`, ppm: rec.ppmA == null ? null : `${rec.ppmA}/${rec.ppmO}`, pmNet: rec.sat?.pmNet ?? null, oppNet: rec.sat?.oppNet ?? null });
   }
 
-  // Fallback: waves YouGov never released on yougov.com, sourced from the
-  // Wikipedia poll table. Only fills gaps — the RSS pass's dates win. A
-  // Wikipedia fetch failure is logged as N24_NOTE, not pipeline-fatal.
+  // Fallback: waves YouGov never released on yougov.com. Wikipedia discovers
+  // the wave and its canonical article URL; with NEWSIE_CHROME=1, News24 then
+  // enriches that wave before Wikipedia fills the fields News24 omits.
   status.fallback = { source: "wikipedia", checked: 0, added: [], skipped_existing: 0, unparsed: [] };
+  status.news24 = {
+    enabled: !!(process.env.NEWSIE_CHROME || NEWS24_FILE),
+    attempted: 0, enriched: [], skipped: [], problems: [],
+  };
   try {
     const wikiText = WIKI_FILE ? readFileSync(WIKI_FILE, "utf8") : (await fetchText(WIKI_RAW)).text;
     const { waves, unparsed } = parseWikiYouGov(wikiText);
     if (WIKI_DEBUG) console.error("N24_WIKI " + JSON.stringify(waves));
     status.fallback.checked = waves.length;
     status.fallback.unparsed = unparsed.slice(0, 10);
-    const have = new Set([...ygDates, ...newPolls.map((p) => p.date)]);
-    for (const w of waves) {
-      if (have.has(w.date)) { status.fallback.skipped_existing++; continue; }
-      const errs = guard(w, { requirePublished: false, requireTpp: false, spanMin: 0 });
-      if (errs.length) { status.fallback.unparsed.push(`${w.date}: ${errs.join(" | ")}`); continue; }
-      newPolls.push({
-        date: w.date, dateStart: w.dateStart,
-        pollster: "YouGov", client: w.client, sample: w.sample,
-        alp: w.vi.alp, lnp: w.vi.lnp, grn: w.vi.grn, onp: w.vi.onp,
-        ind: w.vi.ind, oth: w.vi.oth,
-        tpp_alp: w.vi.tpp_alp, tpp_lnp: w.vi.tpp_lnp,
-        ...(w.url ? { url: w.url } : {}),
-      });
+    status.news24.upgraded = [];
+    const existingByDate = new Map(D.polls.filter((p) => p.pollster === "YouGov").map((p) => [p.date, p]));
+    const newDates = new Set(newPolls.map((p) => p.date));
+    const firmRowExists = (key, date) => (D[key] ?? []).some((r) => r.date === date && r.firm === "YouGov");
+    const addDerived = (key, rows, row) => {
+      if (!firmRowExists(key, row.date)) rows.push(row);
+    };
+    for (const wikiWave of waves) {
+      const existing = existingByDate.get(wikiWave.date) ?? null;
+      const news24Url = (() => {
+        try { return /(^|\.)news24\.com\.au$/.test(new URL(wikiWave.url ?? "").hostname) ? wikiWave.url : null; }
+        catch { return null; }
+      })();
+      const canUpgrade = !!existing && wikiWave.date === latestYg && existing.client === "News24" && !existing.published && !!news24Url;
+      if ((existing || newDates.has(wikiWave.date)) && !canUpgrade) { status.fallback.skipped_existing++; continue; }
+
+      let h = wikiWave, n24 = null;
+      if (news24Url && (process.env.NEWSIE_CHROME || NEWS24_FILE)) {
+        status.news24.attempted++;
+        const html = fetchNews24Chrome(news24Url);
+        const parsed = html ? parseNews24Article(html, news24Url) : null;
+        if (parsed) {
+          const merged = mergeNews24Wave(wikiWave, parsed);
+          if (merged.problems.length) {
+            status.news24.problems.push(`${wikiWave.date}: ${merged.problems.join(" | ")}`);
+          } else {
+            h = merged.wave;
+            n24 = merged.news24;
+            status.news24.enriched.push(h.date);
+          }
+        } else {
+          status.news24.skipped.push(`${wikiWave.date}: News24 Chrome/parse failed`);
+        }
+      } else if (news24Url && !existing) {
+        status.news24.skipped.push(`${wikiWave.date}: NEWSIE_CHROME unset`);
+      }
+      if (canUpgrade && !n24) continue;
+
+      const errs = guard(h, { requirePublished: !!n24, requireTpp: false, spanMin: 0 });
+      if (errs.length) { status.fallback.unparsed.push(`${h.date}: ${errs.join(" | ")}`); continue; }
+      const era = olFor(h.date);
+      const pollRow = {
+        date: h.date, dateStart: h.dateStart,
+        pollster: "YouGov", client: h.client, sample: h.sample,
+        alp: h.vi.alp, lnp: h.vi.lnp, grn: h.vi.grn, onp: h.vi.onp,
+        ind: h.vi.ind, oth: h.vi.oth,
+        tpp_alp: h.vi.tpp_alp, tpp_lnp: h.vi.tpp_lnp,
+        ...(h.published ? { published: h.published } : {}),
+        ...(h.url ? { url: h.url } : {}),
+      };
+      if (existing) {
+        Object.assign(existing, pollRow);
+        status.news24.upgraded.push(h.date);
+      } else {
+        newPolls.push(pollRow);
+        newDates.add(h.date);
+      }
+      if (n24?.ppmA != null && n24.ppmO != null)
+        addDerived("ppm", newPpm, { date: h.date, firm: "YouGov", alb: n24.ppmA, opp: n24.ppmO, oppName: era?.oppName ?? null, han: null, extra: null });
+      if (n24?.sat && (n24.sat.pmNet != null || n24.sat.oppNet != null)) {
+        const detail = {};
+        const addSplit = (key, app, dis) => {
+          const out = {};
+          if (app != null) out.app = app;
+          if (dis != null) out.dis = dis;
+          if (Object.keys(out).length) detail[key] = out;
+        };
+        addSplit("alb", n24.sat.pmApp, n24.sat.pmDis);
+        addSplit("opp", n24.sat.oppApp, n24.sat.oppDis);
+        addDerived("approval", newAppr, {
+          date: h.date, firm: "YouGov", alb: n24.sat.pmNet, opp: n24.sat.oppNet,
+          oppName: era?.oppName ?? null, han: null,
+          detail: Object.keys(detail).length ? detail : null,
+        });
+      }
+      if (n24?.altAlp != null && n24.altOnp != null)
+        addDerived("altTpp", newAlt, { date: h.date, firm: "YouGov", alpVsOnp_alp: n24.altAlp, lnpVsOnp_lnp: null });
+      if (n24?.ppmHan != null && n24.ppmHanOpp != null)
+        addDerived("ppmHeadToHead", newPpmH, { date: h.date, firm: "YouGov", alb: n24.ppmHan, han: n24.ppmHanOpp });
       sources.push({
-        date: w.date, file: `wiki-${w.date}.json`,
+        date: h.date, file: `${n24 ? "news24" : "wiki"}-${h.date}.json`,
         json: JSON.stringify({
-          source: "wikipedia", title: WIKI_TITLE, url: w.url,
-          fieldwork: { date: w.date, dateStart: w.dateStart, sample: w.sample }, vi: w.vi,
+          source: n24 ? "news24+wikipedia" : "wikipedia", title: WIKI_TITLE, url: h.url,
+          published: h.published ?? null,
+          fieldwork: { date: h.date, dateStart: h.dateStart, sample: h.sample }, vi: h.vi,
+          satisfaction: n24?.sat ?? null,
+          ppm: n24 ? { alb: n24.ppmA, opp: n24.ppmO, albVsHanson: n24.ppmHan, hanson: n24.ppmHanOpp } : null,
+          altTpp: n24 ? { alpVsOnp_alp: n24.altAlp, alpVsOnp_onp: n24.altOnp } : null,
         }, null, 2) + "\n",
       });
-      status.fallback.added.push(w.date);
-      status.added.push({ date: w.date, primaries: `${w.vi.alp}/${w.vi.lnp}/${w.vi.grn}/${w.vi.onp}/${w.vi.ind}`, tpp: w.vi.tpp_alp == null ? null : `${w.vi.tpp_alp}/${w.vi.tpp_lnp}`, ppm: null, pmNet: null, oppNet: null, via: "wikipedia" });
+      if (existing) continue;
+      status.fallback.added.push(h.date);
+      status.added.push({
+        date: h.date,
+        primaries: `${h.vi.alp}/${h.vi.lnp}/${h.vi.grn}/${h.vi.onp}/${h.vi.ind}`,
+        tpp: h.vi.tpp_alp == null ? null : `${h.vi.tpp_alp}/${h.vi.tpp_lnp}`,
+        ppm: n24?.ppmA == null ? null : `${n24.ppmA}/${n24.ppmO}`,
+        pmNet: n24?.sat?.pmNet ?? null, oppNet: n24?.sat?.oppNet ?? null,
+        via: n24 ? "news24+wikipedia" : "wikipedia",
+      });
     }
     if (status.fallback.added.length > MAX_WIKI_ADDS)
       guardFails.push(`wiki fallback: ${status.fallback.added.length} new waves > cap ${MAX_WIKI_ADDS}`);
@@ -615,10 +886,13 @@ try {
     process.exit(2);
   }
 
-  if (newPolls.length) {
-    D.polls = [...D.polls, ...newPolls].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-    for (const [key, rows] of [["ppm", newPpm], ["approval", newAppr]])
-      if (rows.length) D[key] = [...D[key], ...rows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  if (sources.length) {
+    if (newPolls.length) D.polls = [...D.polls, ...newPolls].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    for (const [key, rows] of [["ppm", newPpm], ["approval", newAppr], ["altTpp", newAlt], ["ppmHeadToHead", newPpmH]]) {
+      if (!rows.length) continue;
+      D[key] ??= [];
+      D[key] = [...D[key], ...rows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    }
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
     const next = JSON.stringify(D, null, 2) + trailingNl;
     status.changed = next !== orig;
@@ -627,7 +901,10 @@ try {
       renameSync(OUT + ".tmp", OUT);
       mkdirSync(SRC_DIR, { recursive: true });
       for (const s of sources) writeFileSync(`${SRC_DIR}/${s.file}`, s.json);
-      console.log(`wrote ${OUT}: +${newPolls.length} YouGov wave(s): ${status.added.map((a) => a.date).join(", ")}`);
+      const parts = [];
+      if (newPolls.length) parts.push(`+${newPolls.length} YouGov wave(s): ${status.added.map((a) => a.date).join(", ")}`);
+      if (status.news24.upgraded.length) parts.push(`enriched latest News24 wave: ${status.news24.upgraded.join(", ")}`);
+      console.log(`wrote ${OUT}: ${parts.join(", ")}`);
     }
   }
   console.log("N24_STATUS " + JSON.stringify(status));
