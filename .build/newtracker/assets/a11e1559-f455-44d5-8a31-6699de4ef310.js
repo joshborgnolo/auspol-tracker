@@ -838,10 +838,10 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           <h3 className="card-title">Preferred prime minister</h3>
           <p className="card-sub">
             {three ? "“Who would make the better PM?”, asked as a three-way including Hanson"
-                   : "“Who would make the better PM?”, asked as a two-way — both of the contests pollsters run"}
+                   : "“Who would make the better PM?”, asked head to head — in both of the contests pollsters run"}
             {three
-              ? " · as published — houses leave 16–50% uncommitted, so shares aren’t directly comparable"
-              : " · as published — uncommitted runs from none (Newspoll’s head-to-head) to half the sample, so shares aren’t directly comparable"}
+              ? " · as published: houses leave 16–50% uncommitted, so shares aren’t directly comparable"
+              : " · as published: uncommitted runs from none (Newspoll’s head-to-head) to half the sample, so shares aren’t directly comparable"}
           </p>
         </div>
         <div className="card-head-tools">
