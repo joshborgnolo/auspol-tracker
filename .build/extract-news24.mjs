@@ -43,8 +43,17 @@
 // han:null,extra:null}; approval {date,firm,alb,opp,oppName,han:null,
 // detail{alb:{app,dis},opp:{app,dis}}}.
 //
-// Provenance: parsed figures per wave are saved to
-// .build/news24-src/release-<dateIso>.json and committed alongside.
+// Fallback source: the Wikipedia poll-table wikitext, used only for waves
+// with no yougov.com release — historically most of them (an Aug 2026 audit
+// found releases for 2 of 18 waves since Dec 2025). The VI-table [[YouGov]]
+// rows give fieldwork dates, sample, primaries and optional 2PP; the row's
+// citation URL becomes the row's `url`. Fallback rows carry no `published`,
+// ppm or approval data. At most 4 fallback waves per run; more trips the
+// safety guard. A Wikipedia fetch failure degrades to RSS-only, not exit 1.
+//
+// Provenance: parsed figures per wave are saved to .build/news24-src/
+// release-<dateIso>.json (yougov.com) or wiki-<dateIso>.json (fallback) and
+// committed alongside.
 //
 // Usage: node .build/extract-news24.mjs [--check] [--url <article-url>]
 //   --url parses one YouGov article and prints the record without touching
@@ -60,12 +69,14 @@
 //     upstream layout changed; nothing is written
 //   - --check computes everything, prints N24_STATUS, never writes
 //   - writes are atomic (.tmp + rename)
+//   - test hooks: N24_OUT redirects the write target; N24_WIKI_FILE parses
+//     local wikitext; N24_WIKI_DEBUG prints parsed fallback waves
 import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
 const URL_OF = (i => i >= 0 ? argv[i + 1] : null)(argv.indexOf("--url"));
-const OUT = "data/polls.json";
+const OUT = process.env.N24_OUT || "data/polls.json"; // N24_OUT: test hook only
 const SRC_DIR = ".build/news24-src";
 const FETCH_TIMEOUT_MS = 30_000;
 const FETCH_TRIES = 3;
@@ -75,6 +86,17 @@ const DAY = 86400000;
 // Newspoll releases and this series publish ~05:00 AEST; canon `published`
 // strings are local-without-offset, so AEST (UTC+10 fixed) is applied here.
 const AEST_MS = 10 * 3600_000;
+
+// Fallback wave source: the Wikipedia poll table's wikitext. Used only for
+// waves with no yougov.com release — historically the norm (an Aug 2026
+// audit found releases for 2 of 18 waves since Dec 2025). Env overrides are
+// test hooks: N24_WIKI_FILE parses a local snapshot, N24_WIKI_DEBUG prints
+// parsed waves to stderr.
+const WIKI_TITLE = "Opinion_polling_for_the_next_Australian_federal_election";
+const WIKI_RAW = `https://en.wikipedia.org/w/index.php?title=${WIKI_TITLE}&action=raw`;
+const WIKI_FILE = process.env.N24_WIKI_FILE ?? null;
+const WIKI_DEBUG = !!process.env.N24_WIKI_DEBUG;
+const MAX_WIKI_ADDS = 4; // fortnightly series: >4 new fallback waves in one run = upstream layout shift
 
 // Candidate-title pre-screen (cheap; the methodology sentence is the gate).
 const TITLE_HIT = /yougov public data poll|primary vote|albanese|coalition|one nation|\blabor\b/i;
@@ -301,13 +323,19 @@ async function parseArticle(url, id) {
 }
 
 // ---------------------------------------------------------------- guard
-function guard(rec) {
+// requirePublished/requireTpp hold for yougov.com releases; Wikipedia
+// fallback waves legitimately lack a publish timestamp and (pre-2026) a 2PP.
+function guard(rec, { requirePublished = true, requireTpp = true, spanMin = 1 } = {}) {
   const errs = [];
   const check = (n, ok) => { if (!ok) errs.push(n); };
   const { vi, sat } = rec;
-  for (const [k, v] of Object.entries({ date: rec.date, dateStart: rec.dateStart, sample: rec.sample, published: rec.published }))
+  const core = { date: rec.date, dateStart: rec.dateStart, sample: rec.sample };
+  if (requirePublished) core.published = rec.published;
+  for (const [k, v] of Object.entries(core))
     if (v == null) errs.push(`missing ${k}`);
-  for (const k of ["alp", "lnp", "grn", "onp", "ind", "tpp_alp", "tpp_lnp"]) if (vi[k] == null) errs.push(`missing ${k}`);
+  const viReq = ["alp", "lnp", "grn", "onp", "ind"];
+  if (requireTpp) viReq.push("tpp_alp", "tpp_lnp");
+  for (const k of viReq) if (vi[k] == null) errs.push(`missing ${k}`);
   if (vi.ind == null && vi.oth == null) errs.push("missing others bucket");
   for (const k of ["alp", "lnp", "grn", "onp", "ind", "oth"])
     if (vi[k] != null) check(`${k}=${vi[k]} in 1–70`, vi[k] >= 1 && vi[k] <= 70);
@@ -326,7 +354,7 @@ function guard(rec) {
   }
   check(`date ${rec.date} not future`, rec.date <= today());
   const span = (new Date(rec.date) - new Date(rec.dateStart)) / DAY;
-  check(`field span ${span}d in 1–14`, span >= 1 && span <= 14);
+  check(`field span ${span}d in ${spanMin}–14`, span >= spanMin && span <= 14);
   if (rec.published) {
     const lag = (new Date(rec.published.slice(0, 10)) - new Date(rec.date)) / DAY;
     check(`release lag ${lag}d in 0–10`, lag >= 0 && lag <= 10);
@@ -334,6 +362,126 @@ function guard(rec) {
   if (rec.date < LEADERS.pm.from) errs.push("pre-Albanese-era date");
   if (rec.sample != null) check(`sample=${rec.sample} in 1000–2500`, rec.sample >= 1000 && rec.sample <= 2500);
   return errs;
+}
+
+// ------------------------------------------------------ Wikipedia fallback
+// Parse the federal VI table's wikitext into wave records as a stand-in for
+// waves YouGov never releases on yougov.com. A poll's TPP-vs-Coalition triple
+// sits at the end of its own chunk (rowspan=2 layouts) or trailing the
+// primaries (single-row 2025-era layout); the continuation chunk (TPP vs
+// PHON) and non-VI tables are ignored. Only [[YouGov]] rows count; MRP rows
+// are excluded.
+const wikiMonth = (s) => MONTHS[s.toLowerCase().replace(/\.$/, "")] ?? null;
+function parseWikiDate(cell, fallbackYear) {
+  const s = cell.replace(/\[\[|\]\]/g, "").trim();
+  let m = s.match(/^(\d{1,2})\s*(?:([A-Za-z]{3,9})\.?)?\s*[–—-]\s*(\d{1,2})\s+([A-Za-z]{3,9})\.?(?:\s+(\d{4}))?$/);
+  if (!m) {
+    m = s.match(/^(\d{1,2})\s+([A-Za-z]{3,9})\.?(?:\s+(\d{4}))?$/);
+    if (!m) return null;
+    const mo = wikiMonth(m[2]), d = +m[1], y = m[3] ? +m[3] : fallbackYear;
+    if (mo == null || y == null) return null;
+    const dt = iso(y, mo, d);
+    return { date: dt, dateStart: dt };
+  }
+  const m2 = wikiMonth(m[4]), m1 = m[2] ? wikiMonth(m[2]) : m2;
+  const y2 = m[5] ? +m[5] : fallbackYear;
+  if (m1 == null || m2 == null || y2 == null) return null;
+  return { date: iso(y2, m2, +m[3]), dateStart: iso(m1 > m2 ? y2 - 1 : y2, m1, +m[1]) };
+}
+
+// Cell content = text after the final "|" (attributes precede it); refs and
+// templates, which contain pipes, are stripped beforehand. Citation data
+// (url, client) must be harvested from the raw chunk before this runs.
+function wikiCells(chunk) {
+  const t = chunk
+    .replace(/<ref[^>]*\/>/g, " ")
+    .replace(/<ref[^>]*>[\s\S]*?<\/ref>/g, " ")
+    .replace(/\{\{[^{}]*\}\}/g, " ")
+    .replace(/\{\{[^{}]*\}\}/g, " ");
+  const cells = [];
+  for (const l of t.split("\n")) {
+    const c = l.match(/^([|!])(.*)$/);
+    if (!c) continue;
+    const pipe = c[2].lastIndexOf("|");
+    cells.push({ hdr: c[1] === "!", content: (pipe >= 0 ? c[2].slice(pipe + 1) : c[2]).trim() });
+  }
+  return cells;
+}
+
+const near100 = (sum) => Math.abs(sum - 100) <= 2.5;
+const WIKI_PCT = /^'{0,3}(\d{1,2}(?:\.\d{1,2})?)%'{0,3}$/;
+
+// The Coalition shares one colspan=3 cell in this series (form A); tolerate
+// pollsters' lib/lnp/nat triple (form B) in case the table layout shifts.
+function wikiPrims(tokens) {
+  if (tokens.length >= 6) {
+    const p = tokens.slice(0, 6);
+    if (p.every((v) => v != null) && near100(p.reduce((a, b) => a + b, 0)))
+      return { alp: p[0], lnp: p[1], grn: p[2], onp: p[3], ind: p[4], oth: p[5], used: 6 };
+  }
+  if (tokens.length >= 8) {
+    const coal = tokens.slice(1, 4).filter((v) => v != null);
+    const rest = tokens.slice(4, 8);
+    if (tokens[0] != null && coal.length && rest.every((v) => v != null)) {
+      const lnp = Math.round(coal.reduce((a, b) => a + b, 0) * 10) / 10;
+      if (near100(tokens[0] + lnp + rest.reduce((a, b) => a + b, 0)))
+        return { alp: tokens[0], lnp, grn: rest[0], onp: rest[1], ind: rest[2], oth: rest[3], used: 8 };
+    }
+  }
+  return null;
+}
+
+function waveFromCells(cells) {
+  const si = cells.findIndex((c) => !c.hdr && /^\d[\d,]{2,}$/.test(c.content));
+  if (si < 0) return { fail: "no sample cell" };
+  const sample = +cells[si].content.replace(/,/g, "");
+  const tokens = [];
+  for (const c of cells.slice(si + 1)) {
+    const m = c.content.match(WIKI_PCT);
+    if (m) tokens.push(parseFloat(m[1]));
+    else if (c.content === "") tokens.push(null); // voids where templates sat
+    else return { fail: `unexpected cell "${c.content.slice(0, 40)}"` };
+    if (tokens.length >= 11) break;
+  }
+  const prims = wikiPrims(tokens);
+  if (!prims) return { fail: `primaries don't sum ~100 [${tokens.join(",")}]` };
+  const [ta, tb] = tokens.slice(prims.used, prims.used + 2);
+  const tpp = ta != null && tb != null && Math.abs(ta + tb - 100) <= 2
+    ? { tpp_alp: ta, tpp_lnp: tb }
+    : { tpp_alp: null, tpp_lnp: null };
+  const { used, ...vi } = prims;
+  return { sample, vi: { ...vi, ...tpp } };
+}
+
+function parseWikiYouGov(text) {
+  const out = [], unparsed = [];
+  let year = null, inVi = false;
+  for (const chunk of text.split(/^\|-[^\n]*$/m)) {
+    for (const h of chunk.matchAll(/^={2,4}\s*([^=]+?)\s*={2,4}\s*$/gm)) {
+      const y = h[1].match(/\b(20\d\d)\b/);
+      if (y) year = +y[1];
+    }
+    if (/\{\|/.test(chunk)) inVi = /Primary vote/i.test(chunk) && /2PP|Two-party.preferred/i.test(chunk);
+    else if (/\|\}/.test(chunk)) inVi = false;
+    if (!inVi || !/\[\[YouGov\]\]/.test(chunk) || /\bMRP\b/.test(chunk)) continue;
+    const um = chunk.match(/\|\s*url\s*=\s*(https?:\/\/[^\s|}\]]+)/);
+    const bm = chunk.match(/\[(https?:\/\/[^\s\]]+)\s/);
+    let url = um?.[1] ?? bm?.[1] ?? null;
+    if (url && /wikipedia\.org/.test(url)) url = null;
+    const cm = chunk.match(/\[\S+\s+''([^'']{3,40})''\]/);
+    const clientTxt = `${cm?.[1] ?? ""} ${um?.[1] ?? ""}`;
+    const client = /australia[ -]?institute/i.test(clientTxt) ? "Australia Inst." : "News24";
+    const cells = wikiCells(chunk);
+    const dd = cells.find((c) => c.hdr && parseWikiDate(c.content, year));
+    if (!dd) { unparsed.push("no parseable date cell"); continue; }
+    const fw = parseWikiDate(dd.content, year);
+    const w = waveFromCells(cells);
+    if (w.fail) { unparsed.push(`${fw.date}: ${w.fail}`); continue; }
+    out.push({ ...fw, sample: w.sample, url, client, vi: w.vi });
+  }
+  const seen = new Set(), waves = [];
+  for (const w of out) if (!seen.has(w.date)) { seen.add(w.date); waves.push(w); }
+  return { waves, unparsed };
 }
 
 // --------------------------------------------------------------- entry
@@ -410,7 +558,7 @@ try {
       });
     }
     sources.push({
-      date: rec.date,
+      date: rec.date, file: `release-${rec.date}.json`,
       json: JSON.stringify({
         url: rec.url, id: rec.id, published: rec.published,
         fieldwork: { date: rec.date, dateStart: rec.dateStart, sample: rec.sample },
@@ -419,6 +567,47 @@ try {
     });
     status.added.push({ date: rec.date, primaries: `${rec.vi.alp}/${rec.vi.lnp}/${rec.vi.grn}/${rec.vi.onp}/${rec.vi.ind}`, tpp: `${rec.vi.tpp_alp}/${rec.vi.tpp_lnp}`, ppm: rec.ppmA == null ? null : `${rec.ppmA}/${rec.ppmO}`, pmNet: rec.sat?.pmNet ?? null, oppNet: rec.sat?.oppNet ?? null });
   }
+
+  // Fallback: waves YouGov never released on yougov.com, sourced from the
+  // Wikipedia poll table. Only fills gaps — the RSS pass's dates win. A
+  // Wikipedia fetch failure is logged as N24_NOTE, not pipeline-fatal.
+  status.fallback = { source: "wikipedia", checked: 0, added: [], skipped_existing: 0, unparsed: [] };
+  try {
+    const wikiText = WIKI_FILE ? readFileSync(WIKI_FILE, "utf8") : (await fetchText(WIKI_RAW)).text;
+    const { waves, unparsed } = parseWikiYouGov(wikiText);
+    if (WIKI_DEBUG) console.error("N24_WIKI " + JSON.stringify(waves));
+    status.fallback.checked = waves.length;
+    status.fallback.unparsed = unparsed.slice(0, 10);
+    const have = new Set([...ygDates, ...newPolls.map((p) => p.date)]);
+    for (const w of waves) {
+      if (have.has(w.date)) { status.fallback.skipped_existing++; continue; }
+      const errs = guard(w, { requirePublished: false, requireTpp: false, spanMin: 0 });
+      if (errs.length) { status.fallback.unparsed.push(`${w.date}: ${errs.join(" | ")}`); continue; }
+      newPolls.push({
+        date: w.date, dateStart: w.dateStart,
+        pollster: "YouGov", client: w.client, sample: w.sample,
+        alp: w.vi.alp, lnp: w.vi.lnp, grn: w.vi.grn, onp: w.vi.onp,
+        ind: w.vi.ind, oth: w.vi.oth,
+        tpp_alp: w.vi.tpp_alp, tpp_lnp: w.vi.tpp_lnp,
+        ...(w.url ? { url: w.url } : {}),
+      });
+      sources.push({
+        date: w.date, file: `wiki-${w.date}.json`,
+        json: JSON.stringify({
+          source: "wikipedia", title: WIKI_TITLE, url: w.url,
+          fieldwork: { date: w.date, dateStart: w.dateStart, sample: w.sample }, vi: w.vi,
+        }, null, 2) + "\n",
+      });
+      status.fallback.added.push(w.date);
+      status.added.push({ date: w.date, primaries: `${w.vi.alp}/${w.vi.lnp}/${w.vi.grn}/${w.vi.onp}/${w.vi.ind}`, tpp: w.vi.tpp_alp == null ? null : `${w.vi.tpp_alp}/${w.vi.tpp_lnp}`, ppm: null, pmNet: null, oppNet: null, via: "wikipedia" });
+    }
+    if (status.fallback.added.length > MAX_WIKI_ADDS)
+      guardFails.push(`wiki fallback: ${status.fallback.added.length} new waves > cap ${MAX_WIKI_ADDS}`);
+  } catch (e) {
+    console.error(`N24_NOTE wiki fallback skipped: ${e.message}`);
+    status.fallback.error = String(e?.message || e);
+  }
+
   if (guardFails.length) {
     console.error("N24_GUARD " + guardFails.join(" || "));
     status.guard = guardFails;
@@ -437,7 +626,7 @@ try {
       writeFileSync(OUT + ".tmp", next);
       renameSync(OUT + ".tmp", OUT);
       mkdirSync(SRC_DIR, { recursive: true });
-      for (const s of sources) writeFileSync(`${SRC_DIR}/release-${s.date}.json`, s.json);
+      for (const s of sources) writeFileSync(`${SRC_DIR}/${s.file}`, s.json);
       console.log(`wrote ${OUT}: +${newPolls.length} YouGov wave(s): ${status.added.map((a) => a.date).join(", ")}`);
     }
   }
