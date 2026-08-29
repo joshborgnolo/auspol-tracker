@@ -578,10 +578,15 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
       .toLocaleDateString("en-AU", { day: "numeric", month: "long", year: "numeric" });
   })() : null;
 
-  // build a monthly series per visible cycle. Past cycles are tinted by the
-  // governing party (red Labor / blue Coalition terms) at reduced opacity and
-  // carry a year label at the line's end – identifiable at rest, not only on
-  // hover, which uniform grey reference lines couldn't manage with real data.
+  // build a monthly series per visible cycle. Past cycles sit behind at
+  // reduced opacity and carry a year label at the line's end – identifiable
+  // at rest, not only on hover, which uniform grey reference lines couldn't
+  // manage with real data. The tint follows the party being MEASURED (red
+  // Labor / blue Coalition): the term's government on its own charts, its
+  // opposition on the opposition charts, so a Coalition line never wears
+  // Labor red. (The legend chips keep term colours – a chip toggles a
+  // parliament, and a parliament is named for its government.)
+  const colorOf = (c) => (isOpp ? D.PARTIES[c.opp].color : c.color);
   const shown = cycles.filter((c) => !hidden.has(c.year));
   /* One cycle left on the chart: the year on every readout row is then drawing
      a distinction against nothing, so the row keeps the leader alone and the
@@ -641,7 +646,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
       const runs = obsRuns(pts, observed);
       const termEnd = si === seriesIn.length - 1;
       return runs.map((run, i) => ({
-        id: "c" + c.year + (si ? "-e" + si : "") + (i ? "-" + i : ""), label, color: c.color, width,
+        id: "c" + c.year + (si ? "-e" + si : "") + (i ? "-" + i : ""), label, color: colorOf(c), width,
         points: run.points, weight, current: c.current, opacity, dashed: run.dashed,
         // the end label and the end-cap dot belong to the LINE, so only the
         // final era's last run carries them – otherwise a split line grows a
@@ -685,7 +690,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
       const n = nameAt(p.iso);
       return {
         x: p.x, y: chg ? +(p.y - base).toFixed(2) : p.y,
-        color: c.color, shape: shapes[c.year],
+        color: colorOf(c), shape: shapes[c.year],
         label: n ? (solo ? n : c.year + " · " + n) : label, meta: p.meta, op: dim ? 0.3 : 1,
       };
     });
@@ -1248,9 +1253,9 @@ function PastCyclesView() {
       <div className="view-intro">
         <p className="view-lede">
           Every federal term since 2010, lined up on its election day so each government’s
-          run can be read off the same clock. Past terms sit behind in their party’s
-          colour – red for Labor, blue for the Coalition – with the year marked at the
-          end of each line.{" "}
+          run can be read off the same clock. Past terms sit behind, each line in the
+          colour of the party it measures – red for Labor, blue for the Coalition – with
+          its year marked at the end.{" "}
           {CANT_HOVER
             ? "Tap a cycle below to hide or restore its line, and leave just one visible to see more details."
             : "Hover over a cycle below to bring its line forward, and leave just one visible to see more details."}
