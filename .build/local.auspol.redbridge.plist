@@ -39,8 +39,8 @@
                 <dict><key>Day</key><integer>4</integer><key>Hour</key><integer>6</integer></dict>
         </array>
         <key>StandardOutPath</key>
-        <string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-redbridge-stdout.log</string>
+        <string>/Users/joshuaborgnolo/auspol tracker/.build/logs/launchd-redbridge-stdout.log</string>
         <key>StandardErrorPath</key>
-        <string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-redbridge-stderr.log</string>
+        <string>/Users/joshuaborgnolo/auspol tracker/.build/logs/launchd-redbridge-stderr.log</string>
 </dict>
 </plist>

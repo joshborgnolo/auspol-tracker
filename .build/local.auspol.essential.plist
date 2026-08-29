@@ -30,8 +30,8 @@
 		<dict><key>Day</key><integer>2</integer><key>Hour</key><integer>5</integer></dict>
 	</array>
 	<key>StandardOutPath</key>
-	<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-essential-stdout.log</string>
+	<string>/Users/joshuaborgnolo/auspol tracker/.build/logs/launchd-essential-stdout.log</string>
 	<key>StandardErrorPath</key>
-	<string>/Users/joshuaborgnolo/Documents/4. auspol/.build/logs/launchd-essential-stderr.log</string>
+	<string>/Users/joshuaborgnolo/auspol tracker/.build/logs/launchd-essential-stderr.log</string>
 </dict>
 </plist>
