@@ -18,7 +18,9 @@
 //
 // Source ranking (stored url/client come from the best-ranked source fetched):
 //   0 theaustralian.com.au  – publisher; standfirst/JSON-LD only, 403/429 ->
-//                             archive.md/newest snapshot of the same URL
+//                             archive.md/newest snapshot of the same URL ->
+//                             NEWSIE_CHROME=1 only: rendered read through the
+//                             user's logged-in Chrome (chrome-article.mjs)
 //   1 aapnews.aap.com.au    – free AAP wire
 //   2 abc.net.au            – free
 //   3 thenewdaily.com.au    – free but Cloudflare-walled; archive.md fallback
@@ -68,6 +70,7 @@
 //   - --check computes everything, prints NP_STATUS, never writes
 //   - writes are atomic (.tmp + rename)
 import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -147,10 +150,29 @@ async function fetchArticle(url) {
       text: `<title>${title}</title><meta property="article:published_time" content="${pubd}"><p>${j.abstract ?? ""}</p>${j.body ?? ""}`,
     };
   }
+  // NEWSIE_CHROME=1 only: rendered read of the page in the user's logged-in
+  // Chrome (chrome-article.mjs drives it via AppleScript; needs Chrome's
+  // "Allow JavaScript from Apple Events" plus one-time Automation consent).
+  // Interactive rescue path — launchd never sets NEWSIE_CHROME, so scheduled
+  // runs keep the plain + archive.md behaviour exactly.
+  const chromeFallback = () => {
+    if (!process.env.NEWSIE_CHROME) return null;
+    if (!/(^|\.)theaustralian\.com\.au$/.test(new URL(url).hostname)) return null;
+    try {
+      const text = execFileSync("node", [".build/chrome-article.mjs", url],
+        { encoding: "utf8", timeout: 180_000, maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "inherit"] });
+      return { url, text };
+    } catch {
+      return null; // helper already said why on stderr; caller keeps falling
+    }
+  };
   const archiveFallback = async (cause) => {
     const arc = await fetchText(`https://archive.md/newest/${url}`).catch(() => null);
-    if (!arc) throw cause;
-    return arc; // final URL is the snapshot page; same parser applies
+    if (arc && !/<title>\s*no cookies\b/i.test(arc.text)) return arc; // final URL is the snapshot page; same parser applies
+    const chrome = chromeFallback();
+    if (chrome) { console.error("NP_NOTE archive.md unusable; read theaustralian via NEWSIE_CHROME session"); return chrome; }
+    if (arc) return arc; // snapshot of the wall page is still better than nothing
+    throw cause;
   };
   try {
     const page = await fetchText(url);

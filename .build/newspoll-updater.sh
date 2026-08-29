@@ -5,6 +5,13 @@
 # directory). Every step logs one line to .build/logs/newspoll.log; any
 # failure exits non-zero before any commit, leaving the working tree for
 # manual review.
+#
+# The extractor's NEWSIE_CHROME=1 Chrome-session fallback (drives the user's
+# logged-in Chrome via AppleScript to read paywalled theaustralian.com.au
+# stories) is intentionally NOT enabled here: it needs Chrome running/logged
+# in, the "Allow JavaScript from Apple Events" toggle, and a one-time macOS
+# Automation consent prompt — interactive rescue only, run the extractor by
+# hand with NEWSIE_CHROME=1 when archive.md is down.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
