@@ -268,11 +268,20 @@ function weightedWithSe(pts) {                 // pts: [{ w, x, n }]
 }
 function nowcastAdj(rows, he, ref) {
   const pts = [];
+  const waves = new Map();                    // firm -> wave count inside the window
   for (const a of rows) {
     const d = ddays(ref, a.mid);
     if (d < 0 || d > HL_WINDOW) continue;
-    pts.push({ w: a.n * Math.exp(-LN2 * d / HL_HALF), x: a.x - heV(he, a.firm), n: a.n });
+    waves.set(a.firm, (waves.get(a.firm) || 0) + 1);
+    pts.push({ w: a.n * Math.exp(-LN2 * d / HL_HALF), x: a.x - heV(he, a.firm), n: a.n, firm: a.firm });
   }
+  /* A house with m waves in the window has not measured the electorate m
+     independent times - same method, same house-effect residue - so its
+     m readings count for sqrt(m), the midpoint between "independent" (m)
+     and "one reading" (1). Weekly Morgan still outweighs monthly everyone
+     else for genuinely measuring more often, ~1.7x rather than 3x - it
+     just can't be half the sample by showing up three times. */
+  for (const p of pts) p.w /= Math.sqrt(waves.get(p.firm));
   const r = weightedWithSe(pts);
   return r && { v: r1(r.v), n: r.n, se: r2(r.se), nEff: r1(r.nEff), ci95: r1(1.96 * r.se) };
 }
