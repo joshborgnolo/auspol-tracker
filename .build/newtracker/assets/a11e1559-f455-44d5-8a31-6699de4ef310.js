@@ -1407,7 +1407,7 @@ function UndecidedPanel({ rangeId }) {
       </div>
       <TrendChart
         key="und"
-        height={210} xDomain={xDomain} yDomain={[lo, hi]}
+        height={340} xDomain={xDomain} yDomain={[lo, hi]}
         yTicks={yTicks} unit="%" axisFont={20}
         pad={{ l: 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
