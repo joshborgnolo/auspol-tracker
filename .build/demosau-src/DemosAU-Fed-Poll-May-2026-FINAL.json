@@ -1,0 +1,13 @@
+{
+  "slug": "DemosAU-Fed-Poll-May-2026-FINAL",
+  "dateStart": "2026-05-15",
+  "date": "2026-05-20",
+  "sample": 1502,
+  "client": "Capital Brief",
+  "undecided": 7,
+  "tppNote": "2PP calculation method No 2PP calculated ",
+  "tpp_alp": null,
+  "tpp_lnp": null,
+  "trendError": "no 'May 25 Election' anchor row (topline table may be an image)",
+  "extractedAt": "2026-08-29T05:47:39.722Z"
+}

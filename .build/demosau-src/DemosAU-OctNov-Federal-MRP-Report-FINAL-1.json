@@ -1,0 +1,17 @@
+{
+  "slug": "DemosAU-OctNov-Federal-MRP-Report-FINAL-1",
+  "dateStart": "2025-10-05",
+  "date": "2025-11-11",
+  "sample": 6928,
+  "client": "—",
+  "tppNote": "2PP calculation method 3 ABOUT THIS RESEARCH About the MRP Methodology DemosAU surv",
+  "tpp_alp": 56,
+  "tpp_lnp": 44,
+  "alp": 33,
+  "lnp": 24,
+  "grn": 13,
+  "onp": 17,
+  "ind": 13,
+  "seatsError": "no 'Projection: Seats Won' table",
+  "extractedAt": "2026-08-29T05:47:40.304Z"
+}

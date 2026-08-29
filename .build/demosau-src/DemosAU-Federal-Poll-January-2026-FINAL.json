@@ -1,0 +1,12 @@
+{
+  "slug": "DemosAU-Federal-Poll-January-2026-FINAL",
+  "dateStart": "2026-01-13",
+  "date": "2026-01-21",
+  "sample": 1933,
+  "client": "Capital Brief",
+  "tppNote": "2PP calculation method No National TPP calculated Topline Results Seat Projections Bottom Top of ",
+  "tpp_alp": null,
+  "tpp_lnp": null,
+  "trendError": "no 'May 25 Election' anchor row (topline table may be an image)",
+  "extractedAt": "2026-08-29T05:47:40.168Z"
+}

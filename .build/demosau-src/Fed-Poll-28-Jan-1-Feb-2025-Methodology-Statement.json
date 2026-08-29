@@ -1,0 +1,12 @@
+{
+  "slug": "Fed-Poll-28-Jan-1-Feb-2025-Methodology-Statement",
+  "dateStart": "2025-01-28",
+  "date": "2025-02-01",
+  "sample": 1238,
+  "client": "—",
+  "tppNote": "2PP calculation method Using relevant 2022 federal election preference flows. ",
+  "tpp_alp": null,
+  "tpp_lnp": null,
+  "trendError": "no 'May 25 Election' anchor row (topline table may be an image)",
+  "extractedAt": "2026-08-29T05:47:40.340Z"
+}

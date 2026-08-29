@@ -1,0 +1,17 @@
+{
+  "slug": "Capital-BriefDemosAU-Federal-Poll-June-2026-FINAL",
+  "dateStart": "2026-06-16",
+  "date": "2026-06-18",
+  "sample": 1497,
+  "client": "Capital Brief",
+  "undecided": 7,
+  "tppNote": "2PP calculation method N/A ",
+  "tpp_alp": null,
+  "tpp_lnp": null,
+  "alp": 27,
+  "lnp": 18,
+  "grn": 13,
+  "onp": 30,
+  "ind": 12,
+  "extractedAt": "2026-08-29T05:47:39.619Z"
+}

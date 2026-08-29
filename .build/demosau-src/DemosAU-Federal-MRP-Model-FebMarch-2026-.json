@@ -1,0 +1,52 @@
+{
+  "slug": "DemosAU-Federal-MRP-Model-FebMarch-2026-",
+  "dateStart": "2026-01-13",
+  "date": "2026-03-03",
+  "sample": 8424,
+  "client": "—",
+  "tppNote": "2PP calculation method Using relevant 2025 federal election preference flows and selected respondent allocated preferenc",
+  "tpp_alp": null,
+  "tpp_lnp": null,
+  "alp": 29,
+  "lnp": 21,
+  "grn": 12,
+  "onp": 27,
+  "ind": 11,
+  "seats": {
+    "total": 150,
+    "basis": "2025 election",
+    "p": {
+      "alp": {
+        "est": 83,
+        "chg": -11,
+        "lo": 77,
+        "hi": 86
+      },
+      "onp": {
+        "est": 52,
+        "chg": 52,
+        "lo": 46,
+        "hi": 55
+      },
+      "lnp": {
+        "est": 9,
+        "chg": -34,
+        "lo": 9,
+        "hi": 17
+      },
+      "grn": {
+        "est": 1,
+        "chg": 0,
+        "lo": 0,
+        "hi": 3
+      },
+      "ind": {
+        "est": 5,
+        "chg": -7,
+        "lo": 2,
+        "hi": 6
+      }
+    }
+  },
+  "extractedAt": "2026-08-29T05:47:40.082Z"
+}

@@ -1,0 +1,1494 @@
+            MRP Model
+Australian Federal Voting Intention
+    - October/November 2025
+                                 1
+TABLE OF CONTENTS
+
+
+      03    Methodology Statement
+
+   04-05    About This Research
+
+   06-12    Summary
+
+    13-15   Results Overview
+
+   16-23    Seat Projections - Primary Vote A-Z
+
+   24-31    Seat Projections - Sorted by ALP TCP
+
+
+
+
+                                                   2
+METHODOLOGY
+STATEMENT
+Publication date: 1 December 2025
+Methodology Statement
+Research company                            DemosAU
+
+Client commissioning the research           Self-initiated
+
+End client                                  Self-initiated
+
+Fieldwork dates                             5 October-11 November 2025
+
+Mode of data collection                     Internet panels
+
+Target population                           Australians 18+ eligible to vote at elections
+
+Sample size                                 6,928
+
+Is voting intention published?              In this report
+
+Effective sample size after weighting       n/a for MRP
+applied
+
+Margin of error associated with effective   Approx. +/- 5% (for MRP seat estimates).
+sample size
+
+Variables used in weighting                 Age, gender, education, income, state, region, 2025 Federal
+                                            Election vote
+
+Weighting method used                       Multivariate Regression and Post-stratification
+
+Full question text, responses categories    Q. If a Federal Election was held today, which one of the following would
+and randomisation                           you vote for?
+                                            Answers randomly listed except DK kept last
+                                            Labor (with Anthony Albanese as Leader)
+                                            Liberal National Coalition (with Sussan Ley as Leader)
+                                            The Greens
+                                            Pauline Hanson's One Nation
+                                            Any other Candidate
+                                            Don't Know
+
+                                            If respondent chose Don’t Know they were asked
+                                            Q. Being undecided, which of the following would you have even a slight
+                                            leaning towards? Answers as above
+
+                                            Internet Panels (100%)
+Source of sample
+
+                                            Federal Voting Intention asked mid-survey after State Voting
+Positioning of voting intention questions
+                                            Intention.
+in questionnaire?
+
+                                            Initial undecided voters were provided with a follow up question
+How were undecided voters handled?
+                                            asking which VI option they were leaning towards. Respondents
+                                            who again answered Don't Know were excluded from final totals.
+
+                                            Using relevant 2025 federal election preference flows.
+2PP calculation method
+
+
+                                                                                                                  3
+ABOUT THIS
+RESEARCH
+About the MRP Methodology
+DemosAU surveyed 6,928 respondents nationwide between 5 October-11 November 2025. This
+data was then analysed using a Multilevel Regression and Poststratification (MRP) model of
+federal voting intention. The MRP model generated primary vote share estimates for all 150 House
+of Representative electorates.
+
+The poststratification frame for the MRP model used Age, Gender, Education, Income, State,
+Region and 2025 Federal Election Vote as the relevant demographic information.
+
+Two-Candidate Preferred results for each seat were estimated based on relevant preference
+flows at the 2025 Federal Elections.
+
+
+Seat Safety Classification
+The electorate vote shares indicated by the DemosAU MRP should be considered with a
+confidence interval at 95% probability of +/- 5%. To reflect this uncertainty, each seat is classified
+based on the strength of the result in the following three categories;
+
+   In Doubt - Any seat where the winning TCP is 50-51%, or a trailing candidate can win with an
+   increase in their vote of between 0-2%.
+   Lean - Any seat where the winning TCP is between 52-54%, or a trailing candidate can win with
+   an increase in their vote of between 2-4%.
+   Firm - All seats not classified as Lean or In Doubt.
+
+
+Electorate Classification
+For the purposes of this research, electorates have been classified as either Inner Metro, Outer
+Metro or Rural/Region. Please see P32 of this report for more information on the classification of
+individual electorates.
+
+
+
+
+                                                                                               4
+ ABOUT THIS
+ RESEARCH
+Limitations Of This Research
+Changes to Incumbency
+The DemosAU MRP does not take into account any possible changes in incumbency status in any
+seats for the next election, given that it may be over 2 years away.
+
+Therefore the estimates for each electorate should be considered on the basis of the current
+incumbent MP recontesting.
+
+Determination of final two in each seats
+The determination of which two parties/candidates make the final count in each electorate in the
+DemosAU model is based on the preference distribution data provided by the AEC for each seat.
+Whilst this data is the best available, this data is not static between elections and can change
+depending on the party composition of the eliminated candidates.
+
+The confidence interval for vote share estimate is also a source of uncertainty in determining the
+final two parties/candidates in each seat. This is recognised in the seat safety classifications. In a
+seat where a party/candidate misses the final count by less than 2% and if such a
+party/candidate could win a final count, then that seat will be classified as “in doubt” even if the
+estimated winning TCP was 52% or more.
+
+TCP Preference Flows
+In determining TCP results for a given electorate, relevant preference flows are used from the 2025
+federal election for that given seat. If the TCP candidate pairing in the DemosAU MRP model is
+different to the election, then national average preference flows from contests with the relevant
+pairing at the 2025 federal election are used.
+
+In terms of Coalition-One Nation TCP contests, the preference flows from the Maranoa electorate
+are used. For Labor-One Nation TCP contests, the preference flows from the Hunter electorate are
+used. While these electorates probably reflect the seats elsewhere where these TCP contests may
+occur, given the small number of observations for this data, this adds an extra factor of
+uncertainty for the results in such seats.
+
+
+
+
+                                                                                                5
+SUMMARY
+
+Labor in strong position, as rising One Nation vote threatens Coalition
+The DemosAU Federal Voting Intention MRP indicates that if a federal election was held in recent
+weeks it would result in a more fractured primary vote outcome compared to the 2025 election
+result with both major parties losing primary votes; Labor 33% (down 1.6%) and the Coalition 24%
+(down 7.6%) .
+
+The major recipient of the lost vote is One Nation which has risen 10.6% to 17%. The Greens are up
+marginally to 13% and Others have fallen slightly to 13% (down 2.0%).
+
+On a two party preferred basis Labor leads the Coalition 56-44%, a swing to Labor of 0.8%.
+
+In terms of seats, Labor increases its seat tally to 98 seats based on the MRP central forecast with
+marginal gains in Victoria and Queensland.
+
+The MRP results reflect the major trend in publicly available federal polling, a large swing from the
+Coalition to One Nation. These results give shape to the rising One Nation challenge which is
+largely in Coalition held seats in rural, regional and outer metropolitan Australia.
+
+The MRP central forecast gives a seat tally of 29 for the Coalition (21 Liberals, 8 Nationals) and 12
+for One Nation. However, as outlined across the following pages there is a significant degree of
+fluidity in these results.
+
+The next Federal election is likely more than 2 years away. This MRP model is a snapshot of
+contemporary voting intentions. Its most valuable insight is the shape of the One Nation electoral
+challenge based on current polling.
+
+Please see the Results Overview section on pages 13-15 to view the MRP Central Forecast and
+detailed demographic breakdowns.
+
+Individual seat projections are sorted alphabetically on pages 16-23 and by ALP TCP (two
+candidate preferred) on pages 24-31.
+
+
+
+
+                                                                                               6
+ SUMMARY
+State based swings & Major Party Contest
+Despite the significant changes on the Right of Centre parties, the overall “left-right” result is
+largely the same as the May federal election. The MRP indicates Labor has a chance to pick up
+more seats off the Liberals than vice-versa, however the MRP central forecast only indicates small
+gains for Labor.
+
+                          Marginal Labor-Coalition TCP Contests
+
+           TCP of held party                Labor held                  Coalition held
+
+
+                  54%                            3                            1
+
+                  53%                            5                            2
+
+                  52%                            1                            4
+
+                  51%                            1                            4
+
+                  50%                            0                            2
+
+
+The nationwide two-party swing of just under 1% to Labor comprises a swing to Labor of 2.6% in
+Queensland, 1.6% in Victoria, 0.8% in South Australia and 0.7% in Tasmania. There was little TPP
+change in NSW and Western Australia.
+
+A significant factor in the two-party swing, especially in Queensland is the more even split of
+primary votes between the Coalition and One Nation which negatively affects the Coalition TPP
+through preference leakage.
+
+
+Focus on rise of One Nation
+If the central forecast of the DemosAU MRP was a final election result, One Nation would win 12
+seats (8% of House of Representatives) off 17% of the vote. This would be the party’s best seat share
+since its 1998 Queensland election result of 11 seats (12% of Legislative Assembly) off 23% of the
+vote. It would also be the most significant third party result in the House of Representatives since
+Lang Labor in 1934.
+
+While One Nation has been contesting elections since the late 1990s, the seat breakthrough in the
+MRP has occurred for several reasons in addition to its significantly improved vote share.
+
+Firstly, the Federal Coalition now preferences One Nation on its how-to-vote cards which it did not
+in the late 1990's. The TCP flows from the Coalition to One Nation over Labor now exceed 80% where
+the Coalition is eliminated before the final count.
+
+
+
+                                                                                               7
+SUMMARY
+Focus on rise of One Nation (continued)
+Secondly, although Labor places the Coalition above One Nation on its how-to-vote cards, where
+Labor is eliminated prior to the final count, it is usually in rural Australia where it has little chance of
+winning seats and thus does not have many booth worker resources in these seats. As a result,
+Labor’s TCP flows to the Coalition over One Nation are now below 60%.
+
+Thirdly, because the Coalition vote is now at historical lows, One Nation can more easily beat the
+Coalition into the final count and ride its preferences to victory.
+
+Finally, a significant Others vote - 13% nationally - beyond the Greens and One Nation, still remains.
+Much of this vote still is an anti-major party vote. Where the final 3CP is One Nation and the major
+parties, preferences can send One Nation from third into the final count and potentially victory.
+
+Demographic features of the One Nation Vote
+The DemosAU MRP indicates that once undecided voters are excluded, approximately 1 in 5
+Coalition voters at the 2025 Federal Election are now intending to vote for One Nation.
+
+The key demographic differentials in the shift from the Coalition to One Nation are age, education
+and location (metro v region). The shift to One Nation is strongest among over 55’s, non-university
+degree holders and rural/regional voters. Among voters with this combination of demographic
+factors, the shift among 2025 Coalition voters is 1 in 3.
+
+                         One Nation Share of 2025 Coalition Voters
+                   Didn’t Finish Gr
+    Age Cohort            12              Gr12             TAFE      Undergraduate Postgraduate
+
+                                                 Inner Metro
+
+       18-34             13%              11%                  11%          6%               5%
+
+       35-54             18%              15%                  15%          10%              9%
+
+        55+              23%              20%                  20%          12%              11%
+                                                Outer Metro
+
+       18-34             18%              15%                  15%          9%               7%
+
+       35-54             24%              21%                  21%          13%              11%
+
+        55+              30%              26%                  27%          17%              15%
+                                            Rural/Regional
+
+       18-34             21%              18%                  18%          11%              9%
+
+       35-54             28%              25%                  25%          16%              14%
+        55+              35%              31%                  31%          20%              18%
+
+
+
+                                                                                                     8
+ SUMMARY
+Demographic features of the One Nation Vote (continued)
+Among 2025 Labor voters there is only a marginal attrition to One Nation of about 1 in 20, however
+the same demographic trends as 2025 Coalition voters applies. Among 2025 Labor voters which
+are over 55’s, non-university degree holders and in rural/regional areas, the shift is 1 in 10.
+
+                        One Nation Share of 2025 Labor Voters
+
+                      Didn’t Finish
+       Age Cohort                         G12             TAFE      Undergraduate Postgraduate
+                          G12
+
+                                                Inner Metro
+
+          18-34            3%             3%                  3%          2%              1%
+
+         35-54             5%             4%                  4%          2%             2%
+
+          55+              7%             6%                  6%          3%             3%
+
+                                               Outer Metro
+
+         18-34             5%             4%                  4%          2%             2%
+
+         35-54             7%             6%                  6%          3%             3%
+
+          55+             10%             8%                  8%         5%              4%
+
+                                           Rural/Regional
+
+         18-34             6%             5%                  5%          3%             2%
+
+         35-54             9%             7%                  7%         4%              4%
+
+          55+             12%             10%                 10%        6%              5%
+
+
+
+
+Seats Where One Nation is Competitive
+The demographic features of the shift to One Nation shape the seats which the party now has
+become competitive in. These seats are generally in rural/regional and also Outer Metropolitan
+areas where there is a relatively low share of university degree holders.
+
+While the central forecast indicates 12 seats for One Nation, this is inside a wide range based on
+the safety status of the seat. One Nation is only the firm leader in 3 seats, while is at least a small
+chance or better in up to 34 seats, albeit 16 seats within this group (trailing) have a minority
+probability of a One Nation victory.
+
+
+
+
+                                                                                                 9
+ SUMMARY
+Seats Where One Nation is Competitive (continued)
+
+The other striking feature about the competitiveness of One Nation is that it can win seats outside
+of Queensland. One Nation is ahead or competitive in at least one seat in every mainland state.
+
+One Nation can also challenge existing rural independents and minor party MPs. The MRP indicates
+One Nation is competitive in Calare (vs Ind - Andrew Gee), Indi (vs Ind - Helen Haines) and
+Kennedy (vs Bob Katter).
+
+                               Seats In Play for One Nation
+                                            IN DOUBT -
+           FIRM              LEAN                         IN DOUBT - BEHIND      TRAILING
+                                             LEADING
+
+                                                                                   NSW
+                                                                                 Cowper
+                                                                                  Farrer
+                                                                                 Paterson
+                                                                                 Whitlam
+                                                                  Qld
+                                               NSW                                  Qld
+                                                                Dawson
+                             Qld              Calare                                Blair
+                                                                 Forde
+                            Hinkler                                              Fadden
+                                                               Longman
+                           Wide Bay            WA                                  Fisher
+          Qld                                                  Maranoa
+                                             Canning                             Kennedy
+       Capricornia
+                             NSW                                                Leichhardt
+         Flynn                                                    WA
+                             Lyne               SA
+         Wright                                                 Forrest
+                            Parkes             Grey                                 Vic
+                           Riverina                                             Gippsland
+                                                                 NSW
+                                               Qld                                Hawke
+                                                                Hunter
+                                              Groom                                Indi
+                                                                                  Mallee
+                                                                                 Monash
+                                                                                 Nicholls
+
+                                                                                    WA
+                                                                                 O'Connor
+
+
+
+
+                                                                                             10
+ SUMMARY
+Coaltion Seats Under Threat
+The Nationals as a party are most at risk from the rise of One Nation. Of the 15 seats which elected
+Nationals MPs in 2025, the MRP model central forecast indicates that One Nation leads in 7 seats
+and the Nationals retain the lead in 8. Again the model indicates a wide range of close contests
+and within this cohort of 15 seats, the Nationals only remain firm holds in 2 of these; Lyne and New
+England. If Barnaby Joyce were to reconsider running in New England for One Nation, then this may
+make the seat more competitive for One Nation.
+
+One Nation are only firm winners from the Nationals in Capricornia and Flynn.
+
+Another feature is that One Nation is polling strongly enough in some safe National Party seats that
+it can possibly win despite Labor HTV direction towards the Nationals over One Nation.
+
+The Liberals are also at risk of losing regional and outer metropolitan seats to One Nation. There
+are 7 Liberal seats where One Nation can possibly mount a challenge to the sitting Liberal. In
+Wright, One Nation is firmly in the lead. One Nation is slightly ahead in close contests in Canning,
+Grey and Groom, while One Nation pushes the Liberals into third in Longman, but is narrowly
+behind Labor. One Nation trails close behind in Farrer, Forrest and O’Connor.
+
+The rise in the One Nation vote at the expense of the Coalition also increases preference leakage
+against the Coalition in many of their tight contests against Independents.
+
+A striking political outcome of the MRP model is that the Liberal and Nationals leaders and many of
+their putative alternatives both have very strong challenges from One Nation or Independents.
+
+The central forecast indicates;
+
+   Leader of the Opposition Sussan Ley has a slender 52-48 lead over One Nation in Farrer
+   Nationals Leader David Littleproud’s hold on Maranoa is threatened with a 19% TCP swing to One
+   Nation, leaving a fragile 51-49 Nationals lead
+   Putative Liberal Leadership challenger Andrew Hastie is pushed into third place in Canning,
+   where One Nation holds a 56-44 TCP lead over Labor
+   Due to a falling primary and preference leakage from One Nation, Dan Tehan is reduced to a
+   very slender lead in Wannon vs Independent, the rounded TCP result is 50-50
+   Former Nationals leader Michael McCormack trails One Nation 48-52 in Riverina
+   The mooted electorate for the transition of Nationals senator Matt Canavan to the lower house,
+   Capricornia, is a firm One Nation win on the current MRP model.
+
+The only bright spots for leading coalition MPs based on the MRP central forecast are Angus Taylor
+in Hume, a firm Liberal hold (56-44 v Labor) and Deputy Nationals Leader Kevin Hogan in Page
+which is also a firm National hold (59-41 v Labor).
+
+
+
+
+                                                                                              11
+SUMMARY
+Labor seats under threat
+Finally, while One Nation is mostly a threat to Coalition seats, there are a handful of Labor seats in
+regional and outer metropolitan Australia in which One Nation are competitive according to the
+DemosAU MRP model.
+
+Hunter and Forde are both in doubt with narrow Labor leads according to the central forecast.
+While One Nation trails closely in 5 urban fringe and regional seats; Paterson, Leichhardt, Blair,
+Whitlam and Hawke.
+
+Going forward Labor will have to face three electoral fronts; Coalition, Greens and One Nation. In
+total the MRP model indicates that One Nation makes into the final count in 26 seats vs Labor.
+
+
+George Hasanakos
+Director, Head of Research
+
+
+
+
+                                                                                               12
+RESULTS OVERVIEW
+
+              MRP Seat Estimates - Central Forecast
+
+
+
+
+                                      Seats Won             Seats                  Change
+             Party                     (Central           Forecast   2025 Seats    (Central
+                                      Forecast)            Range*                 Forecast)
+
+               ALP                          98            92-104        94           +4
+
+               LNP                          29             21-38        43           -14
+
+              GRN                           0               0-0          1           -1
+
+              ONP                           12             8-18          0           +12
+
+              OTH                           11              9-13         12          -1
+ *Assessing In Doubt seats as variable within the range
+
+
+
+
+                                                                                              13
+ RESULTS OVERVIEW
+
+                                            Topline Results
+                                                         Primary Vote
+
+                                                 ALP           LNP          GRN         ONP          OTH
+
+ May 25 Election                                 34.6%                                     31.8%           12.2%    6.4%          15.0%
+ Oct-Nov 25 MRP                                 33.0%                        24.0%            13.0%                  17.0%        13.0%
+                   0%               20%                       40%                       60%                      80%                  100%
+
+                                                  Two Party Preferred
+ May 25 Election                                                            55.2%                                                 44.8%
+ Oct-Nov 25 MRP                                                              56.0%                                                44.0%
+                   0%               20%                       40%                       60%                        80%                100%
+
+                                           State + Location
+                                            State/Territory - Primaries
+
+                                          ALP           LNP          GRN          ONP         OTH
+
+NSW                                33%                                    24%               12%                   17%                 14%
+ VIC                               33%                                    24%                 14%                   16%               13%
+ QLD                            30%                                     25%               12%                      20%                13%
+  SA                                  36%                                  21%                14%                   16%               13%
+ WA                                 34%                                   23%               12%                      19%              12%
+ TAS                                  36%                              18%               13%                    17%                   16%
+  NT                                34%                                      25%              12%                       19%           10%
+ACT                                                       46%                           20%                   16%     6%              12%
+       0%               20%                        40%                            60%                         80%                      100%
+
+                                    State/Territory - Two Party Preferred
+NSW                                                                     55%                                                           45%
+ VIC                                                                       58%                                                        42%
+ QLD                                                                 52%                                                              48%
+  SA                                                                         60%                                                      40%
+ WA                                                                      56%                                                          44%
+ TAS                                                                                 64%                                              36%
+  NT                                                                  54%                                                             46%
+ACT                                                                                           71%                                     29%
+       0%               20%                        40%                            60%                         80%                      100%
+
+                                                              Location
+Inner Metro                                        38%                              23%                    17%             10%        12%
+Outer Metro                                     35%                            23%             12%                       17%          13%
+  Reg & Rur                    24%                                    26%          9%                              24%                17%
+              0%              20%                         40%                        60%                           80%                 100%
+
+
+
+
+                                                                                                                                 14
+RESULTS OVERVIEW
+
+
+                                         Demographics
+                                                               Gender
+                                             ALP         LNP          GRN          ONP              OTH
+
+  Male                                  33%                                  25%              10%                       18%              14%
+
+Female                                  33%                                22%                      16%                  16%             13%
+         0%                    20%                   40%                           60%                            80%                     100%
+
+                                                                Age
+18-34                                  32%                           19%                                   26%               11%         12%
+35-54                                   34%                                22%                 13%                     16%               15%
+  55+                                  33%                                       28% 4%                                  22%             13%
+        0%                     20%                  40%                            60%                           80%                      100%
+
+                                                          Education
+Didn't Finish Grade 12                             32%                           23%         7%                          24%             14%
+               Grade 12                             33%                          22%                      16%                16%         13%
+                   TAFE                            31%                           23%               12%                   19%             15%
+     Undergraduate                                       35%                                 27%                 16%          10%        12%
+        Postgraduate                                           40%                             25%                15%          9%        11%
+                          0%           20%                      40%                          60%                       80%                100%
+
+                                                               Income
+    <$45K                                32%                               22%                13%                       19%              14%
+  $45-75K                                    33%                             24%                   13%                  16%              14%
+ $75-125K                                    34%                                 25%                     14%             14%             13%
+$125-200K                                     35%                                      27%                12%                14%         12%
+   >$200K                               31%                                            32%           8%                       18%        11%
+              0%                 20%                     40%                           60%                        80%                     100%
+
+
+
+
+                                                                                                                                    15
+SEAT PROJECTIONS -
+PRIMARY VOTE % A-Z
+
+ Electorate   State   ALP   LNP   GRN   ONP   OTH
+
+
+  Adelaide     SA     44    19    20     11    6
+
+   Aston      VIC     35    28    13    13    11
+
+  Ballarat    VIC     38    21    15    18     8
+
+  Banks       NSW     36    32    12    12     8
+
+  Barker       SA     22    32    10    25    11
+
+  Barton      NSW     44    21    15    13     7
+
+   Bass       TAS     37    23    14    18     8
+
+   Bean       ACT     41    21     11    7    20
+
+  Bendigo     VIC     32    29    13    16    10
+
+ Bennelong    NSW     43    30    12     9     6
+
+ Berowra      NSW     27    33    12    14    14
+
+   Blair      QLD     34    19     11   22    14
+
+ Blaxland     NSW     44    17    10     11   18
+
+  Bonner      QLD     38    27    13    13     9
+
+ Boothby       SA     41    25    17     11    6
+
+
+ Bowman       QLD     31    28    12    19    10
+
+
+ Braddon      TAS     37    22    10    20    11
+
+
+ Bradfield    NSW     24    33     9    10    24
+
+
+   Brand      WA      40    14    13    24     9
+
+
+ Brisbane     QLD     34    27    25     9     5
+
+
+
+                                                   16
+SEAT PROJECTIONS -
+PRIMARY VOTE A-Z
+
+ Electorate   State   ALP   LNP   GRN   ONP   OTH
+
+
+   Bruce      VIC     41    17    13    17    12
+
+ Bullwinkel   WA      31    28     11   21     9
+
+   Burt       WA      42    14    12    20    12
+
+  Calare      NSW     12    20     5    23    40
+
+  Calwell     VIC     30    12    10    12    36
+
+ Canberra     ACT     47    18    20     5    10
+
+ Canning      WA      28    28     9    27     8
+
+Capricornia   QLD     29    23     7    32     9
+
+  Casey       VIC     25    29    12    16    18
+
+  Chifley     NSW     47    16     11   14    12
+
+ Chisholm     VIC     39    30    14     9     8
+
+   Clark      TAS     25    12    14    14    35
+
+   Cook       NSW     30    36    10    16     8
+
+  Cooper      VIC     41    13    25     11   10
+
+Corangamite   VIC     36    26    15    12    11
+
+
+   Corio      VIC     38    18    16    20     8
+
+
+  Cowan       WA      44    20    12    13    11
+
+
+  Cowper      NSW     13    26     6    22    33
+
+
+Cunningham    NSW     40    18    19    17     6
+
+
+  Curtin      WA      20    33    10    12    25
+
+
+
+                                                   17
+SEAT PROJECTIONS -
+PRIMARY VOTE A-Z
+
+ Electorate   State   ALP   LNP   GRN   ONP   OTH
+
+
+  Dawson      QLD     25    28     9    26    12
+
+  Deakin      VIC     34    29    13    12    12
+
+  Dickson     QLD     34    26     9    14    17
+
+  Dobell      NSW     38    21    10    20    11
+
+  Dunkley     VIC     36    23    13    17    11
+
+  Durack      WA      23    31     9    26    11
+
+Eden-Monaro   NSW     38    25     11   18     8
+
+  Fadden      QLD     28    28    10    21    13
+
+  Fairfax     QLD     26    27    10    20    17
+
+   Farrer     NSW     16    30     7    22    25
+
+  Fenner      ACT     51    20    17     5     7
+
+   Fisher     QLD     24    26    10    19    21
+
+  Flinders    VIC     23    29     8    18    22
+
+   Flynn      QLD     23    23     7    32    15
+
+   Forde      QLD     32    21    12    23    12
+
+
+  Forrest     WA      22    25     9    24    20
+
+
+  Fowler      NSW     34    11     8    13    34
+
+
+  Franklin    TAS     40    15    12    14    19
+
+
+  Fraser      VIC     41    15    24     11    9
+
+
+ Fremantle    WA      38    16    13    14    19
+
+
+
+                                                   18
+SEAT PROJECTIONS -
+PRIMARY VOTE A-Z
+
+ Electorate   State   ALP   LNP   GRN   ONP   OTH
+
+
+ Gellibrand   VIC     44    21    18    12     5
+
+  Gilmore     NSW     35    26     9    17    13
+
+ Gippsland    VIC     20    32    10    33     5
+
+ Goldstein    VIC     19    35     9     11   26
+
+  Gorton      VIC     40    22    12    15    11
+
+ Grayndler    NSW     50    14    23     8     5
+
+ Greenway     NSW     46    22    12    12     8
+
+   Grey        SA     21    24     8    27    20
+
+  Griffith    QLD     36    22    29     8     5
+
+  Groom       QLD     18    27     7    26    22
+
+ Hasluck      WA      44    17    13    16    10
+
+  Hawke       VIC     35    21     11   21    12
+
+  Herbert     QLD     24    35     11   18    12
+
+Hindmarsh      SA     45    18    15    13     9
+
+  Hinkler     QLD     28    24     8    31     9
+
+
+   Holt       VIC     40    18    13    18    11
+
+
+ Hotham       VIC     46    21    16     11    6
+
+
+  Hughes      NSW     36    28    12    15     9
+
+
+  Hume        NSW     25    32    10    21    12
+
+
+  Hunter      NSW     36    13     8    30    13
+
+
+
+                                                   19
+SEAT PROJECTIONS -
+PRIMARY VOTE A-Z
+
+   Electorate     State   ALP   LNP   GRN   ONP   OTH
+
+
+      Indi        VIC     11    20     5    22    42
+
+    Isaacs        VIC     45    22    14    13     6
+
+   Jagajaga       VIC     40    23    16    12     9
+
+   Kennedy        QLD     17    16     7    23    37
+
+Kingsford Smith   NSW     47    22    14    13     4
+
+   Kingston        SA     47    14    14    15    10
+
+   Kooyong        VIC     18    36    10     9    27
+
+   La Trobe       VIC     31    28    14    18     9
+
+     Lalor        VIC     40    19    16    16     9
+
+  Leichhardt      QLD     34    20     11   20    15
+
+     Lilley       QLD     45    22    17     11    5
+
+   Lindsay        NSW     30    29    10    19    12
+
+    Lingiari       NT     39    23    12    20     6
+
+   Longman        QLD     34    24    10    23     9
+
+     Lyne         NSW     19    25     7    25    24
+
+
+    Lyons         TAS     40    19    12    18    11
+
+
+  Macarthur       NSW     43    18    13    17     9
+
+
+  Mackellar       NSW     16    30     8    13    33
+
+
+ Macnamara        VIC     36    26    25     9     4
+
+
+  Macquarie       NSW     38    24    12    20     6
+
+
+
+                                                       20
+SEAT PROJECTIONS -
+PRIMARY VOTE A-Z
+
+ Electorate   State   ALP   LNP   GRN   ONP   OTH
+
+
+   Makin       SA     43    16    13    16    12
+
+  Mallee      VIC     19    32    10    28    11
+
+ Maranoa      QLD     17    33     6    32    12
+
+Maribyrnong   VIC     40    24    20    14     2
+
+   Mayo        SA     22    17    13    17    31
+
+  McEwen      VIC     35    24    12    16    13
+
+ McMahon      NSW     40    20    10    20    10
+
+McPherson     QLD     25    27    10    15    23
+
+ Melbourne    VIC     33    17    37     7     6
+
+  Menzies     VIC     34    31    12     11   12
+
+  Mitchell    NSW     32    36    13    14     5
+
+  Monash      VIC     20    22     7    22    29
+
+ Moncrieff    QLD     26    30    10    18    16
+
+  Moore       WA      32    24     11   15    18
+
+ Moreton      QLD     43    21    21     9     6
+
+
+New England   NSW     20    35     9    27     9
+
+
+ Newcastle    NSW     42    16    20    13     9
+
+
+  Nicholls    VIC     23    30     9    28    10
+
+
+ O'Connor     WA      21    31    10    28    10
+
+
+   Oxley      QLD     48    17    14    13     8
+
+
+
+                                                   21
+SEAT PROJECTIONS -
+PRIMARY VOTE A-Z
+
+ Electorate   State   ALP   LNP   GRN   ONP   OTH
+
+
+   Page       NSW     22    32    14    20    12
+
+  Parkes      NSW     18    25     7    32    18
+
+Parramatta    NSW     45    26    13     9     7
+
+ Paterson     NSW     34    20     8    19    19
+
+  Pearce      WA      37    20    12    20    11
+
+   Perth      WA      41    21    23    13     2
+
+  Petrie      QLD     35    27    12    18     8
+
+  Rankin      QLD     45    16    12    15    12
+
+   Reid       NSW     46    27    12     9     6
+
+ Richmond     NSW     29    20    23    16    12
+
+ Riverina     NSW     18    27     6    27    22
+
+ Robertson    NSW     40    23     9    18    10
+
+   Ryan       QLD     31    28    27     9     5
+
+  Scullin     VIC     41    15     11   16    17
+
+ Shortland    NSW     40    20     11   20     9
+
+
+ Solomon       NT     31    27    12    17    13
+
+
+  Spence       SA     39    13    15    20    13
+
+
+   Sturt       SA     36    27    16     11   10
+
+
+   Swan       WA      41    22    17    13     7
+
+
+  Sydney      NSW     51    17    21     8     3
+
+
+
+                                                   22
+SEAT PROJECTIONS -
+PRIMARY VOTE A-Z
+
+ Electorate   State   ALP   LNP   GRN   ONP   OTH
+
+
+  Tangney     WA      41    28    13    12     6
+
+ Wannon       VIC     13    31     6    18    32
+
+ Warringah    NSW     19    28    10     11   32
+
+  Watson      NSW     45    14     11    11   19
+
+Wentworth     NSW     18    31    12     11   28
+
+ Werriwa      NSW     38    24    12    13    13
+
+ Whitlam      NSW     35    21    12    19    13
+
+ Wide Bay     QLD     25    25     9    29    12
+
+   Wills      VIC     37    12    32     9    10
+
+  Wright      QLD     24    21     9    33    13
+
+
+
+
+                                                   23
+SEAT PROJECTIONS -
+SORTED BY ALP TCP
+                                                   Notional
+Electorate   State   ALP   LNP   GRN   ONP   OTH              Safety
+                                                    Leader
+
+Canberra     ACT     73    27                       Labor     FIRM
+
+ Fenner      ACT     70    30                       Labor     FIRM
+
+ Sydney      NSW     70          30                 Labor     FIRM
+
+Adelaide      SA     69    31                       Labor     FIRM
+
+Blaxland     NSW     69    31                       Labor     FIRM
+
+ Chifley     NSW     67    33                       Labor     FIRM
+
+  Oxley      QLD     67    33                       Labor     FIRM
+
+ Watson      NSW     67                      33     Labor     FIRM
+
+Kingsford
+             NSW     66    34                       Labor     FIRM
+  Smith
+
+Hindmarsh     SA     66    34                       Labor     FIRM
+
+ Hotham      VIC     66    34                       Labor     FIRM
+
+ Moreton     QLD     66    34                       Labor     FIRM
+
+Grayndler    NSW     66          34                 Labor     FIRM
+
+Kingston      SA     66                34           Labor     FIRM
+
+Newcastle    NSW     66          34                 Labor     FIRM
+
+
+  Perth      WA      65    35                       Labor     FIRM
+
+
+  Lilley     QLD     65    35                       Labor     FIRM
+
+
+Gellibrand   VIC     65    35                       Labor     FIRM
+
+
+  Swan       WA      64    36                       Labor     FIRM
+
+
+ Barton      NSW     64    36                       Labor     FIRM
+
+
+                                                                24
+SEAT PROJECTIONS -
+SORTED BY ALP TCP
+                                                    Notional
+ Electorate   State   ALP   LNP   GRN   ONP   OTH              Safety
+                                                     Leader
+
+   Lalor      VIC     63    37                       Labor     FIRM
+
+Maribyrnong   VIC     63    37                       Labor     FIRM
+
+  Cowan       WA      63    37                       Labor     FIRM
+
+  Isaacs      VIC     63    37                       Labor     FIRM
+
+  Rankin      QLD     63                37           Labor     FIRM
+
+Macnamara     VIC     62    38                       Labor     FIRM
+
+ Greenway     NSW     62    38                       Labor     FIRM
+
+ Jagajaga     VIC     62    38                       Labor     FIRM
+
+Parramatta    NSW     62    38                       Labor     FIRM
+
+ Boothby       SA     62    38                       Labor     FIRM
+
+  Griffith    QLD     62          38                 Labor     FIRM
+
+Cunningha
+              NSW     62                38           Labor     FIRM
+   m
+
+  Hasluck     WA      62                38           Labor     FIRM
+
+  Makin        SA     62                38           Labor     FIRM
+
+ Brisbane     QLD     61    39                       Labor     LEAN
+
+
+   Reid       NSW     61    39                       Labor     FIRM
+
+
+  Gorton      VIC     61    39                       Labor     FIRM
+
+
+  Cooper      VIC     61          39                 Labor     FIRM
+
+
+ Macarthur    NSW     61                39           Labor     FIRM
+
+
+  Ballarat    VIC     60    40                       Labor     FIRM
+
+
+                                                                 25
+SEAT PROJECTIONS -
+SORTED BY ALP TCP
+                                                    Notional
+ Electorate   State   ALP   LNP   GRN   ONP   OTH              Safety
+                                                     Leader
+
+   Ryan       QLD     60    40                       Labor     LEAN
+
+  Franklin    TAS     60                      40     Labor     FIRM
+
+  Fraser      VIC     60          40                 Labor     FIRM
+
+  Spence       SA     60                40           Labor     FIRM
+
+   Bruce      VIC     60                40           Labor     FIRM
+
+  Scullin     VIC     60                40           Labor     FIRM
+
+Corangamite   VIC     59    41                       Labor     FIRM
+
+   Bass       TAS     59    41                       Labor     FIRM
+
+ Bennelong    NSW     59    41                       Labor     FIRM
+
+ Braddon      TAS     59    41                       Labor     FIRM
+
+   Burt       WA      59                41           Labor     FIRM
+
+    Holt      VIC     59                41           Labor     FIRM
+
+   Corio      VIC     59                41           Labor     FIRM
+
+   Lyons      TAS     58                42           Labor     FIRM
+
+  Dunkley     VIC     58    42                       Labor     FIRM
+
+
+   Sturt       SA     58    42                       Labor     FIRM
+
+
+   Brand      WA      57                43           Labor     FIRM
+
+
+ McMahon      NSW     57                43           Labor     FIRM
+
+
+ Tangney      WA      57    43                       Labor     FIRM
+
+
+ Robertson    NSW     57    43                       Labor     FIRM
+
+
+
+                                                                26
+SEAT PROJECTIONS -
+SORTED BY ALP TCP
+                                                   Notional
+Electorate   State   ALP   LNP   GRN   ONP   OTH              Safety
+                                                    Leader
+
+ Werriwa     NSW     57    43                       Labor     FIRM
+
+Richmond     NSW     57    43                       Labor     FIRM
+
+Chisholm     VIC     57    43                       Labor     FIRM
+
+ Dickson     QLD     57    43                       Labor     FIRM
+
+Macquarie    NSW     56    44                       Labor     FIRM
+
+ McEwen      VIC     56    44                       Labor     FIRM
+
+ Lingiari     NT     56    44                       Labor     FIRM
+
+ Bonner      QLD     56    44                       Labor     FIRM
+
+Melbourne    VIC     56          44                 Labor     FIRM
+
+Shortland    NSW     56                44           Labor     FIRM
+
+ Eden-
+             NSW     55    45                       Labor     FIRM
+ Monaro
+
+  Aston      VIC     55    45                       Labor     FIRM
+
+  Wills      VIC     55          45                 Labor     FIRM
+
+ Dobell      NSW     55                45           Labor     FIRM
+
+ Pearce      WA      55                45           Labor     FIRM
+
+
+ Banks       NSW     54    46                       Labor     LEAN
+
+
+ Deakin      VIC     54    46                       Labor     LEAN
+
+
+ Gilmore     NSW     54    46                       Labor     LEAN
+
+
+ Calwell     VIC     54                      46     Labor     LEAN
+
+
+ Hawke       VIC     54                46           Labor     LEAN
+
+
+
+                                                                27
+SEAT PROJECTIONS -
+SORTED BY ALP TCP
+                                                   Notional
+Electorate   State   ALP   LNP   GRN   ONP   OTH               Safety
+                                                    Leader
+
+ Whitlam     NSW     54                46           Labor      LEAN
+
+ Bendigo     VIC     53    47                       Labor      LEAN
+
+  Moore      WA      53    47                       Labor      LEAN
+
+  Petrie     QLD     53    47                       Labor      LEAN
+
+ Hughes      NSW     53    47                       Labor      LEAN
+
+ Menzies     VIC     53    47                       Labor      LEAN
+
+  Bean       ACT     53                      47     Labor      LEAN
+
+  Blair      QLD     53                47           Labor      LEAN
+
+Leichhardt   QLD     53                47           Labor      LEAN
+
+Bullwinkel   WA      52    48                       Labor      LEAN
+
+Fremantle    WA      52                      48     Labor      LEAN
+
+Paterson     NSW     52                48           Labor      LEAN
+
+Solomon       NT     51    49                       Labor     IN DOUBT
+
+  Forde      QLD     51                49           Labor     IN DOUBT
+
+  Casey      VIC     50    50                       Labor     IN DOUBT
+
+
+ La Trobe    VIC     50    50                       Labor     IN DOUBT
+
+
+ Hunter      NSW     50                50           Labor     IN DOUBT
+
+
+Longman      QLD     50                50           Labor     IN DOUBT
+
+
+ Lindsay     NSW     49    51                      Coalition IN DOUBT
+
+
+Bowman       QLD     49    51                      Coalition IN DOUBT
+
+
+
+                                                                 28
+SEAT PROJECTIONS -
+SORTED BY ALP TCP
+                                                    Notional
+ Electorate   State   ALP   LNP   GRN   ONP   OTH                Safety
+                                                     Leader
+
+  Fairfax     QLD     49    51                      Coalition IN DOUBT
+
+ Berowra      NSW     49    51                      Coalition IN DOUBT
+
+  Forrest     WA      48    52                      Coalition IN DOUBT
+
+ Monash       VIC     48    52                      Coalition    LEAN
+
+McPherson     QLD     48    52                      Coalition    LEAN
+
+ Flinders     VIC     48    52                      Coalition    LEAN
+
+  Fisher      QLD     47    53                      Coalition    LEAN
+
+ Mitchell     NSW     47    53                      Coalition    LEAN
+
+  Fowler      NSW     47                      53     Other       LEAN
+
+  Fadden      QLD     46    54                      Coalition    LEAN
+
+  Hume        NSW     44    56                      Coalition     FIRM
+
+ Moncrieff    QLD     44    56                      Coalition     FIRM
+
+   Cook       NSW     44    56                      Coalition     FIRM
+
+                                                      One
+ Canning      WA      44                56                      IN DOUBT
+                                                     Nation
+
+  Durack      WA      43    57                      Coalition     FIRM
+
+                                                      One
+  Hinkler     QLD     43                57                       LEAN
+                                                     Nation
+
+                                                      One
+Capricornia   QLD     42                58                        FIRM
+                                                     Nation
+
+                                                      One
+ Wide Bay     QLD     42                58                       LEAN
+                                                     Nation
+
+  Herbert     QLD     41    59                      Coalition     FIRM
+
+
+   Page       NSW     41    59                      Coalition     FIRM
+
+
+                                                                   29
+SEAT PROJECTIONS -
+SORTED BY ALP TCP
+                                                    Notional
+ Electorate   State   ALP   LNP   GRN   ONP   OTH                Safety
+                                                     Leader
+
+                                                      One
+  Wright      QLD     41                59                        FIRM
+                                                     Nation
+
+                                                      One
+   Grey        SA     40                60                      IN DOUBT
+                                                     Nation
+
+                                                      One
+   Flynn      QLD     39                61                        FIRM
+                                                     Nation
+
+   Clark      TAS     38                      62     Other        FIRM
+
+   Mayo        SA     38                      62     Other        FIRM
+
+  Barker       SA           55          45          Coalition     FIRM
+
+New England   NSW           55          45          Coalition     FIRM
+
+ O'Connor     WA            53          47          Coalition    LEAN
+
+  Mallee      VIC           53          47          Coalition    LEAN
+
+ Bradfield    NSW           52                48    Coalition    LEAN
+
+  Cowper      NSW           52                48    Coalition    LEAN
+
+  Dawson      QLD           52          48          Coalition IN DOUBT
+
+  Farrer      NSW           52          48          Coalition    LEAN
+
+  Nicholls    VIC           52          48          Coalition    LEAN
+
+ Gippsland    VIC           52          48          Coalition    LEAN
+
+ Maranoa      QLD           51          49          Coalition IN DOUBT
+
+ Kooyong      VIC           50                50     Other      IN DOUBT
+
+ Wannon       VIC           50                50    Coalition IN DOUBT
+
+ Goldstein    VIC           49                51     Other      IN DOUBT
+
+                                                      One
+  Groom       QLD           49          51                      IN DOUBT
+                                                     Nation
+
+
+                                                                   30
+SEAT PROJECTIONS -
+SORTED BY ALP TCP
+                                                   Notional
+Electorate   State   ALP   LNP   GRN   ONP   OTH               Safety
+                                                    Leader
+
+                                                    One
+ Riverina    NSW           48          52                      LEAN
+                                                   Nation
+
+                                                    One
+  Lyne       NSW           48          52                      LEAN
+                                                   Nation
+
+ Curtin      WA            47                53     Other      LEAN
+
+                                                    One
+ Parkes      NSW           46          54                      LEAN
+                                                   Nation
+
+Wentworth    NSW           44                56     Other       FIRM
+
+Mackellar    NSW           44                56     Other       FIRM
+
+Warringah    NSW           42                58     Other       FIRM
+
+  Indi       VIC                       47    53     Other      LEAN
+
+Kennedy      QLD                       47    53     Other      LEAN
+
+                                                    One
+ Calare      NSW                       51    49               IN DOUBT
+                                                   Nation
+
+
+
+
+                                                                 31
+ELECTORATE
+CLASSIFICATIONS
+
+               Inner Metro                   Outer Metro               Regional/Rural
+
+
+
+
+                                       Berowra, Chifley, Cook,
+         Banks, Barton, Bennelong, Cunningham, Dobell, Fowler,
+                                                                    Calare, Cowper, Eden-
+            Blaxland, Bradfield,     Greenway, Hughes, Lindsay,
+                                                                   Monaro, Farrer, Gilmore,
+        Grayndler, Kingsford Smith,    Macarthur, Macquarie,
+  NSW                                                              Hume, Hunter, Lyne, New
+        Mackellar, Parramatta, Reid,     McMahon, Mitchell,
+                                                                    England, Page, Parkes,
+        Sydney, Warringah, Watson,      Newcastle, Paterson,
+                                                                     Richmond, Riverina
+                Wentworth               Robertson, Shortland,
+                                          Werriwa, Whitlam
+
+
+
+
+                                    Aston, Bruce, Calwell,
+        Chisholm, Cooper, Fraser,  Casey, Corangamite,
+          Gellibrand, Goldstein,   Corio, Deakin, Dunkley,    Ballarat, Bendigo,
+  VIC      Hotham, Kooyong,       Flinders, Gorton, Hawke,  Gippsland, Indi, Mallee,
+        Macnamara, Maribyrnong, Holt, Isaacs, Jagajaga, La Monash, Nicholls, Wannon
+            Melbourne, Wills        Trobe, Lalor, McEwen,
+                                       Menzies, Scullin
+
+
+
+                                        Blair, Bonner, Bowman,
+                                                                    Capricornia, Dawson,
+                                       Dickson, Fadden, Fairfax,
+                                                                    Flynn, Groom, Herbert,
+         Brisbane, Griffith, Lilley,   Fisher, Forde, Longman,
+  QLD                                                                  Hinkler, Kennedy,
+             Moreton, Ryan              McPherson, Moncrieff,
+                                                                 Leichhardt, Maranoa, Wide
+                                         Oxley, Petrie, Rankin,
+                                                                              Bay
+                                                 Wright
+
+
+           Adelaide, Boothby,          Kingston, Makin, Mayo,
+  SA                                                                    Barker, Grey
+            Hindmarsh, Sturt                  Spence
+
+
+                                   Brand, Bullwinkel, Burt,
+        Cowan, Curtin, Fremantle,
+  WA                              Canning, Hasluck, Moore,        Durack, Forrest, O'Connor
+          Perth, Swan, Tangney
+                                          Pearce
+
+
+  TAS         Clark, Franklin                                       Bass, Braddon, Lyons
+
+
+  NT                                                                  Lingiari, Solomon
+
+
+  ACT    Bean, Canberra, Fenner
+
+
+
+
+                                                                                          32
+33
+

@@ -1,0 +1,471 @@
+MRP Model
+
+
+   DemosAU
+   MRP Model
+Fieldwork Dates: 13/01/26 -03/03/26
+Total Sample Size: 8,424
+
+
+
+
+                                      1
+Methodology Statement
+
+  Research company                                        DemosAU
+
+  Client commissioning the research                       Self-initiated
+
+  Fieldwork dates                                         13 January - 3 March 2026
+
+  Mode of data collection                                 Internet panels
+
+  Target population                                       Australians 18+ eligible to vote at elections
+
+  Sample size                                             8,484
+
+  Is voting intention published?
+                                                          In this report
+
+  Effective sample size after weighting applied
+                                                          n/a for MRP
+  Margin of error associated with effective sample size
+                                                          n/a for MRP (Approx. +/- 5% (for MRP seat estimates).
+  Variables used in weighting
+                                                          Age, gender, education, income, state, region, 2025 Federal Election vote
+
+
+  Weighting method used                                   Multivariate Regression and Post-stratification
+
+  Full question text, responses categories and            See Page 19
+  randomisation
+
+  Source of sample                                        Internet Panels (100%)
+
+  Positioning of voting intention questions in            Federal Voting Intention asked mid-survey after State Voting Intention.
+  questionnaire?
+
+  How were undecided voters handled?                      Initial undecided voters were provided with a follow up question asking which VI option they were leaning towards.
+                                                          Respondents who again answered Don't Know were excluded from final totals.
+
+  2PP calculation method                                  Using relevant 2025 federal election preference flows and selected respondent allocated preference flows for where ON is
+                                                          in the final count and ON preferences in ALP v L/NP final counts. See Page 20 for more details
+
+
+
+
+                                                                                                                                                                                 2
+About This Research
+ DemosAU surveyed 8,424 respondents nationwide between 13 January-3 March 2026. This data was then analysed
+ in a Multilevel Regression and Poststratification (MRP) model of federal voting intention. The MRP model generated
+ primary vote share estimates for all 150 House of Representative electorates. The poststratification frame for the MRP
+ model used Age, Gender, Education, Income, State, Region and 2025 Federal Election Vote as the relevant
+ demographic information.
+
+ Two-Candidate Preferred results for each seat were estimated based on relevant preference flows at the 2025
+ Federal Elections, except for preferences associated with One Nation where preference flows were modeled on large
+ scale respondent allocated preference data taken during above-stated polling period.
+
+ The MRP model results for the NSW seat of Farrer should not be taken as a prediction of the upcoming by-election
+ result as by-election dynamics are vastly different to those of a general election.
+
+
+
+
+                                                                                                                     3
+                        Topline Results
+
+                                                                Primary Vote %
+                                                                 ALP          LNP        GRN       ONP           OTH
+
+
+  May 25 Election                                      34.6%                                                     31.8%           12.2%         6.4%                 15.0%
+
+
+
+  Oct-Nov 25 MRP                                     33.0%                                     24.0%                     13.0%                   17.0%              13.0%
+
+
+
+Feb-March 26 MRP                             29.0%                                   21.0%               12.0%                                        27.0%         11.0%
+
+                   0%           20%                                    40%                               60%                             80%                             100%
+
+
+
+
+                                                      Change since Last Election %
+                                                         ALP          LNP        GRN         ONP       OTH
+
+                                                             -5.6%
+
+                                      -10.8%
+
+                                                                             -0.2%
+
+                                                                                                                                                         20.6%
+
+                                                                     -4.0%
+
+                    -20%              -10%                                          0%                                   10%                                  20%
+
+
+
+
+                                                                                                                                                                     4
+               Gender + Age
+
+                                               Gender
+                                   ALP         LNP          GRN   ONP         OTH
+
+
+  Male                     28%                         22%             10%                       29%     11%
+
+
+
+Female                       30%                       20%                    15%                 25%   10%
+
+         0%          20%                 40%                            60%               80%             100%
+
+
+
+                                                     Age
+                                   ALP         LNP          GRN   ONP         OTH
+
+
+  18-34                    28%                  18%                                 25%           19%   10%
+
+
+ 35-54                       30%                      19%               12%                     27%     12%
+
+
+   55+                     28%                              24%   5%                              33%   10%
+
+          0%         20%                 40%                            60%               80%            100%
+
+
+
+
+                                                                                                               5
+                    Education + Income
+
+                                                                       Education
+                                                                ALP          LNP          GRN          ONP          OTH
+
+Didn't Finish Grade 12                26%                                   18%           7%                                                  38%          11%
+            Grade 12                    28%                                         21%                             16%                        25%         10%
+                 TAFE                  27%                                    19%                     12%                                    30%           12%
+     Undergraduate                                 32%                                           24%                       16%                 18%         10%
+       Postgraduate                                      35%                                           24%                       16%                 17%   8%
+                         0%     20%                                   40%                                    60%                       80%                     100%
+
+                                                                            Income
+                                                               ALP          LNP          GRN         ONP           OTH
+
+           <$45K                      28%                                     19%                      13%                                   29%           11%
+
+         $45-75K                      28%                                          21%                        14%                              27%         10%
+
+        $75-125K                        30%                                          21%                      12%                            26%           11%
+
+       $125-200K                             31%                                               24%                  11%                        24%         10%
+
+          >$200K                       29%                                                                   34%          8%                   19%         10%
+                   0%         20%                                    40%                                    60%                        80%                     100%
+
+
+
+
+                                                                                                                                                           6
+                   State + Location
+
+                                                                    State/Territory
+                                                              ALP         LNP           GRN         ONP            OTH
+
+NSW                                   29%                                             21%                        12%                                    26%              12%
+ VIC                                 28%                                          21%                             14%                                         27%        10%
+QLD                            25%                                          21%                      12%                                                     31%             11%
+ SA                                               34%                                       18%                        12%                                     27%           9%
+ WA                                    30%                                            20%                         13%                                         27%        10%
+TAS                                         31%                             15%                     11%                                          27%                     16%
+ NT                                         31%                                             21%                    11%                                             29%       8%
+ACT                                                                 42%                                    18%                       18%                     11%             11%
+       0%                20%                                    40%                                         60%                            80%                                100%
+
+
+                                                                            Location
+                                                                    ALP         LNP           GRN         ONP            OTH
+
+Inner Metro                                             34%                                         22%                        17%                             17%       10%
+Outer Metro                                   30%                                       20%                        12%                                        28%        10%
+  Reg & Rur                20%                                        21%               8%                                                             37%               14%
+              0%               20%                                    40%                                         60%                       80%                               100%
+
+
+
+
+                                                                                                                                                                         7
+                     By 2025 Election Result
+
+
+                                             State/Territory
+                                       ALP        LNP   GRN   ONP         OTH
+
+
+ALP                                                                             76%   4%    5%         13%
+
+LNP        4%                                                   56%                                    37%
+
+GRN             6%                                                                               82%   7%       3%
+
+ONP                                                                                                         97%
+
+OTH         5%        6%   4%         24%                                                                   61%
+
+      0%                        20%         40%                     60%               80%                       100%
+
+
+
+
+                                                                                                            8
+                    Where One Nation’s Vote is Coming From
+                    % Share of 2025 L/NP Voters
+
+
+
+
+                    Inner Metro                                                            Outer Metro                                                 Rural/Regional
+             Didn't finish G12         High School Certificate                      Didn't finish G12     High School Certificate                      Didn't finish G12     High School Certificate
+
+             TAFE         Undergraduate           Postgraduate                      TAFE       Undergraduate         Postgraduate                      TAFE       Undergraduate        Postgraduate
+
+
+                                           27%                                                                       38%                                                           43%
+
+                                 19%                                                                     29%                                                               33%
+
+18-34                              21%                                 18-34                                   32%                        18-34                              36%
+
+                     13%                                                                          21%                                                              24%
+
+                     13%                                                                        20%                                                                24%
+
+                                                         37%                                                                      49%                                                           54%
+
+                                           27%                                                                       39%                                                            44%
+
+35-54                                            30%                   35-54                                               42%            35-54                                        47%
+
+                                 19%                                                                     29%                                                               33%
+
+                             18%                                                                         28%                                                               32%
+
+                                                          38%                                                                     50%                                                           55%
+
+                                            28%                                                                       40%                                                            45%
+
+ 55+                                               32%                  55+                                                 44%            55+                                            49%
+
+                                   21%                                                                      31%                                                              35%
+
+                                 20%                                                                      30%                                                               34%
+        0%          10%            20%            30%            40%           0%      10%         20%         30%         40%      50%           0%     10%      20%      30%     40%       50%       60%
+
+
+
+
+                                                                                                                                                                                                 9
+                       Where One Nation’s Vote is Coming From
+                       % Share of 2025 Labor Voters
+
+
+                        Inner Metro                                                           Outer Metro                                                       Rural/Regional
+                  Didn't finish G12      High School Certificate                      Didn't finish G12            High School Certificate                      Didn't finish G12          High School Certificate
+
+              TAFE              Undergraduate      Postgraduate                       TAFE          Undergraduate            Postgraduate                       TAFE         Undergraduate           Postgraduate
+
+
+                     9%                                                                             14%                                                                        17%
+
+              6%                                                                             10%                                                                       12%
+
+18-34             7%                                                     18-34                11%                                                  18-34                13%
+
+             4%                                                                        7%                                                                         8%
+
+             4%                                                                        7%                                                                         8%
+
+
+                              14%                                                                                21%                                                                        24%
+
+                       10%                                                                           15%                                                                        18%
+
+35-54                   11%                                              35-54                            17%                                      35-54                             20%
+
+              6%                                                                             10%                                                                       12%
+
+              6%                                                                             10%                                                                       12%
+
+
+                              14%                                                                                22%                                                                         25%
+
+                       10%                                                                            16%                                                                       18%
+
+ 55+                      12%                                             55+                              18%                                      55+                               21%
+
+                  7%                                                                          11%                                                                       13%
+
+                  7%                                                                          11%                                                                       13%
+        0%                10%          20%          30%            40%           0%           10%                20%          30%            40%           0%          10%            20%             30%            40%
+
+
+
+
+                                                                                                                                                                                                            10
+Projection: Seats Won
+
+
+
+
+                             MRP    2025
+                Party                     Change
+                           Estimate Seats
+
+                Labor        83     94     -11
+
+              One Nation     52      0     +52
+
+              Coalition       9     43     -34
+
+                Green         1      1      0
+
+                Other         5      12    -7
+
+
+                                                   11
+Seat Clasifications
+                         Total
+                                            Firm              Lean              In Doubt          Seat Range
+                        Leading
+
+
+       Labor                83               56                 20                   7                77-86
+
+
+   One Nation               52               23                 25                   4                46-55
+
+
+    Coalition                9                5                  1                   3                 9-17
+
+
+      Green                  1                0                  0                   1                 0-3
+
+
+       Other                 5                1                  1                   3                 2-6
+
+The electorate vote shares indicated by the DemosAU MRP should be considered with a confidence interval at 95%
+probability of +/- 5%. To reflect this uncertainty, each seat is classified based on a calculated probability of victory by the
+leading party. the strength of the result in the following three categories;
+
+In Doubt: Less than 70% chance of victory. This usually equates to a winning TCP of 50-51% or a where trailing candidate
+outside of the final count can win with an increase in their vote of between 0-2%.
+Lean: 70-95% chance of victory. This usually equates to a winning TCP is between 52-54%, or a trailing candidate outside
+of the final count can win with an increase in their vote of between 2-4%.
+Firm: Greater than 95% chance of victory. All seats not classified as Lean or In Doubt.
+                                                                                                                      12
+Seats Changing Hands - Labor Held
+
+
+
+
+                                    13
+Seats Changing Hands - Coalition Held
+
+
+
+
+                                        14
+Seats Changing Hands - Coalition Held
+
+
+
+
+                                        15
+Seats Changing Hands - Coalition Held
+
+
+
+
+                                        16
+Seats Changing Hands - Coalition Held
+
+
+
+
+                                        17
+Seats Changing Hands - Other Held
+
+
+
+
+                                    18
+Questions in this Poll
+
+  Q.If a Federal Election was held today, which one of the following would you vote for?
+  Answers randomly listed except DK kept last
+  Labor (with Anthony Albanese as Leader)
+  Liberal National Coalition (with Sussan Ley/Angus Taylor as Leader)
+  The Greens (with Larissa Waters as Leader)
+  One Nation (with Pauline Hanson as Leader)
+  Any Other Candidate
+  Don't Know
+
+  If respondent chose Don’t Know they were asked
+  Q. Being undecided, which of the following would you have even a slight leaning towards?
+  Answers as above
+
+  If a respondent was not undecided after the 2 voting intention questions they were asked
+
+  Q. If a federal election for the House of Representatives was held tomorrow, and the following were on the
+  ballot in your electorate, how would you vote?Please number the options from 1 to 5 in order of your
+  preference.
+  Answers as above randomly listed with don’t know not offered.
+
+
+
+
+                                                                                                               19
+A Note on Preferences
+    Given the significant rise in the One Nation vote and corresponding fall in the Coalition vote, the composition of
+    preference flows from these parties may have changed significantly.
+
+    To model any possible changes in preference flow we have used large-scale respondent allocated preference
+    flows. The use of respondent allocated preference has been challenging when used in individual polls of 1000 or
+    2000. By using a sample size in excess of 8000 we hope to obtain more reliable data.
+
+    Even at this scale we are only using preference flows informed by respondent data in relation to ALP-ONP, L/NP-
+    ONP TCP contest and the ON preferences in ALP-L/NP contests.
+
+    In all other cases our preference flow assumptions are informed by previous election preferences as before.
+
+    The respondent allocated preference were obtained from respondents completely ranking the 5 voting options
+    (ALP, L/NP, Grn, ONP, Oth). Based on this data DemosAU has applied the following preference flows
+
+    In ALP-L/NP TCP contests, A nationwide ON preference flow of L/NP 78.5% ALP 21.5% is modelled by increasing the
+    Coalition share of ON preferences by 4 percentage points in every electorate.
+
+    In ALP-ONP contests the following preference flows were used;
+
+    Inner Metro: L/NP 60-40 ON, Grn 91-9 ALP, Oth 70-30 ALP
+    Outer Metro: L/NP 69-31 ON, Grn 91-9 ALP, Oth 58-42 ALP
+    Regional/Rural: L/NP 79-21 ON, Grn 87-13 ALP, Oth 53-47 ALP
+
+    In L/NP-ONP contests the following preference flows were used;
+
+    Inner Metro: ALP 72-28 L/NP, Grn 82-18 L/NP, Oth 77-23 L/NP
+    Outer Metro: ALP 68-32 L/NP, Grn 70-30 L/NP, Oth 58-42 L/NP
+    Regional/Rural: ALP 64-36 L/NP, Grn 77-23 L/NP, Oth 54-46 L/NP
+
+                                                                                                                         20
+21
+

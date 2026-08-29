@@ -1,0 +1,17 @@
+{
+  "slug": "Capital-BriefDemosAU-Federal-Poll-August-2026",
+  "dateStart": "2026-08-18",
+  "date": "2026-08-20",
+  "sample": 1562,
+  "client": "Capital Brief",
+  "undecided": 5,
+  "tppNote": "2PP calculation method N/A ",
+  "tpp_alp": null,
+  "tpp_lnp": null,
+  "alp": 26,
+  "lnp": 25,
+  "grn": 12,
+  "onp": 24,
+  "ind": 13,
+  "extractedAt": "2026-08-29T05:47:39.281Z"
+}
