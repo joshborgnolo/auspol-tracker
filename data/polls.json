@@ -5707,14 +5707,18 @@
     {
       "date": "2026-08-07",
       "firm": "Newspoll",
-      "alb": -22,
-      "opp": -12,
+      "alb": 0,
+      "opp": -7,
       "oppName": "Taylor",
       "han": -3,
       "detail": {
+        "alb": {
+          "app": 47,
+          "dis": 47
+        },
         "opp": {
-          "app": 34,
-          "dis": 46
+          "app": 35,
+          "dis": 42
         }
       }
     },
