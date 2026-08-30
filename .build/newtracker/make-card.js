@@ -52,7 +52,7 @@
   const R = (v) => { const p = document.createElement("span"); p.style.color = v;
     document.body.appendChild(p); const x = getComputedStyle(p).color; p.remove(); return x; };
   const T = {
-    bg: R("oklch(0.970 0.008 78)"), ink: R("oklch(0.27 0.012 55)"),
+    bg: R("oklch(0.985 0.004 91.4)"), ink: R("oklch(0.27 0.012 55)"),
     ink2: R("oklch(0.44 0.012 55)"), ink3: R("oklch(0.52 0.010 58)"),
     line: R("oklch(0.895 0.008 75)"), alp: R("oklch(0.55 0.150 27)"),
     lnp: R("oklch(0.50 0.095 250)"), grn: R("oklch(0.60 0.120 150)"),
@@ -66,7 +66,7 @@
   const PAD = 70;
   c.textBaseline = "alphabetic";
   const caps = (t, x, y, size, ls, col, w) => {
-    c.font = `${w || 700} ${size}px "Public Sans", sans-serif`;
+    c.font = `${w || 700} ${size}px "Source Sans 3", sans-serif`;
     c.fillStyle = col; c.letterSpacing = ls + "px"; c.fillText(t, x, y);
     const m = c.measureText(t).width; c.letterSpacing = "0px"; return m;
   };
@@ -82,10 +82,10 @@
      dial's painted extent to centre on the wordmark's, since the pivot is 11
      units below the middle of what gets drawn. */
   const BL1 = 92, BL2 = BL1 + 29.5;
-  c.font = '800 30px "Public Sans", sans-serif'; c.letterSpacing = "-0.75px";
+  c.font = '800 30px "Source Sans 3", sans-serif'; c.letterSpacing = "-0.75px";
   c.fillStyle = T.ink; c.fillText("auspol", PAD, BL1);
   const wN = c.measureText("auspol").width;
-  c.font = '400 30px "Public Sans", sans-serif'; c.letterSpacing = "-0.9px";
+  c.font = '400 30px "Source Sans 3", sans-serif'; c.letterSpacing = "-0.9px";
   c.fillStyle = T.ink3; c.fillText("tracker", PAD, BL2);
   const wMark = Math.max(wN, c.measureText("tracker").width);
   c.letterSpacing = "0px";
@@ -129,7 +129,7 @@
   c.fillText((marg >= 0 ? "Labor" : "Coalition") + " leads by " + Math.abs(marg).toFixed(1), W - PAD, 116);
   // one line, not two: the caveats belong beside the sentence they qualify.
   // The page will not call a move real unless it clears its own interval.
-  c.font = '400 15px "Public Sans", sans-serif'; c.fillStyle = T.ink3;
+  c.font = '400 15px "Source Sans 3", sans-serif'; c.fillStyle = T.ink3;
   c.fillText("95% interval ±" + L.alp2ppCi95.toFixed(1) + " pts · "
              + L.method.nPolls + " polls in " + L.method.windowDays + " days · "
              + (chg > 0 ? "+" : "−") + Math.abs(chg).toFixed(1) + " on a month ago"
@@ -146,7 +146,7 @@
   caps("TWO-PARTY PREFERRED", PAD, 190, 15, 2.6, T.ink3, 700);
   const FIG_Y = 312, FIG_PX = 150, GAP = 22, DOT = 4.5;
   const figFont = "600 " + FIG_PX + 'px Newsreader, Georgia, serif';
-  const measCaps = (t) => { c.font = '700 20px "Public Sans", sans-serif';
+  const measCaps = (t) => { c.font = '700 20px "Source Sans 3", sans-serif';
     c.letterSpacing = "1.8px"; const w = c.measureText(t).width;
     c.letterSpacing = "0px"; return w; };
   const measFig = (v) => { c.font = figFont; return c.measureText(v.toFixed(1)).width; };
@@ -239,10 +239,10 @@
      edge already divides it from the reading above. The old bottom ran 32px
      from the plot to these labels and then 24px to the provenance with 13px
      left under it, which read as cramped; it is 26 / 28 / 22 now. */
-  c.font = '400 17px "Public Sans", sans-serif'; c.fillStyle = T.ink3;
+  c.font = '400 17px "Source Sans 3", sans-serif'; c.fillStyle = T.ink3;
   c.fillText(L.pollsTracked + " polls · " + L.housesTracked
              + " pollsters · House-effect-adjusted aggregate", PAD, 608);
-  c.textAlign = "right"; c.font = '600 17px "Public Sans", sans-serif'; c.fillStyle = T.ink2;
+  c.textAlign = "right"; c.font = '600 17px "Source Sans 3", sans-serif'; c.fillStyle = T.ink2;
   c.fillText("auspoltracker.com", W - PAD, 608); c.textAlign = "left";
 
   /* ---- export at exactly 1200x630, supersampled from the 2x draw --------- */

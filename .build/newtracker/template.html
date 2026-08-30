@@ -221,7 +221,7 @@
    ============================================================ */
 :root {
   /* surfaces – warm paper */
-  --bg:        oklch(0.970 0.008 78);
+  --bg:        oklch(0.985 0.004 91.4);   /* #FBFAF7 */
   --surface:   oklch(0.992 0.004 85);
   --surface-2: oklch(0.980 0.006 80);
 
@@ -282,7 +282,7 @@
      @font-face serving, so it is NAMED here rather than shipped. Anyone who
      has it installed - which is anyone with Adobe software - gets it; every
      other visitor falls through to the face this site does host. */
-  --sans: "Myriad Pro", "Myriad Web Pro", "Public Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sans: "Myriad Pro", "Myriad Web Pro", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --radius: 14px;
   --shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
@@ -2138,7 +2138,10 @@ body.dark .fb-form { color-scheme: dark; }
    Drops card chrome; separates sections with hairline rules and
    stronger serif headings. Charts breathe edge-to-edge on paper.
    ============================================================ */
-body.editorial { --bg: oklch(0.975 0.009 80); --chart-bg: var(--bg); }
+/* The page colour. Editorial and cool are both element+class, so this wins on
+   source order over body.cool's own --bg - which is why one value here sets
+   the light page for warm AND cool paper. */
+body.editorial { --bg: oklch(0.985 0.004 91.4); --chart-bg: var(--bg); }   /* #FBFAF7 */
 
 body.editorial .content { gap: 0; }
 

@@ -102,9 +102,13 @@ let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
 const FONTS = [
   { file: "newsreader-latin.woff2",        family: "Newsreader",  style: "normal", weight: "400 600", preload: true },
   { file: "newsreader-italic-latin.woff2", family: "Newsreader",  style: "italic", weight: "400 500" },
-  // Public Sans is a variable face: one file serves the whole 400-800 range,
-  // which is why the old CSS pointed five per-weight rules at the same uuid.
-  { file: "publicsans-latin.woff2",        family: "Public Sans", style: "normal", weight: "400 800", preload: true },
+  /* Source Sans 3 is a variable face: one file serves the whole 400-800
+     range, which is why the old CSS pointed five per-weight rules at the same
+     uuid. It stands in for Myriad Pro, which the stack names but cannot ship
+     - same designer, same humanist skeleton - so the visitors who have Myriad
+     and the ones who do not are looking at close relatives rather than at two
+     unrelated typefaces. */
+  { file: "sourcesans3-latin.woff2",       family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });
@@ -197,7 +201,7 @@ function oklchHex(L, C, Hdeg) { return rgbHex(oklchRgb(L, C, Hdeg)); }
    whole failure this meta is here to avoid. A static meta cannot follow a
    runtime toggle, so panelled keeps that 2/255; it is imperceptible, and the
    default is the one worth being exact about. */
-const THEME = { light: [0.975, 0.009, 80], dark: [0.205, 0.010, 65] };
+const THEME = { light: [0.985, 0.004, 91.4], dark: [0.205, 0.010, 65] };
 const THEME_LIGHT = oklchHex(...THEME.light), THEME_DARK = oklchHex(...THEME.dark);
 const PARTY_HEX = {
   alp: oklchHex(0.55, 0.150, 27), lnp: oklchHex(0.50, 0.095, 250),
