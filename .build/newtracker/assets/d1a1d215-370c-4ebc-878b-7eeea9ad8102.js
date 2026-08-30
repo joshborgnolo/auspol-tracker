@@ -861,8 +861,14 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
 
 function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll, shapes }) {
   const anyHidden = hidden.size > 0;
+  /* onMouseLeave clears the highlight for a pointer, and a finger never fires
+     it: a term raised by a tap stayed lit on the chart until another chip
+     happened to replace it. The next gesture starting outside the legend puts
+     it back, the same way the chart readouts and the accuracy dots do. */
+  const legRef = useRef(null);
+  window.useDismissOutside(legRef, hi != null, () => setHi(null));
   return (
-    <div className="cyc-legend" onMouseLeave={() => setHi(null)}>
+    <div className="cyc-legend" ref={legRef} onMouseLeave={() => setHi(null)}>
       <div className="cyc-legend-row">
         {cycles.map((c) => {
           const off = hidden.has(c.year);

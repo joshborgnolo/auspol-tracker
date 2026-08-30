@@ -1366,9 +1366,8 @@ function App() {
    version of the page to full transparency and pulls the app up over the
    gap it leaves (--ss-h set below) - so the swap happens on one class
    change, with no blank article-height seam opening at the top. The text
-   stays in the DOM at full size: that version is exactly what reader engines
-   and assistive tech are for, and Safari's reader rejects every harder hide
-   (clip, off-screen position, display:none). */
+   stays in the DOM at full size, because Safari's reader rejects every
+   harder hide (clip, off-screen position, display:none). */
 const staticSummary = document.querySelector(".static-summary");
 if (staticSummary) {
   const setStaticSummaryHeight = () =>
@@ -1380,6 +1379,19 @@ if (staticSummary) {
   /* webfonts swap in after mount and re-lay the article out; the pull-up
      must follow its height or a seam opens where it stood */
   new ResizeObserver(setStaticSummaryHeight).observe(staticSummary);
+  /* opacity:0 hides it from EYES and from nothing else. A screen reader still
+     walked the whole article - 3,690 characters, seven headings and a second
+     <h1> - and then walked the app and heard every figure again. The comment
+     here used to say the fallback was what "reader engines and assistive tech
+     are for", but that is only true when the app has NOT mounted: once it has,
+     the app is the accessible copy and this one is a duplicate of it.
+     So it is hidden from the accessibility tree at the moment the app takes
+     over, and only then - with no JS, nothing runs and the article stands as
+     the page. Reader engines extract from rendered text rather than from the
+     accessibility tree, which is what lets one attribute separate the two
+     audiences. It carries nothing focusable, so there is no tab order to
+     mend as well. */
+  staticSummary.setAttribute("aria-hidden", "true");
 }
 document.body.classList.add("js");
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
