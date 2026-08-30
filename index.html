@@ -422,7 +422,13 @@ body.js #root {
 .dl-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .dl-svg { width: min(420px, 94%); height: auto; overflow: visible; display: block; }
 .dl-arc { fill: none; stroke-width: 1.4; opacity: 0.5; transition: none; }
-.dl-bar { stroke-width: 3.4; stroke-linecap: butt; }
+/* the blades are rects now, so the width is geometry rather than stroke; what
+   is left here is the material - a hairline of its own colour darkened, and a
+   shadow throwing them off the rim they are seated in */
+.dl-bar {
+  stroke: color-mix(in oklch, var(--ink) 30%, transparent); stroke-width: 0.22;
+  filter: drop-shadow(0.3px 0.5px 0.45px color-mix(in oklch, var(--ink) 26%, transparent));
+}
 .dl-read-party {
   font-family: var(--sans); font-size: 2.15px; font-weight: 800;
   letter-spacing: 0.10em; opacity: 0.95;
@@ -13536,6 +13542,20 @@ const wmPolar = (deg, r) => ({
   x: WM_GC.cx + Math.sin(deg * Math.PI / 180) * r,
   y: WM_GC.cy - Math.cos(deg * Math.PI / 180) * r
 });
+/* The housing is a HALF dial, because the instrument is: the sweep runs from
+   due left through the top to due right, so a full disc left a dead lower half
+   pretending to be face. A semicircle over a short flat base ends the plate
+   where the scale ends, and puts the needle's pivot on the baseline where a
+   real gauge mounts it. The base drops a little past the pivot so the boss has
+   housing under it rather than hanging off an edge. */
+const dPlate = (R, drop, corner) => {
+  const x0 = WM_GC.cx - R,
+    x1 = WM_GC.cx + R;
+  const yTop = WM_GC.cy,
+    yBase = WM_GC.cy + drop;
+  return `M ${x0} ${yTop} A ${R} ${R} 0 0 1 ${x1} ${yTop}` + ` L ${x1} ${yBase - corner} Q ${x1} ${yBase} ${x1 - corner} ${yBase}` + ` L ${x0 + corner} ${yBase} Q ${x0} ${yBase} ${x0} ${yBase - corner} Z`;
+};
+const WM_PARTY_IDS = ["alp", "lnp", "grn", "onp"];
 const wmArc = (d1, d2, r) => {
   const a = wmPolar(d1, r),
     b = wmPolar(d2, r);
@@ -13700,17 +13720,29 @@ function DialFigure({
   }), /*#__PURE__*/React.createElement("stop", {
     offset: "100%",
     stopColor: "var(--dl-bezel-lo)"
-  }))), /*#__PURE__*/React.createElement("circle", {
+  })), WM_PARTY_IDS.map(id => /*#__PURE__*/React.createElement("linearGradient", {
+    key: id,
+    id: `dl-blade-${id}`,
+    x1: "0",
+    y1: "0",
+    x2: "1",
+    y2: "0"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: `color-mix(in oklch, white 32%, var(--${id}))`
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "38%",
+    stopColor: `var(--${id})`
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: `color-mix(in oklch, black 28%, var(--${id}))`
+  })))), /*#__PURE__*/React.createElement("path", {
     className: "dl-bezel",
-    cx: WM_GC.cx,
-    cy: WM_GC.cy,
-    r: WM_GC.r + 3.1,
+    d: dPlate(WM_GC.r + 3.1, 3.4, 1.2),
     fill: "url(#dl-bezel)"
-  }), /*#__PURE__*/React.createElement("circle", {
+  }), /*#__PURE__*/React.createElement("path", {
     className: "dl-face",
-    cx: WM_GC.cx,
-    cy: WM_GC.cy,
-    r: WM_GC.r + 1.7,
+    d: dPlate(WM_GC.r + 1.7, 2.2, 0.9),
     fill: "url(#dl-face)"
   }), Array.from({
     length: 31
@@ -13756,16 +13788,20 @@ function DialFigure({
     }
   }), barRing.map(b => {
     const h = Math.max(0.6, b.v / WM_MAX_PCT * WM_BAR_MAX);
-    const inner = wmPolar(b.a, WM_GC.r + 2);
-    const outer = wmPolar(b.a, WM_GC.r + 2 + h);
-    return /*#__PURE__*/React.createElement("line", {
+    /* A rect rotated about the pivot rather than a stroked line: a stroke
+       cannot carry a gradient across its own width, and the width is where
+       a blade gets its roundness. The geometry is the same line it was -
+       same seat at r+2, same length - so the reading has not moved. */
+    return /*#__PURE__*/React.createElement("rect", {
       key: b.id,
       className: "dl-bar",
-      x1: inner.x,
-      y1: inner.y,
-      x2: outer.x,
-      y2: outer.y,
-      stroke: `var(--${b.id})`
+      rx: "0.5",
+      x: WM_GC.cx - 1.7,
+      y: WM_GC.cy - (WM_GC.r + 2 + h),
+      width: "3.4",
+      height: h,
+      fill: `url(#dl-blade-${b.id})`,
+      transform: `rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`
     });
   }), labelRing.map(b => {
     const p = wmPolar(b.a, WM_LABEL_R);
@@ -13822,11 +13858,9 @@ function DialFigure({
     cy: WM_GC.cy,
     r: "1.7",
     fill: "url(#dl-screw)"
-  }), /*#__PURE__*/React.createElement("circle", {
+  }), /*#__PURE__*/React.createElement("path", {
     className: "dl-glass",
-    cx: WM_GC.cx,
-    cy: WM_GC.cy,
-    r: WM_GC.r + 1.7,
+    d: dPlate(WM_GC.r + 1.7, 2.2, 0.9),
     fill: "url(#dl-glass)",
     pointerEvents: "none"
   }));

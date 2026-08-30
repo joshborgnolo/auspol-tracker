@@ -572,7 +572,13 @@ body.js #root {
 .dl-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .dl-svg { width: min(420px, 94%); height: auto; overflow: visible; display: block; }
 .dl-arc { fill: none; stroke-width: 1.4; opacity: 0.5; transition: none; }
-.dl-bar { stroke-width: 3.4; stroke-linecap: butt; }
+/* the blades are rects now, so the width is geometry rather than stroke; what
+   is left here is the material - a hairline of its own colour darkened, and a
+   shadow throwing them off the rim they are seated in */
+.dl-bar {
+  stroke: color-mix(in oklch, var(--ink) 30%, transparent); stroke-width: 0.22;
+  filter: drop-shadow(0.3px 0.5px 0.45px color-mix(in oklch, var(--ink) 26%, transparent));
+}
 .dl-read-party {
   font-family: var(--sans); font-size: 2.15px; font-weight: 800;
   letter-spacing: 0.10em; opacity: 0.95;

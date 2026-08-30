@@ -62,6 +62,21 @@ const wmPolar = (deg, r) => ({
   x: WM_GC.cx + Math.sin((deg * Math.PI) / 180) * r,
   y: WM_GC.cy - Math.cos((deg * Math.PI) / 180) * r,
 });
+/* The housing is a HALF dial, because the instrument is: the sweep runs from
+   due left through the top to due right, so a full disc left a dead lower half
+   pretending to be face. A semicircle over a short flat base ends the plate
+   where the scale ends, and puts the needle's pivot on the baseline where a
+   real gauge mounts it. The base drops a little past the pivot so the boss has
+   housing under it rather than hanging off an edge. */
+const dPlate = (R, drop, corner) => {
+  const x0 = WM_GC.cx - R, x1 = WM_GC.cx + R;
+  const yTop = WM_GC.cy, yBase = WM_GC.cy + drop;
+  return `M ${x0} ${yTop} A ${R} ${R} 0 0 1 ${x1} ${yTop}`
+    + ` L ${x1} ${yBase - corner} Q ${x1} ${yBase} ${x1 - corner} ${yBase}`
+    + ` L ${x0 + corner} ${yBase} Q ${x0} ${yBase} ${x0} ${yBase - corner} Z`;
+};
+const WM_PARTY_IDS = ["alp", "lnp", "grn", "onp"];
+
 const wmArc = (d1, d2, r) => {
   const a = wmPolar(d1, r), b = wmPolar(d2, r);
   return `M ${a.x.toFixed(2)} ${a.y.toFixed(2)} A ${r} ${r} 0 0 1 ${b.x.toFixed(2)} ${b.y.toFixed(2)}`;
@@ -173,11 +188,22 @@ function DialFigure({ story, f, envelope, trail }) {
           <stop offset="0%" stopColor="var(--dl-bezel-hi)" />
           <stop offset="100%" stopColor="var(--dl-bezel-lo)" />
         </radialGradient>
+        {/* One per party, across the blade's WIDTH - so it turns with the
+            blade and every vane is lit on its own leading edge. A world-fixed
+            light would be truer and reads worse: at this size the blades on
+            the right would shade the opposite way and the set stops looking
+            like one machined part. Length is untouched either way, which is
+            the only thing that carries a number. */}
+        {WM_PARTY_IDS.map((id) => (
+          <linearGradient key={id} id={`dl-blade-${id}`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor={`color-mix(in oklch, white 32%, var(--${id}))`} />
+            <stop offset="38%" stopColor={`var(--${id})`} />
+            <stop offset="100%" stopColor={`color-mix(in oklch, black 28%, var(--${id}))`} />
+          </linearGradient>
+        ))}
       </defs>
-      <circle className="dl-bezel" cx={WM_GC.cx} cy={WM_GC.cy} r={WM_GC.r + 3.1}
-              fill="url(#dl-bezel)" />
-      <circle className="dl-face" cx={WM_GC.cx} cy={WM_GC.cy} r={WM_GC.r + 1.7}
-              fill="url(#dl-face)" />
+      <path className="dl-bezel" d={dPlate(WM_GC.r + 3.1, 3.4, 1.2)} fill="url(#dl-bezel)" />
+      <path className="dl-face" d={dPlate(WM_GC.r + 1.7, 2.2, 0.9)} fill="url(#dl-face)" />
       {/* engraved graduations: every 6 degrees across the sweep, longer every 30 */}
       {Array.from({ length: 31 }, (_, k) => -90 + k * 6).map((d) => {
         const major = Math.abs(d % 30) < 0.001;
@@ -219,11 +245,15 @@ function DialFigure({ story, f, envelope, trail }) {
       {/* graduation bars – primary vote, absolute scale */}
       {barRing.map((b) => {
         const h = Math.max(0.6, (b.v / WM_MAX_PCT) * WM_BAR_MAX);
-        const inner = wmPolar(b.a, WM_GC.r + 2);
-        const outer = wmPolar(b.a, WM_GC.r + 2 + h);
+        /* A rect rotated about the pivot rather than a stroked line: a stroke
+           cannot carry a gradient across its own width, and the width is where
+           a blade gets its roundness. The geometry is the same line it was -
+           same seat at r+2, same length - so the reading has not moved. */
         return (
-          <line key={b.id} className="dl-bar" x1={inner.x} y1={inner.y} x2={outer.x} y2={outer.y}
-                stroke={`var(--${b.id})`} />
+          <rect key={b.id} className="dl-bar" rx="0.5"
+                x={WM_GC.cx - 1.7} y={WM_GC.cy - (WM_GC.r + 2 + h)}
+                width="3.4" height={h} fill={`url(#dl-blade-${b.id})`}
+                transform={`rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`} />
         );
       })}
 
@@ -261,8 +291,8 @@ function DialFigure({ story, f, envelope, trail }) {
               fill="url(#dl-screw)" />
       {/* the glass. Last, so it lies over the readings the way glass does, and
           inert to the pointer so it never eats a hover. */}
-      <circle className="dl-glass" cx={WM_GC.cx} cy={WM_GC.cy} r={WM_GC.r + 1.7}
-              fill="url(#dl-glass)" pointerEvents="none" />
+      <path className="dl-glass" d={dPlate(WM_GC.r + 1.7, 2.2, 0.9)}
+            fill="url(#dl-glass)" pointerEvents="none" />
     </g>
   );
 }
