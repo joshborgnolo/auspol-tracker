@@ -242,6 +242,24 @@ function DialFigure({ story, f, envelope, trail }) {
               style={{ opacity: oppMix }} />
       )}
 
+      {/* Where each blade meets the machine. Without this they read as stuck ON
+         the rim rather than coming OUT of it, because nothing said the housing
+         had an opening. Three parts, drawn before every blade so no blade sits
+         under its neighbour's mount: a BOSS of the same bezel material
+         standing a little proud of the rim, a SLOT cut into it, and then the
+         blade rising through. The slot is wider than the blade by 0.3 either
+         side, and that dark margin is the whole trick - it is the gap you
+         would see around a vane in its own aperture. */}
+      {barRing.map((b) => (
+        <g key={"mount" + b.id}
+           transform={`rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`}>
+          <rect className="dl-boss" x={WM_GC.cx - 3.1} y={WM_GC.cy - 16.1}
+                width="6.2" height="2.9" rx="0.9" fill="url(#dl-bezel)" />
+          <rect className="dl-slot" x={WM_GC.cx - 2.25} y={WM_GC.cy - 16.0}
+                width="4.5" height="2.1" rx="0.8" />
+        </g>
+      ))}
+
       {/* graduation bars – primary vote, absolute scale */}
       {barRing.map((b) => {
         const h = Math.max(0.6, (b.v / WM_MAX_PCT) * WM_BAR_MAX);

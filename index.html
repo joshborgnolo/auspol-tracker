@@ -492,6 +492,7 @@ body.js #root {
   --dl-bezel-lo:  color-mix(in oklch, var(--ink) 36%, var(--line));
   --dl-glass:     color-mix(in oklch, white 34%, transparent);
   --dl-grad:      color-mix(in oklch, var(--ink) 34%, transparent);
+  --dl-slot:      color-mix(in oklch, var(--ink) 46%, var(--line));
 }
 body.dark {
   --dl-face-hi:   color-mix(in oklch, white 7%, var(--surface-2));
@@ -502,6 +503,7 @@ body.dark {
   --dl-bezel-lo:  color-mix(in oklch, black 44%, var(--line));
   --dl-glass:     color-mix(in oklch, white 9%, transparent);
   --dl-grad:      color-mix(in oklch, white 30%, transparent);
+  --dl-slot:      color-mix(in oklch, black 62%, var(--line));
 }
 /* the face sits INSIDE the bezel, so the rim reads as a wall around it */
 .dl-face { filter: drop-shadow(0 0.35px 0.5px color-mix(in oklch, var(--ink) 22%, transparent)); }
@@ -520,6 +522,13 @@ body.dark {
 /* the earlier .dl-pivot sets fill, and CSS beats a presentation attribute, so
    the gradient has to be claimed here or the screw renders flat */
 .dl-pivot { fill: url(#dl-screw); stroke: color-mix(in oklch, var(--ink) 34%, transparent); stroke-width: 0.3; }
+/* the boss stands proud of the rim, so it takes the rim's own edge and a
+   shadow of its own; the slot is a hole, so it gets neither */
+.dl-boss {
+  stroke: color-mix(in oklch, var(--ink) 30%, transparent); stroke-width: 0.22;
+  filter: drop-shadow(0.25px 0.4px 0.35px color-mix(in oklch, var(--ink) 30%, transparent));
+}
+.dl-slot { fill: var(--dl-slot); }
 .dl-glass { pointer-events: none; }
 @media (prefers-reduced-motion: reduce) {
   /* the shadows are static; nothing here needs suppressing */
@@ -13786,7 +13795,25 @@ function DialFigure({
     style: {
       opacity: oppMix
     }
-  }), barRing.map(b => {
+  }), barRing.map(b => /*#__PURE__*/React.createElement("g", {
+    key: "mount" + b.id,
+    transform: `rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`
+  }, /*#__PURE__*/React.createElement("rect", {
+    className: "dl-boss",
+    x: WM_GC.cx - 3.1,
+    y: WM_GC.cy - 16.1,
+    width: "6.2",
+    height: "2.9",
+    rx: "0.9",
+    fill: "url(#dl-bezel)"
+  }), /*#__PURE__*/React.createElement("rect", {
+    className: "dl-slot",
+    x: WM_GC.cx - 2.25,
+    y: WM_GC.cy - 16.0,
+    width: "4.5",
+    height: "2.1",
+    rx: "0.8"
+  }))), barRing.map(b => {
     const h = Math.max(0.6, b.v / WM_MAX_PCT * WM_BAR_MAX);
     /* A rect rotated about the pivot rather than a stroked line: a stroke
        cannot carry a gradient across its own width, and the width is where
