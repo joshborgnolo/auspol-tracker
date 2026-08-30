@@ -435,7 +435,7 @@ body {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
 }
 .boot-noscript strong { color: var(--ink); }
-.legend-val, .appr-bar span, .tip-val { font-variant-numeric: tabular-nums; }
+.legend-val, .tip-val { font-variant-numeric: tabular-nums; }
 
 /* Insets, not guesses. viewport-fit=cover means the page now owns the notch
    strip and the home-indicator strip, so the padding has to give them back -
@@ -1365,15 +1365,6 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
   transition: color .32s cubic-bezier(.4, .1, .25, 1); }
 .net.pos { color: var(--grn-text); }
 .net.neg { color: var(--alp-text); }
-.appr-bar { display: flex; height: 22px; border-radius: 5px; overflow: hidden; font-size: 11.5px; font-weight: 700; }
-/* inline figures use full-strength ink so they stay legible on the pale
-   approve/disapprove tints in both light and dark themes (the bar colour
-   and the net value at right already carry the green/red coding) */
-.appr-app { background: var(--appr-app-bg); color: var(--ink); display: flex; align-items: center; padding-left: 7px; }
-.appr-dis { background: var(--appr-dis-bg); color: var(--ink); display: flex; align-items: center; padding-left: 7px; }
-.appr-dk  { background: transparent; color: var(--ink-3); display: flex; align-items: center; justify-content: center; }
-/* compact split bar inside the poll-detail blocks */
-.pd-appr-bar { height: 16px; font-size: 10px; border: 1px solid var(--line-2); }
 /* favourability marker – flags nets that are positive−negative, a different
    question from approval and not directly comparable */
 .fav-mark {
@@ -1549,12 +1540,6 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .skey-val { font-weight: 700; color: var(--ink); }
 .skey.muted .skey-val { color: var(--ink-3); }
 .share-compact .share-keys { font-size: 11px; gap: 3px 9px; }
-/* in an expanded row the figures ARE the block, not a column cell, so they
-   step up from the compact rows; the two-party block – the number the poll
-   is published for – steps up once more */
-.poll-detail .skey-val { font-size: 13px; }
-.pd-head .share-keys { font-size: 12.5px; }
-.pd-head .skey-val { font-size: 15px; }
 
 .facet-flag {
   display: inline-block; font-size: 9.5px; font-weight: 700;
@@ -1632,15 +1617,96 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
      left to say, so the whole band (padding and rule included) goes away */
   .pd-meta-sm { display: none; }
 }
-/* the second column (first preferences, approval) carries the wider legends,
-   so it takes the slightly larger share of the row */
-.pd-grid {
-  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  gap: 18px 34px;
+
+/* ---------- the ledger: one scale for every measure ----------
+   Every measure a poll publishes is a share of 100, so they all belong on ONE
+   scale: a fixed label gutter, a scale column that every bar fills exactly,
+   and a margin column that always answers the same question – by how much.
+   Bar LENGTH therefore only ever means share. Rank is carried by ink and
+   position, never by a shorter bar: the old panel demoted a second measure to
+   78% width, so a secondary contest drew a bar that ended short of the one
+   above it and read as a smaller quantity. */
+.pd-ledger {
+  display: grid; grid-template-columns: 168px minmax(0, 1fr) 112px;
+  gap: 0 22px; align-items: center;
 }
-.pd-block { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-/* a seat projection is a whole chamber – it needs both columns to read */
-.pd-block-wide { grid-column: 1 / -1; }
+/* the three cells land in the PARENT grid's columns, so every bar on the panel
+   shares one left and right edge. On a phone the row becomes its own little
+   grid instead – see the narrow rules further down. */
+.pd-lrow { display: contents; }
+.pd-lgroup { grid-column: 1 / -1; padding: 15px 0 7px; }
+.pd-lgroup:first-child { padding-top: 2px; }
+.pd-lrule { grid-column: 1 / -1; height: 1px; background: var(--line-2); }
+.pd-lgut {
+  text-align: right; padding: 11px 0; align-self: center; min-width: 0;
+  font-family: var(--serif); font-style: italic; font-size: 12.5px;
+  font-weight: 700; color: var(--ink-2); text-wrap: pretty;
+}
+/* a leader is a name, not a contest – it takes the plain sans face */
+.pd-lgut-name {
+  font-family: var(--sans); font-style: normal; font-size: 13px; font-weight: 600;
+  color: var(--ink); display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+}
+.pd-lscale { padding: 9px 0; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.pd-lmar { text-align: right; padding: 9px 0; font-variant-numeric: tabular-nums; }
+.pd-lmar-v { font-family: var(--serif); font-size: 19px; font-weight: 600; line-height: 1; }
+.pd-lmar-k {
+  display: block; margin-top: 3px; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-3);
+}
+/* the figures sit at the ENDS of the bar they describe, spread across its own
+   width and in BAR ORDER, so each one lands over the segment it names */
+.pd-lnums {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+  font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+}
+.pd-lnum { display: inline-flex; align-items: baseline; gap: 5px; white-space: nowrap; }
+.pd-lnum b {
+  font-family: var(--serif); font-size: 18px; font-weight: 600;
+  line-height: 1; letter-spacing: -0.01em;
+}
+.pd-lnum.muted, .pd-lnum.muted b { color: var(--ink-3); }
+/* the residual – undecided, don't know, unsure. ONE treatment everywhere, and
+   never the bar's own track colour: it used to be var(--line-2), which is
+   exactly .sbar's background, so nineteen points of a preferred-PM bar were
+   data drawn as empty track. */
+.pd-lnum.resid { color: var(--ink-3); }
+.pd-lnum.resid b { font-family: var(--sans); font-size: 12.5px; font-weight: 700; }
+.sbar-resid, .pd-resid-sw, .skey-dot.resid {
+  background: repeating-linear-gradient(135deg, var(--line) 0 2px, var(--surface) 2px 5px);
+}
+.pd-resid-sw { display: inline-block; width: 12px; height: 7px; border-radius: 2px; flex: none; }
+.skey-dot.resid { border-radius: 2px; }
+.sbar-lg { height: 12px; border-radius: 6px; }
+/* the line that decides a two-party contest, drawn the way the seat bar draws
+   the majority line. An axis tick that CROSSES the bar, with no halo: at 53 the
+   notch lands ~10px from the segment boundary, and a ring there reads as a gap
+   punched in the fill rather than as the line the contest turns on. */
+.pd-barwrap { position: relative; }
+.pd-notch {
+  position: absolute; top: -4px; bottom: -4px; width: 1.5px; cursor: help;
+  background: var(--ink); opacity: 0.92; transform: translateX(-0.75px);
+}
+/* Leader approval keeps a geometry of its own, because it is the one measure
+   here with a real zero: a centred axis, approve growing left and disapprove
+   right, so the overhang IS the net and two leaders compare at a glance. Each
+   half is scaled to 100 – the same axis the snapshot panel's .appr-netbar
+   already uses, rather than a second, non-comparable one. */
+.pd-aprbar { position: relative; height: 12px; border-radius: 6px; background: var(--line-2); }
+.pd-aprbar > span { position: absolute; top: 0; bottom: 0; }
+.pd-apr-pos { right: 50%; background: var(--appr-app-bg); border-radius: 6px 0 0 6px; }
+.pd-apr-neg { left: 50%; background: var(--appr-dis-bg); border-radius: 0 6px 6px 0; }
+.pd-apr-mid {
+  left: 50%; width: 1.5px; top: -4px; bottom: -4px; z-index: 2;
+  background: var(--ink-3); transform: translateX(-0.75px);
+}
+.pd-apr-key { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.pd-apr-key b { color: var(--ink); font-weight: 700; }
+.pd-lnote { font-size: 11.5px; color: var(--ink-3); text-wrap: pretty; }
+.pd-lnote .netv { font-size: 12.5px; margin-left: 4px; }
+/* a modelled chamber is not a share of 100 – it takes the whole width and
+   keeps its own component rather than pretending to sit on the scale */
+.pd-lwide { grid-column: 1 / -1; padding: 10px 0 4px; min-width: 0; }
 
 /* ---------- Seat projection (MRP polls) ---------- */
 .seatproj { display: flex; flex-direction: column; gap: 8px; }
@@ -1680,49 +1746,10 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   .seat-rows { gap: 6px 16px; }
   .seat-est { font-size: 14px; }
 }
-/* leader-approval rows in the detail block – net-only readings from the live
-   source, so each row is name left, net right */
-.pd-apprs { display: flex; flex-direction: column; gap: 7px; }
-.pd-appr-top { display: flex; align-items: center; gap: 7px; }
-.pd-appr-name { font-weight: 600; font-size: 13px; }
-.pd-appr-net { margin-left: auto; font-variant-numeric: tabular-nums; }
-/* the three-way split stated as words – the figures step out of the cramped
-   16px bar segments into a muted legend line beneath it */
-.pd-appr-key {
-  margin-top: 4px; font-size: 11.5px; color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
-}
-.pd-appr-key b { color: var(--ink); font-weight: 700; }
-/* the second measure, when a wave published both for one leader – indented and
-   quieter than the primary net, so it reads as an addition, not a correction */
-.pd-appr-alt {
-  display: flex; align-items: baseline; gap: 7px; margin-top: 4px; padding-left: 15px;
-  font-variant-numeric: tabular-nums;
-}
-.pd-appr-alt-k {
-  font-size: 11px; color: var(--ink-3); letter-spacing: 0.01em;
-}
-.pd-appr-alt .netv { margin-left: auto; font-size: 12.5px; opacity: 0.85; }
-.pd-wide { grid-column: 1 / -1; max-width: 520px; }
 .pd-k {
   font-size: 11px; font-weight: 700;
   color: var(--ink-3);
 }
-.pd-contests { display: flex; flex-direction: column; gap: 12px; }
-.pd-contest { display: flex; flex-direction: column; gap: 6px; }
-.pd-contest-lab {
-  font-size: 12px; font-weight: 700; color: var(--ink-2);
-  font-family: var(--serif); font-style: italic; letter-spacing: 0;
-}
-/* a second matchup (e.g. ALP v ON) answers the same question as the headline
-   contest, not a new one – narrower bar, quieter keys, so it reads as the
-   aside it is. Comes AFTER the pd-head sizing so the demotion survives
-   sitting inside the headline block. */
-.pd-contest-minor { max-width: 78%; }
-.pd-contest-minor .pd-contest-lab { color: var(--ink-3); }
-.pd-contest-minor .sbar { height: 6px; }
-.pd-contest-minor .share-keys { font-size: 11px; color: var(--ink-3); }
-.pd-contest-minor .skey-val { font-size: 12px; color: var(--ink-2); }
 /* undecided: one readout per question, because the panel carries two of them
    and they must not read as one measure with two sources */
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
@@ -1740,11 +1767,6 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .und-read-v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
 .und-read-note { margin: 1px 0 0; font-size: 11.5px; color: var(--ink-3); }
 
-/* undecided, one line inside a poll's breakdown: the figure, its change, and
-   what it means, on the same baseline so it reads as a stated share */
-.pd-und { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
-.pd-und-v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
-.pd-und-note { font-size: 12px; color: var(--ink-3); }
 .pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13.5px; }
 /* a fieldwork end standing in for a publication date nobody recorded, marked
    the dashed way the Latest-polls pill marks the same substitution */
@@ -1832,9 +1854,28 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 
 @media (max-width: 720px) {
-  .pd-grid { grid-template-columns: 1fr; }
-  .pd-wide { grid-column: auto; }
   .poll-detail { padding-left: 20px; }
+  /* The label gutter and the margin column are what cannot survive 356px, so
+     they fold onto one line above the bar. The scale column does survive, and
+     it is the part that matters: every bar still spans the full content width,
+     one scale for the whole panel, exactly as on the desktop. */
+  .pd-ledger { display: block; }
+  .pd-lrow {
+    display: grid; grid-template-columns: 1fr auto; gap: 2px 12px;
+    grid-template-areas: "gut mar" "scale scale";
+    padding: 8px 0 9px; border-top: 1px solid var(--line-2);
+  }
+  .pd-lgut { grid-area: gut; text-align: left; padding: 0; }
+  .pd-lgut-name { justify-content: flex-start; }
+  .pd-lmar { grid-area: mar; padding: 0; white-space: nowrap; }
+  .pd-lmar-v { font-size: 17px; }
+  .pd-lmar-k { display: inline; margin: 0 0 0 4px; }
+  .pd-lscale { grid-area: scale; padding: 4px 0 0; }
+  .pd-lgroup { padding: 11px 0 5px; }
+  .pd-lrule { display: none; }   /* each row carries its own rule instead */
+  .pd-lnums { gap: 8px; }
+  .pd-lnum b { font-size: 17px; }
+  .pd-lwide { padding: 8px 0 4px; }
 }
 
 /* ---------- method footer ---------- */

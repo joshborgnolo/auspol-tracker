@@ -283,7 +283,7 @@ body {
   background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
 }
 .boot-noscript strong { color: var(--ink); }
-.legend-val, .appr-bar span, .tip-val { font-variant-numeric: tabular-nums; }
+.legend-val, .tip-val { font-variant-numeric: tabular-nums; }
 
 /* Insets, not guesses. viewport-fit=cover means the page now owns the notch
    strip and the home-indicator strip, so the padding has to give them back -
@@ -1213,15 +1213,6 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
   transition: color .32s cubic-bezier(.4, .1, .25, 1); }
 .net.pos { color: var(--grn-text); }
 .net.neg { color: var(--alp-text); }
-.appr-bar { display: flex; height: 22px; border-radius: 5px; overflow: hidden; font-size: 11.5px; font-weight: 700; }
-/* inline figures use full-strength ink so they stay legible on the pale
-   approve/disapprove tints in both light and dark themes (the bar colour
-   and the net value at right already carry the green/red coding) */
-.appr-app { background: var(--appr-app-bg); color: var(--ink); display: flex; align-items: center; padding-left: 7px; }
-.appr-dis { background: var(--appr-dis-bg); color: var(--ink); display: flex; align-items: center; padding-left: 7px; }
-.appr-dk  { background: transparent; color: var(--ink-3); display: flex; align-items: center; justify-content: center; }
-/* compact split bar inside the poll-detail blocks */
-.pd-appr-bar { height: 16px; font-size: 10px; border: 1px solid var(--line-2); }
 /* favourability marker – flags nets that are positive−negative, a different
    question from approval and not directly comparable */
 .fav-mark {
@@ -1397,12 +1388,6 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .skey-val { font-weight: 700; color: var(--ink); }
 .skey.muted .skey-val { color: var(--ink-3); }
 .share-compact .share-keys { font-size: 11px; gap: 3px 9px; }
-/* in an expanded row the figures ARE the block, not a column cell, so they
-   step up from the compact rows; the two-party block – the number the poll
-   is published for – steps up once more */
-.poll-detail .skey-val { font-size: 13px; }
-.pd-head .share-keys { font-size: 12.5px; }
-.pd-head .skey-val { font-size: 15px; }
 
 .facet-flag {
   display: inline-block; font-size: 9.5px; font-weight: 700;
@@ -1480,15 +1465,96 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
      left to say, so the whole band (padding and rule included) goes away */
   .pd-meta-sm { display: none; }
 }
-/* the second column (first preferences, approval) carries the wider legends,
-   so it takes the slightly larger share of the row */
-.pd-grid {
-  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
-  gap: 18px 34px;
+
+/* ---------- the ledger: one scale for every measure ----------
+   Every measure a poll publishes is a share of 100, so they all belong on ONE
+   scale: a fixed label gutter, a scale column that every bar fills exactly,
+   and a margin column that always answers the same question – by how much.
+   Bar LENGTH therefore only ever means share. Rank is carried by ink and
+   position, never by a shorter bar: the old panel demoted a second measure to
+   78% width, so a secondary contest drew a bar that ended short of the one
+   above it and read as a smaller quantity. */
+.pd-ledger {
+  display: grid; grid-template-columns: 168px minmax(0, 1fr) 112px;
+  gap: 0 22px; align-items: center;
 }
-.pd-block { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
-/* a seat projection is a whole chamber – it needs both columns to read */
-.pd-block-wide { grid-column: 1 / -1; }
+/* the three cells land in the PARENT grid's columns, so every bar on the panel
+   shares one left and right edge. On a phone the row becomes its own little
+   grid instead – see the narrow rules further down. */
+.pd-lrow { display: contents; }
+.pd-lgroup { grid-column: 1 / -1; padding: 15px 0 7px; }
+.pd-lgroup:first-child { padding-top: 2px; }
+.pd-lrule { grid-column: 1 / -1; height: 1px; background: var(--line-2); }
+.pd-lgut {
+  text-align: right; padding: 11px 0; align-self: center; min-width: 0;
+  font-family: var(--serif); font-style: italic; font-size: 12.5px;
+  font-weight: 700; color: var(--ink-2); text-wrap: pretty;
+}
+/* a leader is a name, not a contest – it takes the plain sans face */
+.pd-lgut-name {
+  font-family: var(--sans); font-style: normal; font-size: 13px; font-weight: 600;
+  color: var(--ink); display: flex; align-items: center; justify-content: flex-end; gap: 6px;
+}
+.pd-lscale { padding: 9px 0; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.pd-lmar { text-align: right; padding: 9px 0; font-variant-numeric: tabular-nums; }
+.pd-lmar-v { font-family: var(--serif); font-size: 19px; font-weight: 600; line-height: 1; }
+.pd-lmar-k {
+  display: block; margin-top: 3px; font-size: 10px; font-weight: 700;
+  letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-3);
+}
+/* the figures sit at the ENDS of the bar they describe, spread across its own
+   width and in BAR ORDER, so each one lands over the segment it names */
+.pd-lnums {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
+  font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+}
+.pd-lnum { display: inline-flex; align-items: baseline; gap: 5px; white-space: nowrap; }
+.pd-lnum b {
+  font-family: var(--serif); font-size: 18px; font-weight: 600;
+  line-height: 1; letter-spacing: -0.01em;
+}
+.pd-lnum.muted, .pd-lnum.muted b { color: var(--ink-3); }
+/* the residual – undecided, don't know, unsure. ONE treatment everywhere, and
+   never the bar's own track colour: it used to be var(--line-2), which is
+   exactly .sbar's background, so nineteen points of a preferred-PM bar were
+   data drawn as empty track. */
+.pd-lnum.resid { color: var(--ink-3); }
+.pd-lnum.resid b { font-family: var(--sans); font-size: 12.5px; font-weight: 700; }
+.sbar-resid, .pd-resid-sw, .skey-dot.resid {
+  background: repeating-linear-gradient(135deg, var(--line) 0 2px, var(--surface) 2px 5px);
+}
+.pd-resid-sw { display: inline-block; width: 12px; height: 7px; border-radius: 2px; flex: none; }
+.skey-dot.resid { border-radius: 2px; }
+.sbar-lg { height: 12px; border-radius: 6px; }
+/* the line that decides a two-party contest, drawn the way the seat bar draws
+   the majority line. An axis tick that CROSSES the bar, with no halo: at 53 the
+   notch lands ~10px from the segment boundary, and a ring there reads as a gap
+   punched in the fill rather than as the line the contest turns on. */
+.pd-barwrap { position: relative; }
+.pd-notch {
+  position: absolute; top: -4px; bottom: -4px; width: 1.5px; cursor: help;
+  background: var(--ink); opacity: 0.92; transform: translateX(-0.75px);
+}
+/* Leader approval keeps a geometry of its own, because it is the one measure
+   here with a real zero: a centred axis, approve growing left and disapprove
+   right, so the overhang IS the net and two leaders compare at a glance. Each
+   half is scaled to 100 – the same axis the snapshot panel's .appr-netbar
+   already uses, rather than a second, non-comparable one. */
+.pd-aprbar { position: relative; height: 12px; border-radius: 6px; background: var(--line-2); }
+.pd-aprbar > span { position: absolute; top: 0; bottom: 0; }
+.pd-apr-pos { right: 50%; background: var(--appr-app-bg); border-radius: 6px 0 0 6px; }
+.pd-apr-neg { left: 50%; background: var(--appr-dis-bg); border-radius: 0 6px 6px 0; }
+.pd-apr-mid {
+  left: 50%; width: 1.5px; top: -4px; bottom: -4px; z-index: 2;
+  background: var(--ink-3); transform: translateX(-0.75px);
+}
+.pd-apr-key { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.pd-apr-key b { color: var(--ink); font-weight: 700; }
+.pd-lnote { font-size: 11.5px; color: var(--ink-3); text-wrap: pretty; }
+.pd-lnote .netv { font-size: 12.5px; margin-left: 4px; }
+/* a modelled chamber is not a share of 100 – it takes the whole width and
+   keeps its own component rather than pretending to sit on the scale */
+.pd-lwide { grid-column: 1 / -1; padding: 10px 0 4px; min-width: 0; }
 
 /* ---------- Seat projection (MRP polls) ---------- */
 .seatproj { display: flex; flex-direction: column; gap: 8px; }
@@ -1528,49 +1594,10 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   .seat-rows { gap: 6px 16px; }
   .seat-est { font-size: 14px; }
 }
-/* leader-approval rows in the detail block – net-only readings from the live
-   source, so each row is name left, net right */
-.pd-apprs { display: flex; flex-direction: column; gap: 7px; }
-.pd-appr-top { display: flex; align-items: center; gap: 7px; }
-.pd-appr-name { font-weight: 600; font-size: 13px; }
-.pd-appr-net { margin-left: auto; font-variant-numeric: tabular-nums; }
-/* the three-way split stated as words – the figures step out of the cramped
-   16px bar segments into a muted legend line beneath it */
-.pd-appr-key {
-  margin-top: 4px; font-size: 11.5px; color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
-}
-.pd-appr-key b { color: var(--ink); font-weight: 700; }
-/* the second measure, when a wave published both for one leader – indented and
-   quieter than the primary net, so it reads as an addition, not a correction */
-.pd-appr-alt {
-  display: flex; align-items: baseline; gap: 7px; margin-top: 4px; padding-left: 15px;
-  font-variant-numeric: tabular-nums;
-}
-.pd-appr-alt-k {
-  font-size: 11px; color: var(--ink-3); letter-spacing: 0.01em;
-}
-.pd-appr-alt .netv { margin-left: auto; font-size: 12.5px; opacity: 0.85; }
-.pd-wide { grid-column: 1 / -1; max-width: 520px; }
 .pd-k {
   font-size: 11px; font-weight: 700;
   color: var(--ink-3);
 }
-.pd-contests { display: flex; flex-direction: column; gap: 12px; }
-.pd-contest { display: flex; flex-direction: column; gap: 6px; }
-.pd-contest-lab {
-  font-size: 12px; font-weight: 700; color: var(--ink-2);
-  font-family: var(--serif); font-style: italic; letter-spacing: 0;
-}
-/* a second matchup (e.g. ALP v ON) answers the same question as the headline
-   contest, not a new one – narrower bar, quieter keys, so it reads as the
-   aside it is. Comes AFTER the pd-head sizing so the demotion survives
-   sitting inside the headline block. */
-.pd-contest-minor { max-width: 78%; }
-.pd-contest-minor .pd-contest-lab { color: var(--ink-3); }
-.pd-contest-minor .sbar { height: 6px; }
-.pd-contest-minor .share-keys { font-size: 11px; color: var(--ink-3); }
-.pd-contest-minor .skey-val { font-size: 12px; color: var(--ink-2); }
 /* undecided: one readout per question, because the panel carries two of them
    and they must not read as one measure with two sources */
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
@@ -1588,11 +1615,6 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .und-read-v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
 .und-read-note { margin: 1px 0 0; font-size: 11.5px; color: var(--ink-3); }
 
-/* undecided, one line inside a poll's breakdown: the figure, its change, and
-   what it means, on the same baseline so it reads as a stated share */
-.pd-und { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; }
-.pd-und-v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
-.pd-und-note { font-size: 12px; color: var(--ink-3); }
 .pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13.5px; }
 /* a fieldwork end standing in for a publication date nobody recorded, marked
    the dashed way the Latest-polls pill marks the same substitution */
@@ -1680,9 +1702,28 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 
 @media (max-width: 720px) {
-  .pd-grid { grid-template-columns: 1fr; }
-  .pd-wide { grid-column: auto; }
   .poll-detail { padding-left: 20px; }
+  /* The label gutter and the margin column are what cannot survive 356px, so
+     they fold onto one line above the bar. The scale column does survive, and
+     it is the part that matters: every bar still spans the full content width,
+     one scale for the whole panel, exactly as on the desktop. */
+  .pd-ledger { display: block; }
+  .pd-lrow {
+    display: grid; grid-template-columns: 1fr auto; gap: 2px 12px;
+    grid-template-areas: "gut mar" "scale scale";
+    padding: 8px 0 9px; border-top: 1px solid var(--line-2);
+  }
+  .pd-lgut { grid-area: gut; text-align: left; padding: 0; }
+  .pd-lgut-name { justify-content: flex-start; }
+  .pd-lmar { grid-area: mar; padding: 0; white-space: nowrap; }
+  .pd-lmar-v { font-size: 17px; }
+  .pd-lmar-k { display: inline; margin: 0 0 0 4px; }
+  .pd-lscale { grid-area: scale; padding: 4px 0 0; }
+  .pd-lgroup { padding: 11px 0 5px; }
+  .pd-lrule { display: none; }   /* each row carries its own rule instead */
+  .pd-lnums { gap: 8px; }
+  .pd-lnum b { font-size: 17px; }
+  .pd-lwide { padding: 8px 0 4px; }
 }
 
 /* ---------- method footer ---------- */
@@ -7728,21 +7769,23 @@ function UndecidedLine({
 }) {
   const d = segDelta(chg, "und");
   return /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
+    className: "pd-lrow"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
+    className: "pd-lgut"
   }, "Undecided"), /*#__PURE__*/React.createElement("div", {
-    className: "pd-und"
+    className: "pd-lscale"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pd-lnote"
+  }, basis === "tpp" ? "won’t pick a side – counted inside the two-party pair above, which is why it sums to under 100" : basis === "soft" ? `named a party, but not firmly – the flip side of this wave’s ${100 - v}% committed` : "can’t say – excluded from the shares above")), /*#__PURE__*/React.createElement("div", {
+    className: "pd-lmar"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-und-v"
-  }, v, /*#__PURE__*/React.createElement("span", {
-    className: "pct"
-  }, "%")), /*#__PURE__*/React.createElement(ChgTag, {
+    className: "pd-lmar-v"
+  }, v), /*#__PURE__*/React.createElement(ChgTag, {
     v: d ? d.v : null,
     refDate: d ? d.refDate : null
   }), /*#__PURE__*/React.createElement("span", {
-    className: "pd-und-note"
-  }, basis === "tpp" ? "won’t pick a side – counted inside the two-party pair above, which is why it sums to under 100" : basis === "soft" ? `named a party, but not firmly – the flip side of this wave’s ${100 - v}% committed` : "can’t say – excluded from the shares above")));
+    className: "pd-lmar-k"
+  }, basis === "tpp" ? "inside the pair" : basis === "soft" ? "not firm" : "set aside")));
 }
 
 /* Roy Morgan publishes TWO ALP–L/NP 2PPs per wave: the headline pair is
@@ -7755,21 +7798,26 @@ function FlowsLine({
 }) {
   const d = segDelta(chg, "flows");
   return /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
+    className: "pd-lrow"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, "2PP \xB7 2025-election flows"), /*#__PURE__*/React.createElement("div", {
-    className: "pd-und"
+    className: "pd-lgut"
+  }, "ALP v L/NP \xB7 2025 flows"), /*#__PURE__*/React.createElement("div", {
+    className: "pd-lscale"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pd-lnote"
+  }, "last election\u2019s preference flows applied to these primaries, so L/NP ", Math.round((100 - v) * 10) / 10, "% \u2013 the pair above is respondent-allocated")), /*#__PURE__*/React.createElement("div", {
+    className: "pd-lmar"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-und-v"
-  }, v, /*#__PURE__*/React.createElement("span", {
-    className: "pct"
-  }, "%")), /*#__PURE__*/React.createElement(ChgTag, {
+    className: "pd-lmar-v",
+    style: {
+      color: window.inkOf("var(--alp)")
+    }
+  }, v), /*#__PURE__*/React.createElement(ChgTag, {
     v: d ? d.v : null,
     refDate: d ? d.refDate : null
   }), /*#__PURE__*/React.createElement("span", {
-    className: "pd-und-note"
-  }, "ALP (L/NP ", Math.round((100 - v) * 10) / 10, "%) \u2013 last election\u2019s preference flows applied to these primaries; the 2PP above is respondent-allocated")));
+    className: "pd-lmar-k"
+  }, "ALP")));
 }
 
 // ---- Undecided ("can't say who they would vote for") -----------------
@@ -8020,7 +8068,7 @@ function tppFlag(r) {
 }
 // heading for the detail block – names the single measure, counts several
 function tppHeading(cs) {
-  if (cs.length > 1) return "After preferences · " + cs.length + " measures";
+  if (cs.length > 1) return "After preferences";
   if (cs.length === 1 && cs[0].kind === "3cp") return "Three-cornered preferred";
   return "Two-party preferred";
 }
@@ -8096,8 +8144,7 @@ function ppmContestSegs(c, chg) {
   if (c.unc != null) segs.push({
     label: "Undecided",
     value: c.unc,
-    color: PARTY_C.unc,
-    muted: true
+    resid: true
   });
   return segs;
 }
@@ -8139,8 +8186,7 @@ function dirSegs(r) {
   }, {
     label: "Unsure",
     value: unsure,
-    color: PARTY_C.unc,
-    muted: true
+    resid: true
   }, {
     label: "Wrong track",
     value: r.dir.wrong,
@@ -8196,19 +8242,19 @@ function ShareBar({
     "aria-label": segs.map(s => `${s.label} ${s.value}`).join(", ")
   }, segs.map((s, i) => /*#__PURE__*/React.createElement("span", {
     key: i,
-    className: "sbar-seg",
+    className: "sbar-seg" + (s.resid ? " sbar-resid" : ""),
     style: {
       width: s.value / total * 100 + "%",
-      background: s.color
+      background: s.resid ? undefined : s.color
     }
   }))), /*#__PURE__*/React.createElement("div", {
     className: "share-keys"
   }, segs.map((s, i) => /*#__PURE__*/React.createElement("span", {
     key: i,
-    className: "skey" + (s.muted ? " muted" : "")
+    className: "skey" + (s.muted || s.resid ? " muted" : "")
   }, /*#__PURE__*/React.createElement("span", {
-    className: "skey-dot",
-    style: {
+    className: "skey-dot" + (s.resid ? " resid" : ""),
+    style: s.resid ? undefined : {
       background: s.color
     }
   }), /*#__PURE__*/React.createElement("span", {
@@ -8441,97 +8487,6 @@ function segDelta(chg, key) {
   };
 }
 
-// leader approval – approve / don't-know / disapprove split per leader,
-// mirroring the snapshot panel's bars, with the net at right. Ragged-
-// tolerant: a leader the pollster didn't poll shows a dash, and a net-only
-// reading (no published split) shows just the net.
-function ApprBlock({
-  appr,
-  chg
-}) {
-  // nothing published at all → say so once instead of three dashed rows
-  if (appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null) {
-    return /*#__PURE__*/React.createElement("div", {
-      className: "pd-absent"
-    }, "No leader approval or favourability published with this poll");
-  }
-  return /*#__PURE__*/React.createElement("div", {
-    className: "pd-apprs"
-  }, ["alb", "taylor", "hanson"].map(id => {
-    const s = appr[id],
-      net = appr[id + "Net"];
-    const dk = s ? Math.max(0, 100 - s.app - s.dis) : 0;
-    // metric is PER LEADER – one poll can ask approval of the majors and
-    // favourability (likeability) of a minor-party leader
-    const mt = appr.metricBy && appr.metricBy[id] || "approval";
-    const segNames = mt === "fav" ? ["Positive", "Neutral", "Negative"] : ["Approve", "Don't know / never heard of", "Disapprove"];
-    // short lowercase forms for the legend under the bar – the full phrase
-    // (“Don't know / never heard of”) stays in the tooltip, but the legend
-    // has to fit beside its figures at 11.5px
-    const segLeg = mt === "fav" ? ["positive", "neutral", "negative"] : ["approve", "don’t know", "disapprove"];
-    // the opposition slot is an office – label it by who held it (Ley →
-    // Taylor, spliced Feb 2026) when the poll records that
-    const label = id === "taylor" && appr.oppName ? appr.oppName : LEADER_META[id].label;
-    // some waves publish BOTH measures for the same leader (Resolve rates
-    // the majors on performance and likeability). They answer different
-    // questions, so the second one sits beside the first – never averaged
-    // into it, never shown as a correction of it.
-    const alt = appr.alt && appr.alt[id];
-    return /*#__PURE__*/React.createElement("div", {
-      className: "pd-appr",
-      key: id
-    }, /*#__PURE__*/React.createElement("div", {
-      className: "pd-appr-top"
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "skey-dot",
-      style: {
-        background: LEADER_META[id].color
-      }
-    }), /*#__PURE__*/React.createElement("span", {
-      className: "pd-appr-name"
-    }, label), /*#__PURE__*/React.createElement("span", {
-      className: "pd-appr-net"
-    }, net == null ? /*#__PURE__*/React.createElement("span", {
-      className: "dash",
-      title: "Not asked by this pollster"
-    }, "\u2014") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(NetVal, {
-      v: net
-    }), /*#__PURE__*/React.createElement(FavMark, {
-      metric: mt
-    }), /*#__PURE__*/React.createElement(ChgTag, {
-      v: chg && chg.d[id + "Net"] != null ? chg.d[id + "Net"] : null,
-      refDate: chg && chg.r[id + "Net"]
-    })))), s && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-      className: "appr-bar pd-appr-bar",
-      title: `${segNames[0]} ${s.app} · ${segNames[1]} ${dk} · ${segNames[2]} ${s.dis}`
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "appr-app",
-      style: {
-        width: s.app + "%"
-      }
-    }), /*#__PURE__*/React.createElement("span", {
-      className: "appr-dk",
-      style: {
-        width: dk + "%"
-      }
-    }), /*#__PURE__*/React.createElement("span", {
-      className: "appr-dis",
-      style: {
-        width: s.dis + "%"
-      }
-    })), /*#__PURE__*/React.createElement("div", {
-      className: "pd-appr-key"
-    }, /*#__PURE__*/React.createElement("b", null, s.app), " ", segLeg[0], " \xB7 ", /*#__PURE__*/React.createElement("b", null, dk), " ", segLeg[1], " \xB7 ", /*#__PURE__*/React.createElement("b", null, s.dis), " ", segLeg[2])), alt && /*#__PURE__*/React.createElement("div", {
-      className: "pd-appr-alt",
-      title: "This pollster asked both questions of this leader in the same wave \u2013 favourability (positive minus negative) is not directly comparable with approval"
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "pd-appr-alt-k"
-    }, "also ", alt.metric === "fav" ? "favourability" : "approval"), /*#__PURE__*/React.createElement(NetVal, {
-      v: alt.net
-    })));
-  }));
-}
-
 // Direction net – dashed when the poll didn't ask the question.
 // Lives in the expanded detail only: it isn't part of any facet's question,
 // so it earns no permanent column in the compact table.
@@ -8591,6 +8546,287 @@ function SortTh({
   }, active ? sort.dir < 0 ? "▾" : "▴" : "⇅")));
 }
 
+/* ====================================================================
+   THE LEDGER
+   Every measure a poll publishes is a share of 100, so they all belong on ONE
+   scale: a label gutter, a scale column every bar fills exactly, and a margin
+   column that always answers the same question – by how much. That makes bar
+   LENGTH mean share and nothing else, which the old two-column grid could not
+   claim: it drew seven bars at three different widths, and demoted a second
+   measure by shortening it, so a secondary contest read as a smaller number.
+
+   Shared by BOTH poll tables – Latest polls and the All-polls archive – which
+   is why it takes a row object rather than reaching for either one's state.
+   ==================================================================== */
+
+// "by how much" – the one question every row in the ledger answers. The
+// residual is not a contender: nobody leads by being undecided.
+function segMargin(segs) {
+  const c = segs.filter(x => !x.resid && x.value != null).slice().sort((a, b) => b.value - a.value);
+  if (c.length < 2) return null;
+  const [top, second] = c;
+  return {
+    v: Math.round((top.value - second.value) * 10) / 10,
+    color: window.inkOf(top.color),
+    lab: c.length === 2 ? top.label + " lead" : top.label + " over " + second.label
+  };
+}
+
+// the bar itself – one geometry, one length, however many segments it is given
+function LedgerBar({
+  segs
+}) {
+  const total = segs.reduce((a, x) => a + x.value, 0) || 100;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "sbar sbar-lg",
+    role: "img",
+    "aria-label": segs.map(x => `${x.label} ${x.value}`).join(", ")
+  }, segs.map((x, i) => /*#__PURE__*/React.createElement("span", {
+    key: i,
+    className: "sbar-seg" + (x.resid ? " sbar-resid" : ""),
+    style: {
+      width: x.value / total * 100 + "%",
+      background: x.resid ? undefined : x.color
+    }
+  })));
+}
+
+/* The figures, spread across the bar's own width in BAR ORDER, so each one
+   sits over the segment it names. This is also what let the residual stop
+   taking a line of its own: "44 Albanese · 37 Taylor · 19 Undecided" maps
+   left-to-right onto the three segments beneath it. */
+function LedgerNums({
+  segs
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pd-lnums"
+  }, segs.map((x, i) => /*#__PURE__*/React.createElement("span", {
+    key: i,
+    className: "pd-lnum" + (x.resid ? " resid" : x.muted ? " muted" : "")
+  }, x.resid && /*#__PURE__*/React.createElement("span", {
+    className: "pd-resid-sw",
+    "aria-hidden": "true"
+  }), /*#__PURE__*/React.createElement("b", {
+    style: x.resid ? undefined : {
+      color: window.inkOf(x.color)
+    }
+  }, x.value), /*#__PURE__*/React.createElement("span", null, x.label), x.delta && /*#__PURE__*/React.createElement(ChgTag, {
+    v: x.delta.v,
+    refDate: x.delta.refDate
+  }))));
+}
+
+/* One measure. `threshold` marks 50 – and ONLY where 50 actually decides the
+   contest: a two-sided preferred pair. A preferred-PM matchup carries an
+   undecided share, so 50 is not the winning line there and no notch is drawn. */
+function LedgerRow({
+  label,
+  name,
+  segs,
+  threshold
+}) {
+  const m = segMargin(segs);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pd-lrow"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pd-lgut" + (name ? " pd-lgut-name" : "")
+  }, label), /*#__PURE__*/React.createElement("div", {
+    className: "pd-lscale"
+  }, /*#__PURE__*/React.createElement(LedgerNums, {
+    segs: segs
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "pd-barwrap"
+  }, /*#__PURE__*/React.createElement(LedgerBar, {
+    segs: segs
+  }), threshold && /*#__PURE__*/React.createElement("span", {
+    className: "pd-notch",
+    style: {
+      left: "50%"
+    },
+    title: "50 \u2013 the line a two-party contest turns on"
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "pd-lmar"
+  }, m ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    className: "pd-lmar-v",
+    style: {
+      color: m.color
+    }
+  }, "+", m.v), /*#__PURE__*/React.createElement("span", {
+    className: "pd-lmar-k"
+  }, m.lab)) : /*#__PURE__*/React.createElement("span", {
+    className: "dash"
+  }, "\u2014")));
+}
+
+/* Leader approval keeps a geometry of its own, because it is the one measure
+   here with a real zero. Approve grows left of the axis and disapprove right,
+   each half scaled to 100, so the overhang IS the net and two leaders can be
+   compared by eye – which three stacked 100% bars never allowed. */
+function LedgerApprRow({
+  id,
+  appr,
+  chg
+}) {
+  const s = appr[id],
+    net = appr[id + "Net"];
+  if (s == null && net == null) return null;
+  const mt = appr.metricBy && appr.metricBy[id] || "approval";
+  // the opposition slot is an office – label it by who held it when the poll
+  // records that (Ley → Taylor, spliced February 2026)
+  const label = id === "taylor" && appr.oppName ? appr.oppName : LEADER_META[id].label;
+  const leg = mt === "fav" ? ["positive", "neutral", "negative"] : ["approve", "don’t know", "disapprove"];
+  const dk = s ? Math.max(0, 100 - s.app - s.dis) : 0;
+  const d = chg && chg.d[id + "Net"] != null ? {
+    v: chg.d[id + "Net"],
+    refDate: chg.r[id + "Net"]
+  } : null;
+  // some waves publish BOTH measures for one leader (Resolve rates the majors
+  // on performance and likeability). They answer different questions, so the
+  // second sits beside the first – never averaged in, never a correction of it.
+  const alt = appr.alt && appr.alt[id];
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pd-lrow"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pd-lgut pd-lgut-name"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "skey-dot",
+    style: {
+      background: LEADER_META[id].color
+    }
+  }), label), /*#__PURE__*/React.createElement("div", {
+    className: "pd-lscale"
+  }, s ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "pd-aprbar",
+    title: `${leg[0]} ${s.app} · ${leg[1]} ${dk} · ${leg[2]} ${s.dis}`
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-apr-pos",
+    style: {
+      width: s.app / 2 + "%"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "pd-apr-neg",
+    style: {
+      width: s.dis / 2 + "%"
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "pd-apr-mid"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "pd-apr-key"
+  }, /*#__PURE__*/React.createElement("b", null, s.app), " ", leg[0], " \xB7 ", /*#__PURE__*/React.createElement("b", null, dk), " ", leg[1], " \xB7 ", /*#__PURE__*/React.createElement("b", null, s.dis), " ", leg[2])) : /*#__PURE__*/React.createElement("div", {
+    className: "pd-lnote"
+  }, "Net only \u2013 this pollster published no ", leg[0], " / ", leg[2], " split"), alt && /*#__PURE__*/React.createElement("div", {
+    className: "pd-lnote",
+    title: "This pollster asked both questions of this leader in the same wave \u2013 favourability (positive minus negative) is not directly comparable with approval"
+  }, "also ", alt.metric === "fav" ? "favourability" : "approval", " ", /*#__PURE__*/React.createElement(NetVal, {
+    v: alt.net
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "pd-lmar"
+  }, net == null ? /*#__PURE__*/React.createElement("span", {
+    className: "dash",
+    title: "Not asked by this pollster"
+  }, "\u2014") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    className: "pd-lmar-v"
+  }, /*#__PURE__*/React.createElement(NetVal, {
+    v: net
+  }), /*#__PURE__*/React.createElement(FavMark, {
+    metric: mt
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "pd-lmar-k"
+  }, "net ", /*#__PURE__*/React.createElement(ChgTag, {
+    v: d ? d.v : null,
+    refDate: d ? d.refDate : null
+  })))));
+}
+
+/* A group of rows under one heading. The rule goes BEFORE each row rather than
+   after, so a group never ends on a hanging hairline. */
+function LedgerGroup({
+  label,
+  absent,
+  children
+}) {
+  const kids = React.Children.toArray(children).filter(Boolean);
+  if (!kids.length && !absent) return null;
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+    className: "pd-lgroup"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pd-k"
+  }, label)), kids.length ? kids.map((k, i) => /*#__PURE__*/React.createElement(React.Fragment, {
+    key: i
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pd-lrule",
+    "aria-hidden": "true"
+  }), k)) : /*#__PURE__*/React.createElement("div", {
+    className: "pd-lwide"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pd-absent"
+  }, absent)));
+}
+
+// the whole breakdown – EVERYTHING the poll measured, ragged set and all.
+// `dirSegments` is passed in because the two tables build it from different
+// shapes of the same reading.
+function PollLedger({
+  r,
+  dirSegments
+}) {
+  const tcs = tppContests(r);
+  const ppms = ppmContests(r);
+  const appr = r.appr || {};
+  const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pd-ledger"
+  }, /*#__PURE__*/React.createElement(LedgerGroup, {
+    label: tppHeading(tcs),
+    absent: "No two-party figure published with this poll"
+  }, tcs.map((c, i) => /*#__PURE__*/React.createElement(LedgerRow, {
+    key: "t" + i,
+    label: c.lab.replace(/^2PP · /, ""),
+    segs: c.segs,
+    threshold: c.segs.length === 2 && c.kind !== "3cp"
+  })), r.tppFlows != null && /*#__PURE__*/React.createElement(FlowsLine, {
+    key: "flows",
+    v: r.tppFlows,
+    chg: r.chg
+  })), /*#__PURE__*/React.createElement(LedgerGroup, {
+    label: "First preferences"
+  }, /*#__PURE__*/React.createElement(LedgerRow, {
+    label: "All parties",
+    segs: primarySegs(r)
+  }), r.undecided != null && /*#__PURE__*/React.createElement(UndecidedLine, {
+    key: "und",
+    v: r.undecided,
+    chg: r.chg,
+    basis: r.undecidedBasis
+  })), /*#__PURE__*/React.createElement(LedgerGroup, {
+    label: "Preferred PM",
+    absent: "No preferred-PM question this wave"
+  }, ppms.map((c, i) => /*#__PURE__*/React.createElement(LedgerRow, {
+    key: "p" + i,
+    label: ppmLabel(c),
+    segs: ppmContestSegs(c, i === 0 ? r.chg : null)
+  }))), /*#__PURE__*/React.createElement(LedgerGroup, {
+    label: apprHeading(appr),
+    absent: "No leader approval or favourability published with this poll"
+  }, noAppr ? null : ["alb", "taylor", "hanson"].map(id => /*#__PURE__*/React.createElement(LedgerApprRow, {
+    key: id,
+    id: id,
+    appr: appr,
+    chg: r.chg
+  }))), dirSegments && /*#__PURE__*/React.createElement(LedgerGroup, {
+    label: "National direction"
+  }, /*#__PURE__*/React.createElement(LedgerRow, {
+    label: "Right direction v wrong track",
+    segs: dirSegments
+  })), r.seats && /*#__PURE__*/React.createElement(LedgerGroup, {
+    label: "Seat projection"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pd-lwide"
+  }, /*#__PURE__*/React.createElement(SeatProjection, {
+    seats: r.seats
+  }))));
+}
+
 // full per-poll breakdown – shows EVERYTHING the poll measured, ragged set and all
 function PollDetail({
   r
@@ -8607,71 +8843,10 @@ function PollDetail({
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Sample"), " ", r.sample ? "n = " + r.sample.toLocaleString() : "—")), /*#__PURE__*/React.createElement("div", {
-    className: "pd-grid"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-block pd-head"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, tppHeading(tppContests(r))), tppContests(r).length === 0 ? /*#__PURE__*/React.createElement("div", {
-    className: "pd-absent"
-  }, "No two-party figure published with this poll") : /*#__PURE__*/React.createElement("div", {
-    className: "pd-contests"
-  }, tppContests(r).map((c, i) => /*#__PURE__*/React.createElement("div", {
-    className: "pd-contest" + (i > 0 ? " pd-contest-minor" : ""),
-    key: i
-  }, tppContests(r).length > 1 && /*#__PURE__*/React.createElement("div", {
-    className: "pd-contest-lab"
-  }, c.lab), /*#__PURE__*/React.createElement(ShareBar, {
-    segs: c.segs
-  }))))), /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, "First preferences"), /*#__PURE__*/React.createElement(ShareBar, {
-    segs: primarySegs(r)
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, "Preferred PM", ppmContests(r).length > 1 ? " · " + ppmContests(r).length + " matchups" : ppmContests(r).length === 1 && ppmKind(ppmContests(r)[0]) === "three-way" ? " · Three-way" : ""), ppmContests(r).length === 0 ? /*#__PURE__*/React.createElement("div", {
-    className: "pd-absent"
-  }, "No preferred-PM question this wave") : /*#__PURE__*/React.createElement("div", {
-    className: "pd-contests"
-  }, ppmContests(r).map((c, i) => /*#__PURE__*/React.createElement("div", {
-    className: "pd-contest",
-    key: i
-  }, ppmContests(r).length > 1 && /*#__PURE__*/React.createElement("div", {
-    className: "pd-contest-lab"
-  }, ppmLabel(c)), /*#__PURE__*/React.createElement(ShareBar, {
-    segs: ppmContestSegs(c, i === 0 ? r.chg : null)
-  }))))), /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, apprHeading(r.appr)), /*#__PURE__*/React.createElement(ApprBlock, {
-    appr: r.appr,
-    chg: r.chg
-  })), r.dir && /*#__PURE__*/React.createElement("div", {
-    className: "pd-block pd-wide"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, "National direction"), /*#__PURE__*/React.createElement(ShareBar, {
-    segs: dirSegs(r)
-  })), r.undecided != null && /*#__PURE__*/React.createElement(UndecidedLine, {
-    v: r.undecided,
-    chg: r.chg,
-    basis: r.undecidedBasis
-  }), r.tppFlows != null && /*#__PURE__*/React.createElement(FlowsLine, {
-    v: r.tppFlows,
-    chg: r.chg
-  }), r.seats && /*#__PURE__*/React.createElement("div", {
-    className: "pd-block pd-wide"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, "Seat projection"), /*#__PURE__*/React.createElement(SeatProjection, {
-    seats: r.seats
-  }))));
+  }, "Sample"), " ", r.sample ? "n = " + r.sample.toLocaleString() : "—")), /*#__PURE__*/React.createElement(PollLedger, {
+    r: r,
+    dirSegments: r.dir ? dirSegs(r) : null
+  }));
 }
 
 /* ====================================================================
@@ -9498,7 +9673,6 @@ Object.assign(window, {
   NetVal,
   FavMark,
   ChgTag,
-  ApprBlock,
   apprHeading,
   SeatProjection,
   tppContests,
@@ -9515,6 +9689,11 @@ Object.assign(window, {
   LEADER_META,
   PPM_ORDER,
   PARTY_C,
+  PollLedger,
+  LedgerRow,
+  LedgerGroup,
+  LedgerApprRow,
+  segMargin,
   // the archive prints publication stamps too, and there is only one way to
   // write one
   pubStamp
@@ -11288,21 +11467,33 @@ function ArchPollDetail({
   backLabel
 }) {
   const {
-    ShareBar,
-    NetVal,
-    ApprBlock,
-    primarySegs,
-    tppContests,
-    tppHeading,
-    ppmContests,
-    ppmContestSegs,
-    ppmLabel,
-    ppmKind,
-    LEADER_META,
+    PollLedger,
     pubStamp
   } = window;
-  const contests = ppmContests(p);
-  const tcs = tppContests(p);
+  /* The archive stores the unsure share and its change; the Latest table
+     derives the residual instead. Same reading, two shapes – so the ledger
+     takes the segments already built rather than guessing which it has. */
+  const dirSegments = p.dir ? [{
+    label: "Right direction",
+    value: p.dir.right,
+    color: "var(--mood-pos)",
+    delta: p.dir.chg ? {
+      v: p.dir.chg.right,
+      refDate: p.dir.ref
+    } : null
+  }, {
+    label: "Unsure",
+    value: p.dir.unsure,
+    resid: true
+  }, {
+    label: "Wrong track",
+    value: p.dir.wrong,
+    color: "var(--mood-neg)",
+    delta: p.dir.chg ? {
+      v: p.dir.chg.wrong,
+      refDate: p.dir.ref
+    } : null
+  }] : null;
   return /*#__PURE__*/React.createElement("div", {
     className: "poll-detail"
   }, /*#__PURE__*/React.createElement("div", {
@@ -11372,94 +11563,10 @@ function ArchPollDetail({
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("path", {
     d: "M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
-  })), "Report an error")), /*#__PURE__*/React.createElement("div", {
-    className: "pd-grid"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-block pd-head"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, tppHeading(tcs)), tcs.length === 0 ? /*#__PURE__*/React.createElement("div", {
-    className: "pd-absent"
-  }, "No two-party figure published with this poll") : /*#__PURE__*/React.createElement("div", {
-    className: "pd-contests"
-  }, tcs.map((c, i) => /*#__PURE__*/React.createElement("div", {
-    className: "pd-contest" + (i > 0 ? " pd-contest-minor" : ""),
-    key: i
-  }, tcs.length > 1 && /*#__PURE__*/React.createElement("div", {
-    className: "pd-contest-lab"
-  }, c.lab), /*#__PURE__*/React.createElement(ShareBar, {
-    segs: c.segs
-  }))))), /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, "First preferences"), /*#__PURE__*/React.createElement(ShareBar, {
-    segs: primarySegs(p)
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, "Preferred PM", contests.length > 1 ? " · " + contests.length + " matchups" : contests.length === 1 && ppmKind(contests[0]) === "three-way" ? " · Three-way" : ""), contests.length === 0 ? /*#__PURE__*/React.createElement("div", {
-    className: "pd-absent"
-  }, "No preferred-PM question this wave") : /*#__PURE__*/React.createElement("div", {
-    className: "pd-contests"
-  }, contests.map((c, i) => /*#__PURE__*/React.createElement("div", {
-    className: "pd-contest",
-    key: i
-  }, contests.length > 1 && /*#__PURE__*/React.createElement("div", {
-    className: "pd-contest-lab"
-  }, ppmLabel(c)), /*#__PURE__*/React.createElement(ShareBar, {
-    segs: ppmContestSegs(c, i === 0 ? p.chg : null)
-  }))))), /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, window.apprHeading(p.appr)), /*#__PURE__*/React.createElement(ApprBlock, {
-    appr: p.appr,
-    chg: p.chg
-  })), p.dir && /*#__PURE__*/React.createElement("div", {
-    className: "pd-block"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, "National direction"), /*#__PURE__*/React.createElement(ShareBar, {
-    segs: [{
-      key: "right",
-      label: "Right direction",
-      value: p.dir.right,
-      color: "var(--mood-pos)",
-      delta: p.dir.chg ? {
-        v: p.dir.chg.right,
-        refDate: p.dir.ref
-      } : null
-    }, {
-      key: "unsure",
-      label: "Unsure",
-      value: p.dir.unsure,
-      color: "var(--line-2)"
-    }, {
-      key: "wrong",
-      label: "Wrong track",
-      value: p.dir.wrong,
-      color: "var(--mood-neg)",
-      delta: p.dir.chg ? {
-        v: p.dir.chg.wrong,
-        refDate: p.dir.ref
-      } : null
-    }]
-  })), p.undecided != null && /*#__PURE__*/React.createElement(window.UndecidedLine, {
-    v: p.undecided,
-    chg: p.chg,
-    basis: p.undecidedBasis
-  }), p.tppFlows != null && /*#__PURE__*/React.createElement(window.FlowsLine, {
-    v: p.tppFlows,
-    chg: p.chg
-  }), p.seats && /*#__PURE__*/React.createElement("div", {
-    className: "pd-block pd-block-wide"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, "Seat projection"), /*#__PURE__*/React.createElement(window.SeatProjection, {
-    seats: p.seats
-  }))));
+  })), "Report an error")), /*#__PURE__*/React.createElement(PollLedger, {
+    r: p,
+    dirSegments: dirSegments
+  }));
 }
 
 // data-content tags – shown on each archive row and used as filters, so you can

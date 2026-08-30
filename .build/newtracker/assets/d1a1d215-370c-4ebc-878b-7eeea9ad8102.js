@@ -1460,9 +1460,17 @@ function ArchLead({ p, measure }) {
 // column at any width, so the meta line owns both outright – left untagged,
 // never width-hidden.
 function ArchPollDetail({ p, onBack, backLabel }) {
-  const { ShareBar, NetVal, ApprBlock, primarySegs, tppContests, tppHeading, ppmContests, ppmContestSegs, ppmLabel, ppmKind, LEADER_META, pubStamp } = window;
-  const contests = ppmContests(p);
-  const tcs = tppContests(p);
+  const { PollLedger, pubStamp } = window;
+  /* The archive stores the unsure share and its change; the Latest table
+     derives the residual instead. Same reading, two shapes – so the ledger
+     takes the segments already built rather than guessing which it has. */
+  const dirSegments = p.dir ? [
+    { label: "Right direction", value: p.dir.right, color: "var(--mood-pos)",
+      delta: p.dir.chg ? { v: p.dir.chg.right, refDate: p.dir.ref } : null },
+    { label: "Unsure", value: p.dir.unsure, resid: true },
+    { label: "Wrong track", value: p.dir.wrong, color: "var(--mood-neg)",
+      delta: p.dir.chg ? { v: p.dir.chg.wrong, refDate: p.dir.ref } : null },
+  ] : null;
   return (
     <div className="poll-detail">
       <div className="pd-meta">
@@ -1512,66 +1520,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
           </button>
         )}
       </div>
-      <div className="pd-grid">
-        <div className="pd-block pd-head">
-          <div className="pd-k">{tppHeading(tcs)}</div>
-          {tcs.length === 0
-            ? <div className="pd-absent">No two-party figure published with this poll</div>
-            : <div className="pd-contests">
-                {tcs.map((c, i) => (
-                  <div className={"pd-contest" + (i > 0 ? " pd-contest-minor" : "")} key={i}>
-                    {tcs.length > 1 && <div className="pd-contest-lab">{c.lab}</div>}
-                    <ShareBar segs={c.segs} />
-                  </div>
-                ))}
-              </div>}
-        </div>
-        <div className="pd-block">
-          <div className="pd-k">First preferences</div>
-          <ShareBar segs={primarySegs(p)} />
-        </div>
-        <div className="pd-block">
-          <div className="pd-k">Preferred PM{contests.length > 1 ? " · " + contests.length + " matchups" : contests.length === 1 && ppmKind(contests[0]) === "three-way" ? " · Three-way" : ""}</div>
-          {contests.length === 0
-            ? <div className="pd-absent">No preferred-PM question this wave</div>
-            : <div className="pd-contests">
-                {contests.map((c, i) => (
-                  <div className="pd-contest" key={i}>
-                    {contests.length > 1 && <div className="pd-contest-lab">{ppmLabel(c)}</div>}
-                    <ShareBar segs={ppmContestSegs(c, i === 0 ? p.chg : null)} />
-                  </div>
-                ))}
-              </div>}
-        </div>
-        <div className="pd-block">
-          <div className="pd-k">{window.apprHeading(p.appr)}</div>
-          <ApprBlock appr={p.appr} chg={p.chg} />
-        </div>
-        {/* seat projection spans the full grid – it is a chamber, not a
-            per-poll measure, and needs the width to read at 150 seats */}
-        {p.dir && (
-          <div className="pd-block">
-            <div className="pd-k">National direction</div>
-            <ShareBar segs={[
-              { key: "right",  label: "Right direction", value: p.dir.right,  color: "var(--mood-pos)",
-                delta: p.dir.chg ? { v: p.dir.chg.right, refDate: p.dir.ref } : null },
-              { key: "unsure", label: "Unsure",          value: p.dir.unsure, color: "var(--line-2)" },
-              { key: "wrong",  label: "Wrong track",     value: p.dir.wrong,  color: "var(--mood-neg)",
-                delta: p.dir.chg ? { v: p.dir.chg.wrong, refDate: p.dir.ref } : null },
-            ]} />
-          </div>
-        )}
-        {p.undecided != null && <window.UndecidedLine v={p.undecided} chg={p.chg} basis={p.undecidedBasis} />}
-        {/* Roy Morgan's second 2PP – absent, not zero, on waves whose
-            release printed no flows pair */}
-        {p.tppFlows != null && <window.FlowsLine v={p.tppFlows} chg={p.chg} />}
-        {p.seats && (
-          <div className="pd-block pd-block-wide">
-            <div className="pd-k">Seat projection</div>
-            <window.SeatProjection seats={p.seats} />
-          </div>
-        )}
-      </div>
+      <PollLedger r={p} dirSegments={dirSegments} />
     </div>
   );
 }

@@ -1318,21 +1318,26 @@ function DirectionPanel({ rangeId }) {
 function UndecidedLine({ v, chg, basis }) {
   const d = segDelta(chg, "und");
   return (
-    <div className="pd-block">
-      <div className="pd-k">Undecided</div>
-      <div className="pd-und">
-        <span className="pd-und-v">{v}<span className="pct">%</span></span>
-        {/* the same change tag the primary shares carry, so it reads as one
-            more figure from this wave rather than a separate claim */}
-        <ChgTag v={d ? d.v : null} refDate={d ? d.refDate : null} />
+    <div className="pd-lrow">
+      <div className="pd-lgut">Undecided</div>
+      <div className="pd-lscale">
         {/* where the figure SITS is the whole difference between the two
             questions, and it decides how the shares above should be read */}
-        <span className="pd-und-note">
+        <div className="pd-lnote">
           {basis === "tpp"
             ? "won’t pick a side – counted inside the two-party pair above, which is why it sums to under 100"
             : basis === "soft"
               ? `named a party, but not firmly – the flip side of this wave’s ${100 - v}% committed`
               : "can’t say – excluded from the shares above"}
+        </div>
+      </div>
+      <div className="pd-lmar">
+        <span className="pd-lmar-v">{v}</span>
+        {/* the same change tag the primary shares carry, so it reads as one
+            more figure from this wave rather than a separate claim */}
+        <ChgTag v={d ? d.v : null} refDate={d ? d.refDate : null} />
+        <span className="pd-lmar-k">
+          {basis === "tpp" ? "inside the pair" : basis === "soft" ? "not firm" : "set aside"}
         </span>
       </div>
     </div>
@@ -1346,18 +1351,19 @@ function UndecidedLine({ v, chg, basis }) {
 function FlowsLine({ v, chg }) {
   const d = segDelta(chg, "flows");
   return (
-    <div className="pd-block">
-      <div className="pd-k">2PP · 2025-election flows</div>
-      <div className="pd-und">
-        <span className="pd-und-v">{v}<span className="pct">%</span></span>
-        {/* the same change tag the primary shares carry, so it reads as one
-            more figure from this wave rather than a separate claim */}
-        <ChgTag v={d ? d.v : null} refDate={d ? d.refDate : null} />
-        <span className="pd-und-note">
-          ALP (L/NP {Math.round((100 - v) * 10) / 10}%) – last election’s
-          preference flows applied to these primaries; the 2PP above is
+    <div className="pd-lrow">
+      <div className="pd-lgut">ALP v L/NP · 2025 flows</div>
+      <div className="pd-lscale">
+        <div className="pd-lnote">
+          last election’s preference flows applied to these primaries, so
+          L/NP {Math.round((100 - v) * 10) / 10}% – the pair above is
           respondent-allocated
-        </span>
+        </div>
+      </div>
+      <div className="pd-lmar">
+        <span className="pd-lmar-v" style={{ color: window.inkOf("var(--alp)") }}>{v}</span>
+        <ChgTag v={d ? d.v : null} refDate={d ? d.refDate : null} />
+        <span className="pd-lmar-k">ALP</span>
       </div>
     </div>
   );
@@ -1513,7 +1519,7 @@ function tppFlag(r) {
 }
 // heading for the detail block – names the single measure, counts several
 function tppHeading(cs) {
-  if (cs.length > 1) return "After preferences · " + cs.length + " measures";
+  if (cs.length > 1) return "After preferences";
   if (cs.length === 1 && cs[0].kind === "3cp") return "Three-cornered preferred";
   return "Two-party preferred";
 }
@@ -1544,7 +1550,7 @@ function ppmContestSegs(c, chg) {
   const segs = PPM_ORDER.filter((id) => c[id] != null)
     .map((id) => ({ label: LEADER_META[id].label, value: c[id], color: LEADER_META[id].color,
                     delta: PPM_CHG_KEY[id] ? segDelta(chg, PPM_CHG_KEY[id]) : null }));
-  if (c.unc != null) segs.push({ label: "Undecided", value: c.unc, color: PARTY_C.unc, muted: true });
+  if (c.unc != null) segs.push({ label: "Undecided", value: c.unc, resid: true });
   return segs;
 }
 // a poll may test ONE preferred-PM question (r.ppm) or SEVERAL pairwise
@@ -1582,7 +1588,7 @@ function dirSegs(r) {
   const unsure = 100 - r.dir.right - r.dir.wrong;
   return [
     { label: "Right direction", value: r.dir.right, color: "var(--mood-pos)" },
-    { label: "Unsure", value: unsure, color: PARTY_C.unc, muted: true },
+    { label: "Unsure", value: unsure, resid: true },
     { label: "Wrong track", value: r.dir.wrong, color: "var(--mood-neg)" },
   ];
 }
@@ -1618,14 +1624,16 @@ function ShareBar({ segs, compact, flag }) {
       <div className="sbar" role="img"
            aria-label={segs.map((s) => `${s.label} ${s.value}`).join(", ")}>
         {segs.map((s, i) => (
-          <span key={i} className="sbar-seg"
-                style={{ width: (s.value / total * 100) + "%", background: s.color }}></span>
+          <span key={i} className={"sbar-seg" + (s.resid ? " sbar-resid" : "")}
+                style={{ width: (s.value / total * 100) + "%",
+                         background: s.resid ? undefined : s.color }}></span>
         ))}
       </div>
       <div className="share-keys">
         {segs.map((s, i) => (
-          <span key={i} className={"skey" + (s.muted ? " muted" : "")}>
-            <span className="skey-dot" style={{ background: s.color }}></span>
+          <span key={i} className={"skey" + (s.muted || s.resid ? " muted" : "")}>
+            <span className={"skey-dot" + (s.resid ? " resid" : "")}
+                  style={s.resid ? undefined : { background: s.color }}></span>
             <span className="skey-lab">{s.label}</span>
             <span className="skey-val">{s.value}</span>
             {/* change vs the pollster's last poll – detail only; the compact
@@ -1799,81 +1807,6 @@ function segDelta(chg, key) {
   return { v: chg.d[key], refDate: chg.r[key] };
 }
 
-// leader approval – approve / don't-know / disapprove split per leader,
-// mirroring the snapshot panel's bars, with the net at right. Ragged-
-// tolerant: a leader the pollster didn't poll shows a dash, and a net-only
-// reading (no published split) shows just the net.
-function ApprBlock({ appr, chg }) {
-  // nothing published at all → say so once instead of three dashed rows
-  if (appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null) {
-    return <div className="pd-absent">No leader approval or favourability published with this poll</div>;
-  }
-  return (
-    <div className="pd-apprs">
-      {["alb", "taylor", "hanson"].map((id) => {
-        const s = appr[id], net = appr[id + "Net"];
-        const dk = s ? Math.max(0, 100 - s.app - s.dis) : 0;
-        // metric is PER LEADER – one poll can ask approval of the majors and
-        // favourability (likeability) of a minor-party leader
-        const mt = (appr.metricBy && appr.metricBy[id]) || "approval";
-        const segNames = mt === "fav" ? ["Positive", "Neutral", "Negative"]
-          : ["Approve", "Don't know / never heard of", "Disapprove"];
-        // short lowercase forms for the legend under the bar – the full phrase
-        // (“Don't know / never heard of”) stays in the tooltip, but the legend
-        // has to fit beside its figures at 11.5px
-        const segLeg = mt === "fav" ? ["positive", "neutral", "negative"]
-          : ["approve", "don’t know", "disapprove"];
-        // the opposition slot is an office – label it by who held it (Ley →
-        // Taylor, spliced Feb 2026) when the poll records that
-        const label = id === "taylor" && appr.oppName ? appr.oppName : LEADER_META[id].label;
-        // some waves publish BOTH measures for the same leader (Resolve rates
-        // the majors on performance and likeability). They answer different
-        // questions, so the second one sits beside the first – never averaged
-        // into it, never shown as a correction of it.
-        const alt = appr.alt && appr.alt[id];
-        return (
-          <div className="pd-appr" key={id}>
-            <div className="pd-appr-top">
-              <span className="skey-dot" style={{ background: LEADER_META[id].color }}></span>
-              <span className="pd-appr-name">{label}</span>
-              <span className="pd-appr-net">
-                {net == null
-                  ? <span className="dash" title="Not asked by this pollster">—</span>
-                  : <><NetVal v={net} /><FavMark metric={mt} /><ChgTag v={(chg && chg.d[id + "Net"] != null) ? chg.d[id + "Net"] : null} refDate={chg && chg.r[id + "Net"]} /></>}
-              </span>
-            </div>
-            {s && (
-              <React.Fragment>
-                <div className="appr-bar pd-appr-bar"
-                     title={`${segNames[0]} ${s.app} · ${segNames[1]} ${dk} · ${segNames[2]} ${s.dis}`}>
-                  <span className="appr-app" style={{ width: s.app + "%" }}></span>
-                  <span className="appr-dk" style={{ width: dk + "%" }}></span>
-                  <span className="appr-dis" style={{ width: s.dis + "%" }}></span>
-                </div>
-                {/* The middle segment of three tints was unguessable, so the
-                    split is now stated: a line of labelled figures under the
-                    bar instead of bare numbers crammed inside 10px segments. */}
-                <div className="pd-appr-key">
-                  <b>{s.app}</b> {segLeg[0]} · <b>{dk}</b> {segLeg[1]} · <b>{s.dis}</b> {segLeg[2]}
-                </div>
-              </React.Fragment>
-            )}
-            {alt && (
-              <div className="pd-appr-alt"
-                   title="This pollster asked both questions of this leader in the same wave – favourability (positive minus negative) is not directly comparable with approval">
-                <span className="pd-appr-alt-k">
-                  also {alt.metric === "fav" ? "favourability" : "approval"}
-                </span>
-                <NetVal v={alt.net} />
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 // Direction net – dashed when the poll didn't ask the question.
 // Lives in the expanded detail only: it isn't part of any facet's question,
 // so it earns no permanent column in the compact table.
@@ -1910,6 +1843,233 @@ function SortTh({ label, short, sortKey, k, sort, onSort, className }) {
   );
 }
 
+/* ====================================================================
+   THE LEDGER
+   Every measure a poll publishes is a share of 100, so they all belong on ONE
+   scale: a label gutter, a scale column every bar fills exactly, and a margin
+   column that always answers the same question – by how much. That makes bar
+   LENGTH mean share and nothing else, which the old two-column grid could not
+   claim: it drew seven bars at three different widths, and demoted a second
+   measure by shortening it, so a secondary contest read as a smaller number.
+
+   Shared by BOTH poll tables – Latest polls and the All-polls archive – which
+   is why it takes a row object rather than reaching for either one's state.
+   ==================================================================== */
+
+// "by how much" – the one question every row in the ledger answers. The
+// residual is not a contender: nobody leads by being undecided.
+function segMargin(segs) {
+  const c = segs.filter((x) => !x.resid && x.value != null)
+                .slice().sort((a, b) => b.value - a.value);
+  if (c.length < 2) return null;
+  const [top, second] = c;
+  return {
+    v: Math.round((top.value - second.value) * 10) / 10,
+    color: window.inkOf(top.color),
+    lab: c.length === 2 ? top.label + " lead" : top.label + " over " + second.label,
+  };
+}
+
+// the bar itself – one geometry, one length, however many segments it is given
+function LedgerBar({ segs }) {
+  const total = segs.reduce((a, x) => a + x.value, 0) || 100;
+  return (
+    <div className="sbar sbar-lg" role="img"
+         aria-label={segs.map((x) => `${x.label} ${x.value}`).join(", ")}>
+      {segs.map((x, i) => (
+        <span key={i} className={"sbar-seg" + (x.resid ? " sbar-resid" : "")}
+              style={{ width: (x.value / total * 100) + "%",
+                       background: x.resid ? undefined : x.color }}></span>
+      ))}
+    </div>
+  );
+}
+
+/* The figures, spread across the bar's own width in BAR ORDER, so each one
+   sits over the segment it names. This is also what let the residual stop
+   taking a line of its own: "44 Albanese · 37 Taylor · 19 Undecided" maps
+   left-to-right onto the three segments beneath it. */
+function LedgerNums({ segs }) {
+  return (
+    <div className="pd-lnums">
+      {segs.map((x, i) => (
+        <span key={i} className={"pd-lnum" + (x.resid ? " resid" : x.muted ? " muted" : "")}>
+          {x.resid && <span className="pd-resid-sw" aria-hidden="true"></span>}
+          <b style={x.resid ? undefined : { color: window.inkOf(x.color) }}>{x.value}</b>
+          <span>{x.label}</span>
+          {x.delta && <ChgTag v={x.delta.v} refDate={x.delta.refDate} />}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/* One measure. `threshold` marks 50 – and ONLY where 50 actually decides the
+   contest: a two-sided preferred pair. A preferred-PM matchup carries an
+   undecided share, so 50 is not the winning line there and no notch is drawn. */
+function LedgerRow({ label, name, segs, threshold }) {
+  const m = segMargin(segs);
+  return (
+    <div className="pd-lrow">
+      <div className={"pd-lgut" + (name ? " pd-lgut-name" : "")}>{label}</div>
+      <div className="pd-lscale">
+        <LedgerNums segs={segs} />
+        <div className="pd-barwrap">
+          <LedgerBar segs={segs} />
+          {threshold && <span className="pd-notch" style={{ left: "50%" }}
+                              title="50 – the line a two-party contest turns on"></span>}
+        </div>
+      </div>
+      <div className="pd-lmar">
+        {m
+          ? <React.Fragment>
+              <span className="pd-lmar-v" style={{ color: m.color }}>+{m.v}</span>
+              <span className="pd-lmar-k">{m.lab}</span>
+            </React.Fragment>
+          : <span className="dash">—</span>}
+      </div>
+    </div>
+  );
+}
+
+/* Leader approval keeps a geometry of its own, because it is the one measure
+   here with a real zero. Approve grows left of the axis and disapprove right,
+   each half scaled to 100, so the overhang IS the net and two leaders can be
+   compared by eye – which three stacked 100% bars never allowed. */
+function LedgerApprRow({ id, appr, chg }) {
+  const s = appr[id], net = appr[id + "Net"];
+  if (s == null && net == null) return null;
+  const mt = (appr.metricBy && appr.metricBy[id]) || "approval";
+  // the opposition slot is an office – label it by who held it when the poll
+  // records that (Ley → Taylor, spliced February 2026)
+  const label = id === "taylor" && appr.oppName ? appr.oppName : LEADER_META[id].label;
+  const leg = mt === "fav" ? ["positive", "neutral", "negative"]
+                           : ["approve", "don’t know", "disapprove"];
+  const dk = s ? Math.max(0, 100 - s.app - s.dis) : 0;
+  const d = chg && chg.d[id + "Net"] != null ? { v: chg.d[id + "Net"], refDate: chg.r[id + "Net"] } : null;
+  // some waves publish BOTH measures for one leader (Resolve rates the majors
+  // on performance and likeability). They answer different questions, so the
+  // second sits beside the first – never averaged in, never a correction of it.
+  const alt = appr.alt && appr.alt[id];
+  return (
+    <div className="pd-lrow">
+      <div className="pd-lgut pd-lgut-name">
+        <span className="skey-dot" style={{ background: LEADER_META[id].color }}></span>{label}
+      </div>
+      <div className="pd-lscale">
+        {s
+          ? <React.Fragment>
+              <div className="pd-aprbar"
+                   title={`${leg[0]} ${s.app} · ${leg[1]} ${dk} · ${leg[2]} ${s.dis}`}>
+                <span className="pd-apr-pos" style={{ width: (s.app / 2) + "%" }}></span>
+                <span className="pd-apr-neg" style={{ width: (s.dis / 2) + "%" }}></span>
+                <span className="pd-apr-mid"></span>
+              </div>
+              <div className="pd-apr-key">
+                <b>{s.app}</b> {leg[0]} · <b>{dk}</b> {leg[1]} · <b>{s.dis}</b> {leg[2]}
+              </div>
+            </React.Fragment>
+          : <div className="pd-lnote">Net only – this pollster published no {leg[0]} / {leg[2]} split</div>}
+        {alt && (
+          <div className="pd-lnote"
+               title="This pollster asked both questions of this leader in the same wave – favourability (positive minus negative) is not directly comparable with approval">
+            also {alt.metric === "fav" ? "favourability" : "approval"}{" "}
+            <NetVal v={alt.net} />
+          </div>
+        )}
+      </div>
+      <div className="pd-lmar">
+        {net == null
+          ? <span className="dash" title="Not asked by this pollster">—</span>
+          : <React.Fragment>
+              <span className="pd-lmar-v"><NetVal v={net} /><FavMark metric={mt} /></span>
+              <span className="pd-lmar-k">net <ChgTag v={d ? d.v : null} refDate={d ? d.refDate : null} /></span>
+            </React.Fragment>}
+      </div>
+    </div>
+  );
+}
+
+/* A group of rows under one heading. The rule goes BEFORE each row rather than
+   after, so a group never ends on a hanging hairline. */
+function LedgerGroup({ label, absent, children }) {
+  const kids = React.Children.toArray(children).filter(Boolean);
+  if (!kids.length && !absent) return null;
+  return (
+    <React.Fragment>
+      <div className="pd-lgroup"><div className="pd-k">{label}</div></div>
+      {kids.length
+        ? kids.map((k, i) => (
+            <React.Fragment key={i}>
+              <div className="pd-lrule" aria-hidden="true"></div>
+              {k}
+            </React.Fragment>
+          ))
+        : <div className="pd-lwide"><div className="pd-absent">{absent}</div></div>}
+    </React.Fragment>
+  );
+}
+
+// the whole breakdown – EVERYTHING the poll measured, ragged set and all.
+// `dirSegments` is passed in because the two tables build it from different
+// shapes of the same reading.
+function PollLedger({ r, dirSegments }) {
+  const tcs = tppContests(r);
+  const ppms = ppmContests(r);
+  const appr = r.appr || {};
+  const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
+  return (
+    <div className="pd-ledger">
+
+      <LedgerGroup label={tppHeading(tcs)}
+                   absent="No two-party figure published with this poll">
+        {tcs.map((c, i) => (
+          <LedgerRow key={"t" + i} label={c.lab.replace(/^2PP · /, "")} segs={c.segs}
+                     threshold={c.segs.length === 2 && c.kind !== "3cp"} />
+        ))}
+        {/* Roy Morgan's second ALP–L/NP 2PP: same question, different
+            allocation, so it is a row in this group and not a footnote */}
+        {r.tppFlows != null && <FlowsLine key="flows" v={r.tppFlows} chg={r.chg} />}
+      </LedgerGroup>
+
+      <LedgerGroup label="First preferences">
+        <LedgerRow label="All parties" segs={primarySegs(r)} />
+        {/* the share the primaries have already set aside – it belongs beside
+            the shares it is missing from */}
+        {r.undecided != null &&
+          <UndecidedLine key="und" v={r.undecided} chg={r.chg} basis={r.undecidedBasis} />}
+      </LedgerGroup>
+
+      <LedgerGroup label="Preferred PM" absent="No preferred-PM question this wave">
+        {ppms.map((c, i) => (
+          <LedgerRow key={"p" + i} label={ppmLabel(c)}
+                     segs={ppmContestSegs(c, i === 0 ? r.chg : null)} />
+        ))}
+      </LedgerGroup>
+
+      <LedgerGroup label={apprHeading(appr)}
+                   absent="No leader approval or favourability published with this poll">
+        {noAppr ? null : ["alb", "taylor", "hanson"].map((id) => (
+          <LedgerApprRow key={id} id={id} appr={appr} chg={r.chg} />
+        ))}
+      </LedgerGroup>
+
+      {dirSegments && (
+        <LedgerGroup label="National direction">
+          <LedgerRow label="Right direction v wrong track" segs={dirSegments} />
+        </LedgerGroup>
+      )}
+
+      {r.seats && (
+        <LedgerGroup label="Seat projection">
+          <div className="pd-lwide"><SeatProjection seats={r.seats} /></div>
+        </LedgerGroup>
+      )}
+
+    </div>
+  );
+}
+
 // full per-poll breakdown – shows EVERYTHING the poll measured, ragged set and all
 function PollDetail({ r }) {
   return (
@@ -1923,65 +2083,7 @@ function PollDetail({ r }) {
         {r.mode && <span className="pd-meta-i"><span className="pd-meta-k">Method</span> {r.mode}</span>}
         <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {r.sample ? "n = " + r.sample.toLocaleString() : "—"}</span>
       </div>
-      <div className="pd-grid">
-        <div className="pd-block pd-head">
-          <div className="pd-k">{tppHeading(tppContests(r))}</div>
-          {tppContests(r).length === 0
-            ? <div className="pd-absent">No two-party figure published with this poll</div>
-            : <div className="pd-contests">
-                {tppContests(r).map((c, i) => (
-                  <div className={"pd-contest" + (i > 0 ? " pd-contest-minor" : "")} key={i}>
-                    {tppContests(r).length > 1 && <div className="pd-contest-lab">{c.lab}</div>}
-                    <ShareBar segs={c.segs} />
-                  </div>
-                ))}
-              </div>}
-        </div>
-        <div className="pd-block">
-          <div className="pd-k">First preferences</div>
-          <ShareBar segs={primarySegs(r)} />
-        </div>
-        <div className="pd-block">
-          <div className="pd-k">Preferred PM{ppmContests(r).length > 1 ? " · " + ppmContests(r).length + " matchups" : ppmContests(r).length === 1 && ppmKind(ppmContests(r)[0]) === "three-way" ? " · Three-way" : ""}</div>
-          {ppmContests(r).length === 0
-            ? <div className="pd-absent">No preferred-PM question this wave</div>
-            : <div className="pd-contests">
-                {ppmContests(r).map((c, i) => (
-                  <div className="pd-contest" key={i}>
-                    {ppmContests(r).length > 1 && <div className="pd-contest-lab">{ppmLabel(c)}</div>}
-                    <ShareBar segs={ppmContestSegs(c, i === 0 ? r.chg : null)} />
-                  </div>
-                ))}
-              </div>}
-        </div>
-        <div className="pd-block">
-          <div className="pd-k">{apprHeading(r.appr)}</div>
-          <ApprBlock appr={r.appr} chg={r.chg} />
-        </div>
-        {/* only when the poll actually asked it – Roy Morgan asks every week,
-            Essential most waves, and nobody else, so a permanent "not asked"
-            row would be noise on most pollsters */}
-        {r.dir && (
-          <div className="pd-block pd-wide">
-            <div className="pd-k">National direction</div>
-            <ShareBar segs={dirSegs(r)} />
-          </div>
-        )}
-        {r.undecided != null && <UndecidedLine v={r.undecided} chg={r.chg} basis={r.undecidedBasis} />}
-        {/* Roy Morgan's second 2PP – absent, not zero, on waves whose
-            release printed no flows pair */}
-        {r.tppFlows != null && <FlowsLine v={r.tppFlows} chg={r.chg} />}
-        {/* a modelled chamber is not a per-poll measure, so it takes the full
-            width – and it belongs HERE as well as in the archive: a projection
-            published this week is exactly what someone reading the latest
-            polls came for */}
-        {r.seats && (
-          <div className="pd-block pd-wide">
-            <div className="pd-k">Seat projection</div>
-            <SeatProjection seats={r.seats} />
-          </div>
-        )}
-      </div>
+      <PollLedger r={r} dirSegments={r.dir ? dirSegs(r) : null} />
     </div>
   );
 }
@@ -2762,7 +2864,8 @@ function PollsterTable() {
 
 Object.assign(window, { UndecidedLine, FlowsLine, Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
-  ShareBar, NetVal, FavMark, ChgTag, ApprBlock, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
+  ShareBar, NetVal, FavMark, ChgTag, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
+  PollLedger, LedgerRow, LedgerGroup, LedgerApprRow, segMargin,
   // the archive prints publication stamps too, and there is only one way to
   // write one
   pubStamp });
