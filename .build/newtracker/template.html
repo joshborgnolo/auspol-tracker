@@ -616,6 +616,58 @@ body.js #root {
 
 /* The timeline is a line graph now (see DialTrack), so it needs real height -
    at 26px a 2PP range of a few points had nowhere to go. */
+/* ---- the dial's housing -------------------------------------------------
+   Tokens, not literal colours, so the instrument reads the same in both
+   themes: light gives it a pale enamel face in a warm steel bezel, dark a
+   sunk graphite face in a rim catching what light there is. Every value is
+   mixed from the palette already in use rather than introduced, so nothing
+   here is a new colour - it is the surface tokens leaned on a little.
+
+   The lighting is fixed at top-left throughout: the bezel gradient runs from
+   there, the face falls away from there, and the glass sheen comes from the
+   same corner. One light source is the whole difference between an object and
+   a pile of gradients. */
+:root {
+  --dl-face-hi:   color-mix(in oklch, white 62%, var(--surface));
+  --dl-face-lo:   var(--surface-2);
+  --dl-face-edge: color-mix(in oklch, var(--ink) 9%, var(--surface-2));
+  --dl-bezel-hi:  color-mix(in oklch, white 70%, var(--line));
+  --dl-bezel-mid: var(--line);
+  --dl-bezel-lo:  color-mix(in oklch, var(--ink) 36%, var(--line));
+  --dl-glass:     color-mix(in oklch, white 34%, transparent);
+  --dl-grad:      color-mix(in oklch, var(--ink) 34%, transparent);
+}
+body.dark {
+  --dl-face-hi:   color-mix(in oklch, white 7%, var(--surface-2));
+  --dl-face-lo:   var(--surface);
+  --dl-face-edge: color-mix(in oklch, black 34%, var(--surface));
+  --dl-bezel-hi:  color-mix(in oklch, white 16%, var(--line));
+  --dl-bezel-mid: var(--line);
+  --dl-bezel-lo:  color-mix(in oklch, black 44%, var(--line));
+  --dl-glass:     color-mix(in oklch, white 9%, transparent);
+  --dl-grad:      color-mix(in oklch, white 30%, transparent);
+}
+/* the face sits INSIDE the bezel, so the rim reads as a wall around it */
+.dl-face { filter: drop-shadow(0 0.35px 0.5px color-mix(in oklch, var(--ink) 22%, transparent)); }
+.dl-grad { stroke: var(--dl-grad); stroke-width: 0.28; stroke-linecap: butt; }
+.dl-grad.major { stroke-width: 0.45; stroke: color-mix(in oklch, var(--ink) 52%, transparent); }
+/* the needle is a moving part, so it throws a shadow onto the face - the one
+   place a reading gets any relief, and only because a needle sitting flat on
+   its own dial is the thing that looks wrong */
+/* one filter on the group, not one per child: the needle turns every frame
+   during playback, and two filtered elements is two rasters a frame for a
+   shadow that reads as one */
+.dl-needle-g {
+  filter: drop-shadow(0.35px 0.55px 0.4px color-mix(in oklch, var(--ink) 30%, transparent));
+}
+.dl-pivot-seat { fill: color-mix(in oklch, var(--ink) 16%, transparent); }
+/* the earlier .dl-pivot sets fill, and CSS beats a presentation attribute, so
+   the gradient has to be claimed here or the screw renders flat */
+.dl-pivot { fill: url(#dl-screw); stroke: color-mix(in oklch, var(--ink) 34%, transparent); stroke-width: 0.3; }
+.dl-glass { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  /* the shadows are static; nothing here needs suppressing */
+}
 .dl-track { position: relative; height: 62px; cursor: default; touch-action: none; }
 .dl-track:not(.playing) { cursor: ew-resize; }
 .dl-track:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 3px; border-radius: 6px; }

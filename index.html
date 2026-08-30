@@ -466,6 +466,58 @@ body.js #root {
 
 /* The timeline is a line graph now (see DialTrack), so it needs real height -
    at 26px a 2PP range of a few points had nowhere to go. */
+/* ---- the dial's housing -------------------------------------------------
+   Tokens, not literal colours, so the instrument reads the same in both
+   themes: light gives it a pale enamel face in a warm steel bezel, dark a
+   sunk graphite face in a rim catching what light there is. Every value is
+   mixed from the palette already in use rather than introduced, so nothing
+   here is a new colour - it is the surface tokens leaned on a little.
+
+   The lighting is fixed at top-left throughout: the bezel gradient runs from
+   there, the face falls away from there, and the glass sheen comes from the
+   same corner. One light source is the whole difference between an object and
+   a pile of gradients. */
+:root {
+  --dl-face-hi:   color-mix(in oklch, white 62%, var(--surface));
+  --dl-face-lo:   var(--surface-2);
+  --dl-face-edge: color-mix(in oklch, var(--ink) 9%, var(--surface-2));
+  --dl-bezel-hi:  color-mix(in oklch, white 70%, var(--line));
+  --dl-bezel-mid: var(--line);
+  --dl-bezel-lo:  color-mix(in oklch, var(--ink) 36%, var(--line));
+  --dl-glass:     color-mix(in oklch, white 34%, transparent);
+  --dl-grad:      color-mix(in oklch, var(--ink) 34%, transparent);
+}
+body.dark {
+  --dl-face-hi:   color-mix(in oklch, white 7%, var(--surface-2));
+  --dl-face-lo:   var(--surface);
+  --dl-face-edge: color-mix(in oklch, black 34%, var(--surface));
+  --dl-bezel-hi:  color-mix(in oklch, white 16%, var(--line));
+  --dl-bezel-mid: var(--line);
+  --dl-bezel-lo:  color-mix(in oklch, black 44%, var(--line));
+  --dl-glass:     color-mix(in oklch, white 9%, transparent);
+  --dl-grad:      color-mix(in oklch, white 30%, transparent);
+}
+/* the face sits INSIDE the bezel, so the rim reads as a wall around it */
+.dl-face { filter: drop-shadow(0 0.35px 0.5px color-mix(in oklch, var(--ink) 22%, transparent)); }
+.dl-grad { stroke: var(--dl-grad); stroke-width: 0.28; stroke-linecap: butt; }
+.dl-grad.major { stroke-width: 0.45; stroke: color-mix(in oklch, var(--ink) 52%, transparent); }
+/* the needle is a moving part, so it throws a shadow onto the face - the one
+   place a reading gets any relief, and only because a needle sitting flat on
+   its own dial is the thing that looks wrong */
+/* one filter on the group, not one per child: the needle turns every frame
+   during playback, and two filtered elements is two rasters a frame for a
+   shadow that reads as one */
+.dl-needle-g {
+  filter: drop-shadow(0.35px 0.55px 0.4px color-mix(in oklch, var(--ink) 30%, transparent));
+}
+.dl-pivot-seat { fill: color-mix(in oklch, var(--ink) 16%, transparent); }
+/* the earlier .dl-pivot sets fill, and CSS beats a presentation attribute, so
+   the gradient has to be claimed here or the screw renders flat */
+.dl-pivot { fill: url(#dl-screw); stroke: color-mix(in oklch, var(--ink) 34%, transparent); stroke-width: 0.3; }
+.dl-glass { pointer-events: none; }
+@media (prefers-reduced-motion: reduce) {
+  /* the shadows are static; nothing here needs suppressing */
+}
 .dl-track { position: relative; height: 62px; cursor: default; touch-action: none; }
 .dl-track:not(.playing) { cursor: ew-resize; }
 .dl-track:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 3px; border-radius: 6px; }
@@ -13596,7 +13648,85 @@ function DialFigure({
   const labelRing = separate(barRing, WM_LABEL_SEP);
   return /*#__PURE__*/React.createElement("g", {
     className: "dl-fig"
-  }, envelope && envelope.max > envelope.min + 2 && /*#__PURE__*/React.createElement("g", {
+  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("radialGradient", {
+    id: "dl-face",
+    cx: "38%",
+    cy: "30%",
+    r: "78%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "var(--dl-face-hi)"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "70%",
+    stopColor: "var(--dl-face-lo)"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "var(--dl-face-edge)"
+  })), /*#__PURE__*/React.createElement("linearGradient", {
+    id: "dl-bezel",
+    x1: "0",
+    y1: "0",
+    x2: "0.35",
+    y2: "1"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "var(--dl-bezel-hi)"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "48%",
+    stopColor: "var(--dl-bezel-mid)"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "var(--dl-bezel-lo)"
+  })), /*#__PURE__*/React.createElement("linearGradient", {
+    id: "dl-glass",
+    x1: "0.1",
+    y1: "0",
+    x2: "0.75",
+    y2: "1"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "var(--dl-glass)"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "46%",
+    stopColor: "transparent"
+  })), /*#__PURE__*/React.createElement("radialGradient", {
+    id: "dl-screw",
+    cx: "35%",
+    cy: "30%",
+    r: "75%"
+  }, /*#__PURE__*/React.createElement("stop", {
+    offset: "0%",
+    stopColor: "var(--dl-bezel-hi)"
+  }), /*#__PURE__*/React.createElement("stop", {
+    offset: "100%",
+    stopColor: "var(--dl-bezel-lo)"
+  }))), /*#__PURE__*/React.createElement("circle", {
+    className: "dl-bezel",
+    cx: WM_GC.cx,
+    cy: WM_GC.cy,
+    r: WM_GC.r + 3.1,
+    fill: "url(#dl-bezel)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    className: "dl-face",
+    cx: WM_GC.cx,
+    cy: WM_GC.cy,
+    r: WM_GC.r + 1.7,
+    fill: "url(#dl-face)"
+  }), Array.from({
+    length: 31
+  }, (_, k) => -90 + k * 6).map(d => {
+    const major = Math.abs(d % 30) < 0.001;
+    const a = wmPolar(d, WM_GC.r - (major ? 2.4 : 1.3));
+    const b = wmPolar(d, WM_GC.r - 0.2);
+    return /*#__PURE__*/React.createElement("line", {
+      key: d,
+      className: "dl-grad" + (major ? " major" : ""),
+      x1: a.x,
+      y1: a.y,
+      x2: b.x,
+      y2: b.y
+    });
+  }), envelope && envelope.max > envelope.min + 2 && /*#__PURE__*/React.createElement("g", {
     className: "dl-envelope"
   }, /*#__PURE__*/React.createElement("path", {
     d: wmArc(envelope.min, envelope.max, WM_ENV_R)
@@ -13666,6 +13796,7 @@ function DialFigure({
       opacity: (k + 1) / trail.length * 0.22
     }
   })), /*#__PURE__*/React.createElement("g", {
+    className: "dl-needle-g",
     transform: `translate(${WM_GC.cx}, ${WM_GC.cy}) rotate(${deg.toFixed(2)})`
   }, /*#__PURE__*/React.createElement("line", {
     className: "dl-needle",
@@ -13681,10 +13812,23 @@ function DialFigure({
     r: "1.9",
     fill: needleColor
   })), /*#__PURE__*/React.createElement("circle", {
+    className: "dl-pivot-seat",
+    cx: WM_GC.cx,
+    cy: WM_GC.cy,
+    r: "2.5"
+  }), /*#__PURE__*/React.createElement("circle", {
     className: "dl-pivot",
     cx: WM_GC.cx,
     cy: WM_GC.cy,
-    r: "1.7"
+    r: "1.7",
+    fill: "url(#dl-screw)"
+  }), /*#__PURE__*/React.createElement("circle", {
+    className: "dl-glass",
+    cx: WM_GC.cx,
+    cy: WM_GC.cy,
+    r: WM_GC.r + 1.7,
+    fill: "url(#dl-glass)",
+    pointerEvents: "none"
   }));
 }
 Object.assign(window, {

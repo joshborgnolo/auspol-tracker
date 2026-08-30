@@ -140,6 +140,53 @@ function DialFigure({ story, f, envelope, trail }) {
 
   return (
     <g className="dl-fig">
+      {/* ---- the instrument it is pretending to be -------------------------
+         The dial is a gauge, so at this size it is allowed to look like one:
+         a face sunk slightly below its bezel, a rim lit from the top left, a
+         ring of engraved graduations, a pivot with a screw head, and a sheen
+         where the glass would be.
+
+         Where the line falls: this is all CHROME. Every mark that carries a
+         READING - the bars, the arc, the needle, the envelope - stays flat and
+         literal. Gloss on a data mark is the same mistake as a 3D chart: it
+         edits the quantity while claiming to decorate it. So the housing is
+         the skeuomorph and the readings sit on top of it, unstyled.
+
+         Only here, not on the masthead. That mark renders at 39px from its own
+         markup, where a bevel is mud. */}
+      <defs>
+        <radialGradient id="dl-face" cx="38%" cy="30%" r="78%">
+          <stop offset="0%" stopColor="var(--dl-face-hi)" />
+          <stop offset="70%" stopColor="var(--dl-face-lo)" />
+          <stop offset="100%" stopColor="var(--dl-face-edge)" />
+        </radialGradient>
+        <linearGradient id="dl-bezel" x1="0" y1="0" x2="0.35" y2="1">
+          <stop offset="0%" stopColor="var(--dl-bezel-hi)" />
+          <stop offset="48%" stopColor="var(--dl-bezel-mid)" />
+          <stop offset="100%" stopColor="var(--dl-bezel-lo)" />
+        </linearGradient>
+        <linearGradient id="dl-glass" x1="0.1" y1="0" x2="0.75" y2="1">
+          <stop offset="0%" stopColor="var(--dl-glass)" />
+          <stop offset="46%" stopColor="transparent" />
+        </linearGradient>
+        <radialGradient id="dl-screw" cx="35%" cy="30%" r="75%">
+          <stop offset="0%" stopColor="var(--dl-bezel-hi)" />
+          <stop offset="100%" stopColor="var(--dl-bezel-lo)" />
+        </radialGradient>
+      </defs>
+      <circle className="dl-bezel" cx={WM_GC.cx} cy={WM_GC.cy} r={WM_GC.r + 3.1}
+              fill="url(#dl-bezel)" />
+      <circle className="dl-face" cx={WM_GC.cx} cy={WM_GC.cy} r={WM_GC.r + 1.7}
+              fill="url(#dl-face)" />
+      {/* engraved graduations: every 6 degrees across the sweep, longer every 30 */}
+      {Array.from({ length: 31 }, (_, k) => -90 + k * 6).map((d) => {
+        const major = Math.abs(d % 30) < 0.001;
+        const a = wmPolar(d, WM_GC.r - (major ? 2.4 : 1.3));
+        const b = wmPolar(d, WM_GC.r - 0.2);
+        return <line key={d} className={"dl-grad" + (major ? " major" : "")}
+                     x1={a.x} y1={a.y} x2={b.x} y2={b.y} />;
+      })}
+
       {/* envelope of everywhere the needle has been */}
       {/* Everywhere the needle has been, drawn as a band at the tip radius
           rather than a wedge from the pivot: it reads as an arc the needle has
@@ -205,11 +252,17 @@ function DialFigure({ story, f, envelope, trail }) {
       ))}
 
       {/* the needle */}
-      <g transform={`translate(${WM_GC.cx}, ${WM_GC.cy}) rotate(${deg.toFixed(2)})`}>
+      <g className="dl-needle-g" transform={`translate(${WM_GC.cx}, ${WM_GC.cy}) rotate(${deg.toFixed(2)})`}>
         <line className="dl-needle" x1="0" y1="0" x2="0" y2="-8.6" stroke={needleColor} />
         <circle className="dl-needle-tip" cx="0" cy="-8.6" r="1.9" fill={needleColor} />
       </g>
-      <circle className="dl-pivot" cx={WM_GC.cx} cy={WM_GC.cy} r="1.7" />
+      <circle className="dl-pivot-seat" cx={WM_GC.cx} cy={WM_GC.cy} r="2.5" />
+      <circle className="dl-pivot" cx={WM_GC.cx} cy={WM_GC.cy} r="1.7"
+              fill="url(#dl-screw)" />
+      {/* the glass. Last, so it lies over the readings the way glass does, and
+          inert to the pointer so it never eats a hover. */}
+      <circle className="dl-glass" cx={WM_GC.cx} cy={WM_GC.cy} r={WM_GC.r + 1.7}
+              fill="url(#dl-glass)" pointerEvents="none" />
     </g>
   );
 }
