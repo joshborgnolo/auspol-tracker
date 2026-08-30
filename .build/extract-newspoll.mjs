@@ -6,7 +6,10 @@
 // Newspoll has no data endpoint: News Corp publishes numbers only inside
 // paywalled articles, so this extractor reads FREE coverage and merges the
 // pieces. Discovery is the Bing News RSS query "newspoll" for the AU market
-// (plus the News Corp topic page, best-effort); Bing item links are
+// (plus the publisher-of-record topic page theaustralian.com.au/topics/
+// newspoll — bot-walled for plain fetch, so its tiles are read through the
+// NEWSIE_CHROME session when set, and yield "Newspoll:" release titles+links
+// only, never figures: 1c5c3ea, reverted f14a46f); Bing item links are
 // apiclick.aspx?...&url=<encoded> wrappers and decode IN-PROCESS to the
 // publisher URL — Google News RSS was tried first but its /rss/articles/
 // links now serve a JS shell with the publisher URL behind a rotating
@@ -470,6 +473,21 @@ function bingUrl(link) {
   catch { return link; }
 }
 
+// The topic page is wall-covered for bots: plain fetch gets the 200
+// "No Cookies" challenge, so the rendered read goes through Chrome when
+// NEWSIE_CHROME is set — the same rescue rung article fetches use.
+async function topicHtml() {
+  try {
+    const p = await fetchText(TOPIC);
+    if (!/<title>\s*no cookies\b/i.test(p.text) && p.text.includes("/news-story/")) return p.text;
+  } catch { /* News Corp wall; RSS usually suffices */ }
+  if (!process.env.NEWSIE_CHROME) return null;
+  try {
+    return execFileSync("node", [".build/chrome-article.mjs", TOPIC],
+      { encoding: "utf8", timeout: 180_000, maxBuffer: 64 * 1024 * 1024, stdio: ["ignore", "pipe", "inherit"] });
+  } catch { return null; }
+}
+
 async function discover() {
   const out = [];
   try {
@@ -483,11 +501,23 @@ async function discover() {
       out.push({ title, link: bingUrl(link), pubIso: pub ? dateIso(new Date(pub)) : null });
     }
   } catch (e) { console.error("NP_NOTE bing discovery failed: " + e.message); }
-  try {
-    const tp = await fetchText(TOPIC);
-    for (const m of tp.text.matchAll(/href="(https:\/\/www\.theaustralian\.com\.au\/[^"]*\/news-story\/[a-f0-9]{16,})"/g))
-      out.push({ title: m[1], link: m[1], pubIso: null });
-  } catch { /* News Corp wall; RSS usually suffices */ }
+  // Publisher-of-record discovery. The tile stream mixes commentary, state
+  // polls and evergreens, so the gate is deliberate: federal RELEASE
+  // headlines begin "Newspoll:". Titles and links are ALL that is taken —
+  // 1c5c3ea (reverted f14a46f) transcribed a satisfaction split off the
+  // tile standfirsts, which mix waves; figures are only ever read from a
+  // fetched article itself.
+  const tp = await topicHtml().catch(() => null);
+  if (tp) {
+    let n = 0;
+    for (const m of tp.matchAll(/<h3[^>]*>\s*<a[^>]*href="(https:\/\/www\.theaustralian\.com\.au\/[^"]*\/news-story\/[a-f0-9]{16,})"[^>]*>([\s\S]*?)<\/a>/gi)) {
+      const title = clean(m[2]).replace(/&amp;/g, "&");
+      if (!/^newspoll:/i.test(title) || EXCLUDE.test(title)) continue;
+      out.push({ title, link: m[1], pubIso: null });
+      n++;
+    }
+    if (n) console.error(`NP_NOTE topic page yielded ${n} "Newspoll:" release headline(s)`);
+  }
   return out;
 }
 
