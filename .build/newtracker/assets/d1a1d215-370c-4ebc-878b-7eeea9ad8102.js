@@ -1471,54 +1471,76 @@ function ArchPollDetail({ p, onBack, backLabel }) {
     { label: "Wrong track", value: p.dir.wrong, color: "var(--mood-neg)",
       delta: p.dir.chg ? { v: p.dir.chg.wrong, refDate: p.dir.ref } : null },
   ] : null;
+
+  /* The meta items, as a list rather than loose children, because the controls
+     at the end of this band need to know which one is LAST. */
+  const metaItems = [
+    p.client && <span className="pd-meta-i" key="client"><span className="pd-meta-k">Commissioned by</span> {p.client}</span>,
+    <span className="pd-meta-i meta-dup" key="field"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>,
+    /* The date the poll came OUT, and the hour where the release recorded
+       one. This line has always been labelled "Published" and has always
+       printed `fullDate`, which is the last day of FIELDWORK - the same
+       substitution the Latest-polls column was corrected for, still being
+       made one tab across. Where no publication date was recorded the
+       fieldwork end still stands in, but now says that it is doing so. */
+    <span className="pd-meta-i" key="pub"><span className="pd-meta-k">Published</span>{" "}
+      {pubStamp(p.published, { year: true })
+        || <span className="pd-est"
+                 title="Publication date not recorded for this poll – showing the last day of fieldwork">
+             {p.fullDate}
+           </span>}
+    </span>,
+    <span className="pd-meta-i meta-md" key="sample"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>,
+    p.lean != null && <span className="pd-meta-i" key="lean"><span className="pd-meta-k">Poll lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>,
+    p.hfx != null && <span className="pd-meta-i" key="hfx"><span className="pd-meta-k">House effect</span> {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)} vs consensus</span>,
+  ].filter(Boolean);
+
+  const controls = [
+    /* the way back rides the line that already describes this poll, rather
+       than inventing a band of its own above the panel */
+    onBack && (
+      <button className="back-to-chart" key="back" onClick={(e) => { e.stopPropagation(); onBack(); }}>
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+             strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M19 12H5M11 18l-6-6 6-6" />
+        </svg>
+        Back to {backLabel || "the chart"}
+      </button>
+    ),
+    /* Corrections are nearly always about ONE poll, and the reader who has a
+       row open is looking at the figure they doubt. Seeding the footer's form
+       from here means the pollster and field dates - the two things that
+       identify a row in data/polls.json - arrive already written, rather than
+       being retyped from memory after scrolling away from them. Only rendered
+       when a form exists to seed. */
+    window.AP_FEEDBACK && (
+      <button className="back-to-chart pd-report" key="report"
+              title="Report an error in this poll" aria-label="Report an error in this poll"
+              onClick={(e) => { e.stopPropagation(); window.AP.reportPoll && window.AP.reportPoll(p); }}>
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+             strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+        </svg>
+        <span className="pd-report-lbl">Report an error</span>
+      </button>
+    ),
+  ].filter(Boolean);
+
+  /* The controls ride with the LAST meta item rather than floating free at the
+     end of the band, so a wrap can never strand them on a line of their own -
+     which is what "Report an error" did at every width where the band ran to
+     two lines. Where even the pair doesn't fit, a container query drops the
+     button's label and leaves the icon. */
+  const lead = controls.length ? metaItems.slice(0, -1) : metaItems;
+  const tail = controls.length ? metaItems.slice(-1) : [];
+
   return (
     <div className="poll-detail">
       <div className="pd-meta">
-        {p.client && <span className="pd-meta-i"><span className="pd-meta-k">Commissioned by</span> {p.client}</span>}
-        <span className="pd-meta-i meta-dup"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>
-        {/* The date the poll came OUT, and the hour where the release recorded
-            one. This line has always been labelled "Published" and has always
-            printed `fullDate`, which is the last day of FIELDWORK - the same
-            substitution the Latest-polls column was corrected for, still being
-            made one tab across. Where no publication date was recorded the
-            fieldwork end still stands in, but now says that it is doing so. */}
-        <span className="pd-meta-i"><span className="pd-meta-k">Published</span>{" "}
-          {pubStamp(p.published, { year: true })
-            || <span className="pd-est"
-                     title="Publication date not recorded for this poll – showing the last day of fieldwork">
-                 {p.fullDate}
-               </span>}
-        </span>
-        <span className="pd-meta-i meta-md"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>
-        {p.lean != null && <span className="pd-meta-i"><span className="pd-meta-k">Poll lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>}
-        {p.hfx != null && <span className="pd-meta-i"><span className="pd-meta-k">House effect</span> {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)} vs consensus</span>}
-        {/* the way back rides the line that already describes this poll, rather
-            than inventing a band of its own above the panel */}
-        {onBack && (
-          <button className="back-to-chart" onClick={(e) => { e.stopPropagation(); onBack(); }}>
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
-                 strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M19 12H5M11 18l-6-6 6-6" />
-            </svg>
-            Back to {backLabel || "the chart"}
-          </button>
-        )}
-        {/* Corrections are nearly always about ONE poll, and the reader who
-            has a row open is looking at the figure they doubt. Seeding the
-            footer's form from here means the pollster and field dates - the
-            two things that identify a row in data/polls.json - arrive already
-            written, rather than being retyped from memory after scrolling
-            away from them. Only rendered when a form exists to seed. */}
-        {window.AP_FEEDBACK && (
-          <button className="back-to-chart pd-report"
-                  onClick={(e) => { e.stopPropagation(); window.AP.reportPoll && window.AP.reportPoll(p); }}>
-            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
-                 strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-              <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
-            </svg>
-            Report an error
-          </button>
-        )}
+        {lead}
+        {controls.length > 0
+          ? <span className="pd-meta-tail">{tail}{controls}</span>
+          : tail}
       </div>
       <PollLedger r={p} dirSegments={dirSegments} />
     </div>

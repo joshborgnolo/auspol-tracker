@@ -1562,7 +1562,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
    aligns with the panel's content instead of with the table cell behind it. */
 .back-to-chart {
   display: inline-flex; align-items: center; gap: 6px;
-  margin-left: auto; align-self: center;
+  align-self: center; flex: none;
   border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
   padding: 5px 13px 5px 10px; font-family: var(--sans); font-size: 12px; font-weight: 600;
   color: var(--ink-2); cursor: pointer; white-space: nowrap;
@@ -1570,9 +1570,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 .back-to-chart:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
 /* Both controls in the line are the same kind of thing - a way out of the row
-   - so they read as a pair. Only the first claims the free space; without
-   this the second takes its own margin-left:auto and the two split apart. */
-.back-to-chart + .pd-report { margin-left: 0; }
+   - so they read as a pair, and they travel with the last meta item. */
 .pd-report svg { opacity: 0.75; }
 /* but the report button is not a peer of the way back - it exists for the
    reader who already doubts a figure, not as a call to action - so it wears
@@ -1581,6 +1579,28 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-report:hover { color: var(--ink); }
 /* the meta line carries text and now a control, so centre what sits in it */
 .pd-meta { align-items: center; }
+/* The controls ride WITH the last meta item rather than floating at the end of
+   the band. A flex line breaks between items, never inside one, so grouping
+   them means a wrap can no longer strand "Report an error" on a line of its
+   own - which is what it did at every width where the band ran to two lines. */
+.pd-meta-tail {
+  display: inline-flex; align-items: center; gap: 10px;
+  flex-wrap: nowrap; min-width: 0;
+}
+/* the group is nowrap so the buttons cannot leave the item; the item's own
+   TEXT may still wrap, which is what keeps the pair inside a phone's width
+   instead of overflowing it */
+.pd-meta-tail .pd-meta-i { white-space: normal; min-width: 0; }
+/* Below this the label will not fit beside the figures it sits with - the
+   archive's own band runs 742px of items at 796px wide, and the labelled
+   button needs 133 more - so it drops to the icon, which fits. Measured on
+   the widest meta line the archive produces (published, sample, poll lean,
+   house effect); a poll with fewer items would have fitted the label a little
+   narrower, and shows the icon slightly sooner than it strictly must. */
+@container pdmeta (max-width: 900px) {
+  .pd-report .pd-report-lbl { display: none; }
+  .pd-report { padding: 4px 9px; gap: 0; }
+}
 /* a poll arrived at from a chart gets one quiet pulse, so the eye finds it
    after the scroll instead of hunting the row that just opened */
 @media (prefers-reduced-motion: no-preference) {
@@ -1593,6 +1613,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .detail-row:hover { background: transparent !important; }
 .poll-detail { padding: 6px 14px 20px 42px; background: var(--surface-2); text-align: left; }
 .pd-meta {
+  container-type: inline-size; container-name: pdmeta;
   display: flex; flex-wrap: wrap; gap: 6px 26px; padding: 4px 0 16px;
   margin-bottom: 18px; border-bottom: 1px solid var(--line-2);
   font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
