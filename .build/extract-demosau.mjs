@@ -55,10 +55,22 @@
 // date order (validate.mjs demands a globally sorted array) and the row shape
 // mirrors the hand-entered DemosAU entries, url = the PDF.
 //
-// Provenance: each candidate's parsed metrics cache to
-// .build/demosau-src/<slug>.json and its pdftotext output to <slug>.txt
-// (committed alongside). A cached candidate is never re-downloaded
-// (--force re-downloads everything), so routine runs fetch only the index.
+//   candidates are NEVER re-fetched: parsed metrics cache to
+//   .build/demosau-src/<slug>.json (schema-versioned via cacheV — a version
+//   bump re-derives from the committed <slug>.txt instead of downloading);
+//   --force re-downloads everything. A wave row whose release has rolled
+//   OFF the index page (July 2026, Feb 2026) is refetched by the curated
+//   row's own url so verification coverage never silently drops.
+//   - leadership (federal polls): the Preferred-PM three-choice chart
+//     (name order varies per release; values are the bar rows in the same
+//     order), the Head-to-Head pair vs the Liberal leader (committed as
+//     ppm.extra), and the "Leader Ratings" table (Positive / Neutral /
+//     Negative / Net Positive / Change %) → approval nets + app/dis detail.
+//     A new wave's ppm and approval rows are inserted alongside its VI row;
+//     Jan-2026-style releases with leadership charts as images fail the
+//     new-wave guard. Existing ppm/approval rows are verified with the same
+//     file-is-authoritative semantics (missing rows surface in
+//     DEMOSAU_STATUS.missing_rows).
 //
 // Usage: node .build/extract-demosau.mjs [--check] [--force] [index-url]
 //
@@ -161,11 +173,156 @@ function parsePeriod(raw) {
 
 const pctTokens = (line) => {
   const out = [];
-  const re = /(\d+(?:\.\d+)?)\s*%/g;
+  const re = /(-?\d+(?:\.\d+)?)\s*%/g;
   let m;
   while ((m = re.exec(line))) out.push({ x: m.index, v: parseFloat(m[1]) });
   return out;
 };
+
+// ------------------------------------------------------------- leadership
+// Preferred-PM (three-choice) chart: a names row ("Anthony Albanese (Labor)
+// Angus Taylor (Liberal)  Pauline Hanson (One Nation)  Don't Know") whose
+// NAME order varies per release (May/Jun 2026 put Hanson second), then one
+// value line per name in the same order (value first on the line; the
+// "Change from …%" column sits further right). Row order = bar order.
+// Head-to-Head: two side-by-side sub-charts (Albanese vs Hanson one side,
+// Albanese vs Liberal leader the other), bars top-to-bottom in name order
+// (Albanese, other, Don't Know). The committed `extra` pair is the
+// Albanese-vs-Liberal-leader one. Leader Ratings is a real table: "Prime
+// Minister X / Opposition Leader Y / One Nation Leader Z" rows with
+// Positive, Neutral, Negative, Net Positive, Change % columns (the net and
+// change can wrap to a continuation line of lone signed tokens).
+// Jan-2026-style releases render all of this as images: nothing parses —
+// a note on an existing wave, a guard fail on a new one.
+const ROLE_RE = /([A-Z][A-Za-z'.-]+(?: [A-Z][A-Za-z'.-]+){0,2}) \((Labor|Liberal|One Nation)\)|(Don't Know)\b/g;
+
+function leaderRoles(line) {
+  const roles = [];
+  let m;
+  ROLE_RE.lastIndex = 0;
+  while ((m = ROLE_RE.exec(line))) {
+    if (m[3]) roles.push({ role: "dk", x: m.index });
+    else roles.push({ role: m[2] === "Labor" ? "alb" : m[2] === "Liberal" ? "opp" : "han", name: m[1].trim(), x: m.index });
+  }
+  return roles;
+}
+
+const surname = (full) => full.trim().split(/\s+/).pop();
+
+function parsePreferredPM(lines) {
+  const namesIdx = lines.findIndex((l) => {
+    if (/^\s*Q\./.test(l)) return false;
+    const got = new Set(leaderRoles(l).map((r) => r.role));
+    return got.has("alb") && got.has("opp") && got.has("han") && got.has("dk");
+  });
+  if (namesIdx === -1) return { error: "no preferred-PM names row (leadership charts may be images)" };
+  const roles = leaderRoles(lines[namesIdx]);
+  const values = [];
+  for (let i = namesIdx + 1; i < lines.length && values.length < roles.length; i++) {
+    const l = lines[i];
+    if (/^\s*0%(?:\s|$)/.test(l) || /^\s*(Head to Head|Second Choices|Leader Ratings|Personal Ratings|Q\.)/i.test(l)) break;
+    const m = l.match(/(-?\d+(?:\.\d+)?)\s*%/);
+    if (m) values.push(parseFloat(m[1]));
+  }
+  if (values.length !== roles.length) return { error: `preferred-PM values ${values.length}/${roles.length} parsed` };
+  const ppm = {};
+  let oppName = null;
+  roles.forEach((r, i) => {
+    if (r.role === "alb") ppm.alb = values[i];
+    else if (r.role === "opp") { ppm.opp = values[i]; oppName = surname(r.name); }
+    else if (r.role === "han") ppm.han = values[i];
+  });
+  const total = ppm.alb + ppm.opp + ppm.han;
+  if (!(total > 65 && total <= 100)) return { error: `preferred-PM three-choice total ${total} implausible` };
+  return { ppm, oppName, namesIdx };
+}
+
+function parseHeadToHead(lines, afterIdx) {
+  const hIdx = lines.findIndex((l, i) => i > afterIdx && /^\s*Head to Head\s*$/i.test(l));
+  if (hIdx === -1) return null;
+  let endIdx = lines.length;
+  for (let i = hIdx + 1; i < lines.length; i++) {
+    if (/^\s*(Second Choices|Leader Ratings|Personal Ratings|Q\. What is your opinion)/i.test(lines[i])) { endIdx = i; break; }
+  }
+  const block = lines.slice(hIdx, endIdx);
+  const pairIdx = block.findIndex((l) => l.includes("(Labor)") && l.includes("(Liberal)"));
+  if (pairIdx === -1) return { error: "head-to-head: no Labor+Liberal names line" };
+  const toks = [];
+  block.forEach((l, li) => {
+    if (/^\s*0%(?:\s|$)/.test(l)) return;
+    for (const t of pctTokens(l)) toks.push({ ...t, li });
+  });
+  if (toks.length < 4) return { error: `head-to-head: only ${toks.length} value tokens` };
+  const xs = toks.map((t) => t.x);
+  const mid = (Math.min(...xs) + Math.max(...xs)) / 2;
+  const byLine = (a, b) => a.li - b.li || a.x - b.x;
+  const right = toks.filter((t) => t.x > mid).sort(byLine);
+  const left = toks.filter((t) => t.x <= mid).sort(byLine);
+  // the Liberal-leader pair is whichever cluster shares the pair line's side
+  const pairLine = block[pairIdx];
+  const albX = pairLine.indexOf("(Labor)");
+  const cluster = (albX > mid ? right : left);
+  if (cluster.length < 2) return { error: "head-to-head: Liberal pair cluster has <2 values" };
+  const [alb, opp] = cluster.map((t) => t.v);
+  if (cluster.length >= 3 && Math.abs(alb + opp + cluster[2].v - 100) > 3)
+    return { error: `head-to-head pair ${alb}/${opp}/${cluster[2].v} sums off 100` };
+  return { alb, opp };
+}
+
+function parseLeaderRatings(lines) {
+  const pats = [
+    ["alb", /^\s*Prime Minister ([A-Z][A-Za-z'.-]+(?: [A-Z][A-Za-z'.-]+){1,2})\s{2,}/],
+    ["opp", /^\s*Opposition Leader ([A-Z][A-Za-z'.-]+(?: [A-Z][A-Za-z'.-]+){1,2})\s{2,}/],
+    ["han", /^\s*One Nation Leader ([A-Z][A-Za-z'.-]+(?: [A-Z][A-Za-z'.-]+){1,2})\s{2,}/],
+  ];
+  const out = {};
+  let oppName = null;
+  for (const [role, pat] of pats) {
+    let found = null;
+    for (let i = 0; i < lines.length; i++) {
+      const m = lines[i].match(pat);
+      if (!m) continue;
+      let vals = pctTokens(lines[i]).filter((t) => t.x > m[0].length - 2).map((t) => t.v);
+      if (vals.length === 3) {
+        // net/change wrapped to a continuation line of lone signed tokens
+        for (let j = i + 1; j <= Math.min(i + 3, lines.length - 1); j++) {
+          const t2 = pctTokens(lines[j]);
+          if (t2.length === 2 && lines[i + 1] && /^-?\d/.test(lines[j].trim())) { vals = [...vals, ...t2.map((t) => t.v)]; break; }
+        }
+      }
+      if (vals.length >= 3) {
+        found = { app: vals[0], dis: vals[2], net: vals.length >= 4 ? vals[3] : vals[0] - vals[2] };
+        if (role === "opp") oppName = surname(m[1]);
+        break;
+      }
+    }
+    if (!found) return { error: `leader ratings: ${role} row unparsed` };
+    out[role === "alb" ? "alb" : role === "opp" ? "opp" : "han"] = found;
+  }
+  return { ratings: out, oppName };
+}
+
+function parseLeadership(lines) {
+  const out = {};
+  const pm = parsePreferredPM(lines);
+  if (pm.error) out.ppmError = pm.error;
+  else {
+    out.ppm = pm.ppm;
+    if (pm.oppName) out.oppName = pm.oppName;
+    const h2h = parseHeadToHead(lines, pm.namesIdx);
+    if (h2h && !h2h.error) out.ppmExtra = h2h;
+  }
+  const rat = parseLeaderRatings(lines);
+  if (rat.error) out.ratingsError = rat.error;
+  else {
+    out.approval = rat.ratings;
+    if (!out.oppName && rat.oppName) out.oppName = rat.oppName;
+  }
+  if (!out.ppm && !out.approval) out.leadershipError = out.ppmError || out.ratingsError || "leadership sections unparsed";
+  return out;
+}
+
+const r1 = (v) => Math.round(v * 10) / 10;
 
 // ------------------------------------------------------------ trend table
 // Locate the "May 25 Election" row and calibrate party COLUMN ORDER from the
@@ -303,6 +460,17 @@ function guardNewWave(w, isMRP) {
   need("date", w.date); need("dateStart", w.dateStart); need("sample", w.sample);
   if (w.trendError) errs.push(`trend table: ${w.trendError}`);
   for (const k of ["alp", "lnp", "grn", "onp", "ind"]) need(k, w[k]);
+  if (!isMRP) {
+    if (!w.ppm) errs.push(`leadership: ${w.ppmError || w.leadershipError || "preferred-PM unparsed"}`);
+    if (!w.approval) errs.push(`leadership: ${w.ratingsError || w.leadershipError || "leader ratings unparsed"}`);
+    if ((w.ppm || w.approval) && !w.oppName) errs.push("opposition leader name unresolved");
+    else if (w.ppm) for (const k of ["alb", "opp", "han"]) {
+      if (w.ppm[k] == null || w.ppm[k] < 2 || w.ppm[k] > 75) errs.push(`ppm.${k}=${w.ppm[k]} implausible`);
+    }
+    if (w.approval) for (const k of ["alb", "opp", "han"]) {
+      if (Math.abs(w.approval[k].net) > 85) errs.push(`approval net ${k}=${w.approval[k].net} implausible`);
+    }
+  }
   if (w.date && w.dateStart) {
     const span = daysBetween(w.dateStart, w.date);
     const max = isMRP ? 120 : 15;
@@ -327,8 +495,143 @@ function guardNewWave(w, isMRP) {
   return errs;
 }
 
+// ------------------------------------------------------------------- diff
+// Difference of everything parseable against an existing curated row set for
+// the same wave. The hand-curated file stays authoritative: differences are
+// reported, never imposed. Returns { diffs, missingRows }.
+function leadershipDiffs(date, w, D) {
+  const diffs = [], missingRows = [];
+  const near = (arr) => arr.find((r) => r.firm === "DemosAU" && Math.abs(daysBetween(r.date, date)) <= 10);
+  if (w.ppm) {
+    const pm = near(D.ppm);
+    if (!pm) missingRows.push("ppm");
+    else {
+      if (pm.alb !== w.ppm.alb) diffs.push(`ppm.alb: pdf=${w.ppm.alb} vs file=${pm.alb}`);
+      if (pm.opp !== w.ppm.opp) diffs.push(`ppm.opp: pdf=${w.ppm.opp} vs file=${pm.opp}`);
+      if (pm.han !== w.ppm.han) diffs.push(`ppm.han: pdf=${w.ppm.han} vs file=${pm.han}`);
+      if (pm.oppName && w.oppName && pm.oppName !== w.oppName) diffs.push(`ppm.oppName: pdf=${w.oppName} vs file=${pm.oppName}`);
+      const xe = Array.isArray(pm.extra) && pm.extra[0];
+      if (w.ppmExtra && (!xe || xe.alb !== w.ppmExtra.alb || xe.opp !== w.ppmExtra.opp))
+        diffs.push(`ppm.extra: pdf=${JSON.stringify(w.ppmExtra)} vs file=${JSON.stringify(xe || null)}`);
+    }
+  }
+  if (w.approval) {
+    const ap = near(D.approval);
+    if (!ap) missingRows.push("approval");
+    else {
+      for (const [k, role] of [["alb", "alb"], ["opp", "opp"], ["han", "han"]]) {
+        if (ap[k] !== w.approval[role].net) diffs.push(`approval.${k}: pdf=${w.approval[role].net} vs file=${ap[k]}`);
+        const d = ap.detail?.[role];
+        if (d) {
+          if (d.app !== w.approval[role].app) diffs.push(`approval.detail.${role}.app: pdf=${w.approval[role].app} vs file=${d.app}`);
+          if (d.dis !== w.approval[role].dis) diffs.push(`approval.detail.${role}.dis: pdf=${w.approval[role].dis} vs file=${d.dis}`);
+        }
+      }
+    }
+  }
+  return { diffs, missingRows };
+}
+
+// Sections with a committed row this release cannot re-verify because the PDF
+// renders that chart as an image. Silent ok:true would be a lie, so these get
+// flagged on the wave's verified entry rather than swallowed.
+function unverifiableSections(w, D, date) {
+  const un = [];
+  if (!w.ppm && D.ppm.some((r) => r.firm === "DemosAU" && Math.abs(daysBetween(r.date, date)) <= 10)) un.push("ppm");
+  if (!w.approval && D.approval.some((r) => r.firm === "DemosAU" && Math.abs(daysBetween(r.date, date)) <= 10)) un.push("approval");
+  return un;
+}
+
+// wave date + leadership data → one ppm row and one approval row, shaped
+// exactly like the hand-entered DemosAU leadership entries
+function leadershipRows(w) {
+  const rows = { ppm: null, approval: null };
+  if (w.ppm) {
+    rows.ppm = {
+      date: w.date,
+      firm: "DemosAU",
+      alb: r1(w.ppm.alb),
+      opp: r1(w.ppm.opp),
+      ...(w.oppName ? { oppName: w.oppName } : {}),
+      han: r1(w.ppm.han),
+      extra: w.ppmExtra ? [{ alb: r1(w.ppmExtra.alb), opp: r1(w.ppmExtra.opp) }] : null,
+    };
+  }
+  if (w.approval) {
+    rows.approval = {
+      date: w.date,
+      firm: "DemosAU",
+      alb: r1(w.approval.alb.net),
+      opp: r1(w.approval.opp.net),
+      ...(w.oppName ? { oppName: w.oppName } : {}),
+      han: r1(w.approval.han.net),
+      detail: {
+        alb: { app: r1(w.approval.alb.app), dis: r1(w.approval.alb.dis) },
+        opp: { app: r1(w.approval.opp.app), dis: r1(w.approval.opp.dis) },
+        han: { app: r1(w.approval.han.app), dis: r1(w.approval.han.dis) },
+      },
+    };
+  }
+  return rows;
+}
+
+// ---------------------------------------------------------------- pipelines
+// Wave-level comparison of VI inputs (sample/dates/primaries/2pp/MRP seats).
+function viDiffs(e, w) {
+  const diffs = [];
+  const cmp = (k, got, exp) => { if (got != null && exp !== got) diffs.push(`${k}: pdf=${got} vs file=${exp}`); };
+  cmp("sample", w.sample, e.sample);
+  cmp("date", w.date, e.date);
+  cmp("dateStart", w.dateStart, e.dateStart);
+  for (const k of ["alp", "lnp", "grn", "onp", "ind"]) cmp(k, w[k], e[k]);
+  if (w.tpp_alp != null) cmp("tpp_alp", w.tpp_alp, e.tpp_alp);
+  if (w.tpp_lnp != null) cmp("tpp_lnp", w.tpp_lnp, e.tpp_lnp);
+  if (w.seats && e.seats?.p)
+    for (const [k, v] of Object.entries(w.seats.p)) {
+      const h = e.seats.p[k];
+      if (!h) continue;
+      if (h.est != null && h.est !== v.est) diffs.push(`seats.${k}.est: pdf=${v.est} vs file=${h.est}`);
+      if (h.lo != null && v.lo != null && h.lo !== v.lo) diffs.push(`seats.${k}.lo: pdf=${v.lo} vs file=${h.lo}`);
+      if (h.hi != null && v.hi != null && v.hi !== h.hi) diffs.push(`seats.${k}.hi: pdf=${v.hi} vs file=${h.hi}`);
+    }
+  return diffs;
+}
+
+function parseWave(txt, slug, isMRP) {
+  const w = parsePdf(txt, slug, status.notes);
+  if (isMRP) {
+    const st = parseSeats(txt);
+    if (st.error) w.seatsError = st.error; else w.seats = st.seats;
+  } else {
+    Object.assign(w, parseLeadership(txt.split("\n")));
+  }
+  return w;
+}
+
+// load → cache → (re)parse one wave PDF. Cached metrics carry CACHE_V; a
+// stale schema is re-derived from the cached pdftotext (committed alongside)
+// without re-downloading, fetch only when the txt is missing too.
+const CACHE_VER = 2;
+async function loadWave(url, slug, isMRP) {
+  const cachePath = `${SRC_DIR}/${slug}.json`;
+  const txtPath = `${SRC_DIR}/${slug}.txt`;
+  let w = null;
+  if (!FORCE && existsSync(cachePath)) w = JSON.parse(readFileSync(cachePath, "utf8"));
+  if (FORCE || !w || w.cacheV !== CACHE_VER) {
+    let txt;
+    if (!FORCE && existsSync(txtPath)) txt = readFileSync(txtPath, "utf8");
+    else { txt = pdfToText(await fetchBuffer(url), slug); writeFileSync(txtPath, txt); }
+    const prev = w?.extractedAt;
+    w = parseWave(txt, slug, isMRP);
+    w.extractedAt = prev || new Date().toISOString();
+    w.cacheV = CACHE_VER;
+    writeFileSync(cachePath, JSON.stringify(w, null, 2) + "\n");
+  }
+  return w;
+}
+
 // -------------------------------------------------------------------- main
-const status = { changed: false, check: CHECK, added: [], verified: [], mismatches: [], notes: [], skipped_titles: [], out_of_cycle: [] };
+const status = { changed: false, check: CHECK, added: [], backfilled: [], verified: [], mismatches: [], notes: [], skipped_titles: [], out_of_cycle: [], missing_rows: [] };
 try {
   const orig = readFileSync(OUT, "utf8");
   const D = JSON.parse(orig);
@@ -355,23 +658,12 @@ try {
   mkdirSync(SRC_DIR, { recursive: true });
   const guardFails = [];
   const newRows = [];
+  const newPpmRows = [];
+  const newApprovalRows = [];
+  const matched = new Set();
   for (const c of candidates) {
     const slug = decodeURIComponent(c.url.split("/").pop().replace(/\.pdf$/i, ""));
-    const cachePath = `${SRC_DIR}/${slug}.json`;
-    let w;
-    if (!FORCE && existsSync(cachePath)) {
-      w = JSON.parse(readFileSync(cachePath, "utf8"));
-    } else {
-      const txt = pdfToText(await fetchBuffer(c.url), slug);
-      w = parsePdf(txt, slug, status.notes);
-      if (c.isMRP) {
-        const st = parseSeats(txt);
-        if (st.error) w.seatsError = st.error; else w.seats = st.seats;
-      }
-      w.extractedAt = new Date().toISOString();
-      writeFileSync(cachePath, JSON.stringify(w, null, 2) + "\n");
-      writeFileSync(`${SRC_DIR}/${slug}.txt`, txt);
-    }
+    const w = await loadWave(c.url, slug, c.isMRP);
 
     if (w.date && w.date < CYCLE_START) { status.out_of_cycle.push({ title: c.title, date: w.date }); continue; }
 
@@ -381,23 +673,24 @@ try {
         (w.date && Math.abs(daysBetween(e.date, w.date)) <= 14)));
 
     if (match) {
-      const diffs = [];
-      const cmp = (k, got, exp) => { if (got != null && exp !== got) diffs.push(`${k}: pdf=${got} vs file=${exp}`); };
-      cmp("sample", w.sample, match.sample);
-      cmp("date", w.date, match.date);
-      cmp("dateStart", w.dateStart, match.dateStart);
-      for (const k of ["alp", "lnp", "grn", "onp", "ind"]) cmp(k, w[k], match[k]);
-      if (w.tpp_alp != null) cmp("tpp_alp", w.tpp_alp, match.tpp_alp);
-      if (w.tpp_lnp != null) cmp("tpp_lnp", w.tpp_lnp, match.tpp_lnp);
-      if (w.seats && match.seats?.p)
-        for (const [k, v] of Object.entries(w.seats.p)) {
-          const h = match.seats.p[k];
-          if (!h) continue;
-          if (h.est != null && h.est !== v.est) diffs.push(`seats.${k}.est: pdf=${v.est} vs file=${h.est}`);
-          if (h.lo != null && v.lo != null && h.lo !== v.lo) diffs.push(`seats.${k}.lo: pdf=${v.lo} vs file=${h.lo}`);
-          if (h.hi != null && v.hi != null && v.hi !== h.hi) diffs.push(`seats.${k}.hi: pdf=${v.hi} vs file=${h.hi}`);
-        }
-      status.verified.push({ date: match.date, pollster: match.pollster, slug, ok: diffs.length === 0, ...(w.trendError ? { note: w.trendError } : {}) });
+      matched.add(match);
+      const led = leadershipDiffs(match.date, w, D);
+      const diffs = [...viDiffs(match, w), ...led.diffs];
+      // parseable leadership data for a wave whose section row is absent is
+      // backfilled (same rows the new-wave branch would have written);
+      // genuinely absent chart data (image-only releases) stays missing
+      const rows = leadershipRows(w);
+      for (const sec of led.missingRows) {
+        if (!rows[sec]) { status.missing_rows.push({ date: match.date, missing: [sec] }); continue; }
+        const bucket = sec === "ppm" ? newPpmRows : newApprovalRows;
+        const file = sec === "ppm" ? D.ppm : D.approval;
+        if (bucket.some((r) => r.date === match.date) || file.some((r) => r.firm === "DemosAU" && Math.abs(daysBetween(r.date, match.date)) <= 10)) continue;
+        bucket.push(rows[sec]);
+        status.backfilled.push({ date: match.date, section: sec, slug });
+      }
+      const unver = unverifiableSections(w, D, match.date);
+      status.verified.push({ date: match.date, pollster: match.pollster, slug, ok: diffs.length === 0,
+        ...(w.trendError ? { note: w.trendError } : {}), ...(unver.length ? { unverifiable: unver } : {}) });
       if (diffs.length) status.mismatches.push({ date: match.date, slug, diffs });
       continue;
     }
@@ -423,7 +716,42 @@ try {
       continue;
     }
     newRows.push(row);
-    status.added.push({ date: row.date, pollster: row.pollster, slug, alp: row.alp, lnp: row.lnp, onp: row.onp });
+
+    const lead = leadershipRows(w);
+    if (lead.ppm && !newPpmRows.some((r) => r.date === row.date) &&
+        !D.ppm.some((r) => r.firm === "DemosAU" && Math.abs(daysBetween(r.date, row.date)) <= 10))
+      newPpmRows.push(lead.ppm);
+    if (lead.approval && !newApprovalRows.some((r) => r.date === row.date) &&
+        !D.approval.some((r) => r.firm === "DemosAU" && Math.abs(daysBetween(r.date, row.date)) <= 10))
+      newApprovalRows.push(lead.approval);
+
+    status.added.push({ date: row.date, pollster: row.pollster, slug, alp: row.alp, lnp: row.lnp, onp: row.onp,
+      ...(lead.ppm ? { ppm: true } : {}), ...(lead.approval ? { approval: true } : {}) });
+  }
+
+  // waves whose release has rolled off the index page are refetched via the
+  // curated row's own url so verify coverage never silently drops
+  for (const e of existing) {
+    if (matched.has(e)) continue;
+    const url = typeof e.url === "string" ? e.url : "";
+    if (!/^https:\/\/demosau\.com\/wp-content\/uploads\/.*\.pdf$/i.test(url)) continue;
+    const slug = decodeURIComponent(url.split("/").pop().replace(/\.pdf$/i, ""));
+    const w = await loadWave(url, slug, e.pollster === "DemosAU (MRP)");
+    const led = leadershipDiffs(e.date, w, D);
+    const diffs = [...viDiffs(e, w), ...led.diffs];
+    const rows = leadershipRows(w);
+    for (const sec of led.missingRows) {
+      if (!rows[sec]) { status.missing_rows.push({ date: e.date, missing: [sec] }); continue; }
+      const bucket = sec === "ppm" ? newPpmRows : newApprovalRows;
+      const file = sec === "ppm" ? D.ppm : D.approval;
+      if (bucket.some((r) => r.date === e.date) || file.some((r) => r.firm === "DemosAU" && Math.abs(daysBetween(r.date, e.date)) <= 10)) continue;
+      bucket.push(rows[sec]);
+      status.backfilled.push({ date: e.date, section: sec, slug, via: "row-url" });
+    }
+    const unver = unverifiableSections(w, D, e.date);
+    status.verified.push({ date: e.date, pollster: e.pollster, slug, ok: diffs.length === 0, via: "row-url",
+      ...(w.trendError ? { note: w.trendError } : {}), ...(unver.length ? { unverifiable: unver } : {}) });
+    if (diffs.length) status.mismatches.push({ date: e.date, slug, diffs });
   }
 
   if (guardFails.length) {
@@ -433,8 +761,11 @@ try {
     process.exit(2);
   }
 
-  if (newRows.length) {
-    D.polls = [...D.polls, ...newRows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  if (newRows.length || newPpmRows.length || newApprovalRows.length) {
+    const byDate = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
+    D.polls = [...D.polls, ...newRows].sort(byDate);
+    D.ppm = [...D.ppm, ...newPpmRows].sort(byDate);
+    D.approval = [...D.approval, ...newApprovalRows].sort(byDate);
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
     const next = JSON.stringify(D, null, 2) + trailingNl;
     status.changed = next !== orig;

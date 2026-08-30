@@ -9,5 +9,29 @@
   "tpp_alp": null,
   "tpp_lnp": null,
   "trendError": "no 'May 25 Election' anchor row (topline table may be an image)",
-  "extractedAt": "2026-08-29T05:47:39.830Z"
+  "ppm": {
+    "alb": 35,
+    "han": 24,
+    "opp": 22
+  },
+  "oppName": "Taylor",
+  "approval": {
+    "alb": {
+      "app": 26,
+      "dis": 46,
+      "net": -20
+    },
+    "opp": {
+      "app": 25,
+      "dis": 28,
+      "net": -3
+    },
+    "han": {
+      "app": 34,
+      "dis": 39,
+      "net": -5
+    }
+  },
+  "extractedAt": "2026-08-29T05:47:39.830Z",
+  "cacheV": 2
 }

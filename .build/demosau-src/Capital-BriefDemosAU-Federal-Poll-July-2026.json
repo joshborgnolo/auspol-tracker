@@ -1,0 +1,45 @@
+{
+  "slug": "Capital-BriefDemosAU-Federal-Poll-July-2026",
+  "dateStart": "2026-07-03",
+  "date": "2026-07-08",
+  "sample": 2694,
+  "client": "Capital Brief",
+  "undecided": 7,
+  "tppNote": "2PP calculation method N/A ",
+  "tpp_alp": null,
+  "tpp_lnp": null,
+  "alp": 26,
+  "lnp": 21,
+  "grn": 14,
+  "onp": 29,
+  "ind": 10,
+  "ppm": {
+    "alb": 35,
+    "han": 26,
+    "opp": 22
+  },
+  "oppName": "Taylor",
+  "ppmExtra": {
+    "alb": 38,
+    "opp": 38
+  },
+  "approval": {
+    "alb": {
+      "app": 25,
+      "dis": 48,
+      "net": -23
+    },
+    "opp": {
+      "app": 24,
+      "dis": 27,
+      "net": -3
+    },
+    "han": {
+      "app": 34,
+      "dis": 43,
+      "net": -9
+    }
+  },
+  "extractedAt": "2026-08-30T01:18:24.955Z",
+  "cacheV": 2
+}

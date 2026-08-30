@@ -13,5 +13,29 @@
   "grn": 13,
   "onp": 30,
   "ind": 12,
-  "extractedAt": "2026-08-29T05:47:39.619Z"
+  "ppm": {
+    "alb": 35,
+    "han": 28,
+    "opp": 19
+  },
+  "oppName": "Taylor",
+  "approval": {
+    "alb": {
+      "app": 26,
+      "dis": 49,
+      "net": -23
+    },
+    "opp": {
+      "app": 22,
+      "dis": 28,
+      "net": -6
+    },
+    "han": {
+      "app": 37,
+      "dis": 40,
+      "net": -3
+    }
+  },
+  "extractedAt": "2026-08-29T05:47:39.619Z",
+  "cacheV": 2
 }

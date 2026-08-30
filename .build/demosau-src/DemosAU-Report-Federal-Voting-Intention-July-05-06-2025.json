@@ -1,16 +1,16 @@
 {
-  "slug": "DemosAU-Federal-Poll-January-2026-FINAL",
-  "dateStart": "2026-01-13",
-  "date": "2026-01-21",
-  "sample": 1933,
-  "client": "Capital Brief",
-  "tppNote": "2PP calculation method No National TPP calculated Topline Results Seat Projections Bottom Top of ",
+  "slug": "DemosAU-Report-Federal-Voting-Intention-July-05-06-2025",
+  "dateStart": "2025-07-05",
+  "date": "2025-07-06",
+  "sample": 1199,
+  "client": "Self Generated",
+  "tppNote": "2PP calculation method Nation-wide preference flows from 2025 Federal Election VOTING INTENTION Primary Vote % ",
   "tpp_alp": null,
   "tpp_lnp": null,
   "trendError": "no 'May 25 Election' anchor row (topline table may be an image)",
   "ppmError": "no preferred-PM names row (leadership charts may be images)",
   "ratingsError": "leader ratings: alb row unparsed",
   "leadershipError": "no preferred-PM names row (leadership charts may be images)",
-  "extractedAt": "2026-08-29T05:47:40.168Z",
+  "extractedAt": "2026-08-30T01:18:24.604Z",
   "cacheV": 2
 }
