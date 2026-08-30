@@ -526,7 +526,12 @@ body.js #root {
      block at one end or 2.5px past it at the other, and the midpoint between
      them is a construction line nobody can see. */
   background: none; border: 0; padding: 3px; margin: -3px; cursor: pointer;
-  border-radius: 8px; transition: transform .28s cubic-bezier(.3,1.2,.5,1), background-color .2s ease;
+  /* A hover scale is a surface responding to a pointer, not a mass with
+     momentum, so it decelerates rather than overshooting - the old curve
+     sprang past 1.06 and settled back, which reads as a toy. The needle keeps
+     its overshoot deliberately (see .wm-needle-g): a real gauge needle does
+     swing past and settle, and that one IS a mass. */
+  border-radius: 8px; transition: transform .28s cubic-bezier(.22, 1, .36, 1), background-color .2s ease;
 }
 .wm-glyph:hover { background: color-mix(in oklch, var(--ink) 6%, transparent); transform: scale(1.06); }
 .wm-glyph:active { transform: scale(0.97); }
@@ -2075,13 +2080,51 @@ body.dark .fb-form { color-scheme: dark; }
      absolutely pinned) so it can't add phantom column-gap above the rule */
   .head-right { display: contents; }
   .theme-seg { position: absolute; top: 0; right: 0; }
-  .hero-readout { flex-direction: column; gap: 6px; align-items: flex-start; }
-  .ro-sep { display: none; }
-  /* stack the two toggles so the dot-paired matchup control never overflows */
-  .hero-controls { flex-direction: column; align-items: flex-start; gap: 12px; }
+  /* The desktop pair is heraldic: it mirrors around the rule, so Labor reads
+     outward to the left and the Coalition outward to the right. Stacked, that
+     mirroring turns into two rows that read in opposite directions - "Labor
+     52.0" above "48.0 Coalition" - and the reader has to change direction
+     between the only two numbers on the page that exist to be compared.
+     So narrow screens abandon the mirror and use a ledger instead: one grid,
+     party on the left, figure on the right, both rows reading the same way and
+     the two figures sharing a column edge so the gap between them is legible
+     as a gap. `display: contents` lets each side's three children join that
+     grid directly, which is the only way to re-order them without touching the
+     DOM the desktop mirror depends on. */
+  .hero-readout {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    row-gap: 4px; column-gap: 12px;
+  }
+  .ro-party { display: contents; }
+  .alp-side .ro-dot  { grid-area: 1 / 1; }
+  .alp-side .ro-name { grid-area: 1 / 2; }
+  .alp-side .ro-num  { grid-area: 1 / 3; justify-self: end; }
+  .lnp-side .ro-dot  { grid-area: 3 / 1; }
+  .lnp-side .ro-name { grid-area: 3 / 2; }
+  .lnp-side .ro-num  { grid-area: 3 / 3; justify-self: end; }
+  /* the rule survives the stack as a hairline: it still says "these two are
+     one measure", which is the job it was doing between them */
+  .ro-sep { grid-area: 2 / 1 / 2 / -1; width: auto; height: 1px; margin: 2px 0; }
+  .ro-name { font-size: 16px; }
+
+  /* Four full-width control rows used to stand between the headline and the
+     chart, which put the chart under the fold on a 390x844 screen - the reader
+     scrolls past every control before seeing the thing they came for. The two
+     chip groups are small enough to share a line, so they do. */
+  .hero-controls { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
   .text-toggle { gap: 9px; }
   .tt-opt { font-size: 13px; }
   .tt-dots { margin-right: 5px; }
+  /* Two controls switch the matchup: this bare toggle, and the "Switch 2PP"
+     pill under the headline. The pill wins the narrow screen because it names
+     the alternative AND carries its figure - it answers "what would I be
+     looking at?" before you press it, which is the whole reason it stopped
+     being a bare tab. Dropping the toggle here removes a duplicate and a row
+     at once; the pill offers every matchup that is not the active one, so
+     both directions still work, and the headline itself names the live pair. */
+  .hero-controls > .text-toggle:not(.tt-caps) { display: none; }
 }
 
 /* ============================================================
@@ -2961,7 +3004,12 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
      already bleeds 4px past the card's text column at every width; here
      the 28px page and 24px card gutters aside are a third of a 375px
      viewport, which is where the overflow was coming from */
-  .card .table-wrap.ap-wrap { margin-left: -20px; margin-right: -20px; }
+  /* Full-bleed to the page gutter, and no further. This bled 20px a side into
+     a 16px gutter, and .ap-wrap keeps overflow visible on purpose (a scrolling
+     wrapper would become the sticky thead's containing block), so the 4px it
+     overhung on each side had nowhere to go but the document - which is why
+     the whole page scrolled sideways at 390px. The gutter is the bleed. */
+  .card .table-wrap.ap-wrap { margin-left: -16px; margin-right: -16px; }
   /* the pollster is a cell like any other at phone width: the name steps
      off its display size, and the client line under it, both into the
      table's own scale */

@@ -6,6 +6,28 @@
 ["useState", "useRef", "useMemo", "useCallback", "useEffect", "useId"]
   .forEach((h) => { window[h] = React[h]; });
 
+/* Charts are SVGs with a fixed viewBox, so their rendered height is a function
+   of the column they sit in: the 1000x420 box the hero draws at comes out about
+   150px tall inside a 358px phone column, which is not enough room for a
+   twenty-point band carrying 150 dots - the trend flattens into a smear. A
+   media query cannot fix that, because the aspect ratio lives in the viewBox
+   rather than in CSS, so the breakpoint has to reach the component and ask for
+   a TALLER box instead of a scaled-down wide one. */
+window.useNarrow = function useNarrow(query) {
+  const q = query || "(max-width: 620px)";
+  const [narrow, setNarrow] = React.useState(() =>
+    typeof window !== "undefined" && window.matchMedia ? window.matchMedia(q).matches : false);
+  React.useEffect(() => {
+    if (!window.matchMedia) return undefined;
+    const mq = window.matchMedia(q);
+    const on = (e) => setNarrow(e.matches);
+    setNarrow(mq.matches);
+    if (mq.addEventListener) { mq.addEventListener("change", on); return () => mq.removeEventListener("change", on); }
+    mq.addListener(on); return () => mq.removeListener(on);
+  }, [q]);
+  return narrow;
+};
+
 /* Mark colour -> text colour. The party tokens are tuned for dots and lines;
    at 10px Greens sits at 3.5:1 and One Nation at 3.0:1 on paper, so the same
    value cannot also paint a numeral. Component data carries ONE colour per

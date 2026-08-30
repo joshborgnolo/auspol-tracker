@@ -1045,9 +1045,15 @@ function TrendChart(props) {
            align:"left" moves a label to the left edge, clear of end-of-line
            year labels on the cycle charts */}
         {refLines.map((r, i) => r.label && (
+          {/* Both offsets scale with the type, because they are clearances from
+              the y-axis labels rather than absolute gaps. A flat 6px and 8px
+              held against the desktop axis and failed against the phone one,
+              where the axis font is half again as large: "tie" ended up butted
+              against "50%" and read as one smudged token, at the exact point
+              the chart makes its most important statement. */}
           <text key={"rl" + i}
-                x={r.align === "left" ? pad.l + 6 : W - pad.r}
-                y={sy(r.y) - 8}
+                x={r.align === "left" ? pad.l + refUnits * 0.5 : W - pad.r}
+                y={sy(r.y) - refUnits * 0.5}
                 className="refline-label" textAnchor={r.align === "left" ? "start" : "end"}
                 style={{ fontSize: refUnits, strokeWidth: refUnits * 0.34 }}
                 /* The label is TEXT and the rule is a hairline, so they cannot

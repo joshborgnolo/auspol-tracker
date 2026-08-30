@@ -390,6 +390,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
      nobody is kept waiting for a number they can already read, since the value
      itself is correct from the first frame and only its digits are in motion. */
   const MORPH_MS = window.AP.MORPH_MS;
+  /* A phone column renders the wide desktop viewBox about 150px tall; the
+     trend needs vertical room more than it needs a familiar aspect ratio. */
+  const narrow = useNarrow();
   const [morph, setMorph] = useState(null);        // { from, to, t }
   const morphRaf = useRef(0);
   /* The synthetic 2PP overlay: "what would these polls' PRIMARIES imply if
@@ -745,9 +748,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           A stale hover index is already clamped inside. */}
       <TrendChart
         key="hero"
-        height={420} xDomain={xDomain} yDomain={yDomain} yTicks={yTicks} unit="%"
-        axisFont={22}
-        pad={{ l: 58, r: 22, t: 30, b: 42 }}
+        height={narrow ? 700 : 420} xDomain={xDomain} yDomain={yDomain} yTicks={yTicks} unit="%"
+        axisFont={narrow ? 30 : 22}
+        pad={narrow ? { l: 74, r: 16, t: 26, b: 54 } : { l: 58, r: 22, t: 30, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         refLines={heroRefLines}
         events={heroEvents}

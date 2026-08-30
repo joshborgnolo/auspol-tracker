@@ -1399,11 +1399,21 @@ function UndecidedPanel({ rangeId }) {
   }).filter((d) => d.pts.length >= 2);
   if (!drawn.length) return null;
 
+  /* The step has to follow the span, not sit at a fixed 2 points. These two
+     questions live far apart - the "can't say" share around 5%, the soft share
+     of the decided around 27% - so a 2-point step ruled fourteen lines across
+     a range whose middle third holds no data at all, and the gridlines ended up
+     louder than the two lines they were there to serve. Pick the coarsest nice
+     step that still leaves enough rows to read a level off, so a narrow span
+     keeps fine gridlines and a wide one stops striping the empty middle. */
   const vals = drawn.flatMap((d) => d.pts.map((p) => p.v).concat(d.dots.map((p) => p.y)));
-  const lo = Math.max(0, Math.floor((Math.min(...vals) - 1.5) / 2) * 2);
-  const hi = Math.ceil((Math.max(...vals) + 1.5) / 2) * 2;
+  const rawLo = Math.max(0, Math.min(...vals) - 1.5);
+  const rawHi = Math.max(...vals) + 1.5;
+  const step = [1, 2, 5, 10, 20].find((s) => (rawHi - rawLo) / s <= 6) ?? 20;
+  const lo = Math.max(0, Math.floor(rawLo / step) * step);
+  const hi = Math.ceil(rawHi / step) * step;
   const yTicks = [];
-  for (let v = lo + 2; v < hi; v += 2) yTicks.push(v);
+  for (let v = lo + step; v < hi; v += step) yTicks.push(v);
   const spine = drawn[0].pts;
 
   return (
