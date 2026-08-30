@@ -421,7 +421,12 @@ body.js #root {
 
 .dl-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .dl-svg { width: min(420px, 94%); height: auto; overflow: visible; display: block; }
-.dl-arc { fill: none; stroke-width: 1.4; opacity: 0.5; transition: none; }
+.dl-arc { fill: none; stroke-width: 1.4; opacity: 0.55; transition: none; }
+/* the colour glowing in its channel - wide, faint, and under the crisp band.
+   The first pass was 3.6 wide and read as a fat painted band rather than as
+   light around a line; the band has to stay the thing you see. */
+.dl-arc-glow { fill: none; stroke-width: 2.7; opacity: 0.11; stroke-linecap: round; transition: none; }
+body.dark .dl-arc-glow { opacity: 0.2; }
 /* the blades are rects now, so the width is geometry rather than stroke; what
    is left here is the material - a hairline of its own colour darkened, and a
    shadow throwing them off the rim they are seated in */
@@ -437,7 +442,10 @@ body.js #root {
   font-family: var(--sans); font-size: 3.3px; font-weight: 700; fill: var(--ink-2);
   font-variant-numeric: tabular-nums;
 }
-.dl-needle { stroke-width: 1.7; stroke-linecap: round; }
+/* a filled pointer now, so the old stroke sizing has nothing to size */
+.dl-needle { stroke: none; }
+.dl-needle-lit { fill: #fff; opacity: 0.32; }
+body.dark .dl-needle-lit { opacity: 0.4; }
 /* a bearing, not a blob – the solid grey disc sat heavier than the needle */
 .dl-pivot { fill: var(--surface); stroke: var(--ink-3); stroke-width: 0.7; }
 .dl-trail { stroke: var(--ink-3); stroke-width: 1.1; stroke-linecap: round; }
@@ -13845,6 +13853,24 @@ function DialFigure({
     x2: wmPolar(d, WM_ENV_R + 0.85).x,
     y2: wmPolar(d, WM_ENV_R + 0.85).y
   }))), /*#__PURE__*/React.createElement("path", {
+    className: "dl-arc-glow",
+    d: wmArc(-90, 0, WM_GC.r),
+    stroke: "var(--alp)"
+  }), /*#__PURE__*/React.createElement("path", {
+    className: "dl-arc-glow",
+    d: wmArc(0, 90, WM_GC.r),
+    stroke: A.oppColor,
+    style: {
+      opacity: 1 - oppMix
+    }
+  }), oppMix > 0 && /*#__PURE__*/React.createElement("path", {
+    className: "dl-arc-glow",
+    d: wmArc(0, 90, WM_GC.r),
+    stroke: B.oppColor,
+    style: {
+      opacity: oppMix
+    }
+  }), /*#__PURE__*/React.createElement("path", {
     className: "dl-arc",
     d: wmArc(-90, 0, WM_GC.r),
     stroke: "var(--alp)"
@@ -13938,19 +13964,19 @@ function DialFigure({
   })), /*#__PURE__*/React.createElement("g", {
     className: "dl-needle-g",
     transform: `translate(${WM_GC.cx}, ${WM_GC.cy}) rotate(${deg.toFixed(2)})`
-  }, /*#__PURE__*/React.createElement("line", {
-    className: "dl-needle",
-    x1: "0",
-    y1: "0",
-    x2: "0",
-    y2: "-8.6",
-    stroke: needleColor
-  }), /*#__PURE__*/React.createElement("circle", {
-    className: "dl-needle-tip",
+  }, /*#__PURE__*/React.createElement("circle", {
+    className: "dl-needle-cw",
     cx: "0",
-    cy: "-8.6",
-    r: "1.9",
+    cy: "1.6",
+    r: "1.45",
     fill: needleColor
+  }), /*#__PURE__*/React.createElement("path", {
+    className: "dl-needle",
+    fill: needleColor,
+    d: "M 0 -9.1 L 1.15 0.2 L -1.15 0.2 Z"
+  }), /*#__PURE__*/React.createElement("path", {
+    className: "dl-needle-lit",
+    d: "M 0 -9.1 L -0.98 0.2 L -0.3 0.2 Z"
   })), /*#__PURE__*/React.createElement("circle", {
     className: "dl-pivot-seat",
     cx: WM_GC.cx,

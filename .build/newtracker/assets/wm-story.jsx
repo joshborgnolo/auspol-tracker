@@ -277,7 +277,20 @@ function DialFigure({ story, f, envelope, trail }) {
         </g>
       )}
 
-      {/* the two-tone swing arc */}
+      {/* The arc says one thing - which side leads, split at level - and says it
+         with a colour and a boundary. Its width and radius carry nothing, so
+         it can be lit like everything else here. Each half is drawn twice: a
+         wide, faint pass that reads as the colour glowing in a channel, and
+         the crisp band over it that keeps the boundary exact. The glow is a
+         fat translucent stroke rather than a blur, because it sits under a
+         needle that redraws every frame. */}
+      <path className="dl-arc-glow" d={wmArc(-90, 0, WM_GC.r)} stroke="var(--alp)" />
+      <path className="dl-arc-glow" d={wmArc(0, 90, WM_GC.r)} stroke={A.oppColor}
+            style={{ opacity: 1 - oppMix }} />
+      {oppMix > 0 && (
+        <path className="dl-arc-glow" d={wmArc(0, 90, WM_GC.r)} stroke={B.oppColor}
+              style={{ opacity: oppMix }} />
+      )}
       <path className="dl-arc" d={wmArc(-90, 0, WM_GC.r)} stroke="var(--alp)" />
       <path className="dl-arc" d={wmArc(0, 90, WM_GC.r)} stroke={A.oppColor}
             style={{ opacity: 1 - oppMix }} />
@@ -354,10 +367,23 @@ function DialFigure({ story, f, envelope, trail }) {
               style={{ opacity: ((k + 1) / trail.length) * 0.22 }} />
       ))}
 
-      {/* the needle */}
+      {/* The needle carries an ANGLE and nothing else - not a length, not an
+         area - so its shape and finish are chrome all the way down. There was
+         never a reading here to protect, which is why it can taper where the
+         blades could not.
+
+         A stick with a bead on the end was reading as a lollipop. This is the
+         pointer shape a gauge actually uses: a spine that widens from the tip
+         to the pivot and carries on into a counterweight behind it, which is
+         what stops a needle looking like it would tip forward off its own
+         bearing. The lit edge is a separate slip of white rather than a
+         gradient, because the needle changes colour with whoever leads and a
+         highlight that works for any colour cannot be baked into one. */}
       <g className="dl-needle-g" transform={`translate(${WM_GC.cx}, ${WM_GC.cy}) rotate(${deg.toFixed(2)})`}>
-        <line className="dl-needle" x1="0" y1="0" x2="0" y2="-8.6" stroke={needleColor} />
-        <circle className="dl-needle-tip" cx="0" cy="-8.6" r="1.9" fill={needleColor} />
+        {/* counterweight first, so the pivot screw seats over where they meet */}
+        <circle className="dl-needle-cw" cx="0" cy="1.6" r="1.45" fill={needleColor} />
+        <path className="dl-needle" fill={needleColor} d="M 0 -9.1 L 1.15 0.2 L -1.15 0.2 Z" />
+        <path className="dl-needle-lit" d="M 0 -9.1 L -0.98 0.2 L -0.3 0.2 Z" />
       </g>
       <circle className="dl-pivot-seat" cx={WM_GC.cx} cy={WM_GC.cy} r="2.5" />
       <circle className="dl-pivot" cx={WM_GC.cx} cy={WM_GC.cy} r="1.7"
