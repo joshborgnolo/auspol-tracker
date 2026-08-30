@@ -1019,9 +1019,60 @@ function AccuracyPanel() {
      above the early return: a hook that runs only on some renders is a hook
      React cannot keep in order. */
   const [hov, setHov] = useState(null);
+  /* Houses that missed by the SAME amount are drawn on top of one another, so
+     the row shows one dot where there are four - 2025 has four houses all out
+     by exactly 2.2, and every election here has at least one exact tie.
+     Magnifying the scale cannot pull those apart: they are not near each
+     other, they are identical. A second axis can, so this steps each
+     colliding dot into a lane of its own and leaves its place on the scale
+     exactly where it was - the shared scale is the point of the panel. */
+  const [spread, setSpread] = useState(false);
+  /* Whether two dots collide is a question in PIXELS, not in points: the same
+     0.1 gap is 8px of track on a desktop and under 2px on a phone. So the
+     track is measured rather than assumed, and the lanes re-pack when it
+     changes. */
+  const rowsRef = useRef(null);
+  const [trackW, setTrackW] = useState(0);
+  React.useEffect(() => {
+    const el = rowsRef.current && rowsRef.current.querySelector(".acc-track");
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setTrackW(el.clientWidth));
+    ro.observe(el);
+    setTrackW(el.clientWidth);
+    return () => ro.disconnect();
+  }, []);
   if (!A || !A.cycles.length) return null;
   const SPAN = 5;                                   // points either side of the result
   const pct = (err) => 50 + (Math.max(-SPAN, Math.min(SPAN, err)) / SPAN) * 50;
+  const LANE_SEP = 20;            // px of track a dot needs to keep a lane to itself
+  const LANE_H = 20;              // px between lane centres once they are separated
+  /* Greedy packing, left to right: a dot takes the first lane whose last dot
+     is far enough away, so a row only grows by as many lanes as it must.
+     Lanes alternate above and below the centre line, which keeps the row
+     balanced around the average dot rather than drifting downwards. */
+  const laneOffset = (i) => (i === 0 ? 0 : (i % 2 ? 1 : -1) * Math.ceil(i / 2) * LANE_H);
+  const lanesFor = (houses) => {
+    const lane = {};
+    if (!trackW) { houses.forEach((h) => { lane[h.firm] = 0; }); return { lane, n: 1 }; }
+    const pts = houses.map((h) => ({ firm: h.firm, x: (pct(h.err) / 100) * trackW }))
+                      .sort((a, b) => a.x - b.x);
+    const last = [];
+    for (const p of pts) {
+      let i = 0;
+      while (i < last.length && p.x - last[i] < LANE_SEP) i++;
+      last[i] = p.x;
+      lane[p.firm] = i;
+    }
+    return { lane, n: Math.max(1, last.length) };
+  };
+  /* How many dots are hidden behind another at this very moment - the number
+     the reader cannot see, and the whole reason the control is offered. */
+  const stacked = A.cycles.reduce((n, c) => {
+    const seen = {};
+    return n + c.houses.filter((h) => {
+      const k = h.err.toFixed(2); const had = seen[k]; seen[k] = 1; return had;
+    }).length;
+  }, 0);
   const col = (err) => (err > 0 ? "var(--alp)" : "var(--lnp)");
   const oneSided = A.cycles.filter((c) => c.sameSide);
 
@@ -1060,14 +1111,32 @@ function AccuracyPanel() {
         </div>
       </div>
 
+      {stacked > 0 && (
+        <div className="acc-tools">
+          <button className="acc-spread" aria-pressed={spread}
+                  onClick={() => setSpread(!spread)}
+                  title="Dots at the same miss are drawn on top of one another. This steps them into their own lanes, keeping each one exactly where it sits on the scale, so all of them can be seen and tapped.">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                 strokeWidth="2.2" strokeLinecap="round" aria-hidden="true">
+              <circle cx="7" cy="12" r="2.4" /><circle cx="17" cy="6.5" r="2.4" /><circle cx="17" cy="17.5" r="2.4" />
+              <path d="M9.6 10.9 14.6 8M9.6 13.1l5 2.9" />
+            </svg>
+            Separate overlapping dots
+          </button>
+        </div>
+      )}
+
       <div className="acc-scale" aria-hidden="true">
         <span className="acc-scale-l" style={{ color: "var(--lnp)" }}>← Labor understated</span>
         <span className="acc-scale-c">Result</span>
         <span className="acc-scale-r" style={{ color: "var(--alp)" }}>Labor overstated →</span>
       </div>
 
-      <div className="acc-rows">
-        {A.cycles.map((c, ri) => (
+      <div className={"acc-rows" + (spread ? " acc-spread-on" : "")} ref={rowsRef}>
+        {A.cycles.map((c, ri) => {
+          const { lane, n: nLanes } = lanesFor(c.houses);
+          const maxOff = Math.ceil((nLanes - 1) / 2) * LANE_H;
+          return (
           <div className="acc-row" key={c.year}>
             <div className="acc-label">
               <span className="acc-year">{c.year}</span>
@@ -1076,17 +1145,21 @@ function AccuracyPanel() {
                   figure on the page is read at */}
               <span className="acc-detail">{c.mean.toFixed(1)} v {c.result.toFixed(1)}</span>
             </div>
-            <div className="acc-track">
+            <div className="acc-track"
+                 style={spread && maxOff ? { height: (26 + maxOff * 2) + "px" } : null}>
               <span className="acc-zero"></span>
               {[-SPAN / 2, SPAN / 2].map((t) => (
                 <span key={t} className="acc-tick" style={{ left: pct(t) + "%" }}></span>
               ))}
-              {c.houses.map((h) => (
+              {c.houses.map((h) => {
+                const off = spread ? laneOffset(lane[h.firm] || 0) : 0;
+                return (
                 <span key={h.firm} className="acc-dot" role="img"
-                      style={{ left: pct(h.err) + "%", background: col(h.err) }}
+                      style={{ left: pct(h.err) + "%", background: col(h.err),
+                               top: off ? `calc(50% + ${off}px)` : null }}
                       aria-label={`${h.firm}, ${fmtDay(h.date)}: Labor ${h.alp2pp.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(h.err)}`}
                       onMouseEnter={(e) => open(e, pct(h.err), {
-                        year: c.year, flip: ri === 0, title: h.firm, date: fmtDay(h.date),
+                        year: c.year, flip: ri === 0, off, title: h.firm, date: fmtDay(h.date),
                         rows: [
                           { label: "Poll", value: h.alp2pp.toFixed(1), color: col(h.err) },
                           { label: "Result", value: c.result.toFixed(1) },
@@ -1095,7 +1168,8 @@ function AccuracyPanel() {
                         sub: lean(h.err),
                       })}
                       onMouseLeave={close}></span>
-              ))}
+                );
+              })}
               <span className="acc-mean" role="img"
                     style={{ left: pct(c.err) + "%", background: col(c.err) }}
                     aria-label={`Average of the ${c.n} final polls of ${c.year}: ${c.mean.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(c.err)}`}
@@ -1113,7 +1187,8 @@ function AccuracyPanel() {
                     onMouseLeave={close}></span>
               {hov && hov.year === c.year && (
                 <div className={"tip acc-tip" + (hov.flip ? " acc-tip-below" : "")}
-                     style={{ left: hov.left + "%" }}>
+                     style={{ left: hov.left + "%",
+                              top: hov.off ? `calc(50% + ${hov.off}px)` : null }}>
                   <div className="tip-title">{hov.title}</div>
                   <div className="tip-date">{hov.date}</div>
                   {hov.rows.map((r, i) => (
@@ -1138,12 +1213,18 @@ function AccuracyPanel() {
               {c.sameSide && <span className="acc-flag" title="Every house missed the same way – the signature of an industry-wide problem rather than one firm's noise">All one way</span>}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       <p className="table-hint">
         Big dots are the average of that election’s final polls; small dots are the individual
-        houses – {CANT_HOVER ? "tap" : "hover"} one for its figure. Exit polls are excluded, and a
+        houses – {CANT_HOVER ? "tap" : "hover"} one for its figure.
+        {stacked > 0 && (
+          <> {stacked} of them missed by exactly the same amount as another house, so they are
+          drawn on top of each other – <strong>Separate overlapping dots</strong> steps those into
+          their own lanes without moving any of them along the scale.</>
+        )} Exit polls are excluded, and a
         house that publishes an undecided-inclusive pair is normalised first, so its arithmetic
         isn’t scored as a miss.
         {bothWays && (

@@ -1825,8 +1825,32 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   background: var(--ink-3); opacity: 0.55; }
 .acc-tick { position: absolute; top: 6px; bottom: 6px; width: 1px; background: var(--line-2); }
 .acc-dot, .acc-mean { position: absolute; top: 50%; border-radius: 50%;
-  transition: transform .12s ease, opacity .12s ease; }
+  transition: transform .12s ease, opacity .12s ease, top .18s ease; }
 .acc-dot { width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; opacity: 0.5; }
+/* The control that steps colliding dots into lanes. A dot's place on the
+   SCALE never changes - only which lane it sits in - so the row can be read
+   against the others exactly as before. */
+.acc-tools { display: flex; justify-content: flex-end; margin: 10px 0 -4px; }
+.acc-spread {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 5px 12px 5px 9px; font-family: var(--sans); font-size: 11.5px; font-weight: 600;
+  color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.acc-spread:hover { color: var(--ink); border-color: var(--ink-3); }
+.acc-spread[aria-pressed="true"] {
+  color: var(--ink); border-color: var(--ink-3);
+  background: color-mix(in oklch, var(--ink) 7%, var(--surface));
+}
+.acc-spread svg { opacity: 0.75; }
+.acc-track { transition: height .18s ease; }
+/* separated dots are the ones being aimed at, so they come up in weight and
+   size - a 9px dot at half opacity is not a target */
+.acc-spread-on .acc-dot { width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; opacity: 0.75; }
+@media (prefers-reduced-motion: reduce) {
+  .acc-dot, .acc-mean, .acc-track { transition: none; }
+}
 .acc-mean { width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px;
   box-shadow: 0 0 0 2.5px var(--surface); }
 /* A 9px dot is a hard thing to keep a pointer on, and the whole readout hangs

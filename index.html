@@ -1673,8 +1673,32 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   background: var(--ink-3); opacity: 0.55; }
 .acc-tick { position: absolute; top: 6px; bottom: 6px; width: 1px; background: var(--line-2); }
 .acc-dot, .acc-mean { position: absolute; top: 50%; border-radius: 50%;
-  transition: transform .12s ease, opacity .12s ease; }
+  transition: transform .12s ease, opacity .12s ease, top .18s ease; }
 .acc-dot { width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; opacity: 0.5; }
+/* The control that steps colliding dots into lanes. A dot's place on the
+   SCALE never changes - only which lane it sits in - so the row can be read
+   against the others exactly as before. */
+.acc-tools { display: flex; justify-content: flex-end; margin: 10px 0 -4px; }
+.acc-spread {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 5px 12px 5px 9px; font-family: var(--sans); font-size: 11.5px; font-weight: 600;
+  color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.acc-spread:hover { color: var(--ink); border-color: var(--ink-3); }
+.acc-spread[aria-pressed="true"] {
+  color: var(--ink); border-color: var(--ink-3);
+  background: color-mix(in oklch, var(--ink) 7%, var(--surface));
+}
+.acc-spread svg { opacity: 0.75; }
+.acc-track { transition: height .18s ease; }
+/* separated dots are the ones being aimed at, so they come up in weight and
+   size - a 9px dot at half opacity is not a target */
+.acc-spread-on .acc-dot { width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px; opacity: 0.75; }
+@media (prefers-reduced-motion: reduce) {
+  .acc-dot, .acc-mean, .acc-track { transition: none; }
+}
 .acc-mean { width: 15px; height: 15px; margin: -7.5px 0 0 -7.5px;
   box-shadow: 0 0 0 2.5px var(--surface); }
 /* A 9px dot is a hard thing to keep a pointer on, and the whole readout hangs
@@ -10913,9 +10937,76 @@ function AccuracyPanel() {
      above the early return: a hook that runs only on some renders is a hook
      React cannot keep in order. */
   const [hov, setHov] = useState(null);
+  /* Houses that missed by the SAME amount are drawn on top of one another, so
+     the row shows one dot where there are four - 2025 has four houses all out
+     by exactly 2.2, and every election here has at least one exact tie.
+     Magnifying the scale cannot pull those apart: they are not near each
+     other, they are identical. A second axis can, so this steps each
+     colliding dot into a lane of its own and leaves its place on the scale
+     exactly where it was - the shared scale is the point of the panel. */
+  const [spread, setSpread] = useState(false);
+  /* Whether two dots collide is a question in PIXELS, not in points: the same
+     0.1 gap is 8px of track on a desktop and under 2px on a phone. So the
+     track is measured rather than assumed, and the lanes re-pack when it
+     changes. */
+  const rowsRef = useRef(null);
+  const [trackW, setTrackW] = useState(0);
+  React.useEffect(() => {
+    const el = rowsRef.current && rowsRef.current.querySelector(".acc-track");
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => setTrackW(el.clientWidth));
+    ro.observe(el);
+    setTrackW(el.clientWidth);
+    return () => ro.disconnect();
+  }, []);
   if (!A || !A.cycles.length) return null;
   const SPAN = 5; // points either side of the result
   const pct = err => 50 + Math.max(-SPAN, Math.min(SPAN, err)) / SPAN * 50;
+  const LANE_SEP = 20; // px of track a dot needs to keep a lane to itself
+  const LANE_H = 20; // px between lane centres once they are separated
+  /* Greedy packing, left to right: a dot takes the first lane whose last dot
+     is far enough away, so a row only grows by as many lanes as it must.
+     Lanes alternate above and below the centre line, which keeps the row
+     balanced around the average dot rather than drifting downwards. */
+  const laneOffset = i => i === 0 ? 0 : (i % 2 ? 1 : -1) * Math.ceil(i / 2) * LANE_H;
+  const lanesFor = houses => {
+    const lane = {};
+    if (!trackW) {
+      houses.forEach(h => {
+        lane[h.firm] = 0;
+      });
+      return {
+        lane,
+        n: 1
+      };
+    }
+    const pts = houses.map(h => ({
+      firm: h.firm,
+      x: pct(h.err) / 100 * trackW
+    })).sort((a, b) => a.x - b.x);
+    const last = [];
+    for (const p of pts) {
+      let i = 0;
+      while (i < last.length && p.x - last[i] < LANE_SEP) i++;
+      last[i] = p.x;
+      lane[p.firm] = i;
+    }
+    return {
+      lane,
+      n: Math.max(1, last.length)
+    };
+  };
+  /* How many dots are hidden behind another at this very moment - the number
+     the reader cannot see, and the whole reason the control is offered. */
+  const stacked = A.cycles.reduce((n, c) => {
+    const seen = {};
+    return n + c.houses.filter(h => {
+      const k = h.err.toFixed(2);
+      const had = seen[k];
+      seen[k] = 1;
+      return had;
+    }).length;
+  }, 0);
   const col = err => err > 0 ? "var(--alp)" : "var(--lnp)";
   const oneSided = A.cycles.filter(c => c.sameSide);
   const TIP_W = 184; // matches .acc-tip's width
@@ -10956,7 +11047,37 @@ function AccuracyPanel() {
     className: "dir-net-val"
   }, A.meanAbs, /*#__PURE__*/React.createElement("span", {
     className: "pct"
-  }, " pts")))), /*#__PURE__*/React.createElement("div", {
+  }, " pts")))), stacked > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "acc-tools"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "acc-spread",
+    "aria-pressed": spread,
+    onClick: () => setSpread(!spread),
+    title: "Dots at the same miss are drawn on top of one another. This steps them into their own lanes, keeping each one exactly where it sits on the scale, so all of them can be seen and tapped."
+  }, /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    width: "13",
+    height: "13",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2.2",
+    strokeLinecap: "round",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/React.createElement("circle", {
+    cx: "7",
+    cy: "12",
+    r: "2.4"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "17",
+    cy: "6.5",
+    r: "2.4"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "17",
+    cy: "17.5",
+    r: "2.4"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M9.6 10.9 14.6 8M9.6 13.1l5 2.9"
+  })), "Separate overlapping dots")), /*#__PURE__*/React.createElement("div", {
     className: "acc-scale",
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("span", {
@@ -10972,122 +11093,139 @@ function AccuracyPanel() {
       color: "var(--alp)"
     }
   }, "Labor overstated \u2192")), /*#__PURE__*/React.createElement("div", {
-    className: "acc-rows"
-  }, A.cycles.map((c, ri) => /*#__PURE__*/React.createElement("div", {
-    className: "acc-row",
-    key: c.year
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "acc-label"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "acc-year"
-  }, c.year), /*#__PURE__*/React.createElement("span", {
-    className: "acc-detail"
-  }, c.mean.toFixed(1), " v ", c.result.toFixed(1))), /*#__PURE__*/React.createElement("div", {
-    className: "acc-track"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "acc-zero"
-  }), [-SPAN / 2, SPAN / 2].map(t => /*#__PURE__*/React.createElement("span", {
-    key: t,
-    className: "acc-tick",
-    style: {
-      left: pct(t) + "%"
-    }
-  })), c.houses.map(h => /*#__PURE__*/React.createElement("span", {
-    key: h.firm,
-    className: "acc-dot",
-    role: "img",
-    style: {
-      left: pct(h.err) + "%",
-      background: col(h.err)
-    },
-    "aria-label": `${h.firm}, ${fmtDay(h.date)}: Labor ${h.alp2pp.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(h.err)}`,
-    onMouseEnter: e => open(e, pct(h.err), {
-      year: c.year,
-      flip: ri === 0,
-      title: h.firm,
-      date: fmtDay(h.date),
-      rows: [{
-        label: "Poll",
-        value: h.alp2pp.toFixed(1),
-        color: col(h.err)
-      }, {
-        label: "Result",
-        value: c.result.toFixed(1)
-      }, {
-        label: "Miss",
-        value: sgn(h.err),
-        strong: col(h.err)
-      }],
-      sub: lean(h.err)
-    }),
-    onMouseLeave: close
-  })), /*#__PURE__*/React.createElement("span", {
-    className: "acc-mean",
-    role: "img",
-    style: {
-      left: pct(c.err) + "%",
-      background: col(c.err)
-    },
-    "aria-label": `Average of the ${c.n} final polls of ${c.year}: ${c.mean.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(c.err)}`,
-    onMouseEnter: e => open(e, pct(c.err), {
-      year: c.year,
-      flip: ri === 0,
-      title: `Average of ${c.n} final poll${c.n === 1 ? "" : "s"}`,
-      date: fmtDay(c.eDate),
-      rows: [{
-        label: "Poll average",
-        value: c.mean.toFixed(1),
+    className: "acc-rows" + (spread ? " acc-spread-on" : ""),
+    ref: rowsRef
+  }, A.cycles.map((c, ri) => {
+    const {
+      lane,
+      n: nLanes
+    } = lanesFor(c.houses);
+    const maxOff = Math.ceil((nLanes - 1) / 2) * LANE_H;
+    return /*#__PURE__*/React.createElement("div", {
+      className: "acc-row",
+      key: c.year
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "acc-label"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "acc-year"
+    }, c.year), /*#__PURE__*/React.createElement("span", {
+      className: "acc-detail"
+    }, c.mean.toFixed(1), " v ", c.result.toFixed(1))), /*#__PURE__*/React.createElement("div", {
+      className: "acc-track",
+      style: spread && maxOff ? {
+        height: 26 + maxOff * 2 + "px"
+      } : null
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "acc-zero"
+    }), [-SPAN / 2, SPAN / 2].map(t => /*#__PURE__*/React.createElement("span", {
+      key: t,
+      className: "acc-tick",
+      style: {
+        left: pct(t) + "%"
+      }
+    })), c.houses.map(h => {
+      const off = spread ? laneOffset(lane[h.firm] || 0) : 0;
+      return /*#__PURE__*/React.createElement("span", {
+        key: h.firm,
+        className: "acc-dot",
+        role: "img",
+        style: {
+          left: pct(h.err) + "%",
+          background: col(h.err),
+          top: off ? `calc(50% + ${off}px)` : null
+        },
+        "aria-label": `${h.firm}, ${fmtDay(h.date)}: Labor ${h.alp2pp.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(h.err)}`,
+        onMouseEnter: e => open(e, pct(h.err), {
+          year: c.year,
+          flip: ri === 0,
+          off,
+          title: h.firm,
+          date: fmtDay(h.date),
+          rows: [{
+            label: "Poll",
+            value: h.alp2pp.toFixed(1),
+            color: col(h.err)
+          }, {
+            label: "Result",
+            value: c.result.toFixed(1)
+          }, {
+            label: "Miss",
+            value: sgn(h.err),
+            strong: col(h.err)
+          }],
+          sub: lean(h.err)
+        }),
+        onMouseLeave: close
+      });
+    }), /*#__PURE__*/React.createElement("span", {
+      className: "acc-mean",
+      role: "img",
+      style: {
+        left: pct(c.err) + "%",
+        background: col(c.err)
+      },
+      "aria-label": `Average of the ${c.n} final polls of ${c.year}: ${c.mean.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(c.err)}`,
+      onMouseEnter: e => open(e, pct(c.err), {
+        year: c.year,
+        flip: ri === 0,
+        title: `Average of ${c.n} final poll${c.n === 1 ? "" : "s"}`,
+        date: fmtDay(c.eDate),
+        rows: [{
+          label: "Poll average",
+          value: c.mean.toFixed(1),
+          color: col(c.err)
+        }, {
+          label: "Result",
+          value: c.result.toFixed(1)
+        }, {
+          label: "Miss",
+          value: sgn(c.err),
+          strong: col(c.err)
+        }],
+        sub: lean(c.err)
+      }),
+      onMouseLeave: close
+    }), hov && hov.year === c.year && /*#__PURE__*/React.createElement("div", {
+      className: "tip acc-tip" + (hov.flip ? " acc-tip-below" : ""),
+      style: {
+        left: hov.left + "%",
+        top: hov.off ? `calc(50% + ${hov.off}px)` : null
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "tip-title"
+    }, hov.title), /*#__PURE__*/React.createElement("div", {
+      className: "tip-date"
+    }, hov.date), hov.rows.map((r, i) => /*#__PURE__*/React.createElement("div", {
+      className: "tip-row",
+      key: i
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "tip-swatch",
+      style: {
+        background: r.color || "transparent"
+      }
+    }), /*#__PURE__*/React.createElement("span", {
+      className: "tip-label"
+    }, r.label), /*#__PURE__*/React.createElement("span", {
+      className: "tip-val",
+      style: r.strong ? {
+        color: r.strong
+      } : null
+    }, r.value))), /*#__PURE__*/React.createElement("div", {
+      className: "tip-sub"
+    }, hov.sub))), /*#__PURE__*/React.createElement("div", {
+      className: "acc-err",
+      style: {
         color: col(c.err)
-      }, {
-        label: "Result",
-        value: c.result.toFixed(1)
-      }, {
-        label: "Miss",
-        value: sgn(c.err),
-        strong: col(c.err)
-      }],
-      sub: lean(c.err)
-    }),
-    onMouseLeave: close
-  }), hov && hov.year === c.year && /*#__PURE__*/React.createElement("div", {
-    className: "tip acc-tip" + (hov.flip ? " acc-tip-below" : ""),
-    style: {
-      left: hov.left + "%"
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "tip-title"
-  }, hov.title), /*#__PURE__*/React.createElement("div", {
-    className: "tip-date"
-  }, hov.date), hov.rows.map((r, i) => /*#__PURE__*/React.createElement("div", {
-    className: "tip-row",
-    key: i
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "tip-swatch",
-    style: {
-      background: r.color || "transparent"
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "tip-label"
-  }, r.label), /*#__PURE__*/React.createElement("span", {
-    className: "tip-val",
-    style: r.strong ? {
-      color: r.strong
-    } : null
-  }, r.value))), /*#__PURE__*/React.createElement("div", {
-    className: "tip-sub"
-  }, hov.sub))), /*#__PURE__*/React.createElement("div", {
-    className: "acc-err",
-    style: {
-      color: col(c.err)
-    }
-  }, c.err > 0 ? "+" : "", c.err), /*#__PURE__*/React.createElement("div", {
-    className: "acc-note"
-  }, c.n, " house", c.n === 1 ? "" : "s", c.sameSide && /*#__PURE__*/React.createElement("span", {
-    className: "acc-flag",
-    title: "Every house missed the same way \u2013 the signature of an industry-wide problem rather than one firm's noise"
-  }, "All one way"))))), /*#__PURE__*/React.createElement("p", {
+      }
+    }, c.err > 0 ? "+" : "", c.err), /*#__PURE__*/React.createElement("div", {
+      className: "acc-note"
+    }, c.n, " house", c.n === 1 ? "" : "s", c.sameSide && /*#__PURE__*/React.createElement("span", {
+      className: "acc-flag",
+      title: "Every house missed the same way \u2013 the signature of an industry-wide problem rather than one firm's noise"
+    }, "All one way")));
+  })), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Big dots are the average of that election\u2019s final polls; small dots are the individual houses \u2013 ", CANT_HOVER ? "tap" : "hover", " one for its figure. Exit polls are excluded, and a house that publishes an undecided-inclusive pair is normalised first, so its arithmetic isn\u2019t scored as a miss.", bothWays && /*#__PURE__*/React.createElement(React.Fragment, null, " The two elections where every house missed the same way, ", oneSided.map(c => c.year).join(" and "), ",", " ", "missed in ", /*#__PURE__*/React.createElement("strong", null, "opposite directions"), " \u2013 so this is not a standing lean that today\u2019s figures could be corrected for. It is the size of the error, not its direction, that carries.")), /*#__PURE__*/React.createElement("div", {
+  }, "Big dots are the average of that election\u2019s final polls; small dots are the individual houses \u2013 ", CANT_HOVER ? "tap" : "hover", " one for its figure.", stacked > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, " ", stacked, " of them missed by exactly the same amount as another house, so they are drawn on top of each other \u2013 ", /*#__PURE__*/React.createElement("strong", null, "Separate overlapping dots"), " steps those into their own lanes without moving any of them along the scale."), " Exit polls are excluded, and a house that publishes an undecided-inclusive pair is normalised first, so its arithmetic isn\u2019t scored as a miss.", bothWays && /*#__PURE__*/React.createElement(React.Fragment, null, " The two elections where every house missed the same way, ", oneSided.map(c => c.year).join(" and "), ",", " ", "missed in ", /*#__PURE__*/React.createElement("strong", null, "opposite directions"), " \u2013 so this is not a standing lean that today\u2019s figures could be corrected for. It is the size of the error, not its direction, that carries.")), /*#__PURE__*/React.createElement("div", {
     className: "acc-firms"
   }, /*#__PURE__*/React.createElement("div", {
     className: "acc-firms-h"
