@@ -696,6 +696,29 @@ body.js #root {
   font-display: swap;
   src: local("Myriad Pro Light SemiExtended Italic"), local("MyriadPro-LightSemiExtIt");
 }
+/* The way into the replay. It sits with the wordmark because the wordmark is
+   what it replays - the mark's bars are the primary vote and its needle the
+   two-party preferred, so winding it back IS the story. Quiet on purpose: the
+   same pill the row controls use, at the same voice as the meta line beside
+   it, because this is an invitation and not the reason anyone came. */
+.head-replay {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 9px;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 5px 12px 5px 9px; font-family: var(--sans); font-size: 11.5px;
+  font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.head-replay:hover { color: var(--ink); border-color: var(--ink-3);
+  background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
+.head-replay svg { opacity: 0.75; }
+/* a finger's target, not a pointer's: the pill keeps its printed size and
+   claims the rest underneath it, the way the row caret does */
+.head-replay { position: relative; }
+.head-replay::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%;
+  height: 44px; transform: translateY(-50%);
+}
+.head-replay:hover svg { opacity: 1; }
 .tagline {
   /* negative bottom margin drops Newsreader's last line ~1.5px so the tagline
      text baseline-to-bottom edge optically matches the head-meta values */

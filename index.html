@@ -546,6 +546,29 @@ body.js #root {
   font-display: swap;
   src: local("Myriad Pro Light SemiExtended Italic"), local("MyriadPro-LightSemiExtIt");
 }
+/* The way into the replay. It sits with the wordmark because the wordmark is
+   what it replays - the mark's bars are the primary vote and its needle the
+   two-party preferred, so winding it back IS the story. Quiet on purpose: the
+   same pill the row controls use, at the same voice as the meta line beside
+   it, because this is an invitation and not the reason anyone came. */
+.head-replay {
+  display: inline-flex; align-items: center; gap: 6px; margin-top: 9px;
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 5px 12px 5px 9px; font-family: var(--sans); font-size: 11.5px;
+  font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.head-replay:hover { color: var(--ink); border-color: var(--ink-3);
+  background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
+.head-replay svg { opacity: 0.75; }
+/* a finger's target, not a pointer's: the pill keeps its printed size and
+   claims the rest underneath it, the way the row caret does */
+.head-replay { position: relative; }
+.head-replay::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%;
+  height: 44px; transform: translateY(-50%);
+}
+.head-replay:hover svg { opacity: 1; }
 .tagline {
   /* negative bottom margin drops Newsreader's last line ~1.5px so the tagline
      text baseline-to-bottom edge optically matches the head-meta values */
@@ -14155,7 +14178,13 @@ function Header({
      instead of appearing on top of it. */
   const [story, setStory] = useState(null);
   const glyphRef = useRef(null);
-  const openStory = () => {
+  /* There are two ways in now - the mark itself and the pill below the tagline
+     - so closing has to hand focus back to whichever one was used, not always
+       to the mark. The dial still grows out of the MARK either way: that is
+       where the instrument being wound back actually sits on the page. */
+  const openerRef = useRef(null);
+  const openStory = e => {
+    openerRef.current = e && e.currentTarget || glyphRef.current;
     const el = glyphRef.current;
     setStory({
       rect: el ? el.getBoundingClientRect() : null
@@ -14336,7 +14365,25 @@ function Header({
     className: "tagline"
   }, "Aggregated opinion polling for the next Australian federal election, ", /*#__PURE__*/React.createElement("br", {
     className: "tagline-br"
-  }), "set against the last five"), /*#__PURE__*/React.createElement("div", {
+  }), "set against the last five"), /*#__PURE__*/React.createElement("button", {
+    className: "head-replay",
+    onClick: openStory,
+    title: "Wind the masthead dial back to the 2025 election and let the term run"
+  }, /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    width: "13",
+    height: "13",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2.2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M3.5 12a8.5 8.5 0 1 0 2.6-6.1"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M3 4.2v4.4h4.4"
+  })), "Replay the term"), /*#__PURE__*/React.createElement("div", {
     className: "head-meta-compact",
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("span", {
@@ -14424,7 +14471,10 @@ function Header({
     originRect: story.rect,
     onClose: () => {
       setStory(null);
-      requestAnimationFrame(() => glyphRef.current && glyphRef.current.focus());
+      requestAnimationFrame(() => {
+        const back = openerRef.current || glyphRef.current;
+        back && back.focus && back.focus();
+      });
     }
   }));
 }
