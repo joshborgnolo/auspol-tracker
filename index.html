@@ -1526,8 +1526,13 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 /* the figures sit at the ENDS of the bar they describe, spread across its own
    width and in BAR ORDER, so each one lands over the segment it names */
 .pd-lnums {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 10px;
-  font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+  display: flex; justify-content: space-between; align-items: baseline;
+  gap: 4px 10px; font-size: 11.5px; color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  /* A wrap is the safety net at every width: the figures spread to the bar's
+     ends, and without this a legend wider than the bar simply ran off the
+     side of the screen instead of taking a second line. */
+  flex-wrap: wrap;
 }
 .pd-lnum { display: inline-flex; align-items: baseline; gap: 5px; white-space: nowrap; }
 .pd-lnum b {
@@ -1766,7 +1771,12 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   .pd-lscale { grid-area: scale; padding: 4px 0 0; }
   .pd-lgroup { padding: 11px 0 5px; }
   .pd-lrule { display: none; }   /* each row carries its own rule instead */
-  .pd-lnums { gap: 8px; }
+  .pd-lnums { gap: 3px 8px; }
+  /* Once a legend has had to wrap, spreading it to both edges only opens a gap
+     in the middle of a broken line - so on a phone a row that can wrap reads
+     left to right instead. Two-figure rows keep the ends: they always fit, and
+     sitting at the ends is what pairs each figure with its half of the bar. */
+  .pd-lnums-many { justify-content: flex-start; column-gap: 14px; }
   .pd-lnum b { font-size: 17px; }
   .pd-lwide { padding: 8px 0 4px; }
 }
@@ -8717,8 +8727,13 @@ function LedgerBar({
 function LedgerNums({
   segs
 }) {
+  /* Two figures always fit, at any width, and belong at the bar's two ends.
+     Three or more may not: a five-party legend wants 448px of the 332 a phone
+     gives it, and so does right-direction v wrong-track at 369. Those are
+     marked so a narrow screen can lay them out as a legend instead of
+     stretching them past the edge of the screen. */
   return /*#__PURE__*/React.createElement("div", {
-    className: "pd-lnums"
+    className: "pd-lnums" + (segs.length > 2 ? " pd-lnums-many" : "")
   }, segs.map((x, i) => /*#__PURE__*/React.createElement("span", {
     key: i,
     className: "pd-lnum" + (x.resid ? " resid" : x.muted ? " muted" : "")

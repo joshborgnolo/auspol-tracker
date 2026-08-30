@@ -1893,8 +1893,13 @@ function LedgerBar({ segs }) {
    taking a line of its own: "44 Albanese · 37 Taylor · 19 Undecided" maps
    left-to-right onto the three segments beneath it. */
 function LedgerNums({ segs }) {
+  /* Two figures always fit, at any width, and belong at the bar's two ends.
+     Three or more may not: a five-party legend wants 448px of the 332 a phone
+     gives it, and so does right-direction v wrong-track at 369. Those are
+     marked so a narrow screen can lay them out as a legend instead of
+     stretching them past the edge of the screen. */
   return (
-    <div className="pd-lnums">
+    <div className={"pd-lnums" + (segs.length > 2 ? " pd-lnums-many" : "")}>
       {segs.map((x, i) => (
         <span key={i} className={"pd-lnum" + (x.resid ? " resid" : x.muted ? " muted" : "")}>
           {x.resid && <span className="pd-resid-sw" aria-hidden="true"></span>}
