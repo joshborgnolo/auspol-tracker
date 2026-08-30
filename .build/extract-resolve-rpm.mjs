@@ -1,20 +1,26 @@
 // Extract every polling series from the Resolve Political Monitor interactive
 // (https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html,
-// data source https://www.smh.com.au/interactive/2021/political-monitor/data/data.json)
+// data source https://www.smh.com.au/interactive/2026/political-monitor/site/data/data.json
+// — the 2021 path still serves the previous generation's file, frozen at
+// 2026-07-12; reading it is what made this extractor look healthy while stale)
 // and merge with the rows already in data/resolve-political-monitor.csv.
 //
 // Datasets produced from the live file (question ids are the interactive's):
 //   Q5  primary_vote             federal primary vote, 2021-04 -> latest, National + regions
 //   Q17 pm_performance           PM job rating (series starts Aug 2022)
 //   Q15 opp_leader_performance   opposition-leader job rating (series starts Aug 2022)
+//   Q19 preferred_pm             preferred PM; answers resolved to leader names
 //   Q22 who_will_win             expected election winner ("two group preffered bar")
 //   Q21a party_attributes        "which party would perform best" per policy area
 //   Q21b party_descriptors       statements describing each party
-//   Q11 well_being_index         Self / State / Country wellbeing
+//   Q11 well_being_index         Self / State / Country wellbeing — RETIRED upstream
+//                                in the 2026 rebuild; committed rows stay, no new ones
 //   Q25NSW primary_vote_nsw      NSW state primary vote
 //   Q28NSW preferred_premier_nsw NSW premier vs opposition leader
 //   Q29VIC primary_vote_vic      VIC state primary vote
 //   Q32VIC preferred_premier_vic VIC premier vs opposition leader
+//   Q33QLD primary_vote_qld      QLD state primary vote (2026 rebuild onward)
+//   Q34QLD preferred_premier_qld QLD premier vs opposition leader (2026 rebuild onward)
 //
 // Nested subSections (answers carry their own timeseries under the parent's id):
 //   Q5  vote_firmness            "How firm are you with your vote?" —
@@ -66,8 +72,27 @@
 // (see LNP_OK in .build/backfill-resolve-approval.mjs).
 //
 // 6. Q22 answerSecond = 0 upstream from 2026-04-18 (Nine stopped keying the
-//    second option after the Hanson-era question changes). Extracted as-is;
-//    a warning is printed.
+//    second option after the Hanson-era question changes). The 2026 payload
+//    restores real values for that stretch; the merge REPAIRS committed
+//    zero-fill rows in place (counted as wiw_restored) rather than locking
+//    the zeros in, and any remaining fresh zero still prints a warning.
+// 7. 2026 interactive rebuild (the migration this extractor now runs against):
+//    a. values are obfuscated, not CryptoJS-encrypted (see decodeUx), and
+//       ship UNROUNDED (1-2 decimals) where the 2021 generation stored
+//       pre-rounded ints — committed CSV rows keep the old ints (Nine's own
+//       .5-rounding was editorially inconsistent and cannot be re-derived),
+//       fresh waves land at full precision; overlaps reconcile by key in the
+//       merge (value mismatches counted, committed wins).
+//    b. the Net computed answers (Coalition-Labor, Good-Poor) are gone
+//       upstream; only committed rows carry them now.
+//    c. Q22 was re-keyed in April 2026 (parties label "/ Other" appended
+//       18/04, One Nation slot added 17/05 = answerThird); Q22 rows are kept
+//       slot-named since the zip remap is only proven for leadership datasets.
+//    d. leadership datasets' slot labels carry no meaning — parties[] zips
+//       with the answers ARRAY ORDER; answers land as leader names.
+//    e. upstream quirks archived as-is: a "QLD" breakdown key misfilled under
+//       gender; Liberals/Nationals stored 0 on waves where only combined LNP
+//       is published.
 //
 // `Total Others` = 100 - LNP - ALP and therefore INCLUDES the undecided
 // share; it is NOT comparable with the tracker's `oth` (IND + OTH).
@@ -102,7 +127,13 @@ import { gunzipSync } from "node:zlib";
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
 const FORCE = argv.includes("--force");
-const SRC = argv.find((a) => !a.startsWith("--")) || "https://www.smh.com.au/interactive/2021/political-monitor/data/data.json";
+// The interactive was rebuilt for 2026 at its own path, and the 2021 file it
+// replaced is still served — frozen. Reading the old one is why this extractor
+// looked healthy while going quietly stale: it kept returning a clean, complete
+// payload whose newest wave was 2026-07-12, weeks after 2026-08-16 was on the
+// page. A dead endpoint that still answers 200 is the failure mode a status
+// line cannot show you, which is what `source_updated` in RPM_STATUS is for.
+const SRC = argv.find((a) => !a.startsWith("--")) || "https://www.smh.com.au/interactive/2026/political-monitor/site/data/data.json";
 const OUT = "data/resolve-political-monitor.csv";
 const FETCH_TIMEOUT_MS = 30_000;
 const FETCH_TRIES = 3;
@@ -115,6 +146,7 @@ const DATASETS = {
   Q11: "well_being_index",
   Q17: "pm_performance",
   Q15: "opp_leader_performance",
+  Q19: "preferred_pm",
   Q21a: "party_attributes",
   Q21b: "party_descriptors",
   Q22: "who_will_win",
@@ -122,7 +154,16 @@ const DATASETS = {
   Q28NSW: "preferred_premier_nsw",
   Q29VIC: "primary_vote_vic",
   Q32VIC: "preferred_premier_vic",
+  Q33QLD: "primary_vote_qld",
+  Q34QLD: "preferred_premier_qld",
 };
+
+// Sections an earlier generation of the interactive carried and the current
+// one does not. Their rows stay in the CSV — the merge keeps what the live
+// file no longer refreshes — but requiring them would trip the guard on every
+// run. Q11 (wellbeing) went when the 2026 interactive replaced the 2021 one:
+// the series stops rather than disappearing.
+const RETIRED = new Set(["Q11"]);
 
 async function loadSource(src) {
   let buf;
@@ -173,13 +214,62 @@ const decrypt = (v) => {
   return decodeCryptoJS(v.replace(/!e!/g, ""), "sacho");
 };
 
+// The 2026 rebuild of the interactive stopped CryptoJS-encrypting timeseries
+// values; they now ship obfuscated per point — int part = base36 of
+// (value XOR 123), fractional tail verbatim — decoded by Ux() in the site's
+// own bundle (interactive/2026/political-monitor/site/assets/index-*.js):
+//   "2l"    -> parseInt("2l",36)=93 ; 93^123 = 38
+//   "2l.83" -> 38.83   ("-35.80" -> -12.8; JS XOR is signed, exactly as Ux)
+// The 2026 payload also stores UNROUNDED values (1-2 decimals) where the 2021
+// generation stored pre-rounded ints. The scheme is detected per-PAYLOAD, not
+// per value: a pure-digit cipher like "31" is also a plausible plaintext
+// number, so the only safe rule is that a payload's values all agree on one
+// scheme (live check 2026-08: the 2021 payload is 100% "!e!", the 2026
+// payload 100% xor-shaped). Anything mixed or unrecognised means an upstream
+// change we have not modelled — stop, don't guess.
+const decodeUx = (s) => {
+  s = String(s);
+  if (s.includes(".")) {
+    const [i, f] = s.split(".");
+    return parseFloat(`${parseInt(i, 36) ^ 123}.${f}`);
+  }
+  return parseInt(s, 36) ^ 123;
+};
+
+const XOR_VALUE = /^-?[0-9a-z]+(\.[0-9]+)?$/i;
+let VALUE_SCHEME = null; // "crypto" | "xor", set by detectValueScheme post-fetch
+function detectValueScheme(sections) {
+  const values = [];
+  (function walk(nodes) {
+    for (const n of nodes || []) {
+      for (const a of n.answers || [])
+        for (const segs of [a.states, a.age, a.gender, a.categories])
+          for (const seg of segs || [])
+            for (const p of seg.timeseries || []) values.push(p.value);
+      walk(n.subSections);
+    }
+  })(sections);
+  let enc = 0, xor = 0, plain = 0;
+  const other = [];
+  for (const v of values) {
+    if (typeof v === "number") plain++;
+    else if (typeof v === "string" && v.includes("!e!")) enc++;
+    else if (typeof v === "string" && XOR_VALUE.test(v)) xor++;
+    else other.push(JSON.stringify(String(v).slice(0, 24)));
+  }
+  if (other.length)
+    throw new Error(`unrecognised value encoding (${other.length} of ${values.length}), e.g. ${other.slice(0, 3).join(", ")} — upstream restructure?`);
+  if (enc && xor) throw new Error(`mixed value encodings: ${enc} crypto + ${xor} xor across ${values.length} values — upstream restructure?`);
+  VALUE_SCHEME = enc ? "crypto" : "xor";
+}
+
 const isoDate = (dmy) => {
   const [d, m, y] = String(dmy).split("/");
   return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 };
 
 const num = (v) => {
-  const n = parseFloat(decrypt(v));
+  const n = typeof v === "number" ? v : VALUE_SCHEME === "xor" ? decodeUx(v) : parseFloat(decrypt(v));
   return Number.isFinite(n) ? Math.round(n * 100) / 100 : "";
 };
 
@@ -213,14 +303,28 @@ const parseLine = (line) => {
 
 const SUB_DATASETS = {
   Q5: [[/actual .*election results/i, "election_2025_results"], [/firm are you/i, "vote_firmness"]],
+  Q33QLD: [[/firm are you/i, "vote_firmness_qld"]],
   Q25NSW: [[/firm are you/i, "vote_firmness_nsw"]],
   Q29VIC: [[/firm are you/i, "vote_firmness_vic"]],
 };
 
 const rowsOut = [];
 let wiwCorrupt2021 = 0, wiwZeroSecond = 0, electionPoints = 0, verbatimCount = 0;
+let leaderNameResolutions = 0, leaderNameFallbacks = 0;
 
-function pushSeries(dataset, q, answer, dim, key, series) {
+// Leadership datasets carry generic slot labels (answerFirst / answerUndecided
+// / answerSecond / answerThird) whose MEANINGS live in the same point's
+// parties array, zipped with the section's answers ARRAY ORDER: parties[i]
+// names answers[i]'s target. Verified against the curated ppm rows (2026-07
+// and 2026-08: the zip reproduces them exactly). Resolve slots to names per
+// point — slot assignments shift across Nine's re-keyings (Q22 gained a One
+// Nation slot on 2026-05-17) and across leadership changes, so only the
+// per-point zip is trustworthy. who_will_win (Q22) is deliberately excluded:
+// nothing downstream consumes it, and its zero-fill defect (6) is keyed by
+// slot name.
+const LEADER_NAME_DS = new Set(["preferred_pm", "preferred_premier_nsw", "preferred_premier_vic", "preferred_premier_qld"]);
+
+function pushSeries(dataset, q, answer, dim, key, series, ansIndex) {
   for (const p of series || []) {
     const value = num(p.value);
     if (value === "") continue;
@@ -234,14 +338,20 @@ function pushSeries(dataset, q, answer, dim, key, series) {
     // (6) Coalition series reads 0 upstream from Apr 2026.
     if (dataset === "who_will_win" && answer === "answerSecond" && date >= "2026-04-01" && value === 0) wiwZeroSecond++;
     const parties = (p.parties || []).map((x) => String(x).trim()).join("; ");
-    rowsOut.push({ dataset, question_id: q.id, question: q.question, visual: q.visual, answer, dimension: dim, key: key.trim(), date, value_pct: value, parties });
+    let resolved = answer;
+    if (LEADER_NAME_DS.has(dataset)) {
+      const name = (p.parties || [])[ansIndex];
+      if (name) { resolved = String(name).trim(); leaderNameResolutions++; }
+      else leaderNameFallbacks++;
+    }
+    rowsOut.push({ dataset, question_id: q.id, question: q.question, visual: q.visual, answer: resolved, dimension: dim, key: key.trim(), date, value_pct: value, parties });
   }
 }
 
 const pushAnswers = (dataset, meta, answers) => {
-  for (const ans of answers || []) {
+  for (const [ai, ans] of (answers || []).entries()) {
     for (const [dim, segs] of [["region", ans.states], ["age", ans.age], ["gender", ans.gender], ["category", ans.categories]])
-      for (const seg of segs || []) pushSeries(dataset, meta, ans.answer, dim, seg.key, seg.timeseries);
+      for (const seg of segs || []) pushSeries(dataset, meta, ans.answer, dim, seg.key, seg.timeseries, ai);
   }
 };
 
@@ -262,8 +372,9 @@ const walkSubs = (sec, subs) => {
 
 try {
 const data = await loadSource(SRC);
+detectValueScheme(data.sections);
 const seenIds = new Set(data.sections.map((s) => s.id));
-const missing = Object.keys(DATASETS).filter((id) => !seenIds.has(id));
+const missing = Object.keys(DATASETS).filter((id) => !RETIRED.has(id) && !seenIds.has(id));
 if (missing.length) {
   console.error(`RPM_GUARD missing expected sections from source: ${missing.join(", ")}`);
   process.exit(2);
@@ -303,8 +414,6 @@ for (const r of existingRows) {
   legacyFixed.push(r);
 }
 
-const seen = new Set();
-const merged = [];
 const combined = [...legacyFixed, ...rowsOut];
 
 // (2)(3) Net reconciliation: a stored "Net" that contradicts the same wave's
@@ -337,15 +446,68 @@ const reconcile = (dsNames, netAnswer, refAnswers, refLabel) => {
     }
   }
 };
-const PRIMARY_DS = ["primary_vote", "primary_vote_nsw", "primary_vote_vic", "primary_vote_ley_scenario"];
+const PRIMARY_DS = ["primary_vote", "primary_vote_nsw", "primary_vote_vic", "primary_vote_qld", "primary_vote_ley_scenario"];
 reconcile(PRIMARY_DS, "Net (Coalition - Labor)", ["LNP", "ALP"], "LNP-ALP");
 reconcile(["pm_performance", "opp_leader_performance"], "Net (Good - Poor)", ["TOTAL GOOD", "TOTAL POOR"], "TOTAL GOOD-TOTAL POOR");
 
+// Exact-line dedupe first: identical rows from re-extraction collapse.
+const seenLines = new Set();
+const lineDeduped = [];
 for (const r of combined) {
   const line = rowToLine(r);
-  if (seen.has(line)) continue;
-  seen.add(line);
+  if (seenLines.has(line)) continue;
+  seenLines.add(line);
+  lineDeduped.push(r);
+}
+
+// Keyed reconciliation. The 2026 payload restates pre-2026-07 waves at full
+// decimal precision, and Nine's own int rounding upstream is editorially
+// inconsistent on exact .5s, so a fresh row and its committed twin almost
+// never string-match even when they are the same measurement. Committed rows
+// are the archive's authority: a fresh row sharing a committed row's key
+// (question, answer, breakdown, wave) but not its bytes is DROPPED — a value
+// mismatch counts as a conflict (first few logged below); same value with
+// different ornamentation (question text, parties) counts as metadata drift.
+// The one exception is defect (6): where the committed value is an upstream
+// zero-fill and the fresh payload restores a real one, the committed row is
+// repaired in place rather than locking the zero in.
+const keyOf = (r) => [r.dataset, r.question_id, r.answer, r.dimension, r.key, r.date].join("|");
+const isCommitted = new Set(legacyFixed); // object identity across the dedupe pass
+const committedByKey = new Map();
+const merged = [];
+for (const r of lineDeduped) {
+  if (!isCommitted.has(r)) continue;
+  committedByKey.set(keyOf(r), r);
   merged.push(r);
+}
+let valueConflicts = 0, metaDrift = 0, wiwRestored = 0, repRounding = 0;
+const conflictSamples = [];
+const conflictFams = new Map(); // dataset -> count, for the one-line breakdown
+for (const r of lineDeduped) {
+  if (isCommitted.has(r)) continue;
+  const k = keyOf(r);
+  const cur = committedByKey.get(k);
+  if (!cur) {
+    merged.push(r);
+    committedByKey.set(k, r); // two fresh rows with one key: first kept, the next counts below
+    continue;
+  }
+  const curV = Number(cur.value_pct), newV = Number(r.value_pct);
+  if (curV !== newV) {
+    // (7a) Representation, not restatement: a committed int and a fresh
+    // decimal within rounding distance are the same measurement in the two
+    // payload generations. Keep the committed int and count it quietly —
+    // counting ~28k of these as conflicts would mask a REAL restatement.
+    if (Number.isInteger(curV) && Math.abs(newV - curV) < 0.5) repRounding++;
+    else if (r.dataset === "who_will_win" && r.answer === "answerSecond" && curV === 0 && newV !== 0 && r.date >= "2026-04-01") {
+      cur.value_pct = newV;
+      wiwRestored++;
+    } else {
+      valueConflicts++;
+      conflictFams.set(r.dataset, (conflictFams.get(r.dataset) || 0) + 1);
+      if (conflictSamples.length < 12) conflictSamples.push(`${k}: kept ${cur.value_pct} over fresh ${r.value_pct}`);
+    }
+  } else metaDrift++;
 }
 
 const output = [header, ...merged.map(rowToLine)].join("\n") + "\n";
@@ -370,6 +532,9 @@ else if (changed) {
 
 console.log(`drops/renames: wiw-corrupt-2021=${wiwCorrupt2021} wiw-existing-dropped=${wiwExistingDropped} legacy-relabelled=${legacyRenamed} legacy-dropped=${legacyDropped} ley-scenario=${leyScenario} wiw-zero-second-warn=${wiwZeroSecond}`);
 console.log(`subsections: election-2025-points=${electionPoints} verbatim-comments-skipped=${verbatimCount}`);
+console.log(`merge: value_conflicts=${valueConflicts} rep_rounding=${repRounding} meta_drift=${metaDrift} wiw_restored=${wiwRestored} leader_names=${leaderNameResolutions} leader_name_fallbacks=${leaderNameFallbacks} scheme=${VALUE_SCHEME}`);
+if (valueConflicts) console.log(`conflicts by dataset: ${[...conflictFams.entries()].sort((a, b) => b[1] - a[1]).map(([d, n]) => `${d}=${n}`).join(" ")}`);
+for (const c of conflictSamples) console.log("  #", c);
 console.log(`net rows corrected: ${netFixes.length}`);
 for (const f of netFixes) console.log("  ~", f);
 const dates = [...new Set(rowsOut.map((r) => r.date))].sort();
@@ -381,10 +546,17 @@ const newDates = previous === null ? dates : dates.filter((d) => !existingBody.s
 console.log(`RPM_STATUS ${JSON.stringify({
   changed: changed && !CHECK,
   check: CHECK,
+  scheme: VALUE_SCHEME,
   rows_kept: legacyFixed.length,
   rows_fresh: rowsOut.length,
   rows_total: merged.length,
   net_fixes: netFixes.length,
+  value_conflicts: valueConflicts,
+  rep_rounding: repRounding,
+  meta_drift: metaDrift,
+  wiw_restored: wiwRestored,
+  leader_names: leaderNameResolutions,
+  leader_name_fallbacks: leaderNameFallbacks,
   dropped_corrupt_2021: wiwCorrupt2021 + wiwExistingDropped,
   legacy_relabelled: legacyRenamed,
   legacy_dropped: legacyDropped,
