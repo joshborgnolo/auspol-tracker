@@ -1517,11 +1517,14 @@ function tppFlag(r) {
   const f = tppContests(r).map((c) => c.flag).filter(Boolean);
   return f.length ? f.join(" · ") : null;
 }
-// heading for the detail block – names the single measure, counts several
+/* Heading for the group – names the measure when there is exactly one, and
+   falls back to the CATEGORY otherwise. That matters most when there is
+   nothing to show: Newspoll, Resolve and DemosAU often publish no headline
+   2PP, and "Two-party preferred / No two-party figure published with this
+   poll" announced the very figure it was about to say was missing. */
 function tppHeading(cs) {
-  if (cs.length > 1) return "After preferences";
-  if (cs.length === 1 && cs[0].kind === "3cp") return "Three-cornered preferred";
-  return "Two-party preferred";
+  if (cs.length === 1) return cs[0].kind === "3cp" ? "Three-cornered preferred" : "Two-party preferred";
+  return "After preferences";
 }
 function primarySegs(r) {
   return [
