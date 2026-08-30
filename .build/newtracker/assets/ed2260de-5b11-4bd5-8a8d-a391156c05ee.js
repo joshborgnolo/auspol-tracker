@@ -72,8 +72,10 @@ window.AP = (function () {
     const step = span > 1.0 ? 2 : 1;
     return months.filter((_, i) => i % step === 0).map((m) => {
       const [y, mo] = m.ym.split("-").map(Number);
+      // an elided year takes a right single QUOTATION mark, not a typewriter
+      // apostrophe - the mark stands in for the century it drops
       const label = mo === 1 || (m === months[0])
-        ? `${D.monthName(mo)} '${String(y).slice(2)}`
+        ? `${D.monthName(mo)} ’${String(y).slice(2)}`
         : D.monthName(mo);
       return { x: m.x, label };
     });
