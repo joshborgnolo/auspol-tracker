@@ -1971,7 +1971,12 @@ body.dark .fb-form { color-scheme: dark; }
 
      It is also about 28px shorter than the stack it replaces, which on this
      screen goes straight to the chart below. */
-  .hero-readout { display: flex; align-items: center; gap: 14px; }
+  /* 20px, not 14: the ink-to-ink gap between the two figures is set by these
+     two gaps plus the rule, and it does NOT scale with the type. At 48px a
+     30px channel was comfortable; at 54 the figures crowded the rule and it
+     stopped reading as an axis with room around it. 20 puts the channel back
+     to 42px, which is the same breathing space at the larger size. */
+  .hero-readout { display: flex; align-items: center; gap: 20px; }
   /* each side becomes its own two-row column: the figure claims a full row
      (order pulls Labor's out in front of its dot - the Coalition's already
      leads, being the mirrored one), the dot and name flow onto the next */
@@ -1979,7 +1984,13 @@ body.dark .fb-form { color-scheme: dark; }
               gap: 5px 8px; flex: 1 1 0; min-width: 0; }
   .alp-side { justify-content: flex-end; }
   .lnp-side { justify-content: flex-start; }
-  .ro-num { order: -1; flex: 0 0 100%; }
+  /* 54, up from the 48 that ≤900px sets: the figure is the headline of the
+     page and the unstacked pair left it room - the ink is 90px inside a 164px
+     column, so width was never what held it at 48. Six more pixels of block
+     height, against the 29 the unstack gave back. Scoped HERE rather than at
+     the 900px rule, which also covers 560-900 where the desktop mirror is
+     still the layout and this bump would not be the same change. */
+  .ro-num { order: -1; flex: 0 0 100%; font-size: 54px; }
   /* .roll is an inline-flex, so the figure is positioned by justify-content
      inside its own box - text-align has nothing to act on */
   .alp-side .ro-num { justify-content: flex-end; }
