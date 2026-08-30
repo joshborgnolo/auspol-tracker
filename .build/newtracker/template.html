@@ -2107,32 +2107,37 @@ body.dark .fb-form { color-scheme: dark; }
   .head-right { display: contents; }
   .theme-seg { position: absolute; top: 0; right: 0; }
   /* The desktop pair is heraldic: it mirrors around the rule, so Labor reads
-     outward to the left and the Coalition outward to the right. Stacked, that
-     mirroring turns into two rows that read in opposite directions - "Labor
-     52.0" above "48.0 Coalition" - and the reader has to change direction
-     between the only two numbers on the page that exist to be compared.
-     So narrow screens abandon the mirror and use a ledger instead: one grid,
-     party on the left, figure on the right, both rows reading the same way and
-     the two figures sharing a column edge so the gap between them is legible
-     as a gap. `display: contents` lets each side's three children join that
-     grid directly, which is the only way to re-order them without touching the
-     DOM the desktop mirror depends on. */
-  .hero-readout {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    row-gap: 4px; column-gap: 12px;
-  }
-  .ro-party { display: contents; }
-  .alp-side .ro-dot  { grid-area: 1 / 1; }
-  .alp-side .ro-name { grid-area: 1 / 2; }
-  .alp-side .ro-num  { grid-area: 1 / 3; justify-self: end; }
-  .lnp-side .ro-dot  { grid-area: 3 / 1; }
-  .lnp-side .ro-name { grid-area: 3 / 2; }
-  .lnp-side .ro-num  { grid-area: 3 / 3; justify-self: end; }
-  /* the rule survives the stack as a hairline: it still says "these two are
-     one measure", which is the job it was doing between them */
-  .ro-sep { grid-area: 2 / 1 / 2 / -1; width: auto; height: 1px; margin: 2px 0; }
+     outward to the left and the Coalition outward to the right. What a phone
+     cannot take is the STACK - "Labor 52.0" over "48.0 Coalition" put the two
+     figures 76px apart on different baselines, and the mirror stopped meaning
+     anything the moment its axis lay down: a face-off needs the rule upright.
+
+     So the pair does not stack. It keeps the desktop arrangement and just
+     unstacks the columns: each side turns its own figure and label into two
+     rows, the rule stays vertical between them, and the figures sit either
+     side of it on ONE baseline. The sides still face each other - Labor's
+     dot outward left, the Coalition's outward right - so this is the same
+     design the desktop is, at a smaller size, rather than a second one.
+
+     It is also about 28px shorter than the stack it replaces, which on this
+     screen goes straight to the chart below. */
+  .hero-readout { display: flex; align-items: center; gap: 14px; }
+  /* each side becomes its own two-row column: the figure claims a full row
+     (order pulls Labor's out in front of its dot - the Coalition's already
+     leads, being the mirrored one), the dot and name flow onto the next */
+  .ro-party { display: flex; flex-wrap: wrap; align-items: center;
+              gap: 5px 8px; flex: 1 1 0; min-width: 0; }
+  .alp-side { justify-content: flex-end; }
+  .lnp-side { justify-content: flex-start; }
+  .ro-num { order: -1; flex: 0 0 100%; }
+  /* .roll is an inline-flex, so the figure is positioned by justify-content
+     inside its own box - text-align has nothing to act on */
+  .alp-side .ro-num { justify-content: flex-end; }
+  .lnp-side .ro-num { justify-content: flex-start; }
+  /* the rule stays what it is on the desktop - an upright axis, not a divider
+     - and grows to the height of the pair it stands between */
+  .ro-sep { width: 2px; height: auto; align-self: stretch;
+            min-height: 62px; margin: 0; }
   .ro-name { font-size: 16px; }
 
   /* Four full-width control rows used to stand between the headline and the
