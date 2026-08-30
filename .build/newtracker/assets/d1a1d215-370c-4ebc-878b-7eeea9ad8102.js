@@ -1274,6 +1274,16 @@ function PastCyclesView() {
   const { D } = window.AP;
   const cycles = D.cycles;
   const [mode, setMode] = useState("abs");
+  /* The individual polls behind each term are ~240KB and are read by this tab
+     alone, so they are fetched when it opens rather than shipped to everyone.
+     The chart draws immediately from the aggregates it already has; the dots
+     arrive with the file. */
+  const [, redrawWithSource] = useState(0);   // a re-render trigger, not a value
+  React.useEffect(() => {
+    let live = true;
+    D.loadCycleSource().then(() => { if (live) redrawWithSource((n) => n + 1); });
+    return () => { live = false; };
+  }, []);
   /* Which terms are hidden rides in the URL too, so "the 2019 term" stays
      comparable when the link is passed around. Hidden years – not shown
      ones, since "Show all" is the ordinary state and keeps the bar clean –
@@ -1330,8 +1340,10 @@ function PastCyclesView() {
      the board, so a hidden term's polls stay out of the download just as
      its line is out of the chart. (The row-fetch inside cycleSourceRows
      already skips any term not in the list it is given.) */
-  const exportSource = () => downloadCsv(
-    `auspol-tracker-cycles-source-polls-${D.latest.updatedISO}.csv`, cycleSourceRows(shownCycles, D));
+  // the rows may not have landed yet on a fast click, so wait for them rather
+  // than handing over a file with nothing in it
+  const exportSource = () => D.loadCycleSource().then(() => downloadCsv(
+    `auspol-tracker-cycles-source-polls-${D.latest.updatedISO}.csv`, cycleSourceRows(shownCycles, D)));
 
   return (
     <div className="view view-cycles">

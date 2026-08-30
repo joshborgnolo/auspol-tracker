@@ -15,6 +15,7 @@
        on it (base64-of-gzip is near-incompressible). */
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import { createRequire } from "node:module";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -90,35 +91,59 @@ const inlineJs = (code) => code.replace(/<\/script/gi, "<\\/script");
 /* ---- 4. template ------------------------------------------------------- */
 let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
 
-// -- fonts: 21 @font-face rules over 9 files -> 3 latin faces, inlined --
+/* -- fonts: 21 @font-face rules over 9 files -> 3 latin faces --------------
+   These used to be base64'd into the stylesheet. woff2 is already compressed,
+   so base64 added a third to each file and gzip could not win it back: the
+   three faces were ~157KB of the ~490KB the page cost over the wire, they
+   blocked the first paint, and they were re-downloaded on every visit because
+   they had no URL of their own to be cached under.
+   They are files again, named by a hash of their own bytes so a browser can
+   keep them forever and still pick up a new cut the moment one ships. */
 const FONTS = [
-  { file: "newsreader-latin.woff2",        family: "Newsreader",  style: "normal", weight: "400 600" },
+  { file: "newsreader-latin.woff2",        family: "Newsreader",  style: "normal", weight: "400 600", preload: true },
   { file: "newsreader-italic-latin.woff2", family: "Newsreader",  style: "italic", weight: "400 500" },
   // Public Sans is a variable face: one file serves the whole 400-800 range,
   // which is why the old CSS pointed five per-weight rules at the same uuid.
-  { file: "publicsans-latin.woff2",        family: "Public Sans", style: "normal", weight: "400 800" },
+  { file: "publicsans-latin.woff2",        family: "Public Sans", style: "normal", weight: "400 800", preload: true },
 ];
+const FONT_DIR = path.join(ROOT, "assets", "fonts");
+fs.mkdirSync(FONT_DIR, { recursive: true });
+const hash8 = (buf) => crypto.createHash("sha256").update(buf).digest("hex").slice(0, 8);
+const fontKeep = new Set();
+const fontLinks = [];
 const LATIN = "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD";
 const faceCss = FONTS.map((f) => {
-  const b64 = fs.readFileSync(path.join(HERE, "fonts", f.file)).toString("base64");
+  const buf = fs.readFileSync(path.join(HERE, "fonts", f.file));
+  const name = f.file.replace(/\.woff2$/, `.${hash8(buf)}.woff2`);
+  fontKeep.add(name);
+  fs.writeFileSync(path.join(FONT_DIR, name), buf);
+  const href = `assets/fonts/${name}`;
+  /* Only the two faces that paint text on the way in are preloaded. The italic
+     serif sets a handful of small labels, so it can arrive with the rest of
+     the page rather than competing with it for the first connections. */
+  if (f.preload) fontLinks.push(`<link rel="preload" href="${href}" as="font" type="font/woff2" crossorigin>`);
   return `@font-face {
   font-family: '${f.family}';
   font-style: ${f.style};
   font-weight: ${f.weight};
   font-display: swap;
-  src: url(data:font/woff2;base64,${b64}) format('woff2');
+  src: url("${href}") format('woff2');
   unicode-range: ${LATIN};
 }`;
 }).join("\n");
+// a hashed name changes when the bytes do, so sweep the ones nothing points at
+for (const old of fs.readdirSync(FONT_DIR)) {
+  if (/\.woff2$/.test(old) && !fontKeep.has(old)) fs.unlinkSync(path.join(FONT_DIR, old));
+}
 
 const faceStart = html.indexOf("@font-face");
 const faceEnd = html.lastIndexOf("}", html.indexOf("</style>", faceStart)) + 1;
 if (faceStart < 0 || faceEnd <= faceStart) throw new Error("font block not found");
 html = html.slice(0, faceStart) + faceCss + html.slice(faceEnd);
 
-// -- head: drop the vestigial Google preconnects (every font is inlined; these
-//    were two pointless handshakes to Google on a page that works offline),
-//    and give it a tab icon + a share card --
+// -- head: drop the vestigial Google preconnects (the faces are served from
+//    this origin, so these were two pointless handshakes to Google), and give
+//    it a tab icon + a share card --
 html = html.replace(/\s*<link rel="preconnect" href="https:\/\/fonts\.(googleapis|gstatic)\.com"[^>]*>/g, "");
 
 /* Tab icon: the masthead glyph itself, drawn from the same aggregates and the
@@ -435,19 +460,26 @@ html = html.replace('<meta property="og:type" content="website">',
   <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="${SITE_URL}">
   <link rel="alternate" type="application/rss+xml" title="auspol tracker – new polls" href="${SITE_URL}feed.xml">
-  <link rel="icon" href="data:image/svg+xml,${favicon}">`);
+  <link rel="icon" href="data:image/svg+xml,${favicon}">
+  ${fontLinks.join("\n  ")}`);
 
 /* ---- 5. inline every script ------------------------------------------- */
 const parts = [];
-/* The cycle-source rows go in FIRST, as an inert application/json block. The
-   HTML parser skips its contents (no JS compilation, no evaluation) and the
-   data module JSON.parses it only if someone asks for the Past-cycles CSV.
-   It must precede the module that reads it only in the sense of being in the
-   document – the read is lazy, so order is not load-bearing.
-   "</script" cannot appear in JSON-encoded data (the "/" would have to be
-   escaped as \/ or the "<" as \u003c), but escape defensively anyway. */
+/* The cycle-source rows are the individual polls behind every past term. They
+   are ~240KB, they are read by nothing outside the Past-cycles tab - its dots
+   and its source-polls CSV - and they used to ride in the document as an inert
+   application/json block, which cost every visitor the download whether or not
+   they ever opened that tab.
+   They are a file now, fetched when the tab opens. Named by a hash of its own
+   bytes so it caches immutably and a new build invalidates it on its own. */
 const cycleSourceJson = fs.readFileSync(A("cycle-source.json"), "utf8");
-parts.push(`<script type="application/json" id="ap-cycle-source">${inlineJs(cycleSourceJson)}</script>`);
+const cycleSrcName = `cycle-source.${hash8(Buffer.from(cycleSourceJson))}.json`;
+for (const old of fs.readdirSync(path.join(ROOT, "assets"))) {
+  if (/^cycle-source\..*\.json$/.test(old) && old !== cycleSrcName)
+    fs.unlinkSync(path.join(ROOT, "assets", old));
+}
+fs.writeFileSync(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
+parts.push(`<script>window.AP_CYCLE_SRC=${JSON.stringify("assets/" + cycleSrcName)};<\/script>`);
 for (const f of ["react.production.min.js", "react-dom.production.min.js"])
   parts.push(`<script>${inlineJs(fs.readFileSync(path.join(HERE, "vendor", f), "utf8"))}</script>`);
 /* Read by the footer's report-an-error block. Set before the components so it
@@ -558,6 +590,8 @@ const size = fs.statSync(OUT).size;
 const gz = zlib.gzipSync(fs.readFileSync(OUT), { level: 9 }).length;
 console.log(`built ${path.basename(OUT)}`);
 console.log(`  ${(size / 1024 / 1024).toFixed(2)} MB raw · ${(gz / 1024).toFixed(0)} KB over the wire (gzipped)`);
+console.log(`  + assets/fonts · ${[...fontKeep].length} faces, ${(FONTS.reduce((n, f) => n + fs.statSync(path.join(HERE, "fonts", f.file)).size, 0) / 1024).toFixed(0)} KB, cached by hash`);
+console.log(`  + assets/${cycleSrcName} · ${(Buffer.byteLength(cycleSourceJson) / 1024).toFixed(0)} KB, fetched only by Past cycles`);
 console.log(`built feed.xml · ${feedPolls.length} polls, newest ${feedPolls[0].date} ${feedPolls[0].pollster}`);
 console.log(`built sitemap.xml · lastmod ${dataStamp}`);
 console.log("built robots.txt");

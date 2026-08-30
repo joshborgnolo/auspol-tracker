@@ -1696,26 +1696,33 @@ window.AUSPOL = (function () {
   const events = ${JSON.stringify(events)};
 
   const CYCLE_DEFS = ${JSON.stringify(CYCLE_DEFS)};
-  /* Individual readings behind each past cycle's lines – powers the Past-cycles
-     download, so the charts are checkable rather than just assertions.
+  /* Individual readings behind each past cycle's lines – its dots, and the
+     Past-cycles download that makes the charts checkable rather than just
+     assertions.
 
-     It is also, at ~200KB, the single largest thing in the payload, and it
-     serves exactly one caller: the "source polls" CSV button. As an inline
-     object literal every visitor paid to PARSE it before the first chart could
-     paint, whether or not they ever opened Past cycles, let alone pressed
-     download. It now sits in a <script type="application/json"> block, which
-     the HTML parser skips entirely, and is JSON.parsed on first access. */
+     At ~240KB it is the largest thing the page could carry, and nothing
+     outside that one tab reads it. It used to ride in the document as an inert
+     <script type="application/json"> block: cheap to PARSE, since the HTML
+     parser skips it, but every visitor still paid to DOWNLOAD it whether or
+     not they ever opened Past cycles. So it is a file now, fetched when the
+     tab opens, named by a hash of its own bytes so it caches immutably.
+
+     Two doors, deliberately. loadCycleSource() is the async one the tab calls
+     on mount; D.cycleSource stays a plain synchronous read so the render path
+     is unchanged, answering {} until the file lands and the tab re-renders. A
+     failed fetch is not fatal: the lines still draw from the aggregates, and
+     the CSV comes out short rather than the tab dying. */
   let _cycleSource = null;
-  const readCycleSource = () => {
-    if (_cycleSource) return _cycleSource;
-    const el = document.getElementById("ap-cycle-source");
-    try {
-      _cycleSource = el ? JSON.parse(el.textContent) : {};
-    } catch (e) {
-      console.error("cycle source data failed to parse", e);
-      _cycleSource = {};      // the CSV comes out short rather than the tab dying
+  let _cyclePromise = null;
+  const loadCycleSource = () => {
+    if (_cycleSource) return Promise.resolve(_cycleSource);
+    if (!_cyclePromise) {
+      const url = window.AP_CYCLE_SRC;
+      _cyclePromise = (url ? fetch(url).then((r) => (r.ok ? r.json() : {})) : Promise.resolve({}))
+        .catch((e) => { console.error("cycle source failed to load", e); return {}; })
+        .then((j) => { _cycleSource = j; return j; });
     }
-    return _cycleSource;
+    return _cyclePromise;
   };
   /* Measured publication rhythm per house – drives "Next expected polls".
      The dates themselves are computed in the browser against the real current
@@ -1748,8 +1755,10 @@ window.AUSPOL = (function () {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, adjusted, houseEffects, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
     individualPolls, pollsterTable, latest, cycles, events,
-    // a getter, so existing callers keep reading D.cycleSource unchanged
-    get cycleSource() { return readCycleSource(); },
+    // a getter, so existing callers keep reading D.cycleSource unchanged –
+    // empty until loadCycleSource() has resolved
+    get cycleSource() { return _cycleSource || {}; },
+    loadCycleSource,
     pollCadence,
     domain: { x0: mx(MONTHS[0]) - 0.06, x1: mx(MONTHS[MONTHS.length - 1]) + 0.04 },
   };
@@ -1757,7 +1766,7 @@ window.AUSPOL = (function () {
 `;
 fs.writeFileSync(DATA_ASSET, out);
 /* Sidecar, inlined by build.mjs as an application/json block. Kept out of the
-   JS module on purpose – see the note beside readCycleSource above. */
+   JS module on purpose – see the note beside loadCycleSource above. */
 fs.writeFileSync(CYCLE_SOURCE_ASSET, JSON.stringify(cycleSource));
 
 /* ---- sanity summary ---------------------------------------------------- */

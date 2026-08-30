@@ -20,7 +20,7 @@ Most coverage reports one house's release in isolation, or aggregates without sh
 
 ## Operating Context
 
-- Ships as a single self-contained static HTML file (`index.html`), built by `node .build/newtracker/build.mjs` from `data/polls.json`; no backend, no runtime dependencies, works offline.
+- Ships as static files, built by `node .build/newtracker/build.mjs` from `data/polls.json`: `index.html` plus the webfonts and the past-cycle source rows it fetches from the same origin. No backend, no framework to install, nothing served from anyone else's host.
 - Hosted on GitHub Pages (repo `joshborgnolo/auspol-tracker`).
 - Data entry is manual: a new poll is added to `data/polls.json` by hand following documented pollster conventions (e.g. Roy Morgan's respondent-allocated 2PP, Newspoll/Resolve often publishing no headline 2PP, leadership rows keyed to fieldwork end), then the build validates and regenerates the page.
 - Readers can flag a correction via a footer form (Formspree-backed); the whole block is simply omitted when no Formspree id is configured.
