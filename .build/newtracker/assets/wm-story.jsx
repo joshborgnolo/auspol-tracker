@@ -117,7 +117,7 @@ function buildDialStory(D) {
 
 /* The dial itself, drawn at an arbitrary FLOAT position in the story so the
    same function serves the replay, the scrub and the resting state. */
-function DialFigure({ story, f, envelope, trail }) {
+function DialFigure({ story, f, envelope, trail, neo }) {
   const D = window.AP.D;
   const i0 = Math.max(0, Math.min(story.length - 1, Math.floor(f)));
   const i1 = Math.min(story.length - 1, i0 + 1);
@@ -154,7 +154,7 @@ function DialFigure({ story, f, envelope, trail }) {
   const labelRing = separate(barRing, WM_LABEL_SEP);
 
   return (
-    <g className="dl-fig">
+    <g className={"dl-fig" + (neo ? " dl-neo" : "")}>
       {/* ---- the instrument it is pretending to be -------------------------
          The dial is a gauge, so at this size it is allowed to look like one:
          a face sunk slightly below its bezel, a rim lit from the top left, a
@@ -194,6 +194,47 @@ function DialFigure({ story, f, envelope, trail }) {
             the right would shade the opposite way and the set stops looking
             like one machined part. Length is untouched either way, which is
             the only thing that carries a number. */}
+        {/* --- neo material. Impossible on purpose: translucent AND emissive,
+               which no real glass is. That is the difference between naming a
+               material and copying one. --- */}
+        <linearGradient id="dl-neo-bezel" x1="0.15" y1="0" x2="0.7" y2="1">
+          <stop offset="0%" stopColor="var(--dl-neo-rim-hi)" />
+          <stop offset="55%" stopColor="var(--dl-neo-rim)" />
+          <stop offset="100%" stopColor="var(--dl-neo-rim-lo)" />
+        </linearGradient>
+        <linearGradient id="dl-neo-face" x1="0.2" y1="0" x2="0.6" y2="1">
+          <stop offset="0%" stopColor="var(--dl-neo-face-hi)" />
+          <stop offset="100%" stopColor="var(--dl-neo-face-lo)" />
+        </linearGradient>
+        <linearGradient id="dl-neo-edge" x1="0" y1="0" x2="0.6" y2="1">
+          <stop offset="0%" stopColor="var(--dl-neo-edge)" />
+          <stop offset="45%" stopColor="transparent" />
+          <stop offset="100%" stopColor="var(--dl-neo-edge)" />
+        </linearGradient>
+        <filter id="dl-grain" x="0%" y="0%" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="1.9" numOctaves="2" seed="7" />
+          <feColorMatrix type="saturate" values="0" />
+          <feComponentTransfer><feFuncA type="linear" slope="0.055" /></feComponentTransfer>
+        </filter>
+        {WM_PARTY_IDS.map((id) => (
+          <radialGradient key={"bo" + id} id={`dl-bounce-${id}`}>
+            <stop offset="0%" stopColor={`color-mix(in oklch, var(--${id}) 46%, transparent)`} />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+        ))}
+        {WM_PARTY_IDS.map((id) => (
+          <radialGradient key={"bl" + id} id={`dl-bloom-${id}`}>
+            <stop offset="0%" stopColor={`color-mix(in oklch, var(--${id}) 26%, transparent)`} />
+            <stop offset="100%" stopColor="transparent" />
+          </radialGradient>
+        ))}
+        {WM_PARTY_IDS.map((id) => (
+          <linearGradient key={"nb" + id} id={`dl-neoblade-${id}`} x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor={`color-mix(in oklch, white 6%, var(--${id}))`} />
+            <stop offset="32%" stopColor={`color-mix(in oklch, white 24%, var(--${id}))`} />
+            <stop offset="100%" stopColor={`color-mix(in oklch, black 14%, var(--${id}))`} />
+          </linearGradient>
+        ))}
         {WM_PARTY_IDS.map((id) => (
           <linearGradient key={id} id={`dl-blade-${id}`} x1="0" y1="0" x2="1" y2="0">
             <stop offset="0%" stopColor={`color-mix(in oklch, white 32%, var(--${id}))`} />
@@ -202,8 +243,19 @@ function DialFigure({ story, f, envelope, trail }) {
           </linearGradient>
         ))}
       </defs>
+      {/* The bloom is what the translucent housing has to carry: with an opaque
+          shell behind the dial there is nothing to see THROUGH it, so the
+          glass is given something of its own to pick up - a soft wash in the
+          colour of whoever leads this month. */}
+      {neo && (
+        <ellipse className="dl-bloom" cx={WM_GC.cx} cy={WM_GC.cy - 2} rx="21" ry="17"
+                 fill={`url(#dl-bloom-${labLeads ? "alp" : (oppMix > 0.5 ? B.oppId : A.oppId)})`} />
+      )}
       <path className="dl-bezel" d={dPlate(WM_GC.r + 3.1, 3.4, 1.2)} fill="url(#dl-bezel)" />
       <path className="dl-face" d={dPlate(WM_GC.r + 1.7, 2.2, 0.9)} fill="url(#dl-face)" />
+      {/* Light IN the material rather than reflected off it - the neo reading
+          of a rim, where classic skeuo would have put a specular highlight. */}
+      {neo && <path className="dl-edge" d={dPlate(WM_GC.r + 3.1, 3.4, 1.2)} fill="none" />}
       {/* engraved graduations: every 6 degrees across the sweep, longer every 30 */}
       {Array.from({ length: 31 }, (_, k) => -90 + k * 6).map((d) => {
         const major = Math.abs(d % 30) < 0.001;
@@ -242,6 +294,17 @@ function DialFigure({ story, f, envelope, trail }) {
               style={{ opacity: oppMix }} />
       )}
 
+      {/* Bounce: each blade throws its own colour onto the face beneath it.
+          This is the move the style turns on - material answering what sits on
+          it - and it is free of the readings, being a wash under them rather
+          than a mark of its own. Drawn before the graduations so those stay
+          crisp on top. */}
+      {neo && barRing.map((b) => {
+        const p = wmPolar(b.a, WM_GC.r - 1.5);
+        return <circle key={"bo" + b.id} className="dl-bounce" cx={p.x} cy={p.y} r="6"
+                       fill={`url(#dl-bounce-${b.id})`} />;
+      })}
+
       {/* Where each blade meets the machine. Without this they read as stuck ON
          the rim rather than coming OUT of it, because nothing said the housing
          had an opening. Three parts, drawn before every blade so no blade sits
@@ -270,7 +333,7 @@ function DialFigure({ story, f, envelope, trail }) {
         return (
           <rect key={b.id} className="dl-bar" rx="0.5"
                 x={WM_GC.cx - 1.7} y={WM_GC.cy - (WM_GC.r + 2 + h)}
-                width="3.4" height={h} fill={`url(#dl-blade-${b.id})`}
+                width="3.4" height={h} fill={`url(#dl-${neo ? "neoblade" : "blade"}-${b.id})`}
                 transform={`rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`} />
         );
       })}
@@ -307,6 +370,11 @@ function DialFigure({ story, f, envelope, trail }) {
       <circle className="dl-pivot-seat" cx={WM_GC.cx} cy={WM_GC.cy} r="2.5" />
       <circle className="dl-pivot" cx={WM_GC.cx} cy={WM_GC.cy} r="1.7"
               fill="url(#dl-screw)" />
+      {/* Grain, so the gradients read as a surface rather than as plastic. One
+          static rect: the turbulence is rasterised once and never animates. */}
+      {neo && <path className="dl-grain" d={dPlate(WM_GC.r + 3.1, 3.4, 1.2)}
+                    filter="url(#dl-grain)" pointerEvents="none" />}
+
       {/* the glass. Last, so it lies over the readings the way glass does, and
           inert to the pointer so it never eats a hover. */}
       <path className="dl-glass" d={dPlate(WM_GC.r + 1.7, 2.2, 0.9)}
@@ -436,6 +504,9 @@ function DialStory({ originRect, onClose }) {
      the fly-in and the whole thing is over before it has arrived. */
   const [playing, setPlaying] = useState(false);
   const [lifted, setLifted] = useState(false);
+  /* Temporary: two finishes on the same frame, so the choice can be made by
+     looking rather than by describing. Whichever wins, the other goes. */
+  const [neo, setNeo] = useState(false);
   const trailRef = useRef([]);
   const envRef = useRef(reduce
     ? story.reduce((a, s) => ({ min: Math.min(a.min, wmDeg(s.margin)), max: Math.max(a.max, wmDeg(s.margin)) }),
@@ -587,7 +658,7 @@ function DialStory({ originRect, onClose }) {
           </div>
           <svg viewBox="-9 -11 62 48" className="dl-svg" role="img"
                aria-label={`Dial for ${monthLabel}: Labor ${cur.lab.toFixed(1)} versus ${cur.oppName} ${cur.opp.toFixed(1)} two-party preferred`}>
-            <DialFigure story={story} f={f} envelope={envRef.current} trail={trailRef.current} />
+            <DialFigure story={story} f={f} envelope={envRef.current} trail={trailRef.current} neo={neo} />
           </svg>
 
           <figcaption className="dl-cap">
@@ -622,9 +693,15 @@ function DialStory({ originRect, onClose }) {
             the arc – and the line below – take the colour of Labor’s strongest challenger that
             month; the line is Labor’s two-party preferred against them, measured from 50.
           </span>
-          <button className="dl-replay" onClick={replay} disabled={playing}>
-            {playing ? "Playing…" : "Replay"}
-          </button>
+          <div className="dl-acts">
+            <button className="dl-finish" onClick={() => setNeo(!neo)} aria-pressed={neo}
+                    title="Switch the dial's finish: machined metal, or the site's own glass">
+              {neo ? "Glass" : "Machined"}
+            </button>
+            <button className="dl-replay" onClick={replay} disabled={playing}>
+              {playing ? "Playing…" : "Replay"}
+            </button>
+          </div>
         </div>
       </div>
     </div>

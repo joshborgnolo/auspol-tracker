@@ -643,6 +643,14 @@ body.js #root {
   --dl-glass:     color-mix(in oklch, white 34%, transparent);
   --dl-grad:      color-mix(in oklch, var(--ink) 34%, transparent);
   --dl-slot:      color-mix(in oklch, var(--ink) 46%, var(--line));
+  /* neo: the housing stops being metal and becomes the site's own glass, so
+     the material is one already in the system rather than one invented here */
+  --dl-neo-rim-hi:   color-mix(in oklch, white 55%, var(--glass-border));
+  --dl-neo-rim:      var(--glass-bg);
+  --dl-neo-rim-lo:   color-mix(in oklch, var(--ink) 12%, var(--glass-bg));
+  --dl-neo-face-hi:  color-mix(in oklch, white 40%, var(--surface));
+  --dl-neo-face-lo:  color-mix(in oklch, var(--ink) 7%, var(--surface-2));
+  --dl-neo-edge:     color-mix(in oklch, white 78%, transparent);
 }
 body.dark {
   --dl-face-hi:   color-mix(in oklch, white 7%, var(--surface-2));
@@ -654,6 +662,12 @@ body.dark {
   --dl-glass:     color-mix(in oklch, white 9%, transparent);
   --dl-grad:      color-mix(in oklch, white 30%, transparent);
   --dl-slot:      color-mix(in oklch, black 62%, var(--line));
+  --dl-neo-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
+  --dl-neo-rim:      var(--glass-bg);
+  --dl-neo-rim-lo:   color-mix(in oklch, black 34%, var(--glass-bg));
+  --dl-neo-face-hi:  color-mix(in oklch, white 9%, var(--surface-2));
+  --dl-neo-face-lo:  color-mix(in oklch, black 26%, var(--surface));
+  --dl-neo-edge:     color-mix(in oklch, white 40%, transparent);
 }
 /* the face sits INSIDE the bezel, so the rim reads as a wall around it */
 .dl-face { filter: drop-shadow(0 0.35px 0.5px color-mix(in oklch, var(--ink) 22%, transparent)); }
@@ -680,6 +694,43 @@ body.dark {
 }
 .dl-slot { fill: var(--dl-slot); }
 .dl-glass { pointer-events: none; }
+
+/* ---- the neo finish -----------------------------------------------------
+   Same instrument, different material. Everything below is fill and light;
+   not one blade moves, and the graduations, arc and needle keep their
+   geometry, so the two finishes are the same reading twice. */
+.dl-neo .dl-bezel { fill: url(#dl-neo-bezel); stroke: var(--glass-border); stroke-width: 0.4; }
+.dl-neo .dl-face  { fill: url(#dl-neo-face); filter: none; }
+.dl-neo .dl-boss  { fill: url(#dl-neo-bezel); stroke: var(--glass-border); }
+/* the specular sheen is the literal move the style drops */
+.dl-neo .dl-glass { display: none; }
+.dl-neo .dl-edge  { stroke: url(#dl-neo-edge); stroke-width: 0.5; }
+.dl-neo .dl-grad  { stroke: color-mix(in oklch, var(--ink) 26%, transparent); }
+.dl-neo .dl-grad.major { stroke: color-mix(in oklch, var(--ink) 44%, transparent); }
+.dl-neo .dl-slot  { fill: color-mix(in oklch, var(--ink) 24%, transparent); }
+/* blades keep their length and gain inner light instead of a machined face */
+.dl-neo .dl-bar {
+  stroke: color-mix(in oklch, white 26%, transparent); stroke-width: 0.3;
+  filter: drop-shadow(0 0.5px 1.1px color-mix(in oklch, var(--ink) 22%, transparent));
+}
+.dl-bounce, .dl-bloom, .dl-grain { pointer-events: none; }
+/* Bounce is light, so it wants a dark face to land on. At full strength on
+   pale enamel it stops reading as light and starts reading as a smudge, so
+   the paper theme takes about half of what the dark one does. */
+.dl-bounce { opacity: 0.45; }
+.dl-bloom { opacity: 0.55; }
+body.dark .dl-bounce { opacity: 1; }
+body.dark .dl-bloom { opacity: 1; }
+
+/* the finish switch - scaffolding while the two are being compared */
+.dl-acts { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.dl-finish {
+  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
+  padding: 5px 11px; font-family: var(--sans); font-size: 11px; font-weight: 700;
+  letter-spacing: 0.02em; color: var(--ink-3); cursor: pointer; white-space: nowrap;
+}
+.dl-finish[aria-pressed="true"] { color: var(--ink); border-color: var(--ink-3); }
+
 @media (prefers-reduced-motion: reduce) {
   /* the shadows are static; nothing here needs suppressing */
 }
