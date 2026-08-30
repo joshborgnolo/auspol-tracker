@@ -18,6 +18,30 @@ window.inkOf = function inkOf(c) {
     : c;
 };
 
+/* A readout opened by a FINGER has no equivalent of the pointer leaving it:
+   there is no mouseleave, no blur, nothing. So a panel opened on a phone used
+   to stay up until something else happened to open one, which is not what
+   anybody means by tapping away from it. This puts it away on the next
+   gesture that starts outside the element that owns it.
+
+   pointerdown rather than click, and in the CAPTURE phase, so the panel goes
+   as the next gesture BEGINS - before that gesture turns into a scroll, and
+   before any handler inside the page can stop it propagating. */
+window.useDismissOutside = function useDismissOutside(ref, open, onDismiss) {
+  const cb = React.useRef(onDismiss);
+  cb.current = onDismiss;
+  React.useEffect(() => {
+    if (!open) return;
+    const outside = (e) => {
+      const el = ref && ref.current;
+      if (el && e.target instanceof Node && el.contains(e.target)) return;
+      cb.current();
+    };
+    document.addEventListener("pointerdown", outside, true);
+    return () => document.removeEventListener("pointerdown", outside, true);
+  }, [open]);
+};
+
 window.AP = (function () {
   const D = window.AUSPOL;
 

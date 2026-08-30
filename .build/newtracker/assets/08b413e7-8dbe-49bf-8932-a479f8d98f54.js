@@ -349,42 +349,79 @@ function TrendChart(props) {
     return near && nearD <= rPx ? near : null;
   };
 
-  const pickTouch = (e) => {
+  const pickTouch = (e, isTap) => {
     if (!ref.current) return;
     const p = toVB(e);
     const near = nearestDot(p, TOUCH_PICK_PX);
     if (near) {
       // tapping the poll that is already open closes it, so a finger can put
       // the chart back to its resting state without hunting for empty space
-      if (e.type === "pointerdown" && dot === near) { setDotFrom(null, null); return; }
+      if (isTap && dot === near) { setDotFrom(null, null); return; }
       setHover(null); setEvt(null); setDotFrom("touch", near); onHoverIndex && onHoverIndex(null);
       return;
     }
     const ev = nearestEvent(p, TOUCH_PICK_PX);
     if (ev) {
       // tapping the open annotation closes it, exactly as tapping its poll does
-      if (e.type === "pointerdown" && evt && evt.e === ev.e) { setEvt(null); return; }
+      if (isTap && evt && evt.e === ev.e) { setEvt(null); return; }
       showEvent(ev);
       return;
     }
     if (spinePts.length) showSpine(nearestSpine(p.x));
   };
 
+  /* A touch used to open a readout on pointerDOWN, so the panel appeared the
+     instant a finger landed - including the finger that was only on its way
+     past, starting to scroll. The svg is touch-action: pan-y, so the browser
+     does not decide a drag is a page scroll until it has travelled a few
+     pixels, and by then the panel was already up and had no reason to go
+     again.
+
+     So a touch now commits to nothing until the gesture has said what it is.
+     A TAP opens the readout, on release. A mostly-horizontal drag scrubs,
+     which is the gesture this chart is built around. A mostly-vertical one is
+     the page scrolling and opens nothing at all. */
+  const TAP_SLOP_PX = 10;   // travel still counted as a tap rather than a drag
+  const SCRUB_PX = 8;       // horizontal travel that commits the gesture to scrubbing
+  const gesture = useRef(null);
   const onPointerDown = (e) => {
     if (e.pointerType === "mouse") return;
     // keep the gesture coming to this element even if the finger drifts off it
     try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
-    pickTouch(e);
+    gesture.current = { x: e.clientX, y: e.clientY, scrub: false, dead: false };
   };
   const onPointerMove = (e) => {
     if (e.pointerType === "mouse") { handleMove(e); return; }
+    const g = gesture.current;
+    if (!g || g.dead) return;
     if (e.buttons === 0 && e.pressure === 0) return;   // not an active drag
-    pickTouch(e);
+    if (!g.scrub) {
+      const dx = Math.abs(e.clientX - g.x), dy = Math.abs(e.clientY - g.y);
+      if (dy > dx && dy > TAP_SLOP_PX) { g.dead = true; return; }   // the page is scrolling
+      if (dx < SCRUB_PX) return;                                    // still undecided
+      g.scrub = true;
+    }
+    pickTouch(e, false);
   };
   const onPointerUp = (e) => {
     if (e.pointerType === "mouse") return;
     try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) {}
+    const g = gesture.current;
+    gesture.current = null;
+    if (!g || g.dead || g.scrub) return;          // a scroll, or a scrub already read
+    if (Math.abs(e.clientX - g.x) > TAP_SLOP_PX
+        || Math.abs(e.clientY - g.y) > TAP_SLOP_PX) return;
+    pickTouch(e, true);                            // a tap, and only now
   };
+  // the browser has taken the gesture for a scroll - nothing to read from it
+  const onPointerCancel = (e) => {
+    gesture.current = null;
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) {}
+  };
+  /* Touch has no pointer-leave, so a readout a finger opened stayed up until
+     another one replaced it. The next gesture starting outside this chart now
+     puts it away - the thing a reader is doing when they tap the page. */
+  window.useDismissOutside(ref, !!(dot || evt || hover), handleLeave);
 
   /* ---- keyboard -----------------------------------------------------------
      The chart is one tab stop that steps the month guide, which is the same
@@ -647,7 +684,7 @@ function TrendChart(props) {
     <div className="chart" ref={ref}>
       <svg viewBox={`0 0 ${W} ${H}`} className="chart-svg"
            onPointerMove={onPointerMove} onPointerDown={onPointerDown}
-           onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
+           onPointerUp={onPointerUp} onPointerCancel={onPointerCancel}
            onMouseLeave={handleLeave} onClick={handleClick}
            style={openable ? { cursor: "pointer" } : null}
            onKeyDown={handleKeyDown} onBlur={handleLeave}

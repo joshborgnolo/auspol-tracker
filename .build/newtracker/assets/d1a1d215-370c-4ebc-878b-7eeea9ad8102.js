@@ -1041,6 +1041,10 @@ function AccuracyPanel() {
     setTrackW(el.clientWidth);
     return () => ro.disconnect();
   }, []);
+  /* These dots are read by tapping them, and a tap has no leave event - so a
+     readout opened on a phone stayed on the row until another dot replaced
+     it. The next gesture outside the rows puts it away. */
+  window.useDismissOutside(rowsRef, !!hov, () => setHov(null));
   if (!A || !A.cycles.length) return null;
   const SPAN = 5;                                   // points either side of the result
   const pct = (err) => 50 + (Math.max(-SPAN, Math.min(SPAN, err)) / SPAN) * 50;
