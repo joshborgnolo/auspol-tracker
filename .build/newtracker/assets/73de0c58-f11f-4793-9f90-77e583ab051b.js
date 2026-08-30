@@ -27,6 +27,45 @@ function Header({ isDark, onToggleTheme }) {
   const { D } = window.AP;
   const fresh = freshness(D.latest.publishedISO);
 
+  /* The lockup squares itself off only while the two words happen to MEASURE
+     the same, and that was a property of Public Sans rather than of the
+     design: at 30px it set `auspol` 93.6 and `tracker` 95. The faces that
+     replaced it do not agree - Myriad sets `tracker` 8.2px short of `auspol`,
+     Source Sans 3 2.9px short - and which of them renders depends on what the
+     reader has installed, so no fixed tracking can be right for both. The
+     shortfall is measured and closed instead, which also means the next change
+     of face carries itself.
+
+     Letter-spacing lands after the LAST letter too, so it widens the box by
+     one more unit than it widens the ink. What has to line up is the ink, so
+     the trailing unit comes back off both measurements before they are
+     compared. */
+  const wmName = useRef(null), wmTrack = useRef(null);
+  React.useEffect(() => {
+    const a = wmName.current, b = wmTrack.current;
+    if (!a || !b) return;
+    let dropped = false;
+    const inkWidth = (el) => {
+      const ls = parseFloat(getComputedStyle(el).letterSpacing);
+      return el.getBoundingClientRect().width - (isNaN(ls) ? 0 : ls);
+    };
+    const align = () => {
+      if (dropped || !a.isConnected) return;
+      a.style.letterSpacing = ""; b.style.letterSpacing = "";
+      const wide = inkWidth(a) >= inkWidth(b) ? a : b;
+      const narrow = wide === a ? b : a;
+      const gaps = narrow.textContent.length - 1;
+      if (gaps < 1) return;
+      const base = parseFloat(getComputedStyle(narrow).letterSpacing);
+      narrow.style.letterSpacing =
+        (((isNaN(base) ? 0 : base) + (inkWidth(wide) - inkWidth(narrow)) / gaps)).toFixed(3) + "px";
+    };
+    align();
+    // the webfont can land after the first paint and re-measure both words
+    if (document.fonts) document.fonts.ready.then(align);
+    return () => { dropped = true; };
+  }, []);
+
   /* The mark is the whole tracker at 44x28 units, so clicking it opens the
      thing it abbreviates rather than anything decorative – see wm-story.jsx.
      The origin rect is handed over so the overlay can fly out of the masthead
@@ -111,8 +150,8 @@ function Header({ isDark, onToggleTheme }) {
       <div className="brand">
         <h1 className="wordmark stacked">
           <span className="wm-textcol">
-            <span className="wm-name">auspol</span>
-            <span className="wm-track">tracker</span>
+            <span className="wm-name" ref={wmName}>auspol</span>
+            <span className="wm-track" ref={wmTrack}>tracker</span>
           </span>
           <button className="wm-glyph" ref={glyphRef} onClick={openStory}
                   title="Wind the dial back through the term"
