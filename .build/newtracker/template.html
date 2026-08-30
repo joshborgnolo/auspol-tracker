@@ -571,12 +571,28 @@ body.js #root {
 
 .dl-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .dl-svg { width: min(420px, 94%); height: auto; overflow: visible; display: block; }
-.dl-arc { fill: none; stroke-width: 1.4; opacity: 0.55; transition: none; }
-/* the colour glowing in its channel - wide, faint, and under the crisp band.
-   The first pass was 3.6 wide and read as a fat painted band rather than as
-   light around a line; the band has to stay the thing you see. */
-.dl-arc-glow { fill: none; stroke-width: 2.7; opacity: 0.11; stroke-linecap: round; transition: none; }
-body.dark .dl-arc-glow { opacity: 0.2; }
+/* ---- the mercury column -------------------------------------------------
+   The channel is a groove: darker than the face, capped round at both ends,
+   and empty until the liquid runs into it. The tint under it keeps each side
+   named without pretending to be a quantity. */
+.dl-channel { fill: none; stroke: var(--dl-channel); stroke-width: 2.2;
+              stroke-linecap: round; transition: none; }
+.dl-side, .dl-side-raw { fill: none; stroke-width: 1.9; stroke-linecap: round;
+                         transition: none; }
+.dl-side, .dl-side-g { opacity: 0.17; }
+/* The liquid itself. Slightly proud of the channel it sits in, because a
+   meniscus stands above its walls, and carrying one bright line along the
+   upper wall - the specular is the whole difference between mercury and
+   paint. */
+.dl-merc { fill: none; stroke-width: 2.05; stroke-linecap: round; transition: none; }
+.dl-merc-lit { fill: none; stroke: #fff; stroke-width: 0.42; opacity: 0.5;
+               stroke-linecap: round; transition: none; }
+.dl-merc-cap-lit { fill: #fff; opacity: 0.62; }
+.dl-mercury {
+  filter: drop-shadow(0 0.35px 0.7px color-mix(in oklch, var(--ink) 34%, transparent));
+}
+body.dark .dl-merc-lit { opacity: 0.62; }
+body.dark .dl-side, body.dark .dl-side-g { opacity: 0.26; }
 /* the blades are rects now, so the width is geometry rather than stroke; what
    is left here is the material - a hairline of its own colour darkened, and a
    shadow throwing them off the rim they are seated in */
@@ -655,6 +671,7 @@ body {
   --dl-edge:     color-mix(in oklch, white 78%, transparent);
   --dl-grad:     color-mix(in oklch, var(--ink) 26%, transparent);
   --dl-slot:     color-mix(in oklch, var(--ink) 24%, transparent);
+  --dl-channel:  color-mix(in oklch, var(--ink) 13%, var(--surface-2));
 }
 body.dark {
   --dl-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
@@ -664,6 +681,7 @@ body.dark {
   --dl-edge:     color-mix(in oklch, white 40%, transparent);
   --dl-grad:     color-mix(in oklch, white 30%, transparent);
   --dl-slot:     color-mix(in oklch, white 16%, transparent);
+  --dl-channel:  color-mix(in oklch, black 40%, var(--surface));
 }
 /* ---- the dial's housing -------------------------------------------------
    Glass rather than metal, and the site's own glass: the frosted recipe the

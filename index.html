@@ -421,12 +421,28 @@ body.js #root {
 
 .dl-figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .dl-svg { width: min(420px, 94%); height: auto; overflow: visible; display: block; }
-.dl-arc { fill: none; stroke-width: 1.4; opacity: 0.55; transition: none; }
-/* the colour glowing in its channel - wide, faint, and under the crisp band.
-   The first pass was 3.6 wide and read as a fat painted band rather than as
-   light around a line; the band has to stay the thing you see. */
-.dl-arc-glow { fill: none; stroke-width: 2.7; opacity: 0.11; stroke-linecap: round; transition: none; }
-body.dark .dl-arc-glow { opacity: 0.2; }
+/* ---- the mercury column -------------------------------------------------
+   The channel is a groove: darker than the face, capped round at both ends,
+   and empty until the liquid runs into it. The tint under it keeps each side
+   named without pretending to be a quantity. */
+.dl-channel { fill: none; stroke: var(--dl-channel); stroke-width: 2.2;
+              stroke-linecap: round; transition: none; }
+.dl-side, .dl-side-raw { fill: none; stroke-width: 1.9; stroke-linecap: round;
+                         transition: none; }
+.dl-side, .dl-side-g { opacity: 0.17; }
+/* The liquid itself. Slightly proud of the channel it sits in, because a
+   meniscus stands above its walls, and carrying one bright line along the
+   upper wall - the specular is the whole difference between mercury and
+   paint. */
+.dl-merc { fill: none; stroke-width: 2.05; stroke-linecap: round; transition: none; }
+.dl-merc-lit { fill: none; stroke: #fff; stroke-width: 0.42; opacity: 0.5;
+               stroke-linecap: round; transition: none; }
+.dl-merc-cap-lit { fill: #fff; opacity: 0.62; }
+.dl-mercury {
+  filter: drop-shadow(0 0.35px 0.7px color-mix(in oklch, var(--ink) 34%, transparent));
+}
+body.dark .dl-merc-lit { opacity: 0.62; }
+body.dark .dl-side, body.dark .dl-side-g { opacity: 0.26; }
 /* the blades are rects now, so the width is geometry rather than stroke; what
    is left here is the material - a hairline of its own colour darkened, and a
    shadow throwing them off the rim they are seated in */
@@ -505,6 +521,7 @@ body {
   --dl-edge:     color-mix(in oklch, white 78%, transparent);
   --dl-grad:     color-mix(in oklch, var(--ink) 26%, transparent);
   --dl-slot:     color-mix(in oklch, var(--ink) 24%, transparent);
+  --dl-channel:  color-mix(in oklch, var(--ink) 13%, var(--surface-2));
 }
 body.dark {
   --dl-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
@@ -514,6 +531,7 @@ body.dark {
   --dl-edge:     color-mix(in oklch, white 40%, transparent);
   --dl-grad:     color-mix(in oklch, white 30%, transparent);
   --dl-slot:     color-mix(in oklch, white 16%, transparent);
+  --dl-channel:  color-mix(in oklch, black 40%, var(--surface));
 }
 /* ---- the dial's housing -------------------------------------------------
    Glass rather than metal, and the site's own glass: the frosted recipe the
@@ -13853,70 +13871,49 @@ function DialFigure({
     x2: wmPolar(d, WM_ENV_R + 0.85).x,
     y2: wmPolar(d, WM_ENV_R + 0.85).y
   }))), /*#__PURE__*/React.createElement("path", {
-    className: "dl-arc-glow",
+    className: "dl-channel",
+    d: wmArc(-90, 90, WM_GC.r)
+  }), /*#__PURE__*/React.createElement("path", {
+    className: "dl-side",
     d: wmArc(-90, 0, WM_GC.r),
     stroke: "var(--alp)"
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "dl-arc-glow",
+  }), /*#__PURE__*/React.createElement("g", {
+    className: "dl-side-g"
+  }, /*#__PURE__*/React.createElement("path", {
+    className: "dl-side-raw",
     d: wmArc(0, 90, WM_GC.r),
     stroke: A.oppColor,
     style: {
       opacity: 1 - oppMix
     }
   }), oppMix > 0 && /*#__PURE__*/React.createElement("path", {
-    className: "dl-arc-glow",
+    className: "dl-side-raw",
     d: wmArc(0, 90, WM_GC.r),
     stroke: B.oppColor,
     style: {
       opacity: oppMix
     }
+  })), Math.abs(deg) > 0.35 && /*#__PURE__*/React.createElement("g", {
+    className: "dl-mercury"
+  }, /*#__PURE__*/React.createElement("path", {
+    className: "dl-merc",
+    stroke: needleColor,
+    d: wmArc(Math.min(0, deg), Math.max(0, deg), WM_GC.r)
   }), /*#__PURE__*/React.createElement("path", {
-    className: "dl-arc",
-    d: wmArc(-90, 0, WM_GC.r),
-    stroke: "var(--alp)"
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "dl-arc",
-    d: wmArc(0, 90, WM_GC.r),
-    stroke: A.oppColor,
-    style: {
-      opacity: 1 - oppMix
-    }
-  }), oppMix > 0 && /*#__PURE__*/React.createElement("path", {
-    className: "dl-arc",
-    d: wmArc(0, 90, WM_GC.r),
-    stroke: B.oppColor,
-    style: {
-      opacity: oppMix
-    }
-  }), barRing.map(b => {
-    const p = wmPolar(b.a, WM_GC.r - 1.5);
-    return /*#__PURE__*/React.createElement("circle", {
-      key: "bo" + b.id,
-      className: "dl-bounce",
-      cx: p.x,
-      cy: p.y,
-      r: "6",
-      fill: `url(#dl-bounce-${b.id})`
-    });
-  }), barRing.map(b => /*#__PURE__*/React.createElement("g", {
-    key: "mount" + b.id,
-    transform: `rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`
-  }, /*#__PURE__*/React.createElement("rect", {
-    className: "dl-boss",
-    x: WM_GC.cx - 3.1,
-    y: WM_GC.cy - 16.1,
-    width: "6.2",
-    height: "2.9",
-    rx: "0.9",
-    fill: "url(#dl-rim)"
-  }), /*#__PURE__*/React.createElement("rect", {
-    className: "dl-slot",
-    x: WM_GC.cx - 2.25,
-    y: WM_GC.cy - 16.0,
-    width: "4.5",
-    height: "2.1",
-    rx: "0.8"
-  }))), barRing.map(b => {
+    className: "dl-merc-lit",
+    d: wmArc(Math.min(0, deg), Math.max(0, deg), WM_GC.r + 0.42)
+  }), /*#__PURE__*/React.createElement("circle", {
+    className: "dl-merc-cap",
+    fill: needleColor,
+    cx: wmPolar(deg, WM_GC.r).x,
+    cy: wmPolar(deg, WM_GC.r).y,
+    r: "0.92"
+  }), /*#__PURE__*/React.createElement("circle", {
+    className: "dl-merc-cap-lit",
+    cx: wmPolar(deg, WM_GC.r + 0.3).x,
+    cy: wmPolar(deg, WM_GC.r + 0.3).y,
+    r: "0.34"
+  })), barRing.map(b => {
     const h = Math.max(0.6, b.v / WM_MAX_PCT * WM_BAR_MAX);
     /* A rect rotated about the pivot rather than a stroked line: a stroke
        cannot carry a gradient across its own width, and the width is where

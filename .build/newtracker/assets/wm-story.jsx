@@ -277,56 +277,54 @@ function DialFigure({ story, f, envelope, trail }) {
         </g>
       )}
 
-      {/* The arc says one thing - which side leads, split at level - and says it
-         with a colour and a boundary. Its width and radius carry nothing, so
-         it can be lit like everything else here. Each half is drawn twice: a
-         wide, faint pass that reads as the colour glowing in a channel, and
-         the crisp band over it that keeps the boundary exact. The glow is a
-         fat translucent stroke rather than a blur, because it sits under a
-         needle that redraws every frame. */}
-      <path className="dl-arc-glow" d={wmArc(-90, 0, WM_GC.r)} stroke="var(--alp)" />
-      <path className="dl-arc-glow" d={wmArc(0, 90, WM_GC.r)} stroke={A.oppColor}
-            style={{ opacity: 1 - oppMix }} />
-      {oppMix > 0 && (
-        <path className="dl-arc-glow" d={wmArc(0, 90, WM_GC.r)} stroke={B.oppColor}
-              style={{ opacity: oppMix }} />
-      )}
-      <path className="dl-arc" d={wmArc(-90, 0, WM_GC.r)} stroke="var(--alp)" />
-      <path className="dl-arc" d={wmArc(0, 90, WM_GC.r)} stroke={A.oppColor}
-            style={{ opacity: 1 - oppMix }} />
-      {oppMix > 0 && (
-        <path className="dl-arc" d={wmArc(0, 90, WM_GC.r)} stroke={B.oppColor}
-              style={{ opacity: oppMix }} />
-      )}
+      {/* The two halves used to be drawn full, always, from -90 to 0 and 0 to
+         +90. Only the challenger's COLOUR ever changed, so the band was a
+         legend wearing a gauge's clothes: it told you which side belonged to
+         whom and never once told you how far.
 
-      {/* Bounce: each blade throws its own colour onto the face beneath it.
-          This is the move the style turns on - material answering what sits on
-          it - and it is free of the readings, being a wash under them rather
-          than a mark of its own. Drawn before the graduations so those stay
-          crisp on top. */}
-      {barRing.map((b) => {
-        const p = wmPolar(b.a, WM_GC.r - 1.5);
-        return <circle key={"bo" + b.id} className="dl-bounce" cx={p.x} cy={p.y} r="6"
-                       fill={`url(#dl-bounce-${b.id})`} />;
-      })}
+         It is a mercury column now. The channel runs the whole sweep and sits
+         empty; the liquid fills from LEVEL outward toward whoever leads, and
+         its extent is the margin - the same wmDeg the needle turns on, so the
+         column and the pointer agree by construction rather than by being
+         kept in step. Two points of lead is two points of mercury, read
+         against the same ticks.
 
-      {/* Where each blade meets the machine. Without this they read as stuck ON
-         the rim rather than coming OUT of it, because nothing said the housing
-         had an opening. Three parts, drawn before every blade so no blade sits
-         under its neighbour's mount: a BOSS of the same bezel material
-         standing a little proud of the rim, a SLOT cut into it, and then the
-         blade rising through. The slot is wider than the blade by 0.3 either
-         side, and that dark margin is the whole trick - it is the gap you
-         would see around a vane in its own aperture. */}
-      {barRing.map((b) => (
-        <g key={"mount" + b.id}
-           transform={`rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`}>
-          <rect className="dl-boss" x={WM_GC.cx - 3.1} y={WM_GC.cy - 16.1}
-                width="6.2" height="2.9" rx="0.9" fill="url(#dl-rim)" />
-          <rect className="dl-slot" x={WM_GC.cx - 2.25} y={WM_GC.cy - 16.0}
-                width="4.5" height="2.1" rx="0.8" />
+         The faint tint stays in the empty channel so the sides keep their
+         parties at a glance, which is the one thing the old band did do. */}
+      <path className="dl-channel" d={wmArc(-90, 90, WM_GC.r)} />
+      <path className="dl-side" d={wmArc(-90, 0, WM_GC.r)} stroke="var(--alp)" />
+      {/* The challenger's half carries an inline opacity to crossfade between
+         two colours when the challenger changes hands, and an inline opacity
+         REPLACES the one in the stylesheet rather than combining with it - so
+         Labor's side rendered at the intended tint and the challenger's at
+         full strength, which is why that half always looked the heavier one.
+         Nesting fixes it: the group holds the tint, the paths inside hold only
+         the crossfade, and the two multiply. */}
+      <g className="dl-side-g">
+        <path className="dl-side-raw" d={wmArc(0, 90, WM_GC.r)} stroke={A.oppColor}
+              style={{ opacity: 1 - oppMix }} />
+        {oppMix > 0 && (
+          <path className="dl-side-raw" d={wmArc(0, 90, WM_GC.r)} stroke={B.oppColor}
+                style={{ opacity: oppMix }} />
+        )}
+      </g>
+      {Math.abs(deg) > 0.35 && (
+        <g className="dl-mercury">
+          {/* the body of the liquid */}
+          <path className="dl-merc" stroke={needleColor}
+                d={wmArc(Math.min(0, deg), Math.max(0, deg), WM_GC.r)} />
+          {/* specular line along the upper wall - what makes it read as metal
+              rather than as paint. Sits a third of a unit out from the centre
+              of the channel, which is where the light would catch. */}
+          <path className="dl-merc-lit"
+                d={wmArc(Math.min(0, deg), Math.max(0, deg), WM_GC.r + 0.42)} />
+          {/* the meniscus: liquid ends in a dome, not a chop */}
+          <circle className="dl-merc-cap" fill={needleColor}
+                  cx={wmPolar(deg, WM_GC.r).x} cy={wmPolar(deg, WM_GC.r).y} r="0.92" />
+          <circle className="dl-merc-cap-lit"
+                  cx={wmPolar(deg, WM_GC.r + 0.3).x} cy={wmPolar(deg, WM_GC.r + 0.3).y} r="0.34" />
         </g>
-      ))}
+      )}
 
       {/* graduation bars – primary vote, absolute scale */}
       {barRing.map((b) => {
