@@ -530,10 +530,30 @@ body.js #root {
    its own value and back reads as an error rather than as momentum */
 .wm-bar { transition: stroke-dasharray .75s cubic-bezier(.22,.9,.24,1); }
 @media (prefers-reduced-motion: reduce) { .wm-needle-g, .wm-bar { transition: none; } }
+/* The masthead line is set in Myriad Pro's Light SemiExtended Italic. Adobe
+   registers every width under the one "Myriad Pro" family and tells them apart
+   by STYLE name, so font-stretch cannot reach it; local() names the cut
+   exactly. Declared italic at 300 rather than asked for with font-style, so a
+   machine that has it matches the real face instead of slanting it twice.
+
+   It is named, not shipped - same licence as the rest of the family - and this
+   block sits in the second stylesheet on purpose: the build splices the whole
+   @font-face run out of the first one and would carry this away with it. */
+@font-face {
+  font-family: "Myriad Tagline";
+  font-style: italic;
+  font-weight: 300;
+  font-display: swap;
+  src: local("Myriad Pro Light SemiExtended Italic"), local("MyriadPro-LightSemiExtIt");
+}
 .tagline {
   /* negative bottom margin drops Newsreader's last line ~1.5px so the tagline
      text baseline-to-bottom edge optically matches the head-meta values */
-  margin: 7px 0 -1.5px; font-family: var(--serif);
+  margin: 7px 0 -1.5px;
+  /* Newsreader carries a real italic, so the visitor without Myriad gets a
+     drawn italic rather than a synthesised slant of an upright face */
+  font-family: "Myriad Tagline", var(--serif);
+  font-style: italic; font-weight: 300;
   font-size: 15px; color: var(--ink-3); text-wrap: balance;
 }
 /* compact freshness line – only surfaced on small screens, where the full
