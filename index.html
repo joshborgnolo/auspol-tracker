@@ -5553,8 +5553,8 @@ function TrendChart(props) {
     }, l.text));
   })(), refLines.map((r, i) => r.label && /*#__PURE__*/React.createElement("text", {
     key: "rl" + i,
-    x: r.align === "left" ? pad.l + 6 : W - pad.r,
-    y: sy(r.y) - 8,
+    x: r.align === "left" ? pad.l + refUnits * 0.5 : W - pad.r,
+    y: sy(r.y) - refUnits * 0.5,
     className: "refline-label",
     textAnchor: r.align === "left" ? "start" : "end",
     style: {

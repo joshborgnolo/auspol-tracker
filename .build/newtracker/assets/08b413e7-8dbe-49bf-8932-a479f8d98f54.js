@@ -1044,13 +1044,17 @@ function TrendChart(props) {
            cleanly where data lines cross the 50%/even line (esp. small screens).
            align:"left" moves a label to the left edge, clear of end-of-line
            year labels on the cycle charts */}
+        {/* Both refline-label offsets scale with the type, because they are
+            clearances from the y-axis labels rather than absolute gaps. A flat
+            6px and 8px held against the desktop axis and failed against the
+            phone one, where the axis font is half again as large: "tie" ended
+            up butted against "50%" and read as one smudged token, at the exact
+            point the chart makes its most important statement.
+            This comment lives OUTSIDE the map on purpose: a JSX comment inside
+            the callback's parenthesised return is a second sibling expression,
+            which does not parse — it broke the build for a whole commit while
+            a stale index.html kept the page looking fine. */}
         {refLines.map((r, i) => r.label && (
-          {/* Both offsets scale with the type, because they are clearances from
-              the y-axis labels rather than absolute gaps. A flat 6px and 8px
-              held against the desktop axis and failed against the phone one,
-              where the axis font is half again as large: "tie" ended up butted
-              against "50%" and read as one smudged token, at the exact point
-              the chart makes its most important statement. */}
           <text key={"rl" + i}
                 x={r.align === "left" ? pad.l + refUnits * 0.5 : W - pad.r}
                 y={sy(r.y) - refUnits * 0.5}
