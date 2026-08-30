@@ -1,0 +1,24 @@
+{
+  "generatedAt": "2026-08-30T00:13:43.768Z",
+  "vi": {
+    "added": [],
+    "skipped": {
+      "preHorizon": 50,
+      "dateDup": 15,
+      "figureDup": [],
+      "horizon": "2025-07-18"
+    }
+  },
+  "ppm": {
+    "added": [],
+    "skipped": {
+      "preHorizon": 48,
+      "dateOrFigureDup": 14,
+      "nameShape": []
+    }
+  },
+  "approval": {
+    "added": [],
+    "skipped": null
+  }
+}

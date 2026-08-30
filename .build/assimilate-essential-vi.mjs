@@ -39,7 +39,7 @@ const parseCsv = (text) => {
       else cell += c;
     } else if (c === '"') inQ = true;
     else if (c === ",") { row.push(cell); cell = ""; }
-    else if (c === "\n") { row.push(cell); rows.push(row); row = []; }
+    else if (c === "\n") { row.push(cell); rows.push(row); row = []; cell = ""; }
     else cell += c;
   }
   if (cell !== "" || row.length) { row.push(cell); rows.push(row); }
