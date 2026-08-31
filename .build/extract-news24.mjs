@@ -35,6 +35,19 @@
 //                   state ("data":{"id":<num>,…"published_at":"isoZ"}),
 //                   converted to AEST.
 //
+// News24 fallback waves additionally run the Infogram rung
+// (.build/newspoll-infogram-rung.md): each article's six anonymous `_/`
+// embeds (crosstab + dedicated tables) are authoritative for the figures
+// they carry; prose keeps sample/published, Wikipedia fills what all
+// charts+prose lack, and every cross-source disagreement >0.5pp is logged to
+// problems, never silently swapped. The horserace time-series chart is
+// corroboration-only (proven Σ=94/102 columns, Σ-guarded). The article DOM
+// itself needs Chrome (Akamai cookie wall serves anonymous fetches a 404);
+// fetchNews24Article tries anonymous first so Chrome drops out the day the
+// wall drops. status.news24 gains `sources` (which leg served each DOM) and
+// `infogram` (per-wave ids/kinds/problems); provenance files carry the
+// parsed Infogram record so rows re-derive without re-fetching.
+//
 // Row shapes mirror the existing canon YouGov rows: polls
 // {date,published,dateStart,pollster:"YouGov",client:"News24",sample,alp,
 // lnp,grn,onp,ind,oth,tpp_alp,tpp_lnp,url}; ppm {date,firm,alb,opp,oppName,
@@ -74,9 +87,12 @@
 //   - writes are atomic (.tmp + rename)
 //   - test hooks: N24_OUT redirects the write target; N24_SRC_DIR redirects
 //     provenance; N24_WIKI_FILE parses local wikitext; N24_WIKI_DEBUG prints
-//     parsed fallback waves; N24_NEWS24_FILE parses a saved News24 page
+//     parsed fallback waves; N24_NEWS24_FILE parses a saved News24 page;
+//     N24_IG_DIR reads Infogram embeds from ig-<id>.html fixture captures
 import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { IG_EMBED } from "./infogram.mjs";
+import { n24IdsOf, n24InfogramFetch, n24Figures, n24Corroborate } from "./news24-infogram.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -153,6 +169,112 @@ function fetchNews24Chrome(url) {
   } catch {
     return null;
   }
+}
+
+// ----------------------------------------------------- News24 Infogram rung
+// (spec: .build/newspoll-infogram-rung.md) Each News24 Pulse article embeds
+// six static Infogram projects (`_/` ids, fresh per wave); the embeds fetch
+// anonymously. The ARTICLE DOM is not anonymous today: Akamai's cookie wall
+// serves a 404 "Nocookies" page to plain fetch. The chain below tries
+// anonymous first so the day the wall drops, Chrome drops out too.
+const IG_DIR = process.env.N24_IG_DIR ?? null; // test hook: dir of ig-<id>.html captures
+async function fetchIgEmbed(id) {
+  if (IG_DIR) return readFileSync(`${IG_DIR}/ig-${id.replace("_/", "")}.html`, "utf8");
+  return (await fetchText(IG_EMBED(id))).text;
+}
+
+async function fetchNews24Article(url) {
+  if (NEWS24_FILE) return { html: readFileSync(NEWS24_FILE, "utf8"), via: "file" };
+  try {
+    const { text } = await fetchText(url);
+    if (/News24 Pulse/i.test(text) || n24IdsOf(text).length) return { html: text, via: "anon" };
+  } catch { /* Akamai cookie wall; Chrome is the fallback */ }
+  const html = fetchNews24Chrome(url);
+  return html ? { html, via: "chrome" } : { html: null, via: null };
+}
+
+// Figure precedence inside a News24 wave: Infogram crosstab + dedicated
+// tables are authoritative for what they carry; prose then Wikipedia fill
+// only what charts lack (sample, published, candidate discovery). Returns
+// problems (BLOCKING — figure/window/era disagreements >0.5pp that must not
+// be written silently) separately from notes (corroboration-only signals:
+// the hand-maintained horserace's Σ-guarded exclusions and value drift,
+// which carry proven errors and can never block a wave). Mutates `wave`
+// (vi/dateStart) and `prose` (the parsed News24 rec: sat/ppm/alt/
+// ppmHeadToHead, which derived rows read).
+async function infogramEnrichNews24(html, wave, prose) {
+  const problems = [], notes = [];
+  const ids = n24IdsOf(html);
+  if (!ids.length) return { ig: null, problems, notes };
+  const projects = await n24InfogramFetch(fetchIgEmbed, ids);
+  const fig = n24Figures(projects);
+  for (const p of fig.problems) (/^horserace .* sums to/.test(p) ? notes : problems).push(p);
+  // Snapshot pre-overlay values so every crosscheck names its source.
+  const pv = prose?.vi ?? {};
+  const wasV = (k) => pv[k] != null ? ["News24 prose", pv[k]]
+    : wave !== prose && wave.vi?.[k] != null ? ["Wikipedia", wave.vi[k]] : null;
+  const wasP = (v) => (v != null ? ["News24 prose", v] : null);
+  const shift = (label, igV, was) => {
+    if (igV != null && was && Math.abs(igV - was[1]) > 0.5)
+      problems.push(`Infogram ${label} ${igV} != ${was[0]} ${was[1]}`);
+  };
+
+  if (fig.vi) for (const k of ["alp", "lnp", "grn", "onp", "ind", "oth"]) {
+    if (fig.vi[k] == null) continue;
+    shift(k, fig.vi[k], wasV(k));
+    wave.vi[k] = fig.vi[k];
+  }
+  if (fig.tpp) {
+    shift("tpp_alp", fig.tpp.tpp_alp, wasP(pv.tpp_alp));
+    wave.vi.tpp_alp = fig.tpp.tpp_alp;
+    wave.vi.tpp_lnp = fig.tpp.tpp_lnp;
+  }
+  if (fig.altTpp) {
+    shift("alt TPP ALP", fig.altTpp.alpVsOnp_alp, wasP(prose?.altAlp));
+    if (prose) { prose.altAlp = fig.altTpp.alpVsOnp_alp; prose.altOnp = fig.altTpp.alpVsOnp_onp; }
+  }
+  const net = (p) => (p?.app != null && p?.dis != null ? Math.round((p.app - p.dis) * 10) / 10 : null);
+  if (fig.approval?.alb) {
+    shift("PM net", net(fig.approval.alb), wasP(prose?.sat?.pmNet));
+    shift("OL net", net(fig.approval.opp), wasP(prose?.sat?.oppNet));
+    if (prose) prose.sat = {
+      pmApp: fig.approval.alb.app, pmDis: fig.approval.alb.dis, pmNet: net(fig.approval.alb),
+      oppApp: fig.approval.opp?.app ?? null, oppDis: fig.approval.opp?.dis ?? null, oppNet: net(fig.approval.opp),
+    };
+    // Era drift detector: charts name the OL; LEADERS is a hand-kept table.
+    const eraNow = olFor(wave.date ?? today());
+    if (fig.approval.oppName && eraNow && fig.approval.oppName !== eraNow.surname)
+      problems.push(`Infogram charts name OL "${fig.approval.oppName}" but LEADERS says ${eraNow.surname}`);
+  }
+  const olTable = fig.ppm.find((p) => p.alb != null && !/hanson/i.test(p.oppRaw ?? ""));
+  const hanTable = fig.ppm.find((p) => /hanson/i.test(p.oppRaw ?? ""));
+  if (olTable) {
+    shift("ppm ALP", olTable.alb, wasP(prose?.ppmA));
+    shift("ppm OPP", olTable.opp, wasP(prose?.ppmO));
+    if (prose) { prose.ppmA = olTable.alb; prose.ppmO = olTable.opp; }
+  }
+  if (hanTable) {
+    shift("ppm ALP (vs Hanson)", hanTable.alb, wasP(prose?.ppmHan));
+    shift("ppm Hanson", hanTable.opp, wasP(prose?.ppmHanOpp));
+    if (prose) { prose.ppmHan = hanTable.alb; prose.ppmHanOpp = hanTable.opp; }
+  }
+  if (fig.window) {
+    if (wave.date && fig.window.end !== wave.date)
+      problems.push(`Infogram window end ${fig.window.end} != wave date ${wave.date}`);
+    if (wave.dateStart && fig.window.start !== wave.dateStart)
+      problems.push(`Infogram window start ${fig.window.start} != dateStart ${wave.dateStart}`);
+    if (!wave.dateStart) wave.dateStart = fig.window.start;
+  }
+  if (fig.horserace?.length)
+    notes.push(...n24Corroborate(fig.horserace, wave.date, wave.vi));
+
+  const ig = {
+    ids, kinds: projects.map((p) => p.kind ?? p.state),
+    window: fig.window ?? null,
+    vi: fig.vi, tpp: fig.tpp, altTpp: fig.altTpp,
+    approval: fig.approval, ppm: fig.ppm.length ? fig.ppm : null,
+  };
+  return { ig, problems, notes };
 }
 
 // ------------------------------------------------------------ text helpers
@@ -674,15 +796,17 @@ function parseWikiYouGov(text) {
 const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [] };
 
 if (NEWS24_OF) { // dev oracle: parse one News24 article, print the record, exit
-  const html = fetchNews24Chrome(NEWS24_OF);
-  if (!html) { console.error("News24 fetch failed: set NEWSIE_CHROME=1 or N24_NEWS24_FILE"); process.exit(1); }
-  const rec = parseNews24Article(html, NEWS24_OF);
+  const art = await fetchNews24Article(NEWS24_OF);
+  if (!art.html) { console.error("News24 fetch failed: set NEWSIE_CHROME=1 or N24_NEWS24_FILE"); process.exit(1); }
+  const rec = parseNews24Article(art.html, NEWS24_OF);
   if (!rec) { console.error("not a News24 Pulse / YouGov federal-poll article"); process.exit(1); }
+  const { ig, problems, notes } = await infogramEnrichNews24(art.html, rec, rec);
   console.log(JSON.stringify({
-    url: rec.url, date: rec.date, dateStart: rec.dateStart, sample: rec.sample,
+    url: rec.url, via: art.via, date: rec.date, dateStart: rec.dateStart, sample: rec.sample,
     published: rec.published, vi: rec.vi, sat: rec.sat,
     ppmA: rec.ppmA, ppmO: rec.ppmO, ppmHan: rec.ppmHan, ppmHanOpp: rec.ppmHanOpp,
     altAlp: rec.altAlp, altOnp: rec.altOnp,
+    infogram: ig, igProblems: problems, igNotes: notes,
   }, null, 2));
   process.exit(0);
 }
@@ -775,6 +899,8 @@ try {
   status.news24 = {
     enabled: !!(process.env.NEWSIE_CHROME || NEWS24_FILE),
     attempted: 0, enriched: [], skipped: [], problems: [],
+    sources: {}, // date -> "anon"|"chrome"|"file" (which leg served the article DOM)
+    infogram: {}, // date -> {ids, kinds, problems}
   };
   try {
     const wikiText = WIKI_FILE ? readFileSync(WIKI_FILE, "utf8") : (await fetchText(WIKI_RAW)).text;
@@ -798,25 +924,33 @@ try {
       const canUpgrade = !!existing && wikiWave.date === latestYg && existing.client === "News24" && !existing.published && !!news24Url;
       if ((existing || newDates.has(wikiWave.date)) && !canUpgrade) { status.fallback.skipped_existing++; continue; }
 
-      let h = wikiWave, n24 = null;
-      if (news24Url && (process.env.NEWSIE_CHROME || NEWS24_FILE)) {
+      let h = wikiWave, n24 = null, ig = null;
+      if (news24Url) {
         status.news24.attempted++;
-        const html = fetchNews24Chrome(news24Url);
-        const parsed = html ? parseNews24Article(html, news24Url) : null;
+        const art = await fetchNews24Article(news24Url);
+        const parsed = art.html ? parseNews24Article(art.html, news24Url) : null;
         if (parsed) {
           const merged = mergeNews24Wave(wikiWave, parsed);
-          if (merged.problems.length) {
-            status.news24.problems.push(`${wikiWave.date}: ${merged.problems.join(" | ")}`);
+          const enriched = await infogramEnrichNews24(art.html, merged.wave, merged.news24);
+          status.news24.sources[wikiWave.date] = art.via;
+          if (enriched.ig)
+            status.news24.infogram[wikiWave.date] = {
+              ids: enriched.ig.ids.length, kinds: enriched.ig.kinds,
+              problems: enriched.problems, notes: enriched.notes,
+            };
+          if (enriched.notes.length) console.error(`N24_NOTE ${wikiWave.date}: ${enriched.notes.join(" | ")}`);
+          const allProblems = [...merged.problems, ...enriched.problems];
+          if (allProblems.length) {
+            status.news24.problems.push(`${wikiWave.date}: ${allProblems.join(" | ")}`);
           } else {
             h = merged.wave;
             n24 = merged.news24;
+            ig = { via: art.via, ...enriched.ig };
             status.news24.enriched.push(h.date);
           }
         } else {
-          status.news24.skipped.push(`${wikiWave.date}: News24 Chrome/parse failed`);
+          status.news24.skipped.push(`${wikiWave.date}: News24 ${art.via ?? "fetch"}/parse failed`);
         }
-      } else if (news24Url && !existing) {
-        status.news24.skipped.push(`${wikiWave.date}: NEWSIE_CHROME unset`);
       }
       if (canUpgrade && !n24) continue;
 
@@ -870,6 +1004,7 @@ try {
           satisfaction: n24?.sat ?? null,
           ppm: n24 ? { alb: n24.ppmA, opp: n24.ppmO, albVsHanson: n24.ppmHan, hanson: n24.ppmHanOpp } : null,
           altTpp: n24 ? { alpVsOnp_alp: n24.altAlp, alpVsOnp_onp: n24.altOnp } : null,
+          infogram: ig ?? null,
         }, null, 2) + "\n",
       });
       if (existing) continue;

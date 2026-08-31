@@ -76,6 +76,23 @@ mis-parse evidence that drove this design. The Chrome path is a rescue for "no o
 all", its output still subject to the caller's guards, and the caller must let conflicts fail
 loud rather than coin-flip.
 
+## Multi-page sweeps: a different script shape than the single-URL helper
+
+chrome-article.mjs opens one URL and closes it; for sweeps (N paginated URLs in one
+osascript run) three findings from the News24 section-headline job (2026-08-31, full
+detail in the news24-section-headlines skill):
+
+1. **One FRESH TAB per page** — `make new tab at end of tabs of front window` each time.
+   Reusing a tab via `set URL of tabRef to <next>` yields EMPTY-BUT-LOADED pages
+   (h1 present, readyState complete, 0 content anchors) on Akamai-walled News Corp
+   sections. Count expected anchors per page to detect this.
+2. **Never `close tabRef` mid-sweep** — the next `front window`/`count of windows` throws
+   `-1728 Can't get window id "…"`. Leave tabs open, close at the very end (in `try`) or
+   not at all.
+3. **Preflight EVERY page's extraction** — paginated endpoints may silently ignore your
+   params (`?page=N` returned the identical 20 stories on News24; the real pagination is
+   path-style `/page/N`). Diff page 1 vs page 2 results before trusting a 5-page run.
+
 ## Known site outcomes
 
 - `theaustralian.com.au` — works; full subscriber article HTML via the piggyback.

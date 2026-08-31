@@ -95,6 +95,10 @@ export function liveChartsOf(data) {
 
 // Static charts carry their values inline at chartData.data (cells {value}).
 // Returns [{header, rows}] where rows are arrays of plain cell strings.
+// Gated on sheet shape (>= 2 rows), NOT on a truthy corner cell: News24's
+// approvals/ppm/2PP sheets have an EMPTY corner cell and are identified by
+// the caller from shape/title instead. Newspoll sheets all carry corner
+// labels, so this is inert for the built rung.
 export function staticChartsOf(data) {
   const out = [];
   (function walk(o) {
@@ -102,7 +106,7 @@ export function staticChartsOf(data) {
     const cd = o.chartData;
     if (cd?.data && !cd.custom?.live) {
       const sheet = cd.data[0];
-      if (Array.isArray(sheet) && Array.isArray(sheet[0]) && sheet[0]?.[0]) {
+      if (Array.isArray(sheet) && Array.isArray(sheet[0]) && sheet.length >= 2) {
         const rows = sheet.map((r) => r.map((c) => String(c?.value ?? "").trim()));
         out.push({ header: rows[0][0], rows });
       }

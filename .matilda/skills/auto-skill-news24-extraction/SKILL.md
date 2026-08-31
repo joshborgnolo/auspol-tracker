@@ -1,6 +1,6 @@
 ---
 name: news24-extraction
-description: Extract YouGov News24 "Public Data" fortnightly federal polls from YouGov's own yougov.com releases into data/polls.json — global RSS discovery (regional feeds 404), methodology-sentence series gate, Datawrapper public TSV datasets (tab-structure-preserving cell parse, <span> arrows, \\u003C escapes), oth=sum-of-tail-row convention, ppm chart→prose fallback, yearless fieldwork-window year inference from published_at, plus manual NEWSIE_CHROME news24.com.au enrichment layered over Wikipedia-wave discovery (.build/extract-news24.mjs).
+description: Extract YouGov News24 "Public Data" fortnightly federal polls from YouGov's own yougov.com releases into data/polls.json — global RSS discovery (regional feeds 404), methodology-sentence series gate, Datawrapper public TSV datasets (tab-structure-preserving cell parse, <span> arrows, \\u003C escapes), oth=sum-of-tail-row convention, ppm chart→prose fallback, yearless fieldwork-window year inference from published_at, plus manual NEWSIE_CHROME news24.com.au enrichment layered over Wikipedia-wave discovery, and the ANONYMOUS Infogram embed rung (six static _/ ids per Pulse article at e.infogram.com, pinned per wave; authoritative crosstab vs corroboration-only horserace; cornerless approvals mapped by title-order x geometry) (.build/extract-news24.mjs, .build/news24-infogram.mjs).
 source: auto-skill
 extracted_at: '2026-08-29T07:23:34.665Z'
 ---
@@ -117,6 +117,62 @@ can't while in canon).
 3. expect exactly one `via:"news24+wikipedia"` wave with News24 figures and
    Wiki's `ind`/`oth`, provenance under `/tmp/n24-src`, exit 0; rerun to get
    `changed:false`.
+
+## Infogram embeds: the structured News24 figure source (added 2026-09-01)
+
+Spec: `.build/newspoll-infogram-rung.md`. Module `.build/news24-infogram.mjs`, wired in as
+`infogramEnrichNews24()`; shared core `.build/infogram.mjs`; self-test
+`node .build/test-news24-infogram.mjs` (23 cases) over six pinned fixtures in
+`.build/news24-src/ig-fixtures-2026-08-24/`.
+
+Every Pulse article embeds SIX static Infogram projects as
+`<div class="media embed-infogram infogram-embed" data-id="_/<id>">`, each fetchable
+**anonymously** at `https://e.infogram.com/_/<id>?src=embed` — no cookies, no login, no
+Chrome. Only the `data-id`s need the rendered DOM: the walled page ships
+`thirdPartyArticle.infogram = []`, and news24.com.au answers HTTP **404 "Nocookies"** to a
+plain fetch. Ids are minted fresh per wave (2026-08-24's six and 2026-07-28's five are
+disjoint), so News24 embeds are PINNED to their article — unlike The Australian's rolling
+project — and any past Pulse article still serves its own wave's figures.
+
+Chart roles and their traps:
+
+- **Crosstab** (corner `Party`, col 2 `Total`) — AUTHORITATIVE. Primaries by 46 demographic
+  breaks. `oth` = Other + Community Strong (verified 5 + 2 = canon `oth:7` on 2026-08-24),
+  both kept separately as provenance. Σ100 on the Total column is the authority gate; fail ⇒
+  decline and fall back to prose/Wikipedia.
+- **Horserace** (corner `Party`, party-name columns) — CORROBORATION ONLY, never a figure
+  source. Hand-maintained and provably wrong in places: the Jul-14 column sums to 94, Jan-8
+  to 102. Its date labels also run +1 day ahead of canon `date` before June 2026, then align
+  exactly from June 16 — never key on them.
+- **Approvals** — two CORNERLESS tables headed `["", "Support"]` with no leader name inside.
+  Mapped by zipping the chart TITLE's leader-name order to geometry order (`left`). Title or
+  table-count mismatch ⇒ null: decline, never guess.
+- **Preferred PM** — cornerless, safely keyed by COLUMN NAME (`Anthony Albanese` /
+  `Don't know` / `<opponent>`), never by order. Two tables: Albanese–Taylor → `ppm`,
+  Albanese–Hanson → `ppmHeadToHead`.
+- **2PP** — cornerless, columns `Labor vs Coalition` and `Labor vs One Nation`; blank cells
+  are STRUCTURAL (each pairing owns its column), not missing data. Second pairing → `altTpp`.
+- **Voter issues** — issue ownership, 12 issues × 5 parties. Not currently modelled.
+
+`staticChartsOf` in the shared core gates sheets on `sheet.length >= 2`, NOT on a truthy
+corner cell — the original corner gate silently dropped the approvals, ppm and 2PP sheets,
+i.e. every YouGov row except the primaries. Newspoll sheets all carry corner labels, so the
+change is inert there.
+
+The fieldwork window comes free from each chart's caption
+(`Source: News24 Pulse / YouGov (August 18-24, 2026)`; same- and cross-month forms handled).
+NOT in the embeds: `sample` (prose only — "poll of 1510 voters was conducted online between
+August 18 and 24") and `published` (JSON-LD `datePublished` / the page transfer state).
+
+**When it actually fires.** `status.news24.enabled` needs `NEWSIE_CHROME=1` or
+`N24_NEWS24_FILE`, so launchd runs never reach it. The upgrade gate is
+`!existing.published`, so a latest wave already carrying `published` yields `attempted:0` —
+verified 2026-09-01: `N24_NEWS24_FILE=.matilda/chrome-n24.html --check` → `enabled:true,
+attempted:0, changed:false`. The rung is therefore proven against fixtures but has NOT yet
+run on a live wave; first real exercise is the ~2026-09-07 release.
+
+Verified field-for-field against canon 2026-08-24: primaries 29/21/26/12/5/7, TPP 53/47,
+approval −24/−16 off 35/59 and 33/49, ppm 44/37, ppmHeadToHead 52/37, altTpp 56.
 
 ## Series gate: methodology sentence, not title keywords
 
