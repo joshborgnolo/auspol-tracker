@@ -66,6 +66,33 @@ bug (sheet is `data[0]`, not `data[0][0]`) initially made the rung silently retu
 `live-skip` on every static page — if rung B ever reports nothing for a wave, re-check
 `staticChartsOf` against a fresh fixture first.
 
+## The release watchdog on CI (added 2026-09-01)
+
+`.build/check-newspoll-release.mjs` + `.github/workflows/newspoll-watch.yml`. The extractor
+itself cannot run on CI (paywall + rung B needs the user's Chrome), but **rung A can**: the
+live project is addressed by a stable slug, so it needs no article, no cookies and no Chrome.
+CI therefore detects a published wave days before free coverage clusters — the 2026-08-28 wave
+sat as a candidate for four days and landed manually.
+
+Convention: like coverage-check, **the job's failure IS the message** (exit 1 → GitHub
+notification email); last stdout line is `NP_WATCH {json}`.
+
+- **Detects only, never writes.** The live project rolls forward and its label is a
+  PUBLICATION date; a writer would reintroduce exactly the dating trap rung A exists to avoid.
+  Figures still land through the extractor and its guards.
+- **The window is the whole trick.** "Label newer than canon" is a FALSE POSITIVE for the wave
+  already recorded — the 2026-08-30 label belongs to the 2026-08-28 row. Fire only when the
+  label is beyond `latest + IG_DAY_WINDOW` (5 d). Verified 2026-09-01: quiet against real canon
+  (`state:"current"`, threshold 2026-09-02), fires with correct figures (29/19/30/13/9, ppm
+  44/35, nets −21/−17) against a canon copy with the 2026-08-28 wave stripped.
+- `state:"unavailable"` (CDN blip) exits 0 — a watchdog that cries wolf gets muted. Only
+  `guard` (structure changed) and `release` exit 1.
+- A 2PP resumption is REPORTED in the alert but is not an independent fire condition, or the
+  watchdog would stay permanently red until canon modelled it.
+- The alert prompts the operator to settle the rung-B open question (refetch
+  `8b461452-…` — if it serves the new wave, rung B is article-free too), so that question
+  resolves itself the next time a wave lands.
+
 ## The automation contract (mirrors all sibling extractors)
 
 Exit 0 ok / 1 fetch-parse error / 2 guard trip; last stdout line `NP_STATUS {json}`; atomic

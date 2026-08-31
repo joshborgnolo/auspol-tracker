@@ -1,0 +1,25 @@
+# Newspoll release watchdog — like coverage-check, its FAILURE is the message.
+#
+# The Newspoll extractor itself can't run here (The Australian is paywalled and
+# bot-walled, and rung B needs the user's Chrome), but rung A addresses the live
+# Infogram project by a stable slug: no article, no cookies, no Chrome. So CI
+# can detect that a wave has been published days before free secondary coverage
+# clusters — the 2026-08-28 wave sat as a candidate for four days and landed
+# manually. This job DETECTS ONLY; figures still land via the extractor.
+
+name: newspoll-watch
+
+on:
+  schedule:
+    - cron: '0 11 * * 0'  # 21:00 AEST Sunday — just after the usual embargo lift
+    - cron: '30 21 * * *' # 07:30 AEST daily — catch-all for off-pattern releases
+  workflow_dispatch:
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check for an unlanded Newspoll release
+        run: node .build/check-newspoll-release.mjs

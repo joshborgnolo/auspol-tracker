@@ -69,6 +69,10 @@ inert for the built rung — but re-run `test-infogram.mjs` to confirm.
 
 ## The Australian / Newspoll — built
 
+Rung A also backs a CI watchdog, `.github/workflows/newspoll-watch.yml` — the only part of
+either publisher that can run off-machine, because the slug needs no article. It DETECTS ONLY
+(exit 1 = unlanded wave, the failure is the message); figures still land via the extractor.
+
 Implemented as rung A (live project via `IG_SLUG`, no article needed, four charts resolved by
 `IG_LIVE_TITLES`) and rung B (per-wave static embeds from the article DOM). See
 `.build/infogram.mjs` and the newspoll-extraction skill for the working detail.
@@ -198,6 +202,9 @@ graphics were wrong and the tracker was right.
 1. Is Newspoll's rung B GUID reused each wave or minted fresh? It rolled forward once, which
    suggests reuse. Refetch `8b461452-4d45-46fc-8d8f-d1c761a4932e` after the next release: if it
    serves the new wave, rung B becomes article-free and Chrome drops out of Newspoll entirely.
+   **Self-resolving as of 2026-09-01**: the release watchdog
+   (`.build/check-newspoll-release.mjs`) prints this refetch in its alert, so the next wave to
+   land puts the question in front of whoever handles it.
 2. YouGov alignment: the tracker has a 2026-03-19 wave the horserace omits, and the horserace
    has a Jan 8 point the tracker dates 2026-01-27. Adjudicate before trusting either.
 

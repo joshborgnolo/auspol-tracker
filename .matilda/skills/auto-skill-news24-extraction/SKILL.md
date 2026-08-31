@@ -236,6 +236,30 @@ Parse gotchas that each produced a real bug:
   win — canon was aligned 2026-08-29 (2026-07-14 row corrected 1500→1468); going forward,
   never "correct" YouGov-sourced values back to media-reported ones.
 
+## News24 enrichment cannot move to CI (settled 2026-09-01)
+
+The Infogram rung is anonymous, but the six per-wave `_/` ids exist ONLY in the rendered
+article DOM, and there is no anonymous route to them:
+
+- news24.com.au answers a plain fetch with HTTP **404 "Nocookies"**, and the walled page
+  ships `thirdPartyArticle.infogram = []` — empty.
+- The section listing has no usable RSS at all (every endpoint returns 200 with a ZERO-BYTE
+  body — see the news24-section-headlines skill), so pagination is Chrome-only.
+- The publisher's Infogram account (`user_id 211358766`, `team_user_id 211359126`) has no
+  public index: `infogram.com/profile/<id>` and `/u/<id>` 404, `/api/infographics?user_id=`
+  403s, and `search?q=N24P` returns an empty shell. The projects are link-only
+  (`publishType: 1`), so title patterns like `N24P PV 2026: 2482026` are not searchable.
+
+Contrast Newspoll, whose rung A addresses a live project by a STABLE SLUG and therefore needs
+no article at all — that half runs on CI as `.github/workflows/newspoll-watch.yml`. No
+equivalent exists here, because News24 mints fresh ids per wave (which is also what makes its
+embeds pinned and its history retrievable — the same property cuts both ways).
+
+Practical consequence: the realistic end state is Wikipedia + yougov.com on CI with News24
+Infogram enrichment as a LOCAL pass. Scope the ~2026-09-07 yougov.com RSS verdict
+accordingly — even a fully repaired RSS does not make News24 migratable. This is a structural
+property of the source, not a migration backlog item.
+
 ## The automation contract (same as siblings; see resolve-monitor-extraction)
 
 Exit 0 ok / 1 fetch-parse / 2 guard trip; last stdout line `N24_STATUS {json}` with
