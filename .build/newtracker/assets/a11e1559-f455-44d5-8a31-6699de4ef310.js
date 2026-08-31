@@ -1489,6 +1489,28 @@ function tppHeading(cs) {
   if (cs.length === 1) return cs[0].kind === "3cp" ? "Three-cornered preferred" : "Two-party preferred";
   return "After preferences";
 }
+/* The detail section's line list: the contests tppContests builds, with the
+   2025-flows pair spliced in as a full contest straight after the canonical
+   ALP v L/NP pair it re-anchors, plus each line's trailing basis note. The
+   flows pair carries its OWN change vs the pollster's last such figure ("flows"
+   in chg), L/NP moving opposite, exactly as the canonical pair uses "alp2pp". */
+function tppLines(cs, r) {
+  const out = [];
+  const dFlows = segDelta(r.chg, "flows");
+  for (const c of cs) {
+    const canonical = c.kind === "2pp" && !c.derived && r.tppFlows != null;
+    out.push({ c, note: canonical ? "respondent-allocated" : null });
+    if (canonical) out.push({ note: "2025 preference flows", c: {
+      kind: "flows", lab: "2PP · ALP v L/NP", flag: null,
+      segs: [
+        { label: "ALP", value: r.tppFlows, color: PARTY_C.alp, delta: dFlows },
+        { label: "L/NP", value: Math.round((100 - r.tppFlows) * 10) / 10, color: PARTY_C.lnp,
+                          delta: dFlows ? { v: +(-dFlows.v).toFixed(1), refDate: dFlows.refDate } : null },
+      ],
+    } });
+  }
+  return out.map((x) => ({ ...x, count: out.length }));
+}
 function primarySegs(r) {
   return [
     { label: "ALP", value: r.p.alp, color: PARTY_C.alp, delta: segDelta(r.chg, "pAlp") },
@@ -1911,19 +1933,11 @@ function PollLedger({ r, dirSegments }) {
       <PdSec label={tppHeading(tcs)}>
         {/* name the main pair's basis only when the flows second line joins
             it – a single pair needs no disambiguation, and a derived pair
-            (3-cornered waves) is never the respondent-allocated one */}
-        {tcs.map((c, i) => <TppLine key={"t" + i} c={c} prefixed={tcs.length > 1}
-          note={c.kind === "2pp" && !c.derived && r.tppFlows != null ? "respondent-allocated" : null} />)}
-        {/* Roy Morgan's second ALP–L/NP 2PP: same question, 2025's preference
-            flows applied to these primaries, so it gets its own line and is
-            never folded into the respondent-allocated pair */}
-        {r.tppFlows != null && (
-          <p className="pd-s">
-            <b>{r.tppFlows}%</b> ALP vs <b>{Math.round((100 - r.tppFlows) * 10) / 10}%</b> L/NP
-            <span className="pd-s-note"> (2025 preference flows)</span>
-            <ChgParen d={segDelta(r.chg, "flows")} />
-          </p>
-        )}
+            (3-cornered waves) is never the respondent-allocated one. The
+            flows line itself is the same question with 2025's flows applied
+            to these primaries, so it takes the main pair's exact format and
+            sits straight after it, ahead of the ON head-to-heads */}
+        {tppLines(tcs, r).map((x, i) => <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1} note={x.note} />)}
       </PdSec>
 
       <PdSec label="First preferences">

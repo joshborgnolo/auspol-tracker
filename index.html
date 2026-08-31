@@ -9018,6 +9018,48 @@ function tppHeading(cs) {
   if (cs.length === 1) return cs[0].kind === "3cp" ? "Three-cornered preferred" : "Two-party preferred";
   return "After preferences";
 }
+/* The detail section's line list: the contests tppContests builds, with the
+   2025-flows pair spliced in as a full contest straight after the canonical
+   ALP v L/NP pair it re-anchors, plus each line's trailing basis note. The
+   flows pair carries its OWN change vs the pollster's last such figure ("flows"
+   in chg), L/NP moving opposite, exactly as the canonical pair uses "alp2pp". */
+function tppLines(cs, r) {
+  const out = [];
+  const dFlows = segDelta(r.chg, "flows");
+  for (const c of cs) {
+    const canonical = c.kind === "2pp" && !c.derived && r.tppFlows != null;
+    out.push({
+      c,
+      note: canonical ? "respondent-allocated" : null
+    });
+    if (canonical) out.push({
+      note: "2025 preference flows",
+      c: {
+        kind: "flows",
+        lab: "2PP · ALP v L/NP",
+        flag: null,
+        segs: [{
+          label: "ALP",
+          value: r.tppFlows,
+          color: PARTY_C.alp,
+          delta: dFlows
+        }, {
+          label: "L/NP",
+          value: Math.round((100 - r.tppFlows) * 10) / 10,
+          color: PARTY_C.lnp,
+          delta: dFlows ? {
+            v: +(-dFlows.v).toFixed(1),
+            refDate: dFlows.refDate
+          } : null
+        }]
+      }
+    });
+  }
+  return out.map(x => ({
+    ...x,
+    count: out.length
+  }));
+}
 function primarySegs(r) {
   return [{
     label: "ALP",
@@ -9597,17 +9639,11 @@ function PollLedger({
     className: "pd-simple"
   }, /*#__PURE__*/React.createElement(PdSec, {
     label: tppHeading(tcs)
-  }, tcs.map((c, i) => /*#__PURE__*/React.createElement(TppLine, {
+  }, tppLines(tcs, r).map((x, i) => /*#__PURE__*/React.createElement(TppLine, {
     key: "t" + i,
-    c: c,
-    prefixed: tcs.length > 1,
-    note: c.kind === "2pp" && !c.derived && r.tppFlows != null ? "respondent-allocated" : null
-  })), r.tppFlows != null && /*#__PURE__*/React.createElement("p", {
-    className: "pd-s"
-  }, /*#__PURE__*/React.createElement("b", null, r.tppFlows, "%"), " ALP vs ", /*#__PURE__*/React.createElement("b", null, Math.round((100 - r.tppFlows) * 10) / 10, "%"), " L/NP", /*#__PURE__*/React.createElement("span", {
-    className: "pd-s-note"
-  }, " (2025 preference flows)"), /*#__PURE__*/React.createElement(ChgParen, {
-    d: segDelta(r.chg, "flows")
+    c: x.c,
+    prefixed: x.count > 1,
+    note: x.note
   }))), /*#__PURE__*/React.createElement(PdSec, {
     label: "First preferences"
   }, /*#__PURE__*/React.createElement("p", {
