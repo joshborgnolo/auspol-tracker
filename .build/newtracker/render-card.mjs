@@ -121,13 +121,13 @@ try {
   await page.evaluate("HTMLAnchorElement.prototype.click = function () {};\n"
     + src + "\nundefined;");
   await page.waitForFunction("!!window.__auspolCard", { timeout: 60000 });
-  const { png, updatedISO } = await page.evaluate("window.__auspolCard");
+  const { png, publishedISO } = await page.evaluate("window.__auspolCard");
 
   const buf = Buffer.from(png.replace(/^data:image\/png;base64,/, ""), "base64");
   fs.writeFileSync(CARD, buf);
-  fs.writeFileSync(STAMP, JSON.stringify({ updatedISO }) + "\n");
+  fs.writeFileSync(STAMP, JSON.stringify({ publishedISO }) + "\n");
   console.log("drew assets/auspol-card.png · " + (buf.length / 1024).toFixed(0)
-    + " KB · data dated " + updatedISO);
+    + " KB · data dated " + publishedISO);
   console.log("stamped assets/auspol-card.json · run build.mjs to re-stamp og:image");
 } finally {
   await browser.close();

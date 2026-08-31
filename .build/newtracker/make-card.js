@@ -188,10 +188,15 @@
      fits without taking it from them. */
   const marg = L.alp2pp - L.lnp2pp, chg = L.alp2pp - L.alp2ppPrev;
   c.textAlign = "right";
-  /* Sentence case with the rest of the card. L.updated already arrives as
-     "28 August 2026", so the upcasing that fed the caps setting simply goes -
+  /* The PUBLICATION date of the most recent poll, which is what the site's own
+     "Updated" stamp shows - not `updated`, the end of its fieldwork. The two
+     are routinely days apart (28 vs 30 August as this is written), so the card
+     was previewing the site as staler than it is.
+
+     Sentence case with the rest of the card: L.published already arrives as
+     "30 August 2026", so the upcasing that fed the caps setting simply goes,
      and the 2.2px tracking with it, being what carried the caps. */
-  caps("Updated " + L.updated, W - PAD, 74, 13.5, 0, T.ink3, 600);
+  caps("Updated " + L.published, W - PAD, 74, 13.5, 0, T.ink3, 600);
   c.font = "600 40px Newsreader, Georgia, serif"; c.fillStyle = T.ink;
   c.fillText((marg >= 0 ? "Labor" : "Coalition") + " leads by " + Math.abs(marg).toFixed(1), W - PAD, 116);
   // one line, not two: the caveats belong beside the sentence they qualify.
@@ -334,8 +339,14 @@
   oc.imageSmoothingEnabled = true; oc.imageSmoothingQuality = "high";
   oc.drawImage(cv, 0, 0, W, H);
   const png = out.toDataURL("image/png");
-  window.__auspolCard = { png, updatedISO: L.updatedISO };
-  console.log("card drawn for data dated " + L.updatedISO
+  /* Stamped on the date the card SHOWS. It used to stamp updatedISO while
+     showing the same field; now that the face carries `published`, a stamp on
+     fieldwork end would let the card go stale invisibly - a poll's publisher
+     being corrected moves `published` and not `updated`, which is a real edit
+     in this repo's history, and build.mjs would have called the card current
+     while it displayed the old date. */
+  window.__auspolCard = { png, publishedISO: L.publishedISO };
+  console.log("card drawn for data dated " + L.publishedISO
               + " – put this in assets/auspol-card.json");
   const a = document.createElement("a");
   a.download = "auspol-card.png"; a.href = png; a.click();

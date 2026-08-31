@@ -424,12 +424,17 @@ html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + buildStaticSummary() + "
    a stale one pass unremarked, and it can stop scrapers serving a cached old
    card once a new one exists. The date the card was drawn for is recorded
    beside it; ?v= makes every redraw a new URL as far as a scraper is
-   concerned, because they key their caches on the full URL. */
+   concerned, because they key their caches on the full URL.
+
+   Stamped on publishedISO, which is the date the card puts on its own face.
+   It was updatedISO - the end of the most recent poll's FIELDWORK - and a
+   correction to a poll's publisher moves one and not the other, so the check
+   could call a card current while it showed a date the site no longer did. */
 let cardStamp = null;
 try {
-  cardStamp = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-card.json"), "utf8")).updatedISO;
+  cardStamp = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-card.json"), "utf8")).publishedISO;
 } catch (_) { /* no stamp: reported below */ }
-const dataStamp = grabLatest().updatedISO;
+const dataStamp = grabLatest().publishedISO;
 if (cardStamp !== dataStamp) {
   console.warn(`\n  ! share card is drawn for ${cardStamp || "an unrecorded date"}, data is ${dataStamp}`);
   console.warn(`    it will preview figures that are not the ones on the page.`);
