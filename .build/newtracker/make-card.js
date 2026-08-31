@@ -283,12 +283,14 @@
   });
   c.restore();
 
+  /* The 50% rule, unlabelled. It carried "50% – TIE" - kept as "tie" rather
+     than "majority", since 50% 2PP is a tied national vote and not a majority
+     of seats - but the shading already runs from the leader's line down to
+     this rule, and the standfirst has said who leads and by how much. A
+     dashed line under a lead reads as the tie without being told. */
   c.setLineDash([3, 6]); c.strokeStyle = T.ink3; c.lineWidth = 1.4; c.globalAlpha = 0.7;
   c.beginPath(); c.moveTo(CX0, sy(50)); c.lineTo(CX1, sy(50)); c.stroke();
   c.setLineDash([]); c.globalAlpha = 1;
-  // "tie", not "majority" – 50% 2PP is a tied national vote, not a
-  // majority of seats, and the page label says the same thing
-  caps("50% – TIE", PAD, sy(50) + 21, 12, 1.3, T.ink3, 700);
 
   [[lPts, T.lnp], [aPts, T.alp]].forEach(([pts, col]) => {
     c.beginPath(); c.moveTo(pts[0][0], pts[0][1]); curve(pts);
