@@ -188,7 +188,10 @@
      fits without taking it from them. */
   const marg = L.alp2pp - L.lnp2pp, chg = L.alp2pp - L.alp2ppPrev;
   c.textAlign = "right";
-  caps("UPDATED " + L.updated.toUpperCase(), W - PAD, 74, 13, 2.2, T.ink3, 700);
+  /* Sentence case with the rest of the card. L.updated already arrives as
+     "28 August 2026", so the upcasing that fed the caps setting simply goes -
+     and the 2.2px tracking with it, being what carried the caps. */
+  caps("Updated " + L.updated, W - PAD, 74, 13.5, 0, T.ink3, 600);
   c.font = "600 40px Newsreader, Georgia, serif"; c.fillStyle = T.ink;
   c.fillText((marg >= 0 ? "Labor" : "Coalition") + " leads by " + Math.abs(marg).toFixed(1), W - PAD, 116);
   // one line, not two: the caveats belong beside the sentence they qualify.
