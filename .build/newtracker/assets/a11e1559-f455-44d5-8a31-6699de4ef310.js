@@ -1834,8 +1834,10 @@ function PdSec({ label, absent, children }) {
 /* One preference contest as a single sentence line. Two figures read as a
    head-to-head ("53% ALP vs 47% L/NP"), three run on with dashes. When the
    section holds more than one contest each line names its matchup first, so
-   the reader never has to match a line to its pairing by position. */
-function TppLine({ c, prefixed }) {
+   the reader never has to match a line to its pairing by position. An
+   optional trailing note names the allocation basis where a second pair
+   appears. */
+function TppLine({ c, prefixed, note }) {
   const segs = c.segs.filter((x) => x.value != null);
   const mat = c.lab.replace(/^2PP · /, "").replace(/^3-cornered · /, "")
                    .replace(/ · Derived$/, c.derived ? " (derived)" : "");
@@ -1849,6 +1851,7 @@ function TppLine({ c, prefixed }) {
           <ChgParen d={x.delta} />
         </React.Fragment>
       ))}
+      {note && <span className="pd-s-note"> ({note})</span>}
     </p>
   );
 }
@@ -1906,7 +1909,11 @@ function PollLedger({ r, dirSegments }) {
     <div className="pd-simple">
 
       <PdSec label={tppHeading(tcs)}>
-        {tcs.map((c, i) => <TppLine key={"t" + i} c={c} prefixed={tcs.length > 1} />)}
+        {/* name the main pair's basis only when the flows second line joins
+            it – a single pair needs no disambiguation, and a derived pair
+            (3-cornered waves) is never the respondent-allocated one */}
+        {tcs.map((c, i) => <TppLine key={"t" + i} c={c} prefixed={tcs.length > 1}
+          note={c.kind === "2pp" && !c.derived && r.tppFlows != null ? "respondent-allocated" : null} />)}
         {/* Roy Morgan's second ALP–L/NP 2PP: same question, 2025's preference
             flows applied to these primaries, so it gets its own line and is
             never folded into the respondent-allocated pair */}

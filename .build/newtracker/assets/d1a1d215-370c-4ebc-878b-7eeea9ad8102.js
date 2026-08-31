@@ -2910,7 +2910,12 @@ function infoTerms(D) {
     { id: "undecided", term: "Undecided", body: (
       <>Electors who won’t name a party – the “can’t say” share – shown beside the soft share who
       name one but won’t call their choice firm. They are different questions with different
-      wordings, so the panel keeps them as separate lines rather than one averaged measure.</>) },
+      wordings, so the panel keeps them as separate lines rather than one averaged measure. Where
+      the undecided sit differs by house too, and a poll’s breakdown says which: “set aside”
+      (Roy Morgan, DemosAU) takes the can’t-say share out of the base before the party shares are
+      computed, so the primaries sum to 100; “inside the pair” (Essential) leaves them inside the
+      published two-party pair, which then sums to under 100; and “not firm” (Resolve) is not
+      undecided at all – a share of the decided, who named a party but might still move.</>) },
     { id: "weighted-aggregate", term: "Weighted aggregate", body: (
       <>The headline method. Recent and larger polls count for more, and each pollster’s figure is
       adjusted for its own {xref("house-effect", "weighted aggregate", "house effect")}. Where one
