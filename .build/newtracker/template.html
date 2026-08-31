@@ -1108,8 +1108,15 @@ body.dark .dl-bloom { opacity: 1; }
 .seg-btn.active { box-shadow: inset 0 1px 0 var(--btn-lit), 0 1px 2px var(--btn-shade),
                               0 3px 6px -3px var(--btn-shade); }
 /* the checkbox is a well until it is filled, then it is a raised cap */
-.pg-check input { box-shadow: inset 0 1px 2px var(--btn-press); }
-.pg-check input:checked { box-shadow: inset 0 1px 0 var(--btn-lit), 0 1px 1.5px var(--btn-shade); }
+/* Empty, it is a well. Deeper than the first attempt, which at 13px was too
+   faint to read as anything. */
+.pg-check input { box-shadow: inset 0 1.5px 2.5px var(--btn-press); }
+/* Filled, it is a cap sitting in that well - lit by a gradient across its own
+   face rather than by `inset 0 1px 0 white`, which on a saturated fill read as
+   a strip of gloss laid over the colour instead of light falling on it. */
+.pg-check input:checked {
+  box-shadow: 0 1px 1.5px var(--btn-shade), 0 2px 4px -2px var(--btn-shade);
+}
 
 /* A bevel, not an outline. A 1px border of one colour is a drawn edge; a real
    one is lit on its crown and shaded under its lower lip. The border stays -
@@ -2745,11 +2752,17 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
   background: var(--surface); cursor: pointer; position: relative;
   transition: background 0.12s ease, border-color 0.12s ease;
 }
-.pg-check input:checked { background: var(--accent); border-color: var(--accent); }
+.pg-check input:checked {
+  background: linear-gradient(to bottom,
+    color-mix(in oklch, white 15%, var(--accent)), var(--accent));
+  border-color: color-mix(in oklch, black 14%, var(--accent));
+}
+/* Thinner strokes and a shorter tail: 2px arms on a 13px box put more ink in
+   the tick than in the space around it, and the long arm ran into the corner. */
 .pg-check input:checked::after {
-  content: ""; position: absolute; left: 4px; top: 1px;
-  width: 3px; height: 7px; border: solid var(--chart-bg);
-  border-width: 0 2px 2px 0; transform: rotate(45deg);
+  content: ""; position: absolute; left: 4.2px; top: 1.7px;
+  width: 2.8px; height: 6.2px; border: solid var(--chart-bg);
+  border-width: 0 1.7px 1.7px 0; transform: rotate(43deg);
 }
 .pg-check input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* cycle-chart checkboxes colour their label to the party once switched on;
