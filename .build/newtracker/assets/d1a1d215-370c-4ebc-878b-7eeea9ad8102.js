@@ -2316,9 +2316,9 @@ function AllPollsView({ focus, onBack, backLabel }) {
         {/* The lead column is a 2PP idea, so its controls live and die with
             that view – and they are one button, because choosing the matchup
             and filtering by who holds it are the same thought. The button and
-            the view's "With a 2PP" scope pill share the ap-2line wrapper: on
-            big screens it unfolds into the bar's row in place; on a phone it
-            becomes a line of its own, the pair side by side. */}
+            the view's "With a 2PP" scope pill share the ap-2line wrapper,
+            which unfolds into the bar's flex row at every width: the lead
+            toggle lands right after Contains, even on a phone. */}
         {facet === "twopp" && (
           <div className="ap-2line">
             <FilterPop id="lead" label="Lead" open={pop} setOpen={setPop}

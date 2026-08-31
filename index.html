@@ -2524,15 +2524,11 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-count strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* 2PP's own pair: the lead control and the view's "With a 2PP" scope pill
-   share one wrapper. Big screens unfold it (display: contents) so the pair
-   joins the bar's flex row in place; under 560px the wrapper becomes a full-
-   width line of its own at the END of the bar, the phone showing the lead
-   toggle beside what it scopes instead of shoving the count onto a ragged
-   line alone. */
+   share one wrapper, but the wrapper never takes a box of its own – at
+   every width it unfolds (display: contents) so the lead toggle flows in
+   the bar's flex row right after Contains, wrapping onto the next line
+   with the rest of the toggles on a phone. */
 .ap-bar .ap-2line { display: contents; }
-@media (max-width: 560px) {
-  .ap-bar .ap-2line { display: flex; align-items: center; gap: 8px; flex: 0 0 100%; order: 1; }
-}
 
 .ap-search {
   position: relative; display: inline-flex; align-items: center; max-width: 320px;
