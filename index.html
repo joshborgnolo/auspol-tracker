@@ -4576,7 +4576,17 @@ window.AP = (function () {
     c.querySelectorAll(".sr-only").forEach((n) => n.remove());
     return (c.textContent || "").replace(/\s+/g, " ").trim();
   };
-  const col = (el, prop) => (el ? getComputedStyle(el)[prop || "color"] : "#000");
+  const col = (el, prop) => (el ? getComputedStyle(el)[prop || "color"] : null);
+  /* Resolved through a probe rather than read as a raw token, because a canvas
+     fillStyle wants a resolved colour - the same trick make-card.js uses. */
+  const inkVar = (name) => {
+    const el = document.createElement("span");
+    el.style.color = "var(" + name + ")";
+    document.body.appendChild(el);
+    const v = getComputedStyle(el).color;
+    el.remove();
+    return v;
+  };
 
   /* Every chart card has the same bones - a title, a subtitle or a readout,
      the chart, a legend, sometimes a caption - so one composer draws them all
@@ -4618,12 +4628,13 @@ window.AP = (function () {
   };
 
   const composeCardInner = (target, svgEl) => new Promise((resolve, reject) => {
-    const T = {
-      bg: pageBg(),
-      ink: col(document.querySelector(".card-title")),
-      ink2: col(document.querySelector(".lead-tag")) || col(document.querySelector(".card-title")),
-      ink3: col(document.querySelector(".card-sub")) || col(document.querySelector(".hero-caption")),
-    };
+    /* Taken from the theme's own tokens, not from whichever element happened
+       to be on screen. ink2 used to come from .lead-tag, which exists only in
+       the hero - so on every other card col() fell through to its "#000"
+       default and the legend was drawn in hard black. Invisible on a dark
+       page, and indistinguishable from correct on a light one, which is why
+       it survived. col() no longer has a black default either. */
+    const T = { bg: pageBg(), ink: inkVar("--ink"), ink2: inkVar("--ink-2"), ink3: inkVar("--ink-3") };
     const sans = getComputedStyle(document.querySelector(".card-sub") || document.body).fontFamily;
     const serif = getComputedStyle(document.querySelector(".card-title") || document.body).fontFamily;
 
