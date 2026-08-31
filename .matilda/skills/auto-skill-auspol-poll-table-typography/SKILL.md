@@ -1,6 +1,6 @@
 ---
 name: auspol-poll-table-typography
-description: auspol-tracker — type-size map of the Latest-polls and All-polls tables. BOTH tables share class `poll-table archive` (a11e1559 PollsterTable ~:2688 + d1a1d215 archive ~:2408), so one template.html size change covers both. Desktop cell 16px / pollster-name 16px / apub numerals 14.5px; th stays 13px (deliberately tracks .meta-k); the ≤1000px (13.5px) and ≤480/430px ladders are viewport-FIT tuning — .ap-wrap is overflow:visible so an over-wide table scrolls the PAGE, not a scroller. Bump sizes in .build/newtracker/template.html, rebuild, grep index.html.
+description: auspol-tracker — type-size map of the Latest-polls and All-polls tables. BOTH tables share class `poll-table archive` (a11e1559 PollsterTable ~:2688 + d1a1d215 archive ~:2408), so one template.html size change covers both. Desktop cell 17px / pollster-name 17px / apub numerals 15.5px / PPM share-keys 12.5px; th stays 13px (deliberately tracks .meta-k); the ≤1000px (13.5px) and ≤480/430px ladders are viewport-FIT tuning — .ap-wrap is overflow:visible so an over-wide table scrolls the PAGE, not a scroller. PPM figures exist ONLY under the Leadership facet, so probes of the default 2PP facet find no `.share-compact`. Bump sizes in .build/newtracker/template.html, rebuild, grep index.html.
 source: auto-skill
 extracted_at: '2026-08-31T05:05:04.621Z'
 ---
@@ -18,15 +18,18 @@ is exactly these two tables, and editing one size changes both at once.
 
 ## Where the sizes live (all in `.build/newtracker/template.html`)
 
-- `.poll-table { … font-size: 16px; }` (~:1754) — universal base for both tables.
-- `.poll-table th { font-size: 13px; … }` (~:1755) — **intentional**: the comment there says
+- `.poll-table { … font-size: 17px; }` (~:1816) — universal base for both tables.
+- `.poll-table th { font-size: 13px; … }` (~:1817) — **intentional**: the comment there says
   "the same 13px semibold ink-3 label as .meta-k: track them alike". Do NOT scale th with
   the cells without updating .meta-k compare-or-contrast expectations.
-- `.pollster-name { font-size: 16px; }` (~:1767) — the bold display name in the first column.
-- `.pollster-mode { font-size: 12px; }` (~:1797) — the client/sub-line, its own scale.
-- `.poll-table.archive { font-size: 16px; }` (~:3125) — restates the base; keep equal.
-- `.apub { font-size: 14.5px; }` (~:3175) — the archive's as-published dot numerals; sits a
+- `.pollster-name { font-size: 17px; }` (~:1829) — the bold display name in the first column.
+- `.pollster-mode { font-size: 12.5px; }` (~:1859) — the client/sub-line, its own scale.
+- `.poll-table.archive { font-size: 17px; }` (~:3182) — restates the base; keep equal.
+- `.apub { font-size: 15.5px; }` (~:3232) — the archive's as-published dot numerals; sits a
   deliberate step under cell size.
+- `.share-compact .share-keys { font-size: 12.5px; gap: 4px 10px; }` (~:1918) — the table PPM
+  figures (leader name + share numeral under the mini bar). ShareBar is only ever rendered
+  `compact` in the PPM column, so this rule is exactly "the ppm figures" and nothing else.
 
 ## The narrow ladders are viewport-fit tuning — do not bump blindly
 
@@ -43,6 +46,10 @@ wide for the viewport does not scroll in-place; it pushes the whole **page** sid
 Every point of size at narrow widths must be earned by columns shedding first. When a user
 says the table type is too small "on my laptop" the fix is the >1000px desktop rules — a
 full-width laptop window never hits the ladders.
+
+Probe gotcha: at exactly 500px (Chrome headless's minimum window width) only the ≤1000px
+block fires, so cells read 13.5px while `.pollster-name` stays desktop-sized — expected, the
+name/mode ladder rules live in the ≤480/≤430px blocks. Real phone widths hit those.
 
 ## Procedure (thanks commit d952219, 2026-08-31)
 
