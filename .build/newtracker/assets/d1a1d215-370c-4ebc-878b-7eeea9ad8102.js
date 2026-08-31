@@ -1629,17 +1629,17 @@ function ArchPollDetail({ p, onBack, backLabel }) {
     ),
   ].filter(Boolean);
 
-  /* The line's split: what the poll IS flows from the left, what the reader
-     can DO sits flush right - report at the band's right edge, the way back
-     where it is present beside it. The pair stays together under nowrap, and
-     if the band wraps the pair lands on its own line still flush right. Where
-     even the pair doesn't fit, a container query drops the button's label and
+  /* The band's split: what the poll IS occupies the left region and wraps on
+     itself; what the reader can DO is docked to the band's top-right corner,
+     on the first line beside published and sample, however many lines the
+     metadata runs to. The pair stays together under nowrap; where even the
+     pair doesn't fit, the container query drops the button's label and
      leaves the icon. */
 
   return (
     <div className="poll-detail">
-      <div className="pd-meta">
-        {metaItems}
+      <div className="pd-meta pd-meta-split">
+        <span className="pd-meta-items">{metaItems}</span>
         {controls.length > 0 && <span className="pd-meta-tail">{controls}</span>}
       </div>
       <PollLedger r={p} dirSegments={dirSegments} />

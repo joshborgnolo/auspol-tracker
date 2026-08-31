@@ -1724,15 +1724,24 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-report:hover { color: var(--ink); }
 /* the meta line carries text and now a control, so centre what sits in it */
 .pd-meta { align-items: center; }
-/* The controls are bracketed flush right in the band, against the table's
-   own right edge - the report of an error goes where a reader looks for an
-   action, not among the items that describe the poll. margin-left: auto
-   keeps them there whether the line wraps or not, and the nowrap keeps the
-   pair together rather than letting the two buttons break apart. */
+/* The band's split: the metadata occupies the left region and wraps on
+   itself; the controls are docked to the band's top-right corner - report at
+   the right edge, the way back where it is present beside it - and they stay
+   on the first line, beside published and sample, however many lines the
+   metadata runs to. Chained on .pd-meta because the base .pd-meta block sits
+   LATER in this sheet and would otherwise retake flex-wrap: wrap - at 500px
+   the items region fills the row and the controls drop to the band's bottom
+   left. (The Latest-polls band keeps the plain wrapping-inline rule: no
+   controls ever ride in it.) */
+.pd-meta.pd-meta-split { flex-wrap: nowrap; align-items: flex-start; }
+.pd-meta-split .pd-meta-items {
+  display: flex; flex-wrap: wrap; gap: 6px 26px;
+  flex: 1 1 auto; min-width: 0;
+}
 .pd-meta-tail {
   display: inline-flex; align-items: center; gap: 10px;
   flex-wrap: nowrap; min-width: 0;
-  margin-left: auto;
+  flex: 0 0 auto;
 }
 /* Below this the label will not fit beside the figures it sits with - the
    archive's own band runs 742px of items at 796px wide, and the labelled
@@ -12184,18 +12193,20 @@ function ArchPollDetail({
     className: "pd-report-lbl"
   }, "Report an error"))].filter(Boolean);
 
-  /* The line's split: what the poll IS flows from the left, what the reader
-     can DO sits flush right - report at the band's right edge, the way back
-     where it is present beside it. The pair stays together under nowrap, and
-     if the band wraps the pair lands on its own line still flush right. Where
-     even the pair doesn't fit, a container query drops the button's label and
+  /* The band's split: what the poll IS occupies the left region and wraps on
+     itself; what the reader can DO is docked to the band's top-right corner,
+     on the first line beside published and sample, however many lines the
+     metadata runs to. The pair stays together under nowrap; where even the
+     pair doesn't fit, the container query drops the button's label and
      leaves the icon. */
 
   return /*#__PURE__*/React.createElement("div", {
     className: "poll-detail"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-meta"
-  }, metaItems, controls.length > 0 && /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta pd-meta-split"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-items"
+  }, metaItems), controls.length > 0 && /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-tail"
   }, controls)), /*#__PURE__*/React.createElement(PollLedger, {
     r: p,
