@@ -76,6 +76,15 @@ mis-parse evidence that drove this design. The Chrome path is a rescue for "no o
 all", its output still subject to the caller's guards, and the caller must let conflicts fail
 loud rather than coin-flip.
 
+## Known site outcomes
+
+- `theaustralian.com.au` — works; full subscriber article HTML via the piggyback.
+- **`afr.com` — DEAD END for article bodies** (verified 2026-08-31 across sessions): the body
+  is paywall-trimmed server/client-side even in the user's subscribed Chrome — no figures in
+  the DOM, metas, or Flourish embeds. Topic pages (`afr.com/topic/…`), however, DO render
+  article titles/links via plain unauthenticated fetch (~1 MB HTML) — use them for
+  DETECTION only (see redbridge-accent-extraction's AFR topic-page cross-check).
+
 ## Testing the whole chain headlessly-ish
 
 - Helper alone: `node .build/chrome-article.mjs <live-url> > /tmp/page.html; echo $?` — expect
