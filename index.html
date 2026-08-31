@@ -625,8 +625,8 @@ body.dark .dl-bloom { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   /* the shadows are static; nothing here needs suppressing */
 }
-.dl-track { position: relative; height: 62px; cursor: default; touch-action: none; }
-.dl-track:not(.playing) { cursor: ew-resize; }
+/* grabbable at all times now, including mid-replay */
+.dl-track { position: relative; height: 62px; cursor: ew-resize; touch-action: none; }
 .dl-track:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 3px; border-radius: 6px; }
 .dl-spark { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .dl-spark-50 {
@@ -1601,7 +1601,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 
 /* ---------- table ---------- */
 .table-wrap { overflow-x: auto; margin: 0 -4px; }
-.poll-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.poll-table { width: 100%; border-collapse: collapse; font-size: 16px; }
 .poll-table th {
   text-align: center; font-weight: 600; font-size: 13px;
   color: var(--ink-3); padding: 0 12px 10px;
@@ -1614,7 +1614,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .poll-table tr:last-child td { border-bottom: 0; }
 .poll-table tbody tr:hover { background: var(--surface-2); }
 .pollster-cell { line-height: 1.25; }
-.pollster-name { display: block; font-weight: 700; color: var(--ink); font-size: 15px; }
+.pollster-name { display: block; font-weight: 700; color: var(--ink); font-size: 16px; }
 
 /* A linked pollster name reads as the name first and a link second: no blue,
    no permanent underline. The ↗ is the standing signal that it leaves the
@@ -1644,7 +1644,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 .ptag.hit { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
-.pollster-mode { display: block; margin-top: 1px; font-size: 11.5px; color: var(--ink-3); }
+.pollster-mode { display: block; margin-top: 1px; font-size: 12px; color: var(--ink-3); }
 .released-pill {
   display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
   background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
@@ -2967,7 +2967,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
    overflow must stay visible here – any overflow on the wrapper turns it into
    the sticky containing block and the thead can never pin to the viewport. */
 .ap-wrap { border-bottom: 1px solid var(--line-2); overflow: visible; }
-.poll-table.archive { font-size: 15px; }
+.poll-table.archive { font-size: 16px; }
 .poll-table.archive thead th {
   position: sticky; top: 39px; z-index: 2; background: var(--bg);
   /* generous topside padding – the th background paints this gap, so the
@@ -3019,7 +3019,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    record, so no bar ink (65 near-identical 53/47 bars carry nothing) */
 .apub {
   display: inline-flex; align-items: center; gap: 12px;
-  font-variant-numeric: tabular-nums; font-size: 13.5px; font-weight: 600; color: var(--ink);
+  font-variant-numeric: tabular-nums; font-size: 14.5px; font-weight: 600; color: var(--ink);
 }
 .apub-seg { display: inline-flex; align-items: center; gap: 5px; }
 .apub-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
@@ -12504,23 +12504,29 @@ function archLeadInfo(p, measure) {
 // it – its held-by filter and sort run off archLeadInfo directly, and a
 // primary margin must not leak into that ordering. Display-only, same opt-in
 // principle as the 3cp derivation this file already notes inline.
+// The margin runs against the poll's STRONGEST rival, not always the
+// Coalition: One Nation's primary now tops the L/NP vote in some waves, so an
+// "ALP +10" vs a third-placed Coalition would hide that Labor actually
+// trails One Nation. The note names the rival so the margin can't be misread.
 function primaryLeadInfo(p) {
   if (!p.p || p.p.alp == null || p.p.lnp == null) return null;
-  const m = +(p.p.alp - p.p.lnp).toFixed(1);
+  const opp = [["lnp", "L/NP", p.p.lnp, "var(--lnp)"], ["onp", "ON", p.p.onp, "var(--onp)"], ["grn", "GRN", p.p.grn, "var(--grn)"]].filter(e => e[2] != null).sort((a, b) => b[2] - a[2])[0];
+  const m = +(p.p.alp - opp[2]).toFixed(1);
+  const alpWins = m >= 0;
   return {
     m,
     primary: true,
-    who: m >= 0 ? "alp" : "lnp",
-    lab: m >= 0 ? "ALP" : "L/NP",
-    color: m >= 0 ? "var(--alp)" : "var(--lnp)",
+    who: alpWins ? "alp" : opp[0],
+    lab: alpWins ? "ALP" : opp[1],
+    color: alpWins ? "var(--alp)" : opp[3],
     segs: [{
       v: p.p.alp,
       color: "var(--alp)"
     }, {
-      v: p.p.lnp,
-      color: "var(--lnp)"
+      v: opp[2],
+      color: opp[3]
     }],
-    note: " on primary votes – the poll published no after-preferences figure"
+    note: ` over ${alpWins ? opp[1] : "ALP"} on primary votes – the poll published no after-preferences figure`
   };
 }
 function ArchLead({
@@ -14963,12 +14969,24 @@ function DialStory({
     }));
   }, []);
 
-  // land, register that it is wound back, then run
+  /* land, register that it is wound back, then run - unless the reader gets
+     there first. The timer used to be unconditional, so grabbing the track
+     inside the opening 900ms was overruled a moment later: the replay started
+     anyway and dragged the playhead back to the election under the hand that
+     was holding it. Anything that takes the transport cancels it. */
+  const autoStartRef = useRef(0);
   useEffect(() => {
     if (reduce) return;
-    const t = setTimeout(() => setPlaying(true), 900);
-    return () => clearTimeout(t);
+    autoStartRef.current = setTimeout(() => setPlaying(true), 900);
+    return () => clearTimeout(autoStartRef.current);
   }, []);
+  const takeOver = () => {
+    if (autoStartRef.current) {
+      clearTimeout(autoStartRef.current);
+      autoStartRef.current = 0;
+    }
+    setPlaying(false);
+  };
 
   // ---- the replay ----
   useEffect(() => {
@@ -15013,8 +15031,9 @@ function DialStory({
         ev.preventDefault();
         onClose();
       }
-      if (!playing && (ev.key === "ArrowLeft" || ev.key === "ArrowRight")) {
+      if (ev.key === "ArrowLeft" || ev.key === "ArrowRight") {
         ev.preventDefault();
+        takeOver(); // as with the drag, a step takes the wheel
         setF(v => Math.max(0, Math.min(n - 1, Math.round(v) + (ev.key === "ArrowRight" ? 1 : -1))));
       }
     };
@@ -15030,25 +15049,71 @@ function DialStory({
     };
   }, [playing, n]);
 
-  // ---- scrub ----
-  const scrubTo = clientX => {
+  /* ---- scrub ----
+     Two things were wrong with dragging this.
+      It was refused outright while the replay ran, so the only way to look at a
+     particular month was to sit through the term first. Taking hold of the
+     track now takes over from the playback, the way grabbing any transport
+     does: the replay stops where the hand caught it and the drag continues
+     from there.
+      And it was heavy. Every pointermove read getBoundingClientRect - a forced
+     layout, on an element inside a dialog with a blurred backdrop - and then
+     set a float state, re-rendering the whole instrument. A pointer emits
+     moves faster than frames, so several full renders were being done per
+     frame and thrown away. The rect is measured once when the drag starts and
+     the moves are coalesced onto one render per frame. */
+  const rafRef = useRef(0);
+  const pendXRef = useRef(0);
+  const applyScrub = () => {
+    rafRef.current = 0;
+    /* Measured per FRAME, not per event and not once per drag. Per event was
+       the original cost - a forced layout for every pointermove. Once per drag
+       was my first fix and was wrong: the shell flies in over ~900ms, so a
+       reader who grabs the track early caches a rect of a still-scaling
+       element and drags against it for the rest of the gesture. Once a frame
+       is one read per render either way, and never stale. */
     const el = scrubRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const p = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+    if (!r.width) return;
+    const p = Math.max(0, Math.min(1, (pendXRef.current - r.left) / r.width));
     setF(p * (n - 1));
   };
+  const queueScrub = clientX => {
+    pendXRef.current = clientX;
+    if (!rafRef.current) rafRef.current = requestAnimationFrame(applyScrub);
+  };
+  useEffect(() => () => {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+  }, []);
   const onScrubDown = e => {
-    if (playing) return;
+    const el = scrubRef.current;
+    if (!el) return;
     e.preventDefault();
-    scrubTo(e.clientX);
-    const move = ev => scrubTo(ev.clientX);
-    const up = () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
+    takeOver(); // the hand wins over the clock
+    try {
+      el.setPointerCapture(e.pointerId);
+    } catch (_) {/* not fatal */}
+    queueScrub(e.clientX);
+    const move = ev => {
+      ev.preventDefault();
+      queueScrub(ev.clientX);
     };
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
+    const end = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", end);
+      window.removeEventListener("pointercancel", end);
+      /* land on the last position rather than dropping a queued frame */
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        applyScrub();
+      }
+    };
+    window.addEventListener("pointermove", move, {
+      passive: false
+    });
+    window.addEventListener("pointerup", end);
+    window.addEventListener("pointercancel", end);
   };
   const i = Math.max(0, Math.min(n - 1, Math.round(f)));
   const cur = story[i];
@@ -15126,13 +15191,13 @@ function DialStory({
     className: "dl-track" + (playing ? " playing" : ""),
     ref: scrubRef,
     onPointerDown: onScrubDown,
-    role: playing ? undefined : "slider",
+    role: "slider",
     "aria-valuemin": 0,
     "aria-valuemax": n - 1,
     "aria-valuenow": i,
     "aria-valuetext": `${monthLabel}: Labor ${cur.lab.toFixed(1)} against ${cur.oppName} ${cur.opp.toFixed(1)}`,
     "aria-label": "Month",
-    tabIndex: playing ? -1 : 0
+    tabIndex: 0
   }, /*#__PURE__*/React.createElement(DialTrack, {
     story: story,
     f: f,

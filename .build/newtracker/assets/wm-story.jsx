@@ -575,12 +575,21 @@ function DialStory({ originRect, onClose }) {
     }));
   }, []);
 
-  // land, register that it is wound back, then run
+  /* land, register that it is wound back, then run - unless the reader gets
+     there first. The timer used to be unconditional, so grabbing the track
+     inside the opening 900ms was overruled a moment later: the replay started
+     anyway and dragged the playhead back to the election under the hand that
+     was holding it. Anything that takes the transport cancels it. */
+  const autoStartRef = useRef(0);
   useEffect(() => {
     if (reduce) return;
-    const t = setTimeout(() => setPlaying(true), 900);
-    return () => clearTimeout(t);
+    autoStartRef.current = setTimeout(() => setPlaying(true), 900);
+    return () => clearTimeout(autoStartRef.current);
   }, []);
+  const takeOver = () => {
+    if (autoStartRef.current) { clearTimeout(autoStartRef.current); autoStartRef.current = 0; }
+    setPlaying(false);
+  };
 
   // ---- the replay ----
   useEffect(() => {
@@ -617,8 +626,9 @@ function DialStory({ originRect, onClose }) {
   useEffect(() => {
     const onKey = (ev) => {
       if (ev.key === "Escape") { ev.preventDefault(); onClose(); }
-      if (!playing && (ev.key === "ArrowLeft" || ev.key === "ArrowRight")) {
+      if (ev.key === "ArrowLeft" || ev.key === "ArrowRight") {
         ev.preventDefault();
+        takeOver();               // as with the drag, a step takes the wheel
         setF((v) => Math.max(0, Math.min(n - 1, Math.round(v) + (ev.key === "ArrowRight" ? 1 : -1))));
       }
     };
@@ -634,22 +644,63 @@ function DialStory({ originRect, onClose }) {
     };
   }, [playing, n]);
 
-  // ---- scrub ----
-  const scrubTo = (clientX) => {
+  /* ---- scrub ----
+     Two things were wrong with dragging this.
+
+     It was refused outright while the replay ran, so the only way to look at a
+     particular month was to sit through the term first. Taking hold of the
+     track now takes over from the playback, the way grabbing any transport
+     does: the replay stops where the hand caught it and the drag continues
+     from there.
+
+     And it was heavy. Every pointermove read getBoundingClientRect - a forced
+     layout, on an element inside a dialog with a blurred backdrop - and then
+     set a float state, re-rendering the whole instrument. A pointer emits
+     moves faster than frames, so several full renders were being done per
+     frame and thrown away. The rect is measured once when the drag starts and
+     the moves are coalesced onto one render per frame. */
+  const rafRef = useRef(0);
+  const pendXRef = useRef(0);
+
+  const applyScrub = () => {
+    rafRef.current = 0;
+    /* Measured per FRAME, not per event and not once per drag. Per event was
+       the original cost - a forced layout for every pointermove. Once per drag
+       was my first fix and was wrong: the shell flies in over ~900ms, so a
+       reader who grabs the track early caches a rect of a still-scaling
+       element and drags against it for the rest of the gesture. Once a frame
+       is one read per render either way, and never stale. */
     const el = scrubRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const p = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
+    if (!r.width) return;
+    const p = Math.max(0, Math.min(1, (pendXRef.current - r.left) / r.width));
     setF(p * (n - 1));
   };
+  const queueScrub = (clientX) => {
+    pendXRef.current = clientX;
+    if (!rafRef.current) rafRef.current = requestAnimationFrame(applyScrub);
+  };
+  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+
   const onScrubDown = (e) => {
-    if (playing) return;
+    const el = scrubRef.current;
+    if (!el) return;
     e.preventDefault();
-    scrubTo(e.clientX);
-    const move = (ev) => scrubTo(ev.clientX);
-    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); };
-    window.addEventListener("pointermove", move);
-    window.addEventListener("pointerup", up);
+    takeOver();                   // the hand wins over the clock
+    try { el.setPointerCapture(e.pointerId); } catch (_) { /* not fatal */ }
+    queueScrub(e.clientX);
+    const move = (ev) => { ev.preventDefault(); queueScrub(ev.clientX); };
+    const end = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", end);
+      window.removeEventListener("pointercancel", end);
+      /* land on the last position rather than dropping a queued frame */
+      if (rafRef.current) { cancelAnimationFrame(rafRef.current); applyScrub(); }
+    };
+    window.addEventListener("pointermove", move, { passive: false });
+    window.addEventListener("pointerup", end);
+    window.addEventListener("pointercancel", end);
   };
 
   const i = Math.max(0, Math.min(n - 1, Math.round(f)));
@@ -708,10 +759,10 @@ function DialStory({ originRect, onClose }) {
             bare month index would describe none of it. */}
         <div className={"dl-track" + (playing ? " playing" : "")} ref={scrubRef}
              onPointerDown={onScrubDown}
-             role={playing ? undefined : "slider"}
+             role="slider"
              aria-valuemin={0} aria-valuemax={n - 1} aria-valuenow={i}
              aria-valuetext={`${monthLabel}: Labor ${cur.lab.toFixed(1)} against ${cur.oppName} ${cur.opp.toFixed(1)}`}
-             aria-label="Month" tabIndex={playing ? -1 : 0}>
+             aria-label="Month" tabIndex={0}>
           <DialTrack story={story} f={f} evs={evs} playing={playing} />
         </div>
 

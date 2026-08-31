@@ -775,8 +775,8 @@ body.dark .dl-bloom { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   /* the shadows are static; nothing here needs suppressing */
 }
-.dl-track { position: relative; height: 62px; cursor: default; touch-action: none; }
-.dl-track:not(.playing) { cursor: ew-resize; }
+/* grabbable at all times now, including mid-replay */
+.dl-track { position: relative; height: 62px; cursor: ew-resize; touch-action: none; }
 .dl-track:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 3px; border-radius: 6px; }
 .dl-spark { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
 .dl-spark-50 {
@@ -1751,7 +1751,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 
 /* ---------- table ---------- */
 .table-wrap { overflow-x: auto; margin: 0 -4px; }
-.poll-table { width: 100%; border-collapse: collapse; font-size: 15px; }
+.poll-table { width: 100%; border-collapse: collapse; font-size: 16px; }
 .poll-table th {
   text-align: center; font-weight: 600; font-size: 13px;
   color: var(--ink-3); padding: 0 12px 10px;
@@ -1764,7 +1764,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .poll-table tr:last-child td { border-bottom: 0; }
 .poll-table tbody tr:hover { background: var(--surface-2); }
 .pollster-cell { line-height: 1.25; }
-.pollster-name { display: block; font-weight: 700; color: var(--ink); font-size: 15px; }
+.pollster-name { display: block; font-weight: 700; color: var(--ink); font-size: 16px; }
 
 /* A linked pollster name reads as the name first and a link second: no blue,
    no permanent underline. The ↗ is the standing signal that it leaves the
@@ -1794,7 +1794,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 .ptag.hit { background: var(--ink); color: var(--bg); border-color: var(--ink); }
 
-.pollster-mode { display: block; margin-top: 1px; font-size: 11.5px; color: var(--ink-3); }
+.pollster-mode { display: block; margin-top: 1px; font-size: 12px; color: var(--ink-3); }
 .released-pill {
   display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
   background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
@@ -3117,7 +3117,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
    overflow must stay visible here – any overflow on the wrapper turns it into
    the sticky containing block and the thead can never pin to the viewport. */
 .ap-wrap { border-bottom: 1px solid var(--line-2); overflow: visible; }
-.poll-table.archive { font-size: 15px; }
+.poll-table.archive { font-size: 16px; }
 .poll-table.archive thead th {
   position: sticky; top: 39px; z-index: 2; background: var(--bg);
   /* generous topside padding – the th background paints this gap, so the
@@ -3169,7 +3169,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    record, so no bar ink (65 near-identical 53/47 bars carry nothing) */
 .apub {
   display: inline-flex; align-items: center; gap: 12px;
-  font-variant-numeric: tabular-nums; font-size: 13.5px; font-weight: 600; color: var(--ink);
+  font-variant-numeric: tabular-nums; font-size: 14.5px; font-weight: 600; color: var(--ink);
 }
 .apub-seg { display: inline-flex; align-items: center; gap: 5px; }
 .apub-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
