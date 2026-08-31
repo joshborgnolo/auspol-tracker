@@ -314,53 +314,71 @@
   };
   const col = (el, prop) => (el ? getComputedStyle(el)[prop || "color"] : "#000");
 
-  const composeTpp = async (target) => {
+  /* Every chart card has the same bones - a title, a subtitle or a readout,
+     the chart, a legend, sometimes a caption - so one composer draws them all
+     and the hero is simply the card that has a readout instead of a subtitle.
+     Three legend idioms exist across the tabs (.hl-item on the hero,
+     .legend-chip on primary vote, .cyc-chip on past cycles) and each swatch is
+     read for the mark it actually is, so a rule, a dot, a shaded band and a
+     square are not all drawn as lines. */
+  const readLegend = (target) =>
+    [...target.querySelectorAll(".hl-item, .legend-chip, .cyc-chip")].map((i) => {
+      const sw = i.querySelector(".hl-line,.hl-dashed,.hl-band,.hl-dot,.hl-swatch-dot,.legend-swatch,.cyc-swatch");
+      const k = sw ? (sw.className || "") : "";
+      const cs2 = sw ? getComputedStyle(sw) : null;
+      /* Joined from the chip's own parts, not read off it whole: a legend chip
+         is <span>Labor</span><span>27.8%</span> with only a flex gap between
+         them, so concatenating the text gave "Labor27.8%". Items whose label
+         is a bare text node beside the swatch fall back to reading the chip. */
+      const parts = [...i.children]
+        .filter((ch) => !/swatch|hl-line|hl-dashed|hl-band|hl-dot/.test(ch.className || ""))
+        .map((ch) => txt(ch)).filter(Boolean);
+      return {
+        label: parts.length ? parts.join(" ") : txt(i),
+        kind: /hl-line/.test(k) ? "line" : /hl-dashed/.test(k) ? "dashed"
+            : /hl-band/.test(k) ? "band" : /legend-swatch/.test(k) ? "square" : "dot",
+        fill: cs2 ? (cs2.backgroundColor !== "rgba(0, 0, 0, 0)" ? cs2.backgroundColor
+                                                               : cs2.borderTopColor) : "#888",
+        /* a chip switched off is still on the page, so it is still in the
+           copy - at the weight the page gives it, not silently dropped */
+        alpha: (cs2 ? (parseFloat(cs2.opacity) || 1) : 1) * (i.classList.contains("off") ? 0.45 : 1),
+      };
+    });
+
+  const composeCard = async (target) => {
     const svgEl = target.querySelector("svg.chart-svg");
     if (!svgEl) throw new Error("no chart to compose");
     const restore = await widenForCopy(svgEl);
-    try { return await composeTppInner(target, svgEl); }
+    try { return await composeCardInner(target, svgEl); }
     finally { restore(); }
   };
 
-  const composeTppInner = (target, svgEl) => new Promise((resolve, reject) => {
-    const cs = getComputedStyle(document.body);
+  const composeCardInner = (target, svgEl) => new Promise((resolve, reject) => {
     const T = {
       bg: pageBg(),
-      ink: cs.getPropertyValue("--ink") ? col(document.querySelector(".card-title")) : "#222",
-      ink2: col(document.querySelector(".lead-tag")),
-      ink3: col(document.querySelector(".hi-note")) || col(document.querySelector(".hero-caption")),
+      ink: col(document.querySelector(".card-title")),
+      ink2: col(document.querySelector(".lead-tag")) || col(document.querySelector(".card-title")),
+      ink3: col(document.querySelector(".card-sub")) || col(document.querySelector(".hero-caption")),
     };
-    const sans = getComputedStyle(document.querySelector(".hi-note") || document.body).fontFamily;
+    const sans = getComputedStyle(document.querySelector(".card-sub") || document.body).fontFamily;
     const serif = getComputedStyle(document.querySelector(".card-title") || document.body).fontFamily;
 
+    const isHero = !!target.querySelector(".hero-readout");
     const parties = [...target.querySelectorAll(".ro-party")].map((p) => ({
       name: txt(p.querySelector(".ro-name")),
       num: txt(p.querySelector(".ro-num")),
       dot: col(p.querySelector(".ro-dot"), "backgroundColor"),
       ink: col(p.querySelector(".ro-num")),
     }));
-    const legend = [...target.querySelectorAll(".hl-item")].map((i) => {
-      const sw = i.querySelector("span");
-      const k = sw ? sw.className : "";
-      const cs2 = sw ? getComputedStyle(sw) : null;
-      return {
-        label: txt(i),
-        /* a rule, a dot and a shaded band are three different marks, and a
-           legend that drew all three as a line would be describing a chart
-           that does not exist */
-        kind: /hl-line/.test(k) ? "line" : /hl-dashed/.test(k) ? "dashed"
-            : /hl-band/.test(k) ? "band" : "dot",
-        fill: cs2 ? (cs2.backgroundColor !== "rgba(0, 0, 0, 0)"
-                     ? cs2.backgroundColor : cs2.borderTopColor) : "#888",
-        alpha: cs2 ? (parseFloat(cs2.opacity) || 1) : 1,
-      };
-    });
+    const legend = readLegend(target);
     const meta = [txt(target.querySelector(".hi-method")), txt(target.querySelector(".hi-range")),
                   txt(target.querySelector(".hi-note"))].filter(Boolean).join("  ·  ");
     const lead = [txt(target.querySelector(".lead-tag")), txt(target.querySelector(".delta")),
                   txt(target.querySelector(".hero-sub-note"))].filter(Boolean).join("  ");
-    const title = txt(target.querySelector(".card-title")) || "Two-party preferred";
-    const caption = txt(target.querySelector(".hero-caption"));
+    const title = txt(target.querySelector(".card-title, h2, h3")) || "auspol tracker";
+    const sub = txt(target.querySelector(".card-sub"));
+    const caption = txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
+    const hero = isHero && parties.length === 2;
 
     const { markup, w: vw, h: vh } = bakeSvg(svgEl);
     const img = new Image();
@@ -369,12 +387,27 @@
       try {
         const S = 2, W = 1200, PAD = 64, IW = W - PAD * 2;
         const chartH = Math.round(IW * (vh / vw));
-        /* Laid out top-down with real measurements, so nothing can collide the
-           way flex did when its gaps were dropped. */
-        const c0 = document.createElement("canvas").getContext("2d");
-        c0.font = "400 15px " + sans;
-        const capLines = wrapText(c0, caption, IW);
-        const H = 96 + 104 + 30 + 28 + 26 + chartH + 44 + (capLines.length * 22) + 44;
+        const m = document.createElement("canvas").getContext("2d");
+
+        /* Measured before anything is drawn: the canvas has to be the right
+           height before the first stroke, and a legend of five chips or a
+           three-line caption is not a fixed cost. */
+        m.font = "400 15px " + sans;
+        const capLines = wrapText(m, caption, IW);
+        m.font = "600 14px " + sans;
+        const LEG_GAP = 26, SW_W = 26;
+        const legLines = [];
+        let line = [], used = 0;
+        legend.forEach((it) => {
+          const w = SW_W + m.measureText(it.label).width + LEG_GAP;
+          if (used + w > IW && line.length) { legLines.push(line); line = []; used = 0; }
+          line.push(it); used += w;
+        });
+        if (line.length) legLines.push(line);
+
+        const headBlock = hero ? 92 + 34 + 26 : (sub ? 40 : 8);
+        const H = 76 + headBlock + 30 + chartH + 34 + legLines.length * 26
+                + (capLines.length ? 8 + capLines.length * 22 : 0) + 56;
 
         const cv = document.createElement("canvas");
         cv.width = W * S; cv.height = H * S;
@@ -387,102 +420,87 @@
         c.fillStyle = T.ink; c.font = "600 40px " + serif;
         c.fillText(title, PAD, y);
 
-        /* The readout, mirrored about a rule the way the page sets it -
-           measured and centred rather than trusted to a flex row. */
-        y += 92;
-        let FIG = 68, NAME = 19; const DOT = 6, G = 14;
-        c.font = "800 " + FIG + "px " + sans;
-        const wNum = parties.map((p) => c.measureText(p.num).width);
-        c.font = "700 " + NAME + "px " + sans;
-        const wName = parties.map((p) => c.measureText(p.name).width);
-        let rowW = DOT * 2 + G + wName[0] + G + wNum[0] + G + 2 + G
-                 + wNum[1] + G + wName[1] + G + DOT * 2;
-        /* A fixed composition still has to survive a wide readout - "Labor v
-           One Nation" sets longer names than the headline pair. Shrink the
-           figure until the row fits rather than letting it run off the edge,
-           which is the failure mode the DOM capture had. */
-        if (rowW > IW) {
-          const k = IW / rowW;
-          FIG = Math.floor(FIG * k); NAME = Math.floor(NAME * k);
+        if (hero) {
+          y += 92;
+          let FIG = 68, NAME = 19; const DOT = 6, G = 14;
           c.font = "800 " + FIG + "px " + sans;
-          for (let i = 0; i < parties.length; i++) wNum[i] = c.measureText(parties[i].num).width;
+          const wNum = parties.map((p) => c.measureText(p.num).width);
           c.font = "700 " + NAME + "px " + sans;
-          for (let i = 0; i < parties.length; i++) wName[i] = c.measureText(parties[i].name).width;
-          rowW = DOT * 2 + G + wName[0] + G + wNum[0] + G + 2 + G
-               + wNum[1] + G + wName[1] + G + DOT * 2;
-        }
-        /* Left, with everything else. Centring it made the one element that
-           did not line up with the title, the method line or the caption. */
-        let x = PAD;
-        const dot = (cx, fill) => { c.beginPath(); c.arc(cx, y - FIG * 0.28, DOT, 0, 7);
-          c.fillStyle = fill; c.fill(); };
-        dot(x + DOT, parties[0].dot); x += DOT * 2 + G;
-        c.font = "700 " + NAME + "px " + sans; c.fillStyle = T.ink2;
-        c.fillText(parties[0].name, x, y); x += wName[0] + G;
-        c.font = "800 " + FIG + "px " + sans; c.fillStyle = parties[0].ink;
-        c.fillText(parties[0].num, x, y); x += wNum[0] + G;
-        c.strokeStyle = T.ink3; c.globalAlpha = 0.35; c.lineWidth = 2;
-        c.beginPath(); c.moveTo(x + 1, y - FIG * 0.78); c.lineTo(x + 1, y + 4); c.stroke();
-        c.globalAlpha = 1; x += 2 + G;
-        c.font = "800 " + FIG + "px " + sans; c.fillStyle = parties[1].ink;
-        c.fillText(parties[1].num, x, y); x += wNum[1] + G;
-        c.font = "700 " + NAME + "px " + sans; c.fillStyle = T.ink2;
-        c.fillText(parties[1].name, x, y); x += wName[1] + G;
-        dot(x + DOT, parties[1].dot);
-
-        y += 34;
-        c.font = "600 15px " + sans; c.fillStyle = T.ink3;
-        c.fillText(meta, PAD, y);
-        y += 26;
-        c.font = "700 15px " + sans; c.fillStyle = T.ink2;
-        c.fillText(lead, PAD, y);
+          const wName = parties.map((p) => c.measureText(p.name).width);
+          let x = PAD;
+          const dot = (cx, fill) => { c.beginPath(); c.arc(cx, y - FIG * 0.28, DOT, 0, 7);
+            c.fillStyle = fill; c.fill(); };
+          dot(x + DOT, parties[0].dot); x += DOT * 2 + G;
+          c.font = "700 " + NAME + "px " + sans; c.fillStyle = T.ink2;
+          c.fillText(parties[0].name, x, y); x += wName[0] + G;
+          c.font = "800 " + FIG + "px " + sans; c.fillStyle = parties[0].ink;
+          c.fillText(parties[0].num, x, y); x += wNum[0] + G;
+          c.strokeStyle = T.ink3; c.globalAlpha = 0.35; c.lineWidth = 2;
+          c.beginPath(); c.moveTo(x + 1, y - FIG * 0.78); c.lineTo(x + 1, y + 4); c.stroke();
+          c.globalAlpha = 1; x += 2 + G;
+          c.font = "800 " + FIG + "px " + sans; c.fillStyle = parties[1].ink;
+          c.fillText(parties[1].num, x, y); x += wNum[1] + G;
+          c.font = "700 " + NAME + "px " + sans; c.fillStyle = T.ink2;
+          c.fillText(parties[1].name, x, y); x += wName[1] + G;
+          dot(x + DOT, parties[1].dot);
+          y += 34;
+          c.font = "600 15px " + sans; c.fillStyle = T.ink3; c.fillText(meta, PAD, y);
+          y += 26;
+          c.font = "700 15px " + sans; c.fillStyle = T.ink2; c.fillText(lead, PAD, y);
+        } else if (sub) {
+          y += 32;
+          c.font = "400 16px " + sans; c.fillStyle = T.ink3;
+          c.fillText(wrapText(c, sub, IW)[0] || sub, PAD, y);
+          y += 8;
+        } else { y += 8; }
 
         y += 30;
         c.drawImage(img, PAD, y, IW, chartH);
-        y += chartH + 30;
+        y += chartH + 34;
 
-        /* the legend, drawn rather than screenshotted, so its rule swatches
-           keep their colour and its items keep their spacing */
-        let lx = PAD;
         c.font = "600 14px " + sans;
-        legend.forEach((it) => {
-          const tw = c.measureText(it.label).width;
-          const my = y - 5;
-          c.save(); c.globalAlpha = it.alpha;
-          if (it.kind === "line" || it.kind === "dashed") {
-            c.strokeStyle = it.fill; c.lineWidth = 3; c.lineCap = "round";
-            if (it.kind === "dashed") c.setLineDash([4, 4]);
-            c.beginPath(); c.moveTo(lx, my); c.lineTo(lx + 18, my); c.stroke();
-            c.setLineDash([]);
-          } else if (it.kind === "band") {
-            /* .hl-band is a two-stop gradient of the two party colours, and a
-               gradient has no backgroundColor to read - the swatch came out
-               the grey of a fallback border. Rebuilt from the series colours
-               the legend is already carrying. */
-            const two = legend.filter((l) => l.kind === "line").map((l) => l.fill);
-            const g = c.createLinearGradient(0, my - 5, 0, my + 6);
-            g.addColorStop(0, two[0] || it.fill); g.addColorStop(1, two[1] || two[0] || it.fill);
-            c.globalAlpha = 0.22; c.fillStyle = g;
-            c.beginPath(); c.roundRect(lx, my - 5, 18, 11, 2); c.fill();
-          } else {
-            c.fillStyle = it.fill;
-            c.beginPath(); c.arc(lx + 5, my, 4.5, 0, 7); c.fill();
-          }
-          c.restore();
-          c.fillStyle = T.ink2; c.fillText(it.label, lx + 26, y);
-          lx += 26 + tw + 24;
+        legLines.forEach((ln) => {
+          let lx = PAD;
+          ln.forEach((it) => {
+            const tw = c.measureText(it.label).width, my = y - 5;
+            c.save(); c.globalAlpha = it.alpha;
+            if (it.kind === "line" || it.kind === "dashed") {
+              c.strokeStyle = it.fill; c.lineWidth = 3; c.lineCap = "round";
+              if (it.kind === "dashed") c.setLineDash([4, 4]);
+              c.beginPath(); c.moveTo(lx, my); c.lineTo(lx + 18, my); c.stroke();
+              c.setLineDash([]);
+            } else if (it.kind === "band") {
+              const two = legend.filter((l) => l.kind === "line").map((l) => l.fill);
+              const g = c.createLinearGradient(0, my - 5, 0, my + 6);
+              g.addColorStop(0, two[0] || it.fill); g.addColorStop(1, two[1] || two[0] || it.fill);
+              c.globalAlpha = it.alpha * 0.22; c.fillStyle = g;
+              c.beginPath(); c.roundRect(lx, my - 5, 18, 11, 2); c.fill();
+            } else if (it.kind === "square") {
+              c.fillStyle = it.fill;
+              c.beginPath(); c.roundRect(lx + 3, my - 5, 11, 11, 2); c.fill();
+            } else {
+              c.fillStyle = it.fill;
+              c.beginPath(); c.arc(lx + 5, my, 4.5, 0, 7); c.fill();
+            }
+            c.restore();
+            c.fillStyle = T.ink2; c.fillText(it.label, lx + SW_W, y);
+            lx += SW_W + tw + LEG_GAP;
+          });
+          y += 26;
         });
 
-        y += 30;
-        c.font = "400 15px " + sans; c.fillStyle = T.ink3;
-        capLines.forEach((ln) => { c.fillText(ln, PAD, y); y += 22; });
+        if (capLines.length) {
+          y += 8;
+          c.font = "400 15px " + sans; c.fillStyle = T.ink3;
+          capLines.forEach((ln) => { c.fillText(ln, PAD, y); y += 22; });
+        }
 
         c.font = "600 15px " + sans; c.fillStyle = T.ink2;
         c.textAlign = "right";
         c.fillText("auspoltracker.com", W - PAD, H - 34);
         c.textAlign = "left";
 
-        cv.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob returned null"))), "image/png");
+        cv.toBlob((b2) => (b2 ? resolve(b2) : reject(new Error("toBlob returned null"))), "image/png");
       } catch (e) { reject(e); }
     };
     img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(markup);
@@ -595,24 +613,19 @@
   const copyChart = (host) => {
     const target = pickTarget(host);
     const svg = host.querySelector("svg.chart-svg");
-    /* The hero is composed; everything else is still captured. One chart
-       proven end to end beats six renderers half-tested, and the capture path
-       stays the fallback if composing throws - a copy that silently produces
-       nothing is worse than one that produces the old picture.
+    /* Every chart is composed now, not just the hero. The capture stays as
+       the fallback if composing throws - a copy that produces nothing is worse
+       than one that produces the old picture - and it says so in the console
+       rather than degrading in silence.
 
-       Found by walking UP from the chart, not by testing whatever pickTarget
-       returned: that walk stops at the nearest ancestor holding a heading or a
-       legend, which is the .hero section on a desktop and an inner wrapper on
-       a phone - so testing its class composed the card at one width and
-       quietly captured at the other, which is exactly the bug being fixed. */
-    const heroEl = host.closest && host.closest(".hero");
-    const composed = !!(heroEl && heroEl.querySelector(".hero-readout") && heroEl.querySelector("svg.chart-svg"));
-    const png = composed
-      ? composeTpp(heroEl).catch((e) => {
-          /* Falling back is right; falling back QUIETLY is not. A composer
-             that throws on one viewport and not another looks like nothing at
-             all from the outside - the copy still works, just worse. */
-          console.warn("copy-chart: composed 2PP failed, captured instead –", e && e.message || e);
+       The card is found by walking UP from the chart rather than by testing
+       whatever pickTarget returned: that walk stops at the nearest ancestor
+       holding a heading or a legend, which differs by viewport, and testing it
+       composed at one width and quietly captured at another. */
+    const card = host.closest && host.closest(".card");
+    const png = (card && card.querySelector("svg.chart-svg"))
+      ? composeCard(card).catch((e) => {
+          console.warn("copy-chart: composed card failed, captured instead –", e && e.message || e);
           return rasterise(target, host);
         })
       : rasterise(target, host);
