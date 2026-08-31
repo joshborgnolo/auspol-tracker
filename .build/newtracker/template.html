@@ -695,6 +695,11 @@ body {
   --well-rim:    color-mix(in oklch, var(--ink) 9%, transparent);
   --well-bounce: color-mix(in oklch, white 45%, transparent);
   --well-sill: color-mix(in oklch, white 85%, transparent);
+  /* the theme rocker: faceplate, the half standing proud, the half pushed in */
+  --sw-plate: color-mix(in oklch, var(--ink) 5%, var(--surface));
+  --sw-cap:   var(--surface);
+  --sw-well:  color-mix(in oklch, var(--ink) 13%, var(--surface));
+  --sw-pivot: color-mix(in oklch, var(--ink) 18%, transparent);
 }
 body.dark {
   --dl-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
@@ -721,6 +726,10 @@ body.dark {
   --well-rim:    color-mix(in oklch, black 34%, transparent);
   --well-bounce: color-mix(in oklch, white 14%, transparent);
   --well-sill: color-mix(in oklch, white 10%, transparent);
+  --sw-plate: color-mix(in oklch, black 22%, var(--surface));
+  --sw-cap:   color-mix(in oklch, white 7%, var(--surface));
+  --sw-well:  color-mix(in oklch, black 44%, var(--surface));
+  --sw-pivot: color-mix(in oklch, black 58%, transparent);
 }
 /* ---- the dial's housing -------------------------------------------------
    Glass rather than metal, and the site's own glass: the frosted recipe the
@@ -889,6 +898,59 @@ body.dark .dl-bloom { opacity: 1; }
 .theme-cell:hover { color: var(--ink-2); }
 .theme-cell.active { color: var(--ink); }
 .theme-cell svg { display: block; }
+
+/* ---------- the theme control is a rocker switch -------------------------
+   Not a segmented selector with a chosen cell, which is what it was and what
+   every other .segmented on the site still is. A light switch has one plate
+   and two halves, and the half you press goes IN - so the active theme is the
+   depressed one and the other stands proud. That is the same thing
+   aria-pressed already says, drawn.
+
+   No markup change: the two buttons ARE the two halves, which keeps the
+   semantics and the keyboard behaviour exactly as they were. */
+.theme-seg.segmented {
+  /* Both classes, because .segmented sets the recessed track that every other
+     segmented group wants and it is declared later in this file - as one class
+     it beat the plate and the switch came out sunk into the page. */
+  gap: 0;                        /* the halves meet on a pivot, not across a gap */
+  padding: 3px;
+  border-radius: 10px;
+  background: var(--sw-plate);
+  /* the faceplate is screwed to the wall: raised, like every other control,
+     rather than the recessed track a segmented group gets */
+  box-shadow: inset 0 1px 0 var(--btn-lit),
+              0 1px 1.5px var(--btn-shade),
+              0 3px 6px -3px var(--btn-shade);
+}
+.theme-seg .theme-cell {
+  border: 0; border-radius: 0; padding: 7px 11px;
+  transition-property: background-color, box-shadow, color, transform;
+  transition-duration: .19s;
+}
+.theme-seg .theme-cell:first-child { border-radius: 7px 0 0 7px; }
+.theme-seg .theme-cell:last-child  { border-radius: 0 7px 7px 0; }
+/* The pivot the rocker turns on. A border rather than a box-shadow: the two
+   half rules below both set box-shadow outright, and as a shadow this was
+   simply overwritten - the halves met with no seam at all. */
+.theme-seg .theme-cell:first-child { border-right: 1px solid var(--sw-pivot); }
+/* the half standing proud: lit on its crown, casting onto the plate */
+.theme-seg .theme-cell:not(.active) {
+  background: var(--sw-cap);
+  box-shadow: inset 0 1px 0 var(--btn-lit), 0 1px 1.5px var(--btn-shade);
+}
+/* the half pressed in: shadow cast under the near wall, light off the far
+   one, and the icon travels with it rather than floating over a moved face */
+.theme-seg .theme-cell.active {
+  background: var(--sw-well);
+  box-shadow: inset 0 2px 3px var(--btn-press), inset 0 -1px 0 var(--btn-lit);
+}
+.theme-seg .theme-cell.active svg { transform: translateY(0.5px); }
+/* pressing the proud half starts it moving before the state catches up */
+.theme-seg .theme-cell:not(.active):active {
+  background: var(--sw-well);
+  box-shadow: inset 0 2px 3px var(--btn-press);
+}
+.theme-seg .theme-cell:not(.active):active svg { transform: translateY(0.5px); }
 
 /* ---------- accessibility: keyboard focus ---------- */
 /* single shared focus ring for every interactive control. mouse/touch users
