@@ -1,0 +1,109 @@
+# Reusable poll-agent pipeline — the Roy Morgan pattern (roymorgan-update.yml)
+# generalised. Each caller workflow supplies its own schedule and names the
+# wrapper to run; this file owns the update job (checkout -> wrapper, which
+# extracts/validates/builds/commits/pushes) and the repair job (headless
+# Matilda, only when update fails).
+#
+# The wrappers are idempotent no-ops when there's nothing new upstream, so
+# dense schedules are safe. All wrappers fast-forward to origin/main and skip
+# their slot if main moved underneath them, so the local launchd copies of the
+# same jobs can stay installed as backups.
+
+name: poll-agent (reusable)
+
+on:
+  workflow_call:
+    inputs:
+      house:
+        description: 'House name, e.g. resolve (used in job names/concurrency)'
+        required: true
+        type: string
+      wrapper:
+        description: 'Path to the updater shell script'
+        required: true
+        type: string
+      repair_prompt:
+        description: 'Path to the Matilda repair-agent prompt'
+        required: true
+        type: string
+      apt_packages:
+        description: 'Extra apt packages the extractor needs (e.g. poppler-utils)'
+        required: false
+        type: string
+        default: ''
+      simulate_failure:
+        description: "Force update to fail (exercises the repair job); set to 'true' only via workflow_dispatch"
+        required: false
+        type: string
+        default: 'false'
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    concurrency:
+      group: poll-agent-${{ inputs.house }}
+      cancel-in-progress: false
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install apt packages
+        if: inputs.apt_packages != ''
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ${{ inputs.apt_packages }}
+
+      - name: Install puppeteer-core (best effort, for the share-card redraw)
+        run: npm i puppeteer-core --prefix "$HOME" || true
+
+      - name: Run the ${{ inputs.house }} updater
+        env:
+          CHROME: /usr/bin/google-chrome
+        run: |
+          if [ "${{ inputs.simulate_failure }}" = "true" ]; then
+            echo "simulate_failure requested; failing to exercise the repair job"
+            exit 1
+          fi
+          bash ${{ inputs.wrapper }}
+
+  repair:
+    needs: update
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install apt packages
+        if: inputs.apt_packages != ''
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ${{ inputs.apt_packages }}
+
+      - name: Install puppeteer-core (best effort)
+        run: npm i puppeteer-core --prefix "$HOME" || true
+
+      - name: Install Matilda CLI
+        run: npm i -g @maincode-ai/matilda-code
+
+      - name: Run the repair agent
+        env:
+          MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHROME: /usr/bin/google-chrome
+        run: |
+          if [ -z "$MATILDA_API_KEY" ]; then
+            echo "::warning::MATILDA_API_KEY secret not set; skipping repair. Add it in repo Settings > Secrets."
+            exit 0
+          fi
+          matilda -p "$(cat ${{ inputs.repair_prompt }})" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80

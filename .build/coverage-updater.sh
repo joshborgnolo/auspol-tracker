@@ -22,7 +22,15 @@ cd "$REPO"
 LOG_DIR=".build/logs"
 LOG="$LOG_DIR/coverage.log"
 mkdir -p "$LOG_DIR"
-log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
+log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
+
+# GitHub Actions may push data updates to main between local launchd slots;
+# the check is only meaningful against current main. Untracked files don't
+# count as dirty.
+if git diff --quiet && git diff --cached --quiet; then
+  git fetch origin -q || true
+  git merge --ff-only origin/main >> "$LOG" 2>&1 || log "note: ff-only sync failed; checking against local main"
+fi
 
 OUT="$(node .build/check-coverage.mjs 2>&1)"
 CODE=$?
@@ -55,4 +63,10 @@ log "ALERT $MSG"
 
 osascript -e "display notification \"${MSG//\"/\'}\" with title \"auspol tracker: missing poll\" sound name \"Basso\"" \
   >> "$LOG" 2>&1 || log "note: osascript notification failed (no GUI session?)"
+
+# In CI (GitHub Actions sets CI=true) fail the run so the alert arrives as a
+# GitHub notification email instead of sitting in a logfile nobody reads.
+if [ "${CI:-}" = "true" ]; then
+  exit 1
+fi
 exit 0

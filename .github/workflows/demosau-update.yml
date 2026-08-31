@@ -1,0 +1,29 @@
+# DemosAU poll updater. Irregular ~monthly cadence; cheap daily sweep.
+
+name: demosau-update
+
+on:
+  schedule:
+    - cron: '5 21 * * *' # 07:05 AEST daily
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: 'Force the update job to fail (tests the Matilda repair job)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    uses: ./.github/workflows/poll-agent.yml
+    with:
+      house: demosau
+      wrapper: .build/demosau-updater.sh
+      repair_prompt: .build/demosau-repair-prompt.md
+      apt_packages: poppler-utils
+      simulate_failure: ${{ inputs.simulate_failure }}
+    secrets: inherit

@@ -1,0 +1,21 @@
+# Coverage watchdog — the only scheduled job whose failure IS the message.
+# It compares data/polls.json against Wikipedia's poll table and exits
+# non-zero when a wave exists there that no agent has landed. Runs after the
+# morning data-agent sweeps; a failed run arrives as a GitHub notification
+# email, replacing the local macOS notification.
+
+name: coverage-check
+
+on:
+  schedule:
+    - cron: '30 22 * * *' # 08:30 AEST daily
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check poll coverage against Wikipedia
+        run: bash .build/coverage-updater.sh

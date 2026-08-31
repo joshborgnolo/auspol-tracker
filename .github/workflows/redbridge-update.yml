@@ -1,0 +1,31 @@
+# RedBridge/Accent updater (AFR monthly, usually lands late in the month).
+# Morning + early-evening sweeps; the extractor drives Chrome via CDP itself —
+# ubuntu runners ship google-chrome and CHROME is set by the reusable workflow.
+
+name: redbridge-update
+
+on:
+  schedule:
+    - cron: '15 21 * * *' # 07:15 AEST daily
+    - cron: '15 8 * * *'  # 18:15 AEST daily (evening PDF drops)
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: 'Force the update job to fail (tests the Matilda repair job)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    uses: ./.github/workflows/poll-agent.yml
+    with:
+      house: redbridge
+      wrapper: .build/redbridge-updater.sh
+      repair_prompt: .build/redbridge-repair-prompt.md
+      simulate_failure: ${{ inputs.simulate_failure }}
+    secrets: inherit

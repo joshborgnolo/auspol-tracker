@@ -14,7 +14,20 @@ cd "$REPO"
 LOG_DIR=".build/logs"
 LOG="$LOG_DIR/resolve-rpm.log"
 mkdir -p "$LOG_DIR"
-log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
+log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
+
+# GitHub Actions may push to main between local launchd slots. Refresh first;
+# if the local tree can't fast-forward, skip this slot rather than commit on a
+# stale base. Untracked files don't count as dirty.
+if git diff --quiet && git diff --cached --quiet; then
+  git fetch origin -q || true
+  if ! git merge --ff-only origin/main >> "$LOG" 2>&1; then
+    log "local main diverged from origin/main; skipping slot"
+    exit 0
+  fi
+else
+  log "working tree dirty; skipping freshness sync"
+fi
 
 EXTRACT_OUT="$(node .build/extract-resolve-rpm.mjs 2>&1)"
 CODE=$?
@@ -59,7 +72,7 @@ if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! git push >> "$LOG" 2>&1; then
+if ! git push origin HEAD:main >> "$LOG" 2>&1; then
   log "FAIL git push (commit kept locally)"
   exit 1
 fi

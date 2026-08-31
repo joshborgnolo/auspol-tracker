@@ -18,7 +18,7 @@ log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
 # The GitHub Actions roymorgan-update job may push to main between local
 # launchd slots. Refresh first; if the local tree can't fast-forward, skip
 # this slot rather than commit on a stale base.
-if [ -z "$(git status --porcelain)" ]; then
+if git diff --quiet && git diff --cached --quiet; then
   git fetch origin -q || true
   if ! git merge --ff-only origin/main >> "$LOG" 2>&1; then
     log "local main diverged from origin/main; skipping slot"

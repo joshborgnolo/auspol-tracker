@@ -13,7 +13,20 @@ cd "$REPO"
 LOG_DIR=".build/logs"
 LOG="$LOG_DIR/essential.log"
 mkdir -p "$LOG_DIR"
-log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
+log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
+
+# GitHub Actions may push to main between local launchd slots. Refresh first;
+# if the local tree can't fast-forward, skip this slot rather than commit on a
+# stale base. Untracked files don't count as dirty.
+if git diff --quiet && git diff --cached --quiet; then
+  git fetch origin -q || true
+  if ! git merge --ff-only origin/main >> "$LOG" 2>&1; then
+    log "local main diverged from origin/main; skipping slot"
+    exit 0
+  fi
+else
+  log "working tree dirty; skipping freshness sync"
+fi
 
 EXTRACT_OUT="$(node .build/extract-essential-report.mjs 2>&1)"
 CODE=$?
@@ -52,13 +65,17 @@ if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
   exit 1
 fi
 
-git add data/essential-report.csv data/polls.json .build/essential-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json || { log "FAIL git add"; exit 1; }
+# essential-src has no tracked files (the extractor writes the CSV directly);
+# add it only if this run produced snapshots, so a fresh checkout doesn't fail
+# the add with "pathspec did not match".
+git add data/essential-report.csv data/polls.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json || { log "FAIL git add"; exit 1; }
+[ -d .build/essential-src ] && git add .build/essential-src/ || true
 MSG="Update Essential Report data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! git push >> "$LOG" 2>&1; then
+if ! git push origin HEAD:main >> "$LOG" 2>&1; then
   log "FAIL git push (commit kept locally)"
   exit 1
 fi
