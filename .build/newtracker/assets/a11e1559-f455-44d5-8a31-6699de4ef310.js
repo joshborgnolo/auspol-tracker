@@ -2075,7 +2075,13 @@ function PollDetail({ r }) {
 const DAY_MS = 86400000;
 const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const NP_HORIZON_DAYS = 28;   // one month of schedule
-const NP_MAX_ROWS = 10;       // a busy fortnight shouldn't run off the page
+/* The most rows one horizon can produce with the current field: four weekly
+   Roy Morgans, two fortnightly YouGovs, one appearance each for the six
+   houses on a monthly-or-looser rhythm. A cap BELOW that spent the field's
+   last row rather than the busiest house's fourth – RedBridge's one monthly
+   slot was being cut while Roy Morgan's fourth weekly one kept its place.
+   If a house joins or leaves, this number moves with it. */
+const NP_MAX_ROWS = 12;
 /* A house nobody has timed keeps its whole day: with no hour recorded there is
    no moment to say has passed, so the row stays "today" until today is over
    rather than being rolled off the list by an hour we invented for it. */
@@ -2782,9 +2788,7 @@ function PollsterTable() {
       </div>
       <p className="table-hint">
         Tap any poll to see its full breakdown · Click a column heading to sort · “—” Means the pollster didn’t ask that question.
-        {" "}<strong>Published</strong> is the day the poll was released, taken from the source each row links
-        to – not the last day of fieldwork, which is the next column. A dashed date is a fallback: publication
-        day isn’t recorded for that poll, so the column shows its fieldwork end instead.
+        {" "}<strong>Published</strong> is the day the poll was released, taken from the source each row links to.
         {" "}Each house’s systematic lean – its house effect – sits beside poll lean in the All polls archive.
       </p>
     </section>

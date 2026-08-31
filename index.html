@@ -9403,7 +9403,13 @@ function PollDetail({
 const DAY_MS = 86400000;
 const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 const NP_HORIZON_DAYS = 28; // one month of schedule
-const NP_MAX_ROWS = 10; // a busy fortnight shouldn't run off the page
+/* The most rows one horizon can produce with the current field: four weekly
+   Roy Morgans, two fortnightly YouGovs, one appearance each for the six
+   houses on a monthly-or-looser rhythm. A cap BELOW that spent the field's
+   last row rather than the busiest house's fourth – RedBridge's one monthly
+   slot was being cut while Roy Morgan's fourth weekly one kept its place.
+   If a house joins or leaves, this number moves with it. */
+const NP_MAX_ROWS = 12;
 /* A house nobody has timed keeps its whole day: with no hour recorded there is
    no moment to say has passed, so the row stays "today" until today is over
    rather than being rolled off the list by an hour we invented for it. */
@@ -10182,7 +10188,7 @@ function PollsterTable() {
     }))));
   })))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll to see its full breakdown \xB7 Click a column heading to sort \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t ask that question.", " ", /*#__PURE__*/React.createElement("strong", null, "Published"), " is the day the poll was released, taken from the source each row links to \u2013 not the last day of fieldwork, which is the next column. A dashed date is a fallback: publication day isn\u2019t recorded for that poll, so the column shows its fieldwork end instead.", " ", "Each house\u2019s systematic lean \u2013 its house effect \u2013 sits beside poll lean in the All polls archive."));
+  }, "Tap any poll to see its full breakdown \xB7 Click a column heading to sort \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t ask that question.", " ", /*#__PURE__*/React.createElement("strong", null, "Published"), " is the day the poll was released, taken from the source each row links to.", " ", "Each house\u2019s systematic lean \u2013 its house effect \u2013 sits beside poll lean in the All polls archive."));
 }
 Object.assign(window, {
   UndecidedLine,
