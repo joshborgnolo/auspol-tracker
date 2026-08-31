@@ -2457,13 +2457,6 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.79); } /* 19 → 15 *
   line-height: 19px;
 }
 .tab-note { font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-/* a tab with a long and a short name shows the short one on phone widths
-   (Info ↔ Information) */
-.tab-lab-narrow { display: none; }
-@media (max-width: 640px) {
-  .tab-lab-wide { display: none; }
-  .tab-lab-narrow { display: inline; }
-}
 .tab:hover { color: var(--ink-2); }
 .tab.active { color: var(--ink); }
 .tab::after {
@@ -10432,13 +10425,7 @@ function Tabs({
     onClick: () => onChange(t.id)
   }, /*#__PURE__*/React.createElement("span", {
     className: "tab-label"
-  }, t.labelNarrow
-  /* a tab that names itself in full where the bar is wide and
-     abbreviates on phones carries both spans; CSS keeps one */ ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
-    className: "tab-lab-wide"
-  }, t.label), /*#__PURE__*/React.createElement("span", {
-    className: "tab-lab-narrow"
-  }, t.labelNarrow)) : t.label), t.note != null && /*#__PURE__*/React.createElement("span", {
+  }, t.label), t.note != null && /*#__PURE__*/React.createElement("span", {
     className: "tab-note"
   }, t.note)))), /*#__PURE__*/React.createElement(TabScore, {
     onGoHero: goHero,
@@ -16473,13 +16460,11 @@ const TABS = [{
 /* pinHide: the docked 2PP score takes this end of the bar once the bar
    pins, and on a phone there is not room for both. The glossary is the one
    tab a reader is never mid-task in, so it is the one that yields. The CSS
-   gates the hide to phone widths only – a wide bar has room for the full
-   tab set plus the score, so Information stays put there, its label
-   abbreviating to "Info" only on the same phone widths. */
+   gates the hide to phone widths – a wide bar has room for the full tab
+   set plus the score, so Info stays put there. */
 {
   id: "info",
-  label: "Information",
-  labelNarrow: "Info",
+  label: "Info",
   pinHide: true,
   tip: "About this site – how it works, what it tracks, and the terms it uses"
 }];

@@ -128,14 +128,7 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
                       className={"tab" + (active === t.id ? " active" : "")
                                  + (t.pinHide ? " tab-pinhide" : "")}
                       onClick={() => onChange(t.id)}>
-                <span className="tab-label">{t.labelNarrow
-                  /* a tab that names itself in full where the bar is wide and
-                     abbreviates on phones carries both spans; CSS keeps one */
-                  ? <React.Fragment>
-                      <span className="tab-lab-wide">{t.label}</span>
-                      <span className="tab-lab-narrow">{t.labelNarrow}</span>
-                    </React.Fragment>
-                  : t.label}</span>
+                <span className="tab-label">{t.label}</span>
                 {t.note != null && <span className="tab-note">{t.note}</span>}
               </button>
             ))}

@@ -2607,13 +2607,6 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.79); } /* 19 → 15 *
   line-height: 19px;
 }
 .tab-note { font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-/* a tab with a long and a short name shows the short one on phone widths
-   (Info ↔ Information) */
-.tab-lab-narrow { display: none; }
-@media (max-width: 640px) {
-  .tab-lab-wide { display: none; }
-  .tab-lab-narrow { display: inline; }
-}
 .tab:hover { color: var(--ink-2); }
 .tab.active { color: var(--ink); }
 .tab::after {
