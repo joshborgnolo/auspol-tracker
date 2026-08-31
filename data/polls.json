@@ -4183,8 +4183,8 @@
     {
       "date": "2026-01-29",
       "firm": "RedBridge / Accent",
-      "alb": 42,
-      "opp": 29,
+      "alb": 37,
+      "opp": 9,
       "oppName": "Ley",
       "han": null,
       "extra": null
@@ -4255,8 +4255,8 @@
     {
       "date": "2026-02-27",
       "firm": "RedBridge / Accent",
-      "alb": 33,
-      "opp": 14,
+      "alb": 34,
+      "opp": 10,
       "oppName": "Taylor",
       "han": 23,
       "extra": null
@@ -4295,6 +4295,15 @@
       "opp": 36,
       "oppName": "Taylor",
       "han": null,
+      "extra": null
+    },
+    {
+      "date": "2026-03-27",
+      "firm": "RedBridge / Accent",
+      "alb": 33,
+      "opp": 14,
+      "oppName": "Taylor",
+      "han": 23,
       "extra": null
     },
     {
