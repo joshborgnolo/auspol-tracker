@@ -583,8 +583,12 @@ function TrendChart(props) {
     }
     return null;
   };
+  /* Named because the plot clip has to know them: a dot is placed by its
+     CENTRE, so a clip drawn at the plot's edge shaves the outer half of any
+     reading that sits on it. */
+  const DOT_R = 4.2, DOT_R_LIVE = 6.5;
   const dotEls = (arr, live) => arr.map((d, i) => {
-    const cx = sx(d.x), cy = sy(d.y), r = live && dot === d ? 6.5 : 4.2;
+    const cx = sx(d.x), cy = sy(d.y), r = live && dot === d ? DOT_R_LIVE : DOT_R;
     /* no per-dot pointer listeners: both inputs pick from the svg root, so
        nothing here depends on a browser firing enter/leave on an SVG child */
     const common = { className: "scatter-dot", fill: d.color,
@@ -600,7 +604,7 @@ function TrendChart(props) {
      group: only the polls that published both matchups move, so this is ~90
      circles a frame rather than the ~330 on the chart. */
   const moveDots = scatterMove.map((d, i) => (
-    <circle key={"m" + i} cx={sx(d.x)} cy={sy(d.y)} r={4.2}
+    <circle key={"m" + i} cx={sx(d.x)} cy={sy(d.y)} r={DOT_R}
             className="scatter-dot" fill={d.color} opacity={0.6 * (d.op != null ? d.op : 1)} />
   ));
 
@@ -704,7 +708,17 @@ function TrendChart(props) {
               cloud; this one only ever means "inside the plot", which is what
               keeps dots off the axis labels as the window zooms past them. */}
           <clipPath id={plotId}>
-            <rect x={pad.l} y="0" width={W - pad.l - pad.r} height={H} />
+            {/* Slack of one live dot radius either side, for the reason the
+                clip above carries slack for a line cap: the most recent poll
+                sits ON the right edge of the plot, and a clip drawn exactly
+                there cut the outer 1.2 units off it - a visibly flat-sided
+                dot at the end of every chart. Dots are placed by their centre,
+                so anything genuinely outside the window is still hidden: its
+                centre is far past the boundary, not on it. The left gutter has
+                10 units between the axis labels and the plot, so the same
+                slack there clears them. */}
+            <rect x={pad.l - DOT_R_LIVE} y="0"
+                  width={W - pad.l - pad.r + DOT_R_LIVE * 2} height={H} />
           </clipPath>
           {/* One travelling window per line that asked for one. The <g> below
               still carries the chart-wide clip; these intersect with it. */}
