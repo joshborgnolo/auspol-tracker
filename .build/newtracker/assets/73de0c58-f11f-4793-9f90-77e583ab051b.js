@@ -943,7 +943,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && (
             <label className={"pg-check" + (showSynth ? " on" : "")} title="Also draw what the same polls’ primary votes imply when run through one fixed preference-flow table (the 2025 election’s actual flows). A diagnostic, not a correction.">
               <input type="checkbox" checked={showSynth} onChange={(e) => setShowSynth(e.target.checked)} />
-              Compare implied 2PP
+              Compare{" "}
+              <button type="button" className="hi-term"
+                      title="What an implied two-party figure is"
+                      onClick={(e) => { e.preventDefault();
+                        window.AP.openTerm && window.AP.openTerm("implied-2pp", "two-party preferred"); }}>
+                implied 2PP
+              </button>
             </label>
           )}
         </div>
@@ -997,12 +1003,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
         </div>
         <p className="hero-caption">
           {m.real
-            ? ("Each dot is one published poll; the line is a smoothed average across all pollsters, "
+            ? "Each dot is one published poll; the line is a smoothed average across all pollsters, "
               + "shaded with the interval around it. Where the two bands overlap, the lead is "
-              + "inside its own margin of error – the polls cannot separate the parties that month.")
-              + (synthOverlay.length
-                ? " The dashed line reads the same polls’ primaries through the 2025 election’s actual preference flows – a diagnostic, not a correction (see the method note below)."
-                : "")
+              + "inside its own margin of error – the polls cannot separate the parties that month."
             : `Each dot is one pollster’s published ${m.label} head-to-head` +
               (adjusted
                 ? ", adjusted for each house’s lean on this matchup as the headline two-party is."

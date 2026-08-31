@@ -2352,18 +2352,6 @@ function NextPollsPanel() {
   rows.sort((a, b) => first(a) - first(b));
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
 
-  const overdue = rows.some((r) => r.overdue);
-  // which houses are running on a schedule that was stated rather than measured
-  const stated = [...new Set(rows.filter((r) => (r.declared || []).length).map((r) => r.pollster))];
-  /* Which houses are projected from their PUBLICATION dates and which fall back
-     to fieldwork ends. Named rather than described in the abstract: a reader
-     comparing two rows should be able to tell which of them rests on the
-     steadier measure. */
-  const shownHouses = [...new Set(rows.map((r) => r.pollster))];
-  const basisOf = (b) => shownHouses.filter((h) => (cad.find((c) => c.pollster === h) || {}).basis === b);
-  const byPub = basisOf("published"), byField = basisOf("fieldwork");
-  const listOf = (a) => (a.length === 1 ? a[0]
-    : a.slice(0, -1).join(", ") + " and " + a[a.length - 1]);
   // UTC accessors, matching the frame the dates were parsed and compared in –
   // local ones would name the day before for any reader west of Greenwich
   const fmt = (ms) => {
@@ -2607,42 +2595,6 @@ function NextPollsPanel() {
           );
         })}
       </ol>
-
-      <p className="np-foot">
-        Each date is the house’s median interval between its last eight releases, nudged onto
-        the weekday it keeps. What an interval is measured between depends on what the house
-        has on record. Where its recent releases carry publication dates in an unbroken run, it
-        is the gaps between those – which is the thing being forecast, and much the steadier
-        measure: Newspoll’s last eight fieldwork gaps run from 18 days to 31, while it has
-        published exactly three weeks apart six times in eight, all the wobble being in when
-        its fieldwork happened to close.
-        {byPub.length > 0 && ` ${listOf(byPub)} ${byPub.length > 1 ? "are" : "is"} projected that way.`}
-        {byField.length > 0 && ` ${listOf(byField)}, which ${byField.length > 1 ? "have" : "has"} too few recorded publication dates to measure one, ${byField.length > 1 ? "fall" : "falls"} back to the gaps between fieldwork ends plus a publication lag – measured from the dates recorded against each poll, or read from a release URL that carries one, and otherwise a day, which is the field’s.`}
-        {" "}The ± is half
-        the range of those intervals with the longest and shortest set aside, widening for waves
-        further out – in whole weeks for a house pinned to a weekday, since that is the only step
-        its date can take, and dropped where the interval never reaches the day either side.
-        {" "}Where a house
-        has been timed often enough the hour it files is shown too – the span its releases have
-        covered where that is tight, and otherwise the hour it usually keeps, so one late morning
-        doesn’t speak for a house that is normally punctual. Every hour here is the publisher’s
-        own clock and is labelled with it, AEDT through the summer and AEST the rest of the year,
-        because the two are an hour apart and “8 pm” alone names both. Weekday and
-        hour are read off recent releases rather than the whole record, because a schedule is a
-        current fact about a house and its first year is often a different house. A house whose
-        interval is too variable to name a day gets the window its own record supports instead
-        of being left out – DemosAU polls about monthly, but anywhere in a five-week span.
-        {stated.length > 0 && ` ${stated.join(" and ")} ${stated.length > 1 ? "run" : "runs"} on a schedule stated by hand rather than measured, because the recorded releases don’t measure the one the house plainly keeps.`}
-        {" "}A projection is a moment, not a guess: once the hour passes without that release, the
-        date stays exactly where it is and says so, rather than rolling forward onto a date nobody
-        has published.
-        {overdue && " A row past its moment is taken to be a poll not yet published: it counts on to the far edge of its own window, and sorts there too, while the wave can still land inside it, and only reads as missed, in red at the foot of the list, once that edge has passed too. It leaves this list only once that release is added, not on a date guessed in its place."}
-        {" "}Opening a row lists that house’s five most recent releases with the interval between
-        each, and names the house’s own release page, so the estimate can be checked against the
-        thing it was taken from rather than taken on trust.
-        {" "}Houses that have stopped publishing are omitted. “Today” is Sydney’s. These are
-        estimates, not announced dates.
-      </p>
     </section>
   );
 }
