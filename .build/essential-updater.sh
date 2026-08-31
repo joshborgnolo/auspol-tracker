@@ -1,6 +1,6 @@
 #!/bin/bash
 # Scheduled Essential Report update: extract -> if the CSV changed -> validate
-# -> build -> commit -> push. Installed via launchd (plist copied to
+# -> render-card -> build -> commit -> push. Installed via launchd (plist copied to
 # ~/Library/LaunchAgents/local.auspol.essential.plist from the copy in this
 # directory). Every step logs one line to .build/logs/essential.log; any
 # failure exits non-zero before any commit, leaving the working tree with just
@@ -41,12 +41,18 @@ if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
 fi
+# Best-effort card redraw: headless Chrome is flakier than the node steps,
+# so a miss warns (and build.mjs prints its stale-card line) instead of
+# blocking the commit over a social-preview image.
+if ! node .build/newtracker/render-card.mjs >> "$LOG" 2>&1; then
+  log "WARN render-card failed; shipping with the previous card"
+fi
 if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
   log "FAIL build; no commit made"
   exit 1
 fi
 
-git add data/essential-report.csv data/polls.json .build/essential-src/ index.html feed.xml sitemap.xml robots.txt || { log "FAIL git add"; exit 1; }
+git add data/essential-report.csv data/polls.json .build/essential-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json || { log "FAIL git add"; exit 1; }
 MSG="Update Essential Report data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"

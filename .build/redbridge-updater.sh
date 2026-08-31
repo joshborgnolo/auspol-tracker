@@ -1,6 +1,6 @@
 #!/bin/bash
 # Scheduled RedBridge/Accent federal-poll update: extract -> if polls.json
-# changed -> validate -> build -> commit -> push. Installed via launchd
+# changed -> validate -> render-card -> build -> commit -> push. Installed via launchd
 # (plist copied to ~/Library/LaunchAgents/local.auspol.redbridge.plist from
 # the copy in this directory). Every step logs one line to
 # .build/logs/redbridge.log; any failure exits non-zero before any commit,
@@ -44,12 +44,18 @@ if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
 fi
+# Best-effort card redraw: headless Chrome is flakier than the node steps,
+# so a miss warns (and build.mjs prints its stale-card line) instead of
+# blocking the commit over a social-preview image.
+if ! node .build/newtracker/render-card.mjs >> "$LOG" 2>&1; then
+  log "WARN render-card failed; shipping with the previous card"
+fi
 if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
   log "FAIL build; no commit made"
   exit 1
 fi
 
-git add data/polls.json .build/redbridge-src/ index.html feed.xml sitemap.xml robots.txt || { log "FAIL git add"; exit 1; }
+git add data/polls.json .build/redbridge-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json || { log "FAIL git add"; exit 1; }
 MSG="Update RedBridge/Accent poll data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
