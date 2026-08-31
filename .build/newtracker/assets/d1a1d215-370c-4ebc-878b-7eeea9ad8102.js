@@ -2660,7 +2660,10 @@ function infoTerms(D) {
       buys half the error. It prices chance and nothing else: skewed samples, turnout guesses and
       house choices sit outside it. Beside the headline the same idea is carried across
       {" "}{L.method.nPolls} polls at once – currently ±{(L.alp2ppCi95 ?? 0).toFixed(1)} points –
-      as the {xref("interval", "margin of error", "95% interval")}.</>) },
+      as the {xref("interval", "margin of error", "95% interval")}. Pooling that many surveys is
+      what brings the band in narrower than one poll’s own ±3: the chance part of the error
+      shrinks with the square root of the combined sample, while the part every house shares
+      alike does not shrink at all.</>) },
     { id: "monthly-average", term: "Monthly average", body: (
       <>What a matchup gets when too few houses ask it for {xref("house-effect", "monthly average",
       "house effects")} to be estimable: a plain

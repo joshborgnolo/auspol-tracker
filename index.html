@@ -1601,7 +1601,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 
 /* ---------- table ---------- */
 .table-wrap { overflow-x: auto; margin: 0 -4px; }
-.poll-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.poll-table { width: 100%; border-collapse: collapse; font-size: 15px; }
 .poll-table th {
   text-align: center; font-weight: 600; font-size: 13px;
   color: var(--ink-3); padding: 0 12px 10px;
@@ -1614,7 +1614,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .poll-table tr:last-child td { border-bottom: 0; }
 .poll-table tbody tr:hover { background: var(--surface-2); }
 .pollster-cell { line-height: 1.25; }
-.pollster-name { display: block; font-weight: 700; color: var(--ink); font-size: 14px; }
+.pollster-name { display: block; font-weight: 700; color: var(--ink); font-size: 15px; }
 
 /* A linked pollster name reads as the name first and a link second: no blue,
    no permanent underline. The ↗ is the standing signal that it leaves the
@@ -2972,7 +2972,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
    overflow must stay visible here – any overflow on the wrapper turns it into
    the sticky containing block and the thead can never pin to the viewport. */
 .ap-wrap { border-bottom: 1px solid var(--line-2); overflow: visible; }
-.poll-table.archive { font-size: 13.5px; }
+.poll-table.archive { font-size: 15px; }
 .poll-table.archive thead th {
   position: sticky; top: 39px; z-index: 2; background: var(--bg);
   /* generous topside padding – the th background paints this gap, so the
@@ -3024,7 +3024,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    record, so no bar ink (65 near-identical 53/47 bars carry nothing) */
 .apub {
   display: inline-flex; align-items: center; gap: 12px;
-  font-variant-numeric: tabular-nums; font-size: 12.5px; font-weight: 600; color: var(--ink);
+  font-variant-numeric: tabular-nums; font-size: 13.5px; font-weight: 600; color: var(--ink);
 }
 .apub-seg { display: inline-flex; align-items: center; gap: 5px; }
 .apub-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
@@ -13759,7 +13759,7 @@ function infoTerms(D) {
   }, {
     id: "margin-of-error",
     term: "Margin of error",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "How far a poll can miss by because it asked a sample rather than the whole country. A thousand respondents on their own carry about \xB13 points of sampling error at 95% confidence, and the figure shrinks only with the square root of the sample \u2013 four times the interviews buys half the error. It prices chance and nothing else: skewed samples, turnout guesses and house choices sit outside it. Beside the headline the same idea is carried across", " ", L.method.nPolls, " polls at once \u2013 currently \xB1", (L.alp2ppCi95 ?? 0).toFixed(1), " points \u2013 as the ", xref("interval", "margin of error", "95% interval"), ".")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "How far a poll can miss by because it asked a sample rather than the whole country. A thousand respondents on their own carry about \xB13 points of sampling error at 95% confidence, and the figure shrinks only with the square root of the sample \u2013 four times the interviews buys half the error. It prices chance and nothing else: skewed samples, turnout guesses and house choices sit outside it. Beside the headline the same idea is carried across", " ", L.method.nPolls, " polls at once \u2013 currently \xB1", (L.alp2ppCi95 ?? 0).toFixed(1), " points \u2013 as the ", xref("interval", "margin of error", "95% interval"), ". Pooling that many surveys is what brings the band in narrower than one poll\u2019s own \xB13: the chance part of the error shrinks with the square root of the combined sample, while the part every house shares alike does not shrink at all.")
   }, {
     id: "monthly-average",
     term: "Monthly average",
