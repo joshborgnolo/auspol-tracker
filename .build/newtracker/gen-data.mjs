@@ -934,38 +934,24 @@ const individualPolls = POLLS.map((p) => {
 
 /* ---- 7. latest polls – the most recent reading from each ACTIVE house ----
    This was a flat three-week window, which is a rule about weekly houses. It
-   silently dropped every monthly one: Essential and RedBridge/Accent were both
-   missing from a table headed "the most recent poll from each active pollster"
-   for the crime of polling monthly, and no reader could tell whether that meant
-   they had stopped or that the table did not go back far enough.
+   silently dropped every monthly one, so it became adaptive: half again the
+   house's OWN median interval. That fixed the monthly houses and granted the
+   irregular ones unbounded courtesy - Spectre Strategy polled every three to
+   five months and so earned a seven-MONTH stay on a table headed "the most
+   recent poll from each active pollster".
 
-   A house is kept while it is inside half again its OWN median interval — the
-   same test the projections panel uses to decide a house has stopped, so the
-   two panels now agree about which houses still exist. Three weeks stays as
-   the floor, for houses too new to have measured an interval and so that no
-   house that used to qualify has lost its place. */
-const LATEST_MIN_DAYS = 21;
-const LATEST_SILENT = 1.5;      // intervals of silence before a house has stopped
-const LATEST_MIN_WAVES = 4;     // before an interval is worth measuring at all
-const houseInterval = (() => {
-  const by = {}, out = new Map();
-  for (const p of POLLS) (by[p.pollster] ||= []).push(p.date);
-  for (const [firm, ds] of Object.entries(by)) {
-    if (ds.length < LATEST_MIN_WAVES) continue;
-    const gaps = ds.slice(1)
-      .map((d, i) => Math.round((Date.parse(d) - Date.parse(ds[i])) / 86400000)).slice(-8);
-    const m = medianOf(gaps);
-    if (m > 0) out.set(firm, m);
-  }
-  return out;
-})();
+   Now a flat seven weeks. Every regularly publishing house polls inside six
+   (the slowest observed non-hiatus gap was DemosAU, 53 days), so the window
+   covers one missed wave for any of them and drops a house that has actually
+   stopped, whatever its history says. Silence is measured against the dataset
+   clock - LATEST_ISO, not the wall clock - so a universal pause (everyone
+   stops over Christmas) doesn't count against any house. The projections
+   panel keeps its own per-house interval test: what counts as "expected
+   soon" is a different question from what counts as "still active". */
+const LATEST_WINDOW_DAYS = 49;
 const canon = (n) => n.replace(/\s*\(.*?\)\s*/g, "").replace(/\s*\/\s*Accent.*$/i, "").trim();
 const latestMs = Date.parse(LATEST_ISO);
-const recent = POLLS.filter((p) => {
-  const quiet = (latestMs - Date.parse(p.date)) / 86400000;
-  const allowed = Math.max(LATEST_MIN_DAYS, LATEST_SILENT * (houseInterval.get(p.pollster) || 0));
-  return quiet <= allowed;
-});
+const recent = POLLS.filter((p) => (latestMs - Date.parse(p.date)) / 86400000 <= LATEST_WINDOW_DAYS);
 const perHouse = new Map();
 for (const p of recent.sort((a, b) => a.date.localeCompare(b.date))) perHouse.set(canon(p.pollster), p);
 const pollsterTable = [...perHouse.values()].map((p) => {
