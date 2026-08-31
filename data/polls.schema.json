@@ -36,6 +36,7 @@
               "note": { "type": "string", "description": "Where the claim comes from, and why the measurement is not trusted instead." }
             }
           },
+          "stopped": { "type": "boolean", "description": "The house has stopped publishing, declared by hand. It drops the house out of \"Next expected polls\" entirely - a silent house otherwise KEEPS its slot there, marked overdue, until a release is recorded, so there is no other way a dead house leaves the list. Delete the flag if it resumes." },
           "note": { "type": "string" }
         }
       }

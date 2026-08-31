@@ -2295,10 +2295,12 @@ function npProject() {
      the assumption is that its poll has not been published, and while the
      window stays open the soonest it can land is that edge – so Essential
      sits under "in 3 days" and "in 5 days", at its own "in 6 days", instead
-     of claiming the top of the list with yesterday's slot. A missed row
-     (edge also past) drops to the foot: there is no date left to give it. */
-  const first = (r) => (r.loose ? r.release - r.spread * DAY_MS
-    : r.missed ? Infinity
+     of claiming the top of the list with yesterday's slot. A missed row –
+     edge passed, dated OR loose – drops to the foot: there is no date left
+     to give it. (Loose rows used to keep their window-open date here, which
+     put a house whose window closed months ago at the TOP of the list.) */
+  const first = (r) => (r.missed ? Infinity
+    : r.loose ? r.release - r.spread * DAY_MS
     : r.overdue ? r.release + (r.winHalf != null ? r.winHalf : r.spread) * DAY_MS
     : r.release);
   rows.sort((a, b) => first(a) - first(b));
@@ -2459,7 +2461,11 @@ function NextPollsPanel() {
                 that can no longer land inside its own span */}
             <span className={"np-when" + (r.missed ? " np-missed" : "")}>
               {r.loose
-                ? (r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn))
+                /* A window reads as open right up to its far edge; past it
+                   the wave is late, counted from that edge - the day the
+                   last of the room the span claimed ran out. */
+                ? (r.missed ? when(r.closesIn)
+                  : r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn))
                 : r.overdue && !r.missed
                   ? `${when(r.closesIn)} (or ${ago(-r.inDays)})`
                   : when(r.inDays)}

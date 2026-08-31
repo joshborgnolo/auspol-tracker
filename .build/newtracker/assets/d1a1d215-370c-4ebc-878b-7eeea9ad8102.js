@@ -70,7 +70,16 @@ function TabScore({ onGoHero, matchup }) {
    loose cadence. A weekday house rolled to its next slot inside its old
    window is NOT hedged - the doubt there points backwards, to days the
    poll did not come. (The hedge rule lives in the items map; keep them in
-   step.) */
+   step.)
+
+   A projection is a moment, not a date, and an unrecorded release is not
+   rolled forward past it: a slot whose tolerance has run out unpublished
+   leaves the countdown and leads the bar, red, counting the days it is
+   late - the same claim the panel's red row makes. It used to roll silently
+   onto the next slot-week instead, which read exactly like a fresh,
+   unmissed forecast. The count clears itself the moment the real release
+   is recorded - the projection re-anchors, and this bar and the panel fall
+   back to guessing about the future. */
 const TN_DAY = 86400000;
 const tnUntil = (ms) => {
   const mins = Math.max(1, Math.round(ms / 60000));
@@ -125,21 +134,34 @@ function NextPollTicker() {
     return { at: t, byDay: true };
   };
 
-  /* Nothing is past due for a weekday house any more - it rolls to its next
-     slot - so only a house without one can run out of window. */
-  const live = rows.filter((r) => r.releaseDow != null
-                                || r.release + (r.winHalf || 0) * TN_DAY > nowMs);
-  if (!live.length) return null;
+  /* A slot whose whole tolerance has passed without its release being
+     recorded is not rolled forward onto next week's guess and not dropped:
+     it leads the bar in red, counting the days it is late - the same claim
+     the panel's red row makes, on the same `missed` flag. A late WINDOW
+     counts from its close; a late DAY from the day itself, matching the
+     number the panel prints. It leaves when the real release moves the
+     projection, never on a date guessed in its place. */
+  const overdueItems = rows
+    .filter((r) => r.missed)
+    .map((r) => {
+      const days = Math.round(
+        (t0 - (r.loose ? r.release + (r.winHalf || 0) * TN_DAY : r.release)) / TN_DAY);
+      return {
+        firm: r.pollster, site: r.site, overdue: true, days,
+        when: days === 1 ? "1 day overdue" : days + " days overdue",
+      };
+    })
+    .sort((a, b) => b.days - a.days);
 
   /* Re-sorted on the rolled target rather than left in the panel's order.
      The panel sorts a missed wave by the slot it missed, because a reader
      looking at the schedule wants to see it is late; the bar is answering
      "what lands next", and after rolling, a Monday house due today comes
      before a Wednesday one that slipped a week. */
-  const items = live
+  const upcomingItems = rows
+    .filter((r) => !r.missed)
     .map((r) => ({ r, t: targetOf(r) }))
     .sort((a, b) => a.t.at - b.t.at)
-    .slice(0, 2)
     .map(({ r, t }) => {
       const half = r.winHalf || 0;
       let when;
@@ -176,8 +198,15 @@ function NextPollTicker() {
       return { firm: r.pollster, when, maybe, site: r.site };
     });
 
+  /* Overdue leads: an already-blown forecast is more news than any countdown,
+     and the overdue count is capped by the same two slots so a busy week of
+     misses cannot push the future off the bar entirely. */
+  const items = [...overdueItems, ...upcomingItems].slice(0, 2);
+  if (!items.length) return null;
+
   const title = "Projected from each house's recent publication intervals"
-    + " – the earliest each wave could land, not the likeliest";
+    + " – the earliest each wave could land, not the likeliest."
+    + " A slot that passes unrecorded counts up as overdue until the release is added";
   return (
     <div className="tab-next" title={title}>
       <span className="tn-lab">Next</span>
@@ -193,7 +222,7 @@ function NextPollTicker() {
                 </a>
               : it.firm}
           </span>
-          <span className="tn-when">
+          <span className={"tn-when" + (it.overdue ? " tn-overdue" : "")}>
             {it.when}
             {it.maybe && <span className="tn-maybe"> (maybe)</span>}
           </span>
@@ -2911,9 +2940,11 @@ function infoTerms(D) {
       projection is a moment, not a guess: a date that passes unpublished holds its row and counts
       on to the far edge of its window, reading as missed, in red, only once that has passed too,
       and it leaves the list only when the real release is added – never on a date guessed in its
-      place. Opening a row shows the house’s five most recent releases and its own release page, so
-      the forecast can be checked against the record it came from. Houses that have stopped
-      publishing are omitted. These are estimates, not announced dates.</>) },
+      place. The countdown in the tab bar marks the same thing the same way: an unrecorded wave
+      leads it, red, counting the days it is late. Opening a row shows the house’s five most
+      recent releases and its own release page, so the forecast can be checked against the record
+      it came from. Houses that have stopped publishing are removed by hand rather than read out
+      of their silence. These are estimates, not announced dates.</>) },
     { id: "polling-error", term: "Polling error", body: acc ? (
       <>How far the final polls have missed. Across the {acc.cycles.length} elections from
       {" "}{acc.cycles[0].year} to {acc.cycles[acc.cycles.length - 1].year} they missed the

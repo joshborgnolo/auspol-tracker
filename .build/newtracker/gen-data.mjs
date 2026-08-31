@@ -946,8 +946,9 @@ const individualPolls = POLLS.map((p) => {
    stopped, whatever its history says. Silence is measured against the dataset
    clock - LATEST_ISO, not the wall clock - so a universal pause (everyone
    stops over Christmas) doesn't count against any house. The projections
-   panel keeps its own per-house interval test: what counts as "expected
-   soon" is a different question from what counts as "still active". */
+   panel answers a different question with a different rule: a house's slot
+   there holds, overdue, until its release is recorded, so only a hand-
+   declared stop (pollsterRules.stopped) takes one off it. */
 const LATEST_WINDOW_DAYS = 49;
 const canon = (n) => n.replace(/\s*\(.*?\)\s*/g, "").replace(/\s*\/\s*Accent.*$/i, "").trim();
 const latestMs = Date.parse(LATEST_ISO);
@@ -1303,9 +1304,10 @@ const CYCLE_DEFS = CYC_META.map((c) => {
      `published` on its polls.
 
    Only houses on a genuine cadence are published: at least 4 waves, a spread
-   small relative to the interval, and still active. A house that has broken
-   its own pattern is not "expected" and is left out rather than given a
-   made-up date. */
+   small relative to the interval, and not declared stopped. Silence alone
+   does not remove one - an unrecorded release holds its slot, overdue, until
+   it is recorded. A house that has broken its own pattern is not "expected"
+   and is left out rather than given a made-up date. */
 const CAD_DEFAULT_LAG = 1;
 /* The weekday, the hour and the spread are all read off a RECENT window, not
    the whole record - the same eight-wave window the cadence itself uses, plus
@@ -1341,16 +1343,20 @@ const CAD_PUB_MIN = 4;         // publication intervals before that basis is use
 const CAD_DOW_MIN = 5;         // dated releases before a weekday can be a habit
 const CAD_DOW_SHARE = 0.8;     // and the share of them that must share it
 const CAD_MIN_POLLS = 4;
-/* Two further gates, both learned the hard way from Fox & Hedgehog, which
-   sailed through the first version: 86 days silent on a 44-day cycle, and a
-   window of ±15 days – and it still sorted ABOVE metronomic Roy Morgan,
-   because a wide window can centre on an early date. So:
-     ACTIVE – a house must be inside 1.5 of its own intervals, not 2. Past
-       that it has stopped, and "expected" is the wrong word for it.
-     USABLE – the window must be tight relative to the interval. "Some time
-       in a 30-day range" is not a forecast, and printing one next to a house
-       that really is weekly devalues both. */
-const CAD_MAX_SILENT = 1.5;
+/* One further gate, learned the hard way from Fox & Hedgehog: 86 days
+   silent on a 44-day cycle, and a window of ±15 days – and it still sorted
+   ABOVE metronomic Roy Morgan, because a wide window can centre on an early
+   date. So the window must be tight relative to the interval: "some time in
+   a 30-day range" is not a forecast, and printing one next to a house that
+   really is weekly devalues both.
+
+   A silence cliff used to sit beside it: past 1.5 intervals unpublished a
+   house was judged to have stopped and dropped from the projection. That
+   turned a blown slot into a vanished one – exactly when a reader most
+   needs to see it. Silence is not evidence of stoppage any more: an
+   unrecorded release HOLDS its slot, marked overdue, until it is recorded,
+   and a house that has genuinely stopped (Fox & Hedgehog among them) is
+   removed by hand instead, via pollsterRules.stopped. */
 const CAD_MAX_REL_SPREAD = 0.30;
 /* The spread is half the RANGE of a house's recent intervals with the single
    most extreme at each end set aside - not a robust SD off the MAD, which is
@@ -1451,8 +1457,10 @@ for (const [firm, rows] of Object.entries(byHouse)) {
   const cadence = medianOf(gaps);
   if (!cadence || cadence <= 0) continue;
   const last = seq[seq.length - 1];
-  // a house that has stopped is not "expected" in any form
-  if ((Date.parse(LATEST_ISO) - Date.parse(last)) / 86400000 > CAD_MAX_SILENT * cadence) continue;
+  /* The only way OFF the projection: declared stopped by hand. Silence on
+     its own no longer removes a house – an unrecorded release holds its
+     slot until it is recorded (see CAD_MAX_REL_SPREAD above). */
+  if ((D.pollsterRules?.[firm] || {}).stopped) continue;
   const ts = (timeSamples[firm] || []).slice(-CAD_RECENT);
   /* Some houses keep a weekday, not just an interval. Newspoll and Resolve
      have published on a Sunday evening every one of the nine times each has

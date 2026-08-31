@@ -29,7 +29,7 @@ Most coverage reports one house's release in isolation, or aggregates without sh
 
 - Aggregates federal voting intention (primary vote, 2PP), leader approval / preferred PM, and right-direction/wrong-track across pollsters, plus an ALP-v-One Nation 2PP series and past-cycle history.
 - Every poll is individually visible, searchable, sortable, and links back to its original published source.
-- "Next expected polls" projects each house's next likely release from its own recent publication rhythm; a slot that goes overdue stays marked overdue rather than being silently rolled forward onto a guessed date.
+- "Next expected polls" projects each house's next likely release from its own recent publication rhythm; a slot that goes overdue stays marked overdue — in the panel and in the nav-bar countdown, which reads "N days overdue" — until the release is actually recorded, rather than being silently rolled forward onto a guessed date. A house that has stopped publishing is removed by hand (`pollsterRules.stopped`), never inferred from silence.
 - The build refuses to produce a page from data that fails validation; known-good pollster oddities are recorded as documented exceptions rather than treated as errors.
 - No server, no database, no user accounts — `data/polls.json` is the single source of truth, and `index.html` is a generated artifact that must never be hand-edited.
 - A predecessor page, `auspol-polling.html`, is frozen (not rebuilt, noindex, on-page banner) and kept only for its design history.

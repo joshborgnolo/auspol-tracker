@@ -60,6 +60,14 @@
     },
     "YouGov (MRP)": {
       "site": "https://www.news24.com.au/politics/australian-politics"
+    },
+    "Fox & Hedgehog": {
+      "stopped": true,
+      "note": "Four waves, last 26 May 2026, silent since. Flagged by hand so its slot does not sit red on Next expected polls indefinitely; unflag if it resumes."
+    },
+    "Freshwater": {
+      "stopped": true,
+      "note": "Five waves, last 15 May 2026, silent since. Flagged by hand so its slot does not sit red on Next expected polls indefinitely; unflag if it resumes."
     }
   },
   "elections": {
@@ -5259,6 +5267,28 @@
       "detail": null
     },
     {
+      "date": "2026-03-27",
+      "firm": "RedBridge / Accent",
+      "alb": -9,
+      "opp": -2,
+      "oppName": "Taylor",
+      "han": -1,
+      "detail": {
+        "alb": {
+          "app": 34,
+          "dis": 43
+        },
+        "opp": {
+          "app": 20,
+          "dis": 22
+        },
+        "han": {
+          "app": 40,
+          "dis": 41
+        }
+      }
+    },
+    {
       "date": "2026-03-29",
       "firm": "Freshwater",
       "alb": -17,
@@ -5387,10 +5417,23 @@
       "date": "2026-04-30",
       "firm": "RedBridge / Accent",
       "alb": -9,
-      "opp": -2,
+      "opp": -12,
       "oppName": "Taylor",
       "han": -1,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 34,
+          "dis": 43
+        },
+        "opp": {
+          "app": 20,
+          "dis": 32
+        },
+        "han": {
+          "app": 40,
+          "dis": 41
+        }
+      }
     },
     {
       "date": "2026-04-30",
