@@ -354,7 +354,9 @@ function LeadershipSection({ rangeId }) {
       </div>
       <p className="leadership-note">
         The Coalition line splices leaders – <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.
-        Leadership questions are asked irregularly, so the lines simply join published readings.
+        The approval and favourability points are monthly aggregates, weighted and house-adjusted
+        the way the vote series are; the preferred-PM lines join published readings as they came,
+        unadjusted.
         Preferred PM is put to voters as two separate two-way contests – against the opposition
         leader, and against Hanson head to head – so both are drawn, the head-to-head dashed.
       </p>

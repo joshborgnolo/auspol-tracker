@@ -3307,7 +3307,10 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
         the consensus of all houses. The lean is measured separately for every measure &#8211; a firm
         that leans one way on the classic two-party is not assumed to lean the same way on a primary
         share or an ALP-v-One Nation head-to-head &#8211; and a matchup too few houses ask is left as
-        a plain monthly average rather than adjusted on guesswork. Houses that publish no two-party
+        a plain monthly average rather than adjusted on guesswork. The leaders&#8217; ratings and
+        national direction run through the same monthly weighting and adjustment; preferred prime
+        minister and the undecided share stay as plain averages, the differences there being a
+        matter of question wording rather than lean. Houses that publish no two-party
         figure feed the primary-vote and leadership series only.</p>
       <p>The headline carries a 95% interval &#8211; the greater of the spread among polls in the
         window and their sampling error &#8211; currently about &#177;1.9 points
@@ -3324,8 +3327,9 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
       <h2>Reading the charts</h2>
       <p>Each dot is one published poll; the lines are monthly aggregates, shaded with the 95%
         interval around them. Where the two bands meet, that month&#8217;s lead is inside its own
-        margin of error. Leadership questions are asked irregularly and worded differently from
-        house to house, so those lines simply join published readings. A &#8220;&#8212;&#8221; in any
+        margin of error. Leadership questions are asked irregularly, so those lines are monthly
+        aggregates too &#8211; adjusted per house for approval and favourability, joined straight
+        from published readings for preferred prime minister. A &#8220;&#8212;&#8221; in any
         table means the pollster didn&#8217;t ask that question.</p>
       <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
         figure into a seat count assumes a uniform swing, and with One Nation near
@@ -7409,7 +7413,7 @@ function LeadershipSection({
     className: "section-h"
   }, "Leadership")), /*#__PURE__*/React.createElement("p", {
     className: "leadership-note"
-  }, "The Coalition line splices leaders \u2013 ", /*#__PURE__*/React.createElement("strong", null, "Ley"), " to February 2026, ", /*#__PURE__*/React.createElement("strong", null, "Taylor"), " since. Leadership questions are asked irregularly, so the lines simply join published readings. Preferred PM is put to voters as two separate two-way contests \u2013 against the opposition leader, and against Hanson head to head \u2013 so both are drawn, the head-to-head dashed."), /*#__PURE__*/React.createElement("div", {
+  }, "The Coalition line splices leaders \u2013 ", /*#__PURE__*/React.createElement("strong", null, "Ley"), " to February 2026, ", /*#__PURE__*/React.createElement("strong", null, "Taylor"), " since. The approval and favourability points are monthly aggregates, weighted and house-adjusted the way the vote series are; the preferred-PM lines join published readings as they came, unadjusted. Preferred PM is put to voters as two separate two-way contests \u2013 against the opposition leader, and against Hanson head to head \u2013 so both are drawn, the head-to-head dashed."), /*#__PURE__*/React.createElement("div", {
     className: "two-col lead-grid lg-" + view
   }, view === "both" ? /*#__PURE__*/React.createElement(ApprovalPanel, {
     key: "appr-net",
@@ -14083,7 +14087,7 @@ function infoTerms(D) {
   }, {
     id: "net-approval",
     term: "Net approval",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "Approve minus disapprove for a party leader \u2013 favourable minus unfavourable where a house words it as favourability. The two are separate questions \u2013 see ", xref("approval", "net approval", "Approval"), " and", " ", xref("favourability", "net approval", "Favourability"), " \u2013 asked irregularly and worded differently from house to house, so the lines simply join published readings rather than aggregating them.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "Approve minus disapprove for a party leader \u2013 favourable minus unfavourable where a house words it as favourability. The two are separate questions \u2013 see ", xref("approval", "net approval", "Approval"), " and", " ", xref("favourability", "net approval", "Favourability"), " \u2013 asked irregularly and worded differently from house to house. The lines drawn are monthly aggregates, weighted and house-adjusted the same way the vote series are \u2013 see", " ", xref("weighted-aggregate", "net approval", "Weighted aggregate"), ".")
   }, {
     id: "next-polls",
     term: "Next polls",
@@ -14103,7 +14107,7 @@ function infoTerms(D) {
   }, {
     id: "preferred-pm",
     term: "Preferred prime minister",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "Who voters name as the better prime minister \u2013 head to head, or as a three-way where a house offers one. Houses leave different shares uncommitted, so the published levels aren\u2019t comparable across houses; the gaps and the trend are.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "Who voters name as the better prime minister \u2013 head to head, or as a three-way where a house offers one. Houses leave different shares uncommitted, so the published levels aren\u2019t comparable across houses; the gaps and the trend are. House effects are not removed from these lines \u2013 see ", xref("weighted-aggregate", "preferred-pm", "Weighted aggregate"), ".")
   }, {
     id: "primary-vote",
     term: "Primary vote",
@@ -14127,7 +14131,7 @@ function infoTerms(D) {
   }, {
     id: "weighted-aggregate",
     term: "Weighted aggregate",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "The headline method. Recent and larger polls count for more, and each pollster\u2019s figure is adjusted for its own ", xref("house-effect", "weighted aggregate", "house effect"), ". Where one house publishes more than once in a window or a calendar month \u2013 Roy Morgan polls weekly \u2013 its repeat waves count for the square root of their number, so three weekly waves count as 1.7, not 3.", " ", "Full formula: the headline is \u03A3w\u1D62x\u1D62 \xF7 \u03A3w\u1D62 over the polls in the 21-day window, where x\u1D62 is a poll\u2019s house-adjusted figure and its weight w\u1D62 = n\u1D62 \xD7 2^(\u2212d/7) \xF7 \u221Am \u2013 n\u1D62 the poll\u2019s sample, d its age in days (halving every seven), and m its house\u2019s wave count in the window. The effective sample behind it is (\u03A3w\u1D62)\xB2 \xF7 \u03A3w\u1D62\xB2, and the monthly trend points run the same formula with the recency term dropped.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "The headline method. Recent and larger polls count for more, and each pollster\u2019s figure is adjusted for its own ", xref("house-effect", "weighted aggregate", "house effect"), ". Where one house publishes more than once in a window or a calendar month \u2013 Roy Morgan polls weekly \u2013 its repeat waves count for the square root of their number, so three weekly waves count as 1.7, not 3.", " ", "Full formula: the headline is \u03A3w\u1D62x\u1D62 \xF7 \u03A3w\u1D62 over the polls in the 21-day window, where x\u1D62 is a poll\u2019s house-adjusted figure and its weight w\u1D62 = n\u1D62 \xD7 2^(\u2212d/7) \xF7 \u221Am \u2013 n\u1D62 the poll\u2019s sample, d its age in days (halving every seven), and m its house\u2019s wave count in the window. The effective sample behind it is (\u03A3w\u1D62)\xB2 \xF7 \u03A3w\u1D62\xB2, and the monthly trend points run the same formula with the recency term dropped. The leaders\u2019 ratings and national direction are built the same way monthly; preferred prime minister and the undecided share stay as plain ", xref("monthly-average", "weighted aggregate", "monthly averages"), " \u2013 their houses\u2019 differences live in the questions asked, not in a lean to correct.")
   }];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"

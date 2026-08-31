@@ -379,7 +379,10 @@ function buildStaticSummary() {
         the consensus of all houses. The lean is measured separately for every measure &#8211; a firm
         that leans one way on the classic two-party is not assumed to lean the same way on a primary
         share or an ALP-v-One Nation head-to-head &#8211; and a matchup too few houses ask is left as
-        a plain monthly average rather than adjusted on guesswork. Houses that publish no two-party
+        a plain monthly average rather than adjusted on guesswork. The leaders&#8217; ratings and
+        national direction run through the same monthly weighting and adjustment; preferred prime
+        minister and the undecided share stay as plain averages, the differences there being a
+        matter of question wording rather than lean. Houses that publish no two-party
         figure feed the primary-vote and leadership series only.</p>
       <p>The headline carries a 95% interval &#8211; the greater of the spread among polls in the
         window and their sampling error &#8211; currently about &#177;${L.alp2ppCi95.toFixed(1)} points
@@ -396,8 +399,9 @@ function buildStaticSummary() {
       <h2>Reading the charts</h2>
       <p>Each dot is one published poll; the lines are monthly aggregates, shaded with the 95%
         interval around them. Where the two bands meet, that month&#8217;s lead is inside its own
-        margin of error. Leadership questions are asked irregularly and worded differently from
-        house to house, so those lines simply join published readings. A &#8220;&#8212;&#8221; in any
+        margin of error. Leadership questions are asked irregularly, so those lines are monthly
+        aggregates too &#8211; adjusted per house for approval and favourability, joined straight
+        from published readings for preferred prime minister. A &#8220;&#8212;&#8221; in any
         table means the pollster didn&#8217;t ask that question.</p>
       <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
         figure into a seat count assumes a uniform swing, and with One Nation near

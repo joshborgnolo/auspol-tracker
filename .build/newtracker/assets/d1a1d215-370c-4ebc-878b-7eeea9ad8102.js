@@ -2708,8 +2708,9 @@ function infoTerms(D) {
       words it as favourability. The two are separate questions –
       see {xref("approval", "net approval", "Approval")} and{" "}
       {xref("favourability", "net approval", "Favourability")} – asked irregularly and worded
-      differently from house to house, so the lines simply join published readings rather than
-      aggregating them.</>) },
+      differently from house to house. The lines drawn are monthly aggregates, weighted and
+      house-adjusted the same way the vote series are – see
+      {" "}{xref("weighted-aggregate", "net approval", "Weighted aggregate")}.</>) },
     { id: "next-polls", term: "Next polls", body: (
       <>When each house is likely to publish next, forecast from its own record. Its dates are the
       median gap between its last eight releases, nudged no more than three days onto the weekday
@@ -2747,7 +2748,8 @@ function infoTerms(D) {
     { id: "preferred-pm", term: "Preferred prime minister", body: (
       <>Who voters name as the better prime minister – head to head, or as a three-way where a
       house offers one. Houses leave different shares uncommitted, so the published levels aren’t
-      comparable across houses; the gaps and the trend are.</>) },
+      comparable across houses; the gaps and the trend are. House effects are not removed from
+      these lines – see {xref("weighted-aggregate", "preferred-pm", "Weighted aggregate")}.</>) },
     { id: "primary-vote", term: "Primary vote", body: (
       <>First-preference share – who voters put 1 beside, before any preferences are distributed.
       Houses that publish no two-party figure still feed this series and the leadership ones.</>) },
@@ -2778,7 +2780,10 @@ function infoTerms(D) {
       xᵢ is a poll’s house-adjusted figure and its weight wᵢ = nᵢ × 2^(−d/7) ÷ √m – nᵢ the
       poll’s sample, d its age in days (halving every seven), and m its house’s wave count in
       the window. The effective sample behind it is (Σwᵢ)² ÷ Σwᵢ², and the monthly trend points
-      run the same formula with the recency term dropped.</>) },
+      run the same formula with the recency term dropped. The leaders’ ratings and national
+      direction are built the same way monthly; preferred prime minister and the undecided share
+      stay as plain {xref("monthly-average", "weighted aggregate", "monthly averages")} – their
+      houses’ differences live in the questions asked, not in a lean to correct.</>) },
   ];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"
