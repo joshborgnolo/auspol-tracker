@@ -64,12 +64,13 @@ function TabScore({ onGoHero, matchup }) {
    the bar and the panel can never disagree about when a poll is due.
 
    It counts to the EARLIEST the wave could land, not to the middle of the
-   window, and says "(maybe)" whenever that window is wider than nothing. A
-   house with a kept weekday is projected to the hour and gets no hedge; one
-   whose cadence is a median over drifting fieldwork could be a day either
-   side, and "2 hours" alone would be a harder claim than the data supports.
-   Saying the near edge and marking it uncertain is the honest shape of it:
-   it could be two hours, and it could be a week. */
+   window, and says "(maybe)" when a genuinely ALTERNATIVE future day is
+   still in play: a window wide enough to hold two of the house's slots, a
+   shown slot rolled more than one slot-week past the projected one, or a
+   loose cadence. A weekday house rolled to its next slot inside its old
+   window is NOT hedged - the doubt there points backwards, to days the
+   poll did not come. (The hedge rule lives in the items map; keep them in
+   step.) */
 const TN_DAY = 86400000;
 const tnUntil = (ms) => {
   const mins = Math.max(1, Math.round(ms / 60000));
@@ -154,11 +155,24 @@ function NextPollTicker() {
       } else {
         when = t.at <= nowMs ? "any moment now" : tnUntil(t.at - nowMs);
       }
-      /* Hedged when the schedule leaves room to be wrong: a wide window, no
-         reliable cadence, or a wave that has already missed a slot and so is
-         not certain to keep the next one either. "any moment now" is left
-         alone - it already says what the hedge would. */
-      const maybe = when !== "any moment now" && (half > 0 || !!r.loose || !!r.overdue);
+      /* "(maybe)" answers "could it be some FUTURE day instead?". A weekday
+         house can only file on its weekday, so every alternative date is a
+         slot of its own, a week apart: the hedge belongs only while two
+         slots from now on are both in play – a window wider than a week, or
+         a slot rolled more than one slot-week past the projected one (a
+         one-week roll is just the old window's own far edge, still this
+         wave). A still-open window after a missed slot is not future doubt
+         – its earlier dates are past days the wave publicly did not land
+         on, so Essential rolled from a missed 26 Aug to 2 Sep reads
+         "2 days", full stop. (r.overdue reads "slot moment passed" and
+         fires on exactly that case – it is npProject's missed + still-open
+         flag, not future doubt.) Non-weekday houses keep the day-spread
+         rule. "any moment now" is left alone - it already says what the
+         hedge would. */
+      const maybe = when !== "any moment now" &&
+        (half > 7 || !!r.loose ||
+         (r.releaseDow != null && t.at - r.release > 7 * TN_DAY) ||
+         (r.releaseDow == null && half > 0));
       return { firm: r.pollster, when, maybe, site: r.site };
     });
 
@@ -2059,11 +2073,21 @@ function VariancePanel({ facet, rangeId }) {
       <div className="ap-var-read">
         {latest.map(({ m, d }) => {
           const read = discordRead(d.R);
+          const readTerm = { chance: "chance-consistent", mild: "mild-divergence" }[read.id];
           return (
             <div key={m.id} className={"vr-tile" + (hidden[m.id] ? " off" : "")}>
               <span className="vr-name" style={{ color: inkOf(m.color) }}>{m.label}</span>
               <span className="vr-sigma">{d.sigma.toFixed(2)}<em>pp</em></span>
-              <span className={"vr-pill vr-" + read.id}>{read.label}</span>
+              {readTerm ? (
+                <button type="button"
+                  className={"vr-pill vr-" + read.id + " hi-term"}
+                  title={"What " + read.label + " means"}
+                  onClick={() => window.AP.openTerm && window.AP.openTerm(readTerm, "Poll disagreement")}>
+                  {read.label}
+                </button>
+              ) : (
+                <span className={"vr-pill vr-" + read.id}>{read.label}</span>
+              )}
               <span className="vr-sub">
                 {d.R.toFixed(2)}× the {d.floor.toFixed(2)}pp floor
                 {d.excess > 0.05 && <> · {d.excess.toFixed(2)}pp unexplained</>}

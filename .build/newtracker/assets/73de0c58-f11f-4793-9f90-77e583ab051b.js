@@ -57,11 +57,18 @@ function Header({ isDark, onToggleTheme }) {
      toggling repeatedly, which matters more than usual here: the theme change
      runs inside a view transition, so each flip is a whole-page crossfade.
 
-     Nothing has to be undone for the click that follows a drag. Both buttons
-     were already written to do nothing when their own half is the live one,
-     so a release over the half the drag just chose is a no-op. */
+     Capture belongs to the throw, never to the tap. Taking it at pointerdown
+     sent every plain tap's click to the housing instead of the half under it
+     - a captured pointer's subsequent events, click included, retarget to the
+     capturer - so aimed presses fell silent and the switch read as dead.
+     Capture engages only once the pointer has actually travelled: a tap keeps
+     its click, a flick keeps its stream, and the release-click of a throw
+     still dies on the housing, which is what it has to do or it would undo
+     the toggle its drag just made. */
   const segRef = useRef(null);
-  const segDrag = useRef(false);
+  const segDrag = useRef(false);   // pointer down, not yet known to be a throw
+  const segHeld = useRef(false);   // pointer capture actually engaged
+  const segDownX = useRef(0);
   const halfAt = (clientX) => {
     const el = segRef.current;
     if (!el) return null;
@@ -73,16 +80,22 @@ function Header({ isDark, onToggleTheme }) {
   };
   const onSegDown = (e) => {
     segDrag.current = true;
-    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) { /* fine without */ }
+    segDownX.current = e.clientX;
   };
   const onSegMove = (e) => {
     if (!segDrag.current) return;
+    if (!segHeld.current && Math.abs(e.clientX - segDownX.current) >= 4) {
+      try { e.currentTarget.setPointerCapture(e.pointerId); segHeld.current = true; } catch (_) { /* fine without */ }
+    }
     const want = halfAt(e.clientX);
     if (want != null && want !== isDark) onToggleTheme();
   };
   const onSegUp = (e) => {
     segDrag.current = false;
-    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) { /* fine */ }
+    if (segHeld.current) {
+      try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) { /* fine */ }
+    }
+    segHeld.current = false;
   };
 
   const wmName = useRef(null), wmTrack = useRef(null);

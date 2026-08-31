@@ -3188,6 +3188,14 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   border-radius: 999px; padding: 3px 9px; white-space: nowrap;
   border: 1px solid currentColor;
 }
+/* a pill that opens its own glossary entry keeps the pill shape – the
+   hi-term reset would strip its padding and border */
+.vr-pill.hi-term {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+  border-radius: 999px; padding: 3px 9px; border: 1px solid currentColor;
+  text-decoration: none;
+}
+.vr-pill.hi-term:hover { text-decoration: underline; text-decoration-color: currentColor; }
 .vr-pill.vr-herded { color: var(--accent);   background: color-mix(in oklch, var(--accent) 11%, transparent); }
 .vr-pill.vr-chance { color: var(--ink-3);    background: color-mix(in oklch, var(--ink) 6%, transparent); }
 .vr-pill.vr-mild   { color: var(--ink-2);    background: color-mix(in oklch, var(--ink) 9%, transparent); }

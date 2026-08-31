@@ -3038,6 +3038,14 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   border-radius: 999px; padding: 3px 9px; white-space: nowrap;
   border: 1px solid currentColor;
 }
+/* a pill that opens its own glossary entry keeps the pill shape – the
+   hi-term reset would strip its padding and border */
+.vr-pill.hi-term {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.02em;
+  border-radius: 999px; padding: 3px 9px; border: 1px solid currentColor;
+  text-decoration: none;
+}
+.vr-pill.hi-term:hover { text-decoration: underline; text-decoration-color: currentColor; }
 .vr-pill.vr-herded { color: var(--accent);   background: color-mix(in oklch, var(--accent) 11%, transparent); }
 .vr-pill.vr-chance { color: var(--ink-3);    background: color-mix(in oklch, var(--ink) 6%, transparent); }
 .vr-pill.vr-mild   { color: var(--ink-2);    background: color-mix(in oklch, var(--ink) 9%, transparent); }
@@ -10844,12 +10852,13 @@ function TabScore({
    the bar and the panel can never disagree about when a poll is due.
 
    It counts to the EARLIEST the wave could land, not to the middle of the
-   window, and says "(maybe)" whenever that window is wider than nothing. A
-   house with a kept weekday is projected to the hour and gets no hedge; one
-   whose cadence is a median over drifting fieldwork could be a day either
-   side, and "2 hours" alone would be a harder claim than the data supports.
-   Saying the near edge and marking it uncertain is the honest shape of it:
-   it could be two hours, and it could be a week. */
+   window, and says "(maybe)" when a genuinely ALTERNATIVE future day is
+   still in play: a window wide enough to hold two of the house's slots, a
+   shown slot rolled more than one slot-week past the projected one, or a
+   loose cadence. A weekday house rolled to its next slot inside its old
+   window is NOT hedged - the doubt there points backwards, to days the
+   poll did not come. (The hedge rule lives in the items map; keep them in
+   step.) */
 const TN_DAY = 86400000;
 const tnUntil = ms => {
   const mins = Math.max(1, Math.round(ms / 60000));
@@ -10940,11 +10949,21 @@ function NextPollTicker() {
     } else {
       when = t.at <= nowMs ? "any moment now" : tnUntil(t.at - nowMs);
     }
-    /* Hedged when the schedule leaves room to be wrong: a wide window, no
-       reliable cadence, or a wave that has already missed a slot and so is
-       not certain to keep the next one either. "any moment now" is left
-       alone - it already says what the hedge would. */
-    const maybe = when !== "any moment now" && (half > 0 || !!r.loose || !!r.overdue);
+    /* "(maybe)" answers "could it be some FUTURE day instead?". A weekday
+       house can only file on its weekday, so every alternative date is a
+       slot of its own, a week apart: the hedge belongs only while two
+       slots from now on are both in play – a window wider than a week, or
+       a slot rolled more than one slot-week past the projected one (a
+       one-week roll is just the old window's own far edge, still this
+       wave). A still-open window after a missed slot is not future doubt
+       – its earlier dates are past days the wave publicly did not land
+       on, so Essential rolled from a missed 26 Aug to 2 Sep reads
+       "2 days", full stop. (r.overdue reads "slot moment passed" and
+       fires on exactly that case – it is npProject's missed + still-open
+       flag, not future doubt.) Non-weekday houses keep the day-spread
+       rule. "any moment now" is left alone - it already says what the
+       hedge would. */
+    const maybe = when !== "any moment now" && (half > 7 || !!r.loose || r.releaseDow != null && t.at - r.release > 7 * TN_DAY || r.releaseDow == null && half > 0);
     return {
       firm: r.pollster,
       when,
@@ -13375,6 +13394,10 @@ function VariancePanel({
     d
   }) => {
     const read = discordRead(d.R);
+    const readTerm = {
+      chance: "chance-consistent",
+      mild: "mild-divergence"
+    }[read.id];
     return /*#__PURE__*/React.createElement("div", {
       key: m.id,
       className: "vr-tile" + (hidden[m.id] ? " off" : "")
@@ -13385,7 +13408,12 @@ function VariancePanel({
       }
     }, m.label), /*#__PURE__*/React.createElement("span", {
       className: "vr-sigma"
-    }, d.sigma.toFixed(2), /*#__PURE__*/React.createElement("em", null, "pp")), /*#__PURE__*/React.createElement("span", {
+    }, d.sigma.toFixed(2), /*#__PURE__*/React.createElement("em", null, "pp")), readTerm ? /*#__PURE__*/React.createElement("button", {
+      type: "button",
+      className: "vr-pill vr-" + read.id + " hi-term",
+      title: "What " + read.label + " means",
+      onClick: () => window.AP.openTerm && window.AP.openTerm(readTerm, "Poll disagreement")
+    }, read.label) : /*#__PURE__*/React.createElement("span", {
       className: "vr-pill vr-" + read.id
     }, read.label), /*#__PURE__*/React.createElement("span", {
       className: "vr-sub"
@@ -15584,11 +15612,18 @@ function Header({
       A deadzone either side of the pivot stops a wobble on the seam from
      toggling repeatedly, which matters more than usual here: the theme change
      runs inside a view transition, so each flip is a whole-page crossfade.
-      Nothing has to be undone for the click that follows a drag. Both buttons
-     were already written to do nothing when their own half is the live one,
-     so a release over the half the drag just chose is a no-op. */
+      Capture belongs to the throw, never to the tap. Taking it at pointerdown
+     sent every plain tap's click to the housing instead of the half under it
+     - a captured pointer's subsequent events, click included, retarget to the
+     capturer - so aimed presses fell silent and the switch read as dead.
+     Capture engages only once the pointer has actually travelled: a tap keeps
+     its click, a flick keeps its stream, and the release-click of a throw
+     still dies on the housing, which is what it has to do or it would undo
+     the toggle its drag just made. */
   const segRef = useRef(null);
-  const segDrag = useRef(false);
+  const segDrag = useRef(false); // pointer down, not yet known to be a throw
+  const segHeld = useRef(false); // pointer capture actually engaged
+  const segDownX = useRef(0);
   const halfAt = clientX => {
     const el = segRef.current;
     if (!el) return null;
@@ -15601,20 +15636,27 @@ function Header({
   };
   const onSegDown = e => {
     segDrag.current = true;
-    try {
-      e.currentTarget.setPointerCapture(e.pointerId);
-    } catch (_) {/* fine without */}
+    segDownX.current = e.clientX;
   };
   const onSegMove = e => {
     if (!segDrag.current) return;
+    if (!segHeld.current && Math.abs(e.clientX - segDownX.current) >= 4) {
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+        segHeld.current = true;
+      } catch (_) {/* fine without */}
+    }
     const want = halfAt(e.clientX);
     if (want != null && want !== isDark) onToggleTheme();
   };
   const onSegUp = e => {
     segDrag.current = false;
-    try {
-      e.currentTarget.releasePointerCapture(e.pointerId);
-    } catch (_) {/* fine */}
+    if (segHeld.current) {
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch (_) {/* fine */}
+    }
+    segHeld.current = false;
   };
   const wmName = useRef(null),
     wmTrack = useRef(null);
