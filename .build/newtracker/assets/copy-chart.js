@@ -370,15 +370,71 @@
       dot: col(p.querySelector(".ro-dot"), "backgroundColor"),
       ink: col(p.querySelector(".ro-num")),
     }));
-    const legend = readLegend(target);
+    /* Read before the legend, which needs the title to tell an opposition
+       chart from a government one. */
+    const titleBase = txt(target.querySelector(".card-title, h2, h3")) || "auspol tracker";
+    const sub = txt(target.querySelector(".card-sub"));
+    const caption = txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
+
+    /* Past cycles keeps its legend OUTSIDE the card - one row of chips at the
+       top of the tab selects cycles for all five charts - so a card copied on
+       its own arrived with six unnamed lines and years for end labels. Worse,
+       those chips name the PRIME MINISTER, which on an opposition chart is the
+       wrong person entirely: the 2013 line is Shorten, not Abbott.
+
+       So the legend is rebuilt from the end labels the chart drew. Pairing on
+       those rather than on the cycle list means the colours are the ones
+       actually used - an opposition line is drawn in the OPPOSITION party's
+       colour, not the cycle's - and a cycle the reader has switched off has no
+       label, so it is absent here too, without having to ask the chips.
+
+       A label that is not a year is a leader in their own right (Hanson runs
+       as a dashed line on the opposition chart, labelled PH). Those are named
+       by matching the line's colour against LEADERS, which is where the chart
+       took it from. */
+    const cycleLegend = () => {
+      const AUS = window.AUSPOL || {};
+      const cyc = AUS.cycles && (Array.isArray(AUS.cycles) ? AUS.cycles : Object.values(AUS.cycles));
+      const labels = [...svgEl.querySelectorAll(".end-label")];
+      if (!cyc || !labels.length) return [];
+      const opp = /opposition/i.test(titleBase + " " + sub);   // `title` is not bound yet here
+      const resolve = (c) => {
+        const el = document.createElement("span");
+        el.style.color = c; document.body.appendChild(el);
+        const v = getComputedStyle(el).color; el.remove(); return v;
+      };
+      const leaders = (AUS.LEADERS || []).map((l) => ({ name: l.name, col: resolve(l.color) }));
+      return labels.map((t) => {
+        const digits = (t.textContent || "").replace(/[^0-9]/g, "");
+        const fill = getComputedStyle(t).fill;
+        const c = digits.length === 2 && cyc.find((r) => String(r.year).slice(2) === digits);
+        if (c) return { label: c.year + " " + (opp ? (c.oppLead || c.lead) : c.lead),
+                        kind: "line", fill, alpha: 1, year: c.year };
+        const m = leaders.find((l) => l.col === fill);
+        return { label: m ? m.name : (t.textContent || "").trim(),
+                 kind: "dashed", fill, alpha: 1, year: 9999 };
+      }).sort((a, b) => a.year - b.year);
+    };
+    let legend = readLegend(target);
+    if (!legend.length) legend = cycleLegend();
     const meta = [txt(target.querySelector(".hi-method")), txt(target.querySelector(".hi-range")),
                   txt(target.querySelector(".hi-note"))].filter(Boolean).join("  ·  ");
     const lead = [txt(target.querySelector(".lead-tag")), txt(target.querySelector(".delta")),
                   txt(target.querySelector(".hero-sub-note"))].filter(Boolean).join("  ");
-    const title = txt(target.querySelector(".card-title, h2, h3")) || "auspol tracker";
-    const sub = txt(target.querySelector(".card-sub"));
-    const caption = txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
     const hero = isHero && parties.length === 2;
+
+    /* A shared image has to say what period it covers - the page around it
+       does not travel with it. Past cycles names the elections it lines up
+       (2010-2025, taken from the cycles actually drawn); every other chart
+       names the span its x-axis already runs across. */
+    const yrs = legend.map((l) => l.year).filter((y) => y && y < 9000).sort((a, b) => a - b);
+    const xLabels = [...svgEl.querySelectorAll(".axis-label.x")].map((n) => txt(n)).filter(Boolean);
+    const datey = (t) => /[0-9]/.test(t) && !/^(Election|\d+ ?yrs?)$/i.test(t);
+    let span = "";
+    if (yrs.length >= 2) span = yrs[0] + "\u2013" + yrs[yrs.length - 1];
+    else if (xLabels.length >= 2 && datey(xLabels[0]) && datey(xLabels[xLabels.length - 1]))
+      span = xLabels[0] + " \u2013 " + xLabels[xLabels.length - 1];
+    const title = span ? titleBase + "  \u00b7  " + span : titleBase;
 
     const { markup, w: vw, h: vh } = bakeSvg(svgEl);
     const img = new Image();
