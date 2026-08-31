@@ -4299,8 +4299,27 @@ window.AP = (function () {
     else dstEl.appendChild(span);
   };
 
-  const bake = (srcEl, dstEl) => {
+  /* Every ancestor of something stripped, up to the captured root. Their
+     computed height was measured while the stripped thing was still in them,
+     so baking it leaves a hole exactly the size of what was removed. */
+  const elasticSet = (target) => {
+    const set = new Set();
+    target.querySelectorAll(STRIP_SEL).forEach((el) => {
+      for (let p = el.parentElement; p; p = p.parentElement) {
+        set.add(p);
+        if (p === target) break;
+      }
+    });
+    return set;
+  };
+
+  const bake = (srcEl, dstEl, elastic) => {
     dstEl.setAttribute("style", decls(getComputedStyle(srcEl)));
+    if (elastic && elastic.has(srcEl)) {
+      dstEl.style.height = "auto";
+      dstEl.style.minHeight = "0";
+      dstEl.style.maxHeight = "none";
+    }
     /* the source still holds elements stripped from the clone (the copy
        button itself) - pair children by position, skipping those */
     const sKids = srcEl.children;
@@ -4308,7 +4327,7 @@ window.AP = (function () {
     let j = 0;
     for (let i = 0; i < sKids.length; i++) {
       if (sKids[i].matches && sKids[i].matches(STRIP_SEL)) continue;
-      bake(sKids[i], dKids[j++]);
+      bake(sKids[i], dKids[j++], elastic);
     }
     if (!VOID_TAGS.has(srcEl.tagName) && srcEl.namespaceURI.indexOf("svg") === -1) {
       bakePseudo(srcEl, dstEl, "::before", true);
@@ -4351,13 +4370,10 @@ window.AP = (function () {
     if (!rect.width || !rect.height) { reject(new Error("nothing visible to capture")); return; }
     const dpr = Math.min(Math.max(window.devicePixelRatio || 1, 1), 3);
     const w = Math.round(rect.width);
-    const h = Math.round(rect.height);
-    const W = Math.max(1, Math.round(rect.width * dpr));
-    const H = Math.max(1, Math.round(rect.height * dpr));
 
     const clone = target.cloneNode(true);
     clone.querySelectorAll(STRIP_SEL).forEach((b) => b.remove());
-    bake(target, clone);
+    bake(target, clone, elasticSet(target));
     /* the rect is what was on screen: the clone's own frame (margin, root
        transform, document flow position) must not shift it a second time */
     clone.style.margin = "0";
@@ -4367,7 +4383,30 @@ window.AP = (function () {
     clone.style.top = "auto"; clone.style.right = "auto";
     clone.style.bottom = "auto"; clone.style.left = "auto";
     clone.style.width = w + "px";
+
+    /* The height is MEASURED off the stripped clone, not taken from the live
+       rect. rect was read before the strip, so on a layout where the removed
+       controls sit in their own row - every phone, where .hero-top wraps -
+       it is taller than what is left by exactly the band they occupied, and
+       the capture came out with a hole in it and blank space to match. On a
+       desktop the controls are a short side column that never set the row's
+       height, which is why this only ever showed on a phone.
+
+       Laid out off-screen rather than guessed at: the clone is already fully
+       style-baked, so the only thing it needs to report a true height is a
+       box of the right width to flow in. */
+    clone.style.height = "auto";
+    const holder = document.createElement("div");
+    holder.style.cssText = "position:fixed;left:-100000px;top:0;width:" + w +
+      "px;visibility:hidden;pointer-events:none;";
+    holder.appendChild(clone);
+    document.body.appendChild(holder);
+    const h = Math.max(1, Math.round(clone.getBoundingClientRect().height));
+    holder.remove();
     clone.style.height = h + "px";
+
+    const W = Math.max(1, Math.round(w * dpr));
+    const H = Math.max(1, Math.round(h * dpr));
 
     /* WebKit lays foreignObject XHTML out in the img's device-pixel viewport
        and ignores a viewBox transform, which parked the whole card compressed
