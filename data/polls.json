@@ -4910,8 +4910,17 @@
       "alb": -2,
       "opp": -21,
       "oppName": "Ley",
-      "han": -12,
-      "detail": null
+      "han": -13,
+      "detail": {
+        "alb": {
+          "app": 37,
+          "dis": 39
+        },
+        "han": {
+          "app": 32,
+          "dis": 45
+        }
+      }
     },
     {
       "date": "2025-11-20",
@@ -4986,8 +4995,17 @@
       "alb": 1,
       "opp": -20,
       "oppName": "Ley",
-      "han": null,
-      "detail": null
+      "han": -19,
+      "detail": {
+        "alb": {
+          "app": 39,
+          "dis": 38
+        },
+        "han": {
+          "app": 31,
+          "dis": 50
+        }
+      }
     },
     {
       "date": "2025-12-20",
@@ -5094,11 +5112,20 @@
     {
       "date": "2026-01-29",
       "firm": "RedBridge / Accent",
-      "alb": -13,
+      "alb": -10,
       "opp": -11,
       "oppName": "Ley",
-      "han": -2,
-      "detail": null
+      "han": -3,
+      "detail": {
+        "alb": {
+          "app": 34,
+          "dis": 44
+        },
+        "han": {
+          "app": 38,
+          "dis": 41
+        }
+      }
     },
     {
       "date": "2026-02-08",
@@ -5197,11 +5224,24 @@
     {
       "date": "2026-02-27",
       "firm": "RedBridge / Accent",
-      "alb": -17,
-      "opp": -3,
+      "alb": -13,
+      "opp": -1,
       "oppName": "Taylor",
-      "han": -3,
-      "detail": null
+      "han": -2,
+      "detail": {
+        "alb": {
+          "app": 32,
+          "dis": 45
+        },
+        "opp": {
+          "app": 19,
+          "dis": 20
+        },
+        "han": {
+          "app": 38,
+          "dis": 40
+        }
+      }
     },
     {
       "date": "2026-03-10",
@@ -5269,22 +5309,22 @@
     {
       "date": "2026-03-27",
       "firm": "RedBridge / Accent",
-      "alb": -9,
-      "opp": -2,
+      "alb": -17,
+      "opp": -3,
       "oppName": "Taylor",
-      "han": -1,
+      "han": -3,
       "detail": {
         "alb": {
-          "app": 34,
-          "dis": 43
+          "app": 29,
+          "dis": 46
         },
         "opp": {
-          "app": 20,
+          "app": 19,
           "dis": 22
         },
         "han": {
           "app": 40,
-          "dis": 41
+          "dis": 43
         }
       }
     },
@@ -5417,7 +5457,7 @@
       "date": "2026-04-30",
       "firm": "RedBridge / Accent",
       "alb": -9,
-      "opp": -12,
+      "opp": -2,
       "oppName": "Taylor",
       "han": -1,
       "detail": {
@@ -5427,7 +5467,7 @@
         },
         "opp": {
           "app": 20,
-          "dis": 32
+          "dis": 22
         },
         "han": {
           "app": 40,
@@ -5589,7 +5629,20 @@
       "opp": -4,
       "oppName": "Taylor",
       "han": 0,
-      "detail": null
+      "detail": {
+        "alb": {
+          "app": 29,
+          "dis": 48
+        },
+        "opp": {
+          "app": 21,
+          "dis": 25
+        },
+        "han": {
+          "app": 40,
+          "dis": 40
+        }
+      }
     },
     {
       "date": "2026-06-02",
