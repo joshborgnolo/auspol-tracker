@@ -3919,6 +3919,29 @@
       "tpp_alp": 48,
       "tpp_lnp": 52,
       "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn"
+    },
+    {
+      "date": "2026-08-30",
+      "published": "2026-08-31T17:00",
+      "dateStart": "2026-08-24",
+      "pollster": "Roy Morgan",
+      "client": "—",
+      "sample": 1585,
+      "undecided": 6.5,
+      "alp": 29.5,
+      "lnp": 20.5,
+      "grn": 13.5,
+      "onp": 23.5,
+      "ind": 13,
+      "oth": null,
+      "tpp_alp": 56,
+      "tpp_lnp": 44,
+      "tpp_flows": 55,
+      "lnpSplit": {
+        "Lib": 18,
+        "Nat": 2.5
+      },
+      "url": "https://www.roymorgan.com/findings/10328-federal-voting-intention-august-31-2026"
     }
   ],
   "ppm": [
