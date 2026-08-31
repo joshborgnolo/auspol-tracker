@@ -2554,6 +2554,13 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
 .tn-item { display: inline-flex; align-items: baseline; gap: 6px; }
 .tn-firm { font-weight: 700; color: var(--ink-2); }
 .tn-when { font-variant-numeric: tabular-nums; }
+/* the when doubles as the out-link to where the house publishes - the same
+   link the panel puts on the pollster name, but here it lands on the
+   countdown itself; the ↗ is the standing cue, as elsewhere */
+a.tn-link { color: inherit; text-decoration: none; cursor: pointer; }
+a.tn-link:hover, a.tn-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+a.tn-link:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
+a.tn-link:hover .plink-mark, a.tn-link:focus-visible .plink-mark { color: var(--ink-2); }
 /* the hedge is quieter than the figure it qualifies, not the same weight */
 .tn-maybe { color: var(--ink-faint); }
 

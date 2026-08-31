@@ -159,7 +159,7 @@ function NextPollTicker() {
          not certain to keep the next one either. "any moment now" is left
          alone - it already says what the hedge would. */
       const maybe = when !== "any moment now" && (half > 0 || !!r.loose || !!r.overdue);
-      return { firm: r.pollster, when, maybe };
+      return { firm: r.pollster, when, maybe, site: r.site };
     });
 
   const title = "Projected from each house's recent publication intervals"
@@ -171,7 +171,14 @@ function NextPollTicker() {
         <span className="tn-item" key={i}>
           <span className="tn-firm">{it.firm}</span>
           <span className="tn-when">
-            {it.when}
+            {/* the when carries the house's publication link, the same one the
+                panel attaches to the pollster name */}
+            {it.site
+              ? <a className="tn-link" href={it.site} target="_blank" rel="noopener noreferrer"
+                   title={`Where ${it.firm} publishes`}>
+                  {it.when}<span className="plink-mark" aria-hidden="true">↗</span>
+                </a>
+              : it.when}
             {it.maybe && <span className="tn-maybe"> (maybe)</span>}
           </span>
         </span>
