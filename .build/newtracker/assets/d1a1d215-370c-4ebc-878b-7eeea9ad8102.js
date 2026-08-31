@@ -1490,10 +1490,28 @@ function ArchApprCell({ s, net, metric }) {
 // them, as plain numerals (dot-coded by party) with any shape-flags inline.
 // Numerals, not a 0–100 bar: at archive scale every 53/47 bar looks identical,
 // so the ink carries nothing – the figures themselves are the record.
+// A poll with NO after-preferences figure published only its primaries – and
+// those are the record too, so they print here under a Primary flag rather
+// than leaving the cell a bare dash.
 function ArchPublished({ p }) {
-  const { tppContests, tppFlag } = window;
+  const { tppContests, tppFlag, primarySegs } = window;
   const c0 = tppContests(p)[0];
-  if (!c0) return <span className="dash" title="No two-party or head-to-head figure published – primaries only">—</span>;
+  if (!c0) {
+    const pSegs = p.p ? primarySegs(p) : [];
+    if (!pSegs.length) return <span className="dash" title="No voting-intention figures published with this poll">—</span>;
+    return (
+      <div className="apub" aria-label={"Primary votes: " + pSegs.map((s) => `${s.label} ${s.value}`).join(", ")}
+           title="No two-party or head-to-head figure in this poll – these are the primary votes">
+        {pSegs.map((s, i) => (
+          <span key={i} className="apub-seg" title={s.label}>
+            <span className="apub-dot" style={{ background: s.color }}></span>
+            {s.value.toFixed(1)}
+          </span>
+        ))}
+        <span className="facet-flag">Primary</span>
+      </div>
+    );
+  }
   const flag = tppFlag(p);
   return (
     <div className="apub" aria-label={c0.segs.map((s) => `${s.label} ${s.value}`).join(", ")}>
@@ -1561,14 +1579,31 @@ function archLeadInfo(p, measure) {
 // rather than a parallel set of lead rules. A pair published
 // undecided-inclusive doesn't sum to 100 – the bar's base shows through as
 // the remainder, exactly like an approval cell's don't-know gap.
-function ArchLead({ p, measure }) {
-  const li = archLeadInfo(p, measure);
+// A primary-vote margin to stand in for the missing 2PP, where a caller asks
+// for it: the Latest table passes primaryFallback so a row with no
+// after-preferences figure still shows what the poll DID publish, flagged as
+// primary so it can't be read as a two-party lead. The archive never passes
+// it – its held-by filter and sort run off archLeadInfo directly, and a
+// primary margin must not leak into that ordering. Display-only, same opt-in
+// principle as the 3cp derivation this file already notes inline.
+function primaryLeadInfo(p) {
+  if (!p.p || p.p.alp == null || p.p.lnp == null) return null;
+  const m = +(p.p.alp - p.p.lnp).toFixed(1);
+  return { m, primary: true, who: m >= 0 ? "alp" : "lnp", lab: m >= 0 ? "ALP" : "L/NP",
+           color: m >= 0 ? "var(--alp)" : "var(--lnp)",
+           segs: [{ v: p.p.alp, color: "var(--alp)" }, { v: p.p.lnp, color: "var(--lnp)" }],
+           note: " on primary votes – the poll published no after-preferences figure" };
+}
+function ArchLead({ p, measure, primaryFallback }) {
+  const li = archLeadInfo(p, measure) ||
+             (primaryFallback && measure === "lnp" ? primaryLeadInfo(p) : null);
   if (!li) return <span className="dash" title="This pollster didn’t publish the selected matchup this wave">—</span>;
   return (
     <div className="arch-appr"
          title={`${li.lab} leads by ${Math.abs(li.m).toFixed(1)}${li.note}`}>
       <span className="netv" style={{ color: inkOf(li.color) }}>
         {li.m > 0 ? "+" : ""}{li.m.toFixed(1)}
+        {li.primary && <>{" "}<span className="facet-flag">primary</span></>}
       </span>
       <div className="arch-appr-bar" aria-hidden="true">
         {li.segs.map((s, i) => <span key={i} style={{ width: s.v + "%", background: s.color }}></span>)}

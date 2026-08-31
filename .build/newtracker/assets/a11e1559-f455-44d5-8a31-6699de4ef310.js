@@ -2762,7 +2762,10 @@ function PollsterTable() {
 
                     {facet === "twopp" && (<>
                       <td className="ta-l apub-col hide-md"><ArchPublished p={r} /></td>
-                      <td className="num"><ArchLead p={r} measure="lnp" /></td>
+                      {/* polls with no published 2PP still have something to
+                          say in this facet – the fallback prints their ALP
+                          v L/NP primary margin, flagged as primary */}
+                      <td className="num"><ArchLead p={r} measure="lnp" primaryFallback /></td>
                     </>)}
                     {facet === "primary" && (<>
                       <td className="num" style={{ color: "var(--alp-text)", fontWeight: 600 }}>{r.p.alp != null ? r.p.alp.toFixed(1) : "—"}</td>
