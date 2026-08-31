@@ -2113,6 +2113,9 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .und-read-note { margin: 1px 0 0; font-size: 11.5px; color: var(--ink-3); }
 
 .pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13.5px; }
+/* inside the breakdown an absent section reads as just another plain line –
+   the serif italic is for empty states elsewhere (eg National direction) */
+.pd-sec .pd-absent { font-family: inherit; font-style: normal; font-size: 13px; margin: 0; }
 /* a fieldwork end standing in for a publication date nobody recorded, marked
    the dashed way the Latest-polls pill marks the same substitution */
 .pd-est { border-bottom: 1px dashed var(--line-2); color: var(--ink-3); }
