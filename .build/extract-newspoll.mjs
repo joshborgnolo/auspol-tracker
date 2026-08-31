@@ -74,6 +74,8 @@
 //   - writes are atomic (.tmp + rename)
 import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { IG_SLUG, IG_EMBED, igWindow, infogramLive, infogramStatic, attachTarget,
+  IG_DAY_WINDOW, IG_STA_WINDOW } from "./infogram.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -590,6 +592,15 @@ async function discover() {
   return out;
 }
 
+// ---------------------------------------------------------------- infogram
+// Rank-0 corroborator (spec: .build/newspoll-infogram-rung.md; orchestration
+// in ./infogram.mjs). Embeds are NOT pinned to their article, so their
+// figures date only from the charts' own labels and can only ever JOIN a
+// coverage-formed cluster (never found one): a chart-only release would fail
+// the existing missing-sample guard by design. Unavailability degrades to a
+// note — the prose pipeline must survive an Infogram outage; structural
+// drift is a guard and fails loudly (exit 2), per the spec's durability rule.
+
 // ------------------------------------------------------------- merge/guard
 const FIELDS = ["alp", "lnp", "grn", "onp", "ind", "oth", "tpp_alp", "tpp_lnp",
   "pmNet", "oppNet", "pmApp", "pmDis", "oppApp", "oppDis", "ppmA", "ppmO", "ppmH",
@@ -708,7 +719,9 @@ try {
     if (EXCLUDE.test(bits.headline ?? "")) continue;
     const { r, missing } = parseArticle(bits.entryText, pubIso);
     status.candidates.push((bits.headline ?? it.title).slice(0, 90));
-    recs.push({ src, url: art.canon ?? url, client: art.provider ?? src.client, title: bits.headline ?? it.title, pubIso, r, missing });
+    // Infogram embed ids ride in rendered/article DOMs (rung B input).
+    const igIds = [...art.text.matchAll(/infogram-embed[^>]*?data-id="([0-9a-f-]{36})"/gi)].map((m) => m[1].toLowerCase());
+    recs.push({ src, url: art.canon ?? url, client: art.provider ?? src.client, title: bits.headline ?? it.title, pubIso, r, missing, igIds });
   }
 
   const clusters = new Map();
@@ -732,6 +745,110 @@ try {
   }
 
   const guardFails = [];
+  const newPpmH = [];
+  const embed = { live: null, static: null, recon: null };
+
+  // ---- infogram rung A (live project) — corroborate or fill, never found
+  const A = await infogramLive(fetchText, latestNp);
+  embed.live = A.state;
+  if (A.state === "guard") guardFails.push("infogram: " + A.why);
+  else if (A.state !== "ok") console.error(`NP_NOTE infogram live rung ${A.state}${A.why ? " — " + A.why : ""}`);
+  if (A.state === "ok") {
+    let d = attachTarget([...clusters.keys()], A.pubIso, IG_DAY_WINDOW, A.figs.alp,
+      (dd) => mergeCluster(clusters.get(dd).filter((c) => !c.embed)), DAY);
+    if (!d) { console.error(`NP_NOTE infogram live (label ${A.pubIso}) found no agreeing cluster to join`); embed.live = "unattached"; }
+    else {
+      const era = olFor(d) ?? LEADERS.ols[LEADERS.ols.length - 1];
+      const figs = { ...A.figs, oppNet: A.figs.oppNetByEra[era.surname] ?? null };
+      delete figs.oppNetByEra;
+      // A chart naming a different OL than the era table expects is a note
+      // (era boundary just moved), not grounds to poison the release.
+      if (A.betterpmOppName && !A.betterpmOppName.toLowerCase().includes(era.surname)) {
+        console.error(`NP_NOTE infogram better-PM names "${A.betterpmOppName}" vs era OL ${era.oppName} — dropping live ppm pair, keeping the rest`);
+        figs.ppmA = null; figs.ppmO = null; figs.oppNet = null;
+      }
+      if (A.tppResumed) console.error("NP_NOTE infogram tpp feed has a numeric 2PP again — Newspoll resumed publishing it");
+      clusters.get(d).push({ src: { client: "The Australian", rank: -1 }, embed: "live",
+        url: IG_SLUG, title: "Infogram live project", pubIso: A.pubIso,
+        r: { date: d, dateStart: null, ...figs }, missing: [] });
+      embed.live = `attached@${d}`;
+      if (A.ppmUnc != null) console.error(`NP_NOTE infogram better-PM uncommitted ${A.ppmUnc}% (not modelled — corroboration only)`);
+    }
+  }
+
+  // ---- infogram rung B (per-wave static embeds)
+  const igIds = [...new Set(recs.flatMap((c) => c.igIds ?? []))].slice(0, 6);
+  const statics = igIds.length ? await infogramStatic(fetchText, igIds) : [];
+  const staticOk = statics.filter((s) => s.state === "ok");
+  for (const s of statics.filter((x) => x.state === "note"))
+    console.error(`NP_NOTE infogram embed ${s.id.slice(0, 8)}: ${s.why}`);
+  for (const s of staticOk) {
+    const label = s.parsed.hanson?.fieldworkLabel;
+    if (!label) { console.error(`NP_NOTE infogram embed ${s.id.slice(0, 8)}: no Hanson window label — skipping`); continue; }
+    // Date the figures from the chart's own window label; the year comes
+    // from whichever candidate actually lands on a cluster (never the clock).
+    let hit = null;
+    for (const y of [new Date().getUTCFullYear(), new Date().getUTCFullYear() - 1]) {
+      const w = igWindow(label, `${y}-12-31`);
+      if (!w) break;
+      const cands = [...clusters.keys()]
+        .filter((d) => Math.abs((new Date(d) - new Date(w.end)) / DAY) <= IG_STA_WINDOW)
+        .sort((a, b) => Math.abs(new Date(a) - new Date(w.end)) - Math.abs(new Date(b) - new Date(w.end)));
+      if (cands.length) { hit = { d: cands[0], w }; break; }
+    }
+    if (!hit) { console.error(`NP_NOTE infogram embed ${s.id.slice(0, 8)}: window "${label}" matches no cluster — skipping`); s.derived = { label, attached: false }; continue; }
+    const { d, w } = hit;
+    const era = olFor(d) ?? LEADERS.ols[LEADERS.ols.length - 1];
+    const rk = s.parsed.ranked ?? {};
+    if (rk.oppName && !rk.oppName.toLowerCase().includes(era.surname)) {
+      guardFails.push(`infogram static: ranked-PM OL "${rk.oppName}" vs era ${era.oppName} at ${d} — parse or era table drift`);
+      continue;
+    }
+    const { hanApp, hanDis } = s.parsed.hanson ?? {};
+    clusters.get(d).push({ src: { client: "The Australian", rank: -1 }, embed: "static",
+      url: IG_EMBED(s.id), title: "Infogram static embed", pubIso: null,
+      r: { date: d, dateStart: w.start, hanApp, hanDis,
+        hanNet: hanApp != null && hanDis != null ? Math.round((hanApp - hanDis) * 10) / 10 : null,
+        ppm3A: rk.ppm3A ?? null, ppm3H: rk.ppm3H ?? null, ppm3O: rk.ppm3O ?? null },
+      missing: [] });
+    s.derived = { label, attached: d };
+    // The distributed pair is the ALB–ONP preference matchup — the
+    // ppmHeadToHead section modelled across sections. Insert once.
+    const dist = s.parsed.distributed;
+    if (dist?.isAlbHan && dist.alb != null && dist.han != null && d >= LEADERS.pm.from
+      && !D.ppmHeadToHead?.some((r) => r.date === d && r.firm === "Newspoll")
+      && !newPpmH.some((r) => r.date === d))
+      newPpmH.push({ date: d, firm: "Newspoll", alb: dist.alb, han: dist.han });
+  }
+  embed.static = staticOk.length
+    ? staticOk.map((s) => `${s.id.slice(0, 8)}→${s.derived?.attached ?? "unattached"}`).join(",")
+    : igIds.length ? `0 of ${igIds.length} usable` : "no ids (no article DOM)";
+
+  // Netsat archive reconciliation — READ-ONLY. Pairs by publication label
+  // within +0..5d, requires the ALB net to agree, then compares the era OL.
+  // Divergences are notes for adjudication, never auto-writes.
+  if (A.state === "ok") {
+    const divergent = [], gaps = [];
+    let paired = 0, exact = 0;
+    for (const p of A.netsat) {
+      if (!p.iso || p.pm == null) continue;
+      const rows = (D.approval ?? []).filter((r) => r.firm === "Newspoll"
+        && (new Date(p.iso) - new Date(r.date)) / DAY >= 0 && (new Date(p.iso) - new Date(r.date)) / DAY <= IG_DAY_WINDOW);
+      const tr = rows.sort((a, b) => a.date < b.date ? 1 : -1)[0];
+      if (!tr || tr.alb == null || Math.abs(tr.alb - p.pm) > 0.5) continue;
+      paired++;
+      const eraK = (tr.oppName ?? "").toLowerCase();
+      const feedOpp = p[eraK] ?? null;
+      if (tr.opp == null && feedOpp != null) { gaps.push(`${tr.date}: tracker opp null, infogram ${tr.oppName} ${feedOpp}`); continue; }
+      if (tr.opp == null || feedOpp == null) { exact++; continue; }
+      if (Math.abs(tr.opp - feedOpp) <= 0.5) exact++;
+      else divergent.push(`${tr.date}: tracker ${tr.oppName} ${tr.opp} vs infogram ${feedOpp}`);
+    }
+    embed.recon = { paired, exact, divergent, gaps };
+    for (const x of divergent) console.error("NP_NOTE netsat recon divergent — " + x);
+    for (const x of gaps) console.error("NP_NOTE netsat recon gap — " + x);
+  }
+
   const newPolls = [], newPpm = [], newAppr = [], sources = [];
   for (const [date, cl] of [...clusters.entries()].sort()) {
     if (npDates.has(date)) { status.skipped_existing.push(date); continue; }
@@ -740,7 +857,9 @@ try {
     const pubIso = cl.map((c) => c.pubIso).filter(Boolean).sort()[0] ?? null;
     const errs = guardCluster(m, pubIso);
     if (errs.length) { guardFails.push(`${date}: ${errs.join(" | ")}`); continue; }
-    const best = cl[0];
+    // Provenance comes from real articles, never an embed record — rank −1
+    // sorts them first, so the row's client/url pick must skip them.
+    const best = cl.find((c) => !c.embed) ?? cl[0];
     const era = olFor(date);
     // Provenance URL: prefer the publisher of record's own link when one
     // theaustralian.com story falls uniquely inside this release's window
@@ -799,21 +918,27 @@ try {
     process.exit(2);
   }
 
-  if (newPolls.length) {
-    D.polls = [...D.polls, ...newPolls].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-    for (const [key, rows] of [["ppm", newPpm], ["approval", newAppr]])
-      if (rows.length) D[key] = [...D[key], ...rows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+  if (newPolls.length || newPpmH.length) {
+    if (newPolls.length)
+      D.polls = [...D.polls, ...newPolls].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    for (const [key, rows] of [["ppm", newPpm], ["approval", newAppr], ["ppmHeadToHead", newPpmH]])
+      if (rows.length) D[key] = [...(D[key] ?? []), ...rows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
     const next = JSON.stringify(D, null, 2) + trailingNl;
     status.changed = next !== orig;
     if (status.changed && !CHECK) {
       writeFileSync(OUT + ".tmp", next);
       renameSync(OUT + ".tmp", OUT);
-      mkdirSync(SRC_DIR, { recursive: true });
-      for (const s of sources) writeFileSync(`${SRC_DIR}/release-${s.date}.json`, s.json);
-      console.log(`wrote ${OUT}: +${newPolls.length} Newspoll release(s): ${status.added.map((a) => a.date).join(", ")}`);
+      if (newPolls.length) {
+        mkdirSync(SRC_DIR, { recursive: true });
+        for (const s of sources) writeFileSync(`${SRC_DIR}/release-${s.date}.json`, s.json);
+        console.log(`wrote ${OUT}: +${newPolls.length} Newspoll release(s): ${status.added.map((a) => a.date).join(", ")}`);
+      }
+      if (newPpmH.length) console.log(`wrote ${OUT}: +${newPpmH.length} Newspoll ppmHeadToHead row(s): ${newPpmH.map((r) => r.date).join(", ")}`);
     }
+    if (newPpmH.length) status.ppmHeadToHead = newPpmH.map((r) => `${r.date} ${r.alb}/${r.han}`);
   }
+  status.embed = embed;
   console.log("NP_STATUS " + JSON.stringify(status));
 } catch (err) {
   console.error("NP_ERROR " + (err?.message || err));
