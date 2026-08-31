@@ -111,32 +111,57 @@
   c.fillStyle = T.ink3; c.fillText("tracker", PAD, BL2);
   c.letterSpacing = "0px";
 
-  /* the masthead dial, same geometry and same data as the favicon in build.mjs:
-     graduation bars are the latest primary aggregate sorted tallest first, the
-     needle is the 2PP margin */
+  /* The masthead dial. This is a hand-copy of the header's glyph, and it had
+     drifted: it drew the right half of the arc in Coalition blue and swung the
+     needle on ALP v L/NP no matter what, where the header and the favicon both
+     pick Labor's STRONGEST challenger - whichever opponent polls the highest
+     2PP against them. One Nation has been taking that place in some months, so
+     the card could state a contest the site was not showing. Its strokes had
+     drifted too: an opaque arc a third heavier than the header's half-opacity
+     hairline, bars seated further out, a needle with no tip, a pivot in the
+     wrong ink. All of it is the header's now, times k - which is what the
+     header itself does when it renders a 12-unit dial at 57px.
+
+     The favicon in build.mjs stays heavier on purpose: it is read at 16px,
+     where a 1.4-unit hairline disappears. Same data, same geometry, thicker
+     pen. This one is drawn near the header's own size, so it takes the
+     header's weights. */
   (function dial(cx, cy, k) {
     const r = 12 * k, rad = (d) => ((d - 90) * Math.PI) / 180;
     const P = (d, rr) => ({ x: cx + Math.sin((d * Math.PI) / 180) * rr,
                             y: cy - Math.cos((d * Math.PI) / 180) * rr });
+    // whichever opponent polls the highest 2PP against Labor
+    const g2 = D.agg2pp[D.agg2pp.length - 1];
+    const gon = D.alt2pp && D.alt2pp.alp_on && D.alt2pp.alp_on[D.alt2pp.alp_on.length - 1];
+    const cands = [{ id: "lnp", lab: g2.alp, opp: g2.lnp }];
+    if (gon) cands.push({ id: "onp", lab: gon.a, opp: gon.b });
+    const top = cands.slice().sort((x, y) => y.opp - x.opp)[0];
+    const oppCol = T[top.id], margin = top.lab - top.opp;
+
     const arc = (a, b, col) => { c.beginPath(); c.arc(cx, cy, r, rad(a), rad(b));
-      c.strokeStyle = col; c.lineWidth = 3 * k; c.lineCap = "round"; c.stroke(); };
-    arc(-90, 0, T.alp); arc(0, 90, T.lnp);
+      c.strokeStyle = col; c.lineWidth = 1.4 * k; c.lineCap = "round"; c.stroke(); };
+    c.globalAlpha = 0.5; arc(-90, 0, T.alp); arc(0, 90, oppCol); c.globalAlpha = 1;
+
     const lp = D.aggPrimary[D.aggPrimary.length - 1];
     const ps = [["alp", lp.alp], ["lnp", lp.lnp], ["grn", lp.grn], ["onp", lp.onp]]
       .sort((a, b) => b[1] - a[1]);
     const vs = ps.map((p) => p[1]), mn = Math.min(...vs), mx = Math.max(...vs);
     [-54, -18, 18, 54].forEach((a, i) => {
       const h = (mx === mn ? 10.5 : 5 + ((ps[i][1] - mn) / (mx - mn)) * 5.5) * k;
-      const q = P(a, r + 2.4 * k), o = P(a, r + 2.4 * k + h);
+      const q = P(a, r + 2 * k), o = P(a, r + 2 * k + h);
       c.beginPath(); c.moveTo(q.x, q.y); c.lineTo(o.x, o.y);
-      c.strokeStyle = T[ps[i][0]]; c.lineWidth = 4.2 * k; c.lineCap = "butt"; c.stroke();
+      c.strokeStyle = T[ps[i][0]]; c.lineWidth = 3.4 * k; c.lineCap = "butt"; c.stroke();
     });
-    const g2 = D.agg2pp[D.agg2pp.length - 1], m = g2.alp - g2.lnp;
-    const tip = P(-Math.max(-1, Math.min(1, m / 12)) * 34, 8.6 * k);
+
+    const deg = -Math.max(-1, Math.min(1, margin / 12)) * 34;
+    const col = margin >= 0 ? T.alp : oppCol, tip = P(deg, 8.6 * k);
     c.beginPath(); c.moveTo(cx, cy); c.lineTo(tip.x, tip.y);
-    c.strokeStyle = m >= 0 ? T.alp : T.lnp; c.lineWidth = 2.8 * k;
-    c.lineCap = "round"; c.stroke();
-    c.beginPath(); c.arc(cx, cy, 2.2 * k, 0, 7); c.fillStyle = T.ink; c.fill();
+    c.strokeStyle = col; c.lineWidth = 1.7 * k; c.lineCap = "round"; c.stroke();
+    c.beginPath(); c.arc(tip.x, tip.y, 1.9 * k, 0, 7); c.fillStyle = col; c.fill();
+    // pivot last, so it caps the needle rather than sitting under it
+    c.beginPath(); c.arc(cx, cy, 1.7 * k, 0, 7); c.fillStyle = T.ink3; c.fill();
+    console.log("card dial · needle " + deg.toFixed(1) + "deg vs " + top.id
+                + " · " + ps.map((x) => x[0] + " " + x[1].toFixed(1)).join(", "));
   })(PAD + wMark + 43.8, BL1 + 20.33, 1.485);
 
   /* The reading rides in the masthead band, right-aligned under the date.
