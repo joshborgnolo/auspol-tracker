@@ -71,6 +71,31 @@ jobs:
           fi
           bash ${{ inputs.wrapper }}
 
+      # The wrappers send every step's output to .build/logs/<house>.log and
+      # nothing to stdout, so a failed run used to be opaque: the diagnosis died
+      # with the runner. .build/logs/ is gitignored, so anything matching here
+      # was written by THIS run — no marker file needed.
+      - name: Show the updater log on failure
+        if: failure()
+        run: |
+          shopt -s nullglob
+          logs=(.build/logs/*.log)
+          if [ ${#logs[@]} -eq 0 ]; then
+            echo "No .build/logs/*.log was written — the wrapper failed before its first log line."
+            exit 0
+          fi
+          for f in "${logs[@]}"; do
+            echo "::group::$f (last 200 lines)"
+            tail -n 200 "$f"
+            echo "::endgroup::"
+            {
+              echo "### $f (tail)"
+              echo '```'
+              tail -n 40 "$f"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          done
+
   repair:
     needs: update
     if: failure()
