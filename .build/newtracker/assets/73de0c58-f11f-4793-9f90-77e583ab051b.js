@@ -80,10 +80,11 @@ function Header({ isDark, onToggleTheme }) {
      instead of appearing on top of it. */
   const [story, setStory] = useState(null);
   const glyphRef = useRef(null);
-  /* There are two ways in now - the mark itself and the pill below the tagline
-     - so closing has to hand focus back to whichever one was used, not always
-       to the mark. The dial still grows out of the MARK either way: that is
-       where the instrument being wound back actually sits on the page. */
+  /* Closing hands focus back to whichever element opened the overlay - the
+     whole lockup is the way in today, but the return is kept generic so a
+     second entry point never has to touch this. The dial still grows out of
+     the MARK either way: that is where the instrument being wound back
+     actually sits on the page. */
   const openerRef = useRef(null);
   const openStory = (e) => {
     openerRef.current = (e && e.currentTarget) || glyphRef.current;
@@ -161,13 +162,13 @@ function Header({ isDark, onToggleTheme }) {
     <header className="site-head">
       <div className="brand">
         <h1 className="wordmark stacked">
-          <span className="wm-textcol">
-            <span className="wm-name" ref={wmName}>auspol</span>
-            <span className="wm-track" ref={wmTrack}>tracker</span>
-          </span>
-          <button className="wm-glyph" ref={glyphRef} onClick={openStory}
+          <button className="wm-glyph" onClick={openStory}
                   title="Wind the dial back through the term"
                   aria-label="Wind the dial back: replay the term on the masthead dial">
+            <span className="wm-textcol">
+              <span className="wm-name" ref={wmName}>auspol</span>
+              <span className="wm-track" ref={wmTrack}>tracker</span>
+            </span>
             {/* viewBox bounds what is actually drawn, the way the favicon's does in
                 build.mjs, rather than the old hardcoded 0 0 44 28 - which held the
                 ink hard against its left edge and carried 5.6 units of dead space
@@ -177,7 +178,7 @@ function Header({ isDark, onToggleTheme }) {
                 they cannot reach past the top edge. 57px sizes the ink to 74% of
                 the wordmark's height, the proportion the lockup was drawn with
                 before both words went to 30px. */}
-            <svg className="wm-dial" viewBox="0.58 0.07 38.39 26.73" width="57" height="39.7" aria-hidden="true">
+            <svg className="wm-dial" ref={glyphRef} viewBox="0.58 0.07 38.39 26.73" width="57" height="39.7" aria-hidden="true">
               <title>{glyphTitle + " · " + pendTitle}</title>
               {/* half-circle two-tone swing arc: Labor left, strongest challenger right */}
               <path d={arcPath(-90, 0)} className="wm-arc" stroke="var(--alp)"></path>
@@ -213,20 +214,6 @@ function Header({ isDark, onToggleTheme }) {
           <span className="wm-sr">– Australian federal polling</span>
         </h1>
         <p className="tagline">Aggregated opinion polling for the next Australian federal election, <br className="tagline-br"></br>set against the last five</p>
-        {/* The replay was reachable only by clicking the masthead mark, which
-            nothing announced: a hover tint on a pointer, and on a phone no cue
-            at all. The mark is still the way in - it is the instrument being
-            wound back, so clicking it is the honest gesture - but a reader who
-            has never been told cannot be expected to try it. This says so. */}
-        <button className="head-replay" onClick={openStory}
-                title="Wind the masthead dial back to the 2025 election and let the term run">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
-               strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1" />
-            <path d="M3 4.2v4.4h4.4" />
-          </svg>
-          Replay the term
-        </button>
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot " + fresh.state}></span>
           Updated {D.latest.published} · {D.latest.pollsTracked} polls, and counting

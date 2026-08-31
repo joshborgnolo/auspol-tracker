@@ -490,11 +490,7 @@ body.js .static-summary {
 body.js #root {
   margin-top: calc(-1 * var(--ss-h, 0px));
 }
-/* 12px, not 7: the dial's nearest ink is the tallest graduation's tip, which
-   reaches to within 0.9px of the box edge, so the clear space a reader sees is
-   the gap plus almost nothing. 12px puts it at 12.9px - a third of the mark's
-   own height, and it opens to 25px beside the letters themselves. */
-.wordmark.stacked { flex-direction: row; align-items: center; gap: 12px; }
+.wordmark.stacked { flex-direction: row; align-items: center; }
 /* Both words at ONE size, told apart by weight alone. At 30px `auspol` at 800
    measures 93.6px and `tracker` at 400 measures 95px, so the block squares
    itself off on its own - no tracking, no size step, no indent to force it.
@@ -532,6 +528,16 @@ body.js #root {
      block at one end or 2.5px past it at the other, and the midpoint between
      them is a construction line nobody can see. */
   background: none; border: 0; padding: 3px; margin: -3px; cursor: pointer;
+  /* The words live inside this button - the whole lockup is the way into the
+     replay - so it has to carry the wordmark's typography onward to them
+     rather than fall back to the button UA face. */
+  font: inherit; letter-spacing: inherit; text-align: left; color: inherit;
+  /* 12px, not 7: the dial's nearest ink is the tallest graduation's tip,
+     which reaches to within 0.9px of the box edge, so the clear space a
+     reader sees is the gap plus almost nothing. 12px puts it at 12.9px - a
+     third of the mark's own height, and it opens to 25px beside the letters
+     themselves. */
+  gap: 12px;
   /* A hover scale is a surface responding to a pointer, not a mass with
      momentum, so it decelerates rather than overshooting - the old curve
      sprang past 1.06 and settled back, which reads as a toy. The needle keeps
@@ -671,11 +677,20 @@ body {
   --dl-channel:  color-mix(in oklch, var(--ink) 13%, var(--surface-2));
   --dl-scale-band: color-mix(in oklch, var(--ink) 6%, transparent);
   --dl-lip:        color-mix(in oklch, white 80%, transparent);
-  --hg-well: color-mix(in oklch, var(--ink) 5%, var(--surface));
-  --hg-cut:  color-mix(in oklch, var(--ink) 20%, transparent);
+  /* On paper the recess cannot be drawn with a highlight. The page sits at
+     L 0.985, so a lit lip has 0.015 of headroom to white and lands +0.013 -
+     invisible - where the same lip in dark lifts +0.102 off its page. The old
+     well was only 3% darker than the page against dark's 18%, so the two cues
+     that carry depth in dark both failed here at once and the track read flat.
+     All of it moves inside: a deeper floor, and a gradient down the channel -
+     the near wall shadowed, the far wall catching the bounce. */
+  --hg-well:    color-mix(in oklch, var(--ink) 15%, var(--surface));
+  --hg-well-lo: color-mix(in oklch, var(--ink) 6%, var(--surface));
+  --hg-cut:     color-mix(in oklch, var(--ink) 40%, transparent);
+  --hg-bounce:  color-mix(in oklch, white 80%, transparent);
   --hg-lip:  color-mix(in oklch, white 85%, transparent);
-  --hg-grad: color-mix(in oklch, var(--ink) 17%, transparent);
-  --hg-tie-cut: color-mix(in oklch, var(--ink) 55%, transparent);
+  --hg-grad: color-mix(in oklch, var(--ink) 27%, transparent);
+  --hg-tie-cut: color-mix(in oklch, var(--ink) 62%, transparent);
 }
 body.dark {
   --dl-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
@@ -688,8 +703,13 @@ body.dark {
   --dl-channel:  color-mix(in oklch, black 40%, var(--surface));
   --dl-scale-band: color-mix(in oklch, black 30%, transparent);
   --dl-lip:        color-mix(in oklch, white 22%, transparent);
-  --hg-well: color-mix(in oklch, black 30%, var(--surface));
-  --hg-cut:  color-mix(in oklch, black 55%, transparent);
+  /* Same structure, tuned to land where dark already was - it reads as a
+     notch as it stands, so the floor either side of the gradient averages the
+     flat 30% it replaces rather than deepening it. */
+  --hg-well:    color-mix(in oklch, black 35%, var(--surface));
+  --hg-well-lo: color-mix(in oklch, black 25%, var(--surface));
+  --hg-cut:     color-mix(in oklch, black 58%, transparent);
+  --hg-bounce:  color-mix(in oklch, white 12%, transparent);
   --hg-lip:  color-mix(in oklch, white 13%, transparent);
   --hg-grad: color-mix(in oklch, white 20%, transparent);
   --hg-tie-cut: color-mix(in oklch, black 70%, transparent);
@@ -827,29 +847,6 @@ body.dark .dl-bloom { opacity: 1; }
   font-display: swap;
   src: local("Myriad Pro Light SemiExtended Italic"), local("MyriadPro-LightSemiExtIt");
 }
-/* The way into the replay. It sits with the wordmark because the wordmark is
-   what it replays - the mark's bars are the primary vote and its needle the
-   two-party preferred, so winding it back IS the story. Quiet on purpose: the
-   same pill the row controls use, at the same voice as the meta line beside
-   it, because this is an invitation and not the reason anyone came. */
-.head-replay {
-  display: inline-flex; align-items: center; gap: 6px; margin-top: 9px;
-  border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
-  padding: 5px 12px 5px 9px; font-family: var(--sans); font-size: 11.5px;
-  font-weight: 600; color: var(--ink-2); cursor: pointer; white-space: nowrap;
-  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
-}
-.head-replay:hover { color: var(--ink); border-color: var(--ink-3);
-  background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
-.head-replay svg { opacity: 0.75; }
-/* a finger's target, not a pointer's: the pill keeps its printed size and
-   claims the rest underneath it, the way the row caret does */
-.head-replay { position: relative; }
-.head-replay::after {
-  content: ""; position: absolute; left: 0; right: 0; top: 50%;
-  height: 44px; transform: translateY(-50%);
-}
-.head-replay:hover svg { opacity: 1; }
 .tagline {
   /* negative bottom margin drops Newsreader's last line ~1.5px so the tagline
      text baseline-to-bottom edge optically matches the head-meta values */
@@ -1101,8 +1098,14 @@ body.dark .dl-bloom { opacity: 1; }
 .hero-gauge { margin-top: 16px; max-width: 340px; }
 .hg-track {
   position: relative; height: 12px; border-radius: 999px;
-  background: var(--hg-well);
-  box-shadow: inset 0 2px 3px var(--hg-cut), inset 0 -1px 0 var(--hg-lip), 0 1px 0 var(--hg-lip);
+  /* Down the channel, not across it: the wall nearest the light occludes and
+     the far one catches the bounce, which is the cue that survives on paper
+     where a highlight has no room to. */
+  background: linear-gradient(to bottom, var(--hg-well), var(--hg-well-lo));
+  box-shadow: inset 0 1px 0 var(--hg-cut),          /* the cut edge itself */
+              inset 0 3px 5px -2px var(--hg-cut),   /* what it casts inside */
+              inset 0 -1px 0 var(--hg-bounce),      /* light off the far wall */
+              0 1px 0 var(--hg-lip);                /* the sill, where there is room */
 }
 /* Ticks on the sill, not lines across the channel. Crossing it made six even
    bars that read as a segmented meter and drowned the one mark that matters. */
