@@ -2666,7 +2666,8 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-head-side { display: inline-flex; align-items: center; gap: 14px; }
 .ap-head-side .ap-count { display: none; }
 @media (max-width: 560px) {
-  .ap-head-side .ap-count { display: inline; }
+  .ap-head-side { width: 100%; }                 /* fill its line, so the tally can park at the far edge */
+  .ap-head-side .ap-count { display: inline; margin-left: auto; }
   .ap-bar-end .ap-count { display: none; }
 }
 /* ---------- archive filter bar ---------- */
