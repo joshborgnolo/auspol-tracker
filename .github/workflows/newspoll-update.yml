@@ -1,0 +1,48 @@
+# Newspoll updater. Newspoll publishes roughly every three weeks on Sunday
+# evening AEST (canonical rows show published ~20:00 Sun), but the extractor
+# reads FREE SECONDARY COVERAGE, which lags the release by hours to days — the
+# 2026-08-28 wave sat as a candidate for four days. So the cadence is a Sunday
+# evening sweep plus weekday mornings, not a dense burst at the embargo.
+#
+# Chrome-dependent rungs are intentionally absent here: the wrapper leaves
+# NEWSIE_CHROME unset (as it already did under launchd), so this is a lift with
+# no behaviour change. Rung B enrichment and the topic-page discovery rung stay
+# a local, manual pass. `newspoll-watch.yml` separately detects a published wave
+# from the anonymous Infogram slug and is the early warning this job can't be.
+#
+# The local launchd job stays installed as a backup — newspoll-updater.sh now
+# fast-forwards to origin/main and skips its slot if main moved underneath it.
+#
+# AEST = UTC+10.
+
+name: newspoll-update
+
+on:
+  schedule:
+    - cron: '0 9 * * 0'   # Sun 19:00 AEST — ahead of the usual embargo
+    - cron: '30 12 * * 0' # Sun 22:30 AEST — after it, first coverage
+    - cron: '0 20 * * 0'  # Mon 06:00 AEST
+    - cron: '0 20 * * 1'  # Tue 06:00 AEST
+    - cron: '0 20 * * 3'  # Thu 06:00 AEST
+    - cron: '0 20 * * 4'  # Fri 06:00 AEST — late-clustering coverage
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: 'Force the update job to fail (tests the Matilda repair job)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    uses: ./.github/workflows/poll-agent.yml
+    with:
+      house: newspoll
+      wrapper: .build/newspoll-updater.sh
+      repair_prompt: .build/newspoll-repair-prompt.md
+      simulate_failure: ${{ inputs.simulate_failure }}
+    secrets: inherit

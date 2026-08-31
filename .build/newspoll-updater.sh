@@ -23,6 +23,20 @@ LOG="$LOG_DIR/newspoll.log"
 mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
 
+# The GitHub Actions newspoll-update job may push to main between local
+# launchd slots. Refresh first; if the local tree can't fast-forward, skip
+# this slot rather than commit on a stale base. (Same guard as the migrated
+# siblings — required before the two schedules can coexist.)
+if git diff --quiet && git diff --cached --quiet; then
+  git fetch origin -q || true
+  if ! git merge --ff-only origin/main >> "$LOG" 2>&1; then
+    log "local main diverged from origin/main; skipping slot"
+    exit 0
+  fi
+else
+  log "working tree dirty; skipping freshness sync"
+fi
+
 EXTRACT_OUT="$(node .build/extract-newspoll.mjs 2>&1)"
 CODE=$?
 LAST_LINE="$(echo "$EXTRACT_OUT" | tail -1)"
