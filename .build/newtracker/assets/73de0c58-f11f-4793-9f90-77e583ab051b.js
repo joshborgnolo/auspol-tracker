@@ -1296,8 +1296,9 @@ const TABS = [
      pins, and on a phone there is not room for both. The glossary is the one
      tab a reader is never mid-task in, so it is the one that yields. The CSS
      gates the hide to phone widths only – a wide bar has room for the full
-     tab set plus the score, so Info stays put there. */
-  { id: "info", label: "Info", pinHide: true,
+     tab set plus the score, so Information stays put there, its label
+     abbreviating to "Info" only on the same phone widths. */
+  { id: "info", label: "Information", labelNarrow: "Info", pinHide: true,
     tip: "About this site – how it works, what it tracks, and the terms it uses" },
 ];
 const TAB_IDS = TABS.map((t) => t.id);
