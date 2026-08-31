@@ -111,6 +111,24 @@
   c.fillStyle = T.ink3; c.fillText("tracker", PAD, BL2);
   c.letterSpacing = "0px";
 
+  /* Placement derived from the scale instead of baked for one of them. The
+     two numbers this replaces - 43.8 across and 20.33 down - were measured off
+     the lockup at k=1.485 and silently encoded it: at 1.5x they would have put
+     the dial's left edge 4px INSIDE the l of auspol and its top 12px above the
+     card's margin. Both are now what they always meant.
+
+     DIAL_LEFT and DIAL_DROP come off the header's own viewBox (0.58 0.07 38.39
+     26.73, pivot at 22 24.5): the drawing reaches 21.42 units left of the pivot
+     and the pivot sits 11.065 units below the middle of it. So the left edge
+     lands a fixed ink gap past the wordmark whatever the size, and the drawing
+     centres on the lockup rather than the pivot doing so - which is the whole
+     point of the second number, since the dial is far from symmetric about its
+     own pivot. */
+  const DIAL_K = 2.2275;            // 1.5x the 1.485 this was drawn at
+  const DIAL_GAP = 12;              // wordmark's right ink edge to the dial's left
+  const DIAL_LEFT = 21.42, DIAL_DROP = 11.065;
+  const WM_MID = 95.9;              // the lockup's optical centre, cap of auspol to baseline of tracker
+
   /* The masthead dial. This is a hand-copy of the header's glyph, and it had
      drifted: it drew the right half of the arc in Coalition blue and swung the
      needle on ALP v L/NP no matter what, where the header and the favicon both
@@ -162,7 +180,7 @@
     c.beginPath(); c.arc(cx, cy, 1.7 * k, 0, 7); c.fillStyle = T.ink3; c.fill();
     console.log("card dial · needle " + deg.toFixed(1) + "deg vs " + top.id
                 + " · " + ps.map((x) => x[0] + " " + x[1].toFixed(1)).join(", "));
-  })(PAD + wMark + 43.8, BL1 + 20.33, 1.485);
+  })(PAD + wMark + DIAL_GAP + DIAL_LEFT * DIAL_K, WM_MID + DIAL_DROP * DIAL_K, DIAL_K);
 
   /* The reading rides in the masthead band, right-aligned under the date.
      The band was 143px tall carrying one 14px line; the figures below need
@@ -185,11 +203,14 @@
   c.beginPath(); c.moveTo(PAD, 162.5); c.lineTo(W - PAD, 162.5); c.stroke();
 
   /* ---- the figures ------------------------------------------------------ */
-  /* 150px and centred on the card, arranged the way the page's own hero
+  /* No eyebrow over them. "TWO-PARTY PREFERRED" labelled a row that already
+     says LABOR and COALITION inline, under a standfirst that has just said
+     who leads and by how much - three namings of one measure.
+
+     150px and centred on the card, arranged the way the page's own hero
      arranges them - LABOR 51.4 | 48.6 COALITION - so the labels sit inline
      and no separate label row is needed. They are the only element that
      survives a 360px thumbnail, so they get the middle. */
-  caps("TWO-PARTY PREFERRED", PAD, 202, 15, 2.6, T.ink3, 700);
   const FIG_Y = 330, FIG_PX = 150, GAP = 22, DOT = 4.5;
   const figFont = "600 " + FIG_PX + 'px Newsreader, Georgia, serif';
   const measCaps = (t) => { c.font = '700 20px "Source Sans 3", sans-serif';
