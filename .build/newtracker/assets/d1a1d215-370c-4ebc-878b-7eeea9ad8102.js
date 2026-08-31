@@ -169,16 +169,18 @@ function NextPollTicker() {
       <span className="tn-lab">Next</span>
       {items.map((it, i) => (
         <span className="tn-item" key={i}>
-          <span className="tn-firm">{it.firm}</span>
-          <span className="tn-when">
-            {/* the when carries the house's publication link, the same one the
-                panel attaches to the pollster name */}
+          {/* the name carries the house's publication link, the same one the
+              panel attaches to the pollster name */}
+          <span className="tn-firm">
             {it.site
               ? <a className="tn-link" href={it.site} target="_blank" rel="noopener noreferrer"
                    title={`Where ${it.firm} publishes`}>
-                  {it.when}<span className="plink-mark" aria-hidden="true">↗</span>
+                  {it.firm}<span className="plink-mark" aria-hidden="true">↗</span>
                 </a>
-              : it.when}
+              : it.firm}
+          </span>
+          <span className="tn-when">
+            {it.when}
             {it.maybe && <span className="tn-maybe"> (maybe)</span>}
           </span>
         </span>
