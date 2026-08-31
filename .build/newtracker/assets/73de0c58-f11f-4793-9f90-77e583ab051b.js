@@ -48,6 +48,43 @@ function Header({ isDark, onToggleTheme }) {
      one more unit than it widens the ink. What has to line up is the ink, so
      the trailing unit comes back off both measurements before they are
      compared. */
+  /* The rocker can be flicked as well as pressed. Dragging across the pivot
+     throws it, the way a real switch goes over under a thumb rather than
+     needing to be aimed at and tapped - and on a phone that is the more
+     natural gesture of the two.
+
+     A deadzone either side of the pivot stops a wobble on the seam from
+     toggling repeatedly, which matters more than usual here: the theme change
+     runs inside a view transition, so each flip is a whole-page crossfade.
+
+     Nothing has to be undone for the click that follows a drag. Both buttons
+     were already written to do nothing when their own half is the live one,
+     so a release over the half the drag just chose is a no-op. */
+  const segRef = useRef(null);
+  const segDrag = useRef(false);
+  const halfAt = (clientX) => {
+    const el = segRef.current;
+    if (!el) return null;
+    const r = el.getBoundingClientRect();
+    const mid = r.left + r.width / 2, DEAD = 6;
+    if (clientX > mid + DEAD) return true;    // the moon half
+    if (clientX < mid - DEAD) return false;   // the sun half
+    return null;                              // on the pivot: not yet thrown
+  };
+  const onSegDown = (e) => {
+    segDrag.current = true;
+    try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) { /* fine without */ }
+  };
+  const onSegMove = (e) => {
+    if (!segDrag.current) return;
+    const want = halfAt(e.clientX);
+    if (want != null && want !== isDark) onToggleTheme();
+  };
+  const onSegUp = (e) => {
+    segDrag.current = false;
+    try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) { /* fine */ }
+  };
+
   const wmName = useRef(null), wmTrack = useRef(null);
   React.useEffect(() => {
     const a = wmName.current, b = wmTrack.current;
@@ -240,7 +277,9 @@ function Header({ isDark, onToggleTheme }) {
             <span className="meta-v">{D.latest.pollsTracked} · {D.latest.housesTracked} pollsters</span>
           </div>
         </div>
-        <div className="theme-seg segmented" role="group" aria-label="Colour theme">
+        <div className="theme-seg segmented" role="group" aria-label="Colour theme"
+             ref={segRef} onPointerDown={onSegDown} onPointerMove={onSegMove}
+             onPointerUp={onSegUp} onPointerCancel={onSegUp}>
           <button className={"seg-btn theme-cell" + (!isDark ? " active" : "")}
                   onClick={() => { if (isDark) onToggleTheme(); }}
                   aria-pressed={!isDark} aria-label="Light mode" title="Light mode">
