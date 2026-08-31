@@ -2014,10 +2014,13 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 .detail-row:hover { background: transparent !important; }
 .poll-detail { padding: 6px 14px 20px 42px; background: var(--surface-2); text-align: left; }
+/* the meta line is part of the one detail container, not a band of its own:
+   no dividing rule, and the gap to the first ledger section is the ledger's
+   own rhythm rather than a header's clearance */
 .pd-meta {
   container-type: inline-size; container-name: pdmeta;
-  display: flex; flex-wrap: wrap; gap: 6px 26px; padding: 4px 0 16px;
-  margin-bottom: 18px; border-bottom: 1px solid var(--line-2);
+  display: flex; flex-wrap: wrap; gap: 6px 26px; padding: 4px 0 0;
+  margin-bottom: 13px;
   font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
 }
 .pd-meta-i { white-space: nowrap; }
@@ -2036,8 +2039,8 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 @media (min-width: 1001px) {
   .pd-meta .meta-md { display: none; }
   /* the latest detail's own band exists only where the table has dropped
-     its sample column – above 1000px it would be a divider with nothing
-     left to say, so the whole band (padding and rule included) goes away */
+     its sample column – above 1000px it would have nothing left to say,
+     so the whole band goes away */
   .pd-meta-sm { display: none; }
 }
 
