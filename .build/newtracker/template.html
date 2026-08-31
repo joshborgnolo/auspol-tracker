@@ -2600,6 +2600,28 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
 @media (max-width: 640px) {
   .tabs.pinned .tab-pinhide { display: none; }
 }
+/* ---- the next-poll countdown in the tab bar ------------------------------
+   Wide screens only, and only while the bar sits in the page. Once it pins,
+   the docked 2PP score takes the right end - it is absolutely positioned
+   there - and the two would sit on top of one another; the score is the one
+   that has to travel across every tab, so the countdown is the one that goes. */
+.tab-next { display: none; }
+@media (min-width: 1100px) {
+  .tabs:not(.pinned) .tab-next {
+    display: inline-flex; align-items: baseline; gap: 14px;
+    margin-left: auto; padding-bottom: 11px;
+    font-family: var(--sans); font-size: 12px; white-space: nowrap;
+    color: var(--ink-3);
+  }
+}
+.tn-lab { font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-faint); }
+.tn-item { display: inline-flex; align-items: baseline; gap: 6px; }
+.tn-firm { font-weight: 700; color: var(--ink-2); }
+.tn-when { font-variant-numeric: tabular-nums; }
+/* the hedge is quieter than the figure it qualifies, not the same weight */
+.tn-maybe { color: var(--ink-faint); }
+
 .tabs-sentinel { height: 0; margin: 0; padding: 0; pointer-events: none; }
 .tabs {
   position: relative;

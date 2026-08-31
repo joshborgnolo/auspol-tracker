@@ -2450,6 +2450,28 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
 @media (max-width: 640px) {
   .tabs.pinned .tab-pinhide { display: none; }
 }
+/* ---- the next-poll countdown in the tab bar ------------------------------
+   Wide screens only, and only while the bar sits in the page. Once it pins,
+   the docked 2PP score takes the right end - it is absolutely positioned
+   there - and the two would sit on top of one another; the score is the one
+   that has to travel across every tab, so the countdown is the one that goes. */
+.tab-next { display: none; }
+@media (min-width: 1100px) {
+  .tabs:not(.pinned) .tab-next {
+    display: inline-flex; align-items: baseline; gap: 14px;
+    margin-left: auto; padding-bottom: 11px;
+    font-family: var(--sans); font-size: 12px; white-space: nowrap;
+    color: var(--ink-3);
+  }
+}
+.tn-lab { font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--ink-faint); }
+.tn-item { display: inline-flex; align-items: baseline; gap: 6px; }
+.tn-firm { font-weight: 700; color: var(--ink-2); }
+.tn-when { font-variant-numeric: tabular-nums; }
+/* the hedge is quieter than the figure it qualifies, not the same weight */
+.tn-maybe { color: var(--ink-faint); }
+
 .tabs-sentinel { height: 0; margin: 0; padding: 0; pointer-events: none; }
 .tabs {
   position: relative;
@@ -9644,10 +9666,11 @@ function LedgerRow({
   }, "\u2014")));
 }
 
-/* Leader approval as figures: approve · don't know · disapprove, with the
-   net kept for the margin column. The don't-know is the measure's residual,
-   so it takes the same muted ink undecided wears in the shares rows. */
-function LedgerApprRow({
+/* Leader approval as a text line: "Albanese: 38% approve, 59% disapprove,
+   3% don't know". The don't-know is the residual of the published pair. The
+   net rides at the end of the same line with its change tag; a wave that
+   printed only the net says so rather than inventing a split. */
+function ApprLine({
   id,
   appr,
   chg
@@ -9666,77 +9689,25 @@ function LedgerApprRow({
     refDate: chg.r[id + "Net"]
   } : null;
   // some waves publish BOTH measures for one leader (Resolve rates the majors
-  // on performance and likeability). They answer different questions, so the
-  // second sits beside the first – never averaged in, never a correction of it.
+  // on performance and likeability); the second trails on the same line –
+  // never averaged in, never a correction of the first.
   const alt = appr.alt && appr.alt[id];
   return /*#__PURE__*/React.createElement("div", {
-    className: "pd-lrow"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-lgut pd-lgut-name"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "skey-dot",
-    style: {
-      background: LEADER_META[id].color
-    }
-  }), label), /*#__PURE__*/React.createElement("div", {
-    className: "pd-lscale"
-  }, s ? /*#__PURE__*/React.createElement("div", {
-    className: "pd-lnums"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-lnum"
-  }, /*#__PURE__*/React.createElement("b", null, s.app), " ", /*#__PURE__*/React.createElement("span", null, leg[0])), /*#__PURE__*/React.createElement("span", {
-    className: "pd-lnum muted"
-  }, /*#__PURE__*/React.createElement("b", null, dk), " ", /*#__PURE__*/React.createElement("span", null, leg[1])), /*#__PURE__*/React.createElement("span", {
-    className: "pd-lnum"
-  }, /*#__PURE__*/React.createElement("b", null, s.dis), " ", /*#__PURE__*/React.createElement("span", null, leg[2]))) : /*#__PURE__*/React.createElement("div", {
-    className: "pd-lnote"
-  }, "Net only \u2013 this pollster published no ", leg[0], " / ", leg[2], " split"), alt && /*#__PURE__*/React.createElement("div", {
-    className: "pd-lnote",
-    title: "This pollster asked both questions of this leader in the same wave \u2013 favourability (positive minus negative) is not directly comparable with approval"
-  }, "also ", alt.metric === "fav" ? "favourability" : "approval", " ", /*#__PURE__*/React.createElement(NetVal, {
-    v: alt.net
-  }))), /*#__PURE__*/React.createElement("div", {
-    className: "pd-lmar"
-  }, net == null ? /*#__PURE__*/React.createElement("span", {
-    className: "dash",
-    title: "Not asked by this pollster"
-  }, "\u2014") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
-    className: "pd-lmar-v"
-  }, /*#__PURE__*/React.createElement(NetVal, {
+    className: "pd-s"
+  }, label, ": ", s ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("b", null, s.app, "%"), " ", leg[0], ", ", /*#__PURE__*/React.createElement("b", null, s.dis, "%"), " ", leg[2], ", ", /*#__PURE__*/React.createElement("b", null, dk, "%"), " ", leg[1]) : /*#__PURE__*/React.createElement("span", {
+    className: "pd-s-note"
+  }, "no ", leg[0], " / ", leg[2], " split published \xB7"), net != null && /*#__PURE__*/React.createElement(React.Fragment, null, " ", "net ", /*#__PURE__*/React.createElement(NetVal, {
     v: net
   }), /*#__PURE__*/React.createElement(FavMark, {
     metric: mt
-  })), /*#__PURE__*/React.createElement("span", {
-    className: "pd-lmar-k"
-  }, "net ", /*#__PURE__*/React.createElement(ChgTag, {
-    v: d ? d.v : null,
-    refDate: d ? d.refDate : null
-  })))));
-}
-
-/* A group of rows under one heading. The rule goes BEFORE each row rather than
-   after, so a group never ends on a hanging hairline. */
-function LedgerGroup({
-  label,
-  absent,
-  children
-}) {
-  const kids = React.Children.toArray(children).filter(Boolean);
-  if (!kids.length && !absent) return null;
-  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: "pd-lgroup"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-k"
-  }, label)), kids.length ? kids.map((k, i) => /*#__PURE__*/React.createElement(React.Fragment, {
-    key: i
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-lrule",
-    "aria-hidden": "true"
-  }), k)) : /*#__PURE__*/React.createElement("div", {
-    className: "pd-lwide"
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-absent"
-  }, absent)));
+  }), /*#__PURE__*/React.createElement(ChgParen, {
+    d: d
+  })), alt && /*#__PURE__*/React.createElement("span", {
+    className: "pd-s-note",
+    title: "This pollster asked both questions of this leader in the same wave \u2013 favourability (positive minus negative) is not directly comparable with approval"
+  }, " ", "\xB7 also ", alt.metric === "fav" ? "favourability" : "approval", " ", /*#__PURE__*/React.createElement(NetVal, {
+    v: alt.net
+  })));
 }
 
 // the whole breakdown – EVERYTHING the poll measured, ragged set and all.
@@ -9749,57 +9720,67 @@ function PollLedger({
   const tcs = tppContests(r);
   const ppms = ppmContests(r);
   const appr = r.appr || {};
-  const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
+  // "can't say" sits beside the primaries it was taken out of; the basis word
+  // says WHERE the figure sits, which is what decides how the shares read
+  const dUnd = segDelta(r.chg, "und");
+  const undBasis = r.undecidedBasis === "tpp" ? "inside the pair" : r.undecidedBasis === "soft" ? "not firm" : "set aside";
   return /*#__PURE__*/React.createElement("div", {
-    className: "pd-ledger"
-  }, /*#__PURE__*/React.createElement(LedgerGroup, {
-    label: tppHeading(tcs),
-    absent: "No two-party figure published with this poll"
-  }, tcs.map((c, i) => /*#__PURE__*/React.createElement(LedgerRow, {
-    key: "t" + i,
-    label: c.lab.replace(/^2PP · /, ""),
-    segs: c.segs
-  })), r.tppFlows != null && /*#__PURE__*/React.createElement(FlowsLine, {
-    key: "flows",
-    v: r.tppFlows,
-    chg: r.chg
-  })), /*#__PURE__*/React.createElement(LedgerGroup, {
+    className: "pd-simple"
+  }, /*#__PURE__*/React.createElement(PdSec, {
+    label: tppHeading(tcs)
+  }, tcs.map(c => /*#__PURE__*/React.createElement(TppLine, {
+    key: c.kind,
+    c: c,
+    prefixed: tcs.length > 1
+  })), r.tppFlows != null && /*#__PURE__*/React.createElement("div", {
+    className: "pd-s"
+  }, tcs.length > 1 ? "ALP v L/NP: " : "", /*#__PURE__*/React.createElement("b", null, r.tppFlows, "%"), " ALP vs ", /*#__PURE__*/React.createElement("b", null, Math.round((100 - r.tppFlows) * 10) / 10, "%"), " L/NP", " ", "(2025 preference flows)", /*#__PURE__*/React.createElement(ChgParen, {
+    d: segDelta(r.chg, "flows")
+  }))), /*#__PURE__*/React.createElement(PdSec, {
     label: "First preferences"
-  }, /*#__PURE__*/React.createElement(LedgerRow, {
-    label: "All parties",
-    segs: primarySegs(r)
-  }), r.undecided != null && /*#__PURE__*/React.createElement(UndecidedLine, {
-    key: "und",
-    v: r.undecided,
-    chg: r.chg,
-    basis: r.undecidedBasis
-  })), /*#__PURE__*/React.createElement(LedgerGroup, {
-    label: "Preferred PM",
-    absent: "No preferred-PM question this wave"
-  }, ppms.map((c, i) => /*#__PURE__*/React.createElement(LedgerRow, {
-    key: "p" + i,
-    label: ppmLabel(c),
-    segs: ppmContestSegs(c, i === 0 ? r.chg : null)
-  }))), /*#__PURE__*/React.createElement(LedgerGroup, {
-    label: apprHeading(appr),
-    absent: "No leader approval or favourability published with this poll"
-  }, noAppr ? null : ["alb", "taylor", "hanson"].map(id => /*#__PURE__*/React.createElement(LedgerApprRow, {
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "pd-s"
+  }, primarySegs(r).map((s, i) => /*#__PURE__*/React.createElement(React.Fragment, {
+    key: i
+  }, i > 0 ? ", " : "", s.label, " ", /*#__PURE__*/React.createElement("b", null, s.value, "%"), /*#__PURE__*/React.createElement(ChgParen, {
+    d: s.delta
+  }))), r.undecided != null && /*#__PURE__*/React.createElement(React.Fragment, null, " ", "\xB7 undecided ", /*#__PURE__*/React.createElement("b", null, r.undecided, "%"), " (", undBasis, dUnd ? /*#__PURE__*/React.createElement(React.Fragment, null, ", ", /*#__PURE__*/React.createElement(ChgTag, {
+    v: dUnd.v,
+    refDate: dUnd.refDate
+  })) : null, ")"))), /*#__PURE__*/React.createElement(PdSec, {
+    label: "Preferred PM"
+  }, ppms.map((c, i) => {
+    const segs = ppmContestSegs(c, i === 0 ? r.chg : null);
+    const ns = segs.filter(s => !s.resid);
+    const und = segs.find(s => s.resid);
+    return /*#__PURE__*/React.createElement("div", {
+      className: "pd-s",
+      key: "p" + i
+    }, ns.map((s, j) => /*#__PURE__*/React.createElement(React.Fragment, {
+      key: j
+    }, j > 0 ? " vs " : "", /*#__PURE__*/React.createElement("b", null, s.value, "%"), " ", s.label, s.delta ? /*#__PURE__*/React.createElement(ChgParen, {
+      d: s.delta
+    }) : null)), und && /*#__PURE__*/React.createElement(React.Fragment, null, " (", /*#__PURE__*/React.createElement("b", null, und.value, "%"), " undecided)"));
+  })), /*#__PURE__*/React.createElement(PdSec, {
+    label: apprHeading(appr)
+  }, ["alb", "taylor", "hanson"].map(id => /*#__PURE__*/React.createElement(ApprLine, {
     key: id,
     id: id,
     appr: appr,
     chg: r.chg
-  }))), dirSegments && /*#__PURE__*/React.createElement(LedgerGroup, {
+  }))), dirSegments && /*#__PURE__*/React.createElement(PdSec, {
     label: "National direction"
-  }, /*#__PURE__*/React.createElement(LedgerRow, {
-    label: "Right direction v wrong track",
-    segs: dirSegments
-  })), r.seats && /*#__PURE__*/React.createElement(LedgerGroup, {
-    label: "Seat projection"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-lwide"
+    className: "pd-s"
+  }, /*#__PURE__*/React.createElement("b", null, dirSegments[0].value, "%"), " right direction ", /*#__PURE__*/React.createElement(ChgParen, {
+    d: dirSegments[0].delta
+  }), " vs", " ", /*#__PURE__*/React.createElement("b", null, dirSegments[2].value, "%"), " wrong track ", /*#__PURE__*/React.createElement(ChgParen, {
+    d: dirSegments[2].delta
+  }), " ", "(", dirSegments[1].value, "% unsure)")), r.seats && /*#__PURE__*/React.createElement(PdSec, {
+    label: "Seat projection"
   }, /*#__PURE__*/React.createElement(SeatProjection, {
     seats: r.seats
-  }))));
+  })));
 }
 
 // full per-poll breakdown – shows EVERYTHING the poll measured, ragged set and all
@@ -10012,40 +9993,22 @@ function cadenceLabel(d) {
 // survives the panel being unmounted by a tab change – see the note in the
 // component on why an open row has to outlive the trip to the archive
 let npOpenRow = null;
-function NextPollsPanel() {
+/* The projection, lifted out of the panel because the tab bar runs it too.
+   Two places working out "when is the next poll" from the same cadence table
+   would drift apart the moment either changed, and a countdown in the navbar
+   has to be the same claim the panel makes or the site contradicts itself in
+   two places at once. Everything below is the panel's own reasoning, moved
+   rather than rewritten. */
+function npProject() {
   const {
     D
   } = window.AP;
   const cad = D.pollCadence || [];
-  /* Which row is showing its working. A date arrived at by a median of
-     intervals is a claim, and the releases it was taken over are the evidence
-     for it - kept folded away because the panel's job is the answer, one
-     click from the reason.
-      Held outside the component as well as in it. Opening a release in the
-     archive leaves this tab, which unmounts the panel, and the return trip
-     lands on the same pixel in front of a row that had closed itself while the
-     reader was away - the one thing they were looking at. */
-  const [open, setOpenState] = useState(npOpenRow);
-  const setOpen = v => {
-    npOpenRow = v;
-    setOpenState(v);
+  if (!cad.length) return {
+    rows: [],
+    t0: 0,
+    nowMs: 0
   };
-  if (!cad.length) return null;
-
-  /* Every date in here comes from Date.parse("YYYY-MM-DD"), which is UTC
-     midnight, so "today" has to be the same thing or the comparison measures
-     the reader's timezone as well as the gap - see easternNow.
-      And the projection is floored to its own calendar day, because that is
-     what the row prints. Essential's cadence is a median of 29.5 days, so its
-     release landed at noon; against a midnight "today" that rounded to one day
-     out, and the row said "tomorrow" underneath a date that was today. A
-     half-day is not a fact about when a poll lands - it is a fact about
-     medians of an odd number of days.
-      The CLOCK matters too, and used not to be looked at at all. Essential is
-     expected at 1am on a Wednesday; read at 3pm on that Wednesday the panel
-     still said "today", naming a moment fourteen hours gone as the next thing
-     to happen. So a projection is a moment, not a date, and it is spent once
-     that moment passes. */
   const eNow = easternNow();
   const t0 = eNow.day;
   const nowMs = t0 + eNow.mins * 60000;
@@ -10142,6 +10105,50 @@ function NextPollsPanel() {
      (edge also past) drops to the foot: there is no date left to give it. */
   const first = r => r.loose ? r.release - r.spread * DAY_MS : r.missed ? Infinity : r.overdue ? r.release + (r.winHalf != null ? r.winHalf : r.spread) * DAY_MS : r.release;
   rows.sort((a, b) => first(a) - first(b));
+  return {
+    rows,
+    t0,
+    nowMs
+  };
+}
+window.AP.nextPolls = npProject;
+function NextPollsPanel() {
+  const {
+    D
+  } = window.AP;
+  /* Which row is showing its working. A date arrived at by a median of
+     intervals is a claim, and the releases it was taken over are the evidence
+     for it - kept folded away because the panel's job is the answer, one
+     click from the reason.
+      Held outside the component as well as in it. Opening a release in the
+     archive leaves this tab, which unmounts the panel, and the return trip
+     lands on the same pixel in front of a row that had closed itself while the
+     reader was away - the one thing they were looking at. */
+  const [open, setOpenState] = useState(npOpenRow);
+  const setOpen = v => {
+    npOpenRow = v;
+    setOpenState(v);
+  };
+  const {
+    rows
+  } = npProject();
+  if (!rows.length) return null;
+
+  /* Every date in here comes from Date.parse("YYYY-MM-DD"), which is UTC
+     midnight, so "today" has to be the same thing or the comparison measures
+     the reader's timezone as well as the gap - see easternNow.
+      And the projection is floored to its own calendar day, because that is
+     what the row prints. Essential's cadence is a median of 29.5 days, so its
+     release landed at noon; against a midnight "today" that rounded to one day
+     out, and the row said "tomorrow" underneath a date that was today. A
+     half-day is not a fact about when a poll lands - it is a fact about
+     medians of an odd number of days.
+      The CLOCK matters too, and used not to be looked at at all. Essential is
+     expected at 1am on a Wednesday; read at 3pm on that Wednesday the panel
+     still said "today", naming a moment fourteen hours gone as the next thing
+     to happen. So a projection is a moment, not a date, and it is spent once
+     that moment passes. */
+
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
 
   // UTC accessors, matching the frame the dates were parsed and compared in –
@@ -10759,6 +10766,90 @@ function TabScore({
 }
 
 // ====================================================================
+// NextPollTicker – how long until the next two polls are expected
+// ====================================================================
+/* Runs the panel's own projection (window.AP.nextPolls, lifted out of
+   NextPollsPanel for this) rather than a second guess at the same thing, so
+   the bar and the panel can never disagree about when a poll is due.
+
+   It counts to the EARLIEST the wave could land, not to the middle of the
+   window, and says "(maybe)" whenever that window is wider than nothing. A
+   house with a kept weekday is projected to the hour and gets no hedge; one
+   whose cadence is a median over drifting fieldwork could be a day either
+   side, and "2 hours" alone would be a harder claim than the data supports.
+   Saying the near edge and marking it uncertain is the honest shape of it:
+   it could be two hours, and it could be a week. */
+const TN_DAY = 86400000;
+const tnUntil = ms => {
+  const mins = Math.max(1, Math.round(ms / 60000));
+  if (mins < 60) return mins + (mins === 1 ? " min" : " mins");
+  const h = Math.round(mins / 60);
+  if (h < 36) return h + (h === 1 ? " hour" : " hours");
+  const d = Math.round(h / 24);
+  if (d < 14) return d + (d === 1 ? " day" : " days");
+  const w = Math.round(d / 7);
+  return w + (w === 1 ? " week" : " weeks");
+};
+function NextPollTicker() {
+  /* A minute is finer than the answer ever is - the tightest projection here
+     is to the hour - but it keeps "59 mins" from sitting there after it has
+     become "in 2 mins". */
+  const [, tick] = React.useState(0);
+  React.useEffect(() => {
+    const id = setInterval(() => tick(x => x + 1), 60000);
+    return () => clearInterval(id);
+  }, []);
+  if (!window.AP.nextPolls) return null;
+  const {
+    rows,
+    nowMs
+  } = window.AP.nextPolls();
+  if (!rows.length) return null;
+
+  /* Only what is still ahead. The panel lists a house whose whole window has
+     closed - Roy Morgan was due 16 hours ago on a schedule with no window at
+     all - because a reader looking at the schedule wants to see it is late.
+     A countdown does not: "any time" would be a promise about a wave that is
+     already overdue, so those rows are passed over here and left to the panel
+     to report. A window still OPEN is different - that poll really could land
+     at any moment - and it stays. */
+  const live = rows.filter(r => r.release + (r.winHalf || 0) * TN_DAY > nowMs);
+  if (!live.length) return null;
+  const items = live.slice(0, 2).map(r => {
+    const half = r.winHalf || 0;
+    const earliest = r.release - half * TN_DAY;
+    /* "any time" already says the thing "(maybe)" says, so it does not get
+       hedged twice; a real countdown does. */
+    if (earliest <= nowMs) return {
+      firm: r.pollster,
+      when: "any time",
+      maybe: false
+    };
+    return {
+      firm: r.pollster,
+      when: tnUntil(earliest - nowMs),
+      maybe: half > 0 || !!r.loose
+    };
+  });
+  const title = "Projected from each house's recent publication intervals" + " – the earliest each wave could land, not the likeliest";
+  return /*#__PURE__*/React.createElement("div", {
+    className: "tab-next",
+    title: title
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "tn-lab"
+  }, "Next"), items.map((it, i) => /*#__PURE__*/React.createElement("span", {
+    className: "tn-item",
+    key: i
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "tn-firm"
+  }, it.firm), /*#__PURE__*/React.createElement("span", {
+    className: "tn-when"
+  }, it.when, it.maybe && /*#__PURE__*/React.createElement("span", {
+    className: "tn-maybe"
+  }, " (maybe)")))));
+}
+
+// ====================================================================
 // Tabs – editorial underlined nav beneath the header
 // ====================================================================
 function Tabs({
@@ -10846,7 +10937,7 @@ function Tabs({
     className: "tab-label"
   }, t.label), t.note != null && /*#__PURE__*/React.createElement("span", {
     className: "tab-note"
-  }, t.note)))), /*#__PURE__*/React.createElement(TabScore, {
+  }, t.note)))), /*#__PURE__*/React.createElement(NextPollTicker, null), /*#__PURE__*/React.createElement(TabScore, {
     onGoHero: goHero,
     matchup: tppMatchup
   }))));

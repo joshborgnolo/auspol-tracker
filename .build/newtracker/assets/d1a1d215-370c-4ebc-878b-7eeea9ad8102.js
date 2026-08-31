@@ -57,6 +57,80 @@ function TabScore({ onGoHero, matchup }) {
 }
 
 // ====================================================================
+// NextPollTicker – how long until the next two polls are expected
+// ====================================================================
+/* Runs the panel's own projection (window.AP.nextPolls, lifted out of
+   NextPollsPanel for this) rather than a second guess at the same thing, so
+   the bar and the panel can never disagree about when a poll is due.
+
+   It counts to the EARLIEST the wave could land, not to the middle of the
+   window, and says "(maybe)" whenever that window is wider than nothing. A
+   house with a kept weekday is projected to the hour and gets no hedge; one
+   whose cadence is a median over drifting fieldwork could be a day either
+   side, and "2 hours" alone would be a harder claim than the data supports.
+   Saying the near edge and marking it uncertain is the honest shape of it:
+   it could be two hours, and it could be a week. */
+const TN_DAY = 86400000;
+const tnUntil = (ms) => {
+  const mins = Math.max(1, Math.round(ms / 60000));
+  if (mins < 60) return mins + (mins === 1 ? " min" : " mins");
+  const h = Math.round(mins / 60);
+  if (h < 36) return h + (h === 1 ? " hour" : " hours");
+  const d = Math.round(h / 24);
+  if (d < 14) return d + (d === 1 ? " day" : " days");
+  const w = Math.round(d / 7);
+  return w + (w === 1 ? " week" : " weeks");
+};
+
+function NextPollTicker() {
+  /* A minute is finer than the answer ever is - the tightest projection here
+     is to the hour - but it keeps "59 mins" from sitting there after it has
+     become "in 2 mins". */
+  const [, tick] = React.useState(0);
+  React.useEffect(() => {
+    const id = setInterval(() => tick((x) => x + 1), 60000);
+    return () => clearInterval(id);
+  }, []);
+  if (!window.AP.nextPolls) return null;
+  const { rows, nowMs } = window.AP.nextPolls();
+  if (!rows.length) return null;
+
+  /* Only what is still ahead. The panel lists a house whose whole window has
+     closed - Roy Morgan was due 16 hours ago on a schedule with no window at
+     all - because a reader looking at the schedule wants to see it is late.
+     A countdown does not: "any time" would be a promise about a wave that is
+     already overdue, so those rows are passed over here and left to the panel
+     to report. A window still OPEN is different - that poll really could land
+     at any moment - and it stays. */
+  const live = rows.filter((r) => r.release + (r.winHalf || 0) * TN_DAY > nowMs);
+  if (!live.length) return null;
+  const items = live.slice(0, 2).map((r) => {
+    const half = r.winHalf || 0;
+    const earliest = r.release - half * TN_DAY;
+    /* "any time" already says the thing "(maybe)" says, so it does not get
+       hedged twice; a real countdown does. */
+    if (earliest <= nowMs) return { firm: r.pollster, when: "any time", maybe: false };
+    return { firm: r.pollster, when: tnUntil(earliest - nowMs), maybe: half > 0 || !!r.loose };
+  });
+  const title = "Projected from each house's recent publication intervals"
+    + " – the earliest each wave could land, not the likeliest";
+  return (
+    <div className="tab-next" title={title}>
+      <span className="tn-lab">Next</span>
+      {items.map((it, i) => (
+        <span className="tn-item" key={i}>
+          <span className="tn-firm">{it.firm}</span>
+          <span className="tn-when">
+            {it.when}
+            {it.maybe && <span className="tn-maybe"> (maybe)</span>}
+          </span>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+// ====================================================================
 // Tabs – editorial underlined nav beneath the header
 // ====================================================================
 function Tabs({ tabs, active, onChange, tppMatchup }) {
@@ -133,6 +207,7 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
               </button>
             ))}
           </div>
+          <NextPollTicker />
           <TabScore onGoHero={goHero} matchup={tppMatchup} />
         </div>
       </nav>
