@@ -527,20 +527,11 @@ body {
   --dl-channel:  color-mix(in oklch, var(--ink) 13%, var(--surface-2));
   --dl-scale-band: color-mix(in oklch, var(--ink) 6%, transparent);
   --dl-lip:        color-mix(in oklch, white 80%, transparent);
-  /* On paper the recess cannot be drawn with a highlight. The page sits at
-     L 0.985, so a lit lip has 0.015 of headroom to white and lands +0.013 -
-     invisible - where the same lip in dark lifts +0.102 off its page. The old
-     well was only 3% darker than the page against dark's 18%, so the two cues
-     that carry depth in dark both failed here at once and the track read flat.
-     All of it moves inside: a deeper floor, and a gradient down the channel -
-     the near wall shadowed, the far wall catching the bounce. */
-  --hg-well:    color-mix(in oklch, var(--ink) 15%, var(--surface));
-  --hg-well-lo: color-mix(in oklch, var(--ink) 6%, var(--surface));
-  --hg-cut:     color-mix(in oklch, var(--ink) 40%, transparent);
-  --hg-bounce:  color-mix(in oklch, white 80%, transparent);
+  --hg-well: color-mix(in oklch, var(--ink) 5%, var(--surface));
+  --hg-cut:  color-mix(in oklch, var(--ink) 20%, transparent);
   --hg-lip:  color-mix(in oklch, white 85%, transparent);
-  --hg-grad: color-mix(in oklch, var(--ink) 27%, transparent);
-  --hg-tie-cut: color-mix(in oklch, var(--ink) 62%, transparent);
+  --hg-grad: color-mix(in oklch, var(--ink) 17%, transparent);
+  --hg-tie-cut: color-mix(in oklch, var(--ink) 55%, transparent);
 }
 body.dark {
   --dl-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
@@ -553,13 +544,8 @@ body.dark {
   --dl-channel:  color-mix(in oklch, black 40%, var(--surface));
   --dl-scale-band: color-mix(in oklch, black 30%, transparent);
   --dl-lip:        color-mix(in oklch, white 22%, transparent);
-  /* Same structure, tuned to land where dark already was - it reads as a
-     notch as it stands, so the floor either side of the gradient averages the
-     flat 30% it replaces rather than deepening it. */
-  --hg-well:    color-mix(in oklch, black 35%, var(--surface));
-  --hg-well-lo: color-mix(in oklch, black 25%, var(--surface));
-  --hg-cut:     color-mix(in oklch, black 58%, transparent);
-  --hg-bounce:  color-mix(in oklch, white 12%, transparent);
+  --hg-well: color-mix(in oklch, black 30%, var(--surface));
+  --hg-cut:  color-mix(in oklch, black 55%, transparent);
   --hg-lip:  color-mix(in oklch, white 13%, transparent);
   --hg-grad: color-mix(in oklch, white 20%, transparent);
   --hg-tie-cut: color-mix(in oklch, black 70%, transparent);
@@ -948,14 +934,8 @@ body.dark .dl-bloom { opacity: 1; }
 .hero-gauge { margin-top: 16px; max-width: 340px; }
 .hg-track {
   position: relative; height: 12px; border-radius: 999px;
-  /* Down the channel, not across it: the wall nearest the light occludes and
-     the far one catches the bounce, which is the cue that survives on paper
-     where a highlight has no room to. */
-  background: linear-gradient(to bottom, var(--hg-well), var(--hg-well-lo));
-  box-shadow: inset 0 1px 0 var(--hg-cut),          /* the cut edge itself */
-              inset 0 3px 5px -2px var(--hg-cut),   /* what it casts inside */
-              inset 0 -1px 0 var(--hg-bounce),      /* light off the far wall */
-              0 1px 0 var(--hg-lip);                /* the sill, where there is room */
+  background: var(--hg-well);
+  box-shadow: inset 0 2px 3px var(--hg-cut), inset 0 -1px 0 var(--hg-lip), 0 1px 0 var(--hg-lip);
 }
 /* Ticks on the sill, not lines across the channel. Crossing it made six even
    bars that read as a segmented meter and drowned the one mark that matters. */
