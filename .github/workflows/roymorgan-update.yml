@@ -1,0 +1,99 @@
+# Roy Morgan poll update pipeline — cloud-scheduled (replaces/supplements the
+# local launchd job so the site updates while the laptop is shut).
+#
+# Roy Morgan normally releases its federal voting-intention poll on Monday
+# afternoons (AEST), so Monday 16:00-18:00 AEST gets a dense 10-minute cadence
+# until the wave is caught; the extractor is idempotent, so extra slots are
+# no-ops once polls.json holds the wave. The local launchd job stays installed
+# as a backup — roymorgan-updater.sh fast-forwards to origin/main and skips
+# its slot if main moved underneath it, so the two can coexist.
+#
+# AEST = UTC+10 (no DST in Brisbane, but Melbourne/Sydney DST means AEDT slots
+# run ~1h late — acceptable, the cadence still brackets the release window).
+#
+# Failure path: when the deterministic update job fails (guard trip, parse
+# error, upstream format change), the repair job boots headless Matilda with
+# MATILDA_API_KEY (repo secret) and the prompt in .build/roymorgan-repair-prompt.md.
+
+name: roymorgan-update
+
+on:
+  schedule:
+    # Mon 16:05-17:45 AEST, every ~10 min (06:05-07:45 UTC) — release window
+    - cron: '5,15,25,35,45,55 6 * * 1'
+    - cron: '5,15,25,35,45 7 * * 1'
+    # Mon evening follow-ups AEST (08:00, 12:30 UTC)
+    - cron: '0 8 * * 1'
+    - cron: '30 12 * * 1'
+    # Tue 06:00 & 19:00 AEST (20:00 Mon / 09:00 Tue UTC)
+    - cron: '0 20 * * 1'
+    - cron: '0 9 * * 2'
+    # Nightly sweep 06:00 AEST Wed-Sun (20:00 UTC)
+    - cron: '0 20 * * 2,3,4,5,6,0'
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: 'Force the update job to fail (tests the Matilda repair job)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+concurrency:
+  group: roymorgan-update
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install puppeteer-core (best effort, for the share-card redraw)
+        run: npm i puppeteer-core --prefix "$HOME" || true
+
+      - name: Run the Roy Morgan updater
+        env:
+          CHROME: /usr/bin/google-chrome
+        run: |
+          if [ "${{ inputs.simulate_failure }}" = "true" ]; then
+            echo "simulate_failure requested; failing to exercise the repair job"
+            exit 1
+          fi
+          bash .build/roymorgan-updater.sh
+
+  repair:
+    needs: update
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install Matilda CLI
+        run: npm i -g @maincode-ai/matilda-code
+
+      - name: Run the repair agent
+        env:
+          MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$MATILDA_API_KEY" ]; then
+            echo "::warning::MATILDA_API_KEY secret not set; skipping repair. Add it in repo Settings > Secrets."
+            exit 0
+          fi
+          matilda -p "$(cat .build/roymorgan-repair-prompt.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
