@@ -2041,72 +2041,27 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   .pd-meta-sm { display: none; }
 }
 
-/* ---------- the ledger: one typographic line per measure ----------
-   Everything a poll published, set in type: a fixed label gutter, the figures
-   in the middle, and a margin column that always answers the same question –
-   by how much. No bars in this panel: the numbers themselves carry the
-   reading, and every row sits on the same three columns. */
-.pd-ledger {
-  display: grid; grid-template-columns: 168px minmax(0, 1fr) 112px;
-  gap: 0 22px; align-items: center;
+/* ---------- the breakdown: plain headed text lines ----------
+   Everything a poll published, set as running text: a small-kicker heading,
+   then one wrap-anywhere line per measure with its figures bold. No grid,
+   no figures-only colour code – the lines read like sentences. */
+.pd-simple { display: flex; flex-direction: column; gap: 13px; }
+.pd-simple .pd-k { margin-bottom: 3px; }
+.pd-s {
+  margin: 0; font-size: 13px; line-height: 1.55; color: var(--ink-2);
+  font-variant-numeric: tabular-nums; text-wrap: pretty;
 }
-/* the three cells land in the PARENT grid's columns, so the whole panel
-   shares one set of verticals. On a phone the row becomes its own little
-   grid instead – see the narrow rules further down. */
-.pd-lrow { display: contents; }
-.pd-lgroup { grid-column: 1 / -1; padding: 15px 0 7px; }
-.pd-lgroup:first-child { padding-top: 2px; }
-.pd-lrule { grid-column: 1 / -1; height: 1px; background: var(--line-2); }
-.pd-lgut {
-  text-align: right; padding: 11px 0; align-self: center; min-width: 0;
-  font-family: var(--serif); font-style: italic; font-size: 12.5px;
-  font-weight: 700; color: var(--ink-2); text-wrap: pretty;
-}
-/* a leader is a name, not a contest – it takes the plain sans face */
-.pd-lgut-name {
-  font-family: var(--sans); font-style: normal; font-size: 13px; font-weight: 600;
-  color: var(--ink); display: flex; align-items: center; justify-content: flex-end; gap: 6px;
-}
-.pd-lscale { padding: 9px 0; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.pd-lmar { text-align: right; padding: 9px 0; font-variant-numeric: tabular-nums; }
-.pd-lmar-v { font-family: var(--serif); font-size: 19px; font-weight: 600; line-height: 1; }
-.pd-lmar-k {
-  display: block; margin-top: 3px; font-size: 10px; font-weight: 700;
-  letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-3);
-}
-/* a measure's figures, left to right in one line – the row's payload now that
-   the panel is set in type */
-.pd-lnums {
-  display: flex; justify-content: flex-start; align-items: baseline;
-  gap: 5px 18px; font-size: 11.5px; color: var(--ink-2);
-  font-variant-numeric: tabular-nums;
-  /* A wrap is the safety net at every width: a five-party line is wider than
-     a phone, and must take a second line rather than run off the edge. */
-  flex-wrap: wrap;
-}
-.pd-lnum { display: inline-flex; align-items: baseline; gap: 5px; white-space: nowrap; }
-.pd-lnum b {
-  font-family: var(--serif); font-size: 18px; font-weight: 600;
-  line-height: 1; letter-spacing: -0.01em;
-}
-.pd-lnum.muted, .pd-lnum.muted b { color: var(--ink-3); }
+.pd-s b { font-weight: 700; color: var(--ink); }
+.pd-s-chg .chg { margin-left: 1px; }
+.pd-s-note { color: var(--ink-3); }
 /* the residual – undecided, don't know, unsure. ONE treatment everywhere, and
    never the bar's own track colour: it used to be var(--line-2), which is
    exactly .sbar's background, so nineteen points of a preferred-PM bar were
    data drawn as empty track. */
-.pd-lnum.resid { color: var(--ink-3); }
-.pd-lnum.resid b { font-family: var(--sans); font-size: 12.5px; font-weight: 700; }
-.sbar-resid, .pd-resid-sw, .skey-dot.resid {
+.sbar-resid, .skey-dot.resid {
   background: repeating-linear-gradient(135deg, var(--line) 0 2px, var(--surface) 2px 5px);
 }
-.pd-resid-sw { display: inline-block; width: 12px; height: 7px; border-radius: 2px; flex: none; }
 .skey-dot.resid { border-radius: 2px; }
-.pd-lnote { font-size: 11.5px; color: var(--ink-3); text-wrap: pretty; }
-.pd-lnote .netv { font-size: 12.5px; margin-left: 4px; }
-/* a modelled chamber is not a share of 100 – it takes the whole width and
-   keeps its own component rather than pretending to sit on the ledger's
-   three columns */
-.pd-lwide { grid-column: 1 / -1; padding: 10px 0 4px; min-width: 0; }
 
 /* ---------- Seat projection (MRP polls) ----------
    Seats as figures: one row per party, the majority line said in words, and
@@ -2275,26 +2230,6 @@ button.acc-spread[aria-pressed="true"] {
 
 @media (max-width: 720px) {
   .poll-detail { padding-left: 20px; }
-  /* The label gutter and the margin column are what cannot survive 356px, so
-     they fold onto one line above the figures. The figures line itself
-     survives intact – it is the panel's whole content. */
-  .pd-ledger { display: block; }
-  .pd-lrow {
-    display: grid; grid-template-columns: 1fr auto; gap: 2px 12px;
-    grid-template-areas: "gut mar" "scale scale";
-    padding: 8px 0 9px; border-top: 1px solid var(--line-2);
-  }
-  .pd-lgut { grid-area: gut; text-align: left; padding: 0; }
-  .pd-lgut-name { justify-content: flex-start; }
-  .pd-lmar { grid-area: mar; padding: 0; white-space: nowrap; }
-  .pd-lmar-v { font-size: 17px; }
-  .pd-lmar-k { display: inline; margin: 0 0 0 4px; }
-  .pd-lscale { grid-area: scale; padding: 4px 0 0; }
-  .pd-lgroup { padding: 11px 0 5px; }
-  .pd-lrule { display: none; }   /* each row carries its own rule instead */
-  .pd-lnums { gap: 3px 8px; }
-  .pd-lnum b { font-size: 17px; }
-  .pd-lwide { padding: 8px 0 4px; }
 }
 
 /* ---------- method footer ---------- */
