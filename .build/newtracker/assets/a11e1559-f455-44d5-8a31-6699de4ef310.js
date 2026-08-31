@@ -1879,7 +1879,9 @@ function ApprLine({ id, appr, chg }) {
       )}
       {net != null && (
         <React.Fragment>
-          {" "}net <NetVal v={net} /><FavMark metric={mt} /><ChgParen d={d} />
+          {/* comma only after split figures - the no-split note already ends
+              with its own */}
+          {s ? ", " : " "}net <NetVal v={net} /><FavMark metric={mt} /><ChgParen d={d} />
         </React.Fragment>
       )}
       {alt && (
