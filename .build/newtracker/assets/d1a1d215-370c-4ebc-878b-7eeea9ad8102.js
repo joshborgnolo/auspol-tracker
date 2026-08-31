@@ -112,11 +112,9 @@ function NextPollTicker() {
      read "any time" - naming a moment that cannot happen until Wednesday. The
      next slot is the next Wednesday, and that is what it counts to.
 
-     The window still does the work it should: it decides which slot is the
-     EARLIEST plausible one, and the answer is the first matching weekday on
-     or after that. Resolve is projected twelve days out with a +-7 window, so
-     the earliest Sunday it could be is the one five days away, not the one it
-     was projected onto. Roy Morgan, due at midnight today on a Monday
+     The window's EARLY edge still does the work it should: it decides which
+     slot is the EARLIEST plausible one, and the answer is the first matching
+     weekday on or after that. Roy Morgan, due at midnight today on a Monday
      schedule, is still today rather than a week away.
 
      Houses with no weekday habit keep the plain window: the earliest the wave
@@ -127,9 +125,18 @@ function NextPollTicker() {
   };
   const targetOf = (r) => {
     const half = r.winHalf || 0;
-    const earliest = r.release - half * TN_DAY;
-    if (r.releaseDow == null) return { at: Math.max(earliest, nowMs), byDay: false };
-    let t = Math.max(t0, dayFloor(earliest));
+    if (r.releaseDow == null)
+      return { at: Math.max(r.release - half * TN_DAY, nowMs), byDay: false };
+    /* The window's EARLY edge is measured, not mirrored: no weekday house has
+       ever filed a slot early, so counting to release - ±half names a date
+       with no precedent - Resolve was counting down to Sun 6 Sep when its
+       real alternatives are Sun 13 and Sun 20 Sep. spreadEarly=0 keeps the
+       countdown on the projected day itself. */
+    const widen = Math.sqrt((r.ahead || 0) + 1);
+    const earlyHalf = r.spreadEarly != null
+      ? 7 * Math.floor((r.spreadEarly * widen + 3) / 7)
+      : half;
+    let t = Math.max(t0, dayFloor(r.release - earlyHalf * TN_DAY));
     t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * TN_DAY;
     return { at: t, byDay: true };
   };

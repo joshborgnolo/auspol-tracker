@@ -2008,6 +2008,22 @@ function PollLedger({ r, dirSegments }) {
         </PdSec>
       )}
 
+      {/* a pointer to the pollster's own release page, where the citation in
+          the row (`url`) is something else – the RedBridge/Accent waves cite
+          their AFR write-up but publish the report on accent-research.com.
+          It rides the ledger, not a meta band, so it shows in BOTH expansions
+          (the Latest detail's band hides past 1000px) – and only where the
+          wave actually has a release page. */}
+      {r.releaseUrl && (
+        <PdSec label="Pollster’s release">
+          <p className="pd-s">
+            <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
+              here<span className="plink-mark" aria-hidden="true">↗</span>
+            </a>
+          </p>
+        </PdSec>
+      )}
+
     </div>
   );
 }
@@ -2381,6 +2397,20 @@ function NextPollsPanel() {
     }
     return spreadLabel(r);
   };
+  /* The when-column's own statement of the same one-sidedness pmLabel puts
+     after the date: "in 12 days (or 19)" names the later slot in days, so a
+     reader who screens off the countdown still sees the alternative. */
+  const dayAlt = (r) => {
+    if (r.releaseDow != null && r.spreadEarly != null) {
+      const widen = Math.sqrt(r.ahead + 1);
+      const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
+      const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
+      if (earlyW === 0 && lateW >= 1) return ` (or ${r.inDays + lateW * 7})`;
+      if (lateW === 0 && earlyW >= 1 && r.inDays - earlyW * 7 >= 1)
+        return ` (or ${r.inDays - earlyW * 7})`;
+    }
+    return null;
+  };
   /* The releases list spans months and sometimes a new year, so unlike the
      projection column it carries one. The weekday rides on the PUBLICATION
      date only: a weekday is a fact about when a house files, and putting one
@@ -2468,7 +2498,7 @@ function NextPollsPanel() {
                   : r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn))
                 : r.overdue && !r.missed
                   ? `${when(r.closesIn)} (or ${ago(-r.inDays)})`
-                  : when(r.inDays)}
+                  : when(r.inDays) + (dayAlt(r) || "")}
             </span>
             <span className="np-cadence">
               {cadenceLabel(r.cadence)}
