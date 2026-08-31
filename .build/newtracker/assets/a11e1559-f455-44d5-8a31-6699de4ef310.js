@@ -1065,8 +1065,16 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
           <h3 className="card-title">{metric === "net" ? "Leader net approval" : "Leader net favourability"}</h3>
           <p className="card-sub">
             {metric === "net"
-              ? "Approve minus disapprove – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential and others"
-              : "Positive minus negative – the person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"}
+              ? (<><button type="button" className="hi-term"
+                     title="What the approval question asks"
+                     onClick={() => window.AP.openTerm &&
+                       window.AP.openTerm("approval", "Leader net approval")}>Approve minus disapprove</button>
+                   {" – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential and others"}</>)
+              : (<><button type="button" className="hi-term"
+                     title="What the favourability question asks"
+                     onClick={() => window.AP.openTerm &&
+                       window.AP.openTerm("favourability", "Leader net favourability")}>Positive minus negative</button>
+                   {" – the person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"}</>)}
           </p>
         </div>
         <div className="card-head-tools">

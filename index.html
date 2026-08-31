@@ -874,18 +874,21 @@ body.dark .dl-bloom { opacity: 1; }
    a way a tint cannot. The .segmented track recesses so its active cell has
    something to stand proud of - that cell already carried a drop shadow, which
    is the idiom the rest of this follows. */
-.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay {
+.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay, .acc-spread {
   box-shadow: inset 0 1px 0 var(--btn-lit),
               0 1px 1.5px var(--btn-shade),      /* contact */
               0 3px 6px -3px var(--btn-shade);   /* ambient - what makes it sit ON the page */
 }
-.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay,
+.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay, .acc-spread,
 .seg-btn, .pg-check input {
   transition-property: color, border-color, background-color, opacity, transform, box-shadow;
 }
 .ha-chip:active, .legend-chip:active, .cyc-chip:active,
-.ap-popbtn:active, .dl-replay:active:not(:disabled),
-.ap-popbtn.on, .ap-popbtn.open {
+.ap-popbtn:active, .dl-replay:active:not(:disabled), .acc-spread:active,
+.ap-popbtn.on, .ap-popbtn.open,
+/* a latching toggle that is ON is a button held in, which is a thing a tint
+   alone cannot say */
+.acc-spread[aria-pressed="true"] {
   box-shadow: inset 0 1.5px 2.5px var(--btn-press);
 }
 .segmented { box-shadow: inset 0 1px 2px var(--btn-press); }
@@ -898,7 +901,13 @@ body.dark .dl-bloom { opacity: 1; }
 /* A bevel, not an outline. A 1px border of one colour is a drawn edge; a real
    one is lit on its crown and shaded under its lower lip. The border stays -
    it carries the shape - and these two hairlines give it a top and a bottom. */
-.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay {
+/* Element+class, not class alone. Every one of these controls declares its
+   own `border: 1px solid var(--line)` LATER in this file, and the shorthand
+   resets border-bottom-color - so written as bare classes this rule lost the
+   cascade to all of them and the bevel silently never rendered. One extra
+   element selector outranks a single class whatever the source order. */
+button.ha-chip, button.legend-chip, button.cyc-chip,
+button.ap-popbtn, button.dl-replay, button.acc-spread {
   border-bottom-color: var(--btn-edge);
 }
 
@@ -1977,17 +1986,23 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 /* The control that steps colliding dots into lanes. A dot's place on the
    SCALE never changes - only which lane it sits in - so the row can be read
    against the others exactly as before. */
-.acc-tools { display: flex; justify-content: flex-end; margin: 10px 0 -4px; }
+/* The -4px here used to pull the button down onto the scale row, so it read
+   as attached to the chart rather than sitting above it. */
+.acc-tools { display: flex; justify-content: flex-end; margin: 12px 0 18px; }
 .acc-spread {
   display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
   padding: 5px 12px 5px 9px; font-family: var(--sans); font-size: 11.5px; font-weight: 600;
   color: var(--ink-2); cursor: pointer; white-space: nowrap;
-  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+  /* named rather than shorthand: the shared control rule sets
+     transition-property earlier in the file, and a `transition:` here would
+     win and drop box-shadow and transform back out of it */
+  transition-property: color, border-color, background-color, box-shadow, transform;
+  transition-duration: .19s; transition-timing-function: ease;
 }
 .acc-spread:hover { color: var(--ink); border-color: var(--ink-3); }
-.acc-spread[aria-pressed="true"] {
-  color: var(--ink); border-color: var(--ink-3);
+button.acc-spread[aria-pressed="true"] {
+  color: var(--ink); border-color: var(--ink-3); border-bottom-color: var(--ink-3);
   background: color-mix(in oklch, var(--ink) 7%, var(--surface));
 }
 .acc-spread svg { opacity: 0.75; }
@@ -3076,16 +3091,16 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
      scale only steadies it. The shadow collapse that goes with it is in the
      controls block above; together they are the object meeting the paper. */
   .legend-chip:active, .cyc-chip:active, .ap-popbtn:active,
-  .seg-btn:active, .ha-chip:active,
+  .seg-btn:active, .ha-chip:active, .acc-spread:active,
   .dl-replay:active:not(:disabled) { transform: translateY(1px) scale(0.985); }
   .exp-btn:active { transform: scale(0.965); }
   /* Fast in, slower out. A press that returns at the speed it went is a
      crossfade between two states; the asymmetry is what reads as a thing
      with weight being let go of. */
-  .legend-chip, .cyc-chip, .ap-popbtn, .seg-btn, .ha-chip, .dl-replay {
+  .legend-chip, .cyc-chip, .ap-popbtn, .seg-btn, .ha-chip, .dl-replay, .acc-spread {
     transition-duration: .19s;
   }
-  .legend-chip:active, .cyc-chip:active, .ap-popbtn:active,
+  .legend-chip:active, .cyc-chip:active, .ap-popbtn:active, .acc-spread:active,
   .seg-btn:active, .ha-chip:active, .dl-replay:active:not(:disabled) {
     transition-duration: .055s;
   }
@@ -8026,7 +8041,17 @@ function ApprovalPanel({
     className: "card-title"
   }, metric === "net" ? "Leader net approval" : "Leader net favourability"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, metric === "net" ? "Approve minus disapprove – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential and others" : "Positive minus negative – the person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval")), /*#__PURE__*/React.createElement("div", {
+  }, metric === "net" ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    title: "What the approval question asks",
+    onClick: () => window.AP.openTerm && window.AP.openTerm("approval", "Leader net approval")
+  }, "Approve minus disapprove"), " – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential and others") : /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    title: "What the favourability question asks",
+    onClick: () => window.AP.openTerm && window.AP.openTerm("favourability", "Leader net favourability")
+  }, "Positive minus negative"), " – the person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"))), /*#__PURE__*/React.createElement("div", {
     className: "card-head-tools"
   }, !lockMetric && /*#__PURE__*/React.createElement(TextToggle, {
     caps: true,
@@ -10426,10 +10451,14 @@ function Tabs({
 // ====================================================================
 // y-windows are fitted to the real data per metric+mode (see cycDomain) –
 // fixed windows clip real history (e.g. net approval spans −44…+41)
-const CYC_METRICS = [{
+const CYC_METRICS = [
+/* The "Approve minus disapprove" half of the approval subs is attached at
+   render time as a tap-to-define link – keeping it in the string here would
+   leave it as dead text. */
+{
   key: "net",
   title: "Leader net approval",
-  sub: "Sitting prime minister · Approve minus disapprove",
+  sub: "Sitting prime minister",
   unit: "",
   fmt: v => (v > 0 ? "+" : "") + Math.round(v),
   step: 20,
@@ -10438,7 +10467,7 @@ const CYC_METRICS = [{
 }, {
   key: "oppnet",
   title: "Opposition leader net approval",
-  sub: "Sitting opposition leader · Approve minus disapprove",
+  sub: "Sitting opposition leader",
   leader: "opp",
   unit: "",
   fmt: v => (v > 0 ? "+" : "") + Math.round(v),
@@ -11227,7 +11256,12 @@ function CycleChart({
     className: "card-title"
   }, M.title), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, M.sub), hanCtl && /*#__PURE__*/React.createElement("label", {
+  }, M.sub, (M.key === "net" || M.key === "oppnet") && /*#__PURE__*/React.createElement(React.Fragment, null, " · ", /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    title: "What the approval question asks",
+    onClick: () => window.AP.openTerm && window.AP.openTerm("approval", M.title)
+  }, "Approve minus disapprove"))), hanCtl && /*#__PURE__*/React.createElement("label", {
     className: "pg-check cyc-han" + (showHan ? " on" : ""),
     title: "Pauline Hanson, on the same approve-minus-disapprove basis. " + "Rated in the current term only, from " + hanFrom + " – no past cycle asked about her, " + "and favourability ratings are left out, so the line is short."
   }, /*#__PURE__*/React.createElement("input", {
@@ -13695,6 +13729,14 @@ function infoTerms(D) {
     onClick: () => window.AP.openTerm && window.AP.openTerm(to, from)
   }, label);
   const list = [{
+    id: "approval",
+    term: "Approval",
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "A verdict on the job: approve minus disapprove for a leader\u2019s performance. Essential words it \u201CQ. Do you approve or disapprove of the job Anthony Albanese is doing as Prime Minister?\u201D, and Newspoll, YouGov and Resolve ask the same form with their own wordings.", " ", xref("favourability", "approval", "Favourability"), " is a different question \u2013 about the person, not the job \u2013 asked by the houses that ask it instead. The numbers it feeds are what ", xref("net-approval", "approval", "net approval"), " records.")
+  }, {
+    id: "favourability",
+    term: "Favourability",
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "A verdict on the person: positive minus negative, for the houses that ask favour rather than job performance. RedBridge/Accent asks \u201CDo you have a favourable or unfavourable view of the following?\u201D, DemosAU asks \u201CQ. What is your opinion of the following people?\u201D with positive, neutral and negative on offer, and Freshwater its own form of it. Not interchangeable with ", xref("approval", "favourability", "approval"), " \u2013 a leader can be approved of for the job and disliked as a person, or the reverse \u2013 so the two measures sit in separate panels rather than one averaged line. ", " ", "The ", xref("net-approval", "favourability", "net approval"), " lines join each house\u2019s own readings without pretending they measure the same thing.")
+  }, {
     id: "interval",
     term: "95% interval",
     body: /*#__PURE__*/React.createElement(React.Fragment, null, "The uncertainty carried beside the headline: the greater of the spread among the polls in the window and their ", xref("margin-of-error", "95% interval", "sampling error"), " \u2013 currently \xB1", (L.alp2ppCi95 ?? 0).toFixed(1), " points on", " ", L.method.nPolls, " polls across ", L.method.windowDays, " days. It cannot cover error the whole industry shares, because an aggregate has no way to see a lean every poll inside it carries. Movement smaller than the interval is marked as such rather than reported as a change.")
@@ -13729,7 +13771,7 @@ function infoTerms(D) {
   }, {
     id: "net-approval",
     term: "Net approval",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "Approve minus disapprove for a party leader \u2013 favourable minus unfavourable where a house words it as favourability. The questions come irregularly and worded differently from house to house, so the lines simply join published readings rather than aggregating them.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "Approve minus disapprove for a party leader \u2013 favourable minus unfavourable where a house words it as favourability. The two are separate questions \u2013 see ", xref("approval", "net approval", "Approval"), " and", " ", xref("favourability", "net approval", "Favourability"), " \u2013 asked irregularly and worded differently from house to house, so the lines simply join published readings rather than aggregating them.")
   }, {
     id: "next-polls",
     term: "Next polls",
@@ -13773,7 +13815,7 @@ function infoTerms(D) {
   }, {
     id: "weighted-aggregate",
     term: "Weighted aggregate",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "The headline method. Recent and larger polls count for more, and each pollster\u2019s figure is adjusted for its own ", xref("house-effect", "weighted aggregate", "house effect"), ". Where one house publishes more than once in a window or a calendar month \u2013 Roy Morgan polls weekly \u2013 its repeat waves count for the square root of their number, so three weekly waves count as 1.7, not 3.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "The headline method. Recent and larger polls count for more, and each pollster\u2019s figure is adjusted for its own ", xref("house-effect", "weighted aggregate", "house effect"), ". Where one house publishes more than once in a window or a calendar month \u2013 Roy Morgan polls weekly \u2013 its repeat waves count for the square root of their number, so three weekly waves count as 1.7, not 3.", " ", "Full formula: the headline is \u03A3w\u1D62x\u1D62 \xF7 \u03A3w\u1D62 over the polls in the 21-day window, where x\u1D62 is a poll\u2019s house-adjusted figure and its weight w\u1D62 = n\u1D62 \xD7 2^(\u2212d/7) \xF7 \u221Am \u2013 n\u1D62 the poll\u2019s sample, d its age in days (halving every seven), and m its house\u2019s wave count in the window. The effective sample behind it is (\u03A3w\u1D62)\xB2 \xF7 \u03A3w\u1D62\xB2, and the monthly trend points run the same formula with the recency term dropped.")
   }];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"

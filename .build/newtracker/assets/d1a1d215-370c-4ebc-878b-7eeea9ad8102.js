@@ -153,10 +153,13 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
 // y-windows are fitted to the real data per metric+mode (see cycDomain) –
 // fixed windows clip real history (e.g. net approval spans −44…+41)
 const CYC_METRICS = [
-  { key: "net", title: "Leader net approval", sub: "Sitting prime minister · Approve minus disapprove",
+  /* The "Approve minus disapprove" half of the approval subs is attached at
+     render time as a tap-to-define link – keeping it in the string here would
+     leave it as dead text. */
+  { key: "net", title: "Leader net approval", sub: "Sitting prime minister",
     unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
     step: 20, refAbs: 0, refAbsLabel: "even" },
-  { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader · Approve minus disapprove",
+  { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader",
     leader: "opp", unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
     step: 10, refAbs: 0, refAbsLabel: "even", han: true },
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
@@ -803,7 +806,12 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
       <div className="card-head cycle-head">
         <div>
           <h2 className="card-title">{M.title}</h2>
-          <p className="card-sub">{M.sub}</p>
+          <p className="card-sub">{M.sub}{(M.key === "net" || M.key === "oppnet") && (
+            <>{" · "}<button type="button" className="hi-term"
+                     title="What the approval question asks"
+                     onClick={() => window.AP.openTerm &&
+                       window.AP.openTerm("approval", M.title)}>Approve minus disapprove</button></>
+          )}</p>
           {hanCtl && (
             <label className={"pg-check cyc-han" + (showHan ? " on" : "")}
                    title={"Pauline Hanson, on the same approve-minus-disapprove basis. " +
@@ -2593,6 +2601,23 @@ function infoTerms(D) {
     <button type="button" className="hi-term"
             onClick={() => window.AP.openTerm && window.AP.openTerm(to, from)}>{label}</button>);
   const list = [
+    { id: "approval", term: "Approval", body: (
+      <>A verdict on the job: approve minus disapprove for a leader’s performance. Essential words
+      it “Q. Do you approve or disapprove of the job Anthony Albanese is doing as Prime
+      Minister?”, and Newspoll, YouGov and Resolve ask the same form with their own wordings.
+      {" "}{xref("favourability", "approval", "Favourability")} is a different question – about
+      the person, not the job – asked by the houses that ask it instead. The numbers it feeds
+      are what {xref("net-approval", "approval", "net approval")} records.</>) },
+    { id: "favourability", term: "Favourability", body: (
+      <>A verdict on the person: positive minus negative, for the houses that ask favour rather
+      than job performance. RedBridge/Accent asks “Do you have a favourable or unfavourable view
+      of the following?”, DemosAU asks “Q. What is your opinion of the following people?” with
+      positive, neutral and negative on offer, and Freshwater its own form of it. Not
+      interchangeable with {xref("approval", "favourability", "approval")} – a leader can be
+      approved of for the job and disliked as a person, or the reverse – so the two measures sit
+      in separate panels rather than one averaged
+      line. {" "}The {xref("net-approval", "favourability", "net approval")} lines join each
+      house’s own readings without pretending they measure the same thing.</>) },
     { id: "interval", term: "95% interval", body: (
       <>The uncertainty carried beside the headline: the greater of the spread among the polls in
       the window and their {xref("margin-of-error", "95% interval", "sampling error")} – currently
@@ -2649,8 +2674,11 @@ function infoTerms(D) {
       tag in the archive marks.</>) },
     { id: "net-approval", term: "Net approval", body: (
       <>Approve minus disapprove for a party leader – favourable minus unfavourable where a house
-      words it as favourability. The questions come irregularly and worded differently from house
-      to house, so the lines simply join published readings rather than aggregating them.</>) },
+      words it as favourability. The two are separate questions –
+      see {xref("approval", "net approval", "Approval")} and{" "}
+      {xref("favourability", "net approval", "Favourability")} – asked irregularly and worded
+      differently from house to house, so the lines simply join published readings rather than
+      aggregating them.</>) },
     { id: "next-polls", term: "Next polls", body: (
       <>When each house is likely to publish next, forecast from its own record. Its dates are the
       median gap between its last eight releases, nudged no more than three days onto the weekday
@@ -2714,7 +2742,12 @@ function infoTerms(D) {
       adjusted for its own {xref("house-effect", "weighted aggregate", "house effect")}. Where one
       house publishes more than once in a window or a
       calendar month – Roy Morgan polls weekly – its repeat waves count for the square root of
-      their number, so three weekly waves count as 1.7, not 3.</>) },
+      their number, so three weekly waves count as 1.7, not 3.
+      {" "}Full formula: the headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window, where
+      xᵢ is a poll’s house-adjusted figure and its weight wᵢ = nᵢ × 2^(−d/7) ÷ √m – nᵢ the
+      poll’s sample, d its age in days (halving every seven), and m its house’s wave count in
+      the window. The effective sample behind it is (Σwᵢ)² ÷ Σwᵢ², and the monthly trend points
+      run the same formula with the recency term dropped.</>) },
   ];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"
