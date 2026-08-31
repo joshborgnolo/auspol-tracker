@@ -901,10 +901,10 @@ body.dark .dl-bloom { opacity: 1; }
 .ro-party { display: flex; align-items: baseline; gap: 11px; }
 .ro-dot { width: 13px; height: 13px; border-radius: 50%; align-self: center; }
 .ro-name { font-size: 17px; font-weight: 700; color: var(--ink-2); letter-spacing: -0.01em; white-space: nowrap; }
-.ro-num { font-size: 62px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
+.ro-num { font-size: 68px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
 .alp-side .ro-num { color: var(--alp-text); }
 .lnp-side .ro-num { color: var(--lnp-text); }
-.ro-sep { width: 2px; height: 44px; border-radius: 1px; background: var(--line); align-self: center; }
+.ro-sep { width: 2px; height: 47px; border-radius: 1px; background: var(--line); align-self: center; }
 
 /* ---- rolling figures ----
    Each digit is a reel of 0-9 in a one-em window, moved by transform alone, so
@@ -959,8 +959,12 @@ body.dark .dl-bloom { opacity: 1; }
 .hg-grad { position: absolute; bottom: 2px; height: 3px; width: 1px; background: var(--hg-grad); }
 /* Geometry straight from the data: left and width are the interval's own
    edges. No min-width and no padding - a floor on the bar would widen a
-   narrow interval into a claim the polls do not support. */
-.hg-span { position: absolute; top: 2px; height: 8px; border-radius: 999px; }
+   narrow interval into a claim the polls do not support. The edges move on
+   the same curve and duration the digits roll with, so a switch slides the
+   mercury rather than cutting it, and on load the component lets it fill
+   out from the tie (see HeroGauge). */
+.hg-span { position: absolute; top: 2px; height: 8px; border-radius: 999px;
+  transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
 /* The tie is the whole point of the instrument - whether the span clears it -
    so it is cut into the housing rather than drawn over it: a dark cut with a
    lit lip on its lower right, the page's one light direction, the same pair
@@ -2111,7 +2115,7 @@ body.dark .fb-form { color-scheme: dark; }
 @media (max-width: 900px) {
   .method-grid { grid-template-columns: 1fr; }
   .head-meta { gap: 12px; }
-  .ro-num { font-size: 48px; }
+  .ro-num { font-size: 52px; }
   /* Never one row of six small targets: at this width the controls have the
      headline's full line to themselves, so the matchup toggle sits above the
      range toggle (the desktop arrangement, left-aligned) and both get real
@@ -2174,13 +2178,13 @@ body.dark .fb-form { color-scheme: dark; }
               gap: 5px 8px; flex: 1 1 0; min-width: 0; }
   .alp-side { justify-content: flex-end; }
   .lnp-side { justify-content: flex-start; }
-  /* 54, up from the 48 that ≤900px sets: the figure is the headline of the
-     page and the unstacked pair left it room - the ink is 90px inside a 164px
-     column, so width was never what held it at 48. Six more pixels of block
-     height, against the 29 the unstack gave back. Scoped HERE rather than at
-     the 900px rule, which also covers 560-900 where the desktop mirror is
-     still the layout and this bump would not be the same change. */
-  .ro-num { order: -1; flex: 0 0 100%; font-size: 54px; }
+  /* 58, up from the 52 that ≤900px sets: the figure is the headline of the
+     page and the unstacked pair left it room - the ink is ~97px inside a 164px
+     column, so width was never what held it small. The bump stands over the
+     29px the unstack gave back. Scoped HERE rather than at the 900px rule,
+     which also covers 560-900 where the desktop mirror is the layout and this
+     bump would not be the same change. */
+  .ro-num { order: -1; flex: 0 0 100%; font-size: 58px; }
   /* .roll is an inline-flex, so the figure is positioned by justify-content
      inside its own box - text-align has nothing to act on */
   .alp-side .ro-num { justify-content: flex-end; }
@@ -2188,7 +2192,7 @@ body.dark .fb-form { color-scheme: dark; }
   /* the rule stays what it is on the desktop - an upright axis, not a divider
      - and grows to the height of the pair it stands between */
   .ro-sep { width: 2px; height: auto; align-self: stretch;
-            min-height: 62px; margin: 0; }
+            min-height: 66px; margin: 0; }
   .ro-name { font-size: 16px; }
 
   /* Four full-width control rows used to stand between the headline and the
@@ -2992,7 +2996,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
   .acc-dot, .acc-mean { transition: none; }
-  .roll-reel, .net { transition: none; }
+  .roll-reel, .hg-span, .net { transition: none; }
 }
 
 /* The theme flip crossfades as ONE composited picture – see applyChrome() in
@@ -6711,7 +6715,8 @@ function Delta({
   goodUp = true,
   small,
   title,
-  roll
+  roll,
+  spinIn
 }) {
   if (value == null) return null;
   const up = value > 0,
@@ -6726,7 +6731,8 @@ function Delta({
   }, /*#__PURE__*/React.createElement("span", {
     className: "delta-arrow"
   }, arrow), flat ? "no change" : roll && Roll ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement(Roll, {
-    value: figure
+    value: figure,
+    spinIn: spinIn
   }), suffix) : figure + suffix);
 }
 
@@ -14477,6 +14483,13 @@ Object.assign(window, {
 });</script>
   <script>/* auspol tracker – header, hero, page assembly */
 
+/* Load-time settle, shared by everything that moves into place on the way in:
+   the masthead needle and graduations, the hero's rolling figures and its
+   mercury. One clock, so the page reads as one instrument coming to rest,
+   not four animations that happen to overlap. */
+const SETTLE_MS = 220;
+const REDUCED_MOTION = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 // relative freshness for the "last poll" stamp, which is measured off the
 // date that stamp SHOWS - the last publication, not the last fieldwork end,
 // or the page would read "26 Aug 2026 · 2 days ago" on 26 August
@@ -14626,10 +14639,9 @@ function Header({
   const pendTitle = `2PP swing · ALP v ${topOpp.abbr} · ` + (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
 
   // settle the needle in from vertical on load (skip the swing for reduced motion)
-  const reduceMotion = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const [pendSettled, setPendSettled] = React.useState(reduceMotion);
+  const [pendSettled, setPendSettled] = React.useState(REDUCED_MOTION);
   React.useEffect(() => {
-    const t = setTimeout(() => setPendSettled(true), 220);
+    const t = setTimeout(() => setPendSettled(true), SETTLE_MS);
     return () => clearTimeout(t);
   }, [pendDeg]);
   // Needle points UP from the pivot, so the sign flips vs the old hanging
@@ -14876,9 +14888,22 @@ window.RollNum = RollNum; // the hero's Delta reads it off the window (see Delta
 function RollNum({
   value,
   className,
-  style
+  style,
+  spinIn
 }) {
   const text = String(value);
+  /* spinIn: arrive the way a matchup switch does - every reel mounts at 0 and
+     rolls up to its real digit on the shared settle clock, an odometer spun
+     up on load. The DOM value is still the FINAL figure from the first frame
+     (see above), so nothing is ever withheld from the accessibility tree;
+     and with reduced motion there is no pretend state at all - the figure is
+     mounted already correct. */
+  const [spun, setSpun] = React.useState(!spinIn || REDUCED_MOTION);
+  React.useEffect(() => {
+    if (spun) return;
+    const t = setTimeout(() => setSpun(true), SETTLE_MS);
+    return () => clearTimeout(t);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
   /* Keyed by PLACE VALUE - distance from the right end - not by position from
      the left. A figure that loses a character has every reel to the left of it
      renumbered under an index key, so React sees a different element at each
@@ -14902,7 +14927,7 @@ function RollNum({
   }, /*#__PURE__*/React.createElement("span", {
     className: "roll-reel",
     style: {
-      "--d": Number(ch)
+      "--d": spun ? Number(ch) : 0
     }
   }, ROLL_DIGITS.map(d => /*#__PURE__*/React.createElement("span", {
     key: d
@@ -15134,6 +15159,18 @@ function HeroGauge({
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(align);
     return () => ro.disconnect();
   }, [aName, bName]);
+
+  /* The mercury does not simply appear on load: it fills from the tie outward
+     toward whoever leads, the way the dial's column fills from level. The
+     span mounts collapsed on the 50 mark and reaches its real edges on the
+     shared settle clock - the same transition the matchup switch slides with.
+     Reduced motion mounts it already at extent; there is no pretend state. */
+  const [mercSettled, setMercSettled] = React.useState(REDUCED_MOTION);
+  React.useEffect(() => {
+    if (mercSettled) return;
+    const t = setTimeout(() => setMercSettled(true), SETTLE_MS);
+    return () => clearTimeout(t);
+  }, []);
   const dev = a - 50;
   const cl = v => Math.max(-HG_DOM, Math.min(HG_DOM, v));
   /* % from the left edge. Decreasing in v, because a Labor lead travels LEFT
@@ -15165,9 +15202,13 @@ function HeroGauge({
     }
   })), /*#__PURE__*/React.createElement("span", {
     className: "hg-span",
-    style: {
+    style: mercSettled ? {
       left: L + "%",
       width: R - L + "%",
+      background: color
+    } : {
+      left: "50%",
+      width: "0%",
       background: color
     }
   }), overA && /*#__PURE__*/React.createElement("span", {
@@ -15582,7 +15623,8 @@ function Hero({
     value: latest.a.toFixed(1),
     style: {
       color: inkOf(colA)
-    }
+    },
+    spinIn: true
   })), /*#__PURE__*/React.createElement("span", {
     className: "ro-sep",
     "aria-hidden": "true",
@@ -15594,7 +15636,8 @@ function Hero({
     value: latest.b.toFixed(1),
     style: {
       color: inkOf(colB)
-    }
+    },
+    spinIn: true
   }), /*#__PURE__*/React.createElement("span", {
     className: "ro-name"
   }, m.b.name), /*#__PURE__*/React.createElement("span", {
@@ -15624,12 +15667,14 @@ function Hero({
   }, /*#__PURE__*/React.createElement("span", {
     className: "lead-tag"
   }, leadName, " leads by ", /*#__PURE__*/React.createElement(RollNum, {
-    value: Math.abs(lead).toFixed(1)
+    value: Math.abs(lead).toFixed(1),
+    spinIn: true
   }), " pts"), /*#__PURE__*/React.createElement(Delta, {
     value: monthDelta,
     suffix: " pt",
     small: true,
-    roll: true
+    roll: true,
+    spinIn: true
   }), /*#__PURE__*/React.createElement("span", {
     className: "hero-sub-note"
   }, m.real || altL && altL.aPrev != null ? "vs. one month ago" : "vs. previous reading", unc && unc.changeSig === false && /*#__PURE__*/React.createElement("span", {

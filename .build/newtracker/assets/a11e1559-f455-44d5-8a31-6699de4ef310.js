@@ -159,7 +159,7 @@ function fitDomain(vals, step, include) {
    RollNum is defined by the header script, which loads after this one -
    resolved at render, and guarded so a reordering degrades to a plain figure
    rather than a blank panel. */
-function Delta({ value, suffix = "", goodUp = true, small, title, roll }) {
+function Delta({ value, suffix = "", goodUp = true, small, title, roll, spinIn }) {
   if (value == null) return null;
   const up = value > 0, flat = Math.abs(value) < 0.05;
   const cls = flat ? "flat" : (up === goodUp ? "up" : "down");
@@ -170,7 +170,7 @@ function Delta({ value, suffix = "", goodUp = true, small, title, roll }) {
     <span className={"delta " + cls + (small ? " delta-sm" : "")} title={title}>
       <span className="delta-arrow">{arrow}</span>
       {flat ? "no change"
-        : roll && Roll ? <><Roll value={figure} />{suffix}</>
+        : roll && Roll ? <><Roll value={figure} spinIn={spinIn} />{suffix}</>
         : figure + suffix}
     </span>
   );

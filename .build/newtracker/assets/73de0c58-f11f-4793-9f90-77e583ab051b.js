@@ -1,5 +1,13 @@
 /* auspol tracker – header, hero, page assembly */
 
+/* Load-time settle, shared by everything that moves into place on the way in:
+   the masthead needle and graduations, the hero's rolling figures and its
+   mercury. One clock, so the page reads as one instrument coming to rest,
+   not four animations that happen to overlap. */
+const SETTLE_MS = 220;
+const REDUCED_MOTION = typeof window !== "undefined" && window.matchMedia &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 // relative freshness for the "last poll" stamp, which is measured off the
 // date that stamp SHOWS - the last publication, not the last fieldwork end,
 // or the page would read "26 Aug 2026 · 2 days ago" on 26 August
@@ -122,11 +130,9 @@ function Header({ isDark, onToggleTheme }) {
     (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
 
   // settle the needle in from vertical on load (skip the swing for reduced motion)
-  const reduceMotion = typeof window !== "undefined" && window.matchMedia &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const [pendSettled, setPendSettled] = React.useState(reduceMotion);
+  const [pendSettled, setPendSettled] = React.useState(REDUCED_MOTION);
   React.useEffect(() => {
-    const t = setTimeout(() => setPendSettled(true), 220);
+    const t = setTimeout(() => setPendSettled(true), SETTLE_MS);
     return () => clearTimeout(t);
   }, [pendDeg]);
   // Needle points UP from the pivot, so the sign flips vs the old hanging
@@ -293,8 +299,20 @@ function Header({ isDark, onToggleTheme }) {
    clipped digit boxes align to its top edge. */
 const ROLL_DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 window.RollNum = RollNum;      // the hero's Delta reads it off the window (see Delta)
-function RollNum({ value, className, style }) {
+function RollNum({ value, className, style, spinIn }) {
   const text = String(value);
+  /* spinIn: arrive the way a matchup switch does - every reel mounts at 0 and
+     rolls up to its real digit on the shared settle clock, an odometer spun
+     up on load. The DOM value is still the FINAL figure from the first frame
+     (see above), so nothing is ever withheld from the accessibility tree;
+     and with reduced motion there is no pretend state at all - the figure is
+     mounted already correct. */
+  const [spun, setSpun] = React.useState(!spinIn || REDUCED_MOTION);
+  React.useEffect(() => {
+    if (spun) return;
+    const t = setTimeout(() => setSpun(true), SETTLE_MS);
+    return () => clearTimeout(t);
+  }, []);   // eslint-disable-line react-hooks/exhaustive-deps
   /* Keyed by PLACE VALUE - distance from the right end - not by position from
      the left. A figure that loses a character has every reel to the left of it
      renumbered under an index key, so React sees a different element at each
@@ -310,7 +328,7 @@ function RollNum({ value, className, style }) {
       {text.split("").map((ch, i) => (
         /[0-9]/.test(ch) ? (
           <span className="roll-d" key={n - 1 - i} aria-hidden="true">
-            <span className="roll-reel" style={{ "--d": Number(ch) }}>
+            <span className="roll-reel" style={{ "--d": spun ? Number(ch) : 0 }}>
               {ROLL_DIGITS.map((d) => <span key={d}>{d}</span>)}
             </span>
           </span>
@@ -464,6 +482,18 @@ function HeroGauge({ a, ci, color, aName, bName, sepRef }) {
     return () => ro.disconnect();
   }, [aName, bName]);
 
+  /* The mercury does not simply appear on load: it fills from the tie outward
+     toward whoever leads, the way the dial's column fills from level. The
+     span mounts collapsed on the 50 mark and reaches its real edges on the
+     shared settle clock - the same transition the matchup switch slides with.
+     Reduced motion mounts it already at extent; there is no pretend state. */
+  const [mercSettled, setMercSettled] = React.useState(REDUCED_MOTION);
+  React.useEffect(() => {
+    if (mercSettled) return;
+    const t = setTimeout(() => setMercSettled(true), SETTLE_MS);
+    return () => clearTimeout(t);
+  }, []);
+
   const dev = a - 50;
   const cl = (v) => Math.max(-HG_DOM, Math.min(HG_DOM, v));
   /* % from the left edge. Decreasing in v, because a Labor lead travels LEFT
@@ -484,7 +514,9 @@ function HeroGauge({ a, ci, color, aName, bName, sepRef }) {
         {[-6, -4, -2, 2, 4, 6].map((t) => (
           <span key={t} className="hg-grad" style={{ left: pos(t) + "%" }} />
         ))}
-        <span className="hg-span" style={{ left: L + "%", width: (R - L) + "%", background: color }} />
+        <span className="hg-span" style={mercSettled
+          ? { left: L + "%", width: (R - L) + "%", background: color }
+          : { left: "50%", width: "0%", background: color }} />
         {overA && <span className="hg-over hg-over-a" />}
         {overB && <span className="hg-over hg-over-b" />}
         <span className="hg-tie" />
@@ -804,11 +836,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             <div className="ro-party alp-side">
               <span className="ro-dot" style={{ background: colA }}></span>
               <span className="ro-name">{m.a.name}</span>
-              <RollNum className="ro-num" value={latest.a.toFixed(1)} style={{ color: inkOf(colA) }} />
+              <RollNum className="ro-num" value={latest.a.toFixed(1)} style={{ color: inkOf(colA) }} spinIn />
             </div>
             <span className="ro-sep" aria-hidden="true" ref={sepRef}></span>
             <div className="ro-party lnp-side">
-              <RollNum className="ro-num" value={latest.b.toFixed(1)} style={{ color: inkOf(colB) }} />
+              <RollNum className="ro-num" value={latest.b.toFixed(1)} style={{ color: inkOf(colB) }} spinIn />
               <span className="ro-name">{m.b.name}</span>
               <span className="ro-dot" style={{ background: colB }}></span>
             </div>
@@ -845,9 +877,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               it swap outright, as the party names above them do. */}
           <div className="hero-sub">
             <span className="lead-tag">
-              {leadName} leads by <RollNum value={Math.abs(lead).toFixed(1)} /> pts
+              {leadName} leads by <RollNum value={Math.abs(lead).toFixed(1)} spinIn /> pts
             </span>
-            <Delta value={monthDelta} suffix=" pt" small roll />
+            <Delta value={monthDelta} suffix=" pt" small roll spinIn />
             <span className="hero-sub-note">
               {(m.real || (altL && altL.aPrev != null)) ? "vs. one month ago" : "vs. previous reading"}
               {/* A month-on-month move smaller than its own interval is not a
