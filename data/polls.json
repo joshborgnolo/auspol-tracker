@@ -6190,6 +6190,12 @@
       "lnpVsOnp_lnp": null
     },
     {
+      "date": "2026-05-24",
+      "firm": "Roy Morgan",
+      "alpVsOnp_alp": 53.5,
+      "lnpVsOnp_lnp": null
+    },
+    {
       "date": "2026-05-26",
       "firm": "Fox & Hedgehog",
       "alpVsOnp_alp": 54,
@@ -6343,6 +6349,12 @@
       "date": "2026-08-28",
       "firm": "RedBridge / Accent",
       "alpVsOnp_alp": 52,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-08-30",
+      "firm": "Roy Morgan",
+      "alpVsOnp_alp": 55.5,
       "lnpVsOnp_lnp": null
     }
   ],

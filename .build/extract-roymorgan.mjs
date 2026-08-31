@@ -31,6 +31,13 @@
 //     phrase at all and the pair stays null — an anchor WITHOUT a pair is
 //     only a warning, but a parsed pair that fails the plausibility guards
 //     aborts the run.
+//   - ALP v One Nation 2PP: weekly since 2026-05-17 (polls.json wave date;
+//     released May 18) the release closes with an ALP-vs-One-Nation
+//     head-to-head after the anchor "contest is set to be between the ALP
+//     and One Nation" (two estimator phrasings — "the Morgan Poll estimates
+//     …" and "Roy Morgan estimates …"). Filed as an altTpp record {date,
+//     firm, alpVsOnp_alp, lnpVsOnp_lnp:null}, never a polls-row field;
+//     absent anchors before that wave are NOT a warning.
 //   - fieldwork period "conducted from Month D – Month D, YYYY", sample
 //     "cross-section of N electors", and (when present) the "can't say" share,
 //     which is undecided BESIDE the primaries, not inside them.
@@ -38,8 +45,11 @@
 // Row shape mirrors the hand-entered Roy Morgan entries already in
 // data/polls.json; `date` is the fieldwork-ending Sunday, `published` the
 // CMS post datetime converted UTC → Australia/Melbourne. Rows are inserted
-// in date order (validate.mjs demands a globally sorted array), existing
-// (date, "Roy Morgan") rows are never re-added, and a run that adds nothing
+// in date order (validate.mjs demands a globally sorted array). An existing
+// (date, "Roy Morgan") polls row is never re-added, but its release can
+// still contribute: a parsed ALP-v-One-Nation pair whose (date, firm) key
+// is missing from altTpp is appended there even when the polls row exists
+// (self-heals a wave missed on its original run). A run that adds neither
 // writes nothing.
 //
 // Provenance: each appended release's parsed post JSON is saved to
@@ -195,6 +205,24 @@ function parseRelease(post) {
     else flowsPairMissing = true;
   }
 
+  // ALP v One Nation 2PP — weekly since wave date 2026-05-17, anchored on
+  // "...contest is set to be between the ALP and One Nation" (absent before
+  // that wave, no warning then). Two estimator phrasings — "the Morgan Poll
+  // estimates … (narrowly )?(leading|in front of)" and "Roy Morgan
+  // estimates … in front of". The window goes through normaliseLead() first:
+  // the week-on-week change parentheticals ("(up 2.5%)") contain "%" and a
+  // [^%]* gap would mis-latch. The 2026-05-17 variant ("the ALP 54% leads
+  // One Nation 46%", post-budget SMS-poll flows) is already recorded in
+  // altTpp and its release is out of the feed — documented, not parsed here.
+  let tpp_onp = null, tpp_onp_onp = null, onpPairMissing = false;
+  const oi = t.search(/contest is set to be between the ALP and One Nation/i);
+  if (oi !== -1) {
+    const w = normaliseLead(t.slice(oi, oi + 500));
+    const op = w.match(/the ALP\s+(?:on\s+)?([\d.]+)\s*%[^%]{0,60}?(?:leading|leads?|in front of)\s+One Nation\s+(?:on\s+)?([\d.]+)\s*%/i);
+    if (op) { tpp_onp = parseFloat(op[1]); tpp_onp_onp = parseFloat(op[2]); }
+    else onpPairMissing = true;
+  }
+
   // CMS post datetime (UTC) → Australia/Melbourne local, "YYYY-MM-DDTHH:MM"
   let published = null;
   const pd = post.date;
@@ -213,6 +241,7 @@ function parseRelease(post) {
   return {
     date, dateStart, published, alp, lnp, grn, onp, ind, undecided, lib, nat,
     tpp_alp, tpp_lnp, tpp_flows, tpp_flows_lnp, flowsPairMissing,
+    tpp_onp, tpp_onp_onp, onpPairMissing,
     sample: sampleM ? +sampleM[1].replace(/,/g, "") : null,
     missing,
   };
@@ -248,6 +277,10 @@ function guardRelease(r, slug, releaseDate) {
     check(`flows 2pp Σ=${r.tpp_flows + r.tpp_flows_lnp} ~100`, Math.abs(r.tpp_flows + r.tpp_flows_lnp - 100) <= 1.0);
     check(`flows alp=${r.tpp_flows} in 40–65`, r.tpp_flows >= 40 && r.tpp_flows <= 65);
   }
+  if (r.tpp_onp != null && r.tpp_onp_onp != null) {
+    check(`onp 2pp Σ=${r.tpp_onp + r.tpp_onp_onp} ~100`, Math.abs(r.tpp_onp + r.tpp_onp_onp - 100) <= 1.0);
+    check(`onp alp=${r.tpp_onp} in 40–65`, r.tpp_onp >= 40 && r.tpp_onp <= 65);
+  }
   if (r.undecided != null) check(`undecided=${r.undecided} in 0–25`, r.undecided > 0 && r.undecided <= 25);
   if (r.sample != null) check(`sample=${r.sample} in 500–10000`, r.sample >= 500 && r.sample <= 10000);
   return errs.map((e) => `${slug}: ${e}`);
@@ -259,6 +292,7 @@ try {
   const orig = readFileSync(OUT, "utf8");
   const D = JSON.parse(orig);
   const rmDates = new Set(D.polls.filter((p) => p.pollster === "Roy Morgan").map((p) => p.date));
+  const altBy = new Set((D.altTpp || []).map((a) => a.date + "|" + a.firm));
 
   const feed = nextData(await fetchText(FEED_URL), "findings feed");
   const posts = feed?.props?.pageProps?.pageData?.postData?.posts;
@@ -271,15 +305,30 @@ try {
   const newRows = [];
   const guardFails = [];
   const sources = [];
+  const altAdds = [];
   for (const c of candidates) {
     const post = nextData(await fetchText(`https://www.roymorgan.com/findings/${c.slug}`), c.slug)
       ?.props?.pageProps?.findingData?.postBy;
     if (!post?.content) { guardFails.push(`${c.slug}: no findingData.postBy.content`); continue; }
     const r = parseRelease(post);
     if (r.flowsPairMissing) status.warnings.push(`${c.slug}: "2025 Federal Election" anchor present but no flows pair parsed`);
-    if (r.date && rmDates.has(r.date)) { status.skipped_existing.push(r.date); continue; }
+    if (r.onpPairMissing) status.warnings.push(`${c.slug}: "between the ALP and One Nation" anchor present but no ALP-v-ON pair parsed`);
     const rd = post.findings?.releaseDate?.split("/").reverse().join("-"); // "24/08/2026" → 2026-08-24
-    guardFails.push(...guardRelease(r, c.slug, rd && /^\d{4}-\d{2}-\d{2}$/.test(rd) ? rd : null));
+    const rdOk = rd && /^\d{4}-\d{2}-\d{2}$/.test(rd) ? rd : null;
+    const existed = !!(r.date && rmDates.has(r.date));
+    const errs = guardRelease(r, c.slug, rdOk);
+    // For a wave already recorded in polls[], only its altTpp contribution is
+    // still live — guard just that pair; poll-field guards belong to the
+    // row's original run (historic rows predate some checks).
+    guardFails.push(...(existed ? errs.filter((e) => /\bonp (?:2pp Σ|alp=)/.test(e)) : errs));
+    if (r.tpp_onp != null && r.date) {
+      const k = r.date + "|Roy Morgan";
+      if (!altBy.has(k) && !altAdds.some((a) => a.date + "|" + a.firm === k)) {
+        altAdds.push({ date: r.date, firm: "Roy Morgan", alpVsOnp_alp: r.tpp_onp, lnpVsOnp_lnp: null });
+        if (existed) status.alt_healed = [...(status.alt_healed || []), r.date];
+      }
+    }
+    if (existed) { status.skipped_existing.push(r.date); continue; }
     if (guardFails.length) continue;
     newRows.push({
       date: r.date,
@@ -296,7 +345,7 @@ try {
       url: `https://www.roymorgan.com/findings/${c.slug}`,
     });
     sources.push({ slug: c.slug, json: JSON.stringify(post, null, 2) + "\n" });
-    status.added.push({ date: r.date, slug: c.slug, alp: r.alp, lnp: r.lnp, onp: r.onp, tpp: `${r.tpp_alp}/${r.tpp_lnp}`, flows: r.tpp_flows });
+    status.added.push({ date: r.date, slug: c.slug, alp: r.alp, lnp: r.lnp, onp: r.onp, tpp: `${r.tpp_alp}/${r.tpp_lnp}`, flows: r.tpp_flows, onp2pp: r.tpp_onp != null ? `${r.tpp_onp}/${r.tpp_onp_onp}` : null });
   }
   for (const w of status.warnings) console.warn("RM_WARN " + w);
   if (guardFails.length) {
@@ -306,18 +355,25 @@ try {
     process.exit(2);
   }
 
-  if (newRows.length) {
-    const byDate = [...D.polls, ...newRows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
-    D.polls = byDate;
+  if (newRows.length || altAdds.length) {
+    if (newRows.length) {
+      D.polls = [...D.polls, ...newRows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+    }
+    if (altAdds.length) {
+      D.altTpp = [...(D.altTpp || []), ...altAdds].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+      console.log(`altTpp: +${altAdds.length} Roy Morgan ALP-v-One-Nation pair(s): ${altAdds.map((a) => a.date).join(", ")}`);
+    }
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
     const next = JSON.stringify(D, null, 2) + trailingNl;
     status.changed = next !== orig;
     if (status.changed && !CHECK) {
       writeFileSync(OUT + ".tmp", next);
       renameSync(OUT + ".tmp", OUT);
-      mkdirSync(SRC_DIR, { recursive: true });
-      for (const s of sources) writeFileSync(`${SRC_DIR}/release-${s.slug}.json`, s.json);
-      console.log(`wrote ${OUT}: +${newRows.length} Roy Morgan wave(s): ${status.added.map((a) => a.date).join(", ")}`);
+      if (sources.length) {
+        mkdirSync(SRC_DIR, { recursive: true });
+        for (const s of sources) writeFileSync(`${SRC_DIR}/release-${s.slug}.json`, s.json);
+      }
+      if (newRows.length) console.log(`wrote ${OUT}: +${newRows.length} Roy Morgan wave(s): ${status.added.map((a) => a.date).join(", ")}`);
     }
   } else {
     status.changed = false;

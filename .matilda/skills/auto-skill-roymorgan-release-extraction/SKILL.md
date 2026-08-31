@@ -1,14 +1,16 @@
 ---
 name: roymorgan-release-extraction
-description: Extract new Roy Morgan federal-voting-intention releases from the live roymorgan.com/findings Next.js feed into data/polls.json — __NEXT_DATA__ data flow (no HTML scraping), candidate filtering by topic+slug, prose-lead normalisation parser, guard suite, sorted-insert row contract (.build/extract-roymorgan.mjs, scheduled by local.auspol.roymorgan).
+description: Extract new Roy Morgan federal-voting-intention releases from the live roymorgan.com/findings Next.js feed into data/polls.json — __NEXT_DATA__ data flow (no HTML scraping), candidate filtering by topic+slug, prose-lead normalisation parser, guard suite, sorted-insert row contract (.build/extract-roymorgan.mjs, GitHub Actions since 84509d1); includes the ALP-v-One-Nation head-to-head research (anchor, sentence shapes, verified series) for its altTpp extension.
 source: auto-skill
-extracted_at: '2026-08-29T02:57:00.610Z'
+extracted_at: '2026-08-31T10:41:58.795Z'
 ---
 
 # Roy Morgan live-release extraction (findings feed → polls.json)
 
-Built 2026-08-29: `node .build/extract-roymorgan.mjs [--check]`, scheduled by the
-`local.auspol.roymorgan` LaunchAgent (see launchd-scheduled-data-pipeline skill). Distinct from
+Built 2026-08-29: `node .build/extract-roymorgan.mjs [--check]`. Runs on GitHub Actions since
+commit `84509d1` (`.github/workflows/roymorgan-update.yml` + `.build/roymorgan-updater.sh` —
+see auspol-actions-data-pipeline skill; the `local.auspol.roymorgan` LaunchAgent is retired).
+Distinct from
 the one-shot **archive** extractor (roymorgan-archive-extraction): this one is a recurring
 live-source job whose output is `data/polls.json`, never the frozen `data/roymorgan-*.csv`
 archive (archive ends 2025-05-31 and is not consumed by the site build).
@@ -48,7 +50,9 @@ Working approach (v2, 17/19 vs live hand-verified rows):
    pattern handles both "Independents/ Other Parties" and "Other Parties/ Independents".
 4. **2PP**: the first `ALP x%` … `L-NP y%` pair within ~300 chars after the `vote… their
    preferences` anchor — the text ALSO carries an ALP-vs-One-Nation pair and a 2025-election
-   preference-flow pair, neither of which is the tracker series. Anchor must come first.
+   preference-flow pair. The flows pair feeds `tpp_flows`; the ALP-v-ON pair is the altTpp
+   series (see the ONP section below). NEITHER may ever feed `tpp_alp`/`tpp_lnp` — the
+   canonical-pair anchor must come first.
 5. Field period `conducted from Month D – Month D, YYYY` (abbrev months, cross-year spans);
    sample `cross-section of N electors`; the `can't say` undecided line is **optional** —
    pre-June-2026 eras omit it, and polls.json rows omit it too (conditional key, not null).
@@ -83,6 +87,55 @@ a parser that silently returns partial rows is the failure mode to design agains
   mirrors extract-resolve-rpm.mjs — see resolve-monitor-extraction skill.
 - Provenance: save each parsed release's post JSON to `.build/roymorgan-src/release-<slug>.json`
   and commit it alongside `data/polls.json` (the wrapper's add-list covers both).
+
+## The third published pair: ALP v One Nation (SHIPPED 2026-08-31 in extract-roymorgan.mjs)
+
+Since the wave of 2026-05-17 every weekly release ALSO publishes preferences allocated between
+the ALP and One Nation. User-reported gap 2026-08-31: the agent captured both 2PP pairs of the
+Aug-31 release but missed this one. The extractor now parses it (the "tpp_onp" block beside the
+flows block — `grep -c 'altTpp' .build/extract-roymorgan.mjs` → 3 as of shipping). The record
+lives in `data/polls.json`'s `altTpp` array (see the auspol-alt-tpp-model skill for the data
+model + generic display path).
+
+**Verified facts (safe to build on):**
+
+- Anchor: `contest is set to be between the ALP and One Nation` — present in every release from
+  2026-05-17 on, ABSENT before (era boundary: pre-May waves must leave the pair null silently,
+  same as the flows anchor logic).
+- Sentence shapes (inventoried against every 2026 release by live fetch):
+  - **(a) 2026-05-17 only**: `…the ALP 54% leads One Nation 46%` — allocated on the
+    post-budget SPECIAL's SMS-poll flows, a different basis. Row already recorded; release no
+    longer in the findings feed → do NOT write a parser alternation for it.
+  - **(b)**: `the Morgan Poll estimates the ALP X% … (narrowly…)? (leading|in front of) One
+    Nation Y%` (seen 05-24, 06-21, 06-28).
+  - **(c)**: `Roy Morgan estimates the ALP X% (chg%) in front of One Nation Y% (chg%)` (05-31
+    onward — the live format; the Aug-31 release the user quoted).
+  One alternation of estimator phrase + verb covers (b)+(c).
+- **Regex traps (burned two throwaway probes):** (i) the change parentheticals contain `%`
+  (`ALP 55.5% (up 2.5%)`) so `[^%]{0,60}`-style spans fail — run the window through the
+  existing `normaliseLead()` FIRST (it strips those parens); (ii) the anchor sentence itself
+  ends with "…the ALP and One Nation" — a pattern that tolerates that phrase as lead-in matches
+  the anchor's own tail and yields the wrong pair → slice the window to AFTER the anchor.
+- **Verified series** (wave-date → ALP%/ONP%): 05-17 54/46 · 05-24 53.5/46.5 · 05-31 53.5/46.5
+  · 06-07 53.5/46.5 · 06-14 53/47 · 06-21 51/49 · 06-28 53/47 · 07-05 56/44 · 07-12 52.5/47.5
+  · 07-19 55/45 · 07-26 53.5/46.5 · 08-02 54/46 · 08-09 53/47 · 08-16 53/47 · 08-23 53/47
+  · 08-30 55.5/44.5. Gaps remaining in `altTpp` at hand-off: exactly **05-24 and 08-30** —
+  NOT the 14 initially assumed (the array was audited row by row before planning).
+
+**Shipped design (2026-08-31):** parse in a block beside the flows block; guard
+`onp Σ=100±1.0` + `tpp_onp in 40–65` like the other 2PP guards; append
+`{date, firm:"Roy Morgan", alpVsOnp_alp, lnpVsOnp_lnp:null}` to `D.altTpp` with `date|firm`
+de-dupe placed BEFORE the `rmDates` skip so old gaps self-heal whenever a release is still in
+the feed (this retro-filled 08-30 on the first live run); merge + date-sort `altTpp`; write
+gate is `newRows.length || altAdds.length`; anchor-seen-but-pair-unparsed pushes
+`onpPairMissing` to `status.warnings`, mirroring `flowsPairMissing`. One guard nuance: for a
+wave whose polls row ALREADY exists, only the onp pair's guards are enforced, not the full
+suite (historic rows predate some checks — a full re-guard would block the altTpp self-heal
+on era-shifted rows). Only 05-24 needs a hand-backfill row (`alpVsOnp_alp: 53.5`,
+date-ordered) — its release fell out of the feed.
+**Display needs zero work** — the path is house-generic already (altTpp → tppAlt →
+"2PP · ALP v ON" line + "+ALP v ON" flag + `altAlpOn` delta, exercised daily by YouGov rows);
+expect `▲2.5` on 08-30 and `▲0.5` on 05-24 once data lands.
 
 ## Verification recipe that caught the bugs
 
