@@ -2418,7 +2418,12 @@ function NextPollsPanel() {
       <div className="np-head">
         <h2 className="card-title">Next expected polls</h2>
         <p className="card-sub">
-          Projected from each house’s recent publication intervals · Open a row for the releases behind it
+          <button type="button" className="hi-term"
+                  title="How these forecasts are made"
+                  onClick={() => window.AP.openTerm &&
+                    window.AP.openTerm("next-polls", "Next expected polls")}>
+            Projected from each house’s recent publication intervals
+          </button>{" · "}Open a row for the releases behind it
         </p>
       </div>
 

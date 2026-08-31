@@ -859,7 +859,17 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               {adjusted ? "Weighted aggregate" : "Monthly average"}
             </button>
             {!adjusted && <span className="eyebrow-warn">Limited data</span>}
-            {unc && <span className="hi-range">± {unc.ci95.toFixed(1)} pts</span>}
+            {/* The figure gets the same treatment as the method word beside
+                it: it names a thing Info defines (margin of error), so it is
+                the shortest way to the definition. */}
+            {unc && (
+              <button type="button" className="hi-range hi-term"
+                      title="What a margin of error means"
+                      onClick={() => window.AP.openTerm &&
+                        window.AP.openTerm("margin-of-error", "two-party preferred")}>
+                ± {unc.ci95.toFixed(1)} pts
+              </button>
+            )}
             {unc && (
               <span className="hi-note">
                 95% interval · {unc.n} poll{unc.n === 1 ? "" : "s"} in {D.latest.method.windowDays} days
@@ -1045,7 +1055,7 @@ function fbAutosize(box) {
   box.style.overflowY = want > max ? "auto" : "hidden";
 }
 
-function ReportError() {
+function ReportError({ onInfo }) {
   const endpoint = window.AP_FEEDBACK;
   const { D } = window.AP;
   const [open, setOpen] = useState(false);
@@ -1167,16 +1177,25 @@ function ReportError() {
   return (
     <div className="fb">
       <p className="fb-lede">
-        Every figure here is transcribed from a pollster’s published release – sometimes via
-        Wikipedia, PollBludger or another secondary source – and some of them may be wrong. Spotted
-        an error, a missing poll, or anything else worth saying? Please{" "}
+        {/* The Info signpost rides the front of this line only away from
+            Info: on the tab itself it could only point at where the reader
+            is standing, so the caller passes a null onInfo there and the
+            clause goes unrendered. */}
+        {onInfo && (
+          <>
+            See{" "}
+            <button type="button" className="hi-term" onClick={onInfo}>Info</button>
+            {" "}for more info.{" "}
+          </>
+        )}
+        Spot an error, a missing poll, or have any other feedback? Please{" "}
         {/* A toggle both ways: the thing that opened the form is the only
             thing in the sentence that looks like a control, so it is where a
             reader who has changed their mind will click. What is typed stays
             in state, so closing it is not the same as discarding it. */}
         <button type="button" className="fb-link" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
           let me know
-        </button>{open ? "." : " and I’ll take a look."}
+        </button>.
       </p>
 
       {open && (
@@ -1241,11 +1260,7 @@ function ReportError() {
 function MethodNote({ onInfo }) {
   return (
     <footer className="method method-slim">
-      <p className="method-pointer">
-        Every term on this site is defined in{" "}
-        <button type="button" className="hi-term" onClick={onInfo}>Info</button>.
-      </p>
-      <ReportError />
+      <ReportError onInfo={onInfo} />
       <div className="disclaimer">
         Unofficial aggregate of published national polling. Aggregate figures are estimates, not
         measurements – treat decimal places gently.
@@ -1267,8 +1282,11 @@ const TABS = [
   { id: "allpolls", label: "All polls" },
   /* pinHide: the docked 2PP score takes this end of the bar once the bar
      pins, and on a phone there is not room for both. The glossary is the one
-     tab a reader is never mid-task in, so it is the one that yields. */
-  { id: "info", label: "Info", pinHide: true },
+     tab a reader is never mid-task in, so it is the one that yields. The CSS
+     gates the hide to phone widths only – a wide bar has room for the full
+     tab set plus the score, so Info stays put there. */
+  { id: "info", label: "Info", pinHide: true,
+    tip: "About this site – how it works, what it tracks, and the terms it uses" },
 ];
 const TAB_IDS = TABS.map((t) => t.id);
 
@@ -1474,7 +1492,7 @@ function App() {
             onBack={focusTerm ? backFromTerm : null}
             backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}
         </div>
-        <MethodNote onInfo={() => goTab("info")} />
+        <MethodNote onInfo={tab === "info" ? null : () => goTab("info")} />
       </main>
 
       <TweaksPanel>
