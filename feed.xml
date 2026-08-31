@@ -6,7 +6,21 @@
     <atom:link href="https://auspoltracker.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
     <language>en-AU</language>
-    <lastBuildDate>Mon, 24 Aug 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Fri, 28 Aug 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>RedBridge / Accent, 24–28 Aug 2026 – ALP 29, L/NP 22, GRN 12, ON 28, Ind/Oth 9</title>
+      <link>https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-28|RedBridge / Accent</guid>
+      <pubDate>Fri, 28 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 29, L/NP 22, GRN 12, ON 28, Ind/Oth 9. No two-party figure published. Sample 1,006. Fieldwork 24–28 Aug 2026.</description>
+    </item>
+    <item>
+      <title>Newspoll, 24–28 Aug 2026 – ALP 29, L/NP 19, GRN 13, ON 30, Ind/Oth 9</title>
+      <link>https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-28|Newspoll</guid>
+      <pubDate>Fri, 28 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 29, L/NP 19, GRN 13, ON 30, Ind/Oth 9. No two-party figure published. Sample 1,243. Fieldwork 24–28 Aug 2026.</description>
+    </item>
     <item>
       <title>YouGov, 18–24 Aug 2026 – 2PP ALP 53 – L/NP 47</title>
       <link>https://www.news24.com.au/politics/australian-politics/one-nation-trails-labor-by-three-points-following-a-difficult-parliamentary-fortnight-for-albanese/news-story/d04bde51f5545775296ce13f7e15515e</link>
@@ -272,20 +286,6 @@
       <guid isPermaLink="false">auspol-tracker:2026-05-26|Fox &amp; Hedgehog</guid>
       <pubDate>Tue, 26 May 2026 12:00:00 GMT</pubDate>
       <description>Primary vote: ALP 29, L/NP 25, GRN 10, ON 27, Ind/Oth 9. Two-party preferred: ALP 49 – L/NP 51. Sample 1,700. Fieldwork 25–26 May 2026.</description>
-    </item>
-    <item>
-      <title>Agenda C Synesis, 22–26 May 2026 – ALP 29, L/NP 18, GRN 10, ON 24, Ind/Oth 19</title>
-      <link>https://www.news.com.au/finance/money/tax/no-basis-labor-frontbencher-mark-butler-warns-landlords-over-500-a-year-rent-hikes-linked-to-cgt/news-story/0c74b51fc1b0b5704d9b4a0adf2df699</link>
-      <guid isPermaLink="false">auspol-tracker:2026-05-26|Agenda C Synesis</guid>
-      <pubDate>Tue, 26 May 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29, L/NP 18, GRN 10, ON 24, Ind/Oth 19. No two-party figure published. Sample 1,232. Fieldwork 22–26 May 2026.</description>
-    </item>
-    <item>
-      <title>Essential, 20–24 May 2026 – 2PP ALP 48 – L/NP 47</title>
-      <link>https://www.theguardian.com/australia-news/2026/may/27/guardian-essential-poll-labors-housing-and-tax-changes-fail-to-win-over-voters-as-support-for-one-nation-swells</link>
-      <guid isPermaLink="false">auspol-tracker:2026-05-24|Essential</guid>
-      <pubDate>Sun, 24 May 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 29, L/NP 23, GRN 11, ON 28, Ind/Oth 9. Two-party preferred: ALP 48 – L/NP 47. Sample 1,027. Fieldwork 20–24 May 2026.</description>
     </item>
   </channel>
 </rss>

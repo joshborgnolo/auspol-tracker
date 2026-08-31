@@ -3881,6 +3881,40 @@
       "tpp_alp": 53,
       "tpp_lnp": 47,
       "url": "https://www.news24.com.au/politics/australian-politics/one-nation-trails-labor-by-three-points-following-a-difficult-parliamentary-fortnight-for-albanese/news-story/d04bde51f5545775296ce13f7e15515e"
+    },
+    {
+      "date": "2026-08-28",
+      "published": "2026-08-30T20:00",
+      "dateStart": "2026-08-24",
+      "pollster": "Newspoll",
+      "client": "The Australian",
+      "sample": 1243,
+      "alp": 29,
+      "lnp": 19,
+      "grn": 13,
+      "onp": 30,
+      "ind": 9,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b"
+    },
+    {
+      "date": "2026-08-28",
+      "published": "2026-08-30T18:00",
+      "dateStart": "2026-08-24",
+      "pollster": "RedBridge / Accent",
+      "client": "AFR",
+      "sample": 1006,
+      "alp": 29,
+      "lnp": 22,
+      "grn": 12,
+      "onp": 28,
+      "ind": 9,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn"
     }
   ],
   "ppm": [
@@ -4564,6 +4598,29 @@
       "opp": 37,
       "oppName": "Taylor",
       "han": null,
+      "extra": null
+    },
+    {
+      "date": "2026-08-28",
+      "firm": "Newspoll",
+      "alb": 46,
+      "opp": 23,
+      "oppName": "Taylor",
+      "han": 31,
+      "extra": [
+        {
+          "alb": 44,
+          "opp": 35
+        }
+      ]
+    },
+    {
+      "date": "2026-08-28",
+      "firm": "RedBridge / Accent",
+      "alb": 31,
+      "opp": 15,
+      "oppName": "Taylor",
+      "han": 24,
       "extra": null
     }
   ],
@@ -5852,6 +5909,37 @@
           "dis": 49
         }
       }
+    },
+    {
+      "date": "2026-08-28",
+      "firm": "Newspoll",
+      "alb": -21,
+      "opp": -17,
+      "oppName": "Taylor",
+      "han": -1,
+      "detail": {
+        "alb": {
+          "app": 38,
+          "dis": 59
+        },
+        "opp": {
+          "app": 33,
+          "dis": 50
+        },
+        "han": {
+          "app": 47,
+          "dis": 48
+        }
+      }
+    },
+    {
+      "date": "2026-08-28",
+      "firm": "RedBridge / Accent",
+      "alb": -19,
+      "opp": -6,
+      "oppName": "Taylor",
+      "han": -10,
+      "detail": null
     }
   ],
   "ppmHeadToHead": [
@@ -5932,6 +6020,12 @@
       "firm": "YouGov",
       "alb": 52,
       "han": 37
+    },
+    {
+      "date": "2026-08-28",
+      "firm": "Newspoll",
+      "alb": 56,
+      "han": 44
     }
   ],
   "altTpp": [
@@ -6215,6 +6309,12 @@
       "date": "2026-08-24",
       "firm": "YouGov",
       "alpVsOnp_alp": 56,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-08-28",
+      "firm": "RedBridge / Accent",
+      "alpVsOnp_alp": 52,
       "lnpVsOnp_lnp": null
     }
   ],

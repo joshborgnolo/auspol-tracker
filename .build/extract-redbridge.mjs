@@ -26,6 +26,15 @@
 // coverage, which is preferred over the PDF as the row's `url` (Feb 2026 is
 // the only committed row citing the usrfiles PDF directly).
 //
+// AFR TOPIC-PAGE CROSS-CHECK (added Aug 2026): AFR publishes each wave's
+// coverage on release Sunday 18:00, but the accent-research.com project
+// page + PDF can lag by days — sitemap discovery alone missed the 30 Aug
+// 2026 wave. Main() additionally fetches the AFR RedBridge-Accent topic
+// page (AFR_TOPIC) and reports articles dated after the latest committed
+// wave's published date in RB_STATUS.afrTopicNotes. Detection only: the
+// article body is trimmed behind AFR's paywall for automation, so figures
+// still come from the Accent PDF (or manual ingest, as this wave was).
+//
 // PDF (40MB+, 130+ pages, poppler pdftotext -layout): every figure the
 // tracker needs is a LIVE-TEXT TABLE — no OCR required:
 //   - Methodology (internal p1): fieldwork line "conducted between Monday 27
@@ -100,6 +109,11 @@ const PDF_TIMEOUT_MS = 180_000;
 const FETCH_TRIES = 3;
 const CHROME = process.env.RB_CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const PAGE_SLUG_RE = /^\/projects\/afr%2C-redbridge-group-and-accent-research-(?:([a-z]+)-(\d{4})-)?federal-poll$/i;
+// AFR's RedBridge-Accent poll topic page. AFR publishes each wave's coverage
+// SUNDAY EVENING, while the accent-research.com project page + PDF can lag
+// by days (August 2026: article out 30 Aug, no Accent slug yet) — so the
+// sitemap alone misses fresh waves. The cross-check below surfaces them.
+const AFR_TOPIC = process.env.RB_AFR_TOPIC || "https://www.afr.com/topic/redbridge-accent-poll-6ikd";
 
 // ---------------------------------------------------------------- fetching
 async function fetchBuffer(url, timeoutMs = FETCH_TIMEOUT_MS) {
@@ -590,6 +604,30 @@ if (process.env.RB_LIB !== "1") try {
   }
   if (!candidates.length) throw new Error("no federal-poll project pages found in the projects sitemap (site restructure?)");
   status.candidates = candidates.map((c) => c.slug);
+
+  // ---- AFR topic-page cross-check: detection only (the article itself is
+  // paywall-trimmed to automation, so figures still come from the Accent
+  // PDF). An AFR article dated after the LATEST PUBLISHED committed wave
+  // means a wave is live in AFR but not yet on accent-research.com — report
+  // it in RB_STATUS.afrTopicNotes instead of silently missing the poll.
+  try {
+    const topic = (await fetchBuffer(AFR_TOPIC)).toString("utf8");
+    const latestPub = Math.max(...D.polls.filter((r) => r.pollster === POLLSTER).map((r) => (r.published || r.date).slice(0, 10).replace(/-/g, "")).map(Number));
+    const fresh = new Map();
+    for (const m of topic.matchAll(/href="([^"]*?-(20\d{6})-p[0-9a-z]+)"/g)) {
+      const day = +m[2];
+      if (day > latestPub && !fresh.has(m[1])) fresh.set(m[1], day);
+    }
+    for (const [path, day] of [...fresh].sort((a, b) => a[1] - b[1])) {
+      const url = path.startsWith("http") ? path : `https://www.afr.com${path}`;
+      const iso = String(day).replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3");
+      (status.afrTopicNotes ||= []).push(url);
+      status.notes.push(
+        `AFR topic page lists a post-${String(latestPub).replace(/^(\d{4})(\d{2})(\d{2})$/, "$1-$2-$3")} article (${iso}) with no Accent project page yet — detect-only; ingest figures manually or wait for the Accent PDF: ${url}`);
+    }
+  } catch (err) {
+    status.notes.push(`AFR topic-page cross-check failed: ${err.message} — sitemap discovery unaffected`);
+  }
 
   mkdirSync(SRC_DIR, { recursive: true });
   const guardFails = [];

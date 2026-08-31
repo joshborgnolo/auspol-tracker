@@ -255,9 +255,54 @@ function findParty(scope, names) {
   return null;
 }
 
+// Roundups keep describing a rival poll's figures WITHOUT re-naming the
+// firm ("In a three-way preferred PM question, Albanese had 31% …" —
+// Redbridge's three-way printed sentence-after-sentence under the
+// "Redbridge and Accent Research poll" intro, with no firm name of its own
+// — 2026-08-30). Once a firm is named, sentences are dropped until one
+// re-anchors on "Newspoll".
+function dropForeign(sents) {
+  const out = [];
+  let foreign = false;
+  for (const s of sents) {
+    if (OTHER_FIRM.test(s)) { foreign = true; continue; }
+    if (foreign) {
+      if (/\bnewspoll\b/i.test(s)) foreign = false;
+      else continue;
+    }
+    out.push(s);
+  }
+  return out;
+}
+
+// "core support for the Greens and Others fell to 13% and 9% respectively":
+// figures pair positionally with the named entities. Without this rule the
+// naive forward regex assigned the FIRST figure to every party in the chain
+// (ind was read as 13, the Greens figure — the 2026-08-28 conflict).
+const RESPEC_PARTY = /one nation(?:'s)?|\b(?:the )?coalition\b|\bliberal-national\b|\blabor\b|\bthe alp\b|\bgreens\b|\bindependents\b|\ball others\b|\bother parties\b|\bothers\b/gi;
+const respecKey = (tok) => (/one nation/i.test(tok) ? "onp"
+  : /coalition|liberal/i.test(tok) ? "lnp"
+  : /labor|the alp/i.test(tok) ? "alp"
+  : /greens/i.test(tok) ? "grn" : "ind");
+function respectivelyMap(scope) {
+  const out = {};
+  for (const s of scope) {
+    const cut = s.search(/\brespectively\b/i);
+    if (cut < 0) continue;
+    // only the clause up to "respectively" pairs entities with figures;
+    // the sentence may then run on into other questions' numbers
+    const seg = s.slice(0, cut);
+    const ents = [...seg.matchAll(RESPEC_PARTY)].map((m) => respecKey(m[0]));
+    const figs = [...seg.matchAll(/([\d.]+)\s*%/g)].map((m) => parseFloat(m[1]));
+    if (ents.length < 2 || ents.length !== figs.length) continue;
+    ents.forEach((k, i) => { if (out[k] == null) out[k] = figs[i]; });
+  }
+  return out;
+}
+
 function parseArticle(text, pubDateIso) {
   const t = normalise(text);
-  const S = sentences(t).filter((s) => !OTHER_FIRM.test(s));
+  const S = dropForeign(sentences(t));
   // Whole-text fallbacks ("poll of 1,242 voters", "conducted … X to Y") run
   // over the same firm-filtered corpus so a rival poll's sample or window
   // can't win by document position.
@@ -287,6 +332,9 @@ function parseArticle(text, pubDateIso) {
   if (comboScope.length) { r.ind = othSplit; r.oth = null; }
   else if (indSplit != null && othSplit != null) { r.ind = indSplit; r.oth = othSplit; }
   else { r.ind = indSplit ?? othSplit; r.oth = null; }
+  // "A fell to 13% and 9% respectively" positions override regex grabs.
+  const resp = respectivelyMap(scope);
+  for (const k of ["alp", "lnp", "onp", "grn", "ind"]) if (resp[k] != null) r[k] = resp[k];
   if (r.ind == null && r.oth == null) missing.push("others bucket");
 
   // --- TPP: 2pp-anchored ALP figure, or an "X-Y"/"X to Y" pair near Labor.
@@ -378,15 +426,20 @@ function parseArticle(text, pubDateIso) {
   r.pmNet = netOf(pmS);
   r.oppNet = netOf(oppS);
   r.hanNet = netOf(leadScope(/\bhanson\b/i));
+  r.hanApp = null; r.hanDis = null;
   { const p = pairOf(pmS); r.pmApp = p.app; r.pmDis = p.dis; }
   { const p = pairOf(oppS); r.oppApp = p.app; r.oppDis = p.dis; }
+  { const p = pairOf(leadScope(/\bhanson\b/i)); r.hanApp = p.app; r.hanDis = p.dis; }
   if (r.pmNet == null && r.pmApp != null && r.pmDis != null) r.pmNet = Math.round((r.pmApp - r.pmDis) * 10) / 10;
   if (r.oppNet == null && r.oppApp != null && r.oppDis != null) r.oppNet = Math.round((r.oppApp - r.oppDis) * 10) / 10;
 
   // --- preferred PM: named figures, or a bare "51 to 31" pair ordered by
-  // name. Newspoll's question has been a THREE-WAY (Albanese / Hanson / OL)
-  // since mid-2026; Hanson's share is captured in ppmH when stated.
+  // name. Newspoll since mid-2026 asks BOTH a head-to-head (Albanese vs OL,
+  // "margin of 44% to 35%") and a three-way ("Mr Albanese leads with 46% of
+  // support, ahead of Senator Hanson on 31% and Mr Taylor on 23%"). Canonical
+  // rows carry the three-way in ppmA/O/H and the head-to-head in extra.
   r.ppmA = null; r.ppmO = null; r.ppmH = null;
+  r.ppm3A = null; r.ppm3H = null; r.ppm3O = null;
   const ppmS = S.filter((s) => /preferred (?:prime minister|pm)\b|better (?:prime minister|pm)\b/i.test(s));
   const HON_OR_NAME = "(?:(?:senator|mr|ms|mrs|dr)\\s+|[A-Z][a-z]+\\s+)";
   // A surname inside a comparison enumeration ("… well ahead of Pauline
@@ -430,9 +483,25 @@ function parseArticle(text, pubDateIso) {
         const after = names.find((x) => x.i > pair.index);
         if (before) (before.n === "albanese" ? r.ppmA ??= +pair[1] : r.ppmO ??= +pair[1]);
         if (after) (after.n === "albanese" ? r.ppmA ??= +pair[2] : r.ppmO ??= +pair[2]);
+        // Head-to-head phrased with one leader unnamed ("Albanese leads the
+        // Opposition Leader … by a margin of 44% to 35%"): the pair's other
+        // figure is the partner's. Not applied in PM–Hanson pairwise
+        // sentences, where the partner is Hanson, not the OL.
+        if (!/\bhanson\b/i.test(s)) {
+          if (before && !after) (before.n === "albanese" ? r.ppmO ??= +pair[2] : r.ppmA ??= +pair[2]);
+          if (after && !before) (after.n === "albanese" ? r.ppmO ??= +pair[1] : r.ppmA ??= +pair[1]);
+        }
       }
     }
     if (r.ppmA != null && r.ppmO != null && r.ppmH != null) break;
+  }
+  // Three-way from The Australian's own wording ("Mr Albanese leads with
+  // 46% of support, ahead of Senator Hanson on 31% and Mr Taylor on 23%"):
+  // the PM owns the figure AFTER "leads with", each rival gets the figure
+  // after their name; undecided remainder is implied, not stated.
+  {
+    const tri = tNP.match(new RegExp(`\\balbanese\\b[^.]{0,90}?leads?\\s+with\\s+([\\d.]+)\\s*%[^.]{0,140}?hanson\\b[^%]{0,30}?([\\d.]+)\\s*%[^%]{0,40}?\\b${eraOl.surname}\\b[^%]{0,30}?([\\d.]+)\\s*%`, "i"));
+    if (tri) { r.ppm3A ??= +tri[1]; r.ppm3H ??= +tri[2]; r.ppm3O ??= +tri[3]; }
   }
 
   // --- sample size ("survey of 1,283 voters"); 800–3000 or it isn't Newspoll's
@@ -524,7 +593,7 @@ async function discover() {
 // ------------------------------------------------------------- merge/guard
 const FIELDS = ["alp", "lnp", "grn", "onp", "ind", "oth", "tpp_alp", "tpp_lnp",
   "pmNet", "oppNet", "pmApp", "pmDis", "oppApp", "oppDis", "ppmA", "ppmO", "ppmH",
-  "hanNet", "sample"];
+  "hanNet", "hanApp", "hanDis", "ppm3A", "ppm3H", "ppm3O", "sample"];
 function mergeCluster(recs) {
   const m = { conflicts: [] };
   for (const k of ["date", "dateStart"]) {
@@ -557,11 +626,19 @@ function guardCluster(m, clusterPub) {
   if (m.ppmA != null) check(`ppmA=${m.ppmA} in 15–80`, m.ppmA >= 15 && m.ppmA <= 80);
   if (m.ppmO != null) check(`ppmO=${m.ppmO} in 5–70`, m.ppmO >= 5 && m.ppmO <= 70);
   if (m.ppmH != null) check(`ppmH=${m.ppmH} in 5–70`, m.ppmH >= 5 && m.ppmH <= 70);
+  if (m.ppm3A != null) check(`ppm3A=${m.ppm3A} in 15–80`, m.ppm3A >= 15 && m.ppm3A <= 80);
+  if (m.ppm3O != null) check(`ppm3O=${m.ppm3O} in 5–70`, m.ppm3O >= 5 && m.ppm3O <= 70);
+  if (m.ppm3H != null) check(`ppm3H=${m.ppm3H} in 5–70`, m.ppm3H >= 5 && m.ppm3H <= 70);
   // An equal pair means the subject's figure got misattributed to a trailing
   // candidate — the failure mode the enumeration rejection targets.
   if (m.ppmA != null && m.ppmA === m.ppmO) errs.push(`ppm tie ${m.ppmA}/${m.ppmO} — parse suspect`);
-  const ppmParts = [m.ppmA, m.ppmO, m.ppmH].filter((v) => v != null);
-  if (m.ppmA != null && m.ppmO != null) {
+  // Sum the consistent set: three-way shares when captured, else the classic
+  // pair (ppmA/ppmO are the head-to-head in the three-way era and would
+  // double-count the three-way ppmH).
+  const ppmTri = m.ppm3A != null;
+  const ppmParts = (ppmTri ? [m.ppm3A, m.ppm3O, m.ppm3H] : [m.ppmA, m.ppmO, m.ppmH]).filter((v) => v != null);
+  const ppmBaseFull = ppmTri ? m.ppm3O != null : m.ppmA != null && m.ppmO != null;
+  if (ppmBaseFull) {
     const ppmSum = Math.round(ppmParts.reduce((a, b) => a + b, 0) * 10) / 10;
     check(`ppm Σ=${ppmSum} ≤ 100.5`, ppmSum <= 100.5);
   }
@@ -693,12 +770,18 @@ try {
       alp: m.alp, lnp: m.lnp, grn: m.grn, onp: m.onp, ind: m.ind, oth: m.oth,
       tpp_alp: m.tpp_alp ?? null, tpp_lnp: m.tpp_lnp ?? null, url: ausUrl ?? best.url,
     });
-    if (m.ppmA != null && m.ppmO != null && date >= LEADERS.pm.from)
-      newPpm.push({ date, firm: "Newspoll", alb: m.ppmA, opp: m.ppmO, oppName: era?.oppName ?? null, han: m.ppmH ?? null, extra: null });
+    // Canonical Newspoll ppm row: the three-way shares are the headline
+    // fields; the PM–OL head-to-head pairs off in `extra`.
+    const ppmTri = m.ppm3A != null && m.ppm3O != null;
+    if ((ppmTri || (m.ppmA != null && m.ppmO != null)) && date >= LEADERS.pm.from)
+      newPpm.push({ date, firm: "Newspoll", alb: ppmTri ? m.ppm3A : m.ppmA, opp: ppmTri ? m.ppm3O : m.ppmO,
+        oppName: era?.oppName ?? null, han: ppmTri ? m.ppm3H : m.ppmH ?? null,
+        extra: ppmTri && m.ppmA != null && m.ppmO != null ? [{ alb: m.ppmA, opp: m.ppmO }] : null });
     if ((m.pmNet != null || m.oppNet != null) && date >= LEADERS.pm.from) {
       const detail = {};
       if (m.pmApp != null && m.pmDis != null) detail.alb = { app: m.pmApp, dis: m.pmDis };
       if (m.oppApp != null && m.oppDis != null) detail.opp = { app: m.oppApp, dis: m.oppDis };
+      if (m.hanApp != null && m.hanDis != null) detail.han = { app: m.hanApp, dis: m.hanDis };
       newAppr.push({ date, firm: "Newspoll", alb: m.pmNet, opp: m.oppNet, oppName: era?.oppName ?? null, han: m.hanNet ?? null, detail: Object.keys(detail).length ? detail : null });
     }
     sources.push({
