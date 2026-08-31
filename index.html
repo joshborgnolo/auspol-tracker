@@ -521,6 +521,11 @@ body {
   --dl-channel:  color-mix(in oklch, var(--ink) 13%, var(--surface-2));
   --dl-scale-band: color-mix(in oklch, var(--ink) 6%, transparent);
   --dl-lip:        color-mix(in oklch, white 80%, transparent);
+  --hg-well: color-mix(in oklch, var(--ink) 5%, var(--surface));
+  --hg-cut:  color-mix(in oklch, var(--ink) 20%, transparent);
+  --hg-lip:  color-mix(in oklch, white 85%, transparent);
+  --hg-grad: color-mix(in oklch, var(--ink) 17%, transparent);
+  --hg-tie-cut: color-mix(in oklch, var(--ink) 55%, transparent);
 }
 body.dark {
   --dl-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
@@ -533,6 +538,11 @@ body.dark {
   --dl-channel:  color-mix(in oklch, black 40%, var(--surface));
   --dl-scale-band: color-mix(in oklch, black 30%, transparent);
   --dl-lip:        color-mix(in oklch, white 22%, transparent);
+  --hg-well: color-mix(in oklch, black 30%, var(--surface));
+  --hg-cut:  color-mix(in oklch, black 55%, transparent);
+  --hg-lip:  color-mix(in oklch, white 13%, transparent);
+  --hg-grad: color-mix(in oklch, white 20%, transparent);
+  --hg-tie-cut: color-mix(in oklch, black 70%, transparent);
 }
 /* ---- the dial's housing -------------------------------------------------
    Glass rather than metal, and the site's own glass: the frosted recipe the
@@ -931,6 +941,40 @@ body.dark .dl-bloom { opacity: 1; }
    to sit beside it in small caps has moved down to the interval line, where it
    reads as the first clause of how the figure was made and how well it is known */
 .hero-title { margin-bottom: 12px; }
+/* ---- the hero's interval gauge -----------------------------------------
+   The channel is chrome and obeys the page's top-left light: shadow cast in
+   under the upper wall, a lit lip on the sill below. The span inside it is a
+   READING, so it is flat colour and nothing else - the same division the dial
+   keeps between its housing and its mercury. */
+.hero-gauge { margin-top: 16px; max-width: 320px; }
+.hg-track {
+  position: relative; height: 12px; border-radius: 999px;
+  background: var(--hg-well);
+  box-shadow: inset 0 2px 3px var(--hg-cut), inset 0 -1px 0 var(--hg-lip), 0 1px 0 var(--hg-lip);
+}
+/* Ticks on the sill, not lines across the channel. Crossing it made six even
+   bars that read as a segmented meter and drowned the one mark that matters. */
+.hg-grad { position: absolute; bottom: 2px; height: 3px; width: 1px; background: var(--hg-grad); }
+/* Geometry straight from the data: left and width are the interval's own
+   edges. No min-width and no padding - a floor on the bar would widen a
+   narrow interval into a claim the polls do not support. */
+.hg-span { position: absolute; top: 2px; height: 8px; border-radius: 999px; }
+/* The tie is the whole point of the instrument - whether the span clears it -
+   so it is cut into the housing rather than drawn over it: a dark cut with a
+   lit lip on its lower right, the page's one light direction, the same pair
+   the dial's graduations use. It reads through the span, which is what a mark
+   machined into the case would do. */
+.hg-tie { position: absolute; left: 50%; top: -4px; bottom: -4px; width: 1px; margin-left: -0.5px;
+  background: var(--hg-tie-cut); box-shadow: 1px 0 0 var(--hg-lip); }
+.hg-over { position: absolute; top: 3px; bottom: 3px; width: 3px; background: var(--hg-cut); }
+.hg-over-a { left: 0; border-radius: 999px 0 0 999px; }
+.hg-over-b { right: 0; border-radius: 0 999px 999px 0; }
+/* Positioned on the mark, not spaced by flexbox - space-between put the word
+   at 46.7% against a tie at 49.8%, labelling a place the scale does not have. */
+.hg-foot { position: relative; height: 13px; margin-top: 6px; }
+.hg-tie-lab { position: absolute; left: 50%; transform: translateX(-50%);
+  font-size: 10.5px; font-weight: 600; color: var(--ink-3); }
+
 .hero-interval { display: flex; align-items: baseline; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 .hi-method { font-size: 13px; font-weight: 600; color: var(--ink-3); white-space: nowrap; }
 /* Separators hang off the END of each clause, not the start of the next: as
@@ -15018,6 +15062,79 @@ function tppLatest(id) {
 }
 window.AP.tppMatchups = MATCHUPS;
 window.AP.tppLatest = tppLatest;
+
+/* The 95% interval as an instrument rather than a footnote.
+
+   Centre is the tie; the span runs toward whoever leads - matching both the
+   readout above, where Labor sits left, and the dial's "needle leans to
+   whoever leads". Distance from centre is 2PP points off 50, the same
+   quantity the dial's needle carries.
+
+   Why it exists: the hero states a lead and an interval as two separate
+   numbers and leaves the reader to compare them. Whether the lead clears its
+   own margin is the single thing that decides if the headline means anything,
+   and it was arithmetic homework. Here the tie mark either falls inside the
+   span or it does not.
+
+   Where the line falls - the same one the dial draws: the CHANNEL is chrome
+   and takes the page's top-left light, recessed with a lit lip below. The
+   SPAN is a reading and stays flat. No gradient, no gloss on the quantity.
+
+   The domain is fixed, not fitted, so the bar means the same width when the
+   reader switches matchups - which is the only comparison the hero invites.
+   Values past it clamp and say so with an overflow mark rather than quietly
+   sitting at the end. */
+const HG_DOM = 8; // 2PP points either side of the tie
+
+function HeroGauge({
+  a,
+  ci,
+  color,
+  aName,
+  bName
+}) {
+  const dev = a - 50;
+  const cl = v => Math.max(-HG_DOM, Math.min(HG_DOM, v));
+  /* % from the left edge. Decreasing in v, because a Labor lead travels LEFT
+     to agree with the readout - so pos(dev + ci) is always the near edge. */
+  const pos = v => 50 - cl(v) / HG_DOM * 50;
+  const L = pos(dev + ci),
+    R = pos(dev - ci);
+  const overA = dev + ci > HG_DOM;
+  const overB = dev - ci < -HG_DOM;
+  const lo = (a - ci).toFixed(1),
+    hi = (a + ci).toFixed(1);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "hero-gauge",
+    role: "img",
+    "aria-label": `${aName} ${a.toFixed(1)} per cent two-party preferred, 95% interval ${lo} to ${hi}. ` + `A tie is 50. ${a - ci > 50 || a + ci < 50 ? "The interval does not include a tie." : "The interval includes a tie."}`
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "hg-track"
+  }, [-6, -4, -2, 2, 4, 6].map(t => /*#__PURE__*/React.createElement("span", {
+    key: t,
+    className: "hg-grad",
+    style: {
+      left: pos(t) + "%"
+    }
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "hg-span",
+    style: {
+      left: L + "%",
+      width: R - L + "%",
+      background: color
+    }
+  }), overA && /*#__PURE__*/React.createElement("span", {
+    className: "hg-over hg-over-a"
+  }), overB && /*#__PURE__*/React.createElement("span", {
+    className: "hg-over hg-over-b"
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "hg-tie"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "hg-foot"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "hg-tie-lab"
+  }, "tie")));
+}
 function Hero({
   rangeId,
   setRangeId,
@@ -15436,7 +15553,13 @@ function Hero({
     style: {
       background: colB
     }
-  }))), /*#__PURE__*/React.createElement("div", {
+  }))), unc && /*#__PURE__*/React.createElement(HeroGauge, {
+    a: latest.a,
+    ci: unc.ci95,
+    color: lead >= 0 ? colA : colB,
+    aName: m.a.name,
+    bName: m.b.name
+  }), /*#__PURE__*/React.createElement("div", {
     className: "hero-interval"
   }, /*#__PURE__*/React.createElement("span", {
     className: "hi-method"

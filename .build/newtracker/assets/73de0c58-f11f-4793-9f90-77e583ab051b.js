@@ -405,6 +405,63 @@ function tppLatest(id) {
 window.AP.tppMatchups = MATCHUPS;
 window.AP.tppLatest = tppLatest;
 
+/* The 95% interval as an instrument rather than a footnote.
+
+   Centre is the tie; the span runs toward whoever leads - matching both the
+   readout above, where Labor sits left, and the dial's "needle leans to
+   whoever leads". Distance from centre is 2PP points off 50, the same
+   quantity the dial's needle carries.
+
+   Why it exists: the hero states a lead and an interval as two separate
+   numbers and leaves the reader to compare them. Whether the lead clears its
+   own margin is the single thing that decides if the headline means anything,
+   and it was arithmetic homework. Here the tie mark either falls inside the
+   span or it does not.
+
+   Where the line falls - the same one the dial draws: the CHANNEL is chrome
+   and takes the page's top-left light, recessed with a lit lip below. The
+   SPAN is a reading and stays flat. No gradient, no gloss on the quantity.
+
+   The domain is fixed, not fitted, so the bar means the same width when the
+   reader switches matchups - which is the only comparison the hero invites.
+   Values past it clamp and say so with an overflow mark rather than quietly
+   sitting at the end. */
+const HG_DOM = 8;               // 2PP points either side of the tie
+
+function HeroGauge({ a, ci, color, aName, bName }) {
+  const dev = a - 50;
+  const cl = (v) => Math.max(-HG_DOM, Math.min(HG_DOM, v));
+  /* % from the left edge. Decreasing in v, because a Labor lead travels LEFT
+     to agree with the readout - so pos(dev + ci) is always the near edge. */
+  const pos = (v) => 50 - (cl(v) / HG_DOM) * 50;
+  const L = pos(dev + ci), R = pos(dev - ci);
+  const overA = dev + ci > HG_DOM;
+  const overB = dev - ci < -HG_DOM;
+  const lo = (a - ci).toFixed(1), hi = (a + ci).toFixed(1);
+  return (
+    <div className="hero-gauge" role="img"
+         aria-label={`${aName} ${a.toFixed(1)} per cent two-party preferred, 95% interval ${lo} to ${hi}. `
+                     + `A tie is 50. ${(a - ci > 50 || a + ci < 50)
+                          ? "The interval does not include a tie."
+                          : "The interval includes a tie."}`}>
+      <div className="hg-track">
+        {[-6, -4, -2, 2, 4, 6].map((t) => (
+          <span key={t} className="hg-grad" style={{ left: pos(t) + "%" }} />
+        ))}
+        <span className="hg-span" style={{ left: L + "%", width: (R - L) + "%", background: color }} />
+        {overA && <span className="hg-over hg-over-a" />}
+        {overB && <span className="hg-over hg-over-b" />}
+        <span className="hg-tie" />
+      </div>
+      {/* Only the tie is labelled. The names sit in the readout directly
+          above, in 62px type, and the point estimate needs no mark of its own:
+          a symmetric interval puts it at the span's midpoint by construction,
+          so a tick there restated the bar while cutting it in half. */}
+      <div className="hg-foot"><span className="hg-tie-lab">tie</span></div>
+    </div>
+  );
+}
+
 function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const xDomain = rangeDomain(rangeId);
@@ -719,6 +776,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               <span className="ro-dot" style={{ background: colB }}></span>
             </div>
           </div>
+          {unc && (
+            <HeroGauge a={latest.a} ci={unc.ci95} color={lead >= 0 ? colA : colB}
+                       aName={m.a.name} bName={m.b.name} />
+          )}
           {/* An aggregate of five polls is not known to a tenth of a point, so
               the interval sits with the number rather than in a footnote. It
               covers how far the polls in the window disagree plus their
