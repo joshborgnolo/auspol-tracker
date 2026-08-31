@@ -2399,17 +2399,21 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
   .tabs.pinned .tab-pinhide { display: none; }
 }
 /* ---- the next-poll countdown in the tab bar ------------------------------
-   Wide screens only, and only while the bar sits in the page. Once it pins,
-   the docked 2PP score takes the right end - it is absolutely positioned
-   there - and the two would sit on top of one another; the score is the one
-   that has to travel across every tab, so the countdown is the one that goes. */
+   Wide screens only. While the bar sits in the page the countdown rides the
+   right end; once the bar pins, the docked 2PP score owns that end, so the
+   countdown leaves the flex row and centres itself absolutely in the bar -
+   the tab set's layout box is untouched, so the pin still relayouts nothing. */
 .tab-next { display: none; }
 @media (min-width: 1100px) {
-  .tabs:not(.pinned) .tab-next {
+  .tab-next {
     display: inline-flex; align-items: baseline; gap: 14px;
     margin-left: auto; padding-bottom: 11px;
     font-family: var(--sans); font-size: 12px; white-space: nowrap;
     color: var(--ink-3);
+  }
+  .tabs.pinned .tab-next {
+    position: absolute; left: 50%; bottom: 0; margin-left: 0;
+    transform: translateX(-50%);
   }
 }
 .tn-lab { font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
