@@ -2808,6 +2808,24 @@ function infoTerms(D) {
       measured separately for every measure – a firm that leans one way on the classic two-party is
       not assumed to lean the same way on a primary share or on an ALP-v-One Nation head-to-head –
       and it is a property of the pollster, not of any single poll.</>) },
+    { id: "chance-consistent", term: "Chance-consistent", body: (
+      <>The Poll disagreement panel’s verdict when the houses agree as well as polling lets them.
+      Even on an unmoved electorate no two surveys match, because each is a sample: a scatter of
+      {" "}{xref("margin-of-error", "chance-consistent", "sampling error")} around the truth is
+      expected. The panel sets the spread the houses actually show against the spread sampling
+      error alone predicts – the chance floor, built from each poll’s own sample size – and a
+      ratio between 0.80× and 1.20× reads chance-consistent. Tighter than 0.80× and the polls are
+      huddled closer than independent sampling can explain – herding; wider than 1.20× and they
+      begin to {xref("mild-divergence", "chance-consistent", "diverge")}. It is the ordinary state
+      of healthy polling, not evidence the houses have compared notes.</>) },
+    { id: "mild-divergence", term: "Mild divergence", body: (
+      <>A little further apart than chance can explain. On the Poll disagreement panel the ratio of
+      the houses’ actual spread to the chance floor has passed 1.20× without reaching 1.60×:
+      sampling scatter alone no longer covers the gap, so something real sits on top of it – houses
+      weighting differently, reaching different voters, or genuinely moving at different speeds.
+      The excess stays modest; past 1.60× the panel drops the hedge and calls it real disagreement.
+      Below 1.20× the same ratio reads {" "}{xref("chance-consistent", "mild-divergence",
+      "chance-consistent")} – the spread chance’s own making.</>) },
     { id: "implied-2pp", term: "Implied 2PP", body: (
       <>An optional dashed line on the two-party chart (“Compare implied 2PP”) showing what the same
       polls’ own primary votes add up to under one fixed {xref("preference-flows", "implied 2PP",
