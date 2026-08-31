@@ -798,6 +798,7 @@ const CHG_MEASURES = {
   pLnp:      (p, a, pm) => p.lnp ?? null,
   pGrn:      (p, a, pm) => p.grn ?? null,
   pOnp:      (p, a, pm) => p.onp ?? null,
+  pOth:      (p, a, pm) => p.oth ?? null,
   // the movable share – "can't say" beside the primaries (Roy Morgan), the
   // shortfall inside the two-party pair (Essential), and the not-firm share
   // of the decided (Resolve). Each is that house's own series, so a delta

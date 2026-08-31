@@ -1542,7 +1542,7 @@ function primarySegs(r) {
     { label: "L/NP", value: r.p.lnp, color: PARTY_C.lnp, delta: segDelta(r.chg, "pLnp") },
     { label: "GRN", value: r.p.grn, color: PARTY_C.grn, delta: segDelta(r.chg, "pGrn") },
     { label: "ON", value: r.p.onp, color: PARTY_C.onp, delta: segDelta(r.chg, "pOnp") },
-    { label: "OTH", value: r.p.oth, color: PARTY_C.oth, muted: true },
+    { label: "OTH", value: r.p.oth, color: PARTY_C.oth, muted: true, delta: segDelta(r.chg, "pOth") },
   ].filter((s) => s.value != null);   // a pollster may not publish every party
 }
 // leader identity → label + colour (shared by table PM bars & net columns)
