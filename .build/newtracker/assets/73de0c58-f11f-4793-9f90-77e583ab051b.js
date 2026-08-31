@@ -889,9 +889,18 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             <span className="hero-sub-note">
               {(m.real || (altL && altL.aPrev != null)) ? "vs. one month ago" : "vs. previous reading"}
               {/* A month-on-month move smaller than its own interval is not a
-                  finding. Say so next to the arrow, not three scrolls down. */}
+                  finding. Say so next to the arrow, not three scrolls down -
+                  and let the margin the caveat invokes carry the reader to its
+                  definition, as the terms in the interval above do. */}
               {unc && unc.changeSig === false && (
-                <span className="hero-caveat"> (within the margin)</span>
+                <span className="hero-caveat"> (within the{" "}
+                  <button type="button" className="hi-term"
+                          title="What a margin of error means"
+                          onClick={() => window.AP.openTerm &&
+                            window.AP.openTerm("margin-of-error", "two-party preferred")}>
+                    margin
+                  </button>)
+                </span>
               )}
             </span>
           </div>
