@@ -72,28 +72,34 @@ jobs:
           bash ${{ inputs.wrapper }}
 
       # The wrappers send every step's output to .build/logs/<house>.log and
-      # nothing to stdout, so a failed run used to be opaque: the diagnosis died
-      # with the runner. .build/logs/ is gitignored, so anything matching here
-      # was written by THIS run — no marker file needed.
-      - name: Show the updater log on failure
-        if: failure()
+      # nothing to stdout, so a run used to be opaque in BOTH directions: a
+      # failure's diagnosis died with the runner, and a green run never said
+      # what it actually saw. .build/logs/ is gitignored, so anything matching
+      # here was written by THIS run — no marker file needed. The step summary
+      # (what the notification email links to) is reserved for failures.
+      - name: Show the updater log
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
         run: |
           shopt -s nullglob
           logs=(.build/logs/*.log)
           if [ ${#logs[@]} -eq 0 ]; then
-            echo "No .build/logs/*.log was written — the wrapper failed before its first log line."
+            echo "No .build/logs/*.log was written this run."
             exit 0
           fi
           for f in "${logs[@]}"; do
             echo "::group::$f (last 200 lines)"
             tail -n 200 "$f"
             echo "::endgroup::"
-            {
-              echo "### $f (tail)"
-              echo '```'
-              tail -n 40 "$f"
-              echo '```'
-            } >> "$GITHUB_STEP_SUMMARY"
+            if [ "$JOB_STATUS" = "failure" ]; then
+              {
+                echo "### $f (tail)"
+                echo '```'
+                tail -n 40 "$f"
+                echo '```'
+              } >> "$GITHUB_STEP_SUMMARY"
+            fi
           done
 
   repair:
