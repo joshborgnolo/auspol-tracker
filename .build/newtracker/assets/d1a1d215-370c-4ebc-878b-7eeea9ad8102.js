@@ -2259,8 +2259,15 @@ function AllPollsView({ focus, onBack, backLabel }) {
             })()}
           </p>
         </div>
-        <TextToggle value={facet} onChange={onFacet} options={FACETS}
-          ariaLabel="Archive table view" caps />
+        {/* phone only (CSS hides it wider): the filter bar's own copy of
+            this count is the one desktop sees */}
+        <div className="ap-head-side">
+          <span className="ap-count">
+            <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + total : ""} {sorted.length === 1 ? "poll" : "polls"}
+          </span>
+          <TextToggle value={facet} onChange={onFacet} options={FACETS}
+            ariaLabel="Archive table view" caps />
+        </div>
       </div>
 
       <div className="ap-bar">

@@ -2511,6 +2511,14 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   display: flex; justify-content: space-between; align-items: flex-start;
   gap: 18px; flex-wrap: wrap; margin-bottom: 18px;
 }
+/* On a phone the facet tally rides up beside the view switch, where it reads
+   as part of the heading; wider screens keep it down at the bar's end. */
+.ap-head-side { display: inline-flex; align-items: center; gap: 14px; }
+.ap-head-side .ap-count { display: none; }
+@media (max-width: 560px) {
+  .ap-head-side .ap-count { display: inline; }
+  .ap-bar-end .ap-count { display: none; }
+}
 /* ---------- archive filter bar ---------- */
 /* One row at rest. Search stays visible because it cuts across every facet;
    everything else is a button that names its own state and opens a panel of
@@ -13099,13 +13107,17 @@ function AllPollsView({
        wave ran 5 May–1 Jun, and this span read "June 2025" until
        the opening month was admitted */
     return lab(f.fym || f.ym) + "–" + lab(l.ym); // range: tight en dash, never spaced
-  })())), /*#__PURE__*/React.createElement(TextToggle, {
+  })())), /*#__PURE__*/React.createElement("div", {
+    className: "ap-head-side"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "ap-count"
+  }, /*#__PURE__*/React.createElement("strong", null, sorted.length), sorted.length !== total ? " of " + total : "", " ", sorted.length === 1 ? "poll" : "polls"), /*#__PURE__*/React.createElement(TextToggle, {
     value: facet,
     onChange: onFacet,
     options: FACETS,
     ariaLabel: "Archive table view",
     caps: true
-  })), /*#__PURE__*/React.createElement("div", {
+  }))), /*#__PURE__*/React.createElement("div", {
     className: "ap-bar"
   }, /*#__PURE__*/React.createElement("div", {
     className: "ap-search"
