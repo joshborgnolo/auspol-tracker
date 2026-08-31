@@ -1061,9 +1061,8 @@ body.dark .dl-bloom { opacity: 1; }
    the segments cover their track completely and would bury it. Over the top
    is also the truer place for it: light falling into a real channel lands on
    whatever the channel is holding, not just on the empty ends. */
-.sbar, .appr-netbar, .dir-bar, .pd-aprbar, .seatbar { position: relative; }
-.sbar::after, .appr-netbar::after, .dir-bar::after,
-.pd-aprbar::after, .seatbar::after {
+.sbar, .appr-netbar, .dir-bar { position: relative; }
+.sbar::after, .appr-netbar::after, .dir-bar::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit;
   /* A channel reads by its EDGES, not by a haze. The first pass was a single
      soft inset at 15%, which is invisible the moment a saturated segment sits
@@ -1076,7 +1075,7 @@ body.dark .dl-bloom { opacity: 1; }
               inset 0 0 0 1px var(--well-rim);        /* the walls */
   pointer-events: none;
 }
-.sbar, .appr-netbar, .dir-bar, .pd-aprbar, .seatbar {
+.sbar, .appr-netbar, .dir-bar {
   box-shadow: 0 1px 0 var(--well-sill);
 }
 
@@ -1935,20 +1934,17 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   .pd-meta-sm { display: none; }
 }
 
-/* ---------- the ledger: one scale for every measure ----------
-   Every measure a poll publishes is a share of 100, so they all belong on ONE
-   scale: a fixed label gutter, a scale column that every bar fills exactly,
-   and a margin column that always answers the same question – by how much.
-   Bar LENGTH therefore only ever means share. Rank is carried by ink and
-   position, never by a shorter bar: the old panel demoted a second measure to
-   78% width, so a secondary contest drew a bar that ended short of the one
-   above it and read as a smaller quantity. */
+/* ---------- the ledger: one typographic line per measure ----------
+   Everything a poll published, set in type: a fixed label gutter, the figures
+   in the middle, and a margin column that always answers the same question –
+   by how much. No bars in this panel: the numbers themselves carry the
+   reading, and every row sits on the same three columns. */
 .pd-ledger {
   display: grid; grid-template-columns: 168px minmax(0, 1fr) 112px;
   gap: 0 22px; align-items: center;
 }
-/* the three cells land in the PARENT grid's columns, so every bar on the panel
-   shares one left and right edge. On a phone the row becomes its own little
+/* the three cells land in the PARENT grid's columns, so the whole panel
+   shares one set of verticals. On a phone the row becomes its own little
    grid instead – see the narrow rules further down. */
 .pd-lrow { display: contents; }
 .pd-lgroup { grid-column: 1 / -1; padding: 15px 0 7px; }
@@ -1971,15 +1967,14 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   display: block; margin-top: 3px; font-size: 10px; font-weight: 700;
   letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-3);
 }
-/* the figures sit at the ENDS of the bar they describe, spread across its own
-   width and in BAR ORDER, so each one lands over the segment it names */
+/* a measure's figures, left to right in one line – the row's payload now that
+   the panel is set in type */
 .pd-lnums {
-  display: flex; justify-content: space-between; align-items: baseline;
-  gap: 4px 10px; font-size: 11.5px; color: var(--ink-2);
+  display: flex; justify-content: flex-start; align-items: baseline;
+  gap: 5px 18px; font-size: 11.5px; color: var(--ink-2);
   font-variant-numeric: tabular-nums;
-  /* A wrap is the safety net at every width: the figures spread to the bar's
-     ends, and without this a legend wider than the bar simply ran off the
-     side of the screen instead of taking a second line. */
+  /* A wrap is the safety net at every width: a five-party line is wider than
+     a phone, and must take a second line rather than run off the edge. */
   flex-wrap: wrap;
 }
 .pd-lnum { display: inline-flex; align-items: baseline; gap: 5px; white-space: nowrap; }
@@ -1999,52 +1994,18 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 .pd-resid-sw { display: inline-block; width: 12px; height: 7px; border-radius: 2px; flex: none; }
 .skey-dot.resid { border-radius: 2px; }
-.sbar-lg { height: 12px; border-radius: 6px; }
-/* the line that decides a two-party contest, drawn the way the seat bar draws
-   the majority line. An axis tick that CROSSES the bar, with no halo: at 53 the
-   notch lands ~10px from the segment boundary, and a ring there reads as a gap
-   punched in the fill rather than as the line the contest turns on. */
-.pd-barwrap { position: relative; }
-.pd-notch {
-  position: absolute; top: -4px; bottom: -4px; width: 1.5px; cursor: help;
-  background: var(--ink); opacity: 0.92; transform: translateX(-0.75px);
-}
-/* Leader approval keeps a geometry of its own, because it is the one measure
-   here with a real zero: a centred axis, approve growing left and disapprove
-   right, so the overhang IS the net and two leaders compare at a glance. Each
-   half is scaled to 100 – the same axis the snapshot panel's .appr-netbar
-   already uses, rather than a second, non-comparable one. */
-.pd-aprbar { position: relative; height: 12px; border-radius: 6px; background: var(--line-2); }
-.pd-aprbar > span { position: absolute; top: 0; bottom: 0; }
-.pd-apr-pos { right: 50%; background: var(--appr-app-bg); border-radius: 6px 0 0 6px; }
-.pd-apr-neg { left: 50%; background: var(--appr-dis-bg); border-radius: 0 6px 6px 0; }
-.pd-apr-mid {
-  left: 50%; width: 1.5px; top: -4px; bottom: -4px; z-index: 2;
-  background: var(--ink-3); transform: translateX(-0.75px);
-}
-.pd-apr-key { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.pd-apr-key b { color: var(--ink); font-weight: 700; }
 .pd-lnote { font-size: 11.5px; color: var(--ink-3); text-wrap: pretty; }
 .pd-lnote .netv { font-size: 12.5px; margin-left: 4px; }
 /* a modelled chamber is not a share of 100 – it takes the whole width and
-   keeps its own component rather than pretending to sit on the scale */
+   keeps its own component rather than pretending to sit on the ledger's
+   three columns */
 .pd-lwide { grid-column: 1 / -1; padding: 10px 0 4px; min-width: 0; }
 
-/* ---------- Seat projection (MRP polls) ---------- */
+/* ---------- Seat projection (MRP polls) ----------
+   Seats as figures: one row per party, the majority line said in words, and
+   the basis of the estimate as a footnote. No chamber bar. */
 .seatproj { display: flex; flex-direction: column; gap: 8px; }
-.seatbar {
-  position: relative; display: flex; height: 26px; border-radius: 5px;
-  overflow: hidden; background: var(--surface-2); border: 1px solid var(--line-2);
-}
-.seatbar-seg { height: 100%; }
-/* the majority line is the number that decides government – it sits ON TOP of
-   the segments, as a hard notch rather than a colour change */
-.seatbar-maj {
-  position: absolute; top: -3px; bottom: -3px; width: 2px;
-  background: var(--ink); transform: translateX(-1px);
-  box-shadow: 0 0 0 1.5px var(--chart-bg);
-}
-.seatbar-note {
+.seat-majline {
   display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap;
   font-size: 11.5px; color: var(--ink-3);
 }
@@ -2202,9 +2163,8 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 @media (max-width: 720px) {
   .poll-detail { padding-left: 20px; }
   /* The label gutter and the margin column are what cannot survive 356px, so
-     they fold onto one line above the bar. The scale column does survive, and
-     it is the part that matters: every bar still spans the full content width,
-     one scale for the whole panel, exactly as on the desktop. */
+     they fold onto one line above the figures. The figures line itself
+     survives intact – it is the panel's whole content. */
   .pd-ledger { display: block; }
   .pd-lrow {
     display: grid; grid-template-columns: 1fr auto; gap: 2px 12px;
@@ -2220,11 +2180,6 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   .pd-lgroup { padding: 11px 0 5px; }
   .pd-lrule { display: none; }   /* each row carries its own rule instead */
   .pd-lnums { gap: 3px 8px; }
-  /* Once a legend has had to wrap, spreading it to both edges only opens a gap
-     in the middle of a broken line - so on a phone a row that can wrap reads
-     left to right instead. Two-figure rows keep the ends: they always fit, and
-     sitting at the ends is what pairs each figure with its half of the bar. */
-  .pd-lnums-many { justify-content: flex-start; column-gap: 14px; }
   .pd-lnum b { font-size: 17px; }
   .pd-lwide { padding: 8px 0 4px; }
 }

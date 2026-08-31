@@ -911,9 +911,8 @@ body.dark .dl-bloom { opacity: 1; }
    the segments cover their track completely and would bury it. Over the top
    is also the truer place for it: light falling into a real channel lands on
    whatever the channel is holding, not just on the empty ends. */
-.sbar, .appr-netbar, .dir-bar, .pd-aprbar, .seatbar { position: relative; }
-.sbar::after, .appr-netbar::after, .dir-bar::after,
-.pd-aprbar::after, .seatbar::after {
+.sbar, .appr-netbar, .dir-bar { position: relative; }
+.sbar::after, .appr-netbar::after, .dir-bar::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit;
   /* A channel reads by its EDGES, not by a haze. The first pass was a single
      soft inset at 15%, which is invisible the moment a saturated segment sits
@@ -926,7 +925,7 @@ body.dark .dl-bloom { opacity: 1; }
               inset 0 0 0 1px var(--well-rim);        /* the walls */
   pointer-events: none;
 }
-.sbar, .appr-netbar, .dir-bar, .pd-aprbar, .seatbar {
+.sbar, .appr-netbar, .dir-bar {
   box-shadow: 0 1px 0 var(--well-sill);
 }
 
@@ -1785,20 +1784,17 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   .pd-meta-sm { display: none; }
 }
 
-/* ---------- the ledger: one scale for every measure ----------
-   Every measure a poll publishes is a share of 100, so they all belong on ONE
-   scale: a fixed label gutter, a scale column that every bar fills exactly,
-   and a margin column that always answers the same question – by how much.
-   Bar LENGTH therefore only ever means share. Rank is carried by ink and
-   position, never by a shorter bar: the old panel demoted a second measure to
-   78% width, so a secondary contest drew a bar that ended short of the one
-   above it and read as a smaller quantity. */
+/* ---------- the ledger: one typographic line per measure ----------
+   Everything a poll published, set in type: a fixed label gutter, the figures
+   in the middle, and a margin column that always answers the same question –
+   by how much. No bars in this panel: the numbers themselves carry the
+   reading, and every row sits on the same three columns. */
 .pd-ledger {
   display: grid; grid-template-columns: 168px minmax(0, 1fr) 112px;
   gap: 0 22px; align-items: center;
 }
-/* the three cells land in the PARENT grid's columns, so every bar on the panel
-   shares one left and right edge. On a phone the row becomes its own little
+/* the three cells land in the PARENT grid's columns, so the whole panel
+   shares one set of verticals. On a phone the row becomes its own little
    grid instead – see the narrow rules further down. */
 .pd-lrow { display: contents; }
 .pd-lgroup { grid-column: 1 / -1; padding: 15px 0 7px; }
@@ -1821,15 +1817,14 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   display: block; margin-top: 3px; font-size: 10px; font-weight: 700;
   letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-3);
 }
-/* the figures sit at the ENDS of the bar they describe, spread across its own
-   width and in BAR ORDER, so each one lands over the segment it names */
+/* a measure's figures, left to right in one line – the row's payload now that
+   the panel is set in type */
 .pd-lnums {
-  display: flex; justify-content: space-between; align-items: baseline;
-  gap: 4px 10px; font-size: 11.5px; color: var(--ink-2);
+  display: flex; justify-content: flex-start; align-items: baseline;
+  gap: 5px 18px; font-size: 11.5px; color: var(--ink-2);
   font-variant-numeric: tabular-nums;
-  /* A wrap is the safety net at every width: the figures spread to the bar's
-     ends, and without this a legend wider than the bar simply ran off the
-     side of the screen instead of taking a second line. */
+  /* A wrap is the safety net at every width: a five-party line is wider than
+     a phone, and must take a second line rather than run off the edge. */
   flex-wrap: wrap;
 }
 .pd-lnum { display: inline-flex; align-items: baseline; gap: 5px; white-space: nowrap; }
@@ -1849,52 +1844,18 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 .pd-resid-sw { display: inline-block; width: 12px; height: 7px; border-radius: 2px; flex: none; }
 .skey-dot.resid { border-radius: 2px; }
-.sbar-lg { height: 12px; border-radius: 6px; }
-/* the line that decides a two-party contest, drawn the way the seat bar draws
-   the majority line. An axis tick that CROSSES the bar, with no halo: at 53 the
-   notch lands ~10px from the segment boundary, and a ring there reads as a gap
-   punched in the fill rather than as the line the contest turns on. */
-.pd-barwrap { position: relative; }
-.pd-notch {
-  position: absolute; top: -4px; bottom: -4px; width: 1.5px; cursor: help;
-  background: var(--ink); opacity: 0.92; transform: translateX(-0.75px);
-}
-/* Leader approval keeps a geometry of its own, because it is the one measure
-   here with a real zero: a centred axis, approve growing left and disapprove
-   right, so the overhang IS the net and two leaders compare at a glance. Each
-   half is scaled to 100 – the same axis the snapshot panel's .appr-netbar
-   already uses, rather than a second, non-comparable one. */
-.pd-aprbar { position: relative; height: 12px; border-radius: 6px; background: var(--line-2); }
-.pd-aprbar > span { position: absolute; top: 0; bottom: 0; }
-.pd-apr-pos { right: 50%; background: var(--appr-app-bg); border-radius: 6px 0 0 6px; }
-.pd-apr-neg { left: 50%; background: var(--appr-dis-bg); border-radius: 0 6px 6px 0; }
-.pd-apr-mid {
-  left: 50%; width: 1.5px; top: -4px; bottom: -4px; z-index: 2;
-  background: var(--ink-3); transform: translateX(-0.75px);
-}
-.pd-apr-key { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
-.pd-apr-key b { color: var(--ink); font-weight: 700; }
 .pd-lnote { font-size: 11.5px; color: var(--ink-3); text-wrap: pretty; }
 .pd-lnote .netv { font-size: 12.5px; margin-left: 4px; }
 /* a modelled chamber is not a share of 100 – it takes the whole width and
-   keeps its own component rather than pretending to sit on the scale */
+   keeps its own component rather than pretending to sit on the ledger's
+   three columns */
 .pd-lwide { grid-column: 1 / -1; padding: 10px 0 4px; min-width: 0; }
 
-/* ---------- Seat projection (MRP polls) ---------- */
+/* ---------- Seat projection (MRP polls) ----------
+   Seats as figures: one row per party, the majority line said in words, and
+   the basis of the estimate as a footnote. No chamber bar. */
 .seatproj { display: flex; flex-direction: column; gap: 8px; }
-.seatbar {
-  position: relative; display: flex; height: 26px; border-radius: 5px;
-  overflow: hidden; background: var(--surface-2); border: 1px solid var(--line-2);
-}
-.seatbar-seg { height: 100%; }
-/* the majority line is the number that decides government – it sits ON TOP of
-   the segments, as a hard notch rather than a colour change */
-.seatbar-maj {
-  position: absolute; top: -3px; bottom: -3px; width: 2px;
-  background: var(--ink); transform: translateX(-1px);
-  box-shadow: 0 0 0 1.5px var(--chart-bg);
-}
-.seatbar-note {
+.seat-majline {
   display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap;
   font-size: 11.5px; color: var(--ink-3);
 }
@@ -2052,9 +2013,8 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 @media (max-width: 720px) {
   .poll-detail { padding-left: 20px; }
   /* The label gutter and the margin column are what cannot survive 356px, so
-     they fold onto one line above the bar. The scale column does survive, and
-     it is the part that matters: every bar still spans the full content width,
-     one scale for the whole panel, exactly as on the desktop. */
+     they fold onto one line above the figures. The figures line itself
+     survives intact – it is the panel's whole content. */
   .pd-ledger { display: block; }
   .pd-lrow {
     display: grid; grid-template-columns: 1fr auto; gap: 2px 12px;
@@ -2070,11 +2030,6 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   .pd-lgroup { padding: 11px 0 5px; }
   .pd-lrule { display: none; }   /* each row carries its own rule instead */
   .pd-lnums { gap: 3px 8px; }
-  /* Once a legend has had to wrap, spreading it to both edges only opens a gap
-     in the middle of a broken line - so on a phone a row that can wrap reads
-     left to right instead. Two-figure rows keep the ends: they always fit, and
-     sitting at the ends is what pairs each figure with its half of the bar. */
-  .pd-lnums-many { justify-content: flex-start; column-gap: 14px; }
   .pd-lnum b { font-size: 17px; }
   .pd-lwide { padding: 8px 0 4px; }
 }
@@ -8887,9 +8842,8 @@ function SeatProjection({
   /* Some projections are published as a RANGE and nothing else – DemosAU's
      Monte Carlo gives each party a bottom and a top and no central figure.
      There is no honest point estimate to derive from that (a midpoint would be
-     one this pollster declined to state), so the chamber bar is skipped and
-     the ranges are shown as ranges. The ranges also overlap and sum past the
-     chamber, which is exactly why they cannot be stacked. */
+     one this pollster declined to state), so the ranges are shown as ranges
+     and nothing more. The ranges also overlap and sum past the chamber. */
   const rangeOnly = Object.keys(seats.p).every(id => !seats.p[id] || seats.p[id].est == null);
   // largest first – an MRP's story is who leads the chamber, not ballot order
   const mid = r => r.est != null ? r.est : (r.lo + r.hi) / 2;
@@ -8929,7 +8883,7 @@ function SeatProjection({
     }, r.lo, "\u2013", r.hi), r.note && /*#__PURE__*/React.createElement("span", {
       className: "seat-note"
     }, r.note)))), /*#__PURE__*/React.createElement("div", {
-      className: "seatbar-note"
+      className: "seat-majline"
     }, /*#__PURE__*/React.createElement("span", {
       className: "seat-majlab"
     }, majority, " for majority"), !reach.length && /*#__PURE__*/React.createElement("span", {
@@ -8943,30 +8897,6 @@ function SeatProjection({
   return /*#__PURE__*/React.createElement("div", {
     className: "seatproj"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "seatbar",
-    role: "img",
-    "aria-label": rows.map(r => `${r.name} ${r.est} seats`).join(", ") + `, majority ${majority} of ${total}`
-  }, rows.map(r => /*#__PURE__*/React.createElement("span", {
-    key: r.id,
-    className: "seatbar-seg",
-    title: `${r.name} ${r.est} seats (${r.lo}–${r.hi})`,
-    style: {
-      width: r.est / total * 100 + "%",
-      background: r.color
-    }
-  })), /*#__PURE__*/React.createElement("span", {
-    className: "seatbar-maj",
-    style: {
-      left: majority / total * 100 + "%"
-    },
-    title: `${majority} seats needed for a majority`
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "seatbar-note"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "seat-majlab"
-  }, majority, " for majority"), lead.est < majority && /*#__PURE__*/React.createElement("span", {
-    className: "seat-hung"
-  }, "no party at a majority \u2013 ", lead.name, " short by ", majority - lead.est)), /*#__PURE__*/React.createElement("div", {
     className: "seat-rows"
   }, rows.map(r => /*#__PURE__*/React.createElement("div", {
     className: "seat-row",
@@ -8984,7 +8914,13 @@ function SeatProjection({
     className: "seat-range"
   }, r.lo, "\u2013", r.hi), r.chg != null && /*#__PURE__*/React.createElement("span", {
     className: "seat-chg " + (r.chg > 0 ? "up" : r.chg < 0 ? "down" : "flat")
-  }, r.chg === 0 ? "–" : (r.chg > 0 ? "▲" : "▼") + Math.abs(r.chg))))), /*#__PURE__*/React.createElement("p", {
+  }, r.chg === 0 ? "–" : (r.chg > 0 ? "▲" : "▼") + Math.abs(r.chg))))), /*#__PURE__*/React.createElement("div", {
+    className: "seat-majline"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "seat-majlab"
+  }, majority, " for majority"), lead.est < majority && /*#__PURE__*/React.createElement("span", {
+    className: "seat-hung"
+  }, "no party at a majority \u2013 ", lead.name, " short by ", majority - lead.est)), /*#__PURE__*/React.createElement("p", {
     className: "seat-basis"
   }, "Modelled seat estimate with range \xB7 ", sum, " of ", total, " seats allocated", seats.basis ? ` · Change vs the ${seats.basis}, not this pollster’s previous poll` : ""));
 }
@@ -9106,12 +9042,10 @@ function SortTh({
 
 /* ====================================================================
    THE LEDGER
-   Every measure a poll publishes is a share of 100, so they all belong on ONE
-   scale: a label gutter, a scale column every bar fills exactly, and a margin
-   column that always answers the same question – by how much. That makes bar
-   LENGTH mean share and nothing else, which the old two-column grid could not
-   claim: it drew seven bars at three different widths, and demoted a second
-   measure by shortening it, so a secondary contest read as a smaller number.
+   Everything a poll published, set in type: a label gutter, the figures
+   themselves in reading order, and a margin column that always answers the
+   same question – by how much. No bars, no shapes to decode: the numbers are
+   the content, and every row of the panel sits on the same three columns.
 
    Shared by BOTH poll tables – Latest polls and the All-polls archive – which
    is why it takes a row object rather than reaching for either one's state.
@@ -9130,39 +9064,16 @@ function segMargin(segs) {
   };
 }
 
-// the bar itself – one geometry, one length, however many segments it is given
-function LedgerBar({
-  segs
-}) {
-  const total = segs.reduce((a, x) => a + x.value, 0) || 100;
-  return /*#__PURE__*/React.createElement("div", {
-    className: "sbar sbar-lg",
-    role: "img",
-    "aria-label": segs.map(x => `${x.label} ${x.value}`).join(", ")
-  }, segs.map((x, i) => /*#__PURE__*/React.createElement("span", {
-    key: i,
-    className: "sbar-seg" + (x.resid ? " sbar-resid" : ""),
-    style: {
-      width: x.value / total * 100 + "%",
-      background: x.resid ? undefined : x.color
-    }
-  })));
-}
-
-/* The figures, spread across the bar's own width in BAR ORDER, so each one
-   sits over the segment it names. This is also what let the residual stop
-   taking a line of its own: "44 Albanese · 37 Taylor · 19 Undecided" maps
-   left-to-right onto the three segments beneath it. */
+/* A measure's figures, in reading order – the row's whole content. Each
+   figure carries its change tag on the same house's last wave. Wrap is the
+   safety net: a five-party line is wider than any phone, and takes a second
+   line rather than running off the edge. The residual keeps the striped
+   swatch it wears everywhere else on the site. */
 function LedgerNums({
   segs
 }) {
-  /* Two figures always fit, at any width, and belong at the bar's two ends.
-     Three or more may not: a five-party legend wants 448px of the 332 a phone
-     gives it, and so does right-direction v wrong-track at 369. Those are
-     marked so a narrow screen can lay them out as a legend instead of
-     stretching them past the edge of the screen. */
   return /*#__PURE__*/React.createElement("div", {
-    className: "pd-lnums" + (segs.length > 2 ? " pd-lnums-many" : "")
+    className: "pd-lnums"
   }, segs.map((x, i) => /*#__PURE__*/React.createElement("span", {
     key: i,
     className: "pd-lnum" + (x.resid ? " resid" : x.muted ? " muted" : "")
@@ -9179,14 +9090,11 @@ function LedgerNums({
   }))));
 }
 
-/* One measure. `threshold` marks 50 – and ONLY where 50 actually decides the
-   contest: a two-sided preferred pair. A preferred-PM matchup carries an
-   undecided share, so 50 is not the winning line there and no notch is drawn. */
+/* One measure, one line: figures in the middle, the lead in the margin. */
 function LedgerRow({
   label,
   name,
-  segs,
-  threshold
+  segs
 }) {
   const m = segMargin(segs);
   return /*#__PURE__*/React.createElement("div", {
@@ -9197,17 +9105,7 @@ function LedgerRow({
     className: "pd-lscale"
   }, /*#__PURE__*/React.createElement(LedgerNums, {
     segs: segs
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "pd-barwrap"
-  }, /*#__PURE__*/React.createElement(LedgerBar, {
-    segs: segs
-  }), threshold && /*#__PURE__*/React.createElement("span", {
-    className: "pd-notch",
-    style: {
-      left: "50%"
-    },
-    title: "50 \u2013 the line a two-party contest turns on"
-  }))), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("div", {
     className: "pd-lmar"
   }, m ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
     className: "pd-lmar-v",
@@ -9221,10 +9119,9 @@ function LedgerRow({
   }, "\u2014")));
 }
 
-/* Leader approval keeps a geometry of its own, because it is the one measure
-   here with a real zero. Approve grows left of the axis and disapprove right,
-   each half scaled to 100, so the overhang IS the net and two leaders can be
-   compared by eye – which three stacked 100% bars never allowed. */
+/* Leader approval as figures: approve · don't know · disapprove, with the
+   net kept for the margin column. The don't-know is the measure's residual,
+   so it takes the same muted ink undecided wears in the shares rows. */
 function LedgerApprRow({
   id,
   appr,
@@ -9258,24 +9155,15 @@ function LedgerApprRow({
     }
   }), label), /*#__PURE__*/React.createElement("div", {
     className: "pd-lscale"
-  }, s ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    className: "pd-aprbar",
-    title: `${leg[0]} ${s.app} · ${leg[1]} ${dk} · ${leg[2]} ${s.dis}`
+  }, s ? /*#__PURE__*/React.createElement("div", {
+    className: "pd-lnums"
   }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-apr-pos",
-    style: {
-      width: s.app / 2 + "%"
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "pd-apr-neg",
-    style: {
-      width: s.dis / 2 + "%"
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "pd-apr-mid"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "pd-apr-key"
-  }, /*#__PURE__*/React.createElement("b", null, s.app), " ", leg[0], " \xB7 ", /*#__PURE__*/React.createElement("b", null, dk), " ", leg[1], " \xB7 ", /*#__PURE__*/React.createElement("b", null, s.dis), " ", leg[2])) : /*#__PURE__*/React.createElement("div", {
+    className: "pd-lnum"
+  }, /*#__PURE__*/React.createElement("b", null, s.app), " ", /*#__PURE__*/React.createElement("span", null, leg[0])), /*#__PURE__*/React.createElement("span", {
+    className: "pd-lnum muted"
+  }, /*#__PURE__*/React.createElement("b", null, dk), " ", /*#__PURE__*/React.createElement("span", null, leg[1])), /*#__PURE__*/React.createElement("span", {
+    className: "pd-lnum"
+  }, /*#__PURE__*/React.createElement("b", null, s.dis), " ", /*#__PURE__*/React.createElement("span", null, leg[2]))) : /*#__PURE__*/React.createElement("div", {
     className: "pd-lnote"
   }, "Net only \u2013 this pollster published no ", leg[0], " / ", leg[2], " split"), alt && /*#__PURE__*/React.createElement("div", {
     className: "pd-lnote",
@@ -9345,8 +9233,7 @@ function PollLedger({
   }, tcs.map((c, i) => /*#__PURE__*/React.createElement(LedgerRow, {
     key: "t" + i,
     label: c.lab.replace(/^2PP · /, ""),
-    segs: c.segs,
-    threshold: c.segs.length === 2 && c.kind !== "3cp"
+    segs: c.segs
   })), r.tppFlows != null && /*#__PURE__*/React.createElement(FlowsLine, {
     key: "flows",
     v: r.tppFlows,

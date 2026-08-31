@@ -1691,9 +1691,8 @@ function SeatProjection({ seats }) {
   /* Some projections are published as a RANGE and nothing else – DemosAU's
      Monte Carlo gives each party a bottom and a top and no central figure.
      There is no honest point estimate to derive from that (a midpoint would be
-     one this pollster declined to state), so the chamber bar is skipped and
-     the ranges are shown as ranges. The ranges also overlap and sum past the
-     chamber, which is exactly why they cannot be stacked. */
+     one this pollster declined to state), so the ranges are shown as ranges
+     and nothing more. The ranges also overlap and sum past the chamber. */
   const rangeOnly = Object.keys(seats.p).every((id) => !seats.p[id] || seats.p[id].est == null);
   // largest first – an MRP's story is who leads the chamber, not ballot order
   const mid = (r) => (r.est != null ? r.est : ((r.lo + r.hi) / 2));
@@ -1719,7 +1718,7 @@ function SeatProjection({ seats }) {
             </div>
           ))}
         </div>
-        <div className="seatbar-note">
+        <div className="seat-majline">
           <span className="seat-majlab">{majority} for majority</span>
           {!reach.length && (
             <span className="seat-hung">
@@ -1738,21 +1737,6 @@ function SeatProjection({ seats }) {
   const lead = rows[0];
   return (
     <div className="seatproj">
-      <div className="seatbar" role="img"
-           aria-label={rows.map((r) => `${r.name} ${r.est} seats`).join(", ") + `, majority ${majority} of ${total}`}>
-        {rows.map((r) => (
-          <span key={r.id} className="seatbar-seg" title={`${r.name} ${r.est} seats (${r.lo}–${r.hi})`}
-                style={{ width: (r.est / total * 100) + "%", background: r.color }}></span>
-        ))}
-        <span className="seatbar-maj" style={{ left: (majority / total * 100) + "%" }}
-              title={`${majority} seats needed for a majority`}></span>
-      </div>
-      <div className="seatbar-note">
-        <span className="seat-majlab">{majority} for majority</span>
-        {lead.est < majority && (
-          <span className="seat-hung">no party at a majority – {lead.name} short by {majority - lead.est}</span>
-        )}
-      </div>
       <div className="seat-rows">
         {rows.map((r) => (
           <div className="seat-row" key={r.id}>
@@ -1767,6 +1751,12 @@ function SeatProjection({ seats }) {
             )}
           </div>
         ))}
+      </div>
+      <div className="seat-majline">
+        <span className="seat-majlab">{majority} for majority</span>
+        {lead.est < majority && (
+          <span className="seat-hung">no party at a majority – {lead.name} short by {majority - lead.est}</span>
+        )}
       </div>
       <p className="seat-basis">
         Modelled seat estimate with range · {sum} of {total} seats allocated
@@ -1858,12 +1848,10 @@ function SortTh({ label, short, sortKey, k, sort, onSort, className }) {
 
 /* ====================================================================
    THE LEDGER
-   Every measure a poll publishes is a share of 100, so they all belong on ONE
-   scale: a label gutter, a scale column every bar fills exactly, and a margin
-   column that always answers the same question – by how much. That makes bar
-   LENGTH mean share and nothing else, which the old two-column grid could not
-   claim: it drew seven bars at three different widths, and demoted a second
-   measure by shortening it, so a secondary contest read as a smaller number.
+   Everything a poll published, set in type: a label gutter, the figures
+   themselves in reading order, and a margin column that always answers the
+   same question – by how much. No bars, no shapes to decode: the numbers are
+   the content, and every row of the panel sits on the same three columns.
 
    Shared by BOTH poll tables – Latest polls and the All-polls archive – which
    is why it takes a row object rather than reaching for either one's state.
@@ -1883,33 +1871,14 @@ function segMargin(segs) {
   };
 }
 
-// the bar itself – one geometry, one length, however many segments it is given
-function LedgerBar({ segs }) {
-  const total = segs.reduce((a, x) => a + x.value, 0) || 100;
-  return (
-    <div className="sbar sbar-lg" role="img"
-         aria-label={segs.map((x) => `${x.label} ${x.value}`).join(", ")}>
-      {segs.map((x, i) => (
-        <span key={i} className={"sbar-seg" + (x.resid ? " sbar-resid" : "")}
-              style={{ width: (x.value / total * 100) + "%",
-                       background: x.resid ? undefined : x.color }}></span>
-      ))}
-    </div>
-  );
-}
-
-/* The figures, spread across the bar's own width in BAR ORDER, so each one
-   sits over the segment it names. This is also what let the residual stop
-   taking a line of its own: "44 Albanese · 37 Taylor · 19 Undecided" maps
-   left-to-right onto the three segments beneath it. */
+/* A measure's figures, in reading order – the row's whole content. Each
+   figure carries its change tag on the same house's last wave. Wrap is the
+   safety net: a five-party line is wider than any phone, and takes a second
+   line rather than running off the edge. The residual keeps the striped
+   swatch it wears everywhere else on the site. */
 function LedgerNums({ segs }) {
-  /* Two figures always fit, at any width, and belong at the bar's two ends.
-     Three or more may not: a five-party legend wants 448px of the 332 a phone
-     gives it, and so does right-direction v wrong-track at 369. Those are
-     marked so a narrow screen can lay them out as a legend instead of
-     stretching them past the edge of the screen. */
   return (
-    <div className={"pd-lnums" + (segs.length > 2 ? " pd-lnums-many" : "")}>
+    <div className="pd-lnums">
       {segs.map((x, i) => (
         <span key={i} className={"pd-lnum" + (x.resid ? " resid" : x.muted ? " muted" : "")}>
           {x.resid && <span className="pd-resid-sw" aria-hidden="true"></span>}
@@ -1922,21 +1891,14 @@ function LedgerNums({ segs }) {
   );
 }
 
-/* One measure. `threshold` marks 50 – and ONLY where 50 actually decides the
-   contest: a two-sided preferred pair. A preferred-PM matchup carries an
-   undecided share, so 50 is not the winning line there and no notch is drawn. */
-function LedgerRow({ label, name, segs, threshold }) {
+/* One measure, one line: figures in the middle, the lead in the margin. */
+function LedgerRow({ label, name, segs }) {
   const m = segMargin(segs);
   return (
     <div className="pd-lrow">
       <div className={"pd-lgut" + (name ? " pd-lgut-name" : "")}>{label}</div>
       <div className="pd-lscale">
         <LedgerNums segs={segs} />
-        <div className="pd-barwrap">
-          <LedgerBar segs={segs} />
-          {threshold && <span className="pd-notch" style={{ left: "50%" }}
-                              title="50 – the line a two-party contest turns on"></span>}
-        </div>
       </div>
       <div className="pd-lmar">
         {m
@@ -1950,10 +1912,9 @@ function LedgerRow({ label, name, segs, threshold }) {
   );
 }
 
-/* Leader approval keeps a geometry of its own, because it is the one measure
-   here with a real zero. Approve grows left of the axis and disapprove right,
-   each half scaled to 100, so the overhang IS the net and two leaders can be
-   compared by eye – which three stacked 100% bars never allowed. */
+/* Leader approval as figures: approve · don't know · disapprove, with the
+   net kept for the margin column. The don't-know is the measure's residual,
+   so it takes the same muted ink undecided wears in the shares rows. */
 function LedgerApprRow({ id, appr, chg }) {
   const s = appr[id], net = appr[id + "Net"];
   if (s == null && net == null) return null;
@@ -1976,17 +1937,11 @@ function LedgerApprRow({ id, appr, chg }) {
       </div>
       <div className="pd-lscale">
         {s
-          ? <React.Fragment>
-              <div className="pd-aprbar"
-                   title={`${leg[0]} ${s.app} · ${leg[1]} ${dk} · ${leg[2]} ${s.dis}`}>
-                <span className="pd-apr-pos" style={{ width: (s.app / 2) + "%" }}></span>
-                <span className="pd-apr-neg" style={{ width: (s.dis / 2) + "%" }}></span>
-                <span className="pd-apr-mid"></span>
-              </div>
-              <div className="pd-apr-key">
-                <b>{s.app}</b> {leg[0]} · <b>{dk}</b> {leg[1]} · <b>{s.dis}</b> {leg[2]}
-              </div>
-            </React.Fragment>
+          ? <div className="pd-lnums">
+              <span className="pd-lnum"><b>{s.app}</b> <span>{leg[0]}</span></span>
+              <span className="pd-lnum muted"><b>{dk}</b> <span>{leg[1]}</span></span>
+              <span className="pd-lnum"><b>{s.dis}</b> <span>{leg[2]}</span></span>
+            </div>
           : <div className="pd-lnote">Net only – this pollster published no {leg[0]} / {leg[2]} split</div>}
         {alt && (
           <div className="pd-lnote"
@@ -2042,8 +1997,7 @@ function PollLedger({ r, dirSegments }) {
       <LedgerGroup label={tppHeading(tcs)}
                    absent="No two-party figure published with this poll">
         {tcs.map((c, i) => (
-          <LedgerRow key={"t" + i} label={c.lab.replace(/^2PP · /, "")} segs={c.segs}
-                     threshold={c.segs.length === 2 && c.kind !== "3cp"} />
+          <LedgerRow key={"t" + i} label={c.lab.replace(/^2PP · /, "")} segs={c.segs} />
         ))}
         {/* Roy Morgan's second ALP–L/NP 2PP: same question, different
             allocation, so it is a row in this group and not a footnote */}
