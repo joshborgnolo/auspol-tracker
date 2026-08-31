@@ -10323,12 +10323,15 @@ function PollsterTable() {
     if (va > vb) return sort.dir;
     return 0;
   });
-  const newest = [...D.pollsterTable].sort((a, b) => b.released.localeCompare(a.released));
+
+  // range by when polls came OUT, matching the Published column - `released`
+  // (fieldwork end) lags publication by a day for next-day houses (Roy Morgan)
+  const newest = [...D.pollsterTable].sort((a, b) => b.pubSort.localeCompare(a.pubSort));
   const fmtWin = iso => {
-    const [, m, d] = iso.split("-").map(Number);
+    const [, m, d] = iso.slice(0, 10).split("-").map(Number);
     return `${d} ${D.monthNameFull(m)}`;
   };
-  const windowLabel = `${fmtWin(newest[newest.length - 1].released)}\u2013${fmtWin(newest[0].released)}`;
+  const windowLabel = `${fmtWin(newest[newest.length - 1].pubSort)}\u2013${fmtWin(newest[0].pubSort)}`;
   const FACETS = [{
     id: "twopp",
     label: "2PP"
