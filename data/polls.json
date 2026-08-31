@@ -151,7 +151,7 @@
       "short": "Joyce → ONP",
       "label": "Barnaby Joyce joins One Nation",
       "desc": "Joyce defects to One Nation – the first sitting MP defection from the major-party bloc to ONP.",
-      "major": true
+      "major": false
     },
     {
       "date": "2025-12-14",
@@ -200,7 +200,7 @@
       "short": "ONP wins Farrer",
       "label": "One Nation wins Farrer",
       "desc": "One Nation gains Farrer from the Liberals – the party's first lower-house seat won at a by-election.",
-      "major": true
+      "major": false
     },
     {
       "date": "2026-05-12",
