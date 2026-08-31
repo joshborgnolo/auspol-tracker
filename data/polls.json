@@ -2761,6 +2761,7 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "tpp_flows": 53,
       "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy"
     },
     {
@@ -3130,6 +3131,7 @@
       "oth": null,
       "tpp_alp": 51,
       "tpp_lnp": 49,
+      "tpp_flows": 52,
       "url": "https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9"
     },
     {
@@ -3336,6 +3338,7 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "tpp_flows": 55,
       "url": "https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9"
     },
     {
@@ -3674,6 +3677,7 @@
       "oth": null,
       "tpp_alp": 48,
       "tpp_lnp": 52,
+      "tpp_flows": 50,
       "url": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6"
     },
     {
@@ -3914,6 +3918,7 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "tpp_flows": 48,
       "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn"
     }
   ],

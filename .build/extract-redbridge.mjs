@@ -44,8 +44,10 @@
 //     flavours — vs-Coalition 2025-flows, vs-Coalition respondent-allocated,
 //     vs-One-Nation respondent-allocated. Current wave = first row.
 //     `tpp_alp`/`tpp_lnp` = RESPONDENT-ALLOCATED vs-Coalition (matches every
-//     committed row; Jul 2026 = 48/52, not the 50/50 headline). The vs-ON
-//     value feeds altTpp.alpVsOnp_alp; "-" before Dec 2025.
+//     committed row; Jul 2026 = 48/52, not the 50/50 headline). The
+//     vs-Coalition 2025-flows value feeds tpp_flows (ALP share, same
+//     convention as Roy Morgan's tpp_flows). The vs-ON value feeds
+//     altTpp.alpVsOnp_alp; "-" before Dec 2025.
 //   - Table N "Favourability ratings and name recognition of political
 //     figures": per-leader wave rows (very/mostly favourable, neither,
 //     mostly/very unfavourable, not sure, not heard, NET). Tracker approval
@@ -671,6 +673,7 @@ if (process.env.RB_LIB !== "1") try {
       for (const k of ["alp", "lnp", "grn", "onp", "ind"]) cmp(k, w[k], matchPoll[k]);
       cmp("tpp_alp", w.tppResp, matchPoll.tpp_alp);
       cmp("tpp_lnp", w.tppResp != null ? 100 - w.tppResp : null, matchPoll.tpp_lnp);
+      cmp("tpp_flows", w.tppHist, matchPoll.tpp_flows);
       if (w.pubIso && matchPoll.published && matchPoll.published.slice(0, 10) !== w.pubIso)
         diffs.push(`published: page=${w.pubIso} vs file=${matchPoll.published.slice(0, 10)}`);
 
@@ -719,6 +722,7 @@ if (process.env.RB_LIB !== "1") try {
         pollster: POLLSTER, client: "AFR", sample: w.sample,
         alp: w.alp, lnp: w.lnp, grn: w.grn, onp: w.onp, ind: w.ind, oth: null,
         tpp_alp: w.tppResp, tpp_lnp: w.tppResp != null ? 100 - w.tppResp : null,
+        ...(w.tppHist != null ? { tpp_flows: w.tppHist } : {}),
         url: w.afrUrl || w.pdfUrl,
       }),
       ppm: { date: w.date, firm: POLLSTER, alb: w.ppm.alb, opp: w.ppm.opp, oppName: w.oppName, han: w.ppm.han, extra: null },
