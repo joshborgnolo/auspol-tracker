@@ -682,6 +682,16 @@ body {
   --hg-lip:  color-mix(in oklch, white 85%, transparent);
   --hg-grad: color-mix(in oklch, var(--ink) 17%, transparent);
   --hg-tie-cut: color-mix(in oklch, var(--ink) 55%, transparent);
+  /* Controls. The hero channel's lesson, applied the other way up: paper has
+     almost no headroom ABOVE it - a white lip lands +0.013 on an L 0.985 page
+     - but plenty below, so a RAISED thing reads here by the shadow it casts,
+     where a recess could not. Dark is the reverse and leans on the crown. */
+  --btn-lit:   color-mix(in oklch, white 85%, transparent);
+  --btn-shade: oklch(0.4 0.02 60 / 0.16);
+  --btn-press: color-mix(in oklch, var(--ink) 15%, transparent);
+  --btn-edge:  color-mix(in oklch, var(--ink) 8%, transparent);
+  --well-cut:  color-mix(in oklch, var(--ink) 15%, transparent);
+  --well-sill: color-mix(in oklch, white 85%, transparent);
 }
 body.dark {
   --dl-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
@@ -699,6 +709,12 @@ body.dark {
   --hg-lip:  color-mix(in oklch, white 13%, transparent);
   --hg-grad: color-mix(in oklch, white 20%, transparent);
   --hg-tie-cut: color-mix(in oklch, black 70%, transparent);
+  --btn-lit:   color-mix(in oklch, white 9%, transparent);
+  --btn-shade: oklch(0 0 0 / 0.44);
+  --btn-press: color-mix(in oklch, black 48%, transparent);
+  --btn-edge:  color-mix(in oklch, black 40%, transparent);
+  --well-cut:  color-mix(in oklch, black 46%, transparent);
+  --well-sill: color-mix(in oklch, white 10%, transparent);
 }
 /* ---- the dial's housing -------------------------------------------------
    Glass rather than metal, and the site's own glass: the frosted recipe the
@@ -991,6 +1007,64 @@ body.dark .dl-bloom { opacity: 1; }
   box-shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.12); border: 1px solid var(--line-2);
 }
 .segmented-sm .seg-btn { padding: 5px 10px; font-size: 12px; }
+
+/* ---------- neo-skeuomorphic controls -------------------------------------
+   One light source, top left - the dial's, and the hero channel's. Every rule
+   below is box-shadow only: no size, colour or layout changes, so the whole
+   treatment lifts out in one deletion if it is not wanted.
+
+   Pressed is not decoration here. Engagement on these controls was carried by
+   colour and border alone, and a control that goes IN when it is on says so in
+   a way a tint cannot. The .segmented track recesses so its active cell has
+   something to stand proud of - that cell already carried a drop shadow, which
+   is the idiom the rest of this follows. */
+.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay {
+  box-shadow: inset 0 1px 0 var(--btn-lit),
+              0 1px 1.5px var(--btn-shade),      /* contact */
+              0 3px 6px -3px var(--btn-shade);   /* ambient - what makes it sit ON the page */
+}
+.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay,
+.seg-btn, .pg-check input {
+  transition-property: color, border-color, background-color, opacity, transform, box-shadow;
+}
+.ha-chip:active, .legend-chip:active, .cyc-chip:active,
+.ap-popbtn:active, .dl-replay:active:not(:disabled),
+.ap-popbtn.on, .ap-popbtn.open {
+  box-shadow: inset 0 1.5px 2.5px var(--btn-press);
+}
+.segmented { box-shadow: inset 0 1px 2px var(--btn-press); }
+.seg-btn.active { box-shadow: inset 0 1px 0 var(--btn-lit), 0 1px 2px var(--btn-shade),
+                              0 3px 6px -3px var(--btn-shade); }
+/* the checkbox is a well until it is filled, then it is a raised cap */
+.pg-check input { box-shadow: inset 0 1px 2px var(--btn-press); }
+.pg-check input:checked { box-shadow: inset 0 1px 0 var(--btn-lit), 0 1px 1.5px var(--btn-shade); }
+
+/* A bevel, not an outline. A 1px border of one colour is a drawn edge; a real
+   one is lit on its crown and shaded under its lower lip. The border stays -
+   it carries the shape - and these two hairlines give it a top and a bottom. */
+.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay {
+  border-bottom-color: var(--btn-edge);
+}
+
+/* ---------- bars are channels ---------------------------------------------
+   Every bar on the site is already the hero gauge's anatomy under another
+   name: a track that is CHROME holding segments that are READINGS. So they
+   all get the same milling, and not one encoding is touched.
+
+   Drawn on an overlay rather than as the track's own inset shadow, because
+   the segments cover their track completely and would bury it. Over the top
+   is also the truer place for it: light falling into a real channel lands on
+   whatever the channel is holding, not just on the empty ends. */
+.sbar, .appr-netbar, .dir-bar, .pd-aprbar, .seatbar { position: relative; }
+.sbar::after, .appr-netbar::after, .dir-bar::after,
+.pd-aprbar::after, .seatbar::after {
+  content: ""; position: absolute; inset: 0; border-radius: inherit;
+  box-shadow: inset 0 1px 2px var(--well-cut);
+  pointer-events: none;
+}
+.sbar, .appr-netbar, .dir-bar, .pd-aprbar, .seatbar {
+  box-shadow: 0 1px 0 var(--well-sill);
+}
 
 /* ---------- text toggle (editorial control) ---------- */
 .text-toggle { display: inline-flex; align-items: baseline; gap: 11px; }
@@ -3126,9 +3200,26 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
 
   /* quiet press acknowledgement on chip-like controls */
-  .legend-chip, .cyc-chip, .ap-popbtn, .seg-btn { transition-property: color, border-color, background-color, opacity, transform; }
+  .legend-chip, .cyc-chip, .ap-popbtn, .seg-btn { transition-property: color, border-color, background-color, opacity, transform, box-shadow; }
+  /* A press you can feel: the control travels DOWN into the page rather than
+     just shrinking on the spot. Scale alone reads as a zoom - it is the one
+     gesture a physical button cannot make - so the travel carries it and the
+     scale only steadies it. The shadow collapse that goes with it is in the
+     controls block above; together they are the object meeting the paper. */
   .legend-chip:active, .cyc-chip:active, .ap-popbtn:active,
-  .seg-btn:active, .exp-btn:active { transform: scale(0.965); }
+  .seg-btn:active, .ha-chip:active,
+  .dl-replay:active:not(:disabled) { transform: translateY(1px) scale(0.985); }
+  .exp-btn:active { transform: scale(0.965); }
+  /* Fast in, slower out. A press that returns at the speed it went is a
+     crossfade between two states; the asymmetry is what reads as a thing
+     with weight being let go of. */
+  .legend-chip, .cyc-chip, .ap-popbtn, .seg-btn, .ha-chip, .dl-replay {
+    transition-duration: .19s;
+  }
+  .legend-chip:active, .cyc-chip:active, .ap-popbtn:active,
+  .seg-btn:active, .ha-chip:active, .dl-replay:active:not(:disabled) {
+    transition-duration: .055s;
+  }
   .exp-btn.open:active { transform: rotate(90deg) scale(0.965); }
 }
 @media (prefers-reduced-motion: reduce) {
