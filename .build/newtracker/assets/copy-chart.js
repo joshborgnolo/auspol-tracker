@@ -431,7 +431,15 @@
     const xLabels = [...svgEl.querySelectorAll(".axis-label.x")].map((n) => txt(n)).filter(Boolean);
     const datey = (t) => /[0-9]/.test(t) && !/^(Election|\d+ ?yrs?)$/i.test(t);
     let span = "";
-    if (yrs.length >= 2) span = yrs[0] + "\u2013" + yrs[yrs.length - 1];
+    if (yrs.length >= 2) {
+      /* 2010-25, not 2010-2025: the second year is written short when it
+         shares a century with the first, which is how a year range is set.
+         Guarded rather than assumed - a range that crosses one (1999-2001)
+         has to print both in full or it reads as going backwards. */
+      const a = yrs[0], b = yrs[yrs.length - 1];
+      const short = String(a).slice(0, 2) === String(b).slice(0, 2);
+      span = a + "\u2013" + (short ? String(b).slice(2) : b);
+    }
     else if (xLabels.length >= 2 && datey(xLabels[0]) && datey(xLabels[xLabels.length - 1]))
       span = xLabels[0] + " \u2013 " + xLabels[xLabels.length - 1];
     const title = span ? titleBase + "  \u00b7  " + span : titleBase;
