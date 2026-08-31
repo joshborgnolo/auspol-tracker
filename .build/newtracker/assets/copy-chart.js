@@ -414,15 +414,36 @@
         el.style.color = c; document.body.appendChild(el);
         const v = getComputedStyle(el).color; el.remove(); return v;
       };
-      const leaders = (AUS.LEADERS || []).map((l) => ({ name: l.name, col: resolve(l.color) }));
+      const leaders = (AUS.LEADERS || []).map((l) => ({ id: l.id, name: l.name, col: resolve(l.color) }));
+      /* When a leader's line actually starts. leaderMonths runs from the
+         election with every leader's field null until they appear, so their
+         first month is the first row carrying one.
+
+         The MEASURE matters: Hanson's favourability begins 2025-11 but her net
+         approval - the series these charts draw - begins 2026-02, and reading
+         any field gave 2025, three months before the line exists. Net is asked
+         for first, since a leader only joins these charts by being rated on
+         it. */
+      const firstYear = (id) => {
+        const lm = AUS.leaderMonths || [];
+        const hit = lm.find((r) => r[id + "_net"] != null)
+                 || lm.find((r) => Object.keys(r).some((k) => k.indexOf(id + "_") === 0 && r[k] != null));
+        return hit && hit.ym ? String(hit.ym).slice(0, 4) : null;
+      };
       return labels.map((t) => {
         const digits = (t.textContent || "").replace(/[^0-9]/g, "");
         const fill = getComputedStyle(t).fill;
         const c = digits.length === 2 && cyc.find((r) => String(r.year).slice(2) === digits);
         if (c) return { label: c.year + " " + (opp ? (c.oppLead || c.lead) : c.lead),
                         kind: "line", fill, alpha: 1, year: c.year };
+        /* A leader who is not a cycle needs saying differently. Every other
+           entry reads "2025 Ley -> Taylor", meaning the leader OF that term -
+           so "2025 Hanson" would file her among prime ministers and opposition
+           leaders, which she has never been. "Hanson, from 2026" says the one
+           true thing instead: when her line starts. */
         const m = leaders.find((l) => l.col === fill);
-        return { label: m ? m.name : (t.textContent || "").trim(),
+        const from = m && firstYear(m.id);
+        return { label: m ? (m.name + (from ? ", from " + from : "")) : (t.textContent || "").trim(),
                  kind: "dashed", fill, alpha: 1, year: 9999 };
       }).sort((a, b) => a.year - b.year);
     };
