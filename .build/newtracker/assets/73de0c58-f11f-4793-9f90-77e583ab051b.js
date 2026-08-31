@@ -1309,13 +1309,13 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
       <Hero rangeId={rangeId} setRangeId={setRangeId} showScatter={showScatter}
             matchup={tppMatchup} setMatchup={setTppMatchup} />
       <PrimaryVotePanel rangeId={rangeId} />
+      <PollsterTable />
       <LeadershipSection rangeId={rangeId} />
       <DirectionPanel rangeId={rangeId} />
       {/* directly under direction: both are questions about the electorate's
           mood rather than its party choice, and both come from the houses that
           bother to publish more than a headline */}
       <UndecidedPanel rangeId={rangeId} />
-      <PollsterTable />
       <NextPollsPanel />
     </>
   );
