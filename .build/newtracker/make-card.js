@@ -82,12 +82,33 @@
      dial's painted extent to centre on the wordmark's, since the pivot is 11
      units below the middle of what gets drawn. */
   const BL1 = 92, BL2 = BL1 + 29.5;
-  c.font = '800 30px "Source Sans 3", sans-serif'; c.letterSpacing = "-0.75px";
+  /* The two words are set at different weights, so at their own tracking they
+     end at different places and the l of auspol and the r of tracker do not
+     line up. The header solves this by measuring the shortfall and closing it
+     over the narrower word's gaps rather than by hand-tuning a number; the
+     card drew its own fixed pair instead and stayed misaligned. Same algorithm
+     here, so the next change of face carries itself in both places.
+
+     Letter-spacing lands after the LAST letter too, widening the box by one
+     more unit than it widens the ink. What has to line up is the ink, so the
+     trailing unit comes off both measurements before they are compared - the
+     header's note on the same subtraction. */
+  const ink = (text, weight, ls) => {
+    c.font = `${weight} 30px "Source Sans 3", sans-serif`;
+    c.letterSpacing = ls + "px";
+    const w = c.measureText(text).width;
+    c.letterSpacing = "0px";
+    return w - ls;
+  };
+  let lsName = -0.75, lsTrack = -0.9;
+  const inkName = ink("auspol", 800, lsName), inkTrack = ink("tracker", 400, lsTrack);
+  if (inkName >= inkTrack) lsTrack += (inkName - inkTrack) / ("tracker".length - 1);
+  else                     lsName += (inkTrack - inkName) / ("auspol".length - 1);
+  const wMark = Math.max(inkName, inkTrack);
+  c.font = '800 30px "Source Sans 3", sans-serif'; c.letterSpacing = lsName + "px";
   c.fillStyle = T.ink; c.fillText("auspol", PAD, BL1);
-  const wN = c.measureText("auspol").width;
-  c.font = '400 30px "Source Sans 3", sans-serif'; c.letterSpacing = "-0.9px";
+  c.font = '400 30px "Source Sans 3", sans-serif'; c.letterSpacing = lsTrack + "px";
   c.fillStyle = T.ink3; c.fillText("tracker", PAD, BL2);
-  const wMark = Math.max(wN, c.measureText("tracker").width);
   c.letterSpacing = "0px";
 
   /* the masthead dial, same geometry and same data as the favicon in build.mjs:
@@ -143,8 +164,8 @@
      arranges them - LABOR 51.4 | 48.6 COALITION - so the labels sit inline
      and no separate label row is needed. They are the only element that
      survives a 360px thumbnail, so they get the middle. */
-  caps("TWO-PARTY PREFERRED", PAD, 190, 15, 2.6, T.ink3, 700);
-  const FIG_Y = 312, FIG_PX = 150, GAP = 22, DOT = 4.5;
+  caps("TWO-PARTY PREFERRED", PAD, 202, 15, 2.6, T.ink3, 700);
+  const FIG_Y = 330, FIG_PX = 150, GAP = 22, DOT = 4.5;
   const figFont = "600 " + FIG_PX + 'px Newsreader, Georgia, serif';
   const measCaps = (t) => { c.font = '700 20px "Source Sans 3", sans-serif';
     c.letterSpacing = "1.8px"; const w = c.measureText(t).width;
@@ -182,8 +203,8 @@
      It bleeds LEFT but stops at the right margin: the past runs off the edge,
      the present - the end dots, which are what the card is about - keeps its
      70px of air. */
-  c.fillStyle = T.panel; c.fillRect(0, 342, W, H - 342);
-  const CX0 = 0, CX1 = W - PAD, CY0 = 364, CY1 = 554;
+  c.fillStyle = T.panel; c.fillRect(0, 372, W, H - 372);
+  const CX0 = 0, CX1 = W - PAD, CY0 = 392, CY1 = 578;
   const xs = D.agg2pp.map((d) => d.x), x0 = Math.min(...xs), x1 = Math.max(...xs);
   const y0 = 43, y1 = 57;
   const sx = (x) => CX0 + ((x - x0) / (x1 - x0)) * (CX1 - CX0);
@@ -231,19 +252,20 @@
     c.beginPath(); c.arc(e[0], e[1], 5, 0, 7); c.fillStyle = col; c.fill();
   });
   // the term's two ends, so the trend is anchored rather than floating
-  caps("2025 ELECTION · LABOR " + D.agg2pp[0].alp.toFixed(1), PAD, 580, 13, 1.4, T.ink3, 700);
-  c.textAlign = "right"; caps("AUG 2026", W - PAD, 580, 13, 1.4, T.ink3, 700); c.textAlign = "left";
+  caps("2025 ELECTION · LABOR " + D.agg2pp[0].alp.toFixed(1), PAD, 604, 13, 1.4, T.ink3, 700);
+  c.textAlign = "right"; caps("AUG 2026", W - PAD, 604, 13, 1.4, T.ink3, 700); c.textAlign = "left";
 
   /* ---- footer ------------------------------------------------------------ */
   /* No rule: the footer sits inside the plot's panel, and the panel's own top
      edge already divides it from the reading above. The old bottom ran 32px
      from the plot to these labels and then 24px to the provenance with 13px
      left under it, which read as cramped; it is 26 / 28 / 22 now. */
-  c.font = '400 17px "Source Sans 3", sans-serif'; c.fillStyle = T.ink3;
-  c.fillText(L.pollsTracked + " polls · " + L.housesTracked
-             + " pollsters · House-effect-adjusted aggregate", PAD, 608);
-  c.textAlign = "right"; c.font = '600 17px "Source Sans 3", sans-serif'; c.fillStyle = T.ink2;
-  c.fillText("auspoltracker.com", W - PAD, 608); c.textAlign = "left";
+  /* Centred, on the axis labels' own baseline. Dropping the provenance line
+     left the card stacking two right-aligned items 18px apart above an empty
+     left half; the bottom is one row now, and the margin under it went from
+     18px to 26. */
+  c.textAlign = "center"; c.font = '600 17px "Source Sans 3", sans-serif'; c.fillStyle = T.ink2;
+  c.fillText("auspoltracker.com", W / 2, 604); c.textAlign = "left";
 
   /* ---- export at exactly 1200x630, supersampled from the 2x draw --------- */
   const out = document.createElement("canvas"); out.width = W; out.height = H;
