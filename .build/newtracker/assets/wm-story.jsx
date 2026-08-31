@@ -28,7 +28,6 @@ const WM_BAR_MAX = 13;          // units of bar at 40%
 const WM_SWING_PTS = 12;        // margin that deflects the needle fully
 const WM_SWING_DEG = 34;
 const WM_NEEDLE_R = 8.6;        // needle length
-const WM_ENV_R = 10.75;         // swept-range arc: clear of the needle, inside the dial
 const WM_LABEL_R = 29;          // labels sit on one ring, like numerals on a bezel
 const WM_LABEL_SEP = 21;        // min degrees between labels before they push apart
 /* Slot 0 always holds the month's TALLEST bar, and at 54 degrees off vertical
@@ -117,7 +116,7 @@ function buildDialStory(D) {
 
 /* The dial itself, drawn at an arbitrary FLOAT position in the story so the
    same function serves the replay, the scrub and the resting state. */
-function DialFigure({ story, f, envelope, trail }) {
+function DialFigure({ story, f }) {
   const D = window.AP.D;
   const i0 = Math.max(0, Math.min(story.length - 1, Math.floor(f)));
   const i1 = Math.min(story.length - 1, i0 + 1);
@@ -162,7 +161,7 @@ function DialFigure({ story, f, envelope, trail }) {
          where the glass would be.
 
          Where the line falls: this is all CHROME. Every mark that carries a
-         READING - the bars, the arc, the needle, the envelope - stays flat and
+         READING - the bars, the arc, the needle - stays flat and
          literal. Gloss on a data mark is the same mistake as a 3D chart: it
          edits the quantity while claiming to decorate it. So the housing is
          the skeuomorph and the readings sit on top of it, unstyled.
@@ -303,26 +302,6 @@ function DialFigure({ story, f, envelope, trail }) {
         );
       })()}
 
-      {/* envelope of everywhere the needle has been */}
-      {/* Everywhere the needle has been, drawn as a band at the tip radius
-          rather than a wedge from the pivot: it reads as an arc the needle has
-          swept, which is what it is, and survives being faint. End ticks mark
-          the extremes of the term. */}
-      {/* Everywhere the needle has been. This used to sit at radius 8.6 – the
-          needle's exact length – so the arc hid under the needle and its end
-          ticks read as a stray grey hook crossing the sweep. It now occupies
-          its own band between the needle tip and the dial face, where it reads
-          as a range rather than debris. */}
-      {envelope && envelope.max > envelope.min + 2 && (
-        <g className="dl-envelope">
-          <path d={wmArc(envelope.min, envelope.max, WM_ENV_R)} />
-          {[envelope.min, envelope.max].map((d, k) => (
-            <line key={k} x1={wmPolar(d, WM_ENV_R - 0.85).x} y1={wmPolar(d, WM_ENV_R - 0.85).y}
-                  x2={wmPolar(d, WM_ENV_R + 0.85).x} y2={wmPolar(d, WM_ENV_R + 0.85).y} />
-          ))}
-        </g>
-      )}
-
       {/* The two halves used to be drawn full, always, from -90 to 0 and 0 to
          +90. Only the challenger's COLOUR ever changed, so the band was a
          legend wearing a gauge's clothes: it told you which side belonged to
@@ -421,13 +400,6 @@ function DialFigure({ story, f, envelope, trail }) {
           </g>
         );
       })}
-
-      {/* needle trail – recent positions, fading behind the needle */}
-      {trail && trail.map((tr, k) => (
-        <line key={"t" + k} className="dl-trail" x1={WM_GC.cx} y1={WM_GC.cy}
-              x2={wmPolar(tr, 8.6).x} y2={wmPolar(tr, 8.6).y}
-              style={{ opacity: ((k + 1) / trail.length) * 0.22 }} />
-      ))}
 
       {/* The needle carries an ANGLE and nothing else - not a length, not an
          area - so its shape and finish are chrome all the way down. There was
@@ -580,11 +552,6 @@ function DialStory({ originRect, onClose }) {
      the fly-in and the whole thing is over before it has arrived. */
   const [playing, setPlaying] = useState(false);
   const [lifted, setLifted] = useState(false);
-  const trailRef = useRef([]);
-  const envRef = useRef(reduce
-    ? story.reduce((a, s) => ({ min: Math.min(a.min, wmDeg(s.margin)), max: Math.max(a.max, wmDeg(s.margin)) }),
-                   { min: 999, max: -999 })
-    : { min: 999, max: -999 });
   const [, forceTick] = useState(0);
   const shellRef = useRef(null);
   const closeRef = useRef(null);
@@ -639,15 +606,6 @@ function DialStory({ originRect, onClose }) {
       last = now;
       const v = Math.max(0, Math.min(n - 1, elapsed / per));
       setF(v);
-      const d = wmDeg(lerp(story[Math.floor(v)].margin,
-                           story[Math.min(n - 1, Math.floor(v) + 1)].margin,
-                           smooth(v - Math.floor(v))));
-      const tr = trailRef.current;
-      tr.push(d);
-      if (tr.length > 34) tr.shift();
-      const e = envRef.current;
-      if (d < e.min) e.min = d;
-      if (d > e.max) e.max = d;
       if (v >= n - 1) { setPlaying(false); forceTick((x) => x + 1); return; }
       raf = requestAnimationFrame(step);
     };
@@ -683,7 +641,6 @@ function DialStory({ originRect, onClose }) {
     const r = el.getBoundingClientRect();
     const p = Math.max(0, Math.min(1, (clientX - r.left) / r.width));
     setF(p * (n - 1));
-    trailRef.current = [];
   };
   const onScrubDown = (e) => {
     if (playing) return;
@@ -709,8 +666,6 @@ function DialStory({ originRect, onClose }) {
   const evOp = near ? Math.min(1, (0.7 - Math.abs(near.i - f)) / 0.35) : 0;
 
   const replay = () => {
-    trailRef.current = [];
-    envRef.current = { min: 999, max: -999 };
     setF(0);
     setPlaying(true);
   };
@@ -731,7 +686,7 @@ function DialStory({ originRect, onClose }) {
           </div>
           <svg viewBox="-9 -11 62 48" className="dl-svg" role="img"
                aria-label={`Dial for ${monthLabel}: Labor ${cur.lab.toFixed(1)} versus ${cur.oppName} ${cur.opp.toFixed(1)} two-party preferred`}>
-            <DialFigure story={story} f={f} envelope={envRef.current} trail={trailRef.current} />
+            <DialFigure story={story} f={f} />
           </svg>
 
           <figcaption className="dl-cap">
