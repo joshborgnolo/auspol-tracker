@@ -13784,14 +13784,24 @@ function DialFigure({
     type: "fractalNoise",
     baseFrequency: "1.9",
     numOctaves: "2",
-    seed: "7"
+    seed: "7",
+    result: "noise"
   }), /*#__PURE__*/React.createElement("feColorMatrix", {
     type: "saturate",
-    values: "0"
-  }), /*#__PURE__*/React.createElement("feComponentTransfer", null, /*#__PURE__*/React.createElement("feFuncA", {
+    values: "0",
+    in: "noise",
+    result: "grey"
+  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
+    in: "grey",
+    result: "faint"
+  }, /*#__PURE__*/React.createElement("feFuncA", {
     type: "linear",
     slope: "0.055"
-  }))), WM_PARTY_IDS.map(id => /*#__PURE__*/React.createElement("radialGradient", {
+  })), /*#__PURE__*/React.createElement("feComposite", {
+    in: "faint",
+    in2: "SourceAlpha",
+    operator: "in"
+  })), WM_PARTY_IDS.map(id => /*#__PURE__*/React.createElement("radialGradient", {
     key: "bo" + id,
     id: `dl-bounce-${id}`
   }, /*#__PURE__*/React.createElement("stop", {
@@ -13844,6 +13854,16 @@ function DialFigure({
     className: "dl-edge",
     d: dPlate(WM_GC.r + 3.1, 3.4, 1.2),
     fill: "none"
+  }), barRing.map(b => {
+    const p = wmPolar(b.a, WM_GC.r - 1.5);
+    return /*#__PURE__*/React.createElement("circle", {
+      key: "bo" + b.id,
+      className: "dl-bounce",
+      cx: p.x,
+      cy: p.y,
+      r: "6",
+      fill: `url(#dl-bounce-${b.id})`
+    });
   }), Array.from({
     length: 13
   }, (_, k) => -12 + k * 2).map(pts => {
@@ -13913,7 +13933,24 @@ function DialFigure({
     cx: wmPolar(deg, WM_GC.r + 0.3).x,
     cy: wmPolar(deg, WM_GC.r + 0.3).y,
     r: "0.34"
-  })), barRing.map(b => {
+  })), barRing.map(b => /*#__PURE__*/React.createElement("g", {
+    key: "mount" + b.id,
+    transform: `rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`
+  }, /*#__PURE__*/React.createElement("rect", {
+    className: "dl-boss",
+    x: WM_GC.cx - 3.1,
+    y: WM_GC.cy - 16.1,
+    width: "6.2",
+    height: "2.9",
+    rx: "0.9"
+  }), /*#__PURE__*/React.createElement("rect", {
+    className: "dl-slot",
+    x: WM_GC.cx - 2.25,
+    y: WM_GC.cy - 16.0,
+    width: "4.5",
+    height: "2.1",
+    rx: "0.8"
+  }))), barRing.map(b => {
     const h = Math.max(0.6, b.v / WM_MAX_PCT * WM_BAR_MAX);
     /* A rect rotated about the pivot rather than a stroked line: a stroke
        cannot carry a gradient across its own width, and the width is where

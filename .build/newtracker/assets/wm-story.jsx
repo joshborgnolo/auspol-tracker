@@ -193,10 +193,19 @@ function DialFigure({ story, f, envelope, trail }) {
           <stop offset="0%" stopColor="var(--dl-rim-hi)" />
           <stop offset="100%" stopColor="var(--dl-rim-lo)" />
         </radialGradient>
+        {/* feTurbulence generates across the whole FILTER REGION, not across the
+            shape it was asked for, so without the composite the noise came out
+            as a rectangle the size of the plate's bounding box - visible behind
+            the dial, square across the top, stopping exactly where the bbox
+            stopped. Clipping it to the source's own alpha is what makes it
+            grain ON the housing rather than a panel behind it. */}
         <filter id="dl-grain" x="0%" y="0%" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="1.9" numOctaves="2" seed="7" />
-          <feColorMatrix type="saturate" values="0" />
-          <feComponentTransfer><feFuncA type="linear" slope="0.055" /></feComponentTransfer>
+          <feTurbulence type="fractalNoise" baseFrequency="1.9" numOctaves="2" seed="7" result="noise" />
+          <feColorMatrix type="saturate" values="0" in="noise" result="grey" />
+          <feComponentTransfer in="grey" result="faint">
+            <feFuncA type="linear" slope="0.055" />
+          </feComponentTransfer>
+          <feComposite in="faint" in2="SourceAlpha" operator="in" />
         </filter>
         {WM_PARTY_IDS.map((id) => (
           <radialGradient key={"bo" + id} id={`dl-bounce-${id}`}>
@@ -233,6 +242,17 @@ function DialFigure({ story, f, envelope, trail }) {
       {/* Light IN the material rather than reflected off it - the neo reading
           of a rim, where classic skeuo would have put a specular highlight. */}
       {<path className="dl-edge" d={dPlate(WM_GC.r + 3.1, 3.4, 1.2)} fill="none" />}
+      {/* Bounce: each blade throws its own colour onto the face beneath it.
+         This is the move the finish turns on - material answering what sits on
+         it - and it is free of the readings, being a wash under them rather
+         than a mark of its own. Before the graduations, so those stay crisp
+         on top of it. */}
+      {barRing.map((b) => {
+        const p = wmPolar(b.a, WM_GC.r - 1.5);
+        return <circle key={"bo" + b.id} className="dl-bounce" cx={p.x} cy={p.y} r="6"
+                       fill={`url(#dl-bounce-${b.id})`} />;
+      })}
+
       {/* The graduations used to be spaced in DEGREES - one every 6 across the
          whole sweep - which made them decoration wearing a scale's clothes.
          wmDeg clamps the needle to ±34°, so 56° at each end carried ticks the
@@ -325,6 +345,24 @@ function DialFigure({ story, f, envelope, trail }) {
                   cx={wmPolar(deg, WM_GC.r + 0.3).x} cy={wmPolar(deg, WM_GC.r + 0.3).y} r="0.34" />
         </g>
       )}
+
+      {/* Where each blade meets the machine. Without this they read as stuck ON
+         the rim rather than coming OUT of it, because nothing said the housing
+         had an opening. Three parts, drawn before every blade so no blade sits
+         under its neighbour's mount: a BOSS of the same material standing a
+         little proud of the rim, a SLOT cut into it, and the blade rising
+         through. The slot is wider than the blade either side, and that dark
+         margin is the whole trick - it is the gap you would see around a vane
+         in its own aperture. */}
+      {barRing.map((b) => (
+        <g key={"mount" + b.id}
+           transform={`rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`}>
+          <rect className="dl-boss" x={WM_GC.cx - 3.1} y={WM_GC.cy - 16.1}
+                width="6.2" height="2.9" rx="0.9" />
+          <rect className="dl-slot" x={WM_GC.cx - 2.25} y={WM_GC.cy - 16.0}
+                width="4.5" height="2.1" rx="0.8" />
+        </g>
+      ))}
 
       {/* graduation bars – primary vote, absolute scale */}
       {barRing.map((b) => {
