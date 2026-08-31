@@ -1865,7 +1865,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 }
 .back-to-chart:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
 /* Both controls in the line are the same kind of thing - a way out of the row
-   - so they read as a pair, and they travel with the last meta item. */
+   - so they read as a pair, docked together at the band's right edge. */
 .pd-report svg { opacity: 0.75; }
 /* but the report button is not a peer of the way back - it exists for the
    reader who already doubts a figure, not as a call to action - so it wears
@@ -1874,18 +1874,16 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-report:hover { color: var(--ink); }
 /* the meta line carries text and now a control, so centre what sits in it */
 .pd-meta { align-items: center; }
-/* The controls ride WITH the last meta item rather than floating at the end of
-   the band. A flex line breaks between items, never inside one, so grouping
-   them means a wrap can no longer strand "Report an error" on a line of its
-   own - which is what it did at every width where the band ran to two lines. */
+/* The controls are bracketed flush right in the band, against the table's
+   own right edge - the report of an error goes where a reader looks for an
+   action, not among the items that describe the poll. margin-left: auto
+   keeps them there whether the line wraps or not, and the nowrap keeps the
+   pair together rather than letting the two buttons break apart. */
 .pd-meta-tail {
   display: inline-flex; align-items: center; gap: 10px;
   flex-wrap: nowrap; min-width: 0;
+  margin-left: auto;
 }
-/* the group is nowrap so the buttons cannot leave the item; the item's own
-   TEXT may still wrap, which is what keeps the pair inside a phone's width
-   instead of overflowing it */
-.pd-meta-tail .pd-meta-i { white-space: normal; min-width: 0; }
 /* Below this the label will not fit beside the figures it sits with - the
    archive's own band runs 742px of items at 796px wide, and the labelled
    button needs 133 more - so it drops to the icon, which fits. Measured on

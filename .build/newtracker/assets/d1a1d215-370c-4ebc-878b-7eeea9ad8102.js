@@ -1575,8 +1575,8 @@ function ArchPollDetail({ p, onBack, backLabel }) {
       delta: p.dir.chg ? { v: p.dir.chg.wrong, refDate: p.dir.ref } : null },
   ] : null;
 
-  /* The meta items, as a list rather than loose children, because the controls
-     at the end of this band need to know which one is LAST. */
+  /* The meta items as a list rather than loose children, so the controls
+     bracketed to the right of the band sit clear of them. */
   const metaItems = [
     p.client && <span className="pd-meta-i" key="client"><span className="pd-meta-k">Commissioned by</span> {p.client}</span>,
     <span className="pd-meta-i meta-dup" key="field"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>,
@@ -1629,21 +1629,18 @@ function ArchPollDetail({ p, onBack, backLabel }) {
     ),
   ].filter(Boolean);
 
-  /* The controls ride with the LAST meta item rather than floating free at the
-     end of the band, so a wrap can never strand them on a line of their own -
-     which is what "Report an error" did at every width where the band ran to
-     two lines. Where even the pair doesn't fit, a container query drops the
-     button's label and leaves the icon. */
-  const lead = controls.length ? metaItems.slice(0, -1) : metaItems;
-  const tail = controls.length ? metaItems.slice(-1) : [];
+  /* The line's split: what the poll IS flows from the left, what the reader
+     can DO sits flush right - report at the band's right edge, the way back
+     where it is present beside it. The pair stays together under nowrap, and
+     if the band wraps the pair lands on its own line still flush right. Where
+     even the pair doesn't fit, a container query drops the button's label and
+     leaves the icon. */
 
   return (
     <div className="poll-detail">
       <div className="pd-meta">
-        {lead}
-        {controls.length > 0
-          ? <span className="pd-meta-tail">{tail}{controls}</span>
-          : tail}
+        {metaItems}
+        {controls.length > 0 && <span className="pd-meta-tail">{controls}</span>}
       </div>
       <PollLedger r={p} dirSegments={dirSegments} />
     </div>
