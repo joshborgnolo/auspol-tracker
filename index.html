@@ -4453,6 +4453,56 @@ window.AP = (function () {
     "transform", "transform-origin", "transform-box", "mix-blend-mode",
   ];
 
+  /* The chart sizes its own labels against its MEASURED width - scale = cw /
+     1000, and every label is expressed in units of 10.5px/scale - so a 388px
+     phone renders them nearly three times larger in user units, and the event
+     annotations get dropped for want of room (row == null in charts.jsx). The
+     copy is a thing people send to other people; it should not be the thinner
+     chart just because it was taken on a phone.
+
+     So the chart is asked to lay itself out wide before it is serialised. The
+     width is real, or the ResizeObserver would not fire and React would not
+     re-run the placement - there is no way to fake this from the outside. The
+     jump that would cause is prevented rather than tolerated: the host is
+     pinned to its current height and clipped, the svg is taken out of flow
+     inside it and hidden, so nothing below moves and nothing is seen to
+     change. Everything is put back in a finally. */
+  const COPY_W = 1120;
+  const widenForCopy = async (svg) => {
+    /* The chart measures ITS HOST, not its svg - charts.jsx puts the ref and
+       the ResizeObserver on <div class="chart">. Widening the svg alone left
+       cw at 388, the observer never fired, and the placement never re-ran:
+       the svg came out 1120 wide with the same dropped labels. It is the host
+       that has to grow. */
+    const host = svg.closest(".chart");
+    const anchor = host && host.parentElement;
+    if (!host || !anchor || host.getBoundingClientRect().width >= COPY_W - 1) return () => {};
+    const hostStyle = host.getAttribute("style"), anchorStyle = anchor.getAttribute("style");
+    /* Taking the host out of flow would collapse everything under it, so the
+       ancestor is pinned to its current height and clipped first. Nothing
+       below moves, and the wide chart is parked outside the clip - offset
+       rather than hidden, since visibility and opacity would be baked into
+       the serialised svg and blank the copy. */
+    anchor.style.height = anchor.getBoundingClientRect().height + "px";
+    anchor.style.overflow = "hidden";
+    if (getComputedStyle(anchor).position === "static") anchor.style.position = "relative";
+    host.style.position = "absolute";
+    host.style.top = "0";
+    host.style.left = "-99999px";
+    host.style.width = COPY_W + "px";
+    /* Wait for the observer to fire and React to commit the wider placement,
+       watching for the labels themselves rather than counting frames - a busy
+       main thread makes any fixed frame count a guess. */
+    for (let i = 0; i < 30; i++) {
+      await new Promise((r) => setTimeout(r, 16));
+      if (svg.querySelector(".evt-label")) break;
+    }
+    return () => {
+      if (hostStyle == null) host.removeAttribute("style"); else host.setAttribute("style", hostStyle);
+      if (anchorStyle == null) anchor.removeAttribute("style"); else anchor.setAttribute("style", anchorStyle);
+    };
+  };
+
   const bakeSvg = (src) => {
     const clone = src.cloneNode(true);
     const walk = (a, b) => {
@@ -4471,6 +4521,11 @@ window.AP = (function () {
     clone.setAttribute("width", vb[2]);
     clone.setAttribute("height", vb[3]);
     clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    /* The root is the one element whose own visibility must not be inherited
+       from the page: it is being rendered standalone. */
+    clone.style.visibility = "visible";
+    clone.style.opacity = "1";
+    clone.style.display = "block";
     return { markup: new XMLSerializer().serializeToString(clone), w: vb[2], h: vb[3] };
   };
 
@@ -4490,9 +4545,15 @@ window.AP = (function () {
   };
   const col = (el, prop) => (el ? getComputedStyle(el)[prop || "color"] : "#000");
 
-  const composeTpp = (target) => new Promise((resolve, reject) => {
+  const composeTpp = async (target) => {
     const svgEl = target.querySelector("svg.chart-svg");
-    if (!svgEl) { reject(new Error("no chart to compose")); return; }
+    if (!svgEl) throw new Error("no chart to compose");
+    const restore = await widenForCopy(svgEl);
+    try { return await composeTppInner(target, svgEl); }
+    finally { restore(); }
+  };
+
+  const composeTppInner = (target, svgEl) => new Promise((resolve, reject) => {
     const cs = getComputedStyle(document.body);
     const T = {
       bg: pageBg(),
