@@ -298,8 +298,12 @@
     c.beginPath(); c.arc(e[0], e[1], 5, 0, 7); c.fillStyle = col; c.fill();
   });
   // the term's two ends, so the trend is anchored rather than floating
-  caps("2025 ELECTION · LABOR " + D.agg2pp[0].alp.toFixed(1), PAD, 604, 13, 1.4, T.ink3, 700);
-  c.textAlign = "right"; caps("AUG 2026", W - PAD, 604, 13, 1.4, T.ink3, 700); c.textAlign = "left";
+  /* Sentence case, so the tracking goes with it: 1.4px is what makes small
+     caps legible and what makes lowercase look pulled apart. The right-hand
+     label takes the chart axis's own form - month, curly apostrophe, two
+     digits - the same string buildXTicks writes on the site. */
+  caps("2025 election · Labor " + D.agg2pp[0].alp.toFixed(1), PAD, 604, 13.5, 0, T.ink3, 600);
+  c.textAlign = "right"; caps("Aug \u201926", W - PAD, 604, 13.5, 0, T.ink3, 600); c.textAlign = "left";
 
   /* ---- footer ------------------------------------------------------------ */
   /* No rule: the footer sits inside the plot's panel, and the panel's own top
