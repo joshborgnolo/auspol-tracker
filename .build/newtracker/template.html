@@ -1215,6 +1215,16 @@ body.dark .dl-bloom { opacity: 1; }
   .hi-note { flex-basis: 100%; margin-top: 1px; }
   .hero-interval > .hi-range:not(:last-child)::after { content: none; }
 }
+/* A word that is also the way into its own definition. Reset far enough that
+   a <button> stops looking like one, and no further - whatever rule styles the
+   label itself still sets its size and colour, so this can wrap any of them. */
+.hi-term {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0;
+  cursor: pointer; text-decoration: underline;
+  text-decoration-color: var(--line-2); text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.hi-term:hover { color: var(--ink); text-decoration-color: currentColor; }
 .hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hi-note { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
 /* Movement smaller than its own interval – stated, not colour-coded, so it
@@ -1855,6 +1865,25 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 /* Sits at the end of the detail's own meta line - so it needs no space of its
    own, lands inside the panel's tint rather than on a pale band above it, and
    aligns with the panel's content instead of with the table cell behind it. */
+/* ---- Info: the glossary --------------------------------------------------
+   One paragraph per term, the term bolded and its definition running straight
+   on from it. A printed glossary's shape rather than a table's, because these
+   are sentences and not fields - and a measure narrower than the page, because
+   they are read rather than scanned. */
+.info { max-width: 66ch; }
+.info-term { margin: 0 0 20px; font-size: 15px; line-height: 1.62;
+  color: var(--ink-2); text-wrap: pretty; }
+.info-t { color: var(--ink); font-weight: 700; }
+/* The entry a link landed on, marked so the reader can see WHICH one answered
+   them - the scroll puts it mid-screen, where nothing else says "this one". */
+.info-term.lit {
+  border-left: 2px solid var(--accent);
+  padding-left: 15px; margin-left: -17px;
+}
+/* the way back rides the end of the sentence it belongs to, not a band above */
+.info-back { margin-left: 10px; vertical-align: baseline; }
+.method-slim .method-pointer { margin: 0 0 18px; font-size: 13px; color: var(--ink-3); }
+
 .back-to-chart {
   display: inline-flex; align-items: center; gap: 6px;
   align-self: center; flex: none;
@@ -2480,6 +2509,10 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
 /* ============================================================
    TABS – editorial section nav beneath the header
    ============================================================ */
+/* Info gives up its place to the docked 2PP score once the bar pins. Not when
+   it is the ACTIVE tab, though: hiding the tab a reader is standing on leaves
+   the bar with nothing selected and no way back to the view they are reading. */
+.tabs.pinned .tab-pinhide:not(.active) { display: none; }
 .tabs-sentinel { height: 0; margin: 0; padding: 0; pointer-events: none; }
 .tabs {
   position: relative;

@@ -848,7 +848,16 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               cannot cover bias shared across the industry, which no aggregate
               can measure about itself. */}
           <div className="hero-interval">
-            <span className="hi-method">{adjusted ? "Weighted aggregate" : "Monthly average"}</span>
+            {/* The label names the method; now it also explains it. Everything
+                this figure is built on has a definition in Info, and the word
+                the reader is looking at is the shortest way to it. */}
+            <button type="button" className="hi-method hi-term"
+                    title={"What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"}
+                    onClick={() => window.AP.openTerm &&
+                      window.AP.openTerm(adjusted ? "weighted-aggregate" : "monthly-average",
+                                         "two-party preferred")}>
+              {adjusted ? "Weighted aggregate" : "Monthly average"}
+            </button>
             {!adjusted && <span className="eyebrow-warn">Limited data</span>}
             {unc && <span className="hi-range">± {unc.ci95.toFixed(1)} pts</span>}
             {unc && (
@@ -1221,95 +1230,21 @@ function ReportError() {
   );
 }
 
-function MethodNote() {
-  const { D } = window.AP;
-  // pollster list straight from the archive, busiest first
-  const counts = {};
-  D.individualPolls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
-  const sources = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).join(", ");
+/* What is left of the method footer. Its three sections of prose - about the
+   tracker, reading the charts, sources - are now the Info tab's glossary,
+   where a reader can find one definition without reading all of them and
+   without scrolling past the whole page to get there.
+
+   What stays is not information but furniture: the way to report an error,
+   which belongs wherever the reader notices one, and the standing caveat on
+   the figures, which has to sit under the figures rather than one tab away. */
+function MethodNote({ onInfo }) {
   return (
-    <footer className="method">
-      <div className="method-grid">
-        <div>
-          <h2 className="method-h">About this tracker</h2>
-          <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
-             election. The two-party and primary-vote aggregates are weighted means: recent and
-             larger polls count for more, and each pollster’s figure is adjusted for its own
-             lean against the consensus of all houses. Where one house publishes more than once
-             in a window or a calendar month – Roy Morgan polls weekly – its repeat waves count
-             for the square root of their number, so three weekly waves count as 1.7, not 3.
-             The lean is measured separately for
-             every measure – a firm that leans one way on the classic two-party is not assumed
-             to lean the same way on a primary share or an ALP-v-One Nation head-to-head – and
-             a matchup too few houses ask is left as a plain monthly average rather than adjusted
-             on guesswork. Houses that publish no two-party figure feed the primary-vote and
-             leadership series only.</p>
-          <p>The headline carries a 95% interval – the greater of the spread among polls in
-             the window and their sampling error – currently about
-             {" "}±{(D.latest.alp2ppCi95 ?? 0).toFixed(1)} points on {D.latest.method.nPolls} polls
-             across {D.latest.method.windowDays} days (effective sample {D.latest.alp2ppNEff} after
-             weighting). It cannot cover error the whole industry shares: an aggregate has no way
-             to see a lean every poll in it carries. Movement smaller than the
-             interval is marked as such.</p>
-          {/* The industry-wide error the paragraph above says an aggregate
-              cannot see about itself IS measurable after the fact, and the
-              page now measures it. Saying so here, where the caveat is made,
-              is the difference between a disclaimer and an answer. */}
-          {D.accuracy && (
-            <p>That caveat is not idle. Across the {D.accuracy.cycles.length} elections from
-               {" "}{D.accuracy.cycles[0].year} to {D.accuracy.cycles[D.accuracy.cycles.length - 1].year}{" "}
-               the final polls missed the two-party result by
-               {" "}{D.accuracy.meanAbs} points on average – at {D.accuracy.worstCycle.year} by
-               {" "}{Math.abs(D.accuracy.worstCycle.err)}, every house on the same side of it.
-               Past cycles carries the full record, house by house.</p>
-          )}
-          {/* The diagnostic lives here rather than nowhere: if the site is
-              going to compute a flow-table 2PP at all, it says so with its
-              measured miss against the election attached, next to the
-              guarantee that the headline never uses it. The "on request"
-              pointer keeps the hero control (its legend and caption say the
-              rest) from needing to carry the full explanation. */}
-          {D.synthLatest && D.synth2pp && D.synth2pp.length > 1 && (
-            <p><strong>What the primaries imply.</strong> An optional dashed line on the two-party
-               chart ("Compare implied 2PP") draws what the same polls’ own primary votes add up to
-               under one fixed preference-flow table – the flows as they actually ran at the 2025
-               election (<a href="https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm"
-               target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5%, all others
-               54.6% to Labor</a>) – every formal ballot redistributed
-               Labor v Coalition, so run back over the election’s own primaries that table returns
-               the {D.synth2pp[0].alp.toFixed(1)} it was built from. At One Nation’s current
-               {" "}{Math.round(D.aggPrimary[D.aggPrimary.length - 1].onp)}% primary, five points of
-               doubt about their flow rate is
-               {" "}{(D.aggPrimary[D.aggPrimary.length - 1].onp * 0.05).toFixed(1)} points of
-               two-party either way. Today the table reads {D.synthLatest.alp.toFixed(1)} against
-               the aggregate’s {D.latest.alp2pp.toFixed(1)} – a gap, not a verdict: pollsters’ own
-               allocations answer a live question a fixed table cannot, so the headline stays the
-               published aggregate.</p>
-          )}
-        </div>
-        <div>
-          <h2 className="method-h">Reading the charts</h2>
-          <p>Each dot is one published poll; the lines are monthly aggregates, shaded with the 95%
-             interval around them. Where the two bands meet, that month’s lead is inside its own
-             margin of error. Leadership questions are asked irregularly and worded differently from
-             house to house, so those lines simply join published readings. A “—” in any
-             table means the pollster didn’t ask that question.</p>
-          {/* The single most-requested number this page does not carry. Better
-              to say why once, plainly, than to keep declining to say it. */}
-          <p><strong>Why there is no seat projection here.</strong> Turning a national two-party
-             figure into a seat count assumes a uniform swing, and with One Nation near
-             {" "}{Math.round(D.aggPrimary[D.aggPrimary.length - 1].onp)}% of the primary vote the
-             assumption fails in exactly the seats that would decide the election: a large minor
-             party wins seats where its vote is concentrated and none where it is not – and no
-             national number knows the difference. Seat figures appear on this page only where a
-             pollster modelled them seat by seat and published the result, which is what the MRP
-             tag in the archive marks.</p>
-        </div>
-        <div>
-          <h2 className="method-h">Sources</h2>
-          <p>{sources}. Field dates and sample sizes are listed per poll in the archive.</p>
-        </div>
-      </div>
+    <footer className="method method-slim">
+      <p className="method-pointer">
+        Every term on this site is defined in{" "}
+        <button type="button" className="hi-term" onClick={onInfo}>Info</button>.
+      </p>
       <ReportError />
       <div className="disclaimer">
         Unofficial aggregate of published national polling. Aggregate figures are estimates, not
@@ -1330,6 +1265,10 @@ const TABS = [
   { id: "snapshot", label: "Snapshot" },
   { id: "cycles", label: "Past cycles" },
   { id: "allpolls", label: "All polls" },
+  /* pinHide: the docked 2PP score takes this end of the bar once the bar
+     pins, and on a phone there is not room for both. The glossary is the one
+     tab a reader is never mid-task in, so it is the one that yields. */
+  { id: "info", label: "Info", pinHide: true },
 ];
 const TAB_IDS = TABS.map((t) => t.id);
 
@@ -1374,6 +1313,7 @@ function App() {
   };
   const [tab, setTab] = useState(readHash);
   const [focusPoll, setFocusPoll] = useState(null);   // the poll a chart dot sent us to
+  const [focusTerm, setFocusTerm] = useState(null);   // the glossary entry a link sent us to
   React.useEffect(() => {
     const fn = () => setTab(readHash());
     window.addEventListener("hashchange", fn);
@@ -1385,8 +1325,10 @@ function App() {
     window.scrollTo({ top: 0, behavior: "auto" });
     // walking off with the tabs ends the trip: coming back to the archive later
     // should not still be holding a row open with a way back to a chart the
-    // reader has long since left
+    // reader has long since left. Same for a glossary entry still offering to
+    // return somewhere the reader has since walked away from.
     setFocusPoll(null);
+    setFocusTerm(null);
   };
 
   /* Clicking a dot on any chart crosses to that poll in the archive, opened.
@@ -1408,7 +1350,17 @@ function App() {
       setTab("allpolls");
       if (readHash() !== "allpolls") window.location.hash = "allpolls";
     };
-    return () => { delete window.AP.openPoll; };
+    /* The same trip, for a definition. Any panel can send a reader to the term
+       that explains a word it just used - the hero's method label is the first
+       - and `from` names the place being left in the words the return button
+       will use, so the way back can say where it goes rather than guessing. */
+    window.AP.openTerm = (id, from) => {
+      if (!id) return;
+      setFocusTerm({ id, back: { tab: readHash(), y: window.scrollY, from: from || "where you were" } });
+      setTab("info");
+      if (readHash() !== "info") window.location.hash = "info";
+    };
+    return () => { delete window.AP.openPoll; delete window.AP.openTerm; };
   }, []);
   /* The return trip puts the reader back on the pixel they left from. The
      scroll is handed to a layout effect rather than to requestAnimationFrame:
@@ -1420,6 +1372,13 @@ function App() {
   const backFromPoll = () => {
     const b = (focusPoll && focusPoll.back) || { tab: "snapshot", y: 0 };
     setFocusPoll(null);
+    restoreY.current = b.y;
+    setTab(b.tab);
+    if (readHash() !== b.tab) window.location.hash = b.tab;
+  };
+  const backFromTerm = () => {
+    const b = (focusTerm && focusTerm.back) || { tab: "snapshot", y: 0 };
+    setFocusTerm(null);
     restoreY.current = b.y;
     setTab(b.tab);
     if (readHash() !== b.tab) window.location.hash = b.tab;
@@ -1511,8 +1470,11 @@ function App() {
           {tab === "cycles" && <PastCyclesView />}
           {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
             backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null} />}
+          {tab === "info" && <InfoView focus={focusTerm ? focusTerm.id : null}
+            onBack={focusTerm ? backFromTerm : null}
+            backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}
         </div>
-        <MethodNote />
+        <MethodNote onInfo={() => goTab("info")} />
       </main>
 
       <TweaksPanel>

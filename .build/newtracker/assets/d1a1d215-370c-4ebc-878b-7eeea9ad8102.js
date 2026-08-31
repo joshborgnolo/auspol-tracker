@@ -122,7 +122,8 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
                          arrow keys move within it, per the ARIA tabs pattern */
                       tabIndex={active === t.id ? 0 : -1}
                       ref={(el) => { btnRefs.current[t.id] = el; }}
-                      className={"tab" + (active === t.id ? " active" : "")}
+                      className={"tab" + (active === t.id ? " active" : "")
+                                 + (t.pinHide ? " tab-pinhide" : "")}
                       onClick={() => onChange(t.id)}>
                 <span className="tab-label">{t.label}</span>
                 {t.note != null && <span className="tab-note">{t.note}</span>}
@@ -2551,6 +2552,156 @@ function AllPollsView({ focus, onBack, backLabel }) {
   );
 }
 
-Object.assign(window, { Tabs, PastCyclesView, AllPollsView,
+
+// ====================================================================
+// INFO – the glossary
+// ====================================================================
+/* Every term the rest of the site uses, defined once, alphabetically. It
+   replaces the method footer that used to sit under all three tabs: three
+   sections of flowing prose that a reader had to scroll past the whole page
+   to reach and then read end-to-end to find one definition.
+
+   The figures inside are LIVE. A definition that quotes a number has to quote
+   the current one or it becomes a second, drifting copy of the page - the same
+   rule the share card is held to.
+
+   Every entry carries a stable id, because other panels link INTO them: the
+   hero's "Weighted aggregate" is a link to the entry defining it, and the
+   entry arrived at grows a way back (see window.AP.openTerm). Ids are fixed
+   strings rather than slugs derived from the term, so rewording a heading
+   cannot quietly break a link pointing at it. */
+function infoTerms(D) {
+  const L = D.latest, prim = D.aggPrimary[D.aggPrimary.length - 1];
+  const counts = {};
+  D.individualPolls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
+  const sources = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).join(", ");
+  const onp = Math.round(prim.onp);
+  const acc = D.accuracy;
+  const list = [
+    { id: "interval", term: "95% interval", body: (
+      <>The uncertainty carried beside the headline: the greater of the spread among the polls in
+      the window and their sampling error – currently ±{(L.alp2ppCi95 ?? 0).toFixed(1)} points on
+      {" "}{L.method.nPolls} polls across {L.method.windowDays} days. It cannot cover error the
+      whole industry shares, because an aggregate has no way to see a lean every poll inside it
+      carries. Movement smaller than the interval is marked as such rather than reported as a
+      change.</>) },
+    { id: "effective-sample", term: "Effective sample", body: (
+      <>How many polls the window is really worth once weighting is applied – currently
+      {" "}{L.alp2ppNEff} of the {L.method.nPolls} in it. Recency, sample size and the square-root
+      discount on repeat waves all pull it below the raw count, and it is what the interval is
+      computed against.</>) },
+    { id: "house-effect", term: "House effect", body: (
+      <>A pollster's own lean against the consensus of all houses, measured across every poll it has
+      published and shrunk toward zero when it has published few. The aggregates subtract it. It is
+      measured separately for every measure – a firm that leans one way on the classic two-party is
+      not assumed to lean the same way on a primary share or on an ALP-v-One Nation head-to-head –
+      and it is a property of the pollster, not of any single poll.</>) },
+    { id: "implied-2pp", term: "Implied 2PP", body: (
+      <>An optional dashed line on the two-party chart ("Compare implied 2PP") showing what the same
+      polls' own primary votes add up to under one fixed preference-flow table. It is a diagnostic,
+      never the headline: pollsters' own allocations answer a live question a fixed table cannot.
+      {D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? (
+        <> Today the table reads {D.synthLatest.alp.toFixed(1)} against the aggregate's
+        {" "}{L.alp2pp.toFixed(1)} – a gap, not a verdict. At One Nation's current {onp}% primary,
+        five points of doubt about their flow rate is {(prim.onp * 0.05).toFixed(1)} points of
+        two-party either way.</>
+      ) : null}</>) },
+    { id: "individual-poll", term: "Individual poll", body: (
+      <>One published poll, drawn as a single dot. The lines through them are monthly aggregates,
+      shaded with the 95% interval around them; where two bands meet, that month's lead is inside
+      its own margin of error. A "—" in any table means the pollster did not ask that question.</>) },
+    { id: "monthly-average", term: "Monthly average", body: (
+      <>What a matchup gets when too few houses ask it for house effects to be estimable: a plain
+      mean of the month's polls, adjusted for nothing. The hero says which of the two it is showing,
+      because a matchup that switched silently from an adjusted aggregate to a bare average would
+      read as the more precise of the two.</>) },
+    { id: "mrp", term: "MRP", body: (
+      <>Multilevel regression and post-stratification – a model that estimates each seat separately
+      rather than applying one national swing to all of them. Seat figures appear on this site only
+      where a pollster modelled them seat by seat and published the result, which is what the MRP
+      tag in the archive marks.</>) },
+    { id: "net-approval", term: "Net approval", body: (
+      <>Approve minus disapprove for a party leader. These questions are asked irregularly and
+      worded differently from house to house, so the lines simply join published readings rather
+      than aggregating them.</>) },
+    { id: "polling-error", term: "Polling error", body: acc ? (
+      <>How far the final polls have missed. Across the {acc.cycles.length} elections from
+      {" "}{acc.cycles[0].year} to {acc.cycles[acc.cycles.length - 1].year} they missed the
+      two-party result by {acc.meanAbs} points on average – at {acc.worstCycle.year} by
+      {" "}{Math.abs(acc.worstCycle.err)}, with every house on the same side of it. This is the
+      error an aggregate cannot see about itself, measured after the fact. Past cycles carries the
+      full record, house by house.</>) : (
+      <>How far the final polls have missed at past elections. Past cycles carries the record,
+      house by house.</>) },
+    { id: "preference-flows", term: "Preference flows", body: (
+      <>How minor-party ballots split between the two final candidates. The implied-2PP diagnostic
+      uses the flows as they actually ran at the 2025 election
+      {" "}(<a href="https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm"
+      target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5%, all others 54.6% to
+      Labor</a>), every formal ballot redistributed Labor v Coalition.</>) },
+    { id: "primary-vote", term: "Primary vote", body: (
+      <>First-preference share – who voters put 1 beside, before any preferences are distributed.
+      Houses that publish no two-party figure still feed this series and the leadership ones.</>) },
+    { id: "seat-projection", term: "Seat projection", body: (
+      <>Not carried here, deliberately. Turning a national two-party figure into a seat count
+      assumes a uniform swing, and with One Nation near {onp}% of the primary vote that assumption
+      fails in exactly the seats that would decide the election: a large minor party wins seats
+      where its vote is concentrated and none where it is not, and no national number knows the
+      difference.</>) },
+    { id: "sources", term: "Sources", body: (
+      <>Every national voting-intention poll published since the May 2025 federal election, from:
+      {" "}{sources}. Field dates and sample sizes are listed per poll in the archive.</>) },
+    { id: "two-party-preferred", term: "Two-party preferred", body: (
+      <>The share each of two parties holds once every other candidate's preferences have been
+      distributed – the number that decides a seat. The headline contest is Labor against the
+      Coalition; the hero can be switched to the other head-to-heads pollsters publish.</>) },
+    { id: "weighted-aggregate", term: "Weighted aggregate", body: (
+      <>The headline method. Recent and larger polls count for more, and each pollster's figure is
+      adjusted for its own house effect. Where one house publishes more than once in a window or a
+      calendar month – Roy Morgan polls weekly – its repeat waves count for the square root of
+      their number, so three weekly waves count as 1.7, not 3.</>) },
+  ];
+  /* Sorted here rather than written in order, so an entry added later cannot
+     land in the wrong place. localeCompare with numeric so "95% interval"
+     sorts as a number and not as the character 9. */
+  return list.sort((a, b) => a.term.localeCompare(b.term, "en", { numeric: true }));
+}
+
+function InfoView({ focus, onBack, backLabel }) {
+  const { D } = window.AP;
+  const terms = infoTerms(D);
+  /* A layout effect, for the reason the archive's restore uses one: the view
+     has to be in the DOM before it is tall enough to take the scroll. */
+  React.useLayoutEffect(() => {
+    if (!focus) return;
+    const el = document.getElementById("term-" + focus);
+    if (el) el.scrollIntoView({ block: "center", behavior: "auto" });
+  }, [focus]);
+  return (
+    <section className="card info">
+      <div className="card-head">
+        <h2 className="card-title">Info</h2>
+        <p className="card-sub">Every term this site uses, defined once.</p>
+      </div>
+      {terms.map((t) => (
+        <p key={t.id} id={"term-" + t.id}
+           className={"info-term" + (focus === t.id ? " lit" : "")}>
+          <strong className="info-t">{t.term}.</strong> {t.body}
+          {focus === t.id && onBack && (
+            <button className="back-to-chart info-back" onClick={onBack}>
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+                   strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M19 12H5M11 18l-6-6 6-6" />
+              </svg>
+              Back to {backLabel || "where you were"}
+            </button>
+          )}
+        </p>
+      ))}
+    </section>
+  );
+}
+
+Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView,
   // shared cell renderers reused by the latest-polls table
   ArchSortTh, ArchPublished, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo });
