@@ -1579,13 +1579,22 @@ function archLeadInfo(p, measure) {
 // it – its held-by filter and sort run off archLeadInfo directly, and a
 // primary margin must not leak into that ordering. Display-only, same opt-in
 // principle as the 3cp derivation this file already notes inline.
+// The margin runs against the poll's STRONGEST rival, not always the
+// Coalition: One Nation's primary now tops the L/NP vote in some waves, so an
+// "ALP +10" vs a third-placed Coalition would hide that Labor actually
+// trails One Nation. The note names the rival so the margin can't be misread.
 function primaryLeadInfo(p) {
   if (!p.p || p.p.alp == null || p.p.lnp == null) return null;
-  const m = +(p.p.alp - p.p.lnp).toFixed(1);
-  return { m, primary: true, who: m >= 0 ? "alp" : "lnp", lab: m >= 0 ? "ALP" : "L/NP",
-           color: m >= 0 ? "var(--alp)" : "var(--lnp)",
-           segs: [{ v: p.p.alp, color: "var(--alp)" }, { v: p.p.lnp, color: "var(--lnp)" }],
-           note: " on primary votes – the poll published no after-preferences figure" };
+  const opp = [["lnp", "L/NP", p.p.lnp, "var(--lnp)"], ["onp", "ON", p.p.onp, "var(--onp)"], ["grn", "GRN", p.p.grn, "var(--grn)"]]
+    .filter((e) => e[2] != null)
+    .sort((a, b) => b[2] - a[2])[0];
+  const m = +(p.p.alp - opp[2]).toFixed(1);
+  const alpWins = m >= 0;
+  return { m, primary: true, who: alpWins ? "alp" : opp[0],
+           lab: alpWins ? "ALP" : opp[1],
+           color: alpWins ? "var(--alp)" : opp[3],
+           segs: [{ v: p.p.alp, color: "var(--alp)" }, { v: opp[2], color: opp[3] }],
+           note: ` over ${alpWins ? opp[1] : "ALP"} on primary votes – the poll published no after-preferences figure` };
 }
 function ArchLead({ p, measure, primaryFallback }) {
   const li = archLeadInfo(p, measure) ||
