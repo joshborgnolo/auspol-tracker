@@ -2064,6 +2064,10 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-s b { font-weight: 700; color: var(--ink); }
 .pd-s-chg .chg { margin-left: 1px; }
 .pd-s-note { color: var(--ink-3); }
+a.pd-release { text-decoration: none; cursor: pointer; }
+a.pd-release:hover, a.pd-release:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+a.pd-release:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
+a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: var(--ink-2); }
 /* the residual – undecided, don't know, unsure. ONE treatment everywhere, and
    never the bar's own track colour: it used to be var(--line-2), which is
    exactly .sbar's background, so nineteen points of a preferred-PM bar were

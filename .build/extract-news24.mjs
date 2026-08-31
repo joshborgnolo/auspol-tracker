@@ -793,7 +793,7 @@ function parseWikiYouGov(text) {
 }
 
 // --------------------------------------------------------------- entry
-const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [] };
+const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [], releaseFilled: [] };
 
 if (NEWS24_OF) { // dev oracle: parse one News24 article, print the record, exit
   const art = await fetchNews24Article(NEWS24_OF);
@@ -824,6 +824,14 @@ try {
   const D = JSON.parse(orig);
   const ygDates = new Set(D.polls.filter((p) => p.pollster === "YouGov").map((p) => p.date));
   const latestYg = [...ygDates].sort().pop();
+  const youGovByDate = new Map(D.polls.filter((p) => p.pollster === "YouGov").map((p) => [p.date, p]));
+  // Waves still waiting on a self-release link (releaseUrl absent, source not
+  // already a yougov.com release): keep RSS candidates this old alive so a
+  // release published after the wave landed gets backfilled — mirror of the
+  // RedBridge extractor's filledRelease logic.
+  const fillableFloor = [...youGovByDate.values()]
+    .filter((p) => !p.releaseUrl && !(p.url ?? "").startsWith("https://yougov.com/"))
+    .map((p) => p.date).sort()[0];
 
   const rss = (await fetchText(RSS)).text;
   const items = [];
@@ -837,8 +845,11 @@ try {
     items.push({ title, link, pubIso: pubIso ? dateIso(new Date(pubIso)) : null });
   }
   // A wave publishes within days of fieldwork end; the RSS item's pubDate
-  // pre-screen drops articles older than the latest known wave.
-  const cands = latestYg ? items.filter((i) => !i.pubIso || i.pubIso >= latestYg) : items;
+  // pre-screen drops articles older than the latest known wave — unless a
+  // canon wave still lacks its releaseUrl (releases are occasional and can
+  // post-date the wave, which usually lands via the Wikipedia path first).
+  const cands = items.filter((i) =>
+    !i.pubIso || i.pubIso >= (latestYg ?? "") || (fillableFloor && i.pubIso >= fillableFloor));
 
   const recs = [];
   const seen = new Set();
@@ -858,7 +869,15 @@ try {
   const guardFails = [];
   const newPolls = [], newPpm = [], newAppr = [], newAlt = [], newPpmH = [], sources = [];
   for (const rec of recs.sort((a, b) => (a.date < b.date ? -1 : 1))) {
-    if (ygDates.has(rec.date)) { status.skipped_existing.push(rec.date); continue; }
+    if (ygDates.has(rec.date)) {
+      status.skipped_existing.push(rec.date);
+      const hit = youGovByDate.get(rec.date);
+      if (hit && !hit.releaseUrl && hit.url !== rec.url) {
+        hit.releaseUrl = rec.url;
+        status.releaseFilled.push(rec.date);
+      }
+      continue;
+    }
     const errs = guard(rec);
     if (errs.length) { guardFails.push(`${rec.date}: ${errs.join(" | ")}`); continue; }
     const era = olFor(rec.date);
@@ -1032,7 +1051,7 @@ try {
     process.exit(2);
   }
 
-  if (sources.length) {
+  if (sources.length || status.releaseFilled.length) {
     if (newPolls.length) D.polls = [...D.polls, ...newPolls].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
     for (const [key, rows] of [["ppm", newPpm], ["approval", newAppr], ["altTpp", newAlt], ["ppmHeadToHead", newPpmH]]) {
       if (!rows.length) continue;
@@ -1050,6 +1069,7 @@ try {
       const parts = [];
       if (newPolls.length) parts.push(`+${newPolls.length} YouGov wave(s): ${status.added.map((a) => a.date).join(", ")}`);
       if (status.news24.upgraded.length) parts.push(`enriched latest News24 wave: ${status.news24.upgraded.join(", ")}`);
+      if (status.releaseFilled.length) parts.push(`releaseUrl filled: ${status.releaseFilled.join(", ")}`);
       console.log(`wrote ${OUT}: ${parts.join(", ")}`);
     }
   }

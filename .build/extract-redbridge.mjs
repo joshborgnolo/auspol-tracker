@@ -24,7 +24,10 @@
 // per wave on an OS-assigned debug port and killed afterwards). The page also
 // yields the publication date line ("2 August 2026") and the link to the AFR
 // coverage, which is preferred over the PDF as the row's `url` (Feb 2026 is
-// the only committed row citing the usrfiles PDF directly).
+// the only committed row citing the usrfiles PDF directly). The sitemap <loc>
+// itself is kept too: it is the wave's `releaseUrl`, the pollster's own
+// release page the expanded poll links as "Pollster's release" — set on new
+// waves and filled onto already-committed rows that lack it.
 //
 // AFR TOPIC-PAGE CROSS-CHECK (added Aug 2026): AFR publishes each wave's
 // coverage on release Sunday 18:00, but the accent-research.com project
@@ -634,6 +637,7 @@ if (process.env.RB_LIB !== "1") try {
   mkdirSync(SRC_DIR, { recursive: true });
   const guardFails = [];
   const newRows = { polls: [], ppm: [], approval: [], altTpp: [] };
+  const filledRelease = [];
 
   for (const c of candidates) {
     const cachePath = `${SRC_DIR}/${c.slug}.json`;
@@ -690,6 +694,13 @@ if (process.env.RB_LIB !== "1") try {
         diffs.push(...d2.map((s) => `${sec}: ${s}`));
       }
 
+      // the sitemap's own loc is the pollster's release page: a committed row
+      // that lacks it gains it free of re-ingest (check mode reports instead)
+      if (!matchPoll.releaseUrl) {
+        if (CHECK) diffs.push(`releaseUrl: file lacks the wave's project page (${c.url})`);
+        else { matchPoll.releaseUrl = c.url; filledRelease.push(matchPoll.date); }
+      }
+
       status.verified.push({ date: matchPoll.date, slug: c.slug, ok: diffs.length === 0 });
       if (diffs.length) status.mismatches.push({ date: matchPoll.date, slug: c.slug, diffs });
       continue;
@@ -724,6 +735,7 @@ if (process.env.RB_LIB !== "1") try {
         tpp_alp: w.tppResp, tpp_lnp: w.tppResp != null ? 100 - w.tppResp : null,
         ...(w.tppHist != null ? { tpp_flows: w.tppHist } : {}),
         url: w.afrUrl || w.pdfUrl,
+        releaseUrl: c.url,
       }),
       ppm: { date: w.date, firm: POLLSTER, alb: w.ppm.alb, opp: w.ppm.opp, oppName: w.oppName, han: w.ppm.han, extra: null },
       approval: { date: w.date, firm: POLLSTER, alb: w.nets.alb, opp: w.nets.opp, oppName: w.oppName, han: w.nets.han, detail: w.detail },
@@ -743,9 +755,12 @@ if (process.env.RB_LIB !== "1") try {
     process.exit(2);
   }
 
-  if (Object.values(newRows).some((r) => r.length)) {
+  const hasNew = Object.values(newRows).some((r) => r.length);
+  if (hasNew)
     for (const sec of ["polls", "ppm", "approval", "altTpp"])
       if (newRows[sec].length) D[sec] = [...D[sec], ...newRows[sec]].sort(byDate);
+  if (filledRelease.length) status.releaseFilled = filledRelease;
+  if (hasNew || filledRelease.length) {
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
     const next = JSON.stringify(D, null, 2) + trailingNl;
     status.changed = next !== orig;

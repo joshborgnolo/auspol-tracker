@@ -36,6 +36,14 @@ new and worth looking at.
   Its combined "Independents/Other" goes in `ind` with `oth: null`.
 - **Newspoll** and **Resolve** often publish no headline 2PP – leave `tpp_*` null
   rather than deriving one.
+- **RedBridge / Accent** rows cite the AFR write-up in `url`; the wave's own
+  release page on accent-research.com goes beside it in `releaseUrl` (the
+  extractor fills it for new waves, and the expanded poll shows it as
+  "Pollster's release"). Absent, not zero: some waves never got an Accent page.
+- **YouGov / News24** rows work the same way: `url` cites the media write-up;
+  a wave YouGov self-released on yougov.com carries that release in
+  `releaseUrl` (the extractor fills it when one surfaces). Absent, not zero:
+  YouGov releases only a few waves per series.
 - Leadership rows must key to **fieldwork end**, matching their poll. An
   unexplained "leadership-only" row in the build output usually means a date has
   drifted off its poll, not that the firm skipped voting intention.

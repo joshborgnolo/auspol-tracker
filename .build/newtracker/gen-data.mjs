@@ -923,6 +923,10 @@ const individualPolls = POLLS.map((p) => {
     // citation Wikipedia carries for it). Omitted where no source is cited,
     // so the views can fall back to plain text.
     ...(p.url ? { url: p.url } : {}),
+    // the pollster's own release page, when it isn't what `url` cites – the
+    // expanded poll links it as "Pollster's release" (RedBridge/Accent waves,
+    // whose citation is the AFR write-up)
+    ...(p.releaseUrl ? { releaseUrl: p.releaseUrl } : {}),
     // right-track / wrong-track, where this poll asked it
     ...(DIR_BY.has(p.date + "|" + p.pollster) ? { dir: DIR_BY.get(p.date + "|" + p.pollster) } : {}),
     // seat projections – MRPs only. Carried verbatim; their change basis is the
@@ -977,6 +981,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     ...(p.url ? { url: p.url } : {}),
+    ...(p.releaseUrl ? { releaseUrl: p.releaseUrl } : {}),
     ...(DIR_BY.has(p.date + "|" + p.pollster) ? { dir: DIR_BY.get(p.date + "|" + p.pollster) } : {}),
     // a modelled chamber travels with the poll here too, not only into the
     // archive – a projection published this week belongs in Latest polls

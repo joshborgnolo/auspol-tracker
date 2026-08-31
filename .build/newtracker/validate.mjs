@@ -53,6 +53,11 @@ export function validate(D) {
       fail("flows-range", `tpp_flows = ${p.tpp_flows}`);
     if (p.tpp_flows != null && !["Roy Morgan", "RedBridge / Accent"].includes(p.pollster))
       fail("flows-pollster", `tpp_flows on a row for ${p.pollster}`);
+    // 2c. releaseUrl, where present, is the pollster's OWN release page – an
+    //     absolute https URL. Anything else is a hand-entry slip, not a
+    //     weird source.
+    if (p.releaseUrl != null && (typeof p.releaseUrl !== "string" || !/^https:\/\/.+\..+\//.test(p.releaseUrl)))
+      fail("release-url", `releaseUrl = ${JSON.stringify(p.releaseUrl)}`);
     // 3. dates parse, run oldest→newest, and fieldwork starts before it ends
     const ts = Date.parse(p.date);
     if (isNaN(ts)) fail("bad-date", `unparseable date "${p.date}"`);
