@@ -1922,11 +1922,10 @@ function LedgerRow({ label, name, segs }) {
   );
 }
 
-/* Leader approval as a text line: "Albanese: 38% approve, 59% disapprove,
-   3% don't know". The don't-know is the residual of the published pair. The
-   net rides at the end of the same line with its change tag; a wave that
-   printed only the net says so rather than inventing a split. */
-function ApprLine({ id, appr, chg }) {
+/* Leader approval as figures: approve · don't know · disapprove, with the
+   net kept for the margin column. The don't-know is the measure's residual,
+   so it takes the same muted ink undecided wears in the shares rows. */
+function LedgerApprRow({ id, appr, chg }) {
   const s = appr[id], net = appr[id + "Net"];
   if (s == null && net == null) return null;
   const mt = (appr.metricBy && appr.metricBy[id]) || "approval";
@@ -1938,29 +1937,59 @@ function ApprLine({ id, appr, chg }) {
   const dk = s ? Math.max(0, 100 - s.app - s.dis) : 0;
   const d = chg && chg.d[id + "Net"] != null ? { v: chg.d[id + "Net"], refDate: chg.r[id + "Net"] } : null;
   // some waves publish BOTH measures for one leader (Resolve rates the majors
-  // on performance and likeability); the second trails on the same line –
-  // never averaged in, never a correction of the first.
+  // on performance and likeability). They answer different questions, so the
+  // second sits beside the first – never averaged in, never a correction of it.
   const alt = appr.alt && appr.alt[id];
   return (
-    <div className="pd-s">
-      {label}: {s
-        ? <React.Fragment>
-            <b>{s.app}%</b> {leg[0]}, <b>{s.dis}%</b> {leg[2]}, <b>{dk}%</b> {leg[1]}
-          </React.Fragment>
-        : <span className="pd-s-note">no {leg[0]} / {leg[2]} split published ·</span>}
-      {net != null && (
-        <React.Fragment>
-          {" "}net <NetVal v={net} /><FavMark metric={mt} />
-          <ChgParen d={d} />
-        </React.Fragment>
-      )}
-      {alt && (
-        <span className="pd-s-note"
-              title="This pollster asked both questions of this leader in the same wave – favourability (positive minus negative) is not directly comparable with approval">
-          {" "}· also {alt.metric === "fav" ? "favourability" : "approval"} <NetVal v={alt.net} />
-        </span>
-      )}
+    <div className="pd-lrow">
+      <div className="pd-lgut pd-lgut-name">
+        <span className="skey-dot" style={{ background: LEADER_META[id].color }}></span>{label}
+      </div>
+      <div className="pd-lscale">
+        {s
+          ? <div className="pd-lnums">
+              <span className="pd-lnum"><b>{s.app}</b> <span>{leg[0]}</span></span>
+              <span className="pd-lnum muted"><b>{dk}</b> <span>{leg[1]}</span></span>
+              <span className="pd-lnum"><b>{s.dis}</b> <span>{leg[2]}</span></span>
+            </div>
+          : <div className="pd-lnote">Net only – this pollster published no {leg[0]} / {leg[2]} split</div>}
+        {alt && (
+          <div className="pd-lnote"
+               title="This pollster asked both questions of this leader in the same wave – favourability (positive minus negative) is not directly comparable with approval">
+            also {alt.metric === "fav" ? "favourability" : "approval"}{" "}
+            <NetVal v={alt.net} />
+          </div>
+        )}
+      </div>
+      <div className="pd-lmar">
+        {net == null
+          ? <span className="dash" title="Not asked by this pollster">—</span>
+          : <React.Fragment>
+              <span className="pd-lmar-v"><NetVal v={net} /><FavMark metric={mt} /></span>
+              <span className="pd-lmar-k">net <ChgTag v={d ? d.v : null} refDate={d ? d.refDate : null} /></span>
+            </React.Fragment>}
+      </div>
     </div>
+  );
+}
+
+/* A group of rows under one heading. The rule goes BEFORE each row rather than
+   after, so a group never ends on a hanging hairline. */
+function LedgerGroup({ label, absent, children }) {
+  const kids = React.Children.toArray(children).filter(Boolean);
+  if (!kids.length && !absent) return null;
+  return (
+    <React.Fragment>
+      <div className="pd-lgroup"><div className="pd-k">{label}</div></div>
+      {kids.length
+        ? kids.map((k, i) => (
+            <React.Fragment key={i}>
+              <div className="pd-lrule" aria-hidden="true"></div>
+              {k}
+            </React.Fragment>
+          ))
+        : <div className="pd-lwide"><div className="pd-absent">{absent}</div></div>}
+    </React.Fragment>
   );
 }
 
@@ -1971,89 +2000,52 @@ function PollLedger({ r, dirSegments }) {
   const tcs = tppContests(r);
   const ppms = ppmContests(r);
   const appr = r.appr || {};
-  // "can't say" sits beside the primaries it was taken out of; the basis word
-  // says WHERE the figure sits, which is what decides how the shares read
-  const dUnd = segDelta(r.chg, "und");
-  const undBasis = r.undecidedBasis === "tpp" ? "inside the pair"
-                 : r.undecidedBasis === "soft" ? "not firm" : "set aside";
+  const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
   return (
-    <div className="pd-simple">
+    <div className="pd-ledger">
 
-      <PdSec label={tppHeading(tcs)}>
-        {tcs.map((c) => (
-          <TppLine key={c.kind} c={c} prefixed={tcs.length > 1} />
+      <LedgerGroup label={tppHeading(tcs)}
+                   absent="No two-party figure published with this poll">
+        {tcs.map((c, i) => (
+          <LedgerRow key={"t" + i} label={c.lab.replace(/^2PP · /, "")} segs={c.segs} />
         ))}
-        {/* Roy Morgan's second ALP–L/NP 2PP: same question, the 2025
-            election's flows applied to these primaries, so it is a line in
-            this section and not a footnote */}
-        {r.tppFlows != null && (
-          <div className="pd-s">
-            {tcs.length > 1 ? "ALP v L/NP: " : ""}
-            <b>{r.tppFlows}%</b> ALP vs <b>{Math.round((100 - r.tppFlows) * 10) / 10}%</b> L/NP
-            {" "}(2025 preference flows)
-            <ChgParen d={segDelta(r.chg, "flows")} />
-          </div>
-        )}
-      </PdSec>
+        {/* Roy Morgan's second ALP–L/NP 2PP: same question, different
+            allocation, so it is a row in this group and not a footnote */}
+        {r.tppFlows != null && <FlowsLine key="flows" v={r.tppFlows} chg={r.chg} />}
+      </LedgerGroup>
 
-      <PdSec label="First preferences">
-        <div className="pd-s">
-          {primarySegs(r).map((s, i) => (
-            <React.Fragment key={i}>
-              {i > 0 ? ", " : ""}
-              {s.label} <b>{s.value}%</b>
-              <ChgParen d={s.delta} />
-            </React.Fragment>
-          ))}
-          {r.undecided != null && (
-            <React.Fragment>
-              {" "}· undecided <b>{r.undecided}%</b> ({undBasis}
-              {dUnd ? <React.Fragment>, <ChgTag v={dUnd.v} refDate={dUnd.refDate} /></React.Fragment> : null})
-            </React.Fragment>
-          )}
-        </div>
-      </PdSec>
+      <LedgerGroup label="First preferences">
+        <LedgerRow label="All parties" segs={primarySegs(r)} />
+        {/* the share the primaries have already set aside – it belongs beside
+            the shares it is missing from */}
+        {r.undecided != null &&
+          <UndecidedLine key="und" v={r.undecided} chg={r.chg} basis={r.undecidedBasis} />}
+      </LedgerGroup>
 
-      <PdSec label="Preferred PM">
-        {ppms.map((c, i) => {
-          const segs = ppmContestSegs(c, i === 0 ? r.chg : null);
-          const ns = segs.filter((s) => !s.resid);
-          const und = segs.find((s) => s.resid);
-          return (
-            <div className="pd-s" key={"p" + i}>
-              {ns.map((s, j) => (
-                <React.Fragment key={j}>
-                  {j > 0 ? " vs " : ""}
-                  <b>{s.value}%</b> {s.label}
-                  {s.delta ? <ChgParen d={s.delta} /> : null}
-                </React.Fragment>
-              ))}
-              {und && <React.Fragment> (<b>{und.value}%</b> undecided)</React.Fragment>}
-            </div>
-          );
-        })}
-      </PdSec>
-
-      <PdSec label={apprHeading(appr)}>
-        {["alb", "taylor", "hanson"].map((id) => (
-          <ApprLine key={id} id={id} appr={appr} chg={r.chg} />
+      <LedgerGroup label="Preferred PM" absent="No preferred-PM question this wave">
+        {ppms.map((c, i) => (
+          <LedgerRow key={"p" + i} label={ppmLabel(c)}
+                     segs={ppmContestSegs(c, i === 0 ? r.chg : null)} />
         ))}
-      </PdSec>
+      </LedgerGroup>
+
+      <LedgerGroup label={apprHeading(appr)}
+                   absent="No leader approval or favourability published with this poll">
+        {noAppr ? null : ["alb", "taylor", "hanson"].map((id) => (
+          <LedgerApprRow key={id} id={id} appr={appr} chg={r.chg} />
+        ))}
+      </LedgerGroup>
 
       {dirSegments && (
-        <PdSec label="National direction">
-          <div className="pd-s">
-            <b>{dirSegments[0].value}%</b> right direction <ChgParen d={dirSegments[0].delta} /> vs{" "}
-            <b>{dirSegments[2].value}%</b> wrong track <ChgParen d={dirSegments[2].delta} />{" "}
-            ({dirSegments[1].value}% unsure)
-          </div>
-        </PdSec>
+        <LedgerGroup label="National direction">
+          <LedgerRow label="Right direction v wrong track" segs={dirSegments} />
+        </LedgerGroup>
       )}
 
       {r.seats && (
-        <PdSec label="Seat projection">
-          <SeatProjection seats={r.seats} />
-        </PdSec>
+        <LedgerGroup label="Seat projection">
+          <div className="pd-lwide"><SeatProjection seats={r.seats} /></div>
+        </LedgerGroup>
       )}
 
     </div>
@@ -2251,9 +2243,7 @@ let npOpenRow = null;
 /* The projection, lifted out of the panel because the tab bar runs it too.
    Two places working out "when is the next poll" from the same cadence table
    would drift apart the moment either changed, and a countdown in the navbar
-   has to be the same claim the panel makes or the site contradicts itself in
-   two places at once. Everything below is the panel's own reasoning, moved
-   rather than rewritten. */
+   has to be the same claim the panel makes. Moved, not rewritten. */
 function npProject() {
   const { D } = window.AP;
   const cad = D.pollCadence || [];

@@ -84,7 +84,7 @@ const tnUntil = (ms) => {
 
 function NextPollTicker() {
   /* A minute is finer than the answer ever is - the tightest projection here
-     is to the hour - but it keeps "59 mins" from sitting there after it has
+     is to the day - but it keeps "59 mins" from sitting there after it has
      become "in 2 mins". */
   const [, tick] = React.useState(0);
   React.useEffect(() => {
@@ -92,26 +92,76 @@ function NextPollTicker() {
     return () => clearInterval(id);
   }, []);
   if (!window.AP.nextPolls) return null;
-  const { rows, nowMs } = window.AP.nextPolls();
+  const { rows, nowMs, t0 } = window.AP.nextPolls();
   if (!rows.length) return null;
 
-  /* Only what is still ahead. The panel lists a house whose whole window has
-     closed - Roy Morgan was due 16 hours ago on a schedule with no window at
-     all - because a reader looking at the schedule wants to see it is late.
-     A countdown does not: "any time" would be a promise about a wave that is
-     already overdue, so those rows are passed over here and left to the panel
-     to report. A window still OPEN is different - that poll really could land
-     at any moment - and it stays. */
-  const live = rows.filter((r) => r.release + (r.winHalf || 0) * TN_DAY > nowMs);
-  if (!live.length) return null;
-  const items = live.slice(0, 2).map((r) => {
+  /* A house that keeps a weekday can only publish ON that weekday, and the
+     countdown has to respect that or it says something impossible. Essential
+     files on Wednesdays; projected onto Wed 26 Aug and missed, its +-7 day
+     window was still technically open on the Monday after, so this used to
+     read "any time" - naming a moment that cannot happen until Wednesday. The
+     next slot is the next Wednesday, and that is what it counts to.
+
+     The window still does the work it should: it decides which slot is the
+     EARLIEST plausible one, and the answer is the first matching weekday on
+     or after that. Resolve is projected twelve days out with a +-7 window, so
+     the earliest Sunday it could be is the one five days away, not the one it
+     was projected onto. Roy Morgan, due at midnight today on a Monday
+     schedule, is still today rather than a week away.
+
+     Houses with no weekday habit keep the plain window: the earliest the wave
+     could land, or "any time" once that has passed. */
+  const dayFloor = (ms) => {
+    const d = new Date(ms);
+    return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  };
+  const targetOf = (r) => {
     const half = r.winHalf || 0;
     const earliest = r.release - half * TN_DAY;
-    /* "any time" already says the thing "(maybe)" says, so it does not get
-       hedged twice; a real countdown does. */
-    if (earliest <= nowMs) return { firm: r.pollster, when: "any time", maybe: false };
-    return { firm: r.pollster, when: tnUntil(earliest - nowMs), maybe: half > 0 || !!r.loose };
-  });
+    if (r.releaseDow == null) return { at: Math.max(earliest, nowMs), byDay: false };
+    let t = Math.max(t0, dayFloor(earliest));
+    t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * TN_DAY;
+    return { at: t, byDay: true };
+  };
+
+  /* Nothing is past due for a weekday house any more - it rolls to its next
+     slot - so only a house without one can run out of window. */
+  const live = rows.filter((r) => r.releaseDow != null
+                                || r.release + (r.winHalf || 0) * TN_DAY > nowMs);
+  if (!live.length) return null;
+
+  /* Re-sorted on the rolled target rather than left in the panel's order.
+     The panel sorts a missed wave by the slot it missed, because a reader
+     looking at the schedule wants to see it is late; the bar is answering
+     "what lands next", and after rolling, a Monday house due today comes
+     before a Wednesday one that slipped a week. */
+  const items = live
+    .map((r) => ({ r, t: targetOf(r) }))
+    .sort((a, b) => a.t.at - b.t.at)
+    .slice(0, 2)
+    .map(({ r, t }) => {
+      const half = r.winHalf || 0;
+      let when;
+      if (t.byDay) {
+        const days = Math.round((t.at - t0) / TN_DAY);
+        /* Due today and the projected hour already gone is not "today" - it is
+           the wave arriving. Roy Morgan files on Mondays and was projected to
+           midnight; read on the Monday afternoon, "today" understates a poll
+           that could appear while the page is open. */
+        when = days === 0 ? (r.release <= nowMs ? "any moment now" : "today")
+             : days === 1 ? "tomorrow"
+             : tnUntil(days * TN_DAY);
+      } else {
+        when = t.at <= nowMs ? "any moment now" : tnUntil(t.at - nowMs);
+      }
+      /* Hedged when the schedule leaves room to be wrong: a wide window, no
+         reliable cadence, or a wave that has already missed a slot and so is
+         not certain to keep the next one either. "any moment now" is left
+         alone - it already says what the hedge would. */
+      const maybe = when !== "any moment now" && (half > 0 || !!r.loose || !!r.overdue);
+      return { firm: r.pollster, when, maybe };
+    });
+
   const title = "Projected from each house's recent publication intervals"
     + " – the earliest each wave could land, not the likeliest";
   return (
