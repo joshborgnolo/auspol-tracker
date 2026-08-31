@@ -49,9 +49,19 @@ so row `url`/`client` still come from a real article when one exists; if an embe
 record, the cluster comes from rung B (NEWSIE_CHROME) anyway. Full spec:
 `.build/newspoll-infogram-rung.md`.
 
+Netsat reconciliation (READ-ONLY, reported in `NP_STATUS.embed.recon`). When tracker and feed
+figures disagree, adjudicate against the PUBLISHED RELEASE — inter-wave deltas
+("slumped N points to −X") cross-check a single scraped figure. 2026-08-31 adjudication of the
+three initial divergences (Conversation + archive copies): Infogram correct on 2025-10-02
+(−20) and 2026-06-04 (Taylor −10) → tracker rows corrected/filled; tracker correct on
+2026-02-08 (−39; the −35 is a The Nightly misprint + the chart inherited it) → kept. The
+2026-02-08 divergence is PERMANENT chart error (`infographicData` is a mutable chart, not the
+release) and will keep printing NP_NOTE every run — expect recon ≈ 15/16 exact with that one
+divergence and do not re-adjudicate.
+
 Regression note: this skill suite ran fully green 2026-08-31 — `test-infogram.mjs` ALL PASS,
-extract `--check` exit 0 (`changed:false`, recon 16 paired / 13 exact with three known
-read-only divergences), polls.json byte-identical, validate.mjs errors 0. A static-nesting
+extract `--check` exit 0 (`changed:false`, recon 15/16 exact — one permanent chart error),
+polls.json byte-identical across the extractor run, validate.mjs errors 0. A static-nesting
 bug (sheet is `data[0]`, not `data[0][0]`) initially made the rung silently return
 `live-skip` on every static page — if rung B ever reports nothing for a wave, re-check
 `staticChartsOf` against a fresh fixture first.
