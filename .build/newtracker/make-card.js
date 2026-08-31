@@ -208,36 +208,42 @@
      who leads and by how much - three namings of one measure.
 
      150px and centred on the card, arranged the way the page's own hero
-     arranges them - LABOR 51.4 | 48.6 COALITION - so the labels sit inline
+     arranges them - Labor 51.4 | 48.6 Coalition - so the labels sit inline
      and no separate label row is needed. They are the only element that
      survives a 360px thumbnail, so they get the middle. */
   const FIG_Y = 330, FIG_PX = 150, GAP = 22, DOT = 4.5;
   const figFont = "600 " + FIG_PX + 'px Newsreader, Georgia, serif';
-  const measCaps = (t) => { c.font = '700 20px "Source Sans 3", sans-serif';
-    c.letterSpacing = "1.8px"; const w = c.measureText(t).width;
-    c.letterSpacing = "0px"; return w; };
+  /* Sentence case, so no tracking - 1.8px is what carries small caps and what
+     pulls lowercase apart - and 22px rather than 20 to hold the optical size
+     caps had, since only the L and the C now reach cap height. */
+  const LAB_PX = 22;
+  const measLabel = (t) => { c.font = `700 ${LAB_PX}px "Source Sans 3", sans-serif`;
+    return c.measureText(t).width; };
   const measFig = (v) => { c.font = figFont; return c.measureText(v.toFixed(1)).width; };
 
-  const wLabTxt = measCaps("LABOR"), wCoaTxt = measCaps("COALITION");
+  const wLabTxt = measLabel("Labor"), wCoaTxt = measLabel("Coalition");
   const wAlp = measFig(L.alp2pp), wLnp = measFig(L.lnp2pp);
   const rowW = DOT * 2 + 10 + wLabTxt + GAP + wAlp + GAP + 1 + GAP + wLnp
              + GAP + wCoaTxt + 10 + DOT * 2;
   let x = (W - rowW) / 2;
 
-  // centred on the label's cap height (20px caps ≈ 14.5 tall), not floating above it
-  const dot = (cx, col) => { c.beginPath(); c.arc(cx, FIG_Y - 7, DOT, 0, 7);
+  /* Centred on the label's cap height, not floating above it - derived from
+     the size rather than the 7 that was measured for 20px caps, so it stays
+     centred if the label is ever resized again. */
+  const DOT_Y = FIG_Y - LAB_PX * 0.3625;
+  const dot = (cx, col) => { c.beginPath(); c.arc(cx, DOT_Y, DOT, 0, 7);
     c.fillStyle = col; c.fill(); };
   const figure = (v, col) => { c.font = figFont; c.fillStyle = col;
     c.fillText(v.toFixed(1), x, FIG_Y); x += c.measureText(v.toFixed(1)).width; };
 
   dot(x + DOT, T.alp); x += DOT * 2 + 10;
-  caps("LABOR", x, FIG_Y, 20, 1.8, T.ink2, 700); x += wLabTxt + GAP;
+  caps("Labor", x, FIG_Y, LAB_PX, 0, T.ink2, 700); x += wLabTxt + GAP;
   figure(L.alp2pp, T.alp); x += GAP;
   c.strokeStyle = T.line; c.lineWidth = 1;
   c.beginPath(); c.moveTo(x + 0.5, FIG_Y - 104); c.lineTo(x + 0.5, FIG_Y); c.stroke();
   x += 1 + GAP;
   figure(L.lnp2pp, T.lnp); x += GAP;
-  caps("COALITION", x, FIG_Y, 20, 1.8, T.ink2, 700); x += wCoaTxt + 10;
+  caps("Coalition", x, FIG_Y, LAB_PX, 0, T.ink2, 700); x += wCoaTxt + 10;
   dot(x + DOT, T.lnp);
 
   /* ---- the term's trend -------------------------------------------------- */
