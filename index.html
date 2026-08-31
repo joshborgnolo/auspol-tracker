@@ -13109,15 +13109,15 @@ function AllPollsView({
     return lab(f.fym || f.ym) + "–" + lab(l.ym); // range: tight en dash, never spaced
   })())), /*#__PURE__*/React.createElement("div", {
     className: "ap-head-side"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "ap-count"
-  }, /*#__PURE__*/React.createElement("strong", null, sorted.length), sorted.length !== total ? " of " + total : "", " ", sorted.length === 1 ? "poll" : "polls"), /*#__PURE__*/React.createElement(TextToggle, {
+  }, /*#__PURE__*/React.createElement(TextToggle, {
     value: facet,
     onChange: onFacet,
     options: FACETS,
     ariaLabel: "Archive table view",
     caps: true
-  }))), /*#__PURE__*/React.createElement("div", {
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "ap-count"
+  }, /*#__PURE__*/React.createElement("strong", null, sorted.length), sorted.length !== total ? " of " + total : "", " ", sorted.length === 1 ? "poll" : "polls"))), /*#__PURE__*/React.createElement("div", {
     className: "ap-bar"
   }, /*#__PURE__*/React.createElement("div", {
     className: "ap-search"
