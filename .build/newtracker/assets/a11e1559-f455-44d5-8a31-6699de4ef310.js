@@ -1930,6 +1930,24 @@ function PollLedger({ r, dirSegments }) {
   return (
     <div className="pd-simple">
 
+      {/* a pointer to the pollster's own release page, where the citation in
+          the row (`url`) is something else – the RedBridge/Accent waves cite
+          their AFR write-up but publish the report on accent-research.com.
+          It tops the ledger so it sits directly under the meta band
+          (Published / Poll lean / House effect), and rides the ledger rather
+          than the band itself so it shows in BOTH expansions (the Latest
+          detail's band hides past 1000px) – and only where the wave actually
+          has a release page. */}
+      {r.releaseUrl && (
+        <PdSec label="Pollster’s release">
+          <p className="pd-s">
+            <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
+              here<span className="plink-mark" aria-hidden="true">↗</span>
+            </a>
+          </p>
+        </PdSec>
+      )}
+
       <PdSec label={tppHeading(tcs)}>
         {/* name the main pair's basis only when the flows second line joins
             it – a single pair needs no disambiguation, and a derived pair
@@ -2005,22 +2023,6 @@ function PollLedger({ r, dirSegments }) {
       {r.seats && (
         <PdSec label="Seat projection">
           <SeatProjection seats={r.seats} />
-        </PdSec>
-      )}
-
-      {/* a pointer to the pollster's own release page, where the citation in
-          the row (`url`) is something else – the RedBridge/Accent waves cite
-          their AFR write-up but publish the report on accent-research.com.
-          It rides the ledger, not a meta band, so it shows in BOTH expansions
-          (the Latest detail's band hides past 1000px) – and only where the
-          wave actually has a release page. */}
-      {r.releaseUrl && (
-        <PdSec label="Pollster’s release">
-          <p className="pd-s">
-            <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
-              here<span className="plink-mark" aria-hidden="true">↗</span>
-            </a>
-          </p>
         </PdSec>
       )}
 

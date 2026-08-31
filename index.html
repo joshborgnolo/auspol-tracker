@@ -9808,7 +9808,19 @@ function PollLedger({
   const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
   return /*#__PURE__*/React.createElement("div", {
     className: "pd-simple"
-  }, /*#__PURE__*/React.createElement(PdSec, {
+  }, r.releaseUrl && /*#__PURE__*/React.createElement(PdSec, {
+    label: "Pollster\u2019s release"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "pd-s"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "pd-release",
+    href: r.releaseUrl,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, "here", /*#__PURE__*/React.createElement("span", {
+    className: "plink-mark",
+    "aria-hidden": "true"
+  }, "\u2197")))), /*#__PURE__*/React.createElement(PdSec, {
     label: tppHeading(tcs)
   }, tppLines(tcs, r).map((x, i) => /*#__PURE__*/React.createElement(TppLine, {
     key: "t" + i,
@@ -9867,19 +9879,7 @@ function PollLedger({
     label: "Seat projection"
   }, /*#__PURE__*/React.createElement(SeatProjection, {
     seats: r.seats
-  })), r.releaseUrl && /*#__PURE__*/React.createElement(PdSec, {
-    label: "Pollster\u2019s release"
-  }, /*#__PURE__*/React.createElement("p", {
-    className: "pd-s"
-  }, /*#__PURE__*/React.createElement("a", {
-    className: "pd-release",
-    href: r.releaseUrl,
-    target: "_blank",
-    rel: "noopener noreferrer"
-  }, "here", /*#__PURE__*/React.createElement("span", {
-    className: "plink-mark",
-    "aria-hidden": "true"
-  }, "\u2197")))));
+  })));
 }
 
 // full per-poll breakdown – shows EVERYTHING the poll measured, ragged set and all
