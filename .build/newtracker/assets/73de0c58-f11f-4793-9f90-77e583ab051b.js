@@ -427,8 +427,43 @@ window.AP.tppLatest = tppLatest;
    Values past it clamp and say so with an overflow mark rather than quietly
    sitting at the end. */
 const HG_DOM = 8;               // 2PP points either side of the tie
+const HG_MAX = 340;             // widest the track is allowed to draw
 
-function HeroGauge({ a, ci, color, aName, bName }) {
+function HeroGauge({ a, ci, color, aName, bName, sepRef }) {
+  /* The tie has to sit under the rule between the two figures, or the two
+     centres read as a failed alignment. It cannot be done in CSS: the rule's
+     position is set by the text either side of it, and those are different
+     widths - on the desktop layout "Labor 52.0" is 195px against "48.0
+     Coalition" at 219px, putting the rule 11.8px left of the readout's own
+     centre. Equalising the two halves would fix that and ragged the left edge
+     against the heading above instead, so the instrument moves to the rule.
+
+     Measured off the SEPARATOR and the PARENT, never off the gauge itself:
+     this effect sets the gauge's own box, so measuring it would feed the
+     output back in and the observer would never settle. Width is then the
+     widest span that stays symmetric about the rule, which is what keeps the
+     scale honest - a track whose centre is not the tie is a lie about both. */
+  const wrapRef = React.useRef(null);
+  const [box, setBox] = React.useState(null);
+  React.useLayoutEffect(() => {
+    const el = wrapRef.current, sep = sepRef && sepRef.current;
+    if (!el || !sep || !el.parentElement) return;
+    const parent = el.parentElement;
+    const align = () => {
+      const pr = parent.getBoundingClientRect(), sr = sep.getBoundingClientRect();
+      if (!pr.width || !sr.width) return;
+      const cx = sr.left - pr.left + sr.width / 2;
+      const w = Math.min(HG_MAX, 2 * Math.min(cx, pr.width - cx));
+      setBox({ w, ml: cx - w / 2 });
+    };
+    align();
+    const ro = new ResizeObserver(align);
+    ro.observe(parent);
+    /* Fonts land after first paint and move every width under this. */
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(align);
+    return () => ro.disconnect();
+  }, [aName, bName]);
+
   const dev = a - 50;
   const cl = (v) => Math.max(-HG_DOM, Math.min(HG_DOM, v));
   /* % from the left edge. Decreasing in v, because a Labor lead travels LEFT
@@ -439,7 +474,8 @@ function HeroGauge({ a, ci, color, aName, bName }) {
   const overB = dev - ci < -HG_DOM;
   const lo = (a - ci).toFixed(1), hi = (a + ci).toFixed(1);
   return (
-    <div className="hero-gauge" role="img"
+    <div className="hero-gauge" role="img" ref={wrapRef}
+         style={box ? { width: box.w + "px", marginLeft: box.ml + "px", maxWidth: "none" } : undefined}
          aria-label={`${aName} ${a.toFixed(1)} per cent two-party preferred, 95% interval ${lo} to ${hi}. `
                      + `A tie is 50. ${(a - ci > 50 || a + ci < 50)
                           ? "The interval does not include a tie."
@@ -463,6 +499,7 @@ function HeroGauge({ a, ci, color, aName, bName }) {
 }
 
 function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) {
+  const sepRef = React.useRef(null);   // the rule between the figures; the gauge aligns its tie to it
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const xDomain = rangeDomain(rangeId);
 
@@ -769,7 +806,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               <span className="ro-name">{m.a.name}</span>
               <RollNum className="ro-num" value={latest.a.toFixed(1)} style={{ color: inkOf(colA) }} />
             </div>
-            <span className="ro-sep" aria-hidden="true"></span>
+            <span className="ro-sep" aria-hidden="true" ref={sepRef}></span>
             <div className="ro-party lnp-side">
               <RollNum className="ro-num" value={latest.b.toFixed(1)} style={{ color: inkOf(colB) }} />
               <span className="ro-name">{m.b.name}</span>
@@ -778,7 +815,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           </div>
           {unc && (
             <HeroGauge a={latest.a} ci={unc.ci95} color={lead >= 0 ? colA : colB}
-                       aName={m.a.name} bName={m.b.name} />
+                       aName={m.a.name} bName={m.b.name} sepRef={sepRef} />
           )}
           {/* An aggregate of five polls is not known to a tenth of a point, so
               the interval sits with the number rather than in a footnote. It

@@ -1096,7 +1096,9 @@ body.dark .dl-bloom { opacity: 1; }
    under the upper wall, a lit lip on the sill below. The span inside it is a
    READING, so it is flat colour and nothing else - the same division the dial
    keeps between its housing and its mercury. */
-.hero-gauge { margin-top: 16px; max-width: 320px; }
+/* max-width is only the pre-measure paint; the component sets width and
+   margin-left so the track's centre lands on the rule between the figures. */
+.hero-gauge { margin-top: 16px; max-width: 340px; }
 .hg-track {
   position: relative; height: 12px; border-radius: 999px;
   background: var(--hg-well);
