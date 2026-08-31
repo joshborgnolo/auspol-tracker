@@ -1294,9 +1294,10 @@ const TABS = [
   { id: "allpolls", label: "All polls" },
   /* pinHide: the docked 2PP score takes this end of the bar once the bar
      pins, and on a phone there is not room for both. The glossary is the one
-     tab a reader is never mid-task in, so it is the one that yields. The CSS
-     gates the hide to phone widths – a wide bar has room for the full tab
-     set plus the score, so Info stays put there. */
+     tab a reader is never mid-task in, so it is the one that yields – even
+     as the active tab, since an active tab is never clicked and the panel
+     itself stays put. The CSS gates the hide to phone widths – a wide bar
+     has room for the full tab set plus the score, so Info stays there. */
   { id: "info", label: "Info", pinHide: true,
     tip: "About this site – how it works, what it tracks, and the terms it uses" },
 ];

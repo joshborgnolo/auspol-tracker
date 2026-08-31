@@ -2529,11 +2529,13 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
 /* Only a phone bar is too narrow to pin the full tab set around the docked
    2PP score, so only there does Info yield its place (the score clicks home,
    where the unpinned bar holds it). A wide bar has room for the set AND the
-   score, and nothing hides. Not when it is the ACTIVE tab, either way:
-   hiding the tab a reader is standing on leaves the bar with nothing
-   selected and no way back to the view they are reading. */
+   score, and nothing hides. Hiding applies even when Info is the ACTIVE tab:
+   an active tab can never be clicked, and with the score docked it crowds the
+   line into an overlap – better that the bar carry only the tabs that do
+   something. The reader is undisturbed: the Info panel stays on screen, and
+   a scroll back up restores the unpinned bar with its tab. */
 @media (max-width: 640px) {
-  .tabs.pinned .tab-pinhide:not(.active) { display: none; }
+  .tabs.pinned .tab-pinhide { display: none; }
 }
 .tabs-sentinel { height: 0; margin: 0; padding: 0; pointer-events: none; }
 .tabs {
