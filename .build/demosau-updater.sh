@@ -56,6 +56,7 @@ fi
 # blocking the commit over a social-preview image.
 if ! node .build/newtracker/render-card.mjs >> "$LOG" 2>&1; then
   log "WARN render-card failed; shipping with the previous card"
+  echo "::warning::render-card failed; shipped the previous card"
 fi
 if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
   log "FAIL build; no commit made"
