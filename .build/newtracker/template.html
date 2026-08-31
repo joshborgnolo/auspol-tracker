@@ -2549,22 +2549,29 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
   .tabs.pinned .tab-pinhide { display: none; }
 }
 /* ---- the next-poll countdown in the tab bar ------------------------------
-   Wide screens only. While the bar sits in the page the countdown rides the
-   right end; once the bar pins, the docked 2PP score owns that end, so the
-   countdown leaves the flex row and centres itself absolutely in the bar -
-   the tab set's layout box is untouched, so the pin still relayouts nothing. */
+   Wide screens only. The countdown is absolutely seated in BOTH bar states
+   so a pin can GLIDE it: while the bar sits in the page it docks to the
+   right end (left:100% + translateX(-100%) - the same edge the flex row gave
+   it), and once the docked 2PP score owns that end it slides to the bar's
+   centre. The glide is a SINGLE transition property: left stays 100% and
+   only the transform interpolates (-100% of itself -> -50% of itself - 50%
+   of the container, cqw via .tabs-inner). An earlier left+transform pair
+   put left on the layout thread and transform on the compositor, which
+   raced in probes and jittered the first ~150ms; one transform interpolant
+   keeps every frame on one clock. Out of flow in both states, so the pin
+   still relayouts nothing. */
 .tab-next { display: none; }
 @media (min-width: 1100px) {
   .tab-next {
     display: inline-flex; align-items: baseline; gap: 14px;
-    margin-left: auto; padding-bottom: 11px;
+    position: absolute; bottom: 0; left: 100%;
+    transform: translateX(-100%);
+    padding-bottom: 11px;
     font-family: var(--sans); font-size: 12px; white-space: nowrap;
     color: var(--ink-3);
+    transition: transform .38s cubic-bezier(.22, 1, .36, 1);
   }
-  .tabs.pinned .tab-next {
-    position: absolute; left: 50%; bottom: 0; margin-left: 0;
-    transform: translateX(-50%);
-  }
+  .tabs.pinned .tab-next { transform: translateX(calc(-50% - 50cqw)); }
 }
 .tn-lab { font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
   color: var(--ink-faint); }
@@ -2623,12 +2630,15 @@ a.tn-link:hover .plink-mark, a.tn-link:focus-visible .plink-mark { color: var(--
    thread), and no layout change at all (no oscillation risk). */
 .tabs.pinned::after { opacity: 1; }
 /* position/z-index keep the row painting above the full-bleed backdrop;
-   overflow hides the docked score until the bar pins (see .tab-score) */
+   overflow hides the docked score until the bar pins (see .tab-score);
+   container-type gives the next-poll countdown a cqw yardstick (see
+   .tab-next) - the row's inline size is parent-set, so containment is free */
 .tabs-inner {
   position: relative; z-index: 1;
   display: flex; align-items: flex-end;
   border-bottom: 1px solid var(--line);
   overflow: hidden;
+  container-type: inline-size;
 }
 /* the tab set condenses as ONE unit – a single transform: scale() seated on
    the underline (origin left bottom), GPU-composited end to end */
@@ -2640,7 +2650,7 @@ a.tn-link:hover .plink-mark, a.tn-link:focus-visible .plink-mark { color: var(--
 .tabs.pinned .tabs-set { transform: scale(0.844); }   /* 16px → 13.5px */
 body.editorial .tabs.pinned .tabs-set { transform: scale(0.79); } /* 19 → 15 */
 @media (prefers-reduced-motion: reduce) {
-  .tabs-set, .tabs::after, .tab-score { transition: none; }
+  .tabs-set, .tabs::after, .tab-score, .tab-next { transition: none; }
 }
 .tab {
   position: relative; border: 0; background: none; cursor: pointer;
