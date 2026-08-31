@@ -267,15 +267,41 @@ function DialFigure({ story, f, envelope, trail }) {
          otherwise. Every 2 points, longer every 6, and level - the 50-50 the
          whole contest turns on - is the longest mark on the face, the same
          thing the poll rows say with their 50 notch. */}
-      {Array.from({ length: 13 }, (_, k) => -12 + k * 2).map((pts) => {
-        const d = wmDeg(pts);
-        const level = pts === 0;
-        const major = pts % 6 === 0;
-        const a = wmPolar(d, WM_GC.r - (level ? 3.4 : major ? 2.4 : 1.3));
-        const b = wmPolar(d, WM_GC.r - 0.2);
-        return <line key={pts} className={"dl-grad" + (level ? " level" : major ? " major" : "")}
-                     x1={a.x} y1={a.y} x2={b.x} y2={b.y} />;
-      })}
+      {(() => {
+        /* They were flat strokes laid ON a face that has depth, which is why
+           they read as applied rather than belonging. Two changes fix that.
+
+           They sit on a scale BAND now - a shallow recess in the face running
+           the width of the needle's travel - so the marks have a plate to be
+           on instead of floating over the enamel.
+
+           And each one is cut rather than drawn. A groove shows as two lines:
+           the dark cut itself, and the lip beyond it catching the light. The
+           lip is the same tick set shifted a tenth of a unit down and right,
+           which is the one light direction the whole instrument uses, so the
+           marks are lit by the same lamp as the rim and the blades. */
+        const ticks = Array.from({ length: 13 }, (_, k) => -12 + k * 2).map((pts) => {
+          const d = wmDeg(pts);
+          const level = pts === 0;
+          const major = pts % 6 === 0;
+          return { pts, level, major,
+                   a: wmPolar(d, WM_GC.r - (level ? 3.4 : major ? 2.4 : 1.3)),
+                   b: wmPolar(d, WM_GC.r - 0.2) };
+        });
+        const marks = (tag) => ticks.map((t) => (
+          <line key={tag + t.pts}
+                className={"dl-grad" + (t.level ? " level" : t.major ? " major" : "")}
+                x1={t.a.x} y1={t.a.y} x2={t.b.x} y2={t.b.y} />
+        ));
+        return (
+          <g className="dl-scale">
+            <path className="dl-scale-band"
+                  d={wmArc(wmDeg(12), wmDeg(-12), WM_GC.r - 1.7)} />
+            <g className="dl-grad-lip" transform="translate(0.12 0.12)">{marks("lip")}</g>
+            <g className="dl-grad-cut">{marks("cut")}</g>
+          </g>
+        );
+      })()}
 
       {/* envelope of everywhere the needle has been */}
       {/* Everywhere the needle has been, drawn as a band at the tip radius

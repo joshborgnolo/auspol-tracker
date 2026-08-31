@@ -672,6 +672,8 @@ body {
   --dl-grad:     color-mix(in oklch, var(--ink) 26%, transparent);
   --dl-slot:     color-mix(in oklch, var(--ink) 24%, transparent);
   --dl-channel:  color-mix(in oklch, var(--ink) 13%, var(--surface-2));
+  --dl-scale-band: color-mix(in oklch, var(--ink) 6%, transparent);
+  --dl-lip:        color-mix(in oklch, white 80%, transparent);
 }
 body.dark {
   --dl-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
@@ -682,6 +684,8 @@ body.dark {
   --dl-grad:     color-mix(in oklch, white 30%, transparent);
   --dl-slot:     color-mix(in oklch, white 16%, transparent);
   --dl-channel:  color-mix(in oklch, black 40%, var(--surface));
+  --dl-scale-band: color-mix(in oklch, black 30%, transparent);
+  --dl-lip:        color-mix(in oklch, white 22%, transparent);
 }
 /* ---- the dial's housing -------------------------------------------------
    Glass rather than metal, and the site's own glass: the frosted recipe the
@@ -695,6 +699,15 @@ body.dark {
 .dl-boss  { fill: url(#dl-rim); stroke: var(--glass-border); stroke-width: 0.22;
             filter: drop-shadow(0.25px 0.4px 0.35px color-mix(in oklch, var(--ink) 30%, transparent)); }
 .dl-slot  { fill: var(--dl-slot); }
+/* The plate the marks are cut into: a shallow recess spanning exactly the
+   needle's travel, so the scale has an extent of its own and the ticks stop
+   floating on bare enamel. */
+.dl-scale-band { fill: none; stroke: var(--dl-scale-band); stroke-width: 4.2;
+                 stroke-linecap: round; }
+/* the lit lip of each groove, shifted by the instrument's one light direction */
+.dl-grad-lip .dl-grad, .dl-grad-lip .dl-grad.major, .dl-grad-lip .dl-grad.level {
+  stroke: var(--dl-lip);
+}
 /* the scale: two points a tick, six a long one, and level the longest mark on
    the face - the reading the whole contest turns on */
 .dl-grad { stroke: var(--dl-grad); stroke-width: 0.28; stroke-linecap: butt; }

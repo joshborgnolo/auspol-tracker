@@ -522,6 +522,8 @@ body {
   --dl-grad:     color-mix(in oklch, var(--ink) 26%, transparent);
   --dl-slot:     color-mix(in oklch, var(--ink) 24%, transparent);
   --dl-channel:  color-mix(in oklch, var(--ink) 13%, var(--surface-2));
+  --dl-scale-band: color-mix(in oklch, var(--ink) 6%, transparent);
+  --dl-lip:        color-mix(in oklch, white 80%, transparent);
 }
 body.dark {
   --dl-rim-hi:   color-mix(in oklch, white 26%, var(--glass-border));
@@ -532,6 +534,8 @@ body.dark {
   --dl-grad:     color-mix(in oklch, white 30%, transparent);
   --dl-slot:     color-mix(in oklch, white 16%, transparent);
   --dl-channel:  color-mix(in oklch, black 40%, var(--surface));
+  --dl-scale-band: color-mix(in oklch, black 30%, transparent);
+  --dl-lip:        color-mix(in oklch, white 22%, transparent);
 }
 /* ---- the dial's housing -------------------------------------------------
    Glass rather than metal, and the site's own glass: the frosted recipe the
@@ -545,6 +549,15 @@ body.dark {
 .dl-boss  { fill: url(#dl-rim); stroke: var(--glass-border); stroke-width: 0.22;
             filter: drop-shadow(0.25px 0.4px 0.35px color-mix(in oklch, var(--ink) 30%, transparent)); }
 .dl-slot  { fill: var(--dl-slot); }
+/* The plate the marks are cut into: a shallow recess spanning exactly the
+   needle's travel, so the scale has an extent of its own and the ticks stop
+   floating on bare enamel. */
+.dl-scale-band { fill: none; stroke: var(--dl-scale-band); stroke-width: 4.2;
+                 stroke-linecap: round; }
+/* the lit lip of each groove, shifted by the instrument's one light direction */
+.dl-grad-lip .dl-grad, .dl-grad-lip .dl-grad.major, .dl-grad-lip .dl-grad.level {
+  stroke: var(--dl-lip);
+}
 /* the scale: two points a tick, six a long one, and level the longest mark on
    the face - the reading the whole contest turns on */
 .dl-grad { stroke: var(--dl-grad); stroke-width: 0.28; stroke-linecap: butt; }
@@ -13864,23 +13877,51 @@ function DialFigure({
       r: "6",
       fill: `url(#dl-bounce-${b.id})`
     });
-  }), Array.from({
-    length: 13
-  }, (_, k) => -12 + k * 2).map(pts => {
-    const d = wmDeg(pts);
-    const level = pts === 0;
-    const major = pts % 6 === 0;
-    const a = wmPolar(d, WM_GC.r - (level ? 3.4 : major ? 2.4 : 1.3));
-    const b = wmPolar(d, WM_GC.r - 0.2);
-    return /*#__PURE__*/React.createElement("line", {
-      key: pts,
-      className: "dl-grad" + (level ? " level" : major ? " major" : ""),
-      x1: a.x,
-      y1: a.y,
-      x2: b.x,
-      y2: b.y
+  }), (() => {
+    /* They were flat strokes laid ON a face that has depth, which is why
+       they read as applied rather than belonging. Two changes fix that.
+        They sit on a scale BAND now - a shallow recess in the face running
+       the width of the needle's travel - so the marks have a plate to be
+       on instead of floating over the enamel.
+        And each one is cut rather than drawn. A groove shows as two lines:
+       the dark cut itself, and the lip beyond it catching the light. The
+       lip is the same tick set shifted a tenth of a unit down and right,
+       which is the one light direction the whole instrument uses, so the
+       marks are lit by the same lamp as the rim and the blades. */
+    const ticks = Array.from({
+      length: 13
+    }, (_, k) => -12 + k * 2).map(pts => {
+      const d = wmDeg(pts);
+      const level = pts === 0;
+      const major = pts % 6 === 0;
+      return {
+        pts,
+        level,
+        major,
+        a: wmPolar(d, WM_GC.r - (level ? 3.4 : major ? 2.4 : 1.3)),
+        b: wmPolar(d, WM_GC.r - 0.2)
+      };
     });
-  }), envelope && envelope.max > envelope.min + 2 && /*#__PURE__*/React.createElement("g", {
+    const marks = tag => ticks.map(t => /*#__PURE__*/React.createElement("line", {
+      key: tag + t.pts,
+      className: "dl-grad" + (t.level ? " level" : t.major ? " major" : ""),
+      x1: t.a.x,
+      y1: t.a.y,
+      x2: t.b.x,
+      y2: t.b.y
+    }));
+    return /*#__PURE__*/React.createElement("g", {
+      className: "dl-scale"
+    }, /*#__PURE__*/React.createElement("path", {
+      className: "dl-scale-band",
+      d: wmArc(wmDeg(12), wmDeg(-12), WM_GC.r - 1.7)
+    }), /*#__PURE__*/React.createElement("g", {
+      className: "dl-grad-lip",
+      transform: "translate(0.12 0.12)"
+    }, marks("lip")), /*#__PURE__*/React.createElement("g", {
+      className: "dl-grad-cut"
+    }, marks("cut")));
+  })(), envelope && envelope.max > envelope.min + 2 && /*#__PURE__*/React.createElement("g", {
     className: "dl-envelope"
   }, /*#__PURE__*/React.createElement("path", {
     d: wmArc(envelope.min, envelope.max, WM_ENV_R)
