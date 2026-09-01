@@ -52,7 +52,7 @@
   const R = (v) => { const p = document.createElement("span"); p.style.color = v;
     document.body.appendChild(p); const x = getComputedStyle(p).color; p.remove(); return x; };
   const T = {
-    bg: R("oklch(0.985 0.004 91.4)"), ink: R("oklch(0.27 0.012 55)"),
+    bg: R("oklch(0.970 0.008 78)"), ink: R("oklch(0.27 0.012 55)"),
     ink2: R("oklch(0.44 0.012 55)"), ink3: R("oklch(0.52 0.010 58)"),
     line: R("oklch(0.895 0.008 75)"), alp: R("oklch(0.55 0.150 27)"),
     lnp: R("oklch(0.50 0.095 250)"), grn: R("oklch(0.60 0.120 150)"),

@@ -202,7 +202,7 @@ function oklchHex(L, C, Hdeg) { return rgbHex(oklchRgb(L, C, Hdeg)); }
    whole failure this meta is here to avoid. A static meta cannot follow a
    runtime toggle, so panelled keeps that 2/255; it is imperceptible, and the
    default is the one worth being exact about. */
-const THEME = { light: [0.985, 0.004, 91.4], dark: [0.205, 0.010, 65] };
+const THEME = { light: [0.975, 0.009, 80], dark: [0.205, 0.010, 65] };
 const THEME_LIGHT = oklchHex(...THEME.light), THEME_DARK = oklchHex(...THEME.dark);
 const PARTY_HEX = {
   alp: oklchHex(0.55, 0.150, 27), lnp: oklchHex(0.50, 0.095, 250),
