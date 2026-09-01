@@ -687,6 +687,10 @@ body {
   --btn-lit:   color-mix(in oklch, white 85%, transparent);
   --btn-shade: oklch(0.4 0.02 60 / 0.16);
   --btn-press: color-mix(in oklch, var(--ink) 15%, transparent);
+  /* The site's tick, as the tweaks panel already draws it: viewBox 0 0 14 14,
+     `M3 7.2 5.8 10 11 4.2`, 2.2 stroke, ROUND cap and join. Carried as a mask
+     so the one glyph serves every checkbox and each keeps its own colour. */
+  --tick-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3 7.2 5.8 10 11 4.2' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   --btn-edge:  color-mix(in oklch, var(--ink) 8%, transparent);
   --well-cut:    color-mix(in oklch, var(--ink) 20%, transparent);
   --well-edge:   color-mix(in oklch, var(--ink) 24%, transparent);
@@ -2784,13 +2788,18 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
     color-mix(in oklch, white 15%, var(--accent)), var(--accent));
   border-color: color-mix(in oklch, black 14%, var(--accent));
 }
-/* Thinner strokes and a shorter tail: 2px arms on a 13px box put more ink in
-   the tick than in the space around it, and the long arm ran into the corner. */
-.pg-check input:checked::after {
-  content: ""; position: absolute; left: 4.2px; top: 1.7px;
-  width: 2.8px; height: 6.2px; border: solid var(--chart-bg);
-  border-width: 0 1.7px 1.7px 0; transform: rotate(43deg);
+/* Was two rotated borders — the only square-ended, mitred glyph on a site whose
+   every other mark is a round-capped stroke. Now the site's own tick, masked so
+   the shape is drawn once and the colour stays per-control. At this size its
+   2.2 stroke lands at ~1.7px, the weight the border version was tuned to, so
+   this changes the ends and the join and not the heft. */
+.pg-check input:checked::after,
+.ap-check.on .ap-tick::after {
+  content: ""; position: absolute; inset: 0;
+  -webkit-mask: var(--tick-glyph) center / 100% 100% no-repeat;
+          mask: var(--tick-glyph) center / 100% 100% no-repeat;
 }
+.pg-check input:checked::after { background-color: var(--chart-bg); }
 .pg-check input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* cycle-chart checkboxes colour their label to the party once switched on;
    the hero diagnostic leaves its label neutral */
@@ -2949,20 +2958,17 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
     color-mix(in oklch, white 15%, var(--accent)), var(--accent));
   border-color: color-mix(in oklch, black 14%, var(--accent));
 }
-/* Same tick as .pg-check, scaled to this box rather than drawn afresh: the
-   padding box is 12px here (15px, border-box, 1.5px border) against 11px
-   there, so every measure is the approved one x 12/11. Drawn independently it
-   had 2px arms and an 8px tail on a 12px face - more ink than space, with the
-   long arm running into the corner, which is the exact fault .pg-check was
-   already fixed for. A checkbox should mean the same thing wherever the site
-   draws one, and that has to include the one the page renders as a span. */
-.ap-check.on .ap-tick::after {
-  content: ""; position: absolute; left: 4.6px; top: 1.85px; width: 3.05px; height: 6.8px;
-  border: solid var(--bg); border-width: 0 1.85px 1.85px 0; transform: rotate(43deg);
-}
+/* Geometry is shared with .pg-check above, so the two cannot drift again — that
+   drift is what left this one square-ended after the other was fixed. Only the
+   colour differs, because these sit on different surfaces. */
+.ap-check.on .ap-tick::after { background-color: var(--bg); }
+/* The radio shares this pseudo-element, so it has to opt OUT of the tick mask
+   and out of `inset: 0` — otherwise its dot gets cut to a checkmark. Centred
+   on the 12px padding box: (12 - 5) / 2. */
 .ap-check.radio.on .ap-tick::after {
-  left: 3.8px; top: 3.8px; width: 5px; height: 5px;
+  inset: auto; left: 3.5px; top: 3.5px; width: 5px; height: 5px;
   border: 0; border-radius: 50%; background: var(--bg); transform: none;
+  -webkit-mask: none; mask: none;
 }
 /* ---- the pollster toggles, as switches ----------------------------------
    An empty tick is a WELL - a hole waiting to be filled - and a ticked one is
