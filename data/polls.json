@@ -217,7 +217,7 @@
       "date": "2026-05-12",
       "short": "2026 Budget",
       "label": "2026 federal Budget",
-      "desc": "Treasurer Jim Chalmers delivers the Albanese government’s fifth federal budget, with sweeping CGT changes.",
+      "desc": "Treasurer Jim Chalmers delivers the Albanese government’s fifth federal budget, rated, according to Newspoll, as the worst for the economy since 1993.",
       "major": true
     }
   ],
@@ -4495,6 +4495,15 @@
       "firm": "YouGov",
       "alb": 41,
       "opp": 39,
+      "oppName": "Taylor",
+      "han": null,
+      "extra": null
+    },
+    {
+      "date": "2026-06-04",
+      "firm": "Newspoll",
+      "alb": 44,
+      "opp": 38,
       "oppName": "Taylor",
       "han": null,
       "extra": null
