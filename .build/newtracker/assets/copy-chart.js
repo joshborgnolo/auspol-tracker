@@ -399,10 +399,11 @@
        colour, not the cycle's - and a cycle the reader has switched off has no
        label, so it is absent here too, without having to ask the chips.
 
-       A label that is not a year is a leader in their own right (Hanson runs
-       as a dashed line on the opposition chart, labelled PH). Those are named
-       by matching the line's colour against LEADERS, which is where the chart
-       took it from. */
+       A label that is not a year belongs to an overlay, not a term: Hanson's
+       line, labelled PH and named by matching the line's colour against
+       LEADERS (which is where the chart took it), and One Nation's vote over
+       the current term, ending "ON ’25" and mapping in the classifier
+       below. */
     const cycleLegend = () => {
       const AUS = window.AUSPOL || {};
       const cyc = AUS.cycles && (Array.isArray(AUS.cycles) ? AUS.cycles : Object.values(AUS.cycles));
@@ -431,9 +432,19 @@
         return hit && hit.ym ? String(hit.ym).slice(0, 4) : null;
       };
       return labels.map((t) => {
-        const digits = (t.textContent || "").replace(/[^0-9]/g, "");
+        const text = (t.textContent || "").trim();
         const fill = getComputedStyle(t).fill;
-        const c = digits.length === 2 && cyc.find((r) => String(r.year).slice(2) === digits);
+        /* The digits are not the first word here: One Nation's overlay ends
+           "ON ’25", and digits alone would pass for the 2025 term and hang
+           that term's opposition leaders - "2025 Ley -> Taylor" - on the
+           party's vote line. The legend spreads the abbreviation the way
+           the chart's own checkbox does. */
+        if (/^ON[’ ]+\d{2}$/.test(text))
+          return { label: text.replace(/^ON/, "One Nation"),
+                   kind: "dashed", fill, alpha: 1, year: 9999 };
+        const digits = text.replace(/[^0-9]/g, "");
+        const c = !/[A-Za-z]/.test(text) && digits.length === 2 &&
+          cyc.find((r) => String(r.year).slice(2) === digits);
         if (c) return { label: c.year + " " + (opp ? (c.oppLead || c.lead) : c.lead),
                         kind: "line", fill, alpha: 1, year: c.year };
         /* A leader who is not a cycle needs saying differently. Every other
