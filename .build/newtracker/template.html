@@ -2546,8 +2546,8 @@ a.tn-link:hover .plink-mark, a.tn-link:focus-visible .plink-mark { color: var(--
   transform-origin: left bottom;
   transition: transform .38s cubic-bezier(.22, 1, .36, 1);
 }
-.tabs.pinned .tabs-set { transform: scale(0.964); }   /* 14px → 13.5px */
-body.editorial .tabs.pinned .tabs-set { transform: scale(0.938); } /* 16 → 15 */
+.tabs.pinned .tabs-set { transform: scale(0.9); }   /* 15px → 13.5px */
+body.editorial .tabs.pinned .tabs-set { transform: scale(0.857); } /* 17.5 → 15 */
 @media (prefers-reduced-motion: reduce) {
   .tabs-set, .tabs::after, .tab-score, .tab-next, .tab-glyph { transition: none; }
 }
@@ -2559,8 +2559,8 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.938); } /* 16 → 15 
 }
 .tab-label {
   font-family: "Crimson Pro", var(--serif);
-  font-size: 14px; font-weight: 600; letter-spacing: -0.005em;
-  line-height: 17px;
+  font-size: 15px; font-weight: 600; letter-spacing: -0.005em;
+  line-height: 18.5px;
 }
 .tab-note { font-size: 12px; font-weight: 600; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .tab:hover { color: var(--ink-2); }
@@ -2571,7 +2571,7 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.938); } /* 16 → 15 
   transform: scaleX(0); transform-origin: left center; transition: transform .2s ease;
 }
 .tab.active::after { transform: scaleX(1); }
-body.editorial .tab-label { font-family: "Crimson Pro", var(--serif); font-weight: 500; font-size: 16px; line-height: 19.5px; letter-spacing: -0.01em; }
+body.editorial .tab-label { font-family: "Crimson Pro", var(--serif); font-weight: 500; font-size: 17.5px; line-height: 21.5px; letter-spacing: -0.01em; }
 
 /* narrow screens condense a touch further so the docked score clears the
    scaled tab set. The gap (and the shrunk phone bar below) lives HERE, after
@@ -2579,16 +2579,16 @@ body.editorial .tab-label { font-family: "Crimson Pro", var(--serif); font-weigh
    cascade and sat dead (so did the .tab-label sizes now revived here). The
    shrink is RESTING-ONLY: the stuck bar must keep its former size, and since
    .pinned may only ever re-scale (never re-lay out; see the .tabs.pinned
-   note above), the pinned scales below are enlarged to cancel the smaller
-   base - 12.5 × 1.02 ≈ the old 16 × 0.8, 14 × 1.032 ≈ the old 19 × 0.76. */
+   note above), the pinned scales below are adjusted to cancel the resting
+   base - 13.5 × 0.944 ≈ the old 16 × 0.8, 15 × 0.963 ≈ the old 19 × 0.76. */
 @media (max-width: 640px) {
   .tabs { margin: -18px -4px 18px; }
   .tab { padding-block: 9px; }
-  .tab-label { font-size: 12.5px; line-height: 16px; }
-  body.editorial .tab-label { font-size: 14px; line-height: 17px; }
+  .tab-label { font-size: 13.5px; line-height: 17px; }
+  body.editorial .tab-label { font-size: 15px; line-height: 18px; }
   .tabs-set { gap: 14px; }
-  .tabs.pinned .tabs-set { transform: scale(1.02); }
-  body.editorial .tabs.pinned .tabs-set { transform: scale(1.032); }
+  .tabs.pinned .tabs-set { transform: scale(0.944); }
+  body.editorial .tabs.pinned .tabs-set { transform: scale(0.963); }
 }
 
 /* ============================================================
