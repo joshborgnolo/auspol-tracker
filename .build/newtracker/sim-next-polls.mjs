@@ -20,6 +20,9 @@
 //     seed (Essential 2026-08-26), so S1-S4 exercise BOTH sides — the
 //     slipped projection on the real row, and the pre-skip behaviour on a
 //     copy with the seed stripped (cadHold).
+//   - the slipped slot ALREADY is the house's measured late step (35 days),
+//     so pmLabel/dayAlt name no "(or +1 week)" alternative past it: the row
+//     reads "tomorrow", never "tomorrow (or 8)"
 //
 // Run after a rebuild:  node .build/newtracker/build.mjs
 //                       node .build/newtracker/sim-next-polls.mjs
@@ -89,7 +92,9 @@ function project(cad, t0, nowMs) {
     let release = dayFloor(snap(field + c.lag * DAY));
     // the skipped-roll steps ONE WEEK for a dated house (the only slip its
     // record shows: Essential's 28-day cadence slips to 35, never 56)
+    let rolled = false;
     while ((c.skipped || []).includes(new Date(release).toISOString().slice(0, 10))) {
+      rolled = true;
       field += (c.releaseDow != null ? 7 : c.cadence) * DAY;
       release = dayFloor(snap(field + c.lag * DAY));
     }
@@ -101,6 +106,9 @@ function project(cad, t0, nowMs) {
       rows.push({
         ...c, field, release, overdue, ahead: i,
         spread: sp, winHalf,
+        // a slot the skip-roll carried onto the measured late step IS the
+        // late alternative; the labels must not name a step past it
+        rolled: rolled && i === 0,
         inDays: Math.round((release - t0) / DAY),
         opensIn: Math.round((release - winHalf * DAY - t0) / DAY),
         closesIn: Math.round((release + winHalf * DAY - t0) / DAY),
@@ -130,7 +138,39 @@ const panelWhen = (r) => (r.loose
   ? (r.missed ? when(r.closesIn) : r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn))
   : r.overdue && !r.missed
     ? `${when(r.closesIn)} (or ${ago(-r.inDays)})`
-    : when(r.inDays));
+    : when(r.inDays) + (dayAlt(r) || ""));
+const npFmt = (ms) => {
+  const d = new Date(ms);
+  return `${["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
+};
+const spreadLabel = (r) => {
+  if (r.releaseDow == null) return ` ± ${r.spread} day${r.spread === 1 ? "" : "s"}`;
+  const weeks = Math.floor((r.spread + 3) / 7);
+  return weeks === 0 ? "" : ` ± ${weeks} week${weeks === 1 ? "" : "s"}`;
+};
+const pmLabel = (r) => {
+  if (r.rolled) return "";
+  if (r.releaseDow != null && r.spreadEarly != null) {
+    const widen = Math.sqrt(r.ahead + 1);
+    const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
+    const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
+    if (earlyW === 0 && lateW >= 1) return ` (or ${npFmt(r.release + lateW * 7 * DAY)})`;
+    if (lateW === 0 && earlyW >= 1) return ` (or ${npFmt(r.release - earlyW * 7 * DAY)})`;
+  }
+  return spreadLabel(r);
+};
+const dayAlt = (r) => {
+  if (r.rolled) return null;
+  if (r.releaseDow != null && r.spreadEarly != null) {
+    const widen = Math.sqrt(r.ahead + 1);
+    const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
+    const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
+    if (earlyW === 0 && lateW >= 1) return ` (or ${r.inDays + lateW * 7})`;
+    if (lateW === 0 && earlyW >= 1 && r.inDays - earlyW * 7 >= 1)
+      return ` (or ${r.inDays - earlyW * 7})`;
+  }
+  return null;
+};
 
 // --- exact algorithm shipped in d1a1d215 (NextPollTicker) ---
 const tnUntil = (ms) => {
@@ -243,6 +283,17 @@ function eq(name, got, want) {
   // DemosAU's calendar-month window (1-30 Sep) is OPEN from today, so the bar
   // puts "any moment now" ahead of Essential's tomorrow
   eq("DemosAU's open month window leads the ticker", items[0] && [items[0].firm, items[0].when], ["DemosAU", "any moment now"]);
+  // the slipped slot already sits on the house's measured late step (35 days)
+  // - the projection IS the alternative, so neither column may name a
+  // further +1-week date (the "tomorrow (or 8)" / "(or Wed 9 Sep)" copy a
+  // 42-day slot no Essential wave has ever filed on)
+  eq("slipped slot rolls no further alternatives", es && [pmLabel(es), dayAlt(es)], ["", null]);
+  // a house whose projection did NOT absorb a confirmed skip keeps the
+  // honest one-sided tails: Resolve's slot is a week early of its measured
+  // late step, so both columns still name it
+  const rs = firm(rows, "Resolve");
+  eq("un-rolled house still names its late alternative",
+     rs && [pmLabel(rs), dayAlt(rs)], [" (or Sun 20 Sep)", " (or 19)"]);
   // the roll is every house's nearest slot, unsliced - on the live bar the
   // fit pass trims this to the room it actually has; the roll itself never
   // caps (a weekly house appears once, not twice inside the same week)

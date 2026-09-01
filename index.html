@@ -10246,9 +10246,11 @@ function npProject() {
        35, not 56), a full cadence otherwise. The honest row then is the
        next UNVERIFIED expectation, not a "(or N days ago)" asterisk on a
        release verified never filed. */
+    let rolled = false;
     {
       const isoDay = ms => new Date(ms).toISOString().slice(0, 10);
       while ((c.skipped || []).includes(isoDay(release))) {
+        rolled = true;
         field += (c.releaseDow != null ? 7 : c.cadence) * DAY_MS;
         release = relOf(field);
       }
@@ -10277,6 +10279,13 @@ function npProject() {
         ahead: i,
         spread: sp,
         winHalf,
+        /* This slot already landed on the house's measured late step because
+           a confirmed skip pushed it there: it IS the late alternative the
+           ± would name. Flag it so the row labels don't offer a further
+           +1-week date the record never shows (Essential slips 28→35, and
+           the rolled 35-day slot then had 42 named as its miss) - only the
+           first row of a walk can sit on it. */
+        rolled: rolled && i === 0,
         inDays: Math.round((release - t0) / DAY_MS),
         opensIn: Math.round((release - winHalf * DAY_MS - t0) / DAY_MS),
         /* Overdue is not missed while the ± window is still open: the row
@@ -10376,6 +10385,12 @@ function NextPollsPanel() {
      tolerance. Both sides are possible in principle - an early-only record
      names the earlier day the same way. */
   const pmLabel = r => {
+    /* A skip-rolled slot sits where the ±'s late side already reaches - the
+       forecast's own alternative. Naming " (or +1 week)" past it doubles the
+       one late step the record contains, and stepping back an early week
+       would land on a date confirmed never filed. So a rolled slot names
+       itself and nothing else. */
+    if (r.rolled) return "";
     if (r.releaseDow != null && r.spreadEarly != null) {
       const widen = Math.sqrt(r.ahead + 1);
       const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
@@ -10389,6 +10404,7 @@ function NextPollsPanel() {
      after the date: "in 12 days (or 19)" names the later slot in days, so a
      reader who screens off the countdown still sees the alternative. */
   const dayAlt = r => {
+    if (r.rolled) return null; // the slot IS the late step - see pmLabel
     if (r.releaseDow != null && r.spreadEarly != null) {
       const widen = Math.sqrt(r.ahead + 1);
       const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
