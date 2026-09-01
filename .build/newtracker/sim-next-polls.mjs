@@ -146,8 +146,10 @@ function ticker(rows, t0, nowMs) {
     .filter((r) => !r.missed)
     .map((r) => ({ r, t: targetOf(r) }))
     .sort((a, b) => a.t.at - b.t.at)
-    .filter(((seen) => ({ r }) =>
-      !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set()))
+    .filter(({ t }) =>
+      t.byDay
+        ? Math.round((t.at - t0) / DAY) <= 7
+        : t.at <= nowMs + 7 * DAY)
     .map(({ r, t }) => {
       const half = r.winHalf || 0;
       let when;
@@ -155,7 +157,7 @@ function ticker(rows, t0, nowMs) {
         const days = Math.round((t.at - t0) / DAY);
         when = days === 0 ? (r.release <= nowMs ? "any moment now" : "today")
              : days === 1 ? "tomorrow"
-             : days + " days";
+             : tnUntil(days * DAY);
       } else {
         when = t.at <= nowMs ? "any moment now" : tnUntil(t.at - nowMs);
       }
@@ -207,9 +209,9 @@ function eq(name, got, want) {
   const es = firm(rows, "Essential");
   eq("Essential not overdue, rolled to Wed 23 Sep", [es && es.overdue, es && es.missed], [false, false]);
   eq("panel counts to the NEXT slot, no 'or' alternative", es && panelWhen(es), "in 22 days");
-  eq("no Essential ticker item (fourth house out, three slots filled)", items.some((i) => i.firm === "Essential"), false);
-  eq("ticker is the next-three-houses list", items.map((i) => [i.firm, i.when]),
-    [["Roy Morgan", "6 days"], ["YouGov", "8 days"], ["Resolve", "12 days"]]);
+  eq("no Essential ticker item (next slot is 3 weeks out)", items.some((i) => i.firm === "Essential"), false);
+  eq("ticker is the next-week list", items.map((i) => [i.firm, i.when]),
+    [["Roy Morgan", "6 days"]]);
   // the hold-the-slot rule, still in force for any unconfirmed slot
   const holdRows = project(cadHold, t0, nowMs);
   const holdItems = ticker(holdRows, t0, nowMs);

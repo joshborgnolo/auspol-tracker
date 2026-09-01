@@ -2575,15 +2575,6 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
   }
   .tabs.pinned .tab-next { transform: translateX(calc(-50% - 50cqw)); }
 }
-/* the THIRD slot needs more room than the first two do: its worst case
-   (three overdue counts, the longest text the ticker ever carries) would
-   crowd the pinned tab set at the bar's narrowest widths - measured live at
-   1100px the 2-item bar clears the tabs and the docked score on both
-   sides, the 3-item doesn't. Items are children 2-4 of .tab-next (child 1
-   is the "Next" jump button), so the third item is :nth-child(4). */
-@media (max-width: 1199px) {
-  .tab-next > .tn-item:nth-child(4) { display: none; }
-}
 .tn-lab { font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
   color: var(--ink-faint); }
 /* the label is also the jump down to the full panel on the snapshot - keep
