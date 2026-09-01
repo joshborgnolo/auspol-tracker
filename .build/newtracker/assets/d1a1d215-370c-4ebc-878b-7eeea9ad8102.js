@@ -224,7 +224,13 @@ function NextPollTicker() {
     + " A slot that passes unrecorded counts up as overdue until the release is added";
   return (
     <div className="tab-next" title={title}>
-      <span className="tn-lab">Next polls:</span>
+      {/* the label itself is the way DOWN to the full panel on the snapshot -
+          same trick as the house names being the way OUT to the publisher */}
+      <button type="button" className="tn-lab tn-jump"
+              title="Jump to the Next expected polls panel"
+              onClick={() => window.AP.gotoNextPolls && window.AP.gotoNextPolls()}>
+        Next
+      </button>
       {items.map((it, i) => (
         <span className="tn-item" key={i}>
           {/* the name carries the house's publication link, the same one the

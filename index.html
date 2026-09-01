@@ -2429,6 +2429,14 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
 }
 .tn-lab { font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
   color: var(--ink-faint); }
+/* the label is also the jump down to the full panel on the snapshot - keep
+   the label's quiet look, except the pointer and an underline on invite */
+button.tn-jump { appearance: none; background: none; border: 0; margin: 0; padding: 0;
+  font: inherit; letter-spacing: inherit; color: inherit; cursor: pointer }
+button.tn-jump:hover, button.tn-jump:focus-visible { text-decoration: underline;
+  text-underline-offset: 2px; }
+button.tn-jump:focus-visible { outline: 2px solid var(--accent, currentColor);
+  outline-offset: 2px; border-radius: 2px; }
 .tn-item { display: inline-flex; align-items: baseline; gap: 6px; }
 .tn-firm { font-weight: 700; color: var(--ink-2); }
 .tn-when { font-variant-numeric: tabular-nums; }
@@ -2874,7 +2882,9 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 /* ---------- Next expected polls ---------- */
 /* A forecast, not a record – so it is deliberately quieter than the tables
    above it: no rules between rows, no numerals competing with real figures. */
-.next-polls { }
+/* landing target of the navbar "Next" jump - the margin lands the heading
+   below the pinned tab bar instead of under it */
+.next-polls { scroll-margin-top: 72px; }
 .np-head { margin-bottom: 16px; }
 .np-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
 /* A window rather than a day: quieter, because it is a looser claim - but in
@@ -11054,9 +11064,12 @@ function NextPollTicker() {
   return /*#__PURE__*/React.createElement("div", {
     className: "tab-next",
     title: title
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "tn-lab"
-  }, "Next polls:"), items.map((it, i) => /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "tn-lab tn-jump",
+    title: "Jump to the Next expected polls panel",
+    onClick: () => window.AP.gotoNextPolls && window.AP.gotoNextPolls()
+  }, "Next"), items.map((it, i) => /*#__PURE__*/React.createElement("span", {
     className: "tn-item",
     key: i
   }, /*#__PURE__*/React.createElement("span", {
@@ -17415,6 +17428,20 @@ function App() {
     setFocusTerm(null);
   };
 
+  /* The navbar's "Next" label is a jump to the NextPollsPanel, which lives at
+     the foot of the snapshot view. When the reader is on another tab the
+     scroll has to wait for the snapshot to mount, so it is parked in a ref
+     the tab layout-effect below empties; a generous scroll-margin-top (see
+     .next-polls) keeps the panel's heading clear of the pinned tab bar. */
+  const npJumpRef = useRef(false);
+  const npScrollNow = () => {
+    const el = document.querySelector("section.next-polls");
+    if (el) el.scrollIntoView({
+      block: "start",
+      behavior: "auto"
+    });
+  };
+
   /* Clicking a dot on any chart crosses to that poll in the archive, opened.
      The charts are six components deep in two different views, so the entry
      point is registered on window.AP - the namespace this app already uses to
@@ -17458,9 +17485,23 @@ function App() {
       setTab("info");
       if (readHash() !== "info") window.location.hash = "info";
     };
+    /* The navbar "Next" label jumps straight to the NextPollsPanel on the
+       snapshot. Same-tab scrolls happen in place; a cross-tab trip has to
+       wait for the snapshot view to mount, so the scroll is parked for the
+       layout effect below the way a restore scroll is. */
+    window.AP.gotoNextPolls = () => {
+      if (readHash() === "snapshot") {
+        npScrollNow();
+        return;
+      }
+      npJumpRef.current = true;
+      setTab("snapshot");
+      window.location.hash = "snapshot";
+    };
     return () => {
       delete window.AP.openPoll;
       delete window.AP.openTerm;
+      delete window.AP.gotoNextPolls;
     };
   }, []);
   /* The return trip puts the reader back on the pixel they left from. The
@@ -17491,6 +17532,11 @@ function App() {
     if (readHash() !== b.tab) window.location.hash = b.tab;
   };
   React.useLayoutEffect(() => {
+    if (npJumpRef.current) {
+      npJumpRef.current = false;
+      npScrollNow();
+      return;
+    }
     if (restoreY.current == null) return;
     const y = restoreY.current;
     restoreY.current = null;

@@ -1414,6 +1414,17 @@ function App() {
     setFocusTerm(null);
   };
 
+  /* The navbar's "Next" label is a jump to the NextPollsPanel, which lives at
+     the foot of the snapshot view. When the reader is on another tab the
+     scroll has to wait for the snapshot to mount, so it is parked in a ref
+     the tab layout-effect below empties; a generous scroll-margin-top (see
+     .next-polls) keeps the panel's heading clear of the pinned tab bar. */
+  const npJumpRef = useRef(false);
+  const npScrollNow = () => {
+    const el = document.querySelector("section.next-polls");
+    if (el) el.scrollIntoView({ block: "start", behavior: "auto" });
+  };
+
   /* Clicking a dot on any chart crosses to that poll in the archive, opened.
      The charts are six components deep in two different views, so the entry
      point is registered on window.AP - the namespace this app already uses to
@@ -1443,7 +1454,18 @@ function App() {
       setTab("info");
       if (readHash() !== "info") window.location.hash = "info";
     };
-    return () => { delete window.AP.openPoll; delete window.AP.openTerm; };
+    /* The navbar "Next" label jumps straight to the NextPollsPanel on the
+       snapshot. Same-tab scrolls happen in place; a cross-tab trip has to
+       wait for the snapshot view to mount, so the scroll is parked for the
+       layout effect below the way a restore scroll is. */
+    window.AP.gotoNextPolls = () => {
+      if (readHash() === "snapshot") { npScrollNow(); return; }
+      npJumpRef.current = true;
+      setTab("snapshot");
+      window.location.hash = "snapshot";
+    };
+    return () => { delete window.AP.openPoll; delete window.AP.openTerm;
+                   delete window.AP.gotoNextPolls; };
   }, []);
   /* The return trip puts the reader back on the pixel they left from. The
      scroll is handed to a layout effect rather than to requestAnimationFrame:
@@ -1467,6 +1489,11 @@ function App() {
     if (readHash() !== b.tab) window.location.hash = b.tab;
   };
   React.useLayoutEffect(() => {
+    if (npJumpRef.current) {
+      npJumpRef.current = false;
+      npScrollNow();
+      return;
+    }
     if (restoreY.current == null) return;
     const y = restoreY.current;
     restoreY.current = null;
