@@ -1079,7 +1079,7 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   font-size: 10.5px; font-weight: 600; color: var(--ink-3); }
 
 .hero-interval { display: flex; align-items: baseline; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
-.hi-method { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.hi-method { color: var(--ink-3); white-space: nowrap; }
 /* Separators hang off the END of each clause, not the start of the next: as
    a ::before they belonged to the following flex item, so a wrap carried the
    dot down to open the next line on its own. The lead clause opens the row,
@@ -1106,6 +1106,12 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   text-decoration-thickness: 1px;
 }
 .hi-term:hover { color: var(--ink); text-decoration-color: currentColor; }
+/* The button-sizing lives past .hi-term, not before it: on a <button> the
+   term reset's `font: inherit` lands at the same specificity as any sibling
+   sizing rule, so a size set ABOVE it (as .hi-method's once was) is rewritten
+   to the inherited 16px and the word reads as a stray larger font. Declared
+   here it wins, and the strip keeps one size story. */
+.hero-interval .hi-method { font-size: 12px; }
 .hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hi-note { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
 /* Movement smaller than its own interval – stated, not colour-coded, so it
