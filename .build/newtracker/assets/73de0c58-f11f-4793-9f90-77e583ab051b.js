@@ -1012,29 +1012,6 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               )}
             </span>
           </div>
-        {/* The OTHER contests, carrying their figures rather than just their
-            names. One Nation sits level with Labor on the primary vote, so in
-            a good many seats the final two are not Labor and the Coalition and
-            "the 2PP" is doing less work than a single headline implies. These
-            were previously a bare tab you had to press to find out what was
-            behind it; the number is the reason to press it. */}
-        {otherContests.length > 0 && (
-          <div className="hero-alt">
-            <span className="ha-lab">Switch 2PP</span>
-            {otherContests.map((o) => (
-              <button key={o.id} type="button" className="ha-chip" onClick={() => chooseMatchup(o.id)}
-                      title={"Show " + MATCHUPS[o.id].a.name + " v " + MATCHUPS[o.id].b.name}>
-                <span className="ha-vs">{MATCHUPS[o.id].a.name} v {MATCHUPS[o.id].b.name}</span>
-                <span className="ha-fig">
-                  <span style={{ color: inkOf(MATCHUPS[o.id].a.color) }}>{o.v.a.toFixed(1)}</span>
-                  <span className="ha-dash">–</span>
-                  <span style={{ color: inkOf(MATCHUPS[o.id].b.color) }}>{o.v.b.toFixed(1)}</span>
-                </span>
-                {o.v.ci95 != null && <span className="ha-ci">± {o.v.ci95.toFixed(1)}</span>}
-              </button>
-            ))}
-          </div>
-        )}
         </div>
         <div className="hero-controls">
           <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
@@ -1045,6 +1022,31 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                with its own tick per month rather than every second one */
             options={[{ id: "3", label: "3mo" }, { id: "6", label: "6mo" },
                       { id: "12", label: "12mo" }, { id: "all", label: "All" }]} />
+          {/* The OTHER contests, carrying their figures rather than just their
+              names. One Nation sits level with Labor on the primary vote, so
+              in a good many seats the final two are not Labor and the Coalition
+              and "the 2PP" is doing less work than a single headline implies.
+              These were previously a bare tab you had to press to find out
+              what was behind it; the number is the reason to press it. Sits
+              in the control column, between the range toggle and the
+              implied-2PP switch. */}
+          {otherContests.length > 0 && (
+            <div className="hero-alt">
+              <span className="ha-lab">Switch 2PP</span>
+              {otherContests.map((o) => (
+                <button key={o.id} type="button" className="ha-chip" onClick={() => chooseMatchup(o.id)}
+                        title={"Show " + MATCHUPS[o.id].a.name + " v " + MATCHUPS[o.id].b.name}>
+                  <span className="ha-vs">{MATCHUPS[o.id].a.name} v {MATCHUPS[o.id].b.name}</span>
+                  <span className="ha-fig">
+                    <span style={{ color: inkOf(MATCHUPS[o.id].a.color) }}>{o.v.a.toFixed(1)}</span>
+                    <span className="ha-dash">–</span>
+                    <span style={{ color: inkOf(MATCHUPS[o.id].b.color) }}>{o.v.b.toFixed(1)}</span>
+                  </span>
+                  {o.v.ci95 != null && <span className="ha-ci">± {o.v.ci95.toFixed(1)}</span>}
+                </button>
+              ))}
+            </div>
+          )}
           {/* The synthetic overlay is only meaningfully comparable against the
               published ALP v L/NP series, so the control only exists there.
               Off by default: it is a diagnostic, not a third headline. */}

@@ -1159,8 +1159,11 @@ body.dark .ci-band { opacity: 0.22; }
 .hero-caption { margin: 0; font-size: 12.5px; color: var(--ink-3); }
 
 /* the contests that are not on the chart, each carrying its own figure. A
-   button, not a tab: pressing one makes it the headline and morphs the chart. */
-.hero-alt { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+   button, not a tab: pressing one makes it the headline and morphs the chart.
+   Lives inside .hero-controls (under the range toggle), so the parent column's
+   own gap spaces it - no margin-top of its own - and wrapped rows keep the
+   desktop column's right edge. */
+.hero-alt { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 .ha-lab { font-size: 10.5px; font-weight: 700;
   color: var(--ink-3); }
 .ha-chip { display: inline-flex; align-items: baseline; gap: 8px; cursor: pointer;
@@ -2288,12 +2291,13 @@ body.dark .fb-form { color-scheme: dark; }
   .tt-opt { font-size: 13px; }
   .tt-dots { margin-right: 5px; }
   /* Two controls switch the matchup: this bare toggle, and the "Switch 2PP"
-     pill under the headline. The pill wins the narrow screen because it names
-     the alternative AND carries its figure - it answers "what would I be
-     looking at?" before you press it, which is the whole reason it stopped
-     being a bare tab. Dropping the toggle here removes a duplicate and a row
-     at once; the pill offers every matchup that is not the active one, so
-     both directions still work, and the headline itself names the live pair. */
+     pill, which sits with the rest of the controls. The pill wins the narrow
+     screen because it names the alternative AND carries its figure - it
+     answers "what would I be looking at?" before you press it, which is the
+     whole reason it stopped being a bare tab. Dropping the toggle here
+     removes a duplicate and a row at once; the pill offers every matchup that
+     is not the active one, so both directions still work, and the headline
+     itself names the live pair. */
   .hero-controls > .text-toggle:not(.tt-caps) { display: none; }
 }
 

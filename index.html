@@ -1207,8 +1207,11 @@ body.dark .ci-band { opacity: 0.22; }
 .hero-caption { margin: 0; font-size: 12.5px; color: var(--ink-3); }
 
 /* the contests that are not on the chart, each carrying its own figure. A
-   button, not a tab: pressing one makes it the headline and morphs the chart. */
-.hero-alt { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; }
+   button, not a tab: pressing one makes it the headline and morphs the chart.
+   Lives inside .hero-controls (under the range toggle), so the parent column's
+   own gap spaces it - no margin-top of its own - and wrapped rows keep the
+   desktop column's right edge. */
+.hero-alt { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 .ha-lab { font-size: 10.5px; font-weight: 700;
   color: var(--ink-3); }
 .ha-chip { display: inline-flex; align-items: baseline; gap: 8px; cursor: pointer;
@@ -2336,12 +2339,13 @@ body.dark .fb-form { color-scheme: dark; }
   .tt-opt { font-size: 13px; }
   .tt-dots { margin-right: 5px; }
   /* Two controls switch the matchup: this bare toggle, and the "Switch 2PP"
-     pill under the headline. The pill wins the narrow screen because it names
-     the alternative AND carries its figure - it answers "what would I be
-     looking at?" before you press it, which is the whole reason it stopped
-     being a bare tab. Dropping the toggle here removes a duplicate and a row
-     at once; the pill offers every matchup that is not the active one, so
-     both directions still work, and the headline itself names the live pair. */
+     pill, which sits with the rest of the controls. The pill wins the narrow
+     screen because it names the alternative AND carries its figure - it
+     answers "what would I be looking at?" before you press it, which is the
+     whole reason it stopped being a bare tab. Dropping the toggle here
+     removes a duplicate and a row at once; the pill offers every matchup that
+     is not the active one, so both directions still work, and the headline
+     itself names the live pair. */
   .hero-controls > .text-toggle:not(.tt-caps) { display: none; }
 }
 
@@ -17335,33 +17339,7 @@ function Hero({
     className: "hi-term",
     title: "What a margin of error means",
     onClick: () => window.AP.openTerm && window.AP.openTerm("margin-of-error", "two-party preferred")
-  }, "margin"), ")"))), otherContests.length > 0 && /*#__PURE__*/React.createElement("div", {
-    className: "hero-alt"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "ha-lab"
-  }, "Switch 2PP"), otherContests.map(o => /*#__PURE__*/React.createElement("button", {
-    key: o.id,
-    type: "button",
-    className: "ha-chip",
-    onClick: () => chooseMatchup(o.id),
-    title: "Show " + MATCHUPS[o.id].a.name + " v " + MATCHUPS[o.id].b.name
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "ha-vs"
-  }, MATCHUPS[o.id].a.name, " v ", MATCHUPS[o.id].b.name), /*#__PURE__*/React.createElement("span", {
-    className: "ha-fig"
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: inkOf(MATCHUPS[o.id].a.color)
-    }
-  }, o.v.a.toFixed(1)), /*#__PURE__*/React.createElement("span", {
-    className: "ha-dash"
-  }, "\u2013"), /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: inkOf(MATCHUPS[o.id].b.color)
-    }
-  }, o.v.b.toFixed(1))), o.v.ci95 != null && /*#__PURE__*/React.createElement("span", {
-    className: "ha-ci"
-  }, "\xB1 ", o.v.ci95.toFixed(1)))))), /*#__PURE__*/React.createElement("div", {
+  }, "margin"), ")")))), /*#__PURE__*/React.createElement("div", {
     className: "hero-controls"
   }, /*#__PURE__*/React.createElement(TextToggle, {
     value: matchup,
@@ -17389,7 +17367,33 @@ function Hero({
       id: "all",
       label: "All"
     }]
-  }), matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && /*#__PURE__*/React.createElement("label", {
+  }), otherContests.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "hero-alt"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "ha-lab"
+  }, "Switch 2PP"), otherContests.map(o => /*#__PURE__*/React.createElement("button", {
+    key: o.id,
+    type: "button",
+    className: "ha-chip",
+    onClick: () => chooseMatchup(o.id),
+    title: "Show " + MATCHUPS[o.id].a.name + " v " + MATCHUPS[o.id].b.name
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "ha-vs"
+  }, MATCHUPS[o.id].a.name, " v ", MATCHUPS[o.id].b.name), /*#__PURE__*/React.createElement("span", {
+    className: "ha-fig"
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: inkOf(MATCHUPS[o.id].a.color)
+    }
+  }, o.v.a.toFixed(1)), /*#__PURE__*/React.createElement("span", {
+    className: "ha-dash"
+  }, "\u2013"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: inkOf(MATCHUPS[o.id].b.color)
+    }
+  }, o.v.b.toFixed(1))), o.v.ci95 != null && /*#__PURE__*/React.createElement("span", {
+    className: "ha-ci"
+  }, "\xB1 ", o.v.ci95.toFixed(1))))), matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && /*#__PURE__*/React.createElement("label", {
     className: "pg-check" + (showSynth ? " on" : ""),
     title: "Also draw what the same polls\u2019 primary votes imply when run through one fixed preference-flow table (the 2025 election\u2019s actual flows). A diagnostic, not a correction."
   }, /*#__PURE__*/React.createElement("input", {
