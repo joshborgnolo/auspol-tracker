@@ -1097,29 +1097,29 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    margin-left so the track's centre lands on the rule between the figures. */
 .hero-gauge { margin-top: 16px; max-width: 340px; }
 .hg-track {
-  position: relative; height: 12px; border-radius: 999px;
+  position: relative; height: 8px; border-radius: 999px;
   background: var(--hg-well);
-  box-shadow: inset 0 2px 3px var(--hg-cut), inset 0 -1px 0 var(--hg-lip), 0 1px 0 var(--hg-lip);
+  box-shadow: inset 0 1px 2px var(--hg-cut), inset 0 -1px 0 var(--hg-lip), 0 1px 0 var(--hg-lip);
 }
 /* Ticks on the sill, not lines across the channel. Crossing it made six even
    bars that read as a segmented meter and drowned the one mark that matters. */
-.hg-grad { position: absolute; bottom: 2px; height: 3px; width: 1px; background: var(--hg-grad); }
+.hg-grad { position: absolute; bottom: 2px; height: 2px; width: 1px; background: var(--hg-grad); }
 /* Geometry straight from the data: left and width are the interval's own
    edges. No min-width and no padding - a floor on the bar would widen a
    narrow interval into a claim the polls do not support. The edges move on
    the same curve and duration the digits roll with, so a switch slides the
    mercury rather than cutting it, and on load the component lets it fill
    out from the tie (see HeroGauge). */
-.hg-span { position: absolute; top: 2px; height: 8px; border-radius: 999px;
+.hg-span { position: absolute; top: 2px; height: 4px; border-radius: 999px;
   transition: left .32s cubic-bezier(.4, .1, .25, 1), width .32s cubic-bezier(.4, .1, .25, 1); }
 /* The tie is the whole point of the instrument - whether the span clears it -
    so it is cut into the housing rather than drawn over it: a dark cut with a
    lit lip on its lower right, the page's one light direction, the same pair
    the dial's graduations use. It reads through the span, which is what a mark
    machined into the case would do. */
-.hg-tie { position: absolute; left: 50%; top: -4px; bottom: -4px; width: 1px; margin-left: -0.5px;
+.hg-tie { position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; margin-left: -0.5px;
   background: var(--hg-tie-cut); box-shadow: 1px 0 0 var(--hg-lip); }
-.hg-over { position: absolute; top: 3px; bottom: 3px; width: 3px; background: var(--hg-cut); }
+.hg-over { position: absolute; top: 2px; bottom: 2px; width: 3px; background: var(--hg-cut); }
 .hg-over-a { left: 0; border-radius: 999px 0 0 999px; }
 .hg-over-b { right: 0; border-radius: 0 999px 999px 0; }
 /* Positioned on the mark, not spaced by flexbox - space-between put the word
@@ -16368,9 +16368,9 @@ function Header({
     className: "wm-sr"
   }, "\u2013 Australian federal polling")), /*#__PURE__*/React.createElement("p", {
     className: "tagline"
-  }, "Aggregated opinion polling for the ", /*#__PURE__*/React.createElement("br", {
+  }, "Aggregated opinion polling for the next Australian ", /*#__PURE__*/React.createElement("br", {
     className: "tagline-br"
-  }), "next Australian federal election, set against the last five."), /*#__PURE__*/React.createElement("div", {
+  }), "federal election, set against the last five."), /*#__PURE__*/React.createElement("div", {
     className: "head-meta-compact",
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("span", {

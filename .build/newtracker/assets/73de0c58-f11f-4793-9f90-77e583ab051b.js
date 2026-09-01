@@ -309,7 +309,7 @@ function Header({ isDark, onToggleTheme }) {
           </button>
           <span className="wm-sr">– Australian federal polling</span>
         </h1>
-        <p className="tagline">Aggregated opinion polling for the <br className="tagline-br"></br>next Australian federal election, set against the last five.</p>
+        <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last five.</p>
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot " + fresh.state}></span>
           Updated {D.latest.published} · {D.latest.pollsTracked} polls
