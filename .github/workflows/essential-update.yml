@@ -9,6 +9,11 @@ on:
     - cron: '10 21 * * *' # 07:10 AEST daily catch-up
     - cron: '5 15 * * 2'  # Wed 01:05 AEST release window
     - cron: '5 16 * * 2'  # Wed 02:05 AEST release window follow-up
+    # 05:02 AEST daily skip-confirm sweep: a passed slot with no new report at
+    # the publisher gets verified-absent and rolled in pollsterRules. (Under
+    # AEDT this fires at 06:02 instead — harmless, the confirm gate needs
+    # 05:00 Sydney so overshooting is fine.)
+    - cron: '2 19 * * *'
   workflow_dispatch:
     inputs:
       simulate_failure:

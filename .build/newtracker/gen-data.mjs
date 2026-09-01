@@ -1564,6 +1564,11 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     waves: dates.length,
     // the house's own release index, so a reader can go and check
     site: (D.pollsterRules?.[firm] || {}).site || null,
+    /* Slots confirmed absent AT THE PUBLISHER by the house's skip-confirm
+       agent (pollsterRules.skippedSlots), where one exists. The projection
+       rolls straight past them instead of holding the slot open as
+       "(or N days ago)" for a release the agent verified was never filed. */
+    skipped: (D.pollsterRules?.[firm] || {}).skippedSlots || [],
     /* The releases behind the projection, most recent last, so the panel can
        show its working rather than asking to be believed. The interval is the
        gap between FIELDWORK ends - the same quantity the median is taken over

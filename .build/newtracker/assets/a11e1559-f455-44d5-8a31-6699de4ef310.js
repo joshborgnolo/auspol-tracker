@@ -2278,6 +2278,18 @@ function npProject() {
        what got confirmed and the row after it is the fresh guess. */
     let field = Date.parse(c.last) + c.cadence * DAY_MS;
     let release = relOf(field);
+    /* A slot named in `skipped` was confirmed absent at the publisher by the
+       house's agent, the morning after it passed - so it is not an open bet
+       and not overdue, it just isn't coming. Roll straight through to the
+       slot after it; the honest row then is the next UNVERIFIED expectation,
+       not a "(or N days ago)" asterisk on a release verified never filed. */
+    {
+      const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
+      while ((c.skipped || []).includes(isoDay(release))) {
+        field += c.cadence * DAY_MS;
+        release = relOf(field);
+      }
+    }
     /* A loose house earns its place when its WINDOW opens inside the horizon,
        not when its centre falls inside it: DemosAU's next centre is 30 days
        out and its window opens in 13, so testing the centre would hide a house

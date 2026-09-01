@@ -37,6 +37,7 @@
             }
           },
           "stopped": { "type": "boolean", "description": "The house has stopped publishing, declared by hand. It drops the house out of \"Next expected polls\" entirely - a silent house otherwise KEEPS its slot there, marked overdue, until a release is recorded, so there is no other way a dead house leaves the list. Delete the flag if it resumes." },
+          "skippedSlots": { "type": "array", "items": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$" }, "description": "Release-slot dates (YYYY-MM-DD) that are confirmed absent at the publisher, written by the house's skip-confirm agent (e.g. .build/essential-confirm-skip.mjs) after it has checked the publisher index the morning after a slot passed. Each entry rolls the house's \"Next expected polls\" slot one cadence on, so a skipped slot stops showing as (or N days ago) instead of hanging around waiting for a release that was verified not to exist. Observational, not declared-by-hand: do not add entries without the agent's evidence checks." },
           "note": { "type": "string" }
         }
       }

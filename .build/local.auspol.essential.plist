@@ -21,6 +21,10 @@
 		     daily sweep across the month-boundary window. Each run is a full
 		     polite crawl (~13 min), so intervals stay sparse. -->
 		<dict><key>Weekday</key><integer>1</integer><key>Hour</key><integer>5</integer></dict>
+		<!-- daily 05:02 skip-confirm: the GitHub cron at 19:02 UTC lands here
+		     ~05:00 local; a passed slot with no new report at the publisher
+		     gets verified-absent and rolled in pollsterRules. -->
+		<dict><key>Hour</key><integer>5</integer><key>Minute</key><integer>2</integer></dict>
 		<dict><key>Day</key><integer>26</integer><key>Hour</key><integer>5</integer></dict>
 		<dict><key>Day</key><integer>27</integer><key>Hour</key><integer>5</integer></dict>
 		<dict><key>Day</key><integer>28</integer><key>Hour</key><integer>5</integer></dict>

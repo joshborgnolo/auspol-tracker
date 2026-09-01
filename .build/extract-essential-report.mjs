@@ -427,6 +427,12 @@ try {
   console.log(`date labels kept verbatim (unparseable): ${counters.verbatimDates.size ? [...counters.verbatimDates].slice(0, 20).join("; ") : "none"}`);
   console.log("fresh dates:", dates[0], "->", dates.at(-1));
 
+  // Newest report post by publish date — the skip-confirm agent
+  // (.build/essential-confirm-skip.mjs) reads this as positive evidence that
+  // the index was fetched and holds no release newer than a skipped slot.
+  const latest = reports.reduce((a, r) => (a && Date.parse(a.date) > Date.parse(r.date) ? a : r), null);
+  const latestReport = latest ? { date: latest.date, title: stripTags(latest.title?.rendered ?? latest.title ?? "") } : null;
+
   console.log(`ESSENTIAL_STATUS ${JSON.stringify({
     changed: changed && !CHECK,
     check: CHECK,
@@ -442,6 +448,8 @@ try {
     non_numeric_skipped: counters.nonNumericCells,
     verbatim_dates: counters.verbatimDates.size,
     new_dates: previous === null ? dates : dates.filter(d => !existingBody.some(l => l.includes(`,${d},`))),
+    latest_report_date: latestReport ? latestReport.date : null,
+    latest_report_title: latestReport ? latestReport.title : null,
   })}`);
 } catch (err) {
   console.error(`ESSENTIAL_ERROR ${err.message}`);

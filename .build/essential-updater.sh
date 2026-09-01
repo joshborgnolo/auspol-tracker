@@ -42,6 +42,34 @@ case "$LAST_LINE" in
 esac
 
 if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
+  # No new report: give the skip-confirm a go. It verifies — from the
+  # extractor's own status emitted a moment ago, not a cached state file —
+  # that the publisher's newest report predates a passed projection slot and
+  # that it's at least 5am Sydney the day after; exit 3 means a slot got
+  # recorded in pollsterRules.skippedSlots, which then needs a rebuild and a
+  # commit like any other data change. Anything else is a silent no-op.
+  STATUS_JSON="${LAST_LINE#ESSENTIAL_STATUS }"
+  node .build/essential-confirm-skip.mjs "$STATUS_JSON" >> "$LOG" 2>&1
+  CONFIRM=$?
+  if [ $CONFIRM -eq 3 ]; then
+    log "skip confirmed; validating and rebuilding next-polls data"
+    if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
+      log "FAIL validate after skip-confirm; skipping slot"
+      exit 1
+    fi
+    if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
+      log "FAIL build after skip-confirm; skipping slot"
+      exit 1
+    fi
+    git add data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt || true
+    SKIP_ISO="$(git diff --cached -U0 data/polls.json | grep -o '+ *"20[0-9-]*"' | tr -d '+ " ' | head -1)"
+    MSG="Confirm skipped Essential slot $SKIP_ISO"
+    git commit -m "$MSG" >> "$LOG" 2>&1 || true
+    git push origin HEAD:main >> "$LOG" 2>&1 || log "FAIL git push (commit kept locally)"
+    log "OK committed + pushed: $MSG"
+  elif [ $CONFIRM -ne 0 ]; then
+    log "skip-confirm refused (see above); human review needed"
+  fi
   exit 0
 fi
 
