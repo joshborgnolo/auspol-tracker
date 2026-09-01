@@ -169,14 +169,13 @@ function NextPollTicker() {
     .filter((r) => !r.missed)
     .map((r) => ({ r, t: targetOf(r) }))
     .sort((a, b) => a.t.at - b.t.at)
-    /* Only the coming week: the bar answers "what lands soon", and a wave a
-       fortnight or more out is the panel's business, not a countdown. A
-       weekly house can appear twice in a seven-day window, and that is the
-       honest shape of the schedule, not a repetition bug. */
-    .filter(({ t }) =>
-      t.byDay
-        ? Math.round((t.at - t0) / TN_DAY) <= 7
-        : t.at <= nowMs + 7 * TN_DAY)
+    /* One slot per house: the projection's repeats of a week-kept house are
+       that wave's own future turns, not other news, and with only three
+       slots to fill the nearest three HOUSES are the honest answer to "what
+       lands next". Sorted earliest-first above, so a house's first turn
+       keeps its place and its later turns drop out. */
+    .filter(((seen) => ({ r }) =>
+      !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set()))
     .map(({ r, t }) => {
       const half = r.winHalf || 0;
       let when;
@@ -185,10 +184,12 @@ function NextPollTicker() {
         /* Due today and the projected hour already gone is not "today" - it is
            the wave arriving. Roy Morgan files on Mondays and was projected to
            midnight; read on the Monday afternoon, "today" understates a poll
-           that could appear while the page is open. */
+           that could appear while the page is open. Whole days out to the
+           horizon - a slot three weeks off reads "21 days", matching the
+           panel, not a rounded "3 weeks". */
         when = days === 0 ? (r.release <= nowMs ? "any moment now" : "today")
              : days === 1 ? "tomorrow"
-             : tnUntil(days * TN_DAY);
+             : days + " days";
       } else {
         when = t.at <= nowMs ? "any moment now" : tnUntil(t.at - nowMs);
       }
