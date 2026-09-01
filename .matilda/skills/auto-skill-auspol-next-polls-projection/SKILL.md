@@ -22,7 +22,7 @@ Feature added 1 Sep 2026: a slot whose expected release moment passes unrecorded
 ## Fit pass (redone 1 Sep 2026 — replaces the count-of-three)
 
 The ticker shows as many roll items as clear their neighbours, measured live:
-- `React.useLayoutEffect` (deps `[itemsKey, pinned]`, runs PRE-PAINT so no flash) measures a budget: **unpinned** `innerRight − tabsetRight − SAFE`; **pinned** `2*(min(centre − tabsetRight, scoreLeft − centre) − SAFE)` (symmetric about the bar centre; content max-width 1200 freezes it ≥1200). `SAFE = 24`.
+- `React.useLayoutEffect` (deps `[itemsKey, pinned]`, runs PRE-PAINT so no flash) measures a budget: **unpinned** `innerRight − tabsetRight − SAFE`; **pinned** `2*(min(centre − tabsetRight, scoreLeft − centre) − SAFE)` (symmetric about the bar centre; content max-width 1200 freezes it ≥1200). `SAFE = 32`.
 - It accumulates `offsetWidth`s of `.tab-next`'s children — `kids[0]` is the **Next button**, then the `.tn-item`s — plus `column-gap` 14px, and `setFit(k)`; items at index `i >= fit` get class `tn-park` (`.tn-item.tn-park { position: absolute; visibility: hidden; }` inside the `@media (min-width: 1100px)` blocks in template.html — OUT of flow, invisible, still measurable).
 - Recompute triggers: the layout effect itself, `+420ms` settle after a pin flip, `ResizeObserver` on `el.parentElement`, `document.fonts.ready`.
 - Hooks run UNCONDITIONALLY (proj computed defensively; `if (!items.length) return null` sits AFTER the layout effect) — the hooks-after-early-return bug was pre-empted, don't reintroduce it.
