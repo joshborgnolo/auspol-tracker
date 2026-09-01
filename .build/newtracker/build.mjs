@@ -286,6 +286,16 @@ function grabLatest() {
   return JSON.parse(src.slice(i + 15, src.indexOf("\n", i)).replace(/;$/, ""));
 }
 
+/* One short race sentence, shared by the static summary's sub-head and the
+   meta / og descriptions, so the SERP snippet, social previews and the
+   crawled page text can never disagree. */
+const raceLine = (v) => {
+  const d = +(v.alp2pp - v.lnp2pp).toFixed(1);
+  return d > 0 ? `Labor leads the Coalition ${v.alp2pp}\u2013${v.lnp2pp}`
+       : d < 0 ? `The Coalition leads Labor ${v.lnp2pp}\u2013${v.alp2pp}`
+       : `Neither side leads: ${v.alp2pp}\u2013${v.lnp2pp}`;
+};
+
 const fav = buildFavicon();
 console.log("  favicon:", fav.note);
 console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches --bg / the pinned bar)`);
@@ -345,7 +355,7 @@ function buildStaticSummary() {
   return `<article class="static-summary">
       <h1>auspol tracker</h1>
       <p class="ss-sub">Aggregator of Australian opinion polling for the next federal election, set against the last five.
-        Updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
+        ${raceLine(L)} two-party preferred (&#177;${L.alp2ppCi95}) &#8211; updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
         ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Next election due ${esc(L.nextElectionDue[0].toLowerCase() + L.nextElectionDue.slice(1))}.</p>
 
       <h2>Two-party preferred</h2>
@@ -453,13 +463,22 @@ const cl = grabLatest();
 const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, Coalition ${cl.lnp2pp.toFixed(1)} `
   + `two-party preferred, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
   + `with the trend since the 2025 election`;
+/* SERP + social description: the race first (that's what the ~160-char
+   snippet window keeps), then provenance and scope. Figures and their date
+   share the sentence, so a stale cached snippet stays self-dating. Reuses
+   the same numbers as the card alt and the summary below. */
+const metaDesc = `${raceLine(cl)} two-party preferred (±${cl.alp2ppCi95}) `
+  + `– updated ${cl.updated} from ${cl.pollsTracked} published polls across ${cl.housesTracked} polling houses. `
+  + `auspol tracker aggregates every national poll for the next Australian federal election, set against the last five.`;
 
 /* og:site_name must NOT equal the masthead h1 text: Safari Reader skips any
    title candidate whose text equals og:site_name when og:title exists (its
    site-name de-dup), so "auspol tracker" here disqualified the h1 and let
    "Two-party preferred" win. The domain keeps the two distinct. */
 html = html.replace('<meta property="og:type" content="website">',
-  `<meta property="og:type" content="website">
+  `<meta name="description" content="${metaDesc}">
+  <meta property="og:type" content="website">
+  <meta property="og:description" content="${metaDesc}">
   <meta property="og:site_name" content="auspoltracker.com">
   <meta property="og:locale" content="en_AU">
   <meta property="og:url" content="${SITE_URL}">
