@@ -69,6 +69,7 @@ execFileSync(process.execPath, [path.join(HERE, "gen-data.mjs")], { stdio: ["ign
 const PLAIN = [
   "9f09dca2-bd46-49a8-8ae1-51847608cf92.js",
   "ed2260de-5b11-4bd5-8a8d-a391156c05ee.js",
+  "np-project.js", // the next-polls projection (needs window.AP; the sim evals this same file)
   "copy-chart.js", // per-chart copy-as-image button
 ];
 const JSX = [

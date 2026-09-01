@@ -1,8 +1,10 @@
 // Simulation of the "an unrecorded release holds its slot" rule, over the
-// REAL pollCadence from the built data asset. Mirrors the shipped projection
-// (a11e1559 npProject / window.AP.nextPolls) and the nav countdown's item
-// derivation (d1a1d215 NextPollTicker) against mocked Sydney clocks, so a
-// wave going late can be watched without waiting days for it:
+// REAL pollCadence from the built data asset. Runs the SHIPPED projection
+// itself - .build/newtracker/assets/np-project.js, eval'd below, is the same
+// window.AP.nextPolls the page runs - and mirrors the nav countdown's item
+// derivation and the panel's label rules (d1a1d215 NextPollTicker and the
+// a11e1559 labels - both unbaked JSX, not eval-safe) against mocked Sydney
+// clocks, so a wave going late can be watched without waiting days for it:
 //
 //   - slot moment passes, tolerance open: panel counts to the window's edge,
 //     ticker counts to the next landing day ("tomorrow" / "any moment now")
@@ -35,9 +37,13 @@ global.window = {};
 eval(src);
 const D = window.AUSPOL;
 
+// the shipped projection itself, eval'd like the data asset - NOT a copy.
+// It reads window.AP.D at call time, so scenarios pass a mutated cadence
+// table by reassigning window.AP.D for the duration of each projection.
+window.AP = { D };
+eval(readFileSync(new URL("./assets/np-project.js", import.meta.url), "utf8"));
+
 const DAY = 86400000;
-const NP_HORIZON_DAYS = 28;
-const NP_UNTIMED_MINS = 24 * 60;
 const NP_MAX_ROWS = 12;
 
 // a Sydney calendar day + minutes past midnight – the app's own frame, so a
@@ -50,82 +56,11 @@ const dayFloor = (ms) => {
   return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 };
 
-// --- exact algorithm shipped in a11e1559 (npProject) ---
-function spreadDays(c, sp) {
-  return c.releaseDow != null && !c.loose ? 7 * Math.floor((sp + 3) / 7) : sp;
-}
+// --- the shipped projection (assets/np-project.js), with the panel-side row
+// cap applied the way NextPollsPanel applies it (a11e1559 truncates rows)
 function project(cad, t0, nowMs) {
-  const rows = [];
-  const horizon = t0 + NP_HORIZON_DAYS * DAY;
-  for (const c of cad) {
-    // mirrors the calMonth branch in a11e1559 npProject: the slot is the
-    // calendar month after the last wave, window = its measured day-of-month
-    // range (calDays), clamped to the month's own last day
-    if (c.calMonth) {
-      const ld = new Date(Date.parse(c.last));
-      const sm = (ld.getUTCMonth() + 1) % 12;
-      const sy = ld.getUTCFullYear() + (ld.getUTCMonth() === 11 ? 1 : 0);
-      const lastDay = Date.UTC(sy, sm + 1, 0);
-      const open = Date.UTC(sy, sm, c.calDays ? c.calDays[0] : 1);
-      const close = c.calDays ? Math.min(Date.UTC(sy, sm, c.calDays[1]), lastDay) : lastDay;
-      const sp = (close - open) / 2 / DAY;
-      const release = (open + close) / 2;
-      const missed = close < t0;
-      if (open <= horizon || missed) {
-        rows.push({
-          ...c, field: open, release, missed, ahead: 0,
-          overdue: missed, spread: sp, winHalf: sp,
-          inDays: Math.round((release - t0) / DAY),
-          opensIn: Math.round((open - t0) / DAY),
-          closesIn: Math.round((close - t0) / DAY),
-        });
-      }
-      continue;
-    }
-    const snap = (ms) => {
-      if (c.releaseDow == null) return ms;
-      let d = c.releaseDow - new Date(ms).getUTCDay();
-      if (d > 3) d -= 7;
-      if (d < -3) d += 7;
-      return ms + d * DAY;
-    };
-    const due = (rel) => rel + (c.releaseMins == null ? NP_UNTIMED_MINS : c.releaseMins) * 60000;
-    let field = Date.parse(c.last) + c.cadence * DAY;
-    let release = dayFloor(snap(field + c.lag * DAY));
-    // the skipped-roll steps ONE WEEK for a dated house (the only slip its
-    // record shows: Essential's 28-day cadence slips to 35, never 56)
-    let rolled = false;
-    while ((c.skipped || []).includes(new Date(release).toISOString().slice(0, 10))) {
-      rolled = true;
-      field += (c.releaseDow != null ? 7 : c.cadence) * DAY;
-      release = dayFloor(snap(field + c.lag * DAY));
-    }
-    const reaches = (rel, sp) => (c.loose ? rel - sp * DAY : rel) <= horizon;
-    for (let i = 0; reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)))) && i < 12; i++) {
-      const overdue = due(release) <= nowMs;
-      const sp = Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)));
-      const winHalf = spreadDays(c, sp);
-      rows.push({
-        ...c, field, release, overdue, ahead: i,
-        spread: sp, winHalf,
-        // a slot the skip-roll carried onto the measured late step IS the
-        // late alternative; the labels must not name a step past it
-        rolled: rolled && i === 0,
-        inDays: Math.round((release - t0) / DAY),
-        opensIn: Math.round((release - winHalf * DAY - t0) / DAY),
-        closesIn: Math.round((release + winHalf * DAY - t0) / DAY),
-        missed: overdue && release + winHalf * DAY < t0,
-      });
-      if (overdue || c.loose) break;
-      field += c.cadence * DAY;
-      release = dayFloor(snap(field + c.lag * DAY));
-    }
-  }
-  const first = (r) => (r.missed ? Infinity
-    : r.loose ? r.release - r.spread * DAY
-    : r.overdue ? r.release + (r.winHalf != null ? r.winHalf : r.spread) * DAY
-    : r.release);
-  rows.sort((a, b) => first(a) - first(b));
+  window.AP.D = { ...D, pollCadence: cad };
+  const { rows } = window.AP.nextPolls({ day: t0, mins: (nowMs - t0) / 60000 });
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
   return rows;
 }
