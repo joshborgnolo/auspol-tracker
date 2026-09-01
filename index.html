@@ -2795,9 +2795,16 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 }
 .ap-check.radio .ap-tick { border-radius: 50%; }
 .ap-check.on .ap-tick { background: var(--accent); border-color: var(--accent); }
+/* Same tick as .pg-check, scaled to this box rather than drawn afresh: the
+   padding box is 12px here (15px, border-box, 1.5px border) against 11px
+   there, so every measure is the approved one x 12/11. Drawn independently it
+   had 2px arms and an 8px tail on a 12px face - more ink than space, with the
+   long arm running into the corner, which is the exact fault .pg-check was
+   already fixed for. A checkbox should mean the same thing wherever the site
+   draws one, and that has to include the one the page renders as a span. */
 .ap-check.on .ap-tick::after {
-  content: ""; position: absolute; left: 4.4px; top: 1.2px; width: 3.6px; height: 8px;
-  border: solid var(--bg); border-width: 0 2px 2px 0; transform: rotate(42deg);
+  content: ""; position: absolute; left: 4.6px; top: 1.85px; width: 3.05px; height: 6.8px;
+  border: solid var(--bg); border-width: 0 1.85px 1.85px 0; transform: rotate(43deg);
 }
 .ap-check.radio.on .ap-tick::after {
   left: 3.8px; top: 3.8px; width: 5px; height: 5px;
