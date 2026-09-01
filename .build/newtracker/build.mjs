@@ -101,17 +101,19 @@ let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
    They are files again, named by a hash of their own bytes so a browser can
    keep them forever and still pick up a new cut the moment one ships. */
 const FONTS = [
-  /* The text faces are self-hosted latin subsets; the variable cuts serve
-     the page's whole weight range from one file per style. */
-  { file: "merriweather-latin.woff2",        family: "Merriweather", style: "normal", weight: "300 900", preload: true },
-  { file: "merriweather-italic-latin.woff2", family: "Merriweather", style: "italic", weight: "300 900" },
-  { file: "ibmplexsans-latin.woff2",         family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
+  /* The text faces are self-hosted latin subsets. Crimson Text ships as
+     static cuts only (there is no variable cut), so the serif range is
+     carried by one file per weight per style. */
+  { file: "crimsontext-400-latin.woff2",        family: "Crimson Text", style: "normal", weight: "400", preload: true },
+  { file: "crimsontext-600-latin.woff2",        family: "Crimson Text", style: "normal", weight: "600", preload: true },
+  { file: "crimsontext-700-latin.woff2",        family: "Crimson Text", style: "normal", weight: "700", preload: true },
+  { file: "crimsontext-italic-400-latin.woff2", family: "Crimson Text", style: "italic", weight: "400" },
+  { file: "crimsontext-italic-600-latin.woff2", family: "Crimson Text", style: "italic", weight: "600" },
+  { file: "crimsontext-italic-700-latin.woff2", family: "Crimson Text", style: "italic", weight: "700" },
+  { file: "ibmplexsans-latin.woff2",            family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
   /* Source Sans 3 stays shipped for one scoped caller: the .wordmark
      lockup, which keeps its pre-swap face. */
-  { file: "sourcesans3-latin.woff2",         family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
-  /* Crimson Pro ships only for the tab bar labels (.tab-label), which the
-     masthead paints on route in - preload it too. */
-  { file: "crimsonpro-latin.woff2",          family: "Crimson Pro", style: "normal", weight: "200 900", preload: true },
+  { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });

@@ -89,7 +89,7 @@
      leads; the current cycle and any highlighted cycle override with party hue */
 
   /* every text face is a self-hosted latin subset (FONTS in build.mjs) */
-  --serif: "Merriweather", Georgia, "Times New Roman", serif;
+  --serif: "Crimson Text", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --radius: 14px;
@@ -1000,7 +1000,7 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .ro-party { display: flex; align-items: baseline; gap: 11px; }
 .ro-dot { width: 13px; height: 13px; border-radius: 50%; align-self: center; }
 .ro-name { font-size: 17px; font-weight: 700; color: var(--ink-2); letter-spacing: -0.01em; white-space: nowrap; }
-.ro-num { font-size: 68px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
+.ro-num { font-family: var(--serif); font-size: 68px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
 .alp-side .ro-num { color: var(--alp-text); }
 .lnp-side .ro-num { color: var(--lnp-text); }
 .ro-sep { width: 2px; height: 47px; border-radius: 1px; background: var(--line); align-self: center; }
@@ -2558,7 +2558,7 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.789); } /* 19 → 15 
   color: var(--ink-3); transition: color .15s ease;
 }
 .tab-label {
-  font-family: "Crimson Pro", var(--serif);
+  font-family: "Crimson Text", var(--serif);
   font-size: 16px; font-weight: 600; letter-spacing: -0.005em;
   line-height: 19.5px;
 }
@@ -2571,7 +2571,7 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.789); } /* 19 → 15 
   transform: scaleX(0); transform-origin: left center; transition: transform .2s ease;
 }
 .tab.active::after { transform: scaleX(1); }
-body.editorial .tab-label { font-family: "Crimson Pro", var(--serif); font-weight: 500; font-size: 19px; line-height: 23.5px; letter-spacing: -0.01em; }
+body.editorial .tab-label { font-family: "Crimson Text", var(--serif); font-weight: 600; font-size: 19px; line-height: 23.5px; letter-spacing: -0.01em; }
 
 /* narrow screens condense a touch further so the docked score clears the
    scaled tab set. The gap (and the shrunk phone bar below) lives HERE, after

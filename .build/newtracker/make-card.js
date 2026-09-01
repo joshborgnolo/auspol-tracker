@@ -197,7 +197,7 @@
      "30 August 2026", so the upcasing that fed the caps setting simply goes,
      and the 2.2px tracking with it, being what carried the caps. */
   caps("Updated " + L.published, W - PAD, 74, 13.5, 0, T.ink3, 600);
-  c.font = "600 40px Merriweather, Georgia, serif"; c.fillStyle = T.ink;
+  c.font = '600 40px "Crimson Text", Georgia, serif'; c.fillStyle = T.ink;
   c.fillText((marg >= 0 ? "Labor" : "Coalition") + " leads by " + Math.abs(marg).toFixed(1), W - PAD, 116);
   // one line, not two: the caveats belong beside the sentence they qualify.
   // The page will not call a move real unless it clears its own interval.
@@ -220,7 +220,7 @@
      and no separate label row is needed. They are the only element that
      survives a 360px thumbnail, so they get the middle. */
   const FIG_Y = 330, FIG_PX = 150, GAP = 22, DOT = 4.5;
-  const figFont = "600 " + FIG_PX + 'px Merriweather, Georgia, serif';
+  const figFont = "600 " + FIG_PX + 'px "Crimson Text", Georgia, serif';
   /* Sentence case, so no tracking - 1.8px is what carries small caps and what
      pulls lowercase apart - and 22px rather than 20 to hold the optical size
      caps had, since only the L and the C now reach cap height. */
