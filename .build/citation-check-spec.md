@@ -6,24 +6,27 @@ nothing verifies.
 
 ## The surface
 
-187 URLs across 26 hosts, in three fields:
+175 unique URLs across 28 hosts, in three fields (measured off the built
+ledger, 2026-09-01):
 
-| field | count | what it is |
+| field | unique URLs | what it is |
 |---|---|---|
-| `polls[].url` | 155 | the citation for the wave (155 of 156 rows carry one) |
+| `polls[].url` | 146 | the citation for the wave |
 | `polls[].releaseUrl` | 22 | the pollster's own release, beside the coverage link |
-| `pollsterRules[].site` | 10 | the publisher index — **load-bearing** |
+| `pollsterRules.*.site` | 7 | the publisher index — **load-bearing** (10 deployments, 7 unique) |
 
-Top hosts: roymorgan.com 46, essentialreport.com.au 17, smh.com.au 16,
-theaustralian.com.au 15, afr.com 15, skynews.com.au 15, demosau.com 12,
-accent-research.com 9, theguardian.com 6, news24.com.au 5. 15 targets are PDFs;
-the tail includes drive.google.com, a Wix `usrfiles.com` file host, and one
-x.com status.
+Top hosts: roymorgan.com 44, theaustralian.com.au 15, smh.com.au 15,
+afr.com 14, essentialreport.com.au 13, skynews.com.au 13, demosau.com 11,
+accent-research.com 9, theguardian.com 6, drive.google.com 4,
+news24.com.au 4, australiainstitute.org.au 3. The tail includes a Wix
+`usrfiles.com` file host, one x.com status, and a string of News Corp
+mastheads (`heraldsun`, `dailytelegraph`, `couriermail`, `thechronicle`,
+`news.com.au` — one each).
 
-`pollsterRules[].site` deserves emphasis: `essential-confirm-skip.mjs` and
+`pollsterRules.*.site` deserves emphasis: `essential-confirm-skip.mjs` and
 `demosau-confirm-skip.mjs` verify absence against the publisher index. If one of
 those moves, a skip-confirm agent doesn't fail loudly — it loses its evidence
-source. These ten are infrastructure, not decoration.
+source. These seven are infrastructure, not decoration.
 
 ## Why a naive checker is worse than none
 
@@ -32,19 +35,29 @@ walled publishers lie in opposite ones. Measured 2026-09-01:
 
 | host | what an anonymous GET returns | truth |
 |---|---|---|
-| `theaustralian.com.au` (15) | **200** + `<title>No Cookies` | alive, but the 200 proves nothing |
-| `news24.com.au` (5) | **404** + `<title>Nocookies` | alive; 404 is the bot wall |
-| `skynews.com.au` (15) | **404** after 3 redirects → `news24.com.au/nocookies` | alive, via the rebrand redirect |
+| News Corp mastheads (20: `theaustralian.com.au` ×15, `heraldsun`, `dailytelegraph`, `couriermail`, `thechronicle`, `news.com.au` ×1 each) | **403** + a 1.3 KB "You might have been detected and blocked as a crawler bot!" page | alive; News Corp's own bot wall. Browserish UAs get the older **200** + `<title>No Cookies` incarnation |
+| `news24.com.au` (4) | **404** + `<title>Nocookies` | alive; 404 is the bot wall |
+| `skynews.com.au` (13) | **404** after 3 redirects → `news24.com.au/nocookies` | alive, via the rebrand redirect |
+| `thenewdaily.com.au` (1) | **403** + Cloudflare "Just a moment…" shell | alive; the challenge eventually yields |
 | `x.com` (1) | 200, JS shell | a deleted post looks identical |
 | `drive.google.com` (4) | 200, viewer page | an access-denied page looks identical |
 
-That is ~40 of 187 URLs — better than a fifth of the archive — where the HTTP
-status is not evidence. A checker that trusts status codes would report 35 dead
-links that are fine and pass 15 walled ones it never actually saw.
+That is ~43 of 175 URLs — roughly a quarter of the archive — where the HTTP
+status is not evidence. A checker that trusts status codes would report 16 dead
+links that are fine (13 skynews + 3 walls it read at face value) and pass 26
+walled ones it never actually saw.
 
-**I made exactly this mistake while scoping this work**: I reported all 15
-skynews citations as dead 404s. They redirect to News24 and hit its cookie wall.
-Encode the rules or don't build the checker.
+**I made exactly this mistake while scoping this work**: I reported all
+skynews citations as dead 404s. They redirect to News24 and hit its cookie
+wall. Encode the rules or don't build the checker.
+
+**And I made the second mistake too**: the first table draft pinned the
+Australian's wall to `200 + No Cookies` because that's what a browser UA saw
+in the morning. The afternoon's sweep — honest UA, no cookies — got a hard
+403 with a *different* wall page. A status-pinned title rule silently matched
+nothing, and 21 URLs reported `error` until the rule moved to the page body,
+the one thing both incarnations share. Key wall rules on **content**, not
+status — statuses are the most-volatile part of a bot wall.
 
 ## Verdicts
 
@@ -57,21 +70,25 @@ Encode the rules or don't build the checker.
   returning something that is neither the wall nor the page.
 - `error` — DNS, TLS, timeout, 429. Never `gone`; retry next run.
 
-Wall rules are title-based, so the fetch needs the first ~4 KB of the body
-(`Range: bytes=0-4095`), not just headers:
+Wall rules key off page **content**, so the fetch needs the first ~16 KB of
+the body (`Range: bytes=0-16383` — the title alone wasn't enough once News
+Corp's 403 page shipped without one), not just headers:
 
 ```
-theaustralian.com.au        200 + /no cookies/i in <title>      -> wall
-news24.com.au, skynews.com.au  404 + /nocookies/i in <title>    -> wall
-x.com, drive.google.com     any 2xx                             -> wall (unverifiable)
+theaustralian.com.au + News Corp mastheads
+                            body matches /crawler bot|no cookies/i   -> wall (any status)
+news24.com.au, skynews.com.au  404 + /nocookies/i in <title>         -> wall
+thenewdaily.com.au            <title> matches /^just a moment/i      -> wall
+x.com, drive.google.com       any 2xx                                -> wall (unverifiable)
 ```
 
 These are the same detections `auto-skill-newspoll-extraction` and
-`auto-skill-news24-extraction` already carry. Read them; don't re-derive.
+`auto-skill-news24-extraction` already carry, plus the News Corp block page as
+measured above. Read them; don't re-derive.
 
 ## The signal that actually matters: redirect drift
 
-The 15 skynews citations are alive **only because News Corp still redirects the
+The 13 skynews citations are alive **only because News Corp still redirects the
 retired Sky News paths to News24**. Redirects get retired. The valuable output of
 this agent is not "is it 200 today" but "this citation now resolves via 3 hops to
 a different host" — which is the window in which you can rewrite them to
@@ -94,10 +111,10 @@ publisher's own chart turned out to be wrong and the tracker right.
 - `data/link-health.json`: one entry per URL — `{url, field, lastChecked,
   verdict, finalUrl, redirects, status, note}`.
 - **Write only when an entry's verdict, finalUrl or redirect count changes.**
-  `lastChecked` alone must never dirty the file, or the weekly run commits 187
+  `lastChecked` alone must never dirty the file, or the weekly run commits 175
   timestamp churns into a repo that already takes concurrent pushes. Same rule
   `np-score.mjs` follows for its identity tuple.
-- Weekly, not daily. Link rot is slow, and 187 requests a day at other people's
+- Weekly, not daily. Link rot is slow, and 175 requests a day at other people's
   publishers is rude. Sequential with a small delay, one host at a time, honest
   User-Agent, back off on 429.
 
@@ -108,7 +125,8 @@ Following `coverage-doctor.mjs` (`check-coverage`'s `3` already means
 
 - `0` — no citation newly `gone`. `moved` and `wall` are report-only.
 - `1` — inconclusive: too many `error`s to judge (e.g. >20% of the sweep).
-- `2` — at least one URL went from `ok`/`wall` to `gone` since the last run.
+- `2` — at least one URL went from `ok`/`wall`/`moved` to `gone` since the
+  last run.
 
 Only a *transition* into `gone` fires. A link already known dead and recorded
 stays reported, not re-alarmed, or the light is permanently red.
@@ -118,11 +136,23 @@ new `gone` and new `moved` entries.
 
 ## Verification recipe
 
-- Fixture the wall rules first, offline: a saved Australian "No Cookies" page
-  must classify `wall`, not `ok`; a saved News24 `Nocookies` 404 must classify
-  `wall`, not `gone`. These two are the whole point.
+- Fixture the wall rules first, offline: a saved News Corp 403 crawler-bot
+  page must classify `wall`, not `error` (no `<title>` to lean on — the body
+  regex is the detector); a saved News24 `Nocookies` 404 must classify
+  `wall`, not `gone`. These are the whole point.
 - A genuinely dead URL on a plain host must classify `gone`.
 - A known-good redirect (any skynews citation) must classify `moved` with
   `redirects: 3` and `finalUrl` on `news24.com.au` — and must NOT be `gone`.
-- Run the full sweep once against live: expect ~40 `wall`, 15 `moved`, 0 `gone`,
-  and confirm a second immediate run writes nothing to `link-health.json`.
+- Run the full sweep once against live: expect ~30 `wall`, 13 `moved`, and
+  the three known-`gone` australiainstitute.org.au briefs (below), and
+  confirm a second immediate run writes nothing to `link-health.json`.
+
+## Standing baseline: the three gone Australia Institute briefs
+
+The 2026-09-01 baseline recorded three institute PDFs — citations on YouGov
+(2025-10-30, 2026-03-19) and Redbridge (2026-02-12) waves — as `gone`
+(404 with or without a Range header, so genuinely absent). Three consecutive
+briefs suggests a reorganisation, not individual deletions. They fired no
+alarm on the baseline run (a first-seen `gone` never does); whether a later
+release is the right rewrite is a human decision, so they are left as the
+ledger's standing `gone` entries until adjudicated.

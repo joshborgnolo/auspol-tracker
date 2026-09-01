@@ -1,0 +1,67 @@
+# Citation sweep — runs .build/check-citations.mjs (spec:
+# .build/citation-check-spec.md) over the archive's outbound URLs and
+# classifies:
+#
+#   class 0  no citation transitioned to gone → green
+#   class 1  inconclusive (>20% of the sweep errored) → GREEN; a bad
+#             network day is not an alarm
+#   class 2  a citation went from ok/wall/moved to gone → the job
+#             fails (email); the rewrite is a human decision, so there
+#             is deliberately no repair job here
+#
+# Weekly, not daily: link rot is slow, and 175 requests a day at other
+# people's publishers is rude. data/link-health.json comes back only on
+# a real change (the script writes nothing otherwise), committed by the
+# github-actions identity like np-score's calibration ledger.
+
+name: citation-check
+
+on:
+  schedule:
+    - cron: '37 21 * * 0' # 07:37 AEST Mondays
+  workflow_dispatch:
+
+jobs:
+  sweep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Run the citation sweep
+        id: check
+        run: |
+          set +e
+          OUT="$(node .build/check-citations.mjs 2>&1)"
+          CODE=$?
+          echo "$OUT"
+          echo "verdict=$CODE" >> "$GITHUB_OUTPUT"
+          if [ "$CODE" -ne 0 ]; then
+            {
+              echo "### citation-check — class $CODE"
+              echo '```'
+              echo "$OUT" | grep -E ' (GONE|MOVED) | newly gone|inconclusive' || echo "$OUT" | tail -n 20
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # only class 2 (a citation newly gone) goes red
+          [ "$CODE" -ne 2 ]
+
+      - name: Commit whatever moved
+        run: |
+          git add data/link-health.json
+          if git diff --cached --quiet; then
+            echo "no link-health changes this week"
+            exit 0
+          fi
+          git commit -m "Refresh the citation link-health ledger"
+          # another agent may have landed data first thing; rebase, don't race
+          git pull --rebase origin main
+          git push origin HEAD:main
