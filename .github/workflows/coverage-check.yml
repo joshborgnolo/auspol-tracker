@@ -1,8 +1,17 @@
-# Coverage watchdog — the only scheduled job whose failure IS the message.
-# It compares data/polls.json against Wikipedia's poll table and exits
-# non-zero when a wave exists there that no agent has landed. Runs after the
-# morning data-agent sweeps; a failed run arrives as a GitHub notification
-# email, replacing the local macOS notification.
+# Coverage watchdog — now routed through .build/coverage-doctor.mjs, which
+# runs check-coverage.mjs in-process and classifies the result:
+#
+#   class 0  clean            → green
+#   class 1  monitoring-outage → GREEN (the watchdog's standing rule:
+#             inconclusive is not an alarm), noted in the run summary
+#   class 2  defect           → the job fails (email) AND the repair job
+#             fires — only class backed by witness evidence of a missed wave
+#   class 4  report-only      → GREEN, noted in the run summary; genuine
+#             silence with no confirmed absence never fires a repair
+#
+# Silence a skip-confirm agent has verified (pollsterRules.skippedSlots /
+# skippedMonths), or a house declared stopped, is classified clean before
+# either of the noisy classes is considered.
 
 name: coverage-check
 
@@ -15,41 +24,68 @@ jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    outputs:
+      verdict: ${{ steps.doctor.outputs.verdict }}
     steps:
       - uses: actions/checkout@v4
-      - name: Check poll coverage against Wikipedia
-        run: bash .build/coverage-updater.sh
-
-      # The wrappers send every step's output to .build/logs/<house>.log and
-      # nothing to stdout, so a run used to be opaque in BOTH directions: a
-      # failure's diagnosis died with the runner, and a green run never said
-      # what it actually saw. .build/logs/ is gitignored, so anything matching
-      # here was written by THIS run — no marker file needed. The step summary
-      # (what the notification email links to) is reserved for failures.
-      - name: Show the updater log
-        if: always()
-        env:
-          JOB_STATUS: ${{ job.status }}
+      - name: Run the coverage doctor
+        id: doctor
         run: |
-          shopt -s nullglob
-          logs=(.build/logs/*.log)
-          if [ ${#logs[@]} -eq 0 ]; then
-            echo "No .build/logs/*.log was written this run."
+          set +e
+          OUT="$(node .build/coverage-doctor.mjs 2>&1)"
+          CODE=$?
+          echo "$OUT"
+          echo "verdict=$CODE" >> "$GITHUB_OUTPUT"
+          if [ "$CODE" -ne 0 ]; then
+            {
+              echo "### coverage doctor — class $CODE"
+              echo '```'
+              echo "$OUT"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # only class 2 (defect) goes red; 1 is inconclusive-is-not-an-alarm,
+          # 4 is report-only by design
+          [ "$CODE" -ne 2 ]
+
+  # Fires only on class 2: a repair agent gets a worklist of wave dates and
+  # houses, never an unexplained silence. Matched to the poll-agent repair
+  # pattern but kept inline — the prompt and apt needs are coverage-specific.
+  repair:
+    needs: check
+    if: failure() && needs.check.outputs.verdict == '2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Install apt packages
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+
+      - name: Install puppeteer-core (best effort)
+        run: npm i puppeteer-core --prefix "$HOME" || true
+
+      - name: Install Matilda CLI
+        run: npm i -g @maincode-ai/matilda-code
+
+      - name: Run the repair agent
+        env:
+          MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHROME: /usr/bin/google-chrome
+        run: |
+          if [ -z "$MATILDA_API_KEY" ]; then
+            echo "::warning::MATILDA_API_KEY secret not set; skipping repair. Add it in repo Settings > Secrets."
             exit 0
           fi
-          for f in "${logs[@]}"; do
-            echo "::group::$f (last 200 lines)"
-            tail -n 200 "$f"
-            echo "::endgroup::"
-            if [ "$JOB_STATUS" = "failure" ]; then
-              {
-                echo "### $f (tail)"
-                echo '```'
-                tail -n 40 "$f"
-                echo '```'
-              } >> "$GITHUB_STEP_SUMMARY"
-            fi
-          done
+          matilda -p "$(cat .build/coverage-doctor-repair-prompt.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
 
   # Separate job, not another step: a missed wave and a thin wave are different
   # failures and must be able to go red independently of each other.
