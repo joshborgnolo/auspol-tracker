@@ -12,9 +12,11 @@
      index mismatch   live bytes differ -> 2, firstDiffAt is the real offset
      feed mismatch    index matches, feed.xml doesn't -> 2 naming the file
      missing asset    html matches but a referenced asset 404s -> 2 naming it
-     unreachable      nothing on the port -> 1, never 2
+     unreachable      nothing on the port -> 1 locally and on workflow_run,
+                      but 2 on the scheduled backstop (nothing is deploying)
      grace flip       Pages-mid-deploy: wrong bytes twice, then right -> 0
      dirty tree       uncommitted served file outside CI -> refuse with 1
+     ahead of origin  committed but unpushed outside CI -> refuse with 1
 
    Run:  node .build/test-site-check.mjs        exits non-zero on failure
    ==================================================================== */
@@ -159,22 +161,44 @@ const close = (server, ...dirs) => server.close(() => dirs.forEach((d) => rmSync
   close(server, root);
 }
 
-/* --- unreachable: class 1, never 2 -------------------------------------- */
+/* --- unreachable, local/ad-hoc run: class 1 (a deploy may be in flight) - */
 {
   const { server, url } = await serve(() => null);
   server.close(); // nothing on the port
   const root = rootWith();
   const r = await run(url, root);
-  ok("unreachable: exit 1", r.code === 1, r.stdout + r.stderr);
-  ok("unreachable: verdict 1 with reason", r.status?.verdict === 1 && !!r.status?.reason);
+  ok("unreachable (local): exit 1", r.code === 1, r.stdout + r.stderr);
+  ok("unreachable (local): verdict 1 with reason", r.status?.verdict === 1 && !!r.status?.reason);
   rmSync(root, { recursive: true, force: true });
 }
 
-/* --- nonexistent host: DNS failure is also class 1, never 2 ------------- */
+/* --- unreachable on workflow_run: still class 1 (Pages may be building) - */
+{
+  const { server, url } = await serve(() => null);
+  server.close();
+  const root = rootWith();
+  const r = await run(url, root, { GITHUB_EVENT_NAME: "workflow_run" });
+  ok("unreachable (workflow_run): exit 1", r.code === 1, r.stdout + r.stderr);
+  rmSync(root, { recursive: true, force: true });
+}
+
+/* --- unreachable on the scheduled backstop: class 2, nothing is deploying */
+{
+  const { server, url } = await serve(() => null);
+  server.close();
+  const root = rootWith();
+  const r = await run(url, root, { GITHUB_EVENT_NAME: "schedule" });
+  ok("unreachable (schedule): exit 2", r.code === 2, r.stdout + r.stderr);
+  ok("unreachable (schedule): verdict 2, reason unreachable", r.status?.verdict === 2 &&
+    r.status?.reason === "unreachable", JSON.stringify(r.status));
+  rmSync(root, { recursive: true, force: true });
+}
+
+/* --- nonexistent host, local: DNS failure is also class 1 --------------- */
 {
   const root = rootWith();
   const r = await run("https://this-host-does-not-exist.invalid/", root);
-  ok("nonexistent host: exit 1", r.code === 1, r.stdout + r.stderr);
+  ok("nonexistent host (local): exit 1", r.code === 1, r.stdout + r.stderr);
   rmSync(root, { recursive: true, force: true });
 }
 
@@ -206,6 +230,25 @@ const close = (server, ...dirs) => server.close(() => dirs.forEach((d) => rmSync
   const r = await run(url, root);
   ok("dirty tree: refuses with exit 1", r.code === 1, r.stdout + r.stderr);
   ok("dirty tree: reason explains", /working tree dirty/.test(r.stdout));
+  close(server, root);
+}
+
+/* --- committed but unpushed: local run refuses the same way ------------- */
+{
+  const { server, url } = await serve(wholeSite());
+  const root = rootWith();
+  const git = (args) => execFileSync("git", args, { cwd: root, stdio: "pipe" });
+  git(["init", "-q"]);
+  git(["-c", "user.name=t", "-c", "user.email=t@t", "add", "."]);
+  git(["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qm", "x"]);
+  // origin/main is the deployed state; HEAD carries one unpushed commit —
+  // comparing it would read as a stale deploy, spurious class 2
+  git(["update-ref", "refs/remotes/origin/main", "HEAD"]);
+  writeFileSync(join(root, "index.html"), SITE["index.html"] + "<!-- unpushed commit -->");
+  git(["-c", "user.name=t", "-c", "user.email=t@t", "commit", "-qam", "y"]);
+  const r = await run(url, root);
+  ok("ahead of origin: refuses with exit 1", r.code === 1, r.stdout + r.stderr);
+  ok("ahead of origin: reason explains", /ahead of origin\/main/.test(r.stdout));
   close(server, root);
 }
 

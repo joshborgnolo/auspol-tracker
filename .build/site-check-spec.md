@@ -59,7 +59,9 @@ Two entry points, for two different failures:
 ## Checks, in order
 
 1. **Reachable.** `GET https://auspoltracker.com/` — 200, `text/html`, non-empty.
-   Any network failure is *inconclusive*, never a defect (see exit codes).
+   Any network failure is *inconclusive*, never a defect (see exit codes) —
+   except on the scheduled daily backstop, where nothing is deploying and
+   unreachability has no benign explanation: there it is a defect.
 2. **Freshness / integrity.** sha256 of the response vs sha256 of `index.html`
    at the checked-out SHA. On mismatch, retry with backoff for a grace window
    (~5 min on the `workflow_run` path, since Pages is asynchronous). Still
@@ -92,8 +94,12 @@ Follows `coverage-doctor.mjs`, not `check-coverage.mjs` (whose `3` means
 - `0` — deployed bytes match and every referenced asset resolves.
 - `1` — **inconclusive**: the site could not be reached, DNS/TLS failed, or the
   grace window expired while Pages was still building. A watchdog that cries
-  wolf gets muted; an unreachable host is not proof of a broken build.
-- `2` — **defect**: content mismatch after grace, or a referenced asset missing.
+  wolf gets muted; an unreachable host is not proof of a broken build *while a
+  deploy may be in flight*.
+- `2` — **defect**: content mismatch after grace, a referenced asset missing,
+  or — on the scheduled daily backstop only — the site unreachable. The
+  backstop runs when nothing is deploying, so DNS/TLS/reachability failure
+  there has no benign explanation and must not go green.
 
 Last stdout line: `SITE_STATUS {json}` carrying `{verdict, url, sha, liveBytes,
 localBytes, firstDiffAt, assets:{checked,failed:[]}}`.
@@ -105,6 +111,10 @@ localBytes, firstDiffAt, assets:{checked,failed:[]}}`.
   deploy and was actually an uncommitted rebuild from a concurrent session. CI's
   clean checkout avoids it; anyone running the script locally must check
   `git diff --quiet HEAD -- index.html` first and refuse otherwise.
+- **So does committed-but-unpushed work.** Pages builds `origin/main`; a local
+  HEAD one commit ahead compares against bytes that were never deployed and
+  reads as class 2. Local runs refuse on `origin/main..HEAD` non-empty, with
+  the same class 1 as the dirty tree — push, then re-run.
 - **Pages is asynchronous.** Without the grace window this check fails on every
   deploy it is meant to verify.
 - **`main` moves during the run.** Hence pinning to `workflow_run.head_sha`.

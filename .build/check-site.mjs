@@ -20,11 +20,16 @@
         every assets/… reference in the deployed html resolves (200,
         non-empty).
      1  INCONCLUSIVE — the site could not be reached, DNS/TLS failed, the
-        response was not html, or the local tree is dirty and the
-        comparison would lie. An unreachable host is not proof of a broken
-        build; a watchdog that cries wolf gets muted.
-     2  DEFECT — content mismatch after the grace window, or a referenced
-        asset missing. CI fails the job on this class only.
+        response was not html (except on the scheduled backstop — see
+        class 2), or the local tree is dirty or ahead of origin/main and
+        the comparison would lie. An unreachable host is not proof of a
+        broken build while a deploy may be in flight; a watchdog that
+        cries wolf gets muted.
+     2  DEFECT — content mismatch after the grace window, a referenced
+        asset missing, or (on the scheduled daily backstop only) the site
+        unreachable: nothing is deploying then, so DNS/TLS/reachability
+        failure no longer has a benign explanation. CI fails the job on
+        this class only.
 
    Pages is asynchronous: a push to main deploys ~20–30 s later. On the
    workflow_run path (pinned to the deployed commit) a hash mismatch is
@@ -38,7 +43,9 @@
 
    A DIRTY WORKING TREE MAKES THIS LIE. Outside CI the script refuses to
    run against a tree whose served files differ from HEAD: a 31-byte
-   uncommitted rebuild once looked exactly like a stale deploy.
+   uncommitted rebuild once looked exactly like a stale deploy. So does a
+   HEAD ahead of origin/main — Pages builds origin, so committed-but-
+   unpushed bytes were never deployed; that case refuses identically.
 
    Deliberately NOT checked: whether the data is current
    (check-coverage.mjs owns that, with an independent witness), and
@@ -69,8 +76,14 @@ const ROOT = process.env.SITE_CHECK_ROOT ||
 const BASE = (process.env.SITE_CHECK_URL || "https://auspoltracker.com/")
   .replace(/\/+$/, "") + "/";
 const FILES = ["index.html", "feed.xml", "sitemap.xml", "robots.txt", "auspol-polling.html"];
+const EVENT = process.env.GITHUB_EVENT_NAME || "local";
 const GRACE_MS = Number(process.env.SITE_CHECK_GRACE_MS) ||
-  (process.env.GITHUB_EVENT_NAME === "workflow_run" ? 5 * 60_000 : 30_000);
+  (EVENT === "workflow_run" ? 5 * 60_000 : 30_000);
+/* On the daily backstop nothing is deploying, so an unreachable host has no
+   benign explanation: TLS expiry, DNS breakage, the site down. Only the
+   workflow_run path (Pages mid-build, previous deploy still serving) and
+   ad-hoc local runs get to call unreachability inconclusive. */
+const UNREACHABLE_CLASS = EVENT === "schedule" ? 2 : 1;
 const FIXED_SLEEP = Number(process.env.SITE_CHECK_SLEEP_MS) || 0;
 const BACKOFF = [15_000, 20_000, 30_000, 45_000, 60_000];
 const FETCH_TIMEOUT_MS = 30_000;
@@ -145,9 +158,28 @@ function dirtyGuard() {
   emit(1, { reason: "working tree dirty", dirty: dirty.split("\n") });
 }
 
+/* Committed-but-unpushed work is the same lie one step later: Pages builds
+   origin/main, so a local HEAD even one commit ahead would be compared
+   against bytes that were never deployed and read as a class-2 defect.
+   Downgrade exactly the way the dirty case does. Skipped in CI, where the
+   checkout is pinned to the deployed SHA by design. */
+function aheadGuard() {
+  if (process.env.GITHUB_ACTIONS) return;
+  let ahead;
+  try {
+    ahead = Number(execFileSync("git", ["rev-list", "--count", "origin/main..HEAD"],
+      { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim());
+  } catch { return; } // no origin/main ref — nothing to guard
+  if (!ahead) return;
+  console.log(`site-check: HEAD is ${ahead} commit(s) ahead of origin/main — ` +
+    `those bytes were never deployed, so any mismatch is spurious. Push, then re-run.`);
+  emit(1, { reason: "ahead of origin/main", ahead });
+}
+
 async function main() {
   console.log(`site-check: ${BASE} vs ${ROOT} (${FILES.length} files, grace ${GRACE_MS / 1000}s)`);
   dirtyGuard();
+  aheadGuard();
   for (const f of FILES) locals[f] = readFileSync(join(ROOT, f));
 
   /* 1 — reachable */
@@ -155,8 +187,9 @@ async function main() {
   try {
     first = await fetchBuf("index.html");
   } catch (e) {
-    console.log(`site-check: unreachable: ${e.message}`);
-    emit(1, { reason: "unreachable", error: e.message });
+    console.log(`site-check: unreachable: ${e.message}` +
+      (UNREACHABLE_CLASS === 2 ? " — scheduled backstop: nothing is deploying, this is an outage" : ""));
+    emit(UNREACHABLE_CLASS, { reason: "unreachable", error: e.message });
   }
   if (first.status !== 200) {
     console.log(`site-check: HTTP ${first.status} — inconclusive, not a defect`);

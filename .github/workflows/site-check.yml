@@ -2,10 +2,13 @@
 # auspoltracker.com (spec: .build/site-check-spec.md) and classifies:
 #
 #   class 0  deployed bytes == committed bytes, assets resolve → green
-#   class 1  inconclusive (host unreachable, Pages still building, bad
-#             response) → GREEN; inconclusive is not an alarm
-#   class 2  defect (content mismatch after the grace window, or a
-#             referenced asset missing) → the job fails (email)
+#   class 1  inconclusive (host unreachable while a deploy may be in
+#             flight, Pages still building, bad response) → GREEN;
+#             inconclusive is not an alarm
+#   class 2  defect (content mismatch after the grace window, a
+#             referenced asset missing, or — on the scheduled backstop,
+#             where nothing is deploying — the site unreachable) → the
+#             job fails (email)
 #
 # Two triggers for two failures:
 #   * workflow_run of "pages-build-deployment" — checks the commit the
