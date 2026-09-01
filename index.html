@@ -133,6 +133,9 @@
      has it installed - which is anyone with Adobe software - gets it; every
      other visitor falls through to the face this site does host. */
   --sans: "Myriad Pro", "Myriad Web Pro", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* the data face of the expanded poll view's figures: a mono cut so the
+     reading is "numbers", not prose. Self-hosted latin subset, 200-900. */
+  --mono: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --radius: 14px;
   --shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
@@ -1375,6 +1378,22 @@ body.dark .ci-band { opacity: 0.22; }
    bar once they have scrolled off – .show-score is pinned AND the hero
    readout gone (see Tabs in views.jsx). */
 .tabs.show-score .tab-score { opacity: 1; transform: none; pointer-events: auto; }
+/* Before the score docks, the pinned phone bar's right seat sits blank; the
+   masthead's own dial warms it. It lives on the opposite end of the SAME
+   .show-score gate as .tab-score with the same timing pair, so the dial
+   fading out and the score fading in are one move. Phone only: at ≥640px a
+   pinned bar with the hero on screen has plenty of room for its tabs alone,
+   and decorative by nature - never interactive, never in the tab order. */
+.tab-glyph {
+  position: absolute; right: 5px; bottom: 9px; z-index: 1;
+  display: none; pointer-events: none;
+  opacity: 0; transform: translateY(4px);
+  transition: opacity .26s ease, transform .34s cubic-bezier(.22, 1, .36, 1);
+}
+@media (max-width: 640px) {
+  .tab-glyph { display: block; }
+  .tabs.pinned:not(.show-score) .tab-glyph { opacity: 1; transform: none; }
+}
 .ts-eyebrow {
   font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--ink-3); margin-right: 2px;
@@ -1919,6 +1938,11 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-variant-numeric: tabular-nums; text-wrap: pretty;
 }
 .pd-s b { font-weight: 700; color: var(--ink); }
+/* the expanded view's numbers are the poll's data: set them in the mono
+   face (figures in summary lines, signed nets, moves, seat estimates) */
+.poll-detail b, .poll-detail .netv, .poll-detail .chg, .poll-detail .seat-est {
+  font-family: var(--mono);
+}
 .pd-s-chg .chg { margin-left: 1px; }
 .pd-s-note { color: var(--ink-3); }
 a.pd-release { text-decoration: none; cursor: pointer; }
@@ -2513,7 +2537,8 @@ a.tn-link:hover .plink-mark, a.tn-link:focus-visible .plink-mark { color: var(--
    thread), and no layout change at all (no oscillation risk). */
 .tabs.pinned::after { opacity: 1; }
 /* position/z-index keep the row painting above the full-bleed backdrop;
-   overflow hides the docked score until it joins (see .tab-score);
+   overflow hides the docked score and its phone placeholder until they
+   join (see .tab-score, .tab-glyph);
    container-type gives the next-poll countdown a cqw yardstick (see
    .tab-next) - the row's inline size is parent-set, so containment is free */
 .tabs-inner {
@@ -2533,7 +2558,7 @@ a.tn-link:hover .plink-mark, a.tn-link:focus-visible .plink-mark { color: var(--
 .tabs.pinned .tabs-set { transform: scale(0.844); }   /* 16px → 13.5px */
 body.editorial .tabs.pinned .tabs-set { transform: scale(0.79); } /* 19 → 15 */
 @media (prefers-reduced-motion: reduce) {
-  .tabs-set, .tabs::after, .tab-score, .tab-next { transition: none; }
+  .tabs-set, .tabs::after, .tab-score, .tab-next, .tab-glyph { transition: none; }
 }
 .tab {
   position: relative; border: 0; background: none; cursor: pointer;
@@ -11474,6 +11499,10 @@ function Tabs({
     className: "tab-note"
   }, t.note)))), /*#__PURE__*/React.createElement(NextPollTicker, {
     showScore: pinned && heroGone
+  }), /*#__PURE__*/React.createElement(GlyphDial, {
+    className: "tab-glyph",
+    width: "34",
+    height: "23.8"
   }), /*#__PURE__*/React.createElement(TabScore, {
     onGoHero: goHero,
     matchup: tppMatchup
@@ -15972,6 +16001,184 @@ function freshness(iso) {
     state
   };
 }
+
+/* The masthead dial as a reusable mark. The header mounts it in the lockup
+   (its svg carries glyphRef - the story overlay's FLIP origin) and the tab
+   bar mounts the same dial as a placeholder in the 2PP score's seat on phone
+   viewports (GlyphDial via window, see .tab-glyph) - one component, so the
+   two instances can never drift apart. */
+function GlyphDial({
+  className,
+  svgRef,
+  width,
+  height
+}) {
+  const {
+    D
+  } = window.AP;
+
+  // wordmark glyph = live primary-vote aggregate: one bar per party,
+  // sorted tallest-first, height scaled to each party's latest share
+  const lp = D.aggPrimary[D.aggPrimary.length - 1];
+  const glyph = [{
+    id: "alp",
+    color: "var(--alp)",
+    v: lp.alp
+  }, {
+    id: "lnp",
+    color: "var(--lnp)",
+    v: lp.lnp
+  }, {
+    id: "grn",
+    color: "var(--grn)",
+    v: lp.grn
+  }, {
+    id: "onp",
+    color: "var(--onp)",
+    v: lp.onp
+  }].sort((a, b) => b.v - a.v);
+  const gv = glyph.map(p => p.v);
+  const gmin = Math.min(...gv),
+    gmax = Math.max(...gv);
+  const MIN_H = 5,
+    MAX_H = 10.5;
+  glyph.forEach(p => {
+    p.h = gmax === gmin ? MAX_H : MIN_H + (p.v - gmin) / (gmax - gmin) * (MAX_H - MIN_H);
+  });
+  const glyphTitle = "Primary vote aggregate · " + glyph.map(p => `${D.PARTIES[p.id].short} ${p.v.toFixed(1)}`).join(", ");
+
+  // pendulum = the head-to-head against Labor's STRONGEST challenger – the same
+  // pick the hero makes: whichever opponent polls the highest 2PP against Labor.
+  // The needle swings toward whoever leads THAT contest (Labor left, challenger right).
+  const g2 = D.agg2pp[D.agg2pp.length - 1];
+  const gon = D.alt2pp.alp_on[D.alt2pp.alp_on.length - 1];
+  const challengers = [{
+    abbr: "L/NP",
+    color: "var(--lnp)",
+    lab: g2.alp,
+    opp: g2.lnp
+  }];
+  if (gon) challengers.push({
+    abbr: "ON",
+    color: "var(--onp)",
+    lab: gon.a,
+    opp: gon.b
+  });
+  const topOpp = challengers.slice().sort((x, y) => y.opp - x.opp)[0];
+  const pMargin = +(topOpp.lab - topOpp.opp).toFixed(1); // + → Labor leads
+  const labLeads = pMargin >= 0;
+  const pendColor = labLeads ? "var(--alp)" : topOpp.color;
+  const oppColor = topOpp.color;
+  // ±12 pts → full ±34° deflection. Labor (positive margin) swings LEFT,
+  // the challenger swings RIGHT – matching the hero's Labor-left / opp-right order.
+  const pendDeg = Math.max(-1, Math.min(1, pMargin / 12)) * 34;
+  const pendTitle = `2PP swing · ALP v ${topOpp.abbr} · ` + (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
+
+  // settle the needle in from vertical on load (skip the swing for reduced motion)
+  const [pendSettled, setPendSettled] = React.useState(REDUCED_MOTION);
+  React.useEffect(() => {
+    const t = setTimeout(() => setPendSettled(true), SETTLE_MS);
+    return () => clearTimeout(t);
+  }, [pendDeg]);
+  // Needle points UP from the pivot, so the sign flips vs the old hanging
+  // pendulum: NEGATIVE rotation swings the tip left (Labor side).
+  const needleDeg = pendSettled ? -pendDeg : 0;
+  /* The graduations settle with the needle rather than arriving already
+     correct: all four start at one neutral length, then some grow and some
+     shrink into their real share. Half the instrument animating while the
+     other half sat finished read as unfinished. */
+  const SETTLE_H = (MIN_H + MAX_H) / 2;
+
+  // ---- integrated glyph geometry: one dial – party columns are radial
+  // graduations on the arc, the 2PP needle swings from the same pivot ----
+  const GC = {
+    cx: 22,
+    cy: 24.5,
+    r: 12
+  };
+  const polar = (deg, r) => ({
+    x: +(GC.cx + Math.sin(deg * Math.PI / 180) * r).toFixed(2),
+    y: +(GC.cy - Math.cos(deg * Math.PI / 180) * r).toFixed(2)
+  });
+  const BAR_ANGLES = [-54, -18, 18, 54]; // tallest-first, left → right
+  const arcPath = (d1, d2) => {
+    const a = polar(d1, GC.r),
+      b = polar(d2, GC.r);
+    return `M ${a.x} ${a.y} A ${GC.r} ${GC.r} 0 0 1 ${b.x} ${b.y}`;
+  };
+  return (
+    /*#__PURE__*/
+    /* viewBox bounds what is actually drawn, the way the favicon's does in
+       build.mjs, rather than the old hardcoded 0 0 44 28 - which held the
+       ink hard against its left edge and carried 5.6 units of dead space
+       on the right, so the CSS gap never meant what it said. The extremes
+       are fixed, not data-driven: the sort pins the longest graduation to
+       -54° and the shortest to +54°, so only the two middle bars vary and
+       they cannot reach past the top edge. */
+    React.createElement("svg", {
+      className: className,
+      ref: svgRef || null,
+      viewBox: "0.58 0.07 38.39 26.73",
+      width: width,
+      height: height,
+      "aria-hidden": "true"
+    }, /*#__PURE__*/React.createElement("title", null, glyphTitle + " · " + pendTitle), /*#__PURE__*/React.createElement("path", {
+      d: arcPath(-90, 0),
+      className: "wm-arc",
+      stroke: "var(--alp)"
+    }), /*#__PURE__*/React.createElement("path", {
+      d: arcPath(0, 90),
+      className: "wm-arc",
+      stroke: oppColor
+    }), glyph.map((p, i) => {
+      const a = BAR_ANGLES[i];
+      const inner = polar(a, GC.r + 2);
+      const outerMax = polar(a, GC.r + 2 + MAX_H);
+      const shown = pendSettled ? p.h : SETTLE_H;
+      return /*#__PURE__*/React.createElement("line", {
+        key: p.id,
+        className: "wm-bar",
+        x1: inner.x,
+        y1: inner.y,
+        x2: outerMax.x,
+        y2: outerMax.y,
+        stroke: p.color,
+        strokeWidth: "3.4",
+        strokeLinecap: "butt",
+        style: {
+          strokeDasharray: shown.toFixed(2) + " " + MAX_H
+        }
+      });
+    }), /*#__PURE__*/React.createElement("g", {
+      transform: `translate(${GC.cx}, ${GC.cy})`
+    }, /*#__PURE__*/React.createElement("g", {
+      className: "wm-needle-g",
+      style: {
+        transform: `rotate(${needleDeg}deg)`
+      }
+    }, /*#__PURE__*/React.createElement("line", {
+      x1: "0",
+      y1: "0",
+      x2: "0",
+      y2: "-8.6",
+      stroke: pendColor,
+      strokeWidth: "1.7",
+      strokeLinecap: "round"
+    }), /*#__PURE__*/React.createElement("circle", {
+      cx: "0",
+      cy: "-8.6",
+      r: "1.9",
+      fill: pendColor
+    }))), /*#__PURE__*/React.createElement("circle", {
+      cx: GC.cx,
+      cy: GC.cy,
+      r: "1.7",
+      className: "wm-pivot"
+    }))
+  );
+}
+window.GlyphDial = GlyphDial; // the tab bar's placeholder instance (views.jsx)
+
 function Header({
   isDark,
   onToggleTheme
@@ -16126,96 +16333,6 @@ function Header({
       rect: el ? el.getBoundingClientRect() : null
     });
   };
-
-  // wordmark glyph = live primary-vote aggregate: one bar per party,
-  // sorted tallest-first, height scaled to each party's latest share
-  const lp = D.aggPrimary[D.aggPrimary.length - 1];
-  const glyph = [{
-    id: "alp",
-    color: "var(--alp)",
-    v: lp.alp
-  }, {
-    id: "lnp",
-    color: "var(--lnp)",
-    v: lp.lnp
-  }, {
-    id: "grn",
-    color: "var(--grn)",
-    v: lp.grn
-  }, {
-    id: "onp",
-    color: "var(--onp)",
-    v: lp.onp
-  }].sort((a, b) => b.v - a.v);
-  const gv = glyph.map(p => p.v);
-  const gmin = Math.min(...gv),
-    gmax = Math.max(...gv);
-  const MIN_H = 5,
-    MAX_H = 10.5;
-  glyph.forEach(p => {
-    p.h = gmax === gmin ? MAX_H : MIN_H + (p.v - gmin) / (gmax - gmin) * (MAX_H - MIN_H);
-  });
-  const glyphTitle = "Primary vote aggregate · " + glyph.map(p => `${D.PARTIES[p.id].short} ${p.v.toFixed(1)}`).join(", ");
-
-  // pendulum = the head-to-head against Labor's STRONGEST challenger – the same
-  // pick the hero makes: whichever opponent polls the highest 2PP against Labor.
-  // The needle swings toward whoever leads THAT contest (Labor left, challenger right).
-  const g2 = D.agg2pp[D.agg2pp.length - 1];
-  const gon = D.alt2pp.alp_on[D.alt2pp.alp_on.length - 1];
-  const challengers = [{
-    abbr: "L/NP",
-    color: "var(--lnp)",
-    lab: g2.alp,
-    opp: g2.lnp
-  }];
-  if (gon) challengers.push({
-    abbr: "ON",
-    color: "var(--onp)",
-    lab: gon.a,
-    opp: gon.b
-  });
-  const topOpp = challengers.slice().sort((x, y) => y.opp - x.opp)[0];
-  const pMargin = +(topOpp.lab - topOpp.opp).toFixed(1); // + → Labor leads
-  const labLeads = pMargin >= 0;
-  const pendColor = labLeads ? "var(--alp)" : topOpp.color;
-  const oppColor = topOpp.color;
-  // ±12 pts → full ±34° deflection. Labor (positive margin) swings LEFT,
-  // the challenger swings RIGHT – matching the hero's Labor-left / opp-right order.
-  const pendDeg = Math.max(-1, Math.min(1, pMargin / 12)) * 34;
-  const pendTitle = `2PP swing · ALP v ${topOpp.abbr} · ` + (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
-
-  // settle the needle in from vertical on load (skip the swing for reduced motion)
-  const [pendSettled, setPendSettled] = React.useState(REDUCED_MOTION);
-  React.useEffect(() => {
-    const t = setTimeout(() => setPendSettled(true), SETTLE_MS);
-    return () => clearTimeout(t);
-  }, [pendDeg]);
-  // Needle points UP from the pivot, so the sign flips vs the old hanging
-  // pendulum: NEGATIVE rotation swings the tip left (Labor side).
-  const needleDeg = pendSettled ? -pendDeg : 0;
-  /* The graduations settle with the needle rather than arriving already
-     correct: all four start at one neutral length, then some grow and some
-     shrink into their real share. Half the instrument animating while the
-     other half sat finished read as unfinished. */
-  const SETTLE_H = (MIN_H + MAX_H) / 2;
-
-  // ---- integrated glyph geometry: one dial – party columns are radial
-  // graduations on the arc, the 2PP needle swings from the same pivot ----
-  const GC = {
-    cx: 22,
-    cy: 24.5,
-    r: 12
-  };
-  const polar = (deg, r) => ({
-    x: +(GC.cx + Math.sin(deg * Math.PI / 180) * r).toFixed(2),
-    y: +(GC.cy - Math.cos(deg * Math.PI / 180) * r).toFixed(2)
-  });
-  const BAR_ANGLES = [-54, -18, 18, 54]; // tallest-first, left → right
-  const arcPath = (d1, d2) => {
-    const a = polar(d1, GC.r),
-      b = polar(d2, GC.r);
-    return `M ${a.x} ${a.y} A ${GC.r} ${GC.r} 0 0 1 ${b.x} ${b.y}`;
-  };
   return /*#__PURE__*/React.createElement("header", {
     className: "site-head"
   }, /*#__PURE__*/React.createElement("div", {
@@ -16235,66 +16352,12 @@ function Header({
   }, "auspol"), /*#__PURE__*/React.createElement("span", {
     className: "wm-track",
     ref: wmTrack
-  }, "tracker")), /*#__PURE__*/React.createElement("svg", {
+  }, "tracker")), /*#__PURE__*/React.createElement(GlyphDial, {
     className: "wm-dial",
-    ref: glyphRef,
-    viewBox: "0.58 0.07 38.39 26.73",
+    svgRef: glyphRef,
     width: "57",
-    height: "39.7",
-    "aria-hidden": "true"
-  }, /*#__PURE__*/React.createElement("title", null, glyphTitle + " · " + pendTitle), /*#__PURE__*/React.createElement("path", {
-    d: arcPath(-90, 0),
-    className: "wm-arc",
-    stroke: "var(--alp)"
-  }), /*#__PURE__*/React.createElement("path", {
-    d: arcPath(0, 90),
-    className: "wm-arc",
-    stroke: oppColor
-  }), glyph.map((p, i) => {
-    const a = BAR_ANGLES[i];
-    const inner = polar(a, GC.r + 2);
-    const outerMax = polar(a, GC.r + 2 + MAX_H);
-    const shown = pendSettled ? p.h : SETTLE_H;
-    return /*#__PURE__*/React.createElement("line", {
-      key: p.id,
-      className: "wm-bar",
-      x1: inner.x,
-      y1: inner.y,
-      x2: outerMax.x,
-      y2: outerMax.y,
-      stroke: p.color,
-      strokeWidth: "3.4",
-      strokeLinecap: "butt",
-      style: {
-        strokeDasharray: shown.toFixed(2) + " " + MAX_H
-      }
-    });
-  }), /*#__PURE__*/React.createElement("g", {
-    transform: `translate(${GC.cx}, ${GC.cy})`
-  }, /*#__PURE__*/React.createElement("g", {
-    className: "wm-needle-g",
-    style: {
-      transform: `rotate(${needleDeg}deg)`
-    }
-  }, /*#__PURE__*/React.createElement("line", {
-    x1: "0",
-    y1: "0",
-    x2: "0",
-    y2: "-8.6",
-    stroke: pendColor,
-    strokeWidth: "1.7",
-    strokeLinecap: "round"
-  }), /*#__PURE__*/React.createElement("circle", {
-    cx: "0",
-    cy: "-8.6",
-    r: "1.9",
-    fill: pendColor
-  }))), /*#__PURE__*/React.createElement("circle", {
-    cx: GC.cx,
-    cy: GC.cy,
-    r: "1.7",
-    className: "wm-pivot"
-  }))), /*#__PURE__*/React.createElement("span", {
+    height: "39.7"
+  })), /*#__PURE__*/React.createElement("span", {
     className: "wm-sr"
   }, "\u2013 Australian federal polling")), /*#__PURE__*/React.createElement("p", {
     className: "tagline"

@@ -499,6 +499,12 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
               pin flip changes nothing the ticker measures (see the fit pass
               in NextPollTicker) */}
           <NextPollTicker showScore={pinned && heroGone} />
+          {/* phone placeholder: while the bar is pinned but the hero's 2PP
+              is still on screen, the score's seat is empty - the masthead's
+              own dial holds it until the score docks (CSS: .tab-glyph joins
+              and leaves on the same .show-score gate as .tab-score, so the
+              swap is one move). */}
+          <GlyphDial className="tab-glyph" width="34" height="23.8" />
           <TabScore onGoHero={goHero} matchup={tppMatchup} />
         </div>
       </nav>

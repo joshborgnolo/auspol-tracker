@@ -31,6 +31,126 @@ function freshness(iso) {
   return { label, state };
 }
 
+/* The masthead dial as a reusable mark. The header mounts it in the lockup
+   (its svg carries glyphRef - the story overlay's FLIP origin) and the tab
+   bar mounts the same dial as a placeholder in the 2PP score's seat on phone
+   viewports (GlyphDial via window, see .tab-glyph) - one component, so the
+   two instances can never drift apart. */
+function GlyphDial({ className, svgRef, width, height }) {
+  const { D } = window.AP;
+
+  // wordmark glyph = live primary-vote aggregate: one bar per party,
+  // sorted tallest-first, height scaled to each party's latest share
+  const lp = D.aggPrimary[D.aggPrimary.length - 1];
+  const glyph = [
+    { id: "alp", color: "var(--alp)", v: lp.alp },
+    { id: "lnp", color: "var(--lnp)", v: lp.lnp },
+    { id: "grn", color: "var(--grn)", v: lp.grn },
+    { id: "onp", color: "var(--onp)", v: lp.onp },
+  ].sort((a, b) => b.v - a.v);
+  const gv = glyph.map((p) => p.v);
+  const gmin = Math.min(...gv), gmax = Math.max(...gv);
+  const MIN_H = 5, MAX_H = 10.5;
+  glyph.forEach((p) => {
+    p.h = gmax === gmin ? MAX_H : MIN_H + ((p.v - gmin) / (gmax - gmin)) * (MAX_H - MIN_H);
+  });
+  const glyphTitle = "Primary vote aggregate · " +
+    glyph.map((p) => `${D.PARTIES[p.id].short} ${p.v.toFixed(1)}`).join(", ");
+
+  // pendulum = the head-to-head against Labor's STRONGEST challenger – the same
+  // pick the hero makes: whichever opponent polls the highest 2PP against Labor.
+  // The needle swings toward whoever leads THAT contest (Labor left, challenger right).
+  const g2 = D.agg2pp[D.agg2pp.length - 1];
+  const gon = D.alt2pp.alp_on[D.alt2pp.alp_on.length - 1];
+  const challengers = [
+    { abbr: "L/NP", color: "var(--lnp)", lab: g2.alp, opp: g2.lnp },
+  ];
+  if (gon) challengers.push({ abbr: "ON", color: "var(--onp)", lab: gon.a, opp: gon.b });
+  const topOpp = challengers.slice().sort((x, y) => y.opp - x.opp)[0];
+  const pMargin = +(topOpp.lab - topOpp.opp).toFixed(1);        // + → Labor leads
+  const labLeads = pMargin >= 0;
+  const pendColor = labLeads ? "var(--alp)" : topOpp.color;
+  const oppColor = topOpp.color;
+  // ±12 pts → full ±34° deflection. Labor (positive margin) swings LEFT,
+  // the challenger swings RIGHT – matching the hero's Labor-left / opp-right order.
+  const pendDeg = Math.max(-1, Math.min(1, pMargin / 12)) * 34;
+  const pendTitle = `2PP swing · ALP v ${topOpp.abbr} · ` +
+    (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
+
+  // settle the needle in from vertical on load (skip the swing for reduced motion)
+  const [pendSettled, setPendSettled] = React.useState(REDUCED_MOTION);
+  React.useEffect(() => {
+    const t = setTimeout(() => setPendSettled(true), SETTLE_MS);
+    return () => clearTimeout(t);
+  }, [pendDeg]);
+  // Needle points UP from the pivot, so the sign flips vs the old hanging
+  // pendulum: NEGATIVE rotation swings the tip left (Labor side).
+  const needleDeg = pendSettled ? -pendDeg : 0;
+  /* The graduations settle with the needle rather than arriving already
+     correct: all four start at one neutral length, then some grow and some
+     shrink into their real share. Half the instrument animating while the
+     other half sat finished read as unfinished. */
+  const SETTLE_H = (MIN_H + MAX_H) / 2;
+
+  // ---- integrated glyph geometry: one dial – party columns are radial
+  // graduations on the arc, the 2PP needle swings from the same pivot ----
+  const GC = { cx: 22, cy: 24.5, r: 12 };
+  const polar = (deg, r) => ({
+    x: +(GC.cx + Math.sin(deg * Math.PI / 180) * r).toFixed(2),
+    y: +(GC.cy - Math.cos(deg * Math.PI / 180) * r).toFixed(2),
+  });
+  const BAR_ANGLES = [-54, -18, 18, 54];          // tallest-first, left → right
+  const arcPath = (d1, d2) => {
+    const a = polar(d1, GC.r), b = polar(d2, GC.r);
+    return `M ${a.x} ${a.y} A ${GC.r} ${GC.r} 0 0 1 ${b.x} ${b.y}`;
+  };
+
+  return (
+    /* viewBox bounds what is actually drawn, the way the favicon's does in
+       build.mjs, rather than the old hardcoded 0 0 44 28 - which held the
+       ink hard against its left edge and carried 5.6 units of dead space
+       on the right, so the CSS gap never meant what it said. The extremes
+       are fixed, not data-driven: the sort pins the longest graduation to
+       -54° and the shortest to +54°, so only the two middle bars vary and
+       they cannot reach past the top edge. */
+    <svg className={className} ref={svgRef || null}
+         viewBox="0.58 0.07 38.39 26.73" width={width} height={height}
+         aria-hidden="true">
+      <title>{glyphTitle + " · " + pendTitle}</title>
+      {/* half-circle two-tone swing arc: Labor left, strongest challenger right */}
+      <path d={arcPath(-90, 0)} className="wm-arc" stroke="var(--alp)"></path>
+      <path d={arcPath(0, 90)} className="wm-arc" stroke={oppColor}></path>
+      {/* Party columns as radial graduations, heights = primary vote.
+          Each line is drawn at FULL length and revealed by its dash,
+          because stroke-dasharray transitions everywhere while the SVG
+          geometry attributes (x2/y2) do not. */}
+      {glyph.map((p, i) => {
+        const a = BAR_ANGLES[i];
+        const inner = polar(a, GC.r + 2);
+        const outerMax = polar(a, GC.r + 2 + MAX_H);
+        const shown = pendSettled ? p.h : SETTLE_H;
+        return (
+          <line key={p.id} className="wm-bar"
+                x1={inner.x} y1={inner.y} x2={outerMax.x} y2={outerMax.y}
+                stroke={p.color} strokeWidth="3.4" strokeLinecap="butt"
+                style={{ strokeDasharray: shown.toFixed(2) + " " + MAX_H }}></line>
+        );
+      })}
+      {/* 2PP needle – swings toward the leader of the top contest.
+          Wrapped in a translate so rotation happens about local (0,0). */}
+      <g transform={`translate(${GC.cx}, ${GC.cy})`}>
+        <g className="wm-needle-g" style={{ transform: `rotate(${needleDeg}deg)` }}>
+          <line x1="0" y1="0" x2="0" y2="-8.6"
+                stroke={pendColor} strokeWidth="1.7" strokeLinecap="round"></line>
+          <circle cx="0" cy="-8.6" r="1.9" fill={pendColor}></circle>
+        </g>
+      </g>
+      <circle cx={GC.cx} cy={GC.cy} r="1.7" className="wm-pivot"></circle>
+    </svg>
+  );
+}
+window.GlyphDial = GlyphDial;   // the tab bar's placeholder instance (views.jsx)
+
 function Header({ isDark, onToggleTheme }) {
   const { D } = window.AP;
   const fresh = freshness(D.latest.publishedISO);
@@ -169,72 +289,6 @@ function Header({ isDark, onToggleTheme }) {
     setStory({ rect: el ? el.getBoundingClientRect() : null });
   };
 
-  // wordmark glyph = live primary-vote aggregate: one bar per party,
-  // sorted tallest-first, height scaled to each party's latest share
-  const lp = D.aggPrimary[D.aggPrimary.length - 1];
-  const glyph = [
-    { id: "alp", color: "var(--alp)", v: lp.alp },
-    { id: "lnp", color: "var(--lnp)", v: lp.lnp },
-    { id: "grn", color: "var(--grn)", v: lp.grn },
-    { id: "onp", color: "var(--onp)", v: lp.onp },
-  ].sort((a, b) => b.v - a.v);
-  const gv = glyph.map((p) => p.v);
-  const gmin = Math.min(...gv), gmax = Math.max(...gv);
-  const MIN_H = 5, MAX_H = 10.5;
-  glyph.forEach((p) => {
-    p.h = gmax === gmin ? MAX_H : MIN_H + ((p.v - gmin) / (gmax - gmin)) * (MAX_H - MIN_H);
-  });
-  const glyphTitle = "Primary vote aggregate · " +
-    glyph.map((p) => `${D.PARTIES[p.id].short} ${p.v.toFixed(1)}`).join(", ");
-
-  // pendulum = the head-to-head against Labor's STRONGEST challenger – the same
-  // pick the hero makes: whichever opponent polls the highest 2PP against Labor.
-  // The needle swings toward whoever leads THAT contest (Labor left, challenger right).
-  const g2 = D.agg2pp[D.agg2pp.length - 1];
-  const gon = D.alt2pp.alp_on[D.alt2pp.alp_on.length - 1];
-  const challengers = [
-    { abbr: "L/NP", color: "var(--lnp)", lab: g2.alp, opp: g2.lnp },
-  ];
-  if (gon) challengers.push({ abbr: "ON", color: "var(--onp)", lab: gon.a, opp: gon.b });
-  const topOpp = challengers.slice().sort((x, y) => y.opp - x.opp)[0];
-  const pMargin = +(topOpp.lab - topOpp.opp).toFixed(1);        // + → Labor leads
-  const labLeads = pMargin >= 0;
-  const pendColor = labLeads ? "var(--alp)" : topOpp.color;
-  const oppColor = topOpp.color;
-  // ±12 pts → full ±34° deflection. Labor (positive margin) swings LEFT,
-  // the challenger swings RIGHT – matching the hero's Labor-left / opp-right order.
-  const pendDeg = Math.max(-1, Math.min(1, pMargin / 12)) * 34;
-  const pendTitle = `2PP swing · ALP v ${topOpp.abbr} · ` +
-    (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
-
-  // settle the needle in from vertical on load (skip the swing for reduced motion)
-  const [pendSettled, setPendSettled] = React.useState(REDUCED_MOTION);
-  React.useEffect(() => {
-    const t = setTimeout(() => setPendSettled(true), SETTLE_MS);
-    return () => clearTimeout(t);
-  }, [pendDeg]);
-  // Needle points UP from the pivot, so the sign flips vs the old hanging
-  // pendulum: NEGATIVE rotation swings the tip left (Labor side).
-  const needleDeg = pendSettled ? -pendDeg : 0;
-  /* The graduations settle with the needle rather than arriving already
-     correct: all four start at one neutral length, then some grow and some
-     shrink into their real share. Half the instrument animating while the
-     other half sat finished read as unfinished. */
-  const SETTLE_H = (MIN_H + MAX_H) / 2;
-
-  // ---- integrated glyph geometry: one dial – party columns are radial
-  // graduations on the arc, the 2PP needle swings from the same pivot ----
-  const GC = { cx: 22, cy: 24.5, r: 12 };
-  const polar = (deg, r) => ({
-    x: +(GC.cx + Math.sin(deg * Math.PI / 180) * r).toFixed(2),
-    y: +(GC.cy - Math.cos(deg * Math.PI / 180) * r).toFixed(2),
-  });
-  const BAR_ANGLES = [-54, -18, 18, 54];          // tallest-first, left → right
-  const arcPath = (d1, d2) => {
-    const a = polar(d1, GC.r), b = polar(d2, GC.r);
-    return `M ${a.x} ${a.y} A ${GC.r} ${GC.r} 0 0 1 ${b.x} ${b.y}`;
-  };
-
   return (
     <header className="site-head">
       <div className="brand">
@@ -246,47 +300,12 @@ function Header({ isDark, onToggleTheme }) {
               <span className="wm-name" ref={wmName}>auspol</span>
               <span className="wm-track" ref={wmTrack}>tracker</span>
             </span>
-            {/* viewBox bounds what is actually drawn, the way the favicon's does in
-                build.mjs, rather than the old hardcoded 0 0 44 28 - which held the
-                ink hard against its left edge and carried 5.6 units of dead space
-                on the right, so the CSS gap never meant what it said. The extremes
-                are fixed, not data-driven: the sort pins the longest graduation to
-                -54° and the shortest to +54°, so only the two middle bars vary and
-                they cannot reach past the top edge. 57px sizes the ink to 74% of
-                the wordmark's height, the proportion the lockup was drawn with
-                before both words went to 30px. */}
-            <svg className="wm-dial" ref={glyphRef} viewBox="0.58 0.07 38.39 26.73" width="57" height="39.7" aria-hidden="true">
-              <title>{glyphTitle + " · " + pendTitle}</title>
-              {/* half-circle two-tone swing arc: Labor left, strongest challenger right */}
-              <path d={arcPath(-90, 0)} className="wm-arc" stroke="var(--alp)"></path>
-              <path d={arcPath(0, 90)} className="wm-arc" stroke={oppColor}></path>
-              {/* Party columns as radial graduations, heights = primary vote.
-                  Each line is drawn at FULL length and revealed by its dash,
-                  because stroke-dasharray transitions everywhere while the SVG
-                  geometry attributes (x2/y2) do not. */}
-              {glyph.map((p, i) => {
-                const a = BAR_ANGLES[i];
-                const inner = polar(a, GC.r + 2);
-                const outerMax = polar(a, GC.r + 2 + MAX_H);
-                const shown = pendSettled ? p.h : SETTLE_H;
-                return (
-                  <line key={p.id} className="wm-bar"
-                        x1={inner.x} y1={inner.y} x2={outerMax.x} y2={outerMax.y}
-                        stroke={p.color} strokeWidth="3.4" strokeLinecap="butt"
-                        style={{ strokeDasharray: shown.toFixed(2) + " " + MAX_H }}></line>
-                );
-              })}
-              {/* 2PP needle – swings toward the leader of the top contest.
-                  Wrapped in a translate so rotation happens about local (0,0). */}
-              <g transform={`translate(${GC.cx}, ${GC.cy})`}>
-                <g className="wm-needle-g" style={{ transform: `rotate(${needleDeg}deg)` }}>
-                  <line x1="0" y1="0" x2="0" y2="-8.6"
-                        stroke={pendColor} strokeWidth="1.7" strokeLinecap="round"></line>
-                  <circle cx="0" cy="-8.6" r="1.9" fill={pendColor}></circle>
-                </g>
-              </g>
-              <circle cx={GC.cx} cy={GC.cy} r="1.7" className="wm-pivot"></circle>
-            </svg>
+            {/* 57px sizes the ink to 74% of the wordmark's height, the
+                proportion the lockup was drawn with before both words went
+                to 30px. glyphRef stays on THIS instance - the story
+                overlay's FLIP origin is the lockup's dial, never the tab
+                bar's placeholder. */}
+            <GlyphDial className="wm-dial" svgRef={glyphRef} width="57" height="39.7" />
           </button>
           <span className="wm-sr">– Australian federal polling</span>
         </h1>
