@@ -25,6 +25,10 @@
 //   - the slipped slot ALREADY is the house's measured late step (35 days),
 //     so pmLabel/dayAlt name no "(or +1 week)" alternative past it: the row
 //     reads "tomorrow", never "tomorrow (or 8)"
+//   - a slot MONTH confirmed absent at the publisher
+//     (pollsterRules.skippedMonths, written by .build/demosau-confirm-skip.mjs)
+//     slips the calendar-month slot ONE MONTH per confirmed month: no red,
+//     no "open now" on a window verified never filed
 //
 // Run after a rebuild:  node .build/newtracker/build.mjs
 //                       node .build/newtracker/sim-next-polls.mjs
@@ -390,6 +394,56 @@ function eq(name, got, want) {
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("cal-month missed leads as overdue in the ticker", daItems[0] && [daItems[0].firm, daItems[0].when, !!daItems[0].overdue],
     ["DemosAU", "13 days overdue", true]);
+}
+
+// S8 – Mon 28 Sep, 10am: September's measured window (9–27) closed yesterday
+// and the skip-confirm agent has verified the publisher lists no September
+// wave, so skippedMonths rolls the slot to October's range. No red, no
+// "open now" hanging on a month confirmed never filed - the row just counts
+// to the next UNVERIFIED month, exactly as Essential's week-grain roll does.
+{
+  const cad2 = JSON.parse(JSON.stringify(cad));
+  cad2.find((c) => c.pollster === "DemosAU").skippedMonths = ["2026-09"];
+  const { label, t0, nowMs } = scen("Mon 28 Sep, September confirmed absent", "2026-09-28", 600);
+  const rows = project(cad2, t0, nowMs);
+  const items = ticker(rows, t0, nowMs);
+  console.log(`\n${label}:  ticker → ${fmtT(items)}`);
+  const da = firm(rows, "DemosAU");
+  eq("rolled to the October window, not red", da && [da.overdue, da.missed], [false, false]);
+  eq("panel counts to the 9 Oct open", da && panelWhen(da), "opens in 11 days");
+  eq("ticker offers the October open, hedged", items.find((i) => i.firm === "DemosAU") && [items.find((i) => i.firm === "DemosAU").when, items.find((i) => i.firm === "DemosAU").maybe], ["11 days", true]);
+}
+
+// S8b – the rolled window mid-flight, Mon 12 Oct: the roll lands a reader on
+// the same open-window face an unrolled month would have shown.
+{
+  const cad2 = JSON.parse(JSON.stringify(cad));
+  cad2.find((c) => c.pollster === "DemosAU").skippedMonths = ["2026-09"];
+  const { label, t0, nowMs } = scen("Mon 12 Oct, rolled window open", "2026-10-12", 600);
+  const rows = project(cad2, t0, nowMs);
+  const items = ticker(rows, t0, nowMs);
+  console.log(`\n${label}:  ticker → ${fmtT(items)}`);
+  const da = firm(rows, "DemosAU");
+  eq("rolled window reads open now", da && panelWhen(da), "open now");
+  const daItem = items.find((i) => i.firm === "DemosAU");
+  eq("ticker says any day now on the rolled window", daItem && [daItem.when, !!daItem.overdue, !!daItem.maybe],
+    ["any day now", false, false]);
+}
+
+// S8c – Mon 5 Oct with BOTH September and October confirmed absent: the slot
+// rolls to November, whose open (9 Nov) sits past the 28-day horizon, so the
+// house simply leaves the roll until the horizon catches up with it - a real
+// property of the dated houses' skip roll too (a rolled slot past the horizon
+// was never rendered), not a new failure mode.
+{
+  const cad2 = JSON.parse(JSON.stringify(cad));
+  cad2.find((c) => c.pollster === "DemosAU").skippedMonths = ["2026-09", "2026-10"];
+  const { label, t0, nowMs } = scen("Mon 5 Oct, two months confirmed", "2026-10-05", 600);
+  const rows = project(cad2, t0, nowMs);
+  const items = ticker(rows, t0, nowMs);
+  console.log(`\n${label}:  ticker → ${fmtT(items)}`);
+  eq("rolled past the horizon: DemosAU off the panel", firm(rows, "DemosAU"), undefined);
+  eq("rolled past the horizon: DemosAU off the ticker", items.some((i) => i.firm === "DemosAU"), false);
 }
 
 console.log(fails ? `\n${fails} FAILED` : "\nall next-polls expectations held");

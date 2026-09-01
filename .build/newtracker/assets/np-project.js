@@ -101,8 +101,18 @@ function npProject(nowOverride) {
        without a special case of its own. */
     if (c.calMonth) {
       const ld = new Date(Date.parse(c.last));
-      const sm = (ld.getUTCMonth() + 1) % 12;
-      const sy = ld.getUTCFullYear() + (ld.getUTCMonth() === 11 ? 1 : 0);
+      let sm = (ld.getUTCMonth() + 1) % 12;
+      let sy = ld.getUTCFullYear() + (ld.getUTCMonth() === 11 ? 1 : 0);
+      /* A slot month named in `skippedMonths` was confirmed absent at the
+         publisher by the house's agent - the month-grain counterpart of the
+         dated path's `skipped` roll below, and the same off-ramp from the
+         never-rolled-forward-on-a-guess rule: the slot steps one month at a
+         time to the next UNVERIFIED month rather than holding red on a
+         window verified never filed. */
+      while ((c.skippedMonths || []).includes(`${sy}-${String(sm + 1).padStart(2, "0")}`)) {
+        sm += 1;
+        if (sm > 11) { sm = 0; sy += 1; }
+      }
       const lastDay = Date.UTC(sy, sm + 1, 0); // the next month's day 0 = this slot's last day
       const open = Date.UTC(sy, sm, c.calDays ? c.calDays[0] : 1);
       /* a habit reaching past the 28th is not owed a day a shorter month

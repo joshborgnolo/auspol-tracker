@@ -1589,6 +1589,10 @@ for (const [firm, rows] of Object.entries(byHouse)) {
        rolls straight past them instead of holding the slot open as
        "(or N days ago)" for a release the agent verified was never filed. */
     skipped: (D.pollsterRules?.[firm] || {}).skippedSlots || [],
+    /* The month-grain counterpart for calendar-month houses
+       (pollsterRules.skippedMonths, "YYYY-MM" of the SLOT month confirmed
+       absent); only meaningful beside calMonth above. */
+    skippedMonths: (D.pollsterRules?.[firm] || {}).skippedMonths || [],
     /* The releases behind the projection, most recent last, so the panel can
        show its working rather than asking to be believed. The interval is the
        gap between FIELDWORK ends - the same quantity the median is taken over
