@@ -6,7 +6,14 @@
     <atom:link href="https://auspoltracker.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
     <language>en-AU</language>
-    <lastBuildDate>Sun, 30 Aug 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Mon, 31 Aug 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Essential, 31 Aug 2026 – ALP 26, L/NP 26, GRN 13, ON 23, Ind/Oth 11</title>
+      <link>https://auspoltracker.com/</link>
+      <guid isPermaLink="false">auspol-tracker:2026-08-31|Essential</guid>
+      <pubDate>Mon, 31 Aug 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 26, L/NP 26, GRN 13, ON 23, Ind/Oth 11. No two-party figure published. Fieldwork 31 Aug 2026.</description>
+    </item>
     <item>
       <title>Roy Morgan, 24–30 Aug 2026 – 2PP ALP 56 – L/NP 44</title>
       <link>https://www.roymorgan.com/findings/10328-federal-voting-intention-august-31-2026</link>
@@ -279,13 +286,6 @@
       <guid isPermaLink="false">auspol-tracker:2026-05-31|Roy Morgan</guid>
       <pubDate>Sun, 31 May 2026 12:00:00 GMT</pubDate>
       <description>Primary vote: ALP 27, L/NP 20, GRN 13.5, ON 27, Ind/Oth 12.5. Two-party preferred: ALP 55.5 – L/NP 44.5. Sample 1,542. Fieldwork 25–31 May 2026.</description>
-    </item>
-    <item>
-      <title>RedBridge / Accent, 25–28 May 2026 – 2PP ALP 51 – L/NP 49</title>
-      <link>https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9</link>
-      <guid isPermaLink="false">auspol-tracker:2026-05-28|RedBridge / Accent</guid>
-      <pubDate>Thu, 28 May 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 20, GRN 12, ON 31, Ind/Oth 9. Two-party preferred: ALP 51 – L/NP 49. Sample 1,005. Fieldwork 25–28 May 2026.</description>
     </item>
   </channel>
 </rss>
