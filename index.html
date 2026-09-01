@@ -1164,6 +1164,14 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hero-interval .hi-method { font-size: 12px; }
 .hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hi-note { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+/* Phones: one line of lead + range + method + interval is ~386px at the
+   base 14px - it fits desktop widths easily, but a 390px-class phone leaves
+   only ~358px of row. Drop the lead clause and its range to the strip 12px
+   and shave the inter-clause gap, and the whole row holds on one line. */
+@media (max-width: 480px) {
+  .hero-interval { gap: 6px; }
+  .hero-interval .lead-tag, .hero-interval .hi-range { font-size: 12px; }
+}
 /* Movement smaller than its own interval – stated, not colour-coded, so it
    reads as a qualification rather than a warning. */
 .hero-caveat { color: var(--ink-3); }
