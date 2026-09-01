@@ -2246,6 +2246,37 @@ function npProject() {
   const rows = [];
   const horizon = t0 + NP_HORIZON_DAYS * DAY_MS;
   cad.forEach((c) => {
+    /* A CALENDAR-MONTH rhythm (DemosAU) has no day to project: one wave per
+       month on no particular day of it, so the slot IS the month - the 1st to
+       the last day of the month after the last recorded wave. Shaped here as
+       a loose window whose centre and spread are the month's own mid and
+       half-span, so every window consumer (the panel's span and "open now",
+       the bar's countdown, the missed count from the close) reads the month
+       without a special case of its own. */
+    if (c.calMonth) {
+      const ld = new Date(Date.parse(c.last));
+      const sm = (ld.getUTCMonth() + 1) % 12;
+      const sy = ld.getUTCFullYear() + (ld.getUTCMonth() === 11 ? 1 : 0);
+      const open = Date.UTC(sy, sm, 1);
+      const close = Date.UTC(sy, sm + 1, 0);   // the next month's day 0 = this slot's last day
+      const calSpread = (close - open) / 2 / DAY_MS;
+      const release = (open + close) / 2;
+      const missed = close < t0;
+      /* earns its place when the window opens inside the horizon, like any
+         loose house - but a MOOT slot keeps its seat until a release moves
+         the anchor, the same hold-the-slot rule everything else obeys */
+      if (open <= horizon || missed) {
+        rows.push({
+          ...c, field: open, release, missed, ahead: 0,
+          overdue: missed,
+          spread: calSpread, winHalf: calSpread,
+          inDays: Math.round((release - t0) / DAY_MS),
+          opensIn: Math.round((open - t0) / DAY_MS),
+          closesIn: Math.round((close - t0) / DAY_MS),
+        });
+      }
+      return;
+    }
     /* A house that keeps a weekday is projected onto it. Interval alone put
        Essential on a Thursday and YouGov on a Tuesday, when between them they
        have published on a Wednesday thirteen times out of fourteen dated

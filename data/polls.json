@@ -44,6 +44,10 @@
       "site": "https://www.theaustralian.com.au/topics/newspoll?eafs_enabled=false"
     },
     "DemosAU": {
+      "release": {
+        "month": true,
+        "note": "One wave per calendar month, on no discernible day of it: five consecutive months Apr–Aug 2026, landing on the 17th, 22nd, 22nd, 13th and 24th. Measured as an interval the median's ± spills past the month's ends (13 Sep–5 Oct for the Sep 2026 slot), which the house's own rhythm rules out, so the calendar month is the window."
+      },
       "site": "https://demosau.com/methodology-statements/"
     },
     "DemosAU (MRP)": {

@@ -1510,18 +1510,24 @@ for (const [firm, rows] of Object.entries(byHouse)) {
      data actually supports - which is a real forecast, just a wider one. Past
      LOOSE_MAX there is no rhythm left to state and the house is dropped, which
      is where "we don't know" is the honest answer. */
+  const decl = (D.pollsterRules?.[firm] || {}).release || null;
+  /* A CALENDAR-MONTH rhythm (DemosAU): one wave each month on no pattern of
+     day, so the window is the month itself - measured as an interval, the
+     median's ± always spills past the month's ends, which the rhythm rules
+     out. Declared, not inferred: the points sit inside months well enough
+     but nothing in the data marks the month as the unit. Implies loose. */
+  const calMonth = !!decl?.month;
   const rel = spread / cadence;
-  const dated = rel <= CAD_MAX_REL_SPREAD;
-  if (!dated && rel > CAD_LOOSE_MAX_REL_SPREAD) continue;
+  const dated = rel <= CAD_MAX_REL_SPREAD && !calMonth;
+  if (!dated && !calMonth && rel > CAD_LOOSE_MAX_REL_SPREAD) continue;
   const ls = lagSamples[firm] || [];
   /* A DECLARED schedule, where the data cannot measure one the house plainly
      keeps. It is not a nicer default - it is a claim entered by hand in
      pollsterRules, carried through labelled, and meant to be deleted once
      enough `published` values exist to measure the same thing. */
-  const decl = (D.pollsterRules?.[firm] || {}).release || null;
   const declMins = decl && /^\d{1,2}:\d{2}$/.test(decl.time || "")
     ? Number(decl.time.split(":")[0]) * 60 + Number(decl.time.split(":")[1]) : null;
-  const releaseDow = decl && decl.dow != null ? decl.dow : dowHabit;
+  const releaseDow = calMonth ? null : (decl && decl.dow != null ? decl.dow : dowHabit);
   const timed = ts.length >= 5;
   pollCadence.push({
     pollster: firm,
@@ -1560,7 +1566,11 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     releaseDow,
     releaseDowN: releaseDow == null ? 0 : (decl && decl.dow != null ? 0 : dowTop[1]),
     // which parts of this are stated rather than measured, so the panel can say so
-    declared: decl ? [decl.dow != null && "day", declMins != null && !timed && "hour"].filter(Boolean) : [],
+    declared: decl ? [decl.dow != null && "day", declMins != null && !timed && "hour",
+      calMonth && "calendar-month rhythm"].filter(Boolean) : [],
+    /* The month itself is the projection, not a median ± spread: the window
+       in npProject runs 1st-to-last of the month after the last wave. */
+    ...(calMonth ? { calMonth: true } : {}),
     waves: dates.length,
     // the house's own release index, so a reader can go and check
     site: (D.pollsterRules?.[firm] || {}).site || null,
