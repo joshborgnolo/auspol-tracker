@@ -1,0 +1,45 @@
+# Next-polls calibration scoreboard. Once a day, appends any changed live
+# projection tuples to data/np-calibration.jsonl and regenerates
+# data/np-report.md — the hit-rate record of the "Next expected polls" panel,
+# kept honest by appending only when a prediction's identity moves (a wave
+# landed, a skip confirmed, an estimate re-measured), not on the daily tick.
+# Deterministic, so no repair job: a red run here is a plain failure and
+# emails like the coverage watchdog.
+
+name: np-score
+
+on:
+  schedule:
+    - cron: '15 21 * * *' # 07:15 AEST daily
+  workflow_dispatch:
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Log the live tuples, then resolve the ledger
+        run: |
+          node .build/newtracker/np-score.mjs
+          node .build/newtracker/np-score.mjs --report
+
+      - name: Commit whatever moved
+        run: |
+          git add data/np-calibration.jsonl data/np-report.md
+          if git diff --cached --quiet; then
+            echo "no calibration changes today"
+            exit 0
+          fi
+          git commit -m "Score the next-polls projection"
+          # another agent may have landed data first thing; rebase, don't race
+          git pull --rebase origin main
+          git push origin HEAD:main
