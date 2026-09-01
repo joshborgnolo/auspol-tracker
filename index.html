@@ -1371,7 +1371,10 @@ body.dark .ci-band { opacity: 0.22; }
   opacity: 0; transform: translateY(4px); pointer-events: none;
   transition: opacity .26s ease, transform .34s cubic-bezier(.22, 1, .36, 1);
 }
-.tabs.pinned .tab-score { opacity: 1; transform: none; pointer-events: auto; }
+/* The score is a stand-in for the hero's 2PP figures, so it only joins the
+   bar once they have scrolled off – .show-score is pinned AND the hero
+   readout gone (see Tabs in views.jsx). */
+.tabs.show-score .tab-score { opacity: 1; transform: none; pointer-events: auto; }
 .ts-eyebrow {
   font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--ink-3); margin-right: 2px;
@@ -2408,16 +2411,19 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
 }
 /* ---- the next-poll countdown in the tab bar ------------------------------
    Wide screens only. The countdown is absolutely seated in BOTH bar states
-   so a pin can GLIDE it: while the bar sits in the page it docks to the
-   right end (left:100% + translateX(-100%) - the same edge the flex row gave
-   it), and once the docked 2PP score owns that end it slides to the bar's
-   centre. The glide is a SINGLE transition property: left stays 100% and
-   only the transform interpolates (-100% of itself -> -50% of itself - 50%
-   of the container, cqw via .tabs-inner). An earlier left+transform pair
-   put left on the layout thread and transform on the compositor, which
-   raced in probes and jittered the first ~150ms; one transform interpolant
-   keeps every frame on one clock. Out of flow in both states, so the pin
-   still relayouts nothing. */
+   so it can GLIDE between them: it docks to the right end (left:100% +
+   translateX(-100%) - the same edge the flex row gave it) until the docked
+   2PP score owns that end, then slides to the bar's centre. Score-in and
+   ticker-to-centre are ONE swap, both gated on .show-score (the hero's 2PP
+   block fully scrolled off - see Tabs in views.jsx), never on the pin: a
+   pinned bar with the hero still on screen is unchanged, tabs left and
+   countdown right. The glide is a SINGLE transition property: left stays
+   100% and only the transform interpolates (-100% of itself -> -50% of
+   itself - 50% of the container, cqw via .tabs-inner). An earlier
+   left+transform pair put left on the layout thread and transform on the
+   compositor, which raced in probes and jittered the first ~150ms; one
+   transform interpolant keeps every frame on one clock. Out of flow in both
+   seats, so the swap relayouts nothing. */
 .tab-next { display: none; }
 @media (min-width: 1100px) {
   .tab-next {
@@ -2429,7 +2435,7 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
     color: var(--ink-3);
     transition: transform .38s cubic-bezier(.22, 1, .36, 1);
   }
-  .tabs.pinned .tab-next { transform: translateX(calc(-50% - 50cqw)); }
+  .tabs.show-score .tab-next { transform: translateX(calc(-50% - 50cqw)); }
   /* an item past the measured budget parks rather than wraps: out of flow
      and hidden, but still rendered (and measurable), so the fit pass can
      bring it straight back the moment the bar has room for it again. The
@@ -2504,7 +2510,7 @@ a.tn-link:hover .plink-mark, a.tn-link:focus-visible .plink-mark { color: var(--
    thread), and no layout change at all (no oscillation risk). */
 .tabs.pinned::after { opacity: 1; }
 /* position/z-index keep the row painting above the full-bleed backdrop;
-   overflow hides the docked score until the bar pins (see .tab-score);
+   overflow hides the docked score until it joins (see .tab-score);
    container-type gives the next-poll countdown a cqw yardstick (see
    .tab-next) - the row's inline size is parent-set, so containment is free */
 .tabs-inner {
@@ -11221,9 +11227,13 @@ function Tabs({
   onChange,
   tppMatchup
 }) {
-  // Sticky on every view. Once pinned, a compact 2PP score docks into the
-  // right side of the bar – the headline number stays visible on every tab.
+  // Sticky on every view. Once the bar is pinned AND the hero's 2PP figures
+  // have scrolled out of view, a compact score docks into the right side of
+  // the bar – it is a stand-in for the hero, so it never shares the screen
+  // with it. On the other tabs the hero is not mounted at all, so the score
+  // travels with the bar as soon as it pins.
   const [pinned, setPinned] = React.useState(false);
+  const [heroGone, setHeroGone] = React.useState(false);
   const sentRef = React.useRef(null);
   const btnRefs = React.useRef({});
 
@@ -11265,12 +11275,45 @@ function Tabs({
     io.observe(el);
     return () => io.disconnect();
   }, []);
+
+  /* The swap in the bar – docked 2PP score in, ticker to the middle – is one
+     move, gated on the hero, not the pin: it waits until the hero's 2PP block
+     (the readout figures AND the gauge bar under them) has scrolled off. The
+     ticker's seat change lives in CSS on the same show-score class, so score
+     and seat always move together. The hero unmounts with the snapshot view,
+     so the target is (re)acquired whenever the active tab changes;
+     off-snapshot there is nothing to wait for and the bar swaps as soon as
+     it pins. The gauge IS the trigger element (it sits directly under the
+     figures and spans the block's width); if it is somehow absent the
+     readout itself is the fallback. */
+  React.useEffect(() => {
+    if (!("IntersectionObserver" in window)) {
+      setHeroGone(true);
+      return;
+    }
+    if (active !== "snapshot") {
+      setHeroGone(true);
+      return;
+    }
+    const el = document.querySelector(".hero-gauge") || document.querySelector(".hero-readout");
+    if (!el) {
+      setHeroGone(true);
+      return;
+    }
+    setHeroGone(false);
+    const io = new IntersectionObserver(([e]) => setHeroGone(!e.isIntersecting), {
+      threshold: 0,
+      rootMargin: "0px 0px 0px 0px"
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [active]);
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     ref: sentRef,
     className: "tabs-sentinel",
     "aria-hidden": "true"
   }), /*#__PURE__*/React.createElement("nav", {
-    className: "tabs sticky" + (pinned ? " pinned" : ""),
+    className: "tabs sticky" + (pinned ? " pinned" : "") + (pinned && heroGone ? " show-score" : ""),
     "aria-label": "Views"
   }, /*#__PURE__*/React.createElement("div", {
     className: "tabs-inner"

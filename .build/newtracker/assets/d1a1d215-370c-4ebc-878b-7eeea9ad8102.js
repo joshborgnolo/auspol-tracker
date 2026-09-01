@@ -334,9 +334,13 @@ function NextPollTicker({ pinned }) {
 // Tabs – editorial underlined nav beneath the header
 // ====================================================================
 function Tabs({ tabs, active, onChange, tppMatchup }) {
-  // Sticky on every view. Once pinned, a compact 2PP score docks into the
-  // right side of the bar – the headline number stays visible on every tab.
+  // Sticky on every view. Once the bar is pinned AND the hero's 2PP figures
+  // have scrolled out of view, a compact score docks into the right side of
+  // the bar – it is a stand-in for the hero, so it never shares the screen
+  // with it. On the other tabs the hero is not mounted at all, so the score
+  // travels with the bar as soon as it pins.
   const [pinned, setPinned] = React.useState(false);
+  const [heroGone, setHeroGone] = React.useState(false);
   const sentRef = React.useRef(null);
   const btnRefs = React.useRef({});
 
@@ -379,13 +383,40 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
     io.observe(el);
     return () => io.disconnect();
   }, []);
+
+  /* The swap in the bar – docked 2PP score in, ticker to the middle – is one
+     move, gated on the hero, not the pin: it waits until the hero's 2PP block
+     (the readout figures AND the gauge bar under them) has scrolled off. The
+     ticker's seat change lives in CSS on the same show-score class, so score
+     and seat always move together. The hero unmounts with the snapshot view,
+     so the target is (re)acquired whenever the active tab changes;
+     off-snapshot there is nothing to wait for and the bar swaps as soon as
+     it pins. The gauge IS the trigger element (it sits directly under the
+     figures and spans the block's width); if it is somehow absent the
+     readout itself is the fallback. */
+  React.useEffect(() => {
+    if (!("IntersectionObserver" in window)) { setHeroGone(true); return; }
+    if (active !== "snapshot") { setHeroGone(true); return; }
+    const el = document.querySelector(".hero-gauge")
+            || document.querySelector(".hero-readout");
+    if (!el) { setHeroGone(true); return; }
+    setHeroGone(false);
+    const io = new IntersectionObserver(
+      ([e]) => setHeroGone(!e.isIntersecting),
+      { threshold: 0, rootMargin: "0px 0px 0px 0px" }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [active]);
   return (
     <React.Fragment>
       <div ref={sentRef} className="tabs-sentinel" aria-hidden="true"></div>
       {/* role="tablist" belongs on the element that actually OWNS the tabs. It
           used to sit on the <nav>, two wrappers up, which both broke the
           ownership the pattern requires and overwrote the nav's landmark. */}
-      <nav className={"tabs sticky" + (pinned ? " pinned" : "")} aria-label="Views">
+      <nav className={"tabs sticky" + (pinned ? " pinned" : "")
+                      + (pinned && heroGone ? " show-score" : "")}
+           aria-label="Views">
         <div className="tabs-inner">
           <div className="tabs-set" role="tablist" aria-label="Views"
                onKeyDown={onTabKeyDown}>
