@@ -1401,8 +1401,6 @@ body.dark .ci-band { opacity: 0.22; }
 .ts-sep { width: 1.5px; height: 13px; background: var(--line-2); align-self: center; flex: none; position: relative; top: 1px; }
 /* narrow: tighten the resting tabs so everything sits comfortably */
 @media (max-width: 640px) {
-  .tab-label { font-size: 14.5px; line-height: 18px; }
-  body.editorial .tab-label { font-size: 16.5px; line-height: 20px; }
   .ts-eyebrow { display: none; }
   .tab-score { gap: 7px; }
   .ts-num { font-size: 15.5px; }
@@ -2573,9 +2571,14 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.79); } /* 19 → 15 *
 body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-size: 19px; line-height: 23px; letter-spacing: -0.01em; }
 
 /* narrow screens condense a touch further so the docked score clears the
-   scaled tab set. The gap lives HERE, after the base .tabs-set rule above -
-   an earlier-authored copy of this rule lost that cascade and sat dead. */
+   scaled tab set. The gap (and the shrunk phone bar below) lives HERE, after
+   the base rules above - an earlier-authored copy of this rule lost that
+   cascade and sat dead (so did the .tab-label sizes now revived here). */
 @media (max-width: 640px) {
+  .tabs { margin: -18px -4px 18px; }
+  .tab { padding-block: 9px; }
+  .tab-label { font-size: 14.5px; line-height: 18px; }
+  body.editorial .tab-label { font-size: 16.5px; line-height: 20px; }
   .tabs-set { gap: 18px; }
   .tabs.pinned .tabs-set { transform: scale(0.8); }
   body.editorial .tabs.pinned .tabs-set { transform: scale(0.76); }
