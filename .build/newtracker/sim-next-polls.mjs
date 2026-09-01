@@ -30,6 +30,15 @@
 //     slips the calendar-month slot ONE MONTH per confirmed month: no red,
 //     no "open now" on a window verified never filed
 //
+// A deliberate boundary on what was extracted: the label/ticker derivations
+// mirrored below (a11e1559, d1a1d215) PRESENT the projection's rows; only
+// the projection itself is a falsifiable claim, which is why it alone got
+// lifted into a single source the page, this sim and np-score.mjs all run.
+// A wording mirror that drifts can mislabel a row but cannot move a
+// prediction, and every scenario below pins the wording shipped today. If
+// the ticker derivation ever gains a second real consumer, lift it the same
+// way npProject was lifted — don't leave two sources to drift.
+//
 // Run after a rebuild:  node .build/newtracker/build.mjs
 //                       node .build/newtracker/sim-next-polls.mjs
 // Exits non-zero if any expectation fails.

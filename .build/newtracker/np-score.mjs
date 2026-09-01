@@ -45,6 +45,14 @@
    own bucket: they start life inside special circumstances, and mixing
    them with primary slots would grade two different tests as one.
 
+   The report carries hit-rate BESIDE the median midpoint error per house
+   (days from the window's centre to the wave's publication). Rate alone
+   rewards wider windows - a ±0-day house and a ±9-day house are not
+   sitting the same test - so midpoint error is the number that's
+   comparable across houses, and the one worth tuning cadence constants
+   against. The log stores claims only; both measures derive at report
+   time, so a scoring change is retroactive across the whole record.
+
    Usage:   node .build/newtracker/np-score.mjs            append new tuples
             node .build/newtracker/np-score.mjs --report   rewrite the report
    Both are idempotent and exit 0 on the happy path (1 = internal error).
@@ -208,7 +216,7 @@ function cmdReport() {
       const inWin = wave.pub >= e.open && wave.pub <= e.close;
       const off = Math.round((Date.parse(wave.pub) - Date.parse(e.release)) / DAY);
       resolved.push({
-        ...r, verdict: inWin ? "hit" : "miss", wave,
+        ...r, verdict: inWin ? "hit" : "miss", wave, off,
         note: inWin ? `published ${fmt(wave.pub)}` : `published ${fmt(wave.pub)} (${off > 0 ? `${off}d late` : `${-off}d early`})`,
       });
     });
@@ -220,6 +228,19 @@ function cmdReport() {
     const m = rows.filter((r) => r.verdict === "miss").length;
     return { h, m, rate: h + m ? Math.round((100 * h) / (h + m)) : null };
   };
+  /* Hit-rate alone can't be compared ACROSS houses: an exact-day house
+     (winHalf 0) and a ±9-day house are sitting different tests, and tuning
+     the CAD_* constants to raise hit-rate would only reward wider windows.
+     The comparable number is the midpoint error - how far the window's
+     CENTRE was from the wave's publication, whatever the window's width. */
+  const medErr = (rows) => {
+    const errs = rows.filter((r) => (r.verdict === "hit" || r.verdict === "miss") && r.off != null)
+      .map((r) => Math.abs(r.off)).sort((a, b) => a - b);
+    if (!errs.length) return null;
+    const mid = errs.length >> 1;
+    return errs.length % 2 ? errs[mid] : (errs[mid - 1] + errs[mid]) / 2;
+  };
+  const fmtErr = (v) => (v == null ? "–" : `${v % 1 ? v.toFixed(1) : v}d`);
   const primary = resolved.filter((r) => !r.rolled);
   const rolled = resolved.filter((r) => r.rolled);
   const houses = [...new Set(resolved.map((r) => r.house))];
@@ -237,21 +258,25 @@ function cmdReport() {
   line.push("Each house's first projected slot is logged when its identity changes (release, window, rolled). " +
     "A **hit** published inside the window, a **miss** outside it; a publisher-confirmed absence (**skip**) and a " +
     "data-side supersede (**void**) count neither for nor against. Rolled slots (moved by a confirmed skip) tally separately. " +
-    "The newest entry per house is the live **pending** bet.");
+    "The newest entry per house is the live **pending** bet. " +
+    "Hit-rate is not comparable across houses on its own - an exact-day house and a ±9-day house face different tests - " +
+    "so the table also carries each house's **median midpoint error**: days from the window's centre to the wave's " +
+    "publication, the like-for-like accuracy number (lower is better).");
   line.push("");
   line.push(`Last run: ${new Date().toISOString().slice(0, 16).replace("T", " ")}Z (${sydNow()} Sydney)`);
   line.push("");
   line.push("## Hit rate");
   line.push("");
-  line.push("| house | primary slots | rolled slots | skip | void |");
-  line.push("|---|---|---|---|---|");
+  line.push("| house | primary slots | primary midpoint err | rolled slots | skip | void |");
+  line.push("|---|---|---|---|---|---|");
   for (const h of houses) {
     const rows = resolved.filter((r) => r.house === h);
-    line.push(`| ${h} | ${rateCell(rows.filter((r) => !r.rolled))} | ${rateCell(rows.filter((r) => r.rolled))} | ${rows.filter((r) => r.verdict === "skip").length || "–"} | ${rows.filter((r) => r.verdict === "void").length || "–"} |`);
+    line.push(`| ${h} | ${rateCell(rows.filter((r) => !r.rolled))} | ${fmtErr(medErr(rows.filter((r) => !r.rolled)))} | ${rateCell(rows.filter((r) => r.rolled))} | ${rows.filter((r) => r.verdict === "skip").length || "–"} | ${rows.filter((r) => r.verdict === "void").length || "–"} |`);
   }
-  const P = tally(primary), R = tally(rolled);
+  const P = tally(primary), R = tally(rolled), PE = medErr(primary);
   line.push("");
   line.push(`**Overall: ${P.h + P.m ? `${P.h}/${P.h + P.m} (${P.rate}%)` : "no resolved predictions yet"} primary` +
+    `${PE != null ? ` · median midpoint error ${fmtErr(PE)}` : ""}` +
     `${R.h + R.m ? ` · ${R.h}/${R.h + R.m} rolled` : ""}` +
     `${counts("skip") ? ` · ${counts("skip")} skip` : ""}${counts("void") ? ` · ${counts("void")} void` : ""}` +
     ` · ${counts("pending")} pending**`);
