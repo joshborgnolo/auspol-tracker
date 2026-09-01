@@ -59,13 +59,15 @@ function project(cad, t0, nowMs) {
   const horizon = t0 + NP_HORIZON_DAYS * DAY;
   for (const c of cad) {
     // mirrors the calMonth branch in a11e1559 npProject: the slot is the
-    // calendar month after the last wave, window = 1st to last day
+    // calendar month after the last wave, window = its measured day-of-month
+    // range (calDays), clamped to the month's own last day
     if (c.calMonth) {
       const ld = new Date(Date.parse(c.last));
       const sm = (ld.getUTCMonth() + 1) % 12;
       const sy = ld.getUTCFullYear() + (ld.getUTCMonth() === 11 ? 1 : 0);
-      const open = Date.UTC(sy, sm, 1);
-      const close = Date.UTC(sy, sm + 1, 0);
+      const lastDay = Date.UTC(sy, sm + 1, 0);
+      const open = Date.UTC(sy, sm, c.calDays ? c.calDays[0] : 1);
+      const close = c.calDays ? Math.min(Date.UTC(sy, sm, c.calDays[1]), lastDay) : lastDay;
       const sp = (close - open) / 2 / DAY;
       const release = (open + close) / 2;
       const missed = close < t0;
@@ -222,12 +224,14 @@ function ticker(rows, t0, nowMs) {
              : days === 1 ? "tomorrow"
              : days + " days";
       } else {
-        when = t.at <= nowMs ? "any moment now"
+        // no day pinned → "any day now"; "any moment now" is the dated
+        // houses' word, for a slot whose moment has arrived TODAY
+        when = t.at <= nowMs ? "any day now"
              : Math.round((t.at - nowMs) / 3600000) < 36
              ? tnUntil(t.at - nowMs)
              : Math.round((t.at - t0) / DAY) + " days";
       }
-      const maybe = when !== "any moment now" &&
+      const maybe = when !== "any moment now" && when !== "any day now" &&
         (half > 7 || !!r.loose ||
          (r.releaseDow != null && t.at - r.release > 7 * DAY) ||
          (r.releaseDow == null && half > 0));
@@ -280,9 +284,11 @@ function eq(name, got, want) {
   const es = firm(rows, "Essential");
   eq("Essential not overdue, slipped to THIS week's Wed 2 Sep", [es && es.overdue, es && es.missed], [false, false]);
   eq("panel counts to tomorrow, no 'or' alternative", es && panelWhen(es), "tomorrow");
-  // DemosAU's calendar-month window (1-30 Sep) is OPEN from today, so the bar
-  // puts "any moment now" ahead of Essential's tomorrow
-  eq("DemosAU's open month window leads the ticker", items[0] && [items[0].firm, items[0].when], ["DemosAU", "any moment now"]);
+  // DemosAU's calendar-month window is the house's measured filing range,
+  // the 9th to the 27th, so on the 1st it hasn't opened yet: Essential's
+  // slipped slot leads, and DemosAU counts the days to its own range with
+  // the loose-house hedge on
+  eq("Essential's slipped slot leads the ticker", items[0] && [items[0].firm, items[0].when], ["Essential", "tomorrow"]);
   // the slipped slot already sits on the house's measured late step (35 days)
   // - the projection IS the alternative, so neither column may name a
   // further +1-week date (the "tomorrow (or 8)" / "(or Wed 9 Sep)" copy a
@@ -296,18 +302,41 @@ function eq(name, got, want) {
      rs && [pmLabel(rs), dayAlt(rs)], [" (or Sun 20 Sep)", " (or 19)"]);
   // the roll is every house's nearest slot, unsliced - on the live bar the
   // fit pass trims this to the room it actually has; the roll itself never
-  // caps (a weekly house appears once, not twice inside the same week)
+  // caps (a weekly house appears once, not twice inside the same week).
+  // DemosAU's open (9 Sep) ties YouGov's slot to the minute; the cadence
+  // sort put YouGov's row in first, so it wins the tiebreak
   eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
-    [["DemosAU", "any moment now"], ["Essential", "tomorrow"], ["Roy Morgan", "6 days"], ["YouGov", "8 days"],
-     ["Resolve", "12 days"], ["Newspoll", "19 days"],
+    [["Essential", "tomorrow"], ["Roy Morgan", "6 days"], ["YouGov", "8 days"],
+     ["DemosAU", "8 days"], ["Resolve", "12 days"], ["Newspoll", "19 days"],
      ["RedBridge / Accent", "26 days"]]);
+  {
+    const da = firm(rows, "DemosAU");
+    eq("DemosAU's window opens on the measured 9th, not the 1st", da && panelWhen(da), "opens in 8 days");
+    eq("a day-count that wide keeps its hedge", items.find((i) => i.firm === "DemosAU").maybe, true);
+  }
   // the hold-the-slot rule, still in force for any unconfirmed slot
   const holdRows = project(cadHold, t0, nowMs);
   const holdItems = ticker(holdRows, t0, nowMs);
   const esHold = firm(holdRows, "Essential");
   eq("without the skip seed: overdue, tolerance open", [esHold.overdue, esHold.missed], [true, false]);
   eq("without the skip seed: panel reads to the edge", panelWhen(esHold), "tomorrow (or 6 days ago)");
-  eq("without the skip seed: DemosAU's open window still leads", [holdItems[0].firm, holdItems[0].when], ["DemosAU", "any moment now"]);
+  eq("without the skip seed: Essential leads, overdue and counting", [holdItems[0].firm, holdItems[0].when], ["Essential", "tomorrow"]);
+}
+
+// S1c – Mon 14 Sep, 10am: DemosAU's window (9–27 Sep) opened five days ago.
+// The wave is now due anywhere inside the range, so the bar says so - "any
+// day now", the windowed houses' word; "any moment now" belongs to a dated
+// house whose moment arrived today (S2's Essential, above).
+{
+  const { label, t0, nowMs } = scen("Mon 14 Sep", "2026-09-14", 600);
+  const rows = project(cad, t0, nowMs);
+  const items = ticker(rows, t0, nowMs);
+  console.log(`\n${label}:  ticker → ${fmtT(items)}`);
+  const da = firm(rows, "DemosAU");
+  eq("panel reads open, with the window underway", da && panelWhen(da), "open now");
+  const daItem = items.find((i) => i.firm === "DemosAU");
+  eq("ticker says any day now - not moment, not overdue, no hedge", [daItem.when, !!daItem.overdue, !!daItem.maybe],
+    ["any day now", false, false]);
 }
 
 // S2 – Wed 2 Sep, 3am: the slipped slot itself expired an hour ago but the
@@ -399,8 +428,8 @@ function eq(name, got, want) {
   eq("ticker item 1", items[0] && [items[0].firm, items[0].when, !!items[0].overdue], ["Roy Morgan", "1 day overdue", true]);
 }
 
-// S7 – Sat 10 Oct: DemosAU's calendar-month window (1–30 Sep) has closed
-// unrecorded. It reads as overdue from the month's last day, in both places,
+// S7 – Sat 10 Oct: DemosAU's calendar-month window (9–27 Sep) has closed
+// unrecorded. It reads as overdue from the range's last day, in both places,
 // parked at the panel's foot rather than floating to the top as "open now".
 // (Six weeks past the data clock every house is blown, so the ticker's roll
 // is nothing but red counts, most overdue first; DemosAU's own row is also
@@ -412,20 +441,20 @@ function eq(name, got, want) {
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const da = firm(rows, "DemosAU");
   eq("DemosAU missed", da && da.missed, true);
-  eq("panel no longer says 'open now'", da && panelWhen(da), "10 days overdue");
+  eq("panel no longer says 'open now'", da && panelWhen(da), "13 days overdue");
   eq("missed rows park at the foot, cadence order", rows.slice(-2).map((r) => r.pollster), ["Essential", "DemosAU"]);
   // Essential's slipped 2 Sep slot past its own edge too (the frozen sim data
   // can't run the 3 Sep confirmation that would have slipped it on), so it
-  // leads the late roll, a week clear of Roy Morgan. DemosAU's month window
-  // closed 30 Sep, so on 10 Oct it is ten days late, not five.
+  // leads the late roll, a week clear of Roy Morgan. DemosAU's window closed
+  // on its measured 27th, so on 10 Oct it is thirteen days late, not ten.
   eq("ticker order: most overdue first, all houses kept", items.map((i) => [i.firm, i.when]),
     [["Essential", "38 days overdue"], ["Roy Morgan", "33 days overdue"],
      ["YouGov", "31 days overdue"], ["Resolve", "27 days overdue"],
      ["Newspoll", "20 days overdue"], ["RedBridge / Accent", "13 days overdue"],
-     ["DemosAU", "10 days overdue"]]);
+     ["DemosAU", "13 days overdue"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("cal-month missed leads as overdue in the ticker", daItems[0] && [daItems[0].firm, daItems[0].when, !!daItems[0].overdue],
-    ["DemosAU", "10 days overdue", true]);
+    ["DemosAU", "13 days overdue", true]);
 }
 
 console.log(fails ? `\n${fails} FAILED` : "\nall next-polls expectations held");

@@ -1517,6 +1517,15 @@ for (const [firm, rows] of Object.entries(byHouse)) {
      out. Declared, not inferred: the points sit inside months well enough
      but nothing in the data marks the month as the unit. Implies loose. */
   const calMonth = !!decl?.month;
+  /* ...and WHERE inside the month: the day-of-month range the house has
+     actually filed on, measured over the same published sequence the
+     intervals were. Nothing declares it - it re-measures itself every build
+     as the record grows, so an early-January outlier widens it and a steady
+     run keeps it narrow. DemosAU at present: the 9th to the 27th. */
+  const calDays = !calMonth ? null : (() => {
+    const ds = seq.map((d) => Number(d.slice(8, 10)));
+    return [Math.min(...ds), Math.max(...ds)];
+  })();
   const rel = spread / cadence;
   const dated = rel <= CAD_MAX_REL_SPREAD && !calMonth;
   if (!dated && !calMonth && rel > CAD_LOOSE_MAX_REL_SPREAD) continue;
@@ -1568,9 +1577,10 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     // which parts of this are stated rather than measured, so the panel can say so
     declared: decl ? [decl.dow != null && "day", declMins != null && !timed && "hour",
       calMonth && "calendar-month rhythm"].filter(Boolean) : [],
-    /* The month itself is the projection, not a median ± spread: the window
-       in npProject runs 1st-to-last of the month after the last wave. */
-    ...(calMonth ? { calMonth: true } : {}),
+    /* The month itself is the projection, not a median ± spread: npProject's
+       window is the measured day-of-month range (calDays) of the month
+       after the last wave, with the bare 1st-to-last month as its fallback. */
+    ...(calMonth ? { calMonth: true, calDays } : {}),
     waves: dates.length,
     // the house's own release index, so a reader can go and check
     site: (D.pollsterRules?.[firm] || {}).site || null,

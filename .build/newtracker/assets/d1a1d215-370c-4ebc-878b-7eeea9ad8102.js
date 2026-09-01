@@ -232,9 +232,12 @@ function NextPollTicker({ showScore }) {
                 disagree */
              : days + " days";
       } else {
-        /* sub-day resolution only inside 36 hours; past that, the same exact
+        /* No day pinned, so nothing is "moment" away - the wave is due some
+           DAY inside a measured range, and the countdown says so. ("Moment"
+           is the weekday houses' word above: theirs is a date with an hour.)
+           Sub-day resolution only inside 36 hours; past that, the same exact
            day count the weekday houses get */
-        when = t.at <= nowMs ? "any moment now"
+        when = t.at <= nowMs ? "any day now"
              : Math.round((t.at - nowMs) / 3600000) < 36
              ? tnUntil(t.at - nowMs)
              : Math.round((t.at - t0) / TN_DAY) + " days";
@@ -251,9 +254,9 @@ function NextPollTicker({ showScore }) {
          "2 days", full stop. (r.overdue reads "slot moment passed" and
          fires on exactly that case – it is npProject's missed + still-open
          flag, not future doubt.) Non-weekday houses keep the day-spread
-         rule. "any moment now" is left alone - it already says what the
-         hedge would. */
-      const maybe = when !== "any moment now" &&
+         rule. "any moment/day now" is left alone - it already says what
+         the hedge would. */
+      const maybe = when !== "any moment now" && when !== "any day now" &&
         (half > 7 || !!r.loose ||
          (r.releaseDow != null && t.at - r.release > 7 * TN_DAY) ||
          (r.releaseDow == null && half > 0));

@@ -2247,18 +2247,23 @@ function npProject() {
   const horizon = t0 + NP_HORIZON_DAYS * DAY_MS;
   cad.forEach((c) => {
     /* A CALENDAR-MONTH rhythm (DemosAU) has no day to project: one wave per
-       month on no particular day of it, so the slot IS the month - the 1st to
-       the last day of the month after the last recorded wave. Shaped here as
-       a loose window whose centre and spread are the month's own mid and
+       month on no particular day of it, so the slot IS the month - the
+       day-of-month range the house has actually filed on (calDays, measured
+       by gen-data over the published sequence; the bare month where it is
+       absent) of the month after the last recorded wave. Shaped here as a
+       loose window whose centre and spread are the range's own mid and
        half-span, so every window consumer (the panel's span and "open now",
-       the bar's countdown, the missed count from the close) reads the month
+       the bar's countdown, the missed count from the close) reads it
        without a special case of its own. */
     if (c.calMonth) {
       const ld = new Date(Date.parse(c.last));
       const sm = (ld.getUTCMonth() + 1) % 12;
       const sy = ld.getUTCFullYear() + (ld.getUTCMonth() === 11 ? 1 : 0);
-      const open = Date.UTC(sy, sm, 1);
-      const close = Date.UTC(sy, sm + 1, 0);   // the next month's day 0 = this slot's last day
+      const lastDay = Date.UTC(sy, sm + 1, 0); // the next month's day 0 = this slot's last day
+      const open = Date.UTC(sy, sm, c.calDays ? c.calDays[0] : 1);
+      /* a habit reaching past the 28th is not owed a day a shorter month
+         doesn't have: clamp the close to the slot month's own last day */
+      const close = c.calDays ? Math.min(Date.UTC(sy, sm, c.calDays[1]), lastDay) : lastDay;
       const calSpread = (close - open) / 2 / DAY_MS;
       const release = (open + close) / 2;
       const missed = close < t0;
