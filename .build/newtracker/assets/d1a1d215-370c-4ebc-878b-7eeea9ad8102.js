@@ -127,7 +127,7 @@ function pinnedSetScale() {
   return m.a || 1;
 }
 
-function NextPollTicker({ pinned, showScore }) {
+function NextPollTicker({ showScore }) {
   /* A minute is finer than the answer ever is - the tightest projection here
      is to the day - but it keeps "59 mins" from sitting there after it has
      become "in 2 mins". */
@@ -277,23 +277,28 @@ function NextPollTicker({ pinned, showScore }) {
      (unpinned, or pinned while the hero's 2PP block is still on screen) it
      is the gap between the tab set and the bar's right edge the ticker
      docks to; centred (show-score) it is twice the shorter run from the
-     bar's centre to the tab set and to the docked 2PP score. Keying the
-     budget to the seat means a pin flip with the hero on screen changes
-     no formula - but the pin DOES change the bar's geometry (the tab set
-     condenses), so pin flips recompute. The geometry read must be the
-     glide's END state (see pinnedSetScale): reading a mid-transition rect
+     bar's centre to the tab set and to the docked 2PP score.
+     The tab set the edge is read off is NOT always the live-rendered one.
+     Right-seated it is always the UNCONDENSED set: the pin's condense
+     frees its ~60px for only the few hundred px of scroll between the pin
+     and the score docking (pinned-with-hero is a real, dwellable state -
+     the pin and hero observers are two IntersectionObservers and can flip
+     hundreds of scroll px apart) - so budgeting against it grows the count
+     for that band and shrinks it straight back, the momentary
+     too-many-polls flash. Centred, the set IS condensed, and the read must
+     be the glide's END state (see pinnedSetScale): a mid-transition rect
      leaves a budget - and with it an item count - that only the settle
-     pass corrects, which is exactly the momentary too-many/few flash this
-     must not show. It runs pre-paint (an over-filled bar never reaches
-     the screen), again on row resize and on pin or seat flips, once
-     webfonts settle, and once more ~400ms after a flip to mop up any
-     geometry the prediction could not see (fonts settling mid-glide,
-     a viewport resize racing the flip). The state is a prefix count: the
-     most urgent items (overdue first) are always the ones kept. */
+     pass corrects, the same flash on the other side of the seat swap.
+     The pass runs pre-paint (an over-filled bar never reaches the screen),
+     on row resize and on seat flips, once webfonts settle, and once more
+     ~400ms after a flip to mop up any geometry the prediction could not
+     see (fonts settling mid-glide, a viewport resize racing the flip). The
+     state is a prefix count: the most urgent items (overdue first) are
+     always the ones kept. */
   React.useLayoutEffect(() => {
     const el = rootRef.current;
     if (!el || !items.length) return;
-    const SAFE = 48;
+    const SAFE = 56;
     const compute = () => {
       if (!el.isConnected) return;
       const inner = el.parentElement;
@@ -302,13 +307,17 @@ function NextPollTicker({ pinned, showScore }) {
       if (innerR.width < 1) return;
       const setEl = inner.querySelector(".tabs-set");
       let budget;
-      /* the set edge must be the glide's END state, not whatever frame of
-         the scale transition happens to be rendered now (see
-         pinnedSetScale) */
+      /* the set edge in the geometry the budget is keyed to: the
+         UNCONDENSED set for the right seat (the pin condense is brief
+         chrome and must not grow this seat's count), the condensed END
+         state for the centred seat (a mid-glide rect is wrong for ~400ms
+         - see pinnedSetScale). The scale's origin is the fixed left edge,
+         so rect.left + offsetWidth * endScale lands exactly on the edge
+         the glide is heading to. */
       let setRight = innerR.left;
       if (setEl) {
         setRight = setEl.getBoundingClientRect().left
-          + setEl.offsetWidth * (pinned ? pinnedSetScale() : 1);
+          + setEl.offsetWidth * (showScore ? pinnedSetScale() : 1);
       }
       const gap = parseFloat(getComputedStyle(el).columnGap) || 0;
       const kids = el.children;
@@ -336,7 +345,7 @@ function NextPollTicker({ pinned, showScore }) {
     if (ro && el.parentElement) ro.observe(el.parentElement);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(compute);
     return () => { clearTimeout(settle); if (ro) ro.disconnect(); };
-  }, [itemsKey, pinned, showScore]);
+  }, [itemsKey, showScore]);
 
   if (!items.length) return null;
 
@@ -484,10 +493,9 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
           </div>
           {/* the ticker's fit budget is keyed to the SEAT, and the seat is
               show-score's (score docked => centred), not the pin's - a bare
-              pin flip with the hero on screen changes no formula, only the
-              bar's geometry, which the pinned dep re-measures (see the fit
-              pass in NextPollTicker) */}
-          <NextPollTicker pinned={pinned} showScore={pinned && heroGone} />
+              pin flip changes nothing the ticker measures (see the fit pass
+              in NextPollTicker) */}
+          <NextPollTicker showScore={pinned && heroGone} />
           <TabScore onGoHero={goHero} matchup={tppMatchup} />
         </div>
       </nav>
