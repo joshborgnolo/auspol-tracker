@@ -2315,6 +2315,15 @@ body.dark .fb-form { color-scheme: dark; }
      is not the active one, so both directions still work, and the headline
      itself names the live pair. */
   .hero-controls > .text-toggle:not(.tt-caps) { display: none; }
+  /* …and the Compare-implied switch leaves the strip too. On the phone it
+     belongs with the chart it annotates, so its second copy (.pg-phone)
+     shows just under the legend - directly below the "95% interval" entries
+     it explains - instead of riding the chip line. The .hero ancestor is
+     load-bearing: the base .pg-check.pg-phone{display:none} sits later in
+     the file at equal specificity, so this rule must be one class stronger
+     to win */
+  .hero-controls .pg-check { display: none; }
+  .hero .pg-check.pg-phone { display: inline-flex; margin-top: 14px; }
 }
 
 /* ============================================================
@@ -2661,6 +2670,10 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
   cursor: pointer; user-select: none;
 }
 .pg-check:hover { color: var(--ink-3); }
+/* the hero's Compare-implied switch renders a second copy under the chart
+   legend for the phone (see the <=560px block, which shows this one and
+   hides the copy inside the control strip). Everywhere else it is off */
+.pg-check.pg-phone { display: none; }
 .pg-check input {
   appearance: none; -webkit-appearance: none; margin: 0; flex: none;
   width: 13px; height: 13px; border: 1px solid var(--ink-faint); border-radius: 4px;

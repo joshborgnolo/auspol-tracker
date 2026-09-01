@@ -2363,6 +2363,15 @@ body.dark .fb-form { color-scheme: dark; }
      is not the active one, so both directions still work, and the headline
      itself names the live pair. */
   .hero-controls > .text-toggle:not(.tt-caps) { display: none; }
+  /* …and the Compare-implied switch leaves the strip too. On the phone it
+     belongs with the chart it annotates, so its second copy (.pg-phone)
+     shows just under the legend - directly below the "95% interval" entries
+     it explains - instead of riding the chip line. The .hero ancestor is
+     load-bearing: the base .pg-check.pg-phone{display:none} sits later in
+     the file at equal specificity, so this rule must be one class stronger
+     to win */
+  .hero-controls .pg-check { display: none; }
+  .hero .pg-check.pg-phone { display: inline-flex; margin-top: 14px; }
 }
 
 /* ============================================================
@@ -2709,6 +2718,10 @@ body.editorial .tab-label { font-family: var(--serif); font-weight: 500; font-si
   cursor: pointer; user-select: none;
 }
 .pg-check:hover { color: var(--ink-3); }
+/* the hero's Compare-implied switch renders a second copy under the chart
+   legend for the phone (see the <=560px block, which shows this one and
+   hides the copy inside the control strip). Everywhere else it is off */
+.pg-check.pg-phone { display: none; }
 .pg-check input {
   appearance: none; -webkit-appearance: none; margin: 0; flex: none;
   width: 13px; height: 13px; border: 1px solid var(--ink-faint); border-radius: 4px;
@@ -4722,9 +4735,12 @@ window.AP.nextPolls = npProject;
   /* a static image cannot be operated, so controls are stripped from the
      clone: the copy button itself and the 2PP hero's interactive switches
      (matchup/range toggles + "Switch 2PP" chips) - the matchup and window
-     shown are already described by its title, legend and axis labels */
+     shown are already described by its title, legend and axis labels.
+     .pg-phone is the phone-only copy of the Compare toggle that lives
+     outside .hero-controls (under the legend), so it must be stripped
+     separately */
   const STRIP_SEL =
-    "." + BTN_CLASS + ", .hero-controls, .hero-alt";
+    "." + BTN_CLASS + ", .hero-controls, .hero-alt, .pg-phone";
 
   const COPY_ICON =
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>';
@@ -16973,6 +16989,29 @@ function Hero({
     };
     morphRaf.current = requestAnimationFrame(step);
   };
+
+  /* The Compare-implied switch renders in two homes (one state, both copies
+     call the same setter, so they can never disagree): the control column on
+     the desktop, and under the chart legend on the phone, where the strip
+     tightens to its two chip groups. The CSS picks which copy exists at this
+     width - .pg-phone is display:none everywhere except the <=560 block,
+     which also hides the strip's copy. */
+  const compareToggle = phone => /*#__PURE__*/React.createElement("label", {
+    className: "pg-check" + (phone ? " pg-phone" : "") + (showSynth ? " on" : ""),
+    title: "Also draw what the same polls\u2019 primary votes imply when run through one fixed preference-flow table (the 2025 election\u2019s actual flows). A diagnostic, not a correction."
+  }, /*#__PURE__*/React.createElement("input", {
+    type: "checkbox",
+    checked: showSynth,
+    onChange: e => setShowSynth(e.target.checked)
+  }), /*#__PURE__*/React.createElement("span", null, "Compare ", /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    title: "What an implied two-party figure is",
+    onClick: e => {
+      e.preventDefault();
+      window.AP.openTerm && window.AP.openTerm("implied-2pp", "two-party preferred");
+    }
+  }, "implied 2PP")));
   const m = MATCHUPS[matchup];
   const ptsOf = id => filterPts(MATCHUPS[id].data, xDomain[0]);
   const pts = ptsOf(matchup);
@@ -17409,22 +17448,7 @@ function Hero({
     }
   }, o.v.b.toFixed(1))), o.v.ci95 != null && /*#__PURE__*/React.createElement("span", {
     className: "ha-ci"
-  }, "\xB1 ", o.v.ci95.toFixed(1))))), matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && /*#__PURE__*/React.createElement("label", {
-    className: "pg-check" + (showSynth ? " on" : ""),
-    title: "Also draw what the same polls\u2019 primary votes imply when run through one fixed preference-flow table (the 2025 election\u2019s actual flows). A diagnostic, not a correction."
-  }, /*#__PURE__*/React.createElement("input", {
-    type: "checkbox",
-    checked: showSynth,
-    onChange: e => setShowSynth(e.target.checked)
-  }), "Compare", " ", /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "hi-term",
-    title: "What an implied two-party figure is",
-    onClick: e => {
-      e.preventDefault();
-      window.AP.openTerm && window.AP.openTerm("implied-2pp", "two-party preferred");
-    }
-  }, "implied 2PP")))), /*#__PURE__*/React.createElement(TrendChart, {
+  }, "\xB1 ", o.v.ci95.toFixed(1))))), matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(false))), /*#__PURE__*/React.createElement(TrendChart, {
     key: "hero",
     height: narrow ? 700 : 420,
     xDomain: xDomain,
@@ -17503,7 +17527,7 @@ function Hero({
     }
   }), "Implied from primaries at 2025 flows", D.synthLatest && D.synthLatest.alp != null ? ` · ${D.synthLatest.alp.toFixed(1)}` : "")), /*#__PURE__*/React.createElement("p", {
     className: "hero-caption"
-  }, m.real ? "Each dot is one published poll; the line is a smoothed average across all pollsters, " + "shaded with the interval around it. Where the two bands overlap, the lead is " + "inside its own margin of error – the polls cannot separate the parties that month." : `Each dot is one pollster’s published ${m.label} head-to-head` + (adjusted ? ", adjusted for each house’s lean on this matchup as the headline two-party is." : ", averaged monthly – too few houses ask it to weight or correct.") + (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : ""))));
+  }, m.real ? "Each dot is one published poll; the line is a smoothed average across all pollsters, " + "shaded with the interval around it. Where the two bands overlap, the lead is " + "inside its own margin of error – the polls cannot separate the parties that month." : `Each dot is one pollster’s published ${m.label} head-to-head` + (adjusted ? ", adjusted for each house’s lean on this matchup as the headline two-party is." : ", averaged monthly – too few houses ask it to weight or correct.") + (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : ""))), matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(true));
 }
 
 /* ---- report an error ----------------------------------------------------

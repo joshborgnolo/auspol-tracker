@@ -694,6 +694,29 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
     morphRaf.current = requestAnimationFrame(step);
   };
 
+  /* The Compare-implied switch renders in two homes (one state, both copies
+     call the same setter, so they can never disagree): the control column on
+     the desktop, and under the chart legend on the phone, where the strip
+     tightens to its two chip groups. The CSS picks which copy exists at this
+     width - .pg-phone is display:none everywhere except the <=560 block,
+     which also hides the strip's copy. */
+  const compareToggle = (phone) => (
+    <label className={"pg-check" + (phone ? " pg-phone" : "") + (showSynth ? " on" : "")}
+           title="Also draw what the same polls’ primary votes imply when run through one fixed preference-flow table (the 2025 election’s actual flows). A diagnostic, not a correction.">
+      <input type="checkbox" checked={showSynth} onChange={(e) => setShowSynth(e.target.checked)} />
+      {/* the label is a flex row with a 6px gap, so a loose text node and the
+          term button would become two flex ITEMS with 6px between them - a
+          word space that reads double-spaced. One span = one flex item, and
+          the words run inline at a real word space inside it. */}
+      <span>Compare <button type="button" className="hi-term"
+              title="What an implied two-party figure is"
+              onClick={(e) => { e.preventDefault();
+                window.AP.openTerm && window.AP.openTerm("implied-2pp", "two-party preferred"); }}>
+        implied 2PP
+      </button></span>
+    </label>
+  );
+
   const m = MATCHUPS[matchup];
   const ptsOf = (id) => filterPts(MATCHUPS[id].data, xDomain[0]);
   const pts = ptsOf(matchup);
@@ -1050,18 +1073,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           {/* The synthetic overlay is only meaningfully comparable against the
               published ALP v L/NP series, so the control only exists there.
               Off by default: it is a diagnostic, not a third headline. */}
-          {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && (
-            <label className={"pg-check" + (showSynth ? " on" : "")} title="Also draw what the same polls’ primary votes imply when run through one fixed preference-flow table (the 2025 election’s actual flows). A diagnostic, not a correction.">
-              <input type="checkbox" checked={showSynth} onChange={(e) => setShowSynth(e.target.checked)} />
-              Compare{" "}
-              <button type="button" className="hi-term"
-                      title="What an implied two-party figure is"
-                      onClick={(e) => { e.preventDefault();
-                        window.AP.openTerm && window.AP.openTerm("implied-2pp", "two-party preferred"); }}>
-                implied 2PP
-              </button>
-            </label>
-          )}
+          {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(false)}
         </div>
       </div>
 
@@ -1123,6 +1135,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : "")}
         </p>
       </div>
+      {/* phone home of the same switch - under the chart legend, not in the
+          control strip; hidden by default and shown only by the <=560 rules */}
+      {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(true)}
     </section>
   );
 }
