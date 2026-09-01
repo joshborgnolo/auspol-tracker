@@ -1,10 +1,13 @@
 #!/bin/bash
-# Scheduled Essential Report update: extract -> if the CSV changed -> validate
-# -> render-card -> build -> commit -> push. Installed via launchd (plist copied to
-# ~/Library/LaunchAgents/local.auspol.essential.plist from the copy in this
-# directory). Every step logs one line to .build/logs/essential.log; any
-# failure exits non-zero before any commit, leaving the working tree with just
-# the extracted CSV for manual review.
+# Scheduled Essential Report update: extract -> assimilate (new waves when the
+# CSV changed; retro-fill of late-arriving fields — e.g. a wave's releaseUrl
+# once Essential publishes the release page after the charts — when the
+# extractor reports the report index drifted) -> if anything changed ->
+# validate -> render-card -> build -> commit -> push. Installed via launchd
+# (plist copied to ~/Library/LaunchAgents/local.auspol.essential.plist from
+# the copy in this directory). Every step logs one line to
+# .build/logs/essential.log; any failure exits non-zero before any commit,
+# leaving the working tree with just the extracted CSV for manual review.
 set -uo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
@@ -41,8 +44,63 @@ case "$LAST_LINE" in
   *) log "FAIL extract (no ESSENTIAL_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
 
-if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
-  # No new report: give the skip-confirm a go. It verifies — from the
+# Runs the assimilator, teeing output to the log. Sets ASSIM_LAST to the
+# run's ASSIMILATE_STATUS line; non-zero return means failure (already
+# logged). A no-op run writes nothing (no CSV rewrite, no proof-file
+# timestamp churn), so it can run on index drift without dirtying the tree
+# for the cleanliness pre-flight above.
+run_assimilator() {
+  ASSIM_OUT="$(node .build/assimilate-essential-vi.mjs --apply 2>&1)"
+  local code=$?
+  echo "$ASSIM_OUT" >> "$LOG"
+  if [ $code -ne 0 ]; then
+    log "FAIL assimilate (exit $code); no commit made"
+    return $code
+  fi
+  ASSIM_LAST="$(echo "$ASSIM_OUT" | tail -1)"
+  case "$ASSIM_LAST" in
+    ASSIMILATE_STATUS*) log "$ASSIM_LAST"; return 0 ;;
+    *) log "FAIL assimilate (no ASSIMILATE_STATUS line): $ASSIM_LAST"; return 1 ;;
+  esac
+}
+
+# Two data-change triggers: a changed CSV (a new wave has landed), or a
+# drifted report index (Essential published the wave's release page after
+# the charts updated, so retro-fill can now complete the row). Retro-fill is
+# gated on the extractor's actual index-rewrite line rather than run every
+# slot — there is no other between-waves data source, and the gating keeps
+# the wrapper's log honest about why the assimilator ran.
+DATA_CHANGED=false
+MSG="Update Essential Report data $(date '+%Y-%m-%d')"
+if echo "$LAST_LINE" | grep -q '"changed":true'; then
+  log "changed rows detected; assimilating new VI waves into polls.json"
+  run_assimilator || exit 1
+  DATA_CHANGED=true
+elif echo "$EXTRACT_OUT" | grep -q '^updated .*report-index\.json'; then
+  log "report index drifted; running assimilator retro-fill"
+  run_assimilator || exit 1
+  if echo "$ASSIM_LAST" | grep -q '"changed":true'; then
+    DATA_CHANGED=true
+    MSG="Retro-fill late-arriving Essential fields $(date '+%Y-%m-%d')"
+  else
+    # No row needed the drift (e.g. a slug rename, or a record for a wave
+    # outside the curated horizon): nothing to rebuild, but commit the
+    # refreshed index so the tree is clean for the next slot's pre-flight
+    # and other machines get the provenance.
+    git add .build/essential-src/report-index.json
+    IDX_MSG="Refresh Essential report index $(date '+%Y-%m-%d')"
+    if git commit -m "$IDX_MSG" >> "$LOG" 2>&1; then
+      git push origin HEAD:main >> "$LOG" 2>&1 || log "FAIL git push (commit kept locally)"
+      log "OK committed + pushed: $IDX_MSG"
+    else
+      log "index commit produced nothing; carrying on"
+    fi
+  fi
+fi
+
+if [ "$DATA_CHANGED" = false ]; then
+  # No new CSV wave and no retro-fill changes: give the skip-confirm a go.
+  # It verifies — from the
   # extractor's own status emitted a moment ago, not a cached state file —
   # that the publisher's newest report predates a passed projection slot and
   # that it's at least 5am Sydney the day after; exit 3 means a slot got
@@ -73,11 +131,6 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   exit 0
 fi
 
-log "changed rows detected; assimilating new VI waves into polls.json"
-if ! node .build/assimilate-essential-vi.mjs --apply >> "$LOG" 2>&1; then
-  log "FAIL assimilate (errors above); no commit made"
-  exit 1
-fi
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
@@ -99,7 +152,6 @@ fi
 # the add with "pathspec did not match".
 git add data/essential-report.csv data/polls.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json || { log "FAIL git add"; exit 1; }
 [ -d .build/essential-src ] && git add .build/essential-src/ || true
-MSG="Update Essential Report data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1

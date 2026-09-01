@@ -47,7 +47,9 @@
 // mapped. Leadership changes spin up a new dataset id, so every OTHER
 // approval_of_* dataset with a Trend/Overall series logs a WARNING each
 // run — extend LEADER_APPROVAL when one of them is a new leader series.
-// Dry-run by default; --apply writes data/polls.json and a provenance file.
+// Dry-run by default; --apply writes data/polls.json and a provenance file,
+// both only when something changed (a no-op --apply writes nothing, so the
+// updater can run it on index drift without dirtying the working tree).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const APPLY = process.argv.includes("--apply");
@@ -201,6 +203,7 @@ for (let i = 0; i < D.polls.length; i++) {
   if (p.pollster !== "Essential" || p.assimilated !== true) continue;
   const csvWave = iso(Date.parse(p.date) + DAY);
   const fixes = [];
+  const notes = [];
   if (!vi.has(csvWave)) {
     console.log(`WARNING: assimilated row ${p.date} has no matching CSV wave ${csvWave}; retro-fill skipped`);
     continue;
@@ -219,12 +222,17 @@ for (let i = 0; i < D.polls.length; i++) {
   if (p.releaseUrl == null) {
     const rel = releaseFor(csvWave);
     if (rel) { p.releaseUrl = rel; fixes.push(`releaseUrl ${rel}`); }
-    else fixes.push("releaseUrl still unavailable (report page not indexed yet)");
+    else notes.push("releaseUrl still unavailable (report page not indexed yet)");
   }
-  if (p.url == null) fixes.push("url still unset — hand-set the Guardian write-up URL");
+  if (p.url == null) notes.push("url still unset — hand-set the Guardian write-up URL");
   if (fixes.length) {
     D.polls[i] = reorderPollRow(p);
-    retro.push({ date: p.date, fixes });
+    retro.push({ date: p.date, fixes: [...fixes, ...notes] });
+  } else if (notes.length) {
+    // informational only: pending items hurt nothing and must not mark the
+    // run "changed", or every slot between wave and release-page publication
+    // would rewrite polls.json and the proof file
+    console.log(`  · ${p.date}: ${notes.join("; ")}`);
   }
 }
 
@@ -343,7 +351,7 @@ if (APPLY && touched) {
   writeFileSync("data/polls.json", out);
   console.log(`wrote data/polls.json (${(out.length / 1e6).toFixed(2)} MB)`);
 }
-if (APPLY) {
+if (APPLY && touched) {
   mkdirSync(".build/essential-src", { recursive: true });
   writeFileSync(".build/essential-src/assimilate-vi-proof.json", JSON.stringify({
     generatedAt: new Date().toISOString(), horizon, retro, added,
