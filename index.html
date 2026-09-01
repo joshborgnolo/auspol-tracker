@@ -9204,7 +9204,11 @@ function tppLines(cs, r) {
       note: canonical ? "respondent-allocated" : null
     });
     if (canonical) out.push({
-      note: "2025 preference flows",
+      note: /*#__PURE__*/React.createElement(React.Fragment, null, "2025-election", " ", /*#__PURE__*/React.createElement("button", {
+        type: "button",
+        className: "hi-term",
+        onClick: () => window.AP.openTerm && window.AP.openTerm("preference-flows", "poll breakdown")
+      }, "preference flows")),
       c: {
         kind: "flows",
         lab: "2PP · ALP v L/NP",
@@ -11052,7 +11056,7 @@ function NextPollTicker() {
     title: title
   }, /*#__PURE__*/React.createElement("span", {
     className: "tn-lab"
-  }, "next polls:"), items.map((it, i) => /*#__PURE__*/React.createElement("span", {
+  }, "Next polls:"), items.map((it, i) => /*#__PURE__*/React.createElement("span", {
     className: "tn-item",
     key: i
   }, /*#__PURE__*/React.createElement("span", {

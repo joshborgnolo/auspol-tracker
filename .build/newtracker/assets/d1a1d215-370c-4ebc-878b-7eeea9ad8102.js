@@ -224,7 +224,7 @@ function NextPollTicker() {
     + " A slot that passes unrecorded counts up as overdue until the release is added";
   return (
     <div className="tab-next" title={title}>
-      <span className="tn-lab">next polls:</span>
+      <span className="tn-lab">Next polls:</span>
       {items.map((it, i) => (
         <span className="tn-item" key={i}>
           {/* the name carries the house's publication link, the same one the

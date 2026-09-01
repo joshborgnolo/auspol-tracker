@@ -1500,7 +1500,12 @@ function tppLines(cs, r) {
   for (const c of cs) {
     const canonical = c.kind === "2pp" && !c.derived && r.tppFlows != null;
     out.push({ c, note: canonical ? "respondent-allocated" : null });
-    if (canonical) out.push({ note: "2025 preference flows", c: {
+    if (canonical) out.push({ note: (
+      <>2025-election{" "}
+        <button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm &&
+                  window.AP.openTerm("preference-flows", "poll breakdown")}>preference flows</button></>
+    ), c: {
       kind: "flows", lab: "2PP · ALP v L/NP", flag: null,
       segs: [
         { label: "ALP", value: r.tppFlows, color: PARTY_C.alp, delta: dFlows },
