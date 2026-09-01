@@ -4196,15 +4196,6 @@
       "extra": null
     },
     {
-      "date": "2026-01-23",
-      "firm": "Essential",
-      "alb": 43,
-      "opp": 38,
-      "oppName": "Ley",
-      "han": null,
-      "extra": null
-    },
-    {
       "date": "2026-01-27",
       "firm": "YouGov",
       "alb": 47,
@@ -4256,15 +4247,6 @@
       "opp": 19,
       "oppName": "Taylor",
       "han": 25,
-      "extra": null
-    },
-    {
-      "date": "2026-02-23",
-      "firm": "Essential",
-      "alb": 44,
-      "opp": null,
-      "oppName": null,
-      "han": null,
       "extra": null
     },
     {
@@ -4472,15 +4454,6 @@
       "opp": 23,
       "oppName": "Taylor",
       "han": 27,
-      "extra": null
-    },
-    {
-      "date": "2026-05-24",
-      "firm": "Essential",
-      "alb": 41,
-      "opp": 38,
-      "oppName": "Taylor",
-      "han": null,
       "extra": null
     },
     {
@@ -6135,12 +6108,6 @@
     {
       "date": "2026-05-19",
       "firm": "YouGov",
-      "alb": 50,
-      "han": 38
-    },
-    {
-      "date": "2026-05-24",
-      "firm": "Essential",
       "alb": 50,
       "han": 38
     },
