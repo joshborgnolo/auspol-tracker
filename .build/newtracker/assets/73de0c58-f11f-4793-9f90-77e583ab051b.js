@@ -57,18 +57,23 @@ function Header({ isDark, onToggleTheme }) {
      toggling repeatedly, which matters more than usual here: the theme change
      runs inside a view transition, so each flip is a whole-page crossfade.
 
-     Capture belongs to the throw, never to the tap. Taking it at pointerdown
-     sent every plain tap's click to the housing instead of the half under it
-     - a captured pointer's subsequent events, click included, retarget to the
-     capturer - so aimed presses fell silent and the switch read as dead.
-     Capture engages only once the pointer has actually travelled: a tap keeps
-     its click, a flick keeps its stream, and the release-click of a throw
-     still dies on the housing, which is what it has to do or it would undo
-     the toggle its drag just made. */
+     Capture belongs to the throw, never to the tap, and engages only once the
+     pointer has actually travelled - a flick keeps its stream, while a tap is
+     left alone.
+
+     The tap itself is settled at pointerup rather than by the cells' clicks.
+     Those clicks could only ever select their own half, so a tap on the plate
+     already lit did nothing; the switch now flips wherever it is tapped, which
+     is what a switch does. Pointerup and not click because on touch a tap is
+     rarely motionless: a press on the far half travels enough for the drag
+     path to flip it first, and a click flipping again would cancel it. The
+     cells keep an onClick for keyboard activation only, told apart by
+     `detail === 0`. */
   const segRef = useRef(null);
   const segDrag = useRef(false);   // pointer down, not yet known to be a throw
   const segHeld = useRef(false);   // pointer capture actually engaged
   const segDownX = useRef(0);
+  const segFlipped = useRef(false); // the drag already flipped it; the tap must not repeat
   const halfAt = (clientX) => {
     const el = segRef.current;
     if (!el) return null;
@@ -81,6 +86,7 @@ function Header({ isDark, onToggleTheme }) {
   const onSegDown = (e) => {
     segDrag.current = true;
     segDownX.current = e.clientX;
+    segFlipped.current = false;
   };
   const onSegMove = (e) => {
     if (!segDrag.current) return;
@@ -88,14 +94,35 @@ function Header({ isDark, onToggleTheme }) {
       try { e.currentTarget.setPointerCapture(e.pointerId); segHeld.current = true; } catch (_) { /* fine without */ }
     }
     const want = halfAt(e.clientX);
-    if (want != null && want !== isDark) onToggleTheme();
+    if (want != null && want !== isDark) { onToggleTheme(); segFlipped.current = true; }
   };
+  /* A TAP RESOLVES HERE, not in the cells' onClick. It is a light switch: a tap
+     anywhere on it flips, including on the plate already lit — which is the
+     whole point, and what the cells could never do while each one only knew how
+     to select itself.
+     It has to be pointerup rather than click because on touch a tap is rarely
+     motionless: a press on the far half travels enough for onSegMove to flip it
+     before any click arrives, and a click that flipped again would cancel it.
+     segFlipped records that the drag already did the work, so the tap does not
+     repeat it; segHeld means a throw, which resolved on the way. */
   const onSegUp = (e) => {
+    segDrag.current = false;
+    if (segHeld.current) {
+      try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) { /* fine */ }
+    } else if (!segFlipped.current) {
+      onToggleTheme();
+    }
+    segHeld.current = false;
+    segFlipped.current = false;
+  };
+  /* A cancelled gesture is not a tap and must not flip anything. */
+  const onSegCancel = (e) => {
     segDrag.current = false;
     if (segHeld.current) {
       try { e.currentTarget.releasePointerCapture(e.pointerId); } catch (_) { /* fine */ }
     }
     segHeld.current = false;
+    segFlipped.current = false;
   };
 
   const wmName = useRef(null), wmTrack = useRef(null);
@@ -292,9 +319,9 @@ function Header({ isDark, onToggleTheme }) {
         </div>
         <div className="theme-seg segmented" role="group" aria-label="Colour theme"
              ref={segRef} onPointerDown={onSegDown} onPointerMove={onSegMove}
-             onPointerUp={onSegUp} onPointerCancel={onSegUp}>
+             onPointerUp={onSegUp} onPointerCancel={onSegCancel}>
           <button className={"seg-btn theme-cell" + (!isDark ? " active" : "")}
-                  onClick={() => { if (isDark) onToggleTheme(); }}
+                  onClick={(e) => { if (e.detail === 0) onToggleTheme(); }}
                   aria-pressed={!isDark} aria-label="Light mode" title="Light mode">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -303,7 +330,7 @@ function Header({ isDark, onToggleTheme }) {
             </svg>
           </button>
           <button className={"seg-btn theme-cell" + (isDark ? " active" : "")}
-                  onClick={() => { if (!isDark) onToggleTheme(); }}
+                  onClick={(e) => { if (e.detail === 0) onToggleTheme(); }}
                   aria-pressed={isDark} aria-label="Dark mode" title="Dark mode">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
                  strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
