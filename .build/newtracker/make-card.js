@@ -66,7 +66,7 @@
   const PAD = 70;
   c.textBaseline = "alphabetic";
   const caps = (t, x, y, size, ls, col, w) => {
-    c.font = `${w || 700} ${size}px "Source Sans 3", sans-serif`;
+    c.font = `${w || 700} ${size}px "IBM Plex Sans", sans-serif`;
     c.fillStyle = col; c.letterSpacing = ls + "px"; c.fillText(t, x, y);
     const m = c.measureText(t).width; c.letterSpacing = "0px"; return m;
   };
@@ -94,7 +94,7 @@
      trailing unit comes off both measurements before they are compared - the
      header's note on the same subtraction. */
   const ink = (text, weight, ls) => {
-    c.font = `${weight} 30px "Source Sans 3", sans-serif`;
+    c.font = `${weight} 30px "IBM Plex Sans", sans-serif`;
     c.letterSpacing = ls + "px";
     const w = c.measureText(text).width;
     c.letterSpacing = "0px";
@@ -105,9 +105,9 @@
   if (inkName >= inkTrack) lsTrack += (inkName - inkTrack) / ("tracker".length - 1);
   else                     lsName += (inkTrack - inkName) / ("auspol".length - 1);
   const wMark = Math.max(inkName, inkTrack);
-  c.font = '800 30px "Source Sans 3", sans-serif'; c.letterSpacing = lsName + "px";
+  c.font = '800 30px "IBM Plex Sans", sans-serif'; c.letterSpacing = lsName + "px";
   c.fillStyle = T.ink; c.fillText("auspol", PAD, BL1);
-  c.font = '400 30px "Source Sans 3", sans-serif'; c.letterSpacing = lsTrack + "px";
+  c.font = '400 30px "IBM Plex Sans", sans-serif'; c.letterSpacing = lsTrack + "px";
   c.fillStyle = T.ink3; c.fillText("tracker", PAD, BL2);
   c.letterSpacing = "0px";
 
@@ -197,11 +197,11 @@
      "30 August 2026", so the upcasing that fed the caps setting simply goes,
      and the 2.2px tracking with it, being what carried the caps. */
   caps("Updated " + L.published, W - PAD, 74, 13.5, 0, T.ink3, 600);
-  c.font = "600 40px Newsreader, Georgia, serif"; c.fillStyle = T.ink;
+  c.font = "600 40px Source Serif 4, Georgia, serif"; c.fillStyle = T.ink;
   c.fillText((marg >= 0 ? "Labor" : "Coalition") + " leads by " + Math.abs(marg).toFixed(1), W - PAD, 116);
   // one line, not two: the caveats belong beside the sentence they qualify.
   // The page will not call a move real unless it clears its own interval.
-  c.font = '400 15px "Source Sans 3", sans-serif'; c.fillStyle = T.ink3;
+  c.font = '400 15px "IBM Plex Sans", sans-serif'; c.fillStyle = T.ink3;
   c.fillText("95% interval ±" + L.alp2ppCi95.toFixed(1) + " pts · "
              + L.method.nPolls + " polls in " + L.method.windowDays + " days · "
              + (chg > 0 ? "+" : "−") + Math.abs(chg).toFixed(1) + " on a month ago"
@@ -220,12 +220,12 @@
      and no separate label row is needed. They are the only element that
      survives a 360px thumbnail, so they get the middle. */
   const FIG_Y = 330, FIG_PX = 150, GAP = 22, DOT = 4.5;
-  const figFont = "600 " + FIG_PX + 'px Newsreader, Georgia, serif';
+  const figFont = "600 " + FIG_PX + 'px Source Serif 4, Georgia, serif';
   /* Sentence case, so no tracking - 1.8px is what carries small caps and what
      pulls lowercase apart - and 22px rather than 20 to hold the optical size
      caps had, since only the L and the C now reach cap height. */
   const LAB_PX = 22;
-  const measLabel = (t) => { c.font = `700 ${LAB_PX}px "Source Sans 3", sans-serif`;
+  const measLabel = (t) => { c.font = `700 ${LAB_PX}px "IBM Plex Sans", sans-serif`;
     return c.measureText(t).width; };
   const measFig = (v) => { c.font = figFont; return c.measureText(v.toFixed(1)).width; };
 
@@ -330,7 +330,7 @@
      left the card stacking two right-aligned items 18px apart above an empty
      left half; the bottom is one row now, and the margin under it went from
      18px to 26. */
-  c.textAlign = "center"; c.font = '600 17px "Source Sans 3", sans-serif'; c.fillStyle = T.ink2;
+  c.textAlign = "center"; c.font = '600 17px "IBM Plex Sans", sans-serif'; c.fillStyle = T.ink2;
   c.fillText("auspoltracker.com", W / 2, 604); c.textAlign = "left";
 
   /* ---- export at exactly 1200x630, supersampled from the 2x draw --------- */

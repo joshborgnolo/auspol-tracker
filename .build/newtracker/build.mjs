@@ -92,7 +92,7 @@ const inlineJs = (code) => code.replace(/<\/script/gi, "<\\/script");
 /* ---- 4. template ------------------------------------------------------- */
 let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
 
-/* -- fonts: 21 @font-face rules over 9 files -> 3 latin faces --------------
+/* -- fonts: 21 @font-face rules over 9 files -> 4 latin faces --------------
    These used to be base64'd into the stylesheet. woff2 is already compressed,
    so base64 added a third to each file and gzip could not win it back: the
    three faces were ~157KB of the ~490KB the page cost over the wire, they
@@ -101,15 +101,15 @@ let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
    They are files again, named by a hash of their own bytes so a browser can
    keep them forever and still pick up a new cut the moment one ships. */
 const FONTS = [
-  { file: "newsreader-latin.woff2",        family: "Newsreader",  style: "normal", weight: "400 600", preload: true },
-  { file: "newsreader-italic-latin.woff2", family: "Newsreader",  style: "italic", weight: "400 500" },
-  /* Source Sans 3 is a variable face: one file serves the whole 400-800
-     range, which is why the old CSS pointed five per-weight rules at the same
-     uuid. It stands in for Myriad Pro, which the stack names but cannot ship
-     - same designer, same humanist skeleton - so the visitors who have Myriad
-     and the ones who do not are looking at close relatives rather than at two
-     unrelated typefaces. */
-  { file: "sourcesans3-latin.woff2",       family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
+  /* All three text faces are self-hosted latin subsets of variable cuts, so
+     one file per style serves the page's whole weight range. */
+  { file: "sourceserif4-latin.woff2",        family: "Source Serif 4", style: "normal", weight: "200 900", preload: true },
+  { file: "sourceserif4-italic-latin.woff2", family: "Source Serif 4", style: "italic", weight: "200 900" },
+  { file: "ibmplexsans-latin.woff2",         family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
+  /* The mono face sets only the expanded poll view's figures, so it earns no
+     preload slot - it can arrive with the rest of the page (like the italic
+     serif). Same variable-face trick: one file, 200-900. */
+  { file: "sourcecodepro-latin.woff2",       family: "Source Code Pro", style: "normal", weight: "200 900" },
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });

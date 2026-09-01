@@ -99,15 +99,12 @@ try {
      an SVG is the typefaces; a run that silently fell back to system fonts
      would reintroduce exactly the off-brand drift this replaced.
 
-     Ask for them explicitly before checking. The card names the SHIPPED faces
-     directly - make-card.js asks for Newsreader and Source Sans 3, not for
-     --serif and --sans - and the PAGE may never have fetched them: a machine
-     with Minion Pro or Myriad Pro installed satisfies both stacks locally, so
-     the webfont the canvas is about to draw with sits unrequested and
-     document.fonts.ready resolves having proved nothing about it. That is not
-     a loading failure, so it must not read as one; a file that genuinely
-     cannot load still fails the check below. */
-  const FACES = ["Newsreader", "Source Sans 3"];
+     Ask for them explicitly before checking - make-card.js names the SHIPPED
+     faces directly rather than going through --serif/--sans, so the canvas
+     draw gets the webfont even if the page above the fold hasn't yet asked
+     for the weight or style the card needs. A file that genuinely cannot
+     load fails the check below. */
+  const FACES = ["Source Serif 4", "IBM Plex Sans"];
   await page.evaluate(`Promise.all(${JSON.stringify(FACES)}.flatMap(
     (f) => ["400", "600", "700"].map((w) => document.fonts.load(w + ' 60px "' + f + '"'))
   )).then(() => 0)`);
