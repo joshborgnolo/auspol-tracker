@@ -43,9 +43,9 @@ try {
     document.fonts.load('400 16px "Merriweather"'),
     document.fonts.load('700 16px "Merriweather"'),
     document.fonts.load('italic 400 16px "Merriweather"'),
-    document.fonts.load('400 16px "Plus Jakarta Sans"'),
-    document.fonts.load('600 16px "Plus Jakarta Sans"'),
-    document.fonts.load('700 16px "Plus Jakarta Sans"'),
+    document.fonts.load('400 16px "IBM Plex Sans"'),
+    document.fonts.load('600 16px "IBM Plex Sans"'),
+    document.fonts.load('700 16px "IBM Plex Sans"'),
     document.fonts.load('400 30px "Source Sans 3"'),
     document.fonts.load('600 15px "Crimson Pro"'),
   ]).then(() => 0)`);
@@ -55,13 +55,12 @@ try {
     serif400: document.fonts.check('400 60px "Merriweather"'),
     serif700: document.fonts.check('700 60px "Merriweather"'),
     serifItalic: document.fonts.check('italic 400 60px "Merriweather"'),
-    sans400:  document.fonts.check('400 60px "Plus Jakarta Sans"'),
-    sans600:  document.fonts.check('600 60px "Plus Jakarta Sans"'),
-    sans700:  document.fonts.check('700 60px "Plus Jakarta Sans"'),
+    sans400:  document.fonts.check('400 60px "IBM Plex Sans"'),
+    sans600:  document.fonts.check('600 60px "IBM Plex Sans"'),
+    sans700:  document.fonts.check('700 60px "IBM Plex Sans"'),
     ss3:      document.fonts.check('400 30px "Source Sans 3"'),
     crimson:  document.fonts.check('600 15px "Crimson Pro"'),
-    old_serif_gone: !document.fonts.check('400 60px "Source Serif 4"'),
-    old_sans_gone: !document.fonts.check('400 60px "IBM Plex Sans"'),
+    jakarta_gone: !document.fonts.check('400 60px "Plus Jakarta Sans"'),
   })`);
   console.log("font checks:", JSON.stringify(checks));
 
