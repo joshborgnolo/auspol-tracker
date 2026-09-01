@@ -60,11 +60,12 @@ const snap = (ms) => {
   return ms + d * DAY;
 };
 // Mirror npProject's own slot walk, including the roll past already-skipped
-// slots, so the slot tested here is the next UNVERIFIED expectation.
+// slots (one week per skip for a dated house — Essential's only measured
+// late step), so the slot tested here is the next UNVERIFIED expectation.
 let field = Date.parse(c.last) + c.cadence * DAY;
 let release = dayFloor(snap(field + c.lag * DAY));
 while ((c.skipped || []).includes(new Date(release).toISOString().slice(0, 10))) {
-  field += c.cadence * DAY;
+  field += (c.releaseDow != null ? 7 : c.cadence) * DAY;
   release = dayFloor(snap(field + c.lag * DAY));
 }
 const slotISO = new Date(release).toISOString().slice(0, 10);

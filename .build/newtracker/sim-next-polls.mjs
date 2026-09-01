@@ -14,10 +14,11 @@
 //   - houses declared stopped in pollsterRules are absent from the data
 //   - a slot confirmed ABSENT at the publisher (pollsterRules.skippedSlots,
 //     written by .build/essential-confirm-skip.mjs after verifying the
-//     publisher index the morning after) rolls straight to the following
-//     slot: no overdue markers, no "(or N days ago)". polls.json carries a
-//     real seed (Essential 2026-08-26), so S1-S4 below exercise BOTH sides —
-//     the rolled projection on the real row, and the pre-skip behaviour on a
+//     publisher index the morning after) slips ONE WEEK for a dated house —
+//     the only late slip Essential's record shows (28→35 days, never 56):
+//     no overdue markers, no "(or N days ago)". polls.json carries a real
+//     seed (Essential 2026-08-26), so S1-S4 exercise BOTH sides — the
+//     slipped projection on the real row, and the pre-skip behaviour on a
 //     copy with the seed stripped (cadHold).
 //
 // Run after a rebuild:  node .build/newtracker/build.mjs
@@ -64,8 +65,10 @@ function project(cad, t0, nowMs) {
     const due = (rel) => rel + (c.releaseMins == null ? NP_UNTIMED_MINS : c.releaseMins) * 60000;
     let field = Date.parse(c.last) + c.cadence * DAY;
     let release = dayFloor(snap(field + c.lag * DAY));
+    // the skipped-roll steps ONE WEEK for a dated house (the only slip its
+    // record shows: Essential's 28-day cadence slips to 35, never 56)
     while ((c.skipped || []).includes(new Date(release).toISOString().slice(0, 10))) {
-      field += c.cadence * DAY;
+      field += (c.releaseDow != null ? 7 : c.cadence) * DAY;
       release = dayFloor(snap(field + c.lag * DAY));
     }
     const reaches = (rel, sp) => (c.loose ? rel - sp * DAY : rel) <= horizon;
@@ -199,19 +202,20 @@ function eq(name, got, want) {
 // unrecorded. cadHold shows what that used to mean: its ±1-week tolerance
 // closes tomorrow, so the panel counts "tomorrow (or 6 days ago)" and the
 // ticker counts to tomorrow. The REAL cadence row carries the agent's
-// confirmed skip for 26 Aug, so the projection has rolled straight to the
-// next slot, Wed 23 Sep — no overdue face, no "(or …)" alternative.
+// confirmed skip for 26 Aug, so the projection slips the slot ONE WEEK to
+// the house's measured late step — Wed 2 Sep, tomorrow — instead of holding
+// 26 Aug or leaping a second cadence to 23 Sep.
 {
   const { label, t0, nowMs } = scen("Tue 1 Sep", "2026-09-01", 840);
   const rows = project(cad, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const es = firm(rows, "Essential");
-  eq("Essential not overdue, rolled to Wed 23 Sep", [es && es.overdue, es && es.missed], [false, false]);
-  eq("panel counts to the NEXT slot, no 'or' alternative", es && panelWhen(es), "in 22 days");
-  eq("no Essential ticker item (next slot is 3 weeks out)", items.some((i) => i.firm === "Essential"), false);
+  eq("Essential not overdue, slipped to THIS week's Wed 2 Sep", [es && es.overdue, es && es.missed], [false, false]);
+  eq("panel counts to tomorrow, no 'or' alternative", es && panelWhen(es), "tomorrow");
+  eq("Essential leads the ticker as tomorrow", items[0] && [items[0].firm, items[0].when], ["Essential", "tomorrow"]);
   eq("ticker is the next-week list", items.map((i) => [i.firm, i.when]),
-    [["Roy Morgan", "6 days"]]);
+    [["Essential", "tomorrow"], ["Roy Morgan", "6 days"]]);
   // the hold-the-slot rule, still in force for any unconfirmed slot
   const holdRows = project(cadHold, t0, nowMs);
   const holdItems = ticker(holdRows, t0, nowMs);
@@ -221,45 +225,66 @@ function eq(name, got, want) {
   eq("without the skip seed: ticker leads with Essential", [holdItems[0].firm, holdItems[0].when], ["Essential", "tomorrow"]);
 }
 
-// S2 – Wed 2 Sep, 3am: with the skip recorded this is just another day;
-// Essential's next slot is 3 weeks out, RM leads the ticker. (On cadHold the
-// tolerance edge lands today, but the same check in S1 already pins the
-// stripped-seed behaviour.)
+// S2 – Wed 2 Sep, 3am: the slipped slot itself expired an hour ago but the
+// week of tolerance is still open (edge Wed 9 Sep), so Essential shows the
+// overdue-but-counting face — the agent's daily 5am sweep either records
+// this poll or confirms 2 Sep as absent too and slips again to 9 Sep.
 {
   const { label, t0, nowMs } = scen("Wed 2 Sep 3am", "2026-09-02", 180);
   const rows = project(cad, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
-  eq("Essential still not missed", firm(rows, "Essential").missed, false);
-  eq("ticker item 1", items[0] && [items[0].firm, items[0].when], ["Roy Morgan", "5 days"]);
+  eq("Essential overdue, tolerance open to 9 Sep", [firm(rows, "Essential").overdue, firm(rows, "Essential").missed], [true, false]);
+  eq("ticker item 1", items[0] && [items[0].firm, items[0].when], ["Essential", "any moment now"]);
 }
 
-// S3 – Thu 3 Sep: the skipped slot's tolerance edge is gone by. Nothing
-// turns red — the miss was confirmed absent, so red would be a false alarm.
-// (cadHold would read "8 days overdue" from here, matching S1's hold checks.)
+// S3 – Thu 3 Sep: Wed 2 Sep went by unrecorded and UNCONFIRMED (the 5am
+// sweep hasn't run yet), so Essential holds that slot's counting face:
+// overdue, tolerance edge Wed 9 Sep still 6 days out, "in 6 days (or
+// yesterday)". In reality the 05:02 cron confirms 2 Sep absent this morning
+// and the projection slips to 9 Sep long before red — shown in the cadHold-
+// style unconfirmed case here because the sim's data is frozen.
 {
   const { label, t0, nowMs } = scen("Thu 3 Sep", "2026-09-03", 600);
   const rows = project(cad, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const es = firm(rows, "Essential");
-  eq("Essential still not missed", es && es.missed, false);
-  eq("panel counts to Wed 23 Sep", es && panelWhen(es), "in 20 days");
-  eq("ticker leads with Roy Morgan", items[0] && [items[0].firm, items[0].when], ["Roy Morgan", "4 days"]);
-  eq("no Essential item anywhere in the ticker", items.some((i) => i.firm === "Essential"), false);
+  eq("Essential overdue, tolerance open to 9 Sep", [es && es.overdue, es && es.missed], [true, false]);
+  eq("panel counts to the 9 Sep edge, slot was yesterday", es && panelWhen(es), "in 6 days (or yesterday)");
+  eq("no red rows anywhere", rows.every((r) => !r.missed), true);
+  eq("Essential on the ticker aiming at 9 Sep", items.some((i) => i.firm === "Essential" && i.when === "6 days"), true);
 }
 
-// S4 – Wed 9 Sep: the unseeded walk would long since have stacked another
-// week on the overdue count; the rolled projection is unchanged from S3.
+// S4 – Wed 9 Sep: the 2 Sep slot's tolerance edge closes today. Edge-day is
+// not yet missed (missed needs edge strictly before today), so the counting
+// face reads "today (or 7 days ago)"; from tomorrow it would hold red
+// "7 days overdue" unless the agent has confirmed 2 Sep and slipped again.
 {
   const { label, t0, nowMs } = scen("Wed 9 Sep", "2026-09-09", 600);
   const rows = project(cad, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
-  eq("Essential still on the panel", !!firm(rows, "Essential"), true);
-  eq("ticker leads with Roy Morgan's overdue Monday", [items[0].firm, items[0].when, !!items[0].overdue],
-    ["Roy Morgan", "2 days overdue", true]);
-  eq("Essential still absent from the ticker", items.some((i) => i.firm === "Essential"), false);
+  const es = firm(rows, "Essential");
+  eq("Essential on its tolerance edge, not yet missed", [es && es.overdue, es && es.missed], [true, false]);
+  eq("panel reads to the edge day", es && panelWhen(es), "today (or 7 days ago)");
+  eq("ticker keeps Essential live", items.some((i) => i.firm === "Essential"), true);
+}
+
+// S4b – after the 05:02 sweep confirms 2 Sep absent as well, the projection
+// slips to Wed 9 Sep itself. The slot's own 1am moment is already past at
+// 10am, so it's the due-day face: tolerance open to 16 Sep, panel counts to
+// the edge, ticker says "any moment now" — but no red.
+{
+  const { label, t0, nowMs } = scen("Wed 9 Sep, 2 Sep confirmed too", "2026-09-09", 600);
+  const cad2 = JSON.parse(JSON.stringify(cad));
+  cad2.find((c) => c.pollster === "Essential").skipped = ["2026-08-26", "2026-09-02"];
+  const rows = project(cad2, t0, nowMs);
+  const items = ticker(rows, t0, nowMs);
+  const es = firm(rows, "Essential");
+  eq("both slots confirmed: due-day face, tolerance open", [es && es.overdue, es && es.missed], [true, false]);
+  eq("panel counts to the 16 Sep edge", es && panelWhen(es), "in 7 days (or earlier today)");
+  eq("ticker offers Essential", items.some((i) => i.firm === "Essential" && i.when === "any moment now"), true);
 }
 
 // S5 – the poll is recorded (next build: Essential's last moves to 2 Sep).
@@ -304,8 +329,11 @@ function eq(name, got, want) {
   eq("DemosAU missed", da && da.missed, true);
   eq("panel no longer says 'open now'", da && panelWhen(da), "5 days overdue");
   eq("missed rows park at the foot, cadence order", rows.slice(-2).map((r) => r.pollster), ["Essential", "DemosAU"]);
+  // Essential's slipped 2 Sep slot past its own edge too (the frozen sim data
+  // can't run the 3 Sep confirmation that would have slipped it on), so it
+  // tops the most-overdue trio, a week clear of Roy Morgan.
   eq("ticker order: most overdue first", items.map((i) => [i.firm, i.when]),
-    [["Roy Morgan", "33 days overdue"], ["YouGov", "31 days overdue"], ["Resolve", "27 days overdue"]]);
+    [["Essential", "38 days overdue"], ["Roy Morgan", "33 days overdue"], ["YouGov", "31 days overdue"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("loose missed leads as overdue in the ticker", daItems[0] && [daItems[0].firm, daItems[0].when, !!daItems[0].overdue],
     ["DemosAU", "5 days overdue", true]);

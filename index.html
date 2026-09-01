@@ -10169,13 +10169,16 @@ function npProject() {
     let release = relOf(field);
     /* A slot named in `skipped` was confirmed absent at the publisher by the
        house's agent, the morning after it passed - so it is not an open bet
-       and not overdue, it just isn't coming. Roll straight through to the
-       slot after it; the honest row then is the next UNVERIFIED expectation,
-       not a "(or N days ago)" asterisk on a release verified never filed. */
+       and not overdue, it just isn't coming. Roll to the house's next
+       possible release date: one week on for a dated house (the only step a
+       weekly-slipping house can take; Essential's 28-day cadence slips to
+       35, not 56), a full cadence otherwise. The honest row then is the
+       next UNVERIFIED expectation, not a "(or N days ago)" asterisk on a
+       release verified never filed. */
     {
       const isoDay = ms => new Date(ms).toISOString().slice(0, 10);
       while ((c.skipped || []).includes(isoDay(release))) {
-        field += c.cadence * DAY_MS;
+        field += (c.releaseDow != null ? 7 : c.cadence) * DAY_MS;
         release = relOf(field);
       }
     }
