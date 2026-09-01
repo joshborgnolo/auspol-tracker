@@ -1194,14 +1194,18 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    dot after a .hi-term button cannot live on the button's ::after - a pseudo-
    element is inside the button's box, so it would be clickable and would pick
    up the underline the term carries. That one dot is borrowed from the next
-   clause's ::before instead (its only current case, the method term, is never
-   the last clause when the dot is wanted). */
-.hero-interval > *:not(:last-child):not(.hi-term)::after {
+   clause's ::before instead, provided that clause is not itself a hi-term
+   button (a pseudo would sit inside ITS button box and link). When two terms
+   are directly adjacent - the adjusted-strip method + note - the JSX inserts
+   a real .hi-sep span for the dot, and both rules skip it so it stays the
+   only dot at that junction. */
+.hero-interval > *:not(:last-child):not(.hi-term):not(.hi-sep)::after {
   content: "•"; color: var(--ink-3); font-weight: 400; margin-left: 8px;
 }
-.hero-interval > .hi-term + *::before {
+.hero-interval > .hi-term + :not(.hi-term):not(.hi-sep)::before {
   content: "•"; color: var(--ink-3); font-weight: 400; margin-right: 8px;
 }
+.hi-sep { color: var(--ink-3); font-weight: 400; }
 .hero-interval .lead-tag { font-variant-numeric: tabular-nums; }
 /* No narrow-screen variant: the strip wraps naturally if the row overflows,
    and the same clause order, dots and sizes are wanted at every width. */
@@ -17437,7 +17441,10 @@ function Hero({
     onClick: () => window.AP.openTerm && window.AP.openTerm(adjusted ? "weighted-aggregate" : "monthly-average", "two-party preferred")
   }, adjusted ? "Weighted aggregate" : "Monthly average"), !adjusted && /*#__PURE__*/React.createElement("span", {
     className: "eyebrow-warn"
-  }, "Limited data"), unc &&
+  }, "Limited data"), adjusted && unc && /*#__PURE__*/React.createElement("span", {
+    className: "hi-sep",
+    "aria-hidden": "true"
+  }, "\u2022"), unc &&
   /*#__PURE__*/
   /* One more route to the margin's definition: the glossary
      files "95% interval" as a synonym waypoint of margin of

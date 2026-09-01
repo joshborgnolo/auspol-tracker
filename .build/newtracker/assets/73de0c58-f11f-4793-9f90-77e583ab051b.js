@@ -1012,6 +1012,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               {adjusted ? "Weighted aggregate" : "Monthly average"}
             </button>
             {!adjusted && <span className="eyebrow-warn">Limited data</span>}
+            {/* When the method and the note are adjacent (the adjusted case),
+                both are clickable hi-term buttons, so neither can host the
+                separator dot - a ::before on the note sits inside its button
+                box and reads as part of the link. This span gives that
+                adjacency a neutral host for the dot. Other cases already have
+                a non-term neighbour the CSS can borrow. */}
+            {adjusted && unc && <span className="hi-sep" aria-hidden="true">•</span>}
             {unc && (
               /* One more route to the margin's definition: the glossary
                  files "95% interval" as a synonym waypoint of margin of
