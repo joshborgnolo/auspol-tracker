@@ -21,10 +21,10 @@
 
   /* a static image cannot be operated, so controls are stripped from the
      clone: the copy button itself and the 2PP hero's interactive switches
-     (matchup/range toggles, laptop copies in .hero-chartbar above the chart
-     as well as the .hero-controls strip, + "Switch 2PP" chips) - the matchup
-     and window shown are already described by its title, legend and axis
-     labels. .pg-phone is the phone-only copy of the Compare toggle that
+     (matchup/range toggles, laptop copies in .hero-chartbar, now nested at
+     the foot of the stripped .hero-controls column, + "Switch 2PP" chips) -
+     the matchup and window shown are already described by its title, legend
+     and axis labels. .pg-phone is the phone-only copy of the Compare toggle that
      lives outside .hero-controls (under the legend), so it must be stripped
      separately */
   const STRIP_SEL =

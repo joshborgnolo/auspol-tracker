@@ -1132,18 +1132,20 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 /* Movement smaller than its own interval – stated, not colour-coded, so it
    reads as a qualification rather than a warning. */
 .hero-caveat { color: var(--ink-3); }
-.hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; }
+.hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; align-self: stretch; }
 /* quiet inline checkbox alongside the matchup/range switches – stripped from
    chart copies with the rest of .hero-controls. The column gap already
    spaces it, so the shared checkbox's top margin is dropped here. */
 .hero-controls .pg-check { margin: 0; }
-/* The matchup and range switches' laptop home is a row directly above the
-   2PP chart – the two stacked on the right, the matchup riding directly
-   above the range window it filters – so the copies sitting in this column
-   are for the phone only. Both homes are in the DOM at every width (one
-   state, two copies); display, not JSX, chooses. */
+/* The matchup and range switches' laptop home is the foot of this column:
+   the column stretches to the hero-top row (align-self above) and
+   margin-top:auto sinks the stacked pair level with the interval strip and
+   the delta line across the way, the matchup riding directly above the
+   range window it filters. The plain copies heading the column are the
+   toggles' phone home. Both homes are in the DOM at every width (one state,
+   two copies); display, not JSX, chooses. */
 .hero-controls > .text-toggle { display: none; }
-.hero-chartbar { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin: 16px 0 10px; }
+.hero-chartbar { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: auto; }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
 /* wraps as the fallback: on a phone the ≤640px set below (10px column gap,
@@ -2232,6 +2234,8 @@ body.dark .fb-form { color-scheme: dark; }
      strip, and either way real touch padding is the point - this is exactly
      the control a one-handed thumb comes to. */
   .hero-controls { align-items: flex-start; }
+  /* …but the chartbar stacked pair stays over on the right */
+  .hero-controls .hero-chartbar { align-self: flex-end; }
   .hero-controls .tt-opt, .hero-chartbar .tt-opt { padding: 11px 4px; }
   .hero-controls .tt-div, .hero-chartbar .tt-div { height: 16px; }
 }

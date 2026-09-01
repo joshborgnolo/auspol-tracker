@@ -1069,8 +1069,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
         </div>
         <div className="hero-controls">
           {/* Phone copies of the matchup and range switches: their laptop
-              home is the chartbar row above the chart, and every width shows
-              exactly one home - one state, two copies, the pattern the
+              home is the chartbar at this column's foot, and every width
+              shows exactly one home - one state, two copies, the pattern the
               compare switch below already uses. */}
           <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
             options={matchupOptions} />
@@ -1082,8 +1082,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               and "the 2PP" is doing less work than a single headline implies.
               These were previously a bare tab you had to press to find out
               what was behind it; the number is the reason to press it. Heads
-              the control column on a laptop - the toggles moved out to the
-              chartbar above the chart - and sits above the implied-2PP
+              the control column on a laptop - the toggles sit at its foot,
+              in the chartbar - and sits above the implied-2PP
               switch. */}
           {otherContests.length > 0 && (
             <div className="hero-alt">
@@ -1106,18 +1106,17 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               published ALP v L/NP series, so the control only exists there.
               Off by default: it is a diagnostic, not a third headline. */}
           {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(false)}
+          {/* The laptop home of the matchup and range switches: the foot of
+              this column, sunk level with the interval strip and the delta
+              line across the way. Hidden on a phone, where the strip copies
+              above still do the work, so a width never shows both homes. */}
+          <div className="hero-chartbar">
+            <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
+              options={matchupOptions} />
+            <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
+              options={rangeOptions} />
+          </div>
         </div>
-      </div>
-
-      {/* The laptop home of the matchup and range switches: one row directly
-          above the chart - the matchup on the left, the range window on the
-          right. Hidden on a phone, where the strip copies above still do the
-          work, so a width never shows both homes. */}
-      <div className="hero-chartbar">
-        <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
-          options={matchupOptions} />
-        <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
-          options={rangeOptions} />
       </div>
 
       {/* The key carries NEITHER the matchup nor the range: remounting would
