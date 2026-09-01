@@ -682,6 +682,45 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
      morph, where there is nothing honest for it to reshape into. */
   const [showSynth, setShowSynth] = useState(false);
   React.useEffect(() => () => cancelAnimationFrame(morphRaf.current), []);
+  /* The month clause's caveat shows "the margin" until the row can no
+     longer keep the poll-window clause on its line - then, and only then,
+     it shortens to "margin". Measured, not breakpointed: the wrap point
+     depends on the delta figure's width, the caveat's presence and the
+     loaded font, none of which a media query can know. Restores the full
+     wording once the row is wider than the last width that overflowed. */
+  const subRef = React.useRef(null);
+  const subNoteRef = React.useRef(null);
+  const subCountRef = React.useRef(null);
+  const subOverW = React.useRef(0);
+  const [subTight, setSubTight] = useState(false);
+  const subRecheck = () => {
+    const row = subRef.current, note = subNoteRef.current, count = subCountRef.current;
+    if (!row || !note) return;
+    if (count && count.offsetTop !== note.offsetTop) {
+      subOverW.current = row.clientWidth;
+      setSubTight(true);
+    } else if (row.clientWidth > subOverW.current) {
+      setSubTight(false);
+    }
+  };
+  React.useEffect(subRecheck);
+  React.useEffect(() => {
+    const row = subRef.current;
+    if (!row) return;
+    const ro = new ResizeObserver(subRecheck);
+    ro.observe(row);
+    let live = true;
+    const fontsDone = () => { if (live) subRecheck(); };
+    if (document.fonts) {
+      document.fonts.ready.then(fontsDone);
+      document.fonts.addEventListener("loadingdone", fontsDone);
+    }
+    return () => {
+      live = false;
+      ro.disconnect();
+      if (document.fonts) document.fonts.removeEventListener("loadingdone", fontsDone);
+    };
+  }, []);
   const chooseMatchup = (id) => {
     const from = matchup;
     setMatchup(id);
@@ -1037,16 +1076,16 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             </button>
             {!adjusted && <span className="eyebrow-warn">Limited data</span>}
           </div>
-          <div className="hero-sub">
+          <div className="hero-sub" ref={subRef}>
             <Delta value={monthDelta} suffix={Math.abs(monthDelta) === 1 ? " pt" : " pts"} small roll spinIn />
-            <span className="hero-sub-note">
+            <span className="hero-sub-note" ref={subNoteRef}>
               {(m.real || (altL && altL.aPrev != null)) ? "on a month ago" : "vs. previous reading"}
               {/* A month-on-month move smaller than its own interval is not a
                   finding. Say so next to the arrow, not three scrolls down -
                   and let the margin the caveat invokes carry the reader to its
                   definition, as the terms in the interval above do. */}
               {unc && unc.changeSig === false && (
-                <span className="hero-caveat"> (within the{" "}
+                <span className="hero-caveat"> (within {subTight ? "" : "the "}
                   <button type="button" className="hi-term"
                           title="What a margin of error means"
                           onClick={() => window.AP.openTerm &&
@@ -1060,7 +1099,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                 and span draw on unc, which exists only when an interval does,
                 so the clause rides on the same condition. */}
             {unc && (
-              <span className="hero-sub-count">
+              <span className="hero-sub-count" ref={subCountRef}>
                 {"• "}{unc.n} poll{unc.n === 1 ? "" : "s"} in{" "}
                 {D.latest.method.windowDays} days
               </span>

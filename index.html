@@ -17058,6 +17058,49 @@ function Hero({
      morph, where there is nothing honest for it to reshape into. */
   const [showSynth, setShowSynth] = useState(false);
   React.useEffect(() => () => cancelAnimationFrame(morphRaf.current), []);
+  /* The month clause's caveat shows "the margin" until the row can no
+     longer keep the poll-window clause on its line - then, and only then,
+     it shortens to "margin". Measured, not breakpointed: the wrap point
+     depends on the delta figure's width, the caveat's presence and the
+     loaded font, none of which a media query can know. Restores the full
+     wording once the row is wider than the last width that overflowed. */
+  const subRef = React.useRef(null);
+  const subNoteRef = React.useRef(null);
+  const subCountRef = React.useRef(null);
+  const subOverW = React.useRef(0);
+  const [subTight, setSubTight] = useState(false);
+  const subRecheck = () => {
+    const row = subRef.current,
+      note = subNoteRef.current,
+      count = subCountRef.current;
+    if (!row || !note) return;
+    if (count && count.offsetTop !== note.offsetTop) {
+      subOverW.current = row.clientWidth;
+      setSubTight(true);
+    } else if (row.clientWidth > subOverW.current) {
+      setSubTight(false);
+    }
+  };
+  React.useEffect(subRecheck);
+  React.useEffect(() => {
+    const row = subRef.current;
+    if (!row) return;
+    const ro = new ResizeObserver(subRecheck);
+    ro.observe(row);
+    let live = true;
+    const fontsDone = () => {
+      if (live) subRecheck();
+    };
+    if (document.fonts) {
+      document.fonts.ready.then(fontsDone);
+      document.fonts.addEventListener("loadingdone", fontsDone);
+    }
+    return () => {
+      live = false;
+      ro.disconnect();
+      if (document.fonts) document.fonts.removeEventListener("loadingdone", fontsDone);
+    };
+  }, []);
   const chooseMatchup = id => {
     const from = matchup;
     setMatchup(id);
@@ -17489,7 +17532,8 @@ function Hero({
   }, adjusted ? "Weighted aggregate" : "Monthly average"), !adjusted && /*#__PURE__*/React.createElement("span", {
     className: "eyebrow-warn"
   }, "Limited data")), /*#__PURE__*/React.createElement("div", {
-    className: "hero-sub"
+    className: "hero-sub",
+    ref: subRef
   }, /*#__PURE__*/React.createElement(Delta, {
     value: monthDelta,
     suffix: Math.abs(monthDelta) === 1 ? " pt" : " pts",
@@ -17497,16 +17541,18 @@ function Hero({
     roll: true,
     spinIn: true
   }), /*#__PURE__*/React.createElement("span", {
-    className: "hero-sub-note"
+    className: "hero-sub-note",
+    ref: subNoteRef
   }, m.real || altL && altL.aPrev != null ? "on a month ago" : "vs. previous reading", unc && unc.changeSig === false && /*#__PURE__*/React.createElement("span", {
     className: "hero-caveat"
-  }, " (within the", " ", /*#__PURE__*/React.createElement("button", {
+  }, " (within ", subTight ? "" : "the ", /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "hi-term",
     title: "What a margin of error means",
     onClick: () => window.AP.openTerm && window.AP.openTerm("margin-of-error", "two-party preferred")
   }, "margin"), ")")), unc && /*#__PURE__*/React.createElement("span", {
-    className: "hero-sub-count"
+    className: "hero-sub-count",
+    ref: subCountRef
   }, "• ", unc.n, " poll", unc.n === 1 ? "" : "s", " in", " ", D.latest.method.windowDays, " days"))), /*#__PURE__*/React.createElement("div", {
     className: "hero-controls"
   }, /*#__PURE__*/React.createElement(TextToggle, {
