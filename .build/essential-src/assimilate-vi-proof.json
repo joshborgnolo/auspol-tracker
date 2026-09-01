@@ -1,55 +1,17 @@
 {
-  "generatedAt": "2026-09-01T23:00:38.130Z",
+  "generatedAt": "2026-09-01T23:41:06.255Z",
   "horizon": "2025-09-29",
   "retro": [
     {
       "date": "2026-08-31",
       "fixes": [
-        "published 2026-09-02T01:00",
-        "dateStart 2026-08-26",
-        "tpp 45/50 (csv 2026-09-01)",
-        "releaseUrl still unavailable (report page not indexed yet)",
-        "url still unset — hand-set the Guardian write-up URL"
+        "releaseUrl https://essentialreport.com.au/reports/01-september-2026"
       ]
     }
   ],
   "added": [],
-  "addedAppr": [
-    {
-      "csvWave": "2026-09-01",
-      "row": {
-        "date": "2026-08-31",
-        "firm": "Essential",
-        "alb": -21,
-        "opp": -9,
-        "oppName": "Taylor",
-        "han": null,
-        "detail": {
-          "alb": {
-            "app": 35,
-            "dis": 56
-          },
-          "opp": {
-            "app": 32,
-            "dis": 41
-          }
-        }
-      }
-    }
-  ],
-  "addedDir": [
-    {
-      "csvWave": "2026-09-01",
-      "row": {
-        "date": "2026-08-31",
-        "dateStart": "2026-08-26",
-        "pollster": "Essential",
-        "right": 23,
-        "wrong": 59,
-        "unsure": 19
-      }
-    }
-  ],
+  "addedAppr": [],
+  "addedDir": [],
   "skippedDateDup": [
     "2025-10-29",
     "2025-11-26",
@@ -111,7 +73,8 @@
     "2026-04-29",
     "2026-05-27",
     "2026-06-30",
-    "2026-07-28"
+    "2026-07-28",
+    "2026-09-01"
   ],
   "skippedApprFigureDup": [
     {
@@ -128,7 +91,8 @@
     "2026-04-29",
     "2026-05-27",
     "2026-06-30",
-    "2026-07-28"
+    "2026-07-28",
+    "2026-09-01"
   ],
   "skippedDirFigureDup": [
     {
