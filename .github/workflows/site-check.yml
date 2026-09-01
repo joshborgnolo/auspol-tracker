@@ -1,0 +1,70 @@
+# Deployed-site watchdog — runs .build/check-site.mjs against
+# auspoltracker.com (spec: .build/site-check-spec.md) and classifies:
+#
+#   class 0  deployed bytes == committed bytes, assets resolve → green
+#   class 1  inconclusive (host unreachable, Pages still building, bad
+#             response) → GREEN; inconclusive is not an alarm
+#   class 2  defect (content mismatch after the grace window, or a
+#             referenced asset missing) → the job fails (email)
+#
+# Two triggers for two failures:
+#   * workflow_run of "pages build and deployment" — checks the commit the
+#     deploy actually built (head_sha, NOT main, which may have moved on),
+#     with a 5-minute grace window because Pages is asynchronous
+#   * a daily backstop against main's head — TLS/DNS breakage, Pages
+#     reverting, a stale object long after a green deploy
+
+name: site-check
+
+on:
+  workflow_run:
+    workflows: ["pages build and deployment"]
+    types: [completed]
+  schedule:
+    - cron: '0 23 * * *' # 09:00 AEST daily
+  workflow_dispatch:
+
+# a new push supersedes an in-flight check of the previous deploy
+concurrency:
+  group: site-check
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      # the comparison is only meaningful against the commit Pages built
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      # a failed Pages run leaves the PREVIOUS deploy serving; there is
+      # nothing valid to compare, and inconclusive is not an alarm
+      - name: Note a failed Pages run and stop
+        if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion != 'success'
+        run: |
+          {
+            echo "### site-check — inconclusive"
+            echo "Pages deployment of ${{ github.event.workflow_run.head_sha }} concluded '${{ github.event.workflow_run.conclusion }}'; nothing to compare."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run the site check
+        if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+        id: check
+        run: |
+          set +e
+          OUT="$(node .build/check-site.mjs 2>&1)"
+          CODE=$?
+          echo "$OUT"
+          echo "verdict=$CODE" >> "$GITHUB_OUTPUT"
+          if [ "$CODE" -ne 0 ]; then
+            {
+              echo "### site-check — class $CODE"
+              echo '```'
+              echo "$OUT"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+          # only class 2 (defect) goes red; class 1 is inconclusive-is-not-an-alarm
+          [ "$CODE" -ne 2 ]
