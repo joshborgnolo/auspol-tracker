@@ -99,6 +99,34 @@ const tnUntil = (ms) => {
   return w + (w === 1 ? " week" : " weeks");
 };
 
+/* The pin's condense is a COMPOSITED transform on .tabs-set, so a live
+   getBoundingClientRect during the glide returns a mid-animation edge and a
+   budget read off it is wrong for ~400ms (the too-many/few count flashes,
+   then the settle pass rescues it). The END-STATE set edge is recoverable
+   without disturbing the glide: the scale's origin is the left edge, so
+   rect.left + offsetWidth * endScale lands exactly on the edge the glide is
+   heading to; offsetWidth ignores transforms, and rect.left is the
+   origin-fixed left edge. The end scale itself comes from
+   a parked offscreen pinned bar, so the scale values in template.html stay
+   the single source of truth. */
+let pinScaleProbe = null;
+function pinnedSetScale() {
+  if (!pinScaleProbe) {
+    const nav = document.createElement("div");
+    nav.className = "tabs pinned";
+    nav.setAttribute("aria-hidden", "true");
+    nav.style.cssText = "position:absolute;left:-9999px;top:-9999px;"
+      + "visibility:hidden;pointer-events:none";
+    nav.innerHTML = '<div class="tabs-inner"><div class="tabs-set"></div></div>';
+    document.body.appendChild(nav);
+    pinScaleProbe = nav.firstChild.firstChild;
+  }
+  const t = getComputedStyle(pinScaleProbe).transform;
+  if (!t || t === "none") return 1;
+  const m = new DOMMatrixReadOnly(t);
+  return m.a || 1;
+}
+
 function NextPollTicker({ pinned, showScore }) {
   /* A minute is finer than the answer ever is - the tightest projection here
      is to the day - but it keeps "59 mins" from sitting there after it has
@@ -245,19 +273,22 @@ function NextPollTicker({ pinned, showScore }) {
      invariant). Every candidate renders; items past the measured budget
      get .tn-park (out of flow + hidden, but still laid out and measurable,
      so a later pass with more room can show them again). The budget is
-     read off live geometry and follows the SEAT, not the pin: right-seated
+     read off geometry and follows the SEAT, not the pin: right-seated
      (unpinned, or pinned while the hero's 2PP block is still on screen) it
      is the gap between the tab set and the bar's right edge the ticker
      docks to; centred (show-score) it is twice the shorter run from the
      bar's centre to the tab set and to the docked 2PP score. Keying the
      budget to the seat means a pin flip with the hero on screen changes
-     no formula - it's the pin's geometry shift (the bar lifts off and
-     condenses) that a pinned-dep recompute covers; without it the count
-     measured against the lifted bar stuck around after the bar returned
-     to its natural seat at the top. It runs pre-paint (an over-filled
-     bar never reaches the screen), again on row resize and on pin or
-     seat flips, once webfonts settle, and once more ~400ms after a flip
-     to use the glide's END geometry. The state is a prefix count: the
+     no formula - but the pin DOES change the bar's geometry (the tab set
+     condenses), so pin flips recompute. The geometry read must be the
+     glide's END state (see pinnedSetScale): reading a mid-transition rect
+     leaves a budget - and with it an item count - that only the settle
+     pass corrects, which is exactly the momentary too-many/few flash this
+     must not show. It runs pre-paint (an over-filled bar never reaches
+     the screen), again on row resize and on pin or seat flips, once
+     webfonts settle, and once more ~400ms after a flip to mop up any
+     geometry the prediction could not see (fonts settling mid-glide,
+     a viewport resize racing the flip). The state is a prefix count: the
      most urgent items (overdue first) are always the ones kept. */
   React.useLayoutEffect(() => {
     const el = rootRef.current;
@@ -270,19 +301,26 @@ function NextPollTicker({ pinned, showScore }) {
       const innerR = inner.getBoundingClientRect();
       if (innerR.width < 1) return;
       const setEl = inner.querySelector(".tabs-set");
-      const setR = setEl ? setEl.getBoundingClientRect() : null;
+      let budget;
+      /* the set edge must be the glide's END state, not whatever frame of
+         the scale transition happens to be rendered now (see
+         pinnedSetScale) */
+      let setRight = innerR.left;
+      if (setEl) {
+        setRight = setEl.getBoundingClientRect().left
+          + setEl.offsetWidth * (pinned ? pinnedSetScale() : 1);
+      }
       const gap = parseFloat(getComputedStyle(el).columnGap) || 0;
       const kids = el.children;
-      let budget;
       if (showScore) {
         const scoreEl = inner.querySelector(".tab-score");
         const scoreR = scoreEl ? scoreEl.getBoundingClientRect() : null;
         const centre = (innerR.left + innerR.right) / 2;
-        const leftRoom = centre - (setR ? setR.right : innerR.left);
+        const leftRoom = centre - setRight;
         const rightRoom = (scoreR && scoreR.width ? scoreR.left : innerR.right) - centre;
         budget = 2 * Math.max(0, Math.min(leftRoom, rightRoom) - SAFE);
       } else {
-        budget = innerR.right - (setR ? setR.right : innerR.left) - SAFE;
+        budget = innerR.right - setRight - SAFE;
       }
       let used = kids[0].offsetWidth, k = 0;
       for (let i = 1; i < kids.length; i++) {
