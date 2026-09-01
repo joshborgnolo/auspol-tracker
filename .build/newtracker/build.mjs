@@ -101,15 +101,21 @@ let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
    They are files again, named by a hash of their own bytes so a browser can
    keep them forever and still pick up a new cut the moment one ships. */
 const FONTS = [
-  /* All three text faces are self-hosted latin subsets of variable cuts, so
-     one file per style serves the page's whole weight range. */
+  /* The text faces are self-hosted latin subsets; the variable cuts serve
+     the page's whole weight range from one file per style. */
   { file: "sourceserif4-latin.woff2",        family: "Source Serif 4", style: "normal", weight: "200 900", preload: true },
   { file: "sourceserif4-italic-latin.woff2", family: "Source Serif 4", style: "italic", weight: "200 900" },
   { file: "ibmplexsans-latin.woff2",         family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
-  /* The mono face sets only the expanded poll view's figures, so it earns no
-     preload slot - it can arrive with the rest of the page (like the italic
-     serif). Same variable-face trick: one file, 200-900. */
-  { file: "sourcecodepro-latin.woff2",       family: "Source Code Pro", style: "normal", weight: "200 900" },
+  /* Source Sans 3 stays shipped for one scoped caller: the .wordmark
+     lockup, which keeps its pre-swap face (the only @font-face request the
+     masthead makes - ibmplexsans would only cover the body). */
+  { file: "sourcesans3-latin.woff2",         family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
+  /* The mono faces set only the expanded poll view's figures, so they earn
+     no preload slot - they can arrive with the page (like the italic
+     serif). Google publishes no variable IBM Plex Mono, so the two weights
+     the ledger paints ship as two static cuts: 400 body figures, 600 bold. */
+  { file: "ibmplexmono-400-latin.woff2",     family: "IBM Plex Mono", style: "normal", weight: "400" },
+  { file: "ibmplexmono-600-latin.woff2",     family: "IBM Plex Mono", style: "normal", weight: "600" },
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });

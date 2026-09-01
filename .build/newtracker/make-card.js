@@ -94,7 +94,7 @@
      trailing unit comes off both measurements before they are compared - the
      header's note on the same subtraction. */
   const ink = (text, weight, ls) => {
-    c.font = `${weight} 30px "IBM Plex Sans", sans-serif`;
+    c.font = `${weight} 30px "Source Sans 3", sans-serif`;
     c.letterSpacing = ls + "px";
     const w = c.measureText(text).width;
     c.letterSpacing = "0px";
@@ -105,9 +105,9 @@
   if (inkName >= inkTrack) lsTrack += (inkName - inkTrack) / ("tracker".length - 1);
   else                     lsName += (inkTrack - inkName) / ("auspol".length - 1);
   const wMark = Math.max(inkName, inkTrack);
-  c.font = '800 30px "IBM Plex Sans", sans-serif'; c.letterSpacing = lsName + "px";
+  c.font = '800 30px "Source Sans 3", sans-serif'; c.letterSpacing = lsName + "px";
   c.fillStyle = T.ink; c.fillText("auspol", PAD, BL1);
-  c.font = '400 30px "IBM Plex Sans", sans-serif'; c.letterSpacing = lsTrack + "px";
+  c.font = '400 30px "Source Sans 3", sans-serif'; c.letterSpacing = lsTrack + "px";
   c.fillStyle = T.ink3; c.fillText("tracker", PAD, BL2);
   c.letterSpacing = "0px";
 

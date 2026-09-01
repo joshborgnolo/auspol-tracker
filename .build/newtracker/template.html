@@ -92,8 +92,9 @@
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   /* the data face of the expanded poll view's figures: a mono cut so the
-     reading is "numbers", not prose. Self-hosted latin subset, 200-900. */
-  --mono: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+     reading is "numbers", not prose. IBM Plex Mono ships no variable cut on
+     Google Fonts, so FONTS carries two static weights (400, 600) instead. */
+  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --radius: 14px;
   --shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
@@ -275,6 +276,12 @@ body {
   border-bottom: 1px solid var(--line);
 }
 .wordmark {
+  /* the one place the pre-swap stack survives: body text moved to IBM Plex
+     Sans, but the lockup keeps its Myriad / Source Sans 3 pairing (Source
+     Sans 3 stays shipped for this one caller, standing in where Myriad
+     isn't installed). The .wm-name/.wm-track spans set no family, so this
+     inherits into both words and the stacked variant. */
+  font-family: "Myriad Pro", "Myriad Web Pro", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
   display: inline-flex; align-items: center; gap: 3px;
   font-weight: 800; font-size: 30px; letter-spacing: -0.025em; line-height: 1;
   margin: 0;
@@ -667,10 +674,8 @@ body.dark .dl-bloom { opacity: 1; }
   /* negative bottom margin drops the serif's last line ~1.5px so the tagline
      text baseline-to-bottom edge optically matches the head-meta values */
   margin: 7px 0 -1.5px;
-  /* the serif ships a real italic, so the visitor gets a drawn italic
-     rather than a synthesised slant of an upright face */
   font-family: var(--serif);
-  font-style: italic; font-weight: 300;
+  font-weight: 400;
   font-size: 15px; color: var(--ink-3); text-wrap: balance;
 }
 /* compact freshness line – only surfaced on small screens, where the full
