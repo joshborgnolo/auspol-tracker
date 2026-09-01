@@ -637,12 +637,19 @@ try {
   const D = JSON.parse(orig);
   const existing = D.polls.filter((p) => p.pollster === "DemosAU" || p.pollster === "DemosAU (MRP)");
 
-  const indexHtml = (await fetchBuffer(INDEX_URL)).toString("utf8");
   const linkRe = /<a[^>]+href="(https:\/\/demosau\.com\/wp-content\/uploads\/[^"]+\.pdf)"[\s\S]{0,400}?icon-list-text">([^<]+)</g;
   const links = [];
-  let lm;
-  while ((lm = linkRe.exec(indexHtml))) links.push({ url: lm[1], title: lm[2].replace(/&amp;/g, "&").trim() });
-  if (!links.length) throw new Error("no PDF links found on index page (site restructure?)");
+  // the index page intermittently serves a linkless body (observed 2026-09-01);
+  // retry with fetchBuffer's backoff before declaring a restructure
+  for (let t = 1; ; t++) {
+    const indexHtml = (await fetchBuffer(INDEX_URL)).toString("utf8");
+    links.length = 0;
+    let lm;
+    while ((lm = linkRe.exec(indexHtml))) links.push({ url: lm[1], title: lm[2].replace(/&amp;/g, "&").trim() });
+    if (links.length) break;
+    if (t >= FETCH_TRIES) throw new Error("no PDF links found on index page (site restructure?)");
+    await new Promise((r) => setTimeout(r, 1500 * t));
+  }
 
   const STATE_RE = /victoria|tasmania|queensland|\bWA\b|western australia|\bNSW\b|new south wales|south australia|\bSA\b|sydney|melbourne|brisbane|greyhound/i;
   const candidates = [];
