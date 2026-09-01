@@ -355,7 +355,7 @@ function buildStaticSummary() {
 
   return `<article class="static-summary">
       <h1>auspol tracker</h1>
-      <p class="ss-sub">Aggregator of Australian opinion polling for the next federal election, set against the last five.
+      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last five.
         ${raceLine(L)} two-party preferred (&#177;${L.alp2ppCi95}) &#8211; updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
         ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Next election due ${esc(L.nextElectionDue[0].toLowerCase() + L.nextElectionDue.slice(1))}.</p>
 
@@ -464,13 +464,13 @@ const cl = grabLatest();
 const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, Coalition ${cl.lnp2pp.toFixed(1)} `
   + `two-party preferred, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
   + `with the trend since the 2025 election`;
-/* SERP + social description: the race first (that's what the ~160-char
-   snippet window keeps), then provenance and scope. Figures and their date
-   share the sentence, so a stale cached snippet stays self-dating. Reuses
-   the same numbers as the card alt and the summary below. */
-const metaDesc = `${raceLine(cl)} two-party preferred (±${cl.alp2ppCi95}) `
-  + `– updated ${cl.updated} from ${cl.pollsTracked} published polls across ${cl.housesTracked} polling houses. `
-  + `auspol tracker aggregates every national poll for the next Australian federal election, set against the last five.`;
+/* SERP + social description: the tagline phrasing leads, then the race and
+   provenance. Figures and their date share a sentence, so a stale cached
+   snippet stays self-dating. Reuses the same numbers as the card alt and
+   the summary below. */
+const metaDesc = `Aggregated opinion polling for the next Australian federal election, `
+  + `set against the last five. ${raceLine(cl)} two-party preferred (±${cl.alp2ppCi95}) `
+  + `– updated ${cl.updated} from ${cl.pollsTracked} published polls across ${cl.housesTracked} polling houses.`;
 
 /* og:site_name must NOT equal the masthead h1 text: Safari Reader skips any
    title candidate whose text equals og:site_name when og:title exists (its
