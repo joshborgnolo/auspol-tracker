@@ -111,27 +111,11 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Fira Sans';
+  font-family: 'Archivo';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 100 900;
   font-display: swap;
-  src: url("assets/fonts/firasans-400-latin.7b8f0fbf.woff2") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url("assets/fonts/firasans-700-latin.811e7361.woff2") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'Fira Sans';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url("assets/fonts/firasans-800-latin.06096c29.woff2") format('woff2');
+  src: url("assets/fonts/archivo-latin.7150c0ec.woff2") format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 </style>
@@ -197,7 +181,7 @@
   /* every text face is a self-hosted latin subset (FONTS in build.mjs) */
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --figures: "Fira Sans", var(--sans);
+  --figures: "Archivo", var(--sans);
 
   --radius: 14px;
   --shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
@@ -2024,7 +2008,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-variant-numeric: tabular-nums; text-wrap: pretty;
 }
 .pd-s b { font-weight: 700; color: var(--ink); }
-/* the expanded view's numbers are the poll's data: set them in Fira Sans
+/* the expanded view's numbers are the poll's data: set them in Archivo
    (figures in summary lines, signed nets, moves, seat estimates) */
 .poll-detail b, .poll-detail .netv, .poll-detail .chg, .poll-detail .seat-est {
   font-family: var(--figures, var(--sans));
@@ -9653,11 +9637,22 @@ function tppHeading(cs) {
 function tppLines(cs, r) {
   const out = [];
   const dFlows = segDelta(r.chg, "flows");
+  /* Essential's undecided never left the published pair, so the pair's own
+     line names the share and its move; the first-preferences tail reports
+     only shares that were set aside before the shares were reported. */
+  const dUnd = r.undecidedBasis === "tpp" && r.undecided != null ? segDelta(r.chg, "und") : null;
   for (const c of cs) {
     const canonical = c.kind === "2pp" && !c.derived && r.tppFlows != null;
+    let note = canonical ? "respondent-allocated" : null;
+    if (c.kind === "2pp" && !c.derived && r.undecidedBasis === "tpp" && r.undecided != null) {
+      note = /*#__PURE__*/React.createElement(React.Fragment, null, note && /*#__PURE__*/React.createElement(React.Fragment, null, note, ", "), "undecided ", /*#__PURE__*/React.createElement("b", null, r.undecided, "%"), " inside the pair", dUnd && /*#__PURE__*/React.createElement(React.Fragment, null, ", ", /*#__PURE__*/React.createElement(ChgTag, {
+        v: dUnd.v,
+        refDate: dUnd.refDate
+      })));
+    }
     out.push({
       c,
-      note: canonical ? "respondent-allocated" : null
+      note
     });
     if (canonical) out.push({
       note: /*#__PURE__*/React.createElement(React.Fragment, null, "2025-election", " ", /*#__PURE__*/React.createElement("button", {
@@ -10297,9 +10292,9 @@ function PollLedger({
     className: x.muted ? "pd-s-note" : undefined
   }, x.label, " ", /*#__PURE__*/React.createElement("b", null, x.value, "%")), /*#__PURE__*/React.createElement(ChgParen, {
     d: x.delta
-  }))), r.undecided != null && (d => /*#__PURE__*/React.createElement(React.Fragment, null, " · ", "undecided ", /*#__PURE__*/React.createElement("b", null, r.undecided, "%"), /*#__PURE__*/React.createElement("span", {
+  }))), r.undecided != null && r.undecidedBasis !== "tpp" && (d => /*#__PURE__*/React.createElement(React.Fragment, null, " · ", "undecided ", /*#__PURE__*/React.createElement("b", null, r.undecided, "%"), /*#__PURE__*/React.createElement("span", {
     className: "pd-s-note"
-  }, " (" + (r.undecidedBasis === "tpp" ? "inside the pair" : r.undecidedBasis === "soft" ? "not firm" : "set aside"), d && /*#__PURE__*/React.createElement(React.Fragment, null, ", ", /*#__PURE__*/React.createElement(ChgTag, {
+  }, " (" + (r.undecidedBasis === "soft" ? "not firm" : "set aside"), d && /*#__PURE__*/React.createElement(React.Fragment, null, ", ", /*#__PURE__*/React.createElement(ChgTag, {
     v: d.v,
     refDate: d.refDate
   })), ")")))(segDelta(r.chg, "und")))), /*#__PURE__*/React.createElement(PdSec, {

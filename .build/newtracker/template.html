@@ -1918,7 +1918,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
   font-variant-numeric: tabular-nums; text-wrap: pretty;
 }
 .pd-s b { font-weight: 700; color: var(--ink); }
-/* the expanded view's numbers are the poll's data: set them in Fira Sans
+/* the expanded view's numbers are the poll's data: set them in Archivo
    (figures in summary lines, signed nets, moves, seat estimates) */
 .poll-detail b, .poll-detail .netv, .poll-detail .chg, .poll-detail .seat-est {
   font-family: var(--figures, var(--sans));
@@ -2303,6 +2303,9 @@ body.dark .fb-form { color-scheme: dark; }
      scrolls past every control before seeing the thing they came for. The two
      chip groups are small enough to share a line, so they do. */
   .hero-controls { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+  /* phone carries the matchup only as the Switch-2PP pill, so it leads the
+     control row and the range window follows */
+  .hero-controls .hero-alt { order: -1; }
   /* …and the same fold pressure halves the wrap gap between the headline
      stack and that control strip: the desktop 24px is one row-gap among
      similar ones; on a phone it was the biggest void on the wire to the

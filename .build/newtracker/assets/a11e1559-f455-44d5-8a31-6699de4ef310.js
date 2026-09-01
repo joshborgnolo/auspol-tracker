@@ -1497,9 +1497,23 @@ function tppHeading(cs) {
 function tppLines(cs, r) {
   const out = [];
   const dFlows = segDelta(r.chg, "flows");
+  /* Essential's undecided never left the published pair, so the pair's own
+     line names the share and its move; the first-preferences tail reports
+     only shares that were set aside before the shares were reported. */
+  const dUnd = r.undecidedBasis === "tpp" && r.undecided != null ? segDelta(r.chg, "und") : null;
   for (const c of cs) {
     const canonical = c.kind === "2pp" && !c.derived && r.tppFlows != null;
-    out.push({ c, note: canonical ? "respondent-allocated" : null });
+    let note = canonical ? "respondent-allocated" : null;
+    if (c.kind === "2pp" && !c.derived && r.undecidedBasis === "tpp" && r.undecided != null) {
+      note = (
+        <React.Fragment>
+          {note && <React.Fragment>{note}, </React.Fragment>}
+          undecided <b>{r.undecided}%</b> inside the pair
+          {dUnd && <React.Fragment>, <ChgTag v={dUnd.v} refDate={dUnd.refDate} /></React.Fragment>}
+        </React.Fragment>
+      );
+    }
+    out.push({ c, note });
     if (canonical) out.push({ note: (
       <>2025-election{" "}
         <button type="button" className="hi-term"
@@ -1973,13 +1987,15 @@ function PollLedger({ r, dirSegments }) {
             </React.Fragment>
           ))}
           {/* the share the primaries have already set aside belongs on the
-              same line as the shares it is missing from */}
-          {r.undecided != null &&
+              same line as the shares it is missing from. A share still inside
+              the two-party pair is named on the pair's own line instead
+              (tppLines) – it is not missing from these shares */}
+          {r.undecided != null && r.undecidedBasis !== "tpp" &&
             ((d) => (
               <React.Fragment>
                 {" · "}undecided <b>{r.undecided}%</b>
                 <span className="pd-s-note">
-                  {" (" + (r.undecidedBasis === "tpp" ? "inside the pair" : r.undecidedBasis === "soft" ? "not firm" : "set aside")}
+                  {" (" + (r.undecidedBasis === "soft" ? "not firm" : "set aside")}
                   {d && <React.Fragment>, <ChgTag v={d.v} refDate={d.refDate} /></React.Fragment>})
                 </span>
               </React.Fragment>

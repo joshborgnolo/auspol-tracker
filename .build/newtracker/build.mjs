@@ -92,7 +92,7 @@ const inlineJs = (code) => code.replace(/<\/script/gi, "<\\/script");
 /* ---- 4. template ------------------------------------------------------- */
 let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
 
-/* -- fonts: 11 @font-face rules over 11 files -> 5 latin faces -------------
+/* -- fonts: 9 @font-face rules over 9 files -> 5 latin faces ---------------
    These used to be base64'd into the stylesheet. woff2 is already compressed,
    so base64 added a third to each file and gzip could not win it back: the
    three faces were ~157KB of the ~490KB the page cost over the wire, they
@@ -114,11 +114,9 @@ const FONTS = [
   /* Source Sans 3 stays shipped for one scoped caller: the .wordmark
      lockup, which keeps its pre-swap face. */
   { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
-  /* Fira Sans sets the expanded poll breakdown's figures only - behind a
-     click, so none of its cuts is worth a preload. */
-  { file: "firasans-400-latin.woff2",           family: "Fira Sans", style: "normal", weight: "400" },
-  { file: "firasans-700-latin.woff2",           family: "Fira Sans", style: "normal", weight: "700" },
-  { file: "firasans-800-latin.woff2",           family: "Fira Sans", style: "normal", weight: "800" },
+  /* Archivo sets the expanded poll breakdown's figures only - one variable
+     cut carries 400/700/800, and it sits behind a click, so no preload. */
+  { file: "archivo-latin.woff2",                family: "Archivo", style: "normal", weight: "100 900" },
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });
