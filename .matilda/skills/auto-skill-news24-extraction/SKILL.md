@@ -2,7 +2,7 @@
 name: news24-extraction
 description: Extract YouGov News24 "Public Data" fortnightly federal polls from YouGov's own yougov.com releases into data/polls.json — global RSS discovery (regional feeds 404), methodology-sentence series gate, Datawrapper public TSV datasets (tab-structure-preserving cell parse, <span> arrows, \\u003C escapes), oth=sum-of-tail-row convention, ppm chart→prose fallback, yearless fieldwork-window year inference from published_at, plus manual NEWSIE_CHROME news24.com.au enrichment layered over Wikipedia-wave discovery, and the ANONYMOUS Infogram embed rung (six static _/ ids per Pulse article at e.infogram.com, pinned per wave; authoritative crosstab vs corroboration-only horserace; cornerless approvals mapped by title-order x geometry) (.build/extract-news24.mjs, .build/news24-infogram.mjs).
 source: auto-skill
-extracted_at: '2026-08-29T07:23:34.665Z'
+extracted_at: '2026-09-01T00:36:00.000Z'
 ---
 
 # YouGov News24 Pulse extraction (yougov.com → polls.json)
@@ -40,12 +40,16 @@ leader satisfaction, preferred PM, Albanese–Hanson preferred PM and
 Albanese–One Nation TPP. Wikipedia keeps only the fields News24 prose omits
 — notably `ind`/`oth`, and sample on articles such as 2026-07-28 that omit
 it. Any Chrome/parse mismatch logs `N24_NOTE`-style status and falls back to
-Wikipedia-only; macOS Automation consent makes Chrome manual-only, so
-`.build/news24-updater.sh` intentionally leaves `NEWSIE_CHROME` unset in
-launchd. If launchd gets there first, it writes the News24-linked latest wave
-without `published`; a later manual `NEWSIE_CHROME=1` run upgrades that same
-latest wave in place and fills the derived `ppm`/`approval`/`altTpp` /
-`ppmHeadToHead` rows (`status.news24.upgraded`).
+Wikipedia-only. STALE-CLAIM CORRECTED 2026-09-01: this file previously said
+Automation consent made Chrome manual-only and the wrapper left
+`NEWSIE_CHROME` unset — wrong. Probed from a launchd job 2026-08-30 (consent
+already granted, persists), and `.build/news24-updater.sh` now sets
+`NEWSIE_CHROME=1` on every scheduled run (probe documented in the wrapper's
+header comment). If a wave lands before a successful Chrome run (Chrome
+closed, logged out, or TCC reset by a Chrome update), it is written without
+`published`; a later run with Chrome available UPGRADES that same latest wave
+in place and fills the derived `ppm`/`approval`/`altTpp` / `ppmHeadToHead`
+rows (`status.news24.upgraded`).
 
 News24 page facts verified against saved captures:
 
@@ -165,7 +169,9 @@ NOT in the embeds: `sample` (prose only — "poll of 1510 voters was conducted o
 August 18 and 24") and `published` (JSON-LD `datePublished` / the page transfer state).
 
 **When it actually fires.** `status.news24.enabled` needs `NEWSIE_CHROME=1` or
-`N24_NEWS24_FILE`, so launchd runs never reach it. The upgrade gate is
+`N24_NEWS24_FILE`; the wrapper sets `NEWSIE_CHROME=1` since 2026-08-30, so
+scheduled launchd runs DO reach the rung now (this file's earlier "launchd
+runs never reach it" claim is stale). The upgrade gate is
 `!existing.published`, so a latest wave already carrying `published` yields `attempted:0` —
 verified 2026-09-01: `N24_NEWS24_FILE=.matilda/chrome-n24.html --check` → `enabled:true,
 attempted:0, changed:false`. The rung is therefore proven against fixtures but has NOT yet
@@ -236,6 +242,35 @@ Parse gotchas that each produced a real bug:
   win — canon was aligned 2026-08-29 (2026-07-14 row corrected 1500→1468); going forward,
   never "correct" YouGov-sourced values back to media-reported ones.
 
+## Self-release backfill: releaseUrl fill on existing waves (added 2026-09-01)
+
+Row convention: `url` cites the media write-up (skynews/news24); `releaseUrl` is the wave's
+OWN release on yougov.com, rendered in the expanded poll as "Pollster's release". Absent,
+not zero — YouGov self-releases only occasionally (2 of 18+ waves ever, per
+yougov-poll-provenance: 2026-06-30 → articles/55081, 2026-07-14 → articles/55192). New
+yougov-canonical waves keep `url = <release>` and need no releaseUrl.
+
+- **Fill point**: the canonical loop's `skipped_existing` branch now sets
+  `row.releaseUrl = rec.url` when a parsed release's date matches a canon row lacking the
+  field (guard `hit.url !== rec.url` prevents self-duplication). Mirrored from the
+  RedBridge extractor's filledRelease logic.
+- **Pre-screen relaxed**: the pubDate filter keeps candidates whenever a canon wave still
+  lacks releaseUrl (`fillableFloor` = earliest such row, currently 2025-09-30), not just
+  `pubIso >= latestYg`. Steady state: every run parses the ~2 historical AU releases —
+  ~2 article fetches and `changed:false` with `"releaseFilled":[]` IS the healthy
+  off-wave signature, so don't let a future fleet audit read repopulated `candidates` as
+  an anomaly.
+- **Write gate widened**: writes were gated on `sources.length` (new-wave provenance
+  only), so a pure fill run would silently drop the mutation. Now
+  `sources.length || status.releaseFilled.length`; `status.releaseFilled` reports the
+  dates.
+- **Sandbox gotcha**: `N24_OUT` must point at an EXISTING file — the extractor reads
+  canon from OUT before computing (`cp data/polls.json /tmp/x.json` first; scratch
+  provenance via `N24_SRC_DIR`). Dry-run the fill redirected, diff the sandbox output
+  vs canon (should be releaseUrl-only), then run for real.
+- First run (2026-09-01, commit 75bcb18): filled 55081 + 55192; validate 156 polls /
+  0 errors; second run `changed:false` and idempotent since.
+
 ## News24 enrichment cannot move to CI (settled 2026-09-01)
 
 The Infogram rung is anonymous, but the six per-wave `_/` ids exist ONLY in the rendered
@@ -259,6 +294,59 @@ Practical consequence: the realistic end state is Wikipedia + yougov.com on CI w
 Infogram enrichment as a LOCAL pass. Scope the ~2026-09-07 yougov.com RSS verdict
 accordingly — even a fully repaired RSS does not make News24 migratable. This is a structural
 property of the source, not a migration backlog item.
+
+## Two watchdogs for this agent's real failure mode (added 2026-09-01)
+
+The agent's predicted failure is not an outage, it is **silent thinness**: the
+News24/Chrome leg degrades to Wikipedia-only by design, so the wave still lands —
+as a VI row with no `published`, no ppm/approval/altTpp — and looks healthy from
+outside. `check-coverage.mjs` cannot see it: it reads only (pollster,
+fieldwork-end) pairs, deliberately.
+
+**`.build/check-poll-thinness.mjs`** — data-only, so it runs on CI (a second job
+in `coverage-check.yml`). Exit 1 = at least one wave landed without rows its
+house normally files. Self-calibrating rather than a hardcoded per-house table:
+a section is expected only when the house carries it on ≥80% of its waves
+**since that section first appeared for that house**. Both halves matter — the
+rate alone flagged Roy Morgan's pre-2026-05-17 waves for a missing `altTpp` the
+series had not started yet, and YouGov's pre-2026-05-19 waves for a `published`
+field that did not exist. `EXCEPTIONS` mirrors validate.mjs; only add an entry
+after adjudicating against the release, since an exception hides a real hole as
+effectively as it silences a false alarm.
+
+**`.build/check-news24-chrome.mjs`** — LOCAL ONLY, and the reason is structural:
+the six ids exist only in the rendered DOM and there is no anonymous route to
+them. Probes the latest already-recorded wave (a pure read, no new release
+needed, self-updating) and names the layer that broke, because that decides the
+fix: `chrome` (Automation consent reset — a Chrome update does this),
+`session` (news24 login expired — page returned without embeds or the "News24
+Pulse" marker), `layout` (article rendered but fewer than six `data-id`s), or
+`parser` (embeds fetched but crosstab/approvals/ppm/tpp no longer classify).
+Run it a day or two before an expected wave. It cannot prove the NEXT wave's
+fresh ids will parse — only that every layer beneath them is alive.
+
+Verified 2026-09-01 against live Chrome: `ok:true, ids:6, kinds:[horserace,
+crosstab, unmodelled, approvals, ppm, tpp]`.
+
+### The rehearsal that actually rehearses
+
+`status.news24.enabled:true` in a scheduled run proves ONLY that the env var is
+set. The upgrade gate is `!existing.published`, so when the latest wave already
+carries `published`, `attempted` is 0 and Chrome is never touched. To genuinely
+exercise stages 4–5, strip the wave into a sandbox and run the ADD path against
+live Chrome — which is what the next wave will be:
+
+```
+node -e '<strip the latest YouGov wave from polls + ppm/approval/altTpp/ppmHeadToHead>' 
+N24_OUT=/tmp/e2e/polls.json N24_SRC_DIR=/tmp/e2e/n24-src NEWSIE_CHROME=1 \
+  node .build/extract-news24.mjs
+```
+
+Verified 2026-09-01: reproduced the 2026-08-24 wave from live Chrome + live
+embeds with **zero field diffs** against canon across polls/ppm/approval/
+altTpp/ppmHeadToHead, and the horserace Σ guards excluded the two known-bad
+columns as notes. Remember the key split when stripping: polls → `pollster`,
+the derived sections → `firm`.
 
 ## The automation contract (same as siblings; see resolve-monitor-extraction)
 

@@ -50,3 +50,13 @@ jobs:
               } >> "$GITHUB_STEP_SUMMARY"
             fi
           done
+
+  # Separate job, not another step: a missed wave and a thin wave are different
+  # failures and must be able to go red independently of each other.
+  thinness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check landed waves for missing derived rows
+        run: node .build/check-poll-thinness.mjs
