@@ -1123,7 +1123,7 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
 .hero-sub { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
-.hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+.hero-sub-note, .hero-sub-count { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 /* the hero's subhead matches the other panels; the method label that used
    to sit beside it in small caps has moved to the interval line, where it
    reads as a clause of how the figure was made and how well it is known,
@@ -1228,12 +1228,12 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    spaces it, so the shared checkbox's top margin is dropped here. */
 .hero-controls .pg-check { margin: 0; }
 /* The matchup and range switches' laptop home is a row directly above the
-   2PP chart – the matchup carried left, the range window pushed right – so
-   the copies sitting in this column are for the phone only. Both homes are
-   in the DOM at every width (one state, two copies); display, not JSX,
-   chooses. */
+   2PP chart – the two stacked on the right, the matchup riding directly
+   above the range window it filters – so the copies sitting in this column
+   are for the phone only. Both homes are in the DOM at every width (one
+   state, two copies); display, not JSX, chooses. */
 .hero-controls > .text-toggle { display: none; }
-.hero-chartbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 18px; margin: 16px 0 10px; }
+.hero-chartbar { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin: 16px 0 10px; }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
 /* wraps as the fallback: on a phone the ≤640px set below (10px column gap,
@@ -5244,8 +5244,8 @@ window.AP.nextPolls = npProject;
     if (!legend.length) legend = cycleLegend();
     /* the ± range rides inside .lead-tag now, so the meta tail drops it -
        keeping it here too would print the interval twice on the image */
-    const meta = [txt(target.querySelector(".hi-method")),
-                  txt(target.querySelector(".hi-note"))].filter(Boolean).join("  ·  ");
+    const meta = [txt(target.querySelector(".hi-note")),
+                  txt(target.querySelector(".hi-method"))].filter(Boolean).join("  ·  ");
     const lead = [txt(target.querySelector(".lead-tag")), txt(target.querySelector(".delta")),
                   txt(target.querySelector(".hero-sub-note"))].filter(Boolean).join("  ");
     const hero = isHero && parties.length === 2;
@@ -17461,17 +17461,7 @@ function Hero({
     className: "hi-range hi-term",
     title: "What a margin of error means",
     onClick: () => window.AP.openTerm && window.AP.openTerm("margin-of-error", "two-party preferred")
-  }, "\xB1 ", (2 * unc.ci95).toFixed(1), " pts")) : " pts"), /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "hi-method hi-term",
-    title: "What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means",
-    onClick: () => window.AP.openTerm && window.AP.openTerm(adjusted ? "weighted-aggregate" : "monthly-average", "two-party preferred")
-  }, adjusted ? "Weighted aggregate" : "Monthly average"), !adjusted && /*#__PURE__*/React.createElement("span", {
-    className: "eyebrow-warn"
-  }, "Limited data"), adjusted && unc && /*#__PURE__*/React.createElement("span", {
-    className: "hi-sep",
-    "aria-hidden": "true"
-  }, "\u2022"), unc &&
+  }, "\xB1 ", (2 * unc.ci95).toFixed(1), " pts")) : " pts"), unc &&
   /*#__PURE__*/
   /* One more route to the margin's definition: the glossary
      files "95% interval" as a synonym waypoint of margin of
@@ -17482,7 +17472,17 @@ function Hero({
     className: "hi-note hi-term",
     title: "What a margin of error means",
     onClick: () => window.AP.openTerm && window.AP.openTerm("margin-of-error", "two-party preferred")
-  }, "95% interval")), /*#__PURE__*/React.createElement("div", {
+  }, "95% interval"), unc && /*#__PURE__*/React.createElement("span", {
+    className: "hi-sep",
+    "aria-hidden": "true"
+  }, "\u2022"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "hi-method hi-term",
+    title: "What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means",
+    onClick: () => window.AP.openTerm && window.AP.openTerm(adjusted ? "weighted-aggregate" : "monthly-average", "two-party preferred")
+  }, adjusted ? "Weighted aggregate" : "Monthly average"), !adjusted && /*#__PURE__*/React.createElement("span", {
+    className: "eyebrow-warn"
+  }, "Limited data")), /*#__PURE__*/React.createElement("div", {
     className: "hero-sub"
   }, /*#__PURE__*/React.createElement(Delta, {
     value: monthDelta,
@@ -17499,7 +17499,9 @@ function Hero({
     className: "hi-term",
     title: "What a margin of error means",
     onClick: () => window.AP.openTerm && window.AP.openTerm("margin-of-error", "two-party preferred")
-  }, "margin"), ")")))), /*#__PURE__*/React.createElement("div", {
+  }, "margin"), ")")), unc && /*#__PURE__*/React.createElement("span", {
+    className: "hero-sub-count"
+  }, "· ", unc.n, " poll", unc.n === 1 ? "" : "s", " in", " ", D.latest.method.windowDays, " days"))), /*#__PURE__*/React.createElement("div", {
     className: "hero-controls"
   }, /*#__PURE__*/React.createElement(TextToggle, {
     value: matchup,

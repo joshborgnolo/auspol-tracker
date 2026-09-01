@@ -1033,7 +1033,7 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
 .hero-sub { display: flex; align-items: center; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
-.hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+.hero-sub-note, .hero-sub-count { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 /* the hero's subhead matches the other panels; the method label that used
    to sit beside it in small caps has moved to the interval line, where it
    reads as a clause of how the figure was made and how well it is known,
@@ -1137,6 +1137,13 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    chart copies with the rest of .hero-controls. The column gap already
    spaces it, so the shared checkbox's top margin is dropped here. */
 .hero-controls .pg-check { margin: 0; }
+/* The matchup and range switches' laptop home is a row directly above the
+   2PP chart – the two stacked on the right, the matchup riding directly
+   above the range window it filters – so the copies sitting in this column
+   are for the phone only. Both homes are in the DOM at every width (one
+   state, two copies); display, not JSX, chooses. */
+.hero-controls > .text-toggle { display: none; }
+.hero-chartbar { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin: 16px 0 10px; }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
 /* wraps as the fallback: on a phone the ≤640px set below (10px column gap,
@@ -1181,9 +1188,10 @@ body.dark .ci-band { opacity: 0.22; }
 
 /* the contests that are not on the chart, each carrying its own figure. A
    button, not a tab: pressing one makes it the headline and morphs the chart.
-   Lives inside .hero-controls (under the range toggle), so the parent column's
-   own gap spaces it - no margin-top of its own - and wrapped rows keep the
-   desktop column's right edge. */
+   Lives inside .hero-controls - at the head of the column on a laptop, the
+   toggles having moved out to the chartbar - so the parent column's own gap
+   spaces it - no margin-top of its own - and wrapped rows keep the desktop
+   column's right edge. */
 .hero-alt { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 .ha-lab { font-size: 10.5px; font-weight: 700;
   color: var(--ink-3); }
@@ -2219,13 +2227,13 @@ body.dark .fb-form { color-scheme: dark; }
   .method-grid { grid-template-columns: 1fr; }
   .head-meta { gap: 12px; }
   .ro-num { font-size: 52px; }
-  /* Never one row of six small targets: at this width the controls have the
-     headline's full line to themselves, so the matchup toggle sits above the
-     range toggle (the desktop arrangement, left-aligned) and both get real
-     touch padding – this is exactly the control a one-handed thumb comes to. */
+  /* Never one row of six small targets: at this width the toggles' home is
+     the chartbar row above the chart (laptop arrangement) or still the
+     strip, and either way real touch padding is the point - this is exactly
+     the control a one-handed thumb comes to. */
   .hero-controls { align-items: flex-start; }
-  .hero-controls .tt-opt { padding: 11px 4px; }
-  .hero-controls .tt-div { height: 16px; }
+  .hero-controls .tt-opt, .hero-chartbar .tt-opt { padding: 11px 4px; }
+  .hero-controls .tt-div, .hero-chartbar .tt-div { height: 16px; }
 }
 @media (max-width: 560px) {
   .page { padding: 20px 16px 48px; }
@@ -2303,6 +2311,10 @@ body.dark .fb-form { color-scheme: dark; }
      scrolls past every control before seeing the thing they came for. The two
      chip groups are small enough to share a line, so they do. */
   .hero-controls { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+  /* the laptop row above the chart trades places with the strip copies:
+     this home shows on the phone, that one on the laptop, never both */
+  .hero-chartbar { display: none; }
+  .hero-controls > .text-toggle { display: inline-flex; }
   /* phone carries the matchup only as the Switch-2PP pill, so it leads the
      control row and the range window follows */
   .hero-controls .hero-alt { order: -1; }

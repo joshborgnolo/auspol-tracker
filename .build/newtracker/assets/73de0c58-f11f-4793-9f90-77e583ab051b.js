@@ -650,6 +650,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
   const matchupOptions = orderedMatchups.map((id) => ({
     id, label: MATCHUPS[id].label, dots: MATCHUPS[id].dots,
   }));
+  /* rangeDomain takes any month count, and buildXTicks already labels
+     every month once the span is under a year, so six months arrives
+     with its own tick per month rather than every second one */
+  const rangeOptions = [{ id: "3", label: "3mo" }, { id: "6", label: "6mo" },
+                        { id: "12", label: "12mo" }, { id: "all", label: "All" }];
 
   /* The selected matchup arrives as a prop: App owns it, so the docked
      tab-bar score can follow it and it survives the Snapshot tab unmounting
@@ -1001,24 +1006,6 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                 </>
               ) : " pts"}
             </span>
-            {/* The label names the method; now it also explains it. Everything
-                this figure is built on has a definition in Info, and the word
-                the reader is looking at is the shortest way to it. */}
-            <button type="button" className="hi-method hi-term"
-                    title={"What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"}
-                    onClick={() => window.AP.openTerm &&
-                      window.AP.openTerm(adjusted ? "weighted-aggregate" : "monthly-average",
-                                         "two-party preferred")}>
-              {adjusted ? "Weighted aggregate" : "Monthly average"}
-            </button>
-            {!adjusted && <span className="eyebrow-warn">Limited data</span>}
-            {/* When the method and the note are adjacent (the adjusted case),
-                both are clickable hi-term buttons, so neither can host the
-                separator dot - a ::before on the note sits inside its button
-                box and reads as part of the link. This span gives that
-                adjacency a neutral host for the dot. Other cases already have
-                a non-term neighbour the CSS can borrow. */}
-            {adjusted && unc && <span className="hi-sep" aria-hidden="true">•</span>}
             {unc && (
               /* One more route to the margin's definition: the glossary
                  files "95% interval" as a synonym waypoint of margin of
@@ -1031,6 +1018,24 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                 95% interval
               </button>
             )}
+            {/* When the note and the method sit next to each other, both are
+                clickable hi-term buttons, so neither can host the separator
+                dot - a ::before on the method sits inside its button box and
+                reads as part of the link. This span gives that adjacency a
+                neutral host for the dot. Other cases already have a non-term
+                neighbour the CSS can borrow. */}
+            {unc && <span className="hi-sep" aria-hidden="true">•</span>}
+            {/* The label names the method; now it also explains it. Everything
+                this figure is built on has a definition in Info, and the word
+                the reader is looking at is the shortest way to it. */}
+            <button type="button" className="hi-method hi-term"
+                    title={"What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"}
+                    onClick={() => window.AP.openTerm &&
+                      window.AP.openTerm(adjusted ? "weighted-aggregate" : "monthly-average",
+                                         "two-party preferred")}>
+              {adjusted ? "Weighted aggregate" : "Monthly average"}
+            </button>
+            {!adjusted && <span className="eyebrow-warn">Limited data</span>}
           </div>
           <div className="hero-sub">
             <Delta value={monthDelta} suffix={Math.abs(monthDelta) === 1 ? " pt" : " pts"} small roll spinIn />
@@ -1051,25 +1056,35 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                 </span>
               )}
             </span>
+            {/* The window the interval describes, in plain terms: the count
+                and span draw on unc, which exists only when an interval does,
+                so the clause rides on the same condition. */}
+            {unc && (
+              <span className="hero-sub-count">
+                {"· "}{unc.n} poll{unc.n === 1 ? "" : "s"} in{" "}
+                {D.latest.method.windowDays} days
+              </span>
+            )}
           </div>
         </div>
         <div className="hero-controls">
+          {/* Phone copies of the matchup and range switches: their laptop
+              home is the chartbar row above the chart, and every width shows
+              exactly one home - one state, two copies, the pattern the
+              compare switch below already uses. */}
           <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
             options={matchupOptions} />
           <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
-            /* rangeDomain takes any month count, and buildXTicks already labels
-               every month once the span is under a year, so six months arrives
-               with its own tick per month rather than every second one */
-            options={[{ id: "3", label: "3mo" }, { id: "6", label: "6mo" },
-                      { id: "12", label: "12mo" }, { id: "all", label: "All" }]} />
+            options={rangeOptions} />
           {/* The OTHER contests, carrying their figures rather than just their
               names. One Nation sits level with Labor on the primary vote, so
               in a good many seats the final two are not Labor and the Coalition
               and "the 2PP" is doing less work than a single headline implies.
               These were previously a bare tab you had to press to find out
-              what was behind it; the number is the reason to press it. Sits
-              in the control column, between the range toggle and the
-              implied-2PP switch. */}
+              what was behind it; the number is the reason to press it. Heads
+              the control column on a laptop - the toggles moved out to the
+              chartbar above the chart - and sits above the implied-2PP
+              switch. */}
           {otherContests.length > 0 && (
             <div className="hero-alt">
               <span className="ha-lab">Switch 2PP</span>
@@ -1092,6 +1107,17 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               Off by default: it is a diagnostic, not a third headline. */}
           {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(false)}
         </div>
+      </div>
+
+      {/* The laptop home of the matchup and range switches: one row directly
+          above the chart - the matchup on the left, the range window on the
+          right. Hidden on a phone, where the strip copies above still do the
+          work, so a width never shows both homes. */}
+      <div className="hero-chartbar">
+        <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
+          options={matchupOptions} />
+        <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
+          options={rangeOptions} />
       </div>
 
       {/* The key carries NEITHER the matchup nor the range: remounting would
