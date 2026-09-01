@@ -1094,7 +1094,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           <span className="hl-item">
             <span className={heroSeries.length ? "hl-line" : "hl-swatch-dot"} style={{ background: m.b.color }}></span>{m.b.name}
           </span>
-          {scatterPolls > 0 && heroSeries.length > 0 && <span className="hl-item"><span className="hl-dot"></span>Individual poll</span>}
+          {scatterPolls > 0 && heroSeries.length > 0 && <span className="hl-item hl-polls"><span className="hl-dot"></span>Individual poll</span>}
           {heroAreas.length > 0 && (
             <span className="hl-item"><span className="hl-band"></span>95% interval</span>
           )}

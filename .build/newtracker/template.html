@@ -1120,8 +1120,10 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hero-controls .pg-check { margin: 0; }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
-/* wraps: the interval swatch made this a four-item legend, which runs off
-   the right edge of a phone if the items are held on one line */
+/* wraps as the fallback: on a phone the ≤640px set below (10px column gap,
+   15px swatches, 11.5px type) holds the four entries on one line down to
+   ~360px, with the Individual-poll entry nudged left so the 95% interval
+   label clears the row's end */
 .hero-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; }
 .hl-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-3); font-weight: 500; white-space: nowrap; }
 .hl-line { width: 18px; height: 3px; border-radius: 2px; }
@@ -1141,6 +1143,18 @@ body.dark .ci-band { opacity: 0.22; }
   background: linear-gradient(to bottom,
     color-mix(in oklch, var(--alp) 13%, transparent) 0 55%,
     color-mix(in oklch, var(--lnp) 13%, transparent) 45% 100%); }
+/* phone: hold the four legend entries on one line – smaller type, tighter
+   gaps and swatches, and the Individual-poll entry nudged a touch left so
+   the 95% interval label clears the end of the row. Below ~360px the base
+   wrap still catches it. */
+@media (max-width: 640px) {
+  .hero-legend { column-gap: 10px; row-gap: 4px; }
+  .hl-item { font-size: 11.5px; gap: 5px; }
+  .hl-line, .hl-dashed { width: 15px; }
+  .hl-band { width: 15px; }
+  .hl-dot { width: 8px; height: 8px; }
+  .hero-legend .hl-item.hl-polls { margin-left: -4px; }
+}
 /* "limited data" caveat inside the hero eyebrow – same size, quieter weight,
    so it reads as a qualifier on the method rather than a separate label */
 .eyebrow-warn { color: var(--ink-3); font-weight: 600; }
