@@ -36,8 +36,11 @@
 // Usage: node .build/demosau-confirm-skip.mjs '<DEMOSAU_STATUS json>'
 
 import { readFileSync, writeFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 
-const REPO = new URL("..", import.meta.url).pathname;
+// fileURLToPath, not URL.pathname: the working copy's path carries a space,
+// and pathname leaves it percent-encoded (the write then can't find the repo)
+const REPO = fileURLToPath(new URL("..", import.meta.url));
 const DAY = 86400000;
 
 const status = JSON.parse(process.argv[2] || "null");
