@@ -1131,9 +1131,17 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 /* Separators hang off the END of each clause, not the start of the next: as
    a ::before they belonged to the following flex item, so a wrap carried the
    dot down to open the next line on its own. The lead clause opens the row,
-   so it gets the dot after it too; its figures stay tabular. */
-.hero-interval > *:not(:last-child)::after {
+   so it gets the dot after it too; its figures stay tabular. One exception: a
+   dot after a .hi-term button cannot live on the button's ::after - a pseudo-
+   element is inside the button's box, so it would be clickable and would pick
+   up the underline the term carries. That one dot is borrowed from the next
+   clause's ::before instead (its only current case, the method term, is never
+   the last clause when the dot is wanted). */
+.hero-interval > *:not(:last-child):not(.hi-term)::after {
   content: "•"; color: var(--ink-3); font-weight: 400; margin-left: 8px;
+}
+.hero-interval > .hi-term + *::before {
+  content: "•"; color: var(--ink-3); font-weight: 400; margin-right: 8px;
 }
 .hero-interval .lead-tag { font-variant-numeric: tabular-nums; }
 @media (max-width: 620px) {
@@ -1141,7 +1149,7 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
      with the lead and the range given their own baseline because the roll
      digit inside it is the page's biggest figure */
   .hero-interval > * { flex-basis: 100%; }
-  .hero-interval > *::after { content: none; }
+  .hero-interval > *::after, .hero-interval > .hi-term + *::before { content: none; }
   .hero-interval > * + * { margin-top: 2px; }
 }
 /* A word that is also the way into its own definition. Reset far enough that
