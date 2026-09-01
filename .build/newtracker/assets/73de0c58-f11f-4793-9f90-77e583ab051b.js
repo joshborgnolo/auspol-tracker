@@ -993,7 +993,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             )}
           </div>
           <div className="hero-sub">
-            <Delta value={monthDelta} suffix=" pt" small roll spinIn />
+            <Delta value={monthDelta} suffix={Math.abs(monthDelta) === 1 ? " pt" : " pts"} small roll spinIn />
             <span className="hero-sub-note">
               {(m.real || (altL && altL.aPrev != null)) ? "vs. one month ago" : "vs. previous reading"}
               {/* A month-on-month move smaller than its own interval is not a
