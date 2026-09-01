@@ -2400,14 +2400,17 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
    ============================================================ */
 /* Only a phone bar is too narrow to pin the full tab set around the docked
    2PP score, so only there does Info yield its place (the score clicks home,
-   where the unpinned bar holds it). A wide bar has room for the set AND the
-   score, and nothing hides. Hiding applies even when Info is the ACTIVE tab:
-   an active tab can never be clicked, and with the score docked it crowds the
-   line into an overlap – better that the bar carry only the tabs that do
-   something. The reader is undisturbed: the Info panel stays on screen, and
-   a scroll back up restores the unpinned bar with its tab. */
+   where the unpinned bar holds it) – and only once the score HAS docked: the
+   hide rides .show-score, not the pin, so a pinned bar with the hero still on
+   screen keeps its Info tab until the 2PP readout actually arrives to take
+   the seat. A wide bar has room for the set AND the score, and nothing hides.
+   Hiding applies even when Info is the ACTIVE tab: an active tab can never be
+   clicked, and with the score docked it crowds the line into an overlap –
+   better that the bar carry only the tabs that do something. The reader is
+   undisturbed: the Info panel stays on screen, and a scroll back up restores
+   the unpinned bar with its tab. */
 @media (max-width: 640px) {
-  .tabs.pinned .tab-pinhide { display: none; }
+  .tabs.show-score .tab-pinhide { display: none; }
 }
 /* ---- the next-poll countdown in the tab bar ------------------------------
    Wide screens only. The countdown is absolutely seated in BOTH bar states
@@ -17658,11 +17661,13 @@ const TABS = [{
   label: "All polls"
 },
 /* pinHide: the docked 2PP score takes this end of the bar once the bar
-   pins, and on a phone there is not room for both. The glossary is the one
-   tab a reader is never mid-task in, so it is the one that yields – even
-   as the active tab, since an active tab is never clicked and the panel
-   itself stays put. The CSS gates the hide to phone widths – a wide bar
-   has room for the full tab set plus the score, so Info stays there. */
+   pins AND the hero 2PP has scrolled off (.show-score), and on a phone
+   there is not room for both. The glossary is the one tab a reader is
+   never mid-task in, so it is the one that yields – even as the active
+   tab, since an active tab is never clicked and the panel itself stays
+   put. The CSS gates the hide to phone widths AND to .show-score – a wide
+   bar has room for the full tab set plus the score, and a merely-pinned
+   phone bar (hero still on screen, no score docked) keeps Info too. */
 {
   id: "info",
   label: "Info",
