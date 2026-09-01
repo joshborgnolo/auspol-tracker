@@ -934,6 +934,14 @@
       "right": 27,
       "wrong": 58.5,
       "unsure": 14.5
+    },
+    {
+      "date": "2026-08-31",
+      "dateStart": "2026-08-26",
+      "pollster": "Essential",
+      "right": 23,
+      "wrong": 59,
+      "unsure": 19
     }
   ],
   "polls": [
@@ -4045,6 +4053,8 @@
     },
     {
       "date": "2026-08-31",
+      "published": "2026-09-02T01:00",
+      "dateStart": "2026-08-26",
       "pollster": "Essential",
       "client": "The Guardian",
       "sample": null,
@@ -4054,8 +4064,9 @@
       "onp": 23,
       "ind": 11,
       "oth": null,
-      "tpp_alp": null,
-      "tpp_lnp": null,
+      "tpp_alp": 45,
+      "tpp_lnp": 50,
+      "url": "https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb",
       "assimilated": true
     }
   ],
@@ -6165,6 +6176,24 @@
       "oppName": "Taylor",
       "han": -10,
       "detail": null
+    },
+    {
+      "date": "2026-08-31",
+      "firm": "Essential",
+      "alb": -21,
+      "opp": -9,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 35,
+          "dis": 56
+        },
+        "opp": {
+          "app": 32,
+          "dis": 41
+        }
+      }
     }
   ],
   "ppmHeadToHead": [

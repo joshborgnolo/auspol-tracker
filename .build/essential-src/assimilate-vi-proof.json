@@ -1,7 +1,55 @@
 {
-  "generatedAt": "2026-09-01T22:22:48.038Z",
+  "generatedAt": "2026-09-01T23:00:38.130Z",
   "horizon": "2025-09-29",
+  "retro": [
+    {
+      "date": "2026-08-31",
+      "fixes": [
+        "published 2026-09-02T01:00",
+        "dateStart 2026-08-26",
+        "tpp 45/50 (csv 2026-09-01)",
+        "releaseUrl still unavailable (report page not indexed yet)",
+        "url still unset — hand-set the Guardian write-up URL"
+      ]
+    }
+  ],
   "added": [],
+  "addedAppr": [
+    {
+      "csvWave": "2026-09-01",
+      "row": {
+        "date": "2026-08-31",
+        "firm": "Essential",
+        "alb": -21,
+        "opp": -9,
+        "oppName": "Taylor",
+        "han": null,
+        "detail": {
+          "alb": {
+            "app": 35,
+            "dis": 56
+          },
+          "opp": {
+            "app": 32,
+            "dis": 41
+          }
+        }
+      }
+    }
+  ],
+  "addedDir": [
+    {
+      "csvWave": "2026-09-01",
+      "row": {
+        "date": "2026-08-31",
+        "dateStart": "2026-08-26",
+        "pollster": "Essential",
+        "right": 23,
+        "wrong": 59,
+        "unsure": 19
+      }
+    }
+  ],
   "skippedDateDup": [
     "2025-10-29",
     "2025-11-26",
@@ -54,5 +102,38 @@
     "2025-04-15",
     "2025-04-29",
     "2025-09-30"
+  ],
+  "skippedApprDateDup": [
+    "2025-10-29",
+    "2025-11-26",
+    "2025-12-10",
+    "2026-03-25",
+    "2026-04-29",
+    "2026-05-27",
+    "2026-06-30",
+    "2026-07-28"
+  ],
+  "skippedApprFigureDup": [
+    {
+      "csvWave": "2026-01-28",
+      "matchesRow": "2026-01-23"
+    }
+  ],
+  "skippedDirDateDup": [
+    "2025-10-29",
+    "2025-11-26",
+    "2025-12-10",
+    "2026-02-25",
+    "2026-03-25",
+    "2026-04-29",
+    "2026-05-27",
+    "2026-06-30",
+    "2026-07-28"
+  ],
+  "skippedDirFigureDup": [
+    {
+      "csvWave": "2026-01-28",
+      "matchesRow": "2026-01-23"
+    }
   ]
 }
