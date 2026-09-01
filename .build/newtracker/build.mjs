@@ -110,12 +110,6 @@ const FONTS = [
      lockup, which keeps its pre-swap face (the only @font-face request the
      masthead makes - ibmplexsans would only cover the body). */
   { file: "sourcesans3-latin.woff2",         family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
-  /* The mono faces set only the expanded poll view's figures, so they earn
-     no preload slot - they can arrive with the page (like the italic
-     serif). Google publishes no variable IBM Plex Mono, so the two weights
-     the ledger paints ship as two static cuts: 400 body figures, 600 bold. */
-  { file: "ibmplexmono-400-latin.woff2",     family: "IBM Plex Mono", style: "normal", weight: "400" },
-  { file: "ibmplexmono-600-latin.woff2",     family: "IBM Plex Mono", style: "normal", weight: "600" },
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });

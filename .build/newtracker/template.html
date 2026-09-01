@@ -91,10 +91,6 @@
   /* every text face is a self-hosted latin subset (FONTS in build.mjs) */
   --serif: "Source Serif 4", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  /* the data face of the expanded poll view's figures: a mono cut so the
-     reading is "numbers", not prose. IBM Plex Mono ships no variable cut on
-     Google Fonts, so FONTS carries two static weights (400, 600) instead. */
-  --mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
   --radius: 14px;
   --shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
@@ -1880,15 +1876,16 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pd-simple { display: flex; flex-direction: column; gap: 13px; }
 .pd-simple .pd-k { margin-bottom: 3px; }
 .pd-s {
-  margin: 0; font-size: 13px; line-height: 1.55; color: var(--ink-2);
+  margin: 0; font-size: 14px; line-height: 1.55; color: var(--ink-2);
   font-variant-numeric: tabular-nums; text-wrap: pretty;
 }
 .pd-s b { font-weight: 700; color: var(--ink); }
-/* the expanded view's numbers are the poll's data: set them in the mono
+/* the expanded view's numbers are the poll's data: set them in the serif
    face (figures in summary lines, signed nets, moves, seat estimates) */
 .poll-detail b, .poll-detail .netv, .poll-detail .chg, .poll-detail .seat-est {
-  font-family: var(--mono);
+  font-family: var(--serif);
 }
+.poll-detail .chg { font-size: 11px; }
 .pd-s-chg .chg { margin-left: 1px; }
 .pd-s-note { color: var(--ink-3); }
 a.pd-release { text-decoration: none; cursor: pointer; }
