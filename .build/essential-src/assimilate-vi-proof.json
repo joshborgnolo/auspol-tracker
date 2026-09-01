@@ -1,27 +1,7 @@
 {
-  "generatedAt": "2026-09-01T18:24:07.274Z",
+  "generatedAt": "2026-09-01T22:22:48.038Z",
   "horizon": "2025-09-29",
-  "added": [
-    {
-      "csvWave": "2026-09-01",
-      "tppWave": null,
-      "row": {
-        "date": "2026-08-31",
-        "pollster": "Essential",
-        "client": "The Guardian",
-        "sample": null,
-        "alp": 26,
-        "lnp": 26,
-        "grn": 13,
-        "onp": 23,
-        "ind": 11,
-        "oth": null,
-        "tpp_alp": null,
-        "tpp_lnp": null,
-        "assimilated": true
-      }
-    }
-  ],
+  "added": [],
   "skippedDateDup": [
     "2025-10-29",
     "2025-11-26",
@@ -31,7 +11,8 @@
     "2026-04-29",
     "2026-05-27",
     "2026-06-30",
-    "2026-07-28"
+    "2026-07-28",
+    "2026-09-01"
   ],
   "skippedFigureDup": [
     {
