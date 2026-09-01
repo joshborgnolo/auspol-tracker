@@ -3041,9 +3041,11 @@ function infoTerms(D) {
       house’s own readings without pretending they measure the same thing.</>) },
     { id: "interval", term: "95% interval", body: (
       <>The uncertainty carried beside the headline: the greater of the spread among the polls in
-      the window and their {xref("margin-of-error", "95% interval", "sampling error")} – currently
-      ±{(L.alp2ppCi95 ?? 0).toFixed(1)} points on{" "}
-      {L.method.nPolls} polls across {L.method.windowDays} days. It cannot cover error the
+      the window and their {xref("margin-of-error", "95% interval", "sampling error")} – ±
+      {(L.alp2ppCi95 ?? 0).toFixed(1)} points on a share, so ±
+      {(2 * (L.alp2ppCi95 ?? 0)).toFixed(1)} beside the lead it sits with, since the lead moves
+      twice as far as either share – on {L.method.nPolls} polls across {L.method.windowDays}{" "}
+      days. It cannot cover error the
       whole industry shares, because an aggregate has no way to see a lean every poll inside it
       carries. Movement smaller than the interval is marked as such rather than reported as a
       change.</>) },
@@ -3098,8 +3100,9 @@ function infoTerms(D) {
       and the figure shrinks only with the square root of the sample – four times the interviews
       buys half the error. It prices chance and nothing else: skewed samples, turnout guesses and
       house choices sit outside it. Beside the headline the same idea is carried across
-      {" "}{L.method.nPolls} polls at once – currently ±{(L.alp2ppCi95 ?? 0).toFixed(1)} points –
-      as the {xref("interval", "margin of error", "95% interval")}. Pooling that many surveys is
+      {" "}{L.method.nPolls} polls at once as the {xref("interval", "margin of error", "95% interval")}{" "}
+      – ±{(L.alp2ppCi95 ?? 0).toFixed(1)} points on each share, shown at ±
+      {(2 * (L.alp2ppCi95 ?? 0)).toFixed(1)} beside the lead itself. Pooling that many surveys is
       what brings the band in narrower than one poll’s own ±3: the chance part of the error
       shrinks with the square root of the combined sample, while the part every house shares
       alike does not shrink at all.</>) },

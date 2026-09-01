@@ -365,10 +365,12 @@ function buildStaticSummary() {
 
       <h2>Two-party preferred</h2>
       <p class="ss-lead"><b>Labor ${L.alp2pp.toFixed(1)}%</b> &#183; <b>Coalition ${L.lnp2pp.toFixed(1)}%</b></p>
-      <p>${who} leads by ${Math.abs(lead)} points. The aggregate is a sample- and recency-weighted,
+      <p>${who} leads by ${Math.abs(lead).toFixed(1)} points
+        (&#177;${(2 * L.alp2ppCi95).toFixed(1)} on the lead). The aggregate is a sample- and
+        recency-weighted,
         house-effect-adjusted mean over a ${L.method.windowDays}-day window
         (${L.method.halfLifeDays}-day half-life), carrying a 95% interval of
-        &#177;${L.alp2ppCi95.toFixed(1)} points from ${L.method.nPolls} polls. Repeat waves from
+        &#177;${L.alp2ppCi95.toFixed(1)} points on each share from ${L.method.nPolls} polls. Repeat waves from
         one house inside a window or a calendar month count for the square root of their number,
         so three weekly waves count as 1.7, not 3.</p>
 

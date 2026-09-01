@@ -3502,10 +3502,12 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 
       <h2>Two-party preferred</h2>
       <p class="ss-lead"><b>Labor 52.0%</b> &#183; <b>Coalition 48.0%</b></p>
-      <p>Labor leads by 4 points. The aggregate is a sample- and recency-weighted,
+      <p>Labor leads by 4.0 points
+        (&#177;5.4 on the lead). The aggregate is a sample- and
+        recency-weighted,
         house-effect-adjusted mean over a 21-day window
         (7-day half-life), carrying a 95% interval of
-        &#177;2.7 points from 5 polls. Repeat waves from
+        &#177;2.7 points on each share from 5 polls. Repeat waves from
         one house inside a window or a calendar month count for the square root of their number,
         so three weekly waves count as 1.7, not 3.</p>
 
@@ -14974,7 +14976,7 @@ function infoTerms(D) {
   }, {
     id: "interval",
     term: "95% interval",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "The uncertainty carried beside the headline: the greater of the spread among the polls in the window and their ", xref("margin-of-error", "95% interval", "sampling error"), " \u2013 currently \xB1", (L.alp2ppCi95 ?? 0).toFixed(1), " points on", " ", L.method.nPolls, " polls across ", L.method.windowDays, " days. It cannot cover error the whole industry shares, because an aggregate has no way to see a lean every poll inside it carries. Movement smaller than the interval is marked as such rather than reported as a change.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "The uncertainty carried beside the headline: the greater of the spread among the polls in the window and their ", xref("margin-of-error", "95% interval", "sampling error"), " \u2013 \xB1", (L.alp2ppCi95 ?? 0).toFixed(1), " points on a share, so \xB1", (2 * (L.alp2ppCi95 ?? 0)).toFixed(1), " beside the lead it sits with, since the lead moves twice as far as either share \u2013 on ", L.method.nPolls, " polls across ", L.method.windowDays, " ", "days. It cannot cover error the whole industry shares, because an aggregate has no way to see a lean every poll inside it carries. Movement smaller than the interval is marked as such rather than reported as a change.")
   }, {
     id: "effective-sample",
     term: "Effective sample",
@@ -15002,7 +15004,7 @@ function infoTerms(D) {
   }, {
     id: "margin-of-error",
     term: "Margin of error",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "How far a poll can miss by because it asked a sample rather than the whole country. A thousand respondents on their own carry about \xB13 points of sampling error at 95% confidence, and the figure shrinks only with the square root of the sample \u2013 four times the interviews buys half the error. It prices chance and nothing else: skewed samples, turnout guesses and house choices sit outside it. Beside the headline the same idea is carried across", " ", L.method.nPolls, " polls at once \u2013 currently \xB1", (L.alp2ppCi95 ?? 0).toFixed(1), " points \u2013 as the ", xref("interval", "margin of error", "95% interval"), ". Pooling that many surveys is what brings the band in narrower than one poll\u2019s own \xB13: the chance part of the error shrinks with the square root of the combined sample, while the part every house shares alike does not shrink at all.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "How far a poll can miss by because it asked a sample rather than the whole country. A thousand respondents on their own carry about \xB13 points of sampling error at 95% confidence, and the figure shrinks only with the square root of the sample \u2013 four times the interviews buys half the error. It prices chance and nothing else: skewed samples, turnout guesses and house choices sit outside it. Beside the headline the same idea is carried across", " ", L.method.nPolls, " polls at once as the ", xref("interval", "margin of error", "95% interval"), " ", "\u2013 \xB1", (L.alp2ppCi95 ?? 0).toFixed(1), " points on each share, shown at \xB1", (2 * (L.alp2ppCi95 ?? 0)).toFixed(1), " beside the lead itself. Pooling that many surveys is what brings the band in narrower than one poll\u2019s own \xB13: the chance part of the error shrinks with the square root of the combined sample, while the part every house shares alike does not shrink at all.")
   }, {
     id: "monthly-average",
     term: "Monthly average",
@@ -17396,14 +17398,14 @@ function Hero({
   }, /*#__PURE__*/React.createElement("span", {
     className: "lead-tag"
   }, leadName, " leads by ", /*#__PURE__*/React.createElement(RollNum, {
-    value: String(Math.round(Math.abs(lead))),
+    value: Math.abs(lead).toFixed(1),
     spinIn: true
   }), unc ? /*#__PURE__*/React.createElement(React.Fragment, null, " ", /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "hi-range hi-term",
     title: "What a margin of error means",
     onClick: () => window.AP.openTerm && window.AP.openTerm("margin-of-error", "two-party preferred")
-  }, "\xB1 ", unc.ci95.toFixed(1), " pts")) : " pts"), /*#__PURE__*/React.createElement("button", {
+  }, "\xB1 ", (2 * unc.ci95).toFixed(1), " pts")) : " pts"), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "hi-method hi-term",
     title: "What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means",

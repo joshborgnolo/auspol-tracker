@@ -971,10 +971,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             <HeroGauge a={latest.a} ci={unc.ci95} color={lead >= 0 ? colA : colB}
                        aName={m.a.name} bName={m.b.name} sepRef={sepRef} />
           )}
-          {/* The lead now shares a line with how it was made and how well it
-              is known: an aggregate of a handful of polls is not known to a
-              tenth of a point, so the figure is rounded to whole points and
-              the interval sits beside it rather than in a footnote. It covers
+          {/* The lead shares a line with how it was made and how well it is
+              known, and the pair reads on one scale: the lead is a - b, so
+              the interval beside it is the lead-scale 95% interval, twice
+              the share-scale ci95 the gauge and band use (a - b = 2a - 100
+              quadruples the variance, so the half-width doubles). It covers
               how far the polls in the window disagree plus their sampling
               error; it cannot cover bias shared across the industry, which no
               aggregate can measure about itself. Not keyed on the matchup,
@@ -984,7 +985,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               the line whose words genuinely change. */}
           <div className="hero-interval">
             <span className="lead-tag">
-              {leadName} leads by <RollNum value={String(Math.round(Math.abs(lead)))} spinIn />
+              {leadName} leads by <RollNum value={Math.abs(lead).toFixed(1)} spinIn />
               {unc ? (
                 <>
                   {/* The figure gets the same treatment as the method word
@@ -995,7 +996,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                           title="What a margin of error means"
                           onClick={() => window.AP.openTerm &&
                             window.AP.openTerm("margin-of-error", "two-party preferred")}>
-                    ± {unc.ci95.toFixed(1)} pts
+                    ± {(2 * unc.ci95).toFixed(1)} pts
                   </button>
                 </>
               ) : " pts"}
