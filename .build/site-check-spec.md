@@ -15,8 +15,8 @@ silently. The site is the product; it is the least-watched artifact in the repo.
 
 ## What is deployed
 
-`CNAME` → **auspoltracker.com**, GitHub Pages, workflow "pages build and
-deployment" (typically 20–30 s after a push to `main`).
+`CNAME` → **auspoltracker.com**, GitHub Pages, workflow "pages-build-deployment"
+(typically 20–30 s after a push to `main`).
 
 Served from the repo root:
 
@@ -47,7 +47,7 @@ mirror-drift this repo has just spent effort deleting. The committed
 
 Two entry points, for two different failures:
 
-1. `on: workflow_run:` for **"pages build and deployment"**, `types: [completed]`
+1. `on: workflow_run:` for **"pages-build-deployment"**, `types: [completed]`
    — catches a bad or missing deploy immediately after it happens.
    **Check out `${{ github.event.workflow_run.head_sha }}`, not `main`.** The
    comparison is only meaningful against the commit that was actually deployed;
@@ -71,7 +71,12 @@ Two entry points, for two different failures:
    200 and non-zero length. This is the check the hash comparison cannot do —
    `index.html` can be byte-perfect while a hashed asset it names was never
    emitted. `cycle-source` matters most: it is fetched at runtime, so its absence
-   breaks a whole tab while the page still loads.
+   breaks a whole tab while the page still loads. Extraction reads QUOTED
+   contexts only (attributes, JS string literals, css `url()`) — a source
+   comment in the deployed page merely mentions `assets/np-project.js`, a file
+   inlined by design, and a bare-text match once fetched a 404 on it. And the
+   og card's reference carries a `?v=<date>` cache-buster, so references are
+   captured and fetched query-string and all.
 4. **The other served files** — `feed.xml`, `sitemap.xml`, `robots.txt`,
    `auspol-polling.html` — same hash comparison, same grace.
 
