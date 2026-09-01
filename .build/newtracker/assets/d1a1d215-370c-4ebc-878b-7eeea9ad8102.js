@@ -99,7 +99,7 @@ const tnUntil = (ms) => {
   return w + (w === 1 ? " week" : " weeks");
 };
 
-function NextPollTicker({ pinned }) {
+function NextPollTicker({ showScore }) {
   /* A minute is finer than the answer ever is - the tightest projection here
      is to the day - but it keeps "59 mins" from sitting there after it has
      become "in 2 mins". */
@@ -245,14 +245,19 @@ function NextPollTicker({ pinned }) {
      invariant). Every candidate renders; items past the measured budget
      get .tn-park (out of flow + hidden, but still laid out and measurable,
      so a later pass with more room can show them again). The budget is
-     read off live geometry: unpinned, the gap between the tab set and the
-     bar's right edge the ticker docks to; pinned, twice the shorter run
-     from the bar's centre to the tab set and to the docked 2PP score. It
-     runs pre-paint (an over-filled bar never reaches the screen), again on
-     row resize and pin flips, once webfonts settle, and once more ~400ms
-     after a flip to use the pin glide's END geometry. The state is a
-     prefix count: the most urgent items (overdue first) are always the
-     ones kept. */
+     read off live geometry and follows the SEAT, not the pin: right-seated
+     (unpinned, or pinned while the hero's 2PP block is still on screen) it
+     is the gap between the tab set and the bar's right edge the ticker
+     docks to; centred (show-score) it is twice the shorter run from the
+     bar's centre to the tab set and to the docked 2PP score. Keying the
+     budget to the seat means a pin flip with the hero on screen touches
+     nothing here - no item pops at the sticky boundary; count and seat
+     change together at the hero gate, one move as in CSS. It runs
+     pre-paint (an over-filled bar never reaches the screen), again on row
+     resize and seat flips, once webfonts settle, and once more ~400ms
+     after a flip to use the glide's END geometry. The state is a prefix
+     count: the most urgent items (overdue first) are always the ones
+     kept. */
   React.useLayoutEffect(() => {
     const el = rootRef.current;
     if (!el || !items.length) return;
@@ -268,7 +273,7 @@ function NextPollTicker({ pinned }) {
       const gap = parseFloat(getComputedStyle(el).columnGap) || 0;
       const kids = el.children;
       let budget;
-      if (pinned) {
+      if (showScore) {
         const scoreEl = inner.querySelector(".tab-score");
         const scoreR = scoreEl ? scoreEl.getBoundingClientRect() : null;
         const centre = (innerR.left + innerR.right) / 2;
@@ -292,7 +297,7 @@ function NextPollTicker({ pinned }) {
     if (ro && el.parentElement) ro.observe(el.parentElement);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(compute);
     return () => { clearTimeout(settle); if (ro) ro.disconnect(); };
-  }, [itemsKey, pinned]);
+  }, [itemsKey, showScore]);
 
   if (!items.length) return null;
 
@@ -438,7 +443,11 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
               </button>
             ))}
           </div>
-          <NextPollTicker pinned={pinned} />
+          {/* the ticker's fit budget is keyed to the SEAT, and the seat is
+              show-score's (score docked => centred), not the pin's - a bare
+              pin flip with the hero on screen moves neither the seat nor
+              the item count (see the fit pass in NextPollTicker) */}
+          <NextPollTicker showScore={pinned && heroGone} />
           <TabScore onGoHero={goHero} matchup={tppMatchup} />
         </div>
       </nav>
