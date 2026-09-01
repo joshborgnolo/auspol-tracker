@@ -3021,9 +3021,11 @@ function infoTerms(D) {
             onClick={() => window.AP.openTerm && window.AP.openTerm(to, from)}>{label}</button>);
   const list = [
     { id: "approval", term: "Approval", body: (
-      <>A verdict on the job: approve minus disapprove for a leader’s performance. Essential words
-      it “Q. Do you approve or disapprove of the job Anthony Albanese is doing as Prime
-      Minister?”, and Newspoll, YouGov and Resolve ask the same form with their own wordings.
+      <>A verdict on the job: approve minus disapprove for a leader’s performance. Essential asks,
+      “Do you approve or disapprove of the job Anthony Albanese is doing as Prime Minister?”.
+      YouGov and Newspoll ask, “Are you satisfied or dissatisfied with the way Anthony Albanese is
+      doing his job as Prime Minister?”. Resolve asks, “How would you rate Angus Taylor’s
+      performance as opposition leader in recent weeks?”.
       {" "}{xref("favourability", "approval", "Favourability")} is a different question – about
       the person, not the job – asked by the houses that ask it instead. The numbers it feeds
       are what {xref("net-approval", "approval", "net approval")} records.</>) },
