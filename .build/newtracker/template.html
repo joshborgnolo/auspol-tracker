@@ -2578,6 +2578,11 @@ body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px
     transition: transform .38s cubic-bezier(.22, 1, .36, 1);
   }
   .tabs.pinned .tab-next { transform: translateX(calc(-50% - 50cqw)); }
+  /* an item past the measured budget parks rather than wraps: out of flow
+     and hidden, but still rendered (and measurable), so the fit pass can
+     bring it straight back the moment the bar has room for it again. The
+     number of items on the bar is whatever fits, decided live. */
+  .tn-item.tn-park { position: absolute; visibility: hidden; }
 }
 .tn-lab { font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
   color: var(--ink-faint); }

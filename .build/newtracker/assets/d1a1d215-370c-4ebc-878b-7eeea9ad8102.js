@@ -79,7 +79,14 @@ function TabScore({ onGoHero, matchup }) {
    onto the next slot-week instead, which read exactly like a fresh,
    unmissed forecast. The count clears itself the moment the real release
    is recorded - the projection re-anchors, and this bar and the panel fall
-   back to guessing about the future. */
+   back to guessing about the future.
+
+   The roll itself is one slot per house, nearest first, and how much of it
+   shows is a SPACE decision, not a set number: a fit pass below seats as
+   many items as clear the tab set and the docked score on the live bar,
+   and parks the rest (still rendered, still measurable) until room
+   returns. The old machinery - a 7-day window, then a hard count of three
+   - pretended to know the budget without ever measuring it. */
 const TN_DAY = 86400000;
 const tnUntil = (ms) => {
   const mins = Math.max(1, Math.round(ms / 60000));
@@ -92,7 +99,7 @@ const tnUntil = (ms) => {
   return w + (w === 1 ? " week" : " weeks");
 };
 
-function NextPollTicker() {
+function NextPollTicker({ pinned }) {
   /* A minute is finer than the answer ever is - the tightest projection here
      is to the day - but it keeps "59 mins" from sitting there after it has
      become "in 2 mins". */
@@ -101,9 +108,12 @@ function NextPollTicker() {
     const id = setInterval(() => tick((x) => x + 1), 60000);
     return () => clearInterval(id);
   }, []);
-  if (!window.AP.nextPolls) return null;
-  const { rows, nowMs, t0 } = window.AP.nextPolls();
-  if (!rows.length) return null;
+  const [fit, setFit] = React.useState(0);
+  const rootRef = React.useRef(null);
+  const proj = window.AP.nextPolls ? window.AP.nextPolls() : null;
+  const rows = proj ? proj.rows : [];
+  const nowMs = proj ? proj.nowMs : 0;
+  const t0 = proj ? proj.t0 : 0;
 
   /* A house that keeps a weekday can only publish ON that weekday, and the
      countdown has to respect that or it says something impossible. Essential
@@ -169,14 +179,14 @@ function NextPollTicker() {
     .filter((r) => !r.missed)
     .map((r) => ({ r, t: targetOf(r) }))
     .sort((a, b) => a.t.at - b.t.at)
-    /* Only the coming week: the bar answers "what lands soon", and a wave a
-       fortnight or more out is the panel's business, not a countdown. A
-       weekly house can appear twice in a seven-day window, and that is the
-       honest shape of the schedule, not a repetition bug. */
-    .filter(({ t }) =>
-      t.byDay
-        ? Math.round((t.at - t0) / TN_DAY) <= 7
-        : t.at <= nowMs + 7 * TN_DAY)
+    /* One slot PER HOUSE, its nearest: the bar is a roll-call of what's due
+       soonest from EVERY house, and a weekly house's second slot inside the
+       coming week only repeats a name instead of adding another house to
+       the roll. There is no count or day-window cap here - how much of the
+       roll actually shows is a space decision measured live on the bar
+       itself (the fit pass below). */
+    .filter(((seen) => ({ r }) =>
+      !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set()))
     .map(({ r, t }) => {
       const half = r.winHalf || 0;
       let when;
@@ -188,9 +198,18 @@ function NextPollTicker() {
            that could appear while the page is open. */
         when = days === 0 ? (r.release <= nowMs ? "any moment now" : "today")
              : days === 1 ? "tomorrow"
-             : tnUntil(days * TN_DAY);
+             /* exact day counts past "tomorrow" - the panel's own phrasing
+                ("in 12 days") - so the bar and the panel name the same slot
+                the same way; tnUntil's week rounding ("2 weeks") made them
+                disagree */
+             : days + " days";
       } else {
-        when = t.at <= nowMs ? "any moment now" : tnUntil(t.at - nowMs);
+        /* sub-day resolution only inside 36 hours; past that, the same exact
+           day count the weekday houses get */
+        when = t.at <= nowMs ? "any moment now"
+             : Math.round((t.at - nowMs) / 3600000) < 36
+             ? tnUntil(t.at - nowMs)
+             : Math.round((t.at - t0) / TN_DAY) + " days";
       }
       /* "(maybe)" answers "could it be some FUTURE day instead?". A weekday
          house can only file on its weekday, so every alternative date is a
@@ -213,17 +232,75 @@ function NextPollTicker() {
       return { firm: r.pollster, when, maybe, site: r.site };
     });
 
-  /* Overdue leads: an already-blown forecast is more news than any countdown,
-     and the overdue count is capped by the same three slots so a busy week
-     of misses cannot push the future off the bar entirely. */
-  const items = [...overdueItems, ...upcomingItems].slice(0, 3);
+  /* Overdue leads: an already-blown forecast is more news than any
+     countdown. The tail is the fit pass's business - the candidate list is
+     the whole roll (one slot per house, nearest first), and the bar shows
+     as much of it as clears the neighbours. */
+  const items = [...overdueItems, ...upcomingItems];
+  const itemsKey = items.map((it) => it.firm + it.when).join("");
+
+  /* ---- fit pass: as many items as the bar has room for -----------------
+     The ticker is absolutely seated in both bar states, so anything parked
+     inside it can never move the bar's own layout (the pinned-mechanics
+     invariant). Every candidate renders; items past the measured budget
+     get .tn-park (out of flow + hidden, but still laid out and measurable,
+     so a later pass with more room can show them again). The budget is
+     read off live geometry: unpinned, the gap between the tab set and the
+     bar's right edge the ticker docks to; pinned, twice the shorter run
+     from the bar's centre to the tab set and to the docked 2PP score. It
+     runs pre-paint (an over-filled bar never reaches the screen), again on
+     row resize and pin flips, once webfonts settle, and once more ~400ms
+     after a flip to use the pin glide's END geometry. The state is a
+     prefix count: the most urgent items (overdue first) are always the
+     ones kept. */
+  React.useLayoutEffect(() => {
+    const el = rootRef.current;
+    if (!el || !items.length) return;
+    const SAFE = 24;
+    const compute = () => {
+      if (!el.isConnected) return;
+      const inner = el.parentElement;
+      if (!inner) return;
+      const innerR = inner.getBoundingClientRect();
+      if (innerR.width < 1) return;
+      const setEl = inner.querySelector(".tabs-set");
+      const setR = setEl ? setEl.getBoundingClientRect() : null;
+      const gap = parseFloat(getComputedStyle(el).columnGap) || 0;
+      const kids = el.children;
+      let budget;
+      if (pinned) {
+        const scoreEl = inner.querySelector(".tab-score");
+        const scoreR = scoreEl ? scoreEl.getBoundingClientRect() : null;
+        const centre = (innerR.left + innerR.right) / 2;
+        const leftRoom = centre - (setR ? setR.right : innerR.left);
+        const rightRoom = (scoreR && scoreR.width ? scoreR.left : innerR.right) - centre;
+        budget = 2 * Math.max(0, Math.min(leftRoom, rightRoom) - SAFE);
+      } else {
+        budget = innerR.right - (setR ? setR.right : innerR.left) - SAFE;
+      }
+      let used = kids[0].offsetWidth, k = 0;
+      for (let i = 1; i < kids.length; i++) {
+        if (used + gap + kids[i].offsetWidth > budget) break;
+        used += gap + kids[i].offsetWidth;
+        k++;
+      }
+      setFit(k);
+    };
+    compute();
+    const settle = setTimeout(compute, 420);
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(compute) : null;
+    if (ro && el.parentElement) ro.observe(el.parentElement);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(compute);
+    return () => { clearTimeout(settle); if (ro) ro.disconnect(); };
+  }, [itemsKey, pinned]);
+
   if (!items.length) return null;
 
   const title = "Projected from each house's recent publication intervals"
     + " – the earliest each wave could land, not the likeliest."
     + " A slot that passes unrecorded counts up as overdue until the release is added";
   return (
-    <div className="tab-next" title={title}>
+    <div ref={rootRef} className="tab-next" title={title}>
       {/* the label itself is the way DOWN to the full panel on the snapshot -
           same trick as the house names being the way OUT to the publisher */}
       <button type="button" className="tn-lab tn-jump"
@@ -232,7 +309,7 @@ function NextPollTicker() {
         Next
       </button>
       {items.map((it, i) => (
-        <span className="tn-item" key={i}>
+        <span className={"tn-item" + (i >= fit ? " tn-park" : "")} key={i}>
           {/* the name carries the house's publication link, the same one the
               panel attaches to the pollster name */}
           <span className="tn-firm">
@@ -330,7 +407,7 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
               </button>
             ))}
           </div>
-          <NextPollTicker />
+          <NextPollTicker pinned={pinned} />
           <TabScore onGoHero={goHero} matchup={tppMatchup} />
         </div>
       </nav>

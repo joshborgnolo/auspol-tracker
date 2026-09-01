@@ -149,10 +149,8 @@ function ticker(rows, t0, nowMs) {
     .filter((r) => !r.missed)
     .map((r) => ({ r, t: targetOf(r) }))
     .sort((a, b) => a.t.at - b.t.at)
-    .filter(({ t }) =>
-      t.byDay
-        ? Math.round((t.at - t0) / DAY) <= 7
-        : t.at <= nowMs + 7 * DAY)
+    .filter(((seen) => ({ r }) =>
+      !seen.has(r.pollster) && !!seen.add(r.pollster))(new Set()))
     .map(({ r, t }) => {
       const half = r.winHalf || 0;
       let when;
@@ -160,9 +158,12 @@ function ticker(rows, t0, nowMs) {
         const days = Math.round((t.at - t0) / DAY);
         when = days === 0 ? (r.release <= nowMs ? "any moment now" : "today")
              : days === 1 ? "tomorrow"
-             : tnUntil(days * DAY);
+             : days + " days";
       } else {
-        when = t.at <= nowMs ? "any moment now" : tnUntil(t.at - nowMs);
+        when = t.at <= nowMs ? "any moment now"
+             : Math.round((t.at - nowMs) / 3600000) < 36
+             ? tnUntil(t.at - nowMs)
+             : Math.round((t.at - t0) / DAY) + " days";
       }
       const maybe = when !== "any moment now" &&
         (half > 7 || !!r.loose ||
@@ -170,7 +171,11 @@ function ticker(rows, t0, nowMs) {
          (r.releaseDow == null && half > 0));
       return { firm: r.pollster, when, maybe, site: r.site };
     });
-  return [...overdueItems, ...upcomingItems].slice(0, 3);
+  /* the shipped bar no longer slices the roll: the candidate list is one
+     slot per house, nearest first, and how many show is a fit decision
+     measured on the live bar (not simulated here - the screen is the
+     budget, the sim only checks the roll's derivation and order) */
+  return [...overdueItems, ...upcomingItems];
 }
 
 // ---------------------------------------------------------------------------
@@ -214,8 +219,13 @@ function eq(name, got, want) {
   eq("Essential not overdue, slipped to THIS week's Wed 2 Sep", [es && es.overdue, es && es.missed], [false, false]);
   eq("panel counts to tomorrow, no 'or' alternative", es && panelWhen(es), "tomorrow");
   eq("Essential leads the ticker as tomorrow", items[0] && [items[0].firm, items[0].when], ["Essential", "tomorrow"]);
-  eq("ticker is the next-week list", items.map((i) => [i.firm, i.when]),
-    [["Essential", "tomorrow"], ["Roy Morgan", "6 days"]]);
+  // the roll is every house's nearest slot, unsliced - on the live bar the
+  // fit pass trims this to the room it actually has; the roll itself never
+  // caps (a weekly house appears once, not twice inside the same week)
+  eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
+    [["Essential", "tomorrow"], ["Roy Morgan", "6 days"], ["YouGov", "8 days"],
+     ["Resolve", "12 days"], ["DemosAU", "12 days"], ["Newspoll", "19 days"],
+     ["RedBridge / Accent", "26 days"]]);
   // the hold-the-slot rule, still in force for any unconfirmed slot
   const holdRows = project(cadHold, t0, nowMs);
   const holdItems = ticker(holdRows, t0, nowMs);
@@ -317,9 +327,9 @@ function eq(name, got, want) {
 // S7 – Sat 10 Oct: DemosAU's loose window (13 Sep – 5 Oct) has closed
 // unrecorded. It reads as overdue from the window's close, in both places,
 // parked at the panel's foot rather than floating to the top as "open now".
-// (Six weeks past the data clock every dated house is blown too, so the
-// ticker's three slots go to the most-overdue trio; DemosAU's own item is
-// checked on its row alone.)
+// (Six weeks past the data clock every house is blown, so the ticker's roll
+// is nothing but red counts, most overdue first; DemosAU's own row is also
+// checked on its own below.)
 {
   const { label, t0, nowMs } = scen("Sat 10 Oct", "2026-10-10", 600);
   const rows = project(cad, t0, nowMs);
@@ -331,9 +341,12 @@ function eq(name, got, want) {
   eq("missed rows park at the foot, cadence order", rows.slice(-2).map((r) => r.pollster), ["Essential", "DemosAU"]);
   // Essential's slipped 2 Sep slot past its own edge too (the frozen sim data
   // can't run the 3 Sep confirmation that would have slipped it on), so it
-  // tops the most-overdue trio, a week clear of Roy Morgan.
-  eq("ticker order: most overdue first", items.map((i) => [i.firm, i.when]),
-    [["Essential", "38 days overdue"], ["Roy Morgan", "33 days overdue"], ["YouGov", "31 days overdue"]]);
+  // leads the late roll, a week clear of Roy Morgan.
+  eq("ticker order: most overdue first, all houses kept", items.map((i) => [i.firm, i.when]),
+    [["Essential", "38 days overdue"], ["Roy Morgan", "33 days overdue"],
+     ["YouGov", "31 days overdue"], ["Resolve", "27 days overdue"],
+     ["Newspoll", "20 days overdue"], ["RedBridge / Accent", "13 days overdue"],
+     ["DemosAU", "5 days overdue"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("loose missed leads as overdue in the ticker", daItems[0] && [daItems[0].firm, daItems[0].when, !!daItems[0].overdue],
     ["DemosAU", "5 days overdue", true]);
