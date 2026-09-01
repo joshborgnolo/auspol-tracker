@@ -2794,7 +2794,13 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   border: 1.5px solid var(--line-2); border-radius: 4px;
 }
 .ap-check.radio .ap-tick { border-radius: 50%; }
-.ap-check.on .ap-tick { background: var(--accent); border-color: var(--accent); }
+/* Lit by a gradient across its own face, exactly as .pg-check is. A flat
+   fill plus a light strip is the treatment .pg-check abandoned. */
+.ap-check.on .ap-tick {
+  background: linear-gradient(to bottom,
+    color-mix(in oklch, white 15%, var(--accent)), var(--accent));
+  border-color: color-mix(in oklch, black 14%, var(--accent));
+}
 /* Same tick as .pg-check, scaled to this box rather than drawn afresh: the
    padding box is 12px here (15px, border-box, 1.5px border) against 11px
    there, so every measure is the approved one x 12/11. Drawn independently it
@@ -2816,8 +2822,13 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
    else. That is the same pair .pg-check uses, so a checkbox means the same
    thing wherever the site draws one. */
 .ap-tick { box-shadow: inset 0 1px 2px var(--btn-press); }
+/* No `inset 0 1px 0 var(--btn-lit)` here: --btn-lit is 85% white, so on a
+   saturated fill it lays a near-white 1px band across the top of a 15px box
+   and reads as a strip the fill failed to reach, not as light falling on a
+   cap. .pg-check dropped it for that reason; the gradient above does the
+   lighting instead, and these two shadows do the lifting. */
 .ap-check.on .ap-tick {
-  box-shadow: inset 0 1px 0 var(--btn-lit), 0 1px 1.5px var(--btn-shade);
+  box-shadow: 0 1px 1.5px var(--btn-shade), 0 2px 4px -2px var(--btn-shade);
 }
 /* the row travels under the finger, and the tick travels with it rather than
    floating over a surface that moved beneath it */
