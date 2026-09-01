@@ -104,7 +104,7 @@ try {
      draw gets the webfont even if the page above the fold hasn't yet asked
      for the weight or style the card needs. A file that genuinely cannot
      load fails the check below. */
-  const FACES = ["Source Serif 4", "IBM Plex Sans", "Source Sans 3"]; // SS3: the wordmark only
+  const FACES = ["Merriweather", "Plus Jakarta Sans", "Source Sans 3"]; // SS3: the wordmark only
   await page.evaluate(`Promise.all(${JSON.stringify(FACES)}.flatMap(
     (f) => ["400", "600", "700"].map((w) => document.fonts.load(w + ' 60px "' + f + '"'))
   )).then(() => 0)`);

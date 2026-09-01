@@ -103,12 +103,13 @@ let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
 const FONTS = [
   /* The text faces are self-hosted latin subsets; the variable cuts serve
      the page's whole weight range from one file per style. */
-  { file: "sourceserif4-latin.woff2",        family: "Source Serif 4", style: "normal", weight: "200 900", preload: true },
-  { file: "sourceserif4-italic-latin.woff2", family: "Source Serif 4", style: "italic", weight: "200 900" },
-  { file: "ibmplexsans-latin.woff2",         family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
+  { file: "merriweather-latin.woff2",        family: "Merriweather", style: "normal", weight: "300 900", preload: true },
+  { file: "merriweather-italic-latin.woff2", family: "Merriweather", style: "italic", weight: "300 900" },
+  { file: "plusjakartasans-latin.woff2",     family: "Plus Jakarta Sans", style: "normal", weight: "200 800", preload: true },
   /* Source Sans 3 stays shipped for one scoped caller: the .wordmark
      lockup, which keeps its pre-swap face (the only @font-face request the
-     masthead makes - ibmplexsans would only cover the body). */
+     masthead makes for the lockup - plusjakartasans files only cover the
+     body). */
   { file: "sourcesans3-latin.woff2",         family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
   /* Crimson Pro ships only for the tab bar labels (.tab-label), which the
      masthead paints on route in - preload it too. */
