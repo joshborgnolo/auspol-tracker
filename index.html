@@ -1078,12 +1078,16 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    The value is carried by the .sr-only span, which stays selectable, so the
    line copies as the sentence it looks like. */
 .roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
-.hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+.hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+/* The lead line got promoted out of .hero-sub to sit directly under the
+   gauge: the answer to the page's question belongs with the measure that
+   shows it, before the scaffolding that qualifies it. It takes its spacing
+   from the gauge the way the interval rows below take theirs. */
+.lead-line { margin-top: 10px; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
-/* The interval sits directly under the headline pair, quieter than the numbers
-   but above the lead/delta line – it qualifies the figure, so it reads before
-   the movement does. */
+/* The interval sits under the lead line, quieter than it – it qualifies the
+   figure, so it reads after the answer and before the movement. */
 /* the hero's subhead now matches the other panels; the method label that used
    to sit beside it in small caps has moved down to the interval line, where it
    reads as the first clause of how the figure was made and how well it is known */
@@ -3258,7 +3262,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
 
   /* hero readout crossfades when the matchup changes */
-  .hero-readout, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
+  .hero-readout, .lead-line, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
   @keyframes readout-in {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: none; }
@@ -17265,6 +17269,13 @@ function Hero({
     bName: m.b.name,
     sepRef: sepRef
   }), /*#__PURE__*/React.createElement("div", {
+    className: "lead-line"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "lead-tag"
+  }, leadName, " leads by ", /*#__PURE__*/React.createElement(RollNum, {
+    value: Math.abs(lead).toFixed(1),
+    spinIn: true
+  }), " pts")), /*#__PURE__*/React.createElement("div", {
     className: "hero-interval"
   }, /*#__PURE__*/React.createElement("button", {
     type: "button",
@@ -17282,12 +17293,7 @@ function Hero({
     className: "hi-note"
   }, "95% interval \xB7 ", unc.n, " poll", unc.n === 1 ? "" : "s", " in ", D.latest.method.windowDays, " days")), /*#__PURE__*/React.createElement("div", {
     className: "hero-sub"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "lead-tag"
-  }, leadName, " leads by ", /*#__PURE__*/React.createElement(RollNum, {
-    value: Math.abs(lead).toFixed(1),
-    spinIn: true
-  }), " pts"), /*#__PURE__*/React.createElement(Delta, {
+  }, /*#__PURE__*/React.createElement(Delta, {
     value: monthDelta,
     suffix: " pt",
     small: true,

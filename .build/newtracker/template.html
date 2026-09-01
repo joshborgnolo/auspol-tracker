@@ -34,7 +34,7 @@
    ============================================================ */
 :root {
   /* surfaces – warm paper */
-  --bg:        oklch(0.985 0.004 91.4);   /* #FBFAF7 */
+  --bg:        oklch(0.970 0.008 78);
   --surface:   oklch(0.992 0.004 85);
   --surface-2: oklch(0.980 0.006 80);
 
@@ -1030,12 +1030,16 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    The value is carried by the .sr-only span, which stays selectable, so the
    line copies as the sentence it looks like. */
 .roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
-.hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 14px; flex-wrap: wrap; }
+.hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+/* The lead line got promoted out of .hero-sub to sit directly under the
+   gauge: the answer to the page's question belongs with the measure that
+   shows it, before the scaffolding that qualifies it. It takes its spacing
+   from the gauge the way the interval rows below take theirs. */
+.lead-line { margin-top: 10px; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
-/* The interval sits directly under the headline pair, quieter than the numbers
-   but above the lead/delta line – it qualifies the figure, so it reads before
-   the movement does. */
+/* The interval sits under the lead line, quieter than it – it qualifies the
+   figure, so it reads after the answer and before the movement. */
 /* the hero's subhead now matches the other panels; the method label that used
    to sit beside it in small caps has moved down to the interval line, where it
    reads as the first clause of how the figure was made and how well it is known */
@@ -2289,7 +2293,7 @@ body.dark .fb-form { color-scheme: dark; }
 /* The page colour. Editorial and cool are both element+class, so this wins on
    source order over body.cool's own --bg - which is why one value here sets
    the light page for warm AND cool paper. */
-body.editorial { --bg: oklch(0.985 0.004 91.4); --chart-bg: var(--bg); }   /* #FBFAF7 */
+body.editorial { --bg: oklch(0.975 0.009 80); --chart-bg: var(--bg); }
 
 body.editorial .content { gap: 0; }
 
@@ -3210,7 +3214,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
 
   /* hero readout crossfades when the matchup changes */
-  .hero-readout, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
+  .hero-readout, .lead-line, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
   @keyframes readout-in {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: none; }

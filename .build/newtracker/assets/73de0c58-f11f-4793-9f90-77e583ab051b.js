@@ -934,6 +934,17 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             <HeroGauge a={latest.a} ci={unc.ci95} color={lead >= 0 ? colA : colB}
                        aName={m.a.name} bName={m.b.name} sepRef={sepRef} />
           )}
+          {/* The lead line, now directly under the gauge: not keyed on the
+              matchup either, for the same reason the readout above isn't -
+              the margin is a figure that travels between the two questions,
+              so it rolls rather than being replaced. The words around it swap
+              outright, as the party names above them do, and the readout-in
+              fade lives here, on the line whose words genuinely change. */}
+          <div className="lead-line">
+            <span className="lead-tag">
+              {leadName} leads by <RollNum value={Math.abs(lead).toFixed(1)} spinIn /> pts
+            </span>
+          </div>
           {/* An aggregate of five polls is not known to a tenth of a point, so
               the interval sits with the number rather than in a footnote. It
               covers how far the polls in the window disagree plus their
@@ -974,15 +985,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               </span>
             )}
           </div>
-          {/* Not keyed on the matchup either, for the same reason the readout
-              above isn't: the margin is a figure that travels between the two
-              questions - 2.8 points against the Coalition, 7.6 against One
-              Nation - so it rolls rather than being replaced. The words around
-              it swap outright, as the party names above them do. */}
           <div className="hero-sub">
-            <span className="lead-tag">
-              {leadName} leads by <RollNum value={Math.abs(lead).toFixed(1)} spinIn /> pts
-            </span>
             <Delta value={monthDelta} suffix=" pt" small roll spinIn />
             <span className="hero-sub-note">
               {(m.real || (altL && altL.aPrev != null)) ? "vs. one month ago" : "vs. previous reading"}
