@@ -1096,14 +1096,8 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   content: "•"; color: var(--ink-3); font-weight: 400; margin-right: 8px;
 }
 .hero-interval .lead-tag { font-variant-numeric: tabular-nums; }
-@media (max-width: 620px) {
-  /* stack each clause on its own line and drop the dots that would dangle,
-     with the lead and the range given their own baseline because the roll
-     digit inside it is the page's biggest figure */
-  .hero-interval > * { flex-basis: 100%; }
-  .hero-interval > *::after, .hero-interval > .hi-term + *::before { content: none; }
-  .hero-interval > * + * { margin-top: 2px; }
-}
+/* No narrow-screen variant: the strip wraps naturally if the row overflows,
+   and the same clause order, dots and sizes are wanted at every width. */
 /* A word that is also the way into its own definition. Reset far enough that
    a <button> stops looking like one, and no further - whatever rule styles the
    label itself still sets its size and colour, so this can wrap any of them. */
