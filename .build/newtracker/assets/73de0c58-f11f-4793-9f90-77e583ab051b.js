@@ -1012,7 +1012,16 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             </button>
             {!adjusted && <span className="eyebrow-warn">Limited data</span>}
             {unc && (
-              <span className="hi-note">95% interval</span>
+              /* One more route to the margin's definition: the glossary
+                 files "95% interval" as a synonym waypoint of margin of
+                 error, so a click lands on the same page the ± figure and
+                 the caveat's "margin" already open. */
+              <button type="button" className="hi-note hi-term"
+                      title="What a margin of error means"
+                      onClick={() => window.AP.openTerm &&
+                        window.AP.openTerm("margin-of-error", "two-party preferred")}>
+                95% interval
+              </button>
             )}
           </div>
           <div className="hero-sub">
