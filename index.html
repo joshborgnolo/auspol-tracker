@@ -2311,6 +2311,11 @@ body.dark .fb-form { color-scheme: dark; }
      scrolls past every control before seeing the thing they came for. The two
      chip groups are small enough to share a line, so they do. */
   .hero-controls { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+  /* …and the same fold pressure halves the wrap gap between the headline
+     stack and that control strip: the desktop 24px is one row-gap among
+     similar ones; on a phone it was the biggest void on the wire to the
+     chart */
+  .hero-top { row-gap: 12px; }
   .text-toggle { gap: 9px; }
   .tt-opt { font-size: 13px; }
   .tt-dots { margin-right: 5px; }
