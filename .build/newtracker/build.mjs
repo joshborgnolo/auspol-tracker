@@ -110,6 +110,9 @@ const FONTS = [
      lockup, which keeps its pre-swap face (the only @font-face request the
      masthead makes - ibmplexsans would only cover the body). */
   { file: "sourcesans3-latin.woff2",         family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
+  /* Crimson Pro ships only for the tab bar labels (.tab-label), which the
+     masthead paints on route in - preload it too. */
+  { file: "crimsonpro-latin.woff2",          family: "Crimson Pro", style: "normal", weight: "200 900", preload: true },
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });
