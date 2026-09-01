@@ -22,9 +22,10 @@
 
    READ-ONLY against data/polls.json. The agent proposes; a human
    disposes. State lives in data/link-health.json and is written ONLY
-   when some entry's verdict, finalUrl or redirect count changes (or
-   the URL set itself changes) — lastChecked never dirties the file,
-   same rule np-score.mjs follows for its identity tuple.
+   when some entry's verdict, finalUrl, redirect count or intermediate
+   hops change (or the URL set itself changes) — lastChecked never
+   dirties the file, same rule np-score.mjs follows for its identity
+   tuple.
 
    Exit classes (coverage-doctor.mjs conventions — check-coverage's
    `3` already means "actionable gap"; do not reuse it):
@@ -124,7 +125,14 @@ function wallMatch(host, port, status, title, body) {
 /* --- redirects --------------------------------------------------------
    `redirect: "follow"` collapses the chain; the hop count IS the drift
    signal, so follow manually. Range on every hop: we only classify from
-   status + title and PDFs need a content-type, not a body. */
+   status + title and PDFs need a content-type, not a body.
+
+   Every fetched URL is remembered in `visited` (original … terminal).
+   When the chain runs more than one redirect, the INTERMEDIATE hops are
+   written to the ledger as `hops`: the terminal hop of a walled chain is
+   the wall endpoint (news24's /nocookies) but the FIRST hop's Location
+   is the publisher's own 301 mapping — the rewrite candidate a human
+   acts on. Recording only `finalUrl` throws exactly that hop away. */
 async function readPrefix(res, max = 16384) {
   const reader = res.body.getReader();
   const chunks = [];
@@ -146,6 +154,7 @@ class CitationError extends Error {}
 
 async function fetchFinal(url) {
   let current = url;
+  const visited = [current];
   for (let hops = 0; hops <= MAX_HOPS; hops++) {
     let res;
     try {
@@ -159,13 +168,14 @@ async function fetchFinal(url) {
     }
     if ([301, 302, 303, 307, 308].includes(res.status) && res.headers.get("location")) {
       current = new URL(res.headers.get("location"), current).href;
+      visited.push(current);
       continue;
     }
     let type = res.headers.get("content-type") || "";
     // PDF identity comes from the header, not the magic bytes
     const body = /pdf/i.test(type) ? "" : await readPrefix(res);
     const title = (body.match(/<title[^>]*>([\s\S]*?)<\/title>/i) || [null, ""])[1];
-    return { status: res.status, finalUrl: current, redirects: hops, type, title, body };
+    return { status: res.status, finalUrl: current, redirects: hops, type, title, body, visited };
   }
   throw new CitationError(`too many redirects (>${MAX_HOPS})`);
 }
@@ -277,6 +287,10 @@ async function main() {
       status: got ? got.status : 0,
       note,
     };
+    // intermediate hops only — original and terminal are url/finalUrl.
+    // hops[0] is the publisher's own first Location: the rewrite candidate
+    const via = got ? got.visited.slice(1, -1) : base?.hops || [];
+    if (via.length) entry.hops = via;
     // lastError carries no timestamp so an identical outage is a stable
     // identity tuple — it is part of the change-detection below
     if (verdict === "error") entry.lastError = note;
@@ -304,9 +318,10 @@ async function main() {
     .map((e) => e.url);
 
   /* state writes are change-triggered, not run-triggered: compare the
-     identity tuple (url set + per-entry verdict/finalUrl/redirects/lastError) */
+     identity tuple (url set + per-entry verdict/finalUrl/redirects/hops/
+     lastError) */
   const identity = (list) =>
-    JSON.stringify(list.map((e) => [e.url, e.verdict, e.finalUrl, e.redirects, e.lastError || ""]).sort());
+    JSON.stringify(list.map((e) => [e.url, e.verdict, e.finalUrl, e.redirects, e.hops || [], e.lastError || ""]).sort());
   const prevList = [...prev.values()];
   const dirty = prevList.length !== entries.length || identity(prevList) !== identity(entries);
   if (dirty) {

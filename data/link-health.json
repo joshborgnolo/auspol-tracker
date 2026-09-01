@@ -327,16 +327,16 @@
       "note": ""
     },
     {
-      "url": "https://australiainstitute.org.au/wp-content/uploads/2025/11/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+      "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
       "fields": [
         "url"
       ],
       "lastChecked": "2026-09-01",
-      "verdict": "gone",
-      "finalUrl": "https://australiainstitute.org.au/wp-content/uploads/2025/11/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
+      "verdict": "ok",
+      "finalUrl": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
       "redirects": 0,
-      "status": 404,
-      "note": "http 404"
+      "status": 206,
+      "note": ""
     },
     {
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-hits-historic-low-of-24pc-amid-sussan-leys-struggles/news-story/739877883ee405aeab0fc34c2d7b5218",
@@ -468,7 +468,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/pauline-hansons-one-nation-could-form-opposition-if-an-election-were-held-today-sky-news-pulse-reveals/news-story/43b93b2bc0936232a70553f2cea09a83",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fpauline-hansons-one-nation-could-form-opposition-if-an-election-were-held-today-sky-news-pulse-reveals%2fnews-story%2f43b93b2bc0936232a70553f2cea09a83"
+      ]
     },
     {
       "url": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
@@ -720,19 +724,23 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/one-nation-secures-34-per-cent-primary-vote-among-workingclass-voters-above-both-labor-and-coalition-in-sky-news-pulse/news-story/62b6a2606bfeb7c099e3d7a5d570576b",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fone-nation-secures-34-per-cent-primary-vote-among-workingclass-voters-above-both-labor-and-coalition-in-sky-news-pulse%2fnews-story%2f62b6a2606bfeb7c099e3d7a5d570576b"
+      ]
     },
     {
-      "url": "https://australiainstitute.org.au/wp-content/uploads/2026/02/Polling-brief-One-Nation-voters-and-gas-exports-Web.pdf",
+      "url": "https://cdn.australiainstitute.org.au/2026/02/18022711/Polling-brief-One-Nation-voters-and-gas-exports-Web.pdf",
       "fields": [
         "url"
       ],
       "lastChecked": "2026-09-01",
-      "verdict": "gone",
-      "finalUrl": "https://australiainstitute.org.au/wp-content/uploads/2026/02/Polling-brief-One-Nation-voters-and-gas-exports-Web.pdf",
+      "verdict": "ok",
+      "finalUrl": "https://cdn.australiainstitute.org.au/2026/02/18022711/Polling-brief-One-Nation-voters-and-gas-exports-Web.pdf",
       "redirects": 0,
-      "status": 404,
-      "note": "http 404"
+      "status": 206,
+      "note": ""
     },
     {
       "url": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
@@ -828,7 +836,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/bandaid-on-a-bullet-wound-angus-taylor-halts-coalition-decline-after-taking-over-from-sussan-ley-sky-news-pulse-reveals/news-story/9068187eed61dcd301a5ef5f54a6d8bd",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fbandaid-on-a-bullet-wound-angus-taylor-halts-coalition-decline-after-taking-over-from-sussan-ley-sky-news-pulse-reveals%2fnews-story%2f9068187eed61dcd301a5ef5f54a6d8bd"
+      ]
     },
     {
       "url": "https://www.pollbludger.net/2026/03/01/newspoll-labor-32-one-nation-27-coalition-20-greens-11-open-thread/",
@@ -912,7 +924,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/coalition-vote-collapses-to-historic-low-under-angus-taylor-in-latest-sky-news-pulse-yougov-poll/news-story/a7219b0adb90d87b9b1b9c2e75824a7c",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fcoalition-vote-collapses-to-historic-low-under-angus-taylor-in-latest-sky-news-pulse-yougov-poll%2fnews-story%2fa7219b0adb90d87b9b1b9c2e75824a7c"
+      ]
     },
     {
       "url": "https://www.smh.com.au/politics/federal/one-nation-now-wrenching-votes-from-labor-as-it-overtakes-coalition-20260315-p5oakr.html",
@@ -939,16 +955,16 @@
       "note": ""
     },
     {
-      "url": "https://australiainstitute.org.au/wp-content/uploads/2026/03/Aus-Institute-Mar26-poll-summary-20032026-votingintention_GAS.pdf",
+      "url": "https://cdn.australiainstitute.org.au/2026/03/18023552/Aus-Institute-Mar26-poll-summary-20032026-votingintention_GAS.pdf",
       "fields": [
         "url"
       ],
       "lastChecked": "2026-09-01",
-      "verdict": "gone",
-      "finalUrl": "https://australiainstitute.org.au/wp-content/uploads/2026/03/Aus-Institute-Mar26-poll-summary-20032026-votingintention_GAS.pdf",
+      "verdict": "ok",
+      "finalUrl": "https://cdn.australiainstitute.org.au/2026/03/18023552/Aus-Institute-Mar26-poll-summary-20032026-votingintention_GAS.pdf",
       "redirects": 0,
-      "status": 404,
-      "note": "http 404"
+      "status": 206,
+      "note": ""
     },
     {
       "url": "https://www.roymorgan.com/findings/10171-federal-voting-intention-march-23-2026",
@@ -996,7 +1012,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/pauline-hansons-one-nation-surges-against-labor-in-latest-sky-news-pulse-poll/news-story/6582c87b585bc0554347f6cf870a9bb8",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fpauline-hansons-one-nation-surges-against-labor-in-latest-sky-news-pulse-poll%2fnews-story%2f6582c87b585bc0554347f6cf870a9bb8"
+      ]
     },
     {
       "url": "https://drive.google.com/file/d/1t7xuBbl0e-zppcmyweC1MWeo-4gVkMjX/view",
@@ -1080,7 +1100,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/coalition-locked-in-third-place-behind-labor-and-one-nation-for-sixth-consecutive-poll-sky-news-yougov-pulse/news-story/c8b3eb9a2e8d80c8e1af656f19694212",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fcoalition-locked-in-third-place-behind-labor-and-one-nation-for-sixth-consecutive-poll-sky-news-yougov-pulse%2fnews-story%2fc8b3eb9a2e8d80c8e1af656f19694212"
+      ]
     },
     {
       "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026",
@@ -1164,7 +1188,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/pauline-hansons-one-nation-draws-level-with-labor-on-27-per-cent-primary-vote-for-first-time-in-sky-news-pulse-history/news-story/cbc88f47eac6ff1b3b8aa563dfe305e2",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fpauline-hansons-one-nation-draws-level-with-labor-on-27-per-cent-primary-vote-for-first-time-in-sky-news-pulse-history%2fnews-story%2fcbc88f47eac6ff1b3b8aa563dfe305e2"
+      ]
     },
     {
       "url": "https://www.roymorgan.com/findings/10201-federal-voting-intention-april-27-2026",
@@ -1260,7 +1288,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/coalition-languishing-behind-one-nation-and-labor-for-eight-consecutive-polls-sky-news-pulse-reveals/news-story/136b0b32b0a647328a35440659262b73",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fcoalition-languishing-behind-one-nation-and-labor-for-eight-consecutive-polls-sky-news-pulse-reveals%2fnews-story%2f136b0b32b0a647328a35440659262b73"
+      ]
     },
     {
       "url": "https://www.roymorgan.com/findings/10218-federal-voting-intention-may-11-2026",
@@ -1380,7 +1412,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/labors-primary-vote-plummets-amid-backlash-to-anthony-albaneses-budget-broken-promises/news-story/85b0175fa0db4e02b85f4161771cdefd",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2flabors-primary-vote-plummets-amid-backlash-to-anthony-albaneses-budget-broken-promises%2fnews-story%2f85b0175fa0db4e02b85f4161771cdefd"
+      ]
     },
     {
       "url": "https://demosau.com/wp-content/uploads/2026/05/DemosAU-Fed-Poll-May-2026-FINAL.pdf",
@@ -1500,7 +1536,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/one-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling/news-story/0fe9ddf8797b5e529436557d7ce63897",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fone-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling%2fnews-story%2f0fe9ddf8797b5e529436557d7ce63897"
+      ]
     },
     {
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-in-front-of-labor-anthony-albanese-gets-worst-ever-rating/news-story/f4e47be80091b678d835cb9334fc8b0a",
@@ -1560,7 +1600,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/one-nation-leads-primary-vote-as-80-per-cent-of-voters-say-party-ready-to-govern-by-2028-sky-news-pulse-yougov-poll/news-story/0943b53d79d1e4fb27860c4020be7642",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fone-nation-leads-primary-vote-as-80-per-cent-of-voters-say-party-ready-to-govern-by-2028-sky-news-pulse-yougov-poll%2fnews-story%2f0943b53d79d1e4fb27860c4020be7642"
+      ]
     },
     {
       "url": "https://demosau.com/news/one-nation-lead-grows-as-l-np-primary-sinks-to-18/",
@@ -1668,7 +1712,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/one-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense/news-story/3ecdbeb123199de72a7c12b4fb9efbd2",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fone-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense%2fnews-story%2f3ecdbeb123199de72a7c12b4fb9efbd2"
+      ]
     },
     {
       "url": "https://yougov.com/articles/55081-labor-on-track-for-decisive-election-victory-as-coalition-support-hits-record-low",
@@ -1752,7 +1800,11 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
       "status": 404,
-      "note": "resolves via 3 redirect(s) into the news24.com.au wall"
+      "note": "resolves via 3 redirect(s) into the news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/australia-news/politics/pauline-hansons-monoculture-call-sees-one-nation-support-slide-as-labor-regains-poll-lead-in-sky-news-pulse/news-story/ff02004ef7e9634e18b54b227fba984b",
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2faustralia-news%2fpolitics%2fpauline-hansons-monoculture-call-sees-one-nation-support-slide-as-labor-regains-poll-lead-in-sky-news-pulse%2fnews-story%2fff02004ef7e9634e18b54b227fba984b"
+      ]
     },
     {
       "url": "https://yougov.com/articles/55192-labor-maintains-commanding-lead-over-one-nation-and-coalition-in-latest-yougov-public-data-poll",
@@ -1848,7 +1900,10 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 2,
       "status": 404,
-      "note": "news24.com.au wall"
+      "note": "news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2fpolitics%2faustralian-politics%2flabor-on-lowest-majoritywinning-vote-since-federation-as-voters-turn-on-major-parties-news24-pulse%2fnews-story%2f30abb89ce081815670d1a05c4517f90e"
+      ]
     },
     {
       "url": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6",
@@ -1920,7 +1975,10 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 2,
       "status": 404,
-      "note": "news24.com.au wall"
+      "note": "news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2fpolitics%2faustralian-politics%2fcoalition-and-one-nation-face-vote-consolidation-battle-to-oust-albanese-as-formal-alliance-ruled-out%2fnews-story%2f647c039e1efc5027e63a509879724195"
+      ]
     },
     {
       "url": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
@@ -1980,7 +2038,10 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 2,
       "status": 404,
-      "note": "news24.com.au wall"
+      "note": "news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2fpolitics%2faustralian-politics%2fone-nation-trails-labor-by-three-points-following-a-difficult-parliamentary-fortnight-for-albanese%2fnews-story%2fd04bde51f5545775296ce13f7e15515e"
+      ]
     },
     {
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b",
@@ -2100,7 +2161,10 @@
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 2,
       "status": 404,
-      "note": "news24.com.au wall"
+      "note": "news24.com.au wall",
+      "hops": [
+        "https://www.news24.com.au/remote/check_cookie.html?url=https%3a%2f%2fwww.news24.com.au%2fpolitics%2faustralian-politics"
+      ]
     }
   ]
 }

@@ -18,7 +18,10 @@ ledger, 2026-09-01):
 Top hosts: roymorgan.com 44, theaustralian.com.au 15, smh.com.au 15,
 afr.com 14, essentialreport.com.au 13, skynews.com.au 13, demosau.com 11,
 accent-research.com 9, theguardian.com 6, drive.google.com 4,
-news24.com.au 4, australiainstitute.org.au 3. The tail includes a Wix
+news24.com.au 4, cdn.australiainstitute.org.au 3 (the institute moved its
+uploads to a CDN on 2026-08-18 — see the adjudicated-baseline note below;
+the census was refreshed against the post-rewrite ledger the same day).
+The tail includes a Wix
 `usrfiles.com` file host, one x.com status, and a string of News Corp
 mastheads (`heraldsun`, `dailytelegraph`, `couriermail`, `thechronicle`,
 `news.com.au` — one each).
@@ -65,7 +68,8 @@ status — statuses are the most-volatile part of a bot wall.
   length.
 - `wall` — matched a known wall rule. **Indeterminate, never an alarm.**
 - `moved` — resolved, but the final URL differs from the recorded one. Record
-  the final URL and the redirect count. Not a failure.
+  the final URL, the redirect count, and (for chains longer than one hop) the
+  intermediate `hops`. Not a failure.
 - `gone` — a real 404/410 from a host with no wall rule, or a wall-ruled host
   returning something that is neither the wall nor the page.
 - `error` — DNS, TLS, timeout, 429. Never `gone`; retry next run.
@@ -95,6 +99,18 @@ a different host" — which is the window in which you can rewrite them to
 `news24.com.au` while the mapping still exists, rather than discovering it after
 the redirect is dropped and the original article is unfindable.
 
+Trace one of those chains and the first hop is a clean **301**: the skynews
+citation maps 1:1 onto the same article path on `news24.com.au`, and only the
+*next* hop 302s into the cookie-check machinery that ends on the
+`/nocookies?a=…` wall. So a `moved` entry whose chain ran more than one hop
+records the intermediate URLs as `hops` — original and terminal are already
+`url`/`finalUrl`, so `hops` holds exactly what's between them, first hop's
+Location first. `hops[0]` is the publisher's own permanent mapping: the rewrite
+candidate a human acts on, which recording only the wall-endpoint `finalUrl`
+would throw away. (The `/nocookies?a=…` token was checked stable across
+fetches before this ledgered anything — a volatile terminal URL would churn
+the write-only-on-change rule weekly; it does not.)
+
 So `moved` entries are the report's headline, not its footnote.
 
 ## Never rewrite the data
@@ -108,12 +124,13 @@ publisher's own chart turned out to be wrong and the tracker right.
 
 ## State and cadence
 
-- `data/link-health.json`: one entry per URL — `{url, field, lastChecked,
-  verdict, finalUrl, redirects, status, note}`.
-- **Write only when an entry's verdict, finalUrl or redirect count changes.**
-  `lastChecked` alone must never dirty the file, or the weekly run commits 175
-  timestamp churns into a repo that already takes concurrent pushes. Same rule
-  `np-score.mjs` follows for its identity tuple.
+- `data/link-health.json`: one entry per URL — `{url, fields, lastChecked,
+  verdict, finalUrl, redirects, status, note}`, plus `hops` (the intermediate
+  redirect URLs) when the chain ran longer than one hop.
+- **Write only when an entry's verdict, finalUrl, redirect count or hops
+  change.** `lastChecked` alone must never dirty the file, or the weekly run
+  commits 175 timestamp churns into a repo that already takes concurrent
+  pushes. Same rule `np-score.mjs` follows for its identity tuple.
 - Weekly, not daily. Link rot is slow, and 175 requests a day at other people's
   publishers is rude. Sequential with a small delay, one host at a time, honest
   User-Agent, back off on 429.
@@ -142,17 +159,30 @@ new `gone` and new `moved` entries.
   `wall`, not `gone`. These are the whole point.
 - A genuinely dead URL on a plain host must classify `gone`.
 - A known-good redirect (any skynews citation) must classify `moved` with
-  `redirects: 3` and `finalUrl` on `news24.com.au` — and must NOT be `gone`.
+  `redirects: 3`, `finalUrl` on the `news24.com.au` wall endpoint and
+  `hops[0]` on the `news24.com.au` article path — and must NOT be `gone`.
 - Run the full sweep once against live: expect ~30 `wall`, 13 `moved`, and
-  the three known-`gone` australiainstitute.org.au briefs (below), and
-  confirm a second immediate run writes nothing to `link-health.json`.
+  zero `gone` entries (the three Australia Institute briefs were
+  adjudicated — below), and confirm a second immediate run writes nothing
+  to `link-health.json`.
 
-## Standing baseline: the three gone Australia Institute briefs
+## Adjudicated baseline: the three gone Australia Institute briefs
 
 The 2026-09-01 baseline recorded three institute PDFs — citations on YouGov
 (2025-10-30, 2026-03-19) and Redbridge (2026-02-12) waves — as `gone`
 (404 with or without a Range header, so genuinely absent). Three consecutive
-briefs suggests a reorganisation, not individual deletions. They fired no
-alarm on the baseline run (a first-seen `gone` never does); whether a later
-release is the right rewrite is a human decision, so they are left as the
-ledger's standing `gone` entries until adjudicated.
+briefs suggested a reorganisation, not individual deletions, and that is
+what it was: the institute migrated `wp-content/uploads/…` to
+`cdn.australiainstitute.org.au/<YYYY/MM>/<id>/…` on 2026-08-18 (CDN
+last-modified headers) without redirects from the old paths.
+
+Adjudicated the same day (the agent proposes; a human disposes): all three
+citations were rewritten in `polls.json` to the same filenames on the CDN —
+`2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf`,
+`2026/02/18022711/Polling-brief-One-Nation-voters-and-gas-exports-Web.pdf`,
+`2026/03/18023552/Aus-Institute-Mar26-poll-summary-20032026-votingintention_GAS.pdf`
+— each verified live (200, `application/pdf`) before the edit. The
+replacement paths surfaced from the institute's own post pages and WP
+media API, not guesses; the canonical CDN copy was preferred over a
+Wayback snapshot. The standing `gone` count is now zero; the next `gone`
+this ledger ever logs is a genuine regression by construction.

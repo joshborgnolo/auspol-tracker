@@ -17,7 +17,10 @@
      any2xx shell            200 at an any2xx host    -> wall
      plain ok / gone         200 -> ok, 404  -> gone
      pdf identity            application/pdf -> ok; text/html -> error
-     redirect drift          127.0.0.1 -(3 hops)-> localhost wall -> moved
+     redirect drift          127.0.0.1 -(301,302,302)-> localhost wall -> moved,
+                             intermediates ledgered as hops (mapping first)
+     pre-wall hops           same-host chain into a wall keeps its middle hop
+     one-hop move            a single redirect has no intermediates to record
      transitions             ok/wall/moved -> gone fires exit 2
      steady gone             gone staying gone stays green (exit 0)
      inconclusive            everything refuses -> exit 1
@@ -150,6 +153,8 @@ const verdictOf = (dir, url) => JSON.parse(readFileSync(join(dir, "link-health.j
     JSON.stringify(verdictOf(fx.dir, u(s4.port, "/nc-bot"))));
   ok("battery: 403 Cloudflare challenge title -> wall", verdictOf(fx.dir, u(s4.port, "/cf"))?.verdict === "wall",
     JSON.stringify(verdictOf(fx.dir, u(s4.port, "/cf"))));
+  ok("battery: a wall with no redirects carries no hops key", !("hops" in verdictOf(fx.dir, u(s4.port, "/nc-bot"))),
+    JSON.stringify(verdictOf(fx.dir, u(s4.port, "/nc-bot"))));
   ok("battery: plain 200 -> ok", verdictOf(fx.dir, u(s3.port, "/ok"))?.verdict === "ok");
   ok("battery: real pdf -> ok", verdictOf(fx.dir, u(s3.port, "/doc.pdf"))?.verdict === "ok");
   ok("battery: pdf url serving html -> error, never gone", verdictOf(fx.dir, u(s3.port, "/fake.pdf"))?.verdict === "error",
@@ -169,30 +174,81 @@ const verdictOf = (dir, url) => JSON.parse(readFileSync(join(dir, "link-health.j
   fx.cleanup();
 }
 
-/* --- redirect drift: 127.0.0.1 to localhost is a cross-host chain ------ */
+/* --- redirect drift: 127.0.0.1 to localhost is a cross-host chain ------
+   Mirrors the live skynews -> news24 shape: the ORIGINAL host 301s to the
+   article on the new host (the publisher's own mapping — the actionable
+   hop), which then 302s into the wall machinery and lands on the wall. */
 {
-  let hits = [];
-  const srv = await serve((path, hostHdr) => {
-    hits.push(`${hostHdr}${path}`);
-    if (path === "/sky") return [302, "", { location: "/hop1" }];
-    if (path === "/hop1") return [302, "", { location: "/hop2" }];
-    if (path === "/hop2") return [301, "", { location: `http://localhost:${srv.port}/nocookies` }];
-    if (path === "/nocookies") return [404, N24_WALL];
+  const srv = await serve((path) => {
+    if (path === "/sky")
+      return [301, "", { location: `http://localhost:${srv.port}/australia-news/politics/slug/news-story/abc123` }];
+    if (path === "/australia-news/politics/slug/news-story/abc123")
+      return [302, "", { location: `/remote/check_cookie.html?url=${encodeURIComponent(`http://localhost:${srv.port}/australia-news/politics/slug/news-story/abc123`)}` }];
+    if (path.startsWith("/remote/check_cookie.html"))
+      return [302, "", { location: "/nocookies?a=A.flavipes" }];
+    if (path.startsWith("/nocookies")) return [404, N24_WALL];
     return null;
   });
   const url = `http://127.0.0.1:${srv.port}/sky`;
+  const mapping = `http://localhost:${srv.port}/australia-news/politics/slug/news-story/abc123`;
   const rules = [{ host: `localhost:${srv.port}`, status: 404, titleRe: "nocookies" }];
   const fx = fixtureDir([url]);
   const r = await run(fx.dir, rules);
   const e = verdictOf(fx.dir, url);
   ok("drift: cross-host chain into a wall -> moved, not wall, not gone", r.code === 0 && e?.verdict === "moved",
     `verdict=${e?.verdict} code=${r.code}\n${r.stdout}`);
-  ok("drift: three redirects counted, finalUrl lands on the other hostname",
-    e?.redirects === 3 && new URL(e.finalUrl).hostname === "localhost", JSON.stringify(e));
+  ok("drift: three redirects counted, finalUrl lands on the wall endpoint",
+    e?.redirects === 3 && new URL(e.finalUrl).hostname === "localhost" && e.finalUrl.includes("nocookies"),
+    JSON.stringify(e));
+  ok("drift: hops records the intermediate chain, publisher mapping first",
+    Array.isArray(e?.hops) && e.hops.length === 2 && e.hops[0] === mapping &&
+    e.hops[1].startsWith(`http://localhost:${srv.port}/remote/check_cookie.html`),
+    JSON.stringify(e?.hops));
   ok("drift: appears in newMoved headline", r.status?.newMoved?.includes(url), JSON.stringify(r.status));
   /* and once recorded, a steady chain is not re-reported */
+  const before2 = readFileSync(fx.state, "utf8");
   const r2 = await run(fx.dir, rules);
   ok("drift: steady chain does not re-fire newMoved", r2.status?.newMoved?.length === 0, JSON.stringify(r2.status));
+  ok("drift: steady chain leaves state byte-identical", readFileSync(fx.state, "utf8") === before2);
+  srv.server.close();
+  fx.cleanup();
+}
+
+/* --- a same-host wall reached through a redirect keeps its middle hop --- */
+{
+  const srv = await serve((path) => {
+    if (path === "/start") return [302, "", { location: "/mid" }];
+    if (path === "/mid") return [302, "", { location: "/walled" }];
+    if (path === "/walled") return [403, NC_BOT];
+    return null;
+  });
+  const url = `http://127.0.0.1:${srv.port}/start`;
+  const rules = [{ host: `127.0.0.1:${srv.port}`, bodyRe: "crawler bot" }];
+  const fx = fixtureDir([url]);
+  const r = await run(fx.dir, rules);
+  const e = verdictOf(fx.dir, url);
+  ok("prewall: same-host redirect chain into a wall -> wall", r.code === 0 && e?.verdict === "wall",
+    `verdict=${e?.verdict}\n${r.stdout}`);
+  ok("prewall: the one intermediate hop is recorded",
+    JSON.stringify(e?.hops) === JSON.stringify([`http://127.0.0.1:${srv.port}/mid`]), JSON.stringify(e));
+  srv.server.close();
+  fx.cleanup();
+}
+
+/* --- a one-redirect move has no intermediates to record ----------------- */
+{
+  const srv = await serve((path) => {
+    if (path === "/old") return [301, "", { location: "/new" }];
+    if (path === "/new") return [200, PAGE];
+    return null;
+  });
+  const url = `http://127.0.0.1:${srv.port}/old`;
+  const fx = fixtureDir([url]);
+  const r = await run(fx.dir, []);
+  const e = verdictOf(fx.dir, url);
+  ok("one-hop move: moved, finalUrl is the target, no hops key",
+    r.code === 0 && e?.verdict === "moved" && e.finalUrl.endsWith("/new") && !("hops" in e),
+    JSON.stringify(e));
   srv.server.close();
   fx.cleanup();
 }
