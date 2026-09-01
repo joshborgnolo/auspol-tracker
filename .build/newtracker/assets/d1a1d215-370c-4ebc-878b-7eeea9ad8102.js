@@ -99,7 +99,7 @@ const tnUntil = (ms) => {
   return w + (w === 1 ? " week" : " weeks");
 };
 
-function NextPollTicker({ showScore }) {
+function NextPollTicker({ pinned, showScore }) {
   /* A minute is finer than the answer ever is - the tightest projection here
      is to the day - but it keeps "59 mins" from sitting there after it has
      become "in 2 mins". */
@@ -250,14 +250,15 @@ function NextPollTicker({ showScore }) {
      is the gap between the tab set and the bar's right edge the ticker
      docks to; centred (show-score) it is twice the shorter run from the
      bar's centre to the tab set and to the docked 2PP score. Keying the
-     budget to the seat means a pin flip with the hero on screen touches
-     nothing here - no item pops at the sticky boundary; count and seat
-     change together at the hero gate, one move as in CSS. It runs
-     pre-paint (an over-filled bar never reaches the screen), again on row
-     resize and seat flips, once webfonts settle, and once more ~400ms
-     after a flip to use the glide's END geometry. The state is a prefix
-     count: the most urgent items (overdue first) are always the ones
-     kept. */
+     budget to the seat means a pin flip with the hero on screen changes
+     no formula - it's the pin's geometry shift (the bar lifts off and
+     condenses) that a pinned-dep recompute covers; without it the count
+     measured against the lifted bar stuck around after the bar returned
+     to its natural seat at the top. It runs pre-paint (an over-filled
+     bar never reaches the screen), again on row resize and on pin or
+     seat flips, once webfonts settle, and once more ~400ms after a flip
+     to use the glide's END geometry. The state is a prefix count: the
+     most urgent items (overdue first) are always the ones kept. */
   React.useLayoutEffect(() => {
     const el = rootRef.current;
     if (!el || !items.length) return;
@@ -297,7 +298,7 @@ function NextPollTicker({ showScore }) {
     if (ro && el.parentElement) ro.observe(el.parentElement);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(compute);
     return () => { clearTimeout(settle); if (ro) ro.disconnect(); };
-  }, [itemsKey, showScore]);
+  }, [itemsKey, pinned, showScore]);
 
   if (!items.length) return null;
 
@@ -445,9 +446,10 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
           </div>
           {/* the ticker's fit budget is keyed to the SEAT, and the seat is
               show-score's (score docked => centred), not the pin's - a bare
-              pin flip with the hero on screen moves neither the seat nor
-              the item count (see the fit pass in NextPollTicker) */}
-          <NextPollTicker showScore={pinned && heroGone} />
+              pin flip with the hero on screen changes no formula, only the
+              bar's geometry, which the pinned dep re-measures (see the fit
+              pass in NextPollTicker) */}
+          <NextPollTicker pinned={pinned} showScore={pinned && heroGone} />
           <TabScore onGoHero={goHero} matchup={tppMatchup} />
         </div>
       </nav>

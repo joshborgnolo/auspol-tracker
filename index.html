@@ -10988,6 +10988,7 @@ const tnUntil = ms => {
   return w + (w === 1 ? " week" : " weeks");
 };
 function NextPollTicker({
+  pinned,
   showScore
 }) {
   /* A minute is finer than the answer ever is - the tightest projection here
@@ -11139,14 +11140,15 @@ function NextPollTicker({
      is the gap between the tab set and the bar's right edge the ticker
      docks to; centred (show-score) it is twice the shorter run from the
      bar's centre to the tab set and to the docked 2PP score. Keying the
-     budget to the seat means a pin flip with the hero on screen touches
-     nothing here - no item pops at the sticky boundary; count and seat
-     change together at the hero gate, one move as in CSS. It runs
-     pre-paint (an over-filled bar never reaches the screen), again on row
-     resize and seat flips, once webfonts settle, and once more ~400ms
-     after a flip to use the glide's END geometry. The state is a prefix
-     count: the most urgent items (overdue first) are always the ones
-     kept. */
+     budget to the seat means a pin flip with the hero on screen changes
+     no formula - it's the pin's geometry shift (the bar lifts off and
+     condenses) that a pinned-dep recompute covers; without it the count
+     measured against the lifted bar stuck around after the bar returned
+     to its natural seat at the top. It runs pre-paint (an over-filled
+     bar never reaches the screen), again on row resize and on pin or
+     seat flips, once webfonts settle, and once more ~400ms after a flip
+     to use the glide's END geometry. The state is a prefix count: the
+     most urgent items (overdue first) are always the ones kept. */
   React.useLayoutEffect(() => {
     const el = rootRef.current;
     if (!el || !items.length) return;
@@ -11190,7 +11192,7 @@ function NextPollTicker({
       clearTimeout(settle);
       if (ro) ro.disconnect();
     };
-  }, [itemsKey, showScore]);
+  }, [itemsKey, pinned, showScore]);
   if (!items.length) return null;
   const title = "Projected from each house's recent publication intervals" + " – the earliest each wave could land, not the likeliest." + " A slot that passes unrecorded counts up as overdue until the release is added";
   return /*#__PURE__*/React.createElement("div", {
@@ -11349,6 +11351,7 @@ function Tabs({
   }, t.label), t.note != null && /*#__PURE__*/React.createElement("span", {
     className: "tab-note"
   }, t.note)))), /*#__PURE__*/React.createElement(NextPollTicker, {
+    pinned: pinned,
     showScore: pinned && heroGone
   }), /*#__PURE__*/React.createElement(TabScore, {
     onGoHero: goHero,
