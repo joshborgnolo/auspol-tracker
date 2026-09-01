@@ -293,7 +293,7 @@ function NextPollTicker({ pinned, showScore }) {
   React.useLayoutEffect(() => {
     const el = rootRef.current;
     if (!el || !items.length) return;
-    const SAFE = 32;
+    const SAFE = 48;
     const compute = () => {
       if (!el.isConnected) return;
       const inner = el.parentElement;
