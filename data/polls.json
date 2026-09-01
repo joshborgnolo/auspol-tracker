@@ -1253,7 +1253,8 @@
       "oth": null,
       "tpp_alp": 53.7,
       "tpp_lnp": 46.3,
-      "url": "https://essentialreport.com.au/reports/federal-political-insights"
+      "url": "https://essentialreport.com.au/reports/federal-political-insights",
+      "releaseUrl": "https://essentialreport.com.au/reports/30-september-2025"
     },
     {
       "date": "2025-09-30",
@@ -1371,7 +1372,8 @@
       "oth": null,
       "tpp_alp": 53.2,
       "tpp_lnp": 46.8,
-      "url": "https://essentialreport.com.au/reports/federal-political-insights"
+      "url": "https://essentialreport.com.au/reports/federal-political-insights",
+      "releaseUrl": "https://essentialreport.com.au/reports/29-october-2025"
     },
     {
       "date": "2025-10-30",
@@ -1577,7 +1579,8 @@
       "oth": null,
       "tpp_alp": 53.2,
       "tpp_lnp": 46.8,
-      "url": "https://essentialreport.com.au/reports/federal-political-insights"
+      "url": "https://essentialreport.com.au/reports/federal-political-insights",
+      "releaseUrl": "https://essentialreport.com.au/reports/26-november-2025"
     },
     {
       "date": "2025-11-26",
@@ -1642,7 +1645,8 @@
       "oth": null,
       "tpp_alp": 52.1,
       "tpp_lnp": 47.9,
-      "url": "https://essentialreport.com.au/reports/federal-political-insights"
+      "url": "https://essentialreport.com.au/reports/federal-political-insights",
+      "releaseUrl": "https://essentialreport.com.au/reports/10-december-2025"
     },
     {
       "date": "2025-12-12",
@@ -1868,7 +1872,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theguardian.com/australia-news/2026/jan/28/guardian-essential-poll-one-nation-coalition-liberal-national-labor-anthony-albanese-bondi-attack-ntwnfb"
+      "url": "https://www.theguardian.com/australia-news/2026/jan/28/guardian-essential-poll-one-nation-coalition-liberal-national-labor-anthony-albanese-bondi-attack-ntwnfb",
+      "releaseUrl": "https://essentialreport.com.au/reports/28th-january-2026"
     },
     {
       "date": "2026-01-25",
@@ -2173,7 +2178,8 @@
       "oth": null,
       "tpp_alp": 49.5,
       "tpp_lnp": 50.5,
-      "url": "https://essentialreport.com.au/reports/federal-political-insights"
+      "url": "https://essentialreport.com.au/reports/federal-political-insights",
+      "releaseUrl": "https://essentialreport.com.au/reports/25-february-2026"
     },
     {
       "date": "2026-02-24",
@@ -2759,7 +2765,8 @@
       "oth": null,
       "tpp_alp": 47,
       "tpp_lnp": 49,
-      "url": "https://www.theguardian.com/australia-news/2026/apr/28/pauline-hanson-one-nation-leadership-guardian-essential-poll-ntwnfb"
+      "url": "https://www.theguardian.com/australia-news/2026/apr/28/pauline-hanson-one-nation-leadership-guardian-essential-poll-ntwnfb",
+      "releaseUrl": "https://essentialreport.com.au/reports/29-april-2026"
     },
     {
       "date": "2026-04-30",
@@ -3099,7 +3106,8 @@
       "oth": null,
       "tpp_alp": 48,
       "tpp_lnp": 47,
-      "url": "https://www.theguardian.com/australia-news/2026/may/27/guardian-essential-poll-labors-housing-and-tax-changes-fail-to-win-over-voters-as-support-for-one-nation-swells"
+      "url": "https://www.theguardian.com/australia-news/2026/may/27/guardian-essential-poll-labors-housing-and-tax-changes-fail-to-win-over-voters-as-support-for-one-nation-swells",
+      "releaseUrl": "https://essentialreport.com.au/reports/27-may-2026"
     },
     {
       "date": "2026-05-26",
@@ -3398,7 +3406,8 @@
       "oth": null,
       "tpp_alp": 46,
       "tpp_lnp": 48,
-      "url": "https://www.theguardian.com/australia-news/2026/jun/30/guardian-essential-poll-voters-reject-key-one-nation-policies-as-support-drops"
+      "url": "https://www.theguardian.com/australia-news/2026/jun/30/guardian-essential-poll-voters-reject-key-one-nation-policies-as-support-drops",
+      "releaseUrl": "https://essentialreport.com.au/reports/30-june-2026"
     },
     {
       "date": "2026-06-30",
@@ -3664,7 +3673,8 @@
       "tpp_alp": 48,
       "tpp_lnp": 47,
       "url": "https://www.theguardian.com/australia-news/2026/jul/29/guardian-essential-poll-angus-taylors-approval-rating-crashes-and-one-nation-support-plateaus",
-      "sumNote": "Primaries sum to 96: ind is undecided-exclusive in this wave (6% independent + 4% undecided), unlike other Essential rows which carry the combined figure."
+      "sumNote": "Primaries sum to 96: ind is undecided-exclusive in this wave (6% independent + 4% undecided), unlike other Essential rows which carry the combined figure.",
+      "releaseUrl": "https://essentialreport.com.au/reports/28-july-2026"
     },
     {
       "date": "2026-07-28",

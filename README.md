@@ -44,6 +44,12 @@ new and worth looking at.
   a wave YouGov self-released on yougov.com carries that release in
   `releaseUrl` (the extractor fills it when one surfaces). Absent, not zero:
   YouGov releases only a few waves per series.
+- **Essential** rows cite the Guardian write-up (or the reports landing page)
+  in `url`; the wave's own dated release page on essentialreport.com.au goes
+  in `releaseUrl` (the extractor persists a publish-date → link index to
+  `.build/essential-src/report-index.json`, and the VI assimilator stamps new
+  rows from it). Absent, not zero: the curated row whose `url` already IS the
+  wave's release page carries no `releaseUrl`.
 - Leadership rows must key to **fieldwork end**, matching their poll. An
   unexplained "leadership-only" row in the build output usually means a date has
   drifted off its poll, not that the firm skipped voting intention.

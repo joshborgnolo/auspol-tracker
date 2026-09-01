@@ -66,7 +66,12 @@
 //     shrink the committed row set — re-run with --force after review)
 //   - --check computes everything, prints status, never writes
 //   - the CSV write is atomic (write to .tmp + rename over it)
-import { readFileSync, writeFileSync, renameSync, existsSync } from "node:fs";
+//
+// Side output: .build/essential-src/report-index.json maps each report's
+// publish date to its wave page link. The CSV has no room for URLs, so
+// .build/assimilate-essential-vi.mjs resolves a new tracker row's
+// `releaseUrl` against that index instead.
+import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync } from "node:fs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -421,6 +426,29 @@ try {
     renameSync(OUT + ".tmp", OUT);
     console.log(`updated ${OUT}: kept ${existingRows.length} existing rows, added ${rowsOut.length}, wrote ${merged.length} total (${existingRows.length + rowsOut.length - merged.length} dupes)`);
   } else console.log(`no change: ${OUT} unchanged (${merged.length} rows)`);
+
+  // Report index for the assimilator: publish date -> wave page link. A
+  // companion of the CSV rather than a column in it (the CSV schema stays
+  // byte-compatible with the Resolve one), written whenever the index
+  // drifts rather than only when the CSV did — a renamed slug otherwise
+  // never lands. Raw `modified` isn't in the fetch fields, so date+link
+  // pairs are the comparison; that's all the assimilator consumes.
+  const INDEX = ".build/essential-src/report-index.json";
+  const indexJson = JSON.stringify(
+    Object.fromEntries(
+      reports.map((r) => [r.date.slice(0, 10), r.link]).sort(([a], [b]) => a[0].localeCompare(b[0])),
+    ),
+    null, 2,
+  ) + "\n";
+  const indexChanged = !existsSync(INDEX) || readFileSync(INDEX, "utf8") !== indexJson;
+  if (CHECK) {
+    if (indexChanged) console.log(`--check: ${INDEX} would be updated`);
+  } else if (indexChanged) {
+    mkdirSync(".build/essential-src", { recursive: true });
+    writeFileSync(INDEX + ".tmp", indexJson);
+    renameSync(INDEX + ".tmp", INDEX);
+    console.log(`updated ${INDEX}: ${reports.length} reports`);
+  } else console.log(`no change: ${INDEX} unchanged (${reports.length} reports)`);
 
   const dates = [...new Set(rowsOut.map(r => r.date).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)))].sort();
   console.log(`datasets: ${new Set(rowsOut.map(r => r.dataset)).size} | charts: ${counters.charts} | empty sheets skipped: ${counters.emptySheets} | non-numeric cells skipped: ${counters.nonNumericCells}`);

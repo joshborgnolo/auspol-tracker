@@ -18,11 +18,15 @@
 // sumNote documents its undecided-exclusive deviation), oth null, tpp as
 // published undecided-inclusive (pollsterRules.Essential.tppIncludesUndecided
 // reads the shortfall as undecided-after-preferences). The CSV carries no
-// sample/url/fieldwork window, so those keys land null/omitted; the row is
-// flagged `assimilated: true`, which both records where it came from and
-// exempts it from the validator's sample-size rule.
+// sample/url/fieldwork window, so those keys land null/omitted; the wave's
+// own release page is resolved from .build/essential-src/report-index.json
+// (written by the extractor) and lands in releaseUrl — the WP record date
+// can lag the wave date by a day (UTC post timestamps vs Sydney wave
+// labels), so the lookup allows +/-1 day. The row is flagged
+// `assimilated: true`, which both records where it came from and exempts it
+// from the validator's sample-size rule.
 // Dry-run by default; --apply writes data/polls.json and a provenance file.
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const APPLY = process.argv.includes("--apply");
 const DAY = 86400000;
@@ -85,6 +89,17 @@ const D = JSON.parse(readFileSync("data/polls.json", "utf8"));
 const existing = D.polls.filter((p) => p.pollster === "Essential");
 const horizon = existing.reduce((m, p) => (p.date < m ? p.date : m), "9999");
 
+// WP record date = publish day on UTC, wave date = publish day on Sydney;
+// the record can sit a day behind, never ahead of its wave.
+const reportIndex = existsSync(".build/essential-src/report-index.json")
+  ? JSON.parse(readFileSync(".build/essential-src/report-index.json", "utf8"))
+  : null;
+const releaseFor = (waveDate) => {
+  if (!reportIndex) return null;
+  const t = Date.parse(waveDate);
+  return reportIndex[waveDate] ?? reportIndex[iso(t - DAY)] ?? null;
+};
+
 const close = (a, b) => (a == null && b == null) || (a != null && b != null && Math.abs(a - b) <= 0.5);
 const sameFigures = (p, r) =>
   ["alp", "lnp", "grn", "onp", "ind", "tpp_alp", "tpp_lnp"].every((k) => close(p[k], r[k]));
@@ -112,6 +127,7 @@ for (const waveDate of [...vi.keys()].sort()) {
     oth: null,
     tpp_alp: t?.["Labor"] ?? null,
     tpp_lnp: t?.["TOTAL: Coalition"] ?? null,
+    ...(releaseFor(waveDate) ? { releaseUrl: releaseFor(waveDate) } : {}),
     assimilated: true,
   };
   const figDup = existing.find((p) => daysApart(p.date, row.date) <= 10 && sameFigures(p, row));
@@ -125,7 +141,7 @@ for (const waveDate of [...vi.keys()].sort()) {
 console.log(`mode: ${APPLY ? "APPLY" : "dry-run"}`);
 console.log(`VI waves in CSV: ${vi.size} (2PP waves: ${tppDates.length})`);
 console.log(`added rows: ${added.length}`);
-added.forEach((x) => console.log(`  + ${x.row.date} (csv ${x.csvWave}): alp ${x.row.alp} lnp ${x.row.lnp} grn ${x.row.grn} onp ${x.row.onp} ind ${x.row.ind} | tpp ${x.row.tpp_alp}/${x.row.tpp_lnp}`));
+added.forEach((x) => console.log(`  + ${x.row.date} (csv ${x.csvWave}): alp ${x.row.alp} lnp ${x.row.lnp} grn ${x.row.grn} onp ${x.row.onp} ind ${x.row.ind} | tpp ${x.row.tpp_alp}/${x.row.tpp_lnp} | rel ${x.row.releaseUrl ?? "–"}`));
 skippedFigureDup.forEach((x) => console.log(`  = csv ${x.csvWave} duplicates curated row ${x.matchesRow} (same figures)`));
 console.log(`skipped: ${skippedDateDup.length} date-dup, ${skippedFigureDup.length} figure-dup, ${skippedPreHorizon.length} at/before horizon ${horizon}`);
 
