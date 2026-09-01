@@ -1079,18 +1079,12 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    line copies as the sentence it looks like. */
 .roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
 .hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
-/* The lead line got promoted out of .hero-sub to sit directly under the
-   gauge: the answer to the page's question belongs with the measure that
-   shows it, before the scaffolding that qualifies it. It takes its spacing
-   from the gauge the way the interval rows below take theirs. */
-.lead-line { margin-top: 10px; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
-/* The interval sits under the lead line, quieter than it – it qualifies the
-   figure, so it reads after the answer and before the movement. */
-/* the hero's subhead now matches the other panels; the method label that used
-   to sit beside it in small caps has moved down to the interval line, where it
-   reads as the first clause of how the figure was made and how well it is known */
+/* the hero's subhead matches the other panels; the method label that used
+   to sit beside it in small caps has moved to the interval line, where it
+   reads as a clause of how the figure was made and how well it is known,
+   alongside the lead that line now carries */
 .hero-title { margin-bottom: 12px; }
 /* ---- the hero's interval gauge -----------------------------------------
    The channel is chrome and obeys the page's top-left light: shadow cast in
@@ -1136,15 +1130,19 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hi-method { font-size: 11px; font-weight: 600; color: var(--ink-3); white-space: nowrap; }
 /* Separators hang off the END of each clause, not the start of the next: as
    a ::before they belonged to the following flex item, so a wrap carried the
-   dot down to open the next line on its own. */
+   dot down to open the next line on its own. The lead clause opens the row,
+   so it gets the dot after it too; its figures stay tabular. */
 .hero-interval > *:not(:last-child)::after {
-  content: "·"; color: var(--ink-3); font-weight: 400; margin-left: 8px;
+  content: "•"; color: var(--ink-3); font-weight: 400; margin-left: 8px;
 }
+.hero-interval .lead-tag { font-variant-numeric: tabular-nums; }
 @media (max-width: 620px) {
-  /* give the note its own line rather than letting it break mid-clause, and
-     drop the dot that would then be left dangling at the end of the first */
-  .hi-note { flex-basis: 100%; margin-top: 1px; }
-  .hero-interval > .hi-range:not(:last-child)::after { content: none; }
+  /* stack each clause on its own line and drop the dots that would dangle,
+     with the lead and the range given their own baseline because the roll
+     digit inside it is the page's biggest figure */
+  .hero-interval > * { flex-basis: 100%; }
+  .hero-interval > *::after { content: none; }
+  .hero-interval > * + * { margin-top: 2px; }
 }
 /* A word that is also the way into its own definition. Reset far enough that
    a <button> stops looking like one, and no further - whatever rule styles the
@@ -3276,7 +3274,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
 
   /* hero readout crossfades when the matchup changes */
-  .hero-readout, .lead-line, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
+  .hero-readout, .hero-interval, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
   @keyframes readout-in {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: none; }
@@ -5142,7 +5140,9 @@ window.AP.nextPolls = npProject;
     };
     let legend = readLegend(target);
     if (!legend.length) legend = cycleLegend();
-    const meta = [txt(target.querySelector(".hi-method")), txt(target.querySelector(".hi-range")),
+    /* the ± range rides inside .lead-tag now, so the meta tail drops it -
+       keeping it here too would print the interval twice on the image */
+    const meta = [txt(target.querySelector(".hi-method")),
                   txt(target.querySelector(".hi-note"))].filter(Boolean).join("  ·  ");
     const lead = [txt(target.querySelector(".lead-tag")), txt(target.querySelector(".delta")),
                   txt(target.querySelector(".hero-sub-note"))].filter(Boolean).join("  ");
@@ -17193,18 +17193,33 @@ function Hero({
     align: "left"
   }];
 
-  // y-window auto-fits the matchup spread – min/max taken across BOTH series
-  // so the domain stays correct even if the challenger ever takes the lead
+  // y-window auto-fits everything actually drawn – min/max across BOTH
+  // series (so the domain stays correct even if the challenger ever takes
+  // the lead), their 95% band, and the poll cloud around them, plus the
+  // implied-2PP overlay on the real matchup. The cloud matters: the chart's
+  // vertical clip is the svg, not the domain, so a window fitted to the
+  // lines alone would strand outlying polls outside the plot. The pad is a
+  // live dot's radius in data units, so an extreme reading isn't shaved.
   const domainOf = id => {
-    const v = MATCHUPS[id].data.flatMap(d => [d.a, d.b]);
+    const M = MATCHUPS[id],
+      v = [];
+    M.data.forEach(d => {
+      v.push(d.a, d.b);
+      if (d.ci95 != null) v.push(d.a - d.ci95, d.a + d.ci95, d.b - d.ci95, d.b + d.ci95);
+    });
+    D.individualPolls.forEach(p => {
+      const pair = M.scatter(p);
+      if (pair) pair.forEach(s => v.push(s.y));
+    });
+    if (M.real && D.synth2pp) D.synth2pp.forEach(d => v.push(d.alp, 100 - d.alp));
     const lo = Math.min(...v),
       hi = Math.max(...v),
-      pad6 = 6;
-    return [Math.floor((lo - pad6) / 5) * 5, Math.ceil((hi + pad6) / 5) * 5];
+      padDot = 0.5;
+    return [Math.floor((lo - padDot) / 5) * 5, Math.ceil((hi + padDot) / 5) * 5];
   };
   const yTarget = domainOf(matchup);
   // ticks come from the TARGET window so their number holds still while the
-  // window itself slides; today both matchups share 35–65 and nothing moves
+  // window itself slides; today the Labor matchups share 40–60 and nothing moves
   const yDomain = blend ? (() => {
     const f = domainOf(morph.from),
       t = morph.t;
@@ -17283,29 +17298,27 @@ function Hero({
     bName: m.b.name,
     sepRef: sepRef
   }), /*#__PURE__*/React.createElement("div", {
-    className: "lead-line"
+    className: "hero-interval"
   }, /*#__PURE__*/React.createElement("span", {
     className: "lead-tag"
   }, leadName, " leads by ", /*#__PURE__*/React.createElement(RollNum, {
-    value: Math.abs(lead).toFixed(1),
+    value: String(Math.round(Math.abs(lead))),
     spinIn: true
-  }), " pts")), /*#__PURE__*/React.createElement("div", {
-    className: "hero-interval"
-  }, /*#__PURE__*/React.createElement("button", {
+  }), unc ? /*#__PURE__*/React.createElement(React.Fragment, null, " ", /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "hi-range hi-term",
+    title: "What a margin of error means",
+    onClick: () => window.AP.openTerm && window.AP.openTerm("margin-of-error", "two-party preferred")
+  }, "\xB1 ", unc.ci95.toFixed(1), " pts")) : " pts"), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "hi-method hi-term",
     title: "What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means",
     onClick: () => window.AP.openTerm && window.AP.openTerm(adjusted ? "weighted-aggregate" : "monthly-average", "two-party preferred")
   }, adjusted ? "Weighted aggregate" : "Monthly average"), !adjusted && /*#__PURE__*/React.createElement("span", {
     className: "eyebrow-warn"
-  }, "Limited data"), unc && /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "hi-range hi-term",
-    title: "What a margin of error means",
-    onClick: () => window.AP.openTerm && window.AP.openTerm("margin-of-error", "two-party preferred")
-  }, "\xB1 ", unc.ci95.toFixed(1), " pts"), unc && /*#__PURE__*/React.createElement("span", {
+  }, "Limited data"), unc && /*#__PURE__*/React.createElement("span", {
     className: "hi-note"
-  }, "95% interval \xB7 ", unc.n, " poll", unc.n === 1 ? "" : "s", " in ", D.latest.method.windowDays, " days")), /*#__PURE__*/React.createElement("div", {
+  }, "95% interval")), /*#__PURE__*/React.createElement("div", {
     className: "hero-sub"
   }, /*#__PURE__*/React.createElement(Delta, {
     value: monthDelta,

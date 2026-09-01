@@ -870,16 +870,30 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
      busiest part of the chart. The left edge is empty in every matchup. */
   const heroRefLines = [{ y: 50, label: "tie", color: "var(--ink-faint)", align: "left" }];
 
-  // y-window auto-fits the matchup spread – min/max taken across BOTH series
-  // so the domain stays correct even if the challenger ever takes the lead
+  // y-window auto-fits everything actually drawn – min/max across BOTH
+  // series (so the domain stays correct even if the challenger ever takes
+  // the lead), their 95% band, and the poll cloud around them, plus the
+  // implied-2PP overlay on the real matchup. The cloud matters: the chart's
+  // vertical clip is the svg, not the domain, so a window fitted to the
+  // lines alone would strand outlying polls outside the plot. The pad is a
+  // live dot's radius in data units, so an extreme reading isn't shaved.
   const domainOf = (id) => {
-    const v = MATCHUPS[id].data.flatMap((d) => [d.a, d.b]);
-    const lo = Math.min(...v), hi = Math.max(...v), pad6 = 6;
-    return [Math.floor((lo - pad6) / 5) * 5, Math.ceil((hi + pad6) / 5) * 5];
+    const M = MATCHUPS[id], v = [];
+    M.data.forEach((d) => {
+      v.push(d.a, d.b);
+      if (d.ci95 != null) v.push(d.a - d.ci95, d.a + d.ci95, d.b - d.ci95, d.b + d.ci95);
+    });
+    D.individualPolls.forEach((p) => {
+      const pair = M.scatter(p);
+      if (pair) pair.forEach((s) => v.push(s.y));
+    });
+    if (M.real && D.synth2pp) D.synth2pp.forEach((d) => v.push(d.alp, 100 - d.alp));
+    const lo = Math.min(...v), hi = Math.max(...v), padDot = 0.5;
+    return [Math.floor((lo - padDot) / 5) * 5, Math.ceil((hi + padDot) / 5) * 5];
   };
   const yTarget = domainOf(matchup);
   // ticks come from the TARGET window so their number holds still while the
-  // window itself slides; today both matchups share 35–65 and nothing moves
+  // window itself slides; today the Labor matchups share 40–60 and nothing moves
   const yDomain = blend
     ? (() => { const f = domainOf(morph.from), t = morph.t;
                return [f[0] + (yTarget[0] - f[0]) * t, f[1] + (yTarget[1] - f[1]) * t]; })()
@@ -934,29 +948,35 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             <HeroGauge a={latest.a} ci={unc.ci95} color={lead >= 0 ? colA : colB}
                        aName={m.a.name} bName={m.b.name} sepRef={sepRef} />
           )}
-          {/* The lead line, now directly under the gauge: not keyed on the
-              matchup either, for the same reason the readout above isn't -
-              the margin is a figure that travels between the two questions,
-              so it rolls rather than being replaced. The words around it swap
-              outright, as the party names above them do, and the readout-in
-              fade lives here, on the line whose words genuinely change. */}
-          <div className="lead-line">
-            <span className="lead-tag">
-              {leadName} leads by <RollNum value={Math.abs(lead).toFixed(1)} spinIn /> pts
-            </span>
-          </div>
-          {/* An aggregate of five polls is not known to a tenth of a point, so
-              the interval sits with the number rather than in a footnote. It
-              covers how far the polls in the window disagree plus their
-              sampling error; it cannot cover bias shared across the industry,
-              which no aggregate can measure about itself. */}
-          {/* How the figure was built, then how well it is known. An aggregate
-              of five polls is not known to a tenth of a point, so the interval
-              sits with the number rather than in a footnote. It covers how far
-              the polls in the window disagree plus their sampling error; it
-              cannot cover bias shared across the industry, which no aggregate
-              can measure about itself. */}
+          {/* The lead now shares a line with how it was made and how well it
+              is known: an aggregate of a handful of polls is not known to a
+              tenth of a point, so the figure is rounded to whole points and
+              the interval sits beside it rather than in a footnote. It covers
+              how far the polls in the window disagree plus their sampling
+              error; it cannot cover bias shared across the industry, which no
+              aggregate can measure about itself. Not keyed on the matchup,
+              for the same reason the readout above isn't - the margin is a
+              figure that travels between the two questions, so it rolls
+              rather than being replaced. The readout-in fade lives here, on
+              the line whose words genuinely change. */}
           <div className="hero-interval">
+            <span className="lead-tag">
+              {leadName} leads by <RollNum value={String(Math.round(Math.abs(lead)))} spinIn />
+              {unc ? (
+                <>
+                  {/* The figure gets the same treatment as the method word
+                      beside it: it names a thing Info defines (margin of
+                      error), so it is the shortest way to the definition. */}
+                  {" "}
+                  <button type="button" className="hi-range hi-term"
+                          title="What a margin of error means"
+                          onClick={() => window.AP.openTerm &&
+                            window.AP.openTerm("margin-of-error", "two-party preferred")}>
+                    ± {unc.ci95.toFixed(1)} pts
+                  </button>
+                </>
+              ) : " pts"}
+            </span>
             {/* The label names the method; now it also explains it. Everything
                 this figure is built on has a definition in Info, and the word
                 the reader is looking at is the shortest way to it. */}
@@ -968,21 +988,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               {adjusted ? "Weighted aggregate" : "Monthly average"}
             </button>
             {!adjusted && <span className="eyebrow-warn">Limited data</span>}
-            {/* The figure gets the same treatment as the method word beside
-                it: it names a thing Info defines (margin of error), so it is
-                the shortest way to the definition. */}
             {unc && (
-              <button type="button" className="hi-range hi-term"
-                      title="What a margin of error means"
-                      onClick={() => window.AP.openTerm &&
-                        window.AP.openTerm("margin-of-error", "two-party preferred")}>
-                ± {unc.ci95.toFixed(1)} pts
-              </button>
-            )}
-            {unc && (
-              <span className="hi-note">
-                95% interval · {unc.n} poll{unc.n === 1 ? "" : "s"} in {D.latest.method.windowDays} days
-              </span>
+              <span className="hi-note">95% interval</span>
             )}
           </div>
           <div className="hero-sub">

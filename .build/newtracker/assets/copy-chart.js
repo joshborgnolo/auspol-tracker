@@ -460,7 +460,9 @@
     };
     let legend = readLegend(target);
     if (!legend.length) legend = cycleLegend();
-    const meta = [txt(target.querySelector(".hi-method")), txt(target.querySelector(".hi-range")),
+    /* the ± range rides inside .lead-tag now, so the meta tail drops it -
+       keeping it here too would print the interval twice on the image */
+    const meta = [txt(target.querySelector(".hi-method")),
                   txt(target.querySelector(".hi-note"))].filter(Boolean).join("  ·  ");
     const lead = [txt(target.querySelector(".lead-tag")), txt(target.querySelector(".delta")),
                   txt(target.querySelector(".hero-sub-note"))].filter(Boolean).join("  ");

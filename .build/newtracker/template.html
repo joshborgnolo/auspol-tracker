@@ -1031,18 +1031,12 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    line copies as the sentence it looks like. */
 .roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
 .hero-sub { display: flex; align-items: center; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
-/* The lead line got promoted out of .hero-sub to sit directly under the
-   gauge: the answer to the page's question belongs with the measure that
-   shows it, before the scaffolding that qualifies it. It takes its spacing
-   from the gauge the way the interval rows below take theirs. */
-.lead-line { margin-top: 10px; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
-/* The interval sits under the lead line, quieter than it – it qualifies the
-   figure, so it reads after the answer and before the movement. */
-/* the hero's subhead now matches the other panels; the method label that used
-   to sit beside it in small caps has moved down to the interval line, where it
-   reads as the first clause of how the figure was made and how well it is known */
+/* the hero's subhead matches the other panels; the method label that used
+   to sit beside it in small caps has moved to the interval line, where it
+   reads as a clause of how the figure was made and how well it is known,
+   alongside the lead that line now carries */
 .hero-title { margin-bottom: 12px; }
 /* ---- the hero's interval gauge -----------------------------------------
    The channel is chrome and obeys the page's top-left light: shadow cast in
@@ -1088,15 +1082,19 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hi-method { font-size: 11px; font-weight: 600; color: var(--ink-3); white-space: nowrap; }
 /* Separators hang off the END of each clause, not the start of the next: as
    a ::before they belonged to the following flex item, so a wrap carried the
-   dot down to open the next line on its own. */
+   dot down to open the next line on its own. The lead clause opens the row,
+   so it gets the dot after it too; its figures stay tabular. */
 .hero-interval > *:not(:last-child)::after {
-  content: "·"; color: var(--ink-3); font-weight: 400; margin-left: 8px;
+  content: "•"; color: var(--ink-3); font-weight: 400; margin-left: 8px;
 }
+.hero-interval .lead-tag { font-variant-numeric: tabular-nums; }
 @media (max-width: 620px) {
-  /* give the note its own line rather than letting it break mid-clause, and
-     drop the dot that would then be left dangling at the end of the first */
-  .hi-note { flex-basis: 100%; margin-top: 1px; }
-  .hero-interval > .hi-range:not(:last-child)::after { content: none; }
+  /* stack each clause on its own line and drop the dots that would dangle,
+     with the lead and the range given their own baseline because the roll
+     digit inside it is the page's biggest figure */
+  .hero-interval > * { flex-basis: 100%; }
+  .hero-interval > *::after { content: none; }
+  .hero-interval > * + * { margin-top: 2px; }
 }
 /* A word that is also the way into its own definition. Reset far enough that
    a <button> stops looking like one, and no further - whatever rule styles the
@@ -3228,7 +3226,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
 
   /* hero readout crossfades when the matchup changes */
-  .hero-readout, .lead-line, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
+  .hero-readout, .hero-interval, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
   @keyframes readout-in {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: none; }
