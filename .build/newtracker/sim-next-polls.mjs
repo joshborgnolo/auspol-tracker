@@ -110,9 +110,13 @@ const tnUntil = (ms) => {
 function ticker(rows, t0, nowMs) {
   const targetOf = (r) => {
     const half = r.winHalf || 0;
-    const earliest = r.release - half * DAY;
-    if (r.releaseDow == null) return { at: Math.max(earliest, nowMs), byDay: false };
-    let t = Math.max(t0, dayFloor(earliest));
+    if (r.releaseDow == null)
+      return { at: Math.max(r.release - half * DAY, nowMs), byDay: false };
+    const widen = Math.sqrt((r.ahead || 0) + 1);
+    const earlyHalf = r.spreadEarly != null
+      ? 7 * Math.floor((r.spreadEarly * widen + 3) / 7)
+      : half;
+    let t = Math.max(t0, dayFloor(r.release - earlyHalf * DAY));
     t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * DAY;
     return { at: t, byDay: true };
   };
@@ -131,6 +135,10 @@ function ticker(rows, t0, nowMs) {
     .filter((r) => !r.missed)
     .map((r) => ({ r, t: targetOf(r) }))
     .sort((a, b) => a.t.at - b.t.at)
+    .filter(({ t }) =>
+      t.byDay
+        ? Math.round((t.at - t0) / DAY) <= 7
+        : t.at <= nowMs + 7 * DAY)
     .map(({ r, t }) => {
       const half = r.winHalf || 0;
       let when;
@@ -148,7 +156,7 @@ function ticker(rows, t0, nowMs) {
          (r.releaseDow == null && half > 0));
       return { firm: r.pollster, when, maybe, site: r.site };
     });
-  return [...overdueItems, ...upcomingItems].slice(0, 2);
+  return [...overdueItems, ...upcomingItems].slice(0, 3);
 }
 
 // ---------------------------------------------------------------------------
@@ -184,6 +192,11 @@ function eq(name, got, want) {
   eq("Essential overdue, tolerance open", [es && es.overdue, es && es.missed], [true, false]);
   eq("panel reads to the edge with the slot after 'or'", es && panelWhen(es), "tomorrow (or 6 days ago)");
   eq("ticker item 1", items[0] && [items[0].firm, items[0].when, !!items[0].overdue], ["Essential", "tomorrow", false]);
+  /* The bar shows the coming week (max 3): Resolve's ±1-week window used to
+     phantom it onto Sun 6 Sep – "5 days" – when its record is late-only
+     (spreadEarly 0), and YouGov lands 8 days out, just past the week. */
+  eq("ticker is the next-week list", items.map((i) => [i.firm, i.when]),
+    [["Essential", "tomorrow"], ["Roy Morgan", "6 days"]]);
 }
 
 // S2 – Wed 2 Sep, 3am: the tolerance edge is today. The wave could be in the
@@ -256,7 +269,7 @@ function eq(name, got, want) {
 // unrecorded. It reads as overdue from the window's close, in both places,
 // parked at the panel's foot rather than floating to the top as "open now".
 // (Six weeks past the data clock every dated house is blown too, so the
-// ticker's two slots go to the most-overdue pair; DemosAU's own item is
+// ticker's three slots go to the most-overdue trio; DemosAU's own item is
 // checked on its row alone.)
 {
   const { label, t0, nowMs } = scen("Sat 10 Oct", "2026-10-10", 600);
@@ -268,7 +281,7 @@ function eq(name, got, want) {
   eq("panel no longer says 'open now'", da && panelWhen(da), "5 days overdue");
   eq("missed rows park at the foot, cadence order", rows.slice(-2).map((r) => r.pollster), ["Essential", "DemosAU"]);
   eq("ticker order: most overdue first", items.map((i) => [i.firm, i.when]),
-    [["Essential", "45 days overdue"], ["Roy Morgan", "33 days overdue"]]);
+    [["Essential", "45 days overdue"], ["Roy Morgan", "33 days overdue"], ["YouGov", "31 days overdue"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("loose missed leads as overdue in the ticker", daItems[0] && [daItems[0].firm, daItems[0].when, !!daItems[0].overdue],
     ["DemosAU", "5 days overdue", true]);

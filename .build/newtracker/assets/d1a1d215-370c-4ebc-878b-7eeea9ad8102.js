@@ -57,7 +57,7 @@ function TabScore({ onGoHero, matchup }) {
 }
 
 // ====================================================================
-// NextPollTicker – how long until the next two polls are expected
+// NextPollTicker – how long until this week's expected polls land
 // ====================================================================
 /* Runs the panel's own projection (window.AP.nextPolls, lifted out of
    NextPollsPanel for this) rather than a second guess at the same thing, so
@@ -169,6 +169,14 @@ function NextPollTicker() {
     .filter((r) => !r.missed)
     .map((r) => ({ r, t: targetOf(r) }))
     .sort((a, b) => a.t.at - b.t.at)
+    /* Only the coming week: the bar answers "what lands soon", and a wave a
+       fortnight or more out is the panel's business, not a countdown. A
+       weekly house can appear twice in a seven-day window, and that is the
+       honest shape of the schedule, not a repetition bug. */
+    .filter(({ t }) =>
+      t.byDay
+        ? Math.round((t.at - t0) / TN_DAY) <= 7
+        : t.at <= nowMs + 7 * TN_DAY)
     .map(({ r, t }) => {
       const half = r.winHalf || 0;
       let when;
@@ -206,9 +214,9 @@ function NextPollTicker() {
     });
 
   /* Overdue leads: an already-blown forecast is more news than any countdown,
-     and the overdue count is capped by the same two slots so a busy week of
-     misses cannot push the future off the bar entirely. */
-  const items = [...overdueItems, ...upcomingItems].slice(0, 2);
+     and the overdue count is capped by the same three slots so a busy week
+     of misses cannot push the future off the bar entirely. */
+  const items = [...overdueItems, ...upcomingItems].slice(0, 3);
   if (!items.length) return null;
 
   const title = "Projected from each house's recent publication intervals"
@@ -216,7 +224,7 @@ function NextPollTicker() {
     + " A slot that passes unrecorded counts up as overdue until the release is added";
   return (
     <div className="tab-next" title={title}>
-      <span className="tn-lab">Next</span>
+      <span className="tn-lab">next polls:</span>
       {items.map((it, i) => (
         <span className="tn-item" key={i}>
           {/* the name carries the house's publication link, the same one the

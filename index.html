@@ -10882,7 +10882,7 @@ function TabScore({
 }
 
 // ====================================================================
-// NextPollTicker – how long until the next two polls are expected
+// NextPollTicker – how long until this week's expected polls land
 // ====================================================================
 /* Runs the panel's own projection (window.AP.nextPolls, lifted out of
    NextPollsPanel for this) rather than a second guess at the same thing, so
@@ -10996,7 +10996,13 @@ function NextPollTicker() {
   const upcomingItems = rows.filter(r => !r.missed).map(r => ({
     r,
     t: targetOf(r)
-  })).sort((a, b) => a.t.at - b.t.at).map(({
+  })).sort((a, b) => a.t.at - b.t.at)
+  /* Only the coming week: the bar answers "what lands soon", and a wave a
+     fortnight or more out is the panel's business, not a countdown. A
+     weekly house can appear twice in a seven-day window, and that is the
+     honest shape of the schedule, not a repetition bug. */.filter(({
+    t
+  }) => t.byDay ? Math.round((t.at - t0) / TN_DAY) <= 7 : t.at <= nowMs + 7 * TN_DAY).map(({
     r,
     t
   }) => {
@@ -11036,9 +11042,9 @@ function NextPollTicker() {
   });
 
   /* Overdue leads: an already-blown forecast is more news than any countdown,
-     and the overdue count is capped by the same two slots so a busy week of
-     misses cannot push the future off the bar entirely. */
-  const items = [...overdueItems, ...upcomingItems].slice(0, 2);
+     and the overdue count is capped by the same three slots so a busy week
+     of misses cannot push the future off the bar entirely. */
+  const items = [...overdueItems, ...upcomingItems].slice(0, 3);
   if (!items.length) return null;
   const title = "Projected from each house's recent publication intervals" + " – the earliest each wave could land, not the likeliest." + " A slot that passes unrecorded counts up as overdue until the release is added";
   return /*#__PURE__*/React.createElement("div", {
@@ -11046,7 +11052,7 @@ function NextPollTicker() {
     title: title
   }, /*#__PURE__*/React.createElement("span", {
     className: "tn-lab"
-  }, "Next"), items.map((it, i) => /*#__PURE__*/React.createElement("span", {
+  }, "next polls:"), items.map((it, i) => /*#__PURE__*/React.createElement("span", {
     className: "tn-item",
     key: i
   }, /*#__PURE__*/React.createElement("span", {
