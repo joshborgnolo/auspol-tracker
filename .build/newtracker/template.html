@@ -2276,13 +2276,13 @@ body.dark .fb-form { color-scheme: dark; }
               gap: 5px 8px; flex: 1 1 0; min-width: 0; }
   .alp-side { justify-content: flex-end; }
   .lnp-side { justify-content: flex-start; }
-  /* 58, up from the 52 that ≤900px sets: the figure is the headline of the
-     page and the unstacked pair left it room - the ink is ~97px inside a 164px
-     column, so width was never what held it small. The bump stands over the
-     29px the unstack gave back. Scoped HERE rather than at the 900px rule,
-     which also covers 560-900 where the desktop mirror is the layout and this
-     bump would not be the same change. */
-  .ro-num { order: -1; flex: 0 0 100%; font-size: 58px; }
+  /* 54, eased down from the 58 this block first took: the phone pair read a
+     touch large next to the chart. At ~90px of ink inside a 164px column the
+     42px channel the 20px gaps set still has room around the rule, so the
+     axis look survives the trim. Scoped HERE rather than at the 900px rule,
+     which also covers 560-900 where the desktop mirror is the layout and
+     this change would not be the same one. */
+  .ro-num { order: -1; flex: 0 0 100%; font-size: 54px; }
   /* .roll is an inline-flex, so the figure is positioned by justify-content
      inside its own box - text-align has nothing to act on */
   .alp-side .ro-num { justify-content: flex-end; }
