@@ -74,8 +74,13 @@ new and worth looking at.
   rows the statement PDF off the house's own methodology-statements
   index (demosau.com — plain HTML, no rendering; the two filed MRP
   statements link too, though they print "n/a for MRP" for effective
-  sample). Absent, not zero: only YouGov, Newspoll, RedBridge / Accent
-  and DemosAU have a statement source to link, commissioned YouGov waves
+  sample). Essential's waves carry ONE shared link — the disclosure-
+  statement PDF on essentialreport.com.au, a living document the house
+  appends each wave to and re-uploads (the extractor re-reads the href
+  off /methodology weekly and refreshes every covered wave's link, so
+  the newest wave stays unlinked until the PDF adds it). Absent, not
+  zero: only YouGov, Newspoll, RedBridge / Accent, DemosAU and Essential
+  have a statement source to link, commissioned YouGov waves
   file none, Accent waves with no Accent project page (the 2025 AFR-only
   releases, Mar + Aug 2026) stay unlinked, and so do DemosAU waves with
   no statement on the index (2025-07-06, Jan/Feb/Jul-08 2026, and the

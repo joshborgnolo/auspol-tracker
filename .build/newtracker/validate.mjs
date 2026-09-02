@@ -61,12 +61,14 @@ export function validate(D) {
     // 2c2. methodUrl, where present, is the wave's APC methodology statement
     //      (YouGov's statement PDF, Newspoll's Pyxis statement page, the
     //      RedBridge/Accent wave's usrfiles.com report PDF, DemosAU's
-    //      statement PDF off its methodology-statements index) – an absolute
+    //      statement PDF off its methodology-statements index, Essential's
+    //      ONE living disclosure-statement PDF shared by every covered wave
+    //      – refreshed in place when the house re-uploads it) – an absolute
     //      https URL, stamped by extract-sampleeff.mjs, never by hand. Only
     //      those houses have a source to link.
     if (p.methodUrl != null && (typeof p.methodUrl !== "string" || !/^https:\/\/.+\..+\//.test(p.methodUrl)))
       fail("method-url", `methodUrl = ${JSON.stringify(p.methodUrl)}`);
-    if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge / Accent", "RedBridge / Accent (MRP)", "DemosAU", "DemosAU (MRP)"].includes(p.pollster))
+    if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge / Accent", "RedBridge / Accent (MRP)", "DemosAU", "DemosAU (MRP)", "Essential"].includes(p.pollster))
       fail("method-url", `methodUrl on a row for ${p.pollster}`);
     // 2d. sampleEff (the house's published effective sample size) is a whole
     //     number never below 200 and never above its own raw sample – a

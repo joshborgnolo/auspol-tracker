@@ -1,6 +1,6 @@
 ---
 name: auspol-effective-sample
-description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md. Statement caches in .build/sampleeff-src/. Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement."
+description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md. Statement caches in .build/sampleeff-src/. Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement."
 source: auto-skill
 extracted_at: '2026-09-02T00:00:00.000Z'
 ---
@@ -133,7 +133,7 @@ wave's APC methodology-statement LINK (distinct from the sampleEff NUMBER
 parsed out of it). Stamped by `.build/extract-sampleeff.mjs`, never by
 hand; validate.mjs check "2c2" guards it (https shape + pollster ∈
 {YouGov, Newspoll, RedBridge / Accent, RedBridge / Accent (MRP),
-DemosAU, DemosAU (MRP)} — only
+DemosAU, DemosAU (MRP), Essential} — only
 those houses have a statement source reachable without paywall).
 
 Sources and link forms:
@@ -201,15 +201,36 @@ Sources and link forms:
   lists only two MRP statements (OctNov-2025 report, FebMarch-2026
   model); if a July MRP statement ever posts, the weekly
   sampleeff-updater picks it up.
+- **Essential** (added 2026-09-02, same day) — the odd one out: ONE
+  living disclosure-statement PDF the house appends each wave to and
+  re-uploads (essentialreport.com.au/wp-content/uploads/<YYYY>/<MM>/
+  Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf), linked
+  off essentialreport.com.au/methodology ("…can be found here").
+  `legEssential` re-reads that href off /methodology EVERY weekly run
+  and its records carry `href`, so every covered wave shares the one
+  living URL. That makes Essential the ONLY leg allowed to OVERWRITE
+  an existing methodUrl: a dedicated block before the main stamper
+  refreshes any covered row whose stored link differs from the current
+  href (logs "(refreshed)"), because a re-uploaded PDF at a new URL
+  would otherwise strand eleven rows on a dead link — nothing per-wave
+  is preserved, so nothing is lost. Coverage matching is by the
+  disclosure table's `end` column ±1 day: a wave the house has not yet
+  appended (the brand-new release sits in this gap by design — at ship,
+  2026-08-31) keeps NO link until the house appends it, after which the
+  next weekly run stamps it. The same leg already parsed the survey-
+  details table for sampleEff, so the link rides the existing fetch.
 
 Coverage: YouGov 19/22, Newspoll 17/17 (2025-07-17 → 2026-08-28: seven
 statement-page links + ten post-migration PDF links),
 RedBridge / Accent 9/16 (seven cache-derived + the two constant entries;
 the other seven stay unlinked by design as listed above), DemosAU 7/12
 (seven statement PDFs incl. two of the three MRP waves; the five
-statement-less waves above stay unlinked by design).
+statement-less waves above stay unlinked by design), Essential 11/12
+(living PDF shared across waves; 2026-08-31 links once the house
+appends it).
 Status line gained a `methods` count; the extractor stamps links only
-for unstamped rows (never overwrite), ambiguity on >1 distinct href
+for unstamped rows (never overwrite — EXCEPT the Essential leg above,
+whose shared living URL must refresh), ambiguity on >1 distinct href
 matches = the same error convention as sampleEff conflicts.
 
 Surface path: schema describes it; gen-data emits `methodUrl`
@@ -221,7 +242,9 @@ archive table (d1a1d215) renders MethodLink in its pollster cell above
 the tag chips; template.html styles `.pollster-method` after
 `.pollster-mode`; check-citations.mjs sweeps it (`add(p.methodUrl,
 "methodUrl")`, +36 URLs once Newspoll's 2026 waves linked, +9 more
-when the RedBridge / Accent leg landed, +7 for the DemosAU leg → 52);
+when the RedBridge / Accent leg landed, +7 for the DemosAU leg,
++11 for the Essential leg → 63 entries, though Essential's eleven
+resolve to one living URL);
 README data-fields bullet beside the
 `sampleEff` one.
 

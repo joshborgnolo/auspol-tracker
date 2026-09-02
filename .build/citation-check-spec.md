@@ -26,7 +26,10 @@ re-read from the extract-redbridge.mjs caches, plus two from a one-off
 CDP-click probe → 45 URLs on the sweep — and the DemosAU leg closed the
 day: seven wave statement PDFs read off demosau.com's plain-HTML
 methodology-statements index (both filed MRP statements among them; five
-waves have no statement to link) → 52 URLs on the sweep.
+waves have no statement to link) → 52 URLs on the sweep, plus Essential's
+living disclosure-statement PDF shared across eleven covered waves (the
+2026-08-31 release joins them once the house appends it to the PDF) →
+63 sweep entries, though Essential's eleven resolve to one URL.
 
 Top hosts: roymorgan.com 44, theaustralian.com.au 15, smh.com.au 15,
 afr.com 14, essentialreport.com.au 13, skynews.com.au 13, demosau.com 11,

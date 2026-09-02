@@ -28,7 +28,12 @@
 //              Its "Individual Survey Details" table lists publication &
 //              fieldwork dates, raw sample, weighting efficiency and effective
 //              sample for every wave since May 2021. The current href is read
-//              off essentialreport.com.au/methodology each run.
+//              off essentialreport.com.au/methodology each run. Every covered
+//              wave shares that ONE living URL as its `methodUrl`, and the
+//              link REFRESHES when the PDF is re-uploaded at a new URL – the
+//              only leg allowed to overwrite, since there is no per-wave
+//              statement to preserve. A wave not yet in the table (the brand-
+//              new release) keeps no link until the house appends it.
 //   DemosAU  – the methodology-statements index (already crawlable plain
 //              HTML); federal poll and MRP statement PDFs carry the same APC
 //              template row. This leg also stamps `methodUrl` (the statement
@@ -381,7 +386,7 @@ async function legEssential() {
   if (!hrefM) throw new Error("Essential methodology page: disclosure href not found");
   const pdfUrl = new URL(hrefM[1] || hrefM[2], "https://essentialreport.com.au/methodology").toString();
   const txt = cachedText("essential-disclosure", pdfToText(await fetchBuffer(pdfUrl), "essential-disclosure"));
-  return parseEssentialTable(txt).map((r) => ({ pollster: "Essential", series: "essential", eff: r.eff, sample: r.sample, end: r.end, src: "Essential disclosure " + r.pub }));
+  return parseEssentialTable(txt).map((r) => ({ pollster: "Essential", series: "essential", eff: r.eff, sample: r.sample, end: r.end, href: pdfUrl, src: "Essential disclosure " + r.pub }));
 }
 
 /* ---- leg: DemosAU methodology-statements index -------------------------- */
@@ -520,8 +525,12 @@ for (const p of unstamped) {
    Newspoll ±7 days on the statement's publication date; RedBridge/Accent
    an exact date match on the redbridge-src cache's fieldwork end; DemosAU
    ±1 day on the statement's parsed fieldwork end), absent-not-zero, never
-   overwritten. The commissioned YouGov waves file no statement with
-   YouGov's APC listing, so they keep no link. */
+   overwritten – EXCEPT Essential, whose waves all share the ONE living
+   disclosure-statement PDF, so its link refreshes silently when the house
+   re-uploads at a new URL (the dedicated block below; there is no
+   per-wave Essential statement to preserve). The commissioned YouGov
+   waves file no statement with YouGov's APC listing, so they keep no
+   link. */
 let npLinks = [];
 if (D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
   const needDates = D.polls
@@ -534,6 +543,28 @@ const accentLinks = D.polls.some((p) => p.pollster.startsWith("RedBridge / Accen
   ? legAccentLinks()
   : [];
 const methods = [];
+/* Essential's living-PDF link: stamp or REFRESH every wave the disclosure
+   table covers (the brand-new release, not yet appended, is skipped). */
+const essUrl = (records.find((r) => r.pollster === "Essential") || {}).href;
+if (essUrl) {
+  const essEnds = [...seen.values()].filter((r) => r.pollster === "Essential" && r.end).map((r) => r.end);
+  for (const p of D.polls) {
+    if (p.pollster !== "Essential") continue;
+    if (p.methodUrl === essUrl) continue;
+    if (!essEnds.some((e) => Math.abs(ddays(e, p.date)) <= 1)) continue;
+    const after = "releaseUrl" in p ? "releaseUrl" : "url";
+    const had = "methodUrl" in p;
+    const rebuilt = {};
+    for (const [k, v] of Object.entries(p)) {
+      rebuilt[k] = v;
+      if (k === after && !had) rebuilt.methodUrl = essUrl;
+    }
+    if (!("methodUrl" in rebuilt)) rebuilt.methodUrl = essUrl;
+    for (const k of Object.keys(p)) delete p[k];
+    Object.assign(p, rebuilt);
+    methods.push(`${p.date} Essential${had ? " (refreshed)" : ""} (Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf)`);
+  }
+}
 for (const p of D.polls) {
   if (p.methodUrl != null) continue;
   const hrefs = p.pollster === "YouGov"
