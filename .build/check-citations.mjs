@@ -4,8 +4,9 @@
    URLs. Spec: .build/citation-check-spec.md.
 
    Every poll row's citation is provenance, and nothing else verifies
-   the 175 unique URLs across polls[].url, polls[].releaseUrl and
-   pollsterRules[].site. Status codes lie on this archive in both
+   the unique URLs across polls[].url, polls[].releaseUrl,
+   polls[].methodUrl and pollsterRules[].site. Status codes lie on this
+   archive in both
    directions — News Corp's mastheads answer anonymous GETs with a
    crawler-bot block page (403 to an honest UA today; the "No Cookies"
    200 to browserish UAs), news24.com.au 404s walled-but-alive pages,
@@ -242,6 +243,7 @@ function collect() {
   for (const p of data.polls || []) {
     add(p.url, "url");
     add(p.releaseUrl, "releaseUrl");
+    add(p.methodUrl, "methodUrl");
   }
   // pollsterRules is an object keyed by pollster name
   for (const rule of Object.values(data.pollsterRules || {})) {

@@ -1621,6 +1621,24 @@ function PollsterName({ name, url }) {
   );
 }
 
+/* The sub-line under the pollster's name linking the wave's APC methodology
+   statement (YouGov's statement PDF, Newspoll's Pyxis statement page) – the
+   methodology sibling of the release link the name itself carries. Only
+   YouGov and Newspoll rows ever have one (extract-sampleeff.mjs stamps it). */
+function MethodLink({ url }) {
+  if (!url) return null;
+  let host = "";
+  try { host = new URL(url).hostname.replace(/^www\./, ""); } catch (e) { /* keep the link, drop the hint */ }
+  return (
+    <a className="pollster-method" href={url}
+       target="_blank" rel="noopener noreferrer"
+       onClick={(e) => e.stopPropagation()}
+       title={host ? `Read the wave's APC methodology statement · ${host}` : "Read the wave's APC methodology statement"}>
+      APC methodology<span className="plink-mark" aria-hidden="true">↗</span>
+    </a>
+  );
+}
+
 // arity-agnostic stacked share bar – renders however many segments it is given.
 // `flag` renders inline at the end of the key row (never a second line, so
 // flagged rows keep the same height as plain ones).
@@ -1961,6 +1979,18 @@ function PollLedger({ r, dirSegments }) {
         <PdSec label="Pollster’s release">
           <p className="pd-s">
             <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
+              here<span className="plink-mark" aria-hidden="true">↗</span>
+            </a>
+          </p>
+        </PdSec>
+      )}
+
+      {/* the wave's APC methodology statement (YouGov / Newspoll only),
+          beside the release pointer it accompanies */}
+      {r.methodUrl && (
+        <PdSec label="APC methodology statement">
+          <p className="pd-s">
+            <a className="pd-release" href={r.methodUrl} target="_blank" rel="noopener noreferrer">
               here<span className="plink-mark" aria-hidden="true">↗</span>
             </a>
           </p>
@@ -2640,6 +2670,7 @@ function PollsterTable() {
                     </td>
                     <td className="ta-l pollster-cell">
                       <PollsterName name={r.pollster} url={r.url} />
+                      <MethodLink url={r.methodUrl} />
                       <span className="pollster-mode">{r.client}</span>
                     </td>
                     {/* The date the poll was PUBLISHED where the source says so.

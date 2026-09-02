@@ -61,6 +61,14 @@ new and worth looking at.
   prune older statement PDFs — rows without one stay on the standing
   sample ÷ 1.6 convention. Where present it replaces the derived figure in the
   aggregate's weights (gen-data's `rowN`).
+- **APC methodology statement** travels per poll as `methodUrl`, stamped by
+  the same extractor: YouGov rows link the wave's statement PDF on YouGov's
+  document host, Newspoll rows the wave's pyxispolling.com statement page
+  (the page outlives the PDF, which Pyxis prunes pre-2025-11; Pyxis stops
+  filing Newspoll statements at Jan 2026, so later Newspolls have none).
+  Absent, not zero: only YouGov and Newspoll have a statement source to link,
+  and commissioned YouGov waves file none. The polls tables render it beside
+  the pollster name as "APC methodology".
 
 ## Layout
 

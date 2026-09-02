@@ -58,6 +58,14 @@ export function validate(D) {
     //     weird source.
     if (p.releaseUrl != null && (typeof p.releaseUrl !== "string" || !/^https:\/\/.+\..+\//.test(p.releaseUrl)))
       fail("release-url", `releaseUrl = ${JSON.stringify(p.releaseUrl)}`);
+    // 2c2. methodUrl, where present, is the wave's APC methodology statement
+    //      (YouGov's statement PDF, Newspoll's Pyxis statement page) – an
+    //      absolute https URL, stamped by extract-sampleeff.mjs, never by
+    //      hand. Only YouGov and Newspoll have a source to link.
+    if (p.methodUrl != null && (typeof p.methodUrl !== "string" || !/^https:\/\/.+\..+\//.test(p.methodUrl)))
+      fail("method-url", `methodUrl = ${JSON.stringify(p.methodUrl)}`);
+    if (p.methodUrl != null && !["YouGov", "Newspoll"].includes(p.pollster))
+      fail("method-url", `methodUrl on a row for ${p.pollster}`);
     // 2d. sampleEff (the house's published effective sample size) is a whole
     //     number never below 200 and never above its own raw sample – a
     //     design effect can only deflate. Absent-not-filled means the house

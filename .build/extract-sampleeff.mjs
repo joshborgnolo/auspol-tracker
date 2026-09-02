@@ -9,14 +9,19 @@
 //              all three into pollster "YouGov"; the row's `url` disambiguates
 //              series when two statements cover the same week. The listing
 //              only keeps a rolling window, so unstamped rows that predate it
-//              stay on the derived fallback forever – that is accepted.
+//              stay on the derived fallback forever – that is accepted. This
+//              leg also stamps `methodUrl` (the statement's own URL) on every
+//              YouGov row it can match, whether or not the row needs a
+//              sampleEff – so methodUrl reach equals the listing's window.
 //   Newspoll – pyxispolling.com statement pages, enumerated via sitemap.xml
 //              (the /apc listing is JS-paginated through an authed CMS API and
 //              ?page=N is ignored). Each /methodology-statement/newspoll-* page
 //              renders its PDF link client-side, resolved with headless Chrome
 //              --dump-dom --virtual-time-budget (skipped with a warning when
 //              no Chrome is available). Pyxis statements stop at Jan 2026 for
-//              now; later waves fall back.
+//              now; later waves fall back. The statement PAGES also carry
+//              Newspoll's methodUrl – they outlive their PDFs (pruned pre-
+//              2025-11), so the page, not the pdf, is the link target.
 //   Essential – ONE living disclosure-statement PDF, re-uploaded per release.
 //              Its "Individual Survey Details" table lists publication &
 //              fieldwork dates, raw sample, weighting efficiency and effective
@@ -44,7 +49,7 @@
 //
 // Exit codes: 0 ok (SAMPLEEFF_STATUS line, changed:true/false), 1 fetch/parse
 // failure, 2 guard breach. Status line shape:
-//   SAMPLEEFF_STATUS {"changed":bool,"stamped":n,"failed":n,"skipped":n,"errors":[…]}
+//   SAMPLEEFF_STATUS {"changed":bool,"stamped":n,"methods":n,"failed":n,"skipped":n,"errors":[…]}
 
 import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -233,7 +238,9 @@ async function legYouGov(needDates) {
     if (rec.na) { console.log("  note: house marks eff-size n/a for " + title.slice(0, 60)); continue; }
     if (!rec.end) { console.log("  warn: no fieldwork end in " + title.slice(0, 60)); continue; }
     const series = ygSeries(title);
-    out.push({ pollster: series === "mrp" ? "YouGov (MRP)" : "YouGov", series, ...rec, src: title.slice(0, 70) });
+    // href travels with the record: the statement URL is stamped onto the
+    // row as methodUrl even where the statement's eff-size is already known
+    out.push({ pollster: series === "mrp" ? "YouGov (MRP)" : "YouGov", series, ...rec, href, src: title.slice(0, 70) });
   }
   return out;
 }
@@ -277,6 +284,22 @@ async function resolveNewspollStatement(url, when) {
   const rec = await parsePdfAt(pdfUrl, "newspoll-" + when);
   if (!rec || !rec.end) { console.log("  warn: parse hole in " + url); return null; }
   return rec;
+}
+
+/* Newspoll methodUrl leg: the sitemap's methodology-statement PAGE urls are
+   the link target (their PDFs older than Nov 2025 are pruned, but the pages
+   themselves live on and carry the wave's statement title). No Chrome, no
+   PDF fetch – dates come from the url, matched within ±7 days of a row's
+   publication. Placement mirrors legNewspoll's candidate window. */
+async function legNewspollLinks(needDates) {
+  const xml = await fetchText("https://pyxispolling.com/sitemap.xml");
+  const out = [];
+  for (const m of xml.matchAll(/<loc>(https:\/\/pyxispolling\.com\/methodology-statement\/(newspoll)-(\d{1,2})-(\d{1,2})-(\d{4}))<\/loc>/g)) {
+    const when = iso(+m[5], +m[4], +m[3]);
+    if (!needDates.some((d) => Math.abs(ddays(d, when)) <= 7)) continue;
+    out.push({ when, href: m[1] });
+  }
+  return out;
 }
 
 /* ---- leg: Essential disclosure statement (one living PDF) -------------- */
@@ -375,8 +398,13 @@ const unstamped = D.polls.filter((p) => NEED_HOUSES.includes(p.pollster) && p.sa
 
 const records = [];
 const errors = [];
+/* YouGov rows also need their statements when they lack a methodUrl –
+   the same listing pass serves both fields, so an already-eff-stamped wave
+   is fetched once more to capture its URL, not its number. */
 const legs = [
-  ["yougov", () => legYouGov(unstamped.filter((p) => p.pollster.startsWith("YouGov")).map((p) => p.date))],
+  ["yougov", () => legYouGov([...new Set(D.polls
+    .filter((p) => p.pollster.startsWith("YouGov") && (p.sampleEff == null || p.methodUrl == null))
+    .map((p) => p.date))])],
   ["essential", () => legEssential()],
   ["demosau", () => legDemosau([...new Set(unstamped.filter((p) => p.pollster.startsWith("DemosAU")).map((p) => p.date.slice(0, 7)))])],
 ];
@@ -438,14 +466,55 @@ for (const p of unstamped) {
   stamped.push(`${p.date} ${p.pollster}: ${pick.eff} (${pick.src})`);
 }
 
-const out = { changed: stamped.length > 0, stamped: stamped.length, failed, skipped: unstamped.length - stamped.length - failed, candidates: records.length, errors: errors.concat(ambiguous.map((a) => "ambiguity: " + a)) };
+/* methodUrl: a YouGov or Newspoll row carries its wave's APC statement
+   link. Same matching discipline as sampleEff (YouGov ±1 day, series-locked
+   by the row's URL; Newspoll ±7 days on the statement-page date from its
+   sitemap), absent-not-zero, never overwritten. The commissioned YouGov
+   waves file no statement with YouGov's APC listing, so they keep no link. */
+let npLinks = [];
+if (D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
+  const needDates = D.polls
+    .filter((p) => p.pollster === "Newspoll" && p.methodUrl == null)
+    .map((p) => (p.published || p.date).slice(0, 10));
+  try { npLinks = await legNewspollLinks(needDates); }
+  catch (e) { errors.push("leg newspoll-links: " + String(e.message).slice(0, 180)); }
+}
+const methods = [];
+for (const p of D.polls) {
+  if (p.methodUrl != null) continue;
+  const hrefs = p.pollster === "YouGov"
+    ? [...new Set(records
+        .filter((r) => r.pollster === "YouGov" && r.end && Math.abs(ddays(r.end, p.date)) <= 1 && r.series === rowSeries(p))
+        .map((r) => r.href))]
+    : p.pollster === "Newspoll"
+    ? [...new Set(npLinks
+        .filter((l) => Math.abs(ddays(l.when, (p.published || p.date).slice(0, 10))) <= 7)
+        .map((l) => l.href))]
+    : [];
+  if (!hrefs.length) continue;
+  if (hrefs.length > 1) { errors.push(`ambiguity: ${p.date} ${p.pollster} methodUrl ${hrefs.join(" vs ")}`); continue; }
+  // insert after releaseUrl (or url), keeping the citation links together
+  const after = "releaseUrl" in p ? "releaseUrl" : "url";
+  const rebuilt = {};
+  for (const [k, v] of Object.entries(p)) {
+    rebuilt[k] = v;
+    if (k === after) rebuilt.methodUrl = hrefs[0];
+  }
+  if (!("methodUrl" in rebuilt)) rebuilt.methodUrl = hrefs[0];
+  for (const k of Object.keys(p)) delete p[k];
+  Object.assign(p, rebuilt);
+  methods.push(`${p.date} ${p.pollster} (${rebuilt.methodUrl.split("/").pop().slice(0, 50)})`);
+}
+
+const out = { changed: stamped.length > 0 || methods.length > 0, stamped: stamped.length, methods: methods.length, failed, skipped: unstamped.length - stamped.length - failed, candidates: records.length, errors: errors.concat(ambiguous.map((a) => "ambiguity: " + a)) };
 for (const s of stamped) console.log("  stamp " + s);
+for (const s of methods) console.log("  method " + s);
 for (const a of ambiguous) console.log("  AMBIGUOUS " + a);
 if (errors.length) {
   for (const e of errors) console.log("  ERROR " + e);
   statusAndExit(out, 2);
 }
-if (stamped.length) {
+if (stamped.length || methods.length) {
   const txt = readFileSync(OUT, "utf8");
   const trailingNl = txt.endsWith("\n") ? "\n" : "";
   const next = JSON.stringify(D, null, 2) + trailingNl;
