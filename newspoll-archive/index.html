@@ -151,6 +151,39 @@ body {
   .meta-item { text-align: left; }
 }
 
+/* ------- archive tabs ------- */
+.tabs {
+  display: flex; gap: 4px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 14px;
+}
+.tab {
+  appearance: none; background: none; border: 0;
+  font: inherit; font-weight: 600; font-size: 14px;
+  color: var(--ink-3);
+  padding: 8px 12px 10px; margin-bottom: -1px;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+}
+.tab:hover { color: var(--ink); }
+.tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+
+/* ------- AC Nielsen PDF list ------- */
+.archive-list { list-style: none; border-top: 1px solid var(--line); margin-top: 4px; }
+.archive-list li {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--line);
+  font-size: 14px;
+}
+.archive-list a { font-weight: 600; color: var(--ink); text-decoration: none; }
+.archive-list a:hover { text-decoration: underline; }
+.archive-list a::after { content: " \2197"; font-weight: 400; color: var(--ink-3); }
+.archive-list .note { font-size: 12.5px; color: var(--ink-3); white-space: nowrap; }
+
+.pane { display: flex; flex: 1; flex-direction: column; }
+.pane[hidden] { display: none; }
+
 /* ------- embedded archive ------- */
 .frame-wrap {
   flex: 1; display: flex; flex-direction: column;
@@ -202,14 +235,60 @@ iframe { flex: 1; width: 100%; border: 0; display: block; }
   </div>
 </header>
 <main class="frame-wrap">
-  <p class="credit">Federal Newspoll archive, charted wave by wave — embedded from the Infogram original.</p>
-  <div class="frame-holder">
-    <iframe
-      src="https://e.infogram.com/federal-newspoll-archive-1gv4m7ejjndop18?src=embed"
-      title="Federal Newspoll Archive — historical Newspoll polling results (Infogram)"
-      allow="fullscreen"
-      loading="eager"></iframe>
+  <div class="tabs" role="tablist" aria-label="Poll archives">
+    <button class="tab active" id="tab-newspoll" role="tab" aria-selected="true" aria-controls="pane-newspoll">Newspoll</button>
+    <button class="tab" id="tab-acnielsen" role="tab" aria-selected="false" aria-controls="pane-acnielsen">AC Nielsen</button>
+  </div>
+
+  <div class="pane active" id="pane-newspoll" role="tabpanel" aria-labelledby="tab-newspoll">
+    <p class="credit">Federal Newspoll archive, charted wave by wave — embedded from the Infogram original.</p>
+    <div class="frame-holder">
+      <iframe
+        src="https://e.infogram.com/federal-newspoll-archive-1gv4m7ejjndop18?src=embed"
+        title="Federal Newspoll Archive — historical Newspoll polling results (Infogram)"
+        allow="fullscreen"
+        loading="lazy"></iframe>
+    </div>
+  </div>
+
+  <div class="pane" id="pane-acnielsen" role="tabpanel" aria-labelledby="tab-acnielsen" hidden>
+    <p class="credit">The AC Nielsen federal poll, published with The Age and The Sydney Morning Herald until 2007 — annual PDF compilations of voting intention, leadership approval and preferred PM, preserved by the Internet Archive from au.acnielsen.com. No polls were conducted in 2002.</p>
+    <ul class="archive-list">
+      <li><a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/news/documents/ACNielsenPoll2006.pdf">AC Nielsen Poll 2006</a><span class="note">PDF via web.archive.org</span></li>
+      <li><a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/reports/documents/ACNielsenPoll2005_000.pdf">AC Nielsen Poll 2005</a><span class="note">PDF via web.archive.org</span></li>
+      <li><a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/reports/documents/ACNielsenPoll2004.pdf">AC Nielsen Poll 2004</a><span class="note">PDF via web.archive.org</span></li>
+      <li><a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/reports/documents/ACNielsenPoll2003.pdf">AC Nielsen Poll 2003</a><span class="note">PDF via web.archive.org</span></li>
+      <li><a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/reports/documents/ACNielsenPoll2001.pdf">AC Nielsen Poll 2001</a><span class="note">PDF via web.archive.org</span></li>
+      <li><a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/reports/documents/ACNielsenPoll2000.pdf">AC Nielsen Poll 2000</a><span class="note">PDF via web.archive.org</span></li>
+      <li><a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/reports/documents/ACNielsenPoll1999.pdf">AC Nielsen Poll 1999</a><span class="note">PDF via web.archive.org</span></li>
+      <li><a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/reports/documents/ACNielsenPoll1998_000.pdf">AC Nielsen Poll 1998</a><span class="note">PDF via web.archive.org</span></li>
+      <li><a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/reports/documents/ACNielsenPoll1997.pdf">AC Nielsen Poll 1997</a><span class="note">PDF via web.archive.org</span></li>
+      <li><a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/reports/documents/ACNielsenPoll1996.pdf">AC Nielsen Poll 1996</a><span class="note">PDF via web.archive.org</span></li>
+    </ul>
+    <p class="credit" style="margin-top: 10px;">The same series transcribed to data: <a href="/data/acnielsen-polls.csv">acnielsen-polls.csv</a> (1996–2006).</p>
   </div>
 </main>
+<script>
+const TABS = [
+  ["newspoll", "Federal Newspoll archive · auspol tracker"],
+  ["acnielsen", "AC Nielsen poll archive · auspol tracker"],
+];
+function selectTab(name) {
+  for (const [n, title] of TABS) {
+    const on = n === name;
+    document.getElementById("tab-" + n).classList.toggle("active", on);
+    document.getElementById("tab-" + n).setAttribute("aria-selected", String(on));
+    document.getElementById("pane-" + n).hidden = !on;
+    if (on) document.title = title;
+  }
+}
+function tabFromHash() {
+  selectTab(location.hash === "#acnielsen" ? "acnielsen" : "newspoll");
+}
+document.getElementById("tab-newspoll").addEventListener("click", () => { location.hash = ""; });
+document.getElementById("tab-acnielsen").addEventListener("click", () => { location.hash = "acnielsen"; });
+addEventListener("hashchange", tabFromHash);
+tabFromHash();
+</script>
 </body>
 </html>
