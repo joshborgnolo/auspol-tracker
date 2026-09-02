@@ -92,9 +92,9 @@
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --figures: "Archivo", var(--sans);
-  /* the hero readout alone asks for 800, a weight Crimson Text never drew -
-     Newsreader's variable cut really ships it (with an optical-size axis) */
-  --hero-num: "Newsreader", var(--serif);
+  /* the hero readout alone asks for 650, a weight Crimson Text never drew -
+     Source Serif 4's variable cut really ships it (with an optical-size axis) */
+  --hero-num: "Source Serif 4", var(--serif);
 
   --radius: 14px;
   --shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
@@ -1004,7 +1004,7 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .ro-party { display: flex; align-items: baseline; gap: 11px; }
 .ro-dot { width: 13px; height: 13px; border-radius: 50%; align-self: center; }
 .ro-name { font-size: 17px; font-weight: 700; color: var(--ink-2); letter-spacing: -0.01em; white-space: nowrap; }
-.ro-num { font-family: var(--hero-num, var(--serif)); font-size: 68px; font-weight: 800; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
+.ro-num { font-family: var(--hero-num, var(--serif)); font-size: 68px; font-weight: 650; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
 .alp-side .ro-num { color: var(--alp-text); }
 .lnp-side .ro-num { color: var(--lnp-text); }
 .ro-sep { width: 2px; height: 47px; border-radius: 1px; background: var(--line); align-self: center; }

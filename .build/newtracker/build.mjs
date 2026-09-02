@@ -110,11 +110,11 @@ const FONTS = [
   { file: "crimsontext-italic-400-latin.woff2", family: "Crimson Text", style: "italic", weight: "400" },
   { file: "crimsontext-italic-600-latin.woff2", family: "Crimson Text", style: "italic", weight: "600" },
   { file: "crimsontext-italic-700-latin.woff2", family: "Crimson Text", style: "italic", weight: "700" },
-  /* Newsreader sets ONLY the hero's 2PP figures - one variable cut (wght
-     200-800 + an optical-size axis the browser steers by font-size, so the
-     68px readout gets the display cut and its true 800 weight). Preloaded -
-     it paints the biggest text on the page. */
-  { file: "newsreader-latin.woff2",             family: "Newsreader", style: "normal", weight: "200 800", preload: true },
+  /* Source Serif 4 sets ONLY the hero's 2PP figures - one variable cut (wght
+     200-900 + an optical-size axis the browser steers by font-size, so the
+     68px readout gets the display cut and its in-between weight-650 ask).
+     Preloaded - it paints the biggest text on the page. */
+  { file: "sourceserif4-latin.woff2",           family: "Source Serif 4", style: "normal", weight: "200 900", preload: true },
   { file: "ibmplexsans-latin.woff2",            family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
   /* Source Sans 3 stays shipped for one scoped caller: the .wordmark
      lockup, which keeps its pre-swap face. */
