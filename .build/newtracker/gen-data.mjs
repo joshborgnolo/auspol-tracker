@@ -1458,9 +1458,32 @@ for (const [firm, rows] of Object.entries(byHouse)) {
   const basis = pubDates ? "published" : "fieldwork";
   // the sequence the interval is measured along, and the date it is projected from
   const seq = pubDates || dates;
-  const gaps = seq.slice(1).map((d, i) => Math.round((Date.parse(d) - Date.parse(seq[i])) / 86400000)).slice(-8);
-  const cadence = medianOf(gaps);
+  const gaps = seq.slice(1).map((d, i) => Math.round((Date.parse(d) - Date.parse(seq[i])) / 86400000));
+  const cadence = medianOf(gaps.slice(-8));
   if (!cadence || cadence <= 0) continue;
+  /* A release INSIDE a slot does not move the rhythm: a client-commissioned
+     one-off beside the regular tracker (Redbridge's Australia Institute
+     extra, 18 Feb 2026, published 17 and 11 days from the monthly waves
+     either side) splits one slot's length across two intervals, and measured
+     raw both halves read as misses. Two of them alone took RedBridge's
+     spread past CAD_MAX_REL_SPREAD - demoting a named day to a window on
+     evidence from a slot that never broke. So adjacent below-median gaps
+     whose sum IS the median are fused back into the slot they split, and
+     the recent-eight window for the spread is cut from the fused list. The
+     guards are the test: only a pair BOTH below the median sums to one
+     slot's length (two genuine slots sit AT it; a weekly house's pair sums
+     to two slots), so a real interval is never collapsed. The interval
+     itself keeps the raw-measured median - the fusion repairs the miss
+     measurement, not the rhythm. */
+  const fused = [];
+  for (let i = 0; i < gaps.length; i++) {
+    if (i + 1 < gaps.length && gaps[i] < cadence && gaps[i + 1] < cadence &&
+        Math.abs(gaps[i] + gaps[i + 1] - cadence) <= 2) {
+      fused.push(gaps[i] + gaps[i + 1]);
+      i++;
+    } else fused.push(gaps[i]);
+  }
+  const slotGaps = fused.slice(-8);
   const last = seq[seq.length - 1];
   /* The only way OFF the projection: declared stopped by hand. Silence on
      its own no longer removes a house – an unrecorded release holds its
@@ -1481,10 +1504,10 @@ for (const [firm, rows] of Object.entries(byHouse)) {
   const dowTop = Object.entries(dowTally).sort((a, b) => b[1] - a[1])[0];
   const dowHabit = ds.length >= CAD_DOW_MIN && dowTop && dowTop[1] / ds.length >= CAD_DOW_SHARE
     ? Number(dowTop[0]) : null;
-  /* Half the range of the recent gaps, least and greatest set aside - see
-     CAD_SPREAD_TRIM. Floored at a day: even Roy Morgan's perfect 7-day cadence
-     still moves a day either side on publication. */
-  const trimmed = [...gaps].sort((a, b) => a - b);
+  /* Half the range of the recent slot gaps, least and greatest set aside -
+     see CAD_SPREAD_TRIM. Floored at a day: even Roy Morgan's perfect 7-day
+     cadence still moves a day either side on publication. */
+  const trimmed = [...slotGaps].sort((a, b) => a - b);
   if (trimmed.length >= CAD_SPREAD_TRIM) { trimmed.pop(); trimmed.shift(); }
   const spread = Math.max(1, Math.round((trimmed[trimmed.length - 1] - trimmed[0]) / 2));
   /* The misses don't fall equally either side of the interval. A house slips
@@ -1621,7 +1644,7 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     })(),
     // how many intervals the median and the spread were actually taken over,
     // which is more than the panel shows and should not be implied otherwise
-    gapsUsed: gaps.length,
+    gapsUsed: slotGaps.length,
   });
 }
 pollCadence.sort((a, b) => a.cadence - b.cadence);

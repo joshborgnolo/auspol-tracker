@@ -179,15 +179,30 @@ function NextPollTicker({ showScore }) {
     return { at: t, byDay: true };
   };
 
+  /* A house whose slot is a WINDOW rather than a date - DemosAU's
+     calendar-month bracket - only belongs on the bar while the window is
+     open: before the bracket opens, a countdown to its edge misreads a day
+     range as a date; after it closes unrecorded, the panel's red row is
+     where the lateness is told. While the window IS open the row reads
+     "any day now" and sits at the tail of the roll - "some time in the
+     next N days" is weaker information than every dated count the bar
+     carries, so every slot leads it. */
+  const isWindowRow = (r) => r.loose && r.releaseDow == null;
+  const windowOpen = (r) => r.release - (r.winHalf || 0) * TN_DAY <= nowMs;
+  const windowItems = rows
+    .filter((r) => isWindowRow(r) && !r.missed && windowOpen(r))
+    .map((r) => ({ firm: r.pollster, when: "any day now", maybe: false, site: r.site }));
+
   /* A slot whose whole tolerance has passed without its release being
      recorded is not rolled forward onto next week's guess and not dropped:
      it leads the bar in red, counting the days it is late - the same claim
      the panel's red row makes, on the same `missed` flag. A late WINDOW
      counts from its close; a late DAY from the day itself, matching the
      number the panel prints. It leaves when the real release moves the
-     projection, never on a date guessed in its place. */
+     projection, never on a date guessed in its place. (Window rows sit
+     outside this too - see above.) */
   const overdueItems = rows
-    .filter((r) => r.missed)
+    .filter((r) => r.missed && !isWindowRow(r))
     .map((r) => {
       const days = Math.round(
         (t0 - (r.loose ? r.release + (r.winHalf || 0) * TN_DAY : r.release)) / TN_DAY);
@@ -204,7 +219,7 @@ function NextPollTicker({ showScore }) {
      "what lands next", and after rolling, a Monday house due today comes
      before a Wednesday one that slipped a week. */
   const upcomingItems = rows
-    .filter((r) => !r.missed)
+    .filter((r) => !r.missed && !isWindowRow(r))
     .map((r) => ({ r, t: targetOf(r) }))
     .sort((a, b) => a.t.at - b.t.at)
     /* One slot PER HOUSE, its nearest: the bar is a roll-call of what's due
@@ -266,8 +281,9 @@ function NextPollTicker({ showScore }) {
   /* Overdue leads: an already-blown forecast is more news than any
      countdown. The tail is the fit pass's business - the candidate list is
      the whole roll (one slot per house, nearest first), and the bar shows
-     as much of it as clears the neighbours. */
-  const items = [...overdueItems, ...upcomingItems];
+     as much of it as clears the neighbours. Window-house rows trail it all:
+     "any day now" is weaker information than every dated count. */
+  const items = [...overdueItems, ...upcomingItems, ...windowItems];
   const itemsKey = items.map((it) => it.firm + it.when).join("");
 
   /* ---- fit pass: as many items as the bar has room for -----------------
