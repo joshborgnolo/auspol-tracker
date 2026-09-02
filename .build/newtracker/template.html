@@ -315,6 +315,19 @@ body.js .static-summary {
 body.js #root {
   margin-top: calc(-1 * var(--ss-h, 0px));
 }
+/* The meta line's freshness dot toggles ss-view: the article steps back up
+   to full opacity in its own in-flow box while the app's box collapses out
+   of the way - the same two levers body.js pulls at mount, in reverse. The
+   dot hides with the app, so the way back is the portaled .ss-back pill. */
+body.js.ss-view .static-summary { opacity: 1; pointer-events: auto; }
+body.js.ss-view #root { display: none; }
+.ss-back {
+  position: fixed; right: 18px; bottom: 18px; z-index: 300;
+  padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink); font: inherit; font-size: 13px;
+  font-weight: 600; cursor: pointer; box-shadow: 0 3px 16px oklch(0 0 0 / 0.16);
+}
+.ss-back:hover { border-color: var(--ink-3); }
 .wordmark.stacked { flex-direction: row; align-items: center; }
 /* Both words at ONE size, told apart by weight alone. At 30px `auspol` at 800
    measures 93.6px and `tracker` at 400 measures 95px, so the block squares
@@ -700,6 +713,13 @@ body.dark .dl-bloom { opacity: 1; }
 .fresh-dot.fresh { background: var(--mood-pos); }
 .fresh-dot.aging { background: var(--ink-3); }
 .fresh-dot.stale { background: var(--mood-neg); }
+/* The dot is also the static-view switch (see body.js.ss-view near the top).
+   The compact mirror stays a span and only borrows the cursor; the control
+   in .head-meta is a real button, so it takes the chrome reset and a focus
+   ring. */
+.fresh-toggle { cursor: pointer; }
+button.fresh-dot { appearance: none; -webkit-appearance: none; border: 0; padding: 0; }
+button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-offset: 2px; }
 .fresh-rel { margin-left: 6px; color: var(--ink-3); font-weight: 500; }
 .meta-divide { width: 1px; height: 30px; background: var(--line); }
 .theme-cell {

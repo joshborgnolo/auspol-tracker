@@ -288,6 +288,19 @@ function Header({ isDark, onToggleTheme }) {
     const el = glyphRef.current;
     setStory({ rect: el ? el.getBoundingClientRect() : null });
   };
+  /* The freshness dot in the meta line doubles as a switch: press it and the
+     page trades the interactive app for the article version of itself - the
+     static summary a crawler or reader mode reads, which sits in flow all
+     along under body.js's opacity hide. One class on <body> crosses the two
+     (the article steps back up to full opacity, the app's box collapses) and
+     pressing again flips it straight back, with nothing to recompute. While
+     the app is hidden the dot hides with it, so the way back is a pill
+     portaled onto <body> - createPortal, not a second mount point. */
+  const [staticView, setStaticView] = useState(false);
+  useEffect(() => {
+    document.body.classList.toggle("ss-view", staticView);
+    return () => document.body.classList.remove("ss-view");
+  }, [staticView]);
   /* "The last N" counts the PAST terms in the cycle data (the Now term
      excluded), so a new Past-cycles term renumbers the sentence on its own.
      Spelled out to twenty; elections come ~3-yearly, so the digit fallback
@@ -320,7 +333,8 @@ function Header({ isDark, onToggleTheme }) {
         </h1>
         <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last {pastWord}.</p>
         <div className="head-meta-compact" aria-hidden="true">
-          <span className={"fresh-dot " + fresh.state}></span>
+          <span className={"fresh-dot fresh-toggle " + fresh.state}
+                onClick={() => setStaticView(true)}></span>
           Updated {D.latest.published} · {D.latest.pollsTracked} polls
         </div>
       </div>
@@ -329,7 +343,10 @@ function Header({ isDark, onToggleTheme }) {
           <div className="meta-item meta-updated">
             <span className="meta-k">Last poll</span>
             <span className="meta-v">
-              <span className={"fresh-dot " + fresh.state} aria-hidden="true"></span>
+              <button type="button" className={"fresh-dot fresh-toggle " + fresh.state}
+                      onClick={() => setStaticView(true)}
+                      aria-label="Read this page as a plain, static article"
+                      title="Read this page as a plain, static article"></button>
               {D.latest.published}
               <span className="fresh-rel">· {fresh.label}</span>
             </span>
@@ -372,6 +389,10 @@ function Header({ isDark, onToggleTheme }) {
           const back = openerRef.current || glyphRef.current;
           back && back.focus && back.focus();
         }); }} />}
+      {staticView && ReactDOM.createPortal(
+        <button type="button" className="ss-back" onClick={() => setStaticView(false)}>
+          Back to the interactive tracker
+        </button>, document.body)}
     </header>
   );
 }
