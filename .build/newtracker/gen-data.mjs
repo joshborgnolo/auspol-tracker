@@ -1180,6 +1180,8 @@ function cycleSeries(points, base, cap = 36) {
            obs: idxs.map((i) => i >= firstKnown && i in known) };
 }
 const CYC_META = [
+  { year: 1993, gov: "alp", opp: "lnp", pm: "Keating", lead: "Keating", oppLead: "Hewson → Downer → Howard", eDate: "1993-03-13", ePrim: 44.9, eTpp: 51.4, src: 1996, appr: 1993,
+    oppSpl: { isos: ["1994-05-23", "1995-01-30"], names: ["Hewson", "Downer", "Howard"] } },
   { year: 1996, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley", eDate: "1996-03-02", ePrim: 46.9, eTpp: 53.6, src: 1998, appr: 1996 },
   { year: 1998, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley", eDate: "1998-10-03", ePrim: 39.2, eTpp: 49.0, src: 2001, appr: 1998 },
   { year: 2001, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley → Crean → Latham", eDate: "2001-11-10", ePrim: 43.0, eTpp: 51.0, src: 2004, appr: 2001,
@@ -1239,7 +1241,7 @@ function sparseSeries(points, months, cap) {
 /* ---- how the final polls did, cycle by cycle --------------------------
    The page's own caveat is that no aggregate can measure error shared across
    the whole industry about ITSELF. This is the only place that error is
-   visible: ten past elections, each with a result to check the final polls
+   visible: eleven past elections, each with a result to check the final polls
    against, and the honest answer of how far out they were.
 
    The rule, stated once here so the number is reproducible: every house's LAST
