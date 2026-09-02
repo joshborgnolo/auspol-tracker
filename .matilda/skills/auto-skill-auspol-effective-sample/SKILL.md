@@ -1,6 +1,6 @@
 ---
 name: auspol-effective-sample
-description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md. Statement caches in .build/sampleeff-src/. Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement."
+description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index — with a release-PDF fallback (added 2026-09-02) that parses a needing row's own url when it is a demosau.com wp-content PDF, since the house posts statement-bearing report PDFs it never lists / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md. Statement caches in .build/sampleeff-src/. Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement, DemosAU 2026-01-06's release URL is a Capital Brief article page (no demosau.com PDF to fall back on)."
 source: auto-skill
 extracted_at: '2026-09-02T00:00:00.000Z'
 ---
@@ -35,10 +35,10 @@ extracted_at: '2026-09-02T00:00:00.000Z'
   `seFloor` of the live aggregate estimate, per-poll CHG_MEASURES
   change-CIs/significance.
 
-## Coverage after the 2026-09-02 Newspoll backfill (50/63 APC-statement rows stamped)
+## Coverage after the 2026-09-02 DemosAU release-PDF backfill (53/63 APC-statement rows stamped)
 
 YouGov 16/21 (Sky News Pulse / News24 Pulse / Public Data, 2025-12→),
-Essential 10/12, DemosAU 5/9, Newspoll 17/17 (2025-07-17 → 2026-08-28 —
+Essential 10/12, DemosAU 8/9, Newspoll 17/17 (2025-07-17 → 2026-08-28 —
 the Pyxis CMS migration re-hosted every wave's statement PDF, so the
 earlier "pre-2025-11 pruned, unrecoverable" gap closed; the backfill
 stamped the 16 missing rows on the day the feature shipped).
@@ -51,6 +51,9 @@ Documented gaps, all deliberate:
 - Rows newer than the statement archive (e.g. the latest Essential wave)
   stamp on a later run; the wrapper extracts only CHANGED rows and
   no-ops otherwise.
+- **DemosAU 2026-01-06 is never stamped** — that wave's release URL is a
+  Capital Brief article page, not a demosau.com PDF, so the release-PDF
+  fallback below can't reach it and no statement sits on the index.
 - **Houses with NO statement leg at all are never stamped** — the
   extractor has sources only for Newspoll/YouGov/Essential/DemosAU.
   Resolve Political Monitor has no leg (0/16 rows stamped at ship), and
@@ -195,12 +198,22 @@ Sources and link forms:
   methodUrl matcher dates these n/a records onto "(MRP)" rows, ±1 day).
   The leg's need-months widen to rows missing sampleEff OR methodUrl
   (mirrors the YouGov leg), since post-sampleEff-era DemosAU waves
-  (2026-08-20) need only the link. Deliberately unlinked: 2025-07-06,
-  2026-01-06, 2026-02-20, 2026-07-08 (no statement on the index for the
-  wave) and the 2026-07-11 MRP — verified live 2026-09-02 that the index
-  lists only two MRP statements (OctNov-2025 report, FebMarch-2026
-  model); if a July MRP statement ever posts, the weekly
-  sampleeff-updater picks it up.
+  (2026-08-20) need only the link. RELEASE-PDF FALLBACK (added
+  2026-09-02 after the index-only leg missed real statements): the
+  house posts statement-bearing Capital Brief/report PDFs without
+  listing them on the index, so after the index pass the leg re-reads
+  every needing DemosAU row and parses the row's own `url` when it is
+  itself a demosau.com wp-content PDF (href = the release URL, pollster
+  taken from the row). The 2026-09-02 backfill stamped 2025-07-06
+  (762/1199), 2026-02-20 (1008/1551 — the cover's "Effective Sample
+  Size: 1008" beats the disclosure row's 1006 because the parser stops
+  at the first number) and 2026-07-08 (1532/2694) off exactly this path.
+  Still unlinked by design: 2026-01-06 (release URL is a Capital Brief
+  article page, not a demosau.com PDF) and the 2026-07-11 MRP (release
+  URL is a news page) — verified live 2026-09-02 that the index lists
+  only two MRP statements (OctNov-2025 report, FebMarch-2026 model); if
+  a July MRP statement ever posts, the weekly sampleeff-updater picks
+  it up.
 - **Essential** (added 2026-09-02, same day) — the odd one out: ONE
   living disclosure-statement PDF the house appends each wave to and
   re-uploads (essentialreport.com.au/wp-content/uploads/<YYYY>/<MM>/
@@ -223,9 +236,11 @@ Sources and link forms:
 Coverage: YouGov 19/22, Newspoll 17/17 (2025-07-17 → 2026-08-28: seven
 statement-page links + ten post-migration PDF links),
 RedBridge / Accent 9/16 (seven cache-derived + the two constant entries;
-the other seven stay unlinked by design as listed above), DemosAU 7/12
-(seven statement PDFs incl. two of the three MRP waves; the five
-statement-less waves above stay unlinked by design), Essential 11/12
+the other seven stay unlinked by design as listed above), DemosAU 10/12
+(seven index statement PDFs incl. two of the three MRP waves, plus
+2025-07-06 / 2026-02-20 / 2026-07-08 via the release-PDF fallback;
+2026-01-06 and the 2026-07-11 MRP stay unlinked by design — neither
+wave has a fetchable demosau.com PDF), Essential 11/12
 (living PDF shared across waves; 2026-08-31 links once the house
 appends it).
 Status line gained a `methods` count; the extractor stamps links only

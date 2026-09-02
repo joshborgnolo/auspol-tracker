@@ -41,6 +41,11 @@
 //              "(MRP)" rows, whose statements print "n/a for MRP" for the
 //              effective size but still parse a fieldwork end; those records
 //              travel link-only (the sampleEff matcher filters eff==null).
+//              Fallback after the index pass: the house sometimes posts a
+//              statement-bearing report PDF without listing it on the index
+//              (2025-07 report, 2026-02 and 2026-07 Capital Brief waves), so
+//              any needing row whose release URL is itself a demosau.com
+//              wp-content PDF has THAT URL parsed as a statement too.
 //   RedBridge/Accent (methodUrl only) – no network leg at all: the wave's
 //              Accent project page yields its methodology-report PDF URL
 //              only to a CLICKED document widget, and extract-redbridge.mjs
@@ -396,7 +401,8 @@ function dauMonths(title) {
   const ms = [...new Set([...title.toLowerCase().matchAll(/jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|jul(?:y)?|aug(?:ust)?|sep(?:tember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?/g)].map((m) => monthNo(m[0])))];
   return ms.length && y ? { y: +y[0], lo: Math.min(...ms), hi: Math.max(...ms) } : null;
 }
-async function legDemosau(needYms) {
+async function legDemosau(needRows) {
+  const needYms = [...new Set(needRows.map((p) => p.date.slice(0, 7)))];
   const html = await fetchText("https://demosau.com/methodology-statements/");
   const out = [], naTitles = [];
   for (const m of html.matchAll(/href="(https:\/\/demosau\.com\/wp-content\/uploads\/[^"]+\.pdf)"/gi)) {
@@ -425,6 +431,23 @@ async function legDemosau(needYms) {
     if (rec.na) naTitles.push(title.slice(0, 60));
     else if (!rec.end) { console.log("  warn: no fieldwork end in DemosAU " + title.slice(0, 60)); continue; }
     out.push({ pollster: /mrp/i.test(title) ? "DemosAU (MRP)" : "DemosAU", series: "demosau", ...rec, href: m[1], src: title.slice(0, 70) });
+  }
+  /* fallback: a needing row whose release URL is itself a demosau.com
+     wp-content PDF carries the statement even when the index never listed
+     it (the house posts report PDFs that double as the APC statement) */
+  for (const p of needRows) {
+    if (!/^https:\/\/demosau\.com\/wp-content\/uploads\/\S+\.pdf$/i.test(p.url || "")) continue;
+    if (out.some((r) => r.href === p.url)) continue;
+    const title = decodeURIComponent(p.url.split("/").pop());
+    try {
+      const rec = await parsePdfAt(p.url, "demosau-release-" + title.replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9]+/g, "_").slice(0, 60));
+      if (!rec) { console.log("  warn: parse hole in DemosAU release " + title.slice(0, 60)); continue; }
+      if (rec.na) console.log("  note: house marks eff-size n/a for " + title.slice(0, 60));
+      else if (!rec.end) { console.log("  warn: no fieldwork end in DemosAU release " + title.slice(0, 60)); continue; }
+      out.push({ pollster: p.pollster, series: "demosau", ...rec, href: p.url, src: "release PDF " + title.slice(0, 62) });
+    } catch (e) {
+      console.log("  warn: DemosAU release fetch failed " + title.slice(0, 60) + ": " + String(e.message).slice(0, 100));
+    }
   }
   for (const t of naTitles) console.log("  note: house marks eff-size n/a for " + t);
   return out;
@@ -457,10 +480,11 @@ const legs = [
     .map((p) => p.date))])],
   ["essential", () => legEssential()],
   /* the DemosAU index pass must also cover waves that need only a
-     methodUrl (sampleEff already known) – same trick as the YouGov leg */
-  ["demosau", () => legDemosau([...new Set(D.polls
-    .filter((p) => p.pollster.startsWith("DemosAU") && (p.sampleEff == null || p.methodUrl == null))
-    .map((p) => p.date.slice(0, 7)))])],
+     methodUrl (sampleEff already known) – same trick as the YouGov leg;
+     the leg also gets the needing rows so a statement-bearing release
+     PDF the index never listed is parsed straight off the row's url */
+  ["demosau", () => legDemosau(D.polls
+    .filter((p) => p.pollster.startsWith("DemosAU") && (p.sampleEff == null || p.methodUrl == null)))],
 ];
 if (unstamped.some((p) => p.pollster === "Newspoll"))
   legs.push(["newspoll", () => legNewspoll(unstamped.filter((p) => p.pollster === "Newspoll").map((p) => (p.published || p.date).slice(0, 10)))]);

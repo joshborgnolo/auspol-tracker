@@ -1,0 +1,146 @@
+Federal Voting Intention
+   July 05-06 2025
+METHODOLOGY
+STATEMENT
+Publication date: 09 July 2025
+Methodology Statement
+
+Research company                               DemosAU
+
+Client commissioning the research              Self Generated
+
+End client                                     Self Generated
+
+Fieldwork dates                                05-06 July 2025
+
+Mode of data collection                        Internet panels
+
+Target population                              Australian adults 18+ registered to vote
+
+
+Sample size                                    1,199
+
+
+Is voting intention published?                 In this report
+
+
+Effective sample size after weighting          762
+applied
+
+Margin of error associated with effective      +/-3.6%
+sample size
+
+Variables used in weighting                    Age x gender, education, personal income, residential tenure, state x
+                                               region, 2025 federal election vote
+
+Weighting method used                          Rim Weighting
+
+
+
+Full question text, responses categories       Q. If a Federal Election was held today, which one of the following
+and randomisation                              would you vote for?
+                                               (Answers randomly ordered except Don’t Know kept last)
+                                               Labor (with Anthony Albanese as Leader)
+                                               Liberal National Coalition (with Sussan Ley as Leader)
+                                               The Greens
+                                               Pauline Hanson's One Nation
+                                               Any Other Candidate
+Source of sample                               Online Panels (100%)
+
+Positioning of voting intention questions in   Voting intention was the first of the substantive questions
+questionnaire?                                 following demographic questions
+
+
+
+How were undecided voters handled?             Respondents who answered Don’t Know in the VI question
+                                               were excluded from the final totals.
+
+2PP calculation method                         Nation-wide preference flows from 2025 Federal Election
+ VOTING
+ INTENTION
+
+Primary Vote %
+
+                                                              Change from
+                                          Primary Vote %
+                                                               Election %
+
+   Labor (with Anthony Albanese as
+                                               36%                 1.4%
+                Leader)
+
+Liberal National Coalition (with Sussan
+                                               26%                 -5.8%
+             Ley as Leader)
+
+             The Greens                        14%                 1.8%
+
+     Pauline Hanson's One Nation               9%                  2.6%
+
+        Any Other Candidate                    15%                 0.0%
+
+                                                           9% Undecided excluded
+
+
+
+
+Two Party Preferred
+
+                                                              Change from
+                                              TPP %
+                                                               Election %
+
+               ALP TPP                         59%                 3.8%
+
+               L/NP TPP                        41%                -3.8%
+DEMOGRAPHIC
+BREAKDOWNS
+Undecided excluded from party totals
+
+                                 Total + Gender
+                    ALP       L/NP      Grn   ONP   Oth   Undec   ALP TPP
+
+   Australia        36%        26%      14%   9%    15%    9%      59%
+
+    Males           36%        28%      12%   9%    15%    7%      57%
+
+   Females          36%        25%      15%   9%    15%    10%     60%
+
+
+
+                                        By Age
+                    ALP       L/NP      Grn   ONP   Oth   Undec   ALP TPP
+
+     18-34          39%        16%      31%   4%    10%    10%     73%
+
+    35-54           36%        23%      11%   14%   16%    10%     58%
+
+      55+           35%        34%      6%    9%    16%    7%       51%
+
+
+
+                                     By Education
+                    ALP       L/NP      Grn   ONP   Oth   Undec   ALP TPP
+
+    School          34%        30%      15%   10%   11%    11%     55%
+
+     TAFE           38%        20%      11%   11%   20%    10%      61%
+
+      Uni           37%        28%      15%   6%    14%    6%      59%
+
+
+
+                              By Residential Tenure
+                    ALP       L/NP      Grn   ONP   Oth   Undec   ALP TPP
+
+    Rented          33%        19%      21%   10%   17%    12%     63%
+
+  Mortgage          40%        26%      14%   10%   10%    7%       61%
+
+    Owned           34%        32%      7%    9%    18%    7%      52%
+Get in Touch
+Evan Schwarten
+  evan@demosau.com
+
+  0411663685
+

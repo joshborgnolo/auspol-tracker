@@ -1,0 +1,329 @@
+Federal Poll
+
+
+
+DemosAU/Capital
+Brief Federal Poll
+Fieldwork Dates: 16-20 Feb 2026
+Total Sample Size: 1,551
+Effective Sample Size: 1008
+Effective Margin of Error: 3.1%
+
+
+
+
+                                  1
+Methodology Statement
+
+  Research company                                        DemosAU
+
+  Client commissioning the research                       Capital Brief
+
+  Fieldwork dates                                         10-20 February 2026
+
+  Mode of data collection                                 Internet panels
+
+  Target population                                       Australians 18+ eligible to vote at elections
+
+  Sample size                                             1,551
+
+  Is voting intention published?                          Yes, in this report
+
+  Effective sample size after weighting applied           1006
+
+  Margin of error associated with effective sample size   +/- 3.1%
+
+  Variables used in weighting                             Age x gender, education, personal income, residential tenure, region, 2025 Federal Vote, Left-Right Self ID.
+
+  Weighting method used                                   Rim Weighting
+
+  Full question text, responses categories and            See Pages 10 & 11
+  randomisation
+
+  Source of sample                                        Internet panels
+
+  Positioning of voting intention questions in            Federal VI was first substantive question after demographics.
+  questionnaire?
+
+  How were undecided voters handled?                      Initial undecided voters were asked a leaner question. Remaining undecided voters were excluded from final
+                                                          totals.
+
+
+  2PP calculation method                                  No National TPP calculated
+
+
+
+
+                                                                                                                                                                         2
+       Primary Vote
+                                                              Primary Vote %
+                                                ALP           ONP         L/NP          GRN         Oth
+
+
+                                       29%                                       28%                            21%              12%         10%
+
+0%                        20%                               40%                         60%                           80%                     100%
+                                                                                                           Excludes 6% of voters who were undecided
+
+
+          Swings Since Last Election                                                           Swings Since Last Poll (Jan)
+        ALP        ONP          L/NP          GRN       Oth                                   ALP         ONP        L/NP    GRN       Oth
+
+
+                  -5.6%                                                                                         -1
+
+
+
+                                                    21.6%                                                                              4
+
+
+
+         -10.8%
+
+
+
+                  -0.2%                                                                                         -1
+
+
+
+          -5.0%                                                                                            -2
+
+
+-20%    -10%          0%                10%           20%           30%            -6         -4          -2          0      2         4           6
+                                                                                                                                                   3
+Seat Projections
+
+                                Bottom     Top of
+                                of Range   Range
+
+
+
+
+                     Labor        76        85
+
+
+
+
+                   One Nation     43        54
+
+
+
+
+                   Coalition       9        20
+
+
+
+
+                    Greens         0         2
+
+
+
+
+                    Others         3         7
+
+
+
+
+                                             4
+     Preferred PM + Leader Ratings
+                                      Preferred Prime Minister
+         Anthony Albanese (Labor)   Pauline Hanson (One Nation)      Angus Taylor (Liberal)   Don't Know
+
+
+                                                                                                       37.0%
+
+                                                                  25.0%
+
+                                              19.0%
+
+                                              19.0%
+
+0%                     10%                            20%                              30%                     40%
+
+
+
+
+                                                                                                                     5
+     Top Issues
+
+               Cost of Living                                         45%
+                     Housing                      18%
+                Immigration                 13%
+                       Crime          7%
+          Climate Change          4%
+      Government Policies            3%
+           Social Cohesion           3%
+   Government Corruption           2%
+                 Healthcare        2%
+                    Economy        2%
+         Government Debt           2%
+             Racial Tension       1%
+                     Taxation     1%
+          National Security       1%
+Domestic Political Instability    1%
+          Global Instability      1%
+                  Education       1%
+                 Don't Know       1%
+             Miscellaneous         5%
+                               0%          10%          20%   30%   40%
+
+                                                                            6
+        Party Trusted To Address Issues
+         Q. Which political party do you trust more to handle the following issues?
+
+                                       The Greens         Labor           Don't Know           The Liberal National Coalition           One Nation
+
+           Aged Care              10.0%                           25.0%                                27.0%               19.0%                     19.0%
+
+      Climate Change                                25.0%                     18.0%                             27.0%           13.0%                17.0%
+
+         Cost of living          9.0%                         23.0%                           24.0%                     23.0%                        21.0%
+
+Economic management            6.0%                       24.0%                             24.0%                           29.0%                    17.0%
+
+        Energy policy                     16.0%                       21.0%                          24.0%                  21.0%                    18.0%
+
+     Foreign Relations         6.0%                           26.0%                           24.0%                     22.0%                        22.0%
+
+              Housing             10.0%                       22.0%                                 27.0%               20.0%                        21.0%
+
+         Immigration            7.0%                  19.0%                         21.0%                    20.0%                                   33.0%
+
+              Inflation         7.0%                      22.0%                                27.0%                       26.0%                     18.0%
+
+            Medicare              10.0%                                   31.0%                        22.0%                20.0%                    17.0%
+
+     National Security         6.0%                       24.0%                             23.0%                       26.0%                        21.0%
+
+            Tax policy          7.0%                          25.0%                           24.0%                        26.0%                     18.0%
+
+                          0%                        20%                       40%                       60%                     80%                     100%
+
+                                                                                                                                                             7
+          Demographic Breakdowns
+                                                       Primary Vote %
+                                            ALP        ONP     L/NP             GRN         Oth
+
+                Males                      31%                            28%                       21%              9%           11%
+             Females                27%                             29%                           21%                 14%         9%
+                18-34                     30%                 21%                    15%                               26%        8%
+               35-54                       31%                            29%                           21%           9%          10%
+                  55+               26%                                   33%                             25% 4%                  12%
+     School Education                28%                                  32%                     18%                11%          11%
+       TAFE Education               26%                                  32%                       21%              10%           11%
+  University Education                          34%            19%                                25%                  14%        8%
+               Renter                28%                            27%               13%                      19%                13%
+     Mortgage Holder                       32%                             29%                           22%               10%    7%
+Home Owner (outright)               26%                            28%                                  28%          7%           11%
+               <$45K                27%                                  31%                16%                12%                14%
+            $45-125K                      30%                            28%                            23%                12%    7%
+               $125K+                      31%               19%                                              36%           8%    6%
+          Inner Metro                            36%               18%                              26%                     14%   7%
+          Outer Metro                28%                                 30%                       21%                11%         10%
+       Regional/Rural         22%                                         37%                16%              10%                 15%
+                         0%   20%                      40%                     60%                       80%                       100%
+                                                                                                                                   8
+              Demographic Breakdowns
+                                                       Current Voting Intention Sorted by Past Election Vote
+                                                                  ALP         ONP   L/NP         GRN    Oth
+
+
+
+                 ALP 2025 Vote                                                                                77%         12%   5%
+
+
+
+
+                L/NP 2025 Vote        4%                                35%                                                     59%
+
+
+
+
+                 Grn 2025 Vote        5%              15%                                                                        79%
+
+
+
+
+                ONP 2025 Vote                                                                                                   97%
+
+
+
+
+                 Oth 2025 Vote             7%                    28%          7%                                                 57%
+
+
+
+
+Did Not Remember/ Did Not Vote                  17%                                        40%     6%         13%                24%
+
+
+                                 0%                    20%                40%                    60%                80%               100%
+
+
+
+
+                                                                                                                                       9
+              Question Wording
+Q. If a Federal Election was held today, which one of the following would you vote for?
+Answers randomly listed except Don’t Know kept last
+Labor (with Anthony Albanese as Leader)
+Liberal National Coalition (with Angus Taylor as Leader)
+The Greens (with Larissa Waters as Leader)
+One Nation (with Pauline Hanson as Leader)
+Any Other Candidate
+Don't Know
+
+If respondent chose Don’t Know they were asked:
+Q. Being undecided, which of the following would you have even a slight leaning towards? Answers as above
+Answers randomly listed except Don’t Know kept last
+Answers as above
+
+Q. Who is your preferred Prime Minister
+Answers randomly listed except Don’t Know kept last
+Anthony Albanese (Labor)
+Angus Taylor (Liberal)
+Pauline Hanson (One Nation)
+Don't Know
+
+Q. What is your opinion on the following people?
+People randomly listed, answer order randomly flipped
+Answers: Positive, Neutral, Negative
+People Tested
+Anthony Albanese (Prime Minister, Labor)
+Angus Taylor (Opposition Leader, Liberal)
+Pauline Hanson (One Nation Leader)
+
+
+
+
+                                                                                                            10
+               Question Wording
+Q. Which political party do you trust more to handle the following issues?
+Issues and answer order (except DK) randomly listed
+Answers: The Greens, Labor, Liberal National Coalition, One Nation, Don’t Know
+Issues Tested
+Economic management
+Immigration
+Medicare
+Climate Change
+Cost of living
+Inflation
+Tax policy
+Housing
+National Security
+Energy policy
+Aged Care
+Foreign Relations
+
+
+
+
+Q. In your opinion, what is the biggest issue facing Australia today?
+Open-ended answer
+
+
+
+
+                                                                                 11
+12
+
