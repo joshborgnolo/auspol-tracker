@@ -1092,14 +1092,19 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    button (a pseudo would sit inside ITS button box and link). When two terms
    are directly adjacent - the adjusted-strip method + note - the JSX inserts
    a real .hi-sep span for the dot, and both rules skip it so it stays the
-   only dot at that junction. */
+   only dot at that junction. Every emitter pins 12px: a pseudo inherits its
+   host clause's size (the 14px lead-tag) and the bare span would inherit the
+   page 16px, so an unpinned dot reads bigger than its neighbours (caught
+   live 2026-09-02). */
 .hero-interval > *:not(:last-child):not(.hi-term):not(.hi-sep)::after {
-  content: "•"; color: var(--ink-3); font-weight: 400; margin-left: 8px;
+  content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
+  margin-left: 8px;
 }
 .hero-interval > .hi-term + :not(.hi-term):not(.hi-sep)::before {
-  content: "•"; color: var(--ink-3); font-weight: 400; margin-right: 8px;
+  content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
+  margin-right: 8px;
 }
-.hi-sep { color: var(--ink-3); font-weight: 400; }
+.hi-sep { color: var(--ink-3); font-weight: 400; font-size: 12px; }
 .hero-interval .lead-tag { font-variant-numeric: tabular-nums; }
 /* No narrow-screen variant: the strip wraps naturally if the row overflows,
    and the same clause order, dots and sizes are wanted at every width. */
