@@ -1972,9 +1972,8 @@ function PollLedger({ r, dirSegments }) {
           their AFR write-up but publish the report on accent-research.com.
           It tops the ledger so it sits directly under the meta band
           (Published / Poll lean / House effect), and rides the ledger rather
-          than the band itself so it shows in BOTH expansions (the Latest
-          detail's band hides past 1000px) – and only where the wave actually
-          has a release page. */}
+          than the band itself so the SAME line shows in BOTH expansions –
+          and only where the wave actually has a release page. */}
       {r.releaseUrl && (
         <PdSec label="Pollster’s release">
           <p className="pd-s">
@@ -2085,14 +2084,25 @@ function PollLedger({ r, dirSegments }) {
 function PollDetail({ r }) {
   return (
     <div className="poll-detail">
-      {/* The band only earns its space below 1000px, where the table drops
-          its sample column and this is the one place that figure survives;
-          .pd-meta-sm hides the whole band (divider included) on wider
-          screens, where every value is already in the row. Client/field are
-          said by the row at every width, so they never come back. */}
-      <div className="pd-meta pd-meta-sm">
+      {/* the fact line of the expanded view: fieldwork, published, sample
+          and effective sample show at every width – fieldwork and sample
+          repeat their row columns so the open panel stands alone, and the
+          published stamp falls back to the fieldwork end (saying that it is
+          so) where the release never recorded one */}
+      <div className="pd-meta">
+        <span className="pd-meta-i"><span className="pd-meta-k">Fieldwork</span> {r.field}</span>
+        <span className="pd-meta-i"><span className="pd-meta-k">Published</span>{" "}
+          {pubStamp(r.published, { year: true })
+            || <span className="pd-est"
+                     title="Publication date not recorded for this poll – showing the last day of fieldwork">
+                 {r.releasedLabel}
+               </span>}
+        </span>
         {r.mode && <span className="pd-meta-i"><span className="pd-meta-k">Method</span> {r.mode}</span>}
-        <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {r.sample ? "n = " + r.sample.toLocaleString() : "—"}</span>
+        <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {r.sample != null ? "n = " + r.sample.toLocaleString() : "—"}</span>
+        {r.sampleEff != null && <span className="pd-meta-i"
+             title="Effective sample as published by the pollster (APC methodology statement)">
+          <span className="pd-meta-k">Effective sample</span> n = {r.sampleEff.toLocaleString()}</span>}
       </div>
       <PollLedger r={r} dirSegments={r.dir ? dirSegs(r) : null} />
     </div>

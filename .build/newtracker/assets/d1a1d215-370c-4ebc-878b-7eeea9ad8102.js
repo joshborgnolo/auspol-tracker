@@ -2023,7 +2023,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
      bracketed to the right of the band sit clear of them. */
   const metaItems = [
     p.client && <span className="pd-meta-i" key="client"><span className="pd-meta-k">Commissioned by</span> {p.client}</span>,
-    <span className="pd-meta-i meta-dup" key="field"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>,
+    <span className="pd-meta-i" key="field"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>,
     /* The date the poll came OUT, and the hour where the release recorded
        one. This line has always been labelled "Published" and has always
        printed `fullDate`, which is the last day of FIELDWORK - the same
@@ -2037,8 +2037,8 @@ function ArchPollDetail({ p, onBack, backLabel }) {
              {p.fullDate}
            </span>}
     </span>,
-    <span className="pd-meta-i meta-md" key="sample"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>,
-    p.sampleEff != null && <span className="pd-meta-i meta-md" key="eff"
+    <span className="pd-meta-i" key="sample"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>,
+    p.sampleEff != null && <span className="pd-meta-i" key="eff"
       title="Effective sample as published by the pollster (APC methodology statement)">
       <span className="pd-meta-k">Effective sample</span> n = {p.sampleEff.toLocaleString()}</span>,
     p.lean != null && <span className="pd-meta-i" key="lean"><span className="pd-meta-k">Poll lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>,

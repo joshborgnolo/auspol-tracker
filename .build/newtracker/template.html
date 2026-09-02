@@ -1930,21 +1930,11 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   font-size: 10.5px;
   color: var(--ink-3); font-weight: 700; margin-right: 5px;
 }
-/* the meta line never repeats what the row says at every width – Fieldwork/
-   Field in both tables, "Commissioned by" under the pollster name in the
-   latest table – and it carries a width-dependent column (Sample) only where
-   .hide-md has dropped it, below 1000px. What no column ever prints (the
-   archive's client and published DATE) stays in the meta untagged, at every
-   width – the earlier version hid it on the strength of the As-published
-   figures column, which is a different thing with a similar name. */
-.pd-meta .meta-dup { display: none; }
-@media (min-width: 1001px) {
-  .pd-meta .meta-md { display: none; }
-  /* the latest detail's own band exists only where the table has dropped
-     its sample column – above 1000px it would have nothing left to say,
-     so the whole band goes away */
-  .pd-meta-sm { display: none; }
-}
+/* the meta band is the expansion's fact line: fieldwork, published, sample
+   and effective sample print at every width in both tables – fieldwork and
+   sample repeat their row columns so the open panel stands alone, and what
+   no column ever prints (the archive's client, the published DATE) rides
+   the same line untagged */
 
 /* ---------- the breakdown: plain headed text lines ----------
    Everything a poll published, set as running text: a small-kicker heading,

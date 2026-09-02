@@ -2029,21 +2029,11 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   font-size: 10.5px;
   color: var(--ink-3); font-weight: 700; margin-right: 5px;
 }
-/* the meta line never repeats what the row says at every width – Fieldwork/
-   Field in both tables, "Commissioned by" under the pollster name in the
-   latest table – and it carries a width-dependent column (Sample) only where
-   .hide-md has dropped it, below 1000px. What no column ever prints (the
-   archive's client and published DATE) stays in the meta untagged, at every
-   width – the earlier version hid it on the strength of the As-published
-   figures column, which is a different thing with a similar name. */
-.pd-meta .meta-dup { display: none; }
-@media (min-width: 1001px) {
-  .pd-meta .meta-md { display: none; }
-  /* the latest detail's own band exists only where the table has dropped
-     its sample column – above 1000px it would have nothing left to say,
-     so the whole band goes away */
-  .pd-meta-sm { display: none; }
-}
+/* the meta band is the expansion's fact line: fieldwork, published, sample
+   and effective sample print at every width in both tables – fieldwork and
+   sample repeat their row columns so the open panel stands alone, and what
+   no column ever prints (the archive's client, the published DATE) rides
+   the same line untagged */
 
 /* ---------- the breakdown: plain headed text lines ----------
    Everything a poll published, set as running text: a small-kicker heading,
@@ -10443,8 +10433,21 @@ function PollDetail({
   return /*#__PURE__*/React.createElement("div", {
     className: "poll-detail"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "pd-meta pd-meta-sm"
-  }, r.mode && /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-k"
+  }, "Fieldwork"), " ", r.field), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-k"
+  }, "Published"), " ", pubStamp(r.published, {
+    year: true
+  }) || /*#__PURE__*/React.createElement("span", {
+    className: "pd-est",
+    title: "Publication date not recorded for this poll \u2013 showing the last day of fieldwork"
+  }, r.releasedLabel)), r.mode && /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
@@ -10452,7 +10455,12 @@ function PollDetail({
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Sample"), " ", r.sample ? "n = " + r.sample.toLocaleString() : "—")), /*#__PURE__*/React.createElement(PollLedger, {
+  }, "Sample"), " ", r.sample != null ? "n = " + r.sample.toLocaleString() : "—"), r.sampleEff != null && /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i",
+    title: "Effective sample as published by the pollster (APC methodology statement)"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-k"
+  }, "Effective sample"), " n = ", r.sampleEff.toLocaleString())), /*#__PURE__*/React.createElement(PollLedger, {
     r: r,
     dirSegments: r.dir ? dirSegs(r) : null
   }));
@@ -13596,7 +13604,7 @@ function ArchPollDetail({
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Commissioned by"), " ", p.client), /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i meta-dup",
+    className: "pd-meta-i",
     key: "field"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
@@ -13619,12 +13627,12 @@ function ArchPollDetail({
     className: "pd-est",
     title: "Publication date not recorded for this poll \u2013 showing the last day of fieldwork"
   }, p.fullDate)), /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i meta-md",
+    className: "pd-meta-i",
     key: "sample"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Sample"), " ", p.sample != null ? "n = " + p.sample.toLocaleString() : "—"), p.sampleEff != null && /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i meta-md",
+    className: "pd-meta-i",
     key: "eff",
     title: "Effective sample as published by the pollster (APC methodology statement)"
   }, /*#__PURE__*/React.createElement("span", {
