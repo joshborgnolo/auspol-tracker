@@ -3238,6 +3238,16 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   .vr-sigma { font-size: 21px; }
 }
 
+/* ---------- House lean panel ---------- */
+/* the All-polls tab's closing section, directly under Poll disagreement: it
+   takes the same closing frame – air above, one top rule, nothing trailing.
+   Head, legend, chips and note reuse the disagreement panel's classes
+   wholesale (the two charts read as one family); only the frame is new. */
+.ap-lean {
+  border-top: 1px solid var(--line);
+  padding: 24px 0 0; margin: 30px 0 0;
+}
+
 /* archive ledger flows with the page; header pins just below the tab bar.
    overflow must stay visible here – any overflow on the wrapper turns it into
    the sticky containing block and the thead can never pin to the viewport. */

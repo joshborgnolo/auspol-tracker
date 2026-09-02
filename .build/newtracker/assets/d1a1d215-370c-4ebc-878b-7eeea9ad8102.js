@@ -2354,6 +2354,134 @@ function VariancePanel({ facet, rangeId }) {
   );
 }
 
+// ====================================================================
+// HOUSE LEAN – each pollster's house effect, traced month by month
+// ====================================================================
+/* Poll disagreement measures spread ACROSS houses; this panel traces the
+   lean each house carries against the rest – the same estimator the
+   aggregates subtract (±28-day consensus window, 90-day evidence half-life,
+   shrinkage while evidence is thin), read as a monthly time series rather
+   than as the standing figure the archive table carries. A line settling
+   onto zero is a house tracking the pack; one fading to zero is a house
+   whose evidence has gone stale.
+
+   Colours: a house is not a party, and on a chart ABOUT lean a red line
+   shouts "Labor" before the legend is read. So the palette is a fixed
+   categorical ladder of oklch slots, held off every party hue (ALP 27,
+   ONP/OTH 58-70, GRN 150, LNP 250), assigned alphabetically so a new build
+   can't reshuffle them under the reader. A house not yet catalogued falls
+   back to a deterministic name-hash slot. */
+const HOUSE_LEAN_COLOURS = {
+  "DemosAU":            "oklch(0.63 0.145 90)",
+  "Essential":          "oklch(0.63 0.145 110)",
+  "Fox & Hedgehog":     "oklch(0.63 0.145 128)",
+  "Freshwater":         "oklch(0.63 0.145 165)",
+  "Newspoll":           "oklch(0.63 0.145 185)",
+  "RedBridge / Accent": "oklch(0.63 0.145 205)",
+  "Resolve":            "oklch(0.63 0.145 225)",
+  "Roy Morgan":         "oklch(0.63 0.145 268)",
+  "Spectre Strategy":   "oklch(0.63 0.145 290)",
+  "YouGov":             "oklch(0.63 0.145 312)",
+};
+function houseLeanColour(firm) {
+  if (HOUSE_LEAN_COLOURS[firm]) return HOUSE_LEAN_COLOURS[firm];
+  let h = 0;
+  for (let i = 0; i < firm.length; i++) h = (h * 31 + firm.charCodeAt(i)) % 997;
+  return "oklch(0.63 0.145 " + (99 + (h % 9) * 29) + ")";
+}
+
+function HouseLeanPanel({ rangeId }) {
+  const { D, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
+  const narrow = useNarrow();
+  const [hidden, setHidden] = useState({});
+  if (!D.houseLean) return null;   // an older dataset build: absence, never zero
+
+  // gen-data emits only houses with >=3 polls of evidence – nobody is drawn
+  // wobbling on nearly nothing
+  const houses = Object.keys(D.houseLean).sort();
+  if (!houses.length) return null;
+
+  const xDomain = rangeDomain(rangeId);
+  const inWin = (d) => d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1];
+  const rows = houses.map((firm) => {
+    const all = D.houseLean[firm].map((d) => ({ x: D.mx(d.ym), y: d.v }));
+    return { firm, color: houseLeanColour(firm), all, pts: all.filter(inWin) };
+  });
+
+  const chartSeries = rows.map((r) => ({
+    id: r.firm, label: r.firm, color: r.color, width: 3,
+    opacity: hidden[r.firm] ? 0 : 1,
+    points: r.pts,
+  })).filter((s) => s.points.length > 1);
+  if (!chartSeries.length) return null;
+
+  const spine = D.MONTHS.map((ym) => ({ x: D.mx(ym), y: 0 })).filter(inWin);
+  const spineYm = D.MONTHS.filter((ym) => inWin({ x: D.mx(ym) }));
+
+  const step = 1;
+  const vals = [step, -step];
+  rows.forEach((r) => { if (!hidden[r.firm]) r.pts.forEach((p) => vals.push(p.y)); });
+  const { domain, ticks } = fitDomain(vals, Math.max(...vals.map(Math.abs)) > 4 ? 2 : step, 0);
+
+  // the standing each chip wears comes from the FULL series, not the window
+  const latest = rows.map((r) => ({ firm: r.firm, color: r.color, v: r.all[r.all.length - 1].y }));
+
+  return (
+    <section className="ap-lean">
+      <div className="ap-var-head">
+        <div>
+          <h3 className="ap-var-title">House lean</h3>
+          <p className="card-sub">
+            How far each pollster sits from the consensus of the houses polling around it,
+            estimated month by month – the same <button type="button" className="hi-term"
+              onClick={() => window.AP.openTerm && window.AP.openTerm("house-effect", "House lean")}>house effect</button> the
+            aggregates subtract, shown as it has walked. The chart above spreads the houses
+            against chance; this one tracks where each one stands.
+          </p>
+        </div>
+        <div className="legend">
+          {latest.map((e) => {
+            const s = (e.v > 0 ? "+" : e.v < 0 ? "−" : "") + Math.abs(e.v).toFixed(1) + "pp";
+            const he = D.houseEffects && D.houseEffects.tpp && D.houseEffects.tpp[e.firm];
+            return (
+              <button key={e.firm} type="button"
+                      className={"legend-chip" + (hidden[e.firm] ? " off" : "")}
+                      aria-pressed={!hidden[e.firm]}
+                      title={e.firm + " – currently " + s.replace("−", "-") + " against the consensus"
+                             + (he && he.n ? " · pooled from " + he.n + " polls" : "")}
+                      onClick={() => setHidden((h) => ({ ...h, [e.firm]: !h[e.firm] }))}>
+                <span className="legend-swatch" style={{ background: e.color }}></span>
+                <span className="legend-name">{e.firm}</span>
+                <span className="legend-val">{s}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <TrendChart
+        key={"lean-" + rangeId}
+        height={narrow ? 500 : 300} xDomain={xDomain} yDomain={domain} yTicks={ticks}
+        unit="pp" axisFont={narrow ? 28 : 15} pad={{ l: 54, r: 20, t: 18, b: 40 }}
+        xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        refLines={[{ y: 0, color: "var(--ink-3)" }]}
+        series={chartSeries} spine={spine}
+        tooltipTitle={(i) => monthLabelFull(spineYm[i])}
+        ariaLabel={"Pollster house lean over time – how far each pollster sits from the cross-house consensus"}
+        fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(1)}
+      />
+
+      <p className="table-hint ap-var-note">
+        Above zero leans to Labor on the classic two-party, below zero to the Coalition. Each
+        point reads the lean as of that month, with the 90-day half-life on the evidence, so a
+        house’s current method outranks its history; the All-polls table’s House-effect column
+        instead pools each pollster’s whole history into one standing figure, which is why its
+        numbers won’t match the right-hand edge here.
+      </p>
+    </section>
+  );
+}
+
 function AllPollsView({ focus, onBack, backLabel }) {
   const { D } = window.AP;
   const { ShareBar, NetVal, tppContests, tppFlag, ppmContests, ppmContestSegs, ppmFlag } = window;
@@ -3032,6 +3160,11 @@ function AllPollsView({ focus, onBack, backLabel }) {
       </p>
 
       <VariancePanel facet={facet} rangeId={range} />
+
+      {/* house lean is a 2PP story – the house effect charting the aggregate's
+          debias owes its measure to the classic two-party, so it mounts only
+          where that matchup runs the tab */}
+      {facet === "twopp" && <HouseLeanPanel rangeId={range} />}
     </div>
   );
 }
@@ -3092,7 +3225,16 @@ function infoTerms(D) {
       {(L.alp2ppCi95 ?? 0).toFixed(1)} points on a share, so ±
       {(2 * (L.alp2ppCi95 ?? 0)).toFixed(1)} beside the lead it sits with, since the lead moves
       twice as far as either share – on {L.method.nPolls} polls across {L.method.windowDays}{" "}
-      days. It cannot cover error the
+      days. Full formula: it is 1.96 × the greater of two standard errors taken on exactly the
+      weights wᵢ the {xref("weighted-aggregate", "95% interval", "weighted aggregate")} is built
+      from. The spread term is √(Σwᵢ(xᵢ − x̄)² ÷ Σwᵢ ÷ (nEff − 1)) – the window’s polls scattered
+      around their own weighted mean x̄, divided down by the {xref("effective-sample",
+      "95% interval", "effective sample")} nEff less one. The sampling-error floor is
+      √(Σ wᵢ² × 1.6 × p̂(1−p̂) ÷ nᵢ) ÷ Σwᵢ – what sampling luck alone would still cost a window
+      where every house agreed exactly, with p̂ the aggregate’s own share and 1.6 the design
+      effect of a weighted national panel rather than a simple random sample. The greater of
+      the two terms binds, so the interval prices disagreement among the houses when they show
+      it and never promises better than chance itself when they don’t. It cannot cover error the
       whole industry shares, because an aggregate has no way to see a lean every poll inside it
       carries. Movement smaller than the interval is marked as such rather than reported as a
       change.</>) },

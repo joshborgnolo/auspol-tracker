@@ -246,7 +246,11 @@ function houseEffectsFor(rows) {
   // n = how many of that firm's readings fed the estimate at all, so the UI
   // can distinguish "no lean" from "not enough polls to say"
   const evidenceN = {};
-  for (const d of devs) evidenceN[d.firm] = (evidenceN[d.firm] || 0) + 1;
+  const evidenceFrom = {};
+  for (const d of devs) {
+    evidenceN[d.firm] = (evidenceN[d.firm] || 0) + 1;
+    if (evidenceFrom[d.firm] == null || d.mid < evidenceFrom[d.firm]) evidenceFrom[d.firm] = d.mid;
+  }
   const at = (firm, t) => {
     let sw = 0, swx = 0;
     for (const d of devs) {
@@ -265,7 +269,7 @@ function houseEffectsFor(rows) {
   const snapshot = (t) => Object.fromEntries(
     Object.keys(evidenceN).map((f) => [f, { v: r1(at(f, t)), n: evidenceN[f] }])
   );
-  return { at, evidenceN, snapshot, estimable: devs.length > 0 };
+  return { at, evidenceN, evidenceFrom, snapshot, estimable: devs.length > 0 };
 }
 /* t = the reference time the lean is read at – the nowcast's ref for the
    current estimate, the month's midpoint for monthly points – so every
@@ -362,6 +366,18 @@ function monthWithSe(rows, he, ym) {
 }
 
 const houseEffect = houseEffectsFor(tppRows);
+/* houseLean reads the SAME estimator as a time series – each firm's decayed
+   2PP lean sampled at every month's midpoint from the month its first
+   evidence poll lands, so the House-lean chart under Poll disagreement draws
+   how a house's lean has walked, not just where it stands. Firms with <3
+   evidence polls are absent rather than drawn wobbling on nearly nothing. */
+const houseLean = Object.fromEntries(
+  Object.entries(houseEffect.evidenceN).filter(([, n]) => n >= 3).map(([firm]) => [
+    firm,
+    MONTHS.filter((ym) => ymMidMs(ym) >= houseEffect.evidenceFrom[firm])
+      .map((ym) => ({ ym, v: r1(houseEffect.at(firm, ymMidMs(ym))) })),
+  ])
+);
 /* The synthetic series gets its OWN house effects, measured against its own
    consensus – a house whose primaries run ALP-high is a different bias from
    the same house's published-2PP lean, and the comment on houseEffectsFor
@@ -1817,6 +1833,7 @@ window.AUSPOL = (function () {
     appr: Object.fromEntries(Object.entries(apprHE).map(([lk, h]) => [lk, h.snapshot(Infinity)])),
     synth: synthEffect.snapshot(Infinity),
   })};
+  const houseLean = ${JSON.stringify(houseLean)};
   const leaderMonths = ${JSON.stringify(leaderMonths)};
   const direction = ${JSON.stringify(direction)};
   const directionHouseEffects = ${JSON.stringify({ right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity) })};
@@ -1888,7 +1905,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, adjusted, houseEffects, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, adjusted, houseEffects, houseLean, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
     individualPolls, pollsterTable, latest, cycles, events,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
