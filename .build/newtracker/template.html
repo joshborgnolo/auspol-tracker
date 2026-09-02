@@ -1035,9 +1035,9 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    line copies as the sentence it looks like. */
 .roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
 /* Horizontal junctions keep word-width spacing (a space is ~3px at this
-   line's 12-13px sizes) so the sub reads as one sentence, rather than the
-   clause-rhythm 6px it shared with the interval line above. The 6px row
-   gap only matters between wrapped lines. */
+   line's 12-13px sizes) so the sub reads as one sentence; the interval row
+   above spaces its dots to the same width. The 6px row gap only matters
+   between wrapped lines. */
 .hero-sub { display: flex; align-items: center; gap: 6px 3px; margin-top: 8px; flex-wrap: wrap; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
 .hero-sub-note, .hero-sub-count { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
@@ -1086,7 +1086,12 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hg-tie-lab { position: absolute; left: 50%; transform: translateX(-50%);
   font-size: 10.5px; font-weight: 600; color: var(--ink-3); }
 
-.hero-interval { display: flex; align-items: baseline; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+/* Every junction on this row carries a dot, flanked by this column gap on
+   one side and a margin (or another gap, around the bare .hi-sep) on the
+   other - one word space at the strip's 12-14px sizes is ~3px. Both flanks
+   were 8px, ~2.5 word spaces, and the strip read as if double-spaced. The
+   8px row gap only matters between wrapped lines. */
+.hero-interval { display: flex; align-items: baseline; gap: 8px 3px; margin-top: 10px; flex-wrap: wrap; }
 .hi-method { color: var(--ink-3); white-space: nowrap; }
 /* Separators hang off the END of each clause, not the start of the next: as
    a ::before they belonged to the following flex item, so a wrap carried the
@@ -1107,11 +1112,11 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    sit 1px proud of these, so the JSX borrows .hi-sep there too. */
 .hero-interval > *:not(:last-child):not(.hi-term):not(.hi-sep)::after {
   content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
-  margin-left: 8px;
+  margin-left: 3px;
 }
 .hero-interval > .hi-term + :not(.hi-term):not(.hi-sep)::before {
   content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
-  margin-right: 8px;
+  margin-right: 3px;
 }
 .hi-sep { color: var(--ink-3); font-weight: 400; font-size: 12px; }
 .hero-interval .lead-tag { font-variant-numeric: tabular-nums; }
@@ -1140,9 +1145,10 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 /* Phones: one line of lead + range + method + interval is ~386px at the
    base 14px - it fits desktop widths easily, but a 390px-class phone leaves
    only ~358px of row. Drop the lead clause and its range to the strip 12px
-   and shave the inter-clause gap, and the whole row holds on one line. */
+   so the whole row holds on one line; the dots' word-space flanks carry
+   over from the base rule unchanged. */
 @media (max-width: 480px) {
-  .hero-interval { gap: 6px; }
+  .hero-interval { gap: 6px 3px; }
   .hero-interval .lead-tag, .hero-interval .hi-range { font-size: 12px; }
 }
 /* Movement smaller than its own interval – stated, not colour-coded, so it
