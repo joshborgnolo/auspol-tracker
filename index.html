@@ -1256,22 +1256,27 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; align-self: stretch; }
 /* quiet inline checkbox alongside the matchup/range switches – stripped from
    chart copies with the rest of .hero-controls. The column gap already
-   spaces it, so the shared checkbox's top margin is dropped here. */
-.hero-controls .pg-check { margin: 0; }
+   spaces it, so the shared checkbox's other margins are dropped here. When
+   the synthetic overlay exists the checkbox LEADS the foot group, so it
+   carries the auto margin that sinks the group level with the interval
+   strip. */
+.hero-controls .pg-check { margin: 0; margin-top: auto; }
 /* The matchup and range switches' laptop home is the foot of this column:
    the column stretches to the hero-top row (align-self above) and
-   margin-top:auto sinks the whole foot group - Switch-2PP pill, compare
-   switch, then the stacked toggles - level with the interval strip and
-   the delta line across the way, the matchup riding directly above the
-   range window it filters. The plain copies heading the column are the
-   toggles' phone home. Both homes are in the DOM at every width (one state,
-   two copies); display, not JSX, chooses. */
+   margin-top:auto sinks the foot group - compare switch where it renders,
+   then the stacked toggles - level with the interval strip and the delta
+   line across the way, the matchup riding directly above the range window
+   it filters. The Switch-2PP pill is NOT part of that group: it heads the
+   column, top right. The plain copies heading the column are the toggles'
+   phone home. Both homes are in the DOM at every width (one state, two
+   copies); display, not JSX, chooses. */
 .hero-controls > .text-toggle { display: none; }
 .hero-chartbar { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: auto; }
-/* the pill block leads the foot group, so IT carries the auto margin when
-   present; the chartbar's own margin-top:auto above is the fallback for a
-   window with no other contest, where no pill renders to lead the group */
-.hero-alt ~ .hero-chartbar { margin-top: 0; }
+/* the compare switch leads the foot group where it renders, so the
+   chartbar's own margin-top:auto fetches nothing then; the chartbar keeps
+   the auto only as the fallback where no compare switch renders (a non-ALP/
+   LNP matchup, or no synthetic overlay), when IT is the first foot child */
+.hero-controls .pg-check ~ .hero-chartbar { margin-top: 0; }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
 /* wraps as the fallback: on a phone the ≤640px set below (10px column gap,
@@ -1316,12 +1321,12 @@ body.dark .ci-band { opacity: 0.22; }
 
 /* the contests that are not on the chart, each carrying its own figure. A
    button, not a tab: pressing one makes it the headline and morphs the chart.
-   Lives inside .hero-controls - it LEADS the foot group on a laptop (its own
-   margin-top:auto sinks the group level with the interval strip), the
-   compare switch and the chartbar toggles riding below it - and wrapped
-   rows keep the desktop column's right edge. On a phone the ≤560px block
-   cancels that margin, since a wrapping row has no foot to sink to. */
-.hero-alt { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; margin-top: auto; }
+   Lives inside .hero-controls at the column HEAD on a laptop - top right,
+   above the compare-switch/chartbar foot group, which keeps its own sink
+   (the auto margins on .pg-check and .hero-chartbar) - and wrapped rows
+   keep the desktop column's right edge. On a phone the ≤560px block orders
+   it first in the wrap row. */
+.hero-alt { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 .ha-lab { font-size: 10.5px; font-weight: 700;
   color: var(--ink-3); }
 .ha-chip { display: inline-flex; align-items: baseline; gap: 8px; cursor: pointer;
@@ -2447,10 +2452,8 @@ body.dark .fb-form { color-scheme: dark; }
   .hero-chartbar { display: none; }
   .hero-controls > .text-toggle { display: inline-flex; }
   /* phone carries the matchup only as the Switch-2PP pill, so it leads the
-     control row and the range window follows. The laptop sink margin must
-     come off: in a wrapping row an auto top margin just pins the pill to
-     the bottom of its line, out of centre with the toggle beside it */
-  .hero-controls .hero-alt { order: -1; margin-top: 0; }
+     control row and the range window follows */
+  .hero-controls .hero-alt { order: -1; }
   /* …and the same fold pressure halves the wrap gap between the headline
      stack and that control strip: the desktop 24px is one row-gap among
      similar ones; on a phone it was the biggest void on the wire to the
