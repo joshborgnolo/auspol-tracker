@@ -678,9 +678,6 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
        .sort((x, y) => oppVsLabor(y) - oppVsLabor(x)),
     ...Object.keys(MATCHUPS).filter((id) => !MATCHUPS[id].vsLabor && hasData(id)),
   ];
-  const matchupOptions = orderedMatchups.map((id) => ({
-    id, label: MATCHUPS[id].label, dots: MATCHUPS[id].dots,
-  }));
   /* rangeDomain takes any month count, and buildXTicks already labels
      every month once the span is under a year, so six months arrives
      with its own tick per month rather than every second one */
@@ -1145,12 +1142,12 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           </div>
         </div>
         <div className="hero-controls">
-          {/* Phone copies of the matchup and range switches: their laptop
-              home is the chartbar at this column's foot, and every width
-              shows exactly one home - one state, two copies, the pattern the
-              compare switch below already uses. */}
-          <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
-            options={matchupOptions} />
+          {/* Phone copy of the range switch: its laptop home is the chartbar
+              at this column's foot, and every width shows exactly one home -
+              one state, two copies, the pattern the compare switch below
+              already uses. The matchup has no strip copy at all: the
+              Switch-2PP pill below is its switcher on every width, laptop
+              included, so a bare matchup toggle would only duplicate it. */}
           <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
             options={rangeOptions} />
           {/* The OTHER contests, carrying their figures rather than just their
@@ -1184,13 +1181,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               published ALP v L/NP series, so the control only exists there.
               Off by default: it is a diagnostic, not a third headline. */}
           {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(false)}
-          {/* The laptop home of the matchup and range switches: the foot of
-              this column, sunk level with the interval strip and the delta
-              line across the way. Hidden on a phone, where the strip copies
-              above still do the work, so a width never shows both homes. */}
+          {/* The laptop home of the range switch: the foot of this column,
+              sunk level with the interval strip and the delta line across
+              the way. Hidden on a phone, where the strip copy above still
+              does the work, so a width never shows both homes. The matchup
+              used to keep a bare toggle here too; the figure-bearing pill
+              is the matchup switcher at every width now. */}
           <div className="hero-chartbar">
-            <TextToggle value={matchup} onChange={chooseMatchup} ariaLabel="Matchup"
-              options={matchupOptions} />
             <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
               options={rangeOptions} />
           </div>

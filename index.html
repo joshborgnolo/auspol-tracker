@@ -1279,17 +1279,17 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    carries the auto margin that sinks the group level with the interval
    strip. */
 .hero-controls .pg-check { margin: 0; margin-top: auto; }
-/* The matchup and range switches' laptop home is the foot of this column:
-   the column stretches to the hero-top row (align-self above) and
-   margin-top:auto sinks the foot group - compare switch where it renders,
-   then the stacked toggles - level with the interval strip and the delta
-   line across the way, the matchup riding directly above the range window
-   it filters. The Switch-2PP pill belongs to this group on a laptop: its
-   base order ranks it after the chartbar, so the foot stack reads compare
-   switch, toggles, pill - and the pill is what sits just above the chart.
-   The plain copies heading the column are the toggles'
-   phone home. Both homes are in the DOM at every width (one state, two
-   copies); display, not JSX, chooses. */
+/* The range switch's laptop home is the foot of this column, inside
+   .hero-chartbar: the column stretches to the hero-top row (align-self
+   above) and margin-top:auto sinks the foot group - compare switch where
+   it renders, then the chartbar - level with the interval strip and the
+   delta line across the way. The Switch-2PP pill belongs to this group on
+   a laptop: its base order ranks it after the chartbar, so the foot stack
+   reads compare switch, chartbar, pill - and the pill is what sits just
+   above the chart. The matchup has no bare toggle at any width now; the
+   pill is its switcher everywhere. The plain copy heading the column is
+   the range toggle's phone home. Both homes are in the DOM at every width
+   (one state, two copies); display, not JSX, chooses. */
 .hero-controls > .text-toggle { display: none; }
 .hero-chartbar { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: auto; }
 /* the compare switch leads the foot group where it renders, so the
@@ -2488,15 +2488,10 @@ body.dark .fb-form { color-scheme: dark; }
   .text-toggle { gap: 9px; }
   .tt-opt { font-size: 13px; }
   .tt-dots { margin-right: 5px; }
-  /* Two controls switch the matchup: this bare toggle, and the "Switch 2PP"
-     pill, which sits with the rest of the controls. The pill wins the narrow
-     screen because it names the alternative AND carries its figure - it
-     answers "what would I be looking at?" before you press it, which is the
-     whole reason it stopped being a bare tab. Dropping the toggle here
-     removes a duplicate and a row at once; the pill offers every matchup that
-     is not the active one, so both directions still work, and the headline
-     itself names the live pair. */
-  .hero-controls > .text-toggle:not(.tt-caps) { display: none; }
+  /* The "Switch 2PP" pill is the only matchup switcher on every width,
+     phone included: it names the alternative AND carries its figure, so a
+     bare matchup toggle heading the strip would only duplicate it. The
+     strip's one TextToggle is the range window. */
   /* …and the Compare-implied switch leaves the strip too. On the phone it
      belongs with the chart it annotates, so its second copy (.pg-phone)
      shows just under the legend - directly below the "95% interval" entries
@@ -17212,11 +17207,6 @@ function Hero({
     return last.b; // opponent's share in the Labor head-to-head
   };
   const orderedMatchups = ["alp_lnp", ...Object.keys(MATCHUPS).filter(id => id !== "alp_lnp" && MATCHUPS[id].vsLabor && hasData(id)).sort((x, y) => oppVsLabor(y) - oppVsLabor(x)), ...Object.keys(MATCHUPS).filter(id => !MATCHUPS[id].vsLabor && hasData(id))];
-  const matchupOptions = orderedMatchups.map(id => ({
-    id,
-    label: MATCHUPS[id].label,
-    dots: MATCHUPS[id].dots
-  }));
   /* rangeDomain takes any month count, and buildXTicks already labels
      every month once the span is under a year, so six months arrives
      with its own tick per month rather than every second one */
@@ -17761,11 +17751,6 @@ function Hero({
   }, "margin"), ")")))), /*#__PURE__*/React.createElement("div", {
     className: "hero-controls"
   }, /*#__PURE__*/React.createElement(TextToggle, {
-    value: matchup,
-    onChange: chooseMatchup,
-    ariaLabel: "Matchup",
-    options: matchupOptions
-  }), /*#__PURE__*/React.createElement(TextToggle, {
     caps: true,
     value: rangeId,
     onChange: setRangeId,
@@ -17800,11 +17785,6 @@ function Hero({
   }, "\xB1 ", o.v.ci95.toFixed(1))))), matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(false), /*#__PURE__*/React.createElement("div", {
     className: "hero-chartbar"
   }, /*#__PURE__*/React.createElement(TextToggle, {
-    value: matchup,
-    onChange: chooseMatchup,
-    ariaLabel: "Matchup",
-    options: matchupOptions
-  }), /*#__PURE__*/React.createElement(TextToggle, {
     caps: true,
     value: rangeId,
     onChange: setRangeId,
