@@ -2670,8 +2670,8 @@ function PollsterTable() {
                     </td>
                     <td className="ta-l pollster-cell">
                       <PollsterName name={r.pollster} url={r.url} />
-                      <MethodLink url={r.methodUrl} />
                       <span className="pollster-mode">{r.client}</span>
+                      <MethodLink url={r.methodUrl} />
                     </td>
                     {/* The date the poll was PUBLISHED where the source says so.
                         Where it doesn't, this falls back to the last day of

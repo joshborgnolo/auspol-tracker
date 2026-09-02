@@ -2920,10 +2920,10 @@ function AllPollsView({ focus, onBack, backLabel }) {
                   </td>
                   <td className="ta-l pollster-cell">
                     <PollsterName name={p.pollster} url={p.url} />
-                    <MethodLink url={p.methodUrl} />
                     {/* the publisher, as the Latest-polls table shows it -
-                        after MethodLink, matching that table's cell order */}
+                        above MethodLink, matching that table's cell order */}
                     <span className="pollster-mode">{p.client}</span>
+                    <MethodLink url={p.methodUrl} />
                     {p.tags.length > 0 && (
                       <span className="poll-tags" aria-label={"Contains " + p.tags.map((id) => POLL_TAG_META[id].label).join(", ")}>
                         {p.tags.map((id) => (

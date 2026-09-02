@@ -11063,11 +11063,11 @@ function PollsterTable() {
     }, /*#__PURE__*/React.createElement(PollsterName, {
       name: r.pollster,
       url: r.url
-    }), /*#__PURE__*/React.createElement(MethodLink, {
-      url: r.methodUrl
     }), /*#__PURE__*/React.createElement("span", {
       className: "pollster-mode"
-    }, r.client)), /*#__PURE__*/React.createElement("td", {
+    }, r.client), /*#__PURE__*/React.createElement(MethodLink, {
+      url: r.methodUrl
+    })), /*#__PURE__*/React.createElement("td", {
       className: "ta-l"
     }, /*#__PURE__*/React.createElement("span", {
       className: "released-pill" + (r.publishedLabel ? "" : " est"),
@@ -14949,11 +14949,11 @@ function AllPollsView({
     }, /*#__PURE__*/React.createElement(PollsterName, {
       name: p.pollster,
       url: p.url
-    }), /*#__PURE__*/React.createElement(MethodLink, {
-      url: p.methodUrl
     }), /*#__PURE__*/React.createElement("span", {
       className: "pollster-mode"
-    }, p.client), p.tags.length > 0 && /*#__PURE__*/React.createElement("span", {
+    }, p.client), /*#__PURE__*/React.createElement(MethodLink, {
+      url: p.methodUrl
+    }), p.tags.length > 0 && /*#__PURE__*/React.createElement("span", {
       className: "poll-tags",
       "aria-label": "Contains " + p.tags.map(id => POLL_TAG_META[id].label).join(", ")
     }, p.tags.map(id => /*#__PURE__*/React.createElement("span", {
