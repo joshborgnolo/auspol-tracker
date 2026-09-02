@@ -1417,7 +1417,7 @@ function cycleSourceRows(cycles, D) {
 
 /* ---- How the final polls did ------------------------------------------
    Everywhere else the page can only describe how far the polls disagree with
-   EACH OTHER. Eight past elections are the one place a poll can be checked
+   EACH OTHER. Nine past elections are the one place a poll can be checked
    against the thing it was estimating, so this is the only honest answer to
    "should I believe the number at the top of this page".
 
@@ -1764,7 +1764,7 @@ function PastCyclesView() {
     <div className="view view-cycles">
       <div className="view-intro">
         <p className="view-lede">
-          Every federal term since 2001, lined up on its election day so each government’s
+          Every federal term since 1998, lined up on its election day so each government’s
           run can be read off the same clock. Past terms sit behind, each line in the
           colour of the party it measures – red for Labor, blue for the Coalition – with
           its year marked at the end.{" "}

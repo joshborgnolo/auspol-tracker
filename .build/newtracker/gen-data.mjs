@@ -1180,10 +1180,14 @@ function cycleSeries(points, base, cap = 36) {
            obs: idxs.map((i) => i >= firstKnown && i in known) };
 }
 const CYC_META = [
-  { year: 2001, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley → Crean → Latham", eDate: "2001-11-10", ePrim: 43.0, eTpp: 51.0, src: 2004, appr: 2001 },
-  { year: 2004, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Latham → Beazley → Rudd", eDate: "2004-10-09", ePrim: 46.7, eTpp: 52.7, src: 2007, appr: 2004 },
+  { year: 1998, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley", eDate: "1998-10-03", ePrim: 39.2, eTpp: 49.0, src: 2001, appr: 1998 },
+  { year: 2001, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Beazley → Crean → Latham", eDate: "2001-11-10", ePrim: 43.0, eTpp: 51.0, src: 2004, appr: 2001,
+    oppSpl: { isos: ["2001-11-22", "2003-12-02"], names: ["Beazley", "Crean", "Latham"] } },
+  { year: 2004, gov: "lnp", opp: "alp", pm: "Howard", lead: "Howard", oppLead: "Latham → Beazley → Rudd", eDate: "2004-10-09", ePrim: 46.7, eTpp: 52.7, src: 2007, appr: 2004,
+    oppSpl: { isos: ["2005-01-28", "2006-12-04"], names: ["Latham", "Beazley", "Rudd"] } },
   { year: 2007, gov: "alp", opp: "lnp", pm: "Rudd → Gillard", lead: "Rudd", oppLead: "Nelson → Turnbull → Abbott", eDate: "2007-11-24", ePrim: 43.4, eTpp: 52.7, src: 2010, appr: 2007,
-    pmSpl: { iso: "2010-06-24", names: ["Rudd", "Gillard"] } },
+    pmSpl: { iso: "2010-06-24", names: ["Rudd", "Gillard"] },
+    oppSpl: { isos: ["2008-09-16", "2009-12-01"], names: ["Nelson", "Turnbull", "Abbott"] } },
   { year: 2010, gov: "alp", opp: "lnp", pm: "Gillard → Rudd", lead: "Gillard", oppLead: "Abbott", eDate: "2010-08-21", ePrim: 38.0, eTpp: 50.1, src: 2013, appr: 2010,
     pmSpl: { iso: "2013-06-27", names: ["Gillard", "Rudd"] } },
   { year: 2013, gov: "lnp", opp: "alp", pm: "Abbott → Turnbull", lead: "Abbott", oppLead: "Shorten", eDate: "2013-09-07", ePrim: 45.6, eTpp: 53.5, src: 2016, appr: 2013,
@@ -1206,9 +1210,13 @@ const CYC_META = [
    run exists to draw there), and the chart falls back to the pooled line. */
 function eraSeries(points, spl, cap) {
   if (!spl) return null;
+  /* One boundary (iso) splits a term in two; longer successions
+     (Beazley → Crean → Latham) carry a whole list of handover dates. */
+  const isos = spl.isos || [spl.iso];
   const eras = spl.names.map((name, i) => {
-    const pts = points.filter((p) => (i === 0 ? p.iso < spl.iso : p.iso >= spl.iso));
-    return pts.length ? { name, from: i === 0 ? null : spl.iso, ...cycleSeries(pts, null, cap) } : null;
+    const lo = i > 0 ? isos[i - 1] : null, hi = i < isos.length ? isos[i] : null;
+    const pts = points.filter((p) => (!lo || p.iso >= lo) && (!hi || p.iso < hi));
+    return pts.length ? { name, from: lo, ...cycleSeries(pts, null, cap) } : null;
   }).filter(Boolean);
   return eras.length > 1 ? eras : null;
 }
@@ -1230,7 +1238,7 @@ function sparseSeries(points, months, cap) {
 /* ---- how the final polls did, cycle by cycle --------------------------
    The page's own caveat is that no aggregate can measure error shared across
    the whole industry about ITSELF. This is the only place that error is
-   visible: eight past elections, each with a result to check the final polls
+   visible: nine past elections, each with a result to check the final polls
    against, and the honest answer of how far out they were.
 
    The rule, stated once here so the number is reproducible: every house's LAST
