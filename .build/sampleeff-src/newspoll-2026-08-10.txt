@@ -1,0 +1,307 @@
+Methodology Statement: Newspoll
+Publication date: 10 August 2026
+
+Short Methodology Statement
+
+Research company: Pyxis Polling Pty Ltd
+Client commissioning the research: The Australian, News Corp Australia
+End client: The Australian, News Corp Australia
+Fieldwork dates: 3 August – 7 August 2026
+Mode of data collection: Online recruited from research panel
+Target population: Eligible Australian Voters
+Sample size: 1242
+Australian Polling Council compliant? Yes
+URL of Long Methodology statement Is voting intention published?
+https://www.pyxispolling.com/apc/
+
+Long Methodology Statement
+
+Effective sample size after weighting applied: 851
+Margin of error associated with effective sample size: ±3.4
+Variables used in weighting & weighting method used: Age x gender x location, Region
+x income, House tenure, Age x education, Rim weighting
+Full question text, responses categories and randomisation: See below
+Proportion of landline/mobile completed interviews: Not applicable
+Source of online sample: Selected from previously recruited online panels of research
+participants to fill quotas loosely based on weighting frame
+Positioning of voting intention questions in questionnaire? Immediately after
+demographics
+2PP calculation method: Calculated according to preferences flows at previous elections
+How were undecided voters handled? Undecided respondents who answered “don’t
+know” were asked a leaner question which also included a “don’t know” option. Those who
+answered don’t know were excluded from published voting intention figures but not from the
+survey. 5% were thus excluded from published voting intention figures.
+
+
+
+
+www.pyxispolling.com
+Full Text of Published Questions
+
+Q1 Thinking about federal politics. If a federal election for the House of Representatives was held
+today, which one of the following would you vote for?
+
+Please select one option only; randomize responses
+
+
+     The Labor Party
+
+
+     The Liberal Party     (show in electorates where Liberal ran in 2025)
+
+
+     The Nationals       (show in electorates where Nationals ran in 2025)
+
+
+     The LNP                                         (show in Queensland)
+
+
+     Pauline Hanson's One Nation
+
+
+     The Greens
+
+                                                      (name other
+                                                      parties or
+     Other parties or independent candidate           independent
+                                                      candidate in each
+                                                      electorate)
+
+     Don't know
+
+NB: Minor parties are shown in electorates where they ran in 2025 election
+
+
+ASK IF Q1 = Don’t Know
+Q2 To which one of the following do you have a leaning?
+
+Please select one option only; randomize responses
+
+
+     The Labor Party
+
+
+     The Liberal Party     (show in electorates where Liberal ran in 2025)
+
+
+     The Nationals       (show in electorates where Nationals ran in 2025)
+
+
+     The LNP                                         (show in Queensland)
+
+
+www.pyxispolling.com
+     Pauline Hanson's One Nation
+
+
+     The Greens
+
+                                                         (name other
+                                                         parties or
+     Other party or independent candidate                independent
+                                                         candidate in each
+                                                         electorate
+
+     Don't know
+
+NB: Minor parties are shown in electorates where they ran in 2025 election
+
+
+ASK ALL
+Q3a. You must allocate preferences for all parties. Between these parties, which would you rank
+highest?
+
+Please select one option only; Rotate 1-3; only show parties not selected in Q1 and Q2
+
+
+       Liberal / Nationals / LNP
+
+
+       Labor
+
+
+       Pauline Hanson’s One Nation
+
+
+       Will just follow how to vote cards / don’t know
+
+
+ASK IF NOT VOTING FOR LABOR, COALITION AND ONE NATION AT Q1 OR Q2, AND
+ANSWERED CODES 1 TO 3 AT Q3a
+Q3b. What about between these parties, which would you rank higher?
+
+Please select one option only; Rotate 1-2
+
+
+
+
+       Liberal / Nationals / LNP
+
+
+       Labor
+
+
+       Pauline Hanson’s One Nation
+
+
+www.pyxispolling.com
+       Will just follow how to vote cards / don’t know
+
+
+
+
+ASK ALL
+Q4. Thinking now about the leaders of the parties. Are you satisfied or dissatisfied with the way
+Anthony Albanese is doing his job as Prime Minister?
+
+Please select one option only; Rotate 1-2
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+ASK IF Q4 = Don’t Know
+Q5. On balance, and while you may have no strong feelings either way, would you be more inclined to
+say you have been satisfied or dissatisfied with the way Anthony Albanese is doing his job as Prime
+Minister?
+
+Please select one option only; Rotate 1-2
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+ASK ALL
+Q6. Are you satisfied or dissatisfied with the way Angus Taylor is doing his job as Leader of the
+Opposition?
+
+Please select one option only; Rotate 1-2
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+
+www.pyxispolling.com
+     Don’t know
+
+
+ASK IF Q6 = Don’t Know
+Q7. On balance, and while you may have no strong feelings either way, would you be more inclined to
+say you have been satisfied or dissatisfied with the way Angus Taylor is doing his job as Leader of the
+Opposition?
+
+Please select one option only; Rotate 1-2
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+ASK ALL
+Q8. Who do you think would make the better Prime Minister?
+
+Please select one option only; Rotate 1-2
+
+
+      Anthony Albanese
+
+
+     Angus Taylor
+
+
+       Don’t know
+
+
+ASK IF Q8 = Don’t Know
+Q9. If you had to choose, which one of the two leaders do you think would make the better Prime
+Minister?
+
+Please select one option only; Rotate 1-2
+
+
+       Anthony Albanese
+
+
+       Angus Taylor
+
+
+
+
+www.pyxispolling.com
+       Don’t know
+
+
+
+ASK ALL
+Q10. Are you satisfied or dissatisfied with the way Pauline Hanson is doing her job as Leader of One
+Nation?
+
+Please select one option only; Rotate 1-2
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+ASK IF Q10 = Don’t Know
+Q11. On balance, and while you may have no strong feelings either way, would you be more inclined
+to say you have been satisfied or dissatisfied with the way Pauline Hanson is doing her job as Leader
+of One Nation?
+
+Please select one option only; Rotate 1-2
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+
+
+ASK ALL
+Q12. Please rank the following three people according to your preference as Prime Minister. You
+must rank all three in order from highest preference to lowest preference.
+
+Rotate 1-3
+
+Anthony Albanese
+
+Angus Taylor
+
+Pauline Hanson
+
+
+
+
+www.pyxispolling.com
+

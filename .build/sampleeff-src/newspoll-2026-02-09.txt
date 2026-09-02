@@ -1,0 +1,239 @@
+Methodology Statement: Newspoll
+Publication date: 9 February 2026
+
+Short Methodology Statement
+
+Research company: Pyxis Polling Pty Ltd
+Client commissioning the research: The Australian, News Corp Australia
+End client: The Australian, News Corp Australia
+Fieldwork dates: 4 February – 7 February 2026
+Mode of data collection: Online recruited from research panel
+Target population: Eligible Australian Voters
+Sample size: 1234
+Australian Polling Council compliant? Yes
+URL of Long Methodology statement Is voting intention published?
+https://www.pyxispolling.com/apc/
+
+Long Methodology Statement
+
+Effective sample size after weighting applied: 1059
+Margin of error associated with effective sample size: ±3.01
+Variables used in weighting & weighting method used: Age x gender x location, Housing
+tenure, Region x income, 2025 Past Vote, Rim weighting
+Full question text, responses categories and randomisation: See below
+Proportion of landline/mobile completed interviews: Not applicable
+Source of online sample: Selected from previously recruited online panels of research
+participants to fill quotas loosely based on weighting frame
+Positioning of voting intention questions in questionnaire? Immediately after
+demographics
+2PP calculation method: Calculated according to preferences flows at previous elections
+How were undecided voters handled? Undecided respondents who answered “don’t
+know” were asked a leaner question which also included a “don’t know” option. Those who
+answered don’t know were excluded from published voting intention figures but not from the
+survey. 6% were thus excluded from published voting intention figures.
+
+
+
+
+www.pyxispolling.com
+Full Text of Published Questions
+
+Q1 Thinking about federal politics. If a federal election for the House of Representatives was held
+today, which one of the following would you vote for?
+
+Please select one option only; randomize responses
+
+
+
+
+     The Labor Party
+
+     The Liberal    (show in electorates where Lib ran in 2025, LNP seats
+     Party             where sit with Lib, and QLD seats not won by LNP)
+
+     The           (show in electorates where Nat ran in 2025, LNP seats
+     Nationals        where sit with Nat, and QLD seats not held by LNP)
+
+     Pauline Hanson's One Nation
+
+
+     The Greens
+
+                                                      (name other
+                                                      parties or
+     Other parties or independent candidate           independent
+                                                      candidate in each
+                                                      electorate)
+
+     Don't know
+
+
+NB: Minor parties are shown in electorates where they ran in 2025 election
+
+
+ASK IF Q1 = Don’t Know
+
+
+Q2 To which one of the following do you have a leaning?
+
+Please select one option only; randomize responses
+
+
+
+
+     The Labor Party
+
+     The Liberal    (show in electorates where Lib ran in 2025, LNP seats
+     Party             where sit with Lib, and QLD seats not won by LNP)
+
+     The           (show in electorates where Nat ran in 2025, LNP seats
+     Nationals     where sit with Nat, and QLD seats not held by LNP)
+
+
+www.pyxispolling.com
+     Pauline Hanson's One Nation
+
+
+     The Greens
+
+                                                         (name other
+                                                         parties or
+     Other party or independent candidate                independent
+                                                         candidate in each
+                                                         electorate
+
+     Don't know
+
+
+NB: Minor parties are shown in electorates where they ran in 2025 election
+
+
+ASK IF NOT VOTING FOR LABOR, ONE NATION AT Q1, Q2
+Q3b. You must allocate preferences for all parties. Between these parties, which would you rank
+highest?
+
+Please select one option only; Rotate 1-2
+
+
+
+
+       Pauline Hanson’s One Nation
+
+
+       Labor
+
+
+       Will just follow how to vote cards / don’t know
+
+ASK ALL
+Q4. Thinking now about the leaders of the parties. Are you satisfied or dissatisfied with the way
+Anthony Albanese is doing his job as Prime Minister?
+
+Please select one option only; Rotate 1-2
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+ASK IF Q4 = Don’t Know
+
+www.pyxispolling.com
+Q5. On balance, and while you may have no strong feelings either way, would you be more inclined to
+say you have been satisfied or dissatisfied with the way Anthony Albanese is doing his job as Prime
+Minister?
+
+Please select one option only; Rotate 1-2
+
+
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+ASK ALL
+Q6. Are you satisfied or dissatisfied with the way Sussan Ley is doing her job as Leader of the
+Opposition?
+
+Please select one option only; Rotate 1-2
+
+
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+ASK IF Q6 = Don’t Know
+Q7. On balance, and while you may have no strong feelings either way, would you be more inclined to
+say you have been satisfied or dissatisfied with the way Sussan Ley is doing her job as Leader of the
+Opposition?
+
+Please select one option only; Rotate 1-2
+
+
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+
+www.pyxispolling.com
+ASK ALL
+Q8. Who do you think would make the better Prime Minister?
+
+Please select one option only; Rotate 1-2
+
+
+
+
+      Anthony Albanese
+
+
+     Sussan Ley
+
+
+       Don’t know
+
+
+ASK IF Q8 = Don’t Know
+Q9. If you had to choose, which one of the two leaders do you think would make the better Prime
+Minister?
+
+Please select one option only; Rotate 1-2
+
+
+       Anthony Albanese
+
+
+       Sussan Ley
+
+       Don’t know
+
+
+
+
+www.pyxispolling.com
+

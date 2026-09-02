@@ -13,15 +13,17 @@
 //              leg also stamps `methodUrl` (the statement's own URL) on every
 //              YouGov row it can match, whether or not the row needs a
 //              sampleEff – so methodUrl reach equals the listing's window.
-//   Newspoll – pyxispolling.com statement pages, enumerated via sitemap.xml
-//              (the /apc listing is JS-paginated through an authed CMS API and
-//              ?page=N is ignored). Each /methodology-statement/newspoll-* page
-//              renders its PDF link client-side, resolved with headless Chrome
-//              --dump-dom --virtual-time-budget (skipped with a warning when
-//              no Chrome is available). Pyxis statements stop at Jan 2026 for
-//              now; later waves fall back. The statement PAGES also carry
-//              Newspoll's methodUrl – they outlive their PDFs (pruned pre-
-//              2025-11), so the page, not the pdf, is the link target.
+//   Newspoll – pyxispolling.com's CMS JSON API, discovered from the /apc
+//              page's own collection embed (the page is JS-paginated via
+//              api.php; sitemap.xml stopped being maintained at Jan 2026).
+//              Each item names a slug (newspoll-D-M-YYYY) and its statement
+//              PDF under /api.php/images/document/<id>/… (the bare
+//              /images/document/… path 404s – keep the api.php prefix).
+//              No statement pages exist under the new CMS and none was
+//              published for 2026 waves, so the PDF itself is also
+//              Newspoll's methodUrl target on newly-stamped rows (rows
+//              stamped earlier keep their old statement-page links, which
+//              still resolve). No Chrome, no headless rendering.
 //   Essential – ONE living disclosure-statement PDF, re-uploaded per release.
 //              Its "Individual Survey Details" table lists publication &
 //              fieldwork dates, raw sample, weighting efficiency and effective
@@ -71,8 +73,6 @@ const UA = {
   "sec-fetch-dest": "document",
   "sec-fetch-mode": "navigate",
 };
-const CHROME = process.env.CHROME
-  || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8, sep: 9, oct: 10, nov: 11, dec: 12 };
 const monthNo = (s) => MONTHS[String(s).slice(0, 3).toLowerCase()] || null;
@@ -245,61 +245,52 @@ async function legYouGov(needDates) {
   return out;
 }
 
-/* ---- leg: Newspoll via Pyxis sitemap + headless-Chrome resolution ------ */
-async function legNewspoll(needs) {
-  const xml = await fetchText("https://pyxispolling.com/sitemap.xml");
-  const pages = new Map();   // ISO-ish statement date -> page url
-  for (const m of xml.matchAll(/<loc>(https:\/\/pyxispolling\.com\/methodology-statement\/(newspoll)-(\d{1,2})-(\d{1,2})-(\d{4}))<\/loc>/g))
-    pages.set(m[1], iso(+m[5], +m[4], +m[3]));
-  const cand = [...pages.entries()].filter(([, when]) => needs.some((d) => Math.abs(ddays(d, when)) <= 7));
+/* ---- leg: Newspoll via the pyxispolling.com CMS collection API ----------
+   The /apc page embeds its collection id in a data-attribute; the JSON feed
+   behind it lists every statement with slug + PDF href. Federal slugs are
+   "newspoll-D-M-YYYY" (state variants carry a state prefix and are excluded
+   by the anchor). The slug date is the publication date; fieldwork end still
+   comes from the PDF text like every other leg. */
+const PYXIS_API = "https://pyxispolling.com/api.php/collection/6909661a09b83573fd004fe4/items?limit=200&order=columns.date_DESC";
+async function pyxisStatements() {
+  const j = JSON.parse(await fetchText(PYXIS_API));
   const out = [];
-  for (const [url, when] of cand) {
+  for (const it of j.collection || []) {
+    const c = it.columns || {};
+    const m = /^newspoll-(\d{1,2})-(\d{1,2})-(\d{4})$/.exec(c.slug || "");
+    // the PDF is served through the api.php proxy path; the bare
+    // /images/document/… path 404s, so resolve exactly what the API hands out
+    const pdf = c.file && c.file.url && new URL(c.file.url, "https://pyxispolling.com").toString();
+    if (!m || !pdf) continue;
+    out.push({ when: iso(+m[3], +m[2], +m[1]), href: pdf });
+  }
+  if (!out.length) throw new Error("pyxis API: no federal Newspoll statements found");
+  return out;
+}
+async function legNewspoll(needs) {
+  const cand = (await pyxisStatements()).filter((s) => needs.some((d) => Math.abs(ddays(d, s.when)) <= 7));
+  const out = [];
+  for (const s of cand) {
     let rec = null;
     try {
-      rec = await resolveNewspollStatement(url, when);
+      rec = await parsePdfAt(s.href, "newspoll-" + s.when);
     } catch (e) {
-      console.log("  warn: " + url + ": " + e.message);
+      console.log("  warn: " + s.href + ": " + e.message);
       continue;
     }
-    if (!rec) continue;
-    out.push({ pollster: "Newspoll", series: "newspoll", ...rec, src: "pyxispolling.com statement " + when });
+    if (!rec || !rec.end) { console.log("  warn: parse hole in " + s.href); continue; }
+    out.push({ pollster: "Newspoll", series: "newspoll", ...rec, src: "pyxispolling.com statement " + s.when });
   }
   return out;
 }
 
-async function resolveNewspollStatement(url, when) {
-  const dom = execFileSync(CHROME, ["--headless=new", "--dump-dom", "--virtual-time-budget=12000", "--timeout=20000", url],
-    { encoding: "utf8", maxBuffer: 1 << 24, stdio: ["ignore", "pipe", "ignore"] });
-    // the JS-swapped page must show the right statement, not the cached default
-    const titleM = dom.match(/([A-Za-z]+)\s+(\d{1,2}),\s+(\d{4})<\/[a-z]+>\s*<a[^>]*(?:View Methodology|href=)/i)
-      || dom.match(/\b(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{1,2}),\s+(\d{4})/);
-  if (!titleM || Math.abs(ddays(iso(+titleM[3], monthNo(titleM[1]), +titleM[2]), when)) > 7) {
-    console.log("  warn: pyxis page did not resolve to " + when + " (JS swap?); skipped");
-    return null;
-  }
-  const pdf = dom.match(/\/images\/document\/[^"]+Newspoll[^"]*\.pdf/i)
-           || dom.match(/\/images\/document\/[^"]+\.pdf/i);
-  if (!pdf) { console.log("  warn: no pdf resolved at " + url); return null; }
-  const pdfUrl = new URL(pdf[0], "https://pyxispolling.com").toString();
-  const rec = await parsePdfAt(pdfUrl, "newspoll-" + when);
-  if (!rec || !rec.end) { console.log("  warn: parse hole in " + url); return null; }
-  return rec;
-}
-
-/* Newspoll methodUrl leg: the sitemap's methodology-statement PAGE urls are
-   the link target (their PDFs older than Nov 2025 are pruned, but the pages
-   themselves live on and carry the wave's statement title). No Chrome, no
-   PDF fetch – dates come from the url, matched within ±7 days of a row's
-   publication. Placement mirrors legNewspoll's candidate window. */
+/* Newspoll methodUrl leg: the new CMS has no per-statement PAGES (the old
+   /methodology-statement/newspoll-* ones still resolve, so rows already
+   stamped keep them), so the statement's own PDF on pyxispolling.com is the
+   link target – same shape YouGov uses. Slug dates are publication dates;
+   matched within ±7 days of a row's publication, mirroring legNewspoll. */
 async function legNewspollLinks(needDates) {
-  const xml = await fetchText("https://pyxispolling.com/sitemap.xml");
-  const out = [];
-  for (const m of xml.matchAll(/<loc>(https:\/\/pyxispolling\.com\/methodology-statement\/(newspoll)-(\d{1,2})-(\d{1,2})-(\d{4}))<\/loc>/g)) {
-    const when = iso(+m[5], +m[4], +m[3]);
-    if (!needDates.some((d) => Math.abs(ddays(d, when)) <= 7)) continue;
-    out.push({ when, href: m[1] });
-  }
-  return out;
+  return (await pyxisStatements()).filter((s) => needDates.some((d) => Math.abs(ddays(d, s.when)) <= 7));
 }
 
 /* ---- leg: Essential disclosure statement (one living PDF) -------------- */
@@ -408,12 +399,8 @@ const legs = [
   ["essential", () => legEssential()],
   ["demosau", () => legDemosau([...new Set(unstamped.filter((p) => p.pollster.startsWith("DemosAU")).map((p) => p.date.slice(0, 7)))])],
 ];
-let chromeBin = null;
-try { execFileSync(CHROME, ["--version"], { stdio: "ignore" }); chromeBin = CHROME; } catch {}
-if (chromeBin && unstamped.some((p) => p.pollster === "Newspoll"))
+if (unstamped.some((p) => p.pollster === "Newspoll"))
   legs.push(["newspoll", () => legNewspoll(unstamped.filter((p) => p.pollster === "Newspoll").map((p) => (p.published || p.date).slice(0, 10)))]);
-else if (unstamped.some((p) => p.pollster === "Newspoll"))
-  console.log("  warn: no Chrome at " + CHROME + " – Newspoll leg skipped");
 
 for (const [name, fn] of legs) {
   try { records.push(...await fn()); }

@@ -1073,6 +1073,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1264,
+      "sampleEff": 958,
       "alp": 36,
       "lnp": 29,
       "grn": 12,
@@ -1145,6 +1146,7 @@
       "pollster": "Newspoll",
       "client": "The New Daily",
       "sample": 1283,
+      "sampleEff": 1062,
       "alp": 36,
       "lnp": 30,
       "grn": 12,
@@ -1217,6 +1219,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1283,
+      "sampleEff": 1052,
       "alp": 36,
       "lnp": 27,
       "grn": 13,
@@ -1311,6 +1314,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1264,
+      "sampleEff": 1053,
       "alp": 37,
       "lnp": 28,
       "grn": 12,
@@ -1437,6 +1441,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1265,
+      "sampleEff": 1137,
       "alp": 36,
       "lnp": 24,
       "grn": 11,
@@ -1840,6 +1845,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1224,
+      "sampleEff": 1051,
       "alp": 32,
       "lnp": 21,
       "grn": 12,
@@ -2042,6 +2048,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1234,
+      "sampleEff": 1059,
       "alp": 33,
       "lnp": 18,
       "grn": 12,
@@ -2054,7 +2061,8 @@
         "Lib": 15,
         "Nat": 3
       },
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-sussan-leys-liberals-hit-historic-low-and-hand-angus-taylor-a-challenge-trigger/news-story/bbd4bf5615319c1d872a735e4d1646f9"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-sussan-leys-liberals-hit-historic-low-and-hand-angus-taylor-a-challenge-trigger/news-story/bbd4bf5615319c1d872a735e4d1646f9",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/23197042/NewspollMethodologyStatement9February2026byPyxis-jgvq-njfgtPanNctOUTnLw.pdf"
     },
     {
       "date": "2026-02-08",
@@ -2292,6 +2300,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1237,
+      "sampleEff": 1043,
       "alp": 32,
       "lnp": 20,
       "grn": 11,
@@ -2300,7 +2309,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.pollbludger.net/2026/03/01/newspoll-labor-32-one-nation-27-coalition-20-greens-11-open-thread/"
+      "url": "https://www.pollbludger.net/2026/03/01/newspoll-labor-32-one-nation-27-coalition-20-greens-11-open-thread/",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/23739820/NewspollMethodologyStatement2March2026byPyxis-9A40zTlIA5TflJOBgYdh9g.pdf"
     },
     {
       "date": "2026-02-27",
@@ -2586,6 +2596,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1232,
+      "sampleEff": 1124,
       "alp": 31,
       "lnp": 21,
       "grn": 12,
@@ -2594,7 +2605,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-up-one-nation-plateaus-as-labor-dips-amid-iran-war-fuel-crisis/news-story/683c727a9e67a4f4fe8640440e44f3b1?amp"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-up-one-nation-plateaus-as-labor-dips-amid-iran-war-fuel-crisis/news-story/683c727a9e67a4f4fe8640440e44f3b1?amp",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/24607993/NewspollMethodologyStatement30March2026byPyxis-AvvyTlYpA6zeoV2P_V_Yhg.pdf"
     },
     {
       "date": "2026-03-27",
@@ -2760,6 +2772,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1235,
+      "sampleEff": 1146,
       "alp": 31,
       "lnp": 21,
       "grn": 13,
@@ -2768,7 +2781,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-support-falls-as-voters-resist-new-revenue-measures/news-story/ba583310b812fd590a07d4c5e6812838"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-support-falls-as-voters-resist-new-revenue-measures/news-story/ba583310b812fd590a07d4c5e6812838",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/25699945/NewspollMethodologyStatement20April2026byPyxis-PzbvqKXbZDh2br-RrjMCjw.pdf"
     },
     {
       "date": "2026-04-18",
@@ -3136,6 +3150,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1252,
+      "sampleEff": 1074,
       "alp": 31,
       "lnp": 20,
       "grn": 12,
@@ -3144,7 +3159,8 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/25699942/NewspollMethodologyStatement18May2026byPyxis-MVoGot9Vf0GzsNoVDOrvsQ.pdf"
     },
     {
       "date": "2026-05-19",
@@ -3321,6 +3337,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1240,
+      "sampleEff": 927,
       "alp": 30,
       "lnp": 18,
       "grn": 11,
@@ -3329,7 +3346,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-in-front-of-labor-anthony-albanese-gets-worst-ever-rating/news-story/f4e47be80091b678d835cb9334fc8b0a"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-in-front-of-labor-anthony-albanese-gets-worst-ever-rating/news-story/f4e47be80091b678d835cb9334fc8b0a",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/26125276/NewspollMethodologyStatement8June2026byPyxis-65K2gj5PC1afG43d89wtLQ.pdf"
     },
     {
       "date": "2026-06-07",
@@ -3461,6 +3479,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1235,
+      "sampleEff": 1027,
       "alp": 33,
       "lnp": 17,
       "grn": 13,
@@ -3469,7 +3488,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albanese-and-labor-bounce-back-after-budget-tax-backflips-take-primary-vote-lead-from-one-nation/news-story/3c57c1c54f74b697324f5b5917e74337"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albanese-and-labor-bounce-back-after-budget-tax-backflips-take-primary-vote-lead-from-one-nation/news-story/3c57c1c54f74b697324f5b5917e74337",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/26605651/NewspollMethodologyStatement29June2026byPyxis-szOLdVanOJFNG1BOiiD1Hw.pdf"
     },
     {
       "date": "2026-06-26",
@@ -3713,6 +3733,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1238,
+      "sampleEff": 1021,
       "alp": 30,
       "lnp": 19,
       "grn": 12,
@@ -3721,7 +3742,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hanson-regains-ground-and-liberals-rise-as-labor-falls-to-equal-lowest-point-since-2022/news-story/da8374ff67e3769478b13867909a1074"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hanson-regains-ground-and-liberals-rise-as-labor-falls-to-equal-lowest-point-since-2022/news-story/da8374ff67e3769478b13867909a1074",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/26999641/NewspollMethodologyStatement20July2026byPyxis-UIky81cqYqHOd-HsdsjkDg.pdf"
     },
     {
       "date": "2026-07-19",
@@ -3874,6 +3896,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1242,
+      "sampleEff": 851,
       "alp": 29,
       "lnp": 18,
       "grn": 14,
@@ -3882,7 +3905,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albaneses-labor-hits-a-julia-gillardlevel-low-primary-vote-after-winter-break/news-story/ca81774a347a1fd299e48ce0361d1a8a"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albaneses-labor-hits-a-julia-gillardlevel-low-primary-vote-after-winter-break/news-story/ca81774a347a1fd299e48ce0361d1a8a",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/27378346/NewspollMethodologyStatement10August2026byPyxis-003bk-owSLhtvzyATwtUuA.pdf"
     },
     {
       "date": "2026-08-09",
@@ -4062,6 +4086,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1243,
+      "sampleEff": 875,
       "alp": 29,
       "lnp": 19,
       "grn": 13,
@@ -4070,7 +4095,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/27740193/NewspollMethodologyStatement31August2026byPyxis-A4iDRDxXIuKMFjSr8KuKuw.pdf"
     },
     {
       "date": "2026-08-28",

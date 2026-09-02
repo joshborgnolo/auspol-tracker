@@ -1,6 +1,6 @@
 ---
 name: auspol-effective-sample
-description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md. Statement caches in .build/sampleeff-src/. Known dead-ends: Pyxis Newspoll statements pre-2025-11 pruned (404, not in Wayback) and stop at 2026-01, DemosAU MRP prints 'n/a for MRP' (never stamped), YouGov Australia-Institute commissioned waves have no statement."
+description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md. Statement caches in .build/sampleeff-src/. Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never stamped), YouGov Australia-Institute commissioned waves have no statement."
 source: auto-skill
 extracted_at: '2026-09-02T00:00:00.000Z'
 ---
@@ -35,13 +35,14 @@ extracted_at: '2026-09-02T00:00:00.000Z'
   `seFloor` of the live aggregate estimate, per-poll CHG_MEASURES
   change-CIs/significance.
 
-## Coverage at launch (34/63 APC-statement rows stamped)
+## Coverage after the 2026-09-02 Newspoll backfill (50/63 APC-statement rows stamped)
 
 YouGov 16/21 (Sky News Pulse / News24 Pulse / Public Data, 2025-12→),
-Essential 10/12, DemosAU 5/9, Newspoll 1/17 (2025-11-20 only).
+Essential 10/12, DemosAU 5/9, Newspoll 17/17 (2025-07-17 → 2026-08-28 —
+the Pyxis CMS migration re-hosted every wave's statement PDF, so the
+earlier "pre-2025-11 pruned, unrecoverable" gap closed; the backfill
+stamped the 16 missing rows on the day the feature shipped).
 Documented gaps, all deliberate:
-- **Pyxis/Newspoll statements pre-2025-11-20 are pruned**: 404, not in
-  Wayback. Cannot be recovered.
 - **DemosAU MRP statements print "n/a for MRP"** for effective sample —
   extractor parses it as `{na:true}` (a note, not a hole); MRPs are
   NEVER stamped.
@@ -142,17 +143,27 @@ Sources and link forms:
   pre-window waves (Nov 2025 and earlier) stay unlinked and unstamped
   rows never overwrite. Commissioned waves (Australia Institute
   2025-10-30, 2026-03-19) file no statement.
-- **Newspoll** — Pyxis's sitemap.xml enumerates statement PAGES
-  (`pyxispolling.com/methodology-statement/newspoll-D-M-YYYY`); the
-  statement PAGE is the methodUrl, not the PDF it hosts, because Pyxis
-  prunes the PDFs pre-2025-11 (they 404) while the pages persist. The
-  /apc/ listing itself is JS-paginated with `?page=N` ignored server-
-  side — the sitemap is THE enumeration. Pyxis stops filing Newspoll
-  statements at 2026-01 (last: newspoll-19-01-2026), so post-Jan-2026
-  Newspolls stay unlinked. `legNewspollLinks` matches rows ±7 days on
-  `(p.published || p.date)`; no Chrome, no PDF fetch.
+- **Newspoll** — Pyxis MIGRATED CMS around the 2026-01 wave:
+  pyxispolling.com/apc/ is now JS-rendered from a PUBLIC collection
+  JSON API — `https://pyxispolling.com/api.php/collection/6909661a09b83573fd004fe4/items?limit=200&order=columns.date_DESC`
+  (apiHost = location.host + "/api.php" in the app bundle; the raw
+  cms.sitehub.io service needs auth). `pyxisStatements()` maps each
+  federal item (slug `newspoll-D-M-YYYY`, Sydney publication date) to
+  its statement PDF at `columns.file.url` — PDFs resolve ONLY via the
+  `/api.php/images/document/<id>/…` prefix (the bare path 404s). The
+  migration FROZE `sitemap.xml` at `newspoll-19-01-2026` and removed
+  statement PAGES for post-migration waves (the seven old stamped
+  pages — 2025-07 → 2026-01 — still resolve and stay linked via the
+  never-overwrite rule), so for post-migration waves the PDF itself is
+  the methodUrl, matching YouGov's shape. Anything that describes the
+  OLD enumeration (sitemap.xml as "THE enumeration", "Pyxis stops
+  filing at 2026-01", "pruned PDFs") is stale — this note replaced it
+  on 2026-09-02 after the user saw live 2026 statements the sitemap hid.
+  `legNewspollLinks` matches rows ±7 days on `(p.published || p.date)`;
+  both Newspoll legs now run with no Chrome and no rendering at all.
 
-Coverage at ship: YouGov 19/22, Newspoll 7/17 (2025-07-17 → 2026-01-16).
+Coverage: YouGov 19/22, Newspoll 17/17 (2025-07-17 → 2026-08-28: seven
+statement-page links + ten post-migration PDF links).
 Status line gained a `methods` count; the extractor stamps links only
 for unstamped rows (never overwrite), ambiguity on >1 distinct href
 matches = the same error convention as sampleEff conflicts.
@@ -165,7 +176,7 @@ the Latest-table pollster cell AND in PollLedger as an
 archive table (d1a1d215) renders MethodLink in its pollster cell above
 the tag chips; template.html styles `.pollster-method` after
 `.pollster-mode`; check-citations.mjs sweeps it (`add(p.methodUrl,
-"methodUrl")`, +26 URLs at stamp); README data-fields bullet beside the
+"methodUrl")`, +36 URLs once Newspoll's 2026 waves linked); README data-fields bullet beside the
 `sampleEff` one.
 
 ## Rules

@@ -16,8 +16,11 @@ ledger, 2026-09-01):
 | `pollsterRules.*.site` | 7 | the publisher index — **load-bearing** (10 deployments, 7 unique) |
 
 Post-census: `polls[].methodUrl` joined the sweep 2026-09-02 (the YouGov /
-Newspoll APC statement links, +26 URLs at stamp — YouGov's CloudFront
-document host and pyxispolling.com statement pages)
+Newspoll APC statement links — YouGov's CloudFront
+document host and pyxispolling.com statement pages/PDFs; the Newspoll
+enumerator switched to Pyxis's live collection API the same day when the
+sitemap.xml enumeration turned out to have frozen at Jan 2026 in a CMS
+migration → 36 URLs on the sweep at close of day)
 
 Top hosts: roymorgan.com 44, theaustralian.com.au 15, smh.com.au 15,
 afr.com 14, essentialreport.com.au 13, skynews.com.au 13, demosau.com 11,
