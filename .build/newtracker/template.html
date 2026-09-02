@@ -1166,14 +1166,6 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    reads as a qualification rather than a warning. */
 .hero-caveat { color: var(--ink-3); }
 .hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; align-self: stretch; }
-/* the figure-bearing matchup pills ride LOW on a laptop: ordered to the
-   foot of the controls column, so the Switch-2PP strip sits just above the
-   range switch, off to the right of the interval strip and the delta line
-   across the way, instead of heading the column top right. A negative
-   order lifts it over the chartbar inside the foot group; order, not DOM,
-   does the placing – the phone block re-leads the strip (its order:-1
-   shares this specificity and wins on source order). */
-.hero-controls .hero-alt { order: -1; }
 /* quiet inline checkbox alongside the matchup/range switches – stripped from
    chart copies with the rest of .hero-controls. The column gap already
    spaces it, so the shared checkbox's other margins are dropped here. When
@@ -1181,19 +1173,25 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    carries the auto margin that sinks the group level with the interval
    strip. */
 .hero-controls .pg-check { margin: 0; margin-top: auto; }
-/* Where the compare switch does not render, the PILL leads the foot group
-   instead (its negative order lifts it over the chartbar), so it inherits
-   the same auto-margin sink. */
-.hero-controls > .hero-alt:first-of-type { margin-top: auto; }
+/* The figure-bearing matchup pill's laptop seat is its DOM seat: after the
+   compare switch, so the foot stack reads compare, pill, range toggle -
+   the pill nested between the two bars, the whole group sunk level with
+   the interval strip and the delta line across the way. Its own auto
+   margin is the sink for when the compare switch does not render (a
+   non-ALP/LNP matchup, or no synthetic overlay; the pill then LEADS the
+   foot group) - where the switch does render, the checkbox carries the
+   group and the sibling rule resets the pill's. */
+.hero-controls .hero-alt { margin-top: auto; }
+.hero-controls .pg-check ~ .hero-alt { margin-top: 0; }
 /* The range switch's laptop home is the foot of this column, inside
    .hero-chartbar: the column stretches to the hero-top row (align-self
    above) and an auto margin sinks the foot group - compare switch where
    it renders, else the pill, else the chartbar itself - level with the
    interval strip and the delta line across the way. The Switch-2PP pill
-   belongs to this group on a laptop: a negative order lifts it ahead of
-   the chartbar, so the foot stack reads compare switch, pill, range - and
-   the range toggle is what sits just above the chart, naming the window
-   it filters. The matchup has no bare toggle at any width now; the pill
+   belongs to this group on a laptop, its DOM seat nesting it between the
+   compare switch and the chartbar, so the foot stack reads compare
+   switch, pill, range - and the range toggle is what sits just above the
+   chart, naming the window it filters. The matchup has no bare toggle at any width now; the pill
    is its switcher everywhere. The plain copy heading the column is the
    range toggle's phone home. Both homes are in the DOM at every width
    (one state, two copies); display, not JSX, chooses. */
@@ -1250,11 +1248,10 @@ body.dark .ci-band { opacity: 0.22; }
 
 /* the contests that are not on the chart, each carrying its own figure. A
    button, not a tab: pressing one makes it the headline and morphs the chart.
-   Lives inside .hero-controls; a laptop ranks it WITHIN the column foot,
-   above the chartbar (a negative order lifts the matchup offer over the
-   range window), the foot group sunk level with the interval strip, while
-   the compare switch and chartbar keep their own sink from the auto
-   margins on .pg-check and .hero-chartbar. Wrapped rows keep the desktop
+   Lives inside .hero-controls; a laptop ranks it WITHIN the column foot by
+   its DOM seat, between the compare switch and the chartbar (the foot group
+   sunk level with the interval strip, its own auto margin the sink where
+   the compare switch does not render). Wrapped rows keep the desktop
    column's right edge. On a phone the ≤560px block orders it first in the
    wrap row. */
 .hero-alt { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
@@ -2387,9 +2384,12 @@ body.dark .fb-form { color-scheme: dark; }
   .hero-controls > .text-toggle { display: inline-flex; }
   /* phone carries the matchup only as the Switch-2PP pill, so it leads the
      control row and the range window follows: the laptop order that sinks
-     it to the column foot is outranked here, and the right-alignment the
-     ≤900px block lends it hands back to the wrap row's centring */
-  .hero-controls .hero-alt { order: -1; align-self: center; }
+     it to the column foot is outranked here, and with it the laptop
+     margin-top:auto (in a wrap row an auto top margin would shove the
+     pill to a line of its own instead of leading the chips). The
+     right-alignment the ≤900px block lends it hands back to the wrap
+     row's centring */
+  .hero-controls .hero-alt { order: -1; align-self: center; margin-top: 0; }
   /* …and the same fold pressure halves the wrap gap between the headline
      stack and that control strip: the desktop 24px is one row-gap among
      similar ones; on a phone it was the biggest void on the wire to the

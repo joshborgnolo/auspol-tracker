@@ -1150,17 +1150,20 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               included, so a bare matchup toggle would only duplicate it. */}
           <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
             options={rangeOptions} />
+          {/* The synthetic overlay is only meaningfully comparable against the
+              published ALP v L/NP series, so the control only exists there.
+              Off by default: it is a diagnostic, not a third headline. */}
+          {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(false)}
           {/* The OTHER contests, carrying their figures rather than just their
               names. One Nation sits level with Labor on the primary vote, so
               in a good many seats the final two are not Labor and the Coalition
               and "the 2PP" is doing less work than a single headline implies.
               These were previously a bare tab you had to press to find out
-              what was behind it; the number is the reason to press it. On a
-              laptop CSS lifts the pill OVER the chartbar inside the column
-              foot group, so it sits between the compare switch and the
-              range switch, right of the interval strip; the DOM seat here
-              before the compare switch exists for the phone, whose
-              order:-1 leads the wrap row from this spot. */}
+              what was behind it; the number is the reason to press it. This
+              DOM seat - between the compare switch above and the chartbar's
+              range toggle below - is the laptop foot-group order as well:
+              compare, pill, range. On a phone the ≤560px order:-1 lifts the
+              strip to lead the controls column from this same DOM spot. */}
           {otherContests.length > 0 && (
             <div className="hero-alt">
               <span className="ha-lab">Switch 2PP</span>
@@ -1178,10 +1181,6 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               ))}
             </div>
           )}
-          {/* The synthetic overlay is only meaningfully comparable against the
-              published ALP v L/NP series, so the control only exists there.
-              Off by default: it is a diagnostic, not a third headline. */}
-          {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(false)}
           {/* The laptop home of the range switch: the bottom of this
               column's foot group, the Switch-2PP pill ordered immediately
               above it and the group as a whole sunk level with the interval
