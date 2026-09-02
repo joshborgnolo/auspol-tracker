@@ -1250,6 +1250,16 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    the tighter 6px column gap. */
 @media (max-width: 480px) {
   .hero-interval { gap: 6px; }
+  /* The footer text lines centre on the bar itself, not the column: the
+     gauge is offset to keep the tie tick under the readout's centre rule,
+     so column-centred text would hang a seam off the track. The gauge
+     publishes its box as --hg-w / --hg-ml on the hero column and the three
+     lines take that box before centring their content inside it. With no
+     interval there is no gauge and no properties, and the fallback leaves
+     the lines column-wide. */
+  .hero-lead, .hero-interval, .hero-sub { width: var(--hg-w, auto); margin-left: var(--hg-ml, 0px); }
+  .hero-lead { text-align: center; }
+  .hero-interval, .hero-sub { justify-content: center; }
 }
 /* Movement smaller than its own interval – stated, not colour-coded, so it
    reads as a qualification rather than a warning. */
@@ -17077,6 +17087,12 @@ function HeroGauge({
         w,
         ml: cx - w / 2
       });
+      /* The footer text lines under the gauge are the parent's children,
+         not this component's, so the phone rule that centres them on the
+         bar consumes the bar's box as custom properties rather than
+         re-measuring geometry the gauge already has. */
+      parent.style.setProperty("--hg-w", w + "px");
+      parent.style.setProperty("--hg-ml", cx - w / 2 + "px");
     };
     align();
     const ro = new ResizeObserver(align);

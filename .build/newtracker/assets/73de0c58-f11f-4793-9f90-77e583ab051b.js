@@ -583,6 +583,12 @@ function HeroGauge({ a, ci, color, aName, bName, sepRef }) {
       const cx = sr.left - pr.left + sr.width / 2;
       const w = Math.min(HG_MAX, 2 * Math.min(cx, pr.width - cx));
       setBox({ w, ml: cx - w / 2 });
+      /* The footer text lines under the gauge are the parent's children,
+         not this component's, so the phone rule that centres them on the
+         bar consumes the bar's box as custom properties rather than
+         re-measuring geometry the gauge already has. */
+      parent.style.setProperty("--hg-w", w + "px");
+      parent.style.setProperty("--hg-ml", cx - w / 2 + "px");
     };
     align();
     const ro = new ResizeObserver(align);
