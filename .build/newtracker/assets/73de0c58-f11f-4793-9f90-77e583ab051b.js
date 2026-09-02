@@ -383,21 +383,28 @@ function Header({ isDark, onToggleTheme }) {
    of the row, so the whole figure keeps an ordinary text baseline and the
    clipped digit boxes align to its top edge. */
 const ROLL_DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-/* Optical padding for a .roll-sep next to each digit, em units. Crimson's
-   digits are proportional (a 1 is 0.371em against 0.493 for the rest) and the
-   point is a bare 0.187em, so a fixed seam reads wide against the 1's bare
-   stem and tight against the wide figures; and a reel's overflow:hidden box
-   is sized by its narrowest glyph, so of the reel's own advance there is
-   nothing visible for padding to buy back. Values retire the slack each digit
-   leaves unused. */
-const ROLL_PAD = { "0": 0.03, "2": 0.03, "3": 0.03, "4": 0.03, "5": 0.03,
-                   "6": 0.03, "7": 0.05, "8": 0.03, "9": 0.03 };
-const SEP_PAD = 0.03;
-function sepPad(ch) {
-  return /[0-9]/.test(ch) ? (ROLL_PAD[ch] ?? 0.03) : SEP_PAD;
+/* A .roll-sep between rolled figures is kerned against its neighbours (the
+   hero's `drift` opt-in). Crimson Text's figures ignore tabular-nums: the 1
+   is 0.371em against every other digit's 0.493 (canvas-measured on the
+   shipped 600 cut), so a reel's slot is 0.493em wide (its widest span) and a
+   digit that doesn't fill it hands its slack, on the right, to the separator
+   - which is why the hero's point hung a bare stem-width off every 1. The
+   separator's left margin pays that slack back, pulling negative under the
+   1's empty shoulder, and the margins ride the reel's own transition, so the
+   point drifts in with a rolling figure instead of holding one anchorage for
+   every digit. Opt-in because it's face-specific: faces with genuinely
+   tabular digits (the lead line, the tables) have no slack to reclaim, and
+   these margins would push their point into the 1. */
+const ROLL_FRAME = 0.493;           // the reel slot: widest Crimson digit advance, em
+const ROLL_ADV = { "1": 0.371 };    // Crimson figures narrower than the slot, em
+const SEP_GAP = 0.03;               // the air a separator keeps either side, em
+function driftMargins(text, i) {
+  const L = text[i - 1] || "";
+  const slack = /[0-9]/.test(L) ? ROLL_FRAME - (ROLL_ADV[L] ?? ROLL_FRAME) : 0;
+  return { marginLeft: (SEP_GAP - slack) + "em", marginRight: SEP_GAP + "em" };
 }
 window.RollNum = RollNum;      // the hero's Delta reads it off the window (see Delta)
-function RollNum({ value, className, style, spinIn }) {
+function RollNum({ value, className, style, spinIn, drift }) {
   const text = String(value);
   /* spinIn: arrive the way a matchup switch does - every reel mounts at 0 and
      rolls up to its real digit on the shared settle clock, an odometer spun
@@ -435,10 +442,7 @@ function RollNum({ value, className, style, spinIn }) {
             className="roll-sep"
             key={n - 1 - i}
             aria-hidden="true"
-            style={{
-              marginLeft: sepPad(text[i - 1] || "") + "em",
-              marginRight: sepPad(text[i + 1] || "") + "em",
-            }}
+            style={drift ? driftMargins(text, i) : undefined}
           >{ch}</span>
         )
       ))}
@@ -1024,11 +1028,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             <div className="ro-party alp-side">
               <span className="ro-dot" style={{ background: colA }}></span>
               <span className="ro-name">{m.a.name}</span>
-              <RollNum className="ro-num" value={latest.a.toFixed(1)} style={{ color: inkOf(colA) }} spinIn />
+              <RollNum className="ro-num" value={latest.a.toFixed(1)} style={{ color: inkOf(colA) }} spinIn drift />
             </div>
             <span className="ro-sep" aria-hidden="true" ref={sepRef}></span>
             <div className="ro-party lnp-side">
-              <RollNum className="ro-num" value={latest.b.toFixed(1)} style={{ color: inkOf(colB) }} spinIn />
+              <RollNum className="ro-num" value={latest.b.toFixed(1)} style={{ color: inkOf(colB) }} spinIn drift />
               <span className="ro-name">{m.b.name}</span>
               <span className="ro-dot" style={{ background: colB }}></span>
             </div>

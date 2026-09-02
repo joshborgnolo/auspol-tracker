@@ -1027,12 +1027,13 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   transition: transform .32s cubic-bezier(.4, .1, .25, 1);
 }
 .roll-reel > span, .roll-sep { display: block; height: 1em; line-height: 1em; }
-/* Crimson's 1 is 0.371em wide against the other figures' 0.493 (measured):
-   the reel slots stay tabular, but the punctuation between them re-margins
-   against whatever digit is passing, so the point drifts in under a 1's head
-   serif and back out for the wide figures instead of holding one anchorage.
-   RollNum sets the margins per neighbour; they ride the reel's curve and
-   length so figure and gap settle as one thing. */
+/* Crimson's 1 leaves its reel slot three-quarters empty - 0.371em of glyph
+   in a 0.493em frame (measured) - so instead of anchoring the punctuation to
+   the slot edge, the hero's RollNums (the `drift` option) re-margin it
+   against whichever figure is passing either side: the point tucks under
+   the 1's empty shoulder and breathes back out for the wide digits. The
+   margins ride the reel's own curve and length, so figure and gap settle as
+   one thing. */
 .roll-sep { transition: margin .32s cubic-bezier(.4, .1, .25, 1); }
 /* The reel is nine digits the reader never sees, and aria-hidden keeps them out
    of the accessibility tree – but a SELECTION doesn't consult aria, so without
