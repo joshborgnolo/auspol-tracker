@@ -3535,8 +3535,9 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    is three rhombi in pastel blues with an ivory grout stroke, and every face
    carries five fine tin-glaze hairlines brushing in its own plane direction
    (down-right / vertical / down-left), like painted delftware. One repeating
-   SVG tile (207.84×360, four cubes drawn per repeat); it melts into --bg at
-   both ends, and on dark the tile image is multiplied down, not recoloured. */
+   SVG tile (207.84×360, four cubes drawn per repeat); the tiles breathe in
+   and out through a long eased melt of colour-mixed --bg stops (no straight
+   fade), and on dark the tile image is multiplied down, not recoloured. */
 .tile-band {
   height: 460px;
   margin-top: 80px;
@@ -3547,7 +3548,18 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, var(--bg), transparent 26%, transparent 84%, var(--bg));
+  background: linear-gradient(to bottom,
+    var(--bg) 0%,
+    color-mix(in oklch, var(--bg) 94%, transparent) 22%,
+    color-mix(in oklch, var(--bg) 80%, transparent) 42%,
+    color-mix(in oklch, var(--bg) 54%, transparent) 57%,
+    color-mix(in oklch, var(--bg) 25%, transparent) 68%,
+    transparent 76%,
+    transparent 82%,
+    color-mix(in oklch, var(--bg) 30%, transparent) 88%,
+    color-mix(in oklch, var(--bg) 62%, transparent) 93%,
+    color-mix(in oklch, var(--bg) 87%, transparent) 97%,
+    var(--bg) 100%);
 }
 body.dark .tile-band { background-color: #6f6f6f; background-blend-mode: multiply; }
 @media (max-width: 640px) {
