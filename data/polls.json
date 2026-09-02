@@ -8238,6 +8238,17 @@
         "tpp_alp": 57.5
       },
       {
+        "date": "2007-02-10",
+        "firm": "ACNielsen",
+        "lnp": 36,
+        "alp": 46,
+        "grn": 11,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
         "date": "2007-02-18",
         "firm": "Newspoll",
         "lnp": 41,
@@ -8291,6 +8302,17 @@
         "oth": 8.5,
         "tpp_lnp": 38.5,
         "tpp_alp": 61.5
+      },
+      {
+        "date": "2007-03-10",
+        "firm": "ACNielsen",
+        "lnp": 35,
+        "alp": 50,
+        "grn": 9,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
       },
       {
         "date": "2007-03-11",
@@ -8370,6 +8392,17 @@
         "tpp_alp": 59.5
       },
       {
+        "date": "2007-04-21",
+        "firm": "ACNielsen",
+        "lnp": 37,
+        "alp": 50,
+        "grn": 7,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
         "date": "2007-04-29",
         "firm": "Newspoll",
         "lnp": 37,
@@ -8423,6 +8456,17 @@
         "oth": 5,
         "tpp_lnp": 40.5,
         "tpp_alp": 59.5
+      },
+      {
+        "date": "2007-05-19",
+        "firm": "ACNielsen",
+        "lnp": 39,
+        "alp": 48,
+        "grn": 7,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
       },
       {
         "date": "2007-05-20",
@@ -8491,6 +8535,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2007-06-16",
+        "firm": "ACNielsen",
+        "lnp": 39,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
         "date": "2007-06-17",
         "firm": "Newspoll",
         "lnp": 39,
@@ -8535,6 +8590,17 @@
         "tpp_alp": 56
       },
       {
+        "date": "2007-07-14",
+        "firm": "ACNielsen",
+        "lnp": 39,
+        "alp": 49,
+        "grn": 7,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
         "date": "2007-07-15",
         "firm": "Morgan",
         "lnp": 40.5,
@@ -8577,6 +8643,17 @@
         "oth": 9,
         "tpp_lnp": 44,
         "tpp_alp": 56
+      },
+      {
+        "date": "2007-08-11",
+        "firm": "ACNielsen",
+        "lnp": 41,
+        "alp": 46,
+        "grn": 7,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2007-08-12",
@@ -8632,6 +8709,17 @@
         "oth": 7.5,
         "tpp_lnp": 40,
         "tpp_alp": 60
+      },
+      {
+        "date": "2007-09-08",
+        "firm": "ACNielsen",
+        "lnp": 39,
+        "alp": 49,
+        "grn": 7,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
       },
       {
         "date": "2007-09-09",
@@ -8700,6 +8788,17 @@
         "tpp_alp": 61
       },
       {
+        "date": "2007-10-06",
+        "firm": "ACNielsen",
+        "lnp": 40,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
         "date": "2007-10-07",
         "firm": "Morgan",
         "lnp": 38,
@@ -8731,6 +8830,17 @@
         "oth": 4,
         "tpp_lnp": 43,
         "tpp_alp": 57
+      },
+      {
+        "date": "2007-10-17",
+        "firm": "ACNielsen",
+        "lnp": 42,
+        "alp": 48,
+        "grn": 6,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
       },
       {
         "date": "2007-10-18",
@@ -8799,6 +8909,17 @@
         "tpp_alp": 57.5
       },
       {
+        "date": "2007-10-31",
+        "firm": "ACNielsen",
+        "lnp": 41,
+        "alp": 48,
+        "grn": 6,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
         "date": "2007-11-04",
         "firm": "Newspoll",
         "lnp": 42,
@@ -8854,6 +8975,17 @@
         "tpp_alp": 56.5
       },
       {
+        "date": "2007-11-14",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 47,
+        "grn": 7,
+        "onp": null,
+        "oth": 4,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
         "date": "2007-11-17",
         "firm": "Morgan",
         "lnp": 40,
@@ -8885,6 +9017,17 @@
         "oth": 5,
         "tpp_lnp": 43.5,
         "tpp_alp": 56.5
+      },
+      {
+        "date": "2007-11-21",
+        "firm": "ACNielsen",
+        "lnp": 40,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 4,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
       },
       {
         "date": "2007-11-22",
@@ -28369,6 +28512,14 @@
         "oppPpm": 39
       },
       {
+        "date": "2007-02-10",
+        "firm": "ACNielsen",
+        "pmNet": 5,
+        "oppNet": 50,
+        "pmPpm": 43,
+        "oppPpm": 48
+      },
+      {
         "date": "2007-02-18",
         "firm": "Newspoll",
         "pmNet": -2,
@@ -28383,6 +28534,14 @@
         "oppNet": 44,
         "pmPpm": 38,
         "oppPpm": 45
+      },
+      {
+        "date": "2007-03-10",
+        "firm": "ACNielsen",
+        "pmNet": -3,
+        "oppNet": 48,
+        "pmPpm": 39,
+        "oppPpm": 53
       },
       {
         "date": "2007-03-18",
@@ -28409,6 +28568,14 @@
         "oppPpm": 48
       },
       {
+        "date": "2007-04-21",
+        "firm": "ACNielsen",
+        "pmNet": 4,
+        "oppNet": 44,
+        "pmPpm": 42,
+        "oppPpm": 51
+      },
+      {
         "date": "2007-04-29",
         "firm": "Newspoll",
         "pmNet": -7,
@@ -28425,12 +28592,28 @@
         "oppPpm": 49
       },
       {
+        "date": "2007-05-19",
+        "firm": "ACNielsen",
+        "pmNet": 8,
+        "oppNet": 44,
+        "pmPpm": 43,
+        "oppPpm": 51
+      },
+      {
         "date": "2007-05-27",
         "firm": "Newspoll",
         "pmNet": -3,
         "oppNet": 47,
         "pmPpm": 38,
         "oppPpm": 47
+      },
+      {
+        "date": "2007-06-16",
+        "firm": "ACNielsen",
+        "pmNet": 7,
+        "oppNet": 40,
+        "pmPpm": 42,
+        "oppPpm": 48
       },
       {
         "date": "2007-06-17",
@@ -28449,6 +28632,14 @@
         "oppPpm": 43
       },
       {
+        "date": "2007-07-14",
+        "firm": "ACNielsen",
+        "pmNet": 5,
+        "oppNet": 38,
+        "pmPpm": 41,
+        "oppPpm": 49
+      },
+      {
         "date": "2007-07-22",
         "firm": "Newspoll",
         "pmNet": 1,
@@ -28463,6 +28654,14 @@
         "oppNet": 43,
         "pmPpm": 39,
         "oppPpm": 44
+      },
+      {
+        "date": "2007-08-11",
+        "firm": "ACNielsen",
+        "pmNet": 8,
+        "oppNet": 36,
+        "pmPpm": 42,
+        "oppPpm": 48
       },
       {
         "date": "2007-08-19",
@@ -28481,6 +28680,14 @@
         "oppPpm": 48
       },
       {
+        "date": "2007-09-08",
+        "firm": "ACNielsen",
+        "pmNet": 6,
+        "oppNet": 46,
+        "pmPpm": 39,
+        "oppPpm": 52
+      },
+      {
         "date": "2007-09-16",
         "firm": "Newspoll",
         "pmNet": 1,
@@ -28497,12 +28704,28 @@
         "oppPpm": 47
       },
       {
+        "date": "2007-10-06",
+        "firm": "ACNielsen",
+        "pmNet": 6,
+        "oppNet": 42,
+        "pmPpm": 39,
+        "oppPpm": 52
+      },
+      {
         "date": "2007-10-14",
         "firm": "Newspoll",
         "pmNet": 3,
         "oppNet": 36,
         "pmPpm": 39,
         "oppPpm": 48
+      },
+      {
+        "date": "2007-10-17",
+        "firm": "ACNielsen",
+        "pmNet": 10,
+        "oppNet": 34,
+        "pmPpm": 43,
+        "oppPpm": 47
       },
       {
         "date": "2007-10-21",
@@ -28521,6 +28744,14 @@
         "oppPpm": 48
       },
       {
+        "date": "2007-10-31",
+        "firm": "ACNielsen",
+        "pmNet": 9,
+        "oppNet": 34,
+        "pmPpm": 41,
+        "oppPpm": 49
+      },
+      {
         "date": "2007-11-04",
         "firm": "Newspoll",
         "pmNet": 4,
@@ -28537,12 +28768,28 @@
         "oppPpm": 48
       },
       {
+        "date": "2007-11-14",
+        "firm": "ACNielsen",
+        "pmNet": 8,
+        "oppNet": 31,
+        "pmPpm": 43,
+        "oppPpm": 49
+      },
+      {
         "date": "2007-11-18",
         "firm": "Newspoll",
         "pmNet": 1,
         "oppNet": 40,
         "pmPpm": 42,
         "oppPpm": 46
+      },
+      {
+        "date": "2007-11-21",
+        "firm": "ACNielsen",
+        "pmNet": 5,
+        "oppNet": 34,
+        "pmPpm": 40,
+        "oppPpm": 52
       },
       {
         "date": "2007-11-22",
