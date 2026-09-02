@@ -914,6 +914,9 @@ const individualPolls = POLLS.map((p) => {
        differs from ym, so the byte cost lands only on straddling waves. */
     ...(fym !== ym ? { fym } : {}),
     field, dateLabel: field, released: p.date, sample: p.sample ?? null,
+    // the commissioning publisher, exactly as the Latest-polls table shows
+    // it – "Self-published" where the wave reported under no client
+    client: p.client && p.client !== "—" ? p.client : "Self-published",
     /* the house's own published effective n, where one was filed with the
        Australian Polling Council. Houses that file none get no field at all
        and a "—" in the views; the estimator's derived weighting n is
