@@ -3243,6 +3243,63 @@ function AllPollsView({ focus, onBack, backLabel }) {
    entry arrived at grows a way back (see window.AP.openTerm). Ids are fixed
    strings rather than slugs derived from the term, so rewording a heading
    cannot quietly break a link pointing at it. */
+
+/* The preference-flows history chart inside the glossary entry: AEC full
+   preference-distribution tables by party, 1996-2025, drawn as one static
+   SVG (no component churn for eleven elections). One Nation's series breaks
+   across the parliaments it barely contested. */
+function flowChart() {
+  const YEARS = [1996,1998,2001,2004,2007,2010,2013,2016,2019,2022,2025];
+  const ROWS = [
+    { c: "var(--grn)", name: "Greens",     v: [67.1,73.3,74.8,80.8,79.7,78.8,83.0,81.9,82.2,85.7,88.2] },
+    { c: "var(--onp)", name: "One Nation", v: [null,46.3,44.1,43.3,null,null,null,49.5,34.8,35.7,25.5] },
+    { c: "var(--oth)", name: "Others",     v: [50.3,55.3,55.8,44.4,44.6,41.7,46.7,49.2,46.1,50.0,54.6] },
+  ];
+  const W = 640, H = 226, L = 30, R = 152, T = 16, B = 24;
+  const x = (yr) => L + (yr - 1996) / 29 * (W - L - R);
+  const y = (v) => T + (90 - v) / 70 * (H - T - B);
+  return (
+    <svg viewBox={"0 0 " + W + " " + H} role="img"
+         aria-label="Share of preferences flowing to Labor, by party, 1996 to 2025">
+      <text x={L} y={9} className="fc-unit">share preferencing Labor, %</text>
+      {[30, 50, 70, 90].map((t) => (
+        <g key={t}>
+          <line className="fc-grid" x1={L} x2={W - R} y1={y(t)} y2={y(t)}
+                strokeDasharray={t === 50 ? "4 3" : undefined}/>
+          <text className="fc-tick" x={L - 5} y={y(t)} textAnchor="end"
+                dominantBaseline="middle">{t}</text>
+        </g>
+      ))}
+      {[1996, 2001, 2007, 2013, 2019, 2025].map((yr) => (
+        <text key={yr} className="fc-tick" x={x(yr)} y={H - 7} textAnchor="middle">{yr}</text>
+      ))}
+      {ROWS.map((row) => {
+        const segs = [];
+        let cur = [];
+        row.v.forEach((v, i) => {
+          if (v === null) { if (cur.length > 1) segs.push(cur.join(" ")); cur = []; }
+          else cur.push(x(YEARS[i]).toFixed(1) + "," + y(v).toFixed(1));
+        });
+        if (cur.length > 1) segs.push(cur.join(" "));
+        const last = row.v[row.v.length - 1];
+        return (
+          <g key={row.name}>
+            {segs.map((p, i) => (
+              <polyline key={i} points={p} fill="none" stroke={row.c}
+                        strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
+            ))}
+            {row.v.map((v, i) => v === null ? null : (
+              <circle key={i} cx={x(YEARS[i])} cy={y(v)} r="2.3" fill={row.c}/>
+            ))}
+            <text className="fc-end" x={W - R + 6} y={y(last)} fill={row.c}
+                  dominantBaseline="middle">{row.name} {last.toFixed(1)}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+}
+
 function infoTerms(D) {
   const L = D.latest, prim = D.aggPrimary[D.aggPrimary.length - 1];
   const counts = {};
@@ -3407,7 +3464,11 @@ function infoTerms(D) {
       they actually ran at the 2025 election
       {" "}(<a href="https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm"
       target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5%, all others 54.6% to
-      Labor</a>), every formal ballot redistributed Labor v Coalition.</>) },
+      Labor</a>), every formal ballot redistributed Labor v Coalition.
+      <span className="info-chart">{flowChart()}</span>
+      Full preference distribution data was first published for the 1996 election, so
+      party-by-party flows don't exist before then; One Nation's line is broken across
+      the parliaments it barely contested.</>) },
     { id: "preferred-pm", term: "Preferred prime minister", body: (
       <>Who voters name as the better prime minister – head to head, or as a three-way where a
       house offers one. Houses leave different shares uncommitted, so the published levels aren’t
