@@ -13,6 +13,10 @@
 //   - the release gets recorded: the projection re-anchors, the red clears
 //   - a loose (window) house past its window's close: same overdue state,
 //     counted from the edge, sorted to the panel's foot
+//   - on the BAR a window house shows only while its window is open, as the
+//     trailing "any day now" row: before the window opens a countdown to
+//     its edge misreads a day range as a date, and after it closes
+//     unrecorded the panel's red row is where the lateness is told
 //   - houses declared stopped in pollsterRules are absent from the data
 //   - a slot confirmed ABSENT at the publisher (pollsterRules.skippedSlots,
 //     written by .build/essential-confirm-skip.mjs after verifying the
@@ -146,8 +150,15 @@ function ticker(rows, t0, nowMs) {
     t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * DAY;
     return { at: t, byDay: true };
   };
+  // a window house (DemosAU's calendar-month bracket) only joins the bar
+  // while its window is open, as the trailing "any day now" row (d1a1d215)
+  const isWindowRow = (r) => r.loose && r.releaseDow == null;
+  const windowOpen = (r) => r.release - (r.winHalf || 0) * DAY <= nowMs;
+  const windowItems = rows
+    .filter((r) => isWindowRow(r) && !r.missed && windowOpen(r))
+    .map((r) => ({ firm: r.pollster, when: "any day now", maybe: false, site: r.site }));
   const overdueItems = rows
-    .filter((r) => r.missed)
+    .filter((r) => r.missed && !isWindowRow(r))
     .map((r) => {
       const days = Math.round(
         (t0 - (r.loose ? r.release + (r.winHalf || 0) * DAY : r.release)) / DAY);
@@ -158,7 +169,7 @@ function ticker(rows, t0, nowMs) {
     })
     .sort((a, b) => b.days - a.days);
   const upcomingItems = rows
-    .filter((r) => !r.missed)
+    .filter((r) => !r.missed && !isWindowRow(r))
     .map((r) => ({ r, t: targetOf(r) }))
     .sort((a, b) => a.t.at - b.t.at)
     .filter(((seen) => ({ r }) =>
@@ -189,14 +200,21 @@ function ticker(rows, t0, nowMs) {
      slot per house, nearest first, and how many show is a fit decision
      measured on the live bar (not simulated here - the screen is the
      budget, the sim only checks the roll's derivation and order) */
-  return [...overdueItems, ...upcomingItems];
+  return [...overdueItems, ...upcomingItems, ...windowItems];
 }
 
 // ---------------------------------------------------------------------------
 const cad = JSON.parse(JSON.stringify(D.pollCadence));
-// the S1-S3 'hold the slot' behaviour, still reachable on the same data with
-// the confirmed-skip seed stripped out of the Essential row
-const cadHold = JSON.parse(JSON.stringify(D.pollCadence));
+// Essential's 2 Sep wave is in the real data now, so the world the skip
+// scenarios exercise is rebuilt by stepping the row back one wave: last
+// returns to the 29 Jul wave on the 28-day cadence that measured it, which
+// puts the projected slot back on Wed 26 Aug — the confirmed-skip seed —
+// and the slipped slot on Wed 2 Sep, exactly the world S1-S4b were written
+// against. cadHold strips the seed instead, as before.
+const cadSlip = JSON.parse(JSON.stringify(D.pollCadence));
+Object.assign(cadSlip.find((c) => c.pollster === "Essential"),
+  { last: "2026-07-29", cadence: 28 });
+const cadHold = JSON.parse(JSON.stringify(cadSlip));
 cadHold.find((c) => c.pollster === "Essential").skipped = [];
 const firm = (rows, name) => rows.find((r) => r.pollster === name);
 const fmtT = (items) => items.map((i) =>
@@ -217,16 +235,16 @@ function eq(name, got, want) {
   eq("Freshwater declared stopped → absent", firms.includes("Freshwater"), false);
 }
 
-// S1 – Tue 1 Sep, 2pm. Essential's slot (Wed 26 Aug 1am) passed 6 days ago,
-// unrecorded. cadHold shows what that used to mean: its ±1-week tolerance
-// closes tomorrow, so the panel counts "tomorrow (or 6 days ago)" and the
-// ticker counts to tomorrow. The REAL cadence row carries the agent's
-// confirmed skip for 26 Aug, so the projection slips the slot ONE WEEK to
-// the house's measured late step — Wed 2 Sep, tomorrow — instead of holding
-// 26 Aug or leaping a second cadence to 23 Sep.
+// S1 – Tue 1 Sep, 2pm, in the cadSlip world. Essential's slot (Wed 26 Aug
+// 1am) passed 6 days ago, unrecorded. cadHold shows what that used to mean:
+// its ±1-week tolerance closes tomorrow, so the panel counts "tomorrow (or
+// 6 days ago)" and the ticker counts to tomorrow. The cadSlip row carries
+// the agent's confirmed skip for 26 Aug, so the projection slips the slot
+// ONE WEEK to the house's measured late step — Wed 2 Sep, tomorrow —
+// instead of holding 26 Aug or leaping a second cadence to 23 Sep.
 {
   const { label, t0, nowMs } = scen("Tue 1 Sep", "2026-09-01", 840);
-  const rows = project(cad, t0, nowMs);
+  const rows = project(cadSlip, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const es = firm(rows, "Essential");
@@ -251,16 +269,17 @@ function eq(name, got, want) {
   // the roll is every house's nearest slot, unsliced - on the live bar the
   // fit pass trims this to the room it actually has; the roll itself never
   // caps (a weekly house appears once, not twice inside the same week).
-  // DemosAU's open (9 Sep) ties YouGov's slot to the minute; the cadence
-  // sort put YouGov's row in first, so it wins the tiebreak
+  // DemosAU's window doesn't open until the 9th, so it is OFF the bar here
+  // now (window houses are bar-visible only while open) - a dated-house
+  // ticket from Essential on down.
   eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
     [["Essential", "tomorrow"], ["Roy Morgan", "6 days"], ["YouGov", "8 days"],
-     ["DemosAU", "8 days"], ["Resolve", "12 days"], ["Newspoll", "19 days"],
+     ["Resolve", "12 days"], ["Newspoll", "19 days"],
      ["RedBridge / Accent", "26 days"]]);
   {
     const da = firm(rows, "DemosAU");
     eq("DemosAU's window opens on the measured 9th, not the 1st", da && panelWhen(da), "opens in 8 days");
-    eq("a day-count that wide keeps its hedge", items.find((i) => i.firm === "DemosAU").maybe, true);
+    eq("window not open → DemosAU off the bar", items.some((i) => i.firm === "DemosAU"), false);
   }
   // the hold-the-slot rule, still in force for any unconfirmed slot
   const holdRows = project(cadHold, t0, nowMs);
@@ -285,6 +304,9 @@ function eq(name, got, want) {
   const daItem = items.find((i) => i.firm === "DemosAU");
   eq("ticker says any day now - not moment, not overdue, no hedge", [daItem.when, !!daItem.overdue, !!daItem.maybe],
     ["any day now", false, false]);
+  // "some time in the next fortnight" is the weakest claim on the bar, so
+  // the window row trails every dated slot and count
+  eq("the open window sits at the tail of the roll", items[items.length - 1].firm, "DemosAU");
 }
 
 // S2 – Wed 2 Sep, 3am: the slipped slot itself expired an hour ago but the
@@ -293,7 +315,7 @@ function eq(name, got, want) {
 // this poll or confirms 2 Sep as absent too and slips again to 9 Sep.
 {
   const { label, t0, nowMs } = scen("Wed 2 Sep 3am", "2026-09-02", 180);
-  const rows = project(cad, t0, nowMs);
+  const rows = project(cadSlip, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   eq("Essential overdue, tolerance open to 9 Sep", [firm(rows, "Essential").overdue, firm(rows, "Essential").missed], [true, false]);
@@ -304,11 +326,11 @@ function eq(name, got, want) {
 // sweep hasn't run yet), so Essential holds that slot's counting face:
 // overdue, tolerance edge Wed 9 Sep still 6 days out, "in 6 days (or
 // yesterday)". In reality the 05:02 cron confirms 2 Sep absent this morning
-// and the projection slips to 9 Sep long before red — shown in the cadHold-
-// style unconfirmed case here because the sim's data is frozen.
+// and the projection slips to 9 Sep long before red — shown in the cadSlip
+// world here because the sim's data is frozen with 2 Sep still unconfirmed.
 {
   const { label, t0, nowMs } = scen("Thu 3 Sep", "2026-09-03", 600);
-  const rows = project(cad, t0, nowMs);
+  const rows = project(cadSlip, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const es = firm(rows, "Essential");
@@ -324,7 +346,7 @@ function eq(name, got, want) {
 // "7 days overdue" unless the agent has confirmed 2 Sep and slipped again.
 {
   const { label, t0, nowMs } = scen("Wed 9 Sep", "2026-09-09", 600);
-  const rows = project(cad, t0, nowMs);
+  const rows = project(cadSlip, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const es = firm(rows, "Essential");
@@ -339,7 +361,7 @@ function eq(name, got, want) {
 // the edge, ticker says "any moment now" — but no red.
 {
   const { label, t0, nowMs } = scen("Wed 9 Sep, 2 Sep confirmed too", "2026-09-09", 600);
-  const cad2 = JSON.parse(JSON.stringify(cad));
+  const cad2 = JSON.parse(JSON.stringify(cadSlip));
   cad2.find((c) => c.pollster === "Essential").skipped = ["2026-08-26", "2026-09-02"];
   const rows = project(cad2, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
@@ -349,13 +371,13 @@ function eq(name, got, want) {
   eq("ticker offers Essential", items.some((i) => i.firm === "Essential" && i.when === "any moment now"), true);
 }
 
-// S5 – the poll is recorded (next build: Essential's last moves to 2 Sep).
-// The projection re-anchors and the red clears by itself.
+// S5 – the poll is recorded. Written when the 2 Sep wave still needed a
+// simulated `last`, but that is now the REAL data (Essential recorded
+// 2026-09-02, projecting Wed 30 Sep): the projection re-anchored and the
+// red cleared by itself, so this runs on `cad` untouched.
 {
-  const cad2 = JSON.parse(JSON.stringify(cad));
-  cad2.find((c) => c.pollster === "Essential").last = "2026-09-02";
   const { label, t0, nowMs } = scen("Thu 3 Sep, recorded", "2026-09-03", 600);
-  const rows = project(cad2, t0, nowMs);
+  const rows = project(cad, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const es = firm(rows, "Essential");
@@ -367,7 +389,7 @@ function eq(name, got, want) {
 // S6 – Roy Morgan's Monday filing unrecorded by Tuesday midnight: "1 day
 // overdue" immediately (a weekday house with a flat date has no tolerance).
 {
-  const cad2 = JSON.parse(JSON.stringify(cad));
+  const cad2 = JSON.parse(JSON.stringify(cadSlip));
   cad2.find((c) => c.pollster === "Roy Morgan").last = "2026-08-24";
   const { label, t0, nowMs } = scen("Tue 1 Sep, Roy Morgan not in", "2026-09-01", 30);
   const rows = project(cad2, t0, nowMs);
@@ -377,32 +399,33 @@ function eq(name, got, want) {
 }
 
 // S7 – Sat 10 Oct: DemosAU's calendar-month window (9–27 Sep) has closed
-// unrecorded. It reads as overdue from the range's last day, in both places,
-// parked at the panel's foot rather than floating to the top as "open now".
-// (Six weeks past the data clock every house is blown, so the ticker's roll
-// is nothing but red counts, most overdue first; DemosAU's own row is also
-// checked on its own below.)
+// unrecorded. The PANEL tells the lateness: overdue from the range's last
+// day, parked at the panel's foot rather than floating to the top as "open
+// now". The BAR drops the window house entirely once its window is missed -
+// red lateness is the panel's story for a window house, so the ticker's
+// roll is dated houses only (six weeks past the data clock every one of
+// those is blown, most overdue first).
 {
   const { label, t0, nowMs } = scen("Sat 10 Oct", "2026-10-10", 600);
-  const rows = project(cad, t0, nowMs);
+  const rows = project(cadSlip, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   const da = firm(rows, "DemosAU");
   eq("DemosAU missed", da && da.missed, true);
   eq("panel no longer says 'open now'", da && panelWhen(da), "13 days overdue");
   eq("missed rows park at the foot, cadence order", rows.slice(-2).map((r) => r.pollster), ["Essential", "DemosAU"]);
-  // Essential's slipped 2 Sep slot past its own edge too (the frozen sim data
-  // can't run the 3 Sep confirmation that would have slipped it on), so it
-  // leads the late roll, a week clear of Roy Morgan. DemosAU's window closed
-  // on its measured 27th, so on 10 Oct it is thirteen days late, not ten.
-  eq("ticker order: most overdue first, all houses kept", items.map((i) => [i.firm, i.when]),
+  // Essential's slipped 2 Sep slot past its own edge too (the frozen cadSlip
+  // world can't run the 3 Sep confirmation that would have slipped it on), so
+  // it leads the late roll, a week clear of Roy Morgan. RedBridge is a DATED
+  // house now, so its lateness counts from its Sun 27 Sep slot like every
+  // other dated row. DemosAU's window closed on its measured 27th and its
+  // lateness lives on the panel - on the bar the house is simply absent.
+  eq("ticker order: most overdue first, dated houses only", items.map((i) => [i.firm, i.when]),
     [["Essential", "38 days overdue"], ["Roy Morgan", "33 days overdue"],
      ["YouGov", "31 days overdue"], ["Resolve", "27 days overdue"],
-     ["Newspoll", "20 days overdue"], ["RedBridge / Accent", "13 days overdue"],
-     ["DemosAU", "13 days overdue"]]);
+     ["Newspoll", "20 days overdue"], ["RedBridge / Accent", "13 days overdue"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
-  eq("cal-month missed leads as overdue in the ticker", daItems[0] && [daItems[0].firm, daItems[0].when, !!daItems[0].overdue],
-    ["DemosAU", "13 days overdue", true]);
+  eq("a missed window leaves the bar entirely", daItems, []);
 }
 
 // S8 – Mon 28 Sep, 10am: September's measured window (9–27) closed yesterday
@@ -420,7 +443,9 @@ function eq(name, got, want) {
   const da = firm(rows, "DemosAU");
   eq("rolled to the October window, not red", da && [da.overdue, da.missed], [false, false]);
   eq("panel counts to the 9 Oct open", da && panelWhen(da), "opens in 11 days");
-  eq("ticker offers the October open, hedged", items.find((i) => i.firm === "DemosAU") && [items.find((i) => i.firm === "DemosAU").when, items.find((i) => i.firm === "DemosAU").maybe], ["11 days", true]);
+  // and the bar keeps its window rule: the October window isn't open yet,
+  // (and September's miss earns no red row there) so DemosAU sits it out
+  eq("window house off the bar until its window opens", items.some((i) => i.firm === "DemosAU"), false);
 }
 
 // S8b – the rolled window mid-flight, Mon 12 Oct: the roll lands a reader on
