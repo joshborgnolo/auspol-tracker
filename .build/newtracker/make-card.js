@@ -204,7 +204,7 @@
   c.font = '400 15px "IBM Plex Sans", sans-serif'; c.fillStyle = T.ink3;
   c.fillText("95% interval ±" + L.alp2ppCi95.toFixed(1) + " pts · "
              + L.method.nPolls + " polls in " + L.method.windowDays + " days · "
-             + (chg > 0 ? "+" : "−") + Math.abs(chg).toFixed(1) + " on a month ago"
+             + (chg > 0 ? "+" : "−") + Math.abs(chg).toFixed(1) + " vs. 1 month ago"
              + (L.changeSig ? "" : ", within the margin"), W - PAD, 142);
   c.textAlign = "left";
   c.strokeStyle = T.line; c.lineWidth = 1;

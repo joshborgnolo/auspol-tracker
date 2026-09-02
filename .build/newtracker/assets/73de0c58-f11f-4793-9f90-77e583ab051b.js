@@ -1079,7 +1079,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           <div className="hero-sub" ref={subRef}>
             <Delta value={monthDelta} suffix={Math.abs(monthDelta) === 1 ? " pt" : " pts"} small roll spinIn />
             <span className="hero-sub-note" ref={subNoteRef}>
-              {(m.real || (altL && altL.aPrev != null)) ? "on a month ago" : "vs. previous reading"}
+              {(m.real || (altL && altL.aPrev != null)) ? "vs. 1 month ago" : "vs. previous reading"}
               {/* A month-on-month move smaller than its own interval is not a
                   finding. Say so next to the arrow, not three scrolls down -
                   and let the margin the caveat invokes carry the reader to its
