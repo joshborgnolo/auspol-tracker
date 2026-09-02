@@ -623,11 +623,20 @@ fs.writeFileSync(path.join(ROOT, "feed.xml"), feed);
    key off SITE_URL, so a future CNAME moves them for free – and robots.txt
    is inert at a github.io project path (only the host-root file is honoured)
    precisely until one exists. */
+/* The hand-maintained /newspoll-archive wrapper (1b84aee) was first added by
+   editing this OUTPUT file, so every rebuild dropped it again; it lives here
+   now. Its lastmod is a fixed date — the build can't know when that page last
+   changed, so anyone touching it bumps ARCHIVE_STAMP. */
+const ARCHIVE_STAMP = "2026-09-03";
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>${SITE_URL}</loc>
     <lastmod>${dataStamp}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}newspoll-archive/</loc>
+    <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
 </urlset>
 `;
