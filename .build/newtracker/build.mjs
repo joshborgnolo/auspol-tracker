@@ -447,7 +447,7 @@ function buildStaticSummary() {
         Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
         sound, and informative, but they are, in the end, estimates only. Federal polling archives
         I&#8217;ve located are stored <a href="https://auspoltracker.com/archives">here</a> for
-        safekeeping and posterity.</p>
+        safekeeping and convenience.</p>
     </article>`;
 }
 
