@@ -132,8 +132,8 @@ Same extractor, same absent-not-zero convention: `methodUrl` carries the
 wave's APC methodology-statement LINK (distinct from the sampleEff NUMBER
 parsed out of it). Stamped by `.build/extract-sampleeff.mjs`, never by
 hand; validate.mjs check "2c2" guards it (https shape + pollster ∈
-{YouGov, Newspoll} — only those two houses have a statement source
-reachable without paywall).
+{YouGov, Newspoll, RedBridge / Accent, RedBridge / Accent (MRP)} — only
+those houses have a statement source reachable without paywall).
 
 Sources and link forms:
 - **YouGov** — the APC listing at
@@ -161,9 +161,30 @@ Sources and link forms:
   on 2026-09-02 after the user saw live 2026 statements the sitemap hid.
   `legNewspollLinks` matches rows ±7 days on `(p.published || p.date)`;
   both Newspoll legs now run with no Chrome and no rendering at all.
+- **RedBridge / Accent** (added 2026-09-02, methodUrl only — no
+  sampleEff leg) — NO network fetch at all: `legAccentLinks()` re-reads
+  the `pdfUrl` field already cached in `.build/redbridge-src/*.json` by
+  extract-redbridge.mjs's Chrome-click resolver (an Accent project page
+  yields its usrfiles.com methodology-report PDF URL ONLY to a clicked
+  `[data-hook="file-upload-viewer"]` widget — never in static HTML or
+  the Wix page-model JSON, so do not try to fetch it statically). Match
+  is EXACT on cache `date` = row fieldwork end (not ±days); pollster
+  prefix-matches so "RedBridge / Accent (MRP)" rows are covered. Two
+  Accent pages fall outside the extractor's sitemap regex
+  (afr,-…-federal-poll slugs only) and live as a two-entry constant in
+  the leg: the Oct-2025 snapshot (2025-10-07) and the MRP
+  "a fragmented electorate" (2026-05-14), hrefs captured 2026-09-02 by
+  the one-off probe `.matilda/probe/accent-pdfurl.mjs` (a standalone
+  copy of scrapeProjectPage) and verified 200 application/pdf.
+  Deliberately unlinked: the six waves with no Accent page at all
+  (2025 AFR-only releases, 2026-03-27, 2026-08-28) and the
+  plain-"Redbridge" Australia-Institute row 2026-02-12 (commissioned
+  wave — same precedent as YouGov's AI waves, which file no statement).
 
 Coverage: YouGov 19/22, Newspoll 17/17 (2025-07-17 → 2026-08-28: seven
-statement-page links + ten post-migration PDF links).
+statement-page links + ten post-migration PDF links),
+RedBridge / Accent 9/16 (seven cache-derived + the two constant entries;
+the other seven stay unlinked by design as listed above).
 Status line gained a `methods` count; the extractor stamps links only
 for unstamped rows (never overwrite), ambiguity on >1 distinct href
 matches = the same error convention as sampleEff conflicts.
@@ -176,7 +197,8 @@ the Latest-table pollster cell AND in PollLedger as an
 archive table (d1a1d215) renders MethodLink in its pollster cell above
 the tag chips; template.html styles `.pollster-method` after
 `.pollster-mode`; check-citations.mjs sweeps it (`add(p.methodUrl,
-"methodUrl")`, +36 URLs once Newspoll's 2026 waves linked); README data-fields bullet beside the
+"methodUrl")`, +36 URLs once Newspoll's 2026 waves linked, +9 more
+when the RedBridge / Accent leg landed); README data-fields bullet beside the
 `sampleEff` one.
 
 ## Rules

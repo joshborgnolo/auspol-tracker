@@ -20,7 +20,10 @@ Newspoll APC statement links — YouGov's CloudFront
 document host and pyxispolling.com statement pages/PDFs; the Newspoll
 enumerator switched to Pyxis's live collection API the same day when the
 sitemap.xml enumeration turned out to have frozen at Jan 2026 in a CMS
-migration → 36 URLs on the sweep at close of day)
+migration → 36 URLs on the sweep at close of day), and the RedBridge /
+Accent leg landed later the same day — nine usrfiles.com report PDFs
+re-read from the extract-redbridge.mjs caches, plus two from a one-off
+CDP-click probe → 45 URLs on the sweep.
 
 Top hosts: roymorgan.com 44, theaustralian.com.au 15, smh.com.au 15,
 afr.com 14, essentialreport.com.au 13, skynews.com.au 13, demosau.com 11,

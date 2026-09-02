@@ -2,7 +2,7 @@
 name: redbridge-accent-extraction
 description: Extract AFR/RedBridge Group/Accent Research monthly federal polls into data/polls.json — pre-flight "already recorded?" check, Wix Thunderbolt SPA PDF discovery via headless-Chrome CDP click on the file-upload-viewer widget (usrfiles.com URL), Table 2 live-text wave table via pdftotext (Figures 1–2 are images; tesseract installed if needed), canonical RedBridge row conventions (respondent-allocated TPP, Other→ind, ppm/approval/altTpp companion rows, tpp_flows shared with Roy Morgan since 2026-08-31 — ALP share of the 2025-flows pair), AFR topic-page cross-check for sitemap-lag detection (AFR body paywall-trimmed; figures only from Accent PDF or manual benchmarked ingest).
 source: auto-skill
-extracted_at: '2026-08-29T06:27:11.055Z'
+extracted_at: '2026-09-01T00:36:00.000Z'
 ---
 
 # RedBridge / Accent (AFR) poll extraction → data/polls.json
@@ -51,6 +51,14 @@ only when the viewer widget is clicked:
 
 macOS/script gotchas: no GNU `timeout`; Bogan mode REFUSES write_file outside the workspace —
 put probe scripts under `.matilda/probe/` and `npm i puppeteer-core` there.
+
+The cached `pdfUrl` in `.build/redbridge-src/*.json` now has a SECOND consumer beyond this
+extractor: `.build/extract-sampleeff.mjs`'s `legAccentLinks()` re-reads those caches to stamp
+`methodUrl` (the wave's APC methodology-report link) onto RedBridge / Accent rows — never delete
+or reshape the field. Two Accent pages outside this extractor's sitemap regex (Oct-2025 snapshot,
+May-2026 MRP "a fragmented electorate") had their PDF hrefs captured 2026-09-02 by the standalone
+probe `.matilda/probe/accent-pdfurl.mjs` and live as a constant inside that leg. See
+auto-skill-auspol-effective-sample for the full methodUrl picture.
 
 ## Reading the PDF: Table 2 is live text; figures are images
 
@@ -141,6 +149,28 @@ extraction is only needed if the agent reports mismatches.
   `"Redbridge"` (≤ Apr 2026) and `"RedBridge / Accent"` (May 2026 on); such waves land in
   `notes` with "reconcile labels manually", not in the dataset.
 
+## releaseUrl: the pollster-release link (added 2026-09-01, commit 75bcb18)
+
+Canon rows cite the AFR write-up in `url`; the wave's OWN page on accent-research.com
+goes beside it in `releaseUrl` (rendered "Pollster's release" in the expanded poll —
+absent, not zero). The extractor keeps each wave's sitemap `<loc>`, sets it on NEW waves,
+and fills already-committed rows lacking the field (reported as `status.releaseFilled`;
+write gate includes fills even with no new waves). Mirrored fill logic now lives in
+extract-news24.mjs too (see news24-extraction skill).
+
+- 2026-09-01: extractor filled 7 waves; `.build/backfill-redbridge-releaseurls.mjs`
+  (assertion-guarded, no fetch) set the two pages sitemap discovery can NEVER reach:
+  `federal-political-snapshot---october-2025` (2025-10-07) and `a-fragmented-electorate`
+  (the 2026-05-14 MRP wave).
+- Six waves stay absent by design: 2025-06-30 / 09-08 / 11-13 / 11-26 have no Accent page;
+  2026-03-27 / 2026-08-28 are sitemap lag (may fill later); 2026-02-12 is the
+  plain-`Redbridge` Australia Inst. series — different pollsterRule key, never matched.
+- Row dates are FIELDWORK-END, not publication — key backfills by date accordingly (the
+  first attempt keyed waves by AFR pub dates like 2026-02-01 and missed; the actual row
+  was 2026-01-29).
+- The schema validates releaseUrl as absolute https; README documents the convention for
+  both houses.
+
 ## Discovery gap: AFR topic-page cross-check (added 2026-08-31)
 
 The Accent sitemap/project index can LAG days behind the AFR publication (the 2026-08-28
@@ -195,3 +225,49 @@ approval rows **missing entirely** from the file; July approval `detail` was eye
 corrected rows, respect validate.mjs's strict date-order per section — locate neighbours by
 querying the array (not by grepping one line) and re-run `validate.mjs` + the extractor's
 `--check` until both are clean before rebuilding.
+
+## Adjudicated ppm figures (user-verified 2026-09-01, ground truth)
+
+The user adjudicated the legacy preferred-PM series against the Accent PDFs — treat this as
+authoritative if `--check` ever flags these rows again:
+
+- Nov 2025 (`2025-11-13`): alb 40, opp 10 (Ley) — was already correct.
+- Dec 2025 (`2025-12-12`): alb 41, opp 12 (Ley) — was already correct.
+- Jan 2026 (`2026-01-29`): alb **37**, opp **9** (Ley) — polls.json had 42/29; corrected.
+- Feb 2026 (`2026-02-27`): alb **34**, opp **10** (Taylor), han **23** — polls.json had 33/14;
+  corrected (`han` 23 was already right).
+
+ppm rows carry no undecided field — undecided is the implied remainder of 100 (Nov 50,
+Dec 47, Jan 54, Feb 33); nothing to store. Corrections were validated + rebuilt the same day.
+NOTE: the old chore claim "four AFR waves still labelled `Redbridge`" was ALREADY STALE by the
+time it was recorded — the migration set is empty and the only `Redbridge` row is the
+deliberate 2026-02-12 Australia Inst. exception; verify chore lists against a migration
+dry-run before acting on them.
+
+## Adjudicated leader-favourability series (user-verified 2026-09-01, commit ff5aac0)
+
+The `approval` section's RedBridge NET favourability trio (alb / opp / han) is adjudicated
+ground truth back to Nov 2025; 2025-flows-era figures were cross-checked across THREE
+overlapping trend tables (April/May/June report TXT caches under `.build/redbridge-src/` —
+each later report reprints the whole history, and they all agree):
+
+- 2025-11-13: alb −2, han −13 (han had −12), detail alb 37/39, han 32/45
+- 2025-12-12: alb 1, han −19 (was null), detail alb 39/38, han 31/50
+- 2026-01-29: alb −10 (had −13), han −3, detail alb 34/44, han 38/41
+- 2026-02-27: alb −13 (had −17), opp −1 (Taylor, had −3), han −2, detail 32/45, 19/20, 38/40
+- 2026-03-27: alb −17, opp −3, han −3 — this approval row DID NOT EXIST before this
+  session; detail 29/46, 19/22, 40/43
+- 2026-04-30: alb −9, opp −2 (Taylor), han −1, detail 34/43, 20/22, 40/41
+- 2026-05-28: alb −19, opp −4, han 0 (nets were already right), detail 29/48, 21/25, 40/40
+
+Taylor's favourability was first asked Feb 2026 — rows before that have no `opp` entry
+(Ley's Nov–Jan nets stay as recorded under `opp`). Table 5/6 prints NET as
+fav−unfav on rounded pc; stored detail is fav/unfav. Users typing from the report
+sometimes conflate a wave with its neighbour (the user's "Mar" figures were actually April's)
+and occasionally mis-transcribe (−12 for Taylor Apr) — adjudicate EVERY wave against the
+trend tables, not just the one asked about, and treat a later report's reprinted history as
+corroboration of an earlier report's current-wave table.
+
+Still open (as of 2026-09-01): Jan + Dec-2025 waves have NO `altTpp` rows — the legacy PDFs
+have no "by wave" tables, so the ALP-vs-ONP 2PP figures must be hand-entered from the PDFs
+(extractor reports them "left for manual entry").

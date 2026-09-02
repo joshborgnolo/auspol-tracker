@@ -32,6 +32,15 @@
 //   DemosAU  – the methodology-statements index (already crawlable plain
 //              HTML); federal poll and MRP statement PDFs carry the same APC
 //              template row.
+//   RedBridge/Accent (methodUrl only) – no network leg at all: the wave's
+//              Accent project page yields its methodology-report PDF URL
+//              only to a CLICKED document widget, and extract-redbridge.mjs
+//              already does that weekly, caching the usrfiles.com PDF href
+//              as `pdfUrl` in .build/redbridge-src/*.json (keyed by the
+//              wave's fieldwork end). This leg just re-reads those caches
+//              and stamps `methodUrl` (exact date match) – it derives no
+//              sampleEff, and waves with no Accent page (the 2025 AFR-only
+//              releases) or no cache yet stay unlinked by design.
 //
 // Matching: a statement is stamped onto the polls.json row of the SAME
 // pollster whose `date` (fieldwork end) is within ±1 day of the statement's
@@ -53,7 +62,7 @@
 // failure, 2 guard breach. Status line shape:
 //   SAMPLEEFF_STATUS {"changed":bool,"stamped":n,"methods":n,"failed":n,"skipped":n,"errors":[…]}
 
-import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, dirname } from "node:path";
@@ -293,6 +302,41 @@ async function legNewspollLinks(needDates) {
   return (await pyxisStatements()).filter((s) => needDates.some((d) => Math.abs(ddays(d, s.when)) <= 7));
 }
 
+/* Accent/RedBridge methodUrl leg: the wave's project page on
+   accent-research.com only resolves its methodology-report PDF URL when the
+   site's document widget is CLICKED (headless Chrome needed), but
+   extract-redbridge.mjs already resolves it every week and records `pdfUrl`
+   in the committed .build/redbridge-src caches. This leg just reads those
+   caches (plus a two-entry constant below for the Accent pages the
+   extractor's sitemap regex never enumerates) – no network, no Chrome.
+   Waves with no Accent page at all (the 2025 AFR-only releases, Mar + Aug
+   2026) stay unlinked by design, and the plain-"Redbridge" Australia
+   Institute row files no Accent statement (commissioned wave – the same
+   precedent as YouGov's Australia-Institute waves). Cache `date` IS the
+   row's fieldwork end, so the match is exact (not ±days like the other
+   legs). Pollster prefix-matches so "(MRP)" rows are covered. */
+function legAccentLinks() {
+  const dir = join(ROOT, ".build", "redbridge-src");
+  const out = [];
+  for (const f of readdirSync(dir).filter((f) => f.endsWith(".json"))) {
+    const j = JSON.parse(readFileSync(join(dir, f), "utf8"));
+    if (j.date && typeof j.pdfUrl === "string" && /^https:\/\/[a-z0-9-]+\.usrfiles\.com\//.test(j.pdfUrl))
+      out.push({ date: j.date, href: j.pdfUrl });
+  }
+  // Accent pages the redbridge extractor never enumerates (its sitemap regex
+  // only matches the afr,-redbridge-group-and-accent-research-*federal-poll
+  // slugs), so no cache ever lands for them: the Oct-2025 snapshot and the
+  // May-2026 MRP ("a fragmented electorate"). PDF hrefs captured 2026-09-02
+  // via the CDP-click probe (.matilda/probe/accent-pdfurl.mjs) and verified
+  // 200 application/pdf. A cache later landing for the same date with a
+  // DIFFERENT href trips the >1-href ambiguity guard – deliberately.
+  out.push(
+    { date: "2025-10-07", href: "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_bfa36468f2104c90ba79a9bc66da0ab5.pdf" },
+    { date: "2026-05-14", href: "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_604e597b92a843e3bef4ee2825c88406.pdf" },
+  );
+  return out;
+}
+
 /* ---- leg: Essential disclosure statement (one living PDF) -------------- */
 const MONTH3 = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12 };
 const DDMMMYY = (s) => s.match(/(\d{2})-([A-Za-z]{3})-?(\d{2,4})/);
@@ -454,10 +498,13 @@ for (const p of unstamped) {
 }
 
 /* methodUrl: a YouGov or Newspoll row carries its wave's APC statement
-   link. Same matching discipline as sampleEff (YouGov ±1 day, series-locked
-   by the row's URL; Newspoll ±7 days on the statement-page date from its
-   sitemap), absent-not-zero, never overwritten. The commissioned YouGov
-   waves file no statement with YouGov's APC listing, so they keep no link. */
+   link, and a RedBridge/Accent row the link to its wave's Accent
+   methodology-report PDF. Same matching discipline as sampleEff (YouGov ±1
+   day, series-locked by the row's URL; Newspoll ±7 days on the statement's
+   publication date; RedBridge/Accent an exact date match on the
+   redbridge-src cache's fieldwork end), absent-not-zero, never overwritten.
+   The commissioned YouGov waves file no statement with YouGov's APC
+   listing, so they keep no link. */
 let npLinks = [];
 if (D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
   const needDates = D.polls
@@ -466,6 +513,9 @@ if (D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
   try { npLinks = await legNewspollLinks(needDates); }
   catch (e) { errors.push("leg newspoll-links: " + String(e.message).slice(0, 180)); }
 }
+const accentLinks = D.polls.some((p) => p.pollster.startsWith("RedBridge / Accent") && p.methodUrl == null)
+  ? legAccentLinks()
+  : [];
 const methods = [];
 for (const p of D.polls) {
   if (p.methodUrl != null) continue;
@@ -477,6 +527,8 @@ for (const p of D.polls) {
     ? [...new Set(npLinks
         .filter((l) => Math.abs(ddays(l.when, (p.published || p.date).slice(0, 10))) <= 7)
         .map((l) => l.href))]
+    : p.pollster.startsWith("RedBridge / Accent")
+    ? [...new Set(accentLinks.filter((l) => l.date === p.date).map((l) => l.href))]
     : [];
   if (!hrefs.length) continue;
   if (hrefs.length > 1) { errors.push(`ambiguity: ${p.date} ${p.pollster} methodUrl ${hrefs.join(" vs ")}`); continue; }

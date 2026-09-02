@@ -67,9 +67,14 @@ new and worth looking at.
   (waves through Jan 2026 — the old CMS keeps those pages online) or the
   statement PDF on the new CMS (Feb 2026 on — no statement pages there; the
   extractor enumerates Pyxis's live collection JSON API, not the
-  sitemap.xml that froze in the migration). Absent, not zero: only YouGov
-  and Newspoll have a statement source to link, and commissioned YouGov
-  waves file none. The polls tables render it beside
+  sitemap.xml that froze in the migration), and RedBridge / Accent rows the
+  wave's methodology-report PDF on usrfiles.com (re-read from the RedBridge
+  extractor's own caches — an Accent project page only yields that URL to a
+  clicked document widget; the May 2026 MRP wave included). Absent, not
+  zero: only YouGov, Newspoll and RedBridge / Accent have a statement
+  source to link, commissioned YouGov waves file none, and Accent waves
+  with no Accent project page (the 2025 AFR-only releases, Mar + Aug 2026)
+  stay unlinked. The polls tables render it beside
   the pollster name as "APC methodology".
 
 ## Layout
