@@ -2038,10 +2038,9 @@ function ArchPollDetail({ p, onBack, backLabel }) {
            </span>}
     </span>,
     <span className="pd-meta-i meta-md" key="sample"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>,
-    p.nEff != null && <span className="pd-meta-i meta-md" key="eff" title={p.sampleEff != null
-      ? "Effective sample as published by the pollster (APC methodology statement)"
-      : "No published effective sample for this poll – derived as sample ÷ 1.6 design effect"}>
-      <span className="pd-meta-k">Effective sample</span> n = {p.nEff.toLocaleString()}{p.sampleEff != null ? " (published)" : ""}</span>,
+    p.sampleEff != null && <span className="pd-meta-i meta-md" key="eff"
+      title="Effective sample as published by the pollster (APC methodology statement)">
+      <span className="pd-meta-k">Effective sample</span> n = {p.sampleEff.toLocaleString()}</span>,
     p.lean != null && <span className="pd-meta-i" key="lean"><span className="pd-meta-k">Poll lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>,
     p.hfx != null && <span className="pd-meta-i" key="hfx"><span className="pd-meta-k">House effect</span> {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)} vs consensus</span>,
   ].filter(Boolean);
@@ -2666,8 +2665,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
     ["Sample", (p) => p.sample],
     // the figure each row is weighted on, and the house-filed original it
     // equals where the pollster published one (absent-not-zero elsewhere)
-    ["Effective sample", (p) => (p.nEff == null ? "" : p.nEff)],
-    ["Effective sample published", (p) => (p.sampleEff == null ? "" : p.sampleEff)],
+    ["Effective sample", (p) => (p.sampleEff == null ? "" : p.sampleEff)],
     ["Primary ALP", (p) => p.p.alp], ["Primary L/NP", (p) => p.p.lnp],
     ["Primary GRN", (p) => p.p.grn], ["Primary ON", (p) => p.p.onp], ["Primary OTH", (p) => p.p.oth],
     ["2PP ALP", (p) => p.alp], ["2PP L/NP", (p) => p.lnp],
@@ -2862,11 +2860,11 @@ function AllPollsView({ focus, onBack, backLabel }) {
               <ArchSortTh label="Pollster" k="pollster" sort={sort} onSort={onSort} className="ta-l" />
               <ArchSortTh label="Fieldwork" short="Field" k="date" sort={sort} onSort={onSort} className="ta-l" />
               <ArchSortTh label="Sample" k="sample" sort={sort} onSort={onSort} className="hide-md" />
-              {/* n this poll is weighted on: pollster-published where one was
-                  filed, derived (sample / 1.6) otherwise. Not sortable - the
-                  two provenances are not one homogeneous scale to rank. */}
+              {/* the house's own published effective n - only where the
+                  pollster filed one with the APC (Resolve, Roy Morgan et al.
+                  file none and dash). Sparse column, so not sortable. */}
               <th scope="col" className="hide-md"
-                  title="Effective sample - the n this poll is weighted on">Eff. n</th>
+                  title="Effective sample, where the pollster filed one with the Australian Polling Council">Eff. n</th>
 
               {facet === "twopp" && (<>
                 <th scope="col" className="ta-l apub-col hide-md"
@@ -2933,15 +2931,13 @@ function AllPollsView({ focus, onBack, backLabel }) {
                   </td>
                   <td className="ta-l muted">{p.field}</td>
                   <td className="num muted hide-md">{p.sample != null ? p.sample.toLocaleString() : "—"}</td>
-                  {/* published eff sits a shade firmer than the muted derived
-                      run - the distinction the table hint names */}
-                  <td className={"num hide-md" + (p.sampleEff == null ? " muted" : "")}>
-                    {p.nEff == null
-                      ? "—"
-                      : <span title={p.sampleEff != null
-                          ? "Effective sample as published by the pollster (APC methodology statement)"
-                          : "No published effective sample for this poll – derived as sample ÷ 1.6 design effect"}>
-                          {p.nEff.toLocaleString()}
+                  {/* only ever a house-filed figure - a dash means the pollster
+                      published no effective sample, not that there is no n */}
+                  <td className="num hide-md">
+                    {p.sampleEff == null
+                      ? <span className="muted">—</span>
+                      : <span title="Effective sample as published by the pollster (APC methodology statement)">
+                          {p.sampleEff.toLocaleString()}
                         </span>}
                   </td>
 
@@ -3022,9 +3018,9 @@ function AllPollsView({ focus, onBack, backLabel }) {
         <strong>House effect</strong> is how far a pollster systematically sits from the cross-house consensus
         on 2PP – its own average lean across every poll it has published, shrunk toward zero when it has
         published few. The aggregates subtract it, and it is a property of the pollster, not of this one poll.
-        {" "}<strong>Eff. n</strong> is the effective sample the poll is weighted on – the pollster’s own
-        published figure where one was filed with the Australian Polling Council, otherwise derived as
-        sample ÷ 1.6, and a dash where even the raw sample is unknown.
+        {" "}<strong>Eff. n</strong> is the pollster’s own published effective sample, filed with the
+        Australian Polling Council – Newspoll, YouGov, Essential and DemosAU file them; Resolve
+        and Roy Morgan file none, so a dash there means unpublished, not unknown.
       </p>
 
       <VariancePanel facet={facet} rangeId={range} />

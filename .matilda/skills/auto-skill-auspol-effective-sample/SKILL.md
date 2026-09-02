@@ -50,6 +50,15 @@ Documented gaps, all deliberate:
 - Rows newer than the statement archive (e.g. the latest Essential wave)
   stamp on a later run; the wrapper extracts only CHANGED rows and
   no-ops otherwise.
+- **Houses with NO statement leg at all are never stamped** — the
+  extractor has sources only for Newspoll/YouGov/Essential/DemosAU.
+  Resolve Political Monitor has no leg (0/16 rows stamped at ship), and
+  neither do Roy Morgan, RedBridge/Accent, etc. Their Eff. n values are
+  always the derived `min(sample,3000)/1.6` (muted in the table); a
+  "where does X's effective sample come from" question about any
+  unstamped house has the answer "nowhere published — it's the standing
+  convention". Stamping such a house means writing a NEW extractor leg,
+  not configuring the existing ones away.
 
 ## Extractor + live pipeline
 
@@ -88,25 +97,33 @@ Same-place edits, both done at ship:
 - README.md data-fields table has `sampleEff`; README layout section
   lists `.build/sampleeff-src/`.
 
-## Display surfaces (Eff. n, shipped 2026-09-02)
+## Display surfaces (Eff. n, shipped 2026-09-02; published-only same day)
 
-- gen-data emits per-row `nEff` (= `Math.round(rowN(p)/HL_DEFF)`) plus
-  the `sampleEff` passthrough in BOTH the archive and pollsterTable
-  emitters — views never recompute, so table, detail and estimator can
-  never disagree. `nEff` is omitted only when even raw `sample` is
-  unknown; a "—" in the views means that, not a zero.
+Display shows ONLY the house-filed figure. The estimator's derived
+weighting n (`rowN(p)/HL_DEFF`) is internal and is never surfaced
+per-poll — first cut emitted both and showed derived values muted,
+which read as us claiming precision the house never published; user
+rejected it ("i only want eff n if provided by houses… neither does
+roy morgan"). Resolve and Roy Morgan file nothing, so they dash.
+
+- gen-data emits per-row `sampleEff` only (archive + pollsterTable
+  emitters); the per-row `nEff` field was REMOVED — the remaining
+  `nEff`s in the data asset are aggregate Kish counts
+  (`altLatest`/`synthLatest`/`alp2ppNEff`), leave them alone.
 - Archive table (d1a1d215): non-sortable "Eff. n" column immediately
-  after "Sample" (`hide-md`, drops ≤1000px). Non-sortable on purpose:
-  published and derived figures are two provenances, not one
-  homogeneous scale to rank. Published values (`sampleEff` present)
-  render in default ink, derived ones `muted`; every cell's `title`
-  names the provenance. Per-facet `colCount` and the empty-row
-  colSpans were bumped with it; the provenance legend sits at the end
-  of the archive `table-hint`.
-- Expanded-poll detail (ArchPollDetail metaItems): "Effective sample
-  n = X (published)" meta-md item with a provenance `title`.
-- CSV export: `Effective sample` (nEff) and `Effective sample
-  published` (sampleEff, empty on derived rows).
+  after "Sample" (`hide-md`, drops ≤1000px) — sparse column
+  (36-of-157 rows), non-sortable because ranking a sparsely-filled
+  provenance-specific column misleads. Value rows render the filed
+  figure with a provenance `title`; unstamped rows render a muted
+  "—". Per-facet `colCount` and empty-row colSpans were bumped with
+  it; the provenance legend (names which houses file, dash =
+  unpublished not unknown) sits at the end of the archive
+  `table-hint`.
+- Expanded-poll detail (ArchPollDetail metaItems): conditional
+  "Effective sample n = X" meta-md item, rendered ONLY when
+  `sampleEff != null`.
+- CSV export: single `Effective sample` column (sampleEff; empty
+  where the house filed none).
 
 ## Rules
 

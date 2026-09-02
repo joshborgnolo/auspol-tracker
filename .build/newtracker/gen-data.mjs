@@ -914,13 +914,11 @@ const individualPolls = POLLS.map((p) => {
        differs from ym, so the byte cost lands only on straddling waves. */
     ...(fym !== ym ? { fym } : {}),
     field, dateLabel: field, released: p.date, sample: p.sample ?? null,
-    /* the effective n the estimator held this poll to - the house's published
-       figure where one was filed (nEff === sampleEff then), else the standing
-       convention (raw capped at 3000, /1.6). Omitted only where even the raw
-       sample is unknown, so a "—" in the views means that, not a zero. */
+    /* the house's own published effective n, where one was filed with the
+       Australian Polling Council. Houses that file none get no field at all
+       and a "—" in the views; the estimator's derived weighting n is
+       internal to rowN() and is never surfaced per-poll. */
     ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
-    ...((p.sample != null || p.sampleEff != null)
-      ? { nEff: Math.round(rowN(p) / HL_DEFF) } : {}),
     /* When the wave was PUBLISHED, where the cited release says so. The
        archive's row detail has always had a line labelled "Published" and has
        always filled it with `released`, which is the last day of FIELDWORK -
@@ -992,8 +990,6 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     pubSort: p.published || p.date,
     sample: p.sample ?? null,
     ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
-    ...((p.sample != null || p.sampleEff != null)
-      ? { nEff: Math.round(rowN(p) / HL_DEFF) } : {}),
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
