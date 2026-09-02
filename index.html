@@ -1265,6 +1265,13 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    reads as a qualification rather than a warning. */
 .hero-caveat { color: var(--ink-3); }
 .hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; align-self: stretch; }
+/* the figure-bearing matchup pills ride LOW on a laptop: ordered to the
+   foot of the controls column, so the Switch-2PP strip sits just above the
+   chart, off to the right of the interval strip and the delta line across
+   the way, instead of heading the column top right. order, not DOM, does
+   the placing – the phone block re-leads the strip (its order:-1 shares
+   this specificity and wins on source order). */
+.hero-controls .hero-alt { order: 4; }
 /* quiet inline checkbox alongside the matchup/range switches – stripped from
    chart copies with the rest of .hero-controls. The column gap already
    spaces it, so the shared checkbox's other margins are dropped here. When
@@ -1277,8 +1284,10 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    margin-top:auto sinks the foot group - compare switch where it renders,
    then the stacked toggles - level with the interval strip and the delta
    line across the way, the matchup riding directly above the range window
-   it filters. The Switch-2PP pill is NOT part of that group: it heads the
-   column, top right. The plain copies heading the column are the toggles'
+   it filters. The Switch-2PP pill belongs to this group on a laptop: its
+   base order ranks it after the chartbar, so the foot stack reads compare
+   switch, toggles, pill - and the pill is what sits just above the chart.
+   The plain copies heading the column are the toggles'
    phone home. Both homes are in the DOM at every width (one state, two
    copies); display, not JSX, chooses. */
 .hero-controls > .text-toggle { display: none; }
@@ -1332,11 +1341,12 @@ body.dark .ci-band { opacity: 0.22; }
 
 /* the contests that are not on the chart, each carrying its own figure. A
    button, not a tab: pressing one makes it the headline and morphs the chart.
-   Lives inside .hero-controls at the column HEAD on a laptop - top right,
-   above the compare-switch/chartbar foot group, which keeps its own sink
-   (the auto margins on .pg-check and .hero-chartbar) - and wrapped rows
-   keep the desktop column's right edge. On a phone the ≤560px block orders
-   it first in the wrap row. */
+   Lives inside .hero-controls; a laptop renders it at the column FOOT (the
+   order rule beside .hero-controls ranks it after the chartbar), sunk level
+   with the interval strip and just above the chart, while the compare
+   switch and chartbar keep their own sink from the auto margins on
+   .pg-check and .hero-chartbar. Wrapped rows keep the desktop column's
+   right edge. On a phone the ≤560px block orders it first in the wrap row. */
 .hero-alt { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 .ha-lab { font-size: 10.5px; font-weight: 700;
   color: var(--ink-3); }
@@ -2379,8 +2389,9 @@ body.dark .fb-form { color-scheme: dark; }
      strip, and either way real touch padding is the point - this is exactly
      the control a one-handed thumb comes to. */
   .hero-controls { align-items: flex-start; }
-  /* …but the chartbar stacked pair stays over on the right */
-  .hero-controls .hero-chartbar { align-self: flex-end; }
+  /* …but the chartbar stacked pair stays over on the right, and so does the
+     Switch-2PP pill strip, now ordered last in the column */
+  .hero-controls .hero-chartbar, .hero-controls .hero-alt { align-self: flex-end; }
   .hero-controls .tt-opt, .hero-chartbar .tt-opt { padding: 11px 4px; }
   .hero-controls .tt-div, .hero-chartbar .tt-div { height: 16px; }
 }
@@ -2465,8 +2476,10 @@ body.dark .fb-form { color-scheme: dark; }
   .hero-chartbar { display: none; }
   .hero-controls > .text-toggle { display: inline-flex; }
   /* phone carries the matchup only as the Switch-2PP pill, so it leads the
-     control row and the range window follows */
-  .hero-controls .hero-alt { order: -1; }
+     control row and the range window follows: the laptop order that sinks
+     it to the column foot is outranked here, and the right-alignment the
+     ≤900px block lends it hands back to the wrap row's centring */
+  .hero-controls .hero-alt { order: -1; align-self: center; }
   /* …and the same fold pressure halves the wrap gap between the headline
      stack and that control strip: the desktop 24px is one row-gap among
      similar ones; on a phone it was the biggest void on the wire to the

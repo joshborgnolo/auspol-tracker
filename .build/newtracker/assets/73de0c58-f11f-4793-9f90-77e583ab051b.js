@@ -1159,10 +1159,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               and "the 2PP" is doing less work than a single headline implies.
               These were previously a bare tab you had to press to find out
               what was behind it; the number is the reason to press it. On a
-              laptop the pill HEADS the controls column, top right; the
-              compare switch and the chartbar toggles keep the column foot
-              (their own auto margins sink them level with the interval
-              strip). */}
+              laptop CSS orders the pill to the controls column FOOT, just
+              above the chart and right of the interval strip; the DOM seat
+              here before the compare switch exists for the phone, whose
+              order:-1 leads the wrap row from this spot. */}
           {otherContests.length > 0 && (
             <div className="hero-alt">
               <span className="ha-lab">Switch 2PP</span>
