@@ -10388,7 +10388,29 @@ function PollLedger({
     className: "pd-simple"
   }, r.releaseUrl && /*#__PURE__*/React.createElement(PdSec, {
     label: "Pollster\u2019s release"
-  }, /*#__PURE__*/React.createElement("p", {
+  }, r.releaseHub ? /*#__PURE__*/React.createElement("p", {
+    className: "pd-s"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "pd-release",
+    href: r.releaseUrl,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, "here", /*#__PURE__*/React.createElement("span", {
+    className: "plink-mark",
+    "aria-hidden": "true"
+  }, "\u2197")), /*#__PURE__*/React.createElement("span", {
+    className: "pd-s-note"
+  }, " (wave-specific page), and "), /*#__PURE__*/React.createElement("a", {
+    className: "pd-release",
+    href: r.releaseHub,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, "here", /*#__PURE__*/React.createElement("span", {
+    className: "plink-mark",
+    "aria-hidden": "true"
+  }, "\u2197")), /*#__PURE__*/React.createElement("span", {
+    className: "pd-s-note"
+  }, " (general rolling collection)")) : /*#__PURE__*/React.createElement("p", {
     className: "pd-s"
   }, /*#__PURE__*/React.createElement("a", {
     className: "pd-release",
@@ -10400,19 +10422,7 @@ function PollLedger({
     "aria-hidden": "true"
   }, "\u2197")), r.releaseUrl === r.methodUrl && /*#__PURE__*/React.createElement("span", {
     className: "pd-s-note"
-  }, " (includes the wave’s APC methodology statement)")), r.releaseHub && /*#__PURE__*/React.createElement("p", {
-    className: "pd-s"
-  }, /*#__PURE__*/React.createElement("a", {
-    className: "pd-release",
-    href: r.releaseHub,
-    target: "_blank",
-    rel: "noopener noreferrer"
-  }, r.pollster, " polling", /*#__PURE__*/React.createElement("span", {
-    className: "plink-mark",
-    "aria-hidden": "true"
-  }, "\u2197")), /*#__PURE__*/React.createElement("span", {
-    className: "pd-s-note"
-  }, " — the rolling collection every dated release files under"))), r.methodUrl && r.methodUrl !== r.releaseUrl && /*#__PURE__*/React.createElement(PdSec, {
+  }, " (includes the wave’s APC methodology statement)"))), r.methodUrl && r.methodUrl !== r.releaseUrl && /*#__PURE__*/React.createElement(PdSec, {
     label: "APC methodology statement"
   }, /*#__PURE__*/React.createElement("p", {
     className: "pd-s"

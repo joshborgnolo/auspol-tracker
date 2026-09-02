@@ -1979,26 +1979,31 @@ function PollLedger({ r, dirSegments }) {
           and only where the wave actually has a release page. */}
       {r.releaseUrl && (
         <PdSec label="Pollster’s release">
-          <p className="pd-s">
-            <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
-              here<span className="plink-mark" aria-hidden="true">↗</span>
-            </a>
-            {/* DemosAU's released report IS its APC statement – one link does
-                both jobs, so the separate statement line below sits out and
-                the note here names the second role */}
-            {r.releaseUrl === r.methodUrl &&
-              <span className="pd-s-note">{" (includes the wave’s APC methodology statement)"}</span>}
-          </p>
-          {/* the house's rolling collection page that every dated release
-              files under (pollsterRules.releaseHub – Essential's Federal
-              Political Insights), spliced in beside the dated pointer so
-              both addresses ride under the one pointer */}
-          {r.releaseHub && (
+          {/* houses with a rolling collection page (pollsterRules.releaseHub
+              – Essential's Federal Political Insights) ride both addresses on
+              the one line: the wave's own release first, then the collection
+              every dated release files under */}
+          {r.releaseHub ? (
             <p className="pd-s">
-              <a className="pd-release" href={r.releaseHub} target="_blank" rel="noopener noreferrer">
-                {r.pollster} polling<span className="plink-mark" aria-hidden="true">↗</span>
+              <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
+                here<span className="plink-mark" aria-hidden="true">↗</span>
               </a>
-              <span className="pd-s-note">{" — the rolling collection every dated release files under"}</span>
+              <span className="pd-s-note">{" (wave-specific page), and "}</span>
+              <a className="pd-release" href={r.releaseHub} target="_blank" rel="noopener noreferrer">
+                here<span className="plink-mark" aria-hidden="true">↗</span>
+              </a>
+              <span className="pd-s-note">{" (general rolling collection)"}</span>
+            </p>
+          ) : (
+            <p className="pd-s">
+              <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
+                here<span className="plink-mark" aria-hidden="true">↗</span>
+              </a>
+              {/* DemosAU's released report IS its APC statement – one link does
+                  both jobs, so the separate statement line below sits out and
+                  the note here names the second role */}
+              {r.releaseUrl === r.methodUrl &&
+                <span className="pd-s-note">{" (includes the wave’s APC methodology statement)"}</span>}
             </p>
           )}
         </PdSec>
