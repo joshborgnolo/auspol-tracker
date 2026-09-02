@@ -86,6 +86,7 @@
 //   - writes are atomic (.tmp + rename)
 import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -103,14 +104,29 @@ const FETCH_TRIES = 3;
 const ELEC_2025 = { alp: 34.6, lnp: 31.8, grn: 12.2, onp: 6.4, ind: 15.0 };
 
 // ---------------------------------------------------------------- fetching
+// shared cookie jar: since 2026-09-02 demosau.com sits behind SiteGround's
+// bot wall, whose pass cookie (set once the PoW below is solved) has to ride
+// on every later fetch — index, refetches, and the PDFs alike
+const cookieJar = new Map();
+function storeCookies(res) {
+  for (const sc of res.headers.getSetCookie?.() ?? []) {
+    const [pair] = sc.split(";");
+    const eq = pair.indexOf("=");
+    if (eq > 0) cookieJar.set(pair.slice(0, eq).trim(), pair.slice(eq + 1).trim());
+  }
+}
 async function fetchBuffer(url) {
   let lastErr;
   for (let i = 1; i <= FETCH_TRIES; i++) {
     try {
       const res = await fetch(url, {
-        headers: { "user-agent": "Mozilla/5.0 (auspol-tracker data update)" },
+        headers: {
+          "user-agent": "Mozilla/5.0 (auspol-tracker data update)",
+          ...(cookieJar.size ? { cookie: [...cookieJar].map(([k, v]) => `${k}=${v}`).join("; ") } : {}),
+        },
         signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
       });
+      storeCookies(res);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return Buffer.from(await res.arrayBuffer());
     } catch (err) {
@@ -119,6 +135,43 @@ async function fetchBuffer(url) {
     }
   }
   throw new Error(`fetch failed after ${FETCH_TRIES} tries: ${url}: ${lastErr.message}`);
+}
+
+// SiteGround's "sgcaptcha" wall answers each request with a meta-refresh to
+// a JS proof-of-work: sha1(challenge ‖ counterBytes) must show `complexity`
+// leading zero bits (counter = minimal big-endian bytes, base64(challenge ‖
+// counter) goes back as ?sol=). A few million sha1 rounds — ~1s in Node.
+function solveSgChallenge(challenge) {
+  const complexity = parseInt(challenge.split(":", 1)[0], 10);
+  const cb = Buffer.from(challenge, "utf8");
+  const shift = 32 - complexity;
+  const t0 = Date.now();
+  for (let c = 0; ; c++) {
+    const len = c < 0x100 ? 1 : c < 0x10000 ? 2 : c < 0x1000000 ? 3 : c < 0x100000000 ? 4 : 6;
+    const nb = Buffer.alloc(len);
+    nb.writeUIntBE(c, 0, len);
+    const d = createHash("sha1").update(cb).update(nb).digest();
+    if (d.readUInt32BE(0) >>> shift === 0) {
+      return { sol: Buffer.concat([cb, nb]).toString("base64"), ms: Date.now() - t0, hashes: c + 1 };
+    }
+  }
+}
+
+// follow the wall's meta-refresh, solve, submit — on success the jar holds
+// the pass cookie. False when html isn't the wall or the challenge page
+// didn't parse; the caller's bounded retry loop decides what happens next.
+async function passSgCaptcha(html, pageUrl) {
+  const m = html.match(/refresh" content="0;([^"]*sgcaptcha[^"]*)/);
+  if (!m) return false;
+  const chal = (await fetchBuffer(new URL(m[1], pageUrl).href)).toString("utf8");
+  const challenge = chal.match(/sgchallenge="([^"]+)"/)?.[1];
+  const submit = chal.match(/sgsubmit_url="([^"]+)"/)?.[1];
+  if (!challenge || !submit) return false;
+  const { sol, ms, hashes } = solveSgChallenge(challenge);
+  const u = new URL(submit, pageUrl);
+  u.search += `${u.search ? "&" : "?"}sol=${encodeURIComponent(sol)}&s=${ms}:${hashes}`;
+  await fetchBuffer(u.href);
+  return true;
 }
 
 function pdfToText(buf, slug) {
@@ -647,6 +700,9 @@ try {
     let lm;
     while ((lm = linkRe.exec(indexHtml))) links.push({ url: lm[1], title: lm[2].replace(/&amp;/g, "&").trim() });
     if (links.length) break;
+    // SiteGround bot wall (since 2026-09-02): solve its PoW once, the pass
+    // cookie lands in fetchBuffer's jar and the refetch serves the real page
+    if (indexHtml.includes("sgcaptcha") && (await passSgCaptcha(indexHtml, INDEX_URL))) continue;
     if (t >= FETCH_TRIES) throw new Error("no PDF links found on index page (site restructure?)");
     await new Promise((r) => setTimeout(r, 1500 * t));
   }
