@@ -14,6 +14,7 @@ ledger, 2026-09-01):
 | `polls[].url` | 146 | the citation for the wave |
 | `polls[].releaseUrl` | 22 | the pollster's own release, beside the coverage link |
 | `pollsterRules.*.site` | 7 | the publisher index — **load-bearing** (10 deployments, 7 unique) |
+| `pollsterRules.*.releaseHub` | 1 | the house's rolling report collection page (Essential's Federal Political Insights) — roving, swept for drift like `site` |
 
 Post-census: `polls[].methodUrl` joined the sweep 2026-09-02 (the YouGov /
 Newspoll APC statement links — YouGov's CloudFront

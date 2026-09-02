@@ -786,6 +786,14 @@ const alpNOf = (p) => (p.tpp_alp == null ? null : r1(share2pp(p)));
    these bases at once. */
 const TPP_UNDECIDED = new Set(Object.entries(D.pollsterRules || {})
   .filter(([, r]) => r && r.tppIncludesUndecided).map(([firm]) => firm));
+/* the rolling collection page a pollster's dated release also lives at
+   (Essential's Federal Political Insights hub, which carries the current
+   tables alongside each numbered report). Declared once as a pollster rule
+   and attached to that house's releases so the expanded poll can offer both
+   addresses – the dated page and the hub – without typing the hub URL onto
+   every wave. */
+const RELEASE_HUB = new Map(Object.entries(D.pollsterRules || {})
+  .filter(([, r]) => r && r.releaseHub).map(([firm, r]) => [firm, r.releaseHub]));
 const undecidedOf = (p) => {
   if (p.undecided != null) return { v: p.undecided, basis: "first" };
   if (p.soft != null) return { v: p.soft, basis: "soft" };
@@ -946,6 +954,10 @@ const individualPolls = POLLS.map((p) => {
     // waves, where `url` is the Capital Brief piece and the release is the
     // statement-bearing report PDF)
     ...(p.releaseUrl ? { releaseUrl: p.releaseUrl } : {}),
+    // plus the house's rolling collection page alongside the dated release
+    // (releaseHub in pollsterRules – Essential's Federal Political Insights),
+    // so both addresses ride under the one pointer
+    ...(p.releaseUrl && RELEASE_HUB.has(p.pollster) ? { releaseHub: RELEASE_HUB.get(p.pollster) } : {}),
     // the wave's APC methodology statement (YouGov/Newspoll only)
     ...(p.methodUrl ? { methodUrl: p.methodUrl } : {}),
     // right-track / wrong-track, where this poll asked it
@@ -1007,6 +1019,9 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     // rule as the archive emitter above — RedBridge/Accent AFR citations,
     // Capital Brief-commissioned DemosAU waves)
     ...(p.releaseUrl ? { releaseUrl: p.releaseUrl } : {}),
+    // plus the rolling collection page where pollsterRules ships a releaseHub,
+    // so both addresses ride under the one pointer (archive emitter above)
+    ...(p.releaseUrl && RELEASE_HUB.has(p.pollster) ? { releaseHub: RELEASE_HUB.get(p.pollster) } : {}),
     // APC methodology statement link (YouGov/Newspoll only)
     ...(p.methodUrl ? { methodUrl: p.methodUrl } : {}),
     ...(DIR_BY.has(p.date + "|" + p.pollster) ? { dir: DIR_BY.get(p.date + "|" + p.pollster) } : {}),

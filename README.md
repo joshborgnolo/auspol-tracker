@@ -49,7 +49,11 @@ new and worth looking at.
   in `releaseUrl` (the extractor persists a publish-date → link index to
   `.build/essential-src/report-index.json`, and the VI assimilator stamps new
   rows from it). Absent, not zero: the curated row whose `url` already IS the
-  wave's release page carries no `releaseUrl`.
+  wave's release page carries no `releaseUrl`. The house's rolling report
+  collection page (Federal Political Insights) rides in
+  `pollsterRules.Essential.releaseHub`; gen-data stamps it onto every
+  Essential wave beside `releaseUrl`, and the expanded poll shows both
+  addresses under the one "Pollster's release" pointer.
 - Leadership rows must key to **fieldwork end**, matching their poll. An
   unexplained "leadership-only" row in the build output usually means a date has
   drifted off its poll, not that the firm skipped voting intention.

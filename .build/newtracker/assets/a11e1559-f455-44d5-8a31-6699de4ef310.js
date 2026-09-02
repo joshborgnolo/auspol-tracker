@@ -1989,6 +1989,18 @@ function PollLedger({ r, dirSegments }) {
             {r.releaseUrl === r.methodUrl &&
               <span className="pd-s-note">{" (includes the wave’s APC methodology statement)"}</span>}
           </p>
+          {/* the house's rolling collection page that every dated release
+              files under (pollsterRules.releaseHub – Essential's Federal
+              Political Insights), spliced in beside the dated pointer so
+              both addresses ride under the one pointer */}
+          {r.releaseHub && (
+            <p className="pd-s">
+              <a className="pd-release" href={r.releaseHub} target="_blank" rel="noopener noreferrer">
+                {r.pollster} polling<span className="plink-mark" aria-hidden="true">↗</span>
+              </a>
+              <span className="pd-s-note">{" — the rolling collection every dated release files under"}</span>
+            </p>
+          )}
         </PdSec>
       )}
 

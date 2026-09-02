@@ -5,7 +5,8 @@
 
    Every poll row's citation is provenance, and nothing else verifies
    the unique URLs across polls[].url, polls[].releaseUrl,
-   polls[].methodUrl and pollsterRules[].site. Status codes lie on this
+   polls[].methodUrl, pollsterRules[].site and
+   pollsterRules[].releaseHub. Status codes lie on this
    archive in both
    directions — News Corp's mastheads answer anonymous GETs with a
    crawler-bot block page (403 to an honest UA today; the "No Cookies"
@@ -248,6 +249,9 @@ function collect() {
   // pollsterRules is an object keyed by pollster name
   for (const rule of Object.values(data.pollsterRules || {})) {
     if (rule && rule.site) add(rule.site, "site");
+    // the rolling report collection page rides beside `site` (Essential's
+    // Federal Political Insights) — roving, so the sweep covers it too
+    if (rule && rule.releaseHub) add(rule.releaseHub, "releaseHub");
   }
   return [...byUrl.values()];
 }
