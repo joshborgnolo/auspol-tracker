@@ -1050,8 +1050,7 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 /* the hero's subhead matches the other panels; the method label that used
    to sit beside it in small caps has moved to the interval line, where it
-   reads as a clause of how the figure was made and how well it is known,
-   alongside the lead that line now carries */
+   reads as a clause of how the figure was made and how well it is known */
 .hero-title { margin-bottom: 12px; }
 /* ---- the hero's interval gauge -----------------------------------------
    The channel is chrome and obeys the page's top-left light: shadow cast in
@@ -1144,15 +1143,13 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    keeps one size and colour story. */
 .hero-interval .hi-method { font-size: 12px; color: var(--ink-3); }
 .hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.hi-note { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
-/* Phones: one line of lead + range + method + interval is ~386px at the
-   base 14px - it fits desktop widths easily, but a 390px-class phone leaves
-   only ~358px of row. Drop the lead clause and its range to the strip 12px
-   so the whole row holds on one line; the rows pull to 6px vertically when
-   the strip wraps. */
+.hi-note, .hi-count { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+/* Phones: the lead clause used to share one row with the strip and shrink
+   to 12px to fit it inside ~358px; on its own line a 390px-class phone
+   holds it at the full 14px, so only the strip's wrap rhythm still wants
+   the tighter 6px column gap. */
 @media (max-width: 480px) {
   .hero-interval { gap: 6px; }
-  .hero-interval .lead-tag, .hero-interval .hi-range { font-size: 12px; }
 }
 /* Movement smaller than its own interval – stated, not colour-coded, so it
    reads as a qualification rather than a warning. */
@@ -3322,7 +3319,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
 
   /* hero readout crossfades when the matchup changes */
-  .hero-readout, .hero-interval, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
+  .hero-readout, .hero-lead, .hero-interval, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
   @keyframes readout-in {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: none; }

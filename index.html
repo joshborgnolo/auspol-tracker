@@ -1149,8 +1149,7 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 /* the hero's subhead matches the other panels; the method label that used
    to sit beside it in small caps has moved to the interval line, where it
-   reads as a clause of how the figure was made and how well it is known,
-   alongside the lead that line now carries */
+   reads as a clause of how the figure was made and how well it is known */
 .hero-title { margin-bottom: 12px; }
 /* ---- the hero's interval gauge -----------------------------------------
    The channel is chrome and obeys the page's top-left light: shadow cast in
@@ -1200,21 +1199,19 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hi-method { color: var(--ink-3); white-space: nowrap; }
 /* Separators hang off the END of each clause, not the start of the next: as
    a ::before they belonged to the following flex item, so a wrap carried the
-   dot down to open the next line on its own. The lead clause opens the row,
-   so it gets the dot after it too; its figures stay tabular. One exception: a
-   dot after a .hi-term button cannot live on the button's ::after - a pseudo-
-   element is inside the button's box, so it would be clickable and would pick
-   up the underline the term carries. That one dot is borrowed from the next
+   dot down to open the next line on its own. One exception: a dot after a
+   .hi-term button cannot live on the button's ::after - a pseudo-element is
+   inside the button's box, so it would be clickable and would pick up the
+   underline the term carries. That one dot is borrowed from the next
    clause's ::before instead, provided that clause is not itself a hi-term
-   button (a pseudo would sit inside ITS button box and link). When two terms
-   are directly adjacent - the adjusted-strip method + note - the JSX inserts
-   a real .hi-sep span for the dot, and both rules skip it so it stays the
-   only dot at that junction. Every emitter pins 12px: a pseudo inherits its
-   host clause's size (the 14px lead-tag) and the bare span would inherit the
-   page 16px, so an unpinned dot reads bigger than its neighbours (caught
-   live 2026-09-02). The sub-line's poll-count dot is the same problem one
-   row down - a bare text-node bullet would take .hero-sub-count's 13px and
-   sit 1px proud of these, so the JSX borrows .hi-sep there too. */
+   button (a pseudo would sit inside ITS button box and link) - the poll
+   count and the Limited-data tag both get theirs this way. When two terms
+   are directly adjacent - the adjusted strip's note + method - the JSX
+   inserts a real .hi-sep span for the dot, and both rules skip it so it
+   stays the only dot at that junction. Every emitter pins 12px: a pseudo
+   inherits its host clause's size and the bare span would inherit the page
+   16px, so an unpinned dot reads bigger than its neighbours (caught live
+   2026-09-02). */
 .hero-interval > *:not(:last-child):not(.hi-term):not(.hi-sep)::after {
   content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
   margin-left: 6px;
@@ -1224,7 +1221,6 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   margin-right: 6px;
 }
 .hi-sep { color: var(--ink-3); font-weight: 400; font-size: 12px; }
-.hero-interval .lead-tag { font-variant-numeric: tabular-nums; }
 /* No narrow-screen variant: the strip wraps naturally if the row overflows,
    and the same clause order, dots and sizes are wanted at every width. */
 /* A word that is also the way into its own definition. Reset far enough that
@@ -1246,15 +1242,13 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    keeps one size and colour story. */
 .hero-interval .hi-method { font-size: 12px; color: var(--ink-3); }
 .hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.hi-note { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
-/* Phones: one line of lead + range + method + interval is ~386px at the
-   base 14px - it fits desktop widths easily, but a 390px-class phone leaves
-   only ~358px of row. Drop the lead clause and its range to the strip 12px
-   so the whole row holds on one line; the rows pull to 6px vertically when
-   the strip wraps. */
+.hi-note, .hi-count { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+/* Phones: the lead clause used to share one row with the strip and shrink
+   to 12px to fit it inside ~358px; on its own line a 390px-class phone
+   holds it at the full 14px, so only the strip's wrap rhythm still wants
+   the tighter 6px column gap. */
 @media (max-width: 480px) {
   .hero-interval { gap: 6px; }
-  .hero-interval .lead-tag, .hero-interval .hi-range { font-size: 12px; }
 }
 /* Movement smaller than its own interval – stated, not colour-coded, so it
    reads as a qualification rather than a warning. */
@@ -3424,7 +3418,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
 
   /* hero readout crossfades when the matchup changes */
-  .hero-readout, .hero-interval, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
+  .hero-readout, .hero-lead, .hero-interval, .hero-sub { animation: readout-in .3s cubic-bezier(.25,.6,.3,1) both; }
   @keyframes readout-in {
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: none; }
@@ -5301,9 +5295,11 @@ window.AP.nextPolls = npProject;
     let legend = readLegend(target);
     if (!legend.length) legend = cycleLegend();
     /* the ± range rides inside .lead-tag now, so the meta tail drops it -
-       keeping it here too would print the interval twice on the image */
+       keeping it here too would print the interval twice on the image. The
+       tail mirrors the interval strip: note, method, poll window. */
     const meta = [txt(target.querySelector(".hi-note")),
-                  txt(target.querySelector(".hi-method"))].filter(Boolean).join("  ·  ");
+                  txt(target.querySelector(".hi-method")),
+                  txt(target.querySelector(".hi-count"))].filter(Boolean).join("  ·  ");
     const lead = [txt(target.querySelector(".lead-tag")), txt(target.querySelector(".delta")),
                   txt(target.querySelector(".hero-sub-note"))].filter(Boolean).join("  ");
     const hero = isHero && parties.length === 2;
@@ -17233,23 +17229,23 @@ function Hero({
      morph, where there is nothing honest for it to reshape into. */
   const [showSynth, setShowSynth] = useState(false);
   React.useEffect(() => () => cancelAnimationFrame(morphRaf.current), []);
-  /* The month clause's caveat shows "the margin" until the row can no
-     longer keep the poll-window clause on its line - then, and only then,
-     it shortens to "margin". Measured, not breakpointed: the wrap point
-     depends on the delta figure's width, the caveat's presence and the
-     loaded font, none of which a media query can know. Restores the full
-     wording once the row is wider than the last width that overflowed. */
+  /* The month clause's caveat shows "the margin" until the note no longer
+     fits beside the delta chip - then, and only then, it shortens to
+     "margin". Measured, not breakpointed: the wrap point depends on the
+     delta figure's width, the caveat's presence and the loaded font, none
+     of which a media query can know. Restores the full wording once the row
+     is wider than the last width that overflowed. The note is a nowrap
+     unit, so its top clearing the chip's bottom is what wrapped means. */
   const subRef = React.useRef(null);
   const subNoteRef = React.useRef(null);
-  const subCountRef = React.useRef(null);
   const subOverW = React.useRef(0);
   const [subTight, setSubTight] = useState(false);
   const subRecheck = () => {
     const row = subRef.current,
-      note = subNoteRef.current,
-      count = subCountRef.current;
+      note = subNoteRef.current;
     if (!row || !note) return;
-    if (count && count.offsetTop !== note.offsetTop) {
+    const chip = row.firstElementChild;
+    if (chip && note.offsetTop > chip.offsetTop + chip.offsetHeight) {
       subOverW.current = row.clientWidth;
       setSubTight(true);
     } else if (row.clientWidth > subOverW.current) {
@@ -17723,8 +17719,7 @@ function Hero({
     className: "hero-sub-note",
     ref: subNoteRef
   }, m.real || altL && altL.aPrev != null ? "vs. 1 month ago" : "vs. previous reading", unc && unc.changeSig === false && /*#__PURE__*/React.createElement("span", {
-    className: "hero-caveat",
-    ref: cavRef
+    className: "hero-caveat"
   }, " (within ", subTight ? "" : "the ", /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "hi-term",

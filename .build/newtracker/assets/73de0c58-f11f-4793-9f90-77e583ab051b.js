@@ -703,21 +703,22 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
      morph, where there is nothing honest for it to reshape into. */
   const [showSynth, setShowSynth] = useState(false);
   React.useEffect(() => () => cancelAnimationFrame(morphRaf.current), []);
-  /* The month clause's caveat shows "the margin" until the row can no
-     longer keep the poll-window clause on its line - then, and only then,
-     it shortens to "margin". Measured, not breakpointed: the wrap point
-     depends on the delta figure's width, the caveat's presence and the
-     loaded font, none of which a media query can know. Restores the full
-     wording once the row is wider than the last width that overflowed. */
+  /* The month clause's caveat shows "the margin" until the note no longer
+     fits beside the delta chip - then, and only then, it shortens to
+     "margin". Measured, not breakpointed: the wrap point depends on the
+     delta figure's width, the caveat's presence and the loaded font, none
+     of which a media query can know. Restores the full wording once the row
+     is wider than the last width that overflowed. The note is a nowrap
+     unit, so its top clearing the chip's bottom is what wrapped means. */
   const subRef = React.useRef(null);
   const subNoteRef = React.useRef(null);
-  const subCountRef = React.useRef(null);
   const subOverW = React.useRef(0);
   const [subTight, setSubTight] = useState(false);
   const subRecheck = () => {
-    const row = subRef.current, note = subNoteRef.current, count = subCountRef.current;
+    const row = subRef.current, note = subNoteRef.current;
     if (!row || !note) return;
-    if (count && count.offsetTop !== note.offsetTop) {
+    const chip = row.firstElementChild;
+    if (chip && note.offsetTop > chip.offsetTop + chip.offsetHeight) {
       subOverW.current = row.clientWidth;
       setSubTight(true);
     } else if (row.clientWidth > subOverW.current) {
