@@ -110,10 +110,9 @@ const FONTS = [
   { file: "crimsontext-italic-400-latin.woff2", family: "Crimson Text", style: "italic", weight: "400" },
   { file: "crimsontext-italic-600-latin.woff2", family: "Crimson Text", style: "italic", weight: "600" },
   { file: "crimsontext-italic-700-latin.woff2", family: "Crimson Text", style: "italic", weight: "700" },
-  /* Source Serif 4 sets ONLY the hero's 2PP figures - one variable cut (wght
-     200-900 + an optical-size axis the browser steers by font-size, so the
-     68px readout gets the display cut and its in-between weight-650 ask).
-     Preloaded - it paints the biggest text on the page. */
+  /* Source Serif 4 sets the tab labels (--heads in template.html) - one
+     variable cut (wght 200-900 + an optical-size axis the browser steers by
+     font-size). Preloaded - it paints above the fold. */
   { file: "sourceserif4-latin.woff2",           family: "Source Serif 4", style: "normal", weight: "200 900", preload: true },
   { file: "ibmplexsans-latin.woff2",            family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
   /* Source Sans 3 stays shipped for one scoped caller: the .wordmark
