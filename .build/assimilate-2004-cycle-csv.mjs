@@ -26,8 +26,9 @@
 //   ACNielsen (user request) — single wide CSV: primaries + 2PP + satisfaction
 //   + PPM; mode=phone on every wave; no undecided column (ACN redistributed
 //   them, so VI columns already sum to ~100); date is the LAST day of the
-//   printed range; the series stops 2006-06-17 (wayback gap), which is why it
-//   can't appear in the 2007-election accuracy window.
+//   printed range. (When this drill shipped the series stopped 2006-06-17; the
+//   archive has since been extended through 2012, so a re-run will now also
+//   pick up the 2007 in-term waves Feb–Nov.)
 //
 // Row shapes are the curated ones: cyclePolls rows
 // ({"date","firm","lnp","alp","grn","onp","oth","tpp_lnp","tpp_alp"}), and the
@@ -91,24 +92,27 @@ for (const c of parseCsv("data/roymorgan-primary-vote.csv").slice(1)) {
 }
 
 // ---- ACNielsen VI: date,election,sample,moe,mode,alp,coalition,democrats,
-//      greens,independents,one_nation,other,tpp_alp,tpp_coalition,
-//      pm_approve,pm_disapprove,pm_uncommitted,opp_leader,
-//      ol_approve,ol_disapprove,ol_uncommitted,ppm_pm,ppm_opp,ppm_uncommitted
+//      greens,independents,one_nation,other,family_first,tpp_alp,tpp_coalition,
+//      tpp_flow_alp,tpp_flow_coalition,pm,pm_approve,pm_disapprove,
+//      pm_uncommitted,opp_leader,ol_approve,ol_disapprove,ol_uncommitted,
+//      ppm_pm,ppm_opp,ppm_uncommitted
+//      (28 cols since the 2007–2012 archive extension: family_first, the
+//      election-flow tpp_flow pair and the pm name column were added)
 const acn = parseCsv("data/acnielsen-polls.csv");
-if (acn[0][0] !== "date" || acn[0].length !== 24)
+if (acn[0][0] !== "date" || acn[0].length !== 28 || acn[0][12] !== "family_first")
   throw new Error("acnielsen-polls.csv schema changed — re-check column positions");
 for (const c of acn.slice(1)) {
   if (!inTerm(c[0]) || c[1] === "1") continue;
   vi.push({ date: c[0], firm: "ACNielsen",
     lnp: pct(c[6]), alp: pct(c[5]), grn: pct(c[8]),
-    onp: null, oth: num(c[7]) + num(c[9]) + num(c[10]) + num(c[11]),
-    tpp_lnp: pct(c[13]), tpp_alp: pct(c[12]) });
+    onp: null, oth: num(c[7]) + num(c[9]) + num(c[10]) + num(c[11]) + num(c[12]),
+    tpp_lnp: pct(c[14]), tpp_alp: pct(c[13]) });
   // leadership ratings on the same row — net = approve − disapprove; a wave
   // that didn't ask leaves the field blank and the row carries null
   appr.push({ date: c[0], firm: "ACNielsen",
-    pmNet: pct(c[14]) != null && pct(c[15]) != null ? pct(c[14]) - pct(c[15]) : null,
-    oppNet: pct(c[18]) != null && pct(c[19]) != null ? pct(c[18]) - pct(c[19]) : null,
-    pmPpm: pct(c[21]), oppPpm: pct(c[22]) });
+    pmNet: pct(c[18]) != null && pct(c[19]) != null ? pct(c[18]) - pct(c[19]) : null,
+    oppNet: pct(c[22]) != null && pct(c[23]) != null ? pct(c[22]) - pct(c[23]) : null,
+    pmPpm: pct(c[25]), oppPpm: pct(c[26]) });
 }
 
 // ---- Newspoll ratings: per-leader sparse columns, era column is the one the
