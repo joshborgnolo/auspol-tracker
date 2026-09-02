@@ -92,9 +92,9 @@
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --figures: "Archivo", var(--sans);
-  /* the hero readout alone asks for 650, a weight Crimson Text never drew -
-     Source Serif 4's variable cut really ships it (with an optical-size axis) */
-  --hero-num: "Source Serif 4", var(--serif);
+  /* heads (card titles, tab labels): Source Serif 4, not --serif - the variable
+     cut interpolates the 500/540 head weights crimson's static set can't ship */
+  --heads: "Source Serif 4", var(--serif);
 
   --radius: 14px;
   --shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
@@ -860,7 +860,7 @@ body.dark .dl-bloom { opacity: 1; }
   display: flex; justify-content: space-between; align-items: flex-start;
   gap: 18px; flex-wrap: wrap; margin-bottom: 14px;
 }
-.card-title { font-family: var(--serif); font-weight: 540; font-size: 22px; margin: 0; letter-spacing: -0.01em; color: var(--ink); line-height: 1.15; }
+.card-title { font-family: var(--heads, var(--serif)); font-weight: 540; font-size: 22px; margin: 0; letter-spacing: -0.01em; color: var(--ink); line-height: 1.15; }
 .card-sub { margin: 3px 0 0; font-size: 13px; color: var(--ink-3); text-wrap: pretty; }
 
 /* ---------- segmented control ---------- */
@@ -1004,7 +1004,8 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .ro-party { display: flex; align-items: baseline; gap: 11px; }
 .ro-dot { width: 13px; height: 13px; border-radius: 50%; align-self: center; }
 .ro-name { font-size: 17px; font-weight: 700; color: var(--ink-2); letter-spacing: -0.01em; white-space: nowrap; }
-.ro-num { font-family: var(--hero-num, var(--serif)); font-size: 68px; font-weight: 650; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
+/* crimson ships no 650 cut - face matching lands on its 700 */
+.ro-num { font-family: var(--serif); font-size: 68px; font-weight: 650; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
 .alp-side .ro-num { color: var(--alp-text); }
 .lnp-side .ro-num { color: var(--lnp-text); }
 .ro-sep { width: 2px; height: 47px; border-radius: 1px; background: var(--line); align-self: center; }
@@ -2630,7 +2631,7 @@ body.editorial .tabs.pinned .tabs-set { transform: scale(0.789); } /* 19 → 15 
   transform: scaleX(0); transform-origin: left center; transition: transform .2s ease;
 }
 .tab.active::after { transform: scaleX(1); }
-body.editorial .tab-label { font-family: "Crimson Text", var(--serif); font-weight: 600; font-size: 19px; line-height: 23.5px; letter-spacing: -0.01em; }
+body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight: 600; font-size: 19px; line-height: 23.5px; letter-spacing: -0.01em; }
 
 /* narrow screens condense a touch further so the docked score clears the
    scaled tab set. The gap (and the shrunk phone bar below) lives HERE, after
