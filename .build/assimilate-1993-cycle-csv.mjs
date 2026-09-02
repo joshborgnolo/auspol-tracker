@@ -13,21 +13,32 @@
 //   the only house on file, and both Morgan and ACNielsen blocks are
 //   absent from this script rather than returning zero candidates.
 //
-//   Newspoll 2PP — as in the later drills, the two-party-preferred table
-//   is empty for the term except the campaign: six waves (1996-01-21 →
-//   1996-02-29) carry a printed pair and the primary↔2PP join keeps just
-//   those six; the other 71 in-window primary waves are dropped for want
-//   of a 2PP (no fabricated estimates). All six kept rows sum to exactly
-//   100.
+//   Newspoll 2PP — the two-party-preferred table is empty for the term
+//   except the campaign: only six waves (1996-01-21 → 1996-02-29) print a
+//   pair. The later drills joined primary↔2PP and dropped the primaries
+//   that had no 2PP; with Newspoll the ONLY house this term, that rule
+//   left the VI charts empty for three years. Those 71 primary-only waves
+//   are therefore KEPT with tpp_lnp/tpp_alp null — null is not a
+//   fabricated estimate (the no-fabrication rule stands), and the whole
+//   downstream is null-safe: cycleSeries skips null v, the renderer's
+//   dot cloud skips null fields, the accuracy panel filters them, and
+//   validate.mjs's tpp checks are all null-guarded. All six paired rows
+//   sum to exactly 100.
 //
 //   One Nation — the party didn't exist (founded April 1997); Newspoll's
-//   one_nation column is blank on every kept row and the columns still
-//   sum to exactly 100, so the six rows carry onp: null, same rule as the
-//   pre-formation swathe of the 1996 drill.
+//   one_nation column is blank on every in-window wave and the columns
+//   still sum to exactly 100, so all rows carry onp: null, same rule as
+//   the pre-formation swathe of the 1996 drill.
+//
+//   Greens — Newspoll printed no separate Greens column this term: the
+//   greens cell is blank on every wave except five of the six campaign
+//   waves (1996-01-21 prints it blank too — sub-threshold — and its row
+//   still sums exactly 100). Blank is null-with-zero-contribution, never
+//   an error (auspol-historical-csv-qa); only lnp/alp/oth are hard-checked.
 //
 //   Leadership — three opposition leaders this term (two-name eraPick
 //   would misread it): Hewson (spilled 1994-05-23), Downer (resigned
-//   1995-01-30), Howard. The sparse Columns partition the window cleanly:
+//   1995-01-30), Howard. The sparse columns partition the window cleanly:
 //   satisfaction 30 Hewson + 18 Downer + 29 Howard = 77/77, and PPM
 //   30 + 14 + 30 = 74/74, all against Keating (77/77 · 74/74). eraPick is
 //   chronological ["john_hewson","alexander_downer","john_howard"].
@@ -45,11 +56,6 @@
 // cycleApproval rows ({date,firm,pmNet,oppNet,pmPpm,oppPpm}) with nulls where
 // a wave didn't ask. Re-runs are no-ops (dedupe on date+firm). Dry-run by
 // default; --apply writes data/polls.json.
-//
-// Note on blanks: 1996-01-21 prints greens blank too (sub-threshold, the row
-// still sums to exactly 100) — grn and onp may both be null on a kept row,
-// which the cycle renderer already tolerates (null onp exists in the 1996
-// cycle's pre-formation swathe).
 import { readFileSync, writeFileSync } from "node:fs";
 
 const APPLY = process.argv.includes("--apply");
@@ -73,15 +79,15 @@ const appr = [];
 const dropped = [];
 
 // ---- Newspoll VI: date,coalition,alp,greens,others,democrats,one_nation ---
-//      onp is null everywhere this term (the party didn't exist yet); the
-//      2PP join keeps only the six 1996-campaign waves whose pair is printed
+//      onp is null everywhere this term (the party didn't exist yet); only
+//      six 1996-campaign waves print a 2PP pair — the other 71 rows keep
+//      null tpp rather than being dropped (see the header note)
 const tppNp = Object.fromEntries(
   parseCsv("data/newspoll-two-party-preferred.csv").slice(1)
     .map((c) => [c[0], { tpp_alp: pct(c[1]), tpp_lnp: pct(c[2]) }]));
 for (const c of parseCsv("data/newspoll-primary-vote.csv").slice(1)) {
   if (!inTerm(c[0])) continue;
-  const t = tppNp[c[0]];
-  if (!t) { dropped.push(`Newspoll ${c[0]} — no matching 2PP row`); continue; }
+  const t = tppNp[c[0]] ?? { tpp_alp: null, tpp_lnp: null };
   vi.push({ date: c[0], firm: "Newspoll",
     lnp: pct(c[1]), alp: pct(c[2]), grn: pct(c[3]),
     onp: pct(c[6]), oth: num(c[4]) + num(c[5]),
@@ -128,13 +134,17 @@ D.elections.e1993 ||= { date: TERM[0],
 // ---- guards: never insert a dud row ---------------------------------------
 const guard = [];
 for (const r of vi) {
-  if (["lnp", "alp", "oth", "tpp_lnp", "tpp_alp"].some((k) => r[k] == null || Number.isNaN(r[k])))
+  if (["lnp", "alp", "oth"].some((k) => r[k] == null || Number.isNaN(r[k])))
     { guard.push(`${r.date} ${r.firm} — null/NaN share`); continue; }
   const sum = r.lnp + r.alp + (r.grn ?? 0) + (r.onp ?? 0) + r.oth;
-  // Newspoll is the only house and its kept rows print exactly 100
+  // Newspoll is the only house and its rows print exactly 100
   if (r.firm !== "Election" && (sum < 85 || sum > 100.5))
     { guard.push(`${r.date} ${r.firm} — shares sum ${sum}`); continue; }
-  if (Math.abs(r.tpp_lnp + r.tpp_alp - 100) > 0.6)
+  // a 2PP arrives whole or not at all: half a pair is a parse bug, and a
+  // printed pair sums to 100 within Newspoll's strict rounding
+  if ((r.tpp_lnp == null) !== (r.tpp_alp == null))
+    { guard.push(`${r.date} ${r.firm} — half a 2PP pair`); continue; }
+  if (r.tpp_lnp != null && Math.abs(r.tpp_lnp + r.tpp_alp - 100) > 0.6)
     { guard.push(`${r.date} ${r.firm} — 2PP sums ${r.tpp_lnp + r.tpp_alp}`); continue; }
 }
 for (const r of appr)
@@ -167,7 +177,9 @@ const span = (list) => list.length
 console.log(`mode: ${APPLY ? "APPLY" : "dry-run"}`);
 console.log(`VI:  existing ${viBefore} · candidates ${vi.length} · new ${viFresh.length} (${fmt(viFresh)}) · span ${span(viFresh)} · cyclePolls.${CYCLE_KEY} total ${D.cyclePolls[CYCLE_KEY].length}`);
 console.log(`appr: existing ${apBefore} · candidates ${appr.length} · new ${apFresh.length} (${fmt(apFresh)}) · span ${span(apFresh)} · cycleApproval.${APPR_KEY} total ${D.cycleApproval[APPR_KEY].length}`);
-console.log(`null onp: ${viFresh.filter((r) => r.onp == null).length} of ${viFresh.length} fresh (party not yet formed)`);
+console.log(`null tpp: ${D.cyclePolls[CYCLE_KEY].filter((r) => r.tpp_alp == null).length} of ${D.cyclePolls[CYCLE_KEY].length} in cycle (2PP unprinted inter-election; campaign waves carry the printed pair)`);
+console.log(`null onp: ${D.cyclePolls[CYCLE_KEY].filter((r) => r.onp == null).length} of ${D.cyclePolls[CYCLE_KEY].length} in cycle (party not yet formed)`);
+console.log(`null grn: ${D.cyclePolls[CYCLE_KEY].filter((r) => r.grn == null).length} of ${D.cyclePolls[CYCLE_KEY].length} in cycle (no separate Greens column printed)`);
 console.log(`null oppNet: ${apFresh.filter((r) => r.oppNet == null).length} of ${apFresh.length} fresh · null ppm: ${apFresh.filter((r) => r.pmPpm == null).length}`);
 if (dropped.length) console.log(`dropped: ${dropped.join("; ")}`);
 if (APPLY && (viFresh.length || apFresh.length || !process.env.NO_WRITE))
