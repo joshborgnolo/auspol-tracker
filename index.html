@@ -12441,11 +12441,13 @@ function CycleChart({
     ...e,
     x: cycEventMonth(e.date, solo.eDate)
   })) : [];
-  /* Hanson's control belongs to HER cycle alone: no past term rated her, so
-     the tickbox is offered whenever the current term is on the board, in any
-     combination of the other lines, and disappears only when 2025 is hidden –
-     never leaving her line up with no control in sight to switch it off. */
-  const hanCtl = M.han && hanAvail && hanCycle && !hidden.has(hanCycle.year);
+  /* Hanson's tickbox follows her data, not the board: her series belongs to
+     the current term, but she is a person-toggle, not a property of the 2025
+     chip – she is the one line that can stand alone with every cycle chip
+     off, since no past term holds a counterpart to align her against. The
+     control is offered whenever her readings exist, including when 2025
+     itself is hidden. */
+  const hanCtl = M.han && hanAvail && hanCycle;
   const built = shown.flatMap(c => {
     const base = cycBase(c, M.key);
     /* An office that changed hands mid-term draws one run per person, in the
