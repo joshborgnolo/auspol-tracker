@@ -1518,8 +1518,11 @@ function MethodNote({ onInfo }) {
     <footer className="method method-slim">
       <ReportError onInfo={onInfo} />
       <div className="disclaimer">
-        Unofficial aggregate of published national polling. Aggregate figures are estimates only.
-        Full archives <a href="https://auspoltracker.com/archives">here</a>.
+        auspol tracker is an unofficial aggregate of published national polling. Best efforts are
+        made to make the aggregate figures transparent, trustworthy, statistically sound, and
+        informative, but they are, in the end, estimates only. Federal polling archives I’ve
+        located are stored <a href="https://auspoltracker.com/archives">here</a> for safekeeping
+        and posterity.
       </div>
     </footer>
   );
