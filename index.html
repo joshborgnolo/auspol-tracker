@@ -2932,6 +2932,23 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   .ap-head-side .ap-count { display: inline; margin-left: auto; }
   .ap-bar-end .ap-count { display: none; }
 }
+/* Jump-to links above the archive table: carry the visitor past the rows
+   to the two diagnostic panels below it. The pill repeats .ap-export's
+   shape on a separate class because export goes display:none ≤1000px (a
+   desktop affordance) – the jumps matter most on a phone's long page. */
+.ap-jumps { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.ap-jump {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
+  padding: 5px 13px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  color: var(--ink-2); cursor: pointer; white-space: nowrap; align-self: center;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.ap-jump:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
+.ap-jump svg { stroke: currentColor; }
+/* jump targets get .next-polls' 72px clearance so the sticky tabs never
+   swallow a panel title */
+.ap-var, .ap-lean { scroll-margin-top: 72px; }
 /* ---------- archive filter bar ---------- */
 /* One row at rest. Search stays visible because it cuts across every facet;
    everything else is a button that names its own state and opens a panel of
@@ -14113,7 +14130,8 @@ function VariancePanel({
   });
   const unitNote = facet === "leadership" ? "net approval points" : "percentage points";
   return /*#__PURE__*/React.createElement("section", {
-    className: "ap-var"
+    className: "ap-var",
+    id: "poll-disagreement"
   }, /*#__PURE__*/React.createElement("div", {
     className: "ap-var-head"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
@@ -14317,7 +14335,8 @@ function HouseLeanPanel({
     v: r.all[r.all.length - 1].y
   }));
   return /*#__PURE__*/React.createElement("section", {
-    className: "ap-lean"
+    className: "ap-lean",
+    id: "house-lean"
   }, /*#__PURE__*/React.createElement("div", {
     className: "ap-var-head"
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h3", {
@@ -14584,6 +14603,27 @@ function AllPollsView({
     if (f !== "twopp") {
       setLead("all");
       setMeasure("lnp");
+    }
+  };
+  const jumpTo = id => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({
+      behavior: "smooth",
+      block: "start"
+    });
+  };
+  /* house lean only mounts on the 2PP facet – from another facet the jump
+     switches views first, and the scroll has to wait on the remount */
+  const leanJump = useRef(false);
+  React.useEffect(() => {
+    if (!leanJump.current || facet !== "twopp") return;
+    leanJump.current = false;
+    jumpTo("house-lean");
+  }, [facet]);
+  const jumpToLean = () => {
+    if (facet === "twopp") jumpTo("house-lean");else {
+      leanJump.current = true;
+      onFacet("twopp");
     }
   };
   const onSort = key => setSort(s => s.key === key ? {
@@ -14911,6 +14951,40 @@ function AllPollsView({
   }), /*#__PURE__*/React.createElement("span", {
     className: "ap-count"
   }, /*#__PURE__*/React.createElement("strong", null, sorted.length), sorted.length !== total ? " of " + total : "", " ", sorted.length === 1 ? "poll" : "polls"))), /*#__PURE__*/React.createElement("div", {
+    className: "ap-jumps"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "ap-jump",
+    onClick: () => jumpTo("poll-disagreement"),
+    title: "Scroll down to the poll disagreement panel"
+  }, /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    width: "14",
+    height: "14",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M12 4v13M12 17l-5-5M12 17l5-5"
+  })), "Jump to poll disagreement"), /*#__PURE__*/React.createElement("button", {
+    className: "ap-jump",
+    onClick: jumpToLean,
+    title: "Scroll down to the house lean chart"
+  }, /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 24 24",
+    width: "14",
+    height: "14",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M12 4v13M12 17l-5-5M12 17l5-5"
+  })), "Jump to house lean")), /*#__PURE__*/React.createElement("div", {
     className: "ap-bar"
   }, /*#__PURE__*/React.createElement("div", {
     className: "ap-search"

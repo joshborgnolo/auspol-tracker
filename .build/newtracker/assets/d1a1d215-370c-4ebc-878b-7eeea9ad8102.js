@@ -2271,7 +2271,7 @@ function VariancePanel({ facet, rangeId }) {
   const unitNote = facet === "leadership" ? "net approval points" : "percentage points";
 
   return (
-    <section className="ap-var">
+    <section className="ap-var" id="poll-disagreement">
       <div className="ap-var-head">
         <div>
           <h3 className="ap-var-title">Poll disagreement</h3>
@@ -2430,7 +2430,7 @@ function HouseLeanPanel({ rangeId }) {
   const latest = rows.map((r) => ({ firm: r.firm, color: r.color, v: r.all[r.all.length - 1].y }));
 
   return (
-    <section className="ap-lean">
+    <section className="ap-lean" id="house-lean">
       <div className="ap-var-head">
         <div>
           <h3 className="ap-var-title">House lean</h3>
@@ -2602,6 +2602,23 @@ function AllPollsView({ focus, onBack, backLabel }) {
     // the matchup/ahead pair describes the 2PP lead column – it is hidden
     // outside that facet, so its filter must not keep biting invisibly
     if (f !== "twopp") { setLead("all"); setMeasure("lnp"); }
+  };
+
+  const jumpTo = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+  /* house lean only mounts on the 2PP facet – from another facet the jump
+     switches views first, and the scroll has to wait on the remount */
+  const leanJump = useRef(false);
+  React.useEffect(() => {
+    if (!leanJump.current || facet !== "twopp") return;
+    leanJump.current = false;
+    jumpTo("house-lean");
+  }, [facet]);
+  const jumpToLean = () => {
+    if (facet === "twopp") jumpTo("house-lean");
+    else { leanJump.current = true; onFacet("twopp"); }
   };
 
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
@@ -2864,6 +2881,25 @@ function AllPollsView({ focus, onBack, backLabel }) {
             <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + total : ""} {sorted.length === 1 ? "poll" : "polls"}
           </span>
         </div>
+      </div>
+
+      <div className="ap-jumps">
+        <button className="ap-jump" onClick={() => jumpTo("poll-disagreement")}
+                title="Scroll down to the poll disagreement panel">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 4v13M12 17l-5-5M12 17l5-5"></path>
+          </svg>
+          Jump to poll disagreement
+        </button>
+        <button className="ap-jump" onClick={jumpToLean}
+                title="Scroll down to the house lean chart">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 4v13M12 17l-5-5M12 17l5-5"></path>
+          </svg>
+          Jump to house lean
+        </button>
       </div>
 
       <div className="ap-bar">

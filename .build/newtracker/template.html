@@ -2833,6 +2833,23 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   .ap-head-side .ap-count { display: inline; margin-left: auto; }
   .ap-bar-end .ap-count { display: none; }
 }
+/* Jump-to links above the archive table: carry the visitor past the rows
+   to the two diagnostic panels below it. The pill repeats .ap-export's
+   shape on a separate class because export goes display:none ≤1000px (a
+   desktop affordance) – the jumps matter most on a phone's long page. */
+.ap-jumps { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.ap-jump {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
+  padding: 5px 13px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  color: var(--ink-2); cursor: pointer; white-space: nowrap; align-self: center;
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.ap-jump:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
+.ap-jump svg { stroke: currentColor; }
+/* jump targets get .next-polls' 72px clearance so the sticky tabs never
+   swallow a panel title */
+.ap-var, .ap-lean { scroll-margin-top: 72px; }
 /* ---------- archive filter bar ---------- */
 /* One row at rest. Search stays visible because it cuts across every facet;
    everything else is a button that names its own state and opens a panel of
