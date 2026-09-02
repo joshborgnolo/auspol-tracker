@@ -308,6 +308,19 @@ const raceLine = (v) => {
        : `Neither side leads: ${v.alp2pp}\u2013${v.lnp2pp}`;
 };
 
+/* "Set against the last N" in the tagline / meta copy is the count of PAST
+   federal terms the tracker has cycles for, derived from the cycle-source
+   rows (one key per past term; the Now term is never among them) so a new
+   Past-cycles term renumbers the sentence on its own. Spelled out to twenty
+   – at ~3-yearly elections the digit fallback is decades away. */
+const CYCLE_COUNT_WORDS = ["zero","one","two","three","four","five","six","seven","eight","nine","ten",
+                           "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen",
+                           "eighteen","nineteen","twenty"];
+function pastCycleWord() {
+  const n = Object.keys(JSON.parse(fs.readFileSync(A("cycle-source.json"), "utf8"))).length;
+  return CYCLE_COUNT_WORDS[n] || String(n);
+}
+
 const fav = buildFavicon();
 console.log("  favicon:", fav.note);
 console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches --bg / the pinned bar)`);
@@ -366,7 +379,7 @@ function buildStaticSummary() {
 
   return `<article class="static-summary">
       <h1>auspol tracker</h1>
-      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last five.
+      <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last ${pastCycleWord()}.
         ${raceLine(L)} two-party preferred (&#177;${L.alp2ppCi95}) &#8211; updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
         ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Next election due ${esc(L.nextElectionDue[0].toLowerCase() + L.nextElectionDue.slice(1))}.</p>
 
@@ -490,7 +503,7 @@ const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, Coalition ${cl.l
    snippet stays self-dating. Reuses the same numbers as the card alt and
    the summary below. */
 const metaDesc = `Aggregated opinion polling for the next Australian federal election, `
-  + `set against the last five. ${raceLine(cl)} two-party preferred (±${cl.alp2ppCi95}) `
+  + `set against the last ${pastCycleWord()}. ${raceLine(cl)} two-party preferred (±${cl.alp2ppCi95}) `
   + `– updated ${cl.updated} from ${cl.pollsTracked} published polls across ${cl.housesTracked} polling houses.`;
 
 /* og:site_name must NOT equal the masthead h1 text: Safari Reader skips any

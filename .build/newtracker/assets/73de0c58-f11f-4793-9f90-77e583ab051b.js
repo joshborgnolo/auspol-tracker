@@ -288,6 +288,15 @@ function Header({ isDark, onToggleTheme }) {
     const el = glyphRef.current;
     setStory({ rect: el ? el.getBoundingClientRect() : null });
   };
+  /* "The last N" counts the PAST terms in the cycle data (the Now term
+     excluded), so a new Past-cycles term renumbers the sentence on its own.
+     Spelled out to twenty; elections come ~3-yearly, so the digit fallback
+     is decades away. */
+  const TAGLINE_N = ["zero","one","two","three","four","five","six","seven","eight","nine","ten",
+                     "eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen",
+                     "eighteen","nineteen","twenty"];
+  const pastTerms = D.cycles.filter((c) => !c.current).length;
+  const pastWord = TAGLINE_N[pastTerms] || String(pastTerms);
 
   return (
     <header className="site-head">
@@ -309,7 +318,7 @@ function Header({ isDark, onToggleTheme }) {
           </button>
           <span className="wm-sr">– Australian federal polling</span>
         </h1>
-        <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last five.</p>
+        <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last {pastWord}.</p>
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot " + fresh.state}></span>
           Updated {D.latest.published} · {D.latest.pollsTracked} polls
