@@ -1125,10 +1125,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               in a good many seats the final two are not Labor and the Coalition
               and "the 2PP" is doing less work than a single headline implies.
               These were previously a bare tab you had to press to find out
-              what was behind it; the number is the reason to press it. Heads
-              the control column on a laptop - the toggles sit at its foot,
-              in the chartbar - and sits above the implied-2PP
-              switch. */}
+              what was behind it; the number is the reason to press it. This
+              and the compare switch below ride AT the column foot with the
+              chartbar toggles on a laptop - the pill's margin-top:auto sinks
+              the whole group level with the interval strip, one block of
+              controls rather than controls scattered down the column. */}
           {otherContests.length > 0 && (
             <div className="hero-alt">
               <span className="ha-lab">Switch 2PP</span>
