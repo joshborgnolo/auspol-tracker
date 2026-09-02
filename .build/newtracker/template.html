@@ -3531,23 +3531,27 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   .poll-table.archive .pollster-method { font-size: 10px; }
 }
 
-/* tile band – a rhombille "stacked cubes" mosaic closing the page: each cube
-   is three rhombi in pastel blues with an ivory grout stroke, and every face
-   carries five fine tin-glaze hairlines brushing in its own plane direction
-   (down-right / vertical / down-left), like painted delftware. One repeating
-   SVG tile (207.84×360, four cubes drawn per repeat); the tiles breathe in
-   and out through a long eased melt of colour-mixed --bg stops (no straight
-   fade), and on dark the tile image is multiplied down, not recoloured. */
+/* tile band – a fractal rhombille "stacked cubes" mosaic closing the page.
+   The same SVG tile paints twice: base cubes at full scale, and a third-scale
+   copy revealed by a hexagon mask only inside two cubes per repeat, so those
+   cubes resolve into nine ⅓-scale cubes (the fine lattice's vertices land
+   exactly on the big hexagons' corners, keeping the sub-cubes whole). Faces
+   are pastel blues with ivory grout, five tin-glaze hairlines brushing each
+   face's plane, and a long eased melt of colour-mixed --bg stops breathes the
+   tiles in and out; on dark both layers are multiplied down, not recoloured.
+   The art lives in --tile-art so both scales reuse one data-uri payload. */
 .tile-band {
   height: 460px;
   margin-top: 80px;
   position: relative;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='207.84' height='360' viewBox='0 0 207.84 360'%3E%3Cg stroke='%23f8f4ec' stroke-width='3' stroke-linejoin='round'%3E%3Cg fill='%23ccd9ec'%3E%3Cpath d='M0 0L103.92 60 0 120-103.92 60Z'/%3E%3Cpath d='M207.84 0L311.76 60 207.84 120 103.92 60Z'/%3E%3Cpath d='M103.92 180L207.84 240 103.92 300 0 240Z'/%3E%3Cpath d='M103.92-180L207.84-120 103.92-60 0-120Z'/%3E%3C/g%3E%3Cg fill='%23a3b8da'%3E%3Cpath d='M-103.92 60L0 120 0 240-103.92 180Z'/%3E%3Cpath d='M103.92 60L207.84 120 207.84 240 103.92 180Z'/%3E%3Cpath d='M0 240L103.92 300 103.92 420 0 360Z'/%3E%3Cpath d='M0-120L103.92-60 103.92 60 0 0Z'/%3E%3C/g%3E%3Cg fill='%238ba2cc'%3E%3Cpath d='M0 120L103.92 60 103.92 180 0 240Z'/%3E%3Cpath d='M207.84 120L311.76 60 311.76 180 207.84 240Z'/%3E%3Cpath d='M103.92 300L207.84 240 207.84 360 103.92 420Z'/%3E%3Cpath d='M103.92-60L207.84-120 207.84 0 103.92 60Z'/%3E%3C/g%3E%3C/g%3E%3Cg fill='none' stroke-opacity='.55' stroke-width='2'%3E%3Cpath stroke='%23f4f7fb' d='M-17.32 10L86.6 70M-34.64 20L69.28 80M-51.96 30L51.96 90M-69.28 40L34.64 100M-86.6 50L17.32 110M190.52 10L294.44 70M173.2 20L277.12 80M155.88 30L259.8 90M138.56 40L242.48 100M121.24 50L225.16 110M86.6 190L190.52 250M69.28 200L173.2 260M51.96 210L155.88 270M34.64 220L138.56 280M17.32 230L121.24 290M86.6-170L190.52-110M69.28-160L173.2-100M51.96-150L155.88-30M34.64-140L138.56-20M17.32-130L121.24-10'/%3E%3Cpath stroke='%23eef3fa' d='M-86.6 70V190M-69.28 80V200M-51.96 90V210M-34.64 100V220M-17.32 110V230M121.24 70V190M138.56 80V200M155.88 90V210M173.2 100V220M190.52 110V230M17.32 250V370M34.64 260V380M51.96 270V390M69.28 280V400M86.6 290V410M17.32-110V10M34.64-100V20M51.96-90V30M69.28-80V40M86.6-70V50'/%3E%3Cpath stroke='%23e3ebf8' d='M0 140L103.92 80M0 160L103.92 100M0 180L103.92 120M0 200L103.92 140M0 220L103.92 160M207.84 140L311.76 80M207.84 160L311.76 100M207.84 180L311.76 120M207.84 200L311.76 140M207.84 220L311.76 160M103.92 320L207.84 260M103.92 340L207.84 280M103.92 360L207.84 300M103.92 380L207.84 320M103.92 400L207.84 340M103.92-40L207.84-100M103.92-20L207.84-80M103.92 0L207.84-60M103.92 20L207.84-40M103.92 40L207.84-20'/%3E%3C/g%3E%3C/svg%3E") center top / 207.84px 360px repeat;
+  --tile-art: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='207.84' height='360' viewBox='0 0 207.84 360'%3E%3Cg stroke='%23f8f4ec' stroke-width='3' stroke-linejoin='round'%3E%3Cg fill='%23ccd9ec'%3E%3Cpath d='M0 0L103.92 60 0 120-103.92 60Z'/%3E%3Cpath d='M207.84 0L311.76 60 207.84 120 103.92 60Z'/%3E%3Cpath d='M103.92 180L207.84 240 103.92 300 0 240Z'/%3E%3Cpath d='M103.92-180L207.84-120 103.92-60 0-120Z'/%3E%3C/g%3E%3Cg fill='%23a3b8da'%3E%3Cpath d='M-103.92 60L0 120 0 240-103.92 180Z'/%3E%3Cpath d='M103.92 60L207.84 120 207.84 240 103.92 180Z'/%3E%3Cpath d='M0 240L103.92 300 103.92 420 0 360Z'/%3E%3Cpath d='M0-120L103.92-60 103.92 60 0 0Z'/%3E%3C/g%3E%3Cg fill='%238ba2cc'%3E%3Cpath d='M0 120L103.92 60 103.92 180 0 240Z'/%3E%3Cpath d='M207.84 120L311.76 60 311.76 180 207.84 240Z'/%3E%3Cpath d='M103.92 300L207.84 240 207.84 360 103.92 420Z'/%3E%3Cpath d='M103.92-60L207.84-120 207.84 0 103.92 60Z'/%3E%3C/g%3E%3C/g%3E%3Cg fill='none' stroke-opacity='.55' stroke-width='2'%3E%3Cpath stroke='%23f4f7fb' d='M-17.32 10L86.6 70M-34.64 20L69.28 80M-51.96 30L51.96 90M-69.28 40L34.64 100M-86.6 50L17.32 110M190.52 10L294.44 70M173.2 20L277.12 80M155.88 30L259.8 90M138.56 40L242.48 100M121.24 50L225.16 110M86.6 190L190.52 250M69.28 200L173.2 260M51.96 210L155.88 270M34.64 220L138.56 280M17.32 230L121.24 290M86.6-170L190.52-110M69.28-160L173.2-100M51.96-150L155.88-30M34.64-140L138.56-20M17.32-130L121.24-10'/%3E%3Cpath stroke='%23eef3fa' d='M-86.6 70V190M-69.28 80V200M-51.96 90V210M-34.64 100V220M-17.32 110V230M121.24 70V190M138.56 80V200M155.88 90V210M173.2 100V220M190.52 110V230M17.32 250V370M34.64 260V380M51.96 270V390M69.28 280V400M86.6 290V410M17.32-110V10M34.64-100V20M51.96-90V30M69.28-80V40M86.6-70V50'/%3E%3Cpath stroke='%23e3ebf8' d='M0 140L103.92 80M0 160L103.92 100M0 180L103.92 120M0 200L103.92 140M0 220L103.92 160M207.84 140L311.76 80M207.84 160L311.76 100M207.84 180L311.76 120M207.84 200L311.76 140M207.84 220L311.76 160M103.92 320L207.84 260M103.92 340L207.84 280M103.92 360L207.84 300M103.92 380L207.84 320M103.92 400L207.84 340M103.92-40L207.84-100M103.92-20L207.84-80M103.92 0L207.84-60M103.92 20L207.84-40M103.92 40L207.84-20'/%3E%3C/g%3E%3C/svg%3E");
+  background: var(--tile-art) center top / 207.84px 360px repeat;
 }
 .tile-band::before {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 2;
   background: linear-gradient(to bottom,
     var(--bg) 0%,
     color-mix(in oklch, var(--bg) 94%, transparent) 22%,
@@ -3561,7 +3565,17 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
     color-mix(in oklch, var(--bg) 87%, transparent) 97%,
     var(--bg) 100%);
 }
+.tile-band::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: var(--tile-art) center top / 69.28px 120px repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='207.84' height='360' viewBox='0 0 207.84 360'%3E%3Cg fill='%23fff'%3E%3Cpath d='M0 0L103.92 60 103.92 180 0 240-103.92 180-103.92 60Z'/%3E%3Cpath d='M207.84 0L311.76 60 311.76 180 207.84 240 103.92 180 103.92 60Z'/%3E%3Cpath d='M103.92 180L207.84 240 207.84 360 103.92 420 0 360 0 240Z'/%3E%3C/g%3E%3C/svg%3E") center top / 207.84px 360px repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='207.84' height='360' viewBox='0 0 207.84 360'%3E%3Cg fill='%23fff'%3E%3Cpath d='M0 0L103.92 60 103.92 180 0 240-103.92 180-103.92 60Z'/%3E%3Cpath d='M207.84 0L311.76 60 311.76 180 207.84 240 103.92 180 103.92 60Z'/%3E%3Cpath d='M103.92 180L207.84 240 207.84 360 103.92 420 0 360 0 240Z'/%3E%3C/g%3E%3C/svg%3E") center top / 207.84px 360px repeat;
+}
 body.dark .tile-band { background-color: #6f6f6f; background-blend-mode: multiply; }
+body.dark .tile-band::after { background-color: #6f6f6f; background-blend-mode: multiply; }
 @media (max-width: 640px) {
   .tile-band { height: 320px; margin-top: 56px; }
 }
