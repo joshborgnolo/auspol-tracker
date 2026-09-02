@@ -201,6 +201,10 @@
   /* approval bar tints (theme-aware) */
   --appr-app-bg: oklch(0.62 0.10 150 / 0.22);
   --appr-dis-bg: oklch(0.60 0.13 28 / 0.18);
+  /* house-lean chart ground: the half of the chart each major party's side of
+     zero occupies – Labor red above, Coalition blue below */
+  --lean-alp-bg: oklch(0.55 0.150 27 / 0.08);
+  --lean-lnp-bg: oklch(0.50 0.095 250 / 0.09);
   --tip-shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
   /* shared frosted-glass material – one recipe for every floating readout,
      pill toggle and the pinned nav, so translucency reads as one language.
@@ -261,6 +265,8 @@ body.dark {
   --tip-shadow: 0 1px 2px oklch(0 0 0 / 0.35), 0 10px 30px oklch(0 0 0 / 0.50);
   --appr-app-bg: oklch(0.72 0.13 152 / 0.26);
   --appr-dis-bg: oklch(0.66 0.16 28 / 0.24);
+  --lean-alp-bg: oklch(0.660 0.165 28 / 0.14);
+  --lean-lnp-bg: oklch(0.680 0.130 252 / 0.14);
   /* dark glass: a touch more opaque + more saturation so lines read through it */
   --glass-bg: color-mix(in oklch, var(--surface) 62%, transparent);
   --glass-border: color-mix(in oklch, var(--line) 65%, transparent);
@@ -3346,6 +3352,12 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   border-top: 1px solid var(--line);
   padding: 24px 0 0; margin: 30px 0 0;
 }
+/* …but the chart's GROUND carries the party colours the lines refuse: the
+   half above zero is Labor's, the half below the Coalition's. The fills are
+   theme vars so dark mode lifts them the way it lifts the marks themselves. */
+.lean-band-alp { fill: var(--lean-alp-bg); }
+.lean-band-lnp { fill: var(--lean-lnp-bg); }
+.lean-band-alp, .lean-band-lnp { transition: fill .35s ease; }
 
 /* archive ledger flows with the page; header pins just below the tab bar.
    overflow must stay visible here – any overflow on the wrapper turns it into
@@ -5810,7 +5822,10 @@ function straightPath(pts, sx, sy) {
  *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
  *           labelColor the text (defaults to --ink-3 – see the label below)
  *  fmt:     (y) => string  for tooltip/axis
- *  bands:   [{y0,y1,color}]  shaded horizontal regions (optional)
+ *  bands:   [{y0,y1,color,className?}]  shaded horizontal regions (optional). `className`
+ *           lands on the rect so CSS can theme the fill – same contract as the
+ *           areas below, and how the house-lean panel's red/blue ground is
+ *           themed without passing a colour through the component
  *  areas:   [{id,color,opacity?,smooth?,edge?,clipX?,points:[{x,y0,y1}]}]  shaded
  *           region whose edges VARY with x – e.g. a sampling-error floor that
  *           moves as the polls behind it change size, or the interval around a
@@ -6670,6 +6685,7 @@ function TrendChart(props) {
     }));
   })), bands.map((b, i) => /*#__PURE__*/React.createElement("rect", {
     key: "b" + i,
+    className: b.className,
     x: pad.l,
     y: sy(b.y1),
     width: W - pad.l - pad.r,
@@ -14215,7 +14231,10 @@ function VariancePanel({
    categorical ladder of oklch slots, held off every party hue (ALP 27,
    ONP/OTH 58-70, GRN 150, LNP 250), assigned alphabetically so a new build
    can't reshuffle them under the reader. A house not yet catalogued falls
-   back to a deterministic name-hash slot. */
+   back to a deterministic name-hash slot. The party colours the lines give
+   up are spent on the GROUND instead – the chart's halves carry the ALP/LNP
+   hues as a faint wash (lean-band-*, themed in template.html) so which side
+   of zero a house walks on never needs reading off the axis. */
 const HOUSE_LEAN_COLOURS = {
   "DemosAU": "oklch(0.63 0.145 90)",
   "Essential": "oklch(0.63 0.145 110)",
@@ -14349,6 +14368,15 @@ function HouseLeanPanel({
       b: 40
     },
     xTicks: buildXTicks(xDomain[0], xDomain[1]),
+    bands: [{
+      y0: 0,
+      y1: domain[1],
+      className: "lean-band-alp"
+    }, {
+      y0: domain[0],
+      y1: 0,
+      className: "lean-band-lnp"
+    }],
     refLines: [{
       y: 0,
       color: "var(--ink-3)"
@@ -14356,11 +14384,11 @@ function HouseLeanPanel({
     series: chartSeries,
     spine: spine,
     tooltipTitle: i => monthLabelFull(spineYm[i]),
-    ariaLabel: "Pollster house lean over time – how far each pollster sits from the cross-house consensus",
+    ariaLabel: "Pollster house lean over time – how far each pollster sits from the cross-house consensus; the ground above zero is tinted Labor red, below zero Coalition blue",
     fmt: v => (v > 0 ? "+" : "") + v.toFixed(1)
   }), /*#__PURE__*/React.createElement("p", {
     className: "table-hint ap-var-note"
-  }, "Above zero leans to Labor on the classic two-party, below zero to the Coalition. Each point reads the lean as of that month, with the 90-day half-life on the evidence, so a house\u2019s current method outranks its history; the All-polls table\u2019s House-effect column instead pools each pollster\u2019s whole history into one standing figure, which is why its numbers won\u2019t match the right-hand edge here."));
+  }, "Above zero \u2013 the red ground \u2013 leans to Labor on the classic two-party, the blue below it to the Coalition. Each point reads the lean as of that month, with the 90-day half-life on the evidence, so a house\u2019s current method outranks its history; the All-polls table\u2019s House-effect column instead pools each pollster\u2019s whole history into one standing figure, which is why its numbers won\u2019t match the right-hand edge here."));
 }
 function AllPollsView({
   focus,

@@ -2370,7 +2370,10 @@ function VariancePanel({ facet, rangeId }) {
    categorical ladder of oklch slots, held off every party hue (ALP 27,
    ONP/OTH 58-70, GRN 150, LNP 250), assigned alphabetically so a new build
    can't reshuffle them under the reader. A house not yet catalogued falls
-   back to a deterministic name-hash slot. */
+   back to a deterministic name-hash slot. The party colours the lines give
+   up are spent on the GROUND instead – the chart's halves carry the ALP/LNP
+   hues as a faint wash (lean-band-*, themed in template.html) so which side
+   of zero a house walks on never needs reading off the axis. */
 const HOUSE_LEAN_COLOURS = {
   "DemosAU":            "oklch(0.63 0.145 90)",
   "Essential":          "oklch(0.63 0.145 110)",
@@ -2464,15 +2467,20 @@ function HouseLeanPanel({ rangeId }) {
         height={narrow ? 500 : 300} xDomain={xDomain} yDomain={domain} yTicks={ticks}
         unit="pp" axisFont={narrow ? 28 : 15} pad={{ l: 54, r: 20, t: 18, b: 40 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        bands={[
+          { y0: 0, y1: domain[1], className: "lean-band-alp" },
+          { y0: domain[0], y1: 0, className: "lean-band-lnp" },
+        ]}
         refLines={[{ y: 0, color: "var(--ink-3)" }]}
         series={chartSeries} spine={spine}
         tooltipTitle={(i) => monthLabelFull(spineYm[i])}
-        ariaLabel={"Pollster house lean over time – how far each pollster sits from the cross-house consensus"}
+        ariaLabel={"Pollster house lean over time – how far each pollster sits from the cross-house consensus; the ground above zero is tinted Labor red, below zero Coalition blue"}
         fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(1)}
       />
 
       <p className="table-hint ap-var-note">
-        Above zero leans to Labor on the classic two-party, below zero to the Coalition. Each
+        Above zero – the red ground – leans to Labor on the classic two-party, the blue below
+        it to the Coalition. Each
         point reads the lean as of that month, with the 90-day half-life on the evidence, so a
         house’s current method outranks its history; the All-polls table’s House-effect column
         instead pools each pollster’s whole history into one standing figure, which is why its

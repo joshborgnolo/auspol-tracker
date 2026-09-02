@@ -92,7 +92,10 @@ function straightPath(pts, sx, sy) {
  *  refLines:[{y,label?,color?,labelColor?,align?}]  color paints the hairline,
  *           labelColor the text (defaults to --ink-3 – see the label below)
  *  fmt:     (y) => string  for tooltip/axis
- *  bands:   [{y0,y1,color}]  shaded horizontal regions (optional)
+ *  bands:   [{y0,y1,color,className?}]  shaded horizontal regions (optional). `className`
+ *           lands on the rect so CSS can theme the fill – same contract as the
+ *           areas below, and how the house-lean panel's red/blue ground is
+ *           themed without passing a colour through the component
  *  areas:   [{id,color,opacity?,smooth?,edge?,clipX?,points:[{x,y0,y1}]}]  shaded
  *           region whose edges VARY with x – e.g. a sampling-error floor that
  *           moves as the polls behind it change size, or the interval around a
@@ -760,7 +763,7 @@ function TrendChart(props) {
         </defs>
         {/* shaded bands */}
         {bands.map((b, i) => (
-          <rect key={"b" + i} x={pad.l} y={sy(b.y1)} width={W - pad.l - pad.r}
+          <rect key={"b" + i} className={b.className} x={pad.l} y={sy(b.y1)} width={W - pad.l - pad.r}
                 height={Math.abs(sy(b.y0) - sy(b.y1))} fill={b.color} />
         ))}
         {/* x-varying shaded areas – drawn under everything, clipped to the plot */}
