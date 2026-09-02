@@ -1,6 +1,6 @@
 ---
 name: auspol-effective-sample
-description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md. Statement caches in .build/sampleeff-src/. Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never stamped), YouGov Australia-Institute commissioned waves have no statement."
+description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md. Statement caches in .build/sampleeff-src/. Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement."
 source: auto-skill
 extracted_at: '2026-09-02T00:00:00.000Z'
 ---
@@ -132,7 +132,8 @@ Same extractor, same absent-not-zero convention: `methodUrl` carries the
 wave's APC methodology-statement LINK (distinct from the sampleEff NUMBER
 parsed out of it). Stamped by `.build/extract-sampleeff.mjs`, never by
 hand; validate.mjs check "2c2" guards it (https shape + pollster ∈
-{YouGov, Newspoll, RedBridge / Accent, RedBridge / Accent (MRP)} — only
+{YouGov, Newspoll, RedBridge / Accent, RedBridge / Accent (MRP),
+DemosAU, DemosAU (MRP)} — only
 those houses have a statement source reachable without paywall).
 
 Sources and link forms:
@@ -180,11 +181,33 @@ Sources and link forms:
   (2025 AFR-only releases, 2026-03-27, 2026-08-28) and the
   plain-"Redbridge" Australia-Institute row 2026-02-12 (commissioned
   wave — same precedent as YouGov's AI waves, which file no statement).
+- **DemosAU** (added 2026-09-02, the same day) — the ONLY leg whose
+  source is the house's own public index page:
+  demosau.com/methodology-statements/ is plain HTML, curlable with a UA
+  header, no Chrome; `legDemosau` regexes statement-PDF hrefs
+  (demosau.com/wp-content/uploads/<YYYY>/<MM>/…pdf) out of the index,
+  fetches each new one and caches pdftotext output in
+  `.build/sampleeff-src/demosau-*.txt`, then parses with the shared
+  `parseApcStatement`. Both link forms ride ONE record shape:
+  `{na:true}` statements (the MRPs) parse sample + fieldwork-end off
+  their Australian-order d/m/y dates ("13/01/26 -03/03/26") and push a
+  LINK-ONLY record (the sampleEff matcher filters `r.eff != null`; the
+  methodUrl matcher dates these n/a records onto "(MRP)" rows, ±1 day).
+  The leg's need-months widen to rows missing sampleEff OR methodUrl
+  (mirrors the YouGov leg), since post-sampleEff-era DemosAU waves
+  (2026-08-20) need only the link. Deliberately unlinked: 2025-07-06,
+  2026-01-06, 2026-02-20, 2026-07-08 (no statement on the index for the
+  wave) and the 2026-07-11 MRP — verified live 2026-09-02 that the index
+  lists only two MRP statements (OctNov-2025 report, FebMarch-2026
+  model); if a July MRP statement ever posts, the weekly
+  sampleeff-updater picks it up.
 
 Coverage: YouGov 19/22, Newspoll 17/17 (2025-07-17 → 2026-08-28: seven
 statement-page links + ten post-migration PDF links),
 RedBridge / Accent 9/16 (seven cache-derived + the two constant entries;
-the other seven stay unlinked by design as listed above).
+the other seven stay unlinked by design as listed above), DemosAU 7/12
+(seven statement PDFs incl. two of the three MRP waves; the five
+statement-less waves above stay unlinked by design).
 Status line gained a `methods` count; the extractor stamps links only
 for unstamped rows (never overwrite), ambiguity on >1 distinct href
 matches = the same error convention as sampleEff conflicts.
@@ -198,7 +221,8 @@ archive table (d1a1d215) renders MethodLink in its pollster cell above
 the tag chips; template.html styles `.pollster-method` after
 `.pollster-mode`; check-citations.mjs sweeps it (`add(p.methodUrl,
 "methodUrl")`, +36 URLs once Newspoll's 2026 waves linked, +9 more
-when the RedBridge / Accent leg landed); README data-fields bullet beside the
+when the RedBridge / Accent leg landed, +7 for the DemosAU leg → 52);
+README data-fields bullet beside the
 `sampleEff` one.
 
 ## Rules

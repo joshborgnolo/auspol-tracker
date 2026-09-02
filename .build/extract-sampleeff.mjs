@@ -31,7 +31,11 @@
 //              off essentialreport.com.au/methodology each run.
 //   DemosAU  – the methodology-statements index (already crawlable plain
 //              HTML); federal poll and MRP statement PDFs carry the same APC
-//              template row.
+//              template row. This leg also stamps `methodUrl` (the statement
+//              PDF's own URL) on every DemosAU row it can match – including
+//              "(MRP)" rows, whose statements print "n/a for MRP" for the
+//              effective size but still parse a fieldwork end; those records
+//              travel link-only (the sampleEff matcher filters eff==null).
 //   RedBridge/Accent (methodUrl only) – no network leg at all: the wave's
 //              Accent project page yields its methodology-report PDF URL
 //              only to a CLICKED document widget, and extract-redbridge.mjs
@@ -145,8 +149,6 @@ function parseApcStatement(txt) {
     const n = beforeMargin.match(/(?<![0-9±.])([0-9][0-9,]{2,})(?![\d.]*%)/);
     if (n) { eff = Number(n[1].replace(/,/g, "")); break; }
   }
-  if (eff == null) return naEff ? { na: true } : null;
-  const effN = eff;
   // raw sample: the "Sample size" table row, line-anchored so it can't be
   // confused with the effective-size row (which never sits col-1 after -layout)
   let sample = null;
@@ -178,7 +180,11 @@ function parseApcStatement(txt) {
       end = mkIso(+last[5], last[2] || last[3], day);
     }
   }
-  return { eff: effN, sample, end };
+  /* n/a ("n/a for MRP") statements carry no eff, but their sample and
+     fieldwork end are still parsed – DemosAU MRP waves link the statement
+     as methodUrl even though they never take a sampleEff. */
+  if (eff == null) return naEff ? { na: true, sample, end } : null;
+  return { eff, sample, end };
 }
 
 /* ---- leg: YouGov APC listing (News24 / Sky Pulse / Public Data) -------- */
@@ -407,9 +413,13 @@ async function legDemosau(needYms) {
     const slug = "demosau-" + title.replace(/\.pdf$/i, "").replace(/[^A-Za-z0-9]+/g, "_").slice(0, 60);
     const rec = await parsePdfAt(m[1], slug);
     if (!rec) { console.log("  warn: parse hole in DemosAU " + title.slice(0, 60)); continue; }
-    if (rec.na) { naTitles.push(title.slice(0, 60)); continue; }
-    if (!rec.end) { console.log("  warn: no fieldwork end in DemosAU " + title.slice(0, 60)); continue; }
-    out.push({ pollster: /mrp/i.test(title) ? "DemosAU (MRP)" : "DemosAU", series: "demosau", ...rec, src: title.slice(0, 70) });
+    /* n/a statements (MRP) stay in the stream as link-only records: the
+       sampleEff matcher filters eff==null out, the methodUrl matcher still
+       dates them onto "(MRP)" rows. href travels with every record – the
+       statement's own URL is the wave's methodUrl. */
+    if (rec.na) naTitles.push(title.slice(0, 60));
+    else if (!rec.end) { console.log("  warn: no fieldwork end in DemosAU " + title.slice(0, 60)); continue; }
+    out.push({ pollster: /mrp/i.test(title) ? "DemosAU (MRP)" : "DemosAU", series: "demosau", ...rec, href: m[1], src: title.slice(0, 70) });
   }
   for (const t of naTitles) console.log("  note: house marks eff-size n/a for " + t);
   return out;
@@ -441,7 +451,11 @@ const legs = [
     .filter((p) => p.pollster.startsWith("YouGov") && (p.sampleEff == null || p.methodUrl == null))
     .map((p) => p.date))])],
   ["essential", () => legEssential()],
-  ["demosau", () => legDemosau([...new Set(unstamped.filter((p) => p.pollster.startsWith("DemosAU")).map((p) => p.date.slice(0, 7)))])],
+  /* the DemosAU index pass must also cover waves that need only a
+     methodUrl (sampleEff already known) – same trick as the YouGov leg */
+  ["demosau", () => legDemosau([...new Set(D.polls
+    .filter((p) => p.pollster.startsWith("DemosAU") && (p.sampleEff == null || p.methodUrl == null))
+    .map((p) => p.date.slice(0, 7)))])],
 ];
 if (unstamped.some((p) => p.pollster === "Newspoll"))
   legs.push(["newspoll", () => legNewspoll(unstamped.filter((p) => p.pollster === "Newspoll").map((p) => (p.published || p.date).slice(0, 10)))]);
@@ -463,7 +477,8 @@ for (const r of records) {
 const stamped = [], ambiguous = [];
 let failed = 0;
 for (const p of unstamped) {
-  let cands = [...seen.values()].filter((r) => r.pollster === p.pollster && r.end && Math.abs(ddays(r.end, p.date)) <= 1);
+  // eff==null records are link-only (DemosAU n/a-for-MRP): never eff-stamp
+  let cands = [...seen.values()].filter((r) => r.eff != null && r.pollster === p.pollster && r.end && Math.abs(ddays(r.end, p.date)) <= 1);
   if (!cands.length) continue;
   let pick = null;
   if (p.pollster === "YouGov") {
@@ -498,13 +513,15 @@ for (const p of unstamped) {
 }
 
 /* methodUrl: a YouGov or Newspoll row carries its wave's APC statement
-   link, and a RedBridge/Accent row the link to its wave's Accent
-   methodology-report PDF. Same matching discipline as sampleEff (YouGov ±1
-   day, series-locked by the row's URL; Newspoll ±7 days on the statement's
-   publication date; RedBridge/Accent an exact date match on the
-   redbridge-src cache's fieldwork end), absent-not-zero, never overwritten.
-   The commissioned YouGov waves file no statement with YouGov's APC
-   listing, so they keep no link. */
+   link, a RedBridge/Accent row the link to its wave's Accent
+   methodology-report PDF, and a DemosAU row the statement's own
+   wp-content PDF off the wave's statement record. Same matching
+   discipline as sampleEff (YouGov ±1 day, series-locked by the row's URL;
+   Newspoll ±7 days on the statement's publication date; RedBridge/Accent
+   an exact date match on the redbridge-src cache's fieldwork end; DemosAU
+   ±1 day on the statement's parsed fieldwork end), absent-not-zero, never
+   overwritten. The commissioned YouGov waves file no statement with
+   YouGov's APC listing, so they keep no link. */
 let npLinks = [];
 if (D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
   const needDates = D.polls
@@ -529,6 +546,10 @@ for (const p of D.polls) {
         .map((l) => l.href))]
     : p.pollster.startsWith("RedBridge / Accent")
     ? [...new Set(accentLinks.filter((l) => l.date === p.date).map((l) => l.href))]
+    : p.pollster.startsWith("DemosAU")
+    ? [...new Set(records
+        .filter((r) => r.pollster === p.pollster && r.end && Math.abs(ddays(r.end, p.date)) <= 1)
+        .map((r) => r.href))]
     : [];
   if (!hrefs.length) continue;
   if (hrefs.length > 1) { errors.push(`ambiguity: ${p.date} ${p.pollster} methodUrl ${hrefs.join(" vs ")}`); continue; }

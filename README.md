@@ -70,11 +70,16 @@ new and worth looking at.
   sitemap.xml that froze in the migration), and RedBridge / Accent rows the
   wave's methodology-report PDF on usrfiles.com (re-read from the RedBridge
   extractor's own caches — an Accent project page only yields that URL to a
-  clicked document widget; the May 2026 MRP wave included). Absent, not
-  zero: only YouGov, Newspoll and RedBridge / Accent have a statement
-  source to link, commissioned YouGov waves file none, and Accent waves
-  with no Accent project page (the 2025 AFR-only releases, Mar + Aug 2026)
-  stay unlinked. The polls tables render it beside
+  clicked document widget; the May 2026 MRP wave included), and DemosAU
+  rows the statement PDF off the house's own methodology-statements
+  index (demosau.com — plain HTML, no rendering; the two filed MRP
+  statements link too, though they print "n/a for MRP" for effective
+  sample). Absent, not zero: only YouGov, Newspoll, RedBridge / Accent
+  and DemosAU have a statement source to link, commissioned YouGov waves
+  file none, Accent waves with no Accent project page (the 2025 AFR-only
+  releases, Mar + Aug 2026) stay unlinked, and so do DemosAU waves with
+  no statement on the index (2025-07-06, Jan/Feb/Jul-08 2026, and the
+  Jul 2026 MRP — never filed). The polls tables render it beside
   the pollster name as "APC methodology".
 
 ## Layout
