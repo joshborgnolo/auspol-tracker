@@ -383,6 +383,19 @@ function Header({ isDark, onToggleTheme }) {
    of the row, so the whole figure keeps an ordinary text baseline and the
    clipped digit boxes align to its top edge. */
 const ROLL_DIGITS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+/* Optical padding for a .roll-sep next to each digit, em units. Crimson's
+   digits are proportional (a 1 is 0.371em against 0.493 for the rest) and the
+   point is a bare 0.187em, so a fixed seam reads wide against the 1's bare
+   stem and tight against the wide figures; and a reel's overflow:hidden box
+   is sized by its narrowest glyph, so of the reel's own advance there is
+   nothing visible for padding to buy back. Values retire the slack each digit
+   leaves unused. */
+const ROLL_PAD = { "0": 0.03, "2": 0.03, "3": 0.03, "4": 0.03, "5": 0.03,
+                   "6": 0.03, "7": 0.05, "8": 0.03, "9": 0.03 };
+const SEP_PAD = 0.03;
+function sepPad(ch) {
+  return /[0-9]/.test(ch) ? (ROLL_PAD[ch] ?? 0.03) : SEP_PAD;
+}
 window.RollNum = RollNum;      // the hero's Delta reads it off the window (see Delta)
 function RollNum({ value, className, style, spinIn }) {
   const text = String(value);
@@ -418,7 +431,15 @@ function RollNum({ value, className, style, spinIn }) {
             </span>
           </span>
         ) : (
-          <span className="roll-sep" key={n - 1 - i} aria-hidden="true">{ch}</span>
+          <span
+            className="roll-sep"
+            key={n - 1 - i}
+            aria-hidden="true"
+            style={{
+              marginLeft: sepPad(text[i - 1] || "") + "em",
+              marginRight: sepPad(text[i + 1] || "") + "em",
+            }}
+          >{ch}</span>
         )
       ))}
     </span>
@@ -606,11 +627,11 @@ function HeroGauge({ a, ci, color, aName, bName, sepRef }) {
         {overB && <span className="hg-over hg-over-b" />}
         <span className="hg-tie" />
       </div>
-      {/* Only the tie is labelled. The names sit in the readout directly
-          above, in 62px type, and the point estimate needs no mark of its own:
-          a symmetric interval puts it at the span's midpoint by construction,
-          so a tick there restated the bar while cutting it in half. */}
-      <div className="hg-foot"><span className="hg-tie-lab">tie</span></div>
+      {/* No labels on the track: the names sit in the readout directly
+          above, and the point estimate needs no mark of its own - a symmetric
+          interval puts it at the span's midpoint by construction, so a tick
+          there restated the bar while cutting it in half. The lead itself is
+          the first line under the gauge (hero-lead, in Hero). */}
     </div>
   );
 }
@@ -1015,19 +1036,19 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             <HeroGauge a={latest.a} ci={unc.ci95} color={lead >= 0 ? colA : colB}
                        aName={m.a.name} bName={m.b.name} sepRef={sepRef} />
           )}
-          {/* The lead shares a line with how it was made and how well it is
-              known, and the pair reads on one scale: the lead is a - b, so
-              the interval beside it is the lead-scale 95% interval, twice
-              the share-scale ci95 the gauge and band use (a - b = 2a - 100
-              quadruples the variance, so the half-width doubles). It covers
-              how far the polls in the window disagree plus their sampling
-              error; it cannot cover bias shared across the industry, which no
-              aggregate can measure about itself. Not keyed on the matchup,
-              for the same reason the readout above isn't - the margin is a
-              figure that travels between the two questions, so it rolls
-              rather than being replaced. The readout-in fade lives here, on
-              the line whose words genuinely change. */}
-          <div className="hero-interval">
+          {/* The lead and the interval around it read on one scale: the lead
+              is a - b, so the figure beside it is the lead-scale 95%
+              interval, twice the share-scale ci95 the gauge and band use
+              (a - b = 2a - 100 quadruples the variance, so the half-width
+              doubles). It covers how far the polls in the window disagree
+              plus their sampling error; it cannot cover bias shared across
+              the industry, which no aggregate can measure about itself. Not
+              keyed on the matchup, for the same reason the readout above
+              isn't - the margin is a figure that travels between the two
+              questions, so it rolls rather than being replaced. The
+              readout-in fade lives here, on the line whose words genuinely
+              change. */}
+          <div className="hero-lead">
             <span className="lead-tag">
               {leadName} leads by <RollNum value={Math.abs(lead).toFixed(1)} spinIn />
               {unc ? (
@@ -1045,6 +1066,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                 </>
               ) : " pts"}
             </span>
+          </div>
+          {/* How the lead was made and how much evidence sits under it: the
+              interval's name, the method, and the window both describe. */}
+          <div className="hero-interval">
             {unc && (
               /* One more route to the margin's definition: the glossary
                  files "95% interval" as a synonym waypoint of margin of
@@ -1074,6 +1099,17 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                                          "two-party preferred")}>
               {adjusted ? "Weighted aggregate" : "Monthly average"}
             </button>
+            {/* The window the interval describes, in plain terms: the count
+                and span draw on unc, which exists only when an interval does,
+                so the clause rides on the same condition. Its separator dot
+                comes free from the strip's CSS - it directly follows the
+                .hi-term method button, so the ::before rule hosts it. */}
+            {unc && (
+              <span className="hi-count">
+                {unc.n} poll{unc.n === 1 ? "" : "s"} in{" "}
+                {D.latest.method.windowDays} days
+              </span>
+            )}
             {!adjusted && <span className="eyebrow-warn">Limited data</span>}
           </div>
           <div className="hero-sub" ref={subRef}>
@@ -1095,20 +1131,6 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                 </span>
               )}
             </span>
-            {/* The window the interval describes, in plain terms: the count
-                and span draw on unc, which exists only when an interval does,
-                so the clause rides on the same condition. */}
-            {unc && (
-              <span className="hero-sub-count" ref={subCountRef}>
-                {/* The dot borrows the strip's .hi-sep: this line's text is
-                    13px, and a bare text-node bullet would inherit that and
-                    read 1px bigger than the interval dots on the line above -
-                    .hi-sep carries the shared 12px pin (template.html). */}
-                <span className="hi-sep" aria-hidden="true">{"• "}</span>
-                {unc.n} poll{unc.n === 1 ? "" : "s"} in{" "}
-                {D.latest.method.windowDays} days
-              </span>
-            )}
           </div>
         </div>
         <div className="hero-controls">

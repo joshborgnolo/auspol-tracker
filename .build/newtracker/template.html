@@ -1011,11 +1011,11 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 /* ---- rolling figures ----
    Each digit is a reel of 0-9 in a one-em window, moved by transform alone, so
    the whole headline animates on the compositor however large the type is.
-   Tabular figures keep the columns from breathing as they pass through 1 and
-   7, and `.roll-anchor` is a zero-width invisible line of text that hands the
-   flex row an ordinary text baseline - without it the clipped digit boxes
-   would report their bottom edge as the baseline and drop the party name by a
-   fifth of a 62px em. */
+   The figure columns (tabular figures) keep the columns from breathing as they
+   pass through 1 and 7, and `.roll-anchor` is a zero-width invisible line of
+   text that hands the flex row an ordinary text baseline - without it the
+   clipped digit boxes would report their bottom edge as the baseline and drop
+   the party name by a fifth of a 62px em. */
 .roll { display: inline-flex; align-items: flex-start; line-height: 1; font-variant-numeric: tabular-nums; }
 .roll-anchor { display: block; width: 0; height: 1em; line-height: 1em; visibility: hidden; }
 .roll-d { display: block; height: 1em; overflow: hidden; }
@@ -1027,6 +1027,13 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   transition: transform .32s cubic-bezier(.4, .1, .25, 1);
 }
 .roll-reel > span, .roll-sep { display: block; height: 1em; line-height: 1em; }
+/* Crimson's 1 is 0.371em wide against the other figures' 0.493 (measured):
+   the reel slots stay tabular, but the punctuation between them re-margins
+   against whatever digit is passing, so the point drifts in under a 1's head
+   serif and back out for the wide figures instead of holding one anchorage.
+   RollNum sets the margins per neighbour; they ride the reel's curve and
+   length so figure and gap settle as one thing. */
+.roll-sep { transition: margin .32s cubic-bezier(.4, .1, .25, 1); }
 /* The reel is nine digits the reader never sees, and aria-hidden keeps them out
    of the accessibility tree – but a SELECTION doesn't consult aria, so without
    this, copying "Labor leads by 7.6 pts" would paste every digit on every reel.
@@ -1038,8 +1045,9 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    above gives its dots a wider 6px separator rhythm. The 6px row gap only
    matters between wrapped lines. */
 .hero-sub { display: flex; align-items: center; gap: 6px 3px; margin-top: 8px; flex-wrap: wrap; }
-.lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap; }
-.hero-sub-note, .hero-sub-count { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+.lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap;
+  font-variant-numeric: tabular-nums; }
+.hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
 /* the hero's subhead matches the other panels; the method label that used
    to sit beside it in small caps has moved to the interval line, where it
    reads as a clause of how the figure was made and how well it is known,
@@ -1079,11 +1087,10 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hg-over { position: absolute; top: 2px; bottom: 2px; width: 3px; background: var(--hg-cut); }
 .hg-over-a { left: 0; border-radius: 999px 0 0 999px; }
 .hg-over-b { right: 0; border-radius: 0 999px 999px 0; }
-/* Positioned on the mark, not spaced by flexbox - space-between put the word
-   at 46.7% against a tie at 49.8%, labelling a place the scale does not have. */
-.hg-foot { position: relative; height: 13px; margin-top: 6px; }
-.hg-tie-lab { position: absolute; left: 50%; transform: translateX(-50%);
-  font-size: 10.5px; font-weight: 600; color: var(--ink-3); }
+/* The first line under the gauge: the lead and the interval around it, in
+   the readout's columns rather than centred on the track - centred put the
+   words under neither the left edge of the block nor the bar's middle. */
+.hero-lead { margin-top: 8px; }
 
 /* Every junction on this row carries a dot, flanked by this column gap on
    one side and a margin (or another gap, around the bare .hi-sep) on the
@@ -1094,21 +1101,19 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hi-method { color: var(--ink-3); white-space: nowrap; }
 /* Separators hang off the END of each clause, not the start of the next: as
    a ::before they belonged to the following flex item, so a wrap carried the
-   dot down to open the next line on its own. The lead clause opens the row,
-   so it gets the dot after it too; its figures stay tabular. One exception: a
-   dot after a .hi-term button cannot live on the button's ::after - a pseudo-
-   element is inside the button's box, so it would be clickable and would pick
-   up the underline the term carries. That one dot is borrowed from the next
+   dot down to open the next line on its own. One exception: a dot after a
+   .hi-term button cannot live on the button's ::after - a pseudo-element is
+   inside the button's box, so it would be clickable and would pick up the
+   underline the term carries. That one dot is borrowed from the next
    clause's ::before instead, provided that clause is not itself a hi-term
-   button (a pseudo would sit inside ITS button box and link). When two terms
-   are directly adjacent - the adjusted-strip method + note - the JSX inserts
-   a real .hi-sep span for the dot, and both rules skip it so it stays the
-   only dot at that junction. Every emitter pins 12px: a pseudo inherits its
-   host clause's size (the 14px lead-tag) and the bare span would inherit the
-   page 16px, so an unpinned dot reads bigger than its neighbours (caught
-   live 2026-09-02). The sub-line's poll-count dot is the same problem one
-   row down - a bare text-node bullet would take .hero-sub-count's 13px and
-   sit 1px proud of these, so the JSX borrows .hi-sep there too. */
+   button (a pseudo would sit inside ITS button box and link) - the poll
+   count and the Limited-data tag both get theirs this way. When two terms
+   are directly adjacent - the adjusted strip's note + method - the JSX
+   inserts a real .hi-sep span for the dot, and both rules skip it so it
+   stays the only dot at that junction. Every emitter pins 12px: a pseudo
+   inherits its host clause's size and the bare span would inherit the page
+   16px, so an unpinned dot reads bigger than its neighbours (caught live
+   2026-09-02). */
 .hero-interval > *:not(:last-child):not(.hi-term):not(.hi-sep)::after {
   content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
   margin-left: 6px;
@@ -1118,7 +1123,6 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   margin-right: 6px;
 }
 .hi-sep { color: var(--ink-3); font-weight: 400; font-size: 12px; }
-.hero-interval .lead-tag { font-variant-numeric: tabular-nums; }
 /* No narrow-screen variant: the strip wraps naturally if the row overflows,
    and the same clause order, dots and sizes are wanted at every width. */
 /* A word that is also the way into its own definition. Reset far enough that
@@ -3350,7 +3354,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
   .acc-dot, .acc-mean { transition: none; }
-  .roll-reel, .hg-span, .net { transition: none; }
+  .roll-reel, .roll-sep, .hg-span, .net { transition: none; }
 }
 
 /* The theme flip crossfades as ONE composited picture – see applyChrome() in
