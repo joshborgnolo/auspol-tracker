@@ -1267,11 +1267,12 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .hero-controls { display: flex; flex-direction: column; gap: 14px; align-items: flex-end; align-self: stretch; }
 /* the figure-bearing matchup pills ride LOW on a laptop: ordered to the
    foot of the controls column, so the Switch-2PP strip sits just above the
-   chart, off to the right of the interval strip and the delta line across
-   the way, instead of heading the column top right. order, not DOM, does
-   the placing – the phone block re-leads the strip (its order:-1 shares
-   this specificity and wins on source order). */
-.hero-controls .hero-alt { order: 4; }
+   range switch, off to the right of the interval strip and the delta line
+   across the way, instead of heading the column top right. A negative
+   order lifts it over the chartbar inside the foot group; order, not DOM,
+   does the placing – the phone block re-leads the strip (its order:-1
+   shares this specificity and wins on source order). */
+.hero-controls .hero-alt { order: -1; }
 /* quiet inline checkbox alongside the matchup/range switches – stripped from
    chart copies with the rest of .hero-controls. The column gap already
    spaces it, so the shared checkbox's other margins are dropped here. When
@@ -1279,24 +1280,31 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    carries the auto margin that sinks the group level with the interval
    strip. */
 .hero-controls .pg-check { margin: 0; margin-top: auto; }
+/* Where the compare switch does not render, the PILL leads the foot group
+   instead (its negative order lifts it over the chartbar), so it inherits
+   the same auto-margin sink. */
+.hero-controls > .hero-alt:first-of-type { margin-top: auto; }
 /* The range switch's laptop home is the foot of this column, inside
    .hero-chartbar: the column stretches to the hero-top row (align-self
-   above) and margin-top:auto sinks the foot group - compare switch where
-   it renders, then the chartbar - level with the interval strip and the
-   delta line across the way. The Switch-2PP pill belongs to this group on
-   a laptop: its base order ranks it after the chartbar, so the foot stack
-   reads compare switch, chartbar, pill - and the pill is what sits just
-   above the chart. The matchup has no bare toggle at any width now; the
-   pill is its switcher everywhere. The plain copy heading the column is
-   the range toggle's phone home. Both homes are in the DOM at every width
+   above) and an auto margin sinks the foot group - compare switch where
+   it renders, else the pill, else the chartbar itself - level with the
+   interval strip and the delta line across the way. The Switch-2PP pill
+   belongs to this group on a laptop: a negative order lifts it ahead of
+   the chartbar, so the foot stack reads compare switch, pill, range - and
+   the range toggle is what sits just above the chart, naming the window
+   it filters. The matchup has no bare toggle at any width now; the pill
+   is its switcher everywhere. The plain copy heading the column is the
+   range toggle's phone home. Both homes are in the DOM at every width
    (one state, two copies); display, not JSX, chooses. */
 .hero-controls > .text-toggle { display: none; }
 .hero-chartbar { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; margin-top: auto; }
-/* the compare switch leads the foot group where it renders, so the
-   chartbar's own margin-top:auto fetches nothing then; the chartbar keeps
-   the auto only as the fallback where no compare switch renders (a non-ALP/
-   LNP matchup, or no synthetic overlay), when IT is the first foot child */
-.hero-controls .pg-check ~ .hero-chartbar { margin-top: 0; }
+/* an earlier sibling's auto margin (compare switch, else the pill) already
+   sinks the foot group, so the chartbar's own margin-top:auto fetches
+   nothing then; it keeps the auto only as the fallback where nothing
+   ahead of it renders (no compare switch AND no pill - a solo 2PP race),
+   when IT is the first foot child */
+.hero-controls .pg-check ~ .hero-chartbar,
+.hero-controls .hero-alt ~ .hero-chartbar { margin-top: 0; }
 
 .hero-foot { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-top: 6px; flex-wrap: wrap; }
 /* wraps as the fallback: on a phone the ≤640px set below (10px column gap,
@@ -1341,12 +1349,13 @@ body.dark .ci-band { opacity: 0.22; }
 
 /* the contests that are not on the chart, each carrying its own figure. A
    button, not a tab: pressing one makes it the headline and morphs the chart.
-   Lives inside .hero-controls; a laptop renders it at the column FOOT (the
-   order rule beside .hero-controls ranks it after the chartbar), sunk level
-   with the interval strip and just above the chart, while the compare
-   switch and chartbar keep their own sink from the auto margins on
-   .pg-check and .hero-chartbar. Wrapped rows keep the desktop column's
-   right edge. On a phone the ≤560px block orders it first in the wrap row. */
+   Lives inside .hero-controls; a laptop ranks it WITHIN the column foot,
+   above the chartbar (a negative order lifts the matchup offer over the
+   range window), the foot group sunk level with the interval strip, while
+   the compare switch and chartbar keep their own sink from the auto
+   margins on .pg-check and .hero-chartbar. Wrapped rows keep the desktop
+   column's right edge. On a phone the ≤560px block orders it first in the
+   wrap row. */
 .hero-alt { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
 .ha-lab { font-size: 10.5px; font-weight: 700;
   color: var(--ink-3); }

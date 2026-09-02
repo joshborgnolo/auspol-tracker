@@ -1156,9 +1156,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               and "the 2PP" is doing less work than a single headline implies.
               These were previously a bare tab you had to press to find out
               what was behind it; the number is the reason to press it. On a
-              laptop CSS orders the pill to the controls column FOOT, just
-              above the chart and right of the interval strip; the DOM seat
-              here before the compare switch exists for the phone, whose
+              laptop CSS lifts the pill OVER the chartbar inside the column
+              foot group, so it sits between the compare switch and the
+              range switch, right of the interval strip; the DOM seat here
+              before the compare switch exists for the phone, whose
               order:-1 leads the wrap row from this spot. */}
           {otherContests.length > 0 && (
             <div className="hero-alt">
@@ -1181,12 +1182,14 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               published ALP v L/NP series, so the control only exists there.
               Off by default: it is a diagnostic, not a third headline. */}
           {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(false)}
-          {/* The laptop home of the range switch: the foot of this column,
-              sunk level with the interval strip and the delta line across
-              the way. Hidden on a phone, where the strip copy above still
-              does the work, so a width never shows both homes. The matchup
-              used to keep a bare toggle here too; the figure-bearing pill
-              is the matchup switcher at every width now. */}
+          {/* The laptop home of the range switch: the bottom of this
+              column's foot group, the Switch-2PP pill ordered immediately
+              above it and the group as a whole sunk level with the interval
+              strip and the delta line across the way. Hidden on a phone,
+              where the strip copy above still does the work, so a width
+              never shows both homes. The matchup used to keep a bare toggle
+              here too; the figure-bearing pill is the matchup switcher at
+              every width now. */}
           <div className="hero-chartbar">
             <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
               options={rangeOptions} />
