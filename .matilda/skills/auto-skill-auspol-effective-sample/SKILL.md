@@ -213,7 +213,17 @@ Sources and link forms:
   URL is a news page) — verified live 2026-09-02 that the index lists
   only two MRP statements (OctNov-2025 report, FebMarch-2026 model); if
   a July MRP statement ever posts, the weekly sampleeff-updater picks
-  it up.
+  it up. URL/METHODURL SPLIT (also 2026-09-02, user-asked): every
+  DemosAU wave whose row `url` equalled its statement PDF (Feb, Apr,
+  May, Jul, Aug 2026 + the FebMarch MRP) was re-pointed so `url` =
+  the wave's Capital Brief article/newsletter (`url` is the table's
+  "DemosAU" name link; the same-page-as-method duplication read as a
+  bug) while `methodUrl` keeps the demosau.com PDF. 2025-07-06 keeps
+  `url` == `methodUrl` — the Capital Brief partnership began Jan 2026,
+  so that wave has no article. Consequence for extract-demosau.mjs's
+  row-url verify leg: re-pointed rows drop out of PDF verification the
+  same way the Jan rows always were (Feb/Jul-Aug statements aren't
+  index-listed either) — acceptable, values stay hand-authoritative.
 - **Essential** (added 2026-09-02, same day) — the odd one out: ONE
   living disclosure-statement PDF the house appends each wave to and
   re-uploads (essentialreport.com.au/wp-content/uploads/<YYYY>/<MM>/
