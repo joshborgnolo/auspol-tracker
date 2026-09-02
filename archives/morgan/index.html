@@ -60,9 +60,11 @@
 :root {
   --bg:        oklch(0.975 0.009 80);
   --ink:       oklch(0.27 0.012 55);
+  --ink-2:     oklch(0.44 0.012 55);
   --ink-3:     oklch(0.52 0.010 58);
   --ink-faint: oklch(0.70 0.008 65);
   --line:      oklch(0.895 0.008 75);
+  --line-2:    oklch(0.935 0.006 78);
   --alp: oklch(0.55 0.150 27);
   --lnp: oklch(0.50 0.095 250);
   --grn: oklch(0.60 0.120 150);
@@ -75,9 +77,11 @@
   :root {
     --bg:        oklch(0.205 0.010 65);
     --ink:       oklch(0.940 0.008 80);
+    --ink-2:     oklch(0.800 0.009 78);
     --ink-3:     oklch(0.670 0.009 72);
     --ink-faint: oklch(0.545 0.009 68);
     --line:      oklch(0.355 0.011 66);
+    --line-2:    oklch(0.312 0.010 66);
   }
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -151,11 +155,11 @@ body {
   .meta-item { text-align: left; }
 }
 
-/* ------- archive tabs ------- */
+/* ------- archive tabs: the static page's article-column width ------- */
 .tabs {
   display: flex; gap: 4px;
+  max-width: var(--maxw); margin: 0 auto;
   border-bottom: 1px solid var(--line);
-  margin-bottom: 14px;
 }
 .tab {
   display: inline-block;
@@ -168,30 +172,46 @@ body {
 .tab:hover { color: var(--ink); }
 .tab.active { color: var(--ink); border-bottom-color: var(--ink); }
 
-/* ------- body ------- */
+/* ------- back to the interactive tracker (the static page's .ss-back pill) */
+.ss-back {
+  position: fixed; right: 18px; bottom: 18px; z-index: 300;
+  display: inline-block;
+  padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink); font-size: 13px;
+  font-weight: 600; text-decoration: none; cursor: pointer;
+  box-shadow: 0 3px 16px oklch(0 0 0 / 0.16);
+}
+.ss-back:hover { border-color: var(--ink-3); }
+
+/* ------- body: the static page's type rhythm (verbatim tables stay wide) --- */
 .frame-wrap {
   flex: 1; display: flex; flex-direction: column;
   max-width: var(--maxw); width: 100%; margin: 0 auto;
-  padding: 18px calc(28px + env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px));
+  padding: 28px calc(28px + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px));
 }
 .credit {
-  font-size: 12.5px; color: var(--ink-3); margin-bottom: 10px;
+  font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin-bottom: 12px;
 }
-.credit a { color: inherit; text-decoration: underline; }
+.credit a { color: inherit; }
+.ss-note { margin-top: 24px; font-size: 12.5px; color: var(--ink-3); }
+.ss-note a { color: var(--ink-2); }
+.ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 
 /* ------- replicated tables ------- */
-.rm-sec { margin-top: 26px; }
+.rm-sec { margin-top: 28px; }
 .rm-sec h2 {
-  font-family: var(--serif); font-weight: 600; font-size: 17px;
-  letter-spacing: 0.01em;
+  font-family: var(--serif); font-size: 20px; font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 8px; padding-top: 14px; border-top: 1px solid var(--line);
 }
-.rm-sub { font-size: 12.5px; color: var(--ink-3); margin: 2px 0 4px; }
-.rm-sub a { color: inherit; text-decoration: underline; }
+.rm-sec:first-of-type h2 { border-top: 0; padding-top: 0; }
+.rm-sub { font-size: 12.5px; color: var(--ink-3); margin: 0 0 4px; }
+.rm-sub a { color: inherit; }
 .rm-cap {
   font-size: 12.5px; font-weight: 600; color: var(--ink-3);
   margin: 14px 0 2px; font-variant-numeric: tabular-nums;
 }
-.rm-cap a { font-weight: 400; text-decoration: underline; color: var(--ink-3); }
+.rm-cap a { font-weight: 400; color: var(--ink-2); }
 .rm-scroll { overflow-x: auto; }
 table.rm {
   border-collapse: collapse; width: 100%;
@@ -243,17 +263,16 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
   <div class="head-right">
     <div class="meta-item">
       <span class="meta-k">Pollster archive</span>
-      <span class="meta-v"><a href="/">&larr; Back to live tracker</a></span>
+      <span class="meta-v"><a href="/">&larr; Back to the interactive tracker</a></span>
     </div>
   </div>
 </header>
+<nav class="tabs" aria-label="Poll archives">
+  <a class="tab" href="/archives/newspoll/">Newspoll</a>
+  <a class="tab" href="/archives/acnielsen/">AC Nielsen</a>
+  <a class="tab active" aria-current="page" href="/archives/morgan/">Morgan</a>
+</nav>
 <main class="frame-wrap">
-  <nav class="tabs" aria-label="Poll archives">
-    <a class="tab" href="/archives/newspoll/">Newspoll</a>
-    <a class="tab" href="/archives/acnielsen/">AC Nielsen</a>
-    <a class="tab active" aria-current="page" href="/archives/morgan/">Morgan</a>
-  </nav>
-
   <p class="credit">The Morgan Poll series, transcribed table-for-table from Roy Morgan's four published vote-intention tables (two-party-preferred and primary, current series and the long-term trends back to 1901) and mirrored here as CSV — each table links its own file below. Sourced from <a href="https://www.roymorgan.com/morgan-poll">roymorgan.com/morgan-poll</a> — snapshot refreshed 3 September 2026. Cells are reproduced as printed, including Roy Morgan's own "&lt;0.5" minors floor and "##" markers (no two-party-preferred figure, pre-preferential-voting era).</p>
 
   <section class="rm-sec" id="two-party-preferred-voting-intention">
@@ -2264,6 +2283,9 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
 <tr><td>Federal Election - March 29/30, 1901</td><td>15.8</td><td>30.0</td><td>30.0</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>54.2</td></tr>
 </table></div>
   </section>
+
+  <p class="ss-note">This is a satellite archive page of <a href="/">auspol tracker</a>, an unofficial aggregate of published national polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>
+<a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 </body>
 </html>
