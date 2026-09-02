@@ -6721,6 +6721,17 @@
   "cyclePolls": {
     "2010": [
       {
+        "date": "2007-12-06",
+        "firm": "Morgan",
+        "lnp": 36.5,
+        "alp": 49,
+        "grn": 7,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
+      },
+      {
         "date": "2007-12-09",
         "firm": "Essential",
         "lnp": 34,
@@ -6730,6 +6741,17 @@
         "oth": 11,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2007-12-09",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 49.5,
+        "grn": 10.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 39.5,
+        "tpp_alp": 60.5
       },
       {
         "date": "2007-12-16",
@@ -6765,6 +6787,17 @@
         "tpp_alp": 59
       },
       {
+        "date": "2008-01-13",
+        "firm": "Morgan",
+        "lnp": 33,
+        "alp": 51.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 38.5,
+        "tpp_alp": 61.5
+      },
+      {
         "date": "2008-01-20",
         "firm": "Essential",
         "lnp": 35,
@@ -6776,6 +6809,28 @@
         "tpp_alp": 58
       },
       {
+        "date": "2008-01-20",
+        "firm": "Newspoll",
+        "lnp": 35,
+        "alp": 46,
+        "grn": 12,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2008-01-24",
+        "firm": "Morgan",
+        "lnp": 32,
+        "alp": 53,
+        "grn": 10,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 37,
+        "tpp_alp": 63
+      },
+      {
         "date": "2008-01-27",
         "firm": "Essential",
         "lnp": 34,
@@ -6783,6 +6838,28 @@
         "grn": 9,
         "onp": null,
         "oth": 7,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2008-01-27",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 49,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-01-31",
+        "firm": "Morgan",
+        "lnp": 34.5,
+        "alp": 50,
+        "grn": 8,
+        "onp": null,
+        "oth": 7.5,
         "tpp_lnp": 40,
         "tpp_alp": 60
       },
@@ -6809,11 +6886,33 @@
         "tpp_alp": 58
       },
       {
+        "date": "2008-02-10",
+        "firm": "Morgan",
+        "lnp": 33,
+        "alp": 54,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 37.5,
+        "tpp_alp": 62.5
+      },
+      {
         "date": "2008-02-17",
         "firm": "Essential",
         "lnp": 36,
         "alp": 47,
         "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2008-02-17",
+        "firm": "Newspoll",
+        "lnp": 36,
+        "alp": 46,
+        "grn": 10,
         "onp": null,
         "oth": 8,
         "tpp_lnp": 43,
@@ -6831,6 +6930,17 @@
         "tpp_alp": 64
       },
       {
+        "date": "2008-02-24",
+        "firm": "Morgan",
+        "lnp": 31.5,
+        "alp": 56.5,
+        "grn": 6.5,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 35.5,
+        "tpp_alp": 64.5
+      },
+      {
         "date": "2008-03-02",
         "firm": "Essential",
         "lnp": 30,
@@ -6842,6 +6952,17 @@
         "tpp_alp": 64
       },
       {
+        "date": "2008-03-02",
+        "firm": "Newspoll",
+        "lnp": 31,
+        "alp": 51,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 37,
+        "tpp_alp": 63
+      },
+      {
         "date": "2008-03-09",
         "firm": "Essential",
         "lnp": 32,
@@ -6849,6 +6970,28 @@
         "grn": 8,
         "onp": null,
         "oth": 9,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2008-03-09",
+        "firm": "Morgan",
+        "lnp": 30.5,
+        "alp": 55.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 35,
+        "tpp_alp": 65
+      },
+      {
+        "date": "2008-03-12",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 53.5,
+        "grn": 5.5,
+        "onp": null,
+        "oth": 7,
         "tpp_lnp": 39,
         "tpp_alp": 61
       },
@@ -6864,6 +7007,17 @@
         "tpp_alp": 57
       },
       {
+        "date": "2008-03-16",
+        "firm": "Newspoll",
+        "lnp": 35,
+        "alp": 47,
+        "grn": 11,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
         "date": "2008-03-23",
         "firm": "Essential",
         "lnp": 34,
@@ -6873,6 +7027,28 @@
         "oth": 9,
         "tpp_lnp": 41,
         "tpp_alp": 59
+      },
+      {
+        "date": "2008-03-23",
+        "firm": "Morgan",
+        "lnp": 31,
+        "alp": 55,
+        "grn": 7,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 36.5,
+        "tpp_alp": 63.5
+      },
+      {
+        "date": "2008-04-03",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 51,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 39.5,
+        "tpp_alp": 60.5
       },
       {
         "date": "2008-04-06",
@@ -6886,6 +7062,39 @@
         "tpp_alp": 60
       },
       {
+        "date": "2008-04-06",
+        "firm": "Newspoll",
+        "lnp": 35,
+        "alp": 48,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-04-06",
+        "firm": "Morgan",
+        "lnp": 33.5,
+        "alp": 53.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
+      },
+      {
+        "date": "2008-04-10",
+        "firm": "Morgan",
+        "lnp": 32,
+        "alp": 54,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 36.5,
+        "tpp_alp": 63.5
+      },
+      {
         "date": "2008-04-13",
         "firm": "Essential",
         "lnp": 34,
@@ -6895,6 +7104,28 @@
         "oth": 6,
         "tpp_lnp": 40,
         "tpp_alp": 60
+      },
+      {
+        "date": "2008-04-13",
+        "firm": "Morgan",
+        "lnp": 33.5,
+        "alp": 54,
+        "grn": 6.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
+      },
+      {
+        "date": "2008-04-17",
+        "firm": "Morgan",
+        "lnp": 33,
+        "alp": 55,
+        "grn": 6,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 37.5,
+        "tpp_alp": 62.5
       },
       {
         "date": "2008-04-20",
@@ -6908,6 +7139,17 @@
         "tpp_alp": 53
       },
       {
+        "date": "2008-04-20",
+        "firm": "Newspoll",
+        "lnp": 34,
+        "alp": 51,
+        "grn": 9,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
         "date": "2008-04-27",
         "firm": "Essential",
         "lnp": 32,
@@ -6917,6 +7159,17 @@
         "oth": 9,
         "tpp_lnp": 39,
         "tpp_alp": 61
+      },
+      {
+        "date": "2008-04-27",
+        "firm": "Morgan",
+        "lnp": 33.5,
+        "alp": 54.5,
+        "grn": 5.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 38.5,
+        "tpp_alp": 61.5
       },
       {
         "date": "2008-05-04",
@@ -6930,6 +7183,28 @@
         "tpp_alp": 60
       },
       {
+        "date": "2008-05-04",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2008-05-04",
+        "firm": "Morgan",
+        "lnp": 32.5,
+        "alp": 52.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
+      },
+      {
         "date": "2008-05-11",
         "firm": "Essential",
         "lnp": 34,
@@ -6939,6 +7214,17 @@
         "oth": 9,
         "tpp_lnp": 40,
         "tpp_alp": 60
+      },
+      {
+        "date": "2008-05-11",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
       },
       {
         "date": "2008-05-18",
@@ -6952,6 +7238,28 @@
         "tpp_alp": 61
       },
       {
+        "date": "2008-05-18",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2008-05-18",
+        "firm": "Morgan",
+        "lnp": 35,
+        "alp": 51.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 39.5,
+        "tpp_alp": 60.5
+      },
+      {
         "date": "2008-05-25",
         "firm": "Essential",
         "lnp": 32,
@@ -6961,6 +7269,28 @@
         "oth": 10,
         "tpp_lnp": 39,
         "tpp_alp": 61
+      },
+      {
+        "date": "2008-05-25",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 53,
+        "grn": 5.5,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2008-05-31",
+        "firm": "Morgan",
+        "lnp": 31.5,
+        "alp": 52.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 37,
+        "tpp_alp": 63
       },
       {
         "date": "2008-06-01",
@@ -6974,6 +7304,17 @@
         "tpp_alp": 56
       },
       {
+        "date": "2008-06-01",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 46,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
         "date": "2008-06-08",
         "firm": "Essential",
         "lnp": 35,
@@ -6983,6 +7324,28 @@
         "oth": 10,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2008-06-08",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 48.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
+      },
+      {
+        "date": "2008-06-09",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 45.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
       },
       {
         "date": "2008-06-15",
@@ -6996,6 +7359,17 @@
         "tpp_alp": 60
       },
       {
+        "date": "2008-06-15",
+        "firm": "Newspoll",
+        "lnp": 33,
+        "alp": 46,
+        "grn": 12,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
         "date": "2008-06-22",
         "firm": "Essential",
         "lnp": 34,
@@ -7005,6 +7379,17 @@
         "oth": 9,
         "tpp_lnp": 41,
         "tpp_alp": 59
+      },
+      {
+        "date": "2008-06-22",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 52,
+        "grn": 8,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
       },
       {
         "date": "2008-06-29",
@@ -7018,6 +7403,17 @@
         "tpp_alp": 61
       },
       {
+        "date": "2008-06-29",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 44,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
         "date": "2008-07-06",
         "firm": "Essential",
         "lnp": 31,
@@ -7027,6 +7423,17 @@
         "oth": 10,
         "tpp_lnp": 38,
         "tpp_alp": 62
+      },
+      {
+        "date": "2008-07-06",
+        "firm": "Morgan",
+        "lnp": 35,
+        "alp": 48.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
       },
       {
         "date": "2008-07-13",
@@ -7040,6 +7447,28 @@
         "tpp_alp": 59
       },
       {
+        "date": "2008-07-13",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 43,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2008-07-13",
+        "firm": "Morgan",
+        "lnp": 34.5,
+        "alp": 48,
+        "grn": 11.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
         "date": "2008-07-20",
         "firm": "Essential",
         "lnp": 35,
@@ -7049,6 +7478,17 @@
         "oth": 11,
         "tpp_lnp": 43,
         "tpp_alp": 57
+      },
+      {
+        "date": "2008-07-20",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 45.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2008-07-27",
@@ -7062,6 +7502,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2008-07-27",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 10,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
         "date": "2008-08-03",
         "firm": "Essential",
         "lnp": 36,
@@ -7071,6 +7522,17 @@
         "oth": 8,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2008-08-03",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 45.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2008-08-10",
@@ -7084,6 +7546,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2008-08-10",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
         "date": "2008-08-17",
         "firm": "Essential",
         "lnp": 35,
@@ -7093,6 +7566,17 @@
         "oth": 10,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2008-08-17",
+        "firm": "Morgan",
+        "lnp": 37.5,
+        "alp": 47,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
       },
       {
         "date": "2008-08-24",
@@ -7106,6 +7590,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2008-08-24",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 45,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
         "date": "2008-08-31",
         "firm": "Essential",
         "lnp": 34,
@@ -7115,6 +7610,17 @@
         "oth": 11,
         "tpp_lnp": 41,
         "tpp_alp": 59
+      },
+      {
+        "date": "2008-08-31",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 50,
+        "grn": 6.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
       },
       {
         "date": "2008-09-07",
@@ -7128,6 +7634,17 @@
         "tpp_alp": 59
       },
       {
+        "date": "2008-09-07",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 44,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
         "date": "2008-09-14",
         "firm": "Essential",
         "lnp": 33,
@@ -7139,6 +7656,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2008-09-14",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 45,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
+      },
+      {
         "date": "2008-09-21",
         "firm": "Essential",
         "lnp": 35,
@@ -7146,6 +7674,28 @@
         "grn": 11,
         "onp": null,
         "oth": 10,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2008-09-21",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 42,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2008-09-25",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 46.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
         "tpp_lnp": 43,
         "tpp_alp": 57
       },
@@ -7161,6 +7711,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2008-09-28",
+        "firm": "Morgan",
+        "lnp": 36.5,
+        "alp": 46.5,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
         "date": "2008-10-05",
         "firm": "Essential",
         "lnp": 36,
@@ -7170,6 +7731,17 @@
         "oth": 8,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2008-10-09",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 46.5,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
       },
       {
         "date": "2008-10-12",
@@ -7183,6 +7755,39 @@
         "tpp_alp": 57
       },
       {
+        "date": "2008-10-12",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 41,
+        "grn": 13,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2008-10-12",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 46,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
+        "date": "2008-10-16",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
         "date": "2008-10-26",
         "firm": "Essential",
         "lnp": 33,
@@ -7192,6 +7797,28 @@
         "oth": 8,
         "tpp_lnp": 39,
         "tpp_alp": 61
+      },
+      {
+        "date": "2008-10-26",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 44,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2008-10-26",
+        "firm": "Morgan",
+        "lnp": 37.5,
+        "alp": 46.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 43.5,
+        "tpp_alp": 56.5
       },
       {
         "date": "2008-11-02",
@@ -7216,6 +7843,28 @@
         "tpp_alp": 59
       },
       {
+        "date": "2008-11-09",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 44,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2008-11-09",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 49,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
+      },
+      {
         "date": "2008-11-16",
         "firm": "Essential",
         "lnp": 39,
@@ -7236,6 +7885,28 @@
         "oth": 9,
         "tpp_lnp": 44,
         "tpp_alp": 56
+      },
+      {
+        "date": "2008-11-23",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 42,
+        "grn": 11,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2008-11-23",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 50.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 40.5,
+        "tpp_alp": 59.5
       },
       {
         "date": "2008-11-30",
@@ -7260,6 +7931,28 @@
         "tpp_alp": 59
       },
       {
+        "date": "2008-12-07",
+        "firm": "Newspoll",
+        "lnp": 35,
+        "alp": 48,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2008-12-07",
+        "firm": "Morgan",
+        "lnp": 34.5,
+        "alp": 48.5,
+        "grn": 10.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 40.5,
+        "tpp_alp": 59.5
+      },
+      {
         "date": "2008-12-14",
         "firm": "Essential",
         "lnp": 36,
@@ -7269,6 +7962,17 @@
         "oth": 8,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2008-12-21",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 52.5,
+        "grn": 6,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
       },
       {
         "date": "2009-01-11",
@@ -7282,6 +7986,17 @@
         "tpp_alp": 59
       },
       {
+        "date": "2009-01-11",
+        "firm": "Morgan",
+        "lnp": 35,
+        "alp": 51.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
         "date": "2009-01-18",
         "firm": "Essential",
         "lnp": 35,
@@ -7291,6 +8006,17 @@
         "oth": 7,
         "tpp_lnp": 41,
         "tpp_alp": 59
+      },
+      {
+        "date": "2009-01-18",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 43,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
       },
       {
         "date": "2009-01-25",
@@ -7304,6 +8030,17 @@
         "tpp_alp": 60
       },
       {
+        "date": "2009-01-25",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 50.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 40.5,
+        "tpp_alp": 59.5
+      },
+      {
         "date": "2009-02-01",
         "firm": "Essential",
         "lnp": 34,
@@ -7313,6 +8050,17 @@
         "oth": 8,
         "tpp_lnp": 39,
         "tpp_alp": 61
+      },
+      {
+        "date": "2009-02-01",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 46.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
       },
       {
         "date": "2009-02-08",
@@ -7326,6 +8074,28 @@
         "tpp_alp": 61
       },
       {
+        "date": "2009-02-08",
+        "firm": "Newspoll",
+        "lnp": 36,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-02-08",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 51.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
         "date": "2009-02-15",
         "firm": "Essential",
         "lnp": 34,
@@ -7335,6 +8105,17 @@
         "oth": 7,
         "tpp_lnp": 39,
         "tpp_alp": 61
+      },
+      {
+        "date": "2009-02-15",
+        "firm": "Morgan",
+        "lnp": 36.5,
+        "alp": 49,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 40.5,
+        "tpp_alp": 59.5
       },
       {
         "date": "2009-02-22",
@@ -7348,6 +8129,17 @@
         "tpp_alp": 62
       },
       {
+        "date": "2009-02-22",
+        "firm": "Newspoll",
+        "lnp": 36,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
         "date": "2009-03-01",
         "firm": "Essential",
         "lnp": 32,
@@ -7357,6 +8149,17 @@
         "oth": 7,
         "tpp_lnp": 38,
         "tpp_alp": 62
+      },
+      {
+        "date": "2009-03-01",
+        "firm": "Morgan",
+        "lnp": 33,
+        "alp": 51.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 38.5,
+        "tpp_alp": 61.5
       },
       {
         "date": "2009-03-08",
@@ -7370,6 +8173,28 @@
         "tpp_alp": 60
       },
       {
+        "date": "2009-03-08",
+        "firm": "Newspoll",
+        "lnp": 36,
+        "alp": 44,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2009-03-08",
+        "firm": "Morgan",
+        "lnp": 34.5,
+        "alp": 50.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 39.5,
+        "tpp_alp": 60.5
+      },
+      {
         "date": "2009-03-15",
         "firm": "Essential",
         "lnp": 35,
@@ -7379,6 +8204,17 @@
         "oth": 10,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2009-03-15",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 48.5,
+        "grn": 6,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
       },
       {
         "date": "2009-03-22",
@@ -7392,6 +8228,17 @@
         "tpp_alp": 60
       },
       {
+        "date": "2009-03-22",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 45,
+        "grn": 8,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
         "date": "2009-03-29",
         "firm": "Essential",
         "lnp": 31,
@@ -7401,6 +8248,17 @@
         "oth": 7,
         "tpp_lnp": 37,
         "tpp_alp": 63
+      },
+      {
+        "date": "2009-03-29",
+        "firm": "Morgan",
+        "lnp": 33.5,
+        "alp": 53,
+        "grn": 8,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
       },
       {
         "date": "2009-04-05",
@@ -7414,10 +8272,32 @@
         "tpp_alp": 63
       },
       {
+        "date": "2009-04-05",
+        "firm": "Newspoll",
+        "lnp": 36,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
         "date": "2009-04-12",
         "firm": "Essential",
         "lnp": 34,
         "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2009-04-12",
+        "firm": "Morgan",
+        "lnp": 33.5,
+        "alp": 51.5,
         "grn": 8,
         "onp": null,
         "oth": 7,
@@ -7436,6 +8316,17 @@
         "tpp_alp": 60
       },
       {
+        "date": "2009-04-19",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
         "date": "2009-04-26",
         "firm": "Essential",
         "lnp": 36,
@@ -7445,6 +8336,17 @@
         "oth": 8,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2009-04-26",
+        "firm": "Morgan",
+        "lnp": 36.5,
+        "alp": 50,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
       },
       {
         "date": "2009-05-03",
@@ -7458,6 +8360,17 @@
         "tpp_alp": 57
       },
       {
+        "date": "2009-05-03",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 42,
+        "grn": 11,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
         "date": "2009-05-10",
         "firm": "Essential",
         "lnp": 33,
@@ -7469,6 +8382,17 @@
         "tpp_alp": 61
       },
       {
+        "date": "2009-05-10",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 50,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
         "date": "2009-05-17",
         "firm": "Essential",
         "lnp": 32,
@@ -7478,6 +8402,39 @@
         "oth": 8,
         "tpp_lnp": 38,
         "tpp_alp": 62
+      },
+      {
+        "date": "2009-05-17",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 46,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2009-05-17",
+        "firm": "Morgan",
+        "lnp": 37.5,
+        "alp": 49.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-05-21",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 45,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
       },
       {
         "date": "2009-05-24",
@@ -7502,6 +8459,39 @@
         "tpp_alp": 55
       },
       {
+        "date": "2009-05-31",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 43,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2009-05-31",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 49,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-06-04",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 43.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
         "date": "2009-06-07",
         "firm": "Essential",
         "lnp": 39,
@@ -7513,6 +8503,17 @@
         "tpp_alp": 56
       },
       {
+        "date": "2009-06-11",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 47.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
         "date": "2009-06-14",
         "firm": "Essential",
         "lnp": 38,
@@ -7520,6 +8521,28 @@
         "grn": 8,
         "onp": null,
         "oth": 6,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2009-06-14",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 41,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2009-06-14",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 48.5,
+        "grn": 7,
+        "onp": null,
+        "oth": 6.5,
         "tpp_lnp": 43,
         "tpp_alp": 57
       },
@@ -7535,6 +8558,17 @@
         "tpp_alp": 57
       },
       {
+        "date": "2009-06-21",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 46,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 4.5,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
         "date": "2009-06-28",
         "firm": "Essential",
         "lnp": 36,
@@ -7544,6 +8578,28 @@
         "oth": 8,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2009-06-28",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 44,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2009-07-02",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 46,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
       },
       {
         "date": "2009-07-05",
@@ -7557,6 +8613,17 @@
         "tpp_alp": 59
       },
       {
+        "date": "2009-07-05",
+        "firm": "Morgan",
+        "lnp": 35,
+        "alp": 46.5,
+        "grn": 11.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
         "date": "2009-07-12",
         "firm": "Essential",
         "lnp": 37,
@@ -7566,6 +8633,17 @@
         "oth": 8,
         "tpp_lnp": 43,
         "tpp_alp": 57
+      },
+      {
+        "date": "2009-07-12",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 43,
+        "grn": 11,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2009-07-19",
@@ -7579,6 +8657,17 @@
         "tpp_alp": 56
       },
       {
+        "date": "2009-07-19",
+        "firm": "Morgan",
+        "lnp": 37.5,
+        "alp": 48,
+        "grn": 8,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
         "date": "2009-07-26",
         "firm": "Essential",
         "lnp": 37,
@@ -7586,6 +8675,17 @@
         "grn": 7,
         "onp": null,
         "oth": 8,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2009-07-26",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 46,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
         "tpp_lnp": 43,
         "tpp_alp": 57
       },
@@ -7601,6 +8701,28 @@
         "tpp_alp": 59
       },
       {
+        "date": "2009-08-02",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 50.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 39.5,
+        "tpp_alp": 60.5
+      },
+      {
+        "date": "2009-08-06",
+        "firm": "Morgan",
+        "lnp": 37.5,
+        "alp": 45.5,
+        "grn": 11,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
         "date": "2009-08-09",
         "firm": "Essential",
         "lnp": 34,
@@ -7612,6 +8734,17 @@
         "tpp_alp": 60
       },
       {
+        "date": "2009-08-09",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 45,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
         "date": "2009-08-16",
         "firm": "Essential",
         "lnp": 35,
@@ -7619,6 +8752,17 @@
         "grn": 9,
         "onp": null,
         "oth": 9,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-08-16",
+        "firm": "Morgan",
+        "lnp": 34.5,
+        "alp": 47.5,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 8.5,
         "tpp_lnp": 42,
         "tpp_alp": 58
       },
@@ -7634,6 +8778,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2009-08-23",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 44,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
         "date": "2009-08-30",
         "firm": "Essential",
         "lnp": 33,
@@ -7643,6 +8798,17 @@
         "oth": 8,
         "tpp_lnp": 40,
         "tpp_alp": 60
+      },
+      {
+        "date": "2009-08-30",
+        "firm": "Morgan",
+        "lnp": 33.5,
+        "alp": 50.5,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
       },
       {
         "date": "2009-09-06",
@@ -7656,6 +8822,17 @@
         "tpp_alp": 61
       },
       {
+        "date": "2009-09-06",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 44,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
         "date": "2009-09-13",
         "firm": "Essential",
         "lnp": 35,
@@ -7665,6 +8842,17 @@
         "oth": 8,
         "tpp_lnp": 41,
         "tpp_alp": 59
+      },
+      {
+        "date": "2009-09-13",
+        "firm": "Morgan",
+        "lnp": 32.5,
+        "alp": 51.5,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
       },
       {
         "date": "2009-09-20",
@@ -7678,6 +8866,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2009-09-20",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 43,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
         "date": "2009-09-27",
         "firm": "Essential",
         "lnp": 36,
@@ -7687,6 +8886,28 @@
         "oth": 7,
         "tpp_lnp": 41,
         "tpp_alp": 59
+      },
+      {
+        "date": "2009-09-27",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 51,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 40.5,
+        "tpp_alp": 59.5
+      },
+      {
+        "date": "2009-10-01",
+        "firm": "Newspoll",
+        "lnp": 35,
+        "alp": 46,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
       },
       {
         "date": "2009-10-04",
@@ -7700,6 +8921,17 @@
         "tpp_alp": 60
       },
       {
+        "date": "2009-10-08",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 46.5,
+        "grn": 10.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
         "date": "2009-10-11",
         "firm": "Essential",
         "lnp": 37,
@@ -7709,6 +8941,28 @@
         "oth": 8,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2009-10-11",
+        "firm": "Newspoll",
+        "lnp": 36,
+        "alp": 47,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2009-10-11",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 49.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
       },
       {
         "date": "2009-10-18",
@@ -7722,6 +8976,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2009-10-18",
+        "firm": "Newspoll",
+        "lnp": 34,
+        "alp": 48,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
         "date": "2009-10-25",
         "firm": "Essential",
         "lnp": 36,
@@ -7731,6 +8996,17 @@
         "oth": 7,
         "tpp_lnp": 41,
         "tpp_alp": 59
+      },
+      {
+        "date": "2009-10-25",
+        "firm": "Morgan",
+        "lnp": 34.5,
+        "alp": 52,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 39.5,
+        "tpp_alp": 60.5
       },
       {
         "date": "2009-11-01",
@@ -7744,6 +9020,28 @@
         "tpp_alp": 59
       },
       {
+        "date": "2009-11-01",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 41,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2009-11-01",
+        "firm": "Morgan",
+        "lnp": 32.5,
+        "alp": 51,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
         "date": "2009-11-08",
         "firm": "Essential",
         "lnp": 35,
@@ -7753,6 +9051,28 @@
         "oth": 8,
         "tpp_lnp": 41,
         "tpp_alp": 59
+      },
+      {
+        "date": "2009-11-08",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 46.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2009-11-12",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 42.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2009-11-15",
@@ -7766,6 +9086,28 @@
         "tpp_alp": 55
       },
       {
+        "date": "2009-11-15",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 43,
+        "grn": 11,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2009-11-15",
+        "firm": "Morgan",
+        "lnp": 36.5,
+        "alp": 45,
+        "grn": 9,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 43.5,
+        "tpp_alp": 56.5
+      },
+      {
         "date": "2009-11-22",
         "firm": "Essential",
         "lnp": 39,
@@ -7775,6 +9117,17 @@
         "oth": 9,
         "tpp_lnp": 45,
         "tpp_alp": 55
+      },
+      {
+        "date": "2009-11-22",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 48,
+        "grn": 9,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
       },
       {
         "date": "2009-11-29",
@@ -7788,6 +9141,39 @@
         "tpp_alp": 58
       },
       {
+        "date": "2009-11-29",
+        "firm": "Newspoll",
+        "lnp": 35,
+        "alp": 43,
+        "grn": 12,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2009-11-29",
+        "firm": "Morgan",
+        "lnp": 35,
+        "alp": 47,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
+      },
+      {
+        "date": "2009-12-03",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 41,
+        "grn": 10.5,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
         "date": "2009-12-06",
         "firm": "Essential",
         "lnp": 34,
@@ -7797,6 +9183,28 @@
         "oth": 11,
         "tpp_lnp": 42,
         "tpp_alp": 58
+      },
+      {
+        "date": "2009-12-06",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 43,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2009-12-09",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 42,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2009-12-13",
@@ -7810,6 +9218,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2009-12-13",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 49,
+        "grn": 8,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
         "date": "2009-12-20",
         "firm": "Essential",
         "lnp": 37,
@@ -7821,6 +9240,28 @@
         "tpp_alp": 57
       },
       {
+        "date": "2010-01-03",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 45.5,
+        "grn": 10,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2010-01-14",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 43,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
         "date": "2010-01-17",
         "firm": "Essential",
         "lnp": 38,
@@ -7830,6 +9271,28 @@
         "oth": 9,
         "tpp_lnp": 44,
         "tpp_alp": 56
+      },
+      {
+        "date": "2010-01-17",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 40,
+        "grn": 12,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-01-17",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 47.5,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
       },
       {
         "date": "2010-01-24",
@@ -7854,6 +9317,28 @@
         "tpp_alp": 56
       },
       {
+        "date": "2010-01-31",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 40,
+        "grn": 12,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-01-31",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 46,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 43.5,
+        "tpp_alp": 56.5
+      },
+      {
         "date": "2010-02-07",
         "firm": "Essential",
         "lnp": 38,
@@ -7863,6 +9348,17 @@
         "oth": 8,
         "tpp_lnp": 45,
         "tpp_alp": 55
+      },
+      {
+        "date": "2010-02-11",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 42,
+        "grn": 10.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
       },
       {
         "date": "2010-02-14",
@@ -7876,6 +9372,28 @@
         "tpp_alp": 55
       },
       {
+        "date": "2010-02-14",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 39,
+        "grn": 12,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2010-02-14",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
         "date": "2010-02-21",
         "firm": "Essential",
         "lnp": 40,
@@ -7885,6 +9403,17 @@
         "oth": 9,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2010-02-21",
+        "firm": "Morgan",
+        "lnp": 37.5,
+        "alp": 45,
+        "grn": 9,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 43.5,
+        "tpp_alp": 56.5
       },
       {
         "date": "2010-02-28",
@@ -7898,6 +9427,17 @@
         "tpp_alp": 53
       },
       {
+        "date": "2010-02-28",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 40,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2010-03-07",
         "firm": "Essential",
         "lnp": 40,
@@ -7907,6 +9447,17 @@
         "oth": 8,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2010-03-07",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 45,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
       },
       {
         "date": "2010-03-14",
@@ -7920,6 +9471,17 @@
         "tpp_alp": 56
       },
       {
+        "date": "2010-03-14",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 11,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2010-03-21",
         "firm": "Essential",
         "lnp": 38,
@@ -7929,6 +9491,17 @@
         "oth": 8,
         "tpp_lnp": 44,
         "tpp_alp": 56
+      },
+      {
+        "date": "2010-03-21",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 44.5,
+        "grn": 11,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 43.5,
+        "tpp_alp": 56.5
       },
       {
         "date": "2010-03-28",
@@ -7942,6 +9515,17 @@
         "tpp_alp": 54
       },
       {
+        "date": "2010-03-28",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 43,
+        "grn": 12,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
         "date": "2010-04-04",
         "firm": "Essential",
         "lnp": 39,
@@ -7951,6 +9535,17 @@
         "oth": 8,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2010-04-04",
+        "firm": "Morgan",
+        "lnp": 36.5,
+        "alp": 48,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
       },
       {
         "date": "2010-04-11",
@@ -7975,6 +9570,28 @@
         "tpp_alp": 54
       },
       {
+        "date": "2010-04-18",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 43,
+        "grn": 10,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2010-04-18",
+        "firm": "Morgan",
+        "lnp": 37.5,
+        "alp": 43,
+        "grn": 12,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
         "date": "2010-04-25",
         "firm": "Essential",
         "lnp": 39,
@@ -7984,6 +9601,17 @@
         "oth": 10,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2010-04-25",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 44,
+        "grn": 8,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
       },
       {
         "date": "2010-05-02",
@@ -7997,6 +9625,28 @@
         "tpp_alp": 53
       },
       {
+        "date": "2010-05-02",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 35,
+        "grn": 10,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2010-05-05",
+        "firm": "Morgan",
+        "lnp": 44.5,
+        "alp": 39.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
         "date": "2010-05-09",
         "firm": "Essential",
         "lnp": 42,
@@ -8006,6 +9656,28 @@
         "oth": 10,
         "tpp_lnp": 50,
         "tpp_alp": 50
+      },
+      {
+        "date": "2010-05-09",
+        "firm": "Morgan",
+        "lnp": 42.5,
+        "alp": 41,
+        "grn": 9,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
+      },
+      {
+        "date": "2010-05-13",
+        "firm": "Morgan",
+        "lnp": 46,
+        "alp": 36,
+        "grn": 11.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
       },
       {
         "date": "2010-05-16",
@@ -8019,6 +9691,28 @@
         "tpp_alp": 50
       },
       {
+        "date": "2010-05-16",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 37,
+        "grn": 12,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2010-05-16",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 37.5,
+        "grn": 12,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
+      },
+      {
         "date": "2010-05-23",
         "firm": "Essential",
         "lnp": 41,
@@ -8028,6 +9722,28 @@
         "oth": 9,
         "tpp_lnp": 48,
         "tpp_alp": 52
+      },
+      {
+        "date": "2010-05-23",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 42.5,
+        "grn": 11,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "2010-05-27",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 37.5,
+        "grn": 11.5,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
       },
       {
         "date": "2010-05-30",
@@ -8041,6 +9757,28 @@
         "tpp_alp": 51
       },
       {
+        "date": "2010-05-30",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 35,
+        "grn": 16,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2010-05-30",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 42,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
+      },
+      {
         "date": "2010-06-06",
         "firm": "Essential",
         "lnp": 40,
@@ -8048,6 +9786,17 @@
         "grn": 12,
         "onp": null,
         "oth": 11,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-06-06",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 40,
+        "grn": 11,
+        "onp": null,
+        "oth": 7.5,
         "tpp_lnp": 48,
         "tpp_alp": 52
       },
@@ -8063,6 +9812,17 @@
         "tpp_alp": 51
       },
       {
+        "date": "2010-06-13",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 38,
+        "grn": 13,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
+      },
+      {
         "date": "2010-06-20",
         "firm": "Essential",
         "lnp": 40,
@@ -8072,6 +9832,28 @@
         "oth": 11,
         "tpp_lnp": 48,
         "tpp_alp": 52
+      },
+      {
+        "date": "2010-06-20",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 35,
+        "grn": 15,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-06-20",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 41,
+        "grn": 12.5,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2010-06-27",
@@ -8085,6 +9867,28 @@
         "tpp_alp": 54
       },
       {
+        "date": "2010-06-27",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 42,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2010-06-28",
+        "firm": "Morgan",
+        "lnp": 45.5,
+        "alp": 38.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
+      },
+      {
         "date": "2010-07-04",
         "firm": "Essential",
         "lnp": 39,
@@ -8094,6 +9898,17 @@
         "oth": 8,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2010-07-04",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 45.5,
+        "grn": 10.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2010-07-11",
@@ -8107,6 +9922,17 @@
         "tpp_alp": 55
       },
       {
+        "date": "2010-07-11",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 40.5,
+        "grn": 12,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
         "date": "2010-07-18",
         "firm": "Essential",
         "lnp": 39,
@@ -8116,6 +9942,39 @@
         "oth": 7,
         "tpp_lnp": 45,
         "tpp_alp": 55
+      },
+      {
+        "date": "2010-07-18",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 42,
+        "grn": 12,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2010-07-18",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 44.5,
+        "grn": 10.5,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2010-07-21",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 44,
+        "grn": 11.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
       },
       {
         "date": "2010-07-25",
@@ -8129,6 +9988,39 @@
         "tpp_alp": 55
       },
       {
+        "date": "2010-07-25",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 40,
+        "grn": 12,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-07-25",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 43.5,
+        "grn": 11.5,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
+      },
+      {
+        "date": "2010-07-28",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 42,
+        "grn": 11,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
         "date": "2010-08-01",
         "firm": "Essential",
         "lnp": 39,
@@ -8138,6 +10030,39 @@
         "oth": 8,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2010-08-01",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 37,
+        "grn": 12,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2010-08-01",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 44,
+        "grn": 10,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2010-08-03",
+        "firm": "Morgan",
+        "lnp": 45,
+        "alp": 38,
+        "grn": 11,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
       },
       {
         "date": "2010-08-08",
@@ -8151,6 +10076,39 @@
         "tpp_alp": 52
       },
       {
+        "date": "2010-08-08",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 38,
+        "grn": 13,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-08-08",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 43,
+        "grn": 15.5,
+        "onp": null,
+        "oth": 4.5,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
+        "date": "2010-08-14",
+        "firm": "Morgan",
+        "lnp": 44,
+        "alp": 40.5,
+        "grn": 12.5,
+        "onp": null,
+        "oth": 3,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
         "date": "2010-08-15",
         "firm": "Essential",
         "lnp": 44,
@@ -8160,6 +10118,83 @@
         "oth": 7,
         "tpp_lnp": 49,
         "tpp_alp": 51
+      },
+      {
+        "date": "2010-08-15",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 38,
+        "grn": 14,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-08-15",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 40,
+        "grn": 13.5,
+        "onp": null,
+        "oth": 3.5,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-08-19",
+        "firm": "Newspoll",
+        "lnp": 43.4,
+        "alp": 36.2,
+        "grn": 13.9,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 49.8,
+        "tpp_alp": 50.2
+      },
+      {
+        "date": "2010-08-19",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 38,
+        "grn": 13,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2010-08-20",
+        "firm": "Morgan",
+        "lnp": 42.5,
+        "alp": 39,
+        "grn": 11.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2010-08-21",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 38.5,
+        "grn": 13,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
+      },
+      {
+        "date": "2010-08-21",
+        "firm": "Election",
+        "lnp": 43.3,
+        "alp": 38,
+        "grn": 11.8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 49.9,
+        "tpp_alp": 50.1
       }
     ],
     "2013": [
