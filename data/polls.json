@@ -198,6 +198,26 @@
       "oth": 8.9,
       "tpp_lnp": 48.6,
       "tpp_alp": 51.4
+    },
+    "e1990": {
+      "date": "1990-03-24",
+      "lnp": 43.5,
+      "alp": 39.4,
+      "grn": 0,
+      "onp": 0,
+      "oth": 17.1,
+      "tpp_lnp": 50.1,
+      "tpp_alp": 49.9
+    },
+    "e1987": {
+      "date": "1987-07-11",
+      "lnp": 45.7,
+      "alp": 45.8,
+      "grn": 0,
+      "onp": 0,
+      "oth": 8.5,
+      "tpp_lnp": 49.2,
+      "tpp_alp": 50.8
     }
   },
   "events": [
@@ -6769,6 +6789,1000 @@
     }
   ],
   "cyclePolls": {
+    "1990": [
+      {
+        "date": "1987-08-23",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 49,
+        "grn": null,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1987-09-20",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 47,
+        "grn": null,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1987-10-18",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 45,
+        "grn": null,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1987-11-08",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 45.5,
+        "grn": null,
+        "onp": null,
+        "oth": 11.5,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1987-11-29",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 45,
+        "grn": null,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1987-12-13",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 45,
+        "grn": null,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-02-28",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 44,
+        "grn": null,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-03-27",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 38,
+        "grn": null,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-05-01",
+        "firm": "Newspoll",
+        "lnp": 46,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-05-29",
+        "firm": "Newspoll",
+        "lnp": 46,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-06-26",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 44,
+        "grn": null,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-07-24",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 43,
+        "grn": null,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-08-21",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 45,
+        "grn": null,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-09-25",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 44,
+        "grn": null,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-10-23",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 46,
+        "grn": null,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-11-20",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 44,
+        "grn": null,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1988-12-11",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 45,
+        "grn": null,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-02-19",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 45,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-03-19",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 43,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-04-24",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-05-07",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 49,
+        "grn": null,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-05-21",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 40,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-06-18",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 39,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-06-25",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 40,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-07-23",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-08-27",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-09-24",
+        "firm": "Newspoll",
+        "lnp": 42.5,
+        "alp": 42.5,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-10-22",
+        "firm": "Newspoll",
+        "lnp": 43.5,
+        "alp": 41.5,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-11-26",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1989-12-10",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 44.5,
+        "grn": null,
+        "onp": null,
+        "oth": 15.5,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-02-18",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-03-04",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 19,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-03-18",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 39,
+        "grn": null,
+        "onp": null,
+        "oth": 21,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-03-22",
+        "firm": "Newspoll",
+        "lnp": 39.5,
+        "alp": 41.5,
+        "grn": null,
+        "onp": null,
+        "oth": 19,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-03-24",
+        "firm": "Election",
+        "lnp": 43.5,
+        "alp": 39.4,
+        "grn": 0,
+        "onp": 0,
+        "oth": 17.1,
+        "tpp_lnp": 50.1,
+        "tpp_alp": 49.9
+      }
+    ],
+    "1993": [
+      {
+        "date": "1990-04-22",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 41,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-05-20",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 39,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-06-17",
+        "firm": "Newspoll",
+        "lnp": 46,
+        "alp": 37,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-07-29",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 38,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-08-26",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 38,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-09-23",
+        "firm": "Newspoll",
+        "lnp": 46,
+        "alp": 37,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-10-28",
+        "firm": "Newspoll",
+        "lnp": 49,
+        "alp": 34,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-11-25",
+        "firm": "Newspoll",
+        "lnp": 50,
+        "alp": 34,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1990-12-09",
+        "firm": "Newspoll",
+        "lnp": 50,
+        "alp": 33,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-02-24",
+        "firm": "Newspoll",
+        "lnp": 49,
+        "alp": 35,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-03-17",
+        "firm": "Newspoll",
+        "lnp": 50,
+        "alp": 35,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-04-21",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 35,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-05-19",
+        "firm": "Newspoll",
+        "lnp": 49,
+        "alp": 35,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-06-30",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 38,
+        "grn": null,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-07-28",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 38,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-08-25",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 39,
+        "grn": null,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-09-29",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 40,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-10-20",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 37,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-11-17",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 37,
+        "grn": null,
+        "onp": null,
+        "oth": 18,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-11-24",
+        "firm": "Newspoll",
+        "lnp": 53,
+        "alp": 35,
+        "grn": null,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1991-12-08",
+        "firm": "Newspoll",
+        "lnp": 51,
+        "alp": 36,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-01-19",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 38,
+        "grn": null,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-02-02",
+        "firm": "Newspoll",
+        "lnp": 52,
+        "alp": 34,
+        "grn": null,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-02-16",
+        "firm": "Newspoll",
+        "lnp": 52,
+        "alp": 35,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-03-01",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 41,
+        "grn": null,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-03-15",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 39,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-03-29",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 43,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-04-12",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 40,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-05-03",
+        "firm": "Newspoll",
+        "lnp": 46,
+        "alp": 37,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-05-17",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 36,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-05-31",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 35,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-06-14",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 37,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-06-28",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 38,
+        "grn": null,
+        "onp": null,
+        "oth": 18,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-07-12",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 38,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-07-26",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 39,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-08-09",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 36,
+        "grn": null,
+        "onp": null,
+        "oth": 16,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-08-23",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 37,
+        "grn": null,
+        "onp": null,
+        "oth": 18,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-09-06",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 40,
+        "grn": null,
+        "onp": null,
+        "oth": 17,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-09-20",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 38,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-10-11",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 39,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-10-25",
+        "firm": "Newspoll",
+        "lnp": 49,
+        "alp": 37,
+        "grn": null,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-11-08",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 45,
+        "grn": null,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-11-22",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 44,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-12-06",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 47,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-12-13",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 49,
+        "grn": null,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1992-12-20",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 47,
+        "grn": null,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1993-01-24",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1993-02-07",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 40,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1993-02-14",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 39.5,
+        "grn": null,
+        "onp": null,
+        "oth": 12.5,
+        "tpp_lnp": 53.5,
+        "tpp_alp": 46.5
+      },
+      {
+        "date": "1993-02-21",
+        "firm": "Newspoll",
+        "lnp": 49,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 52.5,
+        "tpp_alp": 47.5
+      },
+      {
+        "date": "1993-02-28",
+        "firm": "Newspoll",
+        "lnp": 46,
+        "alp": 42.5,
+        "grn": null,
+        "onp": null,
+        "oth": 11.5,
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
+      },
+      {
+        "date": "1993-03-07",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 42,
+        "grn": null,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "1993-03-10",
+        "firm": "Newspoll",
+        "lnp": 46.5,
+        "alp": 41,
+        "grn": null,
+        "onp": null,
+        "oth": 12.5,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1993-03-11",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 44,
+        "grn": null,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
+      },
+      {
+        "date": "1993-03-13",
+        "firm": "Election",
+        "lnp": 44.3,
+        "alp": 44.9,
+        "grn": 1.9,
+        "onp": 0,
+        "oth": 8.9,
+        "tpp_lnp": 48.6,
+        "tpp_alp": 51.4
+      }
+    ],
     "1996": [
       {
         "date": "1993-03-21",
@@ -33006,6 +34020,706 @@
     ]
   },
   "cycleApproval": {
+    "1987": [
+      {
+        "date": "1987-08-23",
+        "firm": "Newspoll",
+        "pmNet": 19,
+        "oppNet": -3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-09-20",
+        "firm": "Newspoll",
+        "pmNet": 15,
+        "oppNet": -8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-10-18",
+        "firm": "Newspoll",
+        "pmNet": 5,
+        "oppNet": -5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-11-08",
+        "firm": "Newspoll",
+        "pmNet": 13,
+        "oppNet": -10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-11-29",
+        "firm": "Newspoll",
+        "pmNet": 11,
+        "oppNet": -11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-12-13",
+        "firm": "Newspoll",
+        "pmNet": 18,
+        "oppNet": -14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-02-28",
+        "firm": "Newspoll",
+        "pmNet": -2,
+        "oppNet": -16,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-03-27",
+        "firm": "Newspoll",
+        "pmNet": -6,
+        "oppNet": -15,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-05-01",
+        "firm": "Newspoll",
+        "pmNet": 0,
+        "oppNet": -26,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-05-29",
+        "firm": "Newspoll",
+        "pmNet": 2,
+        "oppNet": -22,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-06-26",
+        "firm": "Newspoll",
+        "pmNet": 10,
+        "oppNet": -24,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-07-24",
+        "firm": "Newspoll",
+        "pmNet": 8,
+        "oppNet": -28,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-08-21",
+        "firm": "Newspoll",
+        "pmNet": 12,
+        "oppNet": -34,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-09-25",
+        "firm": "Newspoll",
+        "pmNet": 10,
+        "oppNet": -35,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-10-23",
+        "firm": "Newspoll",
+        "pmNet": 10,
+        "oppNet": -33,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-11-20",
+        "firm": "Newspoll",
+        "pmNet": 15,
+        "oppNet": -31,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1988-12-11",
+        "firm": "Newspoll",
+        "pmNet": 13,
+        "oppNet": -26,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-02-19",
+        "firm": "Newspoll",
+        "pmNet": -1,
+        "oppNet": -25,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-03-19",
+        "firm": "Newspoll",
+        "pmNet": -9,
+        "oppNet": -33,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-04-24",
+        "firm": "Newspoll",
+        "pmNet": -6,
+        "oppNet": -31,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-05-07",
+        "firm": "Newspoll",
+        "pmNet": 3,
+        "oppNet": -30,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-05-21",
+        "firm": "Newspoll",
+        "pmNet": -8,
+        "oppNet": -28,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-06-18",
+        "firm": "Newspoll",
+        "pmNet": -13,
+        "oppNet": -19,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-06-25",
+        "firm": "Newspoll",
+        "pmNet": -25,
+        "oppNet": -21,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-07-23",
+        "firm": "Newspoll",
+        "pmNet": -12,
+        "oppNet": -28,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-08-27",
+        "firm": "Newspoll",
+        "pmNet": -4,
+        "oppNet": -30,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-09-24",
+        "firm": "Newspoll",
+        "pmNet": -10,
+        "oppNet": -37,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-10-22",
+        "firm": "Newspoll",
+        "pmNet": -14,
+        "oppNet": -36,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-11-26",
+        "firm": "Newspoll",
+        "pmNet": -16,
+        "oppNet": -26,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1989-12-10",
+        "firm": "Newspoll",
+        "pmNet": -10,
+        "oppNet": -28,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1990-02-18",
+        "firm": "Newspoll",
+        "pmNet": -6,
+        "oppNet": -38,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1990-03-04",
+        "firm": "Newspoll",
+        "pmNet": -11,
+        "oppNet": -41,
+        "pmPpm": 52,
+        "oppPpm": 22
+      },
+      {
+        "date": "1990-03-18",
+        "firm": "Newspoll",
+        "pmNet": -13,
+        "oppNet": -44,
+        "pmPpm": 54,
+        "oppPpm": 20
+      },
+      {
+        "date": "1990-03-22",
+        "firm": "Newspoll",
+        "pmNet": -10,
+        "oppNet": -37,
+        "pmPpm": 55,
+        "oppPpm": 24
+      }
+    ],
+    "1990": [
+      {
+        "date": "1990-04-22",
+        "firm": "Newspoll",
+        "pmNet": -7,
+        "oppNet": 18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1990-05-20",
+        "firm": "Newspoll",
+        "pmNet": -8,
+        "oppNet": 23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1990-06-17",
+        "firm": "Newspoll",
+        "pmNet": -15,
+        "oppNet": 25,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1990-07-29",
+        "firm": "Newspoll",
+        "pmNet": -18,
+        "oppNet": 20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1990-08-26",
+        "firm": "Newspoll",
+        "pmNet": -12,
+        "oppNet": 23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1990-09-23",
+        "firm": "Newspoll",
+        "pmNet": -16,
+        "oppNet": 24,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1990-10-28",
+        "firm": "Newspoll",
+        "pmNet": -31,
+        "oppNet": 21,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1990-11-25",
+        "firm": "Newspoll",
+        "pmNet": -28,
+        "oppNet": 19,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1990-12-09",
+        "firm": "Newspoll",
+        "pmNet": -31,
+        "oppNet": 23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1991-02-24",
+        "firm": "Newspoll",
+        "pmNet": -12,
+        "oppNet": 19,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1991-03-17",
+        "firm": "Newspoll",
+        "pmNet": -18,
+        "oppNet": 16,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1991-04-21",
+        "firm": "Newspoll",
+        "pmNet": -30,
+        "oppNet": 6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1991-05-19",
+        "firm": "Newspoll",
+        "pmNet": -25,
+        "oppNet": 10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1991-06-30",
+        "firm": "Newspoll",
+        "pmNet": -18,
+        "oppNet": -1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1991-07-28",
+        "firm": "Newspoll",
+        "pmNet": -23,
+        "oppNet": 15,
+        "pmPpm": 38,
+        "oppPpm": 35
+      },
+      {
+        "date": "1991-08-25",
+        "firm": "Newspoll",
+        "pmNet": -23,
+        "oppNet": 11,
+        "pmPpm": 40,
+        "oppPpm": 35
+      },
+      {
+        "date": "1991-09-29",
+        "firm": "Newspoll",
+        "pmNet": -21,
+        "oppNet": 1,
+        "pmPpm": 41,
+        "oppPpm": 33
+      },
+      {
+        "date": "1991-10-20",
+        "firm": "Newspoll",
+        "pmNet": -29,
+        "oppNet": -4,
+        "pmPpm": 39,
+        "oppPpm": 32
+      },
+      {
+        "date": "1991-11-17",
+        "firm": "Newspoll",
+        "pmNet": -26,
+        "oppNet": -6,
+        "pmPpm": 38,
+        "oppPpm": 33
+      },
+      {
+        "date": "1991-11-24",
+        "firm": "Newspoll",
+        "pmNet": -31,
+        "oppNet": 17,
+        "pmPpm": 32,
+        "oppPpm": 40
+      },
+      {
+        "date": "1991-12-08",
+        "firm": "Newspoll",
+        "pmNet": -37,
+        "oppNet": 20,
+        "pmPpm": 32,
+        "oppPpm": 43
+      },
+      {
+        "date": "1992-01-19",
+        "firm": "Newspoll",
+        "pmNet": -21,
+        "oppNet": 27,
+        "pmPpm": 28,
+        "oppPpm": 43
+      },
+      {
+        "date": "1992-02-02",
+        "firm": "Newspoll",
+        "pmNet": -18,
+        "oppNet": 20,
+        "pmPpm": 30,
+        "oppPpm": 45
+      },
+      {
+        "date": "1992-02-16",
+        "firm": "Newspoll",
+        "pmNet": -20,
+        "oppNet": 11,
+        "pmPpm": 31,
+        "oppPpm": 44
+      },
+      {
+        "date": "1992-03-01",
+        "firm": "Newspoll",
+        "pmNet": -11,
+        "oppNet": 12,
+        "pmPpm": 36,
+        "oppPpm": 40
+      },
+      {
+        "date": "1992-03-15",
+        "firm": "Newspoll",
+        "pmNet": -10,
+        "oppNet": 6,
+        "pmPpm": 36,
+        "oppPpm": 42
+      },
+      {
+        "date": "1992-03-29",
+        "firm": "Newspoll",
+        "pmNet": -12,
+        "oppNet": 9,
+        "pmPpm": 38,
+        "oppPpm": 37
+      },
+      {
+        "date": "1992-04-12",
+        "firm": "Newspoll",
+        "pmNet": -15,
+        "oppNet": -1,
+        "pmPpm": 37,
+        "oppPpm": 35
+      },
+      {
+        "date": "1992-05-03",
+        "firm": "Newspoll",
+        "pmNet": -32,
+        "oppNet": -3,
+        "pmPpm": 35,
+        "oppPpm": 39
+      },
+      {
+        "date": "1992-05-17",
+        "firm": "Newspoll",
+        "pmNet": -30,
+        "oppNet": -6,
+        "pmPpm": 35,
+        "oppPpm": 39
+      },
+      {
+        "date": "1992-05-31",
+        "firm": "Newspoll",
+        "pmNet": -31,
+        "oppNet": -4,
+        "pmPpm": 32,
+        "oppPpm": 40
+      },
+      {
+        "date": "1992-06-14",
+        "firm": "Newspoll",
+        "pmNet": -36,
+        "oppNet": -11,
+        "pmPpm": 32,
+        "oppPpm": 38
+      },
+      {
+        "date": "1992-06-28",
+        "firm": "Newspoll",
+        "pmNet": -26,
+        "oppNet": -8,
+        "pmPpm": 35,
+        "oppPpm": 37
+      },
+      {
+        "date": "1992-07-12",
+        "firm": "Newspoll",
+        "pmNet": -44,
+        "oppNet": -16,
+        "pmPpm": 32,
+        "oppPpm": 38
+      },
+      {
+        "date": "1992-07-26",
+        "firm": "Newspoll",
+        "pmNet": -36,
+        "oppNet": -11,
+        "pmPpm": 35,
+        "oppPpm": 39
+      },
+      {
+        "date": "1992-08-09",
+        "firm": "Newspoll",
+        "pmNet": -36,
+        "oppNet": -11,
+        "pmPpm": 32,
+        "oppPpm": 40
+      },
+      {
+        "date": "1992-08-23",
+        "firm": "Newspoll",
+        "pmNet": -43,
+        "oppNet": -6,
+        "pmPpm": 31,
+        "oppPpm": 40
+      },
+      {
+        "date": "1992-09-06",
+        "firm": "Newspoll",
+        "pmNet": -33,
+        "oppNet": -20,
+        "pmPpm": 35,
+        "oppPpm": 34
+      },
+      {
+        "date": "1992-09-20",
+        "firm": "Newspoll",
+        "pmNet": -32,
+        "oppNet": -16,
+        "pmPpm": 32,
+        "oppPpm": 37
+      },
+      {
+        "date": "1992-10-11",
+        "firm": "Newspoll",
+        "pmNet": -28,
+        "oppNet": -3,
+        "pmPpm": 34,
+        "oppPpm": 38
+      },
+      {
+        "date": "1992-10-25",
+        "firm": "Newspoll",
+        "pmNet": -23,
+        "oppNet": -22,
+        "pmPpm": 37,
+        "oppPpm": 36
+      },
+      {
+        "date": "1992-11-08",
+        "firm": "Newspoll",
+        "pmNet": -19,
+        "oppNet": -20,
+        "pmPpm": 39,
+        "oppPpm": 35
+      },
+      {
+        "date": "1992-11-22",
+        "firm": "Newspoll",
+        "pmNet": -25,
+        "oppNet": -27,
+        "pmPpm": 39,
+        "oppPpm": 32
+      },
+      {
+        "date": "1992-12-06",
+        "firm": "Newspoll",
+        "pmNet": -24,
+        "oppNet": -30,
+        "pmPpm": 43,
+        "oppPpm": 30
+      },
+      {
+        "date": "1992-12-13",
+        "firm": "Newspoll",
+        "pmNet": -20,
+        "oppNet": -24,
+        "pmPpm": 43,
+        "oppPpm": 34
+      },
+      {
+        "date": "1992-12-20",
+        "firm": "Newspoll",
+        "pmNet": -27,
+        "oppNet": -14,
+        "pmPpm": 38,
+        "oppPpm": 35
+      },
+      {
+        "date": "1993-01-24",
+        "firm": "Newspoll",
+        "pmNet": -23,
+        "oppNet": -10,
+        "pmPpm": 39,
+        "oppPpm": 38
+      },
+      {
+        "date": "1993-02-07",
+        "firm": "Newspoll",
+        "pmNet": -37,
+        "oppNet": -20,
+        "pmPpm": 36,
+        "oppPpm": 38
+      },
+      {
+        "date": "1993-02-14",
+        "firm": "Newspoll",
+        "pmNet": -32,
+        "oppNet": -8,
+        "pmPpm": 37,
+        "oppPpm": 42
+      },
+      {
+        "date": "1993-02-21",
+        "firm": "Newspoll",
+        "pmNet": -32,
+        "oppNet": -6,
+        "pmPpm": 36,
+        "oppPpm": 41
+      },
+      {
+        "date": "1993-02-28",
+        "firm": "Newspoll",
+        "pmNet": -28,
+        "oppNet": -10,
+        "pmPpm": 37,
+        "oppPpm": 38
+      },
+      {
+        "date": "1993-03-07",
+        "firm": "Newspoll",
+        "pmNet": -32,
+        "oppNet": -5,
+        "pmPpm": 36,
+        "oppPpm": 42
+      },
+      {
+        "date": "1993-03-11",
+        "firm": "Newspoll",
+        "pmNet": -25,
+        "oppNet": -2,
+        "pmPpm": 40,
+        "oppPpm": 41
+      }
+    ],
     "1993": [
       {
         "date": "1993-03-21",
