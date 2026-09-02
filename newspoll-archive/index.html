@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Federal Newspoll archive · auspol tracker</title>
+<!-- Standalone wrapper: embeds the "Federal Newspoll Archive" Infogram
+     interactive via its official embed URL in a site-styled frame. Not part
+     of the .build/newtracker pipeline — hand-maintained, like
+     auspol-polling.html. -->
+<meta name="description" content="The historical Newspoll record — an embedded copy of the Federal Newspoll Archive interactive, framed inside auspol tracker for reference alongside the live polling tracker.">
+<meta name="theme-color" content="#0b1d2c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="auspol tracker">
+<meta property="og:title" content="Federal Newspoll archive · auspol tracker">
+<meta property="og:description" content="The historical Newspoll record, embedded alongside the live polling tracker.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1d2c'/%3E%3Crect x='6' y='15' width='5' height='11' fill='%23d62828'/%3E%3Crect x='13.5' y='8' width='5' height='18' fill='%23b08d39'/%3E%3Crect x='21' y='18' width='5' height='8' fill='%23ec7a08'/%3E%3C/svg%3E">
+<style>
+@font-face {
+  font-family: 'Archivo';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../assets/fonts/archivo-latin.7150c0ec.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+:root {
+  --bg: #f6f1e8;
+  --surface: #ffffff;
+  --ink: #0b1d2c;
+  --ink-mid: #34495b;
+  --ink-mute: #6d7a87;
+  --rule-soft: #ebe3d3;
+  --accent: #a8252a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Archivo', system-ui, -apple-system, "Segoe UI", sans-serif;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.bar {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 20px 12px;
+  border-bottom: 1px solid var(--rule-soft);
+  background: var(--surface);
+}
+.bar .kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.bar h1 {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.bar .note {
+  font-size: 12px;
+  color: var(--ink-mute);
+}
+.bar a.back {
+  margin-left: auto;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-mid);
+  text-decoration: none;
+  white-space: nowrap;
+}
+.bar a.back:hover { color: var(--accent); text-decoration: underline; }
+.frame-wrap { flex: 1; display: flex; min-height: 480px; }
+iframe {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  display: block;
+  background: var(--surface);
+}
+</style>
+</head>
+<body>
+<header class="bar">
+  <span class="kicker">auspol tracker</span>
+  <h1>Federal Newspoll archive</h1>
+  <span class="note">Historical Newspoll results, embedded from the Infogram original.</span>
+  <a class="back" href="/">&larr; Back to the live tracker</a>
+</header>
+<div class="frame-wrap">
+  <iframe
+    src="https://e.infogram.com/federal-newspoll-archive-1gv4m7ejjndop18?src=embed"
+    title="Federal Newspoll Archive — historical Newspoll polling results (Infogram)"
+    allow="fullscreen"
+    loading="eager"></iframe>
+</div>
+</body>
+</html>
