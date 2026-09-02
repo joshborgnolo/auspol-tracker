@@ -148,6 +148,16 @@
       "oth": 15,
       "tpp_lnp": 44.8,
       "tpp_alp": 55.2
+    },
+    "e2004": {
+      "date": "2004-10-09",
+      "lnp": 46.7,
+      "alp": 37.6,
+      "grn": 7.2,
+      "onp": null,
+      "oth": 8.5,
+      "tpp_lnp": 52.7,
+      "tpp_alp": 47.3
     }
   },
   "events": [
@@ -6719,6 +6729,2208 @@
     }
   ],
   "cyclePolls": {
+    "2007": [
+      {
+        "date": "2004-10-17",
+        "firm": "Morgan",
+        "lnp": 46.5,
+        "alp": 37.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 52.5,
+        "tpp_alp": 47.5
+      },
+      {
+        "date": "2004-11-07",
+        "firm": "Morgan",
+        "lnp": 44.5,
+        "alp": 39.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
+      },
+      {
+        "date": "2004-11-21",
+        "firm": "Newspoll",
+        "lnp": 46,
+        "alp": 38,
+        "grn": 6,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2004-11-21",
+        "firm": "Morgan",
+        "lnp": 44,
+        "alp": 39,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
+      },
+      {
+        "date": "2004-12-05",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 33,
+        "grn": 8,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 55,
+        "tpp_alp": 45
+      },
+      {
+        "date": "2004-12-05",
+        "firm": "Morgan",
+        "lnp": 46.5,
+        "alp": 36,
+        "grn": 9,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2004-12-19",
+        "firm": "Newspoll",
+        "lnp": 46,
+        "alp": 39,
+        "grn": 6,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2004-12-19",
+        "firm": "Morgan",
+        "lnp": 45.5,
+        "alp": 36.5,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 52.5,
+        "tpp_alp": 47.5
+      },
+      {
+        "date": "2005-01-16",
+        "firm": "Morgan",
+        "lnp": 47,
+        "alp": 37,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2005-01-22",
+        "firm": "ACNielsen",
+        "lnp": 52,
+        "alp": 34,
+        "grn": 8,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 57,
+        "tpp_alp": 43
+      },
+      {
+        "date": "2005-01-23",
+        "firm": "Newspoll",
+        "lnp": 46,
+        "alp": 37,
+        "grn": 7,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2005-01-30",
+        "firm": "Morgan",
+        "lnp": 45,
+        "alp": 38,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
+      },
+      {
+        "date": "2005-02-06",
+        "firm": "Newspoll",
+        "lnp": 48,
+        "alp": 37,
+        "grn": 6,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 54,
+        "tpp_alp": 46
+      },
+      {
+        "date": "2005-02-13",
+        "firm": "Morgan",
+        "lnp": 45,
+        "alp": 37.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2005-02-13",
+        "firm": "ACNielsen",
+        "lnp": 47,
+        "alp": 36,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2005-02-20",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 38,
+        "grn": 6,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2005-02-27",
+        "firm": "Morgan",
+        "lnp": 46,
+        "alp": 38.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2005-03-06",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 37,
+        "grn": 5,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2005-03-06",
+        "firm": "Morgan",
+        "lnp": 44.5,
+        "alp": 43,
+        "grn": 7,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2005-03-13",
+        "firm": "Morgan",
+        "lnp": 44.5,
+        "alp": 37,
+        "grn": 10,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2005-03-13",
+        "firm": "ACNielsen",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 11,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2005-03-20",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 36,
+        "grn": 6,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 54,
+        "tpp_alp": 46
+      },
+      {
+        "date": "2005-03-27",
+        "firm": "Morgan",
+        "lnp": 44,
+        "alp": 39,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 50.5,
+        "tpp_alp": 49.5
+      },
+      {
+        "date": "2005-04-03",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 41,
+        "grn": 5,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2005-04-10",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 43,
+        "grn": 8,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2005-04-10",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2005-04-17",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 39,
+        "grn": 5,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2005-04-24",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 40,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2005-05-01",
+        "firm": "Newspoll",
+        "lnp": 46,
+        "alp": 38,
+        "grn": 6,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2005-05-08",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 42.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2005-05-08",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2005-05-15",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 40,
+        "grn": 6,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2005-05-15",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 41,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
+      },
+      {
+        "date": "2005-05-29",
+        "firm": "Newspoll",
+        "lnp": 47,
+        "alp": 37,
+        "grn": 5,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2005-05-29",
+        "firm": "Morgan",
+        "lnp": 45,
+        "alp": 39,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
+      },
+      {
+        "date": "2005-06-05",
+        "firm": "ACNielsen",
+        "lnp": 44,
+        "alp": 38,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2005-06-12",
+        "firm": "Morgan",
+        "lnp": 43.5,
+        "alp": 39.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2005-06-19",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 37,
+        "grn": 7,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2005-06-26",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 39.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
+      },
+      {
+        "date": "2005-07-03",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 39,
+        "grn": 6,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2005-07-03",
+        "firm": "ACNielsen",
+        "lnp": 40,
+        "alp": 41,
+        "grn": 10,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2005-07-10",
+        "firm": "Morgan",
+        "lnp": 42.5,
+        "alp": 40.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2005-07-17",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 39,
+        "grn": 5,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2005-07-24",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 38.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
+      },
+      {
+        "date": "2005-07-31",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 41,
+        "grn": 7,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2005-07-31",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 38,
+        "grn": 11,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2005-08-07",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 42,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2005-08-14",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 37,
+        "grn": 7,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2005-08-21",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 41.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 11.5,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
+      },
+      {
+        "date": "2005-08-28",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 40,
+        "grn": 6,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2005-08-28",
+        "firm": "ACNielsen",
+        "lnp": 44,
+        "alp": 36,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2005-09-04",
+        "firm": "Morgan",
+        "lnp": 44,
+        "alp": 37,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 10.5,
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
+      },
+      {
+        "date": "2005-09-11",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 7,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2005-09-11",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 41.5,
+        "grn": 7,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2005-09-18",
+        "firm": "Morgan",
+        "lnp": 44,
+        "alp": 34.5,
+        "grn": 10,
+        "onp": null,
+        "oth": 11.5,
+        "tpp_lnp": 52.5,
+        "tpp_alp": 47.5
+      },
+      {
+        "date": "2005-09-25",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 34,
+        "grn": 8,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2005-09-25",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 35,
+        "grn": 10,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2005-10-02",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 38.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 10.5,
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
+      },
+      {
+        "date": "2005-10-09",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 37,
+        "grn": 7,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2005-10-16",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 41.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2005-10-23",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 40,
+        "grn": 9,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2005-10-23",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 36,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2005-10-30",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 41,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 10.5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2005-11-06",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 8,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2005-11-06",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 43,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2005-11-12",
+        "firm": "Morgan",
+        "lnp": 43.5,
+        "alp": 38,
+        "grn": 9,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2005-11-20",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 42,
+        "grn": 7,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2005-11-20",
+        "firm": "ACNielsen",
+        "lnp": 37,
+        "alp": 43,
+        "grn": 10,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2005-11-27",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 45.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2005-12-04",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 42,
+        "grn": 6,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2005-12-11",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 42,
+        "grn": 10,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2005-12-18",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 7,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2005-12-18",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 39.5,
+        "grn": 10.5,
+        "onp": null,
+        "oth": 10.5,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2005-12-18",
+        "firm": "ACNielsen",
+        "lnp": 39,
+        "alp": 39,
+        "grn": 10,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2006-01-15",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 37,
+        "grn": 7,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2006-01-15",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 43,
+        "grn": 8,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2006-01-29",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 36,
+        "grn": 7,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2006-01-29",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 38,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 11.5,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2006-01-29",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 36,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2006-02-05",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 42,
+        "grn": 8,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
+      },
+      {
+        "date": "2006-02-12",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 5,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2006-02-19",
+        "firm": "Morgan",
+        "lnp": 40,
+        "alp": 40.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 11.5,
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
+      },
+      {
+        "date": "2006-02-26",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 7,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2006-02-26",
+        "firm": "ACNielsen",
+        "lnp": 42,
+        "alp": 40,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2006-03-05",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 39.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2006-03-12",
+        "firm": "Newspoll",
+        "lnp": 45,
+        "alp": 35,
+        "grn": 6,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "2006-03-19",
+        "firm": "Morgan",
+        "lnp": 44,
+        "alp": 38.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2006-03-26",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 42,
+        "grn": 4,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2006-03-26",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 37,
+        "grn": 8,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2006-04-02",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 43.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2006-04-09",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 7,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2006-04-16",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 42,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2006-04-23",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 38,
+        "grn": 10,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2006-04-30",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 37,
+        "grn": 7,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2006-04-30",
+        "firm": "Morgan",
+        "lnp": 40,
+        "alp": 39,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 12.5,
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
+      },
+      {
+        "date": "2006-05-07",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 42,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
+      },
+      {
+        "date": "2006-05-14",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 39,
+        "grn": 6,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2006-05-14",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 40.5,
+        "grn": 7,
+        "onp": null,
+        "oth": 10.5,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2006-05-20",
+        "firm": "ACNielsen",
+        "lnp": 41,
+        "alp": 40,
+        "grn": 11,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2006-05-28",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 39,
+        "grn": 7,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2006-05-28",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 41,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
+      },
+      {
+        "date": "2006-06-11",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 42,
+        "grn": 8,
+        "onp": null,
+        "oth": 10.5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2006-06-17",
+        "firm": "ACNielsen",
+        "lnp": 41,
+        "alp": 36,
+        "grn": 11,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2006-06-18",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 38,
+        "grn": 7,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2006-06-25",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 40.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2006-07-02",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 41,
+        "grn": 5,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2006-07-09",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 42.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
+      },
+      {
+        "date": "2006-07-16",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 42,
+        "grn": 5,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2006-07-16",
+        "firm": "Morgan",
+        "lnp": 45,
+        "alp": 36.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "2006-07-30",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 40,
+        "grn": 5,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2006-07-30",
+        "firm": "Morgan",
+        "lnp": 40,
+        "alp": 42,
+        "grn": 8,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
+      },
+      {
+        "date": "2006-08-06",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 41,
+        "grn": 7,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2006-08-13",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 37,
+        "grn": 7,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "2006-08-13",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 41.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2006-08-27",
+        "firm": "Newspoll",
+        "lnp": 44,
+        "alp": 42,
+        "grn": 5,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2006-08-27",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 42.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 10.5,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2006-09-10",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 41,
+        "grn": 6,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2006-09-10",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 43,
+        "grn": 9,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2006-09-24",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 42,
+        "grn": 6,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2006-09-24",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 41.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2006-10-08",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 42,
+        "grn": 9.5,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "2006-10-15",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 41,
+        "grn": 6,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2006-10-22",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 41.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 9.5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2006-10-29",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 41,
+        "grn": 7,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2006-11-05",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 40.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
+      },
+      {
+        "date": "2006-11-12",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 37,
+        "grn": 9,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "2006-11-19",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 40.5,
+        "grn": 10,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2006-11-26",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 39,
+        "grn": 7,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "2006-12-03",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 41,
+        "grn": 9,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
+      },
+      {
+        "date": "2006-12-10",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 46,
+        "grn": 5,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2006-12-10",
+        "firm": "Morgan",
+        "lnp": 34.5,
+        "alp": 50,
+        "grn": 7,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2006-12-17",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 49,
+        "grn": 7,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2007-01-14",
+        "firm": "Morgan",
+        "lnp": 36.5,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
+        "date": "2007-01-21",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 44,
+        "grn": 7,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2007-01-28",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 43.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "2007-02-04",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 47,
+        "grn": 5,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2007-02-04",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
+        "date": "2007-02-18",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 46,
+        "grn": 5,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2007-02-18",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 48,
+        "grn": 7,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2007-02-25",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 52.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 38.5,
+        "tpp_alp": 61.5
+      },
+      {
+        "date": "2007-03-04",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 47,
+        "grn": 5,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2007-03-04",
+        "firm": "Morgan",
+        "lnp": 33,
+        "alp": 51.5,
+        "grn": 7,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 38.5,
+        "tpp_alp": 61.5
+      },
+      {
+        "date": "2007-03-11",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 51.5,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2007-03-18",
+        "firm": "Newspoll",
+        "lnp": 34,
+        "alp": 52,
+        "grn": 5,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2007-03-18",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 48.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
+      },
+      {
+        "date": "2007-04-01",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 49,
+        "grn": 4,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2007-04-01",
+        "firm": "Morgan",
+        "lnp": 34.5,
+        "alp": 49.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2007-04-15",
+        "firm": "Newspoll",
+        "lnp": 35,
+        "alp": 50,
+        "grn": 6,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2007-04-15",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 50,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 40.5,
+        "tpp_alp": 59.5
+      },
+      {
+        "date": "2007-04-29",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 48,
+        "grn": 5,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2007-04-29",
+        "firm": "Morgan",
+        "lnp": 34.5,
+        "alp": 52.5,
+        "grn": 6.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2007-05-06",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 51.5,
+        "grn": 7,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2007-05-13",
+        "firm": "Newspoll",
+        "lnp": 36,
+        "alp": 50,
+        "grn": 4,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2007-05-13",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 40.5,
+        "tpp_alp": 59.5
+      },
+      {
+        "date": "2007-05-20",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 49,
+        "grn": 3,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2007-05-20",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 51,
+        "grn": 8,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2007-05-24",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 47,
+        "grn": 5,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2007-05-27",
+        "firm": "Newspoll",
+        "lnp": 35,
+        "alp": 52,
+        "grn": 3,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2007-05-27",
+        "firm": "Morgan",
+        "lnp": 37.5,
+        "alp": 49,
+        "grn": 6,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
+        "date": "2007-06-03",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 51,
+        "grn": 5.5,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2007-06-17",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 46,
+        "grn": 5,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2007-06-17",
+        "firm": "Morgan",
+        "lnp": 37,
+        "alp": 48,
+        "grn": 6.5,
+        "onp": null,
+        "oth": 8.5,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
+        "date": "2007-07-01",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 50.5,
+        "grn": 7,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2007-07-08",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 48,
+        "grn": 4,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2007-07-15",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 47.5,
+        "grn": 5.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2007-07-22",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 47,
+        "grn": 4,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2007-07-29",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 47,
+        "grn": 6.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2007-08-05",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 48,
+        "grn": 4,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2007-08-12",
+        "firm": "Morgan",
+        "lnp": 36.5,
+        "alp": 49.5,
+        "grn": 7,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41.5,
+        "tpp_alp": 58.5
+      },
+      {
+        "date": "2007-08-19",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 46,
+        "grn": 5,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2007-08-26",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 46,
+        "grn": 6.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "2007-09-02",
+        "firm": "Newspoll",
+        "lnp": 37,
+        "alp": 51,
+        "grn": 3,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2007-09-02",
+        "firm": "Morgan",
+        "lnp": 34.5,
+        "alp": 49,
+        "grn": 9,
+        "onp": null,
+        "oth": 7.5,
+        "tpp_lnp": 40,
+        "tpp_alp": 60
+      },
+      {
+        "date": "2007-09-09",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 51,
+        "grn": 6,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 41,
+        "tpp_alp": 59
+      },
+      {
+        "date": "2007-09-16",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 47,
+        "grn": 4,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2007-09-16",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 49.5,
+        "grn": 6,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 43.5,
+        "tpp_alp": 56.5
+      },
+      {
+        "date": "2007-09-23",
+        "firm": "Morgan",
+        "lnp": 36,
+        "alp": 54,
+        "grn": 5.5,
+        "onp": null,
+        "oth": 4.5,
+        "tpp_lnp": 39.5,
+        "tpp_alp": 60.5
+      },
+      {
+        "date": "2007-09-30",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 48,
+        "grn": 5,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2007-09-30",
+        "firm": "Morgan",
+        "lnp": 35.5,
+        "alp": 53.5,
+        "grn": 5.5,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
+      },
+      {
+        "date": "2007-10-07",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 49.5,
+        "grn": 6,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
+        "date": "2007-10-14",
+        "firm": "Newspoll",
+        "lnp": 39,
+        "alp": 48,
+        "grn": 4,
+        "onp": null,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2007-10-14",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 49.5,
+        "grn": 7,
+        "onp": null,
+        "oth": 4,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
+      },
+      {
+        "date": "2007-10-18",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 45,
+        "grn": 9,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
+      },
+      {
+        "date": "2007-10-21",
+        "firm": "Newspoll",
+        "lnp": 38,
+        "alp": 51,
+        "grn": 5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "2007-10-21",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 47,
+        "grn": 8,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2007-10-25",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 44,
+        "grn": 10.5,
+        "onp": null,
+        "oth": 4.5,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "2007-10-28",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 48,
+        "grn": 4,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2007-10-28",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 49,
+        "grn": 7.5,
+        "onp": null,
+        "oth": 4.5,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
+        "date": "2007-11-04",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 47,
+        "grn": 5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "2007-11-04",
+        "firm": "Morgan",
+        "lnp": 34,
+        "alp": 54.5,
+        "grn": 6,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 38,
+        "tpp_alp": 62
+      },
+      {
+        "date": "2007-11-08",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 44.5,
+        "grn": 10.5,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "2007-11-11",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 48,
+        "grn": 6,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2007-11-11",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 48,
+        "grn": 7,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 43.5,
+        "tpp_alp": 56.5
+      },
+      {
+        "date": "2007-11-17",
+        "firm": "Morgan",
+        "lnp": 40,
+        "alp": 46.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 5.5,
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
+      },
+      {
+        "date": "2007-11-18",
+        "firm": "Newspoll",
+        "lnp": 41,
+        "alp": 46,
+        "grn": 7,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "2007-11-18",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 47.5,
+        "grn": 8,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 43.5,
+        "tpp_alp": 56.5
+      },
+      {
+        "date": "2007-11-22",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 44,
+        "grn": 7,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2007-11-22",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 44.5,
+        "grn": 9,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "2007-11-23",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 43.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
+      },
+      {
+        "date": "2007-11-24",
+        "firm": "Election",
+        "lnp": 42.1,
+        "alp": 43.4,
+        "grn": 7.8,
+        "onp": null,
+        "oth": 6.7,
+        "tpp_lnp": 47.3,
+        "tpp_alp": 52.7
+      }
+    ],
     "2010": [
       {
         "date": "2007-12-06",
@@ -25587,6 +27799,760 @@
     ]
   },
   "cycleApproval": {
+    "2004": [
+      {
+        "date": "2004-11-21",
+        "firm": "Newspoll",
+        "pmNet": 24,
+        "oppNet": 3,
+        "pmPpm": 57,
+        "oppPpm": 27
+      },
+      {
+        "date": "2004-12-05",
+        "firm": "Newspoll",
+        "pmNet": 21,
+        "oppNet": -8,
+        "pmPpm": 60,
+        "oppPpm": 25
+      },
+      {
+        "date": "2004-12-19",
+        "firm": "Newspoll",
+        "pmNet": 24,
+        "oppNet": -16,
+        "pmPpm": 60,
+        "oppPpm": 24
+      },
+      {
+        "date": "2005-01-22",
+        "firm": "ACNielsen",
+        "pmNet": 39,
+        "oppNet": null,
+        "pmPpm": 60,
+        "oppPpm": 35
+      },
+      {
+        "date": "2005-01-23",
+        "firm": "Newspoll",
+        "pmNet": 30,
+        "oppNet": -16,
+        "pmPpm": 58,
+        "oppPpm": 31
+      },
+      {
+        "date": "2005-02-06",
+        "firm": "Newspoll",
+        "pmNet": 35,
+        "oppNet": 18,
+        "pmPpm": 56,
+        "oppPpm": 27
+      },
+      {
+        "date": "2005-02-13",
+        "firm": "ACNielsen",
+        "pmNet": 30,
+        "oppNet": 19,
+        "pmPpm": 56,
+        "oppPpm": 35
+      },
+      {
+        "date": "2005-02-20",
+        "firm": "Newspoll",
+        "pmNet": 26,
+        "oppNet": 17,
+        "pmPpm": 54,
+        "oppPpm": 29
+      },
+      {
+        "date": "2005-03-06",
+        "firm": "Newspoll",
+        "pmNet": 21,
+        "oppNet": 13,
+        "pmPpm": 54,
+        "oppPpm": 31
+      },
+      {
+        "date": "2005-03-13",
+        "firm": "ACNielsen",
+        "pmNet": 15,
+        "oppNet": 16,
+        "pmPpm": 50,
+        "oppPpm": 40
+      },
+      {
+        "date": "2005-03-20",
+        "firm": "Newspoll",
+        "pmNet": 20,
+        "oppNet": 19,
+        "pmPpm": 54,
+        "oppPpm": 30
+      },
+      {
+        "date": "2005-04-03",
+        "firm": "Newspoll",
+        "pmNet": 21,
+        "oppNet": 24,
+        "pmPpm": 52,
+        "oppPpm": 31
+      },
+      {
+        "date": "2005-04-10",
+        "firm": "ACNielsen",
+        "pmNet": 15,
+        "oppNet": 25,
+        "pmPpm": 52,
+        "oppPpm": 38
+      },
+      {
+        "date": "2005-04-17",
+        "firm": "Newspoll",
+        "pmNet": 8,
+        "oppNet": 24,
+        "pmPpm": 52,
+        "oppPpm": 31
+      },
+      {
+        "date": "2005-05-01",
+        "firm": "Newspoll",
+        "pmNet": 13,
+        "oppNet": 16,
+        "pmPpm": 52,
+        "oppPpm": 31
+      },
+      {
+        "date": "2005-05-08",
+        "firm": "ACNielsen",
+        "pmNet": 13,
+        "oppNet": 13,
+        "pmPpm": 52,
+        "oppPpm": 38
+      },
+      {
+        "date": "2005-05-15",
+        "firm": "Newspoll",
+        "pmNet": 19,
+        "oppNet": 11,
+        "pmPpm": 52,
+        "oppPpm": 31
+      },
+      {
+        "date": "2005-05-29",
+        "firm": "Newspoll",
+        "pmNet": 17,
+        "oppNet": 11,
+        "pmPpm": 54,
+        "oppPpm": 29
+      },
+      {
+        "date": "2005-06-05",
+        "firm": "ACNielsen",
+        "pmNet": 24,
+        "oppNet": 5,
+        "pmPpm": 55,
+        "oppPpm": 35
+      },
+      {
+        "date": "2005-06-17",
+        "firm": "Newspoll",
+        "pmNet": 18,
+        "oppNet": -1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "2005-07-03",
+        "firm": "ACNielsen",
+        "pmNet": 5,
+        "oppNet": -3,
+        "pmPpm": 50,
+        "oppPpm": 39
+      },
+      {
+        "date": "2005-07-03",
+        "firm": "Newspoll",
+        "pmNet": 3,
+        "oppNet": -6,
+        "pmPpm": 51,
+        "oppPpm": 29
+      },
+      {
+        "date": "2005-07-17",
+        "firm": "Newspoll",
+        "pmNet": 9,
+        "oppNet": -13,
+        "pmPpm": 55,
+        "oppPpm": 25
+      },
+      {
+        "date": "2005-07-31",
+        "firm": "ACNielsen",
+        "pmNet": 10,
+        "oppNet": -8,
+        "pmPpm": 53,
+        "oppPpm": 36
+      },
+      {
+        "date": "2005-07-31",
+        "firm": "Newspoll",
+        "pmNet": 15,
+        "oppNet": -12,
+        "pmPpm": 54,
+        "oppPpm": 26
+      },
+      {
+        "date": "2005-08-14",
+        "firm": "Newspoll",
+        "pmNet": 11,
+        "oppNet": -20,
+        "pmPpm": 57,
+        "oppPpm": 25
+      },
+      {
+        "date": "2005-08-28",
+        "firm": "ACNielsen",
+        "pmNet": 10,
+        "oppNet": -10,
+        "pmPpm": 53,
+        "oppPpm": 36
+      },
+      {
+        "date": "2005-08-28",
+        "firm": "Newspoll",
+        "pmNet": 12,
+        "oppNet": -18,
+        "pmPpm": 56,
+        "oppPpm": 27
+      },
+      {
+        "date": "2005-09-11",
+        "firm": "Newspoll",
+        "pmNet": 5,
+        "oppNet": -9,
+        "pmPpm": 51,
+        "oppPpm": 27
+      },
+      {
+        "date": "2005-09-25",
+        "firm": "ACNielsen",
+        "pmNet": 13,
+        "oppNet": -15,
+        "pmPpm": 55,
+        "oppPpm": 33
+      },
+      {
+        "date": "2005-09-25",
+        "firm": "Newspoll",
+        "pmNet": 7,
+        "oppNet": -16,
+        "pmPpm": 53,
+        "oppPpm": 26
+      },
+      {
+        "date": "2005-10-09",
+        "firm": "Newspoll",
+        "pmNet": 9,
+        "oppNet": -18,
+        "pmPpm": 57,
+        "oppPpm": 23
+      },
+      {
+        "date": "2005-10-23",
+        "firm": "ACNielsen",
+        "pmNet": 6,
+        "oppNet": -15,
+        "pmPpm": 52,
+        "oppPpm": 35
+      },
+      {
+        "date": "2005-10-23",
+        "firm": "Newspoll",
+        "pmNet": -2,
+        "oppNet": -19,
+        "pmPpm": 50,
+        "oppPpm": 26
+      },
+      {
+        "date": "2005-11-06",
+        "firm": "Newspoll",
+        "pmNet": -9,
+        "oppNet": -21,
+        "pmPpm": 50,
+        "oppPpm": 28
+      },
+      {
+        "date": "2005-11-20",
+        "firm": "ACNielsen",
+        "pmNet": -7,
+        "oppNet": -8,
+        "pmPpm": 45,
+        "oppPpm": 43
+      },
+      {
+        "date": "2005-11-20",
+        "firm": "Newspoll",
+        "pmNet": -5,
+        "oppNet": -16,
+        "pmPpm": 51,
+        "oppPpm": 29
+      },
+      {
+        "date": "2005-12-04",
+        "firm": "Newspoll",
+        "pmNet": -6,
+        "oppNet": -8,
+        "pmPpm": 50,
+        "oppPpm": 29
+      },
+      {
+        "date": "2005-12-18",
+        "firm": "ACNielsen",
+        "pmNet": 1,
+        "oppNet": -9,
+        "pmPpm": 47,
+        "oppPpm": 39
+      },
+      {
+        "date": "2005-12-18",
+        "firm": "Newspoll",
+        "pmNet": -3,
+        "oppNet": -18,
+        "pmPpm": 51,
+        "oppPpm": 27
+      },
+      {
+        "date": "2006-01-15",
+        "firm": "Newspoll",
+        "pmNet": 11,
+        "oppNet": -11,
+        "pmPpm": 56,
+        "oppPpm": 25
+      },
+      {
+        "date": "2006-01-29",
+        "firm": "ACNielsen",
+        "pmNet": 13,
+        "oppNet": -2,
+        "pmPpm": 54,
+        "oppPpm": 34
+      },
+      {
+        "date": "2006-01-29",
+        "firm": "Newspoll",
+        "pmNet": 12,
+        "oppNet": -16,
+        "pmPpm": 54,
+        "oppPpm": 26
+      },
+      {
+        "date": "2006-02-12",
+        "firm": "Newspoll",
+        "pmNet": -2,
+        "oppNet": -12,
+        "pmPpm": 51,
+        "oppPpm": 28
+      },
+      {
+        "date": "2006-02-26",
+        "firm": "ACNielsen",
+        "pmNet": 11,
+        "oppNet": -4,
+        "pmPpm": 50,
+        "oppPpm": 36
+      },
+      {
+        "date": "2006-02-26",
+        "firm": "Newspoll",
+        "pmNet": 3,
+        "oppNet": -19,
+        "pmPpm": 53,
+        "oppPpm": 27
+      },
+      {
+        "date": "2006-03-12",
+        "firm": "Newspoll",
+        "pmNet": 15,
+        "oppNet": -33,
+        "pmPpm": 61,
+        "oppPpm": 18
+      },
+      {
+        "date": "2006-03-26",
+        "firm": "ACNielsen",
+        "pmNet": 21,
+        "oppNet": -22,
+        "pmPpm": 59,
+        "oppPpm": 27
+      },
+      {
+        "date": "2006-03-26",
+        "firm": "Newspoll",
+        "pmNet": 14,
+        "oppNet": -29,
+        "pmPpm": 58,
+        "oppPpm": 23
+      },
+      {
+        "date": "2006-04-09",
+        "firm": "Newspoll",
+        "pmNet": 2,
+        "oppNet": -35,
+        "pmPpm": 56,
+        "oppPpm": 23
+      },
+      {
+        "date": "2006-04-23",
+        "firm": "ACNielsen",
+        "pmNet": 5,
+        "oppNet": -27,
+        "pmPpm": 52,
+        "oppPpm": 32
+      },
+      {
+        "date": "2006-04-30",
+        "firm": "Newspoll",
+        "pmNet": 3,
+        "oppNet": -26,
+        "pmPpm": 56,
+        "oppPpm": 25
+      },
+      {
+        "date": "2006-05-14",
+        "firm": "Newspoll",
+        "pmNet": 10,
+        "oppNet": -18,
+        "pmPpm": 53,
+        "oppPpm": 25
+      },
+      {
+        "date": "2006-05-20",
+        "firm": "ACNielsen",
+        "pmNet": 11,
+        "oppNet": -12,
+        "pmPpm": 54,
+        "oppPpm": 34
+      },
+      {
+        "date": "2006-05-28",
+        "firm": "Newspoll",
+        "pmNet": 6,
+        "oppNet": -21,
+        "pmPpm": 55,
+        "oppPpm": 23
+      },
+      {
+        "date": "2006-06-17",
+        "firm": "ACNielsen",
+        "pmNet": 16,
+        "oppNet": -9,
+        "pmPpm": 54,
+        "oppPpm": 33
+      },
+      {
+        "date": "2006-06-18",
+        "firm": "Newspoll",
+        "pmNet": 8,
+        "oppNet": -21,
+        "pmPpm": 55,
+        "oppPpm": 25
+      },
+      {
+        "date": "2006-07-02",
+        "firm": "Newspoll",
+        "pmNet": -4,
+        "oppNet": -18,
+        "pmPpm": 49,
+        "oppPpm": 29
+      },
+      {
+        "date": "2006-07-16",
+        "firm": "Newspoll",
+        "pmNet": 4,
+        "oppNet": -15,
+        "pmPpm": 53,
+        "oppPpm": 27
+      },
+      {
+        "date": "2006-07-30",
+        "firm": "Newspoll",
+        "pmNet": 11,
+        "oppNet": -15,
+        "pmPpm": 53,
+        "oppPpm": 26
+      },
+      {
+        "date": "2006-08-13",
+        "firm": "Newspoll",
+        "pmNet": 4,
+        "oppNet": -16,
+        "pmPpm": 54,
+        "oppPpm": 27
+      },
+      {
+        "date": "2006-08-27",
+        "firm": "Newspoll",
+        "pmNet": 7,
+        "oppNet": -16,
+        "pmPpm": 54,
+        "oppPpm": 26
+      },
+      {
+        "date": "2006-09-10",
+        "firm": "Newspoll",
+        "pmNet": 0,
+        "oppNet": -22,
+        "pmPpm": 54,
+        "oppPpm": 25
+      },
+      {
+        "date": "2006-09-24",
+        "firm": "Newspoll",
+        "pmNet": 6,
+        "oppNet": -19,
+        "pmPpm": 52,
+        "oppPpm": 26
+      },
+      {
+        "date": "2006-10-15",
+        "firm": "Newspoll",
+        "pmNet": 3,
+        "oppNet": -22,
+        "pmPpm": 54,
+        "oppPpm": 26
+      },
+      {
+        "date": "2006-10-29",
+        "firm": "Newspoll",
+        "pmNet": 5,
+        "oppNet": -17,
+        "pmPpm": 54,
+        "oppPpm": 26
+      },
+      {
+        "date": "2006-11-12",
+        "firm": "Newspoll",
+        "pmNet": 6,
+        "oppNet": -16,
+        "pmPpm": 54,
+        "oppPpm": 25
+      },
+      {
+        "date": "2006-11-26",
+        "firm": "Newspoll",
+        "pmNet": 2,
+        "oppNet": -30,
+        "pmPpm": 55,
+        "oppPpm": 25
+      },
+      {
+        "date": "2006-12-10",
+        "firm": "Newspoll",
+        "pmNet": 3,
+        "oppNet": 31,
+        "pmPpm": 39,
+        "oppPpm": 36
+      },
+      {
+        "date": "2007-01-21",
+        "firm": "Newspoll",
+        "pmNet": 3,
+        "oppNet": 43,
+        "pmPpm": 41,
+        "oppPpm": 39
+      },
+      {
+        "date": "2007-02-04",
+        "firm": "Newspoll",
+        "pmNet": 0,
+        "oppNet": 45,
+        "pmPpm": 40,
+        "oppPpm": 39
+      },
+      {
+        "date": "2007-02-18",
+        "firm": "Newspoll",
+        "pmNet": -2,
+        "oppNet": 55,
+        "pmPpm": 37,
+        "oppPpm": 47
+      },
+      {
+        "date": "2007-03-04",
+        "firm": "Newspoll",
+        "pmNet": -7,
+        "oppNet": 44,
+        "pmPpm": 38,
+        "oppPpm": 45
+      },
+      {
+        "date": "2007-03-18",
+        "firm": "Newspoll",
+        "pmNet": -9,
+        "oppNet": 50,
+        "pmPpm": 36,
+        "oppPpm": 49
+      },
+      {
+        "date": "2007-04-01",
+        "firm": "Newspoll",
+        "pmNet": -4,
+        "oppNet": 52,
+        "pmPpm": 38,
+        "oppPpm": 48
+      },
+      {
+        "date": "2007-04-15",
+        "firm": "Newspoll",
+        "pmNet": -7,
+        "oppNet": 50,
+        "pmPpm": 36,
+        "oppPpm": 48
+      },
+      {
+        "date": "2007-04-29",
+        "firm": "Newspoll",
+        "pmNet": -7,
+        "oppNet": 46,
+        "pmPpm": 39,
+        "oppPpm": 46
+      },
+      {
+        "date": "2007-05-13",
+        "firm": "Newspoll",
+        "pmNet": -1,
+        "oppNet": 52,
+        "pmPpm": 37,
+        "oppPpm": 49
+      },
+      {
+        "date": "2007-05-27",
+        "firm": "Newspoll",
+        "pmNet": -3,
+        "oppNet": 47,
+        "pmPpm": 38,
+        "oppPpm": 47
+      },
+      {
+        "date": "2007-06-17",
+        "firm": "Newspoll",
+        "pmNet": 0,
+        "oppNet": 40,
+        "pmPpm": 40,
+        "oppPpm": 46
+      },
+      {
+        "date": "2007-07-08",
+        "firm": "Newspoll",
+        "pmNet": 2,
+        "oppNet": 39,
+        "pmPpm": 42,
+        "oppPpm": 43
+      },
+      {
+        "date": "2007-07-22",
+        "firm": "Newspoll",
+        "pmNet": 1,
+        "oppNet": 40,
+        "pmPpm": 40,
+        "oppPpm": 43
+      },
+      {
+        "date": "2007-08-05",
+        "firm": "Newspoll",
+        "pmNet": 3,
+        "oppNet": 43,
+        "pmPpm": 39,
+        "oppPpm": 44
+      },
+      {
+        "date": "2007-08-19",
+        "firm": "Newspoll",
+        "pmNet": -2,
+        "oppNet": 37,
+        "pmPpm": 39,
+        "oppPpm": 46
+      },
+      {
+        "date": "2007-09-02",
+        "firm": "Newspoll",
+        "pmNet": 2,
+        "oppNet": 47,
+        "pmPpm": 37,
+        "oppPpm": 48
+      },
+      {
+        "date": "2007-09-16",
+        "firm": "Newspoll",
+        "pmNet": 1,
+        "oppNet": 47,
+        "pmPpm": 38,
+        "oppPpm": 48
+      },
+      {
+        "date": "2007-09-30",
+        "firm": "Newspoll",
+        "pmNet": -1,
+        "oppNet": 42,
+        "pmPpm": 38,
+        "oppPpm": 47
+      },
+      {
+        "date": "2007-10-14",
+        "firm": "Newspoll",
+        "pmNet": 3,
+        "oppNet": 36,
+        "pmPpm": 39,
+        "oppPpm": 48
+      },
+      {
+        "date": "2007-10-21",
+        "firm": "Newspoll",
+        "pmNet": -3,
+        "oppNet": 42,
+        "pmPpm": 37,
+        "oppPpm": 50
+      },
+      {
+        "date": "2007-10-28",
+        "firm": "Newspoll",
+        "pmNet": 1,
+        "oppNet": 37,
+        "pmPpm": 41,
+        "oppPpm": 48
+      },
+      {
+        "date": "2007-11-04",
+        "firm": "Newspoll",
+        "pmNet": 4,
+        "oppNet": 35,
+        "pmPpm": 43,
+        "oppPpm": 47
+      },
+      {
+        "date": "2007-11-11",
+        "firm": "Newspoll",
+        "pmNet": -1,
+        "oppNet": 37,
+        "pmPpm": 40,
+        "oppPpm": 48
+      },
+      {
+        "date": "2007-11-18",
+        "firm": "Newspoll",
+        "pmNet": 1,
+        "oppNet": 40,
+        "pmPpm": 42,
+        "oppPpm": 46
+      },
+      {
+        "date": "2007-11-22",
+        "firm": "Newspoll",
+        "pmNet": 6,
+        "oppNet": 37,
+        "pmPpm": 44,
+        "oppPpm": 47
+      }
+    ],
     "2007": [
       {
         "date": "2007-12-09",
