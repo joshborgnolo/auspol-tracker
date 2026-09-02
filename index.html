@@ -12697,7 +12697,7 @@ function CycleChart({
     }, shown, M.unit), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.");
   })()), /*#__PURE__*/React.createElement(TrendChart, {
     key: "cyc-" + M.key + "-" + mode,
-    height: narrow ? 380 : 300,
+    height: narrow ? 500 : 300,
     xDomain: CYC_XDOMAIN,
     yDomain: domain,
     yTicks: ticks,
@@ -14117,7 +14117,7 @@ function VariancePanel({
     }, d.R.toFixed(2), "\xD7"));
   }))), /*#__PURE__*/React.createElement(TrendChart, {
     key: "var-" + facet + "-" + rangeId,
-    height: narrow ? 380 : 300,
+    height: narrow ? 500 : 300,
     xDomain: xDomain,
     yDomain: domain,
     yTicks: ticks,

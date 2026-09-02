@@ -1247,7 +1247,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
       </div>
       <TrendChart
         key={"cyc-" + M.key + "-" + mode}
-        height={narrow ? 380 : 300} xDomain={CYC_XDOMAIN} yDomain={domain} yTicks={ticks}
+        height={narrow ? 500 : 300} xDomain={CYC_XDOMAIN} yDomain={domain} yTicks={ticks}
         unit={M.unit} axisFont={narrow ? 28 : 20}
         pad={{ l: 56, r: 44, t: 16, b: 40 }}
         xTicks={CYC_XTICKS} refLines={refLines}
@@ -2302,7 +2302,7 @@ function VariancePanel({ facet, rangeId }) {
 
       <TrendChart
         key={"var-" + facet + "-" + rangeId}
-        height={narrow ? 380 : 300} xDomain={xDomain} yDomain={domain} yTicks={ticks}
+        height={narrow ? 500 : 300} xDomain={xDomain} yDomain={domain} yTicks={ticks}
         unit="pp" axisFont={narrow ? 28 : 15} pad={{ l: 54, r: 20, t: 18, b: 40 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         areas={[{ id: "floor", color: "var(--ink-faint)", opacity: 0.14, points: floorPts }]}
