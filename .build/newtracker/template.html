@@ -1095,7 +1095,9 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    only dot at that junction. Every emitter pins 12px: a pseudo inherits its
    host clause's size (the 14px lead-tag) and the bare span would inherit the
    page 16px, so an unpinned dot reads bigger than its neighbours (caught
-   live 2026-09-02). */
+   live 2026-09-02). The sub-line's poll-count dot is the same problem one
+   row down - a bare text-node bullet would take .hero-sub-count's 13px and
+   sit 1px proud of these, so the JSX borrows .hi-sep there too. */
 .hero-interval > *:not(:last-child):not(.hi-term):not(.hi-sep)::after {
   content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
   margin-left: 8px;

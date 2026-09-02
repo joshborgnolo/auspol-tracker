@@ -1100,7 +1100,12 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                 so the clause rides on the same condition. */}
             {unc && (
               <span className="hero-sub-count" ref={subCountRef}>
-                {"• "}{unc.n} poll{unc.n === 1 ? "" : "s"} in{" "}
+                {/* The dot borrows the strip's .hi-sep: this line's text is
+                    13px, and a bare text-node bullet would inherit that and
+                    read 1px bigger than the interval dots on the line above -
+                    .hi-sep carries the shared 12px pin (template.html). */}
+                <span className="hi-sep" aria-hidden="true">{"• "}</span>
+                {unc.n} poll{unc.n === 1 ? "" : "s"} in{" "}
                 {D.latest.method.windowDays} days
               </span>
             )}
