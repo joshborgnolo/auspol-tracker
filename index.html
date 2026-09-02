@@ -18170,9 +18170,9 @@ function SnapshotView({
     rangeId: rangeId
   }), /*#__PURE__*/React.createElement(DirectionPanel, {
     rangeId: rangeId
-  }), /*#__PURE__*/React.createElement(UndecidedPanel, {
+  }), /*#__PURE__*/React.createElement(NextPollsPanel, null), /*#__PURE__*/React.createElement(UndecidedPanel, {
     rangeId: rangeId
-  }), /*#__PURE__*/React.createElement(NextPollsPanel, null));
+  }));
 }
 function App() {
   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
@@ -18218,11 +18218,12 @@ function App() {
     setFocusTerm(null);
   };
 
-  /* The navbar's "Next" label is a jump to the NextPollsPanel, which lives at
-     the foot of the snapshot view. When the reader is on another tab the
-     scroll has to wait for the snapshot to mount, so it is parked in a ref
-     the tab layout-effect below empties; a generous scroll-margin-top (see
-     .next-polls) keeps the panel's heading clear of the pinned tab bar. */
+  /* The navbar's "Next" label is a jump to the NextPollsPanel, which sits
+     second-to-last on the snapshot view (undecided is the foot). When the
+     reader is on another tab the scroll has to wait for the snapshot to
+     mount, so it is parked in a ref the tab layout-effect below empties; a
+     generous scroll-margin-top (see .next-polls) keeps the panel's heading
+     clear of the pinned tab bar. */
   const npJumpRef = useRef(false);
   const npScrollNow = () => {
     const el = document.querySelector("section.next-polls");

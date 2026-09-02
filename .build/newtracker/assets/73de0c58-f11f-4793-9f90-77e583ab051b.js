@@ -1526,11 +1526,12 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
       <PollsterTable />
       <LeadershipSection rangeId={rangeId} />
       <DirectionPanel rangeId={rangeId} />
-      {/* directly under direction: both are questions about the electorate's
-          mood rather than its party choice, and both come from the houses that
-          bother to publish more than a headline */}
-      <UndecidedPanel rangeId={rangeId} />
       <NextPollsPanel />
+      {/* the one panel below the what's-next list: it answers a question
+          about the electorate's mood rather than its party choice, so it
+          keeps company with direction - just the far side of the release
+          schedule */}
+      <UndecidedPanel rangeId={rangeId} />
     </>
   );
 }
@@ -1576,11 +1577,12 @@ function App() {
     setFocusTerm(null);
   };
 
-  /* The navbar's "Next" label is a jump to the NextPollsPanel, which lives at
-     the foot of the snapshot view. When the reader is on another tab the
-     scroll has to wait for the snapshot to mount, so it is parked in a ref
-     the tab layout-effect below empties; a generous scroll-margin-top (see
-     .next-polls) keeps the panel's heading clear of the pinned tab bar. */
+  /* The navbar's "Next" label is a jump to the NextPollsPanel, which sits
+     second-to-last on the snapshot view (undecided is the foot). When the
+     reader is on another tab the scroll has to wait for the snapshot to
+     mount, so it is parked in a ref the tab layout-effect below empties; a
+     generous scroll-margin-top (see .next-polls) keeps the panel's heading
+     clear of the pinned tab bar. */
   const npJumpRef = useRef(false);
   const npScrollNow = () => {
     const el = document.querySelector("section.next-polls");
