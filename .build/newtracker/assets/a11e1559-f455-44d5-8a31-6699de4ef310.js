@@ -1969,7 +1969,10 @@ function PollLedger({ r, dirSegments }) {
 
       {/* a pointer to the pollster's own release page, where the citation in
           the row (`url`) is something else – the RedBridge/Accent waves cite
-          their AFR write-up but publish the report on accent-research.com.
+          their AFR write-up but publish the report on accent-research.com,
+          and the Capital Brief-commissioned DemosAU waves cite the Capital
+          Brief piece but publish their statement-bearing report PDF on
+          demosau.com.
           It tops the ledger so it sits directly under the meta band
           (Published / Poll lean / House effect), and rides the ledger rather
           than the band itself so the SAME line shows in BOTH expansions –
@@ -1980,13 +1983,19 @@ function PollLedger({ r, dirSegments }) {
             <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
               here<span className="plink-mark" aria-hidden="true">↗</span>
             </a>
+            {/* DemosAU's released report IS its APC statement – one link does
+                both jobs, so the separate statement line below sits out and
+                the note here names the second role */}
+            {r.releaseUrl === r.methodUrl &&
+              <span className="pd-s-note">{" (includes the wave’s APC methodology statement)"}</span>}
           </p>
         </PdSec>
       )}
 
-      {/* the wave's APC methodology statement (YouGov / Newspoll only),
-          beside the release pointer it accompanies */}
-      {r.methodUrl && (
+      {/* the wave's APC methodology statement, beside the release pointer it
+          accompanies. Absent when the release pointer above already links
+          the same document (releaseUrl === methodUrl). */}
+      {r.methodUrl && r.methodUrl !== r.releaseUrl && (
         <PdSec label="APC methodology statement">
           <p className="pd-s">
             <a className="pd-release" href={r.methodUrl} target="_blank" rel="noopener noreferrer">

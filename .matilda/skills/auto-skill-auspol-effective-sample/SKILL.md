@@ -123,9 +123,12 @@ roy morgan"). Resolve and Roy Morgan file nothing, so they dash.
   it; the provenance legend (names which houses file, dash =
   unpublished not unknown) sits at the end of the archive
   `table-hint`.
-- Expanded-poll detail (ArchPollDetail metaItems): conditional
-  "Effective sample n = X" meta-md item, rendered ONLY when
-  `sampleEff != null`.
+- Expanded-poll detail: conditional "Effective sample n = X" item with the
+  APC provenance title in BOTH expanded meta bands since a174788 (Latest
+  PollDetail in a11e1559 AND ArchPollDetail metaItems in d1a1d215 — the
+  band is class-less at every width; the earlier meta-md / pd-meta-sm /
+  meta-dup width-hide scheme is dead, see auspol-detail-meta-band),
+  rendered ONLY when `sampleEff != null`.
 - CSV export: single `Effective sample` column (sampleEff; empty
   where the house filed none).
 
@@ -224,6 +227,16 @@ Sources and link forms:
   row-url verify leg: re-pointed rows drop out of PDF verification the
   same way the Jan rows always were (Feb/Jul-Aug statements aren't
   index-listed either) — acceptable, values stay hand-authoritative.
+  RELEASELINK (same session, also user-asked): each of those six rows
+  (plus pre-split 2026-01-21, same shape) ALSO gained
+  `releaseUrl` = the same demosau.com PDF, so the capitalbrief-cited
+  rows still show a "Pollster's release" link in the expanded poll
+  pointing at the DemosAU-hosted report. `releaseUrl` ==
+  `methodUrl` there by design — PollLedger merges the two surface
+  PdSecs into one release line carrying the "(includes the wave's APC
+  methodology statement)" note; a11e1559 defines it once for BOTH
+  tables. 2026-01-06 still has neither (no demosau.com PDF exists for
+  it).
 - **Essential** (added 2026-09-02, same day) — the odd one out: ONE
   living disclosure-statement PDF the house appends each wave to and
   re-uploads (essentialreport.com.au/wp-content/uploads/<YYYY>/<MM>/

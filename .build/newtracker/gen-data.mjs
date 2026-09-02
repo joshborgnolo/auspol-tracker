@@ -942,7 +942,9 @@ const individualPolls = POLLS.map((p) => {
     ...(p.url ? { url: p.url } : {}),
     // the pollster's own release page, when it isn't what `url` cites – the
     // expanded poll links it as "Pollster's release" (RedBridge/Accent waves,
-    // whose citation is the AFR write-up)
+    // whose citation is the AFR write-up; Capital Brief-commissioned DemosAU
+    // waves, where `url` is the Capital Brief piece and the release is the
+    // statement-bearing report PDF)
     ...(p.releaseUrl ? { releaseUrl: p.releaseUrl } : {}),
     // the wave's APC methodology statement (YouGov/Newspoll only)
     ...(p.methodUrl ? { methodUrl: p.methodUrl } : {}),
@@ -1001,6 +1003,9 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     ...(p.url ? { url: p.url } : {}),
+    // the pollster's own release page when `url` cites something else (same
+    // rule as the archive emitter above — RedBridge/Accent AFR citations,
+    // Capital Brief-commissioned DemosAU waves)
     ...(p.releaseUrl ? { releaseUrl: p.releaseUrl } : {}),
     // APC methodology statement link (YouGov/Newspoll only)
     ...(p.methodUrl ? { methodUrl: p.methodUrl } : {}),
