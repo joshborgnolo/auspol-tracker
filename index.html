@@ -7996,6 +7996,7 @@ function PrimaryVotePanel({
   const [hidden, setHidden] = useState({
     oth: true
   });
+  const narrow = useNarrow();
   const latest = D.aggPrimary[D.aggPrimary.length - 1];
   // labels & series ordered by descending latest primary-vote share
   const parts = [{
@@ -8088,12 +8089,12 @@ function PrimaryVotePanel({
     className: "legend-val"
   }, latest[p.id].toFixed(1), "%"))))), /*#__PURE__*/React.createElement(TrendChart, {
     key: "pv",
-    height: 340,
+    height: narrow ? 460 : 340,
     xDomain: xDomain,
     yDomain: [0, 40],
     yTicks: [10, 20, 30, 40],
     unit: "%",
-    axisFont: 20,
+    axisFont: narrow ? 28 : 20,
     pad: {
       l: 58,
       r: 20,
@@ -8382,6 +8383,7 @@ function PreferredPMPanel({
     filterPts,
     buildXTicks
   } = window.AP;
+  const narrow = useNarrow();
   /* Only the published figure is plotted. A "share of decided" basis used to
      sit here, on the reasoning that dividing by the people who named someone
      makes houses comparable. Measured against the archive it does the
@@ -8902,12 +8904,12 @@ function PreferredPMPanel({
   /* NOT keyed on the question: a remount would throw away the morph
      itself, along with both memoised dot clouds. */, {
     key: "ppm",
-    height: 340,
+    height: narrow ? 460 : 340,
     xDomain: xDomain,
     yDomain: domain,
     yTicks: ticks,
     unit: "%",
-    axisFont: 20,
+    axisFont: narrow ? 28 : 20,
     pad: {
       l: 58,
       r: 22,
@@ -8966,6 +8968,7 @@ function ApprovalPanel({
     filterPts,
     buildXTicks
   } = window.AP;
+  const narrow = useNarrow();
   // approval (approve − disapprove) and favourability (positive − negative)
   // are DIFFERENT questions from different pollsters – a toggle, never a blend
   const [own, setOwn] = useState("net");
@@ -9212,12 +9215,12 @@ function ApprovalPanel({
   /* NOT keyed on the metric: a remount would replace the very thing
      being animated, along with both memoised dot clouds. */, {
     key: "appr-" + leaders.map(L => L.id).join("."),
-    height: 340,
+    height: narrow ? 460 : 340,
     xDomain: xDomain,
     yDomain: domain,
     yTicks: ticks,
     unit: "",
-    axisFont: 20,
+    axisFont: narrow ? 28 : 20,
     pad: {
       l: 58,
       r: 22,
@@ -9285,6 +9288,7 @@ function DirectionPanel({
     buildXTicks,
     series
   } = window.AP;
+  const narrow = useNarrow();
   const asked = houseList(D.directionHouses);
   const question = "“Is the country heading in the right direction, or on the wrong track?”";
   // no right-track / wrong-track series in the dataset yet – keep the panel
@@ -9420,12 +9424,12 @@ function DirectionPanel({
     className: "pct"
   }, "%")))), /*#__PURE__*/React.createElement(TrendChart, {
     key: "dir",
-    height: 340,
+    height: narrow ? 460 : 340,
     xDomain: xDomain,
     yDomain: [lo, hi],
     yTicks: yTicks,
     unit: "%",
-    axisFont: 20,
+    axisFont: narrow ? 28 : 20,
     pad: {
       l: 58,
       r: 22,
@@ -9483,6 +9487,7 @@ function UndecidedPanel({
     buildXTicks,
     series
   } = window.AP;
+  const narrow = useNarrow();
   const U = D.undecided;
   if (!U || !U.series.length) return null;
   const xDomain = rangeDomain(rangeId);
@@ -9558,12 +9563,12 @@ function UndecidedPanel({
     className: "und-read-note"
   }, sr.note, " \xB7 ", houseList(sr.houses)))))), /*#__PURE__*/React.createElement(TrendChart, {
     key: "und",
-    height: 340,
+    height: narrow ? 460 : 340,
     xDomain: xDomain,
     yDomain: [lo, hi],
     yTicks: yTicks,
     unit: "%",
-    axisFont: 20,
+    axisFont: narrow ? 28 : 20,
     pad: {
       l: 58,
       r: 22,
@@ -12340,6 +12345,7 @@ function CycleChart({
   const {
     D
   } = window.AP;
+  const narrow = useNarrow();
   const M = metric;
   const chg = mode === "chg";
   const isOpp = M.leader === "opp";
@@ -12691,12 +12697,12 @@ function CycleChart({
     }, shown, M.unit), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.");
   })()), /*#__PURE__*/React.createElement(TrendChart, {
     key: "cyc-" + M.key + "-" + mode,
-    height: 300,
+    height: narrow ? 380 : 300,
     xDomain: CYC_XDOMAIN,
     yDomain: domain,
     yTicks: ticks,
     unit: M.unit,
-    axisFont: 20,
+    axisFont: narrow ? 28 : 20,
     pad: {
       l: 56,
       r: 44,
@@ -14008,6 +14014,7 @@ function VariancePanel({
     buildXTicks,
     monthLabelFull
   } = window.AP;
+  const narrow = useNarrow();
   const [hidden, setHidden] = useState({});
 
   // a measure with no computable window anywhere (e.g. Hanson's net, polled
@@ -14110,11 +14117,12 @@ function VariancePanel({
     }, d.R.toFixed(2), "\xD7"));
   }))), /*#__PURE__*/React.createElement(TrendChart, {
     key: "var-" + facet + "-" + rangeId,
-    height: 300,
+    height: narrow ? 380 : 300,
     xDomain: xDomain,
     yDomain: domain,
     yTicks: ticks,
     unit: "pp",
+    axisFont: narrow ? 28 : 15,
     pad: {
       l: 54,
       r: 20,

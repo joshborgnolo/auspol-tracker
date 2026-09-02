@@ -945,6 +945,7 @@ function toMonthly(months, vals, maxM) {
 
 function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp, setOnp, shapes }) {
   const { D } = window.AP;
+  const narrow = useNarrow();
   const M = metric;
   const chg = mode === "chg";
   const isOpp = M.leader === "opp";
@@ -1246,8 +1247,8 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
       </div>
       <TrendChart
         key={"cyc-" + M.key + "-" + mode}
-        height={300} xDomain={CYC_XDOMAIN} yDomain={domain} yTicks={ticks}
-        unit={M.unit} axisFont={20}
+        height={narrow ? 380 : 300} xDomain={CYC_XDOMAIN} yDomain={domain} yTicks={ticks}
+        unit={M.unit} axisFont={narrow ? 28 : 20}
         pad={{ l: 56, r: 44, t: 16, b: 40 }}
         xTicks={CYC_XTICKS} refLines={refLines}
         series={built} spine={CYC_SPINE} scatter={scatter} events={soloEvents}
@@ -2223,6 +2224,7 @@ function PopRow({ on, radio, label, note, n, onClick }) {
 // ====================================================================
 function VariancePanel({ facet, rangeId }) {
   const { D, discord, discordFacet, discordRead, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
+  const narrow = useNarrow();
   const [hidden, setHidden] = useState({});
 
   // a measure with no computable window anywhere (e.g. Hanson's net, polled
@@ -2300,8 +2302,8 @@ function VariancePanel({ facet, rangeId }) {
 
       <TrendChart
         key={"var-" + facet + "-" + rangeId}
-        height={300} xDomain={xDomain} yDomain={domain} yTicks={ticks}
-        unit="pp" pad={{ l: 54, r: 20, t: 18, b: 40 }}
+        height={narrow ? 380 : 300} xDomain={xDomain} yDomain={domain} yTicks={ticks}
+        unit="pp" axisFont={narrow ? 28 : 15} pad={{ l: 54, r: 20, t: 18, b: 40 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         areas={[{ id: "floor", color: "var(--ink-faint)", opacity: 0.14, points: floorPts }]}
         series={chartSeries} spine={spine}

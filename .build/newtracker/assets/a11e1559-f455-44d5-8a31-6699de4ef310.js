@@ -184,6 +184,7 @@ function PrimaryVotePanel({ rangeId }) {
      with the majors' three-way contest crowded it went from context to
      crossings. One chip-tap brings it back. */
   const [hidden, setHidden] = useState({ oth: true });
+  const narrow = useNarrow();
   const latest = D.aggPrimary[D.aggPrimary.length - 1];
   // labels & series ordered by descending latest primary-vote share
   const parts = [
@@ -251,8 +252,8 @@ function PrimaryVotePanel({ rangeId }) {
       </div>
       <TrendChart
         key="pv"
-        height={340} xDomain={xDomain} yDomain={[0, 40]}
-        yTicks={[10, 20, 30, 40]} unit="%" axisFont={20}
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[0, 40]}
+        yTicks={[10, 20, 30, 40]} unit="%" axisFont={narrow ? 28 : 20}
         pad={{ l: 58, r: 20, t: 18, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={chartSeries} spine={series(pts, "alp")}
@@ -464,6 +465,7 @@ const PPM_PAIRS = [
 
 function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, lockFmt, onBoth }) {
   const { D, rangeDomain, filterPts, buildXTicks } = window.AP;
+  const narrow = useNarrow();
   /* Only the published figure is plotted. A "share of decided" basis used to
      sit here, on the reasoning that dividing by the people who named someone
      makes houses comparable. Measured against the archive it does the
@@ -896,8 +898,8 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         /* NOT keyed on the question: a remount would throw away the morph
            itself, along with both memoised dot clouds. */
         key="ppm"
-        height={340} xDomain={xDomain} yDomain={domain}
-        yTicks={ticks} unit="%" axisFont={20}
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={domain}
+        yTicks={ticks} unit="%" axisFont={narrow ? 28 : 20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         events={[OPP_HANDOVER].filter(Boolean)}
@@ -931,6 +933,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
 // ---- Leader approval ------------------------------------------------
 function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetric, onBoth }) {
   const { D, rangeDomain, filterPts, buildXTicks } = window.AP;
+  const narrow = useNarrow();
   // approval (approve − disapprove) and favourability (positive − negative)
   // are DIFFERENT questions from different pollsters – a toggle, never a blend
   const [own, setOwn] = useState("net");
@@ -1153,8 +1156,8 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         /* NOT keyed on the metric: a remount would replace the very thing
            being animated, along with both memoised dot clouds. */
         key={"appr-" + leaders.map((L) => L.id).join(".")}
-        height={340} xDomain={xDomain} yDomain={domain}
-        yTicks={ticks} unit="" axisFont={20}
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={domain}
+        yTicks={ticks} unit="" axisFont={narrow ? 28 : 20}
         pad={{ l: 58, r: 22, t: 22, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         refLines={[{ y: 0, label: "even", color: "var(--ink-faint)" }]}
@@ -1201,6 +1204,7 @@ function houseList(names, max = 4) {
 // ---- National direction (right track / wrong track) -----------------
 function DirectionPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
+  const narrow = useNarrow();
   const asked = houseList(D.directionHouses);
   const question = "“Is the country heading in the right direction, or on the wrong track?”";
   // no right-track / wrong-track series in the dataset yet – keep the panel
@@ -1292,8 +1296,8 @@ function DirectionPanel({ rangeId }) {
 
       <TrendChart
         key="dir"
-        height={340} xDomain={xDomain} yDomain={[lo, hi]}
-        yTicks={yTicks} unit="%" axisFont={20}
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}
+        yTicks={yTicks} unit="%" axisFont={narrow ? 28 : 20}
         pad={{ l: 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={[
@@ -1336,6 +1340,7 @@ function DirectionPanel({ rangeId }) {
    attributed to a wave, so they are not attributed to one. */
 function UndecidedPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
+  const narrow = useNarrow();
   const U = D.undecided;
   if (!U || !U.series.length) return null;
   const xDomain = rangeDomain(rangeId);
@@ -1400,8 +1405,8 @@ function UndecidedPanel({ rangeId }) {
       </div>
       <TrendChart
         key="und"
-        height={340} xDomain={xDomain} yDomain={[lo, hi]}
-        yTicks={yTicks} unit="%" axisFont={20}
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}
+        yTicks={yTicks} unit="%" axisFont={narrow ? 28 : 20}
         pad={{ l: 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: COL,
