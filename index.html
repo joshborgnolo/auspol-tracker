@@ -1102,10 +1102,11 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .ro-party { display: flex; align-items: baseline; gap: 11px; }
 .ro-dot { width: 13px; height: 13px; border-radius: 50%; align-self: center; }
 .ro-name { font-size: 17px; font-weight: 700; color: var(--ink-2); letter-spacing: -0.01em; white-space: nowrap; }
-.ro-num { font-family: var(--serif); font-size: 68px; font-weight: 600; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
+/* crimson ships no 650 cut - face matching lands on its 700 */
+.ro-num { font-family: var(--serif); font-size: 68px; font-weight: 650; letter-spacing: -0.03em; line-height: 0.9; color: var(--ink); }
 /* the decimal point is the only separator a hero figure ever carries, and no
-   crimson cut kerns "." against a following digit - pull the reel closer */
-.ro-num .roll-sep { letter-spacing: -0.08em; }
+   crimson cut kerns "1." - pull the point back toward the reel it follows */
+.ro-num .roll-sep { margin-left: -0.08em; }
 .alp-side .ro-num { color: var(--alp-text); }
 .lnp-side .ro-num { color: var(--lnp-text); }
 .ro-sep { width: 2px; height: 47px; border-radius: 1px; background: var(--line); align-self: center; }
