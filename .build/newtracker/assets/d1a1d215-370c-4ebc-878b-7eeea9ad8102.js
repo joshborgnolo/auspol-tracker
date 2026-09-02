@@ -2481,8 +2481,9 @@ function AllPollsView({ focus, onBack, backLabel }) {
     // house lean uses the NORMALISED share (alpN) so undecided-inclusive
     // pairs compare fairly with the aggregate; null when no 2PP published
     const lean = p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null;
-    // house effect is fixed per pollster (built over the whole sample), so the
-    // same value rides on every row that pollster owns; null when unmeasured
+    // house effect is the emitted all-history snapshot per pollster (the
+    // estimator's applied lean is read per display time; see gen-data), so the
+    // same label value rides on every row that pollster owns; null when unmeasured
     const hfx = (((D.houseEffects || {}).tpp || {})[p.pollster]) || null;
     // searchable haystack – everything a row knows, so the search box matches
     // fieldwork dates, samples, 2PP / primary / matchup figures, nets, flags
@@ -3022,8 +3023,9 @@ function AllPollsView({ focus, onBack, backLabel }) {
         the aggregate for that month · “—” Means the pollster didn’t publish that measure · Search matches
         anything in a row · Click any column heading to sort.{" "}
         <strong>House effect</strong> is how far a pollster systematically sits from the cross-house consensus
-        on 2PP – its own average lean across every poll it has published, shrunk toward zero when it has
-        published few. The aggregates subtract it, and it is a property of the pollster, not of this one poll.
+        on 2PP – pooled from its polls with a 90-day half-life, so its recent methods count for more, and
+        shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure’s
+        own time, and it is a property of the pollster, not of this one poll.
         {" "}<strong>Eff. n</strong> is the pollster’s own published effective sample, filed with the
         Australian Polling Council – Newspoll, YouGov, Essential and DemosAU file them; Resolve
         and Roy Morgan file none, so a dash there means unpublished, not unknown.
@@ -3100,8 +3102,10 @@ function infoTerms(D) {
       discount on repeat waves all pull it below the raw count, and it is what
       the {xref("interval", "effective sample", "95% interval")} is computed against.</>) },
     { id: "house-effect", term: "House effect", body: (
-      <>A pollster’s own lean against the consensus of all houses, measured across every poll it has
-      published and shrunk toward zero when it has published few. The aggregates subtract it. It is
+      <>A pollster’s own lean against the consensus of the houses polling around it, pooled from
+      its polls with a 90-day half-life so recent polls count for more – the lean tracks a house’s
+      current method rather than averaging it with its history – and shrunk toward zero while the
+      evidence is thin. The aggregates subtract it, read as of the time each figure describes. It is
       measured separately for every measure – a firm that leans one way on the classic two-party is
       not assumed to lean the same way on a primary share or on an ALP-v-One Nation head-to-head –
       and it is a property of the pollster, not of any single poll.</>) },

@@ -400,7 +400,9 @@ function buildStaticSummary() {
       <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal
         election. The two-party and primary-vote aggregates are weighted means: recent and larger
         polls count for more, and each pollster&#8217;s figure is adjusted for its own lean against
-        the consensus of all houses. The lean is measured separately for every measure &#8211; a firm
+        the consensus of the houses polling around it &#8211; pooled with a 90-day half-life, so a
+        house&#8217;s lean tracks its current method rather than averaging its whole history &#8211;
+        and shrunk toward zero while the evidence is thin. The lean is measured separately for every measure &#8211; a firm
         that leans one way on the classic two-party is not assumed to lean the same way on a primary
         share or an ALP-v-One Nation head-to-head &#8211; and a matchup too few houses ask is left as
         a plain monthly average rather than adjusted on guesswork. The leaders&#8217; ratings and

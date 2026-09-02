@@ -211,15 +211,25 @@ const tppRowsSynth = POLLS
   .filter((p) => p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
   .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: rowN(p), firm: p.pollster }));
 
-/* A house effect is that pollster's mean deviation from the cross-house
-   consensus ON THAT MEASURE – never borrowed between measures, because a firm
-   that leans Labor on the classic 2PP has no reason to lean the same way on an
-   ALP-v-ON head-to-head or on a primary share. Shrunk toward zero by SHRINK_K
-   so a house with one or two readings barely moves. Returns {} when nothing is
-   estimable (a measure only two houses ask), which makes the caller fall back
-   to a plain mean rather than a fabricated adjustment. */
+/* A house effect is that pollster's lean AWAY FROM the cross-house consensus
+   on that measure – never borrowed between measures, because a firm that
+   leans Labor on the classic 2PP has no reason to lean the same way on an
+   ALP-v-ON head-to-head or on a primary share. Each poll's deviation is
+   measured against the n-weighted consensus of other polls around it in time
+   (±HE_WINDOW days, at least 3, same-stratum only). Those deviations are
+   pooled with recency decay (HE_HALF-day half-life) and shrunk toward zero by
+   SHRINK_K on the decayed count, and the lean is READ at the time it is
+   applied: he.at(firm, t) is the house's lean as of t. A house whose method
+   changes mid-cycle therefore settles on the new lean in a couple of months
+   rather than being averaged with its old method forever – the all-time
+   pooled constant this replaced was measurably wrong for exactly that
+   (Essential −1.96 pooled vs −1.3 recent, Sep 2026) – and a stopped house's
+   lean decays back toward zero as its evidence ages. estimable=false when
+   nothing was measurable (a measure only two houses ask), so the caller falls
+   back to a plain mean rather than a fabricated adjustment. */
+const HE_HALF = 90;                              // lean pooling half-life, days
 function houseEffectsFor(rows) {
-  const err = new Map();
+  const devs = [];                               // { firm, mid, dev }
   for (const a of rows) {
     let sw = 0, swx = 0, k = 0;
     for (const b of rows) {
@@ -231,16 +241,37 @@ function houseEffectsFor(rows) {
       sw += b.n; swx += b.n * b.x; k++;
     }
     if (k < 3) continue;                       // too few neighbours to define a consensus
-    if (!err.has(a.firm)) err.set(a.firm, []);
-    err.get(a.firm).push(a.x - swx / sw);
+    devs.push({ firm: a.firm, mid: a.mid, dev: a.x - swx / sw });
   }
-  const he = {};
-  // {v, n}: n is how many of that firm's readings fed the estimate, so the UI
+  // n = how many of that firm's readings fed the estimate at all, so the UI
   // can distinguish "no lean" from "not enough polls to say"
-  for (const [firm, e] of err) he[firm] = { v: r1((e.length / (e.length + SHRINK_K)) * mean(e)), n: e.length };
-  return he;
+  const evidenceN = {};
+  for (const d of devs) evidenceN[d.firm] = (evidenceN[d.firm] || 0) + 1;
+  const at = (firm, t) => {
+    let sw = 0, swx = 0;
+    for (const d of devs) {
+      if (d.firm !== firm || d.mid > t) continue;
+      // t = Infinity reads the whole history undecayed: equal weights, shrink
+      // on the raw count – the all-time pooled constant this page always
+      // showed, used for the emitted {v, n} snapshots
+      const w = Number.isFinite(t) ? Math.exp(-LN2 * ddays(t, d.mid) / HE_HALF) : 1;
+      sw += w; swx += w * d.dev;
+    }
+    if (!sw) return 0;
+    return (sw / (sw + SHRINK_K)) * (swx / sw);
+  };
+  /* snapshot(t): the {firm: {v, n}} map the data asset emits and the page
+     labels read – v rounded to 0.1 as it always was, n the evidence count. */
+  const snapshot = (t) => Object.fromEntries(
+    Object.keys(evidenceN).map((f) => [f, { v: r1(at(f, t)), n: evidenceN[f] }])
+  );
+  return { at, evidenceN, snapshot, estimable: devs.length > 0 };
 }
-const heV = (he, firm) => (he[firm] ? he[firm].v : 0);
+/* t = the reference time the lean is read at – the nowcast's ref for the
+   current estimate, the month's midpoint for monthly points – so every
+   displayed figure is debiased by what each house's lean was AT the time the
+   figure describes, not by an all-time pooled constant. */
+const heV = (he, firm, t) => (he && typeof he.at === "function" ? he.at(firm, t) : 0);
 const houseEffectsStrat = houseEffectsFor;   // same estimator; rows carry `strat`
 const OPP_SPLICE_ISO = "2026-02-13";         // Taylor replaces Ley – a different person
 /* Which opposition-leader era a reading belongs to. Ley's last published
@@ -299,7 +330,7 @@ function nowcastAdj(rows, he, ref) {
     const d = ddays(ref, a.mid);
     if (d < 0 || d > HL_WINDOW) continue;
     waves.set(a.firm, (waves.get(a.firm) || 0) + 1);
-    pts.push({ w: a.n * Math.exp(-LN2 * d / HL_HALF), x: a.x - heV(he, a.firm), n: a.n, firm: a.firm });
+    pts.push({ w: a.n * Math.exp(-LN2 * d / HL_HALF), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm });
   }
   /* A house with m waves in the window has not measured the electorate m
      independent times - same method, same house-effect residue - so its
@@ -321,16 +352,16 @@ function nowcastAdj(rows, he, ref) {
    same method, same residue - so its waves count for sqrt(m), here exactly
    as in the window (see nowcastAdj). The point weights deflate; the raw n
    still feeds the sampling-error floor, again mirroring the nowcast. */
+const ymMidMs = (ym) => Date.parse(ym + "-15T00:00:00Z");  // month's midpoint in ms
 function monthWithSe(rows, he, ym) {
   const rs = rows.filter((r) => r.ym === ym);
   const waves = new Map();
   for (const r of rs) waves.set(r.firm, (waves.get(r.firm) || 0) + 1);
   return weightedWithSe(rs.map((r) => ({ w: r.n / Math.sqrt(waves.get(r.firm)),
-                                         x: r.x - heV(he, r.firm), n: r.n })));
+                                         x: r.x - heV(he, r.firm, ymMidMs(ym)), n: r.n })));
 }
 
 const houseEffect = houseEffectsFor(tppRows);
-const hOf = (firm) => heV(houseEffect, firm);
 /* The synthetic series gets its OWN house effects, measured against its own
    consensus – a house whose primaries run ALP-high is a different bias from
    the same house's published-2PP lean, and the comment on houseEffectsFor
@@ -419,9 +450,10 @@ aggPrimary.unshift({
 /* The ON head-to-heads are published figures, so they get the same weighted,
    debiased treatment as the classic 2PP WHEREVER it's estimable. It is for
    ALP v ON (40 polls, 9 houses); it is not for L/NP v ON (5 polls, 2 houses –
-   no reading has 3 neighbours, so houseEffectsFor returns {} and no poll falls
-   in the nowcast window). That series therefore stays an honest plain mean and
-   reports no nowcast, rather than pretending to a precision it can't support. */
+   no reading has 3 neighbours, so houseEffectsFor finds nothing estimable and
+   no poll falls in the nowcast window). That series therefore stays an honest
+   plain mean and reports no nowcast, rather than pretending to a precision
+   it can't support. */
 const POLL_BY_KEY = new Map(POLLS.map((p) => [p.date + "|" + p.pollster, p]));
 function altRowsFor(field) {
   const out = [];
@@ -437,7 +469,7 @@ function altRowsFor(field) {
 function altSeries(field) {
   const rows = altRowsFor(field);
   const he = houseEffectsFor(rows);
-  const adjusted = Object.keys(he).length > 0;
+  const adjusted = he.estimable;
   /* Only the adjusted branch carries an interval, for the same reason it is
      the only branch that gets a trend line at all: a series too thin to
      debias is too thin to say how well it is known. */
@@ -525,7 +557,7 @@ const leaderMonths = MONTHS.map((ym) => {
   const apprN = (p) => rowN(POLL_BY_KEY.get(p.date + "|" + p.firm));
   const split = (prop, lk, pool = rows) => {
     const ap = [], fv = [];
-    const deb = (p, v) => v - heV(apprHE[lk] || {}, p.firm);   // debias on this leader's own house effects
+    const deb = (p, v) => v - heV(apprHE[lk] || {}, p.firm, ymMidMs(ym));   // debias on this leader's own house effects, as of this month
     pool.forEach((p) => {
       const n = apprN(p);
       if (p[prop] != null) {
@@ -1770,15 +1802,24 @@ window.AUSPOL = (function () {
   const synth2pp = ${JSON.stringify(agg2ppSynth)};
   const synthLatest = ${JSON.stringify(synthNow ? { ...synthNow, lnp: r1(100 - synthNow.alp), prev: synth1mo ? synth1mo.alp : null } : null)};
   // which measures carry a house-effect adjustment (drives the method labels)
-  const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: Object.keys(synthEffect).length > 0 })};
-  /* Per-measure house effects, {firm: {v, n}}. v = pp that firm runs above the
-     cross-house consensus on THAT measure; n = readings behind the estimate.
+  const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};
+  /* Per-measure house effects, {firm: {v, n}} – snapshots read at t=Infinity,
+     i.e. each firm's lean pooled over its whole history (the adjustment the
+     estimator applies is read at each figure's own reference time instead;
+     see houseEffectsFor). v = pp that firm runs above the cross-house
+     consensus on THAT measure; n = readings behind the estimate.
      A firm absent from a map has too few readings to estimate – which the UI
      must show as "—", never as 0. */
-  const houseEffects = ${JSON.stringify({ tpp: houseEffect, primary: primaryHE, alp_on: altAON.he, appr: apprHE, synth: synthEffect })};
+  const houseEffects = ${JSON.stringify({
+    tpp: houseEffect.snapshot(Infinity),
+    primary: Object.fromEntries(Object.entries(primaryHE).map(([k, h]) => [k, h.snapshot(Infinity)])),
+    alp_on: altAON.he.snapshot(Infinity),
+    appr: Object.fromEntries(Object.entries(apprHE).map(([lk, h]) => [lk, h.snapshot(Infinity)])),
+    synth: synthEffect.snapshot(Infinity),
+  })};
   const leaderMonths = ${JSON.stringify(leaderMonths)};
   const direction = ${JSON.stringify(direction)};
-  const directionHouseEffects = ${JSON.stringify({ right: dirHe.right, wrong: dirHe.wrong })};
+  const directionHouseEffects = ${JSON.stringify({ right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity) })};
   const directionHouses = ${JSON.stringify(directionHouses)};
   const directionPolls = ${JSON.stringify(directionPolls)};
   const directionAvailable = ${direction.length > 0};
@@ -1885,7 +1926,7 @@ console.log("  fav months:", leaderMonths.filter((r) => r.alb_fav != null || r.t
 console.log("  approval months:", leaderMonths.filter((r) => r.alb_net != null).map((r) => r.ym).join(","));
 console.log("individualPolls:", individualPolls.length, "| no 2PP:", individualPolls.filter((p) => p.alp == null).length, "| with ppm:", individualPolls.filter((p) => p.ppm || p.ppmSets).length, "| with appr:", individualPolls.filter((p) => p.appr.albNet != null).length);
 console.log("pollsterTable:", pollsterTable.length, "→", pollsterTable.map((r) => `${r.pollster} ${r.releasedLabel}${r.alp2pp == null ? " (no 2PP)" : ""}`).join(" | "));
-console.log("houseEffects (2PP):", Object.entries(houseEffect).sort((a, b) => b[1].v - a[1].v).map(([f, h]) => `${f} ${h.v > 0 ? "+" : ""}${h.v}(n=${h.n})`).join(", "));
+console.log("houseEffects (2PP):", Object.entries(houseEffect.snapshot(Infinity)).sort((a, b) => b[1].v - a[1].v).map(([f, h]) => `${f} ${h.v > 0 ? "+" : ""}${h.v}(n=${h.n})`).join(", "));
 console.log("headline 2PP:", hlNow, "| 1mo ago:", hl1mo);
 console.log("pollCadence:", pollCadence.length, "houses on a pattern →",
   pollCadence.map((c) => {
