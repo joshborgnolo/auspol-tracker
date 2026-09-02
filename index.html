@@ -3630,6 +3630,27 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   .poll-table.archive .pollster-method { font-size: 10px; }
 }
 
+/* tile band – a rhombille "stacked cubes" mosaic closing the page: each cube
+   is three rhombi in three blues with an ivory grout stroke, surfaced as one
+   repeating SVG tile (103.92×180 = four cube cells); it melts into --bg at
+   both ends, and on dark the tile image is multiplied down, not recoloured. */
+.tile-band {
+  height: 220px;
+  margin-top: 64px;
+  position: relative;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='103.92' height='180' viewBox='0 0 103.92 180'%3E%3Cg stroke='%23f7f2ea' stroke-width='1.6' stroke-linejoin='round'%3E%3Cg fill='%23b4c6e8'%3E%3Cpath d='M0 0L51.96 30 0 60-51.96 30Z'/%3E%3Cpath d='M103.92 0L155.88 30 103.92 60 51.96 30Z'/%3E%3Cpath d='M51.96 90L103.92 120 51.96 150 0 120Z'/%3E%3Cpath d='M51.96-90L103.92-60 51.96-30 0-60Z'/%3E%3C/g%3E%3Cg fill='%236e88c2'%3E%3Cpath d='M-51.96 30L0 60 0 120-51.96 90Z'/%3E%3Cpath d='M51.96 30L103.92 60 103.92 120 51.96 90Z'/%3E%3Cpath d='M0 120L51.96 150 51.96 210 0 180Z'/%3E%3Cpath d='M0-60L51.96-30 51.96 30 0 0Z'/%3E%3C/g%3E%3Cg fill='%233a5189'%3E%3Cpath d='M0 60L51.96 30 51.96 90 0 120Z'/%3E%3Cpath d='M103.92 60L155.88 30 155.88 90 103.92 120Z'/%3E%3Cpath d='M51.96 150L103.92 120 103.92 180 51.96 210Z'/%3E%3Cpath d='M51.96-30L103.92-60 103.92 0 51.96 30Z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center top / 103.92px 180px repeat;
+}
+.tile-band::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, var(--bg), transparent 42%, transparent 88%, var(--bg));
+}
+body.dark .tile-band { background-color: #6f6f6f; background-blend-mode: multiply; }
+@media (max-width: 640px) {
+  .tile-band { height: 150px; margin-top: 44px; }
+}
+
 </style>
   
 </head>
@@ -3784,6 +3805,11 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
       leadership ratings and the full archive &#8211; need JavaScript.
     </div>
   </noscript>
+
+  <!-- decorative mosaic closing the page – body-level so it spans the full
+       width under whatever tailed the document (app footer, static summary
+       or noscript); purely visual, hence hidden from reader modes and AT -->
+  <div class="tile-band" aria-hidden="true"></div>
 
   <!-- build.mjs replaces this marker with the inlined scripts, in this order:
        React production, the generated dataset, the shared helpers, then each
