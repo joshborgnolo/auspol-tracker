@@ -1236,11 +1236,15 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
               the average {insight.peerNoun} at this point.
             </p>
           );
+          /* Net-approval measures carry no axis unit (CYC_METRICS unit:""),
+             so the sentence has to supply its own word – "points" for net
+             gaps, "point" singularised for a one-point gap. Share measures
+             get "x%" free from M.unit. */
           return (
             <p className="cycle-insight">
               {cycMonthLabel(insight.mNow)}, {insight.subjLabel} sits{" "}
               <span className={"ci-delta " + (insight.better ? "pos" : "neg")}>
-                {shown}{M.unit}
+                {shown}{M.unit || (parseFloat(shown) === 1 ? " point" : " points")}
               </span>{" "}
               {insight.better ? "above" : "below"} the average {insight.peerNoun} at this point.
             </p>

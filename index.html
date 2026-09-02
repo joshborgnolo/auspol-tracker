@@ -12793,11 +12793,15 @@ function CycleChart({
     }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " is", " ", /*#__PURE__*/React.createElement("span", {
       className: "ci-delta level"
     }, "in line with"), " ", "the average ", insight.peerNoun, " at this point.");
+    /* Net-approval measures carry no axis unit (CYC_METRICS unit:""),
+       so the sentence has to supply its own word – "points" for net
+       gaps, "point" singularised for a one-point gap. Share measures
+       get "x%" free from M.unit. */
     return /*#__PURE__*/React.createElement("p", {
       className: "cycle-insight"
     }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " sits", " ", /*#__PURE__*/React.createElement("span", {
       className: "ci-delta " + (insight.better ? "pos" : "neg")
-    }, shown, M.unit), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.");
+    }, shown, M.unit || (parseFloat(shown) === 1 ? " point" : " points")), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.");
   })()), /*#__PURE__*/React.createElement(TrendChart, {
     key: "cyc-" + M.key + "-" + mode,
     height: narrow ? 500 : 300,
