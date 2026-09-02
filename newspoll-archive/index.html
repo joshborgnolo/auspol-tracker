@@ -3,292 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Federal Newspoll archive · auspol tracker</title>
-<!-- Standalone wrapper: embeds the "Federal Newspoll Archive" Infogram
-     interactive via its official embed URL in a site-styled frame. Not part
-     of the .build/newtracker pipeline — hand-maintained, like
-     auspol-polling.html. Masthead reuses the main site's lockup, dial and
-     palette; the dial is a static snapshot of the aggregate at last rebuild
-     (ALP 27.8 / LNP 22.2 / GRN 12.8 / ONP 25.9 · 2PP 51.1–48.9 ALP). -->
-<meta name="description" content="The historical Newspoll record — an embedded copy of the Federal Newspoll Archive interactive, framed inside auspol tracker for reference alongside the live polling tracker.">
+<title>Archive moved · auspol tracker</title>
+<!-- Redirect stub: the Newspoll archive moved to /archives/newspoll/ and the
+     AC Nielsen archive to /archives/acnielsen/. A JS redirect preserves old
+     hash links (#acnielsen); the meta refresh covers no-JS agents. Hand-
+     maintained stub, like the satellite pages it points to. -->
+<meta http-equiv="refresh" content="0; url=/archives/newspoll/">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
-<meta property="og:type" content="website">
-<meta property="og:site_name" content="auspol tracker">
-<meta property="og:title" content="Federal Newspoll archive · auspol tracker">
-<meta property="og:description" content="The historical Newspoll record, embedded alongside the live polling tracker.">
-<meta name="twitter:card" content="summary">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1d2c'/%3E%3Crect x='6' y='15' width='5' height='11' fill='%23d62828'/%3E%3Crect x='13.5' y='8' width='5' height='18' fill='%23b08d39'/%3E%3Crect x='21' y='18' width='5' height='8' fill='%23ec7a08'/%3E%3C/svg%3E">
+<link rel="canonical" href="https://auspoltracker.com/archives/newspoll/">
 <style>
-/* ------- fonts: the same self-hosted cuts the main site ships ------- */
-@font-face {
-  font-family: 'Crimson Text';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url("../assets/fonts/crimsontext-400-latin.aac0df38.woff2") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'Source Serif 4';
-  font-style: normal;
-  font-weight: 200 900;
-  font-display: swap;
-  src: url("../assets/fonts/sourceserif4-latin.2a24bad4.woff2") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'IBM Plex Sans';
-  font-style: normal;
-  font-weight: 300 700;
-  font-display: swap;
-  src: url("../assets/fonts/ibmplexsans-latin.056e4e24.woff2") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'Source Sans 3';
-  font-style: normal;
-  font-weight: 400 800;
-  font-display: swap;
-  src: url("../assets/fonts/sourcesans3-latin.ac057a55.woff2") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-
-/* ------- palette: copied from the site's :root, using the editorial -------
-   ------- surfaces the live page actually runs in by default ------- */
 :root {
-  --bg:        oklch(0.975 0.009 80);
-  --ink:       oklch(0.27 0.012 55);
-  --ink-3:     oklch(0.52 0.010 58);
-  --ink-faint: oklch(0.70 0.008 65);
-  --line:      oklch(0.895 0.008 75);
-  --alp: oklch(0.55 0.150 27);
-  --lnp: oklch(0.50 0.095 250);
-  --grn: oklch(0.60 0.120 150);
-  --onp: oklch(0.66 0.130 58);
-  --serif: "Crimson Text", Georgia, "Times New Roman", serif;
-  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --heads: "Source Serif 4", var(--serif);
-  --maxw: 1200px;
+  --bg: oklch(0.975 0.009 80);
+  --ink: oklch(0.27 0.012 55);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg:        oklch(0.205 0.010 65);
-    --ink:       oklch(0.940 0.008 80);
-    --ink-3:     oklch(0.670 0.009 72);
-    --ink-faint: oklch(0.545 0.009 68);
-    --line:      oklch(0.355 0.011 66);
+    --bg: oklch(0.205 0.010 65);
+    --ink: oklch(0.940 0.008 80);
   }
 }
-* { box-sizing: border-box; margin: 0; padding: 0; }
-html, body { height: 100%; }
 body {
-  background: var(--bg);
-  color: var(--ink);
-  font-family: var(--sans);
-  font-size: 14px;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  min-height: 100dvh;
+  background: var(--bg); color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif; font-size: 16px;
+  display: flex; min-height: 100vh; align-items: center; justify-content: center;
+  margin: 0;
 }
-
-/* ------- masthead: the site's own lockup, dial meta in place of ------- */
-.site-head {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  gap: 28px; flex-wrap: wrap;
-  padding: calc(28px + env(safe-area-inset-top, 0px)) calc(28px + env(safe-area-inset-right, 0px))
-           16px calc(28px + env(safe-area-inset-left, 0px));
-  max-width: var(--maxw); width: 100%; margin: 0 auto;
-  box-shadow: inset 0 -1px 0 var(--line);
-}
-.wordmark {
-  font-family: "Myriad Pro", "Myriad Web Pro", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
-  display: inline-flex; align-items: center;
-  font-weight: 800; font-size: 30px; letter-spacing: -0.025em; line-height: 1;
-}
-.wordmark a.wm-home {
-  display: inline-flex; align-items: center; gap: 12px;
-  color: inherit; text-decoration: none;
-  padding: 3px; margin: -3px; border-radius: 8px;
-  transition: background-color .2s ease;
-}
-.wordmark a.wm-home:hover { background: color-mix(in oklch, var(--ink) 6%, transparent); }
-.wm-textcol { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1px; }
-.wm-name {
-  display: inline-flex; font-weight: 800; font-size: 30px;
-  letter-spacing: -0.025em; line-height: 0.95; color: var(--ink);
-}
-.wm-track {
-  align-self: flex-start;
-  display: inline-block;
-  font-size: 30px; font-weight: 400; letter-spacing: -0.03em;
-  text-transform: none; line-height: 0.95; color: var(--ink-3);
-}
-.wm-dial { display: block; overflow: visible; }
-.wm-arc { fill: none; stroke-width: 1.4; opacity: 0.5; }
-.wm-pivot { fill: var(--ink-3); }
-.wm-sr {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-}
-.tagline {
-  margin: 7px 0 -1.5px;
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: 15px; color: var(--ink-3); text-wrap: balance;
-}
-.head-right { display: flex; align-items: center; gap: 18px; }
-.meta-item { display: flex; flex-direction: column; gap: 2px; text-align: right; }
-.meta-k { font-size: 13px; color: var(--ink-3); font-weight: 600; white-space: nowrap; letter-spacing: 0.02em; }
-.meta-v, .meta-v a {
-  font-size: 14px; color: var(--ink); font-weight: 600; white-space: nowrap;
-  text-decoration: none;
-}
-.meta-v a:hover { text-decoration: underline; }
-@media (max-width: 560px) {
-  .site-head { flex-direction: column; align-items: flex-start; gap: 13px; }
-  .meta-item { text-align: left; }
-}
-
-/* ------- archive tabs ------- */
-.tabs {
-  display: flex; gap: 4px;
-  border-bottom: 1px solid var(--line);
-  margin-bottom: 14px;
-}
-.tab {
-  appearance: none; background: none; border: 0;
-  font: inherit; font-weight: 600; font-size: 14px;
-  color: var(--ink-3);
-  padding: 8px 12px 10px; margin-bottom: -1px;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-}
-.tab:hover { color: var(--ink); }
-.tab.active { color: var(--ink); border-bottom-color: var(--ink); }
-
-/* ------- AC Nielsen PDF list ------- */
-.archive-list { list-style: none; border-top: 1px solid var(--line); margin-top: 4px; }
-.archive-list li {
-  display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-  padding: 10px 2px;
-  border-bottom: 1px solid var(--line);
-  font-size: 14px;
-}
-.archive-list a { font-weight: 600; color: var(--ink); text-decoration: none; }
-.archive-list a:hover { text-decoration: underline; }
-.archive-list a::after { content: " \2197"; font-weight: 400; color: var(--ink-3); }
-.archive-list .note { font-size: 12.5px; color: var(--ink-3); white-space: nowrap; }
-
-.pane { display: flex; flex: 1; flex-direction: column; }
-.pane[hidden] { display: none; }
-
-/* ------- embedded archive ------- */
-.frame-wrap {
-  flex: 1; display: flex; flex-direction: column;
-  max-width: var(--maxw); width: 100%; margin: 0 auto;
-  padding: 18px calc(28px + env(safe-area-inset-right, 0px)) calc(28px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px));
-}
-.credit {
-  font-size: 12.5px; color: var(--ink-3); margin-bottom: 10px;
-}
-.credit a { color: inherit; }
-.frame-holder {
-  flex: 1; min-height: 420px;
-  background: #fff;
-  border: 1px solid var(--line);
-  display: flex;
-}
-iframe { flex: 1; width: 100%; border: 0; display: block; }
+a { color: var(--ink); }
 </style>
 </head>
 <body>
-<header class="site-head">
-  <div class="brand">
-    <h1 class="wordmark">
-      <a class="wm-home" href="/" title="Back to the live tracker" aria-label="auspol tracker – back to the live polling tracker">
-        <span class="wm-textcol"><span class="wm-name">auspol</span><span class="wm-track">tracker</span></span>
-        <svg class="wm-dial" viewBox="0.58 0.07 38.39 26.73" width="57" height="39.7" aria-hidden="true">
-          <path d="M 10 24.5 A 12 12 0 0 1 22 12.5" class="wm-arc" stroke="var(--alp)"/>
-          <path d="M 22 12.5 A 12 12 0 0 1 34 24.5" class="wm-arc" stroke="var(--lnp)"/>
-          <line x1="10.67" y1="16.27" x2="2.18" y2="10.10" stroke="var(--alp)" stroke-width="3.4" stroke-linecap="butt" style="stroke-dasharray: 10.5 10.5"/>
-          <line x1="17.67" y1="11.19" x2="14.43" y2="1.20" stroke="var(--onp)" stroke-width="3.4" stroke-linecap="butt" style="stroke-dasharray: 9.8 10.5"/>
-          <line x1="26.33" y1="11.19" x2="29.57" y2="1.20" stroke="var(--lnp)" stroke-width="3.4" stroke-linecap="butt" style="stroke-dasharray: 8.45 10.5"/>
-          <line x1="33.33" y1="16.27" x2="41.82" y2="10.10" stroke="var(--grn)" stroke-width="3.4" stroke-linecap="butt" style="stroke-dasharray: 5 10.5"/>
-          <g transform="translate(22, 24.5)"><g transform="rotate(-6.23)">
-            <line x1="0" y1="0" x2="0" y2="-8.6" stroke="var(--alp)" stroke-width="1.7" stroke-linecap="round"/>
-            <circle cx="0" cy="-8.6" r="1.9" fill="var(--alp)"/>
-          </g></g>
-          <circle cx="22" cy="24.5" r="1.7" class="wm-pivot"/>
-        </svg>
-        <span class="wm-sr">– Australian federal polling</span>
-      </a>
-    </h1>
-    <p class="tagline">The historical Newspoll record,<br class="tagline-br"> for safekeeping</p>
-  </div>
-  <div class="head-right">
-    <div class="meta-item">
-      <span class="meta-k">Pollster archive</span>
-      <span class="meta-v"><a href="/">&larr; Back to live tracker</a></span>
-    </div>
-  </div>
-</header>
-<main class="frame-wrap">
-  <div class="tabs" role="tablist" aria-label="Poll archives">
-    <button class="tab active" id="tab-newspoll" role="tab" aria-selected="true" aria-controls="pane-newspoll">Newspoll</button>
-    <button class="tab" id="tab-acnielsen" role="tab" aria-selected="false" aria-controls="pane-acnielsen">AC Nielsen</button>
-  </div>
-
-  <div class="pane active" id="pane-newspoll" role="tabpanel" aria-labelledby="tab-newspoll">
-    <p class="credit">Federal Newspoll archive, charted wave by wave — embedded from the Infogram original.</p>
-    <div class="frame-holder">
-      <iframe
-        src="https://e.infogram.com/federal-newspoll-archive-1gv4m7ejjndop18?src=embed"
-        title="Federal Newspoll Archive — historical Newspoll polling results (Infogram)"
-        allow="fullscreen"
-        loading="lazy"></iframe>
-    </div>
-  </div>
-
-  <div class="pane" id="pane-acnielsen" role="tabpanel" aria-labelledby="tab-acnielsen" hidden>
-    <p class="credit">The AC Nielsen federal poll, published with The Age and The Sydney Morning Herald until 2007 — annual PDF compilations of voting intention, leadership approval and preferred PM, preserved from au.acnielsen.com via the Internet Archive and mirrored here. No polls were conducted in 2002.</p>
-    <ul class="archive-list">
-      <li><a href="/data/acnielsen/ACNielsenPoll2006.pdf">AC Nielsen Poll 2006</a><span class="note">PDF</span></li>
-      <li><a href="/data/acnielsen/ACNielsenPoll2005.pdf">AC Nielsen Poll 2005</a><span class="note">PDF</span></li>
-      <li><a href="/data/acnielsen/ACNielsenPoll2004.pdf">AC Nielsen Poll 2004</a><span class="note">PDF</span></li>
-      <li><a href="/data/acnielsen/ACNielsenPoll2003.pdf">AC Nielsen Poll 2003</a><span class="note">PDF</span></li>
-      <li><a href="/data/acnielsen/ACNielsenPoll2001.pdf">AC Nielsen Poll 2001</a><span class="note">PDF</span></li>
-      <li><a href="/data/acnielsen/ACNielsenPoll2000.pdf">AC Nielsen Poll 2000</a><span class="note">PDF</span></li>
-      <li><a href="/data/acnielsen/ACNielsenPoll1999.pdf">AC Nielsen Poll 1999</a><span class="note">PDF</span></li>
-      <li><a href="/data/acnielsen/ACNielsenPoll1998.pdf">AC Nielsen Poll 1998</a><span class="note">PDF</span></li>
-      <li><a href="/data/acnielsen/ACNielsenPoll1997.pdf">AC Nielsen Poll 1997</a><span class="note">PDF</span></li>
-      <li><a href="/data/acnielsen/ACNielsenPoll1996.pdf">AC Nielsen Poll 1996</a><span class="note">PDF</span></li>
-    </ul>
-    <p class="credit" style="margin-top: 10px;">The same series transcribed to data: <a href="/data/acnielsen-polls.csv">acnielsen-polls.csv</a> (1996–2006).</p>
-  </div>
-</main>
+<p>This page has moved: <a href="/archives/newspoll/">Newspoll archive</a> · <a href="/archives/acnielsen/">AC Nielsen archive</a>.</p>
 <script>
-const TABS = [
-  ["newspoll", "Federal Newspoll archive · auspol tracker"],
-  ["acnielsen", "AC Nielsen poll archive · auspol tracker"],
-];
-function selectTab(name) {
-  for (const [n, title] of TABS) {
-    const on = n === name;
-    document.getElementById("tab-" + n).classList.toggle("active", on);
-    document.getElementById("tab-" + n).setAttribute("aria-selected", String(on));
-    document.getElementById("pane-" + n).hidden = !on;
-    if (on) document.title = title;
-  }
-}
-function tabFromHash() {
-  selectTab(location.hash === "#acnielsen" ? "acnielsen" : "newspoll");
-}
-document.getElementById("tab-newspoll").addEventListener("click", () => { location.hash = ""; });
-document.getElementById("tab-acnielsen").addEventListener("click", () => { location.hash = "acnielsen"; });
-addEventListener("hashchange", tabFromHash);
-tabFromHash();
+var dest = location.hash === "#acnielsen"
+  ? "/archives/acnielsen/"
+  : "/archives/newspoll/";
+location.replace(dest);
 </script>
 </body>
 </html>
