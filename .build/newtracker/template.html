@@ -1732,8 +1732,10 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 
 /* A linked pollster name reads as the name first and a link second: no blue,
    no permanent underline. The ↗ is the standing signal that it leaves the
-   page; the underline arrives on hover/focus. */
-a.pollster-link { text-decoration: none; cursor: pointer; }
+   page; the underline arrives on hover/focus. fit-content pins the hit lane
+   to the text - a block anchor otherwise spans the cell's full width and
+   swallows taps meant for the row's expand toggle. */
+a.pollster-link { text-decoration: none; cursor: pointer; width: fit-content; }
 a.pollster-link:hover, a.pollster-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 a.pollster-link:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
 .plink-mark {
@@ -1761,8 +1763,9 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
 .pollster-mode { display: block; margin-top: 1px; font-size: 12px; color: var(--ink-3); }
 /* the wave's APC methodology-statement link (YouGov/Newspoll rows only) –
    a quiet sub-line under the pollster name, same "name first, link second"
-   treatment as a.pollster-link */
-.pollster-method { display: block; margin-top: 1px; font-size: 11px; color: var(--ink-3); text-decoration: none; cursor: pointer; }
+   treatment as a.pollster-link, and the same fit-content hit lane so the
+   empty right half of the cell stays row-toggle, not link */
+.pollster-method { display: block; width: fit-content; margin-top: 1px; font-size: 11px; color: var(--ink-3); text-decoration: none; cursor: pointer; }
 a.pollster-method:hover, a.pollster-method:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 a.pollster-method:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
 a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark { color: var(--ink-2); }
