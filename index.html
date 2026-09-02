@@ -191,8 +191,7 @@
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
   --figures: "Archivo", var(--sans);
-  /* heads (card titles, tab labels): Source Serif 4, not --serif - the variable
-     cut interpolates the 500/540 head weights crimson's static set can't ship */
+  /* tab labels: Source Serif 4, not --serif */
   --heads: "Source Serif 4", var(--serif);
 
   --radius: 14px;
@@ -959,7 +958,7 @@ body.dark .dl-bloom { opacity: 1; }
   display: flex; justify-content: space-between; align-items: flex-start;
   gap: 18px; flex-wrap: wrap; margin-bottom: 14px;
 }
-.card-title { font-family: var(--heads, var(--serif)); font-weight: 540; font-size: 22px; margin: 0; letter-spacing: -0.01em; color: var(--ink); line-height: 1.15; }
+.card-title { font-family: var(--serif); font-weight: 540; font-size: 22px; margin: 0; letter-spacing: -0.01em; color: var(--ink); line-height: 1.15; }
 .card-sub { margin: 3px 0 0; font-size: 13px; color: var(--ink-3); text-wrap: pretty; }
 
 /* ---------- segmented control ---------- */
