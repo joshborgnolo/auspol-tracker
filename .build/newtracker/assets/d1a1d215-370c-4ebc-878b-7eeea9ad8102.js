@@ -1275,6 +1275,12 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll, shap
       <div className="cyc-legend-row">
         {cycles.map((c) => {
           const off = hidden.has(c.year);
+          /* A term that changed PM names both of them: "2007 Rudd" alone says
+             Gillard never governed. netEras lists the officeholders in order,
+             so a term that kept one PM keeps its single lead. */
+          const pmNames = c.raw.netEras && c.raw.netEras.length > 1
+            ? c.raw.netEras.map((e) => e.name).join("–")
+            : c.lead;
           return (
             <button key={c.year} type="button"
                     className={"cyc-chip" + (off ? " off" : "") + (c.current ? " current" : "")}
@@ -1290,7 +1296,7 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll, shap
                                                ? " sw-" + shapes[c.year] : "")}
                     style={{ background: c.color }}></span>
               <span className="cyc-year">{c.year}</span>
-              <span className="cyc-lead">{c.lead}</span>
+              <span className="cyc-lead">{pmNames}</span>
               {c.current && <span className="cyc-now">Now</span>}
             </button>
           );

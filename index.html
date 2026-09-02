@@ -12796,6 +12796,10 @@ function CycleLegend({
     className: "cyc-legend-row"
   }, cycles.map(c => {
     const off = hidden.has(c.year);
+    /* A term that changed PM names both of them: "2007 Rudd" alone says
+       Gillard never governed. netEras lists the officeholders in order,
+       so a term that kept one PM keeps its single lead. */
+    const pmNames = c.raw.netEras && c.raw.netEras.length > 1 ? c.raw.netEras.map(e => e.name).join("–") : c.lead;
     return /*#__PURE__*/React.createElement("button", {
       key: c.year,
       type: "button",
@@ -12819,7 +12823,7 @@ function CycleLegend({
       className: "cyc-year"
     }, c.year), /*#__PURE__*/React.createElement("span", {
       className: "cyc-lead"
-    }, c.lead), c.current && /*#__PURE__*/React.createElement("span", {
+    }, pmNames), c.current && /*#__PURE__*/React.createElement("span", {
       className: "cyc-now"
     }, "Now"));
   })), /*#__PURE__*/React.createElement("button", {
