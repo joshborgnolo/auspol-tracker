@@ -178,6 +178,16 @@
       "oth": 10.6,
       "tpp_lnp": 49,
       "tpp_alp": 51
+    },
+    "e1996": {
+      "date": "1996-03-02",
+      "lnp": 46.9,
+      "alp": 38.8,
+      "grn": 1.7,
+      "onp": 0,
+      "oth": 12.6,
+      "tpp_lnp": 53.6,
+      "tpp_alp": 46.4
     }
   },
   "events": [
@@ -6749,6 +6759,1262 @@
     }
   ],
   "cyclePolls": {
+    "1998": [
+      {
+        "date": "1996-03-23",
+        "firm": "Morgan",
+        "lnp": 49.5,
+        "alp": 36.5,
+        "grn": 3,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 56,
+        "tpp_alp": 44
+      },
+      {
+        "date": "1996-04-06",
+        "firm": "Morgan",
+        "lnp": 49.5,
+        "alp": 37,
+        "grn": 3.5,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 56.5,
+        "tpp_alp": 43.5
+      },
+      {
+        "date": "1996-04-20",
+        "firm": "Morgan",
+        "lnp": 48,
+        "alp": 38,
+        "grn": 3.5,
+        "onp": null,
+        "oth": 10.5,
+        "tpp_lnp": 54.5,
+        "tpp_alp": 45.5
+      },
+      {
+        "date": "1996-05-05",
+        "firm": "Morgan",
+        "lnp": 51.5,
+        "alp": 33.5,
+        "grn": 3.5,
+        "onp": null,
+        "oth": 11.5,
+        "tpp_lnp": 58.5,
+        "tpp_alp": 41.5
+      },
+      {
+        "date": "1996-05-05",
+        "firm": "ACNielsen",
+        "lnp": 53,
+        "alp": 31,
+        "grn": 3,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 60,
+        "tpp_alp": 40
+      },
+      {
+        "date": "1996-05-18",
+        "firm": "Morgan",
+        "lnp": 49.5,
+        "alp": 35.5,
+        "grn": 3.5,
+        "onp": null,
+        "oth": 11.5,
+        "tpp_lnp": 57.5,
+        "tpp_alp": 42.5
+      },
+      {
+        "date": "1996-06-01",
+        "firm": "Morgan",
+        "lnp": 50,
+        "alp": 34.5,
+        "grn": 2.5,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 57,
+        "tpp_alp": 43
+      },
+      {
+        "date": "1996-06-02",
+        "firm": "ACNielsen",
+        "lnp": 49,
+        "alp": 35,
+        "grn": 3,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 55,
+        "tpp_alp": 45
+      },
+      {
+        "date": "1996-06-16",
+        "firm": "ACNielsen",
+        "lnp": 50,
+        "alp": 36,
+        "grn": 3,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": 57,
+        "tpp_alp": 43
+      },
+      {
+        "date": "1996-06-22",
+        "firm": "Morgan",
+        "lnp": 50.5,
+        "alp": 38,
+        "grn": 1.5,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 55.5,
+        "tpp_alp": 45.5
+      },
+      {
+        "date": "1996-06-30",
+        "firm": "ACNielsen",
+        "lnp": 46,
+        "alp": 36,
+        "grn": 4,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 54,
+        "tpp_alp": 46
+      },
+      {
+        "date": "1996-07-04",
+        "firm": "Morgan",
+        "lnp": 50.5,
+        "alp": 34,
+        "grn": 3,
+        "onp": null,
+        "oth": 12.5,
+        "tpp_lnp": 58,
+        "tpp_alp": 42
+      },
+      {
+        "date": "1996-07-14",
+        "firm": "ACNielsen",
+        "lnp": 49,
+        "alp": 37,
+        "grn": 4,
+        "onp": null,
+        "oth": 10,
+        "tpp_lnp": 56,
+        "tpp_alp": 44
+      },
+      {
+        "date": "1996-07-18",
+        "firm": "Morgan",
+        "lnp": 51,
+        "alp": 34,
+        "grn": 2.5,
+        "onp": null,
+        "oth": 12.5,
+        "tpp_lnp": 57.5,
+        "tpp_alp": 42.5
+      },
+      {
+        "date": "1996-08-01",
+        "firm": "Morgan",
+        "lnp": 51,
+        "alp": 33.5,
+        "grn": 3.5,
+        "onp": null,
+        "oth": 12,
+        "tpp_lnp": 58.5,
+        "tpp_alp": 41.5
+      },
+      {
+        "date": "1996-08-11",
+        "firm": "ACNielsen",
+        "lnp": 45,
+        "alp": 39,
+        "grn": 3,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "1996-08-15",
+        "firm": "Morgan",
+        "lnp": 50,
+        "alp": 34,
+        "grn": 3.5,
+        "onp": null,
+        "oth": 12.5,
+        "tpp_lnp": 56.5,
+        "tpp_alp": 43.5
+      },
+      {
+        "date": "1996-08-25",
+        "firm": "ACNielsen",
+        "lnp": 45,
+        "alp": 36,
+        "grn": 3,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "1996-08-29",
+        "firm": "Morgan",
+        "lnp": 49.5,
+        "alp": 33.5,
+        "grn": 3.5,
+        "onp": null,
+        "oth": 13.5,
+        "tpp_lnp": 56.5,
+        "tpp_alp": 43.5
+      },
+      {
+        "date": "1996-09-12",
+        "firm": "Morgan",
+        "lnp": 46,
+        "alp": 37.5,
+        "grn": 3,
+        "onp": null,
+        "oth": 13.5,
+        "tpp_lnp": 53.5,
+        "tpp_alp": 46.5
+      },
+      {
+        "date": "1996-09-26",
+        "firm": "Morgan",
+        "lnp": 50,
+        "alp": 35,
+        "grn": 2.5,
+        "onp": null,
+        "oth": 12.5,
+        "tpp_lnp": 56,
+        "tpp_alp": 44
+      },
+      {
+        "date": "1996-10-06",
+        "firm": "ACNielsen",
+        "lnp": 48,
+        "alp": 35,
+        "grn": 3,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": 55,
+        "tpp_alp": 45
+      },
+      {
+        "date": "1996-10-10",
+        "firm": "Morgan",
+        "lnp": 49,
+        "alp": 34,
+        "grn": 3.5,
+        "onp": null,
+        "oth": 13.5,
+        "tpp_lnp": 55.5,
+        "tpp_alp": 45.5
+      },
+      {
+        "date": "1996-10-24",
+        "firm": "Morgan",
+        "lnp": 49.5,
+        "alp": 33,
+        "grn": 2.5,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": 58,
+        "tpp_alp": 42
+      },
+      {
+        "date": "1996-11-03",
+        "firm": "ACNielsen",
+        "lnp": 48,
+        "alp": 34,
+        "grn": 4,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": 56,
+        "tpp_alp": 44
+      },
+      {
+        "date": "1996-11-07",
+        "firm": "Morgan",
+        "lnp": 49,
+        "alp": 34,
+        "grn": 3,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 56.5,
+        "tpp_alp": 43.5
+      },
+      {
+        "date": "1996-11-21",
+        "firm": "Morgan",
+        "lnp": 48,
+        "alp": 35,
+        "grn": 2.5,
+        "onp": null,
+        "oth": 14.5,
+        "tpp_lnp": 56,
+        "tpp_alp": 44
+      },
+      {
+        "date": "1996-12-01",
+        "firm": "ACNielsen",
+        "lnp": 47,
+        "alp": 37,
+        "grn": 3,
+        "onp": null,
+        "oth": 13,
+        "tpp_lnp": 54,
+        "tpp_alp": 46
+      },
+      {
+        "date": "1996-12-05",
+        "firm": "Morgan",
+        "lnp": 48,
+        "alp": 35,
+        "grn": 2.5,
+        "onp": null,
+        "oth": 14.5,
+        "tpp_lnp": 55.5,
+        "tpp_alp": 44.5
+      },
+      {
+        "date": "1996-12-19",
+        "firm": "Morgan",
+        "lnp": 48,
+        "alp": 36.5,
+        "grn": 2,
+        "onp": null,
+        "oth": 13.5,
+        "tpp_lnp": 54.5,
+        "tpp_alp": 45.5
+      },
+      {
+        "date": "1997-01-16",
+        "firm": "Morgan",
+        "lnp": 49.5,
+        "alp": 34.5,
+        "grn": 2,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 57,
+        "tpp_alp": 43
+      },
+      {
+        "date": "1997-01-19",
+        "firm": "ACNielsen",
+        "lnp": 44,
+        "alp": 35,
+        "grn": 3,
+        "onp": null,
+        "oth": 18,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "1997-01-30",
+        "firm": "Morgan",
+        "lnp": 49,
+        "alp": 32.5,
+        "grn": 3,
+        "onp": null,
+        "oth": 15.5,
+        "tpp_lnp": 56.5,
+        "tpp_alp": 43.5
+      },
+      {
+        "date": "1997-02-13",
+        "firm": "Morgan",
+        "lnp": 46,
+        "alp": 36,
+        "grn": 4,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 53.5,
+        "tpp_alp": 46.5
+      },
+      {
+        "date": "1997-02-16",
+        "firm": "ACNielsen",
+        "lnp": 46,
+        "alp": 36,
+        "grn": 4,
+        "onp": null,
+        "oth": 14,
+        "tpp_lnp": 54,
+        "tpp_alp": 46
+      },
+      {
+        "date": "1997-02-27",
+        "firm": "Morgan",
+        "lnp": 47,
+        "alp": 36,
+        "grn": 2.5,
+        "onp": null,
+        "oth": 14.5,
+        "tpp_lnp": 54.5,
+        "tpp_alp": 45.5
+      },
+      {
+        "date": "1997-03-13",
+        "firm": "Morgan",
+        "lnp": 50,
+        "alp": 34.5,
+        "grn": 2,
+        "onp": null,
+        "oth": 13.5,
+        "tpp_lnp": 57.5,
+        "tpp_alp": 42.5
+      },
+      {
+        "date": "1997-03-20",
+        "firm": "Morgan",
+        "lnp": 49.5,
+        "alp": 35.5,
+        "grn": 1.5,
+        "onp": null,
+        "oth": 13.5,
+        "tpp_lnp": 55.5,
+        "tpp_alp": 44.5
+      },
+      {
+        "date": "1997-03-26",
+        "firm": "Morgan",
+        "lnp": 43.5,
+        "alp": 35,
+        "grn": 4,
+        "onp": null,
+        "oth": 17.5,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "1997-04-10",
+        "firm": "Morgan",
+        "lnp": 48,
+        "alp": 35.5,
+        "grn": 3,
+        "onp": null,
+        "oth": 13.5,
+        "tpp_lnp": 55.5,
+        "tpp_alp": 44.5
+      },
+      {
+        "date": "1997-04-13",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 35,
+        "grn": 3,
+        "onp": null,
+        "oth": 19,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "1997-04-23",
+        "firm": "Morgan",
+        "lnp": 40,
+        "alp": 34.5,
+        "grn": 3,
+        "onp": 10,
+        "oth": 12.5,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "1997-04-27",
+        "firm": "ACNielsen",
+        "lnp": 44,
+        "alp": 36,
+        "grn": 3,
+        "onp": null,
+        "oth": 18,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "1997-05-04",
+        "firm": "ACNielsen",
+        "lnp": 38,
+        "alp": 34,
+        "grn": 4,
+        "onp": 10,
+        "oth": 13,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "1997-05-08",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 30,
+        "grn": 2.5,
+        "onp": 13.5,
+        "oth": 12,
+        "tpp_lnp": 55.5,
+        "tpp_alp": 44.5
+      },
+      {
+        "date": "1997-05-15",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 35.5,
+        "grn": 2.5,
+        "onp": 12.5,
+        "oth": 11,
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
+      },
+      {
+        "date": "1997-05-22",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 32.5,
+        "grn": 2.5,
+        "onp": 12,
+        "oth": 11.5,
+        "tpp_lnp": 55,
+        "tpp_alp": 45
+      },
+      {
+        "date": "1997-05-25",
+        "firm": "ACNielsen",
+        "lnp": 39,
+        "alp": 35,
+        "grn": 4,
+        "onp": 12,
+        "oth": 9,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "1997-06-05",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 34,
+        "grn": 3,
+        "onp": 9,
+        "oth": 12.5,
+        "tpp_lnp": 55,
+        "tpp_alp": 45
+      },
+      {
+        "date": "1997-06-19",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 34,
+        "grn": 2.5,
+        "onp": 11,
+        "oth": 10.5,
+        "tpp_lnp": 54.5,
+        "tpp_alp": 45.5
+      },
+      {
+        "date": "1997-07-03",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 34,
+        "grn": 3,
+        "onp": 10,
+        "oth": 12.5,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "1997-07-17",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 35.5,
+        "grn": 3.5,
+        "onp": 8,
+        "oth": 11,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "1997-07-31",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 36,
+        "grn": 3.5,
+        "onp": 8,
+        "oth": 12,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "1997-08-07",
+        "firm": "Morgan",
+        "lnp": 35,
+        "alp": 40.5,
+        "grn": 1.5,
+        "onp": 10,
+        "oth": 13,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "1997-08-16",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 33,
+        "grn": 3,
+        "onp": 8,
+        "oth": 13,
+        "tpp_lnp": 53.5,
+        "tpp_alp": 46.5
+      },
+      {
+        "date": "1997-08-17",
+        "firm": "ACNielsen",
+        "lnp": 39,
+        "alp": 38,
+        "grn": 3,
+        "onp": 9,
+        "oth": 12,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "1997-08-28",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 36.5,
+        "grn": 3,
+        "onp": 8,
+        "oth": 12,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "1997-09-11",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 36,
+        "grn": 2,
+        "onp": 8.5,
+        "oth": 12,
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
+      },
+      {
+        "date": "1997-09-18",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 37,
+        "grn": 3.5,
+        "onp": 8,
+        "oth": 10.5,
+        "tpp_lnp": 52,
+        "tpp_alp": 48
+      },
+      {
+        "date": "1997-09-25",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 40,
+        "grn": 2,
+        "onp": 8,
+        "oth": 8.5,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "1997-10-09",
+        "firm": "Morgan",
+        "lnp": 46.5,
+        "alp": 32,
+        "grn": 2,
+        "onp": 7.5,
+        "oth": 12,
+        "tpp_lnp": 57.5,
+        "tpp_alp": 42.5
+      },
+      {
+        "date": "1997-10-12",
+        "firm": "ACNielsen",
+        "lnp": 40,
+        "alp": 36,
+        "grn": 3,
+        "onp": 7,
+        "oth": 13,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "1997-10-16",
+        "firm": "Morgan",
+        "lnp": 38,
+        "alp": 42.5,
+        "grn": 1.5,
+        "onp": 6,
+        "oth": 12,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "1997-10-18",
+        "firm": "ACNielsen",
+        "lnp": 38,
+        "alp": 42,
+        "grn": 3,
+        "onp": 6,
+        "oth": 11,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "1997-10-30",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 43.5,
+        "grn": 2,
+        "onp": 6,
+        "oth": 10,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
+      },
+      {
+        "date": "1997-11-13",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 43.5,
+        "grn": 2.5,
+        "onp": 4.5,
+        "oth": 11,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
+      },
+      {
+        "date": "1997-11-23",
+        "firm": "ACNielsen",
+        "lnp": 36,
+        "alp": 42,
+        "grn": 4,
+        "onp": 7,
+        "oth": 11,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
+        "date": "1997-11-27",
+        "firm": "Morgan",
+        "lnp": 37.5,
+        "alp": 46,
+        "grn": 2.5,
+        "onp": 4.5,
+        "oth": 9.5,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "1997-12-11",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 41,
+        "grn": 2.5,
+        "onp": 5,
+        "oth": 8.5,
+        "tpp_lnp": 51.5,
+        "tpp_alp": 48.5
+      },
+      {
+        "date": "1998-01-15",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 41.5,
+        "grn": 3,
+        "onp": 5.5,
+        "oth": 8.5,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "1998-01-29",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 44.5,
+        "grn": 2.5,
+        "onp": 5.5,
+        "oth": 8,
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
+      },
+      {
+        "date": "1998-02-01",
+        "firm": "ACNielsen",
+        "lnp": 37,
+        "alp": 45,
+        "grn": 3,
+        "onp": 5,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "1998-02-12",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 43,
+        "grn": 2,
+        "onp": 5.5,
+        "oth": 10,
+        "tpp_lnp": 47.5,
+        "tpp_alp": 52.5
+      },
+      {
+        "date": "1998-02-26",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 44.5,
+        "grn": 2,
+        "onp": 4.5,
+        "oth": 8.5,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "1998-03-01",
+        "firm": "ACNielsen",
+        "lnp": 38,
+        "alp": 40,
+        "grn": 3,
+        "onp": 6,
+        "oth": 12,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "1998-03-12",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 41.5,
+        "grn": 2,
+        "onp": 4.5,
+        "oth": 10.5,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "1998-03-26",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 40,
+        "grn": 3,
+        "onp": 5,
+        "oth": 10,
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
+      },
+      {
+        "date": "1998-03-29",
+        "firm": "ACNielsen",
+        "lnp": 40,
+        "alp": 41,
+        "grn": 3,
+        "onp": 6,
+        "oth": 11,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "1998-04-09",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 40,
+        "grn": 2.5,
+        "onp": 6,
+        "oth": 10,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "1998-04-16",
+        "firm": "Morgan",
+        "lnp": 43,
+        "alp": 36,
+        "grn": 3.5,
+        "onp": 4.5,
+        "oth": 13,
+        "tpp_lnp": 53,
+        "tpp_alp": 47
+      },
+      {
+        "date": "1998-04-19",
+        "firm": "ACNielsen",
+        "lnp": 38,
+        "alp": 41,
+        "grn": 2,
+        "onp": 9,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "1998-04-23",
+        "firm": "Morgan",
+        "lnp": 38.5,
+        "alp": 42,
+        "grn": 3.5,
+        "onp": 6.5,
+        "oth": 9.5,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
+      },
+      {
+        "date": "1998-04-30",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 41.5,
+        "grn": 3,
+        "onp": 6,
+        "oth": 8.5,
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
+      },
+      {
+        "date": "1998-05-14",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 42,
+        "grn": 2.5,
+        "onp": 4,
+        "oth": 9.5,
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
+      },
+      {
+        "date": "1998-05-24",
+        "firm": "ACNielsen",
+        "lnp": 39,
+        "alp": 41,
+        "grn": 3,
+        "onp": 7,
+        "oth": 10,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "1998-05-28",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 43.5,
+        "grn": 3,
+        "onp": 6,
+        "oth": 8,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "1998-06-11",
+        "firm": "Morgan",
+        "lnp": 39.5,
+        "alp": 40.5,
+        "grn": 2.5,
+        "onp": 9.5,
+        "oth": 8,
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
+      },
+      {
+        "date": "1998-06-18",
+        "firm": "Morgan",
+        "lnp": 35,
+        "alp": 39.5,
+        "grn": 2.5,
+        "onp": 14.5,
+        "oth": 8.5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "1998-06-21",
+        "firm": "ACNielsen",
+        "lnp": 34,
+        "alp": 42,
+        "grn": 3,
+        "onp": 12,
+        "oth": 8,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "1998-07-02",
+        "firm": "Morgan",
+        "lnp": 35,
+        "alp": 42,
+        "grn": 2,
+        "onp": 12,
+        "oth": 9,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 53.5
+      },
+      {
+        "date": "1998-07-12",
+        "firm": "Morgan",
+        "lnp": 32,
+        "alp": 42.5,
+        "grn": 2.5,
+        "onp": 14.5,
+        "oth": 8.5,
+        "tpp_lnp": 42.5,
+        "tpp_alp": 57.5
+      },
+      {
+        "date": "1998-07-19",
+        "firm": "ACNielsen",
+        "lnp": 34,
+        "alp": 39,
+        "grn": 4,
+        "onp": 14,
+        "oth": 9,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "1998-07-26",
+        "firm": "Morgan",
+        "lnp": 33,
+        "alp": 41,
+        "grn": 2.5,
+        "onp": 14,
+        "oth": 9.5,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
+        "date": "1998-08-09",
+        "firm": "Morgan",
+        "lnp": 33,
+        "alp": 44,
+        "grn": 2,
+        "onp": 13.5,
+        "oth": 10,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
+        "date": "1998-08-15",
+        "firm": "ACNielsen",
+        "lnp": 40,
+        "alp": 41,
+        "grn": 2,
+        "onp": 10,
+        "oth": 7,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "1998-08-16",
+        "firm": "Morgan",
+        "lnp": 41,
+        "alp": 43.5,
+        "grn": 2,
+        "onp": 10,
+        "oth": 7.5,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "1998-08-23",
+        "firm": "Morgan",
+        "lnp": 40,
+        "alp": 43,
+        "grn": 2.5,
+        "onp": 11,
+        "oth": 8,
+        "tpp_lnp": 45.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "1998-08-30",
+        "firm": "Morgan",
+        "lnp": 39,
+        "alp": 42,
+        "grn": 3,
+        "onp": 9,
+        "oth": 9,
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
+      },
+      {
+        "date": "1998-09-01",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 42,
+        "grn": 1,
+        "onp": 8,
+        "oth": 6,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "1998-09-06",
+        "firm": "Newspoll",
+        "lnp": 41.5,
+        "alp": 41.5,
+        "grn": 2,
+        "onp": 7.5,
+        "oth": 7.5,
+        "tpp_lnp": 48.5,
+        "tpp_alp": 51.5
+      },
+      {
+        "date": "1998-09-06",
+        "firm": "Morgan",
+        "lnp": 40.5,
+        "alp": 43,
+        "grn": 3,
+        "onp": 9.5,
+        "oth": 7,
+        "tpp_lnp": 46.5,
+        "tpp_alp": 54.5
+      },
+      {
+        "date": "1998-09-09",
+        "firm": "ACNielsen",
+        "lnp": 43,
+        "alp": 39,
+        "grn": 2,
+        "onp": 8,
+        "oth": 7,
+        "tpp_lnp": 51,
+        "tpp_alp": 49
+      },
+      {
+        "date": "1998-09-13",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 44,
+        "grn": 2,
+        "onp": 7,
+        "oth": 5,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "1998-09-13",
+        "firm": "Morgan",
+        "lnp": 41.5,
+        "alp": 44.5,
+        "grn": 1.5,
+        "onp": 8.5,
+        "oth": 7,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
+      },
+      {
+        "date": "1998-09-16",
+        "firm": "ACNielsen",
+        "lnp": 42,
+        "alp": 43,
+        "grn": 2,
+        "onp": 8,
+        "oth": 6,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "1998-09-20",
+        "firm": "Newspoll",
+        "lnp": 42,
+        "alp": 43,
+        "grn": 2,
+        "onp": 6,
+        "oth": 7,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "1998-09-20",
+        "firm": "Morgan",
+        "lnp": 42,
+        "alp": 46.5,
+        "grn": 2.5,
+        "onp": 7,
+        "oth": 6.5,
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
+      },
+      {
+        "date": "1998-09-23",
+        "firm": "ACNielsen",
+        "lnp": 41,
+        "alp": 43,
+        "grn": 2,
+        "onp": 7,
+        "oth": 8,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "1998-09-24",
+        "firm": "Morgan",
+        "lnp": 47,
+        "alp": 39,
+        "grn": 3,
+        "onp": 6,
+        "oth": 9,
+        "tpp_lnp": 49.5,
+        "tpp_alp": 50.5
+      },
+      {
+        "date": "1998-09-27",
+        "firm": "Newspoll",
+        "lnp": 43,
+        "alp": 42,
+        "grn": 2,
+        "onp": 7,
+        "oth": 6,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
+        "date": "1998-09-29",
+        "firm": "ACNielsen",
+        "lnp": 42,
+        "alp": 40,
+        "grn": 2,
+        "onp": 8,
+        "oth": 8,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "1998-10-01",
+        "firm": "Newspoll",
+        "lnp": 40,
+        "alp": 44,
+        "grn": 2,
+        "onp": 7,
+        "oth": 7,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
+        "date": "1998-10-01",
+        "firm": "ACNielsen",
+        "lnp": 42,
+        "alp": 40,
+        "grn": 2,
+        "onp": 7,
+        "oth": 8,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
+        "date": "1998-10-03",
+        "firm": "Election",
+        "lnp": 39.2,
+        "alp": 40.1,
+        "grn": 1.7,
+        "onp": 8.4,
+        "oth": 10.6,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      }
+    ],
     "2001": [
       {
         "date": "1998-10-18",
@@ -30870,6 +32136,784 @@
     ]
   },
   "cycleApproval": {
+    "1996": [
+      {
+        "date": "1996-03-31",
+        "firm": "Newspoll",
+        "pmNet": 38,
+        "oppNet": 21,
+        "pmPpm": 56,
+        "oppPpm": 20
+      },
+      {
+        "date": "1996-04-14",
+        "firm": "Newspoll",
+        "pmNet": 42,
+        "oppNet": 24,
+        "pmPpm": 57,
+        "oppPpm": 19
+      },
+      {
+        "date": "1996-04-28",
+        "firm": "Newspoll",
+        "pmNet": 29,
+        "oppNet": 24,
+        "pmPpm": 54,
+        "oppPpm": 20
+      },
+      {
+        "date": "1996-05-05",
+        "firm": "ACNielsen",
+        "pmNet": 43,
+        "oppNet": 25,
+        "pmPpm": 61,
+        "oppPpm": 25
+      },
+      {
+        "date": "1996-05-12",
+        "firm": "Newspoll",
+        "pmNet": 53,
+        "oppNet": 30,
+        "pmPpm": 60,
+        "oppPpm": 18
+      },
+      {
+        "date": "1996-05-26",
+        "firm": "Newspoll",
+        "pmNet": 37,
+        "oppNet": 26,
+        "pmPpm": 54,
+        "oppPpm": 20
+      },
+      {
+        "date": "1996-06-02",
+        "firm": "ACNielsen",
+        "pmNet": 38,
+        "oppNet": 27,
+        "pmPpm": 61,
+        "oppPpm": 27
+      },
+      {
+        "date": "1996-06-16",
+        "firm": "ACNielsen",
+        "pmNet": 41,
+        "oppNet": 22,
+        "pmPpm": 61,
+        "oppPpm": 26
+      },
+      {
+        "date": "1996-06-16",
+        "firm": "Newspoll",
+        "pmNet": 23,
+        "oppNet": 24,
+        "pmPpm": 52,
+        "oppPpm": 22
+      },
+      {
+        "date": "1996-06-30",
+        "firm": "ACNielsen",
+        "pmNet": 32,
+        "oppNet": 26,
+        "pmPpm": 58,
+        "oppPpm": 28
+      },
+      {
+        "date": "1996-06-30",
+        "firm": "Newspoll",
+        "pmNet": 17,
+        "oppNet": 17,
+        "pmPpm": 52,
+        "oppPpm": 24
+      },
+      {
+        "date": "1996-07-14",
+        "firm": "ACNielsen",
+        "pmNet": 32,
+        "oppNet": 27,
+        "pmPpm": 59,
+        "oppPpm": 27
+      },
+      {
+        "date": "1996-07-14",
+        "firm": "Newspoll",
+        "pmNet": 29,
+        "oppNet": 23,
+        "pmPpm": 54,
+        "oppPpm": 24
+      },
+      {
+        "date": "1996-07-28",
+        "firm": "Newspoll",
+        "pmNet": 27,
+        "oppNet": 22,
+        "pmPpm": 51,
+        "oppPpm": 25
+      },
+      {
+        "date": "1996-08-11",
+        "firm": "ACNielsen",
+        "pmNet": 17,
+        "oppNet": 21,
+        "pmPpm": 55,
+        "oppPpm": 32
+      },
+      {
+        "date": "1996-08-11",
+        "firm": "Newspoll",
+        "pmNet": 10,
+        "oppNet": 20,
+        "pmPpm": 51,
+        "oppPpm": 26
+      },
+      {
+        "date": "1996-08-25",
+        "firm": "ACNielsen",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 53,
+        "oppPpm": 33
+      },
+      {
+        "date": "1996-08-25",
+        "firm": "Newspoll",
+        "pmNet": 17,
+        "oppNet": 11,
+        "pmPpm": 53,
+        "oppPpm": 24
+      },
+      {
+        "date": "1996-09-08",
+        "firm": "Newspoll",
+        "pmNet": 18,
+        "oppNet": 17,
+        "pmPpm": 50,
+        "oppPpm": 25
+      },
+      {
+        "date": "1996-09-22",
+        "firm": "Newspoll",
+        "pmNet": 24,
+        "oppNet": 17,
+        "pmPpm": 55,
+        "oppPpm": 25
+      },
+      {
+        "date": "1996-10-06",
+        "firm": "ACNielsen",
+        "pmNet": 26,
+        "oppNet": 13,
+        "pmPpm": 58,
+        "oppPpm": 28
+      },
+      {
+        "date": "1996-10-13",
+        "firm": "Newspoll",
+        "pmNet": 23,
+        "oppNet": 11,
+        "pmPpm": 54,
+        "oppPpm": 23
+      },
+      {
+        "date": "1996-10-27",
+        "firm": "Newspoll",
+        "pmNet": 21,
+        "oppNet": 1,
+        "pmPpm": 55,
+        "oppPpm": 21
+      },
+      {
+        "date": "1996-11-03",
+        "firm": "ACNielsen",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 56,
+        "oppPpm": 28
+      },
+      {
+        "date": "1996-11-10",
+        "firm": "Newspoll",
+        "pmNet": 24,
+        "oppNet": 9,
+        "pmPpm": 54,
+        "oppPpm": 22
+      },
+      {
+        "date": "1996-11-24",
+        "firm": "Newspoll",
+        "pmNet": 21,
+        "oppNet": 13,
+        "pmPpm": 51,
+        "oppPpm": 22
+      },
+      {
+        "date": "1996-12-01",
+        "firm": "ACNielsen",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 55,
+        "oppPpm": 30
+      },
+      {
+        "date": "1996-12-08",
+        "firm": "Newspoll",
+        "pmNet": 16,
+        "oppNet": 9,
+        "pmPpm": 52,
+        "oppPpm": 24
+      },
+      {
+        "date": "1996-12-15",
+        "firm": "Newspoll",
+        "pmNet": 18,
+        "oppNet": 6,
+        "pmPpm": 53,
+        "oppPpm": 24
+      },
+      {
+        "date": "1997-01-19",
+        "firm": "ACNielsen",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 54,
+        "oppPpm": 29
+      },
+      {
+        "date": "1997-01-19",
+        "firm": "Newspoll",
+        "pmNet": 14,
+        "oppNet": 7,
+        "pmPpm": 54,
+        "oppPpm": 22
+      },
+      {
+        "date": "1997-02-02",
+        "firm": "Newspoll",
+        "pmNet": 18,
+        "oppNet": 10,
+        "pmPpm": 53,
+        "oppPpm": 23
+      },
+      {
+        "date": "1997-02-16",
+        "firm": "ACNielsen",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 53,
+        "oppPpm": 30
+      },
+      {
+        "date": "1997-02-16",
+        "firm": "Newspoll",
+        "pmNet": 11,
+        "oppNet": 8,
+        "pmPpm": 49,
+        "oppPpm": 24
+      },
+      {
+        "date": "1997-03-02",
+        "firm": "Newspoll",
+        "pmNet": 15,
+        "oppNet": 13,
+        "pmPpm": 53,
+        "oppPpm": 23
+      },
+      {
+        "date": "1997-03-16",
+        "firm": "Newspoll",
+        "pmNet": 17,
+        "oppNet": 10,
+        "pmPpm": 52,
+        "oppPpm": 24
+      },
+      {
+        "date": "1997-04-06",
+        "firm": "Newspoll",
+        "pmNet": 12,
+        "oppNet": 4,
+        "pmPpm": 53,
+        "oppPpm": 24
+      },
+      {
+        "date": "1997-04-13",
+        "firm": "ACNielsen",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 51,
+        "oppPpm": 31
+      },
+      {
+        "date": "1997-04-20",
+        "firm": "Newspoll",
+        "pmNet": 1,
+        "oppNet": 0,
+        "pmPpm": 50,
+        "oppPpm": 24
+      },
+      {
+        "date": "1997-05-04",
+        "firm": "Newspoll",
+        "pmNet": 5,
+        "oppNet": 4,
+        "pmPpm": 47,
+        "oppPpm": 25
+      },
+      {
+        "date": "1997-05-11",
+        "firm": "Newspoll",
+        "pmNet": -2,
+        "oppNet": 3,
+        "pmPpm": 45,
+        "oppPpm": 22
+      },
+      {
+        "date": "1997-05-18",
+        "firm": "Newspoll",
+        "pmNet": -11,
+        "oppNet": 9,
+        "pmPpm": 45,
+        "oppPpm": 27
+      },
+      {
+        "date": "1997-05-25",
+        "firm": "ACNielsen",
+        "pmNet": 3,
+        "oppNet": 15,
+        "pmPpm": 49,
+        "oppPpm": 34
+      },
+      {
+        "date": "1997-06-01",
+        "firm": "Newspoll",
+        "pmNet": -4,
+        "oppNet": -2,
+        "pmPpm": 45,
+        "oppPpm": 26
+      },
+      {
+        "date": "1997-06-15",
+        "firm": "Newspoll",
+        "pmNet": -2,
+        "oppNet": 5,
+        "pmPpm": 47,
+        "oppPpm": 25
+      },
+      {
+        "date": "1997-06-29",
+        "firm": "Newspoll",
+        "pmNet": -7,
+        "oppNet": 1,
+        "pmPpm": 42,
+        "oppPpm": 30
+      },
+      {
+        "date": "1997-07-13",
+        "firm": "Newspoll",
+        "pmNet": -8,
+        "oppNet": 1,
+        "pmPpm": 44,
+        "oppPpm": 31
+      },
+      {
+        "date": "1997-07-27",
+        "firm": "Newspoll",
+        "pmNet": -1,
+        "oppNet": 11,
+        "pmPpm": 43,
+        "oppPpm": 29
+      },
+      {
+        "date": "1997-08-10",
+        "firm": "Newspoll",
+        "pmNet": -4,
+        "oppNet": 9,
+        "pmPpm": 42,
+        "oppPpm": 29
+      },
+      {
+        "date": "1997-08-17",
+        "firm": "ACNielsen",
+        "pmNet": 4,
+        "oppNet": 7,
+        "pmPpm": 48,
+        "oppPpm": 34
+      },
+      {
+        "date": "1997-08-24",
+        "firm": "Newspoll",
+        "pmNet": -12,
+        "oppNet": -1,
+        "pmPpm": 43,
+        "oppPpm": 29
+      },
+      {
+        "date": "1997-09-07",
+        "firm": "Newspoll",
+        "pmNet": -5,
+        "oppNet": 6,
+        "pmPpm": 43,
+        "oppPpm": 31
+      },
+      {
+        "date": "1997-09-21",
+        "firm": "Newspoll",
+        "pmNet": -5,
+        "oppNet": 2,
+        "pmPpm": 43,
+        "oppPpm": 29
+      },
+      {
+        "date": "1997-09-28",
+        "firm": "Newspoll",
+        "pmNet": -15,
+        "oppNet": 7,
+        "pmPpm": 38,
+        "oppPpm": 33
+      },
+      {
+        "date": "1997-10-12",
+        "firm": "ACNielsen",
+        "pmNet": -1,
+        "oppNet": 13,
+        "pmPpm": 45,
+        "oppPpm": 36
+      },
+      {
+        "date": "1997-10-12",
+        "firm": "Newspoll",
+        "pmNet": -10,
+        "oppNet": 8,
+        "pmPpm": 43,
+        "oppPpm": 30
+      },
+      {
+        "date": "1997-10-19",
+        "firm": "Newspoll",
+        "pmNet": -25,
+        "oppNet": 12,
+        "pmPpm": 34,
+        "oppPpm": 35
+      },
+      {
+        "date": "1997-10-26",
+        "firm": "Newspoll",
+        "pmNet": -24,
+        "oppNet": 9,
+        "pmPpm": 37,
+        "oppPpm": 38
+      },
+      {
+        "date": "1997-11-09",
+        "firm": "Newspoll",
+        "pmNet": -23,
+        "oppNet": 15,
+        "pmPpm": 35,
+        "oppPpm": 38
+      },
+      {
+        "date": "1997-11-23",
+        "firm": "ACNielsen",
+        "pmNet": -10,
+        "oppNet": 22,
+        "pmPpm": 41,
+        "oppPpm": 43
+      },
+      {
+        "date": "1997-11-23",
+        "firm": "Newspoll",
+        "pmNet": -19,
+        "oppNet": 14,
+        "pmPpm": 36,
+        "oppPpm": 40
+      },
+      {
+        "date": "1997-12-07",
+        "firm": "Newspoll",
+        "pmNet": -18,
+        "oppNet": 14,
+        "pmPpm": 36,
+        "oppPpm": 38
+      },
+      {
+        "date": "1998-01-18",
+        "firm": "Newspoll",
+        "pmNet": -17,
+        "oppNet": 16,
+        "pmPpm": 36,
+        "oppPpm": 37
+      },
+      {
+        "date": "1998-02-01",
+        "firm": "ACNielsen",
+        "pmNet": 0,
+        "oppNet": 23,
+        "pmPpm": 43,
+        "oppPpm": 41
+      },
+      {
+        "date": "1998-02-01",
+        "firm": "Newspoll",
+        "pmNet": -11,
+        "oppNet": 20,
+        "pmPpm": 38,
+        "oppPpm": 37
+      },
+      {
+        "date": "1998-02-15",
+        "firm": "Newspoll",
+        "pmNet": -3,
+        "oppNet": 28,
+        "pmPpm": 37,
+        "oppPpm": 37
+      },
+      {
+        "date": "1998-03-01",
+        "firm": "ACNielsen",
+        "pmNet": 7,
+        "oppNet": 20,
+        "pmPpm": 45,
+        "oppPpm": 35
+      },
+      {
+        "date": "1998-03-01",
+        "firm": "Newspoll",
+        "pmNet": -9,
+        "oppNet": 22,
+        "pmPpm": 37,
+        "oppPpm": 36
+      },
+      {
+        "date": "1998-03-15",
+        "firm": "Newspoll",
+        "pmNet": -20,
+        "oppNet": 12,
+        "pmPpm": 36,
+        "oppPpm": 36
+      },
+      {
+        "date": "1998-03-29",
+        "firm": "ACNielsen",
+        "pmNet": -7,
+        "oppNet": 20,
+        "pmPpm": 41,
+        "oppPpm": 40
+      },
+      {
+        "date": "1998-03-29",
+        "firm": "Newspoll",
+        "pmNet": -18,
+        "oppNet": 7,
+        "pmPpm": 36,
+        "oppPpm": 35
+      },
+      {
+        "date": "1998-04-19",
+        "firm": "Newspoll",
+        "pmNet": -17,
+        "oppNet": 4,
+        "pmPpm": 38,
+        "oppPpm": 35
+      },
+      {
+        "date": "1998-05-03",
+        "firm": "Newspoll",
+        "pmNet": -14,
+        "oppNet": 2,
+        "pmPpm": 41,
+        "oppPpm": 34
+      },
+      {
+        "date": "1998-05-17",
+        "firm": "Newspoll",
+        "pmNet": -5,
+        "oppNet": 2,
+        "pmPpm": 45,
+        "oppPpm": 36
+      },
+      {
+        "date": "1998-05-24",
+        "firm": "ACNielsen",
+        "pmNet": 2,
+        "oppNet": 12,
+        "pmPpm": 44,
+        "oppPpm": 39
+      },
+      {
+        "date": "1998-05-31",
+        "firm": "Newspoll",
+        "pmNet": -11,
+        "oppNet": 3,
+        "pmPpm": 40,
+        "oppPpm": 36
+      },
+      {
+        "date": "1998-06-14",
+        "firm": "Newspoll",
+        "pmNet": -22,
+        "oppNet": 4,
+        "pmPpm": 35,
+        "oppPpm": 36
+      },
+      {
+        "date": "1998-06-21",
+        "firm": "ACNielsen",
+        "pmNet": -10,
+        "oppNet": 15,
+        "pmPpm": 41,
+        "oppPpm": 42
+      },
+      {
+        "date": "1998-06-28",
+        "firm": "Newspoll",
+        "pmNet": -31,
+        "oppNet": -2,
+        "pmPpm": 32,
+        "oppPpm": 38
+      },
+      {
+        "date": "1998-07-12",
+        "firm": "Newspoll",
+        "pmNet": -26,
+        "oppNet": 6,
+        "pmPpm": 37,
+        "oppPpm": 36
+      },
+      {
+        "date": "1998-07-19",
+        "firm": "ACNielsen",
+        "pmNet": -11,
+        "oppNet": 12,
+        "pmPpm": 42,
+        "oppPpm": 42
+      },
+      {
+        "date": "1998-07-26",
+        "firm": "Newspoll",
+        "pmNet": -27,
+        "oppNet": 4,
+        "pmPpm": 31,
+        "oppPpm": 39
+      },
+      {
+        "date": "1998-08-09",
+        "firm": "Newspoll",
+        "pmNet": -15,
+        "oppNet": 8,
+        "pmPpm": 37,
+        "oppPpm": 38
+      },
+      {
+        "date": "1998-08-15",
+        "firm": "ACNielsen",
+        "pmNet": 3,
+        "oppNet": 15,
+        "pmPpm": 43,
+        "oppPpm": 40
+      },
+      {
+        "date": "1998-08-16",
+        "firm": "Newspoll",
+        "pmNet": -4,
+        "oppNet": 8,
+        "pmPpm": 41,
+        "oppPpm": 36
+      },
+      {
+        "date": "1998-08-30",
+        "firm": "Newspoll",
+        "pmNet": -13,
+        "oppNet": 5,
+        "pmPpm": 39,
+        "oppPpm": 37
+      },
+      {
+        "date": "1998-09-01",
+        "firm": "ACNielsen",
+        "pmNet": 7,
+        "oppNet": 15,
+        "pmPpm": 45,
+        "oppPpm": 39
+      },
+      {
+        "date": "1998-09-06",
+        "firm": "Newspoll",
+        "pmNet": -6,
+        "oppNet": 8,
+        "pmPpm": 39,
+        "oppPpm": 36
+      },
+      {
+        "date": "1998-09-09",
+        "firm": "ACNielsen",
+        "pmNet": 7,
+        "oppNet": 19,
+        "pmPpm": 44,
+        "oppPpm": 41
+      },
+      {
+        "date": "1998-09-13",
+        "firm": "Newspoll",
+        "pmNet": -11,
+        "oppNet": 13,
+        "pmPpm": 39,
+        "oppPpm": 39
+      },
+      {
+        "date": "1998-09-16",
+        "firm": "ACNielsen",
+        "pmNet": 7,
+        "oppNet": 28,
+        "pmPpm": 41,
+        "oppPpm": 46
+      },
+      {
+        "date": "1998-09-20",
+        "firm": "Newspoll",
+        "pmNet": -1,
+        "oppNet": 11,
+        "pmPpm": 42,
+        "oppPpm": 37
+      },
+      {
+        "date": "1998-09-23",
+        "firm": "ACNielsen",
+        "pmNet": 8,
+        "oppNet": 25,
+        "pmPpm": 43,
+        "oppPpm": 43
+      },
+      {
+        "date": "1998-09-27",
+        "firm": "Newspoll",
+        "pmNet": 1,
+        "oppNet": 13,
+        "pmPpm": 41,
+        "oppPpm": 39
+      },
+      {
+        "date": "1998-09-29",
+        "firm": "ACNielsen",
+        "pmNet": 11,
+        "oppNet": 19,
+        "pmPpm": 47,
+        "oppPpm": 42
+      },
+      {
+        "date": "1998-10-01",
+        "firm": "ACNielsen",
+        "pmNet": 11,
+        "oppNet": 15,
+        "pmPpm": 44,
+        "oppPpm": 43
+      },
+      {
+        "date": "1998-10-01",
+        "firm": "Newspoll",
+        "pmNet": -4,
+        "oppNet": 17,
+        "pmPpm": 40,
+        "oppPpm": 41
+      }
+    ],
     "1998": [
       {
         "date": "1998-10-18",
