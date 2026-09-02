@@ -1,0 +1,167 @@
+                                                                        Ground Floor, 2-12 Mountain Street
+                                                                                         Ultimo NSW 2007
+                                                                                          +61 2 9406 5800
+                                                                                            au.yougov.com
+
+Publication date: 2nd December 2025
+
+
+ Short Methodology Statement
+
+ Research company                  YouGov Galaxy Pty Ltd
+
+ Client commissioning the          Sky News
+ research
+
+ Fieldwork dates                   26th November – 2nd December 2025
+
+ Mode of data collection           Online recruited from research panel (100%)
+
+ Target population                 Australians eligible to vote
+
+ Sample size                       1605
+
+ Australian Polling Council        Yes
+ compliant
+
+ URL of Long Methodology           https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?    Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after       958
+ weighting applied
+
+ Margin of error associated with   ±3.166
+ effective sample size
+
+ Quotas and weighting              Age, Gender, Education, AEC region, household income, 2025
+                                   Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used             Rim weighting.
+
+ Full question text, responses     Below for published questions
+ categories and randomisation
+
+ Source of online sample           Selected from previously recruited online panels of research
+                                   participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention   After demographics
+ questions in questionnaire?
+
+ How were undecided voters         Voters were given an option to select “don’t know”
+ handled?
+
+ 2PP calculation method            Voters who selected don’t know were excluded from the 2PP
+                                   calculation. Past Federal election vote preferences used to
+                                   calculate.
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomize
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Sussan Ley is doing Ask eligible
+                          her job as Leader of the Opposition?                               voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Sussan Ley
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+B1        Do you think increasing the use of renewables will:                  Ask eligible
+                                                                               voters
+          Single select, reverse
+     1.   Lead to cheaper energy bills in future years
+     2.   Lead to increasing energy bills in future years
+     3.   Make no difference either way to my energy bills                     Fixed
+
+B2        Which policy approach do you believe the government should           Ask eligible
+          take to housing policy?                                              voters
+
+          Please select the option that is closest to your view or the
+          most important:
+          Single select, reverse
+     1.   Leave it as it is                                                Fixed
+     2.   Rein in tax concessions for investors, so more first home buyers
+          can afford a house
+     3.   Do more to increase supply of housing so that homes are more
+          affordable
+     4.   Do more to increase housing density so that homes are more
+          affordable
+     5.   Invest in building more public housing at affordable rents
+
+B3        Should Australia support Taiwan in protecting itself against         Ask eligible
+          China?                                                               voters
+          Single select, reverse
+     1.   Yes
+     2.   No
+     3.   Unsure                                                               Fixed
+
+B4        Thinking about the governments economic priorities, which would Ask eligible
+          be closest your view?                                                    voters
+          Single select, rotate
+     1.   Prioritise reducing the budget deficit, even if it means we need
+          cut back on some other priorities
+     2.   Prioritise current priorities, even if it means the budget is in deficit
+     3.   Unsure                                                                   Fixed
+
+
+
+
+                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

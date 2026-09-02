@@ -1,0 +1,176 @@
+                                                                         Ground Floor, 2-12 Mountain Street
+                                                                                          Ultimo NSW 2007
+                                                                                           +61 2 9406 5800
+                                                                                             au.yougov.com
+
+Publication date: 11th March 2026
+
+
+ Short Methodology Statement
+
+ Research company                   YouGov Galaxy Pty Ltd
+
+ Client commissioning the           Sky News
+ research
+
+ Fieldwork dates                    3rd March – 10th March 2026
+
+ Mode of data collection            Online recruited from research panel (100%)
+
+ Target population                  Australians eligible to vote
+
+ Sample size                        1425
+
+ Australian Polling Council         Yes
+ compliant
+
+ URL of Long Methodology            https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?     Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after        899
+ weighting applied
+
+ Margin of error associated with    ±3.268
+ effective sample size
+
+ Quotas and weighting               Age, Gender, Education, AEC region, household income, 2025
+                                    Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used              Rim weighting.
+
+ Full question text, responses      Below for published questions
+ categories and randomisation
+
+ Source of online sample            Selected from previously recruited online panels of research
+                                    participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention    After demographics
+ questions in questionnaire?
+
+ How were undecided voters          Voters were given an option to select “don’t know”. Dont know
+ handled?                           were excluded from final figures
+
+ 2PP calculation method             2pp Labor v ex Coalition 2025 Federal election flows
+                                    2pp Labor v One Nation Survey respondent ordering of
+                                    preferences.
+
+
+
+
+                                                           YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomise
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Sussan Ley is doing Ask eligible
+                          her job as Leader of the Opposition?                               voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Sussan Ley
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+B1        The US and Israel have begun a war on Iran.                           Ask eligible
+                                                                                voters
+          Which of the following statements best describes the main
+          concern you have about this war?
+
+          Please select the option that best applies
+          Single select, Randomise
+     1.   I am worried it could cause major destabilisation in the region
+     2.   I am worried it will increase petrol prices and general inflation
+     3.   I am worried it could mean terror attacks in Australia
+     4.   I am worried it could disrupt travel plans
+     5.   I am not worried about it                                             Fixed
+     6.   Prefer not to say                                                     Fixed
+
+B2        How would you describe how Federal Treasurer Jim Chalmers             Ask eligible
+          policies have dealt with the cost of living?                          voters
+
+          Please select the option that best applies
+          Single select, reverse
+     1.   Very well
+     2.   Reasonably well
+     3.   Neither well nor not well
+     4.   Not very well
+     5.   Very badly
+
+B3        Compared to three months ago, how has your household's                Ask eligible
+          financial situation changed?                                          voters
+
+          Please select the option that best applies
+          Single select, reverse
+     1.   Worse
+     2.   No change
+     3.   Better
+     4.   Don’t know                                                            Fixed
+
+B4        Which best describes how secure you feel Australia is from            Ask eligible
+          external threats?                                                     voters
+
+          Please select the option that best applies
+          Single select, reverse
+     1.   Australia is secure from realistic external threats
+     2.   Australia is fairly secure now, but I am concerned we may not be
+          in the future
+     3.   Australia is not secure, and we need to urgently do more to
+          protect ourselves
+
+
+
+
+                                                 YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

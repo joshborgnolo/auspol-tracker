@@ -1,0 +1,179 @@
+                                                                            Ground Floor, 2-12 Mountain Street
+                                                                                             Ultimo NSW 2007
+                                                                                              +61 2 9406 5800
+                                                                                                au.yougov.com
+
+Publication date: 10th February 2026
+
+
+ Short Methodology Statement
+
+ Research company                      YouGov Galaxy Pty Ltd
+
+ Client commissioning the              Sky News
+ research
+
+ Fieldwork dates                       3rd February – 10th February 2026
+
+ Mode of data collection               Online recruited from research panel (100%)
+
+ Target population                     Australians eligible to vote
+
+ Sample size                           1561
+
+ Australian Polling Council            Yes
+ compliant
+
+ URL of Long Methodology               https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?        Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after           1054
+ weighting applied
+
+ Margin of error associated with       ±3.019
+ effective sample size
+
+ Quotas and weighting                  Age, Gender, Education, AEC region, household income, 2025
+                                       Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used                 Rim weighting.
+
+ Full question text, responses         Below for published questions
+ categories and randomisation
+
+ Source of online sample               Selected from previously recruited online panels of research
+                                       participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention       After demographics
+ questions in questionnaire?
+
+ How were undecided voters             Voters were given an option to select “don’t know”. Dont know
+ handled?                              were exluded from final figuers
+
+ 2PP calculation method                2pp Labor v ex Coalition 2025 Federal election flows
+                                       2pp Labor v One Nation Survey respondent ordering of
+                                       preferences.
+
+
+
+
+                                                              YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomize
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Sussan Ley is doing Ask eligible
+                          her job as Leader of the Opposition?                               voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Sussan Ley
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+B1        Do you think increasing the use of renewables will:                  Ask eligible
+                                                                               voters
+          Single select, reverse
+     1.   Lead to cheaper energy bills in future years
+     2.   Lead to increasing energy bills in future years
+     3.   Make no difference either way to my energy bills                     Fixed
+
+B2        Which policy approach do you believe the government should           Ask eligible
+          take to housing policy?                                              voters
+
+          Please select the option that is closest to your view or the
+          most important:
+          Single select, reverse
+     1.   Leave it as it is                                                Fixed
+     2.   Rein in tax concessions for investors, so more first home buyers
+          can afford a house
+     3.   Do more to increase supply of housing so that homes are more
+          affordable
+     4.   Do more to increase housing density so that homes are more
+          affordable
+     5.   Invest in building more public housing at affordable rents
+
+B3        Thinking about the next election, who do you think the best          Ask eligible
+          person would be to lead the Liberal party to give it the best        voters
+          chance of forming government?
+
+          Please select the option that best applies
+          Single select, randomize
+     1.   Sussan Ley
+     2.   Angus Taylor
+     3.   Andrew Hastie
+     4.   Tim Wilson
+     5.   Ted O’Brien
+     6.   Melissa Mcintosh
+     7.   Don’t know                                                           Fixed
+
+B4        Interest rates are going up.                                         Ask eligible
+                                                                               voters
+          Who do you think is most to blame?
+
+          Please select the option that best applies
+          Single select, rotate
+     1.   The Federal Government
+     2.   The Reserve Bank of Australia
+     3.   Both the Federal Government and the Reserve Bank of Australia
+          equally
+     4.   Banks and other lenders
+     5.   Unsure                                                        Fixed
+
+
+
+
+                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

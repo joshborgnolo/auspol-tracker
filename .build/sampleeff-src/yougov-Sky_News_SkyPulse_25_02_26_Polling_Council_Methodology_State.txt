@@ -1,0 +1,217 @@
+                                                                            Ground Floor, 2-12 Mountain Street
+                                                                                             Ultimo NSW 2007
+                                                                                              +61 2 9406 5800
+                                                                                                au.yougov.com
+
+Publication date: 24th February 2026
+
+
+ Short Methodology Statement
+
+ Research company                      YouGov Galaxy Pty Ltd
+
+ Client commissioning the              Sky News
+ research
+
+ Fieldwork dates                       17th February – 24th February 2026
+
+ Mode of data collection               Online recruited from research panel (100%)
+
+ Target population                     Australians eligible to vote
+
+ Sample size                           1500
+
+ Australian Polling Council            Yes
+ compliant
+
+ URL of Long Methodology               https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?        Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after           980
+ weighting applied
+
+ Margin of error associated with       ±3.13
+ effective sample size
+
+ Quotas and weighting                  Age, Gender, Education, AEC region, household income, 2025
+                                       Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used                 Rim weighting.
+
+ Full question text, responses         Below for published questions
+ categories and randomisation
+
+ Source of online sample               Selected from previously recruited online panels of research
+                                       participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention       After demographics
+ questions in questionnaire?
+
+ How were undecided voters             Voters were given an option to select “don’t know”. Don’t know
+ handled?                              were excluded from final figures
+
+ 2PP calculation method                2pp Labor v ex Coalition 2025 Federal election flows
+                                       2pp Labor v One Nation Survey respondent ordering of
+                                       preferences.
+
+
+
+
+                                                              YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomize
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Sussan Ley is doing Ask eligible
+                          her job as Leader of the Opposition?                               voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Sussan Ley
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+B1        A ban on all migrants from specific regions of 13 countries where Ask eligible
+          listed terrorist organisations have territorial control has been  voters
+          proposed.
+
+          Currently all migrants to Australia are individually assessed on
+          how well they fit Australia's immigration laws regardless of what
+          country they are from.
+
+          In principle, which is closest to your view about how potential
+          migrants to Australia should be selected?
+
+          Single select, Rotate
+     1.   Banning all migrants from specific countries or parts of countries
+          by the Federal government should be allowed under migration
+          law.
+     2.   Individual assessment of all migrants against Australian laws
+          regardless of what country they are from.
+
+B2        Would you ever seriously consider voting One Nation                  Ask eligible
+                                                                               voters
+          Please select the option that best applies
+          Single select, reverse
+     1.   Yes
+     2.   No
+
+B3        What reason is most important to you in considering voting One Ask eligible
+          Nation?                                                        voters who
+                                                                         would
+          Please select the option that best applies                     seriously
+                                                                         consider
+                                                                         voting One
+                                                                         Nation
+                                                                         (selected 1 in
+                                                                         B2)
+          Single select, randomize
+     1.   One Nation’s policies
+     2.   I no longer have confidence in the other parties
+     3.   The leadership of Pauline Hanson
+     4.   The addition of Barnaby Joyce
+
+B4        Thinking about issues facing Australia which do you think is the     Ask eligible
+          most important?                                                      voters
+
+          Please rank the following options in order of importance to
+          you
+          Rank, randomize
+     1.   Immigration
+     2.   The cost of living
+     3.   Health care
+     4.   Education and childcare
+     5.   Managing the economy and government debt
+     6.   Housing affordability
+     7.   Good paying, secure jobs and rights at work
+
+
+
+
+                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+     8. Climate change
+     9. The growing gap between the very rich and poorest Australians
+     10. International affairs and trade
+     11. Pensions and caring for older Australians
+     12. Security and defence
+
+B5       Which party is best at handling…                                  Ask eligible
+                                                                           voters
+         Please select the option that best applies
+         Single select grid, randomize rows
+     1. Immigration
+     2. The cost of living
+     3. Health care
+     4. Education and childcare
+     5. Managing the economy and government debt
+     6. Housing affordability
+     7. Good paying, secure jobs and rights at work
+     8. Climate change
+     9. The growing gap between the very rich and poorest Australians
+     10. International affairs and trade
+     11. Pensions and caring for older Australians
+     12. Security and defence
+         Columns, reverse
+     1. Labor
+     2. The Liberal-National Coalition
+     3. One Nation
+     4. The Greens
+     5. Don’t know                                                         Fixed
+
+
+
+
+                                            YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

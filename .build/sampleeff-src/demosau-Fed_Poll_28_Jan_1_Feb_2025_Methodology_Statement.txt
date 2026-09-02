@@ -1,0 +1,93 @@
+ABOUT THIS POLL
+
+Publication date: 4 February 2025
+Methodology Statement
+
+Research company                               DemosAU
+
+Client commissioning the research              Self-initiated
+
+End client                                     Self-initiated
+
+Fieldwork dates                                28 January - 1 February 2025
+
+Mode of data collection                        Online via Internet Panel (100%)
+
+Target population                              Australian Adults 18+
+
+
+Sample size                                    1238
+
+Is voting intention published?                 On website
+
+
+Effective sample size after weighting          708
+applied
+
+Margin of error associated with effective      +/- 3.7%
+sample size
+                                               Age x gender, education, income, state x region, housing
+Variables used in weighting                    tenure, partisan support.
+
+
+Weighting method used                          Rim-weighting
+
+
+
+
+Full question text, responses categories       On next page
+and randomisation
+
+
+
+Source of online sample                        Internet Panels.
+
+
+
+Positioning of voting intention questions in   A series of demographic questions were asked first prior to 19
+questionnaire?                                 substantive questions. Federal VI 1st.
+
+
+
+How were undecided voters handled?             Initial undecided voters were provided with a follow up question
+                                               asking which VI option they were leaning towards. Respondents
+                                               who again answered Don't Know were excluded from final totals.
+
+
+
+2PP calculation method                         Using relevant 2022 federal election preference flows.
+
+
+
+
+                                                                                                           01
+QUESTION TEXT
+ Q. If a Federal Election was held today, which one of the following would you vote
+ for?
+
+ Answers (randomly rotated except for Don't Know kept last)
+ Labor (with Anthony Albanese as Leader)
+ Liberal / National Coalition (with Peter Dutton as Leader)
+ The Greens
+ Pauline Hanson's One Nation
+ Any Other Candidate
+ Don't know
+
+ (If respondent chose Don't Know they were given the following question)
+
+ Q. Being undecided, which of the following do you have even a slight leaning
+ towards:
+
+ Answers (randomly rotated except for Don't Know kept last)
+ Labor (with Anthony Albanese as Leader)
+ Liberal / National Coalition (with Peter Dutton as Leader)
+ The Greens
+ Pauline Hanson's One Nation
+ Any Other Candidate
+ Don't know
+
+
+
+
+                                                                                      02
+

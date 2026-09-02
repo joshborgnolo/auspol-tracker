@@ -1,0 +1,197 @@
+                                                                        Ground Floor, 2-12 Mountain Street
+                                                                                         Ultimo NSW 2007
+                                                                                          +61 2 9406 5800
+                                                                                            au.yougov.com
+
+Publication date: 6th May 2026
+
+
+ Short Methodology Statement
+
+ Research company                  YouGov Galaxy Pty Ltd
+
+ Client commissioning the          Sky News
+ research
+
+ Fieldwork dates                   28th April – 5th May 2026
+
+ Mode of data collection           Online recruited from research panel (100%)
+
+ Target population                 Australians eligible to vote
+
+ Sample size                       1500
+
+ Australian Polling Council        Yes
+ compliant
+
+ URL of Long Methodology           https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?    Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after       923
+ weighting applied
+
+ Margin of error associated with   ±3.226
+ effective sample size
+
+ Quotas and weighting              Age, Gender, Education, AEC region, household income, 2025
+                                   Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used             Rim weighting.
+
+ Full question text, responses     Below for published questions
+ categories and randomisation
+
+ Source of online sample           Selected from previously recruited online panels of research
+                                   participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention   After demographics
+ questions in questionnaire?
+
+ How were undecided voters         Voters were given an option to select “don’t know”. Don’t know
+ handled?                          were excluded from final figures
+
+ 2PP calculation method            2pp Labor v ex Coalition 2025 Federal election flows
+                                   2pp Labor v One Nation Survey respondent ordering of
+                                   preferences.
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomise
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Angus Taylor is        Ask eligible
+                          doing his job as Leader of the Opposition?                            voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Angus Taylor
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+A10_A11        Which of the following do you think would make the best Prime        Ask eligible
+               Minister?                                                            voters
+
+               Please select one option only
+               Single select, reverse
+          1.   Anthony Albanese
+          2.   Pauline Hanson
+          3.   Don’t know                                                           Fixed
+
+B1             Ben Roberts Smith was awarded the Victoria Cross (VC) for           Ask eligible
+               gallantry in Afghanistan in 2010.                                   voters
+
+               He has been arrested and charged with five counts of War Crime
+               murder alleged to have taken place between 2009 and 2012.
+
+               The war crimes allegations against him do not relate to the
+               incident he won the Victoria Cross.
+
+               Do you believe Ben Roberts-Smith should be stripped of his VC if
+               found guilty of war crimes
+
+               Please select the option that best applies
+               Single select, reverse
+          1.   Yes, I agree, Ben Roberts-Smith should be stripped of his VC if
+               found guilty of war crimes
+          2.   A somewhat serious problem
+          3.   No, I disagree, Ben Roberts-Smith should not be stripped of his
+               VC if found guilty of war crimes.
+          4.   Don’t know                                                          Fixed
+
+B2             What do you believe the government should prioritise in the         Ask eligible
+               Federal Budget?                                                     voters
+
+               Please select from these options the priority that is most
+               important to you
+               Single select, Randomise
+          1.   Income tax cuts
+          2.   Household assistance, like energy bill subsidies or extending the
+               fuel excise cut
+          3.   Budget savings to pay down debt and avoid inflation
+          4.   More spending on social services and welfare for vulnerable
+               Australians
+
+B3             Thinking about the national disability insurance scheme, and it's Ask eligible
+               cost to the budget, do you think...                               voters
+
+               Please select the option that best applies
+               Single select, Reverse
+          1.   It’s affordable and is money well spent
+          2.   It’s a lot of money but it is an important scheme
+          3.   It’s a lot of money and we need to find some savings
+          4.   It’s too much money and we need to find major savings
+
+B4             Compared to three months ago, how has your household's              Ask eligible
+               financial situation changed?                                        voters
+
+
+
+
+                                                    YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+     Please select the option that best applies
+     Single select, reverse
+1.   Worse
+2.   No change
+3.   Better
+4.   Don’t know                                                        Fixed
+
+
+
+
+                                        YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

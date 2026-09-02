@@ -3215,8 +3215,11 @@ function infoTerms(D) {
       their number, so three weekly waves count as 1.7, not 3.
       {" "}Full formula: the headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window, where
       xᵢ is a poll’s house-adjusted figure and its weight wᵢ = nᵢ × 2^(−d/7) ÷ √m – nᵢ the
-      poll’s sample, d its age in days (halving every seven), and m its house’s wave count in
-      the window. The effective sample behind it is (Σwᵢ)² ÷ Σwᵢ², and the monthly trend points
+      poll’s sample: its published effective sample where the house files one (Newspoll, YouGov,
+      Essential and DemosAU, via their Australian Polling Council methodology statements), else
+      its raw sample. nᵢ also sets the sampling-error floor under the whole
+      window, so the same published figure improves both. d is the poll’s age in days (halving
+      every seven), and m its house’s wave count in the window. The effective sample behind it is (Σwᵢ)² ÷ Σwᵢ², and the monthly trend points
       run the same formula with the recency term dropped. The leaders’ ratings and national
       direction are built the same way monthly; preferred prime minister and the undecided share
       stay as plain {xref("monthly-average", "weighted aggregate", "monthly averages")} – their

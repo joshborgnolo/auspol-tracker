@@ -1,0 +1,119 @@
+ Federal Poll
+
+
+
+DemosAU
+Australian
+Federal Poll
+Fieldwork Dates: 13-21 January 2026
+Total Sample Size: 1,933
+Effective Sample Size: 1,265
+Effective Margin of Error: 2.8%
+Methodology Statement
+
+  Research company                                        DemosAU
+
+  Client commissioning the research                       Capital Brief
+
+  End client                                              Capital Brief
+
+  Fieldwork dates                                         13-21 January 2026
+
+  Mode of data collection                                 Internet panels
+
+  Target population                                       Australians 18+ eligible to vote at elections
+
+  Sample size                                             1933
+
+  Is voting intention published?                          Yes
+
+  Effective sample size after weighting applied           1265
+
+  Margin of error associated with effective sample size   +/- 2.8%
+
+  Variables used in weighting                             Age x gender, education, personal income, residential tenure, location, 2025 Federal Vote, Left-Right Self ID.
+
+  Weighting method used                                   Rim Weighting
+
+  Full question text, responses categories and            See Page 11
+  randomisation
+
+  Source of sample                                        Internet panels
+
+  Positioning of voting intention questions in            Federal VI was first substantive question after demographics.
+  questionnaire?
+
+  How were undecided voters handled?                      Initial undecided voters were asked a leaner question. Remaining undecided voters were excluded from final
+                                                          totals.
+
+
+  2PP calculation method                                  No National TPP calculated
+Topline Results
+Seat Projections
+
+                                Bottom     Top of
+                                of Range   Range
+
+
+
+                     Labor        87        95
+
+
+
+                   One Nation     29        38
+
+
+
+                    Liberals       9         17
+
+
+
+                   Nationals       1         5
+
+
+
+                    Greens         0         2
+
+
+
+                    Others         6         11
+Preferred PM + Leader Ratings
+Demographic Breakdowns: Voting Intention
+Demographic Breakdowns: Voting Intention
+Demographic Breakdowns: Voting Intention
+Demographic Breakdowns: Voting Intention
+              Question Wording
+Q. If a Federal Election was held today, which one of the following would you vote for?
+Answers randomly listed except Don’t Know kept last
+Labor (with Anthony Albanese as Leader)
+Liberal National Coalition (with Sussan Ley as Leader)
+The Greens
+One Nation
+Any Other Candidate
+Don't Know
+
+If respondent chose Don’t Know they were asked:
+Q. Being undecided, which of the following would you have even a slight leaning towards? Answers as above
+Answers randomly listed except Don’t Know kept last
+Labor (with Anthony Albanese as Leader)
+Liberal National Coalition (with Sussan Ley as Leader)
+The Greens
+One Nation
+Any Other Candidate
+Don't Know
+
+Q. Who is your preferred Prime Minister
+Answers randomly listed except Don’t Know kept last
+Anthony Albanese (Labor)
+Sussan Ley (Liberal)
+Pauline Hanson (One Nation)
+Don't Know
+
+Q. What is your opinion on the following people?
+People randomly listed, answer order randomly flipped
+Answers: Positive, Neutral, Negative
+People Tested
+Anthony Albanese (Prime Minister, Labor)
+Sussan Ley (Opposition Leader, Liberal)
+Pauline Hanson (One Nation Leader)
+

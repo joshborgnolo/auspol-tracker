@@ -1,0 +1,929 @@
+Project Name                           Essential Report Omnibus Poll
+
+General Project Details
+
+Research Company                       Essential Research
+
+End client/Commissioned by             n/a
+
+Project dates                          See below
+
+Australia Polling Council compliant    Yes
+
+Sample Details
+
+Sample source                          Online panel sample supplied by PureProfile
+
+Data collection                        100% online
+
+Sample size                            See below
+
+Target population                      Australian residents aged 18+
+
+                                       Representative of target population. Quotas applied for age,
+Quotas
+                                       gender and location
+
+Weighting information
+
+Weighting applied to final/published
+                                       Yes
+results
+
+Weighting methodology                  RIM and cell weighting
+
+                                       Age/Gender/Location/Previous Vote (May 2025 Federal
+Weighting variables
+                                       Election)/Education
+
+Weighting target source                ABS, AEC
+
+Effective sample size                  See below
+
+Weighting efficiency                   See below
+
+Margin of Error
+                                       See below
+(Effective sample size)
+
+Question information
+
+                                       Where respondents are required to provide ratings to a list of
+                                       statements (or select from a list of other items) the statements
+                                       (or other items) are randomised.
+                                       For some surveys the statements/items are presented in
+Statement randomisation
+                                       'carousel' format this means that the respondents can only
+                                       see one statement/item at a time.
+                                       To identify which questions are randomised look for the
+                                       RANDOMISE instruction the questionnaire below.
+Individual Survey Details
+
+
+                                                                           Effective
+  Publication   Fieldwork    Fieldwork   Target      Sample   Weighting                Margin
+                                                                           Sample
+     Date       Start Date   End Date    sample       Size    efficiency               of Error
+                                                                             Size
+
+   24-May-21    19-May-21    23-May-21   National    1,100      91%         1,006      ±3.1%
+
+
+   07-Jun-21    02-Jun-21    06-Jun-21   National    1,104      92%         1,019      ±3.1%
+
+   21-Jun-21    16-Jun-21    20-Jun-21   National    1,087      94%         1,017      ±3.1%
+
+
+                                         National    1,099      90%          987       ±3.1%
+    06-Jul-21   30-Jun-21    04-Jul-21
+                                          NSW         553       98%          541       ±4.2%
+
+    19-Jul-21   14-Jul-21    18-Jul-21   National    1,100      91%         1,004      ±3.1%
+
+   03-Aug-21    28-Jul-21    01-Aug-21   National    1,098      96%         1,057      ±3.0%
+
+   16-Aug-21    11-Aug-21    15-Aug-21   National    1,100      95%         1,049      ±3.0%
+
+
+   30-Aug-21    25-Aug-21    29-Aug-21   National    1,100      93%         1,026      ±3.1%
+
+   13-Sep-21    08-Sep-21    12-Sep-21   National    1,100      93%         1,023      ±3.1%
+
+   27-Sep-21    22-Sep-21    26-Sep-21   National    1,094      94%         1,024      ±3.1%
+
+
+   11-Oct-21    06-Oct-21    10-Oct-21   National    1,097      90%          987       ±3.1%
+
+                                          National
+                                         (with WA
+   25-Oct-21    20-Oct-21    24-Oct-21               1,781      63%         1,120      ±2.9%
+                                          and SA
+                                           boost)
+
+   08-Nov-21    03-Nov-21    07-Nov-21   National    1,089      91%          991       ±3.1%
+
+   22-Nov-21    17-Nov-21    21-Nov-21   National    1,095      92%         1,002      ±3.1%
+
+
+   06-Dec-21    01-Dec-21    05-Dec-21   National    1,094      92%         1,010      ±3.1%
+
+   13-Dec-21    08-Dec-21    13-Dec-21   National    1,095      90%          988       ±3.1%
+
+
+
+
+Page 2 / 17
+                                                                          Effective
+  Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
+                                                                          Sample
+     Date       Start Date   End Date    sample      Size    efficiency               of Error
+                                                                            Size
+
+   25-Jan-22    20-Jan-22    23-Jan-22   National   1,062      94%         1,001      ±3.1%
+
+   08-Feb-22    02-Feb-22    06-Feb-22   National   1,069      92%          985       ±3.1%
+
+   22-Feb-22    16-Feb-22    21-Feb-22   National   1,089      93%         1,013      ±3.1%
+
+   08-Mar-22    02-Mar-22    06-Mar-22   National   1,093      93%         1,020      ±3.1%
+
+
+   22-Mar-22    17-Mar-22    20-Mar-22   National   1,091      92%         1,000      ±3.1%
+
+   05-Apr-22    30-Mar-22    02-Apr-22   National   1,086      91%          984       ±3.1%
+
+   20-Apr-22    14-Apr-22    19-Apr-22   National   1,052      92%          971       ±3.1%
+
+   03-May-22    27-Apr-22    02-May-22   National   1,630      93%         1,508      ±2.5%
+
+   18-May-22    11-May-22    17-May-22   National   1,599      91%         1,459      ±2.6%
+
+   31-May-22    25-May-22    30-May-22   National   1,089      88%          958       ±3.2%
+
+
+   15-Jun-22    08-Jun-22    12-Jun-22   National   1,087      88%          957       ±3.2%
+
+
+                                         National   1,087      90%          974       ±3.1%
+   28-Jun-22    23-Jun-22    27-Jun-22
+                                          NSW        700       92%          641       ±3.9%
+
+
+    12-Jul-22   07-Jul-22    11-Jul-22   National   1,097      94%         1,028      ±3.1%
+
+
+    26-Jul-22   20-Jul-22    25-Jul-22   National   1,082      89%          961       ±3.2%
+
+
+   09-Aug-22    03-Aug-22    07-Aug-22   National   1,075      87%          932       ±3.2%
+
+
+   23-Aug-22    17-Aug-22    21-Aug-22   National   1,065      89%          947       ±3.2%
+
+
+   06-Sep-22    31-Aug-22    04-Sep-22   National   1,070      90%          962       ±3.2%
+
+
+   20-Sep-22    14-Sep-22    19-Sep-22   National   1,075      91%          982       ±3.1%
+
+
+
+
+Page 3 / 17
+                                                                          Effective
+  Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
+                                                                          Sample
+     Date       Start Date   End Date    sample      Size    efficiency               of Error
+                                                                            Size
+
+   04-Oct-22    28-Sep-22    02-Oct-22   National   1,050      89%          929       ±3.2%
+
+   18-Oct-22    11-Oct-22    16-Oct-22   National   1,122      88%          985       ±3.1%
+
+   01-Nov-22    26-Oct-22    30-Oct-22   National   1,038      87%          907       ±3.3%
+
+   15-Nov-22    09-Nov-22    14-Nov-22   National   1,035      87%          898       ±3.3%
+
+   29-Nov-22    23-Nov-22    27-Nov-22   National   1,042      90%          934       ±3.2%
+
+   13-Dec-22    07-Dec-22    11-Dec22    National   1,042      87%          906       ±3.3%
+
+   24-Jan-23    18-Jan-23    22-Jan-23   National   1,050      87%          911       ±3.2%
+
+   07-Feb-23    01-Feb-23    06-Feb-23   National   1,000      87%          866       ±3.3%
+
+   21-Feb-23    15-Feb-23    19-Feb-23   National   1,044      84%          877       ±3.3%
+
+   07-Mar-23    01-Mar-23    05-Mar-23   National   1,141      88%          1005      ±3.1%
+
+                                         National   1,124      89%          1004      ±3.1%
+   21-Mar-23    15-Mar-23    20-Mar-23
+                                          NSW        708       97%          686       ±3.7%
+
+   04-Apr-23    29-Mar-23    02-Apr-23   National   1,133      86%          977       ±3.1%
+
+   18-Apr-23    12-Apr-23    16-Apr-23   National   1,136      86%          983       ±3.1%
+
+   02-May-23    26-Apr-23    30-Apr-23   National   1,130      88%          992       ±3.1%
+
+   16-May-23    10-May-23    14-May-23   National   1,125      90%          1011      ±3.1%
+
+   30-May-23    24-May-23    28-May-23   National   1,138      85%          970       ±3.1%
+
+   13-Jun-23    07-Jun-23    11-Jun-23   National   1,123      86%          961       ±3.2%
+
+   27-Jun-23    21-Jun-23    25-Jun-23   National   1,148      85%          972       ±3.1%
+
+    11-Jul-23   05-Jul-23    09-Jul-23   National   2,248      86%         1,941      ±2.1%
+
+
+
+
+Page 4 / 17
+                                                                          Effective
+  Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
+                                                                          Sample
+     Date       Start Date   End Date    sample      Size    efficiency               of Error
+                                                                            Size
+
+    25-Jul-23   19-Jul-23    23-Jul-23   National   1,150      86%          995       ±3.1%
+
+   08-Aug-23    02-Aug-23    06-Aug-23   National   1,150      87%         1,004      ±3.1%
+
+   22-Aug-23    16-Aug-23    20-Aug-23   National   1,151      89%         1,027      ±3.1%
+
+   05-Sep-23    30-Aug-23    03-Sep-23   National   1,151      86%          985       ±3.1%
+
+
+   19-Sep-23    13-Sep-23    17-Sep-23   National   1,135      83%          944       ±3.2%
+
+   03-Oct-23    27-Sep-23    01-Oct-23   National   1,125      87%          975       ±3.1%
+
+   17-Oct-23    11-Oct-23    14-Oct-23   National   1,125      86%          970       ±3.1%
+
+   31-Oct-23    25-Oct-23    29-Oct-23   National   1,149      85%          979       ±3.1%
+
+   14-Nov-23    08-Nov-23    12-Nov-23   National   1,150      81%          936       ±3.2%
+
+   28-Nov-23    22-Nov-23    26-Nov-23   National   1,151      81%          937       ±3.2%
+
+
+   12-Dec-23    06-Dec-23    11-Dec-23   National   1,102      85%          934       ±3.2%
+
+
+   30-Jan-24    24-Jan-24    28-Jan-24   National   1,201      78%          942       ±3.2%
+
+   13-Feb-24    07-Feb-24    11-Feb-24   National   1,148      84%          959       ±3.2%
+
+   27-Feb-24    21-Feb-24    25-Feb-24   National   1,145      82%          945       ±3.2%
+
+   12-Mar-24    05-Mar-24    09-Mar-24   National   1,126      83%          935       ±3.2%
+
+
+   26-Mar-24    20-Mar-24    24-Mar-24   National   1,150      83%          955       ±3.2%
+
+   09-Apr-24    03-Apr-24    07-Apr-24   National   1,165      81%          948       ±3.2%
+
+   23-Apr-24    17-Apr-24    21-Apr-24   National   1,145      83%          946       ±3.2%
+
+   07-May-24    01-May-24    05-May-24   National   1,150      84%          972       ±3.1%
+
+   21-May-24    16-May-24    19-May-24   National   1,149      82%          937       ±3.2%
+
+
+
+
+Page 5 / 17
+                                                                          Effective
+  Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
+                                                                          Sample
+     Date       Start Date   End Date    sample      Size    efficiency               of Error
+                                                                            Size
+
+   04-Jun-24    29-May-24    02-Jun-24   National   1,160      85%          987       ±3.1%
+
+
+   18-Jun-24    12-Jun-24    16-Jun-24   National   1,181      81%          957       ±3.2%
+
+    02-Jul-24   26-Jun-24    30-Jun-24   National   1,141      83%          948       ±3.2%
+
+    16-Jul-24   10-Jul-24    14-Jul-24   National   1,122      80%          892       ±3.3%
+
+
+    30-Jul-24   24-Jul-24    28-Jul-24   National   1,137      83%          943       ±3.2%
+
+
+   13-Aug-24    08-Aug-24    11-Aug-24   National   1,132      83%          940       ±3.2%
+
+   27-Aug-24    20-Aug-24    24-Aug-24   National   1,129      80%          898       ±3.3%
+
+   10-Sep-24    03-Sep-24    07-Sep-24   National   1,132      81%          919       ±3.2%
+
+   24-Sep-24    18-Sep-24    22-Sep-24   National   1,117      83%          927       ±3.2%
+
+   08-Oct-24    02-Oct-24    06-Oct-24   National   1,139      80%          909       ±3.3%
+
+   22-Oct-24    16-Oct-24    20-Oct-24   National   1,140      85%          972       ±3.1%
+
+
+   05-Nov-24    30-Oct-24    03-Nov-24   National   1,131      86%          970       ±3.1%
+
+
+   19-Nov-24    13-Nov-24    18-Nov-24   National   1,206      78%          944       ±3.2%
+
+   03-Dec-24    27-Dec-24    01-Dec-24   National   1,123      80%          895       ±3.3%
+
+   17-Dec-24    12-Dec-24    15-Dec-24   National   1,151      83%          951       ±3.2%
+
+   21-Jan-25    15-Jan-25    19-Jan-25   National   1,132      81%          914       ±3.2%
+
+   04-Feb-25    29-Jan-25    03-Feb-25   National   1,150      79%          910       ±3.2%
+
+
+   18-Feb-25    12-Feb-25    16-Feb-25   National   1,146      78%          898       ±3.3%
+
+   04-Mar-25    26-Feb-25    02-Mar-25   National   1,150      79%          908       ±3.3%
+
+   18-Mar-25    12-Mar-25    17-Mar-25   National   2,256      80%         1,813      ±2.3%
+
+
+
+
+Page 6 / 17
+                                                                          Effective
+  Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
+                                                                          Sample
+     Date       Start Date   End Date    sample      Size    efficiency               of Error
+                                                                            Size
+
+   01-Apr-25    26-Mar-25    31-Mar-25   National   1,144      78%          896       ±3.3%
+
+
+   15-Apr-25    09-Apr-25    13-Apr-25   National   2,254      80%         1,811      ±2.3%
+
+   29-Apr-25    24-Apr-25    27-Apr-25   National   2,241      82%         1,847      ±2.3%
+
+   13-May-25    07-May-25    11-May-25   National   1,137      85%          969       ±3.1%
+
+
+    30-Jul-25   24-Jul-25    29-Jul-25   National   1,012      85%          858       ±3.3%
+
+
+   27-Aug-25    20-Aug-25    26-Aug-25   National   1,034      85%          878       ±3.3%
+
+   30-Sep-25    24-Sep-25    29-Sep-25   National   1,001      82%          822       ±3.4%
+
+   29-Oct-25    22-Oct-25    27-Oct-25   National   1,041      82%          849       ±3.4%
+
+   26-Nov-25    19-Nov-25    24-Nov-25   National   1,020      86%          873       ±3.3%
+
+   10-Dec-25    03-Dec-25    08-Dec25    National   1,030      89%          920       ±3.2%
+
+   28-Jan-26    19-Jan-26    23-Jan-26   National   1,022      82%          833       ±3.4%
+
+
+   25-Feb-26    18-Feb-26    23-Feb-26   National   1,002      78%          786       ±3.5%
+
+
+   25-Mar-26    18-Mar-26    23-Mar-26   National   1,008      82%          829       ±3.4%
+
+   29-Apr-26    22-Apr-26    27-Apr-26   National   1,067      86%          913       ±3.2%
+
+   27-May-26    20-May-26    25-May-26   National   1,062      86%          913       ±3.2%
+
+   30-Jun-26    24-Jun-26    29-Jun-26   National   1,017      79%          802       ±3.4%
+
+    28-Jul-26   22-Jul-26    27-Jul-26   National   1,060      76%          802       ±3.4%
+
+
+
+
+Page 7 / 17
+Questionnaire Content (22 July 2026)
+
+
+SCREENERS
+
+
+ASK ALL
+D1.      What is your gender?
+
+
+         SINGLE RESPONSE
+
+
+         1. Male
+         2. Female
+
+
+
+D2.      What is your age?
+
+
+         SINGLE RESPONSE
+
+
+         1. Under 18 [TERMINATE]
+         2. 18-19
+         3. 20-24
+         4. 25-29
+         5. 30-34
+         6. 35-39
+         7. 40-44
+         8. 45-49
+         9. 50-54
+         10. 55-59
+         11. 60-64
+         12. 65-69
+         13. 70-74
+         14. 75 and over
+
+
+
+D3.      In which one of the following areas do you live?
+
+
+         SINGLE RESPONSE
+
+
+         1.   Sydney
+         2.   NSW other than Sydney
+         3.   Melbourne
+         4.   Victoria other than Melbourne
+         5.   Brisbane
+         6.   Queensland other than Brisbane
+         7.   Adelaide
+
+
+
+
+Page 8 / 17
+         8. South Australia other than Adelaide
+         9. Perth
+         10. Western Australia other than Perth
+         11. Hobart
+         12. Tasmania other than Hobart
+         13. Darwin
+         14. Northern Territory other than Darwin
+         15. Australian Capital Territory
+         16. Other [TERMINATE]
+
+
+
+D4.      What is your postcode?
+         4-DIGIT OPEN-BOX. VALIDATE POSTCODES BASED ON D3
+
+
+D12.     And which of the following best describes the type of household you currently live in?
+         SINGLE RESPONSE
+         1.   Single without children
+         2.   Couple with no children
+         3.   Group household with no children
+         4.   Mix of adults - no children under 18yrs in the household
+         5.   Young family - mainly dependent pre-school kids
+         6.   Middle family - mainly dependent school aged kids
+         7.   Older family - mainly dependent teenagers or older still at home
+         8.   Single or couple whose children have left home
+         9.   Other
+
+
+
+
+Q41.     Are you enrolled to vote in the next Australian federal election?
+         SINGLE RESPONSE
+         1. Yes
+         2. No, but will be come 2028
+         3. No, and won’t be come 2028
+
+
+
+ASK IF Q41=1
+Q43.     Did you vote in the May 2025 federal election, or were you unable to do so for some reason?
+
+
+         SINGLE RESPONSE
+         1. Yes, voted
+         2. No, unable to
+         3. Not enrolled to vote
+
+
+
+ASK IF Q41=1 or 2
+
+
+
+Page 9 / 17
+Q21.     If a federal election was held tomorrow, to which party would you give your first preference vote in
+         the House of Representatives (Lower House)?
+
+
+         SINGLE RESPONSE. STATEMENTS 7 & 8 TO REMAIN AT BOTTOM OF LIST RANDOMISE
+         STATEMENTS 1 & 2/3/4/5
+         1.    Labor
+         2.    Liberal (Do not show in QLD or NT)
+         3.    National (Do not show in QLD or NT)
+         4.    Liberal National Party (Only show in QLD)
+         5.    Country Liberals (Only show in NT)
+         6.    Greens
+         7.    Pauline Hanson’s One Nation
+         8.    Independent or other party
+         9.    Don’t know
+
+ASK IF Q21=1-9
+Q22.     And how likely are you to change your vote between now and the next federal election?
+         SINGLE RESPONSE
+
+
+         1.    Not at all likely to change
+         2.    Not that likely to change
+         3.    Quite likely to change
+         4.    Very likely to change
+
+ASK IF Q21=10
+Q23.     Well which party are you currently leaning towards?
+         SINGLE RESPONSE. STATEMENTS 7 & 8 TO REMAIN AT BOTTOM OF LIST RANDOMISE
+         STATEMENTS 1 & 2/3/4/5
+
+
+         1. Labor
+         2. Liberal (Do not show in QLD or NT)
+         3. National (Do not show in QLD or NT)
+         4. Liberal National Party (Only show in QLD)
+         5. Country Liberals (Only show in NT)
+         6. Greens
+         7. Pauline Hanson’s One Nation
+         8. Trumpet of Patriots
+         9. Independent or other party
+         10. Don’t know
+
+ASK IF Q21=6-9 OR Q23=6-9
+Q24.     Following your first preference vote, which of the following would you preference higher in the House
+         of Representatives (Lower House)?
+
+
+         SINGLE RESPONSE. RANDOMISE 1 & 2
+
+
+
+
+Page 10 / 17
+         1. Labor
+         2. Liberal/National Coalition
+         3. Unsure
+
+
+
+ASK IF Q41=1 or 2
+Q26.     If a state election was held tomorrow, to which party would you give your first preference vote in the
+         Legislative Assembly / House of Assembly (Lower House)?
+
+
+         SINGLE RESPONSE. STATEMENT 19 TO REMAIN AT BOTTOM OF LIST. RANDOMISE
+         STATEMENTS 1 & 2/3/4
+
+
+         1.    Labor [SHOW FOR ALL]
+         2.    Liberal/National (Only show in NSW, VIC and QLD)
+         3.    Liberal (Only show in SA, WA, TAS and ACT)
+         4.    Country Liberal (Only show in NT)
+         5.    Greens [SHOW FOR ALL]
+         6.    One Nation [SHOW FOR ALL]
+         7.    Independent
+         8.    Other party [SHOW FOR ALL]
+         9.    Don’t know [SHOW FOR ALL]
+
+
+
+ASK IF Q43=1
+Q17.     At the most recent Federal election (held on 3 May 2025), to which party did you give your first
+         preference vote in the House of Representatives (Lower House)?
+
+
+         SINGLE RESPONSE. OPTION 10 TO REMAIN AT BOTTOM OF LIST RANDOMISE OPTIONS 1 &
+         2/3/4/5
+
+
+         1.    Labor
+         2.    Liberal (Do not show in QLD or NT)
+         3.    National (Do not show in QLD or NT)
+         4.    Liberal National Party (Only show in QLD)
+         5.    Country Liberals (Only show in NT)
+         6.    Greens
+         7.    Pauline Hanson’s One Nation
+         8.    Independent or other party
+         9.    Don’t know
+
+
+
+
+Page 11 / 17
+AD HOC
+
+
+Q37.     Do you approve or disapprove of the job Anthony Albanese is doing as Prime Minister?
+
+
+         SINGLE RESPONSE
+
+
+         1.    Strongly approve
+         2.    Approve
+         3.    Disapprove
+         4.    Strongly disapprove
+         5.    Don’t know
+
+
+
+Q56.     Do you approve or disapprove of the job Angus Taylor is doing as Opposition Leader?
+
+
+         SINGLE RESPONSE
+
+
+         1.    Strongly approve
+         2.    Approve
+         3.    Disapprove
+         4.    Strongly disapprove
+         5.    Don’t know
+
+
+
+E563.    In general, would you say that Australia is heading in the right direction or on the wrong track?
+
+
+         SINGLE RESPONSE. RANDOMISE 1 & 2.
+
+
+         1. Right direction
+         2. Wrong track
+         3. Unsure
+
+
+
+ASK IF CODE 1 SELECTED AT E563
+
+
+E563A. Why do you think that Australia is heading in the right direction?
+
+
+OPEN ENDED
+
+
+
+
+Page 12 / 17
+ASK IF CODE 2 SELECTED AT E563
+
+
+E563B. Why do you think that Australia is heading in the wrong direction?
+
+
+OPEN ENDED
+
+
+E1096. How important are the following issues to you?
+
+Please rank your top 3 issues where 1=Most important, 2=Second most important and 3=Third most
+important.
+
+         RANK FROM 1 TO 3. RANDOMISE
+
+         1. Inflation and cost of living
+         2. Managing technology change and AI
+         3. Climate change and the energy transition
+         4. Crime
+         5. Medicare and health services
+         6. Aged care
+         7. Childcare
+         8. Workers’ rights and job security
+         9. Immigration
+         10. Defence and international relations
+
+
+
+E1029. How would you rate the performance of the Federal Government on the following issues?
+
+         a.    Very poor
+         b.    Quite poor
+         c.    Neither good, nor poor
+         d.    Quite good
+         e.    Very good
+         f.    Unsure
+
+         SINGLE RESPONSE PER STATEMENT. RANDOMISE STATEMENTS
+
+REPEAT CODE FRAME FROM E1096
+
+
+E1184. Still thinking about the Federal Government, how would you rate its performance in each of the
+following areas relating to health services in Australia?
+
+         a.    Very poor
+         b.    Quite poor
+         c.    Neither good, nor poor
+         d.    Quite good
+         e.    Very good
+         f.    Unsure
+
+         1. Access to GPs offering Medicare bulk billing
+         2. Funding of public hospitals
+
+
+
+Page 13 / 17
+         3.    Making medicines affordable
+         4.    Managing the NDIS to support people with disability
+         5.    Ensuring specialists’ fees are affordable
+         6.    Promoting a healthier society more broadly
+         7.    Getting emergency care in hospital / urgent care clinics
+
+E924. Using a scale of 0 to 10, where 0 means very unhealthy and 10 means very healthy, how would you
+rate each of the following?
+
+         SINGLE RESPONSE. 0-10 SCALE. LABEL END POINTS “0 – Very unhealthy”, “10-Very
+         healthy”. INCLUDE “Unsure” OPTION ON RIGHT HAND SIDE.
+
+RANDOMISE
+     1. The health of the nation (Australians in general)
+     2. The health of your friends and family
+     3. Your own personal health
+
+E1185. In the past 12 months, was there a time when you or a family member in your household needed to
+see each of the following but did not because of the cost?
+
+CARROUSEL WITH FOLLOWING TILES. RANDOMISED.
+
+    1.   Dentist
+    2.   GP
+    3.   Medical specialist
+    4.   Allied health professional (e.g., physio)
+
+         1.    Yes
+         2.    No
+         3.    Unsure
+         4.    Prefer not to say
+
+E1186. Thinking about the future, how confident are you that Australia’s public health system will be able to
+provide you with the care you need, when you need it?
+
+         1.    Very confident
+         2.    Somewhat confident
+         3.    Not very confident
+         4.    Not at all confident
+         5.    Unsure
+
+E1187. Data centres are large facilities that store and process the computing power needed for things like
+cloud storage, streaming and Artificial Intelligence (AI). To what extent would you support or oppose a new
+data centre being built in your local area?
+
+         1.    Strongly support
+         2.    Somewhat support
+         3.    Neither support nor oppose
+         4.    Somewhat oppose
+         5.    Strongly oppose
+         6.    Unsure
+
+
+
+Page 14 / 17
+E1188. If a data centre were to be built in your local area, which of the following, if any, would you be most
+concerned about? Please rank up to your top 3.
+
+RANK. RANDOMISE
+
+         1.    Its impact on local water supply
+         2.    Its impact on energy demand and electricity prices
+         3.    Noise
+         4.    Its impact on the value of your property
+         5.    Impact on the local environment and wildlife
+         6.    Increased traffic or disruption during the construction
+         7.    General concerns about the growth of AI
+         8.    Other (please specify)
+         9.    I would not have any particular concerns EXCLUSIVE OPTION
+
+
+
+DEMOGRAPHICS
+
+
+Thank you for your time so far, we only have a few more questions.
+
+
+ASK ALL
+D23.     In what year were you born?
+
+
+         FOUR DIGIT TEXT BOX. RANGE BETWEEN 1920-2008
+
+
+
+
+D6.      What is the total of all wages/salaries, government benefits, pensions, allowances, and other income
+         that your household usually receives (GROSS – before tax and superannuation deductions)?
+
+
+         SINGLE RESPONSE
+
+
+         1. $3,500 or more per week ($182,000 or more per year)
+         2. $3,000-$3,499 per week ($156,000-$181,999 per year)
+         3. $2,500-$2,999 per week ($130,000-$155,999 per year)
+         4. $2,000-$2,499 per week ($104,000-$129,999 per year)
+         5. $1,500-$1,999 per week ($78,000-$103,999 per year)
+         6. $1,250-$1,499 per week ($65,000-$77,999 per year)
+         7. $1,000-$1,249 per week ($52,000-$64,999 per year)
+         8. $800-$999 per week ($41,600-$51,999 per year)
+         9. $600-$799 per week ($31,200-$41,599 per year)
+         10. $400-$599 per week ($20,800-$31,199 per year)
+         11. $300-$399 per week ($15,600-$20,799 per year)
+         12. $200-$299 per week ($10,400-$15,599 per year)
+         13. $1-$199 per week ($1-$10,399 per year)
+         14. No income
+
+
+
+
+Page 15 / 17
+         15. Negative income
+         16. Prefer not to say
+
+
+
+D7.      What is your current employment status?
+
+
+         SINGLE RESPONSE
+
+
+         1. Employed, working Full-time (more than 35 hours a week)
+         2. Self Employed, working Full-time (more than 35 hours a week)
+         3. Employed, working Part-time (less than 35 hours a week)
+         4. Unemployed, looking for Full-time work (more than 35 hours a week)
+         5. Unemployed, looking for Part-time work (less than 35 hours a week)
+         6. Not Employed and not looking for work
+         7. Student
+         8. Beneficiary/Welfare
+         9. Retired
+         10. Look after the house full time
+         11. Other (please specify)
+         12. Refuse to answer
+
+
+
+D24.     Which of the following best describes how you feel about your current financial circumstances?
+
+
+         SINGLE RESPONSE
+
+
+         1.    Comfortable. I don’t have to worry about paying bills, I have savings and enough to buy luxuries
+         2.    Secure. I’m able to pay bills and usually have money spare for savings or buying luxuries
+         3.    Struggling a bit. I have to watch the budget to make sure there’s enough money for all the bills
+         4.    In serious difficulty. Being able to pay all the bills is a regular concern
+
+
+
+D22.     Which of the following best describes your current living situation?
+
+         SINGLE RESPONSE
+
+         1.    Live in your own home
+         2.    Rent
+         3.    Live with family or friends
+         4.    Other
+
+
+
+D25.     Are you currently paying off a mortgage/home loan?
+
+
+         SINGLE RESPONSE
+
+
+
+
+Page 16 / 17
+         1. Yes
+         2. No
+
+
+
+D14.     What is the highest level of education you have attained?
+
+
+         SINGLE RESPONSE
+
+
+         1.    Year 9 and below
+         2.    Year 10 and above
+         3.    Certificate levels I-IV
+         4.    Diploma or advanced diploma
+         5.    Graduate diploma or certificate
+         6.    Bachelor or honours degree
+         7.    Post-graduate degree
+         8.    Other (please specify)
+         9.    I prefer not to answer
+
+
+
+D21.     Which of the following applies to you?
+
+
+         a. Yes
+         b. No
+         c. Prefer not to say
+
+         SINGLE RESPONSE PER STATEMENT. RANDOMISE ANSWER STATEMENTS.
+
+
+         1.    I identify as Aboriginal or Torres Strait Islander
+         2.    I was born in Australia
+         3.    Both my parents were born in Australia
+         4.    I use a language other than English at home or with close family members
+         5.    I have a disability or long-term health condition (lasting more than 6 months)
+
+
+
+
+Page 17 / 17
+

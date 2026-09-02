@@ -1,0 +1,176 @@
+                                                                        Ground Floor, 2-12 Mountain Street
+                                                                                         Ultimo NSW 2007
+                                                                                          +61 2 9406 5800
+                                                                                            au.yougov.com
+
+Publication date: 14th July 2026
+
+
+ Short Methodology Statement
+
+ Research company                  YouGov Galaxy Pty Ltd
+
+ Client commissioning the          Sky News
+ research
+
+ Fieldwork dates                   7th July – 14th July 2026
+
+ Mode of data collection           Online recruited from research panel (100%)
+
+ Target population                 Australians eligible to vote
+
+ Sample size                       1468
+
+ Australian Polling Council        Yes
+ compliant
+
+ URL of Long Methodology           https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?    Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after       1018
+ weighting applied
+
+ Margin of error associated with   ±3.071
+ effective sample size
+
+ Quotas and weighting              Age, Gender, Education, AEC region, household income, 2025
+                                   Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used             Rim weighting.
+
+ Full question text, responses     Below for published questions
+ categories and randomisation
+
+ Source of online sample           Selected from previously recruited online panels of research
+                                   participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention   After demographics
+ questions in questionnaire?
+
+ How were undecided voters         Voters were given an option to select “Don’t know” and were
+ handled?                          excluded from final figures
+
+ 2PP calculation method            2pp Labor v ex Coalition 2025 Federal election flows
+                                   2pp Labor v One Nation Survey respondent ordering of
+                                   preferences.
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomize
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Sussan Ley is doing Ask eligible
+                          her job as Leader of the Opposition?                               voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Sussan Ley
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Q1        How serious of a problem do you think anti‑semitism is in the        Ask eligible
+          Australia?                                                           voters
+
+          Please select the option that best applies
+          Single select, reverse
+     1.   A very serious problem
+     2.   A somewhat serious problem
+     3.   A minor problem
+     4.   Not a problem
+     5.   Not sure                                                             Fixed
+
+Q2        What do you expect will happen to the level of Unemployment
+          over the coming 12 months?
+
+          Please select the option that best applies
+          Single select, reverse
+     1.   Increase a lot
+     2.   Increase somewhat
+     3.   Stay about the same
+     4.   Decrease somewhat
+     5.   Decrease a lot
+     6.   Don't know                                                           Fixed
+
+Q3        Thinking back over from where Australia was 12 months ago,
+          which of the following statements is closest to your view?
+
+          Please select the option that best applies
+          Single select, reverse
+     1.   Australia is a stronger and most prosperous country
+     2.   Australia is a weaker and poorer country
+     3.   Australia has not changed                                            Fixed
+
+Q4        You said that you currently intend to vote for One Nation.           Ask if intent to
+                                                                               vote One
+          Please select the option that best applies                           Nation
+                                                                               (selected One
+                                                                               Nation in
+                                                                               Federal voting
+                                                                               intention)
+          Single select, reverse
+     1.   I am a firm One Nation voter and will vote for them at the next
+          election
+     2.   I intend to vote one nation at the moment, but this could change
+     3.   I am unsure how I will vote but at the moment I am leaning
+          towards One Nation
+
+
+
+
+                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

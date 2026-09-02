@@ -53,6 +53,14 @@ new and worth looking at.
 - Leadership rows must key to **fieldwork end**, matching their poll. An
   unexplained "leadership-only" row in the build output usually means a date has
   drifted off its poll, not that the firm skipped voting intention.
+- **Effective sample size** travels per poll as `sampleEff`, filled from the
+  house's own Australian Polling Council methodology statement by
+  `.build/extract-sampleeff.mjs` (Newspoll via Pyxis, YouGov's Sky/News24/Public
+  Data series, Essential's disclosure table, DemosAU). Absent, not zero: Resolve
+  files no per-poll figure, MRP statements print "n/a for MRP", and pollsters
+  prune older statement PDFs — rows without one stay on the standing
+  sample ÷ 1.6 convention. Where present it replaces the derived figure in the
+  aggregate's weights (gen-data's `rowN`).
 
 ## Layout
 

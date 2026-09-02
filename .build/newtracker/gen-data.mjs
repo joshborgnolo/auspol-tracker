@@ -180,11 +180,24 @@ function fillSeries(known, idxs) {
 
 /* ---- house effects (shrunk mean deviation from local consensus) -------- */
 const HE_WINDOW = 28, SHRINK_K = 8, SAMPLE_CAP = 3000, LN2 = Math.log(2);
+/* Design effect for a live national sample – the same 1.6 the discord engine
+   uses for its sampling-error floor, so the two agree. */
+const HL_DEFF = 1.6;
+/* A poll's n on the derived scale. Where the house files a published
+   effective sample size (polls.json `sampleEff` – Newspoll, YouGov,
+   Essential, DemosAU via APC methodology statements), that figure is
+   already deflated by the house's own design effect; scale it back up by
+   HL_DEFF so published and derived rows sit on the one convention, and the
+   seFloor formula's `HL_DEFF * pq / p.n` reduces to pq/eff for a published
+   row. Otherwise the standing convention: raw sample capped at 3000. */
+const rowN = (p) => (p && p.sampleEff != null)
+  ? p.sampleEff * HL_DEFF
+  : Math.min((p && p.sample) || 1200, SAMPLE_CAP);
 const midMs = (p) => (new Date(p.dateStart || p.date).getTime() + new Date(p.date).getTime()) / 2;
 const share2pp = (p) => (p.tpp_lnp != null && p.tpp_alp + p.tpp_lnp > 0) ? (p.tpp_alp / (p.tpp_alp + p.tpp_lnp)) * 100 : p.tpp_alp;
 const ddays = (a, b) => (a - b) / 86400000;
 const HL_WINDOW = 21, HL_HALF = 7;
-const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: Math.min(p.sample || 1200, SAMPLE_CAP), firm: p.pollster }));
+const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster }));
 /* Synthetic 2PP rows: each poll's primaries read through the single measured
    flow table in flows.mjs (AEC 2025, Event 31496). This series answers a
    different, narrower question than the published 2PP above – "what would
@@ -196,7 +209,7 @@ const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.
    total ~100 can't be read through a 100-point flow table. */
 const tppRowsSynth = POLLS
   .filter((p) => p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
-  .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: Math.min(p.sample || 1200, SAMPLE_CAP), firm: p.pollster }));
+  .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: rowN(p), firm: p.pollster }));
 
 /* A house effect is that pollster's mean deviation from the cross-house
    consensus ON THAT MEASURE – never borrowed between measures, because a firm
@@ -244,10 +257,6 @@ function monthlyAdj(rows, he) {
   }).filter(Boolean);
 }
 // trailing recency-weighted nowcast (same window/half-life as the headline 2PP)
-/* Design effect for a live national sample – the same 1.6 the discord engine
-   uses for its sampling-error floor, so the two agree. */
-const HL_DEFF = 1.6;
-
 /* Weighted nowcast over the trailing window, WITH its uncertainty. Two
    estimates, larger wins:
      seSpread – how far the polls in the window disagree about the weighted
@@ -374,7 +383,7 @@ const primaryVal = (p, k) => (k === "oth" ? ((p.ind ?? null) === null && (p.oth 
 const primaryRows = {}, primaryHE = {};
 for (const k of PRIMARY_KEYS) {
   primaryRows[k] = POLLS.filter((p) => primaryVal(p, k) != null)
-    .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: primaryVal(p, k), n: Math.min(p.sample || 1200, SAMPLE_CAP), firm: p.pollster }));
+    .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: primaryVal(p, k), n: rowN(p), firm: p.pollster }));
   primaryHE[k] = houseEffectsFor(primaryRows[k]);
 }
 const aggPrimary = MONTHS.map((ym) => {
@@ -421,7 +430,7 @@ function altRowsFor(field) {
     const p = POLL_BY_KEY.get(key);
     const date = key.split("|")[0];
     out.push({ ym: ymOf(date), mid: p ? midMs(p) : new Date(date).getTime(),
-               x: v[field], n: Math.min((p && p.sample) || 1200, SAMPLE_CAP), firm: key.split("|")[1] });
+               x: v[field], n: rowN(p), firm: key.split("|")[1] });
   }
   return out;
 }
@@ -469,7 +478,7 @@ const APPR_SLOTS = [["alb", "alb"], ["opp", "opp"], ["han", "han"]];
 const apprHE = {};
 for (const [prop, lk] of APPR_SLOTS) {
   const rows = appr.filter((p) => p[prop] != null).map((p) => ({
-    firm: p.firm, mid: midMs({ date: p.date }), n: Math.min((POLL_BY_KEY.get(p.date + "|" + p.firm) || {}).sample || 1200, SAMPLE_CAP),
+    firm: p.firm, mid: midMs({ date: p.date }), n: rowN(POLL_BY_KEY.get(p.date + "|" + p.firm)),
     x: p[prop],
     strat: metricOf(p.firm, lk, p.date) + "|" + (lk === "opp" ? eraOf(p.date) : "-"),
   }));
@@ -513,7 +522,7 @@ const leaderMonths = MONTHS.map((ym) => {
     const sum = (sp && sp.app != null && sp.dis != null) ? sp.app + sp.dis : 100;
     return Math.max(0, 100 * sum - net * net);
   };
-  const apprN = (p) => Math.min((POLL_BY_KEY.get(p.date + "|" + p.firm) || {}).sample || 1200, SAMPLE_CAP);
+  const apprN = (p) => rowN(POLL_BY_KEY.get(p.date + "|" + p.firm));
   const split = (prop, lk, pool = rows) => {
     const ap = [], fv = [];
     const deb = (p, v) => v - heV(apprHE[lk] || {}, p.firm);   // debias on this leader's own house effects
@@ -617,7 +626,7 @@ const leaderMonths = MONTHS.map((ym) => {
 const DIR = D.direction || [];
 const dirSample = (d) => {
   const p = POLL_BY_KEY.get(d.date + "|" + d.pollster);
-  return Math.min((p && p.sample) || 1200, SAMPLE_CAP);
+  return rowN(p);
 };
 const dirRows = (field) => DIR.filter((d) => d[field] != null).map((d) => ({
   ym: ymOf(d.date), mid: midMs(d), x: d[field], n: dirSample(d), firm: d.pollster,
@@ -870,7 +879,7 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
     const m = polls.filter((d) => d.ym === ym);
     if (!m.length) return null;
     let sw = 0, swx = 0;
-    for (const r of m) { const n = Math.min(r.sample || 1200, SAMPLE_CAP); sw += n; swx += n * r.v; }
+    for (const r of m) { const n = rowN(r); sw += n; swx += n * r.v; }
     return { ym, x: mx(ym), v: r1(swx / sw), k: m.length };
   }).filter(Boolean);
   const last = polls[polls.length - 1];

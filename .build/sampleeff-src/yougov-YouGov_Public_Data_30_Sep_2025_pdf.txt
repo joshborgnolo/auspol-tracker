@@ -1,0 +1,62 @@
+                                                                        Ground Floor, 2-12 Mountain Street
+                                                                                         Ultimo NSW 2007
+                                                                                          +61 2 9406 5800
+                                                                                            au.yougov.com
+
+Publication date: 30th Sep 2025
+
+ Short Methodology Statement
+ Research company                  YouGov Galaxy Pty Ltd
+
+ Client commissioning the
+ research
+
+ Fieldwork dates                   25 to 30 Sep 2025
+
+ Mode of data collection           Online recruited from research panel (100%)
+
+ Target population                 Australians eligible to vote
+
+ Sample size                       1329
+
+ Australian Polling Council        Yes
+ compliant
+
+ URL of Long Methodology           https://au.yougov.com/results/apc
+ statement
+ Is voting intention published?    Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after       880
+ weighting applied
+
+ Margin of error associated with   ±3.3
+ effective sample size
+
+ Quotas and weighting              Age, Gender, Education, AEC region, household income, 2025
+                                   Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used             Rim weighting.
+
+ Full question text, responses     Below for published questions
+ categories and randomisation
+
+ Source of online sample           Selected from previously recruited online panels of research
+                                   participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention   After demographics
+ questions in questionnaire?
+
+ How were undecided voters         Excluded
+ handled?
+
+ 2PP calculation method            2025 Federal election preference flows
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

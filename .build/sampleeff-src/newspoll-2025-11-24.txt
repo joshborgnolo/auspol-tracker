@@ -1,0 +1,276 @@
+Methodology Statement: Newspoll
+Publication date: 24 November 2025
+
+Short Methodology Statement
+
+Research company: Pyxis Polling Pty Ltd
+Client commissioning the research: The Australian, News Corp Australia
+End client: The Australian, News Corp Australia
+Fieldwork dates: 17 November – 20 November 2025
+Mode of data collection: Online recruited from research panel
+Target population: Eligible Australian Voters
+Sample size: 1245
+Australian Polling Council compliant? Yes
+URL of Long Methodology statement Is voting intention published?
+https://www.pyxispolling.com/apc/
+
+Long Methodology Statement
+
+Effective sample size after weighting applied: 1000
+Margin of error associated with effective sample size: ±3.1
+Variables used in weighting & weighting method used: Age x gender x location, Housing
+tenure, Region x income, 2025 Past Vote, Rim weighting
+Full question text, responses categories and randomisation: See below
+Proportion of landline/mobile completed interviews: Not applicable
+Source of online sample: Selected from previously recruited online panels of research
+participants to fill quotas loosely based on weighting frame
+Positioning of voting intention questions in questionnaire? Immediately after
+demographics
+2PP calculation method: Calculated according to preferences flows at previous elections
+How were undecided voters handled? Undecided respondents who answered “don’t
+know” were asked a leaner question which also included a “don’t know” option. Those who
+answered don’t know were excluded from published voting intention figures but not from the
+survey. 5% were thus excluded from published voting intention figures.
+
+
+
+
+www.pyxispolling.com
+Full Text of Published Questions
+
+Q1 Thinking about federal politics. If a federal election for the House of Representatives was held
+today, which one of the following would you vote for?
+
+Please select one option only; randomize responses
+
+
+
+
+     The Labor Party
+
+
+     The Liberal Party                (show in electorates with candidate)
+
+
+     The Nationals                    (show in electorates with candidate)
+
+
+     The LNP                                         (show in Queensland)
+
+
+     Pauline Hanson's One Nation      (show in electorates with candidate)
+
+
+     The Greens
+
+                                                      (name other
+                                                      parties or
+     Other parties or independent candidate           independent
+                                                      candidate in each
+                                                      electorate)
+
+     Don't know
+
+
+ASK IF Q1 = Don’t Know
+
+
+Q2 To which one of the following do you have a leaning?
+
+Please select one option only; randomize responses
+
+
+
+
+     The Labor Party
+
+
+     The Liberal Party                (show in electorates with candidate)
+
+
+     The Nationals                    (show in electorates with candidate)
+
+
+
+www.pyxispolling.com
+     The LNP                                         (show in Queensland)
+
+
+     Pauline Hanson's One Nation      (show in electorates with candidate)
+
+
+     The Greens
+
+                                                         (name other
+                                                         parties or
+     Other party or independent candidate                independent
+                                                         candidate in each
+                                                         electorate
+
+     Don't know
+
+
+ASK IF NOT VOTING FOR LABOR, LIBERAL, NATIONALS, LNP AT Q1, Q2
+
+
+Q3. You must allocate preferences for all parties. Between these parties, which would you rank
+highest?
+
+Please select one option only; Rotate 1-3
+
+
+
+
+       Liberal / Nationals                   Show outside Queensland
+
+
+       Labor
+
+
+       The LNP                                    Show in Queensland
+
+
+       Will just follow how to vote cards / don’t know
+
+
+ASK ALL
+Q4. Thinking now about the leaders of the parties. Are you satisfied or dissatisfied with the way
+Anthony Albanese is doing his job as Prime Minister?
+
+Please select one option only; Rotate 1-2
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+www.pyxispolling.com
+     Don’t know
+
+
+
+
+ASK IF Q4 = Don’t Know
+Q5. On balance, and while you may have no strong feelings either way, would you be more inclined to
+say you have been satisfied or dissatisfied with the way Anthony Albanese is doing his job as Prime
+Minister?
+
+Please select one option only; Rotate 1-2
+
+
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+ASK ALL
+Q6. Are you satisfied or dissatisfied with the way Sussan Ley is doing her job as Leader of the
+Opposition?
+
+Please select one option only; Rotate 1-2
+
+
+
+
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+ASK IF Q6 = Don’t Know
+Q7. On balance, and while you may have no strong feelings either way, would you be more inclined to
+say you have been satisfied or dissatisfied with the way Sussan Ley is doing her job as Leader of the
+Opposition?
+
+Please select one option only; Rotate 1-2
+
+
+
+
+www.pyxispolling.com
+     Satisfied
+
+
+     Dissatisfied
+
+
+     Don’t know
+
+
+ASK ALL
+Q8. Who do you think would make the better Prime Minister?
+
+Please select one option only; Rotate 1-2
+
+
+
+
+      Anthony Albanese
+
+
+     Sussan Ley
+
+
+       Don’t know
+
+
+ASK IF Q8 = Don’t Know
+Q9. If you had to choose, which one of the two leaders do you think would make the better Prime
+Minister?
+
+Please select one option only; Rotate 1-2
+
+
+       Anthony Albanese
+
+
+       Sussan Ley
+
+       Don’t know
+
+
+
+ASK ALL
+Q10. Whom would you prefer as leader of the Federal Coalition?
+
+Please select one option only; Randomise 1-5
+
+1       Sussan Ley
+2       Andrew Hastie
+3       Ted O’Brien
+
+www.pyxispolling.com
+4      Angus Taylor
+5      Tim Wilson
+6      Don’t know
+
+
+ASK IF DON’T KNOW AT Q10
+Q11. If you had to choose, whom would you prefer as leader of the Federal Coalition?
+
+Please select one option only; Randomise 1-5
+
+1      Sussan Ley
+2      Andrew Hastie
+3      Ted O’Brien
+4      Angus Taylor
+5      Tim Wilson
+6      Don’t know
+
+
+
+
+www.pyxispolling.com
+

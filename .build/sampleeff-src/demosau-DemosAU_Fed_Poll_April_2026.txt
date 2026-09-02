@@ -1,0 +1,568 @@
+ Federal Poll
+
+       Capital
+   Brief/DemosAU
+     Federal Poll
+Fieldwork Dates: 9-14 April 2026
+Total Sample Size: 1,439
+Effective Sample Size: 864
+Effective Margin of Error: +/- 3.3%
+
+
+
+
+                                      1
+Methodology Statement
+
+  Research company                                        DemosAU
+
+  Client commissioning the research                       Capital Brief
+
+  Fieldwork dates                                         9-14 April 2026
+
+  Mode of data collection                                 Internet panels
+
+  Target population                                       Australians 18+ eligible to vote at elections
+
+  Sample size                                             1,439
+
+  Is voting intention published?                          Yes, in this report
+
+  Effective sample size after weighting applied           864
+
+  Margin of error associated with effective sample size   +/- 3.3%
+
+  Variables used in weighting                             Age x gender, education, personal income, residential tenure, region, 2025 Federal Vote, Left-Right Self ID.
+
+  Weighting method used                                   Rim Weighting
+
+  Full question text, responses categories and            See Pages 18 & 19
+  randomisation
+
+  Source of sample                                        Internet panels
+
+  Positioning of voting intention questions in            Federal VI was first substantive question after demographics.
+  questionnaire?
+
+  How were undecided voters handled?                      Initial undecided voters were asked a leaner question. Remaining undecided voters were excluded from final
+                                                          totals.
+
+
+  2PP calculation method                                  No 2PP calculated
+
+
+
+
+                                                                                                                                                                         2
+       Primary Vote & Seat Projection
+                                                       Primary Vote %
+                                              ALP     ONP            L/NP    GRN           Oth
+
+
+                                      26%                          26%                           23%                 13%          12%
+
+0%                             20%                   40%                     60%                          80%                       100%
+Excludeds 7% of respondents who were undecided
+
+
+                     Swings Since Last Election                                           Swings Since Last Poll (Feb)
+                ALP       ONP         L/NP   GRN     Oth                              ALP        ONP       L/NP        GRN    Oth
+
+       -8.6%                                                                                  -3%
+                                                           19.6%                                    -2%
+       -8.8%                                                                                                          2%
+                               0.8%                                                                             1%
+
+                      -3.0%                                                                                           2%
+-10%           -5%        0%          5%     10%     15%       20%          -6%      -4%         -2%       0%          2%    4%         6%
+
+
+                                                             Seat Projection
+                                             Labor          One Nation            Coalition               Greens             Others
+
+               Top of range                   78                   51                30                     4                  8
+
+          Bottom of range                     68                   40                16                     1                  3
+
+
+                                                                                                                                        3
+          Preferred PM + Leader Ratings
+                                                Preferred Prime Minister
+             Anthony Albanese (Labor)         Pauline Hanson (One Nation)                  Angus Taylor (Liberal)     Don't Know
+                                                                                                                                           Change %
+
+                                                                                                                                   35%       -2%
+
+                                                                                             24%                                             -1%
+
+                                                                                     22%                                                     +3%
+
+                                                                         19%                                                                 0%
+     0%              5%                 10%             15%                    20%                 25%              30%             35%
+
+
+
+
+                                                                    Leader Ratings
+                                                              Positive         Neutral           Negative                       Net Positive Change
+                                                                                                                                     %         %
+
+ Prime Minister Anthony Albanese                   26%                           28%                                      46%       -20%      -3%
+
+
+  Opposition Leader Angus Taylor                  25%                                               47%                   28%       -3%        1%
+
+
+One Nation Leader Pauline Hanson                          34%                              27%                            39%
+                                                                                                                                    -5%       -4%
+                                   0%            20%                 40%                    60%              80%            100%
+
+
+
+
+                                                                                                                                              4
+             Personal Ratings - Attributes
+                                                Prime Minister Anthony Albanese
+                                                                       Yes              Don't Know         No
+
+                           Arrogant                                37%                           22%                                  41%
+                            Likeable                            34%                        20%                                       46%
+                       Trustworthy                        30%                              24%                                       46%
+In touch with ordinary Australians                       29%                      17%                                                54%
+                       Competent                                34%                           23%                                    43%
+         Has a vision for Australia                             34%                           23%                                    43%
+               Decisive and strong                 26%                          21%                                                  53%
+           In control of their party                                         44%                             25%                      31%
+                                    0%           20%                        40%                      60%                       80%      100%
+
+                                                Opposition Leader Angus Taylor
+
+                                                                            Yes          Don't Know          No
+
+                              Arrogant                 25%                                                   42%                     33%
+                               Likeable                         32%                                                40%               28%
+                           Trustworthy                 24%                                                         48%               28%
+   In touch with ordinary Australians                    27%                                                  41%                    32%
+                           Competent                            31%                                                      46%         23%
+             Has a vision for Australia                               36%                                                41%         23%
+                  Decisive and strong                            33%                                                 43%             24%
+               In control of their party                     30%                                                     45%             25%
+                                           0%      20%                       40%                       60%                     80%     100%
+
+
+                                                                                                                                           5
+         Personal Ratings - Attributes
+
+                                        One Nation Leader Pauline Hanson
+                                                      Yes        Don't Know        No
+
+                           Arrogant                       42%              19%                        39%
+                            Likeable                      41%            18%                          41%
+                       Trustworthy                  37%                      26%                      37%
+In touch with ordinary Australians                              49%             18%                   33%
+                       Competent                     39%                      26%                     35%
+         Has a vision for Australia                                      59%            16%           25%
+               Decisive and strong                                      58%             17%           25%
+           In control of their party                                  55%                 23%         22%
+                                   0%     20%             40%               60%                 80%     100%
+
+
+
+
+                                                                                                         6
+        Personal Ratings - Attributes
+
+                                        Comparison: Net Positive
+                                                           Albanese                Taylor         Hanson
+
+                                                                              -4%
+                         Arrogant                                      -8%
+                                                                                    3%
+                                                                -12%
+                          Likeable                                                      4%
+
+
+                                                         -16%
+                      Trustworthy                                             -4%
+
+
+                                             -25%
+In touch with ordinary Australians                                           -5%
+                                                                                                        16%
+                                                                   -9%
+                      Competent                                                              8%
+                                                                                        4%
+                                                                   -9%
+         Has a vision for Australia                                                               13%
+                                                                                                                    34%
+                                           -27%
+              Decisive and strong                                                            9%
+                                                                                                                    33%
+                                                                                                  13%
+          In control of their party                                                     5%
+                                                                                                                    33%
+                                 -40%             -20%                             0%                         20%         40%
+
+                                                                                                                           7
+   Top Issue
+Q. In your opinion, what is the biggest issue facing Australia today?
+Open-ended, categories generated by AI (note: totals may not equal 100% as responses can be assigned multiple categories)
+
+                  Cost of Living                                                                                    45%
+                     Fuel Prices                       10%
+         Housing Affordability                         10%
+                   Immigration                    8%
+                       Economy               6%
+                          Crime              6%
+     Government Performance                 5%
+              Climate Change           3%
+            Income Inequality        2%
+                Homelessness         2%
+                 Global Politics     2%
+                    Healthcare       2%
+        War in the Middle East       2%
+               Unemployment            1%
+                          Taxes        1%
+                         Racism        1%
+              Social Cohesion          1%
+               Cultural Erosion        1%
+                     Corruption        1%
+             National Security         1%
+            Political Instability      1%
+                   Environment         1%
+                      Education        1%
+      National Self-Sufficiency        1%
+                 Donald Trump          1%
+                    Don't Know         1%
+                 Miscellaneous               6%
+                                    0%                  10%           20%                30%                40%
+
+
+                                                                                                                            8
+               Voting Intention: Gender + Age
+
+                                                Gender
+                                    ALP     ONP     LNP         Grn    Oth
+
+
+  Males                       28%                  24%                             23%           11%         14%
+
+
+Females                 25%                         28%                            22%                 15%   10%
+
+          0%          20%                 40%                    60%                     80%                  100%
+
+
+                                                  Age
+                                    ALP     ONP     LNP         Grn    OTH
+
+  18-34                 24%                20%                   18%                                   28%   10%
+
+  35-54                     26%                    26%                       20%               13%           15%
+
+    55+                       28%                         29%                              27%         5%    11%
+
+          0%          20%                 40%                   60%                      80%                  100%
+
+
+
+
+                                                                                                                   9
+                    Education + Income
+
+                                                    Education
+                                              ALP     ONP          LNP         Grn    Oth
+
+  School Education                26%                                    31%                       22%           10%         11%
+
+     TAFE Education           24%                                28%                         23%                13%          12%
+
+University Education                29%                    18%                         24%                      17%          12%
+
+                     0%     20%                     40%                        60%                   80%                      100%
+
+                                                          Income
+                                              ALP     ONP          LNP         Grn    Oth
+
+
+            <$45K             25%                                 28%                        21%               12%            14%
+
+
+         $45-125K                 27%                            24%                          25%                      15%    9%
+
+
+           $125K+                       31%                              26%                        23%               10%     10%
+
+                    0%      20%                     40%                         60%                      80%                      100%
+
+
+
+
+                                                                                                                             10
+                   Voting Intention: State + Location
+
+                                                     Location
+                                               ALP         ONP       LNP         Grn    Oth
+
+     Inner Metro                         33%                 14%                              25%                   16%        12%
+
+     Outer Metro                  25%                              26%                              25%            11%         13%
+
+  Regional/Rural            21%                                                  40%                  17%                12%   10%
+
+                   0%       20%                      40%                          60%                       80%                     100%
+
+
+                                                Housing Tenure
+                                               ALP     ONP           LNP         Grn    Oth
+
+         Renter                    27%                                     29%                16%                       17%     11%
+
+Mortgage Holder                   26%                              25%                         23%                12%          14%
+
+   Home Owner                     26%                              25%                                    29%           9%      11%
+                  0%        20%                      40%                         60%                        80%                     100%
+
+
+
+
+                                                                                                                               11
+                Voting Intention: Past Election Vote
+
+
+                                       2025 Federal Election Vote
+                                                   ALP     ONP    LNP   Grn   Oth
+
+
+     ALP 2025 Vote                                                                  74%          14%   6%
+
+
+    L/NP 2025 Vote                            32%                                                           63%
+
+
+     Grn 2025 Vote          7%                                                                               91%
+
+
+    ONP 2025 Vote                                                                                       96%
+
+
+     Oth 2025 Vote                     28%    5%                                                             66%
+
+
+No recall/Not voted        6%                27%                 18%                 25%                         24%
+
+                      0%         20%                     40%            60%                80%                    100%
+
+
+
+
+                                                                                                            12
+                Attitudes Towards US and Trump
+Q. Do you agree with the following statement:
+The United States is a reliable military ally for Australia
+
+                                               Yes             No       Don't Know
+
+                                                         28%
+                                                                                              47%
+                                              25%
+0%                 10%               20%                        30%                   40%           50%            60%
+
+
+
+Q. Which of the below is closest to your view regarding the Australian
+Governments relationship with US President Donald Trump
+                               The Australian Government should closely support President Trump
+
+                     The Australian Government should distance itself from President Trump          Don't Know
+
+                                                                                       40%
+Nov 24                                                                          37%
+                                                   23%
+                                                                              36%
+Jan 25                                                                                        45%
+                                       19%
+                                              22%
+April 26                                                                                                         59%
+                                       19%
+           0%            10%                 20%                      30%               40%           50%              60%
+
+                                                                                                                        13
+                Attitudes Towards US and Trump
+Q. Please indicate whether you agree or disagree with the following statements:
+Australia needs a Prime Minister like Donald Trump
+
+
+                                            Agree         Disagree     Don't Know
+
+
+                                            27%
+
+Jan 25                                                                                    59%
+
+                          14%
+
+
+                                19%
+
+April 26                                                                                              69%
+
+                     12%
+           0%       10%               20%           30%              40%            50%         60%         70%
+
+
+
+
+                                                                                                            14
+       Attitudes Towards US and Trump - Federal
+       Voting Intention Breakdowns
+Q. Do you agree with the following statement: The United States is a reliable military ally for Australia
+                                                                   Yes         Don't Know         No
+
+   ALP Fed VI                                  27%                             23%                                   50%
+  ONP Fed VI                                                 38%                             25%                     37%
+  L/NP Fed VI                                                      42%                        22%                    36%
+  Grn Fed VI               12%                   17%                                                                  71%
+  Oth Fed VI                 13%                                   28%                                               59%
+Undec Fed VI          8%                                                                     55%                     37%
+                0%                       20%                       40%                       60%              80%         100%
+
+
+Q. Which of the below is closest to your view regarding the Australian Government’s
+relationship with US President Donald Trump
+                                                           Close Support         Unsure           Distance
+
+   ALP Fed VI                      17%               15%                                                            68%
+  ONP Fed VI                                                38%                      17%                            45%
+  L/NP Fed VI                                    30%                     17%                                        53%
+  Grn Fed VI     4%         8%                                                                                      88%
+  Oth Fed VI               11%                               27%                                                    62%
+Undec Fed VI          8%                                                             47%                            45%
+                0%                       20%                       40%                      60%              80%     100%
+
+                                                                                                                            15
+           Attitudes Towards US and Trump - Federal
+           Voting Intention Breakdowns
+
+Q. Please indicate whether you agree or disagree with the following statements:
+Australia needs a Prime Minister like Donald Trump
+
+                                                     Agree     Don't Know    Disagree
+
+   ALP Fed VI             10%     6%                                                          84%
+  ONP Fed VI                                             41%         13%                      46%
+  L/NP Fed VI                          21%         14%                                        65%
+  Grn Fed VI         5%    6%                                                                 89%
+  Oth Fed VI                    14%          11%                                              75%
+Undec Fed VI                                             38%                                  59%
+                0%                     20%               40%                60%         80%    100%
+
+
+
+
+                                                                                                      16
+           Shortage of Affordable Housing
+Q.Out of the following issues, which do you believe is more to blame for the shortage of affordable housing
+in Australia?
+
+               The level of immigration         Unsure          Negative Gearing and Capital Gains Tax discounts for investors
+
+
+                                                                                                  51%
+
+
+                                     20%
+
+
+                                                         29%
+
+      0%                      10%         20%                  30%              40%               50%                  60%        70%
+
+
+                                                      Federal VI Breakdown
+                                                               The level of immigration     Unsure
+
+                                                Negative Gearing and Capital Gains Tax discounts for investors
+
+            ALP Fed VI                                               43%                    22%                              35%
+           ONP Fed VI                                                                                73%    6%               21%
+           L/NP Fed VI                                                                               72%           13%       15%
+           Grn Fed VI                           26%      8%                                                                  66%
+           Oth Fed VI                                                         52%                          27%               21%
+        Undec Fed VI                            27%                                                        51%               22%
+                         0%               20%                        40%                  60%                    80%             100%
+                                                                                                                                  17
+               Question Wording
+Q. If a Federal Election was held today, which one of the following would you vote for?
+Answers randomly listed except Don’t Know kept last
+Labor (with Anthony Albanese as Leader)
+Liberal National Coalition (with Angus Taylor as Leader)
+The Greens (with Larissa Waters as Leader)
+One Nation (with Pauline Hanson as Leader)
+Any Other Candidate
+Don't Know
+
+If respondent chose Don’t Know they were asked:
+Q. Being undecided, which of the following would you have even a slight leaning towards?
+Answers randomly listed except Don’t Know kept last - Answers as above
+
+Q. Who is your preferred Prime Minister
+Answers randomly listed except Don’t Know kept last
+Anthony Albanese (Labor)
+Angus Taylor (Liberal)
+Pauline Hanson (One Nation)
+Don't Know
+
+Q. What is your opinion on the following people?
+People randomly listed, answer order randomly flipped
+Answers: Positive, Neutral, Negative
+People Tested
+Anthony Albanese (Prime Minister, Labor)
+Angus Taylor (Opposition Leader, Liberal)
+Pauline Hanson (One Nation Leader)
+
+Q. Considering the following attributes, please indicate which you believe apply to <person tested>
+Attributes order randomly listed, answer order randomly flipped.
+Answers: Yes, Don’t Know, No
+People Tested
+Prime Minister Anthony Albanese
+Opposition Leader Angus Taylor
+One Nation Leader Pauline Hanson
+Attributes Tested: Arrogant, Likeable, Trustworthy, In touch with ordinary Australians, Competent, Has a vision for Australia, Decisive and strong, In control of their
+party                                                                                                                                                           18
+               Question Wording
+Q. In your opinion, what is the biggest issue facing Australia today?
+Open-ended answer
+
+Q. Out of the following issues, which do you believe is more to blame for the shortage of affordable housing in Australia?
+Answers randomly listed except Don’t Know kept last
+The level of immigration
+Negative Gearing and Capital Gains Tax discounts for investors
+Don’t Know
+
+Q. Do you agree with the following statement:
+The United States is a reliable military ally for Australia
+Answers randomly listed except Don’t Know kept last
+Yes
+No
+Don’t Know
+
+Q. Which of the below is closest to your view regarding the Australian Government’s relationship with US President Donald Trump
+Answers randomly listed except Don’t Know kept last
+The Australian Government should closely support President Trump
+The Australian Government should distance itself from President Trump
+Don’t Know
+
+Q. Please indicate whether you agree or disagree with the following statement:
+Australia needs a Prime Minister like Donald Trump
+Answers randomly listed except Don’t Know kept last
+Agree
+Disagree
+Don’t Know
+
+
+
+
+                                                                                                                                  19
+20
+

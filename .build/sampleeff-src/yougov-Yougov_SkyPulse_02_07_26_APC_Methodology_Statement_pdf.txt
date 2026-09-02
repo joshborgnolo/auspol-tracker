@@ -1,0 +1,192 @@
+                                                                        Ground Floor, 2-12 Mountain Street
+                                                                                         Ultimo NSW 2007
+                                                                                          +61 2 9406 5800
+                                                                                            au.yougov.com
+
+Publication date: 2nd July 2026
+
+
+ Short Methodology Statement
+
+ Research company                  YouGov Galaxy Pty Ltd
+
+ Client commissioning the          Sky News
+ research
+
+ Fieldwork dates                   23rd June – 30th June 2026
+
+ Mode of data collection           Online recruited from research panel (100%)
+
+ Target population                 Australians eligible to vote
+
+ Sample size                       1502
+
+ Australian Polling Council        Yes
+ compliant
+
+ URL of Long Methodology           https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?    Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after       1025
+ weighting applied
+
+ Margin of error associated with   ±3.099
+ effective sample size
+
+ Quotas and weighting              Age, Gender, Education, AEC region, household income, 2025
+                                   Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used             Rim weighting.
+
+ Full question text, responses     Below for published questions
+ categories and randomisation
+
+ Source of online sample           Selected from previously recruited online panels of research
+                                   participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention   After demographics
+ questions in questionnaire?
+
+ How were undecided voters         Voters were given an option to select “Don’t know” and were
+ handled?                          excluded from final figures
+
+ 2PP calculation method            2pp Labor v ex Coalition 2025 Federal election flows
+                                   2pp Labor v One Nation Survey respondent ordering of
+                                   preferences.
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomize
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Sussan Ley is doing Ask eligible
+                          her job as Leader of the Opposition?                               voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Sussan Ley
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+B1        Regardless of who you said you would vote for, which of the          Ask eligible
+          following would you seriously consider voting for in a Federal       voters
+          election?
+
+          Please select all options that you would seriously consider
+          voting for, including your current first choice
+          Multiple select, randomize
+     1.   Liberal National Coalition
+     2.   Pauline Hanson’s One Nation
+     3.   Labor
+     4.   The Greens
+     5.   I would not seriously consider voting for any of the above parties Fixed,
+                                                                             exclusive
+
+B2        Who of the following do you think Labor should select to replace Ask if would
+          Anthony Albanese if he unexpectedly stood down as Prime          seriously
+          Minister?                                                        consider
+                                                                           Labor
+          Please select the option that best applies                       (selected 3 in
+                                                                           B1)
+          Single select, randomize
+     1.   Richard Marles
+     2.   Tanya Plibersek
+     3.   Tony Burke
+     4.   Mark Butler
+     5.   Jim Chalmers
+     6.   Don't know                                                       Fixed
+
+B3        Thinking about house prices, what do you think would be best for
+          Australia overall, for house prices over the next two years?
+
+          Please select the option that best applies
+          Single select, rotate
+     1.   House prices to increase
+     2.   House prices to decrease
+     3.   House prices to stay the same                                        Fixed
+     4.   Don't know                                                           Fixed
+
+B4        Thinking about the National Disability Insurance Scheme, and it's
+          cost to the budget, do you think...
+
+          Please select the option that best applies
+          Single select, reverse
+     1.   It’s affordable and is money well spent
+     2.   It’s a lot of money but it is an important scheme
+     3.   It’s a lot of money and we need to find some savings
+     4.   It’s too much money and we need to find major savings
+
+B4        Compared to three months ago, how has your household's
+          financial situation changed?
+
+          Please select the option that best applies
+          Single select, reverse
+     1.   Worse
+     2.   No change
+
+
+
+                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+3.   Better
+4.   Don't know                                  Fixed
+
+
+
+
+                  YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

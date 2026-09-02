@@ -1,0 +1,100 @@
+                                                                        Ground Floor, 2-12 Mountain Street
+                                                                                         Ultimo NSW 2007
+                                                                                          +61 2 9406 5800
+                                                                                            au.yougov.com
+
+Publication date: 22nd December 2025
+
+
+ Short Methodology Statement
+
+ Research company                  YouGov Galaxy Pty Ltd
+
+ Client commissioning the          YouGov
+ research
+
+ Fieldwork dates                   15th December – 22nd December 2025
+
+ Mode of data collection           Online recruited from research panel (100%)
+
+ Target population                 Australians eligible to vote
+
+ Sample size                       1509
+
+ Australian Polling Council        Yes
+ compliant
+
+ URL of Long Methodology           https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?    Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after       848
+ weighting applied
+
+ Margin of error associated with   ±3.36
+ effective sample size
+
+ Quotas and weighting              Age, Gender, Education, AEC region, household income, 2025
+                                   Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used             Rim weighting.
+
+ Full question text, responses     Below for published questions
+ categories and randomisation
+
+ Source of online sample           Selected from previously recruited online panels of research
+                                   participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention   After demographics
+ questions in questionnaire?
+
+ How were undecided voters         NA
+ handled?
+
+ 2PP calculation method            NA
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+         Q1           NSW Police have stated the six weapons used in the Bondi        Ask eligible
+                      Beach attack were legally licensed to one of the attackers <ABC voters
+                      News source link>.
+
+                      In light of the attack, which of the following comes closest to your
+                      view about what Federal and State governments should do on
+                      gun laws?
+
+                      Please select the option that most closely applies to your
+                      views
+                      Single select, reverse
+                 1.   Make it illegal to own these types of weapons
+                 2.   Keep it legal but review and tighten licensing rules
+                 3.   Keep it legal and make no change to gun laws
+                 4.   Prefer not to say                                                      Fixed
+
+         Q2           To what extent do you agree or disagree with the following             Ask eligible
+                      statement...                                                           voters
+
+                      Ahmed al Ahmed, the man who disarmed one of the Bondi
+                      gunmen, deserves to be made Australian of the Year?
+
+                      Please select the option that best applies
+                      Single select, reverse
+                 1.   Agree
+                 2.   Disagree
+                 3.   Prefer not to say                                                      Fixed
+
+
+
+
+                                                             YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

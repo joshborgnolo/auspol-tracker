@@ -1,0 +1,141 @@
+                       Gazette National Poll
+                             April 27-29 2025
+
+Primary Vote
+
+      Federal Voting Intention         PV       Change from 2022
+
+               Labor                  29%             -3.6%
+
+   Liberal / National Coalition       32%             -3.7%
+
+           The Greens                  12%            -0.2%
+
+   Pauline Hanson's One Nation         9%             4.0%
+
+      Any Other Candidate              18%            3.5%
+                                                  7% undecided excluded
+
+
+
+Others Breakdown
+
+               Party                  PV%       Change from 2022
+
+          Independent                 7%              1.7%
+
+       Trumpet of Patriots            3%              -1.4%
+
+           Family First               2%              2.0%
+
+           Libertarian                1%              -0.7%
+
+     Legalise Cannabis Party          1%              1.0%
+
+      Animal Justice Party            1%              0.4%
+
+
+              Others                  3%              0.5%
+
+
+
+
+Two Party Preferred
+               Party                  %         Change from 2022
+
+             ALP TPP                  51%             -1.1%
+
+          Coaltion TPP                49%             +1.1%
+ ABOUT THIS POLL
+
+Publication date: 1 May 2025
+Methodology Statement
+
+
+Research company                            DemosAU
+
+Client commissioning the research           Gazette News
+
+End client                                  Gazette News
+
+Fieldwork dates                             27-29 April 2025
+
+Mode of data collection                     Online via Internet panels
+
+Target population                           Australian adults 18+ who are registered and intending to vote at
+                                            the 2025 Federal Election
+
+
+Sample size                                 1974
+
+Is voting intention published?              Yes
+
+
+Effective sample size after weighting       1206
+applied
+
+Margin of error associated with effective   +/- 2.8%
+sample size
+
+Variables used in weighting                 Age x gender, education, income, state x region, housing tenure,
+                                            2022 Federal Election vote.
+
+Weighting method used                       Rim weighting
+
+
+Full question text, responses categories    As set out on page 3.
+and randomisation
+
+Proportion of landline/mobile               Nil
+completed interviews
+
+Source of online sample                     Internet Panels (100%)
+
+Positioning of voting intention questions   Federal Voting Intention question asked immediately after
+in questionnaire?                           demographic questions.
+
+
+How were undecided voters handled?          Undecided voters were asked a leaner question. If still undecided
+                                            excluded from VI totals.
+
+2PP calculation method                      Preference flows from 2022 federal election are applied with the
+                                            exception of One Nation and Family First which are assigned
+                                            2024 Queensland election preference flows.
+ QUESTION
+ FORMAT
+For voting intention questions, all respondents were presented with the final list of nominated candidates in ballot
+paper order for their electorate.
+
+A sample electorate question is set out below
+
+Q. If a Federal Election for the Adelaide electorate was held today, which one of the following candidates would
+you vote for?
+
+Answers (Candidates in ballot paper order with Don't Know at end)
+
+Lionel Pengilley (Animal Justice Party)
+Steve Georganas (Australian Labor Party)
+Steve Marks (Trumpet of Patriots)
+Mat Monti (The Greens)
+Matthew McMillan (FUSION | Planet Rescue | Whistleblower Protection | Innovation)
+Riley Size (Pauline Hanson's One Nation)
+Amy Grantham (Liberal)
+Don’t know
+
+If a respondent chose don’t know they were asked a follow up leaner question in the following terms with the same
+answer options.
+
+Q. Being undecided, if a Federal Election for the Adelaide electorate was held today which of the following would
+you have a slight leaning towards?
+
+Answers (Candidates in ballot paper order)
+
+Lionel Pengilley (Animal Justice Party)
+Steve Georganas (Australian Labor Party)
+Steve Marks (Trumpet of Patriots)
+Mat Monti (The Greens)
+Matthew McMillan (FUSION | Planet Rescue | Whistleblower Protection | Innovation)
+Riley Size (Pauline Hanson's One Nation)
+Amy Grantham (Liberal)
+Don’t know
+

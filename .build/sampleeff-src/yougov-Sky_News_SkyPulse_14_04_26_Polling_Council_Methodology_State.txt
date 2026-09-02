@@ -1,0 +1,184 @@
+                                                                         Ground Floor, 2-12 Mountain Street
+                                                                                          Ultimo NSW 2007
+                                                                                           +61 2 9406 5800
+                                                                                             au.yougov.com
+
+Publication date: 21st April 2026
+
+
+ Short Methodology Statement
+
+ Research company                   YouGov Galaxy Pty Ltd
+
+ Client commissioning the           Sky News
+ research
+
+ Fieldwork dates                    14th April – 21st April 2026
+
+ Mode of data collection            Online recruited from research panel (100%)
+
+ Target population                  Australians eligible to vote
+
+ Sample size                        1501
+
+ Australian Polling Council         Yes
+ compliant
+
+ URL of Long Methodology            https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?     Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after        1059
+ weighting applied
+
+ Margin of error associated with    ±3.011
+ effective sample size
+
+ Quotas and weighting               Age, Gender, Education, AEC region, household income, 2025
+                                    Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used              Rim weighting.
+
+ Full question text, responses      Below for published questions
+ categories and randomisation
+
+ Source of online sample            Selected from previously recruited online panels of research
+                                    participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention    After demographics
+ questions in questionnaire?
+
+ How were undecided voters          Voters were given an option to select “don’t know”. Don’t know
+ handled?                           were excluded from final figures
+
+ 2PP calculation method             2pp Labor v ex Coalition 2025 Federal election flows
+                                    2pp Labor v One Nation Survey respondent ordering of
+                                    preferences.
+
+
+
+
+                                                           YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomise
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Angus Taylor is        Ask eligible
+                          doing his job as Leader of the Opposition?                            voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Angus Taylor
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+A10_A11        Which of the following do you think would make the best Prime        Ask eligible
+               Minister?                                                            voters
+
+               Please select one option only
+               Single select, reverse
+          1.   Anthony Albanese
+          2.   Pauline Hanson
+          3.   Don’t know                                                           Fixed
+
+B1             How serious of a problem do you think anti-semitism is in the       Ask eligible
+               Australia?                                                          voters
+
+               Please select the option that best applies
+               Single select, reverse
+          1.   A very serious problem
+          2.   A somewhat serious problem
+          3.   A minor problem
+          4.   Not a problem
+          5.   Not sure                                                            Fixed
+
+B2             Thinking about your access to medical treatment for you and         Ask eligible
+               your family, in the past 12 months...                               voters
+
+               Which of the following best describes your situation?
+               Single select, reverse
+          1.   I or a family member have always been able to get affordable
+               care that we need
+          2.   I or a family member struggled to pay but have been able to get
+               the care that we need
+          3.   I or a family member have delayed medical treatment because of
+               the access or cost
+
+B3             Would you support Australia increasing gas and oil exploration      Ask eligible
+               and production domestically, even if it undermined legislated       voters
+               2050 net zero emissions commitments?
+
+               Please select the option that best applies
+               Single select, randomise
+          1.   Yes
+          2.   No
+          3.   Unsure                                                              Fixed
+
+B4             Would you support the Australia Government spending $20           Ask eligible
+               billion over four years to meet the International Energy Agency's voters
+               requirement for a 90-day fuel supply reserve?
+
+               Please select the option that best applies
+               Single select, reverse
+          1.   Strongly support
+          2.   Support
+          3.   Oppose
+          4.   Strongly oppose
+          5.   Don’t know                                                          Fixed
+
+
+
+
+                                                    YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

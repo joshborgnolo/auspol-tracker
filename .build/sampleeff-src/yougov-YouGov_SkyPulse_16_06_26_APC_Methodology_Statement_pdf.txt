@@ -1,0 +1,199 @@
+                                                                        Ground Floor, 2-12 Mountain Street
+                                                                                         Ultimo NSW 2007
+                                                                                          +61 2 9406 5800
+                                                                                            au.yougov.com
+
+Publication date: 17th June 2026
+
+
+ Short Methodology Statement
+
+ Research company                  YouGov Galaxy Pty Ltd
+
+ Client commissioning the          Sky News
+ research
+
+ Fieldwork dates                   9th June – 16th June 2026
+
+ Mode of data collection           Online recruited from research panel (100%)
+
+ Target population                 Australians eligible to vote
+
+ Sample size                       1492
+
+ Australian Polling Council        Yes
+ compliant
+
+ URL of Long Methodology           https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?    Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after       969
+ weighting applied
+
+ Margin of error associated with   ±3.148
+ effective sample size
+
+ Quotas and weighting              Age, Gender, Education, AEC region, household income, 2025
+                                   Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used             Rim weighting.
+
+ Full question text, responses     Below for published questions
+ categories and randomisation
+
+ Source of online sample           Selected from previously recruited online panels of research
+                                   participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention   After demographics
+ questions in questionnaire?
+
+ How were undecided voters         Voters were given an option to select “don’t know”. Dont know
+ handled?                          were excluded from final figures
+
+ 2PP calculation method            2pp Labor v ex Coalition 2025 Federal election flows
+                                   2pp Labor v One Nation Survey respondent ordering of
+                                   preferences.
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomize
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Sussan Ley is doing Ask eligible
+                          her job as Leader of the Opposition?                               voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Sussan Ley
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+B1        Regardless of who you said you would vote for, which of the           Ask eligible
+          following would you seriously consider voting for in a Federal        voters
+          election?
+
+          Please select all options that you would seriously consider
+          voting for, including your current first choice
+          Multiple select, randomize
+     1.   Liberal National Coalition
+     2.   Pauline Hanson’s One Nation
+     3.   Labor
+     4.   The Greens
+     5.   I would not seriously consider voting for any of the above parties Fixed,
+                                                                             exclusive
+
+B2        How would you describe One Nation’s ability to govern?                Ask if would
+          Please select the option that best applies                            seriously
+                                                                                consider One
+                                                                                Nation
+                                                                                (selected 2 in
+                                                                                B1)
+          Single select, reverse
+     1.   I think they are ready to govern Australia well now
+     2.   I don’t believe they are ready to govern now, but they will be
+          ready by the election in 2 years’ time
+     3.   I don’t believe they are ready to govern now, and I am not sure
+          they will be ready by the election in 2 years’ time
+     4.   I don’t believe the party will ever be ready to govern
+     5.   Not sure                                                              Fixed
+
+B3        Pauline Hanson’s One Nation is proposing a partial defunding of
+          the ABC $1.3 billion receives from the taxpayer by partially
+          shifting its financing from the taxpayer to optional subscriptions.
+          Which of these statements best matches your view?
+
+          Single select, reverse
+     1.   I support this and would personally pay to subscribe and support
+          the ABC
+     2.   I support this and would choose not to personally subscribe to
+          pay for the ABC
+     3.   I oppose this proposal
+     4.   I did not vote in the last Federal election                      Fixed
+
+B4        Which best describes how secure you feel Australia is from
+          external threats?
+          Please select the option that best applies
+
+          Single select, reverse
+     1.   Australia is secure from realistic external threats
+     2.   Australia is fairly secure now, but I am concerned we may not be
+          in the future
+     3.   Australia is not secure, and we need to urgently do more to
+          protect ourselves
+
+B4        Thinking about your access to medical treatment for you and
+          your family, in the past 12 months...
+
+
+
+                                                 YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+     Which of the following best describes your situation?
+
+     Single select, reverse
+1.   I or a family member have always been able to get affordable
+     care that we need
+2.   I or a family member struggled to pay but have been able to get
+     the care that we need
+3.   I or a family member have delayed medical treatment because of
+     the access or cost
+
+
+
+
+                                         YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

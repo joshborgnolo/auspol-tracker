@@ -1,0 +1,166 @@
+                                                                        Ground Floor, 2-12 Mountain Street
+                                                                                         Ultimo NSW 2007
+                                                                                          +61 2 9406 5800
+                                                                                            au.yougov.com
+
+Publication date: 11th November 2025
+
+
+ Short Methodology Statement
+
+ Research company                  YouGov Galaxy Pty Ltd
+
+ Client commissioning the          Sky News
+ research
+
+ Fieldwork dates                   5th November – 11th November 2025
+
+ Mode of data collection           Online recruited from research panel (100%)
+
+ Target population                 Australians eligible to vote
+
+ Sample size                       1502
+
+ Australian Polling Council        Yes
+ compliant
+
+ URL of Long Methodology           https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?    Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after       948
+ weighting applied
+
+ Margin of error associated with   ±3.183
+ effective sample size
+
+ Quotas and weighting              Age, Gender, Education, AEC region, household income, 2025
+                                   Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used             Rim weighting.
+
+ Full question text, responses     Below for published questions
+ categories and randomisation
+
+ Source of online sample           Selected from previously recruited online panels of research
+                                   participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention   After demographics
+ questions in questionnaire?
+
+ How were undecided voters         Voters were given an option to select “don’t know”
+ handled?
+
+ 2PP calculation method            Voters who selected don’t know were excluded from the 2PP
+                                   calculation. Past Federal election vote preferences used to
+                                   calculate 2pp.
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomize
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Sussan Ley is doing Ask eligible
+                          her job as Leader of the Opposition?                               voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Sussan Ley
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+B1        Thinking about the financial situation in your household, would      Ask eligible
+          you say you are…                                                     voters
+          Single select, reverse
+     1.   Very comfortable
+     2.   Somewhat comfortable
+     3.   Neither comfortable nor struggling
+     4.   Struggling somewhat
+     5.   Struggling a lot
+
+B2        Thinking about overall immigration to Australia, including total     Ask eligible
+          number of people leaving and arriving, do you think we need…         voters
+          Single select, reverse
+     1.   A big increase in migration
+     2.   A small increase in migration
+     3.   Migration levels to stay about the same
+     4.   A small decrease in migration
+     5.   A big decrease in migration
+
+B3        Australia is introducing a social media ban for children under the Ask eligible
+          age 16 beginning on December 10. Do you support or oppose          voters
+          the ban?
+
+          Single select, reverse
+     1.   Strongly Support
+     2.   Somewhat support
+     3.   Neither
+     4.   Somewhat Oppose
+     5.   Strongly Oppose
+
+B4        Which is closest to your view about the alliance with the United     Ask eligible
+          States?                                                              voters
+          Single select, rotate
+     1.   We can rely upon the United States to support Australia in
+          defending itself
+     2.   We cannot rely upon the United States to support Australia in
+          defending itself
+
+
+
+
+                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

@@ -1,0 +1,208 @@
+                                                                                          Suite 6.01, Level 6,
+                                                                      59 Goulburn Street, Sydney, NSW 2000
+                                                                                            +61 2 9406 5800
+                                                                                              au.yougov.com
+
+Publication date: 11th August 2026
+
+
+ Short Methodology Statement
+
+ Research company                    YouGov Galaxy Pty Ltd
+
+ Client commissioning the            News24
+ research
+
+ Fieldwork dates                     Aug 4th – 11th August 2026
+
+ Mode of data collection             Online recruited from research panel (100%)
+
+ Target population                   Australians eligible to vote
+
+ Sample size                         1511
+
+ Australian Polling Council          Yes
+ compliant
+
+ URL of Long Methodology             https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?      Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after         1017
+ weighting applied
+
+ Margin of error associated with     ±3.073
+ effective sample size
+
+ Quotas and weighting                Age, Gender, Education, AEC region, household income, 2025
+                                     Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used               Rim weighting.
+
+ Full question text, responses       Below for published questions
+ categories and randomisation
+
+ Source of online sample             Selected from previously recruited online panels of research
+                                     participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention     After demographics
+ questions in questionnaire?
+
+ How were undecided voters           Voters were given an option to select “Don’t know” and were
+ handled?                            excluded from final figures
+
+ 2PP calculation method              2pp Labor v ex Coalition 2025 Federal election flows
+                                     2pp Labor v One Nation Survey respondent ordering of
+                                     preferences.
+
+
+
+
+                                                            YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomize
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Angus Taylor is        Ask eligible
+                          doing his job as Leader of the Opposition?                            voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Angus Taylor
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+A10_A11        Which of the following do you think would make the best Prime          Ask eligible
+               Minister?                                                              voters
+
+               Please select one option only
+               Single select, reverse
+          1.   Anthony Albanese
+          2.   Pauline Hanson
+
+
+Q1             Thinking about the financial situation in your household, would       Ask eligible
+               you say you are...                                                    voters
+
+               Please select the option that best applies
+               Single select, reverse
+          1.   Very comfortable
+          2.   Somewhat comfortable
+          3.   Neither comfortable nor struggling
+          4.   Struggling somewhat
+          5.   Struggling a lot
+
+Q2             What do you expect will happen to interest rates over the coming Ask eligible
+               12 months?                                                       voters
+
+               Please select the option that best applies
+               Single select, reverse
+          1.   Increase a lot
+          2.   Increase somewhat
+          3.   Increase a little
+          4.   Stay about the same
+          5.   Decrease a little
+          6.   Decrease somewhat
+          7.   Decrease a lot
+          8.   Don’t know                                                            Fixed
+
+Q3             Politicians are allowed to charge donors any sum of money they Ask eligible
+               want to attend fundraising events.                             voters
+
+               Which of the following options best reflects your view on
+               this practice?
+               Single select, reverse
+          1.   It’s fine as long as it is declared in the usual way under donation
+               laws
+          2.   It’s fine but disclosure laws around declaring money should be
+               better
+          3.   The amount a politician can charge donors to attend an event
+               should be capped at $500 to avoid any real or perceived
+               influence on politics
+
+Q4             A filmmaker contestant on the ABC’s Race around the world             Ask eligible
+               program recently said:                                                voters
+
+               “Because when the revolution comes, will you hide under your
+               bed or will you know exactly how to shove a stick right up Gina
+               Rinehart’s butthole, stirring it round, mixing her guts up nice and
+
+
+
+
+                                                      YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+     smooth, making her into one big sausage roll, to make something
+     outta nothing”
+
+     The contestant has subsequently apologised saying
+
+     “Unfortunately, jokes do not land with everyone. Its purpose was
+     never to be taken literally. I apologise to anyone I’ve offended.”
+
+     The ABC published the prerecorded film on its Race around the
+     world program and there have been calls for the ABC to also
+     issue an apology.
+
+     Which is closest to your view about what the ABC should do?
+
+     Single select, reverse
+1.   Issue an apology
+2.   Not issue an apology
+3.   Don’t know                                                           Fixed
+
+
+
+
+                                           YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

@@ -1,0 +1,144 @@
+                                                                       Ground Floor, 2-12 Mountain Street
+                                                                                        Ultimo NSW 2007
+                                                                                         +61 2 9406 5800
+                                                                                           au.yougov.com
+
+Publication date: 18th April 2025
+
+
+ Short Methodology Statement
+
+ Research company                   YouGov Galaxy Pty Ltd
+ Client commissioning the           YouGov Public Data Poll
+ research
+ Fieldwork dates                    April 11th – April 15th 2025
+ Mode of data collection            Online recruited from research panel (100%)
+ Target population                  Australians eligible to vote
+ Sample size                        1506
+ Australian Polling Council         Yes
+ compliant
+ URL of Long Methodology            https://au.yougov.com/about/panel-methodology/australian-
+                                    polling-council
+ statement
+ Is voting intention                Yes
+ published?
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after        959
+ weighting applied
+ Margin of error associated         ±3.3
+ with effective sample size
+ Quotas and weighting               Age, Gender, Education, AEC region, household income,
+                                    Weighting by Federal and Referendum vote
+ Weighting method used              Rim weighting
+ Full question text, responses      See below
+ categories and randomisation
+ Source of online sample            Selected from previously recruited online panels of research
+                                    participants using quotas based on weighting frame and
+                                    past vote.
+ Positioning of voting              NA
+ intention questions in
+ questionnaire?
+
+
+
+                                                         YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+ How were undecided voters          Forced choice. Undecided not an option
+ handled?
+ 2PP calculation method             Calculated using a statistical model with a blend of survey
+                                    reported preference and previous federal election flows
+                                    details found here:
+                                    https://au.yougov.com/politics/articles/51585-auelection-
+                                    mrp-methodology
+
+Full Question Text of Published Questions
+
+    VI     If a federal election for the House of Representatives was held tomorrow, Ask eligible
+           and these parties were on the ballot in your electorate, how would you       voters
+           vote? In line with the Australian electoral law, you must number all parties
+           in order of your preference.
+
+           Ranking, randomise
+     1     The Labor Party
+
+     2     <if displayCoalition == 1> The Liberal/National Coalition
+
+     3     <4 if geo_state_au ==QLD> The Liberal National Party (LNP)
+
+     4      The Greens
+
+     5     <if displayOneNation==1> Pauline Hanson's One Nation
+
+     6     Trumpet of Patriots                                                           Fixed
+
+     7     An independent candidate                                                      Fixed
+
+     8     A candidate from another party                                                Fixed
+
+                                                                                         ,
+
+
+    A4      Thinking now about the leaders of the major parties. Are you satisfied or    Ask if eligible
+            dissatisfied with the way Anthony Albanese is doing his job as Prime         to vote i.e.
+            Minister?                                                                    code 1 in A1
+            Please select one option only
+            Single select
+         1. Satisfied
+         2. Dissatisfied
+         3. Don’t know
+
+    A5      While you may have no strong feelings either way, would you be more          Ask if don’t
+            inclined to say you have been satisfied or dissatisfied with the way         know i.e. code
+            Anthony Albanese is doing his job as Prime Minister?                         3 in A4. Code
+            Please select one option only                                                1-2 go to A6
+            Single select
+         1. Satisfied
+         2. Dissatisfied
+         3. Don’t know
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+A6      Are you satisfied or dissatisfied with the way Peter Dutton is doing his job Ask all eligible
+        as Leader of the Opposition?                                                 to vote i.e.
+        Please select one option only                                                code 1 in A1
+        Single select
+     1. Satisfied
+     2. Dissatisfied
+     3. Don’t know
+
+A7      While you may have no strong feelings either way, would you be more            Ask if don’t
+        inclined to say you have been satisfied or dissatisfied with the way Peter     know i.e. code
+        Dutton is doing his job as Leader of the Opposition?                           3 in A6. Code
+        Please select one option only                                                  1-2 go to A8
+        Single select
+     1. Satisfied
+     2. Dissatisfied
+     3. Don’t know
+
+A8     Which of the following do you think would make the best Prime Minister?         Ask all eligible
+       Please select one option only                                                   to vote i.e.
+                                                                                       code 1 in A1
+        Single select; ROTATE 1-2
+     1. Anthony Albanese
+     2. Peter Dutton
+     3. Don’t know                                                                     Fixed
+
+A9     If you had to choose, which one of the two leaders do you think would           Ask if don’t
+       make the better Prime Minister?                                                 know i.e. code
+       Please select one option only                                                   3 in A8. Code
+                                                                                       1-2 go to B1
+        Single select; ROTATE 1-2
+     1. Anthony Albanese
+     2. Peter Dutton
+     3. Don’t know                                                                     Fixed
+
+
+
+
+                                                        YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

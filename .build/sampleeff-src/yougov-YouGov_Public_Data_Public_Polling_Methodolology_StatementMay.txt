@@ -1,0 +1,89 @@
+                                                                        Ground Floor, 2-12 Mountain Street
+                                                                                         Ultimo NSW 2007
+                                                                                          +61 2 9406 5800
+                                                                                            au.yougov.com
+
+Publication date: 1 May 2025
+
+ Short Methodology Statement
+ Research company                  YouGov Galaxy Pty Ltd
+
+ Client commissioning the          YouGov public data project- No Client
+ research
+
+ Fieldwork dates                   1st of April and 29th April 2025
+
+ Mode of data collection           Online recruited from research panel (100%)
+
+ Target population                 Australians eligible to vote
+
+ Sample size                       35,185
+
+ Australian Polling Council        Yes
+ compliant
+
+ URL of Long Methodology           https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?    Yes
+
+
+ Long Methodology Statement
+
+ Effective sample size             10,822
+
+ Margin of error associated with   Not applicable for Bayesian MRP models – credible intervals for
+ effective sample size             national vote shares range between 1.4% (Others) to 2.6%
+                                   (Labour), with an average of 2pts.
+
+ Quotas and weighting              Not applicable for MRP models – post-stratification frame
+                                   includes age, gender, education, past voting behaviour,
+                                   country of birth, and location
+ Weighting method used             Bayesian post-stratification estimation
+
+ Full question text, responses     See below
+ categories and randomisation
+
+ Source of online sample           Selected from previously recruited online panels of research
+                                   participants.
+
+ Positioning of voting intention   After demographics
+ questions in questionnaire?
+
+ How were undecided voters         Voters were not given and undecided choice.
+ handled?
+
+ 2PP calculation method            Calculated using a statistical model with a blend of survey
+                                   reported preference and previous federal election flows details
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+                                                  found here: https://au.yougov.com/politics/articles/51585-
+                                                  auelection-mrp-methodology
+
+
+Full Question Text of Published Questions
+ Prior to close of nominations this generic ballot question was asked and. After close of nominations voters were asked the
+named candidates on their electorate.
+        A1          If a federal election for the House of Representatives was held tomorrow, and these parties
+                    were on the ballot in your electorate, how would you vote?
+
+                  In line with the Australian electoral law, you must number all parties in order of your
+                  preference.
+                  Ranking, ROTATE 1-8
+               1. The Labor Party
+               2. The Liberal/National Coalition (if not QLD)
+               3. The LNP (if QLD)
+               4. The Greens
+               5. Pauline Hanson’s One Nation
+               6. An independent candidate                                                                      Fixed
+               7. Trumpets of Patriots                                                                          Fixed
+               8 A candidate from another party                                                                 Fixed
+
+
+
+
+                                                                              YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

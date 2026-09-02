@@ -58,6 +58,15 @@ export function validate(D) {
     //     weird source.
     if (p.releaseUrl != null && (typeof p.releaseUrl !== "string" || !/^https:\/\/.+\..+\//.test(p.releaseUrl)))
       fail("release-url", `releaseUrl = ${JSON.stringify(p.releaseUrl)}`);
+    // 2d. sampleEff (the house's published effective sample size) is a whole
+    //     number never below 200 and never above its own raw sample – a
+    //     design effect can only deflate. Absent-not-filled means the house
+    //     files no such figure (or, for DemosAU/YouGov MRPs, "n/a for MRP"),
+    //     it is never a zero.
+    if (p.sampleEff != null && (!Number.isInteger(p.sampleEff) || p.sampleEff < 200))
+      fail("sample-eff", `sampleEff = ${JSON.stringify(p.sampleEff)}`);
+    if (p.sampleEff != null && p.sample > 0 && p.sampleEff > p.sample * 1.05)
+      fail("sample-eff", `sampleEff ${p.sampleEff} exceeds raw sample ${p.sample}`);
     // 3. dates parse, run oldest→newest, and fieldwork starts before it ends
     const ts = Date.parse(p.date);
     if (isNaN(ts)) fail("bad-date", `unparseable date "${p.date}"`);
