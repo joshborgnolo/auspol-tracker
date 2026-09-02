@@ -1518,8 +1518,8 @@ function MethodNote({ onInfo }) {
     <footer className="method method-slim">
       <ReportError onInfo={onInfo} />
       <div className="disclaimer">
-        Unofficial aggregate of published national polling. Aggregate figures are estimates, not
-        measurements – treat decimal places gently.
+        Unofficial aggregate of published national polling. Aggregate figures are estimates only.
+        Full archives <a href="https://auspoltracker.com/archives">here</a>.
       </div>
     </footer>
   );

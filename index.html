@@ -351,6 +351,8 @@ body {
 .ss-table th[scope="row"], .ss-table thead th:first-child { text-align: left; font-weight: 600; }
 .ss-table td:nth-child(2) { text-align: left; }
 .ss-note { margin-top: 20px; font-size: 12.5px; color: var(--ink-3); }
+.ss-note a { color: var(--ink-2); }
+.ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 .boot-noscript {
   max-width: 680px; margin: 0 auto 12vh; padding: 16px 26px;
   font-family: var(--sans); font-size: 14px; line-height: 1.5; color: var(--ink-2);
@@ -3765,7 +3767,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
       <p>Roy Morgan, YouGov, Newspoll, Resolve, RedBridge / Accent, Essential, DemosAU, Freshwater, Spectre Strategy, Fox &amp; Hedgehog, DemosAU (MRP), Wolf &amp; Smith, YouGov (MRP), RedBridge / Accent (MRP), Roy Morgan (SMS), Agenda C Synesis. Field dates and sample sizes are listed per poll in the archive.</p>
 
       <p class="ss-note">Unofficial aggregate of published national polling. Aggregate figures are
-        estimates, not measurements &#8211; treat decimal places gently.</p>
+        estimates only. Full archives <a href="https://auspoltracker.com/archives">here</a>.</p>
     </article>
   
   <!-- "supplemental" is a reader-engine signal, not styling: Mozilla
@@ -18485,7 +18487,9 @@ function MethodNote({
     onInfo: onInfo
   }), /*#__PURE__*/React.createElement("div", {
     className: "disclaimer"
-  }, "Unofficial aggregate of published national polling. Aggregate figures are estimates, not measurements \u2013 treat decimal places gently."));
+  }, "Unofficial aggregate of published national polling. Aggregate figures are estimates only. Full archives ", /*#__PURE__*/React.createElement("a", {
+    href: "https://auspoltracker.com/archives"
+  }, "here"), "."));
 }
 
 // Sticky score anchor – RETIRED: the 2PP readout now docks into the sticky

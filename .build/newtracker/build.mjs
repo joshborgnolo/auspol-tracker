@@ -444,7 +444,7 @@ function buildStaticSummary() {
       <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
 
       <p class="ss-note">Unofficial aggregate of published national polling. Aggregate figures are
-        estimates, not measurements &#8211; treat decimal places gently.</p>
+        estimates only. Full archives <a href="https://auspoltracker.com/archives">here</a>.</p>
     </article>`;
 }
 
