@@ -2167,6 +2167,8 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
      from, not what it found, so it sits below the sentences that carry the
      figures and never competes with them for the eye. */
   --pd-meta: 12px;
+  /* the approach to a figure - see the .pd-lab + b rule */
+  --pd-figspace: 7px;
   --pd-fig: 20px;     /* a percentage inside a sentence */
   --pd-mid: 22px;     /* national direction - the 2PP treatment, scaled down */
   --pd-hero: 40px;    /* the 2PP pair, the dominant element on the page */
@@ -2256,23 +2258,31 @@ body.dark .poll-detail {
    normal inside a label of more than one word ("don't know", "right
    direction"), which would otherwise loosen along with everything else.
 
-   Word-spacing rather than margins on purpose: a margin between two inline
-   groups survives a line break and hangs the wrapped line 8px in, which at
-   phone widths is most lines. A space collapses at the break, so the left
-   edge stays flush. */
+   Word-spacing rather than margins BETWEEN groups: a margin there survives a
+   line break and hangs the wrapped line in, which at phone widths is most
+   lines. A space collapses at the break, so the left edge stays flush. */
 .pd-s { word-spacing: 7px; }
-.pd-grp { word-spacing: 7px; }
 .pd-lab, .pd-mat { word-spacing: normal; }
 /* the matchup prefix names the line; against a 60px figure a bare word-space
    is not enough to read as a separate phrase */
 .pd-mat { margin-right: 4px; }
 .pd-s-hero .pd-mat { margin-right: 9px; }
-/* the headline pair is set larger, so its junction has to open with it */
-.pd-s-hero .pd-grp { word-spacing: 10px; }
-/* the parenthetical move belongs to the figure it annotates, so it keeps a
-   plain space – opened up, it reads as the next item in the run */
-.pd-s-chg { word-spacing: 4px; }
-.pd-s-hero .pd-s-chg { word-spacing: 7px; }
+/* Air goes BEFORE a figure, not after it. A word-space cannot tell the two
+   apart – it opens every gap in the line – so the approach is a margin on the
+   figure itself, set only where a label runs into one ("ALP 26%", "net −21").
+   What FOLLOWS a figure is that figure's own label ("45% ALP") and binds
+   tight to it; so does the parenthetical move, which is why .pd-s-chg drops
+   back to a plain space here.
+   Safe as a margin, unlike between groups, because .pd-grp is nowrap: a label
+   and its figure can never land on different lines, so this can never hang a
+   wrapped line in. */
+.pd-lab + b, .pd-lab + .netv { margin-left: var(--pd-figspace); }
+/* A small trailing gap remains, measured against the FIGURE rather than the
+   body: a plain word-space is set at 13.5px and all but disappears beside a
+   40px numeral, so "45% ALP" and "26% (▼5)" closed right up. 0.1em holds the
+   pair apart at every size while staying well under the approach above. */
+.pd-s b, .pd-s .netv { margin-right: 0.1em; }
+.pd-grp, .pd-s-chg { word-spacing: normal; }
 /* and the basis caption is a SENTENCE, not a run of pairs: only its own
    figure needs holding off, the prose behind it does not */
 .pd-s.pd-s-basis { word-spacing: 2px; }
@@ -2570,7 +2580,7 @@ button.acc-spread[aria-pressed="true"] {
     padding-left: 16px; padding-right: 16px;
   }
   .pd-s-hero { word-spacing: 5px; }
-  .pd-s-hero .pd-grp { word-spacing: 7px; }
+  .poll-detail { --pd-figspace: 5px; }
 }
 /* The values stay BESIDE their labels at every width. Stacking them cost six
    extra lines to buy back ~110px of a 341px measure that the labels were
