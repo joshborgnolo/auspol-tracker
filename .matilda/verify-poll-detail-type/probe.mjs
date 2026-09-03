@@ -201,6 +201,40 @@ try {
   }
   check(`no panel of ${n} pushes the page sideways at 375px`, worst <= 375, true);
   if (worst > 375) console.log(`       widest document: ${worst}px`);
+
+  /* The provenance list stays TWO COLUMNS at every width. It briefly stacked
+     label-over-value under 560px on the theory that the label column cost too
+     much of the measure - it does not: the values are longer than the labels,
+     so stacking bought ~110px of a 341px line and spent six extra rows on it.
+     Checked at 320px, where the controls wrap above the list to give it the
+     full width (see the 360px block). */
+  for (const w of [500, 390, 320]) {
+    await page.setViewport({ width: w, height: 1100 });
+    await new Promise((r) => setTimeout(r, 300));
+    await page.evaluate(`document.querySelectorAll(".exp-btn")[0].click()`);
+    await new Promise((r) => setTimeout(r, 350));
+    const m = await page.evaluate(`(() => {
+      const p = document.querySelector(".poll-detail");
+      const rows = [...p.querySelectorAll(".pd-meta-k")].map((k) => {
+        const v = k.nextElementSibling;
+        const kr = k.getBoundingClientRect(), vr = v.getBoundingClientRect();
+        // one line box, not one em: .pd-meta-items sets line-height 1.45
+        const ks = getComputedStyle(k);
+        const lh = (parseFloat(ks.lineHeight) || parseFloat(ks.fontSize) * 1.45) * 1.6;
+        return { label: k.textContent.trim(), beside: vr.left >= kr.right - 1,
+                 wrapped: kr.height > lh,
+                 overflows: Math.round(vr.right) > Math.round(p.getBoundingClientRect().right) };
+      });
+      return { n: rows.length,
+               notBeside: rows.filter((r) => !r.beside).map((r) => r.label),
+               wrapped: rows.filter((r) => r.wrapped).map((r) => r.label),
+               overflowing: rows.filter((r) => r.overflows).map((r) => r.label) };
+    })()`);
+    await page.evaluate(`document.querySelectorAll(".exp-btn")[0].click()`);
+    check(`${w}px: all ${m.n} values sit beside their label`, m.notBeside.join(",") || "none", "none");
+    check(`${w}px: no label wraps`, m.wrapped.join(",") || "none", "none");
+    check(`${w}px: no value runs past the panel`, m.overflowing.join(",") || "none", "none");
+  }
 } finally {
   await browser.close();
   server.close();

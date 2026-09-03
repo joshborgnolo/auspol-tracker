@@ -78,6 +78,15 @@ name/mode ladder rules live in the ≤480/≤430px blocks. Real phone widths hit
   the provenance label column, `--pd-body` 16px the sentences, `--pd-fig` 22px every
   published figure, `--pd-hero` 40px the first head-to-head. Change a token, not a rule;
   the `@media 720px/560px` blocks re-set the SAME tokens and nothing else.
+  - **The provenance list is two columns at EVERY width** — do not stack it
+    label-over-value on narrow screens. That was tried and reverted: the values
+    are longer than the labels, so stacking bought ~110px of a 341px line and
+    spent six extra rows buying it. The only structural narrow rule is
+    `@media (max-width: 360px)`, where `.pd-meta` wraps and `.pd-meta-tail`
+    takes `order: -1` so the controls sit ABOVE the list — wrapping them below
+    puts them between "House effect" and the ledger-rendered `.pd-rel` rows and
+    cuts the list in two. Probe asserts beside/no-wrap/no-overflow at 500, 390
+    and 320px.
   - `.pd-meta` is a flex band holding `.pd-meta-items`, a **two-column grid**
     (`var(--pd-lab) minmax(0,1fr)`). Each `.pd-meta-i` is `display: contents`, so its
     `.pd-meta-k` (11.5/600) and `.pd-meta-v` (14px) are the grid's real items — a meta

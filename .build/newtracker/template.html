@@ -2347,21 +2347,35 @@ button.acc-spread[aria-pressed="true"] {
 @media (max-width: 720px) {
   .poll-detail {
     padding: 12px 14px 22px 20px;
-    --pd-lab: 104px; --pd-hero: 32px; --pd-fig: 20px; --pd-body: 15px;
+    /* the label column narrows to the longest label ("Pollster's release")
+       plus a readable gutter, and no further: the value keeps the rest of the
+       line, which is the whole point of a two-column list */
+    --pd-lab: 110px; --pd-hero: 32px; --pd-fig: 20px; --pd-body: 15px;
   }
   .pd-s.pd-s-hero { font-size: 17px; }
   .pd-s.pd-s-basis { font-size: 13.5px; }
   .pd-meta-items { font-size: 13.5px; }
 }
-/* Below this the label column costs a third of the measure and the values it
-   aligns are shorter than the labels themselves, so the list stops being a
-   list of columns and becomes a list of stacked pairs. */
+/* The values stay BESIDE their labels at every width. Stacking them cost six
+   extra lines to buy back ~110px of a 341px measure that the labels were
+   already holding open — and every value the panel prints (a date and time, a
+   sample, a signed lean) fits the remainder at 320px. Only the headline steps
+   down here; the list's shape does not change. */
 @media (max-width: 560px) {
-  .pd-meta-items { grid-template-columns: minmax(0, 1fr); gap: 0; }
-  .pd-meta-k { margin-top: 10px; }
-  .pd-meta-items > .pd-meta-i:first-child > .pd-meta-k { margin-top: 0; }
-  .pd-rel { margin-top: 0; }
   .poll-detail { --pd-hero: 28px; }
+}
+/* On the smallest phones the docked controls take ~56px off EVERY row of the
+   list to serve one, and that is what pushes "-3.9 vs aggregate" onto a second
+   line. Below this they wrap under the list instead: one line spent once,
+   rather than a column of wrapped values. */
+@media (max-width: 360px) {
+  .pd-meta { flex-wrap: wrap; row-gap: 12px; }
+  .pd-meta-items { flex-basis: 100%; }
+  /* ABOVE the list, not after it: the release rows are rendered by the ledger
+     and land under this band, so a wrapped control at the band's end sits
+     between "House effect" and "Pollster's release" and cuts the list in two */
+  .pd-meta-tail { margin-left: 0; order: -1; }
+  .poll-detail { --pd-lab: 104px; }
 }
 
 /* ---------- colophon (the method footer) ----------
