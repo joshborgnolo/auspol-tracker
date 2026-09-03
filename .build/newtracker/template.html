@@ -2872,10 +2872,15 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
    .ap-head-side and never see these copies */
 .ap-jumps > .ap-facet, .ap-jumps > .ap-jumps-count { display: none; }
 @media (max-width: 560px) {
-  .ap-jumps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .ap-jumps > .ap-jump { justify-content: center; }
-  .ap-jumps > .ap-facet { display: inline-flex; justify-self: start; }
-  .ap-jumps > .ap-jumps-count { display: inline; align-self: center; justify-self: end; }
+  .ap-jumps { justify-content: space-between; column-gap: 10px; row-gap: 10px; }
+  /* ~45% basis keeps the pair filling the top line at any phone width and
+     pushes the facet pair onto the next line; nowrap drops away so a long
+     label wraps to a second line instead of overflowing a narrow phone */
+  .ap-jumps > .ap-jump { flex: 1 1 45%; justify-content: center; flex-wrap: wrap; font-size: 11px; padding: 4px 8px; gap: 5px; white-space: normal; text-align: center; line-height: 1.25; }
+  .ap-jumps > .ap-jump svg { width: 12px; height: 12px; flex: none; }
+  .ap-jumps > .ap-facet { display: inline-flex; gap: 6px; }
+  .ap-jumps > .ap-facet .tt-opt { font-size: 12px; letter-spacing: 0.01em; }
+  .ap-jumps > .ap-jumps-count { display: inline; align-self: center; margin-left: auto; }
   .ap-head-side { display: none; }              /* its two children each have a copy in .ap-jumps */
   .ap-bar-end .ap-count { display: none; }
 }
