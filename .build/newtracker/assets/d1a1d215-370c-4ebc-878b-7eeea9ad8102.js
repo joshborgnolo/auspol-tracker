@@ -2497,7 +2497,7 @@ function ArchLead({ p, measure, primaryFallback }) {
 // never width-hidden.
 const signed1 = (v) => (v > 0 ? "+" : "") + v.toFixed(1).replace("-", "\u2212");
 function ArchPollDetail({ p, onBack, backLabel }) {
-  const { PollLedger, pubStamp } = window;
+  const { PollLedger, pubStamp, releaseMetaRows } = window;
   /* The archive stores the unsure share and its change; the Latest table
      derives the residual instead. Same reading, two shapes – so the ledger
      takes the segments already built rather than guessing which it has. */
@@ -2543,6 +2543,9 @@ function ArchPollDetail({ p, onBack, backLabel }) {
       <span className="pd-meta-v">{signed1(p.lean)} vs aggregate</span></span>,
     p.hfx != null && <span className="pd-meta-i" key="hfx"><span className="pd-meta-k">House effect</span>
       <span className="pd-meta-v">{signed1(p.hfx.v)} vs consensus</span></span>,
+    /* the pollster's own pages close the list, in the same grid so their
+       values sit on the band's axis (builder shared with Latest polls) */
+    ...(releaseMetaRows ? releaseMetaRows(p) : []),
   ].filter(Boolean);
 
   const controls = [

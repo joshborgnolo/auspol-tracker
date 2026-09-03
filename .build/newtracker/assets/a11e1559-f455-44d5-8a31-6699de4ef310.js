@@ -1982,16 +1982,17 @@ function ApprLine({ id, appr, chg }) {
   );
 }
 
-// the whole breakdown – EVERYTHING the poll measured, ragged set and all.
-// `dirSegments` is passed in because the two tables build it from different
-// shapes of the same reading.
-function PollLedger({ r, dirSegments }) {
-  const tcs = tppContests(r);
-  const ppms = ppmContests(r);
-  const appr = r.appr || {};
-  const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
-  /* The release rows, in the provenance list's shape. Only rendered where the
-     wave actually has a page of its own. */
+/* The pollster's own pages, as rows for the provenance band. Built here, in
+   the file both tables share, but rendered INSIDE each table's own
+   .pd-meta-items so they land in the same grid as fieldwork and sample - a
+   second grid of their own could not keep its label column the same width as
+   the band's, and the values stopped lining up.
+
+   Where the citation in the row (`url`) is something else: the
+   RedBridge/Accent waves cite their AFR write-up but publish the report on
+   accent-research.com, and the Capital Brief-commissioned DemosAU waves cite
+   the Capital Brief piece but publish their report PDF on demosau.com. */
+function releaseMetaRows(r) {
   const relRows = [];
   if (r.releaseUrl) relRows.push(
     <span className="pd-meta-i" key="rel">
@@ -2035,21 +2036,19 @@ function PollLedger({ r, dirSegments }) {
       </span>
     </span>
   );
+  return relRows;
+}
+
+// the whole breakdown – EVERYTHING the poll measured, ragged set and all.
+// `dirSegments` is passed in because the two tables build it from different
+// shapes of the same reading.
+function PollLedger({ r, dirSegments }) {
+  const tcs = tppContests(r);
+  const ppms = ppmContests(r);
+  const appr = r.appr || {};
+  const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
   return (
     <div className="pd-simple">
-
-      {/* Pointers to the pollster's own pages, where the citation in the row
-          (`url`) is something else – the RedBridge/Accent waves cite their AFR
-          write-up but publish the report on accent-research.com, and the
-          Capital Brief-commissioned DemosAU waves cite the Capital Brief piece
-          but publish their statement-bearing report PDF on demosau.com.
-
-          These are provenance, not measures: they answer "where did this come
-          from", like fieldwork and sample, and not "what did it find". So they
-          take the meta band's label column rather than a kicker of their own,
-          and continue the list the band started – they ride the ledger (which
-          BOTH tables share) only so the rows show in both expansions. */}
-      {relRows.length > 0 && <div className="pd-meta-items pd-rel">{relRows}</div>}
 
       <PdSec label={tppHeading(tcs)} lead>
         {/* name the main pair's basis only when the flows second line joins
@@ -2185,6 +2184,7 @@ function PollDetail({ r }) {
                title="Effective sample as published by the pollster (APC methodology statement)">
             <span className="pd-meta-k">Effective sample</span>
             <span className="pd-meta-v">n = {r.sampleEff.toLocaleString()}</span></span>}
+          {releaseMetaRows(r)}
         </span>
       </div>
       <PollLedger r={r} dirSegments={r.dir ? dirSegs(r) : null} />
@@ -2830,7 +2830,7 @@ function PollsterTable() {
 Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
-  PollLedger, PdSec, TppLine, ApprLine, ChgParen,
+  PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows,
   // the archive prints publication stamps too, and there is only one way to
   // write one
   pubStamp });

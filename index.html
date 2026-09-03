@@ -2188,19 +2188,11 @@ body.dark .poll-detail {
    sample repeat their row columns so the open panel stands alone, and what
    no column ever prints (the archive's client, the published DATE, the
    pollster's own release page) rides the same label column */
-/* the release pointers are provenance too, so they take the list's shape and
-   its label column – they are rendered by the ledger (which both tables
-   share) and only LOOK like the last rows of the band above them */
-/* The release pointers break the grid: they read as a closing note to the
-   list rather than one more of its rows, so the label sits over its value and
-   the block takes its own clearance from the rows above. */
-.pd-meta-items.pd-rel {
-  display: block; margin: 14px auto 0; max-width: var(--pd-measure);
-}
-.pd-rel .pd-meta-i { display: block; }
-.pd-rel .pd-meta-i + .pd-meta-i { margin-top: 8px; }
-.pd-rel .pd-meta-k { display: block; margin-bottom: 2px; }
-.pd-rel .pd-meta-v { display: block; }
+/* the release pointers are provenance too - "where did this come from", like
+   fieldwork and sample - so they are ordinary rows of the same grid, values on
+   the band's own axis. They are built by a shared helper (releaseMetaRows) and
+   appended to each table's band, rather than rendered as a second grid, which
+   could not hold its label column to the same width as the band's. */
 
 /* ---------- the breakdown: headed sections of plain lines ----------
    Everything a poll published, set as running text: a tracked kicker, then
@@ -2510,17 +2502,39 @@ button.acc-spread[aria-pressed="true"] {
   .poll-detail {
     padding: 20px 20px 22px;
     /* only the gutter narrows - the label column sizes itself */
-    --pd-gut: 18px; --pd-hero: 32px; --pd-hero-w: 15px;
+    --pd-gut: 18px; --pd-hero: 27px; --pd-hero-w: 14px;
     --pd-mid: 19px; --pd-fig: 18px; --pd-body: 13px;
     --pd-note: 11px; --pd-hero-note: 12.5px;
   }
   .pd-sec { margin-top: 17px; padding-top: 15px; }
   .pd-k { margin-bottom: 9px; }
   .pd-meta-items { gap: 5px var(--pd-gut); }
-  .pd-meta-items.pd-rel { margin-top: 12px; }
+}
+/* On a phone the matchup name is what pushes a head-to-head onto a third
+   line: "ALP v L/NP: 53.5% ALP (▼0.5) vs 46.5% L/NP (▲0.5)" wants 441px and
+   has 296. It labels the line rather than belonging to the phrase, so it goes
+   above the figures and hands back all of its width. Applied to every matchup
+   line in the section, not just the headline one - three adjacent lines
+   treating the same element differently reads as a fault. */
+@media (max-width: 560px) {
+  .pd-mat { display: block; margin: 0 0 2px; }
 }
 @media (max-width: 430px) {
-  .poll-detail { --pd-gut: 14px; --pd-hero: 29px; }
+  .poll-detail { --pd-gut: 14px; --pd-hero: 24px; }
+}
+/* and one rung smaller again where the phone is narrow enough that even
+   24px figures can't keep the pair on one line (the name is already above
+   it, from 560px down - this is the widths where the figures alone
+   overflow). The same rung trims the panel's side padding by 8px and
+   closes the hero's word spacing: at 320px the All-polls detail measures
+   only 264px across, and every reclaimed pixel is one the pair can use. */
+@media (max-width: 360px) {
+  .poll-detail {
+    --pd-hero: 20px; --pd-hero-w: 12px; --pd-hero-note: 11.5px;
+    padding-left: 16px; padding-right: 16px;
+  }
+  .pd-s-hero { word-spacing: 5px; }
+  .pd-s-hero .pd-grp { word-spacing: 7px; }
 }
 /* The values stay BESIDE their labels at every width. Stacking them cost six
    extra lines to buy back ~110px of a 341px measure that the labels were
@@ -11192,19 +11206,17 @@ function ApprLine({
   })));
 }
 
-// the whole breakdown – EVERYTHING the poll measured, ragged set and all.
-// `dirSegments` is passed in because the two tables build it from different
-// shapes of the same reading.
-function PollLedger({
-  r,
-  dirSegments
-}) {
-  const tcs = tppContests(r);
-  const ppms = ppmContests(r);
-  const appr = r.appr || {};
-  const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
-  /* The release rows, in the provenance list's shape. Only rendered where the
-     wave actually has a page of its own. */
+/* The pollster's own pages, as rows for the provenance band. Built here, in
+   the file both tables share, but rendered INSIDE each table's own
+   .pd-meta-items so they land in the same grid as fieldwork and sample - a
+   second grid of their own could not keep its label column the same width as
+   the band's, and the values stopped lining up.
+
+   Where the citation in the row (`url`) is something else: the
+   RedBridge/Accent waves cite their AFR write-up but publish the report on
+   accent-research.com, and the Capital Brief-commissioned DemosAU waves cite
+   the Capital Brief piece but publish their report PDF on demosau.com. */
+function releaseMetaRows(r) {
   const relRows = [];
   if (r.releaseUrl) relRows.push(/*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
@@ -11260,11 +11272,23 @@ function PollLedger({
     className: "plink-mark",
     "aria-hidden": "true"
   }, "\u2197")))));
+  return relRows;
+}
+
+// the whole breakdown – EVERYTHING the poll measured, ragged set and all.
+// `dirSegments` is passed in because the two tables build it from different
+// shapes of the same reading.
+function PollLedger({
+  r,
+  dirSegments
+}) {
+  const tcs = tppContests(r);
+  const ppms = ppmContests(r);
+  const appr = r.appr || {};
+  const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
   return /*#__PURE__*/React.createElement("div", {
     className: "pd-simple"
-  }, relRows.length > 0 && /*#__PURE__*/React.createElement("div", {
-    className: "pd-meta-items pd-rel"
-  }, relRows), /*#__PURE__*/React.createElement(PdSec, {
+  }, /*#__PURE__*/React.createElement(PdSec, {
     label: tppHeading(tcs),
     lead: true
   }, tppLines(tcs, r).map((x, i) => /*#__PURE__*/React.createElement(TppLine, {
@@ -11393,7 +11417,7 @@ function PollDetail({
     className: "pd-meta-k"
   }, "Effective sample"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
-  }, "n = ", r.sampleEff.toLocaleString())))), /*#__PURE__*/React.createElement(PollLedger, {
+  }, "n = ", r.sampleEff.toLocaleString())), releaseMetaRows(r))), /*#__PURE__*/React.createElement(PollLedger, {
     r: r,
     dirSegments: r.dir ? dirSegs(r) : null
   }));
@@ -12128,6 +12152,7 @@ Object.assign(window, {
   TppLine,
   ApprLine,
   ChgParen,
+  releaseMetaRows,
   // the archive prints publication stamps too, and there is only one way to
   // write one
   pubStamp
@@ -15009,7 +15034,8 @@ function ArchPollDetail({
 }) {
   const {
     PollLedger,
-    pubStamp
+    pubStamp,
+    releaseMetaRows
   } = window;
   /* The archive stores the unsure share and its change; the Latest table
      derives the residual instead. Same reading, two shapes – so the ledger
@@ -15104,7 +15130,10 @@ function ArchPollDetail({
     className: "pd-meta-k"
   }, "House effect"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
-  }, signed1(p.hfx.v), " vs consensus"))].filter(Boolean);
+  }, signed1(p.hfx.v), " vs consensus")),
+  /* the pollster's own pages close the list, in the same grid so their
+     values sit on the band's axis (builder shared with Latest polls) */
+  ...(releaseMetaRows ? releaseMetaRows(p) : [])].filter(Boolean);
   const controls = [
   /* the way back rides the line that already describes this poll, rather
      than inventing a band of its own above the panel */
