@@ -13872,9 +13872,10 @@ function PastCyclesView() {
   /* Which terms are hidden rides in the URL too, so "the 2019 term" stays
      comparable when the link is passed around. Hidden years – not shown
      ones, since "Show all" is the ordinary state and keeps the bar clean –
-     sit in one param as two-digit years joined by dots: ?c=10.19 hides
-     2010 and 2019. Four-digit years are read as well for whoever types
-     them; tokens that name no known term are dropped, never trusted. */
+     sit in one param joined by dots: two-digit years for 2000s terms
+     (?c=10.19 hides 2010 and 2019), four digits for the 1987–1998 terms –
+     "90" would read back as 2090 and be dropped. Tokens naming no known
+     term are dropped, never trusted. */
   const [hidden, setHidden] = useState(() => {
     const raw = new URLSearchParams(window.location.search).get("c");
     const years = new Set(cycles.map(c => c.year));
@@ -13895,7 +13896,7 @@ function PastCyclesView() {
   React.useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     p.delete("c");
-    if (hidden.size) p.set("c", [...hidden].sort((a, b) => a - b).map(y => String(y).slice(2)).join("."));
+    if (hidden.size) p.set("c", [...hidden].sort((a, b) => a - b).map(y => y < 2000 ? String(y) : String(y).slice(2)).join("."));
     const qs = p.toString();
     const L = window.location;
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
