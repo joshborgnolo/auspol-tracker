@@ -1,13 +1,22 @@
-/* Poll-detail typography pass (2026-09-03, responding to critique of the
-   expanded breakdown): expand the latest row of the Latest-polls table and
-   one archive row, and assert the computed type ladder —
-     .pd-k section kicker     11.5px / 600   (was 11px / 700)
-     .pd-meta-k meta label    10.5px / 600   (was 700)
-     .pd-s body               14px / lh 21   (1.5, was 1.55)
-     .poll-detail .chg        10.5px / 600   (was 11px / 700)
-     .pd-sec-lead .pd-s > b   16px           (vote-share headline figures)
+/* Poll-detail typography pass (2026-09-03, second critique of the expanded
+   breakdown): the panel was one flat run of 14px sentences with 16px figures.
+   It is now three voices — a provenance LIST, tracked upper-case KICKERS over
+   ruled sections, and FIGURES that step above the words carrying them.
+
+   Everything hangs off four tokens on .poll-detail, so this asserts the
+   tokens' effects rather than a table of hard-coded rules:
+     --pd-lab   118px  provenance label column (both grids share it)
+     --pd-body   16px  the sentences
+     --pd-fig    22px  every published figure
+     --pd-hero   40px  the first head-to-head only
+   plus the kicker (10.5px / 600 / uppercase / tracked), the meta pair
+   (11.5px label, 14px value), the basis caption (14px, 18px figure), and the
+   700px reading measure the ruled sections are set to.
+
    Row expansion: the Latest table renders ~8 rows immediately; click the
-   .exp-btn toggle, .poll-detail mounts. */
+   .exp-btn toggle, .poll-detail mounts. The archive is behind the All-polls
+   tab. Row 1 of the archive is a multi-matchup wave, which is what proves the
+   hero step applies to the FIRST pair and to nothing else. */
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -52,53 +61,146 @@ try {
   await new Promise((r) => setTimeout(r, 300));
 
   const t = await page.evaluate(`(() => {
-    const cs = (sel) => { const el = document.querySelector(sel); return el ? getComputedStyle(el) : null; };
-    const pk = cs(".poll-detail .pd-sec .pd-k");
-    const mk = cs(".poll-detail .pd-meta-k");
-    const ps = cs(".poll-detail .pd-sec-lead .pd-s");
-    const chg = document.querySelector(".poll-detail .chg");
-    const leadB = document.querySelector(".poll-detail .pd-sec-lead .pd-s > b");
-    const bodyB = document.querySelector(".poll-detail .pd-sec:not(.pd-sec-lead) .pd-s b");
-    const noteB = document.querySelector(".poll-detail .pd-sec-lead .pd-s .pd-s-note b");
+    const p = document.querySelector(".poll-detail");
+    const px = (el) => el ? getComputedStyle(el).fontSize : null;
+    const st = (sel) => { const el = p.querySelector(sel); return el ? getComputedStyle(el) : null; };
+    const k = st(".pd-sec .pd-k");
+    const lead = p.querySelector(".pd-sec-lead");
+    const hero = lead.querySelector("p.pd-s-hero");
     return {
-      kSize: pk && pk.fontSize, kWeight: pk && pk.fontWeight,
-      mWeight: mk && mk.fontWeight,
-      sLh: ps && ps.lineHeight,
-      chgSize: chg && getComputedStyle(chg).fontSize,
-      chgWeight: chg && getComputedStyle(chg).fontWeight,
-      leadSize: leadB && getComputedStyle(leadB).fontSize,
-      bodySize: bodyB && getComputedStyle(bodyB).fontSize,
-      noteSize: noteB ? getComputedStyle(noteB).fontSize : "(no note b)",
-      leadSections: document.querySelectorAll(".poll-detail .pd-sec-lead").length,
+      kSize: k && k.fontSize, kWeight: k && k.fontWeight,
+      kCase: k && k.textTransform, kTracked: k && parseFloat(k.letterSpacing) > 0.9,
+      secRule: st(".pd-sec").borderTopStyle,
+      metaK: px(p.querySelector(".pd-meta-k")),
+      metaV: px(p.querySelector(".pd-meta-v")),
+      /* one label column for BOTH provenance grids - the band the table
+         builds and the release rows the shared ledger builds */
+      labCols: [...p.querySelectorAll(".pd-meta-items")]
+                 .map((g) => getComputedStyle(g).gridTemplateColumns.split(" ")[0]),
+      relRows: p.querySelectorAll(".pd-rel .pd-meta-i").length,
+      heroWords: px(hero), heroFig: px(hero && hero.querySelector("b")),
+      bodyWords: px(p.querySelector(".pd-sec:not(.pd-sec-lead) .pd-s")),
+      bodyFig: px(p.querySelector(".pd-sec:not(.pd-sec-lead) .pd-s b")),
+      basis: px(p.querySelector(".pd-s-basis")),
+      basisFig: px(p.querySelector(".pd-s-basis b")),
+      netFig: px(p.querySelector(".pd-s .netv")),
+      chg: px(p.querySelector(".pd-s:not(.pd-s-hero) .chg")),
+      heroChg: px(hero && hero.querySelector(".chg")),
+      absent: px(p.querySelector(".pd-sec .pd-absent")),
+      grpWrap: getComputedStyle(p.querySelector(".pd-grp")).whiteSpace,
+      /* the move now carries direction in colour, and "no move" stays out of
+         the pair - all three read off the .chg-up/.chg-down tokens */
+      chgUp: (() => { const e = p.querySelector(".chg.up"); return e && getComputedStyle(e).color; })(),
+      chgDown: (() => { const e = p.querySelector(".chg.down"); return e && getComputedStyle(e).color; })(),
+      chgFlat: (() => { const e = p.querySelector(".chg.flat"); return e && getComputedStyle(e).color; })(),
+      /* .pd-k is set in --ink-3, so it is the resolved rgb() to compare
+         against - reading the custom property back gives an oklch() string
+         that never equals a computed color */
+      inkThree: getComputedStyle(p.querySelector(".pd-k")).color,
+      /* every move is parenthesised - none is comma-led */
+      commaLedMove: /,\s*[▲▼–]/.test(p.textContent),
+      /* the figure/label junction is wider than a bare word-space, and the
+         gap BETWEEN two pairs is wider still */
+      gaps: (() => {
+        const sec = [...p.querySelectorAll(".pd-sec")]
+          .find((x) => /First preferences/i.test(x.querySelector(".pd-k").textContent));
+        const g = [...sec.querySelectorAll(".pd-grp")];
+        const r = (el) => el.getBoundingClientRect();
+        const inner = r(g[0].querySelector("b")).left - r(g[0].querySelector(".pd-lab")).right;
+        const between = r(g[1]).left - r(g[0]).right;
+        return { inner: Math.round(inner), between: Math.round(between) };
+      })(),
+      measure: Math.round(p.querySelector(".pd-simple").getBoundingClientRect().width),
+      leadSections: p.querySelectorAll(".pd-sec-lead").length,
+      heroLines: lead.querySelectorAll("p.pd-s-hero").length,
     };
   })()`);
   console.log(t);
-  check("kicker size", t.kSize, "11.5px");
+  check("kicker size", t.kSize, "10.5px");
   check("kicker weight", t.kWeight, "600");
-  check("meta label weight", t.mWeight, "600");
-  check("line height", t.sLh, "21px");
-  check("chg size", t.chgSize, "10.5px");
-  check("chg weight", t.chgWeight, "600");
-  check("lead figure size", t.leadSize, "16px");
-  check("body figure size", t.bodySize, "14px");
-  check("note figure stays body size", t.noteSize === "14px" || t.noteSize === "(no note b)", true);
+  check("kicker upper case", t.kCase, "uppercase");
+  check("kicker tracked", t.kTracked, true);
+  check("each section is ruled", t.secRule, "solid");
+  check("meta label", t.metaK, "11.5px");
+  check("meta value", t.metaV, "14px");
+  check("one label column for every provenance grid",
+        new Set(t.labCols).size === 1 && t.labCols[0] === "118px", true);
+  check("release rides the provenance list", t.relRows > 0, true);
+  check("hero words", t.heroWords, "18px");
+  check("hero figure", t.heroFig, "40px");
+  check("hero move", t.heroChg, "13px");
+  check("body words", t.bodyWords, "16px");
+  check("body figure", t.bodyFig, "22px");
+  check("net takes the figure size", t.netFig, "22px");
+  check("basis caption", t.basis, "14px");
+  check("basis figure sits under the section's", t.basisFig, "18px");
+  check("move", t.chg, "11px");
+  check("absent line takes the body size", t.absent, "16px");
+  check("figure and its label never break apart", t.grpWrap, "nowrap");
+  check("a rise is green", t.chgUp && t.chgUp !== t.inkThree, true);
+  check("a fall is red, and not the same colour as a rise", t.chgDown && t.chgDown !== t.chgUp, true);
+  check("no move stays neutral", !t.chgFlat || t.chgFlat === t.inkThree, true);
+  check("no move is ever comma-led", t.commaLedMove, false);
+  // a bare space at 16px IBM Plex Sans measures ~4.4px; the junction carries a
+  // word-spacing supplement on top of it, the run between pairs carries more
+  check("figure/label junction beats a bare word-space", t.gaps.inner >= 6, true);
+  check("gap between pairs beats the gap inside one",
+        t.gaps.between > t.gaps.inner, true);
+  check("ledger set to the reading measure", t.measure, 700);
   check("exactly one lead section", t.leadSections, 1);
+  check("at most one hero line", t.heroLines <= 1, true);
 
-  // the second consumer: All-polls archive expansion
+  // the second consumer: All-polls archive expansion. Row 1 carries three
+  // matchups, so it is the one that proves the hero applies to the first only.
   await page.evaluate(`
     ([...document.querySelectorAll('button, a')].find((el) =>
-      /all polls/i.test(el.textContent)) || {}).click?.()`);
+      /^all polls$/i.test(el.textContent.trim())) || {}).click?.()`);
   await page.waitForSelector(".poll-table.archive .poll-row", { timeout: 30000 });
-  await page.click(".poll-table.archive .exp-btn");
+  await page.evaluate(`document.querySelectorAll(".exp-btn")[1].click()`);
   await page.waitForSelector(".poll-table.archive .poll-detail .pd-sec-lead", { timeout: 15000 });
+  await new Promise((r) => setTimeout(r, 300));
   const arch = await page.evaluate(`(() => {
-    const b = document.querySelector(".poll-detail .pd-sec-lead .pd-s > b");
-    const k = document.querySelector(".poll-detail .pd-sec .pd-k");
-    return { leadSize: b && getComputedStyle(b).fontSize, kWeight: k && getComputedStyle(k).fontWeight };
+    const p = document.querySelector(".poll-detail");
+    const px = (el) => el ? getComputedStyle(el).fontSize : null;
+    const lead = p.querySelector(".pd-sec-lead");
+    const lines = [...lead.querySelectorAll("p.pd-s:not(.pd-s-basis)")];
+    return {
+      matchups: lines.length,
+      heroFig: px(lines[0].querySelector("b")),
+      restFig: lines.slice(1).map((l) => px(l.querySelector("b"))),
+      kicker: px(p.querySelector(".pd-k")),
+      controlsDocked: (() => {
+        const band = p.querySelector(".pd-meta"), tail = p.querySelector(".pd-meta-tail");
+        return !!tail && tail.getBoundingClientRect().right
+               > band.getBoundingClientRect().right - 40;
+      })(),
+    };
   })()`);
   console.log(arch);
-  check("archive lead figure size", arch.leadSize, "16px");
-  check("archive kicker weight", arch.kWeight, "600");
+  check("archive shows every matchup", arch.matchups > 1, true);
+  check("archive hero figure", arch.heroFig, "40px");
+  check("supporting matchups step down",
+        arch.restFig.every((s) => s === "22px"), true);
+  check("archive kicker", arch.kicker, "10.5px");
+  check("controls stay docked to the band's right edge", arch.controlsDocked, true);
+
+  /* The narrow ladder. .ap-wrap is overflow:visible so an over-wide panel
+     pushes the PAGE sideways - the nowrap figure/label groups are the new
+     way that could happen, so every archive row is opened at phone width and
+     the document is measured. */
+  await page.setViewport({ width: 375, height: 900 });
+  await new Promise((r) => setTimeout(r, 400));
+  const n = await page.evaluate(`document.querySelectorAll(".exp-btn").length`);
+  let worst = 0;
+  for (let i = 0; i < n; i++) {
+    await page.evaluate(`document.querySelectorAll(".exp-btn")[${i}].click()`);
+    await new Promise((r) => setTimeout(r, 40));
+    const w = await page.evaluate(`document.documentElement.scrollWidth`);
+    if (w > worst) worst = w;
+    await page.evaluate(`document.querySelectorAll(".exp-btn")[${i}].click()`);
+  }
+  check(`no panel of ${n} pushes the page sideways at 375px`, worst <= 375, true);
+  if (worst > 375) console.log(`       widest document: ${worst}px`);
 } finally {
   await browser.close();
   server.close();

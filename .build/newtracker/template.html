@@ -89,6 +89,16 @@
   --mood-pos: oklch(0.52 0.085 200);
   --mood-neg: oklch(0.505 0.092 36);
 
+  /* The change indicator's direction colours. The standing rule elsewhere is
+     that "up" is not inherently good – which is why the NET and the mood axis
+     keep the neutral teal/brick pair above – but a move on a house's own last
+     wave is read as a direction of travel, and green/red is the fastest read
+     there is for that. Held at the text-contrast threshold (these paint 11px
+     glyphs), and deliberately NOT the party values: a ▲ must not read as a
+     Greens mark, a ▼ as a Labor one. */
+  --chg-up:   oklch(0.505 0.110 152);
+  --chg-down: oklch(0.510 0.140 25);
+
   /* past-cycle overlay lines – neutral graphite so the metric (not the party)
      leads; the current cycle and any highlighted cycle override with party hue */
 
@@ -167,6 +177,9 @@ body.dark {
   /* national-mood colours – lifted for dark (brick stays browner/duller than ON) */
   --mood-pos: oklch(0.70 0.105 200);
   --mood-neg: oklch(0.685 0.105 38);
+  /* the change indicator, lifted the same way */
+  --chg-up:   oklch(0.735 0.135 152);
+  --chg-down: oklch(0.700 0.145 25);
 
 
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
@@ -1725,6 +1738,9 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
   font-variant-numeric: tabular-nums; white-space: nowrap; cursor: help;
   letter-spacing: -0.01em;
 }
+.chg.up   { color: var(--chg-up); }
+.chg.down { color: var(--chg-down); }
+/* no move is not a small move: it stays out of the colour pair entirely */
 .chg.flat { color: var(--ink-3); opacity: 0.7; }
 
 /* diverging net bar – the live source publishes nets only (no approve /
@@ -2071,6 +2087,28 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    the pair is the unit being read, and half of one at the end of a line is
    the reader's work, not the setter's */
 .pd-grp { white-space: nowrap; }
+/* One word-space is not enough to hold a 22px numeral off its 16px label: the
+   pair reads as a single blurred token, and in a comma-separated run the gap
+   INSIDE a pair ends up the same as the gap between two of them. Three nested
+   word-spacings fix both at once — widest between pairs, less inside one,
+   normal inside a label of more than one word ("don't know", "right
+   direction"), which would otherwise loosen along with everything else.
+
+   Word-spacing rather than margins on purpose: a margin between two inline
+   groups survives a line break and hangs the wrapped line 8px in, which at
+   phone widths is most lines. A space collapses at the break, so the left
+   edge stays flush. */
+.pd-s { word-spacing: 5px; }
+.pd-grp { word-spacing: 3px; }
+.pd-lab, .pd-mat { word-spacing: normal; }
+/* the headline pair is set larger, so its junction has to open with it */
+.pd-s-hero .pd-grp { word-spacing: 6px; }
+/* the parenthetical move belongs to the figure it annotates, so it keeps a
+   plain space – opened up, it reads as the next item in the run */
+.pd-s-chg { word-spacing: normal; }
+/* and the basis caption is a SENTENCE, not a run of pairs: only its own
+   figure needs holding off, the prose behind it does not */
+.pd-s.pd-s-basis { word-spacing: 2px; }
 /* the expanded view's numbers are the poll's data: set them in Archivo
    (figures in summary lines, signed nets, moves, seat estimates) */
 .poll-detail b, .poll-detail .netv, .poll-detail .chg, .poll-detail .seat-est {

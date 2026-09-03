@@ -1514,7 +1514,7 @@ function tppLines(cs, r) {
         <React.Fragment>
           {note && <React.Fragment>{note}, </React.Fragment>}
           undecided <b>{r.undecided}%</b> inside the pair
-          {dUnd && <React.Fragment>, <ChgTag v={dUnd.v} refDate={dUnd.refDate} /></React.Fragment>}
+          <ChgParen d={dUnd} />
         </React.Fragment>
       );
     }
@@ -1903,22 +1903,33 @@ function PdSec({ label, absent, lead, children }) {
    the reader never has to match a line to its pairing by position. An
    optional trailing note names the allocation basis where a second pair
    appears. */
-function TppLine({ c, prefixed, note }) {
+function TppLine({ c, prefixed, note, hero }) {
   const segs = c.segs.filter((x) => x.value != null);
   const mat = c.lab.replace(/^2PP · /, "").replace(/^3-cornered · /, "")
                    .replace(/ · Derived$/, c.derived ? " (derived)" : "");
   return (
-    <p className="pd-s">
-      {prefixed && mat + ": "}
-      {segs.map((x, i) => (
-        <React.Fragment key={i}>
-          {i > 0 && (segs.length === 2 ? " vs " : " · ")}
-          <b>{x.value}%</b> {x.label}
-          <ChgParen d={x.delta} />
-        </React.Fragment>
-      ))}
-      {note && <span className="pd-s-note"> ({note})</span>}
-    </p>
+    <React.Fragment>
+      <p className={"pd-s" + (hero ? " pd-s-hero" : "")}>
+        {/* the matchup name is prose, not a figure/label pair – it keeps
+            normal word-spacing (.pd-mat) so "ALP v L/NP" does not open up
+            with the pairs after it */}
+        {prefixed && <span className="pd-mat">{mat}: </span>}
+        {segs.map((x, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && (segs.length === 2
+              ? <span className="pd-vs"> vs </span>
+              : " · ")}
+            <span className="pd-grp">
+              <b>{x.value}%</b> <span className="pd-lab">{x.label}</span><ChgParen d={x.delta} />
+            </span>
+          </React.Fragment>
+        ))}
+      </p>
+      {/* the basis is a caption to the pair, not a tail on it: a parenthesis
+          trailing a display-size head-to-head pushed the answer onto two
+          lines to make room for its own footnote */}
+      {note && <p className="pd-s pd-s-basis">{note}</p>}
+    </React.Fragment>
   );
 }
 
@@ -1942,15 +1953,20 @@ function ApprLine({ id, appr, chg }) {
       {label}:{s ? " " : <span className="pd-s-note"> no {leg[0]} / {leg[2]} split published,</span>}
       {s && (
         <React.Fragment>
-          <b>{s.app}%</b> {leg[0]}, <b>{s.dis}%</b> {leg[2]}
-          {dk > 0 && <React.Fragment>, <b>{dk}%</b> {leg[1]}</React.Fragment>}
+          <span className="pd-grp"><b>{s.app}%</b> <span className="pd-lab">{leg[0]}</span></span>,{" "}
+          <span className="pd-grp"><b>{s.dis}%</b> <span className="pd-lab">{leg[2]}</span></span>
+          {dk > 0 && <React.Fragment>, <span className="pd-grp">
+            <b>{dk}%</b> <span className="pd-lab">{leg[1]}</span></span></React.Fragment>}
         </React.Fragment>
       )}
       {net != null && (
         <React.Fragment>
           {/* comma only after split figures - the no-split note already ends
               with its own */}
-          {s ? ", " : " "}net <NetVal v={net} /><FavMark metric={mt} /><ChgParen d={d} />
+          {s ? ", " : " "}
+          <span className="pd-grp">
+            <span className="pd-lab">net</span> <NetVal v={net} /><FavMark metric={mt} /><ChgParen d={d} />
+          </span>
         </React.Fragment>
       )}
       {alt && (
@@ -1971,63 +1987,66 @@ function PollLedger({ r, dirSegments }) {
   const ppms = ppmContests(r);
   const appr = r.appr || {};
   const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
+  /* The release rows, in the provenance list's shape. Only rendered where the
+     wave actually has a page of its own. */
+  const relRows = [];
+  if (r.releaseUrl) relRows.push(
+    <span className="pd-meta-i" key="rel">
+      <span className="pd-meta-k">Pollster’s release</span>
+      <span className="pd-meta-v">
+        {/* houses with a rolling collection page (pollsterRules.releaseHub –
+            Essential's Federal Political Insights) ride both addresses on the
+            one row: the wave's own release first, then the collection every
+            dated release files under */}
+        <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
+          here<span className="plink-mark" aria-hidden="true">↗</span>
+        </a>
+        {r.releaseHub ? (
+          <React.Fragment>
+            <span className="pd-s-note">{" (wave-specific page), and "}</span>
+            <a className="pd-release" href={r.releaseHub} target="_blank" rel="noopener noreferrer">
+              here<span className="plink-mark" aria-hidden="true">↗</span>
+            </a>
+            <span className="pd-s-note">{" (general rolling collection)"}</span>
+          </React.Fragment>
+        ) : (
+          /* DemosAU's released report IS its APC statement – one link does
+             both jobs, so the separate statement row below sits out and the
+             note here names the second role */
+          r.releaseUrl === r.methodUrl &&
+            <span className="pd-s-note">{" (includes the wave’s APC methodology statement)"}</span>
+        )}
+      </span>
+    </span>
+  );
+  /* the wave's APC methodology statement, beside the release pointer it
+     accompanies. Absent when the release pointer above already links the same
+     document (releaseUrl === methodUrl). */
+  if (r.methodUrl && r.methodUrl !== r.releaseUrl) relRows.push(
+    <span className="pd-meta-i" key="apc">
+      <span className="pd-meta-k" title="Australian Polling Council methodology statement">APC statement</span>
+      <span className="pd-meta-v">
+        <a className="pd-release" href={r.methodUrl} target="_blank" rel="noopener noreferrer">
+          here<span className="plink-mark" aria-hidden="true">↗</span>
+        </a>
+      </span>
+    </span>
+  );
   return (
     <div className="pd-simple">
 
-      {/* a pointer to the pollster's own release page, where the citation in
-          the row (`url`) is something else – the RedBridge/Accent waves cite
-          their AFR write-up but publish the report on accent-research.com,
-          and the Capital Brief-commissioned DemosAU waves cite the Capital
-          Brief piece but publish their statement-bearing report PDF on
-          demosau.com.
-          It tops the ledger so it sits directly under the meta band
-          (Published / Poll lean / House effect), and rides the ledger rather
-          than the band itself so the SAME line shows in BOTH expansions –
-          and only where the wave actually has a release page. */}
-      {r.releaseUrl && (
-        <PdSec label="Pollster’s release">
-          {/* houses with a rolling collection page (pollsterRules.releaseHub
-              – Essential's Federal Political Insights) ride both addresses on
-              the one line: the wave's own release first, then the collection
-              every dated release files under */}
-          {r.releaseHub ? (
-            <p className="pd-s">
-              <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
-                here<span className="plink-mark" aria-hidden="true">↗</span>
-              </a>
-              <span className="pd-s-note">{" (wave-specific page), and "}</span>
-              <a className="pd-release" href={r.releaseHub} target="_blank" rel="noopener noreferrer">
-                here<span className="plink-mark" aria-hidden="true">↗</span>
-              </a>
-              <span className="pd-s-note">{" (general rolling collection)"}</span>
-            </p>
-          ) : (
-            <p className="pd-s">
-              <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
-                here<span className="plink-mark" aria-hidden="true">↗</span>
-              </a>
-              {/* DemosAU's released report IS its APC statement – one link does
-                  both jobs, so the separate statement line below sits out and
-                  the note here names the second role */}
-              {r.releaseUrl === r.methodUrl &&
-                <span className="pd-s-note">{" (includes the wave’s APC methodology statement)"}</span>}
-            </p>
-          )}
-        </PdSec>
-      )}
+      {/* Pointers to the pollster's own pages, where the citation in the row
+          (`url`) is something else – the RedBridge/Accent waves cite their AFR
+          write-up but publish the report on accent-research.com, and the
+          Capital Brief-commissioned DemosAU waves cite the Capital Brief piece
+          but publish their statement-bearing report PDF on demosau.com.
 
-      {/* the wave's APC methodology statement, beside the release pointer it
-          accompanies. Absent when the release pointer above already links
-          the same document (releaseUrl === methodUrl). */}
-      {r.methodUrl && r.methodUrl !== r.releaseUrl && (
-        <PdSec label="APC methodology statement">
-          <p className="pd-s">
-            <a className="pd-release" href={r.methodUrl} target="_blank" rel="noopener noreferrer">
-              here<span className="plink-mark" aria-hidden="true">↗</span>
-            </a>
-          </p>
-        </PdSec>
-      )}
+          These are provenance, not measures: they answer "where did this come
+          from", like fieldwork and sample, and not "what did it find". So they
+          take the meta band's label column rather than a kicker of their own,
+          and continue the list the band started – they ride the ledger (which
+          BOTH tables share) only so the rows show in both expansions. */}
+      {relRows.length > 0 && <div className="pd-meta-items pd-rel">{relRows}</div>}
 
       <PdSec label={tppHeading(tcs)} lead>
         {/* name the main pair's basis only when the flows second line joins
@@ -2036,7 +2055,13 @@ function PollLedger({ r, dirSegments }) {
             flows line itself is the same question with 2025's flows applied
             to these primaries, so it takes the main pair's exact format and
             sits straight after it, ahead of the ON head-to-heads */}
-        {tppLines(tcs, r).map((x, i) => <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1} note={x.note} />)}
+        {/* the display size goes to the FIRST head-to-head only: a wave with
+            three matchups has one answer and two supporting readings, and a
+            three-cornered contest has too many figures to carry it */}
+        {tppLines(tcs, r).map((x, i) => (
+          <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1} note={x.note}
+                   hero={i === 0 && x.c.segs.filter((g) => g.value != null).length === 2} />
+        ))}
       </PdSec>
 
       <PdSec label="First preferences">
@@ -2044,25 +2069,25 @@ function PollLedger({ r, dirSegments }) {
           {primarySegs(r).map((x, i) => (
             <React.Fragment key={i}>
               {i > 0 && ", "}
-              <span className={x.muted ? "pd-s-note" : undefined}>{x.label} <b>{x.value}%</b></span>
-              <ChgParen d={x.delta} />
+              <span className={"pd-grp" + (x.muted ? " pd-s-note" : "")}>
+                <span className="pd-lab">{x.label}</span> <b>{x.value}%</b><ChgParen d={x.delta} />
+              </span>
             </React.Fragment>
           ))}
-          {/* the share the primaries have already set aside belongs on the
-              same line as the shares it is missing from. A share still inside
-              the two-party pair is named on the pair's own line instead
-              (tppLines) – it is not missing from these shares */}
-          {r.undecided != null && r.undecidedBasis !== "tpp" &&
-            ((d) => (
-              <React.Fragment>
-                {" · "}undecided <b>{r.undecided}%</b>
-                <span className="pd-s-note">
-                  {" (" + (r.undecidedBasis === "soft" ? "not firm" : "set aside")}
-                  {d && <React.Fragment>, <ChgTag v={d.v} refDate={d.refDate} /></React.Fragment>})
-                </span>
-              </React.Fragment>
-            ))(segDelta(r.chg, "und"))}
         </p>
+        {/* the share the primaries have already set aside is the BASIS of the
+            shares above, not one more of them – so it captions the line rather
+            than running on from it. A share still inside the two-party pair is
+            named on the pair's own line instead (tppLines): it is not missing
+            from these shares */}
+        {r.undecided != null && r.undecidedBasis !== "tpp" &&
+          ((d) => (
+            <p className="pd-s pd-s-basis">
+              <b>{r.undecided}%</b> undecided,{" "}
+              {r.undecidedBasis === "soft" ? "not firm" : "set aside"}
+              <ChgParen d={d} />
+            </p>
+          ))(segDelta(r.chg, "und"))}
       </PdSec>
 
       <PdSec label="Preferred PM">
@@ -2071,15 +2096,19 @@ function PollLedger({ r, dirSegments }) {
           const cand = segs.filter((x) => !x.resid);
           const unc = segs.find((x) => x.resid);
           return (
-            <p className="pd-s" key={"p" + i}>
-              {cand.map((x, j) => (
-                <React.Fragment key={j}>
-                  {j > 0 && " vs "}
-                  <b>{x.value}%</b> {x.label}<ChgParen d={x.delta} />
-                </React.Fragment>
-              ))}
-              {unc && <span className="pd-s-note"> (<b>{unc.value}%</b> undecided)</span>}
-            </p>
+            <React.Fragment key={"p" + i}>
+              <p className="pd-s">
+                {cand.map((x, j) => (
+                  <React.Fragment key={j}>
+                    {j > 0 && <span className="pd-vs"> vs </span>}
+                    <span className="pd-grp">
+                      <b>{x.value}%</b> <span className="pd-lab">{x.label}</span><ChgParen d={x.delta} />
+                    </span>
+                  </React.Fragment>
+                ))}
+              </p>
+              {unc && <p className="pd-s pd-s-basis"><b>{unc.value}%</b> undecided</p>}
+            </React.Fragment>
           );
         })}
       </PdSec>
@@ -2093,13 +2122,21 @@ function PollLedger({ r, dirSegments }) {
       {dirSegments && (
         <PdSec label="National direction">
           <p className="pd-s">
-            <b>{dirSegments[0].value}%</b> right direction
-            <ChgParen d={dirSegments[0].delta} />
-            {" vs "}
-            <b>{dirSegments[2].value}%</b> wrong track
-            <ChgParen d={dirSegments[2].delta} />
-            <span className="pd-s-note"> ({dirSegments[1].value}% unsure)</span>
+            <span className="pd-grp">
+              <b>{dirSegments[0].value}%</b> <span className="pd-lab">right direction</span>
+              <ChgParen d={dirSegments[0].delta} />
+            </span>
+            <span className="pd-vs"> vs </span>
+            <span className="pd-grp">
+              <b>{dirSegments[2].value}%</b> <span className="pd-lab">wrong track</span>
+              <ChgParen d={dirSegments[2].delta} />
+            </span>
           </p>
+          {/* the residual is what is LEFT of the two figures above, so it
+              captions them at caption size – unlike the two-party pair's
+              undecided, which sits inside the pair and changes how it reads */}
+          {dirSegments[1].value != null &&
+            <p className="pd-s pd-s-basis">{dirSegments[1].value}% unsure</p>}
         </PdSec>
       )}
 
@@ -2123,19 +2160,27 @@ function PollDetail({ r }) {
           published stamp falls back to the fieldwork end (saying that it is
           so) where the release never recorded one */}
       <div className="pd-meta">
-        <span className="pd-meta-i"><span className="pd-meta-k">Fieldwork</span> {r.field}</span>
-        <span className="pd-meta-i"><span className="pd-meta-k">Published</span>{" "}
-          {pubStamp(r.published, { year: true })
-            || <span className="pd-est"
-                     title="Publication date not recorded for this poll – showing the last day of fieldwork">
-                 {r.releasedLabel}
-               </span>}
+        <span className="pd-meta-items">
+          <span className="pd-meta-i"><span className="pd-meta-k">Fieldwork</span>
+            <span className="pd-meta-v">{r.field}</span></span>
+          <span className="pd-meta-i"><span className="pd-meta-k">Published</span>
+            <span className="pd-meta-v">
+              {pubStamp(r.published, { year: true })
+                || <span className="pd-est"
+                         title="Publication date not recorded for this poll – showing the last day of fieldwork">
+                     {r.releasedLabel}
+                   </span>}
+            </span>
+          </span>
+          {r.mode && <span className="pd-meta-i"><span className="pd-meta-k">Method</span>
+            <span className="pd-meta-v">{r.mode}</span></span>}
+          <span className="pd-meta-i"><span className="pd-meta-k">Sample</span>
+            <span className="pd-meta-v">{r.sample != null ? "n = " + r.sample.toLocaleString() : "—"}</span></span>
+          {r.sampleEff != null && <span className="pd-meta-i"
+               title="Effective sample as published by the pollster (APC methodology statement)">
+            <span className="pd-meta-k">Effective sample</span>
+            <span className="pd-meta-v">n = {r.sampleEff.toLocaleString()}</span></span>}
         </span>
-        {r.mode && <span className="pd-meta-i"><span className="pd-meta-k">Method</span> {r.mode}</span>}
-        <span className="pd-meta-i"><span className="pd-meta-k">Sample</span> {r.sample != null ? "n = " + r.sample.toLocaleString() : "—"}</span>
-        {r.sampleEff != null && <span className="pd-meta-i"
-             title="Effective sample as published by the pollster (APC methodology statement)">
-          <span className="pd-meta-k">Effective sample</span> n = {r.sampleEff.toLocaleString()}</span>}
       </div>
       <PollLedger r={r} dirSegments={r.dir ? dirSegs(r) : null} />
     </div>
