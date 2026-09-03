@@ -111,9 +111,40 @@ data/polls.schema.json   field documentation
   fonts/                 subsetted woff2, emitted to assets/fonts at build time
   vendor/                react production + babel (BUILD TIME ONLY, never shipped)
 lib/                     chart.js + plugins – used ONLY by auspol-polling.html
+archives/<house>/        satellite archive pages (generated or hand-maintained;
+                         outside the newtracker pipeline – see Poll archives)
 auspol-polling.html      frozen predecessor. Not rebuilt; carries noindex and an
                          on-page banner so it can't be mistaken for the live page.
 ```
+
+### Poll archives
+
+`archives/` holds one page per house whose own record has gone offline, kept so
+the sources behind the past-cycle rows stay reachable. They are standalone
+pages: the newtracker build does not touch them, but `build.mjs` does carry
+their sitemap entries, so a new one needs a line there and a tab added to the
+other pages' `<nav class="tabs">`.
+
+- **Newspoll**, **AC Nielsen** – hand-maintained; the AC Nielsen PDFs are
+  mirrored under `data/acnielsen/` and transcribed by
+  `.build/extract-acnielsen-archive.mjs`.
+- **Morgan** – `node .build/refresh-morgan-archive.mjs` re-fetches roymorgan.com's
+  reference tables into `data/roymorgan/*.csv` and regenerates the page.
+- **Galaxy** – the house's site is gone entirely, so the archive is a
+  reconstruction rather than a mirror, and the page carries the method:
+
+  ```
+  node .build/extract-galaxy-archive.mjs --apply --verify
+  node .build/assimilate-galaxy-cycle-csv.mjs --apply
+  node .build/refresh-galaxy-archive.mjs
+  ```
+
+  The first rebuilds `data/galaxy-release-index.csv` from the Internet Archive
+  and re-checks every figure in `data/galaxy-federal-pre2012.csv` against the
+  page it was read off (22/22 at last run). The second merges the qualifying
+  waves into `cyclePolls`; a wave whose Greens share was never published stays
+  a transcript rather than gaining an invented one, which is why 11 of the 22
+  are in the tracker and 11 are on the page only. The third writes the page.
 
 Two markers in `template.html` are load-bearing – `build.mjs` throws if either
 goes missing: `<!--STATIC_SUMMARY-->` (replaced by the article version of the

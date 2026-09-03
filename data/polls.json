@@ -14613,6 +14613,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2007-06-03",
+        "firm": "Galaxy",
+        "lnp": 42,
+        "alp": 44,
+        "grn": 10,
+        "onp": null,
+        "oth": 4,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
+      },
+      {
         "date": "2007-06-16",
         "firm": "ACNielsen",
         "lnp": 39,
@@ -14712,6 +14723,17 @@
         "tpp_alp": 55
       },
       {
+        "date": "2007-07-30",
+        "firm": "Galaxy",
+        "lnp": 41,
+        "alp": 44,
+        "grn": 10,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
+      },
+      {
         "date": "2007-08-05",
         "firm": "Newspoll",
         "lnp": 39,
@@ -14765,6 +14787,17 @@
         "oth": 6.5,
         "tpp_lnp": 45.5,
         "tpp_alp": 54.5
+      },
+      {
+        "date": "2007-08-26",
+        "firm": "Galaxy",
+        "lnp": 39,
+        "alp": 47,
+        "grn": 9,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
       },
       {
         "date": "2007-09-02",
@@ -15139,6 +15172,17 @@
         "oth": 6.5,
         "tpp_lnp": 46.5,
         "tpp_alp": 53.5
+      },
+      {
+        "date": "2007-11-23",
+        "firm": "Galaxy",
+        "lnp": 42.5,
+        "alp": 42.5,
+        "grn": 8.5,
+        "onp": null,
+        "oth": 6.5,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2007-11-24",
@@ -16306,6 +16350,17 @@
         "onp": null,
         "oth": 8,
         "tpp_lnp": 44,
+        "tpp_alp": 55
+      },
+      {
+        "date": "2008-11-17",
+        "firm": "Galaxy",
+        "lnp": 40,
+        "alp": 43,
+        "grn": 11,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 45,
         "tpp_alp": 55
       },
       {
@@ -18146,6 +18201,17 @@
         "tpp_alp": 50.5
       },
       {
+        "date": "2010-05-16",
+        "firm": "Galaxy",
+        "lnp": 43,
+        "alp": 37,
+        "grn": 12,
+        "onp": null,
+        "oth": 8,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
+      },
+      {
         "date": "2010-05-23",
         "firm": "Essential",
         "lnp": 41,
@@ -18366,6 +18432,28 @@
         "tpp_alp": 54.5
       },
       {
+        "date": "2010-07-11",
+        "firm": "Galaxy",
+        "lnp": 42,
+        "alp": 39,
+        "grn": 14,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
+        "date": "2010-07-17",
+        "firm": "Galaxy",
+        "lnp": 42,
+        "alp": 39,
+        "grn": 13,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
+      },
+      {
         "date": "2010-07-18",
         "firm": "Essential",
         "lnp": 39,
@@ -18397,6 +18485,17 @@
         "oth": 5.5,
         "tpp_lnp": 44,
         "tpp_alp": 56
+      },
+      {
+        "date": "2010-07-18",
+        "firm": "Galaxy",
+        "lnp": 44,
+        "alp": 38,
+        "grn": 12,
+        "onp": null,
+        "oth": 6,
+        "tpp_lnp": 50,
+        "tpp_alp": 50
       },
       {
         "date": "2010-07-21",
@@ -18531,6 +18630,17 @@
         "tpp_alp": 57.5
       },
       {
+        "date": "2010-08-08",
+        "firm": "Galaxy",
+        "lnp": 42,
+        "alp": 38,
+        "grn": 13,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 49,
+        "tpp_alp": 51
+      },
+      {
         "date": "2010-08-14",
         "firm": "Morgan",
         "lnp": 44,
@@ -18595,6 +18705,17 @@
         "oth": 7,
         "tpp_lnp": 49,
         "tpp_alp": 51
+      },
+      {
+        "date": "2010-08-19",
+        "firm": "Galaxy",
+        "lnp": 41,
+        "alp": 38,
+        "grn": 14,
+        "onp": null,
+        "oth": 7,
+        "tpp_lnp": 48,
+        "tpp_alp": 52
       },
       {
         "date": "2010-08-20",

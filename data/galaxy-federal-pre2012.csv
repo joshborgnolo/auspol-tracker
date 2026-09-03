@@ -1,0 +1,23 @@
+date,date_basis,fieldwork_start,fieldwork_end,sample,alp,coalition,greens,other,tpp_alp,tpp_coalition,source,note
+2004-09-20,published,,,,,,,,49,51,https://www.pollbludger.net/2004/09/20/newspoll-morgan-and-galaxy/,Second fortnightly campaign poll for the News Ltd tabloids; 2PP only reported
+2004-10-04,published,,,,,45,,,48,52,https://www.pollbludger.net/2004/10/04/newspoll-morgan-and-galaxy-2/,Third fortnightly campaign poll; only the Coalition primary reported
+,undated,,,,39,46,7,8,48,52,https://web.archive.org/web/20080718211841/http://www.galaxyresearch.com.au/pubpolls.html,Final 2004 campaign poll as Galaxy printed it in its own accuracy table; Lib 41 + Nat 5; other = Democrats 1 + other 7; publication date never stated so the row is not dated
+2007-04-23,table_date,,,,49,37,,,58,42,https://www.pollbludger.net/2007/11/22/galaxy-52-46/,From Bowe's running table of Galaxy national polls
+2007-05-14,table_date,,,,49,39,,,57,43,https://www.pollbludger.net/2007/11/22/galaxy-52-46/,From Bowe's running table of Galaxy national polls
+2007-06-04,published,2007-06-01,2007-06-03,,44,42,10,4,53,47,https://web.archive.org/web/20070606212234/http://www.galaxyresearch.com.au/pubpolls.html,"Primaries and fieldwork from Galaxy's own public-polls page; Lib 38 + Nat 4. 2PP and ALP/L-NP agree with Bowe's table exactly"
+2007-07-02,table_date,,,,46,41,,,55,45,https://www.pollbludger.net/2007/07/02/galaxy-55-45/,
+2007-07-30,table_date,,,,44,41,10,5,54,46,https://www.pollbludger.net/2007/07/30/galaxy-54-46/,Greens 10 stated in the post text; other is the residual
+2007-08-27,published,2007-08-24,2007-08-26,1004,47,39,9,5,57,43,https://web.archive.org/web/20070830090556/http://www.galaxyresearch.com.au/pubpolls.html,"Primaries and fieldwork from Galaxy's own public-polls page; Lib 34 + Nat 5. Bowe notes not all 1004 interviews fell in the stated window"
+2007-09-24,table_date,,,,46,40,,,56,44,https://www.pollbludger.net/2007/09/24/galaxy-56-44/,
+2007-10-19,table_date,,,,45,43,,,53,47,https://www.pollbludger.net/2007/10/18/galaxy-53-47/,Bowe's table dates it 19 Oct; his post ran the evening before
+2007-11-04,published,2007-11-02,2007-11-04,1010,45,42,,,54,46,https://www.pollbludger.net/2007/11/05/galaxy-54-46-2/,Conducted Friday to Sunday
+2007-11-23,published,,,,42.5,42.5,8.5,6.5,52,48,https://web.archive.org/web/20080718211841/http://www.galaxyresearch.com.au/pubpolls.html,"Final 2007 campaign poll; primaries from Galaxy's own accuracy table, which names 23 November as the publication date. Lib 37.5 + Nat 5.0; other = Family First 2.5 + other 4.0"
+2008-11-17,published,,,1004,43,40,11,6,55,45,https://www.pollbludger.net/2008/11/17/acnielsen-55-45-5/,Other is the residual
+2009-06-29,published,,,,44,30,,,56,44,https://www.pollbludger.net/2009/06/29/newspoll-56-44-acnielsen-58-42-galaxy-56-44/,SUSPECT: Coalition primary printed as 30 which cannot produce a 56-44 2PP; likely a typo for 40. Not assimilated
+2010-05-17,published,2010-05-14,2010-05-16,994,37,43,12,8,50,50,https://www.pollbludger.net/2010/05/17/galaxy-50-50/,First Galaxy federal poll since June 2009; primaries identical to the same-weekend Newspoll
+2010-06-25,published,2010-06-24,2010-06-25,800,,,,,52,48,https://www.pollbludger.net/2010/06/25/galaxy-52-48-to-labor/,Snap poll over Gillard's first two evenings; released with separate Thursday and Friday figures both at 52-48. No primaries published
+2010-07-11,published,2010-07-09,2010-07-11,1009,39,42,14,5,52,48,https://www.pollbludger.net/2010/07/11/galaxy-52-48-to-labor-2/,Conducted over the weekend
+2010-07-17,published,,,,39,42,13,6,52,48,https://www.pollbludger.net/2010/07/17/galaxy-52-48-to-labor-3/,Conducted in the last days before the election was called
+2010-07-18,published,2010-07-17,2010-07-17,800,38,44,12,6,50,50,https://www.pollbludger.net/2010/07/18/newspoll-55-45-to-labor-galaxy-50-50/,Conducted Saturday night; Galaxy's second poll in two days
+2010-08-08,published,,,800,38,42,13,7,51,49,https://www.pollbludger.net/2010/08/08/newspoll-52-48-to-labor-3/,Sample presumed 800 by Bowe; primaries identical to the same-night Newspoll
+2010-08-19,published,,,1200,38,41,14,7,52,48,https://www.pollbludger.net/2010/08/19/newspoll-50-50-2/,Last Galaxy national poll before the 21 August 2010 election

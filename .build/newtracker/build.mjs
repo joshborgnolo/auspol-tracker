@@ -664,6 +664,10 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
     <loc>${SITE_URL}archives/morgan/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
+  <url>
+    <loc>${SITE_URL}archives/galaxy/</loc>
+    <lastmod>${ARCHIVE_STAMP}</lastmod>
+  </url>
 </urlset>
 `;
 fs.writeFileSync(path.join(ROOT, "sitemap.xml"), sitemapXml);
