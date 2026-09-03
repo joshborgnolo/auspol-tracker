@@ -2782,6 +2782,18 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   font-size: 12.5px; font-weight: 600; color: var(--accent); padding: 2px 0;
 }
 .cyc-showall:hover { text-decoration: underline; }
+/* The chart fills take their theme from here, not from the component: the
+   class beats the opacity attribute, and ink is near-white in dark, so the
+   same tints that whisper on paper would shout on slate without a lift. */
+.cyc-band.lo { opacity: 0.09; }
+.cyc-band.hi { opacity: 0.17; }
+body.dark .cyc-band.lo { opacity: 0.16; }
+body.dark .cyc-band.hi { opacity: 0.30; }
+.cyc-band-note {
+  width: 100%; display: flex; align-items: center; gap: 7px; margin-top: 7px;
+  font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--ink-3);
+}
+.cyc-band-key { width: 30px; height: 12px; flex: none; }
 /* One shared checkbox style for every optional overlay toggle: the hero's
    implied-2PP diagnostic and the past-cycles Hanson/One Nation lines. A
    page should never show two checkbox designs side by side. Deliberately

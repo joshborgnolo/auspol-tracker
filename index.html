@@ -2881,6 +2881,18 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   font-size: 12.5px; font-weight: 600; color: var(--accent); padding: 2px 0;
 }
 .cyc-showall:hover { text-decoration: underline; }
+/* The chart fills take their theme from here, not from the component: the
+   class beats the opacity attribute, and ink is near-white in dark, so the
+   same tints that whisper on paper would shout on slate without a lift. */
+.cyc-band.lo { opacity: 0.09; }
+.cyc-band.hi { opacity: 0.17; }
+body.dark .cyc-band.lo { opacity: 0.16; }
+body.dark .cyc-band.hi { opacity: 0.30; }
+.cyc-band-note {
+  width: 100%; display: flex; align-items: center; gap: 7px; margin-top: 7px;
+  font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--ink-3);
+}
+.cyc-band-key { width: 30px; height: 12px; flex: none; }
 /* One shared checkbox style for every optional overlay toggle: the hero's
    implied-2PP diagnostic and the past-cycles Hanson/One Nation lines. A
    page should never show two checkbox designs side by side. Deliberately
@@ -12523,6 +12535,19 @@ function toMonthly(months, vals, maxM) {
   }
   return out;
 }
+
+// rank-based percentile, linear between neighbouring ranks: the quartile
+// edges of eleven or so terms should not pretend to be integers
+function pctOf(sorted, p) {
+  const i = (sorted.length - 1) * p;
+  const lo = Math.floor(i),
+    hi = Math.ceil(i);
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
+}
+
+/* One gate for the band decision, shared by the charts (which draw it) and
+   the legend (which captions it): three or more past terms on the board. */
+const cycBanded = (cycles, hidden) => cycles.filter(c => !hidden.has(c.year) && !c.current).length >= 3;
 function CycleChart({
   metric,
   cycles,
@@ -12566,16 +12591,29 @@ function CycleChart({
     });
   })() : null;
 
-  // build a monthly series per visible cycle. Past cycles sit behind at
-  // reduced opacity and carry a year label at the line's end – identifiable
-  // at rest, not only on hover, which uniform grey reference lines couldn't
-  // manage with real data. The tint follows the party being MEASURED (red
+  // build a monthly series per drawn cycle. Past cycles that DO draw
+  // (a thin board, or one lifted out of the band by a chip hover) sit
+  // behind at reduced opacity unless highlighted, and carry a year label
+  // at the line's end. The tint follows the party being MEASURED (red
   // Labor / blue Coalition): the term's government on its own charts, its
   // opposition on the opposition charts, so a Coalition line never wears
   // Labor red. (The legend chips keep term colours – a chip toggles a
   // parliament, and a parliament is named for its government.)
   const colorOf = c => isOpp ? D.PARTIES[c.opp].color : c.color;
   const shown = cycles.filter(c => !hidden.has(c.year));
+  /* Ribbon, not spaghetti: with three or more PAST terms on the board their
+     per-term lines collapse into the historical band drawn further down
+     (min–max and interquartile fills around the mean) – a dozen
+     near-identical lines read as weather, not as data. Hovering a legend
+     chip LIFTS its term's own line back out of the band in full colour;
+     thinning the board below three past terms (or isolating one) falls
+     back to plain lines, since a ribbon of two is as tall as the lines it
+     replaces. */
+  const pastShown = shown.filter(c => !c.current);
+  const banded = cycBanded(cycles, hidden);
+  // the band's membership is data; what still gets its own line is the
+  // sitting term plus whatever term a chip hover is lifting out of it
+  const drawnCycles = banded ? shown.filter(c => c.current || hi === c.year) : shown;
   /* One cycle left on the chart: the year on every readout row is then drawing
      a distinction against nothing, so the row keeps the leader alone and the
      title takes the calendar month instead. */
@@ -12591,7 +12629,7 @@ function CycleChart({
      control is offered whenever her readings exist, including when 2025
      itself is hidden. */
   const hanCtl = M.han && hanAvail && hanCycle;
-  const built = shown.flatMap(c => {
+  const built = drawnCycles.flatMap(c => {
     const base = cycBase(c, M.key);
     /* An office that changed hands mid-term draws one run per person, in the
        cycle's single colour: the spliced-out leader's run ends uncapped and
@@ -12682,6 +12720,98 @@ function CycleChart({
       }));
     });
   });
+  /* ---- the past-terms ribbon -------------------------------------------------
+     With three or more past terms on the board the individual lines tangle
+     past reading, so they step down into a band: the spread of past terms at
+     each month (min–max, with the interquartile half darker) and their mean
+     as a dotted centre line. Only eras CHANGE what gets pooled: a series
+     split at a leadership handover would put two rows from one term into a
+     single month's average and double-count it, so offices pool their era
+     series while everything else pools its one row. Membership thins as shorter
+     terms run out of months; the readout annotates the surviving row's value
+     with the month's headcount instead of hiding the thinning. */
+  let bandAreas = null,
+    bandMeanRow = null,
+    bandN = 0;
+  if (banded) {
+    const pooled = [];
+    pastShown.forEach(c => {
+      const base = cycBase(c, M.key);
+      const eras = M.key === "net" && c.raw.netEras || M.key === "oppnet" && c.raw.oppEras || M.key === "ppmm" && c.raw.ppmEras || null;
+      const rows = eras ? eras.map(e => ({
+        months: e.months,
+        vals: e.vals
+      })) : [{
+        months: c.raw.months,
+        vals: c.raw[M.key]
+      }];
+      rows.forEach(r => {
+        const monthly = toMonthly(r.months, r.vals, c.span);
+        pooled.push(monthly.map(p => p.y == null ? null : chg ? +(p.y - base).toFixed(2) : p.y));
+      });
+    });
+    const outer = [],
+      inner = [],
+      meanPts = [];
+    for (let m = 0; m < CYC_SPINE.length; m++) {
+      const vs = [];
+      for (let k = 0; k < pooled.length; k++) {
+        const v = pooled[k][m];
+        if (v != null) vs.push(v);
+      }
+      if (!vs.length) continue;
+      vs.sort((a, b) => a - b);
+      const mean = +(vs.reduce((s, v) => s + v, 0) / vs.length).toFixed(2);
+      outer.push({
+        x: m,
+        y0: vs[0],
+        y1: vs[vs.length - 1]
+      });
+      inner.push({
+        x: m,
+        y0: +pctOf(vs, 0.25).toFixed(2),
+        y1: +pctOf(vs, 0.75).toFixed(2)
+      });
+      meanPts.push({
+        x: m,
+        y: mean,
+        n: vs.length
+      });
+    }
+    bandN = pastShown.length;
+    bandAreas = [{
+      id: "cyc-band-lo",
+      className: "cyc-band lo",
+      color: "var(--ink)",
+      opacity: 0.07,
+      edge: false,
+      points: outer
+    }, {
+      id: "cyc-band-hi",
+      className: "cyc-band hi",
+      color: "var(--ink)",
+      opacity: 0.13,
+      edge: false,
+      points: inner
+    }];
+    bandMeanRow = {
+      id: "cyc-band-mean",
+      label: "Mean of past terms",
+      color: "var(--ink-2)",
+      width: 1.9,
+      weight: 0.5,
+      opacity: 0.85,
+      dash: "2 3.4",
+      smooth: false,
+      endCap: false,
+      points: meanPts.map(p => ({
+        x: p.x,
+        y: p.y,
+        note: p.n + " of " + bandN + " terms"
+      }))
+    };
+    built.push(bandMeanRow);
+  }
   /* The polls the lines are averages of, once the board is narrow enough to
      read them. Each cloud takes its line's colour and shape, and follows it
      into "change since election" mode - a cloud left on absolute levels under
@@ -12917,6 +13047,7 @@ function CycleChart({
     spine: CYC_SPINE,
     scatter: scatter,
     events: soloEvents,
+    areas: bandAreas || undefined,
     tooltipTitle: i => cycMonthLabel(CYC_SPINE[i].x) + (solo ? " – " + cycMonthOf(solo.eDate, CYC_SPINE[i].x) : ""),
     fmt: M.fmt
   }));
@@ -12929,7 +13060,8 @@ function CycleLegend({
   toggle,
   showAll,
   hideAll,
-  shapes
+  shapes,
+  banded
 }) {
   const anyHidden = hidden.size > 0;
   /* onMouseLeave clears the highlight for a pointer, and a finger never fires
@@ -12976,7 +13108,36 @@ function CycleLegend({
     }, pmNames), c.current && /*#__PURE__*/React.createElement("span", {
       className: "cyc-now"
     }, "Now"));
-  })), /*#__PURE__*/React.createElement("button", {
+  })), banded && /*#__PURE__*/React.createElement("div", {
+    className: "cyc-band-note",
+    "aria-hidden": "true"
+  }, /*#__PURE__*/React.createElement("svg", {
+    className: "cyc-band-key",
+    viewBox: "0 0 30 12"
+  }, /*#__PURE__*/React.createElement("rect", {
+    x: "4",
+    y: "0",
+    width: "22",
+    height: "12",
+    fill: "var(--ink)",
+    opacity: "0.07"
+  }), /*#__PURE__*/React.createElement("rect", {
+    x: "4",
+    y: "2.5",
+    width: "22",
+    height: "7",
+    fill: "var(--ink)",
+    opacity: "0.13"
+  }), /*#__PURE__*/React.createElement("line", {
+    x1: "4",
+    y1: "6",
+    x2: "26",
+    y2: "6",
+    stroke: "var(--ink-2)",
+    strokeWidth: "1.9",
+    strokeDasharray: "2 3.4",
+    opacity: "0.85"
+  })), /*#__PURE__*/React.createElement("span", null, "Past terms: mean of the set, middle half and full spread")), /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "cyc-showall",
     onClick: anyHidden ? showAll : hideAll
@@ -13488,7 +13649,7 @@ function PastCyclesView() {
     className: "view-intro"
   }, /*#__PURE__*/React.createElement("p", {
     className: "view-lede"
-  }, "Every federal term since 1987, lined up on its election day so each government\u2019s run can be read off the same clock. Past terms sit behind, each line in the colour of the party it measures \u2013 red for Labor, blue for the Coalition \u2013 with its year marked at the end.", " ", CANT_HOVER ? "Tap a cycle below to hide or restore its line, and leave just one visible to see more details." : "Hover over a cycle below to bring its line forward, and leave just one visible to see more details."), /*#__PURE__*/React.createElement("div", {
+  }, "Every federal term since 1987, lined up on its election day so each government\u2019s run can be read off the same clock. The past terms stand together as a band \u2013 outer edge their full spread, darker half the middle, dotted line their mean \u2013 drawn over the months each term was actually in office.", " ", CANT_HOVER ? "Tap a cycle below to lift its line out of the band, and leave just one visible to see more details." : "Hover over a cycle below to lift its line out of the band, and leave just one visible to see more details."), /*#__PURE__*/React.createElement("div", {
     className: "cyc-controls"
   }, /*#__PURE__*/React.createElement(TextToggle, {
     value: mode,
@@ -13517,7 +13678,8 @@ function PastCyclesView() {
     toggle: toggle,
     showAll: showAll,
     hideAll: hideAll,
-    shapes: shapes
+    shapes: shapes,
+    banded: cycBanded(cycles, hidden)
   }), /*#__PURE__*/React.createElement("div", {
     className: "cyc-charts"
   }, CYC_METRICS.map(m => /*#__PURE__*/React.createElement(CycleChart, {
