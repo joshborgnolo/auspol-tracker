@@ -4235,7 +4235,9 @@
       "tpp_alp": 48,
       "tpp_lnp": 52,
       "tpp_flows": 52,
-      "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn"
+      "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
+      "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
+      "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_cab524c6cbb54cdc80cfeed7d9863703.pdf"
     },
     {
       "date": "2026-08-30",
@@ -6381,11 +6383,24 @@
     {
       "date": "2026-08-28",
       "firm": "RedBridge / Accent",
-      "alb": -19,
-      "opp": -6,
+      "alb": -17,
+      "opp": -3,
       "oppName": "Taylor",
-      "han": -10,
-      "detail": null
+      "han": -12,
+      "detail": {
+        "alb": {
+          "app": 31,
+          "dis": 48
+        },
+        "opp": {
+          "app": 22,
+          "dis": 25
+        },
+        "han": {
+          "app": 36,
+          "dis": 48
+        }
+      }
     },
     {
       "date": "2026-08-31",

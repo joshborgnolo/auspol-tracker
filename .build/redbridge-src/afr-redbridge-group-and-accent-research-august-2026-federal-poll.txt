@@ -1,0 +1,2524 @@
+AFR, RedBridge Group and Accent Research
+federal poll
+August, 2026
+Contents
+Methodology                                                                                                    1
+
+Results summary                                                                                                2
+
+Federal vote intention                                                                                         4
+   Vote softness    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+
+Name recognition and favourability ratings of political figures                                               13
+   Anthony Albanese . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+   Angus Taylor . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+   Pauline Hanson . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 23
+   Matt Canavan . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 26
+   Larissa Waters . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 29
+   Jim Chalmers . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 32
+
+Favourability ratings of institutions                                                                         35
+   The Labor Party . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 39
+   The Liberal Party . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 42
+   The National Party . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+   Pauline Hanson’s One Nation . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 48
+   The Greens      . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 51
+   Medicare . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 54
+
+Issue salience                                                                                                57
+   Cost of living . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 60
+   Healthcare . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 63
+   Housing affordability    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 66
+   Crime and public safety . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 69
+   The rate of immigration . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 72
+   Economic management . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 75
+
+Preferred Prime Minister                                                                                      78
+
+Which party is best able to handle key issues?                                                               82
+  Cost of living . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 85
+   Healthcare . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 88
+   Housing affordability    . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 91
+   National security . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 94
+   Climate change . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 97
+   The rate of immigration . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 100
+   Crime and public safety . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 103
+   Economic management . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 106
+   Tax reform . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 109
+Do voters believe that the Federal Budget changes will increase or reduce rents?   112
+
+
+
+
+©2026 RedBridge Group and Accent Research
+Methodology
+
+
+The fieldwork for this survey was conducted between Monday 24 August and Friday 28 August 2026. The
+sample of N = 1,006 Australian voters aged 18 and older was recruited over online panel. Quotas for
+age, gender, location, education and vote at the 2025 federal election were used to ensure the sample is
+representative of the Australian electorate.
+
+Rim weighting was used to apply interlocking weights for age, gender, education, religion and location.
+The efficiency of these weights was 80 per cent, providing an effective sample size of 808.
+
+All results are estimates and involve a margin of error. Based on the effective sample size, the margin of
+error (95 per cent confidence interval) for a 50 per cent result on the full sample from this survey is ± 3.4
+per cent.
+
+This is larger for subsets of the data, such as age or location, and results based on these and similar break-
+downs should be interpreted conservatively.
+
+Vote intention questions were located immediately after demographic items and other questions used for
+screening and quotas. Undecided respondents were asked a leaner question. Those who refused to or
+were unable to provide a vote intention in both the initial question and leaner made up eight per cent of
+the sample, and were excluded from published vote intention figures.
+
+Two-party preferred results were calculated using both historic preference flows from the 2025 federal
+election, and respondent allocated flows.
+
+Detailed findings and question wording are contained in the following sections. Questions are presented
+in the order they appeared in the survey.
+
+
+
+
+                                                      1
+Results summary
+
+
+
+
+                  2
+Figure 1: Summary of key findings from the August 2026 AFR / RedBridge Group / Accent Research Poll.
+
+
+
+
+                                                 3
+Federal vote intention
+
+Question text
+
+
+If a federal election for the House of Representatives were held today, which of the following would you
+give your first preference vote to?
+  1. Labor Party
+  2. Liberal Party shown in electorates where Liberals ran a candidate in 2025
+  3. National Party shown in electorates where Nationals ran a candidate in 2025
+  4. Liberal-National Party shown in QLD
+  5. Country Liberal Party shown in the NT
+  6. The Greens
+  7. Pauline Hanson’s One Nation
+  8. Other parties and candidates relevant options shown in electorates where they ran in 2025
+  9. Will not vote
+ 10. Undecided
+
+
+
+If answered ’Undecided’ above
+
+If you had to pick, which of these are you leaning towards?
+  1. Labor Party
+  2. Liberal Party shown in electorates where Liberals ran a candidate in 2025
+  3. National Party shown in electorates where Nationals ran a candidate in 2025
+  4. Liberal-National Party shown in QLD
+  5. Country Liberal Party shown in the NT
+  6. The Greens
+  7. Pauline Hanson’s One Nation
+  8. Other parties and candidates relevant options shown in electorates where they ran in 2025
+  9. Will not vote
+ 10. Undecided
+
+
+
+
+                                                       4
+5
+
+
+
+
+    Figure 2: Shifts in the estimated first preference vote share since May 2024. The shaded areas around each of the curves represent 80 and 95 per cent confidence
+    intervals.
+           Table 1: Federal two-party vote intention, by party of first preference.
+
+                                        Respondent allocated two-party preferred
+        First preference vote             Labor              Coalition          One Nation
+Labor vs. Coalition
+                       Greens               78                   22                   -
+                   One Nation               17                   83                   -
+  Other parties and candidates              50                   50                   -
+Labor vs. One Nation
+                      Coalition             32                    -                   68
+                       Greens               90                    -                   10
+  Other parties and candidates              59                    -                   41
+
+
+
+
+                                              6
+    Table 2: Federal vote intention for the House of Representatives, by wave of the AFR/RedBridge/Accent Research poll.
+
+                                                                                    Labor two-party vote share
+
+       Wave       Labor    Coalition       One     Greens       Other      vs. Coalition    vs. Coalition         vs. One
+                                        Nation                 Parties     (2025 flows)     (respondent             Nation
+                                                             And Can-                         allocated)     (respondent
+                                                               didates                                           allocated)
+
+    Aug 2026         29          22         28          12          9                52               48                52
+     Jul 2026        29          22         31          10          8                50               48                53
+    Jun 2026         30          18         29          14          9                55               54                56
+    May 2026         28          20         31          12          9                52               51                51
+    Apr 2026         31          22         27          13          7                53               54                55
+
+    Mar 2026         32          18         29          13          8                55               53                53
+    Feb 2026         32          19         28          12          9                54               53                54
+    Jan 2026         34          19         26          11         10                56               55                56
+    Dec 2025         35          26         17          13          9                56               56                  -
+    Nov 2025         38          24         18           9         11                56               57                  -
+7
+    Oct 2025         34          29         14          11         12                54                 -                 -
+    Sep 2025         35          30         11          11         13                54                 -                 -
+    Jun 2025         38          30          9          11         12                56                 -                 -
+    Apr 2025         34          34          8          12         12                53                 -                 -
+    Mar 2025         32          37          7          12         12                51                 -                 -
+
+    Feb 2025         31          40          7          11         11                49                 -                 -
+    Nov 2024         32          42          5          12          9                49                 -                 -
+    May 2024         35          35          7          14          9                53                 -                 -
+Figure 3: Federal vote intention for the House of Representatives, by demographic characteristics, 24-28 August.
+Note: some cells contain small samples, and these should be interpreted conservatively.
+
+
+
+
+                                                       8
+    Table 3: Federal vote intention for the House of Representatives, by demographic characteristics, 24-28 August. Note: some cells contain small samples, and these
+    should be interpreted conservatively.
+
+                                                                                                                         Labor two-party vote share
+                                                                      First preference vote intention
+                                                                                                                           (respondent allocated)
+                                                          Labor    Coalition      One           Greens       Other       vs. Coalition    vs. One       N
+                                                                                  Nation                    parties                        Nation
+                                                                                                              and
+                                                                                                           candidates
+                                             All voters    29         22            28            12           9              48            52         927
+              Vote softness
+                                                 Solid     30         22            33            10            5             44            47         433
+                                                   Soft    30         22            24            14           10             50            57         408
+                                              Very soft    22         25            24             9           20             53            55          86
+              Generation
+                                                Gen-Z      31         12            16            32           9              64            74         161
+                                           Millennials     27         19            32            14           8              50            52         223
+                                               Gen-X       29         21            34             7           9              45            46         232
+                                        Baby Boomers       29         32            28             2           9              37            43         311
+              Gender
+9                                              Women       28         20            29            14           9              48            54         461
+                                                 Men       30         24            28             9           9              47            50         465
+              Location
+                                   Inner Metropolitan      30         27            21            13            9             50            57         280
+                                   Outer Metropolitan      37         18            27            14            4             54            59         307
+                                           Provincial      25         29            24            12           10             47            46         144
+                                               Rural       22         17            41             8           12             38            42         196
+              Education
+                                      Less than year 12    27         25            41             3            4             38            36         116
+                                 Year 12 or equivalent     28         22            17            26            7             52            63         155
+                              TAFE, trade or vocational    26         19            37             6           12             44            43         311
+                                      University degree    36         26            18            13            7             53            63         345
+              Home ownership
+                                    Owned outright         30         29            29             5            7             40            46         340
+                              Owned with a mortgage        29         18            33            11            9             48            50         340
+                                  Renting and other        29         19            21            21           10             56            62         247
+Vote softness
+
+
+
+
+                10
+11
+
+
+
+
+     Figure 4: Vote softness by current first preference vote intention. A solid voter is defined here as one who could express a first preference in the initial vote intention
+     question, and is certain they will vote that way. A soft voter is one who also expressed a first preference in the initial vote intention question but says they may change
+     their vote. A very soft voter is one who was either undecided in the first vote intention question but who was then able to express a preference when prompted, or
+     who otherwise says they will probably change their vote. The vertical dashed line represents the date of the 2025 federal election.
+                                                    Table 4: Vote softness by current first preference vote intention.
+
+                        ALL VOTERS                 LABOR                     COALITION                     ONE NATION                 GREENS                 OTHER PARTIES
+
+     Wave       Solid    Soft    V. soft   Solid   Soft    V. soft   Solid    Soft       V. soft   Solid     Soft   V. soft   Solid   Soft     V. soft   Solid   Soft   V. soft
+
+     Aug 2026     48       43         9      49     44          7      47      43            10      56       37         7      40     53           7      32     49         19
+     Jul 2026     49       42         9      51     40          9      47      44             9      59       36         5      39     52           9      32     46         22
+     Jun 2026     49       41        10      47     43         10      51      37            12      53       39         8      47     46           7      44     40         16
+     May 2026     49       41        10      49     38         13      49      39            12      52       42         6      54     39           7      28     52         20
+     Apr 2026     52       39         9      53     39          8      50      39            11      59       32         9      48     46           6      26     60         14
+
+     Mar 2026     46       43        11      48     41         11      43      45            12      59       34         7      34     56          10      26     52         22
+     Feb 2026     46       42        12      45     43         12      42      48            10      54       36        10      44     44          12      35     47         18
+     Jan 2026     48       41        11      49     42          9      40      45            15      56       37         7      45     44          11      41     43         16
+     Dec 2025     46       45         9      46     47          7      48      42            10      54       39         7      42     47          11      38     46         16
+     Nov 2025     48       43         9      48     45          7      53      35            12      54       39         7      48     45           7      28     59         13
+
+     Oct 2025     50       41         9      51     40          9      56      35             9      49       45         6      44     49           7      36     45         19
+     Sep 2025     52       37        11      52     39          9      60      28            12      54       37         9      49     42           9      36     48         16
+     Jun 2025     54       38         8      54     38          8      62      31             7      52       40         8      46     47           7      41     42         17
+     Apr 2025     68       26         6      69     25          6      74      21             5      67       29         4      63     32           5      53     34         13
+     Mar 2025     55       37         8      51     41          8      65      29             6      48       40        12      45     48           7      43     42         15
+12
+     Feb 2025     53       38         9      51     39         10      61      34             5      45       39        16      50     39          11      35     51         14
+     Nov 2024     48       36        16      47     44          9      64      31             5      58       34         8      43     49           8      37     49         14
+Name recognition and favourability ratings of political figures
+
+Question text
+
+
+Do you have a favourable or unfavourable view of the following?
+
+Grid; randomise items
+
+  A. Anthony Albanese
+  B. Larissa Waters
+  C. Pauline Hanson
+  D. Angus Taylor
+  E. Matt Canavan
+   F. Jim Chalmers
+
+Single select; random reverse 1-5
+
+  1. Very favourable
+  2. Mostly favourable
+  3. Neither favourable nor unfavourable
+  4. Mostly unfavourable
+  5. Very unfavourable
+  6. Not sure
+  7. I have not heard of them
+
+*Some of the individuals asked about are rotated between surveys, and not asked in every wave.
+
+
+
+
+                                                  13
+14
+
+
+
+
+     Figure 5: Favourability ratings and name recognition of political figures. Figures above the top row of the plot indicate the net share who are favourable to each
+     individual (total share who hold a favourable view, minus the share who hold an unfavourable view). The values above the second row of the plot represent the
+     share of voters with hard name recognition of each political figure (that is, the percentage who are able to express either a favourable or unfavourable perception
+     of each).
+                      Table 5: Favourability ratings and name recognition of political figures.
+
+Wave         Very favourable      Mostly      Neither    Mostly un-     Very un-   Not sure   I have not              Net
+                               favourable   favourable   favourable   favourable                  heard of   favourability
+                                               nor un-                                               them
+                                            favourable
+
+Albanese
+  Aug 2026               11           20           18           15           33          2              1             -17
+  Jul 2026                8           22           19           16           33          2              0             -19
+  Jun 2026                8           23           16           15           34          3              1             -18
+  May 2026               10           19           18           14           34          4              1             -19
+  Apr 2026               10           24           20           16           27          3              0               -9
+  Mar 2026                9           20           23           15           31          2              0             -17
+  Feb 2026                9           23           19           16           29          4              0             -13
+  Jan 2026               11           23           19           13           31          3              0             -10
+  Dec 2025               12           27           19           12           26          4              0               1
+  Nov 2025               12           25           20           13           26          4              0               -2
+
+Canavan
+  Aug 2026                4           10           25            9            9         10             33               -4
+  Jul 2026                4           12           25            8            8         10             33               0
+  Jun 2026                4            9           23            8           12         11             33               -7
+  May 2026                4            9           24            7           10         11             35               -4
+  Apr 2026                5            9           25            5           11         10             35               -2
+  Mar 2026                6            8           24            7           10         12             33               -3
+
+Chalmers
+  Aug 2026                5           14           24           11           22         11             13             -14
+  Jun 2026                5           13           23           13           23          8             15             -18
+  May 2026                5           12           22           11           24         10             16             -18
+  Dec 2025                6           16           26           11           16          9             16               -5
+
+Hanson
+  Aug 2026               18           18           13           10           38          2              1             -12
+  Jul 2026               20           16           15           10           36          2              1             -10
+  Jun 2026               19           18           11           10           37          4              1             -10
+  May 2026               21           19           14            9           31          5              1               0
+  Apr 2026               18           22           15           11           30          3              1               -1
+  Mar 2026               21           19           13           12           31          4              0               -3
+  Feb 2026               20           18           17           12           28          4              1               -2
+  Jan 2026               19           19           17           10           31          3              1               -3
+  Dec 2025               15           16           15           13           37          2              2             -19
+  Nov 2025               16           16           18           12           33          4              1             -13
+
+Taylor
+  Aug 2026                5           17           28           13           12          9             16               -3
+  Jul 2026                5           15           31           14           12          7             16               -6
+  Jun 2026                3           14           28           12           14         11             18               -9
+  May 2026                6           15           23           11           14         10             21               -4
+  Apr 2026                5           15           27           10           12          9             22               -2
+  Mar 2026                5           14           25           10           12         10             24               -3
+  Feb 2026                5           14           25           10           10         11             25               -1
+  Jan 2026                3           10           25            7           10         10             35               -4
+  Nov 2025                3            9           25            8           10          9             36               -6
+
+Waters
+  Aug 2026                2            6           21            5            7          9             50               -4
+  Jul 2026                2            4           22            6            8          9             49               -8
+  Jun 2026                3            5           18            5           11          9             49               -8
+  May 2026                2            5           17            5            8         12             51               -6
+
+
+
+
+                                                          15
+              Table 5: Favourability ratings and name recognition of political figures. (continued)
+
+Wave        Very favourable      Mostly      Neither    Mostly un-     Very un-   Not sure   I have not            Net
+                              favourable   favourable   favourable   favourable               heard of    favourability
+                                              nor un-                                            them
+                                           favourable
+
+ Apr 2026                2            5           19            4            7          9           54               -4
+ Feb 2026                2            5           20            4            6         11           52               -3
+ Nov 2025                2            4           20            4            9         10           51               -7
+
+
+
+
+                                                         16
+Anthony Albanese
+
+
+
+
+                   17
+Figure 6: Favourability rating and name recognition of Anthony Albanese, by demographic characteristics, 24-28
+August. Figures in black on the right-hand side of the plot indicate the net share who are favourable towards each
+individual or group (total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                       18
+                  Table 6: Favourability rating and name recognition of Anthony Albanese, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters               11                  20               18             15             33          2               1             -17
+
+     Federal vote intention
+                               Labor                35                  42               16              4              1          1               1              72
+                              Liberal                4                   9               15             23             47          2               0             -57
+                       CLP/LNP/Nat                   0                   6               15             24             54          1               0             -72
+                         One Nation                  1                   6                9             13             70          1               0             -76
+                              Greens                 6                  29               33             22              8          1               1               5
+       Other parties and candidates                  4                  21               21             19             29          2               4             -23
+          Undecided / will not vote                  2                   6               35             20             19         18               0             -31
+
+     Vote softness
+                                Solid               17                  17                9             10             45          1               1             -21
+                                 Soft                9                  26               20             18             26          1               0               -9
+                            Very soft                4                  15               39             17             19          2               4             -17
+
+     Generation
+                              Gen-Z                  8                  27               25             19             16          3               2               0
+                          Millennials               10                  21               18             15             30          4               2             -14
+
+19                            Gen-X                 12                  17               20             14             34          3               0             -19
+                      Baby Boomers                  14                  16               12             12             45          1               0             -27
+
+     Gender
+                             Women                  11                  19               21             16             30          3               0             -16
+                                Men                 12                  20               15             13             37          2               1             -18
+
+     Location
+                  Inner Metropolitan                11                  20               23             13             29          3               1             -11
+                  Outer Metropolitan                14                  22               16             17             29          2               0             -10
+                           Provincial                8                  22               14             17             37          1               1             -24
+                                Rural               11                  14               17             13             40          4               1             -28
+
+     Education
+                   Less than year 12                14                  13               13             15             39          5               1             -27
+                Year 12 or equivalent                6                  27               23             15             26          1               2               -8
+          TAFE, trade or vocational                 12                  13               17             15             39          3               1             -29
+                   University degree                13                  26               17             14             27          3               0               -2
+
+     Home ownership
+                     Owned outright                 13                  18               13             13             41          2               0             -23
+           Owned with a mortgage                    10                  21               15             17             35          2               0             -21
+                   Renting and other                12                  19               27             14             22          4               2               -5
+Angus Taylor
+
+
+
+
+               20
+Figure 7: Favourability rating and name recognition of Angus Taylor, by demographic characteristics, 24-28 August.
+Figures in black on the right-hand side of the plot indicate the net share who are favourable towards each individual or
+group (total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                          21
+                      Table 7: Favourability rating and name recognition of Angus Taylor, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters                5                  17               28             13             12          9              16               -3
+
+     Federal vote intention
+                               Labor                 1                   9               25             25             22          9               9             -37
+                              Liberal               16                  35               31              2              0          8               8              49
+                       CLP/LNP/Nat                  23                  29               27              8              1          4               8              43
+                         One Nation                  3                  21               38              8              7          7              16               9
+                              Greens                 0                   8               15             15             20         11              31             -27
+       Other parties and candidates                  5                  11               25             11             17          9              22             -12
+          Undecided / will not vote                  0                   6               17             11             10         23              33             -15
+
+     Vote softness
+                                Solid                7                  18               27             11             19          5              13               -5
+                                 Soft                4                  19               30             14              7         11              15               2
+                            Very soft                5                  12               30             17              4          9              23               -4
+
+     Generation
+                              Gen-Z                  1                  11               26             11              6         13              32               -5
+                          Millennials                2                  15               25             11             13         12              22               -7
+
+22                            Gen-X                  5                  15               31             12             14         10              13               -6
+                      Baby Boomers                  10                  23               29             16             14          4               4               3
+
+     Gender
+                             Women                   4                  15               26             10             12         11              22               -3
+                                Men                  6                  19               30             15             13          7              10               -3
+
+     Location
+                  Inner Metropolitan                 5                  16               33             14             12          7              13               -5
+                  Outer Metropolitan                 5                  18               25             14             10         13              15               -1
+                           Provincial                7                  19               29              8             14         10              13               4
+                                Rural                4                  16               24             13             14          7              22               -7
+
+     Education
+                   Less than year 12                 5                  24               29             10             11          7              14               8
+                Year 12 or equivalent                6                  13               28             11             14          9              19               -6
+          TAFE, trade or vocational                  5                  15               27             11             12         12              18               -3
+                   University degree                 5                  18               29             18             12          7              11               -7
+
+     Home ownership
+                     Owned outright                  7                  23               31             16             12          4               7               2
+           Owned with a mortgage                     4                  16               29             11             11         11              18               -2
+                   Renting and other                 4                  11               23             11             14         13              24             -10
+Pauline Hanson
+
+
+
+
+                 23
+Figure 8: Favourability rating and name recognition of Pauline Hanson, by demographic characteristics, 24-28 August.
+Figures in black on the right-hand side of the plot indicate the net share who are favourable towards each individual or
+group (total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                          24
+                     Table 8: Favourability rating and name recognition of Pauline Hanson, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters               18                  18               13             10             38          2               1             -12
+
+     Federal vote intention
+                               Labor                 2                   5               10             12             68          2               1             -73
+                              Liberal               11                  26               24             16             20          3               0               1
+                       CLP/LNP/Nat                  11                  34               19             11             19          6               0              15
+                         One Nation                 58                  30                8              1              2          0               1              85
+                              Greens                 0                   2                9              6             83          0               0             -87
+       Other parties and candidates                  6                  23               12             16             39          4               0             -26
+          Undecided / will not vote                  0                  10               18             26             37          7               2             -53
+
+     Vote softness
+                                Solid               32                  12                8              7             39          1               1               -2
+                                 Soft               10                  25               15             10             37          3               0             -12
+                            Very soft                4                  20               22             15             33          4               2             -24
+
+     Generation
+                              Gen-Z                  9                  15               15              7             52          1               1             -35
+                          Millennials               19                  17               11             13             35          4               1             -12
+
+25                            Gen-X                 20                  19               13              9             36          2               1               -6
+                      Baby Boomers                  23                  19               12             11             33          2               0               -2
+
+     Gender
+                             Women                  17                  17               12             12             39          3               0             -17
+                                Men                 20                  19               13              8             37          2               1               -6
+
+     Location
+                  Inner Metropolitan                16                  14               14             13             41          2               0             -24
+                  Outer Metropolitan                15                  20               13             10             39          2               1             -14
+                           Provincial               15                  18               19              7             37          4               0             -11
+                                Rural               27                  20                8              9             32          3               1               6
+
+     Education
+                   Less than year 12                29                  23               13             10             23          1               1              19
+                Year 12 or equivalent               11                  15               14              8             46          5               1             -28
+          TAFE, trade or vocational                 23                  20               12             12             30          3               0               1
+                   University degree                12                  14               12             10             50          2               0             -34
+
+     Home ownership
+                     Owned outright                 22                  17               11             11             36          3               0               -8
+           Owned with a mortgage                    18                  21               12             11             36          2               0               -8
+                   Renting and other                15                  15               15              8             43          2               2             -21
+Matt Canavan
+
+
+
+
+               26
+Figure 9: Favourability rating and name recognition of Matt Canavan, by demographic characteristics, 24-28 August.
+Figures in black on the right-hand side of the plot indicate the net share who are favourable towards each individual or
+group (total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                          27
+                     Table 9: Favourability rating and name recognition of Matt Canavan, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters                4                  10               25              9              9         10              33               -4
+
+     Federal vote intention
+                               Labor                 0                   7               27             16             15          7              28             -24
+                              Liberal                8                  14               32              3              2          9              32              17
+                       CLP/LNP/Nat                  19                  23               31              4              4          6              13              34
+                         One Nation                  7                  13               28              5              7          9              31               8
+                              Greens                 1                   3               15             12             15         10              44             -23
+       Other parties and candidates                  1                  14               19              9             12         10              35               -6
+          Undecided / will not vote                  0                   3               11              9              5         20              52             -11
+
+     Vote softness
+                                Solid                7                  11               26              9             14          5              28               -5
+                                 Soft                3                  12               28              8              6         11              32               1
+                            Very soft                2                   4               19             16              3         14              42             -13
+
+     Generation
+                              Gen-Z                  1                   4               22              8              5         10              50               -8
+                          Millennials                3                   5               27              7             11         11              36             -10
+
+28                            Gen-X                  2                  13               24             10              8         10              33               -3
+                      Baby Boomers                  10                  15               26             10             11          8              20               4
+
+     Gender
+                             Women                   3                   9               22              8              8         12              38               -4
+                                Men                  6                  11               28             10             11          7              27               -4
+
+     Location
+                  Inner Metropolitan                 4                   8               27             12             11          9              29             -11
+                  Outer Metropolitan                 3                  12               26             11              5         11              32               -1
+                           Provincial                5                  13               23              4             13         10              32               1
+                                Rural                6                  10               22              7              9          8              38               0
+
+     Education
+                   Less than year 12                 5                  16               25              8              3         13              30              10
+                Year 12 or equivalent                2                   4               23             10             10         11              40             -14
+          TAFE, trade or vocational                  6                  11               24              8             11          8              32               -2
+                   University degree                 4                  11               27             10             10          8              30               -5
+
+     Home ownership
+                     Owned outright                  6                  15               27              9              9          7              27               3
+           Owned with a mortgage                     4                   9               25              9              8          9              36               -4
+                   Renting and other                 3                   8               23              8             10         13              35               -7
+Larissa Waters
+
+
+
+
+                 29
+Figure 10: Favourability rating and name recognition of Larissa Waters, by demographic characteristics, 24-28 August.
+Figures in black on the right-hand side of the plot indicate the net share who are favourable towards each individual or
+group (total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                          30
+                     Table 10: Favourability rating and name recognition of Larissa Waters, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters                2                   6               21              5              7          9              50               -4
+
+     Federal vote intention
+                               Labor                 2                   8               29              4              3          8              46               3
+                              Liberal                0                   7               27              2              7          7              50               -2
+                       CLP/LNP/Nat                   3                   2               15              8             17          3              52             -20
+                         One Nation                  0                   1               20              7             10         11              51             -16
+                              Greens                11                  17               16              3              2          9              42              23
+       Other parties and candidates                  3                   7               17              6              8          6              53               -4
+          Undecided / will not vote                  0                   1                6              6              2         16              69               -7
+
+     Vote softness
+                                Solid                3                   5               22              4             10          6              50               -6
+                                 Soft                2                   8               25              5              5         10              45               0
+                            Very soft                0                   4               21              5              1         11              58               -2
+
+     Generation
+                              Gen-Z                  5                   9               21              4              3          7              51               7
+                          Millennials                2                   9               18              7              5         13              46               -1
+
+31                            Gen-X                  2                   3               21              5              5         10              54               -5
+                      Baby Boomers                   1                   4               25              4             11          6              49             -10
+
+     Gender
+                             Women                   4                   4               18              4              5         11              54               -1
+                                Men                  1                   8               25              5              9          6              46               -5
+
+     Location
+                  Inner Metropolitan                 3                   7               25              7              5          7              46               -2
+                  Outer Metropolitan                 1                   6               25              3              8         10              47               -4
+                           Provincial                3                   6               16              5              8          6              56               -4
+                                Rural                2                   4               18              4              7         10              55               -5
+
+     Education
+                   Less than year 12                 2                   4               19              5              4         10              56               -3
+                Year 12 or equivalent                2                   8               23              5              7          8              47               -2
+          TAFE, trade or vocational                  1                   4               21              4              8          8              54               -7
+                   University degree                 3                   8               22              7              6          9              45               -2
+
+     Home ownership
+                     Owned outright                  1                   4               26              4              7          5              53               -6
+           Owned with a mortgage                     1                   4               21              6              6         10              52               -7
+                   Renting and other                 4                  11               17              5              7         12              44               3
+Jim Chalmers
+
+
+
+
+               32
+Figure 11: Favourability rating and name recognition of Jim Chalmers, by demographic characteristics, 24-28 August.
+Figures in black on the right-hand side of the plot indicate the net share who are favourable towards each individual or
+group (total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                          33
+                     Table 11: Favourability rating and name recognition of Jim Chalmers, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters                5                  14               24             11             22         11              13             -14
+
+     Federal vote intention
+                               Labor                13                  32               29              4              1         13               8              40
+                              Liberal                3                   8               21             19             28         12               9             -36
+                       CLP/LNP/Nat                   0                   7               25             23             39          2               4             -55
+                         One Nation                  1                   3               15             11             48         10              12             -55
+                              Greens                 2                  12               34              8              6         12              26               0
+       Other parties and candidates                  4                  14               25             16             14          8              19             -12
+          Undecided / will not vote                  0                   3               27             16             14         16              24             -27
+
+     Vote softness
+                                Solid                7                  13               18             10             31          9              12             -21
+                                 Soft                3                  17               30             11             16         11              12               -7
+                            Very soft                4                  12               24             18             10         14              18             -12
+
+     Generation
+                              Gen-Z                  3                  11               27              9              6         12              32               -1
+                          Millennials                1                  12               27             10             19         16              15             -16
+
+34                            Gen-X                  2                  16               28             12             23         10               9             -17
+                      Baby Boomers                  10                  15               17             14             33          7               4             -22
+
+     Gender
+                             Women                   4                  13               25             11             16         14              17             -10
+                                Men                  5                  14               23             12             28          8              10             -21
+
+     Location
+                  Inner Metropolitan                 6                  15               27             13             19         11               9             -11
+                  Outer Metropolitan                 4                  16               25              9             19         12              15               -8
+                           Provincial                6                  11               23              8             30          9              13             -21
+                                Rural                4                  11               19             15             24         11              16             -24
+
+     Education
+                   Less than year 12                 3                  14               24             12             24         13              10             -19
+                Year 12 or equivalent                4                  12               26             12             18          8              20             -14
+          TAFE, trade or vocational                  5                   9               20             11             27         13              15             -24
+                   University degree                 5                  20               28             12             17         10               8               -4
+
+     Home ownership
+                     Owned outright                  8                  17               19             13             28          8               7             -16
+           Owned with a mortgage                     1                  13               26             11             23         13              13             -20
+                   Renting and other                 5                  11               27             10             14         12              21               -8
+Favourability ratings of institutions
+
+Question text
+
+
+And what about these…
+
+Do you have a favourable or unfavourable view of the following?
+
+Grid; randomise items
+
+  A. The Liberal Party
+  B. The Labor Party
+  C. The Greens
+  D. Pauline Hanson’s One Nation
+  E. The National Party
+   F. Medicare
+
+Single select; random reverse 1-5
+
+  1. Very favourable
+  2. Mostly favourable
+  3. Neither favourable nor unfavourable
+  4. Mostly unfavourable
+  5. Very unfavourable
+  6. Not sure
+  7. I have not heard of them
+
+*In some instances, the parties (or other institutions) asked about are rotated between surveys.
+
+
+
+
+                                                    35
+Figure 12: Favourability ratings and awareness of parties and institutions. Figures in black on the right-hand side of the
+first plot indicate the net share who are favourable to each organisation (total share who hold a favourable view, minus
+the share who hold an unfavourable view). The values on the right-hand side of the second plot represent the share of
+voters with hard awareness of each organisation (that is, the percentage who are able to express either a favourable or
+unfavourable perception of each).
+
+
+                                                           36
+                                   Table 12: Favourability ratings and awareness of institutions.
+
+Wave             Very favourable         Mostly      Neither    Mostly un-     Very un-   Not sure   I have not            Net
+                                      favourable   favourable   favourable   favourable               heard of    favourability
+                                                      nor un-                                            them
+                                                   favourable
+
+Labor Party
+  Aug 2026                   13              22           16           15           31          3            0             -11
+  Jul 2026                    9              24           19           16           30          2            0             -13
+  Jun 2026                   10              24           17           14           31          4            0             -11
+  May 2026                    9              24           17           14           31          5            0             -12
+  Apr 2026                   10              26           20           14           25          5            0               -3
+  Mar 2026                   11              24           19           14           29          3            0               -8
+  Feb 2026                   10              27           19           16           25          3            0               -4
+  Jan 2026                   12              25           20           12           28          3            0               -3
+  Dec 2025                   12              30           20           12           23          3            0               7
+  Nov 2025                   13              28           19           15           23          2            0               3
+
+Liberal Party
+  Aug 2026                    7              25           27           20           17          4            0               -5
+  Jul 2026                    7              22           31           22           15          3            0               -8
+  Jun 2026                    5              20           27           23           21          4            0             -19
+  May 2026                    7              21           26           20           21          5            0             -13
+  Apr 2026                    7              20           29           21           18          5            0             -12
+  Mar 2026                    6              20           28           21           22          3            0             -17
+  Feb 2026                    8              20           26           24           19          3            0             -15
+  Jan 2026                    4              20           26           23           23          4            0             -22
+  Dec 2025                    8              23           22           23           21          3            0             -13
+  Nov 2025                    8              21           24           23           21          3            0             -15
+
+Medicare
+  Aug 2026                   36              37           20            3            2          1            1              68
+
+National Party
+  Aug 2026                    5              19           32           17           17          9            1             -10
+  Jul 2026                    6              16           32           21           15          8            2             -14
+  Jun 2026                    3              14           35           18           20          8            2             -21
+  May 2026                    4              16           33           17           20          9            1             -17
+  Apr 2026                    5              16           33           19           17          9            1             -15
+  Mar 2026                    4              16           34           18           18          9            1             -16
+  Feb 2026                    4              15           34           20           17          8            2             -18
+  Jan 2026                    4              17           30           18           20          9            2             -17
+
+One Nation
+  Aug 2026                   18              18           14           10           36          3            1             -10
+  Jul 2026                   20              17           14            9           37          3            0               -9
+  Jun 2026                   17              17           13            9           40          3            1             -15
+  May 2026                   20              20           15            9           32          4            0               -1
+  Apr 2026                   18              21           16           10           32          3            0               -3
+  Mar 2026                   21              17           16           11           32          3            0               -5
+  Feb 2026                   19              18           17           10           30          5            1               -3
+  Jan 2026                   17              20           15           10           33          4            1               -6
+  Dec 2025                   13              18           16           14           36          2            1             -19
+  Nov 2025                   14              16           19           14           34          3            0             -18
+
+The Greens
+  Aug 2026                    8              19           24           13           31          5            0             -17
+  Jul 2026                    8              17           25           14           32          3            1             -21
+  Jun 2026                    9              18           23           13           32          5            0             -18
+  May 2026                    7              18           23           14           33          5            0             -22
+
+
+
+
+                                                                 37
+                    Table 12: Favourability ratings and awareness of institutions. (continued)
+
+Wave        Very favourable      Mostly      Neither    Mostly un-     Very un-   Not sure   I have not            Net
+                              favourable   favourable   favourable   favourable               heard of    favourability
+                                              nor un-                                            them
+                                           favourable
+
+ Apr 2026                7           19           24           14           31          5            0             -19
+ Mar 2026                7           18           22           16           33          4            0             -24
+ Feb 2026                7           19           24           16           30          4            0             -20
+ Jan 2026                6           17           22           14           35          5            1             -26
+ Dec 2025                8           19           24           12           34          3            0             -19
+ Nov 2025                7           16           24           14           36          3            0             -27
+
+
+
+
+                                                         38
+The Labor Party
+
+
+
+
+                  39
+Figure 13: Favourability rating and awareness of the Labor Party, by demographic characteristics, 24-28 August. Fig-
+ures in black on the right-hand side of the plot indicate the net share who are favourable towards each individual or
+group (total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                        40
+                         Table 13: Favourability rating and awareness of the Labor Party, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters               13                  22               16             15             31          3               0             -11
+
+     Federal vote intention
+                               Labor                41                  47                9              1              1          1               0              86
+                              Liberal                3                  12               10             30             44          1               0             -59
+                       CLP/LNP/Nat                   0                  10               11             28             51          0               0             -69
+                         One Nation                  2                   5                9             16             66          2               0             -75
+                              Greens                 6                  36               30             18              8          2               0              16
+       Other parties and candidates                  3                  18               29             22             26          2               0             -27
+          Undecided / will not vote                  0                   2               39             17             16         25               1             -31
+
+     Vote softness
+                                Solid               19                  19                5             12             44          1               0             -18
+                                 Soft               10                  29               20             18             22          1               0               -1
+                            Very soft                3                  22               31             17             19          8               0             -11
+
+     Generation
+                              Gen-Z                 12                  36               20             14             13          5               0              21
+                          Millennials               10                  22               18             18             28          4               0             -14
+
+41                            Gen-X                 13                  18               17             13             35          4               0             -17
+                      Baby Boomers                  15                  16                9             16             42          2               0             -27
+
+     Gender
+                             Women                  11                  23               17             16             29          4               0             -11
+                                Men                 14                  21               14             15             34          2               0             -14
+
+     Location
+                  Inner Metropolitan                11                  24               22             15             27          1               0               -7
+                  Outer Metropolitan                17                  23               16             14             26          4               0               0
+                           Provincial               10                  24                9             17             38          2               0             -21
+                                Rural               11                  17               12             17             37          6               0             -26
+
+     Education
+                   Less than year 12                11                  18               10             17             38          6               0             -26
+                Year 12 or equivalent               10                  30               18             14             25          3               0               1
+          TAFE, trade or vocational                 13                  15               14             17             36          5               0             -25
+                   University degree                14                  27               18             14             26          1               0               1
+
+     Home ownership
+                     Owned outright                 13                  21               10             16             38          2               0             -20
+           Owned with a mortgage                    11                  21               17             17             31          3               0             -16
+                   Renting and other                13                  24               21             13             23          6               0               1
+The Liberal Party
+
+
+
+
+                    42
+Figure 14: Favourability rating and awareness of the Liberal Party, by demographic characteristics, 24-28 August.
+Figures in black on the right-hand side of the plot indicate the net share who are favourable towards each individual or
+group (total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                          43
+                        Table 14: Favourability rating and awareness of the Liberal Party, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters                7                  25               27             20             17          4               0               -5
+
+     Federal vote intention
+                               Labor                 1                  10               29             35             24          1               0             -48
+                              Liberal               25                  57               14              2              0          2               0              80
+                       CLP/LNP/Nat                  36                  48               14              2              0          0               0              82
+                         One Nation                  3                  32               35             13             14          3               0               8
+                              Greens                 0                   6               25             31             37          1               0             -62
+       Other parties and candidates                  1                  16               26             26             27          4               0             -36
+          Undecided / will not vote                  0                   5               40             15             15         24               1             -25
+
+     Vote softness
+                                Solid               11                  24               20             17             26          2               0               -8
+                                 Soft                4                  31               30             23             11          1               0               1
+                            Very soft                7                  18               44             20              7          4               0               -2
+
+     Generation
+                              Gen-Z                  4                  17               32             25             18          4               0             -22
+                          Millennials                5                  24               28             17             20          6               0               -8
+
+44                            Gen-X                  6                  22               28             22             19          3               0             -13
+                      Baby Boomers                  11                  32               24             16             14          3               0              13
+
+     Gender
+                             Women                   5                  25               29             20             17          4               0               -7
+                                Men                  9                  24               27             19             18          3               0               -4
+
+     Location
+                  Inner Metropolitan                 8                  24               31             18             17          2               0               -3
+                  Outer Metropolitan                 7                  25               29             18             17          4               0               -3
+                           Provincial                9                  25               23             24             16          3               0               -6
+                                Rural                4                  24               25             22             19          6               0             -13
+
+     Education
+                   Less than year 12                10                  28               25             12             18          7               0               8
+                Year 12 or equivalent                6                  23               26             19             23          3               0             -13
+          TAFE, trade or vocational                  6                  23               30             20             17          4               0               -8
+                   University degree                 8                  27               27             23             14          1               0               -2
+
+     Home ownership
+                     Owned outright                  8                  31               22             19             17          3               0               3
+           Owned with a mortgage                     6                  25               31             21             14          3               0               -4
+                   Renting and other                 6                  18               29             20             22          5               0             -18
+The National Party
+
+
+
+
+                     45
+Figure 15: Favourability rating and awareness of the National Party, by demographic characteristics, 24-28 August.
+Figures in black on the right-hand side of the plot indicate the net share who are favourable towards each individual or
+group (total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                          46
+                       Table 15: Favourability rating and awareness of the National Party, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters                5                  19               32             17             17          9               1             -10
+
+     Federal vote intention
+                               Labor                 1                   5               35             26             25          7               1             -45
+                              Liberal                7                  36               36             13              1          5               2              29
+                       CLP/LNP/Nat                  30                  44               19              0              2          5               0              72
+                         One Nation                  5                  31               34             13             10          7               0              13
+                              Greens                 0                   9               20             14             41         11               5             -46
+       Other parties and candidates                  4                  12               36             25             19          3               1             -28
+          Undecided / will not vote                  2                   1               36             15             16         29               1             -28
+
+     Vote softness
+                                Solid                7                  22               25             17             23          5               1             -11
+                                 Soft                4                  20               38             16             12          8               2               -4
+                            Very soft                1                  17               43             18              9         10               2               -9
+
+     Generation
+                              Gen-Z                  2                  12               35             14             21         11               5             -21
+                          Millennials                4                  14               35             14             20         12               1             -16
+
+47                            Gen-X                  4                  19               32             19             16         10               0             -12
+                      Baby Boomers                   9                  27               29             18             13          4               0               5
+
+     Gender
+                             Women                   4                  16               33             19             16         11               1             -15
+                                Men                  6                  23               32             14             18          6               1               -3
+
+     Location
+                  Inner Metropolitan                 4                  17               35             18             19          6               1             -16
+                  Outer Metropolitan                 3                  19               36             17             13         10               2               -8
+                           Provincial               11                  16               32             13             18          9               1               -4
+                                Rural                5                  24               26             16             18         10               1               -5
+
+     Education
+                   Less than year 12                 6                  28               26             15             11         11               3               8
+                Year 12 or equivalent                4                  22               30             11             22          9               2               -7
+          TAFE, trade or vocational                  6                  17               36             16             15         10               0               -8
+                   University degree                 4                  17               32             23             18          5               1             -20
+
+     Home ownership
+                     Owned outright                  5                  26               29             18             16          6               0               -3
+           Owned with a mortgage                     5                  16               36             19             14          9               1             -12
+                   Renting and other                 5                  16               32             12             21         11               3             -12
+Pauline Hanson’s One Nation
+
+
+
+
+                              48
+Figure 16: Favourability rating and awareness of Pauline Hanson’s One Nation, by demographic characteristics, 24-28
+August. Figures in black on the right-hand side of the plot indicate the net share who are favourable towards each
+individual or group (total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                        49
+              Table 16: Favourability rating and awareness of Pauline Hanson’s One Nation, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters               18                  18               14             10             36          3               1             -10
+
+     Federal vote intention
+                               Labor                 2                   5               12             12             65          3               1             -70
+                              Liberal                9                  29               23             18             19          2               0               1
+                       CLP/LNP/Nat                   6                  31               34              9             18          2               0              10
+                         One Nation                 59                  34                6              0              0          0               1              93
+                              Greens                 0                   4                7              8             81          0               0             -85
+       Other parties and candidates                  6                  17               15             13             41          8               0             -31
+          Undecided / will not vote                  0                   7               24             16             32         19               2             -41
+
+     Vote softness
+                                Solid               32                  14                8              8             37          1               0               1
+                                 Soft               10                  24               18             10             35          2               1             -11
+                            Very soft                3                  27               18             12             34          4               2             -16
+
+     Generation
+                              Gen-Z                 13                   8               17              8             48          3               3             -35
+                          Millennials               21                  15               14              9             36          5               0               -9
+
+50                            Gen-X                 20                  22               14              9             33          2               0               0
+                      Baby Boomers                  18                  24               12             12             31          3               0               -1
+
+     Gender
+                             Women                  15                  19               13             12             37          3               1             -15
+                                Men                 21                  18               15              7             35          3               1               -3
+
+     Location
+                  Inner Metropolitan                14                  17               16             12             39          2               0             -20
+                  Outer Metropolitan                17                  18               13              9             39          2               2             -13
+                           Provincial               15                  17               22              7             35          4               0             -10
+                                Rural               26                  21                8              9             30          6               0               8
+
+     Education
+                   Less than year 12                24                  29               10              9             21          6               1              23
+                Year 12 or equivalent               13                  11               19              8             44          4               1             -28
+          TAFE, trade or vocational                 23                  22               13             10             29          3               0               6
+                   University degree                13                  14               13             11             47          2               0             -31
+
+     Home ownership
+                     Owned outright                 20                  20               14             11             32          3               0               -3
+           Owned with a mortgage                    19                  19               14              9             36          3               0               -7
+                   Renting and other                15                  16               14              8             40          5               2             -17
+The Greens
+
+
+
+
+             51
+Figure 17: Favourability rating and awareness of the Greens, by demographic characteristics, 24-28 August. Figures
+in black on the right-hand side of the plot indicate the net share who are favourable towards each individual or group
+(total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                         52
+                            Table 17: Favourability rating and awareness of the Greens, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters                8                  19               24             13             31          5               0             -17
+
+     Federal vote intention
+                               Labor                 6                  32               37             13              8          4               0              17
+                              Liberal                0                   8               20             20             47          5               0             -59
+                       CLP/LNP/Nat                   0                  12               18             12             54          4               0             -54
+                         One Nation                  1                   9               15             13             60          2               0             -63
+                              Greens                52                  41                6              0              1          0               0              92
+       Other parties and candidates                  8                  16               28             15             29          4               0             -20
+          Undecided / will not vote                  0                   6               37             18             12         26               1             -24
+
+     Vote softness
+                                Solid               11                  16               19             11             40          3               0             -24
+                                 Soft                7                  24               26             13             27          3               0               -9
+                            Very soft                0                  23               29             22             20          4               2             -19
+
+     Generation
+                              Gen-Z                 17                  31               27              7             15          2               1              26
+                          Millennials                9                  18               27             13             25          8               0             -11
+
+53                            Gen-X                  7                  18               25             14             30          6               0             -19
+                      Baby Boomers                   2                  14               18             16             46          4               0             -46
+
+     Gender
+                             Women                   9                  23               24             14             25          5               0               -7
+                                Men                  7                  14               24             13             38          4               0             -30
+
+     Location
+                  Inner Metropolitan                 8                  22               24             14             29          3               0             -13
+                  Outer Metropolitan                 8                  21               26             15             25          4               1             -11
+                           Provincial               11                  15               26              8             35          5               0             -17
+                                Rural                6                  16               20             14             37          7               0             -29
+
+     Education
+                   Less than year 12                 1                  13               23             16             35         12               0             -37
+                Year 12 or equivalent               16                  22               27             10             21          3               1               7
+          TAFE, trade or vocational                  4                  16               23             15             37          5               0             -32
+                   University degree                10                  24               23             13             28          2               0               -7
+
+     Home ownership
+                     Owned outright                  4                  18               18             15             40          5               0             -33
+           Owned with a mortgage                     8                  18               24             14             32          4               0             -20
+                   Renting and other                12                  21               30             11             19          6               1               3
+Medicare
+
+
+
+
+           54
+Figure 18: Favourability rating and awareness of Medicare, by demographic characteristics, 24-28 August. Figures in
+black on the right-hand side of the plot indicate the net share who are favourable towards each individual or group
+(total share who hold a favourable view, minus the share who hold an unfavourable view).
+
+
+
+
+                                                        55
+                              Table 18: Favourability rating and awareness of Medicare, by demographic characteristics, 24-28 August.
+
+                                        Very favourable   Mostly favourable         Neither         Mostly           Very    Not sure      I have not            Net
+                                                                              favourable nor   unfavourable   unfavourable              heard of them   favourability
+                                                                               unfavourable
+
+                           All voters               36                  37               20              3              2          1               1              68
+
+     Federal vote intention
+                               Labor                47                  35               13              2              1          1               1              79
+                              Liberal               32                  38               25              3              1          1               0              66
+                       CLP/LNP/Nat                  32                  49               13              6              0          0               0              75
+                         One Nation                 28                  35               25              5              3          2               2              55
+                              Greens                45                  39               11              1              2          2               0              81
+       Other parties and candidates                 35                  31               21              7              3          2               1              56
+          Undecided / will not vote                 19                  38               33              3              3          4               0              51
+
+     Vote softness
+                                Solid               40                  32               19              3              3          2               1              66
+                                 Soft               35                  39               20              3              1          1               1              70
+                            Very soft               27                  49               19              3              0          2               0              73
+
+     Generation
+                              Gen-Z                 38                  34               19              4              2          1               2              66
+                          Millennials               37                  35               20              2              3          3               0              67
+
+56                            Gen-X                 33                  39               21              4              1          1               1              67
+                      Baby Boomers                  36                  38               21              3              1          1               0              70
+
+     Gender
+                             Women                  35                  39               18              4              1          2               1              69
+                                Men                 36                  35               22              2              3          1               1              66
+
+     Location
+                  Inner Metropolitan                36                  37               22              3              2          0               0              68
+                  Outer Metropolitan                37                  32               22              4              2          2               1              63
+                           Provincial               36                  41               16              2              3          1               1              72
+                                Rural               34                  40               18              3              1          3               1              70
+
+     Education
+                   Less than year 12                30                  37               24              4              2          2               1              61
+                Year 12 or equivalent               37                  42               17              2              1          1               0              76
+          TAFE, trade or vocational                 35                  32               24              3              2          2               2              62
+                   University degree                39                  40               15              3              2          1               0              74
+
+     Home ownership
+                     Owned outright                 38                  35               22              3              1          1               0              69
+           Owned with a mortgage                    34                  41               15              4              3          2               1              68
+                   Renting and other                34                  34               24              3              2          2               1              63
+Issue salience
+
+Question text
+
+
+If a federal election were held today, which of the following issues would be most important to you when
+deciding who will receive your vote?
+
+Please rank your top 3, where the most important issue is ranked 1, the second most important 2, and the
+third most important 3.
+
+Rank; min 3, max 3; randomise 1-14
+
+  1. Cost of living
+  2. Healthcare
+  3. Housing affordability
+  4. Crime and public safety
+  5. The rate of immigration
+  6. Climate change
+  7. The environment
+  8. Economic management
+  9. National security
+ 10. Education and training
+ 11. Tax reform
+ 12. Government debt
+ 13. Energy reliability
+ 14. Roads and transport
+ 15. Something else
+ 16. None of these Exclusive
+
+
+
+
+                                                  57
+Figure 19: The issues that voters say are most important when deciding how to vote. Respondents were asked to rank
+the three issues that would most influence their vote (with the most important ranked first). They are ordered by the
+share of voters ranking them as one of their top three issues.
+
+
+
+
+                                                         58
+                      Table 19: Issue salience in the two most recent waves of the AFR/RedBridge/Accent Research poll.
+
+                                                 August 2026                                   July 2026
+
+     Issue                          Ranked     Ranked     Ranked       Top 3    Ranked     Ranked      Ranked      Top 3      Top 3 –
+                                        1st       2nd          3rd                  1st        2nd         3rd                Change
+
+     Cost of living                     44         20          11         75         44         18         11            73        2
+     Healthcare                          8         15          14         37          8         14         14            36        1
+     Housing affordability               8         14          11         33          9         14         12            35        -2
+     Crime and public safety             7         10          10         27          6         12         11            29        -2
+     The rate of immigration            10         10           9         29         10         10          8            28        1
+
+     Climate change                      4          4           4         12          3          5          5            13        -1
+     The environment                     2          2           4          8          2          3          3            8         0
+     Economic management                 4          5           5         14          6          6          6            18        -4
+     National security                   2          2           5          9          2          4          5            11        -2
+     Education and training              1          2           5          8          1          3          4            8         0
+
+     Tax reform                          3          4           5         12          2          4          5            11        1
+59   Government debt                     3          4           6         13          2          4          5            11        2
+     Energy reliability                  1          4           5         10          2          2          5            9         1
+     Roads and transport                 1          2           4          7          1          2          4            7         0
+     Something else                      1          1           0          2          1          0          0            1         1
+
+     None of these                       1           -           -         -          1           -          -            -         -
+Cost of living
+
+
+
+
+                 60
+Figure 20: The salience of cost of living as a federal political issue, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                         61
+Table 20: The salience of cost of living as a federal political issue, by demographic characteristics, 24-28 August.
+
+                                               Ranked 1st       Ranked 2nd        Ranked            Not
+                                                                                      3rd        ranked
+
+                                 All voters             44               20            11            25
+
+           Federal vote intention
+                                     Labor              47               17            10            26
+                                    Liberal             38               22             7            33
+                             CLP/LNP/Nat                47               14            18            21
+                               One Nation               39               24            11            26
+                                    Greens              52               22            11            15
+             Other parties and candidates               51               21             8            20
+                 Undecided / will not vote              42               21            15            22
+
+           Vote softness
+                                      Solid             42               21            11            26
+                                       Soft             46               20            11            23
+                                  Very soft             47               19             7            27
+
+           Generation
+                                    Gen-Z               53               16            14            17
+                                Millennials             49               25             9            17
+                                    Gen-X               47               24            10            19
+                            Baby Boomers                34               17            10            39
+
+           Gender
+                                   Women                48               20            10            22
+                                      Men               40               21            11            28
+
+           Location
+                        Inner Metropolitan              41               16            11            32
+                        Outer Metropolitan              46               21            11            22
+                                 Provincial             46               27             8            19
+                                      Rural             45               21            12            22
+
+           Education
+                         Less than year 12              38               18            13            31
+                      Year 12 or equivalent             57               13            12            18
+                 TAFE, trade or vocational              40               26             8            26
+                         University degree              44               19            12            25
+
+           Home ownership
+                           Owned outright               39               15             9            37
+                  Owned with a mortgage                 49               23            10            18
+                         Renting and other              44               23            15            18
+
+
+
+
+                                                        62
+Healthcare
+
+
+
+
+             63
+Figure 21: The salience of healthcare as a federal political issue, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                       64
+Table 21: The salience of healthcare as a federal political issue, by demographic characteristics, 24-28 August.
+
+                                             Ranked 1st       Ranked 2nd        Ranked           Not
+                                                                                    3rd       ranked
+
+                                All voters             8               15            14            63
+
+          Federal vote intention
+                                    Labor             12               21            18            49
+                                   Liberal             6               11            15            68
+                            CLP/LNP/Nat               11               17            13            59
+                              One Nation               4                6            14            76
+                                   Greens              7               20            11            62
+            Other parties and candidates               9               18             7            66
+                Undecided / will not vote             14               22            10            54
+
+          Vote softness
+                                     Solid             8               13            15            64
+                                      Soft             8               15            13            64
+                                 Very soft             9               19            15            57
+
+          Generation
+                                   Gen-Z               6               14            10            70
+                               Millennials             6               17            14            63
+                                   Gen-X              10               13            16            61
+                           Baby Boomers               10               16            15            59
+
+          Gender
+                                  Women                9               16            18            57
+                                     Men               7               14            11            68
+
+          Location
+                       Inner Metropolitan              7               15            14            64
+                       Outer Metropolitan              9               14            11            66
+                                Provincial             7               18            15            60
+                                     Rural             8               16            17            59
+
+          Education
+                        Less than year 12              7               14            19            60
+                     Year 12 or equivalent             7               14            13            66
+                TAFE, trade or vocational              9               15            15            61
+                        University degree              8               18            11            63
+
+          Home ownership
+                          Owned outright               9               15            15            61
+                Owned with a mortgage                  8               16            13            63
+                        Renting and other              8               15            14            63
+
+
+
+
+                                                      65
+Housing affordability
+
+
+
+
+                        66
+Figure 22: The salience of housing affordability as a federal political issue, by demographic characteristics, 24-28
+August.
+
+
+
+
+                                                        67
+Table 22: The salience of housing affordability as a federal political issue, by demographic characteristics, 24-28
+August.
+
+                                                Ranked 1st     Ranked 2nd        Ranked          Not
+                                                                                    3rd        ranked
+
+                                   All voters           8               14           11            67
+
+             Federal vote intention
+                                       Labor            9               14           15            62
+                                      Liberal           7                9           11            73
+                               CLP/LNP/Nat              5                8             5           82
+                                 One Nation             6               12             7           75
+                                      Greens           13               23           19            45
+               Other parties and candidates             9               13             6           72
+                  Undecided / will not vote             5               19           13            63
+
+             Vote softness
+                                        Solid           9               12             8           71
+                                         Soft           7               13           14            66
+                                    Very soft          12               20           10            58
+
+             Generation
+                                      Gen-Z            10               27           21            42
+                                  Millennials          13               14           12            61
+                                      Gen-X             6               13             8           73
+                              Baby Boomers              4                6             7           83
+
+             Gender
+                                     Women              8               16           11            65
+                                        Men             8               11           11            70
+
+             Location
+                          Inner Metropolitan            8               14           12            66
+                          Outer Metropolitan            8               13           12            67
+                                   Provincial           8               13           10            69
+                                        Rural           8               14           10            68
+
+             Education
+                           Less than year 12            6               15             8           71
+                        Year 12 or equivalent           6               18           19            57
+                  TAFE, trade or vocational             9               12             8           71
+                           University degree            9               13           10            68
+
+             Home ownership
+                             Owned outright             4               10             8           78
+                   Owned with a mortgage                8                9           10            73
+                           Renting and other           13               23           16            48
+
+
+
+
+                                                        68
+Crime and public safety
+
+
+
+
+                          69
+Figure 23: The salience of crime and public safety as a federal political issue, by demographic characteristics, 24-28
+August.
+
+
+
+
+                                                         70
+Table 23: The salience of crime and public safety as a federal political issue, by demographic characteristics, 24-28
+August.
+
+                                                Ranked 1st      Ranked 2nd        Ranked           Not
+                                                                                      3rd       ranked
+
+                                   All voters            7               10            10            73
+
+             Federal vote intention
+                                       Labor             5               10             8            77
+                                      Liberal           13                9             8            70
+                               CLP/LNP/Nat              10                6            11            73
+                                 One Nation              8               12            15            65
+                                      Greens             0                7             8            85
+               Other parties and candidates              5               13             5            77
+                   Undecided / will not vote             8               13            16            63
+
+             Vote softness
+                                        Solid            6               10            11            73
+                                         Soft            8               11             7            74
+                                    Very soft            6                3            14            77
+
+             Generation
+                                      Gen-Z              4                6             7            83
+                                  Millennials            5               12            10            73
+                                      Gen-X             12                7            15            66
+                              Baby Boomers               7               14             9            70
+
+             Gender
+                                     Women               8               12            12            68
+                                        Men              5                9             9            77
+
+             Location
+                          Inner Metropolitan             7                8             8            77
+                          Outer Metropolitan             7               10            13            70
+                                   Provincial            7               13            11            69
+                                        Rural            6               13            10            71
+
+             Education
+                           Less than year 12            11               12            16            61
+                        Year 12 or equivalent            5               11             6            78
+                   TAFE, trade or vocational             7               10            11            72
+                           University degree             6               10             9            75
+
+             Home ownership
+                             Owned outright              7               13            10            70
+                    Owned with a mortgage                8               10             9            73
+                           Renting and other             6                8            11            75
+
+
+
+
+                                                         71
+The rate of immigration
+
+
+
+
+                          72
+Figure 24: The salience of immigration as a federal political issue, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                       73
+Table 24: The salience of immigration as a federal political issue, by demographic characteristics, 24-28 August.
+
+                                              Ranked 1st      Ranked 2nd        Ranked           Not
+                                                                                    3rd        ranked
+
+                                 All voters           10               10             9            71
+
+           Federal vote intention
+                                     Labor             1                 4            6            89
+                                    Liberal           11               10            12            67
+                             CLP/LNP/Nat               7               13             8            72
+                               One Nation             27               21            15            37
+                                    Greens             0                 0            4            96
+             Other parties and candidates              2               13             4            81
+                Undecided / will not vote              5                 3           12            80
+
+           Vote softness
+                                      Solid           15               12             9            64
+                                       Soft            6                 9            9            76
+                                  Very soft            3               12             9            76
+
+           Generation
+                                    Gen-Z              5                 7            6            82
+                                Millennials            6                 8            9            77
+                                    Gen-X              8               13            11            68
+                            Baby Boomers              18               10            10            62
+
+           Gender
+                                   Women               7                 8           10            75
+                                      Men             14               11             9            66
+
+           Location
+                        Inner Metropolitan             8               10             8            74
+                        Outer Metropolitan            11               12             9            68
+                                 Provincial           11                 6           13            70
+                                      Rural           12                 9            9            70
+
+           Education
+                         Less than year 12            12               14            12            62
+                      Year 12 or equivalent            6               12             6            76
+                TAFE, trade or vocational             14                 9           10            67
+                         University degree             6                 7           10            77
+
+           Home ownership
+                           Owned outright             15                 9            8            68
+                 Owned with a mortgage                 8               13            11            68
+                         Renting and other             6                 7            9            78
+
+
+
+
+                                                       74
+Economic management
+
+
+
+
+                      75
+Figure 25: The salience of economic management as a federal political issue, by demographic characteristics, 24-28
+August.
+
+
+
+
+                                                       76
+Table 25: The salience of economic management as a federal political issue, by demographic characteristics, 24-28
+August.
+
+                                                Ranked 1st    Ranked 2nd       Ranked           Not
+                                                                                   3rd       ranked
+
+                                   All voters           4               5            5           86
+
+             Federal vote intention
+                                       Labor            3               4            4           89
+                                      Liberal           6               9            7           78
+                               CLP/LNP/Nat              8               8            7           77
+                                 One Nation             4               5            6           85
+                                      Greens            1               1            1           97
+               Other parties and candidates             4               2           12           82
+                  Undecided / will not vote             2               4            6           88
+
+             Vote softness
+                                        Solid           3               5            5           87
+                                         Soft           4               5            5           86
+                                    Very soft           7               2           14           77
+
+             Generation
+                                      Gen-Z             1               5            2           92
+                                  Millennials           2               2            6           90
+                                      Gen-X             5               6            5           84
+                              Baby Boomers              6               5            8           81
+
+             Gender
+                                     Women              3               4            4           89
+                                        Men             5               5            7           83
+
+             Location
+                          Inner Metropolitan            6               7            8           79
+                          Outer Metropolitan            3               4            4           89
+                                   Provincial           5               1            5           89
+                                        Rural           2               5            5           88
+
+             Education
+                           Less than year 12            1               5            4           90
+                        Year 12 or equivalent           3               3            3           91
+                  TAFE, trade or vocational             3               3            7           87
+                           University degree            7               8            6           79
+
+             Home ownership
+                             Owned outright             6               5            6           83
+                   Owned with a mortgage                3               7            6           84
+                           Renting and other            2               2            4           92
+
+
+
+
+                                                        77
+Preferred Prime Minister
+
+Question text
+
+
+Of the following, who would make the better Prime Minister?
+
+Single select; random reverse 1-3
+
+  1. Anthony Albanese
+  2. Angus Taylor
+  3. Pauline Hanson
+  4. About the same
+  5. None of these
+  6. Not sure
+
+
+
+
+                                                 78
+Figure 26: Preferred Prime Minister, by wave of the AFR/RedBridge/Accent Research poll. Sussan Ley was asked up
+until the January 2026 poll. Pauline Hanson and Angus Taylor were asked from the February poll.
+
+
+
+
+                                                      79
+Figure 27: Preferred Prime Minister, by demographic characteristics, 24-28 August.
+
+
+
+
+                                       80
+                    Table 26: Preferred Prime Minister, by demographic characteristics, 24-28 August.
+
+                                       Anthony      Angus Taylor       Pauline   About the       None of     Not sure
+                                      Albanese                        Hanson          same         these
+
+                      All voters             31               15           24             5             14        11
+
+Federal vote intention
+                          Labor              81                2            1             4              5         7
+                         Liberal              6               46            8             8             13        19
+                  CLP/LNP/Nat                 4               57            8             9              8        14
+                    One Nation                2               11           75             3              5         4
+                         Greens              51                9            3             4             23        10
+  Other parties and candidates               17                5           13            11             44        10
+     Undecided / will not vote               12                2            5             4             39        38
+
+Vote softness
+                           Solid             36               17           32             3              8         4
+                            Soft             33               17           19             7             14        10
+                       Very soft             19                7           14             8             25        27
+
+Generation
+                         Gen-Z               37                8           19             9             13        14
+                     Millennials             31               10           28             4             14        13
+                         Gen-X               31               13           27             4             14        11
+                 Baby Boomers                28               25           19             4             15         9
+
+Gender
+                        Women                28               14           22             5             16        15
+                           Men               34               16           25             5             12         8
+
+Location
+             Inner Metropolitan              34               14           18             7             13        14
+             Outer Metropolitan              38               16           21             4             11        10
+                      Provincial             28               20           20             8             17         7
+                           Rural             23               12           34             3             16        12
+
+Education
+              Less than year 12              21               19           31             3             16        10
+           Year 12 or equivalent             36               13           17             7             13        14
+     TAFE, trade or vocational               25               14           31             6             14        10
+              University degree              42               17           13             4             13        11
+
+Home ownership
+                Owned outright               29               23           21             4             13        10
+      Owned with a mortgage                  31               13           27             6             13        10
+              Renting and other              33                9           22             6             16        14
+
+
+
+
+                                                         81
+Which party is best able to handle key issues?
+
+Question text
+
+
+Which of the following do you believe is best able to deal with…
+
+Carousel; randomise items
+
+  A. Cost of living
+  B. Healthcare
+  C. Housing affordability
+  D. National security
+  E. Climate change
+  F. The rate of immigration
+  G. Crime and public safety
+  H. Economic management
+   I. Tax reform
+
+Single select; randomise 1-5
+
+  1. The Labor Party
+  2. The Liberal Party
+  3. The National Party
+  4. The Greens
+  5. Pauline Hanson’s One Nation
+  6. All about equal
+  7. None of these
+  8. Not sure
+
+
+
+
+                                               82
+Figure 28: Voters’ perceptions on which party is best able to handle key policy issues. The best party to manage Crime
+and public safety and Economic management only asked since March; and Tax reform only asked since July.
+                                                         83
+     Table 27: Which of the following do you believe is best able to deal with each of the following policy areas? The two most recent waves of the AFR/RedBridge/Accent
+     Research poll compared.
+
+                                                                     August 2026                                                               July 2026
+
+                             Issue    Labor   Liberal   National     One    Greens        All   None    Not    Labor   Liberal   National     One    Greens       All   None    Not
+                                                                   Nation               about      of   sure                                Nation              about      of   sure
+                                                                                        equal   these                                                           equal   these
+
+                     Cost of living     25        18          2       20            8      7       9     11      22        19          2       20           6      7      12     12
+                       Healthcare       31        18          2       14            8      9       6     12      27        19          2       17           8      8       6     13
+             Housing affordability      23        17          2       19            8      7      11     13      22        17          2       18           7      8      12     14
+                 National security      22        22          4       18            4     10       6     14      22        21          2       22           3      9       6     15
+                  Climate change        18         8          2       15           26      7      13     11      17         9          2       14          27      7      11     13
+
+           The rate of immigration      19        13          2       39            5      4       7     11      17        16          1       40           6      4       5     11
+           Crime and public safety      20        18          3       24            4     10       8     13      18        21          2       24           5      9       8     13
+           Economic management          24        27          2       14            5      7       8     13      23        27          2       16           5      6       8     13
+                       Tax reform       23        22          2       15            6      7       9     16      22        22          2       16           5      9       9     15
+
+
+
+
+84
+Cost of living
+
+
+
+
+                 85
+Figure 29: The party best suited to deal with cost of living, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                    86
+                              Table 28: The party best suited to deal with cost of living, by demographic characteristics, 24-28 August.
+
+                                        The Labor Party   The Liberal Party   The National        Pauline   The Greens   All about   None of these   Not sure
+                                                                                    Party    Hanson’s One                   equal
+                                                                                                   Nation
+
+                           All voters               25                  18              2             20            8           7               9         11
+
+     Federal vote intention
+                               Labor                78                   2              1              1            3           3               8          4
+                              Liberal                7                  57              0              6            2           6              10         12
+                       CLP/LNP/Nat                   5                  55             13              6            0           9               8          4
+                         One Nation                  1                  14              4             64            1           6               3          7
+                              Greens                16                   2              2              5           54           7               3         11
+       Other parties and candidates                  9                  12              5             13            7          20              23         11
+          Undecided / will not vote                  2                   9              0              3            1           6              28         51
+
+     Vote softness
+                                Solid               29                  18              3             29            8           3               6          4
+                                 Soft               27                  21              2             15            9          10               7          9
+                            Very soft               17                  12              1             11            4          12              20         23
+
+     Generation
+                              Gen-Z                 30                   8              4             16           19           4               3         16
+                          Millennials               22                  14              2             22           11           8              11         10
+
+87                            Gen-X                 24                  18              2             22            4           6              11         13
+                      Baby Boomers                  25                  26              3             19            0           9              10          8
+
+     Gender
+                             Women                  23                  16              2             19            8           7              10         15
+                                Men                 28                  20              3             20            7           7               8          7
+
+     Location
+                  Inner Metropolitan                29                  18              3             14            9           5               9         13
+                  Outer Metropolitan                31                  18              2             18            8           6               8          9
+                           Provincial               18                  21              4             21            7           8               8         13
+                                Rural               19                  15              2             28            5           9              12         10
+
+     Education
+                   Less than year 12                23                  18              4             27            3           7               8         10
+                Year 12 or equivalent               26                  16              4             16           16           7               5         10
+          TAFE, trade or vocational                 20                  15              3             24            4           9              11         14
+                   University degree                32                  22              1             13            9           4              10          9
+
+     Home ownership
+                     Owned outright                 27                  22              2             21            2           7               9         10
+           Owned with a mortgage                    25                  19              1             22            8           6              10          9
+                   Renting and other                24                  11              5             15           14           7               9         15
+Healthcare
+
+
+
+
+             88
+Figure 30: The party best suited to deal with healthcare, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                  89
+                               Table 29: The party best suited to deal with healthcare, by demographic characteristics, 24-28 August.
+
+                                        The Labor Party   The Liberal Party   The National        Pauline   The Greens   All about   None of these   Not sure
+                                                                                    Party    Hanson’s One                   equal
+                                                                                                   Nation
+
+                           All voters               31                  18              2             14            8           9               6         12
+
+     Federal vote intention
+                               Labor                81                   1              1              0            3           6               2          6
+                              Liberal               16                  59              1              0            0           7               6         11
+                       CLP/LNP/Nat                   8                  47             19              5            0          10               4          7
+                         One Nation                  6                  19              2             48            0          10               4         11
+                              Greens                21                   5              1              1           56           5               2          9
+       Other parties and candidates                 20                  11              3              8           11          21              12         14
+          Undecided / will not vote                 10                   4              0              2            3           9              27         45
+
+     Vote softness
+                                Solid               30                  22              4             22            9           5               3          5
+                                 Soft               36                  18              2              9            7          11               5         12
+                            Very soft               28                  12              0              5            7          21               4         23
+
+     Generation
+                              Gen-Z                 37                   4              4             14           20           6               2         13
+                          Millennials               29                  14              2             15           11           9               6         14
+
+90                            Gen-X                 29                  18              2             14            5          10               7         15
+                      Baby Boomers                  30                  29              3             12            1           9               8          8
+
+     Gender
+                             Women                  27                  14              2             15            9          10               7         16
+                                Men                 35                  22              3             12            7           8               5          8
+
+     Location
+                  Inner Metropolitan                34                  23              3              6            9           7               6         12
+                  Outer Metropolitan                37                  16              1             16            8           8               5          9
+                           Provincial               27                  21              3             12            9           9               5         14
+                                Rural               22                  13              4             21            6          11               9         14
+
+     Education
+                   Less than year 12                29                  15              4             18            3           9               8         14
+                Year 12 or equivalent               31                  15              4             11           14           8               6         11
+          TAFE, trade or vocational                 25                  19              2             19            5          11               6         13
+                   University degree                39                  20              2              7            9           7               5         11
+
+     Home ownership
+                     Owned outright                 31                  26              3             12            3           9               6         10
+           Owned with a mortgage                    29                  17              1             17            9           9               5         13
+                   Renting and other                32                  10              4             11           13           9               8         13
+Housing affordability
+
+
+
+
+                        91
+Figure 31: The party best suited to deal with housing affordability, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                       92
+                        Table 30: The party best suited to deal with housing affordability, by demographic characteristics, 24-28 August.
+
+                                        The Labor Party   The Liberal Party   The National        Pauline   The Greens   All about   None of these   Not sure
+                                                                                    Party    Hanson’s One                   equal
+                                                                                                   Nation
+
+                           All voters               23                  17              2             19            8           7              11         13
+
+     Federal vote intention
+                               Labor                67                   3              2              3            3           6               9          7
+                              Liberal               10                  56              1              1            1           8              11         12
+                       CLP/LNP/Nat                   5                  54             16              5            0           7               8          5
+                         One Nation                  4                  11              1             61            1           5               6         11
+                              Greens                15                   3              2              3           60           5               2         10
+       Other parties and candidates                  9                  13              0             17            6          19              23         13
+          Undecided / will not vote                  2                   7              0              3            0           5              26         57
+
+     Vote softness
+                                Solid               28                  17              2             28            9           4               7          5
+                                 Soft               24                  20              4             16            8           9               9         10
+                            Very soft               12                  12              0              5            8          13              19         31
+
+     Generation
+                              Gen-Z                 26                  10              2             15           24           7               2         14
+                          Millennials               21                  15              3             20           10           6              11         14
+
+93                            Gen-X                 22                  15              3             21            4           6              12         17
+                      Baby Boomers                  24                  24              1             19            1           8              13         10
+
+     Gender
+                             Women                  21                  14              3             19            8           6              11         18
+                                Men                 26                  19              2             20            8           7              10          8
+
+     Location
+                  Inner Metropolitan                28                  20              2             13           10           5               9         13
+                  Outer Metropolitan                26                  18              1             19            8           8               9         11
+                           Provincial               17                  18              5             18            9           7              10         16
+                                Rural               18                  11              3             27            5           8              14         14
+
+     Education
+                   Less than year 12                19                  13              3             26            4          10              13         12
+                Year 12 or equivalent               23                  15              2             15           19           7               6         13
+          TAFE, trade or vocational                 19                  16              2             25            3           7              13         15
+                   University degree                31                  21              3             11            9           4               9         12
+
+     Home ownership
+                     Owned outright                 26                  21              2             20            2           8              11         10
+           Owned with a mortgage                    22                  17              2             21            8           6              11         13
+                   Renting and other                22                  12              3             16           15           7               9         16
+National security
+
+
+
+
+                    94
+Figure 32: The party best suited to deal with national security, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                     95
+                           Table 31: The party best suited to deal with national security, by demographic characteristics, 24-28 August.
+
+                                        The Labor Party   The Liberal Party   The National        Pauline   The Greens   All about   None of these   Not sure
+                                                                                    Party    Hanson’s One                   equal
+                                                                                                   Nation
+
+                           All voters               22                  22              4             18            4          10               6         14
+
+     Federal vote intention
+                               Labor                65                   7              3              2            0           9               5          9
+                              Liberal                1                  64              2              5            0           8               6         14
+                       CLP/LNP/Nat                   2                  58             12              7            0          12               1          8
+                         One Nation                  0                  19              4             56            0           9               3          9
+                              Greens                24                  10              3              6           28           9               4         16
+       Other parties and candidates                 11                  18              5              9            5          20              19         13
+          Undecided / will not vote                  5                   5              3              5            0          18              16         48
+
+     Vote softness
+                                Solid               25                  22              4             27            4           6               4          8
+                                 Soft               23                  27              4             12            4          13               6         11
+                            Very soft               13                  20              6             11            1          14              13         22
+
+     Generation
+                              Gen-Z                 28                  13              5             19            8           8               3         16
+                          Millennials               15                  18              5             20            6          14              10         12
+
+96                            Gen-X                 20                  20              3             20            3           8               8         18
+                      Baby Boomers                  24                  33              4             14            0          11               4         10
+
+     Gender
+                             Women                  20                  17              5             17            3          11               8         19
+                                Men                 24                  28              3             19            4          10               4          8
+
+     Location
+                  Inner Metropolitan                24                  25              3             14            4           9               7         14
+                  Outer Metropolitan                27                  23              3             16            5           9               4         13
+                           Provincial               18                  22              8             14            4          10               8         16
+                                Rural               15                  20              4             26            1          14               7         13
+
+     Education
+                   Less than year 12                18                  23              4             22            1          18               3         11
+                Year 12 or equivalent               26                  20              5             14            8          12               3         12
+          TAFE, trade or vocational                 19                  21              3             23            2           8               8         16
+                   University degree                25                  26              4             12            3           9               8         13
+
+     Home ownership
+                     Owned outright                 26                  28              4             17            0           9               4         12
+           Owned with a mortgage                    20                  23              4             20            4          11               7         11
+                   Renting and other                19                  15              5             17            8          11               7         18
+Climate change
+
+
+
+
+                 97
+Figure 33: The party best suited to deal with climate change, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                    98
+                           Table 32: The party best suited to deal with climate change, by demographic characteristics, 24-28 August.
+
+                                        The Labor Party   The Liberal Party   The National        Pauline   The Greens   All about   None of these   Not sure
+                                                                                    Party    Hanson’s One                   equal
+                                                                                                   Nation
+
+                           All voters               18                   8              2             15           26           7              13         11
+
+     Federal vote intention
+                               Labor                55                   1              1              2           25           5               6          5
+                              Liberal               10                  28              2              1           19           9              17         14
+                       CLP/LNP/Nat                   8                  21             15              8           13          12              13         10
+                         One Nation                  2                   7              2             48           11           5              17          8
+                              Greens                 2                   1              0              2           83           2               2          8
+       Other parties and candidates                  8                   9              2             10           34          14              16          7
+          Undecided / will not vote                  1                   3              0              1           15          12              23         45
+
+     Vote softness
+                                Solid               22                  10              2             23           21           5              11          6
+                                 Soft               19                   8              3             10           31           8              11         10
+                            Very soft               11                   6              1              4           42           3              18         15
+
+     Generation
+                              Gen-Z                 15                   7              1             13           47           3               3         11
+                          Millennials               18                   3              2             16           33           7              12          9
+
+99                            Gen-X                 16                  10              2             14           20           7              16         15
+                      Baby Boomers                  22                  13              3             15           13           9              16          9
+
+     Gender
+                             Women                  15                   6              2             12           30           8              12         15
+                                Men                 22                  11              2             17           23           5              13          7
+
+     Location
+                  Inner Metropolitan                20                  10              2              9           29           5              13         12
+                  Outer Metropolitan                23                   8              1             13           26           8              11         10
+                           Provincial               13                  10              2             12           30           7              14         12
+                                Rural               15                   6              3             24           21           8              13         10
+
+     Education
+                   Less than year 12                16                   8              5             15           15           9              16         16
+                Year 12 or equivalent               15                   9              1             13           40           4               8         10
+          TAFE, trade or vocational                 19                   7              2             20           17           7              17         11
+                   University degree                21                  10              1              8           35           8               8          9
+
+     Home ownership
+                     Owned outright                 20                  11              2             16           20           6              15         10
+           Owned with a mortgage                    18                   8              2             15           28           7              12         10
+                   Renting and other                17                   6              3             12           32           7              10         13
+The rate of immigration
+
+
+
+
+                          100
+Figure 34: The party best suited to deal with the rate of immigration, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                       101
+                      Table 33: The party best suited to deal with the rate of immigration, by demographic characteristics, 24-28 August.
+
+                                         The Labor Party   The Liberal Party   The National        Pauline   The Greens   All about   None of these   Not sure
+                                                                                     Party    Hanson’s One                   equal
+                                                                                                    Nation
+
+                            All voters               19                  13              2             39            5           4               7         11
+
+      Federal vote intention
+                                Labor                58                   6              2              9            3           5               9          8
+                               Liberal                3                  44              2             36            0           1               5          9
+                        CLP/LNP/Nat                   3                  42              8             35            0           8               1          3
+                          One Nation                  0                   2              1             93            0           1               1          2
+                               Greens                15                   7              3              9           29           5               7         25
+        Other parties and candidates                 11                   8              4             33            5          12              15         12
+           Undecided / will not vote                  5                   8              0             20            0           5              17         45
+
+      Vote softness
+                                 Solid               23                  14              2             42            6           2               5          6
+                                  Soft               18                  14              2             40            4           6               6         10
+                             Very soft               16                   9              0             41            2           4              12         16
+
+      Generation
+                               Gen-Z                 22                  13              2             31           11           3               6         12
+                           Millennials               17                   8              3             42            5           4               8         13
+
+102                            Gen-X                 18                  10              2             41            3           5               7         14
+                       Baby Boomers                  20                  19              2             40            1           5               5          8
+
+      Gender
+                              Women                  18                  10              1             38            5           4               8         16
+                                 Men                 20                  16              3             40            4           4               6          7
+
+      Location
+                   Inner Metropolitan                20                  16              3             36            6           3               7          9
+                   Outer Metropolitan                23                  14              1             35            4           5               7         11
+                            Provincial               16                  11              2             41            5           7               3         15
+                                 Rural               15                   9              2             48            3           3               8         12
+
+      Education
+                    Less than year 12                13                  12              3             53            2           1               7          9
+                 Year 12 or equivalent               21                  13              3             31            9           4               5         14
+           TAFE, trade or vocational                 17                  11              2             45            2           4               8         11
+                    University degree                24                  17              1             30            6           5               6         11
+
+      Home ownership
+                      Owned outright                 21                  18              2             37            2           3               5         12
+            Owned with a mortgage                    16                  11              2             46            5           5               6          9
+                    Renting and other                21                   9              3             34            6           5               9         13
+Crime and public safety
+
+
+
+
+                          103
+Figure 35: The party best suited to deal with crime and public safety, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                       104
+                       Table 34: The party best suited to deal with crime and public safety, by demographic characteristics, 24-28 August.
+
+                                         The Labor Party   The Liberal Party   The National        Pauline   The Greens   All about   None of these   Not sure
+                                                                                     Party    Hanson’s One                   equal
+                                                                                                    Nation
+
+                            All voters               20                  18              3             24            4          10               8         13
+
+      Federal vote intention
+                                Labor                61                   8              1              3            1          10               8          8
+                               Liberal                4                  51              1             13            1          12               6         12
+                        CLP/LNP/Nat                   5                  50             16             10            0          11               3          5
+                          One Nation                  1                   8              2             71            0           6               5          7
+                               Greens                19                   7              2              7           32          15               5         13
+        Other parties and candidates                  6                  23              3             21            5          17              13         12
+           Undecided / will not vote                  3                   9              0              3            0           6              28         51
+
+      Vote softness
+                                 Solid               25                  18              3             32            5           7               4          6
+                                  Soft               20                  20              3             20            5          14               9          9
+                             Very soft               12                  16              3             22            4          13               7         23
+
+      Generation
+                               Gen-Z                 26                  12              4             19           10          10               5         14
+                           Millennials               17                  14              2             27            6          11              11         12
+
+105                            Gen-X                 17                  17              3             24            3           9               9         18
+                       Baby Boomers                  21                  26              3             25            1          10               7          7
+
+      Gender
+                              Women                  19                  15              2             23            4          11               9         17
+                                 Men                 22                  21              3             26            4           9               7          8
+
+      Location
+                   Inner Metropolitan                22                  21              2             20            6           8               9         12
+                   Outer Metropolitan                24                  17              2             22            5          11               6         13
+                            Provincial               14                  23              4             21            5          14               6         13
+                                 Rural               17                  13              3             33            2           9              10         13
+
+      Education
+                    Less than year 12                18                  16              4             30            2          12               8         10
+                 Year 12 or equivalent               22                  20              4             18           10          12               4         10
+           TAFE, trade or vocational                 16                  16              2             30            2           9              10         15
+                    University degree                25                  21              2             18            4          10               9         11
+
+      Home ownership
+                      Owned outright                 23                  22              3             25            1          10               7          9
+            Owned with a mortgage                    19                  18              3             27            4           9               9         11
+                    Renting and other                19                  13              2             19            9          12               9         17
+Economic management
+
+
+
+
+                      106
+Figure 36: The party best suited to deal with economic management, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                      107
+                      Table 35: The party best suited to deal with economic management, by demographic characteristics, 24-28 August.
+
+                                         The Labor Party   The Liberal Party   The National        Pauline   The Greens   All about   None of these   Not sure
+                                                                                     Party    Hanson’s One                   equal
+                                                                                                    Nation
+
+                            All voters               24                  27              2             14            5           7               8         13
+
+      Federal vote intention
+                                Labor                70                   7              1              1            2           6               5          8
+                               Liberal                3                  75              4              2            0           4               6          6
+                        CLP/LNP/Nat                   2                  62             13              6            0           6               7          4
+                          One Nation                  2                  24              2             48            0           7               5         12
+                               Greens                24                   8              0              2           37           7               7         15
+        Other parties and candidates                 12                  24              2              8            7          13              19         15
+           Undecided / will not vote                  3                  16              2              1            0           4              26         48
+
+      Vote softness
+                                 Solid               29                  25              2             23            6           3               7          5
+                                  Soft               24                  31              2              8            6           9               6         14
+                             Very soft               15                  24              3              6            4          16              11         21
+
+      Generation
+                               Gen-Z                 26                  15              6             14           15           4               3         17
+                           Millennials               21                  23              2             18            6           8              10         12
+
+108                            Gen-X                 26                  23              1             15            4           9               7         15
+                       Baby Boomers                  22                  40              2             11            0           5              10         10
+
+      Gender
+                              Women                  21                  22              2             14            6           8              10         17
+                                 Men                 26                  32              2             15            5           5               6          9
+
+      Location
+                   Inner Metropolitan                25                  34              2              6            6           4              10         13
+                   Outer Metropolitan                29                  24              1             13            7           7               6         13
+                            Provincial               20                  29              4             16            5           7               4         15
+                                 Rural               19                  20              3             23            4           9               9         13
+
+      Education
+                    Less than year 12                18                  27              3             16            2          12               9         13
+                 Year 12 or equivalent               26                  22              2             12           15           4               5         14
+           TAFE, trade or vocational                 20                  26              2             19            3           7               9         14
+                    University degree                29                  31              2              8            4           6               8         12
+
+      Home ownership
+                      Owned outright                 25                  32              2             13            1           6              10         11
+            Owned with a mortgage                    23                  29              2             16            6           6               6         12
+                    Renting and other                23                  17              3             13           10           8               8         18
+Tax reform
+
+
+
+
+             109
+Figure 37: The party best suited to deal with tax reform, by demographic characteristics, 24-28 August.
+
+
+
+
+                                                 110
+                                Table 36: The party best suited to deal with tax reform, by demographic characteristics, 24-28 August.
+
+                                         The Labor Party   The Liberal Party   The National        Pauline   The Greens   All about   None of these   Not sure
+                                                                                     Party    Hanson’s One                   equal
+                                                                                                    Nation
+
+                            All voters               23                  22              2             15            6           7               9         16
+
+      Federal vote intention
+                                Labor                67                   7              1              1            1           6               6         11
+                               Liberal                5                  66              0              3            0           5               6         15
+                        CLP/LNP/Nat                   4                  60             12              6            2          12               0          4
+                          One Nation                  2                  18              2             49            1           6               9         13
+                               Greens                18                   6              1              2           47           8               4         14
+        Other parties and candidates                 16                   9              2             11            7          19              20         16
+           Undecided / will not vote                  2                   7              0              1            1           4              27         58
+
+      Vote softness
+                                 Solid               27                  21              2             23            7           6               7          7
+                                  Soft               24                  26              3             11            6           9               6         15
+                             Very soft               12                  20              1              4            8          10              16         29
+
+      Generation
+                               Gen-Z                 26                  11              0             14           15           6               7         21
+                           Millennials               23                  18              2             18            8           6              11         14
+
+111                            Gen-X                 20                  23              2             15            5           8               9         18
+                       Baby Boomers                  24                  30              3             13            0           8               9         13
+
+      Gender
+                              Women                  20                  18              2             14            7           8               9         22
+                                 Men                 26                  25              2             16            6           7               9          9
+
+      Location
+                   Inner Metropolitan                25                  29              1              8            7           4              11         15
+                   Outer Metropolitan                25                  21              1             13            7           9               7         17
+                            Provincial               20                  21              4             16            9          10               5         15
+                                 Rural               20                  14              3             25            4           6              11         17
+
+      Education
+                    Less than year 12                21                  20              3             15            3           8              11         19
+                 Year 12 or equivalent               22                  21              2             13           13           5               6         18
+           TAFE, trade or vocational                 20                  20              2             21            3           8              11         15
+                    University degree                28                  26              1              9            8           6               7         15
+
+      Home ownership
+                      Owned outright                 25                  25              3             14            2           8               9         14
+            Owned with a mortgage                    20                  26              1             18            7           6               7         15
+                    Renting and other                24                  13              2             12           11           7              11         20
+Do voters believe that the Federal Budget changes will increase or
+reduce rents?
+
+Question text
+
+
+The May Federal Budget includes changes to negative gearing on investment properties, capital gains
+taxes, and extended the ban on foreign buyers purchasing established homes.
+
+Do you think these changes will increase or reduce rents?
+
+Single select; random reverse 1-5
+
+  1. Significantly increase rents
+  2. Somewhat increase rents
+  3. Neither increase nor decrease rents
+  4. Somewhat reduce rents
+  5. Significantly reduce rents
+  6. Not sure
+
+
+
+
+                                                112
+Figure 38: Voters’ views on whether the Federal Budget changes will increase or reduce rents, 24-28 August.
+
+
+
+
+                                                   113
+Figure 39: Voters’ views on whether the Federal Budget changes will increase or reduce rents, by demographic char-
+acteristics, 24-28 August. Figures in black on the right-hand side of the plot indicate the net share who believe the
+Federal Budget changes will increase rents (total share who say increase, minus the share who say decrease).
+
+
+
+
+                                                        114
+      Table 37: Voters’ views on whether the Federal Budget changes will increase or reduce rents, by demographic characteristics, 24-28 August.
+
+                                                  Significantly   Somewhat increase         Neither     Somewhat      Significantly   Not sure   Net increase
+                                                 increase rents               rents     increase nor   reduce rents   reduce rents
+                                                                                      decrease rents
+
+                                    All voters              21                  27               23             10               2         17             36
+
+              Federal vote intention
+                                        Labor                5                  24               34             14               2         21             13
+                                       Liberal              29                  31               22              4               1         13             55
+                                CLP/LNP/Nat                 35                  40               10              5               3          7             67
+                                  One Nation                37                  28               19              4               1         11             60
+                                       Greens                8                  20               26             20               3         23              5
+                Other parties and candidates                13                  34               22             18               3         10             26
+                   Undecided / will not vote                20                  19               12              5               0         44             34
+
+              Vote softness
+                                         Solid              26                  27               22              8               2         15             43
+                                          Soft              15                  30               28             11               1         15             33
+                                     Very soft              21                  26               20             13               1         19             33
+
+              Generation
+                                       Gen-Z                 9                  25               31             16               3         16             15
+                                   Millennials              17                  28               28              8               2         17             35
+
+115                                    Gen-X                24                  22               21              9               0         24             37
+                               Baby Boomers                 29                  32               17              7               1         14             53
+
+              Gender
+                                      Women                 18                  26               20             11               2         23             31
+                                         Men                23                  28               27              8               2         12             41
+
+              Location
+                           Inner Metropolitan               20                  24               27             11               3         15             30
+                           Outer Metropolitan               18                  28               24             11               1         18             34
+                                    Provincial              24                  35               17              8               1         15             50
+                                         Rural              24                  25               23              6               1         21             42
+
+              Education
+                            Less than year 12               26                  23               20              8               1         22             40
+                         Year 12 or equivalent              15                  26               30             13               1         15             27
+                   TAFE, trade or vocational                23                  28               22              7               2         18             42
+                            University degree               19                  29               22             12               2         16             34
+
+              Home ownership
+                              Owned outright                28                  29               19              9               2         13             46
+                    Owned with a mortgage                   19                  30               27              8               0         16             41
+                            Renting and other               14                  23               24             12               3         24             22
+©2026 RedBridge Group and Accent Research
+
+
+                                            116
+

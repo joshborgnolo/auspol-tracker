@@ -6,7 +6,8 @@
 // DISCOVERY (server-side, no browser): the Wix sitemap index exposes
 //   https://www.accent-research.com/dynamic-projects_*_sitemap.xml
 // listing every /projects/<slug> page. Monthly federal polls match
-//   /projects/afr%2C-redbridge-group-and-accent-research-(<month>-<yyyy>-)?federal-poll
+//   /projects/afr[%2C]-redbridge-group-and-accent-research-(<month>-<yyyy>-)?federal-poll
+// (the comma in the prefix is OPTIONAL — dropped from the August 2026 slug on)
 // which also EXCLUDES by construction: state polls ("…-victorian-state-poll",
 // "…-queensland-state-poll"), snapshots ("…-victorian-public-opinion-snapshot"),
 // the MRP releases ("a-fragmented-electorate", May 2026 — tracked separately
@@ -113,7 +114,9 @@ const FETCH_TIMEOUT_MS = 60_000;
 const PDF_TIMEOUT_MS = 180_000;
 const FETCH_TRIES = 3;
 const CHROME = process.env.RB_CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
-const PAGE_SLUG_RE = /^\/projects\/afr%2C-redbridge-group-and-accent-research-(?:([a-z]+)-(\d{4})-)?federal-poll$/i;
+// Accent dropped the encoded comma from slug prefixes with the August 2026
+// wave (`afr-redbridge-…` vs the historical `afr%2C-redbridge-…`) — accept both.
+const PAGE_SLUG_RE = /^\/projects\/afr(?:%2C)?-redbridge-group-and-accent-research-(?:([a-z]+)-(\d{4})-)?federal-poll$/i;
 // AFR's RedBridge-Accent poll topic page. AFR publishes each wave's coverage
 // SUNDAY EVENING, while the accent-research.com project page + PDF can lag
 // by days (August 2026: article out 30 Aug, no Accent slug yet) — so the
