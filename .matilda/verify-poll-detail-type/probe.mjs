@@ -73,11 +73,23 @@ try {
       secRule: st(".pd-sec").borderTopStyle,
       metaK: px(p.querySelector(".pd-meta-k")),
       metaV: px(p.querySelector(".pd-meta-v")),
-      /* one label column for BOTH provenance grids - the band the table
-         builds and the release rows the shared ledger builds */
-      labCols: [...p.querySelectorAll(".pd-meta-items")]
-                 .map((g) => getComputedStyle(g).gridTemplateColumns.split(" ")[0]),
+      /* the label column sizes to its longest label and is held off the
+         values by a real gutter - a fixed px column silently collided */
+      gut: parseFloat(getComputedStyle(p.querySelector(".pd-meta-items")).columnGap),
+      labFits: (() => {
+        const g = p.querySelector(".pd-meta-items:not(.pd-rel)");
+        const col = parseFloat(getComputedStyle(g).gridTemplateColumns.split(" ")[0]);
+        return [...g.querySelectorAll(".pd-meta-k")]
+                 .every((k) => k.getBoundingClientRect().width <= col + 0.5);
+      })(),
+      /* one family, no second face for the figures */
+      fam: getComputedStyle(p.querySelector(".pd-s-hero b")).fontFamily.split(",")[0].replace(/"/g, ""),
       relRows: p.querySelectorAll(".pd-rel .pd-meta-i").length,
+      relStacked: (() => {
+        const k = p.querySelector(".pd-rel .pd-meta-k");
+        return !!k && k.nextElementSibling.getBoundingClientRect().top
+               >= k.getBoundingClientRect().bottom - 1;
+      })(),
       heroWords: px(hero), heroFig: px(hero && hero.querySelector("b")),
       bodyWords: px(p.querySelector(".pd-sec:not(.pd-sec-lead) .pd-s")),
       bodyFig: px(p.querySelector(".pd-sec:not(.pd-sec-lead) .pd-s b")),
@@ -116,26 +128,28 @@ try {
     };
   })()`);
   console.log(t);
-  check("kicker size", t.kSize, "10.5px");
+  check("kicker size", t.kSize, "17px");
   check("kicker weight", t.kWeight, "600");
   check("kicker upper case", t.kCase, "uppercase");
   check("kicker tracked", t.kTracked, true);
   check("each section is ruled", t.secRule, "solid");
-  check("meta label", t.metaK, "11.5px");
-  check("meta value", t.metaV, "14px");
-  check("one label column for every provenance grid",
-        new Set(t.labCols).size === 1 && t.labCols[0] === "118px", true);
+  check("meta label", t.metaK, "17px");
+  check("meta value", t.metaV, "17px");
+  check("panel is set in one family", t.fam, "Source Sans 3");
+  check("label column holds every label", t.labFits, true);
+  check("labels are held off their values", t.gut >= 16, true);
   check("release rides the provenance list", t.relRows > 0, true);
-  check("hero words", t.heroWords, "18px");
-  check("hero figure", t.heroFig, "40px");
-  check("hero move", t.heroChg, "13px");
-  check("body words", t.bodyWords, "16px");
-  check("body figure", t.bodyFig, "22px");
-  check("net takes the figure size", t.netFig, "22px");
-  check("basis caption", t.basis, "14px");
-  check("basis figure sits under the section's", t.basisFig, "18px");
-  check("move", t.chg, "11px");
-  check("absent line takes the body size", t.absent, "16px");
+  check("release stacks label over value", t.relStacked, true);
+  check("hero words", t.heroWords, "24px");
+  check("hero figure", t.heroFig, "60px");
+  check("hero move", t.heroChg, "20px");
+  check("body words", t.bodyWords, "17px");
+  check("body figure", t.bodyFig, "28px");
+  check("net takes the figure size", t.netFig, "28px");
+  check("basis caption", t.basis, "17px");
+  check("basis figure takes the sentence figure size", t.basisFig, "28px");
+  check("move", t.chg, "15px");
+  check("absent line takes the body size", t.absent, "17px");
   check("figure and its label never break apart", t.grpWrap, "nowrap");
   check("a rise is green", t.chgUp && t.chgUp !== t.inkThree, true);
   check("a fall is red, and not the same colour as a rise", t.chgDown && t.chgDown !== t.chgUp, true);
@@ -146,7 +160,7 @@ try {
   check("figure/label junction beats a bare word-space", t.gaps.inner >= 6, true);
   check("gap between pairs beats the gap inside one",
         t.gaps.between > t.gaps.inner, true);
-  check("ledger set to the reading measure", t.measure, 700);
+  check("ledger set to the centred column", t.measure, 820);
   check("exactly one lead section", t.leadSections, 1);
   check("at most one hero line", t.heroLines <= 1, true);
 
@@ -178,10 +192,10 @@ try {
   })()`);
   console.log(arch);
   check("archive shows every matchup", arch.matchups > 1, true);
-  check("archive hero figure", arch.heroFig, "40px");
+  check("archive hero figure", arch.heroFig, "60px");
   check("supporting matchups step down",
-        arch.restFig.every((s) => s === "22px"), true);
-  check("archive kicker", arch.kicker, "10.5px");
+        arch.restFig.every((s) => s === "28px"), true);
+  check("archive kicker", arch.kicker, "17px");
   check("controls stay docked to the band's right edge", arch.controlsDocked, true);
 
   /* The narrow ladder. .ap-wrap is overflow:visible so an over-wide panel
@@ -215,7 +229,7 @@ try {
     await new Promise((r) => setTimeout(r, 350));
     const m = await page.evaluate(`(() => {
       const p = document.querySelector(".poll-detail");
-      const rows = [...p.querySelectorAll(".pd-meta-k")].map((k) => {
+      const rows = [...p.querySelectorAll(".pd-meta-items:not(.pd-rel) .pd-meta-k")].map((k) => {
         const v = k.nextElementSibling;
         const kr = k.getBoundingClientRect(), vr = v.getBoundingClientRect();
         // one line box, not one em: .pd-meta-items sets line-height 1.45

@@ -2495,6 +2495,7 @@ function ArchLead({ p, measure, primaryFallback }) {
 // appr). The archive row prints no client and no published DATE in any
 // column at any width, so the meta line owns both outright – left untagged,
 // never width-hidden.
+const signed1 = (v) => (v > 0 ? "+" : "") + v.toFixed(1).replace("-", "\u2212");
 function ArchPollDetail({ p, onBack, backLabel }) {
   const { PollLedger, pubStamp } = window;
   /* The archive stores the unsure share and its change; the Latest table
@@ -2536,10 +2537,12 @@ function ArchPollDetail({ p, onBack, backLabel }) {
       title="Effective sample as published by the pollster (APC methodology statement)">
       <span className="pd-meta-k">Effective sample</span>
       <span className="pd-meta-v">n = {p.sampleEff.toLocaleString()}</span></span>,
+    /* signed to one decimal, with a true minus (U+2212) rather than a hyphen -
+       these read as figures, not as a range dash or a word break */
     p.lean != null && <span className="pd-meta-i" key="lean"><span className="pd-meta-k">Poll lean</span>
-      <span className="pd-meta-v">{p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span></span>,
+      <span className="pd-meta-v">{signed1(p.lean)} vs aggregate</span></span>,
     p.hfx != null && <span className="pd-meta-i" key="hfx"><span className="pd-meta-k">House effect</span>
-      <span className="pd-meta-v">{p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)} vs consensus</span></span>,
+      <span className="pd-meta-v">{signed1(p.hfx.v)} vs consensus</span></span>,
   ].filter(Boolean);
 
   const controls = [

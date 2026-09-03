@@ -1,6 +1,6 @@
 ---
 name: auspol-poll-table-typography
-description: auspol-tracker — type-size map of the Latest-polls and All-polls tables. BOTH tables share class `poll-table archive` (a11e1559 PollsterTable ~:2688 + d1a1d215 archive ~:2408), so one template.html size change covers both. Desktop cell 16px / pollster-name 16px / apub numerals 14.5px / PPM share-keys 12.5px; th stays 13px (deliberately tracks .meta-k); the ≤1000px (13.5px) and ≤480/430px ladders are viewport-FIT tuning — .ap-wrap is overflow:visible so an over-wide table scrolls the PAGE, not a scroller. PPM figures exist ONLY under the Leadership facet, so probes of the default 2PP facet find no `.share-compact`. Expanded-row figures (`.poll-detail b/.netv/.chg/.seat-est`) are set in `--figures` — the Archivo variable cut since 7a3451f (the 9f2c168 Fira Sans statics it replaced are gone). Bump sizes in .build/newtracker/template.html, rebuild, grep index.html.
+description: auspol-tracker — type-size map of the Latest-polls and All-polls tables. BOTH tables share class `poll-table archive` (a11e1559 PollsterTable ~:2688 + d1a1d215 archive ~:2408), so one template.html size change covers both. Desktop cell 16px / pollster-name 16px / apub numerals 14.5px / PPM share-keys 12.5px; th stays 13px (deliberately tracks .meta-k); the ≤1000px (13.5px) and ≤480/430px ladders are viewport-FIT tuning — .ap-wrap is overflow:visible so an over-wide table scrolls the PAGE, not a scroller. PPM figures exist ONLY under the Leadership facet, so probes of the default 2PP facet find no `.share-compact`. Expanded-row typography was rebuilt 2026-09-03 from a supplied mock-up: the whole panel is Source Sans 3 (`--panel`), Archivo/`--figures` is RETIRED (its only consumer was this panel; the FONTS entry is gone, the subset file stays in fonts/). Bump sizes in .build/newtracker/template.html, rebuild, grep index.html.
 source: auto-skill
 extracted_at: '2026-09-02T00:00:00.000Z'
 ---
@@ -73,58 +73,46 @@ name/mode ladder rules live in the ≤480/≤430px blocks. Real phone widths hit
   Fira statics shipped exactly the 400/700/800 cuts for the same rule) — see
   auspol-font-pipeline for the add-a-typeface recipe and the `document.fonts`
   lazy-loading trap when probing weights.
-- **Detail type ladder — FOUR TOKENS on `.poll-detail`, not a table of sizes** (second
-  2026-09-03 pass; the earlier 14px-body/16px-lead ladder is gone). `--pd-lab` 118px is
-  the provenance label column, `--pd-body` 16px the sentences, `--pd-fig` 22px every
-  published figure, `--pd-hero` 40px the first head-to-head. Change a token, not a rule;
-  the `@media 720px/560px` blocks re-set the SAME tokens and nothing else.
-  - **The provenance list is two columns at EVERY width** — do not stack it
-    label-over-value on narrow screens. That was tried and reverted: the values
-    are longer than the labels, so stacking bought ~110px of a 341px line and
-    spent six extra rows buying it. The only structural narrow rule is
-    `@media (max-width: 360px)`, where `.pd-meta` wraps and `.pd-meta-tail`
-    takes `order: -1` so the controls sit ABOVE the list — wrapping them below
-    puts them between "House effect" and the ledger-rendered `.pd-rel` rows and
-    cuts the list in two. Probe asserts beside/no-wrap/no-overflow at 500, 390
-    and 320px.
-  - `.pd-meta` is a flex band holding `.pd-meta-items`, a **two-column grid**
-    (`var(--pd-lab) minmax(0,1fr)`). Each `.pd-meta-i` is `display: contents`, so its
-    `.pd-meta-k` (11.5/600) and `.pd-meta-v` (14px) are the grid's real items — a meta
-    row that forgets `.pd-meta-v` puts its value in the label column. The controls take
-    `margin-left: auto` because the items are capped at `--pd-measure` (700px).
-  - `.pd-rel` (release / APC-statement rows, built in PollLedger so BOTH tables get them)
-    is a SECOND `.pd-meta-items` grid in `.pd-simple`; the two align only because both
-    read `--pd-lab`. There is no `PdSec` for the release any more.
-  - `.pd-k` kickers are 10.5px/600 **uppercase, 0.115em tracked**, and every `.pd-sec`
-    carries `border-top` — the panel is ruled sections, not a gap-separated stack.
-  - Figures: `.pd-s b` `--pd-fig` with `line-height: 1` (keeps the step out of the
-    leading); `.pd-s.pd-s-hero b` `--pd-hero`. The hero is a **prop**, set only on the
-    first TppLine whose contest has exactly 2 segments — a three-cornered pair or a
-    second matchup stays at `--pd-fig`. Note `b` is a DESCENDANT of `.pd-grp` (the
-    nowrap figure+label unit), so `> b` child selectors silently miss it.
-  - Basis notes are their own `<p class="pd-s pd-s-basis">` caption line (14px, 18px
-    figure) under the measure — undecided-inside-the-pair, set-aside shares, PPM
-    undecided, the flows term. They used to be parentheses trailing the figures.
-  - **The move is ALWAYS parenthesised, never comma-led.** Every site goes through
-    `<ChgParen d={…}/>` (which wraps `ChgTag` in `.pd-s-chg`), including the two basis
-    notes that used to write `, <ChgTag/>` inline (tppLines' undecided, the primaries'
-    set-aside). The probe asserts no `,\s*[▲▼–]` survives in the panel.
-  - **Direction colour**: `.chg.up` / `.chg.down` take `--chg-up` / `--chg-down`
-    (light + dark, ~5–6:1 on the panel ground); `.chg.flat` stays `--ink-3`. This
-    OVERRIDES the "no good/bad colour in a party-neutral tracker" rule the ChgTag
-    comment still states for the NET and the mood axis — asked for directly, 2026-09-03.
-    `.chg` renders in exactly two places (the panel, and the archive's `direction`
-    facet cells, whose `<td>` already carries an inline `--mood-pos`/`--mood-neg`);
-    ShareBar's `{!compact && <ChgTag/>}` is dead — both call sites pass `compact`.
-  - **Spacing between a figure and its word is WORD-SPACING, not margins**: `.pd-s` 5px
-    (between pairs) / `.pd-grp` 3px (inside one) / `.pd-lab`, `.pd-mat`, `.pd-s-chg`
-    normal (multi-word labels, matchup prefixes and the parenthetical must not open up)
-    / `.pd-s-hero .pd-grp` 6px / `.pd-s-basis` 2px. A margin between two inline groups
-    survives a line break and hangs the wrapped line in — at phone widths that is most
-    lines. Every label beside a figure is wrapped in `<span class="pd-lab">` for this.
-  - Probe: `.matilda/verify-poll-detail-type/probe.mjs` — asserts the ladder in both
-    tables and opens all 124 archive rows at 375px to prove no `.pd-grp` pushes the page
-    sideways. Content probe: `.matilda/verify-ticker/probe-tpp-undecided.mjs`.
+- **Detail type ladder — TOKENS on `.poll-detail`, not a table of sizes.** Rebuilt
+  2026-09-03 against a user-supplied mock-up which is the visual source of truth; the
+  earlier 16px-body/22px-fig/40px-hero ladder is gone. Change a token, not a rule.
+  - Family: `--panel: "Source Sans 3", var(--sans)` — ONE family for the whole panel,
+    weights 400 body/values, 500 secondary labels (seat names), 600 metadata labels +
+    section headings, 700 figures. Source Sans 3 was already self-hosted (variable
+    400–800, preloaded for `.wordmark`), so this needed NO font-pipeline work — and it
+    retired Archivo, whose sole consumer was the old `.poll-detail b` rule.
+  - Scale: `--pd-body` 17px/1.45 · `--pd-fig` 28px (a percentage inside a sentence) ·
+    `--pd-mid` 32px (National direction — `PdSec mid` → `.pd-sec-mid`, the 2PP
+    treatment scaled down) · `--pd-hero` 60px/0.98 with `--pd-hero-w` 24px words
+    (first two-way pair only). `.pd-k` headings are 17px/600 **uppercase, 0.12em** —
+    same px as the body; the distinction is case, tracking and grey.
+  - Palette: panel-scoped hex, NOT the theme tokens — `--pd-paper` #FAF9F6,
+    `--pd-ink` #171717, `--pd-ink-2` #62605D, `--pd-rule` #DDDCD8. `body.dark
+    .poll-detail` maps all four back onto `--surface-2`/`--ink`/`--ink-2`/`--line`;
+    a cream/charcoal pair cannot be inverted.
+  - Layout: `--pd-measure` 820px, `margin-inline: auto` on `.pd-meta`, `.pd-rel` and
+    `.pd-simple` — a centred column inside a full-width table row. Rhythm: rule →
+    30px → heading → 20px → result → 36px → rule, one `.pd-sec` rule doing all of it.
+  - **The label column is `max-content`, never a px value.** There is only ONE grid now
+    (the release block is `display: block`, label over value), so nothing needs a shared
+    width; `--pd-gut` is the gutter. A fixed column silently collided with
+    "Commissioned by" at 16px. Watch for narrow-width `gap: Xpx 0` rules zeroing it.
+  - Figures: `.pd-s b` `--pd-fig` at `line-height: 1`; `.pd-s.pd-s-hero b` `--pd-hero`.
+    Hero is a **prop**, only the first TppLine whose contest has exactly 2 segments.
+    `b` is a DESCENDANT of `.pd-grp`, so `> b` child selectors silently miss it.
+  - Moves: `.chg` 15px/600, `.chg.up`/`.chg.down` take `--chg-up`/`--chg-down`,
+    `.poll-detail .chg.flat` takes `--pd-ink-2`. Always parenthesised via `ChgParen`.
+  - `NetVal` and the archive's lean/house-effect (`signed1()` in d1a1d215) emit a true
+    minus **U+2212**, not a hyphen — it is in the build's LATIN subset range.
+  - Spacing between a figure and its word is WORD-SPACING, not margins: `.pd-s` 7px /
+    `.pd-grp` 7px / `.pd-s-hero .pd-grp` 10px / `.pd-lab`, `.pd-mat` normal /
+    `.pd-s-chg` 4px (7px in the hero) / `.pd-s-basis` 2px. Margins between inline
+    groups survive a line break and hang the wrapped line in.
+  - No pills in the panel: `.poll-detail .back-to-chart` is plain text, `.pd-report` is
+    a 30px outlined circle, label always hidden.
+  - Probe: `.matilda/verify-poll-detail-type/probe.mjs` — the whole ladder in both
+    tables, the family, the palette-driven move colours, the self-sizing label column,
+    beside/no-wrap/no-overflow at 500/390/320px, and all 124 archive rows at 375px.
 - **Not every poll's detail has every figure class**: `.netv`/`.seat-est` only render for
   polls carrying those metrics — expand several rows before declaring a selector missing.
 

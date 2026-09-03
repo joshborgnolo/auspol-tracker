@@ -119,14 +119,6 @@
   src: url("assets/fonts/sourcesans3-latin.ac057a55.woff2") format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-@font-face {
-  font-family: 'Archivo';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src: url("assets/fonts/archivo-latin.7150c0ec.woff2") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
 </style>
   <style>/* ============================================================
    auspol tracker – design tokens & styles
@@ -204,7 +196,10 @@
   /* every text face is a self-hosted latin subset (FONTS in build.mjs) */
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --figures: "Archivo", var(--sans);
+  /* the expanded poll breakdown is set entirely in Source Sans 3 - one
+     variable cut already shipped for the wordmark, covering 400/500/600/700.
+     It replaced Archivo (--figures), whose only consumer was this panel. */
+  --panel: "Source Sans 3", var(--sans);
   /* tab labels: Source Serif 4, not --serif */
   --heads: "Source Serif 4", var(--serif);
 
@@ -2093,14 +2088,23 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
      would sit wherever the measure ends rather than at the panel's edge */
   flex: 0 0 auto; margin-left: auto;
 }
-/* Below this the label will not fit beside the list it sits with. The list is
-   capped at the ledger's reading measure and the pair needs ~150px more, so
-   the drop is measured off that cap rather than off the panel: above ~560px
-   of band there is room for both, and under it the icon alone fits. */
-@container pdmeta (max-width: 560px) {
-  .pd-report .pd-report-lbl { display: none; }
-  .pd-report { padding: 4px 9px; gap: 0; }
+/* In the panel the controls carry no pill: the way back is a plain worded
+   link, and the report control is a small outlined circle at the band's
+   top-right corner - understated, and the only icon on the page. */
+.poll-detail .back-to-chart {
+  border: 0; background: none; border-radius: 0; padding: 0;
+  font-family: inherit; font-size: 15px; font-weight: 500;
+  color: var(--pd-ink-2);
 }
+.poll-detail .back-to-chart:hover { background: none; color: var(--pd-ink); }
+.poll-detail .pd-report {
+  width: 30px; height: 30px; padding: 0; gap: 0;
+  border: 1px solid var(--pd-rule); border-radius: 50%;
+  justify-content: center; color: var(--pd-ink-2);
+}
+.poll-detail .pd-report:hover { border-color: var(--pd-ink-2); color: var(--pd-ink); }
+.poll-detail .pd-report svg { opacity: 1; }
+.pd-report .pd-report-lbl { display: none; }
 /* a poll arrived at from a chart gets one quiet pulse, so the eye finds it
    after the scroll instead of hunting the row that just opened */
 @media (prefers-reduced-motion: no-preference) {
@@ -2118,18 +2122,36 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    The whole ladder hangs off the four tokens below, so a size change is one
    edit and every relationship in the panel holds. */
 .poll-detail {
-  padding: 14px 14px 26px 42px; background: var(--surface-2); text-align: left;
-  /* the provenance list's label column. Wide enough for the longest label the
-     panel prints ("Pollster’s release") at .pd-meta-k's size, so no label
-     ever wraps and every value starts on the same axis. */
-  --pd-lab: 118px;
+  font-family: var(--panel, var(--sans));
+  padding: 46px 24px 44px; background: var(--pd-paper); text-align: left;
+  color: var(--pd-ink);
+  /* An editorial palette rather than the site's theme tokens: cream paper,
+     charcoal rather than black, and rules so faint they only just separate.
+     Dark mode maps these back onto the site's own ink below. */
+  --pd-paper: #FAF9F6;
+  --pd-ink:   #171717;
+  --pd-ink-2: #62605D;
+  --pd-rule:  #DDDCD8;
+  /* the gutter between the label column and the values it aligns; the column
+     itself sizes to its longest label (see .pd-meta-items) */
+  --pd-gut: 30px;
   /* reading measure. The panel is as wide as the table (1000px+ on a laptop);
      sentences that long are scanned, not read, so the ledger and the list are
      both capped well inside it. The controls still dock to the panel's edge. */
-  --pd-measure: 700px;
-  --pd-body: 16px;   /* the words around the figures */
-  --pd-fig: 22px;    /* every published figure */
-  --pd-hero: 40px;   /* except the headline pair, which is the answer */
+  --pd-measure: 820px;
+  --pd-body: 17px;    /* the words around the figures */
+  --pd-fig: 28px;     /* a percentage inside a sentence */
+  --pd-mid: 32px;     /* national direction - the 2PP treatment, scaled down */
+  --pd-hero: 60px;    /* the 2PP pair, the dominant element on the page */
+  --pd-hero-w: 24px;  /* and the words carrying it */
+}
+/* the theme keeps its own ink at night - the cream/charcoal pair is a light
+   -mode palette and would be unreadable inverted */
+body.dark .poll-detail {
+  --pd-paper: var(--surface-2);
+  --pd-ink:   var(--ink);
+  --pd-ink-2: var(--ink-2);
+  --pd-rule:  var(--line);
 }
 /* The provenance band. It is a definition list, not a fact line: one row per
    thing, labels in their own column, values on a common axis – so the reader
@@ -2138,23 +2160,27 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .pd-meta {
   container-type: inline-size; container-name: pdmeta;
   display: flex; align-items: flex-start; gap: 20px;
-  padding: 0; margin: 0;
+  padding: 0; margin: 0 auto; max-width: var(--pd-measure);
 }
 .pd-meta-items {
-  display: grid; grid-template-columns: var(--pd-lab) minmax(0, 1fr);
-  align-items: baseline; gap: 6px 0;
-  flex: 1 1 auto; min-width: 0; max-width: var(--pd-measure);
-  font-size: 14px; line-height: 1.45; color: var(--ink-2);
+  /* max-content, not a magic width: a grid column is uniform across rows, so
+     the values still begin on one axis, and the column can never be narrower
+     than its longest label - which a fixed px value silently was at 16px,
+     running "Commissioned by" straight into "The Guardian". */
+  display: grid; grid-template-columns: max-content minmax(0, 1fr);
+  align-items: baseline; gap: 16px var(--pd-gut);
+  flex: 1 1 auto; min-width: 0;
+  font-size: var(--pd-body); line-height: 1.45;
   font-variant-numeric: tabular-nums;
 }
 /* each item is a label/value PAIR that must land in one grid row, so the item
    wrapper contributes no box of its own */
 .pd-meta-i { display: contents; }
 .pd-meta-k {
-  font-size: 11.5px; font-weight: 600; letter-spacing: 0.015em;
-  color: var(--ink-3); white-space: nowrap;
+  font-size: var(--pd-body); font-weight: 600;
+  color: var(--pd-ink-2); white-space: nowrap;
 }
-.pd-meta-v { min-width: 0; text-wrap: pretty; }
+.pd-meta-v { min-width: 0; font-weight: 400; color: var(--pd-ink); text-wrap: pretty; }
 /* the meta band is the expansion's provenance: fieldwork, published, sample
    and effective sample print at every width in both tables – fieldwork and
    sample repeat their row columns so the open panel stands alone, and what
@@ -2163,27 +2189,39 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 /* the release pointers are provenance too, so they take the list's shape and
    its label column – they are rendered by the ledger (which both tables
    share) and only LOOK like the last rows of the band above them */
-.pd-rel { margin-top: 6px; }
+/* The release pointers break the grid: they read as a closing note to the
+   list rather than one more of its rows, so the label sits over its value and
+   the block takes its own clearance from the rows above. */
+.pd-meta-items.pd-rel {
+  display: block; margin: 32px auto 0; max-width: var(--pd-measure);
+}
+.pd-rel .pd-meta-i { display: block; }
+.pd-rel .pd-meta-i + .pd-meta-i { margin-top: 18px; }
+.pd-rel .pd-meta-k { display: block; margin-bottom: 4px; }
+.pd-rel .pd-meta-v { display: block; }
 
 /* ---------- the breakdown: headed sections of plain lines ----------
    Everything a poll published, set as running text: a tracked kicker, then
    one wrap-anywhere line per measure with its figures bold. What changed is
    the hierarchy – a hairline per section instead of a gap, so the panel reads
    as a short document rather than one long paragraph run. */
-.pd-simple { display: block; max-width: var(--pd-measure); }
-.pd-sec { border-top: 1px solid var(--line); margin-top: 17px; padding-top: 15px; }
+.pd-simple { display: block; max-width: var(--pd-measure); margin-inline: auto; }
+/* One rhythm, repeated: rule, 30px, heading, 20px, result, 36px, rule. The
+   whitespace is the vertical rhythm rather than padding inside containers. */
+.pd-sec { border-top: 1px solid var(--pd-rule); margin-top: 36px; padding-top: 30px; }
 .pd-s {
-  margin: 0; font-size: var(--pd-body); line-height: 1.5; color: var(--ink-2);
+  margin: 0; font-size: var(--pd-body); line-height: 1.45; font-weight: 400;
+  color: var(--pd-ink);
   font-variant-numeric: tabular-nums; text-wrap: pretty;
 }
-.pd-s + .pd-s { margin-top: 8px; }
+.pd-s + .pd-s { margin-top: 14px; }
 /* A figure is not an emphasised word. Every published number steps a full
    size above the sentence carrying it, so a line can be read for its figures
    alone; line-height: 1 keeps that step out of the leading, so the lines of a
    wrapped measure stay evenly spaced. */
 .pd-s b {
-  font-size: var(--pd-fig); font-weight: 700; color: var(--ink);
-  line-height: 1;
+  font-size: var(--pd-fig); font-weight: 700; color: var(--pd-ink);
+  line-height: 1; letter-spacing: -0.01em;
 }
 /* a label bound to its figure – "GRN 13% (▲1)" – never breaks across lines:
    the pair is the unit being read, and half of one at the end of a line is
@@ -2200,21 +2238,27 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    groups survives a line break and hangs the wrapped line 8px in, which at
    phone widths is most lines. A space collapses at the break, so the left
    edge stays flush. */
-.pd-s { word-spacing: 5px; }
-.pd-grp { word-spacing: 3px; }
+.pd-s { word-spacing: 7px; }
+.pd-grp { word-spacing: 7px; }
 .pd-lab, .pd-mat { word-spacing: normal; }
+/* the matchup prefix names the line; against a 60px figure a bare word-space
+   is not enough to read as a separate phrase */
+.pd-mat { margin-right: 4px; }
+.pd-s-hero .pd-mat { margin-right: 9px; }
 /* the headline pair is set larger, so its junction has to open with it */
-.pd-s-hero .pd-grp { word-spacing: 6px; }
+.pd-s-hero .pd-grp { word-spacing: 10px; }
 /* the parenthetical move belongs to the figure it annotates, so it keeps a
    plain space – opened up, it reads as the next item in the run */
-.pd-s-chg { word-spacing: normal; }
+.pd-s-chg { word-spacing: 4px; }
+.pd-s-hero .pd-s-chg { word-spacing: 7px; }
 /* and the basis caption is a SENTENCE, not a run of pairs: only its own
    figure needs holding off, the prose behind it does not */
 .pd-s.pd-s-basis { word-spacing: 2px; }
-/* the expanded view's numbers are the poll's data: set them in Archivo
-   (figures in summary lines, signed nets, moves, seat estimates) */
+/* the figures take no face of their own: the panel is one family (Source
+   Sans 3) and the hierarchy is carried by size, weight and spacing alone.
+   This rule used to point them at Archivo, whose only consumer it was. */
 .poll-detail b, .poll-detail .netv, .poll-detail .chg, .poll-detail .seat-est {
-  font-family: var(--figures, var(--sans));
+  font-family: inherit; font-variant-numeric: tabular-nums;
 }
 /* the net is what the approval line is FOR – it summarises the three figures
    before it, so it takes the figure size and a step of weight past it */
@@ -2222,16 +2266,19 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 /* the parenthetical moves are metadata ABOUT the figure, not peers of it –
    in the breakdown they rest a size-octave down and a weight lighter than
    the bold numerals they annotate */
-.poll-detail .chg { font-size: 11px; font-weight: 600; }
+.poll-detail .chg { font-size: 15px; font-weight: 600; margin-left: 0; }
+/* "no move" is not a movement - it stays out of the red/green pair and takes
+   the panel's own secondary ink */
+.poll-detail .chg.flat { color: var(--pd-ink-2); opacity: 1; }
 .pd-s-chg .chg { margin-left: 1px; }
-.pd-s-note { color: var(--ink-3); }
+.pd-s-note { color: var(--pd-ink-2); }
 /* the basis of a figure – what was allocated, what stayed undecided – is a
    caption to the line above, not a tail on it. Trailing a parenthesis off the
    end of a 40px pair pushed the headline into a second line for a footnote. */
-.pd-s.pd-s-basis { margin-top: 5px; color: var(--ink-3); font-size: 14px; }
+.pd-s.pd-s-basis { margin-top: 16px; color: var(--pd-ink-2); font-size: var(--pd-body); }
 /* a caption's figure still steps above its words, but not to the full figure
    size - the basis is about the measure above it and must not out-shout it */
-.pd-s.pd-s-basis b { font-size: 18px; }
+.pd-s.pd-s-basis b { font-size: var(--pd-fig); }
 /* no colour of its own -> UA link blue, illegible on the dark paper; the
    house treatment is text first, link second (cf. a.pollster-link/a.tn-link) */
 a.pd-release { color: inherit; text-decoration: none; cursor: pointer; }
@@ -2253,27 +2300,29 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 .seatproj { display: flex; flex-direction: column; gap: 8px; }
 .seat-majline {
   display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap;
-  font-size: 11.5px; color: var(--ink-3);
+  font-size: 15px; color: var(--pd-ink-2); margin-top: 10px;
 }
-.seat-majlab { font-weight: 600; }
-.seat-hung { color: var(--ink-2); font-weight: 600; }
-.seat-rows { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 2px; }
+.seat-majlab { font-weight: 500; }
+.seat-hung { color: var(--pd-ink); font-weight: 500; }
+.seat-rows { display: flex; flex-wrap: wrap; gap: 10px 30px; margin-top: 2px; }
 .seat-row { display: inline-flex; align-items: baseline; gap: 7px; font-variant-numeric: tabular-nums; }
-.seat-name { font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
-.seat-est { font-size: 20px; font-weight: 800; color: var(--ink); line-height: 1.1; }
-.seat-range { font-size: 12px; color: var(--ink-3); }
+/* the seat rows ride the panel's own ladder: the party is a secondary label
+   (500), the count is a published figure (700, --pd-fig), and the range and
+   change are the annotations around it */
+.seat-name { font-size: var(--pd-body); font-weight: 500; color: var(--pd-ink-2); }
+.seat-est { font-size: var(--pd-fig); font-weight: 700; color: var(--pd-ink); line-height: 1; }
+.seat-range { font-size: 15px; color: var(--pd-ink-2); }
 /* seat change is vs the last ELECTION, so it takes neutral ink like every
    other change indicator – no good/bad colour in a party-neutral tracker */
-.seat-chg { font-size: 11.5px; font-weight: 700; color: var(--ink-3); }
-.seat-chg.flat { color: var(--ink-3); font-weight: 600; }
+.seat-chg { font-size: 15px; font-weight: 600; color: var(--pd-ink-2); }
+.seat-chg.flat { color: var(--pd-ink-2); font-weight: 500; }
 /* a projection published as a range only: the figure column carries the range
    itself, and a party can note what it is made of */
 .seat-est.range { font-variant-numeric: tabular-nums; white-space: nowrap; }
-.seat-note { font-size: 11px; color: var(--ink-3); }
-.seat-basis { margin: 2px 0 0; font-size: 11px; color: var(--ink-3); text-wrap: pretty; }
+.seat-note { font-size: 15px; color: var(--pd-ink-2); }
+.seat-basis { margin: 10px 0 0; font-size: 15px; color: var(--pd-ink-2); text-wrap: pretty; }
 @media (max-width: 700px) {
-  .seat-rows { gap: 6px 16px; }
-  .seat-est { font-size: 17px; }
+  .seat-rows { gap: 8px 18px; }
 }
 /* The section kicker. It names a measure and is never read as a sentence, so
    it is set the way a running head is: small, tracked, upper case, quiet ink.
@@ -2282,9 +2331,9 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
    second label voice in the panel, distinct from the sentence-case labels of
    the provenance list above, so the two never read as one system. */
 .pd-k {
-  font-size: 10.5px; font-weight: 600;
-  letter-spacing: 0.115em; text-transform: uppercase;
-  color: var(--ink-3); margin: 0 0 10px;
+  font-size: var(--pd-body); font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--pd-ink-2); margin: 0 0 20px;
 }
 /* The vote-share section IS the poll's headline - it is the figure the row
    was opened for - so the head-to-head takes a display size and everything
@@ -2293,12 +2342,18 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
    supporting readings, not three headlines. The words keep a size of their
    own between the numerals and the body, so "45% ALP" reads as one phrase
    rather than a figure with a caption. */
-.pd-s.pd-s-hero { font-size: 18px; line-height: 1.3; }
-.pd-s.pd-s-hero b { font-size: var(--pd-hero); font-weight: 700; letter-spacing: -0.02em; }
-.poll-detail .pd-s-hero .chg { font-size: 13px; }
+.pd-s.pd-s-hero { font-size: var(--pd-hero-w); line-height: 1.2; }
+.pd-s.pd-s-hero b {
+  font-size: var(--pd-hero); font-weight: 700;
+  line-height: 0.98; letter-spacing: -0.025em;
+}
+.poll-detail .pd-s-hero .chg { font-size: 20px; }
+/* National direction takes the same treatment one scale down - it is a
+   head-to-head like the pair, and reads as one */
+.pd-sec-mid .pd-s > .pd-grp > b { font-size: var(--pd-mid); line-height: 1; }
 /* the connector is grammar, not data - it holds the two halves apart and
    should not be mistaken for either */
-.pd-vs { font-size: 15px; color: var(--ink-3); padding: 0 2px; }
+.pd-vs { font-size: 0.85em; font-weight: 400; color: var(--pd-ink-2); padding: 0 2px; }
 /* undecided: one readout per question, because the panel carries two of them
    and they must not read as one measure with two sources */
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
@@ -2322,8 +2377,9 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
    and at the body's own size, because "Not published" is an answer to the
    kicker above it and not a footnote about one */
 .pd-sec .pd-absent {
-  font-family: inherit; font-style: normal;
-  font-size: var(--pd-body); line-height: 1.5; margin: 0;
+  font-family: inherit; font-style: normal; font-weight: 400;
+  color: var(--pd-ink-2);
+  font-size: var(--pd-body); line-height: 1.45; margin: 0;
 }
 /* a fieldwork end standing in for a publication date nobody recorded, marked
    the dashed way the Latest-polls pill marks the same substitution */
@@ -2448,24 +2504,26 @@ button.acc-spread[aria-pressed="true"] {
    the same hierarchy on a phone, one octave down. */
 @media (max-width: 720px) {
   .poll-detail {
-    padding: 12px 14px 22px 20px;
-    /* the label column narrows to the longest label ("Pollster's release")
-       plus a readable gutter, and no further: the value keeps the rest of the
-       line, which is the whole point of a two-column list */
-    --pd-lab: 110px; --pd-hero: 32px; --pd-fig: 20px; --pd-body: 15px;
+    padding: 32px 22px 34px;
+    /* only the gutter narrows - the label column sizes itself */
+    --pd-gut: 20px; --pd-hero: 45px; --pd-hero-w: 20px;
+    --pd-mid: 27px; --pd-fig: 24px; --pd-body: 16px;
   }
-  .pd-s.pd-s-hero { font-size: 17px; }
-  .pd-s.pd-s-basis { font-size: 13.5px; }
-  .pd-meta-items { font-size: 13.5px; }
+  .poll-detail .pd-s-hero .chg { font-size: 17px; }
+  .pd-sec { margin-top: 30px; padding-top: 26px; }
+  .pd-k { margin-bottom: 16px; }
+  .pd-meta-items { gap: 13px var(--pd-gut); }
+  .pd-meta-items.pd-rel { margin-top: 26px; }
+}
+@media (max-width: 430px) {
+  .poll-detail { --pd-gut: 16px; --pd-hero: 42px; }
 }
 /* The values stay BESIDE their labels at every width. Stacking them cost six
    extra lines to buy back ~110px of a 341px measure that the labels were
    already holding open — and every value the panel prints (a date and time, a
    sample, a signed lean) fits the remainder at 320px. Only the headline steps
    down here; the list's shape does not change. */
-@media (max-width: 560px) {
-  .poll-detail { --pd-hero: 28px; }
-}
+
 /* On the smallest phones the docked controls take ~56px off EVERY row of the
    list to serve one, and that is what pushes "-3.9 vs aggregate" onto a second
    line. Below this they wrap under the list instead: one line spent once,
@@ -2477,7 +2535,6 @@ button.acc-spread[aria-pressed="true"] {
      and land under this band, so a wrapped control at the band's end sits
      between "House effect" and "Pollster's release" and cuts the list in two */
   .pd-meta-tail { margin-left: 0; order: -1; }
-  .poll-detail { --pd-lab: 104px; }
 }
 
 /* ---------- colophon (the method footer) ----------
@@ -5656,14 +5713,35 @@ window.AP.nextPolls = npProject;
     const anchor = host && host.parentElement;
     if (!host || !anchor || host.getBoundingClientRect().width >= COPY_W - 1) return () => {};
     const hostStyle = host.getAttribute("style"), anchorStyle = anchor.getAttribute("style");
+    /* Measure before mutating: the stand-in below is placed from these rects. */
+    const hostRect = host.getBoundingClientRect();
+    const anchorRect = anchor.getBoundingClientRect();
     /* Taking the host out of flow would collapse everything under it, so the
        ancestor is pinned to its current height and clipped first. Nothing
        below moves, and the wide chart is parked outside the clip - offset
        rather than hidden, since visibility and opacity would be baked into
        the serialised svg and blank the copy. */
-    anchor.style.height = anchor.getBoundingClientRect().height + "px";
+    anchor.style.height = anchorRect.height + "px";
     anchor.style.overflow = "hidden";
     if (getComputedStyle(anchor).position === "static") anchor.style.position = "relative";
+    /* The park leaves a hole until restore() puts the host back - visibly
+       about a second on a phone, where the wide re-layout and the compose
+       take that long (the desktop either clears the width check above or
+       finishes before a frame paints). Pin a static clone where the chart
+       was so the screen shows a frozen, unclickable image of what was there
+       instead of the hole. It rides on <body>, fixed, not inside the card:
+       inside, the composer running below would read its .ro-party/.hl-item
+       nodes a second time and draw every legend row twice. */
+    const stand = host.cloneNode(true);
+    stand.style.position = "fixed";
+    stand.style.margin = "0";
+    stand.style.top = hostRect.top + "px";
+    stand.style.left = hostRect.left + "px";
+    stand.style.width = hostRect.width + "px";
+    stand.style.height = hostRect.height + "px";
+    stand.style.pointerEvents = "none";
+    stand.setAttribute("aria-hidden", "true");
+    document.body.appendChild(stand);
     host.style.position = "absolute";
     host.style.top = "0";
     host.style.left = "-99999px";
@@ -5676,6 +5754,9 @@ window.AP.nextPolls = npProject;
       if (svg.querySelector(".evt-label")) break;
     }
     return () => {
+      /* stand out first so the frame that brings the host back never shows
+         the pair stacked - removal and restore are one paint */
+      if (stand.parentNode) stand.parentNode.removeChild(stand);
       if (hostStyle == null) host.removeAttribute("style"); else host.setAttribute("style", hostStyle);
       if (anchorStyle == null) anchor.removeAttribute("style"); else anchor.setAttribute("style", anchorStyle);
     };
@@ -10666,9 +10747,11 @@ function ShareBar({
 function NetVal({
   v
 }) {
+  /* a true minus (U+2212), not a hyphen: these sit in tabular figures, where
+     a hyphen is both too short and too high to read as a sign */
   return /*#__PURE__*/React.createElement("span", {
     className: "netv " + (v >= 0 ? "pos" : "neg")
-  }, v > 0 ? "+" : "", v);
+  }, v > 0 ? "+" : "", String(v).replace("-", "\u2212"));
 }
 
 // Seat projection – MRP polls only. A seat count is a different animal from a
@@ -10957,11 +11040,12 @@ function PdSec({
   label,
   absent,
   lead,
+  mid,
   children
 }) {
   const kids = React.Children.toArray(children).filter(Boolean);
   return /*#__PURE__*/React.createElement("section", {
-    className: "pd-sec" + (lead ? " pd-sec-lead" : "")
+    className: "pd-sec" + (lead ? " pd-sec-lead" : "") + (mid ? " pd-sec-mid" : "")
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-k"
   }, label), kids.length ? kids : /*#__PURE__*/React.createElement("p", {
@@ -11186,7 +11270,8 @@ function PollLedger({
     appr: appr,
     chg: r.chg
   }))), dirSegments && /*#__PURE__*/React.createElement(PdSec, {
-    label: "National direction"
+    label: "National direction",
+    mid: true
   }, /*#__PURE__*/React.createElement("p", {
     className: "pd-s"
   }, /*#__PURE__*/React.createElement("span", {
@@ -11205,7 +11290,7 @@ function PollLedger({
     d: dirSegments[2].delta
   }))), dirSegments[1].value != null && /*#__PURE__*/React.createElement("p", {
     className: "pd-s pd-s-basis"
-  }, dirSegments[1].value, "% unsure")), r.seats && /*#__PURE__*/React.createElement(PdSec, {
+  }, "(", dirSegments[1].value, "% unsure)")), r.seats && /*#__PURE__*/React.createElement(PdSec, {
     label: "Seat projection"
   }, /*#__PURE__*/React.createElement(SeatProjection, {
     seats: r.seats
@@ -14866,6 +14951,7 @@ function ArchLead({
 // appr). The archive row prints no client and no published DATE in any
 // column at any width, so the meta line owns both outright – left untagged,
 // never width-hidden.
+const signed1 = v => (v > 0 ? "+" : "") + v.toFixed(1).replace("-", "\u2212");
 function ArchPollDetail({
   p,
   onBack,
@@ -14951,21 +15037,24 @@ function ArchPollDetail({
     className: "pd-meta-k"
   }, "Effective sample"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
-  }, "n = ", p.sampleEff.toLocaleString())), p.lean != null && /*#__PURE__*/React.createElement("span", {
+  }, "n = ", p.sampleEff.toLocaleString())),
+  /* signed to one decimal, with a true minus (U+2212) rather than a hyphen -
+     these read as figures, not as a range dash or a word break */
+  p.lean != null && /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     key: "lean"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Poll lean"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
-  }, p.lean > 0 ? "+" : "", p.lean.toFixed(1), " vs aggregate")), p.hfx != null && /*#__PURE__*/React.createElement("span", {
+  }, signed1(p.lean), " vs aggregate")), p.hfx != null && /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     key: "hfx"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "House effect"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
-  }, p.hfx.v > 0 ? "+" : "", p.hfx.v.toFixed(1), " vs consensus"))].filter(Boolean);
+  }, signed1(p.hfx.v), " vs consensus"))].filter(Boolean);
   const controls = [
   /* the way back rides the line that already describes this poll, rather
      than inventing a band of its own above the panel */

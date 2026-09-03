@@ -115,12 +115,13 @@ const FONTS = [
      font-size). Preloaded - it paints above the fold. */
   { file: "sourceserif4-latin.woff2",           family: "Source Serif 4", style: "normal", weight: "200 900", preload: true },
   { file: "ibmplexsans-latin.woff2",            family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
-  /* Source Sans 3 stays shipped for one scoped caller: the .wordmark
-     lockup, which keeps its pre-swap face. */
+  /* Source Sans 3 has two callers: the .wordmark lockup, which keeps its
+     pre-swap face, and the whole expanded poll breakdown (--panel), which
+     needs 400/500/600/700 - all inside this one variable cut. */
   { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
-  /* Archivo sets the expanded poll breakdown's figures only - one variable
-     cut carries 400/700/800, and it sits behind a click, so no preload. */
-  { file: "archivo-latin.woff2",                family: "Archivo", style: "normal", weight: "100 900" },
+  /* Archivo is retired: the expanded poll breakdown was its only consumer and
+     that panel is now set in Source Sans 3 throughout. The source subset stays
+     in fonts/ so re-registering it is a one-line change. */
 ];
 const FONT_DIR = path.join(ROOT, "assets", "fonts");
 fs.mkdirSync(FONT_DIR, { recursive: true });

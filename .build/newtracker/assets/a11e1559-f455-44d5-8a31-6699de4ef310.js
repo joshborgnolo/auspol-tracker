@@ -1678,7 +1678,10 @@ function ShareBar({ segs, compact, flag }) {
 }
 
 function NetVal({ v }) {
-  return <span className={"netv " + (v >= 0 ? "pos" : "neg")}>{v > 0 ? "+" : ""}{v}</span>;
+  /* a true minus (U+2212), not a hyphen: these sit in tabular figures, where
+     a hyphen is both too short and too high to read as a sign */
+  return <span className={"netv " + (v >= 0 ? "pos" : "neg")}>
+    {v > 0 ? "+" : ""}{String(v).replace("-", "\u2212")}</span>;
 }
 
 // Seat projection – MRP polls only. A seat count is a different animal from a
@@ -1887,10 +1890,10 @@ function ChgParen({ d }) {
    section would leave the reader guessing whether the poll even asked. The
    `lead` flag is the vote-share section's figure-size step: the result is
    the headline, so its numerals read 2px up on the rest of the breakdown. */
-function PdSec({ label, absent, lead, children }) {
+function PdSec({ label, absent, lead, mid, children }) {
   const kids = React.Children.toArray(children).filter(Boolean);
   return (
-    <section className={"pd-sec" + (lead ? " pd-sec-lead" : "")}>
+    <section className={"pd-sec" + (lead ? " pd-sec-lead" : "") + (mid ? " pd-sec-mid" : "")}>
       <div className="pd-k">{label}</div>
       {kids.length ? kids : <p className="pd-absent">{absent || "Not published"}</p>}
     </section>
@@ -2119,8 +2122,10 @@ function PollLedger({ r, dirSegments }) {
         ))}
       </PdSec>
 
+      {/* the same head-to-head shape as the vote share, so it takes the same
+          treatment one scale down (`mid`) rather than body figures */}
       {dirSegments && (
-        <PdSec label="National direction">
+        <PdSec label="National direction" mid>
           <p className="pd-s">
             <span className="pd-grp">
               <b>{dirSegments[0].value}%</b> <span className="pd-lab">right direction</span>
@@ -2136,7 +2141,7 @@ function PollLedger({ r, dirSegments }) {
               captions them at caption size – unlike the two-party pair's
               undecided, which sits inside the pair and changes how it reads */}
           {dirSegments[1].value != null &&
-            <p className="pd-s pd-s-basis">{dirSegments[1].value}% unsure</p>}
+            <p className="pd-s pd-s-basis">({dirSegments[1].value}% unsure)</p>}
         </PdSec>
       )}
 
