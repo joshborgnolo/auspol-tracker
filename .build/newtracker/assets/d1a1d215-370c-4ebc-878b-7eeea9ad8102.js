@@ -644,6 +644,15 @@ function cycMonthOf(eDate, m) {
    whitelist pins the event to those chart measures alone. */
 const cycEventMonth = (iso, eDate) => (Date.parse(iso) - Date.parse(eDate)) / 86400000 / MS_MONTH_C;
 const CYC_EVENTS = {
+  1987: [
+    {
+      date: "1989-05-09", short: "Howard → Peacock",
+      label: "Peacock replaces Howard as opposition leader",
+      desc: "Andrew Peacock defeats John Howard in a Liberal leadership spill, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+  ],
   1990: [
     {
       date: "1991-12-20", short: "Hawke → Keating",
@@ -666,6 +675,60 @@ const CYC_EVENTS = {
       desc: "John Howard replaces Alexander Downer as Liberal leader and opposition leader after Downer resigns.",
       major: true,
       metrics: ["oppnet"],
+    },
+  ],
+  2001: [
+    {
+      date: "2001-11-22", short: "Beazley → Crean",
+      label: "Crean replaces Beazley as opposition leader",
+      desc: "Kim Beazley resigns after Labor’s 2001 election defeat and Simon Crean is elected unopposed as Labor leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+    {
+      date: "2003-12-02", short: "Crean → Latham",
+      label: "Latham replaces Crean as opposition leader",
+      desc: "Mark Latham defeats Kim Beazley 47–45 in a Labor leadership ballot after Simon Crean resigns, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+  ],
+  2004: [
+    {
+      date: "2005-01-28", short: "Latham → Beazley",
+      label: "Beazley replaces Latham as opposition leader",
+      desc: "Mark Latham resigns the Labor leadership and leaves parliament; Kim Beazley is elected unopposed as his replacement.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+    {
+      date: "2006-12-04", short: "Beazley → Rudd",
+      label: "Rudd replaces Beazley as opposition leader",
+      desc: "Kevin Rudd defeats Kim Beazley 49–39 in a Labor leadership spill, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+  ],
+  2007: [
+    {
+      date: "2008-09-16", short: "Nelson → Turnbull",
+      label: "Turnbull replaces Nelson as opposition leader",
+      desc: "Malcolm Turnbull defeats Brendan Nelson 45–41 in a Liberal leadership spill, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+    {
+      date: "2009-12-01", short: "Turnbull → Abbott",
+      label: "Abbott replaces Turnbull as opposition leader",
+      desc: "Tony Abbott defeats Malcolm Turnbull 42–41 in a Liberal leadership spill over emissions trading, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+    {
+      date: "2010-06-24", short: "Rudd → Gillard",
+      label: "Gillard replaces Rudd as prime minister",
+      desc: "Kevin Rudd stands down rather than contest a Labor leadership spill and Julia Gillard is sworn in as prime minister.",
+      major: true,
     },
   ],
   2010: [

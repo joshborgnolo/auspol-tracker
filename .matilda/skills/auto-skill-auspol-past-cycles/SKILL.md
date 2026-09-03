@@ -571,12 +571,22 @@ stands alone on the chart (SOLO panel, `CYC_EVENTS[solo.year]`); overlaid
 with other cycles an event belongs to no single line, so it hides. An
 optional `metrics: [...]` whitelist (e.g. Shorten→Albanese pins to
 `oppnet`) narrows a marker to named measures. Keys must match CYCLE_DEFS
-years. Entries as of 2026-09-03: ONE 1990 entry (Hawke→Keating spill
-dated 1991-12-20 — swearing-in day; the ballot was the 19th, pmSpl's iso
-in gen-data stays 1991-12-19) and TWO 1993 entries (Hewson→Downer spill
-1994-05-23 and Downer→Howard handover 1995-01-30, both pinned
-`metrics: ["oppnet"]` as opposition-leader-only changes; both dates ARE
-the existing oppSpl boundary isos, no gen-data change needed).
+years. Leadership-change entries as of 2026-09-03: every pmSpl/oppSpl
+boundary in CYCLE_DEFS now has a matching event — 1987 (Howard→Peacock
+1989-05-09, oppnet), 1990 (Hawke→Keating 1991-12-20 — swearing-in day;
+the ballot was the 19th, pmSpl's iso in gen-data stays 1991-12-19), 1993
+(Hewson→Downer 1994-05-23 + Downer→Howard 1995-01-30, both oppnet; both
+dates ARE the existing oppSpl isos, no gen-data change needed), 2001
+(Beazley→Crean 2001-11-22 + Crean→Latham 2003-12-02, both oppnet), 2004
+(Latham→Beazley 2005-01-28 + Beazley→Rudd 2006-12-04, both oppnet),
+2007 (Nelson→Turnbull 2008-09-16 + Turnbull→Abbott 2009-12-01, both
+oppnet; Rudd→Gillard 2010-06-24, PM event left UNPINNED), plus the
+pre-existing 2010 (Gillard→Rudd), 2013 (Abbott→Turnbull), 2016
+(Turnbull→Morrison + Shorten→Albanese oppnet) and 2025 (Ley→Taylor).
+PM-spill events are unpinned (appear on all measures); opposition-leader
+events pin `metrics: ["oppnet"]` — convention from Shorten→Albanese.
+Non-leadership events (budgets, crises) also exist under 2010/2013/
+2016/2019/2022/2025 and are a separate, unpinned set.
 
 ## State as of 2026-09-03 (commit a0b910f)
 
