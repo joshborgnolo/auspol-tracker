@@ -3731,10 +3731,27 @@ html {
      is tunable on iOS at all; the two are deliberately far apart until we
      know. */
   --tide-ground: oklch(0.91 0.014 250);
-  background: var(--tile-art) center bottom / auto 400px repeat var(--tide-ground);
+  /* --bg lives on body, not html, so the fade names its own light ground and
+     the dark rule below renames it; a bare var(--bg) here would fade to cream
+     under a dark page. The fade is an IMAGE, so it exists on the desktop
+     gutter only - iOS gets the flat colour under it, which is the whole
+     point of the probe - and it keeps a laptop pull from opening on a hard
+     line where the ground changes. */
+  --tide-fade: var(--bg);
+  background-image: var(--tile-art),
+                    linear-gradient(to bottom, var(--tide-fade), var(--tide-ground));
+  background-position: center bottom, left bottom -180px;
+  background-size: auto 400px, 100% 180px;
+  background-repeat: repeat, no-repeat;
+  background-color: var(--tide-ground);
   transition: background-color .35s ease;
 }
-html:has(body.dark) { background-image: var(--tile-art-dark); --tide-ground: oklch(0.175 0.014 250); }
+html:has(body.dark) {
+  background-image: var(--tile-art-dark),
+                    linear-gradient(to bottom, var(--tide-fade), var(--tide-ground));
+  --tide-fade: oklch(0.215 0.010 65);
+  --tide-ground: oklch(0.175 0.014 250);
+}
 .tile-band {
   height: 400px;
   margin-top: 12px;
@@ -3756,7 +3773,7 @@ html:has(body.dark) { background-image: var(--tile-art-dark); --tide-ground: okl
 }
 body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (max-width: 640px) {
-  html { background-size: auto 320px; }
+  html { background-size: auto 320px, 100% 180px; }
   .tile-band { height: 320px; margin-top: 8px; background-size: auto 320px; }
 }
 
