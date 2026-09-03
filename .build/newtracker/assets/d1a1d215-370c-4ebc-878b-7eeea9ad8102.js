@@ -4105,7 +4105,25 @@ function infoTerms(D) {
       run the same formula with the recency term dropped. The leaders’ ratings and national
       direction are built the same way monthly; preferred prime minister and the undecided share
       stay as plain {xref("monthly-average", "weighted aggregate", "monthly averages")} – their
-      houses’ differences live in the questions asked, not in a lean to correct.</>) },
+      houses’ differences live in the questions asked, not in a lean to correct.
+      <span className="info-p">The current Labor primary is that construction run as the month to
+      date. Each wave taken this month contributes its published Labor share – minus the house’s
+      lean on the ALP primary specifically, read at the month’s midpoint – weighted by sample
+      size alone, the recency halving dropped because a month is read at its centre; a house in
+      the field twice counts for √2, not 2. Only once all five parties are estimated is the sum
+      checked, and the five stand unrescaled unless the debiased total sits more than half a
+      point from the plain-average total – a real undecided-driven shortfall is kept, not ironed
+      out. As the month stands, that is {prim.alp.toFixed(1)} for Labor.</span>
+      <span className="info-p">The two-party-preferred is the nowcast proper, over the rows the
+      measure admits: waves whose fieldwork midpoint falls inside the 21-day window ending at the
+      newest poll, each contributing its published Labor share of the pair – a pair printed with
+      undecided still inside it is rebased to 100 first – adjusted for the house’s lean on the
+      2PP as of the reference day. A house that publishes no two-party adds no row; running its
+      primaries through one fixed flow table stays in the
+      {" "}{xref("implied-2pp", "weighted aggregate", "implied 2PP")} diagnostic, never the
+      headline, and an empty window falls back to the last monthly point rather than vanishing.
+      As of the latest poll, that is {L.alp2pp.toFixed(1)} to Labor,
+      {" "}{L.lnp2pp.toFixed(1)} to the Coalition.</span></>) },
   ];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"
