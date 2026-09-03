@@ -1292,10 +1292,10 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
        fallback. */
     bandAreas = segs.filter((s) => s.pts.length > 1).flatMap((s, i) => [
       { id: "cyc-band-lo" + i, className: "cyc-band lo" + (s.thin ? " thin" : ""),
-        color: "var(--ink)", opacity: 0.07, edge: false,
+        color: "var(--cyc-fill)", opacity: 0.07, edge: false,
         points: s.pts.map((r) => ({ x: r.m, y0: r.p10, y1: r.p90 })) },
       { id: "cyc-band-hi" + i, className: "cyc-band hi" + (s.thin ? " thin" : ""),
-        color: "var(--ink)", opacity: 0.13, edge: false,
+        color: "var(--cyc-fill)", opacity: 0.13, edge: false,
         points: s.pts.map((r) => ({ x: r.m, y0: r.q1, y1: r.q3 })) },
     ]);
     /* One mean line over all of it, not one per stretch: two segments sharing
@@ -1522,6 +1522,21 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
                              + (solo ? " – " + cycMonthOf(solo.eDate, CYC_SPINE[i].x) : "")}
         fmt={M.fmt}
       />
+      {/* one solo term in the frame: how thick its newspaper record is, when the
+          Trove harvest reaches it (cycleSource sidecar; absent for uncovered
+          terms and before the sidecar resolves, so nothing paints early).
+          M-keyed so it appears once — under the primary vote panel — instead
+          of repeating identical text under every measure's chart. */}
+      {solo && M.key === "primary" && ((D.cycleSource || {})[solo.year] || {}).trove && (() => {
+        const t = (D.cycleSource || {})[solo.year].trove;
+        return (
+          <p className="cycle-insight">
+            Newspapers mentioned a poll in {t.articles.toLocaleString()} articles over this term
+            ({t.pollArticles.toLocaleString()} poll reports) —{" "}
+            <a href={"/archives/trove/#y" + solo.year}>Trove newspaper archive</a>.
+          </p>
+        );
+      })()}
     </section>
   );
 }
@@ -1575,8 +1590,8 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll, shap
             {/* the same two classes the chart's fills wear, so the key is not a
                 hand-matched approximation that drifts when the band is retuned
                 – or sits at light-theme weights on a dark page */}
-            <rect className="cyc-band lo" x="4" y="0" width="22" height="12" fill="var(--ink)" />
-            <rect className="cyc-band hi" x="4" y="2.5" width="22" height="7" fill="var(--ink)" />
+            <rect className="cyc-band lo" x="4" y="0" width="22" height="12" fill="var(--cyc-fill)" />
+            <rect className="cyc-band hi" x="4" y="2.5" width="22" height="7" fill="var(--cyc-fill)" />
             <line x1="4" y1="6" x2="26" y2="6" stroke="var(--ink-2)" strokeWidth="1.9" strokeDasharray="2 3.4" opacity="0.85" />
           </svg>
           <span>Past terms: mean of the set, middle half and middle 80%</span>
@@ -2338,27 +2353,35 @@ function ArchPollDetail({ p, onBack, backLabel }) {
   /* The meta items as a list rather than loose children, so the controls
      bracketed to the right of the band sit clear of them. */
   const metaItems = [
-    p.client && <span className="pd-meta-i" key="client"><span className="pd-meta-k">Commissioned by</span> {p.client}</span>,
-    <span className="pd-meta-i" key="field"><span className="pd-meta-k">Fieldwork</span> {p.field}</span>,
+    p.client && <span className="pd-meta-i" key="client"><span className="pd-meta-k">Commissioned by</span>
+      <span className="pd-meta-v">{p.client}</span></span>,
+    <span className="pd-meta-i" key="field"><span className="pd-meta-k">Fieldwork</span>
+      <span className="pd-meta-v">{p.field}</span></span>,
     /* The date the poll came OUT, and the hour where the release recorded
        one. This line has always been labelled "Published" and has always
        printed `fullDate`, which is the last day of FIELDWORK - the same
        substitution the Latest-polls column was corrected for, still being
        made one tab across. Where no publication date was recorded the
        fieldwork end still stands in, but now says that it is doing so. */
-    <span className="pd-meta-i" key="pub"><span className="pd-meta-k">Published</span>{" "}
-      {pubStamp(p.published, { year: true })
-        || <span className="pd-est"
-                 title="Publication date not recorded for this poll – showing the last day of fieldwork">
-             {p.fullDate}
-           </span>}
+    <span className="pd-meta-i" key="pub"><span className="pd-meta-k">Published</span>
+      <span className="pd-meta-v">
+        {pubStamp(p.published, { year: true })
+          || <span className="pd-est"
+                   title="Publication date not recorded for this poll – showing the last day of fieldwork">
+               {p.fullDate}
+             </span>}
+      </span>
     </span>,
-    <span className="pd-meta-i" key="sample"><span className="pd-meta-k">Sample</span> {p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span>,
+    <span className="pd-meta-i" key="sample"><span className="pd-meta-k">Sample</span>
+      <span className="pd-meta-v">{p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span></span>,
     p.sampleEff != null && <span className="pd-meta-i" key="eff"
       title="Effective sample as published by the pollster (APC methodology statement)">
-      <span className="pd-meta-k">Effective sample</span> n = {p.sampleEff.toLocaleString()}</span>,
-    p.lean != null && <span className="pd-meta-i" key="lean"><span className="pd-meta-k">Poll lean</span> {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span>,
-    p.hfx != null && <span className="pd-meta-i" key="hfx"><span className="pd-meta-k">House effect</span> {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)} vs consensus</span>,
+      <span className="pd-meta-k">Effective sample</span>
+      <span className="pd-meta-v">n = {p.sampleEff.toLocaleString()}</span></span>,
+    p.lean != null && <span className="pd-meta-i" key="lean"><span className="pd-meta-k">Poll lean</span>
+      <span className="pd-meta-v">{p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)} vs aggregate</span></span>,
+    p.hfx != null && <span className="pd-meta-i" key="hfx"><span className="pd-meta-k">House effect</span>
+      <span className="pd-meta-v">{p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)} vs consensus</span></span>,
   ].filter(Boolean);
 
   const controls = [

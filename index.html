@@ -159,6 +159,10 @@
   --grn: oklch(0.60 0.120 150);  /* Greens       */
   --onp: oklch(0.66 0.130 58);   /* One Nation orange */
   --oth: oklch(0.64 0.018 70);   /* Others grey  */
+  /* past-cycles band fills: halfway Labor→Coalition in oklch – one definition
+     serves both themes because var() resolves --alp/--lnp at the use site,
+     which in dark mode means the lifted values below */
+  --cyc-fill: color-mix(in oklch, var(--alp) 50%, var(--lnp));
 
   /* The party colours above are MARK colours – tuned for dots, lines and bars,
      where luminance carries no legibility burden. Set the same hue as 10px
@@ -2058,34 +2062,23 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    the pill shape at a lower voice */
 .pd-report { font-size: 11.5px; font-weight: 500; color: var(--ink-3); padding: 4px 11px 4px 9px; }
 .pd-report:hover { color: var(--ink); }
-/* the meta line carries text and now a control, so centre what sits in it */
-.pd-meta { align-items: center; }
-/* The band's split: the metadata occupies the left region and wraps on
-   itself; the controls are docked to the band's top-right corner - report at
-   the right edge, the way back where it is present beside it - and they stay
-   on the first line, beside published and sample, however many lines the
-   metadata runs to. Chained on .pd-meta because the base .pd-meta block sits
-   LATER in this sheet and would otherwise retake flex-wrap: wrap - at 500px
-   the items region fills the row and the controls drop to the band's bottom
-   left. (The Latest-polls band keeps the plain wrapping-inline rule: no
-   controls ever ride in it.) */
-.pd-meta.pd-meta-split { flex-wrap: nowrap; align-items: flex-start; }
-.pd-meta-split .pd-meta-items {
-  display: flex; flex-wrap: wrap; gap: 6px 26px;
-  flex: 1 1 auto; min-width: 0;
-}
+/* The band's split: the poll's provenance is a label/value LIST that keeps
+   its own narrow column on the left (see .pd-meta-items), and the controls
+   dock to the band's top-right corner - report at the right edge, the way
+   back where it is present beside it. They ride the first row, level with
+   "commissioned by", however many rows the list runs to. */
 .pd-meta-tail {
   display: inline-flex; align-items: center; gap: 10px;
   flex-wrap: nowrap; min-width: 0;
-  flex: 0 0 auto;
+  /* the list is capped at the reading measure, so without this the controls
+     would sit wherever the measure ends rather than at the panel's edge */
+  flex: 0 0 auto; margin-left: auto;
 }
-/* Below this the label will not fit beside the figures it sits with - the
-   archive's own band runs 742px of items at 796px wide, and the labelled
-   button needs 133 more - so it drops to the icon, which fits. Measured on
-   the widest meta line the archive produces (published, sample, poll lean,
-   house effect); a poll with fewer items would have fitted the label a little
-   narrower, and shows the icon slightly sooner than it strictly must. */
-@container pdmeta (max-width: 900px) {
+/* Below this the label will not fit beside the list it sits with. The list is
+   capped at the ledger's reading measure and the pair needs ~150px more, so
+   the drop is measured off that cap rather than off the panel: above ~560px
+   of band there is room for both, and under it the icon alone fits. */
+@container pdmeta (max-width: 560px) {
   .pd-report .pd-report-lbl { display: none; }
   .pd-report { padding: 4px 9px; gap: 0; }
 }
@@ -2099,49 +2092,105 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   }
 }
 .detail-row:hover { background: transparent !important; }
-.poll-detail { padding: 6px 14px 20px 42px; background: var(--surface-2); text-align: left; }
-/* the meta line is part of the one detail container, not a band of its own:
-   no dividing rule, and the gap to the first ledger section is the ledger's
-   own rhythm rather than a header's clearance */
+/* ---------- the expanded breakdown ----------
+   Three voices, and only three: a provenance LIST (quiet label column, values
+   aligned against it), section KICKERS in tracked small caps, and the poll's
+   own FIGURES, which are the reason the row was opened and are set to win.
+   The whole ladder hangs off the four tokens below, so a size change is one
+   edit and every relationship in the panel holds. */
+.poll-detail {
+  padding: 14px 14px 26px 42px; background: var(--surface-2); text-align: left;
+  /* the provenance list's label column. Wide enough for the longest label the
+     panel prints ("Pollster’s release") at .pd-meta-k's size, so no label
+     ever wraps and every value starts on the same axis. */
+  --pd-lab: 118px;
+  /* reading measure. The panel is as wide as the table (1000px+ on a laptop);
+     sentences that long are scanned, not read, so the ledger and the list are
+     both capped well inside it. The controls still dock to the panel's edge. */
+  --pd-measure: 700px;
+  --pd-body: 16px;   /* the words around the figures */
+  --pd-fig: 22px;    /* every published figure */
+  --pd-hero: 40px;   /* except the headline pair, which is the answer */
+}
+/* The provenance band. It is a definition list, not a fact line: one row per
+   thing, labels in their own column, values on a common axis – so the reader
+   can find "sample" without reading "fieldwork" first. It carries no rule of
+   its own; the first section's rule is what closes it. */
 .pd-meta {
   container-type: inline-size; container-name: pdmeta;
-  display: flex; flex-wrap: wrap; gap: 6px 26px; padding: 4px 0 0;
-  margin-bottom: 13px;
-  font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+  display: flex; align-items: flex-start; gap: 20px;
+  padding: 0; margin: 0;
 }
-.pd-meta-i { white-space: nowrap; }
+.pd-meta-items {
+  display: grid; grid-template-columns: var(--pd-lab) minmax(0, 1fr);
+  align-items: baseline; gap: 6px 0;
+  flex: 1 1 auto; min-width: 0; max-width: var(--pd-measure);
+  font-size: 14px; line-height: 1.45; color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+/* each item is a label/value PAIR that must land in one grid row, so the item
+   wrapper contributes no box of its own */
+.pd-meta-i { display: contents; }
 .pd-meta-k {
-  font-size: 10.5px;
-  color: var(--ink-3); font-weight: 600; margin-right: 5px;
+  font-size: 11.5px; font-weight: 600; letter-spacing: 0.015em;
+  color: var(--ink-3); white-space: nowrap;
 }
-/* the meta band is the expansion's fact line: fieldwork, published, sample
+.pd-meta-v { min-width: 0; text-wrap: pretty; }
+/* the meta band is the expansion's provenance: fieldwork, published, sample
    and effective sample print at every width in both tables – fieldwork and
    sample repeat their row columns so the open panel stands alone, and what
-   no column ever prints (the archive's client, the published DATE) rides
-   the same line untagged */
+   no column ever prints (the archive's client, the published DATE, the
+   pollster's own release page) rides the same label column */
+/* the release pointers are provenance too, so they take the list's shape and
+   its label column – they are rendered by the ledger (which both tables
+   share) and only LOOK like the last rows of the band above them */
+.pd-rel { margin-top: 6px; }
 
-/* ---------- the breakdown: plain headed text lines ----------
-   Everything a poll published, set as running text: a small-kicker heading,
-   then one wrap-anywhere line per measure with its figures bold. No grid,
-   no figures-only colour code – the lines read like sentences. */
-.pd-simple { display: flex; flex-direction: column; gap: 13px; }
-.pd-simple .pd-k { margin-bottom: 3px; }
+/* ---------- the breakdown: headed sections of plain lines ----------
+   Everything a poll published, set as running text: a tracked kicker, then
+   one wrap-anywhere line per measure with its figures bold. What changed is
+   the hierarchy – a hairline per section instead of a gap, so the panel reads
+   as a short document rather than one long paragraph run. */
+.pd-simple { display: block; max-width: var(--pd-measure); }
+.pd-sec { border-top: 1px solid var(--line); margin-top: 17px; padding-top: 15px; }
 .pd-s {
-  margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink-2);
+  margin: 0; font-size: var(--pd-body); line-height: 1.5; color: var(--ink-2);
   font-variant-numeric: tabular-nums; text-wrap: pretty;
 }
-.pd-s b { font-weight: 700; color: var(--ink); }
+.pd-s + .pd-s { margin-top: 8px; }
+/* A figure is not an emphasised word. Every published number steps a full
+   size above the sentence carrying it, so a line can be read for its figures
+   alone; line-height: 1 keeps that step out of the leading, so the lines of a
+   wrapped measure stay evenly spaced. */
+.pd-s b {
+  font-size: var(--pd-fig); font-weight: 700; color: var(--ink);
+  line-height: 1;
+}
+/* a label bound to its figure – "GRN 13% (▲1)" – never breaks across lines:
+   the pair is the unit being read, and half of one at the end of a line is
+   the reader's work, not the setter's */
+.pd-grp { white-space: nowrap; }
 /* the expanded view's numbers are the poll's data: set them in Archivo
    (figures in summary lines, signed nets, moves, seat estimates) */
 .poll-detail b, .poll-detail .netv, .poll-detail .chg, .poll-detail .seat-est {
   font-family: var(--figures, var(--sans));
 }
+/* the net is what the approval line is FOR – it summarises the three figures
+   before it, so it takes the figure size and a step of weight past it */
+.poll-detail .pd-s .netv { font-size: var(--pd-fig); line-height: 1; }
 /* the parenthetical moves are metadata ABOUT the figure, not peers of it –
    in the breakdown they rest a size-octave down and a weight lighter than
    the bold numerals they annotate */
-.poll-detail .chg { font-size: 10.5px; font-weight: 600; }
+.poll-detail .chg { font-size: 11px; font-weight: 600; }
 .pd-s-chg .chg { margin-left: 1px; }
 .pd-s-note { color: var(--ink-3); }
+/* the basis of a figure – what was allocated, what stayed undecided – is a
+   caption to the line above, not a tail on it. Trailing a parenthesis off the
+   end of a 40px pair pushed the headline into a second line for a footnote. */
+.pd-s.pd-s-basis { margin-top: 5px; color: var(--ink-3); font-size: 14px; }
+/* a caption's figure still steps above its words, but not to the full figure
+   size - the basis is about the measure above it and must not out-shout it */
+.pd-s.pd-s-basis b { font-size: 18px; }
 /* no colour of its own -> UA link blue, illegible on the dark paper; the
    house treatment is text first, link second (cf. a.pollster-link/a.tn-link) */
 a.pd-release { color: inherit; text-decoration: none; cursor: pointer; }
@@ -2169,9 +2218,9 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 .seat-hung { color: var(--ink-2); font-weight: 600; }
 .seat-rows { display: flex; flex-wrap: wrap; gap: 6px 22px; margin-top: 2px; }
 .seat-row { display: inline-flex; align-items: baseline; gap: 7px; font-variant-numeric: tabular-nums; }
-.seat-name { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
-.seat-est { font-size: 15px; font-weight: 800; color: var(--ink); }
-.seat-range { font-size: 11.5px; color: var(--ink-3); }
+.seat-name { font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
+.seat-est { font-size: 20px; font-weight: 800; color: var(--ink); line-height: 1.1; }
+.seat-range { font-size: 12px; color: var(--ink-3); }
 /* seat change is vs the last ELECTION, so it takes neutral ink like every
    other change indicator – no good/bad colour in a party-neutral tracker */
 .seat-chg { font-size: 11.5px; font-weight: 700; color: var(--ink-3); }
@@ -2183,16 +2232,32 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 .seat-basis { margin: 2px 0 0; font-size: 11px; color: var(--ink-3); text-wrap: pretty; }
 @media (max-width: 700px) {
   .seat-rows { gap: 6px 16px; }
-  .seat-est { font-size: 14px; }
+  .seat-est { font-size: 17px; }
 }
+/* The section kicker. It names a measure and is never read as a sentence, so
+   it is set the way a running head is: small, tracked, upper case, quiet ink.
+   Tracking is not decoration here - capitals set solid at 10.5px close up and
+   stop being scannable, which is the one job the kicker has. It also puts a
+   second label voice in the panel, distinct from the sentence-case labels of
+   the provenance list above, so the two never read as one system. */
 .pd-k {
-  font-size: 11.5px; font-weight: 600;
-  color: var(--ink-3);
+  font-size: 10.5px; font-weight: 600;
+  letter-spacing: 0.115em; text-transform: uppercase;
+  color: var(--ink-3); margin: 0 0 10px;
 }
-/* the vote-share section IS the poll's headline: its figures step 2px up,
-   so the result reads as the one dominant element over every explanation
-   around it (notes inside the same sentence keep the body size) */
-.pd-sec-lead .pd-s > b { font-size: 16px; }
+/* The vote-share section IS the poll's headline - it is the figure the row
+   was opened for - so the head-to-head takes a display size and everything
+   else in the panel arranges itself under it. Only the FIRST pair gets it
+   (see the `hero` prop): a wave with three matchups has one answer and two
+   supporting readings, not three headlines. The words keep a size of their
+   own between the numerals and the body, so "45% ALP" reads as one phrase
+   rather than a figure with a caption. */
+.pd-s.pd-s-hero { font-size: 18px; line-height: 1.3; }
+.pd-s.pd-s-hero b { font-size: var(--pd-hero); font-weight: 700; letter-spacing: -0.02em; }
+.poll-detail .pd-s-hero .chg { font-size: 13px; }
+/* the connector is grammar, not data - it holds the two halves apart and
+   should not be mistaken for either */
+.pd-vs { font-size: 15px; color: var(--ink-3); padding: 0 2px; }
 /* undecided: one readout per question, because the panel carries two of them
    and they must not read as one measure with two sources */
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
@@ -2212,8 +2277,13 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 
 .pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13.5px; }
 /* inside the breakdown an absent section reads as just another plain line –
-   the serif italic is for empty states elsewhere (eg National direction) */
-.pd-sec .pd-absent { font-family: inherit; font-style: normal; font-size: 13px; margin: 0; }
+   the serif italic is for empty states elsewhere (eg National direction) –
+   and at the body's own size, because "Not published" is an answer to the
+   kicker above it and not a footnote about one */
+.pd-sec .pd-absent {
+  font-family: inherit; font-style: normal;
+  font-size: var(--pd-body); line-height: 1.5; margin: 0;
+}
 /* a fieldwork end standing in for a publication date nobody recorded, marked
    the dashed way the Latest-polls pill marks the same substitution */
 .pd-est { border-bottom: 1px dashed var(--line-2); color: var(--ink-3); }
@@ -2332,8 +2402,27 @@ button.acc-spread[aria-pressed="true"] {
   .acc-note { grid-column: 2 / -1; justify-content: flex-start; }
 }
 
+/* The narrow ladder. Only the four tokens move: every relationship inside the
+   panel is expressed against them, so the hierarchy that reads on a laptop is
+   the same hierarchy on a phone, one octave down. */
 @media (max-width: 720px) {
-  .poll-detail { padding-left: 20px; }
+  .poll-detail {
+    padding: 12px 14px 22px 20px;
+    --pd-lab: 104px; --pd-hero: 32px; --pd-fig: 20px; --pd-body: 15px;
+  }
+  .pd-s.pd-s-hero { font-size: 17px; }
+  .pd-s.pd-s-basis { font-size: 13.5px; }
+  .pd-meta-items { font-size: 13.5px; }
+}
+/* Below this the label column costs a third of the measure and the values it
+   aligns are shorter than the labels themselves, so the list stops being a
+   list of columns and becomes a list of stacked pairs. */
+@media (max-width: 560px) {
+  .pd-meta-items { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .pd-meta-k { margin-top: 10px; }
+  .pd-meta-items > .pd-meta-i:first-child > .pd-meta-k { margin-top: 0; }
+  .pd-rel { margin-top: 0; }
+  .poll-detail { --pd-hero: 28px; }
 }
 
 /* ---------- colophon (the method footer) ----------
@@ -10647,19 +10736,24 @@ function PdSec({
 function TppLine({
   c,
   prefixed,
-  note
+  note,
+  hero
 }) {
   const segs = c.segs.filter(x => x.value != null);
   const mat = c.lab.replace(/^2PP · /, "").replace(/^3-cornered · /, "").replace(/ · Derived$/, c.derived ? " (derived)" : "");
-  return /*#__PURE__*/React.createElement("p", {
-    className: "pd-s"
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("p", {
+    className: "pd-s" + (hero ? " pd-s-hero" : "")
   }, prefixed && mat + ": ", segs.map((x, i) => /*#__PURE__*/React.createElement(React.Fragment, {
     key: i
-  }, i > 0 && (segs.length === 2 ? " vs " : " · "), /*#__PURE__*/React.createElement("b", null, x.value, "%"), " ", x.label, /*#__PURE__*/React.createElement(ChgParen, {
+  }, i > 0 && (segs.length === 2 ? /*#__PURE__*/React.createElement("span", {
+    className: "pd-vs"
+  }, " vs ") : " · "), /*#__PURE__*/React.createElement("span", {
+    className: "pd-grp"
+  }, /*#__PURE__*/React.createElement("b", null, x.value, "%"), " ", x.label, /*#__PURE__*/React.createElement(ChgParen, {
     d: x.delta
-  }))), note && /*#__PURE__*/React.createElement("span", {
-    className: "pd-s-note"
-  }, " (", note, ")"));
+  }))))), note && /*#__PURE__*/React.createElement("p", {
+    className: "pd-s pd-s-basis"
+  }, note));
 }
 
 /* A leader's ratings as one sentence: approve, disapprove, don't know, with
@@ -10688,13 +10782,21 @@ function ApprLine({
     className: "pd-s"
   }, label, ":", s ? " " : /*#__PURE__*/React.createElement("span", {
     className: "pd-s-note"
-  }, " no ", leg[0], " / ", leg[2], " split published,"), s && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("b", null, s.app, "%"), " ", leg[0], ", ", /*#__PURE__*/React.createElement("b", null, s.dis, "%"), " ", leg[2], dk > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, ", ", /*#__PURE__*/React.createElement("b", null, dk, "%"), " ", leg[1])), net != null && /*#__PURE__*/React.createElement(React.Fragment, null, s ? ", " : " ", "net ", /*#__PURE__*/React.createElement(NetVal, {
+  }, " no ", leg[0], " / ", leg[2], " split published,"), s && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
+    className: "pd-grp"
+  }, /*#__PURE__*/React.createElement("b", null, s.app, "%"), " ", leg[0]), ",", " ", /*#__PURE__*/React.createElement("span", {
+    className: "pd-grp"
+  }, /*#__PURE__*/React.createElement("b", null, s.dis, "%"), " ", leg[2]), dk > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, ", ", /*#__PURE__*/React.createElement("span", {
+    className: "pd-grp"
+  }, /*#__PURE__*/React.createElement("b", null, dk, "%"), " ", leg[1]))), net != null && /*#__PURE__*/React.createElement(React.Fragment, null, s ? ", " : " ", /*#__PURE__*/React.createElement("span", {
+    className: "pd-grp"
+  }, "net ", /*#__PURE__*/React.createElement(NetVal, {
     v: net
   }), /*#__PURE__*/React.createElement(FavMark, {
     metric: mt
   }), /*#__PURE__*/React.createElement(ChgParen, {
     d: d
-  })), alt && /*#__PURE__*/React.createElement("span", {
+  }))), alt && /*#__PURE__*/React.createElement("span", {
     className: "pd-s-note",
     title: "This pollster asked both questions of this leader in the same wave \u2013 favourability (positive minus negative) is not directly comparable with approval"
   }, " ", "\xB7 also ", alt.metric === "fav" ? "favourability" : "approval", " ", /*#__PURE__*/React.createElement(NetVal, {
@@ -10713,12 +10815,16 @@ function PollLedger({
   const ppms = ppmContests(r);
   const appr = r.appr || {};
   const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
-  return /*#__PURE__*/React.createElement("div", {
-    className: "pd-simple"
-  }, r.releaseUrl && /*#__PURE__*/React.createElement(PdSec, {
-    label: "Pollster\u2019s release"
-  }, r.releaseHub ? /*#__PURE__*/React.createElement("p", {
-    className: "pd-s"
+  /* The release rows, in the provenance list's shape. Only rendered where the
+     wave actually has a page of its own. */
+  const relRows = [];
+  if (r.releaseUrl) relRows.push(/*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i",
+    key: "rel"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-k"
+  }, "Pollster\u2019s release"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
   }, /*#__PURE__*/React.createElement("a", {
     className: "pd-release",
     href: r.releaseUrl,
@@ -10727,7 +10833,7 @@ function PollLedger({
   }, "here", /*#__PURE__*/React.createElement("span", {
     className: "plink-mark",
     "aria-hidden": "true"
-  }, "\u2197")), /*#__PURE__*/React.createElement("span", {
+  }, "\u2197")), r.releaseHub ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
     className: "pd-s-note"
   }, " (wave-specific page), and "), /*#__PURE__*/React.createElement("a", {
     className: "pd-release",
@@ -10739,22 +10845,24 @@ function PollLedger({
     "aria-hidden": "true"
   }, "\u2197")), /*#__PURE__*/React.createElement("span", {
     className: "pd-s-note"
-  }, " (general rolling collection)")) : /*#__PURE__*/React.createElement("p", {
-    className: "pd-s"
-  }, /*#__PURE__*/React.createElement("a", {
-    className: "pd-release",
-    href: r.releaseUrl,
-    target: "_blank",
-    rel: "noopener noreferrer"
-  }, "here", /*#__PURE__*/React.createElement("span", {
-    className: "plink-mark",
-    "aria-hidden": "true"
-  }, "\u2197")), r.releaseUrl === r.methodUrl && /*#__PURE__*/React.createElement("span", {
+  }, " (general rolling collection)")) : (
+  /* DemosAU's released report IS its APC statement – one link does
+     both jobs, so the separate statement row below sits out and the
+     note here names the second role */
+  r.releaseUrl === r.methodUrl && /*#__PURE__*/React.createElement("span", {
     className: "pd-s-note"
-  }, " (includes the wave’s APC methodology statement)"))), r.methodUrl && r.methodUrl !== r.releaseUrl && /*#__PURE__*/React.createElement(PdSec, {
-    label: "APC methodology statement"
-  }, /*#__PURE__*/React.createElement("p", {
-    className: "pd-s"
+  }, " (includes the wave’s APC methodology statement)")))));
+  /* the wave's APC methodology statement, beside the release pointer it
+     accompanies. Absent when the release pointer above already links the same
+     document (releaseUrl === methodUrl). */
+  if (r.methodUrl && r.methodUrl !== r.releaseUrl) relRows.push(/*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i",
+    key: "apc"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-k",
+    title: "Australian Polling Council methodology statement"
+  }, "APC statement"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
   }, /*#__PURE__*/React.createElement("a", {
     className: "pd-release",
     href: r.methodUrl,
@@ -10763,14 +10871,20 @@ function PollLedger({
   }, "here", /*#__PURE__*/React.createElement("span", {
     className: "plink-mark",
     "aria-hidden": "true"
-  }, "\u2197")))), /*#__PURE__*/React.createElement(PdSec, {
+  }, "\u2197")))));
+  return /*#__PURE__*/React.createElement("div", {
+    className: "pd-simple"
+  }, relRows.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "pd-meta-items pd-rel"
+  }, relRows), /*#__PURE__*/React.createElement(PdSec, {
     label: tppHeading(tcs),
     lead: true
   }, tppLines(tcs, r).map((x, i) => /*#__PURE__*/React.createElement(TppLine, {
     key: "t" + i,
     c: x.c,
     prefixed: x.count > 1,
-    note: x.note
+    note: x.note,
+    hero: i === 0 && x.c.segs.filter(g => g.value != null).length === 2
   }))), /*#__PURE__*/React.createElement(PdSec, {
     label: "First preferences"
   }, /*#__PURE__*/React.createElement("p", {
@@ -10778,30 +10892,35 @@ function PollLedger({
   }, primarySegs(r).map((x, i) => /*#__PURE__*/React.createElement(React.Fragment, {
     key: i
   }, i > 0 && ", ", /*#__PURE__*/React.createElement("span", {
-    className: x.muted ? "pd-s-note" : undefined
-  }, x.label, " ", /*#__PURE__*/React.createElement("b", null, x.value, "%")), /*#__PURE__*/React.createElement(ChgParen, {
+    className: "pd-grp" + (x.muted ? " pd-s-note" : "")
+  }, x.label, " ", /*#__PURE__*/React.createElement("b", null, x.value, "%"), /*#__PURE__*/React.createElement(ChgParen, {
     d: x.delta
-  }))), r.undecided != null && r.undecidedBasis !== "tpp" && (d => /*#__PURE__*/React.createElement(React.Fragment, null, " · ", "undecided ", /*#__PURE__*/React.createElement("b", null, r.undecided, "%"), /*#__PURE__*/React.createElement("span", {
-    className: "pd-s-note"
-  }, " (" + (r.undecidedBasis === "soft" ? "not firm" : "set aside"), d && /*#__PURE__*/React.createElement(React.Fragment, null, ", ", /*#__PURE__*/React.createElement(ChgTag, {
+  }))))), r.undecided != null && r.undecidedBasis !== "tpp" && (d => /*#__PURE__*/React.createElement("p", {
+    className: "pd-s pd-s-basis"
+  }, /*#__PURE__*/React.createElement("b", null, r.undecided, "%"), " undecided", " (" + (r.undecidedBasis === "soft" ? "not firm" : "set aside"), d && /*#__PURE__*/React.createElement(React.Fragment, null, ", ", /*#__PURE__*/React.createElement(ChgTag, {
     v: d.v,
     refDate: d.refDate
-  })), ")")))(segDelta(r.chg, "und")))), /*#__PURE__*/React.createElement(PdSec, {
+  })), ")"))(segDelta(r.chg, "und"))), /*#__PURE__*/React.createElement(PdSec, {
     label: "Preferred PM"
   }, ppms.map((c, i) => {
     const segs = ppmContestSegs(c, i === 0 ? r.chg : null);
     const cand = segs.filter(x => !x.resid);
     const unc = segs.find(x => x.resid);
-    return /*#__PURE__*/React.createElement("p", {
-      className: "pd-s",
+    return /*#__PURE__*/React.createElement(React.Fragment, {
       key: "p" + i
+    }, /*#__PURE__*/React.createElement("p", {
+      className: "pd-s"
     }, cand.map((x, j) => /*#__PURE__*/React.createElement(React.Fragment, {
       key: j
-    }, j > 0 && " vs ", /*#__PURE__*/React.createElement("b", null, x.value, "%"), " ", x.label, /*#__PURE__*/React.createElement(ChgParen, {
+    }, j > 0 && /*#__PURE__*/React.createElement("span", {
+      className: "pd-vs"
+    }, " vs "), /*#__PURE__*/React.createElement("span", {
+      className: "pd-grp"
+    }, /*#__PURE__*/React.createElement("b", null, x.value, "%"), " ", x.label, /*#__PURE__*/React.createElement(ChgParen, {
       d: x.delta
-    }))), unc && /*#__PURE__*/React.createElement("span", {
-      className: "pd-s-note"
-    }, " (", /*#__PURE__*/React.createElement("b", null, unc.value, "%"), " undecided)"));
+    }))))), unc && /*#__PURE__*/React.createElement("p", {
+      className: "pd-s pd-s-basis"
+    }, /*#__PURE__*/React.createElement("b", null, unc.value, "%"), " undecided"));
   })), /*#__PURE__*/React.createElement(PdSec, {
     label: apprHeading(appr)
   }, !noAppr && ["alb", "taylor", "hanson"].map(id => /*#__PURE__*/React.createElement(ApprLine, {
@@ -10813,13 +10932,19 @@ function PollLedger({
     label: "National direction"
   }, /*#__PURE__*/React.createElement("p", {
     className: "pd-s"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-grp"
   }, /*#__PURE__*/React.createElement("b", null, dirSegments[0].value, "%"), " right direction", /*#__PURE__*/React.createElement(ChgParen, {
     d: dirSegments[0].delta
-  }), " vs ", /*#__PURE__*/React.createElement("b", null, dirSegments[2].value, "%"), " wrong track", /*#__PURE__*/React.createElement(ChgParen, {
+  })), /*#__PURE__*/React.createElement("span", {
+    className: "pd-vs"
+  }, " vs "), /*#__PURE__*/React.createElement("span", {
+    className: "pd-grp"
+  }, /*#__PURE__*/React.createElement("b", null, dirSegments[2].value, "%"), " wrong track", /*#__PURE__*/React.createElement(ChgParen, {
     d: dirSegments[2].delta
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "pd-s-note"
-  }, " (", dirSegments[1].value, "% unsure)"))), r.seats && /*#__PURE__*/React.createElement(PdSec, {
+  }))), dirSegments[1].value != null && /*#__PURE__*/React.createElement("p", {
+    className: "pd-s pd-s-basis"
+  }, dirSegments[1].value, "% unsure")), r.seats && /*#__PURE__*/React.createElement(PdSec, {
     label: "Seat projection"
   }, /*#__PURE__*/React.createElement(SeatProjection, {
     seats: r.seats
@@ -10835,32 +10960,44 @@ function PollDetail({
   }, /*#__PURE__*/React.createElement("div", {
     className: "pd-meta"
   }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-items"
+  }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Fieldwork"), " ", r.field), /*#__PURE__*/React.createElement("span", {
+  }, "Fieldwork"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, r.field)), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Published"), " ", pubStamp(r.published, {
+  }, "Published"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, pubStamp(r.published, {
     year: true
   }) || /*#__PURE__*/React.createElement("span", {
     className: "pd-est",
     title: "Publication date not recorded for this poll \u2013 showing the last day of fieldwork"
-  }, r.releasedLabel)), r.mode && /*#__PURE__*/React.createElement("span", {
+  }, r.releasedLabel))), r.mode && /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Method"), " ", r.mode), /*#__PURE__*/React.createElement("span", {
+  }, "Method"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, r.mode)), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Sample"), " ", r.sample != null ? "n = " + r.sample.toLocaleString() : "—"), r.sampleEff != null && /*#__PURE__*/React.createElement("span", {
+  }, "Sample"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, r.sample != null ? "n = " + r.sample.toLocaleString() : "—")), r.sampleEff != null && /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     title: "Effective sample as published by the pollster (APC methodology statement)"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Effective sample"), " n = ", r.sampleEff.toLocaleString())), /*#__PURE__*/React.createElement(PollLedger, {
+  }, "Effective sample"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, "n = ", r.sampleEff.toLocaleString())))), /*#__PURE__*/React.createElement(PollLedger, {
     r: r,
     dirSegments: r.dir ? dirSegs(r) : null
   }));
@@ -13068,7 +13205,7 @@ function CycleChart({
     bandAreas = segs.filter(s => s.pts.length > 1).flatMap((s, i) => [{
       id: "cyc-band-lo" + i,
       className: "cyc-band lo" + (s.thin ? " thin" : ""),
-      color: "var(--ink)",
+      color: "var(--cyc-fill)",
       opacity: 0.07,
       edge: false,
       points: s.pts.map(r => ({
@@ -13079,7 +13216,7 @@ function CycleChart({
     }, {
       id: "cyc-band-hi" + i,
       className: "cyc-band hi" + (s.thin ? " thin" : ""),
-      color: "var(--ink)",
+      color: "var(--cyc-fill)",
       opacity: 0.13,
       edge: false,
       points: s.pts.map(r => ({
@@ -13346,7 +13483,14 @@ function CycleChart({
     areas: bandAreas || undefined,
     tooltipTitle: i => cycMonthLabel(CYC_SPINE[i].x) + (solo ? " – " + cycMonthOf(solo.eDate, CYC_SPINE[i].x) : ""),
     fmt: M.fmt
-  }));
+  }), solo && M.key === "primary" && ((D.cycleSource || {})[solo.year] || {}).trove && (() => {
+    const t = (D.cycleSource || {})[solo.year].trove;
+    return /*#__PURE__*/React.createElement("p", {
+      className: "cycle-insight"
+    }, "Newspapers mentioned a poll in ", t.articles.toLocaleString(), " articles over this term (", t.pollArticles.toLocaleString(), " poll reports) \u2014", " ", /*#__PURE__*/React.createElement("a", {
+      href: "/archives/trove/#y" + solo.year
+    }, "Trove newspaper archive"), ".");
+  })());
 }
 function CycleLegend({
   cycles,
@@ -13416,14 +13560,14 @@ function CycleLegend({
     y: "0",
     width: "22",
     height: "12",
-    fill: "var(--ink)"
+    fill: "var(--cyc-fill)"
   }), /*#__PURE__*/React.createElement("rect", {
     className: "cyc-band hi",
     x: "4",
     y: "2.5",
     width: "22",
     height: "7",
-    fill: "var(--ink)"
+    fill: "var(--cyc-fill)"
   }), /*#__PURE__*/React.createElement("line", {
     x1: "4",
     y1: "6",
@@ -14356,12 +14500,16 @@ function ArchPollDetail({
     key: "client"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Commissioned by"), " ", p.client), /*#__PURE__*/React.createElement("span", {
+  }, "Commissioned by"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, p.client)), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     key: "field"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Fieldwork"), " ", p.field),
+  }, "Fieldwork"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, p.field)),
   /*#__PURE__*/
   /* The date the poll came OUT, and the hour where the release recorded
      one. This line has always been labelled "Published" and has always
@@ -14374,33 +14522,43 @@ function ArchPollDetail({
     key: "pub"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Published"), " ", pubStamp(p.published, {
+  }, "Published"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, pubStamp(p.published, {
     year: true
   }) || /*#__PURE__*/React.createElement("span", {
     className: "pd-est",
     title: "Publication date not recorded for this poll \u2013 showing the last day of fieldwork"
-  }, p.fullDate)), /*#__PURE__*/React.createElement("span", {
+  }, p.fullDate))), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     key: "sample"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Sample"), " ", p.sample != null ? "n = " + p.sample.toLocaleString() : "—"), p.sampleEff != null && /*#__PURE__*/React.createElement("span", {
+  }, "Sample"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, p.sample != null ? "n = " + p.sample.toLocaleString() : "—")), p.sampleEff != null && /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     key: "eff",
     title: "Effective sample as published by the pollster (APC methodology statement)"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Effective sample"), " n = ", p.sampleEff.toLocaleString()), p.lean != null && /*#__PURE__*/React.createElement("span", {
+  }, "Effective sample"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, "n = ", p.sampleEff.toLocaleString())), p.lean != null && /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     key: "lean"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "Poll lean"), " ", p.lean > 0 ? "+" : "", p.lean.toFixed(1), " vs aggregate"), p.hfx != null && /*#__PURE__*/React.createElement("span", {
+  }, "Poll lean"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, p.lean > 0 ? "+" : "", p.lean.toFixed(1), " vs aggregate")), p.hfx != null && /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     key: "hfx"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "House effect"), " ", p.hfx.v > 0 ? "+" : "", p.hfx.v.toFixed(1), " vs consensus")].filter(Boolean);
+  }, "House effect"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, p.hfx.v > 0 ? "+" : "", p.hfx.v.toFixed(1), " vs consensus"))].filter(Boolean);
   const controls = [
   /* the way back rides the line that already describes this poll, rather
      than inventing a band of its own above the panel */
