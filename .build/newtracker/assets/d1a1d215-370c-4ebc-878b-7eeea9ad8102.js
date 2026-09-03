@@ -652,6 +652,22 @@ const CYC_EVENTS = {
       major: true,
     },
   ],
+  1993: [
+    {
+      date: "1994-05-23", short: "Hewson → Downer",
+      label: "Downer replaces Hewson as opposition leader",
+      desc: "Alexander Downer defeats John Hewson in a Liberal leadership spill, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+    {
+      date: "1995-01-30", short: "Downer → Howard",
+      label: "Howard replaces Downer as opposition leader",
+      desc: "John Howard replaces Alexander Downer as Liberal leader and opposition leader after Downer resigns.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+  ],
   2010: [
     {
       date: "2010-12-15", short: "Refugee tragedy",

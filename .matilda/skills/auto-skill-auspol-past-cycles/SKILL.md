@@ -571,9 +571,12 @@ stands alone on the chart (SOLO panel, `CYC_EVENTS[solo.year]`); overlaid
 with other cycles an event belongs to no single line, so it hides. An
 optional `metrics: [...]` whitelist (e.g. Shorten→Albanese pins to
 `oppnet`) narrows a marker to named measures. Keys must match CYCLE_DEFS
-years. As of 2026-09-03 there is ONE 1990 entry: Hawke→Keating spill
-dated 1991-12-20 (swearing-in day; the ballot was the 19th — pmSpl's iso
-in gen-data stays 1991-12-19).
+years. Entries as of 2026-09-03: ONE 1990 entry (Hawke→Keating spill
+dated 1991-12-20 — swearing-in day; the ballot was the 19th, pmSpl's iso
+in gen-data stays 1991-12-19) and TWO 1993 entries (Hewson→Downer spill
+1994-05-23 and Downer→Howard handover 1995-01-30, both pinned
+`metrics: ["oppnet"]` as opposition-leader-only changes; both dates ARE
+the existing oppSpl boundary isos, no gen-data change needed).
 
 ## State as of 2026-09-03 (commit a0b910f)
 
