@@ -81,11 +81,16 @@ name/mode ladder rules live in the ≤480/≤430px blocks. Real phone widths hit
     section headings, 700 figures. Source Sans 3 was already self-hosted (variable
     400–800, preloaded for `.wordmark`), so this needed NO font-pipeline work — and it
     retired Archivo, whose sole consumer was the old `.poll-detail b` rule.
-  - Scale: `--pd-body` 17px/1.45 · `--pd-fig` 28px (a percentage inside a sentence) ·
-    `--pd-mid` 32px (National direction — `PdSec mid` → `.pd-sec-mid`, the 2PP
-    treatment scaled down) · `--pd-hero` 60px/0.98 with `--pd-hero-w` 24px words
-    (first two-way pair only). `.pd-k` headings are 17px/600 **uppercase, 0.12em** —
-    same px as the body; the distinction is case, tracking and grey.
+  - Scale — the mock's RATIOS at smaller absolute sizes: its own 17/28/60 read too
+    large in situ (this panel sits inside a 16px data table, not on a standalone
+    page), so the whole ladder stepped down ~15% the same day. `--pd-body` 15px/1.45 ·
+    `--pd-note` 13px (moves, seat ranges, the way back) · `--pd-fig` 23px (a
+    percentage inside a sentence) · `--pd-mid` 26px (National direction — `PdSec mid`
+    → `.pd-sec-mid`) · `--pd-hero` 48px/0.98 with `--pd-hero-w` 20px words and
+    `--pd-hero-note` 16px (first two-way pair only). `.pd-k` headings take
+    `var(--pd-body)` at 600 **uppercase, 0.12em** — same px as the body; the
+    distinction is case, tracking and grey. Every size in the panel is a token:
+    there are no literal px font-sizes left to miss when rescaling.
   - Palette: panel-scoped hex, NOT the theme tokens — `--pd-paper` #FAF9F6,
     `--pd-ink` #171717, `--pd-ink-2` #62605D, `--pd-rule` #DDDCD8. `body.dark
     .poll-detail` maps all four back onto `--surface-2`/`--ink`/`--ink-2`/`--line`;
