@@ -552,7 +552,7 @@ const CYC_METRICS = [
      therefore the first READING, never election day, and the zero line is
      labelled for that. */
   { key: "ppmm", title: "Preferred prime minister",
-    sub: "Sitting PM’s lead on the preferred-PM question",
+    sub: "Sitting prime minister’s lead on the preferred-PM question",
     unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
     step: 10, refAbs: 0, refAbsLabel: "even", chgRefLabel: "First reading" },
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
