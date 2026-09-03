@@ -100,8 +100,13 @@ name/mode ladder rules live in the ≤480/≤430px blocks. Real phone widths hit
     18px → heading → 11px → result → 22px → rule, one `.pd-sec` rule doing all of it
     (`padding-top` / `.pd-k` margin / `margin-top`). Retuned with the type BOTH times
     it stepped down — a rhythm set for a 17px body reads as slack around 13.5px, so
-    **rescaling the type means rescaling this too**; panel padding 28px, meta row gap
-    9px, `.pd-s + .pd-s` 9px, basis caption 9px, `--pd-gut` 26px.
+    **rescaling the type means rescaling this too**; panel padding 28px,
+    `.pd-s + .pd-s` 9px, basis caption 9px, `--pd-gut` 26px.
+  - The provenance block keeps a rhythm of its OWN, tightened separately from the
+    sections below it (asked for directly): row gap 5px on `line-height: 1.35` —
+    not the body's 1.45 — so the list reads as a compact block of facts rather than
+    as spaced-out prose; `.pd-rel` 14px below it, its own rows 8px apart, label to
+    value 2px. Tightening the sections does not imply tightening this, or vice versa.
   - **The label column is `max-content`, never a px value.** There is only ONE grid now
     (the release block is `display: block`, label over value), so nothing needs a shared
     width; `--pd-gut` is the gutter. A fixed column silently collided with

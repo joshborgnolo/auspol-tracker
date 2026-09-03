@@ -2170,9 +2170,9 @@ body.dark .poll-detail {
      than its longest label - which a fixed px value silently was at 16px,
      running "Commissioned by" straight into "The Guardian". */
   display: grid; grid-template-columns: max-content minmax(0, 1fr);
-  align-items: baseline; gap: 9px var(--pd-gut);
+  align-items: baseline; gap: 5px var(--pd-gut);
   flex: 1 1 auto; min-width: 0;
-  font-size: var(--pd-body); line-height: 1.45;
+  font-size: var(--pd-body); line-height: 1.35;
   font-variant-numeric: tabular-nums;
 }
 /* each item is a label/value PAIR that must land in one grid row, so the item
@@ -2195,11 +2195,11 @@ body.dark .poll-detail {
    list rather than one more of its rows, so the label sits over its value and
    the block takes its own clearance from the rows above. */
 .pd-meta-items.pd-rel {
-  display: block; margin: 20px auto 0; max-width: var(--pd-measure);
+  display: block; margin: 14px auto 0; max-width: var(--pd-measure);
 }
 .pd-rel .pd-meta-i { display: block; }
-.pd-rel .pd-meta-i + .pd-meta-i { margin-top: 11px; }
-.pd-rel .pd-meta-k { display: block; margin-bottom: 4px; }
+.pd-rel .pd-meta-i + .pd-meta-i { margin-top: 8px; }
+.pd-rel .pd-meta-k { display: block; margin-bottom: 2px; }
 .pd-rel .pd-meta-v { display: block; }
 
 /* ---------- the breakdown: headed sections of plain lines ----------
@@ -2516,8 +2516,8 @@ button.acc-spread[aria-pressed="true"] {
   }
   .pd-sec { margin-top: 17px; padding-top: 15px; }
   .pd-k { margin-bottom: 9px; }
-  .pd-meta-items { gap: 8px var(--pd-gut); }
-  .pd-meta-items.pd-rel { margin-top: 16px; }
+  .pd-meta-items { gap: 5px var(--pd-gut); }
+  .pd-meta-items.pd-rel { margin-top: 12px; }
 }
 @media (max-width: 430px) {
   .poll-detail { --pd-gut: 14px; --pd-hero: 29px; }
