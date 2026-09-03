@@ -33,8 +33,8 @@
       the latest federal wave in full and kept an accuracy table of its final
       campaign polls. 15 distinct captures exist; two hold a federal wave
       (1-3 June and 24-26 August 2007) and the 2007-08 ones hold the final 2004
-      and 2007 campaign polls. This is the only surviving source for those
-      waves' Greens share and fieldwork windows. Five captures survive with
+      and 2007 campaign polls. Its Greens shares agree with the Courier Mail
+      trend tables (5) everywhere both survive. Five captures survive with
       content; the rest of the URL's history is 404 pages after the 2012
       rebuild dropped the path.
 
@@ -50,6 +50,14 @@
    4. GhostWhoVotes, ghostwhovotes.files.wordpress.com. The de-facto Galaxy
       release mirror of the era: 12 archived PDFs and scans, 2011-2013.
 
+   5. The Courier Mail's media server, media01.couriermail.com.au. Galaxy polled
+      for the News Ltd tabloids and the commissioner's site still serves the
+      trend tables Galaxy printed for them as polldetail PDFs. Two 2007 ones
+      (June, n=1021; November, n=1010) between them carry every 2007 wave's
+      Greens and others shares and fieldwork windows — the record Bowe's
+      running table omitted. Not indexed below (a different genre and domain);
+      the transcript CSV's note column cites the two URLs on each 2007 row.
+
    What Wikipedia holds, for contrast: Galaxy rows exist only in its 2013, 2016
    and 2019 opinion-polling articles (20, 9 and 5 of them). Its 2010-cycle
    article has none and there is no 2007-cycle article. The tracker's own Galaxy
@@ -57,7 +65,10 @@
 
    Run: node .build/extract-galaxy-archive.mjs           (index only, dry run)
         node .build/extract-galaxy-archive.mjs --apply   (writes the index CSV)
-        node .build/extract-galaxy-archive.mjs --verify  (also re-checks the CSV) */
+        node .build/extract-galaxy-archive.mjs --verify  (also re-checks the CSV)
+        node .build/extract-galaxy-archive.mjs --verify-only  (re-checks the
+          CSV without the CDX index build — for when archive.org's CDX API is
+          down but the transcript still needs its provenance gate) */
 import { readFileSync, writeFileSync } from "node:fs";
 
 const APPLY = process.argv.includes("--apply");
@@ -97,6 +108,9 @@ const kindOf = (slug) => {
   return "federal";
 };
 
+const VERIFY_ONLY = process.argv.includes("--verify-only");
+
+if (!VERIFY_ONLY) {
 const index = [];
 for (const [url, ts] of await cdx("url=galaxyresearch.com.au*")) {
   const slug = url.replace(/^https?:\/\/[^/]+\//, "").replace(/\/$/, "").toLowerCase();
@@ -123,9 +137,10 @@ const csv = ["slug,kind,first_capture,wayback_url",
   ...index.map((r) => [r.slug, r.kind, r.first_capture, r.url].join(","))].join("\n") + "\n";
 if (APPLY) { writeFileSync(OUT, csv); console.log(`\nwrote ${OUT}`); }
 else console.log(`\ndry run — pass --apply to write ${OUT}`);
+}
 
 /* ---- 2. verify the transcript against its sources ------------------------ */
-if (!VERIFY) process.exit(0);
+if (!VERIFY && !VERIFY_ONLY) process.exit(0);
 
 const rows = readFileSync(TRANSCRIPT, "utf8").trim().split("\n").slice(1)
   .map((l) => {                                     // notes are quoted; split on top-level commas

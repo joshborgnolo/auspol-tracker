@@ -141,10 +141,19 @@ other pages' `<nav class="tabs">`.
 
   The first rebuilds `data/galaxy-release-index.csv` from the Internet Archive
   and re-checks every figure in `data/galaxy-federal-pre2012.csv` against the
-  page it was read off (22/22 at last run). The second merges the qualifying
+  page it was read off (21/21 at last run). The second merges the qualifying
   waves into `cyclePolls`; a wave whose Greens share was never published stays
-  a transcript rather than gaining an invented one, which is why 11 of the 22
-  are in the tracker and 11 are on the page only. The third writes the page.
+  a transcript rather than gaining an invented one, which is why 18 of the 21
+  are in the tracker and 3 are on the page only. The third writes the page.
+- **Trove** – every newspaper article in the National Library's Trove archive
+  matching "poll", harvested through the site's own search API. The crawler
+  lives in `.build/harvest-trove.mjs` (its header documents the endpoint, the
+  public apikey header and the 5000-record window-splitting), writes local
+  JSONL under `.matilda/trove-harvest/`, and
+  `node .build/refresh-trove-archive.mjs` turns that into
+  `data/trove-mentions-monthly.csv`, `data/trove-poll-articles.csv` and the
+  page. Per-term newspaper-mention counts are also injected into the
+  past-cycles cycle-source sidecar by `gen-data.mjs`.
 
 Two markers in `template.html` are load-bearing – `build.mjs` throws if either
 goes missing: `<!--STATIC_SUMMARY-->` (replaced by the article version of the

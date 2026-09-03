@@ -5,7 +5,7 @@
      data/galaxy-federal-pre2012.csv   the transcribed pre-2012 federal waves
      data/galaxy-release-index.csv     what survives of galaxyresearch.com.au
 
-   Both are produced/checked by .build/extract-galaxy-archive.mjs; the eleven
+   Both are produced/checked by .build/extract-galaxy-archive.mjs; the
    assimilable waves are merged into cyclePolls by
    .build/assimilate-galaxy-cycle-csv.mjs. This script writes only the page.
 
@@ -247,6 +247,7 @@ ol.steps a { color: inherit; }
   <a class="tab" href="/archives/acnielsen/">AC Nielsen</a>
   <a class="tab" href="/archives/morgan/">Morgan</a>
   <a class="tab active" aria-current="page" href="/archives/galaxy/">Galaxy</a>
+  <a class="tab" href="/archives/trove/">Trove</a>
 </nav>
 <main class="frame-wrap">
   <h1>Galaxy Research poll archive</h1>
@@ -278,10 +279,11 @@ ${indexSections}
   <p class="ss-note">The same index as data: <a href="/data/galaxy-release-index.csv">galaxy-release-index.csv</a>.</p>
 
   <h2>How this was assembled</h2>
-  <p class="body-copy">Four sources, in the order they were useful. Anyone can re-run the whole thing; the two scripts below rebuild the data files and re-check every figure against the page it came from.</p>
+  <p class="body-copy">Five sources, in the order they were useful. Anyone can re-run the whole thing; the two scripts below rebuild the data files and re-check every figure against the page it came from.</p>
   <ol class="steps">
     <li><strong>The Poll Bludger</strong>, <a href="https://www.pollbludger.net/">pollbludger.net</a>. William Bowe wrote up essentially every Galaxy federal poll from 2004 on, and through 2007 kept a running table of the year's whole Galaxy series which he re-published in each new post — which is why 2007 is complete when nothing else holds it. The site serves its entire back catalogue live, including posts published under blogs.crikey.com.au. Its search is <em>not</em> a complete index: it missed the 25 June 2010 wave despite "Galaxy" being in the title, so the month archives (<code>/2010/06/</code>) and the Wayback URL index are the cross-check.</li>
-    <li><strong>Galaxy's own pubpolls.html</strong>, via the Internet Archive. The page printed the latest federal wave in full and kept an accuracy table of final campaign polls. It is the only surviving source for the 2007 waves' Greens shares and fieldwork windows, and for the final 2004 and 2007 campaign polls.</li>
+    <li><strong>Galaxy's own pubpolls.html</strong>, via the Internet Archive. The page printed the latest federal wave in full and kept an accuracy table of final campaign polls. It supplies the final 2004 and 2007 campaign polls and two 2007 waves in full.</li>
+    <li><strong>The Courier Mail's media server</strong> (media01.couriermail.com.au). Galaxy polled for the News Ltd tabloids, and the commissioner's site still serves the trend tables Galaxy printed for them as <em>polldetail</em> PDFs. Two survive from 2007 — <a href="http://media01.couriermail.com.au/multimedia/2007/06/070604Poll/polldetail.pdf">June</a> (n=1,021) and <a href="http://media01.couriermail.com.au/multimedia/2007/11/071104-galaxy/071101galaxypoll.pdf">November</a> (n=1,010) — and between them their trend tables carry every wave Galaxy took that year: the only other surviving record of the 2007 Greens and others shares and fieldwork windows, which Bowe's table never tabulated. The two sources' shared waves agree exactly.</li>
     <li><strong>The release pages</strong>, via the Internet Archive's CDX index — the 2012-onward posts listed above.</li>
     <li><strong>GhostWhoVotes</strong>, which mirrored the release scans as they came out.</li>
   </ol>
@@ -294,8 +296,8 @@ ${indexSections}
 
   <h2>Known gaps and one suspect figure</h2>
   <p class="body-copy">The 29 June 2009 wave is transcribed with a Coalition primary of 30, which cannot produce the 56–44 two-party figure reported alongside it; it is almost certainly a typo for 40 in the original write-up. The row is flagged in the CSV and deliberately kept out of the tracker.</p>
-  <p class="body-copy">Galaxy's final 2004 campaign poll survives only inside the accuracy table on its own site, which never says when it was published. It has full primaries and no date, so it is listed undated and not assimilated.</p>
-  <p class="body-copy">Nine 2007 waves reach us through Bowe's running table, which tabulated ALP and L-NP only. Their Greens and other shares were published at the time and are not, as far as this search found, preserved anywhere.</p>
+  <p class="body-copy">Galaxy's final 2004 campaign poll survives in full only inside the accuracy table on its own site, which never printed its date. Bowe's post of 4 October 2004, covering the third fortnightly campaign poll, records the identical 2PP, and the fortnightly series' remaining slot fell after polling day — so the undated accuracy-table row is the 4 October poll, and it is dated accordingly and assimilated. Its figures read off Galaxy's own table diverge from the write-up in one cell (Coalition primary 46 table vs 45 prose); the table wins.</p>
+  <p class="body-copy">Six 2007 waves reached this archive through Bowe's running table, which tabulated ALP, L-NP and 2PP only. Galaxy's printed trend tables on the Courier Mail's media server (source 3 above) supplied their Greens, others and fieldwork windows, cross-checked against the two waves pubpolls.html already held. That leaves three transcript-only waves: the 20 September 2004 campaign poll, reported two-party only; the suspect 29 June 2009 wave above; and the 25 June 2010 snap poll, for which no primaries were published.</p>
 
   <p class="ss-note">This is a satellite archive page of <a href="/">auspol tracker</a>, an unofficial aggregate of published national polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>

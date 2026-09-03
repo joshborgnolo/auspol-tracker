@@ -14492,6 +14492,17 @@
         "tpp_alp": 58
       },
       {
+        "date": "2007-04-22",
+        "firm": "Galaxy",
+        "lnp": 37,
+        "alp": 49,
+        "grn": 9,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 42,
+        "tpp_alp": 58
+      },
+      {
         "date": "2007-04-29",
         "firm": "Newspoll",
         "lnp": 37,
@@ -14545,6 +14556,17 @@
         "oth": 5,
         "tpp_lnp": 40.5,
         "tpp_alp": 59.5
+      },
+      {
+        "date": "2007-05-13",
+        "firm": "Galaxy",
+        "lnp": 39,
+        "alp": 49,
+        "grn": 9,
+        "onp": null,
+        "oth": 3,
+        "tpp_lnp": 43,
+        "tpp_alp": 57
       },
       {
         "date": "2007-05-19",
@@ -14677,6 +14699,17 @@
         "oth": 6.5,
         "tpp_lnp": 41,
         "tpp_alp": 59
+      },
+      {
+        "date": "2007-07-01",
+        "firm": "Galaxy",
+        "lnp": 41,
+        "alp": 46,
+        "grn": 9,
+        "onp": null,
+        "oth": 4,
+        "tpp_lnp": 45,
+        "tpp_alp": 55
       },
       {
         "date": "2007-07-08",
@@ -14888,6 +14921,17 @@
         "tpp_alp": 60.5
       },
       {
+        "date": "2007-09-23",
+        "firm": "Galaxy",
+        "lnp": 40,
+        "alp": 46,
+        "grn": 9,
+        "onp": null,
+        "oth": 5,
+        "tpp_lnp": 44,
+        "tpp_alp": 56
+      },
+      {
         "date": "2007-09-30",
         "firm": "Newspoll",
         "lnp": 39,
@@ -14963,6 +15007,17 @@
         "oth": 5,
         "tpp_lnp": 46,
         "tpp_alp": 54
+      },
+      {
+        "date": "2007-10-17",
+        "firm": "Galaxy",
+        "lnp": 43,
+        "alp": 45,
+        "grn": 8,
+        "onp": null,
+        "oth": 4,
+        "tpp_lnp": 47,
+        "tpp_alp": 53
       },
       {
         "date": "2007-10-18",
@@ -15062,6 +15117,17 @@
         "oth": 5.5,
         "tpp_lnp": 38,
         "tpp_alp": 62
+      },
+      {
+        "date": "2007-11-04",
+        "firm": "Galaxy",
+        "lnp": 42,
+        "alp": 45,
+        "grn": 9,
+        "onp": null,
+        "oth": 4,
+        "tpp_lnp": 46,
+        "tpp_alp": 54
       },
       {
         "date": "2007-11-08",

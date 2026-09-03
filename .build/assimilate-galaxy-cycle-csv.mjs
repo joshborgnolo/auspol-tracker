@@ -8,23 +8,26 @@
 //
 // Source (how the CSV was assembled, and how to re-derive it: see
 // .build/extract-galaxy-archive.mjs and /archives/galaxy/):
-//   data/galaxy-federal-pre2012.csv — 22 transcribed national federal waves,
-//     Sep 2004 to Aug 2010, each row citing the page it was read off. Two
+//   data/galaxy-federal-pre2012.csv — 21 transcribed national federal waves,
+//     Sep 2004 to Aug 2010, each row citing the page it was read off. Three
 //     origins: William Bowe's Poll Bludger write-ups (pollbludger.net serves
-//     its whole back catalogue, 2004 on) and Galaxy's own pubpolls.html via
-//     the Internet Archive, which printed the latest federal wave in full and
-//     kept an accuracy table of final campaign polls.
+//     its whole back catalogue, 2004 on), Galaxy's own pubpolls.html via the
+//     Internet Archive, which printed the latest federal wave in full and kept
+//     an accuracy table of final campaign polls, and the Courier Mail's
+//     polldetail PDFs (media01.couriermail.com.au), which still serve Galaxy's
+//     printed trend tables — the source of the Greens/others shares and
+//     fieldwork windows Bowe's 2007 running table omitted.
 //
 // Only rows that meet the cycle-array row shape are assimilated. Every existing
 // row in these cycles carries non-null lnp/alp/grn/oth/tpp_*, so a wave whose
 // Greens share was never published cannot be represented without inventing one:
-// 11 of the 22 rows qualify, the rest stay in the CSV as the transcript. Absent
+// 18 of the 21 rows qualify, the rest stay in the CSV as the transcript. Absent
 // is not zero — the repo convention, applied to a whole column.
 //
 // Dates. The cycle arrays key on fieldwork END. Galaxy published on a Monday
 // off weekend fieldwork, and its waves reach us dated three ways, so the CSV
 // carries date_basis per row and this script resolves in that order:
-//   fieldwork_end   where a source states the window (5 rows)
+//   fieldwork_end   where a source states the window
 //   date            otherwise — publication day, or Bowe's table date, which is
 //                   itself either publication or fieldwork end (his table prints
 //                   "Aug 27" for a wave that closed the 26th, and "Nov 4" for
