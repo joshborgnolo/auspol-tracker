@@ -95,7 +95,7 @@ name/mode ladder rules live in the ≤480/≤430px blocks. Real phone widths hit
     `--pd-ink` #171717, `--pd-ink-2` #62605D, `--pd-rule` #DDDCD8. `body.dark
     .poll-detail` maps all four back onto `--surface-2`/`--ink`/`--ink-2`/`--line`;
     a cream/charcoal pair cannot be inverted.
-  - Layout: `--pd-measure` 820px, `margin-inline: auto` on `.pd-meta`, `.pd-rel` and
+  - Layout: `--pd-measure` 820px, `margin-inline: auto` on `.pd-meta` and
     `.pd-simple` — a centred column inside a full-width table row. Rhythm: rule →
     18px → heading → 11px → result → 22px → rule, one `.pd-sec` rule doing all of it
     (`padding-top` / `.pd-k` margin / `margin-top`). Retuned with the type BOTH times
@@ -105,12 +105,25 @@ name/mode ladder rules live in the ≤480/≤430px blocks. Real phone widths hit
   - The provenance block keeps a rhythm of its OWN, tightened separately from the
     sections below it (asked for directly): row gap 5px on `line-height: 1.35` —
     not the body's 1.45 — so the list reads as a compact block of facts rather than
-    as spaced-out prose; `.pd-rel` 14px below it, its own rows 8px apart, label to
-    value 2px. Tightening the sections does not imply tightening this, or vice versa.
-  - **The label column is `max-content`, never a px value.** There is only ONE grid now
-    (the release block is `display: block`, label over value), so nothing needs a shared
-    width; `--pd-gut` is the gutter. A fixed column silently collided with
-    "Commissioned by" at 16px. Watch for narrow-width `gap: Xpx 0` rules zeroing it.
+    as spaced-out prose. Tightening the sections does not imply tightening this, or
+    vice versa.
+  - Release / APC-statement rows are ORDINARY rows of the band's single grid, values on
+    the same axis as fieldwork and sample. They are built by `releaseMetaRows(r)` —
+    exported on `window` from a11e1559 so both tables share one builder — and each
+    table spreads them into its OWN `metaItems`. Two earlier shapes were wrong and are
+    not to be reinstated: a `PdSec` of their own (they are provenance, not a measure),
+    and a second `.pd-meta-items` grid, whose `max-content` column sized to ITS longest
+    label and pushed the values off the band's axis.
+  - **Phone: `.pd-mat` goes `display: block` under 560px.** The matchup name is what
+    pushes a prefixed head-to-head onto a third line — "ALP v L/NP: 53.5% ALP (▼0.5)
+    vs 46.5% L/NP (▲0.5)" wants 441px and has 296 — and no hero size that stays a hero
+    closes that gap. It labels the line rather than belonging to the phrase, so it
+    takes its own line and hands back its width; the hero also steps to 27px (24px
+    under 430px). Applied to every matchup line, not just the headline one.
+  - **The label column is `max-content`, never a px value.** There is only ONE grid, so
+    nothing needs a shared width token; `--pd-gut` is the gutter. A fixed column
+    silently collided with "Commissioned by" at 16px. Watch for narrow-width
+    `gap: Xpx 0` rules zeroing the gutter.
   - Figures: `.pd-s b` `--pd-fig` at `line-height: 1`; `.pd-s.pd-s-hero b` `--pd-hero`.
     Hero is a **prop**, only the first TppLine whose contest has exactly 2 segments.
     `b` is a DESCENDANT of `.pd-grp`, so `> b` child selectors silently miss it.

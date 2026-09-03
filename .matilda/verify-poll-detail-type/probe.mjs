@@ -77,18 +77,25 @@ try {
          values by a real gutter - a fixed px column silently collided */
       gut: parseFloat(getComputedStyle(p.querySelector(".pd-meta-items")).columnGap),
       labFits: (() => {
-        const g = p.querySelector(".pd-meta-items:not(.pd-rel)");
+        const g = p.querySelector(".pd-meta-items");
         const col = parseFloat(getComputedStyle(g).gridTemplateColumns.split(" ")[0]);
         return [...g.querySelectorAll(".pd-meta-k")]
                  .every((k) => k.getBoundingClientRect().width <= col + 0.5);
       })(),
       /* one family, no second face for the figures */
       fam: getComputedStyle(p.querySelector(".pd-s-hero b")).fontFamily.split(",")[0].replace(/"/g, ""),
-      relRows: p.querySelectorAll(".pd-rel .pd-meta-i").length,
-      relStacked: (() => {
-        const k = p.querySelector(".pd-rel .pd-meta-k");
-        return !!k && k.nextElementSibling.getBoundingClientRect().top
-               >= k.getBoundingClientRect().bottom - 1;
+      /* the release pointers are ORDINARY rows of the band's one grid - they
+         had their own stacked block briefly, which could not hold its label
+         column to the same width and put the values off the band's axis */
+      relBeside: (() => {
+        const k = [...p.querySelectorAll(".pd-meta-k")]
+          .find((x) => /release|APC/i.test(x.textContent));
+        if (!k) return "no release row";
+        const v = k.nextElementSibling;
+        const first = p.querySelector(".pd-meta-v");
+        return v.getBoundingClientRect().left >= k.getBoundingClientRect().right
+          && Math.abs(v.getBoundingClientRect().left
+                      - first.getBoundingClientRect().left) < 1;
       })(),
       heroWords: px(hero), heroFig: px(hero && hero.querySelector("b")),
       bodyWords: px(p.querySelector(".pd-sec:not(.pd-sec-lead) .pd-s")),
@@ -138,8 +145,7 @@ try {
   check("panel is set in one family", t.fam, "Source Sans 3");
   check("label column holds every label", t.labFits, true);
   check("labels are held off their values", t.gut >= 16, true);
-  check("release rides the provenance list", t.relRows > 0, true);
-  check("release stacks label over value", t.relStacked, true);
+  check("release rides the band, on its value axis", t.relBeside, true);
   check("hero words", t.heroWords, "17px");
   check("hero figure", t.heroFig, "40px");
   check("hero move", t.heroChg, "14px");
@@ -221,7 +227,8 @@ try {
      much of the measure - it does not: the values are longer than the labels,
      so stacking bought ~110px of a 341px line and spent six extra rows on it.
      Checked at 320px, where the controls wrap above the list to give it the
-     full width (see the 360px block). */
+     full width (see the 360px block). The release pointers are rows of this
+     same grid, so they are included. */
   for (const w of [500, 390, 320]) {
     await page.setViewport({ width: w, height: 1100 });
     await new Promise((r) => setTimeout(r, 300));
@@ -229,7 +236,7 @@ try {
     await new Promise((r) => setTimeout(r, 350));
     const m = await page.evaluate(`(() => {
       const p = document.querySelector(".poll-detail");
-      const rows = [...p.querySelectorAll(".pd-meta-items:not(.pd-rel) .pd-meta-k")].map((k) => {
+      const rows = [...p.querySelectorAll(".pd-meta-items .pd-meta-k")].map((k) => {
         const v = k.nextElementSibling;
         const kr = k.getBoundingClientRect(), vr = v.getBoundingClientRect();
         // one line box, not one em: .pd-meta-items sets line-height 1.45
