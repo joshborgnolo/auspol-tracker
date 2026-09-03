@@ -77,6 +77,15 @@ survive), and the GhostWhoVotes mirror of release scans.
 - When a write-up and the house's own table disagree, the TABLE wins and
   the note records the divergence (the 2004 final: Coalition primary 46 in
   Galaxy's accuracy-table split Lib 41 + Nat 5 vs Bowe's 45 — table used).
+- The Courier Mail polldetail vein runs 2007–2008 ONLY (CDX-exhausted):
+  media01.couriermail.com.au holds no Galaxy material outside that run, and
+  the Telegraph/news.com.au hosts hold none at all. A 2026-09-03 sweep of
+  every surviving source (CDX windows around each wave, Bowe's posts,
+  Wikipedia's polling tables) found nothing for the three remaining
+  transcript-only waves (2004-09-20 primaries, 2009-06-29 Coalition/Greens/
+  others, 2010-06-25 primaries — the snap poll had no trend-table PDF at
+  all, consistent with 2PP-only reporting). Treat those three as exhausted
+  unless a NEW source family appears.
 - Dating an UNDATED wave is legitimate when an independent fact pins it:
   Galaxy's accuracy table never printed the 2004 final's date; Bowe's
   4 Oct 2004 post on the next fortnightly wave prints the IDENTICAL 52-48
