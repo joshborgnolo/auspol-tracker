@@ -1,17 +1,29 @@
-/* Poll-detail typography pass (2026-09-03, second critique of the expanded
-   breakdown): the panel was one flat run of 14px sentences with 16px figures.
-   It is now three voices — a provenance LIST, tracked upper-case KICKERS over
-   ruled sections, and FIGURES that step above the words carrying them.
+/* Poll-detail typography: the expanded breakdown's type ladder.
 
-   Everything hangs off four tokens on .poll-detail, so this asserts the
-   tokens' effects rather than a table of hard-coded rules:
-     --pd-lab   118px  provenance label column (both grids share it)
-     --pd-body   16px  the sentences
-     --pd-fig    22px  every published figure
-     --pd-hero   40px  the first head-to-head only
-   plus the kicker (10.5px / 600 / uppercase / tracked), the meta pair
-   (11.5px label, 14px value), the basis caption (14px, 18px figure), and the
-   700px reading measure the ruled sections are set to.
+   Rebuilt 2026-09-03 from a supplied mock-up (the visual source of truth for
+   the RATIOS), then stepped down twice and retuned per-element on request, so
+   the absolute sizes are NOT the mock's. Every size in the panel is a token on
+   .poll-detail - there are no literal font-sizes left - and this asserts the
+   tokens' effects rather than a table of rules:
+
+     --pd-body      13.5px  the sentences (400)
+     --pd-meta      12px    the provenance band, label 600 and value 400
+     --pd-eyebrow   11.5px  section eyebrows, 600 upper case at 0.14em
+     --pd-note      11.5px  moves, seat ranges, the way back
+     --pd-fig       20px    a percentage inside a sentence (700)
+     --pd-mid       22px    national direction (PdSec `mid`)
+     --pd-hero      40px    the first two-way head-to-head only (700)
+     --pd-hero-w    17px    and the words carrying it
+     --pd-hero-note 14px    its moves
+
+   Plus: the basis caption (--pd-body, --pd-fig figure), the 820px centred
+   column, Source Sans 3 as the panel's only family, a self-sizing max-content
+   label column held off its values by --pd-gut, and .chg.up/.chg.down on the
+   --chg-up/--chg-down pair with .chg.flat staying neutral.
+
+   NOTE: this header has been wrong before - earlier edits to it silently
+   no-op'd while the assertions below landed. The checks are the contract; if
+   they disagree with this list, believe the checks.
 
    Row expansion: the Latest table renders ~8 rows immediately; click the
    .exp-btn toggle, .poll-detail mounts. The archive is behind the All-polls
@@ -140,8 +152,8 @@ try {
   check("kicker upper case", t.kCase, "uppercase");
   check("kicker tracked", t.kTracked, true);
   check("each section is ruled", t.secRule, "solid");
-  check("meta label", t.metaK, "13.5px");
-  check("meta value", t.metaV, "13.5px");
+  check("meta label", t.metaK, "12px");
+  check("meta value", t.metaV, "12px");
   check("panel is set in one family", t.fam, "Source Sans 3");
   check("label column holds every label", t.labFits, true);
   check("labels are held off their values", t.gut >= 16, true);

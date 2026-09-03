@@ -2163,6 +2163,10 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
      names the measure and is scanned, never read, so it sits UNDER the
      sentence it introduces and lets the figures keep the section's weight. */
   --pd-eyebrow: 11.5px;
+  /* the provenance band. Its own token too: the list is where the poll came
+     from, not what it found, so it sits below the sentences that carry the
+     figures and never competes with them for the eye. */
+  --pd-meta: 12px;
   --pd-fig: 20px;     /* a percentage inside a sentence */
   --pd-mid: 22px;     /* national direction - the 2PP treatment, scaled down */
   --pd-hero: 40px;    /* the 2PP pair, the dominant element on the page */
@@ -2194,14 +2198,14 @@ body.dark .poll-detail {
   display: grid; grid-template-columns: max-content minmax(0, 1fr);
   align-items: baseline; gap: 5px var(--pd-gut);
   flex: 1 1 auto; min-width: 0;
-  font-size: var(--pd-body); line-height: 1.35;
+  font-size: var(--pd-meta); line-height: 1.35;
   font-variant-numeric: tabular-nums;
 }
 /* each item is a label/value PAIR that must land in one grid row, so the item
    wrapper contributes no box of its own */
 .pd-meta-i { display: contents; }
 .pd-meta-k {
-  font-size: var(--pd-body); font-weight: 600;
+  font-size: var(--pd-meta); font-weight: 600;
   color: var(--pd-ink-2); white-space: nowrap;
 }
 .pd-meta-v { min-width: 0; font-weight: 400; color: var(--pd-ink); text-wrap: pretty; }
@@ -2536,6 +2540,7 @@ button.acc-spread[aria-pressed="true"] {
     --pd-gut: 18px; --pd-hero: 27px; --pd-hero-w: 14px;
     --pd-mid: 19px; --pd-fig: 18px; --pd-body: 13px;
     --pd-note: 11px; --pd-hero-note: 12.5px; --pd-eyebrow: 11px;
+    --pd-meta: 11.5px;
   }
   .pd-sec { margin-top: 17px; padding-top: 15px; }
   .pd-k { margin-bottom: 9px; }
