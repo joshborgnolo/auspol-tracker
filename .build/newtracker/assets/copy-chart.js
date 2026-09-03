@@ -303,6 +303,10 @@
        inside, the composer running below would read its .ro-party/.hl-item
        nodes a second time and draw every legend row twice. */
     const stand = host.cloneNode(true);
+    /* Inserting a cloned .chart re-arms its entrance animation (chart-in -
+     * the snapshot faded in from opacity 0, which is the flash the phone
+     * kept showing). .copy-stand strips all motion inside the clone. */
+    stand.classList.add("copy-stand");
     stand.style.position = "fixed";
     stand.style.margin = "0";
     stand.style.top = hostRect.top + "px";

@@ -3974,6 +3974,13 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
   .exp-btn.open:active { transform: rotate(90deg) scale(0.965); }
 }
+/* The copy-chart stand-in is a frozen snapshot of a chart that is already
+   on screen, not a chart entering: inserted as a fresh .chart it would
+   replay chart-in (and tip-in on its descendants) and phone paints would
+   catch the fade as a flash - event labels included, they ride in the same
+   svg. Unconditional, scoped to the clone class; real charts keep their
+   entrance motion. Must sit after the rules it overrides. */
+.copy-stand, .copy-stand * { animation: none; transition: none; }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
   .acc-dot, .acc-mean { transition: none; }
@@ -5767,6 +5774,10 @@ window.AP.nextPolls = npProject;
        inside, the composer running below would read its .ro-party/.hl-item
        nodes a second time and draw every legend row twice. */
     const stand = host.cloneNode(true);
+    /* Inserting a cloned .chart re-arms its entrance animation (chart-in -
+     * the snapshot faded in from opacity 0, which is the flash the phone
+     * kept showing). .copy-stand strips all motion inside the clone. */
+    stand.classList.add("copy-stand");
     stand.style.position = "fixed";
     stand.style.margin = "0";
     stand.style.top = hostRect.top + "px";

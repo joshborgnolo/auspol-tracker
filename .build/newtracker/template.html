@@ -3883,6 +3883,13 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
   .exp-btn.open:active { transform: rotate(90deg) scale(0.965); }
 }
+/* The copy-chart stand-in is a frozen snapshot of a chart that is already
+   on screen, not a chart entering: inserted as a fresh .chart it would
+   replay chart-in (and tip-in on its descendants) and phone paints would
+   catch the fade as a flash - event labels included, they ride in the same
+   svg. Unconditional, scoped to the clone class; real charts keep their
+   entrance motion. Must sit after the rules it overrides. */
+.copy-stand, .copy-stand * { animation: none; transition: none; }
 @media (prefers-reduced-motion: reduce) {
   .guide, .hover-marker, .tip { transition: none; animation: none; }
   .acc-dot, .acc-mean { transition: none; }
