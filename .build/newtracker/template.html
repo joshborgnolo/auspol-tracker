@@ -2076,8 +2076,11 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
      from, not what it found, so it sits below the sentences that carry the
      figures and never competes with them for the eye. */
   --pd-meta: 12px;
-  /* the approach to a figure - see the .pd-lab + b rule */
-  --pd-figspace: 7px;
+  /* the approach to a figure - see the .pd-lab + b rule. Deliberately less
+     than the gap BETWEEN two pairs (.pd-s word-spacing, ~9.7px with the
+     comma's own space): a label belongs to the figure beside it, so it must
+     bind tighter to it than the pairs do to each other. */
+  --pd-figspace: 3px;
   --pd-fig: 20px;     /* a percentage inside a sentence */
   --pd-mid: 22px;     /* national direction - the 2PP treatment, scaled down */
   --pd-hero: 40px;    /* the 2PP pair, the dominant element on the page */
@@ -2204,6 +2207,14 @@ body.dark .poll-detail {
 /* the net is what the approval line is FOR – it summarises the three figures
    before it, so it takes the figure size and a step of weight past it */
 .poll-detail .pd-s .netv { font-size: var(--pd-fig); line-height: 1; }
+/* Leader approval is the panel's longest line – three shares, a net and two
+   parentheticals in one sentence – so on a phone it is the line that wraps
+   hardest, and its figures are what it can afford to give back. They take a
+   size of their own, falling through to the section figure everywhere else.
+   Selected by the net the line carries: ApprLine is the only line in the
+   panel that renders a .netv, so this needs no class of its own in the JS. */
+.pd-s:has(.netv) b,
+.pd-s:has(.netv) .netv { font-size: var(--pd-fig-appr, var(--pd-fig)); }
 /* the parenthetical moves are metadata ABOUT the figure, not peers of it –
    in the breakdown they rest a size-octave down and a weight lighter than
    the bold numerals they annotate */
@@ -2459,7 +2470,7 @@ button.acc-spread[aria-pressed="true"] {
     --pd-gut: 18px; --pd-hero: 27px; --pd-hero-w: 14px;
     --pd-mid: 19px; --pd-fig: 18px; --pd-body: 13px;
     --pd-note: 11px; --pd-hero-note: 12.5px; --pd-eyebrow: 11px;
-    --pd-meta: 11.5px;
+    --pd-meta: 11.5px; --pd-fig-appr: 16px;
   }
   .pd-sec { margin-top: 17px; padding-top: 15px; }
   .pd-k { margin-bottom: 9px; }
@@ -2475,7 +2486,7 @@ button.acc-spread[aria-pressed="true"] {
   .pd-mat { display: block; margin: 0 0 2px; }
 }
 @media (max-width: 430px) {
-  .poll-detail { --pd-gut: 14px; --pd-hero: 24px; }
+  .poll-detail { --pd-gut: 14px; --pd-hero: 24px; --pd-fig-appr: 15px; }
 }
 /* and one rung smaller again where the phone is narrow enough that even
    24px figures can't keep the pair on one line (the name is already above
@@ -2489,7 +2500,7 @@ button.acc-spread[aria-pressed="true"] {
     padding-left: 16px; padding-right: 16px;
   }
   .pd-s-hero { word-spacing: 5px; }
-  .poll-detail { --pd-figspace: 5px; }
+  .poll-detail { --pd-figspace: 2px; }
 }
 /* The values stay BESIDE their labels at every width. Stacking them cost six
    extra lines to buy back ~110px of a 341px measure that the labels were

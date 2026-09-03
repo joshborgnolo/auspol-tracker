@@ -173,9 +173,10 @@ try {
   check("a fall is red, and not the same colour as a rise", t.chgDown && t.chgDown !== t.chgUp, true);
   check("no move stays neutral", !t.chgFlat || t.chgFlat === t.inkThree, true);
   check("no move is ever comma-led", t.commaLedMove, false);
-  // a bare space at 16px IBM Plex Sans measures ~4.4px; the junction carries a
-  // word-spacing supplement on top of it, the run between pairs carries more
-  check("figure/label junction beats a bare word-space", t.gaps.inner >= 6, true);
+  /* a bare space measures ~2.7px at the band's size; the approach to a figure
+     carries --pd-figspace on top of that, and the run BETWEEN two pairs
+     carries more still, so a label binds to its own figure first */
+  check("figure/label junction beats a bare word-space", t.gaps.inner >= 4, true);
   check("gap between pairs beats the gap inside one",
         t.gaps.between > t.gaps.inner, true);
   check("ledger set to the centred column", t.measure, 820);
