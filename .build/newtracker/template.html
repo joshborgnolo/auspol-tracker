@@ -102,10 +102,13 @@
   /* approval bar tints (theme-aware) */
   --appr-app-bg: oklch(0.62 0.10 150 / 0.22);
   --appr-dis-bg: oklch(0.60 0.13 28 / 0.18);
-  /* house-lean chart ground: the half of the chart each major party's side of
-     zero occupies – Labor red above, Coalition blue below */
+  /* house-lean chart ground: the tint marking which side of zero a house
+     sits on, themed to the measure on view – Labor red / Coalition blue on
+     the 2PP; a primary's own party tint above zero, neutral ink below */
   --lean-alp-bg: oklch(0.55 0.150 27 / 0.08);
   --lean-lnp-bg: oklch(0.50 0.095 250 / 0.09);
+  --lean-onp-bg: oklch(0.56 0.115 62 / 0.09);
+  --lean-ink-bg: oklch(0.52 0.008 260 / 0.05);
   --tip-shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
   /* shared frosted-glass material – one recipe for every floating readout,
      pill toggle and the pinned nav, so translucency reads as one language.
@@ -168,6 +171,8 @@ body.dark {
   --appr-dis-bg: oklch(0.66 0.16 28 / 0.24);
   --lean-alp-bg: oklch(0.660 0.165 28 / 0.14);
   --lean-lnp-bg: oklch(0.680 0.130 252 / 0.14);
+  --lean-onp-bg: oklch(0.700 0.130 62 / 0.14);
+  --lean-ink-bg: oklch(0.720 0.010 260 / 0.08);
   /* dark glass: a touch more opaque + more saturation so lines read through it */
   --glass-bg: color-mix(in oklch, var(--surface) 62%, transparent);
   --glass-border: color-mix(in oklch, var(--line) 65%, transparent);
@@ -3404,12 +3409,16 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   border-top: 1px solid var(--line);
   padding: 24px 0 0; margin: 30px 0 0;
 }
-/* …but the chart's GROUND carries the party colours the lines refuse: the
-   half above zero is Labor's, the half below the Coalition's. The fills are
-   theme vars so dark mode lifts them the way it lifts the marks themselves. */
+/* …but the chart's GROUND carries the party colours the lines refuse: on the
+   2PP the half above zero is Labor's, the half below the Coalition's; on a
+   primary the tint above zero is that party's own, the half below a neutral
+   ink. The fills are theme vars so dark mode lifts them the way it lifts the
+   marks themselves. */
 .lean-band-alp { fill: var(--lean-alp-bg); }
 .lean-band-lnp { fill: var(--lean-lnp-bg); }
-.lean-band-alp, .lean-band-lnp { transition: fill .35s ease; }
+.lean-band-onp { fill: var(--lean-onp-bg); }
+.lean-band-ink { fill: var(--lean-ink-bg); }
+.lean-band-alp, .lean-band-lnp, .lean-band-onp, .lean-band-ink { transition: fill .35s ease; }
 
 /* archive ledger flows with the page; header pins just below the tab bar.
    overflow must stay visible here – any overflow on the wrapper turns it into

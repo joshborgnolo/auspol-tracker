@@ -2529,22 +2529,30 @@ function PopRow({ on, radio, label, note, n, onClick }) {
 
 // ====================================================================
 // VariancePanel – how far apart the polls sit, against the spread that
-// sampling error alone would produce.  One panel per archive facet, so
-// the measures on screen are the ones the table below is showing.
+// sampling error alone would produce.  The page facet seeds the measure
+// set, and on the voting facets an in-panel 2PP | Primaries toggle flips
+// between them (leadership keeps its own set, untoggled).
 //
 // Deliberately computed over EVERY poll in the archive, never the
 // filtered subset: "how much do pollsters disagree" is a property of the
 // industry, and filtering to one house would make it meaningless.  The
 // date range still moves the chart window, because that's just framing.
 // ====================================================================
+/* the in-panel choice between the two voting views – the 2PP matchups, or
+   the ALP / L/NP / ON primaries (the same trio the archive table offers) */
+const VAR_VOTE_VIEWS = [{ id: "twopp", label: "2PP" }, { id: "primary", label: "Primaries" }];
+
 function VariancePanel({ facet, rangeId }) {
   const { D, discord, discordFacet, discordRead, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
   const narrow = useNarrow();
   const [hidden, setHidden] = useState({});
+  // the page facet seeds the view (the parent remounts this panel per facet,
+  // so a facet switch re-syncs); the in-panel toggle flips the voting views
+  const [view, setView] = useState(facet);
 
   // a measure with no computable window anywhere (e.g. Hanson's net, polled
   // by too few houses at a time) is dropped rather than shown as a flat gap
-  const rows = discordFacet(facet)
+  const rows = discordFacet(view)
     .map((m) => ({ m, pts: discord(m.id) }))
     .filter((r) => r.pts.some((d) => d.sigma != null));
   if (!rows.length) return null;
@@ -2583,7 +2591,7 @@ function VariancePanel({ facet, rangeId }) {
     const pts = r.pts.filter((d) => d.sigma != null);
     return { m: r.m, d: pts[pts.length - 1] };
   });
-  const unitNote = facet === "leadership" ? "net approval points" : "percentage points";
+  const unitNote = view === "leadership" ? "net approval points" : "percentage points";
 
   return (
     <section className="ap-var" id="poll-disagreement">
@@ -2596,6 +2604,10 @@ function VariancePanel({ facet, rangeId }) {
             than random sampling permits. Measured across all {D.individualPolls.length} polls; the filters
             above don’t narrow it.
           </p>
+          {(facet === "twopp" || facet === "primary") && (
+            <TextToggle value={view === "primary" ? "primary" : "twopp"} onChange={setView}
+                        options={VAR_VOTE_VIEWS} ariaLabel="Disagreement measure" />
+          )}
         </div>
         <div className="legend">
           {latest.map(({ m, d }) => {
@@ -2616,7 +2628,7 @@ function VariancePanel({ facet, rangeId }) {
       </div>
 
       <TrendChart
-        key={"var-" + facet + "-" + rangeId}
+        key={"var-" + view + "-" + rangeId}
         height={narrow ? 500 : 300} xDomain={xDomain} yDomain={domain} yTicks={ticks}
         unit="pp" axisFont={narrow ? 28 : 15} pad={{ l: 54, r: 20, t: 18, b: 40 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
@@ -2663,7 +2675,7 @@ function VariancePanel({ facet, rangeId }) {
         small divergent polls being measured. The floor is what a design effect of {window.AP.DISC.DEFF} and
         each poll’s own sample size predict. Their ratio reads: under 0.80× herded · Around 1× as close as
         sampling allows · Over 1.20× genuinely apart.
-        {facet === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."}
+        {view === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."}
       </p>
     </section>
   );
@@ -2708,21 +2720,45 @@ function houseLeanColour(firm) {
   return "oklch(0.63 0.145 " + (99 + (h % 9) * 29) + ")";
 }
 
+/* House lean over time, keyed by measure: the 2PP trace gets the classic
+   two-party ground (Labor above the line, Coalition below); a primary trace
+   tints above-zero with its own party's wash and leaves below-zero neutral.
+   Offered measures mirror the Poll-disagreement trio plus the 2PP. */
+const LEAN_MEASURES = [
+  { id: "tpp", label: "2PP" }, { id: "alp", label: "ALP" },
+  { id: "lnp", label: "L/NP" }, { id: "onp", label: "ON" },
+];
+const LEAN_MEASURE_META = {
+  tpp: { phrase: "the 2PP", above: "lean-band-alp", below: "lean-band-lnp",
+         ground: "The ground is Labor red / Coalition blue around zero: a house inside the blue band runs ahead of the consensus on the Coalition's 2PP (pushes the 2PP toward them), inside the red band ahead on Labor's." },
+  alp: { phrase: "Labor's primary vote", above: "lean-band-alp", below: "lean-band-ink",
+         ground: "The ground colours the side of zero a house sits on: inside the red band it runs ahead of the consensus on Labor's primary vote, below zero it trails it." },
+  lnp: { phrase: "the Coalition's primary vote", above: "lean-band-lnp", below: "lean-band-ink",
+         ground: "The ground colours the side of zero a house sits on: inside the blue band it runs ahead of the consensus on the Coalition's primary vote, below zero it trails it." },
+  onp: { phrase: "One Nation's primary vote", above: "lean-band-onp", below: "lean-band-ink",
+         ground: "The ground colours the side of zero a house sits on: inside the tinted band it runs ahead of the consensus on One Nation's primary vote, below zero it trails it." },
+};
+
 function HouseLeanPanel({ rangeId }) {
   const { D, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
   const narrow = useNarrow();
+  const [measure, setMeasure] = useState("tpp");
   const [hidden, setHidden] = useState({});
-  if (!D.houseLean) return null;   // an older dataset build: absence, never zero
+  const meta = LEAN_MEASURE_META[measure] || LEAN_MEASURE_META.tpp;
+  // older dataset builds carry houseLean 2PP-only (flat) or not at all –
+  // absence is never zero, so a measure with no emitted map folds the panel
+  const leanMap = D.houseLean && D.houseLean[measure];
+  if (!leanMap) return null;
 
   // gen-data emits only houses with >=3 polls of evidence – nobody is drawn
   // wobbling on nearly nothing
-  const houses = Object.keys(D.houseLean).sort();
+  const houses = Object.keys(leanMap).sort();
   if (!houses.length) return null;
 
   const xDomain = rangeDomain(rangeId);
   const inWin = (d) => d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1];
   const rows = houses.map((firm) => {
-    const all = D.houseLean[firm].map((d) => ({ x: D.mx(d.ym), y: d.v }));
+    const all = leanMap[firm].map((d) => ({ x: D.mx(d.ym), y: d.v }));
     return { firm, color: houseLeanColour(firm), all, pts: all.filter(inWin) };
   });
 
@@ -2750,22 +2786,27 @@ function HouseLeanPanel({ rangeId }) {
         <div>
           <h3 className="ap-var-title">House lean</h3>
           <p className="card-sub">
-            How far each pollster sits from the consensus of the houses polling around it,
-            estimated month by month – the same <button type="button" className="hi-term"
-              onClick={() => window.AP.openTerm && window.AP.openTerm("house-effect", "House lean")}>house effect</button> the
-            aggregates subtract, shown as it has walked. The chart above spreads the houses
+            How far each pollster sits from the consensus of the houses polling around it
+            {"on " + meta.phrase}, estimated month by month – the same
+            <button type="button" className="hi-term"
+              onClick={() => window.AP.openTerm && window.AP.openTerm("house-effect", "House lean")}>house effect</button>{" "}
+            the aggregates subtract, shown as it has walked. The chart above spreads the houses
             against chance; this one tracks where each one stands.
           </p>
+          <TextToggle value={measure} onChange={setMeasure} options={LEAN_MEASURES}
+                      ariaLabel="House-lean measure" />
         </div>
         <div className="legend">
           {latest.map((e) => {
             const s = (e.v > 0 ? "+" : e.v < 0 ? "−" : "") + Math.abs(e.v).toFixed(1) + "pp";
-            const he = D.houseEffects && D.houseEffects.tpp && D.houseEffects.tpp[e.firm];
+            const he = D.houseEffects && (measure === "tpp"
+              ? (D.houseEffects.tpp && D.houseEffects.tpp[e.firm])
+              : (D.houseEffects.primary && D.houseEffects.primary[measure] && D.houseEffects.primary[measure][e.firm]));
             return (
               <button key={e.firm} type="button"
                       className={"legend-chip" + (hidden[e.firm] ? " off" : "")}
                       aria-pressed={!hidden[e.firm]}
-                      title={e.firm + " – currently " + s.replace("−", "-") + " against the consensus"
+                      title={e.firm + " – currently " + s.replace("−", "-") + " against the consensus on " + meta.phrase
                              + (he && he.n ? " · pooled from " + he.n + " polls" : "")}
                       onClick={() => setHidden((h) => ({ ...h, [e.firm]: !h[e.firm] }))}>
                 <span className="legend-swatch" style={{ background: e.color }}></span>
@@ -2778,24 +2819,23 @@ function HouseLeanPanel({ rangeId }) {
       </div>
 
       <TrendChart
-        key={"lean-" + rangeId}
+        key={"lean-" + measure + "-" + rangeId}
         height={narrow ? 500 : 300} xDomain={xDomain} yDomain={domain} yTicks={ticks}
         unit="pp" axisFont={narrow ? 28 : 15} pad={{ l: 54, r: 20, t: 18, b: 40 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         bands={[
-          { y0: 0, y1: domain[1], className: "lean-band-alp" },
-          { y0: domain[0], y1: 0, className: "lean-band-lnp" },
+          { y0: 0, y1: domain[1], className: meta.above },
+          { y0: domain[0], y1: 0, className: meta.below },
         ]}
         refLines={[{ y: 0, color: "var(--ink-3)" }]}
         series={chartSeries} spine={spine}
         tooltipTitle={(i) => monthLabelFull(spineYm[i])}
-        ariaLabel={"Pollster house lean over time – how far each pollster sits from the cross-house consensus; the ground above zero is tinted Labor red, below zero Coalition blue"}
+        ariaLabel={"Pollster house lean over time on " + meta.phrase + " – how far each pollster sits from the cross-house consensus"}
         fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(1)}
       />
 
       <p className="table-hint ap-var-note">
-        Above zero – the red ground – leans to Labor on the classic two-party, the blue below
-        it to the Coalition. Each
+        {meta.ground + " "}Each
         point reads the lean as of that month, with the 90-day half-life on the evidence, so a
         house’s current method outranks its history; the All-polls table’s House-effect column
         instead pools each pollster’s whole history into one standing figure, which is why its
@@ -2923,16 +2963,17 @@ function AllPollsView({ focus, onBack, backLabel }) {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-  /* house lean only mounts on the 2PP facet – from another facet the jump
-     switches views first, and the scroll has to wait on the remount */
+  /* house lean mounts on the voting facets (2PP and Primary) – from a
+     leadership/direction view the jump switches facets first, and the
+     scroll has to wait on the remount */
   const leanJump = useRef(false);
   React.useEffect(() => {
-    if (!leanJump.current || facet !== "twopp") return;
+    if (!leanJump.current || (facet !== "twopp" && facet !== "primary")) return;
     leanJump.current = false;
     jumpTo("house-lean");
   }, [facet]);
   const jumpToLean = () => {
-    if (facet === "twopp") jumpTo("house-lean");
+    if (facet === "twopp" || facet === "primary") jumpTo("house-lean");
     else { leanJump.current = true; onFacet("twopp"); }
   };
 
@@ -3526,12 +3567,12 @@ function AllPollsView({ focus, onBack, backLabel }) {
         and Roy Morgan file none, so a dash there means unpublished, not unknown.
       </p>
 
-      <VariancePanel facet={facet} rangeId={range} />
+      <VariancePanel key={facet} facet={facet} rangeId={range} />
 
-      {/* house lean is a 2PP story – the house effect charting the aggregate's
-          debias owes its measure to the classic two-party, so it mounts only
-          where that matchup runs the tab */}
-      {facet === "twopp" && <HouseLeanPanel rangeId={range} />}
+      {/* house lean rides the voting facets: the panel's own toggle moves it
+          between the 2PP and the ALP / L/NP / ON primary measures, so it
+          mounts wherever those measures run the tab */}
+      {(facet === "twopp" || facet === "primary") && <HouseLeanPanel rangeId={range} />}
     </div>
   );
 }

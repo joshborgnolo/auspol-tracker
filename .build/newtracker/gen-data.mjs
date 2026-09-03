@@ -366,18 +366,6 @@ function monthWithSe(rows, he, ym) {
 }
 
 const houseEffect = houseEffectsFor(tppRows);
-/* houseLean reads the SAME estimator as a time series – each firm's decayed
-   2PP lean sampled at every month's midpoint from the month its first
-   evidence poll lands, so the House-lean chart under Poll disagreement draws
-   how a house's lean has walked, not just where it stands. Firms with <3
-   evidence polls are absent rather than drawn wobbling on nearly nothing. */
-const houseLean = Object.fromEntries(
-  Object.entries(houseEffect.evidenceN).filter(([, n]) => n >= 3).map(([firm]) => [
-    firm,
-    MONTHS.filter((ym) => ymMidMs(ym) >= houseEffect.evidenceFrom[firm])
-      .map((ym) => ({ ym, v: r1(houseEffect.at(firm, ymMidMs(ym))) })),
-  ])
-);
 /* The synthetic series gets its OWN house effects, measured against its own
    consensus – a house whose primaries run ALP-high is a different bias from
    the same house's published-2PP lean, and the comment on houseEffectsFor
@@ -433,6 +421,20 @@ for (const k of PRIMARY_KEYS) {
     .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: primaryVal(p, k), n: rowN(p), firm: p.pollster }));
   primaryHE[k] = houseEffectsFor(primaryRows[k]);
 }
+/* houseLean reads the SAME estimators as time series – each firm's decayed
+   lean sampled at every month's midpoint from the month its first evidence
+   poll lands, so the House-lean chart under Poll disagreement draws how a
+   house's lean has walked, not just where it stands. Keyed by measure –
+   the 2PP plus the ALP / L/NP / ON primaries (matching the Poll-
+   disagreement trio; lives after primaryHE exists). A firm under 3 evidence
+   polls on a measure is absent from that measure's map, never drawn flat. */
+const houseLean = Object.fromEntries([["tpp", houseEffect], ["alp", primaryHE.alp], ["lnp", primaryHE.lnp], ["onp", primaryHE.onp]]
+  .map(([k, he]) => [k, Object.fromEntries(Object.entries(he.evidenceN).filter(([, n]) => n >= 3).map(([firm]) => [
+    firm,
+    MONTHS.filter((ym) => ymMidMs(ym) >= he.evidenceFrom[firm])
+      .map((ym) => ({ ym, v: r1(he.at(firm, ymMidMs(ym))) })),
+  ]))]),
+);
 const aggPrimary = MONTHS.map((ym) => {
   const rows = POLLS.filter((p) => ymOf(p.date) === ym);
   if (!rows.length) return null;

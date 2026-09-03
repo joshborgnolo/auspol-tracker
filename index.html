@@ -201,10 +201,13 @@
   /* approval bar tints (theme-aware) */
   --appr-app-bg: oklch(0.62 0.10 150 / 0.22);
   --appr-dis-bg: oklch(0.60 0.13 28 / 0.18);
-  /* house-lean chart ground: the half of the chart each major party's side of
-     zero occupies – Labor red above, Coalition blue below */
+  /* house-lean chart ground: the tint marking which side of zero a house
+     sits on, themed to the measure on view – Labor red / Coalition blue on
+     the 2PP; a primary's own party tint above zero, neutral ink below */
   --lean-alp-bg: oklch(0.55 0.150 27 / 0.08);
   --lean-lnp-bg: oklch(0.50 0.095 250 / 0.09);
+  --lean-onp-bg: oklch(0.56 0.115 62 / 0.09);
+  --lean-ink-bg: oklch(0.52 0.008 260 / 0.05);
   --tip-shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
   /* shared frosted-glass material – one recipe for every floating readout,
      pill toggle and the pinned nav, so translucency reads as one language.
@@ -267,6 +270,8 @@ body.dark {
   --appr-dis-bg: oklch(0.66 0.16 28 / 0.24);
   --lean-alp-bg: oklch(0.660 0.165 28 / 0.14);
   --lean-lnp-bg: oklch(0.680 0.130 252 / 0.14);
+  --lean-onp-bg: oklch(0.700 0.130 62 / 0.14);
+  --lean-ink-bg: oklch(0.720 0.010 260 / 0.08);
   /* dark glass: a touch more opaque + more saturation so lines read through it */
   --glass-bg: color-mix(in oklch, var(--surface) 62%, transparent);
   --glass-border: color-mix(in oklch, var(--line) 65%, transparent);
@@ -3503,12 +3508,16 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   border-top: 1px solid var(--line);
   padding: 24px 0 0; margin: 30px 0 0;
 }
-/* …but the chart's GROUND carries the party colours the lines refuse: the
-   half above zero is Labor's, the half below the Coalition's. The fills are
-   theme vars so dark mode lifts them the way it lifts the marks themselves. */
+/* …but the chart's GROUND carries the party colours the lines refuse: on the
+   2PP the half above zero is Labor's, the half below the Coalition's; on a
+   primary the tint above zero is that party's own, the half below a neutral
+   ink. The fills are theme vars so dark mode lifts them the way it lifts the
+   marks themselves. */
 .lean-band-alp { fill: var(--lean-alp-bg); }
 .lean-band-lnp { fill: var(--lean-lnp-bg); }
-.lean-band-alp, .lean-band-lnp { transition: fill .35s ease; }
+.lean-band-onp { fill: var(--lean-onp-bg); }
+.lean-band-ink { fill: var(--lean-ink-bg); }
+.lean-band-alp, .lean-band-lnp, .lean-band-onp, .lean-band-ink { transition: fill .35s ease; }
 
 /* archive ledger flows with the page; header pins just below the tab bar.
    overflow must stay visible here – any overflow on the wrapper turns it into
@@ -4377,7 +4386,7 @@ window.AUSPOL = (function () {
      A firm absent from a map has too few readings to estimate – which the UI
      must show as "—", never as 0. */
   const houseEffects = {"tpp":{"Roy Morgan":{"v":0.9,"n":43},"RedBridge / Accent":{"v":-0.6,"n":14},"Spectre Strategy":{"v":-0.6,"n":4},"DemosAU":{"v":0,"n":2},"Newspoll":{"v":0.6,"n":8},"Resolve":{"v":0,"n":11},"Wolf & Smith":{"v":0,"n":1},"Essential":{"v":-2,"n":11},"YouGov":{"v":0.1,"n":18},"Freshwater":{"v":-0.6,"n":5},"DemosAU (MRP)":{"v":0.1,"n":1},"Fox & Hedgehog":{"v":-1,"n":4},"Roy Morgan (SMS)":{"v":0.2,"n":1}},"primary":{"alp":{"Roy Morgan":{"v":-0.4,"n":43},"RedBridge / Accent":{"v":1,"n":15},"Spectre Strategy":{"v":-0.3,"n":4},"DemosAU":{"v":-1,"n":9},"Newspoll":{"v":1.2,"n":17},"Resolve":{"v":0.2,"n":16},"Wolf & Smith":{"v":0.1,"n":2},"Essential":{"v":0.5,"n":12},"YouGov":{"v":-0.5,"n":21},"Freshwater":{"v":0.5,"n":5},"DemosAU (MRP)":{"v":-0.5,"n":3},"YouGov (MRP)":{"v":0,"n":1},"Fox & Hedgehog":{"v":-0.1,"n":4},"RedBridge / Accent (MRP)":{"v":0.2,"n":1},"Roy Morgan (SMS)":{"v":-0.1,"n":1},"Agenda C Synesis":{"v":0.1,"n":1}},"lnp":{"Roy Morgan":{"v":0.7,"n":43},"RedBridge / Accent":{"v":-0.7,"n":15},"Spectre Strategy":{"v":0.3,"n":4},"DemosAU":{"v":-0.2,"n":9},"Newspoll":{"v":-1.3,"n":17},"Resolve":{"v":0.6,"n":16},"Wolf & Smith":{"v":0.3,"n":2},"Essential":{"v":1.1,"n":12},"YouGov":{"v":-0.8,"n":21},"Freshwater":{"v":1.2,"n":5},"DemosAU (MRP)":{"v":-0.2,"n":3},"YouGov (MRP)":{"v":0,"n":1},"Fox & Hedgehog":{"v":0.7,"n":4},"RedBridge / Accent (MRP)":{"v":-0.1,"n":1},"Roy Morgan (SMS)":{"v":-0.6,"n":1},"Agenda C Synesis":{"v":-0.3,"n":1}},"grn":{"Roy Morgan":{"v":0.6,"n":43},"RedBridge / Accent":{"v":-0.5,"n":15},"Spectre Strategy":{"v":0,"n":4},"DemosAU":{"v":0.3,"n":9},"Newspoll":{"v":0,"n":17},"Resolve":{"v":-0.4,"n":16},"Essential":{"v":-1,"n":12},"YouGov":{"v":0.3,"n":21},"Freshwater":{"v":-0.1,"n":5},"DemosAU (MRP)":{"v":0.1,"n":3},"YouGov (MRP)":{"v":0,"n":1},"Fox & Hedgehog":{"v":0,"n":4},"Wolf & Smith":{"v":-0.1,"n":1},"RedBridge / Accent (MRP)":{"v":-0.1,"n":1},"Roy Morgan (SMS)":{"v":-0.1,"n":1},"Agenda C Synesis":{"v":-0.3,"n":1}},"onp":{"Roy Morgan":{"v":-1.2,"n":43},"RedBridge / Accent":{"v":1.6,"n":15},"Spectre Strategy":{"v":0.3,"n":4},"DemosAU":{"v":0.7,"n":9},"Newspoll":{"v":0.6,"n":17},"Resolve":{"v":-1,"n":16},"Essential":{"v":-0.6,"n":12},"YouGov":{"v":0.4,"n":21},"Freshwater":{"v":-0.7,"n":5},"DemosAU (MRP)":{"v":0.7,"n":3},"YouGov (MRP)":{"v":0.3,"n":1},"Fox & Hedgehog":{"v":-0.1,"n":4},"Wolf & Smith":{"v":-0.5,"n":1},"RedBridge / Accent (MRP)":{"v":0.3,"n":1},"Roy Morgan (SMS)":{"v":0.7,"n":1},"Agenda C Synesis":{"v":-0.4,"n":1}},"oth":{"Roy Morgan":{"v":0.3,"n":43},"RedBridge / Accent":{"v":-1.4,"n":15},"Spectre Strategy":{"v":-0.2,"n":4},"DemosAU":{"v":0.3,"n":9},"Newspoll":{"v":-0.6,"n":17},"Resolve":{"v":0.7,"n":16},"Essential":{"v":-0.5,"n":12},"YouGov":{"v":1,"n":21},"Freshwater":{"v":-1,"n":5},"DemosAU (MRP)":{"v":-0.2,"n":3},"YouGov (MRP)":{"v":-0.3,"n":1},"Fox & Hedgehog":{"v":-0.5,"n":4},"Wolf & Smith":{"v":0.2,"n":1},"RedBridge / Accent (MRP)":{"v":-0.2,"n":1},"Roy Morgan (SMS)":{"v":0.1,"n":1},"Agenda C Synesis":{"v":0.9,"n":1}}},"alp_on":{"DemosAU":{"v":-0.7,"n":1},"Fox & Hedgehog":{"v":0.2,"n":4},"Freshwater":{"v":0.1,"n":3},"YouGov":{"v":0.5,"n":16},"RedBridge / Accent":{"v":-0.2,"n":7},"Spectre Strategy":{"v":-0.3,"n":2},"Roy Morgan (SMS)":{"v":-0.3,"n":1},"Roy Morgan":{"v":-0.1,"n":16}},"appr":{"alb":{"Morning Consult":{"v":1.7,"n":1},"Newspoll":{"v":-0.5,"n":16},"Resolve":{"v":-0.6,"n":15},"Essential":{"v":2.3,"n":14},"YouGov":{"v":-0.9,"n":16},"Fox & Hedgehog":{"v":-0.4,"n":4},"RedBridge / Accent":{"v":0.9,"n":6},"Freshwater":{"v":0.6,"n":3},"Spectre Strategy":{"v":0,"n":2},"DemosAU":{"v":-1.5,"n":5},"Roy Morgan (SMS)":{"v":0.1,"n":1}},"opp":{"Newspoll":{"v":-6.5,"n":16},"Resolve":{"v":8.6,"n":15},"Essential":{"v":1.1,"n":13},"YouGov":{"v":-2.9,"n":14},"Fox & Hedgehog":{"v":0,"n":4},"RedBridge / Accent":{"v":-1.7,"n":5},"Freshwater":{"v":2.9,"n":3},"Spectre Strategy":{"v":-0.2,"n":2},"DemosAU":{"v":-0.4,"n":5}},"han":{"Freshwater":{"v":1.9,"n":3},"DemosAU":{"v":-2.2,"n":7},"RedBridge / Accent":{"v":-1.8,"n":7},"Resolve":{"v":1.9,"n":2},"Spectre Strategy":{"v":1.2,"n":2},"Newspoll":{"v":-0.6,"n":1}}},"synth":{"Roy Morgan":{"v":0,"n":43},"RedBridge / Accent":{"v":0.2,"n":15},"Spectre Strategy":{"v":-0.4,"n":4},"DemosAU":{"v":-0.5,"n":9},"Newspoll":{"v":1,"n":17},"Resolve":{"v":0,"n":16},"Essential":{"v":-0.7,"n":11},"Freshwater":{"v":-0.3,"n":5},"YouGov":{"v":0.2,"n":20},"DemosAU (MRP)":{"v":-0.2,"n":3},"YouGov (MRP)":{"v":-0.1,"n":1},"Fox & Hedgehog":{"v":-0.4,"n":4},"Wolf & Smith":{"v":0,"n":1},"RedBridge / Accent (MRP)":{"v":0,"n":1},"Roy Morgan (SMS)":{"v":0.1,"n":1},"Agenda C Synesis":{"v":0.2,"n":1}}};
-  const houseLean = {"Roy Morgan":[{"ym":"2025-06","v":0.1},{"ym":"2025-07","v":0.1},{"ym":"2025-08","v":0.1},{"ym":"2025-09","v":0.1},{"ym":"2025-10","v":0.2},{"ym":"2025-11","v":0.2},{"ym":"2025-12","v":0.2},{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":0.4},{"ym":"2026-03","v":0.5},{"ym":"2026-04","v":0.7},{"ym":"2026-05","v":0.7},{"ym":"2026-06","v":0.8},{"ym":"2026-07","v":0.8},{"ym":"2026-08","v":0.7}],"RedBridge / Accent":[{"ym":"2025-07","v":-0.2},{"ym":"2025-08","v":-0.1},{"ym":"2025-09","v":-0.4},{"ym":"2025-10","v":-0.5},{"ym":"2025-11","v":-0.3},{"ym":"2025-12","v":-0.1},{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":0.1},{"ym":"2026-03","v":0.1},{"ym":"2026-04","v":0},{"ym":"2026-05","v":0},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":-0.1},{"ym":"2026-08","v":-0.4}],"Spectre Strategy":[{"ym":"2025-07","v":0},{"ym":"2025-08","v":0},{"ym":"2025-09","v":0},{"ym":"2025-10","v":0},{"ym":"2025-11","v":-0.2},{"ym":"2025-12","v":-0.2},{"ym":"2026-01","v":-0.2},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-0.1},{"ym":"2026-04","v":-0.3},{"ym":"2026-05","v":-0.3},{"ym":"2026-06","v":-0.2},{"ym":"2026-07","v":-0.2},{"ym":"2026-08","v":-0.3}],"Newspoll":[{"ym":"2025-08","v":0},{"ym":"2025-09","v":0.2},{"ym":"2025-10","v":0.3},{"ym":"2025-11","v":0.3},{"ym":"2025-12","v":0.5},{"ym":"2026-01","v":0.4},{"ym":"2026-02","v":0.4},{"ym":"2026-03","v":0.3},{"ym":"2026-04","v":0.3},{"ym":"2026-05","v":0.2},{"ym":"2026-06","v":0.2},{"ym":"2026-07","v":0.2},{"ym":"2026-08","v":0.2}],"Resolve":[{"ym":"2025-08","v":0.2},{"ym":"2025-09","v":0.1},{"ym":"2025-10","v":0},{"ym":"2025-11","v":-0.2},{"ym":"2025-12","v":-0.1},{"ym":"2026-01","v":-0.2},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-0.1},{"ym":"2026-04","v":0},{"ym":"2026-05","v":0.1},{"ym":"2026-06","v":0.1},{"ym":"2026-07","v":0},{"ym":"2026-08","v":0}],"Essential":[{"ym":"2025-10","v":-0.2},{"ym":"2025-11","v":-0.3},{"ym":"2025-12","v":-0.6},{"ym":"2026-01","v":-0.5},{"ym":"2026-02","v":-0.4},{"ym":"2026-03","v":-0.7},{"ym":"2026-04","v":-0.9},{"ym":"2026-05","v":-1},{"ym":"2026-06","v":-1},{"ym":"2026-07","v":-1.1},{"ym":"2026-08","v":-1}],"YouGov":[{"ym":"2025-10","v":0},{"ym":"2025-11","v":0.1},{"ym":"2025-12","v":0.1},{"ym":"2026-01","v":0.1},{"ym":"2026-02","v":0.1},{"ym":"2026-03","v":0.1},{"ym":"2026-04","v":0.2},{"ym":"2026-05","v":0.2},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":0},{"ym":"2026-08","v":0}],"Freshwater":[{"ym":"2025-11","v":0},{"ym":"2025-12","v":0},{"ym":"2026-01","v":0},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-0.1},{"ym":"2026-04","v":-0.3},{"ym":"2026-05","v":-0.5},{"ym":"2026-06","v":-0.5},{"ym":"2026-07","v":-0.4},{"ym":"2026-08","v":-0.3}],"Fox & Hedgehog":[{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-0.4},{"ym":"2026-04","v":-0.6},{"ym":"2026-05","v":-0.5},{"ym":"2026-06","v":-0.7},{"ym":"2026-07","v":-0.6},{"ym":"2026-08","v":-0.5}]};
+  const houseLean = {"tpp":{"Roy Morgan":[{"ym":"2025-06","v":0.1},{"ym":"2025-07","v":0.1},{"ym":"2025-08","v":0.1},{"ym":"2025-09","v":0.1},{"ym":"2025-10","v":0.2},{"ym":"2025-11","v":0.2},{"ym":"2025-12","v":0.2},{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":0.4},{"ym":"2026-03","v":0.5},{"ym":"2026-04","v":0.7},{"ym":"2026-05","v":0.7},{"ym":"2026-06","v":0.8},{"ym":"2026-07","v":0.8},{"ym":"2026-08","v":0.7}],"RedBridge / Accent":[{"ym":"2025-07","v":-0.2},{"ym":"2025-08","v":-0.1},{"ym":"2025-09","v":-0.4},{"ym":"2025-10","v":-0.5},{"ym":"2025-11","v":-0.3},{"ym":"2025-12","v":-0.1},{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":0.1},{"ym":"2026-03","v":0.1},{"ym":"2026-04","v":0},{"ym":"2026-05","v":0},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":-0.1},{"ym":"2026-08","v":-0.4}],"Spectre Strategy":[{"ym":"2025-07","v":0},{"ym":"2025-08","v":0},{"ym":"2025-09","v":0},{"ym":"2025-10","v":0},{"ym":"2025-11","v":-0.2},{"ym":"2025-12","v":-0.2},{"ym":"2026-01","v":-0.2},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-0.1},{"ym":"2026-04","v":-0.3},{"ym":"2026-05","v":-0.3},{"ym":"2026-06","v":-0.2},{"ym":"2026-07","v":-0.2},{"ym":"2026-08","v":-0.3}],"Newspoll":[{"ym":"2025-08","v":0},{"ym":"2025-09","v":0.2},{"ym":"2025-10","v":0.3},{"ym":"2025-11","v":0.3},{"ym":"2025-12","v":0.5},{"ym":"2026-01","v":0.4},{"ym":"2026-02","v":0.4},{"ym":"2026-03","v":0.3},{"ym":"2026-04","v":0.3},{"ym":"2026-05","v":0.2},{"ym":"2026-06","v":0.2},{"ym":"2026-07","v":0.2},{"ym":"2026-08","v":0.2}],"Resolve":[{"ym":"2025-08","v":0.2},{"ym":"2025-09","v":0.1},{"ym":"2025-10","v":0},{"ym":"2025-11","v":-0.2},{"ym":"2025-12","v":-0.1},{"ym":"2026-01","v":-0.2},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-0.1},{"ym":"2026-04","v":0},{"ym":"2026-05","v":0.1},{"ym":"2026-06","v":0.1},{"ym":"2026-07","v":0},{"ym":"2026-08","v":0}],"Essential":[{"ym":"2025-10","v":-0.2},{"ym":"2025-11","v":-0.3},{"ym":"2025-12","v":-0.6},{"ym":"2026-01","v":-0.5},{"ym":"2026-02","v":-0.4},{"ym":"2026-03","v":-0.7},{"ym":"2026-04","v":-0.9},{"ym":"2026-05","v":-1},{"ym":"2026-06","v":-1},{"ym":"2026-07","v":-1.1},{"ym":"2026-08","v":-1}],"YouGov":[{"ym":"2025-10","v":0},{"ym":"2025-11","v":0.1},{"ym":"2025-12","v":0.1},{"ym":"2026-01","v":0.1},{"ym":"2026-02","v":0.1},{"ym":"2026-03","v":0.1},{"ym":"2026-04","v":0.2},{"ym":"2026-05","v":0.2},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":0},{"ym":"2026-08","v":0}],"Freshwater":[{"ym":"2025-11","v":0},{"ym":"2025-12","v":0},{"ym":"2026-01","v":0},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-0.1},{"ym":"2026-04","v":-0.3},{"ym":"2026-05","v":-0.5},{"ym":"2026-06","v":-0.5},{"ym":"2026-07","v":-0.4},{"ym":"2026-08","v":-0.3}],"Fox & Hedgehog":[{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-0.4},{"ym":"2026-04","v":-0.6},{"ym":"2026-05","v":-0.5},{"ym":"2026-06","v":-0.7},{"ym":"2026-07","v":-0.6},{"ym":"2026-08","v":-0.5}]},"alp":{"Roy Morgan":[{"ym":"2025-06","v":0.1},{"ym":"2025-07","v":0.1},{"ym":"2025-08","v":0},{"ym":"2025-09","v":-0.1},{"ym":"2025-10","v":0},{"ym":"2025-11","v":-0.1},{"ym":"2025-12","v":-0.3},{"ym":"2026-01","v":-0.4},{"ym":"2026-02","v":-0.3},{"ym":"2026-03","v":-0.4},{"ym":"2026-04","v":-0.4},{"ym":"2026-05","v":-0.1},{"ym":"2026-06","v":-0.3},{"ym":"2026-07","v":-0.3},{"ym":"2026-08","v":-0.4}],"RedBridge / Accent":[{"ym":"2025-07","v":0.1},{"ym":"2025-08","v":0.1},{"ym":"2025-09","v":0},{"ym":"2025-10","v":0},{"ym":"2025-11","v":0.3},{"ym":"2025-12","v":0.5},{"ym":"2026-01","v":0.4},{"ym":"2026-02","v":0.8},{"ym":"2026-03","v":0.8},{"ym":"2026-04","v":0.8},{"ym":"2026-05","v":0.7},{"ym":"2026-06","v":0.5},{"ym":"2026-07","v":0.6},{"ym":"2026-08","v":0.5}],"Spectre Strategy":[{"ym":"2025-07","v":0},{"ym":"2025-08","v":0},{"ym":"2025-09","v":0},{"ym":"2025-10","v":0},{"ym":"2025-11","v":-0.1},{"ym":"2025-12","v":-0.1},{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-0.1},{"ym":"2026-04","v":-0.2},{"ym":"2026-05","v":-0.2},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":-0.1},{"ym":"2026-08","v":-0.1}],"DemosAU":[{"ym":"2025-07","v":0},{"ym":"2025-08","v":0},{"ym":"2025-09","v":0},{"ym":"2025-10","v":0},{"ym":"2025-11","v":0},{"ym":"2025-12","v":0},{"ym":"2026-01","v":-0.2},{"ym":"2026-02","v":-0.2},{"ym":"2026-03","v":-0.3},{"ym":"2026-04","v":-0.6},{"ym":"2026-05","v":-0.5},{"ym":"2026-06","v":-0.6},{"ym":"2026-07","v":-0.7},{"ym":"2026-08","v":-0.6}],"Newspoll":[{"ym":"2025-08","v":0.1},{"ym":"2025-09","v":0.1},{"ym":"2025-10","v":0.3},{"ym":"2025-11","v":0.4},{"ym":"2025-12","v":0.5},{"ym":"2026-01","v":0.5},{"ym":"2026-02","v":0.6},{"ym":"2026-03","v":0.6},{"ym":"2026-04","v":0.6},{"ym":"2026-05","v":0.5},{"ym":"2026-06","v":0.6},{"ym":"2026-07","v":0.9},{"ym":"2026-08","v":0.8}],"Resolve":[{"ym":"2025-08","v":0.1},{"ym":"2025-09","v":0.1},{"ym":"2025-10","v":0.1},{"ym":"2025-11","v":-0.1},{"ym":"2025-12","v":0.1},{"ym":"2026-01","v":0},{"ym":"2026-02","v":0.1},{"ym":"2026-03","v":0.1},{"ym":"2026-04","v":0},{"ym":"2026-05","v":0.2},{"ym":"2026-06","v":0.1},{"ym":"2026-07","v":0.1},{"ym":"2026-08","v":0.1}],"Essential":[{"ym":"2025-10","v":0},{"ym":"2025-11","v":0.2},{"ym":"2025-12","v":0.3},{"ym":"2026-01","v":0.3},{"ym":"2026-02","v":0.2},{"ym":"2026-03","v":0.2},{"ym":"2026-04","v":0.2},{"ym":"2026-05","v":0.2},{"ym":"2026-06","v":0.2},{"ym":"2026-07","v":0.3},{"ym":"2026-08","v":0.5}],"YouGov":[{"ym":"2025-10","v":-0.1},{"ym":"2025-11","v":-0.2},{"ym":"2025-12","v":-0.3},{"ym":"2026-01","v":-0.4},{"ym":"2026-02","v":-0.3},{"ym":"2026-03","v":-0.3},{"ym":"2026-04","v":-0.3},{"ym":"2026-05","v":-0.4},{"ym":"2026-06","v":-0.6},{"ym":"2026-07","v":-0.4},{"ym":"2026-08","v":-0.3}],"Freshwater":[{"ym":"2025-11","v":-0.1},{"ym":"2025-12","v":-0.1},{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":0.2},{"ym":"2026-03","v":0.1},{"ym":"2026-04","v":0.3},{"ym":"2026-05","v":0.4},{"ym":"2026-06","v":0.4},{"ym":"2026-07","v":0.3},{"ym":"2026-08","v":0.2}],"DemosAU (MRP)":[{"ym":"2025-11","v":-0.1},{"ym":"2025-12","v":-0.1},{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":-0.2},{"ym":"2026-03","v":-0.2},{"ym":"2026-04","v":-0.2},{"ym":"2026-05","v":-0.1},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":-0.3},{"ym":"2026-08","v":-0.2}],"Fox & Hedgehog":[{"ym":"2026-01","v":-0.2},{"ym":"2026-02","v":-0.2},{"ym":"2026-03","v":-0.1},{"ym":"2026-04","v":-0.1},{"ym":"2026-05","v":-0.1},{"ym":"2026-06","v":0},{"ym":"2026-07","v":0},{"ym":"2026-08","v":0}]},"lnp":{"Roy Morgan":[{"ym":"2025-06","v":0.1},{"ym":"2025-07","v":0.2},{"ym":"2025-08","v":0.2},{"ym":"2025-09","v":0.3},{"ym":"2025-10","v":0.2},{"ym":"2025-11","v":0.2},{"ym":"2025-12","v":0.3},{"ym":"2026-01","v":0.8},{"ym":"2026-02","v":0.5},{"ym":"2026-03","v":0.7},{"ym":"2026-04","v":0.8},{"ym":"2026-05","v":0.9},{"ym":"2026-06","v":0.5},{"ym":"2026-07","v":0.3},{"ym":"2026-08","v":0.5}],"RedBridge / Accent":[{"ym":"2025-07","v":0.1},{"ym":"2025-08","v":0.1},{"ym":"2025-09","v":0.1},{"ym":"2025-10","v":0.3},{"ym":"2025-11","v":0},{"ym":"2025-12","v":0.1},{"ym":"2026-01","v":0},{"ym":"2026-02","v":-0.6},{"ym":"2026-03","v":-0.7},{"ym":"2026-04","v":-0.9},{"ym":"2026-05","v":-0.7},{"ym":"2026-06","v":-0.6},{"ym":"2026-07","v":-0.6},{"ym":"2026-08","v":-0.5}],"Spectre Strategy":[{"ym":"2025-07","v":0.1},{"ym":"2025-08","v":0.1},{"ym":"2025-09","v":0.1},{"ym":"2025-10","v":0},{"ym":"2025-11","v":-0.1},{"ym":"2025-12","v":-0.1},{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":0},{"ym":"2026-03","v":0},{"ym":"2026-04","v":0.2},{"ym":"2026-05","v":0.1},{"ym":"2026-06","v":0.1},{"ym":"2026-07","v":0.1},{"ym":"2026-08","v":0.2}],"DemosAU":[{"ym":"2025-07","v":-0.5},{"ym":"2025-08","v":-0.4},{"ym":"2025-09","v":-0.3},{"ym":"2025-10","v":-0.2},{"ym":"2025-11","v":-0.2},{"ym":"2025-12","v":-0.2},{"ym":"2026-01","v":-0.2},{"ym":"2026-02","v":-0.3},{"ym":"2026-03","v":-0.2},{"ym":"2026-04","v":-0.1},{"ym":"2026-05","v":-0.1},{"ym":"2026-06","v":0.1},{"ym":"2026-07","v":-0.1},{"ym":"2026-08","v":-0.1}],"Newspoll":[{"ym":"2025-08","v":0},{"ym":"2025-09","v":-0.2},{"ym":"2025-10","v":-0.1},{"ym":"2025-11","v":-0.3},{"ym":"2025-12","v":-0.3},{"ym":"2026-01","v":-0.4},{"ym":"2026-02","v":-0.6},{"ym":"2026-03","v":-0.6},{"ym":"2026-04","v":-0.6},{"ym":"2026-05","v":-0.5},{"ym":"2026-06","v":-0.7},{"ym":"2026-07","v":-0.8},{"ym":"2026-08","v":-0.9}],"Resolve":[{"ym":"2025-08","v":-0.1},{"ym":"2025-09","v":-0.2},{"ym":"2025-10","v":-0.1},{"ym":"2025-11","v":0.2},{"ym":"2025-12","v":0.2},{"ym":"2026-01","v":0.7},{"ym":"2026-02","v":0.5},{"ym":"2026-03","v":0.4},{"ym":"2026-04","v":0.3},{"ym":"2026-05","v":0.4},{"ym":"2026-06","v":0.3},{"ym":"2026-07","v":0.4},{"ym":"2026-08","v":0.4}],"Essential":[{"ym":"2025-10","v":-0.1},{"ym":"2025-11","v":-0.1},{"ym":"2025-12","v":0},{"ym":"2026-01","v":0},{"ym":"2026-02","v":0.3},{"ym":"2026-03","v":0.6},{"ym":"2026-04","v":0.6},{"ym":"2026-05","v":0.6},{"ym":"2026-06","v":0.6},{"ym":"2026-07","v":0.7},{"ym":"2026-08","v":0.6}],"YouGov":[{"ym":"2025-10","v":-0.1},{"ym":"2025-11","v":0},{"ym":"2025-12","v":-0.2},{"ym":"2026-01","v":-0.3},{"ym":"2026-02","v":-0.6},{"ym":"2026-03","v":-0.6},{"ym":"2026-04","v":-0.8},{"ym":"2026-05","v":-0.8},{"ym":"2026-06","v":-0.5},{"ym":"2026-07","v":-0.6},{"ym":"2026-08","v":-0.5}],"Freshwater":[{"ym":"2025-11","v":0.4},{"ym":"2025-12","v":0.3},{"ym":"2026-01","v":0.3},{"ym":"2026-02","v":0.7},{"ym":"2026-03","v":0.6},{"ym":"2026-04","v":0.5},{"ym":"2026-05","v":0.7},{"ym":"2026-06","v":0.6},{"ym":"2026-07","v":0.5},{"ym":"2026-08","v":0.4}],"DemosAU (MRP)":[{"ym":"2025-11","v":-0.3},{"ym":"2025-12","v":-0.2},{"ym":"2026-01","v":-0.2},{"ym":"2026-02","v":-0.2},{"ym":"2026-03","v":-0.2},{"ym":"2026-04","v":-0.1},{"ym":"2026-05","v":-0.1},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":0},{"ym":"2026-08","v":0}],"Fox & Hedgehog":[{"ym":"2026-01","v":0.1},{"ym":"2026-02","v":0.1},{"ym":"2026-03","v":0.3},{"ym":"2026-04","v":0.3},{"ym":"2026-05","v":0.3},{"ym":"2026-06","v":0.5},{"ym":"2026-07","v":0.5},{"ym":"2026-08","v":0.4}]},"onp":{"Roy Morgan":[{"ym":"2025-06","v":-0.2},{"ym":"2025-07","v":-0.2},{"ym":"2025-08","v":-0.2},{"ym":"2025-09","v":-0.2},{"ym":"2025-10","v":-0.3},{"ym":"2025-11","v":-0.3},{"ym":"2025-12","v":-0.3},{"ym":"2026-01","v":-0.8},{"ym":"2026-02","v":-0.6},{"ym":"2026-03","v":-1},{"ym":"2026-04","v":-0.9},{"ym":"2026-05","v":-1.3},{"ym":"2026-06","v":-0.9},{"ym":"2026-07","v":-0.9},{"ym":"2026-08","v":-0.9}],"RedBridge / Accent":[{"ym":"2025-07","v":0.1},{"ym":"2025-08","v":0.1},{"ym":"2025-09","v":0.2},{"ym":"2025-10","v":0.3},{"ym":"2025-11","v":0.5},{"ym":"2025-12","v":0.4},{"ym":"2026-01","v":0.4},{"ym":"2026-02","v":0.7},{"ym":"2026-03","v":0.8},{"ym":"2026-04","v":1},{"ym":"2026-05","v":0.9},{"ym":"2026-06","v":1},{"ym":"2026-07","v":0.8},{"ym":"2026-08","v":1}],"Spectre Strategy":[{"ym":"2025-07","v":0},{"ym":"2025-08","v":0},{"ym":"2025-09","v":0},{"ym":"2025-10","v":0},{"ym":"2025-11","v":0.2},{"ym":"2025-12","v":0.2},{"ym":"2026-01","v":0.1},{"ym":"2026-02","v":0.1},{"ym":"2026-03","v":0.1},{"ym":"2026-04","v":0.2},{"ym":"2026-05","v":0.2},{"ym":"2026-06","v":0.2},{"ym":"2026-07","v":0.1},{"ym":"2026-08","v":0.1}],"DemosAU":[{"ym":"2025-07","v":0.1},{"ym":"2025-08","v":0.1},{"ym":"2025-09","v":0.1},{"ym":"2025-10","v":0.1},{"ym":"2025-11","v":0.1},{"ym":"2025-12","v":0},{"ym":"2026-01","v":0.3},{"ym":"2026-02","v":0.2},{"ym":"2026-03","v":0.4},{"ym":"2026-04","v":0.5},{"ym":"2026-05","v":0.4},{"ym":"2026-06","v":0.4},{"ym":"2026-07","v":0.5},{"ym":"2026-08","v":0.5}],"Newspoll":[{"ym":"2025-08","v":-0.1},{"ym":"2025-09","v":-0.2},{"ym":"2025-10","v":-0.3},{"ym":"2025-11","v":-0.2},{"ym":"2025-12","v":-0.2},{"ym":"2026-01","v":-0.3},{"ym":"2026-02","v":0},{"ym":"2026-03","v":0.2},{"ym":"2026-04","v":0.2},{"ym":"2026-05","v":0.2},{"ym":"2026-06","v":0.4},{"ym":"2026-07","v":0.6},{"ym":"2026-08","v":0.7}],"Resolve":[{"ym":"2025-08","v":-0.1},{"ym":"2025-09","v":0},{"ym":"2025-10","v":-0.1},{"ym":"2025-11","v":-0.4},{"ym":"2025-12","v":-0.6},{"ym":"2026-01","v":-1},{"ym":"2026-02","v":-0.8},{"ym":"2026-03","v":-0.7},{"ym":"2026-04","v":-0.6},{"ym":"2026-05","v":-0.8},{"ym":"2026-06","v":-0.6},{"ym":"2026-07","v":-0.6},{"ym":"2026-08","v":-0.4}],"Essential":[{"ym":"2025-10","v":0.1},{"ym":"2025-11","v":0.1},{"ym":"2025-12","v":0},{"ym":"2026-01","v":0},{"ym":"2026-02","v":-0.2},{"ym":"2026-03","v":-0.4},{"ym":"2026-04","v":-0.3},{"ym":"2026-05","v":-0.3},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":-0.3},{"ym":"2026-08","v":-0.3}],"YouGov":[{"ym":"2025-10","v":0},{"ym":"2025-11","v":-0.2},{"ym":"2025-12","v":0.1},{"ym":"2026-01","v":0.2},{"ym":"2026-02","v":0.6},{"ym":"2026-03","v":0.4},{"ym":"2026-04","v":0.6},{"ym":"2026-05","v":0.5},{"ym":"2026-06","v":0.3},{"ym":"2026-07","v":0.3},{"ym":"2026-08","v":0.1}],"Freshwater":[{"ym":"2025-11","v":-0.4},{"ym":"2025-12","v":-0.3},{"ym":"2026-01","v":-0.2},{"ym":"2026-02","v":-0.6},{"ym":"2026-03","v":-0.5},{"ym":"2026-04","v":-0.3},{"ym":"2026-05","v":-0.3},{"ym":"2026-06","v":-0.2},{"ym":"2026-07","v":-0.2},{"ym":"2026-08","v":-0.2}],"DemosAU (MRP)":[{"ym":"2025-11","v":0.3},{"ym":"2025-12","v":0.2},{"ym":"2026-01","v":0.2},{"ym":"2026-02","v":0.4},{"ym":"2026-03","v":0.3},{"ym":"2026-04","v":0.3},{"ym":"2026-05","v":0.2},{"ym":"2026-06","v":0.2},{"ym":"2026-07","v":0.3},{"ym":"2026-08","v":0.3}],"Fox & Hedgehog":[{"ym":"2026-01","v":0},{"ym":"2026-02","v":0},{"ym":"2026-03","v":0},{"ym":"2026-04","v":-0.1},{"ym":"2026-05","v":-0.1},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":-0.1},{"ym":"2026-08","v":-0.1}]}};
   const leaderMonths = [{"ym":"2025-05","x":2025.375,"alb_pref":null,"ley_pref":null,"taylor_pref":null,"hanson_pref":null,"alb_prefN":null,"ley_prefN":null,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":18,"ley_net":null,"taylor_net":null,"hanson_net":null,"alb_fav":null,"ley_fav":null,"taylor_fav":null,"hanson_fav":null,"alb_netCi":12.7,"ley_netCi":null,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":null,"ley_favCi":null,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-06","x":2025.4583333333333,"alb_pref":null,"ley_pref":null,"taylor_pref":null,"hanson_pref":null,"alb_prefN":null,"ley_prefN":null,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":17,"ley_net":null,"taylor_net":null,"hanson_net":null,"alb_fav":null,"ley_fav":null,"taylor_fav":null,"hanson_fav":null,"alb_netCi":7.1,"ley_netCi":null,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":null,"ley_favCi":null,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-07","x":2025.5416666666667,"alb_pref":46,"ley_pref":30,"taylor_pref":null,"hanson_pref":null,"alb_prefN":61,"ley_prefN":39,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":7,"ley_net":0,"taylor_net":null,"hanson_net":null,"alb_fav":null,"ley_fav":null,"taylor_fav":null,"hanson_fav":null,"alb_netCi":7.5,"ley_netCi":9.3,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":null,"ley_favCi":null,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-08","x":2025.625,"alb_pref":46,"ley_pref":29,"taylor_pref":null,"hanson_pref":null,"alb_prefN":62,"ley_prefN":38,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":2,"ley_net":-1,"taylor_net":null,"hanson_net":null,"alb_fav":null,"ley_fav":null,"taylor_fav":null,"hanson_fav":null,"alb_netCi":4.2,"ley_netCi":8.6,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":null,"ley_favCi":null,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-09","x":2025.7083333333333,"alb_pref":46,"ley_pref":28,"taylor_pref":null,"hanson_pref":null,"alb_prefN":62,"ley_prefN":38,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-3,"ley_net":-9,"taylor_net":null,"hanson_net":null,"alb_fav":null,"ley_fav":null,"taylor_fav":null,"hanson_fav":null,"alb_netCi":3.1,"ley_netCi":10.4,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":null,"ley_favCi":null,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-10","x":2025.7916666666667,"alb_pref":49,"ley_pref":27,"taylor_pref":null,"hanson_pref":null,"alb_prefN":64,"ley_prefN":36,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-3,"ley_net":-17,"taylor_net":null,"hanson_net":null,"alb_fav":-7,"ley_fav":-5,"taylor_fav":null,"hanson_fav":null,"alb_netCi":2.6,"ley_netCi":7.5,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":6.3,"ley_favCi":6.3,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-11","x":2025.875,"alb_pref":44,"ley_pref":21,"taylor_pref":null,"hanson_pref":null,"alb_prefN":69,"ley_prefN":31,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":1,"ley_net":-17,"taylor_net":null,"hanson_net":null,"alb_fav":-2,"ley_fav":-21,"taylor_fav":null,"hanson_fav":-13,"alb_netCi":3.5,"ley_netCi":8.7,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":6.8,"ley_favCi":7.6,"taylor_favCi":null,"hanson_favCi":6.8},{"ym":"2025-12","x":2025.9583333333333,"alb_pref":40,"ley_pref":23,"taylor_pref":null,"hanson_pref":null,"alb_prefN":65,"ley_prefN":35,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-2,"ley_net":-7,"taylor_net":null,"hanson_net":null,"alb_fav":1,"ley_fav":-8,"taylor_fav":null,"hanson_fav":-19,"alb_netCi":8.2,"ley_netCi":4.4,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":7.6,"ley_favCi":14.5,"taylor_favCi":null,"hanson_favCi":6.9},{"ym":"2026-01","x":2026.0416666666667,"alb_pref":42,"ley_pref":26,"taylor_pref":null,"hanson_pref":null,"alb_prefN":63,"ley_prefN":37,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":39,"ley_pref3":16,"taylor_pref3":null,"hanson_pref3":26,"alb_prefN3":48,"ley_prefN3":20,"taylor_prefN3":null,"hanson_prefN3":32,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-15,"ley_net":-22,"taylor_net":null,"hanson_net":null,"alb_fav":-11,"ley_fav":-11,"taylor_fav":null,"hanson_fav":-1,"alb_netCi":3.7,"ley_netCi":6.2,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":3.2,"ley_favCi":7.4,"taylor_favCi":null,"hanson_favCi":6.6},{"ym":"2026-02","x":2026.125,"alb_pref":43,"ley_pref":26,"taylor_pref":36,"hanson_pref":null,"alb_prefN":58,"ley_prefN":37,"taylor_prefN":45,"hanson_prefN":null,"alb_pref3":36,"ley_pref3":null,"taylor_pref3":15,"hanson_pref3":24,"alb_prefN3":48,"ley_prefN3":null,"taylor_prefN3":19,"hanson_prefN3":33,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-13,"ley_net":-31,"taylor_net":1,"hanson_net":9,"alb_fav":-14,"ley_fav":-15,"taylor_fav":-2,"hanson_fav":1,"alb_netCi":3.6,"ley_netCi":7.7,"taylor_netCi":3.6,"hanson_netCi":6.1,"alb_favCi":3.6,"ley_favCi":5.8,"taylor_favCi":3.3,"hanson_favCi":4.6},{"ym":"2026-03","x":2026.2083333333333,"alb_pref":41,"ley_pref":null,"taylor_pref":35,"hanson_pref":null,"alb_prefN":54,"ley_prefN":null,"taylor_prefN":46,"hanson_prefN":null,"alb_pref3":33,"ley_pref3":null,"taylor_pref3":14,"hanson_pref3":23,"alb_prefN3":47,"ley_prefN3":null,"taylor_prefN3":20,"hanson_prefN3":33,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-16,"ley_net":null,"taylor_net":1,"hanson_net":5,"alb_fav":-17,"ley_fav":null,"taylor_fav":6,"hanson_fav":4,"alb_netCi":2.7,"ley_netCi":null,"taylor_netCi":2.6,"hanson_netCi":5.8,"alb_favCi":5,"ley_favCi":null,"taylor_favCi":16.7,"hanson_favCi":11.6},{"ym":"2026-04","x":2026.2916666666667,"alb_pref":42,"ley_pref":null,"taylor_pref":36,"hanson_pref":null,"alb_prefN":54,"ley_prefN":null,"taylor_prefN":46,"hanson_prefN":null,"alb_pref3":34,"ley_pref3":null,"taylor_pref3":18,"hanson_pref3":24,"alb_prefN3":45,"ley_prefN3":null,"taylor_prefN3":24,"hanson_prefN3":31,"alb_prefH":47,"hanson_prefH":39,"taylor_prefH":null,"ley_prefH":null,"alb_net":-15,"ley_net":null,"taylor_net":-1,"hanson_net":null,"alb_fav":-15,"ley_fav":null,"taylor_fav":2,"hanson_fav":1,"alb_netCi":2.6,"ley_netCi":null,"taylor_netCi":6.3,"hanson_netCi":null,"alb_favCi":6,"ley_favCi":null,"taylor_favCi":4.8,"hanson_favCi":3.5},{"ym":"2026-05","x":2026.375,"alb_pref":40,"ley_pref":null,"taylor_pref":37,"hanson_pref":null,"alb_prefN":51,"ley_prefN":null,"taylor_prefN":49,"hanson_prefN":null,"alb_pref3":33,"ley_pref3":null,"taylor_pref3":19,"hanson_pref3":26,"alb_prefN3":42,"ley_prefN3":null,"taylor_prefN3":24,"hanson_prefN3":34,"alb_prefH":52,"hanson_prefH":37,"taylor_prefH":null,"ley_prefH":null,"alb_net":-19,"ley_net":null,"taylor_net":-3,"hanson_net":8,"alb_fav":-18,"ley_fav":null,"taylor_fav":3,"hanson_fav":6,"alb_netCi":2.2,"ley_netCi":null,"taylor_netCi":3.8,"hanson_netCi":5.4,"alb_favCi":3.5,"ley_favCi":null,"taylor_favCi":4.7,"hanson_favCi":6.1},{"ym":"2026-06","x":2026.4583333333333,"alb_pref":43,"ley_pref":null,"taylor_pref":37,"hanson_pref":null,"alb_prefN":54,"ley_prefN":null,"taylor_prefN":46,"hanson_prefN":null,"alb_pref3":32,"ley_pref3":null,"taylor_pref3":15,"hanson_pref3":28,"alb_prefN3":43,"ley_prefN3":null,"taylor_prefN3":20,"hanson_prefN3":37,"alb_prefH":47,"hanson_prefH":41,"taylor_prefH":null,"ley_prefH":null,"alb_net":-21,"ley_net":null,"taylor_net":-4,"hanson_net":null,"alb_fav":-20,"ley_fav":null,"taylor_fav":-7,"hanson_fav":-5,"alb_netCi":3.6,"ley_netCi":null,"taylor_netCi":5.1,"hanson_netCi":null,"alb_favCi":4.4,"ley_favCi":null,"taylor_favCi":3.5,"hanson_favCi":6.9},{"ym":"2026-07","x":2026.5416666666667,"alb_pref":44,"ley_pref":null,"taylor_pref":36,"hanson_pref":null,"alb_prefN":55,"ley_prefN":null,"taylor_prefN":45,"hanson_prefN":null,"alb_pref3":37,"ley_pref3":null,"taylor_pref3":20,"hanson_pref3":27,"alb_prefN3":44,"ley_prefN3":null,"taylor_prefN3":24,"hanson_prefN3":32,"alb_prefH":49,"hanson_prefH":36,"taylor_prefH":null,"ley_prefH":null,"alb_net":-16,"ley_net":null,"taylor_net":-11,"hanson_net":1,"alb_fav":-18,"ley_fav":null,"taylor_fav":-5,"hanson_fav":-6,"alb_netCi":2.6,"ley_netCi":null,"taylor_netCi":7.4,"hanson_netCi":4,"alb_favCi":4.8,"ley_favCi":null,"taylor_favCi":2.7,"hanson_favCi":4.8},{"ym":"2026-08","x":2026.625,"alb_pref":43,"ley_pref":null,"taylor_pref":38,"hanson_pref":null,"alb_prefN":53,"ley_prefN":null,"taylor_prefN":47,"hanson_prefN":null,"alb_pref3":38,"ley_pref3":null,"taylor_pref3":21,"hanson_pref3":27,"alb_prefN3":44,"ley_prefN3":null,"taylor_prefN3":24,"hanson_prefN3":32,"alb_prefH":52,"hanson_prefH":39,"taylor_prefH":null,"ley_prefH":null,"alb_net":-21,"ley_net":null,"taylor_net":-8,"hanson_net":1,"alb_fav":-17,"ley_fav":null,"taylor_fav":-2,"hanson_fav":-7,"alb_netCi":2.5,"ley_netCi":null,"taylor_netCi":5,"hanson_netCi":4.1,"alb_favCi":3.7,"ley_favCi":null,"taylor_favCi":4.1,"hanson_favCi":11.2}];
   const direction = [{"ym":"2025-05","x":2025.375,"right":37.5,"wrong":41.8,"unsure":20.7,"net":-4.3,"n":1,"rightCi":3.5,"wrongCi":3.5},{"ym":"2025-06","x":2025.4583333333333,"right":41.1,"wrong":43.4,"unsure":15.5,"net":-2.3,"n":3,"rightCi":2.4,"wrongCi":2.5},{"ym":"2025-07","x":2025.5416666666667,"right":37.3,"wrong":46.2,"unsure":16.5,"net":-8.9,"n":2,"rightCi":1.9,"wrongCi":1.9},{"ym":"2025-08","x":2025.625,"right":36.5,"wrong":49.5,"unsure":14,"net":-13,"n":2,"rightCi":2.5,"wrongCi":3.5},{"ym":"2025-09","x":2025.7083333333333,"right":33,"wrong":52,"unsure":15,"net":-19,"n":2,"rightCi":1.8,"wrongCi":2.5},{"ym":"2025-10","x":2025.7916666666667,"right":34,"wrong":51.1,"unsure":14.9,"net":-17.1,"n":3,"rightCi":1.5,"wrongCi":3.9},{"ym":"2025-11","x":2025.875,"right":34,"wrong":50.1,"unsure":15.9,"net":-16.1,"n":2,"rightCi":1.8,"wrongCi":3.6},{"ym":"2025-12","x":2025.9583333333333,"right":34.3,"wrong":50.1,"unsure":15.6,"net":-15.8,"n":2,"rightCi":2.9,"wrongCi":2.5},{"ym":"2026-01","x":2026.0416666666667,"right":27.6,"wrong":53.7,"unsure":18.7,"net":-26.1,"n":4,"rightCi":4.8,"wrongCi":5.2},{"ym":"2026-02","x":2026.125,"right":30.6,"wrong":54.6,"unsure":14.8,"net":-24,"n":6,"rightCi":2.3,"wrongCi":3.4},{"ym":"2026-03","x":2026.2083333333333,"right":27.9,"wrong":57.6,"unsure":14.5,"net":-29.7,"n":6,"rightCi":2.6,"wrongCi":2},{"ym":"2026-04","x":2026.2916666666667,"right":26.8,"wrong":58.4,"unsure":14.8,"net":-31.6,"n":5,"rightCi":2,"wrongCi":2.4},{"ym":"2026-05","x":2026.375,"right":26.8,"wrong":59,"unsure":14.2,"net":-32.2,"n":6,"rightCi":1.2,"wrongCi":1.3},{"ym":"2026-06","x":2026.4583333333333,"right":27.2,"wrong":59.2,"unsure":13.6,"net":-32,"n":5,"rightCi":2.6,"wrongCi":4},{"ym":"2026-07","x":2026.5416666666667,"right":26.4,"wrong":57.8,"unsure":15.8,"net":-31.4,"n":5,"rightCi":1.3,"wrongCi":2.5},{"ym":"2026-08","x":2026.625,"right":25.1,"wrong":59.7,"unsure":15.2,"net":-34.6,"n":5,"rightCi":2.2,"wrongCi":1.5}];
   const directionHouseEffects = {"right":{"Essential":{"v":0.8,"n":21},"Roy Morgan":{"v":-0.4,"n":41},"Freshwater":{"v":0.2,"n":1}},"wrong":{"Essential":{"v":-1.8,"n":21},"Roy Morgan":{"v":0.7,"n":41},"Freshwater":{"v":0.1,"n":1}}};
@@ -14661,14 +14670,24 @@ function PopRow({
 
 // ====================================================================
 // VariancePanel – how far apart the polls sit, against the spread that
-// sampling error alone would produce.  One panel per archive facet, so
-// the measures on screen are the ones the table below is showing.
+// sampling error alone would produce.  The page facet seeds the measure
+// set, and on the voting facets an in-panel 2PP | Primaries toggle flips
+// between them (leadership keeps its own set, untoggled).
 //
 // Deliberately computed over EVERY poll in the archive, never the
 // filtered subset: "how much do pollsters disagree" is a property of the
 // industry, and filtering to one house would make it meaningless.  The
 // date range still moves the chart window, because that's just framing.
 // ====================================================================
+/* the in-panel choice between the two voting views – the 2PP matchups, or
+   the ALP / L/NP / ON primaries (the same trio the archive table offers) */
+const VAR_VOTE_VIEWS = [{
+  id: "twopp",
+  label: "2PP"
+}, {
+  id: "primary",
+  label: "Primaries"
+}];
 function VariancePanel({
   facet,
   rangeId
@@ -14684,10 +14703,13 @@ function VariancePanel({
   } = window.AP;
   const narrow = useNarrow();
   const [hidden, setHidden] = useState({});
+  // the page facet seeds the view (the parent remounts this panel per facet,
+  // so a facet switch re-syncs); the in-panel toggle flips the voting views
+  const [view, setView] = useState(facet);
 
   // a measure with no computable window anywhere (e.g. Hanson's net, polled
   // by too few houses at a time) is dropped rather than shown as a flat gap
-  const rows = discordFacet(facet).map(m => ({
+  const rows = discordFacet(view).map(m => ({
     m,
     pts: discord(m.id)
   })).filter(r => r.pts.some(d => d.sigma != null));
@@ -14747,7 +14769,7 @@ function VariancePanel({
       d: pts[pts.length - 1]
     };
   });
-  const unitNote = facet === "leadership" ? "net approval points" : "percentage points";
+  const unitNote = view === "leadership" ? "net approval points" : "percentage points";
   return /*#__PURE__*/React.createElement("section", {
     className: "ap-var",
     id: "poll-disagreement"
@@ -14757,7 +14779,12 @@ function VariancePanel({
     className: "ap-var-title"
   }, "Poll disagreement"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, "How far apart the polls sit, against the spread sampling error alone would produce. The shading is that chance floor \u2013 a line inside it means the houses are running tighter than random sampling permits. Measured across all ", D.individualPolls.length, " polls; the filters above don\u2019t narrow it.")), /*#__PURE__*/React.createElement("div", {
+  }, "How far apart the polls sit, against the spread sampling error alone would produce. The shading is that chance floor \u2013 a line inside it means the houses are running tighter than random sampling permits. Measured across all ", D.individualPolls.length, " polls; the filters above don\u2019t narrow it."), (facet === "twopp" || facet === "primary") && /*#__PURE__*/React.createElement(TextToggle, {
+    value: view === "primary" ? "primary" : "twopp",
+    onChange: setView,
+    options: VAR_VOTE_VIEWS,
+    ariaLabel: "Disagreement measure"
+  })), /*#__PURE__*/React.createElement("div", {
     className: "legend"
   }, latest.map(({
     m,
@@ -14785,7 +14812,7 @@ function VariancePanel({
       className: "legend-val vr-" + read.id
     }, d.R.toFixed(2), "\xD7"));
   }))), /*#__PURE__*/React.createElement(TrendChart, {
-    key: "var-" + facet + "-" + rangeId,
+    key: "var-" + view + "-" + rangeId,
     height: narrow ? 500 : 300,
     xDomain: xDomain,
     yDomain: domain,
@@ -14849,7 +14876,7 @@ function VariancePanel({
     }, d.R.toFixed(2), "\xD7 the ", d.floor.toFixed(2), "pp floor", d.excess > 0.05 && /*#__PURE__*/React.createElement(React.Fragment, null, " \xB7 ", d.excess.toFixed(2), "pp unexplained")));
   })), /*#__PURE__*/React.createElement("p", {
     className: "table-hint ap-var-note"
-  }, "Spread is the recency-weighted standard deviation of each poll\u2019s distance from a local trend, in ", unitNote, " \u2013 recency-weighted only, because weighting by sample size would mute exactly the small divergent polls being measured. The floor is what a design effect of ", window.AP.DISC.DEFF, " and each poll\u2019s own sample size predict. Their ratio reads: under 0.80\xD7 herded \xB7 Around 1\xD7 as close as sampling allows \xB7 Over 1.20\xD7 genuinely apart.", facet === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."));
+  }, "Spread is the recency-weighted standard deviation of each poll\u2019s distance from a local trend, in ", unitNote, " \u2013 recency-weighted only, because weighting by sample size would mute exactly the small divergent polls being measured. The floor is what a design effect of ", window.AP.DISC.DEFF, " and each poll\u2019s own sample size predict. Their ratio reads: under 0.80\xD7 herded \xB7 Around 1\xD7 as close as sampling allows \xB7 Over 1.20\xD7 genuinely apart.", view === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."));
 }
 
 // ====================================================================
@@ -14890,6 +14917,50 @@ function houseLeanColour(firm) {
   for (let i = 0; i < firm.length; i++) h = (h * 31 + firm.charCodeAt(i)) % 997;
   return "oklch(0.63 0.145 " + (99 + h % 9 * 29) + ")";
 }
+
+/* House lean over time, keyed by measure: the 2PP trace gets the classic
+   two-party ground (Labor above the line, Coalition below); a primary trace
+   tints above-zero with its own party's wash and leaves below-zero neutral.
+   Offered measures mirror the Poll-disagreement trio plus the 2PP. */
+const LEAN_MEASURES = [{
+  id: "tpp",
+  label: "2PP"
+}, {
+  id: "alp",
+  label: "ALP"
+}, {
+  id: "lnp",
+  label: "L/NP"
+}, {
+  id: "onp",
+  label: "ON"
+}];
+const LEAN_MEASURE_META = {
+  tpp: {
+    phrase: "the 2PP",
+    above: "lean-band-alp",
+    below: "lean-band-lnp",
+    ground: "The ground is Labor red / Coalition blue around zero: a house inside the blue band runs ahead of the consensus on the Coalition's 2PP (pushes the 2PP toward them), inside the red band ahead on Labor's."
+  },
+  alp: {
+    phrase: "Labor's primary vote",
+    above: "lean-band-alp",
+    below: "lean-band-ink",
+    ground: "The ground colours the side of zero a house sits on: inside the red band it runs ahead of the consensus on Labor's primary vote, below zero it trails it."
+  },
+  lnp: {
+    phrase: "the Coalition's primary vote",
+    above: "lean-band-lnp",
+    below: "lean-band-ink",
+    ground: "The ground colours the side of zero a house sits on: inside the blue band it runs ahead of the consensus on the Coalition's primary vote, below zero it trails it."
+  },
+  onp: {
+    phrase: "One Nation's primary vote",
+    above: "lean-band-onp",
+    below: "lean-band-ink",
+    ground: "The ground colours the side of zero a house sits on: inside the tinted band it runs ahead of the consensus on One Nation's primary vote, below zero it trails it."
+  }
+};
 function HouseLeanPanel({
   rangeId
 }) {
@@ -14900,17 +14971,22 @@ function HouseLeanPanel({
     monthLabelFull
   } = window.AP;
   const narrow = useNarrow();
+  const [measure, setMeasure] = useState("tpp");
   const [hidden, setHidden] = useState({});
-  if (!D.houseLean) return null; // an older dataset build: absence, never zero
+  const meta = LEAN_MEASURE_META[measure] || LEAN_MEASURE_META.tpp;
+  // older dataset builds carry houseLean 2PP-only (flat) or not at all –
+  // absence is never zero, so a measure with no emitted map folds the panel
+  const leanMap = D.houseLean && D.houseLean[measure];
+  if (!leanMap) return null;
 
   // gen-data emits only houses with >=3 polls of evidence – nobody is drawn
   // wobbling on nearly nothing
-  const houses = Object.keys(D.houseLean).sort();
+  const houses = Object.keys(leanMap).sort();
   if (!houses.length) return null;
   const xDomain = rangeDomain(rangeId);
   const inWin = d => d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1];
   const rows = houses.map(firm => {
-    const all = D.houseLean[firm].map(d => ({
+    const all = leanMap[firm].map(d => ({
       x: D.mx(d.ym),
       y: d.v
     }));
@@ -14962,21 +15038,26 @@ function HouseLeanPanel({
     className: "ap-var-title"
   }, "House lean"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, "How far each pollster sits from the consensus of the houses polling around it, estimated month by month \u2013 the same ", /*#__PURE__*/React.createElement("button", {
+  }, "How far each pollster sits from the consensus of the houses polling around it", "on " + meta.phrase, ", estimated month by month \u2013 the same", /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("house-effect", "House lean")
-  }, "house effect"), " the aggregates subtract, shown as it has walked. The chart above spreads the houses against chance; this one tracks where each one stands.")), /*#__PURE__*/React.createElement("div", {
+  }, "house effect"), " ", "the aggregates subtract, shown as it has walked. The chart above spreads the houses against chance; this one tracks where each one stands."), /*#__PURE__*/React.createElement(TextToggle, {
+    value: measure,
+    onChange: setMeasure,
+    options: LEAN_MEASURES,
+    ariaLabel: "House-lean measure"
+  })), /*#__PURE__*/React.createElement("div", {
     className: "legend"
   }, latest.map(e => {
     const s = (e.v > 0 ? "+" : e.v < 0 ? "−" : "") + Math.abs(e.v).toFixed(1) + "pp";
-    const he = D.houseEffects && D.houseEffects.tpp && D.houseEffects.tpp[e.firm];
+    const he = D.houseEffects && (measure === "tpp" ? D.houseEffects.tpp && D.houseEffects.tpp[e.firm] : D.houseEffects.primary && D.houseEffects.primary[measure] && D.houseEffects.primary[measure][e.firm]);
     return /*#__PURE__*/React.createElement("button", {
       key: e.firm,
       type: "button",
       className: "legend-chip" + (hidden[e.firm] ? " off" : ""),
       "aria-pressed": !hidden[e.firm],
-      title: e.firm + " – currently " + s.replace("−", "-") + " against the consensus" + (he && he.n ? " · pooled from " + he.n + " polls" : ""),
+      title: e.firm + " – currently " + s.replace("−", "-") + " against the consensus on " + meta.phrase + (he && he.n ? " · pooled from " + he.n + " polls" : ""),
       onClick: () => setHidden(h => ({
         ...h,
         [e.firm]: !h[e.firm]
@@ -14992,7 +15073,7 @@ function HouseLeanPanel({
       className: "legend-val"
     }, s));
   }))), /*#__PURE__*/React.createElement(TrendChart, {
-    key: "lean-" + rangeId,
+    key: "lean-" + measure + "-" + rangeId,
     height: narrow ? 500 : 300,
     xDomain: xDomain,
     yDomain: domain,
@@ -15009,11 +15090,11 @@ function HouseLeanPanel({
     bands: [{
       y0: 0,
       y1: domain[1],
-      className: "lean-band-alp"
+      className: meta.above
     }, {
       y0: domain[0],
       y1: 0,
-      className: "lean-band-lnp"
+      className: meta.below
     }],
     refLines: [{
       y: 0,
@@ -15022,11 +15103,11 @@ function HouseLeanPanel({
     series: chartSeries,
     spine: spine,
     tooltipTitle: i => monthLabelFull(spineYm[i]),
-    ariaLabel: "Pollster house lean over time – how far each pollster sits from the cross-house consensus; the ground above zero is tinted Labor red, below zero Coalition blue",
+    ariaLabel: "Pollster house lean over time on " + meta.phrase + " – how far each pollster sits from the cross-house consensus",
     fmt: v => (v > 0 ? "+" : "") + v.toFixed(1)
   }), /*#__PURE__*/React.createElement("p", {
     className: "table-hint ap-var-note"
-  }, "Above zero \u2013 the red ground \u2013 leans to Labor on the classic two-party, the blue below it to the Coalition. Each point reads the lean as of that month, with the 90-day half-life on the evidence, so a house\u2019s current method outranks its history; the All-polls table\u2019s House-effect column instead pools each pollster\u2019s whole history into one standing figure, which is why its numbers won\u2019t match the right-hand edge here."));
+  }, meta.ground + " ", "Each point reads the lean as of that month, with the 90-day half-life on the evidence, so a house\u2019s current method outranks its history; the All-polls table\u2019s House-effect column instead pools each pollster\u2019s whole history into one standing figure, which is why its numbers won\u2019t match the right-hand edge here."));
 }
 function AllPollsView({
   focus,
@@ -15231,16 +15312,17 @@ function AllPollsView({
       block: "start"
     });
   };
-  /* house lean only mounts on the 2PP facet – from another facet the jump
-     switches views first, and the scroll has to wait on the remount */
+  /* house lean mounts on the voting facets (2PP and Primary) – from a
+     leadership/direction view the jump switches facets first, and the
+     scroll has to wait on the remount */
   const leanJump = useRef(false);
   React.useEffect(() => {
-    if (!leanJump.current || facet !== "twopp") return;
+    if (!leanJump.current || facet !== "twopp" && facet !== "primary") return;
     leanJump.current = false;
     jumpTo("house-lean");
   }, [facet]);
   const jumpToLean = () => {
-    if (facet === "twopp") jumpTo("house-lean");else {
+    if (facet === "twopp" || facet === "primary") jumpTo("house-lean");else {
       leanJump.current = true;
       onFacet("twopp");
     }
@@ -16090,9 +16172,10 @@ function AllPollsView({
   }, "Clear filters")))))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
   }, "Tap any poll for its full breakdown \xB7 Dates are fieldwork windows (publication dates sit in the breakdown) \xB7 \u201CAs published\u201D lists each poll\u2019s headline figures exactly as the pollster released them \xB7 The lead bar shows the selected matchup where a pollster published it \xB7 \u201CPoll lean\u201D is the poll minus the aggregate for that month \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t publish that measure \xB7 Search matches anything in a row \xB7 Click any column heading to sort.", " ", /*#__PURE__*/React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll.", " ", /*#__PURE__*/React.createElement("strong", null, "Eff. n"), " is the pollster\u2019s own published effective sample, filed with the Australian Polling Council \u2013 Newspoll, YouGov, Essential and DemosAU file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown."), /*#__PURE__*/React.createElement(VariancePanel, {
+    key: facet,
     facet: facet,
     rangeId: range
-  }), facet === "twopp" && /*#__PURE__*/React.createElement(HouseLeanPanel, {
+  }), (facet === "twopp" || facet === "primary") && /*#__PURE__*/React.createElement(HouseLeanPanel, {
     rangeId: range
   }));
 }
