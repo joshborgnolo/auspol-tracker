@@ -44,6 +44,8 @@ const PAGES = [
   { url: "/archives/newspoll/", name: "newspoll", maxw: "680px" },
   { url: "/archives/acnielsen/", name: "acnielsen", maxw: "680px" },
   { url: "/archives/morgan/", name: "morgan", maxw: "1200px" }, // verbatim tables stay wide
+  { url: "/archives/galaxy/", name: "galaxy", maxw: "1080px" },
+  { url: "/archives/trove/", name: "trove", maxw: "1080px" },
 ];
 
 const H1_PROPS = ["fontFamily", "fontSize", "fontWeight", "letterSpacing", "marginBottom", "color"];
@@ -137,7 +139,7 @@ try {
         eq("column padding-left", got.col.paddingLeft, live.col.paddingLeft);
         eq("column max-width", got.col.maxWidth, spec.maxw);
       } else fail("column: .frame-wrap missing");
-      if (spec.name !== "morgan" && live.col) eq("column aligns with live 680px", got.col.maxWidth, live.col.maxWidth);
+      if (spec.maxw === "680px" && live.col) eq("column aligns with live 680px", got.col.maxWidth, live.col.maxWidth);
       if (!got.serif600Loaded) fail("Crimson Text 600 not loadable");
       if (!got.sansLoaded) fail("IBM Plex Sans not loadable");
       if (!(got.gone.siteHead && got.gone.glyph && got.gone.wordmark))

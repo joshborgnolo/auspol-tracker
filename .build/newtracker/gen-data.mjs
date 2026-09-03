@@ -1994,10 +1994,40 @@ pollCadence.sort((a, b) => a.cadence - b.cadence);
    two halves. The current cycle is omitted: its source rows are individualPolls,
    already in the payload, and the export reads them from there. */
 const cycleSource = {};
+/* ---- Trove newspaper coverage per term ----------------------------------
+   The archives/trove harvest (refresh-trove-archive products) counted per
+   term [election, next election). Goes on the sidecar so a solo term can
+   say how thick its newspaper record is; missing files (no local harvest)
+   leave no key and the panel shows nothing. */
+const troveByTerm = (() => {
+  try {
+    const monFile = path.join(ROOT, "data", "trove-mentions-monthly.csv");
+    if (!fs.existsSync(monFile)) return null;
+    const months = fs.readFileSync(monFile, "utf8").trim().split("\n").slice(1)
+      .map((l) => { const [y, m, a] = l.split(",").map(Number); return { k: y * 12 + m, a }; });
+    const pollFile = path.join(ROOT, "data", "trove-poll-articles.csv");
+    const pollIsos = fs.existsSync(pollFile)
+      ? fs.readFileSync(pollFile, "utf8").trim().split("\n").slice(1)
+        .map((l) => l.split(",")[1]).filter((d) => /^\d{4}-\d{2}-\d{2}$/.test(d))
+      : [];
+    const out = {};
+    for (let i = 0; i + 1 < CYC_META.length; i++) {
+      const a = CYC_META[i], b = CYC_META[i + 1]; // rows are year-sorted
+      const k1 = +a.eDate.slice(0, 4) * 12 + +a.eDate.slice(5, 7);
+      const k2 = +b.eDate.slice(0, 4) * 12 + +b.eDate.slice(5, 7);
+      let articles = 0, pollArticles = 0;
+      for (const mo of months) if (mo.k >= k1 && mo.k < k2) articles += mo.a;
+      for (const iso of pollIsos) if (iso >= a.eDate && iso < b.eDate) pollArticles++;
+      if (articles > 0) out[a.year] = { articles, pollArticles };
+    }
+    return out;
+  } catch { return null; }
+})();
 for (const c of CYC_META) {
   if (c.current) continue;
   const mo = (d) => Math.round(monthsSince(d, c.eDate) * 10) / 10;
   cycleSource[c.year] = {
+    ...(troveByTerm && troveByTerm[c.year] ? { trove: troveByTerm[c.year] } : {}),
     polls: (cyclePolls[c.src] || []).map((p) => ({
       date: p.date, firm: p.firm, m: mo(p.date),
       alp: p.alp ?? null, lnp: p.lnp ?? null, grn: p.grn ?? null,
