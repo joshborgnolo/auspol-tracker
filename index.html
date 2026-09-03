@@ -17091,6 +17091,14 @@ function infoTerms(D) {
     term: "House effect",
     body: /*#__PURE__*/React.createElement(React.Fragment, null, "A pollster\u2019s own lean against the consensus of the houses polling around it, pooled from its polls with a 90-day half-life so recent polls count for more \u2013 the lean tracks a house\u2019s current method rather than averaging it with its history \u2013 and shrunk toward zero while the evidence is thin. The aggregates subtract it, read as of the time each figure describes. It is measured separately for every measure \u2013 a firm that leans one way on the classic two-party is not assumed to lean the same way on a primary share or on an ALP-v-One Nation head-to-head \u2013 and it is a property of the pollster, not of any single poll.")
   }, {
+    id: "poll-lean",
+    term: "Poll lean",
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "How far one published poll sits from the consensus around it: the poll\u2019s own figure minus the weighted aggregate for the month it was taken. It is a property of this one poll, not of the pollster \u2013 sampling luck alone can land a survey off the consensus, so a single lean carries little weight; a house leaning the same way over and over is showing ", xref("house-effect", "poll-lean", "its house effect"), ". Poll lean is sortable in the All polls archive and printed in each poll\u2019s breakdown.")
+  }, {
+    id: "house-lean",
+    term: "House lean",
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "A pollster\u2019s ", xref("house-effect", "house-lean", "house effect"), " read month by month instead of only as it stands now, so a change of method or hands shows up where it happened rather than smeared across the house\u2019s history. Estimated per measure \u2013 a firm can walk one way on two-party and another on a primary share \u2013 and the aggregates still subtract the as-of-date value; the trace is the same estimator re-read at each month.")
+  }, {
     id: "chance-consistent",
     term: "Chance-consistent",
     body: /*#__PURE__*/React.createElement(React.Fragment, null, "The Poll disagreement panel\u2019s verdict when the houses agree as well as polling lets them. Even on an unmoved electorate no two surveys match, because each is a sample: a scatter of", " ", xref("margin-of-error", "chance-consistent", "sampling error"), " around the truth is expected. The panel sets the spread the houses actually show against the spread sampling error alone predicts \u2013 the chance floor, built from each poll\u2019s own sample size \u2013 and a ratio between 0.80\xD7 and 1.20\xD7 reads chance-consistent. Tighter than 0.80\xD7 and the polls are huddled closer than independent sampling can explain \u2013 herding; wider than 1.20\xD7 and they begin to ", xref("mild-divergence", "chance-consistent", "diverge"), ". It is the ordinary state of healthy polling, not evidence the houses have compared notes.")

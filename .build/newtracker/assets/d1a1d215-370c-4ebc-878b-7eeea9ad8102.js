@@ -3940,6 +3940,20 @@ function infoTerms(D) {
       measured separately for every measure – a firm that leans one way on the classic two-party is
       not assumed to lean the same way on a primary share or on an ALP-v-One Nation head-to-head –
       and it is a property of the pollster, not of any single poll.</>) },
+    { id: "poll-lean", term: "Poll lean", body: (
+      <>How far one published poll sits from the consensus around it: the poll’s own figure
+      minus the weighted aggregate for the month it was taken. It is a property of this one
+      poll, not of the pollster – sampling luck alone can land a survey off the consensus, so
+      a single lean carries little weight; a house leaning the same way over and over is
+      showing {xref("house-effect", "poll-lean", "its house effect")}. Poll lean is sortable
+      in the All polls archive and printed in each poll’s breakdown.</>) },
+    { id: "house-lean", term: "House lean", body: (
+      <>A pollster’s {xref("house-effect", "house-lean", "house effect")} read month by month
+      instead of only as it stands now, so a change of method or hands shows up where it
+      happened rather than smeared across the house’s history. Estimated per measure – a firm
+      can walk one way on two-party and another on a primary share – and the aggregates still
+      subtract the as-of-date value; the trace is the same estimator re-read at each
+      month.</>) },
     { id: "chance-consistent", term: "Chance-consistent", body: (
       <>The Poll disagreement panel’s verdict when the houses agree as well as polling lets them.
       Even on an unmoved electorate no two surveys match, because each is a sample: a scatter of
