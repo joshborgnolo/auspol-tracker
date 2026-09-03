@@ -1112,55 +1112,117 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
       }));
     });
   });
-  /* ---- the past-terms ribbon -------------------------------------------------
-     With three or more past terms on the board the individual lines tangle
-     past reading, so they step down into a band: the spread of past terms at
-     each month (min–max, with the interquartile half darker) and their mean
-     as a dotted centre line. Only eras CHANGE what gets pooled: a series
-     split at a leadership handover would put two rows from one term into a
-     single month's average and double-count it, so offices pool their era
-     series while everything else pools its one row. Membership thins as shorter
-     terms run out of months; the readout annotates the surviving row's value
-     with the month's headcount instead of hiding the thinning. */
-  let bandAreas = null, bandMeanRow = null, bandN = 0;
-  if (banded) {
-    const pooled = [];
-    pastShown.forEach((c) => {
+  /* ---- the past terms, pooled once -------------------------------------------
+     ONE peer set for the whole card: the past terms on the board, month by
+     month. The ribbon draws it and the insight sentence summarises it, so the
+     two are the same computation – a chip that reshapes the band has to
+     reshape the sentence above it, or the card prints two figures both called
+     "the average" and neither can be checked against the other.
+     Pooled by TERM, never by era. A handover splits a line for DRAWING, but a
+     term that changed prime minister is still one term, and pooling its eras
+     as separate rows entered it twice in the month the two overlap – which is
+     how a board of thirteen terms came to report fourteen of them.
+     `polled` counts how many of the month's values are readings rather than
+     interpolations: a line dashes itself across a month nobody polled, a
+     filled band cannot, so the readout says it in words instead. */
+  const bandN = pastShown.length;
+  /* Memoised on what actually moves a row – which terms are on the board, the
+     measure, and absolute-vs-change. Hovering a chip re-renders all six charts
+     to lift ONE line, and the pooled set it lifts out of has not changed;
+     keyed on the years for the same reason the dot cloud is, since `pastShown`
+     is a fresh array every render and the years are what decide it. */
+  const pastKey = pastShown.map((c) => c.year).join(",");
+  const bandRows = React.useMemo(() => {
+    const rows = [];
+    if (!bandN) return rows;
+    const pooled = pastShown.map((c) => {
       const base = cycBase(c, M.key);
-      const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || null;
-      const rows = eras
-        ? eras.map((e) => ({ months: e.months, vals: e.vals }))
-        : [{ months: c.raw.months, vals: c.raw[M.key] }];
-      rows.forEach((r) => {
-        const monthly = toMonthly(r.months, r.vals, c.span);
-        pooled.push(monthly.map((p) => (p.y == null ? null : chg ? +(p.y - base).toFixed(2) : p.y)));
+      const flags = (c.raw.obs || {})[M.key];
+      /* The month grid is dense and `months` is 0..n, but look the index up
+         rather than assume it – the observed flag has to describe the same
+         month the value does, exactly as the drawn lines do it. */
+      return toMonthly(c.raw.months, c.raw[M.key], c.span).map((p, m) => {
+        if (p.y == null) return null;
+        const i = c.raw.months.indexOf(m);
+        return { v: chg ? +(p.y - base).toFixed(2) : p.y, obs: !flags || i < 0 || !!flags[i] };
       });
     });
-    const outer = [], inner = [], meanPts = [];
     for (let m = 0; m < CYC_SPINE.length; m++) {
       const vs = [];
+      let polled = 0;
       for (let k = 0; k < pooled.length; k++) {
-        const v = pooled[k][m];
-        if (v != null) vs.push(v);
+        const p = pooled[k][m];
+        if (!p) continue;
+        vs.push(p.v);
+        if (p.obs) polled++;
       }
       if (!vs.length) continue;
       vs.sort((a, b) => a - b);
-      const mean = +(vs.reduce((s, v) => s + v, 0) / vs.length).toFixed(2);
-      outer.push({ x: m, y0: vs[0], y1: vs[vs.length - 1] });
-      inner.push({ x: m, y0: +pctOf(vs, 0.25).toFixed(2), y1: +pctOf(vs, 0.75).toFixed(2) });
-      meanPts.push({ x: m, y: mean, n: vs.length });
+      rows.push({
+        m, n: vs.length, polled,
+        mean: +(vs.reduce((s, v) => s + v, 0) / vs.length).toFixed(2),
+        p10: +pctOf(vs, 0.1).toFixed(2), p90: +pctOf(vs, 0.9).toFixed(2),
+        q1: +pctOf(vs, 0.25).toFixed(2), q3: +pctOf(vs, 0.75).toFixed(2),
+      });
     }
-    bandN = pastShown.length;
-    bandAreas = [
-      { id: "cyc-band-lo", className: "cyc-band lo", color: "var(--ink)", opacity: 0.07, edge: false, points: outer },
-      { id: "cyc-band-hi", className: "cyc-band hi", color: "var(--ink)", opacity: 0.13, edge: false, points: inner },
-    ];
-    bandMeanRow = {
+    return rows;
+  }, [pastKey, bandN, M.key, chg]);
+  /* ---- the ribbon ------------------------------------------------------------
+     With three or more past terms on the board the per-term lines collapse
+     into this band – a dozen near-identical lines read as weather, not as
+     data. Hovering a legend chip LIFTS its term's own line back out of the
+     band in full colour; thinning the board below three past terms (or
+     isolating one) falls back to plain lines, since a ribbon of two is as
+     tall as the lines it replaces.
+     The outer fill is the middle 80%, not the full spread. Min–max is drawn
+     entirely by whichever single term happened to be most extreme that month,
+     so it lurched five points from one month to the next and covered half the
+     plot – the loudest mark on the chart carrying the least information, with
+     the interquartile half that actually says something hidden inside it.
+     Membership is not constant along the axis either: no house was asking the
+     approval question in the first months of the older terms, and only the
+     longest parliaments reach month 36. Where the headcount drops below
+     three-quarters of the board the fills go fainter, so a stretch built from
+     half the terms cannot pass for the full set. */
+  let bandAreas = null;
+  if (banded && bandRows.length > 1) {
+    const floor = Math.max(3, Math.ceil(bandN * 0.75));
+    /* Neighbouring stretches meet on a SHARED vertex instead of overlapping:
+       two fills that overlapped even slightly would double their tint and draw
+       a seam exactly where the band is meant to be growing quieter. */
+    const segs = [];
+    bandRows.forEach((r, i) => {
+      const thin = r.n < floor;
+      const last = segs[segs.length - 1];
+      if (!last || last.thin !== thin) segs.push({ thin, pts: i ? [bandRows[i - 1], r] : [r] });
+      else last.pts.push(r);
+    });
+    /* Weight is CSS's, not ours: `opacity` here is a presentation attribute and
+       any `.cyc-band` rule beats it, which is how the fills carry a heavier
+       tint in dark without this component knowing the theme. So a thinned
+       stretch asks for it by CLASS – setting a fainter number here would have
+       been silently overruled – and the inline values stay as the unstyled
+       fallback. */
+    bandAreas = segs.filter((s) => s.pts.length > 1).flatMap((s, i) => [
+      { id: "cyc-band-lo" + i, className: "cyc-band lo" + (s.thin ? " thin" : ""),
+        color: "var(--ink)", opacity: 0.07, edge: false,
+        points: s.pts.map((r) => ({ x: r.m, y0: r.p10, y1: r.p90 })) },
+      { id: "cyc-band-hi" + i, className: "cyc-band hi" + (s.thin ? " thin" : ""),
+        color: "var(--ink)", opacity: 0.13, edge: false,
+        points: s.pts.map((r) => ({ x: r.m, y0: r.q1, y1: r.q3 })) },
+    ]);
+    /* One mean line over all of it, not one per stretch: two segments sharing
+       a boundary month would hand the readout that month twice, under the same
+       name. The headcount rides in the note instead, where a thinning set is
+       stated rather than implied. */
+    built.push({
       id: "cyc-band-mean", label: "Mean of past terms", color: "var(--ink-2)",
       width: 1.9, weight: 0.5, opacity: 0.85, dash: "2 3.4", smooth: false, endCap: false,
-      points: meanPts.map((p) => ({ x: p.x, y: p.y, note: p.n + " of " + bandN + " terms" })),
-    };
-    built.push(bandMeanRow);
+      points: bandRows.map((r) => ({
+        x: r.m, y: r.mean,
+        note: r.n + " of " + bandN + " terms" + (r.polled < r.n ? " \u00b7 " + r.polled + " polled" : ""),
+      })),
+    });
   }
   /* The polls the lines are averages of, once the board is narrow enough to
      read them. Each cloud takes its line's colour and shape, and follows it
@@ -1259,24 +1321,23 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
   const refLabel = chg ? (M.chgRefLabel || "Election result") : M.refAbsLabel;
   const refLines = refY != null ? [{ y: refY, label: refLabel, color: "var(--ink-faint)", align: "left" }] : [];
 
-  // insight: current government vs the average past government at the same month
+  /* insight: the sitting term against the SAME peer set the ribbon draws, read
+     straight off the month's pooled row. It used to run its own pass over every
+     past cycle whatever the chips said, so hiding a term moved the band and
+     left the sentence directly above it quoting an average of terms no longer
+     on the board – narrow the board to the 2010s and the ribbon's mean and the
+     sentence's "average" stood more than five points apart on one card.
+     A month with no row is a month no past term on the board reached, and
+     there is nothing to compare against: the sentence stands down rather than
+     inventing a peer. */
   const cur = cycles.find((c) => c.current);
   let insight = null;
   if (cur && !hidden.has(cur.year)) {
     const mNow = cur.span;
     const curVal = chg ? cur.end[M.key] - cycBase(cur, M.key) : cur.end[M.key];
-    // a peer only counts if it was actually measured at this month – comparing
-    // against a cycle whose approval series hadn't started yet is comparing
-    // against nothing
-    const peers = cycles.filter((c) => !c.current && c.span >= mNow).map((c) => {
-      const mly = toMonthly(c.raw.months, c.raw[M.key], c.span);
-      const v = mly[mNow] ? mly[mNow].y : null;
-      if (v == null) return null;
-      return chg ? v - cycBase(c, M.key) : v;
-    }).filter((v) => v != null);
-    if (peers.length) {
-      const avg = peers.reduce((s, v) => s + v, 0) / peers.length;
-      const d = curVal - avg;
+    const peerRow = bandRows.find((r) => r.m === mNow);
+    if (peerRow) {
+      const d = curVal - peerRow.mean;
       const better = d >= 0;
       /* Leader charts compare people, so the subject is the sitting holder
          (Albanese, Taylor) and the peer is the office's past holders. The
@@ -1424,11 +1485,14 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll, shap
       {banded && (
         <div className="cyc-band-note" aria-hidden="true">
           <svg className="cyc-band-key" viewBox="0 0 30 12">
-            <rect x="4" y="0" width="22" height="12" fill="var(--ink)" opacity="0.07" />
-            <rect x="4" y="2.5" width="22" height="7" fill="var(--ink)" opacity="0.13" />
+            {/* the same two classes the chart's fills wear, so the key is not a
+                hand-matched approximation that drifts when the band is retuned
+                – or sits at light-theme weights on a dark page */}
+            <rect className="cyc-band lo" x="4" y="0" width="22" height="12" fill="var(--ink)" />
+            <rect className="cyc-band hi" x="4" y="2.5" width="22" height="7" fill="var(--ink)" />
             <line x1="4" y1="6" x2="26" y2="6" stroke="var(--ink-2)" strokeWidth="1.9" strokeDasharray="2 3.4" opacity="0.85" />
           </svg>
-          <span>Past terms: mean of the set, middle half and full spread</span>
+          <span>Past terms: mean of the set, middle half and middle 80%</span>
         </div>
       )}
       {/* One control, both directions. "Show all" existed on its own, so
@@ -1895,10 +1959,15 @@ function PastCyclesView() {
         <p className="view-lede">
           Every federal term since 1987, lined up on its election day so each government’s
           run can be read off the same clock. The past terms stand together as a band –
-          outer edge their full spread, darker half the middle, dotted line their mean –
-          drawn over the months each term was actually in office.{" "}
+          outer edge the middle 80% of them, darker half the middle 50%, dotted line their
+          mean – drawn over the months each term was actually in office, and going fainter
+          where fewer of them were.{" "}
+          {/* A finger cannot hover, and the chips it CAN reach toggle: telling a
+              phone reader to tap a term out of the band described a gesture that
+              hides it instead. The way to a single past line on touch is to thin
+              the board until the band gives way, so that is what it now says. */}
           {CANT_HOVER
-            ? "Tap a cycle below to lift its line out of the band, and leave just one visible to see more details."
+            ? "Tap a cycle below to take its term off the board or put it back; with two past terms left the band gives way to their own lines, and with one you get its full detail."
             : "Hover over a cycle below to lift its line out of the band, and leave just one visible to see more details."}
         </p>
         <div className="cyc-controls">
@@ -1934,7 +2003,11 @@ function PastCyclesView() {
         The individual polls behind the plotted series are downloadable above
         {hidden.size > 0 && ", the file leaving the hidden terms out just as the charts do"}.{" "}
         Past cycles run the full ~3-year term to the next election; the current cycle stops at the
-        latest reading.{" "}
+        latest reading. Where the band runs faint, fewer than three-quarters of the terms on the
+        board were in office that month – the oldest terms open before any house asked about
+        approval, and only the longest parliaments reach three years – and the readout on its
+        mean names the headcount, and how many of them were polled rather than interpolated,
+        month by month.{" "}
         {showHan && (
           <span>
             Hanson is drawn on the opposition chart from {"“"}approve minus disapprove{"”"} readings only,
