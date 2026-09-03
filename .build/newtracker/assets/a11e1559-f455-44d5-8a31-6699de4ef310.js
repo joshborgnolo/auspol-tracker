@@ -1936,39 +1936,23 @@ function TppLine({ c, prefixed, note, hero }) {
   );
 }
 
-/* The poll's own pull on the figure a reader watches – "(Moved Labor's 2PP
-   aggregate vs. L/NP +0.1% to 53.3% from 53.4%)" – closing the provenance
-   band as its last rows. One parenthetical row per aggregate the wave feeds:
-   the classic 2PP; the flow-table implied 2PP for a poll that published no
-   pair (its primaries still move THAT estimate); and Labor's head-to-head
-   against One Nation where the wave asked it. lo/hi are gen-data's leave-one-
-   out run (the `eff` payload): lo is the aggregate WITHOUT the wave, hi the
+/* The poll's own pull on the figure a reader watches, as one ordinary row
+   of the provenance band: "2PP effect   +0.1 for Labor vs. L/NP; −0.4 for
+   Labor vs. ON". One clause per aggregate the wave feeds: the classic 2PP;
+   the flow-table implied 2PP for a poll that published no pair (its
+   primaries still move THAT estimate); and Labor's head-to-head against
+   One Nation where the wave asked it. lo/hi are gen-data's leave-one-out
+   run (the `eff` payload): lo is the aggregate WITHOUT the wave, hi the
    standing aggregate with it; `w` marks a wave outside the current window,
-   so its null move reads as "before the window", not "the poll did nothing".
-   Each row spans the whole meta grid (its .pd-s-eff box) so the sentence
-   never stretches the band's label column. */
+   so its null move reads as "before the window", not "the poll did
+   nothing". */
 function EffLines({ eff }) {
   if (!eff || (!eff.lnp && !eff.imp && !eff.onp)) return null;
-  const fig = (v) => <b>{v.toFixed(1)}%</b>;
-  /* signed like the ChgParen moves, but grey – this is arithmetic about the
-     aggregate, not a shift in a party's standing */
-  const moved = (e) => {
+  /* signed like Poll lean and House effect in the rows above (% dropped –
+     the row's verbs carry that it is points) */
+  const signed = (e) => {
     const d = Math.round((e.hi - e.lo) * 10) / 10;
-    return <span className="pd-s-note">
-      {d === 0 ? "±0.0" : ((d > 0 ? "+" : "−") + Math.abs(d).toFixed(1))}%
-    </span>;
-  };
-  const line = (k, label) => {
-    const e = eff[k];
-    if (!e) return null;
-    /* a note only when the wave can't move the current window's figure at
-       all – silence would otherwise read as a miscounted zero */
-    const inner = e.w
-      ? <React.Fragment>{moved(e)} to {fig(e.hi)} from {fig(e.lo)}</React.Fragment>
-      : <span className="pd-s-note">±0.0% – outside the {e.m ? "month" : "21-day window"} the aggregate covers</span>;
-    return (
-      <span className="pd-s-eff" key={k}>(Moved Labor’s {label} {inner})</span>
-    );
+    return d === 0 ? "±0.0" : (d > 0 ? "+" : "−") + Math.abs(d).toFixed(1);
   };
   /* the implied 2PP only ever STANDS IN for the pair – gen-data emits it
      solely for a poll with none – so the word carries its glossary meaning */
@@ -1976,12 +1960,29 @@ function EffLines({ eff }) {
     <button type="button" className="hi-term"
             onClick={() => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
   );
-  return (
+  /* a window note rides its clause in a mixed row; when every clause is out
+     of window one note at the end speaks for them all (the alternative was
+     the same parenthesis twice in a line) */
+  const prim = eff.lnp || eff.imp;
+  const shareOut = prim && !prim.w && (!eff.onp || !eff.onp.w);
+  const winNote = (m) => (
+    <span className="pd-s-note"> (outside the {m ? "month" : "21-day window"} the aggregate covers)</span>
+  );
+  const clause = (e, who, imp) => (
     <React.Fragment>
-      {line("lnp", "2PP aggregate vs. L/NP")}
-      {line("imp", <React.Fragment>{implied} aggregate</React.Fragment>)}
-      {line("onp", "2PP aggregate vs. ON")}
+      {signed(e)} for Labor vs. {who}{imp && <React.Fragment> ({implied})</React.Fragment>}
+      {!e.w && !shareOut && winNote(e.m)}
     </React.Fragment>
+  );
+  return (
+    <span className="pd-meta-i">
+      <span className="pd-meta-k">2PP effect</span>
+      <span className="pd-meta-v">
+        {eff.lnp ? clause(eff.lnp, "L/NP") : clause(eff.imp, "L/NP", true)}
+        {eff.onp && <React.Fragment>; {clause(eff.onp, "ON")}</React.Fragment>}
+        {shareOut && winNote(prim.m)}
+      </span>
+    </span>
   );
 }
 

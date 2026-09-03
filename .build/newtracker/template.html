@@ -2209,13 +2209,6 @@ body.dark .poll-detail {
 /* a caption's figure still steps above its words, but not to the full figure
    size - the basis is about the measure above it and must not out-shout it */
 .pd-s.pd-s-basis b { font-size: var(--pd-fig); }
-/* the leave-one-out effect lines ("(Moved Labor's 2PP aggregate vs. L/NP
-   +0.1% to 53.3% from 53.4%)") close the provenance band: full-width rows of
-   the meta grid, in their own grid item so the sentence can never stretch
-   the column the label/value pairs above share. A parenthetical aside in
-   the panel's secondary ink; its figures keep the band's tabular figures */
-.pd-s-eff { display: block; grid-column: 1 / -1; color: var(--pd-ink-2); font-size: var(--pd-body); }
-.pd-s-eff b { font-size: var(--pd-fig); }
 /* no colour of its own -> UA link blue, illegible on the dark paper; the
    house treatment is text first, link second (cf. a.pollster-link/a.tn-link) */
 a.pd-release { color: inherit; text-decoration: none; cursor: pointer; }

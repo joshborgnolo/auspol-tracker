@@ -2300,13 +2300,6 @@ body.dark .poll-detail {
 /* a caption's figure still steps above its words, but not to the full figure
    size - the basis is about the measure above it and must not out-shout it */
 .pd-s.pd-s-basis b { font-size: var(--pd-fig); }
-/* the leave-one-out effect lines ("(Moved Labor's 2PP aggregate vs. L/NP
-   +0.1% to 53.3% from 53.4%)") close the provenance band: full-width rows of
-   the meta grid, in their own grid item so the sentence can never stretch
-   the column the label/value pairs above share. A parenthetical aside in
-   the panel's secondary ink; its figures keep the band's tabular figures */
-.pd-s-eff { display: block; grid-column: 1 / -1; color: var(--pd-ink-2); font-size: var(--pd-body); }
-.pd-s-eff b { font-size: var(--pd-fig); }
 /* no colour of its own -> UA link blue, illegible on the dark paper; the
    house treatment is text first, link second (cf. a.pollster-link/a.tn-link) */
 a.pd-release { color: inherit; text-decoration: none; cursor: pointer; }
@@ -11183,42 +11176,25 @@ function TppLine({
   }, note));
 }
 
-/* The poll's own pull on the figure a reader watches – "(Moved Labor's 2PP
-   aggregate vs. L/NP +0.1% to 53.3% from 53.4%)" – closing the provenance
-   band as its last rows. One parenthetical row per aggregate the wave feeds:
-   the classic 2PP; the flow-table implied 2PP for a poll that published no
-   pair (its primaries still move THAT estimate); and Labor's head-to-head
-   against One Nation where the wave asked it. lo/hi are gen-data's leave-one-
-   out run (the `eff` payload): lo is the aggregate WITHOUT the wave, hi the
+/* The poll's own pull on the figure a reader watches, as one ordinary row
+   of the provenance band: "2PP effect   +0.1 for Labor vs. L/NP; −0.4 for
+   Labor vs. ON". One clause per aggregate the wave feeds: the classic 2PP;
+   the flow-table implied 2PP for a poll that published no pair (its
+   primaries still move THAT estimate); and Labor's head-to-head against
+   One Nation where the wave asked it. lo/hi are gen-data's leave-one-out
+   run (the `eff` payload): lo is the aggregate WITHOUT the wave, hi the
    standing aggregate with it; `w` marks a wave outside the current window,
-   so its null move reads as "before the window", not "the poll did nothing".
-   Each row spans the whole meta grid (its .pd-s-eff box) so the sentence
-   never stretches the band's label column. */
+   so its null move reads as "before the window", not "the poll did
+   nothing". */
 function EffLines({
   eff
 }) {
   if (!eff || !eff.lnp && !eff.imp && !eff.onp) return null;
-  const fig = v => /*#__PURE__*/React.createElement("b", null, v.toFixed(1), "%");
-  /* signed like the ChgParen moves, but grey – this is arithmetic about the
-     aggregate, not a shift in a party's standing */
-  const moved = e => {
+  /* signed like Poll lean and House effect in the rows above (% dropped –
+     the row's verbs carry that it is points) */
+  const signed = e => {
     const d = Math.round((e.hi - e.lo) * 10) / 10;
-    return /*#__PURE__*/React.createElement("span", {
-      className: "pd-s-note"
-    }, d === 0 ? "±0.0" : (d > 0 ? "+" : "−") + Math.abs(d).toFixed(1), "%");
-  };
-  const line = (k, label) => {
-    const e = eff[k];
-    if (!e) return null;
-    /* a note only when the wave can't move the current window's figure at
-       all – silence would otherwise read as a miscounted zero */
-    const inner = e.w ? /*#__PURE__*/React.createElement(React.Fragment, null, moved(e), " to ", fig(e.hi), " from ", fig(e.lo)) : /*#__PURE__*/React.createElement("span", {
-      className: "pd-s-note"
-    }, "\xB10.0% \u2013 outside the ", e.m ? "month" : "21-day window", " the aggregate covers");
-    return /*#__PURE__*/React.createElement("span", {
-      className: "pd-s-eff",
-      key: k
-    }, "(Moved Labor\u2019s ", label, " ", inner, ")");
+    return d === 0 ? "±0.0" : (d > 0 ? "+" : "−") + Math.abs(d).toFixed(1);
   };
   /* the implied 2PP only ever STANDS IN for the pair – gen-data emits it
      solely for a poll with none – so the word carries its glossary meaning */
@@ -11227,7 +11203,22 @@ function EffLines({
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
   }, "implied 2PP");
-  return /*#__PURE__*/React.createElement(React.Fragment, null, line("lnp", "2PP aggregate vs. L/NP"), line("imp", /*#__PURE__*/React.createElement(React.Fragment, null, implied, " aggregate")), line("onp", "2PP aggregate vs. ON"));
+  /* a window note rides its clause in a mixed row; when every clause is out
+     of window one note at the end speaks for them all (the alternative was
+     the same parenthesis twice in a line) */
+  const prim = eff.lnp || eff.imp;
+  const shareOut = prim && !prim.w && (!eff.onp || !eff.onp.w);
+  const winNote = m => /*#__PURE__*/React.createElement("span", {
+    className: "pd-s-note"
+  }, " (outside the ", m ? "month" : "21-day window", " the aggregate covers)");
+  const clause = (e, who, imp) => /*#__PURE__*/React.createElement(React.Fragment, null, signed(e), " for Labor vs. ", who, imp && /*#__PURE__*/React.createElement(React.Fragment, null, " (", implied, ")"), !e.w && !shareOut && winNote(e.m));
+  return /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-k"
+  }, "2PP effect"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, eff.lnp ? clause(eff.lnp, "L/NP") : clause(eff.imp, "L/NP", true), eff.onp && /*#__PURE__*/React.createElement(React.Fragment, null, "; ", clause(eff.onp, "ON")), shareOut && winNote(prim.m)));
 }
 
 /* A leader's ratings as one sentence: approve, disapprove, don't know, with
