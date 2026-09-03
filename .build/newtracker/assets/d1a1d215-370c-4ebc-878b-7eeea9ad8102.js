@@ -2899,6 +2899,9 @@ function AllPollsView({ focus, onBack, backLabel }) {
         </div>
       </div>
 
+      {/* phone (≤560px) turns this block into a two-column grid: the pills sit
+          side by side on the top line and the facet pair lands beneath them;
+          wider screens keep the originals in .ap-head-side and hide these copies */}
       <div className="ap-jumps">
         <button className="ap-jump" onClick={() => jumpTo("poll-disagreement")}
                 title="Scroll down to the poll disagreement panel">
@@ -2916,6 +2919,11 @@ function AllPollsView({ focus, onBack, backLabel }) {
           </svg>
           Jump to house lean
         </button>
+        <TextToggle value={facet} onChange={onFacet} options={FACETS}
+          ariaLabel="Archive table view" caps className="ap-facet" />
+        <span className="ap-jumps-count">
+          <strong>{sorted.length}</strong>{sorted.length !== total ? " of " + total : ""} {sorted.length === 1 ? "poll" : "polls"}
+        </span>
       </div>
 
       <div className="ap-bar">

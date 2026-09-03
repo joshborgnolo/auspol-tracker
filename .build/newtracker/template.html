@@ -2866,7 +2866,19 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
    to the two diagnostic panels below it. The pill repeats .ap-export's
    shape on a separate class because export goes display:none ≤1000px (a
    desktop affordance) – the jumps matter most on a phone's long page. */
-.ap-jumps { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.ap-jumps { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+/* facet toggle + count live inside the jumps block so that on a phone they
+   can pair up under the two pills; wider screens keep the originals in
+   .ap-head-side and never see these copies */
+.ap-jumps > .ap-facet, .ap-jumps > .ap-jumps-count { display: none; }
+@media (max-width: 560px) {
+  .ap-jumps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ap-jumps > .ap-jump { justify-content: center; }
+  .ap-jumps > .ap-facet { display: inline-flex; justify-self: start; }
+  .ap-jumps > .ap-jumps-count { display: inline; align-self: center; justify-self: end; }
+  .ap-head-side { display: none; }              /* its two children each have a copy in .ap-jumps */
+  .ap-bar-end .ap-count { display: none; }
+}
 .ap-jump {
   display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;

@@ -67,10 +67,10 @@ function toggleLabel(label) {
   return label;
 }
 
-function TextToggle({ options, value, onChange, caps, ariaLabel }) {
+function TextToggle({ options, value, onChange, caps, ariaLabel, className }) {
   const rg = useRadioGroup(options, value, onChange);
   return (
-    <div className={"text-toggle" + (caps ? " tt-caps" : "")} role="radiogroup"
+    <div className={"text-toggle" + (caps ? " tt-caps" : "") + (className ? " " + className : "")} role="radiogroup"
          aria-label={ariaLabel} onKeyDown={rg.onKeyDown}>
       {options.map((o, i) => (
         <React.Fragment key={o.id}>
