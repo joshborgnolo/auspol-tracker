@@ -3468,58 +3468,95 @@ function AllPollsView({ focus, onBack, backLabel }) {
    cannot quietly break a link pointing at it. */
 
 /* The preference-flows history chart inside the glossary entry: AEC full
-   preference-distribution tables by party, 1996-2025, drawn as one static
-   SVG (no component churn for eleven elections). One Nation's series breaks
-   across the parliaments it barely contested. */
-function flowChart() {
-  const YEARS = [1996,1998,2001,2004,2007,2010,2013,2016,2019,2022,2025];
-  const ROWS = [
-    { c: "var(--grn)", name: "Greens",     v: [67.1,73.3,74.8,80.8,79.7,78.8,83.0,81.9,82.2,85.7,88.2] },
-    { c: "var(--onp)", name: "One Nation", v: [null,46.3,44.1,43.3,null,null,null,49.5,34.8,35.7,25.5] },
-    { c: "var(--oth)", name: "Others",     v: [50.3,55.3,55.8,44.4,44.6,41.7,46.7,49.2,46.1,50.0,54.6] },
+   preference-distribution tables by party, 1996-2025.
+
+   This was the one chart on the page drawn by hand - a 640x226 SVG carrying
+   its own axis, its own type sizes and no readout - and sitting outside
+   TrendChart cost it both of the things every other chart was given in
+   654b926. Its aspect was frozen in the viewBox, so a phone rendered 9.5px
+   axis type at 4.8px inside a plot 115px tall; and pointing at it did
+   nothing, on a page where every other line answers the pointer. It renders
+   through TrendChart now, on the same useNarrow contract as the other eight
+   (see the auspol-chart-sizing note).
+
+   One Nation is split into RUNS rather than nulled through: TrendChart draws
+   a series as one path, so a gap would be crossed by a straight line implying
+   flows through parliaments it barely contested and nobody measured. Only the
+   final run carries the end cap and the label - endCap:false on the rest, or
+   every run boundary grows a dot in the middle of the line.
+
+   The party colours are the site's identity tokens and stay as they are, but
+   they sit close together under protanopia - the Greens' green against One
+   Nation's orange especially - so identity is never left to colour alone:
+   each line is named at its own end where there is room for it, and the
+   legend under the plot names all three at any width. */
+function FlowChart() {
+  const narrow = useNarrow();
+  const YEARS = [1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022, 2025];
+  const PARTIES = [
+    { id: "grn", name: "Greens",     color: "var(--grn)",
+      v: [67.1, 73.3, 74.8, 80.8, 79.7, 78.8, 83.0, 81.9, 82.2, 85.7, 88.2] },
+    { id: "onp", name: "One Nation", color: "var(--onp)",
+      v: [null, 46.3, 44.1, 43.3, null, null, null, 49.5, 34.8, 35.7, 25.5] },
+    { id: "oth", name: "Others",     color: "var(--oth)",
+      v: [50.3, 55.3, 55.8, 44.4, 44.6, 41.7, 46.7, 49.2, 46.1, 50.0, 54.6] },
   ];
-  const W = 640, H = 226, L = 30, R = 152, T = 16, B = 24;
-  const x = (yr) => L + (yr - 1996) / 29 * (W - L - R);
-  const y = (v) => T + (90 - v) / 70 * (H - T - B);
+
+  const series = [];
+  PARTIES.forEach((p) => {
+    const runs = [];
+    let cur = [];
+    p.v.forEach((val, i) => {
+      if (val == null) { if (cur.length) runs.push(cur); cur = []; }
+      else cur.push({ x: YEARS[i], y: val });
+    });
+    if (cur.length) runs.push(cur);
+    runs.forEach((points, i) => {
+      const tail = i === runs.length - 1;
+      series.push({
+        id: p.id + i, label: p.name, color: p.color, points,
+        /* eleven elections, not a monthly reading: straight segments between
+           them, because a smoothed curve would invent a shape for the years
+           between counts where there is no such thing as a flow. */
+        smooth: false, width: 2.6, endCap: tail,
+        /* the label gutter is worth 10% of a laptop's width and all of a
+           phone's, so narrow drops the labels and leans on the legend */
+        endLabel: tail && !narrow ? p.name : null,
+      });
+    });
+  });
+
   return (
-    <svg viewBox={"0 0 " + W + " " + H} role="img"
-         aria-label="Share of preferences flowing to Labor, by party, 1996 to 2025">
-      <text x={L} y={9} className="fc-unit">share preferencing Labor, %</text>
-      {[30, 50, 70, 90].map((t) => (
-        <g key={t}>
-          <line className="fc-grid" x1={L} x2={W - R} y1={y(t)} y2={y(t)}
-                strokeDasharray={t === 50 ? "4 3" : undefined}/>
-          <text className="fc-tick" x={L - 5} y={y(t)} textAnchor="end"
-                dominantBaseline="middle">{t}</text>
-        </g>
-      ))}
-      {[1996, 2001, 2007, 2013, 2019, 2025].map((yr) => (
-        <text key={yr} className="fc-tick" x={x(yr)} y={H - 7} textAnchor="middle">{yr}</text>
-      ))}
-      {ROWS.map((row) => {
-        const segs = [];
-        let cur = [];
-        row.v.forEach((v, i) => {
-          if (v === null) { if (cur.length > 1) segs.push(cur.join(" ")); cur = []; }
-          else cur.push(x(YEARS[i]).toFixed(1) + "," + y(v).toFixed(1));
-        });
-        if (cur.length > 1) segs.push(cur.join(" "));
-        const last = row.v[row.v.length - 1];
-        return (
-          <g key={row.name}>
-            {segs.map((p, i) => (
-              <polyline key={i} points={p} fill="none" stroke={row.c}
-                        strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"/>
-            ))}
-            {row.v.map((v, i) => v === null ? null : (
-              <circle key={i} cx={x(YEARS[i])} cy={y(v)} r="2.3" fill={row.c}/>
-            ))}
-            <text className="fc-end" x={W - R + 6} y={y(last)} fill={row.c}
-                  dominantBaseline="middle">{row.name} {last.toFixed(1)}</text>
-          </g>
-        );
-      })}
-    </svg>
+    <>
+      {/* the unit rides above the plot as text rather than as an SVG label:
+          inside the viewBox it scaled with the chart and vanished on a phone */}
+      <span className="fc-unit">share preferencing Labor, %</span>
+      <TrendChart
+        height={narrow ? 470 : 330}
+        xDomain={[1996, 2025]} yDomain={[20, 92]}
+        yTicks={[30, 50, 70, 90]}
+        xTicks={(narrow ? [1996, 2004, 2013, 2019, 2025]
+                        : [1996, 2001, 2007, 2013, 2019, 2025])
+                  .map((x) => ({ x, label: String(x) }))}
+        unit="%" fmt={(v) => v.toFixed(1)}
+        axisFont={narrow ? 28 : 15}
+        pad={{ l: 46, r: narrow ? 22 : 104, t: 16, b: 40 }}
+        series={series} spine={YEARS.map((x) => ({ x }))}
+        /* 50 is the line the whole chart is read against: above it a party's
+           preferences favour Labor, below it the Coalition. It was drawn
+           before and left unnamed. */
+        refLines={[{ y: 50, label: "even split", color: "var(--ink-faint)", align: "left" }]}
+        tooltipTitle={(i) => YEARS[i] + " election"}
+        ariaLabel="Share of preferences flowing to Labor, by party, 1996 to 2025"
+      />
+      <span className="hero-legend fc-legend">
+        {PARTIES.map((p) => (
+          <span className="hl-item" key={p.id}>
+            <span className="hl-line" style={{ background: p.color }}></span>{p.name}
+          </span>
+        ))}
+      </span>
+    </>
   );
 }
 
@@ -3688,7 +3725,7 @@ function infoTerms(D) {
       {" "}(<a href="https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm"
       target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5%, all others 54.6% to
       Labor</a>), every formal ballot redistributed Labor v Coalition.
-      <span className="info-chart">{flowChart()}</span>
+      <span className="info-chart"><FlowChart /></span>
       Full preference distribution data was first published for the 1996 election, so
       party-by-party flows don't exist before then; One Nation's line is broken across
       the parliaments it barely contested.</>) },
@@ -3761,8 +3798,11 @@ function InfoView({ focus, onBack, backLabel }) {
       {/* No in-card masthead: the tab that opened this view already names it,
           and a body of definitions needs no preface. */}
       {terms.map((t) => (
-        <p key={t.id} id={"term-" + t.id}
-           className={"info-term" + (focus === t.id ? " lit" : "")}>
+        /* a div, not a p: the preference-flows entry embeds TrendChart and
+           TrendChart's root is a div. .info-term is only ever selected by
+           class, so the paragraph styling is unchanged. */
+        <div key={t.id} id={"term-" + t.id}
+             className={"info-term" + (focus === t.id ? " lit" : "")}>
           <strong className="info-t">{t.term}.</strong> {t.body}
           {focus === t.id && onBack && (
             <button className="back-to-chart info-back" onClick={onBack}>
@@ -3773,7 +3813,7 @@ function InfoView({ focus, onBack, backLabel }) {
               Back to {backLabel || "where you were"}
             </button>
           )}
-        </p>
+        </div>
       ))}
     </section>
   );
