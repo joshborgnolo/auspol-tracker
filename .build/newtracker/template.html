@@ -2194,7 +2194,14 @@ body.dark .poll-detail {
    the panel's own secondary ink */
 .poll-detail .chg.flat { color: var(--pd-ink-2); opacity: 1; }
 .pd-s-chg .chg { margin-left: 1px; }
+/* The word-spacing ladder above exists to hold a figure off the word it
+   belongs to. A note is a SENTENCE - "no positive / negative split published"
+   - and opening every gap in it by 7px made it read as broken-up rather than
+   quiet, which is the one thing a note must not do. `:not(.pd-grp)` because
+   first preferences puts this class on a figure/label group (the OTH share),
+   which still needs its junction held open. */
 .pd-s-note { color: var(--pd-ink-2); }
+.pd-s-note:not(.pd-grp) { word-spacing: normal; }
 /* the basis of a figure – what was allocated, what stayed undecided – is a
    caption to the line above, not a tail on it. Trailing a parenthesis off the
    end of a 40px pair pushed the headline into a second line for a footnote. */
