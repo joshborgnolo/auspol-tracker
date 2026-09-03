@@ -251,14 +251,35 @@
     const anchor = host && host.parentElement;
     if (!host || !anchor || host.getBoundingClientRect().width >= COPY_W - 1) return () => {};
     const hostStyle = host.getAttribute("style"), anchorStyle = anchor.getAttribute("style");
+    /* Measure before mutating: the stand-in below is placed from these rects. */
+    const hostRect = host.getBoundingClientRect();
+    const anchorRect = anchor.getBoundingClientRect();
     /* Taking the host out of flow would collapse everything under it, so the
        ancestor is pinned to its current height and clipped first. Nothing
        below moves, and the wide chart is parked outside the clip - offset
        rather than hidden, since visibility and opacity would be baked into
        the serialised svg and blank the copy. */
-    anchor.style.height = anchor.getBoundingClientRect().height + "px";
+    anchor.style.height = anchorRect.height + "px";
     anchor.style.overflow = "hidden";
     if (getComputedStyle(anchor).position === "static") anchor.style.position = "relative";
+    /* The park leaves a hole until restore() puts the host back - visibly
+       about a second on a phone, where the wide re-layout and the compose
+       take that long (the desktop either clears the width check above or
+       finishes before a frame paints). Pin a static clone where the chart
+       was so the screen shows a frozen, unclickable image of what was there
+       instead of the hole. It rides on <body>, fixed, not inside the card:
+       inside, the composer running below would read its .ro-party/.hl-item
+       nodes a second time and draw every legend row twice. */
+    const stand = host.cloneNode(true);
+    stand.style.position = "fixed";
+    stand.style.margin = "0";
+    stand.style.top = hostRect.top + "px";
+    stand.style.left = hostRect.left + "px";
+    stand.style.width = hostRect.width + "px";
+    stand.style.height = hostRect.height + "px";
+    stand.style.pointerEvents = "none";
+    stand.setAttribute("aria-hidden", "true");
+    document.body.appendChild(stand);
     host.style.position = "absolute";
     host.style.top = "0";
     host.style.left = "-99999px";
@@ -271,6 +292,9 @@
       if (svg.querySelector(".evt-label")) break;
     }
     return () => {
+      /* stand out first so the frame that brings the host back never shows
+         the pair stacked - removal and restore are one paint */
+      if (stand.parentNode) stand.parentNode.removeChild(stand);
       if (hostStyle == null) host.removeAttribute("style"); else host.setAttribute("style", hostStyle);
       if (anchorStyle == null) anchor.removeAttribute("style"); else anchor.setAttribute("style", anchorStyle);
     };
