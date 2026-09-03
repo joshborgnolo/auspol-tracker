@@ -46,15 +46,20 @@
 //              (2025-07 report, 2026-02 and 2026-07 Capital Brief waves), so
 //              any needing row whose release URL is itself a demosau.com
 //              wp-content PDF has THAT URL parsed as a statement too.
-//   RedBridge/Accent (methodUrl only) – no network leg at all: the wave's
-//              Accent project page yields its methodology-report PDF URL
-//              only to a CLICKED document widget, and extract-redbridge.mjs
-//              already does that weekly, caching the usrfiles.com PDF href
-//              as `pdfUrl` in .build/redbridge-src/*.json (keyed by the
-//              wave's fieldwork end). This leg just re-reads those caches
-//              and stamps `methodUrl` (exact date match) – it derives no
-//              sampleEff, and waves with no Accent page (the 2025 AFR-only
-//              releases) or no cache yet stay unlinked by design.
+//   RedBridge/Accent – no network leg at all: the wave's Accent project
+//              page yields its methodology-report PDF URL only to a
+//              CLICKED document widget, and extract-redbridge.mjs already
+//              does that weekly, caching the usrfiles.com PDF href as
+//              `pdfUrl` in .build/redbridge-src/*.json (keyed by the
+//              wave's fieldwork end) with the report's pdftotext output as
+//              the sibling .txt. Two legs read those caches offline: the
+//              pdfUrl stamps `methodUrl` (exact date match) and the txt's
+//              "effective sample size of N" (the APC statement every Accent
+//              methodology report carries) stamps `sampleEff`. Waves with
+//              no Accent page (the 2025 AFR-only releases) or no cache yet
+//              stay unlinked by design; the constant-link waves with no
+//              cache (Oct-2025 snapshot, the May-2026 MRP) keep links but
+//              get no sampleEff – MRPs are never eff-stamped in any house.
 //
 // Matching: a statement is stamped onto the polls.json row of the SAME
 // pollster whose `date` (fieldwork end) is within ±1 day of the statement's
@@ -353,6 +358,34 @@ function legAccentLinks() {
   return out;
 }
 
+/* RedBridge/Accent sampleEff leg: the same committed caches, offline. Every
+   redbridge-src *.txt is the wave's Accent methodology-report PDF already
+   run through pdftotext by extract-redbridge.mjs, and its APC statement
+   prints "…providing an effective sample size of N." – parse just that
+   number. Cache `date` is the wave's fieldwork end (exact row match) and
+   cache `sample` the raw n the guard sanity-checks against. A cache whose
+   .txt never landed simply yields no record; a .txt missing the sentence
+   warns rather than fails, so a template change surfaces without
+   poisoning the other legs. The two constant-link waves above have no
+   cache, so no record – the MRP must stay unstamped anyway (every house's
+   MRP precedent: an MRP's precision is not a weighting-efficiency n). */
+function legAccentEff() {
+  const dir = join(ROOT, ".build", "redbridge-src");
+  const out = [];
+  for (const f of readdirSync(dir).filter((f) => f.endsWith(".json"))) {
+    const j = JSON.parse(readFileSync(join(dir, f), "utf8"));
+    if (!j.date) continue;
+    const txtFile = f.replace(/\.json$/, ".txt");
+    if (!existsSync(join(dir, txtFile))) continue;
+    const m = readFileSync(join(dir, txtFile), "utf8").match(/effective sample size of\s+([\d,]+)/i);
+    if (!m) { console.log("  warn: no effective-sample sentence in " + txtFile); continue; }
+    out.push({ pollster: "RedBridge / Accent", end: j.date, eff: Number(m[1].replace(/,/g, "")),
+               sample: typeof j.sample === "number" ? j.sample : null,
+               src: "redbridge-src cache " + (j.slug || f.replace(/\.json$/, "")) });
+  }
+  return out;
+}
+
 /* ---- leg: Essential disclosure statement (one living PDF) -------------- */
 const MONTH3 = { Jan: 1, Feb: 2, Mar: 3, Apr: 4, May: 5, Jun: 6, Jul: 7, Aug: 8, Sep: 9, Oct: 10, Nov: 11, Dec: 12 };
 const DDMMMYY = (s) => s.match(/(\d{2})-([A-Za-z]{3})-?(\d{2,4})/);
@@ -466,7 +499,7 @@ const rowSeries = (p) => {
   if (/news24\.com\.au/i.test(u)) return "news24";
   return "publicdata";
 };
-const NEED_HOUSES = ["YouGov", "YouGov (MRP)", "Newspoll", "Essential", "DemosAU", "DemosAU (MRP)"];
+const NEED_HOUSES = ["YouGov", "YouGov (MRP)", "Newspoll", "Essential", "DemosAU", "DemosAU (MRP)", "RedBridge / Accent"];
 const unstamped = D.polls.filter((p) => NEED_HOUSES.includes(p.pollster) && p.sampleEff == null);
 
 const records = [];
@@ -485,6 +518,7 @@ const legs = [
      PDF the index never listed is parsed straight off the row's url */
   ["demosau", () => legDemosau(D.polls
     .filter((p) => p.pollster.startsWith("DemosAU") && (p.sampleEff == null || p.methodUrl == null)))],
+  ["accent", () => legAccentEff()],
 ];
 if (unstamped.some((p) => p.pollster === "Newspoll"))
   legs.push(["newspoll", () => legNewspoll(unstamped.filter((p) => p.pollster === "Newspoll").map((p) => (p.published || p.date).slice(0, 10)))]);
