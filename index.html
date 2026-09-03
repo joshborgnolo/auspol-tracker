@@ -5713,9 +5713,32 @@ window.AP.nextPolls = npProject;
     const anchor = host && host.parentElement;
     if (!host || !anchor || host.getBoundingClientRect().width >= COPY_W - 1) return () => {};
     const hostStyle = host.getAttribute("style"), anchorStyle = anchor.getAttribute("style");
-    /* Measure before mutating: the stand-in below is placed from these rects. */
+    /* Measure before mutating: the stand-in and the sibling freeze below are
+       placed from these rects. */
     const hostRect = host.getBoundingClientRect();
     const anchorRect = anchor.getBoundingClientRect();
+    const anchorCS = getComputedStyle(anchor);
+    /* The host's siblings share its containing block - in the hero that is the
+       whole section, so the legend and caption sit below the chart in flow.
+       Taking the host out of flow lets them slide up into the freed space,
+       and they show through the transparent parts of the stand-in pinned over
+       the slot (the phone reported the caption climbing onto the chart).
+       Freeze each in-flow sibling where it is for the park's duration: an
+       absolute box at its measured border-box rect, margins zeroed, inside
+       the height-pinned anchor. */
+    const bL = parseFloat(anchorCS.borderLeftWidth) || 0;
+    const bT = parseFloat(anchorCS.borderTopWidth) || 0;
+    const frozenSibs = [];
+    for (const sib of anchor.children) {
+      if (sib === host) continue;
+      const cs = getComputedStyle(sib);
+      if (cs.position !== "static" && cs.position !== "relative" && cs.position !== "sticky") continue;
+      const r = sib.getBoundingClientRect();
+      if (r.width === 0 && r.height === 0) continue;
+      frozenSibs.push({ el: sib, style: sib.getAttribute("style"),
+                        left: r.left - anchorRect.left - bL, top: r.top - anchorRect.top - bT,
+                        width: r.width, height: r.height });
+    }
     /* Taking the host out of flow would collapse everything under it, so the
        ancestor is pinned to its current height and clipped first. Nothing
        below moves, and the wide chart is parked outside the clip - offset
@@ -5723,7 +5746,16 @@ window.AP.nextPolls = npProject;
        the serialised svg and blank the copy. */
     anchor.style.height = anchorRect.height + "px";
     anchor.style.overflow = "hidden";
-    if (getComputedStyle(anchor).position === "static") anchor.style.position = "relative";
+    if (anchorCS.position === "static") anchor.style.position = "relative";
+    for (const f of frozenSibs) {
+      const s = f.el.style;
+      s.position = "absolute";
+      s.margin = "0";
+      s.left = f.left + "px";
+      s.top = f.top + "px";
+      s.width = f.width + "px";
+      s.height = f.height + "px";
+    }
     /* The park leaves a hole until restore() puts the host back - visibly
        about a second on a phone, where the wide re-layout and the compose
        take that long (the desktop either clears the width check above or
@@ -5758,6 +5790,9 @@ window.AP.nextPolls = npProject;
          the pair stacked - removal and restore are one paint */
       if (stand.parentNode) stand.parentNode.removeChild(stand);
       if (hostStyle == null) host.removeAttribute("style"); else host.setAttribute("style", hostStyle);
+      for (const f of frozenSibs) {
+        if (f.style == null) f.el.removeAttribute("style"); else f.el.setAttribute("style", f.style);
+      }
       if (anchorStyle == null) anchor.removeAttribute("style"); else anchor.setAttribute("style", anchorStyle);
     };
   };
