@@ -1706,6 +1706,13 @@ function AccuracyPanel() {
   const close = () => setHov(null);
   const bothWays = oneSided.length > 1
     && oneSided.some((c) => c.err > 0) && oneSided.some((c) => c.err < 0);
+  /* Recency order, most recent first, in two blocks: the elections a reader
+     remembers voting in get their own labelled run up top, and the longer
+     historical record continues below. Splitting on position, never on year,
+     so a newly added election slides in without touching this panel. */
+  const byRecency = [...A.cycles].sort((a, b) => b.year - a.year);
+  const recent = byRecency.slice(0, 5);
+  const earlier = byRecency.slice(5);
 
   return (
     <section className="card acc-card">
@@ -1745,7 +1752,14 @@ function AccuracyPanel() {
       </div>
 
       <div className={"acc-rows" + (spread ? " acc-spread-on" : "")} ref={rowsRef}>
-        {A.cycles.map((c, ri) => {
+        {[
+          ["Last five elections", recent],
+          ["More elections", earlier],
+        ].filter(([, list]) => list.length).map(([label, list], gi) => (
+          <React.Fragment key={label}>
+            <div className={"acc-group-h" + (gi ? " acc-group-more" : "")}>{label}</div>
+            {list.map((c, rj) => {
+          const ri = (gi ? recent.length : 0) + rj;
           const { lane, n: nLanes } = lanesFor(c.houses);
           const maxOff = Math.ceil((nLanes - 1) / 2) * LANE_H;
           return (
@@ -1826,7 +1840,9 @@ function AccuracyPanel() {
             </div>
           </div>
           );
-        })}
+            })}
+          </React.Fragment>
+        ))}
       </div>
 
       <p className="table-hint">

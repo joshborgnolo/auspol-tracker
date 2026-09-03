@@ -2297,6 +2297,9 @@ button.acc-spread[aria-pressed="true"] {
 .acc-firms { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
 .acc-firms-h { font-size: 11px; font-weight: 700;
   color: var(--ink-3); margin-bottom: 8px; }
+.acc-group-h { font-size: 11px; font-weight: 700; color: var(--ink-3);
+  margin: 3px 0 6px; }
+.acc-group-h.acc-group-more { margin-top: 18px; }
 .acc-firms-grid { display: grid; gap: 8px 18px;
   grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); }
 .acc-firm { display: flex; flex-direction: column; gap: 1px; }
@@ -13416,6 +13419,13 @@ function AccuracyPanel() {
   };
   const close = () => setHov(null);
   const bothWays = oneSided.length > 1 && oneSided.some(c => c.err > 0) && oneSided.some(c => c.err < 0);
+  /* Recency order, most recent first, in two blocks: the elections a reader
+     remembers voting in get their own labelled run up top, and the longer
+     historical record continues below. Splitting on position, never on year,
+     so a newly added election slides in without touching this panel. */
+  const byRecency = [...A.cycles].sort((a, b) => b.year - a.year);
+  const recent = byRecency.slice(0, 5);
+  const earlier = byRecency.slice(5);
   return /*#__PURE__*/React.createElement("section", {
     className: "card acc-card"
   }, /*#__PURE__*/React.createElement("div", {
@@ -13480,7 +13490,12 @@ function AccuracyPanel() {
   }, "Labor overstated \u2192")), /*#__PURE__*/React.createElement("div", {
     className: "acc-rows" + (spread ? " acc-spread-on" : ""),
     ref: rowsRef
-  }, A.cycles.map((c, ri) => {
+  }, [["Last five elections", recent], ["More elections", earlier]].filter(([, list]) => list.length).map(([label, list], gi) => /*#__PURE__*/React.createElement(React.Fragment, {
+    key: label
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "acc-group-h" + (gi ? " acc-group-more" : "")
+  }, label), list.map((c, rj) => {
+    const ri = (gi ? recent.length : 0) + rj;
     const {
       lane,
       n: nLanes
@@ -13608,7 +13623,7 @@ function AccuracyPanel() {
       className: "acc-flag",
       title: "Every house missed the same way \u2013 the signature of an industry-wide problem rather than one firm's noise"
     }, "All one way")));
-  })), /*#__PURE__*/React.createElement("p", {
+  })))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
   }, "Big dots are the average of that election\u2019s final polls; small dots are the individual houses \u2013 ", CANT_HOVER ? "tap" : "hover", " one for its figure.", stacked > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, " ", stacked, " of them missed by exactly the same amount as another house, so they are drawn on top of each other \u2013 ", /*#__PURE__*/React.createElement("strong", null, "Separate overlapping dots"), " steps those into their own lanes without moving any of them along the scale."), " Exit polls are excluded, and a house that publishes an undecided-inclusive pair is normalised first, so its arithmetic isn\u2019t scored as a miss.", bothWays && /*#__PURE__*/React.createElement(React.Fragment, null, " The two elections where every house missed the same way, ", oneSided.map(c => c.year).join(" and "), ",", " ", "missed in ", /*#__PURE__*/React.createElement("strong", null, "opposite directions"), " \u2013 so this is not a standing lean that today\u2019s figures could be corrected for. It is the size of the error, not its direction, that carries.")), /*#__PURE__*/React.createElement("div", {
     className: "acc-firms"
