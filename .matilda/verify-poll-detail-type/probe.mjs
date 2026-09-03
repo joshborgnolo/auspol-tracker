@@ -135,7 +135,7 @@ try {
     };
   })()`);
   console.log(t);
-  check("kicker size", t.kSize, "13.5px");
+  check("eyebrow size", t.kSize, "11.5px");
   check("kicker weight", t.kWeight, "600");
   check("kicker upper case", t.kCase, "uppercase");
   check("kicker tracked", t.kTracked, true);
@@ -201,7 +201,7 @@ try {
   check("archive hero figure", arch.heroFig, "40px");
   check("supporting matchups step down",
         arch.restFig.every((s) => s === "20px"), true);
-  check("archive kicker", arch.kicker, "13.5px");
+  check("archive eyebrow", arch.kicker, "11.5px");
   check("controls stay docked to the band's right edge", arch.controlsDocked, true);
 
   /* The narrow ladder. .ap-wrap is overflow:visible so an over-wide panel

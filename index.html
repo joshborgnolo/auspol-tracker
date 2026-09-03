@@ -2159,6 +2159,10 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   --pd-measure: 820px;
   --pd-body: 13.5px;  /* the words around the figures */
   --pd-note: 11.5px;  /* moves, ranges, the way back - annotations */
+  /* the section eyebrows. Their own token, not the body's size: an eyebrow
+     names the measure and is scanned, never read, so it sits UNDER the
+     sentence it introduces and lets the figures keep the section's weight. */
+  --pd-eyebrow: 11.5px;
   --pd-fig: 20px;     /* a percentage inside a sentence */
   --pd-mid: 22px;     /* national direction - the 2PP treatment, scaled down */
   --pd-hero: 40px;    /* the 2PP pair, the dominant element on the page */
@@ -2352,8 +2356,10 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
    second label voice in the panel, distinct from the sentence-case labels of
    the provenance list above, so the two never read as one system. */
 .pd-k {
-  font-size: var(--pd-body); font-weight: 600;
-  letter-spacing: 0.12em; text-transform: uppercase;
+  font-size: var(--pd-eyebrow); font-weight: 600;
+  /* smaller capitals need more air between them, not less, or the word
+     closes up into a block - the tracking rises as the size falls */
+  letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--pd-ink-2); margin: 0 0 11px;
 }
 /* The vote-share section IS the poll's headline - it is the figure the row
@@ -2529,7 +2535,7 @@ button.acc-spread[aria-pressed="true"] {
     /* only the gutter narrows - the label column sizes itself */
     --pd-gut: 18px; --pd-hero: 27px; --pd-hero-w: 14px;
     --pd-mid: 19px; --pd-fig: 18px; --pd-body: 13px;
-    --pd-note: 11px; --pd-hero-note: 12.5px;
+    --pd-note: 11px; --pd-hero-note: 12.5px; --pd-eyebrow: 11px;
   }
   .pd-sec { margin-top: 17px; padding-top: 15px; }
   .pd-k { margin-bottom: 9px; }
