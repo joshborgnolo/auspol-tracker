@@ -1,6 +1,6 @@
 ---
 name: auspol-tile-band
-description: auspol-tracker — the decorative "seismograph tide" band closing the page (.tile-band; current art is 30 stacked wave traces, shipped b6a6443, REPLACING the 07523d4→4ac45e1 fractal rhombille cubes): lives in template.html CSS + a body-level div after </noscript>, NOT in any asset; SVG art lives in a --tile-art custom property; background is cover-fit (center bottom / auto 400px repeat-x) so NO fixed tile size, row snapping, ::after layer, or masks are needed; dark-mode multiply-dim convention, headless-Chrome+Playwright pixel verification, and the giant-line edit/probe gotchas
+description: auspol-tracker — the decorative "seismograph tide" band closing the page (.tile-band; current art is 30 stacked wave traces, shipped b6a6443, REPLACING the 07523d4→4ac45e1 fractal rhombille cubes; canvas twin on html shipped 41bc58c): lives in template.html CSS + a body-level div after </noscript>, NOT in any asset; strip painted TWICE coincident (html canvas for rubber-band overscroll + in-flow band), themed --bg mirrored via html:has(body.<theme>), SVG art in a --tile-art custom property on html; background is cover-fit (center bottom / auto 400px repeat-x) so NO fixed tile size, row snapping, ::after layer, or masks are needed; dark-mode multiply-dim on the band, canvas drops art on dark; headless-Chrome pixel verification and the giant-line edit/probe gotchas
 source: auto-skill
 extracted_at: '2026-09-03T00:00:00.000Z'
 ---
@@ -16,12 +16,38 @@ files. Rebuild (`node .build/newtracker/build.mjs`) after editing.
 ## Structure
 
 - CSS block at the very end of the template's main stylesheet (just before
-  the final `</style>`): a descriptive comment, `.tile-band` (declares the
-  `--tile-art` custom property ~43KB data-URI line), `.tile-band::before`
-  melt gradient, `body.dark .tile-band` dim, phone media query.
+  the final `</style>`): a descriptive comment, an **`html` rule** (declares
+  the `--tile-art` custom property ~43KB data-URI line + paints the strip on
+  the canvas: `background: var(--tile-art) center bottom / auto 400px
+  repeat-x var(--bg)`), six `html:has(body.<theme>)` canvas-colour mirrors,
+  `.tile-band` (in-flow copy of the same strip), `.tile-band::before` melt
+  gradient, `body.dark .tile-band` dim, phone media query (overrides BOTH
+  html and band `background-size: auto 320px`).
 - One element in `<body>` **after `</noscript>`**:
   `<div class="tile-band" aria-hidden="true"></div>`. Body-level placement is
   deliberate; do NOT wrap it in a max-width container. Keep `aria-hidden`.
+
+## Canvas twin (shipped 41bc58c, "extend past the page bottom")
+
+The strip is painted TWICE, coincident to the pixel: once in-flow on
+`.tile-band`, once on `html` — the canvas is the only surface a phone's
+rubber-band overscroll can reveal, so dragging past the page end keeps
+tracing instead of opening blank paper. Consequences:
+
+- **Themed --bg is mirrored up to html.** A background on html ends body's
+  propagation, so the canvas colour is html's again: the base `html` rule
+  carries light `:root` --bg, and `html:has(body.cool|editorial|dark|
+  dark.cool|dark.editorial|dark.editorial.cool)` mirrors re-declare the
+  exact `background-color` from each body theme rule. **Editing a theme's
+  --bg now means editing its html:has mirror too** — a new two-homes pair.
+- **Dark canvases drop the strip** (`html:has(body.dark) background-image:
+  none`): the multiply-dim convention needs an element box to sit on and the
+  canvas has none, so overscroll regions fall back to themed flat ground.
+- Harmony proof: html strip + band strip share the identical tile, size
+  (`auto 400px`/`auto 320px` under 640px), and `center bottom` anchoring —
+  verified 0.000% pixel diff on-page at two widths with the canvas art
+  toggled off. Any size change must edit html AND .tile-band AND the media
+  query override.
 
 ## How the tide works (b6a6443)
 
@@ -48,21 +74,25 @@ files. Rebuild (`node .build/newtracker/build.mjs`) after editing.
   git history (07523d4 → c13853a → 4ac45e1).
 - `.tile-band::before` (`content:""`, `position:absolute`, `inset:0`,
   `z-index:2`) overlays the eased melt: `color-mix(in oklch, var(--bg) N%,
-  transparent)` stops easing the band out of and back into the page. Tail
-  lands at **`var(--bg) 92%`** — the veil completes before the bottom edge so
-  the deepest arcs don't get a hard cut but also can't print un-veiled ink
-  into the footer. Wave arcs tolerate any edge, so the "snap fade to lattice
-  rows" rule from the cube era no longer applies; only the crest fade
-  matters. `z-index:2` is vestigial now (no competing ::after) — harmless,
-  keep it.
+  transparent)` stops easing the band out of the page at the crest fade,
+  reaching `transparent 76%` and STAYING there — the old tail fade (back to
+  `var(--bg) 92%`) was removed in 41bc58c so the tide runs inky to the
+  page's last pixel. Wave arcs tolerate any edge, so no terminal fade is
+  needed; only the crest fade matters. `z-index:2` is vestigial (no
+  competing ::after) — harmless, keep it.
 - Dark mode (`body.dark`, CLASS-based): the single surviving rule
   `body.dark .tile-band { background-color:#6f6f6f; background-blend-mode:
   multiply }`. The `body.dark .tile-band::after` twin was deleted with
   ::after. Never recolour the SVG per theme; multiply-dim is the convention.
-- Heights: **400px** desktop / **320px** under 640px (margin-top 80px/56px).
-  The media query must ALSO override `background-size: auto 320px` — a
-  px-valued background-size does not rescale with a height change, so
-  shrinking the band without it would silently crop the art.
+- Heights: **400px** desktop / **320px** under 640px. Gap-to-footer is
+  controlled solely by `margin-top`: 80px/56px originally, pulled to
+  **32px/24px** in c67a5fe at user request ("not so far from the rest of
+  the website") — a "move the band up/down" request = edit margin-top only,
+  in BOTH the base rule and the media query.
+  The media query must ALSO override `background-size: auto 320px` on BOTH
+  html and .tile-band — a px-valued background-size does not rescale with a
+  height change, so shrinking without it would silently crop the art (and
+  silently desync the canvas twin).
 
 ## URL-encoding & verification
 
@@ -75,15 +105,18 @@ files. Rebuild (`node .build/newtracker/build.mjs`) after editing.
   persisted-output files — work by `grep -n` anchors and small `awk`/`sed -n
   'N,Mp'` windows instead of reading ranges that contain the line.
 - Visual check (BOGAN mode blocks writes outside the workspace — put the
-  harness under `.build/`, delete after): extract the tile-band CSS slice
-  into a standalone page with a redefined `:root{--bg}` (light #f6f6f2 /
-  dark #1a1612), a 220px spacer and a bare `<div class="tile-band">`;
-  Playwright chromium at dpr=1, `locator('.tile-band').screenshot()` after
-  `scroll_into_view_if_needed()` (a clip screenshot at un-scrolled page y
-  captures blank viewport), then PIL `row_profile` diffing each row band
-  against the bg colour. Expected: traces appear ~35–85% depth, random
-  teleporting crests near 87–92%, zero ink ≥93%, and dark mode shows the
-  multiplied traces.
+  harness under `.build/`, delete after): puppeteer-core from
+  `~/node_modules` + system Chrome (render-card.mjs convention; Playwright
+  is NOT installed here), full built `index.html`, scroll to
+  `document.body.scrollHeight`, viewport screenshot, then PIL diff each row
+  band against the bg colour. Expected: traces ~35–85% depth AND ink right
+  down to the final rows (~10–16% coverage at 96–100% depth since 41bc58c;
+  the pre-41bc58c profile was zero ink ≥93%). Canvas-twin checks:
+  `getComputedStyle(documentElement)` shows the svg bg in light and
+  `background-image:none` in dark, html `.backgroundSize` tracks the band's
+  at both widths, and a screenshot diff of the band region with
+  `documentElement.style.backgroundImage='none'` toggled MUST be ~0%
+  on-page (proves html/band coincidence, no ghosting).
 - Mobile check: same page at viewport 375×660; expect 320px band and correct
   scaled traces (no crop) — then ALSO toggle a visibly-wrong tint on the
   media-override value and re-screenshot to prove the override actually
