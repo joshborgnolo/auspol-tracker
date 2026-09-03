@@ -1828,20 +1828,16 @@ function PastCyclesView() {
     D.loadCycleSource().then(() => { if (live) redrawWithSource((n) => n + 1); });
     return () => { live = false; };
   }, []);
-  const narrow = useNarrow();
   /* Which terms are hidden rides in the URL too, so "the 2019 term" stays
      comparable when the link is passed around. Hidden years – not shown
      ones, since "Show all" is the ordinary state and keeps the bar clean –
      sit in one param as two-digit years joined by dots: ?c=10.19 hides
      2010 and 2019. Four-digit years are read as well for whoever types
-     them; tokens that name no known term are dropped, never trusted.
-     With no param at all, a phone gets the pre-2010 terms deselected out
-     of the box – fourteen chips of legend crowd a narrow board, and the
-     modern era reads cleaner alone; the desktop default stays every term. */
+     them; tokens that name no known term are dropped, never trusted. */
   const [hidden, setHidden] = useState(() => {
     const raw = new URLSearchParams(window.location.search).get("c");
     const years = new Set(cycles.map((c) => c.year));
-    if (!raw) return narrow ? new Set([...years].filter((y) => y < 2010)) : new Set();
+    if (!raw) return new Set();
     return new Set(raw.split(/[.,]/).map((t) => {
       if (/^\d{4}$/.test(t)) return +t;
       if (/^\d{2}$/.test(t)) return 2000 + +t;
