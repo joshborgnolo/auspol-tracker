@@ -207,6 +207,22 @@ function TrendChart(props) {
   const [dot, setDot] = useState(null);         // hovered scatter point
   const [evt, setEvt] = useState(null);         // hovered key event {e, x, y}
   const ref = useRef(null);
+  /* The readout's own width, measured off the page. The clamp below needs it,
+     and every attempt to name it in advance has gone stale as rows were added
+     to the panel – see the note there. */
+  const tipRef = useRef(null);
+  const [tipW, setTipW] = useState(0);
+  /* LAYOUT effect, not a plain one: it runs before the browser paints, so the
+     corrected left lands in the same frame the readout appears in. Measured on
+     every render and written back only when it actually moves, so a readout
+     travelling along the spine at a settled width re-renders nothing; a closed
+     readout keeps the last width rather than resetting to a guess, since the
+     next one to open on this chart carries the same rows. */
+  React.useLayoutEffect(() => {
+    if (!tipRef.current) return;
+    const w = tipRef.current.offsetWidth;
+    setTipW((prev) => (Math.abs(prev - w) > 0.5 ? w : prev));
+  });
   const clipId = "clip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const plotId = clipId + "p";      // the plot area itself, which never travels
   const wipeId = clipId + "w";      // + the series id, for a line being erased
@@ -523,15 +539,25 @@ function TrendChart(props) {
     };
   }
 
-  /* Clamp the tooltip so it never spills past the card edge on end-of-range
-     hovers. The half-width has to match the readout being drawn: one hardcoded
-     "~half a typical tip" was measured off the guide readout, so the event
-     panel - which is much wider - was allowed to sit up to 40px past the edge.
-     240 is .tip-evt's max-width and 156 the guide/dot readouts' working width;
-     both are capped in CSS, so clamping by them contains the element itself. */
+  /* Clamp the readout so it never spills past the card edge on end-of-range
+     hovers. The half-width has to match the panel actually being drawn, and
+     naming that number in advance has now been wrong twice: first a single
+     "~half a typical tip" taken off the guide readout, which let the much
+     wider event panel sit 40px past the edge; then a pair of constants whose
+     comment claimed "both are capped in CSS", true of .tip-evt's 240 and never
+     true of the guide readout, which has no cap and grows with its rows. Once
+     Past cycles put a "Mean of past terms" row and a headcount beside it, the
+     guide readout measured 253px against an assumed 156 – and on a 375px phone
+     a tap at the election-day end of the axis opened it 32px off the left of
+     the screen.
+     So measure the element instead. The constants stay as the first-paint
+     fallback only, and the next row nobody has thought of yet is contained
+     without anyone having to remember this line. A panel somehow wider than
+     its chart clamps to dead centre, which is the least-bad place for it. */
   if (tip) {
-    const tipMax = Math.min(evt ? 240 : 156, cw);
-    const halfPct = (tipMax / 2 / Math.max(cw, 1)) * 100;
+    const assumed = Math.min(evt ? 240 : 156, cw);
+    const tipMax = Math.min(tipW || assumed, cw);
+    const halfPct = Math.min(50, (tipMax / 2 / Math.max(cw, 1)) * 100);
     tip.left = Math.min(100 - halfPct, Math.max(halfPct, tip.left));
   }
 
@@ -1087,7 +1113,7 @@ function TrendChart(props) {
       </svg>
 
       {tip && (
-        <div className={"tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide")}
+        <div ref={tipRef} className={"tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide")}
              style={{ left: tip.left + "%", top: tip.top + "%" }}>
           {tip.title && <div className="tip-title">{tip.title}</div>}
           {tip.date && <div className="tip-date">{tip.date}</div>}
