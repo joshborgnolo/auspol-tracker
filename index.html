@@ -2188,16 +2188,26 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .pd-grp { white-space: nowrap; }
 /* One word-space is not enough to hold a 22px numeral off its 16px label: the
    pair reads as a single blurred token, and in a comma-separated run the gap
-   INSIDE a pair ends up the same as the gap between two of them. So the
-   junction gets a supplement – written against both elements either side, so
-   it lands in both orders the panel sets ("ALP 26%" and "45% ALP") and
-   nowhere else, leaving the group's outer edges alone. */
-.pd-grp b + .pd-lab, .pd-grp .netv + .pd-lab,
-.pd-grp .pd-lab + b, .pd-grp .pd-lab + .netv { margin-left: 4px; }
-.pd-s-hero .pd-grp b + .pd-lab, .pd-s-hero .pd-grp .pd-lab + b { margin-left: 7px; }
-/* and the gap BETWEEN two pairs has to beat the gap inside one, or the run
-   has no rhythm and the comma is doing the work alone */
-.pd-grp + .pd-grp { margin-left: 8px; }
+   INSIDE a pair ends up the same as the gap between two of them. Three nested
+   word-spacings fix both at once — widest between pairs, less inside one,
+   normal inside a label of more than one word ("don't know", "right
+   direction"), which would otherwise loosen along with everything else.
+
+   Word-spacing rather than margins on purpose: a margin between two inline
+   groups survives a line break and hangs the wrapped line 8px in, which at
+   phone widths is most lines. A space collapses at the break, so the left
+   edge stays flush. */
+.pd-s { word-spacing: 5px; }
+.pd-grp { word-spacing: 3px; }
+.pd-lab, .pd-mat { word-spacing: normal; }
+/* the headline pair is set larger, so its junction has to open with it */
+.pd-s-hero .pd-grp { word-spacing: 6px; }
+/* the parenthetical move belongs to the figure it annotates, so it keeps a
+   plain space – opened up, it reads as the next item in the run */
+.pd-s-chg { word-spacing: normal; }
+/* and the basis caption is a SENTENCE, not a run of pairs: only its own
+   figure needs holding off, the prose behind it does not */
+.pd-s.pd-s-basis { word-spacing: 2px; }
 /* the expanded view's numbers are the poll's data: set them in Archivo
    (figures in summary lines, signed nets, moves, seat estimates) */
 .poll-detail b, .poll-detail .netv, .poll-detail .chg, .poll-detail .seat-est {
@@ -5768,25 +5778,56 @@ window.AP.nextPolls = npProject;
     const hero = isHero && parties.length === 2;
 
     /* A shared image has to say what period it covers - the page around it
-       does not travel with it. Past cycles names the elections it lines up
-       (2010-2025, taken from the cycles actually drawn); every other chart
-       names the span its x-axis already runs across. */
-    const yrs = legend.map((l) => l.year).filter((y) => y && y < 9000).sort((a, b) => a - b);
-    const xLabels = [...svgEl.querySelectorAll(".axis-label.x")].map((n) => txt(n)).filter(Boolean);
-    const datey = (t) => /[0-9]/.test(t) && !/^(Election|\d+ ?yrs?)$/i.test(t);
-    let span = "";
-    if (yrs.length >= 2) {
+       does not travel with it. Past cycles names every term it shows, and a
+       deselected term breaks the range in two: each run of shown chips is
+       labelled from its first election to the next election boundary
+       (2007's term runs to the 2010 election, so 1987-2007), and the run
+       holding the live term ends in "present". The years come from the
+       chips, not the legend - banded terms have no label of their own to
+       take a year from. Every other chart names the span its x-axis
+       already runs across. */
+    const abRange = (a, b) => {
       /* 2010-25, not 2010-2025: the second year is written short when it
          shares a century with the first, which is how a year range is set.
          Guarded rather than assumed - a range that crosses one (1999-2001)
          has to print both in full or it reads as going backwards. */
-      const a = yrs[0], b = yrs[yrs.length - 1];
-      const short = String(a).slice(0, 2) === String(b).slice(0, 2);
-      span = a + "\u2013" + (short ? String(b).slice(2) : b);
+      const short = typeof b === "number" && String(a).slice(0, 2) === String(b).slice(0, 2);
+      return a + "\u2013" + (short ? String(b).slice(2) : b);
+    };
+    const chipByYear = new Map();
+    [...document.querySelectorAll(".cyc-chip")].forEach((ch) => {
+      const y = parseInt((ch.querySelector(".cyc-year") || {}).textContent, 10);
+      if (Number.isFinite(y) && !chipByYear.has(y)) chipByYear.set(y, {
+        off: ch.classList.contains("off"), current: ch.classList.contains("current"),
+      });
+    });
+    const cycs = [...chipByYear.keys()].sort((a, b) => a - b)
+      .map((year) => ({ year, off: chipByYear.get(year).off, current: chipByYear.get(year).current }));
+    const yrs = legend.map((l) => l.year).filter((y) => y && y < 9000).sort((a, b) => a - b);
+    const xLabels = [...svgEl.querySelectorAll(".axis-label.x")].map((n) => txt(n)).filter(Boolean);
+    const datey = (t) => /[0-9]/.test(t) && !/^(Election|\d+ ?yrs?)$/i.test(t);
+    let span = "", cycSpan = false;
+    if (cycs.length) {
+      const runs = [];
+      cycs.forEach((c, i) => {
+        if (c.off) return;
+        const prev = i > 0 ? cycs[i - 1] : null;
+        if (prev && !prev.off && runs.length) runs[runs.length - 1].push(c);
+        else runs.push([c]);
+      });
+      const ranges = runs.map((run) => {
+        const first = run[0], next = cycs[cycs.indexOf(run[run.length - 1]) + 1];
+        if (!next && run[run.length - 1].current) return abRange(first.year, "present");
+        const end = next ? next.year : run[run.length - 1].year;
+        return end === first.year ? String(first.year) : abRange(first.year, end);
+      });
+      if (ranges.length) { span = ranges.join(", "); cycSpan = true; }
     }
-    else if (xLabels.length >= 2 && datey(xLabels[0]) && datey(xLabels[xLabels.length - 1]))
+    if (!span && yrs.length >= 2)
+      span = abRange(yrs[0], yrs[yrs.length - 1]);
+    else if (!span && xLabels.length >= 2 && datey(xLabels[0]) && datey(xLabels[xLabels.length - 1]))
       span = xLabels[0] + " \u2013 " + xLabels[xLabels.length - 1];
-    const title = span ? titleBase + "  \u00b7  " + span : titleBase;
+    const title = span ? titleBase + (cycSpan ? ", " : "  \u00b7  ") + span : titleBase;
 
     const { markup, w: vw, h: vh } = bakeSvg(svgEl);
     const img = new Image();
@@ -10813,7 +10854,9 @@ function TppLine({
   const mat = c.lab.replace(/^2PP · /, "").replace(/^3-cornered · /, "").replace(/ · Derived$/, c.derived ? " (derived)" : "");
   return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("p", {
     className: "pd-s" + (hero ? " pd-s-hero" : "")
-  }, prefixed && mat + ": ", segs.map((x, i) => /*#__PURE__*/React.createElement(React.Fragment, {
+  }, prefixed && /*#__PURE__*/React.createElement("span", {
+    className: "pd-mat"
+  }, mat, ": "), segs.map((x, i) => /*#__PURE__*/React.createElement(React.Fragment, {
     key: i
   }, i > 0 && (segs.length === 2 ? /*#__PURE__*/React.createElement("span", {
     className: "pd-vs"

@@ -504,25 +504,56 @@
     const hero = isHero && parties.length === 2;
 
     /* A shared image has to say what period it covers - the page around it
-       does not travel with it. Past cycles names the elections it lines up
-       (2010-2025, taken from the cycles actually drawn); every other chart
-       names the span its x-axis already runs across. */
-    const yrs = legend.map((l) => l.year).filter((y) => y && y < 9000).sort((a, b) => a - b);
-    const xLabels = [...svgEl.querySelectorAll(".axis-label.x")].map((n) => txt(n)).filter(Boolean);
-    const datey = (t) => /[0-9]/.test(t) && !/^(Election|\d+ ?yrs?)$/i.test(t);
-    let span = "";
-    if (yrs.length >= 2) {
+       does not travel with it. Past cycles names every term it shows, and a
+       deselected term breaks the range in two: each run of shown chips is
+       labelled from its first election to the next election boundary
+       (2007's term runs to the 2010 election, so 1987-2007), and the run
+       holding the live term ends in "present". The years come from the
+       chips, not the legend - banded terms have no label of their own to
+       take a year from. Every other chart names the span its x-axis
+       already runs across. */
+    const abRange = (a, b) => {
       /* 2010-25, not 2010-2025: the second year is written short when it
          shares a century with the first, which is how a year range is set.
          Guarded rather than assumed - a range that crosses one (1999-2001)
          has to print both in full or it reads as going backwards. */
-      const a = yrs[0], b = yrs[yrs.length - 1];
-      const short = String(a).slice(0, 2) === String(b).slice(0, 2);
-      span = a + "\u2013" + (short ? String(b).slice(2) : b);
+      const short = typeof b === "number" && String(a).slice(0, 2) === String(b).slice(0, 2);
+      return a + "\u2013" + (short ? String(b).slice(2) : b);
+    };
+    const chipByYear = new Map();
+    [...document.querySelectorAll(".cyc-chip")].forEach((ch) => {
+      const y = parseInt((ch.querySelector(".cyc-year") || {}).textContent, 10);
+      if (Number.isFinite(y) && !chipByYear.has(y)) chipByYear.set(y, {
+        off: ch.classList.contains("off"), current: ch.classList.contains("current"),
+      });
+    });
+    const cycs = [...chipByYear.keys()].sort((a, b) => a - b)
+      .map((year) => ({ year, off: chipByYear.get(year).off, current: chipByYear.get(year).current }));
+    const yrs = legend.map((l) => l.year).filter((y) => y && y < 9000).sort((a, b) => a - b);
+    const xLabels = [...svgEl.querySelectorAll(".axis-label.x")].map((n) => txt(n)).filter(Boolean);
+    const datey = (t) => /[0-9]/.test(t) && !/^(Election|\d+ ?yrs?)$/i.test(t);
+    let span = "", cycSpan = false;
+    if (cycs.length) {
+      const runs = [];
+      cycs.forEach((c, i) => {
+        if (c.off) return;
+        const prev = i > 0 ? cycs[i - 1] : null;
+        if (prev && !prev.off && runs.length) runs[runs.length - 1].push(c);
+        else runs.push([c]);
+      });
+      const ranges = runs.map((run) => {
+        const first = run[0], next = cycs[cycs.indexOf(run[run.length - 1]) + 1];
+        if (!next && run[run.length - 1].current) return abRange(first.year, "present");
+        const end = next ? next.year : run[run.length - 1].year;
+        return end === first.year ? String(first.year) : abRange(first.year, end);
+      });
+      if (ranges.length) { span = ranges.join(", "); cycSpan = true; }
     }
-    else if (xLabels.length >= 2 && datey(xLabels[0]) && datey(xLabels[xLabels.length - 1]))
+    if (!span && yrs.length >= 2)
+      span = abRange(yrs[0], yrs[yrs.length - 1]);
+    else if (!span && xLabels.length >= 2 && datey(xLabels[0]) && datey(xLabels[xLabels.length - 1]))
       span = xLabels[0] + " \u2013 " + xLabels[xLabels.length - 1];
-    const title = span ? titleBase + "  \u00b7  " + span : titleBase;
+    const title = span ? titleBase + (cycSpan ? ", " : "  \u00b7  ") + span : titleBase;
 
     const { markup, w: vw, h: vh } = bakeSvg(svgEl);
     const img = new Image();
