@@ -2008,7 +2008,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .pd-meta-i { white-space: nowrap; }
 .pd-meta-k {
   font-size: 10.5px;
-  color: var(--ink-3); font-weight: 700; margin-right: 5px;
+  color: var(--ink-3); font-weight: 600; margin-right: 5px;
 }
 /* the meta band is the expansion's fact line: fieldwork, published, sample
    and effective sample print at every width in both tables – fieldwork and
@@ -2023,7 +2023,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .pd-simple { display: flex; flex-direction: column; gap: 13px; }
 .pd-simple .pd-k { margin-bottom: 3px; }
 .pd-s {
-  margin: 0; font-size: 14px; line-height: 1.55; color: var(--ink-2);
+  margin: 0; font-size: 14px; line-height: 1.5; color: var(--ink-2);
   font-variant-numeric: tabular-nums; text-wrap: pretty;
 }
 .pd-s b { font-weight: 700; color: var(--ink); }
@@ -2032,7 +2032,10 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .poll-detail b, .poll-detail .netv, .poll-detail .chg, .poll-detail .seat-est {
   font-family: var(--figures, var(--sans));
 }
-.poll-detail .chg { font-size: 11px; }
+/* the parenthetical moves are metadata ABOUT the figure, not peers of it –
+   in the breakdown they rest a size-octave down and a weight lighter than
+   the bold numerals they annotate */
+.poll-detail .chg { font-size: 10.5px; font-weight: 600; }
 .pd-s-chg .chg { margin-left: 1px; }
 .pd-s-note { color: var(--ink-3); }
 /* no colour of its own -> UA link blue, illegible on the dark paper; the
@@ -2079,9 +2082,13 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
   .seat-est { font-size: 14px; }
 }
 .pd-k {
-  font-size: 11px; font-weight: 700;
+  font-size: 11.5px; font-weight: 600;
   color: var(--ink-3);
 }
+/* the vote-share section IS the poll's headline: its figures step 2px up,
+   so the result reads as the one dominant element over every explanation
+   around it (notes inside the same sentence keep the body size) */
+.pd-sec-lead .pd-s > b { font-size: 16px; }
 /* undecided: one readout per question, because the panel carries two of them
    and they must not read as one measure with two sources */
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;

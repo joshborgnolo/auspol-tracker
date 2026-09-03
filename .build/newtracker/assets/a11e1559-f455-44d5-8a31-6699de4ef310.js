@@ -1884,11 +1884,13 @@ function ChgParen({ d }) {
 
 /* One headed section of the breakdown. With nothing to show it collapses to
    the heading and "Not published" rather than vanishing, because a missing
-   section would leave the reader guessing whether the poll even asked. */
-function PdSec({ label, absent, children }) {
+   section would leave the reader guessing whether the poll even asked. The
+   `lead` flag is the vote-share section's figure-size step: the result is
+   the headline, so its numerals read 2px up on the rest of the breakdown. */
+function PdSec({ label, absent, lead, children }) {
   const kids = React.Children.toArray(children).filter(Boolean);
   return (
-    <section className="pd-sec">
+    <section className={"pd-sec" + (lead ? " pd-sec-lead" : "")}>
       <div className="pd-k">{label}</div>
       {kids.length ? kids : <p className="pd-absent">{absent || "Not published"}</p>}
     </section>
@@ -2027,7 +2029,7 @@ function PollLedger({ r, dirSegments }) {
         </PdSec>
       )}
 
-      <PdSec label={tppHeading(tcs)}>
+      <PdSec label={tppHeading(tcs)} lead>
         {/* name the main pair's basis only when the flows second line joins
             it – a single pair needs no disambiguation, and a derived pair
             (3-cornered waves) is never the respondent-allocated one. The
