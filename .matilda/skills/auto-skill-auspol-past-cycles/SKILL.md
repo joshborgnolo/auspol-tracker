@@ -114,6 +114,41 @@ shipping the 2007 Rudd term (commit `8c8e15c`, 2026-09-02).
   Morgan's final in-window wave join it — assimilated from the historical
   CSVs, see "CSV assimilation" below).
 
+### Renderer: recency split (commit 0ac1c14, 2026-09-03)
+
+User asked for the panel in two labelled blocks. Shipped entirely renderer-
+side (AccuracyPanel in d1a1d215 + two CSS lines in template.html); gen-data's
+`accuracy.cycles` is untouched and still emits in CYC_META order (ascending).
+
+- The raw `A.cycles.map(...)` was replaced by
+  `const byRecency = [...A.cycles].sort((a, b) => b.year - a.year)` →
+  `recent = slice(0, 5)` / `earlier = slice(5)`, mapped as a
+  `[label, list][]` array through ONE keyed-`<React.Fragment>` group
+  renderer (the asset's established pattern, ~:3307), inserting
+  `<div className="acc-group-h">` subheads ("Last five elections",
+  "More elections") between groups. **Split is positional, never
+  year-keyed** — a new cycle slides in (and pushes the 6th-newest down
+  to "More elections") with zero edits here.
+- `.acc-rows` is a flex column (`display: flex; flex-direction: column`),
+  NOT a grid — subhead divs stretch full width with no `grid-column`
+  fixup; each `.acc-row` carries its own inner grid.
+- The hover tip's `flip: ri === 0` (first-row-only, "readout would
+  otherwise leave the card") kept a GLOBAL index across groups via
+  `const ri = (gi ? recent.length : 0) + rj;` — group 2's first row does
+  NOT flip; an upward tip overlapping the "More elections" subhead was
+  accepted over the alternatives.
+- Subhead CSS sits beside `.acc-firms-h` in template.html (same 11px/700/
+  `--ink-3` look): `.acc-group-h { margin: 3px 0 6px }` +
+  `.acc-group-h.acc-group-more { margin-top: 18px }`.
+- **Probe gotcha**: AccuracyPanel renders ONLY in the Past-cycles view —
+  on the default page a DOM probe finds 8 `.card`s and NO `.acc-card`.
+  Click the "Past cycles" tab (`[...document.querySelectorAll("button,a")]
+  .find(b => /past cycles/i.test(b.textContent)).click()`) before
+  waiting on `.acc-card .acc-row`.
+- Verified by DOM probe (not pixel diff): subhead text/classes, row order
+  2025,2022,2019,2016,2013 | 2010,2007,2004,2001,1998,1996,1993, zero
+  page errors.
+
 ## Hard-coded copy that must move with the count
 
 Adding/removing a cycle means re-counting these strings (all edited together
@@ -528,6 +563,17 @@ pieces shipped in 7240d7d, all in d1a1d215 + template.html:
   the ribbon exists to draw the sentence.
 - **Verify built**: `grep -c "cyc-band" index.html` => 13; `"Mean of past
   terms"` => 1. Caption text is plain ASCII in the compiled bundle.
+
+## Per-term event lines (CYC_EVENTS in d1a1d215)
+
+Board of event markers per past-term year, drawn ONLY while that term
+stands alone on the chart (SOLO panel, `CYC_EVENTS[solo.year]`); overlaid
+with other cycles an event belongs to no single line, so it hides. An
+optional `metrics: [...]` whitelist (e.g. Shorten→Albanese pins to
+`oppnet`) narrows a marker to named measures. Keys must match CYCLE_DEFS
+years. As of 2026-09-03 there is ONE 1990 entry: Hawke→Keating spill
+dated 1991-12-20 (swearing-in day; the ballot was the 19th — pmSpl's iso
+in gen-data stays 1991-12-19).
 
 ## State as of 2026-09-03 (commit a0b910f)
 

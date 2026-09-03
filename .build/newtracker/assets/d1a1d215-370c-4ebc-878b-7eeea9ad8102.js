@@ -644,6 +644,14 @@ function cycMonthOf(eDate, m) {
    whitelist pins the event to those chart measures alone. */
 const cycEventMonth = (iso, eDate) => (Date.parse(iso) - Date.parse(eDate)) / 86400000 / MS_MONTH_C;
 const CYC_EVENTS = {
+  1990: [
+    {
+      date: "1991-12-20", short: "Hawke → Keating",
+      label: "Keating replaces Hawke as prime minister",
+      desc: "Paul Keating defeats Bob Hawke in a Labor leadership spill at his second attempt and is sworn in as prime minister.",
+      major: true,
+    },
+  ],
   2010: [
     {
       date: "2010-12-15", short: "Refugee tragedy",
