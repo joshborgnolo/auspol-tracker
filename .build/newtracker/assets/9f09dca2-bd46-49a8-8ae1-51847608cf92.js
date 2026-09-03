@@ -132,7 +132,7 @@ window.AUSPOL = (function () {
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
     agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, adjusted, houseEffects, houseLean, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
-    individualPolls, pollsterTable, latest, cycles, events,
+    individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
     get cycleSource() { return _cycleSource || {}; },
