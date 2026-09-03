@@ -1202,7 +1202,12 @@ const CYC_META = [
   { year: 2016, gov: "lnp", opp: "alp", pm: "Turnbull → Morrison", lead: "Turnbull", oppLead: "Shorten", eDate: "2016-07-02", ePrim: 42.0, eTpp: 50.4, src: 2019, appr: 2016,
     pmSpl: { iso: "2018-08-24", names: ["Turnbull", "Morrison"] },
     oppSpl: { iso: "2019-05-27", names: ["Shorten", "Albanese"] } },
-  { year: 2019, gov: "lnp", opp: "alp", pm: "Morrison", lead: "Morrison", oppLead: "Shorten → Albanese", eDate: "2019-05-18", ePrim: 41.44, eTpp: 51.53, src: 2022, appr: 2019 },
+  /* Shorten → Albanese carries the iso here (like every other mid-term
+     opposition change) because the preferred-PM pairing eras need it to
+     name themselves; for the approval panels his era holds no post-
+     election readings, so the eras collapse to one and nothing redraws. */
+  { year: 2019, gov: "lnp", opp: "alp", pm: "Morrison", lead: "Morrison", oppLead: "Shorten → Albanese", eDate: "2019-05-18", ePrim: 41.44, eTpp: 51.53, src: 2022, appr: 2019,
+    oppSpl: { iso: "2019-05-27", names: ["Shorten", "Albanese"] } },
   { year: 2022, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Dutton", eDate: "2022-05-21", ePrim: 32.6, eTpp: 52.1, src: 2025, appr: 2022 },
   { year: 2025, gov: "alp", opp: "lnp", pm: "Albanese", lead: "Albanese", oppLead: "Ley → Taylor", current: true, eDate: "2025-05-03", ePrim: 34.6, eTpp: 55.2,
     oppSpl: { iso: OPP_SPLICE_ISO, names: ["Ley", "Taylor"] } },
@@ -1224,6 +1229,33 @@ function eraSeries(points, spl, cap) {
     const lo = i > 0 ? isos[i - 1] : null, hi = i < isos.length ? isos[i] : null;
     const pts = points.filter((p) => (!lo || p.iso >= lo) && (!hi || p.iso < hi));
     return pts.length ? { name, from: lo, ...cycleSeries(pts, null, cap) } : null;
+  }).filter(Boolean);
+  return eras.length > 1 ? eras : null;
+}
+/* Preferred-PM is a pairing, not an office: the pairing changes whenever
+   EITHER leader changes, so its eras splice on the union of both sides'
+   handover dates and name themselves "PM v Opponent" per segment. Person
+   lists are the CYC_META display strings split on "→" (they agree with the
+   spl names by construction); an office that changed hands but holds no
+   ppm readings before the handover contributes an empty segment and the
+   lines collapse – 2019's Shorten segment evaporates, leaving one
+   Morrison v Albanese pairing; 2001's Beazley fortnight does the same. */
+const splIsos = (spl) => (spl ? (spl.isos || [spl.iso]) : []);
+const eraNameAt = (isos, names, iso) =>
+  names[Math.min(isos.filter((b) => b <= iso).length, names.length - 1)];
+const ppmPairName = (c, iso) =>
+  eraNameAt(splIsos(c.pmSpl), c.pm.split(" → "), iso) + " v " +
+  eraNameAt(splIsos(c.oppSpl), c.oppLead.split(" → "), iso);
+function ppmErasFor(c, points, cap) {
+  const isos = [...new Set([...splIsos(c.pmSpl), ...splIsos(c.oppSpl)])].sort();
+  if (!isos.length) return null;
+  const segs = isos.map((b, i) => [i ? isos[i - 1] : null, b])
+    .concat([[isos[isos.length - 1], null]]);
+  const eras = segs.map(([lo, hi]) => {
+    const pts = points.filter((p) => (!lo || p.iso >= lo) && (!hi || p.iso < hi));
+    return pts.length
+      ? { name: ppmPairName(c, lo ?? pts[0].iso), from: lo, ...cycleSeries(pts, null, cap) }
+      : null;
   }).filter(Boolean);
   return eras.length > 1 ? eras : null;
 }
@@ -1320,7 +1352,7 @@ const accuracy = accuracyCycles.length ? (() => {
 })() : null;
 
 const CYCLE_DEFS = CYC_META.map((c) => {
-  let primPts, tppPts, netPts, oppPts, hanPts, oppPrimPts, onpPts;
+  let primPts, tppPts, netPts, oppPts, hanPts, oppPrimPts, onpPts, ppmPts;
   if (c.current) {
     primPts = aggPrimary.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.alp }));
     tppPts = agg2pp.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.alp }));
@@ -1337,6 +1369,8 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     const apprOnly = appr.filter((a) => metricOf(a.firm, "alb") !== "fav");   // PM approval only, not favourability
     netPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.alb, iso: a.date }));
     oppPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.opp, iso: a.date }));
+    // current-term ppm readings are the live ppm table's per-wave margin
+    ppmPts = ppm.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p.alb - p.opp, iso: p.date }));
     // Hanson's metric is filtered per row and per DATE – Resolve rated her on
     // likeability until the 6-11 Jul 2026 wave and on performance after it, so
     // an unbounded firm test would put favourability on an approval line.
@@ -1355,6 +1389,12 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     const apprRows = as.filter((r) => (r.metric || metricOf(r.firm, "alb")) !== "fav");
     netPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.pmNet, iso: r.date }));
     oppPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.oppNet, iso: r.date }));
+    // preferred-PM rides the same approval waves: margin per wave, PM minus
+    // opponent. Pairing-neutral number, so it filters ALL rows, not the
+    // favourability-safe apprRows – Freshwater reports approval as
+    // favourability but its ppm readings stand independently
+    ppmPts = as.filter((r) => r.pmPpm != null && r.oppPpm != null)
+      .map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.pmPpm - r.oppPpm, iso: r.date }));
     // no past cycle rated Hanson: cycleApproval carries pmNet and oppNet only
     hanPts = [];
   }
@@ -1371,6 +1411,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
   const onp = cycleSeries(onpPts, eOpp.onp, cap);
   const net = cycleSeries(netPts, null, cap);
   const opp = cycleSeries(oppPts, null, cap);
+  const ppmm = cycleSeries(ppmPts, null, cap);
   const months = prim.months;
   // trailing months beyond a measure's range hold its last value; leading
   // nulls stay null (see cycleSeries)
@@ -1391,13 +1432,18 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     eDate: c.eDate,
     months, primary: prim.vals, tpp: tpp.vals, net: align(net), oppnet: align(opp),
     oppr: oppr.vals,
+    ppmm: align(ppmm),
     // the null-padded form align() can't produce alone: with no ONP readings
     // on record (2010/13), s.months is empty and align has nothing to index
     onp: onp.months.length ? align(onp) : months.map(() => null),
     obs: { primary: prim.obs, tpp: tpp.obs, net: alignObs(net), oppnet: alignObs(opp),
-           oppr: oppr.obs, onp: alignObs(onp) },
+           oppr: oppr.obs, onp: alignObs(onp), ppmm: alignObs(ppmm) },
     han: sparseSeries(hanPts, months, cap),
     netEras: eraSeries(netPts, c.pmSpl, cap), oppEras: eraSeries(oppPts, c.oppSpl, cap),
+    ppmEras: ppmErasFor(c, ppmPts, cap),
+    // pairing name for the single-line legend when the pairing never
+    // changed inside the measured window (e.g. "Albanese v Dutton")
+    ppmPair: ppmPts.length ? ppmPairName(c, ppmPts[0].iso) : null,
   };
 });
 
@@ -1904,10 +1950,12 @@ window.AUSPOL = (function () {
     eDate: c.eDate,
     color: PARTIES[c.gov].color, span: c.months[c.months.length - 1],
     base: { tpp: c.tpp[0], primary: c.primary[0], net: c.net[0], oppnet: c.oppnet[0], han: c.han[0],
-            oppr: c.oppr[0], onp: c.onp[0] },
-    // han is sparse, so "end" is its last READING, not its last slot
+            oppr: c.oppr[0], onp: c.onp[0], ppmm: c.ppmm[0] },
+    // han is sparse, so "end" is its last READING, not its last slot;
+    // onp and ppmm follow it — both grid as all-null on some cycles
     end: { tpp: c.tpp[c.tpp.length - 1], primary: c.primary[c.primary.length - 1], net: c.net[c.net.length - 1], oppnet: c.oppnet[c.oppnet.length - 1], han: [...c.han].reverse().find((v) => v != null) ?? null,
-           oppr: c.oppr[c.oppr.length - 1], onp: [...c.onp].reverse().find((v) => v != null) ?? null },
+           oppr: c.oppr[c.oppr.length - 1], onp: [...c.onp].reverse().find((v) => v != null) ?? null,
+           ppmm: [...c.ppmm].reverse().find((v) => v != null) ?? null },
     points: {
       tpp: c.months.map((m, i) => ({ x: m, y: c.tpp[i] })),
       primary: c.months.map((m, i) => ({ x: m, y: c.primary[i] })),
@@ -1916,10 +1964,12 @@ window.AUSPOL = (function () {
       han: c.months.map((m, i) => ({ x: m, y: c.han[i] })),
       oppr: c.months.map((m, i) => ({ x: m, y: c.oppr[i] })),
       onp: c.months.map((m, i) => ({ x: m, y: c.onp[i] })),
+      ppmm: c.months.map((m, i) => ({ x: m, y: c.ppmm[i] })),
     },
     raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, han: c.han, months: c.months, obs: c.obs,
-           oppr: c.oppr, onp: c.onp,
-           ...(c.netEras ? { netEras: c.netEras } : {}), ...(c.oppEras ? { oppEras: c.oppEras } : {}) },
+           oppr: c.oppr, onp: c.onp, ppmm: c.ppmm,
+           ...(c.netEras ? { netEras: c.netEras } : {}), ...(c.oppEras ? { oppEras: c.oppEras } : {}),
+           ...(c.ppmEras ? { ppmEras: c.ppmEras } : {}), ...(c.ppmPair ? { ppmPair: c.ppmPair } : {}) },
   }));
 
   return {

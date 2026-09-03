@@ -543,6 +543,18 @@ const CYC_METRICS = [
   { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader",
     leader: "opp", unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
     step: 10, refAbs: 0, refAbsLabel: "even", han: true },
+  /* One line per term: the PM's lead in the preferred-PM question, pmPpm
+     minus oppPpm. The pairing names itself per segment (e.ppmEras, or
+     c.raw.ppmPair when it never changed), the fallback label for an
+     unsegmented term is that pairing, not a lone office – "Hawke v Peacock",
+     not "Hawke". Leading nulls stay null, so sparse terms open mid-term
+     (1990's first ppm reading is 1991-07); the change-since anchor is
+     therefore the first READING, never election day, and the zero line is
+     labelled for that. */
+  { key: "ppmm", title: "Preferred prime minister",
+    sub: "Sitting PM's lead on the preferred-PM question",
+    unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
+    step: 10, refAbs: 0, refAbsLabel: "even", chgRefLabel: "First reading" },
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
     unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: null },
@@ -835,6 +847,16 @@ function cycleReadings(c, M, D) {
       else if (key === "tpp") y = p[c.gov];
       else if (key === "net") y = (mb.alb || "approval") === "fav" ? null : (p.appr ? p.appr.albNet : null);
       else if (key === "oppnet") y = (mb.taylor || "approval") === "fav" ? null : (p.appr ? p.appr.taylorNet : null);
+      /* the ppm line's margin, from the wave's MAIN pairing (sets[0] is
+         always the published main row; the Albanese-v-Hanson H2 is appended
+         last). The opponent's key varies with the leader (ley, taylor…), so
+         find it as the one dynamic key among alb/unc/hanson. */
+      else if (key === "ppmm") {
+        const s = p.ppmSets ? p.ppmSets[0] : p.ppm;
+        const ok = s && Object.keys(s).find((k) => !["alb", "unc", "hanson"].includes(k));
+        if (ok == null || s[ok] == null || s.alb == null) continue;
+        y = s.alb - s[ok];
+      }
       if (y == null) continue;
       out.push({ x: mOf(p.released), y, iso: p.released,
                  meta: { pollster: p.pollster, dateLabel: p.dateLabel, sample: p.sample, released: p.released } });
@@ -850,6 +872,14 @@ function cycleReadings(c, M, D) {
     for (const p of src.polls) {
       if (p[f] == null || p.firm === "Election" || !inCycleRange(p.m)) continue;
       out.push({ x: p.m, y: p[f], iso: p.date, meta: { pollster: p.firm, dateLabel: cycDotDate(p.date) } });
+    }
+  } else if (key === "ppmm") {
+    // margin per wave, PM minus opponent. Pairing-neutral, so the
+    // favourability gate below does not apply (gen-data says why: a firm
+    // can report approval as favourability while its ppm readings stand)
+    for (const r of src.approval) {
+      if (r.pmPpm == null || r.oppPpm == null || !inCycleRange(r.m)) continue;
+      out.push({ x: r.m, y: r.pmPpm - r.oppPpm, iso: r.date, meta: { pollster: r.firm, dateLabel: cycDotDate(r.date) } });
     }
   } else {
     const f = isOpp ? "oppNet" : "pmNet";
@@ -1007,7 +1037,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
        answers to its own name, so the handover month lists both readings
        rather than letting one office row average two people. The pooled
        series still carries terms that never changed leaders. */
-    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || null;
+    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || null;
     const seriesIn = eras
       ? eras.map((e) => ({ name: e.name, months: e.months, vals: e.vals, obs: e.obs }))
       : [{ name: null, months: c.raw.months, vals: c.raw[M.key], obs: (c.raw.obs || {})[M.key] }];
@@ -1023,7 +1053,8 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
       // does instead of running flat out of a value that was never measured
       const pts = monthly.filter((p) => p.y != null)
         .map((p) => ({ x: p.x, y: chg ? +(p.y - base).toFixed(2) : p.y }));
-      const leadName = s.name || (isOpp ? c.oppLead : c.lead);
+      // an unsegmented ppm line names its single pairing, never a lone office
+      const leadName = s.name || (M.key === "ppmm" ? c.raw.ppmPair : (isOpp ? c.oppLead : c.lead));
       const label = solo ? leadName : c.year + " · " + leadName;
       /* Months are the x values, and `months` is 0..n, but look the index up
          rather than assume it: the flags have to describe the same month the
@@ -1072,11 +1103,11 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
   const shownKey = shown.map((c) => c.year).join(",");
   const scatter = React.useMemo(() => (!dotsOn ? [] : shown.flatMap((c) => {
     const base = cycBase(c, M.key);
-    const leadName = isOpp ? c.oppLead : c.lead;
+    const leadName = M.key === "ppmm" ? c.raw.ppmPair : (isOpp ? c.oppLead : c.lead);
     const label = solo ? leadName : c.year + " · " + leadName;
     // a term that changed holders names the holder at the dot's own date,
     // matching the per-person runs drawn under it
-    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || null;
+    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || null;
     const nameAt = (iso) => {
       if (!eras || !iso) return null;
       let n = eras[0].name;
@@ -1147,7 +1178,9 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
 
   const { domain, ticks } = cycDomain(cycles, M, chg);
   const refY = chg ? 0 : M.refAbs;
-  const refLabel = chg ? "Election result" : M.refAbsLabel;
+  // measures with no election-day anchor (ppm margin opens at its first
+  // reading) must not have the zero line claim one
+  const refLabel = chg ? (M.chgRefLabel || "Election result") : M.refAbsLabel;
   const refLines = refY != null ? [{ y: refY, label: refLabel, color: "var(--ink-faint)", align: "left" }] : [];
 
   // insight: current government vs the average past government at the same month
@@ -1174,12 +1207,14 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
          primary/2PP charts measure the party machine itself, so they keep
          the party name – "Labor … the average government", "the Coalition …
          the average opposition". */
-      const subjParty = M.key === "net" || M.key === "oppnet" ? null : (isOpp ? cur.opp : cur.gov);
+      const subjParty = M.key === "net" || M.key === "oppnet" || M.key === "ppmm" ? null : (isOpp ? cur.opp : cur.gov);
       const subjLabel = M.key === "net" ? sitting(cur.pm)
         : M.key === "oppnet" ? sitting(cur.oppLead)
+        : M.key === "ppmm" ? sitting(cur.pm) + " v " + sitting(cur.oppLead)
         : (subjParty === "lnp" ? "the " : "") + D.PARTIES[subjParty].name;
       const peerNoun = M.key === "net" ? "prime minister"
         : M.key === "oppnet" ? "opposition leader"
+        : M.key === "ppmm" ? "pairing"
         : isOpp ? "opposition" : "government";
       insight = { d: Math.abs(d), better, mNow, subjLabel, peerNoun };
     }

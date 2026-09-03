@@ -42799,7 +42799,9 @@
         "date": "2022-07-30",
         "firm": "Newspoll",
         "pmNet": 35,
-        "oppNet": -4
+        "oppNet": -4,
+        "pmPpm": 59,
+        "oppPpm": 25
       },
       {
         "date": "2022-08-07",
@@ -42811,13 +42813,17 @@
         "date": "2022-08-21",
         "firm": "Resolve",
         "pmNet": 39,
-        "oppNet": -7
+        "oppNet": -7,
+        "pmPpm": 55,
+        "oppPpm": 17
       },
       {
         "date": "2022-09-03",
         "firm": "Newspoll",
         "pmNet": 32,
-        "oppNet": -8
+        "oppNet": -8,
+        "pmPpm": 61,
+        "oppPpm": 22
       },
       {
         "date": "2022-09-04",
@@ -42829,13 +42835,17 @@
         "date": "2022-09-18",
         "firm": "Resolve",
         "pmNet": 36,
-        "oppNet": -12
+        "oppNet": -12,
+        "pmPpm": 53,
+        "oppPpm": 19
       },
       {
         "date": "2022-10-09",
         "firm": "Resolve",
         "pmNet": 35,
-        "oppNet": -11
+        "oppNet": -11,
+        "pmPpm": 53,
+        "oppPpm": 18
       },
       {
         "date": "2022-10-16",
@@ -42853,13 +42863,17 @@
         "date": "2022-10-30",
         "firm": "Resolve",
         "pmNet": 29,
-        "oppNet": -12
+        "oppNet": -12,
+        "pmPpm": 53,
+        "oppPpm": 19
       },
       {
         "date": "2022-10-30",
         "firm": "Newspoll",
         "pmNet": 26,
-        "oppNet": -7
+        "oppNet": -7,
+        "pmPpm": 54,
+        "oppPpm": 27
       },
       {
         "date": "2022-11-14",
@@ -42877,13 +42891,17 @@
         "date": "2022-12-03",
         "firm": "Newspoll",
         "pmNet": 33,
-        "oppNet": -9
+        "oppNet": -9,
+        "pmPpm": 59,
+        "oppPpm": 24
       },
       {
         "date": "2022-12-04",
         "firm": "Resolve",
         "pmNet": 36,
-        "oppNet": -15
+        "oppNet": -15,
+        "pmPpm": 54,
+        "oppPpm": 19
       },
       {
         "date": "2022-12-11",
@@ -42892,10 +42910,20 @@
         "oppNet": null
       },
       {
+        "date": "2022-12-18",
+        "firm": "Freshwater",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 55,
+        "oppPpm": 29
+      },
+      {
         "date": "2023-01-22",
         "firm": "Resolve",
         "pmNet": 35,
-        "oppNet": -18
+        "oppNet": -18,
+        "pmPpm": 55,
+        "oppPpm": 20
       },
       {
         "date": "2023-01-22",
@@ -42907,13 +42935,17 @@
         "date": "2023-02-04",
         "firm": "Newspoll",
         "pmNet": 24,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 56,
+        "oppPpm": 26
       },
       {
         "date": "2023-02-19",
         "firm": "Resolve",
         "pmNet": 26,
-        "oppNet": -16
+        "oppNet": -16,
+        "pmPpm": 55,
+        "oppPpm": 23
       },
       {
         "date": "2023-02-19",
@@ -42931,19 +42963,25 @@
         "date": "2023-03-04",
         "firm": "Newspoll",
         "pmNet": 17,
-        "oppNet": -11
+        "oppNet": -11,
+        "pmPpm": 54,
+        "oppPpm": 28
       },
       {
         "date": "2023-03-16",
         "firm": "Resolve",
         "pmNet": 24,
-        "oppNet": -12
+        "oppNet": -12,
+        "pmPpm": 51,
+        "oppPpm": 22
       },
       {
         "date": "2023-04-01",
         "firm": "Newspoll",
         "pmNet": 21,
-        "oppNet": -13
+        "oppNet": -13,
+        "pmPpm": 58,
+        "oppPpm": 26
       },
       {
         "date": "2023-04-02",
@@ -42955,7 +42993,9 @@
         "date": "2023-04-16",
         "firm": "Resolve",
         "pmNet": 27,
-        "oppNet": -28
+        "oppNet": -28,
+        "pmPpm": 55,
+        "oppPpm": 21
       },
       {
         "date": "2023-04-16",
@@ -42967,19 +43007,25 @@
         "date": "2023-04-22",
         "firm": "Newspoll",
         "pmNet": 16,
-        "oppNet": -19
+        "oppNet": -19,
+        "pmPpm": 54,
+        "oppPpm": 28
       },
       {
         "date": "2023-05-13",
         "firm": "Newspoll",
         "pmNet": 19,
-        "oppNet": -15
+        "oppNet": -15,
+        "pmPpm": 56,
+        "oppPpm": 29
       },
       {
         "date": "2023-05-14",
         "firm": "Resolve",
         "pmNet": 27,
-        "oppNet": -21
+        "oppNet": -21,
+        "pmPpm": 53,
+        "oppPpm": 20
       },
       {
         "date": "2023-05-14",
@@ -42991,19 +43037,25 @@
         "date": "2023-05-17",
         "firm": "Freshwater",
         "pmNet": 5,
-        "oppNet": -12
+        "oppNet": -12,
+        "pmPpm": 51,
+        "oppPpm": 33
       },
       {
         "date": "2023-06-03",
         "firm": "Newspoll",
         "pmNet": 18,
-        "oppNet": -14
+        "oppNet": -14,
+        "pmPpm": 55,
+        "oppPpm": 28
       },
       {
         "date": "2023-06-11",
         "firm": "Resolve",
         "pmNet": 18,
-        "oppNet": -20
+        "oppNet": -20,
+        "pmPpm": 53,
+        "oppPpm": 22
       },
       {
         "date": "2023-06-12",
@@ -43015,19 +43067,25 @@
         "date": "2023-06-24",
         "firm": "Newspoll",
         "pmNet": 10,
-        "oppNet": -11
+        "oppNet": -11,
+        "pmPpm": 52,
+        "oppPpm": 32
       },
       {
         "date": "2023-07-15",
         "firm": "Newspoll",
         "pmNet": 11,
-        "oppNet": -13
+        "oppNet": -13,
+        "pmPpm": 54,
+        "oppPpm": 29
       },
       {
         "date": "2023-07-16",
         "firm": "Resolve",
         "pmNet": 17,
-        "oppNet": -16
+        "oppNet": -16,
+        "pmPpm": 51,
+        "oppPpm": 21
       },
       {
         "date": "2023-07-23",
@@ -43039,13 +43097,17 @@
         "date": "2023-08-13",
         "firm": "Resolve",
         "pmNet": 2,
-        "oppNet": -13
+        "oppNet": -13,
+        "pmPpm": 46,
+        "oppPpm": 25
       },
       {
         "date": "2023-09-01",
         "firm": "Newspoll",
         "pmNet": -1,
-        "oppNet": -11
+        "oppNet": -11,
+        "pmPpm": 50,
+        "oppPpm": 31
       },
       {
         "date": "2023-09-03",
@@ -43057,43 +43119,65 @@
         "date": "2023-09-10",
         "firm": "Resolve",
         "pmNet": -7,
-        "oppNet": -8
+        "oppNet": -8,
+        "pmPpm": 43,
+        "oppPpm": 28
       },
       {
         "date": "2023-09-22",
         "firm": "Newspoll",
         "pmNet": 3,
-        "oppNet": -20
+        "oppNet": -20,
+        "pmPpm": 50,
+        "oppPpm": 30
       },
       {
         "date": "2023-09-24",
         "firm": "Freshwater",
         "pmNet": -3,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 46,
+        "oppPpm": 37
+      },
+      {
+        "date": "2023-09-29",
+        "firm": "YouGov",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 50,
+        "oppPpm": 33
       },
       {
         "date": "2023-10-05",
         "firm": "Resolve",
         "pmNet": 0,
-        "oppNet": -15
+        "oppNet": -15,
+        "pmPpm": 47,
+        "oppPpm": 25
       },
       {
         "date": "2023-10-06",
         "firm": "Newspoll",
         "pmNet": -1,
-        "oppNet": -13
+        "oppNet": -13,
+        "pmPpm": 50,
+        "oppPpm": 33
       },
       {
         "date": "2023-10-10",
         "firm": "YouGov",
         "pmNet": -3,
-        "oppNet": -12
+        "oppNet": -12,
+        "pmPpm": 50,
+        "oppPpm": 34
       },
       {
         "date": "2023-10-12",
         "firm": "Newspoll",
         "pmNet": 0,
-        "oppNet": -18
+        "oppNet": -18,
+        "pmPpm": 51,
+        "oppPpm": 31
       },
       {
         "date": "2023-10-14",
@@ -43105,25 +43189,33 @@
         "date": "2023-11-03",
         "firm": "Newspoll",
         "pmNet": -10,
-        "oppNet": -13
+        "oppNet": -13,
+        "pmPpm": 46,
+        "oppPpm": 36
       },
       {
         "date": "2023-11-05",
         "firm": "Resolve",
         "pmNet": -7,
-        "oppNet": -4
+        "oppNet": -4,
+        "pmPpm": 40,
+        "oppPpm": 27
       },
       {
         "date": "2023-11-14",
         "firm": "YouGov",
         "pmNet": -7,
-        "oppNet": -7
+        "oppNet": -7,
+        "pmPpm": 48,
+        "oppPpm": 34
       },
       {
         "date": "2023-11-24",
         "firm": "Newspoll",
         "pmNet": -13,
-        "oppNet": -13
+        "oppNet": -13,
+        "pmPpm": 46,
+        "oppPpm": 35
       },
       {
         "date": "2023-11-26",
@@ -43135,37 +43227,49 @@
         "date": "2023-12-03",
         "firm": "Resolve",
         "pmNet": -11,
-        "oppNet": -8
+        "oppNet": -8,
+        "pmPpm": 42,
+        "oppPpm": 28
       },
       {
         "date": "2023-12-05",
         "firm": "YouGov",
         "pmNet": -16,
-        "oppNet": -9
+        "oppNet": -9,
+        "pmPpm": 46,
+        "oppPpm": 36
       },
       {
         "date": "2023-12-15",
         "firm": "Newspoll",
         "pmNet": -8,
-        "oppNet": -9
+        "oppNet": -9,
+        "pmPpm": 46,
+        "oppPpm": 35
       },
       {
         "date": "2023-12-17",
         "firm": "Freshwater",
         "pmNet": -5,
-        "oppNet": -2
+        "oppNet": -2,
+        "pmPpm": 43,
+        "oppPpm": 39
       },
       {
         "date": "2024-01-11",
         "firm": "Freshwater",
         "pmNet": -5,
-        "oppNet": -9
+        "oppNet": -9,
+        "pmPpm": 47,
+        "oppPpm": 38
       },
       {
         "date": "2024-01-17",
         "firm": "YouGov",
         "pmNet": -13,
-        "oppNet": -11
+        "oppNet": -11,
+        "pmPpm": 45,
+        "oppPpm": 35
       },
       {
         "date": "2024-01-28",
@@ -43177,31 +43281,41 @@
         "date": "2024-02-03",
         "firm": "Newspoll",
         "pmNet": -9,
-        "oppNet": -13
+        "oppNet": -13,
+        "pmPpm": 46,
+        "oppPpm": 35
       },
       {
         "date": "2024-02-07",
         "firm": "YouGov",
         "pmNet": -16,
-        "oppNet": -8
+        "oppNet": -8,
+        "pmPpm": 45,
+        "oppPpm": 38
       },
       {
         "date": "2024-02-18",
         "firm": "Freshwater",
         "pmNet": -7,
-        "oppNet": -9
+        "oppNet": -9,
+        "pmPpm": 42,
+        "oppPpm": 38
       },
       {
         "date": "2024-02-23",
         "firm": "Newspoll",
         "pmNet": -8,
-        "oppNet": -14
+        "oppNet": -14,
+        "pmPpm": 47,
+        "oppPpm": 35
       },
       {
         "date": "2024-02-25",
         "firm": "Resolve",
         "pmNet": -6,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 39,
+        "oppPpm": 32
       },
       {
         "date": "2024-02-25",
@@ -43213,49 +43327,65 @@
         "date": "2024-03-05",
         "firm": "YouGov",
         "pmNet": -6,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 48,
+        "oppPpm": 34
       },
       {
         "date": "2024-03-10",
         "firm": "Freshwater",
         "pmNet": -8,
-        "oppNet": -13
+        "oppNet": -13,
+        "pmPpm": 47,
+        "oppPpm": 38
       },
       {
         "date": "2024-03-22",
         "firm": "Newspoll",
         "pmNet": -7,
-        "oppNet": -15
+        "oppNet": -15,
+        "pmPpm": 48,
+        "oppPpm": 34
       },
       {
         "date": "2024-03-24",
         "firm": "Resolve",
         "pmNet": -11,
-        "oppNet": -8
+        "oppNet": -8,
+        "pmPpm": 40,
+        "oppPpm": 30
       },
       {
         "date": "2024-03-27",
         "firm": "YouGov",
         "pmNet": -11,
-        "oppNet": -11
+        "oppNet": -11,
+        "pmPpm": 46,
+        "oppPpm": 34
       },
       {
         "date": "2024-04-14",
         "firm": "Freshwater",
         "pmNet": -7,
-        "oppNet": -9
+        "oppNet": -9,
+        "pmPpm": 45,
+        "oppPpm": 39
       },
       {
         "date": "2024-04-18",
         "firm": "Newspoll",
         "pmNet": -6,
-        "oppNet": -15
+        "oppNet": -15,
+        "pmPpm": 48,
+        "oppPpm": 35
       },
       {
         "date": "2024-04-21",
         "firm": "Resolve",
         "pmNet": -2,
-        "oppNet": -2
+        "oppNet": -2,
+        "pmPpm": 41,
+        "oppPpm": 32
       },
       {
         "date": "2024-04-21",
@@ -43267,25 +43397,33 @@
         "date": "2024-05-14",
         "firm": "YouGov",
         "pmNet": -12,
-        "oppNet": -6
+        "oppNet": -6,
+        "pmPpm": 44,
+        "oppPpm": 37
       },
       {
         "date": "2024-05-18",
         "firm": "Newspoll",
         "pmNet": 0,
-        "oppNet": -12
+        "oppNet": -12,
+        "pmPpm": 52,
+        "oppPpm": 33
       },
       {
         "date": "2024-05-19",
         "firm": "Resolve",
         "pmNet": -10,
-        "oppNet": -3
+        "oppNet": -3,
+        "pmPpm": 40,
+        "oppPpm": 32
       },
       {
         "date": "2024-05-19",
         "firm": "Freshwater",
         "pmNet": -9,
-        "oppNet": -9
+        "oppNet": -9,
+        "pmPpm": 46,
+        "oppPpm": 37
       },
       {
         "date": "2024-06-02",
@@ -43297,31 +43435,41 @@
         "date": "2024-06-04",
         "firm": "YouGov",
         "pmNet": -12,
-        "oppNet": -13
+        "oppNet": -13,
+        "pmPpm": 47,
+        "oppPpm": 36
       },
       {
         "date": "2024-06-07",
         "firm": "Newspoll",
         "pmNet": -7,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 46,
+        "oppPpm": 38
       },
       {
         "date": "2024-06-16",
         "firm": "Resolve",
         "pmNet": -14,
-        "oppNet": 2
+        "oppNet": 2,
+        "pmPpm": 35,
+        "oppPpm": 36
       },
       {
         "date": "2024-06-16",
         "firm": "Freshwater",
         "pmNet": -12,
-        "oppNet": -5
+        "oppNet": -5,
+        "pmPpm": 43,
+        "oppPpm": 41
       },
       {
         "date": "2024-06-28",
         "firm": "Newspoll",
         "pmNet": -11,
-        "oppNet": -16
+        "oppNet": -16,
+        "pmPpm": 46,
+        "oppPpm": 38
       },
       {
         "date": "2024-06-30",
@@ -43333,25 +43481,33 @@
         "date": "2024-07-14",
         "firm": "Resolve",
         "pmNet": -22,
-        "oppNet": -1
+        "oppNet": -1,
+        "pmPpm": 34,
+        "oppPpm": 35
       },
       {
         "date": "2024-07-17",
         "firm": "YouGov",
         "pmNet": -10,
-        "oppNet": -4
+        "oppNet": -4,
+        "pmPpm": 45,
+        "oppPpm": 37
       },
       {
         "date": "2024-07-19",
         "firm": "Newspoll",
         "pmNet": -7,
-        "oppNet": -8
+        "oppNet": -8,
+        "pmPpm": 46,
+        "oppPpm": 39
       },
       {
         "date": "2024-07-21",
         "firm": "Freshwater",
         "pmNet": -14,
-        "oppNet": -3
+        "oppNet": -3,
+        "pmPpm": 45,
+        "oppPpm": 39
       },
       {
         "date": "2024-07-28",
@@ -43363,19 +43519,25 @@
         "date": "2024-08-09",
         "firm": "Newspoll",
         "pmNet": -8,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 46,
+        "oppPpm": 39
       },
       {
         "date": "2024-08-11",
         "firm": "Resolve",
         "pmNet": -17,
-        "oppNet": 3
+        "oppNet": 3,
+        "pmPpm": 35,
+        "oppPpm": 36
       },
       {
         "date": "2024-08-18",
         "firm": "Freshwater",
         "pmNet": -10,
-        "oppNet": -3
+        "oppNet": -3,
+        "pmPpm": 45,
+        "oppPpm": 41
       },
       {
         "date": "2024-08-24",
@@ -43387,37 +43549,49 @@
         "date": "2024-08-28",
         "firm": "YouGov",
         "pmNet": -11,
-        "oppNet": -5
+        "oppNet": -5,
+        "pmPpm": 43,
+        "oppPpm": 38
       },
       {
         "date": "2024-08-30",
         "firm": "Newspoll",
         "pmNet": -13,
-        "oppNet": -13
+        "oppNet": -13,
+        "pmPpm": 45,
+        "oppPpm": 37
       },
       {
         "date": "2024-09-07",
         "firm": "Resolve",
         "pmNet": -18,
-        "oppNet": -1
+        "oppNet": -1,
+        "pmPpm": 35,
+        "oppPpm": 34
       },
       {
         "date": "2024-09-15",
         "firm": "Freshwater",
         "pmNet": -15,
-        "oppNet": -4
+        "oppNet": -4,
+        "pmPpm": 45,
+        "oppPpm": 41
       },
       {
         "date": "2024-09-19",
         "firm": "YouGov",
         "pmNet": -22,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 42,
+        "oppPpm": 39
       },
       {
         "date": "2024-09-20",
         "firm": "Newspoll",
         "pmNet": -8,
-        "oppNet": -15
+        "oppNet": -15,
+        "pmPpm": 46,
+        "oppPpm": 37
       },
       {
         "date": "2024-09-22",
@@ -43429,13 +43603,17 @@
         "date": "2024-10-06",
         "firm": "Resolve",
         "pmNet": -17,
-        "oppNet": 0
+        "oppNet": 0,
+        "pmPpm": 38,
+        "oppPpm": 35
       },
       {
         "date": "2024-10-11",
         "firm": "Newspoll",
         "pmNet": -14,
-        "oppNet": -14
+        "oppNet": -14,
+        "pmPpm": 45,
+        "oppPpm": 37
       },
       {
         "date": "2024-10-16",
@@ -43453,25 +43631,33 @@
         "date": "2024-10-20",
         "firm": "Freshwater",
         "pmNet": -14,
-        "oppNet": -2
+        "oppNet": -2,
+        "pmPpm": 44,
+        "oppPpm": 43
       },
       {
         "date": "2024-11-08",
         "firm": "Newspoll",
         "pmNet": -15,
-        "oppNet": -11
+        "oppNet": -11,
+        "pmPpm": 45,
+        "oppPpm": 41
       },
       {
         "date": "2024-11-10",
         "firm": "Resolve",
         "pmNet": -14,
-        "oppNet": 5
+        "oppNet": 5,
+        "pmPpm": 37,
+        "oppPpm": 37
       },
       {
         "date": "2024-11-17",
         "firm": "Freshwater",
         "pmNet": -17,
-        "oppNet": -4
+        "oppNet": -4,
+        "pmPpm": 43,
+        "oppPpm": 42
       },
       {
         "date": "2024-11-18",
@@ -43483,25 +43669,33 @@
         "date": "2024-11-21",
         "firm": "YouGov",
         "pmNet": -20,
-        "oppNet": -8
+        "oppNet": -8,
+        "pmPpm": 42,
+        "oppPpm": 39
       },
       {
         "date": "2024-12-06",
         "firm": "Newspoll",
         "pmNet": -14,
-        "oppNet": -12
+        "oppNet": -12,
+        "pmPpm": 45,
+        "oppPpm": 38
       },
       {
         "date": "2024-12-08",
         "firm": "Resolve",
         "pmNet": -26,
-        "oppNet": -2
+        "oppNet": -2,
+        "pmPpm": 35,
+        "oppPpm": 35
       },
       {
         "date": "2024-12-15",
         "firm": "Freshwater",
         "pmNet": -17,
-        "oppNet": -3
+        "oppNet": -3,
+        "pmPpm": 46,
+        "oppPpm": 43
       },
       {
         "date": "2024-12-15",
@@ -43513,7 +43707,9 @@
         "date": "2025-01-15",
         "firm": "YouGov",
         "pmNet": -15,
-        "oppNet": -6
+        "oppNet": -6,
+        "pmPpm": 44,
+        "oppPpm": 40
       },
       {
         "date": "2025-01-19",
@@ -43525,19 +43721,25 @@
         "date": "2025-01-19",
         "firm": "Freshwater",
         "pmNet": -18,
-        "oppNet": -4
+        "oppNet": -4,
+        "pmPpm": 43,
+        "oppPpm": 43
       },
       {
         "date": "2025-01-21",
         "firm": "Resolve",
         "pmNet": -22,
-        "oppNet": 6
+        "oppNet": 6,
+        "pmPpm": 34,
+        "oppPpm": 39
       },
       {
         "date": "2025-01-24",
         "firm": "Newspoll",
         "pmNet": -20,
-        "oppNet": -11
+        "oppNet": -11,
+        "pmPpm": 44,
+        "oppPpm": 41
       },
       {
         "date": "2025-02-11",
@@ -43549,7 +43751,9 @@
         "date": "2025-02-14",
         "firm": "Newspoll",
         "pmNet": -21,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 45,
+        "oppPpm": 40
       },
       {
         "date": "2025-02-16",
@@ -43561,13 +43765,17 @@
         "date": "2025-02-23",
         "firm": "Resolve",
         "pmNet": -22,
-        "oppNet": 5
+        "oppNet": 5,
+        "pmPpm": 35,
+        "oppPpm": 39
       },
       {
         "date": "2025-02-23",
         "firm": "Freshwater",
         "pmNet": -11,
-        "oppNet": -8
+        "oppNet": -8,
+        "pmPpm": 45,
+        "oppPpm": 43
       },
       {
         "date": "2025-02-25",
@@ -43579,7 +43787,9 @@
         "date": "2025-02-27",
         "firm": "YouGov",
         "pmNet": -12,
-        "oppNet": -2
+        "oppNet": -2,
+        "pmPpm": 42,
+        "oppPpm": 40
       },
       {
         "date": "2025-03-02",
@@ -43591,25 +43801,41 @@
         "date": "2025-03-06",
         "firm": "YouGov",
         "pmNet": -9,
-        "oppNet": -4
+        "oppNet": -4,
+        "pmPpm": 45,
+        "oppPpm": 39
       },
       {
         "date": "2025-03-07",
         "firm": "Newspoll",
         "pmNet": -12,
-        "oppNet": -14
+        "oppNet": -14,
+        "pmPpm": 47,
+        "oppPpm": 38
+      },
+      {
+        "date": "2025-03-07",
+        "firm": "Freshwater",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 39,
+        "oppPpm": 39
       },
       {
         "date": "2025-03-13",
         "firm": "YouGov",
         "pmNet": -6,
-        "oppNet": -6
+        "oppNet": -6,
+        "pmPpm": 45,
+        "oppPpm": 39
       },
       {
         "date": "2025-03-15",
         "firm": "Freshwater",
         "pmNet": -10,
-        "oppNet": -11
+        "oppNet": -11,
+        "pmPpm": 46,
+        "oppPpm": 42
       },
       {
         "date": "2025-03-16",
@@ -43621,13 +43847,33 @@
         "date": "2025-03-19",
         "firm": "YouGov",
         "pmNet": -9,
-        "oppNet": -5
+        "oppNet": -5,
+        "pmPpm": 45,
+        "oppPpm": 40
+      },
+      {
+        "date": "2025-03-21",
+        "firm": "DemosAU",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 40,
+        "oppPpm": 37
       },
       {
         "date": "2025-03-29",
         "firm": "Newspoll",
         "pmNet": -9,
-        "oppNet": -18
+        "oppNet": -18,
+        "pmPpm": 49,
+        "oppPpm": 38
+      },
+      {
+        "date": "2025-03-29",
+        "firm": "DemosAU",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 39,
+        "oppPpm": 38
       },
       {
         "date": "2025-03-30",
@@ -43639,43 +43885,57 @@
         "date": "2025-03-30",
         "firm": "Resolve",
         "pmNet": -10,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 42,
+        "oppPpm": 33
       },
       {
         "date": "2025-03-30",
         "firm": "Freshwater",
         "pmNet": -12,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 46,
+        "oppPpm": 45
       },
       {
         "date": "2025-04-03",
         "firm": "YouGov",
         "pmNet": -6,
-        "oppNet": -15
+        "oppNet": -15,
+        "pmPpm": 45,
+        "oppPpm": 38
       },
       {
         "date": "2025-04-04",
         "firm": "Newspoll",
         "pmNet": -11,
-        "oppNet": -17
+        "oppNet": -17,
+        "pmPpm": 48,
+        "oppPpm": 40
       },
       {
         "date": "2025-04-10",
         "firm": "YouGov",
         "pmNet": -2,
-        "oppNet": -15
+        "oppNet": -15,
+        "pmPpm": 48,
+        "oppPpm": 37
       },
       {
         "date": "2025-04-10",
         "firm": "Newspoll",
         "pmNet": -4,
-        "oppNet": -19
+        "oppNet": -19,
+        "pmPpm": 49,
+        "oppPpm": 38
       },
       {
         "date": "2025-04-14",
         "firm": "Resolve",
         "pmNet": 2,
-        "oppNet": -19
+        "oppNet": -19,
+        "pmPpm": 46,
+        "oppPpm": 30
       },
       {
         "date": "2025-04-14",
@@ -43687,31 +43947,49 @@
         "date": "2025-04-15",
         "firm": "YouGov",
         "pmNet": -6,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 48,
+        "oppPpm": 38
       },
       {
         "date": "2025-04-16",
         "firm": "Freshwater",
         "pmNet": -11,
-        "oppNet": -10
+        "oppNet": -10,
+        "pmPpm": 45,
+        "oppPpm": 41
       },
       {
         "date": "2025-04-17",
         "firm": "Newspoll",
         "pmNet": -9,
-        "oppNet": -22
+        "oppNet": -22,
+        "pmPpm": 52,
+        "oppPpm": 36
       },
       {
         "date": "2025-04-22",
         "firm": "YouGov",
         "pmNet": -7,
-        "oppNet": -18
+        "oppNet": -18,
+        "pmPpm": 50,
+        "oppPpm": 35
+      },
+      {
+        "date": "2025-04-23",
+        "firm": "DemosAU",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 43,
+        "oppPpm": 34
       },
       {
         "date": "2025-04-24",
         "firm": "Newspoll",
         "pmNet": -9,
-        "oppNet": -24
+        "oppNet": -24,
+        "pmPpm": 51,
+        "oppPpm": 35
       },
       {
         "date": "2025-04-27",
@@ -43723,31 +44001,57 @@
         "date": "2025-04-28",
         "firm": "Resolve",
         "pmNet": 1,
-        "oppNet": -24
+        "oppNet": -24,
+        "pmPpm": 47,
+        "oppPpm": 31
+      },
+      {
+        "date": "2025-04-28",
+        "firm": "Spectre Strategy",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 47,
+        "oppPpm": 35
+      },
+      {
+        "date": "2025-04-30",
+        "firm": "DemosAU",
+        "pmNet": null,
+        "oppNet": null,
+        "pmPpm": 46,
+        "oppPpm": 34
       },
       {
         "date": "2025-05-01",
         "firm": "Newspoll",
         "pmNet": -10,
-        "oppNet": -28
+        "oppNet": -28,
+        "pmPpm": 51,
+        "oppPpm": 35
       },
       {
         "date": "2025-05-01",
         "firm": "YouGov",
         "pmNet": -6,
-        "oppNet": -24
+        "oppNet": -24,
+        "pmPpm": 51,
+        "oppPpm": 34
       },
       {
         "date": "2025-05-01",
         "firm": "Freshwater",
         "pmNet": -3,
-        "oppNet": -16
+        "oppNet": -16,
+        "pmPpm": 49,
+        "oppPpm": 39
       },
       {
         "date": "2025-05-02",
         "firm": "Ipsos",
         "pmNet": -6,
-        "oppNet": -24
+        "oppNet": -24,
+        "pmPpm": 48,
+        "oppPpm": 34
       }
     ]
   }
