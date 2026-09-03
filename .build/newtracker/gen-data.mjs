@@ -197,7 +197,7 @@ const midMs = (p) => (new Date(p.dateStart || p.date).getTime() + new Date(p.dat
 const share2pp = (p) => (p.tpp_lnp != null && p.tpp_alp + p.tpp_lnp > 0) ? (p.tpp_alp / (p.tpp_alp + p.tpp_lnp)) * 100 : p.tpp_alp;
 const ddays = (a, b) => (a - b) / 86400000;
 const HL_WINDOW = 21, HL_HALF = 7;
-const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster }));
+const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
 /* Synthetic 2PP rows: each poll's primaries read through the single measured
    flow table in flows.mjs (AEC 2025, Event 31496). This series answers a
    different, narrower question than the published 2PP above – "what would
@@ -209,7 +209,7 @@ const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.
    total ~100 can't be read through a 100-point flow table. */
 const tppRowsSynth = POLLS
   .filter((p) => p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
-  .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: rowN(p), firm: p.pollster }));
+  .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
 
 /* A house effect is that pollster's lean AWAY FROM the cross-house consensus
    on that measure – never borrowed between measures, because a firm that
@@ -480,7 +480,7 @@ function altRowsFor(field) {
     const p = POLL_BY_KEY.get(key);
     const date = key.split("|")[0];
     out.push({ ym: ymOf(date), mid: p ? midMs(p) : new Date(date).getTime(),
-               x: v[field], n: rowN(p), firm: key.split("|")[1] });
+               x: v[field], n: rowN(p), firm: key.split("|")[1], key });
   }
   return out;
 }
@@ -506,6 +506,75 @@ function altSeries(field) {
 }
 const altAON = altSeries("ao"), altLON = altSeries("lo");
 const alt2pp = { alp_on: altAON.monthly, lnp_on: altLON.monthly };
+
+/* ---- 3b. each poll's footprint on the aggregates (leave-one-out) ---------
+   The expanded tables answer "how much did THIS poll move the figure the
+   reader sees up top?": the aggregate WITHOUT the poll, paired with the
+   aggregate as it stands. House effects are NOT re-estimated inside the
+   leave-one-out – a lean is a property of the whole cross-house consensus
+   and the headline itself only relearns one slowly; what moves when one wave
+   drops out is the weighting of the numbers it sat beside.
+   Payload key `eff`, per poll, series key → { lo, hi, w[, m] }:
+     lo  – the aggregate recomputed without this poll (ALP share, 0.1)
+     hi  – the standing aggregate, identically rounded (so hi−lo is the move)
+     w   – the poll sits inside the aggregation's window: without it, a zero
+           move reads "before the window", not "no pull"
+     m   – the ALP-v-ON line was measured against its MONTHLY mean (the
+           series is too thin to nowcast), so w speaks about that month
+   Series: `lnp` for a poll with a published classic pair; `imp` instead for
+   a poll with no pair at all – its primaries still pull the implied 2PP; and
+   `onp` additionally wherever the wave printed an ALP-v-ON head-to-head.
+   Keys are absent (not null) wherever the poll has no row in that series. An
+   empty 21-day window for the classic/implied nowcast emits nothing rather
+   than mixing bases against the monthly-fallback the headline would show. */
+const effByKey = (() => {
+  const ref = new Date(LATEST_ISO).getTime();
+  const cur2pp = nowcastAdj(tppRows, houseEffect, ref);
+  const curSynth = nowcastAdj(tppRowsSynth, synthEffect, ref);
+  const synthKeys = new Set(tppRowsSynth.map((r) => r.key));
+  const inWin = (rows, key) => rows.some((r) => r.key === key
+    && ddays(ref, r.mid) >= 0 && ddays(ref, r.mid) <= HL_WINDOW);
+  const loo = (rows, he, key) => { const r = nowcastAdj(rows.filter((q) => q.key !== key), he, ref); return r ? r.v : null; };
+  /* the ON matchup's CURRENT basis, mirroring altNowcast's gate: a nowcast
+     where the series supports one, else the last monthly point it draws */
+  const onpNow = altAON.adjusted ? nowcastAdj(altAON.rows, altAON.he, ref) : null;
+  const onpMonth = alt2pp.alp_on.length ? alt2pp.alp_on[alt2pp.alp_on.length - 1] : null;
+  const out = new Map();
+  for (const p of POLLS) {
+    const key = p.date + "|" + p.pollster;
+    const eff = {};
+    if (p.tpp_alp != null && cur2pp) {
+      const lo = loo(tppRows, houseEffect, key);
+      if (lo != null) eff.lnp = { lo: r1(lo), hi: r1(cur2pp.v), w: inWin(tppRows, key) ? 1 : 0 };
+    } else if (p.tpp_alp == null && synthKeys.has(key) && curSynth) {
+      const lo = loo(tppRowsSynth, synthEffect, key);
+      if (lo != null) eff.imp = { lo: r1(lo), hi: r1(curSynth.v), w: inWin(tppRowsSynth, key) ? 1 : 0 };
+    }
+    const ao = ALT_BY.get(key) && ALT_BY.get(key).ao;
+    if (ao != null) {
+      if (onpNow) {
+        const r = nowcastAdj(altAON.rows.filter((q) => q.key !== key), altAON.he, ref);
+        if (r) eff.onp = { lo: r1(r.v), hi: r1(onpNow.v), w: inWin(altAON.rows, key) ? 1 : 0 };
+      } else if (onpMonth) {
+        const rest = altAON.rows.filter((q) => q.key !== key && q.ym === onpMonth.ym);
+        const est = altAON.adjusted ? monthWithSe(rest, altAON.he, onpMonth.ym) : null;
+        const lo = est ? est.v : (rest.length ? mean(rest.map((q) => q.x)) : null);
+        if (lo != null) eff.onp = { lo: r1(lo), hi: r1(onpMonth.a), w: inWin(altAON.rows, key) ? 1 : 0, m: 1 };
+      }
+    }
+    if (Object.keys(eff).length) out.set(key, eff);
+  }
+  return out;
+})();
+/* guard the estimator's own arithmetic: one wave may lean a weighted
+   aggregate a point or so (the window carries ~ten), anything past that is a
+   bug in this file, not data – measured moves run ±0.1–1pp */
+for (const [k, eff] of effByKey) {
+  for (const e of Object.values(eff)) {
+    if (!Number.isFinite(e.lo) || !Number.isFinite(e.hi) || Math.abs(e.hi - e.lo) > 4)
+      throw new Error(`poll footprint out of range (${k}): ${JSON.stringify(e)}`);
+  }
+}
 
 /* ---- 4. leadership monthly – gap-aware (no interpolation) --------------
    Rows exist only for months with at least one published leadership reading;
@@ -991,6 +1060,9 @@ const individualPolls = POLLS.map((p) => {
     // election-flows 2PP, ALP share (Roy Morgan; RedBridge/Accent since the
     // Aug 2026 wave) – absent, not zero, where no flows pair was published
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
+    // this poll's pull on the standing aggregates (leave-one-out, §3b) –
+    // absent where the wave sits in none of the three series
+    ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
@@ -1061,6 +1133,9 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
+    // this poll's pull on the standing aggregates (leave-one-out, §3b) –
+    // absent where the wave sits in none of the three series
+    ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
