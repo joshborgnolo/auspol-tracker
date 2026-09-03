@@ -1222,6 +1222,110 @@ const latest = {
   method: { kind: "weighted house-effect-adjusted mean", windowDays: HL_WINDOW, halfLifeDays: HL_HALF, shrinkK: SHRINK_K, nPolls: hlNow.n },
 };
 
+/* ---- 8b. show-your-working: the rows behind the two headline estimates ---
+   The glossary's weighted-aggregate entry prints the headline as tables of
+   its own inputs, so a reader can reproduce the number from data/polls.json
+   by hand rather than take a formula on trust. Built line-for-line from
+   nowcastAdj (the 21-day 2PP window) and monthWithSe / aggPrimary (the
+   current month's ALP primary) – same helpers, same weights – so each
+   table's Σwᵢxᵢ ÷ Σwᵢ line reproduces the figure in the hero. The console
+   lines at the end compare these sums against the estimates themselves, so
+   estimator drift that an emitted table would now contradict shows in the
+   build log. */
+const dayMon = (ms) => { const t = new Date(ms); return `${t.getUTCDate()} ${MN[t.getUTCMonth()]}`; };
+/* a wave's fieldwork as it fits the table – "10–16 Aug" in-month, so the
+   range columns stay narrow; the window and month these tables describe are
+   days-to-weeks old, the year is never in doubt at view time */
+const fwText = (p) => {
+  if (!p.dateStart || p.dateStart === p.date) return dayMon(new Date(p.date).getTime());
+  const s = new Date(p.dateStart), e = new Date(p.date);
+  return s.getUTCMonth() === e.getUTCMonth()
+    ? `${s.getUTCDate()}–${dayMon(e.getTime())}`
+    : `${dayMon(s.getTime())} – ${dayMon(e.getTime())}`;
+};
+const showWorking = (() => {
+  // 2PP: polls whose fieldwork mid falls inside the trailing window – the
+  // filter is nowcastAdj's own predicate, ref and constants included
+  const tppRowsIn = tppRows.filter((a) => { const d = ddays(refNow, a.mid); return d >= 0 && d <= HL_WINDOW; });
+  tppRowsIn.sort((a, b) => a.mid - b.mid);
+  let tpp = null;
+  if (tppRowsIn.length) {
+    const waves = new Map();
+    for (const a of tppRowsIn) waves.set(a.firm, (waves.get(a.firm) || 0) + 1);
+    let sw = 0, swx = 0;
+    const rows = tppRowsIn.map((a) => {
+      const p = POLL_BY_KEY.get(a.key);
+      const d = ddays(refNow, a.mid);
+      const w = a.n * Math.exp(-LN2 * d / HL_HALF) / Math.sqrt(waves.get(a.firm));
+      const lean = heV(houseEffect, a.firm, refNow);
+      const adj = a.x - lean;
+      sw += w; swx += adj * w;
+      return { firm: a.firm, fw: fwText(p), mid: dayMon(a.mid), d: r1(d),
+               pair: p.tpp_lnp != null ? `${p.tpp_alp}–${p.tpp_lnp}` : `${p.tpp_alp}`,
+               x: r2(a.x), lean: r2(lean), adj: r2(adj),
+               n: Math.round(a.n), m: waves.get(a.firm), w: r2(w) };
+    });
+    tpp = { rows, k: tppRowsIn.length, sw: r2(sw), swx: r2(swx), mean: r2(swx / sw), v: r1(swx / sw) };
+  }
+  /* ALP primary: the current calendar month, sampled and debiased exactly as
+     monthWithSe(primaryRows.alp, primaryHE.alp, ym) computes it – rebuilt
+     from POLLS only so each row can name its fieldwork; the wave counts,
+     weights and lean calls are the estimator's own. The five-party check is
+     aggPrimary's for this one month: debiased per party, plain-mean total
+     alongside, renormalised only if the two totals disagree by more than
+     half a point. */
+  const ym = MONTHS[MONTHS.length - 1];
+  const mPolls = POLLS.filter((p) => ymOf(p.date) === ym && p.alp != null);
+  mPolls.sort((a, b) => midMs(a) - midMs(b));
+  let primary = null;
+  if (mPolls.length) {
+    const waves = new Map();
+    for (const p of mPolls) waves.set(p.pollster, (waves.get(p.pollster) || 0) + 1);
+    const midT = ymMidMs(ym);
+    let sw = 0, swx = 0, plainSum = 0;
+    const rows = mPolls.map((p) => {
+      const n = rowN(p);
+      const w = n / Math.sqrt(waves.get(p.pollster));
+      const lean = heV(primaryHE.alp, p.pollster, midT);
+      const adj = p.alp - lean;
+      sw += w; swx += adj * w; plainSum += p.alp;
+      return { firm: p.pollster, fw: fwText(p), mid: dayMon(midMs(p)),
+               ...(new Date(midMs(p)).getUTCMonth() !== +ym.slice(5, 7) - 1 ? { crossed: true } : {}),
+               x: r2(p.alp), lean: r2(lean), adj: r2(adj),
+               n: Math.round(n), m: waves.get(p.pollster), w: r2(w) };
+    });
+    const parties = {};
+    let plainTotal = 0, adjTotal = 0, alpEst = null;
+    for (const k of PRIMARY_KEYS) {
+      const rs = primaryRows[k].filter((r) => r.ym === ym);
+      if (!rs.length) { parties[k] = null; continue; }
+      const est = monthWithSe(primaryRows[k], primaryHE[k], ym);
+      const plain = mean(rs.map((r) => r.x));
+      parties[k] = { plain: r2(plain), adj: r2(est.v) };
+      plainTotal += plain; adjTotal += est.v;
+      if (k === "alp") alpEst = est.v;
+    }
+    const rescaled = adjTotal > 0 && Math.abs(adjTotal - plainTotal) > 0.5;
+    const alpFinal = rescaled ? alpEst * (plainTotal / adjTotal) : alpEst;
+    primary = { ym, ymLabel: `${MNF[+ym.slice(5, 7) - 1]} ${ym.slice(0, 4)}`, rows,
+                sw: r2(sw), swx: r2(swx), mean: r2(swx / sw),
+                plainMean: r2(plainSum / mPolls.length),
+                parties, plainTotal: r2(plainTotal), adjTotal: r2(adjTotal),
+                rescaled, v: r1(alpFinal) };
+  }
+  return { tpp, primary };
+})();
+/* The tables must say what the estimates say – drift here means an emitted
+   table contradicts the hero it claims to explain. */
+if (showWorking.tpp && showWorking.tpp.v !== hlNow.alp)
+  console.warn(`  WARN show-working 2pp ${showWorking.tpp.v} != headline ${hlNow.alp}`);
+if (showWorking.primary && showWorking.primary.v !== aggPrimary[aggPrimary.length - 1].alp)
+  console.warn(`  WARN show-working primary ${showWorking.primary.v} != aggPrimary ${aggPrimary[aggPrimary.length - 1].alp}`);
+console.log("showWorking:",
+  showWorking.tpp ? `2pp mean ${showWorking.tpp.mean}% over ${showWorking.tpp.k} polls` : "2pp window empty",
+  "|",
+  showWorking.primary ? `primary mean ${showWorking.primary.mean}% (${showWorking.primary.ymLabel})` : "no current-month primary rows");
+
 /* ---- 9. events (chart markers) ----------------------------------------- */
 const events = EVENTS.map((e) => ({
   date: e.date, x: dx(e.date), short: e.short, label: e.label, desc: e.desc, major: !!e.major,
@@ -1987,6 +2091,7 @@ window.AUSPOL = (function () {
   const individualPolls = ${JSON.stringify(individualPolls)};
   const pollsterTable = ${JSON.stringify(pollsterTable)};
   const latest = ${JSON.stringify(latest)};
+  const showWorking = ${JSON.stringify(showWorking)};
   const events = ${JSON.stringify(events)};
 
   const CYCLE_DEFS = ${JSON.stringify(CYCLE_DEFS)};

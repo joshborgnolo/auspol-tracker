@@ -3898,6 +3898,61 @@ function infoTerms(D) {
   const counts = {};
   D.individualPolls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
   const sources = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).join(", ");
+  /* Show-your-working tables (weighted-aggregate entry). Every row is the
+     estimator's own, emitted beside the headline it builds, so the Σ line at
+     the foot of each table reproduces the figure the hero prints. */
+  const F = (v) => (+v).toLocaleString("en-AU", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const swP = D.showWorking && D.showWorking.primary;
+  const swT = D.showWorking && D.showWorking.tpp;
+  const primWork = swP && swP.rows.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work">
+        <thead><tr><th>Pollster</th><th>Fieldwork</th><th>Mid</th><th>Published</th><th>lean</th><th>xᵢ</th><th>nᵢ</th><th>m</th><th>wᵢ</th></tr></thead>
+        <tbody>
+          {swP.rows.map((r) => (
+            <tr key={r.firm + r.fw}>
+              <td>{r.firm}</td><td>{r.fw}</td><td>{r.mid}</td><td>{F(r.x)}</td>
+              <td>{F(r.lean)}</td><td>{F(r.adj)}</td><td>{r.n}</td><td>{r.m}</td><td>{F(r.w)}</td>
+            </tr>
+          ))}
+          <tr className="info-work-sum"><td colSpan="9">
+            Σwᵢ = {F(swP.sw)} · Σwᵢxᵢ = {F(swP.swx)} · the month is {F(swP.swx)} ÷ {F(swP.sw)} = {F(swP.mean)}
+            {" "}→ {swP.v.toFixed(1)} for Labor, {swP.ymLabel}.
+          </td></tr>
+        </tbody>
+      </table>
+      <p className="info-work-note">The five-party check: debiased, the parties sum to {swP.adjTotal}
+        {" "}({["alp", "lnp", "grn", "onp", "oth"].filter((k) => swP.parties[k]).map((k) => swP.parties[k].adj.toFixed(2)).join(" · ")})
+        {" "}against {swP.plainTotal} unweighted
+        {swP.rescaled
+          ? ` – past the half-point tolerance, so all five are scaled by ${swP.plainTotal} ÷ ${swP.adjTotal}, which is how the Labor figure above lands at ${swP.v.toFixed(1)}.`
+          : " – within the half-point tolerance, so nothing is rescaled."}
+        {" "}A wave joins the calendar month its fieldwork ended in.
+        {swP.rows.some((r) => r.crossed)
+          ? " The wave above whose midpoint falls in the month before counts here, where it closed."
+          : null}</p>
+    </div>
+  ) : null;
+  const tppWork = swT && swT.rows.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work">
+        <thead><tr><th>Pollster</th><th>Fieldwork</th><th>Mid</th><th>Published</th><th>of pair</th><th>lean</th><th>xᵢ</th><th>d</th><th>nᵢ</th><th>m</th><th>wᵢ</th></tr></thead>
+        <tbody>
+          {swT.rows.map((r) => (
+            <tr key={r.firm + r.fw}>
+              <td>{r.firm}</td><td>{r.fw}</td><td>{r.mid}</td><td>{r.pair}</td>
+              <td>{F(r.x)}</td><td>{F(r.lean)}</td><td>{F(r.adj)}</td>
+              <td>{r.d}</td><td>{r.n}</td><td>{r.m}</td><td>{F(r.w)}</td>
+            </tr>
+          ))}
+          <tr className="info-work-sum"><td colSpan="11">
+            Σwᵢ = {F(swT.sw)} · Σwᵢxᵢ = {F(swT.swx)} · the headline is {F(swT.swx)} ÷ {F(swT.sw)} = {F(swT.mean)}
+            {" "}→ {swT.v.toFixed(1)}, from the {swT.k} polls in the window.
+          </td></tr>
+        </tbody>
+      </table>
+    </div>
+  ) : null;
   const onp = Math.round(prim.onp);
   const acc = D.accuracy;
   /* Term-to-term links: the same hi-term tap-to-define treatment the hero
@@ -4114,9 +4169,11 @@ function infoTerms(D) {
       their number, so three weekly waves count as 1.7, not 3.
       {" "}Full formula: the headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window, where
       xᵢ is a poll’s house-adjusted figure and its weight wᵢ = nᵢ × 2^(−d/7) ÷ √m – nᵢ the
-      poll’s sample: its published effective sample where the house files one (Newspoll, YouGov,
-      Essential and DemosAU, via their Australian Polling Council methodology statements), else
-      its raw sample. nᵢ also sets the sampling-error floor under the whole
+      poll’s sample on the estimator’s scale: its published effective sample where the house files
+      one (Newspoll, YouGov, Essential and DemosAU, via their Australian Polling Council
+      methodology statements), grossed back up by the shared 1.6 design factor, else its raw
+      sample capped at 3,000 – 1,200 where no sample is filed at all. nᵢ also sets the
+      sampling-error floor under the whole
       window, so the same published figure improves both. d is the poll’s age in days (halving
       every seven), and m its house’s wave count in the window. The effective sample behind it is (Σwᵢ)² ÷ Σwᵢ², and the monthly trend points
       run the same formula with the recency term dropped. The leaders’ ratings and national
@@ -4131,6 +4188,7 @@ function infoTerms(D) {
       checked, and the five stand unrescaled unless the debiased total sits more than half a
       point from the plain-average total – a real undecided-driven shortfall is kept, not ironed
       out. As the month stands, that is {prim.alp.toFixed(1)} for Labor.</span>
+      {primWork}
       <span className="info-p">The two-party-preferred is the nowcast proper, over the rows the
       measure admits: waves whose fieldwork midpoint falls inside the 21-day window ending at the
       newest poll, each contributing its published Labor share of the pair – a pair printed with
@@ -4140,7 +4198,8 @@ function infoTerms(D) {
       {" "}{xref("implied-2pp", "weighted aggregate", "implied 2PP")} diagnostic, never the
       headline, and an empty window falls back to the last monthly point rather than vanishing.
       As of the latest poll, that is {L.alp2pp.toFixed(1)} to Labor,
-      {" "}{L.lnp2pp.toFixed(1)} to the Coalition.</span></>) },
+      {" "}{L.lnp2pp.toFixed(1)} to the Coalition.</span>
+      {tppWork}</>) },
   ];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"
