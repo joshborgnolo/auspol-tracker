@@ -97,7 +97,11 @@ name/mode ladder rules live in the ≤480/≤430px blocks. Real phone widths hit
     a cream/charcoal pair cannot be inverted.
   - Layout: `--pd-measure` 820px, `margin-inline: auto` on `.pd-meta`, `.pd-rel` and
     `.pd-simple` — a centred column inside a full-width table row. Rhythm: rule →
-    30px → heading → 20px → result → 36px → rule, one `.pd-sec` rule doing all of it.
+    24px → heading → 15px → result → 28px → rule, one `.pd-sec` rule doing all of it
+    (`padding-top` / `.pd-k` margin / `margin-top`). Retuned with the type when the
+    ladder stepped down — a rhythm set for a 17px body reads as slack around 15px, so
+    **rescaling the type means rescaling this too**; panel padding 36px, meta row gap
+    12px, `.pd-s + .pd-s` 11px, basis caption 12px.
   - **The label column is `max-content`, never a px value.** There is only ONE grid now
     (the release block is `display: block`, label over value), so nothing needs a shared
     width; `--pd-gut` is the gutter. A fixed column silently collided with
