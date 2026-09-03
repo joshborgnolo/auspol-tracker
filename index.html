@@ -2293,11 +2293,13 @@ body.dark .poll-detail {
 /* a caption's figure still steps above its words, but not to the full figure
    size - the basis is about the measure above it and must not out-shout it */
 .pd-s.pd-s-basis b { font-size: var(--pd-fig); }
-/* the leave-one-out effect line ("Effect on Labor's 2PP aggregate: x → y")
-   is a caption of the same order as the basis note - a sentence with figures
-   in it, set like the basis line and never fighting the pair above */
-.pd-s.pd-s-eff { margin-top: 9px; color: var(--pd-ink-2); font-size: var(--pd-body); word-spacing: 2px; }
-.pd-s.pd-s-eff b { font-size: var(--pd-fig); }
+/* the leave-one-out effect lines ("(Moved Labor's 2PP aggregate vs. L/NP
+   +0.1% to 53.3% from 53.4%)") close the provenance band: full-width rows of
+   the meta grid, in their own grid item so the sentence can never stretch
+   the column the label/value pairs above share. A parenthetical aside in
+   the panel's secondary ink; its figures keep the band's tabular figures */
+.pd-s-eff { display: block; grid-column: 1 / -1; color: var(--pd-ink-2); font-size: var(--pd-body); }
+.pd-s-eff b { font-size: var(--pd-fig); }
 /* no colour of its own -> UA link blue, illegible on the dark paper; the
    house treatment is text first, link second (cf. a.pollster-link/a.tn-link) */
 a.pd-release { color: inherit; text-decoration: none; cursor: pointer; }
@@ -11174,14 +11176,17 @@ function TppLine({
   }, note));
 }
 
-/* The poll's own pull on the figure a reader watches – "without this wave the
-   aggregate says x; with it, y" – closing the two-party section after the
-   pair lines. One line per aggregate the wave feeds: the classic 2PP; the
-   flow-table implied 2PP for a poll that published no pair (its primaries
-   still move THAT estimate); and Labor's head-to-head against One Nation
-   where the wave asked it. lo/hi are gen-data's leave-one-out run (the
-   `eff` payload); `w` marks the wave sitting outside the current window, so
-   a null move reads as "before the window", not "the poll did nothing". */
+/* The poll's own pull on the figure a reader watches – "(Moved Labor's 2PP
+   aggregate vs. L/NP +0.1% to 53.3% from 53.4%)" – closing the provenance
+   band as its last rows. One parenthetical row per aggregate the wave feeds:
+   the classic 2PP; the flow-table implied 2PP for a poll that published no
+   pair (its primaries still move THAT estimate); and Labor's head-to-head
+   against One Nation where the wave asked it. lo/hi are gen-data's leave-one-
+   out run (the `eff` payload): lo is the aggregate WITHOUT the wave, hi the
+   standing aggregate with it; `w` marks a wave outside the current window,
+   so its null move reads as "before the window", not "the poll did nothing".
+   Each row spans the whole meta grid (its .pd-s-eff box) so the sentence
+   never stretches the band's label column. */
 function EffLines({
   eff
 }) {
@@ -11189,24 +11194,24 @@ function EffLines({
   const fig = v => /*#__PURE__*/React.createElement("b", null, v.toFixed(1), "%");
   /* signed like the ChgParen moves, but grey – this is arithmetic about the
      aggregate, not a shift in a party's standing */
-  const move = e => {
+  const moved = e => {
     const d = Math.round((e.hi - e.lo) * 10) / 10;
     return /*#__PURE__*/React.createElement("span", {
       className: "pd-s-note"
-    }, "(", d === 0 ? "±0.0" : (d > 0 ? "+" : "−") + Math.abs(d).toFixed(1), "%)");
+    }, d === 0 ? "±0.0" : (d > 0 ? "+" : "−") + Math.abs(d).toFixed(1), "%");
   };
-  /* a note only when the wave can't move the current window's figure at all –
-     silence would otherwise read as a miscounted zero */
-  const windowNote = e => e.w ? null : /*#__PURE__*/React.createElement("span", {
-    className: "pd-s-note"
-  }, " \xB7 outside the ", e.m ? "month" : "21-day window", " the aggregate covers");
   const line = (k, label) => {
     const e = eff[k];
     if (!e) return null;
-    return /*#__PURE__*/React.createElement("p", {
-      className: "pd-s pd-s-eff",
+    /* a note only when the wave can't move the current window's figure at
+       all – silence would otherwise read as a miscounted zero */
+    const inner = e.w ? /*#__PURE__*/React.createElement(React.Fragment, null, moved(e), " to ", fig(e.hi), " from ", fig(e.lo)) : /*#__PURE__*/React.createElement("span", {
+      className: "pd-s-note"
+    }, "\xB10.0% \u2013 outside the ", e.m ? "month" : "21-day window", " the aggregate covers");
+    return /*#__PURE__*/React.createElement("span", {
+      className: "pd-s-eff",
       key: k
-    }, label, fig(e.lo), " \u2192 ", fig(e.hi), " ", move(e), windowNote(e));
+    }, "(Moved Labor\u2019s ", label, " ", inner, ")");
   };
   /* the implied 2PP only ever STANDS IN for the pair – gen-data emits it
      solely for a poll with none – so the word carries its glossary meaning */
@@ -11215,7 +11220,7 @@ function EffLines({
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
   }, "implied 2PP");
-  return /*#__PURE__*/React.createElement(React.Fragment, null, line("lnp", /*#__PURE__*/React.createElement("span", null, "Effect on Labor\u2019s 2PP aggregate: ")), line("imp", /*#__PURE__*/React.createElement("span", null, "Effect on Labor\u2019s ", implied, " aggregate: ")), line("onp", /*#__PURE__*/React.createElement("span", null, "Effect on Labor\u2019s 2PP aggregate vs One Nation: ")));
+  return /*#__PURE__*/React.createElement(React.Fragment, null, line("lnp", "2PP aggregate vs. L/NP"), line("imp", /*#__PURE__*/React.createElement(React.Fragment, null, implied, " aggregate")), line("onp", "2PP aggregate vs. ON"));
 }
 
 /* A leader's ratings as one sentence: approve, disapprove, don't know, with
@@ -11365,9 +11370,7 @@ function PollLedger({
     prefixed: x.count > 1,
     note: x.note,
     hero: i === 0 && x.c.segs.filter(g => g.value != null).length === 2
-  })), r.eff && /*#__PURE__*/React.createElement(EffLines, {
-    eff: r.eff
-  })), /*#__PURE__*/React.createElement(PdSec, {
+  }))), /*#__PURE__*/React.createElement(PdSec, {
     label: "First preferences"
   }, /*#__PURE__*/React.createElement("p", {
     className: "pd-s"
@@ -11487,7 +11490,9 @@ function PollDetail({
     className: "pd-meta-k"
   }, "Effective sample"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
-  }, "n = ", r.sampleEff.toLocaleString())), releaseMetaRows(r))), /*#__PURE__*/React.createElement(PollLedger, {
+  }, "n = ", r.sampleEff.toLocaleString())), releaseMetaRows(r), r.eff && /*#__PURE__*/React.createElement(EffLines, {
+    eff: r.eff
+  }))), /*#__PURE__*/React.createElement(PollLedger, {
     r: r,
     dirSegments: r.dir ? dirSegs(r) : null
   }));
@@ -12223,6 +12228,7 @@ Object.assign(window, {
   ApprLine,
   ChgParen,
   releaseMetaRows,
+  EffLines,
   // the archive prints publication stamps too, and there is only one way to
   // write one
   pubStamp
@@ -15123,7 +15129,8 @@ function ArchPollDetail({
   const {
     PollLedger,
     pubStamp,
-    releaseMetaRows
+    releaseMetaRows,
+    EffLines
   } = window;
   /* The archive stores the unsure share and its change; the Latest table
      derives the residual instead. Same reading, two shapes – so the ledger
@@ -15219,9 +15226,15 @@ function ArchPollDetail({
   }, "House effect"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
   }, signed1(p.hfx.v), " vs consensus")),
-  /* the pollster's own pages close the list, in the same grid so their
-     values sit on the band's axis (builder shared with Latest polls) */
-  ...(releaseMetaRows ? releaseMetaRows(p) : [])].filter(Boolean);
+  /* the pollster's own pages, in the same grid so their values sit on
+     the band's axis (builder shared with Latest polls) */
+  ...(releaseMetaRows ? releaseMetaRows(p) : []),
+  /* the wave's pull on the standing aggregates closes the band – the last
+     rows of the same grid as the provenance above */
+  EffLines && p.eff && /*#__PURE__*/React.createElement(EffLines, {
+    key: "aggEff",
+    eff: p.eff
+  })].filter(Boolean);
   const controls = [
   /* the way back rides the line that already describes this poll, rather
      than inventing a band of its own above the panel */

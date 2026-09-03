@@ -1936,37 +1936,38 @@ function TppLine({ c, prefixed, note, hero }) {
   );
 }
 
-/* The poll's own pull on the figure a reader watches – "without this wave the
-   aggregate says x; with it, y" – closing the two-party section after the
-   pair lines. One line per aggregate the wave feeds: the classic 2PP; the
-   flow-table implied 2PP for a poll that published no pair (its primaries
-   still move THAT estimate); and Labor's head-to-head against One Nation
-   where the wave asked it. lo/hi are gen-data's leave-one-out run (the
-   `eff` payload); `w` marks the wave sitting outside the current window, so
-   a null move reads as "before the window", not "the poll did nothing". */
+/* The poll's own pull on the figure a reader watches – "(Moved Labor's 2PP
+   aggregate vs. L/NP +0.1% to 53.3% from 53.4%)" – closing the provenance
+   band as its last rows. One parenthetical row per aggregate the wave feeds:
+   the classic 2PP; the flow-table implied 2PP for a poll that published no
+   pair (its primaries still move THAT estimate); and Labor's head-to-head
+   against One Nation where the wave asked it. lo/hi are gen-data's leave-one-
+   out run (the `eff` payload): lo is the aggregate WITHOUT the wave, hi the
+   standing aggregate with it; `w` marks a wave outside the current window,
+   so its null move reads as "before the window", not "the poll did nothing".
+   Each row spans the whole meta grid (its .pd-s-eff box) so the sentence
+   never stretches the band's label column. */
 function EffLines({ eff }) {
   if (!eff || (!eff.lnp && !eff.imp && !eff.onp)) return null;
   const fig = (v) => <b>{v.toFixed(1)}%</b>;
   /* signed like the ChgParen moves, but grey – this is arithmetic about the
      aggregate, not a shift in a party's standing */
-  const move = (e) => {
+  const moved = (e) => {
     const d = Math.round((e.hi - e.lo) * 10) / 10;
     return <span className="pd-s-note">
-      ({d === 0 ? "±0.0" : ((d > 0 ? "+" : "−") + Math.abs(d).toFixed(1))}%)
+      {d === 0 ? "±0.0" : ((d > 0 ? "+" : "−") + Math.abs(d).toFixed(1))}%
     </span>;
   };
-  /* a note only when the wave can't move the current window's figure at all –
-     silence would otherwise read as a miscounted zero */
-  const windowNote = (e) => (e.w ? null : (
-    <span className="pd-s-note"> · outside the {e.m ? "month" : "21-day window"} the aggregate covers</span>
-  ));
   const line = (k, label) => {
     const e = eff[k];
     if (!e) return null;
+    /* a note only when the wave can't move the current window's figure at
+       all – silence would otherwise read as a miscounted zero */
+    const inner = e.w
+      ? <React.Fragment>{moved(e)} to {fig(e.hi)} from {fig(e.lo)}</React.Fragment>
+      : <span className="pd-s-note">±0.0% – outside the {e.m ? "month" : "21-day window"} the aggregate covers</span>;
     return (
-      <p className="pd-s pd-s-eff" key={k}>
-        {label}{fig(e.lo)} → {fig(e.hi)} {move(e)}{windowNote(e)}
-      </p>
+      <span className="pd-s-eff" key={k}>(Moved Labor’s {label} {inner})</span>
     );
   };
   /* the implied 2PP only ever STANDS IN for the pair – gen-data emits it
@@ -1977,9 +1978,9 @@ function EffLines({ eff }) {
   );
   return (
     <React.Fragment>
-      {line("lnp", <span>Effect on Labor’s 2PP aggregate: </span>)}
-      {line("imp", <span>Effect on Labor’s {implied} aggregate: </span>)}
-      {line("onp", <span>Effect on Labor’s 2PP aggregate vs One Nation: </span>)}
+      {line("lnp", "2PP aggregate vs. L/NP")}
+      {line("imp", <React.Fragment>{implied} aggregate</React.Fragment>)}
+      {line("onp", "2PP aggregate vs. ON")}
     </React.Fragment>
   );
 }
@@ -2112,10 +2113,6 @@ function PollLedger({ r, dirSegments }) {
           <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1} note={x.note}
                    hero={i === 0 && x.c.segs.filter((g) => g.value != null).length === 2} />
         ))}
-        {/* the wave's pull on the standing aggregates closes the section –
-            gated here so a poll in NO series still lets PdSec say "Not
-            published" when it has nothing at all */}
-        {r.eff && <EffLines eff={r.eff} />}
       </PdSec>
 
       <PdSec label="First preferences">
@@ -2237,6 +2234,9 @@ function PollDetail({ r }) {
             <span className="pd-meta-k">Effective sample</span>
             <span className="pd-meta-v">n = {r.sampleEff.toLocaleString()}</span></span>}
           {releaseMetaRows(r)}
+          {/* the wave's pull on the standing aggregates closes the band –
+              last rows of the same grid as the provenance above */}
+          {r.eff && <EffLines eff={r.eff} />}
         </span>
       </div>
       <PollLedger r={r} dirSegments={r.dir ? dirSegs(r) : null} />
@@ -2882,7 +2882,7 @@ function PollsterTable() {
 Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
-  PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows,
+  PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows, EffLines,
   // the archive prints publication stamps too, and there is only one way to
   // write one
   pubStamp });
