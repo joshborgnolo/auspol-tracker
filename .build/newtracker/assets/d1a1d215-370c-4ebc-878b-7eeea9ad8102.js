@@ -1068,12 +1068,51 @@ function pctOf(sorted, p) {
   return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
 }
 
+/* Who the line on THIS chart belongs to. The legend above the tab names every
+   term for its prime minister, which on the two opposition charts is the wrong
+   person entirely – the 2013 line there is Shorten, not Abbott – and with one
+   legend serving six charts there is nowhere for it to say so. The per-chart
+   strip can, so it asks the measure. Same rule the drawn line labels use: the
+   measure's own eras where the office changed hands, both holders joined "–",
+   and the plain officeholder otherwise. */
+function cycHolders(c, M) {
+  /* Preferred PM is a PAIRING, and its eras are already whole pairings – so
+     joining them the way the single-office measures join theirs produced
+     "Rudd v Nelson–Rudd v Turnbull–Rudd v Abbott–Gillard v Abbott". The two
+     sides are collapsed separately instead: "Rudd–Gillard v Nelson–Turnbull–
+     Abbott". ppmPair alone would not do either – it is the term's FIRST
+     pairing, so the current term would answer "Albanese v Ley" months after
+     Taylor took the job. */
+  if (M.key === "ppmm") {
+    const pairs = c.raw.ppmEras && c.raw.ppmEras.length > 1
+      ? c.raw.ppmEras.map((e) => e.name) : [c.raw.ppmPair];
+    const side = (i) => {
+      const seen = [];
+      for (const pr of pairs) {
+        const nm = String(pr).split(" v ")[i];
+        if (nm && seen[seen.length - 1] !== nm) seen.push(nm);
+      }
+      return seen.join("\u2013");
+    };
+    return side(0) + " v " + side(1);
+  }
+  /* Everything else is one office. The CYC_META display string is the whole
+     succession for that side of the term – "Rudd → Gillard", "Nelson → Turnbull
+     → Abbott" – and the same string on both sides, which the eras are not: the
+     share charts have no eras of their own, and an approval era only exists
+     where a holder was rated. It agrees with the legend chip's netEras join on
+     every term on the board; where it would not, it is the more complete of the
+     two, and the two must not disagree about who led a term. */
+  return String(M.leader === "opp" ? c.oppLead : c.pm)
+    .split(/\s*\u2192\s*/).join("\u2013");
+}
+
 /* One gate for the band decision, shared by the charts (which draw it) and
    the legend (which captions it): three or more past terms on the board. */
 const cycBanded = (cycles, hidden) =>
   cycles.filter((c) => !hidden.has(c.year) && !c.current).length >= 3;
 
-function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp, setOnp, shapes }) {
+function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan, setHan, showOnp, setOnp, shapes }) {
   const { D } = window.AP;
   const narrow = useNarrow();
   const M = metric;
@@ -1124,9 +1163,14 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
      replaces. */
   const pastShown = shown.filter((c) => !c.current);
   const banded = cycBanded(cycles, hidden);
-  // the band's membership is data; what still gets its own line is the
-  // sitting term plus whatever term a chip hover is lifting out of it
-  const drawnCycles = banded ? shown.filter((c) => c.current || hi === c.year) : shown;
+  /* The band's membership is data; what still gets its own line is the sitting
+     term, whatever terms the reader has LIFTED out of the band, and whatever a
+     chip hover is previewing. The lift is the durable one: it survives the
+     pointer leaving the legend, which is the whole point of it, since the
+     legend sits above six charts and scrolls out of reach after the first. */
+  const drawnCycles = banded
+    ? shown.filter((c) => c.current || lifted.has(c.year) || hi === c.year)
+    : shown;
   /* One cycle left on the chart: the year on every readout row is then drawing
      a distinction against nothing, so the row keeps the leader alone and the
      title takes the calendar month instead. */
@@ -1155,10 +1199,17 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
       ? eras.map((e) => ({ name: e.name, months: e.months, vals: e.vals, obs: e.obs }))
       : [{ name: null, months: c.raw.months, vals: c.raw[M.key], obs: (c.raw.obs || {})[M.key] }];
     const isHi = hi === c.year;
-    const dim = hi != null && !isHi && !c.current;
+    /* Lifted and hovered draw the same: one is the reader asking to keep the
+       line, the other is asking to see it, and a line that changed weight when
+       the pointer left would read as two different readings of the term. */
+    const out = isHi || lifted.has(c.year);
+    /* Something is being pointed at, so the rest of the board steps back. Only
+       bites once the ribbon has given way – a banded board draws nothing else
+       to step back. */
+    const dim = !out && !c.current && (hi != null || lifted.size > 0);
     let width, weight, opacity, labOp;
     if (c.current) { width = isHi ? 4 : 3.6; weight = 3; opacity = 1; labOp = 1; }
-    else if (isHi) { width = 3; weight = 2; opacity = 1; labOp = 1; }
+    else if (out) { width = 3; weight = 2; opacity = 1; labOp = 1; }
     else { width = 1.7; weight = dim ? 0 : 1; opacity = dim ? 0.13 : 0.42; labOp = dim ? 0.2 : 0.75; }
     return seriesIn.flatMap((s, si) => {
       const monthly = toMonthly(s.months, s.vals, c.span);
@@ -1326,6 +1377,9 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
      the array, since `shown`, `shapes` and `solo` are all rebuilt every
      render and all three are decided by exactly that list. */
   const shownKey = shown.map((c) => c.year).join(",");
+  /* Same reason as shownKey: `lifted` is a Set the panel replaces wholesale on
+     every toggle, so the memo needs the years, not the identity. */
+  const liftKey = [...lifted].sort((a, b) => a - b).join(",");
   const scatter = React.useMemo(() => (!dotsOn ? [] : shown.flatMap((c) => {
     const base = cycBase(c, M.key);
     const leadName = M.key === "ppmm" ? c.raw.ppmPair : (isOpp ? c.oppLead : c.lead);
@@ -1339,7 +1393,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
       for (const e of eras) if (e.from && iso >= e.from) n = e.name;
       return n;
     };
-    const dim = hi != null && hi !== c.year && !c.current;
+    const dim = !c.current && hi !== c.year && !lifted.has(c.year) && (hi != null || lifted.size > 0);
     return cycleReadings(c, M, D).map((p) => {
       const n = nameAt(p.iso);
       return {
@@ -1348,7 +1402,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
         label: n ? (solo ? n : c.year + " · " + n) : label, meta: p.meta, op: dim ? 0.3 : 1,
       };
     });
-  })), [dotsOn, shownKey, M.key, isOpp, chg, hi]);
+  })), [dotsOn, shownKey, M.key, isOpp, chg, hi, liftKey]);
   /* Hanson – one line, not one per cycle. She has been rated for part of the
      current term and in no term before it, so there is no past-cycle
      counterpart to draw and nothing to align her against. Points come straight
@@ -1417,6 +1471,14 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
      A month with no row is a month no past term on the board reached, and
      there is nothing to compare against: the sentence stands down rather than
      inventing a peer. */
+  /* The strip's own list: the sitting term plus whatever has been lifted, or –
+     once the ribbon has given way – simply everything drawn. Sorted with the
+     sitting term first and the rest by year, so the row reads the way the
+     legend above it does. */
+  const stripCycles = solo ? []
+    : (banded ? shown.filter((c) => c.current || lifted.has(c.year)) : shown.slice())
+        .sort((a, b) => (b.current ? 1 : 0) - (a.current ? 1 : 0) || a.year - b.year);
+
   const cur = cycles.find((c) => c.current);
   let insight = null;
   if (cur && !hidden.has(cur.year)) {
@@ -1510,6 +1572,37 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
           );
         })()}
       </div>
+      {/* What this chart is drawing, named for this chart. Absent on a solo
+          board, where the readouts already carry the leader and there is no
+          second term to tell it apart from. The hover preview is deliberately
+          NOT listed: a strip that rewrote itself as the pointer crossed the
+          legend would be a flicker, not a caption. */}
+      {stripCycles.length > 0 && (
+        <div className="cyc-drawn">
+          <span className="cyc-drawn-label">Drawn here</span>
+          {stripCycles.map((c) => (
+            <span key={c.year} className={"cyc-drawn-item" + (lifted.has(c.year) ? "" : " fixed")}
+                  style={{ "--cyc": colorOf(c) }}>
+              <span className="cyc-drawn-rule" aria-hidden="true"></span>
+              <span className="cyc-drawn-year">{c.year}</span>
+              <span className="cyc-drawn-who">{cycHolders(c, M)}</span>
+              {/* The ✕ here means one thing only: put this term back in the
+                  band. So it is offered on exactly the terms that were lifted
+                  out of it – never on the sitting term, which was never in the
+                  band, and never on a term drawn only because the board is too
+                  thin for a band at all. Both of those are removed from the
+                  legend instead, and a ✕ that did nothing would be worse than
+                  no ✕ at all. */}
+              {lifted.has(c.year) && (
+                <button type="button" className="cyc-drawn-x"
+                        title={"Return " + c.year + " to the band"}
+                        aria-label={"Return " + c.year + " to the band"}
+                        onClick={() => unlift(c.year)}>×</button>
+              )}
+            </span>
+          ))}
+        </div>
+      )}
       <TrendChart
         key={"cyc-" + M.key + "-" + mode}
         height={narrow ? 500 : 300} xDomain={CYC_XDOMAIN} yDomain={domain} yTicks={ticks}
@@ -1541,7 +1634,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, showHan, setHan, showOnp
   );
 }
 
-function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll, shapes, banded }) {
+function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, showAll, hideAll, shapes, banded }) {
   const anyHidden = hidden.size > 0;
   /* onMouseLeave clears the highlight for a pointer, and a finger never fires
      it: a term raised by a tap stayed lit on the chart until another chip
@@ -1550,34 +1643,61 @@ function CycleLegend({ cycles, hidden, hi, setHi, toggle, showAll, hideAll, shap
   const legRef = useRef(null);
   window.useDismissOutside(legRef, hi != null, () => setHi(null));
   return (
-    <div className="cyc-legend" ref={legRef} onMouseLeave={() => setHi(null)}>
+    <div className={"cyc-legend" + (banded ? " banded" : "")} ref={legRef}
+         onMouseLeave={() => setHi(null)}>
       <div className="cyc-legend-row">
         {cycles.map((c) => {
           const off = hidden.has(c.year);
+          /* Two states, not one, and they answer different questions: whether
+             the term is on the board at all (in the band, the mean and the
+             download) and whether it is DRAWN as its own line over the band.
+             The sitting term is always drawn and so is never "lifted" – it has
+             no band to be lifted out of. */
+          const lift = lifted.has(c.year) && !off;
+          const drawn = lift || c.current;
           /* A term that changed PM names both of them: "2007 Rudd" alone says
              Gillard never governed. netEras lists the officeholders in order,
              so a term that kept one PM keeps its single lead. */
           const pmNames = c.raw.netEras && c.raw.netEras.length > 1
             ? c.raw.netEras.map((e) => e.name).join("–")
             : c.lead;
+          const label = c.year + " " + pmNames;
           return (
-            <button key={c.year} type="button"
-                    className={"cyc-chip" + (off ? " off" : "") + (c.current ? " current" : "")}
-                    /* --cyc paints the chip border and tint; --cyc-text is the
-                       same party at the text threshold, for the "now" badge */
-                    style={{ "--cyc": c.color, "--cyc-text": inkOf(c.color) }}
-                    aria-pressed={!off}
-                    onMouseEnter={() => setHi(c.year)} onFocus={() => setHi(c.year)}
-                    onClick={() => toggle(c.year)}>
-              {/* the swatch takes the same shape as the term's dots, or the
-                  cloud under two same-coloured lines is undecodable */}
-              <span className={"cyc-swatch" + (shapes && shapes[c.year] && shapes[c.year] !== "circle"
-                                               ? " sw-" + shapes[c.year] : "")}
-                    style={{ background: c.color }}></span>
-              <span className="cyc-year">{c.year}</span>
-              <span className="cyc-lead">{pmNames}</span>
-              {c.current && <span className="cyc-now">Now</span>}
-            </button>
+            /* The chip is a WRAPPER, not a button: it carries two controls and
+               a button may not contain a button. The pill's chrome stays on the
+               wrapper so the whole thing still presses as one object. */
+            <span key={c.year}
+                  className={"cyc-chip" + (off ? " off" : "") + (c.current ? " current" : "")
+                             + (lift ? " lifted" : "") + (drawn ? " drawn" : "")}
+                  /* --cyc paints the chip border and tint; --cyc-text is the
+                     same party at the text threshold, for the "now" badge */
+                  style={{ "--cyc": c.color, "--cyc-text": inkOf(c.color) }}
+                  onMouseEnter={() => setHi(c.year)}>
+              <button type="button" className="cyc-main"
+                      aria-pressed={drawn}
+                      aria-label={off ? label + " – off the board, put it back"
+                                : c.current ? label + " – the sitting term, always drawn"
+                                : lift ? label + " – drawn as its own line, return it to the band"
+                                : label + " – pooled into the band, draw its own line"}
+                      onFocus={() => setHi(c.year)}
+                      onClick={() => chipClick(c.year)}>
+                {/* the swatch takes the same shape as the term's dots, or the
+                    cloud under two same-coloured lines is undecodable. Its FILL
+                    is the state: filled means there is a line of this colour on
+                    the chart, hollow means the term is in the band instead. */}
+                <span className={"cyc-swatch" + (shapes && shapes[c.year] && shapes[c.year] !== "circle"
+                                                 ? " sw-" + shapes[c.year] : "")}></span>
+                <span className="cyc-year">{c.year}</span>
+                <span className="cyc-lead">{pmNames}</span>
+                {c.current && <span className="cyc-now">Now</span>}
+              </button>
+              <button type="button" className="cyc-x"
+                      title={off ? "Put " + c.year + " back on the board"
+                                 : "Take " + c.year + " off the board – out of the band, the mean and the download"}
+                      aria-label={off ? "Put " + label + " back on the board"
+                                      : "Take " + label + " off the board"}
+                      onClick={() => toggle(c.year)}>{off ? "+" : "×"}</button>
+            </span>
           );
         })}
       </div>
@@ -2017,8 +2137,9 @@ function PastCyclesView() {
      (?c=10.19 hides 2010 and 2019), four digits for the 1987–1998 terms –
      "90" would read back as 2090 and be dropped. Tokens naming no known
      term are dropped, never trusted. */
-  const [hidden, setHidden] = useState(() => {
-    const raw = new URLSearchParams(window.location.search).get("c");
+  /* One parser for both year params. Two-digit tokens are this century, so
+     the pre-2000 terms write themselves out in full. */
+  const cycYears = (raw) => {
     const years = new Set(cycles.map((c) => c.year));
     if (!raw) return new Set();
     return new Set(raw.split(/[.,]/).map((t) => {
@@ -2026,7 +2147,16 @@ function PastCyclesView() {
       if (/^\d{2}$/.test(t)) return 2000 + +t;
       return null;
     }).filter((y) => y != null && years.has(y)));
-  });
+  };
+  const [hidden, setHidden] = useState(
+    () => cycYears(new URLSearchParams(window.location.search).get("c")));
+  /* Terms drawn as their own line over the band. A separate question from
+     membership: a lifted term is still IN the band, the mean and the download –
+     it is being compared against its own peer set, which is the comparison the
+     card is for, and a band that moved when you drew a line over it would shift
+     the baseline under the reading. */
+  const [lifted, setLifted] = useState(
+    () => cycYears(new URLSearchParams(window.location.search).get("l")));
   const [hi, setHi] = useState(null);
   const [showHan, setShowHan] = useState(false);
   const [showOnp, setShowOnp] = useState(false);
@@ -2036,23 +2166,48 @@ function PastCyclesView() {
      board is back to every term. */
   React.useEffect(() => {
     const p = new URLSearchParams(window.location.search);
-    p.delete("c");
-    if (hidden.size) p.set("c", [...hidden].sort((a, b) => a - b).map((y) => y < 2000 ? String(y) : String(y).slice(2)).join("."));
+    const pack = (set) => [...set].sort((a, b) => a - b)
+      .map((y) => (y < 2000 ? String(y) : String(y).slice(2))).join(".");
+    p.delete("c"); p.delete("l");
+    if (hidden.size) p.set("c", pack(hidden));
+    if (lifted.size) p.set("l", pack(lifted));
     const qs = p.toString();
     const L = window.location;
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;
     if (next !== L.pathname + L.search + L.hash) window.history.replaceState(null, "", next);
-  }, [hidden]);
+  }, [hidden, lifted]);
 
   /* A chip may now turn off the last line. It used to refuse, on the grounds
      that an empty chart is useless – but the way back is one button away and
      sits right under the chips, and refusing a click that was plainly meant
      reads as the page being broken rather than careful. */
-  const toggle = (year) => setHidden((h) => {
-    const n = new Set(h);
+  const toggle = (year) => {
+    setHidden((h) => {
+      const n = new Set(h);
+      n.has(year) ? n.delete(year) : n.add(year);
+      return n;
+    });
+    /* A term taken off the board takes its line with it – there is nothing left
+       to have lifted it out of. Coming back, it comes back pooled. */
+    setLifted((l) => {
+      if (!l.has(year)) return l;
+      const n = new Set(l); n.delete(year); return n;
+    });
+  };
+  const lift = (year) => setLifted((l) => {
+    const n = new Set(l);
     n.has(year) ? n.delete(year) : n.add(year);
     return n;
   });
+  const unlift = (year) => setLifted((l) => {
+    if (!l.has(year)) return l;
+    const n = new Set(l); n.delete(year); return n;
+  });
+  /* The chip's own click draws the line, because with the band in place that is
+     the common thing to want; taking a term off the board is the rarer, larger
+     act and lives on the ✕ beside it. An off term has no line to draw, so its
+     chip does the only useful thing instead and puts the term back. */
+  const chipClick = (year) => (hidden.has(year) ? toggle(year) : lift(year));
   /* Shapes are a property of what is CURRENTLY on the board, so they are
      worked out once here and handed to the legend and all four charts – a
      chip and the dots it explains must never disagree about which term is
@@ -2061,7 +2216,7 @@ function PastCyclesView() {
   const shapes = shownCycles.length <= CYC_DOT_MAX ? cycShapes(shownCycles) : null;
 
   const showAll = () => setHidden(new Set());
-  const hideAll = () => setHidden(new Set(cycles.map((c) => c.year)));
+  const hideAll = () => { setHidden(new Set(cycles.map((c) => c.year))); setLifted(new Set()); };
 
   /* The source-polls file respects the chips: it is built from the terms on
      the board, so a hidden term's polls stay out of the download just as
@@ -2081,13 +2236,15 @@ function PastCyclesView() {
           outer edge the middle 80% of them, darker half the middle 50%, dotted line their
           mean – drawn over the months each term was actually in office, and going fainter
           where fewer of them were.{" "}
-          {/* A finger cannot hover, and the chips it CAN reach toggle: telling a
-              phone reader to tap a term out of the band described a gesture that
-              hides it instead. The way to a single past line on touch is to thin
-              the board until the band gives way, so that is what it now says. */}
-          {CANT_HOVER
-            ? "Tap a cycle below to take its term off the board or put it back; with two past terms left the band gives way to their own lines, and with one you get its full detail."
-            : "Hover over a cycle below to lift its line out of the band, and leave just one visible to see more details."}
+          {/* One sentence for pointer and finger alike. It used to fork on
+              CANT_HOVER, because the only way out of the band was a hover and a
+              finger cannot hover – so a phone reader was told to thin the board
+              until the ribbon gave way, which is a workaround described as a
+              feature. Drawing a line is a click now, so both inputs get the
+              same instruction and it is the true one. */}
+          Click a cycle below to draw its own line over the band, and again to put it back;
+          the ✕ beside it takes the term off the board altogether. Leave one term on the
+          board to see its full detail.
         </p>
         <div className="cyc-controls">
           <TextToggle value={mode} onChange={setMode} ariaLabel="Measure"
@@ -2104,13 +2261,14 @@ function PastCyclesView() {
         </div>
       </div>
 
-      <CycleLegend cycles={cycles} hidden={hidden} hi={hi} setHi={setHi}
-        toggle={toggle} showAll={showAll} hideAll={hideAll} shapes={shapes}
+      <CycleLegend cycles={cycles} hidden={hidden} lifted={lifted} hi={hi} setHi={setHi}
+        chipClick={chipClick} toggle={toggle} showAll={showAll} hideAll={hideAll} shapes={shapes}
         banded={cycBanded(cycles, hidden)} />
 
       <div className="cyc-charts">
         {CYC_METRICS.map((m) => (
           <CycleChart key={m.key} metric={m} cycles={cycles} mode={mode} hidden={hidden} hi={hi}
+                      lifted={lifted} unlift={unlift}
                       showHan={showHan} setHan={setShowHan}
                       showOnp={showOnp} setOnp={setShowOnp} shapes={shapes} />
         ))}

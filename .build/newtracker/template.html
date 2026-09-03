@@ -824,9 +824,9 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
 /* keep the tight editorial sizing visually, but extend the *hit* area to a
    44px-tall invisible overlay so the controls are comfortable on touch. */
 .tt-opt, .theme-cell, .legend-chip, .seg-btn,
-.cyc-chip, .ap-popbtn, .tab-score, .cyc-showall, .ap-clear { position: relative; }
+.cyc-main, .cyc-x, .cyc-drawn-x, .ap-popbtn, .tab-score, .cyc-showall, .ap-clear { position: relative; }
 .tt-opt::after, .theme-cell::after, .legend-chip::after, .seg-btn::after,
-.cyc-chip::after, .ap-popbtn::after, .tab-score::after,
+.cyc-main::after, .cyc-x::after, .cyc-drawn-x::after, .ap-popbtn::after, .tab-score::after,
 .cyc-showall::after, .ap-clear::after {
   content: ""; position: absolute; left: 0; right: 0;
   top: 50%; transform: translateY(-50%);
@@ -979,10 +979,13 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
    resets border-bottom-color - so written as bare classes this rule lost the
    cascade to all of them and the bevel silently never rendered. One extra
    element selector outranks a single class whatever the source order. */
-button.ha-chip, button.legend-chip, button.cyc-chip,
+button.ha-chip, button.legend-chip,
 button.ap-popbtn, button.dl-replay, button.acc-spread {
   border-bottom-color: var(--btn-edge);
 }
+/* .cyc-chip is a <span> wrapper (it holds two buttons), so the element+class
+   trick above cannot reach it – it sets its own bevel in the block below,
+   after its own `border` shorthand. */
 
 /* ---------- bars are channels ---------------------------------------------
    Every bar on the site is already the hero gauge's anatomy under another
@@ -2950,15 +2953,79 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 
 .cyc-legend { margin: 20px 0 6px; }
 .cyc-legend-row { display: flex; flex-wrap: wrap; gap: 7px; }
+/* The chip is a WRAPPER, not a button: it carries two controls that answer two
+   different questions – .cyc-main draws the term's line over the band, .cyc-x
+   takes the term off the board entirely – and a button may not contain a
+   button. All the pill chrome stays here so the pair still presses as one
+   object, and `border-bottom-color` is declared after the `border` shorthand
+   rather than by the element+class bevel rule further up, which cannot match a
+   span. */
 .cyc-chip {
-  display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
+  display: inline-flex; align-items: center; white-space: nowrap;
   background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
-  padding: 6px 13px 6px 11px; cursor: pointer; font-family: var(--sans);
-  color: var(--ink-2);
+  border-bottom-color: var(--btn-edge);
+  font-family: var(--sans); color: var(--ink-2);
   transition: color .15s ease, border-color .15s ease, background-color .15s ease, opacity .15s ease;
 }
 .cyc-chip:hover { border-color: var(--ink-faint); }
-.cyc-chip .cyc-swatch { width: 11px; height: 11px; border-radius: 50%; flex: none; transition: transform .15s ease; }
+.cyc-main {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 0; background: none; color: inherit; font: inherit; cursor: pointer;
+  padding: 6px 6px 6px 11px; border-radius: 999px 0 0 999px;
+}
+.cyc-main:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* Quiet until it is wanted. It keeps its space in the row either way – a ✕ that
+   appeared on hover and pushed the chips along would move the target the reader
+   is aiming at – and it cannot be clicked while it is invisible, which on a
+   control that empties a term out of the band matters more than the tidiness. */
+.cyc-x {
+  border: 0; background: none; cursor: pointer; font-family: var(--sans);
+  font-size: 14px; font-weight: 500; line-height: 1; color: var(--ink-faint);
+  padding: 6px 10px 6px 4px; border-radius: 0 999px 999px 0;
+  opacity: 0; pointer-events: none;
+  transition: opacity .15s ease, color .15s ease;
+}
+.cyc-chip:hover .cyc-x, .cyc-chip:focus-within .cyc-x,
+.cyc-chip.lifted .cyc-x, .cyc-chip.off .cyc-x { opacity: 1; pointer-events: auto; }
+.cyc-x:hover { color: var(--ink); }
+.cyc-x:focus-visible { opacity: 1; pointer-events: auto; outline: 2px solid var(--accent); outline-offset: 1px; }
+/* A finger has no hover to reveal it with. */
+@media (hover: none) { .cyc-x { opacity: 1; pointer-events: auto; } }
+/* Phones: fourteen chips already wrap to ten rows in a 375px column, and
+   reserving the ✕ on every one of them added three more – half the viewport
+   spent on a legend. Here it is not reserved at all, and appears on the chips
+   whose state gives it something to say: a term drawn out of the band, or one
+   already off the board. Every other term is one tap from lifted, which is the
+   tap a reader coming to remove it would make first anyway. */
+@media (max-width: 620px) {
+  .cyc-x { display: none; }
+  .cyc-chip.lifted .cyc-x, .cyc-chip.off .cyc-x { display: inline-block; }
+  .cyc-main { padding-right: 11px; }
+  .cyc-chip.lifted .cyc-main, .cyc-chip.off .cyc-main { padding-right: 4px; }
+  /* The rules already carry the colour and the years are self-evidently a list
+     of terms; the caption is the first thing to go when the column is this
+     narrow. */
+  .cyc-drawn-label { display: none; }
+  .cyc-drawn-item { font-size: 11.5px; padding: 3px 4px 3px 8px; }
+}
+/* NO background transition here, and the swap is instant by design. Animating
+   background-color to a var()-derived colour on this element sticks: the swatch
+   took the .drawn rule's `box-shadow: none` but never arrived at the fill, so a
+   term lifted out of the band lost its ring and gained nothing — an invisible
+   swatch. Transform only, which is what this rule carried before the ring
+   existed. (Longhand `background-color` regardless: a `background` shorthand
+   carrying a var() is a pending-substitution value and cannot be interpolated,
+   so it is the wrong thing to hand a transition even if one comes back.) */
+.cyc-chip .cyc-swatch { width: 11px; height: 11px; border-radius: 50%; flex: none;
+  background-color: var(--cyc); transition: transform .15s ease; }
+/* The fill IS the state: filled means there is a line of this colour on the
+   chart, a ring means the term is pooled into the band instead. Said only where
+   there is a band to be pooled into – once the ribbon has given way every shown
+   term draws its own line, and a ring would then be denying a line the chart is
+   drawing. inset box-shadow rather than a border so the ring is clipped along
+   with the swatch when the swatch is a triangle or a diamond. */
+.cyc-legend.banded .cyc-chip .cyc-swatch { background-color: transparent; box-shadow: inset 0 0 0 2px var(--cyc); }
+.cyc-legend.banded .cyc-chip.drawn .cyc-swatch { background-color: var(--cyc); box-shadow: none; }
 /* A swatch borrows the shape of the term's dots when the chart is drawing
    them, so two Coalition terms in the same blue are told apart in the legend
    the same way they are told apart on the chart. clip-path over a second
@@ -2972,14 +3039,64 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
 .cyc-chip .cyc-year { font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 .cyc-chip .cyc-lead { font-size: 13px; font-weight: 500; color: var(--ink-3); }
-.cyc-chip.off { opacity: 0.4; }
-.cyc-chip.off .cyc-swatch { background: var(--ink-faint) !important; }
+/* Off the board is a third state, and it has to be unmistakable against the
+   other two: not in the band, not drawn, not in the download. Dashed, because a
+   broken edge is the one thing neither of the other two says. */
+.cyc-chip.off { opacity: 0.4; border-style: dashed; }
+.cyc-chip.off .cyc-swatch,
+.cyc-legend.banded .cyc-chip.off .cyc-swatch { background-color: var(--ink-faint); box-shadow: none; }
 .cyc-chip.current {
   border-color: color-mix(in oklch, var(--cyc) 45%, var(--line));
   background: color-mix(in oklch, var(--cyc) 8%, var(--surface));
 }
+/* A term the reader has drawn out of the band. Louder than .current's resting
+   tint, because .current is simply where the page starts and this is a thing
+   that was asked for. Both are two classes, so both out-rank the frosted-glass
+   background at the foot of this file. */
+.cyc-chip.lifted {
+  border-color: color-mix(in oklch, var(--cyc) 55%, var(--line));
+  background: color-mix(in oklch, var(--cyc) 10%, var(--surface));
+}
 .cyc-chip.current:hover .cyc-swatch,
 .cyc-chip:hover .cyc-swatch { transform: scale(1.18); }
+
+/* ---------- what each chart is drawing ----------
+   A caption on the lines, not a second legend: it lists only what this chart
+   has on it, and names the holder THIS measure follows – the 2013 line on an
+   opposition chart is Shorten, which the one legend above six charts has no way
+   to say. The only control in it undoes the thing it is captioning. */
+.cyc-drawn {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  margin: 0 0 12px;
+}
+.cyc-drawn-label {
+  font-family: var(--sans); font-size: 11px; font-weight: 600;
+  letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-faint); margin-right: 2px;
+}
+/* No nowrap: the preferred-PM chart names both sides of a pairing that changed
+   hands on both, and "Rudd–Gillard v Nelson–Turnbull–Abbott" is wider than a
+   phone. It wraps inside its own pill rather than pushing the page sideways. */
+.cyc-drawn-item {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+  border: 1px solid color-mix(in oklch, var(--cyc) 30%, var(--line));
+  background: color-mix(in oklch, var(--cyc) 7%, var(--surface));
+  border-radius: 999px; padding: 3px 4px 3px 9px;
+  font-family: var(--sans); font-size: 12px; color: var(--ink-2);
+}
+.cyc-drawn-item.fixed { padding-right: 10px; }
+/* The mark is a LINE, so the key is a rule at the line's own weight – a dot
+   here would be keying the scatter, which is a different thing on this page. */
+.cyc-drawn-rule { width: 13px; height: 3px; border-radius: 2px; background: var(--cyc); flex: none; }
+.cyc-drawn-year { font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cyc-drawn-who { color: var(--ink-3); }
+.cyc-drawn-x {
+  width: 17px; height: 17px; border: 0; border-radius: 50%; padding: 0; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: none; color: var(--ink-faint);
+  font-family: var(--sans); font-size: 13px; line-height: 1;
+}
+.cyc-drawn-x:hover { color: var(--ink); background: color-mix(in oklch, var(--ink) 12%, transparent); }
+.cyc-drawn-x:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
 .cyc-now {
   font-size: 10px; font-weight: 800;
   color: var(--cyc-text, var(--cyc)); border: 1px solid color-mix(in oklch, var(--cyc) 40%, var(--line));
