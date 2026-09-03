@@ -180,24 +180,6 @@ function renderTable(rows, spec) {
   return parts.join("\n");
 }
 
-const MASTHEAD = `      <a class="wm-home" href="/" title="Back to the live tracker" aria-label="auspol tracker – back to the live polling tracker">
-        <span class="wm-textcol"><span class="wm-name">auspol</span><span class="wm-track">tracker</span></span>
-        <svg class="wm-dial" viewBox="0.58 0.07 38.39 26.73" width="57" height="39.7" aria-hidden="true">
-          <path d="M 10 24.5 A 12 12 0 0 1 22 12.5" class="wm-arc" stroke="var(--alp)"/>
-          <path d="M 22 12.5 A 12 12 0 0 1 34 24.5" class="wm-arc" stroke="var(--lnp)"/>
-          <line x1="10.67" y1="16.27" x2="2.18" y2="10.10" stroke="var(--alp)" stroke-width="3.4" stroke-linecap="butt" style="stroke-dasharray: 10.5 10.5"/>
-          <line x1="17.67" y1="11.19" x2="14.43" y2="1.20" stroke="var(--onp)" stroke-width="3.4" stroke-linecap="butt" style="stroke-dasharray: 9.8 10.5"/>
-          <line x1="26.33" y1="11.19" x2="29.57" y2="1.20" stroke="var(--lnp)" stroke-width="3.4" stroke-linecap="butt" style="stroke-dasharray: 8.45 10.5"/>
-          <line x1="33.33" y1="16.27" x2="41.82" y2="10.10" stroke="var(--grn)" stroke-width="3.4" stroke-linecap="butt" style="stroke-dasharray: 5 10.5"/>
-          <g transform="translate(22, 24.5)"><g transform="rotate(-6.23)">
-            <line x1="0" y1="0" x2="0" y2="-8.6" stroke="var(--alp)" stroke-width="1.7" stroke-linecap="round"/>
-            <circle cx="0" cy="-8.6" r="1.9" fill="var(--alp)"/>
-          </g></g>
-          <circle cx="22" cy="24.5" r="1.7" class="wm-pivot"/>
-        </svg>
-        <span class="wm-sr">– Australian federal polling</span>
-      </a>`;
-
 function renderPage(sections, fetchedIso) {
   const fetched = new Date(fetchedIso).toLocaleDateString("en-AU", {
     day: "numeric", month: "long", year: "numeric", timeZone: "Australia/Sydney",
@@ -221,9 +203,9 @@ function renderPage(sections, fetchedIso) {
      The Roy Morgan reference tables (two-party-preferred + primary voting
      intention, current series and long-term trends) transcribed verbatim
      into data/roymorgan/*.csv and rendered here table-for-table, mirroring
-     the way roymorgan.com stores them. Masthead reuses the main site's
-     lockup; the dial is a static snapshot of the aggregate at the last site
-     rebuild (ALP 27.8 / LNP 22.2 / GRN 12.8 / ONP 25.9 · 2PP 51.1–48.9 ALP). -->
+     the way roymorgan.com stores them. Chrome is the main site's
+     static-article view (its no-JS static summary): Crimson Text headings
+     over IBM Plex Sans body, ss-note footer and fixed .ss-back pill home. -->
 <meta name="description" content="The Morgan Poll record — Roy Morgan's two-party-preferred and primary voting intention tables, including the long-term trends back to 1901, transcribed verbatim from roymorgan.com.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
@@ -235,7 +217,7 @@ function renderPage(sections, fetchedIso) {
 <link rel="canonical" href="https://auspoltracker.com/archives/morgan/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1d2c'/%3E%3Crect x='6' y='15' width='5' height='11' fill='%23d62828'/%3E%3Crect x='13.5' y='8' width='5' height='18' fill='%23b08d39'/%3E%3Crect x='21' y='18' width='5' height='8' fill='%23ec7a08'/%3E%3C/svg%3E">
 <style>
-/* ------- fonts: the same self-hosted cuts the main site ships ------- */
+/* ------- fonts: the two cuts the static article runs ------- */
 @font-face {
   font-family: 'Crimson Text';
   font-style: normal;
@@ -245,11 +227,11 @@ function renderPage(sections, fetchedIso) {
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Source Serif 4';
+  font-family: 'Crimson Text';
   font-style: normal;
-  font-weight: 200 900;
+  font-weight: 600;
   font-display: swap;
-  src: url("/assets/fonts/sourceserif4-latin.2a24bad4.woff2") format('woff2');
+  src: url("/assets/fonts/crimsontext-600-latin.94af2060.woff2") format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
@@ -258,14 +240,6 @@ function renderPage(sections, fetchedIso) {
   font-weight: 300 700;
   font-display: swap;
   src: url("/assets/fonts/ibmplexsans-latin.056e4e24.woff2") format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'Source Sans 3';
-  font-style: normal;
-  font-weight: 400 800;
-  font-display: swap;
-  src: url("/assets/fonts/sourcesans3-latin.ac057a55.woff2") format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
@@ -304,74 +278,20 @@ body {
   color: var(--ink);
   font-family: var(--sans);
   font-size: 14px;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.45;
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   min-height: 100dvh;
 }
 
-/* ------- masthead ------- */
-.site-head {
-  display: flex; justify-content: space-between; align-items: flex-end;
-  gap: 28px; flex-wrap: wrap;
-  padding: calc(28px + env(safe-area-inset-top, 0px)) calc(28px + env(safe-area-inset-right, 0px))
-           16px calc(28px + env(safe-area-inset-left, 0px));
-  max-width: var(--maxw); width: 100%; margin: 0 auto;
-  box-shadow: inset 0 -1px 0 var(--line);
-}
-.wordmark {
-  font-family: "Myriad Pro", "Myriad Web Pro", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
-  display: inline-flex; align-items: center;
-  font-weight: 800; font-size: 30px; letter-spacing: -0.025em; line-height: 1;
-}
-.wordmark a.wm-home {
-  display: inline-flex; align-items: center; gap: 12px;
-  color: inherit; text-decoration: none;
-  padding: 3px; margin: -3px; border-radius: 8px;
-  transition: background-color .2s ease;
-}
-.wordmark a.wm-home:hover { background: color-mix(in oklch, var(--ink) 6%, transparent); }
-.wm-textcol { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1px; }
-.wm-name {
-  display: inline-flex; font-weight: 800; font-size: 30px;
-  letter-spacing: -0.025em; line-height: 0.95; color: var(--ink);
-}
-.wm-track {
-  align-self: flex-start;
-  display: inline-block;
-  font-size: 30px; font-weight: 400; letter-spacing: -0.03em;
-  text-transform: none; line-height: 0.95; color: var(--ink-3);
-}
-.wm-dial { display: block; overflow: visible; }
-.wm-arc { fill: none; stroke-width: 1.4; opacity: 0.5; }
-.wm-pivot { fill: var(--ink-3); }
-.wm-sr {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
-}
-.tagline {
-  margin: 7px 0 -1.5px;
-  font-family: var(--serif);
-  font-weight: 400;
-  font-size: 15px; color: var(--ink-3); text-wrap: balance;
-}
-.head-right { display: flex; align-items: center; gap: 18px; }
-.meta-item { display: flex; flex-direction: column; gap: 2px; text-align: right; }
-.meta-k { font-size: 13px; color: var(--ink-3); font-weight: 600; white-space: nowrap; letter-spacing: 0.02em; }
-.meta-v, .meta-v a {
-  font-size: 14px; color: var(--ink); font-weight: 600; white-space: nowrap;
-  text-decoration: none;
-}
-.meta-v a:hover { text-decoration: underline; }
-@media (max-width: 560px) {
-  .site-head { flex-direction: column; align-items: flex-start; gap: 13px; }
-  .meta-item { text-align: left; }
-}
-
 /* ------- archive tabs: the static page's article-column width ------- */
 .tabs {
   display: flex; gap: 4px;
-  max-width: var(--maxw); margin: 0 auto;
+  max-width: var(--maxw); margin: 40px auto 0;
   border-bottom: 1px solid var(--line);
 }
 .tab {
@@ -396,17 +316,26 @@ body {
 }
 .ss-back:hover { border-color: var(--ink-3); }
 
-/* ------- body: the static page's type rhythm (verbatim tables stay wide) --- */
+/* ------- body: the static summary's type rhythm (verbatim tables stay wide) --- */
 .frame-wrap {
   flex: 1; display: flex; flex-direction: column;
   max-width: var(--maxw); width: 100%; margin: 0 auto;
-  padding: 28px calc(28px + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px));
+  padding: 40px calc(28px + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px));
 }
+.frame-wrap h1 {
+  font-family: var(--serif); font-size: 34px; font-weight: 600;
+  letter-spacing: -0.01em; margin: 0 0 6px;
+}
+/* .ss-sub/.ss-note copy the static page's RENDERED values, not the source
+   rules: on the live page .static-summary p outranks both, so the sub and
+   the footer note actually run at body-copy 14.5px/1.6 ink-2. */
+.ss-sub { margin: 0 0 4px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+.ss-sub a { color: inherit; }
 .credit {
-  font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin-bottom: 12px;
+  font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin-top: 16px; margin-bottom: 12px;
 }
 .credit a { color: inherit; }
-.ss-note { margin-top: 24px; font-size: 12.5px; color: var(--ink-3); }
+.ss-note { margin-top: 20px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
 .ss-note a { color: var(--ink-2); }
 .ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 
@@ -450,26 +379,15 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
 </style>
 </head>
 <body>
-<header class="site-head">
-  <div class="brand">
-    <h1 class="wordmark">
-${MASTHEAD}
-    </h1>
-    <p class="tagline">The Morgan Poll record,<br class="tagline-br"> for safekeeping</p>
-  </div>
-  <div class="head-right">
-    <div class="meta-item">
-      <span class="meta-k">Pollster archive</span>
-      <span class="meta-v"><a href="/">&larr; Back to the interactive tracker</a></span>
-    </div>
-  </div>
-</header>
 <nav class="tabs" aria-label="Poll archives">
   <a class="tab" href="/archives/newspoll/">Newspoll</a>
   <a class="tab" href="/archives/acnielsen/">AC Nielsen</a>
   <a class="tab active" aria-current="page" href="/archives/morgan/">Morgan</a>
 </nav>
 <main class="frame-wrap">
+  <h1>Morgan Poll archive</h1>
+  <p class="ss-sub">The Morgan Poll record, for safekeeping — Roy Morgan's published vote-intention tables, mirrored verbatim, as at the latest aggregate (ALP 51.1 · Coalition 48.9, 31 August 2026).</p>
+
   <p class="credit">The Morgan Poll series, transcribed table-for-table from Roy Morgan's four published vote-intention tables (two-party-preferred and primary, current series and the long-term trends back to 1901) and mirrored here as CSV — each table links its own file below. Sourced from <a href="https://www.roymorgan.com/morgan-poll">roymorgan.com/morgan-poll</a> — snapshot refreshed ${esc(fetched)}. Cells are reproduced as printed, including Roy Morgan's own "&lt;0.5" minors floor and "##" markers (no two-party-preferred figure, pre-preferential-voting era).</p>
 ${secHtml}
 
