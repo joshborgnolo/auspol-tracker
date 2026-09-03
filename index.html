@@ -2123,7 +2123,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    edit and every relationship in the panel holds. */
 .poll-detail {
   font-family: var(--panel, var(--sans));
-  padding: 36px 24px 36px; background: var(--pd-paper); text-align: left;
+  padding: 28px 24px 28px; background: var(--pd-paper); text-align: left;
   color: var(--pd-ink);
   /* An editorial palette rather than the site's theme tokens: cream paper,
      charcoal rather than black, and rules so faint they only just separate.
@@ -2134,18 +2134,18 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
   --pd-rule:  #DDDCD8;
   /* the gutter between the label column and the values it aligns; the column
      itself sizes to its longest label (see .pd-meta-items) */
-  --pd-gut: 30px;
+  --pd-gut: 26px;
   /* reading measure. The panel is as wide as the table (1000px+ on a laptop);
      sentences that long are scanned, not read, so the ledger and the list are
      both capped well inside it. The controls still dock to the panel's edge. */
   --pd-measure: 820px;
-  --pd-body: 15px;    /* the words around the figures */
-  --pd-note: 13px;    /* moves, ranges, the way back - annotations */
-  --pd-fig: 23px;     /* a percentage inside a sentence */
-  --pd-mid: 26px;     /* national direction - the 2PP treatment, scaled down */
-  --pd-hero: 48px;    /* the 2PP pair, the dominant element on the page */
-  --pd-hero-w: 20px;  /* and the words carrying it */
-  --pd-hero-note: 16px;
+  --pd-body: 13.5px;  /* the words around the figures */
+  --pd-note: 11.5px;  /* moves, ranges, the way back - annotations */
+  --pd-fig: 20px;     /* a percentage inside a sentence */
+  --pd-mid: 22px;     /* national direction - the 2PP treatment, scaled down */
+  --pd-hero: 40px;    /* the 2PP pair, the dominant element on the page */
+  --pd-hero-w: 17px;  /* and the words carrying it */
+  --pd-hero-note: 14px;
 }
 /* the theme keeps its own ink at night - the cream/charcoal pair is a light
    -mode palette and would be unreadable inverted */
@@ -2170,7 +2170,7 @@ body.dark .poll-detail {
      than its longest label - which a fixed px value silently was at 16px,
      running "Commissioned by" straight into "The Guardian". */
   display: grid; grid-template-columns: max-content minmax(0, 1fr);
-  align-items: baseline; gap: 12px var(--pd-gut);
+  align-items: baseline; gap: 9px var(--pd-gut);
   flex: 1 1 auto; min-width: 0;
   font-size: var(--pd-body); line-height: 1.45;
   font-variant-numeric: tabular-nums;
@@ -2195,10 +2195,10 @@ body.dark .poll-detail {
    list rather than one more of its rows, so the label sits over its value and
    the block takes its own clearance from the rows above. */
 .pd-meta-items.pd-rel {
-  display: block; margin: 26px auto 0; max-width: var(--pd-measure);
+  display: block; margin: 20px auto 0; max-width: var(--pd-measure);
 }
 .pd-rel .pd-meta-i { display: block; }
-.pd-rel .pd-meta-i + .pd-meta-i { margin-top: 14px; }
+.pd-rel .pd-meta-i + .pd-meta-i { margin-top: 11px; }
 .pd-rel .pd-meta-k { display: block; margin-bottom: 4px; }
 .pd-rel .pd-meta-v { display: block; }
 
@@ -2208,17 +2208,17 @@ body.dark .poll-detail {
    the hierarchy – a hairline per section instead of a gap, so the panel reads
    as a short document rather than one long paragraph run. */
 .pd-simple { display: block; max-width: var(--pd-measure); margin-inline: auto; }
-/* One rhythm, repeated: rule, 24px, heading, 15px, result, 28px, rule. The
+/* One rhythm, repeated: rule, 18px, heading, 11px, result, 22px, rule. The
    whitespace is the vertical rhythm rather than padding inside containers -
    and it was retuned with the type when the ladder stepped down, because a
    rhythm set for 17px body reads as slack around 15px. */
-.pd-sec { border-top: 1px solid var(--pd-rule); margin-top: 28px; padding-top: 24px; }
+.pd-sec { border-top: 1px solid var(--pd-rule); margin-top: 22px; padding-top: 18px; }
 .pd-s {
   margin: 0; font-size: var(--pd-body); line-height: 1.45; font-weight: 400;
   color: var(--pd-ink);
   font-variant-numeric: tabular-nums; text-wrap: pretty;
 }
-.pd-s + .pd-s { margin-top: 11px; }
+.pd-s + .pd-s { margin-top: 9px; }
 /* A figure is not an emphasised word. Every published number steps a full
    size above the sentence carrying it, so a line can be read for its figures
    alone; line-height: 1 keeps that step out of the leading, so the lines of a
@@ -2279,7 +2279,7 @@ body.dark .poll-detail {
 /* the basis of a figure – what was allocated, what stayed undecided – is a
    caption to the line above, not a tail on it. Trailing a parenthesis off the
    end of a 40px pair pushed the headline into a second line for a footnote. */
-.pd-s.pd-s-basis { margin-top: 12px; color: var(--pd-ink-2); font-size: var(--pd-body); }
+.pd-s.pd-s-basis { margin-top: 9px; color: var(--pd-ink-2); font-size: var(--pd-body); }
 /* a caption's figure still steps above its words, but not to the full figure
    size - the basis is about the measure above it and must not out-shout it */
 .pd-s.pd-s-basis b { font-size: var(--pd-fig); }
@@ -2304,11 +2304,11 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 .seatproj { display: flex; flex-direction: column; gap: 8px; }
 .seat-majline {
   display: flex; gap: 14px; align-items: baseline; flex-wrap: wrap;
-  font-size: var(--pd-note); color: var(--pd-ink-2); margin-top: 8px;
+  font-size: var(--pd-note); color: var(--pd-ink-2); margin-top: 7px;
 }
 .seat-majlab { font-weight: 500; }
 .seat-hung { color: var(--pd-ink); font-weight: 500; }
-.seat-rows { display: flex; flex-wrap: wrap; gap: 8px 26px; margin-top: 2px; }
+.seat-rows { display: flex; flex-wrap: wrap; gap: 7px 22px; margin-top: 2px; }
 .seat-row { display: inline-flex; align-items: baseline; gap: 7px; font-variant-numeric: tabular-nums; }
 /* the seat rows ride the panel's own ladder: the party is a secondary label
    (500), the count is a published figure (700, --pd-fig), and the range and
@@ -2324,7 +2324,7 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
    itself, and a party can note what it is made of */
 .seat-est.range { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .seat-note { font-size: var(--pd-note); color: var(--pd-ink-2); }
-.seat-basis { margin: 8px 0 0; font-size: var(--pd-note); color: var(--pd-ink-2); text-wrap: pretty; }
+.seat-basis { margin: 7px 0 0; font-size: var(--pd-note); color: var(--pd-ink-2); text-wrap: pretty; }
 @media (max-width: 700px) {
   .seat-rows { gap: 8px 18px; }
 }
@@ -2337,7 +2337,7 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 .pd-k {
   font-size: var(--pd-body); font-weight: 600;
   letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--pd-ink-2); margin: 0 0 15px;
+  color: var(--pd-ink-2); margin: 0 0 11px;
 }
 /* The vote-share section IS the poll's headline - it is the figure the row
    was opened for - so the head-to-head takes a display size and everything
@@ -2508,19 +2508,19 @@ button.acc-spread[aria-pressed="true"] {
    the same hierarchy on a phone, one octave down. */
 @media (max-width: 720px) {
   .poll-detail {
-    padding: 26px 22px 28px;
+    padding: 20px 20px 22px;
     /* only the gutter narrows - the label column sizes itself */
-    --pd-gut: 20px; --pd-hero: 38px; --pd-hero-w: 17px;
-    --pd-mid: 22px; --pd-fig: 20px; --pd-body: 14px;
-    --pd-note: 12px; --pd-hero-note: 14px;
+    --pd-gut: 18px; --pd-hero: 32px; --pd-hero-w: 15px;
+    --pd-mid: 19px; --pd-fig: 18px; --pd-body: 13px;
+    --pd-note: 11px; --pd-hero-note: 12.5px;
   }
-  .pd-sec { margin-top: 22px; padding-top: 19px; }
-  .pd-k { margin-bottom: 12px; }
-  .pd-meta-items { gap: 10px var(--pd-gut); }
-  .pd-meta-items.pd-rel { margin-top: 20px; }
+  .pd-sec { margin-top: 17px; padding-top: 15px; }
+  .pd-k { margin-bottom: 9px; }
+  .pd-meta-items { gap: 8px var(--pd-gut); }
+  .pd-meta-items.pd-rel { margin-top: 16px; }
 }
 @media (max-width: 430px) {
-  .poll-detail { --pd-gut: 16px; --pd-hero: 34px; }
+  .poll-detail { --pd-gut: 14px; --pd-hero: 29px; }
 }
 /* The values stay BESIDE their labels at every width. Stacking them cost six
    extra lines to buy back ~110px of a 341px measure that the labels were

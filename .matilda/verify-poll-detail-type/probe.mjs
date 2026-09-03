@@ -128,28 +128,28 @@ try {
     };
   })()`);
   console.log(t);
-  check("kicker size", t.kSize, "15px");
+  check("kicker size", t.kSize, "13.5px");
   check("kicker weight", t.kWeight, "600");
   check("kicker upper case", t.kCase, "uppercase");
   check("kicker tracked", t.kTracked, true);
   check("each section is ruled", t.secRule, "solid");
-  check("meta label", t.metaK, "15px");
-  check("meta value", t.metaV, "15px");
+  check("meta label", t.metaK, "13.5px");
+  check("meta value", t.metaV, "13.5px");
   check("panel is set in one family", t.fam, "Source Sans 3");
   check("label column holds every label", t.labFits, true);
   check("labels are held off their values", t.gut >= 16, true);
   check("release rides the provenance list", t.relRows > 0, true);
   check("release stacks label over value", t.relStacked, true);
-  check("hero words", t.heroWords, "20px");
-  check("hero figure", t.heroFig, "48px");
-  check("hero move", t.heroChg, "16px");
-  check("body words", t.bodyWords, "15px");
-  check("body figure", t.bodyFig, "23px");
-  check("net takes the figure size", t.netFig, "23px");
-  check("basis caption", t.basis, "15px");
-  check("basis figure takes the sentence figure size", t.basisFig, "23px");
-  check("move", t.chg, "13px");
-  check("absent line takes the body size", t.absent, "15px");
+  check("hero words", t.heroWords, "17px");
+  check("hero figure", t.heroFig, "40px");
+  check("hero move", t.heroChg, "14px");
+  check("body words", t.bodyWords, "13.5px");
+  check("body figure", t.bodyFig, "20px");
+  check("net takes the figure size", t.netFig, "20px");
+  check("basis caption", t.basis, "13.5px");
+  check("basis figure takes the sentence figure size", t.basisFig, "20px");
+  check("move", t.chg, "11.5px");
+  check("absent line takes the body size", t.absent, "13.5px");
   check("figure and its label never break apart", t.grpWrap, "nowrap");
   check("a rise is green", t.chgUp && t.chgUp !== t.inkThree, true);
   check("a fall is red, and not the same colour as a rise", t.chgDown && t.chgDown !== t.chgUp, true);
@@ -192,10 +192,10 @@ try {
   })()`);
   console.log(arch);
   check("archive shows every matchup", arch.matchups > 1, true);
-  check("archive hero figure", arch.heroFig, "48px");
+  check("archive hero figure", arch.heroFig, "40px");
   check("supporting matchups step down",
-        arch.restFig.every((s) => s === "23px"), true);
-  check("archive kicker", arch.kicker, "15px");
+        arch.restFig.every((s) => s === "20px"), true);
+  check("archive kicker", arch.kicker, "13.5px");
   check("controls stay docked to the band's right edge", arch.controlsDocked, true);
 
   /* The narrow ladder. .ap-wrap is overflow:visible so an over-wide panel

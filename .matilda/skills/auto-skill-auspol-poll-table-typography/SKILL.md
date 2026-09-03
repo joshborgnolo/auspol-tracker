@@ -83,11 +83,11 @@ name/mode ladder rules live in the ≤480/≤430px blocks. Real phone widths hit
     retired Archivo, whose sole consumer was the old `.poll-detail b` rule.
   - Scale — the mock's RATIOS at smaller absolute sizes: its own 17/28/60 read too
     large in situ (this panel sits inside a 16px data table, not on a standalone
-    page), so the whole ladder stepped down ~15% the same day. `--pd-body` 15px/1.45 ·
-    `--pd-note` 13px (moves, seat ranges, the way back) · `--pd-fig` 23px (a
-    percentage inside a sentence) · `--pd-mid` 26px (National direction — `PdSec mid`
-    → `.pd-sec-mid`) · `--pd-hero` 48px/0.98 with `--pd-hero-w` 20px words and
-    `--pd-hero-note` 16px (first two-way pair only). `.pd-k` headings take
+    page), so the whole ladder stepped down TWICE the same day, 17→15→13.5 body.
+    `--pd-body` 13.5px/1.45 · `--pd-note` 11.5px (moves, seat ranges, the way back) ·
+    `--pd-fig` 20px (a percentage inside a sentence) · `--pd-mid` 22px (National
+    direction — `PdSec mid` → `.pd-sec-mid`) · `--pd-hero` 40px/0.98 with
+    `--pd-hero-w` 17px words and `--pd-hero-note` 14px (first two-way pair only). `.pd-k` headings take
     `var(--pd-body)` at 600 **uppercase, 0.12em** — same px as the body; the
     distinction is case, tracking and grey. Every size in the panel is a token:
     there are no literal px font-sizes left to miss when rescaling.
@@ -97,11 +97,11 @@ name/mode ladder rules live in the ≤480/≤430px blocks. Real phone widths hit
     a cream/charcoal pair cannot be inverted.
   - Layout: `--pd-measure` 820px, `margin-inline: auto` on `.pd-meta`, `.pd-rel` and
     `.pd-simple` — a centred column inside a full-width table row. Rhythm: rule →
-    24px → heading → 15px → result → 28px → rule, one `.pd-sec` rule doing all of it
-    (`padding-top` / `.pd-k` margin / `margin-top`). Retuned with the type when the
-    ladder stepped down — a rhythm set for a 17px body reads as slack around 15px, so
-    **rescaling the type means rescaling this too**; panel padding 36px, meta row gap
-    12px, `.pd-s + .pd-s` 11px, basis caption 12px.
+    18px → heading → 11px → result → 22px → rule, one `.pd-sec` rule doing all of it
+    (`padding-top` / `.pd-k` margin / `margin-top`). Retuned with the type BOTH times
+    it stepped down — a rhythm set for a 17px body reads as slack around 13.5px, so
+    **rescaling the type means rescaling this too**; panel padding 28px, meta row gap
+    9px, `.pd-s + .pd-s` 9px, basis caption 9px, `--pd-gut` 26px.
   - **The label column is `max-content`, never a px value.** There is only ONE grid now
     (the release block is `display: block`, label over value), so nothing needs a shared
     width; `--pd-gut` is the gutter. A fixed column silently collided with
