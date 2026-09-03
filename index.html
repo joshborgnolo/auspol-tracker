@@ -12833,8 +12833,8 @@ function CycleChart({
          the party name – "Labor … the average government", "the Coalition …
          the average opposition". */
       const subjParty = M.key === "net" || M.key === "oppnet" || M.key === "ppmm" ? null : isOpp ? cur.opp : cur.gov;
-      const subjLabel = M.key === "net" ? sitting(cur.pm) : M.key === "oppnet" ? sitting(cur.oppLead) : M.key === "ppmm" ? sitting(cur.pm) + " v " + sitting(cur.oppLead) : (subjParty === "lnp" ? "the " : "") + D.PARTIES[subjParty].name;
-      const peerNoun = M.key === "net" ? "prime minister" : M.key === "oppnet" ? "opposition leader" : M.key === "ppmm" ? "pairing" : isOpp ? "opposition" : "government";
+      const subjLabel = M.key === "net" ? sitting(cur.pm) : M.key === "oppnet" ? sitting(cur.oppLead) : M.key === "ppmm" ? sitting(cur.pm) : (subjParty === "lnp" ? "the " : "") + D.PARTIES[subjParty].name;
+      const peerNoun = M.key === "net" ? "prime minister" : M.key === "oppnet" ? "opposition leader" : M.key === "ppmm" ? "net preference" : isOpp ? "opposition" : "government";
       insight = {
         d: Math.abs(d),
         better,
