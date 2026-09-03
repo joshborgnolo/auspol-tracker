@@ -3639,16 +3639,25 @@ html {
      point of the probe - and it keeps a laptop pull from opening on a hard
      line where the ground changes. */
   --tide-fade: var(--bg);
-  background-image: var(--tile-art),
+  /* Tiling is the only way to fill the gutter below, and background-repeat has
+     no one-way setting - a repeating layer runs off BOTH ends of its anchor,
+     so the tide also climbed into the pull-down gutter above the masthead,
+     where a tide makes no sense. The first layer caps it: a block of plain
+     ground sitting entirely above the document, hiding the upward run. Its
+     3000px is a ceiling, not a measurement - further than any rubber band
+     stretches, and a flat gradient costs nothing at any size. */
+  background-image: linear-gradient(var(--tide-fade), var(--tide-fade)),
+                    var(--tile-art),
                     linear-gradient(to bottom, var(--tide-fade), var(--tide-ground));
-  background-position: center bottom, left bottom -180px;
-  background-size: auto 400px, 100% 180px;
-  background-repeat: repeat, no-repeat;
+  background-position: left top -3000px, center bottom, left bottom -180px;
+  background-size: 100% 3000px, auto 400px, 100% 180px;
+  background-repeat: no-repeat, repeat, no-repeat;
   background-color: var(--tide-ground);
   transition: background-color .35s ease;
 }
 html:has(body.dark) {
-  background-image: var(--tile-art-dark),
+  background-image: linear-gradient(var(--tide-fade), var(--tide-fade)),
+                    var(--tile-art-dark),
                     linear-gradient(to bottom, var(--tide-fade), var(--tide-ground));
   --tide-fade: oklch(0.215 0.010 65);
   --tide-ground: oklch(0.175 0.014 250);
@@ -3674,7 +3683,7 @@ html:has(body.dark) {
 }
 body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (max-width: 640px) {
-  html { background-size: auto 320px, 100% 180px; }
+  html { background-size: 100% 3000px, auto 320px, 100% 180px; }
   .tile-band { height: 320px; margin-top: 8px; background-size: auto 320px; }
 }
 

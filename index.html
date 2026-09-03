@@ -3738,16 +3738,25 @@ html {
      point of the probe - and it keeps a laptop pull from opening on a hard
      line where the ground changes. */
   --tide-fade: var(--bg);
-  background-image: var(--tile-art),
+  /* Tiling is the only way to fill the gutter below, and background-repeat has
+     no one-way setting - a repeating layer runs off BOTH ends of its anchor,
+     so the tide also climbed into the pull-down gutter above the masthead,
+     where a tide makes no sense. The first layer caps it: a block of plain
+     ground sitting entirely above the document, hiding the upward run. Its
+     3000px is a ceiling, not a measurement - further than any rubber band
+     stretches, and a flat gradient costs nothing at any size. */
+  background-image: linear-gradient(var(--tide-fade), var(--tide-fade)),
+                    var(--tile-art),
                     linear-gradient(to bottom, var(--tide-fade), var(--tide-ground));
-  background-position: center bottom, left bottom -180px;
-  background-size: auto 400px, 100% 180px;
-  background-repeat: repeat, no-repeat;
+  background-position: left top -3000px, center bottom, left bottom -180px;
+  background-size: 100% 3000px, auto 400px, 100% 180px;
+  background-repeat: no-repeat, repeat, no-repeat;
   background-color: var(--tide-ground);
   transition: background-color .35s ease;
 }
 html:has(body.dark) {
-  background-image: var(--tile-art-dark),
+  background-image: linear-gradient(var(--tide-fade), var(--tide-fade)),
+                    var(--tile-art-dark),
                     linear-gradient(to bottom, var(--tide-fade), var(--tide-ground));
   --tide-fade: oklch(0.215 0.010 65);
   --tide-ground: oklch(0.175 0.014 250);
@@ -3773,7 +3782,7 @@ html:has(body.dark) {
 }
 body.dark .tile-band { background-image: var(--tile-art-dark); }
 @media (max-width: 640px) {
-  html { background-size: auto 320px, 100% 180px; }
+  html { background-size: 100% 3000px, auto 320px, 100% 180px; }
   .tile-band { height: 320px; margin-top: 8px; background-size: auto 320px; }
 }
 
@@ -19060,19 +19069,39 @@ function ReportError({
 
    What stays is not information but furniture: the way to report an error,
    which belongs wherever the reader notices one, and the standing caveat on
-   the figures, which has to sit under the figures rather than one tab away. */
+   the figures, which has to sit under the figures rather than one tab away.
+
+   The three of them are a COLOPHON, and are set as one: what the site is on
+   the left, what a reader can do about it on the right, the standing caveat
+   under both in the small type it has always deserved. Same composition as
+   the masthead - identity left, ways in right - so the page opens and closes
+   on the same shape. The single sentence that used to run all three thoughts
+   together is broken at its own joins: the copy is unchanged word for word
+   (it is a two-homes pair, see the ss-note in build.mjs), only regrouped. */
 function MethodNote({
   onInfo
 }) {
   return /*#__PURE__*/React.createElement("footer", {
-    className: "method method-slim"
-  }, /*#__PURE__*/React.createElement(ReportError, {
-    onInfo: onInfo
-  }), /*#__PURE__*/React.createElement("div", {
-    className: "disclaimer"
-  }, "auspol tracker is an unofficial aggregate of published national polling. Best efforts are made to make the aggregate figures transparent, trustworthy, statistically sound, and informative, but they are, in the end, estimates only. Federal polling archives I\u2019ve located are stored ", /*#__PURE__*/React.createElement("a", {
+    className: "method"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "colophon"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "colo-about"
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "colo-lede"
+  }, "auspol tracker is an unofficial aggregate of published national polling."), /*#__PURE__*/React.createElement("p", {
+    className: "colo-arch"
+  }, "Federal polling archives I\u2019ve located are stored", " ", /*#__PURE__*/React.createElement("a", {
+    className: "colo-link",
     href: "https://auspoltracker.com/archives"
-  }, "here"), " for safekeeping and convenience."));
+  }, "here", /*#__PURE__*/React.createElement("span", {
+    className: "plink-mark",
+    "aria-hidden": "true"
+  }, "\u2197")), " ", "for safekeeping and convenience.")), /*#__PURE__*/React.createElement(ReportError, {
+    onInfo: onInfo
+  })), /*#__PURE__*/React.createElement("p", {
+    className: "disclaimer"
+  }, "Best efforts are made to make the aggregate figures transparent, trustworthy, statistically sound, and informative, but they are, in the end, estimates only."));
 }
 
 // Sticky score anchor – RETIRED: the 2PP readout now docks into the sticky
