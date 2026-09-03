@@ -1627,6 +1627,18 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
 }
 
 function App() {
+  /* body.js is the "app has mounted" flag (see the boot block below), so it
+     is added by the first COMMIT, from this layout effect, and not by the
+     boot script before it calls render(). createRoot().render() commits
+     asynchronously, and the class being set early left a real window: the
+     static article was already transparent, #root was still empty and
+     already pulled up over it by --ss-h, and the page collapsed to the tide
+     band alone at the top of a blank screen. A refresh painted exactly
+     that frame - the line art splashed across the screen - until the app
+     landed. In a layout effect the class change and the first tree paint
+     together, so no frame exists in between. The no-commit frames are then
+     just the no-JS page, which the static article was built to be. */
+  React.useLayoutEffect(() => { document.body.classList.add("js"); }, []);
   const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
     "layout": "editorial",
     "theme": "auto",
@@ -1875,7 +1887,10 @@ function App() {
    gap it leaves (--ss-h set below) - so the swap happens on one class
    change, with no blank article-height seam opening at the top. The text
    stays in the DOM at full size, because Safari's reader rejects every
-   harder hide (clip, off-screen position, display:none). */
+   harder hide (clip, off-screen position, display:none). The class itself
+   is added by App's first-commit layout effect (see the top of App) -
+   setting it here, a task before render() commits, collapsed the page to
+   the tide band on a blank screen for the frames in between. */
 const staticSummary = document.querySelector(".static-summary");
 if (staticSummary) {
   const setStaticSummaryHeight = () =>
@@ -1901,5 +1916,4 @@ if (staticSummary) {
      mend as well. */
   staticSummary.setAttribute("aria-hidden", "true");
 }
-document.body.classList.add("js");
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);
