@@ -1542,17 +1542,42 @@ function ReportError({ onInfo }) {
 
    What stays is not information but furniture: the way to report an error,
    which belongs wherever the reader notices one, and the standing caveat on
-   the figures, which has to sit under the figures rather than one tab away. */
+   the figures, which has to sit under the figures rather than one tab away.
+
+   Both are a COLOPHON now, and are set as one. What the site is goes left,
+   with its own caveat under it; every way out of the page goes right. That
+   is the masthead's composition again - identity left, ways in right - so
+   the page opens and closes on the same shape. The one sentence that used to
+   run three thoughts together is broken at its own joins and dealt to the
+   column each belongs in; the copy is unchanged word for word, which matters
+   because it is a two-homes pair (the ss-note in build.mjs is the other). */
 function MethodNote({ onInfo }) {
   return (
-    <footer className="method method-slim">
-      <ReportError onInfo={onInfo} />
-      <div className="disclaimer">
-        auspol tracker is an unofficial aggregate of published national polling. Best efforts are
-        made to make the aggregate figures transparent, trustworthy, statistically sound, and
-        informative, but they are, in the end, estimates only. Federal polling archives I’ve
-        located are stored <a href="https://auspoltracker.com/archives">here</a> for safekeeping
-        and convenience.
+    <footer className="method">
+      <div className="colophon">
+        {/* left: what the site claims to be, and immediately under it what it
+            does not claim. Right: every way out of the page. Each column is a
+            statement over its own quieter footnote, which is why they balance
+            at four lines apiece without either being padded to fit. */}
+        <div className="colo-about">
+          <p className="colo-lede">
+            auspol tracker is an unofficial aggregate of published national polling.
+          </p>
+          <p className="disclaimer">
+            Best efforts are made to make the aggregate figures transparent, trustworthy,
+            statistically sound, and informative, but they are, in the end, estimates only.
+          </p>
+        </div>
+        <div className="colo-ways">
+          <ReportError onInfo={onInfo} />
+          <p className="colo-arch">
+            Federal polling archives I’ve located are stored{" "}
+            <a className="colo-link" href="https://auspoltracker.com/archives">
+              here<span className="plink-mark" aria-hidden="true">↗</span>
+            </a>{" "}
+            for safekeeping and convenience.
+          </p>
+        </div>
       </div>
     </footer>
   );

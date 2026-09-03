@@ -2220,17 +2220,55 @@ button.acc-spread[aria-pressed="true"] {
   .poll-detail { padding-left: 20px; }
 }
 
-/* ---------- method footer ---------- */
-.method { margin-top: 6px; padding-top: 24px; border-top: 1px solid var(--line); }
-.method-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
-.method-h { font-family: var(--serif); font-weight: 540; font-size: 16px; margin: 0 0 7px; color: var(--ink); }
-.method p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--ink-3); }
+/* ---------- colophon (the method footer) ----------
+   Three thoughts close the page - what the site is, what it does not claim,
+   and the ways out of it - and each used to arrive under its own horizontal
+   rule. A page built almost entirely of hairlines therefore ended in three
+   more inside 100px: the heaviest punctuation on the site stacked under its
+   quietest content, and no grouping to show for the expense.
+
+   One rule closes the document now, and the grouping the stacked rules were
+   failing at is done by COLUMNS - the claims left, the doors right, divided
+   by the same hairline-and-40px pair body.editorial .two-col uses. It is the
+   masthead's own composition (identity left, ways in right), which is what
+   makes this read as the last band of the same page rather than as an
+   appendix to it. .method-grid / .method-h went with the three prose
+   sections that moved to the Info tab; .method p went because every
+   paragraph down here now names its own size, and that blanket 13px was
+   quietly overriding .fb-note's 12px and .fb-thanks's top margin. */
+.method { margin-top: 6px; padding: 24px 0 20px; border-top: 1px solid var(--line); }
+/* the blanket guard against a colourless anchor falling to the UA link blue
+   (see the a.pollster-link note) - every anchor in the band is ink-2 */
 .method a { color: var(--ink-2); }
-.disclaimer {
-  margin-top: 22px; padding: 11px 14px; border-radius: 9px;
-  background: var(--surface-2); border: 1px solid var(--line);
-  font-size: 12px; color: var(--ink-3); text-align: center;
+
+.colophon { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+/* the divider is the left column's own border, so it runs the full band -
+   including the height the report form adds when it opens on the far side */
+.colo-about { padding-right: 40px; border-right: 1px solid var(--line); min-width: 0; }
+.colo-ways { padding-left: 40px; min-width: 0; }
+
+/* The site's sentence about itself, in the masthead tagline's serif: the page
+   opens on one serif line saying what it shows and closes on another saying
+   what it is. Balanced rather than ragged - at this measure it sets in one
+   line or two, and the two-line break should not leave a single word. */
+.colo-lede {
+  margin: 0; font-family: var(--serif); font-size: 16.5px; line-height: 1.45;
+  color: var(--ink-2); text-wrap: balance;
 }
+/* the caveat is the footnote to the claim directly above it, so it sits in
+   that claim's column at that claim's left edge - not stretched across the
+   full 1144px, which is where a centred box of it used to end up */
+.disclaimer { margin: 13px 0 0; font-size: 11.5px; line-height: 1.65; color: var(--ink-3); }
+
+/* the archive is the quieter of the two doors, and is the footnote shape on
+   this side of the rule - same step down as .disclaimer takes on the other */
+.colo-arch { margin: 20px 0 0; font-size: 12.5px; line-height: 1.65; color: var(--ink-3); }
+/* house link treatment: no standing underline, the plink-mark carries the
+   affordance, and an explicit colour rather than an inherited one */
+a.colo-link { color: var(--ink-2); text-decoration: none; }
+a.colo-link:hover, a.colo-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+a.colo-link:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
+a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: var(--ink-2); }
 
 /* ---------- report an error ----------
    The page is static – GitHub Pages serves files and cannot process a POST –
@@ -2244,8 +2282,12 @@ button.acc-spread[aria-pressed="true"] {
    under the method notes turned the quietest part of the page into the
    busiest. Collapsed to a sentence until it is wanted, for the same reason:
    the footer's job is to explain the method, not to solicit. */
-.fb { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line-2); }
-.fb-lede { margin: 0; max-width: 62ch; font-size: 13px; line-height: 1.65; color: var(--ink-3); }
+/* No rule and no top margin: this is the right column of the colophon, and
+   the vertical hairline beside it already says where it starts. */
+.fb { min-width: 0; }
+/* the lead statement of its column, so it carries that column's ink and size
+   - the archive line under it is the one that steps down */
+.fb-lede { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--ink-2); }
 /* The trigger sits INSIDE the sentence rather than beside it: the offer and
    the way to take it up are one thought, and a pill parked at the end of the
    paragraph read as a second one competing with it. */
@@ -2314,6 +2356,14 @@ body.dark .fb-form { color-scheme: dark; }
 .fb-note.is-error { color: var(--mood-neg); }
 .fb-thanks { margin: 20px 0 0; max-width: 540px; font-size: 13px; line-height: 1.65; color: var(--ink-2); }
 
+/* Stacked, the divider turns through 90 degrees rather than disappearing:
+   the two columns lead with type of a similar size and would otherwise run
+   together into one paragraph of unrelated sentences. */
+@media (max-width: 780px) {
+  .colophon { grid-template-columns: 1fr; }
+  .colo-about { padding-right: 0; border-right: 0; }
+  .colo-ways { padding-left: 0; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
+}
 @media (max-width: 560px) { .fb-form, .fb-thanks { max-width: none; } }
 
 /* ---------- responsive ---------- */
@@ -2325,7 +2375,6 @@ body.dark .fb-form { color-scheme: dark; }
   .two-col { grid-template-columns: 1fr; }
 }
 @media (max-width: 900px) {
-  .method-grid { grid-template-columns: 1fr; }
   .head-meta { gap: 12px; }
   .ro-num { font-size: 52px; }
   /* Never one row of six small targets: at this width the toggles' home is
@@ -2513,8 +2562,11 @@ body.editorial .poll-table td { padding-top: 15px; padding-bottom: 15px; }
 body.editorial .poll-table tbody tr:hover { background: var(--surface-2); }
 
 /* legend / segmented keep a hairline so controls stay legible without cards */
+/* the one rule that closes the document, at the weight editorial gives its
+   strongest hairlines. The .disclaimer override that used to sit here undid
+   a rounded surface-2 card; the base rule draws no card in either layout
+   now, so there is nothing left to undo. */
 body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; padding-top: 30px; }
-body.editorial .disclaimer { background: transparent; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 16px 0 0; text-align: left; font-size: 11.5px; color: var(--ink-3); }
 
 .tweak-note {
   margin: -2px 0 4px; font-size: 11.5px; line-height: 1.45;
