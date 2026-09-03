@@ -1593,7 +1593,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
                   thin for a band at all. Both of those are removed from the
                   legend instead, and a ✕ that did nothing would be worse than
                   no ✕ at all. */}
-              {lifted.has(c.year) && (
+              {lifted.has(c.year) && !c.current && (
                 <button type="button" className="cyc-drawn-x"
                         title={"Return " + c.year + " to the band"}
                         aria-label={"Return " + c.year + " to the band"}
@@ -2148,6 +2148,15 @@ function PastCyclesView() {
       return null;
     }).filter((y) => y != null && years.has(y)));
   };
+  /* The sitting term has no band to be lifted OUT of - it is always drawn -
+     so it can never be "lifted", and two things downstream are written on
+     that assumption: the ✕ in each chart's "Drawn here" strip is offered
+     only on lifted terms, and `lifted.size > 0` dims every term that is not
+     one. Nothing stopped the sitting term's own chip putting it in the set,
+     so both misfired: a ✕ that removed nothing (the term is drawn either
+     way, so the row stayed exactly where it was), and a whole board dimmed
+     for a lift that had not happened. */
+  const currentYear = (cycles.find((c) => c.current) || {}).year;
   const [hidden, setHidden] = useState(
     () => cycYears(new URLSearchParams(window.location.search).get("c")));
   /* Terms drawn as their own line over the band. A separate question from
@@ -2155,8 +2164,13 @@ function PastCyclesView() {
      it is being compared against its own peer set, which is the comparison the
      card is for, and a band that moved when you drew a line over it would shift
      the baseline under the reading. */
-  const [lifted, setLifted] = useState(
-    () => cycYears(new URLSearchParams(window.location.search).get("l")));
+  const [lifted, setLifted] = useState(() => {
+    const l = cycYears(new URLSearchParams(window.location.search).get("l"));
+    /* a shared ?l= carrying the sitting term (every link copied while the bug
+       was live does) must not restore the state it could not legally reach */
+    l.delete(currentYear);
+    return l;
+  });
   const [hi, setHi] = useState(null);
   const [showHan, setShowHan] = useState(false);
   const [showOnp, setShowOnp] = useState(false);
@@ -2194,11 +2208,14 @@ function PastCyclesView() {
       const n = new Set(l); n.delete(year); return n;
     });
   };
-  const lift = (year) => setLifted((l) => {
-    const n = new Set(l);
-    n.has(year) ? n.delete(year) : n.add(year);
-    return n;
-  });
+  const lift = (year) => {
+    if (year === currentYear) return;   // nothing to lift it out of
+    setLifted((l) => {
+      const n = new Set(l);
+      n.has(year) ? n.delete(year) : n.add(year);
+      return n;
+    });
+  };
   const unlift = (year) => setLifted((l) => {
     if (!l.has(year)) return l;
     const n = new Set(l); n.delete(year); return n;

@@ -564,6 +564,44 @@ pieces shipped in 7240d7d, all in d1a1d215 + template.html:
 - **Verify built**: `grep -c "cyc-band" index.html` => 13; `"Mean of past
   terms"` => 1. Caption text is plain ASCII in the compiled bundle.
 
+## `lifted` may NEVER hold the sitting term (bug fixed 2026-09-03)
+
+`hidden` and `lifted` answer different questions: hidden = off the board (out of
+the band, the mean and the download), lifted = drawn as its own line OVER the
+band. The sitting term has no band to be lifted out of — `drawn = lift ||
+c.current` puts it on the chart unconditionally — so it can never legally be in
+`lifted`, and two things downstream assume exactly that:
+
+- each chart's "Drawn here" strip offers its ✕ on `lifted.has(c.year)`;
+- `dim = !out && !c.current && (hi != null || lifted.size > 0)` (twice: the line
+  renderer ~:1209 and the dot renderer ~:1396) dims every term that is not lifted.
+
+Nothing stopped the sitting term's own chip putting it there — `chipClick` →
+`lift(year)` had no guard — so one tap on "2025 Albanese" produced **a ✕ on six
+charts that removed nothing** (pressing it un-lifted a term that was drawn either
+way, so the row did not move: reported as "the ✕ doesn't work") **and dimmed the
+whole board** for a lift that had not happened. It also wrote `?l=25`, so the
+state was shareable.
+
+Three guards, all in the panel component in `d1a1d215`:
+
+1. `const currentYear = (cycles.find((c) => c.current) || {}).year;` and
+   `lift()` returns early for it. This is the root fix.
+2. the `lifted` `useState` initialiser deletes `currentYear` from the parsed
+   `?l=` — links copied while the bug was live all carry it.
+3. the strip's ✕ needs `lifted.has(c.year) && !c.current`, so it can never
+   render where pressing it would change nothing.
+
+Tapping the sitting chip is now a no-op, which is what its own aria-label has
+always promised ("the sitting term, always drawn"). Removing it is still the ✕
+on its legend chip (`toggle`, i.e. off the board) — a different act, and the one
+the user reached for when the strip's ✕ failed.
+
+Probe: `.matilda/verify-cycle-lift/probe.mjs` — 12 checks covering the dead ✕,
+the stale `?l=`, and both paths that must keep working (a past term still lifts
+and its ✕ still returns it to the band; the legend ✕ still clears the sitting
+term).
+
 ## Per-term event lines (CYC_EVENTS in d1a1d215)
 
 Board of event markers per past-term year, drawn ONLY while that term
