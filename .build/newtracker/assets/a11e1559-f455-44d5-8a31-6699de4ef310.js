@@ -1937,15 +1937,15 @@ function TppLine({ c, prefixed, note, hero }) {
 }
 
 /* The poll's own pull on the figure a reader watches, as one ordinary row
-   of the provenance band: "2PP effect   +0.1 for Labor vs. L/NP; −0.4 for
-   Labor vs. ON". One clause per aggregate the wave feeds: the classic 2PP;
-   the flow-table implied 2PP for a poll that published no pair (its
-   primaries still move THAT estimate); and Labor's head-to-head against
-   One Nation where the wave asked it. lo/hi are gen-data's leave-one-out
-   run (the `eff` payload): lo is the aggregate WITHOUT the wave, hi the
-   standing aggregate with it; `w` marks a wave outside the current window,
-   so its null move reads as "before the window", not "the poll did
-   nothing". */
+   of the provenance band: "2PP agg. effect   +0.1 for Labor vs. L/NP;
+   −0.4 for Labor vs. ON". One clause per aggregate the wave feeds: the
+   classic 2PP; the flow-table implied 2PP for a poll that published no
+   pair (its primaries still move THAT estimate); and Labor's head-to-head
+   against One Nation where the wave asked it. lo/hi are gen-data's leave-
+   one-out run (the `eff` payload): lo is the aggregate WITHOUT the wave,
+   hi the standing aggregate with it; a wave outside the current window
+   can't move those figures at all, so the row just says so instead of
+   printing null moves. */
 function EffLines({ eff }) {
   if (!eff || (!eff.lnp && !eff.imp && !eff.onp)) return null;
   /* signed like Poll lean and House effect in the rows above (% dropped –
@@ -1960,27 +1960,30 @@ function EffLines({ eff }) {
     <button type="button" className="hi-term"
             onClick={() => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
   );
-  /* a window note rides its clause in a mixed row; when every clause is out
-     of window one note at the end speaks for them all (the alternative was
-     the same parenthesis twice in a line) */
+  /* when every clause is out of window, the whole row is just the note –
+     its in-window wording, without the brackets and without the ±0.0s. A
+     mixed row keeps the note parenthesised on the out-of-window clause */
   const prim = eff.lnp || eff.imp;
   const shareOut = prim && !prim.w && (!eff.onp || !eff.onp.w);
-  const winNote = (m) => (
-    <span className="pd-s-note"> (outside the {m ? "month" : "21-day window"} the aggregate covers)</span>
-  );
+  const winText = (m) => `outside the ${m ? "month" : "21-day window"} the aggregate covers`;
   const clause = (e, who, imp) => (
     <React.Fragment>
       {signed(e)} for Labor vs. {who}{imp && <React.Fragment> ({implied})</React.Fragment>}
-      {!e.w && !shareOut && winNote(e.m)}
+      {!e.w && <span className="pd-s-note"> ({winText(e.m)})</span>}
     </React.Fragment>
   );
   return (
     <span className="pd-meta-i">
-      <span className="pd-meta-k">2PP effect</span>
+      <span className="pd-meta-k">2PP agg. effect</span>
       <span className="pd-meta-v">
-        {eff.lnp ? clause(eff.lnp, "L/NP") : clause(eff.imp, "L/NP", true)}
-        {eff.onp && <React.Fragment>; {clause(eff.onp, "ON")}</React.Fragment>}
-        {shareOut && winNote(prim.m)}
+        {shareOut ? (
+          <span className="pd-s-note">{winText(prim.m)}</span>
+        ) : (
+          <React.Fragment>
+            {eff.lnp ? clause(eff.lnp, "L/NP") : clause(eff.imp, "L/NP", true)}
+            {eff.onp && <React.Fragment>; {clause(eff.onp, "ON")}</React.Fragment>}
+          </React.Fragment>
+        )}
       </span>
     </span>
   );

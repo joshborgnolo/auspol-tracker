@@ -11177,15 +11177,15 @@ function TppLine({
 }
 
 /* The poll's own pull on the figure a reader watches, as one ordinary row
-   of the provenance band: "2PP effect   +0.1 for Labor vs. L/NP; −0.4 for
-   Labor vs. ON". One clause per aggregate the wave feeds: the classic 2PP;
-   the flow-table implied 2PP for a poll that published no pair (its
-   primaries still move THAT estimate); and Labor's head-to-head against
-   One Nation where the wave asked it. lo/hi are gen-data's leave-one-out
-   run (the `eff` payload): lo is the aggregate WITHOUT the wave, hi the
-   standing aggregate with it; `w` marks a wave outside the current window,
-   so its null move reads as "before the window", not "the poll did
-   nothing". */
+   of the provenance band: "2PP agg. effect   +0.1 for Labor vs. L/NP;
+   −0.4 for Labor vs. ON". One clause per aggregate the wave feeds: the
+   classic 2PP; the flow-table implied 2PP for a poll that published no
+   pair (its primaries still move THAT estimate); and Labor's head-to-head
+   against One Nation where the wave asked it. lo/hi are gen-data's leave-
+   one-out run (the `eff` payload): lo is the aggregate WITHOUT the wave,
+   hi the standing aggregate with it; a wave outside the current window
+   can't move those figures at all, so the row just says so instead of
+   printing null moves. */
 function EffLines({
   eff
 }) {
@@ -11203,22 +11203,24 @@ function EffLines({
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
   }, "implied 2PP");
-  /* a window note rides its clause in a mixed row; when every clause is out
-     of window one note at the end speaks for them all (the alternative was
-     the same parenthesis twice in a line) */
+  /* when every clause is out of window, the whole row is just the note –
+     its in-window wording, without the brackets and without the ±0.0s. A
+     mixed row keeps the note parenthesised on the out-of-window clause */
   const prim = eff.lnp || eff.imp;
   const shareOut = prim && !prim.w && (!eff.onp || !eff.onp.w);
-  const winNote = m => /*#__PURE__*/React.createElement("span", {
+  const winText = m => `outside the ${m ? "month" : "21-day window"} the aggregate covers`;
+  const clause = (e, who, imp) => /*#__PURE__*/React.createElement(React.Fragment, null, signed(e), " for Labor vs. ", who, imp && /*#__PURE__*/React.createElement(React.Fragment, null, " (", implied, ")"), !e.w && /*#__PURE__*/React.createElement("span", {
     className: "pd-s-note"
-  }, " (outside the ", m ? "month" : "21-day window", " the aggregate covers)");
-  const clause = (e, who, imp) => /*#__PURE__*/React.createElement(React.Fragment, null, signed(e), " for Labor vs. ", who, imp && /*#__PURE__*/React.createElement(React.Fragment, null, " (", implied, ")"), !e.w && !shareOut && winNote(e.m));
+  }, " (", winText(e.m), ")"));
   return /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
-  }, "2PP effect"), /*#__PURE__*/React.createElement("span", {
+  }, "2PP agg. effect"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
-  }, eff.lnp ? clause(eff.lnp, "L/NP") : clause(eff.imp, "L/NP", true), eff.onp && /*#__PURE__*/React.createElement(React.Fragment, null, "; ", clause(eff.onp, "ON")), shareOut && winNote(prim.m)));
+  }, shareOut ? /*#__PURE__*/React.createElement("span", {
+    className: "pd-s-note"
+  }, winText(prim.m)) : /*#__PURE__*/React.createElement(React.Fragment, null, eff.lnp ? clause(eff.lnp, "L/NP") : clause(eff.imp, "L/NP", true), eff.onp && /*#__PURE__*/React.createElement(React.Fragment, null, "; ", clause(eff.onp, "ON")))));
 }
 
 /* A leader's ratings as one sentence: approve, disapprove, don't know, with
