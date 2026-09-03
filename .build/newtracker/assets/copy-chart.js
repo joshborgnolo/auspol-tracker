@@ -435,7 +435,7 @@
                  || lm.find((r) => Object.keys(r).some((k) => k.indexOf(id + "_") === 0 && r[k] != null));
         return hit && hit.ym ? String(hit.ym).slice(0, 4) : null;
       };
-      return labels.map((t) => {
+      const entries = labels.map((t) => {
         const text = (t.textContent || "").trim();
         const fill = getComputedStyle(t).fill;
         /* The digits are not the first word here: One Nation's overlay ends
@@ -461,6 +461,35 @@
         return { label: m ? (m.name + (from ? ", from " + from : "")) : (t.textContent || "").trim(),
                  kind: "dashed", fill, alpha: 1, year: 9999 };
       }).sort((a, b) => a.year - b.year);
+      /* While the band is on the chart, the end labels name only the current
+         term (plus any chip-hovered one) - the copied card showed a purple
+         wash that nothing claimed, warming over terms it never named. Here
+         the legend gains the entry the live view gives its band: the terms
+         it pools, read off the chips (everything not switched off), minus
+         any the chart already labels by name. */
+      if (svgEl.querySelector(".cyc-band")) {
+        const chips = [...document.querySelectorAll(".cyc-chip")]
+          .filter((ch) => !ch.classList.contains("off") && !ch.classList.contains("current"));
+        const named = new Set(entries.filter((e) => e.year < 9000).map((e) => e.year));
+        const years = chips.map((ch) => {
+          const y = ch.querySelector(".cyc-year");
+          const n = y ? parseInt(y.textContent, 10) : NaN;
+          return Number.isFinite(n) && !named.has(n) ? n : null;
+        }).filter((n) => n != null);
+        if (years.length) {
+          const lo = svgEl.querySelector(".cyc-band.lo"), hiB = svgEl.querySelector(".cyc-band.hi");
+          entries.push({
+            label: "Past terms (" + years.join(", ") + "): mean of the set, middle half and middle 80%",
+            kind: "cycband",
+            fill: inkVar("--cyc-fill"),
+            lo: lo ? parseFloat(getComputedStyle(lo).opacity) || 0.09 : 0.09,
+            hi: hiB ? parseFloat(getComputedStyle(hiB).opacity) || 0.17 : 0.17,
+            alpha: 1, year: 9998,
+          });
+          entries.sort((a, b) => a.year - b.year);
+        }
+      }
+      return entries;
     };
     let legend = readLegend(target);
     if (!legend.length) legend = cycleLegend();
@@ -582,6 +611,20 @@
             if (it.kind === "line" || it.kind === "dashed") {
               c.strokeStyle = it.fill; c.lineWidth = 3; c.lineCap = "round";
               if (it.kind === "dashed") c.setLineDash([4, 4]);
+              c.beginPath(); c.moveTo(lx, my); c.lineTo(lx + 18, my); c.stroke();
+              c.setLineDash([]);
+            } else if (it.kind === "cycband") {
+              /* the past-cycles band swatch echoes the live legend's key:
+                 both fills stacked at their own opacities with the mean's
+                 dash across – a flat rect would not read as two bands */
+              c.fillStyle = it.fill;
+              c.globalAlpha = it.alpha * it.lo;
+              c.beginPath(); c.roundRect(lx, my - 5, 18, 11, 2); c.fill();
+              c.globalAlpha = it.alpha * it.hi;
+              c.beginPath(); c.roundRect(lx, my - 2.5, 18, 6, 1); c.fill();
+              c.globalAlpha = it.alpha * 0.85;
+              c.strokeStyle = T.ink2; c.lineWidth = 1.6; c.lineCap = "round";
+              c.setLineDash([2, 2.7]);
               c.beginPath(); c.moveTo(lx, my); c.lineTo(lx + 18, my); c.stroke();
               c.setLineDash([]);
             } else if (it.kind === "band") {
