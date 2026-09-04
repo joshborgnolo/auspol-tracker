@@ -14782,14 +14782,14 @@ function CycleChart({
     type: "checkbox",
     checked: !!showHan,
     onChange: e => setHan(e.target.checked)
-  }), "Current Pauline Hanson"), M.onp && /*#__PURE__*/React.createElement("label", {
+  }), "Pauline Hanson this term"), M.onp && /*#__PURE__*/React.createElement("label", {
     className: "pg-check cyc-onp" + (showOnp ? " on" : ""),
     title: "One Nation first-preference support, drawn as one dotted line " + "over the current term only. The party's past terms are left off – " + "they crowd the chart without adding context."
   }, /*#__PURE__*/React.createElement("input", {
     type: "checkbox",
     checked: !!showOnp,
     onChange: e => setOnp(e.target.checked)
-  }), "Current One Nation")), insight && (() => {
+  }), "One Nation this term")), insight && (() => {
     /* Prose, not a table cell: a gap of exactly nine points reads as
        "9%", not "9.0%", and the sign is dropped because the
        "above"/"below" that follows already carries the direction
