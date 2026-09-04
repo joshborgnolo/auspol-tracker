@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Feedback · auspol tracker</title>
+<!-- Standalone page: the report-an-error form, moved out of the main
+     page's footer onto its own route. Not part of the .build/newtracker
+     pipeline — hand-maintained. Chrome is the main site's static-article
+     view (its no-JS static summary): the same 680px column, Crimson Text
+     headings over IBM Plex Sans body, ss-note footer and fixed .ss-back
+     pill home, with the fb-* form styles ported from template.html. -->
+<meta name="description" content="Report a wrong figure, a missing poll, or a site bug in auspol tracker — corrections go straight to the inbox via Formspree and are checked against the pollster's own release before anything moves.">
+<meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="auspol tracker">
+<meta property="og:title" content="Feedback · auspol tracker">
+<meta property="og:description" content="Report a wrong figure, a missing poll, or a site bug — corrections go straight to the inbox and are checked against the pollster's own release before anything moves.">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://auspoltracker.com/feedback/">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1d2c'/%3E%3Crect x='6' y='15' width='5' height='11' fill='%23d62828'/%3E%3Crect x='13.5' y='8' width='5' height='18' fill='%23b08d39'/%3E%3Crect x='21' y='18' width='5' height='8' fill='%23ec7a08'/%3E%3C/svg%3E">
+<style>
+/* ------- fonts: the two cuts the static article runs ------- */
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-400-latin.aac0df38.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Crimson Text';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("/assets/fonts/crimsontext-600-latin.94af2060.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Sans';
+  font-style: normal;
+  font-weight: 300 700;
+  font-display: swap;
+  src: url("/assets/fonts/ibmplexsans-latin.056e4e24.woff2") format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ------- palette: the editorial surfaces the live site runs in ------- */
+:root {
+  --bg:        oklch(0.975 0.009 80);
+  --ink:       oklch(0.27 0.012 55);
+  --ink-2:     oklch(0.44 0.012 55);
+  --ink-3:     oklch(0.52 0.010 58);
+  --ink-faint: oklch(0.70 0.008 65);
+  --line:      oklch(0.895 0.008 75);
+  --line-2:    oklch(0.935 0.006 78);
+  --accent:    oklch(0.50 0.070 205);
+  --mood-neg:  oklch(0.505 0.092 36);
+  --serif: "Crimson Text", Georgia, "Times New Roman", serif;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg:        oklch(0.205 0.010 65);
+    --ink:       oklch(0.940 0.008 80);
+    --ink-2:     oklch(0.800 0.009 78);
+    --ink-3:     oklch(0.670 0.009 72);
+    --ink-faint: oklch(0.545 0.009 68);
+    --line:      oklch(0.355 0.011 66);
+    --line-2:    oklch(0.312 0.010 66);
+    --accent:    oklch(0.70 0.080 205);
+    --mood-neg:  oklch(0.685 0.105 38);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-feature-settings: "tnum" 1, "ss01" 1;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  line-height: 1.45;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+/* ------- back to the interactive tracker (the static page's .ss-back pill) */
+.ss-back {
+  position: fixed; right: 18px; bottom: 18px; z-index: 300;
+  display: inline-block;
+  padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--ink); font-size: 13px;
+  font-weight: 600; text-decoration: none; cursor: pointer;
+  box-shadow: 0 3px 16px oklch(0 0 0 / 0.16);
+}
+.ss-back:hover { border-color: var(--ink-3); }
+
+/* ------- article: the static summary's column + type rhythm ------- */
+.frame-wrap {
+  flex: 1; display: flex; flex-direction: column;
+  max-width: 680px; width: 100%; margin: 0 auto;
+  padding: 40px 28px calc(64px + env(safe-area-inset-bottom, 0px)) 28px;
+}
+.frame-wrap h1 {
+  font-family: var(--serif); font-size: 34px; font-weight: 600;
+  letter-spacing: -0.01em; margin: 0 0 6px;
+}
+/* .ss-sub/.ss-note copy the static page's RENDERED values, not the source
+   rules: on the live page .static-summary p outranks both, so the sub and
+   the footer note actually run at body-copy 14.5px/1.6 ink-2. */
+.ss-sub { margin: 0 0 4px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+.ss-sub a { color: inherit; }
+.ss-note { margin-top: 20px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+.ss-note a { color: var(--ink-2); }
+.ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
+
+/* ------- report an error: the fb-* block, ported from template.html -------
+   The form lives here rather than in the main page's footer; the rules are
+   the same ones the footer ran, minus the colophon placement (no margins
+   inherited from the right column of a two-up footer). */
+.fb { margin-top: 22px; }
+.fb-form, .fb-thanks { animation: fb-in .22s ease both; }
+@keyframes fb-in { from { opacity: 0; transform: translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .fb-form, .fb-thanks { animation: none; } }
+
+.fb-form { display: grid; gap: 19px; max-width: 540px; }
+
+.fb-row { display: grid; gap: 8px; }
+.fb-label { font-size: 11px; font-weight: 600; color: var(--ink-3); }
+/* the parenthetical half of a label is prose, not a heading */
+.fb-label span { font-weight: 400; }
+
+.fb-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+.fb-chip {
+  border: 1px solid var(--line); background: transparent; border-radius: 999px;
+  padding: 5px 12px; cursor: pointer; white-space: nowrap;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 500; color: var(--ink-3);
+  transition: color .15s ease, border-color .15s ease;
+}
+.fb-chip:hover { color: var(--ink-2); border-color: var(--ink-faint); }
+.fb-chip.active { color: var(--ink); border-color: var(--ink); font-weight: 600; }
+
+.fb-form input, .fb-form textarea {
+  width: 100%; font-family: var(--sans); font-size: 14px; line-height: 1.55;
+  color: var(--ink); background: transparent;
+  border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
+  padding: 5px 1px; transition: border-color .15s ease;
+}
+/* No min-height and no drag handle: the box is sized from its own content,
+   opening as one line and growing a line at a time. The cap is about seven
+   lines, past which it scrolls. */
+.fb-form textarea { min-height: 0; max-height: 164px; resize: none; overflow-y: hidden; }
+.fb-form input::placeholder, .fb-form textarea::placeholder { color: var(--ink-3); opacity: 0.72; }
+.fb-form input:focus, .fb-form textarea:focus { outline: none; border-bottom-color: var(--accent); }
+/* Pin the native furniture (caret, selection, autofill) to the page's own
+   scheme; there is no manual theme toggle here, so it follows the media
+   query rather than a body class. */
+.fb-form { color-scheme: light; }
+@media (prefers-color-scheme: dark) { .fb-form { color-scheme: dark; } }
+/* iOS Safari zooms the page IN when a focused field's text is under 16px,
+   and never zooms back out — two points of type is the cheaper thing to
+   give up. */
+@media (pointer: coarse) { .fb-form input, .fb-form textarea { font-size: 16px; } }
+/* Formspree discards anything arriving with _gotcha filled — a field no
+   human sees and every naive bot completes. Off-screen rather than
+   display:none, which the same bots know to skip. */
+.fb-gotcha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+
+.fb-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
+.fb-send {
+  border: 1px solid var(--ink); background: transparent; color: var(--ink);
+  border-radius: 999px; padding: 7px 18px; cursor: pointer; white-space: nowrap;
+  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  transition: background-color .15s ease, color .15s ease, opacity .15s ease;
+}
+.fb-send:hover { background: var(--ink); color: var(--bg); }
+.fb-send[disabled] { opacity: 0.45; cursor: default; background: transparent; color: var(--ink); }
+.fb-note { margin: 0; flex: 1 1 210px; font-size: 12px; line-height: 1.5; color: var(--ink-3); }
+.fb-note.is-error { color: var(--mood-neg); }
+.fb-thanks { max-width: 540px; font-size: 13px; line-height: 1.65; color: var(--ink-2); }
+.fb-link {
+  border: 0; border-bottom: 1px solid var(--ink-faint); background: none;
+  padding: 0; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer;
+  transition: border-color .15s ease;
+}
+.fb-link:hover { border-bottom-color: var(--ink); }
+
+@media (max-width: 560px) { .fb-form, .fb-thanks { max-width: none; } }
+</style>
+</head>
+<body>
+<main class="frame-wrap">
+  <h1>Feedback</h1>
+  <p class="ss-sub">Spotted a wrong figure, a missing poll, or a site bug? Reports are checked against the pollster's own release before a figure moves, so a correction lands at the next build rather than straight away.</p>
+
+  <div class="fb" id="fb">
+    <form class="fb-form" id="fb-form">
+      <div class="fb-row">
+        <span class="fb-label" id="kindlab">What’s this about?</span>
+        <div class="fb-chips" role="group" aria-labelledby="kindlab" id="fb-chips">
+          <button type="button" class="fb-chip active" data-kind="Wrong figure">Wrong figure</button>
+          <button type="button" class="fb-chip" data-kind="Missing poll">Missing poll</button>
+          <button type="button" class="fb-chip" data-kind="Site bug">Site bug</button>
+          <button type="button" class="fb-chip" data-kind="Something else">Something else</button>
+        </div>
+        <input type="hidden" name="kind" id="fb-kind" value="Wrong figure">
+      </div>
+
+      <div class="fb-row">
+        <label class="fb-label" for="fb-msg">
+          Details <span>– the pollster and field dates help most</span>
+        </label>
+        <textarea id="fb-msg" name="message" required rows="4"
+          placeholder="e.g. Resolve, fielded 12–15 Aug – Labor’s primary is 27.9 here, the release says 28.9"></textarea>
+      </div>
+
+      <div class="fb-row">
+        <label class="fb-label" for="fb-email">
+          Email <span>– optional, only used to reply to you</span>
+        </label>
+        <input id="fb-email" name="email" type="email" autocomplete="email"
+          placeholder="you@example.com">
+      </div>
+
+      <div class="fb-gotcha" aria-hidden="true">
+        <label for="fb-gotcha">Leave this field empty</label>
+        <input id="fb-gotcha" name="_gotcha" type="text" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="fb-actions">
+        <button type="submit" class="fb-send" id="fb-send">Send report</button>
+        <p class="fb-note" id="fb-note">Goes to my inbox via Formspree. Nothing is published.</p>
+      </div>
+    </form>
+
+    <p class="fb-thanks" id="fb-thanks" hidden>
+      <strong>Thank you – that’s arrived.</strong> Reports are checked against the
+      pollster’s own release before a figure moves, so a correction lands at the next
+      build rather than straight away.
+      <button type="button" class="fb-link" id="fb-again">Send another</button>
+    </p>
+  </div>
+
+  <p class="ss-note">This is the feedback page of <a href="/">auspol tracker</a>, an unofficial aggregate of published national polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
+</main>
+<a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
+<noscript><style>.fb-form { display: none; }</style></noscript>
+<script>
+(function () {
+  "use strict";
+  var ENDPOINT = "https://formspree.io/f/myzkjdnp";
+  var form = document.getElementById("fb-form");
+  var chips = document.getElementById("fb-chips");
+  var kindInput = document.getElementById("fb-kind");
+  var msg = document.getElementById("fb-msg");
+  var send = document.getElementById("fb-send");
+  var note = document.getElementById("fb-note");
+  var thanks = document.getElementById("fb-thanks");
+  var again = document.getElementById("fb-again");
+  var DEFAULT_NOTE = "Goes to my inbox via Formspree. Nothing is published.";
+  var sending = false;
+
+  /* Seed from ?msg= (the tracker's report-an-error links carry the poll's
+     identity this way so the reader doesn't retype it). */
+  try {
+    var prefill = new URLSearchParams(window.location.search).get("msg");
+    if (prefill) { msg.value = prefill; msg.rows = Math.min(prefill.split("\n").length + 1, 7); }
+  } catch (_) {}
+
+  chips.addEventListener("click", function (e) {
+    var b = e.target.closest(".fb-chip");
+    if (!b) return;
+    kindInput.value = b.dataset.kind;
+    for (var i = 0; i < chips.children.length; i++)
+      chips.children[i].classList.toggle("active", chips.children[i] === b);
+  });
+
+  form.addEventListener("submit", async function (e) {
+    e.preventDefault();
+    if (sending) return;
+    sending = true;
+    send.disabled = true;
+    send.textContent = "Sending…";
+    note.classList.remove("is-error");
+    note.textContent = DEFAULT_NOTE;
+    var body = new FormData(form);
+    // Subject carries the category so a correction is triageable from the
+    // inbox list; the context fields say where the report was written.
+    body.set("_subject", "auspol tracker – " + kindInput.value);
+    body.set("page", document.referrer || "feedback");
+    try {
+      var res = await fetch(ENDPOINT, {
+        method: "POST", body: body,
+        headers: { Accept: "application/json" }
+      });
+      if (res.ok) {
+        form.hidden = true;
+        thanks.hidden = false;
+        msg.value = "";
+        return;
+      }
+      // Formspree answers a rejected submission with {errors:[{message}]};
+      // anything else has no body worth showing.
+      var detail = "";
+      try { detail = ((await res.json()).errors || []).map(function (x) { return x.message; }).join(", "); } catch (_) {}
+      note.textContent = detail || "The form service returned an error (" + res.status + "). Please try again shortly.";
+      note.classList.add("is-error");
+    } catch (_) {
+      note.textContent = "Could not reach the form service – check your connection and try again.";
+      note.classList.add("is-error");
+    } finally {
+      if (!form.hidden) {
+        sending = false;
+        send.disabled = false;
+        send.textContent = "Send report";
+      }
+    }
+  });
+
+  again.addEventListener("click", function () {
+    thanks.hidden = true;
+    form.hidden = false;
+    sending = false;
+    send.disabled = false;
+    send.textContent = "Send report";
+    note.classList.remove("is-error");
+    note.textContent = DEFAULT_NOTE;
+    msg.focus();
+  });
+})();
+</script>
+</body>
+</html>

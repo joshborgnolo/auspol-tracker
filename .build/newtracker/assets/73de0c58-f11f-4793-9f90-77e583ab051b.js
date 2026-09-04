@@ -1292,248 +1292,15 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
 }
 
 /* ---- report an error ----------------------------------------------------
-   A tracker of other people's numbers is going to carry some of them wrong,
-   and until now a reader who noticed had nowhere to say so. The page is
-   static - GitHub Pages serves files and will not process a POST - so the
-   submission goes to Formspree, which does own a server and forwards it on.
-   window.AP_FEEDBACK is the endpoint, set in build.mjs (FORMSPREE_ID); when it
-   is empty this renders nothing at all, so a build without an id shows no form
-   rather than one that quietly discards what someone typed.
+   The report-an-error form LIVES ON /feedback/ now - a standalone page
+   outside the build pipeline, still posting to the same Formspree endpoint.
+   What the tracker still owns is the way IN, rendered below by MethodNote
+   (and the archive row's report-an-error deep link, whose ?msg= query the
+   page prefills).
 
-   Posted with fetch + Accept: application/json rather than as a plain form.
-   A bare form POST hands the reader to Formspree's own thank-you page, which
-   means leaving the tracker to be told the message arrived; the whole page
-   needs JavaScript anyway, so there is nothing to lose by asking for it here.
-
-   window.AP.reportPoll opens it already filled in for one poll - registered on
-   the shared namespace for the same reason openPoll is, the archive row being
-   several components away from the footer with no prop path between them. */
-const FB_KINDS = ["Wrong figure", "Missing poll", "Site bug", "Something else"];
-
-/* The details box sizes itself to what has been typed. It used to open as a
-   74px slab with a drag handle in the corner - more than twice the height of
-   the email field beneath it, all of it empty, on a page that otherwise draws
-   a field as a line and some text. One line to start, grown a line at a time,
-   and the corner grabber taken away because there is nothing left to drag it
-   for.
-
-   Two things the obvious version gets wrong. `scrollHeight` leaves the
-   PLACEHOLDER out, so an empty box collapses under its own example text -
-   fine at 540px where the hint is one line, wrong on a phone where it wraps -
-   so an empty box is measured with the placeholder standing in for the value.
-   That swap is a synchronous read-and-restore inside one frame, never
-   painted, and React is not involved because the value is only borrowed while
-   it is already "". And under border-box the height covers the border while
-   scrollHeight does not, so the border is added back rather than costing a
-   pixel on every grow. */
-function fbAutosize(box) {
-  if (!box) return;
-  const cs = getComputedStyle(box);
-  const border = parseFloat(cs.borderTopWidth || 0) + parseFloat(cs.borderBottomWidth || 0);
-  const max = parseFloat(cs.maxHeight) || Infinity;
-  const borrow = !box.value && box.placeholder;
-  if (borrow) box.value = box.placeholder;
-  box.style.height = "auto";
-  const want = box.scrollHeight + (cs.boxSizing === "border-box" ? border : 0);
-  if (borrow) box.value = "";
-  box.style.height = Math.min(want, max) + "px";
-  // only past the cap does it become a scrolling box rather than a growing one
-  box.style.overflowY = want > max ? "auto" : "hidden";
-}
-
-function ReportError({ onInfo }) {
-  const endpoint = window.AP_FEEDBACK;
-  const { D } = window.AP;
-  const [open, setOpen] = useState(false);
-  const [kind, setKind] = useState(FB_KINDS[0]);
-  const [msg, setMsg] = useState("");
-  const [status, setStatus] = useState("idle");     // idle | sending | sent | error
-  const [error, setError] = useState("");
-  const formRef = useRef(null);
-  const boxRef = useRef(null);
-  const uid = useId();
-
-  /* Arriving from an archive row: open, seeded, and with the caret sitting
-     after the poll's name so the reader types the one thing the page cannot
-     fill in for them. */
-  const [arrival, setArrival] = useState(0);
-  React.useEffect(() => {
-    if (!endpoint) return;
-    window.AP.reportPoll = (poll) => {
-      if (!poll) return;
-      /* "YouGov, 18-24 Aug 2026 – ". The year is the point of the difference:
-         the seeded line is what identifies a row in data/polls.json, and a
-         fieldwork range without one stops doing that the moment the archive
-         holds a second August. Taken from the row's own year where it carries
-         one, and off the ISO fieldwork-end date otherwise, because the two
-         tables this is opened from have different row shapes and only one of
-         them names the year.
-
-         "fielded" is dropped: everything after the comma is a date, so the
-         word was only telling the reader which kind, and the form's own label
-         already asks for the pollster and field dates. */
-      const yr = poll.year != null ? poll.year
-        : /^\d{4}-/.test(poll.released || "") ? Number(poll.released.slice(0, 4))
-        : null;
-      const when = poll.field ? poll.field + (yr ? " " + yr : "")
-        : poll.fullDate ? poll.fullDate : "";
-      setKind(FB_KINDS[0]);
-      setMsg(`${poll.pollster}${when ? ", " + when : ""} – `);
-      setStatus("idle");
-      setOpen(true);
-      setArrival((n) => n + 1);   // drives the scroll+focus effect below
-    };
-    return () => { delete window.AP.reportPoll; };
-  }, [endpoint]);
-
-  /* The move to the form is an EFFECT, not a callback on the click: the
-     textarea does not exist until the state above has rendered, and an effect
-     is the only point that is guaranteed to be after the commit that creates
-     it and attaches the ref. A counter rather than a boolean, so a second
-     report from a second row re-runs it. */
-  React.useEffect(() => {
-    if (!arrival) return;
-    const box = boxRef.current;
-    if (!box) return;
-    box.scrollIntoView({ block: "center", behavior: "smooth" });
-    box.focus({ preventScroll: true });
-    box.setSelectionRange(box.value.length, box.value.length);
-  }, [arrival]);
-
-  /* Runs on open and on every change, because `msg` is also set from outside
-     (an archive row seeds it) and that text has to be measured too. The width
-     matters as well - the same sentence wraps to more lines on a narrower
-     card - so a resize re-measures rather than leaving a stale height behind
-     after a rotation. */
-  React.useLayoutEffect(() => {   // before paint: no first frame at the wrong height
-    if (!open) return;
-    const box = boxRef.current;
-    fbAutosize(box);
-    const onResize = () => fbAutosize(boxRef.current);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [open, msg]);
-
-  if (!endpoint) return null;
-
-  const submit = async (e) => {
-    e.preventDefault();
-    if (status === "sending") return;
-    setStatus("sending");
-    setError("");
-    const body = new FormData(formRef.current);
-    // Subject carries the category so a correction is triageable from the
-    // inbox list; the context fields say which page state it was sent from
-    // and which build of the data the reader was looking at, both of which
-    // are the first two things worth knowing about a reported figure.
-    body.set("_subject", `auspol tracker – ${kind}`);
-    body.set("page", (window.location.hash || "#snapshot").replace(/^#/, ""));
-    body.set("data_updated", D.latest.updatedISO);
-    try {
-      const res = await fetch(endpoint, { method: "POST", body, headers: { Accept: "application/json" } });
-      if (res.ok) { setStatus("sent"); setMsg(""); return; }
-      // Formspree answers a rejected submission with {errors:[{message}]};
-      // anything else (rate limit, outage, a mistyped id) has no body worth
-      // showing, so fall back to a line that points somewhere useful.
-      let detail = "";
-      try { detail = ((await res.json()).errors || []).map((x) => x.message).join(", "); } catch (_) {}
-      setError(detail || `The form service returned an error (${res.status}). Please try again shortly.`);
-      setStatus("error");
-    } catch (_) {
-      setError("Could not reach the form service – check your connection and try again.");
-      setStatus("error");
-    }
-  };
-
-  if (status === "sent") {
-    return (
-      <div className="fb">
-        <p className="fb-thanks">
-          <strong>Thank you – that’s arrived.</strong> Reports are checked against the
-          pollster’s own release before a figure moves, so a correction lands at the next
-          build rather than straight away.{" "}
-          <button type="button" className="fb-link" onClick={() => setStatus("idle")}>
-            Send another
-          </button>
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="fb">
-      <p className="fb-lede">
-        {/* The Info signpost rides the front of this line only away from
-            Info: on the tab itself it could only point at where the reader
-            is standing, so the caller passes a null onInfo there and the
-            clause goes unrendered. */}
-        {onInfo && (
-          <>
-            See{" "}
-            <button type="button" className="hi-term" onClick={onInfo}>Info</button>
-            {" "}for more info.{" "}
-          </>
-        )}
-        Spot an error, a missing poll, or have any other feedback? Please{" "}
-        {/* A toggle both ways: the thing that opened the form is the only
-            thing in the sentence that looks like a control, so it is where a
-            reader who has changed their mind will click. What is typed stays
-            in state, so closing it is not the same as discarding it. */}
-        <button type="button" className="fb-link" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
-          let me know
-        </button>.
-      </p>
-
-      {open && (
-        <form className="fb-form" ref={formRef} onSubmit={submit}>
-          <div className="fb-row">
-            <span className="fb-label" id={uid + "-kindlab"}>What’s this about?</span>
-            <div className="fb-chips" role="group" aria-labelledby={uid + "-kindlab"}>
-              {FB_KINDS.map((k) => (
-                <button key={k} type="button" aria-pressed={k === kind}
-                        className={"fb-chip" + (k === kind ? " active" : "")}
-                        onClick={() => setKind(k)}>{k}</button>
-              ))}
-            </div>
-            <input type="hidden" name="kind" value={kind} />
-          </div>
-
-          <div className="fb-row">
-            <label className="fb-label" htmlFor={uid + "-msg"}>
-              Details <span>– the pollster and field dates help most</span>
-            </label>
-            <textarea id={uid + "-msg"} name="message" required ref={boxRef} rows={1}
-              value={msg} onChange={(e) => setMsg(e.target.value)}
-              placeholder="e.g. Resolve, fielded 12–15 Aug – Labor’s primary is 27.9 here, the release says 28.9" />
-          </div>
-
-          <div className="fb-row">
-            <label className="fb-label" htmlFor={uid + "-email"}>
-              Email <span>– optional, only used to reply to you</span>
-            </label>
-            <input id={uid + "-email"} name="email" type="email" autoComplete="email"
-              placeholder="you@example.com" />
-          </div>
-
-          <div className="fb-gotcha" aria-hidden="true">
-            <label htmlFor={uid + "-gotcha"}>Leave this field empty</label>
-            <input id={uid + "-gotcha"} name="_gotcha" type="text" tabIndex={-1} autoComplete="off" />
-          </div>
-
-          <div className="fb-actions">
-            <button type="submit" className="fb-send" disabled={status === "sending"}>
-              {status === "sending" ? "Sending…" : "Send report"}
-            </button>
-            <p className={"fb-note" + (status === "error" ? " is-error" : "")}
-               role={status === "error" ? "alert" : undefined}>
-              {status === "error" ? error : "Goes to my inbox via Formspree. Nothing is published."}
-            </p>
-          </div>
-        </form>
-      )}
-    </div>
-  );
-}
+   One invariant outlives the move: a reader who notices a wrong figure has
+   to have somewhere to say so within one click of having noticed it - the
+   form being a page away is allowed to cost a navigation, not a hunt. */
 
 /* What is left of the method footer. Its three sections of prose - about the
    tracker, reading the charts, sources - are now the Info tab's glossary,
@@ -1569,7 +1336,22 @@ function MethodNote({ onInfo }) {
           </p>
         </div>
         <div className="colo-ways">
-          <ReportError onInfo={onInfo} />
+          {/* The way in to the form, now that the form is elsewhere. The
+              Info signpost rides the front of this line only away from Info:
+              on the tab itself it could only point at where the reader is
+              standing, so the caller passes a null onInfo there and the
+              clause goes unrendered. */}
+          <p className="fb-lede">
+            {onInfo && (
+              <>
+                See{" "}
+                <button type="button" className="hi-term" onClick={onInfo}>Info</button>
+                {" "}for more info.{" "}
+              </>
+            )}
+            Spot an error, a missing poll, or have any other feedback? Please{" "}
+            <a className="fb-link" href="/feedback/">let me know</a>.
+          </p>
           <p className="colo-arch">
             Federal polling archives I’ve located are stored{" "}
             <a className="colo-link" href="https://auspoltracker.com/archives">

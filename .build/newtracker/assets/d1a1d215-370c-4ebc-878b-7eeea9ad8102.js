@@ -2579,22 +2579,41 @@ function ArchPollDetail({ p, onBack, backLabel }) {
       </button>
     ),
     /* Corrections are nearly always about ONE poll, and the reader who has a
-       row open is looking at the figure they doubt. Seeding the footer's form
-       from here means the pollster and field dates - the two things that
-       identify a row in data/polls.json - arrive already written, rather than
-       being retyped from memory after scrolling away from them. Only rendered
-       when a form exists to seed. */
-    window.AP_FEEDBACK && (
-      <button className="back-to-chart pd-report" key="report"
-              title="Report an error in this poll" aria-label="Report an error in this poll"
-              onClick={(e) => { e.stopPropagation(); window.AP.reportPoll && window.AP.reportPoll(p); }}>
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
-             strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
-        </svg>
-        <span className="pd-report-lbl">Report an error</span>
-      </button>
-    ),
+       row open is looking at the figure they doubt. The form lives on
+       /feedback/ now (a standalone page; it used to be the footer's form,
+       seeded through window.AP.reportPoll), so this deep link carries the
+       seed there as ?msg= instead - the pollster and field dates, the two
+       things that identify a row in data/polls.json, arrive already written
+       rather than being retyped from memory.
+
+       "YouGov, 18-24 Aug 2026 – ". The year is the point of the difference:
+       the seeded line is what identifies a row in data/polls.json, and a
+       fieldwork range without one stops doing that the moment the archive
+       holds a second August. Taken from the row's own year where it carries
+       one, and off the ISO fieldwork-end date otherwise, because the two
+       tables this is opened from have different row shapes and only one of
+       them names the year. "Fielded" is dropped: everything after the comma
+       is a date, so the word was only telling the reader which kind, and the
+       form's own label already asks for the pollster and field dates. */
+    (() => {
+      const yr = p.year != null ? p.year
+        : /^\d{4}-/.test(p.released || "") ? Number(p.released.slice(0, 4))
+        : null;
+      const when = p.field ? p.field + (yr ? " " + yr : "")
+        : p.fullDate ? p.fullDate : "";
+      return (
+        <a className="back-to-chart pd-report" key="report"
+           href={`/feedback/?msg=${encodeURIComponent(`${p.pollster}${when ? ", " + when : ""} – `)}`}
+           title="Report an error in this poll" aria-label="Report an error in this poll"
+           onClick={(e) => e.stopPropagation()}>
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+               strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
+          </svg>
+          <span className="pd-report-lbl">Report an error</span>
+        </a>
+      );
+    })(),
   ].filter(Boolean);
 
   /* The band's split: what the poll IS occupies the left region and wraps on

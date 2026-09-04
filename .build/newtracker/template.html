@@ -2659,7 +2659,7 @@ button.acc-spread[aria-pressed="true"] {
    appendix to it. .method-grid / .method-h went with the three prose
    sections that moved to the Info tab; .method p went because every
    paragraph down here now names its own size, and that blanket 13px was
-   quietly overriding .fb-note's 12px and .fb-thanks's top margin. */
+   quietly overriding them all. */
 .method { margin-top: 6px; padding: 24px 0 20px; border-top: 1px solid var(--line); }
 /* the blanket guard against a colourless anchor falling to the UA link blue
    (see the a.pollster-link note) - every anchor in the band is ink-2 */
@@ -2695,90 +2695,25 @@ a.colo-link:focus-visible { outline: 2px solid var(--accent, currentColor); outl
 a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: var(--ink-2); }
 
 /* ---------- report an error ----------
-   The page is static – GitHub Pages serves files and cannot process a POST –
-   so the form hands the submission to Formspree and only has to send the
-   request.
+   The form itself lives on the standalone /feedback/ page now, which carries
+   its own copy of all the fb-* machinery (chips, fields, send button); the
+   full stylesheet went with it. What stays in the footer is the way IN -
+   the sentence with the /feedback/ link in it - and that is all that is
+   still styled here.
 
-   Built out of the page's own parts rather than a form's: a rule, tracked
-   caps, chips, and fields carrying one hairline underneath instead of a box
-   on four sides. A boxed input was the only shape in the document that
-   belonged to a form rather than to a page of type, and four of them stacked
-   under the method notes turned the quietest part of the page into the
-   busiest. Collapsed to a sentence until it is wanted, for the same reason:
-   the footer's job is to explain the method, not to solicit. */
-/* No rule and no top margin: this is the right column of the colophon, and
-   the vertical hairline beside it already says where it starts. */
-.fb { min-width: 0; }
-/* the lead statement of its column, so it carries that column's ink and size
-   - the archive line under it is the one that steps down */
+   The linked phrase sits INSIDE the sentence rather than beside it: the
+   offer and the way to take it up are one thought, and a pill parked at the
+   end of the paragraph read as a second one competing with it. */
 .fb-lede { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--ink-2); }
-/* The trigger sits INSIDE the sentence rather than beside it: the offer and
-   the way to take it up are one thought, and a pill parked at the end of the
-   paragraph read as a second one competing with it. */
+/* the same treatment as a text link on /feedback/, where .fb-link was the
+   trigger of the old footer's own form - it loses nothing by being an
+   anchor here: a border-bottom and the bold weight is the whole gesture */
 .fb-link {
   border: 0; border-bottom: 1px solid var(--ink-faint); background: none;
   padding: 0; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer;
-  transition: border-color .15s ease;
+  text-decoration: none; transition: border-color .15s ease;
 }
-.fb-link:hover { border-bottom-color: var(--ink); }
-
-.fb-form { margin: 20px 0 0; max-width: 540px; display: grid; gap: 19px; }
-.fb-form, .fb-thanks { animation: fb-in .22s ease both; }
-@keyframes fb-in { from { opacity: 0; transform: translateY(-4px); } }
-@media (prefers-reduced-motion: reduce) { .fb-form, .fb-thanks { animation: none; } }
-
-.fb-row { display: grid; gap: 8px; }
-.fb-label {
-  font-size: 11px; font-weight: 600; color: var(--ink-3);
-}
-/* the parenthetical half of a label is prose, not a heading */
-.fb-label span { font-weight: 400; }
-
-.fb-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-.fb-chip {
-  border: 1px solid var(--line); background: transparent; border-radius: 999px;
-  padding: 5px 12px; cursor: pointer; white-space: nowrap;
-  font-family: var(--sans); font-size: 12.5px; font-weight: 500; color: var(--ink-3);
-  transition: color .15s ease, border-color .15s ease;
-}
-.fb-chip:hover { color: var(--ink-2); border-color: var(--ink-faint); }
-.fb-chip.active { color: var(--ink); border-color: var(--ink); font-weight: 600; }
-
-.fb-form input, .fb-form textarea {
-  width: 100%; font-family: var(--sans); font-size: 14px; line-height: 1.55;
-  color: var(--ink); background: transparent;
-  border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
-  padding: 5px 1px; transition: border-color .15s ease;
-}
-/* No min-height and no drag handle: the box is sized from its own content by
-   fbAutosize, so it opens as one line - the same height as the email field
-   under it - and grows a line at a time. The cap is about seven lines, past
-   which it scrolls instead of pushing the send button off the screen. */
-.fb-form textarea { min-height: 0; max-height: 164px; resize: none; overflow-y: hidden; }
-.fb-form input::placeholder, .fb-form textarea::placeholder { color: var(--ink-3); opacity: 0.72; }
-.fb-form input:focus, .fb-form textarea:focus { outline: none; border-bottom-color: var(--accent); }
-/* The theme here is a manual toggle and can disagree with the OS, so pin the
-   native furniture (caret, selection, autofill) to the page's own theme
-   rather than letting it follow prefers-color-scheme into the wrong one. */
-.fb-form { color-scheme: light; }
-body.dark .fb-form { color-scheme: dark; }
-/* Formspree discards anything arriving with _gotcha filled – a field no human
-   sees and every naive bot completes. Off-screen rather than display:none,
-   which the same bots know to skip. */
-.fb-gotcha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-
-.fb-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-.fb-send {
-  border: 1px solid var(--ink); background: transparent; color: var(--ink);
-  border-radius: 999px; padding: 7px 18px; cursor: pointer; white-space: nowrap;
-  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
-  transition: background-color .15s ease, color .15s ease, opacity .15s ease;
-}
-.fb-send:hover { background: var(--ink); color: var(--bg); }
-.fb-send[disabled] { opacity: 0.45; cursor: default; background: transparent; color: var(--ink); }
-.fb-note { margin: 0; flex: 1 1 210px; font-size: 12px; line-height: 1.5; color: var(--ink-3); }
-.fb-note.is-error { color: var(--mood-neg); }
-.fb-thanks { margin: 20px 0 0; max-width: 540px; font-size: 13px; line-height: 1.65; color: var(--ink-2); }
+.fb-link:hover, .fb-link:focus-visible { border-bottom-color: var(--ink); }
 
 /* Stacked, the divider turns through 90 degrees rather than disappearing:
    the two columns lead with type of a similar size and would otherwise run
@@ -2788,7 +2723,6 @@ body.dark .fb-form { color-scheme: dark; }
   .colo-about { padding-right: 0; border-right: 0; }
   .colo-ways { padding-left: 0; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
 }
-@media (max-width: 560px) { .fb-form, .fb-thanks { max-width: none; } }
 
 /* ---------- responsive ---------- */
 /* The leadership pair carries a scatter cloud in each panel now, and ~120 dots
@@ -3564,9 +3498,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
    a max-width query. Placed after both rules it overrides, since it matches
    their specificity exactly and only source order separates them. */
 @media (pointer: coarse) {
-  .ap-search input,
-  .fb-form input,
-  .fb-form textarea { font-size: 16px; }
+  .ap-search input { font-size: 16px; }
 }
 
 .ap-pop { position: relative; }

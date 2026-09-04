@@ -41,15 +41,9 @@ const SITE_URL = (process.env.SITE_URL || "https://auspoltracker.com/")
   .replace(/\/*$/, "/");
 const A = (f) => path.join(HERE, "assets", f);
 
-/* Where a correction goes. The site is static – GitHub Pages serves files and
-   cannot process a POST – so the form posts to Formspree, whose server takes
-   the submission and emails it on. The id is the tail of the endpoint URL on
-   the form's Formspree dashboard (formspree.io/f/XXXXXXXX); it is public by
-   necessity, since it ships in the page.
-   Set it here, or pass FORMSPREE_ID= in the environment. Left empty, the whole
-   report-an-error block is simply not rendered – a half-configured build shows
-   no form rather than a form that silently drops what a reader types. */
-const FORMSPREE_ID = (process.env.FORMSPREE_ID || "myzkjdnp").trim();
+/* The report-an-error form lives on /feedback/ – a hand-maintained standalone
+   page carrying the Formspree endpoint itself. FORMSPREE_ID once went into the
+   page here as window.AP_FEEDBACK; the move made the wiring unnecessary. */
 
 /* ---- 1. the data must be sound before anything is built ---------------- */
 const DATA = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
@@ -551,9 +545,6 @@ fs.writeFileSync(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
 parts.push(`<script>window.AP_CYCLE_SRC=${JSON.stringify("assets/" + cycleSrcName)};<\/script>`);
 for (const f of ["react.production.min.js", "react-dom.production.min.js"])
   parts.push(`<script>${inlineJs(fs.readFileSync(path.join(HERE, "vendor", f), "utf8"))}</script>`);
-/* Read by the footer's report-an-error block. Set before the components so it
-   is there on first render; empty string = the block does not render at all. */
-parts.push(`<script>window.AP_FEEDBACK=${JSON.stringify(FORMSPREE_ID && `https://formspree.io/f/${FORMSPREE_ID}`)};<\/script>`);
 for (const f of PLAIN)
   parts.push(`<script>${inlineJs(fs.readFileSync(A(f), "utf8"))}</script>`);
 for (const f of JSX)
@@ -672,6 +663,10 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   </url>
   <url>
     <loc>${SITE_URL}archives/trove/</loc>
+    <lastmod>${ARCHIVE_STAMP}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}feedback/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
 </urlset>

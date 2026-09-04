@@ -2750,7 +2750,7 @@ button.acc-spread[aria-pressed="true"] {
    appendix to it. .method-grid / .method-h went with the three prose
    sections that moved to the Info tab; .method p went because every
    paragraph down here now names its own size, and that blanket 13px was
-   quietly overriding .fb-note's 12px and .fb-thanks's top margin. */
+   quietly overriding them all. */
 .method { margin-top: 6px; padding: 24px 0 20px; border-top: 1px solid var(--line); }
 /* the blanket guard against a colourless anchor falling to the UA link blue
    (see the a.pollster-link note) - every anchor in the band is ink-2 */
@@ -2786,90 +2786,25 @@ a.colo-link:focus-visible { outline: 2px solid var(--accent, currentColor); outl
 a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: var(--ink-2); }
 
 /* ---------- report an error ----------
-   The page is static – GitHub Pages serves files and cannot process a POST –
-   so the form hands the submission to Formspree and only has to send the
-   request.
+   The form itself lives on the standalone /feedback/ page now, which carries
+   its own copy of all the fb-* machinery (chips, fields, send button); the
+   full stylesheet went with it. What stays in the footer is the way IN -
+   the sentence with the /feedback/ link in it - and that is all that is
+   still styled here.
 
-   Built out of the page's own parts rather than a form's: a rule, tracked
-   caps, chips, and fields carrying one hairline underneath instead of a box
-   on four sides. A boxed input was the only shape in the document that
-   belonged to a form rather than to a page of type, and four of them stacked
-   under the method notes turned the quietest part of the page into the
-   busiest. Collapsed to a sentence until it is wanted, for the same reason:
-   the footer's job is to explain the method, not to solicit. */
-/* No rule and no top margin: this is the right column of the colophon, and
-   the vertical hairline beside it already says where it starts. */
-.fb { min-width: 0; }
-/* the lead statement of its column, so it carries that column's ink and size
-   - the archive line under it is the one that steps down */
+   The linked phrase sits INSIDE the sentence rather than beside it: the
+   offer and the way to take it up are one thought, and a pill parked at the
+   end of the paragraph read as a second one competing with it. */
 .fb-lede { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--ink-2); }
-/* The trigger sits INSIDE the sentence rather than beside it: the offer and
-   the way to take it up are one thought, and a pill parked at the end of the
-   paragraph read as a second one competing with it. */
+/* the same treatment as a text link on /feedback/, where .fb-link was the
+   trigger of the old footer's own form - it loses nothing by being an
+   anchor here: a border-bottom and the bold weight is the whole gesture */
 .fb-link {
   border: 0; border-bottom: 1px solid var(--ink-faint); background: none;
   padding: 0; font: inherit; font-weight: 600; color: var(--ink); cursor: pointer;
-  transition: border-color .15s ease;
+  text-decoration: none; transition: border-color .15s ease;
 }
-.fb-link:hover { border-bottom-color: var(--ink); }
-
-.fb-form { margin: 20px 0 0; max-width: 540px; display: grid; gap: 19px; }
-.fb-form, .fb-thanks { animation: fb-in .22s ease both; }
-@keyframes fb-in { from { opacity: 0; transform: translateY(-4px); } }
-@media (prefers-reduced-motion: reduce) { .fb-form, .fb-thanks { animation: none; } }
-
-.fb-row { display: grid; gap: 8px; }
-.fb-label {
-  font-size: 11px; font-weight: 600; color: var(--ink-3);
-}
-/* the parenthetical half of a label is prose, not a heading */
-.fb-label span { font-weight: 400; }
-
-.fb-chips { display: flex; flex-wrap: wrap; gap: 7px; }
-.fb-chip {
-  border: 1px solid var(--line); background: transparent; border-radius: 999px;
-  padding: 5px 12px; cursor: pointer; white-space: nowrap;
-  font-family: var(--sans); font-size: 12.5px; font-weight: 500; color: var(--ink-3);
-  transition: color .15s ease, border-color .15s ease;
-}
-.fb-chip:hover { color: var(--ink-2); border-color: var(--ink-faint); }
-.fb-chip.active { color: var(--ink); border-color: var(--ink); font-weight: 600; }
-
-.fb-form input, .fb-form textarea {
-  width: 100%; font-family: var(--sans); font-size: 14px; line-height: 1.55;
-  color: var(--ink); background: transparent;
-  border: 0; border-bottom: 1px solid var(--line); border-radius: 0;
-  padding: 5px 1px; transition: border-color .15s ease;
-}
-/* No min-height and no drag handle: the box is sized from its own content by
-   fbAutosize, so it opens as one line - the same height as the email field
-   under it - and grows a line at a time. The cap is about seven lines, past
-   which it scrolls instead of pushing the send button off the screen. */
-.fb-form textarea { min-height: 0; max-height: 164px; resize: none; overflow-y: hidden; }
-.fb-form input::placeholder, .fb-form textarea::placeholder { color: var(--ink-3); opacity: 0.72; }
-.fb-form input:focus, .fb-form textarea:focus { outline: none; border-bottom-color: var(--accent); }
-/* The theme here is a manual toggle and can disagree with the OS, so pin the
-   native furniture (caret, selection, autofill) to the page's own theme
-   rather than letting it follow prefers-color-scheme into the wrong one. */
-.fb-form { color-scheme: light; }
-body.dark .fb-form { color-scheme: dark; }
-/* Formspree discards anything arriving with _gotcha filled – a field no human
-   sees and every naive bot completes. Off-screen rather than display:none,
-   which the same bots know to skip. */
-.fb-gotcha { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-
-.fb-actions { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; }
-.fb-send {
-  border: 1px solid var(--ink); background: transparent; color: var(--ink);
-  border-radius: 999px; padding: 7px 18px; cursor: pointer; white-space: nowrap;
-  font-family: var(--sans); font-size: 12.5px; font-weight: 600;
-  transition: background-color .15s ease, color .15s ease, opacity .15s ease;
-}
-.fb-send:hover { background: var(--ink); color: var(--bg); }
-.fb-send[disabled] { opacity: 0.45; cursor: default; background: transparent; color: var(--ink); }
-.fb-note { margin: 0; flex: 1 1 210px; font-size: 12px; line-height: 1.5; color: var(--ink-3); }
-.fb-note.is-error { color: var(--mood-neg); }
-.fb-thanks { margin: 20px 0 0; max-width: 540px; font-size: 13px; line-height: 1.65; color: var(--ink-2); }
+.fb-link:hover, .fb-link:focus-visible { border-bottom-color: var(--ink); }
 
 /* Stacked, the divider turns through 90 degrees rather than disappearing:
    the two columns lead with type of a similar size and would otherwise run
@@ -2879,7 +2814,6 @@ body.dark .fb-form { color-scheme: dark; }
   .colo-about { padding-right: 0; border-right: 0; }
   .colo-ways { padding-left: 0; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
 }
-@media (max-width: 560px) { .fb-form, .fb-thanks { max-width: none; } }
 
 /* ---------- responsive ---------- */
 /* The leadership pair carries a scatter cloud in each panel now, and ~120 dots
@@ -3655,9 +3589,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
    a max-width query. Placed after both rules it overrides, since it matches
    their specificity exactly and only source order separates them. */
 @media (pointer: coarse) {
-  .ap-search input,
-  .fb-form input,
-  .fb-form textarea { font-size: 16px; }
+  .ap-search input { font-size: 16px; }
 }
 
 .ap-pop { position: relative; }
@@ -4849,7 +4781,6 @@ var d=null!=c&&c.hydratedSources||null,e=!1,f="",g=aj;null!==c&&void 0!==c&&(!0=
 function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmountComponentAtNode=function(a){if(!Vd(a))throw Error(m(40));return a._reactRootContainer?(yb(function(){Wd(null,null,a,!1,function(){a._reactRootContainer=null;a[Ja]=null})}),!0):!1};Q.unstable_batchedUpdates=Tf;Q.unstable_renderSubtreeIntoContainer=function(a,b,c,d){if(!Vd(c))throw Error(m(200));if(null==a||void 0===a._reactInternals)throw Error(m(38));return Wd(a,b,c,!1,d)};Q.version="18.3.1-next-f1338f8080-20240426"});
 })();
 </script>
-  <script>window.AP_FEEDBACK="https://formspree.io/f/myzkjdnp";</script>
   <script>/* auspol tracker – REAL Australian federal polling data.
    Generated from data/polls.json by .build/newtracker/gen-data.mjs – do
    not edit by hand.  Spine: 2025 federal election (3 May 2025) → 31 August 2026.
@@ -16007,35 +15938,47 @@ function ArchPollDetail({
     d: "M19 12H5M11 18l-6-6 6-6"
   })), "Back to ", backLabel || "the chart"),
   /* Corrections are nearly always about ONE poll, and the reader who has a
-     row open is looking at the figure they doubt. Seeding the footer's form
-     from here means the pollster and field dates - the two things that
-     identify a row in data/polls.json - arrive already written, rather than
-     being retyped from memory after scrolling away from them. Only rendered
-     when a form exists to seed. */
-  window.AP_FEEDBACK && /*#__PURE__*/React.createElement("button", {
-    className: "back-to-chart pd-report",
-    key: "report",
-    title: "Report an error in this poll",
-    "aria-label": "Report an error in this poll",
-    onClick: e => {
-      e.stopPropagation();
-      window.AP.reportPoll && window.AP.reportPoll(p);
-    }
-  }, /*#__PURE__*/React.createElement("svg", {
-    viewBox: "0 0 24 24",
-    width: "13",
-    height: "13",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "2.2",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    "aria-hidden": "true"
-  }, /*#__PURE__*/React.createElement("path", {
-    d: "M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
-  })), /*#__PURE__*/React.createElement("span", {
-    className: "pd-report-lbl"
-  }, "Report an error"))].filter(Boolean);
+     row open is looking at the figure they doubt. The form lives on
+     /feedback/ now (a standalone page; it used to be the footer's form,
+     seeded through window.AP.reportPoll), so this deep link carries the
+     seed there as ?msg= instead - the pollster and field dates, the two
+     things that identify a row in data/polls.json, arrive already written
+     rather than being retyped from memory.
+      "YouGov, 18-24 Aug 2026 – ". The year is the point of the difference:
+     the seeded line is what identifies a row in data/polls.json, and a
+     fieldwork range without one stops doing that the moment the archive
+     holds a second August. Taken from the row's own year where it carries
+     one, and off the ISO fieldwork-end date otherwise, because the two
+     tables this is opened from have different row shapes and only one of
+     them names the year. "Fielded" is dropped: everything after the comma
+     is a date, so the word was only telling the reader which kind, and the
+     form's own label already asks for the pollster and field dates. */
+  (() => {
+    const yr = p.year != null ? p.year : /^\d{4}-/.test(p.released || "") ? Number(p.released.slice(0, 4)) : null;
+    const when = p.field ? p.field + (yr ? " " + yr : "") : p.fullDate ? p.fullDate : "";
+    return /*#__PURE__*/React.createElement("a", {
+      className: "back-to-chart pd-report",
+      key: "report",
+      href: `/feedback/?msg=${encodeURIComponent(`${p.pollster}${when ? ", " + when : ""} – `)}`,
+      title: "Report an error in this poll",
+      "aria-label": "Report an error in this poll",
+      onClick: e => e.stopPropagation()
+    }, /*#__PURE__*/React.createElement("svg", {
+      viewBox: "0 0 24 24",
+      width: "13",
+      height: "13",
+      fill: "none",
+      stroke: "currentColor",
+      strokeWidth: "2.2",
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+      "aria-hidden": "true"
+    }, /*#__PURE__*/React.createElement("path", {
+      d: "M12 9v4M12 17h.01M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z"
+    })), /*#__PURE__*/React.createElement("span", {
+      className: "pd-report-lbl"
+    }, "Report an error"));
+  })()].filter(Boolean);
 
   /* The band's split: what the poll IS occupies the left region and wraps on
      itself; what the reader can DO is docked to the band's top-right corner,
@@ -20695,269 +20638,15 @@ function Hero({
 }
 
 /* ---- report an error ----------------------------------------------------
-   A tracker of other people's numbers is going to carry some of them wrong,
-   and until now a reader who noticed had nowhere to say so. The page is
-   static - GitHub Pages serves files and will not process a POST - so the
-   submission goes to Formspree, which does own a server and forwards it on.
-   window.AP_FEEDBACK is the endpoint, set in build.mjs (FORMSPREE_ID); when it
-   is empty this renders nothing at all, so a build without an id shows no form
-   rather than one that quietly discards what someone typed.
+   The report-an-error form LIVES ON /feedback/ now - a standalone page
+   outside the build pipeline, still posting to the same Formspree endpoint.
+   What the tracker still owns is the way IN, rendered below by MethodNote
+   (and the archive row's report-an-error deep link, whose ?msg= query the
+   page prefills).
 
-   Posted with fetch + Accept: application/json rather than as a plain form.
-   A bare form POST hands the reader to Formspree's own thank-you page, which
-   means leaving the tracker to be told the message arrived; the whole page
-   needs JavaScript anyway, so there is nothing to lose by asking for it here.
-
-   window.AP.reportPoll opens it already filled in for one poll - registered on
-   the shared namespace for the same reason openPoll is, the archive row being
-   several components away from the footer with no prop path between them. */
-const FB_KINDS = ["Wrong figure", "Missing poll", "Site bug", "Something else"];
-
-/* The details box sizes itself to what has been typed. It used to open as a
-   74px slab with a drag handle in the corner - more than twice the height of
-   the email field beneath it, all of it empty, on a page that otherwise draws
-   a field as a line and some text. One line to start, grown a line at a time,
-   and the corner grabber taken away because there is nothing left to drag it
-   for.
-
-   Two things the obvious version gets wrong. `scrollHeight` leaves the
-   PLACEHOLDER out, so an empty box collapses under its own example text -
-   fine at 540px where the hint is one line, wrong on a phone where it wraps -
-   so an empty box is measured with the placeholder standing in for the value.
-   That swap is a synchronous read-and-restore inside one frame, never
-   painted, and React is not involved because the value is only borrowed while
-   it is already "". And under border-box the height covers the border while
-   scrollHeight does not, so the border is added back rather than costing a
-   pixel on every grow. */
-function fbAutosize(box) {
-  if (!box) return;
-  const cs = getComputedStyle(box);
-  const border = parseFloat(cs.borderTopWidth || 0) + parseFloat(cs.borderBottomWidth || 0);
-  const max = parseFloat(cs.maxHeight) || Infinity;
-  const borrow = !box.value && box.placeholder;
-  if (borrow) box.value = box.placeholder;
-  box.style.height = "auto";
-  const want = box.scrollHeight + (cs.boxSizing === "border-box" ? border : 0);
-  if (borrow) box.value = "";
-  box.style.height = Math.min(want, max) + "px";
-  // only past the cap does it become a scrolling box rather than a growing one
-  box.style.overflowY = want > max ? "auto" : "hidden";
-}
-function ReportError({
-  onInfo
-}) {
-  const endpoint = window.AP_FEEDBACK;
-  const {
-    D
-  } = window.AP;
-  const [open, setOpen] = useState(false);
-  const [kind, setKind] = useState(FB_KINDS[0]);
-  const [msg, setMsg] = useState("");
-  const [status, setStatus] = useState("idle"); // idle | sending | sent | error
-  const [error, setError] = useState("");
-  const formRef = useRef(null);
-  const boxRef = useRef(null);
-  const uid = useId();
-
-  /* Arriving from an archive row: open, seeded, and with the caret sitting
-     after the poll's name so the reader types the one thing the page cannot
-     fill in for them. */
-  const [arrival, setArrival] = useState(0);
-  React.useEffect(() => {
-    if (!endpoint) return;
-    window.AP.reportPoll = poll => {
-      if (!poll) return;
-      /* "YouGov, 18-24 Aug 2026 – ". The year is the point of the difference:
-         the seeded line is what identifies a row in data/polls.json, and a
-         fieldwork range without one stops doing that the moment the archive
-         holds a second August. Taken from the row's own year where it carries
-         one, and off the ISO fieldwork-end date otherwise, because the two
-         tables this is opened from have different row shapes and only one of
-         them names the year.
-          "fielded" is dropped: everything after the comma is a date, so the
-         word was only telling the reader which kind, and the form's own label
-         already asks for the pollster and field dates. */
-      const yr = poll.year != null ? poll.year : /^\d{4}-/.test(poll.released || "") ? Number(poll.released.slice(0, 4)) : null;
-      const when = poll.field ? poll.field + (yr ? " " + yr : "") : poll.fullDate ? poll.fullDate : "";
-      setKind(FB_KINDS[0]);
-      setMsg(`${poll.pollster}${when ? ", " + when : ""} – `);
-      setStatus("idle");
-      setOpen(true);
-      setArrival(n => n + 1); // drives the scroll+focus effect below
-    };
-    return () => {
-      delete window.AP.reportPoll;
-    };
-  }, [endpoint]);
-
-  /* The move to the form is an EFFECT, not a callback on the click: the
-     textarea does not exist until the state above has rendered, and an effect
-     is the only point that is guaranteed to be after the commit that creates
-     it and attaches the ref. A counter rather than a boolean, so a second
-     report from a second row re-runs it. */
-  React.useEffect(() => {
-    if (!arrival) return;
-    const box = boxRef.current;
-    if (!box) return;
-    box.scrollIntoView({
-      block: "center",
-      behavior: "smooth"
-    });
-    box.focus({
-      preventScroll: true
-    });
-    box.setSelectionRange(box.value.length, box.value.length);
-  }, [arrival]);
-
-  /* Runs on open and on every change, because `msg` is also set from outside
-     (an archive row seeds it) and that text has to be measured too. The width
-     matters as well - the same sentence wraps to more lines on a narrower
-     card - so a resize re-measures rather than leaving a stale height behind
-     after a rotation. */
-  React.useLayoutEffect(() => {
-    // before paint: no first frame at the wrong height
-    if (!open) return;
-    const box = boxRef.current;
-    fbAutosize(box);
-    const onResize = () => fbAutosize(boxRef.current);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [open, msg]);
-  if (!endpoint) return null;
-  const submit = async e => {
-    e.preventDefault();
-    if (status === "sending") return;
-    setStatus("sending");
-    setError("");
-    const body = new FormData(formRef.current);
-    // Subject carries the category so a correction is triageable from the
-    // inbox list; the context fields say which page state it was sent from
-    // and which build of the data the reader was looking at, both of which
-    // are the first two things worth knowing about a reported figure.
-    body.set("_subject", `auspol tracker – ${kind}`);
-    body.set("page", (window.location.hash || "#snapshot").replace(/^#/, ""));
-    body.set("data_updated", D.latest.updatedISO);
-    try {
-      const res = await fetch(endpoint, {
-        method: "POST",
-        body,
-        headers: {
-          Accept: "application/json"
-        }
-      });
-      if (res.ok) {
-        setStatus("sent");
-        setMsg("");
-        return;
-      }
-      // Formspree answers a rejected submission with {errors:[{message}]};
-      // anything else (rate limit, outage, a mistyped id) has no body worth
-      // showing, so fall back to a line that points somewhere useful.
-      let detail = "";
-      try {
-        detail = ((await res.json()).errors || []).map(x => x.message).join(", ");
-      } catch (_) {}
-      setError(detail || `The form service returned an error (${res.status}). Please try again shortly.`);
-      setStatus("error");
-    } catch (_) {
-      setError("Could not reach the form service – check your connection and try again.");
-      setStatus("error");
-    }
-  };
-  if (status === "sent") {
-    return /*#__PURE__*/React.createElement("div", {
-      className: "fb"
-    }, /*#__PURE__*/React.createElement("p", {
-      className: "fb-thanks"
-    }, /*#__PURE__*/React.createElement("strong", null, "Thank you \u2013 that\u2019s arrived."), " Reports are checked against the pollster\u2019s own release before a figure moves, so a correction lands at the next build rather than straight away.", " ", /*#__PURE__*/React.createElement("button", {
-      type: "button",
-      className: "fb-link",
-      onClick: () => setStatus("idle")
-    }, "Send another")));
-  }
-  return /*#__PURE__*/React.createElement("div", {
-    className: "fb"
-  }, /*#__PURE__*/React.createElement("p", {
-    className: "fb-lede"
-  }, onInfo && /*#__PURE__*/React.createElement(React.Fragment, null, "See", " ", /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "hi-term",
-    onClick: onInfo
-  }, "Info"), " ", "for more info.", " "), "Spot an error, a missing poll, or have any other feedback? Please", " ", /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "fb-link",
-    onClick: () => setOpen(v => !v),
-    "aria-expanded": open
-  }, "let me know"), "."), open && /*#__PURE__*/React.createElement("form", {
-    className: "fb-form",
-    ref: formRef,
-    onSubmit: submit
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "fb-row"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "fb-label",
-    id: uid + "-kindlab"
-  }, "What\u2019s this about?"), /*#__PURE__*/React.createElement("div", {
-    className: "fb-chips",
-    role: "group",
-    "aria-labelledby": uid + "-kindlab"
-  }, FB_KINDS.map(k => /*#__PURE__*/React.createElement("button", {
-    key: k,
-    type: "button",
-    "aria-pressed": k === kind,
-    className: "fb-chip" + (k === kind ? " active" : ""),
-    onClick: () => setKind(k)
-  }, k))), /*#__PURE__*/React.createElement("input", {
-    type: "hidden",
-    name: "kind",
-    value: kind
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "fb-row"
-  }, /*#__PURE__*/React.createElement("label", {
-    className: "fb-label",
-    htmlFor: uid + "-msg"
-  }, "Details ", /*#__PURE__*/React.createElement("span", null, "\u2013 the pollster and field dates help most")), /*#__PURE__*/React.createElement("textarea", {
-    id: uid + "-msg",
-    name: "message",
-    required: true,
-    ref: boxRef,
-    rows: 1,
-    value: msg,
-    onChange: e => setMsg(e.target.value),
-    placeholder: "e.g. Resolve, fielded 12\u201315 Aug \u2013 Labor\u2019s primary is 27.9 here, the release says 28.9"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "fb-row"
-  }, /*#__PURE__*/React.createElement("label", {
-    className: "fb-label",
-    htmlFor: uid + "-email"
-  }, "Email ", /*#__PURE__*/React.createElement("span", null, "\u2013 optional, only used to reply to you")), /*#__PURE__*/React.createElement("input", {
-    id: uid + "-email",
-    name: "email",
-    type: "email",
-    autoComplete: "email",
-    placeholder: "you@example.com"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "fb-gotcha",
-    "aria-hidden": "true"
-  }, /*#__PURE__*/React.createElement("label", {
-    htmlFor: uid + "-gotcha"
-  }, "Leave this field empty"), /*#__PURE__*/React.createElement("input", {
-    id: uid + "-gotcha",
-    name: "_gotcha",
-    type: "text",
-    tabIndex: -1,
-    autoComplete: "off"
-  })), /*#__PURE__*/React.createElement("div", {
-    className: "fb-actions"
-  }, /*#__PURE__*/React.createElement("button", {
-    type: "submit",
-    className: "fb-send",
-    disabled: status === "sending"
-  }, status === "sending" ? "Sending…" : "Send report"), /*#__PURE__*/React.createElement("p", {
-    className: "fb-note" + (status === "error" ? " is-error" : ""),
-    role: status === "error" ? "alert" : undefined
-  }, status === "error" ? error : "Goes to my inbox via Formspree. Nothing is published."))));
-}
+   One invariant outlives the move: a reader who notices a wrong figure has
+   to have somewhere to say so within one click of having noticed it - the
+   form being a page away is allowed to cost a navigation, not a hunt. */
 
 /* What is left of the method footer. Its three sections of prose - about the
    tracker, reading the charts, sources - are now the Info tab's glossary,
@@ -20990,9 +20679,16 @@ function MethodNote({
     className: "disclaimer"
   }, "Best efforts are made to make the aggregate figures transparent, trustworthy, statistically sound, and informative, but they are, in the end, estimates only.")), /*#__PURE__*/React.createElement("div", {
     className: "colo-ways"
-  }, /*#__PURE__*/React.createElement(ReportError, {
-    onInfo: onInfo
-  }), /*#__PURE__*/React.createElement("p", {
+  }, /*#__PURE__*/React.createElement("p", {
+    className: "fb-lede"
+  }, onInfo && /*#__PURE__*/React.createElement(React.Fragment, null, "See", " ", /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    onClick: onInfo
+  }, "Info"), " ", "for more info.", " "), "Spot an error, a missing poll, or have any other feedback? Please", " ", /*#__PURE__*/React.createElement("a", {
+    className: "fb-link",
+    href: "/feedback/"
+  }, "let me know"), "."), /*#__PURE__*/React.createElement("p", {
     className: "colo-arch"
   }, "Federal polling archives I\u2019ve located are stored", " ", /*#__PURE__*/React.createElement("a", {
     className: "colo-link",
