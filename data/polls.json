@@ -4819,6 +4819,15 @@
       ]
     },
     {
+      "date": "2026-06-16",
+      "firm": "YouGov",
+      "alb": 43,
+      "opp": 38,
+      "oppName": "Taylor",
+      "han": null,
+      "extra": null
+    },
+    {
       "date": "2026-06-18",
       "firm": "DemosAU",
       "alb": 35,
@@ -4826,6 +4835,20 @@
       "oppName": "Taylor",
       "han": 28,
       "extra": null
+    },
+    {
+      "date": "2026-06-25",
+      "firm": "Newspoll",
+      "alb": 49,
+      "opp": 20,
+      "oppName": "Taylor",
+      "han": 31,
+      "extra": [
+        {
+          "alb": 47,
+          "opp": 36
+        }
+      ]
     },
     {
       "date": "2026-06-26",
@@ -6050,6 +6073,28 @@
       }
     },
     {
+      "date": "2026-06-25",
+      "firm": "Newspoll",
+      "alb": -17,
+      "opp": -20,
+      "oppName": "Taylor",
+      "han": -3,
+      "detail": {
+        "alb": {
+          "app": 40,
+          "dis": 57
+        },
+        "opp": {
+          "app": 31,
+          "dis": 51
+        },
+        "han": {
+          "app": 46,
+          "dis": 49
+        }
+      }
+    },
+    {
       "date": "2026-06-26",
       "firm": "RedBridge / Accent",
       "alb": -18,
@@ -6459,6 +6504,18 @@
       "firm": "YouGov",
       "alb": 47,
       "han": 41
+    },
+    {
+      "date": "2026-06-16",
+      "firm": "YouGov",
+      "alb": 48,
+      "han": 41
+    },
+    {
+      "date": "2026-06-30",
+      "firm": "YouGov",
+      "alb": 49,
+      "han": 40
     },
     {
       "date": "2026-07-08",
