@@ -71,6 +71,7 @@ const PLAIN = [
   "ed2260de-5b11-4bd5-8a8d-a391156c05ee.js",
   "np-project.js", // the next-polls projection (needs window.AP; the sim evals this same file)
   "copy-chart.js", // per-chart copy-as-image button
+  "copy-poll.js",  // copy-as-image button for the expanded poll breakdown
 ];
 const JSX = [
   "08b413e7-8dbe-49bf-8932-a479f8d98f54.js",  // chart toolkit

@@ -1356,6 +1356,51 @@ body.dark .ci-band { opacity: 0.22; }
 .chart-copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .chart-copy-btn.copied { color: var(--accent); opacity: 1; }
 .chart-copy-btn svg { width: 15px; height: 15px; display: block; }
+
+/* ---------- poll-breakdown copy button ----------
+   The expanded poll row gets the same copy affordance the chart cards have
+   (copy-poll.js), cornered bottom-right on the open panel. Nothing below
+   touches the panel's type ladder - the only `.poll-detail` rules here are
+   the anchor the button positions against, the button itself, and the
+   .copy-wide pin the PNG capture applies while it re-flows the panel. */
+.poll-detail { position: relative; }
+.poll-copy-btn {
+  position: absolute; right: 8px; bottom: 6px; z-index: 3;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; padding: 0; border-radius: 6px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--pd-ink-2); cursor: pointer; opacity: .55;
+  transition: opacity .15s ease, color .15s ease, background-color .15s ease, border-color .15s ease;
+}
+.poll-detail:hover .poll-copy-btn, .poll-copy-btn:focus-visible { opacity: 1; }
+.poll-copy-btn:hover { color: var(--pd-ink); background: var(--pd-paper); border-color: var(--pd-rule); opacity: 1; }
+.poll-copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.poll-copy-btn.copied { color: var(--accent); opacity: 1; }
+.poll-copy-btn svg { width: 15px; height: 15px; display: block; }
+@media (prefers-reduced-motion: reduce) { .poll-copy-btn { transition: none; } }
+/* While a breakdown copy is being painted the panel re-flows at the desktop
+   ladder: the PNG is a thing people send onward, and it should carry the
+   measure a laptop reader sees rather than whichever rung the sharer's
+   phone was on (cf. the hero chart's widenForCopy). Every token and rule
+   the narrow ladder touches in its media rungs below is pinned back to its
+   base value here; the doubled class carries that over the media queries on
+   specificity alone. */
+.poll-detail.copy-wide {
+  padding: 28px 24px 28px;
+  --pd-gut: 26px; --pd-hero: 40px; --pd-hero-w: 17px;
+  --pd-mid: 22px; --pd-fig: 20px; --pd-fig-appr: initial;
+  --pd-body: 13.5px; --pd-note: 11.5px; --pd-hero-note: 14px;
+  --pd-eyebrow: 11.5px; --pd-meta: 12px; --pd-figspace: 3px;
+}
+.poll-detail.copy-wide .pd-sec { margin-top: 22px; padding-top: 18px; }
+.poll-detail.copy-wide .pd-k { margin-bottom: 11px; }
+.poll-detail.copy-wide .pd-s:not(.pd-s-basis) { word-spacing: 7px; }
+.poll-detail.copy-wide .pd-s.pd-s-hero { word-spacing: 7px; }
+.poll-detail.copy-wide .pd-mat { display: inline; margin: 0 4px 0 0; }
+.poll-detail.copy-wide .pd-s-hero .pd-mat { margin-right: 9px; }
+.poll-detail.copy-wide .pd-vs { padding: 0 2px; }
+.poll-detail.copy-wide .poll-copy-btn,
+.poll-detail.copy-wide .pd-meta-tail { display: none; }
 .grid { stroke: var(--line-2); stroke-width: 1; }
 .refline { stroke-width: 1.4; stroke-dasharray: 2 5; opacity: 0.85; }
 .refline-label {
