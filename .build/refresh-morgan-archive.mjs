@@ -392,7 +392,7 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
   <p class="credit">The Morgan Poll series, transcribed table-for-table from Roy Morgan's four published vote-intention tables (two-party-preferred and primary, current series and the long-term trends back to 1901) and mirrored here as CSV — each table links its own file below. Sourced from <a href="https://www.roymorgan.com/morgan-poll">roymorgan.com/morgan-poll</a> — snapshot refreshed ${esc(fetched)}. Cells are reproduced as printed, including Roy Morgan's own "&lt;0.5" minors floor and "##" markers (no two-party-preferred figure, pre-preferential-voting era).</p>
 ${secHtml}
 
-  <p class="ss-note">This is a satellite archive page of <a href="/">auspol tracker</a>, an unofficial aggregate of published national polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
+  <p class="ss-note">This is a satellite archive page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>
 <a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 </body>

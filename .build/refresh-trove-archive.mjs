@@ -355,7 +355,7 @@ node .build/refresh-trove-archive.mjs  # this page + the two CSVs</pre>
   <h2>Known limits</h2>
   <p class="body-copy">The corpus is everything Trove's search matches for the token <code>poll</code> in the newspaper category — that includes polling booths and opinion polls alike, which is the triage the two smaller subsets do. OCR is machine-read and corrected by volunteers; titles from the 1800s especially keep stray misreadings. The gazette tail after 1995 is government printing, not news. And the corpus is a snapshot: the National Library keeps scanning, so a re-run will find more, never less.</p>
 
-  <p class="ss-note">This is a satellite archive page of <a href="/">auspol tracker</a>, an unofficial aggregate of published national polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
+  <p class="ss-note">This is a satellite archive page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>
 <a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 </body>

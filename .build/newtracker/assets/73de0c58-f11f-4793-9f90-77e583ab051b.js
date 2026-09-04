@@ -1328,7 +1328,7 @@ function MethodNote({ onInfo }) {
             at four lines apiece without either being padded to fit. */}
         <div className="colo-about">
           <p className="colo-lede">
-            auspol tracker is an unofficial aggregate of published national polling.
+            auspol tracker is an unofficial aggregate of published federal opinion polling.
           </p>
           <p className="disclaimer">
             Best efforts are made to make the aggregate figures transparent, trustworthy,

@@ -452,7 +452,7 @@ function buildStaticSummary() {
       <h2>Sources</h2>
       <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
 
-      <p class="ss-note">auspol tracker is an unofficial aggregate of published national polling.
+      <p class="ss-note">auspol tracker is an unofficial aggregate of published federal opinion polling.
         Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
         sound, and informative, but they are, in the end, estimates only. Federal polling archives
         I&#8217;ve located are stored <a href="https://auspoltracker.com/archives">here</a> for
