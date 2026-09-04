@@ -7768,6 +7768,17 @@
         "tpp_alp": null
       },
       {
+        "date": "1993-01-23",
+        "firm": "AGB McNair",
+        "lnp": 42,
+        "alp": 43,
+        "grn": null,
+        "onp": null,
+        "oth": 15,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
         "date": "1993-01-24",
         "firm": "Newspoll",
         "lnp": 47,
@@ -7775,6 +7786,17 @@
         "grn": null,
         "onp": null,
         "oth": 11,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1993-02-01",
+        "firm": "AGB McNair",
+        "lnp": 41,
+        "alp": 45,
+        "grn": null,
+        "onp": null,
+        "oth": 14,
         "tpp_lnp": null,
         "tpp_alp": null
       },
@@ -7891,10 +7913,32 @@
         "tpp_alp": null
       },
       {
+        "date": "1993-04-17",
+        "firm": "AGB McNair",
+        "lnp": 40,
+        "alp": 49,
+        "grn": null,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
         "date": "1993-04-18",
         "firm": "Newspoll",
         "lnp": 40,
         "alp": 49,
+        "grn": null,
+        "onp": null,
+        "oth": 11,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1993-05-01",
+        "firm": "AGB McNair",
+        "lnp": 39,
+        "alp": 50,
         "grn": null,
         "onp": null,
         "oth": 11,
@@ -7909,6 +7953,17 @@
         "grn": null,
         "onp": null,
         "oth": 9,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1993-05-15",
+        "firm": "AGB McNair",
+        "lnp": 39,
+        "alp": 47,
+        "grn": null,
+        "onp": null,
+        "oth": 14,
         "tpp_lnp": null,
         "tpp_alp": null
       },
@@ -7942,6 +7997,17 @@
         "grn": null,
         "onp": null,
         "oth": 10,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1993-06-23",
+        "firm": "AGB McNair",
+        "lnp": 40,
+        "alp": 47,
+        "grn": null,
+        "onp": null,
+        "oth": 13,
         "tpp_lnp": null,
         "tpp_alp": null
       },
@@ -8012,6 +8078,17 @@
         "tpp_alp": null
       },
       {
+        "date": "1993-09-15",
+        "firm": "AGB McNair",
+        "lnp": 46,
+        "alp": 36,
+        "grn": null,
+        "onp": null,
+        "oth": 18,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
         "date": "1993-09-19",
         "firm": "Newspoll",
         "lnp": 49,
@@ -8030,6 +8107,17 @@
         "grn": null,
         "onp": null,
         "oth": 12,
+        "tpp_lnp": null,
+        "tpp_alp": null
+      },
+      {
+        "date": "1993-09-29",
+        "firm": "AGB McNair",
+        "lnp": 44,
+        "alp": 36,
+        "grn": null,
+        "onp": null,
+        "oth": 20,
         "tpp_lnp": null,
         "tpp_alp": null
       },
