@@ -5,7 +5,8 @@
 
    The rule here: anything a check flags is either a real mistake (build fails)
    or a documented, deliberate exception recorded IN the data via `sumNote` /
-   pollsterRules. There is no third category, so a clean run means clean.
+   `tppSumNote` / pollsterRules (polls[]) or `cyclePollBases` (cycle rows).
+   There is no third category, so a clean run means clean.
    Exported so build.mjs can call it; runnable on its own for a quick check. */
 import fs from "node:fs";
 import path from "node:path";
@@ -15,12 +16,32 @@ import { impliedAlp2pp } from "./flows.mjs";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
 
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+const ISO_PUBLISHED = /^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2})?$/;
+// ~1 day of grace: an 8pm UTC build should not fail a poll dated the
+// Australian morning that follows its UTC day.
+const TOMORROW = new Date(Date.now() + 24 * 3600e3).toISOString().slice(0, 10);
+
 export function validate(D) {
   const errors = [], exempted = [];
   const rules = D.pollsterRules || {};
   const CORE = ["alp", "lnp", "grn", "onp"];
   const ALL = ["alp", "lnp", "grn", "onp", "ind", "oth"];
+  const RANGES = [["tpp_alp", 30, 70], ["tpp_lnp", 30, 70], ...ALL.map((k) => [k, 0, 70])];
   const n0 = (v) => (v == null ? 0 : v);
+
+  // Pollsters tracked in polls[] that legitimately carry no pollsterRules
+  // entry (they have no extractor/routing logic — most are one-off or
+  // special-purpose labels). Anything else is a typo splitting a series.
+  const KNOWN_POLLSTERS = new Set([
+    ...Object.keys(rules),
+    "Election Result",   // isElection rows: the result, not a poll
+    "Spectre Strategy",  // boutique house, no automated feed
+    "Wolf & Smith",      // boutique house (AFR-commissioned, ad hoc)
+    "Redbridge",         // pre-"RedBridge / Accent" Australia Institute waves
+    "Roy Morgan (SMS)",  // single SMS-mode Morgan release, mode tag not a house
+    "Agenda C Synesis",  // one-off news.com.au poll
+  ]);
 
   let prevTs = -Infinity, prevDate = null;
   const seen = new Set();
@@ -29,21 +50,40 @@ export function validate(D) {
   D.polls.forEach((p, i) => {
     const where = `#${i} ${p.date} · ${p.pollster}`;
     const fail = (t, d) => errors.push({ type: t, poll: where, detail: d });
-    const excuse = (t, d) => exempted.push({ type: t, poll: where, detail: d, why: p.sumNote });
+    const excuse = (t, d, why) => exempted.push({ type: t, poll: where, detail: d, why });
+
+    // 0. the pollster label is a known house. A misspelling doesn't warn
+    //    anywhere else – it splits the house's series on the site.
+    if (!KNOWN_POLLSTERS.has(p.pollster))
+      fail("unknown-pollster", `pollster "${p.pollster}" is not in pollsterRules or the known-labels list`);
+
+    // 0b. shares inside plausible electoral bounds. A 2PP outside 30–70 or a
+    //     primary above 70 (or negative) has never happened federally.
+    for (const [k, lo, hi] of RANGES) {
+      const v = p[k];
+      if (v != null && (v < lo || v > hi)) fail("range", `${k} = ${v} (bounds ${lo}–${hi})`);
+    }
 
     // 1. full primary sets total ~100 (majors-only polls are partial by design)
     if (CORE.every((k) => p[k] != null)) {
       const sum = ALL.reduce((s, k) => s + n0(p[k]), 0);
-      if (Math.abs(sum - 100) > 2)
-        (p.sumNote ? excuse : fail)("primary-sum", `Σ shares = ${sum.toFixed(1)} (expected ~100)`);
+      if (Math.abs(sum - 100) > 2) {
+        if (p.sumNote) excuse("primary-sum", `Σ shares = ${sum.toFixed(1)} (expected ~100)`, p.sumNote);
+        else fail("primary-sum", `Σ shares = ${sum.toFixed(1)} (expected ~100)`);
+      }
     }
     // 2. a reported 2PP pair totals ~100, unless the house publishes an
     //    undecided-inclusive 2PP (Essential does – declared in pollsterRules)
+    //    or this specific row's anomaly is documented via `tppSumNote`.
     if (p.tpp_alp != null && p.tpp_lnp != null) {
       const t = p.tpp_alp + p.tpp_lnp;
       if (Math.abs(t - 100) > 1) {
-        const ok = rules[p.pollster]?.tppIncludesUndecided || p.sumNote;
-        (ok ? excuse : fail)("2pp-sum", `2PP ${p.tpp_alp} + ${p.tpp_lnp} = ${t.toFixed(1)} (expected ~100)`);
+        if (rules[p.pollster]?.tppIncludesUndecided)
+          excuse("2pp-sum", `2PP ${p.tpp_alp} + ${p.tpp_lnp} = ${t.toFixed(1)} (expected ~100)`, "tppIncludesUndecided rule");
+        else if (p.tppSumNote)
+          excuse("2pp-sum", `2PP ${p.tpp_alp} + ${p.tpp_lnp} = ${t.toFixed(1)} (expected ~100)`, p.tppSumNote);
+        else
+          fail("2pp-sum", `2PP ${p.tpp_alp} + ${p.tpp_lnp} = ${t.toFixed(1)} (expected ~100)`);
       }
     }
     // 2b. tpp_flows (2025-election-flows 2PP) is the ALP share
@@ -80,7 +120,11 @@ export function validate(D) {
       fail("sample-eff", `sampleEff = ${JSON.stringify(p.sampleEff)}`);
     if (p.sampleEff != null && p.sample > 0 && p.sampleEff > p.sample * 1.05)
       fail("sample-eff", `sampleEff ${p.sampleEff} exceeds raw sample ${p.sample}`);
-    // 3. dates parse, run oldest→newest, and fieldwork starts before it ends
+    // 3. dates are ISO YYYY-MM-DD, not in the future, run oldest→newest, and
+    //    fieldwork starts before it ends
+    if (!ISO_DAY.test(p.date)) fail("date-format", `date "${p.date}" is not YYYY-MM-DD`);
+    if (p.dateStart != null && !ISO_DAY.test(p.dateStart)) fail("date-format", `dateStart "${p.dateStart}" is not YYYY-MM-DD`);
+    if (p.date > TOMORROW) fail("future-date", `date ${p.date} is after today`);
     const ts = Date.parse(p.date);
     if (isNaN(ts)) fail("bad-date", `unparseable date "${p.date}"`);
     else {
@@ -105,6 +149,15 @@ export function validate(D) {
     //     double-weights the house. Rows without `published` can't be keyed
     //     to a release, so they're out of scope here.
     if (p.published != null) {
+      // published is ISO (day or day+minute precision), sits on/after
+      // fieldwork end, and is not in the future
+      if (typeof p.published !== "string" || !ISO_PUBLISHED.test(p.published))
+        fail("published-format", `published = ${JSON.stringify(p.published)}`);
+      else {
+        if (p.published.slice(0, 10) > TOMORROW) fail("future-date", `published ${p.published} is after today`);
+        if (ISO_DAY.test(p.date) && p.published.slice(0, 10) < p.date)
+          fail("published-order", `published ${p.published} precedes fieldwork-end ${p.date}`);
+      }
       const rk = p.pollster + "|" + p.published;
       if (seenRelease.has(rk))
         fail("same-release", `shares published=${p.published} with the ${seenRelease.get(rk)} row – one release, two waves`);
@@ -116,8 +169,20 @@ export function validate(D) {
     if (!p.isElection && !p.assimilated && !(p.sample > 0)) fail("sample", `sample = ${p.sample}`);
   });
 
+  // 5b. election rows are labelled as elections, and only elections carry the
+  //     Election Result label – a crossed pairing would feed a result into
+  //     the poll aggregate or a poll into the result anchoring.
+  D.polls.forEach((p, i) => {
+    if (p.isElection && p.pollster !== "Election Result")
+      errors.push({ type: "election-label", poll: `#${i} ${p.date} · ${p.pollster}`, detail: "isElection row not labelled Election Result" });
+    if (!p.isElection && p.pollster === "Election Result")
+      errors.push({ type: "election-label", poll: `#${i} ${p.date} · ${p.pollster}`, detail: "Election Result label without isElection" });
+  });
+
   // 6. direction rows are a proportion split
   (D.direction || []).forEach((d, i) => {
+    if (d.date != null && !ISO_DAY.test(d.date))
+      errors.push({ type: "date-format", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `date "${d.date}" is not YYYY-MM-DD` });
     const sum = n0(d.right) + n0(d.wrong) + n0(d.unsure);
     if (Math.abs(sum - 100) > 1)
       errors.push({ type: "direction-sum", poll: `direction #${i} ${d.date} · ${d.pollster}`, detail: `Σ = ${sum.toFixed(1)}` });
@@ -220,9 +285,77 @@ export function validate(D) {
   cycleDupes(D.cyclePolls, "cyclePolls");
   cycleDupes(D.cycleApproval, "cycleApproval");
 
+  /* 8b. cycle arrays run chronologically like polls[] does (check 3), carry
+     ISO dates, and keep shares inside plausible bounds. A mis-sorted cycle
+     row breaks the Past-cycles renderer's assumptions the same way a
+     mis-sorted polls[] row breaks the estimator. */
+  if (D.cyclePolls) {
+    for (const [cycle, rows] of Object.entries(D.cyclePolls)) {
+      let prev = "";
+      rows.forEach((r, i) => {
+        const where = `cyclePolls.${cycle} #${i} ${r.date} · ${r.firm}`;
+        if (!ISO_DAY.test(r.date))
+          errors.push({ type: "date-format", poll: where, detail: `date "${r.date}" is not YYYY-MM-DD` });
+        if (r.date < prev)
+          errors.push({ type: "date-order", poll: where, detail: `precedes previous entry (${prev})` });
+        prev = r.date;
+        for (const [k, lo, hi] of RANGES) {
+          const v = r[k];
+          if (v != null && (v < lo || v > hi))
+            errors.push({ type: "range", poll: where, detail: `${k} = ${v} (bounds ${lo}–${hi})` });
+        }
+      });
+    }
+  }
+  if (D.cycleApproval) {
+    for (const [cycle, rows] of Object.entries(D.cycleApproval)) {
+      let prev = "";
+      rows.forEach((r, i) => {
+        if (!ISO_DAY.test(r.date))
+          errors.push({ type: "date-format", poll: `cycleApproval.${cycle} #${i} ${r.date} · ${r.firm}`, detail: `date "${r.date}" is not YYYY-MM-DD` });
+        if (r.date < prev)
+          errors.push({ type: "date-order", poll: `cycleApproval.${cycle} #${i} ${r.date} · ${r.firm}`, detail: `precedes previous entry (${prev})` });
+        prev = r.date;
+      });
+    }
+  }
+
+  /* 8c. cycle primary sets also total ~100, with firm×era bases declared in
+     `cyclePollBases` ("cycle|firm" → note) rather than per-row notes: whole
+     eras publish one consistent basis, so repeating a note per row would be
+     copy-paste noise. The declared bases, all adjudicated against the source
+     tables:
+       – 1998/2001/2004 Morgan: the printed table splits ALP/L-NP/... each
+         minor party into its own column AND carries an OTH column, so the
+         extracted majors+OTH Σ runs 102.5–106.5. Faithful to
+         data/roymorgan/roymorgan-primary-*.csv verbatim cells.
+       – 2022/2025 Essential, 2022/2025 Ipsos, 2025 Dynata: primaries exclude
+         undecided without a rebase, Σ runs 90–97.
+     An undeclared firm×era off 100±2 is a transcription bug, so it fails. */
+  const bases = D.cyclePollBases || {};
+  for (const [cycle, rows] of Object.entries(D.cyclePolls || {})) {
+    rows.forEach((r, i) => {
+      if (!CORE.every((k) => r[k] != null)) return;
+      const sum = ALL.reduce((s, k) => s + n0(r[k]), 0);
+      if (Math.abs(sum - 100) <= 2) return;
+      const basis = bases[cycle + "|" + r.firm];
+      const where = `cyclePolls.${cycle} #${i} ${r.date} · ${r.firm}`;
+      if (basis) exempted.push({ type: "primary-sum", poll: where, detail: `Σ shares = ${sum.toFixed(1)} (basis: ${basis})` });
+      else errors.push({ type: "primary-sum", poll: where, detail: `Σ shares = ${sum.toFixed(1)} (expected ~100; no declared basis for ${cycle} ${r.firm})` });
+    });
+  }
+
   // 9. every leadership row should key onto a poll's fieldwork-end date, or it
   //    is a leadership-only wave – flagged as info, since a drifted date looks
-  //    exactly like one (the Essential Dec-2025 / Mar-2026 bug)
+  //    exactly like one (the Essential Dec-2025 / Mar-2026 bug). Dates on
+  //    leadership rows are ISO-checked here too since check 3 only walks
+  //    polls[].
+  for (const [rows, label] of [[D.ppm, "ppm"], [D.approval, "approval"]]) {
+    (rows || []).forEach((r, i) => {
+      if (!ISO_DAY.test(r.date))
+        errors.push({ type: "date-format", poll: `${label} #${i} ${r.date} · ${r.firm}`, detail: `date "${r.date}" is not YYYY-MM-DD` });
+    });
+  }
   const pollKeys = new Set(D.polls.map((p) => p.date + "|" + p.pollster));
   const orphans = [...D.ppm, ...D.approval]
     .filter((r) => !pollKeys.has(r.date + "|" + r.firm))

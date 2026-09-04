@@ -30540,17 +30540,6 @@
         "tpp_alp": 53
       },
       {
-        "date": "2021-11-21",
-        "firm": "Roy Morgan",
-        "lnp": 35.5,
-        "alp": 35.5,
-        "grn": 12,
-        "onp": 3.5,
-        "oth": 13.5,
-        "tpp_lnp": 44.5,
-        "tpp_alp": 55.5
-      },
-      {
         "date": "2021-11-20",
         "firm": "Resolve Strategic",
         "lnp": 39,
@@ -30560,6 +30549,17 @@
         "oth": 14,
         "tpp_lnp": null,
         "tpp_alp": null
+      },
+      {
+        "date": "2021-11-21",
+        "firm": "Roy Morgan",
+        "lnp": 35.5,
+        "alp": 35.5,
+        "grn": 12,
+        "onp": 3.5,
+        "oth": 13.5,
+        "tpp_lnp": 44.5,
+        "tpp_alp": 55.5
       },
       {
         "date": "2021-11-21",
@@ -31532,17 +31532,6 @@
         "tpp_alp": 53
       },
       {
-        "date": "2023-05-14",
-        "firm": "Resolve Strategic",
-        "lnp": 30,
-        "alp": 42,
-        "grn": 12,
-        "onp": 5,
-        "oth": 10,
-        "tpp_lnp": 39,
-        "tpp_alp": 61
-      },
-      {
         "date": "2023-05-13",
         "firm": "Newspoll",
         "lnp": 34,
@@ -31552,6 +31541,17 @@
         "oth": 10,
         "tpp_lnp": 45,
         "tpp_alp": 55
+      },
+      {
+        "date": "2023-05-14",
+        "firm": "Resolve Strategic",
+        "lnp": 30,
+        "alp": 42,
+        "grn": 12,
+        "onp": 5,
+        "oth": 10,
+        "tpp_lnp": 39,
+        "tpp_alp": 61
       },
       {
         "date": "2023-05-14",
@@ -44406,5 +44406,16 @@
         "oppPpm": 34
       }
     ]
+  },
+  "cyclePollBases": {
+    "1998|Morgan": "Morgan era table lists each minor party in its own column alongside an OTH column – extracted majors+OTH sums run past 100. Faithful to the printed table (mirrored verbatim in data/roymorgan).",
+    "2001|Morgan": "Morgan era table lists each minor party in its own column alongside an OTH column – extracted majors+OTH sums run past 100. Faithful to the printed table (mirrored verbatim in data/roymorgan).",
+    "2004|Morgan": "Morgan era table lists each minor party in its own column alongside an OTH column – extracted majors+OTH sums run past 100. Faithful to the printed table (mirrored verbatim in data/roymorgan).",
+    "2022|Essential": "Primaries exclude undecided with no rebase to 100 (sums 90–95).",
+    "2025|Essential": "Primaries exclude undecided with no rebase to 100 (sums 92–97).",
+    "2022|Ipsos": "Primaries exclude undecided with no rebase to 100 (sums 90–93).",
+    "2025|Ipsos": "Primaries exclude undecided with no rebase to 100 (this row sums 95).",
+    "2025|Dynata": "Primaries exclude undecided with no rebase to 100 (this row sums 92).",
+    "2025|Resolve Strategic": "Primaries exclude undecided with no rebase to 100 (this row sums 97)."
   }
 }
