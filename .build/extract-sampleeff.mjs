@@ -24,16 +24,21 @@
 //              Newspoll's methodUrl target on newly-stamped rows (rows
 //              stamped earlier keep their old statement-page links, which
 //              still resolve). No Chrome, no headless rendering.
-//   Essential – ONE living disclosure-statement PDF, re-uploaded per release.
-//              Its "Individual Survey Details" table lists publication &
+//   Essential – CURRENT disclosure-statement PDF, re-uploaded per release;
+//              its "Individual Survey Details" table lists publication &
 //              fieldwork dates, raw sample, weighting efficiency and effective
-//              sample for every wave since May 2021. The current href is read
-//              off essentialreport.com.au/methodology each run. Every covered
-//              wave shares that ONE living URL as its `methodUrl`, and the
-//              link REFRESHES when the PDF is re-uploaded at a new URL – the
-//              only leg allowed to overwrite, since there is no per-wave
-//              statement to preserve. A wave not yet in the table (the brand-
-//              new release) keeps no link until the house appends it.
+//              sample for every wave since May 2021, so every covered wave's
+//              sampleEff is read off that living document (current href from
+//              essentialreport.com.au/methodology each run). Essential ALSO
+//              files a PER-WAVE statement per release (uploads/<YYYY>/<MM>/…,
+//              suffixed -1/-2 when the month folder holds an older one — the
+//              name is only unique within its folder), and polls.json rows
+//              carry their own wave's statement as `methodUrl`. This leg
+//              therefore only fills rows with NO methodUrl (the newly
+//              appended wave) and never refreshes existing links, or
+//              historic per-wave links rot. A wave not yet in the living
+//              table (the brand-new release) keeps no link until the house
+//              appends it.
 //   DemosAU  – the methodology-statements index (already crawlable plain
 //              HTML); federal poll and MRP statement PDFs carry the same APC
 //              template row. This leg also stamps `methodUrl` (the statement
@@ -602,14 +607,12 @@ for (const p of unstamped) {
    Newspoll ±7 days on the statement's publication date; RedBridge/Accent
    an exact date match on the redbridge-src cache's fieldwork end; DemosAU
    ±1 day on the statement's parsed fieldwork end), absent-not-zero, never
-   overwritten – EXCEPT Essential, whose waves all share the ONE living
-   disclosure-statement PDF, so its link refreshes silently when the house
-   re-uploads at a new URL (the dedicated block below; there is no
-   per-wave Essential statement to preserve). The commissioned YouGov
-   waves file no statement with YouGov's APC listing, so they keep no
-   link. */
+   overwritten – Essential included, since its rows point at per-wave
+   statement PDFs; the dedicated Essential block below only fills rows
+   lacking a link. The commissioned YouGov waves file no statement with
+   YouGov's APC listing, so they keep no link. */
 let npLinks = [];
-if ((!LEG_ONLY || LEG_ONLY === "newspoll") && D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
+if (D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
   const needDates = D.polls
     .filter((p) => p.pollster === "Newspoll" && p.methodUrl == null)
     .map((p) => (p.published || p.date).slice(0, 10));
@@ -620,26 +623,27 @@ const accentLinks = D.polls.some((p) => p.pollster.startsWith("RedBridge / Accen
   ? legAccentLinks()
   : [];
 const methods = [];
-/* Essential's living-PDF link: stamp or REFRESH every wave the disclosure
-   table covers (the brand-new release, not yet appended, is skipped). */
+/* Essential link: stamp the current statement URL only on rows that have
+   NO methodUrl (the newly appended wave) and never refresh existing links –
+   rows carry per-wave statement PDFs now, so overwriting would rot
+   historic links. A wave not yet in the living table keeps no link. */
 const essUrl = (records.find((r) => r.pollster === "Essential") || {}).href;
 if (essUrl) {
   const essEnds = [...seen.values()].filter((r) => r.pollster === "Essential" && r.end).map((r) => r.end);
   for (const p of D.polls) {
     if (p.pollster !== "Essential") continue;
-    if (p.methodUrl === essUrl) continue;
+    if (p.methodUrl != null) continue;
     if (!essEnds.some((e) => Math.abs(ddays(e, p.date)) <= 1)) continue;
     const after = "releaseUrl" in p ? "releaseUrl" : "url";
-    const had = "methodUrl" in p;
     const rebuilt = {};
     for (const [k, v] of Object.entries(p)) {
       rebuilt[k] = v;
-      if (k === after && !had) rebuilt.methodUrl = essUrl;
+      if (k === after) rebuilt.methodUrl = essUrl;
     }
     if (!("methodUrl" in rebuilt)) rebuilt.methodUrl = essUrl;
     for (const k of Object.keys(p)) delete p[k];
     Object.assign(p, rebuilt);
-    methods.push(`${p.date} Essential${had ? " (refreshed)" : ""} (Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf)`);
+    methods.push(`${p.date} Essential (Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf)`);
   }
 }
 for (const p of D.polls) {
