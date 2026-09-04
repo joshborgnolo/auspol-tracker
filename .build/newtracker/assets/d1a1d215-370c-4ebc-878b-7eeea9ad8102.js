@@ -2985,10 +2985,6 @@ function VariancePanel({ facet, rangeId }) {
             than random sampling permits. Measured across all {D.individualPolls.length} polls; the filters
             above don’t narrow it.
           </p>
-          {(facet === "twopp" || facet === "primary") && (
-            <TextToggle value={view === "primary" ? "primary" : "twopp"} onChange={setView}
-                        options={VAR_VOTE_VIEWS} ariaLabel="Disagreement measure" />
-          )}
         </div>
         <div className="legend">
           {latest.map(({ m, d }) => {
@@ -3007,6 +3003,13 @@ function VariancePanel({ facet, rangeId }) {
           })}
         </div>
       </div>
+
+      {(facet === "twopp" || facet === "primary") && (
+        <div className="ap-var-ctl">
+          <TextToggle value={view === "primary" ? "primary" : "twopp"} onChange={setView}
+                      options={VAR_VOTE_VIEWS} ariaLabel="Disagreement measure" />
+        </div>
+      )}
 
       <TrendChart
         key={"var-" + view + "-" + rangeId}
@@ -3174,8 +3177,6 @@ function HouseLeanPanel({ rangeId }) {
             the aggregates subtract, shown as it has walked. The chart above spreads the houses
             against chance; this one tracks where each one stands.
           </p>
-          <TextToggle value={measure} onChange={setMeasure} options={LEAN_MEASURES}
-                      ariaLabel="House-lean measure" />
         </div>
         <div className="legend">
           {latest.map((e) => {
@@ -3197,6 +3198,11 @@ function HouseLeanPanel({ rangeId }) {
             );
           })}
         </div>
+      </div>
+
+      <div className="ap-var-ctl">
+        <TextToggle value={measure} onChange={setMeasure} options={LEAN_MEASURES}
+                    ariaLabel="House-lean measure" />
       </div>
 
       <TrendChart

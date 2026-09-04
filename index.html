@@ -3919,6 +3919,11 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   font-family: var(--serif); font-weight: 540; font-size: 17px; margin: 0;
   letter-spacing: -0.01em; color: var(--ink); line-height: 1.2;
 }
+/* The measure toggle steers the chart below it, so it parks on its own row
+   hugging that chart – parked at the foot of the header paragraph it read as
+   the paragraph's tail. Shared by the house-lean panel, which wears the same
+   chrome. */
+.ap-var-ctl { margin: 2px 0 8px; }
 /* The ratio, not the spread, is the number that carries the verdict, so it is
    the one that takes colour – on a cool → neutral → warm ramp matching the
    underlying axis (tighter than chance → normal → spread out). Deliberately
@@ -16507,12 +16512,7 @@ function VariancePanel({
     className: "ap-var-title"
   }, "Poll disagreement"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, "How far apart the polls sit, against the spread sampling error alone would produce. The shading is that chance floor \u2013 a line inside it means the houses are running tighter than random sampling permits. Measured across all ", D.individualPolls.length, " polls; the filters above don\u2019t narrow it."), (facet === "twopp" || facet === "primary") && /*#__PURE__*/React.createElement(TextToggle, {
-    value: view === "primary" ? "primary" : "twopp",
-    onChange: setView,
-    options: VAR_VOTE_VIEWS,
-    ariaLabel: "Disagreement measure"
-  })), /*#__PURE__*/React.createElement("div", {
+  }, "How far apart the polls sit, against the spread sampling error alone would produce. The shading is that chance floor \u2013 a line inside it means the houses are running tighter than random sampling permits. Measured across all ", D.individualPolls.length, " polls; the filters above don\u2019t narrow it.")), /*#__PURE__*/React.createElement("div", {
     className: "legend"
   }, latest.map(({
     m,
@@ -16539,7 +16539,14 @@ function VariancePanel({
     }, m.label), /*#__PURE__*/React.createElement("span", {
       className: "legend-val vr-" + read.id
     }, d.R.toFixed(2), "\xD7"));
-  }))), /*#__PURE__*/React.createElement(TrendChart, {
+  }))), (facet === "twopp" || facet === "primary") && /*#__PURE__*/React.createElement("div", {
+    className: "ap-var-ctl"
+  }, /*#__PURE__*/React.createElement(TextToggle, {
+    value: view === "primary" ? "primary" : "twopp",
+    onChange: setView,
+    options: VAR_VOTE_VIEWS,
+    ariaLabel: "Disagreement measure"
+  })), /*#__PURE__*/React.createElement(TrendChart, {
     key: "var-" + view + "-" + rangeId,
     height: narrow ? 500 : 300,
     xDomain: xDomain,
@@ -16770,12 +16777,7 @@ function HouseLeanPanel({
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("house-effect", "House lean")
-  }, "house effect"), " ", "the aggregates subtract, shown as it has walked. The chart above spreads the houses against chance; this one tracks where each one stands."), /*#__PURE__*/React.createElement(TextToggle, {
-    value: measure,
-    onChange: setMeasure,
-    options: LEAN_MEASURES,
-    ariaLabel: "House-lean measure"
-  })), /*#__PURE__*/React.createElement("div", {
+  }, "house effect"), " ", "the aggregates subtract, shown as it has walked. The chart above spreads the houses against chance; this one tracks where each one stands.")), /*#__PURE__*/React.createElement("div", {
     className: "legend"
   }, latest.map(e => {
     const s = (e.v > 0 ? "+" : e.v < 0 ? "−" : "") + Math.abs(e.v).toFixed(1) + "pp";
@@ -16800,7 +16802,14 @@ function HouseLeanPanel({
     }, e.firm), /*#__PURE__*/React.createElement("span", {
       className: "legend-val"
     }, s));
-  }))), /*#__PURE__*/React.createElement(TrendChart, {
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "ap-var-ctl"
+  }, /*#__PURE__*/React.createElement(TextToggle, {
+    value: measure,
+    onChange: setMeasure,
+    options: LEAN_MEASURES,
+    ariaLabel: "House-lean measure"
+  })), /*#__PURE__*/React.createElement(TrendChart, {
     key: "lean-" + measure + "-" + rangeId,
     height: narrow ? 500 : 300,
     xDomain: xDomain,
