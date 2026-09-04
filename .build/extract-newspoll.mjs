@@ -363,8 +363,10 @@ function parseArticle(text, pubDateIso) {
     const pubY = pubDateIso ? +pubDateIso.slice(0, 4) : new Date().getUTCFullYear();
     const mo1 = MONTHS[fm[1].toLowerCase()], mo2 = fm[3] ? MONTHS[fm[3].toLowerCase()] : mo1;
     if (mo1 != null && mo2 != null) {
-      r.dateStart = iso(pubY, mo1, +fm[2]);
-      r.date = mo2 < mo1 ? iso(pubY + 1, mo2, +fm[4]) : iso(pubY, mo2, +fm[4]);
+      /* publication year is the END-date year (lag 0–10d); a Dec→Jan window
+         starts in the prior December */
+      r.dateStart = iso(mo2 < mo1 ? pubY - 1 : pubY, mo1, +fm[2]);
+      r.date = iso(pubY, mo2, +fm[4]);
     }
   }
   if (r.date == null && pubDateIso) {

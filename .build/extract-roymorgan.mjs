@@ -179,8 +179,10 @@ function parseRelease(post) {
     const mo2 = m2 ? MONTHS[m2.toLowerCase()] : mo1;
     if (mo1 == null || mo2 == null) missing.push(`field months ${m1}/${m2}`);
     else {
-      dateStart = iso(+y, mo1, +d1);
-      date = mo2 < mo1 ? iso(+y + 1, mo2, +d2) : iso(+y, mo2, +d2);
+      /* the printed year belongs to the END date; a Dec→Jan window starts in
+         the prior year */
+      dateStart = iso(mo2 < mo1 ? +y - 1 : +y, mo1, +d1);
+      date = iso(+y, mo2, +d2);
     }
   }
 
