@@ -3207,12 +3207,25 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    spent on a legend. Here it is not reserved at all, and appears on the chips
    whose state gives it something to say: a term drawn out of the band, or one
    already off the board. Every other term is one tap from lifted, which is the
-   tap a reader coming to remove it would make first anyway. */
+   tap a reader coming to remove it would make first anyway.
+
+   The SITTING term is the exception that reasoning misses, and the bug it
+   caused: it is never "one tap from lifted" - lift() refuses it outright,
+   since it has no band to be lifted out of (auspol-past-cycles, the
+   2026-09-03 fix) - so it can never earn its way into .lifted or .off and
+   its ✕ sat permanently display:none below this width, with no sequence
+   of taps that reveals it. Reported as "the Albanese line won't clear on
+   my phone", and it was the same on any narrow window regardless of touch:
+   this is a max-width query, not a hover one. .cyc-chip.current joins the
+   exception list here for the reason .lifted and .off are already in it -
+   its ✕ has something to say (take the sitting term off the board) that no
+   tap sequence can surface any other way. */
 @media (max-width: 620px) {
   .cyc-x { display: none; }
-  .cyc-chip.lifted .cyc-x, .cyc-chip.off .cyc-x { display: inline-block; }
+  .cyc-chip.lifted .cyc-x, .cyc-chip.off .cyc-x, .cyc-chip.current .cyc-x { display: inline-block; }
   .cyc-main { padding-right: 11px; }
-  .cyc-chip.lifted .cyc-main, .cyc-chip.off .cyc-main { padding-right: 4px; }
+  .cyc-chip.lifted .cyc-main, .cyc-chip.off .cyc-main,
+  .cyc-chip.current .cyc-main { padding-right: 4px; }
   /* The rules already carry the colour and the years are self-evidently a list
      of terms; the caption is the first thing to go when the column is this
      narrow. */

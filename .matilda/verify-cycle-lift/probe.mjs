@@ -114,6 +114,31 @@ try {
   const stale = await strip(page, years.current);
   check("a stale ?l= naming the sitting term is dropped", stale.withX, 0);
 
+  /* ---- the sitting term's own ✕ is reachable under 620px --------------
+     Reported live: "on my phone I can't x the Albanese line" - and the cause
+     was not touch, it was width. The narrow-width rule that hides a chip's
+     ✕ by default only reveals it for .lifted or .off, on the reasoning that
+     every other term is one tap from lifted - which is false for the
+     sitting term, since lift() refuses it outright (it has no band to be
+     lifted out of). Its ✕ sat permanently display:none below 620px with no
+     tap sequence that ever revealed it. */
+  await page.setViewport({ width: 390, height: 900 });
+  await new Promise((r) => setTimeout(r, 400));
+  const sitX = await page.evaluate(`(() => {
+    const chip = [...document.querySelectorAll(".cyc-chip")].find((c) => c.querySelector(".cyc-now"));
+    const x = chip.querySelector(".cyc-x");
+    const r = x.getBoundingClientRect();
+    return r.width > 0 && r.height > 0;
+  })()`);
+  check("the sitting term's ✕ has a real hit target under 620px", sitX, true);
+  await page.evaluate(`document.querySelector(".cyc-chip.current .cyc-x").click()`);
+  await new Promise((r) => setTimeout(r, 400));
+  check("tapping it under 620px takes the sitting term off the board",
+        await strip(page, years.current), { rows: 0, withX: 0, l: null });
+  await page.evaluate(`document.querySelector(".cyc-chip.current .cyc-x").click()`);
+  await new Promise((r) => setTimeout(r, 400));
+  await page.setViewport({ width: 1280, height: 900 });
+
   // ---- the legend's own ✕ still takes the sitting term off the board ----
   await page.evaluate(`(() => {
     const c = [...document.querySelectorAll(".cyc-chip")]
