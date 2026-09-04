@@ -1176,13 +1176,18 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
      title takes the calendar month instead. */
   const solo = shown.length === 1 ? shown[0] : null;
   /* Events belong to a term's own line, so they display once the chart is
-     about ONE past term - however it was narrowed. Solo is the no-ribbon
-     case. With the ribbon running, exactly one past term brought forward of
-     the band (lifted, or the hover preview) is again a single line the
-     dates can attach to: the band itself is background, not a competing
-     line. The resting state draws no past line at all, so it lifts nothing. */
+     about ONE term - however it was narrowed. Solo is the no-ribbon case.
+     With the ribbon running, exactly one past term brought forward of the
+     band (lifted, or the hover preview) is again a single line the dates
+     can attach to: the band itself is background, not a competing line.
+     And the sitting term is that single line whenever nothing has been
+     brought forward - it cannot be lifted, it is simply always drawn, so
+     the resting ribbon state is where its own events live. */
   const pastForward = drawnCycles.filter((c) => !c.current);
-  const eventCycle = solo || (pastForward.length === 1 ? pastForward[0] : null);
+  const eventCycle = solo
+    || (pastForward.length === 1
+        ? pastForward[0]
+        : (pastForward.length === 0 ? drawnCycles.find((c) => c.current) || null : null));
   const cycleEvents = eventCycle
     ? (CYC_EVENTS[eventCycle.year] || [])
         .filter((e) => !e.metrics || e.metrics.includes(M.key))
