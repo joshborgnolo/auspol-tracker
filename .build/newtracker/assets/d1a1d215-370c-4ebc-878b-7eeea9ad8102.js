@@ -551,13 +551,13 @@ const CYC_METRICS = [
      therefore the first READING, never election day, and the zero line is
      labelled for that. */
   { key: "ppmm", title: "Preferred prime minister",
-    sub: "Sitting prime minister’s lead on the preferred-PM question",
+    sub: "PM’s lead on the preferred-PM question",
     unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
     step: 10, refAbs: 0, refAbsLabel: "even", chgRefLabel: "First reading" },
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
     unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: null },
-  { key: "tpp", title: "Government two-party preferred", sub: "Governing party 2PP",
+  { key: "tpp", title: "Government two-party preferred", sub: "Governing-party 2PP",
     unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: 50, refAbsLabel: "50 – tie" },
   /* The opposition chart reads the same terms from the losing side of them:
@@ -1192,20 +1192,28 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
         .filter((e) => !e.metrics || e.metrics.includes(M.key))
         .map((e) => ({ ...e, x: cycEventMonth(e.date, eventCycle.eDate) }))
     : [];
-  /* The two approval charts caption what the fan behind the singled-out
-     line is made of: "all" when every past term from the shown start is
-     on the board, "selected" when some later term is off too (front-trims
+  /* Five cards caption what the fan behind the singled-out line is made
+     of. The lead-in names the measure – the approval charts say it in
+     words ("Approve minus disapprove") since their static subtitles name
+     an office instead; the ppmm/primary/tpp cards lead with their own
+     subtitle, which already names the measure. Then the fan's
+     composition: "all" when every past term from the shown start is on
+     the board, "selected" when some later term is off too (front-trims
      alone just move the start year), the outcome filter's scope when the
      board has been cut to one outcome (a filter is itself a selection,
-     but names its own clause instead), and the old static subtitle when
-     the board is so thin there is no fan at all. The start year tracks
-     the earliest term left on the board. */
+     but names its own clause instead), and the static subtitle alone
+     when the board is so thin there is no fan at all. The start year
+     tracks the earliest term left on the board. */
   const cardSub = (() => {
-    if (M.key !== "net" && M.key !== "oppnet") return M.sub;
-    if (!banded) return M.sub;
+    const fanned = M.key === "net" || M.key === "oppnet"
+      || M.key === "ppmm" || M.key === "primary" || M.key === "tpp";
+    if (!fanned || !banded) return M.sub;
+    const lead = M.key === "net" || M.key === "oppnet"
+      ? "Approve minus disapprove"
+      : M.sub;
     const firstYear = Math.min(...pastShown.map((c) => c.year));
     const gapped = cycles.some((c) => !c.current && c.year >= firstYear && hidden.has(c.year));
-    const cap = "With a historical fan chart for " + (gapped ? "selected" : "all")
+    const cap = lead + ", with a historical fan chart for " + (gapped ? "selected" : "all")
       + " previous terms since " + firstYear;
     if (outcomeShown === "returned")
       return cap + ", for terms at the end of which the government was returned";
