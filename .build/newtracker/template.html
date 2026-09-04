@@ -1387,6 +1387,12 @@ body.dark .ci-band { opacity: 0.22; }
    specificity alone. */
 .poll-detail.copy-wide {
   padding: 28px 24px 28px;
+  /* the copy runs the full content box, not the live page's centred
+     reading measure: on the sheet the panel's own side padding IS the
+     air, and centring an 820px column inside it would bank ~140px of
+     blank down each side. 1096 = copy-poll.js's CONTENT_W (1144) less
+     this block's two 24px paddings - keep the pair in step. */
+  --pd-measure: 1096px;
   --pd-gut: 26px; --pd-hero: 40px; --pd-hero-w: 17px;
   --pd-mid: 22px; --pd-fig: 20px; --pd-fig-appr: initial;
   --pd-body: 13.5px; --pd-note: 11.5px; --pd-hero-note: 14px;

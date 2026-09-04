@@ -216,20 +216,19 @@ try {
     const paints = await page.evaluate("window.__probePaints");
     ok("canvas painted many colours", paints.length && paints[paints.length - 1].colors > 6, paints);
     /* the card's chrome: one tight, EVEN margin on all four sides (28
-       logical = 56 physical px). Only the footer ink reaches a margin -
-       right-aligned at the right edge, sitting one line above the bottom -
-       so it pins those two exactly. The left and top edges are DERIVED:
-       left = (28 card + 24 panel pad + 138 centred --pd-measure inset)
-       = 190 logical = 380 physical, top = (28 + 28 panel pad) = 56
-       logical = 112 physical plus the first line box's leading */
+       logical = 56 physical px outward), and one even INSET for the ink:
+       the copy-wide pin lets the measure run the content box, so side
+       ink = (28 card + 24 panel pad) = 52 logical = 104 physical, and
+       the footer signature right-aligns to that same padding line. The
+       top adds the panel's 28px padding band = 112 plus line leading */
     const card = paints[paints.length - 1];
     console.log("  card ink bounds:", JSON.stringify(card.ink), "h =", card.h);
     const inInk = (v) => card.ink && v >= 44 && v <= 84;
-    const leftInk = (v) => card.ink && v >= 348 && v <= 412;
+    const sideInk = (v) => card.ink && v >= 88 && v <= 120;
     const topInk = (v) => card.ink && v >= 96 && v <= 136;
-    check("left edge: card margin + panel padding + centred measure", leftInk(card.ink.minX), true);
+    check("left edge: card margin + panel padding", sideInk(card.ink.minX), true);
+    check("right edge: ink keeps the same inset", sideInk(2400 - card.ink.maxX), true);
     check("top edge: card margin + panel padding", topInk(card.ink.minY), true);
-    check("right margin is one tight unit", inInk(2400 - card.ink.maxX), true);
     check("footer sits one margin above the bottom edge", inInk(card.h - card.ink.maxY), true);
     ok("no ink crosses the card margin", card.ink && card.ink.minX >= 48 && card.ink.minY >= 48 &&
        2400 - card.ink.maxX >= 48 && card.h - card.ink.maxY >= 48, card.ink);
