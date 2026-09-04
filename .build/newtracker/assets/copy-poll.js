@@ -242,7 +242,15 @@
         style: fontStyle, weight: cs.fontWeight,
         size: parseFloat(cs.fontSize), family: cs.fontFamily,
       };
-      const dec = cs.textDecorationLine.indexOf("underline") !== -1 ? {
+      /* An underline in this panel is an AFFORDANCE, not typography: the only
+         ones are the glossary term (.hi-term, "preference flows") and the
+         report control, and both say "this can be clicked". Nothing in a PNG
+         can be. The word travels; its promise of a click does not. Anything
+         underlined for meaning rather than for interaction is drawn as a
+         border instead (.pd-est's dashed date) and comes through the element
+         path untouched. */
+      const clickable = el.closest("a[href], button");
+      const dec = !clickable && cs.textDecorationLine.indexOf("underline") !== -1 ? {
         color: cs.textDecorationColor === "currentcolor" ? cs.color : cs.textDecorationColor,
         style: cs.textDecorationStyle,
         thick: parseFloat(cs.textDecorationThickness) || 1,
