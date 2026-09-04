@@ -1495,7 +1495,7 @@ body.dark .ci-band { opacity: 0.22; }
 .poll-detail.copy-wide .pd-s.pd-s-hero { word-spacing: 7px; }
 .poll-detail.copy-wide .pd-mat { display: inline; margin: 0 4px 0 0; }
 .poll-detail.copy-wide .pd-s-hero .pd-mat { margin-right: 9px; }
-.poll-detail.copy-wide .pd-vs { padding: 0 2px; }
+.poll-detail.copy-wide { --pd-vs-pad: 2px; }
 .poll-detail.copy-wide .poll-copy-btn,
 .poll-detail.copy-wide .pd-meta-tail { display: none; }
 .grid { stroke: var(--line-2); stroke-width: 1; }
@@ -2247,6 +2247,9 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
      indents a flows caption has to be set in exactly the same gap as the real
      one, and two literals would drift the moment one breakpoint moved. */
   --pd-wordgap: 7px;
+  /* the connector's side padding, a token for the same reason as the gap
+     above: the flows caption's indent has to carry it identically */
+  --pd-vs-pad: 2px;
   --pd-fig: 20px;     /* a percentage inside a sentence */
   --pd-mid: 22px;     /* national direction - the 2PP treatment, scaled down */
   --pd-hero: 40px;    /* the 2PP pair, the dominant element on the page */
@@ -2424,8 +2427,19 @@ body.dark .poll-detail {
 /* A flows caption is indented to its own figures, and the indent IS the word
    "or" - the same glyphs, the same .pd-vs size and padding, the same word gap
    - just made invisible. Any px value would have been a guess that drifted
-   the next time the scale or a breakpoint moved; this one cannot. */
-.pd-basis-indent { visibility: hidden; word-spacing: var(--pd-wordgap); }
+   the next time the scale or a breakpoint moved; this one cannot.
+
+   It has to be a PSEUDO-element, not a hidden span. copy-poll.js paints the
+   panel glyph-by-glyph off Range rects and reads text nodes without asking
+   whether they are visible, so a real node here printed a stray "or" into
+   the PNG. ::before content never enters the DOM, so it indents the line on
+   the page and the capture cannot see it. */
+.pd-s.pd-s-basis-alt::before {
+  content: "or ";
+  visibility: hidden;
+  font-size: 0.85em; padding: 0 var(--pd-vs-pad);
+  word-spacing: var(--pd-wordgap);
+}
 .pd-s.pd-s-basis { margin-top: 3px; color: var(--pd-ink-2); font-size: var(--pd-body); }
 /* a caption's figure still steps above its words, but not to the full figure
    size - the basis is about the measure above it and must not out-shout it */
@@ -2506,7 +2520,7 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 .pd-sec-mid .pd-s > .pd-grp > b { font-size: var(--pd-mid); line-height: 1; }
 /* the connector is grammar, not data - it holds the two halves apart and
    should not be mistaken for either */
-.pd-vs { font-size: 0.85em; font-weight: 400; color: var(--pd-ink-2); padding: 0 2px; }
+.pd-vs { font-size: 0.85em; font-weight: 400; color: var(--pd-ink-2); padding: 0 var(--pd-vs-pad); }
 /* undecided: one readout per question, because the panel carries two of them
    and they must not read as one measure with two sources */
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
@@ -2673,7 +2687,7 @@ button.acc-spread[aria-pressed="true"] {
      converted no additional line across 124 archive rows: it only tightened
      the ones that already fitted. Not taken.) */
   .poll-detail { --pd-wordgap: 3px; }
-  .pd-vs { padding: 0; }
+  .poll-detail { --pd-vs-pad: 0px; }
 }
 /* On a phone the matchup name is what pushes a head-to-head onto a third
    line: "ALP v L/NP: 53.5% ALP (▼0.5) vs 46.5% L/NP (▲0.5)" wants 441px and
@@ -11809,11 +11823,8 @@ function TppLine({
   }, x.label), /*#__PURE__*/React.createElement(ChgParen, {
     d: x.delta
   }))))), note && /*#__PURE__*/React.createElement("p", {
-    className: "pd-s pd-s-basis"
-  }, alt && /*#__PURE__*/React.createElement("span", {
-    className: "pd-vs pd-basis-indent",
-    "aria-hidden": "true"
-  }, "or "), note));
+    className: "pd-s pd-s-basis" + (alt ? " pd-s-basis-alt" : "")
+  }, note));
 }
 
 /* The poll's own pull on the figure a reader watches, as one ordinary row
