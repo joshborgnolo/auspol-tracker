@@ -1193,37 +1193,24 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
         .filter((e) => !e.metrics || e.metrics.includes(M.key))
         .map((e) => ({ ...e, x: cycEventMonth(e.date, eventCycle.eDate) }))
     : [];
-  /* The two approval charts caption themselves: whose line the chart singles
-     out (the same term the events follow - the sitting term at rest, a
-     lifted or hovered term otherwise) and what the fan behind it is made of.
-     The fan clause names the outcomes filter when the board has been cut to
-     one outcome; a board thinned by hand still reads "since 1987", which
-     stays true of whatever mix remains. The "in his current term" clause is
-     Albanese-true - recast when the sitting prime minister changes. */
+  /* The two approval charts caption what the fan behind the singled-out
+     line is made of: "selected" once any cycle chip is off, the outcome
+     filter's scope when the board has been cut to one outcome (a filter is
+     itself a selection, but names its own clause instead), and the old
+     static subtitle when the board is so thin there is no fan at all. */
   const cardSub = (() => {
     if (M.key !== "net" && M.key !== "oppnet") return M.sub;
+    if (!banded) return M.sub;
     const office = M.leader === "opp" ? "opposition leader" : "prime minister";
-    const scope = outcomeShown === "ousted"
-      ? "for the terms since 1987 at the end of which the government was ousted"
-      : outcomeShown === "returned"
-        ? "for the terms since 1987 at the end of which the government was returned"
-        : "since 1987";
-    const fan = banded
-      ? "a fan chart of historical " + office + " net approval " + scope
-      : null;
-    let subj = null;
-    if (eventCycle) {
-      const chain = [...new Set(
-        (M.leader === "opp" ? eventCycle.oppLead : eventCycle.pm).split(" → "))];
-      const who = chain.length < 3 ? chain.join(" and ")
-        : chain.slice(0, -1).join(", ") + " and " + chain[chain.length - 1];
-      subj = who + "'s net approval" + (eventCycle.current
-        ? (M.key === "net" ? " in his current term" : "")
-        : " in the " + eventCycle.year + " term");
-    }
-    const both = subj && fan ? subj + ", overlaid on " + fan : (subj || fan);
-    if (!both) return M.sub;
-    return both.charAt(0).toUpperCase() + both.slice(1);
+    const hist = office + " net approval since 1987";
+    if (outcomeShown === "returned")
+      return "With a fan chart of historical " + hist
+        + ", for terms at the end of which the government was returned";
+    if (outcomeShown === "ousted")
+      return "With a fan chart of historical " + hist
+        + ", for terms at the end of which the government was ousted";
+    return "With a fan chart of " + (hidden.size ? "selected historical " : "historical ")
+      + hist;
   })();
   /* Hanson's tickbox follows her data, not the board: her series belongs to
      the current term, but she is a person-toggle, not a property of the 2025
@@ -1786,7 +1773,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
                 onClick={() => showOutcome(outcomeShown === "returned" ? "ousted" : "returned")}>
           {outcomeShown === "returned"
             ? "Show ousted governments only"
-            : "Show re-elected governments only"}
+            : "Show returned governments only"}
         </button>
       </div>
     </div>
