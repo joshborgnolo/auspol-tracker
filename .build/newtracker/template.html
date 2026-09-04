@@ -2146,6 +2146,10 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
      comma's own space): a label belongs to the figure beside it, so it must
      bind tighter to it than the pairs do to each other. */
   --pd-figspace: 3px;
+  /* the space BETWEEN items in a line. A token because the hidden "or" that
+     indents a flows caption has to be set in exactly the same gap as the real
+     one, and two literals would drift the moment one breakpoint moved. */
+  --pd-wordgap: 7px;
   --pd-fig: 20px;     /* a percentage inside a sentence */
   --pd-mid: 22px;     /* national direction - the 2PP treatment, scaled down */
   --pd-hero: 40px;    /* the 2PP pair, the dominant element on the page */
@@ -2254,7 +2258,7 @@ body.dark .poll-detail {
    Word-spacing rather than margins BETWEEN groups: a margin there survives a
    line break and hangs the wrapped line in, which at phone widths is most
    lines. A space collapses at the break, so the left edge stays flush. */
-.pd-s { word-spacing: 7px; }
+.pd-s { word-spacing: var(--pd-wordgap); }
 .pd-lab, .pd-mat { word-spacing: normal; }
 /* the matchup prefix names the line; against a 60px figure a bare word-space
    is not enough to read as a separate phrase */
@@ -2320,6 +2324,11 @@ body.dark .poll-detail {
    a third item in the run rather than as a note on the second. 3px binds it
    up; the next pair still gets the full 9px from .pd-s + .pd-s, so the
    grouping is now visible in the spacing instead of only in the words. */
+/* A flows caption is indented to its own figures, and the indent IS the word
+   "or" - the same glyphs, the same .pd-vs size and padding, the same word gap
+   - just made invisible. Any px value would have been a guess that drifted
+   the next time the scale or a breakpoint moved; this one cannot. */
+.pd-basis-indent { visibility: hidden; word-spacing: var(--pd-wordgap); }
 .pd-s.pd-s-basis { margin-top: 3px; color: var(--pd-ink-2); font-size: var(--pd-body); }
 /* a caption's figure still steps above its words, but not to the full figure
    size - the basis is about the measure above it and must not out-shout it */
@@ -2566,7 +2575,7 @@ button.acc-spread[aria-pressed="true"] {
      there is a point the pair itself cannot use. (Going further, to 2px,
      converted no additional line across 124 archive rows: it only tightened
      the ones that already fitted. Not taken.) */
-  .pd-s { word-spacing: 3px; }
+  .poll-detail { --pd-wordgap: 3px; }
   .pd-vs { padding: 0; }
 }
 /* On a phone the matchup name is what pushes a head-to-head onto a third

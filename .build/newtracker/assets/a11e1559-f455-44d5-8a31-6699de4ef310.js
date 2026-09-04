@@ -1939,7 +1939,14 @@ function TppLine({ c, prefixed, note, hero, alt }) {
       {/* the basis is a caption to the pair, not a tail on it: a parenthesis
           trailing a display-size head-to-head pushed the answer onto two
           lines to make room for its own footnote */}
-      {note && <p className="pd-s pd-s-basis">{note}</p>}
+      {note && (
+        <p className="pd-s pd-s-basis">
+          {/* stand the caption under its own figures, not under the "or" that
+              introduced them - see .pd-basis-indent */}
+          {alt && <span className="pd-vs pd-basis-indent" aria-hidden="true">or </span>}
+          {note}
+        </p>
+      )}
     </React.Fragment>
   );
 }
