@@ -72,6 +72,7 @@
 // .build/assimilate-essential-vi.mjs resolves a new tracker row's
 // `releaseUrl` against that index instead.
 import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync } from "node:fs";
+import vm from "node:vm";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -94,13 +95,34 @@ async function sucuriSolve(body, u) {
   const m = body.match(/S='([A-Za-z0-9+/=]+)'/);
   if (!m) throw new Error(`sucuri interstitial at ${u} but no challenge payload`);
   const code = Buffer.from(m[1], "base64").toString("utf8");
+  // The decoded payload is REMOTE JavaScript, so never eval it in this
+  // process: under the old new Function(...) runner it could read
+  // process.env (tokens in CI) or exfiltrate over the network. Run it in a
+  // dedicated vm realm instead — the realm gets fresh ECMAScript intrinsics
+  // but no process/require/Buffer/fetch — with only the three host objects
+  // the challenge legitimately touches. 1s timeout caps a hostile (or
+  // newly-broken) payload that loops forever.
   let pair = "";
-  const fn = new Function("document", "location", "String", code);
-  fn(
-    { set cookie(v) { if (!pair) pair = v.split(";")[0]; } },
-    { reload() {} },
-    String,
-  );
+  const doc = {};
+  Object.defineProperty(doc, "cookie", {
+    set(v) { if (!pair) pair = String(v).split(";")[0]; },
+    get() { return ""; },
+  });
+  const ctx = vm.createContext({
+    document: doc,
+    location: { reload() {} },
+    // atob/btoa are pure string functions the payload may use; Buffer is
+    // deliberately NOT provided — a payload reaching for it is not a cookie
+    // challenge.
+    atob: (s) => Buffer.from(String(s), "base64").toString("binary"),
+    btoa: (s) => Buffer.from(String(s), "binary").toString("base64"),
+  });
+  vm.runInContext("globalThis.window = globalThis", ctx);
+  try {
+    vm.runInContext(code, ctx, { timeout: 1000 });
+  } catch (err) {
+    throw new Error(`sucuri challenge at ${u} failed to execute in the sandbox: ${err.message}`);
+  }
   if (!pair.startsWith("sucuri_cloudproxy_")) throw new Error(`sucuri challenge at ${u} solved to unexpected cookie: ${pair.slice(0, 60)}`);
   return pair;
 }
