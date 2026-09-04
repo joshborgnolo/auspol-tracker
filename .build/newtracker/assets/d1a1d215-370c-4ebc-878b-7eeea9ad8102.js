@@ -622,11 +622,12 @@ function cycMonthLabel(m) {
   return m + " months in";
 }
 
-/* The calendar month a cycle month lands on. Only ever shown when a single
-   cycle is on the chart: with six terms overlaid, "month 11" is the whole
-   point of the alignment and a date would belong to only one of them. Alone,
-   the reader is looking at one term and counting forward from an election date
-   they have to remember is work the tooltip can just do.
+/* The calendar month a cycle month lands on. Only ever shown when one line
+   carries the chart: a lone cycle on the board, or one past term brought
+   forward of the ribbon. With six terms overlaid, "month 11" is the whole
+   point of the alignment and a date would belong to only one of them; but
+   when the reader is looking at one term and counting forward from an
+   election date they have to remember, that is work the tooltip can just do.
    Named from the election month rather than by adding days, because the
    buckets behind the line are averaged months (365.25/12) - this is the month
    the bucket sits in, not an exact date. */
@@ -1187,6 +1188,15 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
     || (pastForward.length === 1
         ? pastForward[0]
         : (pastForward.length === 0 ? drawnCycles.find((c) => c.current) || null : null));
+  /* The tooltip's calendar month attaches for exactly the same reason events
+     do: a date belongs to a single line's count-forward. Solo is the
+     no-ribbon case; with the ribbon running, one past term brought forward
+     of the band is again a single line the date can follow. The resting
+     ribbon state keeps the bare month-in count – the sitting term was never
+     brought forward, it simply always draws – and two lifted terms share
+     no calendar, so the suffix vanishes there the way the events do. */
+  const tipCycle = solo
+    || (banded && pastForward.length === 1 ? pastForward[0] : null);
   const cycleEvents = eventCycle
     ? (CYC_EVENTS[eventCycle.year] || [])
         .filter((e) => !e.metrics || e.metrics.includes(M.key))
@@ -1657,7 +1667,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
         series={built} spine={CYC_SPINE} scatter={scatter} events={cycleEvents}
         areas={bandAreas || undefined}
         tooltipTitle={(i) => cycMonthLabel(CYC_SPINE[i].x)
-                             + (solo ? " – " + cycMonthOf(solo.eDate, CYC_SPINE[i].x) : "")}
+                             + (tipCycle ? " – " + cycMonthOf(tipCycle.eDate, CYC_SPINE[i].x) : "")}
         fmt={M.fmt}
       />
       {/* one solo term in the frame: how thick its newspaper record is, when the
