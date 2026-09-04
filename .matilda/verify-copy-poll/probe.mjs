@@ -83,10 +83,16 @@ const PRELUDE = (tag) => `
       const d = pc.getImageData(0, 0, probe.width, probe.height).data;
       const seen = new Set();
       /* ink bounds, back in physical pixels: the card's chrome is an even
-         56-physical-px margin on every side, with the header near the top
-         edge and the site's name near the bottom */
+         56-physical-px margin on every side, the panel fills the middle,
+         and the site's name signs the bottom right. footX tracks the
+         signature on its own: its glyphs sit 62-84 physical px above the
+         sheet's bottom edge, inside a 40-120px strip the panel's bottom
+         edge (142px up) never enters */
       const ink = { minX: Infinity, minY: Infinity, maxX: -1, maxY: -1 };
+      const footTop = probe.height - 30, footBot = probe.height - 10;
+      let footX = -1;
       for (let y = 0, i = 0; y < probe.height; y++) {
+        const inFoot = y >= footTop && y <= footBot;
         for (let x = 0; x < probe.width; x++, i += 4) {
           const r = d[i], g = d[i + 1], b = d[i + 2], a = d[i + 3];
           if (a > 128 && (r < 245 || g < 245 || b < 245)) {
@@ -94,11 +100,13 @@ const PRELUDE = (tag) => `
             if (x > ink.maxX) ink.maxX = x;
             if (y < ink.minY) ink.minY = y;
             if (y > ink.maxY) ink.maxY = y;
+            if (inFoot && x > footX) footX = x;
           }
           seen.add(((r << 24) | (g << 16) | (b << 8) | a) >>> 0);
         }
       }
       window.__probePaints.push({ w: this.width, h: this.height, colors: seen.size,
+        footX: footX * 4,
         ink: { minX: ink.minX * 4, maxX: ink.maxX * 4, minY: ink.minY * 4, maxY: ink.maxY * 4 } });
     } catch (e) { window.__probePaints.push({ error: String(e) }); }
     return ofBlob.call(this, cb, type, q);
@@ -218,17 +226,20 @@ try {
     /* the card's chrome: one tight, EVEN margin on all four sides (28
        logical = 56 physical px outward), and one even INSET for the ink:
        the copy-wide pin lets the measure run the content box, so side
-       ink = (28 card + 24 panel pad) = 52 logical = 104 physical, and
-       the footer signature right-aligns to that same padding line. The
-       top adds the panel's 28px padding band = 112 plus line leading */
+       ink = (28 card + 24 panel pad) = 52 logical = 104 physical. The
+       footer signature parks DEEPER than the padding line - 80 logical =
+       160 physical in from the right edge. The top adds the panel's 28px
+       padding band = 112 plus line leading */
     const card = paints[paints.length - 1];
     console.log("  card ink bounds:", JSON.stringify(card.ink), "h =", card.h);
     const inInk = (v) => card.ink && v >= 44 && v <= 84;
     const sideInk = (v) => card.ink && v >= 88 && v <= 120;
     const topInk = (v) => card.ink && v >= 96 && v <= 136;
+    const footInk = (v) => card.ink && card.footX > 0 && v >= 150 && v <= 182;
     check("left edge: card margin + panel padding", sideInk(card.ink.minX), true);
     check("right edge: ink keeps the same inset", sideInk(2400 - card.ink.maxX), true);
     check("top edge: card margin + panel padding", topInk(card.ink.minY), true);
+    check("footer signature: the deeper 160px right inset", footInk(2400 - card.footX), true);
     check("footer sits one margin above the bottom edge", inInk(card.h - card.ink.maxY), true);
     ok("no ink crosses the card margin", card.ink && card.ink.minX >= 48 && card.ink.minY >= 48 &&
        2400 - card.ink.maxX >= 48 && card.h - card.ink.maxY >= 48, card.ink);

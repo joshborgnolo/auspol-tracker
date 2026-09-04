@@ -373,14 +373,14 @@
       }
 
       /* the site only signs the footer, since the image travels and the
-         page it came from does not. The signature sits on the panel's
-         own padding line (24px in from the content edge, per template's
-         .poll-detail rule), so the sheet's ink inset is one measure on
-         every side */
+         page it came from does not. The signature parks 80px in from the
+         sheet's edge (28 margin + 52) - deeper than the panel's padding
+         line at 52, which still read as edge-aligned at the card's
+         scale */
       c.font = "600 15px " + model.fontFamily;
       c.fillStyle = inkVar("--pd-ink-2");
       c.textAlign = "right";
-      c.fillText("auspoltracker.com", CARD_W - PAD - 24, H - PAD - 3);
+      c.fillText("auspoltracker.com", CARD_W - PAD - 52, H - PAD - 3);
       c.textAlign = "left";
 
       cv.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob returned null"))), "image/png");
