@@ -2068,7 +2068,12 @@ function sampleValue(x) {
    Where the citation in the row (`url`) is something else: the
    RedBridge/Accent waves cite their AFR write-up but publish the report on
    accent-research.com, and the Capital Brief-commissioned DemosAU waves cite
-   the Capital Brief piece but publish their report PDF on demosau.com. */
+   the Capital Brief piece but publish their report PDF on demosau.com.
+
+   "Here" takes a capital because it OPENS a value, like every other value in
+   the band ("The Guardian", "26-31 Aug", "None. Outside..."); lower case read
+   as a sentence fragment against them. The second link in a release row sits
+   mid-sentence after "and", so it stays lower case. */
 function releaseMetaRows(r) {
   const relRows = [];
   if (r.releaseUrl) relRows.push(
@@ -2080,7 +2085,7 @@ function releaseMetaRows(r) {
             one row: the wave's own release first, then the collection every
             dated release files under */}
         <a className="pd-release" href={r.releaseUrl} target="_blank" rel="noopener noreferrer">
-          here<span className="plink-mark" aria-hidden="true">↗</span>
+          Here<span className="plink-mark" aria-hidden="true">↗</span>
         </a>
         {r.releaseHub ? (
           <React.Fragment>
@@ -2108,7 +2113,7 @@ function releaseMetaRows(r) {
       <span className="pd-meta-k" title="Australian Polling Council methodology statement">APC statement</span>
       <span className="pd-meta-v">
         <a className="pd-release" href={r.methodUrl} target="_blank" rel="noopener noreferrer">
-          here<span className="plink-mark" aria-hidden="true">↗</span>
+          Here<span className="plink-mark" aria-hidden="true">↗</span>
         </a>
       </span>
     </span>

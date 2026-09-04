@@ -11364,7 +11364,12 @@ function sampleValue(x) {
    Where the citation in the row (`url`) is something else: the
    RedBridge/Accent waves cite their AFR write-up but publish the report on
    accent-research.com, and the Capital Brief-commissioned DemosAU waves cite
-   the Capital Brief piece but publish their report PDF on demosau.com. */
+   the Capital Brief piece but publish their report PDF on demosau.com.
+
+   "Here" takes a capital because it OPENS a value, like every other value in
+   the band ("The Guardian", "26-31 Aug", "None. Outside..."); lower case read
+   as a sentence fragment against them. The second link in a release row sits
+   mid-sentence after "and", so it stays lower case. */
 function releaseMetaRows(r) {
   const relRows = [];
   if (r.releaseUrl) relRows.push(/*#__PURE__*/React.createElement("span", {
@@ -11379,7 +11384,7 @@ function releaseMetaRows(r) {
     href: r.releaseUrl,
     target: "_blank",
     rel: "noopener noreferrer"
-  }, "here", /*#__PURE__*/React.createElement("span", {
+  }, "Here", /*#__PURE__*/React.createElement("span", {
     className: "plink-mark",
     "aria-hidden": "true"
   }, "\u2197")), r.releaseHub ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("span", {
@@ -11417,7 +11422,7 @@ function releaseMetaRows(r) {
     href: r.methodUrl,
     target: "_blank",
     rel: "noopener noreferrer"
-  }, "here", /*#__PURE__*/React.createElement("span", {
+  }, "Here", /*#__PURE__*/React.createElement("span", {
     className: "plink-mark",
     "aria-hidden": "true"
   }, "\u2197")))));
