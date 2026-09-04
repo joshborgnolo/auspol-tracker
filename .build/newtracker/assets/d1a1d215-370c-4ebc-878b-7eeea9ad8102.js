@@ -1533,6 +1533,26 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
     : (banded ? shown.filter((c) => c.current || lifted.has(c.year)) : shown.slice())
         .sort((a, b) => (b.current ? 1 : 0) - (a.current ? 1 : 0) || a.year - b.year);
 
+  /* The two person/party overlays are drawn lines too, so the strip names
+     them in the same pill grammar — "One Nation in 2025–2026" — with the
+     span derived from the actual polls, exactly the readings the line itself
+     uses (Hanson's approve-minus-disapprove set, every wave's ON primary),
+     never a year assumed from the term's start. Each entry is gated on the
+     same condition that draws its line: Hanson whenever she is ticked and
+     rated, One Nation only while the sitting term is on the board, since
+     that line cannot draw without it. */
+  const overlayYears = (keep) => {
+    const dates = D.individualPolls.filter(keep).map((p) => p.released).sort();
+    if (!dates.length) return null;
+    const y0 = dates[0].slice(0, 4), y1 = dates[dates.length - 1].slice(0, 4);
+    return y0 + (y1 === y0 ? "" : "–" + y1);
+  };
+  const hanYears = (hanCtl && showHan) ? overlayYears((p) =>
+    p.appr && p.appr.hansonNet != null &&
+    (!p.appr.metricBy || p.appr.metricBy.hanson !== "fav")) : null;
+  const onpYears = (M.onp && showOnp && shown.some((c) => c.current))
+    ? overlayYears((p) => p.p && p.p.onp != null) : null;
+
   const cur = cycles.find((c) => c.current);
   let insight = null;
   if (cur && !hidden.has(cur.year)) {
@@ -1629,10 +1649,11 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
       </div>
       {/* What this chart is drawing, named for this chart. Absent on a solo
           board, where the readouts already carry the leader and there is no
-          second term to tell it apart from. The hover preview is deliberately
-          NOT listed: a strip that rewrote itself as the pointer crossed the
-          legend would be a flicker, not a caption. */}
-      {stripCycles.length > 0 && (
+          second term to tell it apart from – unless a ticked overlay still
+          needs naming, which it does however thin the board is. The hover
+          preview is deliberately NOT listed: a strip that rewrote itself as
+          the pointer crossed the legend would be a flicker, not a caption. */}
+      {(stripCycles.length > 0 || hanYears || onpYears) && (
         <div className="cyc-drawn">
           <span className="cyc-drawn-label">Drawn here</span>
           {stripCycles.map((c) => (
@@ -1656,6 +1677,22 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
               )}
             </span>
           ))}
+          {/* No ✕ and no year-pill: an overlay is not a term membership, so
+              the rule wears the overlay's own party colour, the name leads,
+              and it leaves the strip the way it came in – via its tickbox
+              under the chart title. */}
+          {hanYears && (
+            <span className="cyc-drawn-item fixed" style={{ "--cyc": HAN_COLOR }}>
+              <span className="cyc-drawn-rule" aria-hidden="true"></span>
+              <span className="cyc-drawn-who">{"Pauline Hanson in " + hanYears}</span>
+            </span>
+          )}
+          {onpYears && (
+            <span className="cyc-drawn-item fixed" style={{ "--cyc": HAN_COLOR }}>
+              <span className="cyc-drawn-rule" aria-hidden="true"></span>
+              <span className="cyc-drawn-who">{"One Nation in " + onpYears}</span>
+            </span>
+          )}
         </div>
       )}
       <TrendChart
