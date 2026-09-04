@@ -3478,6 +3478,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
             <circle cx="11" cy="11" r="7"></circle><path d="M21 21l-4.3-4.3"></path>
           </svg>
           <input type="text" value={q} onChange={(e) => setQ(e.target.value)}
+                 autoCorrect="off" spellCheck={false}
                  placeholder="Search anything…" aria-label="Search polls" />
           {q && <button className="ap-search-x" onClick={() => setQ("")} aria-label="Clear search">×</button>}
         </div>

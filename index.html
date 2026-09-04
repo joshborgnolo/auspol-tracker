@@ -17299,6 +17299,8 @@ function AllPollsView({
     type: "text",
     value: q,
     onChange: e => setQ(e.target.value),
+    autoCorrect: "off",
+    spellCheck: false,
     placeholder: "Search anything\u2026",
     "aria-label": "Search polls"
   }), q && /*#__PURE__*/React.createElement("button", {
