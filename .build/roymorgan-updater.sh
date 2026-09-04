@@ -68,7 +68,7 @@ if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! git push >> "$LOG" 2>&1; then
+if ! git push origin HEAD:main >> "$LOG" 2>&1; then
   log "FAIL git push (commit kept locally)"
   exit 1
 fi
