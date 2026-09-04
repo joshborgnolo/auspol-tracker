@@ -56,7 +56,18 @@ jobs:
 
       - name: Install apt packages
         if: inputs.apt_packages != ''
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ${{ inputs.apt_packages }}
+        env:
+          APT_PACKAGES: ${{ inputs.apt_packages }}
+        run: |
+          # The input travels via env, never run: interpolation (which would
+          # make shell metacharacters executable), and every token must look
+          # like a plain apt package name before apt sees it.
+          for pkg in $APT_PACKAGES; do
+            case "$pkg" in
+              *[!a-zA-Z0-9.+=:~-]*|'') echo "::error::refusing apt package name: $pkg"; exit 1 ;;
+            esac
+          done
+          sudo apt-get update -qq && sudo apt-get install -y -qq $APT_PACKAGES
 
       - name: Install puppeteer-core (best effort, for the share-card redraw)
         run: npm i puppeteer-core --prefix "$HOME" || true
@@ -119,13 +130,26 @@ jobs:
 
       - name: Install apt packages
         if: inputs.apt_packages != ''
-        run: sudo apt-get update -qq && sudo apt-get install -y -qq ${{ inputs.apt_packages }}
+        env:
+          APT_PACKAGES: ${{ inputs.apt_packages }}
+        run: |
+          # Same env-var + charset gate as the update job above.
+          for pkg in $APT_PACKAGES; do
+            case "$pkg" in
+              *[!a-zA-Z0-9.+=:~-]*|'') echo "::error::refusing apt package name: $pkg"; exit 1 ;;
+            esac
+          done
+          sudo apt-get update -qq && sudo apt-get install -y -qq $APT_PACKAGES
 
       - name: Install puppeteer-core (best effort)
         run: npm i puppeteer-core --prefix "$HOME" || true
 
+      # Pin the repair-agent CLI: a floating @latest install means a tag move
+      # (compromised or accidental) changes the code that runs with
+      # contents:write and MATILDA_API_KEY. Bump this deliberately after
+      # verifying the new release.
       - name: Install Matilda CLI
-        run: npm i -g @maincode-ai/matilda-code
+        run: npm i -g @maincode-ai/matilda-code@0.21.4
 
       - name: Run the repair agent
         env:

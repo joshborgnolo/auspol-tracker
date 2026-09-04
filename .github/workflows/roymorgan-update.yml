@@ -84,8 +84,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      # Pinned for the same reason as poll-agent.yml — bump both together.
       - name: Install Matilda CLI
-        run: npm i -g @maincode-ai/matilda-code
+        run: npm i -g @maincode-ai/matilda-code@0.21.4
 
       - name: Run the repair agent
         env:
