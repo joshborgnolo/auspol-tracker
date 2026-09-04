@@ -2151,19 +2151,31 @@ function PollLedger({ r, dirSegments }) {
           const cand = segs.filter((x) => !x.resid);
           const unc = segs.find((x) => x.resid);
           return (
-            <React.Fragment key={"p" + i}>
-              <p className="pd-s">
-                {cand.map((x, j) => (
-                  <React.Fragment key={j}>
-                    {j > 0 && <span className="pd-vs"> vs </span>}
-                    <span className="pd-grp">
-                      <b>{x.value}%</b> <span className="pd-lab">{x.label}</span><ChgParen d={x.delta} />
-                    </span>
-                  </React.Fragment>
-                ))}
-              </p>
-              {unc && <p className="pd-s pd-s-basis"><b>{unc.value}%</b> undecided</p>}
-            </React.Fragment>
+            /* The undecided share closes the SAME line as the contest it is
+               left over from, not a caption under it: unlike the two-party
+               pair's undecided (which sits inside the pair and changes how it
+               reads) this one is simply the rest of the same hundred, and a
+               line of its own gave it more weight than a residual earns.
+               Muted the way a non-party share is in first preferences - the
+               figure keeps the section's ink, the word steps back. */
+            <p className="pd-s" key={"p" + i}>
+              {cand.map((x, j) => (
+                <React.Fragment key={j}>
+                  {j > 0 && <span className="pd-vs"> vs </span>}
+                  <span className="pd-grp">
+                    <b>{x.value}%</b> <span className="pd-lab">{x.label}</span><ChgParen d={x.delta} />
+                  </span>
+                </React.Fragment>
+              ))}
+              {unc && (
+                <React.Fragment>
+                  {", "}
+                  <span className="pd-grp pd-s-note">
+                    <b>{unc.value}%</b> <span className="pd-lab">undecided</span>
+                  </span>
+                </React.Fragment>
+              )}
+            </p>
           );
         })}
       </PdSec>
