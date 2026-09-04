@@ -3409,9 +3409,13 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
      surface. The badge is small, high-tracked type – it needs the headroom. */
   background: var(--surface);
 }
+/* the two board-wide controls share one line and one voice - both are ways
+   of re-cutting the same set, not a primary and a secondary */
+.cyc-actions { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; }
 .cyc-showall {
   margin-top: 10px; border: 0; background: none; cursor: pointer; font-family: var(--sans);
   font-size: 12.5px; font-weight: 600; color: var(--accent); padding: 2px 0;
+  text-align: left;
 }
 .cyc-showall:hover { text-decoration: underline; }
 /* The chart fills take their theme from here, not from the component: the
@@ -14816,6 +14820,8 @@ function CycleLegend({
   toggle,
   showAll,
   hideAll,
+  showOutcome,
+  outcomeShown,
   shapes,
   banded
 }) {
@@ -14913,11 +14919,18 @@ function CycleLegend({
     strokeWidth: "1.9",
     strokeDasharray: "2 3.4",
     opacity: "0.85"
-  })), /*#__PURE__*/React.createElement("span", null, "Past terms: mean of the set, middle half and middle 80%")), /*#__PURE__*/React.createElement("button", {
+  })), /*#__PURE__*/React.createElement("span", null, "Past terms: mean of the set, middle half and middle 80%")), /*#__PURE__*/React.createElement("div", {
+    className: "cyc-actions"
+  }, /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "cyc-showall",
     onClick: anyHidden ? showAll : hideAll
-  }, anyHidden ? "Show all cycles" : "Remove all cycles"));
+  }, anyHidden ? "Show all cycles" : "Remove all cycles"), /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "cyc-showall",
+    title: "Terms whose government was " + (outcomeShown === "returned" ? "turned out" : "returned") + " at the election that ended it. The sitting term has not " + "faced its election, so it is in neither set.",
+    onClick: () => showOutcome(outcomeShown === "returned" ? "ousted" : "returned")
+  }, outcomeShown === "returned" ? "Show ousted governments only" : "Show re-elected governments only")));
 }
 
 /* ---- Past-cycles download ---------------------------------------------
@@ -15479,6 +15492,31 @@ function PastCyclesView() {
     setLifted(new Set());
   };
 
+  /* ---- the board by what the term's government did at its own election ----
+     A term's outcome is not stored anywhere, and should not be: the outcome
+     of a term IS the start of the one after it, so a flag would be a second
+     copy free to disagree with the run of CYCLE_DEFS. A government was
+     RETURNED when the next term is governed by the same party and TURNED OUT
+     when it is not. The sitting term has no next term and so no outcome - it
+     belongs to neither set, and "only" is taken to mean only. */
+  const outcomeOf = i => {
+    const next = cycles[i + 1];
+    if (!next) return null;
+    return next.gov === cycles[i].gov ? "returned" : "ousted";
+  };
+  const yearsWith = which => new Set(cycles.filter((c, i) => outcomeOf(i) === which).map(c => c.year));
+  const showOutcome = which => {
+    const keep = yearsWith(which);
+    setHidden(new Set(cycles.filter(c => !keep.has(c.year)).map(c => c.year)));
+    setLifted(new Set());
+  };
+  /* DERIVED, not stored: which filter the board is showing is a fact about
+     `hidden`, so it survives a shared ?c= link and cannot fall out of step
+     when a chip is picked off by hand afterwards. */
+  const sameYears = (a, b) => a.size === b.size && [...a].every(y => b.has(y));
+  const onBoard = new Set(cycles.filter(c => !hidden.has(c.year)).map(c => c.year));
+  const outcomeShown = sameYears(onBoard, yearsWith("returned")) ? "returned" : sameYears(onBoard, yearsWith("ousted")) ? "ousted" : null;
+
   /* The source-polls file respects the chips: it is built from the terms on
      the board, so a hidden term's polls stay out of the download just as
      its line is out of the chart. (The row-fetch inside cycleSourceRows
@@ -15524,6 +15562,8 @@ function PastCyclesView() {
     showAll: showAll,
     hideAll: hideAll,
     shapes: shapes,
+    showOutcome: showOutcome,
+    outcomeShown: outcomeShown,
     banded: cycBanded(cycles, hidden)
   }), /*#__PURE__*/React.createElement("div", {
     className: "cyc-charts"

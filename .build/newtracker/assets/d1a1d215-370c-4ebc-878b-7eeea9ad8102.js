@@ -1634,7 +1634,8 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
   );
 }
 
-function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, showAll, hideAll, shapes, banded }) {
+function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, showAll, hideAll,
+                      showOutcome, outcomeShown, shapes, banded }) {
   const anyHidden = hidden.size > 0;
   /* onMouseLeave clears the highlight for a pointer, and a finger never fires
      it: a term raised by a tap stayed lit on the chart until another chip
@@ -1717,14 +1718,32 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
           <span>Past terms: mean of the set, middle half and middle 80%</span>
         </div>
       )}
-      {/* One control, both directions. "Show all" existed on its own, so
-          clearing the board meant unpicking six chips one at a time – and the
-          reason to clear it is the same reason the chips exist: to compare two
-          terms without the other four behind them. */}
-      <button type="button" className="cyc-showall"
-              onClick={anyHidden ? showAll : hideAll}>
-        {anyHidden ? "Show all cycles" : "Remove all cycles"}
-      </button>
+      <div className="cyc-actions">
+        {/* One control, both directions. "Show all" existed on its own, so
+            clearing the board meant unpicking six chips one at a time – and the
+            reason to clear it is the same reason the chips exist: to compare two
+            terms without the other four behind them. */}
+        <button type="button" className="cyc-showall"
+                onClick={anyHidden ? showAll : hideAll}>
+          {anyHidden ? "Show all cycles" : "Remove all cycles"}
+        </button>
+        {/* The board cut by what the government did at its own election - the
+            comparison the tab exists for, and one nobody can assemble by eye
+            from fourteen chips. It offers the set you are NOT looking at, so
+            one control carries both cuts; the way back to every term is the
+            control beside it, which reads "Show all cycles" the moment either
+            is applied. */}
+        <button type="button" className="cyc-showall"
+                title={"Terms whose government was " +
+                       (outcomeShown === "returned" ? "turned out" : "returned") +
+                       " at the election that ended it. The sitting term has not " +
+                       "faced its election, so it is in neither set."}
+                onClick={() => showOutcome(outcomeShown === "returned" ? "ousted" : "returned")}>
+          {outcomeShown === "returned"
+            ? "Show ousted governments only"
+            : "Show re-elected governments only"}
+        </button>
+      </div>
     </div>
   );
 }
@@ -2235,6 +2254,33 @@ function PastCyclesView() {
   const showAll = () => setHidden(new Set());
   const hideAll = () => { setHidden(new Set(cycles.map((c) => c.year))); setLifted(new Set()); };
 
+  /* ---- the board by what the term's government did at its own election ----
+     A term's outcome is not stored anywhere, and should not be: the outcome
+     of a term IS the start of the one after it, so a flag would be a second
+     copy free to disagree with the run of CYCLE_DEFS. A government was
+     RETURNED when the next term is governed by the same party and TURNED OUT
+     when it is not. The sitting term has no next term and so no outcome - it
+     belongs to neither set, and "only" is taken to mean only. */
+  const outcomeOf = (i) => {
+    const next = cycles[i + 1];
+    if (!next) return null;
+    return next.gov === cycles[i].gov ? "returned" : "ousted";
+  };
+  const yearsWith = (which) =>
+    new Set(cycles.filter((c, i) => outcomeOf(i) === which).map((c) => c.year));
+  const showOutcome = (which) => {
+    const keep = yearsWith(which);
+    setHidden(new Set(cycles.filter((c) => !keep.has(c.year)).map((c) => c.year)));
+    setLifted(new Set());
+  };
+  /* DERIVED, not stored: which filter the board is showing is a fact about
+     `hidden`, so it survives a shared ?c= link and cannot fall out of step
+     when a chip is picked off by hand afterwards. */
+  const sameYears = (a, b) => a.size === b.size && [...a].every((y) => b.has(y));
+  const onBoard = new Set(cycles.filter((c) => !hidden.has(c.year)).map((c) => c.year));
+  const outcomeShown = sameYears(onBoard, yearsWith("returned")) ? "returned"
+                     : sameYears(onBoard, yearsWith("ousted")) ? "ousted" : null;
+
   /* The source-polls file respects the chips: it is built from the terms on
      the board, so a hidden term's polls stay out of the download just as
      its line is out of the chart. (The row-fetch inside cycleSourceRows
@@ -2280,6 +2326,7 @@ function PastCyclesView() {
 
       <CycleLegend cycles={cycles} hidden={hidden} lifted={lifted} hi={hi} setHi={setHi}
         chipClick={chipClick} toggle={toggle} showAll={showAll} hideAll={hideAll} shapes={shapes}
+        showOutcome={showOutcome} outcomeShown={outcomeShown}
         banded={cycBanded(cycles, hidden)} />
 
       <div className="cyc-charts">
