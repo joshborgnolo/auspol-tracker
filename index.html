@@ -2214,6 +2214,13 @@ body.dark .poll-detail {
   color: var(--pd-ink-2); white-space: nowrap;
 }
 .pd-meta-v { min-width: 0; font-weight: 400; color: var(--pd-ink); text-wrap: pretty; }
+/* n_eff. The default <sub> is sized in half-leading and pushes the line box
+   open, which in a 5px-gap list shows as one row sitting lower than the rest;
+   line-height: 0 takes it back out of the line's height. */
+.pd-meta-v sub, .info-term sub {
+  font-size: 0.72em; line-height: 0; vertical-align: -0.22em;
+  font-variant-numeric: normal;
+}
 /* the meta band is the expansion's provenance: fieldwork, published, sample
    and effective sample print at every width in both tables – fieldwork and
    sample repeat their row columns so the open panel stands alone, and what
@@ -11337,6 +11344,17 @@ function ApprLine({
   })));
 }
 
+/* "n = 1,510, n_eff = 1,053" – the sample the pollster reported and, where it
+   files one with the Australian Polling Council, what that sample is worth
+   after its own weighting. Shared by both tables so the two bands cannot
+   drift. n_eff is set as a true subscript rather than borrowed from the
+   Unicode subscript block, which has no "f". */
+function sampleValue(x) {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, x.sample != null ? "n = " + x.sample.toLocaleString() : x.sampleEff == null ? "—" : null, x.sampleEff != null && /*#__PURE__*/React.createElement("span", {
+    title: "Effective sample as published by the pollster (APC methodology statement)"
+  }, x.sample != null && ", ", "n", /*#__PURE__*/React.createElement("sub", null, "eff"), " = ", x.sampleEff.toLocaleString()));
+}
+
 /* The pollster's own pages, as rows for the provenance band. Built here, in
    the file both tables share, but rendered INSIDE each table's own
    .pd-meta-items so they land in the same grid as fieldwork and sample - a
@@ -11552,14 +11570,7 @@ function PollDetail({
     className: "pd-meta-k"
   }, "Sample"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
-  }, r.sample != null ? "n = " + r.sample.toLocaleString() : "—")), r.sampleEff != null && /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i",
-    title: "Effective sample as published by the pollster (APC methodology statement)"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-k"
-  }, "Effective sample"), /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-v"
-  }, "n = ", r.sampleEff.toLocaleString())), releaseMetaRows(r), r.eff && /*#__PURE__*/React.createElement(EffLines, {
+  }, sampleValue(r))), releaseMetaRows(r), r.eff && /*#__PURE__*/React.createElement(EffLines, {
     eff: r.eff
   }))), /*#__PURE__*/React.createElement(PollLedger, {
     r: r,
@@ -12298,6 +12309,7 @@ Object.assign(window, {
   ChgParen,
   releaseMetaRows,
   EffLines,
+  sampleValue,
   // the archive prints publication stamps too, and there is only one way to
   // write one
   pubStamp
@@ -15262,22 +15274,18 @@ function ArchPollDetail({
   }) || /*#__PURE__*/React.createElement("span", {
     className: "pd-est",
     title: "Publication date not recorded for this poll \u2013 showing the last day of fieldwork"
-  }, p.fullDate))), /*#__PURE__*/React.createElement("span", {
+  }, p.fullDate))),
+  /*#__PURE__*/
+  /* one row: the raw count and what it is worth after weighting are one
+     fact about one sample (builder shared with Latest polls) */
+  React.createElement("span", {
     className: "pd-meta-i",
     key: "sample"
   }, /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-k"
   }, "Sample"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
-  }, p.sample != null ? "n = " + p.sample.toLocaleString() : "—")), p.sampleEff != null && /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-i",
-    key: "eff",
-    title: "Effective sample as published by the pollster (APC methodology statement)"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-k"
-  }, "Effective sample"), /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-v"
-  }, "n = ", p.sampleEff.toLocaleString())),
+  }, window.sampleValue(p))),
   /* signed to one decimal, with a true minus (U+2212) rather than a hyphen -
      these read as figures, not as a range dash or a word break */
   p.lean != null && /*#__PURE__*/React.createElement("span", {
@@ -17288,7 +17296,7 @@ function infoTerms(D) {
   }, {
     id: "effective-sample",
     term: "Effective sample",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "How many polls the window is really worth once weighting is applied \u2013 currently", " ", L.alp2ppNEff, " of the ", L.method.nPolls, " in it. Recency, sample size and the square-root discount on repeat waves all pull it below the raw count, and it is what the ", xref("interval", "effective sample", "95% interval"), " is computed against.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "How many polls the window is really worth once weighting is applied \u2013 currently", " ", L.alp2ppNEff, " of the ", L.method.nPolls, " in it. Recency, sample size and the square-root discount on repeat waves all pull it below the raw count, and it is what the ", xref("interval", "effective sample", "95% interval"), " is computed against.", " ", "A single poll carries its own version of the same idea, written n", /*#__PURE__*/React.createElement("sub", null, "eff"), " beside its sample in the poll breakdown: the effective sample its pollster files with the Australian Polling Council, describing what that one sample is worth rather than what the window is.")
   }, {
     id: "house-effect",
     term: "House effect",

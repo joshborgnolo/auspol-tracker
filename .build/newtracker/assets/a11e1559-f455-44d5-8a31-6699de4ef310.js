@@ -2040,6 +2040,25 @@ function ApprLine({ id, appr, chg }) {
   );
 }
 
+/* "n = 1,510, n_eff = 1,053" – the sample the pollster reported and, where it
+   files one with the Australian Polling Council, what that sample is worth
+   after its own weighting. Shared by both tables so the two bands cannot
+   drift. n_eff is set as a true subscript rather than borrowed from the
+   Unicode subscript block, which has no "f". */
+function sampleValue(x) {
+  return (
+    <React.Fragment>
+      {x.sample != null ? "n = " + x.sample.toLocaleString()
+                        : (x.sampleEff == null ? "—" : null)}
+      {x.sampleEff != null && (
+        <span title="Effective sample as published by the pollster (APC methodology statement)">
+          {x.sample != null && ", "}n<sub>eff</sub> = {x.sampleEff.toLocaleString()}
+        </span>
+      )}
+    </React.Fragment>
+  );
+}
+
 /* The pollster's own pages, as rows for the provenance band. Built here, in
    the file both tables share, but rendered INSIDE each table's own
    .pd-meta-items so they land in the same grid as fieldwork and sample - a
@@ -2248,12 +2267,11 @@ function PollDetail({ r }) {
           </span>
           {r.mode && <span className="pd-meta-i"><span className="pd-meta-k">Method</span>
             <span className="pd-meta-v">{r.mode}</span></span>}
+          {/* one row, because they are one fact about the same sample: the
+              raw count and what it is worth after weighting. A row of its own
+              made the effective sample look like a separate measurement. */}
           <span className="pd-meta-i"><span className="pd-meta-k">Sample</span>
-            <span className="pd-meta-v">{r.sample != null ? "n = " + r.sample.toLocaleString() : "—"}</span></span>
-          {r.sampleEff != null && <span className="pd-meta-i"
-               title="Effective sample as published by the pollster (APC methodology statement)">
-            <span className="pd-meta-k">Effective sample</span>
-            <span className="pd-meta-v">n = {r.sampleEff.toLocaleString()}</span></span>}
+            <span className="pd-meta-v">{sampleValue(r)}</span></span>
           {releaseMetaRows(r)}
           {/* the wave's pull on the standing aggregates closes the band –
               last rows of the same grid as the provenance above */}
@@ -2903,7 +2921,7 @@ function PollsterTable() {
 Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
-  PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows, EffLines,
+  PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows, EffLines, sampleValue,
   // the archive prints publication stamps too, and there is only one way to
   // write one
   pubStamp });

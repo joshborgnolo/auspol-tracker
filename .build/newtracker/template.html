@@ -2123,6 +2123,13 @@ body.dark .poll-detail {
   color: var(--pd-ink-2); white-space: nowrap;
 }
 .pd-meta-v { min-width: 0; font-weight: 400; color: var(--pd-ink); text-wrap: pretty; }
+/* n_eff. The default <sub> is sized in half-leading and pushes the line box
+   open, which in a 5px-gap list shows as one row sitting lower than the rest;
+   line-height: 0 takes it back out of the line's height. */
+.pd-meta-v sub, .info-term sub {
+  font-size: 0.72em; line-height: 0; vertical-align: -0.22em;
+  font-variant-numeric: normal;
+}
 /* the meta band is the expansion's provenance: fieldwork, published, sample
    and effective sample print at every width in both tables – fieldwork and
    sample repeat their row columns so the open panel stands alone, and what

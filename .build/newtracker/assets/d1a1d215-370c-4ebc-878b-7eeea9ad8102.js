@@ -2548,12 +2548,10 @@ function ArchPollDetail({ p, onBack, backLabel }) {
              </span>}
       </span>
     </span>,
+    /* one row: the raw count and what it is worth after weighting are one
+       fact about one sample (builder shared with Latest polls) */
     <span className="pd-meta-i" key="sample"><span className="pd-meta-k">Sample</span>
-      <span className="pd-meta-v">{p.sample != null ? "n = " + p.sample.toLocaleString() : "—"}</span></span>,
-    p.sampleEff != null && <span className="pd-meta-i" key="eff"
-      title="Effective sample as published by the pollster (APC methodology statement)">
-      <span className="pd-meta-k">Effective sample</span>
-      <span className="pd-meta-v">n = {p.sampleEff.toLocaleString()}</span></span>,
+      <span className="pd-meta-v">{window.sampleValue(p)}</span></span>,
     /* signed to one decimal, with a true minus (U+2212) rather than a hyphen -
        these read as figures, not as a range dash or a word break */
     p.lean != null && <span className="pd-meta-i" key="lean"><span className="pd-meta-k">Poll lean</span>
@@ -4006,7 +4004,11 @@ function infoTerms(D) {
       <>How many polls the window is really worth once weighting is applied – currently
       {" "}{L.alp2ppNEff} of the {L.method.nPolls} in it. Recency, sample size and the square-root
       discount on repeat waves all pull it below the raw count, and it is what
-      the {xref("interval", "effective sample", "95% interval")} is computed against.</>) },
+      the {xref("interval", "effective sample", "95% interval")} is computed against.
+      {" "}A single poll carries its own version of the same idea, written
+      n<sub>eff</sub> beside its sample in the poll breakdown: the effective
+      sample its pollster files with the Australian Polling Council, describing
+      what that one sample is worth rather than what the window is.</>) },
     { id: "house-effect", term: "House effect", body: (
       <>A pollster’s own lean against the consensus of the houses polling around it, pooled from
       its polls with a 90-day half-life so recent polls count for more – the lean tracks a house’s
