@@ -469,8 +469,8 @@
        A label that is not a year belongs to an overlay, not a term: Hanson's
        line, labelled PH and named by matching the line's colour against
        LEADERS (which is where the chart took it), and One Nation's vote over
-       the current term, ending "ON ’25" and mapping in the classifier
-       below. */
+       the current term, ending the bare mark "ON" and mapping in the
+       classifier below. */
     const cycleLegend = () => {
       const AUS = window.AUSPOL || {};
       const cyc = AUS.cycles && (Array.isArray(AUS.cycles) ? AUS.cycles : Object.values(AUS.cycles));
@@ -501,13 +501,12 @@
       const entries = labels.map((t) => {
         const text = (t.textContent || "").trim();
         const fill = getComputedStyle(t).fill;
-        /* The digits are not the first word here: One Nation's overlay ends
-           "ON ’25", and digits alone would pass for the 2025 term and hang
-           that term's opposition leaders - "2025 Ley -> Taylor" - on the
-           party's vote line. The legend spreads the abbreviation the way
-           the chart's own checkbox does. */
-        if (/^ON[’ ]+\d{2}$/.test(text))
-          return { label: text.replace(/^ON/, "One Nation"),
+        /* Checked before the digits-only branch below: ON is letters, a term
+           code is always two bare digits, so the two can never collide - and
+           the wording matches the chart's own checkbox ("One Nation this
+           term"), the way the Hanson branch below matches hers. */
+        if (text === "ON")
+          return { label: "One Nation this term",
                    kind: "dashed", fill, alpha: 1, year: 9999 };
         const digits = text.replace(/[^0-9]/g, "");
         const c = !/[A-Za-z]/.test(text) && digits.length === 2 &&

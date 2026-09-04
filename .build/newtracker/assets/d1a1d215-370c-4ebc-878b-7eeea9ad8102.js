@@ -1499,7 +1499,11 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
           color: HAN_COLOR, width: 2.2, points: pts, weight: 2.5,
           smooth: false, dash: "1 3",
           opacity: 0.85,
-          endLabel: "ON ’" + String(c.year).slice(2),
+          /* No year: this line is only ever the CURRENT term (c is found by
+             .find(x => x.current) above), so a year suffix here never
+             distinguished one reading from another - it only repeated what
+             "One Nation" already says on the checkbox that draws it. */
+          endLabel: "ON",
           endLabelOpacity: 0.8,
         });
       }

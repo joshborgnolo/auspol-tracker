@@ -69,7 +69,7 @@ try {
   const all = await onBoard();
   check("every term is on the board to start", all.length, RETURNED.length + OUSTED.length + 1);
   check("the control offers the re-elected cut first", await label(),
-        "Show re-elected governments only");
+        "Show returned governments only");
 
   await press(); await new Promise((r) => setTimeout(r, 350));
   check("re-elected only leaves exactly the governments that were returned",
@@ -83,7 +83,7 @@ try {
   check("ousted only leaves exactly the governments that were turned out",
         await onBoard(), OUSTED);
   check("…and it offers the re-elected cut again", await label(),
-        "Show re-elected governments only");
+        "Show returned governments only");
 
   /* the two cuts must not overlap and must not between them claim the
      sitting term - that is the whole content of "no outcome yet" */
@@ -102,7 +102,7 @@ try {
   await page.evaluate(`document.querySelector(".cyc-chip .cyc-x").click()`);
   await new Promise((r) => setTimeout(r, 350));
   check("a hand-picked chip drops the cut, so the label resets", await label(),
-        "Show re-elected governments only");
+        "Show returned governments only");
 } finally {
   await browser.close();
   server.close();
