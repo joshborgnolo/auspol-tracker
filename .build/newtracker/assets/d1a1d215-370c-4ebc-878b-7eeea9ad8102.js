@@ -2052,7 +2052,7 @@ function AccuracyPanel() {
   const earlier = byRecency.slice(5);
 
   return (
-    <section className="card acc-card">
+    <section className="card acc-card" id="final-polls">
       <div className="card-head">
         <div>
           <h2 className="card-title">How the final polls did</h2>
@@ -2399,6 +2399,13 @@ function PastCyclesView() {
   const exportSource = () => D.loadCycleSource().then(() => downloadCsv(
     `auspol-tracker-cycles-source-polls-${D.latest.updatedISO}.csv`, cycleSourceRows(shownCycles, D)));
 
+  /* Always simply scroll: the accuracy card mounts with the view, so unlike
+     the archive's house-lean jump there is no facet to switch first. */
+  const jumpToAcc = () => {
+    const el = document.getElementById("final-polls");
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <div className="view view-cycles">
       <div className="view-intro">
@@ -2418,6 +2425,18 @@ function PastCyclesView() {
           the ✕ beside it takes the term off the board altogether. Leave one term on the
           board to see its full detail.
         </p>
+        {/* the .ap-jump pill shape is global, so the cycles intro reuses it
+            directly – the archive-only .ap-jumps wrapper is not */}
+        <div className="cyc-jumps">
+          <button className="ap-jump" onClick={jumpToAcc}
+                  title="Scroll down to the how-the-final-polls-did panel">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+                 strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M12 4v13M12 17l-5-5M12 17l5-5"></path>
+            </svg>
+            Jump to how the final polls did
+          </button>
+        </div>
         <div className="cyc-controls">
           <TextToggle value={mode} onChange={setMode} ariaLabel="Measure"
             options={[{ id: "abs", label: "Absolute level" }, { id: "chg", label: "Change since election" }]} />

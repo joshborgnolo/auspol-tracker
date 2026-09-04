@@ -3153,6 +3153,8 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 .view-lede strong { color: var(--ink); font-weight: 600; }
 
 /* ---------- Past cycles ---------- */
+/* .ap-jumps' spacing mirror for the cycles intro's own down-pill(s) */
+.cyc-jumps { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .cyc-controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
 /* Download pair. .ap-export carries margin-left:auto for the archive's own
    layout, so it is reset here – inside this group the buttons sit together and
@@ -3476,8 +3478,8 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-jump:hover { color: var(--ink); border-color: var(--ink-3); background: color-mix(in oklch, var(--ink) 7%, var(--surface)); }
 .ap-jump svg { stroke: currentColor; }
 /* jump targets get .next-polls' 72px clearance so the sticky tabs never
-   swallow a panel title */
-.ap-var, .ap-lean { scroll-margin-top: 72px; }
+   swallow a panel title (.acc-card is the cycles view's own jump target) */
+.ap-var, .ap-lean, .acc-card { scroll-margin-top: 72px; }
 /* ---------- archive filter bar ---------- */
 /* One row at rest. Search stays visible because it cuts across every facet;
    everything else is a button that names its own state and opens a panel of
