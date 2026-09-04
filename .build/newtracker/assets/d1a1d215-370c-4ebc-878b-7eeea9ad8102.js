@@ -3114,13 +3114,13 @@ const LEAN_MEASURES = [
 ];
 const LEAN_MEASURE_META = {
   tpp: { phrase: "the 2PP", above: "lean-band-alp", below: "lean-band-lnp",
-         ground: "The ground is Labor red / Coalition blue around zero: a house inside the blue band runs ahead of the consensus on the Coalition's 2PP (pushes the 2PP toward them), inside the red band ahead on Labor's." },
-  alp: { phrase: "Labor's primary vote", above: "lean-band-alp", below: "lean-band-ink",
-         ground: "The ground colours the side of zero a house sits on: inside the red band it runs ahead of the consensus on Labor's primary vote, below zero it trails it." },
-  lnp: { phrase: "the Coalition's primary vote", above: "lean-band-lnp", below: "lean-band-ink",
-         ground: "The ground colours the side of zero a house sits on: inside the blue band it runs ahead of the consensus on the Coalition's primary vote, below zero it trails it." },
-  onp: { phrase: "One Nation's primary vote", above: "lean-band-onp", below: "lean-band-ink",
-         ground: "The ground colours the side of zero a house sits on: inside the tinted band it runs ahead of the consensus on One Nation's primary vote, below zero it trails it." },
+         ground: "The ground is Labor red / Coalition blue around zero: a house inside the blue band runs ahead of the consensus on the Coalition’s 2PP (pushes the 2PP toward them), inside the red band ahead on Labor’s." },
+  alp: { phrase: "Labor’s primary vote", above: "lean-band-alp", below: "lean-band-ink",
+         ground: "The ground colours the side of zero a house sits on: inside the red band it runs ahead of the consensus on Labor’s primary vote, below zero it trails it." },
+  lnp: { phrase: "the Coalition’s primary vote", above: "lean-band-lnp", below: "lean-band-ink",
+         ground: "The ground colours the side of zero a house sits on: inside the blue band it runs ahead of the consensus on the Coalition’s primary vote, below zero it trails it." },
+  onp: { phrase: "One Nation’s primary vote", above: "lean-band-onp", below: "lean-band-ink",
+         ground: "The ground colours the side of zero a house sits on: inside the tinted band it runs ahead of the consensus on One Nation’s primary vote, below zero it trails it." },
 };
 
 function HouseLeanPanel({ rangeId }) {
@@ -3170,8 +3170,8 @@ function HouseLeanPanel({ rangeId }) {
         <div>
           <h3 className="ap-var-title">House lean</h3>
           <p className="card-sub">
-            How far each pollster sits from the consensus of the houses polling around it
-            {"on " + meta.phrase}, estimated month by month – the same
+            How far each pollster sits from the consensus of the houses polling around it{" "}
+            {"on " + meta.phrase}, estimated month by month – the same{" "}
             <button type="button" className="hi-term"
               onClick={() => window.AP.openTerm && window.AP.openTerm("house-effect", "House lean")}>house effect</button>{" "}
             the aggregates subtract, shown as it has walked. The chart above spreads the houses
