@@ -24,7 +24,8 @@
 // oppPpm} with nulls where a wave didn't ask; quotes are whole-percentage
 // integers like the term's other readings. Re-runs are no-ops. Dry-run by
 // default; --apply writes data/polls.json.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { writeAtomic } from "./atomic-write.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const TERM = ["2022-05-23", "2025-05-03"];          // Albanese sworn in .. election day
@@ -120,4 +121,4 @@ console.log(`inserted leadership-only rows: ${inserted.length} (${fmtIns(inserte
 console.log(`cycleApproval.${APPR_KEY} total: ${D.cycleApproval[APPR_KEY].length}`);
 if (missedCsv.length) console.log("UNACCOUNTED CSV ROWS:", missedCsv.map((r) => r.date + "|" + r.firm).join("; "));
 if (APPLY && (enriched.length || inserted.length))
-  writeFileSync("data/polls.json", JSON.stringify(D, null, 2) + "\n");
+  writeAtomic("data/polls.json", JSON.stringify(D, null, 2) + "\n");

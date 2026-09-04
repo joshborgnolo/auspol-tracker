@@ -42,7 +42,8 @@
 //
 // Re-runs are no-ops: a candidate is skipped when its date+firm already sits in
 // the cycle. Dry-run by default; --apply writes data/polls.json.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { writeAtomic } from "./atomic-write.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const CSV = "data/galaxy-federal-pre2012.csv";
@@ -135,5 +136,5 @@ console.log(`\nleft in the CSV as transcript only: ${skipped.length}`);
 for (const s of skipped) console.log(`  - ${s}`);
 
 if (!APPLY) { console.log("\ndry run — pass --apply to write data/polls.json"); process.exit(0); }
-writeFileSync("data/polls.json", JSON.stringify(D, null, 2) + "\n");
+writeAtomic("data/polls.json", JSON.stringify(D, null, 2) + "\n");
 console.log("\nwrote data/polls.json");

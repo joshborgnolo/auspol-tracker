@@ -12,6 +12,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { writeAtomic } from "../atomic-write.mjs";
 import { impliedAlp2pp } from "./flows.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -2224,10 +2225,10 @@ window.AUSPOL = (function () {
   };
 })();
 `;
-fs.writeFileSync(DATA_ASSET, out);
+writeAtomic(DATA_ASSET, out);
 /* Sidecar, inlined by build.mjs as an application/json block. Kept out of the
    JS module on purpose – see the note beside loadCycleSource above. */
-fs.writeFileSync(CYCLE_SOURCE_ASSET, JSON.stringify(cycleSource));
+writeAtomic(CYCLE_SOURCE_ASSET, JSON.stringify(cycleSource));
 
 /* ---- sanity summary ---------------------------------------------------- */
 console.log("cycle leader splits:", CYCLE_DEFS.map((c) => {

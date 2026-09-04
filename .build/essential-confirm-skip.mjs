@@ -26,7 +26,8 @@
 // Usage: node .build/essential-confirm-skip.mjs '<ESSENTIAL_STATUS json>'
 // The status JSON must include latest_report_date (extractor >= Sep 2026).
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { writeAtomic } from "./atomic-write.mjs";
 import { fileURLToPath } from "node:url";
 
 // fileURLToPath, not URL.pathname: the working copy's path carries a space,
@@ -115,6 +116,6 @@ if (list.includes(slotISO)) {
 }
 list.push(slotISO);
 list.sort();
-writeFileSync(pollsPath, JSON.stringify(polls, null, 2) + "\n");
+writeAtomic(pollsPath, JSON.stringify(polls, null, 2) + "\n");
 console.log(`SKIP-CONFIRMED ${slotISO}: extractor says the publisher's newest report is ${status.latest_report_date.slice(0, 10)} ("${status.latest_report_title || "?"}"), Sydney gate passed; appended to pollsterRules.Essential.skippedSlots`);
 process.exit(3);

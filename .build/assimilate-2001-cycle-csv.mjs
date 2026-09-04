@@ -46,7 +46,8 @@
 // cycleApproval rows ({date,firm,pmNet,oppNet,pmPpm,oppPpm}) with nulls where
 // a wave didn't ask. Re-runs are no-ops (dedupe on date+firm). Dry-run by
 // default; --apply writes data/polls.json.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { writeAtomic } from "./atomic-write.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const TERM = ["2001-11-10", "2004-10-09"];          // 2001 election day .. 2004 election day
@@ -214,4 +215,4 @@ console.log(`null onp: ${viFresh.filter((r) => r.onp == null).length} of ${viFre
 console.log(`null oppNet: ${apFresh.filter((r) => r.oppNet == null).length} of ${apFresh.length} fresh · null ppm: ${apFresh.filter((r) => r.pmPpm == null).length}`);
 if (dropped.length) console.log(`dropped: ${dropped.join("; ")}`);
 if (APPLY && (viFresh.length || apFresh.length || !process.env.NO_WRITE))
-  writeFileSync("data/polls.json", JSON.stringify(D, null, 2) + "\n");
+  writeAtomic("data/polls.json", JSON.stringify(D, null, 2) + "\n");

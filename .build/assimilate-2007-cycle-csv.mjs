@@ -24,7 +24,8 @@
 // table, the convention every other cycle array already follows. Re-runs are
 // no-ops: a candidate is skipped when its date+firm already sits in the
 // cycle. Dry-run by default; --apply writes data/polls.json.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { writeAtomic } from "./atomic-write.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const TERM = ["2007-11-24", "2010-08-21"];          // 2007 election day .. 2010 election day
@@ -113,4 +114,4 @@ console.log(`existing ${cycle.length} · candidates ${rows.length} · new ${fres
 if (dropped.length) console.log(`dropped: ${dropped.join("; ")}`);
 if (fresh.length) console.log(`span ${fresh.map((r) => r.date).sort()[0]} → ${fresh.map((r) => r.date).sort().at(-1)} · cycle total ${merged.length}`);
 if (APPLY && fresh.length)
-  writeFileSync("data/polls.json", JSON.stringify(D, null, 2) + "\n");
+  writeAtomic("data/polls.json", JSON.stringify(D, null, 2) + "\n");

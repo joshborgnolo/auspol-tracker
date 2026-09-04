@@ -46,6 +46,7 @@
 //
 // Dry-run by default; --apply writes data/polls.json and a provenance file.
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { writeAtomic } from "./atomic-write.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const DAY = 86400000;
@@ -257,7 +258,7 @@ for (const [k, sec] of Object.entries(report)) {
 
 if (APPLY && total) {
   const out = JSON.stringify(D, null, 2) + "\n";
-  writeFileSync("data/polls.json", out);
+  writeAtomic("data/polls.json", out);
   console.log(`wrote data/polls.json (${(out.length / 1e6).toFixed(2)} MB)`);
 }
 if (APPLY) {

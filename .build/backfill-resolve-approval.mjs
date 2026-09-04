@@ -9,7 +9,8 @@
 // 2. Re-date tracker Resolve waves that were keyed off a date one day from
 //    the CSV's wave date (publication-date convention; values already match,
 //    only dates drifted). Applies to cyclePolls and cycleApproval.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { writeAtomic } from "./atomic-write.mjs";
 
 const APPLY = process.argv.includes("--apply");
 
@@ -105,7 +106,7 @@ anomalies.forEach((a) => console.log("  !", a));
 
 if (APPLY && anomalies.length === 0) {
   const out = JSON.stringify(polls, null, 2) + "\n";
-  writeFileSync("data/polls.json", out);
+  writeAtomic("data/polls.json", out);
   console.log(`wrote data/polls.json (${(out.length / 1e6).toFixed(2)} MB)`);
 } else if (APPLY) {
   console.error("ABORTED: resolve anomalies before applying");

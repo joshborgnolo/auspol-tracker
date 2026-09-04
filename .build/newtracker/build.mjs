@@ -19,6 +19,7 @@ import crypto from "node:crypto";
 import { createRequire } from "node:module";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { writeAtomic } from "../atomic-write.mjs";
 import { validate } from "./validate.mjs";
 
 const require = createRequire(import.meta.url);
@@ -128,7 +129,7 @@ const faceCss = FONTS.map((f) => {
   const buf = fs.readFileSync(path.join(HERE, "fonts", f.file));
   const name = f.file.replace(/\.woff2$/, `.${hash8(buf)}.woff2`);
   fontKeep.add(name);
-  fs.writeFileSync(path.join(FONT_DIR, name), buf);
+  writeAtomic(path.join(FONT_DIR, name), buf);
   const href = `assets/fonts/${name}`;
   /* Only the two faces that paint text on the way in are preloaded. The italic
      serif sets a handful of small labels, so it can arrive with the rest of
@@ -541,7 +542,7 @@ for (const old of fs.readdirSync(path.join(ROOT, "assets"))) {
   if (/^cycle-source\..*\.json$/.test(old) && old !== cycleSrcName)
     fs.unlinkSync(path.join(ROOT, "assets", old));
 }
-fs.writeFileSync(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
+writeAtomic(path.join(ROOT, "assets", cycleSrcName), cycleSourceJson);
 parts.push(`<script>window.AP_CYCLE_SRC=${JSON.stringify("assets/" + cycleSrcName)};<\/script>`);
 for (const f of ["react.production.min.js", "react-dom.production.min.js"])
   parts.push(`<script>${inlineJs(fs.readFileSync(path.join(HERE, "vendor", f), "utf8"))}</script>`);
@@ -557,7 +558,7 @@ for (const f of JSX)
 if (!html.includes("<!--SCRIPTS-->")) throw new Error("SCRIPTS marker not found in template");
 html = html.replace("<!--SCRIPTS-->", parts.join("\n  "));
 
-fs.writeFileSync(OUT, html);
+writeAtomic(OUT, html);
 
 /* ---- 5b. feed.xml – one item per poll ----------------------------------
    The page is a single document that changes in place, so there was no way to
@@ -621,7 +622,7 @@ ${items}
   </channel>
 </rss>
 `;
-fs.writeFileSync(path.join(ROOT, "feed.xml"), feed);
+writeAtomic(path.join(ROOT, "feed.xml"), feed);
 
 /* ---- 5c. robots.txt + sitemap.xml – be findable -------------------------
    A single-page site is trivially mappable, but a crawler still has to learn
@@ -671,8 +672,8 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   </url>
 </urlset>
 `;
-fs.writeFileSync(path.join(ROOT, "sitemap.xml"), sitemapXml);
-fs.writeFileSync(path.join(ROOT, "robots.txt"),
+writeAtomic(path.join(ROOT, "sitemap.xml"), sitemapXml);
+writeAtomic(path.join(ROOT, "robots.txt"),
   `User-agent: *\nAllow: /\n\nSitemap: ${SITE_URL}sitemap.xml\n`);
 
 /* ---- 6. report --------------------------------------------------------- */

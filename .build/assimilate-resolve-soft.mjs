@@ -6,7 +6,8 @@
 // Tolerant ±2d date matching, same as the approval backfill: the tracker's
 // Resolve waves are keyed on publication date while the CSV keys the wave's
 // own date, and the two drift by a day in either direction on some waves.
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { writeAtomic } from "./atomic-write.mjs";
 
 const APPLY = process.argv.includes("--apply");
 
@@ -43,6 +44,6 @@ if (misses.length) console.log("(waves without a reading are left without a 'sof
 
 if (APPLY) {
   const out = JSON.stringify(D, null, 2) + "\n";
-  writeFileSync("data/polls.json", out);
+  writeAtomic("data/polls.json", out);
   console.log(`wrote data/polls.json (${(out.length / 1e6).toFixed(2)} MB)`);
 }

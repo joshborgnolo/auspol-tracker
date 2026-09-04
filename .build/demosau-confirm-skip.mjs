@@ -35,7 +35,8 @@
 //
 // Usage: node .build/demosau-confirm-skip.mjs '<DEMOSAU_STATUS json>'
 
-import { readFileSync, writeFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { writeAtomic } from "./atomic-write.mjs";
 import { fileURLToPath } from "node:url";
 
 // fileURLToPath, not URL.pathname: the working copy's path carries a space,
@@ -128,6 +129,6 @@ if (list.includes(slotYm)) {
 }
 list.push(slotYm);
 list.sort();
-writeFileSync(pollsPath, JSON.stringify(polls, null, 2) + "\n");
+writeAtomic(pollsPath, JSON.stringify(polls, null, 2) + "\n");
 console.log(`SKIP-CONFIRMED ${slotYm}: the publisher's newest wave is ${newest}, the ${closeISO} 05:00-Sydney gate passed; appended to pollsterRules.DemosAU.skippedMonths`);
 process.exit(3);

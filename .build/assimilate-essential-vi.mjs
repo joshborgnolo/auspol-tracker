@@ -51,6 +51,7 @@
 // both only when something changed (a no-op --apply writes nothing, so the
 // updater can run it on index drift without dirtying the working tree).
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { writeAtomic } from "./atomic-write.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const DAY = 86400000;
@@ -348,7 +349,7 @@ console.log(`skipped approval: ${skippedApprDateDup.length} date-dup, ${skippedA
 const touched = added.length + retro.length + addedAppr.length + addedDir.length;
 if (APPLY && touched) {
   const out = JSON.stringify(D, null, 2) + "\n";
-  writeFileSync("data/polls.json", out);
+  writeAtomic("data/polls.json", out);
   console.log(`wrote data/polls.json (${(out.length / 1e6).toFixed(2)} MB)`);
 }
 if (APPLY && touched) {
