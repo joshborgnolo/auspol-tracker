@@ -534,9 +534,9 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
 // y-windows are fitted to the real data per metric+mode (see cycDomain) –
 // fixed windows clip real history (e.g. net approval spans −44…+41)
 const CYC_METRICS = [
-  /* The "Approve minus disapprove" half of the approval subs is attached at
-     render time as a tap-to-define link – keeping it in the string here would
-     leave it as dead text. */
+  /* The tap-to-define "approval" link is composed into the fan caption at
+     render time (see cardSub) – keeping it in the string here would leave
+     it as dead text. */
   { key: "net", title: "Prime minister net approval", sub: "Sitting prime minister",
     unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
     step: 20, refAbs: 0, refAbsLabel: "even" },
@@ -1197,20 +1197,32 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
      line is made of: "selected" once any cycle chip is off, the outcome
      filter's scope when the board has been cut to one outcome (a filter is
      itself a selection, but names its own clause instead), and the old
-     static subtitle when the board is so thin there is no fan at all. */
+     static subtitle when the board is so thin there is no fan at all. The
+     start year tracks the earliest term left on the board, and the word
+     "approval" carries the tap-to-define glossary link. */
   const cardSub = (() => {
     if (M.key !== "net" && M.key !== "oppnet") return M.sub;
     if (!banded) return M.sub;
     const office = M.leader === "opp" ? "opposition leader" : "prime minister";
-    const hist = office + " net approval since 1987";
+    const firstYear = Math.min(...pastShown.map((c) => c.year));
+    const hist = (
+      <>
+        {office}{" net "}
+        <button type="button" className="hi-term"
+                title="What the approval question asks"
+                onClick={() => window.AP.openTerm &&
+                  window.AP.openTerm("approval", M.title)}>approval</button>
+        {" since "}{firstYear}
+      </>
+    );
     if (outcomeShown === "returned")
-      return "With a fan chart of historical " + hist
-        + ", for terms at the end of which the government was returned";
+      return <>{"With a fan chart of historical "}{hist}
+        {", for terms at the end of which the government was returned"}</>;
     if (outcomeShown === "ousted")
-      return "With a fan chart of historical " + hist
-        + ", for terms at the end of which the government was ousted";
-    return "With a fan chart of " + (hidden.size ? "selected historical " : "historical ")
-      + hist;
+      return <>{"With a fan chart of historical "}{hist}
+        {", for terms at the end of which the government was ousted"}</>;
+    return <>{"With a fan chart of "}
+      {hidden.size ? "selected historical " : "historical "}{hist}</>;
   })();
   /* Hanson's tickbox follows her data, not the board: her series belongs to
      the current term, but she is a person-toggle, not a property of the 2025
@@ -1543,12 +1555,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
       <div className="card-head cycle-head">
         <div>
           <h2 className="card-title">{M.title}</h2>
-          <p className="card-sub">{cardSub}{(M.key === "net" || M.key === "oppnet") && (
-            <>{" · "}<button type="button" className="hi-term"
-                     title="What the approval question asks"
-                     onClick={() => window.AP.openTerm &&
-                       window.AP.openTerm("approval", M.title)}>Approve minus disapprove</button></>
-          )}</p>
+          <p className="card-sub">{cardSub}</p>
           {hanCtl && (
             <label className={"pg-check cyc-han" + (showHan ? " on" : "")}
                    title={"Pauline Hanson, on the same approve-minus-disapprove basis. " +
