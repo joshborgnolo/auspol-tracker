@@ -88,7 +88,7 @@ const inlineJs = (code) => code.replace(/<\/script/gi, "<\\/script");
 /* ---- 4. template ------------------------------------------------------- */
 let html = fs.readFileSync(path.join(HERE, "template.html"), "utf8");
 
-/* -- fonts: 10 @font-face rules over 10 files -> 6 latin faces -------------
+/* -- fonts: one hashed, cache-forever file per latin-subset face ------------
    These used to be base64'd into the stylesheet. woff2 is already compressed,
    so base64 added a third to each file and gzip could not win it back: the
    three faces were ~157KB of the ~490KB the page cost over the wire, they
@@ -113,8 +113,9 @@ const FONTS = [
   { file: "ibmplexsans-latin.woff2",            family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
   /* Source Sans 3 has two callers: the .wordmark lockup, which keeps its
      pre-swap face, and the whole expanded poll breakdown (--panel), which
-     needs 400/500/600/700 - all inside this one variable cut. */
-  { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800", preload: true },
+     needs 400/500/600/700 - all inside this one variable cut. Neither paints
+     the first screen, so no preload. */
+  { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800" },
   /* Archivo is retired: the expanded poll breakdown was its only consumer and
      that panel is now set in Source Sans 3 throughout. The source subset stays
      in fonts/ so re-registering it is a one-line change. */
@@ -131,9 +132,10 @@ const faceCss = FONTS.map((f) => {
   fontKeep.add(name);
   writeAtomic(path.join(FONT_DIR, name), buf);
   const href = `assets/fonts/${name}`;
-  /* Only the two faces that paint text on the way in are preloaded. The italic
-     serif sets a handful of small labels, so it can arrive with the rest of
-     the page rather than competing with it for the first connections. */
+  /* Only the faces that paint text on the way in are preloaded. The italic
+     serif sets a handful of small labels, and Source Sans 3 waits for the
+     expanded breakdown, so both can arrive with the rest of the page rather
+     than competing with it for the first connections. */
   if (f.preload) fontLinks.push(`<link rel="preload" href="${href}" as="font" type="font/woff2" crossorigin>`);
   return `@font-face {
   font-family: '${f.family}';
@@ -149,15 +151,16 @@ for (const old of fs.readdirSync(FONT_DIR)) {
   if (/\.woff2$/.test(old) && !fontKeep.has(old)) fs.unlinkSync(path.join(FONT_DIR, old));
 }
 
-const faceStart = html.indexOf("@font-face");
-const faceEnd = html.lastIndexOf("}", html.indexOf("</style>", faceStart)) + 1;
-if (faceStart < 0 || faceEnd <= faceStart) throw new Error("font block not found");
-html = html.slice(0, faceStart) + faceCss + html.slice(faceEnd);
+/* Splice the generated faces in at an explicit marker, like the static
+   summary and the scripts below. The old splice found the first @font-face
+   (a decoy "splice-anchor" rule the template carried for exactly this) and
+   cut to the last } before the next </style> – correct, but only while the
+   template kept that block's shape in lockstep with this arithmetic.
+   Function replacer: face css could carry $-patterns for the string form. */
+if (!html.includes("/*FONTFACES*/")) throw new Error("FONTFACES marker not found in template");
+html = html.replace("/*FONTFACES*/", () => faceCss);
 
-// -- head: drop the vestigial Google preconnects (the faces are served from
-//    this origin, so these were two pointless handshakes to Google), and give
-//    it a tab icon + a share card --
-html = html.replace(/\s*<link rel="preconnect" href="https:\/\/fonts\.(googleapis|gstatic)\.com"[^>]*>/g, "");
+// -- head: give the page a tab icon + a share card --
 
 /* Tab icon: the masthead glyph itself, drawn from the same aggregates and the
    same geometry, so it re-draws with the data instead of drifting away from it.
@@ -507,7 +510,9 @@ const metaDesc = `Aggregated opinion polling for the next Australian federal ele
    title candidate whose text equals og:site_name when og:title exists (its
    site-name de-dup), so "auspol tracker" here disqualified the h1 and let
    "Two-party preferred" win. The domain keeps the two distinct. */
-html = html.replace('<meta property="og:type" content="website">',
+const OG_ANCHOR = '<meta property="og:type" content="website">';
+if (!html.includes(OG_ANCHOR)) throw new Error("og:type meta anchor not found in template");
+html = html.replace(OG_ANCHOR,
   `<meta name="description" content="${metaDesc}">
   <meta property="og:type" content="website">
   <meta property="og:description" content="${metaDesc}">
