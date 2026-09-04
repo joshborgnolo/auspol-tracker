@@ -403,10 +403,19 @@ const existingRows = existingBody.filter(Boolean).map(parseLine);
 // (1) legacy leader_performance: relabel Morrison-era rows as the opposition
 // leader's; drop the post-2022-08 overlap with Q17. (4) drop previously
 // committed corrupt Q22 rows for the 2021 waves, same as for fresh rows.
-let legacyRenamed = 0, legacyDropped = 0, wiwExistingDropped = 0;
+// (5) also rename legacy primary_vote 2026-02-12 rows — the defect-5 rename
+// above only covers freshly parsed rows, and rows committed before it would
+// otherwise leak the Ley counterfactual into primary_vote forever.
+let legacyRenamed = 0, legacyDropped = 0, wiwExistingDropped = 0, legacyLey = 0;
 const legacyFixed = [];
 for (const r of existingRows) {
   if (r.dataset === "who_will_win" && r.date <= "2021-07-18") { wiwExistingDropped++; continue; }
+  if (r.dataset === "primary_vote" && r.date === "2026-02-12") {
+    r.dataset = "primary_vote_ley_scenario";
+    legacyLey++;
+    legacyFixed.push(r);
+    continue;
+  }
   if (r.dataset !== "leader_performance") { legacyFixed.push(r); continue; }
   if (r.date >= "2022-08-21") { legacyDropped++; continue; }
   r.dataset = "opp_leader_performance";
@@ -530,7 +539,7 @@ else if (changed) {
   console.log(`updated ${OUT}: kept ${existingRows.length} existing rows, added ${rowsOut.length}, wrote ${merged.length} total (${legacyFixed.length + rowsOut.length - merged.length} dupes)`);
 } else console.log(`no change: ${OUT} unchanged (${merged.length} rows)`);
 
-console.log(`drops/renames: wiw-corrupt-2021=${wiwCorrupt2021} wiw-existing-dropped=${wiwExistingDropped} legacy-relabelled=${legacyRenamed} legacy-dropped=${legacyDropped} ley-scenario=${leyScenario} wiw-zero-second-warn=${wiwZeroSecond}`);
+console.log(`drops/renames: wiw-corrupt-2021=${wiwCorrupt2021} wiw-existing-dropped=${wiwExistingDropped} legacy-relabelled=${legacyRenamed} legacy-dropped=${legacyDropped} ley-scenario=${leyScenario} ley-scenario-legacy=${legacyLey} wiw-zero-second-warn=${wiwZeroSecond}`);
 console.log(`subsections: election-2025-points=${electionPoints} verbatim-comments-skipped=${verbatimCount}`);
 console.log(`merge: value_conflicts=${valueConflicts} rep_rounding=${repRounding} meta_drift=${metaDrift} wiw_restored=${wiwRestored} leader_names=${leaderNameResolutions} leader_name_fallbacks=${leaderNameFallbacks} scheme=${VALUE_SCHEME}`);
 if (valueConflicts) console.log(`conflicts by dataset: ${[...conflictFams.entries()].sort((a, b) => b[1] - a[1]).map(([d, n]) => `${d}=${n}`).join(" ")}`);
@@ -561,6 +570,7 @@ console.log(`RPM_STATUS ${JSON.stringify({
   legacy_relabelled: legacyRenamed,
   legacy_dropped: legacyDropped,
   ley_scenario_rows: leyScenario,
+  ley_scenario_legacy_rows: legacyLey,
   wiw_zero_second_warn: wiwZeroSecond,
   election_points: electionPoints,
   verbatim_comments_skipped: verbatimCount,

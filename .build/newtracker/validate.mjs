@@ -24,6 +24,7 @@ export function validate(D) {
 
   let prevTs = -Infinity, prevDate = null;
   const seen = new Set();
+  const seenRelease = new Map();
 
   D.polls.forEach((p, i) => {
     const where = `#${i} ${p.date} · ${p.pollster}`;
@@ -95,6 +96,20 @@ export function validate(D) {
     const key = p.date + "|" + p.pollster;
     if (seen.has(key)) fail("duplicate", "same date + pollster already present");
     seen.add(key);
+    // 4b. duplicate release event: one house's two rows sharing one
+    //     `published` timestamp means two tracker waves for one published
+    //     wave – a mis-keyed date, or a scenario/counterfactual pair leaked
+    //     in as if it were a second wave (the Resolve Feb-2026 Ley pair,
+    //     filed 02-12 and 02-14 off the one 15-Feb release). Check 4 can't
+    //     see it because the dates differ; the estimator sees two waves and
+    //     double-weights the house. Rows without `published` can't be keyed
+    //     to a release, so they're out of scope here.
+    if (p.published != null) {
+      const rk = p.pollster + "|" + p.published;
+      if (seenRelease.has(rk))
+        fail("same-release", `shares published=${p.published} with the ${seenRelease.get(rk)} row – one release, two waves`);
+      seenRelease.set(rk, p.date);
+    }
     // 5. real polls carry a sample size. Rows the updaters assimilate from a
     //    house's published dataset legitimately have none (the feed doesn't
     //    carry one) and declare themselves via `assimilated` instead.
