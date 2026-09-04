@@ -2361,7 +2361,12 @@ body.dark .poll-detail {
 /* the basis of a figure – what was allocated, what stayed undecided – is a
    caption to the line above, not a tail on it. Trailing a parenthesis off the
    end of a 40px pair pushed the headline into a second line for a footnote. */
-.pd-s.pd-s-basis { margin-top: 9px; color: var(--pd-ink-2); font-size: var(--pd-body); }
+/* A caption belongs to the line ABOVE it, and at the same 9px as the gap
+   between two separate pairs it sat equidistant between the two - reading as
+   a third item in the run rather than as a note on the second. 3px binds it
+   up; the next pair still gets the full 9px from .pd-s + .pd-s, so the
+   grouping is now visible in the spacing instead of only in the words. */
+.pd-s.pd-s-basis { margin-top: 3px; color: var(--pd-ink-2); font-size: var(--pd-body); }
 /* a caption's figure still steps above its words, but not to the full figure
    size - the basis is about the measure above it and must not out-shout it */
 .pd-s.pd-s-basis b { font-size: var(--pd-fig); }
