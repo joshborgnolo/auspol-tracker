@@ -1216,9 +1216,9 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
     const cap = lead + ", with a historical fan chart for " + (gapped ? "selected" : "all")
       + " previous terms since " + firstYear;
     if (outcomeShown === "returned")
-      return cap + ", for terms at the end of which the government was returned";
+      return cap + " that ended in a returned government";
     if (outcomeShown === "ousted")
-      return cap + ", for terms at the end of which the government was ousted";
+      return cap + " that ended in an ousted government";
     return cap;
   })();
   /* Hanson's tickbox follows her data, not the board: her series belongs to
