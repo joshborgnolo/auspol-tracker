@@ -2377,9 +2377,12 @@ function PastCyclesView() {
   };
   /* DERIVED, not stored: which filter the board is showing is a fact about
      `hidden`, so it survives a shared ?c= link and cannot fall out of step
-     when a chip is picked off by hand afterwards. */
+     when a chip is picked off by hand afterwards. The sitting term stands
+     outside the comparison on both sides – it has no outcome to filter by
+     and never feeds the fan, so toggling its chip must not read as a change
+     of filter. */
   const sameYears = (a, b) => a.size === b.size && [...a].every((y) => b.has(y));
-  const onBoard = new Set(cycles.filter((c) => !hidden.has(c.year)).map((c) => c.year));
+  const onBoard = new Set(cycles.filter((c) => !hidden.has(c.year) && !c.current).map((c) => c.year));
   const outcomeShown = sameYears(onBoard, yearsWith("returned")) ? "returned"
                      : sameYears(onBoard, yearsWith("ousted")) ? "ousted" : null;
 
