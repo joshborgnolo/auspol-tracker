@@ -104,12 +104,14 @@ export function validate(D) {
     //      RedBridge/Accent wave's usrfiles.com report PDF, DemosAU's
     //      statement PDF off its methodology-statements index, Essential's
     //      ONE living disclosure-statement PDF shared by every covered wave
-    //      – refreshed in place when the house re-uploads it) – an absolute
-    //      https URL, stamped by extract-sampleeff.mjs, never by hand. Only
-    //      those houses have a source to link.
+    //      – refreshed in place when the house re-uploads it, Fox &
+    //      Hedgehog's per-wave APC statement off its news-den release
+    //      page, hand-entered – that house has no extractor) –
+    //      an absolute https URL, stamped by extract-sampleeff.mjs for
+    //      the automated houses. Only those houses have a source to link.
     if (p.methodUrl != null && (typeof p.methodUrl !== "string" || !/^https:\/\/.+\..+\//.test(p.methodUrl)))
       fail("method-url", `methodUrl = ${JSON.stringify(p.methodUrl)}`);
-    if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge / Accent", "RedBridge / Accent (MRP)", "DemosAU", "DemosAU (MRP)", "Essential"].includes(p.pollster))
+    if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge / Accent", "RedBridge / Accent (MRP)", "DemosAU", "DemosAU (MRP)", "Essential", "Fox & Hedgehog"].includes(p.pollster))
       fail("method-url", `methodUrl on a row for ${p.pollster}`);
     // 2d. sampleEff (the house's published effective sample size) is a whole
     //     number never below 200 and never above its own raw sample – a
