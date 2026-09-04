@@ -118,6 +118,9 @@ After `node .build/newtracker/build.mjs` (validator runs inside, should print
 ## Companion copy
 
 The per-house undecided-basis explanation ("set aside" / "inside the pair" /
-"not firm") lives in the Info glossary `infoTerms()` "Undecided" term in the
-`d1a1d215` asset (~line 2911) — same commit `9f316a9`. If the basis taxonomy
-changes, that term is its only home (static-summary has no glossary mirror).
+"not firm") has TWO homes since 7a3451f (2026-09-02): the Info glossary
+`infoTerms()` "Undecided" term in the `d1a1d215` asset (~line 2911, same commit
+`9f316a9`) AND the poll breakdown itself — an Essential row's 2PP line now states
+"undecided N% inside the pair" inline via `tppLines` (the primaries tail is gated
+to non-"tpp" bases). If the basis taxonomy changes, BOTH homes move together; see
+the auspol-undecided-basis-display skill for the full three-base system.

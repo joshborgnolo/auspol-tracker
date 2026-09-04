@@ -16,6 +16,12 @@ extracted_at: '2026-09-03T00:00:00.000Z'
   `node .build/refresh-morgan-archive.mjs` (offline: `--offline`, uses
   `.build/morgan-archive-src/` cache and leaves data/roymorgan/*.csv byte-identical when
   the cache is unchanged). See auto-skill-roymorgan-table-mirror.
+- `feedback/index.html` — standalone report-an-error form (moved out of the main page's
+  footer, `1394856`), hand-maintained. Posts to Formspree; `?msg=` URL prefill is the
+  inbound deep link the archive-row "report" anchors target. Same static-article chrome
+  (no tabs strip; 680px column; fb-* form CSS ported from template.html). Its trailing
+  ss-note sentence is one of the strap-line's eleven homes — auto-skill-auspol-strapline-copy — and
+  curly-apostrophe copy rules apply even to its <meta> descriptions (user-audited).
 - `newspoll-archive/index.html` — **redirect stub only** (meta refresh + JS
   `location.replace`, hash-aware: `#acnielsen` → /archives/acnielsen/, everything else →
   /archives/newspoll/). Hand-maintained. Deliberately NOT in the sitemap.
@@ -124,9 +130,12 @@ EACH of light and dark (`page.emulateMediaFeatures`):
    server-side woff2 log shows crimsontext-600 served and NO sourceserif4/sourcesans3
    requests.
 
-Expected output: `ALL CHECKS PASSED` (exit 0). Morgan's column max-width is asserted at
-1200px, the others at 680px and at parity with the live `.static-summary`. Headless Chrome
-defaults to DARK — the dual-scheme loop is load-bearing.
+Expected output: `ALL CHECKS PASSED` (exit 0). Each page's column max-width is asserted
+against its own PAGES entry (newspoll/acnielsen 680px, morgan 1200px, galaxy/trove 1080px,
+all deliberate) — key ANY width exemption on `spec.maxw === "680px"`, NEVER on page name:
+the original `spec.name !== "morgan"` exemption 4-FAILED the moment galaxy/trove shipped.
+Only maxw-680 pages get the "aligns with live .static-summary" parity check; wide pages
+skip it. Headless Chrome defaults to DARK — the dual-scheme loop is load-bearing.
 
 ## Self-hosted archival assets (04c5208 → f86d9b5)
 

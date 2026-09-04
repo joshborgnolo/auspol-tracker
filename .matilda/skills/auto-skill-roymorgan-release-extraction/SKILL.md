@@ -119,8 +119,9 @@ model + generic display path).
 - **Verified series** (wave-date → ALP%/ONP%): 05-17 54/46 · 05-24 53.5/46.5 · 05-31 53.5/46.5
   · 06-07 53.5/46.5 · 06-14 53/47 · 06-21 51/49 · 06-28 53/47 · 07-05 56/44 · 07-12 52.5/47.5
   · 07-19 55/45 · 07-26 53.5/46.5 · 08-02 54/46 · 08-09 53/47 · 08-16 53/47 · 08-23 53/47
-  · 08-30 55.5/44.5. Gaps remaining in `altTpp` at hand-off: exactly **05-24 and 08-30** —
-  NOT the 14 initially assumed (the array was audited row by row before planning).
+  · 08-30 55.5/44.5. The two hand-off gaps (**05-24, 08-30** — NOT the 14 initially assumed)
+  were both closed on ship day 2026-08-31 (below): the series is continuous
+  2026-05-17 → 2026-08-30 (16 waves) in `altTpp`.
 
 **Shipped design (2026-08-31):** parse in a block beside the flows block; guard
 `onp Σ=100±1.0` + `tpp_onp in 40–65` like the other 2PP guards; append
@@ -131,11 +132,16 @@ gate is `newRows.length || altAdds.length`; anchor-seen-but-pair-unparsed pushes
 `onpPairMissing` to `status.warnings`, mirroring `flowsPairMissing`. One guard nuance: for a
 wave whose polls row ALREADY exists, only the onp pair's guards are enforced, not the full
 suite (historic rows predate some checks — a full re-guard would block the altTpp self-heal
-on era-shifted rows). Only 05-24 needs a hand-backfill row (`alpVsOnp_alp: 53.5`,
-date-ordered) — its release fell out of the feed.
+on era-shifted rows). 08-30 self-healed on the first live run; 05-24's release had fallen
+out of the feed, so that record was hand-backfilled (`alpVsOnp_alp: 53.5`, date-ordered).
+Shipped + pushed in commit `8ae19cb` (extractor + polls.json + rebuilt index.html + this
+skill's update).
 **Display needs zero work** — the path is house-generic already (altTpp → tppAlt →
-"2PP · ALP v ON" line + "+ALP v ON" flag + `altAlpOn` delta, exercised daily by YouGov rows);
-expect `▲2.5` on 08-30 and `▲0.5` on 05-24 once data lands.
+"2PP · ALP v ON" line + "+ALP v ON" flag + `altAlpOn` delta, exercised daily by YouGov rows).
+Verified in the built asset after landing: 08-30 carries `tppAlt {alp:55.5, onp:44.5}` with
+`altAlpOn ▲2.5` (ref 08-23); 05-24 carries `altAlpOn **−0.5**` — NOT the `▲0.5` this note
+originally predicted. The delta refs the PREVIOUS wave's value (05-17 = 54 → 53.5 = −0.5),
+so check the ref wave before hand-predicting a delta's sign.
 
 ## Verification recipe that caught the bugs
 

@@ -7,6 +7,15 @@ extracted_at: '2026-08-29T02:40:00.000Z'
 
 # Scheduling a data extractor on macOS launchd (auspol-tracker)
 
+> 2026-08-31: Roy Morgan's primary scheduler moved to **GitHub Actions**
+> (`.github/workflows/roymorgan-update.yml`, commit `5bf7bc9` + Matilda repair job) so the laptop
+> can stay shut; its launchd plist remains as backup, reconciled by an ff-only guard the wrapper
+> runs before extracting (fetch origin; if local main can't fast-forward, log "skipping slot" and
+> exit 0). The same migration is planned for resolve-rpm, demosau, essential, redbridge and the
+> coverage watchdog — see the **auspol-actions-data-pipeline** skill for the workflow template and
+> the **auspol-agent-fleet-status** skill for per-agent health and open items. Everything below
+> still applies to the local jobs.
+
 Installed by 2026-08-29: **seven** agents — `local.auspol.resolve-rpm`, `local.auspol.roymorgan`,
 `local.auspol.essential`, `local.auspol.demosau`, `local.auspol.newspoll`, `local.auspol.redbridge`,
 `local.auspol.news24` (YouGov News24 Pulse; extractor `.build/extract-news24.mjs`, wrapper

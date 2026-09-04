@@ -1,6 +1,6 @@
 ---
 name: auspol-citation-check
-description: auspol-tracker — the citation link-rot watchdog (check-citations.mjs + citation-check.yml, shipped 464d2e6) sweeps all 175 outbound polls[].url/releaseUrl/pollsterRules.site URLs weekly and ledgers verdicts in data/link-health.json. Hard-won core rules — (1) wall classification is CONTENT-keyed (bodyRe/titleRe), never status-keyed, because status codes lie in both directions (News Corp's titleless 403 crawler-bot page, news24's 404 cookie wall, x.com's 200 JS shell, thenewdaily's Cloudflare "Just a moment") and a status-pinned rule silently rots when the host swaps statuses; (2) a redirect chain's TERMINAL hop can be wall machinery, so entries carry `hops` (the intermediate redirect URLs, in chain order) — hops[0] is the publisher's own 301 1:1 mapping and the actionable rewrite candidate the wall-endpoint finalUrl would otherwise throw away. Exit classes 0/1/2 where 2 = a citation TRANSITIONED to gone; the original standing baseline (three Australia Institute PDFs gone) was adjudicated same-day — rewritten to the institute's OWN cdn.australiainstitute.org.au copies (their 2026-08-18 CDN migration) rather than Wayback snapshots — and the ledger is written only on identity-tuple change.
+description: auspol-tracker — the citation link-rot watchdog (check-citations.mjs + citation-check.yml, shipped 464d2e6) sweeps the archive's outbound polls[].url/releaseUrl/methodUrl and pollsterRules[].site/releaseHub URLs weekly (started at 175 unique polls[].url/releaseUrl/pollsterRules[].site URLs on 2026-09-01; the methodUrl and releaseHub categories joined 2026-09-02, see "Adding a sweep category") and ledgers verdicts in data/link-health.json. Hard-won core rules — (1) wall classification is CONTENT-keyed (bodyRe/titleRe), never status-keyed, because status codes lie in both directions (News Corp's titleless 403 crawler-bot page, news24's 404 cookie wall, x.com's 200 JS shell, thenewdaily's Cloudflare "Just a moment") and a status-pinned rule silently rots when the host swaps statuses; (2) a redirect chain's TERMINAL hop can be wall machinery, so entries carry `hops` (the intermediate redirect URLs, in chain order) — hops[0] is the publisher's own 301 1:1 mapping and the actionable rewrite candidate the wall-endpoint finalUrl would otherwise throw away. Exit classes 0/1/2 where 2 = a citation TRANSITIONED to gone; the original standing baseline (three Australia Institute PDFs gone) was adjudicated same-day — rewritten to the institute's OWN cdn.australiainstitute.org.au copies (their 2026-08-18 CDN migration) rather than Wayback snapshots — and the ledger is written only on identity-tuple change.
 source: auto-skill
 extracted_at: '2026-09-01T06:10:59.381Z'
 ---
@@ -120,6 +120,15 @@ field stays minimal. Design choices worth copying:
    before panicking over a "stalled" progress log, check with `ps`/`stat`
    whether a restarted process (fresh pid+lstart) is writing steadily — a
    resumed session can restart the sweep silently.
+5. Background-sweep notifications arrive LATE and out of order (2026-09-01:
+   six completions landed long after the ledger was committed and pushed,
+   including a pre-rewrite run announcing `gone: 3` — its log tail described
+   state the commit had already superseded). When several sweeps are in
+   flight (cite-live-N.log relaunches), the LAST `state changed — wrote`
+   wins the ledger file, so never trust a notification's counts after
+   overlaps: verify the tree directly (`git diff -- data/link-health.json`,
+   grep the verdict counts) before believing, committing, or re-running
+   anything on the strength of a stale tail.
 
 ## Related
 

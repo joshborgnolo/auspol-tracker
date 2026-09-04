@@ -1,6 +1,6 @@
 ---
 name: essential-report-extraction
-description: Extract Essential Report polling from essentialreport.com.au past the Sucuri CloudProxy bot wall (base64 JS-cookie challenge solved in-process via new Function with a capturing document.cookie setter, 403/429 backoff, polite pooled pacing) — WP REST reports/questions pages -> Flourish visualisation.json -> data/essential-report.csv in the Resolve 10-col schema via .build/extract-essential-report.mjs (rpm cron contract, ESSENTIAL_STATUS json). Includes the perl setsid detached long-run trick for macOS.
+description: Extract Essential Report polling from essentialreport.com.au past the Sucuri CloudProxy bot wall (base64 JS-cookie challenge solved in-process via new Function with a capturing document.cookie setter, 403/429 backoff, polite pooled pacing) — WP REST reports/questions pages -> Flourish visualisation.json -> data/essential-report.csv in the Resolve 10-col schema via .build/extract-essential-report.mjs (rpm cron contract, ESSENTIAL_STATUS json; side output .build/essential-src/report-index.json publish-date->release-page for the assimilator's releaseUrl stamping). Includes the perl setsid detached long-run trick for macOS (is_background also survived a full 20-min crawl 2026-09-01).
 source: auto-skill
 extracted_at: '2026-08-29T04:30:26.461Z'
 ---
@@ -11,6 +11,35 @@ Run `node .build/extract-essential-report.mjs [--check] [--force]` from the repo
 schema is byte-compatible with `data/resolve-political-monitor.csv`
 (`dataset,question_id,question,visual,answer,dimension,key,date,value_pct,parties`), so
 downstream consumers can treat the two CSVs uniformly.
+
+## Side output: report-index.json (added 2026-09-01, commit 2dcd752)
+
+Because the CSV can't carry URLs (byte-compatibility above), the extractor also persists
+`.build/essential-src/report-index.json`: `{ "YYYY-MM-DD": "…/reports/<slug>" }`, the WP
+publish date → wave page link for every report (99 entries on the live crawl). Written
+on ANY index drift (a renamed slug lands even on a no-change CSV day), with the same
+byte-compare + tmp+rename + `--check`-announces-only pattern as the CSV; log line
+`updated .build/essential-src/report-index.json: N reports`. The updater wrapper's
+`[ -d .build/essential-src ] && git add .build/essential-src/` sweeps it into commits.
+Consumed by `assimilate-essential-vi.mjs` to stamp `releaseUrl` on new rows
+(waveDate-or-day-before lookup — see the essential-vi-assimilator skill for the
+assimilator's retro-fill/self-repair passes, CSV approval vocab, and dup guards). Two
+traps the index
+encodes: WP `date` is UTC publish time and can key a day BEHIND the Sydney slug
+(`2025-10-28` → `29-october-2025`), and slugs are irregular (`28th-january-2026`,
+zero-padded `01-september-2026`) — so never regex URLs from dates, and search index
+VALUES when checking a slug. Typing guesses fail: `2-september-2026`,
+`2nd-september-2026` and `september-2-2026` are ALL 404 while the real slug is
+`01-september-2026`.
+
+**Release pages publish ~8h AFTER the wave's charts** (charts ~01:00 AEST Wed; the
+2026-09-01 report record is `2026-09-01T23:11:16Z` ≈ 09:11 AEST next day) — so the index
+drifts a slot AFTER the CSV wave, which is exactly the trigger the updater wrapper's
+retro-fill branch consumes (see the essential-vi-assimilator skill). To answer "is the
+release page out yet?" WITHOUT a full ~20-min crawl, hit the WP REST index directly —
+a plain curl (no Sucuri dance) is enough:
+`curl -s 'https://essentialreport.com.au/wp-json/wp/v2/reports?per_page=5&_fields=id,date,modified,link,title'`
+and compare `link`/`date` against the wave date.
 
 ## Site shape (true numbers, only visible after Sucuri is defeated)
 
@@ -75,8 +104,13 @@ no-change skip; atomic `OUT+".tmp"` + `renameSync`.
 
 ## Long-running a crawl from a Matilda session (macOS tool quirks)
 
-- The tool's `run_in_background` and `nohup … &` children both get reaped at command teardown —
-  detach with a perl setsid launcher redirecting to a log:
+- The full crawl (~20 min) exceeds the 10-min foreground command cap — a foreground run is
+  killed mid-crawl with NO output (files are written only at the end, so nothing corrupts,
+  but the turn is wasted). 2026-09-01: an `is_background: true` run survived the full
+  ~20 min and completed — try that first.
+- If background children get reaped at command teardown on your harness (observed with
+  `run_in_background` and `nohup … &` on an earlier harness), detach with a perl setsid
+  launcher redirecting to a log:
   ```sh
   perl -MPOSIX -e 'POSIX::setsid(); open(STDOUT,">","/tmp/ess.log"); open(STDERR,">&STDOUT");
     open(STDIN,"<","/dev/null"); exec "node", ".build/extract-essential-report.mjs";' &

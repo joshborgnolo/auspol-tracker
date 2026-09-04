@@ -1,8 +1,8 @@
 ---
 name: redbridge-accent-extraction
-description: Extract AFR/RedBridge Group/Accent Research monthly federal polls into data/polls.json — pre-flight "already recorded?" check, Wix Thunderbolt SPA PDF discovery via headless-Chrome CDP click on the file-upload-viewer widget (usrfiles.com URL), Table 2 live-text wave table via pdftotext (Figures 1–2 are images; tesseract installed if needed), canonical RedBridge row conventions (respondent-allocated TPP, Other→ind, ppm/approval/altTpp companion rows, tpp_flows shared with Roy Morgan since 2026-08-31 — ALP share of the 2025-flows pair), AFR topic-page cross-check for sitemap-lag detection (AFR body paywall-trimmed; figures only from Accent PDF or manual benchmarked ingest).
+description: Extract AFR/RedBridge Group/Accent Research monthly federal polls into data/polls.json — project-page slugs lost their %2C comma prefix with the Aug 2026 wave (PAGE_SLUG_RE accepts both; a wave missing from candidates = slug-format suspect before sitemap lag), pre-flight "already recorded?" check, Wix Thunderbolt SPA PDF discovery via headless-Chrome CDP click on the file-upload-viewer widget (usrfiles.com URL), Table 2 live-text wave table via pdftotext (Figures 1–2 are images; tesseract installed if needed), canonical RedBridge row conventions (respondent-allocated TPP, Other→ind, ppm/approval/altTpp companion rows, tpp_flows shared with Roy Morgan since 2026-08-31 — ALP share of the 2025-flows pair), hand-entered waves can carry placeholder companion figures (check identical-to-previous nets + detail:null), AFR topic-page cross-check for sitemap-lag detection (AFR body paywall-trimmed; figures only from Accent PDF or manual benchmarked ingest).
 source: auto-skill
-extracted_at: '2026-09-01T00:36:00.000Z'
+extracted_at: '2026-09-04T00:00:00.000Z'
 ---
 
 # RedBridge / Accent (AFR) poll extraction → data/polls.json
@@ -32,6 +32,12 @@ prepared OCR before discovering Table 2 was live text — and the wave was alrea
   `6b72024e-077a-44e2-88f5-dc1a0ed81099`). `/_api/v2/dynamicmodel` POST 403s via curl.
 - **Don't guess slugs** — wrong guesses hit Wix "Page Not Found". Enumerate the `/projects`
   index or web-search first. Slugs can contain commas (`/projects/afr%2C-redbridge-group-and-...`).
+- **Slug prefix changed 2026-08 (commit 52de606)**: Accent DROPPED the encoded comma from
+  the monthly-poll slug prefix with the August 2026 wave — `afr-redbridge-group-and-accent-
+  research-august-2026-federal-poll` vs the historical `afr%2C-redbridge-…`. `PAGE_SLUG_RE`
+  in extract-redbridge.mjs now accepts both (`/^\/projects\/afr(?:%2C)?-redbridge-…/i`).
+  Every run with the comma-only regex had silently listed the page under `skipped_slugs`;
+  a wave missing from `candidates` is now a SLUG-FORMAT suspect first, not just sitemap lag.
 - Disambiguation: `a-fragmented-electorate` = the **May 2026 MRP** release (seat projections,
   ~6k sample), NOT the monthly poll — different polls.json row (`pollster` gets `(MRP)` suffix).
 
@@ -105,13 +111,15 @@ Physical PDF page ≈ internal page + 3 (cover/TOC). Confirm with pdftotext, don
   on new waves (absent, not zero, when unprinted), and `--check` runs
   `cmp("tpp_flows", w.tppHist, matchPoll.tpp_flows)` — **any committed wave whose cache
   carries tppHist must carry tpp_flows or check reports a mismatch forever**. Backfilled
-  at the reversal straight from the PDF caches: Apr 53, May 52, Jun 55, Jul 50. **The
-  Aug 2026 wave was NOT in the PDF caches** (manual ingest — Accent sitemap lag; see
-  *Discovery gap*), and an earlier "Aug 48" note here was a misread. The user-corrected
-  benchmark (hand-entered 2026-08-31, commit `9fea364`): 2025-flows ALP **52** / LNP 48
+  at the reversal straight from the PDF caches: Apr 53, May 52, Jun 55, Jul 50. **Aug 2026
+  was hand-entered during the Accent sitemap lag** (now RESOLVED — the page appeared with
+  a comma-less slug; `PAGE_SLUG_RE` fixed and the wave cached in `52de606`, 2026-09-04;
+  see *Discovery gap*), and an earlier "Aug 48" note here was a misread. The user-corrected
+  benchmark (hand-entered 2026-08-31, commit `9fea364`; extractor VERIFIED it against the
+  PDF on 2026-09-04 with zero diffs): 2025-flows ALP **52** / LNP 48
   → `tpp_flows: 52`, respondent-allocated ALP 48 / LNP 52 → `tpp_alp`/`tpp_lnp` — i.e.
-  BOTH ALP–Coalition pairs exist for Aug 2026, hand-entered because automated discovery
-  still can't see the wave (`--check` confirms: absent from candidates, `changed:false`).
+  BOTH ALP–Coalition pairs exist for Aug 2026; they were hand-entered because automated
+  discovery couldn't yet see the wave (it can now, via the comma-less slug fix).
   A hand-entered `tpp_flows` slides between `tpp_lnp` and `url`, matching the Roy Morgan
   key order; the rebuild regenerates the `9f09dca2` boot bundle AND `index.html` —
   stage both in the data commit. TPP stays out of the
@@ -162,9 +170,12 @@ extract-news24.mjs too (see news24-extraction skill).
   (assertion-guarded, no fetch) set the two pages sitemap discovery can NEVER reach:
   `federal-political-snapshot---october-2025` (2025-10-07) and `a-fragmented-electorate`
   (the 2026-05-14 MRP wave).
-- Six waves stay absent by design: 2025-06-30 / 09-08 / 11-13 / 11-26 have no Accent page;
-  2026-03-27 / 2026-08-28 are sitemap lag (may fill later); 2026-02-12 is the
-  plain-`Redbridge` Australia Inst. series — different pollsterRule key, never matched.
+- Waves still absent by design (as of 52de606, 2026-09-04): 2025-06-30 / 09-08 / 11-13 /
+  11-26 have no Accent page; 2026-03-27 still has no project page at all (never posted to
+  the sitemap — no longer mere "lag"); 2026-02-12 is the plain-`Redbridge` Australia Inst.
+  series — different pollsterRule key, never matched. **2026-08-28 was REMOVED from this
+  list**: its page appeared with the comma-less slug and the extractor filled its
+  releaseUrl (+methodUrl via legAccentLinks off the new cache) on 2026-09-04.
 - Row dates are FIELDWORK-END, not publication — key backfills by date accordingly (the
   first attempt keyed waves by AFR pub dates like 2026-02-01 and missed; the actual row
   was 2026-01-29).
@@ -190,6 +201,16 @@ agent silently "missed" the wave and the user had to feed the figures manually).
   ingest; the cross-check exists so the wave is never *missed*, not so it can be parsed.
 - Post-ingest the cross-check is silent as designed (no fresh articles) — that's the healthy
   steady state; verify it stays silent vs falsely flagging the just-ingested wave.
+- False-positive noise (seen 2026-09-04): the AFR topic page now carries UNRELATED AFR
+  articles under the tag (careers, cars/luxury pieces) — `afrTopicNotes` flags them as
+  phantom "waves". Cosmetic wart only; not an extractor error.
+- The 2026-08-28 lag case RESOLVED 2026-09-04 (52de606): Accent DID post the project page,
+  but with a comma-LESS slug the comma-only `PAGE_SLUG_RE` couldn't match (see the
+  slug-prefix bullet) — so "wave in the AFR but not in candidates" has TWO possible causes
+  (page not yet posted, or slug-format drift). Triage: check the weekend launchd log's
+  `skipped_slugs` for a look-alike slug before hand-ingesting; and when hand-ingesting,
+  remember companion rows may get placeholder figures from the AFR coverage (see the
+  Aug-2026 approval fix in *Verification-driven data fixes*).
 
 ## Parser eras (hard-won probes against the Dec 2025→Jul 2026 wave corpus)
 
@@ -225,6 +246,17 @@ approval rows **missing entirely** from the file; July approval `detail` was eye
 corrected rows, respect validate.mjs's strict date-order per section — locate neighbours by
 querying the array (not by grepping one line) and re-run `validate.mjs` + the extractor's
 `--check` until both are clean before rebuilding.
+
+**Hand-entered waves can carry PLACEHOLDER companion figures** (Aug 2026, fixed 2026-09-04
+in 52de606): the sitemap-lag hand-ingest copied JULY's approval nets onto the August
+approval row (alb −19 / opp −6 / han −10 — bit-for-bit July's, with `detail: null`, because
+AFR coverage printed no leadership numbers). The extractor verified the wave's votes
+clean but reported the approval trio as mismatches; the Accent PDF's true figures were
+alb **−17**, opp **−3**, han **−12** (detail 31/48, 22/25, 36/48) — corrected by hand to
+match, since the extractor never overwrites committed rows. Tells of a placeholder row:
+companion values IDENTICAL to the previous wave + `detail: null` on a house that always
+prints breakdowns. A `detail: null` also silently DISABLES the extractor's detail
+comparison (`if (r.detail && w.detail)`), so null-detail rows get only the net check.
 
 ## Adjudicated ppm figures (user-verified 2026-09-01, ground truth)
 

@@ -1,8 +1,8 @@
 ---
 name: demosau-extraction
-description: DemosAU poll agent (extract-demosau.mjs) — PDF structure (trend table "May 25 Election" anchor, name-shuffling preferred-PM bar chart, two-panel head-to-head, wrapped Leader Ratings rows, image-only charts), whole-poll insertion (VI+ppm+approval), replay-test acceptance, row-url fallback for rolled-off releases, backfill of parseable-missing rows, and never silently reporting ok when a committed row can't be re-verified.
+description: DemosAU poll agent (extract-demosau.mjs) — PDF structure (trend table "May 25 Election" anchor, name-shuffling preferred-PM bar chart, two-panel head-to-head, wrapped Leader Ratings rows, image-only charts), whole-poll insertion (VI+ppm+approval), replay-test acceptance, row-url fallback for rolled-off releases, backfill of parseable-missing rows, `published` on VI rows is hand-curated only (verify via the PDF's Last-Modified header), and never silently reporting ok when a committed row can't be re-verified.
 source: auto-skill
-extracted_at: '2026-08-30T09:27:51.860Z'
+extracted_at: '2026-09-01T05:24:46.078Z'
 ---
 
 # DemosAU whole-poll extractor (.build/extract-demosau.mjs)
@@ -84,6 +84,26 @@ depend on what the index happens to list today.
 — stale caches re-derive from the committed `.txt` WITHOUT re-downloading
 (`loadWave`); `--force` re-downloads. The `.txt` files are committed: they are
 the provenance, and reparse-after-upgrade must not hit the network.
+
+## `published` on the VI rows is hand-curated — the extractor will NEVER fill it
+
+Every extractor route into `polls.json` omits `published`: the new-wave row
+builder has no such field, the matched/backfill branch regenerates only missing
+LEADERSHIP sections (ppm/approval), and existing rows are never overwritten. A
+wave committed without `published` (the hand-entered Jul 2025 wave sat that way
+until 1 Sep 2026) stays that way until a human edits the row — `DemosAU (MRP)`
+rows never carry one at all. So curation of this field is legitimate and
+expected, not a "never hand-edit polls.json" breach: add it in the house's
+convention (Sydney-local `…T HH:MM`, placed directly after `date`), then
+validate + rebuild.
+
+Verify the date from the source, not memory or the PDF text:
+`curl -sI <pdf-url> | grep -i last-modified` — WordPress's media store stamps
+the upload moment (Jul 2025: `Wed, 09 Jul 2025 02:24:30 GMT` → +10h AEST →
+`"published": "2025-07-09T12:24"`). Downstream consequences of backfilling
+(cadence/spread re-derive off the extended published tail; calDays min/max can
+only move if the new date extends them) live in the
+auspol-next-polls-projection skill.
 
 ## Replay-test acceptance (delete-and-regrow)
 

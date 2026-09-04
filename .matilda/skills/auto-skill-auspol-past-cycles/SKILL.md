@@ -1,8 +1,8 @@
 ---
 name: auspol-past-cycles
-description: auspol-tracker — Past-cycles machinery end-to-end (CYC_META → CYCLE_DEFS → 9f09dca2 data asset + root cycle-source.<hash>.json). Adding a historical cycle is ONE CYC_META row + ONE elections row in polls.json; the renderer, accuracy panel, legend and CSV export are fully data-driven — only copy strings hard-coding the count (now "ten"/"since 1996") need parallel edits. Keyed gotchas: src keys cyclePolls by term-END election, appr keys cycleApproval by term-START, ELECTIONS["e"+year] must exist for the lead-anchor, and accuracy rows are labelled by the election being CALLED (c.src), not the term-start year. The CycleChart person-toggles (Hanson '25 `hanCtl`, One Nation) are the ONE non-CYC_META part: they gate on DATA AVAILABILITY, never the cycle chips — Hanson can stand alone with every chip off (a062495). Legend chips name split terms with BOTH officeholders from c.raw.netEras joined "–" ("Rudd–Gillard", 90db0a4); D.cycles items are TRANSFORMED objects — eras/series live under .raw, never top-level. Also covers the historical ribbon (7240d7d): cycBanded ≥3-past-terms gate shared by chart+legend; drawnCycles swap; pctOf quartile stats; TrendChart areas (cyc-band lo/hi fills, class-beats-opacity-attribute theming); 'Mean of past terms' series with per-point n-of-N-tooltip notes; legend caption .cyc-band-note.
+description: auspol-tracker — Past-cycles machinery end-to-end (CYC_META → CYCLE_DEFS → 9f09dca2 data asset + root cycle-source.<hash>.json). Adding a historical cycle is ONE CYC_META row + ONE elections row in polls.json; the renderer, accuracy panel, legend and CSV export are fully data-driven — only copy strings hard-coding the count (now "ten"/"since 1996") need parallel edits. Keyed gotchas: src keys cyclePolls by term-END election, appr keys cycleApproval by term-START, ELECTIONS["e"+year] must exist for the lead-anchor, and accuracy rows are labelled by the election being CALLED (c.src), not the term-start year. The CycleChart person-toggles (Hanson '25 `hanCtl`, One Nation) are the ONE non-CYC_META part: they gate on DATA AVAILABILITY, never the cycle chips — Hanson can stand alone with every chip off (a062495). Legend chips name split terms with BOTH officeholders from c.raw.netEras joined "–" ("Rudd–Gillard", 90db0a4); D.cycles items are TRANSFORMED objects — eras/series live under .raw, never top-level. Also covers the historical ribbon (7240d7d): cycBanded ≥3-past-terms gate shared by chart+legend; drawnCycles swap; pctOf quartile stats; TrendChart areas (cyc-band lo/hi fills, class-beats-opacity-attribute theming; fill colour is the --cyc-fill variable = color-mix oklch 50/50 Labor→Coalition purple since ab4de49, one :root definition that follows theme via use-site var resolution); ('Mean of past terms' series with per-point n-of-N-tooltip notes; legend caption .cyc-band-note. Per-term event lines (CYC_EVENTS) follow ONE singled-out term via eventCycle = solo || single-forward-past || sitting-term-fallthrough (5995b8f). Card captions are measure-lead fan descriptions shared across FIVE charts (net/oppnet/ppmm/primary/tpp since a670008): approval cards lead with the literal "Approval minus disapproval" (0929fac — the rename is CAPTION-LEAD-scoped: glossary bodies, the Hanson note and the Latest-table metric link keep "approve minus disapprove" as formula words), the others lead with their own CYC_METRICS sub (ppmm "PM's lead on the preferred-PM question", tpp "Governing-party 2PP" — hyphenated); "<lead>, with a historical fan chart for all|selected previous terms since <firstYear>" where firstYear = min VISIBLE past-term year (front-trims re-anchor the year, only interior gaps flip 'all'→'selected'), outcome-filter clause " that ended in a returned/ousted government" appended last (no comma, 08f2cca); the 'net approval' glossary tap-to-define lives in the CARD TITLE h2 via .hi-term (8b36759, keep the phrase 'net approval' intact in CYC_METRICS titles or the link silently dies); `hidden` is a Set — .size/.has(), never .length; card subs live ONLY in CYC_METRICS (index.html string hits are the compiled bundle, auspol-polling.html is a different legacy page).
 source: auto-skill
-extracted_at: '2026-09-02T13:53:18.498Z'
+extracted_at: '2026-09-04T06:57:40.352Z'
 ---
 
 # Past cycles machinery (auspol-tracker)
@@ -25,6 +25,19 @@ shipping the 2007 Rudd term (commit `8c8e15c`, 2026-09-02).
    **deletes the old hash** and writes a fresh one. After any CYC_META or
    polls.json change: stage BOTH the new hash file AND the old hash's deletion
    (plus `.build/newtracker/assets/cycle-source.json`, its dev-side copy).
+   The hash ALSO rolls with no data edit of your own when a sibling
+   session's uncommitted gen-data.mjs/CYC_META WIP sits in the tree during
+   your unrelated rebuild (observed 2026-09-03, commit `ed55a03` — a
+   copy-chart.js-only change rolled 21e54581→be7ba726); the renamed
+   delete+add must still ride your index.html commit or the live page 404s
+   the fetch. Check `git status --short -- assets/` after every rebuild.
+   The INVERSE also confuses: adding a row to an EXISTING cycle's
+   cyclePolls, when the data edit landed before your rebuild, leaves
+   index.html AND assets/ untouched — the content-addressed sidecar
+   regenerates byte-identically and cycle rows never travel inside
+   index.html anyway. No diff does NOT mean the row didn't materialise;
+   grep the sidecar for the date (observed 2026-09-03 materialising the
+   Galaxy 2004-10-04 wave, see auspol-galaxy-archive).
 
 ## Keying quirks (the mistakes are all here)
 
@@ -456,8 +469,9 @@ after the two approval charts.
   c.raw.ppmPair : (isOpp ? c.oppLead : c.lead))`. Insight copy treats ppmm
   like net/oppnet (subjParty null); 010109f then narrowed the subject to
   the sitting PM ALONE with peer noun "net preference" (originally
-  "PM v OppLead" + "pairing" — read as about the contest, not the officeholder); the card-sub "Approve minus disapprove" pill stays
-  approval-only.
+  "PM v OppLead" + "pairing" — read as about the contest, not the officeholder). (The approval-only "Approve minus disapprove" pill
+  this once referred to is gone — a670008 moved the measure naming INTO
+  the caption lead itself; see the cardSub section below.)
 - **Dot-cloud sources**: current term from `individualPolls` —
   `p.ppmSets[0]` (the MAIN published pairing; the Albanese-v-Hanson H2 is
   appended last so sets[0] is safe) with the opponent found as the dynamic
@@ -495,8 +509,9 @@ pieces shipped in 7240d7d, all in d1a1d215 + template.html:
   if the two ever computed the gate individually they would disagree; keep
   the helper shared.
 - **`drawnCycles`** (CycleChart, after `shown`):
-  `banded ? shown.filter((c) => c.current || hi === c.year) : shown` — only
-  the sitting term plus any chip-hovered/tapped term keep their own lines.
+  `banded ? shown.filter((c) => c.current || lifted.has(c.year) || hi === c.year) : shown` — only
+  the sitting term plus any chip-tapped (durable `lifted`) or chip-hovered
+  (`hi`) term keep their own lines.
   The line builder flatMaps `drawnCycles` (was `shown` — that one-identifier
   rename is the whole "lines step down" half of the feature). `pastShown` /
   `bandN` stay based on `shown` regardless of `hi`: the band's membership is
@@ -520,7 +535,9 @@ pieces shipped in 7240d7d, all in d1a1d215 + template.html:
   :102-106 contract): `{id, color, opacity?, smooth?, edge?, clipX?,
   className?, points:[{x, y0, y1}]}`, rendered BEFORE gridlines and lines,
   i.e. under everything. Ours: `cyc-band-lo` (min–max) + `cyc-band-hi`
-  (IQR), `color: "var(--ink)"`, `edge: false` (no dashed outline),
+  (IQR), `color: "var(--cyc-fill)"` (was `var(--ink)` — recoloured to a
+  Labor–Coalition purple in commit ab4de49, 2026-09-03; see "Band colour"
+  below), `edge: false` (no dashed outline),
   `className: "cyc-band lo"` / `"cyc-band hi"`. Theming rides on the
   documented mechanism that a CLASS RULE beats the opacity presentation
   ATTRIBUTE (the house-lean `bands` precedent): template.html rules
@@ -543,12 +560,23 @@ pieces shipped in 7240d7d, all in d1a1d215 + template.html:
   TrendChart (~:1360) — bandAreas is `null` when unbanded.
 - **Legend caption** (`{banded && …}` inside CycleLegend, after the chip
   row): `div.cyc-band-note` `aria-hidden` with an inline 30×12 SVG key
-  mirroring the chart exactly (outer rect fill var(--ink) opacity .07,
-  inner .13, dashed var(--ink-2) line 1.9 "2 3.4") and copy "Past terms:
-  mean of the set, middle half and full spread". CSS lives with the
-  `.cyc-chip` rules in template.html; `.cyc-band-note` MUST keep
+  mirroring the chart exactly (outer rect fill var(--cyc-fill) opacity
+  .07, inner .13, dashed var(--ink-2) line 1.9 "2 3.4" — the dashed mean
+  line stays ink-2 both in the key and on the chart) and copy "Past
+  terms: mean of the set, middle half and middle 80%". CSS lives with
+  the `.cyc-chip` rules in template.html; `.cyc-band-note` MUST keep
   `width: 100%` — the legend row is flex, without it the caption rides
   inline after the last chip instead of wrapping.
+- **Band colour — `--cyc-fill` CSS variable** (template.html :root, right
+  after the party colours): `color-mix(in oklch, var(--alp) 50%,
+  var(--lnp))` — exactly halfway Labor red → Coalition blue in oklch.
+  ONE definition serves both themes: var() resolves `--alp`/`--lnp` at
+  the USE SITE, so dark mode mixes the lifted party colours with no dark
+  override needed. Consumers are exactly two places in d1a1d215: the two
+  cyc-band area fills and the two key rects (all four `fill` attributes,
+  not the JS `color:` of the mean series — that stays `var(--ink-2)`).
+  Hue-tuning is a one-line edit to the mix ratio; a revert to grey is
+  swapping `var(--cyc-fill)` back to `var(--ink)` in four spots.
 - **Lede + hint copy** (PastCyclesView): the lede's second sentence is now
   "The past terms stand together as a band – outer edge their full spread,
   darker half the middle, dotted line their mean – drawn over the months
@@ -604,12 +632,15 @@ term).
 
 ## Per-term event lines (CYC_EVENTS in d1a1d215)
 
-Board of event markers per past-term year, drawn ONLY while that term
-stands alone on the chart (SOLO panel, `CYC_EVENTS[solo.year]`); overlaid
-with other cycles an event belongs to no single line, so it hides. An
-optional `metrics: [...]` whitelist (e.g. Shorten→Albanese pins to
-`oppnet`) narrows a marker to named measures. Keys must match CYCLE_DEFS
-years. Leadership-change entries as of 2026-09-03: every pmSpl/oppSpl
+Board of event markers per past-term year, drawn whenever the chart
+resolves to ONE forward-drawn past line: the solo board
+(`shown.length === 1`) or one past term brought forward of the running
+ribbon by itself (lift/hover — shipped 5ae7d35, 2026-09-04; gate
+mechanics below). Overlaid with other forward lines an event belongs to
+no single line, so it hides; the resting ribbon (zero forward past
+lines) lifts nothing. An optional `metrics: [...]` whitelist (e.g.
+Shorten→Albanese pins to `oppnet`) narrows a marker to named measures.
+Keys must match CYCLE_DEFS years. Leadership-change entries as of 2026-09-03: every pmSpl/oppSpl
 boundary in CYCLE_DEFS now has a matching event — 1987 (Howard→Peacock
 1989-05-09, oppnet), 1990 (Hawke→Keating 1991-12-20 — swearing-in day;
 the ballot was the 19th, pmSpl's iso in gen-data stays 1991-12-19), 1993
@@ -625,6 +656,213 @@ PM-spill events are unpinned (appear on all measures); opposition-leader
 events pin `metrics: ["oppnet"]` — convention from Shorten→Albanese.
 Non-leadership events (budgets, crises) also exist under 2010/2013/
 2016/2019/2022/2025 and are a separate, unpinned set.
+
+### The events GATE's precise mechanics (5ae7d35, then 5995b8f, 2026-09-04)
+
+In CycleChart (d1a1d215), right after `drawnCycles`:
+
+```js
+const solo = shown.length === 1 ? shown[0] : null;
+const pastForward = drawnCycles.filter((c) => !c.current);
+const eventCycle = solo
+  || (pastForward.length === 1
+      ? pastForward[0]
+      : (pastForward.length === 0
+          ? drawnCycles.find((c) => c.current) || null
+          : null));
+const cycleEvents = eventCycle
+  ? (CYC_EVENTS[eventCycle.year] || [])
+      .filter((e) => !e.metrics || e.metrics.includes(M.key))
+      .map((e) => ({ ...e, x: cycEventMonth(e.date, eventCycle.eDate …) }))
+  : [];
+… <TrendChart … events={cycleEvents} …>
+```
+
+The rule follows the DRAWN lines, not the legend: with a ribbon running,
+events display when the chart resolves to ONE singled-out term — a past
+term brought forward on its own, or (since 5995b8f) the SITTING term when
+nothing is forward. States:
+
+- **Solo board** — every other chip hidden; `solo` fires as before
+  (metrics-pinned entries filtered per measure key).
+- **Ribbon + exactly one past term forward** (lifted chip-tap or `hi`
+  hover preview) — `pastForward.length === 1` fires; the band itself is
+  background, not a competing line. Before 5ae7d35 this could never
+  happen: the gate was `shown.length === 1`, and with banding needing ≥3
+  past terms the two states were structurally mutually exclusive
+  (the user's gap report: "when only one line is brought forward (even
+  if there's a ribbon) the events should display").
+- **Resting ribbon** (zero forward past lines) — 5995b8f: the
+  `pastForward.length === 0` clause falls through to the current term,
+  so the SITTING term's events show (user report: "ah it works for all
+  the series except for 2025 albanese" — the sitting term can never be
+  lifted, per the no-lift guard above, so without the fallthrough its
+  events never fired). Two clauses above remain structurally
+  unreachable for `pastForward.length >= 2`: **two+ past terms
+  forward** still yields nothing (`eventCycle` null).
+
+`solo` is retained separately for the tooltip suffix
+(`cycleEvents`-independent; the " – \<month\>" suffix on the readout row
+stays solo-only by design). Live-probe recipe (also the verification that
+the fix deployed): open the live page, click the Past-cycles tab, read
+`document.querySelectorAll(".evt-line").length` at rest (0), click ONE
+past chip's `.cyc-main` (18 markers for 2019), click a second (0 again).
+The event SVG bits (`.evt-hit`/`.evt-line`/`.evt-conn`/`.evt-label`) are
+rendered by TrendChart in asset 08b413e7; copy-chart's bake waits on
+`.evt-label` (copy-chart.js:328).
+
+## Card captions (cardSub) — five-chart measure-lead fan descriptions (861b428 → 8b36759 → a670008 → 08f2cca → 0929fac, 2026-09-04)
+
+The caption below each fanned card narrates itself in TWO clauses:
+`<measure-lead>, with a historical fan chart for {all|selected} previous
+terms since {firstYear}` + optional
+` that ended in a {returned|ousted} government` (no comma — 08f2cca).
+It never names the singled-out term. Lineage: 2ad0b48/2ad…(early same-day)
+built approval-only captions naming offices; e5f36a6 scrapped the
+subject-following body ("scratch those subtitles") into fan-composition
+text; 861b428 moved the glossary link into the caption and made the start
+year track the board; 8b36759 reworded to "historical fan chart for
+all/selected previous terms" and moved the glossary link into the card
+TITLE; a670008 generalised to five charts and added the measure lead-ins;
+08f2cca reworded the outcome tail ("…terms since {year} that ended in a
+returned government" — attaches the verdict to the terms themselves, not
+a comma-spliced relative clause; "an ousted government" when ousted);
+0929fac renamed the approval caption lead to "Approval minus disapproval"
+(noun pair, matching the other measure leads).
+
+Current form — one `cardSub` IIFE in CycleChart right after `cycleEvents`
+(d1a1d215 ~:1210, after the a670008 generalisation):
+
+```js
+const fanned = M.key === "net" || M.key === "oppnet"
+  || M.key === "ppmm" || M.key === "primary" || M.key === "tpp";
+if (!fanned || !banded) return M.sub;
+const lead = M.key === "net" || M.key === "oppnet"
+  ? "Approval minus disapproval"
+  : M.sub;
+const firstYear = Math.min(...pastShown.map((c) => c.year));
+const gapped = cycles.some((c) => !c.current && c.year >= firstYear
+  && hidden.has(c.year));
+const cap = lead + ", with a historical fan chart for "
+  + (gapped ? "selected" : "all") + " previous terms since " + firstYear;
+// + " that ended in a returned/ousted government" when outcomeShown
+// is set (08f2cca — "a returned" but "an ousted")
+```
+
+Semantics, all probed and shipped:
+
+- **Measure lead**: the approval cards get the LITERAL "Approve minus
+  disapprove" because their static subs ("Sitting prime minister" /
+  "Sitting opposition leader") name an office, not the measure. The
+  ppmm/primary/tpp cards lead with their own sub, which names the
+  measure already — so a sub edit there CHANGES THE CAPTION LEAD TOO.
+  a670008 shortened ppmm's sub to "PM's lead on the preferred-PM
+  question" (from "Sitting prime minister's lead…") and hyphenated tpp's
+  to "Governing-party 2PP" (matching the decline charts' governing-party
+  compound) — both rewrites happened BECAUSE the sub had become
+  caption-facing copy, not just a static descriptor.
+- **`firstYear` = min year of VISIBLE non-current terms** (`pastShown`,
+  861b428): a front-trim (deselect 1987 → 1989…) simply re-anchors the
+  start year ("all previous terms since 1990") and does NOT fire
+  "selected".
+- **`gapped`** (8b36759): "selected" appears only when a HIDDEN past term
+  sits at-or-after firstYear — i.e. a real interior hole in the span.
+  Front-trims alone move the year: "all since 1990", because everything
+  from 1990 on is on the board. The earlier `hidden.size > 0` test was
+  wrong for exactly this reason.
+- **Outcome-filter clause is appended LAST and forces "selected"**: the
+  returned/ousted filter works by HIDING interior non-matching years, so
+  `gapped` is true whenever the filter is active — the caption reads
+  "…for selected previous terms since {year}, for terms at the end of
+  which the government was returned". Only the clause order is
+  load-bearing now (lead → all/selected → year → outcome clause); the
+  old "evaluate outcome BEFORE hidden.size" trap is superseded.
+- **`!banded` still returns `M.sub` statics** — the fan claims would lie
+  on a <3-past-terms board. The empty board lands here too, so probe the
+  remove-all state to confirm the STATIC sub text (the strings users
+  asked to shorten live there as well).
+- **Non-fanned cards (`oppr`, the opposition primary) keep their plain
+  static sub always** — extending the fan set is a one-key edit to
+  `fanned`, but the user explicitly scopes each card ("add … to
+  'First-preference support for the governing party'", "do the same for
+  the Government two-party preferred chart").
+
+### The glossary link lives in the card TITLE (8b36759)
+
+The tap-to-define "net approval" link is now composed into the card
+title h2 at render time (d1a1d215 ~:1548): for net/oppnet,
+`M.title.replace("net approval", "")` renders the office part, then a
+`<button className="hi-term" title="What the approval question asks"
+onClick={() => window.AP.openTerm?.("approval", M.title)}>net
+approval</button>`. Other metrics render their title plain. Two hazards:
+
+- **CYC_METRICS titles must keep the exact phrase "net approval"** —
+  "Prime minister net approval" / "Opposition leader net approval". The
+  replace is a silent no-op if a title reword drops the phrase: the pill
+  disappears with no build error. The CYC_METRICS comment (:536) says
+  this; keep it true.
+- `.hi-term` (template.html :1187–1194) is `font: inherit; color:
+  inherit` with only a `--line-2` underline, so it inherits h2 sizing
+  fine — no CSS needed. The OLD hazard (a font-size rule BELOW .hi-term
+  shrinking it) does not apply at h2, but never add a sized `.hi-term`
+  rule below the base one.
+- Pre-8b36759 the link sat INSIDE the caption ("…prime minister net
+  approval since 1987" linked phrase), and pre-861b428 it was an
+  "Approve minus disapprove" pill outside `{cardSub}` in the same
+  `<p className="card-sub">`. Both are gone — a caption-string grep for
+  the glossary link will find nothing; check the TITLE JSX.
+
+### Sub copy lives ONLY in CYC_METRICS
+
+"A card-sub string appears in N places" reports are mostly noise: grep
+`index.html` for e.g. `Sitting prime minister’s lead` and you hit the
+COMPILED bundle (the asset inlined), which the rebuild regenerates — never
+edit it. `auspol-polling.html` is a separate LEGACY page with its own
+governing-party compounds; its hits don't gate on the CYC_METRICS sub.
+Curly-typography rule applies in reverse for probes: the asset keeps
+curly `’` (apostrophe in "PM's lead") in SOURCE, but the built bundle
+escapes it to `\u2019` — assert subs in the built DOM (probe) or with the
+escaped form, never grepping the raw apostrophe in index.html.
+
+### Probe recipe (retired probes: captions-probe2/3/4, then `.matilda/probe.mjs` in the a670008 worktree)
+
+Local static server + puppeteer-core (createRequire on
+`~/node_modules/.`, Chrome binary at
+`/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`):
+
+1. **Click the Past-cycles tab BEFORE reading cards** — gotcha bitten
+   2026-09-04: on the default Snapshot tab, `.card-title`/`.card-sub`
+   belong to the Latest-poll cards ("Approve minus disapprove – a
+   verdict on the job…"), so a probe that skips the click reports the
+   WRONG subs with plausible confidence. Click
+   `#tab-cycles` (or the button whose text is exactly "Past cycles"),
+   wait ~2.5 s for the cycle-source fetch + render.
+2. Match cards by title text ("net approval" for net/oppnet —
+   disambiguate on "Opposition" — else exact strings "Preferred prime
+   minister", "Government primary vote", "Government two-party
+   preferred"); read the sibling `.card-sub`.
+3. **Partial selection: the per-chip `.cyc-x` button** on the `.cyc-chip`
+   containing `.cyc-year` text == the year (aria-label "Take {label} off
+   the board"). Board-level "Show all cycles"/"Remove all cycles" never
+   express a partial board. Front-trim = hide the EARLIEST chip; the
+   interior-gap state needs a middle chip hidden (e.g. 1990, 1996 with
+   1987 already off yields firstYear 1993 + "selected").
+4. Outcome filter button: text matches
+   `/Show (returned|ousted) governments only/`, toggles between the two.
+5. Five ship-verified states: rest (all five cards "…for all previous
+   terms since 1987"; oppr static), 1987 off (all "…since 1990", no
+   "selected"), gap (all "…for selected previous terms since 1993"),
+   returned filter (+"…was returned" clause, since 1987), ousted filter
+   (+"…was ousted", since 1993).
+6. `createRequire` comes from `node:module`, NOT `node:url` (bitten
+   2026-09-04 — the url module has no such export).
+7. `new URL(...).pathname` percent-encodes the space in "auspol tracker"
+   and 404s every asset — serve from
+   `fileURLToPath(new URL("..", import.meta.url))`; mime-map `.woff2` or
+   fonts silently 404.
+8. DOM clicks need `dispatchEvent(new MouseEvent("click", {bubbles:
+   true}))` inside `page.evaluate` — puppeteer's `page.click` targets
+   selectors, not the React handler, only when the node is in view.
 
 ## State as of 2026-09-03 (commit a0b910f)
 
