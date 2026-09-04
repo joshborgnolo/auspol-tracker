@@ -1947,8 +1947,8 @@ function TppLine({ c, prefixed, note, hero, alt }) {
 }
 
 /* The poll's own pull on the figure a reader watches, as one ordinary row
-   of the provenance band: "2PP agg. effect   +0.1 for ALP vs. L/NP;
-   −0.4 for ALP vs. ON" - the party named the way every figure in the panel
+   of the provenance band: "2PP agg. effect   +0.1 for ALP vs L/NP;
+   −0.4 for ALP vs ON" - the party named the way every figure in the panel
    names it, not as "Labor" beside a column of ALP/L/NP/GRN/ON. One clause
    per aggregate the wave feeds: the
    classic 2PP; the flow-table implied 2PP for a poll that published no
@@ -1994,7 +1994,7 @@ function EffLines({ eff }) {
   const winSpan = (m) => `the aggregate\u2019s ${m ? "month" : "21-day window"}`;
   const clause = (e, who, imp) => (
     <React.Fragment>
-      {signed(e)} for ALP vs. {who}{imp && <React.Fragment> ({implied})</React.Fragment>}
+      {signed(e)} for ALP vs {who}{imp && <React.Fragment> ({implied})</React.Fragment>}
       {!e.w && <span className="pd-s-note"> (outside {winSpan(e.m)})</span>}
     </React.Fragment>
   );
