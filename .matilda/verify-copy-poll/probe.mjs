@@ -76,13 +76,30 @@ const PRELUDE = (tag) => `
   HTMLCanvasElement.prototype.toBlob = function (cb, type, q) {
     try {
       const probe = document.createElement("canvas");
-      probe.width = 96; probe.height = Math.max(1, Math.round(96 * this.height / this.width));
+      probe.width = Math.round(this.width / 4);
+      probe.height = Math.max(1, Math.round(probe.width * this.height / this.width));
       const pc = probe.getContext("2d");
       pc.drawImage(this, 0, 0, probe.width, probe.height);
       const d = pc.getImageData(0, 0, probe.width, probe.height).data;
       const seen = new Set();
-      for (let i = 0; i < d.length; i += 16) seen.add(((d[i] << 24) | (d[i+1] << 16) | (d[i+2] << 8) | d[i+3]) >>> 0);
-      window.__probePaints.push({ w: this.width, h: this.height, colors: seen.size });
+      /* ink bounds, back in physical pixels: the card's chrome is an even
+         56-physical-px margin on every side, with the header near the top
+         edge and the site's name near the bottom */
+      const ink = { minX: Infinity, minY: Infinity, maxX: -1, maxY: -1 };
+      for (let y = 0, i = 0; y < probe.height; y++) {
+        for (let x = 0; x < probe.width; x++, i += 4) {
+          const r = d[i], g = d[i + 1], b = d[i + 2], a = d[i + 3];
+          if (a > 128 && (r < 245 || g < 245 || b < 245)) {
+            if (x < ink.minX) ink.minX = x;
+            if (x > ink.maxX) ink.maxX = x;
+            if (y < ink.minY) ink.minY = y;
+            if (y > ink.maxY) ink.maxY = y;
+          }
+          seen.add(((r << 24) | (g << 16) | (b << 8) | a) >>> 0);
+        }
+      }
+      window.__probePaints.push({ w: this.width, h: this.height, colors: seen.size,
+        ink: { minX: ink.minX * 4, maxX: ink.maxX * 4, minY: ink.minY * 4, maxY: ink.maxY * 4 } });
     } catch (e) { window.__probePaints.push({ error: String(e) }); }
     return ofBlob.call(this, cb, type, q);
   };
@@ -168,6 +185,17 @@ try {
     ok("PNG is not a bare sheet", info.bytes > 100 * 1024, info.bytes);
     const paints = await page.evaluate("window.__probePaints");
     ok("canvas painted many colours", paints.length && paints[paints.length - 1].colors > 6, paints);
+    /* the card's chrome: one tight, EVEN margin on all four sides (28
+       logical = 56 physical px), the pollster header riding the top band,
+         and the site's name alone in the footer */
+    const card = paints[paints.length - 1];
+    const inInk = (v) => card.ink && v >= 44 && v <= 84;
+    check("left margin is one tight unit", inInk(card.ink.minX), true);
+    check("right margin is one tight unit", inInk(2400 - card.ink.maxX), true);
+    check("header rides the top margin", inInk(card.ink.minY), true);
+    check("footer sits one margin above the bottom edge", inInk(card.h - card.ink.maxY), true);
+    check("margins are equal left and right",
+      Math.abs(card.ink.minX - (2400 - card.ink.maxX)) <= 12, true);
     await page.close();
   }
 

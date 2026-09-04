@@ -3,24 +3,26 @@
    A small icon button at the bottom-right corner of every open
    `.poll-detail` panel that turns the panel - provenance band, section
    rules, eyebrow kickers and every published figure exactly as laid out -
-   into a PNG on the same 1200px card the chart copies come out on. If a
-   clipboard write is unavailable or refused, the PNG downloads instead
-   (and on http pages, where no clipboard API exists, the button says so
-   rather than promising a copy).
+   into a PNG on a 1200px card at the same 2x scale the chart copies come
+   out at. If a clipboard write is unavailable or refused, the PNG
+   downloads instead (and on http pages, where no clipboard API exists,
+   the button says so rather than promising a copy).
 
    It is the sibling of copy-chart.js, and deliberately NOT a caller of it:
    the chart copy composes an svg under card chrome; this one paints DOM
    text. The two share no code (plain scripts are inlined separately and
-   each must stand alone).
+   each must stand alone), and their chrome differs where the content asks
+   for it: the breakdown card runs one tight, even margin on all four
+   sides rather than the chart card's generous frame.
 
    Why DOM text is painted glyph-by-glyph and not photographed: the
-   rasterise path (clone + computed-style bake + svg foreignObject) asks the
-   engine to re-layout the panel - and WebKit does not honour flex/grid gap
-   in that context, which is precisely what the provenance band and meta
-   grid are held together by. So the layout the panel has ALREADY computed
-   is read off Range rects at capture time and replayed onto a canvas: every
-   background, hairline and glyph goes on at its measured position, and no
-   second layout is ever attempted.
+   rasterise path (clone + computed-style bake + svg foreignObject) asks
+   the engine to re-layout the panel - and WebKit does not honour flex/grid
+   gap in that context, which is precisely what the provenance band and
+   meta grid are held together by. So the layout the panel has ALREADY
+   computed is read off Range rects at capture time and replayed onto a
+   canvas: every background, hairline and glyph goes on at its measured
+   position, and no second layout is ever attempted.
 
    The capture re-flows the panel wide while it measures, under a
    `.copy-wide` class that pins the desktop type ladder (the media-query
@@ -52,11 +54,14 @@
     typeof navigator.clipboard.write === "function";
   const ACTION_LABEL = CAN_COPY ? "Copy breakdown as image" : "Save breakdown as PNG";
 
-  /* the chart card comes out at 1200px with 64px of breathing room and a
-     2x raster (copy-chart.js); the breakdown copy sits on the same card so
-     the two read as one output */
-  const CARD_W = 1200, PAD = 64, SCALE = 2;
+  /* the chart card comes out at 1200px and 2x (copy-chart.js) and the
+     breakdown copy stays on that sheet so the two read as one output. The
+     margins are tighter, though: a 1200px card with one 28px unit of air
+     on all four sides, and the header and footer lines inside ride the
+     same rhythm, so no side of the sheet is emptier than another */
+  const CARD_W = 1200, PAD = 28, SCALE = 2;
   const CONTENT_W = CARD_W - PAD * 2;
+  const TEXT_H = 15;   /* the header and footer are one 15px line each */
 
   /* Resolved through a probe rather than read as a raw token, because a
      canvas fill wants a concrete colour - the same trick copy-chart.js
@@ -225,7 +230,8 @@
     }
     const pcs = getComputedStyle(panel);
     return { els, texts, rootW: root.width, rootH: root.height,
-             bg: pcs.backgroundColor, fontFamily: pcs.fontFamily };
+             bg: pcs.backgroundColor, fontFamily: pcs.fontFamily,
+             ink: pcs.color };
   };
 
   const roundRectPath = (c, x, y, w, h, r) => {
@@ -240,11 +246,14 @@
     c.closePath();
   };
 
-  const paintCard = (model, caption) => new Promise((resolve, reject) => {
+  const paintCard = (model, house) => new Promise((resolve, reject) => {
     try {
       const factor = CONTENT_W / model.rootW;
       const panelH = model.rootH * factor;
-      const H = Math.ceil(PAD + panelH + 46 + 24);
+      /* PAD everywhere: around the card, and again between the header,
+         panel and footer lines inside it, so every side of the sheet
+         carries the same margin */
+      const H = Math.ceil(PAD + (house ? TEXT_H + PAD : 0) + panelH + PAD + TEXT_H + PAD);
       const cv = document.createElement("canvas");
       cv.width = CARD_W * SCALE; cv.height = H * SCALE;
       const c = cv.getContext("2d");
@@ -253,7 +262,7 @@
       c.fillRect(0, 0, CARD_W, H);
       c.textBaseline = "alphabetic";
 
-      const ox = PAD, oy = PAD;
+      const ox = PAD, oy = PAD + (house ? TEXT_H + PAD : 0);
       const X = (v) => ox + v * factor, Y = (v) => oy + v * factor;
 
       for (const el of model.els) {
@@ -330,14 +339,24 @@
         }
       }
 
-      /* the caption: who this poll is, beside the site's name - the image
-         travels and the page it came from does not */
+      /* the pollster is a FACT of the capture, not chrome - it heads the
+         card as a field, in the provenance band's own label/value voice.
+         The site only signs the footer, since the image travels and the
+         page it came from does not */
+      if (house) {
+        const hy = PAD + 12;
+        c.font = "600 12px " + model.fontFamily;
+        c.fillStyle = inkVar("--pd-ink-2");
+        const labelW = c.measureText("Pollster").width;
+        c.fillText("Pollster", PAD, hy);
+        c.fillStyle = model.ink;
+        c.font = "600 15px " + model.fontFamily;
+        c.fillText(house, PAD + labelW + 10, hy);
+      }
       c.font = "600 15px " + model.fontFamily;
       c.fillStyle = inkVar("--pd-ink-2");
-      const cy = H - 26;
-      if (caption) c.fillText(caption, PAD, cy);
       c.textAlign = "right";
-      c.fillText("auspoltracker.com", CARD_W - PAD, cy);
+      c.fillText("auspoltracker.com", CARD_W - PAD, H - PAD - 3);
       c.textAlign = "left";
 
       cv.toBlob((b) => (b ? resolve(b) : reject(new Error("toBlob returned null"))), "image/png");
@@ -345,9 +364,20 @@
   });
 
   /* ---- identification -------------------------------------------------
-     The card names the poll the way the table does: the house and the
-     fieldwork window. The house lives on the row ABOVE the expanded one;
-     the fieldwork is the provenance band's own first fact. */
+     The card names its poll in two places: the header carries the house,
+     and the FILE NAME keeps house and fieldwork window together so two
+     waves of one house never overwrite each other on disk. The house
+     lives on the row ABOVE the expanded one; the fieldwork is the
+     provenance band's own first fact. */
+  const houseName = (panel) => {
+    const tr = panel.closest("tr");
+    const row = tr && tr.previousElementSibling;
+    const nameEl = row && row.querySelector(".pollster-name");
+    return nameEl
+      ? (nameEl.textContent || "").replace(/↗/g, "").replace(/\s+/g, " ").trim()
+      : "";
+  };
+
   const metaValue = (panel, key) => {
     const ks = panel.querySelectorAll(".pd-meta-k");
     for (const k of ks) {
@@ -359,16 +389,8 @@
     return "";
   };
 
-  const idLine = (panel) => {
-    const tr = panel.closest("tr");
-    const row = tr && tr.previousElementSibling;
-    const nameEl = row && row.querySelector(".pollster-name");
-    const house = nameEl
-      ? (nameEl.textContent || "").replace(/↗/g, "").replace(/\s+/g, " ").trim()
-      : "";
-    const field = metaValue(panel, "Fieldwork");
-    return [house, field].filter(Boolean).join(" · ");
-  };
+  const idLine = (panel) => [houseName(panel), metaValue(panel, "Fieldwork")]
+    .filter(Boolean).join(" · ");
 
   const fileName = (panel) => {
     const label = idLine(panel).toLowerCase()
@@ -386,7 +408,7 @@
          the parked state never reaches the screen */
       panel.getBoundingClientRect(); /* reflow */
       const model = readModel(panel);
-      return paintCard(model, idLine(panel));
+      return paintCard(model, houseName(panel));
     } finally {
       restore();
     }
