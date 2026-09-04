@@ -3029,7 +3029,7 @@ function VariancePanel({ facet, rangeId }) {
       <div className="ap-var-read">
         {latest.map(({ m, d }) => {
           const read = discordRead(d.R);
-          const readTerm = { chance: "chance-consistent", mild: "mild-divergence" }[read.id];
+          const readTerm = { chance: "chance-consistent", mild: "mild-divergence", wide: "real-disagreement" }[read.id];
           return (
             <div key={m.id} className={"vr-tile" + (hidden[m.id] ? " off" : "")}>
               <span className="vr-name" style={{ color: inkOf(m.color) }}>{m.label}</span>
@@ -4229,9 +4229,20 @@ function infoTerms(D) {
       the houses’ actual spread to the chance floor has passed 1.20× without reaching 1.60×:
       sampling scatter alone no longer covers the gap, so something real sits on top of it – houses
       weighting differently, reaching different voters, or genuinely moving at different speeds.
-      The excess stays modest; past 1.60× the panel drops the hedge and calls it real disagreement.
+      The excess stays modest; past 1.60× the panel drops the hedge and calls it
+      {" "}{xref("real-disagreement", "mild-divergence", "real disagreement")}.
       Below 1.20× the same ratio reads {" "}{xref("chance-consistent", "mild-divergence",
       "chance-consistent")} – the spread chance’s own making.</>) },
+    { id: "real-disagreement", term: "Real disagreement", body: (
+      <>The Poll disagreement panel’s verdict when the houses disagree further than polling lets
+      them. The chance floor already prices the scatter of independent samples – each survey
+      missing by its own {xref("margin-of-error", "real-disagreement", "sampling error")} – so
+      when the houses’ actual spread reaches 1.60× that floor, the excess can no longer be
+      chance. What remains is structural: houses weighting differently, reaching different
+      voters, or carrying {xref("house-effect", "real-disagreement", "house effects")} too
+      strong to cancel out. Below 1.60× the reading hedges
+      as {xref("mild-divergence", "real-disagreement", "mild divergence")}; past it, the polls
+      are not measuring one number with different luck.</>) },
     { id: "implied-2pp", term: "Implied 2PP", body: (
       <>An optional dashed line on the two-party chart (“Compare implied 2PP”) showing what the same
       polls’ own primary votes add up to under one fixed {xref("preference-flows", "implied 2PP",

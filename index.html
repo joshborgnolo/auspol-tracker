@@ -16587,7 +16587,8 @@ function VariancePanel({
     const read = discordRead(d.R);
     const readTerm = {
       chance: "chance-consistent",
-      mild: "mild-divergence"
+      mild: "mild-divergence",
+      wide: "real-disagreement"
     }[read.id];
     return /*#__PURE__*/React.createElement("div", {
       key: m.id,
@@ -18144,7 +18145,11 @@ function infoTerms(D) {
   }, {
     id: "mild-divergence",
     term: "Mild divergence",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "A little further apart than chance can explain. On the Poll disagreement panel the ratio of the houses\u2019 actual spread to the chance floor has passed 1.20\xD7 without reaching 1.60\xD7: sampling scatter alone no longer covers the gap, so something real sits on top of it \u2013 houses weighting differently, reaching different voters, or genuinely moving at different speeds. The excess stays modest; past 1.60\xD7 the panel drops the hedge and calls it real disagreement. Below 1.20\xD7 the same ratio reads ", " ", xref("chance-consistent", "mild-divergence", "chance-consistent"), " \u2013 the spread chance\u2019s own making.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "A little further apart than chance can explain. On the Poll disagreement panel the ratio of the houses\u2019 actual spread to the chance floor has passed 1.20\xD7 without reaching 1.60\xD7: sampling scatter alone no longer covers the gap, so something real sits on top of it \u2013 houses weighting differently, reaching different voters, or genuinely moving at different speeds. The excess stays modest; past 1.60\xD7 the panel drops the hedge and calls it", " ", xref("real-disagreement", "mild-divergence", "real disagreement"), ". Below 1.20\xD7 the same ratio reads ", " ", xref("chance-consistent", "mild-divergence", "chance-consistent"), " \u2013 the spread chance\u2019s own making.")
+  }, {
+    id: "real-disagreement",
+    term: "Real disagreement",
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "The Poll disagreement panel\u2019s verdict when the houses disagree further than polling lets them. The chance floor already prices the scatter of independent samples \u2013 each survey missing by its own ", xref("margin-of-error", "real-disagreement", "sampling error"), " \u2013 so when the houses\u2019 actual spread reaches 1.60\xD7 that floor, the excess can no longer be chance. What remains is structural: houses weighting differently, reaching different voters, or carrying ", xref("house-effect", "real-disagreement", "house effects"), " too strong to cancel out. Below 1.60\xD7 the reading hedges as ", xref("mild-divergence", "real-disagreement", "mild divergence"), "; past it, the polls are not measuring one number with different luck.")
   }, {
     id: "implied-2pp",
     term: "Implied 2PP",
