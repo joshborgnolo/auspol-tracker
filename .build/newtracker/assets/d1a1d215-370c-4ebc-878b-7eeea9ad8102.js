@@ -1192,10 +1192,10 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
         .filter((e) => !e.metrics || e.metrics.includes(M.key))
         .map((e) => ({ ...e, x: cycEventMonth(e.date, eventCycle.eDate) }))
     : [];
-  /* Five cards caption what the fan behind the singled-out line is made
+  /* Six cards caption what the fan behind the singled-out line is made
      of. The lead-in names the measure – the approval charts say it in
      words ("Approval minus disapproval") since their static subtitles name
-     an office instead; the ppmm/primary/tpp cards lead with their own
+     an office instead; the ppmm/primary/oppr/tpp cards lead with their own
      subtitle, which already names the measure. Then the fan's
      composition: "all" when every past term from the shown start is on
      the board, "selected" when some later term is off too (front-trims
@@ -1207,7 +1207,8 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
      left on the board. */
   const cardSub = (() => {
     const fanned = M.key === "net" || M.key === "oppnet"
-      || M.key === "ppmm" || M.key === "primary" || M.key === "tpp";
+      || M.key === "ppmm" || M.key === "primary" || M.key === "tpp"
+      || M.key === "oppr";
     if (!fanned || !banded) return M.sub;
     const lead = M.key === "net" || M.key === "oppnet"
       ? "Approval minus disapproval"
