@@ -2540,7 +2540,13 @@ button.acc-spread[aria-pressed="true"] {
    list to serve one, and that is what pushes "-3.9 vs aggregate" onto a second
    line. Below this they wrap under the list instead: one line spent once,
    rather than a column of wrapped values. */
-@media (max-width: 360px) {
+/* The docked controls cost ~50px off EVERY row of the list to serve one, and
+   on a phone that is what pushes the longest value ("None. Outside the
+   aggregate's 21-day window") onto a second line - 219px of text against 182
+   of column at 390px. Wrapping them above the list hands all of it back for
+   one line spent once. This used to fire only under 360px; the row that
+   needed it is the one that reads worst wrapped, so it moves up a rung. */
+@media (max-width: 430px) {
   .pd-meta { flex-wrap: wrap; row-gap: 12px; }
   .pd-meta-items { flex-basis: 100%; }
   /* ABOVE the list, not after it: the release rows are rendered by the ledger
