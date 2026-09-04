@@ -2008,6 +2008,26 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    dock to the band's top-right corner - report at the right edge, the way
    back where it is present beside it. They ride the first row, level with
    "commissioned by", however many rows the list runs to. */
+/* The controls sit in the band's flex row, which means they reserve their
+   width down the WHOLE band to clear ONE row - ~50px off every line of a
+   list that only the first line ever comes near. Where the report icon is
+   the only control, it lifts out of flow and sits over the first row's own
+   slack instead, and every row below gets the full measure: at 390px the
+   value column goes from 182px to 232px, which is what takes the aggregate
+   -effect sentence from three lines to two.
+
+   Gated on :only-child rather than a width: a panel reached from a chart
+   also carries "Back to the chart", and that pair is far too wide to hang
+   over a row. It keeps the old in-flow behaviour, where it is the rarer
+   state and the band is one row shorter anyway. */
+.pd-meta:has(.pd-meta-tail > :only-child) { position: relative; }
+.pd-meta:has(.pd-meta-tail > :only-child) .pd-meta-tail {
+  position: absolute; top: 0; right: 0; margin-left: 0;
+}
+.pd-meta:has(.pd-meta-tail > :only-child) .pd-meta-items { flex-basis: 100%; }
+/* the one row that does pass under it keeps its distance */
+.pd-meta:has(.pd-meta-tail > :only-child)
+  .pd-meta-items > .pd-meta-i:first-child > .pd-meta-v { padding-right: 42px; }
 .pd-meta-tail {
   display: inline-flex; align-items: center; gap: 10px;
   flex-wrap: nowrap; min-width: 0;
