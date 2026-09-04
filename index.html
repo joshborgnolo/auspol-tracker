@@ -11951,8 +11951,10 @@ function EffLines({
   }, " (outside ", winSpan(e.m), ")"));
   return /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-k"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "pd-meta-k hi-term",
+    onClick: () => window.AP.openTerm && window.AP.openTerm("aggregate-effect", "poll breakdown")
   }, "2PP agg. effect"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
   }, shareOut ? prim.t ? /*#__PURE__*/React.createElement(React.Fragment, null, eff.lnp ? clause(asThen(eff.lnp), "L/NP") : clause(asThen(eff.imp), "L/NP", true), eff.onp && eff.onp.t && /*#__PURE__*/React.createElement(React.Fragment, null, "; ", clause(asThen(eff.onp), "ON")), /*#__PURE__*/React.createElement("span", {
@@ -12086,9 +12088,11 @@ function releaseMetaRows(r) {
   if (r.methodUrl && r.methodUrl !== r.releaseUrl) relRows.push(/*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     key: "apc"
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "pd-meta-k",
-    title: "Australian Polling Council methodology statement"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "pd-meta-k hi-term",
+    title: "Australian Polling Council methodology statement",
+    onClick: () => window.AP.openTerm && window.AP.openTerm("apc-statement", "poll breakdown")
   }, "APC statement"), /*#__PURE__*/React.createElement("span", {
     className: "pd-meta-v"
   }, /*#__PURE__*/React.createElement("a", {
@@ -18130,7 +18134,11 @@ function infoTerms(D) {
   }, {
     id: "effective-sample",
     term: "Effective sample",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "How many polls the window is really worth once weighting is applied \u2013 currently", " ", L.alp2ppNEff, " of the ", L.method.nPolls, " in it. Recency, sample size and the square-root discount on repeat waves all pull it below the raw count, and it is what the ", xref("interval", "effective sample", "95% interval"), " is computed against.", " ", "A single poll carries its own version of the same idea, written n", /*#__PURE__*/React.createElement("sub", null, "eff"), " beside its sample in the poll breakdown: the effective sample its pollster files with the Australian Polling Council, describing what that one sample is worth rather than what the window is.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "How many polls the window is really worth once weighting is applied \u2013 currently", " ", L.alp2ppNEff, " of the ", L.method.nPolls, " in it. Recency, sample size and the square-root discount on repeat waves all pull it below the raw count, and it is what the ", xref("interval", "effective sample", "95% interval"), " is computed against.", " ", "A single poll carries its own version of the same idea, written n", /*#__PURE__*/React.createElement("sub", null, "eff"), " beside its sample in the poll breakdown: the effective sample its pollster files with the ", " ", xref("apc-statement", "effective sample", "Australian Polling Council"), ", describing what that one sample is worth rather than what the window is.")
+  }, {
+    id: "apc-statement",
+    term: "APC statement",
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "The methodology disclosure a pollster files with the Australian Polling Council, the industry body whose members publish a standard statement per wave: fieldwork dates and mode, the raw sample, the ", " ", xref("effective-sample", "apc-statement", "effective sample"), " that sample is worth after weighting, and the weighting scheme and question order behind the figures. A wave\u2019s poll breakdown links its statement where one is on record and reads its two published sample figures off it \u2013 the raw count and the effective one, the latter serving as that wave\u2019s n\u1D62 in the", " ", xref("weighted-aggregate", "apc-statement", "weighted aggregate"), ". Newspoll, YouGov, Essential, DemosAU and RedBridge / Accent file them; where a house files none, the poll breakdown carries its raw sample alone and the archive\u2019s n", /*#__PURE__*/React.createElement("sub", null, "eff"), " column dashes \u2013 a precision figure the pollster never published is not this site\u2019s to invent.")
   }, {
     id: "house-effect",
     term: "House effect",
@@ -18229,6 +18237,10 @@ function infoTerms(D) {
     }, "The current Labor primary is that construction run as the month to date. Each wave taken this month contributes its published Labor share \u2013 minus the house\u2019s lean on the ALP primary specifically, read at the month\u2019s midpoint \u2013 weighted by sample size alone, the recency halving dropped because a month is read at its centre; a house in the field twice counts for \u221A2, not 2. Only once all five parties are estimated is the sum checked, and the five stand unrescaled unless the debiased total sits more than half a point from the plain-average total \u2013 a real undecided-driven shortfall is kept, not ironed out. As the month stands, that is ", prim.alp.toFixed(1), " for Labor."), primWork, /*#__PURE__*/React.createElement("span", {
       className: "info-p"
     }, "The two-party-preferred is the nowcast proper, over the rows the measure admits: waves whose fieldwork midpoint falls inside the 21-day window ending at the newest poll, each contributing its published Labor share of the pair \u2013 a pair printed with undecided still inside it is rebased to 100 first \u2013 adjusted for the house\u2019s lean on the 2PP as of the reference day. A house that publishes no two-party adds no row; running its primaries through one fixed flow table stays in the", " ", xref("implied-2pp", "weighted aggregate", "implied 2PP"), " diagnostic, never the headline, and an empty window falls back to the last monthly point rather than vanishing. As of the latest poll, that is ", L.alp2pp.toFixed(1), " to Labor,", " ", L.lnp2pp.toFixed(1), " to the Coalition."), tppWork)
+  }, {
+    id: "aggregate-effect",
+    term: "Aggregate effect",
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "A poll\u2019s own pull on the figure a reader watches. The poll breakdown recomputes the", " ", xref("weighted-aggregate", "aggregate effect", "weighted aggregate"), " without this one poll and prints the difference as a signed move: \u201C+0.1 for ALP\u201D is a tenth of a point of today\u2019s two-party that exists only while this wave sits in the window. It is a pull on today\u2019s number, not a verdict on the poll \u2013 a wave older than the 21-day window moves nothing now and says so, with what it was worth on its own publication day where that can still be estimated. One clause prints per aggregate the wave feeds: the published two-party; the ", " ", xref("implied-2pp", "aggregate effect", "implied two-party"), " for a wave that published no pair, whose primaries still move that estimate; and Labor against One Nation where the wave asked it. The leans stand as measured \u2013 a", " ", xref("house-effect", "aggregate effect", "house effect"), " is a property of the pollster, not the poll, so only the nowcast itself is re-run on the remaining waves.")
   }];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"

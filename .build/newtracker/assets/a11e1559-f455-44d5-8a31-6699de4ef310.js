@@ -2000,7 +2000,8 @@ function EffLines({ eff }) {
   );
   return (
     <span className="pd-meta-i">
-      <span className="pd-meta-k">2PP agg. effect</span>
+      <button type="button" className="pd-meta-k hi-term"
+              onClick={() => window.AP.openTerm && window.AP.openTerm("aggregate-effect", "poll breakdown")}>2PP agg. effect</button>
       <span className="pd-meta-v">
         {shareOut ? (prim.t ? (
           <React.Fragment>
@@ -2137,7 +2138,9 @@ function releaseMetaRows(r) {
      document (releaseUrl === methodUrl). */
   if (r.methodUrl && r.methodUrl !== r.releaseUrl) relRows.push(
     <span className="pd-meta-i" key="apc">
-      <span className="pd-meta-k" title="Australian Polling Council methodology statement">APC statement</span>
+      <button type="button" className="pd-meta-k hi-term"
+              title="Australian Polling Council methodology statement"
+              onClick={() => window.AP.openTerm && window.AP.openTerm("apc-statement", "poll breakdown")}>APC statement</button>
       <span className="pd-meta-v">
         <a className="pd-release" href={r.methodUrl} target="_blank" rel="noopener noreferrer">
           Here<span className="plink-mark" aria-hidden="true">↗</span>

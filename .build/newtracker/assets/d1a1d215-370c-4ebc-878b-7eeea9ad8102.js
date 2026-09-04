@@ -4190,8 +4190,21 @@ function infoTerms(D) {
       the {xref("interval", "effective sample", "95% interval")} is computed against.
       {" "}A single poll carries its own version of the same idea, written
       n<sub>eff</sub> beside its sample in the poll breakdown: the effective
-      sample its pollster files with the Australian Polling Council, describing
+      sample its pollster files with the {" "}{xref("apc-statement",
+      "effective sample", "Australian Polling Council")}, describing
       what that one sample is worth rather than what the window is.</>) },
+    { id: "apc-statement", term: "APC statement", body: (
+      <>The methodology disclosure a pollster files with the Australian Polling Council, the
+      industry body whose members publish a standard statement per wave: fieldwork dates and
+      mode, the raw sample, the {" "}{xref("effective-sample", "apc-statement",
+      "effective sample")} that sample is worth after weighting, and the weighting scheme and
+      question order behind the figures. A wave’s poll breakdown links its statement where one
+      is on record and reads its two published sample figures off it – the raw count and the
+      effective one, the latter serving as that wave’s nᵢ in the
+      {" "}{xref("weighted-aggregate", "apc-statement", "weighted aggregate")}. Newspoll, YouGov,
+      Essential, DemosAU and RedBridge / Accent file them; where a house files none, the poll
+      breakdown carries its raw sample alone and the archive’s n<sub>eff</sub> column dashes –
+      a precision figure the pollster never published is not this site’s to invent.</>) },
     { id: "house-effect", term: "House effect", body: (
       <>A pollster’s own lean against the consensus of the houses polling around it, pooled from
       its polls with a 90-day half-life so recent polls count for more – the lean tracks a house’s
@@ -4399,6 +4412,19 @@ function infoTerms(D) {
       As of the latest poll, that is {L.alp2pp.toFixed(1)} to Labor,
       {" "}{L.lnp2pp.toFixed(1)} to the Coalition.</span>
       {tppWork}</>) },
+    { id: "aggregate-effect", term: "Aggregate effect", body: (
+      <>A poll’s own pull on the figure a reader watches. The poll breakdown recomputes the
+      {" "}{xref("weighted-aggregate", "aggregate effect", "weighted aggregate")} without this
+      one poll and prints the difference as a signed move: “+0.1 for ALP” is a tenth of a point
+      of today’s two-party that exists only while this wave sits in the window. It is a pull on
+      today’s number, not a verdict on the poll – a wave older than the 21-day window moves
+      nothing now and says so, with what it was worth on its own publication day where that can
+      still be estimated. One clause prints per aggregate the wave feeds: the published
+      two-party; the {" "}{xref("implied-2pp", "aggregate effect", "implied two-party")} for a
+      wave that published no pair, whose primaries still move that estimate; and Labor against
+      One Nation where the wave asked it. The leans stand as measured – a
+      {" "}{xref("house-effect", "aggregate effect", "house effect")} is a property of the
+      pollster, not the poll, so only the nowcast itself is re-run on the remaining waves.</>) },
   ];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"
