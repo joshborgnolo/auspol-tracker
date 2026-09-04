@@ -1508,7 +1508,12 @@ function tppLines(cs, r) {
   const dUnd = r.undecidedBasis === "tpp" && r.undecided != null ? segDelta(r.chg, "und") : null;
   for (const c of cs) {
     const canonical = c.kind === "2pp" && !c.derived && r.tppFlows != null;
-    let note = canonical ? "respondent-allocated" : null;
+    /* No "respondent-allocated" caption any more. The flows pair now reads as
+       an alternative to the line above it ("or … under 2025-election
+       preference flows"), which says what the first pair is BY CONTRAST -
+       naming it as well repeated the same distinction twice, once under each
+       half, and cost a caption line to do it. */
+    let note = null;
     if (c.kind === "2pp" && !c.derived && r.undecidedBasis === "tpp" && r.undecided != null) {
       note = (
         <React.Fragment>
@@ -1519,8 +1524,8 @@ function tppLines(cs, r) {
       );
     }
     out.push({ c, note });
-    if (canonical) out.push({ note: (
-      <>2025-election{" "}
+    if (canonical) out.push({ alt: true, note: (
+      <>under 2025-election{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm &&
                   window.AP.openTerm("preference-flows", "poll breakdown")}>preference flows</button></>
@@ -1906,7 +1911,7 @@ function PdSec({ label, absent, lead, mid, children }) {
    the reader never has to match a line to its pairing by position. An
    optional trailing note names the allocation basis where a second pair
    appears. */
-function TppLine({ c, prefixed, note, hero }) {
+function TppLine({ c, prefixed, note, hero, alt }) {
   const segs = c.segs.filter((x) => x.value != null);
   const mat = c.lab.replace(/^2PP · /, "").replace(/^3-cornered · /, "")
                    .replace(/ · Derived$/, c.derived ? " (derived)" : "");
@@ -1917,6 +1922,9 @@ function TppLine({ c, prefixed, note, hero }) {
             normal word-spacing (.pd-mat) so "ALP v L/NP" does not open up
             with the pairs after it */}
         {prefixed && <span className="pd-mat">{mat}: </span>}
+        {/* an alternative reading of the pair above, so it takes a connector
+            instead of repeating that pair's name */}
+        {alt && <span className="pd-vs">or </span>}
         {segs.map((x, i) => (
           <React.Fragment key={i}>
             {i > 0 && (segs.length === 2
@@ -2143,7 +2151,7 @@ function PollLedger({ r, dirSegments }) {
             three matchups has one answer and two supporting readings, and a
             three-cornered contest has too many figures to carry it */}
         {tppLines(tcs, r).map((x, i) => (
-          <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1} note={x.note}
+          <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt}
                    hero={i === 0 && x.c.segs.filter((g) => g.value != null).length === 2} />
         ))}
       </PdSec>
