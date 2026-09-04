@@ -909,6 +909,13 @@ function buildAlt(date, firm) {
   if (a && a.lo != null) out.tppAlt2 = { lnp: r1(a.lo), onp: r1(100 - a.lo) };
   return out;
 }
+/* tpp3 is a per-poll field (only Fox & Hedgehog prints a three-cornered
+   preferred), so it rides with the row rather than a join map, the same way
+   undecided and tppFlows do. */
+function build3cp(p) {
+  if (!p.tpp3) return {};
+  return { tppKind: "3cp", tpp3: { alp: r1(p.tpp3.alp), lnp: r1(p.tpp3.lnp), onp: r1(p.tpp3.onp) } };
+}
 function primaryOf(p) {
   return { alp: p.alp, lnp: p.lnp, grn: p.grn, onp: p.onp, oth: (p.ind == null && p.oth == null) ? null : r1((p.ind ?? 0) + (p.oth ?? 0)) };
 }
@@ -1095,7 +1102,7 @@ const individualPolls = POLLS.map((p) => {
     // absent where the wave sits in none of the three series
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
-    p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
+    p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     // link back to the published release/report this row came from (the
     // citation Wikipedia carries for it). Omitted where no source is cited,
@@ -1168,7 +1175,7 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     // absent where the wave sits in none of the three series
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
     alp2pp: p.tpp_alp ?? null, lnp2pp: p.tpp_lnp ?? null,
-    p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...buildPpm(p.date, p.pollster),
+    p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     ...(p.url ? { url: p.url } : {}),
     // the pollster's own release page when `url` cites something else (same

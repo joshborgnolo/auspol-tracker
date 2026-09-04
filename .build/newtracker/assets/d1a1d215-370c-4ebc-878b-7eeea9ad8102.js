@@ -3277,7 +3277,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
      values. Both spellings are still read here, the short one winning if
      a hand-edited URL carries both; only the short one is ever written. */
   const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", primary: "primary", leadership: "leadership", direction: "direction" };
-  const MEAS_BY_URL = { o: "onp", lo: "lnponp", onp: "onp", lnponp: "lnponp" };
+  const MEAS_BY_URL = { o: "onp", lo: "lnponp", "3": "3cp", onp: "onp", lnponp: "lnponp", "3cp": "3cp" };
   const LEAD_BY_URL = { a: "alp", l: "lnp", o: "onp", alp: "alp", lnp: "lnp", onp: "onp" };
   const urlInit = (() => {
     const p = new URLSearchParams(window.location.search);
@@ -3510,7 +3510,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
      view it lives elsewhere: beside the lead control in the ap-2line wrapper
      below, so a phone sees the pair share one line. */
   const RANGE_LAB = { "12": "Last 12 months", "6": "Last 6 months", "3": "Last 3 months" };
-  const MEASURE_LAB = { lnp: "ALP v L/NP", onp: "ALP v ON", lnponp: "L/NP v ON" };
+  const MEASURE_LAB = { lnp: "ALP v L/NP", onp: "ALP v ON", lnponp: "L/NP v ON", "3cp": "3-cornered" };
   const HOLDER_LAB = { alp: "ALP", lnp: "L/NP", onp: "ON" };
   const pills = [];
   if (ql) pills.push({ k: "q", lab: "“" + q.trim() + "”", off: () => setQ("") });
@@ -3533,7 +3533,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
      without it the URL was normalised every render, and this effect also
      runs for the reader who typed a stale or partial query by hand. */
   const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d" };  // facet → URL letter (inverse of the restore map)
-  const MEAS_BY_ID = { onp: "o", lnponp: "lo" };                          // matchup → URL letter; "lnp" is the omitted default
+  const MEAS_BY_ID = { onp: "o", lnponp: "lo", "3cp": "3" };              // matchup → URL letter; "lnp" is the omitted default
   const LEAD_BY_ID = { alp: "a", lnp: "l", onp: "o" };                    // holder → URL letter; "all" is the omitted default
   React.useEffect(() => {
     const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "who", "when", "has", "vs", "lead", "view", "scope"];
@@ -3716,7 +3716,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
               summary={[measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
             <div className="ap-pop-head"><span>Show the lead in</span></div>
             <div className="ap-poplist" role="radiogroup" aria-label="Lead column matchup">
-              {["lnp", "onp", "lnponp"].map((m) => (
+              {["lnp", "onp", "lnponp", "3cp"].map((m) => (
                 <PopRow key={m} radio on={measure === m} label={MEASURE_LAB[m]}
                         n={rows.filter((r) => archLeadInfo(r, m)).length} onClick={() => onMeasure(m)} />
               ))}
@@ -3724,7 +3724,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
             <div className="ap-pop-head bordered"><span>Held by</span></div>
             <div className="ap-poplist" role="radiogroup" aria-label="Lead held by">
               {[{ id: "all", label: "Either" }].concat(
-                ({ lnp: ["alp", "lnp"], onp: ["alp", "onp"], lnponp: ["lnp", "onp"] })[measure]
+                ({ lnp: ["alp", "lnp"], onp: ["alp", "onp"], lnponp: ["lnp", "onp"], "3cp": ["alp", "lnp", "onp"] })[measure]
                   .map((id) => ({ id, label: HOLDER_LAB[id] }))).map((o) => (
                 <PopRow key={o.id} radio on={lead === o.id} label={o.label}
                         n={o.id === "all" ? without("lead").length

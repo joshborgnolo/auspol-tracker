@@ -94,6 +94,22 @@ export function validate(D) {
       fail("flows-range", `tpp_flows = ${p.tpp_flows}`);
     if (p.tpp_flows != null && !["Roy Morgan", "RedBridge / Accent"].includes(p.pollster))
       fail("flows-pollster", `tpp_flows on a row for ${p.pollster}`);
+    // 2b2. tpp3 (Fox & Hedgehog's three-cornered preferred) carries all
+    //      three slices or none, each in bounds, and the trio sums ~100 –
+    //      the same sum discipline as the 2PP pair.
+    if (p.tpp3 != null) {
+      if (p.pollster !== "Fox & Hedgehog")
+        fail("3cp-pollster", `tpp3 on a row for ${p.pollster}`);
+      const t3 = ["alp", "lnp", "onp"].map((k) => p.tpp3[k]);
+      if (t3.some((v) => v == null))
+        fail("3cp-shape", `tpp3 missing a slice: ${JSON.stringify(p.tpp3)}`);
+      else {
+        for (const [k, v] of [["alp", t3[0]], ["lnp", t3[1]], ["onp", t3[2]]])
+          if (v < 10 || v > 70) fail("3cp-range", `tpp3.${k} = ${v}`);
+        const s = t3[0] + t3[1] + t3[2];
+        if (Math.abs(s - 100) > 1) fail("3cp-sum", `Σ tpp3 = ${s.toFixed(1)} (expected ~100)`);
+      }
+    }
     // 2c. releaseUrl, where present, is the pollster's OWN release page – an
     //     absolute https URL. Anything else is a hand-entry slip, not a
     //     weird source.

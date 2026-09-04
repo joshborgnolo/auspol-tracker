@@ -2292,6 +2292,7 @@
       "oth": null,
       "tpp_alp": 51,
       "tpp_lnp": 49,
+      "tpp3": { "alp": 44, "lnp": 27, "onp": 29 },
       "url": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fpoll-reveals-majority-of-australians-think-labor-needs-to-give-parents-more-childcare-choice%2Fnews-story%2F55f6d28f2a7fe8d52464e9d32b82f75f",
       "releaseUrl": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-february-2026-national-voter-sentiment-survey",
       "methodUrl": "https://tinyurl.com/Feb26FEDPollFoxHedgehogAPC-1"
@@ -3374,6 +3375,7 @@
       "oth": null,
       "tpp_alp": 49,
       "tpp_lnp": 51,
+      "tpp3": { "alp": 43, "lnp": 27, "onp": 30 },
       "url": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fpoll-reveals-australians-want-to-give-someone-else-a-go%2Fnews-story%2F822912d3d85418363515e3ea0e062986",
       "releaseUrl": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-may-2026-national-voter-sentiment-survey",
       "methodUrl": "https://tinyurl.com/May2026-Methodology-FH"
