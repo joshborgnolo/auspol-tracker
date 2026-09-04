@@ -1973,6 +1973,15 @@ function EffLines({ eff }) {
      mixed row keeps the note parenthesised on the out-of-window clause */
   const prim = eff.lnp || eff.imp;
   const shareOut = prim && !prim.w && (!eff.onp || !eff.onp.w);
+  /* A wave that has fallen out of the window still DID something on the day
+     it landed, and "None." threw that away. gen-data re-runs the same
+     leave-one-out at the poll's own publication day and files it as `t`, so
+     the row can say what the wave was worth then instead of only that it is
+     worth nothing now. Reading it means swapping lo/hi for that pair and
+     forcing w, or the clause would also append its own "(outside …)" - the
+     sentence already ends with the condition. `t` is absent where the wave
+     cannot be estimated on its own day, and then "None." still stands. */
+  const asThen = (e) => ({ ...e, lo: e.t.lo, hi: e.t.hi, w: 1 });
   /* the window as a NOUN PHRASE, so the two places that name it cannot drift
      apart: the standalone row leads with "None." because there the note IS
      the value - the wave has no figure to give - while a mixed row keeps it
@@ -1989,9 +1998,15 @@ function EffLines({ eff }) {
     <span className="pd-meta-i">
       <span className="pd-meta-k">2PP agg. effect</span>
       <span className="pd-meta-v">
-        {shareOut ? (
-          <span className="pd-s-note">None. Outside {winSpan(prim.m)}</span>
+        {shareOut ? (prim.t ? (
+          <React.Fragment>
+            {eff.lnp ? clause(asThen(eff.lnp), "L/NP") : clause(asThen(eff.imp), "L/NP", true)}
+            {eff.onp && eff.onp.t && <React.Fragment>; {clause(asThen(eff.onp), "ON")}</React.Fragment>}
+            <span className="pd-s-note">, when inside {winSpan(prim.m)}</span>
+          </React.Fragment>
         ) : (
+          <span className="pd-s-note">None. Outside {winSpan(prim.m)}</span>
+        )) : (
           <React.Fragment>
             {eff.lnp ? clause(eff.lnp, "L/NP") : clause(eff.imp, "L/NP", true)}
             {eff.onp && <React.Fragment>; {clause(eff.onp, "ON")}</React.Fragment>}

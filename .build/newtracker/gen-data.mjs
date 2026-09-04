@@ -520,6 +520,12 @@ const alt2pp = { alp_on: altAON.monthly, lnp_on: altLON.monthly };
      hi  – the standing aggregate, identically rounded (so hi−lo is the move)
      w   – the poll sits inside the aggregation's window: without it, a zero
            move reads "before the window", not "no pull"
+     t   – ONLY when w is 0: the same leave-one-out re-run at the poll's own
+           publication day, so a wave that has since fallen out of the window
+           can still say what it did when it was in one. Everything else is
+           held identical - same rows, same house-effect curve, just read at
+           `ref = this poll's date` instead of at the newest poll's, which is
+           all `nowcastAdj` needs to see the window that closed on it
      m   – the ALP-v-ON line was measured against its MONTHLY mean (the
            series is too thin to nowcast), so w speaks about that month
    Series: `lnp` for a poll with a published classic pair; `imp` instead for
@@ -536,6 +542,17 @@ const effByKey = (() => {
   const inWin = (rows, key) => rows.some((r) => r.key === key
     && ddays(ref, r.mid) >= 0 && ddays(ref, r.mid) <= HL_WINDOW);
   const loo = (rows, he, key) => { const r = nowcastAdj(rows.filter((q) => q.key !== key), he, ref); return r ? r.v : null; };
+  /* The same pair read at the poll's OWN day. nowcastAdj already drops rows
+     with ddays < 0, so passing that day restricts the window to the polls
+     that existed then - no separate filtering, and no risk of the two halves
+     disagreeing about which rows are in scope. Null when the wave cannot be
+     estimated on its own day (a lone poll leaves nothing to compare). */
+  const thenPair = (rows, he, key, iso) => {
+    const at = new Date(iso).getTime();
+    const hi = nowcastAdj(rows, he, at);
+    const lo = nowcastAdj(rows.filter((q) => q.key !== key), he, at);
+    return hi && lo ? { lo: r1(lo.v), hi: r1(hi.v) } : null;
+  };
   /* the ON matchup's CURRENT basis, mirroring altNowcast's gate: a nowcast
      where the series supports one, else the last monthly point it draws */
   const onpNow = altAON.adjusted ? nowcastAdj(altAON.rows, altAON.he, ref) : null;
@@ -546,16 +563,25 @@ const effByKey = (() => {
     const eff = {};
     if (p.tpp_alp != null && cur2pp) {
       const lo = loo(tppRows, houseEffect, key);
-      if (lo != null) eff.lnp = { lo: r1(lo), hi: r1(cur2pp.v), w: inWin(tppRows, key) ? 1 : 0 };
+      if (lo != null) {
+        eff.lnp = { lo: r1(lo), hi: r1(cur2pp.v), w: inWin(tppRows, key) ? 1 : 0 };
+        if (!eff.lnp.w) { const t = thenPair(tppRows, houseEffect, key, p.date); if (t) eff.lnp.t = t; }
+      }
     } else if (p.tpp_alp == null && synthKeys.has(key) && curSynth) {
       const lo = loo(tppRowsSynth, synthEffect, key);
-      if (lo != null) eff.imp = { lo: r1(lo), hi: r1(curSynth.v), w: inWin(tppRowsSynth, key) ? 1 : 0 };
+      if (lo != null) {
+        eff.imp = { lo: r1(lo), hi: r1(curSynth.v), w: inWin(tppRowsSynth, key) ? 1 : 0 };
+        if (!eff.imp.w) { const t = thenPair(tppRowsSynth, synthEffect, key, p.date); if (t) eff.imp.t = t; }
+      }
     }
     const ao = ALT_BY.get(key) && ALT_BY.get(key).ao;
     if (ao != null) {
       if (onpNow) {
         const r = nowcastAdj(altAON.rows.filter((q) => q.key !== key), altAON.he, ref);
-        if (r) eff.onp = { lo: r1(r.v), hi: r1(onpNow.v), w: inWin(altAON.rows, key) ? 1 : 0 };
+        if (r) {
+          eff.onp = { lo: r1(r.v), hi: r1(onpNow.v), w: inWin(altAON.rows, key) ? 1 : 0 };
+          if (!eff.onp.w) { const t = thenPair(altAON.rows, altAON.he, key, p.date); if (t) eff.onp.t = t; }
+        }
       } else if (onpMonth) {
         const rest = altAON.rows.filter((q) => q.key !== key && q.ym === onpMonth.ym);
         const est = altAON.adjusted ? monthWithSe(rest, altAON.he, onpMonth.ym) : null;
