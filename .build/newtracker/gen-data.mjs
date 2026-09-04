@@ -962,7 +962,10 @@ const CHG_MEASURES = {
   pLnp:      (p, a, pm) => p.lnp ?? null,
   pGrn:      (p, a, pm) => p.grn ?? null,
   pOnp:      (p, a, pm) => p.onp ?? null,
-  pOth:      (p, a, pm) => p.oth ?? null,
+  /* "Other" on screen is IND+OTH combined (primaryVal's oth branch), so the
+     delta must compare the combined series – a wave filing ind-only shows a
+     Other cell but would look missing to a p.oth-only delta. */
+  pOth:      (p, a, pm) => primaryVal(p, "oth"),
   // the movable share – "can't say" beside the primaries (Roy Morgan), the
   // shortfall inside the two-party pair (Essential), and the not-firm share
   // of the decided (Resolve). Each is that house's own series, so a delta
@@ -1067,7 +1070,7 @@ const individualPolls = POLLS.map((p) => {
        label read off the ym bucket loudly opened the archive in June while
        every row said its fieldwork began in May. Only carried when it
        differs from ym, so the byte cost lands only on straddling waves. */
-    ...(fym !== ym ? { fym } : {}),
+    ...(fym != null && fym !== ym ? { fym } : {}),
     field, dateLabel: field, released: p.date, sample: p.sample ?? null,
     // the commissioning publisher, exactly as the Latest-polls table shows
     // it – "Self-published" where the wave reported under no client
@@ -1344,11 +1347,12 @@ const showWorking = (() => {
   return { tpp, primary };
 })();
 /* The tables must say what the estimates say – drift here means an emitted
-   table contradicts the hero it claims to explain. */
+   table contradicts the hero it claims to explain. Fail the build, don't
+   warn-and-ship a page that disagrees with itself. */
 if (showWorking.tpp && showWorking.tpp.v !== hlNow.alp)
-  console.warn(`  WARN show-working 2pp ${showWorking.tpp.v} != headline ${hlNow.alp}`);
+  throw new Error(`show-working 2pp ${showWorking.tpp.v} != headline ${hlNow.alp} – emitted table would contradict the hero`);
 if (showWorking.primary && showWorking.primary.v !== aggPrimary[aggPrimary.length - 1].alp)
-  console.warn(`  WARN show-working primary ${showWorking.primary.v} != aggPrimary ${aggPrimary[aggPrimary.length - 1].alp}`);
+  throw new Error(`show-working primary ${showWorking.primary.v} != aggPrimary ${aggPrimary[aggPrimary.length - 1].alp} – emitted table would contradict the hero`);
 console.log("showWorking:",
   showWorking.tpp ? `2pp mean ${showWorking.tpp.mean}% over ${showWorking.tpp.k} polls` : "2pp window empty",
   "|",
