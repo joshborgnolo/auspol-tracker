@@ -1194,7 +1194,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
     : [];
   /* Five cards caption what the fan behind the singled-out line is made
      of. The lead-in names the measure – the approval charts say it in
-     words ("Approve minus disapprove") since their static subtitles name
+     words ("Approval minus disapproval") since their static subtitles name
      an office instead; the ppmm/primary/tpp cards lead with their own
      subtitle, which already names the measure. Then the fan's
      composition: "all" when every past term from the shown start is on
@@ -1209,7 +1209,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
       || M.key === "ppmm" || M.key === "primary" || M.key === "tpp";
     if (!fanned || !banded) return M.sub;
     const lead = M.key === "net" || M.key === "oppnet"
-      ? "Approve minus disapprove"
+      ? "Approval minus disapproval"
       : M.sub;
     const firstYear = Math.min(...pastShown.map((c) => c.year));
     const gapped = cycles.some((c) => !c.current && c.year >= firstYear && hidden.has(c.year));
