@@ -2198,6 +2198,10 @@ body.dark .poll-detail {
 .pd-meta-k {
   font-size: var(--pd-meta); font-weight: 600;
   color: var(--pd-ink-2); white-space: nowrap;
+  /* a label rendered as a hi-term <button> inherits the UA's
+     text-align:center and its text drifts right of the label column's
+     other rows; the author layer outranks the UA rule, so pin it here */
+  text-align: left;
 }
 .pd-meta-v { min-width: 0; font-weight: 400; color: var(--pd-ink); text-wrap: pretty; }
 /* n_eff. The default <sub> is sized in half-leading and pushes the line box
