@@ -1965,11 +1965,16 @@ function EffLines({ eff }) {
      mixed row keeps the note parenthesised on the out-of-window clause */
   const prim = eff.lnp || eff.imp;
   const shareOut = prim && !prim.w && (!eff.onp || !eff.onp.w);
-  const winText = (m) => `outside the ${m ? "month" : "21-day window"} the aggregate covers`;
+  /* the window as a NOUN PHRASE, so the two places that name it cannot drift
+     apart: the standalone row leads with "None." because there the note IS
+     the value - the wave has no figure to give - while a mixed row keeps it
+     parenthesised after the clause it qualifies, where a full stop would
+     read as the end of the sentence it sits inside. */
+  const winSpan = (m) => `the aggregate\u2019s ${m ? "month" : "21-day window"}`;
   const clause = (e, who, imp) => (
     <React.Fragment>
       {signed(e)} for Labor vs. {who}{imp && <React.Fragment> ({implied})</React.Fragment>}
-      {!e.w && <span className="pd-s-note"> ({winText(e.m)})</span>}
+      {!e.w && <span className="pd-s-note"> (outside {winSpan(e.m)})</span>}
     </React.Fragment>
   );
   return (
@@ -1977,7 +1982,7 @@ function EffLines({ eff }) {
       <span className="pd-meta-k">2PP agg. effect</span>
       <span className="pd-meta-v">
         {shareOut ? (
-          <span className="pd-s-note">{winText(prim.m)}</span>
+          <span className="pd-s-note">None. Outside {winSpan(prim.m)}</span>
         ) : (
           <React.Fragment>
             {eff.lnp ? clause(eff.lnp, "L/NP") : clause(eff.imp, "L/NP", true)}
