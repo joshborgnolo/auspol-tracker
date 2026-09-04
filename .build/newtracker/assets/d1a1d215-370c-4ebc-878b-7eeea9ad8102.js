@@ -3791,7 +3791,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
                   pollster filed one with the APC (Resolve, Roy Morgan et al.
                   file none and dash). Sparse column, so not sortable. */}
               <th scope="col" className="hide-md"
-                  title="Effective sample, where the pollster filed one with the Australian Polling Council">Eff. n</th>
+                  title="Effective sample, where the pollster filed one with the Australian Polling Council">n<sub>eff</sub></th>
 
               {facet === "twopp" && (<>
                 <th scope="col" className="ta-l apub-col hide-md"
@@ -3950,7 +3950,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
         on 2PP – pooled from its polls with a 90-day half-life, so its recent methods count for more, and
         shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure’s
         own time, and it is a property of the pollster, not of this one poll.
-        {" "}<strong>Eff. n</strong> is the pollster’s own published effective sample, filed with the
+        {" "}<strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, filed with the
         Australian Polling Council – Newspoll, YouGov, Essential, DemosAU and RedBridge / Accent
         file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown.
       </p>
