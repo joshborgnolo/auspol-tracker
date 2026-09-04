@@ -14301,21 +14301,21 @@ function CycleChart({
      subtitle, which already names the measure. Then the fan's
      composition: "all" when every past term from the shown start is on
      the board, "selected" when some later term is off too (front-trims
-     alone just move the start year), the outcome filter's scope when the
-     board has been cut to one outcome (a filter is itself a selection,
-     but names its own clause instead), and the static subtitle alone
-     when the board is so thin there is no fan at all. The start year
-     tracks the earliest term left on the board. */
+     alone just move the start year), and – when the board has been cut
+     to one outcome – "all terms", since the outcome clause itself is
+     the selection (what remains on the board is exactly every term of
+     that kind), and the static subtitle alone when the board is so thin
+     there is no fan at all. The start year tracks the earliest term
+     left on the board. */
   const cardSub = (() => {
     const fanned = M.key === "net" || M.key === "oppnet" || M.key === "ppmm" || M.key === "primary" || M.key === "tpp";
     if (!fanned || !banded) return M.sub;
     const lead = M.key === "net" || M.key === "oppnet" ? "Approval minus disapproval" : M.sub;
     const firstYear = Math.min(...pastShown.map(c => c.year));
+    if (outcomeShown === "returned") return lead + ", with a historical fan chart for all terms since " + firstYear + " that ended in a returned government";
+    if (outcomeShown === "ousted") return lead + ", with a historical fan chart for all terms since " + firstYear + " that ended in an ousted government";
     const gapped = cycles.some(c => !c.current && c.year >= firstYear && hidden.has(c.year));
-    const cap = lead + ", with a historical fan chart for " + (gapped ? "selected" : "all") + " previous terms since " + firstYear;
-    if (outcomeShown === "returned") return cap + " that ended in a returned government";
-    if (outcomeShown === "ousted") return cap + " that ended in an ousted government";
-    return cap;
+    return lead + ", with a historical fan chart for " + (gapped ? "selected" : "all") + " previous terms since " + firstYear;
   })();
   /* Hanson's tickbox follows her data, not the board: her series belongs to
      the current term, but she is a person-toggle, not a property of the 2025
