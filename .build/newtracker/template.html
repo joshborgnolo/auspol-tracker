@@ -2148,7 +2148,16 @@ body.dark .poll-detail {
 .pd-s {
   margin: 0; font-size: var(--pd-body); line-height: 1.45; font-weight: 400;
   color: var(--pd-ink);
-  font-variant-numeric: tabular-nums; text-wrap: pretty;
+  font-variant-numeric: tabular-nums;
+  /* NOT text-wrap: pretty. Pretty avoids a short last line, which is right
+     for prose and wrong for a run of figures: it was holding "9% don't know,"
+     back to pad the tail, breaking "Albanese: 35% approve, 56% disapprove, 9%
+     don't know," a phrase early even where the whole phrase fitted with 12px
+     to spare. Greedy filling keeps the measures together and lets the summary
+     ("net −21") take the short line, which is where a short line belongs
+     here. Worth 3 → 29 of 68 approval lines holding their shares together at
+     390px, measured across the archive. */
+  text-wrap: wrap;
 }
 .pd-s + .pd-s { margin-top: 9px; }
 /* A figure is not an emphasised word. Every published number steps a full
@@ -2475,6 +2484,13 @@ button.acc-spread[aria-pressed="true"] {
   .pd-sec { margin-top: 17px; padding-top: 15px; }
   .pd-k { margin-bottom: 9px; }
   .pd-meta-items { gap: 5px var(--pd-gut); }
+  /* On a narrow measure the space BETWEEN items is a luxury the line cannot
+     afford - the comma is already doing that work, and every point spent
+     there is a point the pair itself cannot use. (Going further, to 2px,
+     converted no additional line across 124 archive rows: it only tightened
+     the ones that already fitted. Not taken.) */
+  .pd-s { word-spacing: 3px; }
+  .pd-vs { padding: 0; }
 }
 /* On a phone the matchup name is what pushes a head-to-head onto a third
    line: "ALP v L/NP: 53.5% ALP (▼0.5) vs 46.5% L/NP (▲0.5)" wants 441px and
@@ -2486,7 +2502,12 @@ button.acc-spread[aria-pressed="true"] {
   .pd-mat { display: block; margin: 0 0 2px; }
 }
 @media (max-width: 430px) {
-  .poll-detail { --pd-gut: 14px; --pd-hero: 24px; --pd-fig-appr: 15px; }
+  .poll-detail {
+    --pd-gut: 14px; --pd-hero: 24px; --pd-fig-appr: 15px; --pd-fig: 17px;
+    /* the side padding is the cheapest measure on the page - it widens every
+       line at once, and the panel is already inset by the row it opens under */
+    padding-left: 16px; padding-right: 16px;
+  }
 }
 /* and one rung smaller again where the phone is narrow enough that even
    24px figures can't keep the pair on one line (the name is already above
