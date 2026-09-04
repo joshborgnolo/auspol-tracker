@@ -77,9 +77,18 @@
 // statements' pdftotext output is cached under .build/sampleeff-src/
 // (committed) so a parsing change is re-derivable offline.
 //
+// Reconciliation: the statement's raw "Sample size" row is the authority for
+// `sample` too, but a row ever only met its statement while unstamped – a
+// wave first recorded from rounded press copy ("about 1,500" for the
+// 2026-06-16 Sky Pulse wave, filed as 1492) kept that figure even after its
+// eff-size and methodUrl landed, and no later pass revisited it. The pass
+// below re-parses the committed caches (offline) every run and corrects
+// `sample` to the filed number; a correction must sit within 0.5–2.0× of
+// the value it replaces or it is logged and not written (exit 2).
+//
 // Exit codes: 0 ok (SAMPLEEFF_STATUS line, changed:true/false), 1 fetch/parse
 // failure, 2 guard breach. Status line shape:
-//   SAMPLEEFF_STATUS {"changed":bool,"stamped":n,"methods":n,"failed":n,"skipped":n,"errors":[…]}
+//   SAMPLEEFF_STATUS {"changed":bool,"stamped":n,"methods":n,"samples":n,"failed":n,"skipped":n,"errors":[…]}
 //
 // Usage: `node extract-sampleeff.mjs [leg]` – an optional positional leg
 // name (accent/yougov/newspoll/essential/demosau) runs JUST that leg's
@@ -665,15 +674,92 @@ for (const p of D.polls) {
   methods.push(`${p.date} ${p.pollster} (${rebuilt.methodUrl.split("/").pop().slice(0, 50)})`);
 }
 
-const out = { changed: stamped.length > 0 || methods.length > 0, stamped: stamped.length, methods: methods.length, failed, skipped: unstamped.length - stamped.length - failed, candidates: records.length, errors: errors.concat(ambiguous.map((a) => "ambiguity: " + a)) };
+/* ---- raw-sample reconciliation (offline, from the committed caches) ----
+   `sample` answers to the same authority as sampleEff – the statement's own
+   "Sample size" row – but a row ever only met its statement while unstamped,
+   so a figure first recorded from rounded press copy ("about 1,500" for the
+   2026-06-16 Sky Pulse wave, filed as 1492) survived even after its eff and
+   methodUrl landed. Re-parse the caches every run and correct the row's
+   sample: zero network, and a wave is covered from the run its statement
+   cache lands. YouGov rows resolve their cache url-exactly through methodUrl
+   (the exact statement – series ambiguity impossible by construction); the
+   single-series houses date-match like the stamp pass; Essential rides the
+   living disclosure table (this run's parse, the committed table as
+   fallback). Corrections sit inside 0.5–2.0× of the value they replace or
+   they are logged as guards, not written. */
+const sampleFromCache = (file) => {
+  const rec = parseApcStatement(readFileSync(join(SRC_DIR, file), "utf8"));
+  return rec && Number.isInteger(rec.sample) && rec.end
+    ? { end: rec.end, sample: rec.sample, src: "cache " + file }
+    : null;
+};
+const cacheTxts = readdirSync(SRC_DIR).filter((f) => f.endsWith(".txt"));
+const samplePools = { Newspoll: [], DemosAU: [], "DemosAU (MRP)": [] };
+for (const f of cacheTxts) {
+  const pool = f.startsWith("newspoll-") ? samplePools.Newspoll
+    : f.startsWith("demosau-") ? samplePools[/mrp/i.test(f) ? "DemosAU (MRP)" : "DemosAU"]
+    : null; // yougov-* resolve url-exactly below; Essential handled next
+  const rec = pool && sampleFromCache(f);
+  if (rec) pool.push(rec);
+}
+const essSamplePool = records
+  .filter((r) => r.pollster === "Essential" && Number.isInteger(r.sample) && r.end)
+  .map((r) => ({ end: r.end, sample: r.sample, src: r.src }));
+if (!essSamplePool.length && cacheTxts.includes("essential-disclosure.txt"))
+  try {
+    for (const r of parseEssentialTable(readFileSync(join(SRC_DIR, "essential-disclosure.txt"), "utf8")))
+      essSamplePool.push({ end: r.end, sample: r.sample, src: "cache essential-disclosure.txt" });
+  } catch (e) { console.log("  warn: essential cache re-parse failed: " + String(e.message).slice(0, 100)); }
+samplePools.Essential = essSamplePool;
+
+const samples = [];
+for (const p of D.polls) {
+  if (!NEED_HOUSES.includes(p.pollster)) continue;
+  let cands;
+  if (p.pollster.startsWith("YouGov")) {
+    if (typeof p.methodUrl !== "string") continue;
+    const f = "yougov-" + p.methodUrl.split("/").pop().replace(/[^A-Za-z0-9]+/g, "_").slice(0, 60) + ".txt";
+    const rec = cacheTxts.includes(f) ? sampleFromCache(f) : null;
+    cands = rec ? [rec] : [];
+  } else {
+    cands = (samplePools[p.pollster] || []).filter((r) => Math.abs(ddays(r.end, p.date)) <= 1);
+  }
+  const wants = [...new Set(cands.map((r) => r.sample))];
+  if (!wants.length) continue;
+  if (wants.length > 1) {
+    errors.push(`ambiguity: ${p.date} ${p.pollster} statement sample ${cands.map((r) => r.sample + " (" + r.src + ")").join(" vs ")}`);
+    continue;
+  }
+  const want = wants[0];
+  if (want < 400 || want > 60000) { errors.push(`guard: ${p.date} ${p.pollster} statement sample=${want} out of range`); continue; }
+  if (p.sample === want) continue;
+  if (p.sample == null) {
+    const rebuilt = {};
+    for (const [k, v] of Object.entries(p)) { rebuilt[k] = v; if (k === "client") rebuilt.sample = want; }
+    if (!("sample" in rebuilt)) rebuilt.sample = want;
+    for (const k of Object.keys(p)) delete p[k];
+    Object.assign(p, rebuilt);
+    samples.push(`${p.date} ${p.pollster}: sample := ${want} (${cands[0].src})`);
+    continue;
+  }
+  if (!Number.isInteger(p.sample) || want < p.sample * 0.5 || want > p.sample * 2) {
+    errors.push(`guard: ${p.date} ${p.pollster} statement sample=${want} vs row sample=${p.sample}`);
+    continue;
+  }
+  samples.push(`${p.date} ${p.pollster}: sample ${p.sample}→${want} (${cands[0].src})`);
+  p.sample = want;
+}
+
+const out = { changed: stamped.length > 0 || methods.length > 0 || samples.length > 0, stamped: stamped.length, methods: methods.length, samples: samples.length, failed, skipped: unstamped.length - stamped.length - failed, candidates: records.length, errors: errors.concat(ambiguous.map((a) => "ambiguity: " + a)) };
 for (const s of stamped) console.log("  stamp " + s);
 for (const s of methods) console.log("  method " + s);
+for (const s of samples) console.log("  sample " + s);
 for (const a of ambiguous) console.log("  AMBIGUOUS " + a);
 if (errors.length) {
   for (const e of errors) console.log("  ERROR " + e);
   statusAndExit(out, 2);
 }
-if (stamped.length || methods.length) {
+if (stamped.length || methods.length || samples.length) {
   const txt = readFileSync(OUT, "utf8");
   const trailingNl = txt.endsWith("\n") ? "\n" : "";
   const next = JSON.stringify(D, null, 2) + trailingNl;
