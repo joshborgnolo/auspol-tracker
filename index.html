@@ -6685,11 +6685,11 @@ window.AP.nextPolls = npProject;
   /* the chart card comes out at 1200px and 2x (copy-chart.js) and the
      breakdown copy stays on that sheet so the two read as one output. The
      margins are tighter, though: a 1200px card with one 28px unit of air
-     on all four sides, and the header and footer lines inside ride the
-     same rhythm, so no side of the sheet is emptier than another */
+     on all four sides, and the footer line inside rides the same rhythm,
+     so no side of the sheet is emptier than another */
   const CARD_W = 1200, PAD = 28, SCALE = 2;
   const CONTENT_W = CARD_W - PAD * 2;
-  const TEXT_H = 15;   /* the header and footer are one 15px line each */
+  const TEXT_H = 15;   /* the footer is one 15px line */
 
   /* Resolved through a probe rather than read as a raw token, because a
      canvas fill wants a concrete colour - the same trick copy-chart.js
@@ -6735,6 +6735,40 @@ window.AP.nextPolls = npProject;
       if (hostStyle == null) host.removeAttribute("style");
       else host.setAttribute("style", hostStyle);
     };
+  };
+
+  /* ---- the poll row ---------------------------------------------------
+     The band carries Fieldwork, Published, Sample … but never names the
+     firm: the house labels the row ABOVE the panel, and the card does
+     not take that row. So for the measure the capture re-titles the
+     band's Fieldwork row - the window moves into the value beside the
+     house and the pair reads "Poll: ‹house›, ‹fieldwork›" at the head
+     of the list, in the band's own label/value voice, because it IS the
+     band. The original node is kept and goes back, untouched. */
+  const retitleFieldworkRow = (panel, house) => {
+    const ks = panel.querySelectorAll(".pd-meta-k");
+    for (const k of ks) {
+      if ((k.textContent || "").trim() !== "Fieldwork") continue;
+      const item = k.parentElement;
+      if (!item || !item.classList.contains("pd-meta-i")) return () => {};
+      const parent = item.parentElement;
+      if (!parent) return () => {};
+      const v = item.querySelector(".pd-meta-v");
+      const fieldwork = ((v && v.textContent) || "").replace(/\s+/g, " ").trim();
+      if (!fieldwork) return () => {};
+      const clone = item.cloneNode(true);
+      clone.querySelector(".pd-meta-k").textContent = "Poll";
+      clone.querySelector(".pd-meta-v").textContent =
+        (house ? house + ", " : "") + fieldwork;
+      const next = item.nextSibling;
+      item.remove();
+      parent.insertBefore(clone, parent.firstChild);
+      return () => {
+        clone.remove();
+        parent.insertBefore(item, next);
+      };
+    }
+    return () => {};
   };
 
   /* ---- the measure --------------------------------------------------
@@ -6858,8 +6892,7 @@ window.AP.nextPolls = npProject;
     }
     const pcs = getComputedStyle(panel);
     return { els, texts, rootW: root.width, rootH: root.height,
-             bg: pcs.backgroundColor, fontFamily: pcs.fontFamily,
-             ink: pcs.color };
+             bg: pcs.backgroundColor, fontFamily: pcs.fontFamily };
   };
 
   const roundRectPath = (c, x, y, w, h, r) => {
@@ -6870,18 +6903,18 @@ window.AP.nextPolls = npProject;
     c.arcTo(x + w, y, x + w, y + h, r);
     c.arcTo(x + w, y + h, x, y + h, r);
     c.arcTo(x, y + h, x, y, r);
-    c.arcTo(x, y, x + w, y, r);
+    c.arcTo(x, y, x + r, y, r);
     c.closePath();
   };
 
-  const paintCard = (model, house) => new Promise((resolve, reject) => {
+  const paintCard = (model) => new Promise((resolve, reject) => {
     try {
       const factor = CONTENT_W / model.rootW;
       const panelH = model.rootH * factor;
-      /* PAD everywhere: around the card, and again between the header,
-         panel and footer lines inside it, so every side of the sheet
-         carries the same margin */
-      const H = Math.ceil(PAD + (house ? TEXT_H + PAD : 0) + panelH + PAD + TEXT_H + PAD);
+      /* PAD everywhere: around the card, and again between the panel and
+         the footer line inside it, so every side of the sheet carries
+         the same margin */
+      const H = Math.ceil(PAD + panelH + PAD + TEXT_H + PAD);
       const cv = document.createElement("canvas");
       cv.width = CARD_W * SCALE; cv.height = H * SCALE;
       const c = cv.getContext("2d");
@@ -6890,7 +6923,7 @@ window.AP.nextPolls = npProject;
       c.fillRect(0, 0, CARD_W, H);
       c.textBaseline = "alphabetic";
 
-      const ox = PAD, oy = PAD + (house ? TEXT_H + PAD : 0);
+      const ox = PAD, oy = PAD;
       const X = (v) => ox + v * factor, Y = (v) => oy + v * factor;
 
       for (const el of model.els) {
@@ -6967,20 +7000,8 @@ window.AP.nextPolls = npProject;
         }
       }
 
-      /* the pollster is a FACT of the capture, not chrome - it heads the
-         card as a field, in the provenance band's own label/value voice.
-         The site only signs the footer, since the image travels and the
+      /* the site only signs the footer, since the image travels and the
          page it came from does not */
-      if (house) {
-        const hy = PAD + 12;
-        c.font = "600 12px " + model.fontFamily;
-        c.fillStyle = inkVar("--pd-ink-2");
-        const labelW = c.measureText("Pollster").width;
-        c.fillText("Pollster", PAD, hy);
-        c.fillStyle = model.ink;
-        c.font = "600 15px " + model.fontFamily;
-        c.fillText(house, PAD + labelW + 10, hy);
-      }
       c.font = "600 15px " + model.fontFamily;
       c.fillStyle = inkVar("--pd-ink-2");
       c.textAlign = "right";
@@ -6992,11 +7013,12 @@ window.AP.nextPolls = npProject;
   });
 
   /* ---- identification -------------------------------------------------
-     The card names its poll in two places: the header carries the house,
-     and the FILE NAME keeps house and fieldwork window together so two
-     waves of one house never overwrite each other on disk. The house
-     lives on the row ABOVE the expanded one; the fieldwork is the
-     provenance band's own first fact. */
+     On the card the panel stands alone, so the capture re-titles the
+     band's Fieldwork row into "Poll: ‹house›, ‹fieldwork›" - the one
+     fact the band was missing, at the head of the list. The FILE NAME
+     keeps house and window together too, so two waves of one house never
+     overwrite each other on disk. The house lives on the row ABOVE the
+     expanded one; the window reads from the band. */
   const houseName = (panel) => {
     const tr = panel.closest("tr");
     const row = tr && tr.previousElementSibling;
@@ -7031,13 +7053,17 @@ window.AP.nextPolls = npProject;
   /* ---- composition + delivery --------------------------------------- */
   const compose = (panel) => {
     const restore = widenPanel(panel);
+    /* re-title inside the widen window too, so the one swapped row lands
+       under the desktop ladder and is measured with everything else */
+    const untitle = retitleFieldworkRow(panel, houseName(panel));
     try {
       /* one synchronous block: force layout, read the model, restore -
          the parked state never reaches the screen */
       panel.getBoundingClientRect(); /* reflow */
       const model = readModel(panel);
-      return paintCard(model, houseName(panel));
+      return paintCard(model);
     } finally {
+      untitle();
       restore();
     }
   };

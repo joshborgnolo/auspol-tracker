@@ -108,6 +108,36 @@ const PRELUDE = (tag) => `
     navigator.clipboard.__origWrite = w;
     navigator.clipboard.write = () => Promise.reject(new Error("probe: force download fallback"));
   }
+  /* the Fieldwork row is re-titled "Poll: house, fieldwork" and put back
+     inside the capture's own synchronous block - the nodes involved are
+     long detached by the time anything async could look. MutationRecords
+     still carry the facts: node identity gets a WeakMap id so a removal
+     can be paired with the identical node's later return */
+  window.__probeRetitle = [];
+  window.__probeIds = new WeakMap();
+  let probeSeq = 0;
+  const probeId = (n) => {
+    let i = window.__probeIds.get(n);
+    if (!i) { i = ++probeSeq; window.__probeIds.set(n, i); }
+    return i;
+  };
+  new MutationObserver((ms) => {
+    for (const m of ms) {
+      const band = !!(m.target.classList && m.target.classList.contains("pd-meta-items"));
+      for (const n of m.addedNodes) {
+        if (n.nodeType !== 1 || !n.classList.contains("pd-meta-i")) continue;
+        window.__probeRetitle.push({ ev: "add", id: probeId(n), band,
+          first: m.previousSibling === null,
+          k: ((n.querySelector(".pd-meta-k") || {}).textContent || "").trim(),
+          v: ((n.querySelector(".pd-meta-v") || {}).textContent || "").replace(/\\s+/g, " ").trim() });
+      }
+      for (const n of m.removedNodes) {
+        if (n.nodeType !== 1 || !n.classList.contains("pd-meta-i")) continue;
+        window.__probeRetitle.push({ ev: "remove", id: probeId(n), band,
+          k: ((n.querySelector(".pd-meta-k") || {}).textContent || "").trim() });
+      }
+    }
+  }).observe(document, { childList: true, subtree: true });
 `;
 /* downloads are tagged so parallel pages can't claim each other's files */
 const tagDownloads = (tag) => `
@@ -186,16 +216,53 @@ try {
     const paints = await page.evaluate("window.__probePaints");
     ok("canvas painted many colours", paints.length && paints[paints.length - 1].colors > 6, paints);
     /* the card's chrome: one tight, EVEN margin on all four sides (28
-       logical = 56 physical px), the pollster header riding the top band,
-         and the site's name alone in the footer */
+       logical = 56 physical px). Only the footer ink reaches a margin -
+       right-aligned at the right edge, sitting one line above the bottom -
+       so it pins those two exactly. The left and top edges are DERIVED:
+       left = (28 card + 24 panel pad + 138 centred --pd-measure inset)
+       = 190 logical = 380 physical, top = (28 + 28 panel pad) = 56
+       logical = 112 physical plus the first line box's leading */
     const card = paints[paints.length - 1];
+    console.log("  card ink bounds:", JSON.stringify(card.ink), "h =", card.h);
     const inInk = (v) => card.ink && v >= 44 && v <= 84;
-    check("left margin is one tight unit", inInk(card.ink.minX), true);
+    const leftInk = (v) => card.ink && v >= 348 && v <= 412;
+    const topInk = (v) => card.ink && v >= 96 && v <= 136;
+    check("left edge: card margin + panel padding + centred measure", leftInk(card.ink.minX), true);
+    check("top edge: card margin + panel padding", topInk(card.ink.minY), true);
     check("right margin is one tight unit", inInk(2400 - card.ink.maxX), true);
-    check("header rides the top margin", inInk(card.ink.minY), true);
     check("footer sits one margin above the bottom edge", inInk(card.h - card.ink.maxY), true);
-    check("margins are equal left and right",
-      Math.abs(card.ink.minX - (2400 - card.ink.maxX)) <= 12, true);
+    ok("no ink crosses the card margin", card.ink && card.ink.minX >= 48 && card.ink.minY >= 48 &&
+       2400 - card.ink.maxX >= 48 && card.h - card.ink.maxY >= 48, card.ink);
+    /* the capture re-titles the band's Fieldwork row into "Poll: ‹house›,
+       ‹fieldwork›" at the head of the list, and puts it back verbatim */
+    const retitle = await page.evaluate(`(() => {
+      const d = document.querySelector(".poll-detail");
+      const row = d.closest("tr").previousElementSibling;
+      const house = ((row.querySelector(".pollster-name") || {}).textContent || "")
+        .replace(/↗/g, "").replace(/\\s+/g, " ").trim();
+      let firstK = null, fieldwork = null;
+      for (const k of d.querySelectorAll(".pd-meta-k")) {
+        const t = (k.textContent || "").trim();
+        if (firstK === null) firstK = t;
+        if (t === "Fieldwork") {
+          fieldwork = ((k.parentElement.querySelector(".pd-meta-v") || {}).textContent || "")
+            .replace(/\\s+/g, " ").trim();
+        }
+      }
+      return { house, firstK, fieldwork, rec: window.__probeRetitle };
+    })()`);
+    check("Fieldwork row is back at the head of the band", retitle.firstK, "Fieldwork");
+    const pollAdd = retitle.rec.find((r) => r.ev === "add" && r.k === "Poll");
+    ok("a Poll row headed the band during the capture", !!pollAdd, retitle.rec);
+    if (pollAdd) {
+      check("Poll row sits on the band itself", pollAdd.band, true);
+      check("Poll row is first in the band", pollAdd.first, true);
+      check("Poll value is house, fieldwork", pollAdd.v, retitle.house + ", " + retitle.fieldwork);
+    }
+    const fwGone = retitle.rec.find((r) => r.ev === "remove" && r.k === "Fieldwork" && r.band);
+    const fwBack = fwGone && retitle.rec.find((r) => r.ev === "add" && r.id === fwGone.id);
+    ok("the Fieldwork item left and returned as the same node", !!fwBack,
+       fwGone ? { fwGone, fwBack: !!fwBack } : retitle.rec);
     await page.close();
   }
 
