@@ -2048,6 +2048,12 @@ function AccuracyPanel() {
           const ri = (gi ? recent.length : 0) + rj;
           const { lane, n: nLanes } = lanesFor(c.houses);
           const maxOff = Math.ceil((nLanes - 1) / 2) * LANE_H;
+          /* One house in the field: an average of one IS the poll, so the
+             row draws that poll AS the big dot – firm, date and miss under
+             its own name – rather than an identical mean dot stacked on its
+             only member's small one. */
+          const solo = c.n === 1 ? c.houses[0] : null;
+          const accErr = solo ? solo.err : c.err;
           return (
           <div className="acc-row" key={c.year}>
             <div className="acc-label">
@@ -2063,7 +2069,7 @@ function AccuracyPanel() {
               {[-SPAN / 2, SPAN / 2].map((t) => (
                 <span key={t} className="acc-tick" style={{ left: pct(t) + "%" }}></span>
               ))}
-              {c.houses.map((h) => {
+              {!solo && c.houses.map((h) => {
                 const off = spread ? laneOffset(lane[h.firm] || 0) : 0;
                 return (
                 <span key={h.firm} className="acc-dot" role="img"
@@ -2083,18 +2089,21 @@ function AccuracyPanel() {
                 );
               })}
               <span className="acc-mean" role="img"
-                    style={{ left: pct(c.err) + "%", background: col(c.err) }}
-                    aria-label={`Average of the ${c.n} final polls of ${c.year}: ${c.mean.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(c.err)}`}
-                    onMouseEnter={(e) => open(e, pct(c.err), {
+                    style={{ left: pct(accErr) + "%", background: col(accErr) }}
+                    aria-label={solo
+                      ? `${solo.firm}, ${fmtDay(solo.date)}: Labor ${solo.alp2pp.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(solo.err)}`
+                      : `Average of the ${c.n} final polls of ${c.year}: ${c.mean.toFixed(1)} against a result of ${c.result.toFixed(1)}, a miss of ${sgn(c.err)}`}
+                    onMouseEnter={(e) => open(e, pct(accErr), {
                       year: c.year, flip: ri === 0,
-                      title: `Average of ${c.n} final poll${c.n === 1 ? "" : "s"}`,
-                      date: fmtDay(c.eDate),
+                      title: solo ? solo.firm : `Average of ${c.n} final polls`,
+                      date: solo ? fmtDay(solo.date) : fmtDay(c.eDate),
                       rows: [
-                        { label: "Poll average", value: c.mean.toFixed(1), color: col(c.err) },
+                        { label: solo ? "Poll" : "Poll average",
+                          value: (solo ? solo.alp2pp : c.mean).toFixed(1), color: col(accErr) },
                         { label: "Result", value: c.result.toFixed(1) },
-                        { label: "Miss", value: sgn(c.err), strong: col(c.err) },
+                        { label: "Miss", value: sgn(accErr), strong: col(accErr) },
                       ],
-                      sub: lean(c.err),
+                      sub: lean(accErr),
                     })}
                     onMouseLeave={close}></span>
               {hov && hov.year === c.year && (
@@ -2132,7 +2141,8 @@ function AccuracyPanel() {
       </div>
 
       <p className="table-hint">
-        Big dots are the average of that election’s final polls; small dots are the individual
+        Big dots are the average of that election’s final polls – where only one house
+        was in the field, its own figure stands alone; small dots are the individual
         houses – {CANT_HOVER ? "tap" : "hover"} one for its figure.
         {stacked > 0 && (
           <> {stacked} of them missed by exactly the same amount as another house, so they are
