@@ -537,7 +537,7 @@ const CYC_METRICS = [
   /* The "Approve minus disapprove" half of the approval subs is attached at
      render time as a tap-to-define link – keeping it in the string here would
      leave it as dead text. */
-  { key: "net", title: "Leader net approval", sub: "Sitting prime minister",
+  { key: "net", title: "Prime minister net approval", sub: "Sitting prime minister",
     unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
     step: 20, refAbs: 0, refAbsLabel: "even" },
   { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader",
@@ -1112,7 +1112,7 @@ function cycHolders(c, M) {
 const cycBanded = (cycles, hidden) =>
   cycles.filter((c) => !hidden.has(c.year) && !c.current).length >= 3;
 
-function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan, setHan, showOnp, setOnp, shapes }) {
+function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan, setHan, showOnp, setOnp, shapes, outcomeShown }) {
   const { D } = window.AP;
   const narrow = useNarrow();
   const M = metric;
@@ -1193,6 +1193,38 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
         .filter((e) => !e.metrics || e.metrics.includes(M.key))
         .map((e) => ({ ...e, x: cycEventMonth(e.date, eventCycle.eDate) }))
     : [];
+  /* The two approval charts caption themselves: whose line the chart singles
+     out (the same term the events follow - the sitting term at rest, a
+     lifted or hovered term otherwise) and what the fan behind it is made of.
+     The fan clause names the outcomes filter when the board has been cut to
+     one outcome; a board thinned by hand still reads "since 1987", which
+     stays true of whatever mix remains. The "in his current term" clause is
+     Albanese-true - recast when the sitting prime minister changes. */
+  const cardSub = (() => {
+    if (M.key !== "net" && M.key !== "oppnet") return M.sub;
+    const office = M.leader === "opp" ? "opposition leader" : "prime minister";
+    const scope = outcomeShown === "ousted"
+      ? "for the terms since 1987 at the end of which the government was ousted"
+      : outcomeShown === "returned"
+        ? "for the terms since 1987 at the end of which the government was returned"
+        : "since 1987";
+    const fan = banded
+      ? "a fan chart of historical " + office + " net approval " + scope
+      : null;
+    let subj = null;
+    if (eventCycle) {
+      const chain = [...new Set(
+        (M.leader === "opp" ? eventCycle.oppLead : eventCycle.pm).split(" → "))];
+      const who = chain.length < 3 ? chain.join(" and ")
+        : chain.slice(0, -1).join(", ") + " and " + chain[chain.length - 1];
+      subj = who + "'s net approval" + (eventCycle.current
+        ? (M.key === "net" ? " in his current term" : "")
+        : " in the " + eventCycle.year + " term");
+    }
+    const both = subj && fan ? subj + ", overlaid on " + fan : (subj || fan);
+    if (!both) return M.sub;
+    return both.charAt(0).toUpperCase() + both.slice(1);
+  })();
   /* Hanson's tickbox follows her data, not the board: her series belongs to
      the current term, but she is a person-toggle, not a property of the 2025
      chip – she is the one line that can stand alone with every cycle chip
@@ -1524,7 +1556,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
       <div className="card-head cycle-head">
         <div>
           <h2 className="card-title">{M.title}</h2>
-          <p className="card-sub">{M.sub}{(M.key === "net" || M.key === "oppnet") && (
+          <p className="card-sub">{cardSub}{(M.key === "net" || M.key === "oppnet") && (
             <>{" · "}<button type="button" className="hi-term"
                      title="What the approval question asks"
                      onClick={() => window.AP.openTerm &&
@@ -2347,7 +2379,8 @@ function PastCyclesView() {
           <CycleChart key={m.key} metric={m} cycles={cycles} mode={mode} hidden={hidden} hi={hi}
                       lifted={lifted} unlift={unlift}
                       showHan={showHan} setHan={setShowHan}
-                      showOnp={showOnp} setOnp={setShowOnp} shapes={shapes} />
+                      showOnp={showOnp} setOnp={setShowOnp} shapes={shapes}
+                      outcomeShown={outcomeShown} />
         ))}
       </div>
 
