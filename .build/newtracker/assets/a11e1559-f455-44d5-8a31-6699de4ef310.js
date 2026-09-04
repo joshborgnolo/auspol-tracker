@@ -1436,7 +1436,7 @@ const PARTY_C = {
 
 // segment builders – each returns a list the ShareBar can render at ANY arity
 // A poll may publish SEVERAL headline voting-intention figures – a
-// conventional 2PP, a three-cornered preferred (ALP / L‑NP / ON), an
+// conventional 2PP, a three-cornered preferred (ALP v L‑NP v ON), an
 // ALP v ON head-to-head – or a combination. Normalise them into a list of
 // contests, exactly the way ppmContests does for preferred PM:
 //   [{ kind, lab, flag, segs: [{label, value, color}] }]
@@ -1449,38 +1449,37 @@ function tppContests(r) {
   // ALP v L/NP delta vs the pollster's last poll; L/NP moves the opposite way
   const dAlp = segDelta(r.chg, "alp2pp");
   const dLnp = dAlp ? { v: +(-dAlp.v).toFixed(1), refDate: dAlp.refDate } : null;
-  if (r.tppKind === "3cp" && r.tpp3) {
-    out.push({ kind: "3cp", lab: "3-cornered · ALP / L‑NP / ON", flag: "3-cornered", segs: [
-      { label: "ALP", value: r.tpp3.alp, color: PARTY_C.alp },
-      { label: "L/NP", value: r.tpp3.lnp, color: PARTY_C.lnp },
-      { label: "ON", value: r.tpp3.onp, color: PARTY_C.onp },
-    ] });
-    if (alp != null) out.push({ kind: "2pp", lab: "2PP · ALP v L/NP · Derived", derived: true, flag: null, segs: [
-      { label: "ALP", value: alp, color: PARTY_C.alp, delta: dAlp },
-      { label: "L/NP", value: lnp, color: PARTY_C.lnp, delta: dLnp },
-    ] });
-  } else if (alp != null) {
-    out.push({ kind: "2pp", lab: "2PP · ALP v L/NP", flag: null, segs: [
-      { label: "ALP", value: alp, color: PARTY_C.alp, delta: dAlp },
-      { label: "L/NP", value: lnp, color: PARTY_C.lnp, delta: dLnp },
-    ] });
-  }
   // each One Nation head-to-head carries its OWN change vs the pollster's last
   // publication of that same matchup; ON moves opposite its opponent
   const mirror = (d) => (d ? { v: +(-d.v).toFixed(1), refDate: d.refDate } : null);
   const dAltAlp = segDelta(r.chg, "altAlpOn");
   const dAlt2Lnp = segDelta(r.chg, "altLnpOn");
+  if (alp != null) out.push({ kind: "2pp", lab: "2PP · ALP v L/NP", flag: null, segs: [
+    { label: "ALP", value: alp, color: PARTY_C.alp, delta: dAlp },
+    { label: "L/NP", value: lnp, color: PARTY_C.lnp, delta: dLnp },
+  ] });
   if (r.tppAlt) out.push({ kind: "alt", lab: "2PP · ALP v ON", flag: "+ALP v ON", segs: [
     { label: "ALP", value: r.tppAlt.alp, color: PARTY_C.alp, delta: dAltAlp },
     { label: "ON", value: r.tppAlt.onp, color: PARTY_C.onp, delta: mirror(dAltAlp) },
   ] });
+  /* A three-cornered poll asks each pairing directly, so its headline reads
+     as "ALP vs its strongest challenger", like every other detail: order the
+     ALP match-ups by how well the challenger does. */
+  if (r.tppKind === "3cp" && r.tpp3) out.sort((a, b) => a.segs[0].value - b.segs[0].value);
   if (r.tppAlt2) out.push({ kind: "alt2", lab: "2PP · L/NP v ON", flag: "+L/NP v ON", segs: [
     { label: "L/NP", value: r.tppAlt2.lnp, color: PARTY_C.lnp, delta: dAlt2Lnp },
     { label: "ON", value: r.tppAlt2.onp, color: PARTY_C.onp, delta: mirror(dAlt2Lnp) },
   ] });
+  if (r.tppKind === "3cp" && r.tpp3) {
+    out.push({ kind: "3cp", lab: "3-cornered · ALP v L/NP v ON", flag: "3-cornered", segs: [
+      { label: "ALP", value: r.tpp3.alp, color: PARTY_C.alp },
+      { label: "L/NP", value: r.tpp3.lnp, color: PARTY_C.lnp },
+      { label: "ON", value: r.tpp3.onp, color: PARTY_C.onp },
+    ] });
+  }
   return out;
 }
-// flag text for the compact voting-intention cell ("3-cornered · +ALP v ON")
+// flag text for the compact voting-intention cell ("+ALP v ON · 3-cornered")
 function tppFlag(r) {
   const f = tppContests(r).map((c) => c.flag).filter(Boolean);
   return f.length ? f.join(" · ") : null;
@@ -1507,14 +1506,14 @@ function tppLines(cs, r) {
      only shares that were set aside before the shares were reported. */
   const dUnd = r.undecidedBasis === "tpp" && r.undecided != null ? segDelta(r.chg, "und") : null;
   for (const c of cs) {
-    const canonical = c.kind === "2pp" && !c.derived && r.tppFlows != null;
+    const canonical = c.kind === "2pp" && r.tppFlows != null;
     /* No "respondent-allocated" caption any more. The flows pair now reads as
        an alternative to the line above it ("or … under 2025-election
        preference flows"), which says what the first pair is BY CONTRAST -
        naming it as well repeated the same distinction twice, once under each
        half, and cost a caption line to do it. */
     let note = null;
-    if (c.kind === "2pp" && !c.derived && r.undecidedBasis === "tpp" && r.undecided != null) {
+    if (c.kind === "2pp" && r.undecidedBasis === "tpp" && r.undecided != null) {
       note = (
         <React.Fragment>
           {note && <React.Fragment>{note}, </React.Fragment>}
@@ -1913,8 +1912,7 @@ function PdSec({ label, absent, lead, mid, children }) {
    appears. */
 function TppLine({ c, prefixed, note, hero, alt }) {
   const segs = c.segs.filter((x) => x.value != null);
-  const mat = c.lab.replace(/^2PP · /, "").replace(/^3-cornered · /, "")
-                   .replace(/ · Derived$/, c.derived ? " (derived)" : "");
+  const mat = c.lab.replace(/^2PP · /, "").replace(/^3-cornered · /, "");
   return (
     <React.Fragment>
       <p className={"pd-s" + (hero ? " pd-s-hero" : "")}>
@@ -2164,11 +2162,10 @@ function PollLedger({ r, dirSegments }) {
 
       <PdSec label={tppHeading(tcs)} lead>
         {/* name the main pair's basis only when the flows second line joins
-            it – a single pair needs no disambiguation, and a derived pair
-            (3-cornered waves) is never the respondent-allocated one. The
-            flows line itself is the same question with 2025's flows applied
-            to these primaries, so it takes the main pair's exact format and
-            sits straight after it, ahead of the ON head-to-heads */}
+            it – a single pair needs no disambiguation. The flows line itself
+            is the same question with 2025's flows applied to these
+            primaries, so it takes the main pair's exact format and sits
+            straight after it, ahead of the ON head-to-heads */}
         {/* the display size goes to the FIRST head-to-head only: a wave with
             three matchups has one answer and two supporting readings, and a
             three-cornered contest has too many figures to carry it */}

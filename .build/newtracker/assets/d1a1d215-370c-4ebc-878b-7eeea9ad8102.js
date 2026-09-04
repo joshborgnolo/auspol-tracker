@@ -2612,8 +2612,7 @@ function archLeadInfo(p, measure) {
   return { m, who: m >= 0 ? "alp" : "lnp", lab: m >= 0 ? "ALP" : "L/NP",
            color: m >= 0 ? "var(--alp)" : "var(--lnp)",
            segs: [{ v: alp, color: "var(--alp)" }, { v: lnpV, color: "var(--lnp)" }],
-           note: " on the two-party ALP v L/NP measure" +
-                 (p.tppKind === "3cp" ? " · Derived from the published 3-cornered figures" : "") };
+           note: " on the two-party ALP v L/NP measure" };
 }
 
 // the table's after-preferences cell, in the shape the direction and approval
