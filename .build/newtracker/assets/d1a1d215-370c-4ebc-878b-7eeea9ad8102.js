@@ -1175,10 +1175,18 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
      a distinction against nothing, so the row keeps the leader alone and the
      title takes the calendar month instead. */
   const solo = shown.length === 1 ? shown[0] : null;
-  const soloEvents = solo
-    ? (CYC_EVENTS[solo.year] || [])
+  /* Events belong to a term's own line, so they display once the chart is
+     about ONE past term - however it was narrowed. Solo is the no-ribbon
+     case. With the ribbon running, exactly one past term brought forward of
+     the band (lifted, or the hover preview) is again a single line the
+     dates can attach to: the band itself is background, not a competing
+     line. The resting state draws no past line at all, so it lifts nothing. */
+  const pastForward = drawnCycles.filter((c) => !c.current);
+  const eventCycle = solo || (pastForward.length === 1 ? pastForward[0] : null);
+  const cycleEvents = eventCycle
+    ? (CYC_EVENTS[eventCycle.year] || [])
         .filter((e) => !e.metrics || e.metrics.includes(M.key))
-        .map((e) => ({ ...e, x: cycEventMonth(e.date, solo.eDate) }))
+        .map((e) => ({ ...e, x: cycEventMonth(e.date, eventCycle.eDate) }))
     : [];
   /* Hanson's tickbox follows her data, not the board: her series belongs to
      the current term, but she is a person-toggle, not a property of the 2025
@@ -1609,7 +1617,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
         unit={M.unit} axisFont={narrow ? 28 : 20}
         pad={{ l: 56, r: 44, t: 16, b: 40 }}
         xTicks={CYC_XTICKS} refLines={refLines}
-        series={built} spine={CYC_SPINE} scatter={scatter} events={soloEvents}
+        series={built} spine={CYC_SPINE} scatter={scatter} events={cycleEvents}
         areas={bandAreas || undefined}
         tooltipTitle={(i) => cycMonthLabel(CYC_SPINE[i].x)
                              + (solo ? " – " + cycMonthOf(solo.eDate, CYC_SPINE[i].x) : "")}
