@@ -80,6 +80,12 @@
 // Exit codes: 0 ok (SAMPLEEFF_STATUS line, changed:true/false), 1 fetch/parse
 // failure, 2 guard breach. Status line shape:
 //   SAMPLEEFF_STATUS {"changed":bool,"stamped":n,"methods":n,"failed":n,"skipped":n,"errors":[…]}
+//
+// Usage: `node extract-sampleeff.mjs [leg]` – an optional positional leg
+// name (accent/yougov/newspoll/essential/demosau) runs JUST that leg's
+// stamps. redbridge-updater.sh invokes the offline Accent pass this way
+// right after its own extractor so a newly-cached wave's eff + methodUrl
+// lands in the same commit instead of waiting for the weekly sweep.
 
 import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync, readdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -504,6 +510,10 @@ const unstamped = D.polls.filter((p) => NEED_HOUSES.includes(p.pollster) && p.sa
 
 const records = [];
 const errors = [];
+/* Optional positional leg filter (`node extract-sampleeff.mjs accent`) –
+   the updater scripts run the offline Accent pass alone right after
+   extract-redbridge.mjs, skipping the network legs entirely. */
+const LEG_ONLY = process.argv[2] || null;
 /* YouGov rows also need their statements when they lack a methodUrl –
    the same listing pass serves both fields, so an already-eff-stamped wave
    is fetched once more to capture its URL, not its number. */
@@ -523,7 +533,7 @@ const legs = [
 if (unstamped.some((p) => p.pollster === "Newspoll"))
   legs.push(["newspoll", () => legNewspoll(unstamped.filter((p) => p.pollster === "Newspoll").map((p) => (p.published || p.date).slice(0, 10)))]);
 
-for (const [name, fn] of legs) {
+for (const [name, fn] of LEG_ONLY ? legs.filter(([n]) => n === LEG_ONLY) : legs) {
   try { records.push(...await fn()); }
   catch (e) { errors.push(`leg ${name}: ${String(e.message).slice(0, 180)}`); }
 }
@@ -590,7 +600,7 @@ for (const p of unstamped) {
    waves file no statement with YouGov's APC listing, so they keep no
    link. */
 let npLinks = [];
-if (D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
+if ((!LEG_ONLY || LEG_ONLY === "newspoll") && D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
   const needDates = D.polls
     .filter((p) => p.pollster === "Newspoll" && p.methodUrl == null)
     .map((p) => (p.published || p.date).slice(0, 10));

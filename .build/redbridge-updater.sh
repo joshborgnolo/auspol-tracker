@@ -1,6 +1,8 @@
 #!/bin/bash
 # Scheduled RedBridge/Accent federal-poll update: extract -> if polls.json
-# changed -> validate -> render-card -> build -> commit -> push. Installed via launchd
+# changed -> stamp the wave's sampleEff/methodUrl off the fresh redbridge-src
+# caches (extract-sampleeff.mjs accent, offline) -> validate -> render-card ->
+# build -> commit -> push. Installed via launchd
 # (plist copied to ~/Library/LaunchAgents/local.auspol.redbridge.plist from
 # the copy in this directory). Every step logs one line to
 # .build/logs/redbridge.log; any failure exits non-zero before any commit,
@@ -53,6 +55,23 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
 fi
 
 log "new RedBridge/Accent wave(s) detected; running validate/build/commit/push"
+
+# Offline ride-along: the fresh redbridge-src caches may carry the wave's
+# "effective sample size of N" APC line; stamp it (plus the wave's methodUrl)
+# now so it reaches the site in this commit instead of waiting for the weekly
+# sampleeff sweep. Failures abort before any commit like every other step.
+SE_OUT="$(node .build/extract-sampleeff.mjs accent 2>&1)"
+SE_CODE=$?
+SE_LAST="$(echo "$SE_OUT" | tail -1)"
+if [ $SE_CODE -ne 0 ]; then
+  log "FAIL sampleeff-accent (exit $SE_CODE): $SE_LAST"
+  exit $SE_CODE
+fi
+case "$SE_LAST" in
+  SAMPLEEFF_STATUS*) log "sampleeff-accent: $SE_LAST" ;;
+  *) log "FAIL sampleeff-accent (no SAMPLEEFF_STATUS line): $SE_LAST"; exit 1 ;;
+esac
+
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1

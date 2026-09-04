@@ -13,6 +13,13 @@ available for pushing.
   fetch/click flake (the wrapper already retries once after 5 minutes — if
   you're running, it failed twice), exit 2 a safety guard tripped.
 - `index.html` is a GENERATED artifact — never hand-edit it.
+- After a `changed:true` extract, the wrapper also runs
+  `node .build/extract-sampleeff.mjs accent` (fully offline — reads the
+  committed `.build/redbridge-src/*.json|.txt` caches to stamp the wave's
+  `sampleEff`/`methodUrl`). A failure there logs
+  `FAIL sampleeff-accent (exit N)` followed by the last `SAMPLEEFF_STATUS`
+  line — exit 1 means a parse problem, exit 2 a guard trip. Diagnose via
+  that status line and the caches it names.
 - Note: `RB_STATUS` may include `notes` about known-unfinished business (old
   waves labelled `Redbridge`, a Feb-2026 PPM mismatch, two waves awaiting
   manual 2PP entry). Those are pre-existing, logged every run, and are NOT
@@ -37,7 +44,9 @@ available for pushing.
 
 - NEVER weaken or delete a guard check to make the run pass.
 - NEVER hand-edit `data/polls.json` or `index.html`.
-- Only touch `.build/extract-redbridge.mjs`. No refactors.
+- Only touch `.build/extract-redbridge.mjs`; if the failure is in the
+  sampleeff-accent step, only the Accent legs (`legAccentEff` /
+  `legAccentLinks`) of `.build/extract-sampleeff.mjs`. No refactors.
 - Do NOT act on the pre-existing `notes` — no label migrations, no figure
   "corrections"; those are a separate manual task.
 - Unfixable within your turn budget? Stop and print what changed and what
