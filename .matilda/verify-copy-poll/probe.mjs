@@ -7,7 +7,11 @@
      - clicking it (with clipboard writes force-rejected so the fallbacks all
        fire) delivers a downloaded auspol-breakdown-*.png on both laptop and
        phone viewports;
-     - the PNG is the 1200px card at 2x (2400 physical), on BOTH automations
+     - the PNG is the card at 2x, sized to the breakdown's own ink (the sheet
+       is no longer a fixed 1200: a breakdown's longest line runs ~600-710px,
+       and a fixed sheet left ~450px of bare paper down the right). Bounds are
+       CARD_MIN 560 and CARD_MAX 1200, and the SAME width out of BOTH
+       automations
        - the .copy-wide pin re-flows the panel at the desktop ladder even on
        the phone, so the raster does not shrink with the rung;
      - the canvas handed to toBlob contains real painted text (many distinct
@@ -43,6 +47,7 @@ const server = http.createServer((req, res) => {
 await new Promise((ok) => server.listen(8743, "127.0.0.1", ok));
 
 let failures = 0;
+let deskW = null;   /* the desktop card's width; the phone copy must match it */
 const check = (label, got, want) => {
   if (got === want) { console.log(`  ok   ${label} = ${want}`); return; }
   failures += 1;
@@ -218,7 +223,11 @@ try {
     check("host cell pin cleared", restored.hostUnpinned, true);
     const file = await waitFile(dl1, tag1);
     const info = pngInfo(file);
-    check("PNG width is the 1200px card at 2x", info.w, 2400);
+    /* the sheet follows the ink, so assert the CONTRACT - inside the bounds,
+       an even margin either side - rather than a number that now varies */
+    check("PNG width is within the card bounds at 2x",
+          info.w >= 560 * 2 && info.w <= 1200 * 2, true);
+    deskW = info.w;
     ok("PNG has panel height (not a stub)", info.h > 600 && info.h < 6000, info.h);
     ok("PNG is not a bare sheet", info.bytes > 100 * 1024, info.bytes);
     const paints = await page.evaluate("window.__probePaints");
@@ -237,9 +246,11 @@ try {
     const topInk = (v) => card.ink && v >= 96 && v <= 136;
     const footInk = (v) => card.ink && card.footX > 0 && v >= 150 && v <= 182;
     check("left edge: card margin + panel padding", sideInk(card.ink.minX), true);
-    check("right edge: ink keeps the same inset", sideInk(2400 - card.ink.maxX), true);
+    /* measured off the card's OWN width now the sheet follows the ink - the
+       inset is the contract, the width is not */
+    check("right edge: ink keeps the same inset", sideInk(card.w - card.ink.maxX), true);
     check("top edge: card margin + panel padding", topInk(card.ink.minY), true);
-    check("footer signature: the deeper 160px right inset", footInk(2400 - card.footX), true);
+    check("footer signature: the deeper 160px right inset", footInk(card.w - card.footX), true);
     check("footer sits one margin above the bottom edge", inInk(card.h - card.ink.maxY), true);
     ok("no ink crosses the card margin", card.ink && card.ink.minX >= 48 && card.ink.minY >= 48 &&
        2400 - card.ink.maxX >= 48 && card.h - card.ink.maxY >= 48, card.ink);
@@ -296,7 +307,10 @@ try {
     await page.click(".poll-detail > .poll-copy-btn");
     const file = await waitFile(dl2, tag2);
     const info = pngInfo(file);
-    check("phone copy is STILL the 2400px card, not a phone-width sheet", info.w, 2400);
+    /* the phone copy re-flows to the same desktop ladder, so it must come out
+       at the same width as the desktop one - not a phone-width sheet, and not
+       a different measured width either */
+    check("phone copy is the SAME card width as the desktop copy", info.w, deskW);
     ok("phone copy names the poll in its filename",
        path.basename(file).startsWith(tag2 + "-auspol-breakdown-") && path.basename(file).length > 40,
        path.basename(file));
@@ -338,7 +352,8 @@ try {
     await page.click(".poll-table.archive .poll-detail > .poll-copy-btn");
     const file = await waitFile(dl3, tag3);
     const info = pngInfo(file);
-    check("archive copy is the 2400px card", info.w, 2400);
+    check("archive copy sits within the card bounds at 2x",
+          info.w >= 560 * 2 && info.w <= 1200 * 2, true);
     ok("archive copy is not a bare sheet", info.bytes > 100 * 1024, info.bytes);
     await page.close();
   }

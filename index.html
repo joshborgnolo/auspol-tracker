@@ -1478,12 +1478,12 @@ body.dark .ci-band { opacity: 0.22; }
    specificity alone. */
 .poll-detail.copy-wide {
   padding: 28px 24px 28px;
-  /* the copy runs the full content box, not the live page's centred
-     reading measure: on the sheet the panel's own side padding IS the
-     air, and centring an 820px column inside it would bank ~140px of
-     blank down each side. 1096 = copy-poll.js's CONTENT_W (1144) less
-     this block's two 24px paddings - keep the pair in step. */
-  --pd-measure: 1096px;
+  /* the copy runs the full content box, not the live page's centred reading
+     measure: on the sheet the panel's own side padding IS the air. `none`
+     rather than a number, because copy-poll.js now sizes the panel to the ink
+     and the sheet to the panel - so the measure has to follow the width it is
+     given instead of pinning a second, separate one. */
+  --pd-measure: none;
   --pd-gut: 26px; --pd-hero: 40px; --pd-hero-w: 17px;
   --pd-mid: 22px; --pd-fig: 20px; --pd-fig-appr: initial;
   --pd-body: 13.5px; --pd-note: 11.5px; --pd-hero-note: 14px;
@@ -6638,8 +6638,15 @@ window.AP.nextPolls = npProject;
      margins are tighter, though: a 1200px card with one 28px unit of air
      on all four sides, and the footer line inside rides the same rhythm,
      so no side of the sheet is emptier than another */
-  const CARD_W = 1200, PAD = 28, SCALE = 2;
-  const CONTENT_W = CARD_W - PAD * 2;
+  /* The sheet is sized to the CONTENT, not to a fixed 1200. A breakdown is
+     text, and its longest line is nowhere near a chart's width - on a 1200px
+     card that left ~450px of bare paper down the right, so the card read as
+     badly off-centre even though its four margins were equal. Measured across
+     30 archive polls the natural width runs 598-708px, so neither bound below
+     binds in practice: the width is the ink's, not a guess. */
+  const CARD_MAX = 1200, CARD_MIN = 560, PAD = 28, SCALE = 2;
+  const CONTENT_MAX = CARD_MAX - PAD * 2;
+  const CONTENT_MIN = CARD_MIN - PAD * 2;
   const TEXT_H = 15;   /* the footer is one 15px line */
 
   /* Resolved through a probe rather than read as a raw token, because a
@@ -6661,7 +6668,7 @@ window.AP.nextPolls = npProject;
      desktop ladder forced on, and return a restore closure. Synchronous
      both ways: the measure that follows is also synchronous, so no frame
      ever paints the parked state. */
-  const widenPanel = (panel) => {
+  const widenPanel = (panel, width) => {
     const host = panel.parentElement;
     if (!host) return () => {};
     const panelStyle = panel.getAttribute("style");
@@ -6678,7 +6685,7 @@ window.AP.nextPolls = npProject;
     panel.style.position = "absolute";
     panel.style.top = "0";
     panel.style.left = "-99999px";
-    panel.style.width = CONTENT_W + "px";
+    panel.style.width = width + "px";
     return () => {
       panel.classList.remove("copy-wide");
       if (panelStyle == null) panel.removeAttribute("style");
@@ -6835,6 +6842,7 @@ window.AP.nextPolls = npProject;
         texts.push({
           ch: upper ? ch.toUpperCase() : ch,
           x: b.left - root.left, y: b.top - root.top, h: b.height,
+          right: b.right - root.left,
           font, fill: cs.color, numeric: cs.fontVariantNumeric || "",
           dec,
         });
@@ -6842,7 +6850,13 @@ window.AP.nextPolls = npProject;
       }
     }
     const pcs = getComputedStyle(panel);
-    return { els, texts, rootW: root.width, rootH: root.height,
+    /* how far the ink actually reaches. Text only: the section rules and the
+       band span the measure by construction, so they follow the panel rather
+       than deciding it, and asking them would return the width we just set. */
+    let inkRight = 0;
+    for (const t of texts) if (t.right > inkRight) inkRight = t.right;
+    return { els, texts, rootW: root.width, rootH: root.height, inkRight,
+             padRight: parseFloat(pcs.paddingRight) || 0,
              bg: pcs.backgroundColor, fontFamily: pcs.fontFamily };
   };
 
@@ -6860,7 +6874,8 @@ window.AP.nextPolls = npProject;
 
   const paintCard = (model) => new Promise((resolve, reject) => {
     try {
-      const factor = CONTENT_W / model.rootW;
+      const CARD_W = model.rootW + PAD * 2;
+      const factor = 1;
       const panelH = model.rootH * factor;
       /* PAD everywhere: around the card, and again between the panel and
          the footer line inside it, so every side of the sheet carries
@@ -7006,15 +7021,33 @@ window.AP.nextPolls = npProject;
 
   /* ---- composition + delivery --------------------------------------- */
   const compose = (panel) => {
-    const restore = widenPanel(panel);
-    /* re-title inside the widen window too, so the one swapped row lands
-       under the desktop ladder and is measured with everything else */
-    const untitle = retitleFieldworkRow(panel, houseName(panel));
+    /* Two passes, both inside the same synchronous block so neither parked
+       state ever paints. The first lays the panel out at the widest sheet and
+       asks how far the ink reached; the second re-lays it to exactly that, so
+       the section rules and the band - which span the measure - come in with
+       the text instead of running on past it.
+       re-titling happens inside each widen window, so the one swapped row is
+       measured under the desktop ladder with everything else. */
+    let restore = widenPanel(panel, CONTENT_MAX);
+    let untitle = retitleFieldworkRow(panel, houseName(panel));
     try {
-      /* one synchronous block: force layout, read the model, restore -
-         the parked state never reaches the screen */
       panel.getBoundingClientRect(); /* reflow */
-      const model = readModel(panel);
+      const wide = readModel(panel);
+      /* +SLACK, not +0: the ink's right edge is a fractional Range rect and
+         line-breaking rounds it differently, so laying out to the exact
+         measured width re-wraps the very line that set it. 1px still wrapped
+         in testing, 2px held; 4px is the cheap side of that. */
+      const SLACK = 4;
+      const want = Math.min(CONTENT_MAX, Math.max(CONTENT_MIN,
+        Math.ceil(wide.inkRight + wide.padRight) + SLACK));
+      let model = wide;
+      if (want < wide.rootW) {
+        untitle(); restore();
+        restore = widenPanel(panel, want);
+        untitle = retitleFieldworkRow(panel, houseName(panel));
+        panel.getBoundingClientRect(); /* reflow */
+        model = readModel(panel);
+      }
       return paintCard(model);
     } finally {
       untitle();
