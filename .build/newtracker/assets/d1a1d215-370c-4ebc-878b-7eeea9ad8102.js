@@ -1599,7 +1599,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
                           "and favourability ratings are left out, so the line is short."}>
               <input type="checkbox" checked={!!showHan}
                      onChange={(e) => setHan(e.target.checked)} />
-              Hanson ’25
+              Current Pauline Hanson
             </label>
           )}
           {M.onp && (
@@ -1609,7 +1609,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
                           "they crowd the chart without adding context."}>
               <input type="checkbox" checked={!!showOnp}
                      onChange={(e) => setOnp(e.target.checked)} />
-              One Nation ’25
+              Current One Nation
             </label>
           )}
         </div>
