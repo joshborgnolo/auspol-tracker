@@ -32,6 +32,7 @@ LOG_DIR=".build/logs"
 LOG="$LOG_DIR/news24.log"
 mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
+. "$REPO/.build/git-push-main.sh"
 
 EXTRACT_OUT="$(NEWSIE_CHROME=1 node .build/extract-news24.mjs 2>&1)"
 CODE=$?
@@ -73,8 +74,7 @@ if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! git push origin HEAD:main >> "$LOG" 2>&1; then
-  log "FAIL git push (commit kept locally)"
+if ! push_main "$MSG" data/polls.json .build/news24-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

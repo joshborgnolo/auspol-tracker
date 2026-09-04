@@ -13,6 +13,11 @@ on:
     - cron: '15 21 * * *' # 07:15 AEST daily
   workflow_dispatch:
 
+# Pushes to main → serialise with the other writers (see roymorgan-update.yml).
+concurrency:
+  group: main-writers
+  cancel-in-progress: false
+
 jobs:
   score:
     runs-on: ubuntu-latest

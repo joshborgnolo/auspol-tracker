@@ -56,6 +56,11 @@ jobs:
     if: failure() && needs.check.outputs.verdict == '2'
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    # The repair agent commits and pushes; serialise with the other writers
+    # (see roymorgan-update.yml).
+    concurrency:
+      group: main-writers
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
@@ -72,8 +77,9 @@ jobs:
       - name: Install puppeteer-core (best effort)
         run: npm i puppeteer-core --prefix "$HOME" || true
 
+      # Pinned for the same reason as poll-agent.yml — bump both together.
       - name: Install Matilda CLI
-        run: npm i -g @maincode-ai/matilda-code
+        run: npm i -g @maincode-ai/matilda-code@0.21.4
 
       - name: Run the repair agent
         env:

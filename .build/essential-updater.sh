@@ -17,6 +17,7 @@ LOG_DIR=".build/logs"
 LOG="$LOG_DIR/essential.log"
 mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
+. "$REPO/.build/git-push-main.sh"
 
 # GitHub Actions may push to main between local launchd slots. Refresh first;
 # if the local tree can't fast-forward, skip this slot rather than commit on a
@@ -90,7 +91,8 @@ elif echo "$EXTRACT_OUT" | grep -q '^updated .*report-index\.json'; then
     git add .build/essential-src/report-index.json
     IDX_MSG="Refresh Essential report index $(date '+%Y-%m-%d')"
     if git commit -m "$IDX_MSG" >> "$LOG" 2>&1; then
-      git push origin HEAD:main >> "$LOG" 2>&1 || log "FAIL git push (commit kept locally)"
+      push_main "$IDX_MSG" .build/essential-src/report-index.json \
+        || log "FAIL git push (commit kept locally)"
       log "OK committed + pushed: $IDX_MSG"
     else
       log "index commit produced nothing; carrying on"
@@ -123,7 +125,8 @@ if [ "$DATA_CHANGED" = false ]; then
     SKIP_ISO="$(git diff --cached -U0 data/polls.json | grep -o '+ *"20[0-9-]*"' | tr -d '+ " ' | head -1)"
     MSG="Confirm skipped Essential slot $SKIP_ISO"
     git commit -m "$MSG" >> "$LOG" 2>&1 || true
-    git push origin HEAD:main >> "$LOG" 2>&1 || log "FAIL git push (commit kept locally)"
+    push_main "$MSG" data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt \
+      || log "FAIL git push (commit kept locally)"
     log "OK committed + pushed: $MSG"
   elif [ $CONFIRM -ne 0 ]; then
     log "skip-confirm refused (see above); human review needed"
@@ -156,8 +159,9 @@ if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! git push origin HEAD:main >> "$LOG" 2>&1; then
-  log "FAIL git push (commit kept locally)"
+ESS_FILES=(data/essential-report.csv data/polls.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json)
+[ -d .build/essential-src ] && ESS_FILES+=(.build/essential-src/)
+if ! push_main "$MSG" "${ESS_FILES[@]}"; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

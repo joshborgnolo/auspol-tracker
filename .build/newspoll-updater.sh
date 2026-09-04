@@ -22,6 +22,7 @@ LOG_DIR=".build/logs"
 LOG="$LOG_DIR/newspoll.log"
 mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
+. "$REPO/.build/git-push-main.sh"
 
 # The GitHub Actions newspoll-update job may push to main between local
 # launchd slots. Refresh first; if the local tree can't fast-forward, skip
@@ -77,8 +78,7 @@ if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! git push origin HEAD:main >> "$LOG" 2>&1; then
-  log "FAIL git push (commit kept locally)"
+if ! push_main "$MSG" data/polls.json .build/newspoll-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

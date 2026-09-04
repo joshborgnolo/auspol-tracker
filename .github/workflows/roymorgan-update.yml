@@ -39,8 +39,11 @@ on:
         type: choice
         options: ['false', 'true']
 
+# Every push-capable workflow shares one concurrency group so two writers
+# can never be mid-flight against main at the same time. Serialised, not
+# cancelled: a queued run still gets its slot.
 concurrency:
-  group: roymorgan-update
+  group: main-writers
   cancel-in-progress: false
 
 permissions:

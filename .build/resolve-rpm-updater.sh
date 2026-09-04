@@ -15,6 +15,7 @@ LOG_DIR=".build/logs"
 LOG="$LOG_DIR/resolve-rpm.log"
 mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" | tee -a "$LOG"; }
+. "$REPO/.build/git-push-main.sh"
 
 # GitHub Actions may push to main between local launchd slots. Refresh first;
 # if the local tree can't fast-forward, skip this slot rather than commit on a
@@ -73,8 +74,7 @@ if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! git push origin HEAD:main >> "$LOG" 2>&1; then
-  log "FAIL git push (commit kept locally)"
+if ! push_main "$MSG" data/resolve-political-monitor.csv data/polls.json .build/resolve-rpm-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

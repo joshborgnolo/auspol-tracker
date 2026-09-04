@@ -41,8 +41,10 @@ jobs:
   update:
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    # All push-capable workflows serialise on the shared main-writers group
+    # (see roymorgan-update.yml) so two writers never race main at once.
     concurrency:
-      group: poll-agent-${{ inputs.house }}
+      group: main-writers
       cancel-in-progress: false
     permissions:
       contents: write
@@ -118,6 +120,10 @@ jobs:
     if: failure()
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    # The repair agent commits and pushes; serialise with the other writers.
+    concurrency:
+      group: main-writers
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
