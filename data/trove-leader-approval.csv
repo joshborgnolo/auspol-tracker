@@ -1,0 +1,121 @@
+date,leader,role,measure,approve,disapprove,undecided,base,sample_n,pollster,date_basis,note,article_id,url
+1942-08-01,john_curtin,pm,job-rating,78,18,4,all,,APOP Gallup,printed,Four-statement scale: 35 excellent + 43 fairly good = approve; 13 some good things + 5 not a success = disapprove,245198753,https://trove.nla.gov.au/newspaper/article/245198753
+1943-08-15,john_curtin,party,party-leader-choice,74,,,own-party voters,,APOP Gallup,printed-month,"First Gallup leader-choice survey; share among Labor voters, per Nov 1954 retrospective",50611956,https://trove.nla.gov.au/newspaper/article/50611956
+1943-08-15,robert_menzies,party,party-leader-choice,44,,,own-party voters,,APOP Gallup,printed-month,"Share among L-CP voters, per Nov 1954 retrospective",50611956,https://trove.nla.gov.au/newspaper/article/50611956
+1945-06-15,robert_menzies,party,party-leader-choice,59,,,own-party voters,,APOP Gallup,printed-month,"Share among L-CP voters, per Nov 1954 retrospective",50611956,https://trove.nla.gov.au/newspaper/article/50611956
+1945-06-15,john_curtin,party,party-leader-choice,58,,,own-party voters,,APOP Gallup,printed-month,Share among Labor voters; survey just before Curtin's death,278976863,https://trove.nla.gov.au/newspaper/article/278976863
+1946-06-15,ben_chifley,party,party-leader-choice,55,,,own-party voters,,APOP Gallup,printed-month,Share among Labor voters from Dec 1947 Herald table (labelled June '46),243847056,https://trove.nla.gov.au/newspaper/article/243847056
+1946-06-15,doc_evatt,party,party-leader-choice,31,,,own-party voters,,APOP Gallup,printed-month,Share among Labor voters from Dec 1947 Herald table,243847056,https://trove.nla.gov.au/newspaper/article/243847056
+1946-06-15,robert_menzies,party,party-leader-choice,44,,,own-party voters,,APOP Gallup,printed-month,Share among L-CP voters from Dec 1947 Herald table (labelled June '46),243847056,https://trove.nla.gov.au/newspaper/article/243847056
+1946-06-15,richard_casey,party,party-leader-choice,34,,,own-party voters,,APOP Gallup,printed-month,Share among L-CP voters from Dec 1947 Herald table,243847056,https://trove.nla.gov.au/newspaper/article/243847056
+1947-10-15,ben_chifley,party,party-leader-choice,62,,,own-party voters,,APOP Gallup,printed-month,"Share among Labor voters; published 17 Dec 1947, labelled October in Nov 1954 retrospective",243847056,https://trove.nla.gov.au/newspaper/article/243847056
+1947-10-15,doc_evatt,party,party-leader-choice,23,,,own-party voters,,APOP Gallup,printed-month,Share among Labor voters,243847056,https://trove.nla.gov.au/newspaper/article/243847056
+1947-10-15,robert_menzies,party,party-leader-choice,41,,,own-party voters,,APOP Gallup,printed-month,"Share among L-CP voters, labelled October in Nov 1954 retrospective",243847056,https://trove.nla.gov.au/newspaper/article/243847056
+1947-10-15,richard_casey,party,party-leader-choice,40,,,own-party voters,,APOP Gallup,printed-month,Share among L-CP voters,243847056,https://trove.nla.gov.au/newspaper/article/243847056
+1949-06-15,ben_chifley,party,party-leader-choice,78,,,own-party voters,,APOP Gallup,printed-month,"Share among Labor voters; survey published 27 Aug 1949, third wave of series",26644403,https://trove.nla.gov.au/newspaper/article/26644403
+1949-06-15,robert_menzies,party,party-leader-choice,53,,,own-party voters,,APOP Gallup,printed-month,"Share among L-CP voters, labelled June 1949 in Nov 1954 retrospective",50611956,https://trove.nla.gov.au/newspaper/article/50611956
+1950-10-03,menzies_government,government,government-performance,59,25,16,all,,APOP Gallup,publication-week,Satisfied/dissatisfied with what Federal Government has done this year; 9 months into term,45684054,https://trove.nla.gov.au/newspaper/article/45684054
+1951-02-15,ben_chifley,party,party-leader-choice,83,,,own-party voters,1700,APOP Gallup,printed-month,"Share among Labor voters; labelled February in Nov 1954 retrospective, published 17 Mar 1951",248326367,https://trove.nla.gov.au/newspaper/article/248326367
+1951-02-15,robert_menzies,party,party-leader-choice,75,,,own-party voters,1700,APOP Gallup,printed-month,Share among L-CP voters,248326367,https://trove.nla.gov.au/newspaper/article/248326367
+1952-09-15,robert_menzies,party,party-leader-choice,72,,,own-party voters,1800,APOP Gallup,printed-month,"Share among L-CP voters; published mid-Oct 1952, labelled September in Nov 1954 retrospective",27115825,https://trove.nla.gov.au/newspaper/article/27115825
+1952-09-15,doc_evatt,party,party-leader-choice,75,,,own-party voters,1800,APOP Gallup,printed-month,Share among Labor voters,27115825,https://trove.nla.gov.au/newspaper/article/27115825
+1953-01-08,robert_menzies,pm,job-rating,48,38,14,all,,APOP Gallup,publication-week,Question: has Mr Menzies done a good job as PM,249184916,https://trove.nla.gov.au/newspaper/article/249184916
+1953-10-15,robert_menzies,party,party-leader-choice,82,,,own-party voters,2000,APOP Gallup,printed-month,"Share among L-CP voters; published 7 Nov 1953, labelled October in Nov 1954 retrospective",48915822,https://trove.nla.gov.au/newspaper/article/48915822
+1953-10-15,doc_evatt,party,party-leader-choice,79,,,own-party voters,2000,APOP Gallup,printed-month,Share among Labor voters,48915822,https://trove.nla.gov.au/newspaper/article/48915822
+1954-09-04,doc_evatt,opposition,action-approval,31,40,29,all,,APOP Gallup,publication-week,Question: should/should not have appeared as barrister at the Petrov enquiry,47597805,https://trove.nla.gov.au/newspaper/article/47597805
+1954-10-15,robert_menzies,party,party-leader-choice,87,,,own-party voters,1800,APOP Gallup,printed-month,Share among L-CP voters; fieldwork second half of October,47627466,https://trove.nla.gov.au/newspaper/article/47627466
+1954-10-15,doc_evatt,party,party-leader-choice,66,,,own-party voters,1800,APOP Gallup,printed-month,Share among Labor voters,47627466,https://trove.nla.gov.au/newspaper/article/47627466
+1955-08-22,menzies_government,government,government-performance,69,16,15,all,,APOP Gallup,publication-week,"Question: is the Menzies Government handling things fairly well, or not",266336236,https://trove.nla.gov.au/newspaper/article/266336236
+1971-04-15,william_mcmahon,pm,job-rating,55,8,37,all,,Morgan Gallup,printed-month,First Morgan Gallup PM-rating wave; backcast in later tables,102200546,https://trove.nla.gov.au/newspaper/article/102200546
+1971-04-15,gough_whitlam,opposition,job-rating,45,33,22,all,,Morgan Gallup,printed-month,Backcast in later tables,102200546,https://trove.nla.gov.au/newspaper/article/102200546
+1971-04-15,bob_hawke,other,job-rating,42,30,28,all,2000,Morgan Gallup,printed-month,Hawke as ACTU president series,110692577,https://trove.nla.gov.au/newspaper/article/110692577
+1971-08-15,william_mcmahon,pm,job-rating,37,41,22,all,,Morgan Gallup,printed-month,,102200546,https://trove.nla.gov.au/newspaper/article/102200546
+1971-08-15,gough_whitlam,opposition,job-rating,38,41,21,all,,Morgan Gallup,printed-month,,102200546,https://trove.nla.gov.au/newspaper/article/102200546
+1971-08-15,bob_hawke,other,job-rating,30,50,20,all,,Morgan Gallup,printed-month,Hawke as ACTU president,110692577,https://trove.nla.gov.au/newspaper/article/110692577
+1971-09-15,bob_hawke,other,job-rating,34,43,23,all,,Morgan Gallup,printed-month,Hawke as ACTU president,110692577,https://trove.nla.gov.au/newspaper/article/110692577
+1971-11-13,william_mcmahon,pm,job-rating,37,39,24,all,2338,Morgan Gallup,publication-week,Interviewing completed 13 Nov 1971,110692002,https://trove.nla.gov.au/newspaper/article/110692002
+1971-11-13,gough_whitlam,opposition,job-rating,36,41,23,all,2338,Morgan Gallup,publication-week,,110692002,https://trove.nla.gov.au/newspaper/article/110692002
+1971-11-13,bob_hawke,other,job-rating,38,40,22,all,2000,Morgan Gallup,printed-month,Hawke as ACTU president; fourth wave of series,110692577,https://trove.nla.gov.au/newspaper/article/110692577
+1972-02-12,william_mcmahon,pm,job-rating,28,49,23,all,2097,Morgan Gallup,publication-week,Interviewing completed 12 Feb 1972,102200546,https://trove.nla.gov.au/newspaper/article/102200546
+1972-02-12,gough_whitlam,opposition,job-rating,34,38,28,all,2097,Morgan Gallup,publication-week,,102200546,https://trove.nla.gov.au/newspaper/article/102200546
+1972-02-15,bob_hawke,other,job-rating,39,37,24,all,2000,Morgan Gallup,printed-month,Hawke as ACTU president series table,101999198,https://trove.nla.gov.au/newspaper/article/101999198
+1972-04-08,william_mcmahon,pm,job-rating,25,57,18,all,2316,Morgan Gallup,publication-week,Took before the mini-budget; interviewing completed 8 Apr 1972,102020329,https://trove.nla.gov.au/newspaper/article/102020329
+1972-04-08,gough_whitlam,opposition,job-rating,37,39,24,all,2316,Morgan Gallup,publication-week,,102020329,https://trove.nla.gov.au/newspaper/article/102020329
+1972-04-29,william_mcmahon,pm,job-rating,26,54,20,all,2391,Morgan Gallup,publication-week,Two weeks after mini-budget; interviewing completed 29 Apr 1972,102021563,https://trove.nla.gov.au/newspaper/article/102021563
+1972-04-29,gough_whitlam,opposition,job-rating,37,40,23,all,2391,Morgan Gallup,publication-week,,102021563,https://trove.nla.gov.au/newspaper/article/102021563
+1972-06-10,william_mcmahon,pm,job-rating,31,48,21,all,2299,Morgan Gallup,publication-week,Interviewing completed 10 Jun 1972,101993031,https://trove.nla.gov.au/newspaper/article/101993031
+1972-06-10,gough_whitlam,opposition,job-rating,39,38,23,all,2299,Morgan Gallup,publication-week,,101993031,https://trove.nla.gov.au/newspaper/article/101993031
+1972-07-15,william_mcmahon,pm,job-rating,28,51,21,all,,Morgan Gallup,printed-month,July wave from 4 Aug 1972 trend table,101997658,https://trove.nla.gov.au/newspaper/article/101997658
+1972-07-15,gough_whitlam,opposition,job-rating,39,37,24,all,,Morgan Gallup,printed-month,July wave from 4 Aug 1972 trend table,101997658,https://trove.nla.gov.au/newspaper/article/101997658
+1972-07-15,bob_hawke,other,job-rating,48,32,20,all,2000,Morgan Gallup,printed-month,Hawke as ACTU president; sixth wave of series,101999198,https://trove.nla.gov.au/newspaper/article/101999198
+1972-08-15,william_mcmahon,pm,job-rating,29,52,19,all,2245,Morgan Gallup,printed-month,August wave from 11 Sep 1972 table,102003520,https://trove.nla.gov.au/newspaper/article/102003520
+1972-08-15,gough_whitlam,opposition,job-rating,39,39,22,all,2245,Morgan Gallup,printed-month,August wave from 11 Sep 1972 table,102003520,https://trove.nla.gov.au/newspaper/article/102003520
+1972-09-15,william_mcmahon,pm,job-rating,31,49,20,all,2173,Morgan Gallup,printed-month,September wave from 11 Oct 1972 table,102008378,https://trove.nla.gov.au/newspaper/article/102008378
+1972-09-15,gough_whitlam,opposition,job-rating,39,40,21,all,2173,Morgan Gallup,printed-month,September wave from 11 Oct 1972 table,102008378,https://trove.nla.gov.au/newspaper/article/102008378
+1972-10-15,william_mcmahon,pm,job-rating,32,50,18,all,,Morgan Gallup,printed-month,October wave from 29 Nov 1972 table,110622798,https://trove.nla.gov.au/newspaper/article/110622798
+1972-10-15,gough_whitlam,opposition,job-rating,43,34,23,all,,Morgan Gallup,printed-month,October wave from 29 Nov 1972 table,110622798,https://trove.nla.gov.au/newspaper/article/110622798
+1972-11-15,william_mcmahon,pm,job-rating,32,47,21,all,,Morgan Gallup,printed-month,Mid-November wave from 29 Nov 1972 table,110622798,https://trove.nla.gov.au/newspaper/article/110622798
+1972-11-15,gough_whitlam,opposition,job-rating,44,30,26,all,,Morgan Gallup,printed-month,Mid-November wave from 29 Nov 1972 table,110622798,https://trove.nla.gov.au/newspaper/article/110622798
+1972-11-15,bob_hawke,other,job-rating,48,32,20,all,2000,Morgan Gallup,printed-month,Hawke as ACTU president; seventh wave,110624886,https://trove.nla.gov.au/newspaper/article/110624886
+1973-02-15,gough_whitlam,pm,job-rating,62,18,20,all,2258,Morgan Gallup,printed-month,February wave from 6 Jun 1973 table,110713171,https://trove.nla.gov.au/newspaper/article/110713171
+1973-02-15,billy_snedden,opposition,job-rating,38,23,39,all,2258,Morgan Gallup,printed-month,February wave from 6 Jun 1973 table,110713171,https://trove.nla.gov.au/newspaper/article/110713171
+1973-05-15,gough_whitlam,pm,job-rating,51,27,22,all,2258,Morgan Gallup,printed-month,May wave; interviewing prior month,110713171,https://trove.nla.gov.au/newspaper/article/110713171
+1973-05-15,billy_snedden,opposition,job-rating,37,28,35,all,2258,Morgan Gallup,printed-month,,110713171,https://trove.nla.gov.au/newspaper/article/110713171
+1973-12-15,gough_whitlam,pm,job-rating,52,,,all,2009,Morgan Gallup,printed-month,December poll; disapproval not printed,131700608,https://trove.nla.gov.au/newspaper/article/131700608
+1973-12-15,billy_snedden,opposition,job-rating,38,52,,all,2009,Morgan Gallup,printed-month,Undecided remainder,131700608,https://trove.nla.gov.au/newspaper/article/131700608
+1975-03-22,gough_whitlam,pm,job-rating,46,,,all,,Morgan Gallup,publication-week,"Fieldwork 15-22 Mar 1975, Channel 9-commissioned; disapproval not printed",116340727,https://trove.nla.gov.au/newspaper/article/116340727
+1975-03-22,billy_snedden,opposition,job-rating,21,,,all,,Morgan Gallup,publication-week,All-time low for an Opposition Leader at the time,116340727,https://trove.nla.gov.au/newspaper/article/116340727
+1975-03-22,malcolm_fraser,opposition,job-rating,36,,,all,,Morgan Gallup,publication-week,Fraser's first rating as leader; same March wave,116340727,https://trove.nla.gov.au/newspaper/article/116340727
+1975-11-24,malcolm_fraser,pm,dismissal-approval,20,72,8,all,,ANOP,publication-week,Question as printed: approved/disapproved of the way Fraser became Prime Minister; swinging-voters survey also reported,236920782,https://trove.nla.gov.au/newspaper/article/236920782
+1975-11-29,malcolm_fraser,pm,job-rating,55,,,all,,Morgan Gallup,publication-week,Caretaker period poll before policy speeches; disapproval not printed,102188650,https://trove.nla.gov.au/newspaper/article/102188650
+1975-11-29,gough_whitlam,opposition,job-rating,42,,,all,,Morgan Gallup,publication-week,,102188650,https://trove.nla.gov.au/newspaper/article/102188650
+1977-02-15,gough_whitlam,opposition,job-rating,38,,,all,,Morgan Gallup,printed-month,Published in The Bulletin; disapproval not printed,110841889,https://trove.nla.gov.au/newspaper/article/110841889
+1977-02-15,malcolm_fraser,pm,job-rating,36,,,all,,Morgan Gallup,printed-month,,110841889,https://trove.nla.gov.au/newspaper/article/110841889
+1977-10-15,malcolm_fraser,pm,good-job/bad-job,39,47,14,all,,unknown,printed-month,Good job/bad job question; poll source not named in article,110869916,https://trove.nla.gov.au/newspaper/article/110869916
+1977-10-15,gough_whitlam,opposition,good-job/bad-job,41,43,16,all,,unknown,printed-month,Good job/bad job question; poll source not named in article,110869916,https://trove.nla.gov.au/newspaper/article/110869916
+1978-08-15,bill_hayden,opposition,job-rating,48,,,all,1991,Morgan Gallup,publication-week,Fieldwork weekends of 8 and 15 Jul 1978; disapproval not printed,110900913,https://trove.nla.gov.au/newspaper/article/110900913
+1978-08-15,malcolm_fraser,pm,job-rating,41,,,all,1991,Morgan Gallup,publication-week,,110900913,https://trove.nla.gov.au/newspaper/article/110900913
+1982-04-15,malcolm_fraser,pm,job-rating,32,53,,all,,Morgan Gallup,printed-month,Late-March wave reported 9 Apr 1982,126915465,https://trove.nla.gov.au/newspaper/article/126915465
+1982-11-06,malcolm_fraser,pm,job-rating,38,47,,all,,Morgan Gallup,publication-week,Fieldwork 30 Oct-6 Nov 1982,130830150,https://trove.nla.gov.au/newspaper/article/130830150
+1982-11-06,bill_hayden,opposition,job-rating,42,36,,all,,Morgan Gallup,publication-week,,130830150,https://trove.nla.gov.au/newspaper/article/130830150
+1982-12-15,malcolm_fraser,pm,job-rating,37,49,,all,,Morgan Gallup,printed-month,Late-November wave published 2 Dec 1982,130833326,https://trove.nla.gov.au/newspaper/article/130833326
+1982-12-15,bill_hayden,opposition,job-rating,41,36,,all,,Morgan Gallup,printed-month,,130833326,https://trove.nla.gov.au/newspaper/article/130833326
+1983-02-13,bob_hawke,opposition,job-rating,46,22,32,all,2095,Morgan Gallup,publication-week,First Gallup wave after Hawke became Opposition Leader,116451408,https://trove.nla.gov.au/newspaper/article/116451408
+1983-02-13,malcolm_fraser,pm,job-rating,40,52,8,all,2095,Morgan Gallup,publication-week,,116451408,https://trove.nla.gov.au/newspaper/article/116451408
+1983-02-15,malcolm_fraser,pm,job-rating,39,,,all,,Morgan Gallup,printed-month,Rose 1pc vs January per 17 Feb 1983 article,116450549,https://trove.nla.gov.au/newspaper/article/116450549
+1983-02-15,bob_hawke,other,job-rating,53,,,all,,Morgan Gallup,printed-month,"Personal popularity as ACTU figure, fell 9pc from January; disapproval not printed",116450549,https://trove.nla.gov.au/newspaper/article/116450549
+1984-01-16,bob_hawke,pm,job-rating,73,15,12,all,,Morgan Gallup,publication-week,First two weeks of January 1984; 91/3/6 among Labor voters,116386498,https://trove.nla.gov.au/newspaper/article/116386498
+1984-01-16,andrew_peacock,opposition,job-rating,41,,,all,,Morgan Gallup,publication-week,Steadied at 41 per 26 Jan 1984 article,116386498,https://trove.nla.gov.au/newspaper/article/116386498
+1984-02-25,bob_hawke,pm,job-rating,70,,,all,,Morgan Gallup,publication-week,Poll week 18-25 Feb 1984,124994750,https://trove.nla.gov.au/newspaper/article/124994750
+1984-02-25,andrew_peacock,opposition,job-rating,36,,26,all,,Morgan Gallup,publication-week,Undecided rose 3pc to 26pc,124994750,https://trove.nla.gov.au/newspaper/article/124994750
+1984-03-31,bob_hawke,pm,job-rating,74,,,all,,Morgan Gallup,publication-week,Steady at record 74; poll in the fortnight before 5 Apr 1984,125001431,https://trove.nla.gov.au/newspaper/article/125001431
+1984-03-31,andrew_peacock,opposition,job-rating,34,,,all,,Morgan Gallup,publication-week,"Peacock sequence 41,37,39,36,36,34 (start of year, biweekly)",125001431,https://trove.nla.gov.au/newspaper/article/125001431
+1984-05-31,bob_hawke,pm,job-rating,72,,,all,,Morgan Gallup,publication-week,,127000847,https://trove.nla.gov.au/newspaper/article/127000847
+1984-05-31,andrew_peacock,opposition,job-rating,34,,,all,,Morgan Gallup,publication-week,,127000847,https://trove.nla.gov.au/newspaper/article/127000847
+1984-06-07,bob_hawke,pm,job-rating,68,,,all,,Morgan Gallup,publication-week,Poll during assets-test debate,127002388,https://trove.nla.gov.au/newspaper/article/127002388
+1984-06-07,andrew_peacock,opposition,job-rating,37,,,all,,Morgan Gallup,publication-week,,127002388,https://trove.nla.gov.au/newspaper/article/127002388
+1984-06-23,bob_hawke,pm,job-rating,69,,,all,,Morgan Gallup,publication-week,Fieldwork weekends of 9 and 16 Jun 1984,127005828,https://trove.nla.gov.au/newspaper/article/127005828
+1984-06-23,andrew_peacock,opposition,job-rating,31,,,all,,Morgan Gallup,publication-week,Peacock's lowest yet at publication,127005828,https://trove.nla.gov.au/newspaper/article/127005828
+1984-08-15,bob_hawke,pm,job-rating,68,,,all,,Morgan Gallup,printed-month,,127221565,https://trove.nla.gov.au/newspaper/article/127221565
+1984-08-15,andrew_peacock,opposition,job-rating,35,,,all,,Morgan Gallup,printed-month,,127221565,https://trove.nla.gov.au/newspaper/article/127221565
+1984-09-16,bob_hawke,pm,job-rating,66,,,all,,Morgan Gallup,publication-week,Weekend of 15-16 Sep 1984,136918540,https://trove.nla.gov.au/newspaper/article/136918540
+1984-09-16,andrew_peacock,opposition,job-rating,25,,,all,,Morgan Gallup,publication-week,Equal-lowest leader rating recorded to this point (with McMahon's 25),136918540,https://trove.nla.gov.au/newspaper/article/136918540
+1984-09-23,bob_hawke,pm,job-rating,67,,,all,,Morgan Gallup,publication-week,Weekend of 22-23 Sep 1984,136919920,https://trove.nla.gov.au/newspaper/article/136919920
+1984-09-23,andrew_peacock,opposition,job-rating,25,,,all,,Morgan Gallup,publication-week,,136919920,https://trove.nla.gov.au/newspaper/article/136919920
+1984-09-30,bob_hawke,pm,job-rating,69,,,all,,Morgan Gallup,publication-week,Weekend of 29-30 Sep 1984,136921141,https://trove.nla.gov.au/newspaper/article/136921141
+1984-09-30,andrew_peacock,opposition,job-rating,22,,,all,,Morgan Gallup,publication-week,,136921141,https://trove.nla.gov.au/newspaper/article/136921141
+1984-10-13,bob_hawke,pm,job-rating,68,,,all,958,Morgan Gallup,publication-week,,136923815,https://trove.nla.gov.au/newspaper/article/136923815
+1984-10-13,andrew_peacock,opposition,job-rating,19,,,all,958,Morgan Gallup,publication-week,Lowest Gallup rating for any Federal leader at the time,136923815,https://trove.nla.gov.au/newspaper/article/136923815
+1984-10-27,bob_hawke,pm,job-rating,67,,,all,,Morgan Gallup,publication-week,Poll taken about ten days before 1 Nov 1984,122525999,https://trove.nla.gov.au/newspaper/article/122525999
+1984-10-27,andrew_peacock,opposition,job-rating,24,,,all,,Morgan Gallup,publication-week,,122525999,https://trove.nla.gov.au/newspaper/article/122525999
+1984-11-04,bob_hawke,pm,job-rating,68,,,all,,Morgan Gallup,publication-week,Fieldwork weekend of 3-4 Nov 1984,122528594,https://trove.nla.gov.au/newspaper/article/122528594
+1984-11-04,andrew_peacock,opposition,job-rating,28,,,all,,Morgan Gallup,publication-week,,122528594,https://trove.nla.gov.au/newspaper/article/122528594
+1984-11-10,bob_hawke,pm,job-rating,67,,,all,,Morgan Gallup,publication-week,Poll weekend after leaders' policy speeches,122529807,https://trove.nla.gov.au/newspaper/article/122529807
+1984-11-10,andrew_peacock,opposition,job-rating,31,,,all,,Morgan Gallup,publication-week,Article says recovered two points to 31 though prior printed wave was 28,122529807,https://trove.nla.gov.au/newspaper/article/122529807
+1985-02-17,bob_hawke,pm,job-rating,57,,,all,,Morgan Gallup,publication-week,Low point cited in 14 Mar 1985 article,122503149,https://trove.nla.gov.au/newspaper/article/122503149
+1985-03-03,bob_hawke,pm,job-rating,58,,,all,,Morgan Gallup,publication-week,Poll weekends of 23-24 Feb and 2-3 Mar 1985,122503149,https://trove.nla.gov.au/newspaper/article/122503149
+1985-03-03,andrew_peacock,opposition,job-rating,51,,,all,,Morgan Gallup,publication-week,,122503149,https://trove.nla.gov.au/newspaper/article/122503149
+1985-04-06,bob_hawke,pm,job-rating,55,,,all,,Morgan Gallup,publication-week,First two weekends of April 1985; peak was 75 in Mar 1984 per 25 Apr 1985 article,122474895,https://trove.nla.gov.au/newspaper/article/122474895
+1985-04-06,andrew_peacock,opposition,job-rating,47,,,all,,Morgan Gallup,publication-week,Post-election high was 56,122474895,https://trove.nla.gov.au/newspaper/article/122474895
+1985-04-30,bob_hawke,pm,job-rating,52,,,all,,Morgan Gallup,publication-week,Lost 3 points in April,127008418,https://trove.nla.gov.au/newspaper/article/127008418
+1985-08-07,bob_hawke,pm,job-rating,50,,,all,,Morgan Gallup,publication-week,Highest in four polls; weekends of late Jul and early Aug 1985,122522652,https://trove.nla.gov.au/newspaper/article/122522652
