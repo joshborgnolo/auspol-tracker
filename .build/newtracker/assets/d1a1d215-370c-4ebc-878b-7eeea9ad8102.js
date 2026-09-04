@@ -3770,8 +3770,8 @@ function AllPollsView({ focus, onBack, backLabel }) {
         shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure’s
         own time, and it is a property of the pollster, not of this one poll.
         {" "}<strong>Eff. n</strong> is the pollster’s own published effective sample, filed with the
-        Australian Polling Council – Newspoll, YouGov, Essential and DemosAU file them; Resolve
-        and Roy Morgan file none, so a dash there means unpublished, not unknown.
+        Australian Polling Council – Newspoll, YouGov, Essential, DemosAU and RedBridge / Accent
+        file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown.
       </p>
 
       <VariancePanel key={facet} facet={facet} rangeId={range} />
@@ -4173,8 +4173,8 @@ function infoTerms(D) {
       {" "}Full formula: the headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window, where
       xᵢ is a poll’s house-adjusted figure and its weight wᵢ = nᵢ × 2^(−d/7) ÷ √m – nᵢ the
       poll’s sample on the estimator’s scale: its published effective sample where the house files
-      one (Newspoll, YouGov, Essential and DemosAU, via their Australian Polling Council
-      methodology statements), grossed back up by the shared 1.6 design factor, else its raw
+      one (Newspoll, YouGov, Essential, DemosAU and RedBridge / Accent, via their Australian
+      Polling Council methodology statements), grossed back up by the shared 1.6 design factor, else its raw
       sample capped at 3,000 – 1,200 where no sample is filed at all. nᵢ also sets the
       sampling-error floor under the whole
       window, so the same published figure improves both. d is the poll’s age in days (halving

@@ -185,7 +185,8 @@ const HE_WINDOW = 28, SHRINK_K = 8, SAMPLE_CAP = 3000, LN2 = Math.log(2);
 const HL_DEFF = 1.6;
 /* A poll's n on the derived scale. Where the house files a published
    effective sample size (polls.json `sampleEff` – Newspoll, YouGov,
-   Essential, DemosAU via APC methodology statements), that figure is
+   Essential, DemosAU, RedBridge / Accent via APC methodology
+   statements), that figure is
    already deflated by the house's own design effect; scale it back up by
    HL_DEFF so published and derived rows sit on the one convention, and the
    seFloor formula's `HL_DEFF * pq / p.n` reduces to pq/eff for a published
