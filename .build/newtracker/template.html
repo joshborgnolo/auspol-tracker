@@ -3483,8 +3483,11 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-bar .ap-search { flex: 1 1 190px; max-width: 300px; }
 .ap-bar-end { margin-left: auto; display: inline-flex; align-items: center; gap: 14px; }
 .ap-bar .ap-export { margin-left: 0; }
-.ap-count { font-family: var(--sans); font-size: 13px; color: var(--ink-3); white-space: nowrap; }
-.ap-count strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+/* the phone copy (.ap-jumps-count, in the jump-links grid) carries a
+   different class but must read as the SAME quiet ledger tally – without
+   these selectors it inherits the 16px page text in full ink */
+.ap-count, .ap-jumps-count { font-family: var(--sans); font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+.ap-count strong, .ap-jumps-count strong { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
 
 /* 2PP's own pair: the lead control and the view's "With a 2PP" scope pill
    share one wrapper, but the wrapper never takes a box of its own – at
