@@ -6,6 +6,13 @@
 # can detect that a wave has been published days before free secondary coverage
 # clusters — the 2026-08-28 wave sat as a candidate for four days and landed
 # manually. This job DETECTS ONLY; figures still land via the extractor.
+#
+# Escalation (2026-09-05): once a `release` verdict has sat unlanded past
+# ESCALATE_AFTER_DAYS (see check-newspoll-release.mjs), the watch JSON starts
+# carrying escalate:true. The file-missing job below re-checks the verdict and,
+# only then, hands the wave to the headless filing agent
+# (.build/newspoll-file-missing-prompt.md) — the LLM last resort, never part
+# of the deterministic chain it stands in for.
 
 name: newspoll-watch
 
@@ -15,6 +22,9 @@ on:
     - cron: '30 21 * * *' # 07:30 AEST daily — catch-all for off-pattern releases
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   watch:
     runs-on: ubuntu-latest
@@ -23,3 +33,52 @@ jobs:
       - uses: actions/checkout@v4
       - name: Check for an unlanded Newspoll release
         run: node .build/check-newspoll-release.mjs
+
+  # The watch job's failure IS its message, so its outputs can't be trusted
+  # from a failed job — the gate re-runs the (anonymous, seconds-cheap)
+  # watchdog and reads the NP_WATCH verdict line for itself. escalate only
+  # ever appears on a release verdict, so a quiet run skips every agent step.
+  file-missing:
+    needs: watch
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    # The filing agent commits and pushes; serialise with the other writers.
+    concurrency:
+      group: main-writers
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Gate on the escalated watch verdict
+        id: gate
+        run: |
+          node .build/check-newspoll-release.mjs 2>&1 | tee "$RUNNER_TEMP/npwatch.log" || true
+          json=$(grep '^NP_WATCH ' "$RUNNER_TEMP/npwatch.log" | tail -n 1 | sed 's/^NP_WATCH //') || true
+          esc=$(printf '%s' "$json" | node -e 'let s="";process.stdin.on("data",(d)=>s+=d).on("end",()=>{try{const o=JSON.parse(s);process.stdout.write(o.fired===true&&o.escalate===true?"true":"false")}catch{process.stdout.write("false")}})')
+          echo "gate verdict: escalate=$esc"
+          echo "escalate=$esc" >> "$GITHUB_OUTPUT"
+
+      # Pin the agent CLI: a floating @latest install means a tag move
+      # (compromised or accidental) changes the code that runs with
+      # contents:write and MATILDA_API_KEY (same rationale as poll-agent.yml).
+      - name: Install Matilda CLI
+        if: steps.gate.outputs.escalate == 'true'
+        run: npm i -g @maincode-ai/matilda-code@0.21.4
+
+      - name: Run the missing-wave filing agent
+        if: steps.gate.outputs.escalate == 'true'
+        env:
+          MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$MATILDA_API_KEY" ]; then
+            echo "::warning::MATILDA_API_KEY secret not set; skipping missing-wave filing. Add it in repo Settings > Secrets."
+            exit 0
+          fi
+          matilda -p "$(cat .build/newspoll-file-missing-prompt.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
