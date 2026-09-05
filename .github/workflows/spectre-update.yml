@@ -1,0 +1,30 @@
+# Spectre Strategy poll updater. Roughly quarterly cadence (Australian
+# Federal Political Update report); cheap daily sweep of the blog RSS.
+
+name: spectre-update
+
+on:
+  schedule:
+    - cron: '50 20 * * *' # 06:50 AEST daily
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: 'Force the update job to fail (tests the Matilda repair job)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    uses: ./.github/workflows/poll-agent.yml
+    with:
+      house: spectre
+      wrapper: .build/spectre-updater.sh
+      repair_prompt: .build/spectre-repair-prompt.md
+      apt_packages: poppler-utils
+      simulate_failure: ${{ inputs.simulate_failure }}
+    secrets: inherit

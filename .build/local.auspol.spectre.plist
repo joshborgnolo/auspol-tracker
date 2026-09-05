@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>Label</key>
+        <string>local.auspol.spectre</string>
+        <key>ProgramArguments</key>
+        <array>
+                <string>/bin/bash</string>
+                <string>/Users/joshuaborgnolo/Library/Application Support/auspol-agents/spectre.sh</string>
+        </array>
+        <key>EnvironmentVariables</key>
+        <dict>
+                <key>PATH</key>
+                <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        </dict>
+        <key>StartCalendarInterval</key>
+        <array>
+                <!-- Spectre Strategy files its Australian Federal Political
+                     Update roughly quarterly (canon waves 2025-07-02, 2025-10-31,
+                     2026-04-08, 2026-07-23 — no fixed week of month) on
+                     spectrestrategy.com/blog-3-1. Weekly Saturday sweep is
+                     enough: the daily GitHub Actions run is the primary, this
+                     job is the local backup mirror, and the coverage watchdog
+                     emails if a wave is missed. A cached source means routine
+                     runs fetch only the RSS feed. -->
+                <dict><key>Weekday</key><integer>6</integer><key>Hour</key><integer>6</integer></dict>
+        </array>
+        <key>StandardOutPath</key>
+        <string>/Users/joshuaborgnolo/auspol tracker/.build/logs/launchd-spectre-stdout.log</string>
+        <key>StandardErrorPath</key>
+        <string>/Users/joshuaborgnolo/auspol tracker/.build/logs/launchd-spectre-stderr.log</string>
+</dict>
+</plist>
