@@ -546,6 +546,13 @@
       "unsure": 17
     },
     {
+      "date": "2025-04-28",
+      "pollster": "Spectre Strategy",
+      "right": 30,
+      "wrong": 53,
+      "unsure": 17
+    },
+    {
       "date": "2025-04-29",
       "pollster": "Essential",
       "right": 31,
@@ -583,6 +590,14 @@
       "right": 38.5,
       "wrong": 46,
       "unsure": 15.5
+    },
+    {
+      "date": "2025-07-01",
+      "dateStart": "2025-06-27",
+      "pollster": "Spectre Strategy",
+      "right": 36,
+      "wrong": 42,
+      "unsure": 22
     },
     {
       "date": "2025-07-27",
@@ -663,6 +678,14 @@
       "right": 33.5,
       "wrong": 51.5,
       "unsure": 15
+    },
+    {
+      "date": "2025-11-17",
+      "dateStart": "2025-11-04",
+      "pollster": "Spectre Strategy",
+      "right": 31,
+      "wrong": 53,
+      "unsure": 16
     },
     {
       "date": "2025-11-24",
@@ -825,6 +848,14 @@
       "unsure": 15
     },
     {
+      "date": "2026-04-08",
+      "dateStart": "2026-04-02",
+      "pollster": "Spectre Strategy",
+      "right": 26,
+      "wrong": 60,
+      "unsure": 14
+    },
+    {
       "date": "2026-04-12",
       "dateStart": "2026-04-06",
       "pollster": "Roy Morgan",
@@ -967,6 +998,14 @@
       "right": 26,
       "wrong": 59.5,
       "unsure": 14.5
+    },
+    {
+      "date": "2026-07-23",
+      "dateStart": "2026-07-11",
+      "pollster": "Spectre Strategy",
+      "right": 29,
+      "wrong": 57,
+      "unsure": 14
     },
     {
       "date": "2026-07-26",
@@ -5038,6 +5077,15 @@
       "detail": null
     },
     {
+      "date": "2025-07-01",
+      "firm": "Spectre Strategy",
+      "alb": 4,
+      "opp": null,
+      "oppName": null,
+      "han": -15,
+      "detail": null
+    },
+    {
       "date": "2025-07-10",
       "firm": "Morning Consult",
       "alb": 19,
@@ -5261,6 +5309,15 @@
           "dis": 45
         }
       }
+    },
+    {
+      "date": "2025-11-17",
+      "firm": "Spectre Strategy",
+      "alb": -9,
+      "opp": null,
+      "oppName": null,
+      "han": -6,
+      "detail": null
     },
     {
       "date": "2025-11-20",
@@ -5696,15 +5753,18 @@
       "detail": {
         "alb": {
           "app": 31,
-          "dis": 52
+          "dis": 52,
+          "unsure": 17
         },
         "opp": {
           "app": 28,
-          "dis": 25
+          "dis": 25,
+          "unsure": 47
         },
         "han": {
           "app": 43,
-          "dis": 40
+          "dis": 40,
+          "unsure": 17
         }
       }
     },
@@ -6244,15 +6304,18 @@
       "detail": {
         "alb": {
           "app": 33,
-          "dis": 47
+          "dis": 47,
+          "unsure": 20
         },
         "opp": {
           "app": 26,
-          "dis": 33
+          "dis": 33,
+          "unsure": 42
         },
         "han": {
           "app": 41,
-          "dis": 42
+          "dis": 42,
+          "unsure": 17
         }
       }
     },
@@ -44376,7 +44439,7 @@
       {
         "date": "2025-04-28",
         "firm": "Spectre Strategy",
-        "pmNet": null,
+        "pmNet": -6,
         "oppNet": null,
         "pmPpm": 47,
         "oppPpm": 35

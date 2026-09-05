@@ -121,7 +121,7 @@
           "oppName": { "type": ["string", "null"] }, "han": { "type": ["number", "null"] },
           "detail": {
             "type": ["object", "null"],
-            "description": "Optional. { alb|opp|han: {app,dis} } = the published split behind the primary net — always record it when the pollster gave one. { fav: {...} } = a SECOND measure, when a firm published both for one leader."
+            "description": "Optional. { alb|opp|han: {app,dis} } = the published split behind the primary net — always record it when the pollster gave one; net must equal app − dis. An optional `unsure` beside them is the rest of the sample, so the three sum to ~100 (Spectre publishes it as two categories, \"never heard of\" and \"neutral / unsure\", stored as their sum). { fav: {...} } = a SECOND measure, when a firm published both for one leader."
           }
         }
       }
