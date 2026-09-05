@@ -72,7 +72,11 @@ jobs:
             echo "no link-health changes this week"
             exit 0
           fi
+          node .build/newtracker/validate.mjs
           git commit -m "Refresh the citation link-health ledger"
-          # another agent may have landed data first thing; rebase, don't race
-          git pull --rebase origin main
-          git push origin HEAD:main
+          # Shared helper like the updater wrappers: push with one
+          # rebase+amend retry instead of a bare pull --rebase + push.
+          LOG=/dev/null
+          log() { echo "$*"; }
+          . .build/git-push-main.sh
+          push_main "Refresh the citation link-health ledger" data/link-health.json

@@ -56,18 +56,23 @@ jobs:
   # Fires only on class 2: a repair agent gets a worklist of wave dates and
   # houses, never an unexplained silence. Matched to the poll-agent repair
   # pattern but kept inline — the prompt and apt needs are coverage-specific.
+  # PR-gated (2026-09-05): the agent works a repair/coverage-<run> branch with
+  # no git credentials; the workflow pushes that branch and opens the PR.
   repair:
     needs: check
     if: failure() && needs.check.outputs.verdict == '2'
     runs-on: ubuntu-latest
     timeout-minutes: 35
-    # The repair agent commits and pushes; serialise with the other writers
-    # (see roymorgan-update.yml).
+    # Repair no longer writes main (PR-gated), but it still pushes a branch —
+    # keep it on the shared main-writers serialisation like every other
+    # push-capable job (see roymorgan-update.yml).
     concurrency:
       group: main-writers
       cancel-in-progress: false
     permissions:
-      contents: write
+      contents: write        # push the repair branch (and only the branch)
+      pull-requests: write   # open the PR
+      issues: write          # circuit-breaker alert issues + labels
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
 
@@ -89,21 +94,78 @@ jobs:
         # Version lives in package-lock.json (see roymorgan-update.yml).
         run: npm ci --ignore-scripts --no-audit --no-fund || true
 
+      # A daily run of an unfixed defect would otherwise spend an agent
+      # session forever. Breaker counts repair PRs in 24h.
+      - name: Circuit breaker
+        id: breaker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .build/repair-gate.sh coverage
+
+      - name: Alert when the circuit breaker is tripped
+        if: steps.breaker.outputs.allowed == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bash .build/alert-issue.sh \
+            "Repair circuit breaker: coverage" \
+            "Three repair-agent PRs in 24h and the coverage doctor still reports a defect — [failed run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). No further agent sessions this window; this needs a human."
+
+      - name: Prepare a credential-free repair branch
+        id: branch
+        if: steps.breaker.outputs.allowed == 'true'
+        run: |
+          BRANCH="repair/coverage-${GITHUB_RUN_ID}"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          git checkout -b "$BRANCH"
+          git config --unset-all http.https://github.com/.extraheader || true
+          git config --unset-all url."https://github.com/".insteadOf || true
+          git config --unset-all url."git@github.com:".insteadOf || true
+
       # Pinned for the same reason as poll-agent.yml — bump both together.
       - name: Install Matilda CLI
+        if: steps.breaker.outputs.allowed == 'true'
         run: npm i -g @maincode-ai/matilda-code@0.21.4
 
+      # Deliberately NO GITHUB_TOKEN here: the workflow owns every remote op.
       - name: Run the repair agent
+        if: steps.breaker.outputs.allowed == 'true'
         env:
           MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHROME: /usr/bin/google-chrome
+          GIT_TERMINAL_PROMPT: "0"
+          AUSPOL_PR_GATE: "1" # push_main in the wrappers leaves commits local
         run: |
           if [ -z "$MATILDA_API_KEY" ]; then
             echo "::warning::MATILDA_API_KEY secret not set; skipping repair. Add it in repo Settings > Secrets."
             exit 0
           fi
           matilda -p "$(cat .build/coverage-doctor-repair-prompt.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
+
+      - name: Push the repair branch and open a PR
+        if: steps.breaker.outputs.allowed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if ! git log --oneline origin/main..HEAD | grep -q .; then
+            echo "the agent left no commits; nothing to PR (its report is in the log above)"
+            exit 0
+          fi
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)" \
+            push origin "HEAD:${BRANCH}"
+          gh label create repair-agent --force --description "Opened by a repair agent; human review required" --color 0E8A16 || true
+          printf '%s\n\n%s\n\n%s\n' \
+            "Automated repair attempt for a defect the coverage doctor found — [run](${RUN_URL})." \
+            "**Review before merging.** Nothing here has touched main or the live site; merging deploys it." \
+            "Expected shape of an honest repair: extractor fix and/or the missed wave's data row via the normal validate+build path, guard checks intact, no workflow or permissions changes. Reject anything else." \
+            > "$RUNNER_TEMP/pr-body.md"
+          gh pr create \
+            --label repair-agent \
+            --title "Repair: coverage pipeline (run ${GITHUB_RUN_ID})" \
+            --body-file "$RUNNER_TEMP/pr-body.md"
+          gh pr view --json url --jq .url | tee -a "$GITHUB_STEP_SUMMARY"
 
   # Separate job, not another step: a missed wave and a thin wave are different
   # failures and must be able to go red independently of each other.

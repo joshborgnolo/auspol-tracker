@@ -17,8 +17,19 @@
 # path re-stages it so regenerated artifacts land in the same commit. Pass
 # index.html in the list whenever the commit carries it — that is the signal
 # that the merged tree needs a rebuild before the retry.
+#
+# PR-gated repair runs (AUSPOL_PR_GATE=1, set by the repair workflows' agent
+# step): the agent works a credential-free repair/<house>-<run> branch and
+# the workflow owns every remote op, so this function must NOT push — it
+# leaves the commit on the local branch and returns success so the wrapper
+# pipeline completes. The workflow's deterministic post-step pushes the
+# branch and opens the PR.
 push_main() {
   local msg="$1"; shift
+  if [ "${AUSPOL_PR_GATE:-}" = "1" ]; then
+    log "PR-gated repair run: commit left on the local branch; the workflow will push and PR it"
+    return 0
+  fi
   if git push origin HEAD:main >> "$LOG" 2>&1; then
     return 0
   fi

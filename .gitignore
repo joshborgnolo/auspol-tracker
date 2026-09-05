@@ -9,3 +9,8 @@ node_modules/
 
 # updater-slot lock dirs (self-releasing; stale dirs are reaped by pid check)
 .build/locks/
+
+# .matilda/ is agent scratch space shared by concurrent sessions — nothing
+# under it belongs in a data/site commit except the curated skills.
+.matilda/*
+!.matilda/skills/

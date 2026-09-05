@@ -13,6 +13,10 @@
 # only then, hands the wave to the headless filing agent
 # (.build/newspoll-file-missing-prompt.md) — the LLM last resort, never part
 # of the deterministic chain it stands in for.
+#
+# PR-gated (2026-09-05): the filing agent works a repair/ branch with no git
+# credentials; the workflow pushes the branch and opens the PR. Nothing the
+# agent files reaches main or the site until a human merges it.
 
 name: newspoll-watch
 
@@ -48,10 +52,16 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 35
-    # The filing agent commits and pushes; serialise with the other writers.
+    # The filing agent no longer writes main (PR-gated), but it still pushes
+    # a branch — keep it on the shared main-writers serialisation like every
+    # other push-capable job (see roymorgan-update.yml).
     concurrency:
       group: main-writers
       cancel-in-progress: false
+    permissions:
+      contents: write        # push the repair branch (and only the branch)
+      pull-requests: write   # open the PR
+      issues: write          # circuit-breaker alert issues + labels
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
 
@@ -75,21 +85,77 @@ jobs:
           echo "gate verdict: escalate=$esc"
           echo "escalate=$esc" >> "$GITHUB_OUTPUT"
 
+      # A daily escalated watch would otherwise re-file (and re-spend) on the
+      # same wave forever. Breaker counts repair PRs in 24h.
+      - name: Circuit breaker
+        id: breaker
+        if: steps.gate.outputs.escalate == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .build/repair-gate.sh newspoll-file
+
+      - name: Alert when the circuit breaker is tripped
+        if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bash .build/alert-issue.sh \
+            "Repair circuit breaker: newspoll-file" \
+            "Three filing-agent PRs in 24h and the unlanded Newspoll wave still isn't in polls.json — [run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). No further agent sessions this window; this needs a human."
+
+      - name: Prepare a credential-free repair branch
+        id: branch
+        if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'true'
+        run: |
+          BRANCH="repair/newspoll-file-${GITHUB_RUN_ID}"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          git checkout -b "$BRANCH"
+          git config --unset-all http.https://github.com/.extraheader || true
+          git config --unset-all url."https://github.com/".insteadOf || true
+          git config --unset-all url."git@github.com:".insteadOf || true
+
       # Pin the agent CLI: a floating @latest install means a tag move
       # (compromised or accidental) changes the code that runs with
       # contents:write and MATILDA_API_KEY (same rationale as poll-agent.yml).
       - name: Install Matilda CLI
-        if: steps.gate.outputs.escalate == 'true'
+        if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'true'
         run: npm i -g @maincode-ai/matilda-code@0.21.4
 
+      # Deliberately NO GITHUB_TOKEN here: the workflow owns every remote op.
       - name: Run the missing-wave filing agent
-        if: steps.gate.outputs.escalate == 'true'
+        if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'true'
         env:
           MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_TERMINAL_PROMPT: "0"
+          AUSPOL_PR_GATE: "1" # push_main in the wrappers leaves commits local
         run: |
           if [ -z "$MATILDA_API_KEY" ]; then
             echo "::warning::MATILDA_API_KEY secret not set; skipping missing-wave filing. Add it in repo Settings > Secrets."
             exit 0
           fi
           matilda -p "$(cat .build/newspoll-file-missing-prompt.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
+
+      - name: Push the repair branch and open a PR
+        if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if ! git log --oneline origin/main..HEAD | grep -q .; then
+            echo "the agent left no commits; nothing to PR (its report is in the log above)"
+            exit 0
+          fi
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)" \
+            push origin "HEAD:${BRANCH}"
+          gh label create repair-agent --force --description "Opened by a repair agent; human review required" --color 0E8A16 || true
+          printf '%s\n\n%s\n\n%s\n' \
+            "Automated filing of the unlanded Newspoll wave the watch job escalated — [run](${RUN_URL})." \
+            "**Review before merging.** Nothing here has touched main or the live site; merging deploys it." \
+            "Expected shape of an honest filing: one polls.json Newspoll row with a source URL whose figures match the row, plus the built artifacts from the normal validate+build path. No workflow or permissions changes. Reject anything else." \
+            > "$RUNNER_TEMP/pr-body.md"
+          gh pr create \
+            --label repair-agent \
+            --title "Repair: newspoll-file pipeline (run ${GITHUB_RUN_ID})" \
+            --body-file "$RUNNER_TEMP/pr-body.md"
+          gh pr view --json url --jq .url | tee -a "$GITHUB_STEP_SUMMARY"

@@ -5,8 +5,11 @@ chart, but neither the deterministic extractor
 (`.build/extract-newspoll.mjs`) nor its repair agent has landed it in
 `data/polls.json`. You are the LAST resort, not part of the extraction
 chain: hand-file that ONE wave from fetched, cited sources, gate it through
-the normal validators, and commit + push. You are on a checkout of `main`
-with `GITHUB_TOKEN` available for pushing.
+the normal validators, and commit it on the repair branch you are checked
+out on. You have NO git credentials and CANNOT push: the workflow that
+invoked you pushes the branch and opens a pull request for human review.
+Your commits on the branch are the deliverable — nothing you write can
+reach main or the live site unreviewed.
 
 **Committing nothing is a SUCCESSFUL outcome.** If you cannot corroborate
 the wave's figures from independent sources in this session, report what
@@ -108,10 +111,9 @@ make the run feel useful.
    (unchanged entries stage nothing). Check `git diff --cached --stat`
    touches ONLY those generated artifacts plus `data/polls.json`.
 4. Commit `File unlanded Newspoll wave <fieldwork-end date>` with a body
-   listing every source URL you verified figures against, then
-   `git push origin HEAD:main`. If rejected (non-fast-forward),
-   `git pull --rebase origin main`, re-run step 1, push again — once.
-   Still rejected? Stop and report.
+   listing every source URL you verified figures against. Do NOT push —
+   the workflow that invoked you pushes the repair branch and opens the
+   PR. If the commit itself fails, stop and report.
 
 ## Abort = revert and report
 

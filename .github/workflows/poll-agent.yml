@@ -8,6 +8,11 @@
 # dense schedules are safe. All wrappers fast-forward to origin/main and skip
 # their slot if main moved underneath them, so the local launchd copies of the
 # same jobs can stay installed as backups.
+#
+# Repair is PR-GATED (2026-09-05): the agent works on a repair/<house>-<run>
+# branch with NO git credentials; the workflow — not the agent — pushes that
+# branch and opens a PR. Nothing an agent writes can reach main or the live
+# site unreviewed, no matter what its fetched web content told it to do.
 
 name: poll-agent (reusable)
 
@@ -128,12 +133,13 @@ jobs:
     if: failure()
     runs-on: ubuntu-latest
     timeout-minutes: 35
-    # The repair agent commits and pushes; serialise with the other writers.
     concurrency:
       group: main-writers
       cancel-in-progress: false
     permissions:
-      contents: write
+      contents: write        # push the repair branch (and only the branch — see below)
+      pull-requests: write   # open the PR
+      issues: write          # circuit-breaker alert issues + labels
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
 
@@ -141,7 +147,6 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
         with:
           node-version-file: .nvmrc
-          cache: npm
 
       - name: Configure git identity
         run: |
@@ -164,21 +169,89 @@ jobs:
       - name: Install puppeteer-core (best effort)
         run: npm ci --ignore-scripts --no-audit --no-fund || true
 
+      # A persistent upstream breakage fires a repair on every failed slot —
+      # Roy Morgan alone has 12 slots a Monday. The breaker counts the repair
+      # PRs already opened for this house in 24h and closes the loop at 3.
+      - name: Circuit breaker
+        id: breaker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .build/repair-gate.sh "${{ inputs.house }}"
+
+      - name: Alert when the circuit breaker is tripped
+        if: steps.breaker.outputs.allowed == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bash .build/alert-issue.sh \
+            "Repair circuit breaker: ${{ inputs.house }}" \
+            "Three repair-agent PRs in 24h and the ${{ inputs.house }} updater is still failing — [failed run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). No further agent sessions this window; this needs a human."
+
+      - name: Prepare a credential-free repair branch
+        id: branch
+        if: steps.breaker.outputs.allowed == 'true'
+        env:
+          HOUSE: ${{ inputs.house }}
+        run: |
+          BRANCH="repair/${HOUSE}-${GITHUB_RUN_ID}"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          git checkout -b "$BRANCH"
+          # The agent phase gets NO git credentials: only the deterministic
+          # post-step may push, and it pushes only this workflow-named branch.
+          # checkout leaves the token in git config — strip it, and terminal
+          # prompts off so a stray push fails fast instead of hanging.
+          git config --unset-all http.https://github.com/.extraheader || true
+          git config --unset-all url."https://github.com/".insteadOf || true
+          git config --unset-all url."git@github.com:".insteadOf || true
+
       # Pin the repair-agent CLI: a floating @latest install means a tag move
       # (compromised or accidental) changes the code that runs with
       # contents:write and MATILDA_API_KEY. Bump this deliberately after
       # verifying the new release.
       - name: Install Matilda CLI
+        if: steps.breaker.outputs.allowed == 'true'
         run: npm i -g @maincode-ai/matilda-code@0.21.4
 
+      # Deliberately NO GITHUB_TOKEN here: the agent edits and commits on the
+      # branch; the workflow owns every remote operation.
       - name: Run the repair agent
+        if: steps.breaker.outputs.allowed == 'true'
         env:
           MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CHROME: /usr/bin/google-chrome
+          GIT_TERMINAL_PROMPT: "0"
+          AUSPOL_PR_GATE: "1" # push_main in the wrappers leaves commits local
         run: |
           if [ -z "$MATILDA_API_KEY" ]; then
             echo "::warning::MATILDA_API_KEY secret not set; skipping repair. Add it in repo Settings > Secrets."
             exit 0
           fi
           matilda -p "$(cat ${{ inputs.repair_prompt }})" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
+
+      - name: Push the repair branch and open a PR
+        if: steps.breaker.outputs.allowed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          HOUSE: ${{ inputs.house }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if ! git log --oneline origin/main..HEAD | grep -q .; then
+            echo "the agent left no commits; nothing to PR (its report is in the log above)"
+            exit 0
+          fi
+          # The agent phase carried no credentials; this is the only push in
+          # the job and it can only ever carry the workflow-named branch.
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)" \
+            push origin "HEAD:${BRANCH}"
+          gh label create repair-agent --force --description "Opened by a repair agent; human review required" --color 0E8A16 || true
+          printf '%s\n\n%s\n\n%s\n' \
+            "Automated repair attempt for the failing ${HOUSE} update pipeline — [run](${RUN_URL})." \
+            "**Review before merging.** Nothing here has touched main or the live site; merging deploys it." \
+            "Expected shape of an honest repair: extractor/parser fix only, guard checks intact, no data rows hand-edited, no workflow or permissions changes. Reject anything else." \
+            > "$RUNNER_TEMP/pr-body.md"
+          gh pr create \
+            --label repair-agent \
+            --title "Repair: ${HOUSE} pipeline (run ${GITHUB_RUN_ID})" \
+            --body-file "$RUNNER_TEMP/pr-body.md"
+          gh pr view --json url --jq .url | tee -a "$GITHUB_STEP_SUMMARY"

@@ -3,8 +3,11 @@ coverage doctor found POSITIVE EVIDENCE that the tracker missed a poll wave:
 the Wikipedia witness lists a wave that `data/polls.json` does not have, or
 a house is past its own cadence AND the witness has a newer wave from it.
 Diagnose why the owning extractor missed it, make the MINIMUM fix, land the
-wave through the normal pipeline, and commit + push. You are on a checkout
-of `main` with `GITHUB_TOKEN` available for pushing.
+wave through the normal pipeline, and commit it on the repair branch you are
+checked out on. You have NO git credentials and CANNOT push: the workflow
+that invoked you pushes the branch and opens a pull request for human
+review. Your commits on the branch are the deliverable — nothing you write
+can reach main or the live site unreviewed.
 
 ## Context
 
@@ -64,5 +67,10 @@ of `main` with `GITHUB_TOKEN` available for pushing.
   No refactors, no drive-by fixes in other houses.
 - Unfixable within your turn budget? Stop and print what changed and what
   you tried. Do not commit a partial fix.
-- Push with `git push origin HEAD:main`. If rejected (non-fast-forward),
-  `git pull --rebase origin main`, re-run validate, push again — once.
+- PR-GATED BRANCH CONTRACT: you are on a `repair/<house>` branch with no
+  git credentials. NEVER `git push`, never check out, reset onto, or merge
+  `main`, and never try to restore git credentials. The updater wrappers'
+  own push steps skip themselves (`AUSPOL_PR_GATE=1` is set for your
+  session) — that skip is expected, not a failure. Commit your fix on the
+  current branch; the workflow pushes the branch and opens a pull request
+  that a human reviews before anything reaches main or the live site.

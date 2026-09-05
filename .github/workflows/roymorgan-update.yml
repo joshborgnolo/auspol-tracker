@@ -82,11 +82,18 @@ jobs:
           fi
           bash .build/roymorgan-updater.sh
 
+  # PR-gated like poll-agent.yml's repair job: the agent works on a
+  # repair/roymorgan-<run> branch with no git credentials; the workflow pushes
+  # the branch and opens the PR. Nothing reaches main unreviewed.
   repair:
     needs: update
     if: failure()
     runs-on: ubuntu-latest
     timeout-minutes: 35
+    permissions:
+      contents: write        # push the repair branch (and only the branch)
+      pull-requests: write   # open the PR
+      issues: write          # circuit-breaker alert issues + labels
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
 
@@ -100,17 +107,75 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      # 12 Monday slots: a persistent upstream breakage would otherwise fire
+      # a repair agent every 10 minutes. Breaker counts repair PRs in 24h.
+      - name: Circuit breaker
+        id: breaker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bash .build/repair-gate.sh roymorgan
+
+      - name: Alert when the circuit breaker is tripped
+        if: steps.breaker.outputs.allowed == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          bash .build/alert-issue.sh \
+            "Repair circuit breaker: roymorgan" \
+            "Three repair-agent PRs in 24h and the Roy Morgan updater is still failing — [failed run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). No further agent sessions this window; this needs a human."
+
+      - name: Prepare a credential-free repair branch
+        id: branch
+        if: steps.breaker.outputs.allowed == 'true'
+        run: |
+          BRANCH="repair/roymorgan-${GITHUB_RUN_ID}"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          git checkout -b "$BRANCH"
+          git config --unset-all http.https://github.com/.extraheader || true
+          git config --unset-all url."https://github.com/".insteadOf || true
+          git config --unset-all url."git@github.com:".insteadOf || true
+
       # Pinned for the same reason as poll-agent.yml — bump both together.
       - name: Install Matilda CLI
+        if: steps.breaker.outputs.allowed == 'true'
         run: npm i -g @maincode-ai/matilda-code@0.21.4
 
+      # Deliberately NO GITHUB_TOKEN here: the workflow owns every remote op.
       - name: Run the repair agent
+        if: steps.breaker.outputs.allowed == 'true'
         env:
           MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CHROME: /usr/bin/google-chrome
+          GIT_TERMINAL_PROMPT: "0"
+          AUSPOL_PR_GATE: "1" # push_main in the wrappers leaves commits local
         run: |
           if [ -z "$MATILDA_API_KEY" ]; then
             echo "::warning::MATILDA_API_KEY secret not set; skipping repair. Add it in repo Settings > Secrets."
             exit 0
           fi
           matilda -p "$(cat .build/roymorgan-repair-prompt.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
+
+      - name: Push the repair branch and open a PR
+        if: steps.breaker.outputs.allowed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.branch.outputs.branch }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          if ! git log --oneline origin/main..HEAD | grep -q .; then
+            echo "the agent left no commits; nothing to PR (its report is in the log above)"
+            exit 0
+          fi
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)" \
+            push origin "HEAD:${BRANCH}"
+          gh label create repair-agent --force --description "Opened by a repair agent; human review required" --color 0E8A16 || true
+          printf '%s\n\n%s\n\n%s\n' \
+            "Automated repair attempt for the failing Roy Morgan update pipeline — [run](${RUN_URL})." \
+            "**Review before merging.** Nothing here has touched main or the live site; merging deploys it." \
+            "Expected shape of an honest repair: extractor/parser fix only, guard checks intact, no data rows hand-edited, no workflow or permissions changes. Reject anything else." \
+            > "$RUNNER_TEMP/pr-body.md"
+          gh pr create \
+            --label repair-agent \
+            --title "Repair: roymorgan pipeline (run ${GITHUB_RUN_ID})" \
+            --body-file "$RUNNER_TEMP/pr-body.md"
+          gh pr view --json url --jq .url | tee -a "$GITHUB_STEP_SUMMARY"
