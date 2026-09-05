@@ -2088,6 +2088,13 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    they are read rather than scanned. The FAQ below reuses the same typography
    with the question carrying the bold. */
 .info { max-width: 66ch; }
+/* on a laptop the glossary and the FAQ each run in two balanced columns,
+   printed-glossary fashion; the per-column measure lands back near 66ch */
+@media (min-width: 1100px) {
+  .info { max-width: none; columns: 2; column-gap: 48px; }
+  .info > .info-h { column-span: all; }
+  .info .info-term { break-inside: avoid; }
+}
 /* section titles inside the card: the card-title face with glossary spacing */
 .info-h { margin: 2px 0 18px; }
 .info-h-faq { margin-top: 34px; padding-top: 22px;
