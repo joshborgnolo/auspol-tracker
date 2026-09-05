@@ -682,6 +682,10 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
   <url>
+    <loc>${SITE_URL}atlas/</loc>
+    <lastmod>${ARCHIVE_STAMP}</lastmod>
+  </url>
+  <url>
     <loc>${SITE_URL}feedback/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>

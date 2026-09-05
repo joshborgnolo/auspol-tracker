@@ -1,0 +1,83 @@
+﻿Division,Year,State,Party,Minor_2CP_party,Major_2CP_party,Minor_2CP_percent,Major_2CP_percent,Margin,New_swing
+Barker,2016,SA,LP,Centre Alliance (fmr Nick Xenophon Team),Coalition,45.26,54.74,-4.74,NaN
+Bradfield,2022,NSW,LP,Independent,Coalition,45.77,54.23,-4.23,NaN
+Brisbane,2022,QLD,GRN,Greens,Coalition,53.73,46.27,3.73,NaN
+Calare,2004,NSW,IND,Independent,Coalition,71.24,28.76,21.24,NaN
+Calare,2022,NSW,NAT,Independent,Coalition,61.32,59.68,0.82,NaN
+Canberra,2022,ACT,ALP,Greens,Labor,37.8,62.2,12.2,NaN
+Clark (fmr Denison),2010,TAS,IND,Independent,Labor,51.21,48.79,-1.21,NaN
+Clark (fmr Denison),2013,TAS,IND,Independent,Labor,65.51,34.49,-15.51,-14.3
+Clark (fmr Denison),2016,TAS,IND,Independent,Labor,67.78,32.22,-17.78,-2.27
+Clark (fmr Denison),2019,TAS,IND,Independent,Labor,72.12,27.88,-22.12,-4.34
+Clark (fmr Denison),2022,TAS,IND,Independent,Labor,70.82,29.18,-20.82,1.3
+Cooper (fmr Batman),2010,VIC,ALP,Greens,Labor,42.14,57.86,7.86,NaN
+Cooper (fmr Batman),2013,VIC,ALP,Greens,Labor,39.39,60.61,10.61,2.75
+Cooper (fmr Batman),2016,VIC,ALP,Greens,Labor,48.97,51.03,1.03,-9.58
+Cooper (fmr Batman),2019,VIC,ALP,Greens,Labor,35.35,64.65,14.65,13.62
+Cooper (fmr Batman),2022,VIC,ALP,Greens,Labor,41.33,58.67,8.67,-5.98
+Cowper,2016,NSW,NAT,Independent,Coalition,45.44,54.56,-4.56,NaN
+Cowper,2019,NSW,NAT,Independent,Coalition,43.21,56.79,-6.79,NaN
+Cowper,2022,NSW,NAT,Independent,Coalition,47.68,52.32,-2.32,NaN
+Curtin,2022,WA,IND,Independent,Coalition,51.26,48.74,1.26,NaN
+Fairfax,2013,QLD,PUP,Palmer United,Coalition,50.03,49.97,0.03,NaN
+Farrer,2019,NSW,LP,Independent,Coalition,39.06,60.94,-10.94,NaN
+Fowler,2022,NSW,IND,Independent,Labor,51.63,48.37,-1.63,NaN
+Grayndler,2010,NSW,ALP,Greens,Labor,45.77,54.23,4.23,NaN
+Grayndler,2016,NSW,ALP,Greens,Labor,34.18,65.82,15.82,NaN
+Grayndler,2019,NSW,ALP,Greens,Labor,33.7,66.3,16.3,0.48
+Grayndler,2022,NSW,ALP,Greens,Labor,32.95,67.05,17.05,0.75
+Grey,2016,SA,LP,Centre Alliance (fmr Nick Xenophon Team),Coalition,48.05,51.95,-1.95,NaN
+Goldstein,2022,VIC,IND,Independent,Coalition,52.87,47.13,2.87,NaN
+Griffith,2022,QLD,GRN,Greens,Coalition,60.46,39.54,10.46,NaN
+Groom,2022,QLD,IND,Independent,Coalition,41.33,58.67,-8.67,NaN
+Higgins,2016,VIC,LP,Greens,Coalition,42.01,57.99,-7.99,NaN
+Indi,2013,VIC,IND,Independent,Coalition,50.25,49.75,0.25,NaN
+Indi,2016,VIC,IND,Independent,Coalition,54.83,45.17,4.83,-4.58
+Indi,2019,VIC,IND,Independent,Coalition,51.39,48.61,1.39,3.44
+Indi,2022,VIC,IND,Independent,Coalition,58.94,41.06,8.94,-7.55
+Kennedy,2004,QLD,IND,Independent,Labor,68.88,31.12,-18.88,2.54
+Kennedy,2007,QLD,IND,Independent,Labor,66.29,33.71,-16.29,NaN
+Kennedy,2010,QLD,IND,Independent,Coalition,68.34,31.66,18.34,-16.5
+Kennedy,2013,QLD,KAP,Katter's Australian,Coalition,52.19,47.81,2.19,NaN
+Kennedy,2016,QLD,KAP,Katter's Australian,Coalition,61.12,38.88,11.12,-8.93
+Kennedy,2019,QLD,KAP,Katter's Australian,Coalition,63.33,36.67,13.33,-2.21
+Kennedy,2022,QLD,KAP,Katter's Australian,Coalition,63.1,36.9,13.1,0.23
+Kooyong,2019,VIC,LP,Greens,Coalition,44.3,55.7,-5.7,NaN
+Kooyong,2022,VIC,IND,Independent,Coalition,52.94,47.06,2.94,NaN
+Lyne,2010,NSW,IND,Independent,Coalition,62.73,37.27,12.73,NaN
+Mackellar,2022,NSW,IND,Independent,Coalition,52.5,47.5,2.5,NaN
+Maranoa,2016,QLD,LNP,Pauline Hanson's One Nation,Coalition,34.14,65.86,-15.86,NaN
+Maranoa,2019,QLD,LNP,Pauline Hanson's One Nation,Coalition,27.51,72.49,-22.49,6.63
+Mayo,2004,SA,LP,Independent,Coalition,38.19,61.81,-11.81,NaN
+Mayo,2016,SA,XEN,Centre Alliance (fmr Nick Xenophon Team),Coalition,54.97,45.03,4.97,0.17
+Mayo,2019,SA,CA,Centre Alliance (fmr Nick Xenophon Team),Coalition,55.14,44.86,5.14,7.12
+Mayo,2022,SA,CA,Centre Alliance (fmr Nick Xenophon Team),Coalition,62.26,37.74,12.26,NaN
+Melbourne,2007,VIC,ALP,Greens,Labor,45.29,54.71,4.71,-10.75
+Melbourne,2010,VIC,GRN,Greens,Labor,56.04,43.96,-6.04,-0.77
+Melbourne,2013,VIC,GRN,Greens,Labor,55.27,44.73,-5.27,NaN
+Melbourne,2016,VIC,GRN,Greens,Coalition,68.48,31.52,18.48,-3.35
+Melbourne,2019,VIC,GRN,Greens,Coalition,71.83,28.17,21.83,NaN
+Melbourne,2022,VIC,GRN,Greens,Labor,60.15,39.85,-10.15,NaN
+Nicholls (fmr Murray),2016,VIC,NAT,National,Liberal,55.13,44.87,5.13,NaN
+New England,2004,NSW,IND,Independent,Coalition,71.38,28.62,21.38,2.95
+New England,2007,NSW,IND,Independent,Coalition,74.33,25.67,24.33,-2.81
+New England,2010,NSW,IND,Independent,Coalition,71.52,28.48,21.52,35.98
+New England,2013,NSW,NAT,Independent,Coalition,35.54,64.46,-14.46,-5.94
+New England,2016,NSW,NAT,Independent,Coalition,41.48,58.52,-8.52,5.84
+New England,2019,NSW,NAT,Independent,Coalition,35.64,64.36,-14.36,NaN
+Nicholls (fmr Murray),2022,VIC,NAT,Independent,Coalition,46.19,53.81,-3.81,NaN
+North Sydney,2022,NSW,IND,Independent,Coalition,52.92,47.08,2.92,NaN
+O'Connor,2010,WA,NAT,National,Liberal,53.56,46.44,3.56,-4.51
+O'Connor,2013,WA,LP,National,Liberal,49.05,50.95,-0.95,NaN
+Port Adelaide,2016,SA,ALP,Centre Alliance (fmr Nick Xenophon Team),Labor,35.14,64.87,14.865,NaN
+Ryan,2022,QLD,GRN,Greens,Coalition,53.86,46.14,3.86,NaN
+Sydney,2022,NSW,ALP,Greens,Labor,30.32,69.68,19.68,NaN
+Wannon,2022,VIC,LP,Independent,Coalition,46.08,53.92,-3.92,NaN
+Warringah,2016,NSW,LP,Greens,Coalition,38.45,61.55,-11.55,NaN
+Warringah,2019,NSW,IND,Independent,Coalition,57.24,42.76,7.24,NaN
+Warringah,2022,NSW,IND,Independent,Coalition,60.96,39.04,10.96,NaN
+Wentworth,2019,NSW,LP,Independent,Coalition,48.78,51.22,-1.22,NaN
+Wentworth,2022,NSW,IND,Independent,Coalition,54.2,45.8,4.2,-5.42
+Wills,2016,VIC,ALP,Greens,Labor,45.07,54.93,4.93,NaN
+Wills,2019,VIC,ALP,Greens,Labor,41.93,58.17,8.12,3.24
+Wills,2022,VIC,ALP,Greens,Labor,41.43,58.57,8.57,0.4
