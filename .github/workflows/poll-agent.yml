@@ -49,7 +49,13 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+
+      - name: Pin Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        with:
+          node-version-file: .nvmrc
+          cache: npm
 
       - name: Configure git identity
         run: |
@@ -72,7 +78,9 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq $APT_PACKAGES
 
       - name: Install puppeteer-core (best effort, for the share-card redraw)
-        run: npm i puppeteer-core --prefix "$HOME" || true
+        # Version lives in package-lock.json; render-card.mjs resolves it from
+        # repo node_modules. --ignore-scripts: nothing here needs postinstall.
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
 
       - name: Run the ${{ inputs.house }} updater
         env:
@@ -127,7 +135,13 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+
+      - name: Pin Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        with:
+          node-version-file: .nvmrc
+          cache: npm
 
       - name: Configure git identity
         run: |
@@ -148,7 +162,7 @@ jobs:
           sudo apt-get update -qq && sudo apt-get install -y -qq $APT_PACKAGES
 
       - name: Install puppeteer-core (best effort)
-        run: npm i puppeteer-core --prefix "$HOME" || true
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
 
       # Pin the repair-agent CLI: a floating @latest install means a tag move
       # (compromised or accidental) changes the code that runs with

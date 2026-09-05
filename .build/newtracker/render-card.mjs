@@ -41,10 +41,11 @@ const CHROME = process.env.CHROME
 
 const die = (msg) => { console.error("render-card: " + msg); process.exit(1); };
 
-/* There is no package.json to declare puppeteer-core in, and adding one to pull
-   a browser driver into a build that is otherwise dependency-free is a bad
-   trade for a script that runs a few times a month. So look for it where a
-   machine that has it would have it, and fail helpfully when it is absent. */
+/* puppeteer-core is pinned in the root package.json (the repo's one declared
+   dependency; the BUILD itself stays dependency-free — build.mjs never
+   imports this script, which runs a few times a month). Look for it where a
+   machine that has it would have it — npm ci installs to repo node_modules,
+   an ad-hoc npm i lands in ~ — and fail helpfully when it is absent. */
 const require_ = createRequire(path.join(ROOT, "render-card.mjs"));
 const requireHome = createRequire(path.join(os.homedir(), "node_modules", "."));
 let puppeteer = null;

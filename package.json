@@ -1,0 +1,11 @@
+{
+  "name": "auspol-tracker",
+  "private": true,
+  "description": "Single-file Australian federal polling tracker. Exists to pin puppeteer-core (share-card redraw) and give CI one Node version; the toolchain itself is plain node.",
+  "scripts": {
+    "test": "node .build/newtracker/validate.mjs && node .build/newtracker/build.mjs && node .build/test-citation-check.mjs && node .build/test-site-check.mjs && node .build/test-infogram.mjs && node .build/test-news24-infogram.mjs && node .build/test-redbridge.mjs && node .build/newtracker/test-np-score.mjs && node .build/newtracker/sim-next-polls.mjs && node .build/newtracker/sim-oppr-labels.mjs && node .build/newtracker/deff-backtest.mjs"
+  },
+  "devDependencies": {
+    "puppeteer-core": "25.10.0"
+  }
+}

@@ -32,15 +32,24 @@ concurrency:
   group: site-check
   cancel-in-progress: true
 
+# read-only: compares deployed bytes to committed bytes, touches nothing
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
       # the comparison is only meaningful against the commit Pages built
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
         with:
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Pin Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        with:
+          node-version-file: .nvmrc
 
       # a failed Pages run leaves the PREVIOUS deploy serving; there is
       # nothing valid to compare, and inconclusive is not an alarm

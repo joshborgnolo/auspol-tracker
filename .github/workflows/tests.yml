@@ -1,11 +1,17 @@
-# Test wiring — the repo's six hand-written node:assert suites previously ran
-# only when a human remembered to. This workflow is the only machine that
-# runs them. Advisory by design: writers push straight to main, so a red run
-# here is an email, not a merge gate.
+# Test wiring — the repo's hand-written suites run here and only here.
+# Advisory by design: writers push straight to main, so a red run here is an
+# email, not a merge gate.
 #
-# Node is pinned because nothing else in the pipeline pins the runtime (no
-# workflow used actions/setup-node before this one — every extractor, the
-# validator and the estimator ran on whatever ubuntu-latest shipped).
+# `npm test` is the single home for the suite list (package.json): validate ->
+# build (test-np-score and both sims read the freshly built assets) -> the six
+# fixture suites (their caches under .build/*-src are tracked) -> sim-next-polls
+# and sim-oppr-labels -> deff-backtest, whose A0 parity gate asserts the
+# estimator replica still reproduces the committed headline from the committed
+# data. That gate is what turns an estimator regression into a red run.
+#
+# Node comes from .nvmrc, puppeteer-core from package-lock.json — every
+# workflow draws the same runtime, so a GitHub image bump can't fail all
+# pipelines at once.
 
 name: tests
 
@@ -16,6 +22,7 @@ on:
       - ".build/**"
       - "data/**"
       - ".github/workflows/**"
+      - "package*.json"
   workflow_dispatch:
 
 # Read-only: never races the main-writers group and needs no write perms.
@@ -31,28 +38,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
 
       - name: Pin Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
         with:
-          node-version: 22
+          node-version-file: .nvmrc
+          cache: npm
 
-      - name: Validate the data
-        run: node .build/newtracker/validate.mjs
+      - name: Install the one dependency
+        run: npm ci --ignore-scripts --no-audit --no-fund
 
-      # test-np-score evals the built data asset ("run after a rebuild").
-      - name: Build the site
-        run: node .build/newtracker/build.mjs
-
-      # All six suites pass on a clean checkout: the fixture caches they
-      # read (.build/newspoll-src, .build/redbridge-src) are tracked in git.
-      - name: Run the test suites
-        run: |
-          set -e
-          node .build/test-citation-check.mjs
-          node .build/test-site-check.mjs
-          node .build/test-infogram.mjs
-          node .build/test-news24-infogram.mjs
-          node .build/test-redbridge.mjs
-          node .build/newtracker/test-np-score.mjs
+      - name: Validate, build, run every suite
+        run: npm test

@@ -27,7 +27,12 @@ jobs:
     outputs:
       verdict: ${{ steps.doctor.outputs.verdict }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - name: Pin Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        with:
+          node-version-file: .nvmrc
+
       - name: Run the coverage doctor
         id: doctor
         run: |
@@ -64,7 +69,13 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+
+      - name: Pin Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        with:
+          node-version-file: .nvmrc
+          cache: npm
 
       - name: Configure git identity
         run: |
@@ -75,7 +86,8 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
 
       - name: Install puppeteer-core (best effort)
-        run: npm i puppeteer-core --prefix "$HOME" || true
+        # Version lives in package-lock.json (see roymorgan-update.yml).
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
 
       # Pinned for the same reason as poll-agent.yml — bump both together.
       - name: Install Matilda CLI
@@ -99,6 +111,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - name: Pin Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        with:
+          node-version-file: .nvmrc
+
       - name: Check landed waves for missing derived rows
         run: node .build/check-poll-thinness.mjs
