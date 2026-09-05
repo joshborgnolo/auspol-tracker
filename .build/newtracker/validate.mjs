@@ -12,6 +12,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { impliedAlp2pp } from "./flows.mjs";
+import { canonHouse } from "./house-renames.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -154,8 +155,11 @@ export function validate(D) {
       if (isNaN(ds)) fail("bad-date", `unparseable dateStart "${p.dateStart}"`);
       else if (!isNaN(ts) && ds > ts) fail("date-range", `dateStart ${p.dateStart} is after date ${p.date}`);
     }
-    // 4. duplicate date+pollster – usually an accidental paste
-    const key = p.date + "|" + p.pollster;
+    // 4. duplicate date+pollster – usually an accidental paste. Keyed on the
+    //    CANONICAL name: a pre/post-rebrand spelling pair ("Redbridge" beside
+    //    "RedBridge / Accent") doesn't collide here unless this gate uses the
+    //    name gen-data will actually see.
+    const key = p.date + "|" + canonHouse(p.pollster);
     if (seen.has(key)) fail("duplicate", "same date + pollster already present");
     seen.add(key);
     // 4b. duplicate release event: one house's two rows sharing one
@@ -176,7 +180,7 @@ export function validate(D) {
         if (ISO_DAY.test(p.date) && p.published.slice(0, 10) < p.date)
           fail("published-order", `published ${p.published} precedes fieldwork-end ${p.date}`);
       }
-      const rk = p.pollster + "|" + p.published;
+      const rk = canonHouse(p.pollster) + "|" + p.published;
       if (seenRelease.has(rk))
         fail("same-release", `shares published=${p.published} with the ${seenRelease.get(rk)} row – one release, two waves`);
       seenRelease.set(rk, p.date);
@@ -195,6 +199,84 @@ export function validate(D) {
       errors.push({ type: "election-label", poll: `#${i} ${p.date} · ${p.pollster}`, detail: "isElection row not labelled Election Result" });
     if (!p.isElection && p.pollster === "Election Result")
       errors.push({ type: "election-label", poll: `#${i} ${p.date} · ${p.pollster}`, detail: "Election Result label without isElection" });
+  });
+
+  /* 10. leadership and alternative-pairing shares stay in lane, and a row's
+     published slices never total over 100 (unsure/don't-know makes the
+     remainder, so 100+tolerance is a hard ceiling – a column landing at 103
+     is a misparse, not an electorate). Checks 1–2 give the polls[] shares
+     that discipline; these series have had equivalent misparses silently
+     pass before (e.g. a Slightly/Very approval pair entered as its own
+     sum). Preferred-PM slices print against the decided base in every
+     house behind this data, so 0–100 per slot is the hard bound; altTpp
+     matchup shares use the same 30–70 lane as a 2PP (check 0b). */
+  const shareBad = (v) => v != null && (v < 0 || v > 100);
+  const TPP_LANE = [30, 70];
+  (D.ppm || []).forEach((r, i) => {
+    const where = `ppm #${i} ${r.date} · ${r.firm}`;
+    const slots = [["alb", r.alb], ["opp", r.opp], ["han", r.han]].filter(([, v]) => v != null);
+    for (const [k, v] of slots)
+      if (shareBad(v)) errors.push({ type: "share-range", poll: where, detail: `${k} = ${v} (bounds 0–100)` });
+    const sum = slots.reduce((s, [, v]) => s + v, 0);
+    if (slots.length === 3 && sum > 101)
+      errors.push({ type: "ppm-sum", poll: where, detail: `Σ preferred-PM slots = ${sum.toFixed(1)} (ceiling 100)` });
+    (r.extra || []).forEach((e, j) => {
+      const whereX = `${where} extra[${j}]`;
+      for (const [k, v] of Object.entries(e))
+        if (shareBad(v)) errors.push({ type: "share-range", poll: whereX, detail: `${k} = ${v} (bounds 0–100)` });
+      const sumX = Object.values(e).reduce((s, v) => s + v, 0);
+      if (sumX > 101)
+        errors.push({ type: "ppm-sum", poll: whereX, detail: `Σ = ${sumX.toFixed(1)} (ceiling 100)` });
+    });
+  });
+  (D.ppmHeadToHead || []).forEach((r, i) => {
+    const where = `ppmHeadToHead #${i} ${r.date} · ${r.firm}`;
+    for (const [k, v] of [["alb", r.alb], ["han", r.han]])
+      if (v != null && shareBad(v)) errors.push({ type: "share-range", poll: where, detail: `${k} = ${v} (bounds 0–100)` });
+    if (r.alb != null && r.han != null && r.alb + r.han > 101)
+      errors.push({ type: "h2h-sum", poll: where, detail: `alb ${r.alb} + han ${r.han} = ${(r.alb + r.han).toFixed(1)} (ceiling 100)` });
+  });
+  (D.approval || []).forEach((r, i) => {
+    const where = `approval #${i} ${r.date} · ${r.firm}`;
+    for (const [k, v] of [["alb", r.alb], ["opp", r.opp], ["han", r.han]])
+      if (v != null && (v < -100 || v > 100)) errors.push({ type: "net-range", poll: where, detail: `${k} net = ${v} (bounds −100–100)` });
+    for (const who of ["alb", "opp", "han"]) {
+      const d = r.detail?.[who];
+      if (!d) continue;
+      for (const [k, v] of Object.entries(d))
+        if (shareBad(v)) errors.push({ type: "share-range", poll: `${where} detail.${who}`, detail: `${k} = ${v} (bounds 0–100)` });
+      const appDis = (d.app ?? 0) + (d.dis ?? 0);
+      if (d.app != null && d.dis != null && appDis > 101)
+        errors.push({ type: "approval-sum", poll: `${where} detail.${who}`, detail: `app ${d.app} + dis ${d.dis} = ${appDis.toFixed(1)} (ceiling 100)` });
+    }
+  });
+  (D.altTpp || []).forEach((r, i) => {
+    const where = `altTpp #${i} ${r.date} · ${r.firm}`;
+    for (const [k, v] of Object.entries(r)) {
+      if (!/_/.test(k) || v == null) continue;
+      const [lo, hi] = TPP_LANE;
+      if (v < lo || v > hi) errors.push({ type: "range", poll: where, detail: `${k} = ${v} (bounds ${lo}–${hi})` });
+    }
+  });
+  (D.direction || []).forEach((d, i) => {
+    const where = `direction #${i} ${d.date} · ${d.pollster}`;
+    for (const [k, v] of [["right", d.right], ["wrong", d.wrong], ["unsure", d.unsure]])
+      if (v != null && shareBad(v)) errors.push({ type: "share-range", poll: where, detail: `${k} = ${v} (bounds 0–100)` });
+  });
+
+  /* 11. assimilated rows are exempt from the sample-size check (5) because
+     their producer publishes no per-wave n — the estimator quietly prices
+     the gap as n=1200 (gen-data.mjs), a weight adjudicated sensible for
+     exactly the houses whose assimilators live in .build today. A NEW
+     house arriving here means someone shipped an unsampled series without
+     thinking through that weight: either the house belongs on this list
+     (confirm its typical n makes 1200 sane, then add it with a comment) or
+     the rows shouldn't be assimilated. Fails either way until adjudicated. */
+  const ASSIMILATED_OK = new Set(["Essential", "Resolve"]);
+  D.polls.forEach((p, i) => {
+    if (p.assimilated && !ASSIMILATED_OK.has(p.pollster))
+      errors.push({ type: "assimilated-house", poll: `#${i} ${p.date} · ${p.pollster}`,
+                    detail: "assimilated row from a house with no adjudicated implicit-n convention" });
   });
 
   // 6. direction rows are a proportion split

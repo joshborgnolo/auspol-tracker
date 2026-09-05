@@ -44,8 +44,11 @@ import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const D = JSON.parse(execSync("git show HEAD:data/polls.json", { cwd: ROOT, maxBuffer: 1 << 28 }).toString("utf8"));
 
-/* ---- mirrored from gen-data.mjs ---------------------------------------- */
-const HOUSE_RENAMES = { "Redbridge": "RedBridge / Accent" };
+/* House renames come from house-renames.mjs (everyone's one home for the
+   current-term map). ACC_CANON and the estimator constants below still
+   mirror gen-data.mjs by hand — past-cycle canonicalisation has no shared
+   home yet. */
+import { HOUSE_RENAMES } from "./house-renames.mjs";
 const ACC_CANON = {
   "Morgan": "Roy Morgan", "Newspoll-YouGov": "Newspoll",
   "Resolve Strategic": "Resolve", "Freshwater Strategy": "Freshwater",

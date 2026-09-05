@@ -22,11 +22,15 @@ acquire_slot_lock
 
 # The GitHub Actions roymorgan-update job may push to main between local
 # launchd slots. Refresh first; if the local tree can't fast-forward, skip
-# this slot rather than commit on a stale base.
+# this slot rather than commit on a stale base. A dirty tree means a human
+# or a sibling agent is mid-edit: refresh must not record a commit that
+# sweeps in unrelated unstaged changes, and the extractor must not write
+# polls.json onto a base it did not read, so ABORT rather than skip-sync.
 if git diff --quiet && git diff --cached --quiet; then
   freshness_sync || exit 0
 else
-  log "working tree dirty; skipping freshness sync"
+  log "FAIL working tree dirty (uncommitted changes present); refusing to write & commit on a dirty base"
+  exit 1
 fi
 
 EXTRACT_OUT="$(node .build/extract-roymorgan.mjs 2>&1)"

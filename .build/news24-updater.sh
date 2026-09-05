@@ -40,7 +40,8 @@ acquire_slot_lock
 if git diff --quiet && git diff --cached --quiet; then
   freshness_sync || exit 0
 else
-  log "working tree dirty; skipping freshness sync"
+  log "FAIL working tree dirty (uncommitted changes present); refusing to write & commit on a dirty base"
+  exit 1
 fi
 
 EXTRACT_OUT="$(NEWSIE_CHROME=1 node .build/extract-news24.mjs 2>&1)"

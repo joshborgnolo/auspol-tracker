@@ -89,8 +89,9 @@
 //     provenance; N24_WIKI_FILE parses local wikitext; N24_WIKI_DEBUG prints
 //     parsed fallback waves; N24_NEWS24_FILE parses a saved News24 page;
 //     N24_IG_DIR reads Infogram embeds from ig-<id>.html fixture captures
-import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { fetchText, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
 import { IG_EMBED } from "./infogram.mjs";
 import { n24IdsOf, n24InfogramFetch, n24Figures, n24Corroborate } from "./news24-infogram.mjs";
 import { melbourneMinute } from "./melbourne-time.mjs";
@@ -101,8 +102,6 @@ const URL_OF = (i => i >= 0 ? argv[i + 1] : null)(argv.indexOf("--url"));
 const NEWS24_OF = (i => i >= 0 ? argv[i + 1] : null)(argv.indexOf("--news24"));
 const OUT = process.env.N24_OUT || "data/polls.json"; // N24_OUT: test hook only
 const SRC_DIR = process.env.N24_SRC_DIR || ".build/news24-src";
-const FETCH_TIMEOUT_MS = 30_000;
-const FETCH_TRIES = 3;
 const RSS = "https://yougov.com/en/rss";
 const DAY = 86400000;
 
@@ -140,23 +139,7 @@ const LEADERS = {
 const olFor = (date) => LEADERS.ols.find((o) => date >= o.from && (!o.to || date <= o.to)) ?? null;
 
 // ---------------------------------------------------------------- fetching
-const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
-async function fetchOnce(url) {
-  const res = await fetch(url, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), redirect: "follow" });
-  if (!res.ok) { const e = new Error(`HTTP ${res.status}`); e.status = res.status; throw e; }
-  return { url: res.url, text: await res.text() };
-}
-async function fetchText(url) {
-  let lastErr;
-  for (let i = 1; i <= FETCH_TRIES; i++) {
-    try { return await fetchOnce(url); } catch (err) {
-      lastErr = err;
-      if (err.status === 403 || err.status === 429) break;
-      if (i < FETCH_TRIES) await new Promise((r) => setTimeout(r, 1500 * i));
-    }
-  }
-  throw lastErr;
-}
+// fetchText comes from ./extract-common.mjs (shared retry/UA/wall-break).
 
 function fetchNews24Chrome(url) {
   if (NEWS24_FILE) return readFileSync(NEWS24_FILE, "utf8");
@@ -279,31 +262,10 @@ async function infogramEnrichNews24(html, wave, prose) {
 }
 
 // ------------------------------------------------------------ text helpers
-const MONTHS = { january: 0, jan: 0, february: 1, feb: 1, march: 2, mar: 2, april: 3, apr: 3,
-  may: 4, june: 5, jun: 5, july: 6, jul: 6, august: 7, aug: 7, september: 8, sep: 8, sept: 8,
-  october: 9, oct: 9, november: 10, nov: 10, december: 11, dec: 11 };
+// MONTHS/clean come from ./extract-common.mjs.
 const iso = (y, m, d) => `${y}-${String(m + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 const dateIso = (d) => iso(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
 const today = () => dateIso(new Date());
-
-function clean(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n))
-    .replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCharCode(parseInt(n, 16)))
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&rsquo;|&lsquo;|&#8217;/gi, "'")
-    .replace(/&ldquo;|&rdquo;/gi, '"')
-    .replace(/[‘’]/g, "'")
-    .replace(/[“”]/g, '"')
-    .replace(/&mdash;/gi, "—")
-    .replace(/&ndash;/gi, "–")
-    .replace(/\s+/g, " ")
-    .trim();
-}
 // Datawrapper pages carry the cell HTML inside JSON strings; \u003C is the
 // escaped '<' that clean() can't see otherwise.
 const unescapeJson = (s) => s.replace(/\\u003C/gi, "<").replace(/\\u003E/gi, ">").replace(/\\u0026/gi, "&");
@@ -1059,8 +1021,7 @@ try {
     const next = JSON.stringify(D, null, 2) + trailingNl;
     status.changed = next !== orig;
     if (status.changed && !CHECK) {
-      writeFileSync(OUT + ".tmp", next);
-      renameSync(OUT + ".tmp", OUT);
+      writeAtomic(OUT, next);
       mkdirSync(SRC_DIR, { recursive: true });
       for (const s of sources) writeFileSync(`${SRC_DIR}/${s.file}`, s.json);
       const parts = [];

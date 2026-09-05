@@ -25,8 +25,10 @@ for arg in "$@"; do
  esac
 done
 
-# Another writer may push between local slots. Refresh first; give up cleanly
-# if the tree isn't clean — the next daily slot retries.
+# Another writer may push between local slots. Refresh first; ABORT cleanly
+# if the tree isn't clean — a dirty tree means a human or sibling agent is
+# mid-edit, and the generator's write must not land on a base it did not
+# read. The next daily slot retries.
 if git diff --quiet && git diff --cached --quiet; then
  git fetch origin -q || true
  if ! git merge --ff-only origin/main >> "$LOG" 2>&1; then
@@ -34,7 +36,8 @@ if git diff --quiet && git diff --cached --quiet; then
  exit 0
  fi
 else
- log "working tree dirty; skipping freshness sync"
+ log "FAIL working tree dirty (uncommitted changes present); refusing to write & commit on a dirty base"
+ exit 1
 fi
 
 OUT="$(node .build/refresh-prediction.mjs $FLAGS 2>&1)"

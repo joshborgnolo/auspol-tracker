@@ -34,13 +34,11 @@ const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf
    under the name it was actually published as, and this is the one declared,
    revertible decision to treat two of those names as one shop.
 
-   Only the CURRENT cycle. Past-cycle firm strings are canonicalised
-   separately, by ACC_CANON, where the rules are stricter — see the comment
-   there on why Galaxy and YouGov are not merged.
-
-   Products are not names: the (MRP) variants are a different piece of work on
-   their own schedule and are not folded into the tracking poll. */
-const HOUSE_RENAMES = { "Redbridge": "RedBridge / Accent" };
+   The map itself lives in ./house-renames.mjs, shared with validate.mjs
+   (which duplicates-checks rows under their canonical names) and
+   deff-backtest.mjs, so the estimator and the gate can never disagree
+   about what a house is called. */
+import { HOUSE_RENAMES } from "./house-renames.mjs";
 for (const [key, field] of [["polls", "pollster"], ["ppm", "firm"], ["approval", "firm"],
                             ["altTpp", "firm"], ["ppmHeadToHead", "firm"], ["direction", "pollster"]]) {
   if (!Array.isArray(D[key])) continue;

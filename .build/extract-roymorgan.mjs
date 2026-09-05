@@ -2,13 +2,20 @@
 // findings feed (https://www.roymorgan.com/findings) and append their rows to
 // data/polls.json (the tracker's canonical current-cycle dataset).
 //
-// There is no data file upstream: the site is a Next.js app whose listing
-// cards ride in the page's __NEXT_DATA__ JSON, and each release's figures
-// live in its prose. A release qualifies when its topics include
-// "Federal Poll" AND its slug contains "federal-voting-intention" — press
-// round-ups (topic "Press Release" only) and specials like the post-Budget
-// SMS poll (slug "federal-voting-post-budget-special-sms-morgan-poll-…") are
-// different products and stay out.
+// Discovery: the site's findings page renders only page 1 of a client-side
+// paginated list (the ?page=N query is ignored server-side, so a release
+// that scrolled off page 1 was UNREACHABLE — the gap check-coverage.mjs
+// exists to detect). The front-end's own WP REST endpoint paginates for
+// real: https://wp.roymorgan.com/wp-json/rmr/v1/findings-search?page=N
+// (x-wp-totalpages headers), and &topic[]=federal-poll cuts the ~2500
+// findings to the ~190 poll releases, newest first. The walk stops once a
+// page's releases all predate the newest recorded wave minus a straggler
+// margin, and zero candidates is never a quiet week — it trips the guard.
+// Each release's figures still live in its prose page's __NEXT_DATA__.
+// A release qualifies when its slug contains "federal-voting-intention" —
+// press round-ups and specials like the post-Budget SMS poll (slug
+// "federal-voting-post-budget-special-sms-morgan-poll-…") are different
+// products and stay out.
 //
 // Parsing target (all in findingData.postBy.content, entity/HTML cleaned):
 //   - the lead sentence lists every party's share with the week-on-week
@@ -55,7 +62,7 @@
 // Provenance: each appended release's parsed post JSON is saved to
 // .build/roymorgan-src/release-<slug>.json and committed alongside.
 //
-// Usage: node .build/extract-roymorgan.mjs [--check] [feed-url]
+// Usage: node .build/extract-roymorgan.mjs [--check] [search-api-base]
 //
 // Automation contract (safe to schedule in launchd):
 //   - idempotent: re-running with unchanged upstream data writes nothing
@@ -63,38 +70,33 @@
 //     `RM_STATUS {json}` with changed, added, skipped — machine-greppable
 //   - exit 1 = fetch/parse error; exit 2 = a safety guard tripped (a figure
 //     missing, sums off 100, implausible values, non-Sunday period end,
-//     release date inconsistent with the field period) — the upstream format
-//     changed or the parse went wrong; nothing is written
+//     release date inconsistent with the field period, or the findings-search
+//     feed losing every poll candidate — silence is never a quiet fortnight)
+//     — the upstream format changed or the parse went wrong; nothing written
 //   - --check computes everything, prints RM_STATUS, never writes
 //   - writes are atomic (.tmp + rename)
-import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { fetchText, TRACKER_UA, FETCH_TRIES, FETCH_TIMEOUT_MS, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
-const FEED_URL = argv.find((a) => !a.startsWith("--")) || "https://www.roymorgan.com/findings";
+const FEED_URL = argv.find((a) => !a.startsWith("--")) || "https://wp.roymorgan.com/wp-json/rmr/v1/findings-search";
+// The front-end's own query: date-ordered, filtered server-side to the
+// "Federal Poll" topic, 10 posts/page (x-wp-totalpages reports the count).
+const FEED_QS = "sort_by=date&topic[]=federal-poll";
+// Hard ceiling on the page walk so a wrong stop-margin can never fetch
+// without bound; the poll feed is ~19 pages deep at present.
+const MAX_FEED_PAGES = 20;
+// Walking stops when a page's oldest release predates the newest recorded
+// wave by this much — covers a straggler release for a wave the tracker
+// already has while keeping the normal run to a single page.
+const STRAGGLER_MARGIN_DAYS = 14;
 const OUT = "data/polls.json";
 const SRC_DIR = ".build/roymorgan-src";
-const FETCH_TIMEOUT_MS = 30_000;
-const FETCH_TRIES = 3;
 
 // ---------------------------------------------------------------- fetching
-async function fetchText(url) {
-  let lastErr;
-  for (let i = 1; i <= FETCH_TRIES; i++) {
-    try {
-      const res = await fetch(url, {
-        headers: { "user-agent": "Mozilla/5.0 (auspol-tracker data update)" },
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      return await res.text();
-    } catch (err) {
-      lastErr = err;
-      if (i < FETCH_TRIES) await new Promise((r) => setTimeout(r, 1500 * i));
-    }
-  }
-  throw new Error(`fetch failed after ${FETCH_TRIES} tries: ${url}: ${lastErr.message}`);
-}
+// fetchText/consts come from ./extract-common.mjs; this house identifies as
+// a crawler (TRACKER_UA), not a browser.
 
 function nextData(html, what) {
   const m = html.match(/__NEXT_DATA__[^>]*>([\s\S]*?)<\/script>/);
@@ -102,27 +104,38 @@ function nextData(html, what) {
   return JSON.parse(m[1]);
 }
 
-// ------------------------------------------------------------ text helpers
-const MONTHS = { january: 0, jan: 0, february: 1, feb: 1, march: 2, mar: 2, april: 3, apr: 3,
-  may: 4, june: 5, jun: 5, july: 6, jul: 6, august: 7, aug: 7, september: 8, sep: 8, sept: 8,
-  october: 9, oct: 9, november: 10, nov: 10, december: 11, dec: 11 };
-
-function clean(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?<\/style>/gi, "")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n))
-    .replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCharCode(parseInt(n, 16)))
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&rsquo;|&lsquo;/gi, "'")
-    .replace(/&ldquo;|&rdquo;/gi, '"')
-    .replace(/&mdash;/gi, "—")
-    .replace(/&ndash;/gi, "–")
-    .replace(/\s+/g, " ")
-    .trim();
+// One findings-search page: JSON array of summary posts + x-wp-totalpages.
+async function fetchFeedPage(base, page) {
+  const url = `${base}?page=${page}&${FEED_QS}`;
+  let lastErr;
+  for (let i = 1; i <= FETCH_TRIES; i++) {
+    try {
+      const res = await fetch(url, {
+        headers: { "user-agent": TRACKER_UA },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const arr = await res.json();
+      if (!Array.isArray(arr)) throw new Error(`page ${page} not an array (endpoint changed?)`);
+      return { arr, totalPages: +res.headers.get("x-wp-totalpages") || null };
+    } catch (err) {
+      lastErr = err;
+      if (i < FETCH_TRIES) await new Promise((r) => setTimeout(r, 1500 * i));
+    }
+  }
+  throw new Error(`feed page ${page} fetch failed after ${FETCH_TRIES} tries: ${lastErr.message}`);
 }
+
+// Feed release_date "DD/MM/YYYY" → "YYYY-MM-DD" (null when absent/garbled).
+const dmyToIso = (s) => {
+  const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(String(s || "").trim());
+  return m ? `${m[3]}-${m[2].padStart(2, "0")}-${m[1].padStart(2, "0")}` : null;
+};
+
+// ------------------------------------------------------------ text helpers
+// clean() comes from ./extract-common.mjs — the shared superset normaliser
+// (script→space, curly-quote straightening); release prose parsing uses only
+// ASCII quote shapes after it.
 
 // Strip the week-on-week change phrases so "down 1.5% to 27%", "unchanged at
 // 27.5%", "27% (up 2%)", "increased support 1% to 25.5%" and "down 2% at 12%"
@@ -296,21 +309,57 @@ try {
   const rmDates = new Set(D.polls.filter((p) => p.pollster === "Roy Morgan").map((p) => p.date));
   const altBy = new Set((D.altTpp || []).map((a) => a.date + "|" + a.firm));
 
-  const feed = nextData(await fetchText(FEED_URL), "findings feed");
-  const posts = feed?.props?.pageProps?.pageData?.postData?.posts;
-  if (!Array.isArray(posts)) throw new Error("feed pageData.postData.posts missing (site restructure?)");
-  const candidates = posts.filter((p) =>
-    (p.topics || []).some((t) => t.name === "Federal Poll") &&
+  const feedPosts = [];
+  let pagesFetched = 0;
+  {
+    const newestWave = [...rmDates].sort().pop() ?? null;
+    const stopBefore = newestWave
+      ? new Date(Date.parse(newestWave + "T00:00:00Z") - STRAGGLER_MARGIN_DAYS * DAY).toISOString().slice(0, 10)
+      : null;
+    for (let page = 1; page <= MAX_FEED_PAGES; page++) {
+      const { arr, totalPages } = await fetchFeedPage(FEED_URL, page);
+      pagesFetched = page;
+      feedPosts.push(...arr);
+      if (!arr.length) break;
+      if (totalPages != null && page >= totalPages) break;
+      const rel = arr.map((p) => dmyToIso(p.release_date)).filter(Boolean).sort();
+      // Newest-first feed: once the OLDEST release on a page is older than
+      // the straggler margin, nothing further back can be a new wave.
+      if (stopBefore && rel.length && rel[0] < stopBefore) break;
+    }
+  }
+  status.feed_pages = pagesFetched;
+  // The server-side topic filter narrows to the poll feed, but keep the
+  // slug test (specials like the post-budget SMS poll share the topic) and,
+  // when the payload carries topic sets, verify them as a site-drift canary.
+  const candidates = feedPosts.filter((p) =>
+    (!Array.isArray(p.topics) || p.topics.some((t) => t.name === "Federal Poll")) &&
     /federal-voting-intention/.test(p.slug || ""));
   status.candidates = candidates.map((c) => c.slug);
+  if (!candidates.length) {
+    const msg = `findings-search returned no federal-voting-intention candidates across ${pagesFetched} page(s) — topic slug or endpoint changed (silence here is never a quiet fortnight)`;
+    console.error("RM_GUARD " + msg);
+    status.guard = [msg];
+    console.log("RM_STATUS " + JSON.stringify(status));
+    process.exit(2);
+  }
 
   const newRows = [];
   const guardFails = [];
   const sources = [];
   const altAdds = [];
   for (const c of candidates) {
-    const post = nextData(await fetchText(`https://www.roymorgan.com/findings/${c.slug}`), c.slug)
-      ?.props?.pageProps?.findingData?.postBy;
+    let post;
+    try {
+      post = nextData((await fetchText(`https://www.roymorgan.com/findings/${c.slug}`, { ua: TRACKER_UA })).text, c.slug)
+        ?.props?.pageProps?.findingData?.postBy;
+    } catch (err) {
+      // Deleted posts still appear as feed slugs but 404 individually — a
+      // warning, never a reason to abandon the run's other candidates.
+      status.warnings.push(`${c.slug}: release page fetch failed (${err?.message || err})`);
+      console.warn(`RM_WARN ${c.slug}: release page fetch failed (${err?.message || err})`);
+      continue;
+    }
     if (!post?.content) { guardFails.push(`${c.slug}: no findingData.postBy.content`); continue; }
     const r = parseRelease(post);
     if (r.flowsPairMissing) status.warnings.push(`${c.slug}: "2025 Federal Election" anchor present but no flows pair parsed`);
@@ -369,8 +418,7 @@ try {
     const next = JSON.stringify(D, null, 2) + trailingNl;
     status.changed = next !== orig;
     if (status.changed && !CHECK) {
-      writeFileSync(OUT + ".tmp", next);
-      renameSync(OUT + ".tmp", OUT);
+      writeAtomic(OUT, next);
       if (sources.length) {
         mkdirSync(SRC_DIR, { recursive: true });
         for (const s of sources) writeFileSync(`${SRC_DIR}/release-${s.slug}.json`, s.json);

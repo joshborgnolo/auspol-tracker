@@ -2,13 +2,13 @@
 // any single extractor to notice.
 //
 // WHY THIS EXISTS
-// Every extractor's failure mode is silence. Roy Morgan's discovery reads only
-// page 1 of the findings feed (255 pages exist, but pagination is client-side,
-// so a release that scrolls off is unreachable); Newspoll and YouGov skip by
-// date and never re-check; a rotted parser and a quiet fortnight look
-// identical from the outside. Nothing in the pipeline distinguishes "no new
-// poll" from "we can no longer see new polls", and the first symptom is a week
-// missing from the site.
+// Every extractor's failure mode is silence. Roy Morgan's discovery walks its
+// WordPress feed's x-wp-totalpages pagination but still stops 14 days behind
+// the newest recorded wave (older releases are unreachable to it); Newspoll
+// and YouGov skip by date and never re-check; a rotted parser and a quiet
+// fortnight look identical from the outside. Nothing in the pipeline
+// distinguishes "no new poll" from "we can no longer see new polls", and the
+// first symptom is a week missing from the site.
 //
 // So this asks an INDEPENDENT witness. The Wikipedia federal polling table is
 // maintained by people watching for exactly these releases, cites each one,
@@ -35,6 +35,7 @@
 //   exit 3 = at least one gap or overdue house — deliberately distinct from
 //            the extractors' 1/2 so a wrapper can tell a finding from a fault
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
+import { melbourneDate } from "./melbourne-time.mjs";
 
 const argv = process.argv.slice(2);
 const JSON_ONLY = argv.includes("--json");
@@ -81,12 +82,12 @@ const MONTHS = { jan: 1, feb: 2, mar: 3, apr: 4, may: 5, jun: 6, jul: 7, aug: 8,
 const iso = (y, m, d) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
 const DAY = 86400000;
 const daysBetween = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / DAY);
-// Local date, not UTC: an AEST morning is still the previous day in UTC, and a
-// watchdog that reports yesterday invites exactly the doubt it exists to remove.
-const todayLocal = () => {
-  const n = new Date();
-  return iso(n.getFullYear(), n.getMonth() + 1, n.getDate());
-};
+// Melbourne-local date, not UTC and not the runner's local clock: CI slots
+// fire in UTC, so an AEST/AEDT morning reads as the previous day, and a
+// watchdog that reports yesterday invites exactly the doubt it exists to
+// remove. Repo convention (per .build/melbourne-time.mjs) is that every
+// "what day is it" question is asked in Australia/Melbourne.
+const todayLocal = () => melbourneDate(new Date());
 
 async function fetchWiki() {
   if (WIKI_FILE) return readFileSync(WIKI_FILE, "utf8");

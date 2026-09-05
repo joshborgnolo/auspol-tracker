@@ -85,6 +85,14 @@ push_main() {
 #
 # Usage: acquire_slot_lock   — takes the lock or exits 0 (slot skipped).
 # The lock releases itself via an EXIT trap.
+#
+# SLOT_LOCK_MAX_AGE is the staleness ceiling: a live pid is NOT proof of a
+# healthy holder — a wrapper wedged on a hung fetch or a stray Chrome would
+# otherwise keep the lock (and silence every later slot) forever. Past the
+# ceiling the lock is broken loudly. The pid itself is never killed: pid
+# numbers recycle, and kill -0 cannot tell a wedged wrapper from an
+# innocent process that inherited the number.
+SLOT_LOCK_MAX_AGE=2700 # 45 min — the longest legitimate wrapper run is well under this
 SLOT_LOCK_DIR=""
 acquire_slot_lock() {
   SLOT_LOCK_DIR="$REPO/.build/locks/writers.lock"
@@ -92,10 +100,17 @@ acquire_slot_lock() {
     local oldpid=""
     [ -f "$SLOT_LOCK_DIR/pid" ] && oldpid="$(cat "$SLOT_LOCK_DIR/pid" 2>/dev/null)"
     if [ -n "$oldpid" ] && kill -0 "$oldpid" 2>/dev/null; then
-      log "another wrapper holds the writers lock (pid $oldpid); skipping slot"
-      exit 0
+      local lock_mtime lock_age=999999
+      lock_mtime="$(stat -f %m "$SLOT_LOCK_DIR" 2>/dev/null || stat -c %Y "$SLOT_LOCK_DIR" 2>/dev/null)"
+      [ -n "$lock_mtime" ] && lock_age=$(( $(date +%s) - lock_mtime ))
+      if [ "$lock_age" -lt "$SLOT_LOCK_MAX_AGE" ]; then
+        log "another wrapper holds the writers lock (pid $oldpid); skipping slot"
+        exit 0
+      fi
+      log "WARN writers lock held $(( lock_age / 60 ))min by live pid $oldpid (> $(( SLOT_LOCK_MAX_AGE / 60 ))min ceiling) — treating as wedged and breaking"
+    else
+      log "reaping stale writers lock (pid ${oldpid:-unknown} no longer running)"
     fi
-    log "reaping stale writers lock (pid ${oldpid:-unknown} no longer running)"
     rm -rf "$SLOT_LOCK_DIR"
   fi
   if ! mkdir "$SLOT_LOCK_DIR" 2>/dev/null; then

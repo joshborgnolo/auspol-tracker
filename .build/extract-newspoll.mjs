@@ -72,8 +72,9 @@
 //     is written
 //   - --check computes everything, prints NP_STATUS, never writes
 //   - writes are atomic (.tmp + rename)
-import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
+import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
+import { fetchText, MONTHS, clean, writeAtomic } from "./extract-common.mjs";
 import { IG_SLUG, IG_EMBED, igWindow, infogramLive, infogramStatic, attachTarget,
   IG_DAY_WINDOW, IG_STA_WINDOW } from "./infogram.mjs";
 
@@ -82,8 +83,6 @@ const CHECK = argv.includes("--check");
 const URL_OF = (i => i >= 0 ? argv[i + 1] : null)(argv.indexOf("--url"));
 const OUT = "data/polls.json";
 const SRC_DIR = ".build/newspoll-src";
-const FETCH_TIMEOUT_MS = 30_000;
-const FETCH_TRIES = 3;
 const BING = "https://www.bing.com/news/search?q=newspoll&format=rss&mkt=en-AU";
 const TOPIC = "https://www.theaustralian.com.au/topics/newspoll?eafs_enabled=false";
 const DAY = 86400000;
@@ -122,23 +121,6 @@ const LEADERS = {
 const olFor = (date) => LEADERS.ols.find((o) => date >= o.from && (!o.to || date <= o.to)) ?? null;
 
 // ---------------------------------------------------------------- fetching
-const UA = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36";
-async function fetchOnce(url) {
-  const res = await fetch(url, { headers: { "user-agent": UA }, signal: AbortSignal.timeout(FETCH_TIMEOUT_MS), redirect: "follow" });
-  if (!res.ok) { const e = new Error(`HTTP ${res.status}`); e.status = res.status; throw e; }
-  return { url: res.url, text: await res.text() };
-}
-async function fetchText(url) {
-  let lastErr;
-  for (let i = 1; i <= FETCH_TRIES; i++) {
-    try { return await fetchOnce(url); } catch (err) {
-      lastErr = err;
-      if (err.status === 403 || err.status === 429) break; // walls don't lift on retry
-      if (i < FETCH_TRIES) await new Promise((r) => setTimeout(r, 1500 * i));
-    }
-  }
-  throw lastErr;
-}
 async function fetchArticle(url) {
   // MSN syndication pages are JS shells; the body lives behind MSN's
   // content-view JSON endpoint, keyed by the /ar-<id> segment. Wrap the JSON
@@ -193,28 +175,7 @@ async function fetchArticle(url) {
 }
 
 // ------------------------------------------------------------ text helpers
-const MONTHS = { january: 0, jan: 0, february: 1, feb: 1, march: 2, mar: 2, april: 3, apr: 3,
-  may: 4, june: 5, jun: 5, july: 6, jul: 6, august: 7, aug: 7, september: 8, sep: 8, sept: 8,
-  october: 9, oct: 9, november: 10, nov: 10, december: 11, dec: 11 };
-
-function clean(html) {
-  return html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&#(\d+);/g, (m, n) => String.fromCharCode(+n))
-    .replace(/&#x([0-9a-f]+);/gi, (m, n) => String.fromCharCode(parseInt(n, 16)))
-    .replace(/&nbsp;/gi, " ")
-    .replace(/&amp;/gi, "&")
-    .replace(/&rsquo;|&lsquo;|&#8217;/gi, "'")
-    .replace(/&ldquo;|&rdquo;/gi, '"')
-    .replace(/[‘’]/g, "'")
-    .replace(/[“”]/g, '"')
-    .replace(/&mdash;/gi, "—")
-    .replace(/&ndash;/gi, "–")
-    .replace(/\s+/g, " ")
-    .trim();
-}
+// clean() now lives in ./extract-common.mjs.
 
 // Unified percentage grammar: "34 per cent" and "34%" both become "34%";
 // "minus-17"/"minus 17" -> "-17"; trailing change clauses are dropped so
@@ -929,8 +890,7 @@ try {
     const next = JSON.stringify(D, null, 2) + trailingNl;
     status.changed = next !== orig;
     if (status.changed && !CHECK) {
-      writeFileSync(OUT + ".tmp", next);
-      renameSync(OUT + ".tmp", OUT);
+      writeAtomic(OUT, next);
       if (newPolls.length) {
         mkdirSync(SRC_DIR, { recursive: true });
         for (const s of sources) writeFileSync(`${SRC_DIR}/release-${s.date}.json`, s.json);

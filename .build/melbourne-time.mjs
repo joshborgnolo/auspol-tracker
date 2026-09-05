@@ -20,3 +20,11 @@ export function melbourneMinute(d) {
   const p = Object.fromEntries(MELB.formatToParts(d).map((x) => [x.type, x.value]));
   return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`;
 }
+
+// Melbourne-local calendar date, "YYYY-MM-DD". Watchdogs run on UTC hosts
+// (a 22:30 UTC CI slot is already tomorrow morning in AEDT), so "today"
+// read off the runner's clock is the day BEHIND the day the finder printed.
+export function melbourneDate(d) {
+  const m = melbourneMinute(d instanceof Date ? d : new Date());
+  return m === null ? null : m.slice(0, 10);
+}

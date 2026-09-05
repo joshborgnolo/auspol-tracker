@@ -23,11 +23,15 @@ acquire_slot_lock
 
 # GitHub Actions may push to main between local launchd slots. Refresh first;
 # if the local tree can't fast-forward, skip this slot rather than commit on a
-# stale base. Untracked files don't count as dirty.
+# stale base. Untracked files don't count as dirty. A dirty tree means a human
+# or a sibling agent is mid-edit: refresh must not record a commit that
+# sweeps in unrelated unstaged changes, and the extractor must not write
+# polls.json onto a base it did not read, so ABORT rather than skip-sync.
 if git diff --quiet && git diff --cached --quiet; then
   freshness_sync || exit 0
 else
-  log "working tree dirty; skipping freshness sync"
+  log "FAIL working tree dirty (uncommitted changes present); refusing to write & commit on a dirty base"
+  exit 1
 fi
 
 EXTRACT_OUT="$(node .build/extract-demosau.mjs 2>&1)"
@@ -67,7 +71,14 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
     git add data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt || true
     SKIP_YM="$(git diff --cached -U0 data/polls.json | grep -o '+ *"20[0-9-]*"' | tr -d '+ " ' | head -1)"
     MSG="Confirm skipped DemosAU slot month $SKIP_YM"
-    git commit -m "$MSG" >> "$LOG" 2>&1 || true
+    if git diff --cached --quiet; then
+      log "skip-confirm recorded month $SKIP_YM but nothing staged to commit; leaving tree for review"
+      exit 1
+    fi
+    if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
+      log "FAIL git commit after skip-confirm; no commit made"
+      exit 1
+    fi
     push_main "$MSG" data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt \
       || log "FAIL git push (commit kept locally)"
     log "OK committed + pushed: $MSG"
