@@ -17,14 +17,19 @@ archive (archive ends 2025-05-31 and is not consumed by the site build).
 
 ## RM.com is Next.js — pull JSON, never scrape HTML
 
-- Feed `https://www.roymorgan.com/findings`: post cards ride in
-  `__NEXT_DATA__` → `props.pageProps.pageData.postData.posts` (slug, `topics[].name`,
-  `release_date` "DD/MM/YYYY", `finding_number`, `listing_image`). No pagination walk needed —
-  apply the candidate filter straight on this array.
+- Feed `https://wp.roymorgan.com/wp-json/rmr/v1/findings-search?page=N&topic[]=federal-poll`
+  (REST JSON array of summary posts — slug, `topics[].name`, `release_date` "DD/MM/YYYY",
+  `finding_number` — 10/page, `x-wp-totalpages` header; the topic filter cuts ~2500 posts to
+  ~190). The old path read `www.roymorgan.com/findings` `__NEXT_DATA__`, but that page renders
+  only page 1 of a client-side list and `?page=N` is ignored server-side, so anything scrolled
+  off page 1 was UNREACHABLE — the gap watchdog firing on a missed release moved discovery here.
+- Paginate the walk: stop when a page's oldest release predates the newest recorded wave minus
+  a straggler margin (normal run = 1 page); `MAX_FEED_PAGES = 20` hard-caps the walk so a wrong
+  stop-margin can never fetch without bound.
 - Each release page `https://www.roymorgan.com/findings/<slug>`: figures live in
   `props.pageProps.findingData.postBy` → `.content` (prose HTML), `.date` (UTC publish datetime),
-  `.findings.releaseDate`, `.findingTopics.nodes[].name`.
-- Both extracted with one regex over the `__NEXT_DATA__` script tag + `JSON.parse`.
+  `.findings.releaseDate`, `.findingTopics.nodes[].name` — one regex over the `__NEXT_DATA__`
+  script tag + `JSON.parse` (the feed itself is plain REST JSON, no regex needed there).
 
 ## Candidate filter (verified against the live feed)
 

@@ -1,6 +1,6 @@
 ---
 name: auspol-headline-estimator
-description: auspol-tracker — where each CURRENT headline number actually comes from in gen-data.mjs. ALP 2PP = nowcastAdj over the trailing 21d window (wᵢ = nᵢ·2^(−d/7)÷√m, undecided-inside pairs rebased to 100 by share2pp, lean read at refNow = latest poll's fieldwork end, empty-window falls back to last monthly point). ALP primary/DISPLAYED current primary shares = LAST POINT of aggPrimary = current month-to-date (monthWithSe, NO recency term, lean at month midpoint, five parties rescaled only when the debiased total drifts >0.5pt from the plain-mean total). House effect = ±28d consensus window (≥3 neighbours), pooled 90d half-life, shrunk sw/(sw+8), read as-of-date per measure. Primaries-through-flows is the synthetic DIAGNOSTIC (tppRowsSynth/synthEffect), never the headline. Needed before editing methodology/hero/glossary copy about "how the number is calculated" (worked example: glossary d960b2d).
+description: auspol-tracker — where each CURRENT headline number actually comes from in gen-data.mjs. ALP 2PP = nowcastAdj over the trailing 21d window (wᵢ = nᵢ·2^(−d/7)÷√m, undecided-inside pairs rebased to 100 by share2pp, lean read at refNow = latest poll's fieldwork end, empty-window falls back to last monthly point). ALP primary/DISPLAYED current primary shares = LAST POINT of aggPrimary = current month-to-date (monthWithSe, NO recency term, lean at month midpoint, five parties rescaled only when the debiased total drifts >0.5pt from the plain-mean total). House effect = ±28d OTHER-HOUSES-ONLY consensus window (≥3 neighbours; own-house rows excluded since 0a370c2), pooled 90d half-life, shrunk sw/(sw+8), read as-of-date per measure. Primaries-through-flows is the synthetic DIAGNOSTIC (tppRowsSynth/synthEffect), never the headline. Needed before editing methodology/hero/glossary copy about "how the number is calculated" (worked example: glossary d960b2d).
 source: auto-skill
 extracted_at: '2026-09-03T13:03:15.884Z'
 ---
@@ -58,7 +58,13 @@ in windows and weights.
   sample capped at `SAMPLE_CAP=3000`.
 - **House effect** (`houseEffectsFor` :240): each poll's deviation from
   the n-weighted cross-house consensus within `HE_WINDOW=±28` days (≥3
-  neighbours, same-stratum only); pooled with `HE_HALF=90`-day half-life;
+  neighbours, same-stratum only); **the consensus is OTHER HOUSES ONLY** —
+  same-firm rows are skipped (shipped 0a370c2, 2026-09-06: a weekly house
+  ringing three times in a window used to outvote everyone, read its own
+  level as consensus, and have its measured lean shrunk toward zero by
+  construction; the deff-backtest arms race confirmed the fix with LOO
+  MAE flat, and the dropped trailing-window-primary arm is recorded there
+  too); pooled with `HE_HALF=90`-day half-life;
   shrunk toward zero by `sw/(sw+SHRINK_K)`, `SHRINK_K=8`; **per measure**
   (tpp, each party's primary, leadership…) and **read as-of-date** —
   `he.at(firm, t)` is the lean at t, so a mid-cycle method change settles
