@@ -1,6 +1,6 @@
-# /prediction/ fortnightly refresh — runs .build/prediction-refresh.sh daily.
-# The wrapper's --if-due gate makes non-due days a cheap no-op (anchor
-# 2026-09-19, then every 14 days); on a due day with new data it refreshes
+# /prediction/ daily refresh — runs .build/prediction-refresh.sh daily.
+# The wrapper's --if-due gate makes an already-done day a cheap no-op (one
+# record per Sydney date); on a new day it refreshes
 # data/prediction-history.json + prediction/index.html, rebuilds the sitemap,
 # and commits "Refresh re-election model read as at <date>".
 #

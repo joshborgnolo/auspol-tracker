@@ -5,15 +5,15 @@
  * .build/analysis constructions) against current origin/main data, records
  * the read in data/prediction-history.json, and regenerates
  * prediction/index.html (a GENERATED file — do not hand-edit; the Morgan
- * archive pattern). Called every CI day by .build/prediction-refresh.sh but
- * only acts on FORTNIGHTLY due dates anchored at 2026-09-19 (plus forced
- * runs), so each recompute is one dated record in the page's reading
- * selector. Numbers are composed here, once: the page is a dumb renderer
- * that swaps pre-composed strings per record.
+ * archive pattern). Called every CI day by .build/prediction-refresh.sh; the
+ * first run that finds no record for today's Sydney date appends one dated
+ * record to the page's reading selector (later same-day runs no-op). Numbers
+ * are composed here, once: the page is a dumb renderer that swaps
+ * pre-composed strings per record.
  *
- * Cadence: ANCHOR + 14-day intervals (Sydney dates). The scheduled wrapper
- * runs this with --if-due; `bash .build/prediction-refresh.sh` locally or a
- * workflow_dispatch forces with --force.
+ * Cadence: daily (Sydney dates) — a day with no record yet is due. The
+ * scheduled wrapper runs this with --if-due; `bash .build/prediction-refresh.sh`
+ * locally or a workflow_dispatch forces with --force.
  *
  * Usage: node .build/refresh-prediction.mjs [--if-due] [--force]
  *          [--as-of=YYYY-MM-DD] [--age=N.N] [--dry]
@@ -26,8 +26,6 @@ import { dirname } from "node:path";
 // ---------- cadence + term constants -------------------------------------
 const ELECTION_DATE = "2025-05-03";       // Albanese-2025 term start
 const SPAN_MONTHS = 36.5;                 // must match the hazard script's curSpan
-const ANCHOR = "2026-09-19";              // first scheduled recompute (user-set)
-const INTERVAL_DAYS = 14;
 const ELEC2PP_2025 = 55.2;                // ALP 2PP at the 2025 election (AEC)
 const HISTORY_FILE = "data/prediction-history.json";
 const PAGE = "prediction/index.html";
@@ -42,9 +40,7 @@ const daysBetween = (a, b) => Math.round((dayMs(b) - dayMs(a)) / DAY);
 const addDays = (d, n) => { const t = new Date(dayMs(d) + n * DAY); return t.toISOString().slice(0, 10); };
 const dateLabel = (d) => { const [y, m, dd] = d.split("-").map(Number); return `${dd} ${MONTHS[m - 1]} ${y}`; };
 const dateShort = (d) => { const [y, m, dd] = d.split("-").map(Number); return `${dd} ${MONTHS[m - 1].slice(0, 3)} ${y}`; };
-const nextDue = (asOf) => daysBetween(ANCHOR, asOf) < 0 ? ANCHOR
-  : addDays(ANCHOR, Math.ceil((daysBetween(ANCHOR, asOf) + (daysBetween(ANCHOR, asOf) % INTERVAL_DAYS === 0 ? 1 : 0)) / INTERVAL_DAYS) * INTERVAL_DAYS);
-const isDue = (asOf) => { const d = daysBetween(ANCHOR, asOf); return d >= 0 && d % INTERVAL_DAYS === 0; };
+const nextDue = (asOf) => addDays(asOf, 1);
 
 // ---------- CLI ----------------------------------------------------------
 const argv = process.argv.slice(2);
@@ -58,9 +54,16 @@ let age = +(daysBetween(ELECTION_DATE, asOf) / 30.4375).toFixed(1);
 if (ageOverride != null) age = ageOverride;
 if (age > 33.5) { console.error(`WARN age ${age} exceeds the 33.5-month final-read point — clamping (term nearing end; revisit this generator)`); age = 33.5; }
 
-if (ifDue && !force && !isDue(asOf)) {
-  console.log(`PRED_STATUS ${JSON.stringify({ due: false, ran: false, asOf, nextDue: nextDue(asOf) })}`);
-  process.exit(0);
+if (ifDue && !force) {
+  // Daily cadence: due only when the history has no record for this date
+  // yet; a record for the same date is replace-in-place via --force.
+  let have = false;
+  try { have = JSON.parse(readFileSync(HISTORY_FILE, "utf8")).records.some((r) => r.asOf === asOf); }
+  catch { /* no history file yet — gate open */ }
+  if (have) {
+    console.log(`PRED_STATUS ${JSON.stringify({ due: false, ran: false, asOf, nextDue: nextDue(asOf) })}`);
+    process.exit(0);
+  }
 }
 
 // ---------- run the models (read-only; they git-show origin/main data) ---
@@ -183,9 +186,68 @@ function compose(rec) {
       `features: pmNet ${s1(f.pmNet)} · ppm ${sp1(f.ppm)} · primSw ${s1(f.primSw)} · tppSw ${s1(f.tppSw)} · govAge ${f.govAge} · ageFrac ${f.ageFrac.toFixed(2)}`,
       `(the table’s current-term row shows the in-sample profile read: ${inS.toFixed(2)})`,
     ].join("\n"),
-    metaDesc: `Modelled ${rPct} per cent chance of re-election for the Albanese government as at ${dateLabel(rec.asOf)} — honest range ${loPct}–${hiPct}. A statistical read of thirteen completed federal terms, refreshed fortnightly.`,
+    metaDesc: `Modelled ${rPct} per cent chance of re-election for the Albanese government as at ${dateLabel(rec.asOf)} — honest range ${loPct}–${hiPct}. A statistical read of thirteen completed federal terms, refreshed daily.`,
   };
 }
+
+// ---------- the monthly backcast chart ------------------------------------
+// Frozen hazard-model reads at each 1st-of-month of this term, computed
+// 2026-09-05 against origin/main poll data: each point's features are
+// trailing-three-month summaries cut at that date, so every point is
+// genuinely foresight-blind. Live daily records extend the series from
+// here; these frozen points are never recomputed — a past point's
+// information set cannot change.
+const BACKCAST = [
+  // [age months since 2025-05-03, p(ousted) median, 10%, 90%]
+  [0.95, 0.2461, 0.0905, 0.5019],
+  [1.94, 0.1731, 0.0714, 0.4141],
+  [2.96, 0.1492, 0.0598, 0.4224],
+  [3.98, 0.1304, 0.0499, 0.4351],
+  [4.96, 0.1388, 0.0492, 0.4696],
+  [5.98, 0.1421, 0.0477, 0.4541],
+  [6.97, 0.1461, 0.0528, 0.4288],
+  [7.98, 0.147, 0.056, 0.4337],
+  [9, 0.167, 0.0545, 0.5023],
+  [9.92, 0.1869, 0.0509, 0.5546],
+  [10.94, 0.1984, 0.0457, 0.576],
+  [11.93, 0.1991, 0.0406, 0.5895],
+  [12.94, 0.2172, 0.0384, 0.6111],
+  [13.93, 0.2131, 0.0377, 0.6098],
+  [14.95, 0.2292, 0.0424, 0.61],
+  [15.97, 0.2224, 0.0471, 0.6129],
+];
+const chartSvg = (() => {
+  const pts = BACKCAST.map(([age, median, lo, hi]) => ({ age, median, lo, hi }))
+    .concat(hist.records
+      .filter((r) => r.age > BACKCAST[BACKCAST.length - 1][0] + 0.05)
+      .map((r) => ({ age: r.age, median: r.ousted.median, lo: r.ousted.lo, hi: r.ousted.hi })))
+    .sort((a, b) => a.age - b.age);
+  const W = 640, H = 240, ML = 34, MR = 14, MT = 12, MB = 26;
+  const cw = W - ML - MR, ch = H - MT - MB;
+  const xmax = Math.ceil(pts[pts.length - 1].age + 0.5);
+  const X = (a) => +(ML + (a / xmax) * cw).toFixed(1);
+  const Y = (re) => +(MT + (1 - re / 100) * ch).toFixed(1);   // re = re-elect %
+  const re = (p) => 100 * (1 - p);
+  const path = (f) => pts.map((p, i) => (i ? "L" : "M") + X(p.age) + " " + Y(f(p))).join(" ");
+  const tickLbl = (m) => {
+    const iso = addDays(ELECTION_DATE, Math.round(m * 30.4375));
+    const [y, mo] = iso.split("-").map(Number);
+    return MONTHS[mo - 1].slice(0, 3) + " " + String(y).slice(2);
+  };
+  const gridY = [0, 25, 50, 75, 100].map((v) =>
+    `<line x1="${ML}" y1="${Y(v)}" x2="${W - MR}" y2="${Y(v)}" stroke="${v === 50 ? "var(--line)" : "var(--line-2)"}" stroke-width="1"${v === 50 ? ' stroke-dasharray="3 3"' : ""}/>` +
+    `<text x="${ML - 7}" y="${Y(v) + 3}" text-anchor="end" font-size="9.5" fill="var(--ink-faint)">${v}${v === 100 ? "%" : ""}</text>`).join("");
+  const xTicks = [];
+  for (let m = 3; m < xmax; m += 3)
+    xTicks.push(`<text x="${X(m)}" y="${H - 10}" text-anchor="middle" font-size="9.5" fill="var(--ink-faint)">${tickLbl(m)}</text>`);
+  const band = `<path d="${path((p) => re(p.lo))} ${[...pts].reverse().map((p) => "L" + X(p.age) + " " + Y(re(p.hi))).join(" ")} Z" fill="var(--accent)" opacity="0.16"/>`;
+  const median = `<path d="${path((p) => re(p.median))}" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/>`;
+  const dots = pts.map((p) => `<circle cx="${X(p.age)}" cy="${Y(re(p.median))}" r="2.1" fill="var(--ink)"/>`).join("");
+  const last = pts[pts.length - 1];
+  const end = `<circle cx="${X(last.age)}" cy="${Y(re(last.median))}" r="3.2" fill="var(--accent)"/>` +
+    `<text x="${X(last.age) - 8}" y="${Y(re(last.median)) - 7}" text-anchor="end" font-size="11" font-weight="600" fill="var(--ink)">${Math.round(re(last.median))}</text>`;
+  return `<svg viewBox="0 0 ${W} ${H}" role="presentation" aria-hidden="true">${gridY}${xTicks.join("")}${band}${median}${dots}${end}</svg>`;
+})();
 
 // ---------- static term metadata for the table (election years are facts) --
 const TERMS_META = {
@@ -223,7 +285,7 @@ const selStrip = hist.records.length > 1
     </select>
     <span class="pred-stale" id="pred-stale" hidden></span>
   </div>`
-  : `<p class="pred-selnote">This is the first model read — a dated record begins accumulating at the next fortnightly refresh (${dateLabel(nextDue(asOf))}).</p>`;
+  : `<p class="pred-selnote">This is the first model read — a dated record begins accumulating at the next daily refresh (${dateLabel(nextDue(asOf))}).</p>`;
 
 const pageJs = `<script>
 const PRED_DATA = ${embedJson};
@@ -263,10 +325,10 @@ const html = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Will this government be re-elected? · auspol tracker</title>
-<!-- GENERATED FILE — do not hand-edit. Rebuilt by .build/refresh-prediction.mjs
-     on every fortnightly due date from 2026-09-19 (anchored every 14 days;
-     .build/prediction-refresh.sh, driven by prediction-refresh.yml and the
-     wrapper's --if-due gate). Chrome matches the /feedback/ satellite
+<!-- GENERATED FILE — do not hand-edit. Rebuilt by .build/prediction-refresh.mjs
+     daily (first run of each Sydney date; .build/prediction-refresh.sh,
+     driven by prediction-refresh.yml and the wrapper's --if-due gate).
+     Chrome matches the /feedback/ satellite
      recipe; numbers are composed once in the generator from the live output
      of .build/analysis/reelect-snapshot-hazard.mjs (+ term-ridge cross-check).
      This read: ${dateLabel(latest.asOf)} · age ${latest.age} months. -->
@@ -409,6 +471,10 @@ body {
 }
 .pred-note { margin-top: 12px; font-size: 13px; line-height: 1.6; color: var(--ink-2); }
 
+/* ------- the monthly backcast chart ------- */
+.pred-chart { margin: 18px 0 26px; }
+.pred-chart svg { display: block; width: 100%; height: auto; }
+
 /* ------- the reading-history selector ------- */
 .pred-selwrap { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 16px 0 0; }
 .pred-sellabel { font-size: 12.5px; font-weight: 600; color: var(--ink); }
@@ -495,6 +561,11 @@ body {
     <figcaption class="pred-note" data-slot="note">${S.note}</figcaption>
   </figure>
 
+  <figure class="pred-chart" role="img" aria-label="Chart of the model’s re-election read at the first of each month of this term so far, with the median as a line and the ten-to-ninety per cent uncertainty band shaded.">
+    ${chartSvg}
+    <figcaption class="pred-note">The same machine, backcast: re-run at the start of each month of this term using only the polling published by that date, so every point is genuinely foresight-blind. The shaded band is each point’s ten-to-ninety per cent range — honestly wide, especially early, when the record has little to bite on. Live reads extend the series from here, one point per daily record.</figcaption>
+  </figure>
+
   <h2>What this number is</h2>
   <p>The number above is not a poll of voters and it is not a betting price. It comes from a model that was shown the polling history of every completed federal parliamentary term since 1987 — thirteen terms, nine of which ended in the government’s re-election and four in its defeat — and taught to recognise the signature a term shows part-way through: how the prime minister is rated, whether the prime minister still leads as preferred PM, and how far the vote has faded from the last election result. Read against that record, the signature of Albanese’s second term is the signature of a government that goes on to survive.</p>
   <p data-slot="what2">${S.what2}</p>
@@ -578,7 +649,7 @@ body {
   <p>The validation. Leave-one-term-out: a term’s snapshots are scored only by a model trained on the other twelve. The baseline “always re-elected” scores 69 per cent. Snapshot-level AUC is 0.77 with Brier score 0.182. The interval comes from a 300-draw cluster bootstrap that resamples whole terms, refits, and re-scores the current term each draw. The live call, verbatim:</p>
   <div class="pred-code" data-slot="code">${S.code}</div>
   <p>The cross-check. A deliberately different construction — one ridge logistic per term on first-sixteen-month features — <span data-slot="ridgeCell2">${S.ridgeCell2}</span> Its best-calibrated variant, adding leadership-spill and minority-government flags, holds the same 85 per cent leave-one-term-out accuracy with AUC 0.89 and Brier 0.134. On thirteen terms the estimator is not the constraint — a diagonal LDA ties the ridge and k-nearest-neighbours collapses — and no capacity beyond logistic earns its keep: adjacent accuracies are statistically indistinguishable (85 per cent carries a 95% Wilson interval of roughly [58%, 96%]).</p>
-  <p>To reproduce: from the repo root, <code>node .build/analysis/reelect-snapshot-hazard.mjs</code> (the headline — its snapshot age defaults to the canonical 16.2 months and moves via <code>--age=N.N</code>), <code>node .build/analysis/reelect-term-ridge.mjs</code> (the cross-check), plus <code>reelect-15mo-levels.mjs</code> and <code>reelect-15mo-declines.mjs</code> (the composites). Both models emit machine-readable results with <code>--json</code>; this page is regenerated from them by <code>.build/refresh-prediction.mjs</code> on a fortnightly due-date gate, and each refresh is one dated, selectable record above. The analysis scripts read poll data straight from origin/main, so they are immune to working-tree state; the canonical numbers live in <code>.build/analysis/README.md</code>. The analysis’s own closing caution stands: this is historical signature analysis, not a forecast.</p>
+  <p>To reproduce: from the repo root, <code>node .build/analysis/reelect-snapshot-hazard.mjs</code> (the headline — its snapshot age defaults to the canonical 16.2 months and moves via <code>--age=N.N</code>), <code>node .build/analysis/reelect-term-ridge.mjs</code> (the cross-check), plus <code>reelect-15mo-levels.mjs</code> and <code>reelect-15mo-declines.mjs</code> (the composites). Both models emit machine-readable results with <code>--json</code>; this page is regenerated from them by <code>.build/refresh-prediction.mjs</code> on a daily due gate, and each refresh is one dated, selectable record above. The analysis scripts read poll data straight from origin/main, so they are immune to working-tree state; the canonical numbers live in <code>.build/analysis/README.md</code>. The analysis’s own closing caution stands: this is historical signature analysis, not a forecast.</p>
 
   <p class="ss-note">This is a satellite analysis page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>

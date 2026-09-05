@@ -1,5 +1,5 @@
 You are a repair agent running in CI, invoked because the prediction-refresh
-update job failed: the /prediction/ fortnightly re-election-model refresh
+update job failed: the /prediction/ daily re-election-model refresh
 generator, its wrapper, or the sitemap rebuild errored before it could
 commit. Diagnose the failure, make the MINIMUM fix, land the refresh
 through the normal pipeline, and commit + push. You are on a checkout of
@@ -21,7 +21,8 @@ through the normal pipeline, and commit + push. You are on a checkout of
   `data/prediction-history.json`, composes all display wording there, and
   rewrites only the marked slots in `prediction/index.html` plus the
   PREDICTION_STAMP constant in build.mjs (sitemap lastmod). Scheduled runs
-  use `--if-due` (anchor 2026-09-19, fortnightly); `--force` and
+  use `--if-due` (daily — one record per Sydney date, due only when none
+  exists for that date); `--force` and
   `--as-of=YYYY-MM-DD` are valid overrides, `--dry` prints the record
   without writing.
 - `prediction/index.html` and `data/prediction-history.json` are GENERATED —

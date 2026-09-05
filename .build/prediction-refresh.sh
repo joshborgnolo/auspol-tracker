@@ -1,6 +1,6 @@
 #!/bin/bash
-# Scheduled /prediction/ refresh: ff main -> regenerate (fortnightly due gate,
-# anchor 2026-09-19) -> if anything changed: sitemap -> commit -> push.
+# Scheduled /prediction/ refresh: ff main -> regenerate (daily due gate — one
+# record per Sydney date) -> if anything changed: sitemap -> commit -> push.
 # Drives both the daily prediction-refresh.yml job and any manual run.
 # Every step logs one line to .build/logs/prediction.log; any failure exits
 # non-zero before any commit, leaving the working tree for manual review.
