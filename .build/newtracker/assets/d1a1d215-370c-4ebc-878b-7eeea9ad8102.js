@@ -3969,7 +3969,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
         shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure’s
         own time, and it is a property of the pollster, not of this one poll.
         {" "}<strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, filed with the
-        Australian Polling Council – Newspoll, YouGov, Essential, DemosAU and RedBridge / Accent
+        Australian Polling Council – Newspoll, YouGov, Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog
         file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown.
       </p>
 
@@ -4220,7 +4220,7 @@ function infoTerms(D) {
       is on record and reads its two published sample figures off it – the raw count and the
       effective one, the latter serving as that wave’s nᵢ in the
       {" "}{xref("weighted-aggregate", "apc-statement", "weighted aggregate")}. Newspoll, YouGov,
-      Essential, DemosAU and RedBridge / Accent file them; where a house files none, the poll
+      Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog file them; where a house files none, the poll
       breakdown carries its raw sample alone and the archive’s n<sub>eff</sub> column dashes –
       a precision figure the pollster never published is not this site’s to invent.</>) },
     { id: "house-effect", term: "House effect", body: (
@@ -4400,7 +4400,7 @@ function infoTerms(D) {
       {" "}Full formula: the headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window, where
       xᵢ is a poll’s house-adjusted figure and its weight wᵢ = nᵢ × 2^(−d/7) ÷ √m – nᵢ the
       poll’s sample on the estimator’s scale: its published effective sample where the house files
-      one (Newspoll, YouGov, Essential, DemosAU and RedBridge / Accent, via their Australian
+      one (Newspoll, YouGov, Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog, via their Australian
       Polling Council methodology statements), grossed back up by the shared 1.6 design factor, else its raw
       sample capped at 3,000 – 1,200 where no sample is filed at all. nᵢ also sets the
       sampling-error floor under the whole
