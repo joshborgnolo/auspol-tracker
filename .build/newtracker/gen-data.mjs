@@ -179,8 +179,10 @@ function fillSeries(known, idxs) {
 
 /* ---- house effects (shrunk mean deviation from local consensus) -------- */
 const HE_WINDOW = 28, SHRINK_K = 8, SAMPLE_CAP = 3000, LN2 = Math.log(2);
-/* Design effect for a live national sample – the same 1.6 the discord engine
-   uses for its sampling-error floor, so the two agree. */
+/* Design effect for a live national sample – the one value both engines
+   use. The node estimator consumes it directly (rowN, seFloor); the page's
+   discord engine reads it from latest.method.deff in the data asset so
+   there is no hand-mirrored copy to drift. */
 const HL_DEFF = 1.6;
 /* A poll's n on the derived scale. Where the house files a published
    effective sample size (polls.json `sampleEff` – Newspoll, YouGov,
@@ -215,8 +217,8 @@ const tppRowsSynth = POLLS
    on that measure – never borrowed between measures, because a firm that
    leans Labor on the classic 2PP has no reason to lean the same way on an
    ALP-v-ON head-to-head or on a primary share. Each poll's deviation is
-   measured against the n-weighted consensus of other polls around it in time
-   (±HE_WINDOW days, at least 3, same-stratum only). Those deviations are
+   measured against the n-weighted consensus of OTHER HOUSES' polls around it
+   in time (±HE_WINDOW days, at least 3, same-stratum only). Those deviations are
    pooled with recency decay (HE_HALF-day half-life) and shrunk toward zero by
    SHRINK_K on the decayed count, and the lean is READ at the time it is
    applied: he.at(firm, t) is the house's lean as of t. A house whose method
@@ -234,6 +236,11 @@ function houseEffectsFor(rows) {
     let sw = 0, swx = 0, k = 0;
     for (const b of rows) {
       if (b === a || Math.abs(ddays(b.mid, a.mid)) > HE_WINDOW) continue;
+      // the consensus a poll is measured against is OTHER HOUSES' polls only
+      // – a weekly house ringing three times in a window would otherwise
+      // outvote everyone else, read its own level as consensus, and have its
+      // measured lean shrunk toward zero by construction
+      if (b.firm === a.firm) continue;
       // a stratified row only compares against its own stratum, so a different
       // question (approval vs favourability) or a different person in the same
       // office never enters the consensus it is measured against
@@ -1255,7 +1262,10 @@ const latest = {
   updated: fmtDate(LATEST_ISO), updatedISO: LATEST_ISO,
   published: fmtDate(LATEST_PUB_ISO), publishedISO: LATEST_PUB_ISO,
   nextElectionDue: "By 20 May 2028", pollsTracked: individualPolls.length, housesTracked: houses.size,
-  method: { kind: "weighted house-effect-adjusted mean", windowDays: HL_WINDOW, halfLifeDays: HL_HALF, shrinkK: SHRINK_K, nPolls: hlNow.n },
+  /* deff rides in the payload so the page's discord engine reads the SAME
+     constant the node estimator used (it lives in an untransformed asset and
+     used to mirror 1.6 by hand, free to drift). */
+  method: { kind: "weighted house-effect-adjusted mean", windowDays: HL_WINDOW, halfLifeDays: HL_HALF, shrinkK: SHRINK_K, nPolls: hlNow.n, deff: HL_DEFF },
 };
 
 /* ---- 8b. show-your-working: the rows behind the two headline estimates ---
@@ -1530,10 +1540,18 @@ const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
   const byHouse = new Map();
   for (const p of [...inWindow].sort((a, b) => a.date.localeCompare(b.date)))
     byHouse.set(accCanon(p.firm), p);
-  const houses = [...byHouse.entries()].map(([firm, p]) => ({
-    firm, date: p.date, alp2pp: r1(share2pp(p)), err: r1(share2pp(p) - e.tpp_alp),
+  /* Raw error kept beside the display pair: the sign test below must read
+     the unrounded figure – a +0.04 miss displays as 0.0 but is still a miss
+     on the Coalition's side, and rounding it before the sign test would
+     silently flip one-sidedness on a dead-heat display. */
+  const raw = [...byHouse.entries()].map(([firm, p]) => {
+    const alp = share2pp(p);
+    return { firm, date: p.date, alp, errRaw: alp - e.tpp_alp };
+  });
+  if (!raw.length) return null;
+  const houses = raw.map((h) => ({
+    firm: h.firm, date: h.date, alp2pp: r1(h.alp), err: r1(h.errRaw),
   })).sort((a, b) => Math.abs(a.err) - Math.abs(b.err));
-  if (!houses.length) return null;
   const meanPoll = houses.reduce((t, h) => t + h.alp2pp, 0) / houses.length;
   const err = meanPoll - e.tpp_alp;
   return {
@@ -1544,7 +1562,7 @@ const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
     houses, n: houses.length,
     // did they all miss the same way? one-sided error is the signature of a
     // problem in the industry rather than noise in a house
-    sameSide: houses.every((h) => h.err > 0) || houses.every((h) => h.err < 0),
+    sameSide: raw.every((h) => h.errRaw > 0) || raw.every((h) => h.errRaw < 0),
     worst: r1(Math.max(...houses.map((h) => Math.abs(h.err)))),
   };
 }).filter(Boolean);

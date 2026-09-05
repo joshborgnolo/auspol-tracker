@@ -83,6 +83,7 @@ function houseEffectsFor(rows) {
     let sw = 0, swx = 0, k = 0;
     for (const b of rows) {
       if (b === a || Math.abs(ddays(b.mid, a.mid)) > HE_WINDOW) continue;
+      if (b.firm === a.firm) continue;   // consensus is other houses only (since 2026-09-06)
       if (a.strat != null && b.strat !== a.strat) continue;
       sw += b.n; swx += b.n * b.x; k++;
     }

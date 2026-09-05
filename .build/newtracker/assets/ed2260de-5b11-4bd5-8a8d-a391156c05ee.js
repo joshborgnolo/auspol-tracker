@@ -134,7 +134,10 @@ window.AP = (function () {
        pollsters disagreeing with each other. */
   const DISC = {
     BW: 45,          // Gaussian bandwidth, days
-    DEFF: 1.6,       // design effect – weighted online panels aren't simple random samples
+    // design effect – weighted online panels aren't simple random samples.
+    // emitted by gen-data (HL_DEFF) in latest.method so the two engines can't
+    // drift apart; the literal is only the pre-migration fallback
+    DEFF: (D.latest && D.latest.method && D.latest.method.deff) || 1.6,
     ENGAGED: 0.90,   // assumed approve+disapprove share when a poll publishes only the net
     MIN_NEFF: 4, MIN_HOUSES: 3, MIN_STRAT: 3,
   };

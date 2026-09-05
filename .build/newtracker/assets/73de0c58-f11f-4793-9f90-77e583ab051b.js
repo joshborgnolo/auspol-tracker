@@ -28,7 +28,15 @@ function freshness(iso) {
   else if (days < 56) label = Math.round(days / 7) + " weeks ago";
   else label = Math.round(days / 30) + " months ago";
   const state = days <= 7 ? "fresh" : days <= 21 ? "aging" : "stale";
-  return { label, state };
+  return { label, state, days };
+}
+
+const SHORT_MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+// "31 Aug" – the hero's as-of stamp; the full "31 August 2026" already lives
+// in latest.updated for the prose copy that needs it
+function shortDate(iso) {
+  const t = new Date(Date.parse(iso));
+  return t.getUTCDate() + " " + SHORT_MON[t.getUTCMonth()];
 }
 
 /* The masthead dial as a reusable mark. The header mounts it in the lockup
@@ -1146,6 +1154,14 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               <span className="hi-count">
                 {unc.n} poll{unc.n === 1 ? "" : "s"} in{" "}
                 {D.latest.method.windowDays} days
+                {/* The estimate is only as fresh as the last fieldwork inside
+                    its window: once that date is a couple of days back the
+                    figure deserves its as-of next to it. Same-day cycles
+                    don't need the stamp – "Last poll … Today" already says
+                    it one strip up. */}
+                {freshness(D.latest.updatedISO).days >= 2 && (
+                  <span className="hi-asof"> · as of {shortDate(D.latest.updatedISO)}</span>
+                )}
               </span>
             )}
             {!adjusted && <span className="eyebrow-warn">Limited data</span>}
