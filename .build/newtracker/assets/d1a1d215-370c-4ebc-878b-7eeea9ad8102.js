@@ -4447,8 +4447,19 @@ function infoTerms(D) {
   ];
   /* Questions whose answers ARE the explanation, in the plainest words the
      reader would type - rendered beneath the glossary, and targetable by
-     openTerm exactly the way a term is (the id must not collide with one). */
+     openTerm exactly the way a term is (the id must not collide with one). The
+     order is the reader's own curiosity: what the picture is, then the numbers,
+     then their oddities, then how far to trust them, then the plumbing. */
   const faqs = [
+    { id: "what-am-i-looking-at", q: "What exactly am I looking at in the main chart?", a: (
+      <>One {xref("individual-poll", "what am i looking at", "published poll")} per dot, each
+      drawn at its own fieldwork midpoint. Beneath them runs one trend point per calendar month –
+      every poll closed inside the month, pooled, house-corrected and sample-weighted – shaded
+      with the {xref("interval", "what am i looking at", "95% interval")} around it; where the two
+      bands overlap, the polls cannot separate the parties that month. The headline figure up top
+      keeps its own clock: it is the 21-day nowcast described under
+      {" "}{xref("weighted-aggregate", "what am i looking at", "Weighted aggregate")}, re-run with
+      every poll published, so it can move before the monthly ink catches up.</>) },
     { id: "dots-past-the-line", q: "Why do the newest poll dots sit past the end of the line?", a: (
       <>Because the two markings keep different clocks. Each dot is
       one {xref("individual-poll", "dots past the line", "individual poll")} drawn at its own
@@ -4464,6 +4475,112 @@ function infoTerms(D) {
       meantime, up to half a month of dots can run ahead of it. That is lag in the ink, not in the
       estimate: the headline figure is never read off this line but from the 21-day nowcast, which
       moves with every poll published.</>) },
+    { id: "newest-poll-not-headline", q: "The newest poll doesn’t match the headline. Which one is wrong?", a: (
+      <>Usually neither – they are different objects. The poll is one house’s reading of one
+      week, and chance alone can carry it off the country by its own
+      {" "}{xref("margin-of-error", "newest poll not headline", "margin of error")}. The headline
+      never repeats a single poll: it pools every house polling lately, weights each wave by
+      recency and sample, and first takes out the lean it has measured for the house – its
+      {" "}{xref("house-effect", "newest poll not headline", "house effect")}. One survey moves
+      that estimate by its weight, not by its news value; exactly how much the latest wave pulled
+      the figure today shows as a signed move in its
+      {" "}{xref("aggregate-effect", "newest poll not headline", "poll breakdown")}.</>) },
+    { id: "headline-moved-no-poll", q: "Why did the headline move when no new poll came out?", a: (
+      <>Time itself re-cuts it. Every poll’s weight halves with each seven days of age, so between
+      releases the fresh waves steadily take over from the stale ones and the average re-settles
+      towards the newest readings; a poll that ages past 21 days leaves the window altogether,
+      changing the pooled set in a single step. The estimate is re-run against the calendar at
+      each build of the site, so quiet days can still move the number – by weights decaying, never
+      by the figure being smoothed towards anything.</>) },
+    { id: "lead-interval-double", q: "Why is the ± beside the lead twice the ± beside each share?", a: (
+      <>Because the lead is a difference, not a share. Anything that moves a party’s share –
+      sampling luck included – moves the gap between the parties twice as far, and the uncertainty
+      scales the same way: ±{(2 * (L.alp2ppCi95 ?? 0)).toFixed(1)} beside the lead against
+      ±{(L.alp2ppCi95 ?? 0).toFixed(1)} on each share today. Both come off the one
+      {" "}{xref("interval", "lead interval double", "95% interval")} computed over the polls in
+      the window.</>) },
+    { id: "primaries-not-100", q: "Why don’t the primary votes add up to 100?", a: (
+      <>Deliberately, where the shortfall is real. Some houses keep voters who won’t name a party
+      inside their published shares rather than setting them aside – each poll’s breakdown says
+      which basis it published on – so the parties can sum below 100 by exactly the uncommitted
+      share, a signal about the electorate the aggregate keeps rather than rescales away. Where
+      the {xref("undecided", "primaries not 100", "undecided")} share was set aside before the
+      parties were counted, the primaries sum to 100 as expected.</>) },
+    { id: "why-2pp-headline", q: "Why does the headline lead with two-party preferred and not the primary vote?", a: (
+      <>Because seats are decided on the final pair. Preferences distribute until one candidate
+      holds a majority, so the question who is ahead is a
+      {" "}{xref("two-party-preferred", "why 2pp headline", "two-party preferred")} question, and
+      first preferences alone cannot answer it – with One Nation near {onp}% of the primary vote
+      the two views of the race are genuinely far apart. The primaries are tracked just as
+      closely, with their own weighted, house-corrected series in the panels below; but the
+      headline answers the election’s own question.</>) },
+    { id: "poll-without-2pp", q: "What happens to a poll that publishes no two-party figure?", a: (
+      <>It is not discarded; it simply cannot vote in the pair. Its primary shares feed the
+      primary-vote series and its leadership readings the leadership panels, but the two-party
+      headline takes only published pairs – inventing one the house never printed would be the
+      site guessing where it has promised to add up. What those primaries would imply under one
+      fixed {xref("preference-flows", "poll without 2pp", "preference-flow table")} is kept as the
+      dashed {xref("implied-2pp", "poll without 2pp", "implied 2PP")} line – a diagnostic on
+      request, never the estimate.</>) },
+    { id: "polls-disagree", q: "Two new polls say different things. Which of them is right?", a: (
+      <>Usually both are doing their jobs. Each is one sample, so two honest polls of an unmoved
+      electorate are expected to differ; the question is whether they differ by more than luck
+      allows. The Poll disagreement panel answers exactly that – weighing the spread the houses
+      actually show against the scatter sampling error predicts, and reading
+      {" "}{xref("chance-consistent", "polls disagree", "chance-consistent")} while the two match.
+      Where a gap is method rather than luck – one house tilting the same way wave after wave – it
+      shows as a {xref("house-effect", "polls disagree", "house effect")}, which the aggregate
+      measures and removes rather than splitting the difference.</>) },
+    { id: "is-this-a-forecast", q: "Is the headline a prediction of the election result?", a: acc ? (
+      <>No. Everything here describes where opinion stands now, from polls already published;
+      nothing projects them forward through a campaign. And measurement at one moment is not
+      destiny at another: across the {acc.cycles.length} elections scored on this site the final
+      polls still missed the two-party result by {acc.meanAbs} points on average – see
+      {" "}{xref("polling-error", "is this a forecast", "the error record")}. The site calls its
+      own figures estimates only, and carries no seat projection for the same reason.</>) : (
+      <>No. Everything here describes where opinion stands now, from polls already published;
+      nothing projects them forward through a campaign. The site calls its own figures estimates
+      only.</>) },
+    { id: "two-party-to-seats", q: "What would these numbers mean in seats?", a: (
+      <>Nothing this site will pretend to. Turning a national two-party figure into a seat count
+      assumes the swing runs the same everywhere, and with One Nation near {onp}% of the primary
+      vote that assumption fails in exactly the seats that would decide the election: a large
+      minor party wins where its vote bunches and nowhere else, and no national number can see the
+      difference. {" "}{xref("seat-projection", "two party to seats", "Seat projection")} lays out
+      the geometry; polls that actually modelled the seats one by one carry the
+      {" "}{xref("mrp", "two party to seats", "MRP")} tag in the archive.</>) },
+    { id: "how-wrong-are-the-polls", q: "How wrong have the polls been at past elections?", a: acc ? (
+      <>Scored election by election on the How the final polls did panel in Past cycles: each
+      house’s last two-party figure of the {acc.windowDays} days before polling day, set against
+      the result. Across the {acc.cycles.length} elections from {acc.cycles[0].year} to
+      {" "}{acc.cycles[acc.cycles.length - 1].year} the average miss is {acc.meanAbs} points; the
+      worst, {acc.worstCycle.year}, missed by {Math.abs(acc.worstCycle.err)} with every house on
+      the same side of it. That shared lean is the error an aggregate cannot see about itself,
+      and the reason the {xref("interval", "how wrong are the polls", "95% interval")} never
+      claims to cover it.</>) : (
+      <>The How the final polls did panel in Past cycles scores each house’s last two-party figure
+      of the campaign against the result, election by election, house by house.</>) },
+    { id: "next-poll-when", q: "How does the site know when the next poll is coming?", a: (
+      <>It doesn’t – it forecasts from the record. Each house’s next date is the median gap
+      between its recent releases, nudged only onto the weekday the house keeps, and the ± widens
+      with how ragged that record has been. A date that passes unpublished holds its row and
+      counts on, red, until the real wave lands; nothing in the list is an announced date, only a
+      house’s own habits read back to it. {" "}{xref("next-polls", "next poll when", "Next polls")}
+      lays out the method.</>) },
+    { id: "poll-i-saw-not-here", q: "I saw a poll in the news that isn’t here. Where is it?", a: (
+      <>Most likely one row down. The Latest polls table keeps one row per active house – its
+      newest wave – so an earlier poll from the same firm rolls out of that card the moment a
+      newer one lands. Nothing is lost: the All polls archive holds every wave of the term, and
+      Past cycles the previous ones. If a published current wave is missing outright rather than
+      rolled down a card, that is a genuine error – the report link lives in the footer, one click
+      from anywhere on the page.</>) },
+    { id: "where-does-data-come-from", q: "Where do the numbers come from?", a: (
+      <>From the pollsters, not from here: every published national voting-intention poll since
+      the May 2025 federal election, from {" "}{sources}. Each wave is filed in the archive with
+      its field dates, sample and methodology link, and its Australian Polling Council
+      {" "}{xref("apc-statement", "where does data come from", "statement")} where one exists –
+      the {xref("sources", "where does data come from", "Sources")} entry has the list. The site
+      polls no one itself; it aggregates what those houses publish, and shows its working.</>) },
   ];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"
