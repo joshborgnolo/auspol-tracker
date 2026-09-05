@@ -60,3 +60,77 @@ push_main() {
   fi
   return 0
 }
+
+# ---------------------------------------------------------------------------
+# Slot lock — one repo-wide lock for every writing wrapper.
+#
+# Why: the launchd shim locks per-wrapper (it stops a job overlapping
+# ITSELF), but several plists share the same calendar slot and every
+# extractor does read-modify-write on data/polls.json in this one checkout.
+# Two wrappers a minute apart could each append disjoint waves to their own
+# in-memory copy, and the second write would silently clobber the first in
+# the working file. mkdir is atomic, so it is the mutex; a pid file inside
+# lets a later slot reap the lock of a wrapper that died mid-run.
+#
+# Usage: acquire_slot_lock   — takes the lock or exits 0 (slot skipped).
+# The lock releases itself via an EXIT trap.
+SLOT_LOCK_DIR=""
+acquire_slot_lock() {
+  SLOT_LOCK_DIR="$REPO/.build/locks/writers.lock"
+  if [ -d "$SLOT_LOCK_DIR" ]; then
+    local oldpid=""
+    [ -f "$SLOT_LOCK_DIR/pid" ] && oldpid="$(cat "$SLOT_LOCK_DIR/pid" 2>/dev/null)"
+    if [ -n "$oldpid" ] && kill -0 "$oldpid" 2>/dev/null; then
+      log "another wrapper holds the writers lock (pid $oldpid); skipping slot"
+      exit 0
+    fi
+    log "reaping stale writers lock (pid ${oldpid:-unknown} no longer running)"
+    rm -rf "$SLOT_LOCK_DIR"
+  fi
+  if ! mkdir "$SLOT_LOCK_DIR" 2>/dev/null; then
+    log "writers lock lost to a concurrent wrapper; skipping slot"
+    exit 0
+  fi
+  echo $$ > "$SLOT_LOCK_DIR/pid"
+  trap 'rm -rf "$SLOT_LOCK_DIR"' EXIT
+}
+
+# ---------------------------------------------------------------------------
+# freshness_sync — the pre-flight every writing wrapper used to copy-paste:
+# fetch, ff-only onto origin/main, skip the slot if the local tree can't
+# fast-forward. The old version had a wedge: when push_main's retry fails it
+# keeps the commit locally, and from then on ff-only failed on EVERY slot —
+# logged at exit 0, so the local job never contributed again and nothing
+# ever said so. Now:
+#   1. kept commit tree-identical to origin/main (the common case — the CI
+#      twin won the race and landed the same rows) → reset to origin/main,
+#      slot proceeds. Nothing is lost: identical trees, and the object
+#      stays in the reflog.
+#   2. genuinely diverged content → one rebase attempt; on conflict, abort
+#      and skip the slot with a WARN so the log line greps differently.
+# Callers expect: fresh tree check is the caller's job (dirty tree → no
+# sync at all, as before); returns 0 when main is synced, 1 to skip.
+freshness_sync() {
+  git fetch origin -q || true
+  if git merge --ff-only origin/main >> "$LOG" 2>&1; then
+    return 0
+  fi
+  # A failed ff with a clean tree means local main has commits origin lacks
+  # (behind-only is a fast-forward, and clean was checked by the caller).
+  if git diff --quiet origin/main HEAD; then
+    log "local main's kept commit is tree-identical to origin/main (lost push race); resetting to origin/main"
+    if git reset --hard origin/main >> "$LOG" 2>&1; then
+      return 0
+    fi
+    log "WARN reset to origin/main failed; skipping slot"
+    return 1
+  fi
+  log "local main diverged from origin/main; attempting one rebase recovery"
+  if git rebase origin/main >> "$LOG" 2>&1; then
+    log "rebased kept local commit(s) onto origin/main; continuing slot"
+    return 0
+  fi
+  git rebase --abort >> "$LOG" 2>&1 || true
+  log "WARN local main diverged from origin/main (kept commits conflict); skipping slot"
+  return 1
+}

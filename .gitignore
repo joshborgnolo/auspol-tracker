@@ -6,3 +6,6 @@ node_modules/
 
 # scheduled-job logs
 .build/logs/
+
+# updater-slot lock dirs (self-releasing; stale dirs are reaped by pid check)
+.build/locks/

@@ -1,0 +1,58 @@
+# Test wiring — the repo's six hand-written node:assert suites previously ran
+# only when a human remembered to. This workflow is the only machine that
+# runs them. Advisory by design: writers push straight to main, so a red run
+# here is an email, not a merge gate.
+#
+# Node is pinned because nothing else in the pipeline pins the runtime (no
+# workflow used actions/setup-node before this one — every extractor, the
+# validator and the estimator ran on whatever ubuntu-latest shipped).
+
+name: tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".build/**"
+      - "data/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+# Read-only: never races the main-writers group and needs no write perms.
+concurrency:
+  group: tests
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pin Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Validate the data
+        run: node .build/newtracker/validate.mjs
+
+      # test-np-score evals the built data asset ("run after a rebuild").
+      - name: Build the site
+        run: node .build/newtracker/build.mjs
+
+      # All six suites pass on a clean checkout: the fixture caches they
+      # read (.build/newspoll-src, .build/redbridge-src) are tracked in git.
+      - name: Run the test suites
+        run: |
+          set -e
+          node .build/test-citation-check.mjs
+          node .build/test-site-check.mjs
+          node .build/test-infogram.mjs
+          node .build/test-news24-infogram.mjs
+          node .build/test-redbridge.mjs
+          node .build/newtracker/test-np-score.mjs

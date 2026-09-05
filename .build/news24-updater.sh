@@ -34,6 +34,15 @@ mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
 . "$REPO/.build/git-push-main.sh"
 
+# One repo-wide lock across all writing wrappers. This wrapper also never
+# had the freshness pre-flight at all — same shared call as the others.
+acquire_slot_lock
+if git diff --quiet && git diff --cached --quiet; then
+  freshness_sync || exit 0
+else
+  log "working tree dirty; skipping freshness sync"
+fi
+
 EXTRACT_OUT="$(NEWSIE_CHROME=1 node .build/extract-news24.mjs 2>&1)"
 CODE=$?
 LAST_LINE="$(echo "$EXTRACT_OUT" | tail -1)"

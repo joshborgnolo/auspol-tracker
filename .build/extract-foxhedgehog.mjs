@@ -50,6 +50,7 @@ import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync } from "
 import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { melbourneMinute } from "./melbourne-time.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -164,9 +165,10 @@ function rssItems(xml) {
   return items;
 }
 
-// RSS pubDate (UTC) → canon `published` local form (AEST fixed +10, the
-// YouGov extractor's wiki-pubDate convention)
-const rssToLocal = (pub) => new Date(Date.parse(pub) + 10 * 36e5).toISOString().slice(0, 16);
+// RSS pubDate (UTC) → canon `published` local form (Melbourne-local via
+// ./melbourne-time.mjs, the roymorgan extractor's convention — a fixed +10
+// was wrong half the year)
+const rssToLocal = (pub) => melbourneMinute(new Date(Date.parse(pub)));
 
 // ---------------------------------------------------------------- article
 // Split sqs-html-content into {label, href} pairs: every "Link to <label>:"

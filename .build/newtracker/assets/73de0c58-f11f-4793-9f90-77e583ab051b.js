@@ -1414,6 +1414,46 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
   );
 }
 
+/* Error boundaries. Before these, ANY render throw anywhere in the tree
+   unmounted the whole createRoot root, leaving the reader a blank page
+   over a faded static summary - and the data pipeline (a wave landing at
+   06:00 via CI) is exactly when nobody is watching. Two rings:
+   ViewBoundary wraps the tab panel, so a bad view is a notice in that
+   tab while the strip and the other tabs keep working; the keyed
+   .view-enter wrapper above it remounts it per tab, so switching views
+   clears the error. RootBoundary wraps App at the mount call; its catch
+   undoes precisely what mount did - body.js off, the aria-hidden put
+   back - so the static summary steps back up as the page, the same
+   degradation every no-JS reader already gets. */
+class ViewBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { err: null }; }
+  static getDerivedStateFromError(err) { return { err }; }
+  componentDidCatch(err) { console.error("view render failed:", err); }
+  render() {
+    if (this.state.err) {
+      return (
+        <div className="view-error" role="alert">
+          <p>This view hit an error and could not display. The rest of the page is unaffected.</p>
+          <button type="button" className="view-error-retry"
+            onClick={() => this.setState({ err: null })}>Try again</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+class RootBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { err: null }; }
+  static getDerivedStateFromError(err) { return { err }; }
+  componentDidCatch(err) {
+    console.error("app render failed:", err);
+    document.body.classList.remove("js");
+    const ss = document.querySelector(".static-summary");
+    if (ss) ss.removeAttribute("aria-hidden");
+  }
+  render() { return this.state.err ? null : this.props.children; }
+}
+
 function App() {
   /* body.js is the "app has mounted" flag (see the boot block below), so it
      is added by the first COMMIT, from this layout effect, and not by the
@@ -1627,16 +1667,18 @@ function App() {
         <div className="view-enter content" key={tab}
              role="tabpanel" id={"panel-" + tab} aria-labelledby={"tab-" + tab}
              tabIndex={0}>
-          {tab === "snapshot" && (
-            <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter}
-                          tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />
-          )}
-          {tab === "cycles" && <PastCyclesView />}
-          {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
-            backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null} />}
-          {tab === "info" && <InfoView focus={focusTerm ? focusTerm.id : null}
-            onBack={focusTerm ? backFromTerm : null}
-            backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}
+          <ViewBoundary>
+            {tab === "snapshot" && (
+              <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter}
+                            tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />
+            )}
+            {tab === "cycles" && <PastCyclesView />}
+            {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
+              backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null} />}
+            {tab === "info" && <InfoView focus={focusTerm ? focusTerm.id : null}
+              onBack={focusTerm ? backFromTerm : null}
+              backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}
+          </ViewBoundary>
         </div>
         <MethodNote onInfo={tab === "info" ? null : () => goTab("info")} />
       </main>
@@ -1704,4 +1746,6 @@ if (staticSummary) {
      mend as well. */
   staticSummary.setAttribute("aria-hidden", "true");
 }
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <RootBoundary><App /></RootBoundary>
+);

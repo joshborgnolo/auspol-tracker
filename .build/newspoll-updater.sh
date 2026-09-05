@@ -24,16 +24,16 @@ mkdir -p "$LOG_DIR"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$LOG"; }
 . "$REPO/.build/git-push-main.sh"
 
+# One repo-wide lock across all writing wrappers; freshness_sync (shared,
+# with wedge recovery) replaces the inline ff-only block below.
+acquire_slot_lock
+
 # The GitHub Actions newspoll-update job may push to main between local
 # launchd slots. Refresh first; if the local tree can't fast-forward, skip
 # this slot rather than commit on a stale base. (Same guard as the migrated
 # siblings — required before the two schedules can coexist.)
 if git diff --quiet && git diff --cached --quiet; then
-  git fetch origin -q || true
-  if ! git merge --ff-only origin/main >> "$LOG" 2>&1; then
-    log "local main diverged from origin/main; skipping slot"
-    exit 0
-  fi
+  freshness_sync || exit 0
 else
   log "working tree dirty; skipping freshness sync"
 fi

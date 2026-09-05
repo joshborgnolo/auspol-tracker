@@ -437,6 +437,25 @@ body.js #root {
    dot hides with the app, so the way back is the portaled .ss-back pill. */
 body.js.ss-view .static-summary { opacity: 1; pointer-events: auto; }
 body.js.ss-view #root { display: none; }
+
+/* ViewBoundary's notice (see the mount layer): when one tab's view throws,
+   the rest of the app - tab strip, other tabs - is still the page, so the
+   notice is a quiet hairline card inside the panel, not a takeover. The
+   root-level failure mode has no styles of its own: it restores the static
+   summary by dropping body.js, and the article is already styled. */
+.view-error {
+  margin: 48px auto; max-width: 560px; padding: 24px;
+  border: 1px solid var(--line); border-radius: 8px;
+  text-align: center; color: var(--ink-2);
+}
+.view-error p { margin: 0 0 14px; font-size: 14.5px; line-height: 1.55; }
+.view-error-retry {
+  font: inherit; font-size: 13px; padding: 8px 14px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: transparent; color: var(--ink); cursor: pointer;
+}
+.view-error-retry:hover { border-color: var(--ink-3); }
+
 .ss-back {
   position: fixed; right: 18px; bottom: 18px; z-index: 300;
   padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
@@ -8814,9 +8833,28 @@ const __TWEAKS_STYLE = `
 
 // ── useTweaks ───────────────────────────────────────────────────────────────
 // Single source of truth for tweak values. setTweak persists via the host
-// (__edit_mode_set_keys → host rewrites the EDITMODE block on disk).
+// (__edit_mode_set_keys → host rewrites the EDITMODE block on disk) AND to
+// localStorage. The host message does nothing on the live site — there is no
+// edit-mode host in production — so without the localStorage side every
+// visitor's theme/layout choices silently reset to defaults each visit.
+const TWEAKS_STORE_KEY = 'auspol.tweaks';
+function loadStoredTweaks(defaults) {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TWEAKS_STORE_KEY) || 'null');
+    if (!stored || typeof stored !== 'object') return defaults;
+    // Merge only keys the app still knows: a stale stored value (or junk
+    // another origin-sharing page wrote) must not revive a retired key.
+    const merged = {
+      ...defaults
+    };
+    for (const k of Object.keys(defaults)) if (k in stored) merged[k] = stored[k];
+    return merged;
+  } catch {
+    return defaults;
+  }
+}
 function useTweaks(defaults) {
-  const [values, setValues] = React.useState(defaults);
+  const [values, setValues] = React.useState(() => loadStoredTweaks(defaults));
   // Accepts either setTweak('key', value) or setTweak({ key: value, ... }) so a
   // useState-style call doesn't write a "[object Object]" key into the persisted
   // JSON block.
@@ -8824,10 +8862,19 @@ function useTweaks(defaults) {
     const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null ? keyOrEdits : {
       [keyOrEdits]: val
     };
-    setValues(prev => ({
-      ...prev,
-      ...edits
-    }));
+    setValues(prev => {
+      const next = {
+        ...prev,
+        ...edits
+      };
+      // setItem throws under private-mode Safari; appearance tweaks are
+      // nice-to-have, so a full quota or a blocked store degrades to the
+      // old session-only behaviour.
+      try {
+        window.localStorage.setItem(TWEAKS_STORE_KEY, JSON.stringify(next));
+      } catch {}
+      return next;
+    });
     window.parent.postMessage({
       type: '__edit_mode_set_keys',
       edits
@@ -21128,6 +21175,71 @@ function SnapshotView({
     rangeId: rangeId
   }));
 }
+
+/* Error boundaries. Before these, ANY render throw anywhere in the tree
+   unmounted the whole createRoot root, leaving the reader a blank page
+   over a faded static summary - and the data pipeline (a wave landing at
+   06:00 via CI) is exactly when nobody is watching. Two rings:
+   ViewBoundary wraps the tab panel, so a bad view is a notice in that
+   tab while the strip and the other tabs keep working; the keyed
+   .view-enter wrapper above it remounts it per tab, so switching views
+   clears the error. RootBoundary wraps App at the mount call; its catch
+   undoes precisely what mount did - body.js off, the aria-hidden put
+   back - so the static summary steps back up as the page, the same
+   degradation every no-JS reader already gets. */
+class ViewBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      err: null
+    };
+  }
+  static getDerivedStateFromError(err) {
+    return {
+      err
+    };
+  }
+  componentDidCatch(err) {
+    console.error("view render failed:", err);
+  }
+  render() {
+    if (this.state.err) {
+      return /*#__PURE__*/React.createElement("div", {
+        className: "view-error",
+        role: "alert"
+      }, /*#__PURE__*/React.createElement("p", null, "This view hit an error and could not display. The rest of the page is unaffected."), /*#__PURE__*/React.createElement("button", {
+        type: "button",
+        className: "view-error-retry",
+        onClick: () => this.setState({
+          err: null
+        })
+      }, "Try again"));
+    }
+    return this.props.children;
+  }
+}
+class RootBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      err: null
+    };
+  }
+  static getDerivedStateFromError(err) {
+    return {
+      err
+    };
+  }
+  componentDidCatch(err) {
+    console.error("app render failed:", err);
+    document.body.classList.remove("js");
+    const ss = document.querySelector(".static-summary");
+    if (ss) ss.removeAttribute("aria-hidden");
+  }
+  render() {
+    return this.state.err ? null : this.props.children;
+  }
+}
 function App() {
   /* body.js is the "app has mounted" flag (see the boot block below), so it
      is added by the first COMMIT, from this layout effect, and not by the
@@ -21386,7 +21498,7 @@ function App() {
     id: "panel-" + tab,
     "aria-labelledby": "tab-" + tab,
     tabIndex: 0
-  }, tab === "snapshot" && /*#__PURE__*/React.createElement(SnapshotView, {
+  }, /*#__PURE__*/React.createElement(ViewBoundary, null, tab === "snapshot" && /*#__PURE__*/React.createElement(SnapshotView, {
     rangeId: rangeId,
     setRangeId: setRangeId,
     showScatter: t.showScatter,
@@ -21400,7 +21512,7 @@ function App() {
     focus: focusTerm ? focusTerm.id : null,
     onBack: focusTerm ? backFromTerm : null,
     backLabel: focusTerm && focusTerm.back ? focusTerm.back.from : null
-  })), /*#__PURE__*/React.createElement(MethodNote, {
+  }))), /*#__PURE__*/React.createElement(MethodNote, {
     onInfo: tab === "info" ? null : () => goTab("info")
   })), /*#__PURE__*/React.createElement(TweaksPanel, null, /*#__PURE__*/React.createElement(TweakSection, {
     label: "Appearance"
@@ -21466,7 +21578,7 @@ if (staticSummary) {
      mend as well. */
   staticSummary.setAttribute("aria-hidden", "true");
 }
-ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));</script>
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(RootBoundary, null, /*#__PURE__*/React.createElement(App, null)));</script>
 
 
 </body></html>

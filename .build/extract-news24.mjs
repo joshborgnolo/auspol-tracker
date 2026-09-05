@@ -93,6 +93,7 @@ import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import { IG_EMBED } from "./infogram.mjs";
 import { n24IdsOf, n24InfogramFetch, n24Figures, n24Corroborate } from "./news24-infogram.mjs";
+import { melbourneMinute } from "./melbourne-time.mjs";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
@@ -105,9 +106,9 @@ const FETCH_TRIES = 3;
 const RSS = "https://yougov.com/en/rss";
 const DAY = 86400000;
 
-// Newspoll releases and this series publish ~05:00 AEST; canon `published`
-// strings are local-without-offset, so AEST (UTC+10 fixed) is applied here.
-const AEST_MS = 10 * 3600_000;
+// Newspoll releases and this series publish ~05:00 AEST/AEDT; canon
+// `published` strings are local-without-offset — Melbourne-local conversion
+// lives in ./melbourne-time.mjs (a fixed UTC+10 was wrong half the year).
 
 // Fallback wave source: the Wikipedia poll table's wikitext. Used only for
 // waves with no yougov.com release — historically the norm (an Aug 2026
@@ -338,11 +339,8 @@ function news24Published(html) {
   const raw = html.match(/"datePublished"\s*:\s*"([^"]+)"/i)?.[1];
   const t = raw ? new Date(raw) : null;
   if (!t || isNaN(t)) return { published: null, pubIso: null };
-  const a = new Date(t.getTime() + AEST_MS);
-  return {
-    published: `${dateIso(a)}T${String(a.getUTCHours()).padStart(2, "0")}:${String(a.getUTCMinutes()).padStart(2, "0")}`,
-    pubIso: dateIso(a),
-  };
+  const published = melbourneMinute(t);
+  return published ? { published, pubIso: published.slice(0, 10) } : { published: null, pubIso: null };
 }
 
 function news24Window(t, pubIso) {
@@ -553,9 +551,8 @@ async function parseArticle(url, id) {
     if (pm) {
       const t = new Date(pm[1]);
       if (!isNaN(t)) {
-        const a = new Date(t.getTime() + AEST_MS);
-        published = `${dateIso(a)}T${String(a.getUTCHours()).padStart(2, "0")}:${String(a.getUTCMinutes()).padStart(2, "0")}`;
-        pubIso = dateIso(a);
+        published = melbourneMinute(t);
+        pubIso = published ? published.slice(0, 10) : null;
       }
     }
   }

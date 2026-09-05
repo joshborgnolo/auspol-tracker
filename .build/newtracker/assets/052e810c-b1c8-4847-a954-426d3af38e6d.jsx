@@ -169,16 +169,38 @@ const __TWEAKS_STYLE = `
 
 // ── useTweaks ───────────────────────────────────────────────────────────────
 // Single source of truth for tweak values. setTweak persists via the host
-// (__edit_mode_set_keys → host rewrites the EDITMODE block on disk).
+// (__edit_mode_set_keys → host rewrites the EDITMODE block on disk) AND to
+// localStorage. The host message does nothing on the live site — there is no
+// edit-mode host in production — so without the localStorage side every
+// visitor's theme/layout choices silently reset to defaults each visit.
+const TWEAKS_STORE_KEY = 'auspol.tweaks';
+function loadStoredTweaks(defaults) {
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(TWEAKS_STORE_KEY) || 'null');
+    if (!stored || typeof stored !== 'object') return defaults;
+    // Merge only keys the app still knows: a stale stored value (or junk
+    // another origin-sharing page wrote) must not revive a retired key.
+    const merged = { ...defaults };
+    for (const k of Object.keys(defaults)) if (k in stored) merged[k] = stored[k];
+    return merged;
+  } catch { return defaults; }
+}
 function useTweaks(defaults) {
-  const [values, setValues] = React.useState(defaults);
+  const [values, setValues] = React.useState(() => loadStoredTweaks(defaults));
   // Accepts either setTweak('key', value) or setTweak({ key: value, ... }) so a
   // useState-style call doesn't write a "[object Object]" key into the persisted
   // JSON block.
   const setTweak = React.useCallback((keyOrEdits, val) => {
     const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
       ? keyOrEdits : { [keyOrEdits]: val };
-    setValues((prev) => ({ ...prev, ...edits }));
+    setValues((prev) => {
+      const next = { ...prev, ...edits };
+      // setItem throws under private-mode Safari; appearance tweaks are
+      // nice-to-have, so a full quota or a blocked store degrades to the
+      // old session-only behaviour.
+      try { window.localStorage.setItem(TWEAKS_STORE_KEY, JSON.stringify(next)); } catch {}
+      return next;
+    });
     window.parent.postMessage({ type: '__edit_mode_set_keys', edits }, '*');
     // Same-window signal so in-page listeners (deck-stage rail thumbnails)
     // can react – the parent message only reaches the host, not peers.

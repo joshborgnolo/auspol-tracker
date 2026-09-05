@@ -345,6 +345,25 @@ body.js #root {
    dot hides with the app, so the way back is the portaled .ss-back pill. */
 body.js.ss-view .static-summary { opacity: 1; pointer-events: auto; }
 body.js.ss-view #root { display: none; }
+
+/* ViewBoundary's notice (see the mount layer): when one tab's view throws,
+   the rest of the app - tab strip, other tabs - is still the page, so the
+   notice is a quiet hairline card inside the panel, not a takeover. The
+   root-level failure mode has no styles of its own: it restores the static
+   summary by dropping body.js, and the article is already styled. */
+.view-error {
+  margin: 48px auto; max-width: 560px; padding: 24px;
+  border: 1px solid var(--line); border-radius: 8px;
+  text-align: center; color: var(--ink-2);
+}
+.view-error p { margin: 0 0 14px; font-size: 14.5px; line-height: 1.55; }
+.view-error-retry {
+  font: inherit; font-size: 13px; padding: 8px 14px;
+  border: 1px solid var(--line); border-radius: 999px;
+  background: transparent; color: var(--ink); cursor: pointer;
+}
+.view-error-retry:hover { border-color: var(--ink-3); }
+
 .ss-back {
   position: fixed; right: 18px; bottom: 18px; z-index: 300;
   padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
