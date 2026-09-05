@@ -87,6 +87,7 @@ const PAGE_READ = `(() => {
       paddingLeft: getComputedStyle(col).paddingLeft,
     } : null,
     back: g(".ss-back", ["position", "fontSize", "fontWeight", "borderRadius"]),
+    icon: (document.querySelector('link[rel="icon"]') || {}).href || null,
     serif600Loaded: document.fonts.check('600 34px "Crimson Text"'),
     sansLoaded: document.fonts.check('400 15px "IBM Plex Sans"'),
     gone: {
@@ -149,6 +150,8 @@ try {
         eq("ss-back position", got.back.position, "fixed");
         eq("ss-back radius", got.back.borderRadius, "999px");
       }
+      // satellites all link the live masthead glyph, emitted at build time
+      eq("favicon link", got.icon, "http://127.0.0.1:8733/assets/favicon.svg");
       const crimson600 = fontReqs.some((f) => f.includes("crimsontext-600"));
       const retired = fontReqs.filter((f) => /sourceserif4|sourcesans3/.test(f));
       if (crimson600) ok("crimsontext-600 woff2 served"); else fail("crimsontext-600 woff2 never requested");

@@ -1,6 +1,6 @@
 ---
 name: auspol-satellite-page-branding
-description: auspol-tracker — standalone satellite pages (the /archives/ trio newspoll / acnielsen / morgan, hand- or generator-maintained OUTSIDE .build/newtracker; /newspoll-archive/ is a redirect stub; auspol-polling.html). Current /archives/ recipe (post user-correction, 2026-09-03): FULL static-article chrome — NO masthead lockup, NO glyph dial, NO tagline, NO wordmark. Page opens with a Crimson Text h1 + ss-sub paragraph in the static summary's 680px column (Morgan 1200px for tables), Crimson 400/600 + IBM Plex Sans faces only, serif h2 sections, ss-note footer, fixed .ss-back "← Back to the interactive tracker" pill. Copy the RENDERED values not the source rules: .static-summary p outranks .ss-sub/.ss-note on the live page, so sub+note actually run 14.5px/1.6 ink-2 (declared source says 15px/1.55 and 12.5px ink-3 — probe-caught). THE PALETTE TRAP: body.editorial is default, --bg is oklch(0.975 0.009 80) light / oklch(0.205 0.010 65) dark. Theme via @media prefers-color-scheme :root mirror. Verify with .matilda/verify-archive-static/probe.mjs (compares computed styles vs the live no-JS static summary in BOTH schemes + woff2 request log). For archival assets, MIRROR them into the repo rather than hotlinking.
+description: auspol-tracker — standalone satellite pages (the /archives/ trio newspoll / acnielsen / morgan, hand- or generator-maintained OUTSIDE .build/newtracker; /newspoll-archive/ is a redirect stub; auspol-polling.html). Current /archives/ recipe (post user-correction, 2026-09-03): FULL static-article chrome — NO masthead lockup, NO glyph dial, NO tagline, NO wordmark. Page opens with a Crimson Text h1 + ss-sub paragraph in the static summary's 680px column (Morgan 1200px for tables), Crimson 400/600 + IBM Plex Sans faces only, serif h2 sections, ss-note footer, fixed .ss-back "← Back to the interactive tracker" pill. Copy the RENDERED values not the source rules: .static-summary p outranks .ss-sub/.ss-note on the live page, so sub+note actually run 14.5px/1.6 ink-2 (declared source says 15px/1.55 and 12.5px ink-3 — probe-caught). THE PALETTE TRAP: body.editorial is default, --bg is oklch(0.975 0.009 80) light / oklch(0.205 0.010 65) dark. Theme via @media prefers-color-scheme :root mirror. Verify with .matilda/verify-archive-static/probe.mjs (compares computed styles vs the live no-JS static summary in BOTH schemes + woff2 request log; also asserts each page's favicon link is /assets/favicon.svg). Favicon: every satellite links /assets/favicon.svg, which build.mjs re-writes each build from the LIVE masthead-glyph SVG — never re-freeze a data-URI icon in. For archival assets, MIRROR them into the repo rather than hotlinking.
 source: auto-skill
 extracted_at: '2026-09-03T00:00:00.000Z'
 ---
@@ -31,10 +31,15 @@ extracted_at: '2026-09-03T00:00:00.000Z'
   site**: the footer disclaimer's "Full archives here" link targets /archives.
 - `auspol-polling.html` — older standalone page; **may still carry the RETIRED masthead
   recipe below** — it has not been re-assimilated. Check before copying anything from it.
-- All three real archive pages share the same tabs strip; it is
-  `<nav class="tabs">` of `<a class="tab">` links (no JS tabs). Adding a fourth archive tab
-  means editing the tab strip on ALL pages (both hand-maintained ones + the `renderPage`
-  template inside `.build/refresh-morgan-archive.mjs`) — the strips do NOT auto-sync.
+- The five real archive pages (newspoll / acnielsen / morgan / galaxy / trove) share the
+  same tabs strip; it is `<nav class="tabs">` of `<a class="tab">` links (no JS tabs).
+  The strip lives in FIVE homes that do NOT auto-sync: the two hand-maintained pages
+  (newspoll, acnielsen) + the renderPage templates in `.build/refresh-morgan-archive.mjs`,
+  `.build/refresh-galaxy-archive.mjs`, `.build/refresh-trove-archive.mjs`. Adding an
+  archive tab means editing ALL of them. Lived example (fixed 2026-09-05): the Trove tab
+  shipped to every home EXCEPT the morgan template — HEAD's generated morgan page had it
+  (hand-synced) but the template didn't, so any offline regeneration silently dropped it
+  and the template↔output diff only surfaced on the next unrelated rebuild.
 
 ## SITEMAP TRAP (d2fa826, b89d44e): archive routes are BUILD OUTPUT
 
@@ -87,6 +92,18 @@ masthead at all — just an `<h1>` and a sub paragraph — so the archive pages 
   no ss-view machinery on a static page.
 - **`.ss-note` satellite footer**: "This is a satellite archive page of
   <a href="/">auspol tracker</a> …", rendered-value styling above, `margin-top:20px`.
+- **Favicon (2026-09-05)**: `<link rel="icon" href="/assets/favicon.svg">`. build.mjs
+  writes its live `buildFavicon()` masthead-glyph SVG (quarter arcs + graduation bars from
+  the aggregated primaries + 2PP needle, oklch→rgb) to that STABLE unhashed path on every
+  build — satellites link it, so their tab icon tracks the main site's glyph automatically.
+  The pre-2026-09-05 topology was the lesson: every satellite carried its own frozen copy
+  of the 2024-era bars data-URI (`viewBox='0 0 32 32'`, bg `%230b1d2c`, bars
+  `%23d62828/%23b08d39/%23ec7a08`) while the main site regenerated its icon per build —
+  never re-freeze a data-URI icon into a satellite. The link lives in all four generator
+  templates (refresh-{morgan,galaxy,trove}-archive.mjs, refresh-prediction.mjs) and the
+  hand-maintained pages. **feedback/index.html and auspol-polling.html STILL carry the old
+  bars icon (deliberately untouched 2026-09-05, out of the user's scope)** — flag, don't
+  silently propagate either way.
 
 ## RETIRED recipe (kept for reference — auspol-polling.html may still use it)
 
@@ -125,7 +142,8 @@ EACH of light and dark (`page.emulateMediaFeatures`):
    per the rendered-value trap above).
 2. Loads each archive page and compares computed styles: body background, h1 (family/size/
    weight/letter-spacing/margin/colour), ss-sub, ss-note, column max-width + paddings,
-   .ss-back (fixed + 999px radius).
+   .ss-back (fixed + 999px radius); asserts the page's `<link rel="icon">` href is
+   `assets/favicon.svg`.
 3. Checks the retired chrome is gone (`.site-head`, `.wm-dial`, `.wordmark` absent) and the
    server-side woff2 log shows crimsontext-600 served and NO sourceserif4/sourcesans3
    requests.

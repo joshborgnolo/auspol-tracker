@@ -324,6 +324,11 @@ function pastCycleWord() {
 const fav = buildFavicon();
 console.log("  favicon:", fav.note);
 console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches --bg / the pinned bar)`);
+/* The satellite pages (/archives/*, /prediction/) link this file as their tab
+   icon instead of carrying their own copies, so every page shows the
+   masthead's current glyph. Stable unhashed name - the satellites' <link> is
+   the point; a content hash would orphan them. */
+writeAtomic(path.join(ROOT, "assets", "favicon.svg"), fav.svg + "\n");
 const favicon = encodeURIComponent(fav.svg);
 
 /* ---- 4b. the article version of the page ---------------------------------

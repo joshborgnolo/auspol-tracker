@@ -215,7 +215,7 @@ function renderPage(sections, fetchedIso) {
 <meta property="og:description" content="Roy Morgan's published vote-intention tables, transcribed table-for-table from roymorgan.com.">
 <meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://auspoltracker.com/archives/morgan/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1d2c'/%3E%3Crect x='6' y='15' width='5' height='11' fill='%23d62828'/%3E%3Crect x='13.5' y='8' width='5' height='18' fill='%23b08d39'/%3E%3Crect x='21' y='18' width='5' height='8' fill='%23ec7a08'/%3E%3C/svg%3E">
+<link rel="icon" href="/assets/favicon.svg">
 <style>
 /* ------- fonts: the two cuts the static article runs ------- */
 @font-face {
@@ -384,6 +384,7 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
   <a class="tab" href="/archives/acnielsen/">AC Nielsen</a>
   <a class="tab active" aria-current="page" href="/archives/morgan/">Morgan</a>
   <a class="tab" href="/archives/galaxy/">Galaxy</a>
+  <a class="tab" href="/archives/trove/">Trove</a>
 </nav>
 <main class="frame-wrap">
   <h1>Morgan Poll archive</h1>
