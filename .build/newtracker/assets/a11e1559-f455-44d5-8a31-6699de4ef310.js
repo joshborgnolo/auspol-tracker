@@ -2177,7 +2177,9 @@ function PollLedger({ r, dirSegments }) {
 
       <PdSec label="First preferences">
         <p className="pd-s">
-          {primarySegs(r).map((x, i) => (
+          {/* largest recorded share first – a fresh array each call, so the
+              in-place sort cannot disturb ArchPublished's fixed party order */}
+          {primarySegs(r).sort((a, b) => b.value - a.value).map((x, i) => (
             <React.Fragment key={i}>
               {i > 0 && ", "}
               <span className={"pd-grp" + (x.muted ? " pd-s-note" : "")}>

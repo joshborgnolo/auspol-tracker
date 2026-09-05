@@ -12138,7 +12138,7 @@ function PollLedger({
     label: "First preferences"
   }, /*#__PURE__*/React.createElement("p", {
     className: "pd-s"
-  }, primarySegs(r).map((x, i) => /*#__PURE__*/React.createElement(React.Fragment, {
+  }, primarySegs(r).sort((a, b) => b.value - a.value).map((x, i) => /*#__PURE__*/React.createElement(React.Fragment, {
     key: i
   }, i > 0 && ", ", /*#__PURE__*/React.createElement("span", {
     className: "pd-grp" + (x.muted ? " pd-s-note" : "")
