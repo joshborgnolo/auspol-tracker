@@ -1274,9 +1274,15 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
         </div>
         <p className="hero-caption">
           {m.real
-            ? "Each dot is one published poll; the line is a smoothed average across all pollsters, "
-              + "shaded with the interval around it. Where the two bands overlap, the lead is "
-              + "inside its own margin of error – the polls cannot separate the parties that month."
+            ? (<>Each dot is one published poll; the line is a{" "}
+               <button type="button" className="hi-term"
+                       title="Why the newest dots can sit past the line’s end"
+                       onClick={() => window.AP.openTerm &&
+                         window.AP.openTerm("dots-past-the-line", "two-party preferred")}>
+                 smoothed average</button>
+               {" "}across all pollsters, shaded with the interval around it. Where the two
+               bands overlap, the lead is inside its own margin of error – the polls cannot
+               separate the parties that month.</>)
             : `Each dot is one pollster’s published ${m.label} head-to-head` +
               (adjusted
                 ? ", adjusted for each house’s lean on this matchup as the headline two-party is."

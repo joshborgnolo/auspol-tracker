@@ -2081,12 +2081,17 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 /* Sits at the end of the detail's own meta line - so it needs no space of its
    own, lands inside the panel's tint rather than on a pale band above it, and
    aligns with the panel's content instead of with the table cell behind it. */
-/* ---- Info: the glossary --------------------------------------------------
+/* ---- Info: the glossary, then the FAQ -----------------------------------
    One paragraph per term, the term bolded and its definition running straight
    on from it. A printed glossary's shape rather than a table's, because these
    are sentences and not fields - and a measure narrower than the page, because
-   they are read rather than scanned. */
+   they are read rather than scanned. The FAQ below reuses the same typography
+   with the question carrying the bold. */
 .info { max-width: 66ch; }
+/* section titles inside the card: the card-title face with glossary spacing */
+.info-h { margin: 2px 0 18px; }
+.info-h-faq { margin-top: 34px; padding-top: 22px;
+  border-top: 1px solid var(--line-2); }
 .info-term { margin: 0 0 20px; font-size: 15px; line-height: 1.62;
   color: var(--ink-2); text-wrap: pretty; }
 .info-t { color: var(--ink); font-weight: 700; }
@@ -18191,7 +18196,7 @@ function infoTerms(D) {
   }, {
     id: "individual-poll",
     term: "Individual poll",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "One published poll, drawn as a single dot. The lines through them are monthly aggregates, shaded with the 95% interval around them; where two bands meet, that month\u2019s lead is inside its own ", xref("margin-of-error", "individual poll", "margin of error"), ". A \u201C\u2014\u201D in any table means the pollster did not ask that question.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "One published poll, drawn as a single dot. The lines through them are monthly aggregates, shaded with the 95% interval around them; where two bands meet, that month\u2019s lead is inside its own ", xref("margin-of-error", "individual poll", "margin of error"), ". The FAQ below asks", " ", xref("dots-past-the-line", "individual poll", "why the newest dots can sit past the line’s end"), ". A \u201C\u2014\u201D in any table means the pollster did not ask that question.")
   }, {
     id: "margin-of-error",
     term: "Margin of error",
@@ -18263,46 +18268,34 @@ function infoTerms(D) {
     term: "Aggregate effect",
     body: /*#__PURE__*/React.createElement(React.Fragment, null, "A poll\u2019s own pull on the figure a reader watches. The poll breakdown recomputes the", " ", xref("weighted-aggregate", "aggregate effect", "weighted aggregate"), " without this one poll and prints the difference as a signed move: \u201C+0.1 for ALP\u201D is a tenth of a point of today\u2019s two-party that exists only while this wave sits in the window. It is a pull on today\u2019s number, not a verdict on the poll \u2013 a wave older than the 21-day window moves nothing now and says so, with what it was worth on its own publication day where that can still be estimated. One clause prints per aggregate the wave feeds: the published two-party; the ", " ", xref("implied-2pp", "aggregate effect", "implied two-party"), " for a wave that published no pair, whose primaries still move that estimate; and Labor against One Nation where the wave asked it. The leans stand as measured \u2013 a", " ", xref("house-effect", "aggregate effect", "house effect"), " is a property of the pollster, not the poll, so only the nowcast itself is re-run on the remaining waves.")
   }];
+  /* Questions whose answers ARE the explanation, in the plainest words the
+     reader would type - rendered beneath the glossary, and targetable by
+     openTerm exactly the way a term is (the id must not collide with one). */
+  const faqs = [{
+    id: "dots-past-the-line",
+    q: "Why do the newest poll dots sit past the end of the line?",
+    a: /*#__PURE__*/React.createElement(React.Fragment, null, "Because the two markings keep different clocks. Each dot is one ", xref("individual-poll", "dots past the line", "individual poll"), " drawn at its own fieldwork midpoint, so a wave finishing on the 30th lands late in its month. The line has no points for individual polls at all: it prints one point per calendar month \u2013 pooling every poll whose fieldwork closed inside that month, house-corrected and sample-weighted exactly as the ", xref("weighted-aggregate", "dots past the line", "weighted aggregate"), " does, its recency decay dropped \u2013 and that point is drawn at the month\u2019s midpoint, because a month is read at its centre. The rightmost point is therefore always the current month, pinned at its centre; after mid-month the newest dots must sit to its right even though they are already inside the very estimate it marks. The line steps forward the moment the first poll closes in a new month \u2013 the point appears at the new month\u2019s midpoint in the same build \u2013 so in the meantime, up to half a month of dots can run ahead of it. That is lag in the ink, not in the estimate: the headline figure is never read off this line but from the 21-day nowcast, which moves with every poll published.")
+  }];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"
-     sorts as a number and not as the character 9. */
-  return list.sort((a, b) => a.term.localeCompare(b.term, "en", {
-    numeric: true
-  }));
+     sorts as a number and not as the character 9. The faqs stay in authored
+     order - they number so few that grouping beats alphabetising. */
+  return {
+    terms: list.sort((a, b) => a.term.localeCompare(b.term, "en", {
+      numeric: true
+    })),
+    faqs
+  };
 }
-function InfoView({
-  focus,
+
+/* One question target renders the same back-home affordance either section
+   offers it: the way back belongs to the entry that answered, not to the
+   section that holds it. */
+function InfoBack({
   onBack,
   backLabel
 }) {
-  const {
-    D
-  } = window.AP;
-  const terms = infoTerms(D);
-  /* A layout effect, for the reason the archive's restore uses one: the view
-     has to be in the DOM before it is tall enough to take the scroll. */
-  React.useLayoutEffect(() => {
-    if (!focus) return;
-    const el = document.getElementById("term-" + focus);
-    if (el) el.scrollIntoView({
-      block: "center",
-      behavior: "auto"
-    });
-  }, [focus]);
-  return /*#__PURE__*/React.createElement("section", {
-    className: "card info"
-  }, terms.map(t =>
-  /*#__PURE__*/
-  /* a div, not a p: the preference-flows entry embeds TrendChart and
-     TrendChart's root is a div. .info-term is only ever selected by
-     class, so the paragraph styling is unchanged. */
-  React.createElement("div", {
-    key: t.id,
-    id: "term-" + t.id,
-    className: "info-term" + (focus === t.id ? " lit" : "")
-  }, /*#__PURE__*/React.createElement("strong", {
-    className: "info-t"
-  }, t.term, "."), " ", t.body, focus === t.id && onBack && /*#__PURE__*/React.createElement("button", {
+  return /*#__PURE__*/React.createElement("button", {
     className: "back-to-chart info-back",
     onClick: onBack
   }, /*#__PURE__*/React.createElement("svg", {
@@ -18317,7 +18310,60 @@ function InfoView({
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("path", {
     d: "M19 12H5M11 18l-6-6 6-6"
-  })), "Back to ", backLabel || "where you were"))));
+  })), "Back to ", backLabel || "where you were");
+}
+function InfoView({
+  focus,
+  onBack,
+  backLabel
+}) {
+  const {
+    D
+  } = window.AP;
+  const {
+    terms,
+    faqs
+  } = infoTerms(D);
+  /* A layout effect, for the reason the archive's restore uses one: the view
+     has to be in the DOM before it is tall enough to take the scroll. */
+  React.useLayoutEffect(() => {
+    if (!focus) return;
+    const el = document.getElementById("term-" + focus);
+    if (el) el.scrollIntoView({
+      block: "center",
+      behavior: "auto"
+    });
+  }, [focus]);
+  return /*#__PURE__*/React.createElement("section", {
+    className: "card info"
+  }, /*#__PURE__*/React.createElement("h2", {
+    className: "card-title info-h"
+  }, "Glossary"), terms.map(t =>
+  /*#__PURE__*/
+  /* a div, not a p: the preference-flows entry embeds TrendChart and
+     TrendChart's root is a div. .info-term is only ever selected by
+     class, so the paragraph styling is unchanged. */
+  React.createElement("div", {
+    key: t.id,
+    id: "term-" + t.id,
+    className: "info-term" + (focus === t.id ? " lit" : "")
+  }, /*#__PURE__*/React.createElement("strong", {
+    className: "info-t"
+  }, t.term, "."), " ", t.body, focus === t.id && onBack && /*#__PURE__*/React.createElement(InfoBack, {
+    onBack: onBack,
+    backLabel: backLabel
+  }))), /*#__PURE__*/React.createElement("h2", {
+    className: "card-title info-h info-h-faq"
+  }, "FAQ"), faqs.map(f => /*#__PURE__*/React.createElement("div", {
+    key: f.id,
+    id: "term-" + f.id,
+    className: "info-term" + (focus === f.id ? " lit" : "")
+  }, /*#__PURE__*/React.createElement("strong", {
+    className: "info-t"
+  }, f.q), " ", f.a, focus === f.id && onBack && /*#__PURE__*/React.createElement(InfoBack, {
+    onBack: onBack,
+    backLabel: backLabel
+  }))));
 }
 Object.assign(window, {
   Tabs,
@@ -20889,7 +20935,12 @@ function Hero({
     }
   }), "Implied from primaries at 2025 flows", D.synthLatest && D.synthLatest.alp != null ? ` · ${D.synthLatest.alp.toFixed(1)}` : "")), /*#__PURE__*/React.createElement("p", {
     className: "hero-caption"
-  }, m.real ? "Each dot is one published poll; the line is a smoothed average across all pollsters, " + "shaded with the interval around it. Where the two bands overlap, the lead is " + "inside its own margin of error – the polls cannot separate the parties that month." : `Each dot is one pollster’s published ${m.label} head-to-head` + (adjusted ? ", adjusted for each house’s lean on this matchup as the headline two-party is." : ", averaged monthly – too few houses ask it to weight or correct.") + (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : ""))), matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(true));
+  }, m.real ? /*#__PURE__*/React.createElement(React.Fragment, null, "Each dot is one published poll; the line is a", " ", /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    title: "Why the newest dots can sit past the line\u2019s end",
+    onClick: () => window.AP.openTerm && window.AP.openTerm("dots-past-the-line", "two-party preferred")
+  }, "smoothed average"), " ", "across all pollsters, shaded with the interval around it. Where the two bands overlap, the lead is inside its own margin of error \u2013 the polls cannot separate the parties that month.") : `Each dot is one pollster’s published ${m.label} head-to-head` + (adjusted ? ", adjusted for each house’s lean on this matchup as the headline two-party is." : ", averaged monthly – too few houses ask it to weight or correct.") + (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : ""))), matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(true));
 }
 
 /* ---- report an error ----------------------------------------------------

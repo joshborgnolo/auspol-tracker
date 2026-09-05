@@ -1989,12 +1989,17 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 /* Sits at the end of the detail's own meta line - so it needs no space of its
    own, lands inside the panel's tint rather than on a pale band above it, and
    aligns with the panel's content instead of with the table cell behind it. */
-/* ---- Info: the glossary --------------------------------------------------
+/* ---- Info: the glossary, then the FAQ -----------------------------------
    One paragraph per term, the term bolded and its definition running straight
    on from it. A printed glossary's shape rather than a table's, because these
    are sentences and not fields - and a measure narrower than the page, because
-   they are read rather than scanned. */
+   they are read rather than scanned. The FAQ below reuses the same typography
+   with the question carrying the bold. */
 .info { max-width: 66ch; }
+/* section titles inside the card: the card-title face with glossary spacing */
+.info-h { margin: 2px 0 18px; }
+.info-h-faq { margin-top: 34px; padding-top: 22px;
+  border-top: 1px solid var(--line-2); }
 .info-term { margin: 0 0 20px; font-size: 15px; line-height: 1.62;
   color: var(--ink-2); text-wrap: pretty; }
 .info-t { color: var(--ink); font-weight: 700; }

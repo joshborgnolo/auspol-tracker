@@ -4288,8 +4288,9 @@ function infoTerms(D) {
     { id: "individual-poll", term: "Individual poll", body: (
       <>One published poll, drawn as a single dot. The lines through them are monthly aggregates,
       shaded with the 95% interval around them; where two bands meet, that month’s lead is inside
-      its own {xref("margin-of-error", "individual poll", "margin of error")}. A “—” in any table
-      means the pollster did not ask that question.</>) },
+      its own {xref("margin-of-error", "individual poll", "margin of error")}. The FAQ below asks
+      {" "}{xref("dots-past-the-line", "individual poll", "why the newest dots can sit past the line’s end")}.
+      A “—” in any table means the pollster did not ask that question.</>) },
     { id: "margin-of-error", term: "Margin of error", body: (
       <>How far a poll can miss by because it asked a sample rather than the whole country. A
       thousand respondents on their own carry about ±3 points of sampling error at 95% confidence,
@@ -4444,15 +4445,52 @@ function infoTerms(D) {
       {" "}{xref("house-effect", "aggregate effect", "house effect")} is a property of the
       pollster, not the poll, so only the nowcast itself is re-run on the remaining waves.</>) },
   ];
+  /* Questions whose answers ARE the explanation, in the plainest words the
+     reader would type - rendered beneath the glossary, and targetable by
+     openTerm exactly the way a term is (the id must not collide with one). */
+  const faqs = [
+    { id: "dots-past-the-line", q: "Why do the newest poll dots sit past the end of the line?", a: (
+      <>Because the two markings keep different clocks. Each dot is
+      one {xref("individual-poll", "dots past the line", "individual poll")} drawn at its own
+      fieldwork midpoint, so a wave finishing on the 30th lands late in its month. The line has no
+      points for individual polls at all: it prints one point per calendar month – pooling every
+      poll whose fieldwork closed inside that month, house-corrected and sample-weighted exactly
+      as the {xref("weighted-aggregate", "dots past the line", "weighted aggregate")} does, its
+      recency decay dropped – and that point is drawn at the month’s midpoint, because a month is
+      read at its centre. The rightmost point is therefore always the current month, pinned at its
+      centre; after mid-month the newest dots must sit to its right even though they are already
+      inside the very estimate it marks. The line steps forward the moment the first poll closes
+      in a new month – the point appears at the new month’s midpoint in the same build – so in the
+      meantime, up to half a month of dots can run ahead of it. That is lag in the ink, not in the
+      estimate: the headline figure is never read off this line but from the 21-day nowcast, which
+      moves with every poll published.</>) },
+  ];
   /* Sorted here rather than written in order, so an entry added later cannot
      land in the wrong place. localeCompare with numeric so "95% interval"
-     sorts as a number and not as the character 9. */
-  return list.sort((a, b) => a.term.localeCompare(b.term, "en", { numeric: true }));
+     sorts as a number and not as the character 9. The faqs stay in authored
+     order - they number so few that grouping beats alphabetising. */
+  return { terms: list.sort((a, b) => a.term.localeCompare(b.term, "en", { numeric: true })),
+           faqs };
+}
+
+/* One question target renders the same back-home affordance either section
+   offers it: the way back belongs to the entry that answered, not to the
+   section that holds it. */
+function InfoBack({ onBack, backLabel }) {
+  return (
+    <button className="back-to-chart info-back" onClick={onBack}>
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
+           strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M19 12H5M11 18l-6-6 6-6" />
+      </svg>
+      Back to {backLabel || "where you were"}
+    </button>
+  );
 }
 
 function InfoView({ focus, onBack, backLabel }) {
   const { D } = window.AP;
-  const terms = infoTerms(D);
+  const { terms, faqs } = infoTerms(D);
   /* A layout effect, for the reason the archive's restore uses one: the view
      has to be in the DOM before it is tall enough to take the scroll. */
   React.useLayoutEffect(() => {
@@ -4462,8 +4500,7 @@ function InfoView({ focus, onBack, backLabel }) {
   }, [focus]);
   return (
     <section className="card info">
-      {/* No in-card masthead: the tab that opened this view already names it,
-          and a body of definitions needs no preface. */}
+      <h2 className="card-title info-h">Glossary</h2>
       {terms.map((t) => (
         /* a div, not a p: the preference-flows entry embeds TrendChart and
            TrendChart's root is a div. .info-term is only ever selected by
@@ -4472,13 +4509,20 @@ function InfoView({ focus, onBack, backLabel }) {
              className={"info-term" + (focus === t.id ? " lit" : "")}>
           <strong className="info-t">{t.term}.</strong> {t.body}
           {focus === t.id && onBack && (
-            <button className="back-to-chart info-back" onClick={onBack}>
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor"
-                   strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M19 12H5M11 18l-6-6 6-6" />
-              </svg>
-              Back to {backLabel || "where you were"}
-            </button>
+            <InfoBack onBack={onBack} backLabel={backLabel} />
+          )}
+        </div>
+      ))}
+      {/* The questions sit beneath the definitions under their own title;
+          each carries the same term- anchor so a panel's openTerm can land
+          on a question exactly as it lands on a term. */}
+      <h2 className="card-title info-h info-h-faq">FAQ</h2>
+      {faqs.map((f) => (
+        <div key={f.id} id={"term-" + f.id}
+             className={"info-term" + (focus === f.id ? " lit" : "")}>
+          <strong className="info-t">{f.q}</strong> {f.a}
+          {focus === f.id && onBack && (
+            <InfoBack onBack={onBack} backLabel={backLabel} />
           )}
         </div>
       ))}
