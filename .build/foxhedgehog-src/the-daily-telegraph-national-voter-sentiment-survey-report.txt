@@ -1,0 +1,394 @@
+National Voter Sentiment Survey
+JANUARY 2026
+
+
+
+
+                                  FOX &
+foxhedgehog.com.au
+                                  HEDGEHOG
+CONTENTS
+
+3    Research Methodology Statement
+
+4    Headline Figures - Primary Vote & TPP
+
+6    Three-Party Preferred & TPP Matchups
+
+9    Leadership & Preferred Prime Minister Ratings
+
+12   Voluntary Voting
+
+14   National Issues
+
+
+
+
+                                                     2
+RESEARCH METHODOLOGY STATEMENT
+
+Research conducted by: Fox & Hedgehog
+Client commissioning research: Self-initiated
+Fieldwork dates: 5 January - 6 January 2026
+Mode of data collection: Recruited from online research panels
+Target population: Eligible Australian voters (18+, Australian Citizens)
+Sample Size: 1,608
+Effective sample size post-weighting: 1,038
+Margin of error: 3.0% (larger for subgroups)
+Weighting variables and method: RIM weighting. Age x Gender x Education, Income, Region, State x 2025 Past Vote
+3PP and TPP preference distribution method: Respondent allocated.
+   Three-party preferred (3PP): Respondents who selected Greens, Independent or Other as their first preference were asked
+   which of Labor, the Coalition or One Nation they would prefer in a three-way contest. These responses were then allocated
+   to Labor, the Coalition or One Nation and added to their respective primary votes to produce the 3PP result.
+   Two-party preferred (2PP) match-ups: Separate questions were asked for each hypothetical contest; Labor vs Coalition,
+   Labor vs One Nation, and Coalition vs One Nation. For each match-up, respondents whose first preference was not one of
+   the two parties were allocated according to their stated preference.
+
+                                                                                                                               3
+Headline Figures - Primary Vote & TPP
+
+
+
+
+                                        FOX &
+                                        HEDGEHOG 4
+PRIMARY VOTE & TWO-PARTY PREFERRED
+
+Q: Thinking about federal politics, if a federal election for the House of Representatives was held today, which one of the following
+would you vote for? (Followed by leaner question, voters who express “don’t know” to both main question and leaner are excluded)
+
+
+
+ PRIMARY VOTE                         Labor        Coalition       Greens         One Nation        Independent / Other
+
+
+            January 2026                             29                        25              14                      21      11
+
+
+           2025 Election                                   35                                 32         12        6          15
+
+                           0                  20                  40                   60                     80               100
+ TPP                                                                Labor         Coalition
+
+
+            January 2025                                                     53                                               47
+
+
+           2025 Election                                                        55                                            45
+
+                           0                  20                  40                   60                     80               100
+                                                                                                                                        5
+Three-Party Preferred & TPP Match-ups
+
+
+
+
+                                        FOX &
+                                        HEDGEHOG 6
+THREE-PARTY PREFERRED & TPP MATCH-UPS
+
+As Labor, the Coalition and One Nation all clear 20 per cent of the primary vote, this poll moves beyond the standard two-party
+framework and additionally reports a three-party-preferred (3PP) result. This shows how support would redistribute if all three
+were treated as major contenders. The accompanying 2PP match-ups then show the outcome of each possible head-to-head
+contest once preferences are allocated, to illustrate how different final pairings could produce different election outcomes.
+
+
+ THREE-PARTY PREFERRED (3PP)                                             TPP MATCH-UPS
+
+  One Nation                                                                     Labor         Coalition        One Nation
+    25%
+                                                     Labor v Coalition                             53                           47
+
+                                       Labor
+                                        46%
+                                                   Labor v One Nation                                56                         44
+
+
+
+                                               Coalition v One Nation                                      63                   37
+      Coalition
+        29%                                                              0        20          40           60        80           100
+                                                                                                                                        7
+PRIMARY VOTE, 3PP & TPP - DEMOGRAPHICS
+
+  PRIMARY VOTE - DEMOGRAPHICS                                                         3PP                    TPP MATCH-UPS
+                                                                                       Labor
+
+                         Labor         Coalition                     Greens            Coalition              Labor            Labor          Coalition
+
+                            One Nation                    Ind/Other                    One Nation             Coalition        One Nation     One Nation
+
+               All          29              25            14              21    11     46        29     25     53         47     56      44      63        37
+             Male                31             27         9           23       10     43        30     27     50         50    53       47      61        39
+          Female            27         23                  20          19       11         49    28     23     55         45     58      42      65        35
+            NSW             29                  27         13          19       12     46         31    23     52         48     56      44      65        35
+              VIC          26               28                 18         19    9      45        32     23     51         49     56      44       66       34
+             QLD            27             25         11              25        12     41        30     29    49          51    51       49      60        40
+Other States/Terr.               33        17             17           23       10         52    22     26         59     41     59      41      60        40
+            18-34           27        18                        29     14       12          57       24 19         62     38        65   35       68       32
+           35-49                32              24         14          19       11         48    29     23     54         46     58      42      64        36
+           50-64            28             23        10                28       11     41       27      32     50         50    51       49     57         43
+              65+           28                       35                   24    9     35         38     27    42          58   47        53      63        37
+Edu. High School             30                 26         11              25   8      43        29     28     50         50    52       48      60        40
+ Edu. Trade Cert.           27         23             14               25       11     43        28     29     51         49    53       47      60        40
+  Edu. University           29             24                   21    12        14         53        30 17         58     42        63   37       70       30
+                     0    20          40             60              80         100
+                                                                                                                                                       8
+Leadership & Preferred Prime Minister Ratings
+
+
+
+
+                                                FOX &
+                                                HEDGEHOG 9
+LEADER SATISFACTION & PREFERRED PM
+
+
+ANTHONY ALBANESE - PRIME MINISTER OF AUSTRALIA                                         NET APPROVAL      PREFERRED PRIME MINISTER
+
+             Approve        Neutral/Unsure        Never heard of        Disapprove
+
+
+
+                              33             18                                  48        -15
+                                                                                                      Don’t Know
+                                                                                                         30%
+         0             20           40              60             80                100
+                                                                                                                             Albanese
+                                                                                                                               39%
+
+
+SUSSAN LEY - LEADER OF THE FEDERAL OPPOSITION
+             Approve        Neutral/Unsure        Never heard of        Disapprove
+
+
+
+                  19                         33          16                      32        -13
+                                                                                                                   Ley
+         0             20           40              60             80                100
+                                                                                                                   31%
+
+
+
+
+                                                                                                                                        10
+ KEY FIGURES - APPROVAL
+
+                                    Approve          Neutral / Unsure              Never Heard Of     Disapprove    Net Approval
+
+ The Federal Labor Party                             32                            24                              42     -10
+
+The Federal Liberal Party                       28                                      31 3                       38     -10
+
+              One Nation                                  36                                25                     37     -1
+
+         Pauline Hanson                                    38                       19                             41     -3
+
+          Barnaby Joyce                    24                                 28        6                          42     -18
+
+            Jacinta Price                  24                                      32            14                30     -6
+
+          Larissa Waters        7                              32                                       45         16     -9
+
+            Angus Taylor            15                                   35                           31           19     -4
+
+          Andrew Hastie              17                                  32                            34          17     0
+                            0             20                        40                      60        80            100
+                                                                                                                                   11
+Voluntary Voting
+
+
+
+
+                   FOX &
+                   HEDGEHOG 12
+VOLUNTARY VOTING - LIKELIHOOD TO VOTE
+Q: If voting was voluntary, rather than compulsory in Australia, would you vote at the next federal election?
+(Note, this question was asked prior to questions related to the voting intention of respondents)
+
+                          Yes, Definitely         Yes, Probably        No, Probably Not            No, Definitely Not         Don’t Know / Unsure             % Yes
+
+                All                                                                          58                         20              11          7     4    78%
+              Male                                                                                 61                     19             10           7 3      80%
+            Female                                                                      55                           21                13          6      5    76%
+      Labor Voters                                                                                 62                          22              9      4 3      84%
+   Coalition Voters                                                                                62                          22                 11 3         84%
+     Greens Voters                                                                            59                      18               11             10       77%
+ One Nation Voters                                                                                      65                15              10      5       5    80%
+      Other Voters                                                      44                                23                 15              10           8    67%
+ Undecided Voters                            23                   14                     19                                    28                        16    37%
+             18-34                                                            49                                25                    14            8     4    74%
+             35-49                                                                 51                          21                   15               10 3      72%
+             50-64                                                                                 62                     18              10      5       5    80%
+               65+                                                                                                75                     15      4        4    90%
+  Edu. High School                                                                  53                            21               12            8        6    74%
+   Edu. Trade Cert.                                                                          58                          21             10         6      5    79%
+    Edu. University                                                                                      66                     18              10      5      84%
+
+                      0                     20                         40                          60                        80                          100
+                                                                                                                                                                      13
+National Issues
+
+
+
+
+                  FOX &
+                  HEDGEHOG 14
+BONDI ROYAL COMMISSION
+Q: Select whether you agree or disagree with the following: The Government should call a Royal Commission
+into the Bondi terror attack.
+
+                                                                                                                                          NET:
+                         Strongly Agree           Agree            Neutral / Unsure              Disagree      Strongly Disagree
+
+               All                                  32                            22                           27          12       7     +35
+
+             Male                                    34                           20                         25           13        8     +33
+
+           Female                                 30                              24                            28          11      7     +36
+
+     Labor Voters                  18                             24                              26                19             13     +10
+
+  Coalition Voters                                                42                              26                19        7     6     +55
+
+    Greens Voters             15                                        31                                      36           12     6     +28
+One Nation Voters                                                                      57              16                 19     5 3      +65
+     Other Voters                            27                        18                         23                   21           11    +13
+            18-34                       23                                   28                                      37          9 3      +39
+            35-49                                  32                              24                           26          11      7     +38
+            50-64                                            39                      19                      21           13        8     +37
+              65+                                       35                   16                      20              17            12     +22
+ Edu. High School                                  32                         20                                 31           11    6     +35
+  Edu. Trade Cert.                                  34                                 23                     24           11       8     +38
+   Edu. University                           28                               25                          23              16        8     +29
+
+                     0                  20                        40                        60                  80                  100
+                                                                                                                                                 15
+IMMIGRATION PAUSE FOR NON-TOURISTS
+Q: Select whether you agree or disagree with the following: There should be a pause to all migration to
+Australia other than tourists.
+
+                                                                                                                                                 NET:
+                         Strongly Agree         Agree              Neutral / Unsure                 Disagree         Strongly Disagree
+
+               All                              32                                22                              24             15        7     +32
+
+             Male                                33                                 23                          20              16         8     +32
+
+           Female                               31                               22                                 27             15      5     +33
+
+     Labor Voters                   21                             23                                      28                     22       6     +16
+
+  Coalition Voters                             29                                        30                             24         12      5     +42
+
+    Greens Voters        10                         21                                   28                           23                  18     -10
+One Nation Voters                                                                                         70                 18         9 3      +85
+     Other Voters                              30                            21                           19                    21         9     +21
+            18-34                    22                            22                                          30               17         9     +18
+            35-49                               31                          19                                  25                18       7     +25
+            50-64                                            39                                24                      19          12      6     +45
+              65+                                           38                                24                        21          12     5     +45
+ Edu. High School                                        34                          24                                   27          11 4       +43
+  Edu. Trade Cert.                                         36                         23                             22             14     5     +40
+   Edu. University                        26                           19                            22                      21           12     +12
+
+                     0              20                            40                          60                      80                   100
+                                                                                                                                                        16
+THE AUSTRALIAN POLITICAL SYSTEM
+Q: Select whether you agree or disagree with the following: The Australian political system is fundamentally
+broken.
+
+                                                                                                                                                NET:
+                         Strongly Agree           Agree         Neutral / Unsure             Disagree             Strongly Disagree
+
+               All                     23                                 28                                 27                   18      4     +29
+
+             Male                      23                                27                         24                          20        6     +24
+
+           Female                      23                                  29                                     29                16    3     +33
+
+     Labor Voters        8                           27                                 27                                    30          8      -3
+
+  Coalition Voters              17                                        35                            23                       20       5     +27
+
+    Greens Voters                18                                 28                                       33                  16       5     +25
+One Nation Voters                                                         51                            24                         21     4     +71
+     Other Voters                                         37                            26                              21          13    3     +47
+            18-34                      22                                28                                              36          11   3     +36
+            35-49                           26                                     31                        22                   17      4     +36
+            50-64                            27                               26                        21                       21       5     +27
+              65+               17                             24                              27                             24          8      +9
+ Edu. High School                      23                                     30                                   29               15    3     +35
+  Edu. Trade Cert.                            29                              24                                  28             14       5     +34
+   Edu. University                19                                28                         22                                26       5     +16
+
+                     0                 20                      40                       60                        80                      100
+                                                                                                                                                       17
+CAPTURE OF VENEZUELAN PRESIDENT
+Q: Select whether you agree or disagree with the following: The United States was right to capture
+Venezuelan President Nicolas Maduro.
+
+                                                                                                                                                               NET:
+                                 Strongly Agree                  Agree           Neutral / Unsure            Disagree              Strongly Disagree
+
+               All                       15                 13                                                40                     15                 17      -4
+
+             Male                                 21                       16                                  32                     15                16      +6
+
+           Female                9              10                                                           48                     15                  18     -14
+
+     Labor Voters                9                12                                          36                             20                         23     -22
+
+  Coalition Voters                              19                    15                                           37                          18        11     +5
+
+    Greens Voters        3           8                                                       44                    16                                   29     -34
+One Nation Voters                                                     35                   18                                              35       6    6     +41
+     Other Voters            6             10                                                          46                     16                        22     -22
+            18-34                10                    14                                                              48                 14            14      -4
+            35-49                           17                 13                                            36                     16                  18      -4
+            50-64                                20              11                                               38               12                   19      0
+              65+                     13                13                                              37                           20                 17      -11
+ Edu. High School                         17                     14                                                     43                     15        11     +5
+  Edu. Trade Cert.                      15                12                                                 40                    14                   19      -6
+   Edu. University                    13                12                                        34                         18                         23     -16
+
+                     0                            20                            40                     60                          80                    100
+                                                                                                                                                                      18
+COMMITMENT TO NET-ZERO
+Q: Select whether you agree or disagree with the following: Australia should remain committed to net-zero
+carbon emissions by 2050.
+
+                                                                                                                                                                 NET:
+                             Strongly Agree            Agree          Neutral / Unsure               Disagree              Strongly Disagree
+
+               All                       20                                27                                  27                 12                      14     +21
+
+             Male                      18                            25                          22                        16                             19      +8
+
+           Female                          22                                   28                                         31            9                10     +31
+
+     Labor Voters                                 27                                                 40                                22        6         5     +56
+
+  Coalition Voters               14                         22                                  27                               22                       15      -1
+
+    Greens Voters                                                          46                                       30                               21          +73
+One Nation Voters        4         12                                      30                   17                                                        37     -38
+     Other Voters                   17                                          32                             24                  14                     13     +22
+            18-34                            24                                  26                                              35          8             7     +35
+            35-49                           23                                        33                                 23         8                     13     +35
+            50-64                      18                            25                               25                   13                             19     +11
+              65+                 15                           22                          23                               21                            19      -3
+ Edu. High School                 15                                26                                         32                 13                      14     +14
+  Edu. Trade Cert.                     18                             25                                  27                12                            18     +13
+   Edu. University                                     30                              28                            19                11                 12     +35
+
+                     0                      20                      40                      60                             80                              100
+                                                                                                                                                                        19
+FOX &
+HEDGEHOG
+
+
+
+
+           foxhedgehog.com.au
+

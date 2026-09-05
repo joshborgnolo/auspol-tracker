@@ -1,0 +1,303 @@
+          FOX &
+          HEDGEHOG
+
+March 2026 — National Voter Sentiment Survey
+Australian Polling Council — Disclosures
+
+Long Methodology Disclosure Statement
+Research conducted by: Fox & Hedgehog
+Client commissioning research: Self-initiated
+Fieldwork dates: 25-26 May 2026
+Mode of data collection: Recruited from online research panels
+Target population: Eligible Australian voters (18+, Australian Citizens)
+Sample Size: 1,700
+Effective sample size post-weighting: 1011
+Margin of error: 3.1% (larger for subgroups)
+Weighting variables and method: RIM Weighting. Age x Gender x Education, Region, Income, State x 2025
+Past Vote (Federal). Sourced from the Australian Bureau of Statistics and the Australian Electoral
+Commission.
+Position of voting intention questions: After demographics
+3PP & TPP preference distribution method: Respondent allocated
+   Three-party preferred (3PP): Respondents who selected Greens, Independent or Other as their first
+   preference were asked which of Labor, the Coalition or One Nation they would prefer in a three-way
+   contest. These responses were then allocated to Labor, the Coalition or One Nation and added to their
+   respective primary votes to produce the 3PP result.
+   Two-party preferred (2PP) match-ups: Separate questions were asked for each hypothetical contest;
+   Labor vs the Coalition, Labor vs One Nation, and the Coalition vs One Nation. For each match-up,
+   respondents whose first preference was not one of the two parties were allocated according to their
+   stated preference.
+Handling of undecided voters: Voters were provided the option to select “don’t know”. Voters who selected
+“don’t know” were given a leaner question, with the same options provided. Voters who expressed “don’t
+know” to both questions (comprising 4% of respondents) were excluded from voter intention related figures,
+but included for other questions.
+Australian Polling Council Compliant: Yes
+           FOX &
+           HEDGEHOG
+
+
+Full Text of Published Questions
+
+Q1: Thinking about federal politics, if a federal election for the House of Representatives was held today, which one of the
+following would you vote for?
+Response list shown in all electorates outside QLD. QLD respondents were presented ‘Liberal National Party (LNP)’ rather than
+Liberal and Nationals as two options. Respondent must select one option.
+
+
+   Labor (Rotate)
+   Liberal (Rotate)
+   Nationals (Rotate)
+   Greens (Fixed)
+   One Nation (Fixed)
+   Independent (Fixed)
+   Other (Fixed)
+   Don’t Know (Fixed)
+
+
+If respondent selects “Don’t Know”, ask Q2.
+
+
+Q2: To which of the following do you have a leaning, even by a bit?
+Response list shown in all electorates outside QLD. QLD respondents were presented ‘Liberal National Party (LNP)’ rather than
+Liberal and Nationals as two options. Respondent must select one option.
+
+
+   Labor (Rotate)
+   Liberal (Rotate)
+   Nationals (Rotate)
+   Greens (Fixed)
+   One Nation (Fixed)
+   Independent (Fixed)
+   Other (Fixed)
+   Don’t Know (Fixed)
+
+
+If respondent selects “Greens”, “Independent” or “Other” to either Q1, or Q2, ask Q3.
+
+
+Q3: You must allocate preferences to all parties. Between these three parties, which would you rank highest?
+Response list shown in all electorates outside QLD. QLD respondents were presented ‘Liberal National Party (LNP)’ rather
+than Liberal / Nationals. Respondent must select one option.
+
+
+   Labor (Rotate)
+   Liberal / Nationals (Rotate)
+   One Nation (Rotate)
+   Don’t Know / Will just follow how-to-vote cards (Fixed)
+
+
+If respondent selects “One Nation”, “Greens”, “Independent” or “Other” to either Q1, or Q2, ask Q4.
+              FOX &
+              HEDGEHOG
+
+Q4: If you had to choose between Labor and the Liberal / Nationals, which would you rank highest?
+Respondents in QLD were presented ‘Liberal National Party (LNP)’ rather than Liberal / Nationals. Respondent must select one
+option.
+
+
+   Labor (Rotate)
+   Liberal / Nationals (Rotate)
+   Don’t Know / Will just follow how-to-vote cards (Fixed)
+
+
+
+If respondent selects “Liberal / Nationals”, “Liberal National Party (LNP)”, “Greens”, “Independent” or “Other” to either Q1, or Q2,
+ask Q5.
+
+
+Q5: If you had to choose between Labor and One Nation, which would you rank highest?
+Respondent must select one option.
+
+
+   Labor (Rotate)
+   One Nation (Rotate)
+   Don’t Know / Will just follow how-to-vote cards (Fixed)
+
+
+If respondent selects “Labor”, “Greens”, “Independent” or “Other” to either Q1, or Q2, ask Q6.
+
+
+Q6: If you had to choose between the Liberal / Nationals and One Nation, which would you rank highest?
+Respondents in QLD were presented ‘Liberal National Party (LNP)’ rather than Liberal / Nationals. Respondent must select
+one option.
+
+
+   Liberal (Rotate)
+   One Nation (Rotate)
+   Don’t Know / Will just follow how-to-vote cards (Fixed)
+
+
+Q7: What is your view on the following public figures?
+Respondents must select one of the following options with respect to each figure:
+
+
+   Approve
+   Disapprove
+   Neutral / Unsure
+   Never Heard of
+
+
+List of figures, full list presented to respondents in randomised order:
+                                                                                   Notes:
+   The Federal Labor Party                               Pauline Hanson            *John Morsett is a control figure, designed to capture the baseline
+                                                                                   response of voters when asked to express approval or disapproval
+   The Federal Liberal Party                             Barnaby Joyce             of a non-existent person. John Morsett is a randomly generated
+   One Nation                                            Larissa Waters            name, not a political figure.
+
+   The Australian Greens                                 Jane Hume
+   Community Independents                                Simon Holmes à Court
+   Teal Independents                                     Jim Chalmers
+   Anthony Albanese                                      John Morsett*
+   Angus Taylor
+            FOX &
+            HEDGEHOG
+
+Q8: Some independent MPs, including figures such as Zali Steggall and Allegra Spender, have discussed the possibility of
+forming a new “Teal”-style political party to contest future elections. If a federal election were held today and a Teal-style
+political party were on the ballot, which party would you vote for?
+Response list shown in all electorates outside QLD. QLD respondents were presented ‘Liberal National Party (LNP)’ rather than
+Liberal and Nationals as two options. Respondent must select one option.
+
+
+   Labor (Rotate)
+   Liberal (Rotate)
+   Nationals (Rotate)
+   Greens (Fixed)
+   One Nation (Fixed)
+   A ‘Teal’-style party (Fixed)
+   Independent (Fixed)
+   Other (Fixed)
+   Don’t Know (Fixed)
+
+
+Q9: Do you think Anthony Albanese and the Labor Party have done enough to deserve re-election, or is it time to give
+someone else a go?
+Respondent must select one option.
+
+
+   Yes, they have done enough to deserve re-election
+   No, it’s time to give someone else a go
+   Unsure
+
+
+Q10: Do you think Angus Taylor and the Liberals are ready for Government?
+Respondent must select one option.
+
+
+   Yes
+   No
+   Unsure
+
+
+Q11: Do you think Pauline Hanson and One Nation are ready for Government?
+Respondent must select one option.
+
+
+   Yes
+   No
+   Unsure
+
+
+Q12: Between Anthony Albanese and Angus Taylor, who do you think would make the better Prime Minister?
+Respondent must select one option.
+
+
+   Anthony Albanese (Rotate)
+   Angus Taylor (Rotate)
+   Neutral / Unsure (Fixed)
+             FOX &
+             HEDGEHOG
+
+Q13: Do you have a favourable, or unfavourable view of the recently announced Federal Budget?
+Respondent must select one option.
+
+
+   Very favourable
+   Somewhat favourable
+   Neither favourable nor unfavourable
+   Somewhat unfavourable
+   Very unfavourable
+   Don’t know
+
+
+Q14: Since the Federal Budget, do you think conditions for small businesses in Australia have improved or worsened?
+Respondent must select one option.
+
+
+   Improved a lot
+   Improved a little
+   Stayed about the same
+   Worsened a little
+   Worsened a lot
+   Don’t know
+
+
+Q15: In the past fortnight, have you seen the Treasurer Jim Chalmers explaining or promoting the federal budget?
+Respondent must select one option.
+
+
+   Yes
+   No
+   Unsure
+
+
+Q16: In the past fortnight, have you seen any memes or social media posts comparing Labor’s tax
+policies to someone taking part of a business’s profits or equity, for example the image below?
+Respondent must select one option.
+
+
+   Yes
+   No
+   Unsure
+
+
+
+Q17: For each of the following proposed tax changes, describe whether you believe each measure will, or will not directly
+affect you financially:
+Respondent must select one option for each measure.
+
+
+Measures:
+   Abolishing negative gearing for established homes
+   Replacing the 50% capital gains tax discount with a discount based on inflation
+   Establishing a minimum 30% tax on discretionary trusts
+   Receiving a $250 Working Australian Tax Offset (WATO)
+
+
+Responses:
+   Will affect me positively
+   Will affect me negatively
+   Will not affect me
+            FOX &
+            HEDGEHOG
+
+Q18: The Federal Opposition has announced a policy to index income tax thresholds to inflation. Over time, what effect do
+you believe this would have for income tax as a share of income for most workers?
+Respondent must select one option.
+
+
+   Income tax would become a larger share of income
+   Income tax would become a smaller share of income
+   Income tax would stay about the same as a share of income
+   Don’t know
+
+
+Q19: Which of the following do you believe is One Nation’s proposed policy regarding income tax?
+Respondent must select one option.
+
+
+   Reduce all income tax thresholds by 10%
+   Introduce income tax splitting for families
+   Index income tax thresholds to inflation
+   Cut income tax by a flat $2,000 for all workers
+   Don’t know
+
+
+Q20: The Albanese Government has promised they will not introduce taxes on the family home, or introduce death
+taxes in future budgets. Do you trust the Albanese Government to not introduce these taxes in the future?
+Respondent must select one option.
+
+
+   Yes
+   No
+   Unsure
+

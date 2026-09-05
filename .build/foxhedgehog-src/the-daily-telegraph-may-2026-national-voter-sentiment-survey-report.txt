@@ -1,0 +1,575 @@
+National Voter Sentiment Survey
+MAY 2026
+
+
+
+
+                                  FOX &
+foxhedgehog.com.au
+                                  HEDGEHOG
+CONTENTS
+
+3    Research Methodology Statement
+
+4    Headline Figures - Primary Vote & TPP
+
+6    Three-Party Preferred & TPP Matchups
+
+9    Leadership & Preferred Prime Minister Ratings
+
+12   Hypothetical Poll - Inclusion of ‘Teal’-style Party
+
+14   Re-Election & Readiness for Government
+
+18   National Issues - The Federal Budget
+
+
+
+
+                                                           2
+RESEARCH METHODOLOGY STATEMENT
+Research conducted by: Fox & Hedgehog
+Client commissioning research: Self-initiated
+Fieldwork dates: 25-26 May 2026
+Mode of data collection: Recruited from online research panels
+Target population: Eligible Australian voters (18+, Australian Citizens)
+Sample Size: 1,700
+Effective sample size post-weighting: 1011
+Margin of error: 3.1% (larger for subgroups)
+Weighting variables and method: RIM Weighting. Age x Gender x Education, Region, Income, State x 2025 Past Vote (Federal)
+Position of voting intention questions: After demographics
+3PP & TPP preference distribution method: Respondent allocated
+   Three-party preferred (3PP): Respondents who selected Greens, Independent or Other as their first preference were asked which of Labor, the Liberal /
+   Nationals or One Nation they would prefer in a three-way contest. These responses were then allocated to Labor, the Liberal / Nationals or One Nation and
+   added to their respective primary votes to produce the 3PP result.
+   Two-party preferred (2PP) match-ups: Separate questions were asked for each hypothetical contest; Labor vs Liberal / Nationals, Labor vs One Nation, and
+   the Liberal / Nationals vs One Nation. For each match-up, respondents whose first preference was not one of the two parties were allocated according to their
+   stated preference.
+Handling of undecided voters: Voters were provided the option to select “don’t know”. Voters who selected “don’t know” were given a leaner question, with the
+same options provided. Voters who expressed “don’t know” to both questions (comprising 4% of respondents) were excluded from voter intention related figures,
+but included for other questions.
+Australian Polling Council Compliant: Yes
+Long Methodology Statement: Available at: foxhedgehog.com.au/news-den
+                                                                                                                                                                   3
+Headline Figures - Primary Vote & TPP
+
+
+
+
+                                        FOX &
+                                        HEDGEHOG 4
+PRIMARY VOTE & TWO-PARTY PREFERRED
+
+Q: Thinking about federal politics, if a federal election for the House of Representatives was held today, which one of the following
+would you vote for? (Followed by leaner question, voters who express “don’t know” to both main question and leaner are excluded)
+
+
+
+ PRIMARY VOTE                           Labor        Coalition       Greens          One Nation          Independent / Other
+
+                 May 2026                              29                          25          10                           27    9
+
+               March 2026                               30                      23               13                        23     11
+
+             2025 Election                                   35                                     32       12        6         15
+                             0                  20                  40                     60                     80              100
+ TPP                                                                  Labor          Coalition
+
+                 May 2026                                                  49                                                    51
+
+               March 2026                                                     51                                                 49
+
+             2025 Election                                                         55                                            45
+                             0                  20                  40                    60                    80                100
+                                                                                                                                        5
+Three-Party Preferred & TPP Match-ups
+
+
+
+
+                                        FOX &
+                                        HEDGEHOG 6
+THREE-PARTY PREFERRED & TPP MATCH-UPS
+
+This poll moves beyond the standard two-party framework and additionally reports a three-party-preferred (3PP) result. This
+shows how support would redistribute if all three were treated as major contenders. The accompanying 2PP match-ups then
+show the outcome of each possible head-to-head contest once preferences are allocated, to illustrate how different final
+pairings could produce different election outcomes.
+
+
+ THREE-PARTY PREFERRED (3PP)                                           TPP MATCH-UPS
+
+                                                                                  Labor        Coalition          One Nation
+ One Nation
+   30%
+                                                        Labor v Coalition                          49                          51
+                                      Labor
+                                      43%
+                                                      Labor v One Nation                            54                         46
+
+
+
+                                                 Coalition v One Nation                                 58                     42
+
+          Coalition                                                         0      20         40             60       80        100
+            27%                                                                                                                       7
+PRIMARY VOTE, 3PP & TPP - DEMOGRAPHICS
+
+  PRIMARY VOTE - DEMOGRAPHICS                                                         3PP                         TPP MATCH-UPS
+                                                                                           Labor
+
+                         Labor         Coalition                    Greens                 Coalition               Labor            Labor          Coalition
+
+                            One Nation                    Ind/Other                        One Nation              Coalition        One Nation     One Nation
+
+               All             29           25       10                   27    9      43          27        30    49          51    54       46     58         42
+             Male              30               27       8                27    8      42          28        30    47          53    52       48     58         42
+          Female            28             23        13                   27    9          44      26        30        51      49     56      44     57         43
+            NSW                  31         25           10               25    9          45      27        28    50          50    55       45     59         41
+              VIC              29           27            13              23    8          45        29      26    50          50     56      44      61        39
+             QLD           25          23       8                         35    9     37        25           38    44          56   47        53     51         49
+Other States/Terr.              32          23            11              25    9          47      25        28     52         48     56      44     58         42
+            18-34                35              25             18         17               53          27   20        57      43        64   36      65        35
+           35-49                32         19        11               27        11         48      21        31        54      46     56      44     55         45
+           50-64           25          24       8                     32        11     38        26          36    45          55   48        52    53          47
+              65+         23                32                            32    9     32         33          35   38           62   44        56     56         44
+Edu. High School            27             26        8                    30    9      39        28          33    45          55    50       50     56         44
+ Edu. Trade Cert.              29      20           12                    33 6         43        22          35    49          51    51       49    52          48
+  Edu. University              29                31            14         17    9          46         33     21    50          50     59      41       66       34
+                     0    20          40             60              80         100
+                                                                                                                                                            8
+Leadership & Preferred Prime Minister Ratings
+
+
+
+
+                                                FOX &
+                                                HEDGEHOG 9
+LEADER SATISFACTION & PREFERRED PM
+
+
+ANTHONY ALBANESE - PRIME MINISTER OF AUSTRALIA                                        NET APPROVAL   PREFERRED PRIME MINISTER
+
+             Approve        Neutral/Unsure    Never heard of        Disapprove
+
+
+
+                            29           19                                      51      -22 (-3)
+                                                                                                     Don’t Know
+                                                                                                        26%
+         0             20           40          60             80                100                                       Albanese
+                                                                                                                             36% (-3%)
+
+
+ANGUS TAYLOR - LEADER OF THE FEDERAL OPPOSITION
+             Approve        Neutral/Unsure    Never heard of        Disapprove
+
+
+
+                            29                 32      10                    29           0 (0)
+                                                                                                              Taylor
+         0             20           40          60             80                100                           38% (+3%)
+
+
+
+
+                                                                                                                                    10
+ KEY FIGURES - APPROVAL
+
+                                                    Approve             Neutral / Unsure             Never Heard Of                 Disapprove                  Net Approval
+ The Federal Labor Party                                               30                       23                                                         45        -15 (-5)
+
+The Federal Liberal Party                                               31                                28 3                                             38         -7 (-2)
+
+   The Australian Greens                                          26                                29                                                    43         -17 (New)
+
+                 One Nation                                                         43                        20                                          35          +8 (-1)
+
+        Teal Independents                               19                                               39             13                                 29       -10 (New)
+
+Community Independents                                            26                                                   44              14                  16       +10 (New)
+
+   Simon Holmes à Court                   8                                         35                                         35                          22       -14 (New)
+
+            Pauline Hanson                                                           44                        19                                          36         +8 (-1)
+
+             Barnaby Joyce                                        27                                 29       5                                            39         -12 (-4)
+
+               Jim Chalmers                             20                                     32                 11                                       37         -17 (-5)
+
+                  Jane Hume                        14                                  31                                           37                     18         -4 (-2)
+
+             Larissa Waters                   11                                     33                                             38                     18         -7 (-1)
+
+               John Morsett           5                                      30                                                             53             12         -7 (-3)
+
+                                 0                           20                   40                          60                    80                      100
+*John Morsett is a control figure, designed to capture the baseline response of voters when asked to express approval or disapproval of a non-existent person. John Morsett is a
+randomly generated name, not a political figure.
+                                                                                                                                                                                   11
+Hypothetical Poll - Inclusion of ‘Teal’-style Party
+
+
+
+
+                                                      FOX &
+                                                      HEDGEHOG 12
+     INCLUSION OF ‘TEAL’-STYLE PARTY
+
+     On 24 May 2026, news was reported that a number of Independent MPs, colloquially referred to as “Teals”, were in advanced
+     talks to establish a new political party. The following question was asked to ascertain the likely level of national support for a
+     political party described in these terms, if it were to register and contest elections.
+
+
+     Q: Some independent MPs, including figures such as Zali Steggall and Allegra Spender, have discussed the possibility of forming a new “Teal”-
+     style political party to contest future elections.If a federal election were held today and a Teal-style political party were on the ballot, which party
+     would you vote for?
+
+
+     PRIMARY VOTES (W/O TEAL, VS WITH TEAL)
+30
+         29
+25                    26                     26             27         26
+                                  25
+20
+
+15
+
+10
+                                                                                      10            9                                     9
+5                                                                                                                          6                         7
+                                                                                                               0
+ 0
+              Labor                 Coalition                One Nation                    Greens             Teal-style Party             Ind/Other
+                                                                                                                                                                13
+Re-Election & Readiness for Government
+
+
+
+
+                                         FOX &
+                                         HEDGEHOG 14
+   HAS LABOR DONE ENOUGH FOR RE-ELECTION
+    Q: Do you think Anthony Albanese and the Labor Party have done enough to deserve re-election, or is it time
+    to give someone else a go?
+
+
+   ALL VOTERS                                                                                                                          NET:
+                                                                             Done Enough          Unsure      Give Someone Else a Go
+
+                                                               All                        28      15                               57 -29
+                                  Done Enough                Male                          29    12                                59 -30
+                                     28%                   Female                         27        18                             55 -28
+                                                     Labor Voters                                              66        16        18 +48
+                                                  Coalition Voters           12       9                                            79 -67
+                                                    Greens Voters                           31           19                        50 -19
+                                                One Nation Voters        5        9                                                86 -81
+                                                     Other Voters                      25                25                        50 -25
+  Give                                                      18-34                           31       15                            54 -23
+Someone                                                     35-49                        27         18                             55 -28
+Else a Go                                                   50-64                       26        16                               58 -32
+                                                              65+                         28       15                              57 -29
+  57%
+                                                 Edu. High School                      24          19                              57 -33
+                                     Unsure       Edu. Trade Cert.                       27     12                                  61 -34
+                                      15%          Edu. University                           35        14                           51 -16
+                                                                     0                20          40          60         80          100
+                                                                                                                                              15
+ARE THE LIBERALS READY FOR GOV?
+Q: Do you think Angus Taylor and the Liberal Party are ready for Government?
+
+
+
+ALL VOTERS                                                                                                                             NET:
+                                                                                          Yes        Unsure        No
+
+                                                          All                       30                 26                         44    -14
+                                                        Male                          32               24                         44    -12
+                                  Yes                 Female                       28                  28                         44    -16
+
+                                  30%           Labor Voters             17            17                                         66 -49
+                                             Coalition Voters                                                 63             25   12 +51
+                                               Greens Voters            15                      29                                56 -41
+ No
+                                           One Nation Voters                        30                     30                     40 -10
+44%                                             Other Voters        7                 26                                          67 -60
+                                                       18-34                          33                    27                    40     -7
+                                                       35-49                   25                          34                      41 -16
+                                                       50-64                        30                23                          47    -17
+                                                         65+                         32              20                           48 -16
+                                            Edu. High School                        29                      31                    40    -11
+                                             Edu. Trade Cert.                       30                 26                         44    -14
+                                              Edu. University                        31              21                           48    -17
+
+                         Unsure                                 0             20                40            60        80          100
+                          26%                                                                                                                 16
+ARE ONE NATION READY FOR GOV?
+Q: Do you think Pauline Hanson and One Nation are ready for Government?
+
+
+
+ALL VOTERS                                                                                                                        NET:
+                                                                                       Yes          Unsure        No
+
+                                                         All                            40            15                      45   -5
+                                                       Male                             40           14                       46   -6
+                                                     Female                             39             17                     44   -5
+                                               Labor Voters             18        12                                          70 -52
+                                            Coalition Voters                             40            17                     43   -3
+                                   Yes
+                                              Greens Voters             19        11                                          70 -51
+ No                                40%    One Nation Voters                                                            85   10 5 +80
+45%                                            Other Voters        14              19                                         67 -53
+                                                      18-34                             38           15                       47   -9
+                                                      35-49                             38            17                      45   -7
+                                                      50-64                                  42         16                    42    0
+                                                        65+                                  41      12                       47   -6
+                                           Edu. High School                                    45            18               37   +8
+                                            Edu. Trade Cert.                                 41        16                     43   -2
+                                             Edu. University                      31          11                              58 -27
+                   Unsure                                      0             20              40              60        80      100
+                                                                                                                                         17
+                    15%
+National Issues - The Federal Budget
+
+
+
+
+                                       FOX &
+                                       HEDGEHOG 18
+    OVERALL VIEW OF THE FEDERAL BUDGET
+    Q: Do you have a favourable, or unfavourable view of the recently announced Federal Budget?
+
+                                                                                                        Very favourable                  Somewhat favourable
+
+    ALL VOTERS                                                                                   Neither favourable nor unfavourable                        Don’t know
+
+                    Very favourable                                                                                                                                       NET:
+                                                                                                      Somewhat unfavourable                    Very unfavourable
+                          4%       Somewhat
+                                   favourable                          All       4                 15                       25       9               18                29 -28
+Very unfavourable
+      29%                             15%                            Male        4                 15                      24    8              16                     33 -30
+                                                                   Female                         15                       25        11                21              25 -28
+                                                             Labor Voters            7                                32                             34       9      13 5 +21
+                                                          Coalition Voters               8                      19   7                    24                           40 -54
+                                                            Greens Voters         5                    17                        30              17          13         18 -9
+                                                        One Nation Voters          5                  15 5                  21                                         53 -68
+                                                             Other Voters        4               11                        31      13             21                   20 -26
+                                                                    18-34                                  21                25    10           19                     22 -17
+                                            Neither                 35-49        4                    16                  25      12           19                      24 -23
+                                         favourable nor             50-64                    9                       26       11       16                              35 -39
+                                          unfavourable                65+        4                14                   23 5           18                               36 -36
+                                              25%        Edu. High School
+      Somewhat                                                                               11                          29      13         16                         28 -30
+     unfavourable                                         Edu. Trade Cert.                    14                      22     10          19                            32 -34
+         18%         Don’t know                            Edu. University       5                           21             22 4            20                         28 -22
+                        9%
+                                                                             0                          20              40           60            80                    100
+                                                                                                                                                                                 19
+     SMALL BUSINESS CONDITIONS POST-BUDGET
+      Q: Since the Federal Budget, do you think conditions for small businesses in Australia have improved or
+      worsened?
+                                                                                                  Improved a lot           Improved a little
+
+     ALL VOTERS                                                                                 Stayed about the same             Don’t know
+                                                                                                                                                      NET:
+                                                                                                 Worsened a little           Worsened a lot
+
+               Improved a lot                                               All        10               26           15              21           26 -35
+                    4%     Improved a little                              Male          12                27         12         17               30 -33
+                                10%                                     Female         9               26             17             24           22 -35
+   Worsened a lot
+       26%                                                        Labor Voters      5              21                        40         15     13 6    +7
+                                                               Coalition Voters       7              21    9                27                   35 -54
+                                                                 Greens Voters           11                 30              23              24     11 -23
+                                                             One Nation Voters                  18    8             22                           48 -66
+                                                                  Other Voters         8             20              24             22           24 -36
+                                               Stayed about the same     18-34                17                   31      11         17          21 -18
+                                                       26%               35-49             13              25           18             22         20 -27
+                                                                         50-64      5                24        15             23                 32 -49
+                                                                           65+      5                 26         16             21                31 -46
+                                                              Edu. High School        7                 28           18            20             26 -38
+                                                               Edu. Trade Cert.         10               25         15           20              28 -36
+                                                                Edu. University    4         14               26      9             23           24 -29
+Worsened a little
+     21%                                                                          0             20           40            60            80        100
+                           Don’t know                                                                                                                        20
+                              15%
+TREASURER BUDGET VISIBILITY
+Q: In the past fortnight, have you seen the Treasurer Jim Chalmers explaining or promoting the federal
+budget?
+
+
+ALL VOTERS                                                                                                          NET:
+                                                                         Yes        Unsure           No
+
+                                                          All                      49       13                  38 +11
+                                                        Male                          54      10                36 +18
+                                                      Female                   44         15                    41 +3
+                                                Labor Voters                      48     10                     42 +6
+  No                                         Coalition Voters                       52      10                  38 +14
+ 38%                                           Greens Voters             35           18                        47 -12
+                                           One Nation Voters                            57      10              33 +24
+                                     Yes        Other Voters                        51        13                36 +15
+                                     49%               18-34             35        14                           51 -16
+                                                       35-49                   44          16                   40   +4
+                                                       50-64                         53      10                 37 +16
+                                                         65+                                   66     10        24 +42
+                                            Edu. High School                   43        15                     42   +1
+                                             Edu. Trade Cert.                     49          15                36 +13
+                                              Edu. University                          56      8                36 +20
+           Unsure                                               0   20         40           60             80    100
+                                                                                                                           21
+            13%
+SOCIAL MEDIA BUDGET VISIBILITY
+Q: In the past fortnight, have you seen any memes or social media posts comparing Labor’s tax policies to
+someone taking part of a business’s profits or equity, for example the image below?
+
+
+EXAMPLE              ALL VOTERS                                                                                    NET:
+                                                                                        Yes     Unsure    No
+IMAGE
+                                                                            All           32 8                 60 -28
+                                                                          Male            33 8                 59 -26
+                                                                        Female           30 8                  62 -32
+                                                     Yes
+                                                                  Labor Voters          28                     66 -38
+                                                     32%
+                                                               Coalition Voters            34                  60 -26
+                                                                 Greens Voters        20 9                     71 -51
+                                                             One Nation Voters                42 8             50   -8
+                                                                  Other Voters            32 7                 61 -29
+                                                                         18-34              36 7               57 -21
+                                                                         35-49            32 9                 59 -27
+                     No                                                  50-64           30 9                  61 -31
+                    60%                                                    65+          27 7                   66 -39
+                                                              Edu. High School          27 11                  62 -35
+                                                   Unsure      Edu. Trade Cert.          30 9                  61 -31
+                                                    8%          Edu. University              40                57 -17
+                                                                                  0    20      40    60   80    100
+                                                                                                                          22
+IMPACT OF BUDGET TAX CHANGES
+Q: For each of the following proposed tax changes, describe whether you believe each measure will, or will
+not directly affect you financially:
+
+                              ABOLISHING NEGATIVE GEARING                           REPLACING THE 50% CAPITAL GAINS                                   ESTABLISHING A MINIMUM 30%                          RECEIVING A $250 WORKING
+                              FOR ESTABLISHED HOMES                                 TAX DISCOUNT WITH A DISCOUNT                                      TAX ON DISCRETIONARY TRUSTS                         AUSTRALIAN TAX OFFSET
+                                                                                    BASED ON INFLATION
+
+
+                                   Will affect me positively                                  Will affect me positively                                    Will affect me positively                            Will affect me positively
+
+                                   Will not affect me                                         Will not affect me                                           Will not affect me                                   Will not affect me
+
+                                   Will affect me negatively            NET:                  Will affect me negatively              NET:                  Will affect me negatively          NET:              Will affect me negatively             NET:
+
+               All       10                         62             28     -18       12                        54                34     -22       9                            64         27     -18                 35                    51    14        +21
+             Male        11                         59             30     -19       13                        50                37     -24       9                         62            29     -20                  37                   49    14        +23
+          Female         10                            65          25     -15       11                           58             31     -20       10                            66        24     -14                 32                    54    14        +18
+     Labor Voters             17                         63        20     -3         17                            57           26     -9         15                               66    19     -4                        48               42 10          +38
+  Coalition Voters       8                     53                  39     -31       13                   42                     45     -32   7                           59              34     -27            28                    53         19        +9
+   Greens Voters              17                            66     17     0              18                           59        23     -5             18                            68   14     +4                       43                47 10          +33
+One Nation Voters                                   67             29     -25                               55                  39     -33                               62              35     -32            25                     57        18        +7
+     Other Voters                                   63             31     -25   7                             59                34     -27   7                                     73    20     -13                 31                     59 10          +21
+            18-34            15                   51               34     -19             22                39                  39     -17            17                  51             32     -15                      44          34         22        +22
+           35-49          14                      54               32     -18       14                      47                  39     -25       10                           61         29     -19                       47          38        15        +32
+           50-64     7                              64             29     -22                                 59                35     -29                                 65            29     -23                 32                    55    13        +19
+              65+                                             84   12     -8                                          73        23     -13                                          82   15     -12       10                                   85         +5
+        Investors         14                     51                35     -21            18            35                       47     -29       12                      53              35     -23                      41           43        16        +25
+   Non-Investors                                         75        19     -13                                         74        21     -16                                         76    18     -12            28                         60    12        +16
+                     0             20    40      60         80      100         0             20    40        60           80    100         0             20    40      60         80    100         0        20         40   60         80        100
+
+                                                                                                                                                                                                                                                                23
+  EFFECT OF INCOME TAX INDEXATION
+  Q: The Federal Opposition has announced a policy to index income tax thresholds to inflation. Over time, what
+  effect do you believe this would have for income tax as a share of income for most workers?
+
+  ALL VOTERS                                                             Stay the same       Increase as a portion of income
+
+                                                                          Decrease as a portion of income      Don’t know
+
+                              Increase                       All          18           23           16                         43
+                                23%                        Male            19             25             20                    36
+                                                         Female          17          21       12                               50
+                                                   Labor Voters         16           22            18                          44
+Don’t know                                      Coalition Voters        16                   32         14                     38
+  43%                                             Greens Voters            20           22            17                       41
+                                              One Nation Voters            19         20            18                         43
+                                                   Other Voters               24        18         14                          44
+                                                          18-34          16                   35            19                 30
+                                                          35-49        13           23         15                              49
+                                   Stay the same          50-64              21      17         14                             48
+                                        18%                 65+              22     14         15                              49
+                                               Edu. High School        13        16      14                                    57
+                                                Edu. Trade Cert.          17             26          15                        42
+                   Decrease
+                                                 Edu. University              24                29            20               27
+                     16%
+                                                                   0         20         40              60         80           100
+                                                                                                                                      24
+      ONE NATION INCOME TAX POLICY
+       Q: Which of the following do you believe is One Nation’s proposed policy regarding income tax?
+
+
+      ALL VOTERS                                                                             Income splitting for families                         Reduce all income tax rates by 10%
+
+                                                                            Index tax thresholds to inﬂation                                 Flat $2,000 tax cut for all workers        Don’t know
+
+                         Flat $2,000 tax                          All              14                   13                     11        6                                                           56
+
+             Index tax cut for all workers                      Male           13                       14                      13           7                                                       53
+           thresholds to       6%                            Female                 16                      11             9        5                                                                59
+              inﬂation                                  Labor Voters               14                   12              10           6                                                               58
+                11%                                  Coalition Voters          13                      13                   12           7                                                           55
+                                                      Greens Voters           11                       14              9        5                                                                    61
+                                                   One Nation Voters                         20                         16                   12         8                                            44
+Income splitting                                        Other Voters          11        5                    13 3                                                                                    68
+  for families                                                 18-34                    17                             18                     14            9                                        42
+      14%                                                     35-49                15                   11                  12           7                                                           55
+                                             Don’t know
+                                                              50-64                15                       13         6       4                                                                     62
+                                               56%
+                                                                 65+          11              9                  10 3                                                                                67
+                                                    Edu. High School          11                  11              10        5                                                                        63
+                                                     Edu. Trade Cert.              15                   12                     11        6                                                           56
+     Reduce all income                               Edu. University                    18                         15                    13         7                                                47
+      tax rates by 10%                                                  0                      20                                   40                          60                 80                 100
+            13%                                                                                                                                                                                             25
+TRUST ON FUTURE TAXES
+Q: The Albanese Government has promised they will not introduce taxes on the family home, or introduce death
+taxes in future budgets. Do you trust the Albanese Government to not introduce these taxes in the future?
+
+
+ALL VOTERS                                                                                                                  NET:
+                                                                                     Yes         Unsure        No
+
+                             Yes                         All              20            21                               59 -39
+                             20%                       Male               19          19                                 62 -43
+                                                     Female                21            23                              56 -35
+                                               Labor Voters                                47                  25        28 +19
+                                            Coalition Voters       10        13                                          77 -67
+                                              Greens Voters                 21                     36                    43 -22
+                                          One Nation Voters         10                                                   88 -86
+                                               Other Voters                  21             23                           56 -35
+                                                      18-34                  22               26                         52 -30
+                                                      35-49                19              23                            58 -39
+  No
+                                    Unsure            50-64              16          20                                  64 -48
+ 59%                                                    65+
+                                     21%                                   20           21                               59 -39
+                                           Edu. High School               17           24                                59 -42
+                                            Edu. Trade Cert.              17         20                                  63 -46
+                                             Edu. University                    26          20                           54 -28
+                                                               0              20           40             60        80    100
+                                                                                                                                   26
+FOX &
+HEDGEHOG
+
+
+
+
+                Media: media@foxhedgehog.com.au
+           Enquiries: enquiries@foxhedgehog.com.au
+                                                     27
+

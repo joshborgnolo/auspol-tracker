@@ -1,0 +1,223 @@
+          FOX &
+          HEDGEHOG
+
+March 2026 — National Voter Sentiment Survey
+Australian Polling Council — Disclosures
+
+Long Methodology Disclosure Statement
+Research conducted by: Fox & Hedgehog
+Client commissioning research: Self-initiated
+Fieldwork dates: 24-25 March 2026
+Mode of data collection: Recruited from online research panels
+Target population: Eligible Australian voters (18+, Australian Citizens)
+Sample Size: 1,810
+Effective sample size post-weighting: 1041
+Margin of error: 3.0% (larger for subgroups)
+Weighting variables and method: RIM Weighting. Age x Gender x Education, Region, Income, State x 2025
+Past Vote (Federal). Sourced from the Australian Bureau of Statistics and the Australian Electoral
+Commission.
+Position of voting intention questions: After demographics
+3PP & TPP preference distribution method: Respondent allocated
+   Three-party preferred (3PP): Respondents who selected Greens, Independent or Other as their first
+   preference were asked which of Labor, the Coalition or One Nation they would prefer in a three-way
+   contest. These responses were then allocated to Labor, the Coalition or One Nation and added to their
+   respective primary votes to produce the 3PP result.
+   Two-party preferred (2PP) match-ups: Separate questions were asked for each hypothetical contest;
+   Labor vs the Coalition, Labor vs One Nation, and the Coalition vs One Nation. For each match-up,
+   respondents whose first preference was not one of the two parties were allocated according to their
+   stated preference.
+Handling of undecided voters: Voters were provided the option to select “don’t know”. Voters who selected
+“don’t know” were given a leaner question, with the same options provided. Voters who expressed “don’t
+know” to both questions (comprising 3% of respondents) were excluded from voter intention related figures,
+but included for other questions.
+Australian Polling Council Compliant: Yes
+           FOX &
+           HEDGEHOG
+
+
+Full Text of Published Questions
+
+Q1: Thinking about federal politics, if a federal election for the House of Representatives was held today, which one of the
+following would you vote for?
+Response list shown in all electorates outside QLD. QLD respondents were presented ‘Liberal National Party (LNP)’ rather than
+Liberal and Nationals as two options. Respondent must select one option.
+
+
+   Labor (Rotate)
+   Liberal (Rotate)
+   Nationals (Rotate)
+   Greens (Fixed)
+   One Nation (Fixed)
+   Independent (Fixed)
+   Other (Fixed)
+   Don’t Know (Fixed)
+
+
+If respondent selects “Don’t Know”, ask Q2.
+
+
+Q2: To which of the following do you have a leaning, even by a bit?
+Response list shown in all electorates outside QLD. QLD respondents were presented ‘Liberal National Party (LNP)’ rather than
+Liberal and Nationals as two options. Respondent must select one option.
+
+
+   Labor (Rotate)
+   Liberal (Rotate)
+   Nationals (Rotate)
+   Greens (Fixed)
+   One Nation (Fixed)
+   Independent (Fixed)
+   Other (Fixed)
+   Don’t Know (Fixed)
+
+
+If respondent selects “Greens”, “Independent” or “Other” to either Q1, or Q2, ask Q3.
+
+
+Q3: You must allocate preferences to all parties. Between these three parties, which would you rank highest?
+Response list shown in all electorates outside QLD. QLD respondents were presented ‘Liberal National Party (LNP)’ rather
+than Liberal / Nationals. Respondent must select one option.
+
+
+   Labor (Rotate)
+   Liberal / Nationals (Rotate)
+   One Nation (Rotate)
+   Don’t Know / Will just follow how-to-vote cards (Fixed)
+
+
+If respondent selects “One Nation”, “Greens”, “Independent” or “Other” to either Q1, or Q2, ask Q4.
+              FOX &
+              HEDGEHOG
+
+Q4: If you had to choose between Labor and the Liberal / Nationals, which would you rank highest?
+Respondents in QLD were presented ‘Liberal National Party (LNP)’ rather than Liberal / Nationals. Respondent must select one
+option.
+
+
+   Labor (Rotate)
+   Liberal / Nationals (Rotate)
+   Don’t Know / Will just follow how-to-vote cards (Fixed)
+
+
+
+If respondent selects “Liberal / Nationals”, “Liberal National Party (LNP)”, “Greens”, “Independent” or “Other” to either Q1, or Q2,
+ask Q5.
+
+
+Q5: If you had to choose between Labor and One Nation, which would you rank highest?
+Respondent must select one option.
+
+
+   Labor (Rotate)
+   One Nation (Rotate)
+   Don’t Know / Will just follow how-to-vote cards (Fixed)
+
+
+If respondent selects “Labor”, “Greens”, “Independent” or “Other” to either Q1, or Q2, ask Q6.
+
+
+Q6: If you had to choose between the Liberal / Nationals and One Nation, which would you rank highest?
+Respondents in QLD were presented ‘Liberal National Party (LNP)’ rather than Liberal / Nationals. Respondent must select
+one option.
+
+
+   Liberal (Rotate)
+   One Nation (Rotate)
+   Don’t Know / Will just follow how-to-vote cards (Fixed)
+
+
+Q7: What is your view on the following public figures?
+Respondents must select one of the following options with respect to each figure:
+
+
+   Approve
+   Disapprove
+   Neutral / Unsure
+   Never Heard of
+
+
+List of figures, full list presented to respondents in randomised order:
+                                                                                   Notes:
+   The Federal Labor Party                               Barnaby Joyce             *John Morsett is a control figure, designed to capture the baseline
+                                                                                   response of voters when asked to express approval or disapproval
+   The Federal Liberal Party                             Larissa Waters            of a non-existent person. John Morsett is a randomly generated
+   One Nation                                            Jane Hume                 name, not a political figure.
+
+   Anthony Albanese                                      Jim Chalmers
+   Angus Taylor                                          Chris Bowen
+   Pauline Hanson                                        John Morsett*
+             FOX &
+             HEDGEHOG
+
+Q8: Between Anthony Albanese and Angus Taylor, who do you think would make the better Prime Minister?
+Respondent must select one option.
+
+
+   Anthony Albanese (Rotate)
+   Angus Taylor (Rotate)
+   Neutral / Unsure (Fixed)
+
+
+Q9: Do you think Australia should increase local oil production to improve fuel security, even if this leads to higher carbon
+emissions?
+Respondent must select one option.
+
+
+   Yes
+   No
+   Unsure
+
+
+Q10: Which of the following do you believe is most responsible for the recent rise in Australian fuel prices?
+Respondent must select one option.
+
+
+   Global supply chain disruption from war in the Middle East (Rotate)
+   The Australian Federal Government (Rotate)
+   Petrol stations and suppliers (Rotate)
+   Unsure / None of these (Fixed)
+
+
+Q11: Which of the following best describes your fuel purchasing behaviour over recent weeks?
+Respondent must select one option.
+
+
+   I’m stockpiling additional fuel reserves just in case
+   I’m buying about the same amount of fuel as usual
+   I’m buying less fuel than usual
+   I don’t typically buy petrol/diesel
+
+
+Q12: How would you rate the Australian Federal Government’s handling of fuel prices and fuel supply in recent weeks?
+Respondent must select one option.
+
+
+   Very good
+   Good
+   Neutral /Unsure
+   Poor
+   Very poor
+            FOX &
+            HEDGEHOG
+
+Q13: Thinking about how fuel prices could change over the coming weeks, at what fuel price per litre would you significantly
+reduce your driving (e.g. fewer trips, cancelling non-essential travel)?
+Respondent must select one option.
+
+
+   I am already reducing my driving
+   If fuel prices reached $3.00 a litre
+   If fuel prices reached $3.50 a litre
+   If fuel prices reached $4.00 a litre
+   I would not reduce my driving regardless of price
+   I don’t drive / I drive an electric vehicle
+
+
+Q14: Do you think fuel shortages will become widespread across Australia over the coming weeks?
+Respondent must select one option.
+
+
+   Yes
+   No
+   Unsure
+

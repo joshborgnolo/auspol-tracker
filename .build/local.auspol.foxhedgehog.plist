@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+        <key>Label</key>
+        <string>local.auspol.foxhedgehog</string>
+        <key>ProgramArguments</key>
+        <array>
+                <string>/bin/bash</string>
+                <string>/Users/joshuaborgnolo/Library/Application Support/auspol-agents/foxhedgehog.sh</string>
+        </array>
+        <key>EnvironmentVariables</key>
+        <dict>
+                <key>PATH</key>
+                <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+        </dict>
+        <key>StartCalendarInterval</key>
+        <array>
+                <!-- Fox & Hedgehog files its Daily Telegraph National Voter
+                     Sentiment Survey roughly monthly (2026 waves landed/published:
+                     Jan 5-6/9, Feb 17-19/21, Mar 24-25/28, May 25-26/31) on
+                     foxhedgehog.com.au/news-den. Weekly Saturday sweep, then a
+                     daily sweep across the month-end window. A cached source
+                     means routine runs fetch only the RSS feed. -->
+                <dict><key>Weekday</key><integer>6</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>26</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>27</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>28</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>29</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>30</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>31</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>1</integer><key>Hour</key><integer>6</integer></dict>
+                <dict><key>Day</key><integer>2</integer><key>Hour</key><integer>6</integer></dict>
+        </array>
+        <key>StandardOutPath</key>
+        <string>/Users/joshuaborgnolo/auspol tracker/.build/logs/launchd-foxhedgehog-stdout.log</string>
+        <key>StandardErrorPath</key>
+        <string>/Users/joshuaborgnolo/auspol tracker/.build/logs/launchd-foxhedgehog-stderr.log</string>
+</dict>
+</plist>
