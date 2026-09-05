@@ -106,9 +106,10 @@ const FONTS = [
   { file: "crimsontext-italic-400-latin.woff2", family: "Crimson Text", style: "italic", weight: "400" },
   { file: "crimsontext-italic-600-latin.woff2", family: "Crimson Text", style: "italic", weight: "600" },
   { file: "crimsontext-italic-700-latin.woff2", family: "Crimson Text", style: "italic", weight: "700" },
-  /* Source Serif 4 sets the tab labels (--heads in template.html) - one
-     variable cut (wght 200-900 + an optical-size axis the browser steers by
-     font-size). Preloaded - it paints above the fold. */
+  /* Source Serif 4 sets the tab labels and the navbar's docked 2PP score
+     (--heads in template.html) - one variable cut (wght 200-900 + an
+     optical-size axis the browser steers by font-size). Preloaded - it
+     paints above the fold. */
   { file: "sourceserif4-latin.woff2",           family: "Source Serif 4", style: "normal", weight: "200 900", preload: true },
   { file: "ibmplexsans-latin.woff2",            family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
   /* Source Sans 3 has two callers: the .wordmark lockup, which keeps its

@@ -1654,8 +1654,12 @@ body.dark .ci-band { opacity: 0.22; }
   font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
   color: var(--ink-3);
 }
+/* --heads (Source Serif 4) pairs the docked score with the bar's tab labels;
+   the wght 200-900 variable cut interpolates the 560 below exactly and
+   tabular-nums actually lands - Crimson's static set face-matched 560 to 600
+   and ignored tnum outright. */
 .ts-num {
-  font-family: var(--serif); font-weight: 560; font-size: 16px; line-height: 1;
+  font-family: var(--heads, var(--serif)); font-weight: 560; font-size: 16px; line-height: 1;
   letter-spacing: -0.01em; font-variant-numeric: tabular-nums;
 }
 .ts-sep { width: 1.5px; height: 13px; background: var(--line-2); align-self: center; flex: none; position: relative; top: 1px; }
