@@ -9,6 +9,20 @@
    CI (resample whole terms). Data: origin/main polls.json. */
 import { execSync } from "node:child_process";
 
+// CLI: --age=N.N picks the current-term snapshot age for the live call
+// (default 16.2, the analysis README's canonical read); --json silences the
+// prose and prints one machine-readable summary line instead — consumed by
+// .build/refresh-prediction.mjs. Neither flag changes the model: a default
+// run is byte-identical to before.
+const JSON_OUT = process.argv.includes("--json");
+const AGE_ARG = process.argv.slice(2).find((a) => a.startsWith("--age="));
+const SNAPSHOT_AGE = AGE_ARG ? Number(AGE_ARG.slice(6)) : 16.2;
+if (AGE_ARG && (!Number.isFinite(SNAPSHOT_AGE) || SNAPSHOT_AGE <= 0 || SNAPSHOT_AGE > 36)) {
+  console.error(`--age must be a month count in (0, 36]; got "${AGE_ARG}"`);
+  process.exit(2);
+}
+if (JSON_OUT) console.log = () => {};
+
 const D = JSON.parse(execSync("git show origin/main:data/polls.json", { maxBuffer: 1 << 28, encoding: "utf8" }));
 const WIN = { 1977: "lnp", 1980: "lnp", 1983: "alp", 1984: "alp", 1987: "alp", 1990: "alp", 1993: "alp",
   1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp",
@@ -86,6 +100,10 @@ function fit(rows, sd, lam = 1, iters = 1500) {
 }
 
 // ---- the age-profile for every term (fixed feature set) ------------------
+// Module-scope captures for the --json emit at EOF.
+const cur = snapshot(2025, SNAPSHOT_AGE);
+const PROFILE_JSON = [];
+let CUR_IN_SAMPLE = null, BOOT = null;
 console.log("=== term-age profiles (in-sample fit, λ=1 — for shape, not validation) ===");
 {
   const prepAll = prep(snaps, snaps);
@@ -93,15 +111,18 @@ console.log("=== term-age profiles (in-sample fit, λ=1 — for shape, not valid
   const H = ["6", "12", "15", "18", "24", "30", "fin"];
   console.log("term  fate      " + H.map((h) => ("p@" + h).padStart(7)).join(""));
   for (const y of TERMS) {
+    const bands = {};
     const row = agesOf(y).map((a) => {
       const s = snaps.find((v) => v.y === y && v.age === a);
+      bands[a === agesOf(y).at(-1) ? "fin" : String(a)] = f(s);
       return f(s).toFixed(2).padStart(7);
     });
+    PROFILE_JSON.push({ y, ousted: snaps.find((v) => v.y === y).ousted, span: +spanOf(y).toFixed(1), finAge: agesOf(y).at(-1), bands });
     console.log(`${y}  ${snaps.find((v) => v.y === y).ousted ? "OUSTED  " : "re-elect"}${row.join("")}`);
   }
-  const cur = snapshot(2025, 16.2);
   prep(snaps, [cur]);
-  console.log(`2025  CURRENT   ${"(now)".padStart(7 * 3)}${f(cur).toFixed(2).padStart(7)}  ← p(ousted) at 16.2 months in`);
+  CUR_IN_SAMPLE = f(cur);
+  console.log(`2025  CURRENT   ${"(now)".padStart(7 * 3)}${CUR_IN_SAMPLE.toFixed(2).padStart(7)}  ← p(ousted) at ${SNAPSHOT_AGE} months in`);
 }
 
 // ---- leave-one-term-out: accuracy per term-age band ----------------------
@@ -137,7 +158,6 @@ for (const lam of lams) {
 // ---- current term + cluster bootstrap CI ----------------------------------
 console.log("\n=== Albanese-2025 live call (cluster bootstrap, 300 draws) ===");
 {
-  const cur = snapshot(2025, 16.2);
   const ps = [];
   let seed = 42;
   const rnd = () => (seed = (seed * 1103515245 + 12345) & 0x7fffffff) / 0x7fffffff;
@@ -149,8 +169,21 @@ console.log("\n=== Albanese-2025 live call (cluster bootstrap, 300 draws) ===");
     ps.push(fit(trainRows, pd, 1, 1200)(cur));
   }
   ps.sort((a, b) => a - b);
-  console.log(`p(ousted | profile at 16.2mo) = median ${ps[150].toFixed(2)} · 10–90% CI [${ps[30].toFixed(2)}, ${ps[270].toFixed(2)}]`);
-  console.log(`share of bootstrap draws calling OUSTED (p≥0.5): ${(100 * ps.filter((p) => p >= 0.5).length / ps.length).toFixed(0)}%`);
+  BOOT = { median: ps[150], lo: ps[30], hi: ps[270], shareOuster: ps.filter((p) => p >= 0.5).length / ps.length };
+  console.log(`p(ousted | profile at ${SNAPSHOT_AGE}mo) = median ${ps[150].toFixed(2)} · 10–90% CI [${ps[30].toFixed(2)}, ${ps[270].toFixed(2)}]`);
+  console.log(`share of bootstrap draws calling OUSTED (p≥0.5): ${(100 * BOOT.shareOuster).toFixed(0)}%`);
   console.log(`current features: pmNet ${cur.pmNet?.toFixed(1)} · ppm ${cur.ppmLead?.toFixed(1)} · primSw ${cur.primSw?.toFixed(1)} · tppSw ${cur.tppSw?.toFixed(1)} · govAge ${cur.govAge} · ageFrac ${cur.ageFrac.toFixed(2)}`);
 }
 console.log("\nbaseline: majority 'always re-elected' per band = 9/13 = 69%");
+
+// Machine-readable summary for .build/refresh-prediction.mjs (see --json).
+if (JSON_OUT) {
+  const r4 = (o) => Object.fromEntries(Object.entries(o).map(([k, v]) => [k, +(+v).toFixed(4)]));
+  process.stdout.write(JSON.stringify({
+    age: SNAPSHOT_AGE,
+    ousted: r4(BOOT),
+    inSample: +CUR_IN_SAMPLE.toFixed(4),
+    features: { pmNet: cur.pmNet, ppm: cur.ppmLead, primSw: cur.primSw, tppSw: cur.tppSw, govAge: cur.govAge, ageFrac: +cur.ageFrac.toFixed(4) },
+    profile: PROFILE_JSON.map((t) => ({ ...t, bands: r4(t.bands) })),
+  }) + "\n");
+}

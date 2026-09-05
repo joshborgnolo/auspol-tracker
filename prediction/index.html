@@ -4,23 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Will this government be re-elected? · auspol tracker</title>
-<!-- Standalone page: the re-election model read, hand-maintained (like
-     /feedback/) outside the .build/newtracker pipeline. Chrome is the
-     static-article recipe the satellite pages share — 680px column, Crimson
-     Text headings over IBM Plex Sans body, ss-note footer, fixed .ss-back
-     pill — with pred-* blocks for the figure, the interval band, the term
-     table and the model ladder. Figures re-derived 5 September 2026 from
-     .build/analysis/reelect-snapshot-hazard.mjs against then-current
-     origin/main data and byte-identical to the canonical record in
-     .build/analysis/README.md (committed de5dfa4). The sitemap.xml route
-     lives in build.mjs next to /feedback/. -->
-<meta name="description" content="Sixteen months into the Albanese government’s second term, a statistical model trained on thirteen completed federal terms reads a 78 per cent chance of re-election — with an honest range of 40 to 95 per cent.">
+<!-- GENERATED FILE — do not hand-edit. Rebuilt by .build/refresh-prediction.mjs
+     on every fortnightly due date from 2026-09-19 (anchored every 14 days;
+     .build/prediction-refresh.sh, driven by prediction-refresh.yml and the
+     wrapper's --if-due gate). Chrome matches the /feedback/ satellite
+     recipe; numbers are composed once in the generator from the live output
+     of .build/analysis/reelect-snapshot-hazard.mjs (+ term-ridge cross-check).
+     This read: 5 September 2026 · age 16.1 months. -->
+<meta name="description" content="Modelled 78 per cent chance of re-election for the Albanese government as at 5 September 2026 — honest range 39–95. A statistical read of thirteen completed federal terms, refreshed fortnightly.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="auspol tracker">
 <meta property="og:title" content="Will this government be re-elected? · auspol tracker">
-<meta property="og:description" content="A model trained on every completed federal term since 1987 reads Albanese’s second term at sixteen months: median 78 per cent chance of re-election, honest range 40–95.">
+<meta property="og:description" content="Modelled 78 per cent chance of re-election for the Albanese government as at 5 September 2026 — honest range 39–95. A statistical read of thirteen completed federal terms, refreshed fortnightly.">
 <meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://auspoltracker.com/prediction/">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b1d2c'/%3E%3Crect x='6' y='15' width='5' height='11' fill='%23d62828'/%3E%3Crect x='13.5' y='8' width='5' height='18' fill='%23b08d39'/%3E%3Crect x='21' y='18' width='5' height='8' fill='%23ec7a08'/%3E%3C/svg%3E">
@@ -120,7 +117,7 @@ body {
   font-family: var(--serif); font-size: 20px; font-weight: 600;
   margin: 30px 0 8px; padding-top: 14px; border-top: 1px solid var(--line);
 }
-/* Body copy + ss-sub/ss-note copy the static page's RENDERED values: on the
+/* Body copy + ss-sub/ss-note carry the static page's RENDERED values: on the
    live page .static-summary p outranks the declared sub/note rules, so body
    paragraphs actually run 14.5px/1.6 ink-2. */
 .frame-wrap p { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin: 0 0 12px; }
@@ -140,11 +137,11 @@ body {
 .pred-cap { margin-top: 7px; font-size: 13px; font-weight: 500; color: var(--ink-2); }
 .pred-band { position: relative; height: 6px; margin-top: 20px; border-radius: 3px; background: var(--line-2); }
 .pred-ci {
-  position: absolute; top: -2px; bottom: -2px; left: 40%; width: 55%;
+  position: absolute; top: -2px; bottom: -2px;
   border-radius: 5px; background: var(--accent); opacity: 0.32;
 }
 .pred-med {
-  position: absolute; top: -4px; bottom: -4px; left: 78%; width: 2px;
+  position: absolute; top: -4px; bottom: -4px; width: 2px;
   border-radius: 1px; background: var(--ink);
 }
 .pred-scale {
@@ -152,6 +149,17 @@ body {
   margin-top: 7px; font-size: 10.5px; color: var(--ink-faint);
 }
 .pred-note { margin-top: 12px; font-size: 13px; line-height: 1.6; color: var(--ink-2); }
+
+/* ------- the reading-history selector ------- */
+.pred-selwrap { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin: 16px 0 0; }
+.pred-sellabel { font-size: 12.5px; font-weight: 600; color: var(--ink); }
+.pred-sel {
+  font-family: var(--sans); font-size: 13px; color: var(--ink);
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  padding: 6px 8px;
+}
+.pred-stale { font-size: 12px; color: var(--ink-3); }
+.pred-selnote, .frame-wrap p.pred-selnote { margin-top: 14px; font-size: 12.5px; color: var(--ink-3); }
 
 /* ------- the five readings ------- */
 .pred-feats { list-style: none; margin: 2px 0 14px; }
@@ -209,55 +217,57 @@ body {
 <body>
 <main class="frame-wrap">
   <h1>Will this government be re-elected?</h1>
-  <p class="ss-sub">A statistical model trained on the polling record of every completed federal term since 1987 reads the signature of Albanese’s second term, sixteen months in — as at 5 September 2026.</p>
+  <p class="ss-sub" data-slot="sub">A statistical model trained on the polling record of every completed federal term since 1987 reads the signature of Albanese’s second term, about 16 months in — as at 5 September 2026.</p>
 
-  <figure class="pred-fig" role="img" aria-label="Modelled chance of re-election: median 78 per cent, inside a ten-to-ninety per cent range of 40 to 95 per cent, on a zero to one hundred scale.">
-    <div class="pred-num">78%</div>
+  <p class="pred-selnote">This is the first model read — a dated record begins accumulating at the next fortnightly refresh (19 September 2026).</p>
+
+  <figure class="pred-fig" role="img" aria-label="Modelled chance of re-election: median 78 per cent, inside a ten-to-ninety per cent range of 39 to 95 per cent, on a zero to one hundred scale.">
+    <div class="pred-num"><span data-slot="fig">78</span>%</div>
     <div class="pred-cap">the model’s median chance that the Albanese government is re-elected</div>
     <div class="pred-band" aria-hidden="true">
-      <div class="pred-ci"></div>
-      <div class="pred-med"></div>
+      <div class="pred-ci" style="left:38.9%;width:56.2%"></div>
+      <div class="pred-med" style="left:77.9%"></div>
     </div>
     <div class="pred-scale" aria-hidden="true">
       <span>defeat certain · 0</span>
       <span>50</span>
       <span>100 · re-election certain</span>
     </div>
-    <figcaption class="pred-note">The band is the model’s honest disagreement with itself: re-fit on three hundred reshuffles of the historical record, the middle of its answers — the ten-to-ninety per cent range — runs from <strong>40 to 95 per cent</strong>. In 82 per cent of those re-fits the call is re-election. The rest call defeat.</figcaption>
+    <figcaption class="pred-note" data-slot="note">The band is the model’s honest disagreement with itself: re-fit on three hundred reshuffles of the historical record, the middle of its answers — the ten-to-ninety per cent range — runs from 39 to 95 per cent. In 82 per cent of those re-fits the call is re-election. The rest call defeat.</figcaption>
   </figure>
 
   <h2>What this number is</h2>
-  <p>The 78 per cent is not a poll of voters and it is not a betting price. It comes from a model that was shown the polling history of every completed federal parliamentary term since 1987 — thirteen terms, nine of which ended in the government’s re-election and four in its defeat — and taught to recognise the signature a term shows part-way through: how the prime minister is rated, whether the prime minister still leads as preferred PM, and how far the vote has faded from the last election result. Read against that record, the signature of Albanese’s second term at sixteen months is the signature of a government that goes on to survive.</p>
-  <p>The honest part of the answer is the width of the band. Thirteen terms and four defeats is a thin history, so no model of this kind can separate 78 from 85 per cent with confidence — the genuine range runs from an uncomfortable 40 to a comfortable 95. What the record can say clearly is which company this term keeps: at the same age, three of the four governments that eventually fell already looked markedly sicker than this one.</p>
+  <p>The number above is not a poll of voters and it is not a betting price. It comes from a model that was shown the polling history of every completed federal parliamentary term since 1987 — thirteen terms, nine of which ended in the government’s re-election and four in its defeat — and taught to recognise the signature a term shows part-way through: how the prime minister is rated, whether the prime minister still leads as preferred PM, and how far the vote has faded from the last election result. Read against that record, the signature of Albanese’s second term is the signature of a government that goes on to survive.</p>
+  <p data-slot="what2">The honest part of the answer is the width of the band. Thirteen terms and four defeats is a thin history, so the genuine range runs from an uncomfortable 39 to a comfortable 95 per cent. What the record can say clearly is which company this term keeps: three of the four governments that eventually fell already looked markedly sicker than this one at the same age.</p>
 
   <h2>How the model reads this term</h2>
   <p>Five readings, all knowable from published polling, drive the call.</p>
   <ul class="pred-feats">
     <li>
-      <strong>Net PM approval · −19</strong>
-      Voters disapprove of Albanese by a net margin of about nineteen points. On its own, that is a historically bad level — the four defeated governments all carried numbers like this, and a model that looks only at levels does in fact read this term worse than the typical loser.
+      <strong>Net PM approval · <span data-slot="f1l">−19</span></strong>
+      <span data-slot="f1">Voters disapprove of Albanese by a net margin of about 19 points. On its own that is a historically bad level — the four defeated governments all carried numbers like this, and a model that looks only at levels does in fact read this term worse than the typical loser.</span>
     </li>
     <li>
-      <strong>Preferred-PM lead · +15</strong>
-      Albanese still leads the opposition leader by about fifteen points as preferred prime minister. Governments that lose usually lose the leadership question as well as the vote.
+      <strong>Preferred-PM lead · <span data-slot="f2l">+14</span></strong>
+      <span data-slot="f2">Albanese still leads the opposition leader by about 14 points as preferred prime minister. Governments that lose usually lose the leadership question as well as the vote.</span>
     </li>
     <li>
-      <strong>Primary vote · −6.5 on 2025</strong>
-      Labor’s primary is running about six and a half points under its election vote. That is a standard post-election fade — indistinguishable, in this record, from the fade most surviving governments wore.
+      <strong>Primary vote · <span data-slot="f3l">−6.5</span> on 2025</strong>
+      <span data-slot="f3">Labor’s primary is running about 6.5 points under its election vote — a standard post-election fade, not a collapse, on this record.</span>
     </li>
     <li>
-      <strong>Two-party preferred · −3.1 on 2025</strong>
-      The government remains narrowly in front, about three points off its election pace.
+      <strong>Two-party preferred · <span data-slot="f4l">−2.9</span> on 2025</strong>
+      <span data-slot="f4">The government remains narrowly in front on two-party preferred — about 52.3 versus 55.2 at the election, 2.9 points off its election pace.</span>
     </li>
     <li>
-      <strong>Age of the government · second term</strong>
-      More than any single poll, age sorts the fates. No first-term government on this record has ever been voted out; the four that fell were in their second, third, fourth and fifth terms, at ages 2, 3, 4 and 5. This is the second consecutive Labor term — the same age at which the Gillard government was eventually ousted.
+      <strong>Age of the government · <span data-slot="f5l">2nd term</span></strong>
+      <span data-slot="f5">This is the 2nd consecutive Labor term. More than any single poll, age sorts the fates: no first-term government on this record has been voted out, and the four that fell were in their second, third, fourth and fifth terms. The Gillard government was ousted at exactly this age.</span>
     </li>
   </ul>
-  <p>The blend is the point: bad approval levels, but an ordinary fade, a young government, and a lead on the two measures that most often persist. That is why the model lands well short of alarm — the terms that fell looked far sicker than this by the same month.</p>
+  <p data-slot="blend">The blend is the point: bad approval levels, but an ordinary post-election fade, with a live preferred-PM cushion, in a young government. That is why the model lands well short of alarm — the terms that fell looked far sicker than this by the same month.</p>
 
   <h2>The thirteen terms it learned from</h2>
-  <p>Every few months of each completed term, from month six to the final pre-election read, the model says how likely that government was to be ousted at that point. The four defeats are in colour; the current term is pinned underneath at its present age of sixteen months.</p>
+  <p>Every few months of each completed term, from month six to the final pre-election read, the model says how likely that government was to be ousted at that point. The four defeats are in colour; the current term is pinned underneath.</p>
   <div class="pred-twrap">
     <table class="pred-table">
       <caption>Modelled chance of ouster, per cent, at each age of the term — fitted on the full record.</caption>
@@ -289,12 +299,14 @@ body {
         <tr><td class="l">2016–19</td><td class="l">Coalition — Turnbull → Morrison</td><td class="l fate">returned</td><td>24</td><td>26</td><td>28</td><td>34</td><td>21</td><td>37</td><td>32</td></tr>
         <tr class="lost"><td class="l">2019–22</td><td class="l">Coalition — Morrison</td><td class="l fate">lost</td><td>59</td><td>62</td><td>76</td><td>74</td><td>75</td><td>76</td><td>85</td></tr>
         <tr><td class="l">2022–25</td><td class="l">ALP — Albanese</td><td class="l fate">returned</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
-        <tr class="cur"><td class="l">2025–&nbsp;</td><td class="l">ALP — Albanese</td><td class="l fate">in progress</td><td class="now" colspan="7">reads <strong>24%</strong> at sixteen months — inside the survivors’ range, and below every eventual loser’s month-15 read</td></tr>
+        <tr class="cur"><td class="l">2025–&nbsp;</td><td class="l">ALP — Albanese</td><td class="l fate">in progress</td><td class="now" colspan="7" data-slot="nowRow">reads 23% at 16.1 months — below every eventual loser’s read (losers’ month-15 reads: 91, 91, 29 and 76 per cent; survivors’ worst: 63 per cent there)</td></tr>
       </tbody>
     </table>
   </div>
   <p class="pred-tnote">† The 2007 term ran 33 months, so its month-30 read doubles as its final read. Table values are the model’s in-sample reads; the headline call above comes from the bootstrap described below.</p>
-  <p>You can score 69 per cent on this table by simply always predicting “returned” — incumbents usually win. Tested honestly, with each term held out in turn and never seen by its judge, the model calls ten of thirteen terms correctly from month six onwards, and eleven by the final read on the eve of the campaign. The column that matters today is month 15, roughly where this term stands. The four eventual losers read 91, 91, 76 and 29 there. The nine winners read as low as 1 — and at worst 63, the Hawke government’s famous mid-term scare of 1989–90, from which it recovered to win the 1990 election. History is blur, with two tails that misbehave; the current term’s 24 sits inside the winning side of it.</p>
+  <p data-slot="bandIntro">The column that matters today is month 15 — the yardstick nearest this term’s age of 16.1 months.</p>
+  <p data-slot="bandCompare">The four eventual losers read 91, 91, 29 and 76 per cent there, the nine winners ran from 0 to 63 — and the current term read 23 at that age.</p>
+  <p>You can score 69 per cent on this table by simply always predicting “returned” — incumbents usually win. Tested honestly, with each term held out in turn and never seen by its judge, the model calls ten of thirteen terms correctly from month six onwards, and eleven by the final pre-election read. History blurs at the extremes: the Hawke government’s famous mid-term scare of 1989–90 read as high as 71 per cent ouster-risk at month 12, and it recovered to win the 1990 election — while the 2016–19 Coalition sat at 32 per cent by its final read and survived.</p>
 
   <h2>Where this can go wrong</h2>
   <p><strong>There are only thirteen terms.</strong> Four defeats is a tiny sample, and the final-read accuracy of 85 per cent itself carries about fourteen points of statistical noise either way. Treat every number on this page as a best guess with a range attached — which is why the range, not the median, is the most honest figure here.</p>
@@ -311,21 +323,52 @@ body {
     <tbody>
       <tr><td>15-month <em>levels</em> composite (approval, lead, swings scored against the ousted and survivor centroids)</td><td>−1.18 — worse than the typical ousted term’s level</td><td>15% (useless)</td></tr>
       <tr><td>15-month <em>declines</em> composite (fade from the term’s own honeymoon)</td><td>+0.86 — a standard honeymoon fade</td><td>54%</td></tr>
-      <tr><td>Ridge logistic on per-term trajectory features</td><td>p(ousted) = 0.31 → predict re-elected</td><td>85% full-term · 77% live</td></tr>
-      <tr class="picked"><td><strong>Snapshot / hazard model — the one above</strong></td><td><strong>median p(ousted) = 0.22, 10–90% [0.05, 0.60]</strong></td><td>77% at every band, months 6–24 · 75% at 30 · 85% final</td></tr>
+      <tr><td>Ridge logistic on per-term trajectory features</td><td><span data-slot="ridgeCell">p(ousted) = 0.31 → predict re-elected</span></td><td>85% full-term · 77% live</td></tr>
+      <tr class="picked"><td><strong>Snapshot / hazard model — the one above</strong></td><td><strong><span data-slot="hazardCell">median p(ousted) = 0.22, 10–90% [0.05, 0.61]</span></strong></td><td>77% at every band, months 6–24 · 75% at 30 · 85% final</td></tr>
     </tbody>
   </table>
   <p>The construction. Each completed term contributes snapshots at ages 6, 12, 15, 18, 24 and 30 months plus a final read three months before its last day — ninety snapshots in all. Each snapshot’s features are trailing-three-month summaries knowable at that age: net PM approval, the preferred-PM lead, the primary-vote and two-party swings against the term’s own election result, the government’s incumbency age in consecutive terms, the fraction of the term elapsed (the current term is assumed to run a full span), and the interaction of primary swing with elapsed fraction — seven features in all. Missing values are median-imputed within the training fold; features are standardised within it; the fit is ridge logistic regression with λ = 1.</p>
-  <p>The validation. Leave-one-term-out: a term’s snapshots are scored only by a model trained on the other twelve. The baseline “always re-elected” scores 69 per cent. Snapshot-level AUC is 0.77 with Brier score 0.182. The interval comes from a 300-draw cluster bootstrap that resamples whole terms, refits, and re-scores the current term each draw; 18 per cent of draws cross the halfway line into “ousted”. The live call, verbatim:</p>
-  <div class="pred-code">p(ousted | profile at 16.2mo) = median 0.22 · 10–90% CI [0.05, 0.60]
+  <p>The validation. Leave-one-term-out: a term’s snapshots are scored only by a model trained on the other twelve. The baseline “always re-elected” scores 69 per cent. Snapshot-level AUC is 0.77 with Brier score 0.182. The interval comes from a 300-draw cluster bootstrap that resamples whole terms, refits, and re-scores the current term each draw. The live call, verbatim:</p>
+  <div class="pred-code" data-slot="code">p(ousted | profile at 16.1mo) = median 0.22 · 10–90% CI [0.05, 0.61]
 share of bootstrap draws calling ousted (p ≥ 0.5): 18%
-features: pmNet −18.9 · ppm +14.5 · primSw −6.5 · tppSw −3.1 · govAge 2 · ageFrac 0.44
-(the table’s current-term row shows the in-sample profile read: 0.24)</div>
-  <p>The cross-check. A deliberately different construction — one ridge logistic per term on first-sixteen-month features — reads p(ousted) = 0.31: same verdict, well short of alarm. Its best-calibrated variant, adding leadership-spill and minority-government flags, holds the same 85 per cent leave-one-term-out accuracy with AUC 0.89 and Brier 0.134. On thirteen terms the estimator is not the constraint — a diagonal LDA ties the ridge and k-nearest-neighbours collapses — and no capacity beyond logistic earns its keep: adjacent accuracies are statistically indistinguishable (85 per cent carries a 95% Wilson interval of roughly [58%, 96%]).</p>
-  <p>To reproduce: from the repo root, <code>node .build/analysis/reelect-snapshot-hazard.mjs</code> (the headline), <code>reelect-term-ridge.mjs</code> (the cross-check), plus <code>reelect-15mo-levels.mjs</code> and <code>reelect-15mo-declines.mjs</code> (the composites). The scripts read poll data straight from origin/main, so they are immune to working-tree state; the canonical numbers live in <code>.build/analysis/README.md</code>. Figures on this page were re-derived on 5 September 2026 and match the canonical record. The analysis’s own closing caution stands: this is historical signature analysis, not a forecast.</p>
+features: pmNet −18.9 · ppm +14.5 · primSw −6.5 · tppSw −2.9 · govAge 2 · ageFrac 0.44
+(the table’s current-term row shows the in-sample profile read: 0.23)</div>
+  <p>The cross-check. A deliberately different construction — one ridge logistic per term on first-sixteen-month features — <span data-slot="ridgeCell2">reads p(ousted) = 0.31 — same verdict, well short of alarm.</span> Its best-calibrated variant, adding leadership-spill and minority-government flags, holds the same 85 per cent leave-one-term-out accuracy with AUC 0.89 and Brier 0.134. On thirteen terms the estimator is not the constraint — a diagonal LDA ties the ridge and k-nearest-neighbours collapses — and no capacity beyond logistic earns its keep: adjacent accuracies are statistically indistinguishable (85 per cent carries a 95% Wilson interval of roughly [58%, 96%]).</p>
+  <p>To reproduce: from the repo root, <code>node .build/analysis/reelect-snapshot-hazard.mjs</code> (the headline — its snapshot age defaults to the canonical 16.2 months and moves via <code>--age=N.N</code>), <code>node .build/analysis/reelect-term-ridge.mjs</code> (the cross-check), plus <code>reelect-15mo-levels.mjs</code> and <code>reelect-15mo-declines.mjs</code> (the composites). Both models emit machine-readable results with <code>--json</code>; this page is regenerated from them by <code>.build/refresh-prediction.mjs</code> on a fortnightly due-date gate, and each refresh is one dated, selectable record above. The analysis scripts read poll data straight from origin/main, so they are immune to working-tree state; the canonical numbers live in <code>.build/analysis/README.md</code>. The analysis’s own closing caution stands: this is historical signature analysis, not a forecast.</p>
 
   <p class="ss-note">This is a satellite analysis page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>
+<script>
+const PRED_DATA = [{"asOf":"2026-09-05","sl":"5 Sep 2026","o":{"median":0.2207,"lo":0.0481,"hi":0.6105,"shareOuster":0.1833},"s":{"sub":"A statistical model trained on the polling record of every completed federal term since 1987 reads the signature of Albanese’s second term, about 16 months in — as at 5 September 2026.","fig":"78","figAria":"Modelled chance of re-election: median 78 per cent, inside a ten-to-ninety per cent range of 39 to 95 per cent, on a zero to one hundred scale.","note":"The band is the model’s honest disagreement with itself: re-fit on three hundred reshuffles of the historical record, the middle of its answers — the ten-to-ninety per cent range — runs from 39 to 95 per cent. In 82 per cent of those re-fits the call is re-election. The rest call defeat.","what2":"The honest part of the answer is the width of the band. Thirteen terms and four defeats is a thin history, so the genuine range runs from an uncomfortable 39 to a comfortable 95 per cent. What the record can say clearly is which company this term keeps: three of the four governments that eventually fell already looked markedly sicker than this one at the same age.","f1l":"−19","f1":"Voters disapprove of Albanese by a net margin of about 19 points. On its own that is a historically bad level — the four defeated governments all carried numbers like this, and a model that looks only at levels does in fact read this term worse than the typical loser.","f2l":"+14","f2":"Albanese still leads the opposition leader by about 14 points as preferred prime minister. Governments that lose usually lose the leadership question as well as the vote.","f3l":"−6.5","f3":"Labor’s primary is running about 6.5 points under its election vote — a standard post-election fade, not a collapse, on this record.","f4l":"−2.9","f4":"The government remains narrowly in front on two-party preferred — about 52.3 versus 55.2 at the election, 2.9 points off its election pace.","f5l":"2nd term","f5":"This is the 2nd consecutive Labor term. More than any single poll, age sorts the fates: no first-term government on this record has been voted out, and the four that fell were in their second, third, fourth and fifth terms. The Gillard government was ousted at exactly this age.","blend":"The blend is the point: bad approval levels, but an ordinary post-election fade, with a live preferred-PM cushion, in a young government. That is why the model lands well short of alarm — the terms that fell looked far sicker than this by the same month.","nowRow":"reads 23% at 16.1 months — below every eventual loser’s read (losers’ month-15 reads: 91, 91, 29 and 76 per cent; survivors’ worst: 63 per cent there)","bandIntro":"The column that matters today is month 15 — the yardstick nearest this term’s age of 16.1 months.","bandCompare":"The four eventual losers read 91, 91, 29 and 76 per cent there, the nine winners ran from 0 to 63 — and the current term read 23 at that age.","ridgeCell":"p(ousted) = 0.31 → predict re-elected","ridgeCell2":"reads p(ousted) = 0.31 — same verdict, well short of alarm.","hazardCell":"median p(ousted) = 0.22, 10–90% [0.05, 0.61]","code":"p(ousted | profile at 16.1mo) = median 0.22 · 10–90% CI [0.05, 0.61]\nshare of bootstrap draws calling ousted (p ≥ 0.5): 18%\nfeatures: pmNet −18.9 · ppm +14.5 · primSw −6.5 · tppSw −2.9 · govAge 2 · ageFrac 0.44\n(the table’s current-term row shows the in-sample profile read: 0.23)","metaDesc":"Modelled 78 per cent chance of re-election for the Albanese government as at 5 September 2026 — honest range 39–95. A statistical read of thirteen completed federal terms, refreshed fortnightly."}}];
+(function () {
+  var sel = document.getElementById("pred-sel");
+  if (!sel) return;
+  var latest = PRED_DATA[PRED_DATA.length - 1];
+  function pctv(x) { return (Math.round(x * 1000) / 10) + "%"; }
+  function find(d) { for (var i = 0; i < PRED_DATA.length; i++) if (PRED_DATA[i].asOf === d) return PRED_DATA[i]; return null; }
+  function apply(rec) {
+    var els = document.querySelectorAll("[data-slot]");
+    for (var i = 0; i < els.length; i++) {
+      var k = els[i].getAttribute("data-slot");
+      if (rec.s[k] != null) els[i].textContent = rec.s[k];
+    }
+    var fig = document.querySelector(".pred-fig");
+    if (fig) fig.setAttribute("aria-label", rec.s.figAria);
+    var ci = document.querySelector(".pred-ci");
+    if (ci) { ci.style.left = pctv(1 - rec.o.hi); ci.style.width = pctv(rec.o.hi - rec.o.lo); }
+    var med = document.querySelector(".pred-med");
+    if (med) med.style.left = pctv(1 - rec.o.median);
+    var stale = document.getElementById("pred-stale");
+    if (stale) {
+      if (rec.asOf !== latest.asOf) { stale.hidden = false; stale.textContent = "Archived read — the latest (" + latest.sl + ") puts re-election at " + latest.s.fig + "%."; }
+      else stale.hidden = true;
+    }
+    if (window.history && history.replaceState) history.replaceState(null, "", "#" + rec.asOf);
+  }
+  sel.addEventListener("change", function () { var r = find(sel.value); if (r) apply(r); });
+  if (location.hash.length > 5) { var r = find(location.hash.slice(1)); if (r) { sel.value = r.asOf; apply(r); } }
+})();
+</script>
 <a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 </body>
 </html>

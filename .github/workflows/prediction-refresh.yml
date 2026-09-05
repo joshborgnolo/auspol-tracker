@@ -1,0 +1,89 @@
+# /prediction/ fortnightly refresh — runs .build/prediction-refresh.sh daily.
+# The wrapper's --if-due gate makes non-due days a cheap no-op (anchor
+# 2026-09-19, then every 14 days); on a due day with new data it refreshes
+# data/prediction-history.json + prediction/index.html, rebuilds the sitemap,
+# and commits "Refresh re-election model read as at <date>".
+#
+# The generator's model scripts read `git show origin/main:data/polls.json`,
+# so checkout needs fetch-depth 0 for the origin/main ref to exist.
+#
+# Failure path: when the deterministic update job fails (generator guard,
+# build error, push failure), the repair job boots headless Matilda with
+# MATILDA_API_KEY (repo secret) and the prompt in
+# .build/prediction-repair-prompt.md.
+
+name: prediction-refresh
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # 13:00 AEST daily — due-day no-ops are seconds
+  workflow_dispatch:
+    inputs:
+      simulate_failure:
+        description: 'Force the update job to fail (tests the Matilda repair job)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
+
+# Every push-capable workflow shares one concurrency group so two writers
+# can never be mid-flight against main at the same time. Serialised, not
+# cancelled: a queued run still gets its slot.
+concurrency:
+  group: main-writers
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # model scripts read git show origin/main:...
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Run the prediction refresh
+        run: |
+          if [ "${{ inputs.simulate_failure }}" = "true" ]; then
+            echo "simulate_failure requested; failing to exercise the repair job"
+            exit 1
+          fi
+          bash .build/prediction-refresh.sh
+
+  repair:
+    needs: update
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # Pinned for the same reason as poll-agent.yml — bump both together.
+      - name: Install Matilda CLI
+        run: npm i -g @maincode-ai/matilda-code@0.21.4
+
+      - name: Run the repair agent
+        env:
+          MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$MATILDA_API_KEY" ]; then
+            echo "::warning::MATILDA_API_KEY secret not set; skipping repair. Add it in repo Settings > Secrets."
+            exit 0
+          fi
+          matilda -p "$(cat .build/prediction-repair-prompt.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80

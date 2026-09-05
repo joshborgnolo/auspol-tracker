@@ -11,6 +11,11 @@
    Data: origin/main polls.json. */
 import { execSync } from "node:child_process";
 
+// --json: silence the prose and print only a machine-readable live-call
+// summary (consumed by .build/refresh-prediction.mjs).
+const JSON_OUT = process.argv.includes("--json");
+if (JSON_OUT) console.log = () => {};
+
 const D = JSON.parse(execSync("git show origin/main:data/polls.json", { maxBuffer: 1 << 28, encoding: "utf8" }));
 const WIN = { 1977: "lnp", 1980: "lnp", 1983: "alp", 1984: "alp", 1987: "alp", 1990: "alp", 1993: "alp",
   1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp",
@@ -140,10 +145,12 @@ const rowsB = TERMS.map((y) => live16(y, false));
 const BKEYS = ["pmNet15", "pmNetDrop", "ppm15", "primSw", "tppSw", "govAge"];
 for (const lam of [0.3, 1, 3]) loocv(rowsB, BKEYS, lam, `B λ=${lam}`);
 const cur = live16(2025, true);
+let ridgeLiveP = null;
 {
   const Xh = impute(rowsB.concat([cur]), BKEYS, rowsB.map((_, i) => i));
   const mdl = fitRidge(Xh.slice(0, rowsB.length), rowsB.map((r) => r.ousted), 1);
   const p = mdl.predict(Xh.at(-1));
+  ridgeLiveP = p;
   console.log(`\nAlbanese-2025 features: ` + BKEYS.map((k) => `${k}=${cur[k] == null ? "—" : +cur[k].toFixed(1)}`).join(" "));
   console.log(`LIVE p(ousted | first-16-months profile, λ=1) = ${p.toFixed(2)} → predict ${p >= 0.5 ? "OUSTED" : "re-elected"}`);
 }
@@ -227,4 +234,12 @@ loocvGeneric(rowsExt, [...SETS["A2 +govAge"], "unemp", "spill", "minor"], (tr, z
 loocvGeneric(rowsExt, ["govAge", "unemp", "spill", "minor"], (tr, z) => fitRidge(tr.map((t) => t.x), tr.map((t) => t.y), 1).predict(z), "theory-only     ");
 const binomSE = (a, n) => Math.sqrt(a / n * (1 - a / n) / n);
 { const a = 11 / 13; console.log(`\nnote: 11/13 = 85% carries ±${(100 * 2 * binomSE(a, 13)).toFixed(0)}pp (95% Wilson ≈ [58%,96%]) — adjacent accuracies here are statistically indistinguishable`); }
+
+if (JSON_OUT) {
+  process.stdout.write(JSON.stringify({
+    window: [12, 18],
+    liveP: ridgeLiveP,
+    features: Object.fromEntries(BKEYS.map((k) => [k, cur[k]])),
+  }) + "\n");
+}
 
