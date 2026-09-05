@@ -185,6 +185,32 @@ td .fmr { color: var(--ink-faint); font-weight: 400; font-size: 12px; }
 .pos { color: #a23b2e; } .neg { color: #2f5d8a; }
 @media (prefers-color-scheme: dark) { .pos { color: #e08073; } .neg { color: #7fa6cc; } }
 
+/* ---- states & territories: at-a-glance grid ---- */
+.st-note { margin: 2px 2px 0; font-size: 12.5px; color: var(--ink-3); }
+.states-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+  gap: 10px; margin-top: 12px;
+}
+.state-card {
+  appearance: none; text-align: left; font: inherit; color: inherit;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--panel);
+  padding: 12px 14px 8px; cursor: pointer;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.state-card:hover { border-color: var(--ink-3); }
+.state-card:focus-visible { outline: 2px solid var(--ink-3); outline-offset: 1px; }
+.state-card .st-top {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 8px;
+}
+.state-card .st-name { font-weight: 600; font-size: 13.5px; }
+.state-card .st-fig {
+  font-family: var(--serif); font-size: 21px; font-weight: 600;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.st-fig small { font-size: 12px; font-weight: 400; color: var(--ink-3); }
+.state-card .st-sub { font-size: 12px; color: var(--ink-3); }
+.state-card .st-spark { display: block; width: 100%; height: 56px; margin-top: 4px; }
+
 .ss-note { margin-top: 22px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
 .ss-note a { color: var(--ink-2); }
 .ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
@@ -226,7 +252,11 @@ td .fmr { color: var(--ink-faint); font-weight: 400; font-size: 12px; }
   </div>
   <p class="note" id="chart-note">Positive is a Labor lead; negative is a Coalition (or other-candidate) lead. <span id="nc-note" hidden><sup>†</sup> marks a non-classic contest, shown as the two-candidate-preferred margin for the challenging party against the major party.</span></p>
 
-  <h2>Seats at the 2022 election</h2>
+  <h2>States &amp; territories</h2>
+  <p class="st-note">Labor–Coalition two-party-preferred since 1993, on one shared scale. Click a state to load it in the explorer above.</p>
+  <div class="states-grid" id="states-grid"></div>
+
+  <h2>Seats at the 2025 election</h2>
   <div class="controls">
     <div class="field">
       <label for="state-filter">State / territory</label>
@@ -285,7 +315,7 @@ td .fmr { color: var(--ink-faint); font-weight: 400; font-size: 12px; }
   var tableBody = document.querySelector("#seats tbody");
   var searchInput = document.getElementById("seat-search");
   var cur = { id: null, kind: null, measure: "margin" };
-  var TABLE_YEAR = 2022;               /* latest election in the source CSVs */
+  var TABLE_YEAR = 2025;               /* latest election in the source CSVs */
   var sort = { key: "name", dir: 1 };  /* default: alphabetical */
 
   /* ---------- build the selector ---------- */
@@ -635,6 +665,65 @@ td .fmr { color: var(--ink-faint); font-weight: 400; font-size: 12px; }
     }).filter(Boolean);
   }
 
+  /* ---------- states & territories glance cards ---------- */
+  function renderStateCards() {
+    var grid = document.getElementById("states-grid");
+    grid.innerHTML = "";
+    /* one shared symmetric domain across all cards so the cards compare honestly */
+    var maxAbs = 0;
+    D.states.forEach(function (s) {
+      s.series.forEach(function (r) {
+        var m = r.al - r.co;
+        if (Math.abs(m) > maxAbs) maxAbs = Math.abs(m);
+      });
+    });
+    var A = Math.ceil(maxAbs) + 2;
+    var SW = 200, SH = 56, PX = 4, PY = 4;
+    var yOf = function (m) { return SH / 2 - (m / A) * (SH / 2 - PY); };
+    D.states.forEach(function (s) {
+      var last = s.series[s.series.length - 1];
+      var m = last.al - last.co;
+      var card = document.createElement("button");
+      card.type = "button";
+      card.className = "state-card";
+      card.dataset.state = s.id;
+
+      var top = document.createElement("div"); top.className = "st-top";
+      var nm = document.createElement("span"); nm.className = "st-name"; nm.textContent = s.state;
+      var fig = document.createElement("span"); fig.className = "st-fig";
+      fig.innerHTML = last.al.toFixed(1) + " <small>ALP</small>";
+      top.appendChild(nm); top.appendChild(fig);
+      card.appendChild(top);
+
+      var sw = last.sw;
+      var sub = document.createElement("div"); sub.className = "st-sub";
+      sub.innerHTML = isNum(sw)
+        ? "Swing to Labor <span class='" + (sw >= 0 ? "pos" : "neg") + "'>" + (sw > 0 ? "+" : "") + sw.toFixed(1) + "</span>"
+        : "Swing to Labor —";
+      card.appendChild(sub);
+
+      var svg = el("svg", { "class": "st-spark", viewBox: "0 0 " + SW + " " + SH, "aria-hidden": "true" });
+      el("line", { x1: PX, x2: SW - PX, y1: yOf(0), y2: yOf(0), stroke: "var(--line)", "stroke-dasharray": "3,3", "stroke-width": 1 }, svg);
+      var pts = s.series.map(function (r, i) {
+        var x = PX + (SW - 2 * PX) * (i / (s.series.length - 1));
+        return x.toFixed(1) + "," + yOf(r.al - r.co).toFixed(1);
+      });
+      el("polyline", { points: pts.join(" "), fill: "none", stroke: "var(--ink-3)", "stroke-width": 1.5, "stroke-linejoin": "round", "stroke-linecap": "round" }, svg);
+      el("circle", { cx: SW - PX, cy: yOf(m), r: 2.6, fill: m >= 0 ? colorOf("Labor") : colorOf("Coalition") }, svg);
+      var ttl = document.createElementNS(NS, "title");
+      ttl.textContent = s.state + " — " + last.y + ": ALP " + last.al.toFixed(1) + " · Coalition " + last.co.toFixed(1);
+      svg.appendChild(ttl);
+      card.appendChild(svg);
+
+      card.addEventListener("click", function () {
+        seatSel.value = "state:" + s.id;
+        onSelect();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+      grid.appendChild(card);
+    });
+  }
+
   function renderTable() {
     var q = searchInput.value.trim().toLowerCase();
     var st = stateSelect.value;
@@ -717,6 +806,7 @@ td .fmr { color: var(--ink-faint); font-weight: 400; font-size: 12px; }
     });
   });
   window.addEventListener("resize", function () { if (cur.data) drawChart(); });
+  renderStateCards();
   renderTable();
   onSelect();
 })();

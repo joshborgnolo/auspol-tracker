@@ -80,6 +80,8 @@ const getJson = (path) => new Promise((res, rej) => {
       legendKeys: qa('#legend .key').length,
       title: q('#chart-title') ? q('#chart-title').textContent : null,
       warringahDefault: q('#seat').value,
+      stateCards: qa('.state-card').length,
+      stateSparks: qa('.st-spark polyline').length,
     };
   })()`);
 
@@ -109,6 +111,10 @@ const getJson = (path) => new Promise((res, rej) => {
     ths.find(t => t.dataset.k === 'margin').click();
     const firstMarginCell = document.querySelector('#seats tbody tr td:nth-child(4)');
     out.sortedFirstMargin = firstMarginCell ? firstMarginCell.textContent : null;
+    const card = [...document.querySelectorAll('.state-card')].find(c => c.dataset.state === 'tas');
+    card.click();
+    out.cardClickTitle = q('#chart-title').textContent;
+    out.cardClickSelect = q('#seat').value;
     return out;
   })()`);
 
@@ -117,6 +123,7 @@ const getJson = (path) => new Promise((res, rej) => {
   chrome.kill();
   const fail = errors.length > 0
     || !checks || checks.svgCircles < 5 || checks.tableRows < 100 || checks.seatOptions < 150 || checks.svgPaths < 3
-    || !interact || interact.willsDashed < 1;
+    || checks.stateCards !== 8 || checks.stateSparks !== 8
+    || !interact || interact.willsDashed < 1 || interact.cardClickSelect !== 'state:tas';
   process.exit(fail ? 1 : 0);
 })().catch(e => { console.error("checker error:", e.message); chrome.kill(); process.exit(2); });

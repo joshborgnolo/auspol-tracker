@@ -1,0 +1,10 @@
+2025 Federal Election House of Representatives Two Party Preferred By State [Event:31496 Phase:FinalResults Generated:2025-06-16T10:39:06 Cycle:194a421d-c559-4a18-a78a-90c7cf2acb4e Created:2025-06-16T10:36:42 Environment:PROD Site:CANBERRA Server:Internal Version:10.11.386.0]
+StateAb,StateNm,Australian Labor Party Votes,Australian Labor Party Percentage,Liberal/National Coalition Votes,Liberal/National Coalition Percentage,TotalVotes,Swing
+NSW,New South Wales,2649390,55.27,2143861,44.73,4793251,3.85
+VIC,Victoria,2283824,56.35,1769240,43.65,4053064,1.52
+QLD,Queensland,1556506,49.42,1593135,50.58,3149641,3.47
+WA,Western Australia,892635,55.84,705821,44.16,1598456,0.84
+SA,South Australia,670248,59.2,461990,40.8,1132238,5.23
+TAS,Tasmania,232624,63.34,134635,36.66,367259,9.01
+ACT,Australian Capital Territory,210627,72.49,79938,27.51,290565,5.54
+NT,Northern Territory,57377,54.25,48385,45.75,105762,-1.29

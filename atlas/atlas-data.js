@@ -69,6 +69,13 @@ window.ATLAS_DATA = {
      "co": 38.09,
      "al": 61.91,
      "sw": 3.73
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 30.93,
+     "al": 69.07,
+     "sw": 7.16
     }
    ]
   },
@@ -127,6 +134,13 @@ window.ATLAS_DATA = {
      "co": 52.81,
      "al": 47.19,
      "sw": 7.32
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 46.57,
+     "al": 53.43,
+     "sw": 6.04
     }
    ]
   },
@@ -185,6 +199,13 @@ window.ATLAS_DATA = {
      "co": 37.03,
      "al": 62.97,
      "sw": 2.74
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 39.34,
+     "al": 60.66,
+     "sw": -2.32
     }
    ]
   },
@@ -243,6 +264,13 @@ window.ATLAS_DATA = {
      "co": 53.2,
      "al": 46.8,
      "sw": 3.06
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 47.61,
+     "al": 52.39,
+     "sw": 5.03
     }
    ]
   },
@@ -310,6 +338,13 @@ window.ATLAS_DATA = {
      "co": 66.62,
      "al": 33.38,
      "sw": 2.32
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 62.98,
+     "al": 37.02,
+     "sw": 3.64
     }
    ]
   },
@@ -368,6 +403,13 @@ window.ATLAS_DATA = {
      "co": 34.46,
      "al": 65.54,
      "sw": 6.13
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 34,
+     "al": 66,
+     "sw": 4.01
     }
    ]
   },
@@ -426,6 +468,13 @@ window.ATLAS_DATA = {
      "co": 51.43,
      "al": 48.57,
      "sw": -1.02
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 41.99,
+     "al": 58.01,
+     "sw": 9.44
     }
    ]
   },
@@ -529,6 +578,22 @@ window.ATLAS_DATA = {
       "swing": -5.98,
       "winner": "ALP"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 21.47,
+     "al": 78.53,
+     "sw": 2.82,
+     "nc": {
+      "mine": "Greens",
+      "major": "Labor",
+      "minePct": 40.28,
+      "majorPct": 59.72,
+      "margin": 9.72,
+      "swing": 1.05,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -587,6 +652,13 @@ window.ATLAS_DATA = {
      "co": 37.89,
      "al": 62.11,
      "sw": 3.26
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 48.6,
+     "al": 51.4,
+     "sw": 51.4
     }
    ]
   },
@@ -645,6 +717,13 @@ window.ATLAS_DATA = {
      "co": 49.02,
      "al": 50.98,
      "sw": 7.89
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 40.74,
+     "al": 59.26,
+     "sw": 9.3
     }
    ]
   },
@@ -703,6 +782,13 @@ window.ATLAS_DATA = {
      "co": 59.77,
      "al": 40.23,
      "sw": 5.88
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 51.63,
+     "al": 48.37,
+     "sw": 5.93
     }
    ]
   },
@@ -761,6 +847,13 @@ window.ATLAS_DATA = {
      "co": 44.77,
      "al": 55.23,
      "sw": 4.02
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 44.29,
+     "al": 55.71,
+     "sw": 0.48
     }
    ]
   },
@@ -819,6 +912,13 @@ window.ATLAS_DATA = {
      "co": 35.06,
      "al": 64.94,
      "sw": 0.22
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 28.1,
+     "al": 71.9,
+     "sw": 8.86
     }
    ]
   },
@@ -877,6 +977,13 @@ window.ATLAS_DATA = {
      "co": 53.41,
      "al": 46.59,
      "sw": 4
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 45,
+     "al": 55,
+     "sw": 8.41
     }
    ]
   },
@@ -935,6 +1042,13 @@ window.ATLAS_DATA = {
      "co": 46.72,
      "al": 53.28,
      "sw": 4.66
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 38.9,
+     "al": 61.1,
+     "sw": 7.82
     }
    ]
   },
@@ -993,6 +1107,13 @@ window.ATLAS_DATA = {
      "co": 55.51,
      "al": 44.49,
      "sw": 4.73
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 52.43,
+     "al": 47.57,
+     "sw": 3.08
     }
    ]
   },
@@ -1051,6 +1172,13 @@ window.ATLAS_DATA = {
      "co": 58.03,
      "al": 41.97,
      "sw": -4.94
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 42.8,
+     "al": 57.2,
+     "sw": 15.23
     }
    ]
   },
@@ -1118,6 +1246,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "LP"
      }
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 54.95,
+     "al": 45.05,
+     "sw": 1.18,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 50.01,
+      "majorPct": 49.99,
+      "margin": 0.01,
+      "swing": 4.24,
+      "winner": "IND"
+     }
     }
    ]
   },
@@ -1176,6 +1320,13 @@ window.ATLAS_DATA = {
      "co": 33.29,
      "al": 66.71,
      "sw": 10.05
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 33.08,
+     "al": 66.92,
+     "sw": -0.15
     }
    ]
   },
@@ -1243,6 +1394,13 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "GRN"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 41.04,
+     "al": 58.96,
+     "sw": 58.96
     }
    ]
   },
@@ -1301,6 +1459,13 @@ window.ATLAS_DATA = {
      "co": 43.41,
      "al": 56.59,
      "sw": -0.69
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 35.38,
+     "al": 64.62,
+     "sw": 9.31
     }
    ]
   },
@@ -1377,6 +1542,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "NAT"
      }
+    },
+    {
+     "y": 2025,
+     "party": "NP",
+     "co": 62.26,
+     "al": 37.74,
+     "sw": 3.19,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 56.78,
+      "majorPct": 43.22,
+      "margin": 6.78,
+      "swing": 5.96,
+      "winner": "IND"
+     }
     }
    ]
   },
@@ -1435,6 +1616,22 @@ window.ATLAS_DATA = {
      "co": 37.61,
      "al": 62.39,
      "sw": -7.23
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 35.29,
+     "al": 64.71,
+     "sw": 2.32,
+     "nc": {
+      "mine": "Independent",
+      "major": "Labor",
+      "minePct": 44.92,
+      "majorPct": 55.08,
+      "margin": 5.08,
+      "swing": null,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -1502,6 +1699,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "ALP"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 23.58,
+     "al": 76.42,
+     "sw": 3.96,
+     "nc": {
+      "mine": "Greens",
+      "major": "Labor",
+      "minePct": 30.48,
+      "majorPct": 69.52,
+      "margin": 19.52,
+      "swing": 7.32,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -1560,6 +1773,13 @@ window.ATLAS_DATA = {
      "co": 53.59,
      "al": 46.41,
      "sw": 7.97
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 56.55,
+     "al": 43.45,
+     "sw": -5.35
     }
    ]
   },
@@ -1618,6 +1838,13 @@ window.ATLAS_DATA = {
      "co": 56.59,
      "al": 43.41,
      "sw": 5.76
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 55.83,
+     "al": 44.17,
+     "sw": 0.76
     }
    ]
   },
@@ -1676,6 +1903,13 @@ window.ATLAS_DATA = {
      "co": 51.48,
      "al": 48.52,
      "sw": 3.14
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 52.89,
+     "al": 47.11,
+     "sw": -1.46
     }
    ]
   },
@@ -1771,6 +2005,13 @@ window.ATLAS_DATA = {
      "co": 36.53,
      "al": 63.47,
      "sw": 1.1
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 30.17,
+     "al": 69.83,
+     "sw": 6.18
     }
    ]
   },
@@ -1829,6 +2070,13 @@ window.ATLAS_DATA = {
      "co": 43.59,
      "al": 56.41,
      "sw": 6.86
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 44.3,
+     "al": 55.7,
+     "sw": 2.37
     }
    ]
   },
@@ -1887,6 +2135,13 @@ window.ATLAS_DATA = {
      "co": 62.44,
      "al": 37.56,
      "sw": 6.58
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 57.19,
+     "al": 42.81,
+     "sw": 4.43
     }
    ]
   },
@@ -1945,6 +2200,13 @@ window.ATLAS_DATA = {
      "co": 42.4,
      "al": 57.6,
      "sw": 6.55
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 41.95,
+     "al": 58.05,
+     "sw": 0.21
     }
    ]
   },
@@ -2003,6 +2265,13 @@ window.ATLAS_DATA = {
      "co": 37.16,
      "al": 62.84,
      "sw": 2.52
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 36.77,
+     "al": 63.23,
+     "sw": 0.74
     }
    ]
   },
@@ -2061,6 +2330,13 @@ window.ATLAS_DATA = {
      "co": 39.18,
      "al": 60.82,
      "sw": 9.96
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 36.37,
+     "al": 63.63,
+     "sw": 3.69
     }
    ]
   },
@@ -2146,6 +2422,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "NAT"
      }
+    },
+    {
+     "y": 2025,
+     "party": "NP",
+     "co": 59.08,
+     "al": 40.92,
+     "sw": 0.45,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 47.46,
+      "majorPct": 52.54,
+      "margin": -2.54,
+      "swing": -0.22,
+      "winner": "NAT"
+     }
     }
    ]
   },
@@ -2204,6 +2496,13 @@ window.ATLAS_DATA = {
      "co": 35.3,
      "al": 64.7,
      "sw": 1.29
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 32.48,
+     "al": 67.52,
+     "sw": 2.45
     }
    ]
   },
@@ -2271,6 +2570,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "IND"
      }
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 52.16,
+     "al": 47.84,
+     "sw": 3.48,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 53.27,
+      "majorPct": 46.73,
+      "margin": 3.27,
+      "swing": 2.01,
+      "winner": "IND"
+     }
     }
    ]
   },
@@ -2329,6 +2644,13 @@ window.ATLAS_DATA = {
      "co": 60.42,
      "al": 39.58,
      "sw": 4.19
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 61.83,
+     "al": 38.17,
+     "sw": -1.41
     }
    ]
   },
@@ -2387,6 +2709,13 @@ window.ATLAS_DATA = {
      "co": 50.19,
      "al": 49.81,
      "sw": 4.5
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 47.18,
+     "al": 52.82,
+     "sw": 2.84
     }
    ]
   },
@@ -2490,6 +2819,22 @@ window.ATLAS_DATA = {
       "swing": 1.3,
       "winner": "IND"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 29.11,
+     "al": 70.89,
+     "sw": 3.65,
+     "nc": {
+      "mine": "Independent",
+      "major": "Labor",
+      "minePct": 70.38,
+      "majorPct": 29.62,
+      "margin": -20.38,
+      "swing": 0.44,
+      "winner": "IND"
+     }
     }
    ]
   },
@@ -2548,6 +2893,13 @@ window.ATLAS_DATA = {
      "co": 51.7,
      "al": 48.3,
      "sw": 2.94
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 44.01,
+     "al": 55.99,
+     "sw": 7.69
     }
    ]
   },
@@ -2606,6 +2958,13 @@ window.ATLAS_DATA = {
      "co": 43.48,
      "al": 56.52,
      "sw": 5.02
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 40.57,
+     "al": 59.43,
+     "sw": 2.87
     }
    ]
   },
@@ -2664,6 +3023,13 @@ window.ATLAS_DATA = {
      "co": 43.73,
      "al": 56.27,
      "sw": 3.53
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 42.92,
+     "al": 57.08,
+     "sw": 0.31
     }
    ]
   },
@@ -2722,6 +3088,13 @@ window.ATLAS_DATA = {
      "co": 41.8,
      "al": 58.2,
      "sw": 7.35
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 42.79,
+     "al": 57.21,
+     "sw": 1.13
     }
    ]
   },
@@ -2780,6 +3153,13 @@ window.ATLAS_DATA = {
      "co": 60.63,
      "al": 39.37,
      "sw": 3.55
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 56.88,
+     "al": 43.12,
+     "sw": 3.75
     }
    ]
   },
@@ -2847,6 +3227,13 @@ window.ATLAS_DATA = {
      "co": 58.95,
      "al": 41.05,
      "sw": 4.49
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 53.23,
+     "al": 46.77,
+     "sw": 5.72
     }
    ]
   },
@@ -2914,6 +3301,22 @@ window.ATLAS_DATA = {
      "co": 66.35,
      "al": 33.65,
      "sw": 3.48
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 62.89,
+     "al": 37.11,
+     "sw": 3.46,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 43.81,
+      "majorPct": 56.19,
+      "margin": -6.19,
+      "swing": null,
+      "winner": "LP"
+     }
     }
    ]
   },
@@ -2972,6 +3375,13 @@ window.ATLAS_DATA = {
      "co": 58.67,
      "al": 41.33,
      "sw": 4.03
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 56.03,
+     "al": 43.97,
+     "sw": 2.64
     }
    ]
   },
@@ -3030,6 +3440,22 @@ window.ATLAS_DATA = {
      "co": 56.7,
      "al": 43.3,
      "sw": -1.06
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 54.78,
+     "al": 45.22,
+     "sw": 1.38,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 47.71,
+      "majorPct": 52.29,
+      "margin": -2.29,
+      "swing": null,
+      "winner": "LP"
+     }
     }
    ]
   },
@@ -3088,6 +3514,13 @@ window.ATLAS_DATA = {
      "co": 54.23,
      "al": 45.77,
      "sw": 4.37
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 48.23,
+     "al": 51.77,
+     "sw": 6
     }
    ]
   },
@@ -3146,6 +3579,13 @@ window.ATLAS_DATA = {
      "co": 54.29,
      "al": 45.71,
      "sw": 10.29
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 52.24,
+     "al": 47.76,
+     "sw": 1.95
     }
    ]
   },
@@ -3213,6 +3653,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "IND"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 31.81,
+     "al": 68.19,
+     "sw": 12.29,
+     "nc": {
+      "mine": "Independent",
+      "major": "Labor",
+      "minePct": 52.68,
+      "majorPct": 47.32,
+      "margin": -2.68,
+      "swing": -1.05,
+      "winner": "IND"
+     }
     }
    ]
   },
@@ -3271,6 +3727,22 @@ window.ATLAS_DATA = {
      "co": 36.3,
      "al": 63.7,
      "sw": 1.49
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 30.56,
+     "al": 69.44,
+     "sw": 5.74,
+     "nc": {
+      "mine": "Independent",
+      "major": "Labor",
+      "minePct": 42.22,
+      "majorPct": 57.78,
+      "margin": 7.78,
+      "swing": null,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -3329,6 +3801,13 @@ window.ATLAS_DATA = {
      "co": 34.31,
      "al": 65.69,
      "sw": 5.13
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 27.92,
+     "al": 72.08,
+     "sw": 6.39
     }
    ]
   },
@@ -3387,6 +3866,22 @@ window.ATLAS_DATA = {
      "co": 33.11,
      "al": 66.89,
      "sw": 9.97
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 31.32,
+     "al": 68.68,
+     "sw": 1.75,
+     "nc": {
+      "mine": "Independent",
+      "major": "Labor",
+      "minePct": 49.31,
+      "majorPct": 50.69,
+      "margin": 0.69,
+      "swing": null,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -3445,6 +3940,13 @@ window.ATLAS_DATA = {
      "co": 38.46,
      "al": 61.54,
      "sw": -1.48
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 34.9,
+     "al": 65.1,
+     "sw": 3.9
     }
    ]
   },
@@ -3503,6 +4005,13 @@ window.ATLAS_DATA = {
      "co": 49.83,
      "al": 50.17,
      "sw": -2.44
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 44.87,
+     "al": 55.13,
+     "sw": 4.96
     }
    ]
   },
@@ -3561,6 +4070,13 @@ window.ATLAS_DATA = {
      "co": 70.57,
      "al": 29.43,
      "sw": -3.9
+    },
+    {
+     "y": 2025,
+     "party": "NP",
+     "co": 69.36,
+     "al": 30.64,
+     "sw": 1.21
     }
    ]
   },
@@ -3628,6 +4144,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "IND"
      }
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 53.97,
+     "al": 46.03,
+     "sw": -0.25,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 49.92,
+      "majorPct": 50.08,
+      "margin": -0.08,
+      "swing": -2.95,
+      "winner": "LP"
+     }
     }
    ]
   },
@@ -3686,6 +4218,13 @@ window.ATLAS_DATA = {
      "co": 40.03,
      "al": 59.97,
      "sw": -4.27
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 39.72,
+     "al": 60.28,
+     "sw": 0.3
     }
    ]
   },
@@ -3780,6 +4319,22 @@ window.ATLAS_DATA = {
       "swing": 0.75,
       "winner": "ALP"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 19.82,
+     "al": 80.18,
+     "sw": 3.55,
+     "nc": {
+      "mine": "Greens",
+      "major": "Labor",
+      "minePct": 33.14,
+      "majorPct": 66.86,
+      "margin": 16.86,
+      "swing": -0.19,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -3838,6 +4393,13 @@ window.ATLAS_DATA = {
      "co": 38.47,
      "al": 61.53,
      "sw": 8.73
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 36.24,
+     "al": 63.76,
+     "sw": 5.82
     }
    ]
   },
@@ -3905,6 +4467,13 @@ window.ATLAS_DATA = {
      "co": 60.07,
      "al": 39.93,
      "sw": 3.25
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 54.64,
+     "al": 45.36,
+     "sw": 5.43
     }
    ]
   },
@@ -3972,6 +4541,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "GRN"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 34.06,
+     "al": 65.94,
+     "sw": 4.87,
+     "nc": {
+      "mine": "Greens",
+      "major": "Labor",
+      "minePct": 39.43,
+      "majorPct": 60.57,
+      "margin": 10.57,
+      "swing": null,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -4038,6 +4623,22 @@ window.ATLAS_DATA = {
       "margin": -8.67,
       "swing": null,
       "winner": "IND"
+     }
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 63.35,
+     "al": 36.65,
+     "sw": 0.82,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 44.33,
+      "majorPct": 55.67,
+      "margin": -5.67,
+      "swing": 3,
+      "winner": "LNP"
      }
     }
    ]
@@ -4113,6 +4714,13 @@ window.ATLAS_DATA = {
      "co": 44,
      "al": 56,
      "sw": 11.89
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 34.03,
+     "al": 65.97,
+     "sw": 5.93
     }
    ]
   },
@@ -4171,6 +4779,13 @@ window.ATLAS_DATA = {
      "co": 61.77,
      "al": 38.23,
      "sw": -3.41
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 63.41,
+     "al": 36.59,
+     "sw": -1.64
     }
    ]
   },
@@ -4296,6 +4911,13 @@ window.ATLAS_DATA = {
      "co": 41.05,
      "al": 58.95,
      "sw": 2.41
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 33.65,
+     "al": 66.35,
+     "sw": 7.4
     }
    ]
   },
@@ -4354,6 +4976,13 @@ window.ATLAS_DATA = {
      "co": 60.07,
      "al": 39.93,
      "sw": 4.43
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 56.26,
+     "al": 43.74,
+     "sw": 3.81
     }
    ]
   },
@@ -4412,6 +5041,13 @@ window.ATLAS_DATA = {
      "co": 42.88,
      "al": 57.12,
      "sw": -1.51
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 35.97,
+     "al": 64.03,
+     "sw": 6.92
     }
    ]
   },
@@ -4470,6 +5106,13 @@ window.ATLAS_DATA = {
      "co": 35.75,
      "al": 64.25,
      "sw": 3.07
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 33.14,
+     "al": 66.86,
+     "sw": 5.27
     }
    ]
   },
@@ -4528,6 +5171,13 @@ window.ATLAS_DATA = {
      "co": 57.01,
      "al": 42.99,
      "sw": 2.84
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 46.94,
+     "al": 53.06,
+     "sw": 6.52
     }
    ]
   },
@@ -4586,6 +5236,13 @@ window.ATLAS_DATA = {
      "co": 57.72,
      "al": 42.28,
      "sw": 5.27
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 58.06,
+     "al": 41.94,
+     "sw": -1.19
     }
    ]
   },
@@ -4644,6 +5301,22 @@ window.ATLAS_DATA = {
      "co": 45.97,
      "al": 54.03,
      "sw": 1.05
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 40.52,
+     "al": 59.48,
+     "sw": 4.7,
+     "nc": {
+      "mine": "Pauline Hanson's One Nation",
+      "major": "Labor",
+      "minePct": 40.96,
+      "majorPct": 59.04,
+      "margin": 9.04,
+      "swing": null,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -4738,6 +5411,22 @@ window.ATLAS_DATA = {
       "swing": -7.55,
       "winner": "IND"
      }
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 56.66,
+     "al": 43.34,
+     "sw": -1.4,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 58.64,
+      "majorPct": 41.36,
+      "margin": 8.64,
+      "swing": -0.3,
+      "winner": "IND"
+     }
     }
    ]
   },
@@ -4796,6 +5485,13 @@ window.ATLAS_DATA = {
      "co": 43.15,
      "al": 56.85,
      "sw": 0.39
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 35.66,
+     "al": 64.34,
+     "sw": 4.83
     }
    ]
   },
@@ -4854,6 +5550,13 @@ window.ATLAS_DATA = {
      "co": 37.65,
      "al": 62.35,
      "sw": 6.46
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 37.12,
+     "al": 62.88,
+     "sw": 0.67
     }
    ]
   },
@@ -4998,6 +5701,22 @@ window.ATLAS_DATA = {
       "swing": 0.23,
       "winner": "KAP"
      }
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 59.32,
+     "al": 40.68,
+     "sw": 0.84,
+     "nc": {
+      "mine": "Katter's Australian",
+      "major": "Coalition",
+      "minePct": 65.75,
+      "majorPct": 34.25,
+      "margin": 15.75,
+      "swing": 2.65,
+      "winner": "KAP"
+     }
     }
    ]
   },
@@ -5056,6 +5775,13 @@ window.ATLAS_DATA = {
      "co": 35.5,
      "al": 64.5,
      "sw": 5.69
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 32.81,
+     "al": 67.19,
+     "sw": 3.88
     }
    ]
   },
@@ -5114,6 +5840,13 @@ window.ATLAS_DATA = {
      "co": 33.65,
      "al": 66.35,
      "sw": 4.41
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 29.26,
+     "al": 70.74,
+     "sw": 4.39
     }
    ]
   },
@@ -5190,6 +5923,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "IND"
      }
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 52.37,
+     "al": 47.63,
+     "sw": 1.37,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 50.67,
+      "majorPct": 49.33,
+      "margin": 0.67,
+      "swing": -2.27,
+      "winner": "IND"
+     }
     }
    ]
   },
@@ -5248,6 +5997,13 @@ window.ATLAS_DATA = {
      "co": 58.69,
      "al": 41.31,
      "sw": -3.56
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 52.06,
+     "al": 47.94,
+     "sw": 6.37
     }
    ]
   },
@@ -5306,6 +6062,13 @@ window.ATLAS_DATA = {
      "co": 37.18,
      "al": 62.82,
      "sw": 0.36
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 36.79,
+     "al": 63.21,
+     "sw": 0.42
     }
    ]
   },
@@ -5364,6 +6127,13 @@ window.ATLAS_DATA = {
      "co": 53.44,
      "al": 46.56,
      "sw": 0.73
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 43.94,
+     "al": 56.06,
+     "sw": 9.5
     }
    ]
   },
@@ -5422,6 +6192,13 @@ window.ATLAS_DATA = {
      "co": 39.46,
      "al": 60.54,
      "sw": 9.9
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 35.48,
+     "al": 64.52,
+     "sw": 3.98
     }
    ]
   },
@@ -5480,6 +6257,13 @@ window.ATLAS_DATA = {
      "co": 56.34,
      "al": 43.66,
      "sw": -1.3
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 52.78,
+     "al": 47.22,
+     "sw": 3.33
     }
    ]
   },
@@ -5538,6 +6322,13 @@ window.ATLAS_DATA = {
      "co": 49.05,
      "al": 50.95,
      "sw": -4.51
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 41.87,
+     "al": 58.13,
+     "sw": 6.53
     }
    ]
   },
@@ -5596,6 +6387,13 @@ window.ATLAS_DATA = {
      "co": 53.08,
      "al": 46.92,
      "sw": 0.2
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 50.11,
+     "al": 49.89,
+     "sw": 2.97
     }
    ]
   },
@@ -5686,6 +6484,13 @@ window.ATLAS_DATA = {
      "co": 63.8,
      "al": 36.2,
      "sw": 1.37
+    },
+    {
+     "y": 2025,
+     "party": "NP",
+     "co": 59.78,
+     "al": 40.22,
+     "sw": 4.02
     }
    ]
   },
@@ -5744,6 +6549,13 @@ window.ATLAS_DATA = {
      "co": 49.08,
      "al": 50.92,
      "sw": -4.26
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 38.42,
+     "al": 61.58,
+     "sw": 10.66
     }
    ]
   },
@@ -5802,6 +6614,13 @@ window.ATLAS_DATA = {
      "co": 41.47,
      "al": 58.53,
      "sw": 0.13
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 34.39,
+     "al": 65.61,
+     "sw": 5.85
     }
    ]
   },
@@ -5869,6 +6688,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "IND"
      }
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 53.66,
+     "al": 46.34,
+     "sw": 4.21,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 55.66,
+      "majorPct": 44.34,
+      "margin": 5.66,
+      "swing": 3.16,
+      "winner": "IND"
+     }
     }
    ]
   },
@@ -5927,6 +6762,13 @@ window.ATLAS_DATA = {
      "co": 42.23,
      "al": 57.77,
      "sw": 7.58
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 42.29,
+     "al": 57.71,
+     "sw": 1.38
     }
    ]
   },
@@ -5985,6 +6827,13 @@ window.ATLAS_DATA = {
      "co": 39.2,
      "al": 60.8,
      "sw": 1.08
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 35.34,
+     "al": 64.66,
+     "sw": 3.86
     }
    ]
   },
@@ -6043,6 +6892,13 @@ window.ATLAS_DATA = {
      "co": 68.99,
      "al": 31.01,
      "sw": -3.31
+    },
+    {
+     "y": 2025,
+     "party": "NP",
+     "co": 69.04,
+     "al": 30.96,
+     "sw": -0.05
     }
    ]
   },
@@ -6119,6 +6975,22 @@ window.ATLAS_DATA = {
      "co": 72.12,
      "al": 27.88,
      "sw": 3.3
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 73.96,
+     "al": 26.04,
+     "sw": -1.84,
+     "nc": {
+      "mine": "Pauline Hanson's One Nation",
+      "major": "Coalition",
+      "minePct": 29.9,
+      "majorPct": 70.1,
+      "margin": -20.1,
+      "swing": null,
+      "winner": "LNP"
+     }
     }
    ]
   },
@@ -6177,6 +7049,13 @@ window.ATLAS_DATA = {
      "co": 37.55,
      "al": 62.45,
      "sw": 2.14
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 37.35,
+     "al": 62.65,
+     "sw": -0.38
     }
    ]
   },
@@ -6271,6 +7150,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "CA"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 45.02,
+     "al": 54.98,
+     "sw": 3.39,
+     "nc": {
+      "mine": "Centre Alliance (fmr Nick Xenophon Team)",
+      "major": "Labor",
+      "minePct": 64.89,
+      "majorPct": 35.11,
+      "margin": -14.89,
+      "swing": null,
+      "winner": "CA"
+     }
     }
    ]
   },
@@ -6329,6 +7224,13 @@ window.ATLAS_DATA = {
      "co": 46.72,
      "al": 53.28,
      "sw": -2
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 45.24,
+     "al": 54.76,
+     "sw": 0.94
     }
    ]
   },
@@ -6387,6 +7289,13 @@ window.ATLAS_DATA = {
      "co": 52.9,
      "al": 47.1,
      "sw": 3.96
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 54.09,
+     "al": 45.91,
+     "sw": -1.19
     }
    ]
   },
@@ -6445,6 +7354,13 @@ window.ATLAS_DATA = {
      "co": 59.34,
      "al": 40.66,
      "sw": 2.86
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 54.44,
+     "al": 45.56,
+     "sw": 4.9
     }
    ]
   },
@@ -6557,6 +7473,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "GRN"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 26.03,
+     "al": 73.97,
+     "sw": 0.88,
+     "nc": {
+      "mine": "Greens",
+      "major": "Labor",
+      "minePct": 46.98,
+      "majorPct": 53.02,
+      "margin": 3.02,
+      "swing": 13.17,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -6615,6 +7547,13 @@ window.ATLAS_DATA = {
      "co": 37.75,
      "al": 62.25,
      "sw": 7.34
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 38.2,
+     "al": 61.8,
+     "sw": -0.37
     }
    ]
   },
@@ -6673,6 +7612,13 @@ window.ATLAS_DATA = {
      "co": 50.68,
      "al": 49.32,
      "sw": 6.34
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 48.92,
+     "al": 51.08,
+     "sw": 0.66
     }
    ]
   },
@@ -6731,6 +7677,13 @@ window.ATLAS_DATA = {
      "co": 60.69,
      "al": 39.31,
      "sw": 7.94
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 53.81,
+     "al": 46.19,
+     "sw": 6.68
     }
    ]
   },
@@ -6789,6 +7742,13 @@ window.ATLAS_DATA = {
      "co": 61.19,
      "al": 38.81,
      "sw": 4.17
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 58.8,
+     "al": 41.2,
+     "sw": 2.39
     }
    ]
   },
@@ -6847,6 +7807,13 @@ window.ATLAS_DATA = {
      "co": 50.66,
      "al": 49.34,
      "sw": 10.96
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 47.11,
+     "al": 52.89,
+     "sw": 3.8
     }
    ]
   },
@@ -6905,6 +7872,13 @@ window.ATLAS_DATA = {
      "co": 40.91,
      "al": 59.09,
      "sw": 7.19
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 33.91,
+     "al": 66.09,
+     "sw": 7
     }
    ]
   },
@@ -6981,6 +7955,13 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "NAT"
      }
+    },
+    {
+     "y": 2025,
+     "party": "NP",
+     "co": 64.38,
+     "al": 35.62,
+     "sw": 35.62
     }
    ]
   },
@@ -7093,6 +8074,13 @@ window.ATLAS_DATA = {
      "co": 66.43,
      "al": 33.57,
      "sw": 1.2
+    },
+    {
+     "y": 2025,
+     "party": "NP",
+     "co": 67.06,
+     "al": 32.94,
+     "sw": -1.85
     }
    ]
   },
@@ -7151,6 +8139,22 @@ window.ATLAS_DATA = {
      "co": 32.02,
      "al": 67.98,
      "sw": 4.15
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 29.21,
+     "al": 70.79,
+     "sw": 2.85,
+     "nc": {
+      "mine": "Greens",
+      "major": "Labor",
+      "minePct": 34.2,
+      "majorPct": 65.8,
+      "margin": 15.8,
+      "swing": null,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -7294,6 +8298,13 @@ window.ATLAS_DATA = {
      "co": 56.97,
      "al": 43.03,
      "sw": 8.44
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 63.28,
+     "al": 36.72,
+     "sw": -6.59
     }
    ]
   },
@@ -7352,6 +8363,13 @@ window.ATLAS_DATA = {
      "co": 38.41,
      "al": 61.59,
      "sw": 5.2
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 30.81,
+     "al": 69.19,
+     "sw": 7.6
     }
    ]
   },
@@ -7410,6 +8428,13 @@ window.ATLAS_DATA = {
      "co": 60.74,
      "al": 39.26,
      "sw": -1.29
+    },
+    {
+     "y": 2025,
+     "party": "NP",
+     "co": 59.29,
+     "al": 40.71,
+     "sw": 1.36
     }
    ]
   },
@@ -7468,6 +8493,13 @@ window.ATLAS_DATA = {
      "co": 67.84,
      "al": 32.16,
      "sw": -0.93
+    },
+    {
+     "y": 2025,
+     "party": "NP",
+     "co": 62.97,
+     "al": 37.03,
+     "sw": 5.18
     }
    ]
   },
@@ -7526,6 +8558,13 @@ window.ATLAS_DATA = {
      "co": 45.43,
      "al": 54.57,
      "sw": 1.07
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 37.45,
+     "al": 62.55,
+     "sw": 8.83
     }
    ]
   },
@@ -7584,6 +8623,13 @@ window.ATLAS_DATA = {
      "co": 46.69,
      "al": 53.31,
      "sw": -1.73
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 43.11,
+     "al": 56.89,
+     "sw": 4.29
     }
    ]
   },
@@ -7642,6 +8688,13 @@ window.ATLAS_DATA = {
      "co": 40.96,
      "al": 59.04,
      "sw": 14.23
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 43.56,
+     "al": 56.44,
+     "sw": -2.4
     }
    ]
   },
@@ -7700,6 +8753,13 @@ window.ATLAS_DATA = {
      "co": 35.2,
      "al": 64.8,
      "sw": 11.57
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 33.49,
+     "al": 66.51,
+     "sw": 2.09
     }
    ]
   },
@@ -7758,6 +8818,13 @@ window.ATLAS_DATA = {
      "co": 54.44,
      "al": 45.56,
      "sw": 3.96
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 48.83,
+     "al": 51.17,
+     "sw": 5.61
     }
    ]
   },
@@ -7892,6 +8959,13 @@ window.ATLAS_DATA = {
      "co": 40.91,
      "al": 59.09,
      "sw": 2.65
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 34.45,
+     "al": 65.55,
+     "sw": 6.46
     }
    ]
   },
@@ -7950,6 +9024,13 @@ window.ATLAS_DATA = {
      "co": 44.81,
      "al": 55.19,
      "sw": 8.37
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 37.99,
+     "al": 62.01,
+     "sw": 6.82
     }
    ]
   },
@@ -8008,6 +9089,13 @@ window.ATLAS_DATA = {
      "co": 41.77,
      "al": 58.23,
      "sw": 4.15
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 40,
+     "al": 60,
+     "sw": 1.77
     }
    ]
   },
@@ -8066,6 +9154,13 @@ window.ATLAS_DATA = {
      "co": 64.85,
      "al": 35.15,
      "sw": 4.63
+    },
+    {
+     "y": 2025,
+     "party": "NP",
+     "co": 62.62,
+     "al": 37.38,
+     "sw": -2.91
     }
    ]
   },
@@ -8124,6 +9219,13 @@ window.ATLAS_DATA = {
      "co": 47.74,
      "al": 52.26,
      "sw": 6.5
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 40.63,
+     "al": 59.37,
+     "sw": 7.14
     }
    ]
   },
@@ -8191,6 +9293,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "GRN"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 42.18,
+     "al": 57.82,
+     "sw": 5.4,
+     "nc": {
+      "mine": "Greens",
+      "major": "Coalition",
+      "minePct": 53.27,
+      "majorPct": 46.73,
+      "margin": 3.27,
+      "swing": -0.59,
+      "winner": "GRN"
+     }
     }
    ]
   },
@@ -8249,6 +9367,13 @@ window.ATLAS_DATA = {
      "co": 34.42,
      "al": 65.58,
      "sw": -6.08
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 35.71,
+     "al": 64.29,
+     "sw": -1.14
     }
    ]
   },
@@ -8307,6 +9432,13 @@ window.ATLAS_DATA = {
      "co": 44.18,
      "al": 55.82,
      "sw": 1.37
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 38.49,
+     "al": 61.51,
+     "sw": 5.51
     }
    ]
   },
@@ -8365,6 +9497,13 @@ window.ATLAS_DATA = {
      "co": 40.63,
      "al": 59.37,
      "sw": 6.29
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 48.69,
+     "al": 51.31,
+     "sw": -7.09
     }
    ]
   },
@@ -8474,6 +9613,13 @@ window.ATLAS_DATA = {
      "co": 50.45,
      "al": 49.55,
      "sw": 6.42
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 43.38,
+     "al": 56.62,
+     "sw": 7.07
     }
    ]
   },
@@ -8532,6 +9678,13 @@ window.ATLAS_DATA = {
      "co": 41.23,
      "al": 58.77,
      "sw": 11.99
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 36.01,
+     "al": 63.99,
+     "sw": 4.56
     }
    ]
   },
@@ -8599,6 +9752,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "ALP"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 21.92,
+     "al": 78.08,
+     "sw": 2.42,
+     "nc": {
+      "mine": "Greens",
+      "major": "Labor",
+      "minePct": 29.05,
+      "majorPct": 70.95,
+      "margin": 20.95,
+      "swing": 1.27,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -8657,6 +9826,13 @@ window.ATLAS_DATA = {
      "co": 47.62,
      "al": 52.38,
      "sw": 11.88
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 43.01,
+     "al": 56.99,
+     "sw": 4.14
     }
    ]
   },
@@ -8752,6 +9928,13 @@ window.ATLAS_DATA = {
      "co": 37.1,
      "al": 62.9,
      "sw": -1.23
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 34.66,
+     "al": 65.34,
+     "sw": 2.44
     }
    ]
   },
@@ -8817,6 +10000,22 @@ window.ATLAS_DATA = {
       "majorPct": 53.92,
       "margin": -3.92,
       "swing": null,
+      "winner": "LP"
+     }
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 60.92,
+     "al": 39.08,
+     "sw": -2.27,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 46.73,
+      "majorPct": 53.27,
+      "margin": -3.27,
+      "swing": 0.65,
       "winner": "LP"
      }
     }
@@ -8904,6 +10103,22 @@ window.ATLAS_DATA = {
       "swing": null,
       "winner": "IND"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 45.49,
+     "al": 54.51,
+     "sw": 5.25,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 61.2,
+      "majorPct": 38.8,
+      "margin": 11.2,
+      "swing": 0.24,
+      "winner": "IND"
+     }
     }
    ]
   },
@@ -8962,6 +10177,22 @@ window.ATLAS_DATA = {
      "co": 34.9,
      "al": 65.1,
      "sw": 1.58
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 27.14,
+     "al": 72.86,
+     "sw": 7.7,
+     "nc": {
+      "mine": "Independent",
+      "major": "Labor",
+      "minePct": 33.48,
+      "majorPct": 66.52,
+      "margin": 16.52,
+      "swing": null,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -9038,6 +10269,22 @@ window.ATLAS_DATA = {
       "swing": -5.42,
       "winner": "IND"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 49.44,
+     "al": 50.56,
+     "sw": 1.72,
+     "nc": {
+      "mine": "Independent",
+      "major": "Coalition",
+      "minePct": 58.34,
+      "majorPct": 41.66,
+      "margin": 8.34,
+      "swing": 4.14,
+      "winner": "IND"
+     }
     }
    ]
   },
@@ -9096,6 +10343,13 @@ window.ATLAS_DATA = {
      "co": 44.18,
      "al": 55.82,
      "sw": 0.35
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 43.23,
+     "al": 56.77,
+     "sw": 1.43
     }
    ]
   },
@@ -9154,6 +10408,13 @@ window.ATLAS_DATA = {
      "co": 61.34,
      "al": 38.66,
      "sw": 1.81
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 57.63,
+     "al": 42.37,
+     "sw": 3.71
     }
    ]
   },
@@ -9239,6 +10500,22 @@ window.ATLAS_DATA = {
       "swing": 0.4,
       "winner": "ALP"
      }
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 19.14,
+     "al": 80.86,
+     "sw": 3.77,
+     "nc": {
+      "mine": "Greens",
+      "major": "Labor",
+      "minePct": 48.57,
+      "majorPct": 51.43,
+      "margin": 1.43,
+      "swing": -7.14,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -9290,6 +10567,13 @@ window.ATLAS_DATA = {
      "co": 53.82,
      "al": 46.18,
      "sw": 4.84
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 60.24,
+     "al": 39.76,
+     "sw": -6.42
     }
    ]
   },
@@ -9334,6 +10618,13 @@ window.ATLAS_DATA = {
      "co": 54.27,
      "al": 45.73,
      "sw": 9.22
+    },
+    {
+     "y": 2025,
+     "party": "LP",
+     "co": 60.15,
+     "al": 39.85,
+     "sw": -5.49
     }
    ]
   },
@@ -9378,6 +10669,13 @@ window.ATLAS_DATA = {
      "co": 40.51,
      "al": 59.49,
      "sw": 2.85
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 40.98,
+     "al": 59.02,
+     "sw": -1.46
     }
    ]
   },
@@ -9422,6 +10720,13 @@ window.ATLAS_DATA = {
      "co": 60.89,
      "al": 39.11,
      "sw": 3.69
+    },
+    {
+     "y": 2025,
+     "party": "LNP",
+     "co": 57.98,
+     "al": 42.02,
+     "sw": 2.91
     }
    ]
   },
@@ -9452,6 +10757,13 @@ window.ATLAS_DATA = {
      "co": 34.79,
      "al": 65.21,
      "sw": 9.71
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 34.29,
+     "al": 65.71,
+     "sw": 2.42
     }
    ]
   },
@@ -9482,6 +10794,13 @@ window.ATLAS_DATA = {
      "co": 39.93,
      "al": 60.07,
      "sw": -0.84
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 43.75,
+     "al": 56.25,
+     "sw": -2.06
     }
    ]
   },
@@ -9505,6 +10824,22 @@ window.ATLAS_DATA = {
      "co": 37.05,
      "al": 62.95,
      "sw": 5.43
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 30.71,
+     "al": 69.29,
+     "sw": 6.34,
+     "nc": {
+      "mine": "Independent",
+      "major": "Labor",
+      "minePct": 49.66,
+      "majorPct": 50.34,
+      "margin": 0.34,
+      "swing": null,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -9528,6 +10863,22 @@ window.ATLAS_DATA = {
      "co": 33.5,
      "al": 66.5,
      "sw": -1.55
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 27.98,
+     "al": 72.02,
+     "sw": 5.46,
+     "nc": {
+      "mine": "Greens",
+      "major": "Labor",
+      "minePct": 40.77,
+      "majorPct": 59.23,
+      "margin": 9.23,
+      "swing": null,
+      "winner": "ALP"
+     }
     }
    ]
   },
@@ -9544,6 +10895,29 @@ window.ATLAS_DATA = {
      "co": 42.37,
      "al": 57.63,
      "sw": -2.59
+    },
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 42.37,
+     "al": 57.63,
+     "sw": 0.01
+    }
+   ]
+  },
+  {
+   "id": "bullwinkel",
+   "name": "Bullwinkel",
+   "short": "Bullwinkel",
+   "former": null,
+   "state": "WA",
+   "series": [
+    {
+     "y": 2025,
+     "party": "ALP",
+     "co": 49.49,
+     "al": 50.51,
+     "sw": -2.84
     }
    ]
   }
@@ -9618,6 +10992,12 @@ window.ATLAS_DATA = {
      "co": 48.58,
      "al": 51.42,
      "sw": 3.2
+    },
+    {
+     "y": 2025,
+     "co": 44.73,
+     "al": 55.27,
+     "sw": 3.85
     }
    ]
   },
@@ -9690,6 +11070,12 @@ window.ATLAS_DATA = {
      "co": 45.17,
      "al": 54.83,
      "sw": 1.69
+    },
+    {
+     "y": 2025,
+     "co": 43.65,
+     "al": 56.35,
+     "sw": 1.52
     }
    ]
   },
@@ -9762,6 +11148,12 @@ window.ATLAS_DATA = {
      "co": 54.05,
      "al": 45.95,
      "sw": 4.39
+    },
+    {
+     "y": 2025,
+     "co": 50.58,
+     "al": 49.42,
+     "sw": 3.47
     }
    ]
   },
@@ -9834,6 +11226,12 @@ window.ATLAS_DATA = {
      "co": 45,
      "al": 55,
      "sw": 10.55
+    },
+    {
+     "y": 2025,
+     "co": 44.16,
+     "al": 55.84,
+     "sw": 0.84
     }
    ]
   },
@@ -9906,6 +11304,12 @@ window.ATLAS_DATA = {
      "co": 46.03,
      "al": 53.97,
      "sw": 3.26
+    },
+    {
+     "y": 2025,
+     "co": 40.8,
+     "al": 59.2,
+     "sw": 5.23
     }
    ]
   },
@@ -9978,6 +11382,12 @@ window.ATLAS_DATA = {
      "co": 45.67,
      "al": 54.33,
      "sw": -1.63
+    },
+    {
+     "y": 2025,
+     "co": 36.66,
+     "al": 63.34,
+     "sw": 9.01
     }
    ]
   },
@@ -10050,6 +11460,12 @@ window.ATLAS_DATA = {
      "co": 33.05,
      "al": 66.95,
      "sw": 5.34
+    },
+    {
+     "y": 2025,
+     "co": 27.51,
+     "al": 72.49,
+     "sw": 5.54
     }
    ]
   },
@@ -10061,7 +11477,7 @@ window.ATLAS_DATA = {
      "y": 1993,
      "co": 44.69,
      "al": 55.31,
-     "sw": 0
+     "sw": null
     },
     {
      "y": 1996,
@@ -10122,6 +11538,12 @@ window.ATLAS_DATA = {
      "co": 44.46,
      "al": 55.54,
      "sw": 1.34
+    },
+    {
+     "y": 2025,
+     "co": 45.75,
+     "al": 54.25,
+     "sw": -1.29
     }
    ]
   }
