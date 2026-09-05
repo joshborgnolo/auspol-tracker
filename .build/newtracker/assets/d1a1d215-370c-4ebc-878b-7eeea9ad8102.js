@@ -893,20 +893,23 @@ const CYC_EVENTS = {
 
 /* ---- the readings behind a cycle's line --------------------------------
    These charts are monthly averages, and an average is a claim about polls
-   the reader cannot see. Narrow the board to ONE term and they appear: the
-   cloud under a line is what the line is made of, and how much it is
-   scattering is half of what a term's trajectory means.
+   the reader cannot see. Narrow the board to three terms or fewer and they
+   appear: the cloud under a line is what the line is made of, and how much
+   it is scattering is half of what a term's trajectory means.
 
-   One and not a handful, because a cloud is a much heavier mark than a line.
-   Two lines cross and stay legible; two clouds occupy the same space and
-   become one, and the reader has to decode which points belong to which term
-   before they can read either. A single term has nothing to disentangle, and
-   is also the moment the reader has said they want to look closely.
+   Three and not more, because a cloud is a much heavier mark than a line.
+   Two lines cross and stay legible; a board of clouds occupies the same
+   space and becomes one, and the reader has to decode which points belong
+   to which term before they can read either. Three is where that decode
+   still has an answer: colour splits the parties, and the circle /
+   triangle / diamond rotation (see cycShapes) names up to three terms of
+   one party. Past three the shapes run out and the clouds are back to one
+   unjoinable mass, so three shown terms is also the cap on the cloud.
 
    Same rule as the line it sits under, in both directions: a favourability
    net never joins an approve-minus-disapprove cloud, and the election-day row
    is not a poll, so neither is a dot. */
-const CYC_DOT_MAX = 1;
+const CYC_DOT_MAX = 3;
 const MS_MONTH_C = 365.25 / 12;
 
 /* The same month-bucket test cycleSeries applies when it builds the line, not
@@ -1020,11 +1023,10 @@ const sitting = (s) => s.split(" → ").pop();
    distinction that colour already makes. So the first term of each party
    keeps circles and only a second and third need a shape of their own.
 
-   DORMANT at CYC_DOT_MAX = 1: one term on the board is one colour, so every
-   cloud drawn today is circles. Kept because the rule is the hard part and
-   the threshold is one number - raise it and two same-coloured terms are
-   still told apart, in the legend and on the chart, without rediscovering
-   why colour alone could not do it. */
+   Live from CYC_DOT_MAX = 3: the three named shapes are exactly the budget
+   of three terms - two Coalition terms on the board are triangle and
+   circle, three add the diamond, and a lone Labor term beside them keeps
+   circles because colour already says it is the odd one out. */
 const CYC_SHAPES = ["circle", "triangle", "diamond"];
 function cycShapes(shown) {
   const seen = {}, out = {};
@@ -2250,9 +2252,20 @@ function PastCyclesView() {
      The chart draws immediately from the aggregates it already has; the dots
      arrive with the file. */
   const [, redrawWithSource] = useState(0);   // a re-render trigger, not a value
+  /* loadCycleSource resolves {} when the file will not land (both tries
+     failed); a failed load can therefore tell itself apart from a load that
+     came back legitimately empty. True means "the dots are absent because
+     the fetch died" - the note below offers to try again, and the promise
+     reset in gen-data makes the retry a real refetch rather than the same
+     settled {} coming straight back. */
+  const [srcFailed, setSrcFailed] = useState(false);
   React.useEffect(() => {
     let live = true;
-    D.loadCycleSource().then(() => { if (live) redrawWithSource((n) => n + 1); });
+    D.loadCycleSource().then((j) => {
+      if (!live) return;
+      setSrcFailed(!Object.keys(j || {}).length);
+      redrawWithSource((n) => n + 1);
+    });
     return () => { live = false; };
   }, []);
   /* Which terms are hidden rides in the URL too, so "the 2019 term" stays
@@ -2406,6 +2419,11 @@ function PastCyclesView() {
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  /* Retry is a fresh fetch: loadCycleSource clears a rejected promise, so
+     this call does not come back as the same settled {}. */
+  const retrySource = () => D.loadCycleSource()
+    .then((j) => setSrcFailed(!Object.keys(j || {}).length));
+
   return (
     <div className="view view-cycles">
       <div className="view-intro">
@@ -2422,9 +2440,16 @@ function PastCyclesView() {
               feature. Drawing a line is a click now, so both inputs get the
               same instruction and it is the true one. */}
           Click a cycle below to draw its own line over the band, and again to put it back;
-          the ✕ beside it takes the term off the board altogether. Leave one term on the
-          board to see its full detail.
+          the ✕ beside it takes the term off the board altogether. Leave three or fewer
+          terms on the board to see the individual polls under each line.
         </p>
+        {srcFailed && (
+          <p className="cyc-src-note">
+            The individual polls behind the past terms didn’t load – the monthly
+            lines are unaffected.{" "}
+            <button type="button" onClick={retrySource}>Try again</button>
+          </p>
+        )}
         {/* the .ap-jump pill shape is global, so the cycles intro reuses it
             directly – the archive-only .ap-jumps wrapper is not */}
         <div className="cyc-jumps">

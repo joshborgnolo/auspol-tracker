@@ -284,8 +284,12 @@ td .fmr { color: var(--ink-faint); font-weight: 400; font-size: 12px; }
 </main>
 
 <a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
-<script src="./atlas-data.js"></script>
+<script defer src="./atlas-data.js"></script>
 <script>
+/* Deferred dependency above executes before DOMContentLoaded, so gating the
+   inline app on the event keeps the execution order the older bottom-of-body
+   placement guaranteed. */
+document.addEventListener("DOMContentLoaded", function () {
 (function () {
   "use strict";
   var D = window.ATLAS_DATA;
@@ -810,6 +814,7 @@ td .fmr { color: var(--ink-faint); font-weight: 400; font-size: 12px; }
   renderTable();
   onSelect();
 })();
+});
 </script>
 </body>
 </html>

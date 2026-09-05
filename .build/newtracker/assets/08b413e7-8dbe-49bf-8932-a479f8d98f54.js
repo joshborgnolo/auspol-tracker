@@ -948,8 +948,11 @@ function TrendChart(props) {
             .filter((s) => s.endLabel && s.points.length && s.opacity !== 0)
             .map((s) => {
               const last = s.points[s.points.length - 1];
+              /* inkOf, not the series colour: the label is a GLYPH, and the
+                 mark values for Greens/One Nation/Others fail the text
+                 threshold on paper (see the -text tokens in the template) */
               return { text: s.endLabel, x: sx(last.x) + 7 / scale, ideal: sy(last.y), y: sy(last.y),
-                       color: s.color, op: s.endLabelOpacity != null ? s.endLabelOpacity : 1 };
+                       color: inkOf(s.color), op: s.endLabelOpacity != null ? s.endLabelOpacity : 1 };
             })
             .sort((a, b) => a.y - b.y);
           if (!labs.length) return null;

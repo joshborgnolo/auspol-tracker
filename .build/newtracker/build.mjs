@@ -58,6 +58,16 @@ console.log(`validated ${DATA.polls.length} polls · ${exempted.length} document
 
 /* ---- 2. regenerate the derived dataset --------------------------------- */
 execFileSync(process.execPath, [path.join(HERE, "gen-data.mjs")], { stdio: ["ignore", "ignore", "inherit"] });
+/* gen-data's whole job is these two files. Everything downstream of this
+   line reads them by name, so if either is missing or empty the diagnosis
+   belongs here, not in a readFileSync ENOENT two hundred lines later. */
+for (const rel of ["9f09dca2-bd46-49a8-8ae1-51847608cf92.js", "cycle-source.json"]) {
+  const exists = fs.existsSync(A(rel));
+  if (!exists || fs.statSync(A(rel)).size === 0) {
+    console.error(`\n.build/newtracker/${"assets/" + rel} is ${exists ? "empty" : "missing"} after gen-data – build stopped`);
+    process.exit(1);
+  }
+}
 
 /* ---- 3. source modules, in load order ---------------------------------- */
 // plain scripts first (they define the window aliases every component needs)
@@ -102,7 +112,10 @@ const FONTS = [
      carried by one file per weight per style. */
   { file: "crimsontext-400-latin.woff2",        family: "Crimson Text", style: "normal", weight: "400", preload: true },
   { file: "crimsontext-600-latin.woff2",        family: "Crimson Text", style: "normal", weight: "600", preload: true },
-  { file: "crimsontext-700-latin.woff2",        family: "Crimson Text", style: "normal", weight: "700", preload: true },
+  /* 700 normal is not preloaded: its only serif-context consumer is the
+     leadership note's strong emphasis, below the fold on every viewport, so
+     it can arrive with the page instead of queueing ahead of the hero. */
+  { file: "crimsontext-700-latin.woff2",        family: "Crimson Text", style: "normal", weight: "700" },
   { file: "crimsontext-italic-400-latin.woff2", family: "Crimson Text", style: "italic", weight: "400" },
   { file: "crimsontext-italic-600-latin.woff2", family: "Crimson Text", style: "italic", weight: "600" },
   { file: "crimsontext-italic-700-latin.woff2", family: "Crimson Text", style: "italic", weight: "700" },
@@ -491,6 +504,16 @@ try {
 } catch (_) { /* no stamp: reported below */ }
 const dataStamp = grabLatest().publishedISO;
 if (cardStamp !== dataStamp) {
+  /* Warn-only locally: the unattended pipelines build on every new poll and
+     redraw the card in a separate step, so a hard fail would stop data
+     updates over a stale preview image. In the tests workflow the mismatch
+     IS the signal that a card redraw was committed without its stamp (or a
+     data update landed without one) - fail there so the run goes red. */
+  if (process.env.CI && process.env.GITHUB_WORKFLOW === "tests") {
+    console.error(`\nshare card is drawn for ${cardStamp || "an unrecorded date"}, data is ${dataStamp}`);
+    console.error(`regenerate: see .build/newtracker/make-card.js, then update assets/auspol-card.json\n`);
+    process.exit(1);
+  }
   console.warn(`\n  ! share card is drawn for ${cardStamp || "an unrecorded date"}, data is ${dataStamp}`);
   console.warn(`    it will preview figures that are not the ones on the page.`);
   console.warn(`    regenerate: see .build/newtracker/make-card.js, then update assets/auspol-card.json\n`);

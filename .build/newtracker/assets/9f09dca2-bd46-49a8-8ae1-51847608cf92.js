@@ -84,17 +84,24 @@ window.AUSPOL = (function () {
      Two doors, deliberately. loadCycleSource() is the async one the tab calls
      on mount; D.cycleSource stays a plain synchronous read so the render path
      is unchanged, answering {} until the file lands and the tab re-renders. A
-     failed fetch is not fatal: the lines still draw from the aggregates, and
-     the CSV comes out short rather than the tab dying. */
+     failed fetch is not fatal: the lines still draw from the aggregates, the
+     CSV comes out short rather than the tab dying, and the tab reads the same
+     emptiness to offer a retry. Two tries, one beat apart; on the second miss
+     the promise is dropped (never settled to {}), so calling again really
+     does refetch. */
   let _cycleSource = null;
   let _cyclePromise = null;
   const loadCycleSource = () => {
     if (_cycleSource) return Promise.resolve(_cycleSource);
     if (!_cyclePromise) {
       const url = window.AP_CYCLE_SRC;
-      _cyclePromise = (url ? fetch(url).then((r) => (r.ok ? r.json() : {})) : Promise.resolve({}))
-        .catch((e) => { console.error("cycle source failed to load", e); return {}; })
-        .then((j) => { _cycleSource = j; return j; });
+      const attempt = () => url
+        ? fetch(url).then((r) => (r.ok ? r.json() : Promise.reject(new Error("cycle source HTTP " + r.status))))
+        : Promise.resolve({});
+      _cyclePromise = attempt()
+        .catch(() => new Promise((res, rej) => setTimeout(() => attempt().then(res, rej), 1200)))
+        .then((j) => { _cycleSource = j; return j; })
+        .catch((e) => { console.error("cycle source failed to load", e); _cyclePromise = null; return {}; });
     }
     return _cyclePromise;
   };

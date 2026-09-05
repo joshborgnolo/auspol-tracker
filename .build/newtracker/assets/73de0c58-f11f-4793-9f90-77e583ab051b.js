@@ -307,7 +307,15 @@ function Header({ isDark, onToggleTheme }) {
   const [staticView, setStaticView] = useState(false);
   useEffect(() => {
     document.body.classList.toggle("ss-view", staticView);
-    return () => document.body.classList.remove("ss-view");
+    /* mount marks the article inert so nothing inside it can take focus or a
+       click while the app owns the page; in this view the article IS the
+       page, so the inert has to come off (and go back on the way out) */
+    const ss = document.querySelector(".static-summary");
+    if (ss) ss.inert = !staticView;
+    return () => {
+      document.body.classList.remove("ss-view");
+      if (ss) ss.inert = true;
+    };
   }, [staticView]);
   /* "The last N" counts the PAST terms in the cycle data (the Now term
      excluded), so a new Past-cycles term renumbers the sentence on its own.
@@ -1438,9 +1446,9 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
    tab while the strip and the other tabs keep working; the keyed
    .view-enter wrapper above it remounts it per tab, so switching views
    clears the error. RootBoundary wraps App at the mount call; its catch
-   undoes precisely what mount did - body.js off, the aria-hidden put
-   back - so the static summary steps back up as the page, the same
-   degradation every no-JS reader already gets. */
+   undoes precisely what mount did - body.js off, the aria-hidden and
+   inert put back - so the static summary steps back up as the page,
+   the same degradation every no-JS reader already gets. */
 class ViewBoundary extends React.Component {
   constructor(props) { super(props); this.state = { err: null }; }
   static getDerivedStateFromError(err) { return { err }; }
@@ -1465,7 +1473,10 @@ class RootBoundary extends React.Component {
     console.error("app render failed:", err);
     document.body.classList.remove("js");
     const ss = document.querySelector(".static-summary");
-    if (ss) ss.removeAttribute("aria-hidden");
+    if (ss) {
+      ss.removeAttribute("aria-hidden");
+      ss.inert = false;
+    }
   }
   render() { return this.state.err ? null : this.props.children; }
 }
@@ -1758,9 +1769,15 @@ if (staticSummary) {
      over, and only then - with no JS, nothing runs and the article stands as
      the page. Reader engines extract from rendered text rather than from the
      accessibility tree, which is what lets one attribute separate the two
-     audiences. It carries nothing focusable, so there is no tab order to
-     mend as well. */
+     audiences. It does carry one focusable anchor (the archives link in the
+     closing note), and opacity:0 plus pointer-events:none would not stop
+     keyboard focus landing on that invisible control - so inert comes on
+     too, blocking focus and clicks for as long as the app owns the page.
+     Two places take it back off - the static-view toggle (owned in Header's
+     header block, where the article becomes the page) and RootBoundary's
+     catch (where the app goes away). */
   staticSummary.setAttribute("aria-hidden", "true");
+  staticSummary.inert = true;
 }
 ReactDOM.createRoot(document.getElementById("root")).render(
   <RootBoundary><App /></RootBoundary>

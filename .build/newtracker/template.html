@@ -74,6 +74,7 @@
   --lnp-text: var(--lnp);
   --grn-text: oklch(0.52 0.120 150);
   --onp-text: oklch(0.52 0.130 58);
+  --oth-text: oklch(0.52 0.018 70);
 
   --accent: oklch(0.50 0.070 205);
 
@@ -173,6 +174,7 @@ body.dark {
   --lnp-text: var(--lnp);
   --grn-text: var(--grn);
   --onp-text: var(--onp);
+  --oth-text: var(--oth);
 
   --accent: oklch(0.70 0.080 205);
 
@@ -3191,6 +3193,14 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 /* .ap-jumps' spacing mirror for the cycles intro's own down-pill(s) */
 .cyc-jumps { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
 .cyc-controls { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+/* Quiet note for when the per-poll cycle source would not land: the monthly
+   lines survive, only the dots are missing, so the tone is a footnote rather
+   than an alert. Retry is a bare link-styled button, reloaded in place. */
+.cyc-src-note { margin: 2px 0 12px; font-size: 12.5px; color: var(--ink-3); font-family: var(--sans); }
+.cyc-src-note button {
+  font: inherit; color: var(--accent); background: none; border: 0; padding: 0;
+  cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+}
 /* Download pair. .ap-export carries margin-left:auto for the archive's own
    layout, so it is reset here – inside this group the buttons sit together and
    the GROUP is what gets pushed right. */
