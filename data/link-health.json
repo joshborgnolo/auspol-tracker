@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "generated": "2026-09-01",
+  "generated": "2026-09-06",
   "links": [
     {
       "url": "https://www.roymorgan.com/findings/9901-federal-voting-intention-june-3-2025",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/9901-federal-voting-intention-june-3-2025",
       "redirects": 0,
@@ -19,7 +19,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/9921-federal-voting-intention-june-24-2025",
       "redirects": 0,
@@ -31,7 +31,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/9927-federal-voting-intention-june-30-2025",
       "redirects": 0,
@@ -43,7 +43,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/youthquake-coalition-deserted-by-younger-voters-20250701-p5mbja",
       "redirects": 0,
@@ -55,7 +55,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.spectrestrategy.com/blog-3-1/austalian-federal-polling-update-july-2025",
       "redirects": 0,
@@ -65,21 +65,23 @@
     {
       "url": "https://demosau.com/wp-content/uploads/2025/07/DemosAU-Report-Federal-Voting-Intention-July-05-06-2025.pdf",
       "fields": [
+        "methodUrl",
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://demosau.com/wp-content/uploads/2025/07/DemosAU-Report-Federal-Voting-Intention-July-05-06-2025.pdf",
       "redirects": 0,
-      "status": 206,
-      "note": ""
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-vote-collapses-as-labor-snags-a-second-honeymoon/news-story/f511fc58eac90093dddcf9f7939231a4",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-vote-collapses-as-labor-snags-a-second-honeymoon/news-story/f511fc58eac90093dddcf9f7939231a4",
       "redirects": 0,
@@ -87,11 +89,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/methodology-statement/newspoll-21-7-2025",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/methodology-statement/newspoll-21-7-2025/",
+      "redirects": 1,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.smh.com.au/politics/federal/the-long-climb-disaster-for-coalition-in-new-opinion-poll-as-albanese-builds-on-record-win-20250718-p5mg0x.html",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/the-long-climb-disaster-for-coalition-in-new-opinion-poll-as-albanese-builds-on-record-win-20250718-p5mg0x.html",
       "redirects": 0,
@@ -103,7 +117,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/9932-federal-voting-intention-july-27-2025",
       "redirects": 0,
@@ -115,7 +129,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/voters-baulk-at-expanding-gst-to-fund-tax-cuts-20250804-p5mk99",
       "redirects": 0,
@@ -127,7 +141,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.thenewdaily.com.au/news/politics/2025/08/18/albanese-newspoll",
       "redirects": 0,
@@ -135,11 +149,23 @@
       "note": "thenewdaily.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/methodology-statement/newspoll-18-8-2025",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/methodology-statement/newspoll-18-8-2025/",
+      "redirects": 1,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.smh.com.au/politics/federal/albanese-won-94-seats-at-the-election-now-voters-want-to-give-him-even-more-20250815-p5mnb3.html",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/albanese-won-94-seats-at-the-election-now-voters-want-to-give-him-even-more-20250815-p5mnb3.html",
       "redirects": 0,
@@ -151,7 +177,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/9941-federal-voting-intention-august-25-2025",
       "redirects": 0,
@@ -163,7 +189,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/liberal-party-risks-permanent-opposition-without-youth-vote-20250911-p5mueg",
       "redirects": 0,
@@ -175,10 +201,22 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://thenightly.com.au/politics/australia/newspoll-coalition-slumps-to-worst-ever-primary-vote-in-days-after-jacinta-price-dumped-from-frontbench-c-20017489",
       "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://pyxispolling.com/methodology-statement/newspoll-15-9-2025",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/methodology-statement/newspoll-15-9-2025/",
+      "redirects": 1,
       "status": 206,
       "note": ""
     },
@@ -187,7 +225,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/as-coalition-slumps-to-new-low-poll-shows-minor-party-reaping-the-benefits-20250914-p5muuu.html",
       "redirects": 0,
@@ -199,7 +237,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/9947-federal-voting-intention-september-21-2025",
       "redirects": 0,
@@ -209,9 +247,10 @@
     {
       "url": "https://essentialreport.com.au/reports/federal-political-insights",
       "fields": [
+        "releaseHub",
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/federal-political-insights",
       "redirects": 0,
@@ -223,7 +262,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/30-september-2025",
       "redirects": 0,
@@ -231,11 +270,23 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2025/09/Essential-Report-Disclosure-Statement-30_09_25-Full-Questionnaire.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2025/09/Essential-Report-Disclosure-Statement-30_09_25-Full-Questionnaire.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://x.com/AnalyseDis/status/1972808459134620007",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://x.com/AnalyseDis/status/1972808459134620007",
       "redirects": 0,
@@ -243,11 +294,23 @@
       "note": "x.com wall"
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/YouGov_Public_Data_30_Sep_2025.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/YouGov_Public_Data_30_Sep_2025.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-as-sussan-leys-net-approval-rating-plunges/news-story/bd1e89d2319827a5bb01ce6eb0888453",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-as-sussan-leys-net-approval-rating-plunges/news-story/bd1e89d2319827a5bb01ce6eb0888453",
       "redirects": 0,
@@ -255,11 +318,24 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/methodology-statement/newspoll-6-10-2025",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/methodology-statement/newspoll-6-10-2025/",
+      "redirects": 1,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_bfa36468f2104c90ba79a9bc66da0ab5.pdf",
       "fields": [
+        "methodUrl",
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_bfa36468f2104c90ba79a9bc66da0ab5.pdf",
       "redirects": 0,
@@ -271,7 +347,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.accent-research.com/projects/federal-political-snapshot---october-2025",
       "redirects": 0,
@@ -283,7 +359,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/ley-s-approval-ratings-tank-after-month-of-liberal-chaos-and-disunity-20251011-p5n1sh.html",
       "redirects": 0,
@@ -295,7 +371,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/9948-federal-voting-intention-october-2025",
       "redirects": 0,
@@ -307,7 +383,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.dailytelegraph.com.au/news/national/immigration-fears-surge-among-aussies-as-one-nation-doubles-support-in-new-poll/news-story/710198b07f75a61a6e0168d1afca4c22",
       "redirects": 0,
@@ -319,7 +395,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/29-october-2025",
       "redirects": 0,
@@ -327,11 +403,23 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2025/10/Essential-Report-Disclosure-Statement-29_10_25-Full-Questionnaire.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2025/10/Essential-Report-Disclosure-Statement-29_10_25-Full-Questionnaire.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://cdn.australiainstitute.org.au/2025/11/18020544/Aus-Institute-Poll-on-US-Oct25-summary-30102025.pdf",
       "redirects": 0,
@@ -343,7 +431,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-coalition-hits-historic-low-of-24pc-amid-sussan-leys-struggles/news-story/739877883ee405aeab0fc34c2d7b5218",
       "redirects": 0,
@@ -351,11 +439,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/methodology-statement/newspoll-3-11-2025",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/methodology-statement/newspoll-3-11-2025/",
+      "redirects": 1,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/voters-don-t-punish-liberals-for-infighting-but-albanese-on-notice-over-rising-costs-poll-20251108-p5n8rz.html",
       "redirects": 0,
@@ -367,19 +467,33 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://demosau.com/wp-content/uploads/2025/12/DemosAU-OctNov-Federal-MRP-Report-FINAL.pdf",
       "redirects": 0,
-      "status": 206,
-      "note": ""
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
+    },
+    {
+      "url": "https://demosau.com/wp-content/uploads/2025/12/DemosAU-OctNov-Federal-MRP-Report-FINAL-1.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "error",
+      "finalUrl": "https://demosau.com/wp-content/uploads/2025/12/DemosAU-OctNov-Federal-MRP-Report-FINAL-1.pdf",
+      "redirects": 0,
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2",
       "redirects": 0,
@@ -391,7 +505,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/9951-federal-voting-intention-november-16-2025",
       "redirects": 0,
@@ -403,7 +517,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.spectrestrategy.com/blog-3-1/australian-federal-polling-update-november-2025",
       "redirects": 0,
@@ -415,7 +529,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.climatecouncil.org.au/wp-content/uploads/2025/11/ClimateCouncil_EPA_MRP_Report_201125_national.pdf",
       "redirects": 0,
@@ -427,7 +541,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-andrew-hastie-firms-as-liberal-alternative-to-sussan-ley/news-story/ae7d5d377e1f1d49da95f681615eb7db",
       "redirects": 0,
@@ -435,11 +549,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/methodology-statement/newspoll-24-11-2025",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/methodology-statement/newspoll-24-11-2025/",
+      "redirects": 1,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://essentialreport.com.au/reports/26-november-2025",
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/26-november-2025",
       "redirects": 0,
@@ -447,11 +573,23 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2025/11/Essential-Report-Disclosure-Statement-26_11_25-Full-Questionnaire.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2025/11/Essential-Report-Disclosure-Statement-26_11_25-Full-Questionnaire.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.afr.com/politics/federal/one-in-four-male-gen-xers-now-support-one-nation-20251201-p5njot",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/one-in-four-male-gen-xers-now-support-one-nation-20251201-p5njot",
       "redirects": 0,
@@ -463,7 +601,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -475,11 +613,23 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulsePolling_Council_Methodology_Statement_021225.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulsePolling_Council_Methodology_Statement_021225.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/coalition-vote-crashes-to-record-low-as-housing-anger-fuels-one-nation-surge-poll-20251206-p5nlfd.html",
       "redirects": 0,
@@ -491,7 +641,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/10-december-2025",
       "redirects": 0,
@@ -499,11 +649,23 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2025/12/Essential-Report-Disclosure-Statement-10_12_25-Full-Questionnaire.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2025/12/Essential-Report-Disclosure-Statement-10_12_25-Full-Questionnaire.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.afr.com/politics/federal/labor-loses-skin-over-expenses-scandal-but-keeps-strong-poll-lead-20251214-p5nnhe",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/labor-loses-skin-over-expenses-scandal-but-keeps-strong-poll-lead-20251214-p5nnhe",
       "redirects": 0,
@@ -515,7 +677,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-federal-poll",
       "redirects": 0,
@@ -523,11 +685,23 @@
       "note": ""
     },
     {
+      "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_4df02b5e2ec545b3b4faf83f1d87c7eb.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_4df02b5e2ec545b3b4faf83f1d87c7eb.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/9956-federal-voting-intention-december-14-2025",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/9956-federal-voting-intention-december-14-2025",
       "redirects": 0,
@@ -539,9 +713,21 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/albanese-s-approval-rating-plummets-as-social-cohesion-frays-australians-fear-a-rise-in-antisemitism-poll-20251221-p5npad.html",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News23_12_25_Polling_Council_Methodology_Statement_Dec25.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News23_12_25_Polling_Council_Methodology_Statement_Dec25.pdf",
       "redirects": 0,
       "status": 206,
       "note": ""
@@ -551,7 +737,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.capitalbrief.com/article/one-nation-neck-and-neck-with-coalition-on-primary-vote-new-polling-shows-25e8e4a8-40b3-45bd-8c16-c570e232aa3e/",
       "redirects": 0,
@@ -559,11 +745,35 @@
       "note": ""
     },
     {
-      "url": "https://drive.google.com/file/d/14VSwAKi4y0xqvgnHYtm0IP_92OnbNSk9/view",
+      "url": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fjoyce-hits-out-at-arrogant-critics-amid-one-nation-polling-surge%2Fnews-story%2F36486978c8ed24f4cb365befa4e03f22",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
+      "verdict": "wall",
+      "finalUrl": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fjoyce-hits-out-at-arrogant-critics-amid-one-nation-polling-surge%2Fnews-story%2F36486978c8ed24f4cb365befa4e03f22",
+      "redirects": 0,
+      "status": 403,
+      "note": "dailytelegraph.com.au wall"
+    },
+    {
+      "url": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-national-voter-sentiment-survey",
+      "fields": [
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-national-voter-sentiment-survey",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://drive.google.com/file/d/14VSwAKi4y0xqvgnHYtm0IP_92OnbNSk9/view",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://drive.google.com/file/d/14VSwAKi4y0xqvgnHYtm0IP_92OnbNSk9/view",
       "redirects": 0,
@@ -575,7 +785,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/federal-voting-intention-late-january-alp-increases-two-party-preferred-lead-as-one-nation-overtakes-the-liberal-party-for-the-first-time-as-coalition-splits",
       "redirects": 0,
@@ -587,7 +797,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-ahead-of-the-coalition-on-primary-votes-for-the-first-time/news-story/4e41476c9a605ada111c0c1f7064db1d",
       "redirects": 0,
@@ -595,11 +805,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/methodology-statement/newspoll-19-01-2026",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/methodology-statement/newspoll-19-01-2026/",
+      "redirects": 1,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.smh.com.au/politics/federal/support-for-albanese-plummets-after-muddled-response-to-bondi-attack-20260118-p5nuv8.html",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/support-for-albanese-plummets-after-muddled-response-to-bondi-attack-20260118-p5nuv8.html",
       "redirects": 0,
@@ -611,7 +833,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.heraldsun.com.au/news/national/one-nation-support-surges-as-new-poll-reveals-voter-fears-over-immigration-and-crime/news-story/6fcdf878561d6d3b09afa88e2b60e267",
       "redirects": 0,
@@ -623,7 +845,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.capitalbrief.com/article/pauline-hanson-leads-sussan-ley-as-preferred-pm-as-one-nation-extends-gains-647f3210-a525-4aea-aa0c-f97fb1d226bb/",
       "redirects": 0,
@@ -631,11 +853,25 @@
       "note": ""
     },
     {
+      "url": "https://demosau.com/wp-content/uploads/2026/01/DemosAU-Federal-Poll-January-2026-FINAL.pdf",
+      "fields": [
+        "methodUrl",
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "error",
+      "finalUrl": "https://demosau.com/wp-content/uploads/2026/01/DemosAU-Federal-Poll-January-2026-FINAL.pdf",
+      "redirects": 0,
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
+    },
+    {
       "url": "https://www.theguardian.com/australia-news/2026/jan/28/guardian-essential-poll-one-nation-coalition-liberal-national-labor-anthony-albanese-bondi-attack-ntwnfb",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.theguardian.com/australia-news/2026/jan/28/guardian-essential-poll-one-nation-coalition-liberal-national-labor-anthony-albanese-bondi-attack-ntwnfb",
       "redirects": 0,
@@ -647,7 +883,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/28th-january-2026",
       "redirects": 0,
@@ -655,11 +891,35 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2026/01/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2026/01/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_20_01_26_Polling_Council_Methodology_Statement_Jan26.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_20_01_26_Polling_Council_Methodology_Statement_Jan26.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.afr.com/politics/federal/libs-nats-in-freefall-while-hanson-surges-poll-20260201-p5nylo",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/libs-nats-in-freefall-while-hanson-surges-poll-20260201-p5nylo",
       "redirects": 0,
@@ -671,7 +931,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll",
       "redirects": 0,
@@ -679,11 +939,23 @@
       "note": ""
     },
     {
+      "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_a04c3282929c4378a2f96d0134bfd344.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_a04c3282929c4378a2f96d0134bfd344.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/9971-federal-voting-intention-february-2-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/9971-federal-voting-intention-february-2-2026",
       "redirects": 0,
@@ -695,7 +967,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-sussan-leys-liberals-hit-historic-low-and-hand-angus-taylor-a-challenge-trigger/news-story/bbd4bf5615319c1d872a735e4d1646f9",
       "redirects": 0,
@@ -703,11 +975,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/api.php/images/document/23197042/NewspollMethodologyStatement9February2026byPyxis-jgvq-njfgtPanNctOUTnLw.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/api.php/images/document/23197042/NewspollMethodologyStatement9February2026byPyxis-jgvq-njfgtPanNctOUTnLw.pdf",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/10103-federal-voting-intention-february-8-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10103-federal-voting-intention-february-8-2026",
       "redirects": 0,
@@ -719,7 +1003,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -731,25 +1015,25 @@
       ]
     },
     {
-      "url": "https://cdn.australiainstitute.org.au/2026/02/18022711/Polling-brief-One-Nation-voters-and-gas-exports-Web.pdf",
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_03_02_26_Polling_Council_Methodology_Statement_1.pdf",
       "fields": [
-        "url"
+        "methodUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
-      "finalUrl": "https://cdn.australiainstitute.org.au/2026/02/18022711/Polling-brief-One-Nation-voters-and-gas-exports-Web.pdf",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_03_02_26_Polling_Council_Methodology_Statement_1.pdf",
       "redirects": 0,
       "status": 206,
       "note": ""
     },
     {
-      "url": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
+      "url": "https://cdn.australiainstitute.org.au/2026/02/18022711/Polling-brief-One-Nation-voters-and-gas-exports-Web.pdf",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
-      "finalUrl": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
+      "finalUrl": "https://cdn.australiainstitute.org.au/2026/02/18022711/Polling-brief-One-Nation-voters-and-gas-exports-Web.pdf",
       "redirects": 0,
       "status": 206,
       "note": ""
@@ -759,9 +1043,21 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10113-federal-voting-intention-february-13-2026",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
+      "fields": [
+        "url"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.smh.com.au/politics/federal/one-nation-hunts-down-the-coalition-but-voters-give-taylor-some-ground-20260215-p5o2eh.html",
       "redirects": 0,
       "status": 206,
       "note": ""
@@ -771,7 +1067,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10123-federal-voting-intention-february-16-2026",
       "redirects": 0,
@@ -779,35 +1075,73 @@
       "note": ""
     },
     {
-      "url": "https://drive.google.com/file/d/1HH88HR1Gwa9keIiIYiBbiSWTAANkKRS9/view",
+      "url": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fpoll-reveals-majority-of-australians-think-labor-needs-to-give-parents-more-childcare-choice%2Fnews-story%2F55f6d28f2a7fe8d52464e9d32b82f75f",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
-      "finalUrl": "https://drive.google.com/file/d/1HH88HR1Gwa9keIiIYiBbiSWTAANkKRS9/view",
+      "finalUrl": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fpoll-reveals-majority-of-australians-think-labor-needs-to-give-parents-more-childcare-choice%2Fnews-story%2F55f6d28f2a7fe8d52464e9d32b82f75f",
+      "redirects": 0,
+      "status": 403,
+      "note": "dailytelegraph.com.au wall"
+    },
+    {
+      "url": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-february-2026-national-voter-sentiment-survey",
+      "fields": [
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-february-2026-national-voter-sentiment-survey",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://tinyurl.com/Feb26FEDPollFoxHedgehogAPC-1",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "moved",
+      "finalUrl": "https://drive.google.com/file/d/1fu0PaS4wx-IgkQzBYeJwxIWHiL0bENsk/view?usp=drivesdk",
+      "redirects": 1,
+      "status": 200,
+      "note": "resolves via 1 redirect(s) into the drive.google.com wall"
+    },
+    {
+      "url": "https://www.capitalbrief.com/article/one-nation-closes-in-on-labors-primary-vote-as-its-poll-surge-continues-224ffb9c-517c-4ac9-9bd5-ac3a8ca6b836/",
+      "fields": [
+        "url"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.capitalbrief.com/article/one-nation-closes-in-on-labors-primary-vote-as-its-poll-surge-continues-224ffb9c-517c-4ac9-9bd5-ac3a8ca6b836/",
       "redirects": 0,
       "status": 200,
-      "note": "drive.google.com wall"
+      "note": ""
     },
     {
       "url": "https://demosau.com/wp-content/uploads/2026/02/DemosAU-Federal-Poll-Feb-2026.pdf",
       "fields": [
-        "url"
+        "methodUrl",
+        "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://demosau.com/wp-content/uploads/2026/02/DemosAU-Federal-Poll-Feb-2026.pdf",
       "redirects": 0,
-      "status": 206,
-      "note": ""
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.roymorgan.com/findings/10126-federal-voting-intention-february-24-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10126-federal-voting-intention-february-24-2026",
       "redirects": 0,
@@ -819,7 +1153,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/25-february-2026",
       "redirects": 0,
@@ -827,11 +1161,23 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2026/02/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2026/02/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.skynews.com.au/australia-news/politics/bandaid-on-a-bullet-wound-angus-taylor-halts-coalition-decline-after-taking-over-from-sussan-ley-sky-news-pulse-reveals/news-story/9068187eed61dcd301a5ef5f54a6d8bd",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -843,11 +1189,23 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_25_02_26_Polling_Council_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_25_02_26_Polling_Council_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.pollbludger.net/2026/03/01/newspoll-labor-32-one-nation-27-coalition-20-greens-11-open-thread/",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.pollbludger.net/2026/03/01/newspoll-labor-32-one-nation-27-coalition-20-greens-11-open-thread/",
       "redirects": 0,
@@ -855,11 +1213,24 @@
       "note": ""
     },
     {
+      "url": "https://pyxispolling.com/api.php/images/document/23739820/NewspollMethodologyStatement2March2026byPyxis-9A40zTlIA5TflJOBgYdh9g.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/api.php/images/document/23739820/NewspollMethodologyStatement2March2026byPyxis-9A40zTlIA5TflJOBgYdh9g.pdf",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
       "fields": [
+        "methodUrl",
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
       "redirects": 0,
@@ -871,7 +1242,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll",
       "redirects": 0,
@@ -883,7 +1254,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10148-federal-voting-intention-march-2-2026",
       "redirects": 0,
@@ -891,23 +1262,37 @@
       "note": ""
     },
     {
-      "url": "https://demosau.com/wp-content/uploads/2026/03/DemosAU-Federal-MRP-Model-FebMarch-2026-.pdf",
+      "url": "https://www.capitalbrief.com/article/nationals-face-total-wipeout-as-one-nation-leads-with-male-voters-ae82f323-94e9-436a-b6b1-6dc1ec8cab6a/",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.capitalbrief.com/article/nationals-face-total-wipeout-as-one-nation-leads-with-male-voters-ae82f323-94e9-436a-b6b1-6dc1ec8cab6a/",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
+      "url": "https://demosau.com/wp-content/uploads/2026/03/DemosAU-Federal-MRP-Model-FebMarch-2026-.pdf",
+      "fields": [
+        "methodUrl",
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://demosau.com/wp-content/uploads/2026/03/DemosAU-Federal-MRP-Model-FebMarch-2026-.pdf",
       "redirects": 0,
-      "status": 206,
-      "note": ""
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.roymorgan.com/findings/10151-federal-voting-intention-march-10-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10151-federal-voting-intention-march-10-2026",
       "redirects": 0,
@@ -919,7 +1304,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -931,11 +1316,23 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_11_03_26_Polling_Council_Methodology_Statement_-_Copy.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_11_03_26_Polling_Council_Methodology_Statement_-_Copy.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.smh.com.au/politics/federal/one-nation-now-wrenching-votes-from-labor-as-it-overtakes-coalition-20260315-p5oakr.html",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/one-nation-now-wrenching-votes-from-labor-as-it-overtakes-coalition-20260315-p5oakr.html",
       "redirects": 0,
@@ -947,7 +1344,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10161-federal-voting-intention-march-17-2026",
       "redirects": 0,
@@ -959,7 +1356,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://cdn.australiainstitute.org.au/2026/03/18023552/Aus-Institute-Mar26-poll-summary-20032026-votingintention_GAS.pdf",
       "redirects": 0,
@@ -971,7 +1368,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10171-federal-voting-intention-march-23-2026",
       "redirects": 0,
@@ -983,7 +1380,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.theguardian.com/australia-news/2026/mar/25/guardian-essential-poll-only-a-quarter-of-australians-approve-of-us-israel-war-on-iran",
       "redirects": 0,
@@ -995,7 +1392,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/25-march-2026",
       "redirects": 0,
@@ -1003,11 +1400,23 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2026/03/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2026/03/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.skynews.com.au/australia-news/politics/pauline-hansons-one-nation-surges-against-labor-in-latest-sky-news-pulse-poll/news-story/6582c87b585bc0554347f6cf870a9bb8",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -1019,23 +1428,59 @@
       ]
     },
     {
-      "url": "https://drive.google.com/file/d/1t7xuBbl0e-zppcmyweC1MWeo-4gVkMjX/view",
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_24_03_26_Polling_Council_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_24_03_26_Polling_Council_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fsupport-for-one-nation-stalls-as-albos-approval-drops-again%2Fnews-story%2Ff6a40ee078fb98772190ef8b8a8188d6",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
-      "finalUrl": "https://drive.google.com/file/d/1t7xuBbl0e-zppcmyweC1MWeo-4gVkMjX/view",
+      "finalUrl": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fsupport-for-one-nation-stalls-as-albos-approval-drops-again%2Fnews-story%2Ff6a40ee078fb98772190ef8b8a8188d6",
       "redirects": 0,
+      "status": 403,
+      "note": "dailytelegraph.com.au wall"
+    },
+    {
+      "url": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-march-2026-national-voter-sentiment-survey",
+      "fields": [
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-march-2026-national-voter-sentiment-survey",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://tinyurl.com/APC-LMS-Mar26National-FH",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "moved",
+      "finalUrl": "https://drive.google.com/file/d/1O-fSKAaYISI0RsJLI_hyC16nA_Eh63lD/view?usp=drivesdk",
+      "redirects": 1,
       "status": 200,
-      "note": "drive.google.com wall"
+      "note": "resolves via 1 redirect(s) into the drive.google.com wall"
     },
     {
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-up-one-nation-plateaus-as-labor-dips-amid-iran-war-fuel-crisis/news-story/683c727a9e67a4f4fe8640440e44f3b1?amp",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-liberals-up-one-nation-plateaus-as-labor-dips-amid-iran-war-fuel-crisis/news-story/683c727a9e67a4f4fe8640440e44f3b1?amp",
       "redirects": 0,
@@ -1043,11 +1488,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/api.php/images/document/24607993/NewspollMethodologyStatement30March2026byPyxis-AvvyTlYpA6zeoV2P_V_Yhg.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/api.php/images/document/24607993/NewspollMethodologyStatement30March2026byPyxis-AvvyTlYpA6zeoV2P_V_Yhg.pdf",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://www.afr.com/politics/federal/one-nation-nears-labor-as-coalition-vote-hits-record-low-20260329-p5zjmk",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/one-nation-nears-labor-as-coalition-vote-hits-record-low-20260329-p5zjmk",
       "redirects": 0,
@@ -1059,7 +1516,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://freshwaterstrategy.com/2026/04/15/news-australia-freshwater-strategy-march-polling-data/",
       "redirects": 0,
@@ -1071,7 +1528,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10177-federal-voting-intention-march-30-2026",
       "redirects": 0,
@@ -1083,7 +1540,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10178-federal-voting-intention-april-7-2026",
       "redirects": 0,
@@ -1095,7 +1552,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -1107,11 +1564,23 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_07_04_26_Polling_Council_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_07_04_26_Polling_Council_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026",
       "redirects": 0,
@@ -1123,7 +1592,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10187-federal-voting-intention-april-13-2026",
       "redirects": 0,
@@ -1131,23 +1600,37 @@
       "note": ""
     },
     {
-      "url": "https://demosau.com/wp-content/uploads/2026/04/DemosAU-Fed-Poll-April-2026.pdf",
+      "url": "https://www.capitalbrief.com/article/one-nation-draws-level-with-labor-as-voters-blame-immigration-for-housing-crisis-706653c7-d05f-4c10-9a62-5dde8f2a69cc/",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.capitalbrief.com/article/one-nation-draws-level-with-labor-as-voters-blame-immigration-for-housing-crisis-706653c7-d05f-4c10-9a62-5dde8f2a69cc/",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
+      "url": "https://demosau.com/wp-content/uploads/2026/04/DemosAU-Fed-Poll-April-2026.pdf",
+      "fields": [
+        "methodUrl",
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://demosau.com/wp-content/uploads/2026/04/DemosAU-Fed-Poll-April-2026.pdf",
       "redirects": 0,
-      "status": 206,
-      "note": ""
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-support-falls-as-voters-resist-new-revenue-measures/news-story/ba583310b812fd590a07d4c5e6812838",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-support-falls-as-voters-resist-new-revenue-measures/news-story/ba583310b812fd590a07d4c5e6812838",
       "redirects": 0,
@@ -1155,11 +1638,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/api.php/images/document/25699945/NewspollMethodologyStatement20April2026byPyxis-PzbvqKXbZDh2br-RrjMCjw.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/api.php/images/document/25699945/NewspollMethodologyStatement20April2026byPyxis-PzbvqKXbZDh2br-RrjMCjw.pdf",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://www.smh.com.au/politics/federal/voters-return-to-major-parties-as-one-nation-support-dips-20260417-p5zox0.html",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/voters-return-to-major-parties-as-one-nation-support-dips-20260417-p5zox0.html",
       "redirects": 0,
@@ -1171,7 +1666,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10191-federal-voting-intention-april-20-2026",
       "redirects": 0,
@@ -1183,7 +1678,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -1195,11 +1690,23 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_14_04_26_Polling_Council_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_14_04_26_Polling_Council_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/10201-federal-voting-intention-april-27-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10201-federal-voting-intention-april-27-2026",
       "redirects": 0,
@@ -1211,7 +1718,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.theguardian.com/australia-news/2026/apr/28/pauline-hanson-one-nation-leadership-guardian-essential-poll-ntwnfb",
       "redirects": 0,
@@ -1223,7 +1730,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/29-april-2026",
       "redirects": 0,
@@ -1231,11 +1738,23 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2026/04/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2026/04/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
       "redirects": 0,
@@ -1247,7 +1766,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll",
       "redirects": 0,
@@ -1255,11 +1774,23 @@
       "note": ""
     },
     {
+      "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_61030f1f0f4d4ba49b6c3a10f141c992.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_61030f1f0f4d4ba49b6c3a10f141c992.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.couriermail.com.au/news/queensland/voters-turn-on-albanese-government-over-key-crises-new-poll-reveals/news-story/23eb5a933e38dc96d1b4d53db8cc7bc6",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.couriermail.com.au/news/queensland/voters-turn-on-albanese-government-over-key-crises-new-poll-reveals/news-story/23eb5a933e38dc96d1b4d53db8cc7bc6",
       "redirects": 0,
@@ -1271,7 +1802,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10211-federal-voting-intention-may-4-2026",
       "redirects": 0,
@@ -1283,7 +1814,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -1295,11 +1826,23 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_Pulse_May6th2026_Polling_Council_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_Pulse_May6th2026_Polling_Council_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/10218-federal-voting-intention-may-11-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10218-federal-voting-intention-may-11-2026",
       "redirects": 0,
@@ -1311,7 +1854,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.pollbludger.net/2026/05/17/post-budget-federal-polling-part-one-open-thread/",
       "redirects": 0,
@@ -1321,9 +1864,10 @@
     {
       "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_604e597b92a843e3bef4ee2825c88406.pdf",
       "fields": [
+        "methodUrl",
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_604e597b92a843e3bef4ee2825c88406.pdf",
       "redirects": 0,
@@ -1335,7 +1879,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.accent-research.com/projects/a-fragmented-electorate",
       "redirects": 0,
@@ -1347,7 +1891,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10221-federal-voting-post-budget-special-sms-morgan-poll-may-14-2026",
       "redirects": 0,
@@ -1359,7 +1903,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.thechronicle.com.au/business/economy/australian-economy/albaneses-budget-a-lead-balloon-as-voter-trust-in-government-collapses/news-story/b0272a6f164f3904c0064360f5bb148d",
       "redirects": 0,
@@ -1371,7 +1915,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/labor-s-primary-vote-slumps-after-broken-promise-budget-20260517-p5zxus.html",
       "redirects": 0,
@@ -1383,7 +1927,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10228-federal-voting-intention-may-18-2026",
       "redirects": 0,
@@ -1395,7 +1939,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-jim-chalmers-and-anthony-albaneses-budget-flops-with-every-generation-of-voters/news-story/45c8892cc75b73f650c0b6b50405fce9",
       "redirects": 0,
@@ -1403,11 +1947,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/api.php/images/document/25699942/NewspollMethodologyStatement18May2026byPyxis-MVoGot9Vf0GzsNoVDOrvsQ.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/api.php/images/document/25699942/NewspollMethodologyStatement18May2026byPyxis-MVoGot9Vf0GzsNoVDOrvsQ.pdf",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://www.skynews.com.au/australia-news/politics/labors-primary-vote-plummets-amid-backlash-to-anthony-albaneses-budget-broken-promises/news-story/85b0175fa0db4e02b85f4161771cdefd",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -1419,23 +1975,49 @@
       ]
     },
     {
-      "url": "https://demosau.com/wp-content/uploads/2026/05/DemosAU-Fed-Poll-May-2026-FINAL.pdf",
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/YouGov_SkyPulse_19_05_26_APC_Methodology_Statement.pdf",
       "fields": [
-        "url"
+        "methodUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
-      "finalUrl": "https://demosau.com/wp-content/uploads/2026/05/DemosAU-Fed-Poll-May-2026-FINAL.pdf",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/YouGov_SkyPulse_19_05_26_APC_Methodology_Statement.pdf",
       "redirects": 0,
       "status": 206,
       "note": ""
+    },
+    {
+      "url": "https://www.capitalbrief.com/article/labors-budget-backlash-begins-as-one-nation-continues-its-rise-f730690e-86cf-4231-8d1f-f6bf23d1d8a0/",
+      "fields": [
+        "url"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.capitalbrief.com/article/labors-budget-backlash-begins-as-one-nation-continues-its-rise-f730690e-86cf-4231-8d1f-f6bf23d1d8a0/",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
+      "url": "https://demosau.com/wp-content/uploads/2026/05/DemosAU-Fed-Poll-May-2026-FINAL.pdf",
+      "fields": [
+        "methodUrl",
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://demosau.com/wp-content/uploads/2026/05/DemosAU-Fed-Poll-May-2026-FINAL.pdf",
+      "redirects": 0,
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.roymorgan.com/findings/10231-federal-voting-intention-may-25-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10231-federal-voting-intention-may-25-2026",
       "redirects": 0,
@@ -1447,7 +2029,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.theguardian.com/australia-news/2026/may/27/guardian-essential-poll-labors-housing-and-tax-changes-fail-to-win-over-voters-as-support-for-one-nation-swells",
       "redirects": 0,
@@ -1459,7 +2041,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/27-may-2026",
       "redirects": 0,
@@ -1467,11 +2049,23 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2026/06/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2026/06/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.news.com.au/finance/money/tax/no-basis-labor-frontbencher-mark-butler-warns-landlords-over-500-a-year-rent-hikes-linked-to-cgt/news-story/0c74b51fc1b0b5704d9b4a0adf2df699",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.news.com.au/finance/money/tax/no-basis-labor-frontbencher-mark-butler-warns-landlords-over-500-a-year-rent-hikes-linked-to-cgt/news-story/0c74b51fc1b0b5704d9b4a0adf2df699",
       "redirects": 0,
@@ -1479,23 +2073,47 @@
       "note": "news.com.au wall"
     },
     {
-      "url": "https://drive.google.com/file/d/13CXxW2Ojuq8E7pJRVEEh9fO80SIiEikp/view",
+      "url": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fpoll-reveals-australians-want-to-give-someone-else-a-go%2Fnews-story%2F822912d3d85418363515e3ea0e062986",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
-      "finalUrl": "https://drive.google.com/file/d/13CXxW2Ojuq8E7pJRVEEh9fO80SIiEikp/view",
+      "finalUrl": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fpoll-reveals-australians-want-to-give-someone-else-a-go%2Fnews-story%2F822912d3d85418363515e3ea0e062986",
       "redirects": 0,
+      "status": 403,
+      "note": "dailytelegraph.com.au wall"
+    },
+    {
+      "url": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-may-2026-national-voter-sentiment-survey",
+      "fields": [
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-may-2026-national-voter-sentiment-survey",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://tinyurl.com/May2026-Methodology-FH",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "moved",
+      "finalUrl": "https://drive.google.com/file/d/1AqnfByNKcQKiRDKisB3PzFBivz6PE0Mb/view?usp=drivesdk",
+      "redirects": 1,
       "status": 200,
-      "note": "drive.google.com wall"
+      "note": "resolves via 1 redirect(s) into the drive.google.com wall"
     },
     {
       "url": "https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9",
       "redirects": 0,
@@ -1507,7 +2125,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll",
       "redirects": 0,
@@ -1515,11 +2133,23 @@
       "note": ""
     },
     {
+      "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_c99eef2ffb4242f3b2d0da6311abf61e.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_c99eef2ffb4242f3b2d0da6311abf61e.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/10242-federal-voting-intention-june-1-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10242-federal-voting-intention-june-1-2026",
       "redirects": 0,
@@ -1531,7 +2161,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -1543,11 +2173,23 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_02_06_26_APC_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Sky_News_SkyPulse_02_06_26_APC_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-in-front-of-labor-anthony-albanese-gets-worst-ever-rating/news-story/f4e47be80091b678d835cb9334fc8b0a",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hansons-one-nation-in-front-of-labor-anthony-albanese-gets-worst-ever-rating/news-story/f4e47be80091b678d835cb9334fc8b0a",
       "redirects": 0,
@@ -1555,11 +2197,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/api.php/images/document/26125276/NewspollMethodologyStatement8June2026byPyxis-65K2gj5PC1afG43d89wtLQ.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/api.php/images/document/26125276/NewspollMethodologyStatement8June2026byPyxis-65K2gj5PC1afG43d89wtLQ.pdf",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/10246-federal-voting-intention-june-9-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10246-federal-voting-intention-june-9-2026",
       "redirects": 0,
@@ -1571,7 +2225,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html",
       "redirects": 0,
@@ -1583,7 +2237,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10253-federal-voting-intention-june-15-2026",
       "redirects": 0,
@@ -1595,7 +2249,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -1607,23 +2261,49 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/YouGov_SkyPulse_16_06_26_APC_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/YouGov_SkyPulse_16_06_26_APC_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://demosau.com/news/one-nation-lead-grows-as-l-np-primary-sinks-to-18/",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://demosau.com/news/one-nation-lead-grows-as-l-np-primary-sinks-to-18/",
       "redirects": 0,
-      "status": 200,
-      "note": ""
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
+    },
+    {
+      "url": "https://demosau.com/wp-content/uploads/2026/06/Capital-BriefDemosAU-Federal-Poll-June-2026-FINAL.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "error",
+      "finalUrl": "https://demosau.com/wp-content/uploads/2026/06/Capital-BriefDemosAU-Federal-Poll-June-2026-FINAL.pdf",
+      "redirects": 0,
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.roymorgan.com/findings/10261-federal-voting-intention-june-22-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10261-federal-voting-intention-june-22-2026",
       "redirects": 0,
@@ -1635,7 +2315,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albanese-and-labor-bounce-back-after-budget-tax-backflips-take-primary-vote-lead-from-one-nation/news-story/3c57c1c54f74b697324f5b5917e74337",
       "redirects": 0,
@@ -1643,11 +2323,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/api.php/images/document/26605651/NewspollMethodologyStatement29June2026byPyxis-szOLdVanOJFNG1BOiiD1Hw.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/api.php/images/document/26605651/NewspollMethodologyStatement29June2026byPyxis-szOLdVanOJFNG1BOiiD1Hw.pdf",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9",
       "redirects": 0,
@@ -1659,7 +2351,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll",
       "redirects": 0,
@@ -1667,11 +2359,23 @@
       "note": ""
     },
     {
+      "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_0fe4f080e2cd4654906be0f94268f9b2.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_0fe4f080e2cd4654906be0f94268f9b2.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/10266-federal-voting-intention-june-29-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10266-federal-voting-intention-june-29-2026",
       "redirects": 0,
@@ -1683,7 +2387,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.theguardian.com/australia-news/2026/jun/30/guardian-essential-poll-voters-reject-key-one-nation-policies-as-support-drops",
       "redirects": 0,
@@ -1695,7 +2399,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/30-june-2026",
       "redirects": 0,
@@ -1703,11 +2407,23 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2026/06/Essential-Report-Disclosure-Statement-Full-Questionnaire-2.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2026/06/Essential-Report-Disclosure-Statement-Full-Questionnaire-2.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.skynews.com.au/australia-news/politics/one-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense/news-story/3ecdbeb123199de72a7c12b4fb9efbd2",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -1723,7 +2439,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://yougov.com/articles/55081-labor-on-track-for-decisive-election-victory-as-coalition-support-hits-record-low",
       "redirects": 0,
@@ -1731,11 +2447,23 @@
       "note": ""
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/Yougov_SkyPulse_02_07_26_APC_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/Yougov_SkyPulse_02_07_26_APC_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/10276-federal-voting-intention-july-6-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10276-federal-voting-intention-july-6-2026",
       "redirects": 0,
@@ -1743,23 +2471,37 @@
       "note": ""
     },
     {
-      "url": "https://demosau.com/wp-content/uploads/2026/07/Capital-BriefDemosAU-Federal-Poll-July-2026.pdf",
+      "url": "https://www.capitalbrief.com/newsletter/pauline-hansons-agenda-takes-a-hit-in-new-poll-701d8498-f9f1-43f6-ab7c-dd8d236dfa78/",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.capitalbrief.com/newsletter/pauline-hansons-agenda-takes-a-hit-in-new-poll-701d8498-f9f1-43f6-ab7c-dd8d236dfa78/",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
+      "url": "https://demosau.com/wp-content/uploads/2026/07/Capital-BriefDemosAU-Federal-Poll-July-2026.pdf",
+      "fields": [
+        "methodUrl",
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://demosau.com/wp-content/uploads/2026/07/Capital-BriefDemosAU-Federal-Poll-July-2026.pdf",
       "redirects": 0,
-      "status": 206,
-      "note": ""
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.theage.com.au/politics/federal/the-varnish-has-come-off-support-slips-for-hanson-20260712-p60el9.html",
       "redirects": 0,
@@ -1771,19 +2513,20 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://demosau.com/news/new-mrp-model-points-to-hung-parliament/",
       "redirects": 0,
-      "status": 200,
-      "note": ""
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.roymorgan.com/findings/10283-federal-voting-intention-july-13-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10283-federal-voting-intention-july-13-2026",
       "redirects": 0,
@@ -1795,7 +2538,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "moved",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 3,
@@ -1811,7 +2554,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://yougov.com/articles/55192-labor-maintains-commanding-lead-over-one-nation-and-coalition-in-latest-yougov-public-data-poll",
       "redirects": 0,
@@ -1819,11 +2562,23 @@
       "note": ""
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/YouGov_SkyPulse_14_07_26_APC_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/YouGov_SkyPulse_14_07_26_APC_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hanson-regains-ground-and-liberals-rise-as-labor-falls-to-equal-lowest-point-since-2022/news-story/da8374ff67e3769478b13867909a1074",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-pauline-hanson-regains-ground-and-liberals-rise-as-labor-falls-to-equal-lowest-point-since-2022/news-story/da8374ff67e3769478b13867909a1074",
       "redirects": 0,
@@ -1831,11 +2586,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/api.php/images/document/26999641/NewspollMethodologyStatement20July2026byPyxis-UIky81cqYqHOd-HsdsjkDg.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/api.php/images/document/26999641/NewspollMethodologyStatement20July2026byPyxis-UIky81cqYqHOd-HsdsjkDg.pdf",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/10291-federal-voting-intention-july-20-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10291-federal-voting-intention-july-20-2026",
       "redirects": 0,
@@ -1847,7 +2614,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.spectrestrategy.com/blog-3-1/australian-federal-political-update-april-2026-lrxjw",
       "redirects": 0,
@@ -1859,7 +2626,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10293-federal-voting-intention-july-27-2026",
       "redirects": 0,
@@ -1871,7 +2638,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.theguardian.com/australia-news/2026/jul/29/guardian-essential-poll-angus-taylors-approval-rating-crashes-and-one-nation-support-plateaus",
       "redirects": 0,
@@ -1883,7 +2650,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/reports/28-july-2026",
       "redirects": 0,
@@ -1891,11 +2658,23 @@
       "note": ""
     },
     {
+      "url": "https://essentialreport.com.au/wp-content/uploads/2026/07/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/wp-content/uploads/2026/07/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.news24.com.au/politics/australian-politics/labor-on-lowest-majoritywinning-vote-since-federation-as-voters-turn-on-major-parties-news24-pulse/news-story/30abb89ce081815670d1a05c4517f90e",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 2,
@@ -1906,11 +2685,23 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/YougovNews24_Pulse_28_07_26_APC_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/YougovNews24_Pulse_28_07_26_APC_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6",
       "redirects": 0,
@@ -1922,7 +2713,7 @@
       "fields": [
         "releaseUrl"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-july-2026-federal-poll",
       "redirects": 0,
@@ -1930,11 +2721,23 @@
       "note": ""
     },
     {
+      "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_e09c2025b9df424e98b0f2737e7ae4ca.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_e09c2025b9df424e98b0f2737e7ae4ca.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/10297-federal-voting-intention-august-3-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10297-federal-voting-intention-august-3-2026",
       "redirects": 0,
@@ -1946,7 +2749,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-anthony-albaneses-labor-hits-a-julia-gillardlevel-low-primary-vote-after-winter-break/news-story/ca81774a347a1fd299e48ce0361d1a8a",
       "redirects": 0,
@@ -1954,11 +2757,23 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/api.php/images/document/27378346/NewspollMethodologyStatement10August2026byPyxis-003bk-owSLhtvzyATwtUuA.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/api.php/images/document/27378346/NewspollMethodologyStatement10August2026byPyxis-003bk-owSLhtvzyATwtUuA.pdf",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://www.roymorgan.com/findings/10307-federal-voting-intention-august-10-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10307-federal-voting-intention-august-10-2026",
       "redirects": 0,
@@ -1970,7 +2785,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 2,
@@ -1981,11 +2796,23 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/News24_Pulse_11_08_26_APC_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/News24_Pulse_11_08_26_APC_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
       "redirects": 0,
@@ -1997,7 +2824,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10311-federal-voting-intention-august-17-2026",
       "redirects": 0,
@@ -2005,23 +2832,37 @@
       "note": ""
     },
     {
-      "url": "https://demosau.com/wp-content/uploads/2026/08/Capital-BriefDemosAU-Federal-Poll-August-2026.pdf",
+      "url": "https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
+      "verdict": "moved",
+      "finalUrl": "https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/?gift=398abe86-12ca-485a-96dd-dfae2fea090d",
+      "redirects": 1,
+      "status": 200,
+      "note": "1 redirect(s)"
+    },
+    {
+      "url": "https://demosau.com/wp-content/uploads/2026/08/Capital-BriefDemosAU-Federal-Poll-August-2026.pdf",
+      "fields": [
+        "methodUrl",
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://demosau.com/wp-content/uploads/2026/08/Capital-BriefDemosAU-Federal-Poll-August-2026.pdf",
       "redirects": 0,
-      "status": 206,
-      "note": ""
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.roymorgan.com/findings/10321-federal-voting-intention-august-24-2026",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10321-federal-voting-intention-august-24-2026",
       "redirects": 0,
@@ -2033,7 +2874,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 2,
@@ -2044,11 +2885,23 @@
       ]
     },
     {
+      "url": "https://d3nnbamw3dez3b.cloudfront.net/documents/News24_Pulse_25_08_26_APC_Methodology_Statement.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/News24_Pulse_25_08_26_APC_Methodology_Statement.pdf",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/nation/politics/newspoll-one-nation-surges-past-labor-as-anthony-albanese-vows-to-defeat-dishonest-populists/news-story/1d0a82aec5b93c4f219669693f66c02b",
       "redirects": 0,
@@ -2056,13 +2909,49 @@
       "note": "theaustralian.com.au wall"
     },
     {
+      "url": "https://pyxispolling.com/api.php/images/document/27740193/NewspollMethodologyStatement31August2026byPyxis-A4iDRDxXIuKMFjSr8KuKuw.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://pyxispolling.com/api.php/images/document/27740193/NewspollMethodologyStatement31August2026byPyxis-A4iDRDxXIuKMFjSr8KuKuw.pdf",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
+      "fields": [
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
+      "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_cab524c6cbb54cdc80cfeed7d9863703.pdf",
+      "fields": [
+        "methodUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_cab524c6cbb54cdc80cfeed7d9863703.pdf",
       "redirects": 0,
       "status": 206,
       "note": ""
@@ -2072,7 +2961,7 @@
       "fields": [
         "url"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings/10328-federal-voting-intention-august-31-2026",
       "redirects": 0,
@@ -2080,11 +2969,35 @@
       "note": ""
     },
     {
+      "url": "https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb",
+      "fields": [
+        "url"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb",
+      "redirects": 0,
+      "status": 206,
+      "note": ""
+    },
+    {
+      "url": "https://essentialreport.com.au/reports/01-september-2026",
+      "fields": [
+        "releaseUrl"
+      ],
+      "lastChecked": "2026-09-06",
+      "verdict": "ok",
+      "finalUrl": "https://essentialreport.com.au/reports/01-september-2026",
+      "redirects": 0,
+      "status": 200,
+      "note": ""
+    },
+    {
       "url": "https://essentialreport.com.au/#latest-reports",
       "fields": [
         "site"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://essentialreport.com.au/#latest-reports",
       "redirects": 0,
@@ -2096,7 +3009,7 @@
       "fields": [
         "site"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.roymorgan.com/findings",
       "redirects": 0,
@@ -2108,7 +3021,7 @@
       "fields": [
         "site"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.theaustralian.com.au/topics/newspoll?eafs_enabled=false",
       "redirects": 0,
@@ -2120,19 +3033,20 @@
       "fields": [
         "site"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://demosau.com/methodology-statements/",
       "redirects": 0,
-      "status": 200,
-      "note": ""
+      "status": 0,
+      "note": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)",
+      "lastError": "Connect Timeout Error (attempted address: demosau.com:443, timeout: 10000ms)"
     },
     {
       "url": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
       "fields": [
         "site"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
       "redirects": 0,
@@ -2144,7 +3058,7 @@
       "fields": [
         "site"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "ok",
       "finalUrl": "https://www.afr.com/topic/redbridge-accent-poll-6ikd",
       "redirects": 0,
@@ -2156,7 +3070,7 @@
       "fields": [
         "site"
       ],
-      "lastChecked": "2026-09-01",
+      "lastChecked": "2026-09-06",
       "verdict": "wall",
       "finalUrl": "https://www.news24.com.au/nocookies?a=A.flavipes",
       "redirects": 2,
