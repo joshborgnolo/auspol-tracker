@@ -4531,6 +4531,23 @@ function infoTerms(D) {
       share, a signal about the electorate the aggregate keeps rather than rescales away. Where
       the {xref("undecided", "primaries not 100", "undecided")} share was set aside before the
       parties were counted, the primaries sum to 100 as expected.</>) },
+    { id: "essential-pair-not-100", q: "One house’s two-party pair adds up to less than 100. Is it rescaled before it enters the average?", a: (
+      <>Before, and only the pair. Essential leaves the electors who won’t nominate a side inside
+      its published two-party figure, so that pair falls short of 100 by exactly
+      the {xref("undecided", "essential pair not 100", "undecided")} share after preferences.
+      Pooling it raw against a house whose pair does sum to 100 would set a share of everyone
+      against a share of the decided, and hand one house a standing lean that is arithmetic
+      rather than opinion – so every poll enters
+      the {xref("weighted-aggregate", "essential pair not 100", "weighted aggregate")} as its
+      Labor share of the two, rescaled as the row is built, before any house correction or
+      weighting is applied. That is not a rule about one pollster: each row goes through the same
+      arithmetic, and on a pair already summing to 100 it changes nothing.
+      Note the contrast with the primaries above, where the shortfall is kept rather than rescaled
+      away. Nothing has to be comparable between houses to read a primary share; the pair is
+      pooled across them, so it does. The shortfall is not discarded either – it is kept as that
+      house’s own undecided line, beside the pair rather than inside it. What the rescaling costs
+      is worth knowing: it splits the undecided in proportion, which is no claim that they would
+      break that way, only that a pair on its own gives no basis to break them any other way.</>) },
     { id: "why-2pp-headline", q: "Why does the headline lead with two-party preferred and not the primary vote?", a: (
       <>Because seats are decided on the final pair. Preferences distribute until one candidate
       holds a majority, so the question who is ahead is a
