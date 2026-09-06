@@ -103,7 +103,9 @@ rules; tracks `.poll-table` conventions.
   ~80s) landed in a flat g/t valley at 55/79 vs the election 88/55.
   Meanwhile n-weighting treated 44 polls as iid draws and printed false
   ±0.2–1.4pt SEs. The ridge makes "the waves can't tell" read as ≈the
-  election row instead of an exploded cell.
+  election row instead of an exploded cell. (The generalised
+  flat-series-regression lesson — including the λ-in-normal-equations
+  and pooled-σ̂ traps — lives in `regression-on-flat-series`.)
 - **Payload**: `flowDrift.flows` + `flowDrift.meta.aec = {g, o, t}`.
   flow-drift-check.mjs replicates the block VERBATIM (constants included)
   and eq-compares both fields — update the replica in the same commit.
@@ -115,9 +117,24 @@ rules; tracks `.poll-table` conventions.
   Resolve 89.3/30.6/49.3 (10) · Roy Morgan 79.1/30.8/67.7 (44) ·
   YouGov 88.9/24.4/57.9 (17); SEs ±2.3–9.5; AEC row 88.2/25.5/54.6.
 - Note copy commitments: the shrunk-toward-the-election-row explanation,
-  ± = one standard error, the Morgan respondent-allocation caveat
-  ("tracks a moving allocation rather than fixed assumptions"), the
-  six-waves minimum, and the diagnostic-only closer.
+  ± = one standard error, the respondent-allocation caveat naming BOTH
+  Roy Morgan AND RedBridge/Accent ("their rows track a moving allocation
+  rather than fixed assumptions"), the six-waves minimum, and the
+  diagnostic-only closer. Both houses' headline 2PPs are
+  respondent-allocated (RedBridge's tpp_alp = Table 2's respondent
+  column; its 2025-flows variant rides tpp_flows like Morgan's — see
+  redbridge-accent-extraction). RedBridge also PRINTS its split each wave
+  (report Table 1, per first preference), so the copy adds "RedBridge
+  publishes that allocation beside each wave … its row here is the term
+  average, not any one wave's split". Sanity: RedBridge's published Table-1
+  means Feb–Aug 2026 = Greens 85.5 / ON 20.5 / Other 58.3 to Labor —
+  the fitted row (94.4±8.3 / 19.6±2.9 / 52.8±6.7) sits within ~1σ on all
+  three (g/t trade off through the co-moving primaries); the Aug-2026 wave
+  (78/17/50) is their LOWEST-Greens-flow wave, so fitted-term-constant vs
+  latest-published-wave looks like a bigger disagreement than it is. A
+  future option: for houses that publish the split, show the measured
+  mean instead of the fit (needs a per-poll published-split datapoint —
+  auspol-extra-datapoint-pipeline).
 
 ## The pq-passthrough fix (general estimator gotcha — not flow-specific)
 

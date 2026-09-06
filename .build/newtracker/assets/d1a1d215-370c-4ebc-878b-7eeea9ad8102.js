@@ -3435,10 +3435,12 @@ function FlowDriftPanel({ rangeId }) {
             swings, with its fixed method offset soaked up by an intercept (“Other” lumps
             independents and minor parties together, as the constants in
             {" "}{fd.meta.table} do). Every cell is shrunk toward the election row and departs
-            only as far as the house’s own waves demonstrate – each poll counts once, and the
-            ± figure is one standard error from the same fit. Roy Morgan’s two-party figure is
-            respondent-allocated, so its row tracks a moving allocation rather than fixed
-            assumptions. A house needs at least six waves with a published two-party figure to
+            only as far as the house's own waves demonstrate – each poll counts once, and the
+            ± figure is one standard error from the same fit. Roy Morgan's and RedBridge/Accent's
+            two-party figures are respondent-allocated, so their rows track a moving allocation
+            rather than fixed assumptions; RedBridge publishes that allocation beside each wave,
+            so its row here is the term average, not any one wave's split. A house needs at
+            least six waves with a published two-party figure to
             appear, and like everything in this panel the rows are a diagnostic against the
             election line, not a measurement.
           </p>
