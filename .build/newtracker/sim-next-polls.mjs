@@ -179,7 +179,10 @@ function ticker(rows, t0, nowMs) {
       let when;
       if (t.byDay) {
         const days = Math.round((t.at - t0) / DAY);
-        when = days === 0 ? (r.release <= nowMs ? "any moment now" : "today")
+        // "any moment now" opens at the measured release hour, not midnight -
+        // an untimed house keeps its whole day (the projection's 24*60)
+        const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
+        when = days === 0 ? (dueMs <= nowMs ? "any moment now" : "today")
              : days === 1 ? "tomorrow"
              : days + " days";
       } else {
@@ -478,6 +481,24 @@ function eq(name, got, want) {
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
   eq("rolled past the horizon: DemosAU off the panel", firm(rows, "DemosAU"), undefined);
   eq("rolled past the horizon: DemosAU off the ticker", items.some((i) => i.firm === "DemosAU"), false);
+}
+
+// S9 – Mon 7 Sep, Roy Morgan's slot day, hour by hour. The window opens at
+// the house's measured hour (16:18, recent filings 4:18–5:00pm), not at
+// midnight: a 9am reader gets "today" and "any moment now" only starts once
+// the window does — the gate d1a1d215 hangs the phrase on (dueMs).
+{
+  const am = scen("Mon 7 Sep 9am, window shut", "2026-09-07", 540);
+  const amItems = ticker(project(cad, am.t0, am.nowMs), am.t0, am.nowMs);
+  const pm = scen("Mon 7 Sep 5pm, window open", "2026-09-07", 1020);
+  const pmRows = project(cad, pm.t0, pm.nowMs);
+  const pmItems = ticker(pmRows, pm.t0, pm.nowMs);
+  console.log(`\n${am.label}:  ticker → ${fmtT(amItems)}`);
+  console.log(`${pm.label}:  ticker → ${fmtT(pmItems)}`);
+  eq("9am on the slot day reads today", amItems.some((i) => i.firm === "Roy Morgan" && i.when === "today"), true);
+  eq("5pm: overdue, not missed", [firm(pmRows, "Roy Morgan") && firm(pmRows, "Roy Morgan").missed,
+    !!(firm(pmRows, "Roy Morgan") && firm(pmRows, "Roy Morgan").overdue)], [false, true]);
+  eq("window open reads any moment now", pmItems.some((i) => i.firm === "Roy Morgan" && i.when === "any moment now"), true);
 }
 
 console.log(fails ? `\n${fails} FAILED` : "\nall next-polls expectations held");

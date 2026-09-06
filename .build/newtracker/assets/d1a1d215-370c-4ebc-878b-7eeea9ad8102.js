@@ -235,11 +235,14 @@ function NextPollTicker({ showScore }) {
       let when;
       if (t.byDay) {
         const days = Math.round((t.at - t0) / TN_DAY);
-        /* Due today and the projected hour already gone is not "today" - it is
-           the wave arriving. Roy Morgan files on Mondays and was projected to
-           midnight; read on the Monday afternoon, "today" understates a poll
-           that could appear while the page is open. */
-        when = days === 0 ? (r.release <= nowMs ? "any moment now" : "today")
+        /* "Any moment now" starts when the publication window does - the slot
+           date plus the hour the house keeps - not at the day's first minute:
+           Roy Morgan files Mondays after four, and a 9am reader told the wave
+           is moments away is being lied to for seven hours. An untimed house
+           has no hour to open at, so it keeps its whole day (the projection's
+           same 24*60 default): "today" throughout. */
+        const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
+        when = days === 0 ? (dueMs <= nowMs ? "any moment now" : "today")
              : days === 1 ? "tomorrow"
              /* exact day counts past "tomorrow" - the panel's own phrasing
                 ("in 12 days") - so the bar and the panel name the same slot
