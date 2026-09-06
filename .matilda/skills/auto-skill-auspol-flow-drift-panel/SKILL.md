@@ -60,7 +60,44 @@ is viable ONLY as a diagnostic — this panel corrects no other figure.
   print from gen-data.
 - **Payload shape**: `{months: [{ym,x,v,ci95,k}], now: {v,ci95,n,nEff},
   houses: {firm: [{ym,v}] n-weighted monthly means, ragged}, meta: {table,
-  baseDays, anchor, baseFrom, houses}}`.
+  baseDays, anchor, baseFrom, houses, aec}, flows}` — `flows`/`meta.aec`
+  added 2026-09 with the implied-flows table (next section).
+
+## Implied-flows table (added 2026-09, under the drift chart)
+
+First row = the frozen 2025 election flows (`meta.aec`, derived from `FLOW`
+in flows.mjs — never hardcoded, so a re-anchor moves the row); one row per
+house = that house's IMPLIED flows, rendered by `FlowDriftPanel` as
+`.flow-tab-wrap > table.flow-tab` (AEC row = `tr.flow-tab-aec`, label
+"2025 election outcome (AEC)", waves cell is "–") with a `.flow-tab-note`
+under it. CSS family `.flow-tab*` lives in template.html's flow-drift
+section before the `.ap-wrap` archive-ledger rules; tracks `.poll-table`
+conventions (tabular-nums, `--surface-2` hover).
+
+- **Fitter (gen-data §7c, right after `driftAnom`)**: `FLOW_FIT_MIN = 6`
+  joined waves. Rows: polls with `tpp_alp != null && alp && lnp && grn &&
+  onp != null && !sumNote`; y = `share2pp(p) − p.alp`; design `[1, grn,
+  onp, ind+oth]` — ind+oth lumped to match the FLOW constants' lumping.
+  `flowSolve` = n-weighted least squares (Gaussian elimination, partial
+  pivoting, 1e-9 singularity tolerance); pinned variables leave the design
+  and enter the RHS; the intercept is never pinned.
+- **Box constraint is load-bearing**: `flowFit` is an active-set loop
+  pinning out-of-[0,1] share coefficients to the nearer bound (≤3
+  iterations). Unconstrained fits produced impossible shares (Essential
+  t=−28.5, Newspoll g=106.3) on short collinear series — pinning is the
+  honest estimate when a house's waves can't separate a bucket, and the
+  note copy must keep saying so (a row ON a bound means the data can't
+  identify that bucket yet). Emitted rows: `{firm, g, o, t, n}` as
+  share×100 via r1, sorted by firm; houses under `FLOW_FIT_MIN` are
+  omitted (Freshwater, Fox & Hedgehog, Spectre at ship).
+- **Payload**: `flowDrift.flows` + `flowDrift.meta.aec = {g, o, t}`
+  (percent). The check script replicates `flowSolve`/`flowFit`/the fits
+  build VERBATIM and eq-compares both fields — any intentional fitter
+  change updates the replica in the same commit.
+- Ship-time sanity (Sep 2026): 6 fits — Essential 78.5/15.7/0 (n=10) ·
+  Newspoll 100/23.6/50.1 (n=8) · RedBridge-Accent 89.8/11.9/10 (n=14) ·
+  Resolve 82.6/26.2/28.9 (n=10) · Roy Morgan 55/34.5/78.9 (n=44) ·
+  YouGov 75.3/21.5/52.4 (n=17); AEC row 88.2/25.5/54.6.
 
 ## The pq-passthrough fix (general estimator gotcha — not flow-specific)
 

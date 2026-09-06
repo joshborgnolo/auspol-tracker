@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp, FLOW_TABLE } from "./flows.mjs";
+import { impliedAlp2pp, FLOW, FLOW_TABLE } from "./flows.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -1277,6 +1277,101 @@ const FLOW_BASE_FROM = {};
 const driftAnom = driftResid
   .filter((r) => FLOW_BASE_FROM[r.firm])
   .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key }));
+/* Implied per-house flow shares (the table under the drift chart). Within
+   one house, the part of its published 2PP swings its primary columns
+   should explain under the election's flow table lands in the coefficients
+   of
+     share2pp − alp  =  c + βg·grn + βo·onp + βt·(ind+oth) + ε
+   fit by n-weighted least squares on the SAME joined rows as the residual:
+   a β reads as "the share of that bucket's preferences this house's 2PP
+   series behaves as if it handed to Labor", held against the AEC row in the
+   table. The intercept c soaks the house's fixed method offset (allocation
+   basis again), so the βs are identified from co-movement alone — with
+   6–45 waves and primary series that move together they are noisy, and a
+   house with < FLOW_FIT_MIN joined waves (or a primary column that never
+   varies, singular matrix) is omitted rather than fit on noise. Diagnostic
+   only, like the panel it sits under — it feeds no other figure. */
+const FLOW_FIT_MIN = 6;      // min joined waves per house to attempt a fit
+/* n-weighted least squares on design [1, g, o, t], with a per-coefficient
+   pin list (flow shares are shares: betas are box-constrained to [0,1] –
+   an unconstrained fit on 8–15 waves routinely returns impossible shares
+   like −0.29, and a β pinned at a bound IS the honest estimate for a house
+   whose series can't separate that bucket from the others). Intercept is
+   never pinned. Pinned vars leave the design and enter the RHS; Gaussian
+   elimination with partial pivoting; null return = singular (a regressor
+   never varies within the house). */
+function flowSolve(rows, pin, pinVal) {
+  const idx = [];
+  for (let i = 0; i < 4; i++) if (!pin[i]) idx.push(i);
+  const k = idx.length;
+  const A = Array.from({ length: k }, () => new Float64Array(k));
+  const b = new Float64Array(k);
+  for (const r of rows) {
+    const x = [1, r.g, r.o, r.t];
+    let y = r.y;
+    for (let i = 0; i < 4; i++) if (pin[i]) y -= pinVal[i] * x[i];
+    for (let ii = 0; ii < k; ii++) {
+      b[ii] += r.n * x[idx[ii]] * y;
+      for (let jj = 0; jj < k; jj++) A[ii][jj] += r.n * x[idx[ii]] * x[idx[jj]];
+    }
+  }
+  for (let col = 0; col < k; col++) {
+    let piv = col;
+    for (let r = col + 1; r < k; r++) if (Math.abs(A[r][col]) > Math.abs(A[piv][col])) piv = r;
+    if (Math.abs(A[piv][col]) < 1e-9) return null;
+    if (piv !== col) { [A[col], A[piv]] = [A[piv], A[col]]; [b[col], b[piv]] = [b[piv], b[col]]; }
+    for (let r = col + 1; r < k; r++) {
+      const f = A[r][col] / A[col][col];
+      for (let j = col; j < k; j++) A[r][j] -= f * A[col][j];
+      b[r] -= f * b[col];
+    }
+  }
+  const beta = [0, 0, 0, 0];
+  for (let i = 0; i < 4; i++) if (pin[i]) beta[i] = pinVal[i];
+  for (let ii = k - 1; ii >= 0; ii--) {
+    let s = b[ii];
+    for (let jj = ii + 1; jj < k; jj++) s -= A[ii][jj] * beta[idx[jj]];
+    beta[idx[ii]] = s / A[ii][ii];
+  }
+  return beta;
+}
+function flowFit(rows) {
+  const pin = [false, false, false, false];
+  const pinVal = [0, 0, 0, 0];
+  let beta = null;
+  for (let iter = 0; iter <= 3; iter++) {
+    beta = flowSolve(rows, pin, pinVal);
+    if (!beta) return null;
+    let which = -1, over = 0;
+    for (let i = 1; i < 4; i++) {
+      if (pin[i]) continue;
+      const ex = beta[i] < 0 ? -beta[i] : beta[i] > 1 ? beta[i] - 1 : 0;
+      if (ex > over) { over = ex; which = i; }
+    }
+    if (which === -1) return beta;
+    pin[which] = true;
+    pinVal[which] = beta[which] < 0 ? 0 : 1;
+  }
+  return beta;
+}
+const flowFits = [];
+{
+  const fitRows = POLLS
+    .filter((p) => p.tpp_alp != null && p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
+    .map((p) => ({ firm: p.pollster, y: share2pp(p) - p.alp, g: p.grn, o: p.onp, t: (p.ind || 0) + (p.oth || 0), n: rowN(p) }));
+  const byFirm = new Map();
+  for (const r of fitRows) {
+    if (!byFirm.has(r.firm)) byFirm.set(r.firm, []);
+    byFirm.get(r.firm).push(r);
+  }
+  for (const [firm, rows] of byFirm) {
+    if (rows.length < FLOW_FIT_MIN) continue;
+    const b = flowFit(rows);
+    if (!b) continue;
+    flowFits.push({ firm, g: r1(b[1] * 100), o: r1(b[2] * 100), t: r1(b[3] * 100), n: rows.length });
+  }
+  flowFits.sort((a, z) => (a.firm < z.firm ? -1 : 1));
+}
 const driftMonths = MONTHS.map((ym) => {
   const r = monthWithSe(driftAnom, null, ym);
   return r && { ym, x: mx(ym), v: r1(r.v), ci95: r1(1.96 * r.se), k: r.n };
@@ -1295,10 +1390,14 @@ const flowDrift = {
       return { ym, v: r1(rs.reduce((s, r) => s + r.n * r.x, 0) / w) };
     }).filter(Boolean),
   ])),
+  /* per-house implied flow shares (percent of the bucket's preferences to
+     Labor), fit above; the AEC row the table displays first lives in meta */
+  flows: flowFits,
   meta: {
     table: FLOW_TABLE,
     baseDays: FLOW_BASE_DAYS,
     anchor: ELECTION.date,
+    aec: { g: r1(FLOW.grn * 100), o: r1(FLOW.onp * 100), t: r1(FLOW.oth * 100) },
     baseFrom: Object.fromEntries(Object.entries(FLOW_BASE_FROM).map(([f, b]) => [f, b.from])),
     houses: Object.keys(FLOW_BASE_FROM).sort(),
   },
@@ -2378,6 +2477,7 @@ console.log("pollsterTable:", pollsterTable.length, "→", pollsterTable.map((r)
 console.log("houseEffects (2PP):", Object.entries(houseEffect.snapshot(Infinity)).sort((a, b) => b[1].v - a[1].v).map(([f, h]) => `${f} ${h.v > 0 ? "+" : ""}${h.v}(n=${h.n})`).join(", "));
 console.log("flowDrift:", flowDrift.meta.houses.length, "houses | now:", JSON.stringify(flowDrift.now), "| last month:", JSON.stringify(flowDrift.months[flowDrift.months.length - 1]));
 console.log("  baseFrom:", Object.entries(flowDrift.meta.baseFrom).map(([f, d]) => `${f}→${d}`).join(", "));
+console.log("  flow fits: AEC", JSON.stringify(flowDrift.meta.aec), "|", flowDrift.flows.map((f) => `${f.firm} g${f.g}/o${f.o}/t${f.t} (n=${f.n})`).join(" · "));
 console.log("headline 2PP:", hlNow, "| 1mo ago:", hl1mo);
 console.log("pollCadence:", pollCadence.length, "houses on a pattern →",
   pollCadence.map((c) => {

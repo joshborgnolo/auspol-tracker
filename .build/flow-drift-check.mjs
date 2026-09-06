@@ -3,12 +3,12 @@
 // values gen-data.mjs actually emitted into the data asset.
 //
 // The estimator below is a VERBATIM replica of the flow-drift block in
-// newtracker/gen-data.mjs plus the exact weightedWithSe / nowcastAdj /
-// monthWithSe it pumps its rows through — copied, not imported, so a change
-// to the shipped estimator that shifts the ANSWERS breaks this script and
-// forces a look (the skill est-console-backtest sets that convention). If
-// the upstream block changes on purpose, update the replica in the same
-// commit.
+// newtracker/gen-data.mjs (residuals + per-house flow-share fits) plus the
+// exact weightedWithSe / nowcastAdj / monthWithSe it pumps its rows
+// through — copied, not imported, so a change to the shipped estimator that
+// shifts the ANSWERS breaks this script and forces a look (the skill
+// est-console-backtest sets that convention). If the upstream block changes
+// on purpose, update the replica in the same commit.
 //
 // Exit 0 = emitted flowDrift matches a fresh derivation from polls.json.
 // Exit 1 = disagreement (or no flowDrift in the asset).
@@ -19,7 +19,7 @@ const ROOT = new URL("../", import.meta.url);
 const POLLS_JSON = new URL("data/polls.json", ROOT);
 const DATA_ASSET = new URL(".build/newtracker/assets/9f09dca2-bd46-49a8-8ae1-51847608cf92.js", ROOT);
 
-const { impliedAlp2pp } = await import(new URL(".build/newtracker/flows.mjs", ROOT));
+const { impliedAlp2pp, FLOW } = await import(new URL(".build/newtracker/flows.mjs", ROOT));
 const { HOUSE_RENAMES } = await import(new URL(".build/newtracker/house-renames.mjs", ROOT));
 
 /* ---- canonical dataset (gen-data.mjs:41-65, verbatim) ------------------ */
@@ -135,6 +135,80 @@ const FLOW_BASE_FROM = {};
 const driftAnom = driftResid
   .filter((r) => FLOW_BASE_FROM[r.firm])
   .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key }));
+/* (per-house flow-share fitter, gen-data.mjs §7c, verbatim) */
+const FLOW_FIT_MIN = 6;
+function flowSolve(rows, pin, pinVal) {
+  const idx = [];
+  for (let i = 0; i < 4; i++) if (!pin[i]) idx.push(i);
+  const k = idx.length;
+  const A = Array.from({ length: k }, () => new Float64Array(k));
+  const b = new Float64Array(k);
+  for (const r of rows) {
+    const x = [1, r.g, r.o, r.t];
+    let y = r.y;
+    for (let i = 0; i < 4; i++) if (pin[i]) y -= pinVal[i] * x[i];
+    for (let ii = 0; ii < k; ii++) {
+      b[ii] += r.n * x[idx[ii]] * y;
+      for (let jj = 0; jj < k; jj++) A[ii][jj] += r.n * x[idx[ii]] * x[idx[jj]];
+    }
+  }
+  for (let col = 0; col < k; col++) {
+    let piv = col;
+    for (let r = col + 1; r < k; r++) if (Math.abs(A[r][col]) > Math.abs(A[piv][col])) piv = r;
+    if (Math.abs(A[piv][col]) < 1e-9) return null;
+    if (piv !== col) { [A[col], A[piv]] = [A[piv], A[col]]; [b[col], b[piv]] = [b[piv], b[col]]; }
+    for (let r = col + 1; r < k; r++) {
+      const f = A[r][col] / A[col][col];
+      for (let j = col; j < k; j++) A[r][j] -= f * A[col][j];
+      b[r] -= f * b[col];
+    }
+  }
+  const beta = [0, 0, 0, 0];
+  for (let i = 0; i < 4; i++) if (pin[i]) beta[i] = pinVal[i];
+  for (let ii = k - 1; ii >= 0; ii--) {
+    let s = b[ii];
+    for (let jj = ii + 1; jj < k; jj++) s -= A[ii][jj] * beta[idx[jj]];
+    beta[idx[ii]] = s / A[ii][ii];
+  }
+  return beta;
+}
+function flowFit(rows) {
+  const pin = [false, false, false, false];
+  const pinVal = [0, 0, 0, 0];
+  let beta = null;
+  for (let iter = 0; iter <= 3; iter++) {
+    beta = flowSolve(rows, pin, pinVal);
+    if (!beta) return null;
+    let which = -1, over = 0;
+    for (let i = 1; i < 4; i++) {
+      if (pin[i]) continue;
+      const ex = beta[i] < 0 ? -beta[i] : beta[i] > 1 ? beta[i] - 1 : 0;
+      if (ex > over) { over = ex; which = i; }
+    }
+    if (which === -1) return beta;
+    pin[which] = true;
+    pinVal[which] = beta[which] < 0 ? 0 : 1;
+  }
+  return beta;
+}
+const flowFits = [];
+{
+  const fitRows = POLLS
+    .filter((p) => p.tpp_alp != null && p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
+    .map((p) => ({ firm: p.pollster, y: share2pp(p) - p.alp, g: p.grn, o: p.onp, t: (p.ind || 0) + (p.oth || 0), n: rowN(p) }));
+  const byFirm = new Map();
+  for (const r of fitRows) {
+    if (!byFirm.has(r.firm)) byFirm.set(r.firm, []);
+    byFirm.get(r.firm).push(r);
+  }
+  for (const [firm, rows] of byFirm) {
+    if (rows.length < FLOW_FIT_MIN) continue;
+    const b = flowFit(rows);
+    if (!b) continue;
+    flowFits.push({ firm, g: r1(b[1] * 100), o: r1(b[2] * 100), t: r1(b[3] * 100), n: rows.length });
+  }
+  flowFits.sort((a, z) => (a.firm < z.firm ? -1 : 1));
+}
 const driftMonths = MONTHS.map((ym) => {
   const r = monthWithSe(driftAnom, null, ym);
   return r && { ym, x: mx(ym), v: r1(r.v), ci95: r1(1.96 * r.se), k: r.n };
@@ -158,8 +232,11 @@ eq("last month", driftMonths[driftMonths.length - 1], emitted.months[emitted.mon
 eq("2nd-last month", driftMonths[driftMonths.length - 2], emitted.months[emitted.months.length - 2]);
 eq("3rd-last month", driftMonths[driftMonths.length - 3], emitted.months[emitted.months.length - 3]);
 eq("nowcast", driftNow && { v: driftNow.v, ci95: driftNow.ci95, n: driftNow.n, nEff: driftNow.nEff }, emitted.now);
+eq("flow fits", flowFits, emitted.flows);
+eq("aec row", { g: r1(FLOW.grn * 100), o: r1(FLOW.onp * 100), t: r1(FLOW.oth * 100) }, emitted.meta.aec);
 
 if (bad) process.exit(1);
 console.log(`flow-drift OK: ${emitted.meta.houses.length} houses checked against ${driftAnom.length} anomalies;`,
+  `${emitted.flows.length} flow fits;`,
   `last month ${JSON.stringify(driftMonths[driftMonths.length - 1])};`,
   `now ${JSON.stringify(emitted.now)}`);
