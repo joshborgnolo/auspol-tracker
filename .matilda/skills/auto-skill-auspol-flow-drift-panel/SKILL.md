@@ -67,37 +67,57 @@ is viable ONLY as a diagnostic — this panel corrects no other figure.
 
 First row = the frozen 2025 election flows (`meta.aec`, derived from `FLOW`
 in flows.mjs — never hardcoded, so a re-anchor moves the row); one row per
-house = that house's IMPLIED flows, rendered by `FlowDriftPanel` as
-`.flow-tab-wrap > table.flow-tab` (AEC row = `tr.flow-tab-aec`, label
-"2025 election outcome (AEC)", waves cell is "–") with a `.flow-tab-note`
-under it. CSS family `.flow-tab*` lives in template.html's flow-drift
-section before the `.ap-wrap` archive-ledger rules; tracks `.poll-table`
-conventions (tabular-nums, `--surface-2` hover).
+house = that house's IMPLIED flows with a `±`1σ margin per cell, rendered
+by `FlowDriftPanel` as `.flow-tab-wrap > table.flow-tab` (AEC row =
+`tr.flow-tab-aec`, label "2025 election outcome (AEC)", waves cell "–";
+`.flow-tab-se` styles the ± suffix, `--ink-faint` 12.5px) with a
+`.flow-tab-note` under it. CSS family `.flow-tab*` lives in
+template.html's flow-drift section before the `.ap-wrap` archive-ledger
+rules; tracks `.poll-table` conventions.
 
-- **Fitter (gen-data §7c, right after `driftAnom`)**: `FLOW_FIT_MIN = 6`
-  joined waves. Rows: polls with `tpp_alp != null && alp && lnp && grn &&
-  onp != null && !sumNote`; y = `share2pp(p) − p.alp`; design `[1, grn,
-  onp, ind+oth]` — ind+oth lumped to match the FLOW constants' lumping.
-  `flowSolve` = n-weighted least squares (Gaussian elimination, partial
-  pivoting, 1e-9 singularity tolerance); pinned variables leave the design
-  and enter the RHS; the intercept is never pinned.
-- **Box constraint is load-bearing**: `flowFit` is an active-set loop
-  pinning out-of-[0,1] share coefficients to the nearer bound (≤3
-  iterations). Unconstrained fits produced impossible shares (Essential
-  t=−28.5, Newspoll g=106.3) on short collinear series — pinning is the
-  honest estimate when a house's waves can't separate a bucket, and the
-  note copy must keep saying so (a row ON a bound means the data can't
-  identify that bucket yet). Emitted rows: `{firm, g, o, t, n}` as
-  share×100 via r1, sorted by firm; houses under `FLOW_FIT_MIN` are
-  omitted (Freshwater, Fox & Hedgehog, Spectre at ship).
-- **Payload**: `flowDrift.flows` + `flowDrift.meta.aec = {g, o, t}`
-  (percent). The check script replicates `flowSolve`/`flowFit`/the fits
-  build VERBATIM and eq-compares both fields — any intentional fitter
-  change updates the replica in the same commit.
-- Ship-time sanity (Sep 2026): 6 fits — Essential 78.5/15.7/0 (n=10) ·
-  Newspoll 100/23.6/50.1 (n=8) · RedBridge-Accent 89.8/11.9/10 (n=14) ·
-  Resolve 82.6/26.2/28.9 (n=10) · Roy Morgan 55/34.5/78.9 (n=44) ·
-  YouGov 75.3/21.5/52.4 (n=17); AEC row 88.2/25.5/54.6.
+- **Fitter (gen-data §7c, after `driftAnom`): wave-equal ridge SHRUNK
+  TOWARD THE ELECTION TABLE.** Rows: same joined filter as the residuals
+  (`tpp_alp/alp/lnp/grn/onp != null && !sumNote`); y = `share2pp(p) −
+  p.alp`; design `[1, grn, onp, ind+oth]` with UNIT weight per wave (the
+  residual noise is poll-to-poll, not sampling). Constants
+  `FLOW_FIT_MIN = 6`, `FLOW_FIT_TAU = 0.12` (prior SD per share),
+  `FLOW_FIT_TAU_INT = 0.05` (intercept, prior mean 0). `flowDesign`
+  accumulates X'X/X'y; `flow4Solve` = 4×4 Gaussian elimination + partial
+  pivoting on COPIES (caller arrays preserved — the covariance pass needs
+  the design afterwards); `flow4Inv` = Gauss-Jordan; `flowRidge` solves
+  (X'X+Λ)f = X'y+Λf0 with Λ = diag(σ̂²w/τ_int², σ̂²w/τ² ×3) and
+  f0 = [0, FLOW.grn/onp/oth]. σ̂²w is df-POOLED wave-residual variance
+  across houses (≈0.88pt², df 79 at ship) — a per-house σ̂ let Newspoll's
+  near-interpolating 8-wave fit claim σ≈0.16pt and keep an absurd slope.
+  Emitted: `{firm, g, ge, o, oe, t, te, n}` (percent, r1; betas clamp01 as
+  a seatbelt, all interior on current data). Posterior SEs =
+  σ̂w·diag((X'X+Λ)⁻¹)½.
+- **Why shrinkage replaced the boxed WLS (shipped and retired same day,
+  2026-09-07):** within a house each primary moves only ±1–2pts and the
+  columns co-move, so the three shares are barely identified — Newspoll
+  (8 waves, GRN stuck 11–13) fitted g=106 unconstrained and the box PINNED
+  it at 100, which read in the table as a factual claim; Roy Morgan
+  (n=44, but RESPONDENT-ALLOCATED 2PP — no fixed house-flow constant
+  exists for the regression to recover; their waves' implied minor-pref
+  total sits ~1–2pts over the election table, i.e. true Greens flows
+  ~80s) landed in a flat g/t valley at 55/79 vs the election 88/55.
+  Meanwhile n-weighting treated 44 polls as iid draws and printed false
+  ±0.2–1.4pt SEs. The ridge makes "the waves can't tell" read as ≈the
+  election row instead of an exploded cell.
+- **Payload**: `flowDrift.flows` + `flowDrift.meta.aec = {g, o, t}`.
+  flow-drift-check.mjs replicates the block VERBATIM (constants included)
+  and eq-compares both fields — update the replica in the same commit.
+  Diagnosis diagnostics + candidate-fit comparison were worked up in
+  .matilda/flow-fit-probe.mjs (local scratch, gitignored like all
+  .matilda scripts).
+- Sanity at ridge ship (Sep 2026), 6 fits: Essential 85.7/23/45.2 (n=10)
+  · Newspoll 89.8/24.4/54.6 (8) · RedBridge-Accent 94.4/19.6/52.8 (14) ·
+  Resolve 89.3/30.6/49.3 (10) · Roy Morgan 79.1/30.8/67.7 (44) ·
+  YouGov 88.9/24.4/57.9 (17); SEs ±2.3–9.5; AEC row 88.2/25.5/54.6.
+- Note copy commitments: the shrunk-toward-the-election-row explanation,
+  ± = one standard error, the Morgan respondent-allocation caveat
+  ("tracks a moving allocation rather than fixed assumptions"), the
+  six-waves minimum, and the diagnostic-only closer.
 
 ## The pq-passthrough fix (general estimator gotcha — not flow-specific)
 

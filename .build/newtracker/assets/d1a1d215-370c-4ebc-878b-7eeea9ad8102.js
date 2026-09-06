@@ -3421,20 +3421,26 @@ function FlowDriftPanel({ rangeId }) {
               {fd.flows.map((f) => (
                 <tr key={f.firm}>
                   <th scope="row" className="flow-tab-house">{f.firm}</th>
-                  <td>{f.g.toFixed(1)}%</td><td>{f.o.toFixed(1)}%</td><td>{f.t.toFixed(1)}%</td><td>{f.n}</td>
+                  <td>{f.g.toFixed(1)}%<span className="flow-tab-se"> ±{f.ge.toFixed(1)}</span></td>
+                  <td>{f.o.toFixed(1)}%<span className="flow-tab-se"> ±{f.oe.toFixed(1)}</span></td>
+                  <td>{f.t.toFixed(1)}%<span className="flow-tab-se"> ±{f.te.toFixed(1)}</span></td>
+                  <td>{f.n}</td>
                 </tr>
               ))}
             </tbody>
           </table>
           <p className="table-hint ap-var-note flow-tab-note">
             A house row reads as “the share of that bucket’s preferences this house’s published
-            2PP behaves as if it handed to Labor” – each is fit by regression of the house’s own
-            2PP swings on its primary-vote swings, with its fixed method offset soaked up by an
-            intercept (“Other” lumps independents and minor parties together, as the constants in
-            {" "}{fd.meta.table} do). Shares are constrained to 0–100%: a row sitting on a bound
-            means that house’s waves can’t yet separate that bucket from the rest, and every fit
-            is over a handful of waves on primary series that mostly move together, so read the
-            rows as a diagnostic against the election line, not a measurement.
+            2PP behaves as if it handed to Labor” – fit from the house’s own 2PP and primary
+            swings, with its fixed method offset soaked up by an intercept (“Other” lumps
+            independents and minor parties together, as the constants in
+            {" "}{fd.meta.table} do). Every cell is shrunk toward the election row and departs
+            only as far as the house’s own waves demonstrate – each poll counts once, and the
+            ± figure is one standard error from the same fit. Roy Morgan’s two-party figure is
+            respondent-allocated, so its row tracks a moving allocation rather than fixed
+            assumptions. A house needs at least six waves with a published two-party figure to
+            appear, and like everything in this panel the rows are a diagnostic against the
+            election line, not a measurement.
           </p>
         </div>
       )}

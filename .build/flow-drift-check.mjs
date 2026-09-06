@@ -137,78 +137,113 @@ const driftAnom = driftResid
   .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key }));
 /* (per-house flow-share fitter, gen-data.mjs §7c, verbatim) */
 const FLOW_FIT_MIN = 6;
-function flowSolve(rows, pin, pinVal) {
-  const idx = [];
-  for (let i = 0; i < 4; i++) if (!pin[i]) idx.push(i);
-  const k = idx.length;
-  const A = Array.from({ length: k }, () => new Float64Array(k));
-  const b = new Float64Array(k);
-  for (const r of rows) {
-    const x = [1, r.g, r.o, r.t];
-    let y = r.y;
-    for (let i = 0; i < 4; i++) if (pin[i]) y -= pinVal[i] * x[i];
-    for (let ii = 0; ii < k; ii++) {
-      b[ii] += r.n * x[idx[ii]] * y;
-      for (let jj = 0; jj < k; jj++) A[ii][jj] += r.n * x[idx[ii]] * x[idx[jj]];
-    }
-  }
-  for (let col = 0; col < k; col++) {
+const FLOW_FIT_TAU = 0.12;
+const FLOW_FIT_TAU_INT = 0.05;
+function flow4Solve(Ain, bin) {
+  const A = Ain.map((row) => [...row]);
+  const b = [...bin];
+  for (let col = 0; col < 4; col++) {
     let piv = col;
-    for (let r = col + 1; r < k; r++) if (Math.abs(A[r][col]) > Math.abs(A[piv][col])) piv = r;
+    for (let r = col + 1; r < 4; r++) if (Math.abs(A[r][col]) > Math.abs(A[piv][col])) piv = r;
     if (Math.abs(A[piv][col]) < 1e-9) return null;
     if (piv !== col) { [A[col], A[piv]] = [A[piv], A[col]]; [b[col], b[piv]] = [b[piv], b[col]]; }
-    for (let r = col + 1; r < k; r++) {
+    for (let r = col + 1; r < 4; r++) {
       const f = A[r][col] / A[col][col];
-      for (let j = col; j < k; j++) A[r][j] -= f * A[col][j];
+      for (let j = col; j < 4; j++) A[r][j] -= f * A[col][j];
       b[r] -= f * b[col];
     }
   }
   const beta = [0, 0, 0, 0];
-  for (let i = 0; i < 4; i++) if (pin[i]) beta[i] = pinVal[i];
-  for (let ii = k - 1; ii >= 0; ii--) {
-    let s = b[ii];
-    for (let jj = ii + 1; jj < k; jj++) s -= A[ii][jj] * beta[idx[jj]];
-    beta[idx[ii]] = s / A[ii][ii];
+  for (let i = 3; i >= 0; i--) {
+    let s = b[i];
+    for (let j = i + 1; j < 4; j++) s -= A[i][j] * beta[j];
+    beta[i] = s / A[i][i];
   }
   return beta;
 }
-function flowFit(rows) {
-  const pin = [false, false, false, false];
-  const pinVal = [0, 0, 0, 0];
-  let beta = null;
-  for (let iter = 0; iter <= 3; iter++) {
-    beta = flowSolve(rows, pin, pinVal);
-    if (!beta) return null;
-    let which = -1, over = 0;
-    for (let i = 1; i < 4; i++) {
-      if (pin[i]) continue;
-      const ex = beta[i] < 0 ? -beta[i] : beta[i] > 1 ? beta[i] - 1 : 0;
-      if (ex > over) { over = ex; which = i; }
+function flow4Inv(Ain) {
+  const M = Ain.map((row, i) => [...row, ...[0, 0, 0, 0].map((_, j) => (i === j ? 1 : 0))]);
+  for (let col = 0; col < 4; col++) {
+    let piv = col;
+    for (let r = col + 1; r < 4; r++) if (Math.abs(M[r][col]) > Math.abs(M[piv][col])) piv = r;
+    if (Math.abs(M[piv][col]) < 1e-12) return null;
+    [M[col], M[piv]] = [M[piv], M[col]];
+    const d = M[col][col];
+    for (let j = 0; j < 8; j++) M[col][j] /= d;
+    for (let r = 0; r < 4; r++) {
+      if (r === col) continue;
+      const f = M[r][col];
+      for (let j = 0; j < 8; j++) M[r][j] -= f * M[col][j];
     }
-    if (which === -1) return beta;
-    pin[which] = true;
-    pinVal[which] = beta[which] < 0 ? 0 : 1;
   }
-  return beta;
+  return M.map((row) => row.slice(4));
+}
+function flowDesign(rows) {
+  const A = Array.from({ length: 4 }, () => [0, 0, 0, 0]);
+  const b = [0, 0, 0, 0];
+  for (const r of rows) {
+    const x = [1, r.g, r.o, r.t];
+    for (let i = 0; i < 4; i++) {
+      b[i] += x[i] * r.y;
+      for (let j = 0; j < 4; j++) A[i][j] += x[i] * x[j];
+    }
+  }
+  return { A, b };
+}
+function flowRidge(rows, sigma2W) {
+  const f0 = [0, FLOW.grn, FLOW.onp, FLOW.oth];
+  const lamS = sigma2W / (FLOW_FIT_TAU * FLOW_FIT_TAU);
+  const lamI = sigma2W / (FLOW_FIT_TAU_INT * FLOW_FIT_TAU_INT);
+  const { A, b } = flowDesign(rows);
+  const beta = flow4Solve(A.map((row, i) => row.map((v, j) => (i === j ? v + (i === 0 ? lamI : lamS) : v))),
+                          b.map((v, i) => v + (i === 0 ? lamI : lamS) * f0[i]));
+  if (!beta) return null;
+  const inv = flow4Inv(A.map((row, i) => row.map((v, j) => (i === j ? v + (i === 0 ? lamI : lamS) : v))));
+  if (!inv) return null;
+  return { beta, se: [1, 2, 3].map((i) => Math.sqrt(sigma2W * inv[i][i])) };
+}
+const flowFitRows = POLLS
+  .filter((p) => p.tpp_alp != null && p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
+  .map((p) => ({ firm: p.pollster, y: share2pp(p) - p.alp, g: p.grn, o: p.onp, t: (p.ind || 0) + (p.oth || 0) }));
+const flowFitByFirm = new Map();
+for (const r of flowFitRows) {
+  if (!flowFitByFirm.has(r.firm)) flowFitByFirm.set(r.firm, []);
+  flowFitByFirm.get(r.firm).push(r);
+}
+let flowSigma2W = 1;
+{
+  let ssrSum = 0, dfSum = 0;
+  for (const rows of flowFitByFirm.values()) {
+    if (rows.length < FLOW_FIT_MIN) continue;
+    const { A, b } = flowDesign(rows);
+    const beta = flow4Solve(A, b);
+    if (!beta) continue;
+    let ssr = 0;
+    for (const r of rows) {
+      const x = [1, r.g, r.o, r.t];
+      const resid = r.y - (beta[0] * x[0] + beta[1] * x[1] + beta[2] * x[2] + beta[3] * x[3]);
+      ssr += resid * resid;
+    }
+    ssrSum += ssr;
+    dfSum += rows.length - 4;
+  }
+  if (dfSum > 0) flowSigma2W = ssrSum / dfSum;
 }
 const flowFits = [];
-{
-  const fitRows = POLLS
-    .filter((p) => p.tpp_alp != null && p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
-    .map((p) => ({ firm: p.pollster, y: share2pp(p) - p.alp, g: p.grn, o: p.onp, t: (p.ind || 0) + (p.oth || 0), n: rowN(p) }));
-  const byFirm = new Map();
-  for (const r of fitRows) {
-    if (!byFirm.has(r.firm)) byFirm.set(r.firm, []);
-    byFirm.get(r.firm).push(r);
-  }
-  for (const [firm, rows] of byFirm) {
-    if (rows.length < FLOW_FIT_MIN) continue;
-    const b = flowFit(rows);
-    if (!b) continue;
-    flowFits.push({ firm, g: r1(b[1] * 100), o: r1(b[2] * 100), t: r1(b[3] * 100), n: rows.length });
-  }
-  flowFits.sort((a, z) => (a.firm < z.firm ? -1 : 1));
+for (const [firm, rows] of flowFitByFirm) {
+  if (rows.length < FLOW_FIT_MIN) continue;
+  const fit = flowRidge(rows, flowSigma2W);
+  if (!fit) continue;
+  const clamp01 = (v) => Math.min(1, Math.max(0, v));
+  flowFits.push({
+    firm,
+    g: r1(clamp01(fit.beta[1]) * 100), ge: r1(fit.se[0] * 100),
+    o: r1(clamp01(fit.beta[2]) * 100), oe: r1(fit.se[1] * 100),
+    t: r1(clamp01(fit.beta[3]) * 100), te: r1(fit.se[2] * 100),
+    n: rows.length,
+  });
 }
+flowFits.sort((a, z) => (a.firm < z.firm ? -1 : 1));
 const driftMonths = MONTHS.map((ym) => {
   const r = monthWithSe(driftAnom, null, ym);
   return r && { ym, x: mx(ym), v: r1(r.v), ci95: r1(1.96 * r.se), k: r.n };
