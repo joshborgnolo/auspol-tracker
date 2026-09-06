@@ -345,7 +345,15 @@
      being corrected moves `published` and not `updated`, which is a real edit
      in this repo's history, and build.mjs would have called the card current
      while it displayed the old date. */
-  window.__auspolCard = { png, publishedISO: L.publishedISO };
+  /* The fig block lets render-card's staleness gate tell "date is fresh but
+     what the card SHOWS has moved" (decay drift, a cured wave) without
+     launching Chrome. Same shape build.mjs writes into
+     assets/auspol-latest.json – mirror any change in both files. */
+  window.__auspolCard = { png, publishedISO: L.publishedISO, fig: {
+    alp: L.alp2pp.toFixed(1), lnp: L.lnp2pp.toFixed(1),
+    ci: L.alp2ppCi95.toFixed(1),
+    n: L.method.nPolls, win: L.method.windowDays,
+    mom: (L.alp2pp - L.alp2ppPrev).toFixed(1), sig: !!L.changeSig } };
   console.log("card drawn for data dated " + L.publishedISO
               + " – put this in assets/auspol-card.json");
   const a = document.createElement("a");

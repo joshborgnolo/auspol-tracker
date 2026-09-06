@@ -498,11 +498,27 @@ html = html.replace("<!--STATIC_SUMMARY-->", "\n    " + buildStaticSummary() + "
    It was updatedISO - the end of the most recent poll's FIELDWORK - and a
    correction to a poll's publisher moves one and not the other, so the check
    could call a card current while it showed a date the site no longer did. */
-let cardStamp = null;
+/* The card's figure block, in exactly the shape make-card.js stamps into
+   assets/auspol-card.json – mirror any change in both files. Written out as
+   a machine-readable sidecar so render-card's staleness gate (and any future
+   consumer) reads it here instead of string-splitting the dataset asset the
+   way grabLatest does. */
+function cardFigs(L) {
+  return { alp: L.alp2pp.toFixed(1), lnp: L.lnp2pp.toFixed(1),
+           ci: L.alp2ppCi95.toFixed(1),
+           n: L.method.nPolls, win: L.method.windowDays,
+           mom: (L.alp2pp - L.alp2ppPrev).toFixed(1), sig: !!L.changeSig };
+}
+const cardNow = grabLatest();
+writeAtomic(path.join(ROOT, "assets", "auspol-latest.json"),
+  JSON.stringify({ publishedISO: cardNow.publishedISO, fig: cardFigs(cardNow) }) + "\n");
+let cardStamp = null, cardFigsDrawn = null;
 try {
-  cardStamp = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-card.json"), "utf8")).publishedISO;
+  const drawn = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "auspol-card.json"), "utf8"));
+  cardStamp = drawn.publishedISO;
+  cardFigsDrawn = drawn.fig || null;
 } catch (_) { /* no stamp: reported below */ }
-const dataStamp = grabLatest().publishedISO;
+const dataStamp = cardNow.publishedISO;
 if (cardStamp !== dataStamp) {
   /* Warn-only locally: the unattended pipelines build on every new poll and
      redraw the card in a separate step, so a hard fail would stop data
@@ -517,10 +533,23 @@ if (cardStamp !== dataStamp) {
   console.warn(`\n  ! share card is drawn for ${cardStamp || "an unrecorded date"}, data is ${dataStamp}`);
   console.warn(`    it will preview figures that are not the ones on the page.`);
   console.warn(`    regenerate: see .build/newtracker/make-card.js, then update assets/auspol-card.json\n`);
+} else if (cardFigsDrawn && JSON.stringify(cardFigsDrawn) !== JSON.stringify(cardFigs(cardNow))) {
+  /* Same poll date, but what the card SHOWS has moved (decay drift, a cured
+     wave). Advisory only, not a tests-gate red: figure staleness heals on
+     the daily prediction-refresh redraw, and correcting commits shouldn't
+     have to spin Chrome. render-card's gate uses the same comparison. */
+  console.warn(`\n  ! share card figures moved since it was drawn (date still current);`);
+  console.warn(`    the next gated render-card run will redraw it.\n`);
 } else {
   console.log(`  share card: current (${cardStamp})`);
 }
-const cardUrl = `${SITE_URL}assets/auspol-card.png?v=${cardStamp || dataStamp}`;
+/* The bust key is the STAMP, not the current data: the URL must change exactly
+   when the card's pixels change. Date alone misses figure-only redraws, so
+   when the stamp carries a fig block it joins the key. */
+const cardFigKey = cardFigsDrawn
+  ? "-" + crypto.createHash("sha1").update(JSON.stringify(cardFigsDrawn)).digest("hex").slice(0, 8)
+  : "";
+const cardUrl = `${SITE_URL}assets/auspol-card.png?v=${(cardStamp || dataStamp) + cardFigKey}`;
 /* The card is now a chart with figures on it, so its alt says them. Someone
    who cannot see the preview should get the same reading from it. */
 const cl = grabLatest();

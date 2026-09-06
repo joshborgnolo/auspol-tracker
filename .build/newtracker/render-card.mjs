@@ -36,10 +36,30 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
 const CARD = path.join(ROOT, "assets", "auspol-card.png");
 const STAMP = path.join(ROOT, "assets", "auspol-card.json");
+const LATEST = path.join(ROOT, "assets", "auspol-latest.json");
 const CHROME = process.env.CHROME
   || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 const die = (msg) => { console.error("render-card: " + msg); process.exit(1); };
+
+/* Staleness gate, before any dependency probing: drawing again buys nothing
+   when the date AND the figures the card shows are both what build.mjs last
+   wrote into auspol-latest.json, so exit before puppeteer or Chrome are
+   even looked for. That is what lets every wrapper call this unconditionally
+   between its builds, and lets machines with no browser skip quietly when
+   there is nothing to draw. A stamp without the fig block (pre-gate format)
+   and a missing auspol-latest.json both fall through to a draw. */
+const readJson = (p) => { try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return null; } };
+const drawn = readJson(STAMP), latestMeta = readJson(LATEST);
+if (drawn && latestMeta && drawn.publishedISO === latestMeta.publishedISO
+    && drawn.fig && latestMeta.fig
+    && JSON.stringify(drawn.fig) === JSON.stringify(latestMeta.fig)) {
+  console.log("card current (" + drawn.publishedISO + "; figures unchanged) – nothing to do");
+  process.exit(0);
+}
+console.log("card stale or unstamped – drawing"
+  + (drawn && latestMeta && drawn.publishedISO === latestMeta.publishedISO
+     ? " (same date; figures moved)" : ""));
 
 /* puppeteer-core is pinned in the root package.json (the repo's one declared
    dependency; the BUILD itself stays dependency-free — build.mjs never
@@ -119,11 +139,14 @@ try {
   await page.evaluate("HTMLAnchorElement.prototype.click = function () {};\n"
     + src + "\nundefined;");
   await page.waitForFunction("!!window.__auspolCard", { timeout: 60000 });
-  const { png, publishedISO } = await page.evaluate("window.__auspolCard");
+  const { png, publishedISO, fig } = await page.evaluate("window.__auspolCard");
 
   const buf = Buffer.from(png.replace(/^data:image\/png;base64,/, ""), "base64");
   fs.writeFileSync(CARD, buf);
-  fs.writeFileSync(STAMP, JSON.stringify({ publishedISO }) + "\n");
+  // The fig block is what the staleness gate above compares against
+  // build.mjs's auspol-latest.json — it must be written with the date so
+  // figure drift (and not just new polls) triggers the next redraw.
+  fs.writeFileSync(STAMP, JSON.stringify({ publishedISO, fig }) + "\n");
   console.log("drew assets/auspol-card.png · " + (buf.length / 1024).toFixed(0)
     + " KB · data dated " + publishedISO);
   console.log("stamped assets/auspol-card.json · run build.mjs to re-stamp og:image");

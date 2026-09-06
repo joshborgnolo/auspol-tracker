@@ -76,6 +76,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Install puppeteer-core (best effort, for the gated share-card redraw)
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
+
       - name: Gate on the escalated watch verdict
         id: gate
         run: |
@@ -126,6 +129,7 @@ jobs:
         if: steps.gate.outputs.escalate == 'true' && steps.breaker.outputs.allowed == 'true'
         env:
           MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
+          CHROME: /usr/bin/google-chrome
           GIT_TERMINAL_PROMPT: "0"
           AUSPOL_PR_GATE: "1" # push_main in the wrappers leaves commits local
         run: |

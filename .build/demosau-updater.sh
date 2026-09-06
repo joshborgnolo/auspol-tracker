@@ -93,25 +93,20 @@ if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
 fi
-# Best-effort card redraw: headless Chrome is flakier than the node steps,
-# so a miss warns (and build.mjs prints its stale-card line) instead of
-# blocking the commit over a social-preview image.
-if ! node .build/newtracker/render-card.mjs >> "$LOG" 2>&1; then
-  log "WARN render-card failed; shipping with the previous card"
-  echo "::warning::render-card failed; shipped the previous card"
-fi
-if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
+# Fresh build → gated share-card redraw → og restamp: refresh_site in
+# git-push-main.sh owns the order render-card needs the page built first.
+if ! refresh_site; then
   log "FAIL build; no commit made"
   exit 1
 fi
 
-git add data/polls.json .build/demosau-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json || { log "FAIL git add"; exit 1; }
+git add data/polls.json .build/demosau-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json || { log "FAIL git add"; exit 1; }
 MSG="Update DemosAU poll data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! push_main "$MSG" data/polls.json .build/demosau-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json; then
+if ! push_main "$MSG" data/polls.json .build/demosau-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

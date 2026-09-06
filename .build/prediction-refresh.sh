@@ -66,15 +66,18 @@ if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
  log "FAIL validate before sitemap rebuild; no commit made"
  exit 1
 fi
-if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
- log "FAIL build (sitemap); no commit made"
+# refresh_site (git-push-main.sh) rebuilds and runs the gated card redraw —
+# this daily job is the backstop that heals figure drift the per-poll render
+# never sees (decay, cured waves, PR-merged filings).
+if ! refresh_site; then
+ log "FAIL build; no commit made"
  exit 1
 fi
 
 # Stamp + record date for the commit message
 AS_OF="$(node -p 'JSON.parse(require("fs").readFileSync("data/prediction-history.json","utf8")).records.slice(-1)[0].asOf')"
 
-FILES=(data/prediction-history.json prediction/index.html .build/newtracker/build.mjs sitemap.xml)
+FILES=(data/prediction-history.json prediction/index.html .build/newtracker/build.mjs sitemap.xml index.html feed.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json)
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 if git diff --cached --quiet; then
  log "nothing staged after refresh; no commit"

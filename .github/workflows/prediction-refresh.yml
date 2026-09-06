@@ -56,7 +56,14 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Install puppeteer-core (best effort, for the gated share-card redraw)
+        # Version lives in package-lock.json; render-card.mjs resolves it from
+        # repo node_modules. --ignore-scripts: nothing here needs postinstall.
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
+
       - name: Run the prediction refresh
+        env:
+          CHROME: /usr/bin/google-chrome
         run: |
           if [ "${{ inputs.simulate_failure }}" = "true" ]; then
             echo "simulate_failure requested; failing to exercise the repair job"
@@ -90,6 +97,9 @@ jobs:
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
         with:
           node-version-file: .nvmrc
+
+      - name: Install puppeteer-core (best effort, for the gated share-card redraw)
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
 
       # A daily refresh of a persistent defect would otherwise spend an agent
       # session forever. Breaker counts repair PRs in 24h.
@@ -129,6 +139,7 @@ jobs:
         if: steps.breaker.outputs.allowed == 'true'
         env:
           MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
+          CHROME: /usr/bin/google-chrome
           GIT_TERMINAL_PROMPT: "0"
           AUSPOL_PR_GATE: "1" # push_main in the wrappers leaves commits local
         run: |

@@ -160,3 +160,31 @@ freshness_sync() {
   log "WARN local main diverged from origin/main (kept commits conflict); skipping slot"
   return 1
 }
+
+# ---------------------------------------------------------------------------
+# refresh_site — the shared validate-then-write half of every data wrapper:
+# build → gated share-card redraw → restamp build.
+#
+# Why three steps and in this order: render-card draws from the BUILT page,
+# so the build has to run first or the card previews yesterday's figures and
+# gets committed a wave stale (the pre-2026-09-07 render-then-build order did
+# exactly that — the stamp it committed was one wave behind the data). And
+# og:image is stamped with the card's date at build time, so a redraw must be
+# followed by a restamp build. render-card gates itself on
+# assets/auspol-card.json vs assets/auspol-latest.json and no-ops before
+# launching Chrome when nothing the card shows has moved, so the middle step
+# is cheap unless it is needed; a redraw failure warns rather than blocking
+# the data commit over a social-preview image.
+refresh_site() {
+  if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
+    log "FAIL build (pre-card)"; return 1
+  fi
+  if ! node .build/newtracker/render-card.mjs >> "$LOG" 2>&1; then
+    log "WARN render-card failed; shipping with the previous card"
+    echo "::warning::render-card failed; shipped the previous card"
+  fi
+  if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
+    log "FAIL build (card restamp)"; return 1
+  fi
+  return 0
+}
