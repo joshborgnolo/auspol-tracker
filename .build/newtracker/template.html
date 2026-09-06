@@ -3524,7 +3524,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-jump svg { stroke: currentColor; }
 /* jump targets get .next-polls' 72px clearance so the sticky tabs never
    swallow a panel title (.acc-card is the cycles view's own jump target) */
-.ap-var, .ap-lean, .acc-card { scroll-margin-top: 72px; }
+.ap-var, .ap-lean, .ap-flow, .acc-card { scroll-margin-top: 72px; }
 /* ---------- archive filter bar ---------- */
 /* One row at rest. Search stays visible because it cuts across every facet;
    everything else is a button that names its own state and opens a panel of
@@ -3961,6 +3961,16 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 .lean-band-onp { fill: var(--lean-onp-bg); }
 .lean-band-ink { fill: var(--lean-ink-bg); }
 .lean-band-alp, .lean-band-lnp, .lean-band-onp, .lean-band-ink { transition: fill .35s ease; }
+
+/* ---------- Preference-flow drift panel ----------
+   Sibling of the lean panel, same closing frame and one-family chrome; its
+   ground halves mean something different (above zero = published 2PP running
+   ahead of the flow table's implication for Labor, below = behind) but the
+   party-direction convention is the same, so the fills reuse the lean vars. */
+.ap-flow { border-top: 1px solid var(--line); padding: 24px 0 0; margin: 30px 0 0; }
+.flow-band-alp { fill: var(--lean-alp-bg); }
+.flow-band-lnp { fill: var(--lean-lnp-bg); }
+.flow-band-alp, .flow-band-lnp { transition: fill .35s ease; }
 
 /* archive ledger flows with the page; header pins just below the tab bar.
    overflow must stay visible here – any overflow on the wrapper turns it into

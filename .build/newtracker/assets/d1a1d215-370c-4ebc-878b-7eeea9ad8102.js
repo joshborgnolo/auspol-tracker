@@ -3275,6 +3275,151 @@ function HouseLeanPanel({ rangeId }) {
   );
 }
 
+// ====================================================================
+// FLOW DRIFT – published 2PPs against the frozen election flow table
+// ====================================================================
+/* Sits under House lean on the 2PP facet. House lean asks where each HOUSE
+   stands against the others polling around it; this panel asks whether
+   PREFERENCES still behave the way the anchored election's ballots did.
+   gen-data §7c reads every poll two ways – its published 2PP, and what the
+   same poll's primaries imply under the fixed flow table in flows.mjs – and
+   tracks the residual. A house's residual carries its fixed method offset
+   (allocation basis, undecided handling), so only the CHANGE within a
+   house is read: each firm's baseline is its own polls in the anchor
+   window after the election (late-starting houses anchor on their first
+   waves instead, which the note declares), and the pooled line is the
+   sample-weighted aggregate of the anomalies since, on the same
+   monthly/nowcast machinery as the aggregates.
+
+   DIAGNOSTIC ONLY: nothing else on the page consumes the series, and the
+   note says so. The aggregate line is ink, not a party colour – the zero
+   line is the story, and the party hues are spent on the ground halves
+   instead (above zero the published numbers run Labor-friendlier than the
+   table's implication). Houses ride faint behind the aggregate, same
+   hidden-chip convention as the lean panel, on the lean panel's own
+   palette – a house here is the same house there. */
+function FlowDriftPanel({ rangeId }) {
+  const { D, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
+  const narrow = useNarrow();
+  const [hidden, setHidden] = useState({});
+  const fd = D.flowDrift;
+  if (!fd || !fd.months || !fd.meta) return null;
+  const firms = fd.meta.houses || [];
+  const POOLED = "Pooled, all houses";
+
+  const xDomain = rangeDomain(rangeId);
+  const inWin = (d) => d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1];
+  const vals = [1, -1];
+  const ptsOf = (firm) => (fd.houses[firm] || []).map((d) => ({ x: D.mx(d.ym), y: d.v }));
+
+  const pooledPts = fd.months.map((m) => ({ x: m.x, y: m.v })).filter(inWin);
+  if (pooledPts.length < 2) return null;
+  const ciArea = fd.months
+    .filter((m) => m.ci95 != null)
+    .map((m) => ({ x: m.x, y0: m.v - m.ci95, y1: m.v + m.ci95 }))
+    .filter(inWin);
+
+  const houseRows = firms.map((f) => ({ f, color: houseLeanColour(f), pts: ptsOf(f), latest: null }));
+  for (const r of houseRows) {
+    const all = ptsOf(r.f);
+    r.latest = all.length ? all[all.length - 1].y : null;
+    if (!hidden[r.f]) r.pts.forEach((p) => vals.push(p.y));
+  }
+  pooledPts.forEach((p) => vals.push(p.y));
+  if (!hidden[POOLED]) ciArea.forEach((a) => vals.push(a.y0, a.y1));
+
+  const series = [];
+  if (pooledPts.length > 1) {
+    series.push({ id: POOLED, label: POOLED, color: "var(--ink)", width: 3,
+                  opacity: hidden[POOLED] ? 0 : 1, points: pooledPts });
+  }
+  for (const r of houseRows) {
+    if (r.pts.length > 1) {
+      series.push({ id: r.f, label: r.f, color: r.color, width: 1.5,
+                    opacity: hidden[r.f] ? 0 : 0.4, points: r.pts });
+    }
+  }
+  if (!series.length) return null;
+
+  const { domain, ticks } = fitDomain(vals, Math.max(...vals.map(Math.abs)) > 4 ? 2 : 1, 0);
+  const spine = D.MONTHS.map((ym) => ({ x: D.mx(ym), y: 0 })).filter(inWin);
+  const spineYm = D.MONTHS.filter((ym) => inWin({ x: D.mx(ym) }));
+  const sgn = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+  const lateFirms = firms.filter((f) => fd.meta.baseFrom && fd.meta.baseFrom[f] && fd.meta.baseFrom[f] !== fd.meta.anchor);
+
+  return (
+    <section className="ap-flow" id="flow-drift">
+      <div className="ap-var-head">
+        <div>
+          <h3 className="ap-var-title">Preference-flow drift</h3>
+          <p className="card-sub">
+            How far published 2PPs sit from what the same polls’ primary votes would read as under
+            {" "}{fd.meta.table} – a pooled read on whether{" "}
+            <button type="button" className="hi-term"
+              onClick={() => window.AP.openTerm && window.AP.openTerm("preference-flows", "Preference-flow drift")}>preferences</button>{" "}
+            are still moving the way the election’s ballots did, with every house measured against
+            its own baseline back then.
+          </p>
+        </div>
+        <div className="legend">
+          <button type="button"
+                  className={"legend-chip" + (hidden[POOLED] ? " off" : "")}
+                  aria-pressed={!hidden[POOLED]}
+                  title={"Pooled across " + firms.length + " houses – the 21-day nowcast of the drift, with its 95% interval"}
+                  onClick={() => setHidden((h) => ({ ...h, [POOLED]: !h[POOLED] }))}>
+            <span className="legend-swatch" style={{ background: "var(--ink)" }}></span>
+            <span className="legend-name">Pooled, {firms.length} houses</span>
+            <span className="legend-val">{fd.now && fd.now.ci95 != null ? sgn(fd.now.v) + " ± " + fd.now.ci95.toFixed(1) : "–"}</span>
+          </button>
+          {houseRows.map((r) => (
+            <button key={r.f} type="button"
+                    className={"legend-chip" + (hidden[r.f] ? " off" : "")}
+                    aria-pressed={!hidden[r.f]}
+                    title={r.f + " – drift against its own election baseline"
+                           + (lateFirms.includes(r.f) ? ", anchored on its first waves instead" : "")}
+                    onClick={() => setHidden((h) => ({ ...h, [r.f]: !h[r.f] }))}>
+              <span className="legend-swatch" style={{ background: r.color }}></span>
+              <span className="legend-name">{r.f}</span>
+              <span className="legend-val">{r.latest == null ? "–" : sgn(r.latest) + "pp"}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <TrendChart
+        key={"flow-" + rangeId}
+        height={narrow ? 500 : 300} xDomain={xDomain} yDomain={domain} yTicks={ticks}
+        unit="pp" axisFont={narrow ? 28 : 15} pad={{ l: 54, r: 20, t: 18, b: 40 }}
+        xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        bands={[
+          { y0: 0, y1: domain[1], className: "flow-band-alp" },
+          { y0: domain[0], y1: 0, className: "flow-band-lnp" },
+        ]}
+        areas={hidden[POOLED] ? undefined : [{ id: "ci", color: "var(--ink-faint)", opacity: 0.18, points: ciArea }]}
+        refLines={[{ y: 0, color: "var(--ink-3)" }]}
+        series={series} spine={spine}
+        tooltipTitle={(i) => monthLabelFull(spineYm[i])}
+        ariaLabel="Preference-flow drift over time – how far published 2PPs sit from what the same polls’ primaries imply under the frozen election flow table, above zero friendlier to Labor"
+        fmt={(v) => (v === 0 ? "" : sgn(v))}
+      />
+
+      <p className="table-hint ap-var-note">
+        Above zero – the red ground – the published 2PPs are running friendlier to Labor than the
+        frozen table reads their own primaries; below it, friendlier to the Coalition. Each house’s
+        gap against the table is centred on its own polls in the {fd.meta.baseDays} days after the
+        election – the one moment the electorate’s actual flows are counted, and a house’s fixed
+        allocation habits absorbed into the zero
+        {lateFirms.length > 0 && <> – {lateFirms.join(", ")} began polling later and anchor on
+          {" "}their own first waves instead, so their lines read only the drift since they started</>}.
+        The pooled line and its band are the cross-house aggregate with the same sample weighting
+        as the aggregates above. A wave that publishes no two-party figure carries no gap, so a
+        house that reports a 2PP only irregularly reads through a thinner line – and the whole
+        panel is a diagnostic read on published figures: it corrects no other number on this page.
+      </p>
+    </section>
+  );
+}
+
 function AllPollsView({ focus, onBack, backLabel }) {
   const { D } = window.AP;
   const { ShareBar, NetVal, tppContests, tppFlag, ppmContests, ppmContestSegs, ppmFlag } = window;
@@ -3405,6 +3550,18 @@ function AllPollsView({ focus, onBack, backLabel }) {
   const jumpToLean = () => {
     if (facet === "twopp" || facet === "primary") jumpTo("house-lean");
     else { leanJump.current = true; onFacet("twopp"); }
+  };
+  /* flow drift mounts on 2PP alone – same wait-on-remount dance as the lean
+     jump, but the target facet is always twopp */
+  const flowJump = useRef(false);
+  React.useEffect(() => {
+    if (!flowJump.current || facet !== "twopp") return;
+    flowJump.current = false;
+    jumpTo("flow-drift");
+  }, [facet]);
+  const jumpToFlow = () => {
+    if (facet === "twopp") jumpTo("flow-drift");
+    else { flowJump.current = true; onFacet("twopp"); }
   };
 
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
@@ -3688,6 +3845,14 @@ function AllPollsView({ focus, onBack, backLabel }) {
             <path d="M12 4v13M12 17l-5-5M12 17l5-5"></path>
           </svg>
           Jump to house lean
+        </button>
+        <button className="ap-jump" onClick={jumpToFlow}
+                title="Scroll down to the preference-flow drift chart">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+               strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 4v13M12 17l-5-5M12 17l5-5"></path>
+          </svg>
+          Jump to flow drift
         </button>
         <TextToggle value={facet} onChange={onFacet} options={FACETS}
           ariaLabel="Archive table view" caps className="ap-facet" />
@@ -4004,6 +4169,10 @@ function AllPollsView({ focus, onBack, backLabel }) {
           between the 2PP and the ALP / L/NP / ON primary measures, so it
           mounts wherever those measures run the tab */}
       {(facet === "twopp" || facet === "primary") && <HouseLeanPanel rangeId={range} />}
+
+      {/* flow drift is a 2PP-only diagnostic — it publishes on the canonical
+          pair alone, so it mounts on the 2PP facet right after the lean panel */}
+      {facet === "twopp" && <FlowDriftPanel rangeId={range} />}
     </div>
   );
 }

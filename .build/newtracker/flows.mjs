@@ -22,6 +22,11 @@
    the SAME cut so constants stay comparable across refreshes. */
 export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
 
+/* The table FLOW is anchored to, in the words display copy should use – the
+   flow-drift panel's note interpolates this so a re-anchor at a future
+   election can never leave the page describing yesterday's table. */
+export const FLOW_TABLE = "the AEC's 2025-election flow table (TPP cut)";
+
 /* Implied ALP 2PP from a poll's primary columns: every formal minor-party
    vote ends with ALP or L·NP under full preferential voting, so one ALP-side
    constant per published bucket carries the whole redistribution. */

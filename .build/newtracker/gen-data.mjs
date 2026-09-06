@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp } from "./flows.mjs";
+import { impliedAlp2pp, FLOW_TABLE } from "./flows.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -341,7 +341,7 @@ function nowcastAdj(rows, he, ref) {
     const d = ddays(ref, a.mid);
     if (d < 0 || d > HL_WINDOW) continue;
     waves.set(a.firm, (waves.get(a.firm) || 0) + 1);
-    pts.push({ w: a.n * Math.exp(-LN2 * d / HL_HALF), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm });
+    pts.push({ w: a.n * Math.exp(-LN2 * d / HL_HALF), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
   }
   /* A house with m waves in the window has not measured the electorate m
      independent times - same method, same house-effect residue - so its
@@ -369,7 +369,7 @@ function monthWithSe(rows, he, ym) {
   const waves = new Map();
   for (const r of rs) waves.set(r.firm, (waves.get(r.firm) || 0) + 1);
   return weightedWithSe(rs.map((r) => ({ w: r.n / Math.sqrt(waves.get(r.firm)),
-                                         x: r.x - heV(he, r.firm, ymMidMs(ym)), n: r.n })));
+                                         x: r.x - heV(he, r.firm, ymMidMs(ym)), n: r.n, ...(r.pq != null ? { pq: r.pq } : {}) })));
 }
 
 const houseEffect = houseEffectsFor(tppRows);
@@ -1220,6 +1220,89 @@ const synthHeadline = (ref) => {
 };
 const synthNow = synthHeadline(refNow);
 const synth1mo = synthHeadline(refNow - 30 * 86400000);
+
+/* ---- 7c. flow-drift residual tracker -------------------------------------
+   How far published 2PPs are running from what the SAME polls' primaries
+   would imply under the flow table (flows.mjs). Both row sets already exist
+   keyed date|pollster, so the residual is a join, not a new estimator. A
+   house's residual carries a fixed method offset (its allocation basis;
+   Essential's undecided-inclusive pair was already rebased inside share2pp,
+   so what remains is its own convention), so drift is identified only from
+   CHANGE WITHIN a house: subtract the firm's own election-anchored
+   baseline, then pool the anomalies across houses through the standing
+   monthly/nowcast machinery with NULL house effects – the firm baselines
+   ARE the debias. If the table's flows still held and methods were stable
+   the series sits at zero; movement reads as industry-wide drift. It is a
+   diagnostic and adjusts no other figure on the page, and only houses that
+   publish a 2PP can appear: a wave that prints none (much of Newspoll's
+   and Resolve's output) carries no residual either way. Each residual row
+   carries the published pair's OWN sampling variance (pq from the rebased
+   share) as its floor term – a share scale does not transfer to a
+   difference series, whose mean can sit at zero and leave p(1−p) negative
+   if it were measured off the anomaly mean. */
+const FLOW_BASE_DAYS = 180;   // baseline anchor window after the election
+const FLOW_BASE_MIN = 3;      // min residuals to locate a house's baseline
+const driftSynthByKey = new Map(tppRowsSynth.map((r) => [r.key, r.x]));
+const driftResid = [];
+for (const r of tppRows) {
+  const imp = driftSynthByKey.get(r.key);
+  if (imp == null) continue;
+  driftResid.push({ ...r, pq: (r.x / 100) * (1 - r.x / 100) * 1e4, x: r.x - imp });
+}
+const driftByFirm = new Map();
+for (const r of driftResid) {
+  if (!driftByFirm.has(r.firm)) driftByFirm.set(r.firm, []);
+  driftByFirm.get(r.firm).push(r);
+}
+/* A firm's method offset is read at the election – the one moment the
+   electorate's actual flows are known. A house whose coverage starts late
+   (Fox & Hedgehog began Jan 2026) has no window to read, so it anchors on
+   its own first waves and its series can only speak about drift SINCE it
+   started; meta.baseFrom says which anchor each firm got. */
+const FLOW_BASE_FROM = {};
+{
+  const elecMs = new Date(ELECTION.date).getTime();
+  for (const [firm, rows] of driftByFirm) {
+    rows.sort((a, b) => a.mid - b.mid);
+    const win = rows.filter((r) => ddays(r.mid, elecMs) >= 0 && ddays(r.mid, elecMs) <= FLOW_BASE_DAYS);
+    const anchored = win.length >= FLOW_BASE_MIN;
+    const src = anchored ? win : rows.slice(0, FLOW_BASE_MIN);
+    if (src.length < FLOW_BASE_MIN) continue;
+    FLOW_BASE_FROM[firm] = {
+      base: src.reduce((s, r) => s + r.n * r.x, 0) / src.reduce((s, r) => s + r.n, 0),
+      from: anchored ? ELECTION.date : src[src.length - 1].key.split("|")[0],
+    };
+  }
+}
+const driftAnom = driftResid
+  .filter((r) => FLOW_BASE_FROM[r.firm])
+  .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key }));
+const driftMonths = MONTHS.map((ym) => {
+  const r = monthWithSe(driftAnom, null, ym);
+  return r && { ym, x: mx(ym), v: r1(r.v), ci95: r1(1.96 * r.se), k: r.n };
+}).filter(Boolean);
+const driftNow = nowcastAdj(driftAnom, null, refNow);
+const flowDrift = {
+  months: driftMonths,
+  now: driftNow && { v: driftNow.v, ci95: driftNow.ci95, n: driftNow.n, nEff: driftNow.nEff },
+  /* per-house anomaly series for the faint background lines – same ragged
+     {ym, v} shape houseLean carries, plain n-weighted monthly means */
+  houses: Object.fromEntries(Object.keys(FLOW_BASE_FROM).sort().map((f) => [f,
+    MONTHS.map((ym) => {
+      const rs = driftAnom.filter((r) => r.firm === f && r.ym === ym);
+      if (!rs.length) return null;
+      const w = rs.reduce((s, r) => s + r.n, 0);
+      return { ym, v: r1(rs.reduce((s, r) => s + r.n * r.x, 0) / w) };
+    }).filter(Boolean),
+  ])),
+  meta: {
+    table: FLOW_TABLE,
+    baseDays: FLOW_BASE_DAYS,
+    anchor: ELECTION.date,
+    baseFrom: Object.fromEntries(Object.entries(FLOW_BASE_FROM).map(([f, b]) => [f, b.from])),
+    houses: Object.keys(FLOW_BASE_FROM).sort(),
+  },
+};
 
 /* Nowcasts for the alternative matchups, on the same window/half-life. Null
    where the series can't support one (no reading inside the trailing window),
@@ -2165,6 +2248,12 @@ window.AUSPOL = (function () {
     synth: synthEffect.snapshot(Infinity),
   })};
   const houseLean = ${JSON.stringify(houseLean)};
+  /* Flow-drift residual tracker (gen-data §7c): each poll's published 2PP
+     minus what its primaries imply under the flow table in flows.mjs, with
+     every house's method offset removed against its own election-anchored
+     baseline and the anomalies pooled monthly + nowcast. DIAGNOSTIC ONLY –
+     see the Flow-drift panel's note; it adjusts no other figure. */
+  const flowDrift = ${JSON.stringify(flowDrift)};
   const leaderMonths = ${JSON.stringify(leaderMonths)};
   const direction = ${JSON.stringify(direction)};
   const directionHouseEffects = ${JSON.stringify({ right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity) })};
@@ -2248,7 +2337,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, adjusted, houseEffects, houseLean, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, adjusted, houseEffects, houseLean, flowDrift, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
@@ -2287,6 +2376,8 @@ console.log("  approval months:", leaderMonths.filter((r) => r.alb_net != null).
 console.log("individualPolls:", individualPolls.length, "| no 2PP:", individualPolls.filter((p) => p.alp == null).length, "| with ppm:", individualPolls.filter((p) => p.ppm || p.ppmSets).length, "| with appr:", individualPolls.filter((p) => p.appr.albNet != null).length);
 console.log("pollsterTable:", pollsterTable.length, "→", pollsterTable.map((r) => `${r.pollster} ${r.releasedLabel}${r.alp2pp == null ? " (no 2PP)" : ""}`).join(" | "));
 console.log("houseEffects (2PP):", Object.entries(houseEffect.snapshot(Infinity)).sort((a, b) => b[1].v - a[1].v).map(([f, h]) => `${f} ${h.v > 0 ? "+" : ""}${h.v}(n=${h.n})`).join(", "));
+console.log("flowDrift:", flowDrift.meta.houses.length, "houses | now:", JSON.stringify(flowDrift.now), "| last month:", JSON.stringify(flowDrift.months[flowDrift.months.length - 1]));
+console.log("  baseFrom:", Object.entries(flowDrift.meta.baseFrom).map(([f, d]) => `${f}→${d}`).join(", "));
 console.log("headline 2PP:", hlNow, "| 1mo ago:", hl1mo);
 console.log("pollCadence:", pollCadence.length, "houses on a pattern →",
   pollCadence.map((c) => {
