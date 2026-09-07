@@ -96,6 +96,26 @@ One bash file that glues the stages; each stage gates the next so corruption nev
    same change set) with a `FAIL <stage>` prefix on failures — the log is the only debugging surface
    for a headless job (see plist stdout/stderr below).
 
+## The writers lock can fail silently by CONFIG, not contention (2026-09-07)
+
+`acquire_slot_lock()` (`.build/git-push-main.sh`) serialises every writing wrapper via
+`mkdir .build/locks/writers.lock`. Two failure shapes, both exit 0:
+`writers lock lost to a concurrent wrapper; skipping slot` (lock busy — or the mutex
+`mkdir` failed for a NON-contention reason) and `another wrapper holds the writers lock
+(pid N); skipping slot`. The first caused a two-day total outage (Sat 5 Sep night →
+Mon 7 Sep 17:20): `.build/locks/` is gitignored so it never exists in a fresh checkout,
+and bare `mkdir` of a nested path with a missing parent fails — EVERY slot, local AND
+GitHub Actions, was an instant green no-op (CI runs of 13–23 s are the telltale; a real
+extraction takes minutes). Fixed in `05cda13` by `mkdir -p` of the parent first (the
+lock `mkdir` itself stays bare — `mkdir -p` on the lock would return 0 when it already
+exists and defeat the mutex). **Diagnostic shortcut:** if every writer log shows only
+lock-skip lines and cloud runs are suspiciously fast, `ls .build/locks/` and read the
+skip line before believing "contention" — locks are reaped by staleness
+(`SLOT_LOCK_MAX_AGE`, 45 min) but config-level mkdir failures never age out. The dirty-tree
+guard (`working tree dirty; ... refusing to write & commit`) has the same signature: to
+run a wrapper by hand on a tree carrying a sibling session's WIP, `git stash push -u`,
+run, `git stash pop`.
+
 ## launchd plist essentials (learned the hard way)
 
 - **`EnvironmentVariables.PATH` is mandatory.** LaunchAgents get a minimal PATH; set
