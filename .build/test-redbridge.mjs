@@ -42,6 +42,8 @@ assert.equal(w.alp, 29); assert.equal(w.lnp, 22); assert.equal(w.grn, 10);
 assert.equal(w.onp, 31); assert.equal(w.ind, 8);
 assert.equal(w.tppResp, 48, "respondent-allocated TPP");
 assert.equal(w.tppVsOn, 53, "ALP-vs-One-Nation TPP");
+// Table 1 published respondent-allocated preference split (ALP shares, %)
+assert.deepEqual(w.tppSplit, { grn: 87, onp: 16, oth: 61 });
 
 // PPM (Albanese 32, Taylor 15, Hanson 24)
 assert.deepEqual(w.ppm, { alb: 32, opp: 15, han: 24 });

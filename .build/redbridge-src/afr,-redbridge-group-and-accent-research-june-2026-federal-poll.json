@@ -43,5 +43,10 @@
   "pubIso": "2026-06-28",
   "pdfUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_0fe4f080e2cd4654906be0f94268f9b2.pdf",
   "afrUrl": null,
-  "extractedAt": "2026-08-29T07:04:37.062Z"
+  "extractedAt": "2026-08-29T07:04:37.062Z",
+  "tppSplit": {
+    "grn": 85,
+    "onp": 21,
+    "oth": 62
+  }
 }

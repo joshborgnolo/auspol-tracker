@@ -43,6 +43,12 @@
 // tracker needs is a LIVE-TEXT TABLE — no OCR required:
 //   - Methodology (internal p1): fieldwork line "conducted between Monday 27
 //     July and Thursday 30 July 2026", sample "N = 1,001".
+//   - Table 1 "Federal two-party vote intention, by party of first
+//     preference": the wave's respondent-allocated preference SPLIT (Labor
+//     vs. Coalition block: Greens / One Nation / Other parties-and-
+//     candidates → ALP share per bucket). Feeds tpp_split (ALP shares only —
+//     complements implied, same storage rule as tpp_flows). Absent from the
+//     legacy reports (≤ Jan 2026); those waves carry no tpp_split.
 //   - Table N "Federal vote intention … by wave" (wave history, descending):
 //     ALP / Coalition / One Nation / Greens / Other primaries plus three TPP
 //     flavours — vs-Coalition 2025-flows, vs-Coalition respondent-allocated,
@@ -421,6 +427,31 @@ function parseTable2(txt) {
   return { wave: { label, year, month, ...vals }, rowCount: uniq.length };
 }
 
+// Table 1 "Federal two-party vote intention, by party of first preference":
+// the wave's respondent-allocated preference split. The "Labor vs.
+// Coalition" block prints one line per bucket (`Greens  78  22  -`, `One
+// Nation …`, `Other parties and candidates …`) — cells are the ALP share,
+// the Coalition share, then "-". We keep the ALP share per bucket (the
+// complement is implied).
+function parseTable1(txt) {
+  const sec = sliceBetween(txt, /Table \d+: Federal two-party vote intention/i, /\n\s*(?:Table|Figure) \d+:/);
+  if (!sec) return { error: "preference-split table (Table 1) not found" };
+  const block = sliceBetween(sec, /Labor vs\. Coalition/i, /Labor vs\. One Nation/i);
+  if (!block) return { error: "'Labor vs. Coalition' block not found in Table 1" };
+  const grab = (re) => {
+    const m = block.match(re);
+    return m ? { alp: +m[1], coal: +m[2] } : null;
+  };
+  const grn = grab(/^\s*Greens\s+(\d+)\s+(\d+)\s+[-–]\s*$/m);
+  const onp = grab(/^\s*One Nation\s+(\d+)\s+(\d+)\s+[-–]\s*$/m);
+  const oth = grab(/^\s*Other parties and candidates\s+(\d+)\s+(\d+)\s+[-–]\s*$/m);
+  if (!grn || !onp || !oth) return { error: "split row(s) missing from Table 1's Labor-vs-Coalition block" };
+  for (const [name, v] of [["Greens", grn], ["One Nation", onp], ["Other", oth]])
+    if (Math.abs(v.alp + v.coal - 100) > 1)
+      return { error: `${name} split ${v.alp}/${v.coal} does not sum to 100` };
+  return { tppSplit: { grn: grn.alp, onp: onp.alp, oth: oth.alp } };
+}
+
 // Table 5 "Favourability ratings and name recognition of political figures":
 // leader-name headings each introducing `Mon YYYY` rows of
 // veryFav mostlyFav neither mostlyUnfav veryUnfav notSure notHeard NET.
@@ -487,6 +518,12 @@ function parsePdf(txt, slug, notes) {
   const t2 = parseTable2(txt);
   if (t2.error) out.table2Error = t2.error;
   else Object.assign(out, t2.wave, { waveRows: t2.rowCount });
+
+  const t1 = parseTable1(txt);
+  if (t1.error) {
+    out.table1Error = t1.error;
+    notes.push(`${slug}: Table 1 preference split not parsed (${t1.error}) — tpp_split left absent`);
+  } else out.tppSplit = t1.tppSplit;
 
   // fieldwork years: explicit in the methodology when printed, else filled
   // from the wave-table year, else from the cover's release-month line
@@ -641,12 +678,20 @@ if (process.env.RB_LIB !== "1") try {
   const guardFails = [];
   const newRows = { polls: [], ppm: [], approval: [], altTpp: [] };
   const filledRelease = [];
+  const filledSplit = [];
 
   for (const c of candidates) {
     const cachePath = `${SRC_DIR}/${c.slug}.json`;
     let w;
     if (!FORCE && existsSync(cachePath)) {
       w = JSON.parse(readFileSync(cachePath, "utf8"));
+      // migrate older caches: Table-1 parsing postdates them — re-derive the
+      // split from the cached pdftotext (offline, no refetch) and persist
+      if (w.tppSplit == null && w.table1Error == null && existsSync(`${SRC_DIR}/${c.slug}.txt`)) {
+        const t1 = parseTable1(readFileSync(`${SRC_DIR}/${c.slug}.txt`, "utf8"));
+        if (t1.tppSplit) w.tppSplit = t1.tppSplit; else w.table1Error = t1.error;
+        writeFileSync(cachePath, JSON.stringify(w, null, 2) + "\n");
+      }
     } else {
       const page = await scrapeProjectPage(c.url);
       const pdfUrl = page.pdfUrl;
@@ -681,6 +726,8 @@ if (process.env.RB_LIB !== "1") try {
       cmp("tpp_alp", w.tppResp, matchPoll.tpp_alp);
       cmp("tpp_lnp", w.tppResp != null ? 100 - w.tppResp : null, matchPoll.tpp_lnp);
       cmp("tpp_flows", w.tppHist, matchPoll.tpp_flows);
+      if (matchPoll.tpp_split && w.tppSplit)
+        for (const k of ["grn", "onp", "oth"]) cmp(`tpp_split.${k}`, w.tppSplit[k], matchPoll.tpp_split[k]);
       if (w.pubIso && matchPoll.published && matchPoll.published.slice(0, 10) !== w.pubIso)
         diffs.push(`published: page=${w.pubIso} vs file=${matchPoll.published.slice(0, 10)}`);
 
@@ -702,6 +749,20 @@ if (process.env.RB_LIB !== "1") try {
       if (!matchPoll.releaseUrl) {
         if (CHECK) diffs.push(`releaseUrl: file lacks the wave's project page (${c.url})`);
         else { matchPoll.releaseUrl = c.url; filledRelease.push(matchPoll.date); }
+      }
+
+      // same free fill for the respondent split: a committed row lacking
+      // tpp_split gains the PDF's Table-1 values (check mode reports instead)
+      if (!matchPoll.tpp_split && w.tppSplit) {
+        if (CHECK) diffs.push(`tpp_split: file lacks the PDF's Table-1 split ${JSON.stringify(w.tppSplit)}`);
+        else {
+          // splice before "url" so filled rows keep the constructor's key order
+          const es = Object.entries(matchPoll), at = Object.keys(matchPoll).indexOf("url");
+          es.splice(at < 0 ? es.length : at, 0, ["tpp_split", w.tppSplit]);
+          for (const k of Object.keys(matchPoll)) delete matchPoll[k];
+          Object.assign(matchPoll, Object.fromEntries(es));
+          filledSplit.push(matchPoll.date);
+        }
       }
 
       status.verified.push({ date: matchPoll.date, slug: c.slug, ok: diffs.length === 0 });
@@ -737,6 +798,7 @@ if (process.env.RB_LIB !== "1") try {
         alp: w.alp, lnp: w.lnp, grn: w.grn, onp: w.onp, ind: w.ind, oth: null,
         tpp_alp: w.tppResp, tpp_lnp: w.tppResp != null ? 100 - w.tppResp : null,
         ...(w.tppHist != null ? { tpp_flows: w.tppHist } : {}),
+        ...(w.tppSplit != null ? { tpp_split: w.tppSplit } : {}),
         url: w.afrUrl || w.pdfUrl,
         releaseUrl: c.url,
       }),
@@ -763,9 +825,14 @@ if (process.env.RB_LIB !== "1") try {
     for (const sec of ["polls", "ppm", "approval", "altTpp"])
       if (newRows[sec].length) D[sec] = [...D[sec], ...newRows[sec]].sort(byDate);
   if (filledRelease.length) status.releaseFilled = filledRelease;
-  if (hasNew || filledRelease.length) {
+  if (filledSplit.length) status.splitFilled = filledSplit;
+  if (hasNew || filledRelease.length || filledSplit.length) {
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
-    const next = JSON.stringify(D, null, 2) + trailingNl;
+    // hand-entered rows keep tpp3 on one line; stringify must not expand them
+    const next =
+      JSON.stringify(D, null, 2)
+        .replace(/"tpp3": \{\n\s+"alp": (\d+),\n\s+"lnp": (\d+),\n\s+"onp": (\d+)\n\s+\}/g,
+          `"tpp3": { "alp": $1, "lnp": $2, "onp": $3 }`) + trailingNl;
     status.changed = next !== orig;
     if (status.changed && !CHECK) {
       writeFileSync(OUT + ".tmp", next);
