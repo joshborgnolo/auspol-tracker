@@ -95,6 +95,19 @@ export function validate(D) {
       fail("flows-range", `tpp_flows = ${p.tpp_flows}`);
     if (p.tpp_flows != null && !["Roy Morgan", "RedBridge / Accent"].includes(p.pollster))
       fail("flows-pollster", `tpp_flows on a row for ${p.pollster}`);
+    // 2b1. tpp_split (RedBridge/Accent's published per-cohort allocation to
+    //      Labor) carries all three buckets or none, each a plausible flow
+    //      share – a bucket at 0/100 is a Table-1 misparse, not an electorate.
+    if (p.tpp_split != null) {
+      if (p.pollster !== "RedBridge / Accent")
+        fail("split-pollster", `tpp_split on a row for ${p.pollster}`);
+      const ts = ["grn", "onp", "oth"].map((k) => p.tpp_split[k]);
+      if (ts.some((v) => v == null))
+        fail("split-shape", `tpp_split missing a bucket: ${JSON.stringify(p.tpp_split)}`);
+      else
+        for (const [k, v] of [["grn", ts[0]], ["onp", ts[1]], ["oth", ts[2]]])
+          if (!(v >= 1 && v <= 99)) fail("split-range", `tpp_split.${k} = ${v}`);
+    }
     // 2b2. tpp3 (Fox & Hedgehog's three-cornered preferred) carries all
     //      three slices or none, each in bounds, and the trio sums ~100 –
     //      the same sum discipline as the 2PP pair.

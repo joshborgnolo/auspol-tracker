@@ -40,6 +40,12 @@ new and worth looking at.
   release page on accent-research.com goes beside it in `releaseUrl` (the
   extractor fills it for new waves, and the expanded poll shows it as
   "Pollster's release"). Absent, not zero: some waves never got an Accent page.
+  Its respondent-allocated 2PP is the headline `tpp_alp`/`tpp_lnp` (the
+  2025-flows pair goes in `tpp_flows`, as with Roy Morgan), and the allocation
+  behind it — each first-preference cohort's share to Labor, printed as the
+  report's Table 1 — is stored on the row as `tpp_split` (`grn`/`onp`/`oth`,
+  ALP shares only), parsed from the PDF by the extractor along with the rest.
+  Absent, not zero: reports from Jan 2026 and earlier print no Table 1.
 - **YouGov / News24** rows work the same way: `url` cites the media write-up;
   a wave YouGov self-released on yougov.com carries that release in
   `releaseUrl` (the extractor fills it when one surfaces). Absent, not zero:

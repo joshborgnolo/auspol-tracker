@@ -2462,6 +2462,11 @@
         "LNP": 4,
         "Nat": 2
       },
+      "tpp_split": {
+        "grn": 83,
+        "onp": 23,
+        "oth": 61
+      },
       "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf"
@@ -3044,6 +3049,11 @@
       "tpp_alp": 54,
       "tpp_lnp": 46,
       "tpp_flows": 53,
+      "tpp_split": {
+        "grn": 90,
+        "onp": 25,
+        "oth": 56
+      },
       "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_61030f1f0f4d4ba49b6c3a10f141c992.pdf"
@@ -3442,6 +3452,11 @@
       "tpp_alp": 51,
       "tpp_lnp": 49,
       "tpp_flows": 52,
+      "tpp_split": {
+        "grn": 90,
+        "onp": 21,
+        "oth": 60
+      },
       "url": "https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_c99eef2ffb4242f3b2d0da6311abf61e.pdf"
@@ -3662,6 +3677,11 @@
       "tpp_alp": 54,
       "tpp_lnp": 46,
       "tpp_flows": 55,
+      "tpp_split": {
+        "grn": 85,
+        "onp": 21,
+        "oth": 62
+      },
       "url": "https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_0fe4f080e2cd4654906be0f94268f9b2.pdf"
@@ -4025,6 +4045,11 @@
       "tpp_alp": 48,
       "tpp_lnp": 52,
       "tpp_flows": 50,
+      "tpp_split": {
+        "grn": 87,
+        "onp": 16,
+        "oth": 61
+      },
       "url": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-july-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_e09c2025b9df424e98b0f2737e7ae4ca.pdf"
@@ -4280,6 +4305,11 @@
       "tpp_alp": 48,
       "tpp_lnp": 52,
       "tpp_flows": 52,
+      "tpp_split": {
+        "grn": 78,
+        "onp": 17,
+        "oth": 50
+      },
       "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
       "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_cab524c6cbb54cdc80cfeed7d9863703.pdf"
