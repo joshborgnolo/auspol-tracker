@@ -1,5 +1,5 @@
 {
-  "model": "reelect-snapshot-hazard + reelect-term-ridge cross-check",
+  "model": "reelect-snapshot-hazard (5-feature fit, 2026-09-08 feature audit) + reelect-term-ridge cross-check",
   "generatedBy": ".build/refresh-prediction.mjs",
   "election": "2025-05-03",
   "spanMonths": 36.5,
@@ -8,12 +8,12 @@
       "asOf": "2026-09-05",
       "age": 16.1,
       "ousted": {
-        "median": 0.2207,
-        "lo": 0.0481,
-        "hi": 0.6105,
-        "shareOuster": 0.1833
+        "median": 0.2722,
+        "lo": 0.0861,
+        "hi": 0.5744,
+        "shareOuster": 0.1667
       },
-      "inSample": 0.2347,
+      "inSample": 0.2732,
       "features": {
         "pmNet": -18.913,
         "ppm": 14.4737,
@@ -23,7 +23,7 @@
         "ageFrac": 0.4411
       },
       "ridge": {
-        "liveP": 0.3051,
+        "liveP": 0.3048,
         "window": [
           12,
           18
@@ -34,12 +34,12 @@
       "asOf": "2026-09-06",
       "age": 16.1,
       "ousted": {
-        "median": 0.2207,
-        "lo": 0.0481,
-        "hi": 0.6105,
-        "shareOuster": 0.1833
+        "median": 0.2722,
+        "lo": 0.0861,
+        "hi": 0.5744,
+        "shareOuster": 0.1667
       },
-      "inSample": 0.2347,
+      "inSample": 0.2732,
       "features": {
         "pmNet": -18.913,
         "ppm": 14.4737,
@@ -49,7 +49,7 @@
         "ageFrac": 0.4411
       },
       "ridge": {
-        "liveP": 0.305,
+        "liveP": 0.3048,
         "window": [
           12,
           18
@@ -60,12 +60,38 @@
       "asOf": "2026-09-07",
       "age": 16.2,
       "ousted": {
-        "median": 0.2214,
-        "lo": 0.0475,
-        "hi": 0.603,
-        "shareOuster": 0.1833
+        "median": 0.2728,
+        "lo": 0.0871,
+        "hi": 0.5701,
+        "shareOuster": 0.17
       },
-      "inSample": 0.2365,
+      "inSample": 0.2749,
+      "features": {
+        "pmNet": -18.913,
+        "ppm": 14.4737,
+        "primSw": -6.5054,
+        "tppSw": -3.0462,
+        "govAge": 2,
+        "ageFrac": 0.4438
+      },
+      "ridge": {
+        "liveP": 0.3048,
+        "window": [
+          12,
+          18
+        ]
+      }
+    },
+    {
+      "asOf": "2026-09-08",
+      "age": 16.2,
+      "ousted": {
+        "median": 0.2728,
+        "lo": 0.0871,
+        "hi": 0.5701,
+        "shareOuster": 0.17
+      },
+      "inSample": 0.2749,
       "features": {
         "pmNet": -18.913,
         "ppm": 14.4737,

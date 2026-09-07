@@ -1,12 +1,21 @@
 /* throwaway: discrete-time snapshot model — the "hazard" upgrade.
    Every term contributes snapshots at ages 6,12,15,18,24,30 months and
    final(span-3); each snapshot's features are trailing-3-month summaries
-   knowable at that age. One pooled ridge logistic (7 features incl.
-   age-fraction and swing×age interaction) over ~91 snapshots.
+   knowable at that age. One pooled ridge logistic (5 features: primary
+   and two-party swing, incumbency age, age-fraction, swing×age
+   interaction) over ~91 snapshots.
    Validation: leave-one-TERM-out (all snapshots of a term together).
    Accuracy is reported PER BAND — "how callable is a term N months in?".
    Albanese-2025 predicted at age 16.2mo with a 300-draw cluster bootstrap
-   CI (resample whole terms). Data: origin/main polls.json. */
+   CI (resample whole terms). Data: origin/main polls.json.
+
+   Refit 2026-09-08: net PM approval and the preferred-PM lead were
+   features from the start; a feature-by-feature ablation on this harness
+   found they added nothing (LOOCV bands and calibrated scores never
+   worse — snapshot AUC 0.77→0.84, Brier 0.182→0.153, final band
+   85%→92% — without them), so the shipped model now ignores them.
+   pmNet/ppmLead are still computed below and emitted in --json as
+   context for the page, not as model inputs. */
 import { execSync } from "node:child_process";
 
 // CLI: --age=N.N picks the current-term snapshot age for the live call
@@ -61,7 +70,7 @@ function snapshot(y, age) {
     govAge: govAge(y), ageFrac: age / span,
   };
 }
-const FKEYS = ["pmNet", "ppmLead", "primSw", "tppSw", "govAge"];
+const FKEYS = ["primSw", "tppSw", "govAge"];
 const AGES = [6, 12, 15, 18, 24, 30];
 const snaps = [];
 const agesOf = (y) => [...new Set([...AGES, Math.round(spanOf(y) - 3)])];
@@ -172,7 +181,7 @@ console.log("\n=== Albanese-2025 live call (cluster bootstrap, 300 draws) ===");
   BOOT = { median: ps[150], lo: ps[30], hi: ps[270], shareOuster: ps.filter((p) => p >= 0.5).length / ps.length };
   console.log(`p(ousted | profile at ${SNAPSHOT_AGE}mo) = median ${ps[150].toFixed(2)} · 10–90% CI [${ps[30].toFixed(2)}, ${ps[270].toFixed(2)}]`);
   console.log(`share of bootstrap draws calling OUSTED (p≥0.5): ${(100 * BOOT.shareOuster).toFixed(0)}%`);
-  console.log(`current features: pmNet ${cur.pmNet?.toFixed(1)} · ppm ${cur.ppmLead?.toFixed(1)} · primSw ${cur.primSw?.toFixed(1)} · tppSw ${cur.tppSw?.toFixed(1)} · govAge ${cur.govAge} · ageFrac ${cur.ageFrac.toFixed(2)}`);
+  console.log(`context ratings (not modelled): pmNet ${cur.pmNet?.toFixed(1)} · ppm ${cur.ppmLead?.toFixed(1)} · model features: primSw ${cur.primSw?.toFixed(1)} · tppSw ${cur.tppSw?.toFixed(1)} · govAge ${cur.govAge} · ageFrac ${cur.ageFrac.toFixed(2)}`);
 }
 console.log("\nbaseline: majority 'always re-elected' per band = 9/13 = 69%");
 
