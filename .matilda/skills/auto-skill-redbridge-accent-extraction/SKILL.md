@@ -1,6 +1,6 @@
 ---
 name: redbridge-accent-extraction
-description: Extract AFR/RedBridge Group/Accent Research monthly federal polls into data/polls.json — project-page slugs lost their %2C comma prefix with the Aug 2026 wave (PAGE_SLUG_RE accepts both; a wave missing from candidates = slug-format suspect before sitemap lag), pre-flight "already recorded?" check, Wix Thunderbolt SPA PDF discovery via headless-Chrome CDP click on the file-upload-viewer widget (usrfiles.com URL), Table 2 live-text wave table via pdftotext (Figures 1–2 are images; tesseract installed if needed), canonical RedBridge row conventions (respondent-allocated TPP, Other→ind, ppm/approval/altTpp companion rows, tpp_flows shared with Roy Morgan since 2026-08-31 — ALP share of the 2025-flows pair), hand-entered waves can carry placeholder companion figures (check identical-to-previous nets + detail:null), AFR topic-page cross-check for sitemap-lag detection (AFR body paywall-trimmed; figures only from Accent PDF or manual benchmarked ingest).
+description: Extract AFR/RedBridge Group/Accent Research monthly federal polls into data/polls.json — project-page slugs lost their %2C comma prefix with the Aug 2026 wave (PAGE_SLUG_RE accepts both; a wave missing from candidates = slug-format suspect before sitemap lag), pre-flight "already recorded?" check, Wix Thunderbolt SPA PDF discovery via headless-Chrome CDP click on the file-upload-viewer widget (usrfiles.com URL), Table 2 live-text wave table via pdftotext (Figures 1–2 are images; tesseract installed if needed), canonical RedBridge row conventions (respondent-allocated TPP, Other→ind, ppm/approval/altTpp companion rows, tpp_flows shared with Roy Morgan since 2026-08-31 — ALP share of the 2025-flows pair — and tpp_split per-cohort respondent splits since 2026-09-07, Table 1, whose only consumer is flowDrift's measured row), hand-entered waves can carry placeholder companion figures (check identical-to-previous nets + detail:null), AFR topic-page cross-check for sitemap-lag detection (AFR body paywall-trimmed; figures only from Accent PDF or manual benchmarked ingest).
 source: auto-skill
 extracted_at: '2026-09-04T00:00:00.000Z'
 ---
@@ -83,7 +83,8 @@ Physical PDF page ≈ internal page + 3 (cover/TOC). Confirm with pdftotext, don
   nets and app/dis detail from them. OCR is only a fallback; **tesseract AND ocrmypdf are
   installed on this machine** (homebrew): `pdftoppm -png -r 110 -f A -l B <pdf> out` then
   `tesseract out-00A.png stdout`.
-- Table 1 (text) gives respondent-allocated preference flows by first preference.
+- Table 1 (text) gives respondent-allocated preference flows by first preference → stored
+  per wave as `tpp_split` on the canonical row (see conventions below).
 - Methodology page (internal p1) text: fieldwork dates, N, rim weighting, effective n, MoE,
   undecided-after-leaner share excluded, both TPP computation methods.
 
@@ -130,6 +131,21 @@ Physical PDF page ≈ internal page + 3 (cover/TOC). Confirm with pdftotext, don
 - The ALP-vs-One-Nation respondent-allocated 2PP (e.g. **52/48** for Aug 2026) goes to the
   `altTpp` companion row's `alpVsOnp_alp` (see companion-row conventions below), NOT to
   `tpp_alp`. Don't conflate the two ALP headline figures in an AFR release.
+- **`tpp_split` = Table 1's respondent-allocated per-cohort ALP split (added 2026-09-07)**:
+  `{grn, onp, oth}` = ALP's share (pc) of the respondent-allocated two-party-preferred
+  WITHIN each first-preference cohort (Greens / One Nation / Other+Ind voters), read
+  straight off report Table 1. RedBridge/Accent is the ONLY house that prints this.
+  Sole consumer is gen-data §7c flowDrift's "measured row": at ≥3 published waves
+  (`FLOW_PUB_MIN`) the house's entry in the implied-flows table stops being a ridge fit
+  and becomes the n-weighted term average of these printed splits (provenance marker
+  `m:1`; details in auspol-flow-drift-panel). Aug 2026 wave = 78/17/50 — RedBridge's
+  lowest-Greens-split wave. Absent, not zero: pre-Feb-2026 legacy reports print no
+  Table 1 (their caches record a `table1Error`; test.fixture expected split is Jul
+  2026's 87/16/61). The extractor owns the field end-to-end: `parseTable1` reads
+  Table 1's "Labor vs. Coalition" block, older caches are re-derived offline from
+  the cached pdftotext (no refetch), `--check` compares each bucket
+  (`tpp_split.<k>`), and a committed row lacking the field gets the free fill
+  (`status.splitFilled`) — same absent-not-zero, never-overwrite rules as releaseUrl.
 - "Other parties and candidates" bucket → `ind`, `oth: null` (same convention as Newspoll).
 - Companion rows for each wave: `ppm` `{date, firm, alb, opp, oppName, han, extra}` (three-way
   PPM; oppName Taylor in the current era), `approval` `{date, firm, alb, opp, oppName, han,

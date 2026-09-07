@@ -235,6 +235,10 @@ is documented behaviour, not a constants problem.
 - **Constants only back the validate.mjs inversion check** (series mean vs
   implied, ±3 slack — caught the real 291-row 2022-25 cycle inversion where
   the L/NP figure sat in tpp_alp).
+- The user-facing expression of "diagnostic only" shipped 2026-09-07 as the
+  **preference-flow drift panel**: per-poll residual (published 2PP − implied
+  2PP on the same primaries), election-anchored per-house baselines, pooled
+  cross-house, correcting no other figure. See `auspol-flow-drift-panel`.
 - External corroboration for coarse-only use — SA 2026 (Tally Room 64676,
   cited in the validate.mjs comment): the same party's preferences
   redistribute by CONTEST and SEAT (GRN ~80%→ALP in ALP–ON contests but

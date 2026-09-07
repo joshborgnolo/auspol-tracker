@@ -116,25 +116,48 @@ rules; tracks `.poll-table` conventions.
   · Newspoll 89.8/24.4/54.6 (8) · RedBridge-Accent 94.4/19.6/52.8 (14) ·
   Resolve 89.3/30.6/49.3 (10) · Roy Morgan 79.1/30.8/67.7 (44) ·
   YouGov 88.9/24.4/57.9 (17); SEs ±2.3–9.5; AEC row 88.2/25.5/54.6.
-- Note copy commitments: the shrunk-toward-the-election-row explanation,
+- Note copy commitments: the shrunk-toward-the-election-row explanation
+  (qualified "every FITTED cell" since the measured row shipped),
   ± = one standard error, the respondent-allocation caveat naming BOTH
-  Roy Morgan AND RedBridge/Accent ("their rows track a moving allocation
-  rather than fixed assumptions"), the six-waves minimum, and the
-  diagnostic-only closer. Both houses' headline 2PPs are
-  respondent-allocated (RedBridge's tpp_alp = Table 2's respondent
-  column; its 2025-flows variant rides tpp_flows like Morgan's — see
-  redbridge-accent-extraction). RedBridge also PRINTS its split each wave
-  (report Table 1, per first preference), so the copy adds "RedBridge
-  publishes that allocation beside each wave … its row here is the term
-  average, not any one wave's split". Sanity: RedBridge's published Table-1
-  means Feb–Aug 2026 = Greens 85.5 / ON 20.5 / Other 58.3 to Labor —
-  the fitted row (94.4±8.3 / 19.6±2.9 / 52.8±6.7) sits within ~1σ on all
-  three (g/t trade off through the co-moving primaries); the Aug-2026 wave
-  (78/17/50) is their LOWEST-Greens-flow wave, so fitted-term-constant vs
-  latest-published-wave looks like a bigger disagreement than it is. A
-  future option: for houses that publish the split, show the measured
-  mean instead of the fit (needs a per-poll published-split datapoint —
-  auspol-extra-datapoint-pipeline).
+  Roy Morgan AND RedBridge/Accent, the measured-row explanation below,
+  the waves minimums, and the diagnostic-only closer. Both houses'
+  headline 2PPs are respondent-allocated (RedBridge's tpp_alp = Table 2's
+  respondent column; its 2025-flows variant rides tpp_flows like
+  Morgan's — see redbridge-accent-extraction).
+
+## Measured row replaces the fit (shipped 2026-09-07, same session as tpp_split)
+
+A house that PRINTS its respondent allocation each wave gets no fit row:
+the measured term average of its own published splits answers the same
+question directly. Built before the fits loop so the loop can skip the
+firm; push-then-sort keeps the alphabetical order.
+
+- **Input**: polls.json `tpp_split: {grn, onp, oth}` (ALP shares,
+  RedBridge/Accent only for now, parsed from report Table 1 — see
+  redbridge-accent-extraction). `FLOW_PUB_MIN = 3` published waves.
+- **Row**: n-weighted sample-weighted mean per bucket (w = `sample`),
+  pure-count SE `FLOW_PUB_SD·√(Σw²)/Σw` with `FLOW_PUB_SD = 10` pts
+  (declared per-wave SD; ≈±4.1 at 6 equal waves — NOT a regression SE,
+  and deliberately wider than the empirical wave SD ~4.5 so true drift
+  reads inside it). Emitted `{firm, g,ge, o,oe, t,te, n, m:1}` — **m:1
+  is the provenance marker**: renderer shows `{f.n} published` in the
+  waves cell (header renamed "Waves fit" → "Waves"), note copy explains
+  "its row is no fit at all – it averages the house's own published
+  splits … marked “published”".
+- **RedBridge numbers at ship**: 85.5 ±4.1 / 20.5 ±4.1 / 58.3 ±4.1 (n=6
+  published). The PRE-measured fitted row was 94.4±8.3 / 19.6±2.9 /
+  52.8±6.7 — within ~1σ on all three even though they look far apart
+  (g/t trade off through the co-moving primaries); the Aug-2026 wave
+  (78/17/50) is RedBridge's LOWEST-Greens-flow wave, so
+  fitted-term-constant vs latest-published-wave looked like a bigger
+  disagreement than it ever was. Ignore the stale fit numbers in older
+  notes; the measured row is canonical.
+- **`flow-drift-check.mjs` replicates the block VERBATIM** (consts
+  included) — same update-in-the-same-commit rule as the ridge.
+- σ̂²w pool UNCHANGED: the fits loop skips measured firms but the σ̂²w
+  block above it does not — RedBridge's 14 waves still contribute to the
+  pooled wave-noise estimate (though on current data the difference is
+  immaterial, σ̂²w ≈ 0.78–0.88 either way).
 
 ## The pq-passthrough fix (general estimator gotcha — not flow-specific)
 
