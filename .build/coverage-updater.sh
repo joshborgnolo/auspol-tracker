@@ -46,6 +46,45 @@ log "$STATUS_LINE"
 # Worth knowing about, but it is not evidence of a missing poll, so it must not
 # cry wolf: log it and let a run of them show up in the log rather than as a
 # notification every day the network is flaky.
+# ---------------------------------------------------------------------------
+# Writer-pipeline liveness (added 2026-09-07, after the lock outage): the same
+# two checks the CI heartbeat job runs — that the writers lock is acquirable,
+# and that automation has committed within 60h. Runs BEFORE the inconclusive
+# and clean-exit gates so a stalled pipeline alarms on its own — the day
+# Wikipedia is unreachable is the day you most want to know the pipeline
+# itself is alive. Report-only like everything else here: this job never
+# writes the repo.
+LIVE_FAIL=""
+
+PROBE_OUT="$(bash .build/probe-writers-lock.sh 2>&1)"
+PROBE_RC=$?
+PROBE_STATUS="$(echo "$PROBE_OUT" | grep '^PROBE_STATUS' | tail -1)"
+if [ -z "$PROBE_STATUS" ]; then
+  log "note: lock probe inconclusive (exit $PROBE_RC, no PROBE_STATUS line); not an alarm"
+else
+  log "$PROBE_STATUS"
+  [ "$PROBE_RC" -eq 1 ] && LIVE_FAIL="writers lock refused with config-failure signature"
+fi
+
+HB_OUT="$(node .build/check-writer-heartbeat.mjs 2>&1)"
+HB_RC=$?
+HB_STATUS="$(echo "$HB_OUT" | grep '^HEARTBEAT_STATUS' | tail -1)"
+if [ -z "$HB_STATUS" ]; then
+  log "note: heartbeat inconclusive (exit $HB_RC, no HEARTBEAT_STATUS line); not an alarm"
+else
+  log "$HB_STATUS"
+  if [ "$HB_RC" -eq 3 ]; then
+    HB_DETAIL="$(echo "$HB_OUT" | grep '^STALLED' | tail -1)"
+    LIVE_FAIL="${LIVE_FAIL:+$LIVE_FAIL; }${HB_DETAIL:-automation heartbeat stalled}"
+  fi
+fi
+
+if [ -n "$LIVE_FAIL" ]; then
+  log "ALERT $LIVE_FAIL"
+  osascript -e "display notification \"${LIVE_FAIL//\"/\'}\" with title \"auspol tracker: writer pipeline silent\" sound name \"Basso\"" \
+    >> "$LOG" 2>&1 || log "note: osascript notification failed (no GUI session?)"
+fi
+
 if [ "$CODE" -eq 1 ]; then
   log "coverage check inconclusive; no alert raised"
   exit 0
@@ -70,3 +109,4 @@ if [ "${CI:-}" = "true" ]; then
   exit 1
 fi
 exit 0
+

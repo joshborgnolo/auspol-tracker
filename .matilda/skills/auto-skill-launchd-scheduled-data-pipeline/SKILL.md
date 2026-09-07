@@ -116,6 +116,18 @@ guard (`working tree dirty; ... refusing to write & commit`) has the same signat
 run a wrapper by hand on a tree carrying a sibling session's WIP, `git stash push -u`,
 run, `git stash pop`.
 
+**The outage's second output is a liveness heartbeat** (`.build/probe-writers-lock.sh` +
+`.build/check-writer-heartbeat.mjs`, wired into the `heartbeat` job in
+`.github/workflows/coverage-check.yml` and into `.build/coverage-updater.sh` before its
+exit gates): probe attempts the real `acquire_slot_lock` in a subshell so a config failure
+pages instead of logging exit-0 skips, and the heartbeat fails when no
+`github-actions[bot]` commit has landed on main for 60h (bot commits only, so human
+hand-commits cannot mask an automation stall; 60h not 48h because the measured worst
+normal-operation gap was 47.6h from one silently dropped daily job). Probe gotcha that
+bit once already: `git-push-main.sh` is documented "source AFTER the wrapper defines
+LOG and log()" — any new caller that defines LOG but not `log()` turns the refusal path
+into a false-green success, because the signature line dies as `log: command not found`.
+
 ## launchd plist essentials (learned the hard way)
 
 - **`EnvironmentVariables.PATH` is mandatory.** LaunchAgents get a minimal PATH; set

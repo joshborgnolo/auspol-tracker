@@ -12,6 +12,12 @@
 # Silence a skip-confirm agent has verified (pollsterRules.skippedSlots /
 # skippedMonths), or a house declared stopped, is classified clean before
 # either of the noisy classes is considered.
+#
+# The heartbeat job (2026-09-07) covers the failure the doctor cannot see:
+# automation that runs "green" while doing nothing — the gitignored-
+# .build/locks outage ran every writer as an instant no-op for two days. It
+# probes that the writers lock is actually acquirable and pages if no
+# automated commit has landed for 60h.
 
 name: coverage-check
 
@@ -166,6 +172,37 @@ jobs:
             --title "Repair: coverage pipeline (run ${GITHUB_RUN_ID})" \
             --body-file "$RUNNER_TEMP/pr-body.md"
           gh pr view --json url --jq .url | tee -a "$GITHUB_STEP_SUMMARY"
+
+  # Heartbeat — the "everything ran, nothing happened" detector the doctor
+  # cannot provide. Two checks, both born of the 2026-09-05..07 lock outage:
+  #   probe     attempts the real writers-lock acquisition in this pristine
+  #             checkout; refusal here is impossible for a healthy pipeline
+  #             (gitignored .build/locks parent meant mkdir ENODIR in EVERY
+  #             fresh clone — every writer slot exited 0 doing nothing).
+  #   commit    no github-actions[bot] commit on main in 60h ⇒ schedulers or
+  #             workflows are dead. NOT 48h: one dropped run of the daily
+  #             next-polls score already produced a 47.6h gap in normal
+  #             operation; 60h tolerates one fully missed day plus jitter.
+  # Goes red independently, like thinness; a failed job emails. Deliberately
+  # no repair agent — a dead-writers signal is not a worklist of waves, and
+  # the honest fix is usually the workflow or the lock, not data.
+  heartbeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+        with:
+          fetch-depth: 100 # the commit scan has to see past a few quiet days
+      - name: Pin Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        with:
+          node-version-file: .nvmrc
+
+      - name: Probe the writers lock
+        run: bash .build/probe-writers-lock.sh
+
+      - name: Automation commit heartbeat
+        run: node .build/check-writer-heartbeat.mjs
 
   # Separate job, not another step: a missed wave and a thin wave are different
   # failures and must be able to go red independently of each other.
