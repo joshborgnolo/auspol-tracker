@@ -108,6 +108,22 @@ export function validate(D) {
         for (const [k, v] of [["grn", ts[0]], ["onp", ts[1]], ["oth", ts[2]]])
           if (!(v >= 1 && v <= 99)) fail("split-range", `tpp_split.${k} = ${v}`);
     }
+    // 2b1b. tpp_split_on – the same Table-1 allocation for the Labor-vs-One-
+    //      Nation contest (Coalition/Greens/Other cohorts' shares to Labor).
+    //      Feb–Jun 2026 reports print the Coalition cohort as CLP/LNP/Nat +
+    //      Liberal; the extractor combines those two published sub-flows with
+    //      the wave's own printed sub-primaries, so the pair discipline is
+    //      the same and the combined figure must still land in 1–99.
+    if (p.tpp_split_on != null) {
+      if (p.pollster !== "RedBridge / Accent")
+        fail("spliton-pollster", `tpp_split_on on a row for ${p.pollster}`);
+      const tso = ["lnp", "grn", "oth"].map((k) => p.tpp_split_on[k]);
+      if (tso.some((v) => v == null))
+        fail("spliton-shape", `tpp_split_on missing a bucket: ${JSON.stringify(p.tpp_split_on)}`);
+      else
+        for (const [k, v] of [["lnp", tso[0]], ["grn", tso[1]], ["oth", tso[2]]])
+          if (!(v >= 1 && v <= 99)) fail("spliton-range", `tpp_split_on.${k} = ${v}`);
+    }
     // 2b2. tpp3 (Fox & Hedgehog's three-cornered preferred) carries all
     //      three slices or none, each in bounds, and the trio sums ~100 –
     //      the same sum discipline as the 2PP pair.

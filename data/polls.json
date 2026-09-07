@@ -2467,6 +2467,11 @@
         "onp": 23,
         "oth": 61
       },
+      "tpp_split_on": {
+        "lnp": 32,
+        "grn": 89,
+        "oth": 68
+      },
       "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf"
@@ -3054,6 +3059,11 @@
         "onp": 25,
         "oth": 56
       },
+      "tpp_split_on": {
+        "lnp": 31,
+        "grn": 92,
+        "oth": 66
+      },
       "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_61030f1f0f4d4ba49b6c3a10f141c992.pdf"
@@ -3456,6 +3466,11 @@
         "grn": 90,
         "onp": 21,
         "oth": 60
+      },
+      "tpp_split_on": {
+        "lnp": 32,
+        "grn": 92,
+        "oth": 67
       },
       "url": "https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll",
@@ -4050,6 +4065,11 @@
         "onp": 16,
         "oth": 61
       },
+      "tpp_split_on": {
+        "lnp": 44,
+        "grn": 91,
+        "oth": 61
+      },
       "url": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-july-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_e09c2025b9df424e98b0f2737e7ae4ca.pdf"
@@ -4309,6 +4329,11 @@
         "grn": 78,
         "onp": 17,
         "oth": 50
+      },
+      "tpp_split_on": {
+        "lnp": 32,
+        "grn": 90,
+        "oth": 59
       },
       "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
       "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",

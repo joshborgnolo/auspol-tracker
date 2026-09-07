@@ -46,6 +46,12 @@ new and worth looking at.
   report's Table 1 — is stored on the row as `tpp_split` (`grn`/`onp`/`oth`,
   ALP shares only), parsed from the PDF by the extractor along with the rest.
   Absent, not zero: reports from Jan 2026 and earlier print no Table 1.
+  Table 1's other printed contest — "Labor vs. One Nation" — lands the same
+  way on `tpp_split_on` (`lnp`/`grn`/`oth`, ALP shares only). Where a report
+  splits the Coalition cohort into CLP/LNP/Nat + Liberal rows (Feb–Jun 2026),
+  the extractor combines the two published sub-flows with the wave's own
+  printed Coalition sub-primaries; a wave whose report never prints those
+  sub-primaries (Jun 2026) omits the field.
 - **YouGov / News24** rows work the same way: `url` cites the media write-up;
   a wave YouGov self-released on yougov.com carries that release in
   `releaseUrl` (the extractor fills it when one surfaces). Absent, not zero:
