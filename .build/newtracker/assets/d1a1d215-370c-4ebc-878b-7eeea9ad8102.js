@@ -3466,6 +3466,182 @@ function FlowDriftPanel({ rangeId }) {
   );
 }
 
+// ====================================================================
+// FLOW DRIFT, Labor vs One Nation – the same diagnostic on the head-to-head
+// ====================================================================
+/* The panel above re-run on the ALP-v-ON totals the same publication
+   (gen-data §7d → D.flowDriftOn). Every piece of the machinery is §7c's
+   untouched – join, within-house rebasing, pooled monthly/nowcast, ridge
+   fits – and the two deliberate differences are the ones the data forces:
+   no election ever counts a Labor-v-One-Nation pairing, so the frozen
+   table is RedBridge/Accent's own term-long respondent average (the only
+   house that prints this pairing's per-cohort allocation), and every house
+   anchors on its own first waves, which the note states outright rather
+   than as a conditional clause. Nothing renders if §7d's data isn't in the
+   payload, so the whole panel is absent-not-empty like the other
+   diagnostics. */
+function FlowDriftOnPanel({ rangeId }) {
+  const { D, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
+  const narrow = useNarrow();
+  const [hidden, setHidden] = useState({});
+  const fd = D.flowDriftOn;
+  if (!fd || !fd.months || !fd.meta) return null;
+  const firms = fd.meta.houses || [];
+  const POOLED = "Pooled, all houses";
+
+  const xDomain = rangeDomain(rangeId);
+  const inWin = (d) => d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1];
+  const vals = [1, -1];
+  const ptsOf = (firm) => (fd.houses[firm] || []).map((d) => ({ x: D.mx(d.ym), y: d.v }));
+
+  const pooledPts = fd.months.map((m) => ({ x: m.x, y: m.v })).filter(inWin);
+  if (pooledPts.length < 2) return null;
+  const ciArea = fd.months
+    .filter((m) => m.ci95 != null)
+    .map((m) => ({ x: m.x, y0: m.v - m.ci95, y1: m.v + m.ci95 }))
+    .filter(inWin);
+
+  const houseRows = firms.map((f) => ({ f, color: houseLeanColour(f), pts: ptsOf(f), latest: null }));
+  for (const r of houseRows) {
+    const all = ptsOf(r.f);
+    r.latest = all.length ? all[all.length - 1].y : null;
+    if (!hidden[r.f]) r.pts.forEach((p) => vals.push(p.y));
+  }
+  pooledPts.forEach((p) => vals.push(p.y));
+  if (!hidden[POOLED]) ciArea.forEach((a) => vals.push(a.y0, a.y1));
+
+  const series = [];
+  if (pooledPts.length > 1) {
+    series.push({ id: POOLED, label: POOLED, color: "var(--ink)", width: 3,
+                  opacity: hidden[POOLED] ? 0 : 1, points: pooledPts });
+  }
+  for (const r of houseRows) {
+    if (r.pts.length > 1) {
+      series.push({ id: r.f, label: r.f, color: r.color, width: 1.5,
+                    opacity: hidden[r.f] ? 0 : 0.4, points: r.pts });
+    }
+  }
+  if (!series.length) return null;
+
+  const { domain, ticks } = fitDomain(vals, Math.max(...vals.map(Math.abs)) > 4 ? 2 : 1, 0);
+  const spine = D.MONTHS.map((ym) => ({ x: D.mx(ym), y: 0 })).filter(inWin);
+  const spineYm = D.MONTHS.filter((ym) => inWin({ x: D.mx(ym) }));
+  const sgn = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1);
+
+  return (
+    <section className="ap-flow" id="flow-drift-on">
+      <div className="ap-var-head">
+        <div>
+          <h3 className="ap-var-title">Preference-flow drift · Labor vs One Nation</h3>
+          <p className="card-sub">
+            The same read on the Labor–One Nation head-to-heads: how far published shares sit
+            from what the same polls’ primaries would read as under a
+            {" "}<button type="button" className="hi-term"
+              onClick={() => window.AP.openTerm && window.AP.openTerm("preference-flows", "Preference flows")}>preference</button>{" "}
+            table frozen at RedBridge/Accent’s term-long respondent average – the only
+            election-anchored pair being the classic 2PP, this pairing’s table borrows the one
+            house that prints the pairing’s own allocation.
+          </p>
+        </div>
+        <div className="legend">
+          <button type="button"
+                  className={"legend-chip" + (hidden[POOLED] ? " off" : "")}
+                  aria-pressed={!hidden[POOLED]}
+                  title={"Pooled across " + firms.length + " houses – the 21-day nowcast of the drift, with its 95% interval"}
+                  onClick={() => setHidden((h) => ({ ...h, [POOLED]: !h[POOLED] }))}>
+            <span className="legend-swatch" style={{ background: "var(--ink)" }}></span>
+            <span className="legend-name">Pooled, {firms.length} houses</span>
+            <span className="legend-val">{fd.now && fd.now.ci95 != null ? sgn(fd.now.v) + " ± " + fd.now.ci95.toFixed(1) : "–"}</span>
+          </button>
+          {houseRows.map((r) => (
+            <button key={r.f} type="button"
+                    className={"legend-chip" + (hidden[r.f] ? " off" : "")}
+                    aria-pressed={!hidden[r.f]}
+                    title={r.f + " – drift against its own first-waves baseline"}
+                    onClick={() => setHidden((h) => ({ ...h, [r.f]: !h[r.f] }))}>
+              <span className="legend-swatch" style={{ background: r.color }}></span>
+              <span className="legend-name">{r.f}</span>
+              <span className="legend-val">{r.latest == null ? "–" : sgn(r.latest) + "pp"}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <TrendChart
+        key={"flowon-" + rangeId}
+        height={narrow ? 500 : 300} xDomain={xDomain} yDomain={domain} yTicks={ticks}
+        unit="pp" axisFont={narrow ? 28 : 15} pad={{ l: 54, r: 20, t: 18, b: 40 }}
+        xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        bands={[
+          { y0: 0, y1: domain[1], className: "flow-band-alp" },
+          { y0: domain[0], y1: 0, className: "flow-band-on" },
+        ]}
+        areas={hidden[POOLED] ? undefined : [{ id: "ci", color: "var(--ink-faint)", opacity: 0.18, points: ciArea }]}
+        refLines={[{ y: 0, color: "var(--ink-3)" }]}
+        series={series} spine={spine}
+        tooltipTitle={(i) => monthLabelFull(spineYm[i])}
+        ariaLabel="Preference-flow drift on Labor-v-One Nation head-to-heads over time – how far published head-to-head shares sit from frozen preference flows, above zero friendlier to Labor"
+        fmt={(v) => (v === 0 ? "" : sgn(v))}
+      />
+
+      {fd.flows && fd.flows.length > 0 && fd.meta.pub && (
+        <div className="flow-tab-wrap">
+          <table className="flow-tab">
+            <caption className="flow-tab-cap">Implied preference flows to Labor, by house · Labor vs One Nation</caption>
+            <thead>
+              <tr><th className="flow-tab-house">House</th><th>Coalition</th><th>Greens</th><th>Other</th><th>Waves</th></tr>
+            </thead>
+            <tbody>
+              <tr className="flow-tab-aec">
+                <th scope="row" className="flow-tab-house">RedBridge published splits (term mean)</th>
+                <td>{fd.meta.pub.l.toFixed(1)}%</td><td>{fd.meta.pub.g.toFixed(1)}%</td><td>{fd.meta.pub.t.toFixed(1)}%</td><td>{fd.meta.pubN}</td>
+              </tr>
+              {fd.flows.map((f) => (
+                <tr key={f.firm}>
+                  <th scope="row" className="flow-tab-house">{f.firm}</th>
+                  <td>{f.l.toFixed(1)}%<span className="flow-tab-se"> ±{f.le.toFixed(1)}</span></td>
+                  <td>{f.g.toFixed(1)}%<span className="flow-tab-se"> ±{f.ge.toFixed(1)}</span></td>
+                  <td>{f.t.toFixed(1)}%<span className="flow-tab-se"> ±{f.te.toFixed(1)}</span></td>
+                  <td>{f.n}{f.m ? <span className="flow-tab-se"> published</span> : null}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          <p className="table-hint ap-var-note flow-tab-note">
+            A house row reads as “the share of that cohort’s preferences this house’s published
+            Labor–One Nation figure behaves as if it handed to Labor”, fit from the house’s own
+            head-to-head and primary swings with its fixed method offset soaked up by an
+            intercept. No election ever totals a head-to-head like this one, so the table the
+            cells shrink toward is the term-long average of the only published allocation of the
+            pairing – RedBridge/Accent’s respondent-allocated splits – which makes RedBridge’s
+            own row coincide with it by construction (that row is no fit at all but the average
+            of the house’s own published splits, marked “published” in its waves cell, and its
+            ± is the counting-error scale of that average). Every fitted cell departs from the
+            reference row only as far as that house’s own waves demonstrate – each poll counts
+            once, and the ± figure is one standard error from the same fit. Roy Morgan’s
+            head-to-head is respondent-allocated, so a fitted constant only tracks its moving
+            allocation at best. A house needs at least six waves with a published head-to-head
+            to appear, and like everything in this panel the rows are a diagnostic, not a
+            measurement.
+          </p>
+        </div>
+      )}
+
+      <p className="table-hint ap-var-note">
+        Above zero – the red ground – the published head-to-heads are running friendlier to
+        Labor than the frozen table reads their own primaries; below it, friendlier to One
+        Nation. Each house’s gap against the table is centred on its own first waves – the
+        classic pairing on the panel above can be read at the election, but no count of this
+        pairing exists, so the chart speaks only about drift since each house began. The pooled
+        line and its band are the cross-house aggregate with the same sample weighting as the
+        aggregates above. A wave that publishes no head-to-head carries no gap, and the whole
+        panel is a diagnostic read on published figures: it corrects no other number on this
+        page.
+      </p>
+    </section>
+  );
+}
+
 function AllPollsView({ focus, onBack, backLabel }) {
   const { D } = window.AP;
   const { ShareBar, NetVal, tppContests, tppFlag, ppmContests, ppmContestSegs, ppmFlag } = window;
@@ -4219,6 +4395,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
       {/* flow drift is a 2PP-only diagnostic — it publishes on the canonical
           pair alone, so it mounts on the 2PP facet right after the lean panel */}
       {facet === "twopp" && <FlowDriftPanel rangeId={range} />}
+      {facet === "twopp" && <FlowDriftOnPanel rangeId={range} />}
     </div>
   );
 }
