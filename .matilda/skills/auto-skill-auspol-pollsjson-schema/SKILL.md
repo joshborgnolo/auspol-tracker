@@ -30,6 +30,13 @@ June **2025** for a **2026-06-25** wave.
   sample, sampleEff, alp, lnp, grn, onp, ind, oth, tpp_alp, tpp_lnp, url,
   releaseUrl, assimilated. NOTE: `tpp_alp/tpp_lnp` may be null on a real row
   (Newspoll 2026-06-25 filed primaries only).
+- Optional measured-split fields (RedBridge/Accent only, absent-not-zero):
+  `tpp_split: {grn, onp, oth}` = the house-printed respondent-allocated
+  ALP share of each cohort's preferences on the classic pairing, and
+  `tpp_split_on: {lnp, grn, oth}` = the same for its Labor-vs-One-Nation
+  head-to-head (parsed from report Table 1's "Labor vs. One Nation"
+  sub-block; 5 waves carry it). Never synthesise or round-trip-fill absent
+  waves — gen-data §7d's FLOW_ON term mean reads only the published set.
 - `direction` → also **`pollster`** (gen-data.mjs ~l.824 `d.pollster`).
 - `ppm`, `approval`, `ppmHeadToHead` → **`firm`**, shape
   `{date, firm, alb, opp, oppName, han, …}`; approval detail nests

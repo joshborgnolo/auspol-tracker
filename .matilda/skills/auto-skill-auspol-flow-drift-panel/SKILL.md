@@ -1,6 +1,6 @@
 ---
 name: auspol-flow-drift-panel
-description: "auspol-tracker — the Preference-flow drift panel end-to-end (shipped 2026-09-07): gen-data §7c flowDrift block (~:1224-1310) = per-poll residual (share2pp published 2PP − flows.mjs implied 2PP on the same primaries), election-anchored per-house 180-day baselines, anomalies pooled through monthWithSe/nowcastAdj with NULL house effects; FlowDriftPanel in the d1a1d215 asset mounted on the All-polls 2PP facet after HouseLeanPanel; .ap-flow/.flow-band-* CSS reuses --lean-*-bg vars; .build/flow-drift-check.mjs is the committed verbatim-replica verification script. Includes the pq-passthrough fix to nowcastAdj/monthWithSe (difference series need per-row pq — the share-scale fallback produces p(1−p)<0 and ci95 nulls to NaN→null). Diagnostic-only by design: corrects no other figure."
+description: "auspol-tracker — the Preference-flow drift panels end-to-end (shipped 2026-09-07): gen-data §7c flowDrift block (~:1224-1310) = per-poll residual (share2pp published 2PP − flows.mjs implied 2PP on the same primaries), election-anchored per-house 180-day baselines, anomalies pooled through monthWithSe/nowcastAdj with NULL house effects; §7d flowDriftOn reruns the same machinery on the ALP-v-ON head-to-heads using RedBridge's published splits as the frozen table (no election counts the pairing; every house anchors on its own first waves); FlowDriftPanel + FlowDriftOnPanel in the d1a1d215 asset mounted on the All-polls 2PP facet after HouseLeanPanel; .ap-flow/.flow-band-* CSS reuses --lean-*-bg vars; .build/flow-drift-check.mjs is the committed verbatim-replica verification script. Includes the pq-passthrough fix to nowcastAdj/monthWithSe (difference series need per-row pq — the share-scale fallback produces p(1−p)<0 and ci95 nulls to NaN→null). Diagnostic-only by design: corrects no other figure."
 source: auto-skill
 extracted_at: '2026-09-07T00:00:00.000Z'
 ---
@@ -20,23 +20,77 @@ is viable ONLY as a diagnostic — this panel corrects no other figure.
    ~:2256, added to the `D` export list at ~:2340, console sanity lines at
    ~:2379-2380. Constants: `FLOW_BASE_DAYS = 180`, `FLOW_BASE_MIN = 3`.
 2. **`assets/d1a1d215-….js` `FlowDriftPanel({rangeId})`** (~145 lines, after
-   HouseLeanPanel's closing `}`, before AllPollsView) + mount line
-   `{facet === "twopp" && <FlowDriftPanel rangeId={range} />}` after the
-   HouseLeanPanel mount.
+   HouseLeanPanel's closing `}`) + **`FlowDriftOnPanel({rangeId})`** (the §7d
+   twin, after FlowDriftPanel's closing `}`, before AllPollsView) + mount
+   lines `{facet === "twopp" && <FlowDriftPanel …/>}` /
+   `… <FlowDriftOnPanel rangeId={range} />}` after the HouseLeanPanel mount.
+   FlowDriftOnPanel returns null when `D.flowDriftOn` is null (input set too
+   small — see §7d); nothing renders, absent-not-empty.
 3. **`template.html`** — `.ap-flow` frame (mirrors `.ap-lean`),
    `.flow-band-alp`/`.flow-band-lnp` fills (reuse `--lean-alp-bg`/
-   `--lean-lnp-bg`), `.ap-flow` added to the
-   `.ap-var, .ap-lean, .ap-flow, .acc-card { scroll-margin-top: 72px }` rule.
+   `--lean-lnp-bg`) plus `.flow-band-on` (reuses `--lean-onp-bg`; the ON
+   panel's below-zero ground) folded into the shared transition selector,
+   `.ap-flow` added to the
+   `.ap-var, .ap-lean, .ap-flow, .acc-card { scroll-margin-top: 72px }`
+   rule.
 4. **`.build/flow-drift-check.mjs`** — independent re-derivation from
    data/polls.json compared against the emitted payload; exit ≠ 0 on
-   disagreement. Verbatim estimator replica per
-   `auspol-estimator-arms-race`'s convention (`est-console-backtest.mjs`):
-   COPIED, not imported — any intentional estimator change must update the
-   replica in the same commit.
+   disagreement. Verifies BOTH panels (§7c block then §7d block; the §7d
+   regex accepts `(\{…\}|null)` and FAILs on a null emission). Verbatim
+   estimator replica per `auspol-estimator-arms-race`'s convention
+   (`est-console-backtest.mjs`): COPIED, not imported — any intentional
+   estimator change must update the replica in the same commit. The §7d
+   replica needs `ALT_BY` (altTpp keyed date|pollster) and the shared
+   `POLL_BY_KEY` map built before it; the published-alt-TPP curve builder
+   must run before the §7d block so the join has rows to read.
 5. **`flows.mjs` `FLOW_TABLE`** — display-copy string
    ("the AEC's 2025-election flow table (TPP cut)"), interpolated by the
    panel's note so a future re-anchor can't leave the page describing
    yesterday's table. Also feeds `flowDrift.meta.table`.
+
+## §7d — the Labor-v-One Nation twin panel (shipped 2026-09-07)
+
+The same machinery re-run on the ALP-v-ON totals the same publication
+prints (`altTpp.alpVsOnp_alp`, already a 0–100 share — NOT a fraction to
+rebase). Every estimator piece is §7c's untouched — join, within-house
+rebasing, monthWithSe/nowcastAdj pooling, wave-equal ridge with pooled
+σ̂²w — cloned as a parallel block right after §7c with the constants
+prefixed `FLOW_ON_*`. The differences are the two the data forces:
+
+- **The frozen table is RedBridge's own printed splits** (`polls.json
+  tpp_split_on: {lnp, grn, oth}`, parsed from report Table 1's "Labor vs.
+  One Nation" sub-block — see redbridge-accent-extraction): `FLOW_ON` =
+  raw-sample-weighted term mean as FRACTIONS (~5 published waves;
+  {lnp 34.2, grn 90.8, oth 64.2} as percents). No election ever counts a
+  Labor-v-ON pairing, so there is no election anchor — `impliedOn(p) =
+  p.alp + p.lnp·FLOW_ON.lnp + p.grn·FLOW_ON.grn + (ind+oth)·FLOW_ON.oth`.
+  Note the ON panel's design needs an LNP column (classic pairing folds
+  LNP into the two-party share; this pairing doesn't).
+- **Every house anchors on its own first-waves residual mean**
+  (`FLOW_ON_BASE_MIN = 3`; `meta.baseFrom[firm]` = that wave date for all
+  firms, `meta.anchor = null`). The drift curve's IDENTIFICATION is
+  unaffected — each house's reading is centred on its own start
+  regardless — only the implied-flows table rows are relative-to-
+  RedBridge instead of absolute. gen-data prints per-house baseFrom
+  lines; the panel copy states the first-waves anchoring outright (no
+  conditional clause, since no firm can be election-anchored).
+- RedBridge's measured row is n-weighted mean of its own published
+  splits (`FLOW_ON_PUB_MIN = 3`, `FLOW_ON_PUB_SD = 10` pure-count SE) —
+  same m:1 provenance convention as §7c's measured row; the fits loop
+  skips measured firms; the σ̂²w pool does not (≈1.00 pt², df 27 on
+  current data — printed as ≈1, not the `=== 1` fallback; the two look
+  identical in the sanity line).
+- **`flowDriftOn = null` when `FLOW_ON` can't form** (fewer than
+  `FLOW_ON_PUB_MIN` published split waves) — the panel context then
+  continues from `null` and the renderer returns null; absent-not-empty
+  like every other optional series. flow-drift-check.mjs FAILs if the
+  emitted `const flowDriftOn =` regex matches `null` and prints
+  "skipped" when the input set is too small."
+- Sanity anchors at ship (Sep 2026): 5 houses, 46 anomalies, now
+  −0.1 ± 1.6 (n=5, nEff≈4), last month 2026-08 −0.1 ± 1.2 (k=8); fits
+  YouGov l36.3/g82.2/t67.7 (n=16) and Roy Morgan l28.5/g91.8/t63.9
+  (n=16), SEs ±4.5–9.8; measured RedBridge row 34.2/90.8/64.2 ±4.5
+  (n=5 published). Sanity echo: `FLOW_ON: 5 published split waves …`.
 
 ## §7c construction (the arguments that make it defensible)
 

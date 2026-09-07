@@ -1,6 +1,6 @@
 ---
 name: redbridge-accent-extraction
-description: Extract AFR/RedBridge Group/Accent Research monthly federal polls into data/polls.json — project-page slugs lost their %2C comma prefix with the Aug 2026 wave (PAGE_SLUG_RE accepts both; a wave missing from candidates = slug-format suspect before sitemap lag), pre-flight "already recorded?" check, Wix Thunderbolt SPA PDF discovery via headless-Chrome CDP click on the file-upload-viewer widget (usrfiles.com URL), Table 2 live-text wave table via pdftotext (Figures 1–2 are images; tesseract installed if needed), canonical RedBridge row conventions (respondent-allocated TPP, Other→ind, ppm/approval/altTpp companion rows, tpp_flows shared with Roy Morgan since 2026-08-31 — ALP share of the 2025-flows pair — and tpp_split per-cohort respondent splits since 2026-09-07, Table 1, whose only consumer is flowDrift's measured row), hand-entered waves can carry placeholder companion figures (check identical-to-previous nets + detail:null), AFR topic-page cross-check for sitemap-lag detection (AFR body paywall-trimmed; figures only from Accent PDF or manual benchmarked ingest).
+description: Extract AFR/RedBridge Group/Accent Research monthly federal polls into data/polls.json — project-page slugs lost their %2C comma prefix with the Aug 2026 wave (PAGE_SLUG_RE accepts both; a wave missing from candidates = slug-format suspect before sitemap lag), pre-flight "already recorded?" check, Wix Thunderbolt SPA PDF discovery via headless-Chrome CDP click on the file-upload-viewer widget (usrfiles.com URL), Table 2 live-text wave table via pdftotext (Figures 1–2 are images; tesseract installed if needed), canonical RedBridge row conventions (respondent-allocated TPP, Other→ind, ppm/approval/altTpp companion rows, tpp_flows shared with Roy Morgan since 2026-08-31 — ALP share of the 2025-flows pair — and tpp_split + tpp_split_on per-cohort respondent splits since 2026-09-07, Table 1's classic and Labor-v-One-Nation blocks, whose only consumers are flowDrift's and §7d flowDriftOn's measured rows), hand-entered waves can carry placeholder companion figures (check identical-to-previous nets + detail:null), AFR topic-page cross-check for sitemap-lag detection (AFR body paywall-trimmed; figures only from Accent PDF or manual benchmarked ingest).
 source: auto-skill
 extracted_at: '2026-09-04T00:00:00.000Z'
 ---
@@ -146,6 +146,25 @@ Physical PDF page ≈ internal page + 3 (cover/TOC). Confirm with pdftotext, don
   the cached pdftotext (no refetch), `--check` compares each bucket
   (`tpp_split.<k>`), and a committed row lacking the field gets the free fill
   (`status.splitFilled`) — same absent-not-zero, never-overwrite rules as releaseUrl.
+- **`tpp_split_on` = Table 1's "Labor vs. One Nation" sub-block (added 2026-09-07)**:
+  `{lnp, grn, oth}` = ALP's share of each cohort's preferences re-allocated against ONE
+  NATION rather than the Coalition (note the LNP column — the ON pairing needs one where
+  the classic pairing folded Coalition into the two-party total). Parses three eras of
+  Table 1: the 3-row block (raw LNP/GRN/OTH cohort cells, Feb–May 2026), the 4-row
+  block with the Coalition split into sub-rows (Jul–Aug 2026, cells derived from
+  weighted re-combination), and absent (Dec 2025 / Jan 2026 print no ON block at all
+  — those caches record `table1OnError`). Guard: implied `alp + lnp·lnp + grn·grn +
+  (ind+oth)·oth` must sit within 1pt of Table 2's printed ALP-vs-ON respondent-allocated
+  total for the same wave (deltas on the five derived waves ran −0.60…+0.88). Jun 2026
+  is the only 8-cell-era wave EXCLUDED — its Table 1 prints no sub-primaries to derive
+  the cohort rows from (records a table1OnError; the wave's own `altTpp.alpVsOnp_alp`
+  is parsed from Table 2 as normal and still joins §7d's residuals). Sole consumer is
+  gen-data §7d `FLOW_ON`: at ≥3 published waves (`FLOW_ON_PUB_MIN`) the frozen anchor
+  table is the raw-sample-weighted term mean of these printed splits, and RedBridge's
+  own implied-flows row becomes measured (`m:1`). `--check` compares
+  `tpp_split_on.<k>` per bucket; `status.splitOnFilled` fills committed rows lacking
+  the field. Fixture in test-redbridge.mjs asserts Jul 2026 = {lnp:44, grn:91, oth:61}
+  with implied +0.6 of printed.
 - "Other parties and candidates" bucket → `ind`, `oth: null` (same convention as Newspoll).
 - Companion rows for each wave: `ppm` `{date, firm, alb, opp, oppName, han, extra}` (three-way
   PPM; oppName Taylor in the current era), `approval` `{date, firm, alb, opp, oppName, han,
