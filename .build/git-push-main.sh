@@ -113,6 +113,9 @@ acquire_slot_lock() {
     fi
     rm -rf "$SLOT_LOCK_DIR"
   fi
+  # The locks parent is gitignored, so it never exists in a fresh checkout —
+  # create it explicitly or the atomic mkdir below fails at every slot.
+  mkdir -p "$(dirname "$SLOT_LOCK_DIR")" 2>/dev/null || true
   if ! mkdir "$SLOT_LOCK_DIR" 2>/dev/null; then
     log "writers lock lost to a concurrent wrapper; skipping slot"
     exit 0
