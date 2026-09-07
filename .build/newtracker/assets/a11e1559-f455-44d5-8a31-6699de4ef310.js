@@ -2614,7 +2614,11 @@ function NextPollsPanel() {
                         carries the clock it is read on, since AEST and AEDT
                         are an hour apart and "8 pm" alone names both */}
                     {hour && <span className="np-time">, {zoned(hour, winOpen ? edge : r.release)}</span>}
-                    <span className="np-pm">{winOpen ? ` (or ${fmt(r.release)})` : pmLabel(r)}</span></>}
+                    {/* A zero-half-width window's far edge IS the slot, so the
+                        "or" would rename the day it qualifies - Roy Morgan's
+                        unbroken weekly run read "Mon 7 Sep (or Mon 7 Sep)".
+                        No alternative exists to name, so name none. */}
+                    <span className="np-pm">{winOpen ? (edge !== r.release ? ` (or ${fmt(r.release)})` : "") : pmLabel(r)}</span></>}
             </span>
             {/* the column answers "when", so a window answers it too – with the
                 day it opens, which is the first date the wave is possible. An

@@ -12687,7 +12687,7 @@ function NextPollsPanel() {
       className: "np-time"
     }, ", ", zoned(hour, winOpen ? edge : r.release)), /*#__PURE__*/React.createElement("span", {
       className: "np-pm"
-    }, winOpen ? ` (or ${fmt(r.release)})` : pmLabel(r)))), /*#__PURE__*/React.createElement("span", {
+    }, winOpen ? edge !== r.release ? ` (or ${fmt(r.release)})` : "" : pmLabel(r)))), /*#__PURE__*/React.createElement("span", {
       className: "np-when" + (r.missed ? " np-missed" : "")
     }, r.loose
     /* A window reads as open right up to its far edge; past it
