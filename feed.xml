@@ -6,7 +6,14 @@
     <atom:link href="https://auspoltracker.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
     <language>en-AU</language>
-    <lastBuildDate>Mon, 31 Aug 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 06 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Roy Morgan, 31 Aug – 6 Sep 2026 – 2PP ALP 53 – L/NP 47</title>
+      <link>https://www.roymorgan.com/findings/10333-federal-voting-intention-september-7-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-09-06|Roy Morgan</guid>
+      <pubDate>Sun, 06 Sep 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 27, L/NP 21.5, GRN 14.5, ON 26.5, Ind/Oth 10.5. Two-party preferred: ALP 53 – L/NP 47. Undecided 6.5%. Sample 1,541. Fieldwork 31 Aug – 6 Sep 2026.</description>
+    </item>
     <item>
       <title>Essential, 26–31 Aug 2026 – 2PP ALP 45 – L/NP 50</title>
       <link>https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb</link>
@@ -279,13 +286,6 @@
       <guid isPermaLink="false">auspol-tracker:2026-06-02|YouGov</guid>
       <pubDate>Tue, 02 Jun 2026 12:00:00 GMT</pubDate>
       <description>Primary vote: ALP 26, L/NP 20, GRN 13, ON 29, Ind/Oth 12. Two-party preferred: ALP 51.5 – L/NP 48.5. Sample 1,471. Fieldwork 26 May – 2 Jun 2026.</description>
-    </item>
-    <item>
-      <title>Roy Morgan, 25–31 May 2026 – 2PP ALP 55.5 – L/NP 44.5</title>
-      <link>https://www.roymorgan.com/findings/10242-federal-voting-intention-june-1-2026</link>
-      <guid isPermaLink="false">auspol-tracker:2026-05-31|Roy Morgan</guid>
-      <pubDate>Sun, 31 May 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 27, L/NP 20, GRN 13.5, ON 27, Ind/Oth 12.5. Two-party preferred: ALP 55.5 – L/NP 44.5. Sample 1,542. Fieldwork 25–31 May 2026.</description>
     </item>
   </channel>
 </rss>

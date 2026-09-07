@@ -1946,7 +1946,11 @@
       "oth": null,
       "tpp_alp": 53,
       "tpp_lnp": 47,
-      "tpp3": { "alp": 46, "lnp": 29, "onp": 25 },
+      "tpp3": {
+        "alp": 46,
+        "lnp": 29,
+        "onp": 25
+      },
       "url": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fjoyce-hits-out-at-arrogant-critics-amid-one-nation-polling-surge%2Fnews-story%2F36486978c8ed24f4cb365befa4e03f22",
       "releaseUrl": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-national-voter-sentiment-survey",
       "methodUrl": "https://drive.google.com/file/d/14VSwAKi4y0xqvgnHYtm0IP_92OnbNSk9/view"
@@ -2334,7 +2338,11 @@
       "oth": null,
       "tpp_alp": 51,
       "tpp_lnp": 49,
-      "tpp3": { "alp": 44, "lnp": 27, "onp": 29 },
+      "tpp3": {
+        "alp": 44,
+        "lnp": 27,
+        "onp": 29
+      },
       "url": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fpoll-reveals-majority-of-australians-think-labor-needs-to-give-parents-more-childcare-choice%2Fnews-story%2F55f6d28f2a7fe8d52464e9d32b82f75f",
       "releaseUrl": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-february-2026-national-voter-sentiment-survey",
       "methodUrl": "https://tinyurl.com/Feb26FEDPollFoxHedgehogAPC-1"
@@ -2732,7 +2740,11 @@
       "oth": null,
       "tpp_alp": 51,
       "tpp_lnp": 49,
-      "tpp3": { "alp": 46, "lnp": 27, "onp": 27 },
+      "tpp3": {
+        "alp": 46,
+        "lnp": 27,
+        "onp": 27
+      },
       "url": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fsupport-for-one-nation-stalls-as-albos-approval-drops-again%2Fnews-story%2Ff6a40ee078fb98772190ef8b8a8188d6",
       "releaseUrl": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-march-2026-national-voter-sentiment-survey",
       "methodUrl": "https://tinyurl.com/APC-LMS-Mar26National-FH"
@@ -3440,7 +3452,11 @@
       "oth": null,
       "tpp_alp": 49,
       "tpp_lnp": 51,
-      "tpp3": { "alp": 43, "lnp": 27, "onp": 30 },
+      "tpp3": {
+        "alp": 43,
+        "lnp": 27,
+        "onp": 30
+      },
       "url": "https://www.dailytelegraph.com.au/news%2Fnsw%2Fpoll-reveals-australians-want-to-give-someone-else-a-go%2Fnews-story%2F822912d3d85418363515e3ea0e062986",
       "releaseUrl": "https://www.foxhedgehog.com.au/news-den/the-daily-telegraph-may-2026-national-voter-sentiment-survey",
       "methodUrl": "https://tinyurl.com/May2026-Methodology-FH"
@@ -4380,6 +4396,29 @@
       "url": "https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb",
       "releaseUrl": "https://essentialreport.com.au/reports/01-september-2026",
       "assimilated": true
+    },
+    {
+      "date": "2026-09-06",
+      "published": "2026-09-07T16:30",
+      "dateStart": "2026-08-31",
+      "pollster": "Roy Morgan",
+      "client": "—",
+      "sample": 1541,
+      "undecided": 6.5,
+      "alp": 27,
+      "lnp": 21.5,
+      "grn": 14.5,
+      "onp": 26.5,
+      "ind": 10.5,
+      "oth": null,
+      "tpp_alp": 53,
+      "tpp_lnp": 47,
+      "tpp_flows": 52.5,
+      "lnpSplit": {
+        "Lib": 17,
+        "Nat": 4.5
+      },
+      "url": "https://www.roymorgan.com/findings/10333-federal-voting-intention-september-7-2026"
     }
   ],
   "ppm": [
@@ -6985,6 +7024,12 @@
       "date": "2026-08-30",
       "firm": "Roy Morgan",
       "alpVsOnp_alp": 55.5,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-09-06",
+      "firm": "Roy Morgan",
+      "alpVsOnp_alp": 53.5,
       "lnpVsOnp_lnp": null
     }
   ],
