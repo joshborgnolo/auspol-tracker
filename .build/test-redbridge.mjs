@@ -44,6 +44,16 @@ assert.equal(w.tppResp, 48, "respondent-allocated TPP");
 assert.equal(w.tppVsOn, 53, "ALP-vs-One-Nation TPP");
 // Table 1 published respondent-allocated preference split (ALP shares, %)
 assert.deepEqual(w.tppSplit, { grn: 87, onp: 16, oth: 61 });
+// Table 1's "Labor vs. One Nation" sub-block (ALP shares, %) — and the
+// implied-ALP-vs-ON total rebuilt from these splits + the wave's primaries
+// must land within ~0.6pt of Table 2's printed figure
+assert.deepEqual(w.tppSplitOn, { lnp: 44, grn: 91, oth: 61 });
+{
+  const s = w.tppSplitOn;
+  const implied = w.alp + (w.lnp * s.lnp + w.grn * s.grn + w.ind * s.oth) / 100;
+  assert.ok(Math.abs(implied - w.tppVsOn) <= 0.6,
+    `implied ALP-vs-ON ${implied.toFixed(2)} vs printed ${w.tppVsOn}`);
+}
 
 // PPM (Albanese 32, Taylor 15, Hanson 24)
 assert.deepEqual(w.ppm, { alb: 32, opp: 15, han: 24 });

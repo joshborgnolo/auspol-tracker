@@ -48,5 +48,10 @@
     "grn": 78,
     "onp": 17,
     "oth": 50
+  },
+  "tppSplitOn": {
+    "lnp": 32,
+    "grn": 90,
+    "oth": 59
   }
 }

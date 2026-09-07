@@ -452,6 +452,69 @@ function parseTable1(txt) {
   return { tppSplit: { grn: grn.alp, onp: onp.alp, oth: oth.alp } };
 }
 
+// The Coalition's sub-primaries (Liberal vs CLP/LNP/Nat), needed to combine
+// the 4-row "Labor vs. One Nation" block's two Coalition rows into one flow.
+// Two printed sources: the by-wave Table 2's 11-cell wave row (cells 1–4 =
+// Liberal, LibNat, National, CLP), or the demographic table's All-voters row
+// (Feb 2026: 10 cells there — no CLP column). null when neither prints the
+// split (8-cell era, e.g. Jun 2026).
+function parseCoalitionComponents(txt) {
+  const waveSec = sliceBetween(txt, /Table \d+: Federal vote intention.*by wave/i, /\n\s*(?:Table|Figure) \d+:/);
+  if (waveSec) {
+    const re = /^\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept?|Oct|Nov|Dec) (\d{4})((?:\s+(?:\d+|[-–])){8,11})\s*$/gm;
+    let m;
+    while ((m = re.exec(waveSec))) {
+      const cells = m[3].trim().split(/\s+/).map((v) => (/^[-–]$/.test(v) ? 0 : +v));
+      if (cells.length === 11) return { lib: cells[1], rest: cells[2] + cells[3] + cells[4] };
+      if (cells.length === 10) return { lib: cells[1], rest: cells[2] + cells[3] };
+    }
+  }
+  const demoSec = sliceBetween(txt, /Table \d+: Federal vote intention[^]*?demographic/i, /\n\s*(?:Table|Figure) \d+:/);
+  if (demoSec) {
+    const m = demoSec.match(/^\s*All voters((?:\s+\d+){10,11})\s*$/m);
+    if (m) {
+      const cells = m[1].trim().split(/\s+/).map(Number);
+      if (cells.length === 11) return { lib: cells[1], rest: cells[2] + cells[3] + cells[4] };
+      if (cells.length === 10) return { lib: cells[1], rest: cells[2] + cells[3] };
+    }
+  }
+  return null;
+}
+
+// Table 1's "Labor vs. One Nation" sub-block: the wave's respondent-allocated
+// ALP-vs-ON split by first preference. Rows print as `NAME  <ALP>  -  <ON>`.
+// Two forms: Jul 2026 on prints Coalition/Greens/Other (3 rows, verbatim);
+// Feb–May 2026 split the Coalition row into CLP/LNP/Nat + Liberal (4 rows) —
+// combined with the wave's printed Coalition sub-primaries when available.
+function parseTable1On(txt, comps) {
+  const sec = sliceBetween(txt, /Table \d+: Federal two-party vote intention/i, /\n\s*(?:Table|Figure) \d+:/);
+  if (!sec) return { error: "preference-split table (Table 1) not found" };
+  const block = sliceBetween(sec, /Labor vs\. One Nation/i);
+  if (!block) return { error: "'Labor vs. One Nation' block not found in Table 1" };
+  const grab = (re) => {
+    const m = block.match(re);
+    return m ? { alp: +m[1], on: +m[2] } : null;
+  };
+  const grn = grab(/^\s*Greens\s+(\d+)\s+[-–]\s+(\d+)\s*$/m);
+  const oth = grab(/^\s*Other parties and candidates\s+(\d+)\s+[-–]\s+(\d+)\s*$/m);
+  const coal = grab(/^\s*Coalition\s+(\d+)\s+[-–]\s+(\d+)\s*$/m);
+  const clpLnpNat = grab(/^\s*CLP\/LNP\/Nat\s+(\d+)\s+[-–]\s+(\d+)\s*$/m);
+  const lib = grab(/^\s*Liberal\s+(\d+)\s+[-–]\s+(\d+)\s*$/m);
+  const rows = [["Greens", grn], ["Other", oth], ["Coalition", coal], ["CLP/LNP/Nat", clpLnpNat], ["Liberal", lib]].filter(([, v]) => v);
+  for (const [name, v] of rows)
+    if (Math.abs(v.alp + v.on - 100) > 1)
+      return { error: `${name} ON-split ${v.alp}/${v.on} does not sum to 100` };
+  if (!grn || !oth) return { error: "split row(s) missing from Table 1's Labor-vs-One-Nation block" };
+  if (coal) return { tppSplitOn: { lnp: coal.alp, grn: grn.alp, oth: oth.alp } };
+  if (clpLnpNat && lib) {
+    if (!comps || comps.lib + comps.rest <= 0)
+      return { error: "4-row Labor-vs-One-Nation block but Coalition sub-primaries not printed in this PDF" };
+    const lnp = Math.round((comps.lib * lib.alp + comps.rest * clpLnpNat.alp) / (comps.lib + comps.rest));
+    return { tppSplitOn: { lnp, grn: grn.alp, oth: oth.alp }, derived: true };
+  }
+  return { error: "split row(s) missing from Table 1's Labor-vs-One-Nation block" };
+}
+
 // Table 5 "Favourability ratings and name recognition of political figures":
 // leader-name headings each introducing `Mon YYYY` rows of
 // veryFav mostlyFav neither mostlyUnfav veryUnfav notSure notHeard NET.
@@ -524,6 +587,24 @@ function parsePdf(txt, slug, notes) {
     out.table1Error = t1.error;
     notes.push(`${slug}: Table 1 preference split not parsed (${t1.error}) — tpp_split left absent`);
   } else out.tppSplit = t1.tppSplit;
+
+  const t1on = parseTable1On(txt, parseCoalitionComponents(txt));
+  if (t1on.error) {
+    out.table1OnError = t1on.error;
+    notes.push(`${slug}: Table 1 Labor-vs-One-Nation split not parsed (${t1on.error}) — tpp_split_on left absent`);
+  } else {
+    // sanity: the integer-rounded splits must recombine with the primaries
+    // into Table 2's printed ALP-vs-ON total to ~1pt (the observed rounding
+    // noise band, same as the Coalition lane); a larger gap means a
+    // mis-parsed row — drop the split rather than commit garbage
+    const s = t1on.tppSplitOn;
+    const guarded = out.tppVsOn != null && ["alp", "lnp", "grn", "ind"].every((k) => out[k] != null);
+    const implied = guarded ? out.alp + (out.lnp * s.lnp + out.grn * s.grn + out.ind * s.oth) / 100 : null;
+    if (guarded && Math.abs(implied - out.tppVsOn) > 1.0) {
+      out.table1OnError = `implied ALP-vs-ON ${implied.toFixed(1)} vs printed ${out.tppVsOn} (>1pt)`;
+      notes.push(`${slug}: ${out.table1OnError} — tpp_split_on left absent`);
+    } else out.tppSplitOn = s;
+  }
 
   // fieldwork years: explicit in the methodology when printed, else filled
   // from the wave-table year, else from the cover's release-month line
@@ -679,6 +760,7 @@ if (process.env.RB_LIB !== "1") try {
   const newRows = { polls: [], ppm: [], approval: [], altTpp: [] };
   const filledRelease = [];
   const filledSplit = [];
+  const filledSplitOn = [];
 
   for (const c of candidates) {
     const cachePath = `${SRC_DIR}/${c.slug}.json`;
@@ -690,6 +772,12 @@ if (process.env.RB_LIB !== "1") try {
       if (w.tppSplit == null && w.table1Error == null && existsSync(`${SRC_DIR}/${c.slug}.txt`)) {
         const t1 = parseTable1(readFileSync(`${SRC_DIR}/${c.slug}.txt`, "utf8"));
         if (t1.tppSplit) w.tppSplit = t1.tppSplit; else w.table1Error = t1.error;
+        writeFileSync(cachePath, JSON.stringify(w, null, 2) + "\n");
+      }
+      if (w.tppSplitOn == null && w.table1OnError == null && existsSync(`${SRC_DIR}/${c.slug}.txt`)) {
+        const txt = readFileSync(`${SRC_DIR}/${c.slug}.txt`, "utf8");
+        const t1on = parseTable1On(txt, parseCoalitionComponents(txt));
+        if (t1on.tppSplitOn) w.tppSplitOn = t1on.tppSplitOn; else w.table1OnError = t1on.error;
         writeFileSync(cachePath, JSON.stringify(w, null, 2) + "\n");
       }
     } else {
@@ -728,6 +816,8 @@ if (process.env.RB_LIB !== "1") try {
       cmp("tpp_flows", w.tppHist, matchPoll.tpp_flows);
       if (matchPoll.tpp_split && w.tppSplit)
         for (const k of ["grn", "onp", "oth"]) cmp(`tpp_split.${k}`, w.tppSplit[k], matchPoll.tpp_split[k]);
+      if (matchPoll.tpp_split_on && w.tppSplitOn)
+        for (const k of ["lnp", "grn", "oth"]) cmp(`tpp_split_on.${k}`, w.tppSplitOn[k], matchPoll.tpp_split_on[k]);
       if (w.pubIso && matchPoll.published && matchPoll.published.slice(0, 10) !== w.pubIso)
         diffs.push(`published: page=${w.pubIso} vs file=${matchPoll.published.slice(0, 10)}`);
 
@@ -765,6 +855,18 @@ if (process.env.RB_LIB !== "1") try {
         }
       }
 
+      // and for the Labor-vs-One-Nation split from the same table
+      if (!matchPoll.tpp_split_on && w.tppSplitOn) {
+        if (CHECK) diffs.push(`tpp_split_on: file lacks the PDF's Table-1 ON split ${JSON.stringify(w.tppSplitOn)}`);
+        else {
+          const es = Object.entries(matchPoll), at = Object.keys(matchPoll).indexOf("url");
+          es.splice(at < 0 ? es.length : at, 0, ["tpp_split_on", w.tppSplitOn]);
+          for (const k of Object.keys(matchPoll)) delete matchPoll[k];
+          Object.assign(matchPoll, Object.fromEntries(es));
+          filledSplitOn.push(matchPoll.date);
+        }
+      }
+
       status.verified.push({ date: matchPoll.date, slug: c.slug, ok: diffs.length === 0 });
       if (diffs.length) status.mismatches.push({ date: matchPoll.date, slug: c.slug, diffs });
       continue;
@@ -799,6 +901,7 @@ if (process.env.RB_LIB !== "1") try {
         tpp_alp: w.tppResp, tpp_lnp: w.tppResp != null ? 100 - w.tppResp : null,
         ...(w.tppHist != null ? { tpp_flows: w.tppHist } : {}),
         ...(w.tppSplit != null ? { tpp_split: w.tppSplit } : {}),
+        ...(w.tppSplitOn != null ? { tpp_split_on: w.tppSplitOn } : {}),
         url: w.afrUrl || w.pdfUrl,
         releaseUrl: c.url,
       }),
@@ -826,7 +929,8 @@ if (process.env.RB_LIB !== "1") try {
       if (newRows[sec].length) D[sec] = [...D[sec], ...newRows[sec]].sort(byDate);
   if (filledRelease.length) status.releaseFilled = filledRelease;
   if (filledSplit.length) status.splitFilled = filledSplit;
-  if (hasNew || filledRelease.length || filledSplit.length) {
+  if (filledSplitOn.length) status.splitOnFilled = filledSplitOn;
+  if (hasNew || filledRelease.length || filledSplit.length || filledSplitOn.length) {
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
     // hand-entered rows keep tpp3 on one line; stringify must not expand them
     const next =
@@ -850,4 +954,4 @@ if (process.env.RB_LIB !== "1") try {
 
 // parser exports for .build/test-redbridge.mjs (RB_LIB=1 import skips the
 // main block above)
-export { parsePdf, parseTable2, parseTable5, parsePpm, sliceBetween, guardNewWave };
+export { parsePdf, parseTable1On, parseCoalitionComponents, parseTable2, parseTable5, parsePpm, sliceBetween, guardNewWave };
