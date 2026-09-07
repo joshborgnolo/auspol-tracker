@@ -3411,7 +3411,7 @@ function FlowDriftPanel({ rangeId }) {
           <table className="flow-tab">
             <caption className="flow-tab-cap">Implied preference flows to Labor, by house</caption>
             <thead>
-              <tr><th className="flow-tab-house">House</th><th>Greens</th><th>One Nation</th><th>Other</th><th>Waves fit</th></tr>
+              <tr><th className="flow-tab-house">House</th><th>Greens</th><th>One Nation</th><th>Other</th><th>Waves</th></tr>
             </thead>
             <tbody>
               <tr className="flow-tab-aec">
@@ -3424,7 +3424,7 @@ function FlowDriftPanel({ rangeId }) {
                   <td>{f.g.toFixed(1)}%<span className="flow-tab-se"> ±{f.ge.toFixed(1)}</span></td>
                   <td>{f.o.toFixed(1)}%<span className="flow-tab-se"> ±{f.oe.toFixed(1)}</span></td>
                   <td>{f.t.toFixed(1)}%<span className="flow-tab-se"> ±{f.te.toFixed(1)}</span></td>
-                  <td>{f.n}</td>
+                  <td>{f.n}{f.m ? <span className="flow-tab-se"> published</span> : null}</td>
                 </tr>
               ))}
             </tbody>
@@ -3434,15 +3434,17 @@ function FlowDriftPanel({ rangeId }) {
             2PP behaves as if it handed to Labor” – fit from the house’s own 2PP and primary
             swings, with its fixed method offset soaked up by an intercept (“Other” lumps
             independents and minor parties together, as the constants in
-            {" "}{fd.meta.table} do). Every cell is shrunk toward the election row and departs
-            only as far as the house's own waves demonstrate – each poll counts once, and the
-            ± figure is one standard error from the same fit. Roy Morgan's and RedBridge/Accent's
-            two-party figures are respondent-allocated, so their rows track a moving allocation
-            rather than fixed assumptions; RedBridge publishes that allocation beside each wave,
-            so its row here is the term average, not any one wave's split. A house needs at
-            least six waves with a published two-party figure to
-            appear, and like everything in this panel the rows are a diagnostic against the
-            election line, not a measurement.
+            {" "}{fd.meta.table} do). Every fitted cell is shrunk toward the election row and
+            departs only as far as the house's own waves demonstrate – each poll counts once,
+            and the ± figure is one standard error from the same fit. Roy Morgan's and
+            RedBridge/Accent's two-party figures are respondent-allocated, so a fitted constant
+            only tracks their moving allocation at best; RedBridge also prints its allocation
+            beside each wave, so its row is no fit at all – it averages the house's own
+            published splits over the term (marked “published” in the waves column, needing at
+            least three), and its ± is the counting-error scale of that average. Otherwise a
+            house needs at least six waves with a published two-party figure to appear, and
+            like everything in this panel the rows are a diagnostic against the election line,
+            not a measurement.
           </p>
         </div>
       )}

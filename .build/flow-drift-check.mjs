@@ -229,8 +229,41 @@ let flowSigma2W = 1;
   }
   if (dfSum > 0) flowSigma2W = ssrSum / dfSum;
 }
+/* Houses that PRINT their respondent allocation each wave need no fit: the
+   n-weighted term average of their own published per-cohort splits answers
+   the same question directly from measurement, so it replaces the ridge
+   row wholesale (the fit on such a house only re-derives a noisier version
+   of it). Emitted with m:1 so the renderer can mark the provenance and the
+   note can say so. The ± is a pure-count SE: each wave's published split
+   reads the term's allocation with a wave-to-wave SD declared at
+   FLOW_PUB_SD pts, so the weighted mean's SE is σ·√(Σw²)/Σw. Same
+   diagnostic-only status as the fits — it feeds nothing else. */
+const FLOW_PUB_MIN = 3;        // min published splits before a measured row replaces the fit
+const FLOW_PUB_SD = 10;        // assumed per-wave SD (pts) of a published cohort split
+const flowPubByFirm = new Map();
+for (const p of POLLS) {
+  if (p.tpp_split == null) continue;
+  if (!flowPubByFirm.has(p.pollster)) flowPubByFirm.set(p.pollster, []);
+  flowPubByFirm.get(p.pollster).push(p);
+}
+const flowMeasured = new Map();
+for (const [firm, rows] of flowPubByFirm) {
+  if (rows.length < FLOW_PUB_MIN) continue;
+  const ws = rows.map((p) => p.sample || 0);
+  const W = ws.reduce((s, w) => s + w, 0);
+  const wm = (k) => rows.reduce((s, p, i) => s + ws[i] * p.tpp_split[k], 0) / W;
+  const se = FLOW_PUB_SD * Math.sqrt(ws.reduce((s, w) => s + w * w, 0)) / W;
+  flowMeasured.set(firm, {
+    firm,
+    g: r1(wm("grn")), ge: r1(se),
+    o: r1(wm("onp")), oe: r1(se),
+    t: r1(wm("oth")), te: r1(se),
+    n: rows.length, m: 1,
+  });
+}
 const flowFits = [];
 for (const [firm, rows] of flowFitByFirm) {
+  if (flowMeasured.has(firm)) continue;   // the house's own published allocation beats a fitted constant
   if (rows.length < FLOW_FIT_MIN) continue;
   const fit = flowRidge(rows, flowSigma2W);
   if (!fit) continue;
@@ -243,6 +276,7 @@ for (const [firm, rows] of flowFitByFirm) {
     n: rows.length,
   });
 }
+for (const row of flowMeasured.values()) flowFits.push(row);
 flowFits.sort((a, z) => (a.firm < z.firm ? -1 : 1));
 const driftMonths = MONTHS.map((ym) => {
   const r = monthWithSe(driftAnom, null, ym);
