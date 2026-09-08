@@ -341,7 +341,11 @@ function news24Sat(s) {
 function parseNews24Article(html, url) {
   const { published, pubIso } = news24Published(html);
   const t = normaliseNews24(clean(html));
-  const gate = t.match(/news24(?:\.com\.au)?\s+Pulse\s*\/\s*YouGov\s+poll/i);
+  // Series gate, both house styles seen in the wild: the original
+  // "News24[.com.au] Pulse / YouGov poll" methodology sentence, and the
+  // Sept 2026 style "News24.com.au/YouGov poll" (Pulse unstated; the Pulse
+  // branding survives in the News24 Pulse Infogram embeds downstream).
+  const gate = t.match(/news24(?:\.com\.au)?(?:\s+Pulse)?\s*\/\s*YouGov\s+poll/i);
   if (!gate) return null;
 
   const block = t.slice(gate.index, gate.index + 2200);
