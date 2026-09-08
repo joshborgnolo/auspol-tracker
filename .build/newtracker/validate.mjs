@@ -217,7 +217,18 @@ export function validate(D) {
     // 5. real polls carry a sample size. Rows the updaters assimilate from a
     //    house's published dataset legitimately have none (the feed doesn't
     //    carry one) and declare themselves via `assimilated` instead.
-    if (!p.isElection && !p.assimilated && !(p.sample > 0)) fail("sample", `sample = ${p.sample}`);
+    //    `samplePending` is the rare third case: a wave landed with its full
+    //    data verified, but the house's per-wave n is published in a document
+    //    not yet posted (adjudicated for YouGov's News24 waves, whose n arrives
+    //    in the APC methodology PDF on the yougov cloudfront account — the
+    //    row carries the flag until that URL is on the row and the real n is
+    //    filled). gen-data.mjs prices the gap at the implicit n=1200 regardless;
+    //    the flag is transient and must leave the file with the backfill.
+    const noSample = !(p.sample > 0);
+    if (!p.isElection && !p.assimilated && noSample && !p.samplePending)
+      fail("sample", `sample = ${p.sample}`);
+    if (!p.isElection && p.samplePending && noSample)
+      excuse("sample-pending", "no sample", "house per-wave n unpublished at landing; implicit 1200 until backfill");
   });
 
   // 5b. election rows are labelled as elections, and only elections carry the

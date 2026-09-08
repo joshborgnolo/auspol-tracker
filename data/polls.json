@@ -4419,6 +4419,23 @@
         "Nat": 4.5
       },
       "url": "https://www.roymorgan.com/findings/10333-federal-voting-intention-september-7-2026"
+    },
+    {
+      "date": "2026-09-08",
+      "published": "2026-09-09T05:00",
+      "dateStart": "2026-09-01",
+      "pollster": "YouGov",
+      "client": "News24",
+      "samplePending": true,
+      "alp": 26,
+      "lnp": 18,
+      "grn": 12,
+      "onp": 30,
+      "ind": 7,
+      "oth": 7,
+      "tpp_alp": 52,
+      "tpp_lnp": 48,
+      "url": "https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0"
     }
   ],
   "ppm": [
@@ -5139,6 +5156,15 @@
       "opp": 15,
       "oppName": "Taylor",
       "han": 24,
+      "extra": null
+    },
+    {
+      "date": "2026-09-08",
+      "firm": "YouGov",
+      "alb": 43,
+      "opp": 39,
+      "oppName": "Taylor",
+      "han": null,
       "extra": null
     }
   ],
@@ -6631,6 +6657,24 @@
           "dis": 41
         }
       }
+    },
+    {
+      "date": "2026-09-08",
+      "firm": "YouGov",
+      "alb": -23,
+      "opp": -12,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 36,
+          "dis": 59
+        },
+        "opp": {
+          "app": 36,
+          "dis": 48
+        }
+      }
     }
   ],
   "ppmHeadToHead": [
@@ -6723,6 +6767,12 @@
       "firm": "Newspoll",
       "alb": 56,
       "han": 44
+    },
+    {
+      "date": "2026-09-08",
+      "firm": "YouGov",
+      "alb": 51,
+      "han": 40
     }
   ],
   "altTpp": [
@@ -7030,6 +7080,12 @@
       "date": "2026-09-06",
       "firm": "Roy Morgan",
       "alpVsOnp_alp": 53.5,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-09-08",
+      "firm": "YouGov",
+      "alpVsOnp_alp": 53,
       "lnpVsOnp_lnp": null
     }
   ],

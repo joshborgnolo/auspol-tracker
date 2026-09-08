@@ -6,7 +6,14 @@
     <atom:link href="https://auspoltracker.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
     <language>en-AU</language>
-    <lastBuildDate>Sun, 06 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Tue, 08 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>YouGov, 1–8 Sep 2026 – 2PP ALP 52 – L/NP 48</title>
+      <link>https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0</link>
+      <guid isPermaLink="false">auspol-tracker:2026-09-08|YouGov</guid>
+      <pubDate>Tue, 08 Sep 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 26, L/NP 18, GRN 12, ON 30, Ind/Oth 14. Two-party preferred: ALP 52 – L/NP 48. Fieldwork 1–8 Sep 2026.</description>
+    </item>
     <item>
       <title>Roy Morgan, 31 Aug – 6 Sep 2026 – 2PP ALP 53 – L/NP 47</title>
       <link>https://www.roymorgan.com/findings/10333-federal-voting-intention-september-7-2026</link>
@@ -279,13 +286,6 @@
       <guid isPermaLink="false">auspol-tracker:2026-06-04|Newspoll</guid>
       <pubDate>Thu, 04 Jun 2026 12:00:00 GMT</pubDate>
       <description>Primary vote: ALP 30, L/NP 18, GRN 11, ON 31, Ind/Oth 10. No two-party figure published. Sample 1,240. Fieldwork 1–4 Jun 2026.</description>
-    </item>
-    <item>
-      <title>YouGov, 26 May – 2 Jun 2026 – 2PP ALP 51.5 – L/NP 48.5</title>
-      <link>https://www.skynews.com.au/australia-news/politics/one-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling/news-story/0fe9ddf8797b5e529436557d7ce63897</link>
-      <guid isPermaLink="false">auspol-tracker:2026-06-02|YouGov</guid>
-      <pubDate>Tue, 02 Jun 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 26, L/NP 20, GRN 13, ON 29, Ind/Oth 12. Two-party preferred: ALP 51.5 – L/NP 48.5. Sample 1,471. Fieldwork 26 May – 2 Jun 2026.</description>
     </item>
   </channel>
 </rss>
