@@ -706,7 +706,7 @@ const ARCHIVE_STAMP = "2026-09-05";
 /* prediction/ is not hand-maintained: it regenerates daily via
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
-const PREDICTION_STAMP = "2026-09-08";
+const PREDICTION_STAMP = "2026-09-09";
 const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
