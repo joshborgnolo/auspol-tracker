@@ -568,11 +568,18 @@ const MATCHUPS = (() => {
    sample-weighted, house-effect-adjusted nowcast (D.latest) – NOT the last
    monthly-mean dot. An alternative matchup gets a nowcast too WHERE the
    series supports one (D.altLatest is null for a matchup too thin to
-   weight); otherwise its last monthly point. */
+   weight); otherwise its last monthly point. ONE exception: ALP v ON is
+   quoted on the implied basis (D.latest.onImp – the current primaries run
+   through a first-principles flow set, carrying that set's flow band rather
+   than a sampling interval), because no election count of the pairing exists
+   to discipline the houses' uncoordinated allocations. The pollsters' own
+   head-to-heads corroborate from the chart; they no longer set the number. */
 function tppLatest(id) {
   const D = window.AUSPOL, M = MATCHUPS[id];
   if (!M) return null;
   if (M.real) return { a: D.latest.alp2pp, b: D.latest.lnp2pp, ci95: D.latest.alp2ppCi95 };
+  const imp = M.altKey === "alp_on" && D.latest.onImp ? D.latest.onImp : null;
+  if (imp) return { a: imp.a, b: imp.b, ci95: imp.band, flows: true };
   const al = D.altLatest ? D.altLatest[M.altKey] : null;
   if (al) return { a: al.a, b: al.b, ci95: al.ci95 };
   const last = M.data[M.data.length - 1];
@@ -823,7 +830,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
      which also hides the strip's copy. */
   const compareToggle = (phone) => (
     <label className={"pg-check" + (phone ? " pg-phone" : "") + (showSynth ? " on" : "")}
-           title="Also draw what the same polls’ primary votes imply when run through one fixed preference-flow table (the 2025 election’s actual flows). A diagnostic, not a correction.">
+           title="Also draw what the same polls’ primary votes imply when run through one fixed preference-flow table (the 2025 election’s actual flows), shaded to the 2022 table’s read of the One Nation conversion. A diagnostic, not a correction.">
       <input type="checkbox" checked={showSynth} onChange={(e) => setShowSynth(e.target.checked)} />
       {/* the label is a flex row with a 6px gap, so a loose text node and the
           term button would become two flex ITEMS with 6px between them - a
@@ -895,10 +902,15 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
     .map((id) => ({ id, v: latestOf(id) }))
     .filter((o) => o.v && o.v.a != null);
   const altL = (m.altKey && D.altLatest) ? D.altLatest[m.altKey] : null;
-  const adjusted = m.real || !!(D.adjusted && m.altKey && D.adjusted[m.altKey]);
+  /* ALP v ON when the implied level is in the payload: the first-principles
+     flow estimate is the quoted figure, the published nowcast merely its
+     corroboration (see tppLatest). rides `flows` so the interval copy says
+     "flows range" rather than "95% interval". */
+  const onImpL = (m.altKey === "alp_on" && D.latest.onImp) ? D.latest.onImp : null;
+  const adjusted = m.real || !!onImpL || !!(D.adjusted && m.altKey && D.adjusted[m.altKey]);
   const latest = m.real
     ? { a: D.latest.alp2pp, b: D.latest.lnp2pp }
-    : altL || m.data[m.data.length - 1];
+    : onImpL || altL || m.data[m.data.length - 1];
 
   // mirrored pairs, so each trend line sits inside its own cloud of readings.
   // Driven by the active matchup's own accessor – a poll that didn't publish
@@ -959,14 +971,24 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
   /* The implied-2PP overlay. Same red as the published Labor line – colour
      still says who; the dash says this one is computed from primaries, not
      measured – because the visible GAP to the solid line is the whole point
-     of the diagnostic. Its election-month point is the flow table read back
-     onto the count's own primaries (54.2), so it departs from the published
-     anchor (55.2) on purpose, showing the table's miss at the one point it
-     can be checked. */
+     of the diagnostic. Its election-month point meets the published anchor
+     exactly: under the shipped TPP table the anchor is the table's OWN
+     count read back, so agreement there is consistency, not accuracy. */
   const synthOverlay = (showSynth && matchup === "alp_lnp" && !morph && D.synth2pp && D.synth2pp.length > 1)
     ? [{ id: "synth", label: "Implied ALP (fixed 2025 flows)", color: "var(--alp)",
          points: filterPts(D.synth2pp.map((d) => ({ x: d.x, y: d.alp })), xDomain[0]),
          width: 2.2, dashed: true, opacity: 0.8 }]
+    : [];
+  /* The implied overlay's sensitivity bracket (gen-data §1c → D.flowSens):
+     the same primaries re-read with the ONP-to-Labor share at the 2022
+     election's counted table instead of 2025's, so the shade between its
+     edges is what the One Nation conversion is worth at each month's ONP
+     primary. Both edges are measured tables, so it is a sensitivity read,
+     not an interval – and it never draws without the dashed line it
+     brackets, switched by the same compare toggle. */
+  const sensAreas = (synthOverlay.length && D.flowSens && D.flowSens.length > 1)
+    ? [{ id: "sens", color: "var(--alp)", className: "sens-band", edge: false, smooth: true,
+         points: filterPts(D.flowSens.map((d) => ({ x: d.x, y0: d.lo, y1: d.hi })), xDomain[0]) }]
     : [];
   const heroSeriesAll = synthOverlay.length ? heroSeries.concat(synthOverlay) : heroSeries;
   // with no line there is nothing for a month-guide tooltip to report, so the
@@ -1032,6 +1054,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
       if (pair) pair.forEach((s) => v.push(s.y));
     });
     if (M.real && D.synth2pp) D.synth2pp.forEach((d) => v.push(d.alp, 100 - d.alp));
+    // the sensitivity bracket too, or switching the overlay on would climb out of the window it drew in
+    if (M.real && D.flowSens) D.flowSens.forEach((d) => v.push(d.lo, d.hi, 100 - d.lo, 100 - d.hi));
     const lo = Math.min(...v), hi = Math.max(...v), padDot = 0.5;
     return [Math.floor((lo - padDot) / 5) * 5, Math.ceil((hi + padDot) / 5) * 5];
   };
@@ -1055,10 +1079,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
     ? (D.latest.alp2ppCi95 != null
         ? { ci95: D.latest.alp2ppCi95, n: D.latest.method.nPolls, changeSig: D.latest.changeSig }
         : null)
-    : (altL && altL.ci95 != null
-        ? { ci95: altL.ci95, n: altL.n, changeSig: altL.changeSig }
-        : null);
+    : (onImpL
+        ? { ci95: onImpL.band, n: onImpL.n, flows: true }
+        : (altL && altL.ci95 != null
+            ? { ci95: altL.ci95, n: altL.n, changeSig: altL.changeSig }
+            : null));
   const monthDelta = m.real ? +(D.latest.alp2pp - D.latest.alp2ppPrev).toFixed(1)
+    : (onImpL && onImpL.aPrev != null) ? +(onImpL.a - onImpL.aPrev).toFixed(1)
     : (altL && altL.aPrev != null) ? +(altL.a - altL.aPrev).toFixed(1)
     : +(latest.a - m.data[m.data.length - 2].a).toFixed(1);
 
@@ -1114,9 +1141,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                       error), so it is the shortest way to the definition. */}
                   {" "}
                   <button type="button" className="hi-range hi-term"
-                          title="What a margin of error means"
+                          title={unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means"}
                           onClick={() => window.AP.openTerm &&
-                            window.AP.openTerm("margin-of-error", "two-party preferred")}>
+                            window.AP.openTerm(unc.flows ? "preference-flows" : "margin-of-error",
+                                               "two-party preferred")}>
                     ± {(2 * unc.ci95).toFixed(1)} pts
                   </button>
                 </>
@@ -1132,10 +1160,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                  error, so a click lands on the same page the ± figure and
                  the caveat's "margin" already open. */
               <button type="button" className="hi-note hi-term"
-                      title="What a margin of error means"
+                      title={unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means"}
                       onClick={() => window.AP.openTerm &&
-                        window.AP.openTerm("margin-of-error", "two-party preferred")}>
-                95% interval
+                        window.AP.openTerm(unc.flows ? "preference-flows" : "margin-of-error",
+                                           "two-party preferred")}>
+                {unc.flows ? "flows range" : "95% interval"}
               </button>
             )}
             {/* When the note and the method sit next to each other, both are
@@ -1149,11 +1178,15 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                 this figure is built on has a definition in Info, and the word
                 the reader is looking at is the shortest way to it. */}
             <button type="button" className="hi-method hi-term"
-                    title={"What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"}
+                    title={unc && unc.flows
+                      ? "How this pairing is derived from the primary-vote aggregate"
+                      : "What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"}
                     onClick={() => window.AP.openTerm &&
-                      window.AP.openTerm(adjusted ? "weighted-aggregate" : "monthly-average",
+                      window.AP.openTerm(unc && unc.flows ? "implied-2pp"
+                                           : adjusted ? "weighted-aggregate" : "monthly-average",
                                          "two-party preferred")}>
-              {adjusted ? "Weighted aggregate" : "Monthly average"}
+              {unc && unc.flows ? "Implied from primary votes"
+               : adjusted ? "Weighted aggregate" : "Monthly average"}
             </button>
             {/* The window the interval describes, in plain terms: the count
                 and span draw on unc, which exists only when an interval does,
@@ -1179,7 +1212,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           <div className="hero-sub" ref={subRef}>
             <Delta value={monthDelta} suffix={Math.abs(monthDelta) === 1 ? " pt" : " pts"} small roll spinIn />
             <span className="hero-sub-note" ref={subNoteRef}>
-              {(m.real || (altL && altL.aPrev != null)) ? "vs 1 month ago" : "vs previous reading"}
+              {(m.real || (onImpL && onImpL.aPrev != null) || (altL && altL.aPrev != null))
+                ? "vs 1 month ago" : "vs previous reading"}
               {/* A month-on-month move smaller than its own interval is not a
                   finding. Say so next to the arrow, not three scrolls down -
                   and let the margin the caveat invokes carry the reader to its
@@ -1266,7 +1300,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
         events={heroEvents}
         scatter={scatter} series={heroSeriesAll} spine={heroSpine} pollFacet="twopp"
         scatterOut={scatterOut} scatterMove={scatterMove}
-        areas={heroAreas}
+        areas={sensAreas.length ? heroAreas.concat(sensAreas) : heroAreas}
         fade={blend ? morph.t : 1} clipX={blend ? blend.clip : null}
         tooltipTitle={(i) => window.AP.monthLabelFull((drawPts[i] || drawPts[drawPts.length - 1]).ym)}
         /* A month's figures and how well that month is known, in the same
@@ -1296,6 +1330,12 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           )}
           {synthOverlay.length > 0 && (
             <span className="hl-item"><span className="hl-dashed" style={{ borderColor: "var(--alp)" }}></span>Implied from primaries at 2025 flows{D.synthLatest && D.synthLatest.alp != null ? ` · ${D.synthLatest.alp.toFixed(1)}` : ""}</span>
+          )}
+          {sensAreas.length > 0 && (
+            <span className="hl-item"
+                  title="Shade between the implied figure as read on the 2025 and 2022 counted flow tables (TPP cut) – if One Nation preferences flowed to Labor as they did in 2022, the implied figure would sit at the bracket's top edge. A sensitivity read, not an interval.">
+              <span className="hl-band hl-band-sens"></span>ON-flow sensitivity
+            </span>
           )}
         </div>
         <p className="hero-caption">

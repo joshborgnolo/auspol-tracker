@@ -1,6 +1,6 @@
 ---
 name: auspol-flow-drift-panel
-description: "auspol-tracker — the Preference-flow drift panels end-to-end (shipped 2026-09-07): gen-data §7c flowDrift block (~:1224-1310) = per-poll residual (share2pp published 2PP − flows.mjs implied 2PP on the same primaries), election-anchored per-house 180-day baselines, anomalies pooled through monthWithSe/nowcastAdj with NULL house effects; §7d flowDriftOn reruns the same machinery on the ALP-v-ON head-to-heads using RedBridge's published splits as the frozen table (no election counts the pairing; every house anchors on its own first waves); FlowDriftPanel + FlowDriftOnPanel in the d1a1d215 asset mounted on the All-polls 2PP facet after HouseLeanPanel; .ap-flow/.flow-band-* CSS reuses --lean-*-bg vars; .build/flow-drift-check.mjs is the committed verbatim-replica verification script. Includes the pq-passthrough fix to nowcastAdj/monthWithSe (difference series need per-row pq — the share-scale fallback produces p(1−p)<0 and ci95 nulls to NaN→null). Diagnostic-only by design: corrects no other figure."
+description: "auspol-tracker — the Preference-flow drift panels end-to-end (shipped 2026-09-07): gen-data §7c flowDrift block (~:1224-1310) = per-poll residual (share2pp published 2PP − flows.mjs implied 2PP on the same primaries), election-anchored per-house 180-day baselines, anomalies pooled through monthWithSe/nowcastAdj with NULL house effects; §7d flowDriftOn reruns the same machinery on the ALP-v-ON head-to-heads against a first-principles frozen table FP_ON = {lnp 0.28, grn 0.89, oth 0.53} (AEC 2025 Senate ATL ballots re-anchored on 2026 lower-house counts where ON made the final two; flipped 2026-09-09 from the shipped RedBridge-published-splits table — RedBridge's own splits survive only as its measured row, m:1); FlowDriftPanel + FlowDriftOnPanel in the d1a1d215 asset mounted on the All-polls 2PP facet after HouseLeanPanel; .ap-flow/.flow-band-* CSS reuses --lean-*-bg vars; .build/flow-drift-check.mjs is the committed verbatim-replica verification script. Includes the pq-passthrough fix to nowcastAdj/monthWithSe (difference series need per-row pq — the share-scale fallback produces p(1−p)<0 and ci95 nulls to NaN→null). Diagnostic-only by design: corrects no other figure."
 source: auto-skill
 extracted_at: '2026-09-07T00:00:00.000Z'
 ---
@@ -48,49 +48,81 @@ is viable ONLY as a diagnostic — this panel corrects no other figure.
    panel's note so a future re-anchor can't leave the page describing
    yesterday's table. Also feeds `flowDrift.meta.table`.
 
-## §7d — the Labor-v-One Nation twin panel (shipped 2026-09-07)
+## §7d — the Labor-v-One Nation twin panel (shipped 2026-09-07; frozen table flipped to first-principles 2026-09-09)
 
 The same machinery re-run on the ALP-v-ON totals the same publication
 prints (`altTpp.alpVsOnp_alp`, already a 0–100 share — NOT a fraction to
 rebase). Every estimator piece is §7c's untouched — join, within-house
 rebasing, monthWithSe/nowcastAdj pooling, wave-equal ridge with pooled
 σ̂²w — cloned as a parallel block right after §7c with the constants
-prefixed `FLOW_ON_*`. The differences are the two the data forces:
+prefixed `FLOW_ON_*`. The differences are the ones the data forces:
 
-- **The frozen table is RedBridge's own printed splits** (`polls.json
-  tpp_split_on: {lnp, grn, oth}`, parsed from report Table 1's "Labor vs.
-  One Nation" sub-block — see redbridge-accent-extraction): `FLOW_ON` =
-  raw-sample-weighted term mean as FRACTIONS (~5 published waves;
-  {lnp 34.2, grn 90.8, oth 64.2} as percents). No election ever counts a
+- **The frozen table is FIRST-PRINCIPLES** (`FP_ON = {lnp 0.28, grn 0.89,
+  oth 0.53}` fractions at gen-data.mjs ~:1566, with `FP_ON_BAND =
+  {lnp 0.02, grn 0.03, oth 0.03}` the set's own ± range, stacked linearly
+  into the band §7f's quoted figure carries): the AEC 2025 Senate ATL
+  ballot counts re-anchored on the 2026 lower-house counts where One
+  Nation made the final two (SA state election, Secret Harbour
+  by-election); ON-side shares Coal→ON 72 (70–74), GRN→ON 11 (8–14),
+  others→ON 47 (44–50) carried ALP-side. No election ever counts a
   Labor-v-ON pairing, so there is no election anchor — `impliedOn(p) =
-  p.alp + p.lnp·FLOW_ON.lnp + p.grn·FLOW_ON.grn + (ind+oth)·FLOW_ON.oth`.
-  Note the ON panel's design needs an LNP column (classic pairing folds
-  LNP into the two-party share; this pairing doesn't).
+  p.alp + p.lnp·FP_ON.lnp + p.grn·FP_ON.grn + (ind+oth)·FP_ON.oth`.
+  Chosen 2026-09-09 over RedBridge/Accent's respondent-allocated splits
+  (`tpp_split_on` — the only published per-cohort allocation of the
+  pairing, kept as the panel's measured RedBridge row below) because
+  revealed, re-validated ballots beat a stated allocation with no count
+  to anchor; the published head-to-heads stay the corroboration this
+  panel monitors. This is the table the page QUOTES the pairing on
+  (§7f's `impliedOnFp` hero figure); σ̂²w aside, the drift series is
+  baseline-subtracted per house anyway, so a level offset costs nothing —
+  only a table whose cohort mixes drift from the industry's would. Note
+  the ON panel's design needs an LNP column (classic pairing folds LNP
+  into the two-party share; this pairing doesn't), so the fitter's design
+  is `[1, lnp, grn, ind+oth]` with f0 pointed at FP_ON.
 - **Every house anchors on its own first-waves residual mean**
   (`FLOW_ON_BASE_MIN = 3`; `meta.baseFrom[firm]` = that wave date for all
   firms, `meta.anchor = null`). The drift curve's IDENTIFICATION is
   unaffected — each house's reading is centred on its own start
-  regardless — only the implied-flows table rows are relative-to-
-  RedBridge instead of absolute. gen-data prints per-house baseFrom
+  regardless — only the implied-flows table rows are relative-to-FP_ON
+  instead of absolute. gen-data prints per-house baseFrom
   lines; the panel copy states the first-waves anchoring outright (no
   conditional clause, since no firm can be election-anchored).
-- RedBridge's measured row is n-weighted mean of its own published
-  splits (`FLOW_ON_PUB_MIN = 3`, `FLOW_ON_PUB_SD = 10` pure-count SE) —
-  same m:1 provenance convention as §7c's measured row; the fits loop
-  skips measured firms; the σ̂²w pool does not (≈1.00 pt², df 27 on
-  current data — printed as ≈1, not the `=== 1` fallback; the two look
-  identical in the sanity line).
-- **`flowDriftOn = null` when `FLOW_ON` can't form** (fewer than
-  `FLOW_ON_PUB_MIN` published split waves) — the panel context then
-  continues from `null` and the renderer returns null; absent-not-empty
-  like every other optional series. flow-drift-check.mjs FAILs if the
-  emitted `const flowDriftOn =` regex matches `null` and prints
-  "skipped" when the input set is too small."
-- Sanity anchors at ship (Sep 2026): 5 houses, 46 anomalies, now
-  −0.1 ± 1.6 (n=5, nEff≈4), last month 2026-08 −0.1 ± 1.2 (k=8); fits
-  YouGov l36.3/g82.2/t67.7 (n=16) and Roy Morgan l28.5/g91.8/t63.9
-  (n=16), SEs ±4.5–9.8; measured RedBridge row 34.2/90.8/64.2 ±4.5
-  (n=5 published). Sanity echo: `FLOW_ON: 5 published split waves …`.
+- RedBridge's measured row is the n-weighted mean of its own published
+  splits (`tpp_split_on`, `FLOW_ON_PUB_MIN = 3`, `FLOW_ON_PUB_SD = 10`
+  pure-count SE) — same m:1 provenance convention as §7c's measured row;
+  the fits loop skips measured firms; the σ̂²w pool does not (≈0.95 pt²
+  on current data — printed as ≈1 when it rounds there, not the
+  `=== 1` fallback; the two look identical in the sanity line).
+- **meta.pub carries the frozen table, not a fit**:
+  `pub: { l: FP_ON.lnp×100, g: FP_ON.grn×100, t: FP_ON.oth×100 }` (r1),
+  `pubSrc: "first-principles flow set"` — no `pubN` (there's no wave
+  count behind a first-principles set). `meta.anchor = null`;
+  `meta.baseFrom` maps each firm to its first-waves date.
+- **`flowDriftOn = null` only when there is nothing to say** — the gate
+  is `driftOnAnom.length ? {…} : null` (no joined ALP-v-ON head-to-head
+  anomalies at all); the renderer returns null and nothing renders,
+  absent-not-empty like every other optional series. flow-drift-check.mjs
+  FAILs if the emitted `const flowDriftOn =` matches `null` while the
+  replica has anomalies to report.
+- Sanity anchors at the FP_ON flip (Sep 2026): 5 houses, 48 anomalies,
+  now +0.2 ± 1.7 (n=6, nEff 4.1), last month 2026-09 +0.3 ± 2.4 (k=2);
+  fits Roy Morgan l29.4/g95.1/t58.5 (n=17) and YouGov l36.1/g84.4/t66.2
+  (n=17), SEs ±4.5–9.6; measured RedBridge row 34.2/90.8/64.2 ±4.5
+  (n=5 published). Sanity echo: `flowDriftOn: 5 houses | now: …` plus
+  `  flow fits (wave σ²w=0.95): pub("first-principles flow set") …`
+  (post-flip there is no `FLOW_ON:` echo line — flip-era gen-data had
+  `FLOW_ON: N published split waves …`).
+- **Ship incident (a74e550 → repaired by dc02e64)**: the §7d shipping
+  commit landed gen-data.mjs + the d1a1d215 renderer but STOPPED short of
+  the rebuild — the committed 9f09dca2 data asset didn't export
+  `flowDriftOn`, so main served a renderer reading a field its data
+  layer lacked (harmless only because FlowDriftOnPanel null-guards;
+  the ON panel simply never rendered live). Any gen-data change MUST
+  land with the rebuilt data asset + index.html in the same commit —
+  when a rebuild produces a fixed-name asset diff you didn't expect
+  (`git diff .build/newtracker/assets/9f09dca2-*.js`), suspect exactly
+  this half-committed prior commit and fold the debris in rather than
+  reverting it.
 
 ## §7c construction (the arguments that make it defensible)
 
@@ -127,7 +159,14 @@ by `FlowDriftPanel` as `.flow-tab-wrap > table.flow-tab` (AEC row =
 `.flow-tab-se` styles the ± suffix, `--ink-faint` 12.5px) with a
 `.flow-tab-note` under it. CSS family `.flow-tab*` lives in
 template.html's flow-drift section before the `.ap-wrap` archive-ledger
-rules; tracks `.poll-table` conventions.
+rules; tracks `.poll-table` conventions. `.flow-tab-wrap` MUST keep its
+`overflow-x: auto` (added dc02e64, 2026-09-07): shipped without it, the
+~534px min-content table widened the document to ~550px on phones,
+exposing the html-level line-art down a right gutter top-to-bottom —
+diagnosis recipe and the wrapper-overflow convention live in
+`auspol-mobile-overflow-probe`. The thead is NOT sticky so the
+containing-block side effect doesn't apply here (unlike the archive
+ledger — see the template comment after `.flow-tab-note`).
 
 - **Fitter (gen-data §7c, after `driftAnom`): wave-equal ridge SHRUNK
   TOWARD THE ELECTION TABLE.** Rows: same joined filter as the residuals

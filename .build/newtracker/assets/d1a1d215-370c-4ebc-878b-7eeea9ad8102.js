@@ -3474,12 +3474,12 @@ function FlowDriftPanel({ rangeId }) {
    untouched – join, within-house rebasing, pooled monthly/nowcast, ridge
    fits – and the two deliberate differences are the ones the data forces:
    no election ever counts a Labor-v-One-Nation pairing, so the frozen
-   table is RedBridge/Accent's own term-long respondent average (the only
-   house that prints this pairing's per-cohort allocation), and every house
-   anchors on its own first waves, which the note states outright rather
-   than as a conditional clause. Nothing renders if §7d's data isn't in the
-   payload, so the whole panel is absent-not-empty like the other
-   diagnostics. */
+   table is the first-principles set §7f quotes the pairing's figure on
+   (AEC Senate ballot counts re-anchored on the counted lower-house
+   contests where One Nation made the final two), and every house anchors
+   on its own first waves, which the note states outright rather than as a
+   conditional clause. Nothing renders if §7d's data isn't in the payload,
+   so the panel is absent-not-empty like the other diagnostics. */
 function FlowDriftOnPanel({ rangeId }) {
   const { D, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
   const narrow = useNarrow();
@@ -3538,9 +3538,9 @@ function FlowDriftOnPanel({ rangeId }) {
             from what the same polls’ primaries would read as under a
             {" "}<button type="button" className="hi-term"
               onClick={() => window.AP.openTerm && window.AP.openTerm("preference-flows", "Preference flows")}>preference</button>{" "}
-            table frozen at RedBridge/Accent’s term-long respondent average – the only
-            election-anchored pair being the classic 2PP, this pairing’s table borrows the one
-            house that prints the pairing’s own allocation.
+            table frozen at the first-principles set the page quotes the pairing on – AEC
+            Senate ballot counts re-anchored on the lower-house counts where One Nation made
+            the final two.
           </p>
         </div>
         <div className="legend">
@@ -3593,8 +3593,8 @@ function FlowDriftOnPanel({ rangeId }) {
             </thead>
             <tbody>
               <tr className="flow-tab-aec">
-                <th scope="row" className="flow-tab-house">RedBridge published splits (term mean)</th>
-                <td>{fd.meta.pub.l.toFixed(1)}%</td><td>{fd.meta.pub.g.toFixed(1)}%</td><td>{fd.meta.pub.t.toFixed(1)}%</td><td>{fd.meta.pubN}</td>
+                <th scope="row" className="flow-tab-house">{fd.meta.pubSrc || "First-principles flow set"}</th>
+                <td>{fd.meta.pub.l.toFixed(1)}%</td><td>{fd.meta.pub.g.toFixed(1)}%</td><td>{fd.meta.pub.t.toFixed(1)}%</td><td>–</td>
               </tr>
               {fd.flows.map((f) => (
                 <tr key={f.firm}>
@@ -3612,17 +3612,17 @@ function FlowDriftOnPanel({ rangeId }) {
             Labor–One Nation figure behaves as if it handed to Labor”, fit from the house’s own
             head-to-head and primary swings with its fixed method offset soaked up by an
             intercept. No election ever totals a head-to-head like this one, so the table the
-            cells shrink toward is the term-long average of the only published allocation of the
-            pairing – RedBridge/Accent’s respondent-allocated splits – which makes RedBridge’s
-            own row coincide with it by construction (that row is no fit at all but the average
-            of the house’s own published splits, marked “published” in its waves cell, and its
-            ± is the counting-error scale of that average). Every fitted cell departs from the
-            reference row only as far as that house’s own waves demonstrate – each poll counts
-            once, and the ± figure is one standard error from the same fit. Roy Morgan’s
-            head-to-head is respondent-allocated, so a fitted constant only tracks its moving
-            allocation at best. A house needs at least six waves with a published head-to-head
-            to appear, and like everything in this panel the rows are a diagnostic, not a
-            measurement.
+            cells shrink toward is the first-principles reference row – the set the page quotes
+            the pairing’s headline on, derived from counted elections rather than any house’s
+            allocation. The houses’ own published allocations stay in the table as measured
+            rows wherever a house prints them (marked “published” in the waves cell, with the
+            ± the counting-error scale of its term mean), corroboration rather than the
+            yardstick. Every fitted cell departs from the reference row only as far as that
+            house’s own waves demonstrate – each poll counts once, and the ± figure is one
+            standard error from the same fit. Roy Morgan’s head-to-head is respondent-allocated,
+            so a fitted constant only tracks its moving allocation at best. A house needs at
+            least six waves with a published head-to-head to appear, and like everything in
+            this panel the rows are a diagnostic, not a measurement.
           </p>
         </div>
       )}
@@ -4693,13 +4693,22 @@ function infoTerms(D) {
     { id: "implied-2pp", term: "Implied 2PP", body: (
       <>An optional dashed line on the two-party chart (“Compare implied 2PP”) showing what the same
       polls’ own primary votes add up to under one fixed {xref("preference-flows", "implied 2PP",
-      "preference-flow table")}. It is a diagnostic,
+      "preference-flow table")}. For Labor v Coalition it is a diagnostic,
       never the headline: pollsters’ own allocations answer a live question a fixed table cannot.
       {D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? (
         <> Today the table reads {D.synthLatest.alp.toFixed(1)} against the aggregate’s
         {" "}{L.alp2pp.toFixed(1)} – a gap, not a verdict. At One Nation’s current {onp}% primary,
         five points of doubt about their flow rate is {(prim.onp * 0.05).toFixed(1)} points of
         two-party either way.</>
+      ) : null}
+      {L.onImp ? (
+        <> Labor v One Nation is the exception, quoted on this basis: no election count of
+      that pairing exists to discipline the houses’ uncoordinated allocations, so the figure
+      is the current primaries run through a {xref("preference-flows", "implied 2PP",
+      "first-principles flow set")} – {L.onImp.a.toFixed(1)} to Labor,{" "}
+      {L.onImp.b.toFixed(1)} to One Nation, ±{L.onImp.band.toFixed(1)} on the set’s own
+      range, not a sampling interval. The houses’ published head-to-heads stay on the chart
+      as corroboration.</>
       ) : null}</>) },
     { id: "individual-poll", term: "Individual poll", body: (
       <>One published poll, drawn as a single dot. The lines through them are monthly aggregates,
@@ -4775,6 +4784,12 @@ function infoTerms(D) {
       target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5%, all others 54.6% to
       Labor</a>), every formal ballot redistributed Labor v Coalition.
       <span className="info-chart"><FlowChart /></span>
+      The Labor v One Nation figure runs on a different table, derived at first principles:
+      the AEC's 2025 Senate ballot counts re-anchored on the lower-house contests where the
+      pairing has actually been counted (the SA state election, the Secret Harbour
+      by-election) – Coalition voters 28% to Labor (±2), Greens 89% (±3), everyone else
+      53% (±3). Its figure's band stacks those ranges outright rather than shrinking them
+      with sample size, so it reads wider than a poll interval.
       Full preference distribution data was first published for the 1996 election, so
       party-by-party flows don't exist before then; One Nation's line is broken across
       the parliaments it barely contested.</>) },
@@ -4798,7 +4813,10 @@ function infoTerms(D) {
     { id: "two-party-preferred", term: "Two-party preferred", body: (
       <>The share each of two parties holds once every other candidate’s preferences have been
       distributed – the number that decides a seat. The headline contest is Labor against the
-      Coalition; the hero can be switched to the other head-to-heads pollsters publish.</>) },
+      Coalition; the hero can be switched to the other head-to-heads. One of those is not
+      quoted as published: Labor v One Nation reads on the {xref("implied-2pp",
+      "two-party preferred", "implied basis")} instead, because no election has yet counted
+      that pair to check the houses’ own allocations against.</>) },
     { id: "undecided", term: "Undecided", body: (
       <>Electors who won’t name a party – the “can’t say” share – shown beside the soft share who
       name one but won’t call their choice firm. They are different questions with different

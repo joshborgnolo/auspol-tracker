@@ -215,10 +215,12 @@ const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.
    election, proprietary) move with real preference behaviour, a fixed table
    cannot, so the synthetic series can never become the headline. Rows need a
    full primary set with no documented anomaly (sumNote) – a set that doesn't
-   total ~100 can't be read through a 100-point flow table. */
+   total ~100 can't be read through a 100-point flow table. The row carries
+   its own ONP primary so §1c can re-price that one conversion cell per row
+   (§1b's estimator never reads it). */
 const tppRowsSynth = POLLS
   .filter((p) => p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
-  .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
+  .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: rowN(p), firm: p.pollster, onp: p.onp, key: p.date + "|" + p.pollster }));
 
 /* A house effect is that pollster's lean AWAY FROM the cross-house consensus
    on that measure – never borrowed between measures, because a firm that
@@ -422,6 +424,37 @@ const agg2ppSynth = MONTHS.map((ym) => {
 }).filter(Boolean);
 // computed from the data, never hardcoded – flows.mjs changes, this moves
 agg2ppSynth.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: r1(impliedAlp2pp(ELECTION)), lnp: r1(100 - impliedAlp2pp(ELECTION)), ci95: 0, k: 0, election: true });
+
+/* ---- 1c. flow-sensitivity band --------------------------------------------
+   The conversion cell that actually moves between elections is One Nation's:
+   the 2022 table (TPP cut, Event 24310) sent 35.7% of ON preferences to
+   Labor; the shipped 2025 table sends 25.5%. Re-price THAT ONE CELL on the
+   same polls: implied 2PP is linear in the share, so each alt row is the
+   same row plus (2022 − 2025)·its ONP primary, and the alt series runs
+   §1b's full machinery (own house effects, monthly estimator) rather than a
+   blanket per-month offset – a house whose ONP primary runs high shouldn't
+   drag the band edge as if it were every house's reading. Paired with the
+   shipped series, the bracket between the two is what the ONP conversion is
+   worth at each month's ONP primary (~0.7pt at the election's 6%, ~2.8pt at
+   the current ~27%). Both edges are COUNTED tables, so this is a
+   sensitivity read, not an interval: it brackets the last two elections and
+   claims nothing about the next one. */
+const ONP_FLOW_2022 = 0.3570;
+const tppRowsSynth22 = tppRowsSynth.map((r) => ({ ...r, x: r.x + (ONP_FLOW_2022 - FLOW.onp) * r.onp }));
+const synth22Effect = houseEffectsFor(tppRowsSynth22);
+const agg2ppSynth22 = MONTHS.map((ym) => {
+  const r = monthWithSe(tppRowsSynth22, synth22Effect, ym);
+  if (!r) return null;
+  return { ym, x: mx(ym), alp: r1(r.v), lnp: r1(100 - r.v), ci95: r1(1.96 * r.se), k: r.n };
+}).filter(Boolean);
+const sensElec22 = impliedAlp2pp(ELECTION) + (ONP_FLOW_2022 - FLOW.onp) * ELECTION.onp;
+agg2ppSynth22.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: r1(sensElec22), lnp: r1(100 - sensElec22), ci95: 0, k: 0, election: true });
+// lo/hi per month; the 2022 share sends ONP further ALP-side, so 22 ≥ 25
+// month for month and min/max only guards a rounding tie
+const synthBand = agg2ppSynth.map((m) => {
+  const alt = agg2ppSynth22.find((a) => a.ym === m.ym);
+  return alt ? { ym: m.ym, x: m.x, lo: Math.min(m.alp, alt.alp), hi: Math.max(m.alp, alt.alp) } : null;
+}).filter(Boolean);
 
 /* ---- 2. monthly primary vote + election-day anchor --------------------- */
 /* Primaries get the SAME treatment as the monthly 2PP – sample-weighted and
@@ -1506,29 +1539,33 @@ const flowDrift = {
       flow table for THIS pairing:
           implied = alp + lnp·f_lnp + grn·f_grn + (ind+oth)·f_oth
       — and no election count of an ALP-v-ON pairing exists, so the frozen
-      table cannot be election-anchored like §7c's. It is the n-weighted
-      term mean of the ONLY published per-cohort allocation of the pairing,
-      RedBridge / Accent's respondent-allocated splits (tpp_split_on). The
-      implied level is therefore tangent to that house's own reading rather
-      than to an AEC count, and meta.anchor says null so the copy does.
-      (The drift series is baseline-subtracted per house anyway, so a level
-      offset in the table costs nothing; only a table whose cohort mixes
-      drift from the industry's would.)
+      table cannot be election-anchored like §7c's. It is FIRST-PRINCIPLES:
+      the AEC 2025 Senate ATL ballot counts re-anchored on the 2026
+      lower-house counts where ON made the final two (SA state election,
+      Secret Harbour by-election) — senate-flows first-principles
+      derivations (~/Downloads/senate flows, 2026-09-08) — ON-side shares
+      Coal→ON 72 (70–74), GRN→ON 11 (8–14), others→ON 47 (44–50), carried
+      here ALP-side, with FP_ON_BAND the set's own ± range (stacked
+      linearly into the band §7f's quoted figure carries). This is the
+      table the page QUOTES the pairing on (§7f), and it was chosen over
+      RedBridge/Accent's respondent-allocated splits (tpp_split_on — the
+      only published per-cohort allocation of the pairing, kept below as
+      the panel's measured RedBridge row) because revealed, re-validated
+      ballots beat a stated allocation with no count to anchor; the
+      published head-to-heads themselves stay the corroboration this panel
+      monitors. meta.anchor says null and the copy says so. (The drift
+      series is baseline-subtracted per house anyway, so a level offset in
+      the table costs nothing; only a table whose cohort mixes drift from
+      the industry's would.)
 
    2. No house's residual can be read at the election (no pairing totals
       are published this soon after it in-sample either — the earliest
       ALP-v-ON row is eight months in), so every firm anchors on its own
       first FLOW_ON_BASE_MIN residuals and meta.baseFrom records which date
       each series can speak from. */
+const FP_ON = { lnp: 0.28, grn: 0.89, oth: 0.53 };
+const FP_ON_BAND = { lnp: 0.02, grn: 0.03, oth: 0.03 };
 const FLOW_ON_BASE_MIN = 3;
-const FLOW_ON = (() => {
-  const splitRows = POLLS.filter((p) => p.tpp_split_on != null);
-  if (splitRows.length < FLOW_ON_BASE_MIN) return null;
-  const ws = splitRows.map((p) => p.sample || 0);
-  const W = ws.reduce((s, w) => s + w, 0);
-  const wm = (k) => splitRows.reduce((s, p, i) => s + ws[i] * p.tpp_split_on[k], 0) / W;
-  return { lnp: wm("lnp") / 100, grn: wm("grn") / 100, oth: wm("oth") / 100, n: splitRows.length };
-})();
 const FLOW_ON_FIT_MIN = 6;          // min joined waves per house to attempt a fit
 const FLOW_ON_FIT_TAU = 0.12;       // prior SD on each flow share (12 pts in share units)
 const FLOW_ON_FIT_TAU_INT = 0.05;   // prior SD on the intercept (5 pts), prior mean 0
@@ -1536,13 +1573,14 @@ const FLOW_ON_PUB_MIN = 3;          // min published splits before a measured ro
 const FLOW_ON_PUB_SD = 10;          // assumed per-wave SD (pts) of a published cohort split
 /* implied(reading primaries through the frozen table) is defined wherever a
    full primary set exists with no documented anomaly — exactly the
-   tppRowsSynth eligibility rule. No split waves ⇒ FLOW_ON null ⇒ the whole
-   block collapses to empty payload cells and flowDriftOn is emitted null. */
+   tppRowsSynth eligibility rule. With no published ALP-v-ON totals at all
+   the block collapses to empty payload cells and flowDriftOn is emitted
+   null. */
 const impliedOn = (p) =>
-  p.alp + (p.lnp * FLOW_ON.lnp + p.grn * FLOW_ON.grn + ((p.ind || 0) + (p.oth || 0)) * FLOW_ON.oth);
+  p.alp + (p.lnp * FP_ON.lnp + p.grn * FP_ON.grn + ((p.ind || 0) + (p.oth || 0)) * FP_ON.oth);
 const fullPrimOn = (p) => p && p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote;
 const driftOnResid = [], flowOnFitRows = [];
-if (FLOW_ON) for (const [key, v] of ALT_BY.entries()) {
+for (const [key, v] of ALT_BY.entries()) {
   if (v.ao == null) continue;
   const p = POLL_BY_KEY.get(key);
   if (!fullPrimOn(p)) continue;
@@ -1570,10 +1608,10 @@ const driftOnAnom = driftOnResid
   .filter((r) => FLOW_ON_BASE_FROM[r.firm])
   .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_ON_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key }));
 /* ridge with prior toward the frozen table — the §7c fitter with f0 for the
-   pairing's cohort mix [1, lnp, grn, ind+oth]. Wave-equal weights, σ̂²w
-   pooled across houses: same argument, same constants. */
+   pairing's cohort mix [1, lnp, grn, ind+oth] pointed at FP_ON. Wave-equal
+   weights, σ̂²w pooled across houses: same argument, same constants. */
 function flowOnRidge(rows, sigma2W) {
-  const f0 = [0, FLOW_ON.lnp, FLOW_ON.grn, FLOW_ON.oth];
+  const f0 = [0, FP_ON.lnp, FP_ON.grn, FP_ON.oth];
   const lamS = sigma2W / (FLOW_ON_FIT_TAU * FLOW_ON_FIT_TAU);
   const lamI = sigma2W / (FLOW_ON_FIT_TAU_INT * FLOW_ON_FIT_TAU_INT);
   const { A, b } = flowDesign(rows);
@@ -1608,9 +1646,9 @@ let flowOnSigma2W = 1;
   }
   if (dfSum > 0) flowOnSigma2W = ssrSum / dfSum;
 }
-/* the measured row IS the frozen table's source — RedBridge prints the only
-   respondent allocation of this pairing, so its n-weighted term mean
-   replaces its fit row wholesale (m:1 provenance), as in §7c */
+/* the measured row is the house's own published allocation — RedBridge
+   prints the only respondent splits of this pairing, so its n-weighted
+   term mean replaces its fit row wholesale (m:1 provenance), as in §7c */
 const flowOnPubByFirm = new Map();
 for (const p of POLLS) {
   if (p.tpp_split_on == null) continue;
@@ -1654,7 +1692,7 @@ const driftOnMonths = MONTHS.map((ym) => {
   return r && { ym, x: mx(ym), v: r1(r.v), ci95: r1(1.96 * r.se), k: r.n };
 }).filter(Boolean);
 const driftOnNow = nowcastAdj(driftOnAnom, null, refNow);
-const flowDriftOn = FLOW_ON ? {
+const flowDriftOn = driftOnAnom.length ? {
   months: driftOnMonths,
   now: driftOnNow && { v: driftOnNow.v, ci95: driftOnNow.ci95, n: driftOnNow.n, nEff: driftOnNow.nEff },
   /* per-house anomaly series for the faint background lines — same ragged
@@ -1670,10 +1708,10 @@ const flowDriftOn = FLOW_ON ? {
   flows: flowOnFits,
   meta: {
     /* the frozen table's identity: NOT an election row — no count of the
-       pairing exists — but the n-weighted term mean of the only published
-       per-cohort splits (RedBridge's). anchor null so the copy says so. */
-    pub: { l: r1(FLOW_ON.lnp * 100), g: r1(FLOW_ON.grn * 100), t: r1(FLOW_ON.oth * 100) },
-    pubN: FLOW_ON.n,
+       pairing exists — but the first-principles set the page quotes the
+       pairing on (§7f). anchor null so the copy says so. */
+    pub: { l: r1(FP_ON.lnp * 100), g: r1(FP_ON.grn * 100), t: r1(FP_ON.oth * 100) },
+    pubSrc: "first-principles flow set",
     sigma2w: r2(flowOnSigma2W),
     anchor: null,
     baseFrom: Object.fromEntries(Object.entries(FLOW_ON_BASE_FROM).map(([f, b]) => [f, b.from])),
@@ -1698,7 +1736,7 @@ function altNowcast(s) {
 }
 const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
 
-/* ---- 7d. current primary = the 21-day nowcast, per party -----------------
+/* ---- 7e. current primary = the 21-day nowcast, per party -----------------
    The reader-facing "current primary" is the headline construction itself –
    trailing 21d, 7d half-life, per-party house effects, sqrt-wave deflation –
    NOT the calendar month-to-date mean: early in a month that mean is a
@@ -1709,14 +1747,14 @@ const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
    quotes. The five-party check is aggPrimary's own, applied to the window:
    debiased per party, plain-window total alongside, renormalised only if the
    totals disagree by more than half a point. */
-const primaryNow = (() => {
-  const win = (k) => primaryRows[k].filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= HL_WINDOW; });
+const primaryNowAt = (ref) => {
+  const win = (k) => primaryRows[k].filter((r) => { const d = ddays(ref, r.mid); return d >= 0 && d <= HL_WINDOW; });
   const adj = {}, parties = {};
   let plainTotal = 0, adjTotal = 0, n = 0;
   for (const k of PRIMARY_KEYS) {
     const rows = win(k);
     if (!rows.length) return null;
-    const est = weightedWithSe(nowcastPts(primaryRows[k], primaryHE[k], refNow));
+    const est = weightedWithSe(nowcastPts(primaryRows[k], primaryHE[k], ref));
     adj[k] = est.v;
     const plain = mean(rows.map((r) => r.x));
     parties[k] = { plain: r2(plain), adj: r2(est.v) };
@@ -1727,6 +1765,27 @@ const primaryNow = (() => {
   const out = {};
   for (const k of PRIMARY_KEYS) out[k] = r1(rescaled ? adj[k] * (plainTotal / adjTotal) : adj[k]);
   return { ...out, n, parties, plainTotal, adjTotal, rescaled };
+};
+const primaryNow = primaryNowAt(refNow);
+
+/* ---- 7f. ALP–ON current figure: primaries through the first-principles
+   flow set ---------------------------------------------------------------
+   No election count of an ALP-v-ON pairing exists, and by mid-2026 the
+   industry was quoting that pairing three points apart house to house under
+   uncoordinated respondent allocations. The figure this page QUOTES for the
+   pairing therefore comes from one uniform flow set applied to the §7e
+   current primaries, with the set's own range carried as a band. The set
+   itself is §7d's FP_ON (the full provenance lives there). The pollsters'
+   published head-to-heads are demoted to corroboration: they remain the
+   alt2pp/altLatest series and the flowDriftOn monitor's input. */
+const impliedOnFp = (p) => p.alp + p.lnp * FP_ON.lnp + p.grn * FP_ON.grn + p.oth * FP_ON.oth;
+const onImp = primaryNow && (() => {
+  const a = impliedOnFp(primaryNow);
+  const band = primaryNow.lnp * FP_ON_BAND.lnp + primaryNow.grn * FP_ON_BAND.grn
+             + primaryNow.oth * FP_ON_BAND.oth;   // linear worst-case stack, share scale
+  const prev = primaryNowAt(refNow - 30 * 86400000);
+  return { a: r1(a), b: r1(100 - a), band: r1(band), n: primaryNow.n,
+           aPrev: prev ? r1(impliedOnFp(prev)) : null };
 })();
 
 /* ---- 8. headline readings ---------------------------------------------- */
@@ -1750,10 +1809,14 @@ const latest = {
     const chg = hlNow.alp - hl1mo.alp;
     return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(chg) > 1.96 * seChg };
   })() : {}),
-  /* The quoted "current primary" – the §7d nowcast, NOT aggPrimary's last
+  /* The quoted "current primary" – the §7e nowcast, NOT aggPrimary's last
      monthly point (that stays the chart series). Shares only; the window
      count rides as primaryNow's own n where a reader needs it. */
   primary: primaryNow && Object.fromEntries(PRIMARY_KEYS.map((k) => [k, primaryNow[k]])),
+  /* The ALP–ON pairing's ONLY quoted level: the §7f implied figure (uniform
+     first-principles flow set on the §7e primaries) carrying its flow band.
+     Pollsters' published head-to-heads stay in altLatest as corroboration. */
+  onImp,
   updated: fmtDate(LATEST_ISO), updatedISO: LATEST_ISO,
   published: fmtDate(LATEST_PUB_ISO), publishedISO: LATEST_PUB_ISO,
   nextElectionDue: "By 20 May 2028", pollsTracked: individualPolls.length, housesTracked: houses.size,
@@ -1767,7 +1830,7 @@ const latest = {
    The glossary's weighted-aggregate entry prints the headline as tables of
    its own inputs, so a reader can reproduce the number from data/polls.json
    by hand rather than take a formula on trust. Built line-for-line from
-   nowcastAdj (the 21-day 2PP window) and primaryNow (the §7d 21-day
+   nowcastAdj (the 21-day 2PP window) and primaryNow (the §7e 21-day
    ALP-primary nowcast) – same helpers, same weights – so each
    table's Σwᵢxᵢ ÷ Σwᵢ line reproduces the figure in the hero. The console
    lines at the end compare these sums against the estimates themselves, so
@@ -1808,7 +1871,7 @@ const showWorking = (() => {
     });
     tpp = { rows, k: tppRowsIn.length, sw: r2(sw), swx: r2(swx), mean: r2(swx / sw), v: r1(swx / sw) };
   }
-  /* ALP primary: the §7d nowcast window – rebuilt from POLLS only so each
+  /* ALP primary: the §7e nowcast window – rebuilt from POLLS only so each
      row can name its fieldwork; the wave counts, weights and lean calls are
      the estimator's own. The five-party check rides from primaryNow itself
      (ONE source for it); the Σ of THIS table's rows must reproduce it,
@@ -2620,13 +2683,22 @@ window.AUSPOL = (function () {
   /* Synthetic 2PP diagnostic: the polls' primaries read through the single
      AEC-2025 flow table in flows.mjs, on the SAME estimator (house effects,
      window, half-life) as the published series above. A diagnostic, not a
-     shadow headline: its election "anchor" is the table read back onto the
-     count's own primaries (54.2 vs the actual 55.2), and its nowcast will
-     sit ~0.7pt under the published blend for as long as houses' own
-     allocations run ALP-side of a fixed 2025 table. The UI shows it as a
-     non-default overlay / method-page comparison, never as a correction. */
+     shadow headline: its election "anchor" is a consistency check, not a
+     forecast agreement (the TPP table was built FROM that count, so it
+     reproduces 55.2 by construction – §1b), and its nowcast tracks whatever
+     gap, either side, that a fixed 2025 table runs against houses' own
+     moving allocations – that gap is the diagnostic's content (its drift
+     over time is flowDrift below). The UI shows it as a non-default overlay
+     / method-page comparison, never as a correction. */
   const synth2pp = ${JSON.stringify(agg2ppSynth)};
   const synthLatest = ${JSON.stringify(synthNow ? { ...synthNow, lnp: r1(100 - synthNow.alp), prev: synth1mo ? synth1mo.alp : null } : null)};
+  /* Flow-sensitivity bracket for the diagnostic above (gen-data §1c): each
+     month's {lo, hi} = implied ALP 2PP with the ONP→ALP share at its last
+     two COUNTED election tables (2022 and 2025, TPP cut). A sensitivity
+     bracket, NOT an interval – its width is what the One Nation conversion
+     is worth at that month's ONP primary. Only meaningful beside synth2pp;
+     the hero draws it when the implied overlay is switched on. */
+  const flowSens = ${JSON.stringify(synthBand)};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};
   /* Per-measure house effects, {firm: {v, n}} – snapshots read at t=Infinity,
@@ -2736,7 +2808,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, flowSens, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
@@ -2763,8 +2835,10 @@ console.log("MONTHS:", MONTHS.length, MONTHS[0], "→", MONTHS[MONTHS.length - 1
 console.log("agg2pp:", agg2pp.length, "pts | first:", agg2pp[0], "| last:", agg2pp[agg2pp.length - 1]);
 console.log("synth2pp:", agg2ppSynth.length, "pts | anchor(implied):", agg2ppSynth[0].alp, "vs count 55.2 | last:", agg2ppSynth[agg2ppSynth.length - 1]);
 console.log("synthLatest:", synthNow ? `ALP ${synthNow.alp} (n=${synthNow.n}, se=${synthNow.se.toFixed(2)}) vs published ${hlNow.alp} → Δ${r1(synthNow.alp - hlNow.alp)}` : "none (window empty)");
+console.log("flowSens:", synthBand.length, "pts | bracket at election:", synthBand[0].lo + "–" + synthBand[0].hi, "| last month:", (synthBand[synthBand.length - 1].lo) + "–" + (synthBand[synthBand.length - 1].hi), `(width ${r1(synthBand[synthBand.length - 1].hi - synthBand[synthBand.length - 1].lo)}pt)`);
 console.log("aggPrimary last:", aggPrimary[aggPrimary.length - 1]);
 console.log("primaryNow:", primaryNow ? PRIMARY_KEYS.map((k) => `${k} ${primaryNow[k]}`).join(" ") : "null (empty window)", primaryNow ? `| n=${primaryNow.n}${primaryNow.rescaled ? ", rescaled" : ""}` : "");
+console.log("onImp: ALP v ON first-principles implied:", onImp ? `${onImp.a}–${onImp.b} ± ${onImp.band} (n=${onImp.n})` : "null (empty window)");
 console.log("alt2pp alp_on:", alt2pp.alp_on.length, "pts (last", alt2pp.alp_on.at(-1)?.ym, ") | lnp_on:", alt2pp.lnp_on.length, "pts (last", alt2pp.lnp_on.at(-1)?.ym, ")");
 console.log("leaderMonths:", leaderMonths.length, "rows:", leaderMonths.map((r) => r.ym).join(","));
 console.log("  last:", JSON.stringify(leaderMonths[leaderMonths.length - 1]));
@@ -2782,9 +2856,9 @@ console.log("  flow fits (wave σ²w=" + JSON.stringify(r2(flowSigma2W)) + "): A
 if (flowDriftOn) {
   console.log("flowDriftOn:", flowDriftOn.meta.houses.length, "houses | now:", JSON.stringify(flowDriftOn.now), "| last month:", JSON.stringify(flowDriftOn.months[flowDriftOn.months.length - 1]));
   console.log("  baseFrom:", Object.entries(flowDriftOn.meta.baseFrom).map(([f, d]) => `${f}→${d}`).join(", "));
-  console.log("  flow fits (wave σ²w=" + JSON.stringify(flowDriftOn.meta.sigma2w) + "): pub(RB term mean)", JSON.stringify(flowDriftOn.meta.pub), "|", flowDriftOn.flows.map((f) => `${f.firm} l${f.l}±${f.le}/g${f.g}±${f.ge}/t${f.t}±${f.te} (n=${f.n}${f.m ? ", published mean" : ""})`).join(" · "));
+  console.log("  flow fits (wave σ²w=" + JSON.stringify(flowDriftOn.meta.sigma2w) + "): pub(" + flowDriftOn.meta.pubSrc + ")", JSON.stringify(flowDriftOn.meta.pub), "|", flowDriftOn.flows.map((f) => `${f.firm} l${f.l}±${f.le}/g${f.g}±${f.ge}/t${f.t}±${f.te} (n=${f.n}${f.m ? ", published mean" : ""})`).join(" · "));
 } else {
-  console.log("flowDriftOn: skipped (no published ALP-v-ON splits to anchor the table)");
+  console.log("flowDriftOn: skipped (no published ALP-v-ON head-to-heads to monitor)");
 }
 console.log("headline 2PP:", hlNow, "| 1mo ago:", hl1mo);
 console.log("pollCadence:", pollCadence.length, "houses on a pattern →",
