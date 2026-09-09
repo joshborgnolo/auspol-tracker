@@ -198,7 +198,14 @@ const rowN = (p) => (p && p.sampleEff != null)
 const midMs = (p) => (new Date(p.dateStart || p.date).getTime() + new Date(p.date).getTime()) / 2;
 const share2pp = (p) => (p.tpp_lnp != null && p.tpp_alp + p.tpp_lnp > 0) ? (p.tpp_alp / (p.tpp_alp + p.tpp_lnp)) * 100 : p.tpp_alp;
 const ddays = (a, b) => (a - b) / 86400000;
-const HL_WINDOW = 21, HL_HALF = 7;
+const HL_WINDOW = 21, HL_HALF = 7, HL_TAPER = 14;
+/* Highway: recency decay alone would step from ~14% weight to nothing at the
+   window's edge, so a big poll exiting overnight used to move the estimate
+   discontinuously. Taper (half-cosine) runs from HL_TAPER days to zero at
+   HL_WINDOW, so the edge fades instead of stepping. Shared by nowcastPts and
+   the §8b show-working tables - one formula, one home. */
+const taperW = (d) => (d <= HL_TAPER ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - HL_TAPER) / (HL_WINDOW - HL_TAPER))));
+const recencyW = (d) => Math.exp(-LN2 * d / HL_HALF) * taperW(d);
 const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
 /* Synthetic 2PP rows: each poll's primaries read through the single measured
    flow table in flows.mjs (AEC 2025, Event 31496). This series answers a
@@ -344,7 +351,7 @@ function nowcastPts(rows, he, ref) {
     const d = ddays(ref, a.mid);
     if (d < 0 || d > HL_WINDOW) continue;
     waves.set(a.firm, (waves.get(a.firm) || 0) + 1);
-    pts.push({ w: a.n * Math.exp(-LN2 * d / HL_HALF), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
+    pts.push({ w: a.n * recencyW(d), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
   }
   /* A house with m waves in the window has not measured the electorate m
      independent times - same method, same house-effect residue - so its
@@ -1753,7 +1760,7 @@ const latest = {
   /* deff rides in the payload so the page's discord engine reads the SAME
      constant the node estimator used (it lives in an untransformed asset and
      used to mirror 1.6 by hand, free to drift). */
-  method: { kind: "weighted house-effect-adjusted mean", windowDays: HL_WINDOW, halfLifeDays: HL_HALF, shrinkK: SHRINK_K, nPolls: hlNow.n, deff: HL_DEFF },
+  method: { kind: "weighted house-effect-adjusted mean", windowDays: HL_WINDOW, halfLifeDays: HL_HALF, taperDays: HL_TAPER, shrinkK: SHRINK_K, nPolls: hlNow.n, deff: HL_DEFF },
 };
 
 /* ---- 8b. show-your-working: the rows behind the two headline estimates ---
@@ -1790,7 +1797,7 @@ const showWorking = (() => {
     const rows = tppRowsIn.map((a) => {
       const p = POLL_BY_KEY.get(a.key);
       const d = ddays(refNow, a.mid);
-      const w = a.n * Math.exp(-LN2 * d / HL_HALF) / Math.sqrt(waves.get(a.firm));
+      const w = a.n * recencyW(d) / Math.sqrt(waves.get(a.firm));
       const lean = heV(houseEffect, a.firm, refNow);
       const adj = a.x - lean;
       sw += w; swx += adj * w;
@@ -1816,7 +1823,7 @@ const showWorking = (() => {
     const rows = wPolls.map((p) => {
       const n = rowN(p);
       const d = ddays(refNow, midMs(p));
-      const w = n * Math.exp(-LN2 * d / HL_HALF) / Math.sqrt(waves.get(p.pollster));
+      const w = n * recencyW(d) / Math.sqrt(waves.get(p.pollster));
       const lean = heV(primaryHE.alp, p.pollster, refNow);
       const adj = p.alp - lean;
       sw += w; swx += adj * w;

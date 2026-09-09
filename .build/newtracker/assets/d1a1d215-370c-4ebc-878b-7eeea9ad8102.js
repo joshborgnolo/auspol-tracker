@@ -4546,7 +4546,9 @@ function infoTerms(D) {
         {swP.rescaled
           ? ` – past the half-point tolerance, so all five are scaled by ${swP.plainTotal} ÷ ${swP.adjTotal}, which is how the Labor figure above lands at ${swP.v.toFixed(1)}.`
           : " – within the half-point tolerance, so nothing is rescaled."}
-        {" "}A wave counts from its fieldwork midpoint and leaves the window after 21 days.</p>
+        {" "}A wave counts from its fieldwork midpoint and fades out over its last week: full
+        weight to day 14, then a half-cosine taper to zero on day 21, when it leaves the
+        window.</p>
     </div>
   ) : null;
   const tppWork = swT && swT.rows.length ? (
@@ -4813,14 +4815,16 @@ function infoTerms(D) {
       calendar month – Roy Morgan polls weekly – its repeat waves count for the square root of
       their number, so three weekly waves count as 1.7, not 3.
       {" "}Full formula: the headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window, where
-      xᵢ is a poll’s house-adjusted figure and its weight wᵢ = nᵢ × 2^(−d/7) ÷ √m – nᵢ the
+      xᵢ is a poll’s house-adjusted figure and its weight wᵢ = nᵢ × 2^(−d/7) × t(d) ÷ √m – nᵢ the
       poll’s sample on the estimator’s scale: its published effective sample where the house files
       one (Newspoll, YouGov, Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog, via their Australian
       Polling Council methodology statements), grossed back up by the shared 1.6 design factor, else its raw
       sample capped at 3,000 – 1,200 where no sample is filed at all. nᵢ also sets the
       sampling-error floor under the whole
       window, so the same published figure improves both. d is the poll’s age in days (halving
-      every seven), and m its house’s wave count in the window. The effective sample behind it is (Σwᵢ)² ÷ Σwᵢ², and the monthly trend points
+      every seven) and t(d) a half-cosine edge that holds full weight to day 14 then eases
+      smoothly to zero on day 21 – a wave leaving the window drifts out instead of stepping
+      out – and m its house’s wave count in the window. The effective sample behind it is (Σwᵢ)² ÷ Σwᵢ², and the monthly trend points
       run the same formula with the recency term dropped. The leaders’ ratings and national
       direction are built the same way monthly; preferred prime minister and the undecided share
       stay as plain {xref("monthly-average", "weighted aggregate", "monthly averages")} – their
