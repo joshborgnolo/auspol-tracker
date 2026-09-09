@@ -242,10 +242,10 @@ function buildFavicon() {
     if (i < 0) throw new Error("favicon: " + name + " not found in dataset");
     return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
   };
-  const aggPrimary = grab("aggPrimary"), agg2pp = grab("agg2pp"), alt2pp = grab("alt2pp");
+  const agg2pp = grab("agg2pp"), alt2pp = grab("alt2pp"), L = grab("latest");
 
   // --- graduations: latest primary aggregate, tallest first (as on the page) ---
-  const lp = aggPrimary[aggPrimary.length - 1];
+  const lp = L.primary;
   const glyph = ["alp", "lnp", "grn", "onp"].map((id) => ({ id, v: lp[id] }))
     .sort((a, b) => b.v - a.v);
   const vs = glyph.map((p) => p.v), gmin = Math.min(...vs), gmax = Math.max(...vs);
@@ -367,7 +367,7 @@ function buildStaticSummary() {
     if (i < 0) throw new Error("static summary: " + name + " not found");
     return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
   };
-  const L = grab("latest"), prim = grab("aggPrimary").slice(-1)[0];
+  const L = grab("latest"), prim = L.primary;
   const table = grab("pollsterTable"), acc = grab("accuracy");
   const polls = grab("individualPolls");
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));

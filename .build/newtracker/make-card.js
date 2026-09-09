@@ -160,7 +160,7 @@
       c.strokeStyle = col; c.lineWidth = 1.4 * k; c.lineCap = "round"; c.stroke(); };
     c.globalAlpha = 0.5; arc(-90, 0, T.alp); arc(0, 90, oppCol); c.globalAlpha = 1;
 
-    const lp = D.aggPrimary[D.aggPrimary.length - 1];
+    const lp = D.latest.primary;
     const ps = [["alp", lp.alp], ["lnp", lp.lnp], ["grn", lp.grn], ["onp", lp.onp]]
       .sort((a, b) => b[1] - a[1]);
     const vs = ps.map((p) => p[1]), mn = Math.min(...vs), mx = Math.max(...vs);

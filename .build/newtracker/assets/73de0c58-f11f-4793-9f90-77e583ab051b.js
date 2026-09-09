@@ -49,7 +49,9 @@ function GlyphDial({ className, svgRef, width, height }) {
 
   // wordmark glyph = live primary-vote aggregate: one bar per party,
   // sorted tallest-first, height scaled to each party's latest share
-  const lp = D.aggPrimary[D.aggPrimary.length - 1];
+  // (the 21-day primary nowcast the page quotes – latest.primary, not the
+  // calendar month-to-date point aggPrimary ends on)
+  const lp = D.latest.primary;
   const glyph = [
     { id: "alp", color: "var(--alp)", v: lp.alp },
     { id: "lnp", color: "var(--lnp)", v: lp.lnp },

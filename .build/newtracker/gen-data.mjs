@@ -334,7 +334,10 @@ function weightedWithSe(pts) {                 // pts: [{ w, x, n }]
   const se = Math.max(Number.isFinite(seSpread) ? seSpread : 0, seFloor);
   return { v: mean, n: pts.length, se, nEff };
 }
-function nowcastAdj(rows, he, ref) {
+/* The window's weighted points, split out so an estimate can be taken
+   UNROUNDED (the five-party primary check totals the debiased shares before
+   any r1 touches them). nowcastAdj stays the rounded public face. */
+function nowcastPts(rows, he, ref) {
   const pts = [];
   const waves = new Map();                    // firm -> wave count inside the window
   for (const a of rows) {
@@ -350,7 +353,10 @@ function nowcastAdj(rows, he, ref) {
      else for genuinely measuring more often, ~1.7x rather than 3x - it
      just can't be half the sample by showing up three times. */
   for (const p of pts) p.w /= Math.sqrt(waves.get(p.firm));
-  const r = weightedWithSe(pts);
+  return pts;
+}
+function nowcastAdj(rows, he, ref) {
+  const r = weightedWithSe(nowcastPts(rows, he, ref));
   return r && { v: r1(r.v), n: r.n, se: r2(r.se), nEff: r1(r.nEff), ci95: r1(1.96 * r.se) };
 }
 /* The same estimate for ONE calendar month, weighted by sample size only.
@@ -1685,6 +1691,37 @@ function altNowcast(s) {
 }
 const altLatest = { alp_on: altNowcast(altAON), lnp_on: altNowcast(altLON) };
 
+/* ---- 7d. current primary = the 21-day nowcast, per party -----------------
+   The reader-facing "current primary" is the headline construction itself –
+   trailing 21d, 7d half-life, per-party house effects, sqrt-wave deflation –
+   NOT the calendar month-to-date mean: early in a month that mean is a
+   two-poll, shock-pure panel and runs points off every smoothed comparator
+   in fast moves (2026-09-09 audit, .matilda/divergence-vs-bonham-bludger-2026-09.md,
+   advisory A1). aggPrimary STAYS monthly – that series draws the charts and
+   feeds the prediction history; this object is the point estimate the site
+   quotes. The five-party check is aggPrimary's own, applied to the window:
+   debiased per party, plain-window total alongside, renormalised only if the
+   totals disagree by more than half a point. */
+const primaryNow = (() => {
+  const win = (k) => primaryRows[k].filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= HL_WINDOW; });
+  const adj = {}, parties = {};
+  let plainTotal = 0, adjTotal = 0, n = 0;
+  for (const k of PRIMARY_KEYS) {
+    const rows = win(k);
+    if (!rows.length) return null;
+    const est = weightedWithSe(nowcastPts(primaryRows[k], primaryHE[k], refNow));
+    adj[k] = est.v;
+    const plain = mean(rows.map((r) => r.x));
+    parties[k] = { plain: r2(plain), adj: r2(est.v) };
+    plainTotal += plain; adjTotal += est.v;
+    n = Math.max(n, est.n);
+  }
+  const rescaled = Math.abs(adjTotal - plainTotal) > 0.5;
+  const out = {};
+  for (const k of PRIMARY_KEYS) out[k] = r1(rescaled ? adj[k] * (plainTotal / adjTotal) : adj[k]);
+  return { ...out, n, parties, plainTotal, adjTotal, rescaled };
+})();
+
 /* ---- 8. headline readings ---------------------------------------------- */
 /* The reader-facing count. Products stay distinct series everywhere above –
    an (MRP) release is its own schedule, its own house effect – but this
@@ -1706,6 +1743,10 @@ const latest = {
     const chg = hlNow.alp - hl1mo.alp;
     return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(chg) > 1.96 * seChg };
   })() : {}),
+  /* The quoted "current primary" – the §7d nowcast, NOT aggPrimary's last
+     monthly point (that stays the chart series). Shares only; the window
+     count rides as primaryNow's own n where a reader needs it. */
+  primary: primaryNow && Object.fromEntries(PRIMARY_KEYS.map((k) => [k, primaryNow[k]])),
   updated: fmtDate(LATEST_ISO), updatedISO: LATEST_ISO,
   published: fmtDate(LATEST_PUB_ISO), publishedISO: LATEST_PUB_ISO,
   nextElectionDue: "By 20 May 2028", pollsTracked: individualPolls.length, housesTracked: houses.size,
@@ -1719,8 +1760,8 @@ const latest = {
    The glossary's weighted-aggregate entry prints the headline as tables of
    its own inputs, so a reader can reproduce the number from data/polls.json
    by hand rather than take a formula on trust. Built line-for-line from
-   nowcastAdj (the 21-day 2PP window) and monthWithSe / aggPrimary (the
-   current month's ALP primary) – same helpers, same weights – so each
+   nowcastAdj (the 21-day 2PP window) and primaryNow (the §7d 21-day
+   ALP-primary nowcast) – same helpers, same weights – so each
    table's Σwᵢxᵢ ÷ Σwᵢ line reproduces the figure in the hero. The console
    lines at the end compare these sums against the estimates themselves, so
    estimator drift that an emitted table would now contradict shows in the
@@ -1760,51 +1801,35 @@ const showWorking = (() => {
     });
     tpp = { rows, k: tppRowsIn.length, sw: r2(sw), swx: r2(swx), mean: r2(swx / sw), v: r1(swx / sw) };
   }
-  /* ALP primary: the current calendar month, sampled and debiased exactly as
-     monthWithSe(primaryRows.alp, primaryHE.alp, ym) computes it – rebuilt
-     from POLLS only so each row can name its fieldwork; the wave counts,
-     weights and lean calls are the estimator's own. The five-party check is
-     aggPrimary's for this one month: debiased per party, plain-mean total
-     alongside, renormalised only if the two totals disagree by more than
-     half a point. */
-  const ym = MONTHS[MONTHS.length - 1];
-  const mPolls = POLLS.filter((p) => ymOf(p.date) === ym && p.alp != null);
-  mPolls.sort((a, b) => midMs(a) - midMs(b));
+  /* ALP primary: the §7d nowcast window – rebuilt from POLLS only so each
+     row can name its fieldwork; the wave counts, weights and lean calls are
+     the estimator's own. The five-party check rides from primaryNow itself
+     (ONE source for it); the Σ of THIS table's rows must reproduce it,
+     which the guard below enforces. */
   let primary = null;
-  if (mPolls.length) {
+  if (primaryNow) {
+    const wPolls = POLLS.filter((p) => { if (p.alp == null) return false; const d = ddays(refNow, midMs(p)); return d >= 0 && d <= HL_WINDOW; });
+    wPolls.sort((a, b) => midMs(a) - midMs(b));
     const waves = new Map();
-    for (const p of mPolls) waves.set(p.pollster, (waves.get(p.pollster) || 0) + 1);
-    const midT = ymMidMs(ym);
-    let sw = 0, swx = 0, plainSum = 0;
-    const rows = mPolls.map((p) => {
+    for (const p of wPolls) waves.set(p.pollster, (waves.get(p.pollster) || 0) + 1);
+    let sw = 0, swx = 0;
+    const rows = wPolls.map((p) => {
       const n = rowN(p);
-      const w = n / Math.sqrt(waves.get(p.pollster));
-      const lean = heV(primaryHE.alp, p.pollster, midT);
+      const d = ddays(refNow, midMs(p));
+      const w = n * Math.exp(-LN2 * d / HL_HALF) / Math.sqrt(waves.get(p.pollster));
+      const lean = heV(primaryHE.alp, p.pollster, refNow);
       const adj = p.alp - lean;
-      sw += w; swx += adj * w; plainSum += p.alp;
-      return { firm: p.pollster, fw: fwText(p), mid: dayMon(midMs(p)),
-               ...(new Date(midMs(p)).getUTCMonth() !== +ym.slice(5, 7) - 1 ? { crossed: true } : {}),
+      sw += w; swx += adj * w;
+      return { firm: p.pollster, fw: fwText(p), mid: dayMon(midMs(p)), d: r1(d),
                x: r2(p.alp), lean: r2(lean), adj: r2(adj),
                n: Math.round(n), m: waves.get(p.pollster), w: r2(w) };
     });
-    const parties = {};
-    let plainTotal = 0, adjTotal = 0, alpEst = null;
-    for (const k of PRIMARY_KEYS) {
-      const rs = primaryRows[k].filter((r) => r.ym === ym);
-      if (!rs.length) { parties[k] = null; continue; }
-      const est = monthWithSe(primaryRows[k], primaryHE[k], ym);
-      const plain = mean(rs.map((r) => r.x));
-      parties[k] = { plain: r2(plain), adj: r2(est.v) };
-      plainTotal += plain; adjTotal += est.v;
-      if (k === "alp") alpEst = est.v;
-    }
-    const rescaled = adjTotal > 0 && Math.abs(adjTotal - plainTotal) > 0.5;
-    const alpFinal = rescaled ? alpEst * (plainTotal / adjTotal) : alpEst;
-    primary = { ym, ymLabel: `${MNF[+ym.slice(5, 7) - 1]} ${ym.slice(0, 4)}`, rows,
+    primary = { rows, k: wPolls.length, ref: dayMon(refNow),
                 sw: r2(sw), swx: r2(swx), mean: r2(swx / sw),
-                plainMean: r2(plainSum / mPolls.length),
-                parties, plainTotal: r2(plainTotal), adjTotal: r2(adjTotal),
-                rescaled, v: r1(alpFinal) };
+                parties: primaryNow.parties,
+                plainTotal: r2(primaryNow.plainTotal), adjTotal: r2(primaryNow.adjTotal),
+                rescaled: primaryNow.rescaled,
+                v: r1(primaryNow.rescaled ? (swx / sw) * (primaryNow.plainTotal / primaryNow.adjTotal) : swx / sw) };
   }
   return { tpp, primary };
 })();
@@ -1813,12 +1838,12 @@ const showWorking = (() => {
    warn-and-ship a page that disagrees with itself. */
 if (showWorking.tpp && showWorking.tpp.v !== hlNow.alp)
   throw new Error(`show-working 2pp ${showWorking.tpp.v} != headline ${hlNow.alp} – emitted table would contradict the hero`);
-if (showWorking.primary && showWorking.primary.v !== aggPrimary[aggPrimary.length - 1].alp)
-  throw new Error(`show-working primary ${showWorking.primary.v} != aggPrimary ${aggPrimary[aggPrimary.length - 1].alp} – emitted table would contradict the hero`);
+if (showWorking.primary && showWorking.primary.v !== primaryNow.alp)
+  throw new Error(`show-working primary ${showWorking.primary.v} != primaryNow ${primaryNow.alp} – emitted table would contradict the hero`);
 console.log("showWorking:",
   showWorking.tpp ? `2pp mean ${showWorking.tpp.mean}% over ${showWorking.tpp.k} polls` : "2pp window empty",
   "|",
-  showWorking.primary ? `primary mean ${showWorking.primary.mean}% (${showWorking.primary.ymLabel})` : "no current-month primary rows");
+  showWorking.primary ? `primary mean ${showWorking.primary.mean}% (21d to ${showWorking.primary.ref})` : "primary nowcast window empty");
 
 /* ---- 9. events (chart markers) ----------------------------------------- */
 const events = EVENTS.map((e) => ({
@@ -2732,6 +2757,7 @@ console.log("agg2pp:", agg2pp.length, "pts | first:", agg2pp[0], "| last:", agg2
 console.log("synth2pp:", agg2ppSynth.length, "pts | anchor(implied):", agg2ppSynth[0].alp, "vs count 55.2 | last:", agg2ppSynth[agg2ppSynth.length - 1]);
 console.log("synthLatest:", synthNow ? `ALP ${synthNow.alp} (n=${synthNow.n}, se=${synthNow.se.toFixed(2)}) vs published ${hlNow.alp} → Δ${r1(synthNow.alp - hlNow.alp)}` : "none (window empty)");
 console.log("aggPrimary last:", aggPrimary[aggPrimary.length - 1]);
+console.log("primaryNow:", primaryNow ? PRIMARY_KEYS.map((k) => `${k} ${primaryNow[k]}`).join(" ") : "null (empty window)", primaryNow ? `| n=${primaryNow.n}${primaryNow.rescaled ? ", rescaled" : ""}` : "");
 console.log("alt2pp alp_on:", alt2pp.alp_on.length, "pts (last", alt2pp.alp_on.at(-1)?.ym, ") | lnp_on:", alt2pp.lnp_on.length, "pts (last", alt2pp.lnp_on.at(-1)?.ym, ")");
 console.log("leaderMonths:", leaderMonths.length, "rows:", leaderMonths.map((r) => r.ym).join(","));
 console.log("  last:", JSON.stringify(leaderMonths[leaderMonths.length - 1]));

@@ -185,8 +185,9 @@ function PrimaryVotePanel({ rangeId }) {
      crossings. One chip-tap brings it back. */
   const [hidden, setHidden] = useState({ oth: true });
   const narrow = useNarrow();
-  const latest = D.aggPrimary[D.aggPrimary.length - 1];
+  const latest = D.latest.primary;
   // labels & series ordered by descending latest primary-vote share
+  // (the quoted 21-day nowcast, so chip order matches the figures shown)
   const parts = [
     { id: "alp", ...D.PARTIES.alp },
     { id: "lnp", ...D.PARTIES.lnp },

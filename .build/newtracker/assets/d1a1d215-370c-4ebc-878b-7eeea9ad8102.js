@@ -4513,7 +4513,7 @@ function FlowChart() {
 }
 
 function infoTerms(D) {
-  const L = D.latest, prim = D.aggPrimary[D.aggPrimary.length - 1];
+  const L = D.latest, prim = D.latest.primary;
   const counts = {};
   D.individualPolls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
   const sources = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).join(", ");
@@ -4526,17 +4526,17 @@ function infoTerms(D) {
   const primWork = swP && swP.rows.length ? (
     <div className="info-work-wrap">
       <table className="info-work">
-        <thead><tr><th>Pollster</th><th>Fieldwork</th><th>Mid</th><th>Published</th><th>lean</th><th>xᵢ</th><th>nᵢ</th><th>m</th><th>wᵢ</th></tr></thead>
+        <thead><tr><th>Pollster</th><th>Fieldwork</th><th>Mid</th><th>Published</th><th>lean</th><th>xᵢ</th><th>d</th><th>nᵢ</th><th>m</th><th>wᵢ</th></tr></thead>
         <tbody>
           {swP.rows.map((r) => (
             <tr key={r.firm + r.fw}>
               <td>{r.firm}</td><td>{r.fw}</td><td>{r.mid}</td><td>{F(r.x)}</td>
-              <td>{F(r.lean)}</td><td>{F(r.adj)}</td><td>{r.n}</td><td>{r.m}</td><td>{F(r.w)}</td>
+              <td>{F(r.lean)}</td><td>{F(r.adj)}</td><td>{r.d}</td><td>{r.n}</td><td>{r.m}</td><td>{F(r.w)}</td>
             </tr>
           ))}
-          <tr className="info-work-sum"><td colSpan="9">
-            Σwᵢ = {F(swP.sw)} · Σwᵢxᵢ = {F(swP.swx)} · the month is {F(swP.swx)} ÷ {F(swP.sw)} = {F(swP.mean)}
-            {" "}→ {swP.v.toFixed(1)} for Labor, {swP.ymLabel}.
+          <tr className="info-work-sum"><td colSpan="10">
+            Σwᵢ = {F(swP.sw)} · Σwᵢxᵢ = {F(swP.swx)} · the mean is {F(swP.swx)} ÷ {F(swP.sw)} = {F(swP.mean)}
+            {" "}→ {swP.v.toFixed(1)} for Labor, from the {swP.k} polls in the 21 days to {swP.ref}.
           </td></tr>
         </tbody>
       </table>
@@ -4546,10 +4546,7 @@ function infoTerms(D) {
         {swP.rescaled
           ? ` – past the half-point tolerance, so all five are scaled by ${swP.plainTotal} ÷ ${swP.adjTotal}, which is how the Labor figure above lands at ${swP.v.toFixed(1)}.`
           : " – within the half-point tolerance, so nothing is rescaled."}
-        {" "}A wave joins the calendar month its fieldwork ended in.
-        {swP.rows.some((r) => r.crossed)
-          ? " The wave above whose midpoint falls in the month before counts here, where it closed."
-          : null}</p>
+        {" "}A wave counts from its fieldwork midpoint and leaves the window after 21 days.</p>
     </div>
   ) : null;
   const tppWork = swT && swT.rows.length ? (
@@ -4828,16 +4825,16 @@ function infoTerms(D) {
       direction are built the same way monthly; preferred prime minister and the undecided share
       stay as plain {xref("monthly-average", "weighted aggregate", "monthly averages")} – their
       houses’ differences live in the questions asked, not in a lean to correct.
-      <span className="info-p">The current Labor primary is that construction run as the month to
-      date. Each wave taken this month contributes its published Labor share – minus the house’s
-      lean on the ALP primary specifically, read at the month’s midpoint – weighted by sample
-      size alone, the recency halving dropped because a month is read at its centre; a house in
+      <span className="info-p">The current Labor primary is that same construction, run per
+      party. Each wave whose fieldwork midpoint falls inside the 21-day window contributes its
+      published Labor share – minus the house’s lean on the ALP primary specifically, read at
+      the reference day – weighted by sample and recency alike; a house in
       the field twice counts for √2, not 2. Only once all five parties are estimated is the sum
       checked, and the five stand unrescaled unless the debiased total sits more than half a
       point from the plain-average total – a real undecided-driven shortfall is kept, not ironed
-      out. As the month stands, that is {prim.alp.toFixed(1)} for Labor.</span>
+      out. As it stands, that is {prim.alp.toFixed(1)} for Labor.</span>
       {primWork}
-      <span className="info-p">The two-party-preferred is the nowcast proper, over the rows the
+      <span className="info-p">The two-party-preferred is the same nowcast at the headline, over the rows the
       measure admits: waves whose fieldwork midpoint falls inside the 21-day window ending at the
       newest poll, each contributing its published Labor share of the pair – a pair printed with
       undecided still inside it is rebased to 100 first – adjusted for the house’s lean on the
