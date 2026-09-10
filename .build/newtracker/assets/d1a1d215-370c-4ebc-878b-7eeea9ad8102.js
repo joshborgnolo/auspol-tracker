@@ -4704,7 +4704,7 @@ function infoTerms(D) {
       {L.onImp ? (
         <> Labor v One Nation is the exception, quoted on this basis: no election count of
       that pairing exists to discipline the houses’ uncoordinated allocations, so the figure
-      is the current primaries run through a {xref("preference-flows", "implied 2PP",
+      is the current primaries run through a {xref("fp-flows", "implied 2PP",
       "first-principles flow set")} – {L.onImp.a.toFixed(1)} to Labor,{" "}
       {L.onImp.b.toFixed(1)} to One Nation, ±{L.onImp.band.toFixed(1)} on the set’s own
       range, not a sampling interval. The houses’ published head-to-heads stay on the chart
@@ -4776,6 +4776,36 @@ function infoTerms(D) {
       full record, house by house.</>) : (
       <>How far the final polls have missed at past elections. Past cycles carries the record,
       house by house.</>) },
+    { id: "fp-flows", term: "First-principles flow set", body: (
+      <>The fixed preference table that turns the current primaries into the Labor
+      v One Nation figure – the set every “Implied from primary votes” label names.
+      It is computed for this site; no pollster or commission publishes it. Three
+      cells do all the work: Coalition voters 28% to Labor (±2), Greens 89% (±3),
+      everyone else 53% (±3) – the remainders, 72%, 11% and 47%, land with
+      One Nation.
+      {L.onImp && prim ? (
+        <> On today’s primaries that is {prim.alp.toFixed(1)} Labor plus 28% of
+        {" "}{prim.lnp.toFixed(1)} Coalition, 89% of {prim.grn.toFixed(1)} Greens
+        and 53% of {prim.oth.toFixed(1)} others, against One Nation’s own
+        {" "}{prim.onp.toFixed(1)} and the remainders – reading
+        {" "}{L.onImp.a.toFixed(1)} to Labor, {L.onImp.b.toFixed(1)} to
+        One Nation, ±{L.onImp.band.toFixed(1)}. The ± stacks the three cells’ own
+        ranges outright: doubt about the table, not chance in a sample.</>
+      ) : null}
+      No election has ever counted a Labor v One Nation finish, so the cells
+      cannot be anchored to an election night the way
+      {" "}{xref("preference-flows", "first principles", "the 2025 table")} disciplines
+      Labor v Coalition. They are built from the two counted-ballot records that
+      do exist: the AEC’s 2025 Senate ballot counts, re-anchored on the 2026
+      lower-house contests where One Nation made the final two and preferences
+      were actually counted – the SA state election and the Secret Harbour
+      by-election. The set is frozen between those counts and re-anchored when a
+      new one lands; what it never is is fitted to the polls of the day. The
+      industry’s alternative is respondent allocation – what voters say they
+      would do with a second choice, with no count to anchor it – which is the
+      basis of the houses’ published head-to-heads, and why they stay on the
+      chart as corroboration while the quoted figure runs on counted
+      ballots.</>) },
     { id: "preference-flows", term: "Preference flows", body: (
       <>How minor-party ballots split between the two final candidates. The
       {" "}{xref("implied-2pp", "preference flows", "implied-2PP diagnostic")} uses the flows as
@@ -4784,12 +4814,9 @@ function infoTerms(D) {
       target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5%, all others 54.6% to
       Labor</a>), every formal ballot redistributed Labor v Coalition.
       <span className="info-chart"><FlowChart /></span>
-      The Labor v One Nation figure runs on a different table, derived at first principles:
-      the AEC's 2025 Senate ballot counts re-anchored on the lower-house contests where the
-      pairing has actually been counted (the SA state election, the Secret Harbour
-      by-election) – Coalition voters 28% to Labor (±2), Greens 89% (±3), everyone else
-      53% (±3). Its figure's band stacks those ranges outright rather than shrinking them
-      with sample size, so it reads wider than a poll interval.
+      The Labor v One Nation figure runs on a different fixed table, derived
+      at first principles rather than from an election night – the
+      {" "}{xref("fp-flows", "preference flows", "first-principles flow set")}.
       Full preference distribution data was first published for the 1996 election, so
       party-by-party flows don't exist before then; One Nation's line is broken across
       the parliaments it barely contested.</>) },
