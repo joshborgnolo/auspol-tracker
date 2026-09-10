@@ -4780,11 +4780,11 @@ function infoTerms(D) {
       <>The fixed preference table that turns the current primaries into the Labor
       v One Nation figure – the set every “Implied from primary votes” label names.
       It is computed for this site; no pollster or commission publishes it. Three
-      cells do all the work: Coalition voters 28% to Labor (±2), Greens 89% (±3),
-      everyone else 53% (±3) – the remainders, 72%, 11% and 47%, land with
+      cells do all the work: Coalition voters 31.5% to Labor (±2.5), Greens 89% (±3),
+      everyone else 53% (±3) – the remainders, 68.5%, 11% and 47%, land with
       One Nation.
       {L.onImp && prim ? (
-        <> On today’s primaries that is {prim.alp.toFixed(1)} Labor plus 28% of
+        <> On today’s primaries that is {prim.alp.toFixed(1)} Labor plus 31.5% of
         {" "}{prim.lnp.toFixed(1)} Coalition, 89% of {prim.grn.toFixed(1)} Greens
         and 53% of {prim.oth.toFixed(1)} others, against One Nation’s own
         {" "}{prim.onp.toFixed(1)} and the remainders – reading

@@ -315,9 +315,17 @@ const POLL_BY_KEY = new Map(POLLS.map((p) => [p.date + "|" + p.pollster, p]));
       lower-house counts where ON made the final two (SA state election,
       Secret Harbour by-election) — senate-flows first-principles
       derivations (~/Downloads/senate flows, 2026-09-08) — ON-side shares
-      Coal→ON 72 (70–74), GRN→ON 11 (8–14), others→ON 47 (44–50), carried
-      here ALP-side, with FP_ON_BAND the set's own ± range (stacked
-      linearly into the band §7f's quoted figure carries). This is the
+      Coal→ON 68.5 (66–71), GRN→ON 11 (8–14), others→ON 47 (44–50),
+      carried here ALP-side, with FP_ON_BAND the set's own ± range (stacked
+      linearly into the band §7f's quoted figure carries). LNP cell
+      recalibrated 2026-09-11 from 0.72/0.28: the Senate-ATL-derived
+      reading sat low against the counted 2026 evidence — Antony Green's
+      Secret Harbour preference analysis puts Coalition→Labor above 29.8
+      in a strong-ON seat (so the national figure must sit above it), and
+      SA 2026's whole-state count ran ~33–34 to Labor at a March ON
+      primary of 23.5% (the national ON primary has since firmed to ~27)
+      — anchor lands between the two counts at 31.5 to Labor / 68.5 to ON.
+      This is the
       table the page QUOTES the pairing on (§7f), and it was chosen over
       RedBridge/Accent's respondent-allocated splits (tpp_split_on — the
       only published per-cohort allocation of the pairing, kept below as
@@ -334,8 +342,8 @@ const POLL_BY_KEY = new Map(POLLS.map((p) => [p.date + "|" + p.pollster, p]));
       ALP-v-ON row is eight months in), so every firm anchors on its own
       first FLOW_ON_BASE_MIN residuals and meta.baseFrom records which date
       each series can speak from. */
-const FP_ON = { lnp: 0.28, grn: 0.89, oth: 0.53 };
-const FP_ON_BAND = { lnp: 0.02, grn: 0.03, oth: 0.03 };
+const FP_ON = { lnp: 0.315, grn: 0.89, oth: 0.53 };
+const FP_ON_BAND = { lnp: 0.025, grn: 0.03, oth: 0.03 };
 const FLOW_ON_BASE_MIN = 3;
 const FLOW_ON_FIT_MIN = 6;          // min joined waves per house to attempt a fit
 const FLOW_ON_FIT_TAU = 0.12;       // prior SD on each flow share (12 pts in share units)

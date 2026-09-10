@@ -1,6 +1,6 @@
 ---
 name: auspol-flow-drift-panel
-description: "auspol-tracker — the Preference-flow drift panels end-to-end (shipped 2026-09-07): gen-data §7c flowDrift block (~:1224-1310) = per-poll residual (share2pp published 2PP − flows.mjs implied 2PP on the same primaries), election-anchored per-house 180-day baselines, anomalies pooled through monthWithSe/nowcastAdj with NULL house effects; §7d flowDriftOn reruns the same machinery on the ALP-v-ON head-to-heads against a first-principles frozen table FP_ON = {lnp 0.28, grn 0.89, oth 0.53} (AEC 2025 Senate ATL ballots re-anchored on 2026 lower-house counts where ON made the final two; flipped 2026-09-09 from the shipped RedBridge-published-splits table — RedBridge's own splits survive only as its measured row, m:1); FlowDriftPanel + FlowDriftOnPanel in the d1a1d215 asset mounted on the All-polls 2PP facet after HouseLeanPanel; .ap-flow/.flow-band-* CSS reuses --lean-*-bg vars; .build/flow-drift-check.mjs is the committed verbatim-replica verification script. Includes the pq-passthrough fix to nowcastAdj/monthWithSe (difference series need per-row pq — the share-scale fallback produces p(1−p)<0 and ci95 nulls to NaN→null). Diagnostic-only by design: corrects no other figure."
+description: "auspol-tracker — the Preference-flow drift panels end-to-end (shipped 2026-09-07): gen-data §7c flowDrift block (~:1224-1310) = per-poll residual (share2pp published 2PP − flows.mjs implied 2PP on the same primaries), election-anchored per-house 180-day baselines, anomalies pooled through monthWithSe/nowcastAdj with NULL house effects; §7d flowDriftOn reruns the same machinery on the ALP-v-ON head-to-heads against a first-principles frozen table FP_ON = {lnp 0.315, grn 0.89, oth 0.53} (AEC 2025 Senate ATL ballots, LNP cell recalibrated 2026-09-11 on Green's Secret Harbour analysis + the SA 2026 count; flipped 2026-09-09 from the shipped RedBridge-published-splits table — RedBridge's own splits survive only as its measured row, m:1); FlowDriftPanel + FlowDriftOnPanel in the d1a1d215 asset mounted on the All-polls 2PP facet after HouseLeanPanel; .ap-flow/.flow-band-* CSS reuses --lean-*-bg vars; .build/flow-drift-check.mjs is the committed verbatim-replica verification script. Includes the pq-passthrough fix to nowcastAdj/monthWithSe (difference series need per-row pq — the share-scale fallback produces p(1−p)<0 and ci95 nulls to NaN→null). Diagnostic-only by design: corrects no other figure."
 source: auto-skill
 extracted_at: '2026-09-07T00:00:00.000Z'
 ---
@@ -57,13 +57,17 @@ rebasing, monthWithSe/nowcastAdj pooling, wave-equal ridge with pooled
 σ̂²w — cloned as a parallel block right after §7c with the constants
 prefixed `FLOW_ON_*`. The differences are the ones the data forces:
 
-- **The frozen table is FIRST-PRINCIPLES** (`FP_ON = {lnp 0.28, grn 0.89,
+- **The frozen table is FIRST-PRINCIPLES** (`FP_ON = {lnp 0.315, grn 0.89,
   oth 0.53}` fractions at gen-data.mjs ~:1566, with `FP_ON_BAND =
-  {lnp 0.02, grn 0.03, oth 0.03}` the set's own ± range, stacked linearly
-  into the band §7f's quoted figure carries): the AEC 2025 Senate ATL
-  ballot counts re-anchored on the 2026 lower-house counts where One
-  Nation made the final two (SA state election, Secret Harbour
-  by-election); ON-side shares Coal→ON 72 (70–74), GRN→ON 11 (8–14),
+  {lnp 0.025, grn 0.03, oth 0.03}` the set's own ± range, stacked linearly
+  into the band §7f's quoted figure carries): derived from the AEC 2025
+  Senate ATL ballot counts, then the LNP cell was recalibrated 2026-09-11
+  from 0.28 to 0.315 against the counted 2026 evidence — Antony Green's
+  Secret Harbour preference analysis puts Coalition→Labor above 29.8 in a
+  strong-ON seat (national figure must sit above it), and SA 2026's
+  whole-state count ran ~33–34 to Labor at a March ON primary of 23.5%
+  (the national ON primary has since firmed to ~27); ON-side shares
+  Coal→ON 68.5 (66–71), GRN→ON 11 (8–14),
   others→ON 47 (44–50) carried ALP-side. No election ever counts a
   Labor-v-ON pairing, so there is no election anchor — `impliedOn(p) =
   p.alp + p.lnp·FP_ON.lnp + p.grn·FP_ON.grn + (ind+oth)·FP_ON.oth`.

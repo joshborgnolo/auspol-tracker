@@ -79,3 +79,41 @@ hero's conventions.
   `openTerm` target after adding a nearer-matching entry, but only
   retarget if the label/term semantics actually agree (deliberately left
   pointing at house-effect in 6edc631).
+
+## fp-flows term (7c29292, Sep 2026) — first-principles ALP–ON flow set
+
+The Labor v One Nation figure's preference table got its own term
+(`id: "fp-flows"`, placed just before `preference-flows`) after it spent
+one cryptic paragraph inside preference-flows and the user judged it
+"not explained or clearly identified". The durable lessons:
+
+- **Proper nouns need their own terms.** When page copy references a
+  concept as a proper noun ("the first-principles flow set") and link
+  text reads like a title, the xref/openTerm target must be a term NAMED
+  that noun — a side-paragraph inside a neighbouring term reads as
+  unidentified assertion at the end of a two-hop link chain (hero's
+  "Implied from primary votes" → implied-2pp → the set).
+- The term prints the three cells (Coal→ALP 31.5% ±2.5, GRN→ALP 89% ±3,
+  others→ALP 53% ±3) with a LIVE worked example guarded
+  `{L.onImp && prim ? … : null}` — parts read off `{prim.*}`
+  (= `D.latest.primary`) and the result off `{L.onImp.*}`, so the numbers
+  can never rot (proved necessary: polls moved within a day of the edit).
+- Copy-trap when printing cell percentages: FP_ON's constants are the
+  ALP-side COMPLEMENTS of the published ON-side shares (Coal→ON 68.5 →
+  FP_ON.lnp 0.315). The constant NAMES don't say which side they sit on —
+  confirm against the consumption line (`impliedOnFp` in gen-data §7f)
+  before writing directions into copy. An LLM re-derivation of the sides
+  from memory inverted them once in-session.
+- implied-2pp's ON branch and the preference-flows entry now cross-link
+  to fp-flows; preference-flows keeps only the 2025 ALP–Coalition table.
+
+## Layout hazard — the two-column `.info` media block (12221e0, 2026-09-08)
+
+At ≥1100px `.info` is `columns: 2` with `.info-term { break-inside: avoid }`.
+WebKit reports a garbage pre-fragment `getBoundingClientRect()` for a
+fragmented term, which silently broke the preference-flows chart's hover
+in Safari only. Chart-bearing terms MUST keep
+`.info .info-term:has(.info-chart) { column-span: all; }` in
+template.html (with the chart directly inside an `.info-chart` wrapper —
+if that wrapper class changes, the selector must change with it). Full
+quirk anatomy + WebKit probing recipe: auto-skill-auspol-webkit-multicol-hover.
