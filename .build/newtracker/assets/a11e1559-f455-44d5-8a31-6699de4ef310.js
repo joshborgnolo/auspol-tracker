@@ -2531,14 +2531,18 @@ function NextPollsPanel() {
   };
   /* The when-column's own statement of the same one-sidedness pmLabel puts
      after the date: "in 12 days (or 19)" names the later slot in days, so a
-     reader who screens off the countdown still sees the alternative. */
+     reader who screens off the countdown still sees the alternative. The
+     main label carries the unit only once it does - "in N days" and "N days
+     overdue" already say it, so the tail elides; "today" and "tomorrow"
+     don't, and their tail must spell it out ("today (or 7 days)"). */
   const dayAlt = (r) => {
     if (r.rolled) return null;   // the slot IS the late step - see pmLabel
     if (r.releaseDow != null && r.spreadEarly != null) {
       const widen = Math.sqrt(r.ahead + 1);
       const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
       const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
-      if (earlyW === 0 && lateW >= 1) return ` (or ${r.inDays + lateW * 7})`;
+      if (earlyW === 0 && lateW >= 1)
+        return ` (or ${r.inDays + lateW * 7}${r.inDays < 2 && r.inDays >= 0 ? " days" : ""})`;
       if (lateW === 0 && earlyW >= 1 && r.inDays - earlyW * 7 >= 1)
         return ` (or ${r.inDays - earlyW * 7})`;
     }

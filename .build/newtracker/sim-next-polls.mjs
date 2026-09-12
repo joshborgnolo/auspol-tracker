@@ -119,7 +119,10 @@ const dayAlt = (r) => {
     const widen = Math.sqrt(r.ahead + 1);
     const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
     const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
-    if (earlyW === 0 && lateW >= 1) return ` (or ${r.inDays + lateW * 7})`;
+    // the tail spells its unit out only where the main label drops it -
+    // "today (or 7 days)" vs "in 12 days (or 19)"
+    if (earlyW === 0 && lateW >= 1)
+      return ` (or ${r.inDays + lateW * 7}${r.inDays < 2 && r.inDays >= 0 ? " days" : ""})`;
     if (lateW === 0 && earlyW >= 1 && r.inDays - earlyW * 7 >= 1)
       return ` (or ${r.inDays - earlyW * 7})`;
   }
@@ -276,8 +279,8 @@ function eq(name, got, want) {
   // now (window houses are bar-visible only while open) - a dated-house
   // ticket from Essential on down.
   eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
-    [["Essential", "tomorrow"], ["Roy Morgan", "6 days"], ["YouGov", "8 days"],
-     ["Resolve", "12 days"], ["Newspoll", "19 days"],
+    [["Essential", "tomorrow"], ["Resolve", "12 days"], ["Roy Morgan", "13 days"],
+     ["Newspoll", "19 days"], ["YouGov", "22 days"],
      ["RedBridge / Accent", "26 days"]]);
   {
     const da = firm(rows, "DemosAU");
@@ -291,6 +294,26 @@ function eq(name, got, want) {
   eq("without the skip seed: overdue, tolerance open", [esHold.overdue, esHold.missed], [true, false]);
   eq("without the skip seed: panel reads to the edge", panelWhen(esHold), "tomorrow (or 6 days ago)");
   eq("without the skip seed: Essential leads, overdue and counting", [holdItems[0].firm, holdItems[0].when], ["Essential", "tomorrow"]);
+}
+
+// S1b – Sun 13 Sep, 10am: Resolve's slot day itself, in the same cadSlip
+// world. The when-column's word for inDays 0 is "today", which - unlike "in
+// N days" - names no unit, so the late-alternative tail must spell its own
+// out: "today (or 7 days)", not "today (or 7)" (the day-count elision only
+// stands where the main phrase already carries "days"). Same at tomorrow's
+// distance on Sat 12 Sep.
+{
+  const { label, t0, nowMs } = scen("Sun 13 Sep", "2026-09-13", 600);
+  const rows = project(cadSlip, t0, nowMs);
+  const rs = firm(rows, "Resolve");
+  eq("slot-day panel spells the tail's unit", rs && panelWhen(rs), "today (or 7 days)");
+  eq("slot-day tail itself", rs && dayAlt(rs), " (or 7 days)");
+}
+{
+  const { t0, nowMs } = scen("Sat 12 Sep", "2026-09-12", 600);
+  const rows = project(cadSlip, t0, nowMs);
+  const rs = firm(rows, "Resolve");
+  eq("day-before-slot panel also spells it", rs && panelWhen(rs), "tomorrow (or 8 days)");
 }
 
 // S1c – Mon 14 Sep, 10am: DemosAU's window (9–27 Sep) opened five days ago.
@@ -424,9 +447,9 @@ function eq(name, got, want) {
   // other dated row. DemosAU's window closed on its measured 27th and its
   // lateness lives on the panel - on the bar the house is simply absent.
   eq("ticker order: most overdue first, dated houses only", items.map((i) => [i.firm, i.when]),
-    [["Essential", "38 days overdue"], ["Roy Morgan", "33 days overdue"],
-     ["YouGov", "31 days overdue"], ["Resolve", "27 days overdue"],
-     ["Newspoll", "20 days overdue"], ["RedBridge / Accent", "13 days overdue"]]);
+    [["Essential", "38 days overdue"], ["Resolve", "27 days overdue"],
+     ["Roy Morgan", "26 days overdue"], ["Newspoll", "20 days overdue"],
+     ["YouGov", "17 days overdue"], ["RedBridge / Accent", "13 days overdue"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("a missed window leaves the bar entirely", daItems, []);
 }
@@ -483,14 +506,16 @@ function eq(name, got, want) {
   eq("rolled past the horizon: DemosAU off the ticker", items.some((i) => i.firm === "DemosAU"), false);
 }
 
-// S9 – Mon 7 Sep, Roy Morgan's slot day, hour by hour. The window opens at
-// the house's measured hour (16:18, recent filings 4:18–5:00pm), not at
+// S9 – Mon 14 Sep, Roy Morgan's slot day, hour by hour. The window opens at
+// the house's measured hour (16:21, recent filings 4:18–5:00pm), not at
 // midnight: a 9am reader gets "today" and "any moment now" only starts once
-// the window does — the gate d1a1d215 hangs the phrase on (dueMs).
+// the window does — the gate d1a1d215 hangs the phrase on (dueMs). (The
+// measured hour drifts wave to wave; keep the scenario on whatever slot the
+// projection is counting Morgan to.)
 {
-  const am = scen("Mon 7 Sep 9am, window shut", "2026-09-07", 540);
+  const am = scen("Mon 14 Sep 9am, window shut", "2026-09-14", 540);
   const amItems = ticker(project(cad, am.t0, am.nowMs), am.t0, am.nowMs);
-  const pm = scen("Mon 7 Sep 5pm, window open", "2026-09-07", 1020);
+  const pm = scen("Mon 14 Sep 5pm, window open", "2026-09-14", 1020);
   const pmRows = project(cad, pm.t0, pm.nowMs);
   const pmItems = ticker(pmRows, pm.t0, pm.nowMs);
   console.log(`\n${am.label}:  ticker → ${fmtT(amItems)}`);
