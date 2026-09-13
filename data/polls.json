@@ -4436,6 +4436,22 @@
       "tpp_alp": 52,
       "tpp_lnp": 48,
       "url": "https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0"
+    },
+    {
+      "date": "2026-09-12",
+      "pollster": "Resolve",
+      "client": "SMH / Age",
+      "sample": null,
+      "alp": 28,
+      "lnp": 24,
+      "grn": 11,
+      "onp": 27,
+      "ind": 6,
+      "oth": 3,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "soft": 26,
+      "assimilated": true
     }
   ],
   "ppm": [
@@ -5166,6 +5182,16 @@
       "oppName": "Taylor",
       "han": null,
       "extra": null
+    },
+    {
+      "date": "2026-09-12",
+      "firm": "Resolve",
+      "alb": 29,
+      "opp": 21,
+      "oppName": "Taylor",
+      "han": 25,
+      "extra": null,
+      "assimilated": true
     }
   ],
   "approval": [
@@ -6773,6 +6799,25 @@
           "dis": 48
         }
       }
+    },
+    {
+      "date": "2026-09-12",
+      "firm": "Resolve",
+      "alb": -18,
+      "opp": 9,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 35,
+          "dis": 53
+        },
+        "opp": {
+          "app": 39,
+          "dis": 30
+        }
+      },
+      "assimilated": true
     }
   ],
   "ppmHeadToHead": [
