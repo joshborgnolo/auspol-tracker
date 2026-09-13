@@ -6,6 +6,9 @@ name: resolve-update
 on:
   schedule:
     - cron: '0 21 * * *' # 07:00 AEST daily
+    - cron: '0 13 * * *' # 23:00 AEST daily — Nine pushes wave payloads on
+      # release-night evenings (2026-09-13 wave landed 22:03 AEST, after the
+      # morning run and after the launchd backup's dirty-tree refusal)
   workflow_dispatch:
     inputs:
       simulate_failure:
