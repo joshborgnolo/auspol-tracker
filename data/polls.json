@@ -4439,6 +4439,7 @@
     },
     {
       "date": "2026-09-12",
+      "published": "2026-09-13T18:00",
       "pollster": "Resolve",
       "client": "SMH / Age",
       "sample": null,
@@ -4450,6 +4451,7 @@
       "oth": 3,
       "tpp_alp": null,
       "tpp_lnp": null,
+      "url": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
       "soft": 26,
       "assimilated": true
     }
