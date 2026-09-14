@@ -4442,7 +4442,7 @@
       "published": "2026-09-13T18:00",
       "pollster": "Resolve",
       "client": "SMH / Age",
-      "sample": null,
+      "sample": 2250,
       "alp": 28,
       "lnp": 24,
       "grn": 11,
