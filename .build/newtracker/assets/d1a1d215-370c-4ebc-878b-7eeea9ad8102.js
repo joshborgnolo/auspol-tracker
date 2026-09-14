@@ -1089,6 +1089,11 @@ function cycHolders(c, M) {
      pairing, so the current term would answer "Albanese v Ley" months after
      Taylor took the job. */
   if (M.key === "ppmm") {
+    /* A term with no preferred-PM waves at all (the 1972–84 era buckets)
+       holds neither pairing eras nor a first pairing, and String(undefined)
+       would name them "undefined v". Fall back to the office roll-call. */
+    if (!c.raw.ppmPair && !(c.raw.ppmEras && c.raw.ppmEras.length))
+      return c.lead + " v " + c.oppLead;
     const pairs = c.raw.ppmEras && c.raw.ppmEras.length > 1
       ? c.raw.ppmEras.map((e) => e.name) : [c.raw.ppmPair];
     const side = (i) => {
@@ -1111,11 +1116,6 @@ function cycHolders(c, M) {
   return String(M.leader === "opp" ? c.oppLead : c.pm)
     .split(/\s*\u2192\s*/).join("\u2013");
 }
-
-/* One gate for the band decision, shared by the charts (which draw it) and
-   the legend (which captions it): three or more past terms on the board. */
-const cycBanded = (cycles, hidden) =>
-  cycles.filter((c) => !hidden.has(c.year) && !c.current).length >= 3;
 
 function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan, setHan, showOnp, setOnp, shapes, outcomeShown }) {
   const { D } = window.AP;
@@ -1158,23 +1158,24 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
   // parliament, and a parliament is named for its government.)
   const colorOf = (c) => (isOpp ? D.PARTIES[c.opp].color : c.color);
   const shown = cycles.filter((c) => !hidden.has(c.year));
-  /* Ribbon, not spaghetti: with three or more PAST terms on the board their
-     per-term lines collapse into the historical band drawn further down
-     (min–max and interquartile fills around the mean) – a dozen
-     near-identical lines read as weather, not as data. Hovering a legend
-     chip LIFTS its term's own line back out of the band in full colour;
-     thinning the board below three past terms (or isolating one) falls
-     back to plain lines, since a ribbon of two is as tall as the lines it
-     replaces. */
-  const pastShown = shown.filter((c) => !c.current);
-  const banded = cycBanded(cycles, hidden);
+  /* The fan's membership is per-MEASURE, not per-chip: the legend chips are
+     one shared set across all six charts, but the 1972–84 era buckets carry
+     primary and implied-2PP series only – no approval waves, no preferred-
+     PM pairings – so a term that never recorded this measure earns no seat
+     in its band, moves no start year, and names no strip entry. */
+  const hasData = (c) => (c.raw[M.key] || []).some((v) => v != null);
+  const pastShown = shown.filter((c) => !c.current && hasData(c));
+  /* One gate for the band decision, shared by the chart (which draws it) and
+     the caption (which counts it): three or more DATA-BEARING past terms. */
+  const banded = pastShown.length >= 3;
   /* The band's membership is data; what still gets its own line is the sitting
      term, whatever terms the reader has LIFTED out of the band, and whatever a
      chip hover is previewing. The lift is the durable one: it survives the
      pointer leaving the legend, which is the whole point of it, since the
      legend sits above six charts and scrolls out of reach after the first. */
   const drawnCycles = banded
-    ? shown.filter((c) => c.current || lifted.has(c.year) || hi === c.year)
+    ? shown.filter((c) => c.current
+        || (hasData(c) && (lifted.has(c.year) || hi === c.year)))
     : shown;
   /* One cycle left on the chart: the year on every readout row is then drawing
      a distinction against nothing, so the row keeps the leader alone and the
@@ -1235,7 +1236,9 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
     if (outcomeShown === "ousted")
       return lead + ", with a historical fan chart for all terms since "
         + firstYear + " that ended in an ousted government";
-    const gapped = cycles.some((c) => !c.current && c.year >= firstYear && hidden.has(c.year));
+    /* "Selected" means a DATA-BEARING term is off the board – a hidden chip
+       whose term never held this measure took no seat in the fan to lose. */
+    const gapped = cycles.some((c) => !c.current && hasData(c) && c.year >= firstYear && hidden.has(c.year));
     return lead + ", with a historical fan chart for " + (gapped ? "selected" : "all")
       + " previous terms since " + firstYear;
   })();
@@ -1540,6 +1543,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
      legend above it does. */
   const stripCycles = solo ? []
     : (banded ? shown.filter((c) => c.current || lifted.has(c.year)) : shown.slice())
+        .filter((c) => c.current || hasData(c))
         .sort((a, b) => (b.current ? 1 : 0) - (a.current ? 1 : 0) || a.year - b.year);
 
   /* The two person/party overlays are drawn lines too, so the strip names
