@@ -6,7 +6,14 @@
     <atom:link href="https://auspoltracker.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
     <language>en-AU</language>
-    <lastBuildDate>Sat, 12 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Sun, 13 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>Roy Morgan, 7–13 Sep 2026 – 2PP ALP 55 – L/NP 45</title>
+      <link>https://www.roymorgan.com/findings/10343-federal-voting-intention-september-14-2026</link>
+      <guid isPermaLink="false">auspol-tracker:2026-09-13|Roy Morgan</guid>
+      <pubDate>Sun, 13 Sep 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 25, L/NP 21.5, GRN 16, ON 25, Ind/Oth 12.5. Two-party preferred: ALP 55 – L/NP 45. Undecided 6.5%. Sample 1,583. Fieldwork 7–13 Sep 2026.</description>
+    </item>
     <item>
       <title>Resolve, 12 Sep 2026 – ALP 28, L/NP 24, GRN 11, ON 27, Ind/Oth 9</title>
       <link>https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html</link>
@@ -279,13 +286,6 @@
       <guid isPermaLink="false">auspol-tracker:2026-06-13|Resolve</guid>
       <pubDate>Sat, 13 Jun 2026 12:00:00 GMT</pubDate>
       <description>Primary vote: ALP 28, L/NP 20, GRN 12, ON 29, Ind/Oth 12. No two-party figure published. Sample 1,801. Fieldwork 8–13 Jun 2026.</description>
-    </item>
-    <item>
-      <title>Roy Morgan, 1–7 Jun 2026 – 2PP ALP 56 – L/NP 44</title>
-      <link>https://www.roymorgan.com/findings/10246-federal-voting-intention-june-9-2026</link>
-      <guid isPermaLink="false">auspol-tracker:2026-06-07|Roy Morgan</guid>
-      <pubDate>Sun, 07 Jun 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 26, L/NP 17.5, GRN 15.5, ON 29.5, Ind/Oth 11.5. Two-party preferred: ALP 56 – L/NP 44. Sample 1,631. Fieldwork 1–7 Jun 2026.</description>
     </item>
   </channel>
 </rss>

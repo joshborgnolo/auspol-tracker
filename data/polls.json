@@ -4524,6 +4524,29 @@
       "url": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
       "soft": 26,
       "assimilated": true
+    },
+    {
+      "date": "2026-09-13",
+      "published": "2026-09-14T16:36",
+      "dateStart": "2026-09-07",
+      "pollster": "Roy Morgan",
+      "client": "—",
+      "sample": 1583,
+      "undecided": 6.5,
+      "alp": 25,
+      "lnp": 21.5,
+      "grn": 16,
+      "onp": 25,
+      "ind": 12.5,
+      "oth": null,
+      "tpp_alp": 55,
+      "tpp_lnp": 45,
+      "tpp_flows": 53,
+      "lnpSplit": {
+        "Lib": 19,
+        "Nat": 2.5
+      },
+      "url": "https://www.roymorgan.com/findings/10343-federal-voting-intention-september-14-2026"
     }
   ],
   "ppm": [
@@ -7301,6 +7324,12 @@
       "date": "2026-09-08",
       "firm": "YouGov",
       "alpVsOnp_alp": 53,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-09-13",
+      "firm": "Roy Morgan",
+      "alpVsOnp_alp": 54.5,
       "lnpVsOnp_lnp": null
     }
   ],
