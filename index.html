@@ -15910,8 +15910,14 @@ function PastCyclesView() {
     hideAll: hideAll,
     shapes: shapes,
     showOutcome: showOutcome,
-    outcomeShown: outcomeShown,
-    banded: cycBanded(cycles, hidden)
+    outcomeShown: outcomeShown
+    /* The legend is one shared strip over six charts whose bands are now
+       measure-scoped (a term that never held a measure takes no band
+       seat on its chart). The key note below the chips earns its place
+       if ANY measure could muster three data-bearing past terms –
+       primary/2pp do so whenever three era buckets are visible, so in
+       practice this matches any visible band. */,
+    banded: cycles.filter(c => !hidden.has(c.year) && !c.current && CYC_METRICS.some(m => (c.raw[m.key] || []).some(v => v != null))).length >= 3
   }), /*#__PURE__*/React.createElement("div", {
     className: "cyc-charts"
   }, CYC_METRICS.map(m => /*#__PURE__*/React.createElement(CycleChart, {
