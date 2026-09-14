@@ -6308,9 +6308,30 @@ window.AP.nextPolls = npProject;
           return Number.isFinite(n) && !named.has(n) ? n : null;
         }).filter((n) => n != null);
         if (years.length) {
+          /* Consecutive terms collapse to spans, "1972–80": with the era
+             buckets on the board the year list enumerates wider than the
+             card. Consecutive means adjacent in the FULL chip sequence -
+             a term switched off, or already named by its own end label,
+             is not the band's to span across, so it breaks the run. The
+             century-compression mirrors abRange below (unreachable from
+             here - it is initialised after cycleLegend runs). */
+          const order = [...new Set([...document.querySelectorAll(".cyc-chip .cyc-year")]
+            .map((n) => parseInt(n.textContent, 10)).filter(Number.isFinite))]
+            .sort((a, b) => a - b);
+          const member = new Set(years);
+          const spans = [];
+          for (let i = 0; i < order.length; i++) {
+            if (!member.has(order[i])) continue;
+            const last = spans[spans.length - 1];
+            if (last && member.has(order[i - 1])) last.push(order[i]);
+            else spans.push([order[i]]);
+          }
+          const spanFmt = (run) => run.length === 1 ? String(run[0])
+            : run[0] + "–" + (String(run[0]).slice(0, 2) === String(run[run.length - 1]).slice(0, 2)
+                ? String(run[run.length - 1]).slice(2) : run[run.length - 1]);
           const lo = svgEl.querySelector(".cyc-band.lo"), hiB = svgEl.querySelector(".cyc-band.hi");
           entries.push({
-            label: "Past terms (" + years.join(", ") + "): mean of the set, middle half and middle 80%",
+            label: "Past terms (" + spans.map(spanFmt).join(", ") + "): mean of the set, middle half and middle 80%",
             kind: "cycband",
             fill: inkVar("--cyc-fill"),
             lo: lo ? parseFloat(getComputedStyle(lo).opacity) || 0.09 : 0.09,
