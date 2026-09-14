@@ -14,9 +14,17 @@
    What lands where:
    - cycle VI rows  -> cyclePolls[term-END year]  (row shape matches the
      curated cycle rows exactly: date,firm,lnp,alp,grn,onp,oth,tpp_lnp,
-     tpp_alp). Readings on/before the 1987-07-11 election stay CSV-only —
-     no pre-1990 buckets exist (adjudicated: ~550 pre-1987 Morgan Gallup
-     readings live in the mirror CSV alone, next to trove-primary-vote.csv).
+     tpp_alp). Readings on/before the 1972-12-02 election stay CSV-only
+     (no earlier cycle buckets exist). Readings between e1972 and e1987
+     are F2F Morgan Gallup waves with NO published national 2PP and land
+     in the 1974–1987 buckets as ERA rows: their tpp is the implied
+     last-election-flows figure (FLOW_ERAS in .build/newtracker/flows.mjs,
+     row field tppEra names the constant set), their Democrats/DLP primaries
+     ride separate dem/dlp row fields, and their oth stays the printed OTH
+     column (the era's changing minor-party print conventions make the
+     generic fold unreliable). The full method, backtest, and error budget
+     are documented in flows.mjs and the cyclePollBases notes
+     ("1974|Morgan"…"1987|Morgan", seeded by .build/bootstrap-pre1987-cycles.mjs).
    - current-term VI -> polls[] as `assimilated` rows (sample:null — Hirst's
      tables carry no per-wave n). Only Morning Consult's rows are expected to
      get here; any OTHER house reaching the current term is REFUSED and logged,
@@ -77,6 +85,7 @@
    prints a WATCH list of those. */
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { writeAtomic } from "./atomic-write.mjs";
+import { FLOW_ERAS, impliedEraAlp2pp } from "./newtracker/flows.mjs";
 
 const APPLY = process.argv.includes("--apply");
 const DAY = 86400000;
@@ -100,7 +109,7 @@ const parseCsv = (text) => {
   return rows;
 };
 
-const csv = parseCsv(readFileSync("data/bonham-additional-aeforecasts.csv", "utf8").trim());
+const csv = parseCsv(readFileSync("data/bonham-additional-aeforecasts.csv", "utf8").replace(/^﻿/, "").trim().replace(/\r/g, ""));
 const [header, ...lines] = csv;
 const col = Object.fromEntries(header.map((h, i) => [h, i]));
 
@@ -133,7 +142,10 @@ const firmFor = (remote, bucketYear) => {
 // cyclePolls is keyed term-END year; cycleApproval term-BEGIN year
 const endYears = Object.keys(D.cyclePolls).map(Number).sort((a, b) => a - b);
 const electionDate = (y) => D.elections["e" + y].date;
-const OLDEST_ELECTION = electionDate(endYears[0] - 3); // e1987 — term before the first bucket
+// boundary for insertion is the OLDEST bucket's opening election, hard-keyed
+// (endYears[0] − 3 no longer resolves — the 1974 bucket opens at e1972, and
+// e1971 does not exist); pre-1972 mirror rows stay CSV-only by adjudication
+const OLDEST_ELECTION = D.elections.e1972.date;
 const bucketFor = (date) => {
   for (const y of endYears) if (date <= electionDate(y)) return String(y);
   return null; // after the last closed election -> current term
@@ -149,6 +161,12 @@ const approvalBucketFor = (date) => {
 
 /* ---------- remote rows -> candidates ---------- */
 const VI_NULL_CHECK = (r) => r.alp == null && r.lnp == null; // no VI at all
+// era buckets (pre-1987 rollout) and the FLOW_ERAS set each row is implied
+// through, keyed by the election that opened the cycle (flows.mjs)
+const TPP_ERA_BY_BUCKET = {
+  1974: "1972", 1975: "1974", 1977: "1975", 1980: "1977",
+  1983: "1980", 1984: "1983", 1987: "1984",
+};
 const candidates = [];
 for (const l of lines) {
   const tpp = num(l[col["@TPP"]]);
@@ -162,7 +180,9 @@ for (const l of lines) {
   // OTH ("faithful to the printed table" per the cyclePollBases notes), and
   // the curated Morgan rows already carry that convention — folding here
   // makes the imported rows consistent with what's in each bucket. A row
-  // itemising nothing keeps oth null.
+  // itemising nothing keeps oth null. ERA rows (buckets in TPP_ERA_BY_BUCKET)
+  // are the exception: they ITEMISE dem/dlp on the row and take the raw OTH
+  // FP cell, so the pair is kept on the candidate as rawDem/rawDlp/rawOth.
   const oth = minor.some((m) => m != null) || othRaw != null
     ? Math.round((minorsSum + (othRaw ?? 0)) * 10) / 10
     : null;
@@ -172,6 +192,7 @@ for (const l of lines) {
     date: l[col.MidDate],
     alp, lnp, grn, onp,
     oth,
+    rawDem: minor[2], rawDlp: minor[3], rawOth: othRaw,
     tpp_alp: tpp,
     tpp_lnp: tpp == null ? null : Math.round((100 - tpp) * 10) / 10,
     glApp,
@@ -253,11 +274,32 @@ for (const c of candidates) {
     continue;
   }
   const rows = D.cyclePolls[bucket];
-  const row = {
-    date: c.date, firm,
-    lnp: c.lnp, alp: c.alp, grn: c.grn, onp: c.onp, oth: c.oth,
-    tpp_lnp: c.tpp_lnp, tpp_alp: c.tpp_alp,
-  };
+  const eraKey = TPP_ERA_BY_BUCKET[bucket];
+  let row;
+  if (eraKey) {
+    // ERA row: F2F Morgan published no national 2PP this far back, so dem/dlp
+    // ride their own row fields, oth is the raw upstream "OTH FP" cell (no
+    // minors fold), and tpp is IMPLIED last-election-flows via FLOW_ERAS —
+    // the row's tppEra tag names the constant set (flows.mjs provenance).
+    const implied = impliedEraAlp2pp(FLOW_ERAS[eraKey], {
+      alp: c.alp, dem: c.rawDem, dlp: c.rawDlp, oth: c.rawOth,
+    });
+    const tA = implied == null ? null : Math.round(implied * 10) / 10;
+    row = {
+      date: c.date, firm,
+      lnp: c.lnp, alp: c.alp, grn: null, onp: null,
+      dem: c.rawDem, dlp: c.rawDlp, oth: c.rawOth,
+      tpp_lnp: tA == null ? null : Math.round((100 - tA) * 10) / 10,
+      tpp_alp: tA,
+      tppEra: eraKey,
+    };
+  } else {
+    row = {
+      date: c.date, firm,
+      lnp: c.lnp, alp: c.alp, grn: c.grn, onp: c.onp, oth: c.oth,
+      tpp_lnp: c.tpp_lnp, tpp_alp: c.tpp_alp,
+    };
+  }
   if (MORGAN_REMOTE.has(c.remote)) {
     // Morgan: upstream's mid-dates re-key curated end-date waves ~4 days
     // earlier; plain ±3-day duping lets most re-keys through. A genuine
@@ -347,13 +389,14 @@ if (report.conflicts.length) {
 console.log(`\nGL rows: inserted ${report.glInserts.length} · date-dup ${report.glDup}`);
 for (const g of report.glInserts) console.log(`  + ${g.where}`);
 
-// inserted-row sum watch (validator check 8c needs a declared basis when off 100±2)
+// inserted-row sum watch (validator check 8c needs a declared basis when off 100±2;
+// era rows add their itemised dem/dlp lanes to the Σ)
 const watch = new Map();
 for (const x of report.inserted) {
   if (!x.where.startsWith("polls[]")) {
     const r = x.row;
     if (!["alp", "lnp", "grn", "onp"].every((k) => r[k] != null)) continue;
-    const sum = ["lnp", "alp", "grn", "onp", "oth"].reduce((s, k) => s + (r[k] ?? 0), 0);
+    const sum = ["lnp", "alp", "grn", "onp", "oth", "dem", "dlp"].reduce((s, k) => s + (r[k] ?? 0), 0);
     if (Math.abs(sum - 100) > 2) {
       const key = x.where.split(" ")[0] + "|" + r.firm;
       watch.set(key, { worst: Math.max(watch.get(key)?.worst ?? 0, Math.abs(sum - 100)), sum, row: x.where });

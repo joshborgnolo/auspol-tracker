@@ -1952,9 +1952,12 @@ function cycleSourceRows(cycles, D) {
 
 /* ---- How the final polls did ------------------------------------------
    Everywhere else the page can only describe how far the polls disagree with
-   EACH OTHER. Twelve past elections are the one place a poll can be checked
+   EACH OTHER. Eighteen past elections are the one place a poll can be checked
    against the thing it was estimating, so this is the only honest answer to
    "should I believe the number at the top of this page".
+   Pre-1993 rows score Morgan's implied last-election-flows 2PP (FLOW_ERAS),
+   not a published TPP — single-house era, so the miss folds together poll
+   error and the flow constants' own drift.
 
    The measure is one poll per house - its last with a 2PP inside the window -
    equally weighted, because what matters is how many separate attempts missed

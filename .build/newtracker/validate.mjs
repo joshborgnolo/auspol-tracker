@@ -11,7 +11,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { impliedAlp2pp } from "./flows.mjs";
+import { impliedAlp2pp, FLOW_ERAS, impliedEraAlp2pp } from "./flows.mjs";
 import { canonHouse } from "./house-renames.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -28,7 +28,11 @@ export function validate(D) {
   const rules = D.pollsterRules || {};
   const CORE = ["alp", "lnp", "grn", "onp"];
   const ALL = ["alp", "lnp", "grn", "onp", "ind", "oth"];
-  const RANGES = [["tpp_alp", 30, 70], ["tpp_lnp", 30, 70], ...ALL.map((k) => [k, 0, 70])];
+  // era rows (tppEra-tagged, pre-1987 Morgan import) itemise Democrats/DLP
+  // on the row; they join the Σ (null → 0 elsewhere) and carry a tighter
+  // plausible bound than the 0–70 majors lane
+  const ERA_MINORS = ["dem", "dlp"];
+  const RANGES = [["tpp_alp", 30, 70], ["tpp_lnp", 30, 70], ...ALL.map((k) => [k, 0, 70]), ...ERA_MINORS.map((k) => [k, 0, 30])];
   const n0 = (v) => (v == null ? 0 : v);
 
   // Pollsters tracked in polls[] that legitimately carry no pollsterRules
@@ -387,7 +391,11 @@ export function validate(D) {
      always share one definition. */
   const orientation = (rows, label, alpKey, tppKey) => {
     const ds = rows.map((p) => {
-      const im = impliedAlp2pp({ ...p, alp: p[alpKey] });
+      // era rows invert against the FLOW_ERAS set their tppEra tag names;
+      // everything else uses the 2025 constants
+      const im = p.tppEra != null
+        ? impliedEraAlp2pp(FLOW_ERAS[p.tppEra], { ...p, alp: p[alpKey] })
+        : impliedAlp2pp({ ...p, alp: p[alpKey] });
       return im == null || p[tppKey] == null ? null : p[tppKey] - im;
     }).filter((v) => v != null);
     if (ds.length < 20) return;                       // too few to judge a series
@@ -465,6 +473,10 @@ export function validate(D) {
      eras publish one consistent basis, so repeating a note per row would be
      copy-paste noise. The declared bases, all adjudicated against the source
      tables:
+       – 1974…1987 Morgan (tppEra rows): F2F Morgan Gallup pre-1987, the era
+         where minors ride dem/dlp on the row rather than inside oth. Σ over
+         {"alp","lnp"}+{"dem","dlp"}+{"oth"} (grn/onp did not exist as
+         published columns).
        – 1998/2001/2004 Morgan: the printed table splits ALP/L-NP/... each
          minor party into its own column AND carries an OTH column, so the
          extracted majors+OTH Σ runs 102.5–106.5. Faithful to
@@ -475,8 +487,11 @@ export function validate(D) {
   const bases = D.cyclePollBases || {};
   for (const [cycle, rows] of Object.entries(D.cyclePolls || {})) {
     rows.forEach((r, i) => {
-      if (!CORE.every((k) => r[k] != null)) return;
-      const sum = ALL.reduce((s, k) => s + n0(r[k]), 0);
+      // era rows: Σ over the lanes the era actually published
+      const lanes = r.tppEra != null ? ["alp", "lnp", "dem", "dlp", "oth"] : ALL;
+      const core = r.tppEra != null ? ["alp", "lnp"] : CORE;
+      if (!core.every((k) => r[k] != null)) return;
+      const sum = lanes.reduce((s, k) => s + n0(r[k]), 0);
       if (Math.abs(sum - 100) <= 2) return;
       const basis = bases[cycle + "|" + r.firm];
       const where = `cyclePolls.${cycle} #${i} ${r.date} · ${r.firm}`;

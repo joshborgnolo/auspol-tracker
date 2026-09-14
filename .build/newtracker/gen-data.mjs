@@ -1958,6 +1958,24 @@ function cycleSeries(points, base, cap = 36) {
            obs: idxs.map((i) => i >= firstKnown && i in known) };
 }
 const CYC_META = [
+  /* Pre-1987 rows ship against the aeforecasts F2F Morgan import: their 2PP
+     series is the IMPLIED last-election-flows figure (FLOW_ERAS in flows.mjs,
+     tppEra-tagged rows), not anything Morgan itself published — the method
+     note lives in cyclePollBases. ePrim/eTpp are the governing side's
+     official result, same as every row below. */
+  { year: 1972, gov: "alp", opp: "lnp", pm: "Whitlam", lead: "Whitlam", oppLead: "McMahon → Snedden", eDate: "1972-12-02", ePrim: 49.6, eTpp: 52.7, src: 1974, appr: 1972,
+    oppSpl: { iso: "1972-12-20", names: ["McMahon", "Snedden"] } },
+  { year: 1974, gov: "alp", opp: "lnp", pm: "Whitlam", lead: "Whitlam", oppLead: "Snedden → Fraser", eDate: "1974-05-18", ePrim: 49.3, eTpp: 51.7, src: 1975, appr: 1974,
+    oppSpl: { iso: "1975-03-21", names: ["Snedden", "Fraser"] } },
+  { year: 1975, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Whitlam → Hayden", eDate: "1975-12-13", ePrim: 53.1, eTpp: 55.7, src: 1977, appr: 1975,
+    oppSpl: { iso: "1977-02-10", names: ["Whitlam", "Hayden"] } },
+  { year: 1977, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Hayden", eDate: "1977-12-10", ePrim: 48.1, eTpp: 54.6, src: 1980, appr: 1977 },
+  { year: 1980, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Hayden → Hawke", eDate: "1980-10-18", ePrim: 46.4, eTpp: 50.4, src: 1983, appr: 1980,
+    oppSpl: { iso: "1983-02-08", names: ["Hayden", "Hawke"] } },
+  { year: 1983, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Fraser → Peacock", eDate: "1983-03-05", ePrim: 49.5, eTpp: 53.2, src: 1984, appr: 1983,
+    oppSpl: { iso: "1983-03-11", names: ["Fraser", "Peacock"] } },
+  { year: 1984, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Peacock → Howard", eDate: "1984-12-01", ePrim: 47.6, eTpp: 51.8, src: 1987, appr: 1984,
+    oppSpl: { iso: "1985-09-05", names: ["Peacock", "Howard"] } },
   { year: 1987, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Howard → Peacock", eDate: "1987-07-11", ePrim: 45.8, eTpp: 50.8, src: 1990, appr: 1987,
     oppSpl: { iso: "1989-05-09", names: ["Howard", "Peacock"] } },
   { year: 1990, gov: "alp", opp: "lnp", pm: "Hawke → Keating", lead: "Hawke", oppLead: "Hewson", eDate: "1990-03-24", ePrim: 39.4, eTpp: 49.9, src: 1993, appr: 1990,
@@ -2055,8 +2073,8 @@ function sparseSeries(points, months, cap) {
 /* ---- how the final polls did, cycle by cycle --------------------------
    The page's own caveat is that no aggregate can measure error shared across
    the whole industry about ITSELF. This is the only place that error is
-   visible: twelve past elections, each with a result to check the final polls
-   against, and the honest answer of how far out they were.
+   visible: eighteen past elections, each with a result to check the final
+   polls against, and the honest answer of how far out they were.
 
    The rule, stated once here so the number is reproducible: every house's LAST
    poll with a 2PP in the 14 days before polling day, one per house, equally
@@ -2064,7 +2082,10 @@ function sparseSeries(points, months, cap) {
    question and the interesting quantity is how many of them missed the same
    way, not how many people they rang. Exit polls are excluded: they measure
    voters leaving a booth, not an electorate deciding, and would flatter the
-   record they belong to. Essential's undecided-inclusive pair is normalised
+   record they belong to. Pre-1993 the 2PP scored is IMPLIED last-election-
+   flows on F2F Morgan primaries (FLOW_ERAS; see the CYC_META note), so a
+   single-house era's miss folds poll error and flow-constant drift into one
+   figure. Essential's undecided-inclusive pair is normalised
    first, the same way the trend series normalises it, or its 48/47 would score
    as a 4-point miss that is really an arithmetic difference. */
 const ACC_WINDOW_DAYS = 14;

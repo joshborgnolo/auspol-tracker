@@ -38,3 +38,58 @@ export const impliedAlp2pp = (p) => {
     + FLOW.onp * n0(p.onp)
     + FLOW.oth * (n0(p.ind) + n0(p.oth));
 };
+
+/* FLOW_ERAS – the pre-1987 counterpart of FLOW. F2F Morgan Gallup waves of
+   the 1972–87 era (the aeforecasts mirror import) publish NO 2PP – Morgan
+   did not publish a national two-party figure then – so the rows carry an
+   IMPLIED 2PP (tppEra key → constants), derived by last-election flows the
+   way Kevin Bonham's Wonk Central piece
+   (kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html)
+   applies them to modern polls:
+
+   1. Each era reads a poll's primaries through the flow constants measured
+      at the election that OPENED the cycle (LEF: constants of election E
+      serve the polls of the E→E+1 cycle, never E's own).
+   2. The constants were calibrated per election against that election's
+      OFFICIAL national 2PP (AEC/published: 1972 52.7, 1974 51.7, 1975 44.3,
+      1977 45.4, 1980 49.6, 1983 53.23, 1984 51.77, 1987 50.83, ALP share)
+      using national primaries from the pappubahry election-statistics
+      dataset: f_oth pinned at 0.45 (the stable solved value for the
+      genuine minor/independent remainder in the DLP-era fit), the era's
+      headline minor party (DLP to 1975, Democrats from 1977) solved per
+      election, DLP pinned at 0.27 in the Democrat era (its vote was ≤1.4%
+      and collapsing – the pooled DLP-era estimate).
+   3. The 1977 Democrat debut is a structural break (Bonham's "completely
+      obvious at the time" case): no prior Democrat flow exists, so the
+      1975 set carries dem=0.50 as an explicit debut assumption.
+
+   Right-edge backtest (each set's constants applied to the CLOSING
+   election's actual primaries vs its official 2PP): 1974 −0.04, 1975
+   +0.20, 1977 −0.20, 1980 −0.35, 1983 −0.14, 1984 −0.24, 1987 −0.24.
+   Every cycle lands inside Bonham's measured pre-1983 LEF error budget
+   (±0.6) and the broader post-1983 one (±0.3–1.1); the piece's own
+   normalised-error numbers are the figure the cyclePollBases notes quote.
+   The implied figure is tagged per row with `tppEra` (the opening election
+   year, i.e. the key below), and validate.mjs inverts era rows against
+   THESE constants instead of the 2025 set. */
+export const FLOW_ERAS = Object.freeze({
+  1972: { dlp: 0.2765, oth: 0.45 },
+  1974: { dlp: 0.3032, oth: 0.45 },
+  1975: { dlp: 0.1551, dem: 0.5, oth: 0.45 },
+  1977: { dlp: 0.27, dem: 0.5033, oth: 0.45 },
+  1980: { dlp: 0.27, dem: 0.5571, oth: 0.45 },
+  1983: { dlp: 0.27, dem: 0.584, oth: 0.45 },
+  1984: { dlp: 0.27, dem: 0.6287, oth: 0.45 },
+});
+
+/* Implied ALP 2PP from an ERA row's primaries. Era rows itemise the
+   Democrats and DLP out of oth (dem/dlp row fields, OTH column stays raw),
+   so each headline minor runs through its own calibrated flow. */
+export const impliedEraAlp2pp = (era, p) => {
+  if (p.alp == null) return null;
+  const n0 = (v) => (v == null ? 0 : v);
+  return p.alp
+    + n0(era.dem) * n0(p.dem)
+    + n0(era.dlp) * n0(p.dlp)
+    + era.oth * n0(p.oth);
+};
