@@ -24,6 +24,10 @@ on:
     - cron: '5,15,25,35,45 7 * * 1'
     # Mon evening follow-ups AEST (08:00, 12:30 UTC)
     - cron: '0 8 * * 1'
+    # Mon 19:00 & 20:00 AEST backstops (09:00, 10:00 UTC) — GitHub dropped the
+    # whole 2026-09-14 dense window and the 16:36 AEST publish sat ~2.5h
+    - cron: '0 9 * * 1'
+    - cron: '0 10 * * 1'
     - cron: '30 12 * * 1'
     # Tue 06:00 & 19:00 AEST (20:00 Mon / 09:00 Tue UTC)
     - cron: '0 20 * * 1'
