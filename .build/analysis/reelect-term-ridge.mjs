@@ -1,6 +1,6 @@
 /* throwaway: proper term-level re-election model.
    Ridge logistic regression (L2, standardised features, intercept free),
-   leave-one-out evaluation over the 13 completed terms.
+   leave-one-out evaluation over the 19 completed terms.
    Model A "autopsy": full-term trajectory features — pmNet_late (final 6mo
      mean), pmNet_trend (final6 − first18), prim_late/prim_trend (primary
      swing vs own election, same windows), govAge (consecutive terms of govt),
@@ -8,7 +8,14 @@
      (pre-1996 terms lack 2PP; 1987 lacks PPM).
    Model B "live": identical features computed from months [12,18) + baseline
      [0,5) only — everything knowable 16 months in — then scored for 2025.
-   Data: origin/main polls.json. */
+   Data: origin/main polls.json.
+
+   Extended 2026-09-14 to the F2F-Morgan era record (terms opening
+   1974–1984, added as era cycles in 39de76c/20ef05e): 13 → 19 terms.
+   Era terms carry Morgan primaries + LEF-implied 2PP (read as-is, the only
+   2PP in existence pre-1983) and no leadership series (pmNet/ppm imputed);
+   govAge walks the election sequence (1974→75 and 1975→77 broke the year−3
+   convention). Mirrors the same-day extension of the snapshot-hazard model. */
 import { execSync } from "node:child_process";
 
 // --json: silence the prose and print only a machine-readable live-call
@@ -17,16 +24,25 @@ const JSON_OUT = process.argv.includes("--json");
 if (JSON_OUT) console.log = () => {};
 
 const D = JSON.parse(execSync("git show origin/main:data/polls.json", { maxBuffer: 1 << 28, encoding: "utf8" }));
-const WIN = { 1977: "lnp", 1980: "lnp", 1983: "alp", 1984: "alp", 1987: "alp", 1990: "alp", 1993: "alp",
+const WIN = { 1972: "alp", 1974: "alp", 1975: "lnp", 1977: "lnp", 1980: "lnp", 1983: "alp", 1984: "alp",
+  1987: "alp", 1990: "alp", 1993: "alp",
   1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp",
   2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp" };
-const TERMS = [1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022];
+const TERMS = [1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022];
 const E = Object.fromEntries(Object.entries(D.elections).map(([k, v]) => [+k.slice(1), v]));
 const mo = (d, e) => (new Date(d) - new Date(e)) / (30.4375 * 864e5);
 const inW = (d, e, lo, hi) => { const m = mo(d, e); return m >= lo && m < hi; };
 const mean = (xs) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
 
-const govAge = (y) => { let n = 1, p = WIN[y]; for (let k = y - 3; WIN[k] != null; k -= 3) { if (WIN[k] === p) n++; else break; } return n; };
+// consecutive same-party wins counted along the election sequence, not year−3
+// steps: 1974→75 and 1975→77 are not 3-year hops, so −3 stepping mislabels era
+// terms (1977 would read 1st-term, 1984 too). Modern terms sit on a 3-year
+// grid and are unaffected.
+const govAge = (y) => {
+  const seq = Object.keys(WIN).map(Number).filter((k) => k < y).sort((a, b) => b - a);
+  let n = 1; for (const k of seq) { if (WIN[k] === WIN[y]) n++; else break; }
+  return n;
+};
 
 const termSpan = (y) => { const i = Object.keys(WIN).map(Number).sort((a, b) => a - b); return [y, i[i.indexOf(y) + 1]]; };
 
@@ -154,7 +170,10 @@ let ridgeLiveP = null;
   console.log(`\nAlbanese-2025 features: ` + BKEYS.map((k) => `${k}=${cur[k] == null ? "—" : +cur[k].toFixed(1)}`).join(" "));
   console.log(`LIVE p(ousted | first-16-months profile, λ=1) = ${p.toFixed(2)} → predict ${p >= 0.5 ? "OUSTED" : "re-elected"}`);
 }
-console.log("\nbaselines: majority 'always re-elected' = 9/13 = 69%");
+{
+  const re = TERMS.filter((y) => WIN[termSpan(y)[1]] === WIN[y]).length;
+  console.log(`\nbaselines: majority 'always re-elected' = ${re}/${TERMS.length} = ${(100 * re / TERMS.length).toFixed(0)}%`);
+}
 
 // ================= part 3 — is this as good as it gets? =================
 // (a) does ALGORITHM choice matter on the A2 features?
@@ -205,7 +224,8 @@ loocvGeneric(rowsA, SETS["A2 +govAge"], knn1, "kNN k=1       ");
 loocvGeneric(rowsA, SETS["A2 +govAge"], knn3, "kNN k=3       ");
 const ridgePairs = loocvGeneric(rowsA, SETS["A2 +govAge"], (tr, z) => fitRidge(tr.map((t) => t.x), tr.map((t) => t.y), 1).predict(z), "ridge logistic");
 
-// (b) how tautological is full-term skill? single features on the 10 2PP-era terms
+// (b) how tautological is full-term skill? single features on the terms with a 2PP series
+// (era terms included via their LEF-implied tpp — flows-modelled, not an official 2PP)
 console.log("\n=== part 3b: single-feature ceilings ===");
 {
   let hit = 0, n = 0; const rows = [];
@@ -224,7 +244,8 @@ console.log("\n=== part 3b: single-feature ceilings ===");
 
 // (c) what theory features add: unemployment@election (approx ABS), mid-term PM spill, minority term
 console.log("\n=== part 3c: theory features (econ/spill/minority) ===");
-const UNEMP = { 1987: 8.2, 1990: 6.7, 1993: 10.9, 1996: 8.5, 1998: 7.4, 2001: 6.7, 2004: 5.4, 2007: 4.4, 2010: 5.2, 2013: 5.8, 2016: 5.7, 2019: 5.2, 2022: 3.9 }; // approx, quarter of election
+const UNEMP = { 1974: 2.3, 1975: 4.9, 1977: 6.4, 1980: 6.0, 1983: 10.0, 1984: 8.8,
+  1987: 8.2, 1990: 6.7, 1993: 10.9, 1996: 8.5, 1998: 7.4, 2001: 6.7, 2004: 5.4, 2007: 4.4, 2010: 5.2, 2013: 5.8, 2016: 5.7, 2019: 5.2, 2022: 3.9 }; // approx, quarter of election
 const SPILL = { 1990: 1, 2007: 1, 2010: 1, 2013: 1, 2016: 1 };                  // PM replaced mid-term
 const MINOR = { 2010: 1 };
 const rowsExt = rowsA.map((r) => ({ ...r, unemp: UNEMP[r.y], spill: SPILL[r.y] || 0, minor: MINOR[r.y] || 0 }));
@@ -233,7 +254,11 @@ loocvGeneric(rowsExt, [...SETS["A2 +govAge"], "spill", "minor"], (tr, z) => fitR
 loocvGeneric(rowsExt, [...SETS["A2 +govAge"], "unemp", "spill", "minor"], (tr, z) => fitRidge(tr.map((t) => t.x), tr.map((t) => t.y), 1).predict(z), "A2+all three    ");
 loocvGeneric(rowsExt, ["govAge", "unemp", "spill", "minor"], (tr, z) => fitRidge(tr.map((t) => t.x), tr.map((t) => t.y), 1).predict(z), "theory-only     ");
 const binomSE = (a, n) => Math.sqrt(a / n * (1 - a / n) / n);
-{ const a = 11 / 13; console.log(`\nnote: 11/13 = 85% carries ±${(100 * 2 * binomSE(a, 13)).toFixed(0)}pp (95% Wilson ≈ [58%,96%]) — adjacent accuracies here are statistically indistinguishable`); }
+{
+  const acc = rA["A2 +govAge"].acc, n = TERMS.length, a = acc / n, z = 1.96;
+  const cen = (a + z * z / (2 * n)) / (1 + z * z / n), half = z * Math.sqrt(a * (1 - a) / n + z * z / (4 * n * n)) / (1 + z * z / n);
+  console.log(`\nnote: ${acc}/${n} = ${(100 * a).toFixed(0)}% carries ±${(100 * 2 * binomSE(a, n)).toFixed(0)}pp (95% Wilson ≈ [${(100 * (cen - half)).toFixed(0)}%,${(100 * (cen + half)).toFixed(0)}%]) — adjacent accuracies here are statistically indistinguishable`);
+}
 
 if (JSON_OUT) {
   process.stdout.write(JSON.stringify({

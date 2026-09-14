@@ -3,7 +3,7 @@
    final(span-3); each snapshot's features are trailing-3-month summaries
    knowable at that age. One pooled ridge logistic (5 features: primary
    and two-party swing, incumbency age, age-fraction, swing×age
-   interaction) over ~91 snapshots.
+   interaction) over ~131 snapshots.
    Validation: leave-one-TERM-out (all snapshots of a term together).
    Accuracy is reported PER BAND — "how callable is a term N months in?".
    Albanese-2025 predicted at age 16.2mo with a 300-draw cluster bootstrap
@@ -15,7 +15,16 @@
    worse — snapshot AUC 0.77→0.84, Brier 0.182→0.153, final band
    85%→92% — without them), so the shipped model now ignores them.
    pmNet/ppmLead are still computed below and emitted in --json as
-   context for the page, not as model inputs. */
+   context for the page, not as model inputs.
+
+   Extended 2026-09-14 to the F2F-Morgan era record (terms opening
+   1974–1984, added as era cycles in 39de76c/20ef05e): 13 → 19 terms.
+   Era terms bring primary series + LEF-implied 2PP (tppEra) and NO
+   leadership series (pmNet/ppmLead stay null-safe imputed); the era
+   tppSw reads the implied 2PP — the only 2PP in existence pre-1983 —
+   so era two-party swings are flows-modelled, a documented feature-
+   quality caveat. govAge now walks the election sequence (1974→75 and
+   1975→77 broke the year−3 convention). */
 import { execSync } from "node:child_process";
 
 // CLI: --age=N.N picks the current-term snapshot age for the live call
@@ -33,16 +42,25 @@ if (AGE_ARG && (!Number.isFinite(SNAPSHOT_AGE) || SNAPSHOT_AGE <= 0 || SNAPSHOT_
 if (JSON_OUT) console.log = () => {};
 
 const D = JSON.parse(execSync("git show origin/main:data/polls.json", { maxBuffer: 1 << 28, encoding: "utf8" }));
-const WIN = { 1977: "lnp", 1980: "lnp", 1983: "alp", 1984: "alp", 1987: "alp", 1990: "alp", 1993: "alp",
+const WIN = { 1972: "alp", 1974: "alp", 1975: "lnp", 1977: "lnp", 1980: "lnp", 1983: "alp", 1984: "alp",
+  1987: "alp", 1990: "alp", 1993: "alp",
   1996: "lnp", 1998: "lnp", 2001: "lnp", 2004: "lnp", 2007: "alp", 2010: "alp", 2013: "lnp",
   2016: "lnp", 2019: "lnp", 2022: "alp", 2025: "alp" };
-const TERMS = [1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022];
+const TERMS = [1974, 1975, 1977, 1980, 1983, 1984, 1987, 1990, 1993, 1996, 1998, 2001, 2004, 2007, 2010, 2013, 2016, 2019, 2022];
 const ALL = [...TERMS, 2025];
 const E = Object.fromEntries(Object.entries(D.elections).map(([k, v]) => [+k.slice(1), v]));
 const mo = (d, e) => (new Date(d) - new Date(e)) / (30.4375 * 864e5);
 const mean = (xs) => xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null;
 const med = (xs) => { const s = xs.slice().sort((a, b) => a - b); return s.length ? s[Math.floor(s.length / 2)] : null; };
-const govAge = (y) => { let n = 1, p = WIN[y]; for (let k = y - 3; WIN[k] != null; k -= 3) { if (WIN[k] === p) n++; else break; } return n; };
+// consecutive same-party wins counted along the election sequence, not year−3
+// steps: 1974→75 and 1975→77 are not 3-year hops, so −3 stepping mislabels era
+// terms (1977 would read 1st-term, 1984 too). Modern terms sit on a 3-year
+// grid and are unaffected.
+const govAge = (y) => {
+  const seq = Object.keys(WIN).map(Number).filter((k) => k < y).sort((a, b) => b - a);
+  let n = 1; for (const k of seq) { if (WIN[k] === WIN[y]) n++; else break; }
+  return n;
+};
 const curSpan = 36.5;
 const spanOf = (y) => y === 2025 ? curSpan : mo(E[ALL[ALL.indexOf(y) + 1]].date, E[y].date);
 
@@ -183,7 +201,10 @@ console.log("\n=== Albanese-2025 live call (cluster bootstrap, 300 draws) ===");
   console.log(`share of bootstrap draws calling OUSTED (p≥0.5): ${(100 * BOOT.shareOuster).toFixed(0)}%`);
   console.log(`context ratings (not modelled): pmNet ${cur.pmNet?.toFixed(1)} · ppm ${cur.ppmLead?.toFixed(1)} · model features: primSw ${cur.primSw?.toFixed(1)} · tppSw ${cur.tppSw?.toFixed(1)} · govAge ${cur.govAge} · ageFrac ${cur.ageFrac.toFixed(2)}`);
 }
-console.log("\nbaseline: majority 'always re-elected' per band = 9/13 = 69%");
+{
+  const reElected = TERMS.filter((y) => WIN[ALL[ALL.indexOf(y) + 1]] === WIN[y]).length;
+  console.log(`\nbaseline: majority 'always re-elected' per band = ${reElected}/${TERMS.length} = ${(100 * reElected / TERMS.length).toFixed(0)}%`);
+}
 
 // Machine-readable summary for .build/refresh-prediction.mjs (see --json).
 if (JSON_OUT) {

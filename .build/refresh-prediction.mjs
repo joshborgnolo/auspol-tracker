@@ -80,7 +80,7 @@ const record = {
   features: { pmNet: r4(hz.features.pmNet), ppm: r4(hz.features.ppm), primSw: r4(hz.features.primSw), tppSw: r4(hz.features.tppSw), govAge: hz.features.govAge, ageFrac: hz.features.ageFrac },
   ridge: { liveP: ridgeP, window: rg.window },
 };
-const profile = hz.profile;   // 13 completed terms: { y, ousted, span, finAge, bands:{..,"fin"} }
+const profile = hz.profile;   // 19 completed terms: { y, ousted, span, finAge, bands:{..,"fin"} }
 
 // ---------- history: load, replace-or-append this date's record, sort ----
 let hist;
@@ -127,17 +127,17 @@ function compose(rec) {
     : tppLvl >= 47.5
       ? `Two-party preferred is essentially level — about ${tppLvl.toFixed(1)} versus 55.2 at the election.`
       : `The government is behind on two-party preferred — about ${tppLvl.toFixed(1)} versus 55.2 at the election — and every beaten government was underwater here by now.`;
-  const feat3 = `This is the ${ORD[f.govAge] || f.govAge + "th"} consecutive Labor term. More than any single poll, age sorts the fates: no first-term government on this record has been voted out, and the four that fell were in their second, third, fourth and fifth terms.${f.govAge === 2 ? " The Gillard government was ousted at exactly this age." : ""}`;
+  const feat3 = `This is the ${ORD[f.govAge] || f.govAge + "th"} consecutive Labor term. More than any single poll, age sorts the fates: no first-term government on this record has fallen, and the six that did were all at least one term in — two in their second, two in their third, one in its fourth and one in its fifth.${f.govAge === 2 ? " The Gillard and second Whitlam governments both fell at exactly this age." : ""}`;
 
   const qual = inS < minL ? "below every eventual loser’s read"
     : inS <= maxW ? "inside the survivors’ range" : "above the range survivors have ever worn and won anyway";
   const loserList = joinL(losers.map(pct)), winLo = pct(minW), winHi = pct(maxW);
 
   const sickSentence = inS < minL
-    ? "three of the four governments that eventually fell already looked markedly sicker than this one at the same age."
+    ? "most of the governments that eventually fell already looked markedly sicker than this one at the same age."
     : inS <= maxW
-      ? "at the same age this term reads like the terms that survived rather than the four that fell."
-      : "at the same age this term reads sicker than most of the nine that survived — and sicker than some that fell.";
+      ? "at the same age this term reads like the terms that survived rather than the six that fell."
+      : "at the same age this term reads sicker than most of the thirteen that survived — and sicker than some that fell.";
   const blendBits = [
     f.primSw < -0.5 ? "an ordinary post-election fade in the primary" : f.primSw > 0.5 ? "no post-election fade at all" : "a primary vote holding at its election mark",
     tppLvl > 50.5 ? "a two-party position still in front" : tppLvl >= 47.5 ? "a two-party position essentially level" : "a two-party position behind",
@@ -150,18 +150,18 @@ function compose(rec) {
       : "That is alarm territory by this record’s standards.";
 
   return {
-    sub: `A statistical model trained on the polling record of every completed federal term since 1987 reads the signature of Albanese’s second term, about ${Math.round(age)} months in — as at ${dateLabel(rec.asOf)}.`,
+    sub: `A statistical model trained on the polling record of every completed federal term since 1974 reads the signature of Albanese’s second term, about ${Math.round(age)} months in — as at ${dateLabel(rec.asOf)}.`,
     fig: String(rPct),
     figAria: `Modelled chance of re-election: median ${rPct} per cent, inside a ten-to-ninety per cent range of ${loPct} to ${hiPct} per cent, on a zero to one hundred scale.`,
     note: `The band is the model’s honest disagreement with itself: re-fit on three hundred reshuffles of the historical record, the middle of its answers — the ten-to-ninety per cent range — runs from ${loPct} to ${hiPct} per cent. In ${winShare} per cent of those re-fits the call is re-election. The rest call defeat.`,
-    what2: `The honest part of the answer is the width of the band. Thirteen terms and four defeats is a thin history, so the genuine range runs from an uncomfortable ${loPct} to a comfortable ${hiPct} per cent. What the record can say clearly is which company this term keeps: ${sickSentence}`,
+    what2: `The honest part of the answer is the width of the band. Nineteen terms and six defeats is still a thin history, so the genuine range runs from an uncomfortable ${loPct} to a comfortable ${hiPct} per cent. What the record can say clearly is which company this term keeps: ${sickSentence}`,
     f1l: s1(f.primSw), f1: feat1,
     f2l: s1(f.tppSw), f2: feat2,
     f3l: `${ORD[f.govAge] || f.govAge + "th"} term`, f3: feat3,
     blend: `The blend is the point: ${blendBits}. ${blendTail}`,
     nowRow: `reads ${pct(inS)}% at ${age} months — ${qual} (losers’ month-${band} reads: ${loserList} per cent; survivors’ worst: ${winHi} per cent there)`,
     bandIntro: `The column that matters today is month ${band} — the yardstick nearest this term’s age of ${age} months.`,
-    bandCompare: `The four eventual losers read ${loserList} per cent there, the nine winners ran from ${winLo} to ${winHi} — and the current term read ${pct(inS)} at that age.`,
+    bandCompare: `The six eventual losers read ${loserList} per cent there, the thirteen winners ran from ${winLo} to ${winHi} — and the current term read ${pct(inS)} at that age.`,
     ridgeCell: `p(ousted) = ${rec.ridge.liveP.toFixed(2)} → predict ${rec.ridge.liveP < 0.5 ? "re-elected" : "ousted"}${age > 18.5 ? " (first-16-months yardstick — its window is now closed)" : ""}`,
     ridgeCell2: `reads p(ousted) = ${rec.ridge.liveP.toFixed(2)} — ${rec.ridge.liveP < 0.5 ? "same verdict, well short of alarm" : "in ousted territory too"}${age > 18.5 ? " (its window is now closed)" : ""}.`,
     hazardCell: `median p(ousted) = ${o.median.toFixed(2)}, 10–90% [${o.lo.toFixed(2)}, ${o.hi.toFixed(2)}]`,
@@ -172,38 +172,39 @@ function compose(rec) {
       `context, not modelled (dropped in the September 2026 feature audit): pmNet ${s1(f.pmNet)} · ppm ${sp1(f.ppm)}`,
       `(the table’s current-term row shows the in-sample profile read: ${inS.toFixed(2)})`,
     ].join("\n"),
-    metaDesc: `Modelled ${rPct} per cent chance of re-election for the Albanese government as at ${dateLabel(rec.asOf)} — honest range ${loPct}–${hiPct}. A statistical read of thirteen completed federal terms, refreshed daily.`,
+    metaDesc: `Modelled ${rPct} per cent chance of re-election for the Albanese government as at ${dateLabel(rec.asOf)} — honest range ${loPct}–${hiPct}. A statistical read of nineteen completed federal terms, refreshed daily.`,
   };
 }
 
 // ---------- the monthly backcast chart ------------------------------------
 // Frozen hazard-model reads at each 1st-of-month of this term, computed
-// (and last recomputed) 2026-09-08 against origin/main poll data: each
+// (and last recomputed) 2026-09-14 against origin/main poll data: each
 // point's features are trailing-three-month summaries cut at that date,
-// so every point is genuinely foresight-blind. The 2026-09-08 feature
-// refit (leadership ratings dropped — see "The feature audit" on the
-// page) recomputed the whole series under the five-feature model; the
-// information set behind each point is unchanged. Live daily records
+// so every point is genuinely foresight-blind. Two model generations have
+// recomputed the whole series under an unchanged information set: the
+// 2026-09-08 feature refit (leadership ratings dropped — see "The feature
+// audit" on the page) and the 2026-09-14 era extension (13 → 19 training
+// terms — see "A note on the six oldest terms" on the page). Live daily records
 // extend the series from here; these points are never otherwise
 // recomputed — a past point's information set cannot change.
 const BACKCAST = [
   // [age months since 2025-05-03, p(ousted) median, 10%, 90%]
-  [0.95, 0.2212, 0.0819, 0.4721],
-  [1.94, 0.1607, 0.0602, 0.3813],
-  [2.96, 0.152, 0.0598, 0.377],
-  [3.98, 0.1475, 0.0597, 0.3714],
-  [4.96, 0.1579, 0.0645, 0.3912],
-  [5.98, 0.1684, 0.0673, 0.4056],
-  [6.97, 0.1752, 0.0697, 0.4005],
-  [7.98, 0.1792, 0.0745, 0.4048],
-  [9, 0.2029, 0.0762, 0.4679],
-  [9.92, 0.225, 0.0801, 0.5007],
-  [10.94, 0.2432, 0.082, 0.5283],
-  [11.93, 0.2405, 0.0806, 0.525],
-  [12.94, 0.2614, 0.0838, 0.5462],
-  [13.93, 0.2551, 0.0833, 0.5487],
-  [14.95, 0.2669, 0.0846, 0.5678],
-  [15.97, 0.2744, 0.0867, 0.5765],
+  [0.95, 0.0979, 0.0222, 0.293],
+  [1.94, 0.0638, 0.0125, 0.2196],
+  [2.96, 0.0639, 0.0125, 0.2191],
+  [3.98, 0.0634, 0.0126, 0.2155],
+  [4.96, 0.0755, 0.0171, 0.236],
+  [5.98, 0.0854, 0.0201, 0.2428],
+  [6.97, 0.0908, 0.0239, 0.2485],
+  [7.98, 0.1013, 0.0288, 0.2605],
+  [9, 0.1338, 0.0456, 0.3082],
+  [9.92, 0.1628, 0.0585, 0.3584],
+  [10.94, 0.1889, 0.0743, 0.398],
+  [11.93, 0.1927, 0.0727, 0.4044],
+  [12.94, 0.2255, 0.0858, 0.4385],
+  [13.93, 0.232, 0.088, 0.4588],
+  [14.95, 0.2532, 0.0951, 0.492],
+  [15.97, 0.2759, 0.1084, 0.5255],
 ];
 const chartSvg = (() => {
   const pts = BACKCAST.map(([age, median, lo, hi]) => ({ age, median, lo, hi }))
@@ -240,6 +241,9 @@ const chartSvg = (() => {
 
 // ---------- static term metadata for the table (election years are facts) --
 const TERMS_META = {
+  1974: ["1974–75", "ALP — Whitlam"], 1975: ["1975–77", "Coalition — Fraser"],
+  1977: ["1977–80", "Coalition — Fraser"], 1980: ["1980–83", "Coalition — Fraser"],
+  1983: ["1983–84", "ALP — Hawke"], 1984: ["1984–87", "ALP — Hawke"],
   1987: ["1987–90", "ALP — Hawke"], 1990: ["1990–93", "ALP — Hawke → Keating"],
   1993: ["1993–96", "ALP — Keating"], 1996: ["1996–98", "Coalition — Howard"],
   1998: ["1998–01", "Coalition — Howard"], 2001: ["2001–04", "Coalition — Howard"],
@@ -252,8 +256,10 @@ const cellPct = (v) => (v == null ? "·" : String(Math.round(v * 100)));
 const termRows = profile.map((t) => {
   const [span, govt] = TERMS_META[t.y];
   const lost = t.ousted === 1;
+  // A yardstick past the term's own end would show an extrapolated, median-
+  // imputed snapshot (era terms run as short as 19 months) — render "·".
   const cells = [6, 12, 15, 18, 24, 30].map((b) =>
-    `<td>${b === t.finAge && t.finAge === 30 ? cellPct(t.bands.fin) + "&nbsp;†" : cellPct(t.bands[String(b)])}</td>`).join("");
+    `<td>${b === t.finAge && t.finAge === 30 ? cellPct(t.bands.fin) + "&nbsp;†" : b > t.span ? "·" : cellPct(t.bands[String(b)])}</td>`).join("");
   const finCell = t.finAge === 30 ? "<td>·</td>" : `<td>${cellPct(t.bands.fin)}</td>`;
   return `<tr${lost ? ' class="lost"' : ""}><td class="l">${span}</td><td class="l">${govt}</td><td class="l fate">${lost ? "lost" : "returned"}</td>${cells}${finCell}</tr>`;
 }).join("\n        ");
@@ -556,7 +562,7 @@ body {
   </figure>
 
   <h2>What this number is</h2>
-  <p>The number above is not a poll of voters and it is not a betting price. It comes from a model that was shown the polling history of every completed federal parliamentary term since 1987 — thirteen terms, nine of which ended in the government’s re-election and four in its defeat — and taught to recognise the signature a term shows part-way through: how far the vote has faded from the last election result, and how old the government is. Read against that record, the signature of Albanese’s second term is the signature of a government that goes on to survive.</p>
+  <p>The number above is not a poll of voters and it is not a betting price. It comes from a model that was shown the polling history of every completed federal parliamentary term since 1974 — nineteen terms, thirteen of which ended in the government’s re-election and six in its defeat — and taught to recognise the signature a term shows part-way through: how far the vote has faded from the last election result, and how old the government is. Read against that record, the signature of Albanese’s second term is the signature of a government that goes on to survive.</p>
   <p data-slot="what2">${S.what2}</p>
 
   <h2>How the model reads this term</h2>
@@ -577,8 +583,8 @@ body {
   </ul>
   <p data-slot="blend">${S.blend}</p>
 
-  <h2>The thirteen terms it learned from</h2>
-  <p>Every few months of each completed term, from month six to the final pre-election read, the model says how likely that government was to be ousted at that point. The four defeats are in colour; the current term is pinned underneath.</p>
+  <h2>The nineteen terms it learned from</h2>
+  <p>Every few months of each completed term, from month six to the final pre-election read, the model says how likely that government was to be ousted at that point. The six defeats are in colour; the current term is pinned underneath. Terms shorter than a checkpoint show a dot where they never lived to see one.</p>
   <div class="pred-twrap">
     <table class="pred-table">
       <caption>Modelled chance of ouster, per cent, at each age of the term — fitted on the full record.</caption>
@@ -605,12 +611,13 @@ body {
   <p class="pred-tnote">† The 2007 term ran 33 months, so its month-30 read doubles as its final read. Table values are the model’s in-sample reads; the headline call above comes from the bootstrap described below.</p>
   <p data-slot="bandIntro">${S.bandIntro}</p>
   <p data-slot="bandCompare">${S.bandCompare}</p>
-  <p>You can score 69 per cent on this table by simply always predicting “returned” — incumbents usually win. Tested honestly, with each term held out in turn and never seen by its judge, the model calls ten of thirteen terms correctly from month six onwards, and twelve by the final pre-election read. History blurs at the extremes: the Hawke government’s famous mid-term scare of 1989–90 read as high as 75 per cent ouster-risk at month 12, and it recovered to win the 1990 election — while the 2016–19 Coalition sat at 27 per cent by its final read and survived.</p>
+  <p>You can score 68 per cent on this table by simply always predicting “returned” — incumbents usually win. Tested honestly, with each term held out in turn and never seen by its judge, the model calls between thirteen and fifteen of the nineteen terms correctly at every checkpoint, the final read included. History blurs at the extremes: the Hawke government’s famous mid-term scare of 1989–90 read as high as 79 per cent ouster-risk at month 15, and it recovered to win the 1990 election — while the 2016–19 Coalition sat at 19 per cent by its final read and survived.</p>
+  <p>A note on the six oldest terms. The model’s record was extended back to 1974 in September 2026, and the era rows are the roughest on the table: before 1983 no published two-party-preferred series exists, so every era two-party figure is modelled from first preferences and historical preference flows. Era parliaments also ran at irregular lengths — the 1974–75 and 1983–84 terms were over before month 24, and three of the six era terms never saw a three-year read at all. The model takes the record as it finds it; those checkpoints deserve slightly less trust than the modern ones. (The constants and caveats are documented in the modelling suite’s README.)</p>
 
   <h2>Where this can go wrong</h2>
-  <p><strong>There are only thirteen terms.</strong> Four defeats is a tiny sample, and the final-read accuracy of 92 per cent itself carries roughly sixteen points of statistical noise either way. Treat every number on this page as a best guess with a range attached — which is why the range, not the median, is the most honest figure here.</p>
-  <p><strong>It cannot see shocks.</strong> The model reads the shape of polling, not events. The 2010–13 minority government’s collapse has no antecedent in the record, and the model never calls it — at any horizon. The 2019–22 term flips depending on exactly when you look: the COVID rally peaks at precisely the fifteen-month yardstick. And 1990 is the one genuine comeback on record — a 75 per cent ouster-read at month 12 that still won.</p>
-  <p><strong>Waiting buys less than you’d think.</strong> Accuracy is a flat 77 per cent from month six to month 24; only the final pre-election read climbs, to 92 per cent. Governments that are structurally finished are visible early — three of the four losers were already long shots at six months. Everything else stays murky until the campaign.</p>
+  <p><strong>There are only nineteen terms.</strong> Six defeats is still a tiny sample, and even the final-read accuracy of 79 per cent carries roughly seventeen points of statistical noise either way. Treat every number on this page as a best guess with a range attached — which is why the range, not the median, is the most honest figure here.</p>
+  <p><strong>It cannot see shocks.</strong> The model reads the shape of polling, not events. The 2010–13 minority government’s collapse has no antecedent in the record, and the model never calls it — at any horizon. The 2019–22 term flips depending on exactly when you look: the COVID rally peaks at precisely the fifteen-month yardstick. The 1977–80 government is the opposite kind of miss — re-elected comfortably, yet the cross-check model just tips it over fifty-fifty at its live reads. And 1990 is the one genuine comeback on record — a 77 per cent ouster-read at month 12 that still won.</p>
+  <p><strong>Waiting buys less than you’d think.</strong> Accuracy wanders in a 68-to-79-per-cent band from month six onward and no longer climbs at the finish — the final pre-election read, at 79 per cent, is no better than the year-one reads. Governments that are structurally finished are often visible early — three of the six eventual losers were already rated more likely than not to fall by month six — but the era defeats read murkier, and everything else stays murky until the campaign.</p>
   <p><strong>Winning means seats, not the popular vote.</strong> Fates are coded by who formed government. Howard’s 1998 win on 49 per cent of the two-party vote counts as a win — the model is about survival, not vote share. And none of this is a forecast of events between now and the election: it is a reading of history’s signatures, and the election itself remains its own fact.</p>
 
   <h2>The model, technically</h2>
@@ -622,15 +629,15 @@ body {
     <tbody>
       <tr><td>15-month <em>levels</em> composite (approval, lead, swings scored against the ousted and survivor centroids)</td><td>−1.18 — worse than the typical ousted term’s level</td><td>15% (useless)</td></tr>
       <tr><td>15-month <em>declines</em> composite (fade from the term’s own honeymoon)</td><td>+0.86 — a standard honeymoon fade</td><td>54%</td></tr>
-      <tr><td>Ridge logistic on per-term trajectory features</td><td><span data-slot="ridgeCell">${S.ridgeCell}</span></td><td>85% full-term · 77% live</td></tr>
-      <tr class="picked"><td><strong>Snapshot / hazard model — the one above</strong></td><td><strong><span data-slot="hazardCell">${S.hazardCell}</span></strong></td><td>77% at every band, months 6–24 · 83% at 30 · 92% final</td></tr>
+      <tr><td>Ridge logistic on per-term trajectory features</td><td><span data-slot="ridgeCell">${S.ridgeCell}</span></td><td>68% full-term · 79% live</td></tr>
+      <tr class="picked"><td><strong>Snapshot / hazard model — the one above</strong></td><td><strong><span data-slot="hazardCell">${S.hazardCell}</span></strong></td><td>68–79% across bands, months 6–24 · 76% at 30 · 79% final</td></tr>
     </tbody>
   </table>
-  <p>The construction. Each completed term contributes snapshots at ages 6, 12, 15, 18, 24 and 30 months plus a final read three months before its last day — ninety snapshots in all. Each snapshot’s features are trailing-three-month summaries knowable at that age: the primary-vote and two-party swings against the term’s own election result, the government’s incumbency age in consecutive terms, the fraction of the term elapsed (the current term is assumed to run a full span), and the interaction of primary swing with elapsed fraction — five features in all. Missing values are median-imputed within the training fold; features are standardised within it; the fit is ridge logistic regression with λ = 1.</p>
-  <p>The validation. Leave-one-term-out: a term’s snapshots are scored only by a model trained on the other twelve. The baseline “always re-elected” scores 69 per cent. Snapshot-level AUC is 0.84 with Brier score 0.153. The interval comes from a 300-draw cluster bootstrap that resamples whole terms, refits, and re-scores the current term each draw. The live call, verbatim:</p>
+  <p>The construction. Each completed term contributes snapshots at ages 6, 12, 15, 18, 24 and 30 months plus a final read three months before its last day — a hundred and thirty-one snapshots in all. Each snapshot’s features are trailing-three-month summaries knowable at that age: the primary-vote and two-party swings against the term’s own election result, the government’s incumbency age in consecutive terms, the fraction of the term elapsed (the current term is assumed to run a full span), and the interaction of primary swing with elapsed fraction — five features in all. Missing values are median-imputed within the training fold; features are standardised within it; the fit is ridge logistic regression with λ = 1.</p>
+  <p>The validation. Leave-one-term-out: a term’s snapshots are scored only by a model trained on the other eighteen. The baseline “always re-elected” scores 68 per cent. Snapshot-level AUC is 0.75 with Brier score 0.185. The interval comes from a 300-draw cluster bootstrap that resamples whole terms, refits, and re-scores the current term each draw. The live call, verbatim:</p>
   <div class="pred-code" data-slot="code">${S.code}</div>
-  <p>The feature audit. Until September 2026 this model also read leadership ratings — net PM approval and the preferred-PM lead. Ablated feature by feature on this same leave-one-term-out harness, neither earned its place: dropping the preferred-PM lead changed no accuracy band at all, and dropping both leadership readings lifted snapshot AUC from 0.77 to 0.84 and cut the Brier score from 0.182 to 0.153, with per-band accuracy never worse. Their fitted coefficients had shrunk to nothing, or landed the wrong sign — Howard was popular mid-term and lost anyway. That matches the published record: preferred-PM scores are weak, skewed predictors of election outcomes (Kevin Bonham, 2020), and the strongest leadership construction on offer — the PM-versus-opposition-leader approval margin (Armarium, 2021) — scored no better here than ignoring leadership ratings entirely. The ratings still tell part of the term’s story, so they stay in the live summary as context; the model just no longer lets them vote.</p>
-  <p>The cross-check. A deliberately different construction — one ridge logistic per term on first-sixteen-month features — <span data-slot="ridgeCell2">${S.ridgeCell2}</span> Its best-calibrated variant, adding leadership-spill and minority-government flags, holds the same 85 per cent leave-one-term-out accuracy with AUC 0.89 and Brier 0.134. On thirteen terms the estimator is not the constraint — a diagonal LDA ties the ridge and k-nearest-neighbours collapses — and no capacity beyond logistic earns its keep: adjacent accuracies are statistically indistinguishable (85 per cent carries a 95% Wilson interval of roughly [58%, 96%]).</p>
+  <p>The feature audit. Until September 2026 this model also read leadership ratings — net PM approval and the preferred-PM lead. Ablated feature by feature on this same leave-one-term-out harness (run over the 1987-and-later thirteen-term record, before the era extension), neither earned its place: dropping the preferred-PM lead changed no accuracy band at all, and dropping both leadership readings lifted snapshot AUC from 0.77 to 0.84 and cut the Brier score from 0.182 to 0.153, with per-band accuracy never worse. Their fitted coefficients had shrunk to nothing, or landed the wrong sign — Howard was popular mid-term and lost anyway. That matches the published record: preferred-PM scores are weak, skewed predictors of election outcomes (Kevin Bonham, 2020), and the strongest leadership construction on offer — the PM-versus-opposition-leader approval margin (Armarium, 2021) — scored no better here than ignoring leadership ratings entirely. The ratings still tell part of the term’s story, so they stay in the live summary as context; the model just no longer lets them vote.</p>
+  <p>The cross-check. A deliberately different construction — one ridge logistic per term on first-sixteen-month features — <span data-slot="ridgeCell2">${S.ridgeCell2}</span> Its best-calibrated variant, adding leadership-spill and minority-government flags, reaches 74 per cent leave-one-term-out accuracy with AUC 0.81 and Brier 0.153; adding election-quarter unemployment lands in the same place. On nineteen terms the estimator is not the constraint — a diagonal LDA nearly ties the ridge and k-nearest-neighbours collapses — and no capacity beyond logistic earns its keep: adjacent accuracies are statistically indistinguishable (the base model’s 68 per cent carries a 95% Wilson interval of roughly [46%, 85%]).</p>
   <p>To reproduce: from the repo root, <code>node .build/analysis/reelect-snapshot-hazard.mjs</code> (the headline — its snapshot age defaults to the canonical 16.2 months and moves via <code>--age=N.N</code>), <code>node .build/analysis/reelect-term-ridge.mjs</code> (the cross-check), plus <code>reelect-15mo-levels.mjs</code> and <code>reelect-15mo-declines.mjs</code> (the composites). Both models emit machine-readable results with <code>--json</code>; this page is regenerated from them by <code>.build/refresh-prediction.mjs</code> on a daily due gate, and each refresh is one dated, selectable record above. The analysis scripts read poll data straight from origin/main, so they are immune to working-tree state; the canonical numbers live in <code>.build/analysis/README.md</code>. The analysis’s own closing caution stands: this is historical signature analysis, not a forecast.</p>
 
   <p class="ss-note">This is a satellite analysis page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
