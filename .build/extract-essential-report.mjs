@@ -83,7 +83,11 @@ const FETCH_TRIES = 24;     // generous: sucuri throttles bursts, we wait it out
 const CONCURRENCY = 3;      // wordpress pages
 const PAGE_MIN_GAP_MS = 350; // per-worker gap between wordpress page fetches
 const FLOURISH_CONCURRENCY = 8; // flourish cdn reads
-const H = { "user-agent": "Mozilla/5.0 (compatible; auspol-tracker data collector; +https://essentialreport.com.au/methodology)" };
+// 2026-09-15: Sucuri started hard-403ing the old identifying UA
+// ("Mozilla/5.0 (compatible; auspol-tracker data collector; +...)" got an
+// "Access Denied" block page, no challenge marker) while the plain
+// canonical tracker UA from extract-common.mjs passes — adopt that string.
+const H = { "user-agent": "Mozilla/5.0 (auspol-tracker data update)" };
 
 // The site sits behind Sucuri CloudProxy, which answers cache misses with a
 // 307 interstitial whose inline script sets a `sucuri_cloudproxy_uuid_*`
