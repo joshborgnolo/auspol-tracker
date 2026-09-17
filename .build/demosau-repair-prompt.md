@@ -56,8 +56,10 @@ new `polls` row:
    `undecided` only if stated, primaries `alp`/`lnp`/`grn`/`onp`/`ind`
    (`ind` = the lead's "others"), `oth`: null, `tpp_alp`/`tpp_lnp`: null,
    `url` = the article URL. The five primaries must sum to exactly 100.
-   NO `ppm`/`approval` rows — the extractor backfills those from the PDF
-   once it lands. NO other `polls` rows. NO other files.
+   NO `methodUrl` — its absence keeps the hourly intensive sweep running
+   (`.build/demosau-pending.mjs`) until the PDF lands and a human
+   reconciles the row. NO `ppm`/`approval` rows — the extractor backfills
+   those from the PDF once it lands. NO other `polls` rows. NO other files.
 3. `node .build/extract-demosau.mjs` must now exit 0 — run it to prove it.
    Do NOT pre-fix anything for the PDF: when it lands, the extractor's
    verify step compares its own parse against this row and any field the

@@ -113,6 +113,13 @@ PDF later). When the PDF lands, the matched-row verify reconciles the
 hand-entered row against it; fields the PDF states better (e.g. exact field
 window vs the article's published date) surface in `mismatches` for a human.
 
+A recent DemosAU row with no `methodUrl` IS the awaiting-the-PDF signal:
+`.build/demosau-pending.mjs` exits 0 while such a row is younger than 36h,
+and demosau-update.yml's hourly sweep is gated on it — the PDF gets picked
+up within the hour it lands, and the human reconciliation that adds
+`methodUrl` (Sept 2026: also corrected `date` to the PDF's field end) is
+what closes the gate. Hand-entered rows must NEVER carry `methodUrl`.
+
 ## `published` on the VI rows is hand-curated — the extractor will NEVER fill it
 
 Every extractor route into `polls.json` omits `published`: the new-wave row

@@ -1,10 +1,16 @@
-# DemosAU poll updater. Irregular ~monthly cadence; cheap daily sweep.
+# DemosAU poll updater. Irregular ~monthly cadence; cheap daily sweep. The
+# hourly cron exists for the Capital Brief gap: CB publishes the poll article
+# hours-to-a-day before DemosAU posts the methodology PDF, so after an exit-3
+# hand-entry the `pending` gate below lets the updater sweep hourly until the
+# PDF lands and the row is reconciled. Outside that window the gate makes the
+# hourly run a no-op (checkout + one local script — no fetches).
 
 name: demosau-update
 
 on:
   schedule:
     - cron: '5 21 * * *' # 07:05 AEST daily
+    - cron: '18 * * * *' # hourly sweep, gated on a pending Capital Brief wave
   workflow_dispatch:
     inputs:
       simulate_failure:
@@ -20,7 +26,27 @@ permissions:
   issues: write
 
 jobs:
+  pending:
+    # Cheap gate: exit 0 while a Capital Brief hand-entry awaits its DemosAU
+    # PDF (recent DemosAU row with no methodUrl — clears at reconciliation).
+    # No node setup needed: demosau-pending.mjs has no dependencies and
+    # ubuntu-latest ships node.
+    runs-on: ubuntu-latest
+    outputs:
+      active: ${{ steps.check.outputs.active }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - id: check
+        run: |
+          if node .build/demosau-pending.mjs; then
+            echo "active=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "active=false" >> "$GITHUB_OUTPUT"
+          fi
+
   run:
+    needs: pending
+    if: needs.pending.outputs.active == 'true' || github.event_name == 'workflow_dispatch' || github.event.schedule == '5 21 * * *'
     uses: ./.github/workflows/poll-agent.yml
     with:
       house: demosau
