@@ -1,0 +1,509 @@
+      Capital
+  Brief/DemosAU
+    Federal Poll
+Fieldwork Dates: 10-14 September 2026
+Total Sample Size: 1,583
+Effective Margin of Error: +/- 3.3%
+
+
+
+
+                                        1
+Methodology Statement
+
+  Research company                                        DemosAU
+
+  Client commissioning the research                       Capital Brief
+
+  Fieldwork dates                                         10-14 September 2026
+
+  Mode of data collection                                 Internet panels
+
+  Target population                                       Australian residents 18+ eligible to vote at elections
+
+  Sample size                                             1,583
+
+  Is voting intention published?                          Yes, in this report
+
+  Effective sample size after weighting applied           869
+
+  Margin of error associated with effective sample size   +/- 3.3%
+
+  Variables used in weighting                             Age x gender, education, personal income, residential tenure, language, state x region, 2025 Federal Vote, Left-Right Self ID.
+
+  Weighting method used                                   Rim Weighting
+
+  Full question text, responses categories and            See Pages 13-14
+  randomisation
+
+  Source of sample                                        Internet panels
+
+  Positioning of voting intention questions in            Federal voting intention was first substantive question after demographic questions.
+  questionnaire?
+
+  How were undecided voters handled?                      Initial undecided voters were asked a leaner question. Remaining undecided voters were excluded from final
+                                                          totals.
+
+  2PP calculation method                                  N/A
+
+
+
+
+                                                                                                                                                                                           2
+            Primary Vote
+
+                                         ALP        GRN       OTH         L/NP         ONP
+
+
+Sep 2026                               28%             13%          13%                        20%                      26%
+
+           0%                  20%                     40%                       60%                    80%                 100%
+
+   Excludes 4% of respondents who were undecided
+
+
+
+                                             Primary Vote Over Time %
+                                         ALP        GRN       OTH         L/NP         ONP
+ 35%
+ 30%
+ 25%
+ 20%
+ 15%
+ 10%
+  5%
+  0%
+       2025 Election Jan 2026        Feb 2026      Apr 2026   May 2026      Jun 2026         Jul 2026   Aug 2026   Sep 2026
+
+
+                                                                                                                        3
+   Primary Vote Swing
+
+                                     Swings Since Last Election
+
+                              ALP          GRN          OTH          LNP         ONP
+
+                                -6.6%
+                                                         0.8%
+                                          -2.0%
+                   -11.8%
+                                                                                              19.6%
+-20%                   -10%                         0%                             10%            20%
+
+                               Swings Since Last Poll (August)
+
+                                    ALP           GRN         L/NP         ONP
+
+                                                                       2.0%
+
+                                                              1.0%
+
+         -5.0%
+
+                                                                       2.0%
+   -6%           -4%                -2%                 0%                 2%            4%           6%
+                                                                                                           4
+       Seat Projection
+The below seat projection is based on a 20,000 simulation Monte Carlo probability analysis, assuming uniform national
+swings since the most recent DemosAU MRP model.
+
+
+
+
+                    Current Month                                          May-July 2026 MRP
+
+                                                                  May-July 2026
+                   Bottom of Range       Top of Range                                       Low               High
+                                                                      MRP
+
+
+      Labor                76                  88                      Labor                 60                 72
+
+
+
+   One Nation              38                  49                   One Nation               53                66
+
+
+                            8                   21                                            11                22
+    Coalition                                                        Coalition
+                       Lib 8, Nat 0        Lib 17, Nat 4                                 Lib 11, Nat 0     Lib 20, Nat 2
+
+
+     Greens                 0                   4                     Greens                   1                5
+
+
+
+     Others                 6                   11                     Others                 3                 7
+
+
+
+
+                                                                                                                           5
+     Preferred PM
+
+                                             Three Choices
+                                                                                                                                  Change
+      Anthony Albanese (Labor)      Pauline Hanson (One Nation)         Angus Taylor (Liberal)       Don't Know                 from Aug %
+
+                                                                                                     36%                            1%
+
+                                                                  25%                                                              3%
+                                                       21%                                                                         -2%
+                                             18%
+                                                                                                                                   -2%
+0%                       10%                          20%                           30%                               40%
+
+
+
+                                                   Head to Head
+
+               Anthony Albanese (Labor)                                  Anthony Albanese (Labor)             Angus Taylor (Liberal)
+
+
+      Pauline Hanson (One Nation)     Don't Know                                                 Don't Know
+
+
+                                                      45%                                                                        39%
+
+                                     33%                                                                                  35%
+
+                      22%                                                                                  26%
+
+0%       10%          20%           30%         40%               0%              10%              20%              30%                40%
+
+
+
+
+                                                                                                                                  6
+           Leader Ratings
+
+Q. What is your opinion of the following people?
+                                                                                                              Net        Net
+                                                                                                            Positive   Change
+                                         Positive         Neutral     Negative
+
+
+
+  Prime Minister Anthony Albanese                         29%              26%                      45%      -16%       3%
+
+
+
+
+   Opposition Leader Angus Taylor                   23%                                 50%         27%      -4%        0%
+
+
+
+
+ One Nation Leader Pauline Hanson                          32%              24%                     44%      -12%       4%
+
+
+                                    0%              20%             40%           60%         80%    100%
+
+
+
+
+                                                                                                                        7
+        Social Media Reforms
+
+Q. Which of the following comes closest to your view about social media companies?
+
+
+               Platforms should be legally required to reduce risks*   Platforms should be free to decide**   Don't know
+
+
+
+                                                                                                                     65%
+
+
+
+                                        22%
+
+
+
+                         13%
+
+
+0%                 10%                20%                  30%             40%                50%              60%               70%
+
+
+
+
+*Full wording: They should be legally required to reduce foreseeable risks to users, even if this means placing more restrictions
+on how their platforms operate.
+
+
+**Full wording: They should generally be free to decide how their platforms operate, even if this means users may face greater
+risks of harm
+
+
+
+                                                                                                                             8
+        Social Media Reforms
+
+Q. Social media companies use algorithms to decide what content is shown to users. The federal
+government has proposed giving users the choice to opt out of the algorithm and only be shown
+content from people and accounts they choose to follow.
+
+Do you support or oppose this policy?
+                                                                                             Net Support
+                                 Support     Don't know     Oppose
+
+
+     Australia                                                  66%           21%    13%        53%
+
+
+       Males                                                     67%     17%         16%        51%
+
+
+
+     Females                                                    65%            24%   11%        54%
+
+
+
+        18-34                                             60%           23%          17%        43%
+
+
+
+       35-54                                                      68%          20%   12%        56%
+
+
+
+          55+                                                     68%         19%    13%        55%
+
+                0%       20%               40%             60%          80%           100%
+
+
+                                                                                                   9
+    Top Issue
+Q. In your opinion, what is the biggest issue facing Australia today?
+ Open-ended, categories generated by AI (note: totals may not equal 100% as responses can be assigned multiple categories)
+
+
+
+         Cost of Living and Inflation                                                                         42%
+       Housing and Homelessness                                    13%
+                Immigration Levels                           10%
+                              Crime                     8%
+                Economy and Jobs                   6%
+                   Climate Change                 5%
+ Federal Government Performance               4%
+        Racism And Discrimination            3%
+                      National Debt           2%
+                            Taxation          2%
+             Right-Wing Extremism             2%
+                         Corruption          1%
+             Government Spending             1%
+                        Health Care          1%
+                          Education          1%
+                             Poverty         1%
+                     Miscellaneous                       9%
+               Don't Know / Unsure           1%
+                                        0%                     10%       20%               30%               40%
+
+                                                                                                                             10
+               Voting Intention: Gender + Age
+
+                                                          Gender
+                                    ALP         GRN         OTH             L/NP           ONP
+
+
+  Males                      28%                12%                   13%                              21%            26%
+
+
+Females                      27%                    14%                 14%                             20%           25%
+
+          0%          20%                           40%                              60%                      80%      100%
+
+
+
+
+                                                            Age
+                                        ALP         GRN         OTH           L/NP         ONP
+
+
+  18-34                                       38%                               22%              9%             15%   16%
+
+
+ 35-54                      26%                13%                13%                                  21%            27%
+
+
+   55+                 23%         7%                     16%                                    23%                  31%
+
+          0%          20%                           40%                              60%                      80%      100%
+
+
+
+
+                                                                                                                            11
+                   Education + Income
+
+                                                                 Education
+                                        ALP         GRN           OTH         L/NP         ONP
+
+
+  School education                       29%                    13%                  16%                     17%           25%
+
+
+     TAFE education               24%               11%                11%                       20%                       34%
+
+
+University education                      30%                         15%            13%                             25%   17%
+
+                       0%     20%                           40%                            60%                      80%     100%
+
+                                                                      Income
+                                              ALP         GRN           OTH      L/NP         ONP
+
+
+          <$45K                   26%                12%                       17%                     18%                 27%
+
+
+       $45-125K                         30%                     14%           10%                        21%               25%
+
+
+         $125K+                    27%               11%              8%                                      31%          23%
+
+                  0%        20%                            40%                          60%                         80%     100%
+
+
+
+
+                                                                                                                            12
+                 Location, Tenure + Language
+
+                                                                Location
+                                             ALP          GRN          OTH              L/NP    ONP
+
+   Inner Metro                                 32%                    13%               9%                          28%    18%
+
+  Outer Metro                           28%                      15%                     13%                17%            27%
+
+Regional/Rural                   23%           8%                            19%                      16%                  34%
+                 0%             20%                             40%                            60%                  80%      100%
+
+
+                                                         Housing Tenure
+                                             ALP          GRN          OTH          L/NP        ONP
+
+            Renter                                 31%                      16%                14%           13%           26%
+  Mortgage holder                            28%                 13%               10%                       23%           26%
+Own home outright                      24%               10%                      16%                         25%          25%
+                      0%          20%                            40%                            60%                 80%     100%
+
+
+                                                     Language Status
+                                             ALP          GRN          OTH          L/NP        ONP
+
+            English only                      25%                13%                     14%                  21%          27%
+
+Other language at home                                          38%                      14%          12%            18%   18%
+                           0%           20%                            40%                       60%                 80%    100%
+
+                                                                                                                             13
+           Voting Intention: Past Election Vote
+
+
+                                                 2025 Federal Election Vote
+                                                 ALP         GRN    OTH   L/NP   ONP
+
+
+    ALP 2025 Vote                                                                       68%   6% 4%         8%            14%
+
+
+
+   L/NP 2025 Vote             8%                                                   52%                                    35%
+
+
+
+    Grn 2025 Vote                  12%                                                                           79% 4%   5%
+
+
+
+   ONP 2025 Vote                                                                                                          96%
+
+
+
+    Oth 2025 Vote        4%                                                                     71%     6%                16%
+
+
+
+Did Not Remember                         19%           10%                23%     11%                                     37%
+
+                    0%                     20%                     40%           60%                  80%                  100%
+
+
+
+
+                                                                                                                           14
+              Question Wording
+Q. If a Federal Election was held today, which one of the following would you vote for?
+Answers randomly listed except Don’t Know kept last
+Labor (with Anthony Albanese as Leader)
+Liberal National Coalition (with Angus Taylor as Leader)
+The Greens (with Larissa Waters as Leader)
+One Nation (with Pauline Hanson as Leader)
+Any Other Candidate
+Don't Know
+
+If respondent chose Don’t Know they were asked:
+Q. Being undecided, which of the following would you have even a slight leaning towards?
+Answers randomly listed except Don’t Know kept last - Answers as above
+
+Q. Who is your preferred Prime Minister
+Answers randomly listed except Don’t Know kept last
+Anthony Albanese (Labor)
+Angus Taylor (Liberal)
+Pauline Hanson (One Nation)
+Don't Know
+
+Q. Out of these options, who is your preferred Prime Minister?
+Only asked of respondents who answered Taylor or Hanson above
+Answers randomly listed except Don’t Know kept last
+
+Answers if answered Taylor to initial PPM question
+Anthony Albanese (Labor)
+Pauline Hanson (One Nation)
+Don't Know
+
+Answers if answered Hanson to initial PPM question
+Anthony Albanese (Labor)
+Angus Taylor (Liberal)
+Don't Know
+
+
+
+
+                                                                                           15
+               Question Wording
+Q. What is your opinion on the following people?
+People randomly listed, answer order randomly flipped
+Answers: Positive, Neutral, Negative
+People Tested
+Anthony Albanese (Prime Minister, Labor)
+Angus Taylor (Opposition Leader, Liberal)
+Pauline Hanson (One Nation Leader)
+
+Q. In your opinion, what is the biggest issue facing Australia today?
+Open-ended answer
+
+Q. Which of the following comes closest to your view about social media companies?
+Answers randomly listed except Don’t Know kept last
+They should be legally required to reduce foreseeable risks to users, even if this means placing more restrictions on how their platforms operate.
+They should generally be free to decide how their platforms operate, even if this means users may face greater risks of harm
+Don’t know
+
+Q. Social media companies use algorithms to decide what content is shown to users. The federal government has proposed giving users the
+choice to opt out of the algorithm and only be shown content from people and accounts they choose to follow.
+
+Do you support or oppose this policy?
+Answers randomly listed except Don’t Know kept last
+Support
+Oppose
+Don’t know
+
+
+
+
+                                                                                                                                                     16
+17
+

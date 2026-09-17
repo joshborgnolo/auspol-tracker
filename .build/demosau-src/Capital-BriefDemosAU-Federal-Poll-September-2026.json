@@ -1,0 +1,41 @@
+{
+  "slug": "Capital-BriefDemosAU-Federal-Poll-September-2026",
+  "dateStart": "2026-09-10",
+  "date": "2026-09-14",
+  "sample": 1583,
+  "client": "Capital Brief",
+  "undecided": 4,
+  "tppNote": "2PP calculation method N/A ",
+  "tpp_alp": null,
+  "tpp_lnp": null,
+  "trendError": "no 'May 25 Election' anchor row (topline table may be an image)",
+  "ppm": {
+    "alb": 36,
+    "han": 25,
+    "opp": 21
+  },
+  "oppName": "Taylor",
+  "ppmExtra": {
+    "alb": 45,
+    "opp": 33
+  },
+  "approval": {
+    "alb": {
+      "app": 29,
+      "dis": 45,
+      "net": -16
+    },
+    "opp": {
+      "app": 23,
+      "dis": 27,
+      "net": -4
+    },
+    "han": {
+      "app": 32,
+      "dis": 44,
+      "net": -12
+    }
+  },
+  "extractedAt": "2026-09-17T23:28:45.952Z",
+  "cacheV": 2
+}
