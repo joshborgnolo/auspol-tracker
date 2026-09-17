@@ -1,6 +1,6 @@
 ---
 name: demosau-extraction
-description: DemosAU poll agent (extract-demosau.mjs) — PDF structure (trend table "May 25 Election" anchor, name-shuffling preferred-PM bar chart, two-panel head-to-head, wrapped Leader Ratings rows, image-only charts), whole-poll insertion (VI+ppm+approval), replay-test acceptance, row-url fallback for rolled-off releases, backfill of parseable-missing rows, `published` on VI rows is hand-curated only (verify via the PDF's Last-Modified header), and never silently reporting ok when a committed row can't be re-verified.
+description: DemosAU poll agent (extract-demosau.mjs) — PDF structure (trend table "May 25 Election" anchor, name-shuffling preferred-PM bar chart, two-panel head-to-head, wrapped Leader Ratings rows, image-only charts), whole-poll insertion (VI+ppm+approval), replay-test acceptance, row-url fallback for rolled-off releases, backfill of parseable-missing rows, Capital Brief watch (JSON-LD topic page + NewsArticle dates in Sydney time, cb_ahead flag, exit 3 → the ONE sanctioned hand-entered polls row), `published` on VI rows is hand-curated only (verify via the PDF's Last-Modified header), and never silently reporting ok when a committed row can't be re-verified.
 source: auto-skill
 extracted_at: '2026-09-01T05:24:46.078Z'
 ---
@@ -84,6 +84,34 @@ depend on what the index happens to list today.
 — stale caches re-derive from the committed `.txt` WITHOUT re-downloading
 (`loadWave`); `--force` re-downloads. The `.txt` files are committed: they are
 the provenance, and reparse-after-upgrade must not hit the network.
+
+### Capital Brief watch (exit 3)
+
+Capital Brief publishes its poll ARTICLE hours-to-a-day before DemosAU posts
+the methodology PDF (September 2026 shipped by hand-entry first). CB has NO
+RSS feed — discovery reads the JSON-LD `ItemList` on
+`https://www.capitalbrief.com/topic/polling/` (newest-first), then each
+article's `NewsArticle` node: `datePublished` (compared as an Australia/Sydney
+DAY via `sydneyDay`, never raw UTC), `headline`, and the wave identifier in
+`articleSection`/`keywords` (`"Capital Brief / Demos AU Poll "`,
+`CB_SECTION_RE`). The walk is capped at `CB_MAX_ARTICLES = 5` fetches;
+`STATE_RE` headlines are skipped (an article about a state poll must not
+block the federal watch).
+
+The watch runs AFTER the PDF pipeline — the PDF index stays authoritative.
+`capitalBriefAheadOf(anchor)` returns `{title, url, published}` only when a CB
+article postdates `latestDemosauStamp` (max of `date`/published-day over
+DemosAU + MRP rows); the flag lands in `status.cb_ahead`. Exit 3 fires ONLY
+when the flag is set AND the run wrote nothing (a slot that committed data
+exits 0 so the wrapper still pushes it). A CB fetch/parse failure degrades to
+a status note — never blocks the slot. The updater maps exit 3 to
+`exit 3` (CI's repair job then fires; any non-zero update run does), and the
+repair prompt's exit-3 section contains the ONE sanctioned hand-edit of
+`polls.json`: exactly ONE `polls` row built from the article's free lead
+(`tpp` null/null, no ppm/approval — the extractor backfills those from the
+PDF later). When the PDF lands, the matched-row verify reconciles the
+hand-entered row against it; fields the PDF states better (e.g. exact field
+window vs the article's published date) surface in `mismatches` for a human.
 
 ## `published` on the VI rows is hand-curated — the extractor will NEVER fill it
 

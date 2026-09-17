@@ -248,7 +248,7 @@ jobs:
           printf '%s\n\n%s\n\n%s\n' \
             "Automated repair attempt for the failing ${HOUSE} update pipeline — [run](${RUN_URL})." \
             "**Review before merging.** Nothing here has touched main or the live site; merging deploys it." \
-            "Expected shape of an honest repair: extractor/parser fix only, guard checks intact, no data rows hand-edited, no workflow or permissions changes. Reject anything else." \
+            "Expected shape of an honest repair: extractor/parser fix only, guard checks intact, no data rows hand-edited, no workflow or permissions changes. One exception: a DemosAU exit-3 repair may add exactly ONE Capital Brief-sourced polls row per .build/demosau-repair-prompt.md. Reject anything else." \
             > "$RUNNER_TEMP/pr-body.md"
           gh pr create \
             --label repair-agent \

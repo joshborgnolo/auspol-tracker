@@ -37,7 +37,12 @@ fi
 EXTRACT_OUT="$(node .build/extract-demosau.mjs 2>&1)"
 CODE=$?
 LAST_LINE="$(echo "$EXTRACT_OUT" | tail -1)"
-if [ $CODE -ne 0 ]; then
+if [ $CODE -eq 3 ]; then
+  # Capital Brief published a poll article ahead of the DemosAU index PDF;
+  # status.cb_ahead carries the article url (hand-entry per the repair prompt)
+  log "Capital Brief poll ahead of DemosAU index: $LAST_LINE"
+  exit 3
+elif [ $CODE -ne 0 ]; then
   # exit 1 = fetch/parse, exit 2 = safety guard; either way stop before write-up
   log "FAIL extract (exit $CODE): $LAST_LINE"
   exit $CODE

@@ -72,6 +72,20 @@
 //     file-is-authoritative semantics (missing rows surface in
 //     DEMOSAU_STATUS.missing_rows).
 //
+// SECONDARY WATCH — Capital Brief publishes the federal poll article (free
+// lead carries the full VI set + sample; the rest is paywalled) a few hours
+// to a day BEFORE the methodology PDF lands on the DemosAU index above
+// (Sep-2026: ~18h, the article alone greyed the cycle). After the PDF
+// pipeline, the extractor walks https://www.capitalbrief.com/topic/polling/
+// (JSON-LD ItemList, newest-first) and flags any article sectioned
+// "Capital Brief / Demos AU Poll" that is newer than every DemosAU row's
+// date/published stamp: DEMOSAU_STATUS.cb_ahead, exit 3, nothing written
+// (article prose is not a datasource — no fieldwork dates, no 2PP note, no
+// cacheable artifact — so rows come only from PDFs or deliberate
+// hand-entry per demosau-repair-prompt.md). Once the PDF lands, the normal
+// verify/backfill paths reconcile the hand-entered row automatically.
+// Watch failures degrade to a status note, never an extraction error.
+//
 // Usage: node .build/extract-demosau.mjs [--check] [--force] [index-url]
 //
 // Automation contract (safe to schedule in launchd):
@@ -82,6 +96,9 @@
 //     wave's figure missing, sums off 100, implausible values, bad fieldwork
 //     span, trend table unparseable) — the upstream format changed or the
 //     parse went wrong; nothing is written
+//   - exit 3 = Capital Brief watch flagged a wave article ahead of every
+//     dataset row with no PDF on the index yet (status.cb_ahead carries
+//     {title, url, published}); nothing written — see the watch comment
 //   - --check computes everything, prints DEMOSAU_STATUS, never writes
 //   - writes are atomic (.tmp + rename)
 import { readFileSync, writeFileSync, renameSync, mkdirSync, existsSync } from "node:fs";
@@ -683,6 +700,75 @@ async function loadWave(url, slug, isMRP) {
   return w;
 }
 
+// ------------------------------------------- Capital Brief watch (secondary)
+// capitalbrief.com runs the federal poll article (VI figures in the free
+// lead, body paywalled) hours-to-a-day before the methodology PDF lands on
+// the DemosAU index above. Watch the publisher directly so that gap can't
+// silence the tracker: a wave article newer than every DemosAU row is
+// flagged in DEMOSAU_STATUS.cb_ahead with exit 3 — a prompt to hand-enter
+// the wave (demosau-repair-prompt.md), NOT a datasource (no fieldwork
+// dates, no 2PP note, no cacheable PDF), so nothing is ever written here.
+const STATE_RE = /victoria|tasmania|queensland|\bWA\b|western australia|\bNSW\b|new south wales|south australia|\bSA\b|sydney|melbourne|brisbane|greyhound/i;
+const CB_TOPIC_URL = "https://www.capitalbrief.com/topic/polling/";
+const CB_SECTION_RE = /demos\s*au\s*poll/i; // articleSection of a wave release
+const CB_MAX_ARTICLES = 5; // fetch cap per run; the topic list is newest-first
+
+const sydneyDay = (isoStr) =>
+  new Intl.DateTimeFormat("en-CA", { timeZone: "Australia/Sydney", year: "numeric", month: "2-digit", day: "2-digit" }).format(new Date(isoStr));
+
+// every object node of every ld+json block on a page (handles @graph arrays)
+function jsonLdNodes(html) {
+  const nodes = [];
+  const re = /<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi;
+  let m;
+  while ((m = re.exec(html))) {
+    let doc;
+    try { doc = JSON.parse(m[1].replace(/<!\[CDATA\[|\]\]>/g, "")); } catch { continue; }
+    for (const n of [doc, ...[].concat(doc?.["@graph"] || [])])
+      if (n && typeof n === "object") nodes.push(n);
+  }
+  return nodes;
+}
+
+// the newest federal-poll article on the topic page post-dating every
+// dataset row, or null. ItemList is newest-first, so the first article at
+// or below the anchor ends the walk.
+async function capitalBriefAheadOf(anchorDay) {
+  const topic = (await fetchBuffer(CB_TOPIC_URL)).toString("utf8");
+  const list = jsonLdNodes(topic).find((n) => [].concat(n["@type"]).includes("ItemList"));
+  if (!list) throw new Error("capitalbrief topic page: no ItemList (site restructured?)");
+  const urls = [].concat(list.itemListElement || [])
+    .map((el) => (typeof el === "string" ? el : el.url || el.item?.url || el.item?.["@id"] || el["@id"]))
+    .filter((u) => typeof u === "string" && u.includes("/newsletter/"));
+  let fetched = 0;
+  for (const url of urls) {
+    if (fetched >= CB_MAX_ARTICLES) break;
+    fetched++;
+    const html = (await fetchBuffer(url)).toString("utf8");
+    const art = jsonLdNodes(html).find((n) => [].concat(n["@type"]).includes("NewsArticle"));
+    if (!art?.datePublished) continue;
+    const day = sydneyDay(art.datePublished);
+    if (day <= anchorDay) break;
+    const sections = [].concat(art.articleSection || []).concat(art.keywords || []).join(" ");
+    if (!CB_SECTION_RE.test(sections)) continue;
+    if (STATE_RE.test(String(art.headline || ""))) continue;
+    return { title: String(art.headline || "").trim(), url, published: day };
+  }
+  return null;
+}
+
+// latest field-end/published day across the committed DemosAU rows
+function latestDemosauStamp(D) {
+  let best = "";
+  for (const r of D.polls) {
+    if (r.pollster !== "DemosAU" && r.pollster !== "DemosAU (MRP)") continue;
+    if (r.date && r.date > best) best = r.date;
+    const pub = typeof r.published === "string" ? r.published.slice(0, 10) : "";
+    if (pub && pub > best) best = pub;
+  }
+  return best;
+}
+
 // -------------------------------------------------------------------- main
 const status = { changed: false, check: CHECK, added: [], backfilled: [], verified: [], mismatches: [], notes: [], skipped_titles: [], out_of_cycle: [], missing_rows: [] };
 try {
@@ -707,7 +793,6 @@ try {
     await new Promise((r) => setTimeout(r, 1500 * t));
   }
 
-  const STATE_RE = /victoria|tasmania|queensland|\bWA\b|western australia|\bNSW\b|new south wales|south australia|\bSA\b|sydney|melbourne|brisbane|greyhound/i;
   const candidates = [];
   for (const l of links) {
     const title = l.title;
@@ -824,6 +909,7 @@ try {
     process.exit(2);
   }
 
+  let wrote = false;
   if (newRows.length || newPpmRows.length || newApprovalRows.length) {
     const byDate = (a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0);
     D.polls = [...D.polls, ...newRows].sort(byDate);
@@ -835,10 +921,24 @@ try {
     if (status.changed && !CHECK) {
       writeFileSync(OUT + ".tmp", next);
       renameSync(OUT + ".tmp", OUT);
+      wrote = true;
       console.log(`wrote ${OUT}: +${newRows.length} DemosAU wave(s): ${status.added.map((a) => `${a.date} (${a.pollster})`).join(", ")}`);
     }
   }
+
+  // Capital Brief watch (see header): flag a publisher article ahead of
+  // every dataset row with no PDF on the index yet. Runs LAST because the
+  // flag is derived from the post-write content of D. A slot that already
+  // wrote rows still exits 0 so the wrapper commits this run's data — the
+  // flag rides the status line either way. Watch failure is a note only.
+  try {
+    const ahead = await capitalBriefAheadOf(latestDemosauStamp(D));
+    if (ahead) status.cb_ahead = ahead;
+  } catch (err) {
+    status.notes.push(`capital brief watch failed: ${err?.message || err}`);
+  }
   console.log("DEMOSAU_STATUS " + JSON.stringify(status));
+  if (status.cb_ahead && !wrote) process.exit(3);
 } catch (err) {
   console.error("DEMOSAU_ERROR " + (err?.message || err));
   status.error = String(err?.message || err);
