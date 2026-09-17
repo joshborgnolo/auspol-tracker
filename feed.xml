@@ -6,7 +6,14 @@
     <atom:link href="https://auspoltracker.com/feed.xml" rel="self" type="application/rss+xml"/>
     <description>Every national voting-intention poll as it enters the tracker. Items link to the pollster's own release.</description>
     <language>en-AU</language>
-    <lastBuildDate>Sun, 13 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <lastBuildDate>Wed, 16 Sep 2026 12:00:00 GMT</lastBuildDate>
+    <item>
+      <title>DemosAU, 16 Sep 2026 – ALP 28, L/NP 20, GRN 13, ON 26, Ind/Oth 13</title>
+      <link>https://www.capitalbrief.com/newsletter/exclusive-poll-voters-back-social-media-reform-fbd908f1-a09e-4d1e-9713-9c8c02dd0d31/</link>
+      <guid isPermaLink="false">auspol-tracker:2026-09-16|DemosAU</guid>
+      <pubDate>Wed, 16 Sep 2026 12:00:00 GMT</pubDate>
+      <description>Primary vote: ALP 28, L/NP 20, GRN 13, ON 26, Ind/Oth 13. No two-party figure published. Sample 1,583. Fieldwork 16 Sep 2026.</description>
+    </item>
     <item>
       <title>Roy Morgan, 7–13 Sep 2026 – 2PP ALP 55 – L/NP 45</title>
       <link>https://www.roymorgan.com/findings/10343-federal-voting-intention-september-14-2026</link>
@@ -279,13 +286,6 @@
       <guid isPermaLink="false">auspol-tracker:2026-06-14|Roy Morgan</guid>
       <pubDate>Sun, 14 Jun 2026 12:00:00 GMT</pubDate>
       <description>Primary vote: ALP 28, L/NP 17, GRN 14, ON 29.5, Ind/Oth 11.5. Two-party preferred: ALP 54.5 – L/NP 45.5. Undecided 4%. Sample 1,583. Fieldwork 8–14 Jun 2026.</description>
-    </item>
-    <item>
-      <title>Resolve, 8–13 Jun 2026 – ALP 28, L/NP 20, GRN 12, ON 29, Ind/Oth 12</title>
-      <link>https://www.smh.com.au/politics/federal/hanson-overtakes-albanese-as-preferred-pm-coalition-crashes-to-record-low-20260614-p606lg.html</link>
-      <guid isPermaLink="false">auspol-tracker:2026-06-13|Resolve</guid>
-      <pubDate>Sat, 13 Jun 2026 12:00:00 GMT</pubDate>
-      <description>Primary vote: ALP 28, L/NP 20, GRN 12, ON 29, Ind/Oth 12. No two-party figure published. Sample 1,801. Fieldwork 8–13 Jun 2026.</description>
     </item>
   </channel>
 </rss>

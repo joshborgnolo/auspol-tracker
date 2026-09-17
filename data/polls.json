@@ -4547,6 +4547,22 @@
         "Nat": 2.5
       },
       "url": "https://www.roymorgan.com/findings/10343-federal-voting-intention-september-14-2026"
+    },
+    {
+      "date": "2026-09-16",
+      "published": "2026-09-17T08:30",
+      "pollster": "DemosAU",
+      "client": "Capital Brief",
+      "sample": 1583,
+      "alp": 28,
+      "lnp": 20,
+      "grn": 13,
+      "onp": 26,
+      "ind": 13,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.capitalbrief.com/newsletter/exclusive-poll-voters-back-social-media-reform-fbd908f1-a09e-4d1e-9713-9c8c02dd0d31/"
     }
   ],
   "ppm": [
