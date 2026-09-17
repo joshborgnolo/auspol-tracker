@@ -646,10 +646,23 @@ function leadershipRows(w) {
 }
 
 // ---------------------------------------------------------------- pipelines
+// Human rulings that the COMMITTED value is authoritative over the PDF
+// parse: keyed "<date> <pollster>" → set of viDiffs field names. Each entry
+// must cite its evidence inline. An entry silences exactly that field for
+// that wave — every other field is still verified on every run.
+const ADJUDICATED = new Map([
+  // The PDF disagrees with itself: cover and the About This Research blurb
+  // say 8,424 surveyed, the filed methodology statement table says 8,484.
+  // sample=8484 by 0a280d6's align-with-filed-statements policy (the same
+  // ruling applied to 12 other waves that day); filed statement wins.
+  ["2026-03-03 DemosAU (MRP)", new Set(["sample"])],
+]);
+
 // Wave-level comparison of VI inputs (sample/dates/primaries/2pp/MRP seats).
 function viDiffs(e, w) {
   const diffs = [];
-  const cmp = (k, got, exp) => { if (got != null && exp !== got) diffs.push(`${k}: pdf=${got} vs file=${exp}`); };
+  const skip = ADJUDICATED.get(`${e.date} ${e.pollster}`);
+  const cmp = (k, got, exp) => { if (got != null && exp !== got && !skip?.has(k)) diffs.push(`${k}: pdf=${got} vs file=${exp}`); };
   cmp("sample", w.sample, e.sample);
   cmp("date", w.date, e.date);
   cmp("dateStart", w.dateStart, e.dateStart);

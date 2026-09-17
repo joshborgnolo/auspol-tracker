@@ -64,7 +64,9 @@ new `polls` row:
    Do NOT pre-fix anything for the PDF: when it lands, the extractor's
    verify step compares its own parse against this row and any field the
    PDF states better (e.g. an exact field window) surfaces in `mismatches`
-   for a human, exactly as designed.
+   for a human, exactly as designed. (A human who rules the committed
+   value wins silences the standing mismatch with an `ADJUDICATED` entry
+   in the extractor — never the other way round.)
 4. Then `node .build/newtracker/validate.mjs` and
    `bash .build/demosau-updater.sh` to complete the normal pipeline. In
    your commit message, quote the source paragraph verbatim next to the

@@ -55,7 +55,12 @@ harness and honesty rules below are the transferable parts.
 `--check` compares parseable data against the hand-curated file, which stays
 authoritative: differences go to `status.mismatches` (e.g. the April 2026
 `ppm.alb: pdf=35 vs file=36` adjudication — user ruled the PDF wins), they are
-NEVER imposed. Four status buckets, each with a distinct meaning:
+NEVER imposed. When a human rules the committed value wins (March 2026 MRP:
+the PDF's OWN cover says 8,424 surveyed but its filed statement table says
+8,484 — filed statement won per 0a280d6's policy), the standing mismatch is
+silenced with an `ADJUDICATED` entry in viDiffs keyed `<date> <pollster>` →
+field names, citing evidence inline; every other field of that wave is still
+verified every run. Four status buckets, each with a distinct meaning:
 
 - `verified[]` — committed row and parse agree (wave-level VI/seats +
   leadership). Carries `note:` (e.g. topline image-only) and, when a committed
