@@ -849,9 +849,9 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
 /* ---------- accessibility: 44px tap targets ---------- */
 /* keep the tight editorial sizing visually, but extend the *hit* area to a
    44px-tall invisible overlay so the controls are comfortable on touch. */
-.tt-opt, .theme-cell, .legend-chip, .seg-btn,
+.tt-opt, .theme-cell, .legend-chip, .seg-btn, .hb-toggle,
 .cyc-main, .cyc-x, .cyc-drawn-x, .ap-popbtn, .tab-score, .cyc-showall, .ap-clear { position: relative; }
-.tt-opt::after, .theme-cell::after, .legend-chip::after, .seg-btn::after,
+.tt-opt::after, .theme-cell::after, .legend-chip::after, .seg-btn::after, .hb-toggle::after,
 .cyc-main::after, .cyc-x::after, .cyc-drawn-x::after, .ap-popbtn::after, .tab-score::after,
 .cyc-showall::after, .ap-clear::after {
   content: ""; position: absolute; left: 0; right: 0;
@@ -1132,12 +1132,18 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    to sit beside it in small caps has moved to the interval line, where it
    reads as a clause of how the figure was made and how well it is known */
 .hero-title { margin-bottom: 12px; }
-/* the basis switch lives under the h2, a quiet clause ("Using …") rather
-   than a control - so it snugs up under the title instead of sitting in the
-   control strip, and wraps as a unit on the phone rungs. */
-.hero-basis { display: flex; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; margin: -4px 0 12px; }
-.hero-basis-label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--ink-3); white-space: nowrap; }
+/* the basis switch lives under the h2: ONE button reading "Using <active
+   basis>", pressed to flip to the other. Quiet clause-scale type, with the
+   basis words carrying the interactivity - the same resting underline the
+   track toggles give their options, deepening on hover. */
+.hero-basis { display: flex; align-items: baseline; margin: -4px 0 12px; }
+.hb-toggle { border: 0; background: transparent; cursor: pointer; padding: 2px 0;
+  font-family: var(--sans); font-size: 12px; font-weight: 500;
+  color: var(--ink-3); letter-spacing: 0.01em; text-align: left; }
+.hb-toggle .hb-what { color: var(--ink-2); font-weight: 600;
+  border-bottom: 1.5px solid var(--ink-faint); padding-bottom: 1px;
+  transition: color .15s ease, border-color .15s ease; }
+.hb-toggle:hover .hb-what { color: var(--ink); border-bottom-color: var(--ink); }
 /* ---- the hero's interval gauge -----------------------------------------
    The channel is chrome and obeys the page's top-left light: shadow cast in
    under the upper wall, a lit lip on the sill below. The span inside it is a

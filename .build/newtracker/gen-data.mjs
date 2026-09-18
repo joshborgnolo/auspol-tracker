@@ -214,6 +214,22 @@ const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.
    the implied series (the rows below, the per-poll alpImp dots on the
    chart, the flow-drift join) must agree on which waves have one. */
 const impOk = (p) => p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote;
+/* The frozen flow table for the ALP-v-ON PAIRING, in ALP-shares, with the
+   set's own ± range in FP_ON_BAND. No House count of an ALP-v-ON final
+   pairing has ever run, so unlike flows.mjs's table this one cannot be
+   election-anchored: its provenance is the §7d derivation (2025 Senate ATL
+   counts re-anchored on the 2026 SA-state / Secret Harbour lower-house
+   counts, senate-flows first-principles analysis 2026-09, Coalition cell
+   recalibrated 2026-09-11). Full flow-share warmup:
+       implied ALP v ON = alp + lnp·f_lnp + grn·f_grn + (ind+oth)·f_oth
+   Hoisted here beside impOk – which is ALSO its eligibility rule (impliedOn
+   reads the same primary set, so the implied ALP–ON chart cloud and §1d's
+   implied ALP–ON series take exactly tppRowsSynth's waves) – because §1d
+   and the individualPolls emitter (:1169) run before §7d needs it. */
+const FP_ON = { lnp: 0.315, grn: 0.89, oth: 0.53 };
+const FP_ON_BAND = { lnp: 0.025, grn: 0.03, oth: 0.03 };
+const impliedOn = (p) =>
+  p.alp + (p.lnp * FP_ON.lnp + p.grn * FP_ON.grn + ((p.ind || 0) + (p.oth || 0)) * FP_ON.oth);
 /* Implied 2PP rows: each poll's primaries read through the single measured
    flow table in flows.mjs (AEC 2025, Event 31496). This series answers a
    different question than the published 2PP above – "what do these
@@ -234,6 +250,22 @@ const impOk = (p) => p.alp != null && p.lnp != null && p.grn != null && p.onp !=
 const tppRowsSynth = POLLS
   .filter(impOk)
   .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: rowN(p), firm: p.pollster, onp: p.onp, key: p.date + "|" + p.pollster }));
+/* Implied ALP–ON rows: the same waves re-read under the ALP-v-ON frozen
+   table (FP_ON, above) instead of the AEC count's. Like the classic implied
+   series this answers a single fixed question – "what do these primaries
+   mean at THE flow set the page quotes this pairing on?" – and on the page
+   it is the pairing's DEFAULT basis, since no count exists to discipline
+   the houses' uncoordinated allocations. The row also carries its own
+   flow-table range bn: the set's ± uncertainties are LINEAR in the
+   primaries (primaries·FP_ON_BAND), so a weighted monthly mean's range is
+   just the n-weighted mean of its rows' ranges, which §1d lifts directly –
+   no ratio, no simulation. */
+const tppRowsSynthOn = POLLS
+  .filter(impOk)
+  .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedOn(p),
+                 bn: p.lnp * FP_ON_BAND.lnp + p.grn * FP_ON_BAND.grn
+                     + ((p.ind || 0) + (p.oth || 0)) * FP_ON_BAND.oth,
+                 n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
 
 /* A house effect is that pollster's lean AWAY FROM the cross-house consensus
    on that measure – never borrowed between measures, because a firm that
@@ -467,6 +499,30 @@ agg2ppSynth22.unshift({ ym: ymOf(ELECTION.date), x: dx(ELECTION.date), alp: r1(s
 const synthBand = agg2ppSynth.map((m) => {
   const alt = agg2ppSynth22.find((a) => a.ym === m.ym);
   return alt ? { ym: m.ym, x: m.x, lo: Math.min(m.alp, alt.alp), hi: Math.max(m.alp, alt.alp) } : null;
+}).filter(Boolean);
+
+/* ---- 1d. monthly implied ALP–ON (same estimator, the ALP-v-ON table) ----
+   §1b's machinery once more, on tppRowsSynthOn and its own house effects –
+   one frozen table, one series, so the implied-basis chart under the ALP v
+   ON hero is the pairing's polls treated the way the classic implied 2PP
+   treats ALP v L/NP. Two structural differences, both forced by there being
+   no election count of the pairing:
+   - No anchor row can be unshifted: there is simply nothing to anchor.
+   - ci95 is NOT a sampling interval – it is the frozen table's own range
+     (§0's FP_ON_BAND) read at that month's primaries via each row's bn.
+     That is the ONLY honest band the pairing has; it is what §7f quotes
+     the current ALP–ON figure with, and the hero labels the ribbon "flow
+     range", never "95% interval", on this basis. */
+const synthOnEffect = houseEffectsFor(tppRowsSynthOn);
+const agg2ppSynthOn = MONTHS.map((ym) => {
+  const r = monthWithSe(tppRowsSynthOn, synthOnEffect, ym);
+  if (!r) return null;
+  let bnSum = 0, nSum = 0;
+  for (const q of tppRowsSynthOn) {
+    if (q.ym !== ym) continue;
+    bnSum += q.n * q.bn; nSum += q.n;
+  }
+  return { ym, x: mx(ym), a: r1(r.v), b: r1(100 - r.v), ci95: r1(bnSum / nSum), k: r.n };
 }).filter(Boolean);
 
 /* ---- 2. monthly primary vote + election-day anchor --------------------- */
@@ -1168,8 +1224,9 @@ const individualPolls = POLLS.map((p) => {
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
     // this wave's implied 2PP (its own primaries at the 2025 flow table) –
     // absent under the same eligibility rule tppRowsSynth uses, so the
-    // chart's implied-basis poll cloud is exactly the estimator's own rows
-    ...(impOk(p) ? { alpImp: r1(impliedAlp2pp(p)) } : {}),
+    // chart's implied-basis poll cloud is exactly the estimator's own rows;
+    // alpOnImp is the same re-read under the ALP-v-ON frozen table (§0 FP_ON)
+    ...(impOk(p) ? { alpImp: r1(impliedAlp2pp(p)), alpOnImp: r1(impliedOn(p)) } : {}),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     // link back to the published release/report this row came from (the
@@ -1598,27 +1655,23 @@ const flowDrift = {
       ALP-v-ON row is eight months in), so every firm anchors on its own
       first FLOW_ON_BASE_MIN residuals and meta.baseFrom records which date
       each series can speak from. */
-const FP_ON = { lnp: 0.315, grn: 0.89, oth: 0.53 };
-const FP_ON_BAND = { lnp: 0.025, grn: 0.03, oth: 0.03 };
+/* Constants for the block above: the frozen table (FP_ON, FP_ON_BAND) and
+   impliedOn() itself are hoisted to §0 beside impOk – the implied-basis
+   chart series (§1d) and the per-wave alpOnImp dots are parked in front of
+   this section – and its eligibility rule IS impOk (identical predicate),
+   so fullPrimOn stays impOk. With no published ALP-v-ON totals at all the
+   block collapses to empty payload cells and flowDriftOn is emitted null. */
 const FLOW_ON_BASE_MIN = 3;
 const FLOW_ON_FIT_MIN = 6;          // min joined waves per house to attempt a fit
 const FLOW_ON_FIT_TAU = 0.12;       // prior SD on each flow share (12 pts in share units)
 const FLOW_ON_FIT_TAU_INT = 0.05;   // prior SD on the intercept (5 pts), prior mean 0
 const FLOW_ON_PUB_MIN = 3;          // min published splits before a measured row replaces the fit
 const FLOW_ON_PUB_SD = 10;          // assumed per-wave SD (pts) of a published cohort split
-/* implied(reading primaries through the frozen table) is defined wherever a
-   full primary set exists with no documented anomaly — exactly the
-   tppRowsSynth eligibility rule. With no published ALP-v-ON totals at all
-   the block collapses to empty payload cells and flowDriftOn is emitted
-   null. */
-const impliedOn = (p) =>
-  p.alp + (p.lnp * FP_ON.lnp + p.grn * FP_ON.grn + ((p.ind || 0) + (p.oth || 0)) * FP_ON.oth);
-const fullPrimOn = (p) => p && p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote;
 const driftOnResid = [], flowOnFitRows = [];
 for (const [key, v] of ALT_BY.entries()) {
   if (v.ao == null) continue;
   const p = POLL_BY_KEY.get(key);
-  if (!fullPrimOn(p)) continue;
+  if (!p || !impOk(p)) continue;
   const x = v.ao;                          // published ALP share of the pairing (0-100)
   driftOnResid.push({ ym: ymOf(p.date), mid: midMs(p), n: rowN(p), firm: key.split("|")[1], key,
                       pq: (x / 100) * (1 - x / 100) * 1e4, x: x - impliedOn(p) });
@@ -2750,6 +2803,14 @@ window.AUSPOL = (function () {
      55.2 by construction – §1b). */
   const synth2pp = ${JSON.stringify(agg2ppSynth)};
   const synthLatest = ${JSON.stringify(synthNow ? { ...synthNow, ...synthChg, lnp: r1(100 - synthNow.alp), prev: synth1mo ? synth1mo.alp : null } : null)};
+  /* Implied ALP–ON monthly series (gen-data §1d): every poll's primaries
+     read through the ALP-v-ON frozen flow set (FP_ON, first-principles –
+     no election count of the pairing exists) on the same estimator. This
+     pairing's implied basis IS its default quoted basis (latest.onImp);
+     the toggle restates it against the pollsters' own head-to-heads
+     (alt2pp.alp_on/altLatest). ci95 here is the flow-table RANGE, not a
+     sampling interval, and it has no election anchor. */
+  const synthOn = ${JSON.stringify(agg2ppSynthOn)};
   /* Flow-sensitivity bracket for the implied series above (gen-data §1c):
      each month's {lo, hi} = implied ALP 2PP with the ONP→ALP share at its
      last two COUNTED election tables (2022 and 2025, TPP cut). A
@@ -2867,7 +2928,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, flowSens, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
@@ -2893,6 +2954,7 @@ console.log("cycle leader splits:", CYCLE_DEFS.map((c) => {
 console.log("MONTHS:", MONTHS.length, MONTHS[0], "→", MONTHS[MONTHS.length - 1]);
 console.log("agg2pp:", agg2pp.length, "pts | first:", agg2pp[0], "| last:", agg2pp[agg2pp.length - 1]);
 console.log("synth2pp:", agg2ppSynth.length, "pts | anchor(implied):", agg2ppSynth[0].alp, "vs count 55.2 | last:", agg2ppSynth[agg2ppSynth.length - 1]);
+console.log("synthOn:", agg2ppSynthOn.length, "pts | no anchor (no ALP–ON count exists) | last:", agg2ppSynthOn[agg2ppSynthOn.length - 1]);
 console.log("synthLatest:", synthNow ? `ALP ${synthNow.alp} (n=${synthNow.n}, se=${synthNow.se.toFixed(2)}) vs published ${hlNow.alp} → Δ${r1(synthNow.alp - hlNow.alp)}` : "none (window empty)");
 console.log("flowSens:", synthBand.length, "pts | bracket at election:", synthBand[0].lo + "–" + synthBand[0].hi, "| last month:", (synthBand[synthBand.length - 1].lo) + "–" + (synthBand[synthBand.length - 1].hi), `(width ${r1(synthBand[synthBand.length - 1].hi - synthBand[synthBand.length - 1].lo)}pt)`);
 console.log("aggPrimary last:", aggPrimary[aggPrimary.length - 1]);
