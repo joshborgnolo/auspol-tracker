@@ -186,6 +186,14 @@ function PrimaryVotePanel({ rangeId }) {
   const [hidden, setHidden] = useState({ oth: true });
   const narrow = useNarrow();
   const latest = D.latest.primary;
+  /* The 2025 result, which is where every line on this chart starts: the month
+     spine opens at the election and gen-data flags that row `election: true`,
+     so the AEC primaries are already here and no figure has to be restated.
+     A chip reading "Labor 27.5%" was a level with nothing to be a level
+     AGAINST - and on this chart the level is the least of it, because the
+     story since May 2025 is One Nation going 6.4 to 27.0 and the Coalition
+     31.8 to 21.5. The swing is the number that says so. */
+  const base = D.aggPrimary.find((d) => d.election) || null;
   // labels & series ordered by descending latest primary-vote share
   // (the quoted 21-day nowcast, so chip order matches the figures shown)
   const parts = [
@@ -240,15 +248,30 @@ function PrimaryVotePanel({ rangeId }) {
           <p className="card-sub">First-preference support, poll aggregate</p>
         </div>
         <div className="legend">
-          {parts.map((p) => (
-            <button key={p.id}
-                    className={"legend-chip" + (hidden[p.id] ? " off" : "") + (p.id === "oth" ? " residual" : "")}
-                    onClick={() => setHidden((h) => ({ ...h, [p.id]: !h[p.id] }))}>
-              <span className="legend-swatch" style={{ background: p.color }}></span>
-              <span className="legend-name">{p.name}</span>
-              <span className="legend-val">{latest[p.id].toFixed(1)}%</span>
-            </button>
-          ))}
+          {parts.map((p) => {
+            const was = base && base[p.id] != null ? base[p.id] : null;
+            return (
+              <button key={p.id} type="button"
+                      className={"legend-chip" + (hidden[p.id] ? " off" : "") + (p.id === "oth" ? " residual" : "")}
+                      aria-pressed={!hidden[p.id]}
+                      /* The election figure itself is one hover away rather than
+                         a third number in the chip: five chips already fill the
+                         card head, and "27.5% now, 34.6% then" is the sentence
+                         the arrow is a shorthand for. */
+                      title={was == null ? p.name + " – " + latest[p.id].toFixed(1) + "% now"
+                             : p.name + " – " + latest[p.id].toFixed(1) + "% now, "
+                               + was.toFixed(1) + "% at the 2025 election"}
+                      onClick={() => setHidden((h) => ({ ...h, [p.id]: !h[p.id] }))}>
+                <span className="legend-swatch" style={{ background: p.color }}></span>
+                <span className="legend-name">{p.name}</span>
+                <span className="legend-val">{latest[p.id].toFixed(1)}%</span>
+                {/* Movement is non-partisan here, as everywhere else on the page:
+                    the arrow and the sign carry the direction, not a party
+                    colour, so a falling Labor share is not drawn in Labor red. */}
+                {was != null && <Delta value={latest[p.id] - was} small />}
+              </button>
+            );
+          })}
         </div>
       </div>
       <TrendChart
@@ -270,8 +293,10 @@ function PrimaryVotePanel({ rangeId }) {
       <p className="table-hint">
         Each dot is one published poll’s first-preference figure; the lines are
         monthly averages, weighted by sample and adjusted for each house’s lean.
-        Use the party chips above to isolate one party – on its own its line
-        draws with the 95% interval around it{solo ? ", shaded here" : ""}.
+        Each chip carries a party’s current share and its change since the 2025
+        election, where every line here begins. Use the chips to isolate one
+        party – on its own its line draws with the 95% interval around
+        it{solo ? ", shaded here" : ""}.
       </p>
     </section>
   );

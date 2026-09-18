@@ -367,6 +367,18 @@ console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches 
 writeAtomic(path.join(ROOT, "assets", "favicon.svg"), fav.svg + "\n");
 const favicon = encodeURIComponent(fav.svg);
 
+/* The raster copy Google Search needs, rasterised by render-favicon.mjs and
+   committed like the share card is. Googlebot-Image has to be able to CRAWL a
+   favicon, so the data URI below is invisible to it - and the SVG written just
+   above would not help either, since Google's supported formats are BMP, GIF,
+   ICO, PNG, JPEG, PPM and TIFF. That is why the result page showed a globe.
+   Linked only when it is actually on disk: a <link> pointing at a 404 is
+   worse than no link, and a fresh clone that has never run the rasteriser
+   should still build. */
+const FAV_PNG = path.join(ROOT, "assets", "favicon-192.png");
+const favPng = fs.existsSync(FAV_PNG);
+if (!favPng) console.log("  favicon PNG: absent – run render-favicon.mjs (Google Search shows no icon without it)");
+
 /* ---- 4b. the article version of the page ---------------------------------
    #root held a loading placeholder that was `opacity: 0` with a .25s delay
    while React mounted in ~160ms – so it was never actually seen – and the
@@ -624,7 +636,8 @@ html = html.replace(OG_ANCHOR,
   <meta name="theme-color" content="${THEME_DARK}" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="${SITE_URL}">
   <link rel="alternate" type="application/rss+xml" title="auspol tracker – new polls" href="${SITE_URL}feed.xml">
-  <link rel="icon" href="data:image/svg+xml,${favicon}">
+  ${favPng ? `<link rel="icon" type="image/png" sizes="192x192" href="${SITE_URL}assets/favicon-192.png">
+  ` : ""}<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${favicon}">
   ${fontLinks.join("\n  ")}`);
 
 /* ---- 5. inline every script ------------------------------------------- */

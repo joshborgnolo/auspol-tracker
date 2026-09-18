@@ -1121,7 +1121,9 @@ function cycHolders(c, M) {
     .split(/\s*\u2192\s*/).join("\u2013");
 }
 
-function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan, setHan, showOnp, setOnp, shapes, outcomeShown }) {
+function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, chipClick, toggle,
+                     showAll, hideAll, showOutcome, showHan, setHan, showOnp, setOnp, shapes,
+                     outcomeShown }) {
   const { D } = window.AP;
   const narrow = useNarrow();
   const M = metric;
@@ -1609,6 +1611,18 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
                         window.AP.openTerm("approval", M.title)}>net approval</button></>
           ) : M.title}</h2>
           <p className="card-sub">{cardSub}</p>
+          {/* The board sits under the card it governs, on every card. One
+              shared strip at the top of the tab could only serve the first
+              chart: the other five are a scroll away from it, and a reader
+              who has scrolled to the 2PP card to ask "what did Howard do
+              here" had to climb back up to say so. Each copy reads the same
+              state and reports its OWN band - a term that never held this
+              measure takes no seat in this chart's fan, so the key beside the
+              button is true of the chart under it rather than of the tab. */}
+          <CycleLegend cycles={cycles} hidden={hidden} lifted={lifted} hi={hi} setHi={setHi}
+                       chipClick={chipClick} toggle={toggle} showAll={showAll} hideAll={hideAll}
+                       showOutcome={showOutcome} outcomeShown={outcomeShown} shapes={shapes}
+                       banded={banded} />
           {hanCtl && (
             <label className={"pg-check cyc-han" + (showHan ? " on" : "")}
                    title={"Pauline Hanson, on the same approve-minus-disapprove basis. " +
@@ -1766,15 +1780,21 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
 function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, showAll, hideAll,
                       showOutcome, outcomeShown, shapes, banded }) {
   const [pop, setPop] = useState(null);
-  /* onMouseLeave clears the highlight for a pointer, and a finger never fires
-     it: a term raised by a tap stayed lit on the chart until another row
-     happened to replace it. The next gesture starting outside the legend puts
-     it back, the same way the chart readouts and the accuracy dots do. */
-  const legRef = useRef(null);
-  window.useDismissOutside(legRef, hi != null, () => setHi(null));
+  /* `hi` is cleared by PastCyclesView, not here: there are six of these
+     strips, and a per-strip dismiss meant a tap inside one fired the other
+     five's "you tapped outside me" and put the highlight straight back out. */
 
   const total = cycles.length;
   const onBoard = total - hidden.size;
+  /* LINES ON THE CHART, which is not the same as terms the reader lifted: the
+     sitting term is always drawn and is in no band, so with 1996 lifted the
+     chart carries two lines and the button used to say "1 drawn". Once the
+     ribbon has given way every shown term draws its own line instead, and the
+     count is simply the board. */
+  const cur = cycles.find((c) => c.current);
+  const drawnN = banded
+    ? lifted.size + (cur && !hidden.has(cur.year) ? 1 : 0)
+    : onBoard;
   /* The button has to earn the room the pills were spending, so at rest it
      carries the sweep they showed simply by existing - "21 terms since 1972"
      is a row of years in one line. The moment the reader has cut the board or
@@ -1783,7 +1803,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
   const summary = (hidden.size ? onBoard + " of " + total + " terms"
                    : lifted.size ? total + " terms"
                    : total + " terms since " + cycles[0].year)
-                  + (lifted.size ? " · " + lifted.size + " drawn" : "");
+                  + (lifted.size ? " · " + drawnN + " drawn" : "");
 
   /* The board cut by what each government did at its own election - the
      comparison the tab exists for, and one nobody can assemble by eye from
@@ -1807,7 +1827,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
   const quick = hidden.size === 0 ? "all" : hidden.size === total ? "none" : outcomeShown;
 
   return (
-    <div className={"cyc-legend" + (banded ? " banded" : "")} ref={legRef}
+    <div className={"cyc-legend" + (banded ? " banded" : "")}
          onMouseLeave={() => setHi(null)}>
       <div className="cyc-legend-bar">
         <FilterPop id="board" label="Cycles" summary={summary} open={pop} setOpen={setPop}
@@ -2376,6 +2396,23 @@ function PastCyclesView() {
     return l;
   });
   const [hi, setHi] = useState(null);
+  /* Clearing the highlight belongs HERE, not in the strip. onMouseLeave covers
+     a pointer and a finger never fires it, so a term raised by a tap stayed
+     lit until another row happened to replace it - the next gesture starting
+     outside puts it back, the way the chart readouts and accuracy dots do.
+     With one strip per chart the test has to be "outside EVERY strip": six
+     copies each asking "was that outside ME" would have five of them firing
+     on a tap inside the sixth. */
+  React.useEffect(() => {
+    if (hi == null) return;
+    const onDown = (e) => {
+      const t = e.target;
+      if (t && t.closest && t.closest(".cyc-legend")) return;
+      setHi(null);
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    return () => document.removeEventListener("pointerdown", onDown, true);
+  }, [hi]);
   const [showHan, setShowHan] = useState(false);
   const [showOnp, setShowOnp] = useState(false);
 
@@ -2560,23 +2597,12 @@ function PastCyclesView() {
         </div>
       </div>
 
-      <CycleLegend cycles={cycles} hidden={hidden} lifted={lifted} hi={hi} setHi={setHi}
-        chipClick={chipClick} toggle={toggle} showAll={showAll} hideAll={hideAll} shapes={shapes}
-        showOutcome={showOutcome} outcomeShown={outcomeShown}
-        /* The legend is one shared strip over six charts whose bands are now
-           measure-scoped (a term that never held a measure takes no band
-           seat on its chart). The key note below the chips earns its place
-           if ANY measure could muster three data-bearing past terms –
-           primary/2pp do so whenever three era buckets are visible, so in
-           practice this matches any visible band. */
-        banded={cycles.filter((c) => !hidden.has(c.year) && !c.current
-          && CYC_METRICS.some((m) => (c.raw[m.key] || []).some((v) => v != null)))
-          .length >= 3} />
-
       <div className="cyc-charts">
         {CYC_METRICS.map((m) => (
           <CycleChart key={m.key} metric={m} cycles={cycles} mode={mode} hidden={hidden} hi={hi}
-                      lifted={lifted} unlift={unlift}
+                      setHi={setHi} lifted={lifted} unlift={unlift}
+                      chipClick={chipClick} toggle={toggle}
+                      showAll={showAll} hideAll={hideAll} showOutcome={showOutcome}
                       showHan={showHan} setHan={setShowHan}
                       showOnp={showOnp} setOnp={setShowOnp} shapes={shapes}
                       outcomeShown={outcomeShown} />

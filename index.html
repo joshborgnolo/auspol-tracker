@@ -37,7 +37,8 @@
   <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
   <link rel="canonical" href="https://auspoltracker.com/">
   <link rel="alternate" type="application/rss+xml" title="auspol tracker – new polls" href="https://auspoltracker.com/feed.xml">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'-1.04%20-8.07%2041.63%2041.63'%3E%3Cpath%20d%3D'M%2010%2024.5%20A%2012%2012%200%200%201%2022%2012.5'%20fill%3D'none'%20stroke%3D'%23b9463f'%20stroke-width%3D'3.4'%20stroke-linecap%3D'round'%2F%3E%3Cpath%20d%3D'M%2022%2012.5%20A%2012%2012%200%200%201%2034%2024.5'%20fill%3D'none'%20stroke%3D'%23356697'%20stroke-width%3D'3.4'%20stroke-linecap%3D'round'%2F%3E%3Cline%20x1%3D'10.35'%20y1%3D'16.04'%20x2%3D'1.86'%20y2%3D'9.86'%20stroke%3D'%23b9463f'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'17.55'%20y1%3D'10.8'%20x2%3D'14.36'%20y2%3D'0.99'%20stroke%3D'%23cc7c37'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'26.45'%20y1%3D'10.8'%20x2%3D'29.01'%20y2%3D'2.91'%20stroke%3D'%23356697'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'33.65'%20y1%3D'16.04'%20x2%3D'37.69'%20y2%3D'13.1'%20stroke%3D'%23439458'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'22'%20y1%3D'24.5'%20x2%3D'20.14'%20y2%3D'16.1'%20stroke%3D'%23b9463f'%20stroke-width%3D'3'%20stroke-linecap%3D'round'%2F%3E%3C%2Fsvg%3E">
+  <link rel="icon" type="image/png" sizes="192x192" href="https://auspoltracker.com/assets/favicon-192.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%20viewBox%3D'-1.04%20-8.07%2041.63%2041.63'%3E%3Cpath%20d%3D'M%2010%2024.5%20A%2012%2012%200%200%201%2022%2012.5'%20fill%3D'none'%20stroke%3D'%23b9463f'%20stroke-width%3D'3.4'%20stroke-linecap%3D'round'%2F%3E%3Cpath%20d%3D'M%2022%2012.5%20A%2012%2012%200%200%201%2034%2024.5'%20fill%3D'none'%20stroke%3D'%23356697'%20stroke-width%3D'3.4'%20stroke-linecap%3D'round'%2F%3E%3Cline%20x1%3D'10.35'%20y1%3D'16.04'%20x2%3D'1.86'%20y2%3D'9.86'%20stroke%3D'%23b9463f'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'17.55'%20y1%3D'10.8'%20x2%3D'14.36'%20y2%3D'0.99'%20stroke%3D'%23cc7c37'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'26.45'%20y1%3D'10.8'%20x2%3D'29.01'%20y2%3D'2.91'%20stroke%3D'%23356697'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'33.65'%20y1%3D'16.04'%20x2%3D'37.69'%20y2%3D'13.1'%20stroke%3D'%23439458'%20stroke-width%3D'4.6'%20stroke-linecap%3D'butt'%2F%3E%3Cline%20x1%3D'22'%20y1%3D'24.5'%20x2%3D'20.14'%20y2%3D'16.1'%20stroke%3D'%23b9463f'%20stroke-width%3D'3'%20stroke-linecap%3D'round'%2F%3E%3C%2Fsvg%3E">
   <link rel="preload" href="assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/sourceserif4-latin.2a24bad4.woff2" as="font" type="font/woff2" crossorigin>
@@ -9789,6 +9790,14 @@ function PrimaryVotePanel({
   });
   const narrow = useNarrow();
   const latest = D.latest.primary;
+  /* The 2025 result, which is where every line on this chart starts: the month
+     spine opens at the election and gen-data flags that row `election: true`,
+     so the AEC primaries are already here and no figure has to be restated.
+     A chip reading "Labor 27.5%" was a level with nothing to be a level
+     AGAINST - and on this chart the level is the least of it, because the
+     story since May 2025 is One Nation going 6.4 to 27.0 and the Coalition
+     31.8 to 21.5. The swing is the number that says so. */
+  const base = D.aggPrimary.find(d => d.election) || null;
   // labels & series ordered by descending latest primary-vote share
   // (the quoted 21-day nowcast, so chip order matches the figures shown)
   const parts = [{
@@ -9863,23 +9872,36 @@ function PrimaryVotePanel({
     className: "card-sub"
   }, "First-preference support, poll aggregate")), /*#__PURE__*/React.createElement("div", {
     className: "legend"
-  }, parts.map(p => /*#__PURE__*/React.createElement("button", {
-    key: p.id,
-    className: "legend-chip" + (hidden[p.id] ? " off" : "") + (p.id === "oth" ? " residual" : ""),
-    onClick: () => setHidden(h => ({
-      ...h,
-      [p.id]: !h[p.id]
-    }))
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "legend-swatch",
-    style: {
-      background: p.color
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "legend-name"
-  }, p.name), /*#__PURE__*/React.createElement("span", {
-    className: "legend-val"
-  }, latest[p.id].toFixed(1), "%"))))), /*#__PURE__*/React.createElement(TrendChart, {
+  }, parts.map(p => {
+    const was = base && base[p.id] != null ? base[p.id] : null;
+    return /*#__PURE__*/React.createElement("button", {
+      key: p.id,
+      type: "button",
+      className: "legend-chip" + (hidden[p.id] ? " off" : "") + (p.id === "oth" ? " residual" : ""),
+      "aria-pressed": !hidden[p.id]
+      /* The election figure itself is one hover away rather than
+         a third number in the chip: five chips already fill the
+         card head, and "27.5% now, 34.6% then" is the sentence
+         the arrow is a shorthand for. */,
+      title: was == null ? p.name + " – " + latest[p.id].toFixed(1) + "% now" : p.name + " – " + latest[p.id].toFixed(1) + "% now, " + was.toFixed(1) + "% at the 2025 election",
+      onClick: () => setHidden(h => ({
+        ...h,
+        [p.id]: !h[p.id]
+      }))
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "legend-swatch",
+      style: {
+        background: p.color
+      }
+    }), /*#__PURE__*/React.createElement("span", {
+      className: "legend-name"
+    }, p.name), /*#__PURE__*/React.createElement("span", {
+      className: "legend-val"
+    }, latest[p.id].toFixed(1), "%"), was != null && /*#__PURE__*/React.createElement(Delta, {
+      value: latest[p.id] - was,
+      small: true
+    }));
+  }))), /*#__PURE__*/React.createElement(TrendChart, {
     key: "pv",
     height: narrow ? 460 : 340,
     xDomain: xDomain,
@@ -9907,7 +9929,7 @@ function PrimaryVotePanel({
     fmt: v => v.toFixed(1)
   }), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages, weighted by sample and adjusted for each house\u2019s lean. Use the party chips above to isolate one party \u2013 on its own its line draws with the 95% interval around it", solo ? ", shaded here" : "", "."));
+  }, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages, weighted by sample and adjusted for each house\u2019s lean. Each chip carries a party\u2019s current share and its change since the 2025 election, where every line here begins. Use the chips to isolate one party \u2013 on its own its line draws with the 95% interval around it", solo ? ", shaded here" : "", "."));
 }
 
 // opposition-leader handover: Angus Taylor replaced Sussan Ley on 12 Feb 2026.
@@ -14566,8 +14588,14 @@ function CycleChart({
   mode,
   hidden,
   hi,
+  setHi,
   lifted,
   unlift,
+  chipClick,
+  toggle,
+  showAll,
+  hideAll,
+  showOutcome,
   showHan,
   setHan,
   showOnp,
@@ -15136,7 +15164,21 @@ function CycleChart({
     onClick: () => window.AP.openTerm && window.AP.openTerm("approval", M.title)
   }, "net approval")) : M.title), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, cardSub), hanCtl && /*#__PURE__*/React.createElement("label", {
+  }, cardSub), /*#__PURE__*/React.createElement(CycleLegend, {
+    cycles: cycles,
+    hidden: hidden,
+    lifted: lifted,
+    hi: hi,
+    setHi: setHi,
+    chipClick: chipClick,
+    toggle: toggle,
+    showAll: showAll,
+    hideAll: hideAll,
+    showOutcome: showOutcome,
+    outcomeShown: outcomeShown,
+    shapes: shapes,
+    banded: banded
+  }), hanCtl && /*#__PURE__*/React.createElement("label", {
     className: "pg-check cyc-han" + (showHan ? " on" : ""),
     title: "Pauline Hanson, on the same approve-minus-disapprove basis. " + "Rated in the current term only, from " + hanFrom + " – no past cycle asked about her, " + "and favourability ratings are left out, so the line is short."
   }, /*#__PURE__*/React.createElement("input", {
@@ -15288,20 +15330,25 @@ function CycleLegend({
   banded
 }) {
   const [pop, setPop] = useState(null);
-  /* onMouseLeave clears the highlight for a pointer, and a finger never fires
-     it: a term raised by a tap stayed lit on the chart until another row
-     happened to replace it. The next gesture starting outside the legend puts
-     it back, the same way the chart readouts and the accuracy dots do. */
-  const legRef = useRef(null);
-  window.useDismissOutside(legRef, hi != null, () => setHi(null));
+  /* `hi` is cleared by PastCyclesView, not here: there are six of these
+     strips, and a per-strip dismiss meant a tap inside one fired the other
+     five's "you tapped outside me" and put the highlight straight back out. */
+
   const total = cycles.length;
   const onBoard = total - hidden.size;
+  /* LINES ON THE CHART, which is not the same as terms the reader lifted: the
+     sitting term is always drawn and is in no band, so with 1996 lifted the
+     chart carries two lines and the button used to say "1 drawn". Once the
+     ribbon has given way every shown term draws its own line instead, and the
+     count is simply the board. */
+  const cur = cycles.find(c => c.current);
+  const drawnN = banded ? lifted.size + (cur && !hidden.has(cur.year) ? 1 : 0) : onBoard;
   /* The button has to earn the room the pills were spending, so at rest it
      carries the sweep they showed simply by existing - "21 terms since 1972"
      is a row of years in one line. The moment the reader has cut the board or
      drawn a line it says THAT instead: the flourish is the first thing to go,
      because a control that is doing something should say what. */
-  const summary = (hidden.size ? onBoard + " of " + total + " terms" : lifted.size ? total + " terms" : total + " terms since " + cycles[0].year) + (lifted.size ? " · " + lifted.size + " drawn" : "");
+  const summary = (hidden.size ? onBoard + " of " + total + " terms" : lifted.size ? total + " terms" : total + " terms since " + cycles[0].year) + (lifted.size ? " · " + drawnN + " drawn" : "");
 
   /* The board cut by what each government did at its own election - the
      comparison the tab exists for, and one nobody can assemble by eye from
@@ -15336,7 +15383,6 @@ function CycleLegend({
   const quick = hidden.size === 0 ? "all" : hidden.size === total ? "none" : outcomeShown;
   return /*#__PURE__*/React.createElement("div", {
     className: "cyc-legend" + (banded ? " banded" : ""),
-    ref: legRef,
     onMouseLeave: () => setHi(null)
   }, /*#__PURE__*/React.createElement("div", {
     className: "cyc-legend-bar"
@@ -15960,6 +16006,23 @@ function PastCyclesView() {
     return l;
   });
   const [hi, setHi] = useState(null);
+  /* Clearing the highlight belongs HERE, not in the strip. onMouseLeave covers
+     a pointer and a finger never fires it, so a term raised by a tap stayed
+     lit until another row happened to replace it - the next gesture starting
+     outside puts it back, the way the chart readouts and accuracy dots do.
+     With one strip per chart the test has to be "outside EVERY strip": six
+     copies each asking "was that outside ME" would have five of them firing
+     on a tap inside the sixth. */
+  React.useEffect(() => {
+    if (hi == null) return;
+    const onDown = e => {
+      const t = e.target;
+      if (t && t.closest && t.closest(".cyc-legend")) return;
+      setHi(null);
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    return () => document.removeEventListener("pointerdown", onDown, true);
+  }, [hi]);
   const [showHan, setShowHan] = useState(false);
   const [showOnp, setShowOnp] = useState(false);
 
@@ -16144,27 +16207,7 @@ function PastCyclesView() {
     className: "ap-export",
     onClick: exportSource,
     title: hidden.size ? "The individual polls the monthly averages are built from – hidden terms left out, to match the board" : "The individual polls the monthly averages are built from"
-  }, /*#__PURE__*/React.createElement(DownloadIcon, null), "Source polls")))), /*#__PURE__*/React.createElement(CycleLegend, {
-    cycles: cycles,
-    hidden: hidden,
-    lifted: lifted,
-    hi: hi,
-    setHi: setHi,
-    chipClick: chipClick,
-    toggle: toggle,
-    showAll: showAll,
-    hideAll: hideAll,
-    shapes: shapes,
-    showOutcome: showOutcome,
-    outcomeShown: outcomeShown
-    /* The legend is one shared strip over six charts whose bands are now
-       measure-scoped (a term that never held a measure takes no band
-       seat on its chart). The key note below the chips earns its place
-       if ANY measure could muster three data-bearing past terms –
-       primary/2pp do so whenever three era buckets are visible, so in
-       practice this matches any visible band. */,
-    banded: cycles.filter(c => !hidden.has(c.year) && !c.current && CYC_METRICS.some(m => (c.raw[m.key] || []).some(v => v != null))).length >= 3
-  }), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement(DownloadIcon, null), "Source polls")))), /*#__PURE__*/React.createElement("div", {
     className: "cyc-charts"
   }, CYC_METRICS.map(m => /*#__PURE__*/React.createElement(CycleChart, {
     key: m.key,
@@ -16173,8 +16216,14 @@ function PastCyclesView() {
     mode: mode,
     hidden: hidden,
     hi: hi,
+    setHi: setHi,
     lifted: lifted,
     unlift: unlift,
+    chipClick: chipClick,
+    toggle: toggle,
+    showAll: showAll,
+    hideAll: hideAll,
+    showOutcome: showOutcome,
     showHan: showHan,
     setHan: setShowHan,
     showOnp: showOnp,

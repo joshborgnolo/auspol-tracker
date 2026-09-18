@@ -12,7 +12,7 @@ whole view iterates `CYCLE_DEFS` (board rows, lines, end-labels, download CSV,
 accuracy panel). The minimal diff is data + copy strings only. Worked example:
 shipping the 2007 Rudd term (commit `8c8e15c`, 2026-09-02).
 
-## The legend is a popover — READ THIS FIRST (2026-09-18)
+## The legend is a popover, once per chart — READ THIS FIRST (2026-09-18)
 
 Everything below that says "chip" means a row in the **board panel** now. The
 legend used to be twenty-one `.cyc-chip` pills standing open above the charts
@@ -20,15 +20,41 @@ legend used to be twenty-one `.cyc-chip` pills standing open above the charts
 whose usual state was "all of them are on". It is one `FilterPop` button plus
 the band caption: **35px**.
 
-What changed, and what did NOT:
+There is no longer a shared strip at the top of the tab. **`CycleLegend` is
+rendered by `CycleChart`, directly under that card's `.card-sub`** — six
+copies, one per metric, all reading the same state in `PastCyclesView`. One
+strip at the top could only ever serve the first chart; the other five are a
+scroll away from it, and the reader who has reached the 2PP card to ask what
+Howard did there had to climb back up to say so. Two consequences worth
+knowing:
 
-- `CycleLegend` (d1a1d215 ~:1766) still takes the same props and still owns
-  `hi` / `useDismissOutside`. It renders `.cyc-legend > .cyc-legend-bar`
-  containing **`FilterPop`** (the archive's own popover component — a hoisted
-  function declaration, so calling it from higher in the file is fine) and the
-  `.cyc-band-note` caption **inline beside it**.
+- **Each copy passes its OWN `banded`** (the chart's `pastShown.length >= 3`,
+  measure-scoped), not a tab-wide approximation. So the swatch rings and the
+  `.cyc-band-note` beside the button describe the fan on the card under them —
+  the approval charts hold no 1972–84 data and say so independently of
+  primary/2PP. The old shared call site computed `banded` with a
+  `CYC_METRICS.some(...)` fudge; it is gone.
+- **`hi` is cleared by `PastCyclesView`, never by the strip.** Six copies each
+  running `useDismissOutside` against their own ref meant a pointerdown inside
+  one fired the other five's "that was outside me" and put the highlight
+  straight back out. One `pointerdown` listener in the view tests
+  `e.target.closest(".cyc-legend")` instead, so any strip counts as inside.
+  `onMouseLeave` stays per strip.
+
+What changed in the strip itself, and what did NOT:
+
+- `CycleLegend` still takes the same props. It renders
+  `.cyc-legend > .cyc-legend-bar` containing **`FilterPop`** (the archive's own
+  popover component — a hoisted function declaration, so calling it from higher
+  in the file is fine) and the `.cyc-band-note` caption **inline beside it**.
 - The button: `label="Cycles"`, `summary` = `"21 terms since 1972"` at rest,
   `"12 of 21 terms"` when cut, `" · N drawn"` appended when anything is lifted.
+- **`N drawn` counts LINES, not lifts** (fixed 2026-09-18, reported as "it says
+  1 drawn even if there are 2"). `lifted.size` alone is wrong because the
+  sitting term is always drawn and can never be lifted — with 1996 lifted the
+  chart carries two lines. So `drawnN = banded ? lifted.size + (sitting term on
+  the board ? 1 : 0) : onBoard`; once the ribbon gives way every shown term
+  draws its own line and the count is simply the board.
 - Panel contents, in order: `.ap-pop-head` (the words "On the board" + the
   `.cyc-quick` shortcut row), `.cyc-board` (the grid of terms),
   `.ap-pop-foot` (what the two controls do).
