@@ -1095,6 +1095,46 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
     : (altL && altL.aPrev != null) ? +(altL.a - altL.aPrev).toFixed(1)
     : +(latest.a - m.data[m.data.length - 2].a).toFixed(1);
 
+  /* The evidence strip is one clause and must read on ONE line: on a phone
+     the words shrink before they may wrap. Measure the strip's one-line
+     width at the 12px ceiling, and if the row cannot hold it publish the
+     largest half-pixel (>=8px) that fits as --hi-fs for the strip's font
+     rules; the dot separators consume the same var, so the whole line
+     scales as one. The width is only honest while nothing may fold, so
+     the measurement runs one frame under .hi-fitting, which pins the
+     wrappable clause to nowrap - a clause free to wrap reports its folded
+     width and the fitter would never see the overflow it exists to fix.
+     Reset to the ceiling every pass too: a row that widens again must be
+     allowed to grow back, and a stale shrunken value would measure
+     itself. No dependency list - the clause's words change with the
+     matchup in ways no list could name, so re-fit after every render; the
+     writes below are value-guarded, so a settled strip costs one
+     scrollWidth read and nothing more. Measured off the strip, observed
+     on its PARENT, same as the gauge: writing --hi-fs never moves the
+     strip's own box, so the observer cannot chase its own tail. */
+  const hiRef = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = hiRef.current;
+    if (!el || !el.parentElement) return;
+    const fit = () => {
+      if (el.style.getPropertyValue("--hi-fs") !== "12px")
+        el.style.setProperty("--hi-fs", "12px");
+      el.classList.add("hi-fitting");
+      const px = el.scrollWidth > el.clientWidth + 1
+        ? Math.max(8, Math.floor((12 * el.clientWidth / el.scrollWidth) * 2) / 2)
+        : 12;
+      el.classList.remove("hi-fitting");
+      const val = px + "px";
+      if (el.style.getPropertyValue("--hi-fs") !== val)
+        el.style.setProperty("--hi-fs", val);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el.parentElement);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    return () => ro.disconnect();
+  });
+
   return (
     <section className="card hero">
       <div className="hero-top">
@@ -1168,8 +1208,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             </span>
           </div>
           {/* How the lead was made and how much evidence sits under it: the
-              interval's name, the method, and the window both describe. */}
-          <div className="hero-interval">
+              interval's name, the method, and the window both describe. ref
+              feeds the one-line fitter above. */}
+          <div className="hero-interval" ref={hiRef}>
             {/* The label names the method; now it also explains it. Everything
                 this figure is built on has a definition in Info, and the word
                 the reader is looking at is the shortest way to it. */}

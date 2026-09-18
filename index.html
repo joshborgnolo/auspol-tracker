@@ -1278,26 +1278,41 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    clause's ::before instead, provided that clause is not itself a hi-term
    button (a pseudo would sit inside ITS button box and link) and not the
    poll count, whose parenthetical continues the method word's sentence
-   rather than opening a new clause. Every emitter pins 12px: a pseudo
-   inherits its host clause's size and an unpinned dot reads bigger than its
-   neighbours (caught live 2026-09-02). */
+   rather than opening a new clause. Every emitter pins the strip's size: a
+   pseudo inherits its host clause's size, and an unpinned dot reads bigger
+   than its neighbours (caught live 2026-09-02), so the pin is
+   var(--hi-fs, 12px) - the clause sizes below consume the same var, and
+   the dots shrink with the line they separate rather than looming over
+   it. */
 .hero-interval > *:not(:last-child):not(.hi-term):not(.hi-sep)::after {
-  content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
+  content: "•"; color: var(--ink-3); font-weight: 400; font-size: var(--hi-fs, 12px);
   margin-left: 6px;
 }
 .hero-interval > .hi-term + :not(.hi-term):not(.hi-sep):not(.hi-count)::before {
-  content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
+  content: "•"; color: var(--ink-3); font-weight: 400; font-size: var(--hi-fs, 12px);
   margin-right: 6px;
 }
 /* The count's parenthetical continues the method word's sentence, so the
    junction takes roughly a word space, not the 6px clause flank a dot once
-   breathed in. And it must be free to word-wrap: the whole parenthetical
-   runs past a phone line's width now that the interval label sits inside
-   it. The specificities out-rank the shared .hi-note/.hi-count nowrap. */
+   breathed in. The free word-wrap is kept as the deepest fallback only:
+   the one-line fitter below shrinks the strip before a wrap may happen,
+   and wrapping is what is left under its 8px floor. The specificities
+   out-rank the shared .hi-note/.hi-count nowrap; the fitter's .hi-fitting
+   rules below over-rule this one during measurement. */
 .hero-interval > .hi-count { margin-left: -3px; white-space: normal; }
 .hi-sep { color: var(--ink-3); font-weight: 400; font-size: 12px; }
-/* No narrow-screen variant: the strip wraps naturally if the row overflows,
-   and the same clause order, dots and sizes are wanted at every width. */
+/* One line, whatever size it takes: the strip trades size for width
+   instead of wrapping. The hero's fitter measures the clause run's
+   one-line width and sets --hi-fs on the strip to the largest half-pixel
+   (>=8px) that fits its row; every font-size the strip consumes, dots
+   included, is the same var, so the line scales as one. Rows that fit at
+   the 12px ceiling never move. The measure is honest only while nothing
+   may wrap, so it runs one frame under .hi-fitting, whose nowraps must
+   out-rank every wrappable clause in the strip - a clause allowed to fold
+   reports its folded width, and the fitter would never see the overflow
+   it exists to fix. */
+.hero-interval.hi-fitting { flex-wrap: nowrap; }
+.hero-interval.hi-fitting > * { white-space: nowrap; }
 /* A word that is also the way into its own definition. Reset far enough that
    a <button> stops looking like one, and no further - whatever rule styles the
    label itself still sets its size and colour, so this can wrap any of them. */
@@ -1315,9 +1330,9 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    inherit` plays the same trick on the grey set above: the method word ends
    up ink beside the ink-3 note. Declared here, both win, and the strip
    keeps one size and colour story. */
-.hero-interval .hi-method { font-size: 12px; color: var(--ink-3); }
+.hero-interval .hi-method { font-size: var(--hi-fs, 12px); color: var(--ink-3); }
 .hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.hi-note, .hi-count { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+.hi-note, .hi-count { font-size: var(--hi-fs, 12px); color: var(--ink-3); white-space: nowrap; }
 /* Phones: the lead clause used to share one row with the strip and shrink
    to 12px to fit it inside ~358px; on its own line a 390px-class phone
    holds it at the full 14px, so only the strip's wrap rhythm still wants
@@ -21547,6 +21562,42 @@ function Hero({
     changeSig: altL.changeSig
   } : null;
   const monthDelta = m.real ? +(D.latest.alp2pp - D.latest.alp2ppPrev).toFixed(1) : onImpL && onImpL.aPrev != null ? +(onImpL.a - onImpL.aPrev).toFixed(1) : altL && altL.aPrev != null ? +(altL.a - altL.aPrev).toFixed(1) : +(latest.a - m.data[m.data.length - 2].a).toFixed(1);
+
+  /* The evidence strip is one clause and must read on ONE line: on a phone
+     the words shrink before they may wrap. Measure the strip's one-line
+     width at the 12px ceiling, and if the row cannot hold it publish the
+     largest half-pixel (>=8px) that fits as --hi-fs for the strip's font
+     rules; the dot separators consume the same var, so the whole line
+     scales as one. The width is only honest while nothing may fold, so
+     the measurement runs one frame under .hi-fitting, which pins the
+     wrappable clause to nowrap - a clause free to wrap reports its folded
+     width and the fitter would never see the overflow it exists to fix.
+     Reset to the ceiling every pass too: a row that widens again must be
+     allowed to grow back, and a stale shrunken value would measure
+     itself. No dependency list - the clause's words change with the
+     matchup in ways no list could name, so re-fit after every render; the
+     writes below are value-guarded, so a settled strip costs one
+     scrollWidth read and nothing more. Measured off the strip, observed
+     on its PARENT, same as the gauge: writing --hi-fs never moves the
+     strip's own box, so the observer cannot chase its own tail. */
+  const hiRef = React.useRef(null);
+  React.useLayoutEffect(() => {
+    const el = hiRef.current;
+    if (!el || !el.parentElement) return;
+    const fit = () => {
+      if (el.style.getPropertyValue("--hi-fs") !== "12px") el.style.setProperty("--hi-fs", "12px");
+      el.classList.add("hi-fitting");
+      const px = el.scrollWidth > el.clientWidth + 1 ? Math.max(8, Math.floor(12 * el.clientWidth / el.scrollWidth * 2) / 2) : 12;
+      el.classList.remove("hi-fitting");
+      const val = px + "px";
+      if (el.style.getPropertyValue("--hi-fs") !== val) el.style.setProperty("--hi-fs", val);
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el.parentElement);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    return () => ro.disconnect();
+  });
   return /*#__PURE__*/React.createElement("section", {
     className: "card hero"
   }, /*#__PURE__*/React.createElement("div", {
@@ -21618,7 +21669,8 @@ function Hero({
     value: Math.abs(leadSwing).toFixed(1),
     spinIn: true
   }), narrow ? " since 2025" : " since the 2025 election"))), /*#__PURE__*/React.createElement("div", {
-    className: "hero-interval"
+    className: "hero-interval",
+    ref: hiRef
   }, /*#__PURE__*/React.createElement("button", {
     type: "button",
     className: "hi-method hi-term",
