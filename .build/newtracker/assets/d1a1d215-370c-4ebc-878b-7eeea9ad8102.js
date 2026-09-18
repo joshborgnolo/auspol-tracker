@@ -541,14 +541,30 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
 // y-windows are fitted to the real data per metric+mode (see cycDomain) –
 // fixed windows clip real history (e.g. net approval spans −44…+41)
 const CYC_METRICS = [
-  /* The tap-to-define "net approval" link is composed into the card title at
-     render time – keeping it in the string here would leave it as dead text. */
-  { key: "net", title: "Prime minister net approval", sub: "Sitting prime minister",
-    unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
-    step: 20, refAbs: 0, refAbsLabel: "even" },
-  { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader",
-    leader: "opp", unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
-    step: 10, refAbs: 0, refAbsLabel: "even", han: true },
+  /* ORDER: the outcome, then what drives it, then what explains it.
+     The 2PP leads because it is the measure that decides elections, the one
+     the site's own headline quotes, and the one whose fan is deepest - the
+     vote charts reach back to 1972 while approval and preferred-PM start at
+     1987, so the first chart a reader meets carries the most history. The two
+     primary-vote charts sit together as the pair they are; they used to be
+     split by the 2PP with the opposition's tacked on last. Preferred PM
+     bridges the vote block and the approval block, which is what it measures,
+     and government/opposition stay adjacent inside each pair. */
+  { key: "tpp", title: "Government two-party preferred", sub: "Governing-party 2PP",
+    unit: "%", fmt: (v) => v.toFixed(1),
+    step: 5, refAbs: 50, refAbsLabel: "50 – tie" },
+  { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
+    unit: "%", fmt: (v) => v.toFixed(1),
+    step: 5, refAbs: null },
+  /* The opposition chart reads the same terms from the losing side of them:
+     the opposition party's own primary line. leader:"opp" makes the line and
+     dot labels name the opposition leader; the insight sentence keys its
+     subject off M.key, so this gets "the Coalition … the average opposition".
+     There is no opposition-2PP chart – 2PP sums to 100, so it would be an
+     exact mirror of the government 2PP chart above. */
+  { key: "oppr", title: "Opposition primary vote", sub: "First-preference support for the opposition party",
+    leader: "opp", onp: true, unit: "%", fmt: (v) => v.toFixed(1),
+    step: 5, refAbs: null },
   /* One line per term: the PM's lead in the preferred-PM question, pmPpm
      minus oppPpm. The pairing names itself per segment (e.ppmEras, or
      c.raw.ppmPair when it never changed), the fallback label for an
@@ -561,21 +577,14 @@ const CYC_METRICS = [
     sub: "PM’s lead on the preferred-PM question",
     unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
     step: 10, refAbs: 0, refAbsLabel: "even", chgRefLabel: "First reading" },
-  { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
-    unit: "%", fmt: (v) => v.toFixed(1),
-    step: 5, refAbs: null },
-  { key: "tpp", title: "Government two-party preferred", sub: "Governing-party 2PP",
-    unit: "%", fmt: (v) => v.toFixed(1),
-    step: 5, refAbs: 50, refAbsLabel: "50 – tie" },
-  /* The opposition chart reads the same terms from the losing side of them:
-     the opposition party's own primary line. leader:"opp" makes the line and
-     dot labels name the opposition leader; the insight sentence keys its
-     subject off M.key, so this gets "the Coalition … the average opposition".
-     There is no opposition-2PP chart – 2PP sums to 100, so it would be an
-     exact mirror of the government 2PP chart above. */
-  { key: "oppr", title: "Opposition primary vote", sub: "First-preference support for the opposition party",
-    leader: "opp", onp: true, unit: "%", fmt: (v) => v.toFixed(1),
-    step: 5, refAbs: null },
+  /* The tap-to-define "net approval" link is composed into the card title at
+     render time – keeping it in the string here would leave it as dead text. */
+  { key: "net", title: "Prime minister net approval", sub: "Sitting prime minister",
+    unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
+    step: 20, refAbs: 0, refAbsLabel: "even" },
+  { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader",
+    leader: "opp", unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
+    step: 10, refAbs: 0, refAbsLabel: "even", han: true },
 ];
 
 // domain over ALL cycles (not just visible ones) so toggling a cycle off
