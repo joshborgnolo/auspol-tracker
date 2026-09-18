@@ -368,6 +368,7 @@ function buildStaticSummary() {
     return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
   };
   const L = grab("latest"), prim = L.primary;
+  const EL25 = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).elections.e2025;
   const table = grab("pollsterTable"), acc = grab("accuracy");
   const polls = grab("individualPolls");
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -388,7 +389,7 @@ function buildStaticSummary() {
      flexbox, which left one space between the party and its share. */
   const primary = ["alp", "lnp", "grn", "onp", "oth"]
     .filter((k) => prim[k] != null)
-    .map((k) => `<tr><th scope="row">${PARTY[k]}</th><td>${prim[k].toFixed(1)}%</td></tr>`).join("\n          ");
+    .map((k) => `<tr><th scope="row">${PARTY[k]}</th><td>${EL25[k].toFixed(1)}%</td><td>${prim[k].toFixed(1)}%</td></tr>`).join("\n          ");
 
   /* Same pollster list as MethodNote: straight from the archive, busiest
      first. It is part of the sourcing, not a footer to drop. */
@@ -415,6 +416,9 @@ function buildStaticSummary() {
 
       <h2>Primary vote</h2>
       <table class="ss-primary">
+        <thead>
+          <tr><th scope="col">Party</th><th scope="col">2025 election</th><th scope="col">Now</th></tr>
+        </thead>
         <tbody>
           ${primary}
         </tbody>

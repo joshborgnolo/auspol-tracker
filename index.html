@@ -346,7 +346,7 @@ body {
 .ss-sub { margin: 0 0 4px; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
 .ss-lead { font-size: 22px; margin: 0 0 8px; font-variant-numeric: tabular-nums; }
 .static-summary p { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
-/* a table, not a flex list: reader engines keep a table's two columns but
+/* a table, not a flex list: reader engines keep a table's columns but
    throw flexbox away, which would leave one space between party and share. */
 .ss-primary { border-collapse: collapse; width: 100%; max-width: 320px; font-size: 15px; }
 .ss-primary th, .ss-primary td {
@@ -355,6 +355,9 @@ body {
 }
 .ss-primary th { text-align: left; font-weight: 600; }
 .ss-primary td { text-align: right; }
+.ss-primary td + td, .ss-primary thead th + th { padding-left: 14px; }
+.ss-primary thead th { font-size: 13px; color: var(--ink-3); text-align: right; font-weight: 400; }
+.ss-primary thead th:first-child { text-align: left; font-weight: 600; }
 .ss-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 /* the table's label is a paragraph, not a <caption>: reader engines render a
    caption inside their own table chrome with an odd indent, while a plain
@@ -4486,12 +4489,15 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
 
       <h2>Primary vote</h2>
       <table class="ss-primary">
+        <thead>
+          <tr><th scope="col">Party</th><th scope="col">2025 election</th><th scope="col">Now</th></tr>
+        </thead>
         <tbody>
-          <tr><th scope="row">Labor</th><td>27.5%</td></tr>
-          <tr><th scope="row">Coalition</th><td>21.5%</td></tr>
-          <tr><th scope="row">Greens</th><td>12.5%</td></tr>
-          <tr><th scope="row">One Nation</th><td>27.0%</td></tr>
-          <tr><th scope="row">Others</th><td>11.1%</td></tr>
+          <tr><th scope="row">Labor</th><td>34.6%</td><td>27.5%</td></tr>
+          <tr><th scope="row">Coalition</th><td>31.8%</td><td>21.5%</td></tr>
+          <tr><th scope="row">Greens</th><td>12.2%</td><td>12.5%</td></tr>
+          <tr><th scope="row">One Nation</th><td>6.4%</td><td>27.0%</td></tr>
+          <tr><th scope="row">Others</th><td>15.0%</td><td>11.1%</td></tr>
         </tbody>
       </table>
 
