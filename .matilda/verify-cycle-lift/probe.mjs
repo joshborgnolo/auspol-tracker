@@ -70,7 +70,15 @@ const strip = (page, year) => page.evaluate(`(() => {
   const rows = [...document.querySelectorAll(".cyc-drawn-item")]
     .filter((e) => (e.querySelector(".cyc-drawn-year") || {}).textContent === "${year}");
   return { rows: rows.length, withX: rows.filter((e) => e.querySelector(".cyc-drawn-x")).length,
-           l: new URLSearchParams(location.search).get("l") };
+           /* The shareable state, whatever shape it currently takes. This
+              used to read ?l= specifically; the cycles tab now packs hidden
+              and lifted into one base-36 bitmask in ?c= (83f4e38), and a
+              probe that names the parameter fails the next time the encoding
+              is tuned while the CONTRACT - state survives the URL - holds.
+              So the checks below assert the contract: empty when nothing is
+              asked for, non-empty when something is, and a reload of that URL
+              brings the lift back. */
+           url: location.search };
 })()`);
 const tapRow = (page, year) => page.evaluate(`(() => {
   const c = [...document.querySelectorAll(".cyc-row")]
@@ -99,7 +107,7 @@ try {
   await new Promise((r) => setTimeout(r, 500));
   const after = await strip(page, years.current);
   check("tapping the sitting row raises no ✕", after.withX, 0);
-  check("…and writes no ?l= for it", after.l, null);
+  check("…and writes no shareable state for it", after.url, "");
   check("…and leaves it drawn", after.rows, before.rows);
 
   // ---- a past term still lifts, and its ✕ still returns it to the band ----
@@ -108,7 +116,7 @@ try {
   const lifted = await strip(page, years.past);
   check("a past term lifts into the strips", lifted.rows > 0, true);
   check("…offering a ✕ on each", lifted.withX, lifted.rows);
-  check("…and recording itself in ?l=", lifted.l != null, true);
+  check("…and recording itself in the URL", lifted.url !== "", true);
   await page.evaluate(`(() => {
     const it = [...document.querySelectorAll(".cyc-drawn-item")]
       .find((e) => (e.querySelector(".cyc-drawn-year") || {}).textContent === "${years.past}");
@@ -117,7 +125,19 @@ try {
   await new Promise((r) => setTimeout(r, 500));
   const returned = await strip(page, years.past);
   check("its ✕ returns it to the band", returned.rows, 0);
-  check("…and clears ?l=", returned.l, null);
+  check("…and clears the URL again", returned.url, "");
+
+  /* The contract itself: whatever the encoding, a copied link restores the
+     lift. Lift, copy the URL, reload it cold, and the term must come back
+     drawn with its ✕ on every strip. */
+  await tapRow(page, years.past);
+  await new Promise((r) => setTimeout(r, 500));
+  const shareUrl = await page.evaluate("location.search");
+  await openCycles(page, shareUrl);
+  const restored = await strip(page, years.past);
+  check("a copied link restores the lifted term", restored.rows > 0, true);
+  check("…with its ✕ still offered", restored.withX, restored.rows);
+  await openCycles(page);
 
   // ---- a link copied while the bug was live must not restore the state ----
   await openCycles(page, "?l=" + String(years.current).slice(2));
@@ -146,8 +166,13 @@ try {
   check("the sitting term's ✕ has a real hit target at 390px", sitX, true);
   await page.evaluate(`document.querySelector(".cyc-row.current .cyc-x").click()`);
   await new Promise((r) => setTimeout(r, 400));
-  check("tapping it at 390px takes the sitting term off the board",
-        await strip(page, years.current), { rows: 0, withX: 0, l: null });
+  /* rows/withX only: taking a term off the board DOES write shareable state
+     (that is the point of the ✕), so the url field is not part of this claim. */
+  {
+    const off = await strip(page, years.current);
+    check("tapping it at 390px takes the sitting term off the board",
+          { rows: off.rows, withX: off.withX }, { rows: 0, withX: 0 });
+  }
   await page.evaluate(`document.querySelector(".cyc-row.current .cyc-x").click()`);
   await new Promise((r) => setTimeout(r, 400));
   await page.setViewport({ width: 1280, height: 900 });
