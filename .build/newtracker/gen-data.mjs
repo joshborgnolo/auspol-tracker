@@ -207,19 +207,32 @@ const HL_WINDOW = 21, HL_HALF = 7, HL_TAPER = 14;
 const taperW = (d) => (d <= HL_TAPER ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - HL_TAPER) / (HL_WINDOW - HL_TAPER))));
 const recencyW = (d) => Math.exp(-LN2 * d / HL_HALF) * taperW(d);
 const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
-/* Synthetic 2PP rows: each poll's primaries read through the single measured
+/* Implied 2PP eligibility: a poll's primaries can only be read through the
+   flow table when it files a full primary set with no documented anomaly
+   (sumNote) – a set that doesn't total ~100 can't be read through a
+   100-point flow table. One predicate, hoisted, because every consumer of
+   the implied series (the rows below, the per-poll alpImp dots on the
+   chart, the flow-drift join) must agree on which waves have one. */
+const impOk = (p) => p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote;
+/* Implied 2PP rows: each poll's primaries read through the single measured
    flow table in flows.mjs (AEC 2025, Event 31496). This series answers a
-   different, narrower question than the published 2PP above – "what would
-   these primaries mean if 2025's preference flows still held?" – and it is a
-   diagnostic ONLY: houses' own allocations (respondent-allocated, previous-
-   election, proprietary) move with real preference behaviour, a fixed table
-   cannot, so the synthetic series can never become the headline. Rows need a
-   full primary set with no documented anomaly (sumNote) – a set that doesn't
-   total ~100 can't be read through a 100-point flow table. The row carries
+   different question than the published 2PP above – "what do these
+   primaries mean at the flows the 2025 count actually observed?" – and on
+   the page it is the DEFAULT basis: SINCE this term began the houses'
+   published 2PPs split across allocation bases (previous-election,
+   respondent-allocated, proprietary) whose industry mix doesn't move when
+   real preference behaviour does, while reading every poll on ONE fixed
+   table at least puts the level the flow table's own counted flows support
+   next to every wave, comparably house to house and wave to wave. The
+   published series stays complete beside it (tppRows → agg2pp →
+   latest.alp2pp), the two bases are quoted side by side, and the toggle
+   between them is the reader's. What a fixed table still cannot do is
+   TRACK drift in real preference behaviour after 2025 – drift's home is
+   §7c, and stale flows read as level error, not movement. The row carries
    its own ONP primary so §1c can re-price that one conversion cell per row
    (§1b's estimator never reads it). */
 const tppRowsSynth = POLLS
-  .filter((p) => p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
+  .filter(impOk)
   .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: impliedAlp2pp(p), n: rowN(p), firm: p.pollster, onp: p.onp, key: p.date + "|" + p.pollster }));
 
 /* A house effect is that pollster's lean AWAY FROM the cross-house consensus
@@ -1153,6 +1166,10 @@ const individualPolls = POLLS.map((p) => {
     // absent where the wave sits in none of the three series
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),
     alp: p.tpp_alp ?? null, lnp: p.tpp_lnp ?? null, alpN: alpNOf(p),
+    // this wave's implied 2PP (its own primaries at the 2025 flow table) –
+    // absent under the same eligibility rule tppRowsSynth uses, so the
+    // chart's implied-basis poll cloud is exactly the estimator's own rows
+    ...(impOk(p) ? { alpImp: r1(impliedAlp2pp(p)) } : {}),
     p: primaryOf(p), ...buildAlt(p.date, p.pollster), ...build3cp(p), ...buildPpm(p.date, p.pollster),
     appr: buildAppr(p.date, p.pollster), chg: chgByKey[p.date + "|" + p.pollster],
     // link back to the published release/report this row came from (the
@@ -1266,6 +1283,16 @@ const synthHeadline = (ref) => {
 };
 const synthNow = synthHeadline(refNow);
 const synth1mo = synthHeadline(refNow - 30 * 86400000);
+/* The implied headline's month-on-month significance, on the same RSS rule
+   the published headline uses (two independent 21d windows). Emitted beside
+   synthLatest so the hero's "within the margin" caveat reads the implied
+   basis it displays. */
+const synthChg = (synthNow && synth1mo && synthNow.se != null && synth1mo.se != null)
+  ? (() => {
+      const seChg = Math.sqrt(synthNow.se ** 2 + synth1mo.se ** 2);
+      return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg), changeSig: Math.abs(synthNow.alp - synth1mo.alp) > 1.96 * seChg };
+    })()
+  : {};
 
 /* ---- 7c. flow-drift residual tracker -------------------------------------
    How far published 2PPs are running from what the SAME polls' primaries
@@ -2709,24 +2736,27 @@ window.AUSPOL = (function () {
   const alt2pp = ${JSON.stringify(alt2pp)};
   // nowcast per alternative matchup – null where the series is too thin
   const altLatest = ${JSON.stringify(altLatest)};
-  /* Synthetic 2PP diagnostic: the polls' primaries read through the single
-     AEC-2025 flow table in flows.mjs, on the SAME estimator (house effects,
-     window, half-life) as the published series above. A diagnostic, not a
-     shadow headline: its election "anchor" is a consistency check, not a
-     forecast agreement (the TPP table was built FROM that count, so it
-     reproduces 55.2 by construction – §1b), and its nowcast tracks whatever
-     gap, either side, that a fixed 2025 table runs against houses' own
-     moving allocations – that gap is the diagnostic's content (its drift
-     over time is flowDrift below). The UI shows it as a non-default overlay
-     / method-page comparison, never as a correction. */
+  /* Implied 2PP: the polls' primaries read through the single AEC-2025 flow
+     table in flows.mjs, on the SAME estimator (house effects, window,
+     half-life) as the published series above. This is the site's DEFAULT
+     2PP basis – the hero, the share card and this comment's consumers quote
+     synthLatest; latest.alp2pp stays the respondent-allocated
+     (= the houses' own published) basis beside it, and the flow-drift
+     tracker below watches the gap between the two. What a fixed table
+     cannot do is FOLLOW real preference drift after 2025: that is §7c's
+     content, and a stale-flow table reads as level error, not movement. Its
+     election anchor is likewise a consistency check, not a forecast
+     agreement (the TPP table was built FROM that count, so it reproduces
+     55.2 by construction – §1b). */
   const synth2pp = ${JSON.stringify(agg2ppSynth)};
-  const synthLatest = ${JSON.stringify(synthNow ? { ...synthNow, lnp: r1(100 - synthNow.alp), prev: synth1mo ? synth1mo.alp : null } : null)};
-  /* Flow-sensitivity bracket for the diagnostic above (gen-data §1c): each
-     month's {lo, hi} = implied ALP 2PP with the ONP→ALP share at its last
-     two COUNTED election tables (2022 and 2025, TPP cut). A sensitivity
-     bracket, NOT an interval – its width is what the One Nation conversion
-     is worth at that month's ONP primary. Only meaningful beside synth2pp;
-     the hero draws it when the implied overlay is switched on. */
+  const synthLatest = ${JSON.stringify(synthNow ? { ...synthNow, ...synthChg, lnp: r1(100 - synthNow.alp), prev: synth1mo ? synth1mo.alp : null } : null)};
+  /* Flow-sensitivity bracket for the implied series above (gen-data §1c):
+     each month's {lo, hi} = implied ALP 2PP with the ONP→ALP share at its
+     last two COUNTED election tables (2022 and 2025, TPP cut). A
+     sensitivity bracket, NOT an interval – its width is what the One
+     Nation conversion is worth at that month's ONP primary. Only
+     meaningful beside the implied line; the hero draws it with the
+     basis comparison. */
   const flowSens = ${JSON.stringify(synthBand)};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};

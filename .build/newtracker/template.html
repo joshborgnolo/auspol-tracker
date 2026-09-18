@@ -1132,6 +1132,12 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    to sit beside it in small caps has moved to the interval line, where it
    reads as a clause of how the figure was made and how well it is known */
 .hero-title { margin-bottom: 12px; }
+/* the basis switch lives under the h2, a quiet clause ("Using …") rather
+   than a control - so it snugs up under the title instead of sitting in the
+   control strip, and wraps as a unit on the phone rungs. */
+.hero-basis { display: flex; align-items: baseline; gap: 4px 10px; flex-wrap: wrap; margin: -4px 0 12px; }
+.hero-basis-label { font-size: 12px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--ink-3); white-space: nowrap; }
 /* ---- the hero's interval gauge -----------------------------------------
    The channel is chrome and obeys the page's top-left light: shadow cast in
    under the upper wall, a lit lip on the sill below. The span inside it is a

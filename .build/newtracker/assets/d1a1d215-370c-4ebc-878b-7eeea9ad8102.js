@@ -33,12 +33,16 @@ const DownloadIcon = () => (
 // hands it down): the same definitions and the same nowcast accessor as the
 // hero readout, so the two figures can never disagree.
 // ====================================================================
-function TabScore({ onGoHero, matchup }) {
+function TabScore({ onGoHero, matchup, tppBasis = "imp" }) {
   const MM = window.AP.tppMatchups;
+  // the 2PP basis (respondent-allocated vs implied) comes down as a prop
+  // alongside the matchup so the docked figure can never disagree with
+  // the hero readout
+  const tppNow = (id) => window.AP.tppLatest(id, tppBasis);
   // anything unrecognised (or a matchup with no current figure) falls back
   // to the headline contest – the hero itself never offers one without data
-  const id = MM && MM[matchup] && window.AP.tppLatest(matchup) ? matchup : "alp_lnp";
-  const M = MM[id], v = window.AP.tppLatest(id);
+  const id = MM && MM[matchup] && tppNow(matchup) ? matchup : "alp_lnp";
+  const M = MM[id], v = tppNow(id);
   return (
     <button className="tab-score" onClick={onGoHero}
             title={"Latest " + M.label + " two-party preferred – go to Snapshot"}>
@@ -408,7 +412,7 @@ function NextPollTicker({ showScore }) {
 // ====================================================================
 // Tabs – editorial underlined nav beneath the header
 // ====================================================================
-function Tabs({ tabs, active, onChange, tppMatchup }) {
+function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
   // Sticky on every view. Once the bar is pinned AND the hero's 2PP figures
   // have scrolled out of view, a compact score docks into the right side of
   // the bar – it is a stand-in for the hero, so it never shares the screen
@@ -524,7 +528,7 @@ function Tabs({ tabs, active, onChange, tppMatchup }) {
               and leaves on the same .show-score gate as .tab-score, so the
               swap is one move). */}
           <GlyphDial className="tab-glyph" width="34" height="23.8" />
-          <TabScore onGoHero={goHero} matchup={tppMatchup} />
+          <TabScore onGoHero={goHero} matchup={tppMatchup} tppBasis={tppBasis} />
         </div>
       </nav>
     </React.Fragment>
@@ -4706,18 +4710,21 @@ function infoTerms(D) {
       as {xref("mild-divergence", "real-disagreement", "mild divergence")}; past it, the polls
       are not measuring one number with different luck.</>) },
     { id: "implied-2pp", term: "Implied 2PP", body: (
-      <>An optional dashed line on the two-party chart (“Compare implied 2PP”) showing what the same
-      polls’ own primary votes add up to under one fixed {xref("preference-flows", "implied 2PP",
-      "preference-flow table")}. For Labor v Coalition it is a diagnostic,
-      never the headline: pollsters’ own allocations answer a live question a fixed table cannot.
+      <>The site’s default two-party figure: what the same polls’ own primary votes add up to under
+      one fixed {xref("preference-flows", "implied 2PP", "preference-flow table")}. It leads the
+      hero, the share card and the summary, because one fixed table answers every poll the same
+      way – the published figures let each house answer it differently, so the aggregate moves
+      when the mix of houses moves, not only when voters do. The switch under the two-party
+      heading returns the chart to the pollsters’ own respondent-allocated figures, dots and
+      all. Neither is the true 2PP;
       {D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? (
-        <> Today the table reads {D.synthLatest.alp.toFixed(1)} against the aggregate’s
+        <> today the fixed table reads {D.synthLatest.alp.toFixed(1)} against the pollsters’ own
         {" "}{L.alp2pp.toFixed(1)} – a gap, not a verdict. At One Nation’s current {onp}% primary,
         five points of doubt about their flow rate is {(prim.onp * 0.05).toFixed(1)} points of
         two-party either way.</>
       ) : null}
       {L.onImp ? (
-        <> Labor v One Nation is the exception, quoted on this basis: no election count of
+        <> Labor v One Nation stands on this basis for a harder reason: no election count of
       that pairing exists to discipline the houses’ uncoordinated allocations, so the figure
       is the current primaries run through a {xref("fp-flows", "implied 2PP",
       "first-principles flow set")} – {L.onImp.a.toFixed(1)} to Labor,{" "}

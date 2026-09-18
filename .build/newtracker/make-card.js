@@ -42,7 +42,25 @@
 */
 (async () => {
   await document.fonts.ready;
-  const D = window.AUSPOL, L = D.latest;
+  const D = window.AUSPOL;
+  /* Default basis is IMPLIED preference flows (the site's own default): each
+     poll's primaries re-allocated at the fixed 2025 flow table, aggregated.
+     That is the figure the hero leads with and the one the share card quotes,
+     so the card never contradicts the page it previews. Falls back to the
+     published respondent-allocated aggregate when synthLatest is absent. */
+  const IS_IMP = !!(D.synthLatest && D.synthLatest.alp != null);
+  /* synthLatest carries alp/lnp/ci95/n, not the latest payload's
+     alp2pp/alp2ppCi95/method – merge like build.mjs's headlineView so the
+     rest of the card reads one shape, whichever basis is drawn. published,
+     windowDays and the primary panel are not basis-dependent. */
+  const L = IS_IMP
+    ? { ...D.latest,
+        alp2pp: D.synthLatest.alp, lnp2pp: D.synthLatest.lnp,
+        alp2ppCi95: D.synthLatest.ci95,
+        alp2ppPrev: D.synthLatest.prev != null ? D.synthLatest.prev : D.latest.alp2ppPrev,
+        changeSig: D.synthLatest.changeSig,
+        method: { ...D.latest.method, nPolls: D.synthLatest.n } }
+    : D.latest;
   const W = 1200, H = 630, S = 2;              // draw at 2x, export at 1x
   const cv = document.createElement("canvas");
   cv.width = W * S; cv.height = H * S;
@@ -187,6 +205,7 @@
      the whole middle of the card, and this is the only place the standfirst
      fits without taking it from them. */
   const marg = L.alp2pp - L.lnp2pp, chg = L.alp2pp - L.alp2ppPrev;
+  const basisTag = IS_IMP ? " · implied preference flows" : "";
   c.textAlign = "right";
   /* The PUBLICATION date of the most recent poll, which is what the site's own
      "Updated" stamp shows - not `updated`, the end of its fieldwork. The two
@@ -205,7 +224,8 @@
   c.fillText("95% interval ±" + L.alp2ppCi95.toFixed(1) + " pts · "
              + L.method.nPolls + " polls in " + L.method.windowDays + " days · "
              + (chg > 0 ? "+" : "−") + Math.abs(chg).toFixed(1) + " vs 1 month ago"
-             + (L.changeSig ? "" : ", within the margin"), W - PAD, 142);
+             + (L.changeSig ? "" : ", within the margin")
+             + basisTag, W - PAD, 142);
   c.textAlign = "left";
   c.strokeStyle = T.line; c.lineWidth = 1;
   c.beginPath(); c.moveTo(PAD, 162.5); c.lineTo(W - PAD, 162.5); c.stroke();
@@ -353,7 +373,8 @@
     alp: L.alp2pp.toFixed(1), lnp: L.lnp2pp.toFixed(1),
     ci: L.alp2ppCi95.toFixed(1),
     n: L.method.nPolls, win: L.method.windowDays,
-    mom: (L.alp2pp - L.alp2ppPrev).toFixed(1), sig: !!L.changeSig } };
+    mom: (L.alp2pp - L.alp2ppPrev).toFixed(1), sig: !!L.changeSig,
+    basis: IS_IMP ? "imp" : "pub" } };
   console.log("card drawn for data dated " + L.publishedISO
               + " – put this in assets/auspol-card.json");
   const a = document.createElement("a");

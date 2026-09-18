@@ -304,12 +304,28 @@ function buildFavicon() {
 
 /* Pull the derived headline straight out of the dataset gen-data just wrote,
    so the card's stamp check and its alt text quote the same numbers the page
-   does rather than a second, drifting copy. */
+   does rather than a second, drifting copy. The headline basis is IMPLIED
+   (synthLatest) where it exists - the pollsters' own respondent-allocated
+   figures ride along in .pub for the comparison sentence; every static
+   surface below quotes the implied figure, labelled as such. */
+const headlineView = (L, S) => (S && S.alp != null)
+  ? { ...L,
+      alp2pp: S.alp, lnp2pp: S.lnp, alp2ppCi95: S.ci95, alp2ppNEff: S.nEff,
+      alp2ppPrev: S.prev != null ? S.prev : L.alp2ppPrev, changeSig: S.changeSig,
+      method: { ...L.method, nPolls: S.n },
+      basis: "imp",
+      pub: { alp2pp: L.alp2pp, lnp2pp: L.lnp2pp, alp2ppCi95: L.alp2ppCi95 } }
+  : { ...L, basis: "pub",
+      pub: { alp2pp: L.alp2pp, lnp2pp: L.lnp2pp, alp2ppCi95: L.alp2ppCi95 } };
+
 function grabLatest() {
   const src = fs.readFileSync(A("9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8");
-  const i = src.indexOf("const latest = ");
-  if (i < 0) throw new Error("latest not found in dataset");
-  return JSON.parse(src.slice(i + 15, src.indexOf("\n", i)).replace(/;$/, ""));
+  const grab = (name) => {
+    const i = src.indexOf("const " + name + " = ");
+    if (i < 0) throw new Error(name + " not found in dataset");
+    return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
+  };
+  return headlineView(grab("latest"), grab("synthLatest"));
 }
 
 /* One short race sentence, shared by the static summary's sub-head and the
@@ -321,6 +337,12 @@ const raceLine = (v) => {
        : d < 0 ? `The Coalition leads Labor ${v.lnp2pp}\u2013${v.alp2pp}`
        : `Neither side leads: ${v.alp2pp}\u2013${v.lnp2pp}`;
 };
+
+/* The clause that follows the race line wherever the figure lands: implied
+   is the default basis, and a figure that isn't what a pollster filed must
+   say so in the same breath. The full explanation lives in the Two-party
+   preferred section; this is the tag the figure itself carries. */
+const basisClause = (v) => v.basis === "imp" ? " on implied preference flows" : "";
 
 /* "Set against the last N" in the tagline / meta copy is the count of PAST
    federal terms the tracker has cycles for, derived from the cycle-source
@@ -367,7 +389,7 @@ function buildStaticSummary() {
     if (i < 0) throw new Error("static summary: " + name + " not found");
     return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
   };
-  const L = grab("latest"), prim = L.primary;
+  const L = headlineView(grab("latest"), grab("synthLatest")), prim = L.primary;
   const EL25 = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).elections.e2025;
   const table = grab("pollsterTable"), acc = grab("accuracy");
   const polls = grab("individualPolls");
@@ -400,13 +422,19 @@ function buildStaticSummary() {
   return `<article class="static-summary">
       <h1>auspol tracker</h1>
       <p class="ss-sub">Aggregated opinion polling for the next Australian federal election, set against the last ${pastCycleWord()}.
-        ${raceLine(L)} two-party preferred (&#177;${L.alp2ppCi95}) &#8211; updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
+        ${raceLine(L)} two-party preferred${basisClause(L)} (&#177;${L.alp2ppCi95}) &#8211; updated <time datetime="${esc(L.updatedISO)}">${esc(L.updated)}</time> from
         ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Next election due ${esc(L.nextElectionDue[0].toLowerCase() + L.nextElectionDue.slice(1))}.</p>
 
       <h2>Two-party preferred</h2>
       <p class="ss-lead"><b>Labor ${L.alp2pp.toFixed(1)}%</b> &#183; <b>Coalition ${L.lnp2pp.toFixed(1)}%</b></p>
       <p>${who} leads by ${Math.abs(lead).toFixed(1)} points
-        (&#177;${(2 * L.alp2ppCi95).toFixed(1)} on the lead). The aggregate is a sample- and
+        (&#177;${(2 * L.alp2ppCi95).toFixed(1)} on the lead)${L.basis === "imp" ? `
+        on implied preference flows &#8211; every poll&#8217;s primary votes
+        re-allocated by the preference flows the AEC counted at the 2025 election,
+        so every poll that publishes primaries counts, not only those that file a
+        two-party figure. The pollsters&#8217; own respondent-allocated figures
+        aggregate to ${L.pub.alp2pp.toFixed(1)}&#8211;${L.pub.lnp2pp.toFixed(1)}, and
+        the live chart switches between the two` : ""}. The aggregate is a sample- and
         recency-weighted,
         house-effect-adjusted mean over a ${L.method.windowDays}-day window
         (${L.method.halfLifeDays}-day half-life), carrying a 95% interval of
@@ -462,7 +490,11 @@ function buildStaticSummary() {
         Past cycles carries the full record, house by house.</p>` : ""}
 
       <h2>Reading the charts</h2>
-      <p>Each dot is one published poll; the lines are monthly aggregates, shaded with the 95%
+      <p>On the two-party chart each dot by default is one poll&#8217;s implied figure &#8211;
+        its primaries re-allocated at the 2025 election&#8217;s counted flows &#8211; and the
+        switch under the heading swaps the whole series to the pollsters&#8217; own published
+        figures, dots and all. Elsewhere each dot is one published poll. The lines are monthly
+        aggregates, shaded with the 95%
         interval around them. Where the two bands meet, that month&#8217;s lead is inside its own
         margin of error. Leadership questions are asked irregularly, so those lines are monthly
         aggregates too &#8211; adjusted per house for approval and favourability, joined straight
@@ -511,7 +543,8 @@ function cardFigs(L) {
   return { alp: L.alp2pp.toFixed(1), lnp: L.lnp2pp.toFixed(1),
            ci: L.alp2ppCi95.toFixed(1),
            n: L.method.nPolls, win: L.method.windowDays,
-           mom: (L.alp2pp - L.alp2ppPrev).toFixed(1), sig: !!L.changeSig };
+           mom: (L.alp2pp - L.alp2ppPrev).toFixed(1), sig: !!L.changeSig,
+           basis: L.basis };
 }
 const cardNow = grabLatest();
 writeAtomic(path.join(ROOT, "assets", "auspol-latest.json"),
@@ -558,14 +591,14 @@ const cardUrl = `${SITE_URL}assets/auspol-card.png?v=${(cardStamp || dataStamp) 
    who cannot see the preview should get the same reading from it. */
 const cl = grabLatest();
 const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, Coalition ${cl.lnp2pp.toFixed(1)} `
-  + `two-party preferred, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
+  + `two-party preferred${basisClause(cl)}, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
   + `with the trend since the 2025 election`;
 /* SERP + social description: the tagline phrasing leads, then the race and
    provenance. Figures and their date share a sentence, so a stale cached
    snippet stays self-dating. Reuses the same numbers as the card alt and
    the summary below. */
 const metaDesc = `Aggregated opinion polling for the next Australian federal election, `
-  + `set against the last ${pastCycleWord()}. ${raceLine(cl)} two-party preferred (±${cl.alp2ppCi95}) `
+  + `set against the last ${pastCycleWord()}. ${raceLine(cl)} two-party preferred${basisClause(cl)} (±${cl.alp2ppCi95}) `
   + `– updated ${cl.updated} from ${cl.pollsTracked} published polls across ${cl.housesTracked} polling houses.`;
 
 /* og:site_name must NOT equal the masthead h1 text: Safari Reader skips any

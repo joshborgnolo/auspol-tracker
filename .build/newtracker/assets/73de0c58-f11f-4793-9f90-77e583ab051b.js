@@ -565,19 +565,26 @@ const MATCHUPS = (() => {
 /* The current figure for ANY matchup, headline or not – one accessor, so the
    hero readout, its switcher chips and the docked tab-bar score can never
    disagree. The REAL ALP v L/NP measure reads the trailing recency- +
-   sample-weighted, house-effect-adjusted nowcast (D.latest) – NOT the last
-   monthly-mean dot. An alternative matchup gets a nowcast too WHERE the
-   series supports one (D.altLatest is null for a matchup too thin to
-   weight); otherwise its last monthly point. ONE exception: ALP v ON is
-   quoted on the implied basis (D.latest.onImp – the current primaries run
-   through a first-principles flow set, carrying that set's flow band rather
-   than a sampling interval), because no election count of the pairing exists
-   to discipline the houses' uncoordinated allocations. The pollsters' own
-   head-to-heads corroborate from the chart; they no longer set the number. */
-function tppLatest(id) {
+   sample-weighted, house-effect-adjusted nowcast on the REQUESTED BASIS
+   (basis = "imp": D.synthLatest, the implied figure – every poll's primaries
+   run through the fixed 2025 flow table; "resp": D.latest, the pollsters'
+   own published 2PPs). An alternative matchup has no bases: it gets a
+   nowcast WHERE its series supports one (D.altLatest is null for a matchup
+   too thin to weight); otherwise its last monthly point. ONE exception:
+   ALP v ON is quoted on the implied basis (D.latest.onImp – the current
+   primaries run through a first-principles flow set, carrying that set's
+   flow band rather than a sampling interval), because no election count of
+   the pairing exists to discipline the houses' uncoordinated allocations.
+   The pollsters' own head-to-heads corroborate from the chart; they no
+   longer set the number. */
+function tppLatest(id, basis) {
   const D = window.AUSPOL, M = MATCHUPS[id];
   if (!M) return null;
-  if (M.real) return { a: D.latest.alp2pp, b: D.latest.lnp2pp, ci95: D.latest.alp2ppCi95 };
+  if (M.real) {
+    if (basis === "imp" && D.synthLatest && D.synthLatest.alp != null)
+      return { a: D.synthLatest.alp, b: D.synthLatest.lnp, ci95: D.synthLatest.ci95, implied: true };
+    return { a: D.latest.alp2pp, b: D.latest.lnp2pp, ci95: D.latest.alp2ppCi95 };
+  }
   const imp = M.altKey === "alp_on" && D.latest.onImp ? D.latest.onImp : null;
   if (imp) return { a: imp.a, b: imp.b, ci95: imp.band, flows: true };
   const al = D.altLatest ? D.altLatest[M.altKey] : null;
@@ -701,7 +708,7 @@ function HeroGauge({ a, ci, color, aName, bName, sepRef }) {
   );
 }
 
-function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) {
+function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, basis, setBasis }) {
   const sepRef = React.useRef(null);   // the rule between the figures; the gauge aligns its tie to it
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const xDomain = rangeDomain(rangeId);
@@ -756,13 +763,15 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
   const narrow = useNarrow();
   const [morph, setMorph] = useState(null);        // { from, to, t }
   const morphRaf = useRef(0);
-  /* The synthetic 2PP overlay: "what would these polls' PRIMARIES imply if
-     2025's preference flows still held?" – a diagnostic shown on request
-     only, against the real ALP v L/NP series, and never framed as a
-     correction to it. It is not a matchup (no house published it), so it
-     does not belong in MATCHUPS: local state, one dashed ALP-side line (the
-     L/NP side is its exact complement), and it steps aside during a matchup
-     morph, where there is nothing honest for it to reshape into. */
+  /* The basis our ALP v L/NP contest is displayed on, owned in App and handed
+     down: "imp" = implied preference flows (every poll's primaries through
+     the fixed 2025 flow table; the site's DEFAULT), "resp" = the houses' own
+     published respondent-allocated 2PPs. It re-points data, cloud, readout,
+     interval and the comparison overlay together (impBasis below); it has no
+     effect on the modelled matchups, which have no bases. The comparison the
+     checkbox draws is then always "the OTHER basis" (showSynth), dashed. */
+  const impOffered = D.synthLatest && D.synthLatest.alp != null && D.synth2pp && D.synth2pp.length > 1;
+  const impBasis = impOffered && basis === "imp" && matchup === "alp_lnp";
   const [showSynth, setShowSynth] = useState(false);
   React.useEffect(() => () => cancelAnimationFrame(morphRaf.current), []);
   /* The month clause's caveat shows "the margin" until the note no longer
@@ -822,31 +831,57 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
     morphRaf.current = requestAnimationFrame(step);
   };
 
-  /* The Compare-implied switch renders in two homes (one state, both copies
+  /* The basis-COMPARISON switch renders in two homes (one state, both copies
      call the same setter, so they can never disagree): the control column on
      the desktop, and under the chart legend on the phone, where the strip
      tightens to its two chip groups. The CSS picks which copy exists at this
      width - .pg-phone is display:none everywhere except the <=560 block,
-     which also hides the strip's copy. */
+     which also hides the strip's copy. What "other" means flips with the
+     basis: on respondent-allocated it draws the implied shadow, on implied
+     it draws the houses' own published figures. */
+  const cmpCopy = impBasis
+    ? { term: "published 2PP", termId: "weighted-aggregate", termTip: "What a weighted aggregate means",
+        tip: "Also draw the same polls’ own published two-party figures (respondent-allocated or equivalent), each house’s allocation as filed. The complement of the basis above." }
+    : { term: "implied 2PP", termId: "implied-2pp", termTip: "What an implied two-party figure is",
+        tip: "Also draw what the same polls’ primary votes imply when run through one fixed preference-flow table (the 2025 election’s actual flows), shaded to the 2022 table’s read of the One Nation conversion. A diagnostic, not a correction." };
   const compareToggle = (phone) => (
     <label className={"pg-check" + (phone ? " pg-phone" : "") + (showSynth ? " on" : "")}
-           title="Also draw what the same polls’ primary votes imply when run through one fixed preference-flow table (the 2025 election’s actual flows), shaded to the 2022 table’s read of the One Nation conversion. A diagnostic, not a correction.">
+           title={cmpCopy.tip}>
       <input type="checkbox" checked={showSynth} onChange={(e) => setShowSynth(e.target.checked)} />
       {/* the label is a flex row with a 6px gap, so a loose text node and the
           term button would become two flex ITEMS with 6px between them - a
           word space that reads double-spaced. One span = one flex item, and
           the words run inline at a real word space inside it. */}
       <span>Compare <button type="button" className="hi-term"
-              title="What an implied two-party figure is"
+              title={cmpCopy.termTip}
               onClick={(e) => { e.preventDefault();
-                window.AP.openTerm && window.AP.openTerm("implied-2pp", "two-party preferred"); }}>
-        implied 2PP
+                window.AP.openTerm && window.AP.openTerm(cmpCopy.termId, "two-party preferred"); }}>
+        {cmpCopy.term}
       </button></span>
     </label>
   );
 
   const m = MATCHUPS[matchup];
-  const ptsOf = (id) => filterPts(MATCHUPS[id].data, xDomain[0]);
+  /* The BASIS re-point, one place. On the implied basis the classic
+     contest's chart data becomes synth2pp's monthly points (labor/coalition
+     shares, its own ci95) and its poll cloud becomes each wave's OWN implied
+     figure (alpImp, emitted from the same eligibility rule the implied
+     estimator uses) – so "two charts with different sets of points" is a
+     data swap here, not a second chart component. Everything measure-shaped
+     below takes iDataOf/iScatOf rather than the matchup's own entries.
+     impData is computed whenever the basis is imp at all – NOT only while
+     the classic contest is the one on screen – so a morph AWAY from it
+     still leaves on the implied line it was set in. */
+  const impData = impOffered && basis === "imp"
+    ? D.synth2pp.map((d) => ({ ym: d.ym, x: d.x, a: d.alp, b: d.lnp, ci95: d.ci95, k: d.k }))
+    : null;
+  const impScatter = (p) => (p.alpImp == null ? null : [
+    { y: p.alpImp, color: "var(--alp)", label: "ALP implied" },
+    { y: +(100 - p.alpImp).toFixed(1), color: "var(--lnp)", label: "L/NP implied" },
+  ]);
+  const iDataOf = (id) => (id === "alp_lnp" && impData ? impData : MATCHUPS[id].data);
+  const iScatOf = (id) => (id === "alp_lnp" && impData ? impScatter : MATCHUPS[id].scatter);
+  const ptsOf = (id) => filterPts(iDataOf(id), xDomain[0]);
   const pts = ptsOf(matchup);
   /* Both matchups on ONE grid of months, each holding its own end value across
      the months the other one runs for - so the two paths carry the same shape
@@ -889,11 +924,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
   // An alternative matchup gets a nowcast too WHERE the series supports one
   // (D.altLatest is null for a matchup too thin to weight). Otherwise it reads
   // its last monthly point, as before.
-  /* The current figure for ANY matchup, headline or not – one accessor, so a
+  /* The current figure for ANY matchup, headline or not – ONE accessor, so a
      chip below can never disagree with the readout above when it is that
-     matchup's turn to be the headline. Lives at module scope (tppLatest) so
-     the docked tab-bar score reads it too. */
-  const latestOf = tppLatest;
+     matchup's turn to be the headline. Module-scope tppLatest, so the docked
+     tab-bar score reads it too; `basis` carries to the ALP v L/NP fight. */
+  const latestOf = (id) => tppLatest(id, basis);
   /* Every contest that isn't the one on the chart, in the same order the tabs
      use, and only where there is a current figure to print – a chip with no
      number would be the bare tab it is replacing. */
@@ -909,7 +944,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
   const onImpL = (m.altKey === "alp_on" && D.latest.onImp) ? D.latest.onImp : null;
   const adjusted = m.real || !!onImpL || !!(D.adjusted && m.altKey && D.adjusted[m.altKey]);
   const latest = m.real
-    ? { a: D.latest.alp2pp, b: D.latest.lnp2pp }
+    ? (impBasis && D.synthLatest
+        ? { a: D.synthLatest.alp, b: D.synthLatest.lnp }
+        : { a: D.latest.alp2pp, b: D.latest.lnp2pp })
     : onImpL || altL || m.data[m.data.length - 1];
 
   // mirrored pairs, so each trend line sits inside its own cloud of readings.
@@ -919,14 +956,14 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
   const cloudFor = (id) => (!showScatter ? [] : D.individualPolls
     .filter((p) => p.x >= xDomain[0] && p.x <= xDomain[1])
     .flatMap((p) => {
-      const pair = MATCHUPS[id].scatter(p);
+      const pair = iScatOf(id)(p);
       // `side` 0 is the Labor-side reading and 1 the rival's – with the poll's
       // own identity, that is how a dot recognises itself in the other matchup
       return pair ? pair.map((s, side) => ({ x: p.x, y: s.y, color: s.color, label: s.label, meta: p, side })) : [];
     }));
   // memoised on what actually changes them: a morph frame must not rebuild
   // 240 dots sixty times a second (see the chart's own memo on the same arrays)
-  const settledCloud = React.useMemo(() => cloudFor(matchup), [matchup, rangeId, showScatter]);
+  const settledCloud = React.useMemo(() => cloudFor(matchup), [matchup, rangeId, showScatter, basis]);
 
   /* The cloud morphs the way the lines do. A poll that published BOTH matchups
      is one reading of the same fieldwork asked two ways – Newspoll's 51.4
@@ -947,7 +984,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
     ia.forEach((d, k) => (ib.has(k) ? travel.push([d, ib.get(k)]) : leaving.push(d)));
     ib.forEach((d, k) => { if (!ia.has(k)) arriving.push(d); });
     return { travel, leaving, arriving };
-  }, [morph ? morph.from : null, morph ? morph.to : null, rangeId, showScatter]);
+  }, [morph ? morph.from : null, morph ? morph.to : null, rangeId, showScatter, basis]);
 
   const scatter = morphClouds ? morphClouds.arriving : settledCloud;
   const scatterOut = morphClouds ? morphClouds.leaving : [];
@@ -968,15 +1005,20 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
     { id: "a", label: m.a.name, color: colA, points: series(drawPts, "a"), width: 3.6 },
     { id: "b", label: m.b.name, color: colB, points: series(drawPts, "b"), width: 3.6 },
   ];
-  /* The implied-2PP overlay. Same red as the published Labor line – colour
-     still says who; the dash says this one is computed from primaries, not
-     measured – because the visible GAP to the solid line is the whole point
-     of the diagnostic. Its election-month point meets the published anchor
+  /* The compare overlay is the OTHER basis: by default (implied) the dashed
+     line is the published-basis aggregate, gen-data's agg2pp; on the
+     respondent-allocated basis it is the implied series, computed from
+     primaries, not measured. Same red as the solid Labor line – colour still
+     says who; the dash says this one is the basis the chart is NOT on –
+     because the visible GAP between the bases is the whole point of the
+     diagnostic. The implied election-month point meets the published anchor
      exactly: under the shipped TPP table the anchor is the table's OWN
      count read back, so agreement there is consistency, not accuracy. */
-  const synthOverlay = (showSynth && matchup === "alp_lnp" && !morph && D.synth2pp && D.synth2pp.length > 1)
-    ? [{ id: "synth", label: "Implied ALP (fixed 2025 flows)", color: "var(--alp)",
-         points: filterPts(D.synth2pp.map((d) => ({ x: d.x, y: d.alp })), xDomain[0]),
+  const cmpSeries = impBasis ? D.agg2pp : D.synth2pp;
+  const cmpLabel = impBasis ? "Respondent-allocated ALP" : "Implied ALP (fixed 2025 flows)";
+  const synthOverlay = (showSynth && matchup === "alp_lnp" && !morph && cmpSeries && cmpSeries.length > 1)
+    ? [{ id: "synth", label: cmpLabel, color: "var(--alp)",
+         points: filterPts(cmpSeries.map((d) => ({ x: d.x, y: d.alp })), xDomain[0]),
          width: 2.2, dashed: true, opacity: 0.8 }]
     : [];
   /* The implied overlay's sensitivity bracket (gen-data §1c → D.flowSens):
@@ -1045,16 +1087,19 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
   // live dot's radius in data units, so an extreme reading isn't shaved.
   const domainOf = (id) => {
     const M = MATCHUPS[id], v = [];
-    M.data.forEach((d) => {
+    iDataOf(id).forEach((d) => {
       v.push(d.a, d.b);
       if (d.ci95 != null) v.push(d.a - d.ci95, d.a + d.ci95, d.b - d.ci95, d.b + d.ci95);
     });
     D.individualPolls.forEach((p) => {
-      const pair = M.scatter(p);
+      const pair = iScatOf(id)(p);
       if (pair) pair.forEach((s) => v.push(s.y));
     });
+    // whichever series the compare overlay draws rides the same window, or
+    // switching it on would climb out of the window it drew in
     if (M.real && D.synth2pp) D.synth2pp.forEach((d) => v.push(d.alp, 100 - d.alp));
-    // the sensitivity bracket too, or switching the overlay on would climb out of the window it drew in
+    if (M.real && D.agg2pp) D.agg2pp.forEach((d) => v.push(d.alp, 100 - d.alp));
+    // the sensitivity bracket too, which brackets the implied series
     if (M.real && D.flowSens) D.flowSens.forEach((d) => v.push(d.lo, d.hi, 100 - d.lo, 100 - d.hi));
     const lo = Math.min(...v), hi = Math.max(...v), padDot = 0.5;
     return [Math.floor((lo - padDot) / 5) * 5, Math.ceil((hi + padDot) / 5) * 5];
@@ -1082,15 +1127,22 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
      precise one. Null only where the series is too thin to nowcast at all,
      in which case the readout is a plain monthly point and says so. */
   const unc = m.real
-    ? (D.latest.alp2ppCi95 != null
-        ? { ci95: D.latest.alp2ppCi95, n: D.latest.method.nPolls, changeSig: D.latest.changeSig }
-        : null)
+    ? (impBasis
+        ? (D.synthLatest.ci95 != null
+            ? { ci95: D.synthLatest.ci95, n: D.synthLatest.n, changeSig: D.synthLatest.changeSig, implied: true }
+            : null)
+        : (D.latest.alp2ppCi95 != null
+            ? { ci95: D.latest.alp2ppCi95, n: D.latest.method.nPolls, changeSig: D.latest.changeSig }
+            : null))
     : (onImpL
         ? { ci95: onImpL.band, n: onImpL.n, flows: true }
         : (altL && altL.ci95 != null
             ? { ci95: altL.ci95, n: altL.n, changeSig: altL.changeSig }
             : null));
-  const monthDelta = m.real ? +(D.latest.alp2pp - D.latest.alp2ppPrev).toFixed(1)
+  const monthDelta = m.real
+    ? (impBasis
+        ? +(D.synthLatest.alp - (D.synthLatest.prev ?? D.latest.alp2ppPrev)).toFixed(1)
+        : +(D.latest.alp2pp - D.latest.alp2ppPrev).toFixed(1))
     : (onImpL && onImpL.aPrev != null) ? +(onImpL.a - onImpL.aPrev).toFixed(1)
     : (altL && altL.aPrev != null) ? +(altL.a - altL.aPrev).toFixed(1)
     : +(latest.a - m.data[m.data.length - 2].a).toFixed(1);
@@ -1144,6 +1196,26 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             estimable (ALP v L/NP and ALP v ON both are); one that only two
             houses ask can't be debiased or nowcast, so it says so. */}
         <h2 className="card-title hero-title">Two-party preferred</h2>
+        {/* Which measure of 2PP the readout, line and cloud show. Only the
+            ALP v L/NP pairing HAS two measures: the pollsters' own
+            respondent-allocated figure and the implied figure the site's
+            fixed 2025 flow table reads off the primary-vote aggregate.
+            Implied is the default – it uses every poll that publishes
+            primaries, not just the ones that publish a 2PP, and it is the
+            figure the share card carries. The toggle's labels are full
+            sentences ("Using …") so the choice states what the figure IS,
+            not just what it's called; when a matchup without a second
+            basis is selected the row simply withdraws. */}
+        {impOffered && m.real && (
+          <div className="hero-basis">
+            <span className="hero-basis-label">Using</span>
+            <TextToggle caps value={basis || "imp"} onChange={setBasis} ariaLabel="Two-party preferred basis"
+              options={[
+                { id: "resp", label: "Respondent-allocated preferences only" },
+                { id: "imp", label: "Implied preference flows" },
+              ]} />
+          </div>
+        )}
           {/* NOT keyed on the matchup any more: a remount would replace these
               figures, and the whole point is that they travel. The old
               readout-in fade lives on where it still belongs, on the lead line
@@ -1215,14 +1287,14 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                 this figure is built on has a definition in Info, and the word
                 the reader is looking at is the shortest way to it. */}
             <button type="button" className="hi-method hi-term"
-                    title={unc && unc.flows
-                      ? "How this pairing is derived from the primary-vote aggregate"
+                    title={unc && (unc.flows || unc.implied)
+                      ? "How this figure is derived from the primary-vote aggregate"
                       : "What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"}
                     onClick={() => window.AP.openTerm &&
-                      window.AP.openTerm(unc && unc.flows ? "implied-2pp"
+                      window.AP.openTerm(unc && (unc.flows || unc.implied) ? "implied-2pp"
                                            : adjusted ? "weighted-aggregate" : "monthly-average",
                                          "two-party preferred")}>
-              {unc && unc.flows ? "Implied from primary votes"
+              {unc && (unc.flows || unc.implied) ? "Implied from primary votes"
                : adjusted ? "Weighted aggregate" : "Monthly average"}
             </button>
             {/* The sentence continues in a parenthetical: how much evidence
@@ -1290,7 +1362,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           {/* The synthetic overlay is only meaningfully comparable against the
               published ALP v L/NP series, so the control only exists there.
               Off by default: it is a diagnostic, not a third headline. */}
-          {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(false)}
+          {matchup === "alp_lnp" && impOffered && compareToggle(false)}
           {/* The OTHER contests, carrying their figures rather than just their
               names. One Nation sits level with Labor on the primary vote, so
               in a good many seats the final two are not Labor and the Coalition
@@ -1376,7 +1448,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
             <span className="hl-item"><span className="hl-band"></span>95% interval</span>
           )}
           {synthOverlay.length > 0 && (
-            <span className="hl-item"><span className="hl-dashed" style={{ borderColor: "var(--alp)" }}></span>Implied from primaries at 2025 flows{D.synthLatest && D.synthLatest.alp != null ? ` · ${D.synthLatest.alp.toFixed(1)}` : ""}</span>
+            <span className="hl-item"><span className="hl-dashed" style={{ borderColor: "var(--alp)" }}></span>{impBasis
+              ? <>Published (respondent-allocated){D.latest && D.latest.alp2pp != null ? ` · ${D.latest.alp2pp.toFixed(1)}` : ""}</>
+              : <>Implied from primaries at 2025 flows{D.synthLatest && D.synthLatest.alp != null ? ` · ${D.synthLatest.alp.toFixed(1)}` : ""}</>}
+            </span>
           )}
           {sensAreas.length > 0 && (
             <span className="hl-item"
@@ -1387,13 +1462,16 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
         </div>
         <p className="hero-caption">
           {m.real
-            ? (<>Each dot is one published poll; the line is a{" "}
+            ? (<>{impBasis
+                ? "Each dot is one poll’s primaries re-allocated at fixed 2025 preference flows; the line is a "
+                : "Each dot is one published poll; the line is a "}
                <button type="button" className="hi-term"
                        title="Why the newest dots can sit past the line’s end"
                        onClick={() => window.AP.openTerm &&
                          window.AP.openTerm("dots-past-the-line", "two-party preferred")}>
                  smoothed average</button>
-               {" "}across all pollsters, shaded with the interval around it. Where the two
+               {impBasis ? " of those implied figures" : " across all pollsters"},
+               {" "}shaded with the interval around it. Where the two
                bands overlap, the lead is inside its own margin of error – the polls cannot
                separate the parties that month.</>)
             : `Each dot is one pollster’s published ${m.label} head-to-head` +
@@ -1405,7 +1483,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
       </div>
       {/* phone home of the same switch - under the chart legend, not in the
           control strip; hidden by default and shown only by the <=560 rules */}
-      {matchup === "alp_lnp" && D.synth2pp && D.synth2pp.length > 1 && compareToggle(true)}
+      {matchup === "alp_lnp" && impOffered && compareToggle(true)}
     </section>
   );
 }
@@ -1508,11 +1586,12 @@ const TABS = [
 ];
 const TAB_IDS = TABS.map((t) => t.id);
 
-function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatchup }) {
+function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatchup, tppBasis, setTppBasis }) {
   return (
     <>
       <Hero rangeId={rangeId} setRangeId={setRangeId} showScatter={showScatter}
-            matchup={tppMatchup} setMatchup={setTppMatchup} />
+            matchup={tppMatchup} setMatchup={setTppMatchup}
+            basis={tppBasis} setBasis={setTppBasis} />
       <PrimaryVotePanel rangeId={rangeId} />
       <PollsterTable />
       <LeadershipSection rangeId={rangeId} />
@@ -1597,6 +1676,18 @@ function App() {
      bar must follow it, and the hero unmounts whenever the reader walks off
      the Snapshot tab – the score travels on. */
   const [tppMatchup, setTppMatchup] = useState("alp_lnp");
+
+  /* Which measure of 2PP the hero shows for ALP v L/NP: the pollsters' own
+     respondent-allocated figure ("resp") or the implied figure the fixed
+     2025 flow table reads off the primary-vote aggregate ("imp"). Implied
+     is the default and it is the figure the share card carries. Owned here
+     for the same reason the matchup is: the docked 2PP score must follow
+     it, and the hero unmounts when the reader walks off the Snapshot tab. */
+  const [tppBasis, setTppBasis] = useState("imp");
+  React.useEffect(() => {
+    window.AP.tppBasis = tppBasis;
+    return () => { if (window.AP.tppBasis === tppBasis) delete window.AP.tppBasis; };
+  }, [tppBasis]);
 
   // active tab, persisted in the URL hash so a refresh / share keeps the view
   const readHash = () => {
@@ -1773,7 +1864,7 @@ function App() {
   return (
     <div className="page">
       <Header isDark={isDark} onToggleTheme={cycleTheme} />
-      <Tabs tabs={TABS} active={tab} onChange={goTab} tppMatchup={tppMatchup} />
+      <Tabs tabs={TABS} active={tab} onChange={goTab} tppMatchup={tppMatchup} tppBasis={tppBasis} />
       <main className="content">
         {/* The panel the tab strip points at. There was no role="tabpanel" on
             the page at all, so aria-controls had no target and a screen reader
@@ -1786,7 +1877,8 @@ function App() {
           <ViewBoundary>
             {tab === "snapshot" && (
               <SnapshotView rangeId={rangeId} setRangeId={setRangeId} showScatter={t.showScatter}
-                            tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />
+                            tppMatchup={tppMatchup} setTppMatchup={setTppMatchup}
+                            tppBasis={tppBasis} setTppBasis={setTppBasis} />
             )}
             {tab === "cycles" && <PastCyclesView />}
             {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
