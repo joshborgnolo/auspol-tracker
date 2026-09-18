@@ -3231,6 +3231,10 @@ function VariancePanel({ facet, rangeId }) {
             The shading is that chance floor – a line inside it means the houses are running tighter
             than random sampling permits. Measured across all {D.individualPolls.length} polls; the filters
             above don’t narrow it.
+            {view !== "leadership" && <>{" "}The two-party lines spread each house’s <em>published</em>
+            {" "}figure, not the implied one, and so cover only the waves that publish a 2PP: herding is
+            a habit of what a house prints, and reading every house through one shared flow table would
+            remove part of the very thing this panel is looking for.</>}
           </p>
         </div>
         <div className="legend">
@@ -3355,12 +3359,21 @@ function houseLeanColour(firm) {
    two-party ground (Labor above the line, Coalition below); a primary trace
    tints above-zero with its own party's wash and leaves below-zero neutral.
    Offered measures mirror the Poll-disagreement trio plus the 2PP. */
+/* Implied first, because it is the basis the site's headline runs on: the
+   lean this panel opens with is the one the default aggregate subtracts. The
+   published-2PP lean keeps its place beside it — it is what the Compare line
+   and the All-polls House-effect column are built on — and the two are not
+   interchangeable. */
 const LEAN_MEASURES = [
-  { id: "tpp", label: "2PP" }, { id: "alp", label: "ALP" },
-  { id: "lnp", label: "L/NP" }, { id: "onp", label: "ON" },
+  { id: "imp", label: "2PP · implied" }, { id: "tpp", label: "2PP · published" },
+  { id: "alp", label: "ALP" }, { id: "lnp", label: "L/NP" }, { id: "onp", label: "ON" },
 ];
 const LEAN_MEASURE_META = {
-  tpp: { phrase: "the 2PP", above: "lean-band-alp", below: "lean-band-lnp",
+  imp: { phrase: "the implied 2PP", above: "lean-band-alp", below: "lean-band-lnp",
+         basis: "A lean here is a house’s primaries running high or low — never its allocation method, which one frozen flow table holds identical for everyone.",
+         ground: "The ground is Labor red / Coalition blue around zero: a house inside the blue band runs ahead of the consensus on the Coalition’s implied 2PP, inside the red band ahead on Labor’s." },
+  tpp: { phrase: "the published 2PP", above: "lean-band-alp", below: "lean-band-lnp",
+         basis: "A lean here mixes how a house’s respondents answered with how it chose to allocate their preferences — the two are not separable on this basis.",
          ground: "The ground is Labor red / Coalition blue around zero: a house inside the blue band runs ahead of the consensus on the Coalition’s 2PP (pushes the 2PP toward them), inside the red band ahead on Labor’s." },
   alp: { phrase: "Labor’s primary vote", above: "lean-band-alp", below: "lean-band-ink",
          ground: "The ground colours the side of zero a house sits on: inside the red band it runs ahead of the consensus on Labor’s primary vote, below zero it trails it." },
@@ -3374,9 +3387,9 @@ const LEAN_SURFACE = 1.0;   // pp — the lean chart's first gridline
 function HouseLeanPanel({ rangeId }) {
   const { D, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
   const narrow = useNarrow();
-  const [measure, setMeasure] = useState("tpp");
+  const [measure, setMeasure] = useState("imp");
   const [hidden, setHidden] = useState({});
-  const meta = LEAN_MEASURE_META[measure] || LEAN_MEASURE_META.tpp;
+  const meta = LEAN_MEASURE_META[measure] || LEAN_MEASURE_META.imp;
   // older dataset builds carry houseLean 2PP-only (flat) or not at all –
   // absence is never zero, so a measure with no emitted map folds the panel
   const leanMap = D.houseLean && D.houseLean[measure];
@@ -3431,6 +3444,7 @@ function HouseLeanPanel({ rangeId }) {
               onClick={() => window.AP.openTerm && window.AP.openTerm("house-effect", "House lean")}>house effect</button>{" "}
             the aggregates subtract, shown as it has walked. The chart above spreads the houses
             against chance; this one tracks where each one stands.
+            {meta.basis && <> {meta.basis}</>}
           </p>
         </div>
       </div>

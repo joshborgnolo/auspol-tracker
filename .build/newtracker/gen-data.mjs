@@ -550,7 +550,15 @@ for (const k of PRIMARY_KEYS) {
    the 2PP plus the ALP / L/NP / ON primaries (matching the Poll-
    disagreement trio; lives after primaryHE exists). A firm under 3 evidence
    polls on a measure is absent from that measure's map, never drawn flat. */
-const houseLean = Object.fromEntries([["tpp", houseEffect], ["alp", primaryHE.alp], ["lnp", primaryHE.lnp], ["onp", primaryHE.onp]]
+/* "imp" is synthEffect, and it is here because the site's DEFAULT two-party
+   figure is the implied one, which subtracts synthEffect and not houseEffect.
+   The panel used to draw only the published-2PP lean while telling the reader
+   it was "the same house effect the aggregates subtract" — true until the
+   default basis moved under it. A house's two 2PP leans are genuinely
+   different quantities (Roy Morgan runs +1.6 on its published figure and
+   -0.6/-1.7 on the ALP/ON primaries that drive its implied one), so both are
+   emitted and the panel names which is which. */
+const houseLean = Object.fromEntries([["imp", synthEffect], ["tpp", houseEffect], ["alp", primaryHE.alp], ["lnp", primaryHE.lnp], ["onp", primaryHE.onp]]
   .map(([k, he]) => [k, Object.fromEntries(Object.entries(he.evidenceN).filter(([, n]) => n >= 3).map(([firm]) => [
     firm,
     MONTHS.filter((ym) => ymMidMs(ym) >= he.evidenceFrom[firm])
