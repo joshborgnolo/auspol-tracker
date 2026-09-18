@@ -173,10 +173,13 @@ function NextPollTicker({ showScore }) {
        ever filed a slot early, so counting to release - ±half names a date
        with no precedent - Resolve was counting down to Sun 6 Sep when its
        real alternatives are Sun 13 and Sun 20 Sep. spreadEarly=0 keeps the
-       countdown on the projected day itself. */
+       countdown on the projected day itself. The projection's slotEarly
+       (tails rebased to the slot's own place in the record) is the same
+       measure relative to the slot, and takes precedence where it exists. */
     const widen = Math.sqrt((r.ahead || 0) + 1);
-    const earlyHalf = r.spreadEarly != null
-      ? 7 * Math.floor((r.spreadEarly * widen + 3) / 7)
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const earlyHalf = se != null
+      ? 7 * Math.floor((se * widen + 3) / 7)
       : half;
     let t = Math.max(t0, dayFloor(r.release - earlyHalf * TN_DAY));
     t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * TN_DAY;
@@ -5265,7 +5268,10 @@ function infoTerms(D) {
       measured are those between them, not the fieldwork dates – the steadier clock, and the thing
       actually being forecast. The ± is half the spread of the gaps with the longest and shortest
       set aside, widening for waves further out, and in whole weeks for a house pinned to a
-      weekday, the only step its date can take. A filing hour appears where a house has been timed
+      weekday, the only step its date can take. A projected date will not always sit in the middle
+      of the house's record – if it lands on the record's near edge, only a later filing day gets
+      named as the alternative: “(or Wed 7 Oct)”, never an early day the house has not filed on.{" "}
+      A filing hour appears where a house has been timed
       often enough, always on the publisher’s own clock (AEDT through summer, AEST otherwise),
       and “today” is Sydney’s; weekday and hour are read off recent releases, a schedule being a
       current fact about a house. A house too variable for a date gets the window its record

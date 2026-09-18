@@ -104,10 +104,12 @@ const spreadLabel = (r) => {
 };
 const pmLabel = (r) => {
   if (r.rolled) return "";
-  if (r.releaseDow != null && r.spreadEarly != null) {
+  const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+  const sl = r.slotLate != null ? r.slotLate : r.spreadLate;
+  if (r.releaseDow != null && se != null) {
     const widen = Math.sqrt(r.ahead + 1);
-    const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
-    const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
+    const earlyW = Math.floor((se * widen + 3) / 7);
+    const lateW = Math.floor((sl * widen + 3) / 7);
     if (earlyW === 0 && lateW >= 1) return ` (or ${npFmt(r.release + lateW * 7 * DAY)})`;
     if (lateW === 0 && earlyW >= 1) return ` (or ${npFmt(r.release - earlyW * 7 * DAY)})`;
   }
@@ -115,10 +117,12 @@ const pmLabel = (r) => {
 };
 const dayAlt = (r) => {
   if (r.rolled) return null;
-  if (r.releaseDow != null && r.spreadEarly != null) {
+  const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+  const sl = r.slotLate != null ? r.slotLate : r.spreadLate;
+  if (r.releaseDow != null && se != null) {
     const widen = Math.sqrt(r.ahead + 1);
-    const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
-    const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
+    const earlyW = Math.floor((se * widen + 3) / 7);
+    const lateW = Math.floor((sl * widen + 3) / 7);
     // the tail spells its unit out only where the main label drops it -
     // "today (or 7 days)" vs "in 12 days (or 19)"
     if (earlyW === 0 && lateW >= 1)
@@ -146,8 +150,9 @@ function ticker(rows, t0, nowMs) {
     if (r.releaseDow == null)
       return { at: Math.max(r.release - half * DAY, nowMs), byDay: false };
     const widen = Math.sqrt((r.ahead || 0) + 1);
-    const earlyHalf = r.spreadEarly != null
-      ? 7 * Math.floor((r.spreadEarly * widen + 3) / 7)
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const earlyHalf = se != null
+      ? 7 * Math.floor((se * widen + 3) / 7)
       : half;
     let t = Math.max(t0, dayFloor(r.release - earlyHalf * DAY));
     t += ((r.releaseDow - new Date(t).getUTCDay() + 7) % 7) * DAY;
@@ -423,6 +428,13 @@ function eq(name, got, want) {
   const es = firm(rows, "Essential");
   eq("no missed rows anywhere", rows.every((r) => !r.missed), true);
   eq("Essential re-anchored to Wed 30 Sep", es && es.inDays, 27);
+  /* Essential's slot sits on the record's 28-day edge (the 31.5-day median
+     snapped back 3.5 days), so the only alternative the record offers is the
+     35-day Wednesday a week LATE: the label names Wed 7 Oct, never an early
+     21-day Wednesday the house has never filed on - and the ± is gone. */
+  eq("slot-referenced tails: one-sided late", es && [es.slotEarly, es.slotLate], [0, 7]);
+  eq("panel names only the late Wednesday", es && [pmLabel(es), dayAlt(es)], [" (or Wed 7 Oct)", " (or 34)"]);
+  eq("panel composes the one-sided tail", es && panelWhen(es), "in 27 days (or 34)");
   eq("no overdue item in the ticker", items.every((i) => !i.overdue), true);
 }
 

@@ -5886,9 +5886,27 @@ function npProject(nowOverride) {
          weeks for a weekday house (Essential's ±4 days is a ±1 week claim),
          raw days for everyone else. See spreadDays. */
       const winHalf = spreadDays(c, sp);
+      /* The tails a label names as alternatives must re-reference to THIS
+         slot, not to the median interval they were measured around.
+         Essential's median gap is 31.5 days with ±3.5 of scatter, but the
+         projected slot snaps back 3.5 days to the 28-day Wednesday – the
+         nearest end of the record – so relative to the slot the only
+         alternative the record offers is the 35-day Wednesday a WEEK LATE;
+         the symmetric ± it carried named a 21-day Wednesday the house has
+         never filed on. slotEarly/slotLate rebase the measured tails by how
+         far the weekday snap moved this slot (zero when it sits exactly a
+         cadence of weeks out: tail 2+ slots stay symmetric, which is right
+         – a 63-day claim's alternatives genuinely are 56 and 70). Only a
+         dated house gets the pair; everyone else's tails stay as measured.
+         Clamped at zero, since an alternative cannot sit off the record. */
+      const slotShift = c.releaseDow != null && !c.loose && c.spreadEarly != null
+        ? (release - (field + c.lag * DAY_MS)) / DAY_MS
+        : null;
       rows.push({
         ...c, field, release, overdue, ahead: i,
         spread: sp, winHalf,
+        slotEarly: slotShift == null ? null : Math.max(0, c.spreadEarly + slotShift),
+        slotLate: slotShift == null ? null : Math.max(0, c.spreadLate - slotShift),
         /* This slot already landed on the house's measured late step because
            a confirmed skip pushed it there: it IS the late alternative the
            ± would name. Flag it so the row labels don't offer a further
@@ -12896,10 +12914,18 @@ function NextPollsPanel() {
        would land on a date confirmed never filed. So a rolled slot names
        itself and nothing else. */
     if (r.rolled) return "";
-    if (r.releaseDow != null && r.spreadEarly != null) {
+    /* The tails are read off the SLOT (slotEarly/slotLate, rebased by the
+       projection onto where the slot sits in the house's gap record), not
+       off the median interval: Essential's record scatters ±3.5 days around
+       a 31.5-day median, but its slot lands on the record's 28-day edge, so
+       its only real alternative is the 35-day Wednesday a week late - the
+       symmetric "± 1 week" named an early Wednesday the house never files. */
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const sl = r.slotLate != null ? r.slotLate : r.spreadLate;
+    if (r.releaseDow != null && se != null) {
       const widen = Math.sqrt(r.ahead + 1);
-      const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
-      const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
+      const earlyW = Math.floor((se * widen + 3) / 7);
+      const lateW = Math.floor((sl * widen + 3) / 7);
       if (earlyW === 0 && lateW >= 1) return ` (or ${fmt(r.release + lateW * 7 * DAY_MS)})`;
       if (lateW === 0 && earlyW >= 1) return ` (or ${fmt(r.release - earlyW * 7 * DAY_MS)})`;
     }
@@ -12913,10 +12939,12 @@ function NextPollsPanel() {
      don't, and their tail must spell it out ("today (or 7 days)"). */
   const dayAlt = r => {
     if (r.rolled) return null; // the slot IS the late step - see pmLabel
-    if (r.releaseDow != null && r.spreadEarly != null) {
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const sl = r.slotLate != null ? r.slotLate : r.spreadLate;
+    if (r.releaseDow != null && se != null) {
       const widen = Math.sqrt(r.ahead + 1);
-      const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
-      const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
+      const earlyW = Math.floor((se * widen + 3) / 7);
+      const lateW = Math.floor((sl * widen + 3) / 7);
       if (earlyW === 0 && lateW >= 1) return ` (or ${r.inDays + lateW * 7}${r.inDays < 2 && r.inDays >= 0 ? " days" : ""})`;
       if (lateW === 0 && earlyW >= 1 && r.inDays - earlyW * 7 >= 1) return ` (or ${r.inDays - earlyW * 7})`;
     }
@@ -13663,9 +13691,12 @@ function NextPollTicker({
        ever filed a slot early, so counting to release - ±half names a date
        with no precedent - Resolve was counting down to Sun 6 Sep when its
        real alternatives are Sun 13 and Sun 20 Sep. spreadEarly=0 keeps the
-       countdown on the projected day itself. */
+       countdown on the projected day itself. The projection's slotEarly
+       (tails rebased to the slot's own place in the record) is the same
+       measure relative to the slot, and takes precedence where it exists. */
     const widen = Math.sqrt((r.ahead || 0) + 1);
-    const earlyHalf = r.spreadEarly != null ? 7 * Math.floor((r.spreadEarly * widen + 3) / 7) : half;
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const earlyHalf = se != null ? 7 * Math.floor((se * widen + 3) / 7) : half;
     let t = Math.max(t0, dayFloor(r.release - earlyHalf * TN_DAY));
     t += (r.releaseDow - new Date(t).getUTCDay() + 7) % 7 * TN_DAY;
     return {
@@ -19808,7 +19839,7 @@ function infoTerms(D) {
   }, {
     id: "next-polls",
     term: "Next polls",
-    body: /*#__PURE__*/React.createElement(React.Fragment, null, "When each house is likely to publish next, forecast from its own record. Its dates are the median gap between its last eight releases, nudged no more than three days onto the weekday the house keeps. Where recent releases carry publication dates in an unbroken run, the gaps measured are those between them, not the fieldwork dates \u2013 the steadier clock, and the thing actually being forecast. The \xB1 is half the spread of the gaps with the longest and shortest set aside, widening for waves further out, and in whole weeks for a house pinned to a weekday, the only step its date can take. A filing hour appears where a house has been timed often enough, always on the publisher\u2019s own clock (AEDT through summer, AEST otherwise), and \u201Ctoday\u201D is Sydney\u2019s; weekday and hour are read off recent releases, a schedule being a current fact about a house. A house too variable for a date gets the window its record supports, and a schedule stated but not kept \u2013 Roy Morgan\u2019s \u2013 is taken as stated. A projection is a moment, not a guess: a date that passes unpublished holds its row and counts on to the far edge of its window, reading as missed, in red, only once that has passed too, and it leaves the list only when the real release is added \u2013 never on a date guessed in its place. The countdown in the tab bar marks the same thing the same way: an unrecorded wave leads it, red, counting the days it is late. Opening a row shows the house\u2019s five most recent releases and its own release page, so the forecast can be checked against the record it came from. Houses that have stopped publishing are removed by hand rather than read out of their silence. These are estimates, not announced dates.")
+    body: /*#__PURE__*/React.createElement(React.Fragment, null, "When each house is likely to publish next, forecast from its own record. Its dates are the median gap between its last eight releases, nudged no more than three days onto the weekday the house keeps. Where recent releases carry publication dates in an unbroken run, the gaps measured are those between them, not the fieldwork dates \u2013 the steadier clock, and the thing actually being forecast. The \xB1 is half the spread of the gaps with the longest and shortest set aside, widening for waves further out, and in whole weeks for a house pinned to a weekday, the only step its date can take. A projected date will not always sit in the middle of the house's record \u2013 if it lands on the record's near edge, only a later filing day gets named as the alternative: \u201C(or Wed 7 Oct)\u201D, never an early day the house has not filed on.", " ", "A filing hour appears where a house has been timed often enough, always on the publisher\u2019s own clock (AEDT through summer, AEST otherwise), and \u201Ctoday\u201D is Sydney\u2019s; weekday and hour are read off recent releases, a schedule being a current fact about a house. A house too variable for a date gets the window its record supports, and a schedule stated but not kept \u2013 Roy Morgan\u2019s \u2013 is taken as stated. A projection is a moment, not a guess: a date that passes unpublished holds its row and counts on to the far edge of its window, reading as missed, in red, only once that has passed too, and it leaves the list only when the real release is added \u2013 never on a date guessed in its place. The countdown in the tab bar marks the same thing the same way: an unrecorded wave leads it, red, counting the days it is late. Opening a row shows the house\u2019s five most recent releases and its own release page, so the forecast can be checked against the record it came from. Houses that have stopped publishing are removed by hand rather than read out of their silence. These are estimates, not announced dates.")
   }, {
     id: "polling-error",
     term: "Polling error",

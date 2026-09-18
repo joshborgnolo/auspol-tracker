@@ -2599,10 +2599,18 @@ function NextPollsPanel() {
        would land on a date confirmed never filed. So a rolled slot names
        itself and nothing else. */
     if (r.rolled) return "";
-    if (r.releaseDow != null && r.spreadEarly != null) {
+    /* The tails are read off the SLOT (slotEarly/slotLate, rebased by the
+       projection onto where the slot sits in the house's gap record), not
+       off the median interval: Essential's record scatters ±3.5 days around
+       a 31.5-day median, but its slot lands on the record's 28-day edge, so
+       its only real alternative is the 35-day Wednesday a week late - the
+       symmetric "± 1 week" named an early Wednesday the house never files. */
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const sl = r.slotLate != null ? r.slotLate : r.spreadLate;
+    if (r.releaseDow != null && se != null) {
       const widen = Math.sqrt(r.ahead + 1);
-      const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
-      const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
+      const earlyW = Math.floor((se * widen + 3) / 7);
+      const lateW = Math.floor((sl * widen + 3) / 7);
       if (earlyW === 0 && lateW >= 1) return ` (or ${fmt(r.release + lateW * 7 * DAY_MS)})`;
       if (lateW === 0 && earlyW >= 1) return ` (or ${fmt(r.release - earlyW * 7 * DAY_MS)})`;
     }
@@ -2616,10 +2624,12 @@ function NextPollsPanel() {
      don't, and their tail must spell it out ("today (or 7 days)"). */
   const dayAlt = (r) => {
     if (r.rolled) return null;   // the slot IS the late step - see pmLabel
-    if (r.releaseDow != null && r.spreadEarly != null) {
+    const se = r.slotEarly != null ? r.slotEarly : r.spreadEarly;
+    const sl = r.slotLate != null ? r.slotLate : r.spreadLate;
+    if (r.releaseDow != null && se != null) {
       const widen = Math.sqrt(r.ahead + 1);
-      const earlyW = Math.floor((r.spreadEarly * widen + 3) / 7);
-      const lateW = Math.floor((r.spreadLate * widen + 3) / 7);
+      const earlyW = Math.floor((se * widen + 3) / 7);
+      const lateW = Math.floor((sl * widen + 3) / 7);
       if (earlyW === 0 && lateW >= 1)
         return ` (or ${r.inDays + lateW * 7}${r.inDays < 2 && r.inDays >= 0 ? " days" : ""})`;
       if (lateW === 0 && earlyW >= 1 && r.inDays - earlyW * 7 >= 1)

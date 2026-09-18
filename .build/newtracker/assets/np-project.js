@@ -201,9 +201,27 @@ function npProject(nowOverride) {
          weeks for a weekday house (Essential's ±4 days is a ±1 week claim),
          raw days for everyone else. See spreadDays. */
       const winHalf = spreadDays(c, sp);
+      /* The tails a label names as alternatives must re-reference to THIS
+         slot, not to the median interval they were measured around.
+         Essential's median gap is 31.5 days with ±3.5 of scatter, but the
+         projected slot snaps back 3.5 days to the 28-day Wednesday – the
+         nearest end of the record – so relative to the slot the only
+         alternative the record offers is the 35-day Wednesday a WEEK LATE;
+         the symmetric ± it carried named a 21-day Wednesday the house has
+         never filed on. slotEarly/slotLate rebase the measured tails by how
+         far the weekday snap moved this slot (zero when it sits exactly a
+         cadence of weeks out: tail 2+ slots stay symmetric, which is right
+         – a 63-day claim's alternatives genuinely are 56 and 70). Only a
+         dated house gets the pair; everyone else's tails stay as measured.
+         Clamped at zero, since an alternative cannot sit off the record. */
+      const slotShift = c.releaseDow != null && !c.loose && c.spreadEarly != null
+        ? (release - (field + c.lag * DAY_MS)) / DAY_MS
+        : null;
       rows.push({
         ...c, field, release, overdue, ahead: i,
         spread: sp, winHalf,
+        slotEarly: slotShift == null ? null : Math.max(0, c.spreadEarly + slotShift),
+        slotLate: slotShift == null ? null : Math.max(0, c.spreadLate - slotShift),
         /* This slot already landed on the house's measured late step because
            a confirmed skip pushed it there: it IS the late alternative the
            ± would name. Flag it so the row labels don't offer a further
