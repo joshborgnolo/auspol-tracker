@@ -22,8 +22,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
-  issues: write
 
 jobs:
   pending:
@@ -51,7 +49,6 @@ jobs:
     with:
       house: demosau
       wrapper: .build/demosau-updater.sh
-      repair_prompt: .build/demosau-repair-prompt.md
       apt_packages: poppler-utils
       simulate_failure: ${{ inputs.simulate_failure }}
     secrets: inherit

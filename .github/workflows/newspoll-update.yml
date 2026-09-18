@@ -36,8 +36,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
-  issues: write
 
 jobs:
   run:
@@ -45,6 +43,5 @@ jobs:
     with:
       house: newspoll
       wrapper: .build/newspoll-updater.sh
-      repair_prompt: .build/newspoll-repair-prompt.md
       simulate_failure: ${{ inputs.simulate_failure }}
     secrets: inherit

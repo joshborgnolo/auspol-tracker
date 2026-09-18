@@ -20,8 +20,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
-  issues: write
 
 jobs:
   run:
@@ -29,6 +27,5 @@ jobs:
     with:
       house: resolve
       wrapper: .build/resolve-rpm-updater.sh
-      repair_prompt: .build/resolve-repair-prompt.md
       simulate_failure: ${{ inputs.simulate_failure }}
     secrets: inherit

@@ -1,0 +1,295 @@
+# Central repair agent for the repo. Any failing workflow run on main fires
+# this: a breaker-gated headless-Matilda session diagnoses the failure from
+# the failed run's log, reproduces it locally, publishes a minimal fix as
+# commits on LOCAL main, and only the deterministic post-gate (forbidden
+# paths, syntax checks, validate.mjs) may push HEAD:main. The agent phase
+# holds no git credentials — it cannot push, exfiltrate, or create PRs.
+#
+# Replaces the per-workflow PR-gated repair jobs (poll-agent.yml `repair`,
+# and the in-job repairs in roymorgan-update.yml, coverage-check.yml,
+# prediction-refresh.yml) retired in the same commit: repairs land straight
+# on main, and the gate + prompt hard rules + circuit breaker carry what
+# the human PR review used to.
+#
+# NOT self-triggering: this workflow is deliberately missing from its own
+# `workflow_run.workflows` list, so a red agent-repair run emails normally
+# instead of spawning repairs of repairs.
+
+name: agent-repair
+
+on:
+  workflow_run:
+    workflows: # every workflow on main except this one (poll-agent is reusable-only)
+      - resolve-update
+      - demosau-update
+      - essential-update
+      - redbridge-update
+      - spectre-update
+      - foxhedgehog-update
+      - newspoll-update
+      - sampleeff-update
+      - roymorgan-update
+      - coverage-check
+      - citation-check
+      - prediction-refresh
+      - np-score
+      - newspoll-watch
+      - site-check
+      - tests
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      failed_run_id:
+        description: 'Run ID of the failed workflow run to repair'
+        required: true
+        type: string
+      workflow_name:
+        description: 'Name of the failed workflow (drives the house-prompt map)'
+        required: true
+        type: string
+
+run-name: "agent-repair: ${{ github.event.workflow_run.name || inputs.workflow_name }}"
+
+permissions:
+  contents: write # push the repaired main
+  actions: read   # read the failed run's metadata/log via gh
+  issues: write   # circuit-breaker + gate-block alert issues
+
+jobs:
+  gate:
+    # Only failures on main are repair work. Green runs, cancelled runs and
+    # branch runs exit here without spending a cent.
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'failure' && github.event.workflow_run.head_branch == 'main')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      allowed: ${{ steps.breaker.outputs.allowed }}
+      failed_run_id: ${{ steps.ctx.outputs.failed_run_id }}
+      workflow_name: ${{ steps.ctx.outputs.workflow_name }}
+      house_prompt: ${{ steps.ctx.outputs.house_prompt }}
+      run_url: ${{ steps.ctx.outputs.run_url }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+
+      - name: Resolve run context and house-prompt map
+        id: ctx
+        env:
+          DISPATCH_RUN: ${{ inputs.failed_run_id || '' }}
+          DISPATCH_WF: ${{ inputs.workflow_name || '' }}
+          EVENT_WF: ${{ github.event.workflow_run.name || '' }}
+          EVENT_RUN: ${{ github.event.workflow_run.id || '' }}
+        run: |
+          set -eu
+          if [ -n "$DISPATCH_RUN" ]; then
+            RUN_ID="$DISPATCH_RUN"; WF="$DISPATCH_WF"
+          else
+            RUN_ID="$EVENT_RUN"; WF="$EVENT_WF"
+          fi
+          case "$WF" in
+            essential-update)   HP=.build/essential-repair-prompt.md ;;
+            resolve-update)     HP=.build/resolve-repair-prompt.md ;;
+            demosau-update)     HP=.build/demosau-repair-prompt.md ;;
+            redbridge-update)   HP=.build/redbridge-repair-prompt.md ;;
+            spectre-update)     HP=.build/spectre-repair-prompt.md ;;
+            foxhedgehog-update) HP=.build/foxhedgehog-repair-prompt.md ;;
+            newspoll-update)    HP=.build/newspoll-repair-prompt.md ;;
+            sampleeff-update)   HP=.build/sampleeff-repair-prompt.md ;;
+            roymorgan-update)   HP=.build/roymorgan-repair-prompt.md ;;
+            coverage-check)     HP=.build/coverage-doctor-repair-prompt.md ;;
+            prediction-refresh) HP=.build/prediction-repair-prompt.md ;;
+            *)                  HP="" ;;
+          esac
+          RUN_URL="https://github.com/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}"
+          {
+            echo "failed_run_id=$RUN_ID"
+            echo "workflow_name=$WF"
+            echo "house_prompt=$HP"
+            echo "run_url=$RUN_URL"
+          } >> "$GITHUB_OUTPUT"
+          echo "failed run: $RUN_URL (workflow '$WF', house prompt: ${HP:-none — generic repair})"
+
+      # A persistent breakage fires a repair on every failed slot — Roy Morgan
+      # alone has 12 slots a Monday. The breaker counts this workflow's
+      # agent-repair runs in the trailing 24h and closes the loop at 3.
+      - name: Circuit breaker
+        id: breaker
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WF: ${{ steps.ctx.outputs.workflow_name }}
+        run: bash .build/repair-gate.sh "$WF"
+
+      - name: Alert when the circuit breaker is tripped
+        if: steps.breaker.outputs.allowed == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WF: ${{ steps.ctx.outputs.workflow_name }}
+          RUN_URL: ${{ steps.ctx.outputs.run_url }}
+        run: |
+          bash .build/alert-issue.sh \
+            "Repair circuit breaker: ${WF}" \
+            "Three agent-repair sessions in 24h and ${WF} is still failing — [failed run](${RUN_URL}). No further agent sessions this window; this needs a human."
+
+  repair:
+    needs: gate
+    if: needs.gate.outputs.allowed == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 35 # 25m agent wall-clock + gate/push headroom
+    # Push-capable → serialise with every other main writer (updaters,
+    # coverage, np-score, and sibling repair jobs); queue, never cancel.
+    concurrency:
+      group: main-writers
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+        with:
+          fetch-depth: 0 # prediction's model scripts read git show origin/main:...
+
+      - name: Pin Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Record the base commit
+        id: base
+        run: echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      # Parity with the failing jobs' environments: pdf houses need
+      # poppler, wrappers may redraw the share card through puppeteer-core.
+      - name: Install pdf tooling (poppler)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq poppler-utils
+
+      - name: Install puppeteer-core (best effort, for the share-card redraw)
+        run: npm ci --ignore-scripts --no-audit --no-fund || true
+
+      - name: Fetch the failed run's job log
+        continue-on-error: true # a log-fetch hiccup must not block repair; the prompt tells the agent to reproduce locally instead
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RUN_ID: ${{ needs.gate.outputs.failed_run_id }}
+        run: |
+          mkdir -p .build/logs
+          gh run view "$RUN_ID" --log > .build/logs/failed-run.log 2>&1 || \
+            gh run view "$RUN_ID" --log-failed > .build/logs/failed-run.log 2>&1 || true
+          wc -l < .build/logs/failed-run.log || true
+
+      # The agent phase gets NO git credentials: only the deterministic
+      # post-gate may re-attach the token and push. Prompts off so a stray
+      # credential prompt fails fast instead of hanging.
+      - name: Strip git credentials for the agent phase
+        run: |
+          git config --unset-all http.https://github.com/.extraheader || true
+          git config --unset-all url."https://github.com/".insteadOf || true
+          git config --unset-all url."git@github.com:".insteadOf || true
+
+      # Pin the repair-agent CLI: a floating @latest install means a tag
+      # move (compromised or accidental) changes the code that runs with
+      # contents:write and MATILDA_API_KEY. Bump this deliberately after
+      # verifying the new release. (Pin sites: poll-agent.yml's update-side,
+      # roymorgan-update.yml, coverage-check.yml, prediction-refresh.yml,
+      # newspoll-watch.yml, and here — grep `matilda-code@` before bumping.)
+      - name: Install Matilda CLI
+        run: npm i -g @maincode-ai/matilda-code@0.21.4
+
+      - name: Assemble the repair prompt
+        env:
+          WF: ${{ needs.gate.outputs.workflow_name }}
+          RUN_URL: ${{ needs.gate.outputs.run_url }}
+          HOUSE_PROMPT: ${{ needs.gate.outputs.house_prompt }}
+        run: |
+          {
+            echo "FAILING_WORKFLOW: $WF"
+            echo "FAILED_RUN_URL: $RUN_URL"
+            echo "HOUSE_PROMPT: ${HOUSE_PROMPT:-none}"
+            echo
+            cat .build/agent-repair-prompt.md
+          } > .build/agent-repair-run.md
+
+      # Deliberately NO GITHUB_TOKEN/GH_TOKEN here: the agent edits and
+      # commits locally; the post-gate owns every remote operation.
+      - name: Run the repair agent
+        env:
+          MATILDA_API_KEY: ${{ secrets.MATILDA_API_KEY }}
+          CHROME: /usr/bin/google-chrome
+          GIT_TERMINAL_PROMPT: "0"
+          AUSPOL_PR_GATE: "1" # wrappers self-skip their own push; their data commits stay local for the gate
+        run: |
+          if [ -z "$MATILDA_API_KEY" ]; then
+            echo "::warning::MATILDA_API_KEY secret not set; skipping repair. Add it in repo Settings > Secrets."
+            exit 0
+          fi
+          matilda -p "$(cat .build/agent-repair-run.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
+
+      - name: Gate the repair commits and push main
+        if: always() # an out-of-budget agent may still have left good commits
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BASE: ${{ steps.base.outputs.sha }}
+          WF: ${{ needs.gate.outputs.workflow_name }}
+          RUN_URL: ${{ needs.gate.outputs.run_url }}
+        run: |
+          set -u
+          block() {
+            echo "::error::$1"
+            GH_TOKEN="$GH_TOKEN" bash .build/alert-issue.sh \
+              "Repair gate blocked: ${WF}" \
+              "An agent-repair session for ${WF} left commits the deterministic gate refused to push: $1 — [workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}). Commits remain on the runner only; main is untouched." || true
+            exit 1
+          }
+
+          # The agent must commit on main itself — a branch/ref left behind
+          # means it went off-script; refuse to push whatever it did.
+          [ "$(git symbolic-ref --short HEAD)" = "main" ] || block "agent left HEAD off main"
+
+          if git diff --quiet "$BASE" HEAD; then
+            echo "no repair commits; nothing to push (agent's report is in the log above)"
+            exit 0
+          fi
+
+          git log --oneline "$BASE..HEAD"
+          CHANGED="$(git diff --name-only "$BASE..HEAD")"
+          echo "$CHANGED"
+
+          # Human-review replacement #1: generated artifacts, CI, dependency
+          # manifests and infra are off-limits to agents, in code. A repair
+          # needing them is a human's job.
+          if echo "$CHANGED" | grep -E '^(\.github/|assets/|index\.html$|feed\.xml$|sitemap\.xml$|robots\.txt$|CNAME$|package\.json$|package-lock\.json$|\.nvmrc$)' | grep -q .; then
+            block "repair commits touch forbidden paths"
+          fi
+          # Never push the agent's scratch (log dir is gitignored, belt+braces)
+          if echo "$CHANGED" | grep -q '^\.build/logs/'; then
+            block "repair commits include .build/logs scratch"
+          fi
+
+          # Human-review replacement #2: syntax checks on everything the
+          # agent touched, then the same data validator the wrappers run.
+          while IFS= read -r f; do
+            case "$f" in
+              *.mjs) node --check "$f" || block "node --check failed on $f" ;;
+              *.sh)  bash -n "$f"       || block "bash -n failed on $f" ;;
+            esac
+          done <<< "$CHANGED"
+          node .build/newtracker/validate.mjs || block "validate.mjs failed against the repaired tree"
+
+          # Head-of-the-queue push with ONE rebase retry — the CI-agent
+          # analogue of push_main (ci-main-writer-races): a writer that lost
+          # the main-writers queue may have raced a launchd/human push. Repair
+          # commits never carry index.html, so no rebuild step is needed.
+          AUTH="http.https://github.com/.extraheader=AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)"
+          if git -c "$AUTH" push origin HEAD:main; then
+            echo "pushed repair to main"
+            exit 0
+          fi
+          echo "first push rejected; rebasing onto origin/main and retrying once"
+          git -c "$AUTH" pull --rebase origin main || {
+            git rebase --abort || true
+            block "rebase onto origin/main conflicted"
+          }
+          node .build/newtracker/validate.mjs || block "validate.mjs failed after rebase"
+          git -c "$AUTH" push origin HEAD:main || block "second push rejected"
+          echo "pushed repair to main after one rebase"

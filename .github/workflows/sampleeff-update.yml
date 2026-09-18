@@ -18,8 +18,6 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
-  issues: write
 
 jobs:
   run:
@@ -27,7 +25,6 @@ jobs:
     with:
       house: sampleeff
       wrapper: .build/sampleeff-updater.sh
-      repair_prompt: .build/sampleeff-repair-prompt.md
       apt_packages: poppler-utils
       simulate_failure: ${{ inputs.simulate_failure }}
     secrets: inherit
