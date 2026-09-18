@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp, FLOW, FLOW_PCT, FLOW_TABLE } from "./flows.mjs";
+import { impliedAlp2pp, FLOW, FLOW_TABLE } from "./flows.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -1421,192 +1421,23 @@ const FLOW_BASE_FROM = {};
 const driftAnom = driftResid
   .filter((r) => FLOW_BASE_FROM[r.firm])
   .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key }));
-/* Implied per-house flow shares (the table under the drift chart). Within
-   one house, the part of its published 2PP swings its primary columns
-   should explain under the election's flow table lands in the coefficients
-   of
-     share2pp − alp  =  c + βg·grn + βo·onp + βt·(ind+oth) + ε
-   Every wave counts ONCE — the residual noise is poll-to-poll (2PP
-   rounding, genuinely moving flows, method tweaks), not sample counts, so
-   an n-weighted fit claims ±0.2pt certainty the waves don't have. Every
-   share is then SHRUNK toward the election's flow table: a Gaussian prior
-   f ~ N(FLOW, τ²) solved as a ridge (X'X + Λ)f = X'y + Λf0, with the wave
-   residual variance σ̂²w POOLED across houses (one house's own σ̂ can be
-   flukily tiny when four parameters nearly interpolate eight waves) and
-   Λ = diag(σ̂²w/τ_int², σ̂²w/τ² ×3). A cell therefore departs from the
-   election row only as far as that house's own primaries co-movement can
-   demonstrate — the whole point of holding the table against the AEC row:
-   thin or gently-moving series earn no strong claim and sit near the
-   election figures. The intercept c soaks the house's fixed method offset
-   (allocation basis again) under its own weak prior N(0, τ_int²). (The
-   n-weighted box-constrained WLS this replaces — shipped and retired the
-   same day — fit rounding noise on near-constant primary columns:
-   Newspoll's Greens "share" came out pinned at 100%.) Emitted betas are
-   clamped to [0,1] as a seatbelt against future pathological data; on
-   current data the ridge keeps every cell interior. House with
-   < FLOW_FIT_MIN joined waves (or a primary column that never varies,
-   singular matrix) is omitted rather than fit on noise. Diagnostic only,
-   like the panel it sits under — it feeds no other figure. */
-const FLOW_FIT_MIN = 6;          // min joined waves per house to attempt a fit
-const FLOW_FIT_TAU = 0.12;       // prior SD on each flow share (12 pts in share units)
-const FLOW_FIT_TAU_INT = 0.05;   // prior SD on the intercept (5 pts), prior mean 0
-/* 4×4 Gaussian elimination with partial pivoting on a COPY of A and b
-   (caller's arrays are preserved — the posterior covariance needs the
-   same design afterwards); null return = singular (a regressor never
-   varies within the house). */
-function flow4Solve(Ain, bin) {
-  const A = Ain.map((row) => [...row]);
-  const b = [...bin];
-  for (let col = 0; col < 4; col++) {
-    let piv = col;
-    for (let r = col + 1; r < 4; r++) if (Math.abs(A[r][col]) > Math.abs(A[piv][col])) piv = r;
-    if (Math.abs(A[piv][col]) < 1e-9) return null;
-    if (piv !== col) { [A[col], A[piv]] = [A[piv], A[col]]; [b[col], b[piv]] = [b[piv], b[col]]; }
-    for (let r = col + 1; r < 4; r++) {
-      const f = A[r][col] / A[col][col];
-      for (let j = col; j < 4; j++) A[r][j] -= f * A[col][j];
-      b[r] -= f * b[col];
-    }
-  }
-  const beta = [0, 0, 0, 0];
-  for (let i = 3; i >= 0; i--) {
-    let s = b[i];
-    for (let j = i + 1; j < 4; j++) s -= A[i][j] * beta[j];
-    beta[i] = s / A[i][i];
-  }
-  return beta;
-}
-function flow4Inv(Ain) {
-  const M = Ain.map((row, i) => [...row, ...[0, 0, 0, 0].map((_, j) => (i === j ? 1 : 0))]);
-  for (let col = 0; col < 4; col++) {
-    let piv = col;
-    for (let r = col + 1; r < 4; r++) if (Math.abs(M[r][col]) > Math.abs(M[piv][col])) piv = r;
-    if (Math.abs(M[piv][col]) < 1e-12) return null;
-    [M[col], M[piv]] = [M[piv], M[col]];
-    const d = M[col][col];
-    for (let j = 0; j < 8; j++) M[col][j] /= d;
-    for (let r = 0; r < 4; r++) {
-      if (r === col) continue;
-      const f = M[r][col];
-      for (let j = 0; j < 8; j++) M[r][j] -= f * M[col][j];
-    }
-  }
-  return M.map((row) => row.slice(4));
-}
-/* X'X and X'y for the [1, g, o, t] design, unit weight per wave. */
-function flowDesign(rows) {
-  const A = Array.from({ length: 4 }, () => [0, 0, 0, 0]);
-  const b = [0, 0, 0, 0];
-  for (const r of rows) {
-    const x = [1, r.g, r.o, r.t];
-    for (let i = 0; i < 4; i++) {
-      b[i] += x[i] * r.y;
-      for (let j = 0; j < 4; j++) A[i][j] += x[i] * x[j];
-    }
-  }
-  return { A, b };
-}
-function flowRidge(rows, sigma2W) {
-  const f0 = [0, FLOW.grn, FLOW.onp, FLOW.oth];
-  const lamS = sigma2W / (FLOW_FIT_TAU * FLOW_FIT_TAU);
-  const lamI = sigma2W / (FLOW_FIT_TAU_INT * FLOW_FIT_TAU_INT);
-  const { A, b } = flowDesign(rows);
-  const beta = flow4Solve(A.map((row, i) => row.map((v, j) => (i === j ? v + (i === 0 ? lamI : lamS) : v))),
-                          b.map((v, i) => v + (i === 0 ? lamI : lamS) * f0[i]));
-  if (!beta) return null;
-  const inv = flow4Inv(A.map((row, i) => row.map((v, j) => (i === j ? v + (i === 0 ? lamI : lamS) : v))));
-  if (!inv) return null;
-  return { beta, se: [1, 2, 3].map((i) => Math.sqrt(sigma2W * inv[i][i])) };
-}
-const flowFitRows = POLLS
-  .filter((p) => p.tpp_alp != null && p.alp != null && p.lnp != null && p.grn != null && p.onp != null && !p.sumNote)
-  .map((p) => ({ firm: p.pollster, y: share2pp(p) - p.alp, g: p.grn, o: p.onp, t: (p.ind || 0) + (p.oth || 0) }));
-const flowFitByFirm = new Map();
-for (const r of flowFitRows) {
-  if (!flowFitByFirm.has(r.firm)) flowFitByFirm.set(r.firm, []);
-  flowFitByFirm.get(r.firm).push(r);
-}
-let flowSigma2W = 1;
-{
-  let ssrSum = 0, dfSum = 0;
-  for (const rows of flowFitByFirm.values()) {
-    if (rows.length < FLOW_FIT_MIN) continue;
-    const { A, b } = flowDesign(rows);
-    const beta = flow4Solve(A, b);
-    if (!beta) continue;
-    let ssr = 0;
-    for (const r of rows) {
-      const x = [1, r.g, r.o, r.t];
-      const resid = r.y - (beta[0] * x[0] + beta[1] * x[1] + beta[2] * x[2] + beta[3] * x[3]);
-      ssr += resid * resid;
-    }
-    ssrSum += ssr;
-    dfSum += rows.length - 4;
-  }
-  if (dfSum > 0) flowSigma2W = ssrSum / dfSum;
-}
-/* Houses that PRINT their respondent allocation each wave need no fit: the
-   n-weighted term average of their own published per-cohort splits answers
-   the same question directly from measurement, so it replaces the ridge
-   row wholesale (the fit on such a house only re-derives a noisier version
-   of it). Emitted with m:1 so the renderer can mark the provenance and the
-   note can say so. The ± is a pure-count SE: each wave's published split
-   reads the term's allocation with a wave-to-wave SD declared at
-   FLOW_PUB_SD pts, so the weighted mean's SE is σ·√(Σw²)/Σw. Same
-   diagnostic-only status as the fits — it feeds nothing else. */
-const FLOW_PUB_MIN = 3;        // min published splits before a measured row replaces the fit
-const FLOW_PUB_SD = 10;        // assumed per-wave SD (pts) of a published cohort split
-const flowPubByFirm = new Map();
-for (const p of POLLS) {
-  if (p.tpp_split == null) continue;
-  if (!flowPubByFirm.has(p.pollster)) flowPubByFirm.set(p.pollster, []);
-  flowPubByFirm.get(p.pollster).push(p);
-}
-const flowMeasured = new Map();
-for (const [firm, rows] of flowPubByFirm) {
-  if (rows.length < FLOW_PUB_MIN) continue;
-  const ws = rows.map((p) => p.sample || 0);
-  const W = ws.reduce((s, w) => s + w, 0);
-  const wm = (k) => rows.reduce((s, p, i) => s + ws[i] * p.tpp_split[k], 0) / W;
-  const se = FLOW_PUB_SD * Math.sqrt(ws.reduce((s, w) => s + w * w, 0)) / W;
-  flowMeasured.set(firm, {
-    firm,
-    g: r1(wm("grn")), ge: r1(se),
-    o: r1(wm("onp")), oe: r1(se),
-    t: r1(wm("oth")), te: r1(se),
-    n: rows.length, m: 1,
-  });
-}
-/* How much of a fitted cell is the PRIOR rather than that house's own waves.
-   The ridge posterior precision is 1/se² = 1/τ² + (data precision), so the
-   prior's share of the information is simply (se/τ)². It is the number the
-   table could not say out loud: a cell at 0.6 is more the election row fed
-   back than a measurement of the house, and on this term's primaries the
-   Greens column is that for four houses of five — Greens first preferences
-   have travelled about a point since the election while One Nation's have
-   travelled twenty-two, so there is almost nothing in a Greens series for a
-   fit to hold on to. Emitted per cell; the panel dims the ones at or past a
-   half and says why. Measured rows (a house publishing its own allocation)
-   carry no share — they are not fits. */
-const priorShare = (sePct, tau) => r2(Math.min(1, (sePct / (tau * 100)) ** 2));
+/* The per-house implied-flow fit is deleted (2026-09-19). It asked whether
+   each house's allocation could be recovered from its own published 2PP and
+   primary swings, and the numbers answered no: the ridge's own standard
+   errors ran +/-4 to +/-9.5 on shares whose whole range of interest is
+   perhaps fifteen points, and tested against the election row exactly two of
+   fifteen fitted cells cleared 1.96*se -- both Roy Morgan's. On the
+   Labor-v-One-Nation pairing not one of six cleared it. The flows are not
+   derivable at this signal-to-noise, so the table that presented them as if
+   they were is gone, and so is the machinery behind it.
 
-const flowFits = [];
-for (const [firm, rows] of flowFitByFirm) {
-  if (flowMeasured.has(firm)) continue;   // the house's own published allocation beats a fitted constant
-  if (rows.length < FLOW_FIT_MIN) continue;
-  const fit = flowRidge(rows, flowSigma2W);
-  if (!fit) continue;
-  const clamp01 = (v) => Math.min(1, Math.max(0, v));
-  flowFits.push({
-    firm,
-    g: r1(clamp01(fit.beta[1]) * 100), ge: r1(fit.se[0] * 100), gp: priorShare(fit.se[0] * 100, FLOW_FIT_TAU),
-    o: r1(clamp01(fit.beta[2]) * 100), oe: r1(fit.se[1] * 100), op: priorShare(fit.se[1] * 100, FLOW_FIT_TAU),
-    t: r1(clamp01(fit.beta[3]) * 100), te: r1(fit.se[2] * 100), tp: priorShare(fit.se[2] * 100, FLOW_FIT_TAU),
-    n: rows.length,
-  });
-}
-for (const row of flowMeasured.values()) flowFits.push(row);
-flowFits.sort((a, z) => (a.firm < z.firm ? -1 : 1));
+   The drift diagnostic this section still emits is untouched, and is the part
+   that always worked: it measures each house's published-minus-implied gap
+   against that house's OWN baseline, which needs no per-bucket split and
+   carries no such error. What is gone is only the attempt to say which bucket
+   a house's gap came from. Recoverable from git if enough houses ever publish
+   enough waves to make the fit identifiable.
+ */
 const driftMonths = MONTHS.map((ym) => {
   const r = monthWithSe(driftAnom, null, ym);
   return r && { ym, x: mx(ym), v: r1(r.v), ci95: r1(1.96 * r.se), k: r.n };
@@ -1625,19 +1456,10 @@ const flowDrift = {
       return { ym, v: r1(rs.reduce((s, r) => s + r.n * r.x, 0) / w) };
     }).filter(Boolean),
   ])),
-  /* per-house implied flow shares (percent of the bucket's preferences to
-     Labor), fit above; the AEC row the table displays first lives in meta */
-  flows: flowFits,
   meta: {
     table: FLOW_TABLE,
     baseDays: FLOW_BASE_DAYS,
     anchor: ELECTION.date,
-    /* FLOW_PCT, not r1(FLOW.x * 100): FLOW.oth is 0.5455, a correct 4dp
-       rounding of the AEC's counted 0.545489 — but rounding THAT to a tenth
-       gives 54.6, half a tenth above what the ballots behind it
-       (1,268,209 v 1,056,696) actually say. The row is the count, so it
-       comes from the count. */
-    aec: { g: FLOW_PCT.grn, o: FLOW_PCT.onp, t: FLOW_PCT.oth },
     baseFrom: Object.fromEntries(Object.entries(FLOW_BASE_FROM).map(([f, b]) => [f, b.from])),
     houses: Object.keys(FLOW_BASE_FROM).sort(),
   },
@@ -1694,12 +1516,7 @@ const flowDrift = {
    so fullPrimOn stays impOk. With no published ALP-v-ON totals at all the
    block collapses to empty payload cells and flowDriftOn is emitted null. */
 const FLOW_ON_BASE_MIN = 3;
-const FLOW_ON_FIT_MIN = 6;          // min joined waves per house to attempt a fit
-const FLOW_ON_FIT_TAU = 0.12;       // prior SD on each flow share (12 pts in share units)
-const FLOW_ON_FIT_TAU_INT = 0.05;   // prior SD on the intercept (5 pts), prior mean 0
-const FLOW_ON_PUB_MIN = 3;          // min published splits before a measured row replaces the fit
-const FLOW_ON_PUB_SD = 10;          // assumed per-wave SD (pts) of a published cohort split
-const driftOnResid = [], flowOnFitRows = [];
+const driftOnResid = [];
 for (const [key, v] of ALT_BY.entries()) {
   if (v.ao == null) continue;
   const p = POLL_BY_KEY.get(key);
@@ -1707,7 +1524,6 @@ for (const [key, v] of ALT_BY.entries()) {
   const x = v.ao;                          // published ALP share of the pairing (0-100)
   driftOnResid.push({ ym: ymOf(p.date), mid: midMs(p), n: rowN(p), firm: key.split("|")[1], key,
                       pq: (x / 100) * (1 - x / 100) * 1e4, x: x - impliedOn(p) });
-  flowOnFitRows.push({ firm: key.split("|")[1], y: x - p.alp, g: p.lnp, o: p.grn, t: (p.ind || 0) + (p.oth || 0) });
 }
 const driftOnByFirm = new Map();
 for (const r of driftOnResid) {
@@ -1727,86 +1543,6 @@ for (const [firm, rows] of driftOnByFirm) {
 const driftOnAnom = driftOnResid
   .filter((r) => FLOW_ON_BASE_FROM[r.firm])
   .map((r) => ({ ym: r.ym, mid: r.mid, x: r.x - FLOW_ON_BASE_FROM[r.firm].base, n: r.n, pq: r.pq, firm: r.firm, key: r.key }));
-/* ridge with prior toward the frozen table — the §7c fitter with f0 for the
-   pairing's cohort mix [1, lnp, grn, ind+oth] pointed at FP_ON. Wave-equal
-   weights, σ̂²w pooled across houses: same argument, same constants. */
-function flowOnRidge(rows, sigma2W) {
-  const f0 = [0, FP_ON.lnp, FP_ON.grn, FP_ON.oth];
-  const lamS = sigma2W / (FLOW_ON_FIT_TAU * FLOW_ON_FIT_TAU);
-  const lamI = sigma2W / (FLOW_ON_FIT_TAU_INT * FLOW_ON_FIT_TAU_INT);
-  const { A, b } = flowDesign(rows);
-  const beta = flow4Solve(A.map((row, i) => row.map((v, j) => (i === j ? v + (i === 0 ? lamI : lamS) : v))),
-                          b.map((v, i) => v + (i === 0 ? lamI : lamS) * f0[i]));
-  if (!beta) return null;
-  const inv = flow4Inv(A.map((row, i) => row.map((v, j) => (i === j ? v + (i === 0 ? lamI : lamS) : v))));
-  if (!inv) return null;
-  return { beta, se: [1, 2, 3].map((i) => Math.sqrt(sigma2W * inv[i][i])) };
-}
-const flowOnFitByFirm = new Map();
-for (const r of flowOnFitRows) {
-  if (!flowOnFitByFirm.has(r.firm)) flowOnFitByFirm.set(r.firm, []);
-  flowOnFitByFirm.get(r.firm).push(r);
-}
-let flowOnSigma2W = 1;
-{
-  let ssrSum = 0, dfSum = 0;
-  for (const rows of flowOnFitByFirm.values()) {
-    if (rows.length < FLOW_ON_FIT_MIN) continue;
-    const { A, b } = flowDesign(rows);
-    const beta = flow4Solve(A, b);
-    if (!beta) continue;
-    let ssr = 0;
-    for (const r of rows) {
-      const x = [1, r.g, r.o, r.t];
-      const resid = r.y - (beta[0] * x[0] + beta[1] * x[1] + beta[2] * x[2] + beta[3] * x[3]);
-      ssr += resid * resid;
-    }
-    ssrSum += ssr;
-    dfSum += rows.length - 4;
-  }
-  if (dfSum > 0) flowOnSigma2W = ssrSum / dfSum;
-}
-/* the measured row is the house's own published allocation — RedBridge
-   prints the only respondent splits of this pairing, so its n-weighted
-   term mean replaces its fit row wholesale (m:1 provenance), as in §7c */
-const flowOnPubByFirm = new Map();
-for (const p of POLLS) {
-  if (p.tpp_split_on == null) continue;
-  if (!flowOnPubByFirm.has(p.pollster)) flowOnPubByFirm.set(p.pollster, []);
-  flowOnPubByFirm.get(p.pollster).push(p);
-}
-const flowOnMeasured = new Map();
-for (const [firm, rows] of flowOnPubByFirm) {
-  if (rows.length < FLOW_ON_PUB_MIN) continue;
-  const ws = rows.map((p) => p.sample || 0);
-  const W = ws.reduce((s, w) => s + w, 0);
-  const wm = (k) => rows.reduce((s, p, i) => s + ws[i] * p.tpp_split_on[k], 0) / W;
-  const se = FLOW_ON_PUB_SD * Math.sqrt(ws.reduce((s, w) => s + w * w, 0)) / W;
-  flowOnMeasured.set(firm, {
-    firm,
-    l: r1(wm("lnp")), le: r1(se),
-    g: r1(wm("grn")), ge: r1(se),
-    t: r1(wm("oth")), te: r1(se),
-    n: rows.length, m: 1,
-  });
-}
-const flowOnFits = [];
-for (const [firm, rows] of flowOnFitByFirm) {
-  if (flowOnMeasured.has(firm)) continue;   // the house's own published allocation beats a fitted constant
-  if (rows.length < FLOW_ON_FIT_MIN) continue;
-  const fit = flowOnRidge(rows, flowOnSigma2W);
-  if (!fit) continue;
-  const clamp01 = (v) => Math.min(1, Math.max(0, v));
-  flowOnFits.push({
-    firm,
-    l: r1(clamp01(fit.beta[1]) * 100), le: r1(fit.se[0] * 100), lp: priorShare(fit.se[0] * 100, FLOW_ON_FIT_TAU),
-    g: r1(clamp01(fit.beta[2]) * 100), ge: r1(fit.se[1] * 100), gp: priorShare(fit.se[1] * 100, FLOW_ON_FIT_TAU),
-    t: r1(clamp01(fit.beta[3]) * 100), te: r1(fit.se[2] * 100), tp: priorShare(fit.se[2] * 100, FLOW_ON_FIT_TAU),
-    n: rows.length,
-  });
-}
-for (const row of flowOnMeasured.values()) flowOnFits.push(row);
-flowOnFits.sort((a, z) => (a.firm < z.firm ? -1 : 1));
 const driftOnMonths = MONTHS.map((ym) => {
   const r = monthWithSe(driftOnAnom, null, ym);
   return r && { ym, x: mx(ym), v: r1(r.v), ci95: r1(1.96 * r.se), k: r.n };
@@ -1825,14 +1561,9 @@ const flowDriftOn = driftOnAnom.length ? {
       return { ym, v: r1(rs.reduce((s, r) => s + r.n * r.x, 0) / w) };
     }).filter(Boolean),
   ])),
-  flows: flowOnFits,
   meta: {
-    /* the frozen table's identity: NOT an election row — no count of the
-       pairing exists — but the first-principles set the page quotes the
-       pairing on (§7f). anchor null so the copy says so. */
-    pub: { l: r1(FP_ON.lnp * 100), g: r1(FP_ON.grn * 100), t: r1(FP_ON.oth * 100) },
-    pubSrc: "first-principles flow set",
-    sigma2w: r2(flowOnSigma2W),
+    /* anchor null: no count of this pairing exists, so there is no election
+       date for the copy to measure a baseline from. */
     anchor: null,
     baseFrom: Object.fromEntries(Object.entries(FLOW_ON_BASE_FROM).map(([f, b]) => [f, b.from])),
     houses: Object.keys(FLOW_ON_BASE_FROM).sort(),
@@ -3005,11 +2736,9 @@ console.log("pollsterTable:", pollsterTable.length, "→", pollsterTable.map((r)
 console.log("houseEffects (2PP):", Object.entries(houseEffect.snapshot(Infinity)).sort((a, b) => b[1].v - a[1].v).map(([f, h]) => `${f} ${h.v > 0 ? "+" : ""}${h.v}(n=${h.n})`).join(", "));
 console.log("flowDrift:", flowDrift.meta.houses.length, "houses | now:", JSON.stringify(flowDrift.now), "| last month:", JSON.stringify(flowDrift.months[flowDrift.months.length - 1]));
 console.log("  baseFrom:", Object.entries(flowDrift.meta.baseFrom).map(([f, d]) => `${f}→${d}`).join(", "));
-console.log("  flow fits (wave σ²w=" + JSON.stringify(r2(flowSigma2W)) + "): AEC", JSON.stringify(flowDrift.meta.aec), "|", flowDrift.flows.map((f) => `${f.firm} g${f.g}±${f.ge}/o${f.o}±${f.oe}/t${f.t}±${f.te} (n=${f.n}${f.m ? ", published mean" : ""})`).join(" · "));
 if (flowDriftOn) {
   console.log("flowDriftOn:", flowDriftOn.meta.houses.length, "houses | now:", JSON.stringify(flowDriftOn.now), "| last month:", JSON.stringify(flowDriftOn.months[flowDriftOn.months.length - 1]));
   console.log("  baseFrom:", Object.entries(flowDriftOn.meta.baseFrom).map(([f, d]) => `${f}→${d}`).join(", "));
-  console.log("  flow fits (wave σ²w=" + JSON.stringify(flowDriftOn.meta.sigma2w) + "): pub(" + flowDriftOn.meta.pubSrc + ")", JSON.stringify(flowDriftOn.meta.pub), "|", flowDriftOn.flows.map((f) => `${f.firm} l${f.l}±${f.le}/g${f.g}±${f.ge}/t${f.t}±${f.te} (n=${f.n}${f.m ? ", published mean" : ""})`).join(" · "));
 } else {
   console.log("flowDriftOn: skipped (no published ALP-v-ON head-to-heads to monitor)");
 }

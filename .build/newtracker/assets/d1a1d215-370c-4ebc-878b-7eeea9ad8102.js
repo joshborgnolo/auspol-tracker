@@ -3519,94 +3519,6 @@ function HouseLeanPanel({ rangeId }) {
    it stays on the surface beside the button; the eight houses agreeing with
    the pooled read to within its own error were never news, and are one click
    away. */
-/* One fitted cell, and the thing the table could never say: how much of it
-   is the house's own waves and how much is the election row fed back. Every
-   cell is shrunk toward that row, so a cell whose posterior barely moved off
-   the prior is not a measurement of the house — it is the prior, wearing the
-   house's name. The ridge gives it away for free: prior share = (se/τ)².
-
-   At or past a half the number goes quiet and says so on hover. It is not
-   hidden, because it is not WRONG — it is the best estimate available and it
-   happens to be the election's. It is dimmed because a reader comparing
-   Newspoll's Greens against the AEC's has to know they are reading one
-   number twice. */
-const FLOW_PRIOR_DIM = 0.5;
-/* The finding the table was leaving to the reader. Nine cells and a
-   two-hundred-word note is evidence, not a claim: it never said WHICH bucket
-   the houses disagree about, or what the disagreement is worth, which is the
-   only reason the decomposition is interesting at all. So the widest
-   well-identified column says so above the table, priced in the currency the
-   page trades in — points of two-party.
-
-   Prior-dominated cells are excluded from the spread. A gap between two cells
-   that are both mostly the election row is a gap between two copies of the
-   same number, and quoting it as house disagreement would be the exact error
-   the greying exists to prevent. */
-/* The table's own finding — and the finding has to survive a significance
-   test, which the first version of this did not. It reported the widest gap
-   between any two houses, and the widest gap in a column of ±4s is mostly
-   the widest pair of errors. The One Nation spread it announced (RedBridge
-   20.5 to Resolve 30.6) came to t = 1.68, and RedBridge is not even a fit —
-   its row averages that house's own published splits, a different quantity
-   with a different error — so the claim compared two incommensurable things
-   and was not significant on its own terms either.
-
-   What IS testable is a fitted cell against the reference row, which carries
-   no error of its own: |v − ref| > 1.96·se. On this term's data exactly two
-   cells pass, both Roy Morgan's, which is the honest content of an
-   eighteen-cell table and worth saying out loud. When nothing passes the line
-   renders nothing — which on the Labor-v-One-Nation table is every week so
-   far, and is itself the more useful statement. */
-function FlowFinding({ flows, cols, primary, refLabel }) {
-  const hits = [];
-  for (const c of cols) {
-    const prim = primary[c.prim];
-    if (prim == null || c.ref == null) continue;
-    for (const f of flows) {
-      // fitted rows only, and only cells the fit actually moved
-      if (f.m || f[c.key] == null || f[c.key + "e"] == null) continue;
-      if (f[c.key + "p"] != null && f[c.key + "p"] >= FLOW_PRIOR_DIM) continue;
-      const d = f[c.key] - c.ref;
-      if (Math.abs(d) <= 1.96 * f[c.key + "e"]) continue;
-      hits.push({ firm: f.firm.split(" /")[0], noun: c.noun, v: f[c.key],
-                  ref: c.ref, d, worth: Math.abs(d) * prim / 100 });
-    }
-  }
-  if (!hits.length) return null;
-  hits.sort((a, b) => b.worth - a.worth);
-  const firms = [...new Set(hits.map((h) => h.firm))];
-  const one = firms.length === 1;
-  return (
-    <p className="flow-tab-find">
-      {one ? <>Only <strong>{firms[0]}</strong>&rsquo;s allocation separates from {refLabel}</>
-           : <><strong>{firms.length} houses</strong> separate from {refLabel}</>}
-      {": "}
-      {hits.map((h, i) => (
-        <React.Fragment key={h.firm + h.noun}>
-          {i > 0 && (i === hits.length - 1 ? " and " : ", ")}
-          {!one && h.firm + " on "}{h.noun} {h.v.toFixed(1)}% against {h.ref.toFixed(1)}%
-        </React.Fragment>
-      ))}
-      {" "}&mdash; worth {hits.map((h) => h.worth.toFixed(1)).join(" and ")} point
-      {hits.length > 1 || hits[0].worth !== 1 ? "s" : ""} of two-party. Every other cell here
-      sits within its own error of that row: the houses publish different two-party figures,
-      but only {one ? "this one" : "these"} can be shown to be allocating differently.
-    </p>
-  );
-}
-
-function FlowCell({ v, se, prior }) {
-  const thin = prior != null && prior >= FLOW_PRIOR_DIM;
-  return (
-    <td className={thin ? "flow-tab-thin" : undefined}
-        title={prior == null ? undefined
-               : thin ? `Mostly the election row, not a reading of this house: ${Math.round(prior * 100)}% of this cell is the prior it was shrunk toward. Its own waves move this bucket too little to say more.`
-                      : `${Math.round((1 - prior) * 100)}% of this cell comes from this house's own waves, the rest from the election row it is shrunk toward.`}>
-      {v.toFixed(1)}%<span className="flow-tab-se"> ±{se.toFixed(1)}</span>
-    </td>
-  );
-}
-
 function FlowLegend({ pooledId, pooled, houseRows, hidden, setHidden, sgn, kind }) {
   const [pop, setPop] = useState(null);
   const total = houseRows.length;
@@ -3795,60 +3707,19 @@ function FlowDriftPanel({ rangeId }) {
         fmt={(v) => (v === 0 ? "" : sgn(v))}
       />
 
-      {fd.flows && fd.flows.length > 0 && fd.meta.aec && (
-        <div className="flow-tab-wrap">
-          <FlowFinding flows={fd.flows} primary={D.latest.primary}
-            refLabel="the election&rsquo;s own count" cols={[
-            { key: "g", noun: "Greens", prim: "grn", ref: fd.meta.aec.g },
-            { key: "o", noun: "One Nation", prim: "onp", ref: fd.meta.aec.o },
-            { key: "t", noun: "minor-party and independent", prim: "oth", ref: fd.meta.aec.t },
-          ]} />
-          <table className="flow-tab">
-            <caption className="flow-tab-cap">Implied preference flows to Labor, by house</caption>
-            <thead>
-              <tr><th className="flow-tab-house">House</th><th>Greens</th><th>One Nation</th><th>Other</th><th>Waves</th></tr>
-            </thead>
-            <tbody>
-              <tr className="flow-tab-aec">
-                <th scope="row" className="flow-tab-house">2025 election outcome (AEC)</th>
-                <td>{fd.meta.aec.g.toFixed(1)}%</td><td>{fd.meta.aec.o.toFixed(1)}%</td><td>{fd.meta.aec.t.toFixed(1)}%</td><td>–</td>
-              </tr>
-              {fd.flows.map((f) => (
-                <tr key={f.firm}>
-                  <th scope="row" className="flow-tab-house">{f.firm}</th>
-                  <FlowCell v={f.g} se={f.ge} prior={f.gp} />
-                  <FlowCell v={f.o} se={f.oe} prior={f.op} />
-                  <FlowCell v={f.t} se={f.te} prior={f.tp} />
-                  <td>{f.n}{f.m ? <span className="flow-tab-se"> published</span> : null}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="table-hint ap-var-note flow-tab-note">
-            A house row reads as “the share of that bucket’s preferences this house’s published
-            2PP behaves as if it handed to Labor” – fit from the house’s own 2PP and primary
-            swings, with its fixed method offset soaked up by an intercept (“Other” lumps
-            independents and minor parties together, as the constants in
-            {" "}{fd.meta.table} do). Every fitted cell is shrunk toward the election row and
-            departs only as far as the house's own waves demonstrate – each poll counts once,
-            and the ± figure is one standard error from the same fit. <span className="flow-tab-thin">A
-            greyed cell</span> is one the fit could not move: half or more of it is the election
-            row it was shrunk toward, because that house's own series for that bucket barely
-            travels. Greens first preferences have moved about a point since the election and
-            One Nation's twenty-two, which is why the Greens column greys and the One Nation
-            column does not. Roy Morgan's and
-            RedBridge/Accent's two-party figures are respondent-allocated, so a fitted constant
-            only tracks their moving allocation at best; RedBridge also prints its allocation
-            beside each wave, so its row is no fit at all – it averages the house's own
-            published splits over the term (marked “published” in the waves column, needing at
-            least three), and its ± is the counting-error scale of that average. Otherwise a
-            house needs at least six waves with a published two-party figure to appear, and
-            like everything in this panel the rows are a diagnostic against the election line,
-            not a measurement.
-          </p>
-        </div>
-      )}
+      {/* The by-house implied-flow table is deleted (2026-09-19). It was built
+          on the premise that each house's preference allocation is recoverable
+          from its own published 2PP and primary swings, and it is not: the
+          ridge's standard errors ran +/-4 to +/-9.5 on shares whose whole
+          range of interest is perhaps fifteen points. Against the election row
+          exactly two of fifteen fitted cells cleared 1.96*se, both Roy
+          Morgan's, and on the Labor-v-One-Nation pairing not one of six did.
+          A table whose cells cannot be told apart from the assumption they
+          were shrunk toward is not a diagnostic.
 
+          The drift chart above is the part that always worked and is
+          untouched: each house against its OWN baseline needs no per-bucket
+          split, and carries no such error. gen-data's fitter went with it. */}
       <p className="table-hint ap-var-note">
         Above zero – the red ground – the published 2PPs are running friendlier to Labor than the
         frozen table reads their own primaries; below it, friendlier to the Coalition. Each house’s

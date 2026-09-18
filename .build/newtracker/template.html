@@ -3414,28 +3414,6 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 .cyc-legend.banded .cyc-row.off .cyc-swatch { background-color: var(--ink-faint); box-shadow: none; }
 .cyc-row:hover .cyc-swatch { transform: scale(1.18); }
 
-/* The table's own finding, above it. Same move the drift readout makes: a
-   decomposition that never says which bucket it decomposed into is evidence
-   with no claim attached. */
-.flow-tab-find {
-  font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink-2);
-  margin: 0 0 10px; max-width: 72ch;
-}
-.flow-tab-find strong { color: var(--ink); font-weight: 700; }
-
-/* A fitted flow cell the ridge could not move off its prior: half or more of
-   it is the election row it was shrunk toward, not a reading of the house.
-   Quiet ink and a dotted rule — present, legible, and visibly not load-
-   bearing. The dotted underline is the same grammar the page uses for a term
-   you can hover for a definition, which is what this is. */
-.flow-tab-thin, .flow-tab-thin .flow-tab-se { color: var(--ink-faint); }
-.flow-tab-thin {
-  text-decoration: underline dotted var(--ink-faint);
-  text-underline-offset: 3px; cursor: help;
-}
-/* the same word used inside the note that explains it */
-.flow-tab-note .flow-tab-thin { text-decoration: none; cursor: inherit; font-weight: 600; }
-
 /* ---------- preference-flow drift: the answer, then the board -------------
    Ten chips in one row — nine houses and the pooled line — each doubling as a
    readout, with the pooled figure (the only thing the panel answers) sitting
@@ -4149,28 +4127,6 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 .flow-band-on { fill: var(--lean-onp-bg); }
 .flow-band-alp, .flow-band-lnp, .flow-band-on { transition: fill .35s ease; }
 
-/* implied-flows table under the drift chart: a tighter ledger than the
-   archive's .poll-table – left row-heads, right figures, the AEC row set as
-   the reference line every house row is read against. */
-.flow-tab-wrap { margin: 18px 0 0; max-width: 640px; overflow-x: auto; }
-.flow-tab-cap {
-  caption-side: top; text-align: left; padding: 0 0 12px;
-  font-size: 13.5px; font-weight: 600; color: var(--ink-2); letter-spacing: 0.02em;
-}
-.flow-tab { width: 100%; border-collapse: collapse; font-size: 14px; }
-.flow-tab th {
-  font-weight: 600; font-size: 12.5px; color: var(--ink-3); letter-spacing: 0.02em;
-  padding: 0 10px 8px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap;
-}
-.flow-tab td, .flow-tab tbody th { padding: 9px 10px; border-bottom: 1px solid var(--line-2); }
-.flow-tab td { text-align: right; font-variant-numeric: tabular-nums; }
-.flow-tab-se { color: var(--ink-faint); font-size: 12.5px; }
-.flow-tab th.flow-tab-house { text-align: left; }
-.flow-tab tbody th { font-weight: 500; color: var(--ink); text-align: left; }
-.flow-tab tr:last-child td, .flow-tab tr:last-child th { border-bottom: 0; }
-.flow-tab tbody tr:hover td, .flow-tab tbody tr:hover th { background: var(--surface-2); }
-.flow-tab tr.flow-tab-aec td, .flow-tab tr.flow-tab-aec th { background: var(--surface-2); font-weight: 600; }
-.flow-tab-note { max-width: 640px; }
 
 /* archive ledger flows with the page; header pins just below the tab bar.
    overflow must stay visible here – any overflow on the wrapper turns it into
