@@ -3864,6 +3864,9 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
      and the overdue text butts against the screen's right edge. The column
      still hugs the right, so where the full line fits nothing changes. */
   .np-when { grid-column: 2; text-align: right; white-space: normal; }
+  /* the "(or …)" alternative takes a line of its own, under the count and
+     with it at the right edge, rather than tailing it on one crowded line */
+  .np-when-or { display: block; }
   .np-date { grid-column: 1; }
   .np-cadence { grid-column: 1 / -1; }
   .np-detail { padding: 0 10px 10px 26px; }

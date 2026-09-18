@@ -2637,9 +2637,13 @@ function NextPollsPanel() {
                    last of the room the span claimed ran out. */
                 ? (r.missed ? when(r.closesIn)
                   : r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn))
+                /* The "(or …)" alternative is its own span, not part of the
+                   count's text run, so the ≤720px rung can drop it to a line
+                   under the count (.np-when-or in template.html) while the
+                   wide layout still sets it inline after it. */
                 : r.overdue && !r.missed
-                  ? `${when(r.closesIn)} (or ${ago(-r.inDays)})`
-                  : when(r.inDays) + (dayAlt(r) || "")}
+                  ? <>{when(r.closesIn)}<span className="np-when-or">{` (or ${ago(-r.inDays)})`}</span></>
+                  : <>{when(r.inDays)}{dayAlt(r) && <span className="np-when-or">{dayAlt(r)}</span>}</>}
             </span>
             <span className="np-cadence">
               {cadenceLabel(r.cadence)}
