@@ -21518,6 +21518,12 @@ function Hero({
   for (let v = yTarget[0]; v <= yTarget[1]; v += 5) if (v > yTarget[0] && v < yTarget[1]) yTicks.push(v);
   const lead = +(latest.a - latest.b).toFixed(1);
   const leadName = lead >= 0 ? m.a.name : m.b.name;
+  /* Swing is quoted against the one 2PP baseline there is: the election
+     anchor gen-data unshifts onto agg2pp (election: true row, the official
+     count). Only the real ALP v L/NP pairing has that count - the modelled
+     matchups get no swing clause. */
+  const leadAnchor = matchup === "alp_lnp" ? D.agg2pp.filter(d => d.election)[0] : null;
+  const leadSwing = leadAnchor ? +(latest.a - leadAnchor.alp).toFixed(1) : null;
   /* Uncertainty for whichever matchup is showing. Every nowcast on this hero
      is a weighted mean of a handful of polls, so none of them is exact – a
      matchup that switched from an interval to a bare number would read as the
@@ -21604,7 +21610,10 @@ function Hero({
     className: "hi-range hi-term",
     title: unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means",
     onClick: () => window.AP.openTerm && window.AP.openTerm(unc.flows ? "preference-flows" : "margin-of-error", "two-party preferred")
-  }, "\xB1 ", (2 * unc.ci95).toFixed(1), " pts")) : " pts")), /*#__PURE__*/React.createElement("div", {
+  }, "\xB1 ", (2 * unc.ci95).toFixed(1), " pts")) : " pts", leadSwing != null && /*#__PURE__*/React.createElement(React.Fragment, null, ", ", /*#__PURE__*/React.createElement(RollNum, {
+    value: Math.abs(leadSwing).toFixed(1),
+    spinIn: true
+  }), "% swing " + (leadSwing >= 0 ? "to" : "from") + " " + m.a.name))), /*#__PURE__*/React.createElement("div", {
     className: "hero-interval"
   }, unc &&
   /*#__PURE__*/

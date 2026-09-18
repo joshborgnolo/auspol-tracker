@@ -1070,6 +1070,12 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
   for (let v = yTarget[0]; v <= yTarget[1]; v += 5) if (v > yTarget[0] && v < yTarget[1]) yTicks.push(v);
   const lead = +(latest.a - latest.b).toFixed(1);
   const leadName = lead >= 0 ? m.a.name : m.b.name;
+  /* Swing is quoted against the one 2PP baseline there is: the election
+     anchor gen-data unshifts onto agg2pp (election: true row, the official
+     count). Only the real ALP v L/NP pairing has that count - the modelled
+     matchups get no swing clause. */
+  const leadAnchor = matchup === "alp_lnp" ? D.agg2pp.filter((d) => d.election)[0] : null;
+  const leadSwing = leadAnchor ? +(latest.a - leadAnchor.alp).toFixed(1) : null;
   /* Uncertainty for whichever matchup is showing. Every nowcast on this hero
      is a weighted mean of a handful of polls, so none of them is exact – a
      matchup that switched from an interval to a bare number would read as the
@@ -1149,6 +1155,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                   </button>
                 </>
               ) : " pts"}
+              {leadSwing != null && (
+                <>
+                  {", "}
+                  <RollNum value={Math.abs(leadSwing).toFixed(1)} spinIn />
+                  {"% swing " + (leadSwing >= 0 ? "to" : "from") + " " + m.a.name}
+                </>
+              )}
             </span>
           </div>
           {/* How the lead was made and how much evidence sits under it: the
