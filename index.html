@@ -940,11 +940,14 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
 /* ---------- accessibility: 44px tap targets ---------- */
 /* keep the tight editorial sizing visually, but extend the *hit* area to a
    44px-tall invisible overlay so the controls are comfortable on touch. */
+/* .cyc-main / .cyc-x are deliberately NOT here: they are rows in a dense
+   grid now, where a 44px overlay would reach into the rows either side and the
+   one painted later would take the tap. They grow their own padding on a
+   coarse pointer instead – see the board block below. */
 .tt-opt, .theme-cell, .legend-chip, .seg-btn, .hb-toggle,
-.cyc-main, .cyc-x, .cyc-drawn-x, .ap-popbtn, .tab-score, .cyc-showall, .ap-clear { position: relative; }
+.cyc-drawn-x, .ap-popbtn, .tab-score, .ap-clear { position: relative; }
 .tt-opt::after, .theme-cell::after, .legend-chip::after, .seg-btn::after, .hb-toggle::after,
-.cyc-main::after, .cyc-x::after, .cyc-drawn-x::after, .ap-popbtn::after, .tab-score::after,
-.cyc-showall::after, .ap-clear::after {
+.cyc-drawn-x::after, .ap-popbtn::after, .tab-score::after, .ap-clear::after {
   content: ""; position: absolute; left: 0; right: 0;
   top: 50%; transform: translateY(-50%);
   height: 44px;
@@ -1057,16 +1060,16 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
    a way a tint cannot. The .segmented track recesses so its active cell has
    something to stand proud of - that cell already carried a drop shadow, which
    is the idiom the rest of this follows. */
-.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay, .acc-spread {
+.ha-chip, .legend-chip, .ap-popbtn, .dl-replay, .acc-spread {
   box-shadow: inset 0 1px 0 var(--btn-lit),
               0 1px 1.5px var(--btn-shade),      /* contact */
               0 3px 6px -3px var(--btn-shade);   /* ambient - what makes it sit ON the page */
 }
-.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay, .acc-spread,
+.ha-chip, .legend-chip, .ap-popbtn, .dl-replay, .acc-spread,
 .seg-btn, .pg-check input {
   transition-property: color, border-color, background-color, opacity, transform, box-shadow;
 }
-.ha-chip:active, .legend-chip:active, .cyc-chip:active,
+.ha-chip:active, .legend-chip:active,
 .ap-popbtn:active, .dl-replay:active:not(:disabled), .acc-spread:active,
 .ap-popbtn.on, .ap-popbtn.open,
 /* a latching toggle that is ON is a button held in, which is a thing a tint
@@ -1100,9 +1103,6 @@ button.ha-chip, button.legend-chip,
 button.ap-popbtn, button.dl-replay, button.acc-spread {
   border-bottom-color: var(--btn-edge);
 }
-/* .cyc-chip is a <span> wrapper (it holds two buttons), so the element+class
-   trick above cannot reach it – it sets its own bevel in the block below,
-   after its own `border` shorthand. */
 
 /* ---------- bars are channels ---------------------------------------------
    Every bar on the site is already the hero gauge's anatomy under another
@@ -3345,75 +3345,95 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 }
 @media (max-width: 1000px) { .cyc-export { display: none; } }
 
-.cyc-legend { margin: 20px 0 6px; }
-.cyc-legend-row { display: flex; flex-wrap: wrap; gap: 7px; }
-/* The chip is a WRAPPER, not a button: it carries two controls that answer two
+/* ---------- the board ------------------------------------------------------
+   One button and a caption, where twenty-one pills used to stand. The terms
+   are in the panel it opens, and everything that made a chip legible travels
+   with them – the party colour, the swatch shape the chart's own dots wear,
+   the fill that says whether a line is drawn. What is gone is the pill chrome
+   around it, because a menu row is not a thing that sits ON the page: it is a
+   line in a list, and it answers the pointer by lighting up rather than by
+   standing proud. */
+.cyc-legend { margin: 20px 0 10px; }
+.cyc-legend-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+/* Wider than the archive's filter panels, and deliberately: those hold a
+   column of options and this holds a roll of twenty-one terms with a name on
+   each. At this width a desktop column takes three columns of them and a
+   phone takes one whole name per line – the in-between, two columns of
+   clipped surnames, is the one arrangement worth avoiding. */
+.cyc-legend .ap-panel { width: min(660px, calc(100vw - 28px)); max-width: none; }
+/* The head wraps on a narrow panel: "On the board" plus four options is a
+   little wider than a 320px phone, and a shortcut row that ran off the edge
+   would be worse than one on its own line. */
+.cyc-legend .ap-pop-head { flex-wrap: wrap; }
+/* Four cuts of the same set, so they read as four options in one voice rather
+   than a primary with three alternatives. The active one is underlined, not
+   filled: this is a row inside a panel head, not a segmented control.
+   margin-left:auto keeps it right-aligned whether or not the head wrapped. */
+.cyc-quick { display: flex; align-items: baseline; gap: 13px; margin-left: auto; }
+.cyc-quick-opt {
+  border: 0; background: none; cursor: pointer; padding: 1px 0;
+  font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3);
+  border-bottom: 1.5px solid transparent; transition: color .15s ease;
+}
+.cyc-quick-opt:hover { color: var(--ink-2); }
+.cyc-quick-opt.active { color: var(--ink); font-weight: 700; border-bottom-color: var(--ink); }
+
+.cyc-board {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1px 3px; padding: 2px 1px;
+  max-height: min(52vh, 342px); overflow-y: auto;
+}
+/* The row is a WRAPPER, not a button: it carries two controls that answer two
    different questions – .cyc-main draws the term's line over the band, .cyc-x
    takes the term off the board entirely – and a button may not contain a
-   button. All the pill chrome stays here so the pair still presses as one
-   object, and `border-bottom-color` is declared after the `border` shorthand
-   rather than by the element+class bevel rule further up, which cannot match a
-   span. */
-.cyc-chip {
-  display: inline-flex; align-items: center; white-space: nowrap;
-  background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
-  border-bottom-color: var(--btn-edge);
+   button. The state tint stays here so the pair still reads as one object. */
+.cyc-row {
+  display: flex; align-items: center; min-width: 0; border-radius: 8px;
   font-family: var(--sans); color: var(--ink-2);
-  transition: color .15s ease, border-color .15s ease, background-color .15s ease, opacity .15s ease;
+  transition: background-color .15s ease;
 }
-.cyc-chip:hover { border-color: var(--ink-faint); }
+/* A row that is already tinted by its own state still has to answer the
+   pointer, so the hover is a step up from wherever that row started rather
+   than one flat grey that paints over the state underneath it. */
+.cyc-row:hover, .cyc-row:focus-within { background: color-mix(in oklch, var(--ink) 6%, transparent); }
+.cyc-row.current { background: color-mix(in oklch, var(--cyc) 9%, transparent); }
+/* A term the reader has drawn out of the band. Louder than .current's resting
+   tint, because .current is simply where the page starts and this is a thing
+   that was asked for. */
+.cyc-row.lifted { background: color-mix(in oklch, var(--cyc) 13%, transparent); }
+.cyc-row.current:hover, .cyc-row.current:focus-within,
+.cyc-row.lifted:hover, .cyc-row.lifted:focus-within {
+  background: color-mix(in oklch, var(--cyc) 20%, transparent);
+}
 .cyc-main {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;
   border: 0; background: none; color: inherit; font: inherit; cursor: pointer;
-  padding: 6px 6px 6px 11px; border-radius: 999px 0 0 999px;
+  padding: 8px 3px 8px 9px; border-radius: 8px 0 0 8px; text-align: left;
 }
-.cyc-main:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-/* Quiet until it is wanted. It keeps its space in the row either way – a ✕ that
-   appeared on hover and pushed the chips along would move the target the reader
-   is aiming at – and it cannot be clicked while it is invisible, which on a
-   control that empties a term out of the band matters more than the tidiness. */
+/* Inset, so the ring stays inside the row instead of crossing the one above. */
+.cyc-main:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* On every row, always. It used to appear on hover, and below 620px it was
+   hidden on all but three states, because twenty-one pills each reserving a ✕
+   cost three more rows of legend. That crowding is gone, and so is the bug the
+   hiding kept producing: the sitting term could reach none of the states that
+   revealed its own ✕, so on a narrow window there was no sequence of taps that
+   took it off the board. */
 .cyc-x {
   border: 0; background: none; cursor: pointer; font-family: var(--sans);
   font-size: 14px; font-weight: 500; line-height: 1; color: var(--ink-faint);
-  padding: 6px 10px 6px 4px; border-radius: 0 999px 999px 0;
-  opacity: 0; pointer-events: none;
-  transition: opacity .15s ease, color .15s ease;
+  padding: 8px 9px 8px 4px; border-radius: 0 8px 8px 0; flex: none;
+  transition: color .15s ease;
 }
-.cyc-chip:hover .cyc-x, .cyc-chip:focus-within .cyc-x,
-.cyc-chip.lifted .cyc-x, .cyc-chip.off .cyc-x { opacity: 1; pointer-events: auto; }
+.cyc-row:hover .cyc-x { color: var(--ink-3); }
 .cyc-x:hover { color: var(--ink); }
-.cyc-x:focus-visible { opacity: 1; pointer-events: auto; outline: 2px solid var(--accent); outline-offset: 1px; }
-/* A finger has no hover to reveal it with. */
-@media (hover: none) { .cyc-x { opacity: 1; pointer-events: auto; } }
-/* Phones: fourteen chips already wrap to ten rows in a 375px column, and
-   reserving the ✕ on every one of them added three more – half the viewport
-   spent on a legend. Here it is not reserved at all, and appears on the chips
-   whose state gives it something to say: a term drawn out of the band, or one
-   already off the board. Every other term is one tap from lifted, which is the
-   tap a reader coming to remove it would make first anyway.
-
-   The SITTING term is the exception that reasoning misses, and the bug it
-   caused: it is never "one tap from lifted" - lift() refuses it outright,
-   since it has no band to be lifted out of (auspol-past-cycles, the
-   2026-09-03 fix) - so it can never earn its way into .lifted or .off and
-   its ✕ sat permanently display:none below this width, with no sequence
-   of taps that reveals it. Reported as "the Albanese line won't clear on
-   my phone", and it was the same on any narrow window regardless of touch:
-   this is a max-width query, not a hover one. .cyc-chip.current joins the
-   exception list here for the reason .lifted and .off are already in it -
-   its ✕ has something to say (take the sitting term off the board) that no
-   tap sequence can surface any other way. */
-@media (max-width: 620px) {
-  .cyc-x { display: none; }
-  .cyc-chip.lifted .cyc-x, .cyc-chip.off .cyc-x, .cyc-chip.current .cyc-x { display: inline-block; }
-  .cyc-main { padding-right: 11px; }
-  .cyc-chip.lifted .cyc-main, .cyc-chip.off .cyc-main,
-  .cyc-chip.current .cyc-main { padding-right: 4px; }
-  /* The rules already carry the colour and the years are self-evidently a list
-     of terms; the caption is the first thing to go when the column is this
-     narrow. */
-  .cyc-drawn-label { display: none; }
-  .cyc-drawn-item { font-size: 11.5px; padding: 3px 4px 3px 8px; }
+.cyc-x:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* A finger gets the row, not a 44px overlay. Every other control on this page
+   inflates its hit area with an invisible ::after, which works where a control
+   has air around it – here it would reach a third of the way into the rows
+   above and below, and the row below, painted later, would take the tap. So
+   the row grows to the same size instead, which is the honest version of it. */
+@media (pointer: coarse) {
+  .cyc-main, .cyc-x { padding-top: 12px; padding-bottom: 12px; }
 }
 /* NO background transition here, and the swap is instant by design. Animating
    background-color to a var()-derived colour on this element sticks: the swatch
@@ -3423,7 +3443,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    existed. (Longhand `background-color` regardless: a `background` shorthand
    carrying a var() is a pending-substitution value and cannot be interpolated,
    so it is the wrong thing to hand a transition even if one comes back.) */
-.cyc-chip .cyc-swatch { width: 11px; height: 11px; border-radius: 50%; flex: none;
+.cyc-row .cyc-swatch { width: 11px; height: 11px; border-radius: 50%; flex: none;
   background-color: var(--cyc); transition: transform .15s ease; }
 /* The fill IS the state: filled means there is a line of this colour on the
    chart, a ring means the term is pooled into the band instead. Said only where
@@ -3431,8 +3451,8 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    term draws its own line, and a ring would then be denying a line the chart is
    drawing. inset box-shadow rather than a border so the ring is clipped along
    with the swatch when the swatch is a triangle or a diamond. */
-.cyc-legend.banded .cyc-chip .cyc-swatch { background-color: transparent; box-shadow: inset 0 0 0 2px var(--cyc); }
-.cyc-legend.banded .cyc-chip.drawn .cyc-swatch { background-color: var(--cyc); box-shadow: none; }
+.cyc-legend.banded .cyc-row .cyc-swatch { background-color: transparent; box-shadow: inset 0 0 0 2px var(--cyc); }
+.cyc-legend.banded .cyc-row.drawn .cyc-swatch { background-color: var(--cyc); box-shadow: none; }
 /* A swatch borrows the shape of the term's dots when the chart is drawing
    them, so two Coalition terms in the same blue are told apart in the legend
    the same way they are told apart on the chart. clip-path over a second
@@ -3440,32 +3460,33 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    circle stays the default nothing has to opt into. The triangle is sized a
    little past the box for the same reason the dot is - inscribed, it reads
    smaller than the circle beside it. */
-.cyc-chip .cyc-swatch.sw-triangle { border-radius: 0; width: 12px; height: 12px;
+.cyc-row .cyc-swatch.sw-triangle { border-radius: 0; width: 12px; height: 12px;
   clip-path: polygon(50% 2%, 100% 96%, 0 96%); }
-.cyc-chip .cyc-swatch.sw-diamond { border-radius: 0; width: 12px; height: 12px;
+.cyc-row .cyc-swatch.sw-diamond { border-radius: 0; width: 12px; height: 12px;
   clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
-.cyc-chip .cyc-year { font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
-.cyc-chip .cyc-lead { font-size: 13px; font-weight: 500; color: var(--ink-3); }
+.cyc-row .cyc-year { font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+/* The name is the one part of a row that can outrun its column – "Turnbull–
+   Morrison" in a narrow panel – so it is the part that gives way. It only ever
+   has to at widths where the grid is already down to one column. */
+.cyc-row .cyc-lead { font-size: 13px; font-weight: 500; color: var(--ink-3);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Off the board is a third state, and it has to be unmistakable against the
-   other two: not in the band, not drawn, not in the download. Dashed, because a
-   broken edge is the one thing neither of the other two says. */
-.cyc-chip.off { opacity: 0.4; border-style: dashed; }
-.cyc-chip.off .cyc-swatch,
-.cyc-legend.banded .cyc-chip.off .cyc-swatch { background-color: var(--ink-faint); box-shadow: none; }
-.cyc-chip.current {
-  border-color: color-mix(in oklch, var(--cyc) 45%, var(--line));
-  background: color-mix(in oklch, var(--cyc) 8%, var(--surface));
+   other two: not in the band, not drawn, not in the download. The row goes
+   quiet and its mark goes grey – but the control that brings it back does not
+   dim with it, or the one thing to do with an off row would be the faintest
+   thing in it. (It reads "+" there, not "×", for the same reason.) */
+.cyc-row.off .cyc-main { opacity: 0.45; }
+/* and it wears no state tint while it is off: the sitting term taken off the
+   board is still the sitting term, but it is not on any chart, so a row that
+   went on glowing its party colour would be naming a line that is not there. */
+.cyc-row.off.current, .cyc-row.off.lifted { background: transparent; }
+.cyc-row.off.current:hover, .cyc-row.off.current:focus-within,
+.cyc-row.off.lifted:hover, .cyc-row.off.lifted:focus-within {
+  background: color-mix(in oklch, var(--ink) 6%, transparent);
 }
-/* A term the reader has drawn out of the band. Louder than .current's resting
-   tint, because .current is simply where the page starts and this is a thing
-   that was asked for. Both are two classes, so both out-rank the frosted-glass
-   background at the foot of this file. */
-.cyc-chip.lifted {
-  border-color: color-mix(in oklch, var(--cyc) 55%, var(--line));
-  background: color-mix(in oklch, var(--cyc) 10%, var(--surface));
-}
-.cyc-chip.current:hover .cyc-swatch,
-.cyc-chip:hover .cyc-swatch { transform: scale(1.18); }
+.cyc-row.off .cyc-swatch,
+.cyc-legend.banded .cyc-row.off .cyc-swatch { background-color: var(--ink-faint); box-shadow: none; }
+.cyc-row:hover .cyc-swatch { transform: scale(1.18); }
 
 /* ---------- what each chart is drawing ----------
    A caption on the lines, not a second legend: it lists only what this chart
@@ -3504,6 +3525,14 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 }
 .cyc-drawn-x:hover { color: var(--ink); background: color-mix(in oklch, var(--ink) 12%, transparent); }
 .cyc-drawn-x:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* The rules already carry the colour and the years are self-evidently a list
+   of terms; the caption is the first thing to go when the column is this
+   narrow. (It used to share a media block with the legend chips' ✕-hiding,
+   which the board panel made unnecessary.) */
+@media (max-width: 620px) {
+  .cyc-drawn-label { display: none; }
+  .cyc-drawn-item { font-size: 11.5px; padding: 3px 4px 3px 8px; }
+}
 .cyc-now {
   font-size: 10px; font-weight: 800;
   color: var(--cyc-text, var(--cyc)); border: 1px solid color-mix(in oklch, var(--cyc) 40%, var(--line));
@@ -3514,15 +3543,6 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
      surface. The badge is small, high-tracked type – it needs the headroom. */
   background: var(--surface);
 }
-/* the two board-wide controls share one line and one voice - both are ways
-   of re-cutting the same set, not a primary and a secondary */
-.cyc-actions { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; }
-.cyc-showall {
-  margin-top: 10px; border: 0; background: none; cursor: pointer; font-family: var(--sans);
-  font-size: 12.5px; font-weight: 600; color: var(--accent); padding: 2px 0;
-  text-align: left;
-}
-.cyc-showall:hover { text-decoration: underline; }
 /* The chart fills take their theme from here, not from the component: the
    class beats the opacity attribute, and ink is near-white in dark, so the
    same tints that whisper on paper would shout on slate without a lift. */
@@ -3539,8 +3559,11 @@ body.dark .cyc-band.hi { opacity: 0.30; }
 .cyc-band.hi.thin { opacity: 0.075; }
 body.dark .cyc-band.lo.thin { opacity: 0.07; }
 body.dark .cyc-band.hi.thin { opacity: 0.13; }
+/* It sits BESIDE the button in the legend bar, not under it: the band is one
+   line of key and the bar has room for it. (It used to need `width: 100%` to
+   escape a flex row of chips – there is no such row to escape now.) */
 .cyc-band-note {
-  width: 100%; display: flex; align-items: center; gap: 7px; margin-top: 7px;
+  display: flex; align-items: center; gap: 7px; min-width: 0;
   font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--ink-3);
 }
 .cyc-band-key { width: 30px; height: 12px; flex: none; }
@@ -4244,23 +4267,23 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
 
   /* quiet press acknowledgement on chip-like controls */
-  .legend-chip, .cyc-chip, .ap-popbtn, .seg-btn { transition-property: color, border-color, background-color, opacity, transform, box-shadow; }
+  .legend-chip, .ap-popbtn, .seg-btn { transition-property: color, border-color, background-color, opacity, transform, box-shadow; }
   /* A press you can feel: the control travels DOWN into the page rather than
      just shrinking on the spot. Scale alone reads as a zoom - it is the one
      gesture a physical button cannot make - so the travel carries it and the
      scale only steadies it. The shadow collapse that goes with it is in the
      controls block above; together they are the object meeting the paper. */
-  .legend-chip:active, .cyc-chip:active, .ap-popbtn:active,
+  .legend-chip:active, .ap-popbtn:active,
   .seg-btn:active, .ha-chip:active, .acc-spread:active,
   .dl-replay:active:not(:disabled) { transform: translateY(1px) scale(0.985); }
   .exp-btn:active { transform: scale(0.965); }
   /* Fast in, slower out. A press that returns at the speed it went is a
      crossfade between two states; the asymmetry is what reads as a thing
      with weight being let go of. */
-  .legend-chip, .cyc-chip, .ap-popbtn, .seg-btn, .ha-chip, .dl-replay, .acc-spread {
+  .legend-chip, .ap-popbtn, .seg-btn, .ha-chip, .dl-replay, .acc-spread {
     transition-duration: .19s;
   }
-  .legend-chip:active, .cyc-chip:active, .ap-popbtn:active, .acc-spread:active,
+  .legend-chip:active, .ap-popbtn:active, .acc-spread:active,
   .seg-btn:active, .ha-chip:active, .dl-replay:active:not(:disabled) {
     transition-duration: .055s;
   }
@@ -4296,7 +4319,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    is near-invisible (nothing behind to blur); it comes alive where a control
    sits over content – above all the pinned tab bar as the page scrolls under. */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .segmented, .legend-chip, .cyc-chip, .ap-popbtn, .ap-export {
+  .segmented, .legend-chip, .ap-popbtn, .ap-export {
     background: var(--glass-bg);
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
@@ -6209,13 +6232,14 @@ window.AP.nextPolls = npProject;
   /* Every chart card has the same bones - a title, a subtitle or a readout,
      the chart, a legend, sometimes a caption - so one composer draws them all
      and the hero is simply the card that has a readout instead of a subtitle.
-     Three legend idioms exist across the tabs (.hl-item on the hero,
-     .legend-chip on primary vote, .cyc-chip on past cycles) and each swatch is
-     read for the mark it actually is, so a rule, a dot, a shaded band and a
-     square are not all drawn as lines. */
+     Two legend idioms sit INSIDE a card (.hl-item on the hero, .legend-chip on
+     primary vote) and each swatch is read for the mark it actually is, so a
+     rule, a dot, a shaded band and a square are not all drawn as lines. Past
+     cycles has no in-card legend at all - it is rebuilt from the end labels by
+     cycleLegend() below. */
   const readLegend = (target) =>
-    [...target.querySelectorAll(".hl-item, .legend-chip, .cyc-chip")].map((i) => {
-      const sw = i.querySelector(".hl-line,.hl-dashed,.hl-band,.hl-dot,.hl-swatch-dot,.legend-swatch,.cyc-swatch");
+    [...target.querySelectorAll(".hl-item, .legend-chip")].map((i) => {
+      const sw = i.querySelector(".hl-line,.hl-dashed,.hl-band,.hl-dot,.hl-swatch-dot,.legend-swatch");
       const k = sw ? (sw.className || "") : "";
       const cs2 = sw ? getComputedStyle(sw) : null;
       /* Joined from the chip's own parts, not read off it whole: a legend chip
@@ -6269,10 +6293,33 @@ window.AP.nextPolls = npProject;
     const sub = txt(target.querySelector(".card-sub"));
     const caption = txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
 
-    /* Past cycles keeps its legend OUTSIDE the card - one row of chips at the
-       top of the tab selects cycles for all five charts - so a card copied on
-       its own arrived with six unnamed lines and years for end labels. Worse,
-       those chips name the PRIME MINISTER, which on an opposition chart is the
+    /* Which terms are on the board, in order, and which one is sitting. Two
+       things below need it: the band's own legend entry ("Past terms
+       (1972-98, 2007-13)") and the year span in the card title.
+
+       It used to be read off the legend chips, because the legend WAS a row of
+       chips standing open in the page. The board is a popover now and is
+       usually shut, so the view publishes what the reader has done
+       (window.AP_CYC_BOARD, set in PastCyclesView) and the roll of terms comes
+       from the data - the same three facts, taken from the state rather than
+       from a rendering of it.
+
+       Scoped to the past-cycles view: the published board survives a tab
+       switch, and a hero card copied afterwards must not take its title span
+       from a board that has nothing to do with it. */
+    const AUS = window.AUSPOL || {};
+    const cycList = AUS.cycles && (Array.isArray(AUS.cycles) ? AUS.cycles : Object.values(AUS.cycles));
+    const board = (() => {
+      if (!cycList || !target.closest || !target.closest(".view-cycles")) return [];
+      const off = new Set((window.AP_CYC_BOARD || {}).off || []);
+      return cycList.map((c) => ({ year: c.year, off: off.has(c.year), current: !!c.current }))
+                    .sort((a, b) => a.year - b.year);
+    })();
+
+    /* Past cycles keeps its legend OUTSIDE the card - one board at the top of
+       the tab selects terms for all six charts - so a card copied on its own
+       arrived with six unnamed lines and years for end labels. Worse, that
+       board names the PRIME MINISTER, which on an opposition chart is the
        wrong person entirely: the 2013 line is Shorten, not Abbott.
 
        So the legend is rebuilt from the end labels the chart drew. Pairing on
@@ -6287,10 +6334,8 @@ window.AP.nextPolls = npProject;
        the current term, ending the bare mark "ON" and mapping in the
        classifier below. */
     const cycleLegend = () => {
-      const AUS = window.AUSPOL || {};
-      const cyc = AUS.cycles && (Array.isArray(AUS.cycles) ? AUS.cycles : Object.values(AUS.cycles));
       const labels = [...svgEl.querySelectorAll(".end-label")];
-      if (!cyc || !labels.length) return [];
+      if (!cycList || !labels.length) return [];
       const opp = /opposition/i.test(titleBase + " " + sub);   // `title` is not bound yet here
       const resolve = (c) => {
         const el = document.createElement("span");
@@ -6325,7 +6370,7 @@ window.AP.nextPolls = npProject;
                    kind: "dashed", fill, alpha: 1, year: 9999 };
         const digits = text.replace(/[^0-9]/g, "");
         const c = !/[A-Za-z]/.test(text) && digits.length === 2 &&
-          cyc.find((r) => String(r.year).slice(2) === digits);
+          cycList.find((r) => String(r.year).slice(2) === digits);
         if (c) return { label: c.year + " " + (opp ? (c.oppLead || c.lead) : c.lead),
                         kind: "line", fill, alpha: 1, year: c.year };
         /* A leader who is not a cycle needs saying differently. Every other
@@ -6339,31 +6384,24 @@ window.AP.nextPolls = npProject;
                  kind: "dashed", fill, alpha: 1, year: 9999 };
       }).sort((a, b) => a.year - b.year);
       /* While the band is on the chart, the end labels name only the current
-         term (plus any chip-hovered one) - the copied card showed a purple
+         term (plus any hovered one) - the copied card showed a purple
          wash that nothing claimed, warming over terms it never named. Here
          the legend gains the entry the live view gives its band: the terms
-         it pools, read off the chips (everything not switched off), minus
-         any the chart already labels by name. */
+         it pools - everything on the board that is not the sitting term -
+         minus any the chart already labels by name. */
       if (svgEl.querySelector(".cyc-band")) {
-        const chips = [...document.querySelectorAll(".cyc-chip")]
-          .filter((ch) => !ch.classList.contains("off") && !ch.classList.contains("current"));
         const named = new Set(entries.filter((e) => e.year < 9000).map((e) => e.year));
-        const years = chips.map((ch) => {
-          const y = ch.querySelector(".cyc-year");
-          const n = y ? parseInt(y.textContent, 10) : NaN;
-          return Number.isFinite(n) && !named.has(n) ? n : null;
-        }).filter((n) => n != null);
+        const years = board.filter((c) => !c.off && !c.current && !named.has(c.year))
+                           .map((c) => c.year);
         if (years.length) {
           /* Consecutive terms collapse to spans, "1972–80": with the era
              buckets on the board the year list enumerates wider than the
-             card. Consecutive means adjacent in the FULL chip sequence -
+             card. Consecutive means adjacent in the FULL run of terms -
              a term switched off, or already named by its own end label,
              is not the band's to span across, so it breaks the run. The
              century-compression mirrors abRange below (unreachable from
              here - it is initialised after cycleLegend runs). */
-          const order = [...new Set([...document.querySelectorAll(".cyc-chip .cyc-year")]
-            .map((n) => parseInt(n.textContent, 10)).filter(Number.isFinite))]
-            .sort((a, b) => a - b);
+          const order = board.map((c) => c.year);
           const member = new Set(years);
           const spans = [];
           for (let i = 0; i < order.length; i++) {
@@ -6404,11 +6442,11 @@ window.AP.nextPolls = npProject;
 
     /* A shared image has to say what period it covers - the page around it
        does not travel with it. Past cycles names every term it shows, and a
-       deselected term breaks the range in two: each run of shown chips is
+       deselected term breaks the range in two: each run of shown terms is
        labelled from its first election to the next election boundary
        (2007's term runs to the 2010 election, so 1987-2007), and the run
        holding the live term ends in "present". The years come from the
-       chips, not the legend - banded terms have no label of their own to
+       board, not the legend - banded terms have no label of their own to
        take a year from. Every other chart names the span its x-axis
        already runs across. */
     const abRange = (a, b) => {
@@ -6419,15 +6457,7 @@ window.AP.nextPolls = npProject;
       const short = typeof b === "number" && String(a).slice(0, 2) === String(b).slice(0, 2);
       return a + "\u2013" + (short ? String(b).slice(2) : b);
     };
-    const chipByYear = new Map();
-    [...document.querySelectorAll(".cyc-chip")].forEach((ch) => {
-      const y = parseInt((ch.querySelector(".cyc-year") || {}).textContent, 10);
-      if (Number.isFinite(y) && !chipByYear.has(y)) chipByYear.set(y, {
-        off: ch.classList.contains("off"), current: ch.classList.contains("current"),
-      });
-    });
-    const cycs = [...chipByYear.keys()].sort((a, b) => a - b)
-      .map((year) => ({ year, off: chipByYear.get(year).off, current: chipByYear.get(year).current }));
+    const cycs = board;
     const yrs = legend.map((l) => l.year).filter((y) => y && y < 9000).sort((a, b) => a - b);
     const xLabels = [...svgEl.querySelectorAll(".axis-label.x")].map((n) => txt(n)).filter(Boolean);
     const datey = (t) => /[0-9]/.test(t) && !/^(Election|\d+ ?yrs?)$/i.test(t);
@@ -11480,27 +11510,31 @@ function tppHeading(cs) {
   if (cs.length === 1) return cs[0].kind === "3cp" ? "Three-cornered preferred" : "Two-party preferred";
   return "After preferences";
 }
-/* The detail section's line list: the contests tppContests builds, with the
-   implied pair spliced in as a full contest straight after the canonical
-   ALP v L/NP pair it re-anchors, plus each line's trailing basis note. The
-   implied figure is this poll's own primaries at the fixed 2025 flows – the
-   page's default basis, so it shows for every implied-eligible wave, not
-   only the Morgan/RedBridge pair that prints one in the release. It carries
-   its OWN change vs the pollster's last implied figure ("imp" in chg –
-   "flows" only when that is missing), L/NP moving opposite, exactly as the
-   canonical pair uses "alp2pp". */
+/* The detail section's line list: the contests tppContests builds, plus up
+   to two implied readings of ALP v L/NP. The HOUSE figure – Roy Morgan's
+   and RedBridge's own release-published implied pair at the 2025 flows – is
+   spliced straight after the published pair as its alternative ("or …
+   under 2025-election preference flows"), where the release itself puts it.
+   The COMPUTED implied pair – this poll's own primaries at the fixed 2025
+   flows, the page's default basis, so it closes the section for every
+   implied-eligible wave – is appended LAST, beneath every other line; when
+   the wave printed no pair at all (cs empty), PollLedger still prints "Not
+   published" ahead of it. Each implied reading carries its OWN change vs
+   the pollster's last figure of that kind ("imp" for the computed, "flows"
+   for the house figure – an "imp" delta falls back to "flows" when a wave
+   has only the latter), L/NP moving opposite, exactly as the canonical pair
+   uses "alp2pp". */
 function tppLines(cs, r) {
   const out = [];
-  const impliedV = r.alpImp != null ? r.alpImp : r.tppFlows;
+  const dFlows = segDelta(r.chg, "flows");
   const dImp = segDelta(r.chg, "imp") || segDelta(r.chg, "flows");
   /* Essential's undecided never left the published pair, so the pair's own
      line names the share and its move; the first-preferences tail reports
      only shares that were set aside before the shares were reported. */
   const dUnd = r.undecidedBasis === "tpp" && r.undecided != null ? segDelta(r.chg, "und") : null;
   for (const c of cs) {
-    const canonical = c.kind === "2pp" && impliedV != null;
-    /* No "respondent-allocated" caption any more. The implied pair now reads
-       as an alternative to the line above it ("or … implied, under
+    /* No "respondent-allocated" caption any more. The house-pair alternative
+       reads as an alternative to the line above it ("or … under
        2025-election preference flows"), which says what the first pair is
        BY CONTRAST - naming it as well repeated the same distinction twice,
        once under each half, and cost a caption line to do it. */
@@ -11514,13 +11548,9 @@ function tppLines(cs, r) {
       c,
       note
     });
-    if (canonical) out.push({
+    if (c.kind === "2pp" && r.tppFlows != null) out.push({
       alt: true,
-      note: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
-        type: "button",
-        className: "hi-term",
-        onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
-      }, "implied 2PP"), " ", "from these primaries under 2025-election", " ", /*#__PURE__*/React.createElement("button", {
+      note: /*#__PURE__*/React.createElement(React.Fragment, null, "under 2025-election", " ", /*#__PURE__*/React.createElement("button", {
         type: "button",
         className: "hi-term",
         onClick: () => window.AP.openTerm && window.AP.openTerm("preference-flows", "poll breakdown")
@@ -11531,21 +11561,51 @@ function tppLines(cs, r) {
         flag: null,
         segs: [{
           label: "ALP",
-          value: impliedV,
+          value: r.tppFlows,
           color: PARTY_C.alp,
-          delta: dImp
+          delta: dFlows
         }, {
           label: "L/NP",
-          value: Math.round((100 - impliedV) * 10) / 10,
+          value: Math.round((100 - r.tppFlows) * 10) / 10,
           color: PARTY_C.lnp,
-          delta: dImp ? {
-            v: +(-dImp.v).toFixed(1),
-            refDate: dImp.refDate
+          delta: dFlows ? {
+            v: +(-dFlows.v).toFixed(1),
+            refDate: dFlows.refDate
           } : null
         }]
       }
     });
   }
+  if (r.alpImp != null) out.push({
+    c: {
+      kind: "flows",
+      lab: "2PP · ALP v L/NP",
+      flag: null,
+      segs: [{
+        label: "ALP",
+        value: r.alpImp,
+        color: PARTY_C.alp,
+        delta: dImp
+      }, {
+        label: "L/NP",
+        value: Math.round((100 - r.alpImp) * 10) / 10,
+        color: PARTY_C.lnp,
+        delta: dImp ? {
+          v: +(-dImp.v).toFixed(1),
+          refDate: dImp.refDate
+        } : null
+      }]
+    },
+    note: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+      type: "button",
+      className: "hi-term",
+      onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
+    }, "implied 2PP"), " ", "from these primaries under 2025-election", " ", /*#__PURE__*/React.createElement("button", {
+      type: "button",
+      className: "hi-term",
+      onClick: () => window.AP.openTerm && window.AP.openTerm("preference-flows", "poll breakdown")
+    }, "preference flows"))
+  });
   return out.map(x => ({
     ...x,
     count: out.length
@@ -12369,14 +12429,16 @@ function PollLedger({
   }, /*#__PURE__*/React.createElement(PdSec, {
     label: tppHeading(tcs),
     lead: true
-  }, tppLines(tcs, r).map((x, i) => /*#__PURE__*/React.createElement(TppLine, {
+  }, (tls => /*#__PURE__*/React.createElement(React.Fragment, null, !tcs.length && /*#__PURE__*/React.createElement("p", {
+    className: "pd-absent"
+  }, "Not published"), tls.map((x, i) => /*#__PURE__*/React.createElement(TppLine, {
     key: "t" + i,
     c: x.c,
     prefixed: x.count > 1 && !x.alt,
     note: x.note,
     alt: x.alt,
     hero: i === 0 && x.c.segs.filter(g => g.value != null).length === 2
-  }))), /*#__PURE__*/React.createElement(PdSec, {
+  }))))(tppLines(tcs, r))), /*#__PURE__*/React.createElement(PdSec, {
     label: "First preferences"
   }, /*#__PURE__*/React.createElement("p", {
     className: "pd-s"
@@ -15189,6 +15251,27 @@ function CycleChart({
     }, "Trove newspaper archive"), ".");
   })());
 }
+
+/* ---- the board ---------------------------------------------------------
+   Twenty-one federal terms, three states each, and until now twenty-one pills
+   standing open on the page: four rows deep in a desktop column and eleven on
+   a phone. Half a screen of chrome whose usual job was to say "all of them
+   are on" - and at that size the one thing it could not do at a glance was
+   tell you which ones were.
+
+   So it makes the turn the archive's filter bar made. The CONTROL folds into
+   one button that says what it is holding, and the board opens underneath it.
+   Nothing in it is given up: the two questions each term answers are the same
+   two controls in the same order, the hover preview still runs every chart
+   below, and the outcome cuts - which used to be a single button whose label
+   flipped, so returned and ousted could never be read as a pair - are four
+   named shortcuts, all four visible.
+
+   The KEY does not go with the pills, because the pills were never where it
+   lived: every chart already carries its own "Drawn here" strip, which names
+   the holder THAT measure follows (the 2013 line is Shorten on an opposition
+   chart) and draws its rule in the colour the line is actually in. One shared
+   row of prime ministers above six charts could do neither. */
 function CycleLegend({
   cycles,
   hidden,
@@ -15204,25 +15287,89 @@ function CycleLegend({
   shapes,
   banded
 }) {
-  const anyHidden = hidden.size > 0;
+  const [pop, setPop] = useState(null);
   /* onMouseLeave clears the highlight for a pointer, and a finger never fires
-     it: a term raised by a tap stayed lit on the chart until another chip
+     it: a term raised by a tap stayed lit on the chart until another row
      happened to replace it. The next gesture starting outside the legend puts
      it back, the same way the chart readouts and the accuracy dots do. */
   const legRef = useRef(null);
   window.useDismissOutside(legRef, hi != null, () => setHi(null));
+  const total = cycles.length;
+  const onBoard = total - hidden.size;
+  /* The button has to earn the room the pills were spending, so at rest it
+     carries the sweep they showed simply by existing - "21 terms since 1972"
+     is a row of years in one line. The moment the reader has cut the board or
+     drawn a line it says THAT instead: the flourish is the first thing to go,
+     because a control that is doing something should say what. */
+  const summary = (hidden.size ? onBoard + " of " + total + " terms" : lifted.size ? total + " terms" : total + " terms since " + cycles[0].year) + (lifted.size ? " · " + lifted.size + " drawn" : "");
+
+  /* The board cut by what each government did at its own election - the
+     comparison the tab exists for, and one nobody can assemble by eye from
+     twenty-one rows. It used to be one button offering the set you were NOT
+     looking at, so the two cuts could never be compared as choices and the
+     way back to everything was a second control that only existed once you
+     had used the first. Four shortcuts instead, and which one is in effect is
+     DERIVED (`outcomeShown` already was), so a board picked apart by hand
+     simply lights none of them. */
+  const OUTCOME_NOTE = " at the election that ended it. The sitting term has not" + " faced its election, so it is in neither set.";
+  const QUICK = [{
+    id: "all",
+    label: "All",
+    run: showAll,
+    title: "Every term on the board"
+  }, {
+    id: "none",
+    label: "None",
+    run: hideAll,
+    title: "Clear the board – no term left in the band, the mean or the download"
+  }, {
+    id: "returned",
+    label: "Returned",
+    run: () => showOutcome("returned"),
+    title: "Only terms whose government was returned" + OUTCOME_NOTE
+  }, {
+    id: "ousted",
+    label: "Ousted",
+    run: () => showOutcome("ousted"),
+    title: "Only terms whose government was turned out" + OUTCOME_NOTE
+  }];
+  const quick = hidden.size === 0 ? "all" : hidden.size === total ? "none" : outcomeShown;
   return /*#__PURE__*/React.createElement("div", {
     className: "cyc-legend" + (banded ? " banded" : ""),
     ref: legRef,
     onMouseLeave: () => setHi(null)
   }, /*#__PURE__*/React.createElement("div", {
-    className: "cyc-legend-row"
+    className: "cyc-legend-bar"
+  }, /*#__PURE__*/React.createElement(FilterPop, {
+    id: "board",
+    label: "Cycles",
+    summary: summary,
+    open: pop,
+    setOpen: setPop,
+    on: hidden.size > 0 || lifted.size > 0
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ap-pop-head"
+  }, /*#__PURE__*/React.createElement("span", null, "On the board"), /*#__PURE__*/React.createElement("div", {
+    className: "cyc-quick",
+    role: "group",
+    "aria-label": "Board shortcuts"
+  }, QUICK.map(q => /*#__PURE__*/React.createElement("button", {
+    key: q.id,
+    type: "button",
+    title: q.title,
+    "aria-pressed": quick === q.id,
+    className: "cyc-quick-opt" + (quick === q.id ? " active" : ""),
+    onClick: q.run
+  }, q.label)))), /*#__PURE__*/React.createElement("div", {
+    className: "cyc-board",
+    role: "group",
+    "aria-label": "Federal terms"
   }, cycles.map(c => {
     const off = hidden.has(c.year);
     /* Two states, not one, and they answer different questions: whether
        the term is on the board at all (in the band, the mean and the
        download) and whether it is DRAWN as its own line over the band.
-       The sitting term is always drawn and so is never "lifted" – it has
+       The sitting term is always drawn and so is never "lifted" - it has
        no band to be lifted out of. */
     const lift = lifted.has(c.year) && !off;
     const drawn = lift || c.current;
@@ -15233,14 +15380,15 @@ function CycleLegend({
     const label = c.year + " " + pmNames;
     return (
       /*#__PURE__*/
-      /* The chip is a WRAPPER, not a button: it carries two controls and
-         a button may not contain a button. The pill's chrome stays on the
-         wrapper so the whole thing still presses as one object. */
+      /* The row is a WRAPPER, not a button: it carries two controls and
+         a button may not contain a button. The row's own chrome - the
+         tint that says which state it is in - stays here so the pair
+         still reads as one object. */
       React.createElement("span", {
         key: c.year,
-        className: "cyc-chip" + (off ? " off" : "") + (c.current ? " current" : "") + (lift ? " lifted" : "") + (drawn ? " drawn" : "")
-        /* --cyc paints the chip border and tint; --cyc-text is the
-           same party at the text threshold, for the "now" badge */,
+        className: "cyc-row" + (off ? " off" : "") + (c.current ? " current" : "") + (lift ? " lifted" : "") + (drawn ? " drawn" : "")
+        /* --cyc paints the row's tint; --cyc-text is the same party
+           at the text threshold, for the "now" badge */,
         style: {
           "--cyc": c.color,
           "--cyc-text": inkOf(c.color)
@@ -15269,7 +15417,9 @@ function CycleLegend({
         onClick: () => toggle(c.year)
       }, off ? "+" : "×"))
     );
-  })), banded && /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("p", {
+    className: "ap-pop-foot"
+  }, "Click a term to draw its own line over the band, and again to put it back. The \xD7 takes it off the board altogether \u2013 out of the band, the mean and the download.")), banded && /*#__PURE__*/React.createElement("div", {
     className: "cyc-band-note",
     "aria-hidden": "true"
   }, /*#__PURE__*/React.createElement("svg", {
@@ -15298,18 +15448,7 @@ function CycleLegend({
     strokeWidth: "1.9",
     strokeDasharray: "2 3.4",
     opacity: "0.85"
-  })), /*#__PURE__*/React.createElement("span", null, "Past terms: mean of the set, middle half and middle 80%")), /*#__PURE__*/React.createElement("div", {
-    className: "cyc-actions"
-  }, /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "cyc-showall",
-    onClick: anyHidden ? showAll : hideAll
-  }, anyHidden ? "Show all cycles" : "Remove all cycles"), /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "cyc-showall",
-    title: "Terms whose government was " + (outcomeShown === "returned" ? "turned out" : "returned") + " at the election that ended it. The sitting term has not " + "faced its election, so it is in neither set.",
-    onClick: () => showOutcome(outcomeShown === "returned" ? "ousted" : "returned")
-  }, outcomeShown === "returned" ? "Show ousted governments only" : "Show returned governments only")));
+  })), /*#__PURE__*/React.createElement("span", null, "Past terms: mean of the set, middle half and middle 80%"))));
 }
 
 /* ---- Past-cycles download ---------------------------------------------
@@ -15840,6 +15979,22 @@ function PastCyclesView() {
     if (next !== L.pathname + L.search + L.hash) window.history.replaceState(null, "", next);
   }, [hidden, lifted]);
 
+  /* The copy-as-image card needs the board twice over – for the "Past terms
+     (1972–98, 2007–13)" line under its band swatch, and for the year span in
+     its title. It used to read that off the legend chips, which were always
+     standing in the page; the board is a popover now and is usually shut, so
+     the state is published rather than scraped back out of a rendering of
+     itself. copy-chart.js is a plain script with no React to ask, and it
+     clears on unmount so no other tab can find a board here to believe. */
+  React.useEffect(() => {
+    window.AP_CYC_BOARD = {
+      off: [...hidden]
+    };
+    return () => {
+      window.AP_CYC_BOARD = null;
+    };
+  }, [hidden]);
+
   /* A chip may now turn off the last line. It used to refuse, on the grounds
      that an empty chart is useless – but the way back is one button away and
      sits right under the chips, and refusing a click that was plainly meant
@@ -15945,7 +16100,7 @@ function PastCyclesView() {
     className: "view-intro"
   }, /*#__PURE__*/React.createElement("p", {
     className: "view-lede"
-  }, "Every federal term since 1987, lined up on its election day so each government\u2019s run can be read off the same clock. The past terms stand together as a band \u2013 outer edge the middle 80% of them, darker half the middle 50%, dotted line their mean \u2013 drawn over the months each term was actually in office, and going fainter where fewer of them were.", " ", "Click a cycle below to draw its own line over the band, and again to put it back; the \u2715 beside it takes the term off the board altogether. Leave three or fewer terms on the board to see the individual polls under each line."), srcFailed && /*#__PURE__*/React.createElement("p", {
+  }, "Every federal term since 1987, lined up on its election day so each government\u2019s run can be read off the same clock. The past terms stand together as a band \u2013 outer edge the middle 80% of them, darker half the middle 50%, dotted line their mean \u2013 drawn over the months each term was actually in office, and going fainter where fewer of them were.", " ", "Open ", /*#__PURE__*/React.createElement("strong", null, "Cycles"), " below to draw any term\u2019s own line over the band, to take terms off the board, or to cut the board to the governments that were returned or turned out at their next election. Leave three or fewer terms on the board to see the individual polls under each line."), srcFailed && /*#__PURE__*/React.createElement("p", {
     className: "cyc-src-note"
   }, "The individual polls behind the past terms didn\u2019t load \u2013 the monthly lines are unaffected.", " ", /*#__PURE__*/React.createElement("button", {
     type: "button",
@@ -16628,10 +16783,17 @@ function pollTagIds(p) {
 
    A popover is a listbox, not a dialog: click outside or press Escape to
    close, and focus goes back to the button that opened it. */
+/* `on` is the lit state - "something is applied here". It normally follows
+   the summary, because in the filter bar a summary IS what is applied. The
+   past-cycles board carries a summary at rest too ("21 terms since 1972" is
+   the roll its chips used to show by existing), so it says outright whether
+   the reader has actually done anything; a button that looked pressed in
+   from the first paint would be saying the same word for both. */
 function FilterPop({
   id,
   label,
   summary,
+  on,
   open,
   setOpen,
   children
@@ -16674,7 +16836,7 @@ function FilterPop({
     ref: box
   }, /*#__PURE__*/React.createElement("button", {
     type: "button",
-    className: "ap-popbtn" + (summary ? " on" : "") + (isOpen ? " open" : ""),
+    className: "ap-popbtn" + ((on == null ? !!summary : on) ? " on" : "") + (isOpen ? " open" : ""),
     "aria-expanded": isOpen,
     "aria-haspopup": "true",
     onClick: () => setOpen(isOpen ? null : id)
@@ -21369,8 +21531,11 @@ function Hero({
   /* The ALP–ON contest gets the same swap from its own payload: synthOn's
      monthly points are ALREADY {ym,x,a,b,ci95,k} (no remap needed), and its
      per-wave implied dot is alpOnImp. ci95 there is the frozen flow table's
-     RANGE, not a sampling interval. */
-  const impOnData = impOnBasis ? D.synthOn.map(d => ({
+     RANGE, not a sampling interval. Gated like impData, NOT on impOnBasis:
+     matchup has already flipped when a morph AWAY from this contest renders,
+     so a matchup-gated impOnData would vanish mid-morph - ptsOf/domainOf see
+     the published series from frame zero and the y-window never travels. */
+  const impOnData = impOnOffered && basis === "imp" ? D.synthOn.map(d => ({
     ym: d.ym,
     x: d.x,
     a: d.a,

@@ -1743,115 +1743,167 @@ function CycleChart({ metric, cycles, mode, hidden, hi, lifted, unlift, showHan,
   );
 }
 
+/* ---- the board ---------------------------------------------------------
+   Twenty-one federal terms, three states each, and until now twenty-one pills
+   standing open on the page: four rows deep in a desktop column and eleven on
+   a phone. Half a screen of chrome whose usual job was to say "all of them
+   are on" - and at that size the one thing it could not do at a glance was
+   tell you which ones were.
+
+   So it makes the turn the archive's filter bar made. The CONTROL folds into
+   one button that says what it is holding, and the board opens underneath it.
+   Nothing in it is given up: the two questions each term answers are the same
+   two controls in the same order, the hover preview still runs every chart
+   below, and the outcome cuts - which used to be a single button whose label
+   flipped, so returned and ousted could never be read as a pair - are four
+   named shortcuts, all four visible.
+
+   The KEY does not go with the pills, because the pills were never where it
+   lived: every chart already carries its own "Drawn here" strip, which names
+   the holder THAT measure follows (the 2013 line is Shorten on an opposition
+   chart) and draws its rule in the colour the line is actually in. One shared
+   row of prime ministers above six charts could do neither. */
 function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, showAll, hideAll,
                       showOutcome, outcomeShown, shapes, banded }) {
-  const anyHidden = hidden.size > 0;
+  const [pop, setPop] = useState(null);
   /* onMouseLeave clears the highlight for a pointer, and a finger never fires
-     it: a term raised by a tap stayed lit on the chart until another chip
+     it: a term raised by a tap stayed lit on the chart until another row
      happened to replace it. The next gesture starting outside the legend puts
      it back, the same way the chart readouts and the accuracy dots do. */
   const legRef = useRef(null);
   window.useDismissOutside(legRef, hi != null, () => setHi(null));
+
+  const total = cycles.length;
+  const onBoard = total - hidden.size;
+  /* The button has to earn the room the pills were spending, so at rest it
+     carries the sweep they showed simply by existing - "21 terms since 1972"
+     is a row of years in one line. The moment the reader has cut the board or
+     drawn a line it says THAT instead: the flourish is the first thing to go,
+     because a control that is doing something should say what. */
+  const summary = (hidden.size ? onBoard + " of " + total + " terms"
+                   : lifted.size ? total + " terms"
+                   : total + " terms since " + cycles[0].year)
+                  + (lifted.size ? " · " + lifted.size + " drawn" : "");
+
+  /* The board cut by what each government did at its own election - the
+     comparison the tab exists for, and one nobody can assemble by eye from
+     twenty-one rows. It used to be one button offering the set you were NOT
+     looking at, so the two cuts could never be compared as choices and the
+     way back to everything was a second control that only existed once you
+     had used the first. Four shortcuts instead, and which one is in effect is
+     DERIVED (`outcomeShown` already was), so a board picked apart by hand
+     simply lights none of them. */
+  const OUTCOME_NOTE = " at the election that ended it. The sitting term has not"
+                     + " faced its election, so it is in neither set.";
+  const QUICK = [
+    { id: "all", label: "All", run: showAll, title: "Every term on the board" },
+    { id: "none", label: "None", run: hideAll,
+      title: "Clear the board – no term left in the band, the mean or the download" },
+    { id: "returned", label: "Returned", run: () => showOutcome("returned"),
+      title: "Only terms whose government was returned" + OUTCOME_NOTE },
+    { id: "ousted", label: "Ousted", run: () => showOutcome("ousted"),
+      title: "Only terms whose government was turned out" + OUTCOME_NOTE },
+  ];
+  const quick = hidden.size === 0 ? "all" : hidden.size === total ? "none" : outcomeShown;
+
   return (
     <div className={"cyc-legend" + (banded ? " banded" : "")} ref={legRef}
          onMouseLeave={() => setHi(null)}>
-      <div className="cyc-legend-row">
-        {cycles.map((c) => {
-          const off = hidden.has(c.year);
-          /* Two states, not one, and they answer different questions: whether
-             the term is on the board at all (in the band, the mean and the
-             download) and whether it is DRAWN as its own line over the band.
-             The sitting term is always drawn and so is never "lifted" – it has
-             no band to be lifted out of. */
-          const lift = lifted.has(c.year) && !off;
-          const drawn = lift || c.current;
-          /* A term that changed PM names both of them: "2007 Rudd" alone says
-             Gillard never governed. netEras lists the officeholders in order,
-             so a term that kept one PM keeps its single lead. */
-          const pmNames = c.raw.netEras && c.raw.netEras.length > 1
-            ? c.raw.netEras.map((e) => e.name).join("–")
-            : c.lead;
-          const label = c.year + " " + pmNames;
-          return (
-            /* The chip is a WRAPPER, not a button: it carries two controls and
-               a button may not contain a button. The pill's chrome stays on the
-               wrapper so the whole thing still presses as one object. */
-            <span key={c.year}
-                  className={"cyc-chip" + (off ? " off" : "") + (c.current ? " current" : "")
-                             + (lift ? " lifted" : "") + (drawn ? " drawn" : "")}
-                  /* --cyc paints the chip border and tint; --cyc-text is the
-                     same party at the text threshold, for the "now" badge */
-                  style={{ "--cyc": c.color, "--cyc-text": inkOf(c.color) }}
-                  onMouseEnter={() => setHi(c.year)}>
-              <button type="button" className="cyc-main"
-                      aria-pressed={drawn}
-                      aria-label={off ? label + " – off the board, put it back"
-                                : c.current ? label + " – the sitting term, always drawn"
-                                : lift ? label + " – drawn as its own line, return it to the band"
-                                : label + " – pooled into the band, draw its own line"}
-                      onFocus={() => setHi(c.year)}
-                      onClick={() => chipClick(c.year)}>
-                {/* the swatch takes the same shape as the term's dots, or the
-                    cloud under two same-coloured lines is undecodable. Its FILL
-                    is the state: filled means there is a line of this colour on
-                    the chart, hollow means the term is in the band instead. */}
-                <span className={"cyc-swatch" + (shapes && shapes[c.year] && shapes[c.year] !== "circle"
-                                                 ? " sw-" + shapes[c.year] : "")}></span>
-                <span className="cyc-year">{c.year}</span>
-                <span className="cyc-lead">{pmNames}</span>
-                {c.current && <span className="cyc-now">Now</span>}
-              </button>
-              <button type="button" className="cyc-x"
-                      title={off ? "Put " + c.year + " back on the board"
-                                 : "Take " + c.year + " off the board – out of the band, the mean and the download"}
-                      aria-label={off ? "Put " + label + " back on the board"
-                                      : "Take " + label + " off the board"}
-                      onClick={() => toggle(c.year)}>{off ? "+" : "×"}</button>
-            </span>
-          );
-        })}
-      </div>
-      {/* A caption, not a chip: the band is derived from the chips, so it has
-          no term of its own to toggle and sits one row below in the same
-          grid, with the two band tints and the mean's dash for a key. */}
-      {banded && (
-        <div className="cyc-band-note" aria-hidden="true">
-          <svg className="cyc-band-key" viewBox="0 0 30 12">
-            {/* the same two classes the chart's fills wear, so the key is not a
-                hand-matched approximation that drifts when the band is retuned
-                – or sits at light-theme weights on a dark page */}
-            <rect className="cyc-band lo" x="4" y="0" width="22" height="12" fill="var(--cyc-fill)" />
-            <rect className="cyc-band hi" x="4" y="2.5" width="22" height="7" fill="var(--cyc-fill)" />
-            <line x1="4" y1="6" x2="26" y2="6" stroke="var(--ink-2)" strokeWidth="1.9" strokeDasharray="2 3.4" opacity="0.85" />
-          </svg>
-          <span>Past terms: mean of the set, middle half and middle 80%</span>
-        </div>
-      )}
-      <div className="cyc-actions">
-        {/* One control, both directions. "Show all" existed on its own, so
-            clearing the board meant unpicking six chips one at a time – and the
-            reason to clear it is the same reason the chips exist: to compare two
-            terms without the other four behind them. */}
-        <button type="button" className="cyc-showall"
-                onClick={anyHidden ? showAll : hideAll}>
-          {anyHidden ? "Show all cycles" : "Remove all cycles"}
-        </button>
-        {/* The board cut by what the government did at its own election - the
-            comparison the tab exists for, and one nobody can assemble by eye
-            from fourteen chips. It offers the set you are NOT looking at, so
-            one control carries both cuts; the way back to every term is the
-            control beside it, which reads "Show all cycles" the moment either
-            is applied. */}
-        <button type="button" className="cyc-showall"
-                title={"Terms whose government was " +
-                       (outcomeShown === "returned" ? "turned out" : "returned") +
-                       " at the election that ended it. The sitting term has not " +
-                       "faced its election, so it is in neither set."}
-                onClick={() => showOutcome(outcomeShown === "returned" ? "ousted" : "returned")}>
-          {outcomeShown === "returned"
-            ? "Show ousted governments only"
-            : "Show returned governments only"}
-        </button>
+      <div className="cyc-legend-bar">
+        <FilterPop id="board" label="Cycles" summary={summary} open={pop} setOpen={setPop}
+                   on={hidden.size > 0 || lifted.size > 0}>
+          <div className="ap-pop-head">
+            <span>On the board</span>
+            <div className="cyc-quick" role="group" aria-label="Board shortcuts">
+              {QUICK.map((q) => (
+                <button key={q.id} type="button" title={q.title} aria-pressed={quick === q.id}
+                        className={"cyc-quick-opt" + (quick === q.id ? " active" : "")}
+                        onClick={q.run}>{q.label}</button>
+              ))}
+            </div>
+          </div>
+          <div className="cyc-board" role="group" aria-label="Federal terms">
+            {cycles.map((c) => {
+              const off = hidden.has(c.year);
+              /* Two states, not one, and they answer different questions: whether
+                 the term is on the board at all (in the band, the mean and the
+                 download) and whether it is DRAWN as its own line over the band.
+                 The sitting term is always drawn and so is never "lifted" - it has
+                 no band to be lifted out of. */
+              const lift = lifted.has(c.year) && !off;
+              const drawn = lift || c.current;
+              /* A term that changed PM names both of them: "2007 Rudd" alone says
+                 Gillard never governed. netEras lists the officeholders in order,
+                 so a term that kept one PM keeps its single lead. */
+              const pmNames = c.raw.netEras && c.raw.netEras.length > 1
+                ? c.raw.netEras.map((e) => e.name).join("–")
+                : c.lead;
+              const label = c.year + " " + pmNames;
+              return (
+                /* The row is a WRAPPER, not a button: it carries two controls and
+                   a button may not contain a button. The row's own chrome - the
+                   tint that says which state it is in - stays here so the pair
+                   still reads as one object. */
+                <span key={c.year}
+                      className={"cyc-row" + (off ? " off" : "") + (c.current ? " current" : "")
+                                 + (lift ? " lifted" : "") + (drawn ? " drawn" : "")}
+                      /* --cyc paints the row's tint; --cyc-text is the same party
+                         at the text threshold, for the "now" badge */
+                      style={{ "--cyc": c.color, "--cyc-text": inkOf(c.color) }}
+                      onMouseEnter={() => setHi(c.year)}>
+                  <button type="button" className="cyc-main"
+                          aria-pressed={drawn}
+                          aria-label={off ? label + " – off the board, put it back"
+                                    : c.current ? label + " – the sitting term, always drawn"
+                                    : lift ? label + " – drawn as its own line, return it to the band"
+                                    : label + " – pooled into the band, draw its own line"}
+                          onFocus={() => setHi(c.year)}
+                          onClick={() => chipClick(c.year)}>
+                    {/* the swatch takes the same shape as the term's dots, or the
+                        cloud under two same-coloured lines is undecodable. Its FILL
+                        is the state: filled means there is a line of this colour on
+                        the chart, hollow means the term is in the band instead. */}
+                    <span className={"cyc-swatch" + (shapes && shapes[c.year] && shapes[c.year] !== "circle"
+                                                     ? " sw-" + shapes[c.year] : "")}></span>
+                    <span className="cyc-year">{c.year}</span>
+                    <span className="cyc-lead">{pmNames}</span>
+                    {c.current && <span className="cyc-now">Now</span>}
+                  </button>
+                  <button type="button" className="cyc-x"
+                          title={off ? "Put " + c.year + " back on the board"
+                                     : "Take " + c.year + " off the board – out of the band, the mean and the download"}
+                          aria-label={off ? "Put " + label + " back on the board"
+                                          : "Take " + label + " off the board"}
+                          onClick={() => toggle(c.year)}>{off ? "+" : "×"}</button>
+                </span>
+              );
+            })}
+          </div>
+          {/* The two controls, explained where they are. This used to be a
+              sentence in the lede, two hundred pixels above the chips it was
+              about. */}
+          <p className="ap-pop-foot">
+            Click a term to draw its own line over the band, and again to put it
+            back. The × takes it off the board altogether – out of the band, the
+            mean and the download.
+          </p>
+        </FilterPop>
+        {/* A caption, not a control: the band is derived from the board, so it
+            has no term of its own to toggle and rides beside the button with the
+            two band tints and the mean's dash for a key. */}
+        {banded && (
+          <div className="cyc-band-note" aria-hidden="true">
+            <svg className="cyc-band-key" viewBox="0 0 30 12">
+              {/* the same two classes the chart's fills wear, so the key is not a
+                  hand-matched approximation that drifts when the band is retuned
+                  - or sits at light-theme weights on a dark page */}
+              <rect className="cyc-band lo" x="4" y="0" width="22" height="12" fill="var(--cyc-fill)" />
+              <rect className="cyc-band hi" x="4" y="2.5" width="22" height="7" fill="var(--cyc-fill)" />
+              <line x1="4" y1="6" x2="26" y2="6" stroke="var(--ink-2)" strokeWidth="1.9" strokeDasharray="2 3.4" opacity="0.85" />
+            </svg>
+            <span>Past terms: mean of the set, middle half and middle 80%</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -2343,6 +2395,18 @@ function PastCyclesView() {
     if (next !== L.pathname + L.search + L.hash) window.history.replaceState(null, "", next);
   }, [hidden, lifted]);
 
+  /* The copy-as-image card needs the board twice over – for the "Past terms
+     (1972–98, 2007–13)" line under its band swatch, and for the year span in
+     its title. It used to read that off the legend chips, which were always
+     standing in the page; the board is a popover now and is usually shut, so
+     the state is published rather than scraped back out of a rendering of
+     itself. copy-chart.js is a plain script with no React to ask, and it
+     clears on unmount so no other tab can find a board here to believe. */
+  React.useEffect(() => {
+    window.AP_CYC_BOARD = { off: [...hidden] };
+    return () => { window.AP_CYC_BOARD = null; };
+  }, [hidden]);
+
   /* A chip may now turn off the last line. It used to refuse, on the grounds
      that an empty chart is useless – but the way back is one button away and
      sits right under the chips, and refusing a click that was plainly meant
@@ -2452,10 +2516,15 @@ function PastCyclesView() {
               finger cannot hover – so a phone reader was told to thin the board
               until the ribbon gave way, which is a workaround described as a
               feature. Drawing a line is a click now, so both inputs get the
-              same instruction and it is the true one. */}
-          Click a cycle below to draw its own line over the band, and again to put it back;
-          the ✕ beside it takes the term off the board altogether. Leave three or fewer
-          terms on the board to see the individual polls under each line.
+              same instruction and it is the true one.
+
+              It names the control rather than describing the gesture, because
+              the control is one button now: what each half of a row does is
+              said inside the panel, next to the halves. */}
+          Open <strong>Cycles</strong> below to draw any term’s own line over the band, to
+          take terms off the board, or to cut the board to the governments that were
+          returned or turned out at their next election. Leave three or fewer terms on
+          the board to see the individual polls under each line.
         </p>
         {srcFailed && (
           <p className="cyc-src-note">
@@ -2917,7 +2986,13 @@ function pollTagIds(p) {
 
    A popover is a listbox, not a dialog: click outside or press Escape to
    close, and focus goes back to the button that opened it. */
-function FilterPop({ id, label, summary, open, setOpen, children }) {
+/* `on` is the lit state - "something is applied here". It normally follows
+   the summary, because in the filter bar a summary IS what is applied. The
+   past-cycles board carries a summary at rest too ("21 terms since 1972" is
+   the roll its chips used to show by existing), so it says outright whether
+   the reader has actually done anything; a button that looked pressed in
+   from the first paint would be saying the same word for both. */
+function FilterPop({ id, label, summary, on, open, setOpen, children }) {
   const box = useRef(null), panel = useRef(null);
   const isOpen = open === id;
   const [flip, setFlip] = useState(false);
@@ -2944,7 +3019,8 @@ function FilterPop({ id, label, summary, open, setOpen, children }) {
   }, [isOpen]);
   return (
     <div className="ap-pop" ref={box}>
-      <button type="button" className={"ap-popbtn" + (summary ? " on" : "") + (isOpen ? " open" : "")}
+      <button type="button" className={"ap-popbtn" + ((on == null ? !!summary : on) ? " on" : "")
+                                       + (isOpen ? " open" : "")}
               aria-expanded={isOpen} aria-haspopup="true"
               onClick={() => setOpen(isOpen ? null : id)}>
         <span className="ap-popbtn-lab">{label}</span>

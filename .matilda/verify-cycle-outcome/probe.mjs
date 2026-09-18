@@ -6,7 +6,13 @@
    code that produced it. Get this wrong and the tab quietly libels a
    government, which is worse than a layout bug.
 
-   The sitting term has no next term, so no outcome: it is in neither set. */
+   The sitting term has no next term, so no outcome: it is in neither set.
+
+   The two cuts used to be ONE button offering the set you were not looking
+   at, so the choices could never be compared and "back to everything" was a
+   second control beside it. They are four named shortcuts in the board's
+   panel now - All / None / Returned / Ousted - and which one is in effect is
+   still derived from the board, never remembered. */
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -19,10 +25,11 @@ const require_ = createRequire(path.join(os.homedir(), "node_modules", "."));
 const puppeteer = require_("puppeteer-core");
 const CHROME = process.env.CHROME || "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
-/* The record, written out rather than computed: every term since 1987 and
+/* The record, written out rather than computed: every term since 1972 and
    whether its government survived the election that ended it. */
-const RETURNED = [1987, 1990, 1996, 1998, 2001, 2007, 2013, 2016, 2022];
-const OUSTED   = [1993, 2004, 2010, 2019];
+const RETURNED = [1972, 1975, 1977, 1983, 1984, 1987, 1990, 1996, 1998, 2001,
+                  2007, 2013, 2016, 2022];
+const OUSTED   = [1974, 1980, 1993, 2004, 2010, 2019];
 const SITTING  = 2025;
 
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8",
@@ -53,37 +60,44 @@ try {
   await page.goto("http://127.0.0.1:8746/", { waitUntil: "networkidle0", timeout: 60000 });
   await page.evaluate(`(() => { const b = [...document.querySelectorAll("button,a")]
     .find((x) => /^Past cycles$/i.test(x.textContent.trim())); if (b) b.click(); })()`);
-  await page.waitForSelector(".cyc-chip", { timeout: 30000 });
-  await new Promise((r) => setTimeout(r, 1800));
+  await page.waitForSelector(".cyc-legend .ap-popbtn", { timeout: 30000 });
+  await new Promise((r) => setTimeout(r, 1200));
+  await page.evaluate(`document.querySelector(".cyc-legend .ap-popbtn").click()`);
+  await page.waitForSelector(".cyc-row", { timeout: 30000 });
+  await new Promise((r) => setTimeout(r, 600));
 
-  const onBoard = () => page.evaluate(`[...document.querySelectorAll(".cyc-chip")]
+  const onBoard = () => page.evaluate(`[...document.querySelectorAll(".cyc-row")]
     .filter((c) => !c.className.includes("off"))
     .map((c) => +c.querySelector(".cyc-year").textContent).sort((a, b) => a - b)`);
-  const label = () => page.evaluate(`(() => { const b = [...document.querySelectorAll(".cyc-showall")]
-    .find((x) => /governments only/.test(x.textContent)); return b ? b.textContent.trim() : null; })()`);
-  const press = () => page.evaluate(`(() => { const b = [...document.querySelectorAll(".cyc-showall")]
-    .find((x) => /governments only/.test(x.textContent)); b.click(); return true; })()`);
-  const pressAll = () => page.evaluate(`(() => { const b = [...document.querySelectorAll(".cyc-showall")]
-    .find((x) => /^Show all cycles$/.test(x.textContent.trim())); if (b) b.click(); return !!b; })()`);
+  /* which shortcut the board is standing on, derived, not remembered */
+  const lit = () => page.evaluate(`(() => { const b = [...document.querySelectorAll(".cyc-quick-opt")]
+    .find((x) => x.className.includes("active")); return b ? b.textContent.trim() : null; })()`);
+  const press = (name) => page.evaluate(`(() => { const b = [...document.querySelectorAll(".cyc-quick-opt")]
+    .find((x) => x.textContent.trim() === "${name}"); if (b) b.click(); return !!b; })()`);
 
   const all = await onBoard();
   check("every term is on the board to start", all.length, RETURNED.length + OUSTED.length + 1);
-  check("the control offers the re-elected cut first", await label(),
-        "Show returned governments only");
+  check("…and the board says so", await lit(), "All");
+  check("all four cuts are offered at once",
+        await page.evaluate(`[...document.querySelectorAll(".cyc-quick-opt")].map((b) => b.textContent.trim())`),
+        ["All", "None", "Returned", "Ousted"]);
 
-  await press(); await new Promise((r) => setTimeout(r, 350));
+  check("Returned is a control", await press("Returned"), true);
+  await new Promise((r) => setTimeout(r, 350));
   check("re-elected only leaves exactly the governments that were returned",
         await onBoard(), RETURNED);
   check("…and the sitting term, which has not faced its election, is not in it",
         (await onBoard()).includes(SITTING), false);
-  check("…and the control now offers the other cut", await label(),
-        "Show ousted governments only");
+  check("…and that cut is the one lit", await lit(), "Returned");
 
-  await press(); await new Promise((r) => setTimeout(r, 350));
+  await press("Ousted"); await new Promise((r) => setTimeout(r, 350));
   check("ousted only leaves exactly the governments that were turned out",
         await onBoard(), OUSTED);
-  check("…and it offers the re-elected cut again", await label(),
-        "Show returned governments only");
+  check("…and that cut is the one lit", await lit(), "Ousted");
+
+  await press("None"); await new Promise((r) => setTimeout(r, 350));
+  check("None clears the board", await onBoard(), []);
+  check("…and says so", await lit(), "None");
 
   /* the two cuts must not overlap and must not between them claim the
      sitting term - that is the whole content of "no outcome yet" */
@@ -92,17 +106,16 @@ try {
   check("the two cuts cover every decided term",
         RETURNED.length + OUSTED.length, all.length - 1);
 
-  check("the way back is the control beside it", await pressAll(), true);
+  check("the way back stands beside them", await press("All"), true);
   await new Promise((r) => setTimeout(r, 350));
-  check("…which restores every term", await onBoard(), all);
+  check("…and restores every term", await onBoard(), all);
 
-  /* picking a chip off by hand after a cut must not leave the label lying:
+  /* picking a term off by hand after a cut must not leave a shortcut lying:
      the cut shown is derived from the board, not remembered */
-  await press(); await new Promise((r) => setTimeout(r, 350));
-  await page.evaluate(`document.querySelector(".cyc-chip .cyc-x").click()`);
+  await press("Returned"); await new Promise((r) => setTimeout(r, 350));
+  await page.evaluate(`document.querySelector(".cyc-row .cyc-x").click()`);
   await new Promise((r) => setTimeout(r, 350));
-  check("a hand-picked chip drops the cut, so the label resets", await label(),
-        "Show returned governments only");
+  check("a hand-picked term drops the cut, so no shortcut is lit", await lit(), null);
 } finally {
   await browser.close();
   server.close();

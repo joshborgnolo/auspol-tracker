@@ -1,6 +1,6 @@
 ---
 name: auspol-past-cycles
-description: auspol-tracker — Past-cycles machinery end-to-end (CYC_META → CYCLE_DEFS → 9f09dca2 data asset + root cycle-source.<hash>.json). Adding a historical cycle is ONE CYC_META row + ONE elections row in polls.json; the renderer, accuracy panel, legend and CSV export are fully data-driven — only copy strings hard-coding the count (now "ten"/"since 1996") need parallel edits. Keyed gotchas: src keys cyclePolls by term-END election, appr keys cycleApproval by term-START, ELECTIONS["e"+year] must exist for the lead-anchor, and accuracy rows are labelled by the election being CALLED (c.src), not the term-start year. The CycleChart person-toggles (Hanson '25 `hanCtl`, One Nation) are the ONE non-CYC_META part: they gate on DATA AVAILABILITY, never the cycle chips — Hanson can stand alone with every chip off (a062495). Legend chips name split terms with BOTH officeholders from c.raw.netEras joined "–" ("Rudd–Gillard", 90db0a4); D.cycles items are TRANSFORMED objects — eras/series live under .raw, never top-level. Also covers the historical ribbon (7240d7d): band = 3+ past terms HOLDING THE MEASURE via hasData (the cycBanded helper is deleted, 20ef05e — data-less era-bucket terms 1972-84 hold no fan seat, move no caption year, name no strip entry; a lifted one is a no-op on approval cards); drawnCycles swap; pctOf quartile stats; TrendChart areas (cyc-band lo/hi fills, class-beats-opacity-attribute theming; fill colour is the --cyc-fill variable = color-mix oklch 50/50 Labor→Coalition purple since ab4de49, one :root definition that follows theme via use-site var resolution); ('Mean of past terms' series with per-point n-of-N-tooltip notes; legend caption .cyc-band-note. Per-term event lines (CYC_EVENTS) follow ONE singled-out term via eventCycle = solo || single-forward-past || sitting-term-fallthrough (5995b8f). Card captions are measure-lead fan descriptions shared across FIVE charts (net/oppnet/ppmm/primary/tpp since a670008): approval cards lead with the literal "Approval minus disapproval" (0929fac — the rename is CAPTION-LEAD-scoped: glossary bodies, the Hanson note and the Latest-table metric link keep "approve minus disapprove" as formula words), the others lead with their own CYC_METRICS sub (ppmm "PM's lead on the preferred-PM question", tpp "Governing-party 2PP" — hyphenated); "<lead>, with a historical fan chart for all|selected previous terms since <firstYear>" where firstYear = min visible past-term year HOLDING THE MEASURE (hasData-gated since 20ef05e — approval/PPM captions open "since 1987" while the 1972-84 buckets are approval-empty; front-trims re-anchor the year, only interior DATA-BEARING gaps flip 'all'→'selected'), outcome-filter clause " that ended in a returned/ousted government" appended last (no comma, 08f2cca); the 'net approval' glossary tap-to-define lives in the CARD TITLE h2 via .hi-term (8b36759, keep the phrase 'net approval' intact in CYC_METRICS titles or the link silently dies); `hidden` is a Set — .size/.has(), never .length; card subs live ONLY in CYC_METRICS (index.html string hits are the compiled bundle, auspol-polling.html is a different legacy page).
+description: auspol-tracker — Past-cycles machinery end-to-end (CYC_META → CYCLE_DEFS → 9f09dca2 data asset + root cycle-source.<hash>.json). Adding a historical cycle is ONE CYC_META row + ONE elections row in polls.json; the renderer, accuracy panel, legend and CSV export are fully data-driven — only copy strings hard-coding the count (now "ten"/"since 1996") need parallel edits. Keyed gotchas: src keys cyclePolls by term-END election, appr keys cycleApproval by term-START, ELECTIONS["e"+year] must exist for the lead-anchor, and accuracy rows are labelled by the election being CALLED (c.src), not the term-start year. The CycleChart person-toggles (Hanson '25 `hanCtl`, One Nation) are the ONE non-CYC_META part: they gate on DATA AVAILABILITY, never the cycle rows — Hanson can stand alone with every chip off (a062495). Board rows name split terms with BOTH officeholders from c.raw.netEras joined "–" ("Rudd–Gillard", 90db0a4); D.cycles items are TRANSFORMED objects — eras/series live under .raw, never top-level. Also covers the historical ribbon (7240d7d): band = 3+ past terms HOLDING THE MEASURE via hasData (the cycBanded helper is deleted, 20ef05e — data-less era-bucket terms 1972-84 hold no fan seat, move no caption year, name no strip entry; a lifted one is a no-op on approval cards); drawnCycles swap; pctOf quartile stats; TrendChart areas (cyc-band lo/hi fills, class-beats-opacity-attribute theming; fill colour is the --cyc-fill variable = color-mix oklch 50/50 Labor→Coalition purple since ab4de49, one :root definition that follows theme via use-site var resolution); ('Mean of past terms' series with per-point n-of-N-tooltip notes; legend caption .cyc-band-note. Per-term event lines (CYC_EVENTS) follow ONE singled-out term via eventCycle = solo || single-forward-past || sitting-term-fallthrough (5995b8f). Card captions are measure-lead fan descriptions shared across FIVE charts (net/oppnet/ppmm/primary/tpp since a670008): approval cards lead with the literal "Approval minus disapproval" (0929fac — the rename is CAPTION-LEAD-scoped: glossary bodies, the Hanson note and the Latest-table metric link keep "approve minus disapprove" as formula words), the others lead with their own CYC_METRICS sub (ppmm "PM's lead on the preferred-PM question", tpp "Governing-party 2PP" — hyphenated); "<lead>, with a historical fan chart for all|selected previous terms since <firstYear>" where firstYear = min visible past-term year HOLDING THE MEASURE (hasData-gated since 20ef05e — approval/PPM captions open "since 1987" while the 1972-84 buckets are approval-empty; front-trims re-anchor the year, only interior DATA-BEARING gaps flip 'all'→'selected'), outcome-filter clause " that ended in a returned/ousted government" appended last (no comma, 08f2cca); the 'net approval' glossary tap-to-define lives in the CARD TITLE h2 via .hi-term (8b36759, keep the phrase 'net approval' intact in CYC_METRICS titles or the link silently dies); `hidden` is a Set — .size/.has(), never .length; card subs live ONLY in CYC_METRICS (index.html string hits are the compiled bundle, auspol-polling.html is a different legacy page).
 source: auto-skill
 extracted_at: '2026-09-04T06:57:40.352Z'
 ---
@@ -8,9 +8,64 @@ extracted_at: '2026-09-04T06:57:40.352Z'
 # Past cycles machinery (auspol-tracker)
 
 Adding a historical term to **Past cycles** requires no renderer changes — the
-whole view iterates `CYCLE_DEFS` (chips, lines, end-labels, download CSV,
+whole view iterates `CYCLE_DEFS` (board rows, lines, end-labels, download CSV,
 accuracy panel). The minimal diff is data + copy strings only. Worked example:
 shipping the 2007 Rudd term (commit `8c8e15c`, 2026-09-02).
+
+## The legend is a popover — READ THIS FIRST (2026-09-18)
+
+Everything below that says "chip" means a row in the **board panel** now. The
+legend used to be twenty-one `.cyc-chip` pills standing open above the charts
+— four rows deep in a desktop column, eleven on a phone, ~210px of chrome
+whose usual state was "all of them are on". It is one `FilterPop` button plus
+the band caption: **35px**.
+
+What changed, and what did NOT:
+
+- `CycleLegend` (d1a1d215 ~:1766) still takes the same props and still owns
+  `hi` / `useDismissOutside`. It renders `.cyc-legend > .cyc-legend-bar`
+  containing **`FilterPop`** (the archive's own popover component — a hoisted
+  function declaration, so calling it from higher in the file is fine) and the
+  `.cyc-band-note` caption **inline beside it**.
+- The button: `label="Cycles"`, `summary` = `"21 terms since 1972"` at rest,
+  `"12 of 21 terms"` when cut, `" · N drawn"` appended when anything is lifted.
+- Panel contents, in order: `.ap-pop-head` (the words "On the board" + the
+  `.cyc-quick` shortcut row), `.cyc-board` (the grid of terms),
+  `.ap-pop-foot` (what the two controls do).
+- **Per-term row**: `span.cyc-row` wrapping `button.cyc-main` + `button.cyc-x`
+  — the same wrapper-with-two-buttons shape `.cyc-chip` had, the same classes
+  inside (`.cyc-swatch` + `sw-triangle`/`sw-diamond`, `.cyc-year`,
+  `.cyc-lead`, `.cyc-now`), the same state classes (`off` / `current` /
+  `lifted` / `drawn`) and the same handlers (`chipClick`, `toggle`, `setHi` on
+  enter/focus). **Renaming `.cyc-chip` → `.cyc-row` is the whole per-term DOM
+  change.**
+- **`.cyc-x` is on every row at every width now.** The old "quiet until
+  hovered" rule and its `@media (max-width: 620px)` reveal-list are deleted —
+  that block is what made the sitting term's ✕ unreachable on a phone (it can
+  never enter `.lifted` or `.off`). Do not reintroduce it.
+- **`.cyc-main` / `.cyc-x` are OUT of the shared 44px `::after` tap-inflation
+  list** (template.html ~:853). In a 1px-gap grid a 44px overlay reaches into
+  the neighbouring rows and the later-painted one wins the tap. They grow
+  their own padding under `@media (pointer: coarse)` instead.
+- `.cyc-chip` is gone from every shared selector list (the raised-pill bevel,
+  the press motion, the frosted-glass block). A board row is a menu line, not
+  a control sitting on the page.
+- **`.cyc-showall` / `.cyc-actions` are deleted.** "Show all cycles /
+  Remove all cycles" and the single flipping outcome button are four
+  `.cyc-quick-opt` shortcuts in the panel head: **All · None · Returned ·
+  Ousted**, `aria-pressed`, with the active one DERIVED
+  (`hidden.size === 0` → All, `=== total` → None, else `outcomeShown`), so a
+  hand-picked board lights none of them.
+- **copy-chart.js no longer scrapes the legend.** `PastCyclesView` publishes
+  `window.AP_CYC_BOARD = { off: [...hidden] }` in its own effect (cleared on
+  unmount); copy-chart builds `board` from `AUSPOL.cycles` + that set, gated
+  on `target.closest(".view-cycles")` so a hero card copied after a visit to
+  this tab cannot inherit a cycle span. See `auspol-copy-chart-image`.
+- Probes updated and passing: `.matilda/verify-cycle-lift/probe.mjs` (14
+  checks) and `.matilda/verify-cycle-outcome/probe.mjs` (16 checks — and its
+  RETURNED/OUSTED record now covers 1972–2025, not just 1987+, which had been
+  stale since the era import). Both open the popover first; a synthetic
+  `.click()` never closes it, only a real mousedown outside does.
 
 ## Data flow
 
@@ -261,7 +316,7 @@ The fix is ONE predicate in CycleChart — `const hasData = (c) =>
   honestly open "since 1987", not 1972) and the gapped test carries
   `hasData(c)` — a hidden data-less term can't flip "all"→"selected".
 - `drawnCycles` (banded branch) and `stripCycles` exclude data-less
-  past terms — a lifted 1972–84 chip is a no-op on the approval cards
+  past terms — a lifted 1972–84 row is a no-op on the approval cards
   but lifts normally on primary/2PP, where the term DOES hold data.
 
 Plus belt-and-braces in `cycHolders`: a ppmm term with neither ppmEras
@@ -269,8 +324,8 @@ nor ppmPair falls back to the office roll-call (`c.lead + " v " +
 c.oppLead`) — "undefined" can never render even if a data-less term
 reaches the strip by a future path.
 
-Deliberately untouched: the legend CHIPS stay global (one chip set
-serves all six cards — the 1974 chip is meaningful for primary/2PP);
+Deliberately untouched: the BOARD stays global (one set of rows
+serves all six cards — the 1974 row is meaningful for primary/2PP);
 `align()` on an empty grid still emits all-null rows harmlessly
 (JSON.stringify maps undefined→null; the band pool skips nulls, so
 empty terms never corrupted the band's STATS — they only corrupted the
@@ -279,10 +334,10 @@ approval backfill ever lands (see auspol-era-cycle-import §Display
 fallout), captions and fans re-anchor to 1972 automatically — the
 machinery now follows the data, not the board.
 
-## Renderer: chip labels name split terms (commit 90db0a4)
+## Renderer: row labels name split terms (commit 90db0a4)
 
-The legend chip renders `{c.year}` + a PM name. Since 90db0a4 the name is
-derived per-cycle inside CycleLegend's `cycles.map` (d1a1d215 ~:1278):
+The board row renders `{c.year}` + a PM name. Since 90db0a4 the name is
+derived per-cycle inside CycleLegend's `cycles.map`:
 
 ```js
 const pmNames = c.raw.netEras && c.raw.netEras.length > 1
@@ -296,11 +351,11 @@ Split-PM terms render "2007 Rudd–Gillard", "2010 Gillard–Rudd",
 `c.raw.netEras` (see the display-object transform note in "Splicing and
 eras") — `eraSeries` supplies officeholders in order, so the join is
 chronological for free and a future mid-term PM change automatically
-renames its chip with zero copy edits. The other places `{c.lead}` is
-read — chip tooltips' `leadName`, the solo label `c.year + " · " +
+renames its row with zero copy edits. The other places `{c.lead}` is
+read — row tooltips' `leadName`, the solo label `c.year + " · " +
 leadName`, dot-cloud `nameAt()` — are per-READING eras or first-lead
 labels and were deliberately NOT changed with this commit; only the
-legend chip shows the full pair.
+board row shows the full pair.
 
 ## CSV assimilation (`.build/assimilate-2007-cycle-csv.mjs`, commit 7fef6c1)
 
@@ -605,9 +660,10 @@ pieces shipped in 7240d7d, all in d1a1d215 + template.html:
   .07, inner .13, dashed var(--ink-2) line 1.9 "2 3.4" — the dashed mean
   line stays ink-2 both in the key and on the chart) and copy "Past
   terms: mean of the set, middle half and middle 80%". CSS lives with
-  the `.cyc-chip` rules in template.html; `.cyc-band-note` MUST keep
-  `width: 100%` — the legend row is flex, without it the caption rides
-  inline after the last chip instead of wrapping.
+  the board rules in template.html. `.cyc-band-note` used to need
+  `width: 100%` to escape the flex row of chips; there is no such row now
+  and it deliberately rides INLINE beside the Cycles button in
+  `.cyc-legend-bar`. Do not put the width back.
 - **Band colour — `--cyc-fill` CSS variable** (template.html :root, right
   after the party colours): `color-mix(in oklch, var(--alp) 50%,
   var(--lnp))` — exactly halfway Labor red → Coalition blue in oklch.
@@ -645,7 +701,7 @@ c.current` puts it on the chart unconditionally — so it can never legally be i
 - `dim = !out && !c.current && (hi != null || lifted.size > 0)` (twice: the line
   renderer ~:1209 and the dot renderer ~:1396) dims every term that is not lifted.
 
-Nothing stopped the sitting term's own chip putting it there — `chipClick` →
+Nothing stopped the sitting term's own row putting it there — `chipClick` →
 `lift(year)` had no guard — so one tap on "2025 Albanese" produced **a ✕ on six
 charts that removed nothing** (pressing it un-lifted a term that was drawn either
 way, so the row did not move: reported as "the ✕ doesn't work") **and dimmed the
@@ -661,10 +717,14 @@ Three guards, all in the panel component in `d1a1d215`:
 3. the strip's ✕ needs `lifted.has(c.year) && !c.current`, so it can never
    render where pressing it would change nothing.
 
-Tapping the sitting chip is now a no-op, which is what its own aria-label has
+Tapping the sitting row is now a no-op, which is what its own aria-label has
 always promised ("the sitting term, always drawn"). Removing it is still the ✕
-on its legend chip (`toggle`, i.e. off the board) — a different act, and the one
+on its board row (`toggle`, i.e. off the board) — a different act, and the one
 the user reached for when the strip's ✕ failed.
+
+The third guard's phone half is structural now rather than a CSS exception:
+every row carries its ✕ at every width (see the popover section at the top),
+so there is no reveal-list for the sitting term to fall outside of.
 
 Probe: `.matilda/verify-cycle-lift/probe.mjs` — 12 checks covering the dead ✕,
 the stale `?l=`, and both paths that must keep working (a past term still lifts
@@ -882,7 +942,7 @@ Local static server + puppeteer-core (createRequire on
    disambiguate on "Opposition" — else exact strings "Preferred prime
    minister", "Government primary vote", "Government two-party
    preferred"); read the sibling `.card-sub`.
-3. **Partial selection: the per-chip `.cyc-x` button** on the `.cyc-chip`
+3. **Partial selection: the per-row `.cyc-x` button** on the `.cyc-row`
    containing `.cyc-year` text == the year (aria-label "Take {label} off
    the board"). Board-level "Show all cycles"/"Remove all cycles" never
    express a partial board. Front-trim = hide the EARLIEST chip; the

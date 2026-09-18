@@ -13,7 +13,12 @@
    AND dimmed the whole board for a lift that had not happened.
 
    Guards: lift() ignores the sitting term, the ?l= parser drops it (links
-   copied while the bug was live carry it), and the ✕ needs !c.current. */
+   copied while the bug was live carry it), and the ✕ needs !c.current.
+
+   The board moved into a popover (the legend was twenty-one pills standing
+   open on the page), so every step here opens it first and reads .cyc-row
+   where it used to read .cyc-chip. The behaviour under test is unchanged:
+   same two controls per term, same three states. */
 import http from "node:http";
 import fs from "node:fs";
 import path from "node:path";
@@ -52,8 +57,13 @@ const openCycles = async (page, search) => {
   await page.goto("http://127.0.0.1:8742/" + (search || ""), { waitUntil: "networkidle0", timeout: 60000 });
   await page.evaluate(`(() => { const b = [...document.querySelectorAll("button,a")]
     .find((x) => /^Past cycles$/i.test(x.textContent.trim())); if (b) b.click(); })()`);
-  await page.waitForSelector(".cyc-chip", { timeout: 30000 });
-  await new Promise((r) => setTimeout(r, 1800));
+  await page.waitForSelector(".cyc-legend .ap-popbtn", { timeout: 30000 });
+  await new Promise((r) => setTimeout(r, 1200));
+  /* the board is a popover now: open it, and leave it open. Only a real
+     mousedown outside closes it, and nothing here dispatches one. */
+  await page.evaluate(`document.querySelector(".cyc-legend .ap-popbtn").click()`);
+  await page.waitForSelector(".cyc-row", { timeout: 30000 });
+  await new Promise((r) => setTimeout(r, 600));
 };
 /* one term's presence in the strips, and whether it offers a ✕ there */
 const strip = (page, year) => page.evaluate(`(() => {
@@ -62,8 +72,8 @@ const strip = (page, year) => page.evaluate(`(() => {
   return { rows: rows.length, withX: rows.filter((e) => e.querySelector(".cyc-drawn-x")).length,
            l: new URLSearchParams(location.search).get("l") };
 })()`);
-const tapChip = (page, year) => page.evaluate(`(() => {
-  const c = [...document.querySelectorAll(".cyc-chip")]
+const tapRow = (page, year) => page.evaluate(`(() => {
+  const c = [...document.querySelectorAll(".cyc-row")]
     .find((e) => (e.querySelector(".cyc-year") || {}).textContent === "${year}");
   if (!c) return false; c.querySelector(".cyc-main").click(); return true;
 })()`);
@@ -73,9 +83,9 @@ try {
   page.on("pageerror", (e) => console.error("[page]", e.message));
   await openCycles(page);
   const years = await page.evaluate(`(() => {
-    const chips = [...document.querySelectorAll(".cyc-chip")];
-    const cur = chips.find((c) => c.querySelector(".cyc-now"));
-    const past = chips.filter((c) => !c.querySelector(".cyc-now"));
+    const rows = [...document.querySelectorAll(".cyc-row")];
+    const cur = rows.find((c) => c.querySelector(".cyc-now"));
+    const past = rows.filter((c) => !c.querySelector(".cyc-now"));
     return { current: cur && cur.querySelector(".cyc-year").textContent,
              past: past[past.length - 1].querySelector(".cyc-year").textContent };
   })()`);
@@ -85,15 +95,15 @@ try {
   const before = await strip(page, years.current);
   check("sitting term is drawn in every chart before any tap", before.rows > 0, true);
   check("…and offers no ✕ there", before.withX, 0);
-  await tapChip(page, years.current);
+  await tapRow(page, years.current);
   await new Promise((r) => setTimeout(r, 500));
   const after = await strip(page, years.current);
-  check("tapping the sitting chip raises no ✕", after.withX, 0);
+  check("tapping the sitting row raises no ✕", after.withX, 0);
   check("…and writes no ?l= for it", after.l, null);
   check("…and leaves it drawn", after.rows, before.rows);
 
   // ---- a past term still lifts, and its ✕ still returns it to the band ----
-  await tapChip(page, years.past);
+  await tapRow(page, years.past);
   await new Promise((r) => setTimeout(r, 500));
   const lifted = await strip(page, years.past);
   check("a past term lifts into the strips", lifted.rows > 0, true);
@@ -114,39 +124,42 @@ try {
   const stale = await strip(page, years.current);
   check("a stale ?l= naming the sitting term is dropped", stale.withX, 0);
 
-  /* ---- the sitting term's own ✕ is reachable under 620px --------------
+  /* ---- the sitting term's own ✕ is reachable on a narrow window -------
      Reported live: "on my phone I can't x the Albanese line" - and the cause
-     was not touch, it was width. The narrow-width rule that hides a chip's
-     ✕ by default only reveals it for .lifted or .off, on the reasoning that
-     every other term is one tap from lifted - which is false for the
-     sitting term, since lift() refuses it outright (it has no band to be
-     lifted out of). Its ✕ sat permanently display:none below 620px with no
-     tap sequence that ever revealed it. */
+     was not touch, it was width. A narrow-width rule hid a chip's ✕ by
+     default and revealed it only for .lifted or .off, on the reasoning that
+     every other term is one tap from lifted - which is false for the sitting
+     term, since lift() refuses it outright (it has no band to be lifted out
+     of). Its ✕ sat permanently display:none below 620px with no tap sequence
+     that ever revealed it.
+
+     The rule is gone: rows in the panel carry their ✕ at every width, which
+     is what this now holds the board to. */
   await page.setViewport({ width: 390, height: 900 });
   await new Promise((r) => setTimeout(r, 400));
   const sitX = await page.evaluate(`(() => {
-    const chip = [...document.querySelectorAll(".cyc-chip")].find((c) => c.querySelector(".cyc-now"));
-    const x = chip.querySelector(".cyc-x");
+    const row = [...document.querySelectorAll(".cyc-row")].find((c) => c.querySelector(".cyc-now"));
+    const x = row.querySelector(".cyc-x");
     const r = x.getBoundingClientRect();
     return r.width > 0 && r.height > 0;
   })()`);
-  check("the sitting term's ✕ has a real hit target under 620px", sitX, true);
-  await page.evaluate(`document.querySelector(".cyc-chip.current .cyc-x").click()`);
+  check("the sitting term's ✕ has a real hit target at 390px", sitX, true);
+  await page.evaluate(`document.querySelector(".cyc-row.current .cyc-x").click()`);
   await new Promise((r) => setTimeout(r, 400));
-  check("tapping it under 620px takes the sitting term off the board",
+  check("tapping it at 390px takes the sitting term off the board",
         await strip(page, years.current), { rows: 0, withX: 0, l: null });
-  await page.evaluate(`document.querySelector(".cyc-chip.current .cyc-x").click()`);
+  await page.evaluate(`document.querySelector(".cyc-row.current .cyc-x").click()`);
   await new Promise((r) => setTimeout(r, 400));
   await page.setViewport({ width: 1280, height: 900 });
 
-  // ---- the legend's own ✕ still takes the sitting term off the board ----
+  // ---- the board's own ✕ still takes the sitting term off the board ----
   await page.evaluate(`(() => {
-    const c = [...document.querySelectorAll(".cyc-chip")]
+    const c = [...document.querySelectorAll(".cyc-row")]
       .find((e) => (e.querySelector(".cyc-year") || {}).textContent === "${years.current}");
     c.querySelector(".cyc-x").click();
   })()`);
   await new Promise((r) => setTimeout(r, 500));
-  check("the legend ✕ still removes the sitting term",
+  check("the board ✕ still removes the sitting term",
         (await strip(page, years.current)).rows, 0);
 } finally {
   await browser.close();

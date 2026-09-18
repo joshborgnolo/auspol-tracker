@@ -849,11 +849,14 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
 /* ---------- accessibility: 44px tap targets ---------- */
 /* keep the tight editorial sizing visually, but extend the *hit* area to a
    44px-tall invisible overlay so the controls are comfortable on touch. */
+/* .cyc-main / .cyc-x are deliberately NOT here: they are rows in a dense
+   grid now, where a 44px overlay would reach into the rows either side and the
+   one painted later would take the tap. They grow their own padding on a
+   coarse pointer instead – see the board block below. */
 .tt-opt, .theme-cell, .legend-chip, .seg-btn, .hb-toggle,
-.cyc-main, .cyc-x, .cyc-drawn-x, .ap-popbtn, .tab-score, .cyc-showall, .ap-clear { position: relative; }
+.cyc-drawn-x, .ap-popbtn, .tab-score, .ap-clear { position: relative; }
 .tt-opt::after, .theme-cell::after, .legend-chip::after, .seg-btn::after, .hb-toggle::after,
-.cyc-main::after, .cyc-x::after, .cyc-drawn-x::after, .ap-popbtn::after, .tab-score::after,
-.cyc-showall::after, .ap-clear::after {
+.cyc-drawn-x::after, .ap-popbtn::after, .tab-score::after, .ap-clear::after {
   content: ""; position: absolute; left: 0; right: 0;
   top: 50%; transform: translateY(-50%);
   height: 44px;
@@ -966,16 +969,16 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
    a way a tint cannot. The .segmented track recesses so its active cell has
    something to stand proud of - that cell already carried a drop shadow, which
    is the idiom the rest of this follows. */
-.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay, .acc-spread {
+.ha-chip, .legend-chip, .ap-popbtn, .dl-replay, .acc-spread {
   box-shadow: inset 0 1px 0 var(--btn-lit),
               0 1px 1.5px var(--btn-shade),      /* contact */
               0 3px 6px -3px var(--btn-shade);   /* ambient - what makes it sit ON the page */
 }
-.ha-chip, .legend-chip, .cyc-chip, .ap-popbtn, .dl-replay, .acc-spread,
+.ha-chip, .legend-chip, .ap-popbtn, .dl-replay, .acc-spread,
 .seg-btn, .pg-check input {
   transition-property: color, border-color, background-color, opacity, transform, box-shadow;
 }
-.ha-chip:active, .legend-chip:active, .cyc-chip:active,
+.ha-chip:active, .legend-chip:active,
 .ap-popbtn:active, .dl-replay:active:not(:disabled), .acc-spread:active,
 .ap-popbtn.on, .ap-popbtn.open,
 /* a latching toggle that is ON is a button held in, which is a thing a tint
@@ -1009,9 +1012,6 @@ button.ha-chip, button.legend-chip,
 button.ap-popbtn, button.dl-replay, button.acc-spread {
   border-bottom-color: var(--btn-edge);
 }
-/* .cyc-chip is a <span> wrapper (it holds two buttons), so the element+class
-   trick above cannot reach it – it sets its own bevel in the block below,
-   after its own `border` shorthand. */
 
 /* ---------- bars are channels ---------------------------------------------
    Every bar on the site is already the hero gauge's anatomy under another
@@ -3254,75 +3254,95 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 }
 @media (max-width: 1000px) { .cyc-export { display: none; } }
 
-.cyc-legend { margin: 20px 0 6px; }
-.cyc-legend-row { display: flex; flex-wrap: wrap; gap: 7px; }
-/* The chip is a WRAPPER, not a button: it carries two controls that answer two
+/* ---------- the board ------------------------------------------------------
+   One button and a caption, where twenty-one pills used to stand. The terms
+   are in the panel it opens, and everything that made a chip legible travels
+   with them – the party colour, the swatch shape the chart's own dots wear,
+   the fill that says whether a line is drawn. What is gone is the pill chrome
+   around it, because a menu row is not a thing that sits ON the page: it is a
+   line in a list, and it answers the pointer by lighting up rather than by
+   standing proud. */
+.cyc-legend { margin: 20px 0 10px; }
+.cyc-legend-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+/* Wider than the archive's filter panels, and deliberately: those hold a
+   column of options and this holds a roll of twenty-one terms with a name on
+   each. At this width a desktop column takes three columns of them and a
+   phone takes one whole name per line – the in-between, two columns of
+   clipped surnames, is the one arrangement worth avoiding. */
+.cyc-legend .ap-panel { width: min(660px, calc(100vw - 28px)); max-width: none; }
+/* The head wraps on a narrow panel: "On the board" plus four options is a
+   little wider than a 320px phone, and a shortcut row that ran off the edge
+   would be worse than one on its own line. */
+.cyc-legend .ap-pop-head { flex-wrap: wrap; }
+/* Four cuts of the same set, so they read as four options in one voice rather
+   than a primary with three alternatives. The active one is underlined, not
+   filled: this is a row inside a panel head, not a segmented control.
+   margin-left:auto keeps it right-aligned whether or not the head wrapped. */
+.cyc-quick { display: flex; align-items: baseline; gap: 13px; margin-left: auto; }
+.cyc-quick-opt {
+  border: 0; background: none; cursor: pointer; padding: 1px 0;
+  font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3);
+  border-bottom: 1.5px solid transparent; transition: color .15s ease;
+}
+.cyc-quick-opt:hover { color: var(--ink-2); }
+.cyc-quick-opt.active { color: var(--ink); font-weight: 700; border-bottom-color: var(--ink); }
+
+.cyc-board {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1px 3px; padding: 2px 1px;
+  max-height: min(52vh, 342px); overflow-y: auto;
+}
+/* The row is a WRAPPER, not a button: it carries two controls that answer two
    different questions – .cyc-main draws the term's line over the band, .cyc-x
    takes the term off the board entirely – and a button may not contain a
-   button. All the pill chrome stays here so the pair still presses as one
-   object, and `border-bottom-color` is declared after the `border` shorthand
-   rather than by the element+class bevel rule further up, which cannot match a
-   span. */
-.cyc-chip {
-  display: inline-flex; align-items: center; white-space: nowrap;
-  background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
-  border-bottom-color: var(--btn-edge);
+   button. The state tint stays here so the pair still reads as one object. */
+.cyc-row {
+  display: flex; align-items: center; min-width: 0; border-radius: 8px;
   font-family: var(--sans); color: var(--ink-2);
-  transition: color .15s ease, border-color .15s ease, background-color .15s ease, opacity .15s ease;
+  transition: background-color .15s ease;
 }
-.cyc-chip:hover { border-color: var(--ink-faint); }
+/* A row that is already tinted by its own state still has to answer the
+   pointer, so the hover is a step up from wherever that row started rather
+   than one flat grey that paints over the state underneath it. */
+.cyc-row:hover, .cyc-row:focus-within { background: color-mix(in oklch, var(--ink) 6%, transparent); }
+.cyc-row.current { background: color-mix(in oklch, var(--cyc) 9%, transparent); }
+/* A term the reader has drawn out of the band. Louder than .current's resting
+   tint, because .current is simply where the page starts and this is a thing
+   that was asked for. */
+.cyc-row.lifted { background: color-mix(in oklch, var(--cyc) 13%, transparent); }
+.cyc-row.current:hover, .cyc-row.current:focus-within,
+.cyc-row.lifted:hover, .cyc-row.lifted:focus-within {
+  background: color-mix(in oklch, var(--cyc) 20%, transparent);
+}
 .cyc-main {
-  display: inline-flex; align-items: center; gap: 8px;
+  display: flex; align-items: center; gap: 8px; min-width: 0; flex: 1;
   border: 0; background: none; color: inherit; font: inherit; cursor: pointer;
-  padding: 6px 6px 6px 11px; border-radius: 999px 0 0 999px;
+  padding: 8px 3px 8px 9px; border-radius: 8px 0 0 8px; text-align: left;
 }
-.cyc-main:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-/* Quiet until it is wanted. It keeps its space in the row either way – a ✕ that
-   appeared on hover and pushed the chips along would move the target the reader
-   is aiming at – and it cannot be clicked while it is invisible, which on a
-   control that empties a term out of the band matters more than the tidiness. */
+/* Inset, so the ring stays inside the row instead of crossing the one above. */
+.cyc-main:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* On every row, always. It used to appear on hover, and below 620px it was
+   hidden on all but three states, because twenty-one pills each reserving a ✕
+   cost three more rows of legend. That crowding is gone, and so is the bug the
+   hiding kept producing: the sitting term could reach none of the states that
+   revealed its own ✕, so on a narrow window there was no sequence of taps that
+   took it off the board. */
 .cyc-x {
   border: 0; background: none; cursor: pointer; font-family: var(--sans);
   font-size: 14px; font-weight: 500; line-height: 1; color: var(--ink-faint);
-  padding: 6px 10px 6px 4px; border-radius: 0 999px 999px 0;
-  opacity: 0; pointer-events: none;
-  transition: opacity .15s ease, color .15s ease;
+  padding: 8px 9px 8px 4px; border-radius: 0 8px 8px 0; flex: none;
+  transition: color .15s ease;
 }
-.cyc-chip:hover .cyc-x, .cyc-chip:focus-within .cyc-x,
-.cyc-chip.lifted .cyc-x, .cyc-chip.off .cyc-x { opacity: 1; pointer-events: auto; }
+.cyc-row:hover .cyc-x { color: var(--ink-3); }
 .cyc-x:hover { color: var(--ink); }
-.cyc-x:focus-visible { opacity: 1; pointer-events: auto; outline: 2px solid var(--accent); outline-offset: 1px; }
-/* A finger has no hover to reveal it with. */
-@media (hover: none) { .cyc-x { opacity: 1; pointer-events: auto; } }
-/* Phones: fourteen chips already wrap to ten rows in a 375px column, and
-   reserving the ✕ on every one of them added three more – half the viewport
-   spent on a legend. Here it is not reserved at all, and appears on the chips
-   whose state gives it something to say: a term drawn out of the band, or one
-   already off the board. Every other term is one tap from lifted, which is the
-   tap a reader coming to remove it would make first anyway.
-
-   The SITTING term is the exception that reasoning misses, and the bug it
-   caused: it is never "one tap from lifted" - lift() refuses it outright,
-   since it has no band to be lifted out of (auspol-past-cycles, the
-   2026-09-03 fix) - so it can never earn its way into .lifted or .off and
-   its ✕ sat permanently display:none below this width, with no sequence
-   of taps that reveals it. Reported as "the Albanese line won't clear on
-   my phone", and it was the same on any narrow window regardless of touch:
-   this is a max-width query, not a hover one. .cyc-chip.current joins the
-   exception list here for the reason .lifted and .off are already in it -
-   its ✕ has something to say (take the sitting term off the board) that no
-   tap sequence can surface any other way. */
-@media (max-width: 620px) {
-  .cyc-x { display: none; }
-  .cyc-chip.lifted .cyc-x, .cyc-chip.off .cyc-x, .cyc-chip.current .cyc-x { display: inline-block; }
-  .cyc-main { padding-right: 11px; }
-  .cyc-chip.lifted .cyc-main, .cyc-chip.off .cyc-main,
-  .cyc-chip.current .cyc-main { padding-right: 4px; }
-  /* The rules already carry the colour and the years are self-evidently a list
-     of terms; the caption is the first thing to go when the column is this
-     narrow. */
-  .cyc-drawn-label { display: none; }
-  .cyc-drawn-item { font-size: 11.5px; padding: 3px 4px 3px 8px; }
+.cyc-x:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+/* A finger gets the row, not a 44px overlay. Every other control on this page
+   inflates its hit area with an invisible ::after, which works where a control
+   has air around it – here it would reach a third of the way into the rows
+   above and below, and the row below, painted later, would take the tap. So
+   the row grows to the same size instead, which is the honest version of it. */
+@media (pointer: coarse) {
+  .cyc-main, .cyc-x { padding-top: 12px; padding-bottom: 12px; }
 }
 /* NO background transition here, and the swap is instant by design. Animating
    background-color to a var()-derived colour on this element sticks: the swatch
@@ -3332,7 +3352,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    existed. (Longhand `background-color` regardless: a `background` shorthand
    carrying a var() is a pending-substitution value and cannot be interpolated,
    so it is the wrong thing to hand a transition even if one comes back.) */
-.cyc-chip .cyc-swatch { width: 11px; height: 11px; border-radius: 50%; flex: none;
+.cyc-row .cyc-swatch { width: 11px; height: 11px; border-radius: 50%; flex: none;
   background-color: var(--cyc); transition: transform .15s ease; }
 /* The fill IS the state: filled means there is a line of this colour on the
    chart, a ring means the term is pooled into the band instead. Said only where
@@ -3340,8 +3360,8 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    term draws its own line, and a ring would then be denying a line the chart is
    drawing. inset box-shadow rather than a border so the ring is clipped along
    with the swatch when the swatch is a triangle or a diamond. */
-.cyc-legend.banded .cyc-chip .cyc-swatch { background-color: transparent; box-shadow: inset 0 0 0 2px var(--cyc); }
-.cyc-legend.banded .cyc-chip.drawn .cyc-swatch { background-color: var(--cyc); box-shadow: none; }
+.cyc-legend.banded .cyc-row .cyc-swatch { background-color: transparent; box-shadow: inset 0 0 0 2px var(--cyc); }
+.cyc-legend.banded .cyc-row.drawn .cyc-swatch { background-color: var(--cyc); box-shadow: none; }
 /* A swatch borrows the shape of the term's dots when the chart is drawing
    them, so two Coalition terms in the same blue are told apart in the legend
    the same way they are told apart on the chart. clip-path over a second
@@ -3349,32 +3369,33 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    circle stays the default nothing has to opt into. The triangle is sized a
    little past the box for the same reason the dot is - inscribed, it reads
    smaller than the circle beside it. */
-.cyc-chip .cyc-swatch.sw-triangle { border-radius: 0; width: 12px; height: 12px;
+.cyc-row .cyc-swatch.sw-triangle { border-radius: 0; width: 12px; height: 12px;
   clip-path: polygon(50% 2%, 100% 96%, 0 96%); }
-.cyc-chip .cyc-swatch.sw-diamond { border-radius: 0; width: 12px; height: 12px;
+.cyc-row .cyc-swatch.sw-diamond { border-radius: 0; width: 12px; height: 12px;
   clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
-.cyc-chip .cyc-year { font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
-.cyc-chip .cyc-lead { font-size: 13px; font-weight: 500; color: var(--ink-3); }
+.cyc-row .cyc-year { font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+/* The name is the one part of a row that can outrun its column – "Turnbull–
+   Morrison" in a narrow panel – so it is the part that gives way. It only ever
+   has to at widths where the grid is already down to one column. */
+.cyc-row .cyc-lead { font-size: 13px; font-weight: 500; color: var(--ink-3);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Off the board is a third state, and it has to be unmistakable against the
-   other two: not in the band, not drawn, not in the download. Dashed, because a
-   broken edge is the one thing neither of the other two says. */
-.cyc-chip.off { opacity: 0.4; border-style: dashed; }
-.cyc-chip.off .cyc-swatch,
-.cyc-legend.banded .cyc-chip.off .cyc-swatch { background-color: var(--ink-faint); box-shadow: none; }
-.cyc-chip.current {
-  border-color: color-mix(in oklch, var(--cyc) 45%, var(--line));
-  background: color-mix(in oklch, var(--cyc) 8%, var(--surface));
+   other two: not in the band, not drawn, not in the download. The row goes
+   quiet and its mark goes grey – but the control that brings it back does not
+   dim with it, or the one thing to do with an off row would be the faintest
+   thing in it. (It reads "+" there, not "×", for the same reason.) */
+.cyc-row.off .cyc-main { opacity: 0.45; }
+/* and it wears no state tint while it is off: the sitting term taken off the
+   board is still the sitting term, but it is not on any chart, so a row that
+   went on glowing its party colour would be naming a line that is not there. */
+.cyc-row.off.current, .cyc-row.off.lifted { background: transparent; }
+.cyc-row.off.current:hover, .cyc-row.off.current:focus-within,
+.cyc-row.off.lifted:hover, .cyc-row.off.lifted:focus-within {
+  background: color-mix(in oklch, var(--ink) 6%, transparent);
 }
-/* A term the reader has drawn out of the band. Louder than .current's resting
-   tint, because .current is simply where the page starts and this is a thing
-   that was asked for. Both are two classes, so both out-rank the frosted-glass
-   background at the foot of this file. */
-.cyc-chip.lifted {
-  border-color: color-mix(in oklch, var(--cyc) 55%, var(--line));
-  background: color-mix(in oklch, var(--cyc) 10%, var(--surface));
-}
-.cyc-chip.current:hover .cyc-swatch,
-.cyc-chip:hover .cyc-swatch { transform: scale(1.18); }
+.cyc-row.off .cyc-swatch,
+.cyc-legend.banded .cyc-row.off .cyc-swatch { background-color: var(--ink-faint); box-shadow: none; }
+.cyc-row:hover .cyc-swatch { transform: scale(1.18); }
 
 /* ---------- what each chart is drawing ----------
    A caption on the lines, not a second legend: it lists only what this chart
@@ -3413,6 +3434,14 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 }
 .cyc-drawn-x:hover { color: var(--ink); background: color-mix(in oklch, var(--ink) 12%, transparent); }
 .cyc-drawn-x:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+/* The rules already carry the colour and the years are self-evidently a list
+   of terms; the caption is the first thing to go when the column is this
+   narrow. (It used to share a media block with the legend chips' ✕-hiding,
+   which the board panel made unnecessary.) */
+@media (max-width: 620px) {
+  .cyc-drawn-label { display: none; }
+  .cyc-drawn-item { font-size: 11.5px; padding: 3px 4px 3px 8px; }
+}
 .cyc-now {
   font-size: 10px; font-weight: 800;
   color: var(--cyc-text, var(--cyc)); border: 1px solid color-mix(in oklch, var(--cyc) 40%, var(--line));
@@ -3423,15 +3452,6 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
      surface. The badge is small, high-tracked type – it needs the headroom. */
   background: var(--surface);
 }
-/* the two board-wide controls share one line and one voice - both are ways
-   of re-cutting the same set, not a primary and a secondary */
-.cyc-actions { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 18px; }
-.cyc-showall {
-  margin-top: 10px; border: 0; background: none; cursor: pointer; font-family: var(--sans);
-  font-size: 12.5px; font-weight: 600; color: var(--accent); padding: 2px 0;
-  text-align: left;
-}
-.cyc-showall:hover { text-decoration: underline; }
 /* The chart fills take their theme from here, not from the component: the
    class beats the opacity attribute, and ink is near-white in dark, so the
    same tints that whisper on paper would shout on slate without a lift. */
@@ -3448,8 +3468,11 @@ body.dark .cyc-band.hi { opacity: 0.30; }
 .cyc-band.hi.thin { opacity: 0.075; }
 body.dark .cyc-band.lo.thin { opacity: 0.07; }
 body.dark .cyc-band.hi.thin { opacity: 0.13; }
+/* It sits BESIDE the button in the legend bar, not under it: the band is one
+   line of key and the bar has room for it. (It used to need `width: 100%` to
+   escape a flex row of chips – there is no such row to escape now.) */
 .cyc-band-note {
-  width: 100%; display: flex; align-items: center; gap: 7px; margin-top: 7px;
+  display: flex; align-items: center; gap: 7px; min-width: 0;
   font-family: var(--sans); font-size: 12px; font-weight: 500; color: var(--ink-3);
 }
 .cyc-band-key { width: 30px; height: 12px; flex: none; }
@@ -4153,23 +4176,23 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   }
 
   /* quiet press acknowledgement on chip-like controls */
-  .legend-chip, .cyc-chip, .ap-popbtn, .seg-btn { transition-property: color, border-color, background-color, opacity, transform, box-shadow; }
+  .legend-chip, .ap-popbtn, .seg-btn { transition-property: color, border-color, background-color, opacity, transform, box-shadow; }
   /* A press you can feel: the control travels DOWN into the page rather than
      just shrinking on the spot. Scale alone reads as a zoom - it is the one
      gesture a physical button cannot make - so the travel carries it and the
      scale only steadies it. The shadow collapse that goes with it is in the
      controls block above; together they are the object meeting the paper. */
-  .legend-chip:active, .cyc-chip:active, .ap-popbtn:active,
+  .legend-chip:active, .ap-popbtn:active,
   .seg-btn:active, .ha-chip:active, .acc-spread:active,
   .dl-replay:active:not(:disabled) { transform: translateY(1px) scale(0.985); }
   .exp-btn:active { transform: scale(0.965); }
   /* Fast in, slower out. A press that returns at the speed it went is a
      crossfade between two states; the asymmetry is what reads as a thing
      with weight being let go of. */
-  .legend-chip, .cyc-chip, .ap-popbtn, .seg-btn, .ha-chip, .dl-replay, .acc-spread {
+  .legend-chip, .ap-popbtn, .seg-btn, .ha-chip, .dl-replay, .acc-spread {
     transition-duration: .19s;
   }
-  .legend-chip:active, .cyc-chip:active, .ap-popbtn:active, .acc-spread:active,
+  .legend-chip:active, .ap-popbtn:active, .acc-spread:active,
   .seg-btn:active, .ha-chip:active, .dl-replay:active:not(:disabled) {
     transition-duration: .055s;
   }
@@ -4205,7 +4228,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    is near-invisible (nothing behind to blur); it comes alive where a control
    sits over content – above all the pinned tab bar as the page scrolls under. */
 @supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
-  .segmented, .legend-chip, .cyc-chip, .ap-popbtn, .ap-export {
+  .segmented, .legend-chip, .ap-popbtn, .ap-export {
     background: var(--glass-bg);
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);

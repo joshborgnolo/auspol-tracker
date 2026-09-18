@@ -1,6 +1,6 @@
 ---
 name: auspol-copy-chart-image
-description: auspol-tracker — copy-as-PLAN internals in .build/newtracker/assets/copy-chart.js (PLAIN script, canvas 1200px card): bakeSvg serialises the live svg at forced COPY_W=1120; widenForCopy parks the LIVE chart at left:-99999px during the wide re-layout (~1s on phones) and a fixed stand-in clone on document.body (3bb8bf7) covers the slot for exactly that window; the park ALSO needs every in-flow sibling of the host frozen at its measured rect (d3162c0) or phone users see the hero legend/caption slide up through the stand-in's transparent svg gaps (host.parentElement is the whole section.card.hero — .hero-foot is an in-flow sibling below .chart); the copied legend is REBUILT from DOM (chips sit outside the card) by cycleLegend() mapping .end-label text → {label, kind: line|dashed|band|square|dot|cycband, fill, alpha, year} sorted by year (overlays 9999, band 9998); ON[' ]+\d{2} → One Nation dashed, else colour-matched AUSPOL.LEADERS → "{name}, from {firstYear}"; inkVar() resolves CSS vars via probe span; painter swatch 18px at (lx,my), SW_W=26, LEG_GAP=26; the cycband entry (ed55a03) re-derives past-terms band membership from non-off non-current .cyc-chip minus end-labelled years, label mirrors live .cyc-band-note copy, swatch = stacked lo/hi roundRects in --cyc-fill with opacities read live via getComputedStyle (fallbacks 0.09/0.17) + dashed mean; the copied TITLE span (f8843f0) for past cycles walks deduped .cyc-chip runs → first-election→next-boundary ranges, current run ends "present", "," separator vs " · " fallbacks (legend years → x-axis labels) via abRange() century-compression; source holds LITERAL 2013/00b7 escapes — edit old_string must match them, not the rendered –/·; third phone-copy glitch (7d1b166): the clone is a FRESH .chart element so the no-preference chart-in opacity fade replays on insert (flash incl. evt-labels, same svg) — stand carries .copy-stand class + an unconditional template.html rule killing animation/transition inside it, placed AFTER chart-in in source order.
+description: auspol-tracker — copy-as-PLAN internals in .build/newtracker/assets/copy-chart.js (PLAIN script, canvas 1200px card): bakeSvg serialises the live svg at forced COPY_W=1120; widenForCopy parks the LIVE chart at left:-99999px during the wide re-layout (~1s on phones) and a fixed stand-in clone on document.body (3bb8bf7) covers the slot for exactly that window; the park ALSO needs every in-flow sibling of the host frozen at its measured rect (d3162c0) or phone users see the hero legend/caption slide up through the stand-in's transparent svg gaps (host.parentElement is the whole section.card.hero — .hero-foot is an in-flow sibling below .chart); the copied legend is REBUILT from DOM (the past-cycles legend sits outside the card, and is a popover since 2026-09-18 — board state comes from window.AP_CYC_BOARD, gated on target.closest('.view-cycles')) by cycleLegend() mapping .end-label text → {label, kind: line|dashed|band|square|dot|cycband, fill, alpha, year} sorted by year (overlays 9999, band 9998); ON[' ]+\d{2} → One Nation dashed, else colour-matched AUSPOL.LEADERS → "{name}, from {firstYear}"; inkVar() resolves CSS vars via probe span; painter swatch 18px at (lx,my), SW_W=26, LEG_GAP=26; the cycband entry (ed55a03) re-derives past-terms band membership from the non-off non-current rows of `board` (window.AP_CYC_BOARD + AUSPOL.cycles, 2026-09-18; was non-off non-current .cyc-chip) minus end-labelled years, label mirrors live .cyc-band-note copy, swatch = stacked lo/hi roundRects in --cyc-fill with opacities read live via getComputedStyle (fallbacks 0.09/0.17) + dashed mean; the copied TITLE span (f8843f0) for past cycles walks `board` runs (was deduped .cyc-chip) → first-election→next-boundary ranges, current run ends "present", "," separator vs " · " fallbacks (legend years → x-axis labels) via abRange() century-compression; source holds LITERAL 2013/00b7 escapes — edit old_string must match them, not the rendered –/·; third phone-copy glitch (7d1b166): the clone is a FRESH .chart element so the no-preference chart-in opacity fade replays on insert (flash incl. evt-labels, same svg) — stand carries .copy-stand class + an unconditional template.html rule killing animation/transition inside it, placed AFTER chart-in in source order.
 source: auto-skill
 extracted_at: '2026-09-03T07:10:44.067Z'
 ---
@@ -35,7 +35,7 @@ auspol-build-pipeline skill (29499c2 lesson: no viewBox on the capture svg).
 
 Live legend chips sit OUTSIDE the chart card, so the PNG legend is
 synthesised. Past-cycles variant = `cycleLegend()` inside
-`composeCardInner`:
+`composeCardInner` (it reads `cycList`, the hoisted `AUSPOL.cycles`):
 
 - Entries are `{label, kind, fill, alpha, year}`, kinds
   `line|dashed|band|square|dot|cycband`, sorted by `year`; overlays park at
@@ -59,10 +59,9 @@ outside the SVG. Pattern for the fix (reusable for any future
 - Append the entry ONLY when the svg actually draws the feature:
   `if (svgEl.querySelector(".cyc-band")) { ... }` — the band only exists
   with ≥3 past terms selected (cycBanded gate, see auspol-past-cycles).
-- **Member terms** = `.cyc-chip` elements that are neither `.off` nor
-  `.current` (read year from the chip's `.cyc-year` child), MINUS years
-  already individually named by end labels (avoid double-attribution:
-  named cycles keep their own line entry).
+- **Member terms** = entries of `board` (below) that are neither `off` nor
+  `current`, MINUS years already individually named by end labels (avoid
+  double-attribution: named cycles keep their own line entry).
 - Label mirrors the live key wording:
   `"Past terms (YYYY, YYYY…): mean of the set, middle half and middle 80%"`.
 - Swatch echoes the live 3-part key: stacked lo/hi `roundRect` fills in
@@ -70,6 +69,26 @@ outside the SVG. Pattern for the fix (reusable for any future
   are read LIVE from `.cyc-band.lo` / `.cyc-band.hi` computed opacity
   (`parseFloat(getComputedStyle(el).opacity)`, fallbacks 0.09 / 0.17), plus
   a dashed mean stroke in `--ink-2` (`setLineDash([2, 2.7])`).
+
+## `board`: the past-cycles board, published not scraped (2026-09-18)
+
+Both the `cycband` entry and the copied TITLE span need to know which terms
+are on the board. They used to read it off the legend chips, because the
+legend WAS twenty-one `.cyc-chip` pills standing open in the page. It is a
+popover now (see `auspol-past-cycles`) and is usually shut, so:
+
+- `PastCyclesView` publishes `window.AP_CYC_BOARD = { off: [...hidden] }` in
+  its own `useEffect` keyed on `hidden`, and nulls it on unmount.
+- `composeCardInner` hoists, just after `caption`:
+  `AUS` → `cycList` (`AUSPOL.cycles`, array-or-object normalised) → `board`,
+  a `[{year, off, current}]` sorted by year. `cycleLegend()` and the title
+  span both read it; `chipByYear` is gone.
+- **`board` is `[]` unless `target.closest(".view-cycles")`.** The published
+  board outlives nothing (it is cleared on unmount) but the gate is the real
+  guarantee: a hero card copied after a visit to Past cycles must never take
+  a cycle year-span into its title.
+- `readLegend()` no longer looks for `.cyc-chip` / `.cyc-swatch` — those never
+  appeared inside a card, and the class is gone from the page entirely.
 
 ## widenForCopy: the off-screen park + frozen stand-in (phone vanish fix, 3bb8bf7)
 
@@ -161,9 +180,8 @@ whatever `host.parentElement` happens to be, not a hardcoded selector.
 
 ## Gotchas
 
-- The composer reads the LIVE DOM (`document.querySelectorAll(".cyc-chip")`),
-  not the card clone — chip state (off/current) at click time is what lands
-  in the PNG.
+- The composer reads LIVE state (`window.AP_CYC_BOARD` + `AUSPOL.cycles`),
+  not the card clone — the board at click time is what lands in the PNG.
 - After shipping, standard verify: rebuilt + committed `index.html` in the
   SAME commit, push, then curl `raw.githubusercontent.com/.../index.html |
   grep -c <marker>` after a ~45s CDN lag (see auspol-live-site-verify).

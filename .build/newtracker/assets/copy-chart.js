@@ -394,13 +394,14 @@
   /* Every chart card has the same bones - a title, a subtitle or a readout,
      the chart, a legend, sometimes a caption - so one composer draws them all
      and the hero is simply the card that has a readout instead of a subtitle.
-     Three legend idioms exist across the tabs (.hl-item on the hero,
-     .legend-chip on primary vote, .cyc-chip on past cycles) and each swatch is
-     read for the mark it actually is, so a rule, a dot, a shaded band and a
-     square are not all drawn as lines. */
+     Two legend idioms sit INSIDE a card (.hl-item on the hero, .legend-chip on
+     primary vote) and each swatch is read for the mark it actually is, so a
+     rule, a dot, a shaded band and a square are not all drawn as lines. Past
+     cycles has no in-card legend at all - it is rebuilt from the end labels by
+     cycleLegend() below. */
   const readLegend = (target) =>
-    [...target.querySelectorAll(".hl-item, .legend-chip, .cyc-chip")].map((i) => {
-      const sw = i.querySelector(".hl-line,.hl-dashed,.hl-band,.hl-dot,.hl-swatch-dot,.legend-swatch,.cyc-swatch");
+    [...target.querySelectorAll(".hl-item, .legend-chip")].map((i) => {
+      const sw = i.querySelector(".hl-line,.hl-dashed,.hl-band,.hl-dot,.hl-swatch-dot,.legend-swatch");
       const k = sw ? (sw.className || "") : "";
       const cs2 = sw ? getComputedStyle(sw) : null;
       /* Joined from the chip's own parts, not read off it whole: a legend chip
@@ -454,10 +455,33 @@
     const sub = txt(target.querySelector(".card-sub"));
     const caption = txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
 
-    /* Past cycles keeps its legend OUTSIDE the card - one row of chips at the
-       top of the tab selects cycles for all five charts - so a card copied on
-       its own arrived with six unnamed lines and years for end labels. Worse,
-       those chips name the PRIME MINISTER, which on an opposition chart is the
+    /* Which terms are on the board, in order, and which one is sitting. Two
+       things below need it: the band's own legend entry ("Past terms
+       (1972-98, 2007-13)") and the year span in the card title.
+
+       It used to be read off the legend chips, because the legend WAS a row of
+       chips standing open in the page. The board is a popover now and is
+       usually shut, so the view publishes what the reader has done
+       (window.AP_CYC_BOARD, set in PastCyclesView) and the roll of terms comes
+       from the data - the same three facts, taken from the state rather than
+       from a rendering of it.
+
+       Scoped to the past-cycles view: the published board survives a tab
+       switch, and a hero card copied afterwards must not take its title span
+       from a board that has nothing to do with it. */
+    const AUS = window.AUSPOL || {};
+    const cycList = AUS.cycles && (Array.isArray(AUS.cycles) ? AUS.cycles : Object.values(AUS.cycles));
+    const board = (() => {
+      if (!cycList || !target.closest || !target.closest(".view-cycles")) return [];
+      const off = new Set((window.AP_CYC_BOARD || {}).off || []);
+      return cycList.map((c) => ({ year: c.year, off: off.has(c.year), current: !!c.current }))
+                    .sort((a, b) => a.year - b.year);
+    })();
+
+    /* Past cycles keeps its legend OUTSIDE the card - one board at the top of
+       the tab selects terms for all six charts - so a card copied on its own
+       arrived with six unnamed lines and years for end labels. Worse, that
+       board names the PRIME MINISTER, which on an opposition chart is the
        wrong person entirely: the 2013 line is Shorten, not Abbott.
 
        So the legend is rebuilt from the end labels the chart drew. Pairing on
@@ -472,10 +496,8 @@
        the current term, ending the bare mark "ON" and mapping in the
        classifier below. */
     const cycleLegend = () => {
-      const AUS = window.AUSPOL || {};
-      const cyc = AUS.cycles && (Array.isArray(AUS.cycles) ? AUS.cycles : Object.values(AUS.cycles));
       const labels = [...svgEl.querySelectorAll(".end-label")];
-      if (!cyc || !labels.length) return [];
+      if (!cycList || !labels.length) return [];
       const opp = /opposition/i.test(titleBase + " " + sub);   // `title` is not bound yet here
       const resolve = (c) => {
         const el = document.createElement("span");
@@ -510,7 +532,7 @@
                    kind: "dashed", fill, alpha: 1, year: 9999 };
         const digits = text.replace(/[^0-9]/g, "");
         const c = !/[A-Za-z]/.test(text) && digits.length === 2 &&
-          cyc.find((r) => String(r.year).slice(2) === digits);
+          cycList.find((r) => String(r.year).slice(2) === digits);
         if (c) return { label: c.year + " " + (opp ? (c.oppLead || c.lead) : c.lead),
                         kind: "line", fill, alpha: 1, year: c.year };
         /* A leader who is not a cycle needs saying differently. Every other
@@ -524,31 +546,24 @@
                  kind: "dashed", fill, alpha: 1, year: 9999 };
       }).sort((a, b) => a.year - b.year);
       /* While the band is on the chart, the end labels name only the current
-         term (plus any chip-hovered one) - the copied card showed a purple
+         term (plus any hovered one) - the copied card showed a purple
          wash that nothing claimed, warming over terms it never named. Here
          the legend gains the entry the live view gives its band: the terms
-         it pools, read off the chips (everything not switched off), minus
-         any the chart already labels by name. */
+         it pools - everything on the board that is not the sitting term -
+         minus any the chart already labels by name. */
       if (svgEl.querySelector(".cyc-band")) {
-        const chips = [...document.querySelectorAll(".cyc-chip")]
-          .filter((ch) => !ch.classList.contains("off") && !ch.classList.contains("current"));
         const named = new Set(entries.filter((e) => e.year < 9000).map((e) => e.year));
-        const years = chips.map((ch) => {
-          const y = ch.querySelector(".cyc-year");
-          const n = y ? parseInt(y.textContent, 10) : NaN;
-          return Number.isFinite(n) && !named.has(n) ? n : null;
-        }).filter((n) => n != null);
+        const years = board.filter((c) => !c.off && !c.current && !named.has(c.year))
+                           .map((c) => c.year);
         if (years.length) {
           /* Consecutive terms collapse to spans, "1972–80": with the era
              buckets on the board the year list enumerates wider than the
-             card. Consecutive means adjacent in the FULL chip sequence -
+             card. Consecutive means adjacent in the FULL run of terms -
              a term switched off, or already named by its own end label,
              is not the band's to span across, so it breaks the run. The
              century-compression mirrors abRange below (unreachable from
              here - it is initialised after cycleLegend runs). */
-          const order = [...new Set([...document.querySelectorAll(".cyc-chip .cyc-year")]
-            .map((n) => parseInt(n.textContent, 10)).filter(Number.isFinite))]
-            .sort((a, b) => a - b);
+          const order = board.map((c) => c.year);
           const member = new Set(years);
           const spans = [];
           for (let i = 0; i < order.length; i++) {
@@ -589,11 +604,11 @@
 
     /* A shared image has to say what period it covers - the page around it
        does not travel with it. Past cycles names every term it shows, and a
-       deselected term breaks the range in two: each run of shown chips is
+       deselected term breaks the range in two: each run of shown terms is
        labelled from its first election to the next election boundary
        (2007's term runs to the 2010 election, so 1987-2007), and the run
        holding the live term ends in "present". The years come from the
-       chips, not the legend - banded terms have no label of their own to
+       board, not the legend - banded terms have no label of their own to
        take a year from. Every other chart names the span its x-axis
        already runs across. */
     const abRange = (a, b) => {
@@ -604,15 +619,7 @@
       const short = typeof b === "number" && String(a).slice(0, 2) === String(b).slice(0, 2);
       return a + "\u2013" + (short ? String(b).slice(2) : b);
     };
-    const chipByYear = new Map();
-    [...document.querySelectorAll(".cyc-chip")].forEach((ch) => {
-      const y = parseInt((ch.querySelector(".cyc-year") || {}).textContent, 10);
-      if (Number.isFinite(y) && !chipByYear.has(y)) chipByYear.set(y, {
-        off: ch.classList.contains("off"), current: ch.classList.contains("current"),
-      });
-    });
-    const cycs = [...chipByYear.keys()].sort((a, b) => a - b)
-      .map((year) => ({ year, off: chipByYear.get(year).off, current: chipByYear.get(year).current }));
+    const cycs = board;
     const yrs = legend.map((l) => l.year).filter((y) => y && y < 9000).sort((a, b) => a - b);
     const xLabels = [...svgEl.querySelectorAll(".axis-label.x")].map((n) => txt(n)).filter(Boolean);
     const datey = (t) => /[0-9]/.test(t) && !/^(Election|\d+ ?yrs?)$/i.test(t);
