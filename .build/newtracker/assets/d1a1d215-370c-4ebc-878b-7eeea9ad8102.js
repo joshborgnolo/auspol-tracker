@@ -3366,22 +3366,36 @@ function houseLeanColour(firm) {
    two-party ground (Labor above the line, Coalition below); a primary trace
    tints above-zero with its own party's wash and leaves below-zero neutral.
    Offered measures mirror the Poll-disagreement trio plus the 2PP. */
-/* Implied first, because it is the basis the site's headline runs on: the
-   lean this panel opens with is the one the default aggregate subtracts. The
-   published-2PP lean keeps its place beside it — it is what the Compare line
-   and the All-polls House-effect column are built on — and the two are not
-   interchangeable. */
-const LEAN_MEASURES = [
-  { id: "imp", label: "2PP · implied" }, { id: "tpp", label: "2PP · published" },
+/* Two axes, not one. A "2PP lean" is under-specified twice over: on WHICH
+   contest (Labor against the Coalition, or against One Nation) and on which
+   BASIS (each house's published figure, or its primaries read through one
+   frozen flow table). The panel used to offer a single "2PP" and mean the
+   published Labor-v-Coalition one, which is now neither the site's headline
+   contest nor its headline basis.
+
+   So the measure picks the contest and a second control picks the basis,
+   shown only for the two contests where basis means anything - a primary
+   vote is a primary vote and nobody allocates it. The contests order
+   themselves by latest.rivalLead, the rule the hero opens on. */
+const LEAN_CONTESTS = {
+  alp_on:  { imp: "onimp", pub: "onpub", label: "ALP v ON",
+             phrase: { imp: "the implied ALP-v-One Nation share", pub: "the published ALP-v-One Nation share" },
+             above: "lean-band-alp", below: "lean-band-onp",
+             ground: "The ground is Labor red / One Nation orange around zero: a house inside the orange band runs ahead of the consensus on One Nation\u2019s share of the pairing, inside the red band ahead on Labor\u2019s." },
+  alp_lnp: { imp: "imp", pub: "tpp", label: "ALP v L/NP",
+             phrase: { imp: "the implied 2PP", pub: "the published 2PP" },
+             above: "lean-band-alp", below: "lean-band-lnp",
+             ground: "The ground is Labor red / Coalition blue around zero: a house inside the blue band runs ahead of the consensus on the Coalition\u2019s 2PP, inside the red band ahead on Labor\u2019s." },
+};
+const LEAN_PRIMARIES_LIST = [
   { id: "alp", label: "ALP" }, { id: "lnp", label: "L/NP" }, { id: "onp", label: "ON" },
 ];
+const LEAN_BASES = [{ id: "imp", label: "implied" }, { id: "pub", label: "published" }];
+const LEAN_BASIS_NOTE = {
+  imp: "A lean here is a house\u2019s primaries running high or low \u2014 never its allocation method, which one frozen flow table holds identical for everyone.",
+  pub: "A lean here mixes how a house\u2019s respondents answered with how it chose to allocate their preferences \u2014 the two are not separable on this basis.",
+};
 const LEAN_MEASURE_META = {
-  imp: { phrase: "the implied 2PP", above: "lean-band-alp", below: "lean-band-lnp",
-         basis: "A lean here is a house’s primaries running high or low — never its allocation method, which one frozen flow table holds identical for everyone.",
-         ground: "The ground is Labor red / Coalition blue around zero: a house inside the blue band runs ahead of the consensus on the Coalition’s implied 2PP, inside the red band ahead on Labor’s." },
-  tpp: { phrase: "the published 2PP", above: "lean-band-alp", below: "lean-band-lnp",
-         basis: "A lean here mixes how a house’s respondents answered with how it chose to allocate their preferences — the two are not separable on this basis.",
-         ground: "The ground is Labor red / Coalition blue around zero: a house inside the blue band runs ahead of the consensus on the Coalition’s 2PP (pushes the 2PP toward them), inside the red band ahead on Labor’s." },
   alp: { phrase: "Labor’s primary vote", above: "lean-band-alp", below: "lean-band-ink",
          ground: "The ground colours the side of zero a house sits on: inside the red band it runs ahead of the consensus on Labor’s primary vote, below zero it trails it." },
   lnp: { phrase: "the Coalition’s primary vote", above: "lean-band-lnp", below: "lean-band-ink",
@@ -3394,12 +3408,28 @@ const LEAN_SURFACE = 1.0;   // pp — the lean chart's first gridline
 function HouseLeanPanel({ rangeId }) {
   const { D, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
   const narrow = useNarrow();
-  const [measure, setMeasure] = useState("imp");
   const [hidden, setHidden] = useState({});
-  const meta = LEAN_MEASURE_META[measure] || LEAN_MEASURE_META.imp;
+  /* Contests first, ordered by the same rivalLead the hero opens on, then the
+     primaries. `measure` is a CONTEST id or a primary id; `basis` only bites
+     on the former. */
+  const rivalFirst = (D.latest && D.latest.rivalLead) || "alp_lnp";
+  const contestIds = Object.keys(LEAN_CONTESTS)
+    .sort((x, y) => (x === rivalFirst ? -1 : y === rivalFirst ? 1 : 0));
+  const [measure, setMeasure] = useState(contestIds[0]);
+  const [basis, setBasis] = useState("imp");
+  const contest = LEAN_CONTESTS[measure] || null;
+  const leanKey = contest ? contest[basis] : measure;
+  const meta = contest
+    ? { phrase: contest.phrase[basis], above: contest.above, below: contest.below,
+        ground: contest.ground, basis: LEAN_BASIS_NOTE[basis] }
+    : (LEAN_MEASURE_META[measure] || LEAN_MEASURE_META.alp);
+  const LEAN_MEASURES = [
+    ...contestIds.map((id) => ({ id, label: LEAN_CONTESTS[id].label })),
+    ...LEAN_PRIMARIES_LIST,
+  ];
   // older dataset builds carry houseLean 2PP-only (flat) or not at all –
   // absence is never zero, so a measure with no emitted map folds the panel
-  const leanMap = D.houseLean && D.houseLean[measure];
+  const leanMap = D.houseLean && D.houseLean[leanKey];
   if (!leanMap) return null;
 
   // gen-data emits only houses with >=3 polls of evidence – nobody is drawn
@@ -3489,6 +3519,17 @@ function HouseLeanPanel({ rangeId }) {
       <div className="ap-var-ctl">
         <TextToggle value={measure} onChange={setMeasure} options={LEAN_MEASURES}
                     ariaLabel="House-lean measure" />
+        {/* Only the contests have a basis. A primary vote is a primary vote.
+            The word "basis" is carried, not implied: without it the two
+            toggles read as one seven-item list and "ON | implied" looks like
+            two more measures rather than a different question. */}
+        {contest && (
+          <span className="ap-ctl-group">
+            <span className="ap-ctl-lab">Basis</span>
+            <TextToggle value={basis} onChange={setBasis} options={LEAN_BASES}
+                        ariaLabel="House-lean basis" caps />
+          </span>
+        )}
       </div>
 
       <TrendChart

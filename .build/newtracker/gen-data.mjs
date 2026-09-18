@@ -543,28 +543,6 @@ for (const k of PRIMARY_KEYS) {
     .map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: primaryVal(p, k), n: rowN(p), firm: p.pollster }));
   primaryHE[k] = houseEffectsFor(primaryRows[k]);
 }
-/* houseLean reads the SAME estimators as time series – each firm's decayed
-   lean sampled at every month's midpoint from the month its first evidence
-   poll lands, so the House-lean chart under Poll disagreement draws how a
-   house's lean has walked, not just where it stands. Keyed by measure –
-   the 2PP plus the ALP / L/NP / ON primaries (matching the Poll-
-   disagreement trio; lives after primaryHE exists). A firm under 3 evidence
-   polls on a measure is absent from that measure's map, never drawn flat. */
-/* "imp" is synthEffect, and it is here because the site's DEFAULT two-party
-   figure is the implied one, which subtracts synthEffect and not houseEffect.
-   The panel used to draw only the published-2PP lean while telling the reader
-   it was "the same house effect the aggregates subtract" — true until the
-   default basis moved under it. A house's two 2PP leans are genuinely
-   different quantities (Roy Morgan runs +1.6 on its published figure and
-   -0.6/-1.7 on the ALP/ON primaries that drive its implied one), so both are
-   emitted and the panel names which is which. */
-const houseLean = Object.fromEntries([["imp", synthEffect], ["tpp", houseEffect], ["alp", primaryHE.alp], ["lnp", primaryHE.lnp], ["onp", primaryHE.onp]]
-  .map(([k, he]) => [k, Object.fromEntries(Object.entries(he.evidenceN).filter(([, n]) => n >= 3).map(([firm]) => [
-    firm,
-    MONTHS.filter((ym) => ymMidMs(ym) >= he.evidenceFrom[firm])
-      .map((ym) => ({ ym, v: r1(he.at(firm, ymMidMs(ym))) })),
-  ]))]),
-);
 const aggPrimary = MONTHS.map((ym) => {
   const rows = POLLS.filter((p) => ymOf(p.date) === ym);
   if (!rows.length) return null;
@@ -636,6 +614,41 @@ function altSeries(field) {
 }
 const altAON = altSeries("ao"), altLON = altSeries("lo");
 const alt2pp = { alp_on: altAON.monthly, lnp_on: altLON.monthly };
+
+/* Moved down from §1e: it now also reads altAON.he, the published
+   ALP-v-ON estimator, which is not built until the line above. */
+/* houseLean reads the SAME estimators as time series – each firm's decayed
+   lean sampled at every month's midpoint from the month its first evidence
+   poll lands, so the House-lean chart under Poll disagreement draws how a
+   house's lean has walked, not just where it stands. Keyed by measure –
+   the 2PP plus the ALP / L/NP / ON primaries (matching the Poll-
+   disagreement trio; lives after primaryHE exists). A firm under 3 evidence
+   polls on a measure is absent from that measure's map, never drawn flat. */
+/* "imp" is synthEffect, and it is here because the site's DEFAULT two-party
+   figure is the implied one, which subtracts synthEffect and not houseEffect.
+   The panel used to draw only the published-2PP lean while telling the reader
+   it was "the same house effect the aggregates subtract" — true until the
+   default basis moved under it. A house's two 2PP leans are genuinely
+   different quantities (Roy Morgan runs +1.6 on its published figure and
+   -0.6/-1.7 on the ALP/ON primaries that drive its implied one), so both are
+   emitted and the panel names which is which. */
+const houseLean = Object.fromEntries([
+  ["imp", synthEffect], ["tpp", houseEffect],
+  /* The panel offers the SAME two bases on the other Labor contest. A house's
+     lean on ALP-v-ON is its own quantity — the pairing is carried by the One
+     Nation primary, where a house can sit two points off the field while
+     sitting on it for the 2PP — and the published version measures its own
+     private allocation of a flow nobody has ever counted. Both estimators
+     already existed: synthOnEffect from §1d, and altSeries("ao")'s he, which
+     that function has always returned and nothing read. */
+  ["onimp", synthOnEffect], ["onpub", altAON.he],
+  ["alp", primaryHE.alp], ["lnp", primaryHE.lnp], ["onp", primaryHE.onp]]
+  .map(([k, he]) => [k, Object.fromEntries(Object.entries(he.evidenceN).filter(([, n]) => n >= 3).map(([firm]) => [
+    firm,
+    MONTHS.filter((ym) => ymMidMs(ym) >= he.evidenceFrom[firm])
+      .map((ym) => ({ ym, v: r1(he.at(firm, ymMidMs(ym))) })),
+  ]))]),
+);
 
 /* ---- 3b. each poll's footprint on the aggregates (leave-one-out) ---------
    The expanded tables answer "how much did THIS poll move the figure the

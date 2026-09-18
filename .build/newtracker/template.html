@@ -4036,7 +4036,22 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
    hugging that chart – parked at the foot of the header paragraph it read as
    the paragraph's tail. Shared by the house-lean panel, which wears the same
    chrome. */
-.ap-var-ctl { margin: 2px 0 8px; }
+/* Flex with a real gap and a rule between: the house-lean panel puts TWO
+   text toggles here (which contest, then which basis) and with the old plain
+   block they butted straight together — "ON" and "implied" rendered as one
+   word. The divider is the same hairline .tt-div draws inside a toggle, so
+   two toggles read as two groups rather than one long list. */
+.ap-var-ctl { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin: 2px 0 8px; }
+.ap-ctl-group { display: inline-flex; align-items: baseline; gap: 8px;
+  position: relative; padding-left: 16px; }
+.ap-ctl-group::before {
+  content: ""; position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 1px; height: 13px; background: var(--line);
+}
+.ap-ctl-lab {
+  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-faint);
+}
 /* The ratio, not the spread, is the number that carries the verdict, so it is
    the one that takes colour – on a cool → neutral → warm ramp matching the
    underlying axis (tighter than chance → normal → spread out). Deliberately
