@@ -3414,6 +3414,15 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 .cyc-legend.banded .cyc-row.off .cyc-swatch { background-color: var(--ink-faint); box-shadow: none; }
 .cyc-row:hover .cyc-swatch { transform: scale(1.18); }
 
+/* The table's own finding, above it. Same move the drift readout makes: a
+   decomposition that never says which bucket it decomposed into is evidence
+   with no claim attached. */
+.flow-tab-find {
+  font-family: var(--sans); font-size: 13px; line-height: 1.5; color: var(--ink-2);
+  margin: 0 0 10px; max-width: 72ch;
+}
+.flow-tab-find strong { color: var(--ink); font-weight: 700; }
+
 /* A fitted flow cell the ridge could not move off its prior: half or more of
    it is the election row it was shrunk toward, not a reading of the house.
    Quiet ink and a dotted rule — present, legible, and visibly not load-

@@ -3531,6 +3531,49 @@ function HouseLeanPanel({ rangeId }) {
    Newspoll's Greens against the AEC's has to know they are reading one
    number twice. */
 const FLOW_PRIOR_DIM = 0.5;
+/* The finding the table was leaving to the reader. Nine cells and a
+   two-hundred-word note is evidence, not a claim: it never said WHICH bucket
+   the houses disagree about, or what the disagreement is worth, which is the
+   only reason the decomposition is interesting at all. So the widest
+   well-identified column says so above the table, priced in the currency the
+   page trades in — points of two-party.
+
+   Prior-dominated cells are excluded from the spread. A gap between two cells
+   that are both mostly the election row is a gap between two copies of the
+   same number, and quoting it as house disagreement would be the exact error
+   the greying exists to prevent. */
+function FlowFinding({ flows, cols, primary, refLabel }) {
+  const ranked = cols.map((c) => {
+    /* Prior-dominated cells are excluded from the spread: a gap between two
+       cells that are both mostly the election row is a gap between two copies
+       of one number, and quoting it as house disagreement would be the exact
+       error the greying exists to prevent. */
+    const live = flows.filter((f) => f[c.key] != null
+      && (f[c.key + "p"] == null || f[c.key + "p"] < FLOW_PRIOR_DIM));
+    const prim = primary[c.prim];
+    if (live.length < 3 || prim == null) return null;
+    const lo = live.reduce((a, b) => (b[c.key] < a[c.key] ? b : a));
+    const hi = live.reduce((a, b) => (b[c.key] > a[c.key] ? b : a));
+    const span = hi[c.key] - lo[c.key];
+    return { ...c, lo, hi, span, prim, worth: span * prim / 100 };
+  }).filter(Boolean).sort((a, b) => b.worth - a.worth);
+  /* Below half a point the decomposition has found nothing worth announcing,
+     and a headline that says so every week stops being read. */
+  if (!ranked.length || ranked[0].worth < 0.5) return null;
+  const b = ranked[0];
+  const nm = (f) => f.firm.split(" /")[0];
+  return (
+    <p className="flow-tab-find">
+      Houses disagree most about <strong>{b.the ? "the " : ""}{b.noun}</strong>: {b.lo[b.key].toFixed(1)}%
+      {" "}({nm(b.lo)}) to {b.hi[b.key].toFixed(1)}% ({nm(b.hi)}) to Labor, against the
+      {" "}{b.ref.toFixed(1)}% {refLabel}. At a {b.noun} primary near
+      {" "}{Math.round(b.prim)}, that {b.span.toFixed(1)}-point spread is worth
+      {" "}<strong>{b.worth.toFixed(1)} points</strong> of two-party — two houses that far
+      apart will publish 2PPs {b.worth.toFixed(1)} apart from identical primaries.
+    </p>
+  );
+}
+
 function FlowCell({ v, se, prior }) {
   const thin = prior != null && prior >= FLOW_PRIOR_DIM;
   return (
@@ -3733,6 +3776,12 @@ function FlowDriftPanel({ rangeId }) {
 
       {fd.flows && fd.flows.length > 0 && fd.meta.aec && (
         <div className="flow-tab-wrap">
+          <FlowFinding flows={fd.flows} primary={D.latest.primary}
+            refLabel="the election counted" cols={[
+            { key: "g", noun: "Greens", prim: "grn", ref: fd.meta.aec.g },
+            { key: "o", noun: "One Nation", prim: "onp", ref: fd.meta.aec.o },
+            { key: "t", noun: "minor-party and independent", prim: "oth", ref: fd.meta.aec.t },
+          ]} />
           <table className="flow-tab">
             <caption className="flow-tab-cap">Implied preference flows to Labor, by house</caption>
             <thead>
@@ -3897,6 +3946,17 @@ function FlowDriftOnPanel({ rangeId }) {
 
       {fd.flows && fd.flows.length > 0 && fd.meta.pub && (
         <div className="flow-tab-wrap">
+          {/* "to Labor" reads the same on this pairing: the columns are the
+              share of each bucket reaching Labor rather than One Nation. */}
+          {/* NOT "the election counted": no election has ever counted a
+              Labor-v-One Nation flow, which is the entire reason this pairing
+              has a first-principles table instead of one. */}
+          <FlowFinding flows={fd.flows} primary={D.latest.primary}
+            refLabel="the site&rsquo;s own first-principles set assumes" cols={[
+            { key: "l", noun: "Coalition", the: 1, prim: "lnp", ref: fd.meta.pub.l },
+            { key: "g", noun: "Greens", prim: "grn", ref: fd.meta.pub.g },
+            { key: "t", noun: "minor-party and independent", prim: "oth", ref: fd.meta.pub.t },
+          ]} />
           <table className="flow-tab">
             <caption className="flow-tab-cap">Implied preference flows to Labor, by house · Labor vs One Nation</caption>
             <thead>

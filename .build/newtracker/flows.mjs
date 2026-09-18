@@ -32,6 +32,28 @@ export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
    these; anything computing with it uses FLOW. */
 export const FLOW_PCT = Object.freeze({ grn: 88.2, onp: 25.5, oth: 54.5 });
 
+/* Three-cornered contests — the term the formula below was missing.
+   Points of national 2PP that leak from the Coalition to Labor in seats where
+   BOTH Coalition partners run: one of them is excluded first and its
+   preferences distribute, and most but not all of them stay inside the
+   Coalition. The same AEC file the flows above come from counts it, in the
+   two rows a Coalition-v-Labor formula otherwise has no use for:
+
+     Liberal        11,176 ballots transferred — 12.47% to Labor (1,394)
+     The Nationals  51,243 ballots transferred — 18.97% to Labor (9,723)
+                                                 ────────────────
+                                                 11,117 to Labor
+
+   over a formal vote of 15,490,236 = 0.072 points. Kevin Bonham's aggregate
+   carries the same term at 0.07, derived the same way.
+
+   It has to be a CONSTANT and not a rate on any primary column: the leak
+   depends on how many seats are three-cornered, which is a seat-level fact a
+   national poll's primaries cannot carry. Re-derive it at the next election
+   from that election's own LP/NP transfer rows — the number moves with the
+   Nationals' seat footprint, not with the vote. */
+export const FLOW_3CNR = 0.072;
+
 /* The table FLOW is anchored to, in the words display copy should use – the
    flow-drift panel's note interpolates this so a re-anchor at a future
    election can never leave the page describing yesterday's table. */
@@ -46,7 +68,8 @@ export const impliedAlp2pp = (p) => {
   return p.alp
     + FLOW.grn * n0(p.grn)
     + FLOW.onp * n0(p.onp)
-    + FLOW.oth * (n0(p.ind) + n0(p.oth));
+    + FLOW.oth * (n0(p.ind) + n0(p.oth))
+    + FLOW_3CNR;
 };
 
 /* FLOW_ERAS – the pre-1987 counterpart of FLOW. F2F Morgan Gallup waves of

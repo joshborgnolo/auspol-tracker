@@ -344,9 +344,19 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
       </tbody>
     </table>
   </div>
-  <p class="pred-tnote">The Commission publishes the same election&rsquo;s flows two other ways &mdash; a web table that includes ballots terminating at third parties (Greens 79.9 to Labor), and a <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByPartyDownload-31496.csv" target="_blank" rel="noopener noreferrer">TCP download</a> that collapses every destination to the two majors (86.8/27.1/48.5). The site ships the TPP cut because it measures what the site is simulating &mdash; every formal ballot ending with Labor or the Coalition &mdash; and because it simply performs better: it tracks Roy Morgan&rsquo;s own published 2025-flows 2PP twice as closely as the alternatives, and it won the constants review of 29 August 2026 on average house bias. Anchored at the election, the implied series reproduces the official 55.2&ndash;44.8 result by construction &mdash; a consistency check built into the arithmetic, not a forecast claim.</p>
+  <p class="pred-tnote">The Commission publishes the same election&rsquo;s flows two other ways &mdash; a web table that includes ballots terminating at third parties (Greens 79.9 to Labor), and a <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByPartyDownload-31496.csv" target="_blank" rel="noopener noreferrer">TCP download</a> that collapses every destination to the two majors (86.8/27.1/48.5). One line of that release belongs to a case the formula would otherwise miss. In a
+    <strong>three-cornered contest</strong> both Coalition partners run against Labor, so one of
+    them is excluded first and its preferences distribute &mdash; and most, but not all, stay
+    inside the Coalition. The count: 11,176 Liberal ballots transferred, 12.47&thinsp;% of them
+    to Labor; 51,243 National, 18.97&thinsp;% to Labor. That is 11,117 ballots, or
+    <strong>0.072 points</strong> of national two-party, that a Labor-v-Coalition formula hands to
+    the Coalition and the ballots did not. The site adds it back as a flat constant, which is the
+    only honest shape for it: the leak depends on how many seats are three-cornered, and a
+    national poll&rsquo;s primary votes cannot know that. Kevin Bonham&rsquo;s aggregate carries
+    the same term at 0.07.</p>
+  <p>The site ships the TPP cut because it measures what the site is simulating &mdash; every formal ballot ending with Labor or the Coalition &mdash; and because it simply performs better: it tracks Roy Morgan&rsquo;s own published 2025-flows 2PP twice as closely as the alternatives, and it won the constants review of 29 August 2026 on average house bias. Anchored at the election, the implied series reproduces the official 55.2&ndash;44.8 result by construction &mdash; a consistency check built into the arithmetic, not a forecast claim.</p>
 
-  <p>The implied figure for any poll is then one line of arithmetic per row &mdash; Labor&rsquo;s primary, plus each minor group&rsquo;s primary times its flow:</p>
+  <p>The implied figure for any poll is then one line of arithmetic per row &mdash; Labor&rsquo;s primary, plus each minor group&rsquo;s primary times its flow, plus one flat term for the seats where the Coalition preferences against itself:</p>
   <div class="pred-twrap">
     <table class="pred-table">
       <caption>Worked line by line &mdash; Roy Morgan, 24 August 2025. The same respondents that week produced both answers: the house asked and published 56.5; the table implies 55.1. The gap is allocation arithmetic, and nothing else.</caption>
@@ -364,6 +374,7 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
         <tr><td class="l">One Nation</td><td>9.0</td><td class="c">0.2550</td><td>2.3</td></tr>
         <tr><td class="l">All others</td><td>15.0</td><td class="c">0.5455</td><td>8.2</td></tr>
         <tr><td class="l">Coalition</td><td>30.0</td><td class="c">&mdash;</td><td>0.0</td></tr>
+        <tr><td class="l">Three-cornered contests</td><td>&mdash;</td><td class="c">&mdash;</td><td>+0.07</td></tr>
         <tr class="sum"><td class="l">Implied two-party</td><td></td><td class="c"></td><td class="sum">55.1</td></tr>
       </tbody>
     </table>
