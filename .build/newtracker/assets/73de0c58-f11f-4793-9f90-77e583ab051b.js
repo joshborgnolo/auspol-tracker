@@ -1109,9 +1109,22 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   // when pollsters started asking it, and a marker standing over a stretch with
   // no line would imply a reading that was never taken. A matchup with no trend
   // line at all gets none.
+  // Each matchup also keeps its own change-of-hands: the Coalition leader's
+  // handover belongs to the ALP v L/NP chart, and the defection that made One
+  // Nation the other contest belongs to ALP v ON. Neither is major - a
+  // major marker draws on every chart it spans, and Joyce's move is not the
+  // L/NP chart's story any more than Taylor's promotion is the ON chart's.
+  // Pulled from the dataset BY DATE (the same discipline eventOn() keeps in
+  // the leadership panels), so the marker and its panel can't drift from the
+  // event rail; restating one here would fork the copy.
   const heroEvents = (!heroSeries.length || !pts.length) ? [] : (() => {
     const x0 = pts[0].x, x1 = pts[pts.length - 1].x;
-    return (D.events || []).filter((e) => e.major && e.x >= x0 && e.x <= x1);
+    // markers stay with the scene being drawn: mid-morph that is still the
+    // departed matchup, so its marker rides the blend out and the
+    // destination's lands with the last frame
+    const shown = morph ? morph.from : matchup;
+    const own = { alp_lnp: "2026-02-12", alp_on: "2025-12-08" }[shown];
+    return (D.events || []).filter((e) => (e.major || e.date === own) && e.x >= x0 && e.x <= x1);
   })();
 
   /* One word, and not "50% – majority line". The axis already prints 50% 18px
