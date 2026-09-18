@@ -1656,8 +1656,41 @@ const onImp = primaryNow && (() => {
   const band = primaryNow.lnp * FP_ON_BAND.lnp + primaryNow.grn * FP_ON_BAND.grn
              + primaryNow.oth * FP_ON_BAND.oth;   // linear worst-case stack, share scale
   const prev = primaryNowAt(refNow - 30 * 86400000);
+  /* The month-on-month significance, which the BAND above cannot supply and
+     is not a retreat from what that band says.
+
+     band is the frozen table's own range, and on the LEVEL it is the only
+     honest interval the pairing has: no count exists to check FP_ON against,
+     so a sampling interval quoted on the level would be false precision.
+     That argument does not reach the CHANGE. The table is frozen, so it is
+     the same table at both dates and its error enters the difference scaled
+     by the primary MOVES rather than the primary LEVELS - 0.02 points this
+     month against 1.24 on the level, a factor of ~70. What is left driving
+     the change is ordinary sampling error, and that is estimable.
+
+     Taken from the row-level series rather than by propagating primaryNow's
+     per-party SEs through impliedOnFp: the primaries are shares summing to
+     100 and are negatively correlated, so combining their SEs as if they
+     were independent would overstate the error. Each tppRowsSynthOn row is
+     already one scalar, which sidesteps the covariance entirely. It is the
+     same quantity by either route - the row nowcast reads 51.2/51.9 against
+     the aggregate-primaries 51.2/52.0 - so the SE belongs to the figure.
+
+     Same RSS rule as synthChg (§1b) and altNowcast (§6), which is the point:
+     three of the four basis x contest cells made this call already, the
+     PUBLISHED ALP-v-ON among them. Only ci95 stays the flow range; nothing
+     here renames it, and the hero still labels the ribbon "flow range". */
+  const nw = nowcastAdj(tppRowsSynthOn, synthOnEffect, refNow);
+  const pv = nowcastAdj(tppRowsSynthOn, synthOnEffect, refNow - 30 * 86400000);
+  const chg = (nw && pv && nw.se != null && pv.se != null)
+    ? (() => {
+        const seChg = Math.sqrt(nw.se ** 2 + pv.se ** 2);
+        return { changeSe: r1(seChg), changeCi95: r1(1.96 * seChg),
+                 changeSig: Math.abs(nw.v - pv.v) > 1.96 * seChg };
+      })()
+    : {};
   return { a: r1(a), b: r1(100 - a), band: r1(band), n: primaryNow.n,
-           aPrev: prev ? r1(impliedOnFp(prev)) : null };
+           aPrev: prev ? r1(impliedOnFp(prev)) : null, ...chg };
 })();
 
 /* ---- 8. headline readings ---------------------------------------------- */

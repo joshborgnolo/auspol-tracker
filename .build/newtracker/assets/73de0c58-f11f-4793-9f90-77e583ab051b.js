@@ -1203,7 +1203,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
             ? { ci95: D.latest.alp2ppCi95, n: D.latest.method.nPolls, changeSig: D.latest.changeSig }
             : null))
     : (onImpL
-        ? { ci95: onImpL.band, n: onImpL.n, flows: true }
+        /* ci95 stays the frozen table's flow range (flows:true makes the
+           readout say so). changeSig rides alongside it because the change
+           is a different question from the level: the same frozen table at
+           both dates cancels out of the difference, leaving sampling error
+           the pairing can actually be tested on. Undefined when the window
+           is too thin, which reads as "make no claim", as everywhere else. */
+        ? { ci95: onImpL.band, n: onImpL.n, flows: true, changeSig: onImpL.changeSig }
         : (altL && altL.ci95 != null
             ? { ci95: altL.ci95, n: altL.n, changeSig: altL.changeSig }
             : null));
