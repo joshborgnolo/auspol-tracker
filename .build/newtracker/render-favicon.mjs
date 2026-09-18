@@ -25,13 +25,15 @@
 
    Chrome and puppeteer-core are the only things it needs, and neither is a
    build dependency - build.mjs never imports this, exactly as it never imports
-   render-card.mjs. The PNG is committed like assets/auspol-card.png is, and is
-   redrawn when the glyph's shape changes (a new party in the gauge, a geometry
-   change), not on every poll: the needle angle is not legible at the size a
-   search result draws.
+   render-card.mjs. The PNG is committed like assets/auspol-card.png is, and
+   (like the card) the redraw rides refresh_site() in every data wrapper: the
+   gate below hashes the glyph content, so the rasterisation runs only when
+   the glyph itself moved - a new poll or a 2PP move shifts the gauge's arcs
+   and needle, a copy edit does not - and wrappers with no Chrome skip quietly
+   when there is nothing to draw.
 
      node .build/newtracker/build.mjs           # writes assets/favicon.svg
-     node .build/newtracker/render-favicon.mjs  # rasterises it to the PNG
+     node .build/newtracker/render-favicon.mjs  # gated rasterise to the PNG
      node .build/newtracker/build.mjs           # links it (skipped if absent)
 
    Override the browser with CHROME=/path/to/chrome. */
@@ -39,12 +41,14 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createRequire } from "node:module";
+import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
 const SRC = path.join(ROOT, "assets", "favicon.svg");
 const OUT = path.join(ROOT, "assets", "favicon-192.png");
+const STAMP = path.join(ROOT, "assets", "favicon-192.json");
 const SIZE = 192;
 /* The glyph is dark ink and saturated bars with no ground of its own, which is
    correct on a tab bar and wrong in a search result: Google draws favicons on
@@ -57,6 +61,18 @@ const die = (msg) => { console.error("render-favicon: " + msg); process.exit(1);
 
 if (!fs.existsSync(SRC)) die("no assets/favicon.svg – run build.mjs first.");
 const svg = fs.readFileSync(SRC, "utf8");
+const svgSha = createHash("sha256").update(svg).digest("hex");
+
+/* Staleness gate, the same idiom as render-card's: assets/favicon-192.json
+   records what the PNG was drawn from, and when that is exactly the glyph on
+   disk there is nothing to draw, so we exit before puppeteer or Chrome are
+   even probed. A missing or old-format stamp falls through to a draw. */
+const readJson = (p) => { try { return JSON.parse(fs.readFileSync(p, "utf8")); } catch { return null; } };
+const drawn = readJson(STAMP);
+if (drawn && drawn.svgSha256 === svgSha && fs.existsSync(OUT)) {
+  console.log("favicon current (glyph unchanged) – nothing to do");
+  process.exit(0);
+}
 
 const require_ = createRequire(path.join(ROOT, "package.json"));
 let puppeteer;
@@ -86,9 +102,12 @@ try {
     { waitUntil: "load" });
   const buf = await page.screenshot({ type: "png" });
   fs.writeFileSync(OUT, buf);
+  fs.writeFileSync(STAMP, JSON.stringify({
+    svgSha256: svgSha,
+    drawnISO: new Date().toISOString().slice(0, 10),
+  }) + "\n");
   console.log(`drew assets/favicon-192.png · ${SIZE}x${SIZE} · `
-    + (buf.length / 1024).toFixed(1) + " KB");
-  console.log("run build.mjs to link it into the page head");
+    + (buf.length / 1024).toFixed(1) + " KB · stamped assets/favicon-192.json");
 } finally {
   await browser.close();
 }

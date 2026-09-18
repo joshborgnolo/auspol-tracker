@@ -73,13 +73,13 @@ if ! refresh_site; then
   exit 1
 fi
 
-git add data/polls.json .build/news24-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json || { log "FAIL git add"; exit 1; }
+git add data/polls.json .build/news24-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
 MSG="Update YouGov News24 Pulse data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! push_main "$MSG" data/polls.json .build/news24-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json; then
+if ! push_main "$MSG" data/polls.json .build/news24-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

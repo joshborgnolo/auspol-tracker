@@ -378,6 +378,22 @@ const favicon = encodeURIComponent(fav.svg);
 const FAV_PNG = path.join(ROOT, "assets", "favicon-192.png");
 const favPng = fs.existsSync(FAV_PNG);
 if (!favPng) console.log("  favicon PNG: absent – run render-favicon.mjs (Google Search shows no icon without it)");
+if (favPng) {
+  /* The PNG is re-rasterised only when the glyph's content moved (the gate in
+     render-favicon.mjs). Every build rewrites favicon.svg, so mtime is no
+     signal - content-hash the SVG and compare against the stamp the
+     rasteriser leaves in assets/favicon-192.json. Warn, don't fail: a wrapper
+     that just ran the renderer mid-refresh_site is already consistent, and a
+     human who hasn't can see the reminder without the build going red. */
+  let favStamp = null;
+  try { favStamp = JSON.parse(fs.readFileSync(path.join(ROOT, "assets", "favicon-192.json"), "utf8")); }
+  catch (_) { /* no stamp: reported below */ }
+  /* Hash exactly what the renderer hashes: the FILE on disk, newline included,
+     not the in-memory fav.svg. */
+  const svgSha = crypto.createHash("sha256").update(fav.svg + "\n").digest("hex");
+  if (!favStamp || favStamp.svgSha256 !== svgSha) console.log(
+    "  favicon PNG: drawn from an older glyph – run render-favicon.mjs to re-rasterise");
+}
 
 /* ---- 4b. the article version of the page ---------------------------------
    #root held a loading placeholder that was `opacity: 0` with a .25s delay
