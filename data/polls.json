@@ -4557,6 +4557,7 @@
       "pollster": "DemosAU",
       "client": "Capital Brief",
       "sample": 1583,
+      "sampleEff": 869,
       "undecided": 4,
       "alp": 28,
       "lnp": 20,

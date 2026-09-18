@@ -2724,19 +2724,26 @@ function ArchImplied({ p }) {
 }
 
 // One lead-info helper drives the cell, the held-by filter and the sort, so
-// they can never disagree. Returns null when the poll didn't publish the
-// selected measure. m is signed: + = first-named party of the matchup leads.
-// segs hold the matchup's shares in a FIXED party order for the split bar –
-// deliberately not sorted by leader, so a row-to-row scan never has the
-// colours swapping places.
+// they can never disagree. Returns null when the poll has no figure on the
+// selected measure's basis. m is signed: + = first-named party of the
+// matchup leads. segs hold the matchup's shares in a FIXED party order for
+// the split bar – deliberately not sorted by leader, so a row-to-row scan
+// never has the colours swapping places.
+// Basis follows the table itself: the two implied matchups read the implied
+// series (alpImp / alpOnImp), and only the matchup with no implied series
+// (L/NP v ON, 3-cornered) shows the pollster's own published figures.
 function archLeadInfo(p, measure) {
   if (measure === "onp") {
-    if (!p.tppAlt) return null;
-    const m = +(p.tppAlt.alp - p.tppAlt.onp).toFixed(1);
+    // implied ALP v ON – the pairing's standing basis everywhere else on the
+    // page (the hero default); the frozen ALP–ON flow set prices every wave,
+    // where only two houses publish a head-to-head of their own
+    if (p.alpOnImp == null) return null;
+    const on = +(100 - p.alpOnImp).toFixed(1);
+    const m = +(p.alpOnImp - on).toFixed(1);
     return { m, who: m >= 0 ? "alp" : "onp", lab: m >= 0 ? "ALP" : "ON",
              color: m >= 0 ? "var(--alp)" : "var(--onp)",
-             segs: [{ v: p.tppAlt.alp, color: "var(--alp)" }, { v: p.tppAlt.onp, color: "var(--onp)" }],
-             note: " on the published ALP v One Nation matchup" };
+             segs: [{ v: p.alpOnImp, color: "var(--alp)" }, { v: on, color: "var(--onp)" }],
+             note: " on the implied ALP v One Nation basis (primaries at the site’s ALP–ON flow set)" };
   }
   if (measure === "lnponp") {
     if (!p.tppAlt2) return null;
@@ -2755,17 +2762,18 @@ function archLeadInfo(p, measure) {
              segs: [{ v: p.tpp3.alp, color: "var(--alp)" }, { v: p.tpp3.lnp, color: "var(--lnp)" }, { v: p.tpp3.onp, color: "var(--onp)" }],
              note: ` over ${e[1][1]} on the published 3-cornered figures` };
   }
-  if (p.alp == null && p.alp2pp == null) return null;   // no published 2PP this wave
-  // margin from the published pair (undecided-inclusive pairs don't sum 100);
-  // latest-table rows name the same fields alp2pp/lnp2pp
-  const alp = p.alp2pp != null ? p.alp2pp : p.alp;
-  const lnp = p.lnp2pp != null ? p.lnp2pp : p.lnp;
-  const lnpV = lnp != null ? lnp : 100 - alp;   // a missing half completes the pair; it doesn't leave a gap
+  // implied 2PP in margin form – the same figure the Implied 2PP column
+  // beside it shows, so the two columns can never disagree about the basis
+  // (alpImp rides both row shapes: the archive's and the Latest table's).
+  // A pair computed from one table always sums to 100, so there's no
+  // undecided-inclusive remainder to complete.
+  if (p.alpImp == null) return null;
+  const alp = p.alpImp, lnpV = +(100 - p.alpImp).toFixed(1);
   const m = +(alp - lnpV).toFixed(1);
   return { m, who: m >= 0 ? "alp" : "lnp", lab: m >= 0 ? "ALP" : "L/NP",
            color: m >= 0 ? "var(--alp)" : "var(--lnp)",
            segs: [{ v: alp, color: "var(--alp)" }, { v: lnpV, color: "var(--lnp)" }],
-           note: " on the two-party ALP v L/NP measure" };
+           note: " on the implied 2PP (the poll’s primaries at 2025-election preference flows)" };
 }
 
 // the table's after-preferences cell, in the shape the direction and approval
@@ -2802,7 +2810,10 @@ function primaryLeadInfo(p) {
 function ArchLead({ p, measure, primaryFallback }) {
   const li = archLeadInfo(p, measure) ||
              (primaryFallback && measure === "lnp" ? primaryLeadInfo(p) : null);
-  if (!li) return <span className="dash" title="This pollster didn’t publish the selected matchup this wave">—</span>;
+  if (!li) return <span className="dash"
+    title={measure === "lnponp" || measure === "3cp"
+      ? "This pollster didn’t publish the selected matchup this wave"
+      : "No implied figure – this poll never filed a full primary set the flow tables can read"}>—</span>;
   return (
     <div className="arch-appr"
          title={`${li.lab} leads by ${Math.abs(li.m).toFixed(1)}${li.note}`}>
@@ -2864,9 +2875,9 @@ function ArchPollDetail({ p, onBack, backLabel }) {
     /* signed to one decimal, with a true minus (U+2212) rather than a hyphen -
        these read as figures, not as a range dash or a word break */
     p.lean != null && <span className="pd-meta-i" key="lean"><span className="pd-meta-k">Poll lean</span>
-      <span className="pd-meta-v">{signed1(p.lean)} vs aggregate</span></span>,
+      <span className="pd-meta-v">{signed1(p.lean)} vs implied aggregate</span></span>,
     p.hfx != null && <span className="pd-meta-i" key="hfx"><span className="pd-meta-k">House effect</span>
-      <span className="pd-meta-v">{signed1(p.hfx.v)} vs consensus</span></span>,
+      <span className="pd-meta-v">{signed1(p.hfx.v)} vs implied-basis consensus</span></span>,
     /* the pollster's own pages, in the same grid so their values sit on
        the band's axis (builder shared with Latest polls) */
     ...(releaseMetaRows ? releaseMetaRows(p) : []),
@@ -3771,7 +3782,10 @@ function AllPollsView({ focus, onBack, backLabel }) {
      poll in the archive, so it has nothing to scope and gets no pill. It sits
      ABOVE the state declarations because the URL restore consults it. */
   const FACET_SCOPE = {
-    twopp: { has: (p) => p.alp != null || p.tppAlt || p.tppAlt2 || p.tpp3, label: "With a 2PP" },
+    /* implied is this facet's basis now: a wave whose primaries price an
+       implied 2PP fills every column the facet shows, so the scope keys on
+       THAT, not on the published pair most houses no longer print */
+    twopp: { has: (p) => p.alpImp != null || p.tppAlt || p.tppAlt2 || p.tpp3, label: "With a 2PP" },
     primary: null,
     leadership: { has: (p) => window.ppmContests(p).length > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null)), label: "With leadership numbers" },
     direction: { has: (p) => !!p.dir, label: "With a direction reading" },
@@ -3902,20 +3916,29 @@ function AllPollsView({ focus, onBack, backLabel }) {
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
   const toggleHouse = (h) => setSel((s) => { const n = new Set(s); n.has(h) ? n.delete(h) : n.add(h); return n; });
 
-  const aggByYm = {};
-  D.agg2pp.forEach((d) => { aggByYm[d.ym] = d.alp; });
+  /* the implied monthly series is what Poll lean is held against – the same
+     implied basis the Lead column and the headline aggregate read, so the
+     row never mixes bases. Last write for a ym wins, so the month's own
+     estimate overwrites its unshifted election-anchor row, as with the
+     published map this replaces. */
+  const synthByYm = {};
+  (D.synth2pp || []).forEach((d) => { synthByYm[d.ym] = d.alp; });
 
   const rows = D.individualPolls.map((p) => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
     const tags = pollTagIds(p);
-    // house lean uses the NORMALISED share (alpN) so undecided-inclusive
-    // pairs compare fairly with the aggregate; null when no 2PP published
-    const lean = p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null;
-    // house effect is the emitted all-history snapshot per pollster (the
-    // estimator's applied lean is read per display time; see gen-data), so the
-    // same label value rides on every row that pollster owns; null when unmeasured
-    const hfx = (((D.houseEffects || {}).tpp || {})[p.pollster]) || null;
+    /* poll lean on the implied basis: the wave's own implied 2PP minus the
+       month's implied aggregate. A wave the flow table can't read (no full
+       comparable primary set) has no lean at all. */
+    const lean = p.alpImp != null && synthByYm[p.ym] != null ? +(p.alpImp - synthByYm[p.ym]).toFixed(1) : null;
+    /* house effect is the emitted all-history snapshot per pollster ON THE
+       IMPLIED SERIES (gen-data runs the same estimator over tppRowsSynth as
+       houseEffects.synth – a house's primaries bias is a different thing
+       from its published-2PP lean and the two are never borrowed across), so
+       the same label value rides on every row that pollster owns; null when
+       unmeasured */
+    const hfx = (((D.houseEffects || {}).synth || {})[p.pollster]) || null;
     // searchable haystack – everything a row knows, so the search box matches
     // fieldwork dates, samples, 2PP / primary / matchup figures, nets, flags
     const f1 = (v) => (v != null ? v.toFixed(1) : null);
@@ -4420,17 +4443,17 @@ function AllPollsView({ focus, onBack, backLabel }) {
                   <td className="num"><ArchLead p={p} measure={measure} /></td>
                   <td className="num hide-sm">
                     {p.lean == null
-                      ? <span className="dash" title="No published 2PP to compare with the aggregate">—</span>
+                      ? <span className="dash" title="No implied 2PP this wave, so no lean against the implied aggregate">—</span>
                       : <span className={"arch-lean " + (p.lean > 0.05 ? "alp" : p.lean < -0.05 ? "lnp" : "flat")}
-                              title="Difference from the aggregate that month">
+                              title="Implied 2PP minus the implied aggregate that month">
                           {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)}
                         </span>}
                   </td>
                   <td className="num hide-sm">
                     {p.hfx == null
-                      ? <span className="dash" title="Not enough published polls to measure a house effect">—</span>
+                      ? <span className="dash" title="Too few implied-basis polls to measure a house effect">—</span>
                       : <span className={"arch-lean " + (p.hfx.v > 0.05 ? "alp" : p.hfx.v < -0.05 ? "lnp" : "flat")}
-                              title={`House effect: this pollster's 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus (n=${p.hfx.n})`}>
+                              title={`House effect: this pollster's implied 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus on the implied basis (n=${p.hfx.n})`}>
                           {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)}
                         </span>}
                   </td>
@@ -4488,11 +4511,13 @@ function AllPollsView({ focus, onBack, backLabel }) {
         breakdown) · “Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows –
         one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its
         breakdown ·
-        The lead bar shows the selected matchup where a pollster published it · “Poll lean” is the poll minus
-        the aggregate for that month · “—” Means the pollster didn’t publish that measure · Search matches
+        The lead bar is that implied figure in margin form (the L/NP v ON and 3-cornered matchups are the
+        pollsters’ own published figures – the site prices no implied series for them) · “Poll lean” is
+        the poll’s implied 2PP minus the implied aggregate for that month · “—” Means the pollster didn’t
+        publish that measure · Search matches
         anything in a row · Click any column heading to sort.{" "}
         <strong>House effect</strong> is how far a pollster systematically sits from the cross-house consensus
-        on 2PP – pooled from its polls with a 90-day half-life, so its recent methods count for more, and
+        on implied 2PP – pooled from its polls with a 90-day half-life, so its recent methods count for more, and
         shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure’s
         own time, and it is a property of the pollster, not of this one poll.
         {" "}<strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, filed with the

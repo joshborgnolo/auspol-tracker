@@ -3037,6 +3037,7 @@ function PollsterTable() {
       </div>
       <p className="table-hint">
         Tap any poll to see its full breakdown · Click a column heading to sort · “—” Means the pollster didn’t ask that question.
+        {" "}“Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar is that figure in margin form.
         {" "}<strong>Published</strong> is the day the poll was released, taken from the source each row links to.
         {" "}Each house’s systematic lean – its house effect – sits beside poll lean in the All polls archive.
       </p>
