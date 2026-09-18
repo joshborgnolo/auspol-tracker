@@ -1157,11 +1157,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               ) : " pts"}
               {leadSwing != null && (
                 <>
-                  {/* "±" without a direction word: the clause states how far
-                      the nowcast sits from the official count in EITHER
-                      direction, naming the count itself on phones ("since
-                      2025") and in words where the line has room for it. */}
-                  {", ±"}
+                  {/* Sign carries the direction a "to/from" word used to:
+                      "+" sits above the count, "−" below it. Names the
+                      count on phones ("since 2025"), in words otherwise. */}
+                  {", " + (leadSwing >= 0 ? "+" : "−")}
                   <RollNum value={Math.abs(leadSwing).toFixed(1)} spinIn />
                   {narrow ? " since 2025" : " since the 2025 election"}
                 </>
