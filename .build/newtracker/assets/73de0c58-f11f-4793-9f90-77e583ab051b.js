@@ -1325,9 +1325,31 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
               )}
             </span>
           </div>
+          <div className="hero-sub" ref={subRef}>
+            <Delta value={monthDelta} suffix={Math.abs(monthDelta) === 1 ? " pt" : " pts"} small roll spinIn />
+            <span className="hero-sub-note" ref={subNoteRef}>
+              {(m.real || (onImpL && onImpL.aPrev != null) || (altL && altL.aPrev != null))
+                ? "vs 1 month ago" : "vs previous reading"}
+              {/* A month-on-month move smaller than its own interval is not a
+                  finding. Say so next to the arrow, not three scrolls down -
+                  and let the margin the caveat invokes carry the reader to its
+                  definition, as the terms in the interval below do. */}
+              {unc && unc.changeSig === false && (
+                <span className="hero-caveat"> (within {subTight ? "" : "the "}
+                  <button type="button" className="hi-term"
+                          title="What a margin of error means"
+                          onClick={() => window.AP.openTerm &&
+                            window.AP.openTerm("margin-of-error", "two-party preferred")}>
+                    margin
+                  </button>)
+                </span>
+              )}
+            </span>
+          </div>
           {/* How the lead was made and how much evidence sits under it: the
               interval's name, the method, and the window both describe. ref
-              feeds the one-line fitter above. */}
+              feeds the one-line fitter above. The method line trails the
+              delta line - first the move, then the machinery behind it. */}
           <div className="hero-interval" ref={hiRef}>
             {/* The label names the ESTIMATOR, not the basis. It used to
                 swap to "Implied from primary votes" on the implied basis -
@@ -1373,27 +1395,6 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
               </span>
             )}
             {!adjusted && <span className="eyebrow-warn">Limited data</span>}
-          </div>
-          <div className="hero-sub" ref={subRef}>
-            <Delta value={monthDelta} suffix={Math.abs(monthDelta) === 1 ? " pt" : " pts"} small roll spinIn />
-            <span className="hero-sub-note" ref={subNoteRef}>
-              {(m.real || (onImpL && onImpL.aPrev != null) || (altL && altL.aPrev != null))
-                ? "vs 1 month ago" : "vs previous reading"}
-              {/* A month-on-month move smaller than its own interval is not a
-                  finding. Say so next to the arrow, not three scrolls down -
-                  and let the margin the caveat invokes carry the reader to its
-                  definition, as the terms in the interval above do. */}
-              {unc && unc.changeSig === false && (
-                <span className="hero-caveat"> (within {subTight ? "" : "the "}
-                  <button type="button" className="hi-term"
-                          title="What a margin of error means"
-                          onClick={() => window.AP.openTerm &&
-                            window.AP.openTerm("margin-of-error", "two-party preferred")}>
-                    margin
-                  </button>)
-                </span>
-              )}
-            </span>
           </div>
         </div>
         <div className="hero-controls">

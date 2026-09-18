@@ -1122,9 +1122,9 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
 .roll-d, .roll-sep, .roll-anchor { -webkit-user-select: none; user-select: none; }
 /* Horizontal junctions keep word-width spacing (a space is ~3px at this
    line's 12-13px sizes) so the sub reads as one sentence; the interval row
-   above gives its dots a wider 6px separator rhythm. The 6px row gap only
+   below gives its dots a wider 6px separator rhythm. The 6px row gap only
    matters between wrapped lines. */
-.hero-sub { display: flex; align-items: center; gap: 6px 3px; margin-top: 8px; flex-wrap: wrap; }
+.hero-sub { display: flex; align-items: center; gap: 6px 3px; margin-top: 10px; flex-wrap: wrap; }
 .lead-tag { font-size: 14px; font-weight: 700; color: var(--ink); white-space: nowrap;
   font-variant-numeric: tabular-nums; }
 .hero-sub-note { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
@@ -1188,7 +1188,7 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    other. 6px flanks: wider than a word space, so the dots breathe as clause
    separators, without the 8px double-spaced look of the first pass. The
    8px row gap only matters between wrapped lines. */
-.hero-interval { display: flex; align-items: baseline; gap: 8px 6px; margin-top: 10px; flex-wrap: wrap; }
+.hero-interval { display: flex; align-items: baseline; gap: 8px 6px; margin-top: 8px; flex-wrap: wrap; }
 .hi-method { color: var(--ink-3); white-space: nowrap; }
 /* Separators hang off the END of each clause, not the start of the next: as
    a ::before they belonged to the following flex item, so a wrap carried the
