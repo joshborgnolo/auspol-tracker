@@ -4800,7 +4800,8 @@ function infoTerms(D) {
       house by house.</>) },
     { id: "fp-flows", term: "First-principles flow set", body: (
       <>The fixed preference table that turns the current primaries into the Labor
-      v One Nation figure – the set every “Implied from primary votes” label names.
+      v One Nation figure – the set behind the “Using implied preference flows”
+      figure on the Labor v One Nation view.
       It is computed for this site; no pollster or commission publishes it. Three
       cells do all the work: Coalition voters 31.5% to Labor (±2.5), Greens 89% (±3),
       everyone else 53% (±3) – the remainders, 68.5%, 11% and 47%, land with

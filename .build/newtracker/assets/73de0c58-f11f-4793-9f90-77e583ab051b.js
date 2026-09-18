@@ -583,7 +583,7 @@ function tppLatest(id, basis) {
   if (!M) return null;
   if (M.real) {
     if (basis === "imp" && D.synthLatest && D.synthLatest.alp != null)
-      return { a: D.synthLatest.alp, b: D.synthLatest.lnp, ci95: D.synthLatest.ci95, implied: true };
+      return { a: D.synthLatest.alp, b: D.synthLatest.lnp, ci95: D.synthLatest.ci95 };
     return { a: D.latest.alp2pp, b: D.latest.lnp2pp, ci95: D.latest.alp2ppCi95 };
   }
   const imp = M.altKey === "alp_on" && D.latest.onImp && D.synthOn ? D.latest.onImp : null;
@@ -842,15 +842,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
     morphRaf.current = requestAnimationFrame(step);
   };
 
-  /* The basis-COMPARISON switch renders in two homes (one state, both copies
-     call the same setter, so they can never disagree): the control column on
-     the desktop, and under the chart legend on the phone, where the strip
-     tightens to its two chip groups. The CSS picks which copy exists at this
-     width - .pg-phone is display:none everywhere except the <=560 block,
-     which also hides the strip's copy. What "other" means flips with the
-     basis: on respondent-allocated it draws the implied shadow, on implied
-     it draws the houses' own published figures. */
-  /* matchup (the prop) not m here – const m is declared below this block */
+  /* The basis-COMPARISON switch has ONE home, beneath the chart legend, on
+     every width. What "other" means flips with the basis: on
+     respondent-allocated it draws the implied shadow, on implied it draws
+     the houses' own published figures. */
   const cmpCopy = matchup === "alp_on"
     ? (impOnBasis
         ? { term: "published head-to-head", termId: "weighted-aggregate", termTip: "What a weighted aggregate means",
@@ -862,8 +857,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
             tip: "Also draw the same polls’ own published two-party figures (respondent-allocated or equivalent), each house’s allocation as filed. The complement of the basis above." }
         : { term: "implied 2PP", termId: "implied-2pp", termTip: "What an implied two-party figure is",
             tip: "Also draw what the same polls’ primary votes imply when run through one fixed preference-flow table (the 2025 election’s actual flows), shaded to the 2022 table’s read of the One Nation conversion. A diagnostic, not a correction." });
-  const compareToggle = (phone) => (
-    <label className={"pg-check" + (phone ? " pg-phone" : "") + (showSynth ? " on" : "")}
+  const compareToggle = () => (
+    <label className={"pg-check" + (showSynth ? " on" : "")}
            title={cmpCopy.tip}>
       <input type="checkbox" checked={showSynth} onChange={(e) => setShowSynth(e.target.checked)} />
       {/* the label is a flex row with a 6px gap, so a loose text node and the
@@ -1177,7 +1172,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   const unc = m.real
     ? (impBasis
         ? (D.synthLatest.ci95 != null
-            ? { ci95: D.synthLatest.ci95, n: D.synthLatest.n, changeSig: D.synthLatest.changeSig, implied: true }
+            ? { ci95: D.synthLatest.ci95, n: D.synthLatest.n, changeSig: D.synthLatest.changeSig }
             : null)
         : (D.latest.alp2ppCi95 != null
             ? { ci95: D.latest.alp2ppCi95, n: D.latest.method.nPolls, changeSig: D.latest.changeSig }
@@ -1263,6 +1258,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
                 ((basis || "imp") === "imp" ? "implied preference flows" : "respondent-allocated preferences only")}
               onClick={() => setBasis((basis || "imp") === "imp" ? "resp" : "imp")}>
               Using <span className="hb-what">{(basis || "imp") === "imp" ? "implied preference flows" : "respondent-allocated preferences only"}</span>
+              {(basis || "imp") === "imp" ? " (default)" : ""}
             </button>
           </div>
         )}
@@ -1333,19 +1329,19 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
               interval's name, the method, and the window both describe. ref
               feeds the one-line fitter above. */}
           <div className="hero-interval" ref={hiRef}>
-            {/* The label names the method; now it also explains it. Everything
-                this figure is built on has a definition in Info, and the word
-                the reader is looking at is the shortest way to it. */}
+            {/* The label names the ESTIMATOR, not the basis. It used to
+                swap to "Implied from primary votes" on the implied basis -
+                but the "Using …" button above already declares the basis,
+                and the estimator running under either basis is the same
+                debiased nowcast, only fed implied figures instead of
+                published ones. The word the reader sees stays the
+                estimator's name, and that word links to its definition. */}
             <button type="button" className="hi-method hi-term"
-                    title={unc && (unc.flows || unc.implied)
-                      ? "How this figure is derived from the primary-vote aggregate"
-                      : "What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"}
+                    title={"What " + (adjusted ? "a weighted aggregate" : "a monthly average") + " means"}
                     onClick={() => window.AP.openTerm &&
-                      window.AP.openTerm(unc && (unc.flows || unc.implied) ? "implied-2pp"
-                                           : adjusted ? "weighted-aggregate" : "monthly-average",
+                      window.AP.openTerm(adjusted ? "weighted-aggregate" : "monthly-average",
                                          "two-party preferred")}>
-              {unc && (unc.flows || unc.implied) ? "Implied from primary votes"
-               : adjusted ? "Weighted aggregate" : "Monthly average"}
+              {adjusted ? "Weighted aggregate" : "Monthly average"}
             </button>
             {/* The sentence continues in a parenthetical: how much evidence
                 the figure carries and what its interval is called. The count
@@ -1403,16 +1399,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
         <div className="hero-controls">
           {/* Phone copy of the range switch: its laptop home is the chartbar
               at this column's foot, and every width shows exactly one home -
-              one state, two copies, the pattern the compare switch below
-              already uses. The matchup has no strip copy at all: the
+              one state, two copies. The matchup has no strip copy at all: the
               Switch-2PP pill below is its switcher on every width, laptop
               included, so a bare matchup toggle would only duplicate it. */}
           <TextToggle caps value={rangeId} onChange={setRangeId} ariaLabel="Time range"
             options={rangeOptions} />
-          {/* The synthetic overlay is only meaningful where a second basis
-              exists to compare against - the two implied-basis pairings.
-              Off by default: it is a diagnostic, not a third headline. */}
-          {((matchup === "alp_lnp" && impOffered) || (m.altKey === "alp_on" && impOnOffered)) && compareToggle(false)}
           {/* The OTHER contests, carrying their figures rather than just their
               names. One Nation sits level with Labor on the primary vote, so
               in a good many seats the final two are not Labor and the Coalition
@@ -1540,9 +1531,9 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
               (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : "")}
         </p>
       </div>
-      {/* phone home of the same switch - under the chart legend, not in the
-          control strip; hidden by default and shown only by the <=560 rules */}
-      {((matchup === "alp_lnp" && impOffered) || (m.altKey === "alp_on" && impOnOffered)) && compareToggle(true)}
+      {/* the compare switch's ONE home - under the chart legend, next to the
+          lines it annotates, at every width */}
+      {((matchup === "alp_lnp" && impOffered) || (m.altKey === "alp_on" && impOnOffered)) && compareToggle()}
     </section>
   );
 }
