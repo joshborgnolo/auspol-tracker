@@ -34,10 +34,21 @@
 //     clause can intervene ("…marginally closer … Allocating the preference
 //     flows … shows the ALP on 55% …"), so the window is generous and "the
 //     ALP on x%" phrasing is accepted. Stored as tpp_flows (ALP share only;
-//     L-NP is its complement). Eras that never print the pair have no such
-//     phrase at all and the pair stays null — an anchor WITHOUT a pair is
-//     only a warning, but a parsed pair that fails the plausibility guards
-//     aborts the run.
+//     L-NP is its complement). The anchor is the allocation phrase
+//     ("allocated based on how Australians voted"), NOT "2025 Federal
+//     Election": the prose often quotes the election RESULT under that
+//     phrase first ("clearly above the 2025 Federal Election result in
+//     early May: ALP 55.2% cf. L-NP 44.8%"), and anchoring there stored
+//     55.2 on five 2025 rows (found 2026-09-19, repaired by
+//     backfill-roymorgan-flows.mjs --refill). Roy Morgan prints the flows
+//     pair to the half point, so a pair off that grid is treated as an
+//     election-result echo and trips the guard. A release that allocates
+//     the MONTH's sample ("…this week's Roy Morgan survey for the month of
+//     December are allocated…") prints a figure that belongs to no weekly
+//     row — the field stays absent, with a warning. Eras that never print
+//     the pair have no such phrase at all and the pair stays null — an
+//     anchor WITHOUT a pair is only a warning, but a parsed pair that fails
+//     the plausibility guards aborts the run.
 //   - ALP v One Nation 2PP: weekly since 2026-05-17 (polls.json wave date;
 //     released May 18) the release closes with an ALP-vs-One-Nation
 //     head-to-head after the anchor "contest is set to be between the ALP
@@ -210,14 +221,17 @@ function parseRelease(post) {
     else { tpp_alp = parseFloat(pa[1]); tpp_lnp = parseFloat(pl[1]); }
   }
 
-  let tpp_flows = null, tpp_flows_lnp = null, flowsPairMissing = false;
-  const fi = t.search(/2025 Federal Election/i);
+  let tpp_flows = null, tpp_flows_lnp = null, flowsPairMissing = false, flowsMonthly = false;
+  const fi = t.search(/allocated based on how Australians voted/i);
   if (fi !== -1) {
     const w = t.slice(fi, fi + 700);
     const pa = w.match(/ALP\s+(?:on\s+)?([\d.]+)\s*%/i);
     const pl = pa && w.slice(w.indexOf(pa[0]) + pa[0].length).match(/L-NP(?:\s+Coalition)?\s+(?:on\s+)?([\d.]+)\s*%/i);
-    if (pa && pl) { tpp_flows = parseFloat(pa[1]); tpp_flows_lnp = parseFloat(pl[1]); }
-    else flowsPairMissing = true;
+    // "…survey for the month of December are allocated…": a monthly figure
+    // on a weekly release belongs to no single row
+    flowsMonthly = /for the month of/i.test(t.slice(Math.max(0, fi - 120), fi));
+    if (!pa || !pl) flowsPairMissing = true;
+    else if (!flowsMonthly) { tpp_flows = parseFloat(pa[1]); tpp_flows_lnp = parseFloat(pl[1]); }
   }
 
   // ALP v One Nation 2PP — weekly since wave date 2026-05-17, anchored on
@@ -255,7 +269,7 @@ function parseRelease(post) {
 
   return {
     date, dateStart, published, alp, lnp, grn, onp, ind, undecided, lib, nat,
-    tpp_alp, tpp_lnp, tpp_flows, tpp_flows_lnp, flowsPairMissing,
+    tpp_alp, tpp_lnp, tpp_flows, tpp_flows_lnp, flowsPairMissing, flowsMonthly,
     tpp_onp, tpp_onp_onp, onpPairMissing,
     sample: sampleM ? +sampleM[1].replace(/,/g, "") : null,
     missing,
@@ -291,6 +305,9 @@ function guardRelease(r, slug, releaseDate) {
   if (r.tpp_flows != null && r.tpp_flows_lnp != null) {
     check(`flows 2pp Σ=${r.tpp_flows + r.tpp_flows_lnp} ~100`, Math.abs(r.tpp_flows + r.tpp_flows_lnp - 100) <= 1.0);
     check(`flows alp=${r.tpp_flows} in 40–65`, r.tpp_flows >= 40 && r.tpp_flows <= 65);
+    const onHalfGrid = (v) => Math.abs(v * 2 - Math.round(v * 2)) < 1e-9;
+    check(`flows pair ${r.tpp_flows}/${r.tpp_flows_lnp} on the half-point grid (55.2/44.8 is the election result, not a poll)`,
+      onHalfGrid(r.tpp_flows) && onHalfGrid(r.tpp_flows_lnp));
   }
   if (r.tpp_onp != null && r.tpp_onp_onp != null) {
     check(`onp 2pp Σ=${r.tpp_onp + r.tpp_onp_onp} ~100`, Math.abs(r.tpp_onp + r.tpp_onp_onp - 100) <= 1.0);
@@ -362,7 +379,8 @@ try {
     }
     if (!post?.content) { guardFails.push(`${c.slug}: no findingData.postBy.content`); continue; }
     const r = parseRelease(post);
-    if (r.flowsPairMissing) status.warnings.push(`${c.slug}: "2025 Federal Election" anchor present but no flows pair parsed`);
+    if (r.flowsPairMissing) status.warnings.push(`${c.slug}: "allocated based on how Australians voted" anchor present but no flows pair parsed`);
+    if (r.flowsMonthly) status.warnings.push(`${c.slug}: flows pair is for the month, not this wave — tpp_flows left absent`);
     if (r.onpPairMissing) status.warnings.push(`${c.slug}: "between the ALP and One Nation" anchor present but no ALP-v-ON pair parsed`);
     const rd = post.findings?.releaseDate?.split("/").reverse().join("-"); // "24/08/2026" → 2026-08-24
     const rdOk = rd && /^\d{4}-\d{2}-\d{2}$/.test(rd) ? rd : null;

@@ -58,6 +58,17 @@ Working approach (v2, 17/19 vs live hand-verified rows):
    preference-flow pair. The flows pair feeds `tpp_flows`; the ALP-v-ON pair is the altTpp
    series (see the ONP section below). NEITHER may ever feed `tpp_alp`/`tpp_lnp` — the
    canonical-pair anchor must come first.
+   **Flows-pair anchor is the allocation phrase `allocated based on how Australians voted`,
+   never `2025 Federal Election`** (fixed 2026-09-19): the prose often quotes the election
+   RESULT under that phrase first ("clearly above the 2025 Federal Election result in early
+   May: ALP 55.2% cf. L-NP 44.8%"), and the old anchor stored 55.2 — the election result — on
+   five monthly 2025 rows. Two guards now back the anchor: the flows pair must sit on RM's
+   half-point grid (55.2 can only be the result echo → guard trip), and a `for the month of`
+   qualifier in the ~120 chars before the anchor means the figure is the MONTH's allocation
+   printed on a weekly release (Dec-14-2025) → `tpp_flows` stays absent with a warning
+   (`flowsMonthly`). `backfill-roymorgan-flows.mjs --refill` re-reads rows that already carry
+   the field and corrects/removes them (that run fixed the six rows); the same anchor and
+   guards live in both scripts.
 5. Field period `conducted from Month D – Month D, YYYY` (abbrev months, cross-year spans);
    sample `cross-section of N electors`; the `can't say` undecided line is **optional** —
    pre-June-2026 eras omit it, and polls.json rows omit it too (conditional key, not null).
