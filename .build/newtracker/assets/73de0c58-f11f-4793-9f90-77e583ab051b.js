@@ -777,6 +777,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   const narrow = useNarrow();
   const [morph, setMorph] = useState(null);        // { from, to, t }
   const morphRaf = useRef(0);
+  /* Basis flips get the labels' glide without the line blend: the window
+     slides from whatever is on screen to the new basis's auto-fit, ticks
+     enumerated from the destination so their VALUES hold still (the matchup
+     morph's own trick) - only positions move. Lines/dots swap instantly,
+     as they always have. */
+  const [basisMorph, setBasisMorph] = useState(null); // { from: [lo, hi], t }
+  const basisRaf = useRef(0);
   /* The basis our two "real-question" contests are displayed on, owned in
      App and handed down: "imp" = implied preference flows (every poll's
      primaries through one fixed flow table; the site's DEFAULT on both
@@ -793,7 +800,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   const impOnOffered = D.synthOn && D.synthOn.length > 1 && !!D.latest.onImp;
   const impOnBasis = impOnOffered && basis === "imp" && matchup === "alp_on";
   const [showSynth, setShowSynth] = useState(false);
-  React.useEffect(() => () => cancelAnimationFrame(morphRaf.current), []);
+  React.useEffect(() => () => { cancelAnimationFrame(morphRaf.current); cancelAnimationFrame(basisRaf.current); }, []);
   /* The month clause's caveat shows "the margin" until the note no longer
      fits beside the delta chip - then, and only then, it shortens to
      "margin". Measured, not breakpointed: the wrap point depends on the
@@ -840,6 +847,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
     const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (id === from || still || !MATCHUPS[from] || !MATCHUPS[id]) { setMorph(null); return; }
     cancelAnimationFrame(morphRaf.current);
+    setBasisMorph(null);                                   // a basis slide, if running, lands
+    cancelAnimationFrame(basisRaf.current);
     const t0 = performance.now();
     setMorph({ from, to: id, t: 0 });
     const step = (now) => {
@@ -849,6 +858,31 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
       morphRaf.current = requestAnimationFrame(step);
     };
     morphRaf.current = requestAnimationFrame(step);
+  };
+  /* A basis flip shares the matchup morph's clock but animates ONLY the
+     window: the lines and dots belong to whichever series each basis
+     publishes and swap instantly (there is no canonical interpolation
+     between the pollsters' own aggregate and the implied series), while
+     the axis labels get the same glide the matchup morph gives them. The
+     slide's start is whatever window this render has on screen, so a flip
+     mid-matchup-morph continues smoothly from the interpolated window. */
+  const chooseBasis = () => {
+    const from = yDomain;
+    setBasis((basis || "imp") === "imp" ? "resp" : "imp");
+    setMorph(null);                                        // a matchup blend, if running, lands
+    cancelAnimationFrame(morphRaf.current);
+    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (still) { setBasisMorph(null); return; }
+    cancelAnimationFrame(basisRaf.current);
+    const t0 = performance.now();
+    setBasisMorph({ from, t: 0 });
+    const step = (now) => {
+      const raw = Math.min(1, (now - t0) / MORPH_MS);
+      if (raw >= 1) { setBasisMorph(null); return; }       // land on the real window
+      setBasisMorph({ from, t: MORPH_EASE(raw) });
+      basisRaf.current = requestAnimationFrame(step);
+    };
+    basisRaf.current = requestAnimationFrame(step);
   };
 
   /* The basis-COMPARISON switch has ONE home, beneath the chart legend, on
@@ -1178,7 +1212,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   const yDomain = blend
     ? (() => { const f = domainOf(morph.from), t = morph.t;
                return [f[0] + (yTarget[0] - f[0]) * t, f[1] + (yTarget[1] - f[1]) * t]; })()
-    : yTarget;
+    : basisMorph
+      ? (() => { const f = basisMorph.from, t = basisMorph.t;
+                 return [f[0] + (yTarget[0] - f[0]) * t, f[1] + (yTarget[1] - f[1]) * t]; })()
+      : yTarget;
   const yTicks = [];
   for (let v = yTarget[0]; v <= yTarget[1]; v += 5) if (v > yTarget[0] && v < yTarget[1]) yTicks.push(v);
   const lead = +(latest.a - latest.b).toFixed(1);
@@ -1308,7 +1345,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
             <button type="button" className="hb-toggle"
               aria-label={"Switch two-party preferred basis – currently using " +
                 ((basis || "imp") === "imp" ? "implied preference flows" : "respondent-allocated preferences only")}
-              onClick={() => setBasis((basis || "imp") === "imp" ? "resp" : "imp")}>
+              onClick={chooseBasis}>
               Using <span className="hb-what">{(basis || "imp") === "imp" ? "implied preference flows" : "respondent-allocated preferences only"}</span>
               {(basis || "imp") === "imp" ? " (default)" : ""}
             </button>
