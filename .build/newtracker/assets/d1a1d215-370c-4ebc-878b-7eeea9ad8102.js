@@ -552,7 +552,15 @@ const CYC_METRICS = [
      and government/opposition stay adjacent inside each pair. */
   { key: "tpp", title: "Government two-party preferred", sub: "Governing-party 2PP",
     unit: "%", fmt: (v) => v.toFixed(1),
-    step: 5, refAbs: 50, refAbsLabel: "50 – tie" },
+    step: 5, refAbs: 50, refAbsLabel: "50 – tie",
+    note: <>Two bases sit on this chart, and neither is a choice the site made freely.
+      Before 1990 no pollster published a national two-party figure, so the seven terms from
+      1972 to 1984 are <strong>implied</strong> — their primaries read through that election’s
+      own preference flows — and the 1987 term is absent entirely, because its polls were
+      filed without the Democrats split that method needs. Every term from 1990 on is the
+      two-party figure the houses <strong>published</strong>. The sitting term is drawn
+      published too, so that it is compared with its predecessors on their own terms; that is
+      why this line sits a little above the implied figure the headline quotes.</> },
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
     unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: null },
@@ -1562,7 +1570,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
         .sort((a, b) => (b.current ? 1 : 0) - (a.current ? 1 : 0) || a.year - b.year);
 
   /* The two person/party overlays are drawn lines too, so the strip names
-     them in the same pill grammar — "One Nation in 2025–2026" — with the
+     them in the same pill grammar — "One Nation in 2025–26" — with the
      span derived from the actual polls, exactly the readings the line itself
      uses (Hanson's approve-minus-disapprove set, every wave's ON primary),
      never a year assumed from the term's start. Each entry is gated on the
@@ -1573,7 +1581,10 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     const dates = D.individualPolls.filter(keep).map((p) => p.released).sort();
     if (!dates.length) return null;
     const y0 = dates[0].slice(0, 4), y1 = dates[dates.length - 1].slice(0, 4);
-    return y0 + (y1 === y0 ? "" : "–" + y1);
+    // same compression as copy-chart's spanFmt: two-digit tail inside a
+    // century, full year across the boundary ("2025–26", not "2025–2026")
+    const tail = y0.slice(0, 2) === y1.slice(0, 2) ? y1.slice(2) : y1;
+    return y0 + (y1 === y0 ? "" : "–" + tail);
   };
   const hanYears = (hanCtl && showHan) ? overlayYears((p) =>
     p.appr && p.appr.hansonNet != null &&
@@ -1602,7 +1613,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
         : (subjParty === "lnp" ? "the " : "") + D.PARTIES[subjParty].name;
       const peerNoun = M.key === "net" ? "prime minister"
         : M.key === "oppnet" ? "opposition leader"
-        : M.key === "ppmm" ? "net preference"
+        : M.key === "ppmm" ? "prime minister"
         : isOpp ? "opposition" : "government";
       insight = { d: Math.abs(d), better, mNow, subjLabel, peerNoun };
     }
@@ -1762,6 +1773,13 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
           </p>
         );
       })()}
+      {/* The basis note. Only the 2PP card carries one, because only the 2PP
+          has a basis: a primary vote is counted, not allocated. It says the
+          two things a reader comparing this tab against the hero needs and
+          cannot otherwise get — why the oldest terms are a different kind of
+          figure from the rest, and why the sitting line is drawn on the basis
+          the headline does NOT quote. */}
+      {M.note && <p className="cycle-basis">{M.note}</p>}
     </section>
   );
 }
@@ -2366,12 +2384,41 @@ function PastCyclesView() {
   /* Which terms are hidden rides in the URL too, so "the 2019 term" stays
      comparable when the link is passed around. Hidden years – not shown
      ones, since "Show all" is the ordinary state and keeps the bar clean –
-     sit in one param joined by dots: two-digit years for 2000s terms
-     (?c=10.19 hides 2010 and 2019), four digits for the 1987–1998 terms –
-     "90" would read back as 2090 and be dropped. Tokens naming no known
-     term are dropped, never trusted. */
-  /* One parser for both year params. Two-digit tokens are this century, so
-     the pre-2000 terms write themselves out in full. */
+     ride in one param as a bitmask over the site term list (bit i = i-th
+     term, term order), rendered in base 36: ?c=b1z hides the terms those
+     bits name. Terms only ever append (an election adds a NEW high bit),
+     so an old link can never decode to different terms; bits above the
+     list are dropped, never trusted, same rule as the old format. Lifted
+     terms tack on after a dash: ?c=b1z-o. */
+  const cycBits = (set) => {
+    let m = 0;
+    cycles.forEach((c, i) => { if (set.has(c.year)) m += 2 ** i; });
+    return m;
+  };
+  /* One parse for both masks' worth of state; returns null when `raw` is
+     not the bitmask form, so the legacy year list below still restores
+     every link written before this shipped. */
+  const cycUnpack = (raw) => {
+    const m = /^b(?:([0-9a-z]{1,6}))?(?:-([0-9a-z]{1,6}))?$/.exec(raw || "");
+    if (!m) return null;
+    const bits = cycles.map(() => 0).map((_, i) => 2 ** i);
+    const toSet = (tok) => {
+      if (!tok) return new Set();
+      const v = parseInt(tok, 36);
+      const s = new Set();
+      cycles.forEach((c, i) => { if (v % 2 ** (i + 1) >= bits[i]) s.add(c.year); });
+      return s;
+    };
+    return { hidden: toSet(m[1]), lifted: toSet(m[2]) };
+  };
+  const cycPack = (hidden, lifted) => {
+    const h = cycBits(hidden), l = cycBits(lifted);
+    if (!h && !l) return null;
+    return "b" + (h ? h.toString(36) : "") + (l ? "-" + l.toString(36) : "");
+  };
+  /* Legacy reader: one parser for the old dotted-year params. Two-digit
+     tokens are this century, so the pre-2000 terms wrote themselves out in
+     full. Tokens naming no known term are dropped, never trusted. */
   const cycYears = (raw) => {
     const years = new Set(cycles.map((c) => c.year));
     if (!raw) return new Set();
@@ -2390,19 +2437,28 @@ function PastCyclesView() {
      way, so the row stayed exactly where it was), and a whole board dimmed
      for a lift that had not happened. */
   const currentYear = (cycles.find((c) => c.current) || {}).year;
-  const [hidden, setHidden] = useState(
-    () => cycYears(new URLSearchParams(window.location.search).get("c")));
+  /* URL state is read once, at mount: the bitmask param if that's what's
+     there, the legacy year lists otherwise. One read keeps the two states
+     consistent (the new form carries BOTH in `c`; the legacy form splits
+     them across `c` and `l`). */
+  const urlCyc = (() => {
+    const p = new URLSearchParams(window.location.search);
+    const packed = cycUnpack(p.get("c"));
+    if (packed) return packed;
+    return { hidden: cycYears(p.get("c")), lifted: cycYears(p.get("l")) };
+  })();
+  const [hidden, setHidden] = useState(() => urlCyc.hidden);
   /* Terms drawn as their own line over the band. A separate question from
      membership: a lifted term is still IN the band, the mean and the download –
      it is being compared against its own peer set, which is the comparison the
      card is for, and a band that moved when you drew a line over it would shift
      the baseline under the reading. */
   const [lifted, setLifted] = useState(() => {
-    const l = cycYears(new URLSearchParams(window.location.search).get("l"));
-    /* a shared ?l= carrying the sitting term (every link copied while the bug
+    const s = urlCyc.lifted;
+    /* a shared ?c=/l= carrying the sitting term (every link copied while the bug
        was live does) must not restore the state it could not legally reach */
-    l.delete(currentYear);
-    return l;
+    s.delete(currentYear);
+    return s;
   });
   const [hi, setHi] = useState(null);
   /* Clearing the highlight belongs HERE, not in the strip. onMouseLeave covers
@@ -2430,11 +2486,14 @@ function PastCyclesView() {
      board is back to every term. */
   React.useEffect(() => {
     const p = new URLSearchParams(window.location.search);
-    const pack = (set) => [...set].sort((a, b) => a - b)
-      .map((y) => (y < 2000 ? String(y) : String(y).slice(2))).join(".");
-    p.delete("c"); p.delete("l");
-    if (hidden.size) p.set("c", pack(hidden));
-    if (lifted.size) p.set("l", pack(lifted));
+    p.delete("c");
+    /* "l" belongs to the All-polls view now (its lead filter); the board
+       owned it once, for legacy lifted-year lists. Scrub ONLY that legacy
+       shape – a lead letter is not ours to touch. */
+    const l = p.get("l");
+    if (l != null && /^[0-9.,]+$/.test(l)) p.delete("l");
+    const packed = cycPack(hidden, lifted);
+    if (packed) p.set("c", packed);
     const qs = p.toString();
     const L = window.location;
     const next = L.pathname + (qs ? "?" + qs : "") + L.hash;

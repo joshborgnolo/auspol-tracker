@@ -3487,6 +3487,15 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   .flow-readout-lab { font-size: 12px; }
 }
 
+/* A card's basis note: the caveat that belongs to one chart rather than to
+   the tab. Quieter than .cycle-insight (which states a finding) and set on
+   the reading measure, because it is read once and then trusted. */
+.cycle-basis {
+  font-family: var(--sans); font-size: 12px; line-height: 1.5; color: var(--ink-3);
+  margin: 10px 0 0; max-width: 78ch;
+}
+.cycle-basis strong { color: var(--ink-2); font-weight: 700; }
+
 /* ---------- what each chart is drawing ----------
    A caption on the lines, not a second legend: it lists only what this chart
    has on it, and names the holder THIS measure follows – the 2013 line on an
