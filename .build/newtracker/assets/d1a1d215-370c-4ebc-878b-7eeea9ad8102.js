@@ -3542,34 +3542,55 @@ const FLOW_PRIOR_DIM = 0.5;
    that are both mostly the election row is a gap between two copies of the
    same number, and quoting it as house disagreement would be the exact error
    the greying exists to prevent. */
+/* The table's own finding — and the finding has to survive a significance
+   test, which the first version of this did not. It reported the widest gap
+   between any two houses, and the widest gap in a column of ±4s is mostly
+   the widest pair of errors. The One Nation spread it announced (RedBridge
+   20.5 to Resolve 30.6) came to t = 1.68, and RedBridge is not even a fit —
+   its row averages that house's own published splits, a different quantity
+   with a different error — so the claim compared two incommensurable things
+   and was not significant on its own terms either.
+
+   What IS testable is a fitted cell against the reference row, which carries
+   no error of its own: |v − ref| > 1.96·se. On this term's data exactly two
+   cells pass, both Roy Morgan's, which is the honest content of an
+   eighteen-cell table and worth saying out loud. When nothing passes the line
+   renders nothing — which on the Labor-v-One-Nation table is every week so
+   far, and is itself the more useful statement. */
 function FlowFinding({ flows, cols, primary, refLabel }) {
-  const ranked = cols.map((c) => {
-    /* Prior-dominated cells are excluded from the spread: a gap between two
-       cells that are both mostly the election row is a gap between two copies
-       of one number, and quoting it as house disagreement would be the exact
-       error the greying exists to prevent. */
-    const live = flows.filter((f) => f[c.key] != null
-      && (f[c.key + "p"] == null || f[c.key + "p"] < FLOW_PRIOR_DIM));
+  const hits = [];
+  for (const c of cols) {
     const prim = primary[c.prim];
-    if (live.length < 3 || prim == null) return null;
-    const lo = live.reduce((a, b) => (b[c.key] < a[c.key] ? b : a));
-    const hi = live.reduce((a, b) => (b[c.key] > a[c.key] ? b : a));
-    const span = hi[c.key] - lo[c.key];
-    return { ...c, lo, hi, span, prim, worth: span * prim / 100 };
-  }).filter(Boolean).sort((a, b) => b.worth - a.worth);
-  /* Below half a point the decomposition has found nothing worth announcing,
-     and a headline that says so every week stops being read. */
-  if (!ranked.length || ranked[0].worth < 0.5) return null;
-  const b = ranked[0];
-  const nm = (f) => f.firm.split(" /")[0];
+    if (prim == null || c.ref == null) continue;
+    for (const f of flows) {
+      // fitted rows only, and only cells the fit actually moved
+      if (f.m || f[c.key] == null || f[c.key + "e"] == null) continue;
+      if (f[c.key + "p"] != null && f[c.key + "p"] >= FLOW_PRIOR_DIM) continue;
+      const d = f[c.key] - c.ref;
+      if (Math.abs(d) <= 1.96 * f[c.key + "e"]) continue;
+      hits.push({ firm: f.firm.split(" /")[0], noun: c.noun, v: f[c.key],
+                  ref: c.ref, d, worth: Math.abs(d) * prim / 100 });
+    }
+  }
+  if (!hits.length) return null;
+  hits.sort((a, b) => b.worth - a.worth);
+  const firms = [...new Set(hits.map((h) => h.firm))];
+  const one = firms.length === 1;
   return (
     <p className="flow-tab-find">
-      Houses disagree most about <strong>{b.the ? "the " : ""}{b.noun}</strong>: {b.lo[b.key].toFixed(1)}%
-      {" "}({nm(b.lo)}) to {b.hi[b.key].toFixed(1)}% ({nm(b.hi)}) to Labor, against the
-      {" "}{b.ref.toFixed(1)}% {refLabel}. At a {b.noun} primary near
-      {" "}{Math.round(b.prim)}, that {b.span.toFixed(1)}-point spread is worth
-      {" "}<strong>{b.worth.toFixed(1)} points</strong> of two-party — two houses that far
-      apart will publish 2PPs {b.worth.toFixed(1)} apart from identical primaries.
+      {one ? <>Only <strong>{firms[0]}</strong>&rsquo;s allocation separates from {refLabel}</>
+           : <><strong>{firms.length} houses</strong> separate from {refLabel}</>}
+      {": "}
+      {hits.map((h, i) => (
+        <React.Fragment key={h.firm + h.noun}>
+          {i > 0 && (i === hits.length - 1 ? " and " : ", ")}
+          {!one && h.firm + " on "}{h.noun} {h.v.toFixed(1)}% against {h.ref.toFixed(1)}%
+        </React.Fragment>
+      ))}
+      {" "}&mdash; worth {hits.map((h) => h.worth.toFixed(1)).join(" and ")} point
+      {hits.length > 1 || hits[0].worth !== 1 ? "s" : ""} of two-party. Every other cell here
+      sits within its own error of that row: the houses publish different two-party figures,
+      but only {one ? "this one" : "these"} can be shown to be allocating differently.
     </p>
   );
 }
@@ -3777,7 +3798,7 @@ function FlowDriftPanel({ rangeId }) {
       {fd.flows && fd.flows.length > 0 && fd.meta.aec && (
         <div className="flow-tab-wrap">
           <FlowFinding flows={fd.flows} primary={D.latest.primary}
-            refLabel="the election counted" cols={[
+            refLabel="the election&rsquo;s own count" cols={[
             { key: "g", noun: "Greens", prim: "grn", ref: fd.meta.aec.g },
             { key: "o", noun: "One Nation", prim: "onp", ref: fd.meta.aec.o },
             { key: "t", noun: "minor-party and independent", prim: "oth", ref: fd.meta.aec.t },
@@ -3944,60 +3965,23 @@ function FlowDriftOnPanel({ rangeId }) {
         fmt={(v) => (v === 0 ? "" : sgn(v))}
       />
 
-      {fd.flows && fd.flows.length > 0 && fd.meta.pub && (
-        <div className="flow-tab-wrap">
-          {/* "to Labor" reads the same on this pairing: the columns are the
-              share of each bucket reaching Labor rather than One Nation. */}
-          {/* NOT "the election counted": no election has ever counted a
-              Labor-v-One Nation flow, which is the entire reason this pairing
-              has a first-principles table instead of one. */}
-          <FlowFinding flows={fd.flows} primary={D.latest.primary}
-            refLabel="the site&rsquo;s own first-principles set assumes" cols={[
-            { key: "l", noun: "Coalition", the: 1, prim: "lnp", ref: fd.meta.pub.l },
-            { key: "g", noun: "Greens", prim: "grn", ref: fd.meta.pub.g },
-            { key: "t", noun: "minor-party and independent", prim: "oth", ref: fd.meta.pub.t },
-          ]} />
-          <table className="flow-tab">
-            <caption className="flow-tab-cap">Implied preference flows to Labor, by house · Labor vs One Nation</caption>
-            <thead>
-              <tr><th className="flow-tab-house">House</th><th>Coalition</th><th>Greens</th><th>Other</th><th>Waves</th></tr>
-            </thead>
-            <tbody>
-              <tr className="flow-tab-aec">
-                <th scope="row" className="flow-tab-house">{fd.meta.pubSrc || "First-principles flow set"}</th>
-                <td>{fd.meta.pub.l.toFixed(1)}%</td><td>{fd.meta.pub.g.toFixed(1)}%</td><td>{fd.meta.pub.t.toFixed(1)}%</td><td>–</td>
-              </tr>
-              {fd.flows.map((f) => (
-                <tr key={f.firm}>
-                  <th scope="row" className="flow-tab-house">{f.firm}</th>
-                  <FlowCell v={f.l} se={f.le} prior={f.lp} />
-                  <FlowCell v={f.g} se={f.ge} prior={f.gp} />
-                  <FlowCell v={f.t} se={f.te} prior={f.tp} />
-                  <td>{f.n}{f.m ? <span className="flow-tab-se"> published</span> : null}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <p className="table-hint ap-var-note flow-tab-note">
-            A house row reads as “the share of that cohort’s preferences this house’s published
-            Labor–One Nation figure behaves as if it handed to Labor”, fit from the house’s own
-            head-to-head and primary swings with its fixed method offset soaked up by an
-            intercept. No election ever totals a head-to-head like this one, so the table the
-            cells shrink toward is the first-principles reference row – the set the page quotes
-            the pairing’s headline on, derived from counted elections rather than any house’s
-            allocation. The houses’ own published allocations stay in the table as measured
-            rows wherever a house prints them (marked “published” in the waves cell, with the
-            ± the counting-error scale of its term mean), corroboration rather than the
-            yardstick. Every fitted cell departs from the reference row only as far as that
-            house’s own waves demonstrate – each poll counts once, and the ± figure is one
-            standard error from the same fit. Roy Morgan’s head-to-head is respondent-allocated,
-            so a fitted constant only tracks its moving allocation at best. A house needs at
-            least six waves with a published head-to-head to appear, and like everything in
-            this panel the rows are a diagnostic, not a measurement.
-          </p>
-        </div>
-      )}
+      {/* The by-house flow table is GONE from this pairing, and the reason is
+          the table's own arithmetic. Two houses publish enough Labor-v-One
+          Nation waves to fit (Roy Morgan 18, YouGov 17), which buys standard
+          errors of ±5.7 to ±9.6 on cells whose whole range of interest is
+          maybe fifteen points. Tested against the reference row, NOT ONE of
+          the six fitted cells clears 1.96·se — the largest is YouGov's
+          "other" at t = 1.36 — and no pair of houses separates either. A
+          table where nothing can be distinguished from the assumption it was
+          shrunk toward is not a diagnostic; it is six numbers and an implied
+          claim none of them support.
 
+          It is underpowered by construction rather than by bad luck, so it
+          does not come back on more waves from these two: it comes back when
+          more houses publish the pairing. The classic table keeps its own
+          because it has something that survives the same test — Roy Morgan,
+          on two cells. The drift chart above is unaffected: it measures each
+          house against its own baseline and needs no per-bucket split. */}
       <p className="table-hint ap-var-note">
         Above zero – the red ground – the published head-to-heads are running friendlier to
         Labor than the frozen table reads their own primaries; below it, friendlier to One
