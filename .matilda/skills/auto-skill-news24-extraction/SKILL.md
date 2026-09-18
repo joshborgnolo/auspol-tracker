@@ -1,6 +1,6 @@
 ---
 name: news24-extraction
-description: Extract YouGov News24 "Public Data" fortnightly federal polls from YouGov's own yougov.com releases into data/polls.json — global RSS discovery (regional feeds 404), methodology-sentence series gate, Datawrapper public TSV datasets (tab-structure-preserving cell parse, <span> arrows, \\u003C escapes), oth=sum-of-tail-row convention, ppm chart→prose fallback, yearless fieldwork-window year inference from published_at, plus manual NEWSIE_CHROME news24.com.au enrichment layered over Wikipedia-wave discovery, and the ANONYMOUS Infogram embed rung (six static _/ ids per Pulse article at e.infogram.com, pinned per wave; authoritative crosstab vs corroboration-only horserace; cornerless approvals mapped by title-order x geometry) (.build/extract-news24.mjs, .build/news24-infogram.mjs).
+description: Extract YouGov News24 "Public Data" fortnightly federal polls from YouGov's own yougov.com releases into data/polls.json — global RSS discovery (regional feeds 404), methodology-sentence series gate (accepts BOTH "News24[.com.au] Pulse / YouGov poll" and the Pulse-less "News24.com.au/YouGov poll" house style since f585b62), Datawrapper public TSV datasets (tab-structure-preserving cell parse, <span> arrows, \\u003C escapes), oth=sum-of-tail-row convention, ppm chart→prose fallback, yearless fieldwork-window year inference from published_at, plus manual NEWSIE_CHROME news24.com.au enrichment layered over Wikipedia-wave discovery, the ANONYMOUS Infogram embed rung (six+ static _/ ids per Pulse article at e.infogram.com, pinned per wave; authoritative crosstab vs corroboration-only horserace; cornerless approvals mapped by title-order x geometry), and the manual missed-wave landing runbook (transient samplePending marker, APC-PDF GET probing) (.build/extract-news24.mjs, .build/news24-infogram.mjs).
 source: auto-skill
 extracted_at: '2026-09-01T00:36:00.000Z'
 ---
@@ -56,12 +56,25 @@ News24 page facts verified against saved captures:
 - Displayed publication time comes from byline `<div id="publish-date">…
   July 29, 2026 - 5:00AM …</div>`. The JSON-LD/meta `datePublished` is 8h
   earlier (`…T11:00…Z` → AEST is still the prior evening) and is only a
-  fallback.
-- Series gate is `News24[.com.au] Pulse / YouGov poll`; fieldwork variants
+  fallback. MOVING-TARGET GOTCHA (2026-09-08): the byline itself can be
+  REWRITTEN overnight — the September 2026 article went from "September 8,
+  2026 - 9:00PM" to "September 9, 2026 - 5:00AM" (`dateModified` advanced,
+  `datePublished` stale). Re-capture before stamping `published`, and
+  honour the final display byline (matches the T05:00 canon convention).
+- Series gate RELAXED 2026-09-09 (commit f585b62): was
+  `News24[.com.au] Pulse / YouGov poll`, but News24's new house style
+  drops "Pulse" from the methodology sentence — the 2026-09-08 wave reads
+  "the latest News24.com.au/YouGov poll" (Pulse branding survives only in
+  the Infogram embeds). Now `/news24(?:\.com\.au)?(?:\s+Pulse)?\s*\/\s*YouGov\s+poll/i`
+  (~extract-news24.mjs:345) — accepts both styles. This miss, plus slow
+  Wikipedia updates, silently hid the wave (see "Manually landing
+  a missed wave" below); fieldwork variants
   include "conducted online between August 18 and 24" and "conducted between
   July 21 and July 28".
-- August 2026 article carries sample (`poll of 1510 voters`); July 2026 does
-  not, so Wiki's sample is retained.
+- Sample-in-prose is NOT guaranteed: August 2026 article carries it
+  (`poll of 1510 voters`); July 2026 does not, so Wiki's sample is
+  retained; September 2026 (Wave 2 style) omits it AND its APC PDF wasn't
+  posted at landing — the `samplePending` path below.
 - News24 prose has no independent/others text. Wiki supplies both; do not
   synthesise a residual because undecided/unknown fields would corrupt the
   tracker's existing ex-undecided convention.
@@ -386,3 +399,63 @@ sample 1000–2500.
 - Finish with a live full run in the repo (expect `changed:false`, exit 0, no writes — the
   RSS pubDate pre-screen yields zero candidates between waves) plus `node
   .build/newtracker/validate.mjs`.
+
+## Manually landing a missed wave (worked 2026-09-08 wave, commit c02b02e)
+
+The pipeline has THREE discovery legs and ALL can miss simultaneously:
+yougov.com RSS stays silent (no official release for most waves now),
+Wikipedia's wave table lags days, and the News24 series gate can reject a
+house-style change (see f585b62 above). When the user proves a wave exists,
+land it by hand rather than forcing it through the extractor:
+
+1. **Capture** the live article through logged-in Chrome
+   (`.build/chrome-article.mjs`; save to `.matilda/`); extract the six
+   Infogram `_/` ids and save them as
+   `.build/news24-src/ig-fixtures-<dateIso>/ig-<id>.html` (tracked,
+   mirrors the 2026-08-24 convention — SEVEN ids on the 2026-09-08 wave,
+   the roster isn't always six).
+2. **Append five rows, all sections**: polls (`pollster:"YouGov"`,
+   `client:"News24"`), ppm, approval (nets + `detail`), ppmHeadToHead
+   (Albanese–Hanson) and altTpp (ALP–ONP) — the last three key `firm`.
+3. **`samplePending` when sample is unpublished** (NEW 2026-09-09):
+   `samplePending:true` on the polls row in place of
+   `sample`/`sampleEff`/`methodUrl`. validate.mjs rule 5 skips the missing-sample
+   failure for it and logs a documented `sample-pending` exception
+   (alongside the isElection/assimilated cases); gen-data prices implicit
+   n=1200 regardless of flags, so the estimator is unaffected. The flag is
+   TRANSIENT. Since 78864b1 (2026-09-18) extract-sampleeff.mjs CLEARS it
+   itself — its raw-sample reconciliation deletes `samplePending` on all
+   three paths (n already matches the filed statement, null-fill insert,
+   mismatch correction) as it stamps sample/sampleEff/methodUrl. Before
+   that commit nothing owned the clearing: the 2026-09-08 wave's flag
+   survived its own backfill because the weekly sweep never ran (see
+   auspol-effective-sample). Only hand-remove the flag if you're stamping
+   the numbers by hand too. The flag never reaches build output — gen-data
+   does not emit it into index.html or the data assets.
+   - YouGov's per-wave n lives in the APC methodology PDF on
+     `d3nnbamw3dez3b.cloudfront.net`, named
+     `News24_Pulse_DD_MM_26_APC_Methodology_Statement.pdf` (try both the
+     fieldwork-end and publication dates).
+   - **Probe with GET, never HEAD**: HEAD returns 403
+     `application/xml` (111 B) on EVERY URL including known-good ones — a
+     false-absence trap. A real 200 `application/pdf` (~300 KB) vs 403 xml
+     distinguishes posted from unposted.
+4. **Pass downstream gates with zero extra work**: validate (expect the
+   one new documented exception), `check-poll-thinness.mjs` needs NO
+   EXCEPTIONS entry for this — it checks derived sections + `published`
+   only, and a full five-section landing is not thin.
+5. **Build the full chain**: `build.mjs` → `render-card.mjs` → `build.mjs`
+   (og:image restamp). Verify the wave's story id (32-char hex from the
+   News24 URL) appears 3× in index.html and 3× in the `9f09dca2` data
+   asset BEFORE staging — but grep the LIVE article id, not the headline
+   slug: headline slugs are recycled across waves (an old Sky Pulse story
+   matched "pauline-hansons-one-nation-surges" ahead of the new one).
+6. **Commit scoped** (shared repo — never `git add -A`; siblings leave
+   dirty trees): data/polls.json, validate.mjs, the fixture dir,
+   index.html, feed.xml, sitemap.xml, auspol-card.{png,json},
+   auspol-latest.json, and the `9f09dca2` data asset. One data-asset
+   guard first: `git diff --stat` it — a sibling's stale build output may
+   have been sitting in the worktree; your regeneration from HEAD data
+   should show wave-only hunks (~20 rewritten minified lines) before you
+   stage it. Commit message heredocs break on apostrophes — write the
+   message to a file under `.matilda/` and `git commit -F`.

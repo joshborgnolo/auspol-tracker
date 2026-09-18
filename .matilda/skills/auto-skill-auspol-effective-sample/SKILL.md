@@ -100,7 +100,14 @@ Documented gaps, all deliberate:
   git-add list includes `assets/` because gen-data reweights.
 - `.github/workflows/sampleeff-update.yml` — poll-agent.yml caller,
   Mon 07:15 AEST, `apt_packages: poppler-utils`; repair prompt
-  `.build/sampleeff-repair-prompt.md`.
+  `.build/sampleeff-repair-prompt.md`. The wrapper's header says
+  "installed locally via launchd like the other house jobs" but verified
+  2026-09-18 there is NO sampleeff plist in ~/Library/LaunchAgents — the
+  pipeline is CI-ONLY, so a cancelled weekly run (main-writers
+  preemption; GitHub never retries a scheduled run) leaves a waiting
+  stamp untouched until next Monday unless a leg is run by hand
+  (`node .build/extract-sampleeff.mjs <leg>`). Reporting-site lag is
+  exactly this gap, not extractor breakage.
 - Ride-along inside the RedBridge pipeline (added 2026-09-04):
   `redbridge-updater.sh` runs `node .build/extract-sampleeff.mjs accent`
   immediately after a `changed:true` extract, so the new wave's
@@ -144,6 +151,22 @@ network cost and deterministic reviewability:
   `sample old→new (source)`. Status gains `samples:n`, and
   `changed = stamped || methods || samples`; any of the three triggers
   the atomic polls.json write.
+- **`samplePending` clearing (added 2026-09-18, commit 78864b1)**: the
+  News24 hand-landing convention (`samplePending:true` in place of
+  sample/sampleEff/methodUrl while a wave awaits its APC PDF; validate.mjs
+  rule 5 tolerates) had NO owner for the removal — the weekly sweep
+  stamped the numbers but left the flag, and validate only documents
+  that it "must leave the file with the backfill". The reconciliation
+  loop now deletes `samplePending` on ALL THREE paths once a filed
+  statement confirms the row's n: the n-already-matches fast path
+  (logs `cleared samplePending`), the null-fill insert, and the
+  mismatch correction. Idempotent: a rerun reports `changed:false`,
+  no writes. gen-data never emits the flag, so clearing it is
+  build-output-neutral. Worked case behind the fix: the 2026-09-08
+  News24 wave sat ten days on `samplePending` alone because the
+  2026-09-14 CI sweep was cancelled by the main-writers concurrency
+  group; a manual `yougov` leg stamped 1504/1028 + methodUrl and the
+  same session patched the extractor and backfilled the flag removal.
 
 First reconciliation pass (data commit 0a280d6) corrected 13 waves:
 Newspoll 2025-09-11 1283→1264; Essential 2025-12-08 1300→1030,

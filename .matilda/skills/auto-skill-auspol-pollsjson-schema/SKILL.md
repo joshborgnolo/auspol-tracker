@@ -30,6 +30,13 @@ June **2025** for a **2026-06-25** wave.
   sample, sampleEff, alp, lnp, grn, onp, ind, oth, tpp_alp, tpp_lnp, url,
   releaseUrl, assimilated. NOTE: `tpp_alp/tpp_lnp` may be null on a real row
   (Newspoll 2026-06-25 filed primaries only).
+- Optional `samplePending: true` (added 2026-09-09, first use YouGov
+  2026-09-08): the wave carries full figures but no
+  `sample`/`sampleEff`/`methodUrl` yet — the house's per-wave APC
+  methodology PDF wasn't posted at landing. Absent-not-zero (it's a
+  TRANSIENT flag, dropped on backfill); validate.mjs rule 5 exempts it via
+  a documented `sample-pending` exception and gen-data prices implicit
+  n=1200 (`Math.min((p && p.sample) || 1200, SAMPLE_CAP)`) regardless.
 - Optional measured-split fields (RedBridge/Accent only, absent-not-zero):
   `tpp_split: {grn, onp, oth}` = the house-printed respondent-allocated
   ALP share of each cohort's preferences on the classic pairing, and
@@ -58,6 +65,14 @@ June **2025** for a **2026-06-25** wave.
 - `date` = **fieldwork END** ("22–25 Jun" files as `2026-06-25`).
 - `published` is separate and can lag days (`2026-06-25` wave published
   `2026-06-28T20:00`); `dateStart` = fieldwork start.
+- `published` PROVENANCE (commit 6d7959b, "Published was the last day of
+  fieldwork wearing another name"): hand-stamped per row off the source
+  page's `article:published_time` og meta, stored as **local AEST without
+  offset** (`2026-09-13T08:00:00Z` → `"2026-09-13T18:00"`); never assumed
+  or derived from `date`. No pipeline script writes it — assimilated
+  auto rows land WITHOUT it (see resolve-monitor-extraction for Resolve's
+  enrichment gap). Consumers: next-expected-polls' release-date key and
+  the archive's sort-by-release both prefer `published` over `date`.
 - So a "22–25 June" user citation maps to `date: <YEAR>-06-25`, and a June
   article about it can mean `published` in late June. Also check the YEAR
   the user means — the whole in-session confusion was 2025 vs 2026.
@@ -82,7 +97,24 @@ array spans 2025-05-03 → 2026-08-31 (157 rows) and Newspoll's series starts
 **2025-07-17** — there is no Newspoll wave in June 2025 at all (that month:
 Roy Morgan ×3, RedBridge ×1). Re-check before quoting; span will have moved.
 
-## 4. "I can't see poll X in All polls" — current-era ladder (all shell, ~90s)
+## 4. cyclePolls-side objects an importer meets
+
+- `cyclePolls` — keyed term-END year (the 1987 election runs end 1990 → all
+  1987–90 rows file under `"1990"`); rows are plain VI rows keyed DATE+firm.
+- `cycleApproval` — keyed term-BEGIN year by contrast (don't mix these up).
+- `cyclePollBases` — adjudicated primary-sum basis NOTES, written directly
+  into polls.json AS DATA. validate.mjs check-8c is presence-only: when a
+  bucket's bona-fide rows legitimately stray from Σ100 (e.g. Morgan-era
+  printed tables itemising minors inside "oth", or modern multi-mode weeks
+  published unrounded — one 2023-08-24 Roy Morgan week sums 105), the note
+  `"<year>|<firm>"` is what makes the validator accept it. It is NOT a
+  code-side allowlist in validate.mjs.
+- validate.mjs's strict gates (KNOWN_POLLSTERS, ASSIMILATED_OK, checks
+  1/8a) scan ONLY current-term `polls[]`. Bulk inserts into `cyclePolls`:
+  unknown/one-off house names need NO validate.mjs edit — don't
+  "pre-emptively" add firms to KNOWN_POLLSTERS for historical-only rows.
+
+## 5. "I can't see poll X in All polls" — current-era ladder (all shell, ~90s)
 
 1. **Canonical row, worktree**: load `data/polls.json`, filter
    `p['pollster']==house and p['date']==d`. Note `tpp` nulls.

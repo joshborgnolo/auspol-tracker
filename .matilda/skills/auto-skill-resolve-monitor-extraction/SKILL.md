@@ -1,6 +1,6 @@
 ---
 name: resolve-monitor-extraction
-description: Extract/update the SMH Resolve Political Monitor polling series — 2026 interactive's data.json (values xor-obfuscated parseInt(str,36)^123, scheme detected per-payload) with CryptoJS "sacho" fallback for the frozen-2021 endpoint -> repair-aware keyed merge into data/resolve-political-monitor.csv via .build/extract-resolve-rpm.mjs (exit-code contract, RPM_STATUS json); assimilate VI + preferred-pm + leadership approval into polls.json via .build/assimilate-resolve-vi.mjs.
+description: Extract/update the SMH Resolve Political Monitor polling series — 2026 interactive's data.json (values xor-obfuscated parseInt(str,36)^123, scheme detected per-payload) with CryptoJS "sacho" fallback for the frozen-2021 endpoint -> repair-aware keyed merge into data/resolve-political-monitor.csv via .build/extract-resolve-rpm.mjs (exit-code contract, RPM_STATUS json); assimilate VI + preferred-pm + leadership approval into polls.json via .build/assimilate-resolve-vi.mjs. CI runs 07:00+23:00 AEST (2026-09-13 evening-payload gap fix f04b452); body has the manual landing recipe for missed waves, plus the post-assimilation enrichment gap (auto rows land without published/url/sample/dateStart — fill from the SMH article, published off article:published_time UTC→AEST).
 source: auto-skill
 extracted_at: '2026-08-30T10:30:00.000Z'
 ---
@@ -56,6 +56,35 @@ The quote-aware parser copied across the repo's .build scripts had its newline b
 - `process.on("unhandledRejection")` does NOT catch top-level evaluation throws (Node 23) — wrap main in try/catch; relative paths only; fabricated fixtures need no encryption (decrypt passthrough).
 
 launchd job `local.auspol.resolve-rpm` drives the wrapper (.build/resolve-rpm-updater.sh): extract → changed-gate → assimilate --apply → validate → build → commit/push; log at `.build/logs/resolve-rpm.log`.
+
+## Release-night payload gap + manual landing (2026-09-13 wave)
+
+Nine pushes wave payloads to the 2026 data.json on **release-night evenings** — the 2026-09-13 wave landed at `source_updated 22:03 AEST`, after the CI workflow's only slot (07:00 AEST daily) and while the launchd backup was refusing every slot on the shared-repo dirty tree. A wave sat unlanded most of a day. Fix shipped in `f04b452`: `resolve-update.yml` now runs TWICE daily — `0 21 * * *` (07:00 AEST) **and `0 13 * * *` (23:00 AEST)** — so an evening payload lands within the hour. (Timing lesson generic across houses: GitHub cron is UTC; AEST = UTC+10; watch DST when adding slots.)
+
+When a published wave hasn't landed and the user reports it, the manual run is the normal pipeline, top of repo:
+
+```sh
+node .build/extract-resolve-rpm.mjs            # real run; RPM_STATUS new_dates
+node .build/assimilate-resolve-vi.mjs          # DRY FIRST — inspect the adds
+node .build/assimilate-resolve-vi.mjs --apply  # writes data/polls.json
+node .build/newtracker/validate.mjs            # exit-gated
+node .build/newtracker/build.mjs
+# commit exactly: data/polls.json data/resolve-political-monitor.csv
+#   index.html feed.xml sitemap.xml — then push
+```
+
+The push routinely races other writers in this repo; `git pull --rebase --autostash origin main && git push origin HEAD:main` resolves it in one shot (autostash carries sibling sessions' unstaged dirt through the rebase and back). If the push replies "cannot lock ref … No space left on device" AFTER the remote accepted the objects, the remote move DID happen — confirm `git ls-remote origin main` and repair the stale local ref with `git update-ref refs/remotes/origin/main <sha>`; then check `df -h` (a 100%-full disk starves launchd logs and builds next).
+
+## Post-assimilation enrichment: published / url / sample / dateStart (09-13 wave lesson)
+
+**The assimilator leaves four fields blank by design — the payload never carries them.** A fresh auto row files with `published`, `url`, `sample`, `dateStart` ALL missing, and nothing downstream complains: `assimilated: true` gets a validator sample exemption, so validate.mjs stays green while the row has no source link, no published stamp, and no n. After ANY manual wave landing, check the row for the gap before calling it done.
+
+Fill them from the wave's SMH/Age article (chrome-session-piggyback if paywalled):
+
+- `url` / `dateStart` / `sample` — read off the article page/prose (e.g. the 2026-09-13 wave's n = 2250). Assigning `sample` also RETIRES the validator's assimilated-row sample exemption, so the row starts counting in the estimator's n-weighting.
+- `published` — house convention (commit 6d7959b, "Published was the last day of fieldwork wearing another name"): read off the article's **`article:published_time` og meta**, store local AEST **without offset**, never assume. The meta is UTC: `2026-09-13T08:00:00.000+00:00` → `"2026-09-13T18:00"` — which matches the house's Sunday-6pm AEST pattern (prior curated rows stamp 17:59). `published` matters beyond display: next-expected-polls keys "when was it released" off it (fieldwork-end `date` otherwise), and the archive's "sort by release" uses it.
+
+Worked example 2026-09-14 (wave landed manually 6b095ff without the stamps): `published`+`url` committed as 1b77d28, `sample: 2250` as d4dc5c3 — two commits only because the n arrived from the user later. Standard order: land wave → read article once → stamp all four in one commit (data/polls.json + build outputs index.html/feed.xml/sitemap.xml).
 
 ## poll.json assimilation (three sections — `.build/assimilate-resolve-vi.mjs`)
 

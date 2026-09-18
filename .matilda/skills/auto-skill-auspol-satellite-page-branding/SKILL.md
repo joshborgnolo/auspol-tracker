@@ -16,6 +16,13 @@ extracted_at: '2026-09-03T00:00:00.000Z'
   `node .build/refresh-morgan-archive.mjs` (offline: `--offline`, uses
   `.build/morgan-archive-src/` cache and leaves data/roymorgan/*.csv byte-identical when
   the cache is unchanged). See auto-skill-roymorgan-table-mirror.
+- `atlas/index.html` — the Electoral Atlas (shipped 2026-09-05): hand-maintained page +
+  a GENERATED data sibling `atlas/atlas-data.js` (rebuild with
+  `node .build/refresh-atlas-data.mjs`; source CSVs in `atlas/data/`). Interactive
+  (vanilla-JS SVG charts + sortable seat table) unlike the static archives, but follows
+  the same satellite chrome: .tabs strip, Crimson/Plex fonts, oklch palette, .ss-back
+  pill. See auto-skill-auspol-electoral-atlas for the data/renderer map and its CDP QA
+  harness (.build/qa-atlas.js — serve over local HTTP, file:// 404s the /assets/ fonts).
 - `feedback/index.html` — standalone report-an-error form (moved out of the main page's
   footer, `1394856`), hand-maintained. Posts to Formspree; `?msg=` URL prefill is the
   inbound deep link the archive-row "report" anchors target. Same static-article chrome
@@ -33,8 +40,10 @@ extracted_at: '2026-09-03T00:00:00.000Z'
   recipe below** — it has not been re-assimilated. Check before copying anything from it.
 - The five real archive pages (newspoll / acnielsen / morgan / galaxy / trove) share the
   same tabs strip; it is `<nav class="tabs">` of `<a class="tab">` links (no JS tabs).
-  The strip lives in FIVE homes that do NOT auto-sync: the two hand-maintained pages
-  (newspoll, acnielsen) + the renderPage templates in `.build/refresh-morgan-archive.mjs`,
+  The strip lives in SIX homes that do NOT auto-sync: the two hand-maintained pages
+  (newspoll, acnielsen), atlas/index.html (its active tab is "Atlas" — atlas is NOT
+  linked from the archives' own strips; it was added one-way 2026-09-05), + the
+  renderPage templates in `.build/refresh-morgan-archive.mjs`,
   `.build/refresh-galaxy-archive.mjs`, `.build/refresh-trove-archive.mjs`. Adding an
   archive tab means editing ALL of them. Lived example (fixed 2026-09-05): the Trove tab
   shipped to every home EXCEPT the morgan template — HEAD's generated morgan page had it

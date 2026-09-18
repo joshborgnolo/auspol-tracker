@@ -1,6 +1,6 @@
 ---
 name: auspol-past-cycles
-description: auspol-tracker — Past-cycles machinery end-to-end (CYC_META → CYCLE_DEFS → 9f09dca2 data asset + root cycle-source.<hash>.json). Adding a historical cycle is ONE CYC_META row + ONE elections row in polls.json; the renderer, accuracy panel, legend and CSV export are fully data-driven — only copy strings hard-coding the count (now "ten"/"since 1996") need parallel edits. Keyed gotchas: src keys cyclePolls by term-END election, appr keys cycleApproval by term-START, ELECTIONS["e"+year] must exist for the lead-anchor, and accuracy rows are labelled by the election being CALLED (c.src), not the term-start year. The CycleChart person-toggles (Hanson '25 `hanCtl`, One Nation) are the ONE non-CYC_META part: they gate on DATA AVAILABILITY, never the cycle chips — Hanson can stand alone with every chip off (a062495). Legend chips name split terms with BOTH officeholders from c.raw.netEras joined "–" ("Rudd–Gillard", 90db0a4); D.cycles items are TRANSFORMED objects — eras/series live under .raw, never top-level. Also covers the historical ribbon (7240d7d): cycBanded ≥3-past-terms gate shared by chart+legend; drawnCycles swap; pctOf quartile stats; TrendChart areas (cyc-band lo/hi fills, class-beats-opacity-attribute theming; fill colour is the --cyc-fill variable = color-mix oklch 50/50 Labor→Coalition purple since ab4de49, one :root definition that follows theme via use-site var resolution); ('Mean of past terms' series with per-point n-of-N-tooltip notes; legend caption .cyc-band-note. Per-term event lines (CYC_EVENTS) follow ONE singled-out term via eventCycle = solo || single-forward-past || sitting-term-fallthrough (5995b8f). Card captions are measure-lead fan descriptions shared across FIVE charts (net/oppnet/ppmm/primary/tpp since a670008): approval cards lead with the literal "Approval minus disapproval" (0929fac — the rename is CAPTION-LEAD-scoped: glossary bodies, the Hanson note and the Latest-table metric link keep "approve minus disapprove" as formula words), the others lead with their own CYC_METRICS sub (ppmm "PM's lead on the preferred-PM question", tpp "Governing-party 2PP" — hyphenated); "<lead>, with a historical fan chart for all|selected previous terms since <firstYear>" where firstYear = min VISIBLE past-term year (front-trims re-anchor the year, only interior gaps flip 'all'→'selected'), outcome-filter clause " that ended in a returned/ousted government" appended last (no comma, 08f2cca); the 'net approval' glossary tap-to-define lives in the CARD TITLE h2 via .hi-term (8b36759, keep the phrase 'net approval' intact in CYC_METRICS titles or the link silently dies); `hidden` is a Set — .size/.has(), never .length; card subs live ONLY in CYC_METRICS (index.html string hits are the compiled bundle, auspol-polling.html is a different legacy page).
+description: auspol-tracker — Past-cycles machinery end-to-end (CYC_META → CYCLE_DEFS → 9f09dca2 data asset + root cycle-source.<hash>.json). Adding a historical cycle is ONE CYC_META row + ONE elections row in polls.json; the renderer, accuracy panel, legend and CSV export are fully data-driven — only copy strings hard-coding the count (now "ten"/"since 1996") need parallel edits. Keyed gotchas: src keys cyclePolls by term-END election, appr keys cycleApproval by term-START, ELECTIONS["e"+year] must exist for the lead-anchor, and accuracy rows are labelled by the election being CALLED (c.src), not the term-start year. The CycleChart person-toggles (Hanson '25 `hanCtl`, One Nation) are the ONE non-CYC_META part: they gate on DATA AVAILABILITY, never the cycle chips — Hanson can stand alone with every chip off (a062495). Legend chips name split terms with BOTH officeholders from c.raw.netEras joined "–" ("Rudd–Gillard", 90db0a4); D.cycles items are TRANSFORMED objects — eras/series live under .raw, never top-level. Also covers the historical ribbon (7240d7d): band = 3+ past terms HOLDING THE MEASURE via hasData (the cycBanded helper is deleted, 20ef05e — data-less era-bucket terms 1972-84 hold no fan seat, move no caption year, name no strip entry; a lifted one is a no-op on approval cards); drawnCycles swap; pctOf quartile stats; TrendChart areas (cyc-band lo/hi fills, class-beats-opacity-attribute theming; fill colour is the --cyc-fill variable = color-mix oklch 50/50 Labor→Coalition purple since ab4de49, one :root definition that follows theme via use-site var resolution); ('Mean of past terms' series with per-point n-of-N-tooltip notes; legend caption .cyc-band-note. Per-term event lines (CYC_EVENTS) follow ONE singled-out term via eventCycle = solo || single-forward-past || sitting-term-fallthrough (5995b8f). Card captions are measure-lead fan descriptions shared across FIVE charts (net/oppnet/ppmm/primary/tpp since a670008): approval cards lead with the literal "Approval minus disapproval" (0929fac — the rename is CAPTION-LEAD-scoped: glossary bodies, the Hanson note and the Latest-table metric link keep "approve minus disapprove" as formula words), the others lead with their own CYC_METRICS sub (ppmm "PM's lead on the preferred-PM question", tpp "Governing-party 2PP" — hyphenated); "<lead>, with a historical fan chart for all|selected previous terms since <firstYear>" where firstYear = min visible past-term year HOLDING THE MEASURE (hasData-gated since 20ef05e — approval/PPM captions open "since 1987" while the 1972-84 buckets are approval-empty; front-trims re-anchor the year, only interior DATA-BEARING gaps flip 'all'→'selected'), outcome-filter clause " that ended in a returned/ousted government" appended last (no comma, 08f2cca); the 'net approval' glossary tap-to-define lives in the CARD TITLE h2 via .hi-term (8b36759, keep the phrase 'net approval' intact in CYC_METRICS titles or the link silently dies); `hidden` is a Set — .size/.has(), never .length; card subs live ONLY in CYC_METRICS (index.html string hits are the compiled bundle, auspol-polling.html is a different legacy page).
 source: auto-skill
 extracted_at: '2026-09-04T06:57:40.352Z'
 ---
@@ -237,6 +237,47 @@ exception — hand-wired in the d1a1d215 asset (hash churns; grep `hanCtl` or
   only under `showHan`.
 - Verify in built index.html: `hidden.has(hanCycle` → 0 hits, `cyc-han` still
   present (babel keeps the class string).
+
+## Renderer: measure-aware fan membership (commit 20ef05e, 2026-09-14)
+
+The era-cycle import (39de76c) created terms holding primary and
+implied-2PP series but NO approval/PPM waves (cycleApproval buckets
+1972–1984 are empty arrays; Newspoll first lands in bucket 1987).
+Every fan component had silently assumed "every past term holds every
+measure", breaking three ways: card captions claimed terms "since 1972"
+the fan could not draw, the ≥3 band gate counted them, and a lifted
+1980 on the PPM card fell over `String(undefined)` into "1980
+undefined v" (gen-data emits `ppmPair: null` for wave-less terms → the
+key is OMITTED from the payload → `cycHolders` split a missing string).
+
+The fix is ONE predicate in CycleChart — `const hasData = (c) =>
+(c.raw[M.key] || []).some((v) => v != null)` — gating four places:
+
+- `pastShown = shown.filter((c) => !c.current && hasData(c))` — the
+  band's membership pool.
+- `banded = pastShown.length >= 3` — the module-level `cycBanded`
+  helper is DELETED; the gate now counts ONLY data-bearing past terms.
+- `cardSub`: firstYear = min pastShown year (approval/PPM captions
+  honestly open "since 1987", not 1972) and the gapped test carries
+  `hasData(c)` — a hidden data-less term can't flip "all"→"selected".
+- `drawnCycles` (banded branch) and `stripCycles` exclude data-less
+  past terms — a lifted 1972–84 chip is a no-op on the approval cards
+  but lifts normally on primary/2PP, where the term DOES hold data.
+
+Plus belt-and-braces in `cycHolders`: a ppmm term with neither ppmEras
+nor ppmPair falls back to the office roll-call (`c.lead + " v " +
+c.oppLead`) — "undefined" can never render even if a data-less term
+reaches the strip by a future path.
+
+Deliberately untouched: the legend CHIPS stay global (one chip set
+serves all six cards — the 1974 chip is meaningful for primary/2PP);
+`align()` on an empty grid still emits all-null rows harmlessly
+(JSON.stringify maps undefined→null; the band pool skips nulls, so
+empty terms never corrupted the band's STATS — they only corrupted the
+claims made ABOUT the fan: caption, gate, strip names). If a Trove
+approval backfill ever lands (see auspol-era-cycle-import §Display
+fallout), captions and fans re-anchor to 1972 automatically — the
+machinery now follows the data, not the board.
 
 ## Renderer: chip labels name split terms (commit 90db0a4)
 

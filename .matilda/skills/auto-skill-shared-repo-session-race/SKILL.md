@@ -1,6 +1,6 @@
 ---
 name: shared-repo-session-race
-description: Shared auspol repo — sibling Matilda sessions can sweep YOUR uncommitted work into their commits (git add -A), overwrite your staged index entries, and even land their half-finished hunks INSIDE files you're editing. Locate vanished work by unique phrase; never rebase-split a sibling commit; for contaminated shared sources, re-derive clean copies (sed-revert their hunks, diff vs HEAD to prove) and commit your exact tree through a private GIT_INDEX_FILE without touching their staging area. Also: a fresh build at HEAD can fail to reproduce HEAD's own committed generated data asset (sibling shipped mid-WIP build output) — character-diff the drift, revert the regenerated asset in the worktree, never silently roll back live numbers. If index.html itself IS the deliverable while sibling dirt sits in build inputs: /tmp-snapshot foreign files byte-exact, checkout HEAD copies, rebuild, gate on `git diff -U0 index.html | grep '^@@'` listing only your hunks, PATHSPEC-commit (`git commit -m msg -- <paths>`), push, restore snapshots. Foreign STAGED revert in the index: staged blobs hash-equal HEAD~1 (diff the INDEX, not worktree), prepare HEAD+mine file versions in scratch, plumbing-commit via private GIT_INDEX_FILE (read-tree/write-tree/commit-tree/update-ref, explicit pathspecs never bare -A) so the revert stays staged — post-commit `git status` inversion showing your files as D/M is cosmetic when it's unstaged-direction, never `git reset` to fix THAT; but after HEAD moves past the sibling's stale index, STAGED deletions of your newly tracked files are NOT cosmetic (their next blind commit deletes your feature) — sweep with `git reset -q HEAD --` on exactly those paths, never their revert files. Sibling RESETS your committed work OFF main (survives on a dangling branch; committed files turn untracked while "up to date with origin" — reflog + merge-base confirm): re-land by cherry-picking the orphan inside a DETACHED scratch worktree (zero-drift rebuild is the gate), move main via plumbing update-ref, re-replay cheaply when origin races mid-landing. Sibling hunks staged INSIDE your data file (MM) + data-only deliverable: snapshot the commixed file, checkout HEAD copy, re-apply ONLY your rows, pathspec-commit (replaces that path's index entry — restore the snapshot post-push so their hunks return), and SKIP the index.html rebuild that would compile their template/gen-data WIP into the live site — a data-only commit keeps site-check green and the next pipeline build ships the rows. Sibling staged rollback in the SAME source file you must extend: park BOTH a patch and a same-version reference copy in /tmp, reset exactly that file, pathspec-commit your feature at HEAD, then restore their hunks — if `git apply` fails from drifting context, re-apply manually and prove reference-vs-worktree is exactly your feature before restaging. Origin ahead of local + dirt everywhere + tiny deliverable: detached worktree at the explicit REMOTE sha inside the workspace, build/validate/commit there, `git push origin HEAD:main` — local tree and shared index never touched; old git needs the sha (not `origin/main`) and has no worktree-remove. A crashed commit/amend/reset dance can roll the INDEX back instead (mixed reset = HEAD+index, worktree stays): a SHIPPED feature then masquerades as an uncommitted half-built one (`git diff HEAD` empty, staged diffstat exact-mirrors unstaged, feature commits found via `git log --oneline -- <file>`, reflog shows `reset: moving to`); unstage with `git reset -q HEAD -- <paths>`, never commit it. Machine git is 2.15.0: `git restore` is ABSENT, and `git checkout HEAD -- <paths>` repairs staged file deletions (index entry + worktree in one command). Sibling amend/reset/push races past YOUR pushed data commit while your build commit sits prepared in a detached worktree: survival check is `git merge-base --is-ancestor <yours> origin/main` + row greps on the pushed tree + blob equality (`git hash-object <worktree-output>` == `git rev-parse origin/main:<asset-path>`) — their own rebuild regenerated the content-addressed sidecar byte-identically, so the correct finish is NO commit: prune the worktree and report; amend+`reset: moving to HEAD` in the reflog does NOT mean your commit is gone, only ancestry proof settles it.
+description: Shared auspol repo — sibling Matilda sessions can sweep YOUR uncommitted work into their commits (git add -A), overwrite your staged index entries, and even land their half-finished hunks INSIDE files you're editing. Locate vanished work by unique phrase; never rebase-split a sibling commit; for contaminated shared sources, re-derive clean copies (sed-revert their hunks, diff vs HEAD to prove) and commit your exact tree through a private GIT_INDEX_FILE without touching their staging area. Also: a fresh build at HEAD can fail to reproduce HEAD's own committed generated data asset (sibling shipped mid-WIP build output) — character-diff the drift, revert the regenerated asset in the worktree, never silently roll back live numbers. If index.html itself IS the deliverable while sibling dirt sits in build inputs: /tmp-snapshot foreign files byte-exact, checkout HEAD copies, rebuild, gate on `git diff -U0 index.html | grep '^@@'` listing only your hunks, PATHSPEC-commit (`git commit -m msg -- <paths>`), push, restore snapshots. Foreign STAGED revert in the index: staged blobs hash-equal HEAD~1 (diff the INDEX, not worktree), prepare HEAD+mine file versions in scratch, plumbing-commit via private GIT_INDEX_FILE (read-tree/write-tree/commit-tree/update-ref, explicit pathspecs never bare -A) so the revert stays staged — post-commit `git status` inversion showing your files as D/M is cosmetic when it's unstaged-direction, never `git reset` to fix THAT; but after HEAD moves past the sibling's stale index, STAGED deletions of your newly tracked files are NOT cosmetic (their next blind commit deletes your feature) — sweep with `git reset -q HEAD --` on exactly those paths, never their revert files. Sibling RESETS your committed work OFF main (survives on a dangling branch; committed files turn untracked while "up to date with origin" — reflog + merge-base confirm): re-land by cherry-picking the orphan inside a DETACHED scratch worktree (zero-drift rebuild is the gate), move main via plumbing update-ref, re-replay cheaply when origin races mid-landing. Sibling hunks staged INSIDE your data file (MM) + data-only deliverable: snapshot the commixed file, checkout HEAD copy, re-apply ONLY your rows, pathspec-commit (replaces that path's index entry — restore the snapshot post-push so their hunks return), and SKIP the index.html rebuild that would compile their template/gen-data WIP into the live site — a data-only commit keeps site-check green and the next pipeline build ships the rows. Sibling staged rollback in the SAME source file you must extend: park BOTH a patch and a same-version reference copy in /tmp, reset exactly that file, pathspec-commit your feature at HEAD, then restore their hunks — if `git apply` fails from drifting context, re-apply manually and prove reference-vs-worktree is exactly your feature before restaging. Origin ahead of local + dirt everywhere + tiny deliverable: detached worktree at the explicit REMOTE sha inside the workspace, build/validate/commit there, `git push origin HEAD:main` — local tree and shared index never touched; old git needs the sha (not `origin/main`) and has no worktree-remove. A crashed commit/amend/reset dance can roll the INDEX back instead (mixed reset = HEAD+index, worktree stays): a SHIPPED feature then masquerades as an uncommitted half-built one (`git diff HEAD` empty, staged diffstat exact-mirrors unstaged, feature commits found via `git log --oneline -- <file>`, reflog shows `reset: moving to`); unstage with `git reset -q HEAD -- <paths>`, never commit it. Machine git is 2.15.0: `git restore` is ABSENT, and `git checkout HEAD -- <paths>` repairs staged file deletions (index entry + worktree in one command). Sibling amend/reset/push races past YOUR pushed data commit while your build commit sits prepared in a detached worktree: survival check is `git merge-base --is-ancestor <yours> origin/main` + row greps on the pushed tree + blob equality (`git hash-object <worktree-output>` == `git rev-parse origin/main:<asset-path>`) — their own rebuild regenerated the content-addressed sidecar byte-identically, so the correct finish is NO commit: prune the worktree and report; amend+`reset: moving to HEAD` in the reflog does NOT mean your commit is gone, only ancestry proof settles it. Beware dead-worktree git-fallback (2026-09-05): a worktree that lost its .git gitdir FILE silently resolves all git commands against the MAIN repo (toplevel falls back to the parent through the gitignored `.matilda/worktrees/` gap) — status/diff then show foreign main-tree state as if it were worktree state, and a repo-wide `git reset --hard` from inside wipes EVERY sibling's uncommitted WIP; verify `git rev-parse --absolute-git-dir` contains `.git/worktrees/<name>` before any mutating command, and recover post-mortem via `git fsck --lost-found` (staged content survives as dangling blobs/commits; purely unstaged WIP is unrecoverable). Happy-path variant (2026-09-07): upstream commits landed coherently while YOUR feature sat uncommitted and your index.html was built pre-upstream — staging that stale artifact silently reverts their committed hunks, so `git show --stat` classify overlap (same-artifact or build-input touch = rebuild in place), marker-grep the rebuilt artifact BOTH directions (their method name from their commit subject survives; your feature string present), confirm `git diff --stat HEAD` is insertions-dominated, then stage explicit paths and push. In-place rebuild is correct ONLY because their work is committed; uncommitted dirt in build inputs still needs the isolation machinery.
 source: auto-skill
 extracted_at: '2026-09-04T04:00:29.830Z'
 ---
@@ -743,3 +743,142 @@ made — no clean room existed at edit time. The recipe that shipped
    tree carrying a live sibling's WIP. Verify the ship instead by
    curling the live site (~45–60 s deploy) for the compiled marker
    string, per the live-site-verify skill.
+
+## Dead worktree + git parent-fallback = reset --hard in the MAIN repo (2026-09-05 incident)
+
+The most destructive variant yet, and no sibling was even needed — the
+trap was a DEAD worktree directory. The `.matilda/worktrees/ship-feedback`
+worktree's `.git` FILE (the `gitdir: …` pointer) went missing at some
+point (session restart, prune, or an interrupted `rm -rf`), leaving a
+plain directory tree inside the workspace. Because `.matilda/worktrees/`
+is **gitignored**, git scanning upward from that directory finds the MAIN
+repo's `.git` — and every command (status, diff, log, reset) silently
+operates on the MAIN repository while the prompt/mental model says
+"worktree". The tell-tale state that got read as "sibling trashed my
+worktree": `git status` clean, HEAD == origin/main, but the working
+directory full of scratch files that aren't in the tree (they were the
+dead worktree's untracked leftovers) and puzzling untracked `??` entries
+in status with NO file paths that matched the cwd. `data/polls.json`
+"gone" was the final confusion — ENOENT from the extractor — actually
+the main-tree file was fine; the dead worktree simply had no checkout of
+it... except the directory DID have one, because untracked leftovers from
+earlier sessions linger. Diagnosis dissolved once a shell `pwd; ls` was
+compared against `git rev-parse --show-toplevel` — the toplevel was the
+MAIN repo root, not the worktree path.
+
+The actual damage: while "cleaning" what looked like corrupted worktree
+state, a `git reset --hard origin/main` ran against the MAIN repo — which
+two sibling sessions were using for live WIP (~60 files modified,
+including template.html, build.mjs, 15 SKILL.md files). That WIP was
+unstaged, hence unrecoverable from git. Data-loss class, not
+entanglement class.
+
+### Pre-flight for any mutating git command in a claimed worktree
+
+```bash
+git rev-parse --absolute-git-dir        # MUST contain .git/worktrees/<name>
+git rev-parse --show-toplevel           # MUST equal the worktree path
+git worktree list                       # path MUST appear as a live worktree
+```
+
+Run all three when (a) a worktree directory was created in a previous
+session or survived a restart, (b) `git status` output doesn't square
+with `ls` of the cwd (files on disk that git calls untracked when they
+should be committed; tracked files "missing" that live one directory
+level out), or (c) stale file mtimes contrast with a fresh `git status`.
+`git status`/`git diff` alone CANNOT detect the fallback — from inside
+the dead directory they happily report main-repo state.
+
+### Post-mortem recovery ladder (after reset --hard, stray checkout, etc.)
+
+1. STOP. Fatal if you re-enter mutating commands. `git log --oneline -3`,
+   `git stash list`, and `git status | head` are the read-only triage —
+   the stashes here survived untouched.
+2. `git fsck --lost-found` — everything ever STAGED or committed is a
+   dangling object. Recovery auto-writes `.git/lost-found/commit/` (full
+   commits with subjects — `git log -1` each to identify; one was a lost
+   ship-branch tip) and `.git/lost-found/other/` (blobs: staged file
+   versions — here 5 staged index.html builds and sim scripts, i.e. the
+   skill instructions the reset had wiped were restorable from a staged
+   blob).
+3. Never-staged working-tree edits are NOT in the object store — gone
+   unless editor backups/Time Machine exist. The subset of the wiped
+   WIP that had never been staged (template.html/build.mjs/SKILL.md
+   edits above blob level) stayed lost.
+4. Re-apply recovered blobs to files by hash-match or content inspection
+   (`git cat-file blob <sha> > path`), one read-only inspection at a
+   time, then let the owning sibling sessions re-do their own residual
+   edits — don't invent their content for them.
+
+Rule of thumb: `git reset --hard`, `git checkout --`, `git stash drop`,
+`git clean -fd` — the four commands that destroy uncommitted work — get
+the full pre-flight check (git-dir, toplevel, worktree list) EVERY time
+in this repo, no matter how safe the directory feels.
+
+Follow-on operational fact (same incident, verified later that day):
+`git worktree prune` de-registers stale worktree METADATA but leaves the
+directory contents untouched on disk. An orphaned dir therefore survives
+as plain gitignored scratch inside `.matilda/worktrees/` — and git
+commands from inside it fall back to the MAIN repo exactly like the
+dead-worktree case above, so it is useless and dangerous as a commit
+source. To salvage finished work from one: `git worktree list` to confirm
+it is de-registered, `cp` the artifacts into a FRESH `git worktree add`
+whose `.git` file passes the pre-flight above, re-verify there (re-run
+the artifact's own oracle/check), then commit. Never try to "re-adopt"
+the orphaned dir; never `git add` its files from outside via the main
+repo's index (`.matilda/worktrees/` is gitignored — invisible to the
+main repo's index until a sweep-style `git add -f` finds them).
+
+## Your OWN stale build overlaps upstream's committed hunks (2026-09-07, the happy-path variant)
+
+The routine case, no isolation needed: my flow-table feature was fully
+verified in the working tree but uncommitted when a sibling landed and
+pushed `2de330c` (d1a1d215 asset + index.html — two of my files) and
+`0645e52` (build.mjs stamp logic — changes what the BUILD EMITS in
+index.html's og:image URL). Their commits were coherent; my uncommitted
+edits sat cleanly on top. The trap: my index.html had been built BEFORE
+their commits — staging it would have committed a diff that REVERTS
+`2de330c`'s committed index.html hunks and emits the pre-`0645e52` card
+stamp, silently re-opening both of their shipped features.
+
+Procedure when `git status`/`git log` shows upstream commits landed
+after your last build while your feature is dirty:
+
+1. `git show --stat <each upstream sha>` — classify overlap. Three
+   classes: (a) files you also touched (their d1a1d215/index.html —
+   merge-by-coexistence in the tree is FINE, edits in different regions
+   coexist since theirs are committed and yours are layered on top);
+   (b) build INPUTS (build.mjs, gen-data.mjs, template.html, any
+   .build/newtracker source) — changes what a rebuild emits, so your
+   staged artifact MUST come from a fresh build, not your stale one;
+   (c) disjoint files — ignore. Either (a)-on-the-artifact or (b) means
+   rebuild before staging.
+2. Rebuild in place: `node .build/newtracker/build.mjs`. The working
+   tree already contains their committed sources plus your edits, so
+   the rebuilt artifact contains BOTH — no worktree, no index plumbing
+   needed precisely because their work is COMMITTED (contrast the
+   WIP-dirt variants above, where in-place rebuild is the poisoning
+   move).
+3. Marker-grep BOTH directions on the rebuilt artifact before staging:
+   `grep -c releaseMins index.html` = 3 (their feature survives — the
+   grep target comes from THEIR commit message/subject, e.g. the method
+   name it introduced) and `grep -c flow-tab index.html` = 21 (mine is
+   in). Then `git diff --stat HEAD -- <my paths>` should be
+   insertions-dominated (~324 insertions / 13 deletions here; the
+   handful of deletions were the flowDrift payload line in the data
+   asset being replaced, expected). A diff showing deletions of lines
+   you never wrote = you're about to revert somebody; stop.
+4. Stage exact paths (never -A — sibling SKILL.md edits and their
+   spectre-src JSONs were still dirty, and several of their new
+   auto-skill dirs were untracked; `git add <7 explicit paths>` only),
+   commit with chained -m, then `git fetch &&
+   git rev-list --left-right --count main...origin/main` = `1  0`
+   before `git push`. Post-commit `git status` showing only THEIR files
+   modified/untracked confirms the sweep didn't happen.
+
+Key contrast table for choosing the variant: upstream COMMITTED +
+coherent + your tree sits on top → in-place rebuild + marker-greps
+(this section). Upstream work is UNCOMMITTED dirt in the tree → all the
+isolation machinery above (worktree, private index, snapshot-restore).
+Upstream work is INSIDE your staged/staged-over state → the
+private-GIT_INDEX_FILE section.

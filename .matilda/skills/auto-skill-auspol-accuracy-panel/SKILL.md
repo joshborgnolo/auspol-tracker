@@ -1,6 +1,6 @@
 ---
 name: auspol-accuracy-panel
-description: auspol-tracker — the "How the final polls did" AccuracyPanel end-to-end: gen-data.mjs accuracyCycles (~:1490-1550; ACC_WINDOW_DAYS=14, one final 2PP poll per house equally weighted, exit polls excluded, ACC_CANON renames-only, houses sorted by |err|) emits D.accuracy.cycles {year,eDate,result,mean,err,absErr,houses,n,sameSide,worst} + per-firm aggregates; renderer in the d1a1d215 asset (~:1956-2145) with Last-five/More split BY POSITION, lanesFor spread toggle, small .acc-dot per house + big .acc-mean average dot, "All one way" flag, bothWays hint paragraph, by-house grid for firms with n>1. Solo-rule (9c8c6ee + rebuild 83618e0): a one-house election (1993, 1996) draws ITS OWN poll as the big dot, never an average-of-one stacked on its own small dot.
+description: auspol-tracker — the "How the final polls did" AccuracyPanel end-to-end: gen-data.mjs accuracyCycles (~:1490-1550; ACC_WINDOW_DAYS=14, one final 2PP poll per house equally weighted, exit polls excluded, ACC_CANON renames-only, houses sorted by |err|) emits D.accuracy.cycles {year,eDate,result,mean,err,absErr,houses,n,sameSide,worst} + per-firm aggregates; renderer in the d1a1d215 asset (~:1956-2145) with Last-five/More split BY POSITION, lanesFor spread toggle, small .acc-dot per house + big .acc-mean average dot, "All one way" flag, bothWays hint paragraph, by-house grid for firms with n>1. Solo-rule (9c8c6ee + rebuild 83618e0): a one-house election (1993, 1996) draws ITS OWN poll as the big dot, never an average-of-one stacked on its own small dot. Era cycles (39de76c, 2026-09-12): 1974–1984 era buckets scored on implied LEF 2PP lifted the panel 12→18 cycles — see the era-cycles section for the copy-home list and 1977's correct exclusion.
 source: auto-skill
 extracted_at: '2026-09-04T07:32:32.121Z'
 ---
@@ -39,6 +39,38 @@ the on-page caveat and the reproducibility contract. Distilled:
 - Cycle singletons as of 2026-09: **1993 and 1996 have n=1**; the rest
   are n=3–11. For singletons `c.err === c.houses[0].err` exactly, so
   any solo-aware display logic needs no arithmetic.
+
+## Era cycles in the panel (39de76c, 2026-09-12) — 12 → 18 elections
+
+The 1974–1987 era buckets (see auspol-era-cycle-import) carry an
+IMPLIED last-election-flows 2PP (tpp_alp = alp + FLOW_ERAS shares of
+dem/dlp/oth on F2F Morgan primaries), and the panel ingests them
+exactly like modern cycles — one Morgan final poll per cycle, n=1.
+
+- Era misses scored: 1974 −1.3, 1975 −2.5, 1980 +1.4, 1983 +0.6,
+  1984 +3.2 (the new worstCycle), 1987 +2.6.
+- **1977 is correctly absent**: Morgan's last 1977 wave was 20 days
+  before polling day (1977-11-20 → 1977-12-10), outside
+  ACC_WINDOW_DAYS=14. It's the rule working, not a data bug — don't
+  try to "fix" it without changing the window contract.
+- Provenance comments (not page copy) now state pre-1993 rows score
+  implied LEF 2PP so "a single-house era's miss folds poll error and
+  flow-constant drift into one figure" — three comment homes updated
+  together: d1a1d215 asset ~:1952 ("Eighteen past elections…"),
+  gen-data.mjs ~:2076 ("eighteen past elections"), template.html
+  :2525 ("eighteen elections' worth"). Dynamic copies
+  (`"Across the ${acc.cycles.length} elections…"` in build.mjs :454
+  and the acc-dot-count sentence in the panel) self-update.
+- **Watch for stale count copy**: hard-coded election counts were
+  living in three comment homes and had to move together; any future
+  era/cycle addition re-opens this. `grep -in "twelve past elections\|
+  twelve elections" gen-data.mjs template.html assets/*.js` before
+  shipping a cycle-count change.
+- Probe path for the built payload: the accuracy object is INLINED in
+  index.html as `const accuracy = {…}` (brace-match to extract it);
+  `assets/cycle-source.*.json` in the repo root does NOT carry it
+  (root assets hold fonts/card/sidecars only — `ls assets/*.js` is
+  legitimately empty).
 
 ## Renderer: `.build/newtracker/assets/d1a1d215-…js` (~lines 1956–2145, `AccuracyPanel`)
 

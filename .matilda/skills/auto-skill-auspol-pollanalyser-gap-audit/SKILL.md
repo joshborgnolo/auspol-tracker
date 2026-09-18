@@ -40,7 +40,7 @@ table. Only ~2,100 state polls remain out of scope.**
 
 | Series | Remote rows | Status after f366e74 |
 |---|---|---|
-| **F2F Morgan (face-to-face Gallup) 1943–2013** | 1,214 — by decade: 40s:20, 50s:39, 60s:44, **70s:177, 80s:269** | **PARTIAL** — 195 F2F/Morgan VI rows 1987→2016 inserted into cyclePolls; pre-1987 rows CSV-only (user call: no new pre-1990 buckets) |
+| **F2F Morgan (face-to-face Gallup) 1943–2013** | 1,214 — by decade: 40s:20, 50s:39, 60s:44, **70s:177, 80s:269** | **PARTIAL** — 195 F2F/Morgan VI rows 1987→2016 inserted into cyclePolls; pre-1987 rows 1974+ IMPORTED 39de76c as era buckets 1974–1987 (271 VI rows, LEF-implied 2PP, tppEra-tagged); rows before 1974-05 remain CSV-only |
 | **Morning Consult federal VI 2020-03→2026-04** | 223 (222 with leader-approval) | **GL ONLY — VI never existed upstream** (all MC VI cells `#N/A`); ~250 weekly MC pmNet rows 2020-03→2026-04 imported into cycleApproval (2019/2022) + 7 into approval[] |
 | **AGB McNair 1992–1996** | 102 (100 w/ approval) | **CLOSED** — 95 VI + ~99 pmNet rows inserted |
 | **Quadrant 1988–1998** | 14 | **CLOSED** — 12 inserted (remainder date-merged with existing waves) |
@@ -102,8 +102,9 @@ Adjudications baked into the assimilator (don't relitigate):
   only — upstream MC VI columns are all `#N/A`, so NO MC voting-intention
   rows exist to import. Don't add MC to pollster extraction rules looking
   for VI; it genuinely isn't there.
-- Pre-1987 rows deliberately LEFT csvOnly (user decision: no new pre-1990
-  cycle buckets) — they live in the mirror CSV only.
+- Pre-1987 rows back to 1974-05 IMPORTED (39de76c): era buckets 1974–1987
+  with LEF-implied 2PP (FLOW_ERAS, tppEra-tagged, Bonham error budget in
+  cyclePollBases). 123 Morgan rows before 1974-05 remain CSV-only.
 - State polls (~2,100 rows) deliberately out of scope.
 
 Validate gate: `node .build/newtracker/validate.mjs` → 0 errors, 267
