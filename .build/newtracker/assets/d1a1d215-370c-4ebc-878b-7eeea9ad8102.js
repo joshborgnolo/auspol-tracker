@@ -2691,42 +2691,34 @@ function ArchApprCell({ s, net, metric }) {
   );
 }
 
-// "As published" – the poll's headline figures exactly as the pollster released
-// them, as plain numerals (dot-coded by party) with any shape-flags inline.
-// Numerals, not a 0–100 bar: at archive scale every 53/47 bar looks identical,
-// so the ink carries nothing – the figures themselves are the record.
-// A poll with NO after-preferences figure published only its primaries – and
-// those are the record too, so they print here under a Primary flag rather
-// than leaving the cell a bare dash.
-function ArchPublished({ p }) {
-  const { tppContests, tppFlag, primarySegs } = window;
-  const c0 = tppContests(p)[0];
-  if (!c0) {
-    const pSegs = p.p ? primarySegs(p) : [];
-    if (!pSegs.length) return <span className="dash" title="No voting-intention figures published with this poll">—</span>;
-    return (
-      <div className="apub" aria-label={"Primary votes: " + pSegs.map((s) => `${s.label} ${s.value}`).join(", ")}
-           title="No two-party or head-to-head figure in this poll – these are the primary votes">
-        {pSegs.map((s, i) => (
-          <span key={i} className="apub-seg" title={s.label}>
-            <span className="apub-dot" style={{ background: s.color }}></span>
-            {s.value.toFixed(1)}
-          </span>
-        ))}
-        <span className="facet-flag">Primary</span>
-      </div>
-    );
+// "Implied 2PP" – this poll's primaries read at the 2025 election's flow
+// table, gen-data's alpImp field (one fixed table for every house, so the
+// column compares like with like in a way the houses' mixed published bases
+// can't). As plain dot-coded numerals, the same idiom the "As published"
+// column this replaced used: at archive scale every 53/47 bar looks
+// identical, so the ink would carry nothing – the figures are the record.
+// The wave's own published 2PP lives in its expanded breakdown (and drives
+// the Lead column); this cell is the implied basis only, L/NP completed as
+// 100 minus ALP the way the poll-detail implied line completes it.
+// alpImp is absent under the same eligibility rule the implied estimator
+// uses (a full comparable primary set) – no figure, a dash with the reason,
+// never a silently different basis.
+function ArchImplied({ p }) {
+  if (p.alpImp == null) {
+    return <span className="dash" title="No implied 2PP – this poll never filed a full primary set the flow table can read">—</span>;
   }
-  const flag = tppFlag(p);
+  const lnp = +(100 - p.alpImp).toFixed(1);
   return (
-    <div className="apub" aria-label={c0.segs.map((s) => `${s.label} ${s.value}`).join(", ")}>
-      {c0.segs.map((s, i) => (
-        <span key={i} className="apub-seg" title={s.label}>
-          <span className="apub-dot" style={{ background: s.color }}></span>
-          {s.value.toFixed(1)}
-        </span>
-      ))}
-      {flag && <span className="facet-flag">{flag}</span>}
+    <div className="apub" aria-label={`Implied 2PP at 2025-election preference flows: ALP ${p.alpImp.toFixed(1)}, L/NP ${lnp.toFixed(1)}`}
+         title="This poll's primaries at the 2025 election's preference flows – one fixed table for every house">
+      <span className="apub-seg" title="ALP, implied">
+        <span className="apub-dot" style={{ background: "var(--alp)" }}></span>
+        {p.alpImp.toFixed(1)}
+      </span>
+      <span className="apub-seg" title="L/NP, implied">
+        <span className="apub-dot" style={{ background: "var(--lnp)" }}></span>
+        {lnp.toFixed(1)}
+      </span>
     </div>
   );
 }
@@ -4346,7 +4338,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
 
               {facet === "twopp" && (<>
                 <th scope="col" className="ta-l apub-col hide-md"
-                    title="What the pollster published – a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
+                    title="This poll's primaries read at the 2025 election's preference flows – one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown">Implied 2PP</th>
                 <ArchSortTh label={({ lnp: "Lead · ALP v L/NP", onp: "Lead · ALP v ON", lnponp: "Lead · L/NP v ON", "3cp": "Lead · 3-cornered" })[measure]} short="Lead" k="alp" sort={sort} onSort={onSort} />
                 {/* hide-sm: the last column to go on a phone – see the .hide-sm
                     note in the stylesheet. The row detail carries "Poll lean". */}
@@ -4424,7 +4416,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
                   </td>
 
                   {facet === "twopp" && (<>
-                  <td className="ta-l apub-col hide-md"><ArchPublished p={p} /></td>
+                  <td className="ta-l apub-col hide-md"><ArchImplied p={p} /></td>
                   <td className="num"><ArchLead p={p} measure={measure} /></td>
                   <td className="num hide-sm">
                     {p.lean == null
@@ -4493,7 +4485,9 @@ function AllPollsView({ focus, onBack, backLabel }) {
       </div>
       <p className="table-hint">
         Tap any poll for its full breakdown · Dates are fieldwork windows (publication dates sit in the
-        breakdown) · “As published” lists each poll’s headline figures exactly as the pollster released them ·
+        breakdown) · “Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows –
+        one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its
+        breakdown ·
         The lead bar shows the selected matchup where a pollster published it · “Poll lean” is the poll minus
         the aggregate for that month · “—” Means the pollster didn’t publish that measure · Search matches
         anything in a row · Click any column heading to sort.{" "}
@@ -5254,4 +5248,4 @@ function InfoView({ focus, onBack, backLabel }) {
 
 Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView,
   // shared cell renderers reused by the latest-polls table
-  ArchSortTh, ArchPublished, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo });
+  ArchSortTh, ArchImplied, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo });

@@ -2852,7 +2852,7 @@ function PollsterTable() {
   const { D } = window.AP;
   // ledger look shared with the All-polls archive – its cell renderers are
   // defined in the archive script and arrive on window once both assets load
-  const { ArchPublished, ArchLead, ArchApprCell, archLeadInfo } = window;
+  const { ArchImplied, ArchLead, ArchApprCell, archLeadInfo } = window;
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({ key: "pubSort", dir: -1 });
   const [open, setOpen] = useState(null);
@@ -2941,7 +2941,7 @@ function PollsterTable() {
 
               {facet === "twopp" && (<>
                 <th scope="col" className="ta-l apub-col hide-md"
-                    title="What the pollster published – a conventional 2PP, a 3-cornered preferred, or extra matchups">As published</th>
+                    title="This poll's primaries read at the 2025 election's preference flows – one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown">Implied 2PP</th>
                 <SortTh label="Lead · ALP v L/NP" short="Lead" sortKey="alp" sort={sort} onSort={onSort} />
               </>)}
               {facet === "primary" && (<>
@@ -2999,7 +2999,7 @@ function PollsterTable() {
                     <td className="num muted hide-md">{r.sample != null ? r.sample.toLocaleString() : "—"}</td>
 
                     {facet === "twopp" && (<>
-                      <td className="ta-l apub-col hide-md"><ArchPublished p={r} /></td>
+                      <td className="ta-l apub-col hide-md"><ArchImplied p={r} /></td>
                       {/* polls with no published 2PP still have something to
                           say in this facet – the fallback prints their ALP
                           v L/NP primary margin, flagged as primary */}

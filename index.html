@@ -4204,8 +4204,9 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 .two-pp-col { min-width: 180px; }
 .poll-table.archive td.two-pp-col { vertical-align: middle; }
 
-/* archive "as published" – plain dot-coded numerals; the figures are the
-   record, so no bar ink (65 near-identical 53/47 bars carry nothing) */
+/* archive implied 2PP (class names kept from the "as published" column it
+   replaced) – plain dot-coded numerals; the figures are the record, so no
+   bar ink (65 near-identical 53/47 bars carry nothing) */
 .apub {
   display: inline-flex; align-items: center; gap: 12px;
   font-variant-numeric: tabular-nums; font-size: 14.5px; font-weight: 600; color: var(--ink);
@@ -12998,7 +12999,7 @@ function PollsterTable() {
   // ledger look shared with the All-polls archive – its cell renderers are
   // defined in the archive script and arrive on window once both assets load
   const {
-    ArchPublished,
+    ArchImplied,
     ArchLead,
     ArchApprCell,
     archLeadInfo
@@ -13135,8 +13136,8 @@ function PollsterTable() {
   }), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("th", {
     scope: "col",
     className: "ta-l apub-col hide-md",
-    title: "What the pollster published \u2013 a conventional 2PP, a 3-cornered preferred, or extra matchups"
-  }, "As published"), /*#__PURE__*/React.createElement(SortTh, {
+    title: "This poll's primaries read at the 2025 election's preference flows \u2013 one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown"
+  }, "Implied 2PP"), /*#__PURE__*/React.createElement(SortTh, {
     label: "Lead \xB7 ALP v L/NP",
     short: "Lead",
     sortKey: "alp",
@@ -13223,7 +13224,7 @@ function PollsterTable() {
       className: "num muted hide-md"
     }, r.sample != null ? r.sample.toLocaleString() : "—"), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
       className: "ta-l apub-col hide-md"
-    }, /*#__PURE__*/React.createElement(ArchPublished, {
+    }, /*#__PURE__*/React.createElement(ArchImplied, {
       p: r
     })), /*#__PURE__*/React.createElement("td", {
       className: "num"
@@ -16326,61 +16327,49 @@ function ArchApprCell({
   })));
 }
 
-// "As published" – the poll's headline figures exactly as the pollster released
-// them, as plain numerals (dot-coded by party) with any shape-flags inline.
-// Numerals, not a 0–100 bar: at archive scale every 53/47 bar looks identical,
-// so the ink carries nothing – the figures themselves are the record.
-// A poll with NO after-preferences figure published only its primaries – and
-// those are the record too, so they print here under a Primary flag rather
-// than leaving the cell a bare dash.
-function ArchPublished({
+// "Implied 2PP" – this poll's primaries read at the 2025 election's flow
+// table, gen-data's alpImp field (one fixed table for every house, so the
+// column compares like with like in a way the houses' mixed published bases
+// can't). As plain dot-coded numerals, the same idiom the "As published"
+// column this replaced used: at archive scale every 53/47 bar looks
+// identical, so the ink would carry nothing – the figures are the record.
+// The wave's own published 2PP lives in its expanded breakdown (and drives
+// the Lead column); this cell is the implied basis only, L/NP completed as
+// 100 minus ALP the way the poll-detail implied line completes it.
+// alpImp is absent under the same eligibility rule the implied estimator
+// uses (a full comparable primary set) – no figure, a dash with the reason,
+// never a silently different basis.
+function ArchImplied({
   p
 }) {
-  const {
-    tppContests,
-    tppFlag,
-    primarySegs
-  } = window;
-  const c0 = tppContests(p)[0];
-  if (!c0) {
-    const pSegs = p.p ? primarySegs(p) : [];
-    if (!pSegs.length) return /*#__PURE__*/React.createElement("span", {
+  if (p.alpImp == null) {
+    return /*#__PURE__*/React.createElement("span", {
       className: "dash",
-      title: "No voting-intention figures published with this poll"
+      title: "No implied 2PP \u2013 this poll never filed a full primary set the flow table can read"
     }, "\u2014");
-    return /*#__PURE__*/React.createElement("div", {
-      className: "apub",
-      "aria-label": "Primary votes: " + pSegs.map(s => `${s.label} ${s.value}`).join(", "),
-      title: "No two-party or head-to-head figure in this poll \u2013 these are the primary votes"
-    }, pSegs.map((s, i) => /*#__PURE__*/React.createElement("span", {
-      key: i,
-      className: "apub-seg",
-      title: s.label
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "apub-dot",
-      style: {
-        background: s.color
-      }
-    }), s.value.toFixed(1))), /*#__PURE__*/React.createElement("span", {
-      className: "facet-flag"
-    }, "Primary"));
   }
-  const flag = tppFlag(p);
+  const lnp = +(100 - p.alpImp).toFixed(1);
   return /*#__PURE__*/React.createElement("div", {
     className: "apub",
-    "aria-label": c0.segs.map(s => `${s.label} ${s.value}`).join(", ")
-  }, c0.segs.map((s, i) => /*#__PURE__*/React.createElement("span", {
-    key: i,
+    "aria-label": `Implied 2PP at 2025-election preference flows: ALP ${p.alpImp.toFixed(1)}, L/NP ${lnp.toFixed(1)}`,
+    title: "This poll's primaries at the 2025 election's preference flows \u2013 one fixed table for every house"
+  }, /*#__PURE__*/React.createElement("span", {
     className: "apub-seg",
-    title: s.label
+    title: "ALP, implied"
   }, /*#__PURE__*/React.createElement("span", {
     className: "apub-dot",
     style: {
-      background: s.color
+      background: "var(--alp)"
     }
-  }), s.value.toFixed(1))), flag && /*#__PURE__*/React.createElement("span", {
-    className: "facet-flag"
-  }, flag));
+  }), p.alpImp.toFixed(1)), /*#__PURE__*/React.createElement("span", {
+    className: "apub-seg",
+    title: "L/NP, implied"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "apub-dot",
+    style: {
+      background: "var(--lnp)"
+    }
+  }), lnp.toFixed(1)));
 }
 
 // One lead-info helper drives the cell, the held-by filter and the sort, so
@@ -18672,8 +18661,8 @@ function AllPollsView({
   }, "n", /*#__PURE__*/React.createElement("sub", null, "eff")), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("th", {
     scope: "col",
     className: "ta-l apub-col hide-md",
-    title: "What the pollster published \u2013 a conventional 2PP, a 3-cornered preferred, or extra matchups"
-  }, "As published"), /*#__PURE__*/React.createElement(ArchSortTh, {
+    title: "This poll's primaries read at the 2025 election's preference flows \u2013 one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown"
+  }, "Implied 2PP"), /*#__PURE__*/React.createElement(ArchSortTh, {
     label: {
       lnp: "Lead · ALP v L/NP",
       onp: "Lead · ALP v ON",
@@ -18816,7 +18805,7 @@ function AllPollsView({
       title: "Effective sample as published by the pollster (APC methodology statement)"
     }, p.sampleEff.toLocaleString())), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
       className: "ta-l apub-col hide-md"
-    }, /*#__PURE__*/React.createElement(ArchPublished, {
+    }, /*#__PURE__*/React.createElement(ArchImplied, {
       p: p
     })), /*#__PURE__*/React.createElement("td", {
       className: "num"
@@ -18936,7 +18925,7 @@ function AllPollsView({
     onClick: clearAll
   }, "Clear filters")))))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll for its full breakdown \xB7 Dates are fieldwork windows (publication dates sit in the breakdown) \xB7 \u201CAs published\u201D lists each poll\u2019s headline figures exactly as the pollster released them \xB7 The lead bar shows the selected matchup where a pollster published it \xB7 \u201CPoll lean\u201D is the poll minus the aggregate for that month \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t publish that measure \xB7 Search matches anything in a row \xB7 Click any column heading to sort.", " ", /*#__PURE__*/React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll.", " ", /*#__PURE__*/React.createElement("strong", null, "n", /*#__PURE__*/React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, filed with the Australian Polling Council \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown."), /*#__PURE__*/React.createElement(VariancePanel, {
+  }, "Tap any poll for its full breakdown \xB7 Dates are fieldwork windows (publication dates sit in the breakdown) \xB7 \u201CImplied 2PP\u201D reads each poll\u2019s primaries at the 2025 election\u2019s preference flows \u2013 one fixed table, so the column compares house to house; the wave\u2019s own published 2PP sits in its breakdown \xB7 The lead bar shows the selected matchup where a pollster published it \xB7 \u201CPoll lean\u201D is the poll minus the aggregate for that month \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t publish that measure \xB7 Search matches anything in a row \xB7 Click any column heading to sort.", " ", /*#__PURE__*/React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll.", " ", /*#__PURE__*/React.createElement("strong", null, "n", /*#__PURE__*/React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, filed with the Australian Polling Council \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown."), /*#__PURE__*/React.createElement(VariancePanel, {
     key: facet,
     facet: facet,
     rangeId: range
@@ -19432,7 +19421,7 @@ Object.assign(window, {
   InfoView,
   // shared cell renderers reused by the latest-polls table
   ArchSortTh,
-  ArchPublished,
+  ArchImplied,
   ArchLead,
   ArchApprCell,
   ArchDirCell,
