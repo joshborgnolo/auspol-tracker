@@ -1653,6 +1653,41 @@ const onImp = primaryNow && (() => {
    number says POLLSTERS, and "YouGov (MRP)" is YouGov. */
 const houses = new Set(POLLS.map((p) => p.pollster.replace(/ \((MRP|SMS)\)$/, "")));
 const fmtDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return `${d} ${MNF[m - 1]} ${y}`; };
+/* Which rival leads the board: the contest Labor is doing WORST in goes
+   first, in the hero and in every legend that lists the two.
+
+   Ranked on the IMPLIED basis, always, whatever the hero's own toggle says.
+   That is not a shortcut: the two contests are only comparable when they are
+   read through one frozen table, because the published ALP-v-ON figures are
+   each house's private allocation and the published ALP-v-L/NP figures are a
+   different private allocation again. The bases disagree about the answer
+   today (implied says One Nation by 0.3, published says the Coalition by 1.7)
+   and the implied one is the comparison that means something.
+
+   The DEADBAND is the load-bearing part. One Nation has gone from 7.6 points
+   behind the Coalition as a rival to ahead of it, which is real; but the
+   crossover itself has been decided by 0.2-0.5 points a month, and a naive
+   "whoever is ahead this month" rule flips the site's headline contest three
+   times in five months on differences the page would not otherwise call real.
+   So a rival must lead by more than RIVAL_DEADBAND to take the spot, and
+   having taken it keeps it until it trails by more than that. Walked forward
+   from the first month of the term rather than stored, so the answer is a
+   pure function of the data and every build reproduces it: one switch across
+   this term, in June 2026, instead of three. */
+const RIVAL_DEADBAND = 1.0;
+const rivalLead = (() => {
+  const onBy = Object.fromEntries(agg2ppSynthOn.map((d) => [d.ym, d]));
+  let who = "alp_lnp";
+  for (const d of agg2ppSynth) {
+    const o = onBy[d.ym];
+    if (!o || d.alp == null || o.a == null) continue;
+    const gap = (100 - o.a) - (100 - d.alp);       // One Nation's share minus the Coalition's
+    if (gap > RIVAL_DEADBAND) who = "alp_on";
+    else if (gap < -RIVAL_DEADBAND) who = "alp_lnp";
+  }
+  return who;
+})();
+
 const latest = {
   alp2pp: hlNow.alp, lnp2pp: r1(100 - hlNow.alp),
   alp2ppPrev: hl1mo ? hl1mo.alp : agg2pp[agg2pp.length - 2].alp,
@@ -1678,6 +1713,9 @@ const latest = {
   onImp,
   updated: fmtDate(LATEST_ISO), updatedISO: LATEST_ISO,
   published: fmtDate(LATEST_PUB_ISO), publishedISO: LATEST_PUB_ISO,
+  /* the id the hero opens on, and the order every legend listing the
+     two Labor contests should use */
+  rivalLead,
   nextElectionDue: "By 20 May 2028", pollsTracked: individualPolls.length, housesTracked: houses.size,
   /* deff rides in the payload so the page's discord engine reads the SAME
      constant the node estimator used (it lives in an untransformed asset and

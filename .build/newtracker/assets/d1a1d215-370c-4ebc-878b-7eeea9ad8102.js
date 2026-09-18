@@ -3180,7 +3180,14 @@ function VariancePanel({ facet, rangeId }) {
 
   // a measure with no computable window anywhere (e.g. Hanson's net, polled
   // by too few houses at a time) is dropped rather than shown as a flat gap
-  const rows = discordFacet(view)
+  /* The two Labor contests list in the order the hero uses — the rival Labor
+     is doing worst against first (latest.rivalLead). A reader who has just
+     seen the headline open on ALP v ON should not meet a legend here leading
+     with the other one. Facets without a ranked pair are untouched. */
+  const rivalFirst = (D.latest && D.latest.rivalLead) || "alp_lnp";
+  const RIVAL_FIRST_ID = { alp_on: "tpp_alpon", alp_lnp: "tpp_alp" }[rivalFirst];
+  const rows = discordFacet(view).slice()
+    .sort((a, b) => (a.id === RIVAL_FIRST_ID ? -1 : b.id === RIVAL_FIRST_ID ? 1 : 0))
     .map((m) => ({ m, pts: discord(m.id) }))
     .filter((r) => r.pts.some((d) => d.sigma != null));
   if (!rows.length) return null;
@@ -4701,8 +4708,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
 
       {/* flow drift is a 2PP-only diagnostic — it publishes on the canonical
           pair alone, so it mounts on the 2PP facet right after the lean panel */}
-      {facet === "twopp" && <FlowDriftPanel rangeId={range} />}
-      {facet === "twopp" && <FlowDriftOnPanel rangeId={range} />}
+      {/* Same ranking as the hero: the drift panel for the contest Labor is
+          doing worst in comes first. */}
+      {facet === "twopp" && ((D.latest && D.latest.rivalLead) === "alp_on"
+        ? <><FlowDriftOnPanel rangeId={range} /><FlowDriftPanel rangeId={range} /></>
+        : <><FlowDriftPanel rangeId={range} /><FlowDriftOnPanel rangeId={range} /></>)}
     </div>
   );
 }

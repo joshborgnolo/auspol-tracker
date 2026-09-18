@@ -722,8 +722,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const xDomain = rangeDomain(rangeId);
 
-  /* The REAL published measure (ALP v L/NP) always leads and is the default;
-     the modelled head-to-heads follow, strongest challenger first.
+  /* The Labor contests lead, ordered by how well the rival is doing; the
+     modelled head-to-heads that do not involve Labor follow.
 
      A modelled matchup has to earn its place: enough months to show a trend
      rather than a few scattered points, and a recent enough last reading to be
@@ -743,10 +743,15 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
     const last = MATCHUPS[id].data[MATCHUPS[id].data.length - 1];
     return last.b; // opponent's share in the Labor head-to-head
   };
+  /* The classic pairing used to be pinned first whatever the numbers said.
+     It is not any more: the Labor contests are ordered by how well the rival
+     is doing, strongest first, with latest.rivalLead breaking the top spot so
+     the hero's own default and this list can never disagree. */
+  const rivalFirst = (D.latest && D.latest.rivalLead) || "alp_lnp";
+  const vsLabor = Object.keys(MATCHUPS).filter((id) => MATCHUPS[id].vsLabor && hasData(id))
+    .sort((x, y) => (x === rivalFirst ? -1 : y === rivalFirst ? 1 : oppVsLabor(y) - oppVsLabor(x)));
   const orderedMatchups = [
-    "alp_lnp",
-    ...Object.keys(MATCHUPS).filter((id) => id !== "alp_lnp" && MATCHUPS[id].vsLabor && hasData(id))
-       .sort((x, y) => oppVsLabor(y) - oppVsLabor(x)),
+    ...vsLabor,
     ...Object.keys(MATCHUPS).filter((id) => !MATCHUPS[id].vsLabor && hasData(id)),
   ];
   /* rangeDomain takes any month count, and buildXTicks already labels
@@ -1769,7 +1774,12 @@ function App() {
      for two reasons that are the same one: the docked 2PP score in the tab
      bar must follow it, and the hero unmounts whenever the reader walks off
      the Snapshot tab – the score travels on. */
-  const [tppMatchup, setTppMatchup] = useState("alp_lnp");
+  /* Opens on the rival Labor is doing WORST against, not on the traditional
+     pairing — see latest.rivalLead in gen-data for the deadband that keeps
+     that from flipping month to month. Falls back to the classic pairing if
+     an older data asset carries no ranking. */
+  const [tppMatchup, setTppMatchup] = useState(
+    (window.AUSPOL.latest && window.AUSPOL.latest.rivalLead) || "alp_lnp");
 
   /* Which measure of 2PP the hero shows for ALP v L/NP: the pollsters' own
      respondent-allocated figure ("resp") or the implied figure the fixed
