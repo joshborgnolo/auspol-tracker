@@ -67,16 +67,20 @@ function GlyphDial({ className, svgRef, width, height }) {
   const glyphTitle = "Primary vote aggregate · " +
     glyph.map((p) => `${D.PARTIES[p.id].short} ${p.v.toFixed(1)}`).join(", ");
 
-  // pendulum = the head-to-head against Labor's STRONGEST challenger – the same
-  // pick the hero makes: whichever opponent polls the highest 2PP against Labor.
-  // The needle swings toward whoever leads THAT contest (Labor left, challenger right).
-  const g2 = D.agg2pp[D.agg2pp.length - 1];
-  const gon = D.alt2pp.alp_on[D.alt2pp.alp_on.length - 1];
-  const challengers = [
-    { abbr: "L/NP", color: "var(--lnp)", lab: g2.alp, opp: g2.lnp },
-  ];
-  if (gon) challengers.push({ abbr: "ON", color: "var(--onp)", lab: gon.a, opp: gon.b });
-  const topOpp = challengers.slice().sort((x, y) => y.opp - x.opp)[0];
+  // pendulum = the LIVE implied head-to-head against Labor's STRONGEST
+  // challenger – the same figures the hero headline and the story player's
+  // rest frame quote (tppLatest on the implied basis), and the same pick:
+  // whichever opponent holds the higher implied 2PP against Labor. The
+  // needle swings toward whoever leads THAT contest (Labor left, challenger
+  // right).
+  const challengers = [["L/NP", "var(--lnp)", "alp_lnp"], ["ON", "var(--onp)", "alp_on"]]
+    .map(([abbr, color, id]) => {
+      const v = tppLatest(id, "imp");
+      return v && v.b != null ? { abbr, color, lab: v.a, opp: v.b } : null;
+    })
+    .filter(Boolean);
+  const topOpp = challengers.slice().sort((x, y) => y.opp - x.opp)[0] ||
+    { abbr: "L/NP", color: "var(--lnp)", lab: 50, opp: 50 };
   const pMargin = +(topOpp.lab - topOpp.opp).toFixed(1);        // + → Labor leads
   const labLeads = pMargin >= 0;
   const pendColor = labLeads ? "var(--alp)" : topOpp.color;
@@ -84,7 +88,7 @@ function GlyphDial({ className, svgRef, width, height }) {
   // ±12 pts → full ±34° deflection. Labor (positive margin) swings LEFT,
   // the challenger swings RIGHT – matching the hero's Labor-left / opp-right order.
   const pendDeg = Math.max(-1, Math.min(1, pMargin / 12)) * 34;
-  const pendTitle = `2PP swing · ALP v ${topOpp.abbr} · ` +
+  const pendTitle = `Implied 2PP · ALP v ${topOpp.abbr} · ` +
     (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
 
   // settle the needle in from vertical on load (skip the swing for reduced motion)

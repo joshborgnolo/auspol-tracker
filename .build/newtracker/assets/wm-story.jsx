@@ -1,12 +1,28 @@
 /* auspol tracker – "wind the dial back": the masthead mark, replayed across the term.
 
    The mark is not decoration. Its graduation bars are the primary-vote
-   aggregate, its needle is two-party preferred, and the right half of its arc
-   is coloured for whichever party is Labor's strongest challenger. Clicking it
-   winds the instrument back to the May 2025 election and lets the term run.
+   aggregate, its needle is implied two-party preferred, and the right half
+   of its arc is coloured for whichever party is Labor's strongest
+   challenger. Clicking it winds the instrument back to the May 2025
+   election and lets the term run.
 
-   Everything here is the same monthly aggregate the charts draw. Two liberties,
-   both deliberate:
+   The needle rides the implied series the page defaults to, not the
+   published one: synth2pp (ALP v Coalition, counted 2025-el flows,
+   anchored to the election's implied count) and synthOn (ALP v One Nation,
+   the first-principles set) month by month, with the final month stepping
+   off the monthly mean onto the LIVE implied nowcast – tppLatest on the
+   implied basis, the same figure the hero headline, the tab score and the
+   masthead mark's needle all quote, so the dial and the page cannot
+   disagree. The challenger each month is the strongest ON that implied
+   basis: once One Nation's implied share passes the Coalition's, the 2PP
+   shown – here, in the trace, and at the dial's rest – is ALP v ON.
+
+   Flat, like the mark it flies out of. The dial once dressed as a gauge –
+   bezel, lit rim, blade gradients, a screw-head pivot, grain – and none of
+   it carried a reading. What remains is only what a number can be taken
+   from: bars, the two arc sides, the mercury, the scale, the needle.
+
+   Two liberties, both deliberate:
 
    - BAR ORDER re-ranks live: each month's tallest bar holds the leftmost
      slot, and the slot assignment is interpolated between months, so a party
@@ -27,8 +43,7 @@ const WM_MAX_PCT = 40;          // absolute domain for bar heights
 const WM_BAR_MAX = 13;          // units of bar at 40%
 const WM_SWING_PTS = 12;        // margin that deflects the needle fully
 const WM_SWING_DEG = 34;
-const WM_NEEDLE_R = 8.6;        // needle length
-const WM_LABEL_R = 29;          // labels sit on one ring, like numerals on a bezel
+const WM_LABEL_R = 29;          // readings sit on one ring
 const WM_LABEL_SEP = 21;        // min degrees between labels before they push apart
 /* Slot 0 always holds the month's TALLEST bar, and at 54 degrees off vertical
    that bar reaches far enough out that a reading centred on the ring sits on
@@ -61,21 +76,6 @@ const wmPolar = (deg, r) => ({
   x: WM_GC.cx + Math.sin((deg * Math.PI) / 180) * r,
   y: WM_GC.cy - Math.cos((deg * Math.PI) / 180) * r,
 });
-/* The housing is a HALF dial, because the instrument is: the sweep runs from
-   due left through the top to due right, so a full disc left a dead lower half
-   pretending to be face. A semicircle over a short flat base ends the plate
-   where the scale ends, and puts the needle's pivot on the baseline where a
-   real gauge mounts it. The base drops a little past the pivot so the boss has
-   housing under it rather than hanging off an edge. */
-const dPlate = (R, drop, corner) => {
-  const x0 = WM_GC.cx - R, x1 = WM_GC.cx + R;
-  const yTop = WM_GC.cy, yBase = WM_GC.cy + drop;
-  return `M ${x0} ${yTop} A ${R} ${R} 0 0 1 ${x1} ${yTop}`
-    + ` L ${x1} ${yBase - corner} Q ${x1} ${yBase} ${x1 - corner} ${yBase}`
-    + ` L ${x0 + corner} ${yBase} Q ${x0} ${yBase} ${x0} ${yBase - corner} Z`;
-};
-const WM_PARTY_IDS = ["alp", "lnp", "grn", "onp"];
-
 const wmArc = (d1, d2, r) => {
   const a = wmPolar(d1, r), b = wmPolar(d2, r);
   return `M ${a.x.toFixed(2)} ${a.y.toFixed(2)} A ${r} ${r} 0 0 1 ${b.x.toFixed(2)} ${b.y.toFixed(2)}`;
@@ -88,12 +88,18 @@ const lerp = (a, b, t) => a + (b - a) * t;
 // an instrument rather than gliding uniformly through them
 const smooth = (t) => t * t * t * (t * (t * 6 - 15) + 10);
 
-/* One frame of the story per month on the 2PP spine. */
+/* One frame of the story per month on the implied 2PP spine: synth2pp for
+   Labor v the Coalition, synthOn for Labor v One Nation – the series the
+   page shows under its default (implied) basis. The implied frames carry
+   the same field names as the published ones, so a missing implied payload
+   falls back to the published spine rather than to nothing. */
 function buildDialStory(D) {
   const primBy = new Map(D.aggPrimary.map((p) => [p.ym, p]));
-  const onBy = new Map((D.alt2pp.alp_on || []).map((p) => [p.ym, p]));
+  const implied = D.synth2pp && D.synth2pp.length > 1;
+  const spine = implied ? D.synth2pp : D.agg2pp;
+  const onBy = new Map(((implied ? D.synthOn : D.alt2pp.alp_on) || []).map((p) => [p.ym, p]));
   const IDS = ["alp", "lnp", "grn", "onp"];
-  return D.agg2pp.map((m) => {
+  const frames = spine.map((m) => {
     const on = onBy.get(m.ym);
     const cands = [{ id: "lnp", abbr: "Coalition", color: "var(--lnp)", lab: m.alp, opp: m.lnp }];
     if (on) cands.push({ id: "onp", abbr: "One Nation", color: "var(--onp)", lab: on.a, opp: on.b });
@@ -112,6 +118,28 @@ function buildDialStory(D) {
       vals, slots,
     };
   });
+  /* The final frame leaves the monthly mean and sits on the LIVE implied
+     figure: tppLatest on the implied basis – the same trailing nowcast the
+     hero headline and the masthead needle quote. The dial therefore comes
+     to rest on the number the page is actually saying, and the challenger
+     at rest is whoever is strongest on the implied basis right now. */
+  if (implied && window.AP && window.AP.tppLatest && frames.length) {
+    const live = [["lnp", "Coalition", "var(--lnp)", "alp_lnp"], ["onp", "One Nation", "var(--onp)", "alp_on"]]
+      .map(([id, abbr, color, mId]) => {
+        const v = window.AP.tppLatest(mId, "imp");
+        return v && v.b != null ? { id, abbr, color, v } : null;
+      })
+      .filter(Boolean);
+    if (live.length) {
+      const top = live.slice().sort((x, y) => y.v.b - x.v.b)[0];
+      const last = frames[frames.length - 1];
+      last.lab = top.v.a; last.opp = top.v.b;
+      last.margin = +(top.v.a - top.v.b).toFixed(1);
+      last.oppId = top.id; last.oppName = top.abbr; last.oppColor = top.color;
+      last.live = true;
+    }
+  }
+  return frames;
 }
 
 /* The dial itself, drawn at an arbitrary FLOAT position in the story so the
@@ -154,177 +182,17 @@ function DialFigure({ story, f }) {
 
   return (
     <g className="dl-fig">
-      {/* ---- the instrument it is pretending to be -------------------------
-         The dial is a gauge, so at this size it is allowed to look like one:
-         a face sunk slightly below its bezel, a rim lit from the top left, a
-         ring of engraved graduations, a pivot with a screw head, and a sheen
-         where the glass would be.
+      {/* Only what a number can be read from: the two arc sides, the mercury,
+         the scale, the bars, the needle - the masthead mark's own grammar at
+         story size. The dial once dressed as a gauge here (bezel, lit rim,
+         blade gradients, a screw-head pivot, grain); none of it carried a
+         reading, so none of it remains. */}
 
-         Where the line falls: this is all CHROME. Every mark that carries a
-         READING - the bars, the arc, the needle - stays flat and
-         literal. Gloss on a data mark is the same mistake as a 3D chart: it
-         edits the quantity while claiming to decorate it. So the housing is
-         the skeuomorph and the readings sit on top of it, unstyled.
-
-         Only here, not on the masthead. That mark renders at 39px from its own
-         markup, where a bevel is mud. */}
-      <defs>
-        {/* The material is the site's own frosted recipe rather than an
-            invented metal, so the dial is not the one place a surface appears
-            once. Impossible on purpose - translucent AND emissive - which is
-            the difference between naming a material and copying one. */}
-        <linearGradient id="dl-rim" x1="0.15" y1="0" x2="0.7" y2="1">
-          <stop offset="0%" stopColor="var(--dl-rim-hi)" />
-          <stop offset="55%" stopColor="var(--dl-rim)" />
-          <stop offset="100%" stopColor="var(--dl-rim-lo)" />
-        </linearGradient>
-        <linearGradient id="dl-face" x1="0.2" y1="0" x2="0.6" y2="1">
-          <stop offset="0%" stopColor="var(--dl-face-hi)" />
-          <stop offset="100%" stopColor="var(--dl-face-lo)" />
-        </linearGradient>
-        {/* light IN the rim, not off it */}
-        <linearGradient id="dl-edge" x1="0" y1="0" x2="0.6" y2="1">
-          <stop offset="0%" stopColor="var(--dl-edge)" />
-          <stop offset="45%" stopColor="transparent" />
-          <stop offset="100%" stopColor="var(--dl-edge)" />
-        </linearGradient>
-        <radialGradient id="dl-screw" cx="35%" cy="30%" r="75%">
-          <stop offset="0%" stopColor="var(--dl-rim-hi)" />
-          <stop offset="100%" stopColor="var(--dl-rim-lo)" />
-        </radialGradient>
-        {/* feTurbulence generates across the whole FILTER REGION, not across the
-            shape it was asked for, so without the composite the noise came out
-            as a rectangle the size of the plate's bounding box - visible behind
-            the dial, square across the top, stopping exactly where the bbox
-            stopped. Clipping it to the source's own alpha is what makes it
-            grain ON the housing rather than a panel behind it. */}
-        <filter id="dl-grain" x="0%" y="0%" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="1.9" numOctaves="2" seed="7" result="noise" />
-          <feColorMatrix type="saturate" values="0" in="noise" result="grey" />
-          <feComponentTransfer in="grey" result="faint">
-            <feFuncA type="linear" slope="0.055" />
-          </feComponentTransfer>
-          <feComposite in="faint" in2="SourceAlpha" operator="in" />
-        </filter>
-        {WM_PARTY_IDS.map((id) => (
-          <radialGradient key={"bo" + id} id={`dl-bounce-${id}`}>
-            <stop offset="0%" stopColor={`color-mix(in oklch, var(--${id}) 46%, transparent)`} />
-            <stop offset="100%" stopColor="transparent" />
-          </radialGradient>
-        ))}
-        {WM_PARTY_IDS.map((id) => (
-          <radialGradient key={"bl" + id} id={`dl-bloom-${id}`}>
-            <stop offset="0%" stopColor={`color-mix(in oklch, var(--${id}) 26%, transparent)`} />
-            <stop offset="100%" stopColor="transparent" />
-          </radialGradient>
-        ))}
-        {/* across the blade's WIDTH, so it turns with the blade; the party
-            colour stays saturated because the colour IS the encoding */}
-        {WM_PARTY_IDS.map((id) => (
-          <linearGradient key={"b" + id} id={`dl-blade-${id}`} x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor={`color-mix(in oklch, white 6%, var(--${id}))`} />
-            <stop offset="32%" stopColor={`color-mix(in oklch, white 24%, var(--${id}))`} />
-            <stop offset="100%" stopColor={`color-mix(in oklch, black 14%, var(--${id}))`} />
-          </linearGradient>
-        ))}
-      </defs>
-      {/* The bloom is what the translucent housing has to carry: with an opaque
-          shell behind the dial there is nothing to see THROUGH it, so the
-          glass is given something of its own to pick up - a soft wash in the
-          colour of whoever leads this month. */}
-      {(
-        <ellipse className="dl-bloom" cx={WM_GC.cx} cy={WM_GC.cy - 2} rx="21" ry="17"
-                 fill={`url(#dl-bloom-${labLeads ? "alp" : (oppMix > 0.5 ? B.oppId : A.oppId)})`} />
-      )}
-      <path className="dl-bezel" d={dPlate(WM_GC.r + 3.1, 3.4, 1.2)} fill="url(#dl-rim)" />
-      <path className="dl-face" d={dPlate(WM_GC.r + 1.7, 2.2, 0.9)} fill="url(#dl-face)" />
-      {/* Light IN the material rather than reflected off it - the neo reading
-          of a rim, where classic skeuo would have put a specular highlight. */}
-      {<path className="dl-edge" d={dPlate(WM_GC.r + 3.1, 3.4, 1.2)} fill="none" />}
-      {/* Bounce: each blade throws its own colour onto the face beneath it.
-         This is the move the finish turns on - material answering what sits on
-         it - and it is free of the readings, being a wash under them rather
-         than a mark of its own. Before the graduations, so those stay crisp
-         on top of it. */}
-      {barRing.map((b) => {
-        const p = wmPolar(b.a, WM_GC.r - 1.5);
-        return <circle key={"bo" + b.id} className="dl-bounce" cx={p.x} cy={p.y} r="6"
-                       fill={`url(#dl-bounce-${b.id})`} />;
-      })}
-
-      {/* The graduations used to be spaced in DEGREES - one every 6 across the
-         whole sweep - which made them decoration wearing a scale's clothes.
-         wmDeg clamps the needle to ±34°, so 56° at each end carried ticks the
-         needle can never reach, and none of them stood for a quantity: a mark
-         at -78° meant nothing, because nothing is ever read there.
-
-         They are spaced in POINTS now, through the same wmDeg the needle uses,
-         so a tick is a place the needle can actually be and the gap between
-         two of them is two points of two-party preferred. The scale ends where
-         the needle's travel ends, which is the honest edge of the instrument:
-         past ±12 the reading is pinned, and the dial should not pretend
-         otherwise. Every 2 points, longer every 6, and level - the 50-50 the
-         whole contest turns on - is the longest mark on the face, the same
-         thing the poll rows say with their 50 notch. */}
-      {(() => {
-        /* They were flat strokes laid ON a face that has depth, which is why
-           they read as applied rather than belonging. Two changes fix that.
-
-           They sit on a scale BAND now - a shallow recess in the face running
-           the width of the needle's travel - so the marks have a plate to be
-           on instead of floating over the enamel.
-
-           And each one is cut rather than drawn. A groove shows as two lines:
-           the dark cut itself, and the lip beyond it catching the light. The
-           lip is the same tick set shifted a tenth of a unit down and right,
-           which is the one light direction the whole instrument uses, so the
-           marks are lit by the same lamp as the rim and the blades. */
-        const ticks = Array.from({ length: 13 }, (_, k) => -12 + k * 2).map((pts) => {
-          const d = wmDeg(pts);
-          const level = pts === 0;
-          const major = pts % 6 === 0;
-          return { pts, level, major,
-                   a: wmPolar(d, WM_GC.r - (level ? 3.4 : major ? 2.4 : 1.3)),
-                   b: wmPolar(d, WM_GC.r - 0.2) };
-        });
-        const marks = (tag) => ticks.map((t) => (
-          <line key={tag + t.pts}
-                className={"dl-grad" + (t.level ? " level" : t.major ? " major" : "")}
-                x1={t.a.x} y1={t.a.y} x2={t.b.x} y2={t.b.y} />
-        ));
-        return (
-          <g className="dl-scale">
-            <path className="dl-scale-band"
-                  d={wmArc(wmDeg(12), wmDeg(-12), WM_GC.r - 1.7)} />
-            <g className="dl-grad-lip" transform="translate(0.12 0.12)">{marks("lip")}</g>
-            <g className="dl-grad-cut">{marks("cut")}</g>
-          </g>
-        );
-      })()}
-
-      {/* The two halves used to be drawn full, always, from -90 to 0 and 0 to
-         +90. Only the challenger's COLOUR ever changed, so the band was a
-         legend wearing a gauge's clothes: it told you which side belonged to
-         whom and never once told you how far.
-
-         It is a mercury column now. The channel runs the whole sweep and sits
-         empty; the liquid fills from LEVEL outward toward whoever leads, and
-         its extent is the margin - the same wmDeg the needle turns on, so the
-         column and the pointer agree by construction rather than by being
-         kept in step. Two points of lead is two points of mercury, read
-         against the same ticks.
-
-         The faint tint stays in the empty channel so the sides keep their
-         parties at a glance, which is the one thing the old band did do. */}
-      <path className="dl-channel" d={wmArc(-90, 90, WM_GC.r)} />
+      {/* two-tone sides – Labor left, strongest challenger right. The
+          challenger's half crossfades when the challenger changes hands (an
+          inline opacity REPLACES the stylesheet's, so the tint lives on the
+          group and the paths inside hold only the crossfade). */}
       <path className="dl-side" d={wmArc(-90, 0, WM_GC.r)} stroke="var(--alp)" />
-      {/* The challenger's half carries an inline opacity to crossfade between
-         two colours when the challenger changes hands, and an inline opacity
-         REPLACES the one in the stylesheet rather than combining with it - so
-         Labor's side rendered at the intended tint and the challenger's at
-         full strength, which is why that half always looked the heavier one.
-         Nesting fixes it: the group holds the tint, the paths inside hold only
-         the crossfade, and the two multiply. */}
       <g className="dl-side-g">
         <path className="dl-side-raw" d={wmArc(0, 90, WM_GC.r)} stroke={A.oppColor}
               style={{ opacity: 1 - oppMix }} />
@@ -333,62 +201,60 @@ function DialFigure({ story, f }) {
                 style={{ opacity: oppMix }} />
         )}
       </g>
+
+      {/* mercury: the margin as a fill from LEVEL toward whoever leads - the
+          extent is the same wmDeg the needle turns on, so the column and the
+          pointer agree by construction. Flat fill, party colour, domed end. */}
       {Math.abs(deg) > 0.35 && (
-        <g className="dl-mercury">
-          {/* the body of the liquid */}
+        <g>
           <path className="dl-merc" stroke={needleColor}
                 d={wmArc(Math.min(0, deg), Math.max(0, deg), WM_GC.r)} />
-          {/* specular line along the upper wall - what makes it read as metal
-              rather than as paint. Sits a third of a unit out from the centre
-              of the channel, which is where the light would catch. */}
-          <path className="dl-merc-lit"
-                d={wmArc(Math.min(0, deg), Math.max(0, deg), WM_GC.r + 0.42)} />
-          {/* the meniscus: liquid ends in a dome, not a chop */}
           <circle className="dl-merc-cap" fill={needleColor}
                   cx={wmPolar(deg, WM_GC.r).x} cy={wmPolar(deg, WM_GC.r).y} r="0.92" />
-          <circle className="dl-merc-cap-lit"
-                  cx={wmPolar(deg, WM_GC.r + 0.3).x} cy={wmPolar(deg, WM_GC.r + 0.3).y} r="0.34" />
         </g>
       )}
 
-      {/* Where each blade meets the machine. Without this they read as stuck ON
-         the rim rather than coming OUT of it, because nothing said the housing
-         had an opening. Three parts, drawn before every blade so no blade sits
-         under its neighbour's mount: a BOSS of the same material standing a
-         little proud of the rim, a SLOT cut into it, and the blade rising
-         through. The slot is wider than the blade either side, and that dark
-         margin is the whole trick - it is the gap you would see around a vane
-         in its own aperture. */}
-      {barRing.map((b) => (
-        <g key={"mount" + b.id}
-           transform={`rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`}>
-          <rect className="dl-boss" x={WM_GC.cx - 3.1} y={WM_GC.cy - 16.1}
-                width="6.2" height="2.9" rx="0.9" />
-          <rect className="dl-slot" x={WM_GC.cx - 2.25} y={WM_GC.cy - 16.0}
-                width="4.5" height="2.1" rx="0.8" />
-        </g>
-      ))}
+      {/* the scale, spaced in 2PP POINTS through the same wmDeg the needle
+          uses - a tick is a place the needle can actually be, and the gap
+          between two of them is two points of two-party preferred. The scale
+          ends where the needle's travel ends: past ±12 the reading is pinned.
+          Every 2 points, longer every 6, and level - the 50-50 the whole
+          contest turns on - the longest mark on the face, the same thing the
+          poll rows say with their 50 notch. */}
+      <g className="dl-scale">
+        {Array.from({ length: 13 }, (_, k) => -12 + k * 2).map((pts) => {
+          const d = wmDeg(pts);
+          const level = pts === 0;
+          const major = pts % 6 === 0;
+          const a = wmPolar(d, WM_GC.r - (level ? 3.4 : major ? 2.4 : 1.3));
+          const b = wmPolar(d, WM_GC.r - 0.2);
+          return (
+            <line key={pts}
+                  className={"dl-grad" + (level ? " level" : major ? " major" : "")}
+                  x1={a.x} y1={a.y} x2={b.x} y2={b.y} />
+          );
+        })}
+      </g>
 
-      {/* graduation bars – primary vote, absolute scale */}
+      {/* graduation bars – primary vote, absolute scale, one flat stroke per
+          party in the masthead's line grammar: same seat at r+2, same width,
+          no blade and no mount */}
       {barRing.map((b) => {
         const h = Math.max(0.6, (b.v / WM_MAX_PCT) * WM_BAR_MAX);
-        /* A rect rotated about the pivot rather than a stroked line: a stroke
-           cannot carry a gradient across its own width, and the width is where
-           a blade gets its roundness. The geometry is the same line it was -
-           same seat at r+2, same length - so the reading has not moved. */
+        const inner = wmPolar(b.a, WM_GC.r + 2);
+        const outer = wmPolar(b.a, WM_GC.r + 2 + h);
         return (
-          <rect key={b.id} className="dl-bar" rx="0.5"
-                x={WM_GC.cx - 1.7} y={WM_GC.cy - (WM_GC.r + 2 + h)}
-                width="3.4" height={h} fill={`url(#dl-blade-${b.id})`}
-                transform={`rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`} />
+          <line key={b.id}
+                x1={inner.x} y1={inner.y} x2={outer.x} y2={outer.y}
+                stroke={`var(--${b.id})`} strokeWidth="3.4" strokeLinecap="butt" />
         );
       })}
 
-      {/* Readings on a single ring, like numerals on a bezel. Previously each
-          label hung a fixed gap beyond its own bar tip, so their radii ranged
-          over seven units – they scattered, and horizontal text beside a steep
-          bar landed on top of it. A common ring keeps them level and clear,
-          and naming the party matters now that the bars reorder. */}
+      {/* readings on a single ring: a common radius keeps them level and
+          clear, and naming the party matters now that the bars reorder. The
+          outer readings lift clear of the tallest bar's reach - by slot
+          ANGLE, not party, eased by the square of the angle so a label
+          crossing slots doesn't jump. */}
       {labelRing.map((b) => {
         const p = wmPolar(b.a, WM_LABEL_R);
         p.y -= WM_OUTER_LIFT * Math.pow(Math.min(1, Math.abs(b.a) / 54), 2);
@@ -401,32 +267,14 @@ function DialFigure({ story, f }) {
         );
       })}
 
-      {/* The needle carries an ANGLE and nothing else - not a length, not an
-         area - so its shape and finish are chrome all the way down. There was
-         never a reading here to protect, which is why it can taper where the
-         blades could not.
-
-         A stick with a bead on the end was reading as a lollipop. This is the
-         pointer shape a gauge actually uses: a spine that widens from the tip
-         to the pivot and carries on into a counterweight behind it, which is
-         what stops a needle looking like it would tip forward off its own
-         bearing. The lit edge is a separate slip of white rather than a
-         gradient, because the needle changes colour with whoever leads and a
-         highlight that works for any colour cannot be baked into one. */}
-      <g className="dl-needle-g" transform={`translate(${WM_GC.cx}, ${WM_GC.cy}) rotate(${deg.toFixed(2)})`}>
-        {/* counterweight first, so the pivot screw seats over where they meet */}
-        <circle className="dl-needle-cw" cx="0" cy="1.6" r="1.45" fill={needleColor} />
-        <path className="dl-needle" fill={needleColor} d="M 0 -9.1 L 1.15 0.2 L -1.15 0.2 Z" />
-        <path className="dl-needle-lit" d="M 0 -9.1 L -0.98 0.2 L -0.3 0.2 Z" />
+      {/* the needle – the masthead shape: a spine with a bead on the end, in
+          the colour of whoever leads. */}
+      <g transform={`translate(${WM_GC.cx}, ${WM_GC.cy}) rotate(${deg.toFixed(2)})`}>
+        <line x1="0" y1="0" x2="0" y2="-9.1"
+              stroke={needleColor} strokeWidth="1.7" strokeLinecap="round" />
+        <circle cx="0" cy="-9.1" r="1.7" fill={needleColor} />
       </g>
-      <circle className="dl-pivot-seat" cx={WM_GC.cx} cy={WM_GC.cy} r="2.5" />
-      <circle className="dl-pivot" cx={WM_GC.cx} cy={WM_GC.cy} r="1.7"
-              fill="url(#dl-screw)" />
-      {/* Grain, so the gradients read as a surface rather than as plastic. One
-          static rect: the turbulence is rasterised once and never animates. */}
-      {<path className="dl-grain" d={dPlate(WM_GC.r + 3.1, 3.4, 1.2)}
-                    filter="url(#dl-grain)" pointerEvents="none" />}
-
+      <circle cx={WM_GC.cx} cy={WM_GC.cy} r="1.7" className="wm-pivot" />
     </g>
   );
 }
@@ -440,7 +288,7 @@ Object.assign(window, { buildDialStory, DialFigure, WM_GC, wmPolar, wmDeg, WM_SW
    happened to sit under a chart, carrying no reading of its own. The playhead
    travelled left to right and told you only where in the term you were.
 
-   It now traces Labor's two-party-preferred against WHICHEVER CHALLENGER LED
+   It now traces Labor's implied two-party-preferred against WHICHEVER CHALLENGER LED
    that month - story[i].lab, the same figure the caption and the needle use -
    so the term reads as a shape while it plays, and the dial has a second,
    slower account of itself running underneath.
@@ -736,32 +584,32 @@ function DialStory({ originRect, onClose }) {
             )}
           </div>
           <svg viewBox="-9 -11 62 48" className="dl-svg" role="img"
-               aria-label={`Dial for ${monthLabel}: Labor ${cur.lab.toFixed(1)} versus ${cur.oppName} ${cur.opp.toFixed(1)} two-party preferred`}>
+               aria-label={`Dial for ${monthLabel}: Labor ${cur.lab.toFixed(1)} versus ${cur.oppName} ${cur.opp.toFixed(1)} implied two-party preferred`}>
             <DialFigure story={story} f={f} />
           </svg>
 
           <figcaption className="dl-cap">
-            <div className="dl-month">{monthLabel}{cur.election && <span className="dl-tag">Election</span>}</div>
+            <div className="dl-month">{monthLabel}{cur.election && <span className="dl-tag">Election</span>}{cur.live && <span className="dl-tag">Live</span>}</div>
             <div className="dl-contest">
               <span style={{ color: "var(--alp-text)" }}>Labor {cur.lab.toFixed(1)}</span>
               <span className="dl-v">v</span>
               <span style={{ color: inkOf(cur.oppColor) }}>{cur.oppName} {cur.opp.toFixed(1)}</span>
             </div>
             <div className="dl-note">
-              two-party preferred · Needle leans to whoever leads
+              implied two-party preferred · Needle leans to whoever leads
             </div>
           </figcaption>
         </figure>
 
-        {/* timeline: Labor's 2PP against that month's challenger, traced as it
-            plays and scrubbable once it has run. aria-valuetext carries the
-            reading, because the graph is now the point of the control and a
-            bare month index would describe none of it. */}
+        {/* timeline: Labor's implied 2PP against that month's challenger,
+            traced as it plays and scrubbable once it has run. aria-valuetext
+            carries the reading, because the graph is now the point of the
+            control and a bare month index would describe none of it. */}
         <div className={"dl-track" + (playing ? " playing" : "")} ref={scrubRef}
              onPointerDown={onScrubDown}
              role="slider"
              aria-valuemin={0} aria-valuemax={n - 1} aria-valuenow={i}
-             aria-valuetext={`${monthLabel}: Labor ${cur.lab.toFixed(1)} against ${cur.oppName} ${cur.opp.toFixed(1)}`}
+             aria-valuetext={`${monthLabel}: Labor ${cur.lab.toFixed(1)} against ${cur.oppName} ${cur.opp.toFixed(1)}, implied two-party preferred`}
              aria-label="Month" tabIndex={0}>
           <DialTrack story={story} f={f} evs={evs} playing={playing} />
         </div>
@@ -770,7 +618,8 @@ function DialStory({ originRect, onClose }) {
           <span className="dl-legend">
             Bars are the primary vote, reordering as parties overtake one another. The right of
             the arc – and the line below – take the colour of Labor’s strongest challenger that
-            month; the line is Labor’s two-party preferred against them, measured from 50.
+            month; the line is Labor’s implied two-party preferred against them, measured from
+            50, and the final month rests on the current live figure.
           </span>
           <button className="dl-replay" onClick={replay} disabled={playing}>
             {playing ? "Playing…" : "Replay"}

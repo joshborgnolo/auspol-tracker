@@ -19441,12 +19441,28 @@ Object.assign(window, {
   <script>/* auspol tracker – "wind the dial back": the masthead mark, replayed across the term.
 
    The mark is not decoration. Its graduation bars are the primary-vote
-   aggregate, its needle is two-party preferred, and the right half of its arc
-   is coloured for whichever party is Labor's strongest challenger. Clicking it
-   winds the instrument back to the May 2025 election and lets the term run.
+   aggregate, its needle is implied two-party preferred, and the right half
+   of its arc is coloured for whichever party is Labor's strongest
+   challenger. Clicking it winds the instrument back to the May 2025
+   election and lets the term run.
 
-   Everything here is the same monthly aggregate the charts draw. Two liberties,
-   both deliberate:
+   The needle rides the implied series the page defaults to, not the
+   published one: synth2pp (ALP v Coalition, counted 2025-el flows,
+   anchored to the election's implied count) and synthOn (ALP v One Nation,
+   the first-principles set) month by month, with the final month stepping
+   off the monthly mean onto the LIVE implied nowcast – tppLatest on the
+   implied basis, the same figure the hero headline, the tab score and the
+   masthead mark's needle all quote, so the dial and the page cannot
+   disagree. The challenger each month is the strongest ON that implied
+   basis: once One Nation's implied share passes the Coalition's, the 2PP
+   shown – here, in the trace, and at the dial's rest – is ALP v ON.
+
+   Flat, like the mark it flies out of. The dial once dressed as a gauge –
+   bezel, lit rim, blade gradients, a screw-head pivot, grain – and none of
+   it carried a reading. What remains is only what a number can be taken
+   from: bars, the two arc sides, the mercury, the scale, the needle.
+
+   Two liberties, both deliberate:
 
    - BAR ORDER re-ranks live: each month's tallest bar holds the leftmost
      slot, and the slot assignment is interpolated between months, so a party
@@ -19471,8 +19487,7 @@ const WM_MAX_PCT = 40; // absolute domain for bar heights
 const WM_BAR_MAX = 13; // units of bar at 40%
 const WM_SWING_PTS = 12; // margin that deflects the needle fully
 const WM_SWING_DEG = 34;
-const WM_NEEDLE_R = 8.6; // needle length
-const WM_LABEL_R = 29; // labels sit on one ring, like numerals on a bezel
+const WM_LABEL_R = 29; // readings sit on one ring
 const WM_LABEL_SEP = 21; // min degrees between labels before they push apart
 /* Slot 0 always holds the month's TALLEST bar, and at 54 degrees off vertical
    that bar reaches far enough out that a reading centred on the ring sits on
@@ -19506,20 +19521,6 @@ const wmPolar = (deg, r) => ({
   x: WM_GC.cx + Math.sin(deg * Math.PI / 180) * r,
   y: WM_GC.cy - Math.cos(deg * Math.PI / 180) * r
 });
-/* The housing is a HALF dial, because the instrument is: the sweep runs from
-   due left through the top to due right, so a full disc left a dead lower half
-   pretending to be face. A semicircle over a short flat base ends the plate
-   where the scale ends, and puts the needle's pivot on the baseline where a
-   real gauge mounts it. The base drops a little past the pivot so the boss has
-   housing under it rather than hanging off an edge. */
-const dPlate = (R, drop, corner) => {
-  const x0 = WM_GC.cx - R,
-    x1 = WM_GC.cx + R;
-  const yTop = WM_GC.cy,
-    yBase = WM_GC.cy + drop;
-  return `M ${x0} ${yTop} A ${R} ${R} 0 0 1 ${x1} ${yTop}` + ` L ${x1} ${yBase - corner} Q ${x1} ${yBase} ${x1 - corner} ${yBase}` + ` L ${x0 + corner} ${yBase} Q ${x0} ${yBase} ${x0} ${yBase - corner} Z`;
-};
-const WM_PARTY_IDS = ["alp", "lnp", "grn", "onp"];
 const wmArc = (d1, d2, r) => {
   const a = wmPolar(d1, r),
     b = wmPolar(d2, r);
@@ -19537,12 +19538,18 @@ const lerp = (a, b, t) => a + (b - a) * t;
 // an instrument rather than gliding uniformly through them
 const smooth = t => t * t * t * (t * (t * 6 - 15) + 10);
 
-/* One frame of the story per month on the 2PP spine. */
+/* One frame of the story per month on the implied 2PP spine: synth2pp for
+   Labor v the Coalition, synthOn for Labor v One Nation – the series the
+   page shows under its default (implied) basis. The implied frames carry
+   the same field names as the published ones, so a missing implied payload
+   falls back to the published spine rather than to nothing. */
 function buildDialStory(D) {
   const primBy = new Map(D.aggPrimary.map(p => [p.ym, p]));
-  const onBy = new Map((D.alt2pp.alp_on || []).map(p => [p.ym, p]));
+  const implied = D.synth2pp && D.synth2pp.length > 1;
+  const spine = implied ? D.synth2pp : D.agg2pp;
+  const onBy = new Map(((implied ? D.synthOn : D.alt2pp.alp_on) || []).map(p => [p.ym, p]));
   const IDS = ["alp", "lnp", "grn", "onp"];
-  return D.agg2pp.map(m => {
+  const frames = spine.map(m => {
     const on = onBy.get(m.ym);
     const cands = [{
       id: "lnp",
@@ -19582,6 +19589,34 @@ function buildDialStory(D) {
       slots
     };
   });
+  /* The final frame leaves the monthly mean and sits on the LIVE implied
+     figure: tppLatest on the implied basis – the same trailing nowcast the
+     hero headline and the masthead needle quote. The dial therefore comes
+     to rest on the number the page is actually saying, and the challenger
+     at rest is whoever is strongest on the implied basis right now. */
+  if (implied && window.AP && window.AP.tppLatest && frames.length) {
+    const live = [["lnp", "Coalition", "var(--lnp)", "alp_lnp"], ["onp", "One Nation", "var(--onp)", "alp_on"]].map(([id, abbr, color, mId]) => {
+      const v = window.AP.tppLatest(mId, "imp");
+      return v && v.b != null ? {
+        id,
+        abbr,
+        color,
+        v
+      } : null;
+    }).filter(Boolean);
+    if (live.length) {
+      const top = live.slice().sort((x, y) => y.v.b - x.v.b)[0];
+      const last = frames[frames.length - 1];
+      last.lab = top.v.a;
+      last.opp = top.v.b;
+      last.margin = +(top.v.a - top.v.b).toFixed(1);
+      last.oppId = top.id;
+      last.oppName = top.abbr;
+      last.oppColor = top.color;
+      last.live = true;
+    }
+  }
+  return frames;
 }
 
 /* The dial itself, drawn at an arbitrary FLOAT position in the story so the
@@ -19630,197 +19665,7 @@ function DialFigure({
   const labelRing = separate(barRing, WM_LABEL_SEP);
   return /*#__PURE__*/React.createElement("g", {
     className: "dl-fig"
-  }, /*#__PURE__*/React.createElement("defs", null, /*#__PURE__*/React.createElement("linearGradient", {
-    id: "dl-rim",
-    x1: "0.15",
-    y1: "0",
-    x2: "0.7",
-    y2: "1"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    stopColor: "var(--dl-rim-hi)"
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "55%",
-    stopColor: "var(--dl-rim)"
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    stopColor: "var(--dl-rim-lo)"
-  })), /*#__PURE__*/React.createElement("linearGradient", {
-    id: "dl-face",
-    x1: "0.2",
-    y1: "0",
-    x2: "0.6",
-    y2: "1"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    stopColor: "var(--dl-face-hi)"
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    stopColor: "var(--dl-face-lo)"
-  })), /*#__PURE__*/React.createElement("linearGradient", {
-    id: "dl-edge",
-    x1: "0",
-    y1: "0",
-    x2: "0.6",
-    y2: "1"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    stopColor: "var(--dl-edge)"
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "45%",
-    stopColor: "transparent"
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    stopColor: "var(--dl-edge)"
-  })), /*#__PURE__*/React.createElement("radialGradient", {
-    id: "dl-screw",
-    cx: "35%",
-    cy: "30%",
-    r: "75%"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    stopColor: "var(--dl-rim-hi)"
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    stopColor: "var(--dl-rim-lo)"
-  })), /*#__PURE__*/React.createElement("filter", {
-    id: "dl-grain",
-    x: "0%",
-    y: "0%",
-    width: "100%",
-    height: "100%"
-  }, /*#__PURE__*/React.createElement("feTurbulence", {
-    type: "fractalNoise",
-    baseFrequency: "1.9",
-    numOctaves: "2",
-    seed: "7",
-    result: "noise"
-  }), /*#__PURE__*/React.createElement("feColorMatrix", {
-    type: "saturate",
-    values: "0",
-    in: "noise",
-    result: "grey"
-  }), /*#__PURE__*/React.createElement("feComponentTransfer", {
-    in: "grey",
-    result: "faint"
-  }, /*#__PURE__*/React.createElement("feFuncA", {
-    type: "linear",
-    slope: "0.055"
-  })), /*#__PURE__*/React.createElement("feComposite", {
-    in: "faint",
-    in2: "SourceAlpha",
-    operator: "in"
-  })), WM_PARTY_IDS.map(id => /*#__PURE__*/React.createElement("radialGradient", {
-    key: "bo" + id,
-    id: `dl-bounce-${id}`
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    stopColor: `color-mix(in oklch, var(--${id}) 46%, transparent)`
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    stopColor: "transparent"
-  }))), WM_PARTY_IDS.map(id => /*#__PURE__*/React.createElement("radialGradient", {
-    key: "bl" + id,
-    id: `dl-bloom-${id}`
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    stopColor: `color-mix(in oklch, var(--${id}) 26%, transparent)`
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    stopColor: "transparent"
-  }))), WM_PARTY_IDS.map(id => /*#__PURE__*/React.createElement("linearGradient", {
-    key: "b" + id,
-    id: `dl-blade-${id}`,
-    x1: "0",
-    y1: "0",
-    x2: "1",
-    y2: "0"
-  }, /*#__PURE__*/React.createElement("stop", {
-    offset: "0%",
-    stopColor: `color-mix(in oklch, white 6%, var(--${id}))`
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "32%",
-    stopColor: `color-mix(in oklch, white 24%, var(--${id}))`
-  }), /*#__PURE__*/React.createElement("stop", {
-    offset: "100%",
-    stopColor: `color-mix(in oklch, black 14%, var(--${id}))`
-  })))), /*#__PURE__*/React.createElement("ellipse", {
-    className: "dl-bloom",
-    cx: WM_GC.cx,
-    cy: WM_GC.cy - 2,
-    rx: "21",
-    ry: "17",
-    fill: `url(#dl-bloom-${labLeads ? "alp" : oppMix > 0.5 ? B.oppId : A.oppId})`
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "dl-bezel",
-    d: dPlate(WM_GC.r + 3.1, 3.4, 1.2),
-    fill: "url(#dl-rim)"
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "dl-face",
-    d: dPlate(WM_GC.r + 1.7, 2.2, 0.9),
-    fill: "url(#dl-face)"
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "dl-edge",
-    d: dPlate(WM_GC.r + 3.1, 3.4, 1.2),
-    fill: "none"
-  }), barRing.map(b => {
-    const p = wmPolar(b.a, WM_GC.r - 1.5);
-    return /*#__PURE__*/React.createElement("circle", {
-      key: "bo" + b.id,
-      className: "dl-bounce",
-      cx: p.x,
-      cy: p.y,
-      r: "6",
-      fill: `url(#dl-bounce-${b.id})`
-    });
-  }), (() => {
-    /* They were flat strokes laid ON a face that has depth, which is why
-       they read as applied rather than belonging. Two changes fix that.
-        They sit on a scale BAND now - a shallow recess in the face running
-       the width of the needle's travel - so the marks have a plate to be
-       on instead of floating over the enamel.
-        And each one is cut rather than drawn. A groove shows as two lines:
-       the dark cut itself, and the lip beyond it catching the light. The
-       lip is the same tick set shifted a tenth of a unit down and right,
-       which is the one light direction the whole instrument uses, so the
-       marks are lit by the same lamp as the rim and the blades. */
-    const ticks = Array.from({
-      length: 13
-    }, (_, k) => -12 + k * 2).map(pts => {
-      const d = wmDeg(pts);
-      const level = pts === 0;
-      const major = pts % 6 === 0;
-      return {
-        pts,
-        level,
-        major,
-        a: wmPolar(d, WM_GC.r - (level ? 3.4 : major ? 2.4 : 1.3)),
-        b: wmPolar(d, WM_GC.r - 0.2)
-      };
-    });
-    const marks = tag => ticks.map(t => /*#__PURE__*/React.createElement("line", {
-      key: tag + t.pts,
-      className: "dl-grad" + (t.level ? " level" : t.major ? " major" : ""),
-      x1: t.a.x,
-      y1: t.a.y,
-      x2: t.b.x,
-      y2: t.b.y
-    }));
-    return /*#__PURE__*/React.createElement("g", {
-      className: "dl-scale"
-    }, /*#__PURE__*/React.createElement("path", {
-      className: "dl-scale-band",
-      d: wmArc(wmDeg(12), wmDeg(-12), WM_GC.r - 1.7)
-    }), /*#__PURE__*/React.createElement("g", {
-      className: "dl-grad-lip",
-      transform: "translate(0.12 0.12)"
-    }, marks("lip")), /*#__PURE__*/React.createElement("g", {
-      className: "dl-grad-cut"
-    }, marks("cut")));
-  })(), /*#__PURE__*/React.createElement("path", {
-    className: "dl-channel",
-    d: wmArc(-90, 90, WM_GC.r)
-  }), /*#__PURE__*/React.createElement("path", {
+  }, /*#__PURE__*/React.createElement("path", {
     className: "dl-side",
     d: wmArc(-90, 0, WM_GC.r),
     stroke: "var(--alp)"
@@ -19840,59 +19685,47 @@ function DialFigure({
     style: {
       opacity: oppMix
     }
-  })), Math.abs(deg) > 0.35 && /*#__PURE__*/React.createElement("g", {
-    className: "dl-mercury"
-  }, /*#__PURE__*/React.createElement("path", {
+  })), Math.abs(deg) > 0.35 && /*#__PURE__*/React.createElement("g", null, /*#__PURE__*/React.createElement("path", {
     className: "dl-merc",
     stroke: needleColor,
     d: wmArc(Math.min(0, deg), Math.max(0, deg), WM_GC.r)
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "dl-merc-lit",
-    d: wmArc(Math.min(0, deg), Math.max(0, deg), WM_GC.r + 0.42)
   }), /*#__PURE__*/React.createElement("circle", {
     className: "dl-merc-cap",
     fill: needleColor,
     cx: wmPolar(deg, WM_GC.r).x,
     cy: wmPolar(deg, WM_GC.r).y,
     r: "0.92"
-  }), /*#__PURE__*/React.createElement("circle", {
-    className: "dl-merc-cap-lit",
-    cx: wmPolar(deg, WM_GC.r + 0.3).x,
-    cy: wmPolar(deg, WM_GC.r + 0.3).y,
-    r: "0.34"
-  })), barRing.map(b => /*#__PURE__*/React.createElement("g", {
-    key: "mount" + b.id,
-    transform: `rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`
-  }, /*#__PURE__*/React.createElement("rect", {
-    className: "dl-boss",
-    x: WM_GC.cx - 3.1,
-    y: WM_GC.cy - 16.1,
-    width: "6.2",
-    height: "2.9",
-    rx: "0.9"
-  }), /*#__PURE__*/React.createElement("rect", {
-    className: "dl-slot",
-    x: WM_GC.cx - 2.25,
-    y: WM_GC.cy - 16.0,
-    width: "4.5",
-    height: "2.1",
-    rx: "0.8"
-  }))), barRing.map(b => {
+  })), /*#__PURE__*/React.createElement("g", {
+    className: "dl-scale"
+  }, Array.from({
+    length: 13
+  }, (_, k) => -12 + k * 2).map(pts => {
+    const d = wmDeg(pts);
+    const level = pts === 0;
+    const major = pts % 6 === 0;
+    const a = wmPolar(d, WM_GC.r - (level ? 3.4 : major ? 2.4 : 1.3));
+    const b = wmPolar(d, WM_GC.r - 0.2);
+    return /*#__PURE__*/React.createElement("line", {
+      key: pts,
+      className: "dl-grad" + (level ? " level" : major ? " major" : ""),
+      x1: a.x,
+      y1: a.y,
+      x2: b.x,
+      y2: b.y
+    });
+  })), barRing.map(b => {
     const h = Math.max(0.6, b.v / WM_MAX_PCT * WM_BAR_MAX);
-    /* A rect rotated about the pivot rather than a stroked line: a stroke
-       cannot carry a gradient across its own width, and the width is where
-       a blade gets its roundness. The geometry is the same line it was -
-       same seat at r+2, same length - so the reading has not moved. */
-    return /*#__PURE__*/React.createElement("rect", {
+    const inner = wmPolar(b.a, WM_GC.r + 2);
+    const outer = wmPolar(b.a, WM_GC.r + 2 + h);
+    return /*#__PURE__*/React.createElement("line", {
       key: b.id,
-      className: "dl-bar",
-      rx: "0.5",
-      x: WM_GC.cx - 1.7,
-      y: WM_GC.cy - (WM_GC.r + 2 + h),
-      width: "3.4",
-      height: h,
-      fill: `url(#dl-blade-${b.id})`,
-      transform: `rotate(${b.a.toFixed(2)} ${WM_GC.cx} ${WM_GC.cy})`
+      x1: inner.x,
+      y1: inner.y,
+      x2: outer.x,
+      y2: outer.y,
+      stroke: `var(--${b.id})`,
+      strokeWidth: "3.4",
+      strokeLinecap: "butt"
     });
   }), labelRing.map(b => {
     const p = wmPolar(b.a, WM_LABEL_R);
@@ -19913,37 +19746,25 @@ function DialFigure({
       textAnchor: "middle"
     }, b.v.toFixed(1)));
   }), /*#__PURE__*/React.createElement("g", {
-    className: "dl-needle-g",
     transform: `translate(${WM_GC.cx}, ${WM_GC.cy}) rotate(${deg.toFixed(2)})`
-  }, /*#__PURE__*/React.createElement("circle", {
-    className: "dl-needle-cw",
-    cx: "0",
-    cy: "1.6",
-    r: "1.45",
-    fill: needleColor
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "dl-needle",
-    fill: needleColor,
-    d: "M 0 -9.1 L 1.15 0.2 L -1.15 0.2 Z"
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "dl-needle-lit",
-    d: "M 0 -9.1 L -0.98 0.2 L -0.3 0.2 Z"
-  })), /*#__PURE__*/React.createElement("circle", {
-    className: "dl-pivot-seat",
-    cx: WM_GC.cx,
-    cy: WM_GC.cy,
-    r: "2.5"
+  }, /*#__PURE__*/React.createElement("line", {
+    x1: "0",
+    y1: "0",
+    x2: "0",
+    y2: "-9.1",
+    stroke: needleColor,
+    strokeWidth: "1.7",
+    strokeLinecap: "round"
   }), /*#__PURE__*/React.createElement("circle", {
-    className: "dl-pivot",
+    cx: "0",
+    cy: "-9.1",
+    r: "1.7",
+    fill: needleColor
+  })), /*#__PURE__*/React.createElement("circle", {
     cx: WM_GC.cx,
     cy: WM_GC.cy,
     r: "1.7",
-    fill: "url(#dl-screw)"
-  }), /*#__PURE__*/React.createElement("path", {
-    className: "dl-grain",
-    d: dPlate(WM_GC.r + 3.1, 3.4, 1.2),
-    filter: "url(#dl-grain)",
-    pointerEvents: "none"
+    className: "wm-pivot"
   }));
 }
 Object.assign(window, {
@@ -19962,7 +19783,7 @@ Object.assign(window, {
    happened to sit under a chart, carrying no reading of its own. The playhead
    travelled left to right and told you only where in the term you were.
 
-   It now traces Labor's two-party-preferred against WHICHEVER CHALLENGER LED
+   It now traces Labor's implied two-party-preferred against WHICHEVER CHALLENGER LED
    that month - story[i].lab, the same figure the caption and the needle use -
    so the term reads as a shape while it plays, and the dial has a second,
    slower account of itself running underneath.
@@ -20337,7 +20158,7 @@ function DialStory({
     viewBox: "-9 -11 62 48",
     className: "dl-svg",
     role: "img",
-    "aria-label": `Dial for ${monthLabel}: Labor ${cur.lab.toFixed(1)} versus ${cur.oppName} ${cur.opp.toFixed(1)} two-party preferred`
+    "aria-label": `Dial for ${monthLabel}: Labor ${cur.lab.toFixed(1)} versus ${cur.oppName} ${cur.opp.toFixed(1)} implied two-party preferred`
   }, /*#__PURE__*/React.createElement(DialFigure, {
     story: story,
     f: f
@@ -20347,7 +20168,9 @@ function DialStory({
     className: "dl-month"
   }, monthLabel, cur.election && /*#__PURE__*/React.createElement("span", {
     className: "dl-tag"
-  }, "Election")), /*#__PURE__*/React.createElement("div", {
+  }, "Election"), cur.live && /*#__PURE__*/React.createElement("span", {
+    className: "dl-tag"
+  }, "Live")), /*#__PURE__*/React.createElement("div", {
     className: "dl-contest"
   }, /*#__PURE__*/React.createElement("span", {
     style: {
@@ -20361,7 +20184,7 @@ function DialStory({
     }
   }, cur.oppName, " ", cur.opp.toFixed(1))), /*#__PURE__*/React.createElement("div", {
     className: "dl-note"
-  }, "two-party preferred \xB7 Needle leans to whoever leads"))), /*#__PURE__*/React.createElement("div", {
+  }, "implied two-party preferred \xB7 Needle leans to whoever leads"))), /*#__PURE__*/React.createElement("div", {
     className: "dl-track" + (playing ? " playing" : ""),
     ref: scrubRef,
     onPointerDown: onScrubDown,
@@ -20369,7 +20192,7 @@ function DialStory({
     "aria-valuemin": 0,
     "aria-valuemax": n - 1,
     "aria-valuenow": i,
-    "aria-valuetext": `${monthLabel}: Labor ${cur.lab.toFixed(1)} against ${cur.oppName} ${cur.opp.toFixed(1)}`,
+    "aria-valuetext": `${monthLabel}: Labor ${cur.lab.toFixed(1)} against ${cur.oppName} ${cur.opp.toFixed(1)}, implied two-party preferred`,
     "aria-label": "Month",
     tabIndex: 0
   }, /*#__PURE__*/React.createElement(DialTrack, {
@@ -20381,7 +20204,7 @@ function DialStory({
     className: "dl-foot"
   }, /*#__PURE__*/React.createElement("span", {
     className: "dl-legend"
-  }, "Bars are the primary vote, reordering as parties overtake one another. The right of the arc \u2013 and the line below \u2013 take the colour of Labor\u2019s strongest challenger that month; the line is Labor\u2019s two-party preferred against them, measured from 50."), /*#__PURE__*/React.createElement("button", {
+  }, "Bars are the primary vote, reordering as parties overtake one another. The right of the arc \u2013 and the line below \u2013 take the colour of Labor\u2019s strongest challenger that month; the line is Labor\u2019s implied two-party preferred against them, measured from 50, and the final month rests on the current live figure."), /*#__PURE__*/React.createElement("button", {
     className: "dl-replay",
     onClick: replay,
     disabled: playing
@@ -20476,24 +20299,27 @@ function GlyphDial({
   });
   const glyphTitle = "Primary vote aggregate · " + glyph.map(p => `${D.PARTIES[p.id].short} ${p.v.toFixed(1)}`).join(", ");
 
-  // pendulum = the head-to-head against Labor's STRONGEST challenger – the same
-  // pick the hero makes: whichever opponent polls the highest 2PP against Labor.
-  // The needle swings toward whoever leads THAT contest (Labor left, challenger right).
-  const g2 = D.agg2pp[D.agg2pp.length - 1];
-  const gon = D.alt2pp.alp_on[D.alt2pp.alp_on.length - 1];
-  const challengers = [{
+  // pendulum = the LIVE implied head-to-head against Labor's STRONGEST
+  // challenger – the same figures the hero headline and the story player's
+  // rest frame quote (tppLatest on the implied basis), and the same pick:
+  // whichever opponent holds the higher implied 2PP against Labor. The
+  // needle swings toward whoever leads THAT contest (Labor left, challenger
+  // right).
+  const challengers = [["L/NP", "var(--lnp)", "alp_lnp"], ["ON", "var(--onp)", "alp_on"]].map(([abbr, color, id]) => {
+    const v = tppLatest(id, "imp");
+    return v && v.b != null ? {
+      abbr,
+      color,
+      lab: v.a,
+      opp: v.b
+    } : null;
+  }).filter(Boolean);
+  const topOpp = challengers.slice().sort((x, y) => y.opp - x.opp)[0] || {
     abbr: "L/NP",
     color: "var(--lnp)",
-    lab: g2.alp,
-    opp: g2.lnp
-  }];
-  if (gon) challengers.push({
-    abbr: "ON",
-    color: "var(--onp)",
-    lab: gon.a,
-    opp: gon.b
-  });
-  const topOpp = challengers.slice().sort((x, y) => y.opp - x.opp)[0];
+    lab: 50,
+    opp: 50
+  };
   const pMargin = +(topOpp.lab - topOpp.opp).toFixed(1); // + → Labor leads
   const labLeads = pMargin >= 0;
   const pendColor = labLeads ? "var(--alp)" : topOpp.color;
@@ -20501,7 +20327,7 @@ function GlyphDial({
   // ±12 pts → full ±34° deflection. Labor (positive margin) swings LEFT,
   // the challenger swings RIGHT – matching the hero's Labor-left / opp-right order.
   const pendDeg = Math.max(-1, Math.min(1, pMargin / 12)) * 34;
-  const pendTitle = `2PP swing · ALP v ${topOpp.abbr} · ` + (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
+  const pendTitle = `Implied 2PP · ALP v ${topOpp.abbr} · ` + (labLeads ? "Labor" : topOpp.abbr) + ` +${Math.abs(pMargin).toFixed(1)}`;
 
   // settle the needle in from vertical on load (skip the swing for reduced motion)
   const [pendSettled, setPendSettled] = React.useState(REDUCED_MOTION);
