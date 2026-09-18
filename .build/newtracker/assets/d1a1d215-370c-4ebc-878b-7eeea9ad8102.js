@@ -4115,7 +4115,9 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const PCOLS = {
     alp: { label: "ALP", k: "p.alp", style: { color: "var(--alp-text)", fontWeight: 600 } },
     lnp: { label: "L/NP", k: "p.lnp", style: { color: "var(--lnp-text)", fontWeight: 600 } },
-    grn: { label: "GRN", k: "p.grn", style: { color: "var(--grn-text)" } },
+    // GRN is the primary facet's .hide-sm tier: it goes at ≤430px, and the
+    // row detail still carries the figure one tap away
+    grn: { label: "GRN", k: "p.grn", cls: " hide-sm", style: { color: "var(--grn-text)" } },
     onp: { label: "ON", k: "p.onp", style: { color: "var(--onp-text)" } },
     oth: { label: "OTH", cls: " muted hide-md" },   // the residual stays non-sortable
   };
@@ -4738,8 +4740,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
               {facet === "primary" && pOrder.map((id) => {
                 const c = PCOLS[id];
                 return c.k
-                  ? <ArchSortTh key={id} label={c.label} k={c.k} sort={sort} onSort={onSort} />
-                  : <th key={id} scope="col" className="hide-md">{c.label}</th>;
+                  ? <ArchSortTh key={id} label={c.label} k={c.k} sort={sort} onSort={onSort} className={c.cls ? c.cls.trim() : undefined} />
+                  : <th key={id} scope="col" className={(c.cls || " hide-md").trim()}>{c.label}</th>;
               })}
               {facet === "leadership" && (<>
                 <ArchSortTh label="Preferred PM" k="ppm.alb" sort={sort} onSort={onSort} className="ta-l two-pp-col hide-md" />

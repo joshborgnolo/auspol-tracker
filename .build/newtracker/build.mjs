@@ -482,11 +482,13 @@ function buildStaticSummary() {
 
       <h2>Latest polls</h2>
       <p class="ss-cap" id="ss-polls-cap">Most recent published national polls</p>
+      <div class="ss-tblwrap">
       <table class="ss-table" aria-labelledby="ss-polls-cap">
         <thead><tr><th scope="col">Pollster</th><th scope="col">Fieldwork</th><th scope="col">Sample</th><th scope="col">ALP 2PP</th><th scope="col">L/NP 2PP</th></tr></thead>
         <tbody>${rows}
         </tbody>
       </table>
+      </div>
 
       <h2>About this tracker</h2>
       <p>auspol tracker pools every published national voting-intention poll since the May 2025 federal

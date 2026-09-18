@@ -280,6 +280,12 @@ body {
 .ss-table thead th { font-size: 13px; color: var(--ink-3); }
 .ss-table th[scope="row"], .ss-table thead th:first-child { text-align: left; font-weight: 600; }
 .ss-table td:nth-child(2) { text-align: left; }
+/* the Latest-polls table's min-content (~383px) outgrows a phone viewport,
+   and the static summary stays in the DOM at full size under the app - so
+   the overflow was widening the DOCUMENT (iOS pans right to it). The table
+   gets a scroll box; the page keeps its width. No sticky thead here, so
+   overflow-x:auto is safe (unlike the live tables' .ap-wrap). */
+.ss-tblwrap { overflow-x: auto; }
 .ss-note { margin-top: 20px; font-size: 12.5px; color: var(--ink-3); }
 .ss-note a { color: var(--ink-2); }
 .ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
