@@ -1191,37 +1191,58 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
     : +(latest.a - m.data[m.data.length - 2].a).toFixed(1);
 
   /* The evidence strip is one clause and must read on ONE line: on a phone
-     the words shrink before they may wrap. Measure the strip's one-line
-     width at the 12px ceiling, and if the row cannot hold it publish the
-     largest half-pixel (>=8px) that fits as --hi-fs for the strip's font
-     rules; the dot separators consume the same var, so the whole line
-     scales as one. The width is only honest while nothing may fold, so
-     the measurement runs one frame under .hi-fitting, which pins the
-     wrappable clause to nowrap - a clause free to wrap reports its folded
-     width and the fitter would never see the overflow it exists to fix.
-     Reset to the ceiling every pass too: a row that widens again must be
-     allowed to grow back, and a stale shrunken value would measure
-     itself. No dependency list - the clause's words change with the
-     matchup in ways no list could name, so re-fit after every render; the
-     writes below are value-guarded, so a settled strip costs one
-     scrollWidth read and nothing more. Measured off the strip, observed
-     on its PARENT, same as the gauge: writing --hi-fs never moves the
-     strip's own box, so the observer cannot chase its own tail. */
+     the words shrink before they may wrap. The fitter walks the strip's
+     font size down from the 12px ceiling in half-pixel steps until the
+     line's true width fits its row (8px floor; the wrappable count clause
+     is the designed fallback under it), publishing the settled size as
+     --hi-fs for the strip's font rules - the dot separators consume the
+     same var, so the line scales as one. It ITERATES rather than
+     predicting from a single 12px measurement: measured width does not
+     scale perfectly with font size, so a one-shot prediction can land a
+     half-step wide and, with no further render or resize to re-enter fit,
+     stay there (seen live on the phone-width implied line, marooned a
+     half-step over its row). Each fit starts at the ceiling again: a row
+     that widens must be allowed to grow back, and a stale shrunken value
+     would measure itself. The width is only honest while nothing may fold,
+     so the pass runs under .hi-fitting, which pins the wrappable clause to
+     nowrap - a clause free to wrap reports its folded width and the fitter
+     would never see the overflow it exists to fix. No dependency list -
+     the clause's words change with the matchup in ways no list could name,
+     so re-fit after every render; a settled strip lands the loop's first
+     measurement and writes nothing. Measured off the strip, observed on
+     its PARENT: writing --hi-fs never moves the strip's own box, so the
+     observer cannot chase its own tail. */
   const hiRef = React.useRef(null);
   React.useLayoutEffect(() => {
     const el = hiRef.current;
     if (!el || !el.parentElement) return;
     const fit = () => {
-      if (el.style.getPropertyValue("--hi-fs") !== "12px")
-        el.style.setProperty("--hi-fs", "12px");
+      const setFs = (v) => {
+        const s = v + "px";
+        if (el.style.getPropertyValue("--hi-fs") !== s)
+          el.style.setProperty("--hi-fs", s);
+      };
       el.classList.add("hi-fitting");
-      const px = el.scrollWidth > el.clientWidth + 1
-        ? Math.max(8, Math.floor((12 * el.clientWidth / el.scrollWidth) * 2) / 2)
-        : 12;
+      let fs = 12;
+      setFs(fs);
+      for (let i = 0; i < 6; i++) {
+        /* True content width, fractionally: first child box's left edge to
+           the last child's right. scrollWidth CANNOT be trusted here - it
+           rounds to whole pixels, so a line a hair over its row reads as
+           exactly-fitting and flex wraps it anyway (the live marooned-wrap
+           case). */
+        const kids = el.children;
+        const contentW = kids.length
+          ? kids[kids.length - 1].getBoundingClientRect().right -
+            kids[0].getBoundingClientRect().left
+          : 0;
+        if (contentW <= el.clientWidth - 0.5) break;
+        const next = Math.max(8, Math.floor((fs * el.clientWidth / Math.max(contentW, 1)) * 2) / 2);
+        if (next >= fs) break;
+        fs = next;
+        setFs(fs);
+      }
       el.classList.remove("hi-fitting");
-      const val = px + "px";
-      if (el.style.getPropertyValue("--hi-fs") !== val)
-        el.style.setProperty("--hi-fs", val);
     };
     fit();
     const ro = new ResizeObserver(fit);
@@ -1375,19 +1396,14 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
             {/* The sentence continues in a parenthetical: how much evidence
                 the figure carries and what its interval is called. The count
                 and span draw on unc, which exists only when an interval does,
-                so the clause rides on the same condition. */}
+                so the clause rides on the same condition. The window is
+                TRAILING from the newest poll in it, so its end date is part
+                of the phrase, not a stale-data caveat: "in the 21 days to
+                14 Sep" says the window and the estimate's date in one. */}
             {unc && (
               <span className="hi-count">
-                ({unc.n} poll{unc.n === 1 ? "" : "s"} over{" "}
-                {D.latest.method.windowDays} days
-                {/* The estimate is only as fresh as the last fieldwork inside
-                    its window: once that date is a couple of days back the
-                    figure deserves its as-of next to it. Same-day cycles
-                    don't need the stamp – "Last poll … Today" already says
-                    it one strip up. */}
-                {freshness(D.latest.updatedISO).days >= 2 && (
-                  <span className="hi-asof"> as at {shortDate(D.latest.updatedISO)}</span>
-                )};{" "}
+                ({unc.n} poll{unc.n === 1 ? "" : "s"} in the{" "}
+                {D.latest.method.windowDays} days to {shortDate(D.latest.updatedISO)};{" "}
                 {/* One more route to the margin's definition: the glossary
                     files "95% interval" as a synonym waypoint of margin of
                     error, so a click lands on the same page the ± figure and

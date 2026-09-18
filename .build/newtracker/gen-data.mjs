@@ -649,9 +649,11 @@ const alt2pp = { alp_on: altAON.monthly, lnp_on: altLON.monthly };
            all `nowcastAdj` needs to see the window that closed on it
      m   – the ALP-v-ON line was measured against its MONTHLY mean (the
            series is too thin to nowcast), so w speaks about that month
-   Series: `lnp` for a poll with a published classic pair; `imp` instead for
-   a poll with no pair at all – its primaries still pull the implied 2PP; and
-   `onp` additionally wherever the wave printed an ALP-v-ON head-to-head.
+   Series: `lnp` for a poll with a published classic pair; `imp` for every
+   implied-eligible poll – a paired wave's primaries still pull the implied
+   aggregate, which is the headline's default basis and is now reported
+   beside the published-pair move; and `onp` additionally wherever the wave
+   printed an ALP-v-ON head-to-head.
    Keys are absent (not null) wherever the poll has no row in that series. An
    empty 21-day window for the classic/implied nowcast emits nothing rather
    than mixing bases against the monthly-fallback the headline would show. */
@@ -688,7 +690,11 @@ const effByKey = (() => {
         eff.lnp = { lo: r1(lo), hi: r1(cur2pp.v), w: inWin(tppRows, key) ? 1 : 0 };
         if (!eff.lnp.w) { const t = thenPair(tppRows, houseEffect, key, p.date); if (t) eff.lnp.t = t; }
       }
-    } else if (p.tpp_alp == null && synthKeys.has(key) && curSynth) {
+    }
+    /* not an `else`: a paired wave's primaries sit in the implied series too,
+       so it moves BOTH aggregates and the row reports each move on its own
+       basis (implied is the headline default) */
+    if (synthKeys.has(key) && curSynth) {
       const lo = loo(tppRowsSynth, synthEffect, key);
       if (lo != null) {
         eff.imp = { lo: r1(lo), hi: r1(curSynth.v), w: inWin(tppRowsSynth, key) ? 1 : 0 };
@@ -1102,6 +1108,11 @@ const CHG_MEASURES = {
   // 2025-election preference flows. Only those two houses carry it, so the
   // series is each house's own and the delta keys to its previous wave
   flows:     (p, a, pm) => p.tpp_flows ?? null,
+  // every implied-eligible wave's own implied figure – its primaries read
+  // through the fixed 2025 flow table (the same number the detail shows as
+  // alpImp). The series the implied-basis "Since last wave" moves key to,
+  // whether or not the poll printed a pair of its own
+  imp:       (p, a, pm) => (impOk(p) ? r1(impliedAlp2pp(p)) : null),
   albNet:    (p, a, pm) => (a ? a.alb ?? null : null),
   taylorNet: (p, a, pm) => (a ? a.opp ?? null : null),
   hansonNet: (p, a, pm) => (a ? a.han ?? null : null),
@@ -1296,6 +1307,9 @@ const pollsterTable = [...perHouse.values()].map((p) => {
     ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),
     ...(undecidedOf(p) ? { undecided: undecidedOf(p).v, undecidedBasis: undecidedOf(p).basis } : {}),
     ...(p.tpp_flows != null ? { tppFlows: p.tpp_flows } : {}),
+    // this poll's own primaries implied at the fixed 2025 flows (same rule
+    // as the archive emitter above) – the implied line's default basis
+    ...(impOk(p) ? { alpImp: r1(impliedAlp2pp(p)), alpOnImp: r1(impliedOn(p)) } : {}),
     // this poll's pull on the standing aggregates (leave-one-out, §3b) –
     // absent where the wave sits in none of the three series
     ...(effByKey.has(p.date + "|" + p.pollster) ? { eff: effByKey.get(p.date + "|" + p.pollster) } : {}),

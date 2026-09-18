@@ -1495,24 +1495,29 @@ function tppHeading(cs) {
   return "After preferences";
 }
 /* The detail section's line list: the contests tppContests builds, with the
-   2025-flows pair spliced in as a full contest straight after the canonical
+   implied pair spliced in as a full contest straight after the canonical
    ALP v L/NP pair it re-anchors, plus each line's trailing basis note. The
-   flows pair carries its OWN change vs the pollster's last such figure ("flows"
-   in chg), L/NP moving opposite, exactly as the canonical pair uses "alp2pp". */
+   implied figure is this poll's own primaries at the fixed 2025 flows – the
+   page's default basis, so it shows for every implied-eligible wave, not
+   only the Morgan/RedBridge pair that prints one in the release. It carries
+   its OWN change vs the pollster's last implied figure ("imp" in chg –
+   "flows" only when that is missing), L/NP moving opposite, exactly as the
+   canonical pair uses "alp2pp". */
 function tppLines(cs, r) {
   const out = [];
-  const dFlows = segDelta(r.chg, "flows");
+  const impliedV = r.alpImp != null ? r.alpImp : r.tppFlows;
+  const dImp = segDelta(r.chg, "imp") || segDelta(r.chg, "flows");
   /* Essential's undecided never left the published pair, so the pair's own
      line names the share and its move; the first-preferences tail reports
      only shares that were set aside before the shares were reported. */
   const dUnd = r.undecidedBasis === "tpp" && r.undecided != null ? segDelta(r.chg, "und") : null;
   for (const c of cs) {
-    const canonical = c.kind === "2pp" && r.tppFlows != null;
-    /* No "respondent-allocated" caption any more. The flows pair now reads as
-       an alternative to the line above it ("or … under 2025-election
-       preference flows"), which says what the first pair is BY CONTRAST -
-       naming it as well repeated the same distinction twice, once under each
-       half, and cost a caption line to do it. */
+    const canonical = c.kind === "2pp" && impliedV != null;
+    /* No "respondent-allocated" caption any more. The implied pair now reads
+       as an alternative to the line above it ("or … implied, under
+       2025-election preference flows"), which says what the first pair is
+       BY CONTRAST - naming it as well repeated the same distinction twice,
+       once under each half, and cost a caption line to do it. */
     let note = null;
     if (c.kind === "2pp" && r.undecidedBasis === "tpp" && r.undecided != null) {
       note = (
@@ -1525,16 +1530,19 @@ function tppLines(cs, r) {
     }
     out.push({ c, note });
     if (canonical) out.push({ alt: true, note: (
-      <>under 2025-election{" "}
+      <><button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm &&
+                  window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
+        {" "}from these primaries under 2025-election{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm &&
                   window.AP.openTerm("preference-flows", "poll breakdown")}>preference flows</button></>
     ), c: {
       kind: "flows", lab: "2PP · ALP v L/NP", flag: null,
       segs: [
-        { label: "ALP", value: r.tppFlows, color: PARTY_C.alp, delta: dFlows },
-        { label: "L/NP", value: Math.round((100 - r.tppFlows) * 10) / 10, color: PARTY_C.lnp,
-                          delta: dFlows ? { v: +(-dFlows.v).toFixed(1), refDate: dFlows.refDate } : null },
+        { label: "ALP", value: impliedV, color: PARTY_C.alp, delta: dImp },
+        { label: "L/NP", value: Math.round((100 - impliedV) * 10) / 10, color: PARTY_C.lnp,
+                          delta: dImp ? { v: +(-dImp.v).toFixed(1), refDate: dImp.refDate } : null },
       ],
     } });
   }
@@ -1945,18 +1953,19 @@ function TppLine({ c, prefixed, note, hero, alt }) {
   );
 }
 
-/* The poll's own pull on the figure a reader watches, as one ordinary row
-   of the provenance band: "2PP agg. effect   +0.1 for ALP vs L/NP;
-   −0.4 for ALP vs ON" - the party named the way every figure in the panel
-   names it, not as "Labor" beside a column of ALP/L/NP/GRN/ON. One clause
-   per aggregate the wave feeds: the
-   classic 2PP; the flow-table implied 2PP for a poll that published no
-   pair (its primaries still move THAT estimate); and Labor's head-to-head
-   against One Nation where the wave asked it. lo/hi are gen-data's leave-
-   one-out run (the `eff` payload): lo is the aggregate WITHOUT the wave,
-   hi the standing aggregate with it; a wave outside the current window
-   can't move those figures at all, so the row just says so instead of
-   printing null moves. */
+/* The poll's own pull on the figures a reader watches, as one ordinary row
+   of the provenance band: "2PP agg. effect   +0.2 for ALP vs L/NP (implied
+   2PP); +0.1 (respondent-allocated); −0.4 for ALP vs ON" - the party named
+   the way every figure in the panel names it, not as "Labor" beside a
+   column of ALP/L/NP/GRN/ON. One clause per aggregate the wave feeds: the
+   implied 2PP wherever the wave's primaries support it – a paired wave's
+   primaries still move the implied estimate, the headline's default basis –
+   the respondent-allocated pair it sits beside when the wave printed one,
+   and Labor's head-to-head against One Nation where the wave asked it.
+   lo/hi are gen-data's leave-one-out run (the `eff` payload): lo is the
+   aggregate WITHOUT the wave, hi the standing aggregate with it; a wave
+   outside the current window can't move those figures at all, so the row
+   just says so instead of printing null moves. */
 function EffLines({ eff }) {
   if (!eff || (!eff.lnp && !eff.imp && !eff.onp)) return null;
   /* signed like Poll lean and House effect in the rows above (% dropped –
@@ -1965,17 +1974,23 @@ function EffLines({ eff }) {
     const d = Math.round((e.hi - e.lo) * 10) / 10;
     return d === 0 ? "±0.0" : (d > 0 ? "+" : "−") + Math.abs(d).toFixed(1);
   };
-  /* the implied 2PP only ever STANDS IN for the pair – gen-data emits it
-     solely for a poll with none – so the word carries its glossary meaning */
+  /* the implied word carries its glossary meaning wherever it prints */
   const implied = (
     <button type="button" className="hi-term"
             onClick={() => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
   );
+  /* the 2PP clauses in site order: implied (the default basis) before the
+     published pair, which only needs its "respondent-allocated" tag while
+     it sits beside an implied clause – unambiguous on its own */
+  const tppClauses = [
+    eff.imp && { e: eff.imp, tag: <span className="pd-s-note"> ({implied})</span> },
+    eff.lnp && { e: eff.lnp, tag: eff.imp ? <span className="pd-s-note"> (respondent-allocated)</span> : null },
+  ].filter(Boolean);
   /* when every clause is out of window, the whole row is just the note –
      its in-window wording, without the brackets and without the ±0.0s. A
      mixed row keeps the note parenthesised on the out-of-window clause */
-  const prim = eff.lnp || eff.imp;
-  const shareOut = prim && !prim.w && (!eff.onp || !eff.onp.w);
+  const prim = tppClauses.length ? tppClauses[0].e : null;
+  const shareOut = prim && tppClauses.every((c) => !c.e.w) && (!eff.onp || !eff.onp.w);
   /* A wave that has fallen out of the window still DID something on the day
      it landed, and "None." threw that away. gen-data re-runs the same
      leave-one-out at the poll's own publication day and files it as `t`, so
@@ -1991,12 +2006,21 @@ function EffLines({ eff }) {
      parenthesised after the clause it qualifies, where a full stop would
      read as the end of the sentence it sits inside. */
   const winSpan = (m) => `the aggregate\u2019s ${m ? "month" : "21-day window"}`;
-  const clause = (e, who, imp) => (
+  const clause = (e, who, tag) => (
     <React.Fragment>
-      {signed(e)} for ALP vs {who}{imp && <React.Fragment> ({implied})</React.Fragment>}
+      {signed(e)} for ALP vs {who}{tag}
       {!e.w && <span className="pd-s-note"> (outside {winSpan(e.m)})</span>}
     </React.Fragment>
   );
+  /* the w/t fan-out held in ONE list so the two tenses below can't serve
+     different clause sets; `t` is per-clause because the implied and
+     classic runs answer each wave's own-day pull independently */
+  const tppList = (then) => tppClauses.map((c, i) => (
+    <React.Fragment key={i}>
+      {i > 0 && <React.Fragment>; </React.Fragment>}
+      {clause(then && c.e.t ? asThen(c.e) : c.e, "L/NP", c.tag)}
+    </React.Fragment>
+  ));
   return (
     <span className="pd-meta-i">
       <button type="button" className="pd-meta-k hi-term"
@@ -2004,7 +2028,7 @@ function EffLines({ eff }) {
       <span className="pd-meta-v">
         {shareOut ? (prim.t ? (
           <React.Fragment>
-            {eff.lnp ? clause(asThen(eff.lnp), "L/NP") : clause(asThen(eff.imp), "L/NP", true)}
+            {tppList(true)}
             {eff.onp && eff.onp.t && <React.Fragment>; {clause(asThen(eff.onp), "ON")}</React.Fragment>}
             <span className="pd-s-note">, when inside {winSpan(prim.m)}</span>
           </React.Fragment>
@@ -2012,7 +2036,7 @@ function EffLines({ eff }) {
           <span className="pd-s-note">None. Outside {winSpan(prim.m)}</span>
         )) : (
           <React.Fragment>
-            {eff.lnp ? clause(eff.lnp, "L/NP") : clause(eff.imp, "L/NP", true)}
+            {tppList(false)}
             {eff.onp && <React.Fragment>; {clause(eff.onp, "ON")}</React.Fragment>}
           </React.Fragment>
         )}
