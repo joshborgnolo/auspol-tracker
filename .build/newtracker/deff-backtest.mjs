@@ -27,8 +27,9 @@
       truth, few observations — a corroborator, not a discriminator.
 
    Estimator functions below are VERBATIM copies of gen-data.mjs's
-   houseEffectsFor / nowcastAdj / weightedWithSe and its rowN/constant set
-   (HE_WINDOW, SHRINK_K, SAMPLE_CAP, HL_DEFF, HE_HALF, HL_WINDOW, HL_HALF).
+   houseEffectsFor / nowcastPts / weightedWithSe and its rowN/constant set
+   (HE_WINDOW, SHRINK_K, SAMPLE_CAP, HL_DEFF, HE_HALF, HL_WINDOW, HL_HALF,
+   HL_TAPER).
    If gen-data's estimator changes, re-copy — otherwise the arms race is
    measuring a different estimator than the one that ships. tests.yml runs
    this file after every estimator-touching push; when the copies drift the
@@ -57,7 +58,13 @@ const ACC_CANON = {
 const HE_WINDOW = 28, SHRINK_K = 8, SAMPLE_CAP = 3000, LN2 = Math.log(2);
 const HL_DEFF = 1.6;
 const HE_HALF = 90;
-const HL_WINDOW = 21, HL_HALF = 7;
+const HL_WINDOW = 21, HL_HALF = 7, HL_TAPER = 14;
+/* Production tapers the recency weight from HL_TAPER days down to zero at
+   HL_WINDOW (half-cosine), so a poll sliding off the 21st day fades out of
+   the window instead of stepping. Verbatim copy of gen-data.mjs's taperW /
+   recencyW pair. */
+const taperW = (d) => (d <= HL_TAPER ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - HL_TAPER) / (HL_WINDOW - HL_TAPER))));
+const recencyW = (d) => Math.exp(-LN2 * d / HL_HALF) * taperW(d);
 
 const ymOf = (d) => d.slice(0, 7);
 const ddays = (a, b) => (a - b) / 86400000;
@@ -127,16 +134,20 @@ function weightedWithSe(pts) {
   const se = Math.max(Number.isFinite(seSpread) ? seSpread : 0, seFloor);
   return { v: meanV, n: pts.length, se, nEff };
 }
-function nowcastAdj(rows, he, ref) {
+function nowcastPts(rows, he, ref) {
   const pts = [];
   const waves = new Map();
   for (const a of rows) {
     const d = ddays(ref, a.mid);
     if (d < 0 || d > HL_WINDOW) continue;
     waves.set(a.firm, (waves.get(a.firm) || 0) + 1);
-    pts.push({ w: a.n * Math.exp(-LN2 * d / HL_HALF), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm });
+    pts.push({ w: a.n * recencyW(d), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
   }
   for (const p of pts) p.w /= Math.sqrt(waves.get(p.firm));
+  return pts;
+}
+function nowcastAdj(rows, he, ref) {
+  const pts = nowcastPts(rows, he, ref);
   const r = weightedWithSe(pts);
   return r && { v: r.v, n: r.n, se: r.se, nEff: r.nEff, pts };
 }
