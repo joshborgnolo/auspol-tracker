@@ -895,8 +895,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   /* The ALP–ON contest gets the same swap from its own payload: synthOn's
      monthly points are ALREADY {ym,x,a,b,ci95,k} (no remap needed), and its
      per-wave implied dot is alpOnImp. ci95 there is the frozen flow table's
-     RANGE, not a sampling interval. */
-  const impOnData = impOnBasis
+     RANGE, not a sampling interval. Gated like impData, NOT on impOnBasis:
+     matchup has already flipped when a morph AWAY from this contest renders,
+     so a matchup-gated impOnData would vanish mid-morph - ptsOf/domainOf see
+     the published series from frame zero and the y-window never travels. */
+  const impOnData = impOnOffered && basis === "imp"
     ? D.synthOn.map((d) => ({ ym: d.ym, x: d.x, a: d.a, b: d.b, ci95: d.ci95, k: d.k }))
     : null;
   const impOnScatter = (p) => (p.alpOnImp == null ? null : [
