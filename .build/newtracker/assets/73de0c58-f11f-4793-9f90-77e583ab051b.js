@@ -1260,6 +1260,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
               Using <span className="hb-what">{(basis || "imp") === "imp" ? "implied preference flows" : "respondent-allocated preferences only"}</span>
               {(basis || "imp") === "imp" ? " (default)" : ""}
             </button>
+            {/* The "?" after the sentence is the way OUT to the whole story:
+                a plain link to the /preference-flows/ explainer page, so the
+                toggle keeps its one sentence and the deeper case keeps its
+                own address (and tab). */}
+            <a className="hb-q" href="/preference-flows/"
+               aria-label="How the two bases work – read the full explainer"
+               title="How the two bases work – the full explainer">?</a>
           </div>
         )}
           {/* NOT keyed on the matchup any more: a remount would replace these

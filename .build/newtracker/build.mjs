@@ -739,7 +739,7 @@ writeAtomic(path.join(ROOT, "feed.xml"), feed);
    changed, so anyone touching them bumps ARCHIVE_STAMP. /newspoll-archive/
    itself is only a redirect stub to /archives/newspoll/ and stays OUT of the
    sitemap (canonical entry points belong to the real pages). */
-const ARCHIVE_STAMP = "2026-09-05";
+const ARCHIVE_STAMP = "2026-09-18";
 /* prediction/ is not hand-maintained: it regenerates daily via
    .build/refresh-prediction.mjs, which bumps this stamp itself. Dating those
    runs with ARCHIVE_STAMP would falsely datestamp the hand-maintained pages. */
@@ -776,6 +776,10 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
   </url>
   <url>
     <loc>${SITE_URL}feedback/</loc>
+    <lastmod>${ARCHIVE_STAMP}</lastmod>
+  </url>
+  <url>
+    <loc>${SITE_URL}preference-flows/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
   <url>

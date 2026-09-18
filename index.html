@@ -1235,6 +1235,16 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   border-bottom: 1.5px solid var(--ink-faint); padding-bottom: 1px;
   transition: color .15s ease, border-color .15s ease; }
 .hb-toggle:hover .hb-what { color: var(--ink); border-bottom-color: var(--ink); }
+/* the "?" trailing the basis sentence: a circled question mark linking the
+   /preference-flows/ explainer page. Wayfinding, not part of the toggle's
+   sentence – plain face, quiet ring, the author's own colour rule. */
+.hb-q { margin-left: 8px; align-self: center;
+  width: 17px; height: 17px; border-radius: 999px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; line-height: 1; text-decoration: none;
+  color: var(--ink-3); border: 1px solid var(--ink-faint);
+  transition: color .15s ease, border-color .15s ease; }
+.hb-q:hover, .hb-q:focus-visible { color: var(--ink); border-color: var(--ink-3); }
 /* ---- the hero's interval gauge -----------------------------------------
    The channel is chrome and obeys the page's top-left light: shadow cast in
    under the upper wall, a lit lip on the sill below. The span inside it is a
@@ -21751,7 +21761,12 @@ function Hero({
     onClick: () => setBasis((basis || "imp") === "imp" ? "resp" : "imp")
   }, "Using ", /*#__PURE__*/React.createElement("span", {
     className: "hb-what"
-  }, (basis || "imp") === "imp" ? "implied preference flows" : "respondent-allocated preferences only"), (basis || "imp") === "imp" ? " (default)" : "")), /*#__PURE__*/React.createElement("div", {
+  }, (basis || "imp") === "imp" ? "implied preference flows" : "respondent-allocated preferences only"), (basis || "imp") === "imp" ? " (default)" : ""), /*#__PURE__*/React.createElement("a", {
+    className: "hb-q",
+    href: "/preference-flows/",
+    "aria-label": "How the two bases work \u2013 read the full explainer",
+    title: "How the two bases work \u2013 the full explainer"
+  }, "?")), /*#__PURE__*/React.createElement("div", {
     className: "hero-readout"
   }, /*#__PURE__*/React.createElement("div", {
     className: "ro-party alp-side"
