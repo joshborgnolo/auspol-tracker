@@ -2775,9 +2775,11 @@ function ArchTpp({ p, basis }) {
 // matchup leads. segs hold the matchup's shares in a FIXED party order for
 // the split bar – deliberately not sorted by leader, so a row-to-row scan
 // never has the colours swapping places.
-// Basis follows the table itself: the two implied matchups read the implied
-// series (alpImp / alpOnImp), and only the matchup with no implied series
-// (L/NP v ON, 3-cornered) shows the pollster's own published figures.
+// Basis follows the table itself: on the implied basis the implied-priced
+// matchups read the implied series (alpImp / alpOnImp); on the published
+// basis they read the pollsters' own figures, and the matchups the site
+// prices no implied series for (L/NP v ON, 3-cornered) show published
+// figures either way.
 function archLeadInfo(p, measure, basis) {
   const pub = basis === "resp";
   if (measure === "onp") {
@@ -3517,6 +3519,30 @@ function HouseLeanPanel({ rangeId }) {
    it stays on the surface beside the button; the eight houses agreeing with
    the pooled read to within its own error were never news, and are one click
    away. */
+/* One fitted cell, and the thing the table could never say: how much of it
+   is the house's own waves and how much is the election row fed back. Every
+   cell is shrunk toward that row, so a cell whose posterior barely moved off
+   the prior is not a measurement of the house — it is the prior, wearing the
+   house's name. The ridge gives it away for free: prior share = (se/τ)².
+
+   At or past a half the number goes quiet and says so on hover. It is not
+   hidden, because it is not WRONG — it is the best estimate available and it
+   happens to be the election's. It is dimmed because a reader comparing
+   Newspoll's Greens against the AEC's has to know they are reading one
+   number twice. */
+const FLOW_PRIOR_DIM = 0.5;
+function FlowCell({ v, se, prior }) {
+  const thin = prior != null && prior >= FLOW_PRIOR_DIM;
+  return (
+    <td className={thin ? "flow-tab-thin" : undefined}
+        title={prior == null ? undefined
+               : thin ? `Mostly the election row, not a reading of this house: ${Math.round(prior * 100)}% of this cell is the prior it was shrunk toward. Its own waves move this bucket too little to say more.`
+                      : `${Math.round((1 - prior) * 100)}% of this cell comes from this house's own waves, the rest from the election row it is shrunk toward.`}>
+      {v.toFixed(1)}%<span className="flow-tab-se"> ±{se.toFixed(1)}</span>
+    </td>
+  );
+}
+
 function FlowLegend({ pooledId, pooled, houseRows, hidden, setHidden, sgn, kind }) {
   const [pop, setPop] = useState(null);
   const total = houseRows.length;
@@ -3720,9 +3746,9 @@ function FlowDriftPanel({ rangeId }) {
               {fd.flows.map((f) => (
                 <tr key={f.firm}>
                   <th scope="row" className="flow-tab-house">{f.firm}</th>
-                  <td>{f.g.toFixed(1)}%<span className="flow-tab-se"> ±{f.ge.toFixed(1)}</span></td>
-                  <td>{f.o.toFixed(1)}%<span className="flow-tab-se"> ±{f.oe.toFixed(1)}</span></td>
-                  <td>{f.t.toFixed(1)}%<span className="flow-tab-se"> ±{f.te.toFixed(1)}</span></td>
+                  <FlowCell v={f.g} se={f.ge} prior={f.gp} />
+                  <FlowCell v={f.o} se={f.oe} prior={f.op} />
+                  <FlowCell v={f.t} se={f.te} prior={f.tp} />
                   <td>{f.n}{f.m ? <span className="flow-tab-se"> published</span> : null}</td>
                 </tr>
               ))}
@@ -3735,7 +3761,12 @@ function FlowDriftPanel({ rangeId }) {
             independents and minor parties together, as the constants in
             {" "}{fd.meta.table} do). Every fitted cell is shrunk toward the election row and
             departs only as far as the house's own waves demonstrate – each poll counts once,
-            and the ± figure is one standard error from the same fit. Roy Morgan's and
+            and the ± figure is one standard error from the same fit. <span className="flow-tab-thin">A
+            greyed cell</span> is one the fit could not move: half or more of it is the election
+            row it was shrunk toward, because that house's own series for that bucket barely
+            travels. Greens first preferences have moved about a point since the election and
+            One Nation's twenty-two, which is why the Greens column greys and the One Nation
+            column does not. Roy Morgan's and
             RedBridge/Accent's two-party figures are respondent-allocated, so a fitted constant
             only tracks their moving allocation at best; RedBridge also prints its allocation
             beside each wave, so its row is no fit at all – it averages the house's own
@@ -3879,9 +3910,9 @@ function FlowDriftOnPanel({ rangeId }) {
               {fd.flows.map((f) => (
                 <tr key={f.firm}>
                   <th scope="row" className="flow-tab-house">{f.firm}</th>
-                  <td>{f.l.toFixed(1)}%<span className="flow-tab-se"> ±{f.le.toFixed(1)}</span></td>
-                  <td>{f.g.toFixed(1)}%<span className="flow-tab-se"> ±{f.ge.toFixed(1)}</span></td>
-                  <td>{f.t.toFixed(1)}%<span className="flow-tab-se"> ±{f.te.toFixed(1)}</span></td>
+                  <FlowCell v={f.l} se={f.le} prior={f.lp} />
+                  <FlowCell v={f.g} se={f.ge} prior={f.gp} />
+                  <FlowCell v={f.t} se={f.te} prior={f.tp} />
                   <td>{f.n}{f.m ? <span className="flow-tab-se"> published</span> : null}</td>
                 </tr>
               ))}
@@ -3922,9 +3953,10 @@ function FlowDriftOnPanel({ rangeId }) {
   );
 }
 
-function AllPollsView({ focus, onBack, backLabel }) {
+function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const { D } = window.AP;
   const { ShareBar, NetVal, tppContests, tppFlag, ppmContests, ppmContestSegs, ppmFlag } = window;
+  const pubBasis = tppBasis === "resp";
   /* "YouGov (MRP)" is YouGov: a parenthetical method tag names a product,
      never another pollster, and both the filter panel and the pollster
      count speak in houses. The table rows themselves keep the full name, so
@@ -3938,10 +3970,12 @@ function AllPollsView({ focus, onBack, backLabel }) {
      poll in the archive, so it has nothing to scope and gets no pill. It sits
      ABOVE the state declarations because the URL restore consults it. */
   const FACET_SCOPE = {
-    /* implied is this facet's basis now: a wave whose primaries price an
-       implied 2PP fills every column the facet shows, so the scope keys on
-       THAT, not on the published pair most houses no longer print */
-    twopp: { has: (p) => p.alpImp != null || p.tppAlt || p.tppAlt2 || p.tpp3, label: "With a 2PP" },
+    /* the scope keys on whichever basis the table's 2PP column shows: on the
+       implied basis a wave whose primaries price an implied 2PP fills every
+       column, so THAT is the test; the published basis keys on the pair the
+       house printed. A published alternate matchup (3-cornered or
+       head-to-head) satisfies the scope either way */
+    twopp: { has: (p) => (pubBasis ? p.alp != null : p.alpImp != null) || p.tppAlt || p.tppAlt2 || p.tpp3, label: "With a 2PP" },
     primary: null,
     leadership: { has: (p) => window.ppmContests(p).length > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null)), label: "With leadership numbers" },
     direction: { has: (p) => !!p.dir, label: "With a direction reading" },
@@ -4072,29 +4106,35 @@ function AllPollsView({ focus, onBack, backLabel }) {
   const onSort = (key) => setSort((s) => (s.key === key ? { key, dir: -s.dir } : { key, dir: -1 }));
   const toggleHouse = (h) => setSel((s) => { const n = new Set(s); n.has(h) ? n.delete(h) : n.add(h); return n; });
 
-  /* the implied monthly series is what Poll lean is held against – the same
-     implied basis the Lead column and the headline aggregate read, so the
-     row never mixes bases. Last write for a ym wins, so the month's own
-     estimate overwrites its unshifted election-anchor row, as with the
-     published map this replaces. */
+  /* Poll lean is held against the monthly aggregate ON THE TABLE'S BASIS –
+     the implied basis the headline aggregate reads, or the published one
+     when the table flips; the row never mixes bases. Last write for a ym
+     wins, so the month's own estimate overwrites its unshifted
+     election-anchor row. */
   const synthByYm = {};
   (D.synth2pp || []).forEach((d) => { synthByYm[d.ym] = d.alp; });
+  const aggByYm = {};
+  (D.agg2pp || []).forEach((d) => { aggByYm[d.ym] = d.alp; });
 
   const rows = D.individualPolls.map((p) => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
     const tags = pollTagIds(p);
-    /* poll lean on the implied basis: the wave's own implied 2PP minus the
-       month's implied aggregate. A wave the flow table can't read (no full
-       comparable primary set) has no lean at all. */
-    const lean = p.alpImp != null && synthByYm[p.ym] != null ? +(p.alpImp - synthByYm[p.ym]).toFixed(1) : null;
+    /* poll lean follows the basis: the implied 2PP minus the month's implied
+       aggregate, or the NORMALISED published share (alpN) minus the month's
+       published aggregate – normalised so undecided-inclusive pairs compare
+       fairly with the aggregate. A wave with no figure on that basis has no
+       lean at all. */
+    const lean = pubBasis
+      ? (p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null)
+      : (p.alpImp != null && synthByYm[p.ym] != null ? +(p.alpImp - synthByYm[p.ym]).toFixed(1) : null);
     /* house effect is the emitted all-history snapshot per pollster ON THE
-       IMPLIED SERIES (gen-data runs the same estimator over tppRowsSynth as
-       houseEffects.synth – a house's primaries bias is a different thing
-       from its published-2PP lean and the two are never borrowed across), so
-       the same label value rides on every row that pollster owns; null when
-       unmeasured */
-    const hfx = (((D.houseEffects || {}).synth || {})[p.pollster]) || null;
+       TABLE'S BASIS (gen-data runs the same estimator over tppRowsSynth as
+       houseEffects.synth and over the published series as houseEffects.tpp –
+       a house's implied bias is a different thing from its published-2PP
+       lean and the two are never borrowed across), so the same value rides
+       on every row that pollster owns; null when unmeasured */
+    const hfx = (((D.houseEffects || {})[pubBasis ? "tpp" : "synth"] || {})[p.pollster]) || null;
     // searchable haystack – everything a row knows, so the search box matches
     // fieldwork dates, samples, 2PP / primary / matchup figures, nets, flags
     const f1 = (v) => (v != null ? v.toFixed(1) : null);
@@ -4150,7 +4190,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
     ["who", (p) => !sel.size || sel.has(baseHouse(p.pollster))],
     // a row must contain EVERY selected data type (AND)
     ["has", (p) => !tagSel.size || [...tagSel].every((tg) => p.tags.includes(tg))],
-    ["lead", (p) => { if (lead === "all") return true; const li = archLeadInfo(p, measure); return !!li && li.who === lead; }],
+    ["lead", (p) => { if (lead === "all") return true; const li = archLeadInfo(p, measure, tppBasis); return !!li && li.who === lead; }],
     ["when", (p) => range === "all" || p.x >= x0],
     ["q", (p) => !ql || ql.split(/\s+/).every((t) => p.hay.includes(t))],
     ["scope", (p) => !scoping || scoping.has(p)],
@@ -4183,7 +4223,7 @@ function AllPollsView({ focus, onBack, backLabel }) {
       case "pollster": return p.pollster;
       case "sample": return p.sample ?? -Infinity;
       case "alp": {
-        const li = archLeadInfo(p, measure);
+        const li = archLeadInfo(p, measure, tppBasis);
         return li ? li.m : -Infinity;
       }
       case "lean": return p.lean ?? -Infinity;
@@ -4516,8 +4556,18 @@ function AllPollsView({ focus, onBack, backLabel }) {
                   title="Effective sample, where the pollster filed one with the Australian Polling Council">n<sub>eff</sub></th>
 
               {facet === "twopp" && (<>
-                <th scope="col" className="ta-l apub-col hide-md"
-                    title="This poll's primaries read at the 2025 election's preference flows – one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown">Implied 2PP</th>
+                {/* the 2PP column head is the basis switch – names the ACTIVE
+                    basis like the hero's toggle, flips the whole page to the
+                    other one (same App state the hero toggle drives) */}
+                <th scope="col" className="ta-l apub-col hide-md">
+                  <button type="button" className="th-basis" onClick={() => setTppBasis(tppBasis === "imp" ? "resp" : "imp")}
+                          title={pubBasis
+                            ? "Each poll's headline figures exactly as the pollster released them – click to switch to implied 2PP at the 2025 election's preference flows"
+                            : "Each poll's primaries read at the 2025 election's preference flows – one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown. Click to switch to the published figures"}>
+                    {pubBasis ? "As published" : <>Implied 2PP{" "}<span className="th-basis-def">(default)</span></>}
+                    <span className="th-basis-swap" aria-hidden="true">⇄</span>
+                  </button>
+                </th>
                 <ArchSortTh label={({ lnp: "Lead · ALP v L/NP", onp: "Lead · ALP v ON", lnponp: "Lead · L/NP v ON", "3cp": "Lead · 3-cornered" })[measure]} short="Lead" k="alp" sort={sort} onSort={onSort} />
                 {/* hide-sm: the last column to go on a phone – see the .hide-sm
                     note in the stylesheet. The row detail carries "Poll lean". */}
@@ -4595,21 +4645,23 @@ function AllPollsView({ focus, onBack, backLabel }) {
                   </td>
 
                   {facet === "twopp" && (<>
-                  <td className="ta-l apub-col hide-md"><ArchImplied p={p} /></td>
-                  <td className="num"><ArchLead p={p} measure={measure} /></td>
+                  <td className="ta-l apub-col hide-md"><ArchTpp p={p} basis={tppBasis} /></td>
+                  <td className="num"><ArchLead p={p} measure={measure} basis={tppBasis} /></td>
                   <td className="num hide-sm">
                     {p.lean == null
-                      ? <span className="dash" title="No implied 2PP this wave, so no lean against the implied aggregate">—</span>
+                      ? <span className="dash" title={pubBasis ? "No published 2PP to compare with the aggregate" : "No implied 2PP this wave, so no lean against the implied aggregate"}>—</span>
                       : <span className={"arch-lean " + (p.lean > 0.05 ? "alp" : p.lean < -0.05 ? "lnp" : "flat")}
-                              title="Implied 2PP minus the implied aggregate that month">
+                              title={pubBasis ? "Published 2PP minus the aggregate that month" : "Implied 2PP minus the implied aggregate that month"}>
                           {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)}
                         </span>}
                   </td>
                   <td className="num hide-sm">
                     {p.hfx == null
-                      ? <span className="dash" title="Too few implied-basis polls to measure a house effect">—</span>
+                      ? <span className="dash" title={pubBasis ? "Too few published-basis polls to measure a house effect" : "Too few implied-basis polls to measure a house effect"}>—</span>
                       : <span className={"arch-lean " + (p.hfx.v > 0.05 ? "alp" : p.hfx.v < -0.05 ? "lnp" : "flat")}
-                              title={`House effect: this pollster's implied 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus on the implied basis (n=${p.hfx.n})`}>
+                              title={pubBasis
+                                ? `House effect: this pollster's 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus (n=${p.hfx.n})`
+                                : `House effect: this pollster's implied 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus on the implied basis (n=${p.hfx.n})`}>
                           {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)}
                         </span>}
                   </td>
@@ -4664,16 +4716,18 @@ function AllPollsView({ focus, onBack, backLabel }) {
       </div>
       <p className="table-hint">
         Tap any poll for its full breakdown · Dates are fieldwork windows (publication dates sit in the
-        breakdown) · “Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows –
-        one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its
-        breakdown ·
-        The lead bar is that implied figure in margin form (the L/NP v ON and 3-cornered matchups are the
+        breakdown) ·
+        {pubBasis
+          ? "“As published” lists each poll’s headline figures exactly as the pollster released them · The lead bar is the published figure in margin form"
+          : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown · The lead bar is that implied figure in margin form"}
+        {" "}(the L/NP v ON and 3-cornered matchups are the
         pollsters’ own published figures – the site prices no implied series for them) · “Poll lean” is
-        the poll’s implied 2PP minus the implied aggregate for that month · “—” Means the pollster didn’t
+        the poll’s {pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate"} for that month · “—” Means the pollster didn’t
         publish that measure · Search matches
-        anything in a row · Click any column heading to sort.{" "}
+        anything in a row · Click any column heading to sort · Click the “{pubBasis ? "As published" : "Implied 2PP"}”
+        heading to switch bases.{" "}
         <strong>House effect</strong> is how far a pollster systematically sits from the cross-house consensus
-        on implied 2PP – pooled from its polls with a 90-day half-life, so its recent methods count for more, and
+        on {pubBasis ? "published" : "implied"} 2PP – pooled from its polls with a 90-day half-life, so its recent methods count for more, and
         shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure’s
         own time, and it is a property of the pollster, not of this one poll.
         {" "}<strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, filed with the
@@ -5429,4 +5483,4 @@ function InfoView({ focus, onBack, backLabel }) {
 
 Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView,
   // shared cell renderers reused by the latest-polls table
-  ArchSortTh, ArchImplied, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo });
+  ArchSortTh, ArchImplied, ArchPublished, ArchTpp, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo });

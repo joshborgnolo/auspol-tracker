@@ -1577,6 +1577,19 @@ for (const [firm, rows] of flowPubByFirm) {
     n: rows.length, m: 1,
   });
 }
+/* How much of a fitted cell is the PRIOR rather than that house's own waves.
+   The ridge posterior precision is 1/se² = 1/τ² + (data precision), so the
+   prior's share of the information is simply (se/τ)². It is the number the
+   table could not say out loud: a cell at 0.6 is more the election row fed
+   back than a measurement of the house, and on this term's primaries the
+   Greens column is that for four houses of five — Greens first preferences
+   have travelled about a point since the election while One Nation's have
+   travelled twenty-two, so there is almost nothing in a Greens series for a
+   fit to hold on to. Emitted per cell; the panel dims the ones at or past a
+   half and says why. Measured rows (a house publishing its own allocation)
+   carry no share — they are not fits. */
+const priorShare = (sePct, tau) => r2(Math.min(1, (sePct / (tau * 100)) ** 2));
+
 const flowFits = [];
 for (const [firm, rows] of flowFitByFirm) {
   if (flowMeasured.has(firm)) continue;   // the house's own published allocation beats a fitted constant
@@ -1586,9 +1599,9 @@ for (const [firm, rows] of flowFitByFirm) {
   const clamp01 = (v) => Math.min(1, Math.max(0, v));
   flowFits.push({
     firm,
-    g: r1(clamp01(fit.beta[1]) * 100), ge: r1(fit.se[0] * 100),
-    o: r1(clamp01(fit.beta[2]) * 100), oe: r1(fit.se[1] * 100),
-    t: r1(clamp01(fit.beta[3]) * 100), te: r1(fit.se[2] * 100),
+    g: r1(clamp01(fit.beta[1]) * 100), ge: r1(fit.se[0] * 100), gp: priorShare(fit.se[0] * 100, FLOW_FIT_TAU),
+    o: r1(clamp01(fit.beta[2]) * 100), oe: r1(fit.se[1] * 100), op: priorShare(fit.se[1] * 100, FLOW_FIT_TAU),
+    t: r1(clamp01(fit.beta[3]) * 100), te: r1(fit.se[2] * 100), tp: priorShare(fit.se[2] * 100, FLOW_FIT_TAU),
     n: rows.length,
   });
 }
@@ -1786,9 +1799,9 @@ for (const [firm, rows] of flowOnFitByFirm) {
   const clamp01 = (v) => Math.min(1, Math.max(0, v));
   flowOnFits.push({
     firm,
-    l: r1(clamp01(fit.beta[1]) * 100), le: r1(fit.se[0] * 100),
-    g: r1(clamp01(fit.beta[2]) * 100), ge: r1(fit.se[1] * 100),
-    t: r1(clamp01(fit.beta[3]) * 100), te: r1(fit.se[2] * 100),
+    l: r1(clamp01(fit.beta[1]) * 100), le: r1(fit.se[0] * 100), lp: priorShare(fit.se[0] * 100, FLOW_ON_FIT_TAU),
+    g: r1(clamp01(fit.beta[2]) * 100), ge: r1(fit.se[1] * 100), gp: priorShare(fit.se[1] * 100, FLOW_ON_FIT_TAU),
+    t: r1(clamp01(fit.beta[3]) * 100), te: r1(fit.se[2] * 100), tp: priorShare(fit.se[2] * 100, FLOW_ON_FIT_TAU),
     n: rows.length,
   });
 }

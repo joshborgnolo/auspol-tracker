@@ -3414,6 +3414,19 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 .cyc-legend.banded .cyc-row.off .cyc-swatch { background-color: var(--ink-faint); box-shadow: none; }
 .cyc-row:hover .cyc-swatch { transform: scale(1.18); }
 
+/* A fitted flow cell the ridge could not move off its prior: half or more of
+   it is the election row it was shrunk toward, not a reading of the house.
+   Quiet ink and a dotted rule — present, legible, and visibly not load-
+   bearing. The dotted underline is the same grammar the page uses for a term
+   you can hover for a definition, which is what this is. */
+.flow-tab-thin, .flow-tab-thin .flow-tab-se { color: var(--ink-faint); }
+.flow-tab-thin {
+  text-decoration: underline dotted var(--ink-faint);
+  text-underline-offset: 3px; cursor: help;
+}
+/* the same word used inside the note that explains it */
+.flow-tab-note .flow-tab-thin { text-decoration: none; cursor: inherit; font-weight: 600; }
+
 /* ---------- preference-flow drift: the answer, then the board -------------
    Ten chips in one row — nine houses and the pooled line — each doubling as a
    readout, with the pooled figure (the only thing the panel answers) sitting
