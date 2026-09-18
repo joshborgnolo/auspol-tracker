@@ -17075,6 +17075,35 @@ const POLL_TAGS = [{
   title: "National direction – right direction / wrong track"
 }];
 const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map(t => [t.id, t]));
+/* URL state for the archive's two multi-selects (pollsters w=, tags h=) rides
+   as a bitmask, same scheme as the cycles tab's ?c=: bit i = order[i]
+   selected, rendered in base 36 and prefixed "b" – a shape no legacy value
+   can take (every house name carries a space or "&", and no tag id is b
+   followed by base36 digits), so old comma-joined links and mask links parse
+   under one param. The orderings are FROZEN and append-only: a house or tag
+   that arrives later takes a NEW high bit at the end, and bits naming things
+   no longer in the archive are dropped, never trusted – an old link can
+   never re-decode to different selections. Future houses APPEND to
+   URL_HOUSES, in arrival order, never a re-sort. */
+const URL_HOUSES = ["Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater", "Newspoll", "RedBridge / Accent", "Resolve", "Roy Morgan", "Spectre Strategy", "Wolf & Smith", "YouGov"];
+const archMask = (order, set) => {
+  let m = 0;
+  order.forEach((name, i) => {
+    if (set.has(name)) m += 2 ** i;
+  });
+  return "b" + m.toString(36);
+};
+/* Returns null when raw is not the mask form, so the caller falls back to
+   the legacy comma-list path; bits beyond a frozen order decode to nothing. */
+const archUnpack = (raw, order) => {
+  if (!/^b[0-9a-z]+$/.test(raw || "")) return null;
+  const v = parseInt(raw.slice(1), 36);
+  const s = new Set();
+  order.forEach((name, i) => {
+    if (v % 2 ** (i + 1) >= 2 ** i) s.add(name);
+  });
+  return s;
+};
 function pollTagIds(p) {
   const a = p.appr || {};
   const hasNet = a.albNet != null || a.taylorNet != null || a.hansonNet != null;
@@ -18382,20 +18411,23 @@ function AllPollsView({
   }];
   /* The filtered table is a page in its own right, so its filters ride in
      the URL: every non-default selection sits in the query string beside
-     the #allpolls hash (?w=Newspoll&t=12#allpolls), and "Newspoll's year"
+     the #allpolls hash (?w=bw&t=12#allpolls), and "Newspoll's year"
      becomes a link one reader can paste to another – who lands on exactly
      that table, not on the raw archive. Keys are one letter and enum VALUES
-     one letter or two (the maps below), so a fully-dressed link stays short
-     enough to survive a chat window; names that ARE the vocabulary – the
-     pollsters, the tag slugs – stay words. Restored here, once per mount
+     one letter or two (the maps below); the two multi-selects (pollsters w=,
+     tags h=) ride as b-prefixed base36 bitmasks over the frozen orderings
+     declared beside POLL_TAGS, so a fully-dressed link stays short enough
+     to survive a chat window. Restored here, once per mount
      (the view remounts on every tab switch); the write-back further down
      keeps the address bar current as the filters change. Values that have
      gone stale – a pollster no longer in the archive, a tag that never
      existed – are dropped, never trusted.
       Backwards compatibility: links written before the short scheme used
      verbose keys (who=/when=/has=/vs=/lead=/view=/scope=) and long enum
-     values. Both spellings are still read here, the short one winning if
-     a hand-edited URL carries both; only the short one is ever written. */
+     values; links written before the bitmask scheme spelled the pollster
+     and tag values out as comma-joined names. All spellings are still read
+     here, the short key winning if a hand-edited URL carries both; only
+     the short keys and mask values are ever written. */
   const FACET_BY_URL = {
     p: "primary",
     l: "leadership",
@@ -18434,8 +18466,16 @@ function AllPollsView({
     const sExplicit = get("s", "scope") != null;
     return {
       q: get("q") || "",
-      who: (get("w", "who") || "").split(",").map(baseHouse).filter(h => houses.includes(h)),
-      has: (get("h", "has") || "").split(",").filter(t => POLL_TAGS.some(pt => pt.id === t)),
+      who: (() => {
+        const raw = get("w", "who") || "";
+        const mask = archUnpack(raw, URL_HOUSES);
+        return (mask ? [...mask] : raw.split(",").map(baseHouse)).filter(h => houses.includes(h));
+      })(),
+      has: (() => {
+        const raw = get("h", "has") || "";
+        const mask = archUnpack(raw, POLL_TAGS.map(t => t.id));
+        return (mask ? [...mask] : raw.split(",")).filter(t => POLL_TAGS.some(pt => pt.id === t));
+      })(),
       lead: LEAD_BY_URL[get("l", "lead")] || "all",
       measure: MEAS_BY_URL[get("v", "vs")] || "lnp",
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
@@ -18851,9 +18891,9 @@ function AllPollsView({
     const p = new URLSearchParams(window.location.search);
     OWNED.forEach(k => p.delete(k));
     if (ql) p.set("q", q.trim());
-    if (sel.size) p.set("w", houses.filter(h => sel.has(h)).join(","));
+    if (sel.size) p.set("w", archMask(URL_HOUSES, sel));
     if (range !== "all") p.set("t", range);
-    if (tagSel.size) p.set("h", POLL_TAGS.map(t => t.id).filter(t => tagSel.has(t)).join(","));
+    if (tagSel.size) p.set("h", archMask(POLL_TAGS.map(t => t.id), tagSel));
     if (measure !== "lnp") p.set("v", MEAS_BY_ID[measure]);
     if (lead !== "all") p.set("l", LEAD_BY_ID[lead]);
     if (facet !== "twopp") p.set("f", FACET_BY_ID[facet]);
