@@ -1494,27 +1494,31 @@ function tppHeading(cs) {
   if (cs.length === 1) return cs[0].kind === "3cp" ? "Three-cornered preferred" : "Two-party preferred";
   return "After preferences";
 }
-/* The detail section's line list: the contests tppContests builds, with the
-   implied pair spliced in as a full contest straight after the canonical
-   ALP v L/NP pair it re-anchors, plus each line's trailing basis note. The
-   implied figure is this poll's own primaries at the fixed 2025 flows – the
-   page's default basis, so it shows for every implied-eligible wave, not
-   only the Morgan/RedBridge pair that prints one in the release. It carries
-   its OWN change vs the pollster's last implied figure ("imp" in chg –
-   "flows" only when that is missing), L/NP moving opposite, exactly as the
-   canonical pair uses "alp2pp". */
+/* The detail section's line list: the contests tppContests builds, plus up
+   to two implied readings of ALP v L/NP. The HOUSE figure – Roy Morgan's
+   and RedBridge's own release-published implied pair at the 2025 flows – is
+   spliced straight after the published pair as its alternative ("or …
+   under 2025-election preference flows"), where the release itself puts it.
+   The COMPUTED implied pair – this poll's own primaries at the fixed 2025
+   flows, the page's default basis, so it closes the section for every
+   implied-eligible wave – is appended LAST, beneath every other line; when
+   the wave printed no pair at all (cs empty), PollLedger still prints "Not
+   published" ahead of it. Each implied reading carries its OWN change vs
+   the pollster's last figure of that kind ("imp" for the computed, "flows"
+   for the house figure – an "imp" delta falls back to "flows" when a wave
+   has only the latter), L/NP moving opposite, exactly as the canonical pair
+   uses "alp2pp". */
 function tppLines(cs, r) {
   const out = [];
-  const impliedV = r.alpImp != null ? r.alpImp : r.tppFlows;
+  const dFlows = segDelta(r.chg, "flows");
   const dImp = segDelta(r.chg, "imp") || segDelta(r.chg, "flows");
   /* Essential's undecided never left the published pair, so the pair's own
      line names the share and its move; the first-preferences tail reports
      only shares that were set aside before the shares were reported. */
   const dUnd = r.undecidedBasis === "tpp" && r.undecided != null ? segDelta(r.chg, "und") : null;
   for (const c of cs) {
-    const canonical = c.kind === "2pp" && impliedV != null;
-    /* No "respondent-allocated" caption any more. The implied pair now reads
-       as an alternative to the line above it ("or … implied, under
+    /* No "respondent-allocated" caption any more. The house-pair alternative
+       reads as an alternative to the line above it ("or … under
        2025-election preference flows"), which says what the first pair is
        BY CONTRAST - naming it as well repeated the same distinction twice,
        once under each half, and cost a caption line to do it. */
@@ -1529,7 +1533,30 @@ function tppLines(cs, r) {
       );
     }
     out.push({ c, note });
-    if (canonical) out.push({ alt: true, note: (
+    if (c.kind === "2pp" && r.tppFlows != null) out.push({ alt: true, note: (
+      <>under 2025-election{" "}
+        <button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm &&
+                  window.AP.openTerm("preference-flows", "poll breakdown")}>preference flows</button></>
+    ), c: {
+      kind: "flows", lab: "2PP · ALP v L/NP", flag: null,
+      segs: [
+        { label: "ALP", value: r.tppFlows, color: PARTY_C.alp, delta: dFlows },
+        { label: "L/NP", value: Math.round((100 - r.tppFlows) * 10) / 10, color: PARTY_C.lnp,
+                          delta: dFlows ? { v: +(-dFlows.v).toFixed(1), refDate: dFlows.refDate } : null },
+      ],
+    } });
+  }
+  if (r.alpImp != null) out.push({
+    c: {
+      kind: "flows", lab: "2PP · ALP v L/NP", flag: null,
+      segs: [
+        { label: "ALP", value: r.alpImp, color: PARTY_C.alp, delta: dImp },
+        { label: "L/NP", value: Math.round((100 - r.alpImp) * 10) / 10, color: PARTY_C.lnp,
+                          delta: dImp ? { v: +(-dImp.v).toFixed(1), refDate: dImp.refDate } : null },
+      ],
+    },
+    note: (
       <><button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm &&
                   window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
@@ -1537,15 +1564,8 @@ function tppLines(cs, r) {
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm &&
                   window.AP.openTerm("preference-flows", "poll breakdown")}>preference flows</button></>
-    ), c: {
-      kind: "flows", lab: "2PP · ALP v L/NP", flag: null,
-      segs: [
-        { label: "ALP", value: impliedV, color: PARTY_C.alp, delta: dImp },
-        { label: "L/NP", value: Math.round((100 - impliedV) * 10) / 10, color: PARTY_C.lnp,
-                          delta: dImp ? { v: +(-dImp.v).toFixed(1), refDate: dImp.refDate } : null },
-      ],
-    } });
-  }
+    ),
+  });
   return out.map((x) => ({ ...x, count: out.length }));
 }
 function primarySegs(r) {
@@ -2194,10 +2214,20 @@ function PollLedger({ r, dirSegments }) {
         {/* the display size goes to the FIRST head-to-head only: a wave with
             three matchups has one answer and two supporting readings, and a
             three-cornered contest has too many figures to carry it */}
-        {tppLines(tcs, r).map((x, i) => (
-          <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt}
-                   hero={i === 0 && x.c.segs.filter((g) => g.value != null).length === 2} />
-        ))}
+        {/* the section CLOSES on the page's own implied pair; a wave that
+            printed no pair at all still gets "Not published" first, the
+            implied line beneath it. The house's implied second pair (only
+            Roy Morgan and RedBridge print one) remains spliced after the
+            canonical pair inside tppLines. */}
+        {((tls) => (
+          <React.Fragment>
+            {!tcs.length && <p className="pd-absent">Not published</p>}
+            {tls.map((x, i) => (
+              <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt}
+                       hero={i === 0 && x.c.segs.filter((g) => g.value != null).length === 2} />
+            ))}
+          </React.Fragment>
+        ))(tppLines(tcs, r))}
       </PdSec>
 
       <PdSec label="First preferences">
