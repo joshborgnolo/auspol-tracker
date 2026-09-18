@@ -578,9 +578,10 @@
     if (!legend.length) legend = cycleLegend();
     /* the ± range rides inside .lead-tag now, so the meta tail drops it -
        keeping it here too would print the interval twice on the image. The
-       tail mirrors the interval strip: note, method, poll window. */
-    const meta = [txt(target.querySelector(".hi-note")),
-                  txt(target.querySelector(".hi-method")),
+       tail mirrors the interval strip: method word, then the count's
+       parenthetical, whose textContent already carries the interval label
+       (the .hi-note button is nested inside it). */
+    const meta = [txt(target.querySelector(".hi-method")),
                   txt(target.querySelector(".hi-count"))].filter(Boolean).join("  ·  ");
     const lead = [txt(target.querySelector(".lead-tag")), txt(target.querySelector(".delta")),
                   txt(target.querySelector(".hero-sub-note"))].filter(Boolean).join("  ");

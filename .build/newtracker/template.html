@@ -1185,22 +1185,25 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    inside the button's box, so it would be clickable and would pick up the
    underline the term carries. That one dot is borrowed from the next
    clause's ::before instead, provided that clause is not itself a hi-term
-   button (a pseudo would sit inside ITS button box and link) - the poll
-   count and the Limited-data tag both get theirs this way. When two terms
-   are directly adjacent - the adjusted strip's note + method - the JSX
-   inserts a real .hi-sep span for the dot, and both rules skip it so it
-   stays the only dot at that junction. Every emitter pins 12px: a pseudo
-   inherits its host clause's size and the bare span would inherit the page
-   16px, so an unpinned dot reads bigger than its neighbours (caught live
-   2026-09-02). */
+   button (a pseudo would sit inside ITS button box and link) and not the
+   poll count, whose parenthetical continues the method word's sentence
+   rather than opening a new clause. Every emitter pins 12px: a pseudo
+   inherits its host clause's size and an unpinned dot reads bigger than its
+   neighbours (caught live 2026-09-02). */
 .hero-interval > *:not(:last-child):not(.hi-term):not(.hi-sep)::after {
   content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
   margin-left: 6px;
 }
-.hero-interval > .hi-term + :not(.hi-term):not(.hi-sep)::before {
+.hero-interval > .hi-term + :not(.hi-term):not(.hi-sep):not(.hi-count)::before {
   content: "•"; color: var(--ink-3); font-weight: 400; font-size: 12px;
   margin-right: 6px;
 }
+/* The count's parenthetical continues the method word's sentence, so the
+   junction takes roughly a word space, not the 6px clause flank a dot once
+   breathed in. And it must be free to word-wrap: the whole parenthetical
+   runs past a phone line's width now that the interval label sits inside
+   it. The specificities out-rank the shared .hi-note/.hi-count nowrap. */
+.hero-interval > .hi-count { margin-left: -3px; white-space: normal; }
 .hi-sep { color: var(--ink-3); font-weight: 400; font-size: 12px; }
 /* No narrow-screen variant: the strip wraps naturally if the row overflows,
    and the same clause order, dots and sizes are wanted at every width. */

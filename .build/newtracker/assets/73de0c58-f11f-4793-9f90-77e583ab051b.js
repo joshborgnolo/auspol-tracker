@@ -1157,9 +1157,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               ) : " pts"}
               {leadSwing != null && (
                 <>
-                  {", "}
+                  {/* "±" without a direction word: the clause states how far
+                      the nowcast sits from the official count in EITHER
+                      direction, naming the count itself on phones ("since
+                      2025") and in words where the line has room for it. */}
+                  {", ±"}
                   <RollNum value={Math.abs(leadSwing).toFixed(1)} spinIn />
-                  {"% swing " + (leadSwing >= 0 ? "to" : "from") + " " + m.a.name}
+                  {narrow ? " since 2025" : " since the 2025 election"}
                 </>
               )}
             </span>
@@ -1167,26 +1171,6 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
           {/* How the lead was made and how much evidence sits under it: the
               interval's name, the method, and the window both describe. */}
           <div className="hero-interval">
-            {unc && (
-              /* One more route to the margin's definition: the glossary
-                 files "95% interval" as a synonym waypoint of margin of
-                 error, so a click lands on the same page the ± figure and
-                 the caveat's "margin" already open. */
-              <button type="button" className="hi-note hi-term"
-                      title={unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means"}
-                      onClick={() => window.AP.openTerm &&
-                        window.AP.openTerm(unc.flows ? "preference-flows" : "margin-of-error",
-                                           "two-party preferred")}>
-                {unc.flows ? "flows range" : "95% interval"}
-              </button>
-            )}
-            {/* When the note and the method sit next to each other, both are
-                clickable hi-term buttons, so neither can host the separator
-                dot - a ::before on the method sits inside its button box and
-                reads as part of the link. This span gives that adjacency a
-                neutral host for the dot. Other cases already have a non-term
-                neighbour the CSS can borrow. */}
-            {unc && <span className="hi-sep" aria-hidden="true">•</span>}
             {/* The label names the method; now it also explains it. Everything
                 this figure is built on has a definition in Info, and the word
                 the reader is looking at is the shortest way to it. */}
@@ -1201,14 +1185,13 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
               {unc && unc.flows ? "Implied from primary votes"
                : adjusted ? "Weighted aggregate" : "Monthly average"}
             </button>
-            {/* The window the interval describes, in plain terms: the count
+            {/* The sentence continues in a parenthetical: how much evidence
+                the figure carries and what its interval is called. The count
                 and span draw on unc, which exists only when an interval does,
-                so the clause rides on the same condition. Its separator dot
-                comes free from the strip's CSS - it directly follows the
-                .hi-term method button, so the ::before rule hosts it. */}
+                so the clause rides on the same condition. */}
             {unc && (
               <span className="hi-count">
-                {unc.n} poll{unc.n === 1 ? "" : "s"} in{" "}
+                ({unc.n} poll{unc.n === 1 ? "" : "s"} over{" "}
                 {D.latest.method.windowDays} days
                 {/* The estimate is only as fresh as the last fieldwork inside
                     its window: once that date is a couple of days back the
@@ -1216,8 +1199,19 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup }) 
                     don't need the stamp – "Last poll … Today" already says
                     it one strip up. */}
                 {freshness(D.latest.updatedISO).days >= 2 && (
-                  <span className="hi-asof"> · as of {shortDate(D.latest.updatedISO)}</span>
-                )}
+                  <span className="hi-asof"> as at {shortDate(D.latest.updatedISO)}</span>
+                )};{" "}
+                {/* One more route to the margin's definition: the glossary
+                    files "95% interval" as a synonym waypoint of margin of
+                    error, so a click lands on the same page the ± figure and
+                    the caveat's "margin" already open. */}
+                <button type="button" className="hi-note hi-term"
+                        title={unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means"}
+                        onClick={() => window.AP.openTerm &&
+                          window.AP.openTerm(unc.flows ? "preference-flows" : "margin-of-error",
+                                             "two-party preferred")}>
+                  {unc.flows ? "flows range" : "95% interval"}
+                </button>)
               </span>
             )}
             {!adjusted && <span className="eyebrow-warn">Limited data</span>}
