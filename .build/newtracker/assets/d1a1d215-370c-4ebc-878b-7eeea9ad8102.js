@@ -1834,10 +1834,10 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
                    on={hidden.size > 0 || lifted.size > 0}>
           <div className="ap-pop-head">
             <span>On the board</span>
-            <div className="cyc-quick" role="group" aria-label="Board shortcuts">
+            <div className="pop-quick" role="group" aria-label="Board shortcuts">
               {QUICK.map((q) => (
                 <button key={q.id} type="button" title={q.title} aria-pressed={quick === q.id}
-                        className={"cyc-quick-opt" + (quick === q.id ? " active" : "")}
+                        className={"pop-quick-opt" + (quick === q.id ? " active" : "")}
                         onClick={q.run}>{q.label}</button>
               ))}
             </div>
@@ -2723,6 +2723,52 @@ function ArchImplied({ p }) {
   );
 }
 
+// "As published" – the poll's headline figures exactly as the pollster released
+// them, as plain numerals (dot-coded by party) with any shape-flags inline.
+// Numerals, not a 0–100 bar: at archive scale every 53/47 bar looks identical,
+// so the ink carries nothing – the figures themselves are the record.
+// A poll with NO after-preferences figure published only its primaries – and
+// those are the record too, so they print here under a Primary flag rather
+// than leaving the cell a bare dash.
+function ArchPublished({ p }) {
+  const { tppContests, tppFlag, primarySegs } = window;
+  const c0 = tppContests(p)[0];
+  if (!c0) {
+    const pSegs = p.p ? primarySegs(p) : [];
+    if (!pSegs.length) return <span className="dash" title="No voting-intention figures published with this poll">—</span>;
+    return (
+      <div className="apub" aria-label={"Primary votes: " + pSegs.map((s) => `${s.label} ${s.value}`).join(", ")}
+           title="No two-party or head-to-head figure in this poll – these are the primary votes">
+        {pSegs.map((s, i) => (
+          <span key={i} className="apub-seg" title={s.label}>
+            <span className="apub-dot" style={{ background: s.color }}></span>
+            {s.value.toFixed(1)}
+          </span>
+        ))}
+        <span className="facet-flag">Primary</span>
+      </div>
+    );
+  }
+  const flag = tppFlag(p);
+  return (
+    <div className="apub" aria-label={c0.segs.map((s) => `${s.label} ${s.value}`).join(", ")}>
+      {c0.segs.map((s, i) => (
+        <span key={i} className="apub-seg" title={s.label}>
+          <span className="apub-dot" style={{ background: s.color }}></span>
+          {s.value.toFixed(1)}
+        </span>
+      ))}
+      {flag && <span className="facet-flag">{flag}</span>}
+    </div>
+  );
+}
+
+// The 2PP column's basis switch renders one of these two – same cell slot,
+// same .apub ink, so flipping bases changes the figures and never the layout.
+function ArchTpp({ p, basis }) {
+  return basis === "resp" ? <ArchPublished p={p} /> : <ArchImplied p={p} />;
+}
+
 // One lead-info helper drives the cell, the held-by filter and the sort, so
 // they can never disagree. Returns null when the poll has no figure on the
 // selected measure's basis. m is signed: + = first-named party of the
@@ -2732,11 +2778,21 @@ function ArchImplied({ p }) {
 // Basis follows the table itself: the two implied matchups read the implied
 // series (alpImp / alpOnImp), and only the matchup with no implied series
 // (L/NP v ON, 3-cornered) shows the pollster's own published figures.
-function archLeadInfo(p, measure) {
+function archLeadInfo(p, measure, basis) {
+  const pub = basis === "resp";
   if (measure === "onp") {
-    // implied ALP v ON – the pairing's standing basis everywhere else on the
-    // page (the hero default); the frozen ALP–ON flow set prices every wave,
-    // where only two houses publish a head-to-head of their own
+    // the ALP v ON lead follows the table's basis: implied prices every wave
+    // through the frozen ALP–ON flow set (the pairing's standing basis
+    // everywhere else on the page); published shows the head-to-head only
+    // where the house filed one of its own
+    if (pub) {
+      if (!p.tppAlt) return null;
+      const m = +(p.tppAlt.alp - p.tppAlt.onp).toFixed(1);
+      return { m, who: m >= 0 ? "alp" : "onp", lab: m >= 0 ? "ALP" : "ON",
+               color: m >= 0 ? "var(--alp)" : "var(--onp)",
+               segs: [{ v: p.tppAlt.alp, color: "var(--alp)" }, { v: p.tppAlt.onp, color: "var(--onp)" }],
+               note: " on the published ALP v One Nation matchup" };
+    }
     if (p.alpOnImp == null) return null;
     const on = +(100 - p.alpOnImp).toFixed(1);
     const m = +(p.alpOnImp - on).toFixed(1);
@@ -2761,6 +2817,21 @@ function archLeadInfo(p, measure) {
     return { m: e[0][0] === "alp" ? margin : -margin, who: e[0][0], lab: e[0][1], color: e[0][3],
              segs: [{ v: p.tpp3.alp, color: "var(--alp)" }, { v: p.tpp3.lnp, color: "var(--lnp)" }, { v: p.tpp3.onp, color: "var(--onp)" }],
              note: ` over ${e[1][1]} on the published 3-cornered figures` };
+  }
+  // ALP v L/NP follows the table's basis too. Published shows the pollster's
+  // own pair (undecided-inclusive where that is how the house releases it;
+  // latest-table rows name the same fields alp2pp/lnp2pp) – a missing half
+  // completes the pair rather than leaving the lead blank.
+  if (pub) {
+    if (p.alp == null && p.alp2pp == null) return null;   // no published 2PP this wave
+    const alp = p.alp2pp != null ? p.alp2pp : p.alp;
+    const lnp = p.lnp2pp != null ? p.lnp2pp : p.lnp;
+    const lnpV = lnp != null ? lnp : 100 - alp;
+    const m = +(alp - lnpV).toFixed(1);
+    return { m, who: m >= 0 ? "alp" : "lnp", lab: m >= 0 ? "ALP" : "L/NP",
+             color: m >= 0 ? "var(--alp)" : "var(--lnp)",
+             segs: [{ v: alp, color: "var(--alp)" }, { v: lnpV, color: "var(--lnp)" }],
+             note: " on the two-party ALP v L/NP measure" };
   }
   // implied 2PP in margin form – the same figure the Implied 2PP column
   // beside it shows, so the two columns can never disagree about the basis
@@ -2807,13 +2878,17 @@ function primaryLeadInfo(p) {
            segs: [{ v: p.p.alp, color: "var(--alp)" }, { v: opp[2], color: opp[3] }],
            note: ` over ${alpWins ? opp[1] : "ALP"} on primary votes – the poll published no after-preferences figure` };
 }
-function ArchLead({ p, measure, primaryFallback }) {
-  const li = archLeadInfo(p, measure) ||
+function ArchLead({ p, measure, primaryFallback, basis }) {
+  const li = archLeadInfo(p, measure, basis) ||
              (primaryFallback && measure === "lnp" ? primaryLeadInfo(p) : null);
   if (!li) return <span className="dash"
     title={measure === "lnponp" || measure === "3cp"
       ? "This pollster didn’t publish the selected matchup this wave"
-      : "No implied figure – this poll never filed a full primary set the flow tables can read"}>—</span>;
+      : basis === "resp"
+        ? (measure === "onp"
+          ? "This pollster didn’t publish the selected matchup this wave"
+          : "This pollster published no two-party figure this wave")
+        : "No implied figure – this poll never filed a full primary set the flow tables can read"}>—</span>;
   return (
     <div className="arch-appr"
          title={`${li.lab} leads by ${Math.abs(li.m).toFixed(1)}${li.note}`}>
@@ -3425,6 +3500,126 @@ function HouseLeanPanel({ rangeId }) {
    table's implication). Houses ride faint behind the aggregate, same
    hidden-chip convention as the lean panel, on the lean panel's own
    palette – a house here is the same house there. */
+/* ---- the drift panel's series board ------------------------------------
+   Ten chips in a row, one per house, each doubling as that house's current
+   drift readout — and the POOLED line, which is the only thing the panel
+   actually answers, sitting among them as the eleventh chip of equal weight.
+   A reader had to know which chip was the answer before the panel could give
+   them one.
+
+   So the answer comes out of the row and becomes a readout: the pooled drift,
+   its interval, and the sentence that interval implies. What is left is a
+   control, and controls fold — the same board the past-cycles tab uses, in
+   the same FilterPop.
+
+   Nothing is buried that was saying something. A house whose own drift sits
+   OUTSIDE the pooled interval is making a claim the pooled line is not, and
+   it stays on the surface beside the button; the eight houses agreeing with
+   the pooled read to within its own error were never news, and are one click
+   away. */
+function FlowLegend({ pooledId, pooled, houseRows, hidden, setHidden, sgn, kind }) {
+  const [pop, setPop] = useState(null);
+  const total = houseRows.length;
+  const shownHouses = houseRows.filter((r) => !hidden[r.f]).length;
+  const pooledOn = !hidden[pooledId];
+  /* The band is the pooled 95% interval. A house beyond it is not "wrong" —
+     it is measurably somewhere else, which is exactly what this panel exists
+     to notice. Without an interval nothing is singled out, which is the
+     honest failure mode. */
+  const band = pooled && pooled.ci95 != null ? pooled.ci95 : null;
+  const outliers = band == null ? []
+    : houseRows.filter((r) => r.latest != null && Math.abs(r.latest) > band);
+  const outSet = new Set(outliers.map((r) => r.f));
+
+  /* The label already says "Houses", so the summary counts rather than
+     repeats it. */
+  const summary = (shownHouses === total ? "all " + total : shownHouses + " of " + total)
+                  + (pooledOn ? "" : " · pooled off");
+  const setAll = (v) => setHidden(Object.fromEntries(houseRows.map((r) => [r.f, v])));
+  const QUICK = [
+    { id: "all", label: "All", title: "Every house on the chart",
+      on: shownHouses === total && pooledOn, run: () => setHidden({}) },
+    { id: "pooled", label: "Pooled only", title: "The cross-house line alone, with its interval",
+      on: shownHouses === 0 && pooledOn, run: () => setAll(true) },
+    { id: "out", label: "Off the table", title: "Only the houses whose own drift sits outside the pooled interval",
+      on: outliers.length > 0 && pooledOn && shownHouses === outliers.length
+          && houseRows.every((r) => hidden[r.f] !== outSet.has(r.f)),
+      run: () => setHidden(Object.fromEntries(houseRows.map((r) => [r.f, !outSet.has(r.f)]))) },
+  ].filter((q) => q.id !== "out" || outliers.length > 0);
+
+  const row = (key, colour, name, value, note) => (
+    <button key={key} type="button"
+            className={"flow-row" + (hidden[key] ? " off" : "") + (outSet.has(key) ? " out" : "")}
+            aria-pressed={!hidden[key]}
+            title={(hidden[key] ? "Draw " : "Take ") + name + (hidden[key] ? " on the chart" : " off the chart")}
+            onClick={() => setHidden((h) => ({ ...h, [key]: !h[key] }))}>
+      <span className="flow-swatch" style={{ background: colour }}></span>
+      <span className="flow-row-name">{name}</span>
+      {note && <span className="flow-row-note">{note}</span>}
+      <span className="flow-row-val">{value}</span>
+    </button>
+  );
+
+  return (
+    <div className="flow-legend">
+      {pooled && pooled.ci95 != null && (
+        /* The answer, said once, in the size it deserves. */
+        <div className="flow-readout">
+          <span className="flow-readout-v">{sgn(pooled.v)}
+            <span className="flow-readout-ci"> ± {pooled.ci95.toFixed(1)}</span>
+            <span className="flow-readout-u">pp</span></span>
+          <span className="flow-readout-lab">
+            {Math.abs(pooled.v) <= pooled.ci95
+              ? <>Pooled across {total} houses &mdash; <strong>no drift the interval can separate from zero</strong></>
+              : <>Pooled across {total} houses &mdash; running <strong>{pooled.v > 0 ? "friendlier to Labor" : "friendlier to the Coalition"}</strong> than the table reads their primaries</>}
+          </span>
+        </div>
+      )}
+      <div className="flow-bar">
+        <FilterPop id={"flow-" + kind} label="Houses" summary={summary} open={pop} setOpen={setPop}
+                   on={shownHouses !== total || !pooledOn}>
+          <div className="ap-pop-head">
+            <span>On the chart</span>
+            <div className="pop-quick" role="group" aria-label="Series shortcuts">
+              {QUICK.map((q) => (
+                <button key={q.id} type="button" title={q.title} aria-pressed={q.on}
+                        className={"pop-quick-opt" + (q.on ? " active" : "")}
+                        onClick={q.run}>{q.label}</button>
+              ))}
+            </div>
+          </div>
+          <div className="flow-board" role="group" aria-label="Series">
+            {row(pooledId, "var(--ink)", "Pooled, " + total + " houses",
+                 pooled && pooled.ci95 != null ? sgn(pooled.v) + " ± " + pooled.ci95.toFixed(1) : "–")}
+            {houseRows.map((r) => row(r.f, r.color, r.f,
+                 r.latest == null ? "–" : sgn(r.latest) + "pp",
+                 outSet.has(r.f) ? "outside the interval" : null))}
+          </div>
+          <p className="ap-pop-foot">
+            Click a house to draw or clear its line. Each is measured against its own
+            baseline, so a house sitting at zero is behaving as its own first waves did —
+            not as the election did.
+          </p>
+        </FilterPop>
+        {/* Surfaced, not buried: these are the houses the pooled line is not
+            speaking for. */}
+        {outliers.map((r) => (
+          <button key={r.f} type="button"
+                  className={"flow-out" + (hidden[r.f] ? " off" : "")}
+                  style={{ "--fl": r.color }}
+                  aria-pressed={!hidden[r.f]}
+                  title={r.f + " sits outside the pooled interval — click to clear its line"}
+                  onClick={() => setHidden((h) => ({ ...h, [r.f]: !h[r.f] }))}>
+            <span className="flow-swatch" style={{ background: r.color }}></span>
+            <span className="flow-out-name">{r.f}</span>
+            <span className="flow-out-val">{sgn(r.latest)}pp</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function FlowDriftPanel({ rangeId }) {
   const { D, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
   const narrow = useNarrow();
@@ -3433,6 +3628,7 @@ function FlowDriftPanel({ rangeId }) {
   if (!fd || !fd.months || !fd.meta) return null;
   const firms = fd.meta.houses || [];
   const POOLED = "Pooled, all houses";
+  const KIND = "classic";
 
   const xDomain = rangeDomain(rangeId);
   const inWin = (d) => d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1];
@@ -3488,30 +3684,9 @@ function FlowDriftPanel({ rangeId }) {
             its own baseline back then.
           </p>
         </div>
-        <div className="legend">
-          <button type="button"
-                  className={"legend-chip" + (hidden[POOLED] ? " off" : "")}
-                  aria-pressed={!hidden[POOLED]}
-                  title={"Pooled across " + firms.length + " houses – the 21-day nowcast of the drift, with its 95% interval"}
-                  onClick={() => setHidden((h) => ({ ...h, [POOLED]: !h[POOLED] }))}>
-            <span className="legend-swatch" style={{ background: "var(--ink)" }}></span>
-            <span className="legend-name">Pooled, {firms.length} houses</span>
-            <span className="legend-val">{fd.now && fd.now.ci95 != null ? sgn(fd.now.v) + " ± " + fd.now.ci95.toFixed(1) : "–"}</span>
-          </button>
-          {houseRows.map((r) => (
-            <button key={r.f} type="button"
-                    className={"legend-chip" + (hidden[r.f] ? " off" : "")}
-                    aria-pressed={!hidden[r.f]}
-                    title={r.f + " – drift against its own election baseline"
-                           + (lateFirms.includes(r.f) ? ", anchored on its first waves instead" : "")}
-                    onClick={() => setHidden((h) => ({ ...h, [r.f]: !h[r.f] }))}>
-              <span className="legend-swatch" style={{ background: r.color }}></span>
-              <span className="legend-name">{r.f}</span>
-              <span className="legend-val">{r.latest == null ? "–" : sgn(r.latest) + "pp"}</span>
-            </button>
-          ))}
-        </div>
       </div>
+      <FlowLegend pooledId={POOLED} pooled={fd.now} houseRows={houseRows}
+                  hidden={hidden} setHidden={setHidden} sgn={sgn} kind={KIND} />
 
       <TrendChart
         key={"flow-" + rangeId}
@@ -3612,6 +3787,7 @@ function FlowDriftOnPanel({ rangeId }) {
   if (!fd || !fd.months || !fd.meta) return null;
   const firms = fd.meta.houses || [];
   const POOLED = "Pooled, all houses";
+  const KIND = "alp-on";
 
   const xDomain = rangeDomain(rangeId);
   const inWin = (d) => d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1];
@@ -3667,29 +3843,9 @@ function FlowDriftOnPanel({ rangeId }) {
             the final two.
           </p>
         </div>
-        <div className="legend">
-          <button type="button"
-                  className={"legend-chip" + (hidden[POOLED] ? " off" : "")}
-                  aria-pressed={!hidden[POOLED]}
-                  title={"Pooled across " + firms.length + " houses – the 21-day nowcast of the drift, with its 95% interval"}
-                  onClick={() => setHidden((h) => ({ ...h, [POOLED]: !h[POOLED] }))}>
-            <span className="legend-swatch" style={{ background: "var(--ink)" }}></span>
-            <span className="legend-name">Pooled, {firms.length} houses</span>
-            <span className="legend-val">{fd.now && fd.now.ci95 != null ? sgn(fd.now.v) + " ± " + fd.now.ci95.toFixed(1) : "–"}</span>
-          </button>
-          {houseRows.map((r) => (
-            <button key={r.f} type="button"
-                    className={"legend-chip" + (hidden[r.f] ? " off" : "")}
-                    aria-pressed={!hidden[r.f]}
-                    title={r.f + " – drift against its own first-waves baseline"}
-                    onClick={() => setHidden((h) => ({ ...h, [r.f]: !h[r.f] }))}>
-              <span className="legend-swatch" style={{ background: r.color }}></span>
-              <span className="legend-name">{r.f}</span>
-              <span className="legend-val">{r.latest == null ? "–" : sgn(r.latest) + "pp"}</span>
-            </button>
-          ))}
-        </div>
       </div>
+      <FlowLegend pooledId={POOLED} pooled={fd.now} houseRows={houseRows}
+                  hidden={hidden} setHidden={setHidden} sgn={sgn} kind={KIND} />
 
       <TrendChart
         key={"flowon-" + rangeId}

@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp, FLOW, FLOW_TABLE } from "./flows.mjs";
+import { impliedAlp2pp, FLOW, FLOW_PCT, FLOW_TABLE } from "./flows.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -1619,7 +1619,12 @@ const flowDrift = {
     table: FLOW_TABLE,
     baseDays: FLOW_BASE_DAYS,
     anchor: ELECTION.date,
-    aec: { g: r1(FLOW.grn * 100), o: r1(FLOW.onp * 100), t: r1(FLOW.oth * 100) },
+    /* FLOW_PCT, not r1(FLOW.x * 100): FLOW.oth is 0.5455, a correct 4dp
+       rounding of the AEC's counted 0.545489 — but rounding THAT to a tenth
+       gives 54.6, half a tenth above what the ballots behind it
+       (1,268,209 v 1,056,696) actually say. The row is the count, so it
+       comes from the count. */
+    aec: { g: FLOW_PCT.grn, o: FLOW_PCT.onp, t: FLOW_PCT.oth },
     baseFrom: Object.fromEntries(Object.entries(FLOW_BASE_FROM).map(([f, b]) => [f, b.from])),
     houses: Object.keys(FLOW_BASE_FROM).sort(),
   },

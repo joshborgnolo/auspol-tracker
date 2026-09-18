@@ -70,16 +70,16 @@ try {
     .filter((c) => !c.className.includes("off"))
     .map((c) => +c.querySelector(".cyc-year").textContent).sort((a, b) => a - b)`);
   /* which shortcut the board is standing on, derived, not remembered */
-  const lit = () => page.evaluate(`(() => { const b = [...document.querySelectorAll(".cyc-quick-opt")]
+  const lit = () => page.evaluate(`(() => { const b = [...document.querySelectorAll(".pop-quick-opt")]
     .find((x) => x.className.includes("active")); return b ? b.textContent.trim() : null; })()`);
-  const press = (name) => page.evaluate(`(() => { const b = [...document.querySelectorAll(".cyc-quick-opt")]
+  const press = (name) => page.evaluate(`(() => { const b = [...document.querySelectorAll(".pop-quick-opt")]
     .find((x) => x.textContent.trim() === "${name}"); if (b) b.click(); return !!b; })()`);
 
   const all = await onBoard();
   check("every term is on the board to start", all.length, RETURNED.length + OUSTED.length + 1);
   check("…and the board says so", await lit(), "All");
   check("all four cuts are offered at once",
-        await page.evaluate(`[...document.querySelectorAll(".cyc-quick-opt")].map((b) => b.textContent.trim())`),
+        await page.evaluate(`[...document.querySelectorAll(".pop-quick-opt")].map((b) => b.textContent.trim())`),
         ["All", "None", "Returned", "Ousted"]);
 
   check("Returned is a control", await press("Returned"), true);

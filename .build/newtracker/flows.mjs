@@ -22,6 +22,16 @@
    the SAME cut so constants stay comparable across refreshes. */
 export const FLOW = Object.freeze({ grn: 0.8819, onp: 0.2550, oth: 0.5455 });
 
+/* The same three flows at DISPLAY precision, taken from the ballots rather
+   than from the constants above. They are not the same operation: 0.5455 is
+   the right 4dp rounding of the counted 0.545489, but rounding 0.5455 again
+   to a tenth gives 54.6 — half a tenth above what those 1,268,209 v
+   1,056,696 ballots say, and enough to make the flow-drift table's own row
+   sum to 100.1 and disagree with the /preference-flows explainer, which
+   quotes the count. Anything showing the election row to a reader uses
+   these; anything computing with it uses FLOW. */
+export const FLOW_PCT = Object.freeze({ grn: 88.2, onp: 25.5, oth: 54.5 });
+
 /* The table FLOW is anchored to, in the words display copy should use – the
    flow-drift panel's note interpolates this so a re-anchor at a future
    election can never leave the page describing yesterday's table. */

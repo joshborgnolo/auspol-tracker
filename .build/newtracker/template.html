@@ -1998,6 +1998,21 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .poll-table th.sortable:not(.sorted) .caret { opacity: 0; transition: opacity .15s ease; }
 .poll-table th.sortable:hover .caret { opacity: .45; }
 
+/* the 2PP column's basis-switch header – like the hero's toggle it NAMES the
+   active basis; the swap arrow carries the click-to-the-other-side affordance
+   a plain header doesn't */
+.poll-table th button.th-basis {
+  font: inherit; text-transform: inherit; letter-spacing: inherit;
+  color: inherit; background: none; border: 0; padding: 0; cursor: pointer;
+  user-select: none; white-space: nowrap; transition: color .15s ease;
+}
+.poll-table th button.th-basis:hover { color: var(--ink-2); }
+.poll-table th button.th-basis:focus-visible { outline: 2px solid var(--ink-faint); outline-offset: 2px; border-radius: 4px; }
+.th-basis-def { color: var(--ink-3); font-weight: 400; }
+.th-basis-swap { font-size: 9px; line-height: 1; color: var(--ink-3); margin-left: 4px; }
+.poll-table th button.th-basis:hover .th-basis-swap,
+.poll-table th button.th-basis:focus-visible .th-basis-swap { color: var(--ink); }
+
 /* expand affordance + clickable rows */
 .exp-col { width: 30px; padding-left: 4px !important; padding-right: 0 !important; }
 .poll-row { cursor: pointer; }
@@ -3273,19 +3288,21 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 /* The head wraps on a narrow panel: "On the board" plus four options is a
    little wider than a 320px phone, and a shortcut row that ran off the edge
    would be worse than one on its own line. */
-.cyc-legend .ap-pop-head { flex-wrap: wrap; }
-/* Four cuts of the same set, so they read as four options in one voice rather
-   than a primary with three alternatives. The active one is underlined, not
-   filled: this is a row inside a panel head, not a segmented control.
-   margin-left:auto keeps it right-aligned whether or not the head wrapped. */
-.cyc-quick { display: flex; align-items: baseline; gap: 13px; margin-left: auto; }
-.cyc-quick-opt {
+.cyc-legend .ap-pop-head, .flow-legend .ap-pop-head { flex-wrap: wrap; }
+/* Cuts of the same set, so they read as options in one voice rather than a
+   primary with alternatives. The active one is underlined, not filled: this
+   is a row inside a panel head, not a segmented control. margin-left:auto
+   keeps it right-aligned whether or not the head wrapped. Shared by the
+   past-cycles board and the flow-drift board — same control, same place in
+   the same panel head, so it stopped being named for one of them. */
+.pop-quick { display: flex; align-items: baseline; gap: 13px; margin-left: auto; }
+.pop-quick-opt {
   border: 0; background: none; cursor: pointer; padding: 1px 0;
   font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3);
   border-bottom: 1.5px solid transparent; transition: color .15s ease;
 }
-.cyc-quick-opt:hover { color: var(--ink-2); }
-.cyc-quick-opt.active { color: var(--ink); font-weight: 700; border-bottom-color: var(--ink); }
+.pop-quick-opt:hover { color: var(--ink-2); }
+.pop-quick-opt.active { color: var(--ink); font-weight: 700; border-bottom-color: var(--ink); }
 
 .cyc-board {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -3396,6 +3413,79 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 .cyc-row.off .cyc-swatch,
 .cyc-legend.banded .cyc-row.off .cyc-swatch { background-color: var(--ink-faint); box-shadow: none; }
 .cyc-row:hover .cyc-swatch { transform: scale(1.18); }
+
+/* ---------- preference-flow drift: the answer, then the board -------------
+   Ten chips in one row — nine houses and the pooled line — each doubling as a
+   readout, with the pooled figure (the only thing the panel answers) sitting
+   among them at equal weight. The answer is a readout now and the nine houses
+   fold into the same board the past-cycles tab opens. What stays on the
+   surface beside the button is any house whose own drift sits OUTSIDE the
+   pooled interval: that house is making a claim the pooled line is not. */
+.flow-legend { margin: 4px 0 2px; }
+.flow-readout { display: flex; flex-direction: column; gap: 2px; margin: 0 0 12px; }
+.flow-readout-v {
+  font-family: var(--serif); font-size: 30px; font-weight: 600; line-height: 1;
+  color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+}
+/* The interval is part of the figure, not a footnote to it — a drift of +0.3
+   means nothing until you know it carries ±1.6. Same line, quieter ink. */
+.flow-readout-ci { font-size: 19px; font-weight: 500; color: var(--ink-3); }
+.flow-readout-u { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); margin-left: 4px; }
+.flow-readout-lab {
+  font-family: var(--sans); font-size: 12.5px; font-weight: 500; color: var(--ink-3);
+  line-height: 1.45; max-width: 46ch;
+}
+.flow-readout-lab strong { color: var(--ink-2); font-weight: 700; }
+.flow-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.flow-legend .ap-panel { width: min(440px, calc(100vw - 28px)); max-width: none; }
+.flow-board {
+  display: flex; flex-direction: column; gap: 1px; padding: 2px 1px;
+  max-height: min(52vh, 340px); overflow-y: auto;
+}
+/* One control per row here, not two: a house is on the chart or it is not.
+   (The cycles board carries two because a term answers two questions.) */
+.flow-row {
+  display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
+  border: 0; background: none; cursor: pointer; border-radius: 8px;
+  padding: 8px 10px; font-family: var(--sans); color: var(--ink-2);
+  transition: background-color .15s ease, opacity .15s ease;
+}
+.flow-row:hover, .flow-row:focus-within { background: color-mix(in oklch, var(--ink) 6%, transparent); }
+.flow-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.flow-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.flow-row-name { font-size: 13px; font-weight: 600; color: var(--ink); min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Why this row is on the surface as well as in the list. */
+.flow-row-note { font-size: 11px; font-weight: 600; color: var(--mood-neg); white-space: nowrap; }
+.flow-row-val { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
+  font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Off the chart: the row goes quiet, and its mark hollows out rather than
+   vanishing — the colour is how you find it again. */
+.flow-row.off { opacity: 0.45; }
+.flow-row.off .flow-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
+/* The surfaced outlier: a pill in the house's own colour, carrying the figure
+   that put it there. Pressing it clears the line, like its row would. */
+.flow-out {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid color-mix(in oklch, var(--fl) 45%, var(--line));
+  background: color-mix(in oklch, var(--fl) 9%, var(--surface));
+  border-radius: 999px; padding: 5px 11px; cursor: pointer;
+  font-family: var(--sans); font-size: 12.5px; color: var(--ink-2);
+  transition: opacity .15s ease, border-color .15s ease;
+}
+.flow-out:hover { border-color: var(--fl); }
+.flow-out:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.flow-out.off { opacity: 0.42; }
+.flow-out.off .flow-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
+.flow-out-name { font-weight: 600; color: var(--ink); }
+.flow-out-val { font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+@media (pointer: coarse) { .flow-row { padding-top: 12px; padding-bottom: 12px; } }
+/* Phones: the readout is the panel's headline, so it keeps its size; the
+   label under it is what gives way. */
+@media (max-width: 620px) {
+  .flow-readout-v { font-size: 26px; }
+  .flow-readout-lab { font-size: 12px; }
+}
 
 /* ---------- what each chart is drawing ----------
    A caption on the lines, not a second legend: it lists only what this chart
