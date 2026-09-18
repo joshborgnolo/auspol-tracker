@@ -3370,6 +3370,7 @@ const LEAN_MEASURE_META = {
          ground: "The ground colours the side of zero a house sits on: inside the tinted band it runs ahead of the consensus on One Nation’s primary vote, below zero it trails it." },
 };
 
+const LEAN_SURFACE = 1.0;   // pp — the lean chart's first gridline
 function HouseLeanPanel({ rangeId }) {
   const { D, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
   const narrow = useNarrow();
@@ -3408,8 +3409,15 @@ function HouseLeanPanel({ rangeId }) {
   rows.forEach((r) => { if (!hidden[r.firm]) r.pts.forEach((p) => vals.push(p.y)); });
   const { domain, ticks } = fitDomain(vals, Math.max(...vals.map(Math.abs)) > 4 ? 2 : step, 0);
 
-  // the standing each chip wears comes from the FULL series, not the window
+  // the standing each row wears comes from the FULL series, not the window
   const latest = rows.map((r) => ({ firm: r.firm, color: r.color, v: r.all[r.all.length - 1].y }));
+  const leanStr = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1) + "pp";
+  /* The threshold is the chart's own first gridline (step = 1 above), so
+     "surfaced" means "visibly outside the band" rather than a cutoff invented
+     for the pill. Sorted by size: if the panel is going to name houses, it
+     names the biggest lean first. */
+  const leaners = latest.filter((e) => Math.abs(e.v) >= LEAN_SURFACE)
+    .sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
 
   return (
     <section className="ap-lean" id="house-lean">
@@ -3425,27 +3433,37 @@ function HouseLeanPanel({ rangeId }) {
             against chance; this one tracks where each one stands.
           </p>
         </div>
-        <div className="legend">
-          {latest.map((e) => {
-            const s = (e.v > 0 ? "+" : e.v < 0 ? "−" : "") + Math.abs(e.v).toFixed(1) + "pp";
-            const he = D.houseEffects && (measure === "tpp"
-              ? (D.houseEffects.tpp && D.houseEffects.tpp[e.firm])
-              : (D.houseEffects.primary && D.houseEffects.primary[measure] && D.houseEffects.primary[measure][e.firm]));
-            return (
-              <button key={e.firm} type="button"
-                      className={"legend-chip" + (hidden[e.firm] ? " off" : "")}
-                      aria-pressed={!hidden[e.firm]}
-                      title={e.firm + " – currently " + s.replace("−", "-") + " against the consensus on " + meta.phrase
-                             + (he && he.n ? " · pooled from " + he.n + " polls" : "")}
-                      onClick={() => setHidden((h) => ({ ...h, [e.firm]: !h[e.firm] }))}>
-                <span className="legend-swatch" style={{ background: e.color }}></span>
-                <span className="legend-name">{e.firm}</span>
-                <span className="legend-val">{s}</span>
-              </button>
-            );
-          })}
-        </div>
       </div>
+      {/* Eleven houses is eleven chips over two rows before the chart starts,
+          and on this panel every one of them is a chip saying "0.1pp" —
+          nothing. The board folds them, and what stays on the surface is a
+          house whose line has left the ±1pp band the chart draws its first
+          gridline at: a lean past that is the only kind a reader can see on
+          the chart without hunting for it, so it is the only kind worth
+          spending surface on. Unlike the drift panels there is no pooled line
+          to be outside of — the consensus IS the zero rule — so the threshold
+          is the chart's own scale rather than an interval. */}
+      <SeriesBoard id={"lean-" + measure} label="Houses" hidden={hidden} setHidden={setHidden}
+        items={latest.map((e) => ({
+          id: e.firm, color: e.color, name: e.firm, value: leanStr(e.v),
+          note: Math.abs(e.v) >= LEAN_SURFACE ? "past ±1pp" : null,
+        }))}
+        quick={[
+          { id: "all", label: "All", title: "Every house on the chart",
+            on: latest.every((e) => !hidden[e.firm]), run: () => setHidden({}) },
+          { id: "none", label: "None", title: "Clear the chart",
+            on: latest.every((e) => hidden[e.firm]),
+            run: () => setHidden(Object.fromEntries(latest.map((e) => [e.firm, true]))) },
+        ].concat(leaners.length ? [{ id: "lean", label: "Past ±1pp",
+            title: "Only the houses whose lean has left the band the chart's first gridline draws",
+            on: latest.every((e) => !!hidden[e.firm] !== (Math.abs(e.v) >= LEAN_SURFACE)),
+            run: () => setHidden(Object.fromEntries(latest.map((e) => [e.firm, Math.abs(e.v) < LEAN_SURFACE]))) }] : [])}
+        surfaced={leaners.map((e) => ({ id: e.firm, color: e.color, name: e.firm, value: leanStr(e.v),
+          title: e.firm + " is " + leanStr(e.v).replace("−", "-") + " against the consensus on "
+                 + meta.phrase + " — click to clear its line" }))}
+        foot={<>Click a house to draw or clear its line. Zero is the consensus of the
+              houses polling around it, not a neutral the site defines &mdash; a house at zero
+              agrees with its contemporaries, which is not the same as being right.</>} />
 
       <div className="ap-var-ctl">
         <TextToggle value={measure} onChange={setMeasure} options={LEAN_MEASURES}
@@ -3502,70 +3520,113 @@ function HouseLeanPanel({ rangeId }) {
    table's implication). Houses ride faint behind the aggregate, same
    hidden-chip convention as the lean panel, on the lean panel's own
    palette – a house here is the same house there. */
-/* ---- the drift panel's series board ------------------------------------
-   Ten chips in a row, one per house, each doubling as that house's current
-   drift readout — and the POOLED line, which is the only thing the panel
-   actually answers, sitting among them as the eleventh chip of equal weight.
-   A reader had to know which chip was the answer before the panel could give
-   them one.
+/* ---- series board -------------------------------------------------------
+   One control for every chart on this tab that draws a line per pollster.
+   Each of them opened as a row of chips — one per house, each doubling as
+   that house's current readout — which is a wall at nine or ten houses and
+   buries whichever line the panel is actually about.
 
-   So the answer comes out of the row and becomes a readout: the pooled drift,
-   its interval, and the sentence that interval implies. What is left is a
-   control, and controls fold — the same board the past-cycles tab uses, in
-   the same FilterPop.
-
-   Nothing is buried that was saying something. A house whose own drift sits
-   OUTSIDE the pooled interval is making a claim the pooled line is not, and
-   it stays on the surface beside the button; the eight houses agreeing with
-   the pooled read to within its own error were never news, and are one click
-   away. */
-function FlowLegend({ pooledId, pooled, houseRows, hidden, setHidden, sgn, kind }) {
+   So: the houses fold into a FilterPop (the same one the past-cycles board
+   uses), and anything the panel wants kept on the surface is named beside
+   the button as a pill in its own colour. What counts as "kept" is the
+   caller's judgement and differs per panel — the drift panels surface a
+   house sitting outside the pooled interval, house lean surfaces one past
+   the chart's own first gridline — so `surfaced` arrives decided, with the
+   reason it was surfaced in `note`. */
+function SeriesBoard({ id, label, items, hidden, setHidden, quick, surfaced = [], foot, countIds }) {
   const [pop, setPop] = useState(null);
+  /* The summary counts what the LABEL names, which is not always every row:
+     the drift board carries a pooled line above its nine houses, and a button
+     reading "Houses · all 10" would be counting the thing the houses are
+     pooled into as one of them. */
+  const counted = countIds ? items.filter((i) => countIds.includes(i.id)) : items;
+  const shown = counted.filter((i) => !hidden[i.id]).length;
+  const surfacedIds = new Set(surfaced.map((s) => s.id));
+  const toggle = (k) => setHidden((h) => ({ ...h, [k]: !h[k] }));
+  return (
+    <div className="sb-bar">
+      <FilterPop id={id} label={label} open={pop} setOpen={setPop}
+                 on={shown !== counted.length}
+                 summary={shown === counted.length ? "all " + counted.length : shown + " of " + counted.length}>
+        <div className="ap-pop-head">
+          <span>On the chart</span>
+          {quick && quick.length > 0 && (
+            <div className="pop-quick" role="group" aria-label="Series shortcuts">
+              {quick.map((q) => (
+                <button key={q.id} type="button" title={q.title} aria-pressed={!!q.on}
+                        className={"pop-quick-opt" + (q.on ? " active" : "")}
+                        onClick={q.run}>{q.label}</button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="sb-board" role="group" aria-label={label}>
+          {items.map((i) => (
+            <button key={i.id} type="button"
+                    className={"sb-row" + (hidden[i.id] ? " off" : "") + (surfacedIds.has(i.id) ? " out" : "")}
+                    aria-pressed={!hidden[i.id]}
+                    title={(hidden[i.id] ? "Draw " : "Take ") + i.name + (hidden[i.id] ? " on the chart" : " off the chart")}
+                    onClick={() => toggle(i.id)}>
+              <span className="sb-swatch" style={{ background: i.color }}></span>
+              <span className="sb-row-name">{i.name}</span>
+              {i.note && <span className="sb-row-note">{i.note}</span>}
+              <span className="sb-row-val">{i.value}</span>
+            </button>
+          ))}
+        </div>
+        {foot && <p className="ap-pop-foot">{foot}</p>}
+      </FilterPop>
+      {surfaced.map((sfc) => (
+        <button key={sfc.id} type="button"
+                className={"sb-out" + (hidden[sfc.id] ? " off" : "")}
+                style={{ "--fl": sfc.color }}
+                aria-pressed={!hidden[sfc.id]}
+                title={sfc.title}
+                onClick={() => toggle(sfc.id)}>
+          <span className="sb-swatch" style={{ background: sfc.color }}></span>
+          <span className="sb-out-name">{sfc.name}</span>
+          <span className="sb-out-val">{sfc.value}</span>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/* ---- the drift panels' legend ------------------------------------------
+   The answer, then the board. The pooled figure is what this panel exists to
+   report, so it is a readout rather than the eleventh chip in a row of ten;
+   the houses are a control, and controls fold. A house whose own drift sits
+   OUTSIDE the pooled interval is making a claim the pooled line is not, so it
+   stays on the surface — the rest agreed with the pooled read to within its
+   own error and were never news. */
+function FlowLegend({ pooledId, pooled, houseRows, hidden, setHidden, sgn, kind }) {
   const total = houseRows.length;
-  const shownHouses = houseRows.filter((r) => !hidden[r.f]).length;
   const pooledOn = !hidden[pooledId];
-  /* The band is the pooled 95% interval. A house beyond it is not "wrong" —
-     it is measurably somewhere else, which is exactly what this panel exists
-     to notice. Without an interval nothing is singled out, which is the
-     honest failure mode. */
   const band = pooled && pooled.ci95 != null ? pooled.ci95 : null;
   const outliers = band == null ? []
     : houseRows.filter((r) => r.latest != null && Math.abs(r.latest) > band);
   const outSet = new Set(outliers.map((r) => r.f));
-
-  /* The label already says "Houses", so the summary counts rather than
-     repeats it. */
-  const summary = (shownHouses === total ? "all " + total : shownHouses + " of " + total)
-                  + (pooledOn ? "" : " · pooled off");
   const setAll = (v) => setHidden(Object.fromEntries(houseRows.map((r) => [r.f, v])));
-  const QUICK = [
+  const shownHouses = houseRows.filter((r) => !hidden[r.f]).length;
+  const items = [{ id: pooledId, color: "var(--ink)", name: "Pooled, " + total + " houses",
+                   value: band != null ? sgn(pooled.v) + " ± " + pooled.ci95.toFixed(1) : "–" }]
+    .concat(houseRows.map((r) => ({ id: r.f, color: r.color, name: r.f,
+      value: r.latest == null ? "–" : sgn(r.latest) + "pp",
+      note: outSet.has(r.f) ? "outside the interval" : null })));
+  const quick = [
     { id: "all", label: "All", title: "Every house on the chart",
       on: shownHouses === total && pooledOn, run: () => setHidden({}) },
     { id: "pooled", label: "Pooled only", title: "The cross-house line alone, with its interval",
       on: shownHouses === 0 && pooledOn, run: () => setAll(true) },
-    { id: "out", label: "Off the table", title: "Only the houses whose own drift sits outside the pooled interval",
-      on: outliers.length > 0 && pooledOn && shownHouses === outliers.length
-          && houseRows.every((r) => hidden[r.f] !== outSet.has(r.f)),
-      run: () => setHidden(Object.fromEntries(houseRows.map((r) => [r.f, !outSet.has(r.f)]))) },
-  ].filter((q) => q.id !== "out" || outliers.length > 0);
-
-  const row = (key, colour, name, value, note) => (
-    <button key={key} type="button"
-            className={"flow-row" + (hidden[key] ? " off" : "") + (outSet.has(key) ? " out" : "")}
-            aria-pressed={!hidden[key]}
-            title={(hidden[key] ? "Draw " : "Take ") + name + (hidden[key] ? " on the chart" : " off the chart")}
-            onClick={() => setHidden((h) => ({ ...h, [key]: !h[key] }))}>
-      <span className="flow-swatch" style={{ background: colour }}></span>
-      <span className="flow-row-name">{name}</span>
-      {note && <span className="flow-row-note">{note}</span>}
-      <span className="flow-row-val">{value}</span>
-    </button>
-  );
+  ];
+  if (outliers.length) quick.push({ id: "out", label: "Off the table",
+    title: "Only the houses whose own drift sits outside the pooled interval",
+    on: pooledOn && shownHouses === outliers.length && houseRows.every((r) => !!hidden[r.f] !== outSet.has(r.f)),
+    run: () => setHidden(Object.fromEntries(houseRows.map((r) => [r.f, !outSet.has(r.f)]))) });
 
   return (
-    <div className="flow-legend">
-      {pooled && pooled.ci95 != null && (
-        /* The answer, said once, in the size it deserves. */
+    <div className="sb-legend">
+      {band != null && (
         <div className="flow-readout">
           <span className="flow-readout-v">{sgn(pooled.v)}
             <span className="flow-readout-ci"> ± {pooled.ci95.toFixed(1)}</span>
@@ -3577,47 +3638,14 @@ function FlowLegend({ pooledId, pooled, houseRows, hidden, setHidden, sgn, kind 
           </span>
         </div>
       )}
-      <div className="flow-bar">
-        <FilterPop id={"flow-" + kind} label="Houses" summary={summary} open={pop} setOpen={setPop}
-                   on={shownHouses !== total || !pooledOn}>
-          <div className="ap-pop-head">
-            <span>On the chart</span>
-            <div className="pop-quick" role="group" aria-label="Series shortcuts">
-              {QUICK.map((q) => (
-                <button key={q.id} type="button" title={q.title} aria-pressed={q.on}
-                        className={"pop-quick-opt" + (q.on ? " active" : "")}
-                        onClick={q.run}>{q.label}</button>
-              ))}
-            </div>
-          </div>
-          <div className="flow-board" role="group" aria-label="Series">
-            {row(pooledId, "var(--ink)", "Pooled, " + total + " houses",
-                 pooled && pooled.ci95 != null ? sgn(pooled.v) + " ± " + pooled.ci95.toFixed(1) : "–")}
-            {houseRows.map((r) => row(r.f, r.color, r.f,
-                 r.latest == null ? "–" : sgn(r.latest) + "pp",
-                 outSet.has(r.f) ? "outside the interval" : null))}
-          </div>
-          <p className="ap-pop-foot">
-            Click a house to draw or clear its line. Each is measured against its own
-            baseline, so a house sitting at zero is behaving as its own first waves did —
-            not as the election did.
-          </p>
-        </FilterPop>
-        {/* Surfaced, not buried: these are the houses the pooled line is not
-            speaking for. */}
-        {outliers.map((r) => (
-          <button key={r.f} type="button"
-                  className={"flow-out" + (hidden[r.f] ? " off" : "")}
-                  style={{ "--fl": r.color }}
-                  aria-pressed={!hidden[r.f]}
-                  title={r.f + " sits outside the pooled interval — click to clear its line"}
-                  onClick={() => setHidden((h) => ({ ...h, [r.f]: !h[r.f] }))}>
-            <span className="flow-swatch" style={{ background: r.color }}></span>
-            <span className="flow-out-name">{r.f}</span>
-            <span className="flow-out-val">{sgn(r.latest)}pp</span>
-          </button>
-        ))}
-      </div>
+      <SeriesBoard id={"flow-" + kind} label="Houses" items={items} hidden={hidden}
+        setHidden={setHidden} quick={quick} countIds={houseRows.map((r) => r.f)}
+        surfaced={outliers.map((r) => ({ id: r.f, color: r.color, name: r.f,
+          value: sgn(r.latest) + "pp",
+          title: r.f + " sits outside the pooled interval \u2014 click to clear its line" }))}
+        foot={<>Click a house to draw or clear its line. Each is measured against its own
+              baseline, so a house sitting at zero is behaving as its own first waves did &mdash;
+              not as the election did.</>} />
     </div>
   );
 }

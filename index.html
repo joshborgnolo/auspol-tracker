@@ -3380,7 +3380,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 /* The head wraps on a narrow panel: "On the board" plus four options is a
    little wider than a 320px phone, and a shortcut row that ran off the edge
    would be worse than one on its own line. */
-.cyc-legend .ap-pop-head, .flow-legend .ap-pop-head { flex-wrap: wrap; }
+.cyc-legend .ap-pop-head, .sb-legend .ap-pop-head { flex-wrap: wrap; }
 /* Cuts of the same set, so they read as options in one voice rather than a
    primary with alternatives. The active one is underlined, not filled: this
    is a row inside a panel head, not a segmented control. margin-left:auto
@@ -3513,7 +3513,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    fold into the same board the past-cycles tab opens. What stays on the
    surface beside the button is any house whose own drift sits OUTSIDE the
    pooled interval: that house is making a claim the pooled line is not. */
-.flow-legend { margin: 4px 0 2px; }
+.sb-legend { margin: 4px 0 2px; }
 .flow-readout { display: flex; flex-direction: column; gap: 2px; margin: 0 0 12px; }
 .flow-readout-v {
   font-family: var(--serif); font-size: 30px; font-weight: 600; line-height: 1;
@@ -3528,36 +3528,36 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   line-height: 1.45; max-width: 46ch;
 }
 .flow-readout-lab strong { color: var(--ink-2); font-weight: 700; }
-.flow-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
-.flow-legend .ap-panel { width: min(440px, calc(100vw - 28px)); max-width: none; }
-.flow-board {
+.sb-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.sb-legend .ap-panel { width: min(440px, calc(100vw - 28px)); max-width: none; }
+.sb-board {
   display: flex; flex-direction: column; gap: 1px; padding: 2px 1px;
   max-height: min(52vh, 340px); overflow-y: auto;
 }
 /* One control per row here, not two: a house is on the chart or it is not.
    (The cycles board carries two because a term answers two questions.) */
-.flow-row {
+.sb-row {
   display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
   border: 0; background: none; cursor: pointer; border-radius: 8px;
   padding: 8px 10px; font-family: var(--sans); color: var(--ink-2);
   transition: background-color .15s ease, opacity .15s ease;
 }
-.flow-row:hover, .flow-row:focus-within { background: color-mix(in oklch, var(--ink) 6%, transparent); }
-.flow-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.flow-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
-.flow-row-name { font-size: 13px; font-weight: 600; color: var(--ink); min-width: 0;
+.sb-row:hover, .sb-row:focus-within { background: color-mix(in oklch, var(--ink) 6%, transparent); }
+.sb-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.sb-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.sb-row-name { font-size: 13px; font-weight: 600; color: var(--ink); min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Why this row is on the surface as well as in the list. */
-.flow-row-note { font-size: 11px; font-weight: 600; color: var(--mood-neg); white-space: nowrap; }
-.flow-row-val { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
+.sb-row-note { font-size: 11px; font-weight: 600; color: var(--mood-neg); white-space: nowrap; }
+.sb-row-val { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
   font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* Off the chart: the row goes quiet, and its mark hollows out rather than
    vanishing — the colour is how you find it again. */
-.flow-row.off { opacity: 0.45; }
-.flow-row.off .flow-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
+.sb-row.off { opacity: 0.45; }
+.sb-row.off .sb-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
 /* The surfaced outlier: a pill in the house's own colour, carrying the figure
    that put it there. Pressing it clears the line, like its row would. */
-.flow-out {
+.sb-out {
   display: inline-flex; align-items: center; gap: 7px;
   border: 1px solid color-mix(in oklch, var(--fl) 45%, var(--line));
   background: color-mix(in oklch, var(--fl) 9%, var(--surface));
@@ -3565,13 +3565,13 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   font-family: var(--sans); font-size: 12.5px; color: var(--ink-2);
   transition: opacity .15s ease, border-color .15s ease;
 }
-.flow-out:hover { border-color: var(--fl); }
-.flow-out:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.flow-out.off { opacity: 0.42; }
-.flow-out.off .flow-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
-.flow-out-name { font-weight: 600; color: var(--ink); }
-.flow-out-val { font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-@media (pointer: coarse) { .flow-row { padding-top: 12px; padding-bottom: 12px; } }
+.sb-out:hover { border-color: var(--fl); }
+.sb-out:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sb-out.off { opacity: 0.42; }
+.sb-out.off .sb-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
+.sb-out-name { font-weight: 600; color: var(--ink); }
+.sb-out-val { font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+@media (pointer: coarse) { .sb-row { padding-top: 12px; padding-bottom: 12px; } }
 /* Phones: the readout is the panel's headline, so it keeps its size; the
    label under it is what gives way. */
 @media (max-width: 620px) {
@@ -17437,6 +17437,7 @@ const LEAN_MEASURE_META = {
     ground: "The ground colours the side of zero a house sits on: inside the tinted band it runs ahead of the consensus on One Nation’s primary vote, below zero it trails it."
   }
 };
+const LEAN_SURFACE = 1.0; // pp — the lean chart's first gridline
 function HouseLeanPanel({
   rangeId
 }) {
@@ -17499,12 +17500,18 @@ function HouseLeanPanel({
     ticks
   } = fitDomain(vals, Math.max(...vals.map(Math.abs)) > 4 ? 2 : step, 0);
 
-  // the standing each chip wears comes from the FULL series, not the window
+  // the standing each row wears comes from the FULL series, not the window
   const latest = rows.map(r => ({
     firm: r.firm,
     color: r.color,
     v: r.all[r.all.length - 1].y
   }));
+  const leanStr = v => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(1) + "pp";
+  /* The threshold is the chart's own first gridline (step = 1 above), so
+     "surfaced" means "visibly outside the band" rather than a cutoff invented
+     for the pill. Sorted by size: if the panel is going to name houses, it
+     names the biggest lean first. */
+  const leaners = latest.filter(e => Math.abs(e.v) >= LEAN_SURFACE).sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
   return /*#__PURE__*/React.createElement("section", {
     className: "ap-lean",
     id: "house-lean"
@@ -17518,32 +17525,46 @@ function HouseLeanPanel({
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("house-effect", "House lean")
-  }, "house effect"), " ", "the aggregates subtract, shown as it has walked. The chart above spreads the houses against chance; this one tracks where each one stands.")), /*#__PURE__*/React.createElement("div", {
-    className: "legend"
-  }, latest.map(e => {
-    const s = (e.v > 0 ? "+" : e.v < 0 ? "−" : "") + Math.abs(e.v).toFixed(1) + "pp";
-    const he = D.houseEffects && (measure === "tpp" ? D.houseEffects.tpp && D.houseEffects.tpp[e.firm] : D.houseEffects.primary && D.houseEffects.primary[measure] && D.houseEffects.primary[measure][e.firm]);
-    return /*#__PURE__*/React.createElement("button", {
-      key: e.firm,
-      type: "button",
-      className: "legend-chip" + (hidden[e.firm] ? " off" : ""),
-      "aria-pressed": !hidden[e.firm],
-      title: e.firm + " – currently " + s.replace("−", "-") + " against the consensus on " + meta.phrase + (he && he.n ? " · pooled from " + he.n + " polls" : ""),
-      onClick: () => setHidden(h => ({
-        ...h,
-        [e.firm]: !h[e.firm]
-      }))
-    }, /*#__PURE__*/React.createElement("span", {
-      className: "legend-swatch",
-      style: {
-        background: e.color
-      }
-    }), /*#__PURE__*/React.createElement("span", {
-      className: "legend-name"
-    }, e.firm), /*#__PURE__*/React.createElement("span", {
-      className: "legend-val"
-    }, s));
-  }))), /*#__PURE__*/React.createElement("div", {
+  }, "house effect"), " ", "the aggregates subtract, shown as it has walked. The chart above spreads the houses against chance; this one tracks where each one stands."))), /*#__PURE__*/React.createElement(SeriesBoard, {
+    id: "lean-" + measure,
+    label: "Houses",
+    hidden: hidden,
+    setHidden: setHidden,
+    items: latest.map(e => ({
+      id: e.firm,
+      color: e.color,
+      name: e.firm,
+      value: leanStr(e.v),
+      note: Math.abs(e.v) >= LEAN_SURFACE ? "past ±1pp" : null
+    })),
+    quick: [{
+      id: "all",
+      label: "All",
+      title: "Every house on the chart",
+      on: latest.every(e => !hidden[e.firm]),
+      run: () => setHidden({})
+    }, {
+      id: "none",
+      label: "None",
+      title: "Clear the chart",
+      on: latest.every(e => hidden[e.firm]),
+      run: () => setHidden(Object.fromEntries(latest.map(e => [e.firm, true])))
+    }].concat(leaners.length ? [{
+      id: "lean",
+      label: "Past ±1pp",
+      title: "Only the houses whose lean has left the band the chart's first gridline draws",
+      on: latest.every(e => !!hidden[e.firm] !== Math.abs(e.v) >= LEAN_SURFACE),
+      run: () => setHidden(Object.fromEntries(latest.map(e => [e.firm, Math.abs(e.v) < LEAN_SURFACE])))
+    }] : []),
+    surfaced: leaners.map(e => ({
+      id: e.firm,
+      color: e.color,
+      name: e.firm,
+      value: leanStr(e.v),
+      title: e.firm + " is " + leanStr(e.v).replace("−", "-") + " against the consensus on " + meta.phrase + " — click to clear its line"
+    })),
+    foot: /*#__PURE__*/React.createElement(React.Fragment, null, "Click a house to draw or clear its line. Zero is the consensus of the houses polling around it, not a neutral the site defines \u2014 a house at zero agrees with its contemporaries, which is not the same as being right.")
+  }), /*#__PURE__*/React.createElement("div", {
     className: "ap-var-ctl"
   }, /*#__PURE__*/React.createElement(TextToggle, {
     value: measure,
@@ -17611,23 +17632,117 @@ function HouseLeanPanel({
    table's implication). Houses ride faint behind the aggregate, same
    hidden-chip convention as the lean panel, on the lean panel's own
    palette – a house here is the same house there. */
-/* ---- the drift panel's series board ------------------------------------
-   Ten chips in a row, one per house, each doubling as that house's current
-   drift readout — and the POOLED line, which is the only thing the panel
-   actually answers, sitting among them as the eleventh chip of equal weight.
-   A reader had to know which chip was the answer before the panel could give
-   them one.
+/* ---- series board -------------------------------------------------------
+   One control for every chart on this tab that draws a line per pollster.
+   Each of them opened as a row of chips — one per house, each doubling as
+   that house's current readout — which is a wall at nine or ten houses and
+   buries whichever line the panel is actually about.
 
-   So the answer comes out of the row and becomes a readout: the pooled drift,
-   its interval, and the sentence that interval implies. What is left is a
-   control, and controls fold — the same board the past-cycles tab uses, in
-   the same FilterPop.
+   So: the houses fold into a FilterPop (the same one the past-cycles board
+   uses), and anything the panel wants kept on the surface is named beside
+   the button as a pill in its own colour. What counts as "kept" is the
+   caller's judgement and differs per panel — the drift panels surface a
+   house sitting outside the pooled interval, house lean surfaces one past
+   the chart's own first gridline — so `surfaced` arrives decided, with the
+   reason it was surfaced in `note`. */
+function SeriesBoard({
+  id,
+  label,
+  items,
+  hidden,
+  setHidden,
+  quick,
+  surfaced = [],
+  foot,
+  countIds
+}) {
+  const [pop, setPop] = useState(null);
+  /* The summary counts what the LABEL names, which is not always every row:
+     the drift board carries a pooled line above its nine houses, and a button
+     reading "Houses · all 10" would be counting the thing the houses are
+     pooled into as one of them. */
+  const counted = countIds ? items.filter(i => countIds.includes(i.id)) : items;
+  const shown = counted.filter(i => !hidden[i.id]).length;
+  const surfacedIds = new Set(surfaced.map(s => s.id));
+  const toggle = k => setHidden(h => ({
+    ...h,
+    [k]: !h[k]
+  }));
+  return /*#__PURE__*/React.createElement("div", {
+    className: "sb-bar"
+  }, /*#__PURE__*/React.createElement(FilterPop, {
+    id: id,
+    label: label,
+    open: pop,
+    setOpen: setPop,
+    on: shown !== counted.length,
+    summary: shown === counted.length ? "all " + counted.length : shown + " of " + counted.length
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ap-pop-head"
+  }, /*#__PURE__*/React.createElement("span", null, "On the chart"), quick && quick.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "pop-quick",
+    role: "group",
+    "aria-label": "Series shortcuts"
+  }, quick.map(q => /*#__PURE__*/React.createElement("button", {
+    key: q.id,
+    type: "button",
+    title: q.title,
+    "aria-pressed": !!q.on,
+    className: "pop-quick-opt" + (q.on ? " active" : ""),
+    onClick: q.run
+  }, q.label)))), /*#__PURE__*/React.createElement("div", {
+    className: "sb-board",
+    role: "group",
+    "aria-label": label
+  }, items.map(i => /*#__PURE__*/React.createElement("button", {
+    key: i.id,
+    type: "button",
+    className: "sb-row" + (hidden[i.id] ? " off" : "") + (surfacedIds.has(i.id) ? " out" : ""),
+    "aria-pressed": !hidden[i.id],
+    title: (hidden[i.id] ? "Draw " : "Take ") + i.name + (hidden[i.id] ? " on the chart" : " off the chart"),
+    onClick: () => toggle(i.id)
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "sb-swatch",
+    style: {
+      background: i.color
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "sb-row-name"
+  }, i.name), i.note && /*#__PURE__*/React.createElement("span", {
+    className: "sb-row-note"
+  }, i.note), /*#__PURE__*/React.createElement("span", {
+    className: "sb-row-val"
+  }, i.value)))), foot && /*#__PURE__*/React.createElement("p", {
+    className: "ap-pop-foot"
+  }, foot)), surfaced.map(sfc => /*#__PURE__*/React.createElement("button", {
+    key: sfc.id,
+    type: "button",
+    className: "sb-out" + (hidden[sfc.id] ? " off" : ""),
+    style: {
+      "--fl": sfc.color
+    },
+    "aria-pressed": !hidden[sfc.id],
+    title: sfc.title,
+    onClick: () => toggle(sfc.id)
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "sb-swatch",
+    style: {
+      background: sfc.color
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "sb-out-name"
+  }, sfc.name), /*#__PURE__*/React.createElement("span", {
+    className: "sb-out-val"
+  }, sfc.value))));
+}
 
-   Nothing is buried that was saying something. A house whose own drift sits
-   OUTSIDE the pooled interval is making a claim the pooled line is not, and
-   it stays on the surface beside the button; the eight houses agreeing with
-   the pooled read to within its own error were never news, and are one click
-   away. */
+/* ---- the drift panels' legend ------------------------------------------
+   The answer, then the board. The pooled figure is what this panel exists to
+   report, so it is a readout rather than the eleventh chip in a row of ten;
+   the houses are a control, and controls fold. A house whose own drift sits
+   OUTSIDE the pooled interval is making a claim the pooled line is not, so it
+   stays on the surface — the rest agreed with the pooled read to within its
+   own error and were never news. */
 function FlowLegend({
   pooledId,
   pooled,
@@ -17637,23 +17752,26 @@ function FlowLegend({
   sgn,
   kind
 }) {
-  const [pop, setPop] = useState(null);
   const total = houseRows.length;
-  const shownHouses = houseRows.filter(r => !hidden[r.f]).length;
   const pooledOn = !hidden[pooledId];
-  /* The band is the pooled 95% interval. A house beyond it is not "wrong" —
-     it is measurably somewhere else, which is exactly what this panel exists
-     to notice. Without an interval nothing is singled out, which is the
-     honest failure mode. */
   const band = pooled && pooled.ci95 != null ? pooled.ci95 : null;
   const outliers = band == null ? [] : houseRows.filter(r => r.latest != null && Math.abs(r.latest) > band);
   const outSet = new Set(outliers.map(r => r.f));
-
-  /* The label already says "Houses", so the summary counts rather than
-     repeats it. */
-  const summary = (shownHouses === total ? "all " + total : shownHouses + " of " + total) + (pooledOn ? "" : " · pooled off");
   const setAll = v => setHidden(Object.fromEntries(houseRows.map(r => [r.f, v])));
-  const QUICK = [{
+  const shownHouses = houseRows.filter(r => !hidden[r.f]).length;
+  const items = [{
+    id: pooledId,
+    color: "var(--ink)",
+    name: "Pooled, " + total + " houses",
+    value: band != null ? sgn(pooled.v) + " ± " + pooled.ci95.toFixed(1) : "–"
+  }].concat(houseRows.map(r => ({
+    id: r.f,
+    color: r.color,
+    name: r.f,
+    value: r.latest == null ? "–" : sgn(r.latest) + "pp",
+    note: outSet.has(r.f) ? "outside the interval" : null
+  })));
+  const quick = [{
     id: "all",
     label: "All",
     title: "Every house on the chart",
@@ -17665,41 +17783,17 @@ function FlowLegend({
     title: "The cross-house line alone, with its interval",
     on: shownHouses === 0 && pooledOn,
     run: () => setAll(true)
-  }, {
+  }];
+  if (outliers.length) quick.push({
     id: "out",
     label: "Off the table",
     title: "Only the houses whose own drift sits outside the pooled interval",
-    on: outliers.length > 0 && pooledOn && shownHouses === outliers.length && houseRows.every(r => hidden[r.f] !== outSet.has(r.f)),
+    on: pooledOn && shownHouses === outliers.length && houseRows.every(r => !!hidden[r.f] !== outSet.has(r.f)),
     run: () => setHidden(Object.fromEntries(houseRows.map(r => [r.f, !outSet.has(r.f)])))
-  }].filter(q => q.id !== "out" || outliers.length > 0);
-  const row = (key, colour, name, value, note) => /*#__PURE__*/React.createElement("button", {
-    key: key,
-    type: "button",
-    className: "flow-row" + (hidden[key] ? " off" : "") + (outSet.has(key) ? " out" : ""),
-    "aria-pressed": !hidden[key],
-    title: (hidden[key] ? "Draw " : "Take ") + name + (hidden[key] ? " on the chart" : " off the chart"),
-    onClick: () => setHidden(h => ({
-      ...h,
-      [key]: !h[key]
-    }))
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "flow-swatch",
-    style: {
-      background: colour
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "flow-row-name"
-  }, name), note && /*#__PURE__*/React.createElement("span", {
-    className: "flow-row-note"
-  }, note), /*#__PURE__*/React.createElement("span", {
-    className: "flow-row-val"
-  }, value));
+  });
   return /*#__PURE__*/React.createElement("div", {
-    className: "flow-legend"
-  }, pooled && pooled.ci95 != null &&
-  /*#__PURE__*/
-  /* The answer, said once, in the size it deserves. */
-  React.createElement("div", {
+    className: "sb-legend"
+  }, band != null && /*#__PURE__*/React.createElement("div", {
     className: "flow-readout"
   }, /*#__PURE__*/React.createElement("span", {
     className: "flow-readout-v"
@@ -17709,57 +17803,23 @@ function FlowLegend({
     className: "flow-readout-u"
   }, "pp")), /*#__PURE__*/React.createElement("span", {
     className: "flow-readout-lab"
-  }, Math.abs(pooled.v) <= pooled.ci95 ? /*#__PURE__*/React.createElement(React.Fragment, null, "Pooled across ", total, " houses \u2014 ", /*#__PURE__*/React.createElement("strong", null, "no drift the interval can separate from zero")) : /*#__PURE__*/React.createElement(React.Fragment, null, "Pooled across ", total, " houses \u2014 running ", /*#__PURE__*/React.createElement("strong", null, pooled.v > 0 ? "friendlier to Labor" : "friendlier to the Coalition"), " than the table reads their primaries"))), /*#__PURE__*/React.createElement("div", {
-    className: "flow-bar"
-  }, /*#__PURE__*/React.createElement(FilterPop, {
+  }, Math.abs(pooled.v) <= pooled.ci95 ? /*#__PURE__*/React.createElement(React.Fragment, null, "Pooled across ", total, " houses \u2014 ", /*#__PURE__*/React.createElement("strong", null, "no drift the interval can separate from zero")) : /*#__PURE__*/React.createElement(React.Fragment, null, "Pooled across ", total, " houses \u2014 running ", /*#__PURE__*/React.createElement("strong", null, pooled.v > 0 ? "friendlier to Labor" : "friendlier to the Coalition"), " than the table reads their primaries"))), /*#__PURE__*/React.createElement(SeriesBoard, {
     id: "flow-" + kind,
     label: "Houses",
-    summary: summary,
-    open: pop,
-    setOpen: setPop,
-    on: shownHouses !== total || !pooledOn
-  }, /*#__PURE__*/React.createElement("div", {
-    className: "ap-pop-head"
-  }, /*#__PURE__*/React.createElement("span", null, "On the chart"), /*#__PURE__*/React.createElement("div", {
-    className: "pop-quick",
-    role: "group",
-    "aria-label": "Series shortcuts"
-  }, QUICK.map(q => /*#__PURE__*/React.createElement("button", {
-    key: q.id,
-    type: "button",
-    title: q.title,
-    "aria-pressed": q.on,
-    className: "pop-quick-opt" + (q.on ? " active" : ""),
-    onClick: q.run
-  }, q.label)))), /*#__PURE__*/React.createElement("div", {
-    className: "flow-board",
-    role: "group",
-    "aria-label": "Series"
-  }, row(pooledId, "var(--ink)", "Pooled, " + total + " houses", pooled && pooled.ci95 != null ? sgn(pooled.v) + " ± " + pooled.ci95.toFixed(1) : "–"), houseRows.map(r => row(r.f, r.color, r.f, r.latest == null ? "–" : sgn(r.latest) + "pp", outSet.has(r.f) ? "outside the interval" : null))), /*#__PURE__*/React.createElement("p", {
-    className: "ap-pop-foot"
-  }, "Click a house to draw or clear its line. Each is measured against its own baseline, so a house sitting at zero is behaving as its own first waves did \u2014 not as the election did.")), outliers.map(r => /*#__PURE__*/React.createElement("button", {
-    key: r.f,
-    type: "button",
-    className: "flow-out" + (hidden[r.f] ? " off" : ""),
-    style: {
-      "--fl": r.color
-    },
-    "aria-pressed": !hidden[r.f],
-    title: r.f + " sits outside the pooled interval — click to clear its line",
-    onClick: () => setHidden(h => ({
-      ...h,
-      [r.f]: !h[r.f]
-    }))
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "flow-swatch",
-    style: {
-      background: r.color
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "flow-out-name"
-  }, r.f), /*#__PURE__*/React.createElement("span", {
-    className: "flow-out-val"
-  }, sgn(r.latest), "pp")))));
+    items: items,
+    hidden: hidden,
+    setHidden: setHidden,
+    quick: quick,
+    countIds: houseRows.map(r => r.f),
+    surfaced: outliers.map(r => ({
+      id: r.f,
+      color: r.color,
+      name: r.f,
+      value: sgn(r.latest) + "pp",
+      title: r.f + " sits outside the pooled interval \u2014 click to clear its line"
+    })),
+    foot: /*#__PURE__*/React.createElement(React.Fragment, null, "Click a house to draw or clear its line. Each is measured against its own baseline, so a house sitting at zero is behaving as its own first waves did \u2014 not as the election did.")
+  }));
 }
 function FlowDriftPanel({
   rangeId

@@ -3288,7 +3288,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 /* The head wraps on a narrow panel: "On the board" plus four options is a
    little wider than a 320px phone, and a shortcut row that ran off the edge
    would be worse than one on its own line. */
-.cyc-legend .ap-pop-head, .flow-legend .ap-pop-head { flex-wrap: wrap; }
+.cyc-legend .ap-pop-head, .sb-legend .ap-pop-head { flex-wrap: wrap; }
 /* Cuts of the same set, so they read as options in one voice rather than a
    primary with alternatives. The active one is underlined, not filled: this
    is a row inside a panel head, not a segmented control. margin-left:auto
@@ -3421,7 +3421,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    fold into the same board the past-cycles tab opens. What stays on the
    surface beside the button is any house whose own drift sits OUTSIDE the
    pooled interval: that house is making a claim the pooled line is not. */
-.flow-legend { margin: 4px 0 2px; }
+.sb-legend { margin: 4px 0 2px; }
 .flow-readout { display: flex; flex-direction: column; gap: 2px; margin: 0 0 12px; }
 .flow-readout-v {
   font-family: var(--serif); font-size: 30px; font-weight: 600; line-height: 1;
@@ -3436,36 +3436,36 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   line-height: 1.45; max-width: 46ch;
 }
 .flow-readout-lab strong { color: var(--ink-2); font-weight: 700; }
-.flow-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
-.flow-legend .ap-panel { width: min(440px, calc(100vw - 28px)); max-width: none; }
-.flow-board {
+.sb-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.sb-legend .ap-panel { width: min(440px, calc(100vw - 28px)); max-width: none; }
+.sb-board {
   display: flex; flex-direction: column; gap: 1px; padding: 2px 1px;
   max-height: min(52vh, 340px); overflow-y: auto;
 }
 /* One control per row here, not two: a house is on the chart or it is not.
    (The cycles board carries two because a term answers two questions.) */
-.flow-row {
+.sb-row {
   display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
   border: 0; background: none; cursor: pointer; border-radius: 8px;
   padding: 8px 10px; font-family: var(--sans); color: var(--ink-2);
   transition: background-color .15s ease, opacity .15s ease;
 }
-.flow-row:hover, .flow-row:focus-within { background: color-mix(in oklch, var(--ink) 6%, transparent); }
-.flow-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
-.flow-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
-.flow-row-name { font-size: 13px; font-weight: 600; color: var(--ink); min-width: 0;
+.sb-row:hover, .sb-row:focus-within { background: color-mix(in oklch, var(--ink) 6%, transparent); }
+.sb-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.sb-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.sb-row-name { font-size: 13px; font-weight: 600; color: var(--ink); min-width: 0;
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Why this row is on the surface as well as in the list. */
-.flow-row-note { font-size: 11px; font-weight: 600; color: var(--mood-neg); white-space: nowrap; }
-.flow-row-val { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
+.sb-row-note { font-size: 11px; font-weight: 600; color: var(--mood-neg); white-space: nowrap; }
+.sb-row-val { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
   font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* Off the chart: the row goes quiet, and its mark hollows out rather than
    vanishing — the colour is how you find it again. */
-.flow-row.off { opacity: 0.45; }
-.flow-row.off .flow-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
+.sb-row.off { opacity: 0.45; }
+.sb-row.off .sb-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
 /* The surfaced outlier: a pill in the house's own colour, carrying the figure
    that put it there. Pressing it clears the line, like its row would. */
-.flow-out {
+.sb-out {
   display: inline-flex; align-items: center; gap: 7px;
   border: 1px solid color-mix(in oklch, var(--fl) 45%, var(--line));
   background: color-mix(in oklch, var(--fl) 9%, var(--surface));
@@ -3473,13 +3473,13 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   font-family: var(--sans); font-size: 12.5px; color: var(--ink-2);
   transition: opacity .15s ease, border-color .15s ease;
 }
-.flow-out:hover { border-color: var(--fl); }
-.flow-out:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.flow-out.off { opacity: 0.42; }
-.flow-out.off .flow-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
-.flow-out-name { font-weight: 600; color: var(--ink); }
-.flow-out-val { font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; }
-@media (pointer: coarse) { .flow-row { padding-top: 12px; padding-bottom: 12px; } }
+.sb-out:hover { border-color: var(--fl); }
+.sb-out:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.sb-out.off { opacity: 0.42; }
+.sb-out.off .sb-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
+.sb-out-name { font-weight: 600; color: var(--ink); }
+.sb-out-val { font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+@media (pointer: coarse) { .sb-row { padding-top: 12px; padding-bottom: 12px; } }
 /* Phones: the readout is the panel's headline, so it keeps its size; the
    label under it is what gives way. */
 @media (max-width: 620px) {
