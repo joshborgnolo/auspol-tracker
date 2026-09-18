@@ -186,7 +186,7 @@ const HE_WINDOW = 28, SHRINK_K = 8, SAMPLE_CAP = 3000, LN2 = Math.log(2);
 const HL_DEFF = 1.6;
 /* A poll's n on the derived scale. Where the house files a published
    effective sample size (polls.json `sampleEff` – Newspoll, YouGov,
-   Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog via APC methodology
+   Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog via APC methodology
    statements), that figure is
    already deflated by the house's own design effect; scale it back up by
    HL_DEFF so published and derived rows sit on the one convention, and the
@@ -1734,6 +1734,34 @@ const rivalLead = (() => {
   return who;
 })();
 
+/* The primary-vote facet's column order, shared by the Latest and All-polls
+   tables. Highest aggregate sits leftmost – but the ALP/ON/LNP primaries have
+   crossed and recrossed this term on 0.2-0.5-point monthly differences, and a
+   naive "rank this month's numbers" rule would shuffle the columns on moves
+   the page would not otherwise call real. Same deadband as the rival ruling:
+   a party overtakes the one above it only when its aggregate leads by more
+   than PRIMARY_DEADBAND, and then holds the slot until the reverse happens.
+   Walked forward monthly from the election anchor rather than stored, so the
+   order is a pure function of the data and every build reproduces it. */
+const PRIMARY_DEADBAND = 1.0;
+const primaryOrder = (() => {
+  const order = [...PRIMARY_KEYS];
+  for (const m of aggPrimary) {
+    if (PRIMARY_KEYS.some((k) => m[k] == null)) continue;
+    let moved = true;
+    while (moved) {
+      moved = false;
+      for (let i = order.length - 2; i >= 0; i--) {
+        if (m[order[i + 1]] > m[order[i]] + PRIMARY_DEADBAND) {
+          [order[i], order[i + 1]] = [order[i + 1], order[i]];
+          moved = true;
+        }
+      }
+    }
+  }
+  return order;
+})();
+
 const latest = {
   alp2pp: hlNow.alp, lnp2pp: r1(100 - hlNow.alp),
   alp2ppPrev: hl1mo ? hl1mo.alp : agg2pp[agg2pp.length - 2].alp,
@@ -1762,6 +1790,9 @@ const latest = {
   /* the id the hero opens on, and the order every legend listing the
      two Labor contests should use */
   rivalLead,
+  /* the primary-vote facet's column order in the poll tables – highest
+     aggregate leftmost, an overtake only once a full point clears */
+  primaryOrder,
   nextElectionDue: "By 20 May 2028", pollsTracked: individualPolls.length, housesTracked: houses.size,
   /* deff rides in the payload so the page's discord engine reads the SAME
      constant the node estimator used (it lives in an untransformed asset and
@@ -2031,7 +2062,7 @@ const ACC_WINDOW_DAYS = 14;
 const ACC_CANON = {
   "Morgan": "Roy Morgan", "Newspoll-YouGov": "Newspoll",
   "Resolve Strategic": "Resolve", "Freshwater Strategy": "Freshwater",
-  "Redbridge/Accent": "RedBridge", "Spectre Strategy": "Spectre",
+  "RedBridge/Accent": "RedBridge", "Spectre Strategy": "Spectre",
 };
 const accCanon = (f) => ACC_CANON[f] || f;
 const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {

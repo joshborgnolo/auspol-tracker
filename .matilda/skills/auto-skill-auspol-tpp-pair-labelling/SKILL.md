@@ -88,7 +88,7 @@ would have mislabelled those waves. The correct predicate (now inside `tppLines`
 
 - Roy Morgan — every row (canonical pair = respondent-allocated; `tpp_flows` = the
   2025-election-flows ALP share).
-- "RedBridge / Accent" — since the 2026-08-31 convention reversal: Apr 53, May 52,
+- "RedBridge/Accent" — since the 2026-08-31 convention reversal: Apr 53, May 52,
   Jun 55, Jul 50 (extractor commits from the Accent PDF `tppHist` column), Aug 52
   (hand-entered — that manual-ingest wave is invisible to extractor discovery; see
   the redbridge-accent-extraction skill's *Discovery gap* section).

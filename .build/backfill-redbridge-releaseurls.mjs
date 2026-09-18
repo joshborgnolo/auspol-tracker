@@ -8,7 +8,7 @@
 //
 //   2025-10-07  wave released on the analysis-style page
 //               "Federal Political Snapshot – October 2025"
-//   2026-05-14  the MRP row (pollster "RedBridge / Accent (MRP)"),
+//   2026-05-14  the MRP row (pollster "RedBridge/Accent (MRP)"),
 //               released as "A fragmented electorate"; also unmatchable by
 //               pollster label
 //
@@ -26,8 +26,8 @@ import { readFileSync, writeFileSync, renameSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 const OUT = fileURLToPath(new URL("../data/polls.json", import.meta.url));
 const MAP = {
-  "RedBridge / Accent|2025-10-07": "https://www.accent-research.com/projects/federal-political-snapshot---october-2025",
-  "RedBridge / Accent (MRP)|2026-05-14": "https://www.accent-research.com/projects/a-fragmented-electorate",
+  "RedBridge/Accent|2025-10-07": "https://www.accent-research.com/projects/federal-political-snapshot---october-2025",
+  "RedBridge/Accent (MRP)|2026-05-14": "https://www.accent-research.com/projects/a-fragmented-electorate",
 };
 const orig = readFileSync(OUT, "utf8");
 const D = JSON.parse(orig);

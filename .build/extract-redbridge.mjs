@@ -79,7 +79,7 @@
 //   misfiling a row.
 //
 // ROW CONVENTIONS (verified against the 15 committed RedBridge rows):
-//   pollster "RedBridge / Accent" (AFR-commissioned; "Redbridge" is used for
+//   pollster "RedBridge/Accent" (AFR-commissioned; "Redbridge" is used for
 //   other clients and never collides here), firm = same in companion
 //   sections; client "AFR"; date = fieldwork END, dateStart = start;
 //   published = AFR embargo date with hour pinned "T18:00" (observed
@@ -114,7 +114,7 @@ const FORCE = argv.includes("--force");
 const SITEMAP_INDEX = argv.find((a) => !a.startsWith("--")) || "https://www.accent-research.com/sitemap.xml";
 const OUT = "data/polls.json";
 const SRC_DIR = ".build/redbridge-src";
-const POLLSTER = "RedBridge / Accent";
+const POLLSTER = "RedBridge/Accent";
 const CYCLE_START = "2025-05-04";
 const FETCH_TIMEOUT_MS = 60_000;
 const PDF_TIMEOUT_MS = 180_000;

@@ -1,6 +1,6 @@
 ---
 name: auspol-effective-sample
-description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Filing houses with a sampleEff leg: Newspoll, YouGov, Essential, DemosAU, and (from 2026-09-04) RedBridge/Accent — a fully OFFLINE leg reading the committed .build/redbridge-src caches, 8 waves stamped. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index — with a release-PDF fallback (added 2026-09-02) that parses a needing row's own url when it is a demosau.com wp-content PDF, since the house posts statement-bearing report PDFs it never lists / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md; plus (2026-09-04) an accent-only ride-along inside redbridge-updater.sh — `extract-sampleeff.mjs accent` right after a changed:true extract, so the new wave's eff joins the same commit. Statement caches in .build/sampleeff-src/. Since commit 212282c (2026-09-04) extract-sampleeff.mjs also treats each statement's raw `Sample size` row as authoritative for the row's `sample`, re-parses the committed caches offline every run, and corrects stale press-rounded samples (first data pass 0a280d6 fixed 13 waves, including YouGov 2026-06-16 1500→1492). Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement, DemosAU 2026-01-06's release URL is a Capital Brief article page (no demosau.com PDF to fall back on)."
+description: "auspol-tracker — per-poll effective sample size IMPLEMENTED (2026-09-02): optional per-poll sampleEff field (house-published effective n from APC methodology statements), absent-not-zero like undecided/tpp_flows; gen-data rowN() gives nEff = sampleEff ?? min(sample||1200, 3000)/HL_DEFF — HL_DEFF (1.6) applied ONLY on the derived path, never re-applied to a published value. Filing houses with a sampleEff leg: Newspoll, YouGov, Essential, DemosAU, and (from 2026-09-04) RedBridge/Accent — a fully OFFLINE leg reading the committed .build/redbridge-src caches, 8 waves stamped. Sibling field methodUrl (shipped 2026-09-02) carries the wave's APC statement LINK (YouGov CloudFront PDF / Newspoll Pyxis statement page-or-PDF / RedBridge usrfiles PDF / DemosAU statement PDF off its own index — with a release-PDF fallback (added 2026-09-02) that parses a needing row's own url when it is a demosau.com wp-content PDF, since the house posts statement-bearing report PDFs it never lists / Essential's ONE living disclosure PDF shared by every covered wave and refreshed in place when re-uploaded — the only leg allowed to overwrite; validator check 2c2). Extract/live pipeline: .build/extract-sampleeff.mjs + sampleeff-updater.sh + sampleeff-update.yml (poll-agent reusable, Mon 07:15 AEST) + sampleeff-repair-prompt.md; plus (2026-09-04) an accent-only ride-along inside redbridge-updater.sh — `extract-sampleeff.mjs accent` right after a changed:true extract, so the new wave's eff joins the same commit. Statement caches in .build/sampleeff-src/. Since commit 212282c (2026-09-04) extract-sampleeff.mjs also treats each statement's raw `Sample size` row as authoritative for the row's `sample`, re-parses the committed caches offline every run, and corrects stale press-rounded samples (first data pass 0a280d6 fixed 13 waves, including YouGov 2026-06-16 1500→1492). Pyxis enumeration: the LIVE collection JSON API (sitemap.xml froze at 2026-01 in a CMS migration — never enumerate it). Known dead-ends: DemosAU MRP prints 'n/a for MRP' (never EFF-stamped — but its statement PDF still lands as the wave's methodUrl), YouGov Australia-Institute commissioned waves have no statement, DemosAU 2026-01-06's release URL is a Capital Brief article page (no demosau.com PDF to fall back on). RECURRING REPAIR GAP (hit 2026-09-18, DemosAU 2026-09-14 wave): NO pipeline leg stamps releaseUrl — a CI wave-reconcile that adds methodUrl (commit 4bb73b7) arrives WITHOUT the companion releaseUrl, so the expanded poll regresses to a bare 'APC statement' row instead of the merged 'Pollster's release … (includes the wave's APC methodology statement)' row until releaseUrl = the same demosau.com PDF is hand-set on the row."
 source: auto-skill
 extracted_at: '2026-09-04T01:05:29.530Z'
 ---
@@ -53,7 +53,7 @@ of 1003–1014. Still unstamped by design: the waves with no Accent page at
 all (2025 AFR-only releases, 2026-03-27), the 2026-05-14 MRP (no cache;
 every house's MRP precedent), and the plain-"Redbridge"
 Australia-Institute row (exact-pollster match keeps "Redbridge" and
-"RedBridge / Accent (MRP)" rows away from Accent records).
+"RedBridge/Accent (MRP)" rows away from Accent records).
 
 Documented gaps, all deliberate:
 - **DemosAU MRP statements print "n/a for MRP"** for effective sample —
@@ -179,10 +179,10 @@ the same user-supplied Sky Pulse report.
 ## Copy homes (move together)
 
 Same-place edits, both done at ship (house list extended 2026-09-04 to
-add RedBridge / Accent when its eff leg landed):
+add RedBridge/Accent when its eff leg landed):
 - weighted-aggregate glossary entry (asset d1a1d215, infoTerms) — nᵢ
   sentence lists the filing houses "(Newspoll, YouGov, Essential,
-  DemosAU and RedBridge / Accent, via their Australian Polling Council
+  DemosAU and RedBridge/Accent, via their Australian Polling Council
   methodology statements), else its raw sample", plus the note that nᵢ
   also sets the seFloor.
 - build.mjs static-summary "About this tracker" paragraph — same
@@ -231,7 +231,7 @@ Same extractor, same absent-not-zero convention: `methodUrl` carries the
 wave's APC methodology-statement LINK (distinct from the sampleEff NUMBER
 parsed out of it). Stamped by `.build/extract-sampleeff.mjs`, never by
 hand; validate.mjs check "2c2" guards it (https shape + pollster ∈
-{YouGov, Newspoll, RedBridge / Accent, RedBridge / Accent (MRP),
+{YouGov, Newspoll, RedBridge/Accent, RedBridge/Accent (MRP),
 DemosAU, DemosAU (MRP), Essential} — only
 those houses have a statement source reachable without paywall).
 
@@ -261,7 +261,7 @@ Sources and link forms:
   on 2026-09-02 after the user saw live 2026 statements the sitemap hid.
   `legNewspollLinks` matches rows ±7 days on `(p.published || p.date)`;
   both Newspoll legs now run with no Chrome and no rendering at all.
-- **RedBridge / Accent** (added 2026-09-02 as methodUrl-only; the
+- **RedBridge/Accent** (added 2026-09-02 as methodUrl-only; the
   sampleEff leg followed 2026-09-04 — see the coverage block above) —
   NO network fetch at all: `legAccentLinks()` re-reads
   the `pdfUrl` field already cached in `.build/redbridge-src/*.json` by
@@ -270,7 +270,7 @@ Sources and link forms:
   `[data-hook="file-upload-viewer"]` widget — never in static HTML or
   the Wix page-model JSON, so do not try to fetch it statically). Match
   is EXACT on cache `date` = row fieldwork end (not ±days); pollster
-  prefix-matches so "RedBridge / Accent (MRP)" rows are covered. Two
+  prefix-matches so "RedBridge/Accent (MRP)" rows are covered. Two
   Accent pages fall outside the extractor's sitemap regex
   (afr,-…-federal-poll slugs only) and live as a two-entry constant in
   the leg: the Oct-2025 snapshot (2025-10-07) and the MRP
@@ -331,6 +331,22 @@ Sources and link forms:
   methodology statement)" note; a11e1559 defines it once for BOTH
   tables. 2026-01-06 still has neither (no demosau.com PDF exists for
   it).
+  RELEASELINK MAINTENANCE GAP (verified 2026-09-18, fixed by hand-editing
+  the row): the 2026-09-02 RELEASELINK backfill was a ONE-OFF applied
+  only to rows existing that day — no extractor leg stamps `releaseUrl`.
+  When the CI repair flow reconciled the NEW 2026-09-14 wave to its
+  methodology PDF (commit 4bb73b7) it stamped `methodUrl` alone, so the
+  expanded poll dropped the merged "Pollster's release" row and surfaced
+  a bare "APC statement" row instead (releaseMetaRows in a11e1559
+  :2173-2214 only merges when releaseUrl === methodUrl; with methodUrl
+  but no releaseUrl it renders the statement line solo). Symptom to
+  recognise: ONE DemosAU wave showing "APC statement" while every other
+  wave shows "Pollster's release — Here↗ (includes the wave's APC
+  methodology statement)". Fix: hand-set `releaseUrl` = the same
+  demosau.com wp-content PDF on the polls.json row (between `url` and
+  `methodUrl`), exactly how the six b5b53b2 rows got theirs — do it
+  whenever a new capitalbrief-cited wave receives its methodUrl, whether
+  via the weekly sampleeff leg or a repair session.
 - **Essential** (added 2026-09-02, same day) — the odd one out: ONE
   living disclosure-statement PDF the house appends each wave to and
   re-uploads (essentialreport.com.au/wp-content/uploads/<YYYY>/<MM>/
@@ -352,7 +368,7 @@ Sources and link forms:
 
 Coverage: YouGov 19/22, Newspoll 17/17 (2025-07-17 → 2026-08-28: seven
 statement-page links + ten post-migration PDF links),
-RedBridge / Accent 9/16 (seven cache-derived + the two constant entries;
+RedBridge/Accent 9/16 (seven cache-derived + the two constant entries;
 the other seven stay unlinked by design as listed above), DemosAU 10/12
 (seven index statement PDFs incl. two of the three MRP waves, plus
 2025-07-06 / 2026-02-20 / 2026-07-08 via the release-PDF fallback;
@@ -374,7 +390,7 @@ archive table (d1a1d215) renders MethodLink in its pollster cell above
 the tag chips; template.html styles `.pollster-method` after
 `.pollster-mode`; check-citations.mjs sweeps it (`add(p.methodUrl,
 "methodUrl")`, +36 URLs once Newspoll's 2026 waves linked, +9 more
-when the RedBridge / Accent leg landed, +7 for the DemosAU leg,
+when the RedBridge/Accent leg landed, +7 for the DemosAU leg,
 +11 for the Essential leg → 63 entries, though Essential's eleven
 resolve to one living URL);
 README data-fields bullet beside the

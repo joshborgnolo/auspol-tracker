@@ -14,7 +14,7 @@
 
    Products are not names: the (MRP) variants are a different piece of work on
    their own schedule and are not folded into the tracking poll. */
-export const HOUSE_RENAMES = { "Redbridge": "RedBridge / Accent" };
+export const HOUSE_RENAMES = { "Redbridge": "RedBridge/Accent" };
 
 // Canonical name for a current-term pollster/firm string.
 export const canonHouse = (name) => HOUSE_RENAMES[name] || name;

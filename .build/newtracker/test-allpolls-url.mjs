@@ -65,7 +65,7 @@ const S = (...v) => new Set(v);
      grammar itself (or a legacy comma value could parse as a mask) --- */
 ok("URL_HOUSES is the pinned 12-house list", JSON.stringify(URL_HOUSES) === JSON.stringify([
   "Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater",
-  "Newspoll", "RedBridge / Accent", "Resolve", "Roy Morgan", "Spectre Strategy",
+  "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy",
   "Wolf & Smith", "YouGov",
 ]), JSON.stringify(URL_HOUSES));
 ok("every live house has a bit in URL_HOUSES", liveHouses.every((h) => URL_HOUSES.includes(h)),
@@ -85,10 +85,10 @@ rt(URL_HOUSES, S(...URL_HOUSES), "round-trip: every pollster");
 rt(TAGS, S(...TAGS), "round-trip: every tag");
 ok("empty pollster set packs to b0 (writer omits the param instead)", archMask(URL_HOUSES, S()) === "b0");
 
-/* --- the reported monstrosity: ?w=DemosAU,Newspoll,RedBridge / Accent,
+/* --- the reported monstrosity: ?w=DemosAU,Newspoll,RedBridge/Accent,
      Roy Morgan,YouGov&t=6&h=2pp,2x2pp → w bit-sum 2+32+64+256+2048 = 2402 --- */
 {
-  const who = S("DemosAU", "Newspoll", "RedBridge / Accent", "Roy Morgan", "YouGov");
+  const who = S("DemosAU", "Newspoll", "RedBridge/Accent", "Roy Morgan", "YouGov");
   const tok = archMask(URL_HOUSES, who);
   ok("reported URL's pollster set packs to the 4-char mask b1uq", tok === "b1uq", tok);
   const back = archUnpack(tok, URL_HOUSES);
@@ -100,7 +100,7 @@ ok("single-pollster example stays tiny: Newspoll → bw", archMask(URL_HOUSES, S
 
 /* --- legacy comma links still parse: the mask reader must hand EVERY
      pre-bitmask spelling back to the legacy path --- */
-const legacyW = "DemosAU,Newspoll,RedBridge / Accent,Roy Morgan,YouGov";
+const legacyW = "DemosAU,Newspoll,RedBridge/Accent,Roy Morgan,YouGov";
 const legacyH = "2pp,2x2pp";
 ok("legacy w list is not the mask form", archUnpack(legacyW, URL_HOUSES) === null);
 ok("legacy h list is not the mask form", archUnpack(legacyH, TAGS) === null);

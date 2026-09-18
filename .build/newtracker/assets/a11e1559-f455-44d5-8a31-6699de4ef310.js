@@ -2905,6 +2905,20 @@ function PollsterTable({ tppBasis, setTppBasis }) {
     { id: "leadership", label: "Leadership" },
   ];
 
+  /* Party columns rank by the aggregate (gen-data's latest.primaryOrder –
+     highest leftmost, a party only overtaking once it leads by a full point,
+     same deadband rule as the hero's rival ruling). Presentation travels
+     with the column, so everything keys off party id. The archive renderer
+     carries a copy of this def map – the two move together. */
+  const pOrder = (D.latest && D.latest.primaryOrder) || ["alp", "lnp", "grn", "onp", "oth"];
+  const PCOLS = {
+    alp: { label: "ALP", k: "p.alp", style: { color: "var(--alp-text)", fontWeight: 600 } },
+    lnp: { label: "L/NP", k: "p.lnp", style: { color: "var(--lnp-text)", fontWeight: 600 } },
+    grn: { label: "GRN", k: "p.grn", style: { color: "var(--grn-text)" } },
+    onp: { label: "ON", k: "p.onp", style: { color: "var(--onp-text)" } },
+    oth: { label: "OTH", cls: " muted hide-md" },   // the residual stays non-sortable
+  };
+
   return (
     <section className="card">
       <div className="card-head">
@@ -2954,13 +2968,12 @@ function PollsterTable({ tppBasis, setTppBasis }) {
                 </th>
                 <SortTh label="Lead · ALP v L/NP" short="Lead" sortKey="alp" sort={sort} onSort={onSort} />
               </>)}
-              {facet === "primary" && (<>
-                <SortTh label="ALP" sortKey="p.alp" sort={sort} onSort={onSort} />
-                <SortTh label="L/NP" sortKey="p.lnp" sort={sort} onSort={onSort} />
-                <SortTh label="GRN" sortKey="p.grn" sort={sort} onSort={onSort} />
-                <SortTh label="ON" sortKey="p.onp" sort={sort} onSort={onSort} />
-                <th scope="col" className="hide-md">OTH</th>
-              </>)}
+              {facet === "primary" && pOrder.map((id) => {
+                const c = PCOLS[id];
+                return c.k
+                  ? <SortTh key={id} label={c.label} sortKey={c.k} sort={sort} onSort={onSort} />
+                  : <th key={id} scope="col" className="hide-md">{c.label}</th>;
+              })}
               {facet === "leadership" && (<>
                 <SortTh label="Preferred PM" sortKey="ppm.alb" sort={sort} onSort={onSort} className="ta-l two-pp-col hide-md" />
                 <SortTh label="Alb net" short="Alb" sortKey="appr.albNet" sort={sort} onSort={onSort} />
@@ -3016,13 +3029,11 @@ function PollsterTable({ tppBasis, setTppBasis }) {
                           flagged as primary */}
                       <td className="num"><ArchLead p={r} measure="lnp" primaryFallback basis={tppBasis} /></td>
                     </>)}
-                    {facet === "primary" && (<>
-                      <td className="num" style={{ color: "var(--alp-text)", fontWeight: 600 }}>{r.p.alp != null ? r.p.alp.toFixed(1) : "—"}</td>
-                      <td className="num" style={{ color: "var(--lnp-text)", fontWeight: 600 }}>{r.p.lnp != null ? r.p.lnp.toFixed(1) : "—"}</td>
-                      <td className="num" style={{ color: "var(--grn-text)" }}>{r.p.grn != null ? r.p.grn.toFixed(1) : "—"}</td>
-                      <td className="num" style={{ color: "var(--onp-text)" }}>{r.p.onp != null ? r.p.onp.toFixed(1) : "—"}</td>
-                      <td className="num muted hide-md">{r.p.oth != null ? r.p.oth.toFixed(1) : "—"}</td>
-                    </>)}
+                    {facet === "primary" && pOrder.map((id) => (
+                      <td key={id} className={"num" + (PCOLS[id].cls || "")} style={PCOLS[id].style}>
+                        {r.p[id] != null ? r.p[id].toFixed(1) : "—"}
+                      </td>
+                    ))}
                     {facet === "leadership" && (<>
                       <td className="two-pp-col share-col hide-md">
                         {ppmContests(r).length === 0

@@ -3125,7 +3125,7 @@ const POLL_TAG_META = Object.fromEntries(POLL_TAGS.map((t) => [t.id, t]));
    URL_HOUSES, in arrival order, never a re-sort. */
 const URL_HOUSES = [
   "Agenda C Synesis", "DemosAU", "Essential", "Fox & Hedgehog", "Freshwater",
-  "Newspoll", "RedBridge / Accent", "Resolve", "Roy Morgan", "Spectre Strategy",
+  "Newspoll", "RedBridge/Accent", "Resolve", "Roy Morgan", "Spectre Strategy",
   "Wolf & Smith", "YouGov",
 ];
 const archMask = (order, set) => {
@@ -3446,7 +3446,7 @@ const HOUSE_LEAN_COLOURS = {
   "Fox & Hedgehog":     "oklch(0.63 0.145 128)",
   "Freshwater":         "oklch(0.63 0.145 165)",
   "Newspoll":           "oklch(0.63 0.145 185)",
-  "RedBridge / Accent": "oklch(0.63 0.145 205)",
+  "RedBridge/Accent": "oklch(0.63 0.145 205)",
   "Resolve":            "oklch(0.63 0.145 225)",
   "Roy Morgan":         "oklch(0.63 0.145 268)",
   "Spectre Strategy":   "oklch(0.63 0.145 290)",
@@ -4103,6 +4103,19 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     { id: "leadership", label: "Leadership" },
     { id: "direction", label: "Direction" },
   ];
+  /* Party columns rank by the aggregate (gen-data's latest.primaryOrder –
+     highest leftmost, a party only overtaking once it leads by a full point,
+     same deadband rule as the hero's rival ruling). Presentation travels
+     with the column, so everything keys off party id. A copy of this def
+     map lives in the Latest-polls renderer – the two move together. */
+  const pOrder = (D.latest && D.latest.primaryOrder) || ["alp", "lnp", "grn", "onp", "oth"];
+  const PCOLS = {
+    alp: { label: "ALP", k: "p.alp", style: { color: "var(--alp-text)", fontWeight: 600 } },
+    lnp: { label: "L/NP", k: "p.lnp", style: { color: "var(--lnp-text)", fontWeight: 600 } },
+    grn: { label: "GRN", k: "p.grn", style: { color: "var(--grn-text)" } },
+    onp: { label: "ON", k: "p.onp", style: { color: "var(--onp-text)" } },
+    oth: { label: "OTH", cls: " muted hide-md" },   // the residual stays non-sortable
+  };
   /* The filtered table is a page in its own right, so its filters ride in
      the URL: every non-default selection sits in the query string beside
      the #allpolls hash (?w=bw&t=12#allpolls), and "Newspoll's year"
@@ -4719,13 +4732,12 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                 <ArchSortTh label="Poll lean" short="Lean" k="lean" sort={sort} onSort={onSort} className="hide-sm" />
                 <ArchSortTh label="House effect" short="H/fx" k="hfx" sort={sort} onSort={onSort} className="hide-sm" />
               </>)}
-              {facet === "primary" && (<>
-                <ArchSortTh label="ALP" k="p.alp" sort={sort} onSort={onSort} />
-                <ArchSortTh label="L/NP" k="p.lnp" sort={sort} onSort={onSort} />
-                <ArchSortTh label="GRN" k="p.grn" sort={sort} onSort={onSort} />
-                <ArchSortTh label="ON" k="p.onp" sort={sort} onSort={onSort} />
-                <th scope="col" className="hide-md">OTH</th>
-              </>)}
+              {facet === "primary" && pOrder.map((id) => {
+                const c = PCOLS[id];
+                return c.k
+                  ? <ArchSortTh key={id} label={c.label} k={c.k} sort={sort} onSort={onSort} />
+                  : <th key={id} scope="col" className="hide-md">{c.label}</th>;
+              })}
               {facet === "leadership" && (<>
                 <ArchSortTh label="Preferred PM" k="ppm.alb" sort={sort} onSort={onSort} className="ta-l two-pp-col hide-md" />
                 <ArchSortTh label="Alb net" short="Alb" k="appr.albNet" sort={sort} onSort={onSort} />
@@ -4811,13 +4823,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                         </span>}
                   </td>
                   </>)}
-                  {facet === "primary" && (<>
-                  <td className="num" style={{ color: "var(--alp-text)", fontWeight: 600 }}>{p.p.alp != null ? p.p.alp.toFixed(1) : "—"}</td>
-                  <td className="num" style={{ color: "var(--lnp-text)", fontWeight: 600 }}>{p.p.lnp != null ? p.p.lnp.toFixed(1) : "—"}</td>
-                  <td className="num" style={{ color: "var(--grn-text)" }}>{p.p.grn != null ? p.p.grn.toFixed(1) : "—"}</td>
-                  <td className="num" style={{ color: "var(--onp-text)" }}>{p.p.onp != null ? p.p.onp.toFixed(1) : "—"}</td>
-                  <td className="num muted hide-md">{p.p.oth != null ? p.p.oth.toFixed(1) : "—"}</td>
-                  </>)}
+                  {facet === "primary" && pOrder.map((id) => (
+                  <td key={id} className={"num" + (PCOLS[id].cls || "")} style={PCOLS[id].style}>
+                    {p.p[id] != null ? p.p[id].toFixed(1) : "—"}
+                  </td>
+                  ))}
                   {facet === "leadership" && (<>
                   <td className="two-pp-col share-col hide-md">
                     {ppmContests(p).length === 0
@@ -4876,7 +4886,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure’s
         own time, and it is a property of the pollster, not of this one poll.
         {" "}<strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, filed with the
-        Australian Polling Council – Newspoll, YouGov, Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog
+        Australian Polling Council – Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog
         file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown.
       </p>
 
@@ -5134,7 +5144,7 @@ function infoTerms(D) {
       is on record and reads its two published sample figures off it – the raw count and the
       effective one, the latter serving as that wave’s nᵢ in the
       {" "}{xref("weighted-aggregate", "apc-statement", "weighted aggregate")}. Newspoll, YouGov,
-      Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog file them; where a house files none, the poll
+      Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them; where a house files none, the poll
       breakdown carries its raw sample alone and the archive’s n<sub>eff</sub> column dashes –
       a precision figure the pollster never published is not this site’s to invent.</>) },
     { id: "house-effect", term: "House effect", body: (
@@ -5364,7 +5374,7 @@ function infoTerms(D) {
       {" "}Full formula: the headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window, where
       xᵢ is a poll’s house-adjusted figure and its weight wᵢ = nᵢ × 2^(−d/7) × t(d) ÷ √m – nᵢ the
       poll’s sample on the estimator’s scale: its published effective sample where the house files
-      one (Newspoll, YouGov, Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog, via their Australian
+      one (Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog, via their Australian
       Polling Council methodology statements), grossed back up by the shared 1.6 design factor, else its raw
       sample capped at 3,000 – 1,200 where no sample is filed at all. nᵢ also sets the
       sampling-error floor under the whole

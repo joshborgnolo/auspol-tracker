@@ -5,7 +5,7 @@ source: auto-skill
 extracted_at: '2026-09-04T00:00:00.000Z'
 ---
 
-# RedBridge / Accent (AFR) poll extraction → data/polls.json
+# RedBridge/Accent (AFR) poll extraction → data/polls.json
 
 The AFR-commissioned RedBridge Group/Accent Research monthly federal poll is published at
 accent-research.com as a long PDF (100+ pages). Numbers learned from the July 2026 wave
@@ -60,7 +60,7 @@ put probe scripts under `.matilda/probe/` and `npm i puppeteer-core` there.
 
 The cached `pdfUrl` in `.build/redbridge-src/*.json` now has a SECOND consumer beyond this
 extractor: `.build/extract-sampleeff.mjs`'s `legAccentLinks()` re-reads those caches to stamp
-`methodUrl` (the wave's APC methodology-report link) onto RedBridge / Accent rows — never delete
+`methodUrl` (the wave's APC methodology-report link) onto RedBridge/Accent rows — never delete
 or reshape the field. Two Accent pages outside this extractor's sitemap regex (Oct-2025 snapshot,
 May-2026 MRP "a fragmented electorate") had their PDF hrefs captured 2026-09-02 by the standalone
 probe `.matilda/probe/accent-pdfurl.mjs` and live as a constant inside that leg. See
@@ -90,7 +90,7 @@ Physical PDF page ≈ internal page + 3 (cover/TOC). Confirm with pdftotext, don
 
 ## Canonical polls.json conventions (verified against 15 RedBridge rows)
 
-- `pollster`: `"RedBridge / Accent"` for AFR-commissioned waves; `"Redbridge"` for other clients
+- `pollster`: `"RedBridge/Accent"` for AFR-commissioned waves; `"Redbridge"` for other clients
   (e.g. Australia Inst.); `"(MRP)"` suffix variants for MRP releases. Two spellings coexist —
   match what the wave's client demands, don't "normalise".
 - Row shape: `date` = fieldwork END, `dateStart` = start, `published` = AFR embargo datetime
@@ -103,10 +103,10 @@ Physical PDF page ≈ internal page + 3 (cover/TOC). Confirm with pdftotext, don
   do NOT cite Aug 2026 as that case: it was initially recorded that way by mistake (the wave
   DOES carry a respondent-allocated pair, 48/52 — see the `tpp_flows` bullet below).
 - **`tpp_flows` = 2025-flows vs-Coalition ALP share — now SHARED by Roy Morgan and
-  "RedBridge / Accent"** (convention reversed 2026-08-31 at user direction, commit
+  "RedBridge/Accent"** (convention reversed 2026-08-31 at user direction, commit
   `073906a`; the old Morgan-only rule survives only in git history). RedBridge/Accent
   genuinely publishes a 2025-election-flows pair, so: validate.mjs's `flows-pollster`
-  allows `["Roy Morgan", "RedBridge / Accent"]` (40–65 ALP-share range unchanged);
+  allows `["Roy Morgan", "RedBridge/Accent"]` (40–65 ALP-share range unchanged);
   gen-data emits `tppFlows` + the `flows` change-delta generically per house; the
   extractor commits `tpp_flows` from Table 2's `tppHist` column via a conditional spread
   on new waves (absent, not zero, when unprinted), and `--check` runs
@@ -189,7 +189,7 @@ extraction is only needed if the agent reports mismatches.
 - Parsed-wave caches (JSON+TXT) are committed under `.build/redbridge-src/<slug>.*` —
   commit refreshed caches with parser changes.
 - **Never duplicates a wave already recorded under the other label**: history has
-  `"Redbridge"` (≤ Apr 2026) and `"RedBridge / Accent"` (May 2026 on); such waves land in
+  `"Redbridge"` (≤ Apr 2026) and `"RedBridge/Accent"` (May 2026 on); such waves land in
   `notes` with "reconcile labels manually", not in the dataset.
 
 ## releaseUrl: the pollster-release link (added 2026-09-01, commit 75bcb18)

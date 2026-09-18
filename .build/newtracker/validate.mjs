@@ -43,7 +43,7 @@ export function validate(D) {
     "Election Result",   // isElection rows: the result, not a poll
     "Spectre Strategy",  // boutique house, no automated feed
     "Wolf & Smith",      // boutique house (AFR-commissioned, ad hoc)
-    "Redbridge",         // pre-"RedBridge / Accent" Australia Institute waves
+    "Redbridge",         // pre-"RedBridge/Accent" Australia Institute waves
     "Roy Morgan (SMS)",  // single SMS-mode Morgan release, mode tag not a house
     "Agenda C Synesis",  // one-off news.com.au poll
   ]);
@@ -97,13 +97,13 @@ export function validate(D) {
     //     RedBridge/Accent are the pollsters who publish a flows pair.
     if (p.tpp_flows != null && !(p.tpp_flows >= 40 && p.tpp_flows <= 65))
       fail("flows-range", `tpp_flows = ${p.tpp_flows}`);
-    if (p.tpp_flows != null && !["Roy Morgan", "RedBridge / Accent"].includes(p.pollster))
+    if (p.tpp_flows != null && !["Roy Morgan", "RedBridge/Accent"].includes(p.pollster))
       fail("flows-pollster", `tpp_flows on a row for ${p.pollster}`);
     // 2b1. tpp_split (RedBridge/Accent's published per-cohort allocation to
     //      Labor) carries all three buckets or none, each a plausible flow
     //      share – a bucket at 0/100 is a Table-1 misparse, not an electorate.
     if (p.tpp_split != null) {
-      if (p.pollster !== "RedBridge / Accent")
+      if (p.pollster !== "RedBridge/Accent")
         fail("split-pollster", `tpp_split on a row for ${p.pollster}`);
       const ts = ["grn", "onp", "oth"].map((k) => p.tpp_split[k]);
       if (ts.some((v) => v == null))
@@ -119,7 +119,7 @@ export function validate(D) {
     //      the wave's own printed sub-primaries, so the pair discipline is
     //      the same and the combined figure must still land in 1–99.
     if (p.tpp_split_on != null) {
-      if (p.pollster !== "RedBridge / Accent")
+      if (p.pollster !== "RedBridge/Accent")
         fail("spliton-pollster", `tpp_split_on on a row for ${p.pollster}`);
       const tso = ["lnp", "grn", "oth"].map((k) => p.tpp_split_on[k]);
       if (tso.some((v) => v == null))
@@ -161,7 +161,7 @@ export function validate(D) {
     //      the automated houses. Only those houses have a source to link.
     if (p.methodUrl != null && (typeof p.methodUrl !== "string" || !/^https:\/\/.+\..+\//.test(p.methodUrl)))
       fail("method-url", `methodUrl = ${JSON.stringify(p.methodUrl)}`);
-    if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge / Accent", "RedBridge / Accent (MRP)", "DemosAU", "DemosAU (MRP)", "Essential", "Fox & Hedgehog"].includes(p.pollster))
+    if (p.methodUrl != null && !["YouGov", "Newspoll", "RedBridge/Accent", "RedBridge/Accent (MRP)", "DemosAU", "DemosAU (MRP)", "Essential", "Fox & Hedgehog"].includes(p.pollster))
       fail("method-url", `methodUrl on a row for ${p.pollster}`);
     // 2d. sampleEff (the house's published effective sample size) is a whole
     //     number never below 200 and never above its own raw sample – a
@@ -190,7 +190,7 @@ export function validate(D) {
     }
     // 4. duplicate date+pollster – usually an accidental paste. Keyed on the
     //    CANONICAL name: a pre/post-rebrand spelling pair ("Redbridge" beside
-    //    "RedBridge / Accent") doesn't collide here unless this gate uses the
+    //    "RedBridge/Accent") doesn't collide here unless this gate uses the
     //    name gen-data will actually see.
     const key = p.date + "|" + canonHouse(p.pollster);
     if (seen.has(key)) fail("duplicate", "same date + pollster already present");

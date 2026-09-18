@@ -57,10 +57,10 @@
     "Resolve": {
       "site": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html"
     },
-    "RedBridge / Accent": {
+    "RedBridge/Accent": {
       "site": "https://www.afr.com/topic/redbridge-accent-poll-6ikd"
     },
-    "RedBridge / Accent (MRP)": {
+    "RedBridge/Accent (MRP)": {
       "site": "https://www.afr.com/topic/redbridge-accent-poll-6ikd"
     },
     "YouGov": {
@@ -1209,7 +1209,7 @@
       "date": "2025-06-30",
       "published": "2025-07-02T20:00",
       "dateStart": "2025-06-19",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 4036,
       "alp": 37,
@@ -1391,7 +1391,7 @@
       "date": "2025-09-08",
       "published": "2025-09-13T05:00",
       "dateStart": "2025-08-19",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 5326,
       "alp": 35,
@@ -1523,7 +1523,7 @@
       "date": "2025-10-07",
       "published": "2025-10-10T19:59",
       "dateStart": "2025-09-25",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1997,
       "alp": 34,
@@ -1730,7 +1730,7 @@
       "date": "2025-11-13",
       "published": "2025-11-16T20:00",
       "dateStart": "2025-11-07",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1011,
       "alp": 38,
@@ -1839,7 +1839,7 @@
       "date": "2025-11-26",
       "published": "2025-12-01T18:00",
       "dateStart": "2025-11-07",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 4775,
       "alp": 35,
@@ -1912,7 +1912,7 @@
       "date": "2025-12-12",
       "published": "2025-12-14T20:00",
       "dateStart": "2025-12-05",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1012,
       "sampleEff": 776,
@@ -2210,7 +2210,7 @@
       "date": "2026-01-29",
       "published": "2026-02-01T18:00",
       "dateStart": "2026-01-22",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1003,
       "sampleEff": 782,
@@ -2523,7 +2523,7 @@
       "date": "2026-02-27",
       "published": "2026-03-01T20:00",
       "dateStart": "2026-02-23",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1006,
       "sampleEff": 762,
@@ -2842,7 +2842,7 @@
       "date": "2026-03-27",
       "published": "2026-03-29T18:00",
       "dateStart": "2026-03-23",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1003,
       "alp": 32,
@@ -3123,7 +3123,7 @@
       "date": "2026-04-30",
       "published": "2026-05-03T18:00",
       "dateStart": "2026-04-24",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1014,
       "sampleEff": 774,
@@ -3252,7 +3252,7 @@
       "date": "2026-05-14",
       "published": "2026-05-22T20:00",
       "dateStart": "2026-04-29",
-      "pollster": "RedBridge / Accent (MRP)",
+      "pollster": "RedBridge/Accent (MRP)",
       "client": "AFR",
       "sample": 6015,
       "alp": 31,
@@ -3535,7 +3535,7 @@
       "date": "2026-05-28",
       "published": "2026-05-31T18:00",
       "dateStart": "2026-05-25",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1005,
       "sampleEff": 815,
@@ -3765,7 +3765,7 @@
       "date": "2026-06-26",
       "published": "2026-06-28T18:00",
       "dateStart": "2026-06-22",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1006,
       "sampleEff": 764,
@@ -4133,7 +4133,7 @@
       "date": "2026-07-30",
       "published": "2026-08-02T18:00",
       "dateStart": "2026-07-27",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1001,
       "sampleEff": 857,
@@ -4398,7 +4398,7 @@
       "date": "2026-08-28",
       "published": "2026-08-30T18:00",
       "dateStart": "2026-08-24",
-      "pollster": "RedBridge / Accent",
+      "pollster": "RedBridge/Accent",
       "client": "AFR",
       "sample": 1006,
       "sampleEff": 808,
@@ -4710,7 +4710,7 @@
     },
     {
       "date": "2025-11-13",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 40,
       "opp": 10,
       "oppName": "Ley",
@@ -4737,7 +4737,7 @@
     },
     {
       "date": "2025-12-12",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 41,
       "opp": 12,
       "oppName": "Ley",
@@ -4800,7 +4800,7 @@
     },
     {
       "date": "2026-01-29",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 37,
       "opp": 9,
       "oppName": "Ley",
@@ -4863,7 +4863,7 @@
     },
     {
       "date": "2026-02-27",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 34,
       "opp": 10,
       "oppName": "Taylor",
@@ -4908,7 +4908,7 @@
     },
     {
       "date": "2026-03-27",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 33,
       "opp": 14,
       "oppName": "Taylor",
@@ -4980,7 +4980,7 @@
     },
     {
       "date": "2026-04-30",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 33,
       "opp": 14,
       "oppName": "Taylor",
@@ -5061,7 +5061,7 @@
     },
     {
       "date": "2026-05-28",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 31,
       "opp": 14,
       "oppName": "Taylor",
@@ -5134,7 +5134,7 @@
     },
     {
       "date": "2026-06-26",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 33,
       "opp": 11,
       "oppName": "Taylor",
@@ -5207,7 +5207,7 @@
     },
     {
       "date": "2026-07-30",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 32,
       "opp": 15,
       "oppName": "Taylor",
@@ -5285,7 +5285,7 @@
     },
     {
       "date": "2026-08-28",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 31,
       "opp": 15,
       "oppName": "Taylor",
@@ -5614,7 +5614,7 @@
     },
     {
       "date": "2025-11-13",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": -2,
       "opp": -21,
       "oppName": "Ley",
@@ -5722,7 +5722,7 @@
     },
     {
       "date": "2025-12-12",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": 1,
       "opp": -20,
       "oppName": "Ley",
@@ -5856,7 +5856,7 @@
     },
     {
       "date": "2026-01-29",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": -10,
       "opp": -11,
       "oppName": "Ley",
@@ -5982,7 +5982,7 @@
     },
     {
       "date": "2026-02-27",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": -13,
       "opp": -1,
       "oppName": "Taylor",
@@ -6067,7 +6067,7 @@
     },
     {
       "date": "2026-03-27",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": -17,
       "opp": -3,
       "oppName": "Taylor",
@@ -6231,7 +6231,7 @@
     },
     {
       "date": "2026-04-30",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": -9,
       "opp": -2,
       "oppName": "Taylor",
@@ -6400,7 +6400,7 @@
     },
     {
       "date": "2026-05-28",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": -19,
       "opp": -4,
       "oppName": "Taylor",
@@ -6534,7 +6534,7 @@
     },
     {
       "date": "2026-06-26",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": -18,
       "opp": -9,
       "oppName": "Taylor",
@@ -6733,7 +6733,7 @@
     },
     {
       "date": "2026-07-30",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": -19,
       "opp": -6,
       "oppName": "Taylor",
@@ -6876,7 +6876,7 @@
     },
     {
       "date": "2026-08-28",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alb": -17,
       "opp": -3,
       "oppName": "Taylor",
@@ -7117,7 +7117,7 @@
     },
     {
       "date": "2026-02-27",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 54,
       "lnpVsOnp_lnp": null
     },
@@ -7141,7 +7141,7 @@
     },
     {
       "date": "2026-03-27",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 53,
       "lnpVsOnp_lnp": null
     },
@@ -7171,7 +7171,7 @@
     },
     {
       "date": "2026-04-30",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 55,
       "lnpVsOnp_lnp": null
     },
@@ -7219,7 +7219,7 @@
     },
     {
       "date": "2026-05-28",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 51,
       "lnpVsOnp_lnp": null
     },
@@ -7261,7 +7261,7 @@
     },
     {
       "date": "2026-06-26",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 56,
       "lnpVsOnp_lnp": null
     },
@@ -7321,7 +7321,7 @@
     },
     {
       "date": "2026-07-30",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 53,
       "lnpVsOnp_lnp": null
     },
@@ -7363,7 +7363,7 @@
     },
     {
       "date": "2026-08-28",
-      "firm": "RedBridge / Accent",
+      "firm": "RedBridge/Accent",
       "alpVsOnp_alp": 52,
       "lnpVsOnp_lnp": null
     },
@@ -42809,7 +42809,7 @@
       },
       {
         "date": "2025-04-29",
-        "firm": "Redbridge/Accent",
+        "firm": "RedBridge/Accent",
         "lnp": 34,
         "alp": 34,
         "grn": 12,

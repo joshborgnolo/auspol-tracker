@@ -295,7 +295,7 @@ function eq(name, got, want) {
   eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
     [["Essential", "tomorrow"], ["Resolve", "12 days"], ["Roy Morgan", "13 days"],
      ["Newspoll", "19 days"], ["YouGov", "22 days"],
-     ["RedBridge / Accent", "26 days"]]);
+     ["RedBridge/Accent", "26 days"]]);
   {
     const da = firm(rows, "DemosAU");
     eq("DemosAU's window opens on the measured 9th, not the 1st", da && panelWhen(da), "opens in 8 days");
@@ -467,7 +467,7 @@ function eq(name, got, want) {
   eq("ticker order: most overdue first, dated houses only", items.map((i) => [i.firm, i.when]),
     [["Essential", "38 days overdue"], ["Resolve", "27 days overdue"],
      ["Roy Morgan", "26 days overdue"], ["Newspoll", "20 days overdue"],
-     ["YouGov", "17 days overdue"], ["RedBridge / Accent", "13 days overdue"]]);
+     ["YouGov", "17 days overdue"], ["RedBridge/Accent", "13 days overdue"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("a missed window leaves the bar entirely", daItems, []);
 }

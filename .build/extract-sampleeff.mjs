@@ -399,7 +399,7 @@ function legAccentEff() {
     if (!existsSync(join(dir, txtFile))) continue;
     const m = readFileSync(join(dir, txtFile), "utf8").match(/effective sample size of\s+([\d,]+)/i);
     if (!m) { console.log("  warn: no effective-sample sentence in " + txtFile); continue; }
-    out.push({ pollster: "RedBridge / Accent", end: j.date, eff: Number(m[1].replace(/,/g, "")),
+    out.push({ pollster: "RedBridge/Accent", end: j.date, eff: Number(m[1].replace(/,/g, "")),
                sample: typeof j.sample === "number" ? j.sample : null,
                src: "redbridge-src cache " + (j.slug || f.replace(/\.json$/, "")) });
   }
@@ -519,7 +519,7 @@ const rowSeries = (p) => {
   if (/news24\.com\.au/i.test(u)) return "news24";
   return "publicdata";
 };
-const NEED_HOUSES = ["YouGov", "YouGov (MRP)", "Newspoll", "Essential", "DemosAU", "DemosAU (MRP)", "RedBridge / Accent"];
+const NEED_HOUSES = ["YouGov", "YouGov (MRP)", "Newspoll", "Essential", "DemosAU", "DemosAU (MRP)", "RedBridge/Accent"];
 const unstamped = D.polls.filter((p) => NEED_HOUSES.includes(p.pollster) && p.sampleEff == null);
 
 const records = [];
@@ -619,7 +619,7 @@ if (D.polls.some((p) => p.pollster === "Newspoll" && p.methodUrl == null)) {
   try { npLinks = await legNewspollLinks(needDates); }
   catch (e) { errors.push("leg newspoll-links: " + String(e.message).slice(0, 180)); }
 }
-const accentLinks = D.polls.some((p) => p.pollster.startsWith("RedBridge / Accent") && p.methodUrl == null)
+const accentLinks = D.polls.some((p) => p.pollster.startsWith("RedBridge/Accent") && p.methodUrl == null)
   ? legAccentLinks()
   : [];
 const methods = [];
@@ -656,7 +656,7 @@ for (const p of D.polls) {
     ? [...new Set(npLinks
         .filter((l) => Math.abs(ddays(l.when, (p.published || p.date).slice(0, 10))) <= 7)
         .map((l) => l.href))]
-    : p.pollster.startsWith("RedBridge / Accent")
+    : p.pollster.startsWith("RedBridge/Accent")
     ? [...new Set(accentLinks.filter((l) => l.date === p.date).map((l) => l.href))]
     : p.pollster.startsWith("DemosAU")
     ? [...new Set(records

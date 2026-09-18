@@ -95,7 +95,7 @@ import { HOUSE_RENAMES } from "./house-renames.mjs";
 const ACC_CANON = {
   "Morgan": "Roy Morgan", "Newspoll-YouGov": "Newspoll",
   "Resolve Strategic": "Resolve", "Freshwater Strategy": "Freshwater",
-  "Redbridge/Accent": "RedBridge", "Spectre Strategy": "Spectre",
+  "RedBridge/Accent": "RedBridge", "Spectre Strategy": "Spectre",
 };
 const HE_WINDOW = 28, SHRINK_K = 8, SAMPLE_CAP = 3000, LN2 = Math.log(2);
 const HL_DEFF = 1.6;

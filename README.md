@@ -36,7 +36,7 @@ new and worth looking at.
   Its combined "Independents/Other" goes in `ind` with `oth: null`.
 - **Newspoll** and **Resolve** often publish no headline 2PP – leave `tpp_*` null
   rather than deriving one.
-- **RedBridge / Accent** rows cite the AFR write-up in `url`; the wave's own
+- **RedBridge/Accent** rows cite the AFR write-up in `url`; the wave's own
   release page on accent-research.com goes beside it in `releaseUrl` (the
   extractor fills it for new waves, and the expanded poll shows it as
   "Pollster's release"). Absent, not zero: some waves never got an Accent page.
@@ -83,7 +83,7 @@ new and worth looking at.
   (waves through Jan 2026 — the old CMS keeps those pages online) or the
   statement PDF on the new CMS (Feb 2026 on — no statement pages there; the
   extractor enumerates Pyxis's live collection JSON API, not the
-  sitemap.xml that froze in the migration), and RedBridge / Accent rows the
+  sitemap.xml that froze in the migration), and RedBridge/Accent rows the
   wave's methodology-report PDF on usrfiles.com (re-read from the RedBridge
   extractor's own caches — an Accent project page only yields that URL to a
   clicked document widget; the May 2026 MRP wave included), and DemosAU
@@ -95,7 +95,7 @@ new and worth looking at.
   appends each wave to and re-uploads (the extractor re-reads the href
   off /methodology weekly and refreshes every covered wave's link, so
   the newest wave stays unlinked until the PDF adds it). Absent, not
-  zero: only YouGov, Newspoll, RedBridge / Accent, DemosAU and Essential
+  zero: only YouGov, Newspoll, RedBridge/Accent, DemosAU and Essential
   have a statement source to link, commissioned YouGov waves
   file none, Accent waves with no Accent project page (the 2025 AFR-only
   releases, Mar + Aug 2026) stay unlinked, and so do DemosAU waves with
