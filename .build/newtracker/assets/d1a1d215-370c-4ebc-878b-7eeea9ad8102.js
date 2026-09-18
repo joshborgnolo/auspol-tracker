@@ -3981,10 +3981,25 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
        house printed. A published alternate matchup (3-cornered or
        head-to-head) satisfies the scope either way */
     twopp: { has: (p) => (pubBasis ? p.alp != null : p.alpImp != null) || p.tppAlt || p.tppAlt2 || p.tpp3, label: "With a 2PP" },
+    /* ...and it is armed by DEFAULT only where it earns the pill. On the
+       published basis it removes 34 of 160 rows — a third of the archive
+       prints no two-party pair, and a 2PP facet listing them blank is the
+       noise the scope exists to cut. On the implied basis it removes three:
+       two waves whose primaries fail the sum check and one that published
+       only the majors. A filter that is on by default while doing nothing
+       visible is worse than none, because the reader sees a scope pill and a
+       reduced count and cannot tell what it did. So the 2PP facet seeds its
+       scope from the basis; every other facet keeps the plain default, and an
+       explicit ?s= still wins over both. */
     primary: null,
     leadership: { has: (p) => window.ppmContests(p).length > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null)), label: "With leadership numbers" },
     direction: { has: (p) => !!p.dir, label: "With a direction reading" },
   };
+  /* The scope a facet ARMS ITSELF with. Facets with nothing to scope get
+     false; the 2PP facet follows the basis (see the note on twopp above);
+     everything else keeps the long-standing "on". */
+  const defaultScopeFor = (f) => (!FACET_SCOPE[f] ? false : f === "twopp" ? pubBasis : true);
+
   const FACETS = [
     { id: "twopp", label: "2PP" },
     { id: "primary", label: "Primary" },
@@ -4016,6 +4031,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     /* new short key first, then each legacy key the value once had */
     const get = (...keys) => { for (const k of keys) { const v = p.get(k); if (v != null) return v; } return null; };
     const view = FACET_BY_URL[get("f", "view")] || "twopp";
+    const sExplicit = get("s", "scope") != null;
     return {
       q: get("q") || "",
       who: (get("w", "who") || "").split(",").map(baseHouse).filter((h) => houses.includes(h)),
@@ -4024,10 +4040,22 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
       measure: MEAS_BY_URL[get("v", "vs")] || "lnp",
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
-      scope: (get("s") !== "0" && get("s", "scope") !== "off") || !FACET_SCOPE[view],
+      /* "explicit" means the reader (or a shared link) said something about
+         the scope. Absent that, the facet seeds it and keeps seeding it as
+         the basis moves. */
+      scope: sExplicit
+        ? (get("s") !== "0" && get("s", "scope") !== "off")
+        : defaultScopeFor(view),
+      scopeExplicit: sExplicit,
     };
   })();
 
+  /* Whether the reader has said anything about the scope. Until they have,
+     it follows the basis on the 2PP facet — flip the table to published and
+     the scope arms itself, flip back and it stands down. Once they touch it,
+     it stays where they put it. */
+  const [scopeSet, setScopeSet] = useState(urlInit.scopeExplicit);
+  const chooseScope = (v) => { setScopeSet(true); setScope(v); };
   const [q, setQ] = useState(urlInit.q);
   const [sel, setSel] = useState(new Set(urlInit.who)); // pollster filter; empty = all
   const [lead, setLead] = useState(urlInit.lead);        // all | alp | lnp/onp (per matchup)
@@ -4044,6 +4072,9 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      reader to discover the Contains filter. So the view arms that filter
      itself – as a visible, removable pill, not a hidden default. */
   const [scope, setScope] = useState(urlInit.scope);
+  React.useEffect(() => {
+    if (!scopeSet) setScope(defaultScopeFor(facet));
+  }, [pubBasis, facet, scopeSet]);
 
   /* Arriving from a dot on a chart. The filters ride in the URL now, so they
      survive the remount this trip causes - and any of them could hide the
@@ -4068,7 +4099,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const toggleTag = (id) => setTagSel((s) => { const n = new Set(s); n.has(id) ? n.delete(id) : n.add(id); return n; });
   const onMeasure = (mv) => { setMeasure(mv); setLead("all"); };
   const onFacet = (f) => {
-    setFacet(f); setSort({ key: "date", dir: -1 }); setPop(null); setScope(true);
+    setFacet(f); setSort({ key: "date", dir: -1 }); setPop(null);
+    setScopeSet(false); setScope(defaultScopeFor(f));
     // the expanded row STAYS expanded: `open` keys the poll itself, and the
     // detail panel shows every measure whatever the facet. If the new facet's
     // scope hides that poll it simply isn't rendered, and it resurfaces –
@@ -4277,7 +4309,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   if (range !== "all") pills.push({ k: "r", lab: RANGE_LAB[range], off: () => setRange("all") });
   [...tagSel].forEach((t) => pills.push({ k: "t" + t, lab: (POLL_TAG_META[t] || {}).label || t, off: () => toggleTag(t) }));
   if (lead !== "all") pills.push({ k: "l", lab: HOLDER_LAB[lead] + " ahead", off: () => setLead("all") });
-  if (scoping && facet !== "twopp") pills.push({ k: "s", lab: scoping.label, auto: true, off: () => setScope(false) });
+  if (scoping && facet !== "twopp") pills.push({ k: "s", lab: scoping.label, auto: true, off: () => chooseScope(false) });
 
   /* …and back the other way: every non-default filter is written to the
      query string, so the address bar at any moment IS the link to this
@@ -4503,7 +4535,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
             {scoping && (
               <span className="ap-pill auto">
                 {scoping.label}
-                <button type="button" onClick={() => setScope(false)} aria-label={"Remove filter: " + scoping.label}>×</button>
+                <button type="button" onClick={() => chooseScope(false)} aria-label={"Remove filter: " + scoping.label}>×</button>
               </span>
             )}
           </div>
