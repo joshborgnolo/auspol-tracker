@@ -4496,7 +4496,7 @@
       "dateStart": "2026-09-01",
       "pollster": "YouGov",
       "client": "News24",
-      "samplePending": true,
+      "sample": 1504,
       "alp": 26,
       "lnp": 18,
       "grn": 12,
@@ -4505,7 +4505,9 @@
       "oth": 7,
       "tpp_alp": 52,
       "tpp_lnp": 48,
-      "url": "https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0"
+      "url": "https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0",
+      "methodUrl": "https://d3nnbamw3dez3b.cloudfront.net/documents/News24_Pulse_08_09_26_APC_Methodology_Statement.pdf",
+      "sampleEff": 1028
     },
     {
       "date": "2026-09-12",

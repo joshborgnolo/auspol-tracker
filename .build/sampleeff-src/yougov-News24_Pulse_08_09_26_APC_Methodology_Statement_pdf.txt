@@ -1,0 +1,192 @@
+                                                                                        Suite 6.01, Level 6,
+                                                                    59 Goulburn Street, Sydney, NSW 2000
+                                                                                          +61 2 9406 5800
+                                                                                            au.yougov.com
+
+Publication date: 8th September 2026
+
+
+ Short Methodology Statement
+
+ Research company                  YouGov Galaxy Pty Ltd
+
+ Client commissioning the          News24
+ research
+
+ Fieldwork dates                   1st September – 8th September 2026
+
+ Mode of data collection           Online recruited from research panel (100%)
+
+ Target population                 Australians eligible to vote
+
+ Sample size                       1504
+
+ Australian Polling Council        Yes
+ compliant
+
+ URL of Long Methodology           https://au.yougov.com/results/apc
+ statement
+
+ Is voting intention published?    Yes
+
+
+
+ Long Methodology Statement
+
+ Effective sample size after       1028
+ weighting applied
+
+ Margin of error associated with   ±3.057
+ effective sample size
+
+ Quotas and weighting              Age, Gender, Education, AEC region, household income, 2025
+                                   Federal Election vote and 2023 Voice Referendum vote.
+
+ Weighting method used             Rim weighting.
+
+ Full question text, responses     Below for published questions
+ categories and randomisation
+
+ Source of online sample           Selected from previously recruited online panels of research
+                                   participants using quotas based on weighting frame and past vote.
+
+ Positioning of voting intention   After demographics
+ questions in questionnaire?
+
+ How were undecided voters         Voters were given an option to select “Don’t know” and were
+ handled?                          excluded from final figures
+
+ 2PP calculation method            2pp Labor v ex Coalition 2025 Federal election flows
+                                   2pp Labor v One Nation Survey respondent ordering of
+                                   preferences.
+
+
+
+
+                                                          YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+Full Question Text of Published Questions
+
+
+    Federal voting        If you had to vote tomorrow, and these were the choices on the        Ask eligible
+      intention                                                                                 voters
+                          ballot in your local electorate, how would you vote?
+                          Select all options in order of your preference
+                          Single select, Randomize
+                          Party totals are a NET of selections by each party
+                     1.   Labor
+
+                     2.   Liberal
+
+                     3.   LNP
+
+                     4.   The National Party
+
+                     5.   Greens
+
+                     6.   One Nation
+
+                     7.   Independent
+
+                     8.   Other
+
+                     9.   Don’t know                                                            Fixed,
+                                                                                                exclusive
+
+         A4_A5            Thinking now about the leaders of the major parties. Are you          Ask eligible
+                          satisfied or dissatisfied with the way Anthony Albanese is doing      voters
+                          his job as Prime Minister?
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A6_A7            Are you satisfied or dissatisfied with the way Angus Taylor is        Ask eligible
+                          doing his job as Leader of the Opposition?                            voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Satisfied
+                     2.   Dissatisfied
+                     3.   Don’t know                                                            Fixed
+
+         A8_A9            Which of the following do you think would make the best Prime         Ask eligible
+                          Minister?                                                             voters
+
+                          Please select one option only
+                          Single select, reverse
+                     1.   Anthony Albanese
+                     2.   Angus Taylor
+
+
+
+
+                                                                YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+A10_A11        Which of the following do you think would make the best Prime        Ask eligible
+               Minister?                                                            voters
+
+               Please select one option only
+               Single select, reverse
+          1.   Anthony Albanese
+          2.   Pauline Hanson
+
+
+Q1             State governments across Australia have powers that grant           Ask eligible
+               compulsory access to farms to install and maintain high voltage     voters
+               power lines to provide for community energy needs, and these
+               are currently being used to install new lines as part of the
+               transition to renewable power.
+
+               Which of these is closest to your view?
+               Single select, reverse
+          1.   Needed as we transfer to renewables
+          2.   Farmers should be able to say no
+          3.   Not sure                                                            Fixed
+
+Q2             One Nation are proposing making access to superannuation            Ask eligible
+               before retirement easier arguing people can do what they want       voters
+               with their money.
+
+               This has been opposed on the grounds that it will destroy
+               retirement incomes and people already have access to
+               superannuation in case of hardship.
+
+
+               Do you support or oppose One Nation's proposed change to
+               superannuation?
+               Single select, reverse
+          1.   1. Support
+          2.   2. Oppose
+          3.   3. Not sure                                              Fixed
+
+
+Q3             Which policy approach do you believe the government should          Ask eligible
+               take to housing policy?                                             voters
+
+               Please select the option that is closest to your view
+               Single select, reverse
+          1.   Leave it as it is                                                   Fixed
+          2.   Rein in tax concessions
+          3.   Increase supply
+          4.   Increase density
+          5.   Build more public housing
+
+Q4             Thinking about overall immigration to Australia, do you think we    Ask eligible
+               need...                                                             voters
+               Single select, reverse
+          1.   A big increase
+          2.   A small increase
+          3.   Stay about the same
+
+
+
+                                                    YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+4.   A small decrease
+5.   A big decrease
+
+
+
+
+                        YouGov Galaxy Pty Ltd. I ABN: 81 108 247 767
+

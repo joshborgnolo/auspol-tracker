@@ -736,11 +736,21 @@ for (const p of D.polls) {
   }
   const want = wants[0];
   if (want < 400 || want > 60000) { errors.push(`guard: ${p.date} ${p.pollster} statement sample=${want} out of range`); continue; }
-  if (p.sample === want) continue;
+  /* the row's per-wave n is confirmed against the filed statement, so the
+     transient samplePending marker clears – whether this run writes a new
+     sample or the row already carries the filed figure. */
+  if (p.sample === want) {
+    if (p.samplePending) {
+      delete p.samplePending;
+      samples.push(`${p.date} ${p.pollster}: cleared samplePending (${cands[0].src})`);
+    }
+    continue;
+  }
   if (p.sample == null) {
     const rebuilt = {};
     for (const [k, v] of Object.entries(p)) { rebuilt[k] = v; if (k === "client") rebuilt.sample = want; }
     if (!("sample" in rebuilt)) rebuilt.sample = want;
+    delete rebuilt.samplePending;
     for (const k of Object.keys(p)) delete p[k];
     Object.assign(p, rebuilt);
     samples.push(`${p.date} ${p.pollster}: sample := ${want} (${cands[0].src})`);
@@ -752,6 +762,7 @@ for (const p of D.polls) {
   }
   samples.push(`${p.date} ${p.pollster}: sample ${p.sample}→${want} (${cands[0].src})`);
   p.sample = want;
+  delete p.samplePending;
 }
 
 const out = { changed: stamped.length > 0 || methods.length > 0 || samples.length > 0, stamped: stamped.length, methods: methods.length, samples: samples.length, failed, skipped: unstamped.length - stamped.length - failed, candidates: records.length, errors: errors.concat(ambiguous.map((a) => "ambiguity: " + a)) };
