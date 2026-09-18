@@ -211,13 +211,27 @@ function ticker(rows, t0, nowMs) {
 
 // ---------------------------------------------------------------------------
 const cad = JSON.parse(JSON.stringify(D.pollCadence));
+// The scenario world below was authored against the cadence table of the
+// second week of September 2026. Waves that have landed SINCE then move a
+// house's next slot forward and silently break every date-pinned scenario,
+// so those houses step back to the wave that was newest at the time — each
+// pinned date is that house's real previous wave, so its cadence and
+// spreads still describe the row: Roy Morgan's 14 Sep wave returns to Mon
+// 7 Sep, Resolve's 13 Sep to Sun 16 Aug, and DemosAU's September wave to
+// Mon 24 Aug (putting its calendar-month bracket back on the 9–27 Sep the
+// scenarios count around). cadSlip/cadHold derive from this, so their own
+// steps ride on top.
+for (const [firm, last] of [["Roy Morgan", "2026-09-07"],
+                            ["Resolve", "2026-08-16"],
+                            ["DemosAU", "2026-08-24"]])
+  cad.find((c) => c.pollster === firm).last = last;
 // Essential's 2 Sep wave is in the real data now, so the world the skip
 // scenarios exercise is rebuilt by stepping the row back one wave: last
 // returns to the 29 Jul wave on the 28-day cadence that measured it, which
 // puts the projected slot back on Wed 26 Aug — the confirmed-skip seed —
 // and the slipped slot on Wed 2 Sep, exactly the world S1-S4b were written
 // against. cadHold strips the seed instead, as before.
-const cadSlip = JSON.parse(JSON.stringify(D.pollCadence));
+const cadSlip = JSON.parse(JSON.stringify(cad));
 Object.assign(cadSlip.find((c) => c.pollster === "Essential"),
   { last: "2026-07-29", cadence: 28 });
 const cadHold = JSON.parse(JSON.stringify(cadSlip));
@@ -439,7 +453,11 @@ function eq(name, got, want) {
   const da = firm(rows, "DemosAU");
   eq("DemosAU missed", da && da.missed, true);
   eq("panel no longer says 'open now'", da && panelWhen(da), "13 days overdue");
-  eq("missed rows park at the foot, cadence order", rows.slice(-2).map((r) => r.pollster), ["Essential", "DemosAU"]);
+  /* the foot ties every missed row on Infinity and the sort is stable, so
+     the tail keeps cadence-TABLE order: DemosAU sits ahead of Essential in
+     the table now (the reverse pair dated to when DemosAU was the table's
+     last row) */
+  eq("missed rows park at the foot, cadence order", rows.slice(-2).map((r) => r.pollster), ["DemosAU", "Essential"]);
   // Essential's slipped 2 Sep slot past its own edge too (the frozen cadSlip
   // world can't run the 3 Sep confirmation that would have slipped it on), so
   // it leads the late roll, a week clear of Roy Morgan. RedBridge is a DATED
