@@ -2848,11 +2848,11 @@ function NextPollsPanel() {
   );
 }
 
-function PollsterTable() {
+function PollsterTable({ tppBasis, setTppBasis }) {
   const { D } = window.AP;
   // ledger look shared with the All-polls archive – its cell renderers are
   // defined in the archive script and arrive on window once both assets load
-  const { ArchImplied, ArchLead, ArchApprCell, archLeadInfo } = window;
+  const { ArchTpp, ArchLead, ArchApprCell, archLeadInfo } = window;
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({ key: "pubSort", dir: -1 });
   const [open, setOpen] = useState(null);
@@ -2869,7 +2869,7 @@ function PollsterTable() {
       case "pubSort": return r.pubSort;
       case "sample": return r.sample ?? -Infinity;
       case "alp": {
-        const li = archLeadInfo(r, "lnp");
+        const li = archLeadInfo(r, "lnp", tppBasis);
         return li ? li.m : -Infinity;
       }
       case "p.alp": return r.p.alp ?? -Infinity;
@@ -2940,8 +2940,18 @@ function PollsterTable() {
               <SortTh label="Sample" sortKey="sample" sort={sort} onSort={onSort} className="hide-md" />
 
               {facet === "twopp" && (<>
-                <th scope="col" className="ta-l apub-col hide-md"
-                    title="This poll's primaries read at the 2025 election's preference flows – one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown">Implied 2PP</th>
+                {/* the 2PP column head is the basis switch – names the ACTIVE
+                    basis like the hero's toggle, flips the whole page to the
+                    other one (same App state the hero toggle drives) */}
+                <th scope="col" className="ta-l apub-col hide-md">
+                  <button type="button" className="th-basis" onClick={() => setTppBasis(tppBasis === "imp" ? "resp" : "imp")}
+                          title={tppBasis === "resp"
+                            ? "Each poll's headline figures exactly as the pollster released them – click to switch to implied 2PP at the 2025 election's preference flows"
+                            : "Each poll's primaries read at the 2025 election's preference flows – one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown. Click to switch to the published figures"}>
+                    {tppBasis === "resp" ? "As published" : <>Implied 2PP{" "}<span className="th-basis-def">(default)</span></>}
+                    <span className="th-basis-swap" aria-hidden="true">⇄</span>
+                  </button>
+                </th>
                 <SortTh label="Lead · ALP v L/NP" short="Lead" sortKey="alp" sort={sort} onSort={onSort} />
               </>)}
               {facet === "primary" && (<>
@@ -2999,11 +3009,12 @@ function PollsterTable() {
                     <td className="num muted hide-md">{r.sample != null ? r.sample.toLocaleString() : "—"}</td>
 
                     {facet === "twopp" && (<>
-                      <td className="ta-l apub-col hide-md"><ArchImplied p={r} /></td>
-                      {/* polls with no published 2PP still have something to
-                          say in this facet – the fallback prints their ALP
-                          v L/NP primary margin, flagged as primary */}
-                      <td className="num"><ArchLead p={r} measure="lnp" primaryFallback /></td>
+                      <td className="ta-l apub-col hide-md"><ArchTpp p={r} basis={tppBasis} /></td>
+                      {/* a poll with no after-prefs figure on the table's basis
+                          still has something to say in this facet – the
+                          fallback prints its ALP v L/NP primary margin,
+                          flagged as primary */}
+                      <td className="num"><ArchLead p={r} measure="lnp" primaryFallback basis={tppBasis} /></td>
                     </>)}
                     {facet === "primary" && (<>
                       <td className="num" style={{ color: "var(--alp-text)", fontWeight: 600 }}>{r.p.alp != null ? r.p.alp.toFixed(1) : "—"}</td>
@@ -3037,7 +3048,9 @@ function PollsterTable() {
       </div>
       <p className="table-hint">
         Tap any poll to see its full breakdown · Click a column heading to sort · “—” Means the pollster didn’t ask that question.
-        {" "}“Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar is that figure in margin form.
+        {tppBasis === "resp"
+          ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar is the published figure in margin form. Click the “As published” heading to switch back to implied."
+          : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar is that figure in margin form. Click the “Implied 2PP” heading to switch to the pollsters’ own published figures."}
         {" "}<strong>Published</strong> is the day the poll was released, taken from the source each row links to.
         {" "}Each house’s systematic lean – its house effect – sits beside poll lean in the All polls archive.
       </p>

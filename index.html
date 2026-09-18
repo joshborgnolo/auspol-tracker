@@ -2090,6 +2090,21 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .poll-table th.sortable:not(.sorted) .caret { opacity: 0; transition: opacity .15s ease; }
 .poll-table th.sortable:hover .caret { opacity: .45; }
 
+/* the 2PP column's basis-switch header – like the hero's toggle it NAMES the
+   active basis; the swap arrow carries the click-to-the-other-side affordance
+   a plain header doesn't */
+.poll-table th button.th-basis {
+  font: inherit; text-transform: inherit; letter-spacing: inherit;
+  color: inherit; background: none; border: 0; padding: 0; cursor: pointer;
+  user-select: none; white-space: nowrap; transition: color .15s ease;
+}
+.poll-table th button.th-basis:hover { color: var(--ink-2); }
+.poll-table th button.th-basis:focus-visible { outline: 2px solid var(--ink-faint); outline-offset: 2px; border-radius: 4px; }
+.th-basis-def { color: var(--ink-3); font-weight: 400; }
+.th-basis-swap { font-size: 9px; line-height: 1; color: var(--ink-3); margin-left: 4px; }
+.poll-table th button.th-basis:hover .th-basis-swap,
+.poll-table th button.th-basis:focus-visible .th-basis-swap { color: var(--ink); }
+
 /* expand affordance + clickable rows */
 .exp-col { width: 30px; padding-left: 4px !important; padding-right: 0 !important; }
 .poll-row { cursor: pointer; }
@@ -3365,19 +3380,21 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 /* The head wraps on a narrow panel: "On the board" plus four options is a
    little wider than a 320px phone, and a shortcut row that ran off the edge
    would be worse than one on its own line. */
-.cyc-legend .ap-pop-head { flex-wrap: wrap; }
-/* Four cuts of the same set, so they read as four options in one voice rather
-   than a primary with three alternatives. The active one is underlined, not
-   filled: this is a row inside a panel head, not a segmented control.
-   margin-left:auto keeps it right-aligned whether or not the head wrapped. */
-.cyc-quick { display: flex; align-items: baseline; gap: 13px; margin-left: auto; }
-.cyc-quick-opt {
+.cyc-legend .ap-pop-head, .flow-legend .ap-pop-head { flex-wrap: wrap; }
+/* Cuts of the same set, so they read as options in one voice rather than a
+   primary with alternatives. The active one is underlined, not filled: this
+   is a row inside a panel head, not a segmented control. margin-left:auto
+   keeps it right-aligned whether or not the head wrapped. Shared by the
+   past-cycles board and the flow-drift board — same control, same place in
+   the same panel head, so it stopped being named for one of them. */
+.pop-quick { display: flex; align-items: baseline; gap: 13px; margin-left: auto; }
+.pop-quick-opt {
   border: 0; background: none; cursor: pointer; padding: 1px 0;
   font-family: var(--sans); font-size: 12px; font-weight: 600; color: var(--ink-3);
   border-bottom: 1.5px solid transparent; transition: color .15s ease;
 }
-.cyc-quick-opt:hover { color: var(--ink-2); }
-.cyc-quick-opt.active { color: var(--ink); font-weight: 700; border-bottom-color: var(--ink); }
+.pop-quick-opt:hover { color: var(--ink-2); }
+.pop-quick-opt.active { color: var(--ink); font-weight: 700; border-bottom-color: var(--ink); }
 
 .cyc-board {
   display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -3488,6 +3505,92 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 .cyc-row.off .cyc-swatch,
 .cyc-legend.banded .cyc-row.off .cyc-swatch { background-color: var(--ink-faint); box-shadow: none; }
 .cyc-row:hover .cyc-swatch { transform: scale(1.18); }
+
+/* A fitted flow cell the ridge could not move off its prior: half or more of
+   it is the election row it was shrunk toward, not a reading of the house.
+   Quiet ink and a dotted rule — present, legible, and visibly not load-
+   bearing. The dotted underline is the same grammar the page uses for a term
+   you can hover for a definition, which is what this is. */
+.flow-tab-thin, .flow-tab-thin .flow-tab-se { color: var(--ink-faint); }
+.flow-tab-thin {
+  text-decoration: underline dotted var(--ink-faint);
+  text-underline-offset: 3px; cursor: help;
+}
+/* the same word used inside the note that explains it */
+.flow-tab-note .flow-tab-thin { text-decoration: none; cursor: inherit; font-weight: 600; }
+
+/* ---------- preference-flow drift: the answer, then the board -------------
+   Ten chips in one row — nine houses and the pooled line — each doubling as a
+   readout, with the pooled figure (the only thing the panel answers) sitting
+   among them at equal weight. The answer is a readout now and the nine houses
+   fold into the same board the past-cycles tab opens. What stays on the
+   surface beside the button is any house whose own drift sits OUTSIDE the
+   pooled interval: that house is making a claim the pooled line is not. */
+.flow-legend { margin: 4px 0 2px; }
+.flow-readout { display: flex; flex-direction: column; gap: 2px; margin: 0 0 12px; }
+.flow-readout-v {
+  font-family: var(--serif); font-size: 30px; font-weight: 600; line-height: 1;
+  color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+}
+/* The interval is part of the figure, not a footnote to it — a drift of +0.3
+   means nothing until you know it carries ±1.6. Same line, quieter ink. */
+.flow-readout-ci { font-size: 19px; font-weight: 500; color: var(--ink-3); }
+.flow-readout-u { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); margin-left: 4px; }
+.flow-readout-lab {
+  font-family: var(--sans); font-size: 12.5px; font-weight: 500; color: var(--ink-3);
+  line-height: 1.45; max-width: 46ch;
+}
+.flow-readout-lab strong { color: var(--ink-2); font-weight: 700; }
+.flow-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+.flow-legend .ap-panel { width: min(440px, calc(100vw - 28px)); max-width: none; }
+.flow-board {
+  display: flex; flex-direction: column; gap: 1px; padding: 2px 1px;
+  max-height: min(52vh, 340px); overflow-y: auto;
+}
+/* One control per row here, not two: a house is on the chart or it is not.
+   (The cycles board carries two because a term answers two questions.) */
+.flow-row {
+  display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
+  border: 0; background: none; cursor: pointer; border-radius: 8px;
+  padding: 8px 10px; font-family: var(--sans); color: var(--ink-2);
+  transition: background-color .15s ease, opacity .15s ease;
+}
+.flow-row:hover, .flow-row:focus-within { background: color-mix(in oklch, var(--ink) 6%, transparent); }
+.flow-row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.flow-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.flow-row-name { font-size: 13px; font-weight: 600; color: var(--ink); min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Why this row is on the surface as well as in the list. */
+.flow-row-note { font-size: 11px; font-weight: 600; color: var(--mood-neg); white-space: nowrap; }
+.flow-row-val { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
+  font-variant-numeric: tabular-nums; white-space: nowrap; }
+/* Off the chart: the row goes quiet, and its mark hollows out rather than
+   vanishing — the colour is how you find it again. */
+.flow-row.off { opacity: 0.45; }
+.flow-row.off .flow-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
+/* The surfaced outlier: a pill in the house's own colour, carrying the figure
+   that put it there. Pressing it clears the line, like its row would. */
+.flow-out {
+  display: inline-flex; align-items: center; gap: 7px;
+  border: 1px solid color-mix(in oklch, var(--fl) 45%, var(--line));
+  background: color-mix(in oklch, var(--fl) 9%, var(--surface));
+  border-radius: 999px; padding: 5px 11px; cursor: pointer;
+  font-family: var(--sans); font-size: 12.5px; color: var(--ink-2);
+  transition: opacity .15s ease, border-color .15s ease;
+}
+.flow-out:hover { border-color: var(--fl); }
+.flow-out:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.flow-out.off { opacity: 0.42; }
+.flow-out.off .flow-swatch { background: transparent !important; box-shadow: inset 0 0 0 2px var(--ink-faint); }
+.flow-out-name { font-weight: 600; color: var(--ink); }
+.flow-out-val { font-weight: 700; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+@media (pointer: coarse) { .flow-row { padding-top: 12px; padding-bottom: 12px; } }
+/* Phones: the readout is the panel's headline, so it keeps its size; the
+   label under it is what gives way. */
+@media (max-width: 620px) {
+  .flow-readout-v { font-size: 26px; }
+  .flow-readout-lab { font-size: 12px; }
+}
 
 /* ---------- what each chart is drawing ----------
    A caption on the lines, not a second legend: it lists only what this chart
@@ -5065,10 +5168,10 @@ window.AUSPOL = (function () {
      every house's method offset removed against its own election-anchored
      baseline and the anomalies pooled monthly + nowcast. DIAGNOSTIC ONLY –
      see the Flow-drift panel's note; it adjusts no other figure. */
-  const flowDrift = {"months":[{"ym":"2025-06","x":2025.4583333333333,"v":0.4,"ci95":1.2,"k":4},{"ym":"2025-07","x":2025.5416666666667,"v":0,"ci95":1.4,"k":4},{"ym":"2025-08","x":2025.625,"v":0.6,"ci95":1.5,"k":3},{"ym":"2025-09","x":2025.7083333333333,"v":-0.3,"ci95":1.2,"k":5},{"ym":"2025-10","x":2025.7916666666667,"v":0.1,"ci95":1,"k":8},{"ym":"2025-11","x":2025.875,"v":-0.2,"ci95":1.1,"k":7},{"ym":"2025-12","x":2025.9583333333333,"v":0.3,"ci95":1.5,"k":5},{"ym":"2026-01","x":2026.0416666666667,"v":0.4,"ci95":1.1,"k":9},{"ym":"2026-02","x":2026.125,"v":0.1,"ci95":1,"k":11},{"ym":"2026-03","x":2026.2083333333333,"v":-0.5,"ci95":1,"k":11},{"ym":"2026-04","x":2026.2916666666667,"v":0.3,"ci95":1,"k":11},{"ym":"2026-05","x":2026.375,"v":0.3,"ci95":1,"k":12},{"ym":"2026-06","x":2026.4583333333333,"v":-0.1,"ci95":1.1,"k":9},{"ym":"2026-07","x":2026.5416666666667,"v":0.1,"ci95":1.2,"k":8},{"ym":"2026-08","x":2026.625,"v":-0.9,"ci95":1.1,"k":9},{"ym":"2026-09","x":2026.7083333333333,"v":0.2,"ci95":1.8,"k":3}],"now":{"v":0.3,"ci95":1.6,"n":6,"nEff":3.6},"houses":{"Essential":[{"ym":"2025-09","v":1},{"ym":"2025-10","v":0.2},{"ym":"2025-11","v":-1.1},{"ym":"2025-12","v":0.2},{"ym":"2026-02","v":0},{"ym":"2026-03","v":-1.2},{"ym":"2026-04","v":-0.8},{"ym":"2026-05","v":1.6},{"ym":"2026-06","v":-0.2},{"ym":"2026-08","v":-0.1}],"Fox & Hedgehog":[{"ym":"2026-01","v":1.3},{"ym":"2026-02","v":0.1},{"ym":"2026-03","v":-1.4},{"ym":"2026-05","v":0.4}],"Freshwater":[{"ym":"2025-10","v":1.2},{"ym":"2026-01","v":0.6},{"ym":"2026-03","v":-2.3},{"ym":"2026-04","v":-0.3},{"ym":"2026-05","v":-0.2}],"Newspoll":[{"ym":"2025-07","v":0.1},{"ym":"2025-08","v":-0.1},{"ym":"2025-09","v":0.3},{"ym":"2025-10","v":-0.1},{"ym":"2025-11","v":0.1},{"ym":"2026-01","v":-0.4},{"ym":"2026-05","v":0}],"RedBridge / Accent":[{"ym":"2025-06","v":0.3},{"ym":"2025-09","v":-0.7},{"ym":"2025-10","v":0.6},{"ym":"2025-11","v":-0.1},{"ym":"2025-12","v":0.7},{"ym":"2026-01","v":0.6},{"ym":"2026-02","v":-0.3},{"ym":"2026-03","v":-2.4},{"ym":"2026-04","v":1.2},{"ym":"2026-05","v":0},{"ym":"2026-06","v":-0.3},{"ym":"2026-07","v":-1.7},{"ym":"2026-08","v":-3.3}],"Resolve":[{"ym":"2025-07","v":-0.3},{"ym":"2025-08","v":1.6},{"ym":"2025-09","v":-0.9},{"ym":"2025-10","v":-0.4},{"ym":"2025-11","v":-0.6},{"ym":"2025-12","v":-0.2},{"ym":"2026-01","v":1},{"ym":"2026-02","v":1},{"ym":"2026-04","v":0.9}],"Roy Morgan":[{"ym":"2025-06","v":0.4},{"ym":"2025-07","v":-0.3},{"ym":"2025-08","v":0.4},{"ym":"2025-09","v":-0.5},{"ym":"2025-10","v":-0.7},{"ym":"2025-11","v":0.5},{"ym":"2025-12","v":0.6},{"ym":"2026-01","v":0.2},{"ym":"2026-02","v":0.4},{"ym":"2026-03","v":1.3},{"ym":"2026-04","v":0.8},{"ym":"2026-05","v":0.8},{"ym":"2026-06","v":0.3},{"ym":"2026-07","v":1},{"ym":"2026-08","v":-0.5},{"ym":"2026-09","v":0.7}],"Spectre Strategy":[{"ym":"2025-07","v":1},{"ym":"2025-11","v":-1.7},{"ym":"2026-04","v":0.7},{"ym":"2026-07","v":0.2}],"YouGov":[{"ym":"2025-10","v":0.3},{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":-0.6},{"ym":"2026-03","v":-0.4},{"ym":"2026-04","v":-0.5},{"ym":"2026-05","v":-0.8},{"ym":"2026-06","v":-0.4},{"ym":"2026-07","v":-0.3},{"ym":"2026-08","v":-0.7},{"ym":"2026-09","v":-0.5}]},"flows":[{"firm":"Essential","g":85.7,"ge":9.5,"o":23,"oe":4.1,"t":45.2,"te":7.7,"n":10},{"firm":"Newspoll","g":89.8,"ge":9,"o":24.4,"oe":4.1,"t":54.6,"te":7.7,"n":8},{"firm":"RedBridge / Accent","g":85.5,"ge":4.1,"o":20.5,"oe":4.1,"t":58.3,"te":4.1,"n":6,"m":1},{"firm":"Resolve","g":89.3,"ge":9.2,"o":30.6,"oe":4.4,"t":49.3,"te":6.9,"n":10},{"firm":"Roy Morgan","g":79.9,"ge":7.5,"o":30.6,"oe":2.3,"t":67.4,"te":6,"n":46},{"firm":"YouGov","g":89,"ge":9.2,"o":24.3,"oe":4.1,"t":57.8,"te":7.6,"n":18}],"meta":{"table":"the AEC's 2025-election flow table (TPP cut)","baseDays":180,"anchor":"2025-05-03","aec":{"g":88.2,"o":25.5,"t":54.6},"baseFrom":{"Roy Morgan":"2025-05-03","RedBridge / Accent":"2025-05-03","Spectre Strategy":"2026-04-08","Newspoll":"2025-05-03","Resolve":"2025-05-03","Essential":"2025-11-24","Freshwater":"2026-03-29","YouGov":"2026-02-10","Fox & Hedgehog":"2026-03-25"},"houses":["Essential","Fox & Hedgehog","Freshwater","Newspoll","RedBridge / Accent","Resolve","Roy Morgan","Spectre Strategy","YouGov"]}};
+  const flowDrift = {"months":[{"ym":"2025-06","x":2025.4583333333333,"v":0.4,"ci95":1.2,"k":4},{"ym":"2025-07","x":2025.5416666666667,"v":0,"ci95":1.4,"k":4},{"ym":"2025-08","x":2025.625,"v":0.6,"ci95":1.5,"k":3},{"ym":"2025-09","x":2025.7083333333333,"v":-0.3,"ci95":1.2,"k":5},{"ym":"2025-10","x":2025.7916666666667,"v":0.1,"ci95":1,"k":8},{"ym":"2025-11","x":2025.875,"v":-0.2,"ci95":1.1,"k":7},{"ym":"2025-12","x":2025.9583333333333,"v":0.3,"ci95":1.5,"k":5},{"ym":"2026-01","x":2026.0416666666667,"v":0.4,"ci95":1.1,"k":9},{"ym":"2026-02","x":2026.125,"v":0.1,"ci95":1,"k":11},{"ym":"2026-03","x":2026.2083333333333,"v":-0.5,"ci95":1,"k":11},{"ym":"2026-04","x":2026.2916666666667,"v":0.3,"ci95":1,"k":11},{"ym":"2026-05","x":2026.375,"v":0.3,"ci95":1,"k":12},{"ym":"2026-06","x":2026.4583333333333,"v":-0.1,"ci95":1.1,"k":9},{"ym":"2026-07","x":2026.5416666666667,"v":0.1,"ci95":1.2,"k":8},{"ym":"2026-08","x":2026.625,"v":-0.9,"ci95":1.1,"k":9},{"ym":"2026-09","x":2026.7083333333333,"v":0.2,"ci95":1.8,"k":3}],"now":{"v":0.3,"ci95":1.6,"n":6,"nEff":3.6},"houses":{"Essential":[{"ym":"2025-09","v":1},{"ym":"2025-10","v":0.2},{"ym":"2025-11","v":-1.1},{"ym":"2025-12","v":0.2},{"ym":"2026-02","v":0},{"ym":"2026-03","v":-1.2},{"ym":"2026-04","v":-0.8},{"ym":"2026-05","v":1.6},{"ym":"2026-06","v":-0.2},{"ym":"2026-08","v":-0.1}],"Fox & Hedgehog":[{"ym":"2026-01","v":1.3},{"ym":"2026-02","v":0.1},{"ym":"2026-03","v":-1.4},{"ym":"2026-05","v":0.4}],"Freshwater":[{"ym":"2025-10","v":1.2},{"ym":"2026-01","v":0.6},{"ym":"2026-03","v":-2.3},{"ym":"2026-04","v":-0.3},{"ym":"2026-05","v":-0.2}],"Newspoll":[{"ym":"2025-07","v":0.1},{"ym":"2025-08","v":-0.1},{"ym":"2025-09","v":0.3},{"ym":"2025-10","v":-0.1},{"ym":"2025-11","v":0.1},{"ym":"2026-01","v":-0.4},{"ym":"2026-05","v":0}],"RedBridge / Accent":[{"ym":"2025-06","v":0.3},{"ym":"2025-09","v":-0.7},{"ym":"2025-10","v":0.6},{"ym":"2025-11","v":-0.1},{"ym":"2025-12","v":0.7},{"ym":"2026-01","v":0.6},{"ym":"2026-02","v":-0.3},{"ym":"2026-03","v":-2.4},{"ym":"2026-04","v":1.2},{"ym":"2026-05","v":0},{"ym":"2026-06","v":-0.3},{"ym":"2026-07","v":-1.7},{"ym":"2026-08","v":-3.3}],"Resolve":[{"ym":"2025-07","v":-0.3},{"ym":"2025-08","v":1.6},{"ym":"2025-09","v":-0.9},{"ym":"2025-10","v":-0.4},{"ym":"2025-11","v":-0.6},{"ym":"2025-12","v":-0.2},{"ym":"2026-01","v":1},{"ym":"2026-02","v":1},{"ym":"2026-04","v":0.9}],"Roy Morgan":[{"ym":"2025-06","v":0.4},{"ym":"2025-07","v":-0.3},{"ym":"2025-08","v":0.4},{"ym":"2025-09","v":-0.5},{"ym":"2025-10","v":-0.7},{"ym":"2025-11","v":0.5},{"ym":"2025-12","v":0.6},{"ym":"2026-01","v":0.2},{"ym":"2026-02","v":0.4},{"ym":"2026-03","v":1.3},{"ym":"2026-04","v":0.8},{"ym":"2026-05","v":0.8},{"ym":"2026-06","v":0.3},{"ym":"2026-07","v":1},{"ym":"2026-08","v":-0.5},{"ym":"2026-09","v":0.7}],"Spectre Strategy":[{"ym":"2025-07","v":1},{"ym":"2025-11","v":-1.7},{"ym":"2026-04","v":0.7},{"ym":"2026-07","v":0.2}],"YouGov":[{"ym":"2025-10","v":0.3},{"ym":"2026-01","v":-0.1},{"ym":"2026-02","v":-0.6},{"ym":"2026-03","v":-0.4},{"ym":"2026-04","v":-0.5},{"ym":"2026-05","v":-0.8},{"ym":"2026-06","v":-0.4},{"ym":"2026-07","v":-0.3},{"ym":"2026-08","v":-0.7},{"ym":"2026-09","v":-0.5}]},"flows":[{"firm":"Essential","g":85.7,"ge":9.5,"gp":0.63,"o":23,"oe":4.1,"op":0.12,"t":45.2,"te":7.7,"tp":0.41,"n":10},{"firm":"Newspoll","g":89.8,"ge":9,"gp":0.57,"o":24.4,"oe":4.1,"op":0.12,"t":54.6,"te":7.7,"tp":0.41,"n":8},{"firm":"RedBridge / Accent","g":85.5,"ge":4.1,"o":20.5,"oe":4.1,"t":58.3,"te":4.1,"n":6,"m":1},{"firm":"Resolve","g":89.3,"ge":9.2,"gp":0.59,"o":30.6,"oe":4.4,"op":0.14,"t":49.3,"te":6.9,"tp":0.33,"n":10},{"firm":"Roy Morgan","g":79.9,"ge":7.5,"gp":0.39,"o":30.6,"oe":2.3,"op":0.04,"t":67.4,"te":6,"tp":0.25,"n":46},{"firm":"YouGov","g":89,"ge":9.2,"gp":0.58,"o":24.3,"oe":4.1,"op":0.12,"t":57.8,"te":7.6,"tp":0.41,"n":18}],"meta":{"table":"the AEC's 2025-election flow table (TPP cut)","baseDays":180,"anchor":"2025-05-03","aec":{"g":88.2,"o":25.5,"t":54.5},"baseFrom":{"Roy Morgan":"2025-05-03","RedBridge / Accent":"2025-05-03","Spectre Strategy":"2026-04-08","Newspoll":"2025-05-03","Resolve":"2025-05-03","Essential":"2025-11-24","Freshwater":"2026-03-29","YouGov":"2026-02-10","Fox & Hedgehog":"2026-03-25"},"houses":["Essential","Fox & Hedgehog","Freshwater","Newspoll","RedBridge / Accent","Resolve","Roy Morgan","Spectre Strategy","YouGov"]}};
   /* the same diagnostic for the ALP-v-ON head-to-head (§7d) – null when the
      published per-cohort splits that anchor its implied table are absent */
-  const flowDriftOn = {"months":[{"ym":"2026-01","x":2026.0416666666667,"v":0.2,"ci95":1.9,"k":3},{"ym":"2026-02","x":2026.125,"v":-0.3,"ci95":1.6,"k":4},{"ym":"2026-03","x":2026.2083333333333,"v":-0.6,"ci95":1.5,"k":5},{"ym":"2026-04","x":2026.2916666666667,"v":-1.2,"ci95":2.3,"k":3},{"ym":"2026-05","x":2026.375,"v":0.2,"ci95":1.2,"k":8},{"ym":"2026-06","x":2026.4583333333333,"v":0.2,"ci95":1.1,"k":8},{"ym":"2026-07","x":2026.5416666666667,"v":0.9,"ci95":1.2,"k":7},{"ym":"2026-08","x":2026.625,"v":-0.1,"ci95":1.2,"k":8},{"ym":"2026-09","x":2026.7083333333333,"v":0.5,"ci95":1.8,"k":3}],"now":{"v":0.5,"ci95":1.8,"n":5,"nEff":3.1},"houses":{"Fox & Hedgehog":[{"ym":"2026-01","v":0.1},{"ym":"2026-02","v":-0.7},{"ym":"2026-03","v":0.6},{"ym":"2026-05","v":2.7}],"Freshwater":[{"ym":"2026-01","v":0.4},{"ym":"2026-03","v":0.6},{"ym":"2026-05","v":-0.7}],"RedBridge / Accent":[{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-1.3},{"ym":"2026-04","v":1.2},{"ym":"2026-05","v":0.6},{"ym":"2026-06","v":2.5},{"ym":"2026-07","v":3.3},{"ym":"2026-08","v":0}],"Roy Morgan":[{"ym":"2026-05","v":0},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":-0.2},{"ym":"2026-08","v":-0.6},{"ym":"2026-09","v":0.3}],"YouGov":[{"ym":"2026-01","v":0.2},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-1.9},{"ym":"2026-04","v":-2.4},{"ym":"2026-05","v":-1.3},{"ym":"2026-06","v":-0.4},{"ym":"2026-07","v":0.9},{"ym":"2026-08","v":0.7},{"ym":"2026-09","v":0.8}]},"flows":[{"firm":"RedBridge / Accent","l":34.2,"le":4.5,"g":90.8,"ge":4.5,"t":64.2,"te":4.5,"n":5,"m":1},{"firm":"Roy Morgan","l":29.7,"le":5.7,"g":95.3,"ge":8.5,"t":58,"te":9.2,"n":18},{"firm":"YouGov","l":37.3,"le":6.9,"g":83.1,"ge":9.6,"t":65.5,"te":9.2,"n":17}],"meta":{"pub":{"l":31.5,"g":89,"t":53},"pubSrc":"first-principles flow set","sigma2w":0.92,"anchor":null,"baseFrom":{"Fox & Hedgehog":"2026-03-25","Freshwater":"2026-05-15","YouGov":"2026-02-24","RedBridge / Accent":"2026-04-30","Roy Morgan":"2026-05-31"},"houses":["Fox & Hedgehog","Freshwater","RedBridge / Accent","Roy Morgan","YouGov"]}};
+  const flowDriftOn = {"months":[{"ym":"2026-01","x":2026.0416666666667,"v":0.2,"ci95":1.9,"k":3},{"ym":"2026-02","x":2026.125,"v":-0.3,"ci95":1.6,"k":4},{"ym":"2026-03","x":2026.2083333333333,"v":-0.6,"ci95":1.5,"k":5},{"ym":"2026-04","x":2026.2916666666667,"v":-1.2,"ci95":2.3,"k":3},{"ym":"2026-05","x":2026.375,"v":0.2,"ci95":1.2,"k":8},{"ym":"2026-06","x":2026.4583333333333,"v":0.2,"ci95":1.1,"k":8},{"ym":"2026-07","x":2026.5416666666667,"v":0.9,"ci95":1.2,"k":7},{"ym":"2026-08","x":2026.625,"v":-0.1,"ci95":1.2,"k":8},{"ym":"2026-09","x":2026.7083333333333,"v":0.5,"ci95":1.8,"k":3}],"now":{"v":0.5,"ci95":1.8,"n":5,"nEff":3.1},"houses":{"Fox & Hedgehog":[{"ym":"2026-01","v":0.1},{"ym":"2026-02","v":-0.7},{"ym":"2026-03","v":0.6},{"ym":"2026-05","v":2.7}],"Freshwater":[{"ym":"2026-01","v":0.4},{"ym":"2026-03","v":0.6},{"ym":"2026-05","v":-0.7}],"RedBridge / Accent":[{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-1.3},{"ym":"2026-04","v":1.2},{"ym":"2026-05","v":0.6},{"ym":"2026-06","v":2.5},{"ym":"2026-07","v":3.3},{"ym":"2026-08","v":0}],"Roy Morgan":[{"ym":"2026-05","v":0},{"ym":"2026-06","v":-0.1},{"ym":"2026-07","v":-0.2},{"ym":"2026-08","v":-0.6},{"ym":"2026-09","v":0.3}],"YouGov":[{"ym":"2026-01","v":0.2},{"ym":"2026-02","v":-0.1},{"ym":"2026-03","v":-1.9},{"ym":"2026-04","v":-2.4},{"ym":"2026-05","v":-1.3},{"ym":"2026-06","v":-0.4},{"ym":"2026-07","v":0.9},{"ym":"2026-08","v":0.7},{"ym":"2026-09","v":0.8}]},"flows":[{"firm":"RedBridge / Accent","l":34.2,"le":4.5,"g":90.8,"ge":4.5,"t":64.2,"te":4.5,"n":5,"m":1},{"firm":"Roy Morgan","l":29.7,"le":5.7,"lp":0.23,"g":95.3,"ge":8.5,"gp":0.5,"t":58,"te":9.2,"tp":0.58,"n":18},{"firm":"YouGov","l":37.3,"le":6.9,"lp":0.33,"g":83.1,"ge":9.6,"gp":0.64,"t":65.5,"te":9.2,"tp":0.59,"n":17}],"meta":{"pub":{"l":31.5,"g":89,"t":53},"pubSrc":"first-principles flow set","sigma2w":0.92,"anchor":null,"baseFrom":{"Fox & Hedgehog":"2026-03-25","Freshwater":"2026-05-15","YouGov":"2026-02-24","RedBridge / Accent":"2026-04-30","Roy Morgan":"2026-05-31"},"houses":["Fox & Hedgehog","Freshwater","RedBridge / Accent","Roy Morgan","YouGov"]}};
   const leaderMonths = [{"ym":"2025-05","x":2025.375,"alb_pref":null,"ley_pref":null,"taylor_pref":null,"hanson_pref":null,"alb_prefN":null,"ley_prefN":null,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":18,"ley_net":null,"taylor_net":null,"hanson_net":null,"alb_fav":null,"ley_fav":null,"taylor_fav":null,"hanson_fav":null,"alb_netCi":12.7,"ley_netCi":null,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":null,"ley_favCi":null,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-06","x":2025.4583333333333,"alb_pref":null,"ley_pref":null,"taylor_pref":null,"hanson_pref":null,"alb_prefN":null,"ley_prefN":null,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":17,"ley_net":null,"taylor_net":null,"hanson_net":null,"alb_fav":null,"ley_fav":null,"taylor_fav":null,"hanson_fav":null,"alb_netCi":7.1,"ley_netCi":null,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":null,"ley_favCi":null,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-07","x":2025.5416666666667,"alb_pref":46,"ley_pref":30,"taylor_pref":null,"hanson_pref":null,"alb_prefN":61,"ley_prefN":39,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":7,"ley_net":0,"taylor_net":null,"hanson_net":null,"alb_fav":4,"ley_fav":null,"taylor_fav":null,"hanson_fav":-15,"alb_netCi":7.5,"ley_netCi":9.3,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":7.8,"ley_favCi":null,"taylor_favCi":null,"hanson_favCi":7.7},{"ym":"2025-08","x":2025.625,"alb_pref":46,"ley_pref":29,"taylor_pref":null,"hanson_pref":null,"alb_prefN":62,"ley_prefN":38,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":3,"ley_net":-1,"taylor_net":null,"hanson_net":null,"alb_fav":null,"ley_fav":null,"taylor_fav":null,"hanson_fav":null,"alb_netCi":4.3,"ley_netCi":8.6,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":null,"ley_favCi":null,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-09","x":2025.7083333333333,"alb_pref":46,"ley_pref":28,"taylor_pref":null,"hanson_pref":null,"alb_prefN":62,"ley_prefN":38,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":1,"ley_net":-9,"taylor_net":null,"hanson_net":null,"alb_fav":null,"ley_fav":null,"taylor_fav":null,"hanson_fav":null,"alb_netCi":7.8,"ley_netCi":10,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":null,"ley_favCi":null,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-10","x":2025.7916666666667,"alb_pref":49,"ley_pref":27,"taylor_pref":null,"hanson_pref":null,"alb_prefN":64,"ley_prefN":36,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-1,"ley_net":-17,"taylor_net":null,"hanson_net":null,"alb_fav":-7,"ley_fav":-5,"taylor_fav":null,"hanson_fav":null,"alb_netCi":2.4,"ley_netCi":7.2,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":6.3,"ley_favCi":6.3,"taylor_favCi":null,"hanson_favCi":null},{"ym":"2025-11","x":2025.875,"alb_pref":44,"ley_pref":21,"taylor_pref":null,"hanson_pref":null,"alb_prefN":69,"ley_prefN":31,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":7,"ley_net":-17,"taylor_net":null,"hanson_net":null,"alb_fav":-5,"ley_fav":-21,"taylor_fav":null,"hanson_fav":-9,"alb_netCi":9.1,"ley_netCi":7.8,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":6.9,"ley_favCi":7.6,"taylor_favCi":null,"hanson_favCi":6.9},{"ym":"2025-12","x":2025.9583333333333,"alb_pref":40,"ley_pref":23,"taylor_pref":null,"hanson_pref":null,"alb_prefN":65,"ley_prefN":35,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":null,"ley_pref3":null,"taylor_pref3":null,"hanson_pref3":null,"alb_prefN3":null,"ley_prefN3":null,"taylor_prefN3":null,"hanson_prefN3":null,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-1,"ley_net":-8,"taylor_net":null,"hanson_net":null,"alb_fav":2,"ley_fav":-9,"taylor_fav":null,"hanson_fav":-19,"alb_netCi":5.7,"ley_netCi":4.1,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":7.7,"ley_favCi":13.9,"taylor_favCi":null,"hanson_favCi":6.2},{"ym":"2026-01","x":2026.0416666666667,"alb_pref":42,"ley_pref":26,"taylor_pref":null,"hanson_pref":null,"alb_prefN":63,"ley_prefN":37,"taylor_prefN":null,"hanson_prefN":null,"alb_pref3":39,"ley_pref3":16,"taylor_pref3":null,"hanson_pref3":26,"alb_prefN3":48,"ley_prefN3":20,"taylor_prefN3":null,"hanson_prefN3":32,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-13,"ley_net":-22,"taylor_net":null,"hanson_net":null,"alb_fav":-11,"ley_fav":-11,"taylor_fav":null,"hanson_fav":-1,"alb_netCi":4.1,"ley_netCi":5.8,"taylor_netCi":null,"hanson_netCi":null,"alb_favCi":3.2,"ley_favCi":7.4,"taylor_favCi":null,"hanson_favCi":6.6},{"ym":"2026-02","x":2026.125,"alb_pref":43,"ley_pref":26,"taylor_pref":36,"hanson_pref":null,"alb_prefN":58,"ley_prefN":37,"taylor_prefN":45,"hanson_prefN":null,"alb_pref3":36,"ley_pref3":null,"taylor_pref3":15,"hanson_pref3":24,"alb_prefN3":48,"ley_prefN3":null,"taylor_prefN3":19,"hanson_prefN3":33,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-13,"ley_net":-31,"taylor_net":1,"hanson_net":9,"alb_fav":-13,"ley_fav":-17,"taylor_fav":-3,"hanson_fav":1,"alb_netCi":3.1,"ley_netCi":5.5,"taylor_netCi":3.5,"hanson_netCi":6,"alb_favCi":3.9,"ley_favCi":7.1,"taylor_favCi":3.2,"hanson_favCi":4.6},{"ym":"2026-03","x":2026.2083333333333,"alb_pref":41,"ley_pref":null,"taylor_pref":35,"hanson_pref":null,"alb_prefN":54,"ley_prefN":null,"taylor_prefN":46,"hanson_prefN":null,"alb_pref3":33,"ley_pref3":null,"taylor_pref3":14,"hanson_pref3":23,"alb_prefN3":47,"ley_prefN3":null,"taylor_prefN3":20,"hanson_prefN3":33,"alb_prefH":null,"hanson_prefH":null,"taylor_prefH":null,"ley_prefH":null,"alb_net":-16,"ley_net":null,"taylor_net":1,"hanson_net":5,"alb_fav":-17,"ley_fav":null,"taylor_fav":6,"hanson_fav":3,"alb_netCi":2.7,"ley_netCi":null,"taylor_netCi":2.6,"hanson_netCi":6.1,"alb_favCi":5,"ley_favCi":null,"taylor_favCi":16.7,"hanson_favCi":12},{"ym":"2026-04","x":2026.2916666666667,"alb_pref":42,"ley_pref":null,"taylor_pref":36,"hanson_pref":null,"alb_prefN":54,"ley_prefN":null,"taylor_prefN":46,"hanson_prefN":null,"alb_pref3":34,"ley_pref3":null,"taylor_pref3":18,"hanson_pref3":24,"alb_prefN3":45,"ley_prefN3":null,"taylor_prefN3":24,"hanson_prefN3":31,"alb_prefH":47,"hanson_prefH":39,"taylor_prefH":null,"ley_prefH":null,"alb_net":-15,"ley_net":null,"taylor_net":-1,"hanson_net":null,"alb_fav":-15,"ley_fav":null,"taylor_fav":2,"hanson_fav":1,"alb_netCi":2.5,"ley_netCi":null,"taylor_netCi":5.7,"hanson_netCi":null,"alb_favCi":5.9,"ley_favCi":null,"taylor_favCi":4.8,"hanson_favCi":3.4},{"ym":"2026-05","x":2026.375,"alb_pref":40,"ley_pref":null,"taylor_pref":37,"hanson_pref":null,"alb_prefN":51,"ley_prefN":null,"taylor_prefN":49,"hanson_prefN":null,"alb_pref3":33,"ley_pref3":null,"taylor_pref3":19,"hanson_pref3":26,"alb_prefN3":42,"ley_prefN3":null,"taylor_prefN3":24,"hanson_prefN3":34,"alb_prefH":52,"hanson_prefH":37,"taylor_prefH":null,"ley_prefH":null,"alb_net":-18,"ley_net":null,"taylor_net":-3,"hanson_net":8,"alb_fav":-18,"ley_fav":null,"taylor_fav":3,"hanson_fav":6,"alb_netCi":2.2,"ley_netCi":null,"taylor_netCi":3.4,"hanson_netCi":5.5,"alb_favCi":3.8,"ley_favCi":null,"taylor_favCi":4.3,"hanson_favCi":6.1},{"ym":"2026-06","x":2026.4583333333333,"alb_pref":43,"ley_pref":null,"taylor_pref":38,"hanson_pref":null,"alb_prefN":53,"ley_prefN":null,"taylor_prefN":47,"hanson_prefN":null,"alb_pref3":37,"ley_pref3":null,"taylor_pref3":17,"hanson_pref3":29,"alb_prefN3":45,"ley_prefN3":null,"taylor_prefN3":20,"hanson_prefN3":35,"alb_prefH":48,"hanson_prefH":41,"taylor_prefH":null,"ley_prefH":null,"alb_net":-20,"ley_net":null,"taylor_net":-6,"hanson_net":-3,"alb_fav":-20,"ley_fav":null,"taylor_fav":-6,"hanson_fav":-5,"alb_netCi":3.2,"ley_netCi":null,"taylor_netCi":4.9,"hanson_netCi":6,"alb_favCi":4.2,"ley_favCi":null,"taylor_favCi":3.3,"hanson_favCi":6.7},{"ym":"2026-07","x":2026.5416666666667,"alb_pref":44,"ley_pref":null,"taylor_pref":36,"hanson_pref":null,"alb_prefN":55,"ley_prefN":null,"taylor_prefN":45,"hanson_prefN":null,"alb_pref3":37,"ley_pref3":null,"taylor_pref3":20,"hanson_pref3":27,"alb_prefN3":44,"ley_prefN3":null,"taylor_prefN3":24,"hanson_prefN3":32,"alb_prefH":49,"hanson_prefH":36,"taylor_prefH":null,"ley_prefH":null,"alb_net":-16,"ley_net":null,"taylor_net":-11,"hanson_net":1,"alb_fav":-18,"ley_fav":null,"taylor_fav":-5,"hanson_fav":-6,"alb_netCi":2.6,"ley_netCi":null,"taylor_netCi":6.5,"hanson_netCi":4,"alb_favCi":4.9,"ley_favCi":null,"taylor_favCi":2.5,"hanson_favCi":4.8},{"ym":"2026-08","x":2026.625,"alb_pref":43,"ley_pref":null,"taylor_pref":38,"hanson_pref":null,"alb_prefN":53,"ley_prefN":null,"taylor_prefN":47,"hanson_prefN":null,"alb_pref3":38,"ley_pref3":null,"taylor_pref3":21,"hanson_pref3":27,"alb_prefN3":44,"ley_prefN3":null,"taylor_prefN3":24,"hanson_prefN3":32,"alb_prefH":52,"hanson_prefH":39,"taylor_prefH":null,"ley_prefH":null,"alb_net":-20,"ley_net":null,"taylor_net":-8,"hanson_net":0,"alb_fav":-17,"ley_fav":null,"taylor_fav":-2,"hanson_fav":-8,"alb_netCi":2.5,"ley_netCi":null,"taylor_netCi":4.4,"hanson_netCi":4.2,"alb_favCi":3.3,"ley_favCi":null,"taylor_favCi":2.9,"hanson_favCi":11.1},{"ym":"2026-09","x":2026.7083333333333,"alb_pref":43,"ley_pref":null,"taylor_pref":39,"hanson_pref":null,"alb_prefN":52,"ley_prefN":null,"taylor_prefN":48,"hanson_prefN":null,"alb_pref3":33,"ley_pref3":null,"taylor_pref3":21,"hanson_pref3":25,"alb_prefN3":41,"ley_prefN3":null,"taylor_prefN3":27,"hanson_prefN3":32,"alb_prefH":51,"hanson_prefH":40,"taylor_prefH":null,"ley_prefH":null,"alb_net":-20,"ley_net":null,"taylor_net":-3,"hanson_net":null,"alb_fav":-15,"ley_fav":null,"taylor_fav":-4,"hanson_fav":-11,"alb_netCi":3.8,"ley_netCi":null,"taylor_netCi":10.8,"hanson_netCi":null,"alb_favCi":5.6,"ley_favCi":null,"taylor_favCi":4.7,"hanson_favCi":5.7}];
   const direction = [{"ym":"2025-05","x":2025.375,"right":37,"wrong":42,"unsure":21,"net":-5,"n":1,"rightCi":3.5,"wrongCi":3.5},{"ym":"2025-06","x":2025.4583333333333,"right":40.5,"wrong":43.9,"unsure":15.6,"net":-3.4,"n":3,"rightCi":2.4,"wrongCi":2.5},{"ym":"2025-07","x":2025.5416666666667,"right":36.8,"wrong":45.5,"unsure":17.7,"net":-8.7,"n":3,"rightCi":1.7,"wrongCi":3.2},{"ym":"2025-08","x":2025.625,"right":36.2,"wrong":49.8,"unsure":14,"net":-13.6,"n":2,"rightCi":2.5,"wrongCi":3.8},{"ym":"2025-09","x":2025.7083333333333,"right":32.6,"wrong":52.3,"unsure":15.1,"net":-19.7,"n":2,"rightCi":1.9,"wrongCi":3.2},{"ym":"2025-10","x":2025.7916666666667,"right":33.9,"wrong":51.1,"unsure":15,"net":-17.2,"n":3,"rightCi":1.6,"wrongCi":4},{"ym":"2025-11","x":2025.875,"right":33.5,"wrong":50.6,"unsure":15.9,"net":-17.1,"n":3,"rightCi":1.7,"wrongCi":2.8},{"ym":"2025-12","x":2025.9583333333333,"right":34.3,"wrong":50.4,"unsure":15.3,"net":-16.1,"n":2,"rightCi":2.6,"wrongCi":2.6},{"ym":"2026-01","x":2026.0416666666667,"right":27.2,"wrong":53.6,"unsure":19.2,"net":-26.4,"n":4,"rightCi":4.8,"wrongCi":5.2},{"ym":"2026-02","x":2026.125,"right":30.7,"wrong":54.7,"unsure":14.6,"net":-24,"n":6,"rightCi":2.2,"wrongCi":3.3},{"ym":"2026-03","x":2026.2083333333333,"right":28.1,"wrong":57.3,"unsure":14.6,"net":-29.2,"n":6,"rightCi":2.4,"wrongCi":1.8},{"ym":"2026-04","x":2026.2916666666667,"right":27.3,"wrong":58.1,"unsure":14.6,"net":-30.8,"n":6,"rightCi":1.3,"wrongCi":1.6},{"ym":"2026-05","x":2026.375,"right":27.5,"wrong":58.1,"unsure":14.4,"net":-30.6,"n":6,"rightCi":1.2,"wrongCi":1.3},{"ym":"2026-06","x":2026.4583333333333,"right":27.8,"wrong":58.6,"unsure":13.6,"net":-30.8,"n":5,"rightCi":2.2,"wrongCi":3.6},{"ym":"2026-07","x":2026.5416666666667,"right":27.6,"wrong":56.9,"unsure":15.5,"net":-29.3,"n":6,"rightCi":1.2,"wrongCi":1.6},{"ym":"2026-08","x":2026.625,"right":26,"wrong":58.5,"unsure":15.5,"net":-32.5,"n":5,"rightCi":2.8,"wrongCi":1.7}];
   const directionHouseEffects = {"right":{"Spectre Strategy":{"v":-0.9,"n":5},"Roy Morgan":{"v":-1.7,"n":15},"Essential":{"v":1.6,"n":12},"Freshwater":{"v":0.2,"n":1}},"wrong":{"Spectre Strategy":{"v":0.5,"n":5},"Roy Morgan":{"v":2.7,"n":15},"Essential":{"v":-2.9,"n":12},"Freshwater":{"v":0.1,"n":1}}};
@@ -12992,14 +13095,17 @@ function NextPollsPanel() {
     }, "Median ", r.cadence, " days between", " ", r.basis === "published" ? "publications" : "fieldwork ends", " across the last ", r.gapsUsed, " intervals", r.spreadEarly != null && r.spreadEarly !== r.spreadLate ? `, –${r.spreadEarly}/+${r.spreadLate} days` : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : "", ".", r.basis !== "published" && /*#__PURE__*/React.createElement(React.Fragment, null, " ", "Plus", " ", r.lagMeasured ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases` : "the field’s one-day publication lag", "."), r.releaseDow != null && ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`, r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`, (r.declared || []).length > 0 && ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`)));
   })));
 }
-function PollsterTable() {
+function PollsterTable({
+  tppBasis,
+  setTppBasis
+}) {
   const {
     D
   } = window.AP;
   // ledger look shared with the All-polls archive – its cell renderers are
   // defined in the archive script and arrive on window once both assets load
   const {
-    ArchImplied,
+    ArchTpp,
     ArchLead,
     ArchApprCell,
     archLeadInfo
@@ -13031,7 +13137,7 @@ function PollsterTable() {
         return r.sample ?? -Infinity;
       case "alp":
         {
-          const li = archLeadInfo(r, "lnp");
+          const li = archLeadInfo(r, "lnp", tppBasis);
           return li ? li.m : -Infinity;
         }
       case "p.alp":
@@ -13135,9 +13241,18 @@ function PollsterTable() {
     className: "hide-md"
   }), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("th", {
     scope: "col",
-    className: "ta-l apub-col hide-md",
-    title: "This poll's primaries read at the 2025 election's preference flows \u2013 one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown"
-  }, "Implied 2PP"), /*#__PURE__*/React.createElement(SortTh, {
+    className: "ta-l apub-col hide-md"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "th-basis",
+    onClick: () => setTppBasis(tppBasis === "imp" ? "resp" : "imp"),
+    title: tppBasis === "resp" ? "Each poll's headline figures exactly as the pollster released them – click to switch to implied 2PP at the 2025 election's preference flows" : "Each poll's primaries read at the 2025 election's preference flows – one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown. Click to switch to the published figures"
+  }, tppBasis === "resp" ? "As published" : /*#__PURE__*/React.createElement(React.Fragment, null, "Implied 2PP", " ", /*#__PURE__*/React.createElement("span", {
+    className: "th-basis-def"
+  }, "(default)")), /*#__PURE__*/React.createElement("span", {
+    className: "th-basis-swap",
+    "aria-hidden": "true"
+  }, "\u21C4"))), /*#__PURE__*/React.createElement(SortTh, {
     label: "Lead \xB7 ALP v L/NP",
     short: "Lead",
     sortKey: "alp",
@@ -13224,14 +13339,16 @@ function PollsterTable() {
       className: "num muted hide-md"
     }, r.sample != null ? r.sample.toLocaleString() : "—"), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
       className: "ta-l apub-col hide-md"
-    }, /*#__PURE__*/React.createElement(ArchImplied, {
-      p: r
+    }, /*#__PURE__*/React.createElement(ArchTpp, {
+      p: r,
+      basis: tppBasis
     })), /*#__PURE__*/React.createElement("td", {
       className: "num"
     }, /*#__PURE__*/React.createElement(ArchLead, {
       p: r,
       measure: "lnp",
-      primaryFallback: true
+      primaryFallback: true,
+      basis: tppBasis
     }))), facet === "primary" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
       className: "num",
       style: {
@@ -13292,7 +13409,7 @@ function PollsterTable() {
     }))));
   })))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll to see its full breakdown \xB7 Click a column heading to sort \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t ask that question.", " ", "\u201CImplied 2PP\u201D reads the poll\u2019s primaries at the 2025 election\u2019s preference flows, and the lead bar is that figure in margin form.", " ", /*#__PURE__*/React.createElement("strong", null, "Published"), " is the day the poll was released, taken from the source each row links to.", " ", "Each house\u2019s systematic lean \u2013 its house effect \u2013 sits beside poll lean in the All polls archive."));
+  }, "Tap any poll to see its full breakdown \xB7 Click a column heading to sort \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t ask that question.", tppBasis === "resp" ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar is the published figure in margin form. Click the “As published” heading to switch back to implied." : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar is that figure in margin form. Click the “Implied 2PP” heading to switch to the pollsters’ own published figures.", " ", /*#__PURE__*/React.createElement("strong", null, "Published"), " is the day the poll was released, taken from the source each row links to.", " ", "Each house\u2019s systematic lean \u2013 its house effect \u2013 sits beside poll lean in the All polls archive."));
 }
 Object.assign(window, {
   Segmented,
@@ -15397,7 +15514,7 @@ function CycleLegend({
   }, /*#__PURE__*/React.createElement("div", {
     className: "ap-pop-head"
   }, /*#__PURE__*/React.createElement("span", null, "On the board"), /*#__PURE__*/React.createElement("div", {
-    className: "cyc-quick",
+    className: "pop-quick",
     role: "group",
     "aria-label": "Board shortcuts"
   }, QUICK.map(q => /*#__PURE__*/React.createElement("button", {
@@ -15405,7 +15522,7 @@ function CycleLegend({
     type: "button",
     title: q.title,
     "aria-pressed": quick === q.id,
-    className: "cyc-quick-opt" + (quick === q.id ? " active" : ""),
+    className: "pop-quick-opt" + (quick === q.id ? " active" : ""),
     onClick: q.run
   }, q.label)))), /*#__PURE__*/React.createElement("div", {
     className: "cyc-board",
@@ -16372,20 +16489,112 @@ function ArchImplied({
   }), lnp.toFixed(1)));
 }
 
+// "As published" – the poll's headline figures exactly as the pollster released
+// them, as plain numerals (dot-coded by party) with any shape-flags inline.
+// Numerals, not a 0–100 bar: at archive scale every 53/47 bar looks identical,
+// so the ink carries nothing – the figures themselves are the record.
+// A poll with NO after-preferences figure published only its primaries – and
+// those are the record too, so they print here under a Primary flag rather
+// than leaving the cell a bare dash.
+function ArchPublished({
+  p
+}) {
+  const {
+    tppContests,
+    tppFlag,
+    primarySegs
+  } = window;
+  const c0 = tppContests(p)[0];
+  if (!c0) {
+    const pSegs = p.p ? primarySegs(p) : [];
+    if (!pSegs.length) return /*#__PURE__*/React.createElement("span", {
+      className: "dash",
+      title: "No voting-intention figures published with this poll"
+    }, "\u2014");
+    return /*#__PURE__*/React.createElement("div", {
+      className: "apub",
+      "aria-label": "Primary votes: " + pSegs.map(s => `${s.label} ${s.value}`).join(", "),
+      title: "No two-party or head-to-head figure in this poll \u2013 these are the primary votes"
+    }, pSegs.map((s, i) => /*#__PURE__*/React.createElement("span", {
+      key: i,
+      className: "apub-seg",
+      title: s.label
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "apub-dot",
+      style: {
+        background: s.color
+      }
+    }), s.value.toFixed(1))), /*#__PURE__*/React.createElement("span", {
+      className: "facet-flag"
+    }, "Primary"));
+  }
+  const flag = tppFlag(p);
+  return /*#__PURE__*/React.createElement("div", {
+    className: "apub",
+    "aria-label": c0.segs.map(s => `${s.label} ${s.value}`).join(", ")
+  }, c0.segs.map((s, i) => /*#__PURE__*/React.createElement("span", {
+    key: i,
+    className: "apub-seg",
+    title: s.label
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "apub-dot",
+    style: {
+      background: s.color
+    }
+  }), s.value.toFixed(1))), flag && /*#__PURE__*/React.createElement("span", {
+    className: "facet-flag"
+  }, flag));
+}
+
+// The 2PP column's basis switch renders one of these two – same cell slot,
+// same .apub ink, so flipping bases changes the figures and never the layout.
+function ArchTpp({
+  p,
+  basis
+}) {
+  return basis === "resp" ? /*#__PURE__*/React.createElement(ArchPublished, {
+    p: p
+  }) : /*#__PURE__*/React.createElement(ArchImplied, {
+    p: p
+  });
+}
+
 // One lead-info helper drives the cell, the held-by filter and the sort, so
 // they can never disagree. Returns null when the poll has no figure on the
 // selected measure's basis. m is signed: + = first-named party of the
 // matchup leads. segs hold the matchup's shares in a FIXED party order for
 // the split bar – deliberately not sorted by leader, so a row-to-row scan
 // never has the colours swapping places.
-// Basis follows the table itself: the two implied matchups read the implied
-// series (alpImp / alpOnImp), and only the matchup with no implied series
-// (L/NP v ON, 3-cornered) shows the pollster's own published figures.
-function archLeadInfo(p, measure) {
+// Basis follows the table itself: on the implied basis the implied-priced
+// matchups read the implied series (alpImp / alpOnImp); on the published
+// basis they read the pollsters' own figures, and the matchups the site
+// prices no implied series for (L/NP v ON, 3-cornered) show published
+// figures either way.
+function archLeadInfo(p, measure, basis) {
+  const pub = basis === "resp";
   if (measure === "onp") {
-    // implied ALP v ON – the pairing's standing basis everywhere else on the
-    // page (the hero default); the frozen ALP–ON flow set prices every wave,
-    // where only two houses publish a head-to-head of their own
+    // the ALP v ON lead follows the table's basis: implied prices every wave
+    // through the frozen ALP–ON flow set (the pairing's standing basis
+    // everywhere else on the page); published shows the head-to-head only
+    // where the house filed one of its own
+    if (pub) {
+      if (!p.tppAlt) return null;
+      const m = +(p.tppAlt.alp - p.tppAlt.onp).toFixed(1);
+      return {
+        m,
+        who: m >= 0 ? "alp" : "onp",
+        lab: m >= 0 ? "ALP" : "ON",
+        color: m >= 0 ? "var(--alp)" : "var(--onp)",
+        segs: [{
+          v: p.tppAlt.alp,
+          color: "var(--alp)"
+        }, {
+          v: p.tppAlt.onp,
+          color: "var(--onp)"
+        }],
+        note: " on the published ALP v One Nation matchup"
+      };
+    }
     if (p.alpOnImp == null) return null;
     const on = +(100 - p.alpOnImp).toFixed(1);
     const m = +(p.alpOnImp - on).toFixed(1);
@@ -16442,6 +16651,31 @@ function archLeadInfo(p, measure) {
         color: "var(--onp)"
       }],
       note: ` over ${e[1][1]} on the published 3-cornered figures`
+    };
+  }
+  // ALP v L/NP follows the table's basis too. Published shows the pollster's
+  // own pair (undecided-inclusive where that is how the house releases it;
+  // latest-table rows name the same fields alp2pp/lnp2pp) – a missing half
+  // completes the pair rather than leaving the lead blank.
+  if (pub) {
+    if (p.alp == null && p.alp2pp == null) return null; // no published 2PP this wave
+    const alp = p.alp2pp != null ? p.alp2pp : p.alp;
+    const lnp = p.lnp2pp != null ? p.lnp2pp : p.lnp;
+    const lnpV = lnp != null ? lnp : 100 - alp;
+    const m = +(alp - lnpV).toFixed(1);
+    return {
+      m,
+      who: m >= 0 ? "alp" : "lnp",
+      lab: m >= 0 ? "ALP" : "L/NP",
+      color: m >= 0 ? "var(--alp)" : "var(--lnp)",
+      segs: [{
+        v: alp,
+        color: "var(--alp)"
+      }, {
+        v: lnpV,
+        color: "var(--lnp)"
+      }],
+      note: " on the two-party ALP v L/NP measure"
     };
   }
   // implied 2PP in margin form – the same figure the Implied 2PP column
@@ -16511,12 +16745,13 @@ function primaryLeadInfo(p) {
 function ArchLead({
   p,
   measure,
-  primaryFallback
+  primaryFallback,
+  basis
 }) {
-  const li = archLeadInfo(p, measure) || (primaryFallback && measure === "lnp" ? primaryLeadInfo(p) : null);
+  const li = archLeadInfo(p, measure, basis) || (primaryFallback && measure === "lnp" ? primaryLeadInfo(p) : null);
   if (!li) return /*#__PURE__*/React.createElement("span", {
     className: "dash",
-    title: measure === "lnponp" || measure === "3cp" ? "This pollster didn’t publish the selected matchup this wave" : "No implied figure – this poll never filed a full primary set the flow tables can read"
+    title: measure === "lnponp" || measure === "3cp" ? "This pollster didn’t publish the selected matchup this wave" : basis === "resp" ? measure === "onp" ? "This pollster didn’t publish the selected matchup this wave" : "This pollster published no two-party figure this wave" : "No implied figure – this poll never filed a full primary set the flow tables can read"
   }, "\u2014");
   return /*#__PURE__*/React.createElement("div", {
     className: "arch-appr",
@@ -17411,6 +17646,181 @@ function HouseLeanPanel({
    table's implication). Houses ride faint behind the aggregate, same
    hidden-chip convention as the lean panel, on the lean panel's own
    palette – a house here is the same house there. */
+/* ---- the drift panel's series board ------------------------------------
+   Ten chips in a row, one per house, each doubling as that house's current
+   drift readout — and the POOLED line, which is the only thing the panel
+   actually answers, sitting among them as the eleventh chip of equal weight.
+   A reader had to know which chip was the answer before the panel could give
+   them one.
+
+   So the answer comes out of the row and becomes a readout: the pooled drift,
+   its interval, and the sentence that interval implies. What is left is a
+   control, and controls fold — the same board the past-cycles tab uses, in
+   the same FilterPop.
+
+   Nothing is buried that was saying something. A house whose own drift sits
+   OUTSIDE the pooled interval is making a claim the pooled line is not, and
+   it stays on the surface beside the button; the eight houses agreeing with
+   the pooled read to within its own error were never news, and are one click
+   away. */
+/* One fitted cell, and the thing the table could never say: how much of it
+   is the house's own waves and how much is the election row fed back. Every
+   cell is shrunk toward that row, so a cell whose posterior barely moved off
+   the prior is not a measurement of the house — it is the prior, wearing the
+   house's name. The ridge gives it away for free: prior share = (se/τ)².
+
+   At or past a half the number goes quiet and says so on hover. It is not
+   hidden, because it is not WRONG — it is the best estimate available and it
+   happens to be the election's. It is dimmed because a reader comparing
+   Newspoll's Greens against the AEC's has to know they are reading one
+   number twice. */
+const FLOW_PRIOR_DIM = 0.5;
+function FlowCell({
+  v,
+  se,
+  prior
+}) {
+  const thin = prior != null && prior >= FLOW_PRIOR_DIM;
+  return /*#__PURE__*/React.createElement("td", {
+    className: thin ? "flow-tab-thin" : undefined,
+    title: prior == null ? undefined : thin ? `Mostly the election row, not a reading of this house: ${Math.round(prior * 100)}% of this cell is the prior it was shrunk toward. Its own waves move this bucket too little to say more.` : `${Math.round((1 - prior) * 100)}% of this cell comes from this house's own waves, the rest from the election row it is shrunk toward.`
+  }, v.toFixed(1), "%", /*#__PURE__*/React.createElement("span", {
+    className: "flow-tab-se"
+  }, " \xB1", se.toFixed(1)));
+}
+function FlowLegend({
+  pooledId,
+  pooled,
+  houseRows,
+  hidden,
+  setHidden,
+  sgn,
+  kind
+}) {
+  const [pop, setPop] = useState(null);
+  const total = houseRows.length;
+  const shownHouses = houseRows.filter(r => !hidden[r.f]).length;
+  const pooledOn = !hidden[pooledId];
+  /* The band is the pooled 95% interval. A house beyond it is not "wrong" —
+     it is measurably somewhere else, which is exactly what this panel exists
+     to notice. Without an interval nothing is singled out, which is the
+     honest failure mode. */
+  const band = pooled && pooled.ci95 != null ? pooled.ci95 : null;
+  const outliers = band == null ? [] : houseRows.filter(r => r.latest != null && Math.abs(r.latest) > band);
+  const outSet = new Set(outliers.map(r => r.f));
+
+  /* The label already says "Houses", so the summary counts rather than
+     repeats it. */
+  const summary = (shownHouses === total ? "all " + total : shownHouses + " of " + total) + (pooledOn ? "" : " · pooled off");
+  const setAll = v => setHidden(Object.fromEntries(houseRows.map(r => [r.f, v])));
+  const QUICK = [{
+    id: "all",
+    label: "All",
+    title: "Every house on the chart",
+    on: shownHouses === total && pooledOn,
+    run: () => setHidden({})
+  }, {
+    id: "pooled",
+    label: "Pooled only",
+    title: "The cross-house line alone, with its interval",
+    on: shownHouses === 0 && pooledOn,
+    run: () => setAll(true)
+  }, {
+    id: "out",
+    label: "Off the table",
+    title: "Only the houses whose own drift sits outside the pooled interval",
+    on: outliers.length > 0 && pooledOn && shownHouses === outliers.length && houseRows.every(r => hidden[r.f] !== outSet.has(r.f)),
+    run: () => setHidden(Object.fromEntries(houseRows.map(r => [r.f, !outSet.has(r.f)])))
+  }].filter(q => q.id !== "out" || outliers.length > 0);
+  const row = (key, colour, name, value, note) => /*#__PURE__*/React.createElement("button", {
+    key: key,
+    type: "button",
+    className: "flow-row" + (hidden[key] ? " off" : "") + (outSet.has(key) ? " out" : ""),
+    "aria-pressed": !hidden[key],
+    title: (hidden[key] ? "Draw " : "Take ") + name + (hidden[key] ? " on the chart" : " off the chart"),
+    onClick: () => setHidden(h => ({
+      ...h,
+      [key]: !h[key]
+    }))
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "flow-swatch",
+    style: {
+      background: colour
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "flow-row-name"
+  }, name), note && /*#__PURE__*/React.createElement("span", {
+    className: "flow-row-note"
+  }, note), /*#__PURE__*/React.createElement("span", {
+    className: "flow-row-val"
+  }, value));
+  return /*#__PURE__*/React.createElement("div", {
+    className: "flow-legend"
+  }, pooled && pooled.ci95 != null &&
+  /*#__PURE__*/
+  /* The answer, said once, in the size it deserves. */
+  React.createElement("div", {
+    className: "flow-readout"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "flow-readout-v"
+  }, sgn(pooled.v), /*#__PURE__*/React.createElement("span", {
+    className: "flow-readout-ci"
+  }, " \xB1 ", pooled.ci95.toFixed(1)), /*#__PURE__*/React.createElement("span", {
+    className: "flow-readout-u"
+  }, "pp")), /*#__PURE__*/React.createElement("span", {
+    className: "flow-readout-lab"
+  }, Math.abs(pooled.v) <= pooled.ci95 ? /*#__PURE__*/React.createElement(React.Fragment, null, "Pooled across ", total, " houses \u2014 ", /*#__PURE__*/React.createElement("strong", null, "no drift the interval can separate from zero")) : /*#__PURE__*/React.createElement(React.Fragment, null, "Pooled across ", total, " houses \u2014 running ", /*#__PURE__*/React.createElement("strong", null, pooled.v > 0 ? "friendlier to Labor" : "friendlier to the Coalition"), " than the table reads their primaries"))), /*#__PURE__*/React.createElement("div", {
+    className: "flow-bar"
+  }, /*#__PURE__*/React.createElement(FilterPop, {
+    id: "flow-" + kind,
+    label: "Houses",
+    summary: summary,
+    open: pop,
+    setOpen: setPop,
+    on: shownHouses !== total || !pooledOn
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "ap-pop-head"
+  }, /*#__PURE__*/React.createElement("span", null, "On the chart"), /*#__PURE__*/React.createElement("div", {
+    className: "pop-quick",
+    role: "group",
+    "aria-label": "Series shortcuts"
+  }, QUICK.map(q => /*#__PURE__*/React.createElement("button", {
+    key: q.id,
+    type: "button",
+    title: q.title,
+    "aria-pressed": q.on,
+    className: "pop-quick-opt" + (q.on ? " active" : ""),
+    onClick: q.run
+  }, q.label)))), /*#__PURE__*/React.createElement("div", {
+    className: "flow-board",
+    role: "group",
+    "aria-label": "Series"
+  }, row(pooledId, "var(--ink)", "Pooled, " + total + " houses", pooled && pooled.ci95 != null ? sgn(pooled.v) + " ± " + pooled.ci95.toFixed(1) : "–"), houseRows.map(r => row(r.f, r.color, r.f, r.latest == null ? "–" : sgn(r.latest) + "pp", outSet.has(r.f) ? "outside the interval" : null))), /*#__PURE__*/React.createElement("p", {
+    className: "ap-pop-foot"
+  }, "Click a house to draw or clear its line. Each is measured against its own baseline, so a house sitting at zero is behaving as its own first waves did \u2014 not as the election did.")), outliers.map(r => /*#__PURE__*/React.createElement("button", {
+    key: r.f,
+    type: "button",
+    className: "flow-out" + (hidden[r.f] ? " off" : ""),
+    style: {
+      "--fl": r.color
+    },
+    "aria-pressed": !hidden[r.f],
+    title: r.f + " sits outside the pooled interval — click to clear its line",
+    onClick: () => setHidden(h => ({
+      ...h,
+      [r.f]: !h[r.f]
+    }))
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "flow-swatch",
+    style: {
+      background: r.color
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    className: "flow-out-name"
+  }, r.f), /*#__PURE__*/React.createElement("span", {
+    className: "flow-out-val"
+  }, sgn(r.latest), "pp")))));
+}
 function FlowDriftPanel({
   rangeId
 }) {
@@ -17426,6 +17836,7 @@ function FlowDriftPanel({
   if (!fd || !fd.months || !fd.meta) return null;
   const firms = fd.meta.houses || [];
   const POOLED = "Pooled, all houses";
+  const KIND = "classic";
   const xDomain = rangeDomain(rangeId);
   const inWin = d => d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1];
   const vals = [1, -1];
@@ -17506,46 +17917,15 @@ function FlowDriftPanel({
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("preference-flows", "Preference-flow drift")
-  }, "preferences"), " ", "are still moving the way the election\u2019s ballots did, with every house measured against its own baseline back then.")), /*#__PURE__*/React.createElement("div", {
-    className: "legend"
-  }, /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "legend-chip" + (hidden[POOLED] ? " off" : ""),
-    "aria-pressed": !hidden[POOLED],
-    title: "Pooled across " + firms.length + " houses – the 21-day nowcast of the drift, with its 95% interval",
-    onClick: () => setHidden(h => ({
-      ...h,
-      [POOLED]: !h[POOLED]
-    }))
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "legend-swatch",
-    style: {
-      background: "var(--ink)"
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "legend-name"
-  }, "Pooled, ", firms.length, " houses"), /*#__PURE__*/React.createElement("span", {
-    className: "legend-val"
-  }, fd.now && fd.now.ci95 != null ? sgn(fd.now.v) + " ± " + fd.now.ci95.toFixed(1) : "–")), houseRows.map(r => /*#__PURE__*/React.createElement("button", {
-    key: r.f,
-    type: "button",
-    className: "legend-chip" + (hidden[r.f] ? " off" : ""),
-    "aria-pressed": !hidden[r.f],
-    title: r.f + " – drift against its own election baseline" + (lateFirms.includes(r.f) ? ", anchored on its first waves instead" : ""),
-    onClick: () => setHidden(h => ({
-      ...h,
-      [r.f]: !h[r.f]
-    }))
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "legend-swatch",
-    style: {
-      background: r.color
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "legend-name"
-  }, r.f), /*#__PURE__*/React.createElement("span", {
-    className: "legend-val"
-  }, r.latest == null ? "–" : sgn(r.latest) + "pp"))))), /*#__PURE__*/React.createElement(TrendChart, {
+  }, "preferences"), " ", "are still moving the way the election\u2019s ballots did, with every house measured against its own baseline back then."))), /*#__PURE__*/React.createElement(FlowLegend, {
+    pooledId: POOLED,
+    pooled: fd.now,
+    houseRows: houseRows,
+    hidden: hidden,
+    setHidden: setHidden,
+    sgn: sgn,
+    kind: KIND
+  }), /*#__PURE__*/React.createElement(TrendChart, {
     key: "flow-" + rangeId,
     height: narrow ? 500 : 300,
     xDomain: xDomain,
@@ -17602,17 +17982,25 @@ function FlowDriftPanel({
   }, /*#__PURE__*/React.createElement("th", {
     scope: "row",
     className: "flow-tab-house"
-  }, f.firm), /*#__PURE__*/React.createElement("td", null, f.g.toFixed(1), "%", /*#__PURE__*/React.createElement("span", {
-    className: "flow-tab-se"
-  }, " \xB1", f.ge.toFixed(1))), /*#__PURE__*/React.createElement("td", null, f.o.toFixed(1), "%", /*#__PURE__*/React.createElement("span", {
-    className: "flow-tab-se"
-  }, " \xB1", f.oe.toFixed(1))), /*#__PURE__*/React.createElement("td", null, f.t.toFixed(1), "%", /*#__PURE__*/React.createElement("span", {
-    className: "flow-tab-se"
-  }, " \xB1", f.te.toFixed(1))), /*#__PURE__*/React.createElement("td", null, f.n, f.m ? /*#__PURE__*/React.createElement("span", {
+  }, f.firm), /*#__PURE__*/React.createElement(FlowCell, {
+    v: f.g,
+    se: f.ge,
+    prior: f.gp
+  }), /*#__PURE__*/React.createElement(FlowCell, {
+    v: f.o,
+    se: f.oe,
+    prior: f.op
+  }), /*#__PURE__*/React.createElement(FlowCell, {
+    v: f.t,
+    se: f.te,
+    prior: f.tp
+  }), /*#__PURE__*/React.createElement("td", null, f.n, f.m ? /*#__PURE__*/React.createElement("span", {
     className: "flow-tab-se"
   }, " published") : null))))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint ap-var-note flow-tab-note"
-  }, "A house row reads as \u201Cthe share of that bucket\u2019s preferences this house\u2019s published 2PP behaves as if it handed to Labor\u201D \u2013 fit from the house\u2019s own 2PP and primary swings, with its fixed method offset soaked up by an intercept (\u201COther\u201D lumps independents and minor parties together, as the constants in", " ", fd.meta.table, " do). Every fitted cell is shrunk toward the election row and departs only as far as the house's own waves demonstrate \u2013 each poll counts once, and the \xB1 figure is one standard error from the same fit. Roy Morgan's and RedBridge/Accent's two-party figures are respondent-allocated, so a fitted constant only tracks their moving allocation at best; RedBridge also prints its allocation beside each wave, so its row is no fit at all \u2013 it averages the house's own published splits over the term (marked \u201Cpublished\u201D in the waves column, needing at least three), and its \xB1 is the counting-error scale of that average. Otherwise a house needs at least six waves with a published two-party figure to appear, and like everything in this panel the rows are a diagnostic against the election line, not a measurement.")), /*#__PURE__*/React.createElement("p", {
+  }, "A house row reads as \u201Cthe share of that bucket\u2019s preferences this house\u2019s published 2PP behaves as if it handed to Labor\u201D \u2013 fit from the house\u2019s own 2PP and primary swings, with its fixed method offset soaked up by an intercept (\u201COther\u201D lumps independents and minor parties together, as the constants in", " ", fd.meta.table, " do). Every fitted cell is shrunk toward the election row and departs only as far as the house's own waves demonstrate \u2013 each poll counts once, and the \xB1 figure is one standard error from the same fit. ", /*#__PURE__*/React.createElement("span", {
+    className: "flow-tab-thin"
+  }, "A greyed cell"), " is one the fit could not move: half or more of it is the election row it was shrunk toward, because that house's own series for that bucket barely travels. Greens first preferences have moved about a point since the election and One Nation's twenty-two, which is why the Greens column greys and the One Nation column does not. Roy Morgan's and RedBridge/Accent's two-party figures are respondent-allocated, so a fitted constant only tracks their moving allocation at best; RedBridge also prints its allocation beside each wave, so its row is no fit at all \u2013 it averages the house's own published splits over the term (marked \u201Cpublished\u201D in the waves column, needing at least three), and its \xB1 is the counting-error scale of that average. Otherwise a house needs at least six waves with a published two-party figure to appear, and like everything in this panel the rows are a diagnostic against the election line, not a measurement.")), /*#__PURE__*/React.createElement("p", {
     className: "table-hint ap-var-note"
   }, "Above zero \u2013 the red ground \u2013 the published 2PPs are running friendlier to Labor than the frozen table reads their own primaries; below it, friendlier to the Coalition. Each house\u2019s gap against the table is centred on its own polls in the ", fd.meta.baseDays, " days after the election \u2013 the one moment the electorate\u2019s actual flows are counted, and a house\u2019s fixed allocation habits absorbed into the zero", lateFirms.length > 0 && /*#__PURE__*/React.createElement(React.Fragment, null, " \u2013 ", lateFirms.join(", "), " began polling later and anchor on", " ", "their own first waves instead, so their lines read only the drift since they started"), ". The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. A wave that publishes no two-party figure carries no gap, so a house that reports a 2PP only irregularly reads through a thinner line \u2013 and the whole panel is a diagnostic read on published figures: it corrects no other number on this page."));
 }
@@ -17646,6 +18034,7 @@ function FlowDriftOnPanel({
   if (!fd || !fd.months || !fd.meta) return null;
   const firms = fd.meta.houses || [];
   const POOLED = "Pooled, all houses";
+  const KIND = "alp-on";
   const xDomain = rangeDomain(rangeId);
   const inWin = d => d.x >= xDomain[0] - 0.02 && d.x <= xDomain[1];
   const vals = [1, -1];
@@ -17725,46 +18114,15 @@ function FlowDriftOnPanel({
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("preference-flows", "Preference flows")
-  }, "preference"), " ", "table frozen at the first-principles set the page quotes the pairing on \u2013 AEC Senate ballot counts re-anchored on the lower-house counts where One Nation made the final two.")), /*#__PURE__*/React.createElement("div", {
-    className: "legend"
-  }, /*#__PURE__*/React.createElement("button", {
-    type: "button",
-    className: "legend-chip" + (hidden[POOLED] ? " off" : ""),
-    "aria-pressed": !hidden[POOLED],
-    title: "Pooled across " + firms.length + " houses – the 21-day nowcast of the drift, with its 95% interval",
-    onClick: () => setHidden(h => ({
-      ...h,
-      [POOLED]: !h[POOLED]
-    }))
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "legend-swatch",
-    style: {
-      background: "var(--ink)"
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "legend-name"
-  }, "Pooled, ", firms.length, " houses"), /*#__PURE__*/React.createElement("span", {
-    className: "legend-val"
-  }, fd.now && fd.now.ci95 != null ? sgn(fd.now.v) + " ± " + fd.now.ci95.toFixed(1) : "–")), houseRows.map(r => /*#__PURE__*/React.createElement("button", {
-    key: r.f,
-    type: "button",
-    className: "legend-chip" + (hidden[r.f] ? " off" : ""),
-    "aria-pressed": !hidden[r.f],
-    title: r.f + " – drift against its own first-waves baseline",
-    onClick: () => setHidden(h => ({
-      ...h,
-      [r.f]: !h[r.f]
-    }))
-  }, /*#__PURE__*/React.createElement("span", {
-    className: "legend-swatch",
-    style: {
-      background: r.color
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    className: "legend-name"
-  }, r.f), /*#__PURE__*/React.createElement("span", {
-    className: "legend-val"
-  }, r.latest == null ? "–" : sgn(r.latest) + "pp"))))), /*#__PURE__*/React.createElement(TrendChart, {
+  }, "preference"), " ", "table frozen at the first-principles set the page quotes the pairing on \u2013 AEC Senate ballot counts re-anchored on the lower-house counts where One Nation made the final two."))), /*#__PURE__*/React.createElement(FlowLegend, {
+    pooledId: POOLED,
+    pooled: fd.now,
+    houseRows: houseRows,
+    hidden: hidden,
+    setHidden: setHidden,
+    sgn: sgn,
+    kind: KIND
+  }), /*#__PURE__*/React.createElement(TrendChart, {
     key: "flowon-" + rangeId,
     height: narrow ? 500 : 300,
     xDomain: xDomain,
@@ -17821,13 +18179,19 @@ function FlowDriftOnPanel({
   }, /*#__PURE__*/React.createElement("th", {
     scope: "row",
     className: "flow-tab-house"
-  }, f.firm), /*#__PURE__*/React.createElement("td", null, f.l.toFixed(1), "%", /*#__PURE__*/React.createElement("span", {
-    className: "flow-tab-se"
-  }, " \xB1", f.le.toFixed(1))), /*#__PURE__*/React.createElement("td", null, f.g.toFixed(1), "%", /*#__PURE__*/React.createElement("span", {
-    className: "flow-tab-se"
-  }, " \xB1", f.ge.toFixed(1))), /*#__PURE__*/React.createElement("td", null, f.t.toFixed(1), "%", /*#__PURE__*/React.createElement("span", {
-    className: "flow-tab-se"
-  }, " \xB1", f.te.toFixed(1))), /*#__PURE__*/React.createElement("td", null, f.n, f.m ? /*#__PURE__*/React.createElement("span", {
+  }, f.firm), /*#__PURE__*/React.createElement(FlowCell, {
+    v: f.l,
+    se: f.le,
+    prior: f.lp
+  }), /*#__PURE__*/React.createElement(FlowCell, {
+    v: f.g,
+    se: f.ge,
+    prior: f.gp
+  }), /*#__PURE__*/React.createElement(FlowCell, {
+    v: f.t,
+    se: f.te,
+    prior: f.tp
+  }), /*#__PURE__*/React.createElement("td", null, f.n, f.m ? /*#__PURE__*/React.createElement("span", {
     className: "flow-tab-se"
   }, " published") : null))))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint ap-var-note flow-tab-note"
@@ -17838,7 +18202,9 @@ function FlowDriftOnPanel({
 function AllPollsView({
   focus,
   onBack,
-  backLabel
+  backLabel,
+  tppBasis,
+  setTppBasis
 }) {
   const {
     D
@@ -17852,6 +18218,7 @@ function AllPollsView({
     ppmContestSegs,
     ppmFlag
   } = window;
+  const pubBasis = tppBasis === "resp";
   /* "YouGov (MRP)" is YouGov: a parenthetical method tag names a product,
      never another pollster, and both the filter panel and the pollster
      count speak in houses. The table rows themselves keep the full name, so
@@ -17868,11 +18235,13 @@ function AllPollsView({
      poll in the archive, so it has nothing to scope and gets no pill. It sits
      ABOVE the state declarations because the URL restore consults it. */
   const FACET_SCOPE = {
-    /* implied is this facet's basis now: a wave whose primaries price an
-       implied 2PP fills every column the facet shows, so the scope keys on
-       THAT, not on the published pair most houses no longer print */
+    /* the scope keys on whichever basis the table's 2PP column shows: on the
+       implied basis a wave whose primaries price an implied 2PP fills every
+       column, so THAT is the test; the published basis keys on the pair the
+       house printed. A published alternate matchup (3-cornered or
+       head-to-head) satisfies the scope either way */
     twopp: {
-      has: p => p.alpImp != null || p.tppAlt || p.tppAlt2 || p.tpp3,
+      has: p => (pubBasis ? p.alp != null : p.alpImp != null) || p.tppAlt || p.tppAlt2 || p.tpp3,
       label: "With a 2PP"
     },
     primary: null,
@@ -18085,30 +18454,36 @@ function AllPollsView({
     return n;
   });
 
-  /* the implied monthly series is what Poll lean is held against – the same
-     implied basis the Lead column and the headline aggregate read, so the
-     row never mixes bases. Last write for a ym wins, so the month's own
-     estimate overwrites its unshifted election-anchor row, as with the
-     published map this replaces. */
+  /* Poll lean is held against the monthly aggregate ON THE TABLE'S BASIS –
+     the implied basis the headline aggregate reads, or the published one
+     when the table flips; the row never mixes bases. Last write for a ym
+     wins, so the month's own estimate overwrites its unshifted
+     election-anchor row. */
   const synthByYm = {};
   (D.synth2pp || []).forEach(d => {
     synthByYm[d.ym] = d.alp;
+  });
+  const aggByYm = {};
+  (D.agg2pp || []).forEach(d => {
+    aggByYm[d.ym] = d.alp;
   });
   const rows = D.individualPolls.map(p => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
     const tags = pollTagIds(p);
-    /* poll lean on the implied basis: the wave's own implied 2PP minus the
-       month's implied aggregate. A wave the flow table can't read (no full
-       comparable primary set) has no lean at all. */
-    const lean = p.alpImp != null && synthByYm[p.ym] != null ? +(p.alpImp - synthByYm[p.ym]).toFixed(1) : null;
+    /* poll lean follows the basis: the implied 2PP minus the month's implied
+       aggregate, or the NORMALISED published share (alpN) minus the month's
+       published aggregate – normalised so undecided-inclusive pairs compare
+       fairly with the aggregate. A wave with no figure on that basis has no
+       lean at all. */
+    const lean = pubBasis ? p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null : p.alpImp != null && synthByYm[p.ym] != null ? +(p.alpImp - synthByYm[p.ym]).toFixed(1) : null;
     /* house effect is the emitted all-history snapshot per pollster ON THE
-       IMPLIED SERIES (gen-data runs the same estimator over tppRowsSynth as
-       houseEffects.synth – a house's primaries bias is a different thing
-       from its published-2PP lean and the two are never borrowed across), so
-       the same label value rides on every row that pollster owns; null when
-       unmeasured */
-    const hfx = ((D.houseEffects || {}).synth || {})[p.pollster] || null;
+       TABLE'S BASIS (gen-data runs the same estimator over tppRowsSynth as
+       houseEffects.synth and over the published series as houseEffects.tpp –
+       a house's implied bias is a different thing from its published-2PP
+       lean and the two are never borrowed across), so the same value rides
+       on every row that pollster owns; null when unmeasured */
+    const hfx = ((D.houseEffects || {})[pubBasis ? "tpp" : "synth"] || {})[p.pollster] || null;
     // searchable haystack – everything a row knows, so the search box matches
     // fieldwork dates, samples, 2PP / primary / matchup figures, nets, flags
     const f1 = v => v != null ? v.toFixed(1) : null;
@@ -18162,7 +18537,7 @@ function AllPollsView({
   // a row must contain EVERY selected data type (AND)
   ["has", p => !tagSel.size || [...tagSel].every(tg => p.tags.includes(tg))], ["lead", p => {
     if (lead === "all") return true;
-    const li = archLeadInfo(p, measure);
+    const li = archLeadInfo(p, measure, tppBasis);
     return !!li && li.who === lead;
   }], ["when", p => range === "all" || p.x >= x0], ["q", p => !ql || ql.split(/\s+/).every(t => p.hay.includes(t))], ["scope", p => !scoping || scoping.has(p)]];
   const passing = (p, skip) => TESTS.every(([k, f]) => k === skip || f(p));
@@ -18200,7 +18575,7 @@ function AllPollsView({
         return p.sample ?? -Infinity;
       case "alp":
         {
-          const li = archLeadInfo(p, measure);
+          const li = archLeadInfo(p, measure, tppBasis);
           return li ? li.m : -Infinity;
         }
       case "lean":
@@ -18682,9 +19057,18 @@ function AllPollsView({
     title: "Effective sample, where the pollster filed one with the Australian Polling Council"
   }, "n", /*#__PURE__*/React.createElement("sub", null, "eff")), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("th", {
     scope: "col",
-    className: "ta-l apub-col hide-md",
-    title: "This poll's primaries read at the 2025 election's preference flows \u2013 one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown"
-  }, "Implied 2PP"), /*#__PURE__*/React.createElement(ArchSortTh, {
+    className: "ta-l apub-col hide-md"
+  }, /*#__PURE__*/React.createElement("button", {
+    type: "button",
+    className: "th-basis",
+    onClick: () => setTppBasis(tppBasis === "imp" ? "resp" : "imp"),
+    title: pubBasis ? "Each poll's headline figures exactly as the pollster released them – click to switch to implied 2PP at the 2025 election's preference flows" : "Each poll's primaries read at the 2025 election's preference flows – one fixed table, so the column compares house to house; the wave's own published 2PP sits in its breakdown. Click to switch to the published figures"
+  }, pubBasis ? "As published" : /*#__PURE__*/React.createElement(React.Fragment, null, "Implied 2PP", " ", /*#__PURE__*/React.createElement("span", {
+    className: "th-basis-def"
+  }, "(default)")), /*#__PURE__*/React.createElement("span", {
+    className: "th-basis-swap",
+    "aria-hidden": "true"
+  }, "\u21C4"))), /*#__PURE__*/React.createElement(ArchSortTh, {
     label: {
       lnp: "Lead · ALP v L/NP",
       onp: "Lead · ALP v ON",
@@ -18827,29 +19211,31 @@ function AllPollsView({
       title: "Effective sample as published by the pollster (APC methodology statement)"
     }, p.sampleEff.toLocaleString())), facet === "twopp" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
       className: "ta-l apub-col hide-md"
-    }, /*#__PURE__*/React.createElement(ArchImplied, {
-      p: p
+    }, /*#__PURE__*/React.createElement(ArchTpp, {
+      p: p,
+      basis: tppBasis
     })), /*#__PURE__*/React.createElement("td", {
       className: "num"
     }, /*#__PURE__*/React.createElement(ArchLead, {
       p: p,
-      measure: measure
+      measure: measure,
+      basis: tppBasis
     })), /*#__PURE__*/React.createElement("td", {
       className: "num hide-sm"
     }, p.lean == null ? /*#__PURE__*/React.createElement("span", {
       className: "dash",
-      title: "No implied 2PP this wave, so no lean against the implied aggregate"
+      title: pubBasis ? "No published 2PP to compare with the aggregate" : "No implied 2PP this wave, so no lean against the implied aggregate"
     }, "\u2014") : /*#__PURE__*/React.createElement("span", {
       className: "arch-lean " + (p.lean > 0.05 ? "alp" : p.lean < -0.05 ? "lnp" : "flat"),
-      title: "Implied 2PP minus the implied aggregate that month"
+      title: pubBasis ? "Published 2PP minus the aggregate that month" : "Implied 2PP minus the implied aggregate that month"
     }, p.lean > 0 ? "+" : "", p.lean.toFixed(1))), /*#__PURE__*/React.createElement("td", {
       className: "num hide-sm"
     }, p.hfx == null ? /*#__PURE__*/React.createElement("span", {
       className: "dash",
-      title: "Too few implied-basis polls to measure a house effect"
+      title: pubBasis ? "Too few published-basis polls to measure a house effect" : "Too few implied-basis polls to measure a house effect"
     }, "\u2014") : /*#__PURE__*/React.createElement("span", {
       className: "arch-lean " + (p.hfx.v > 0.05 ? "alp" : p.hfx.v < -0.05 ? "lnp" : "flat"),
-      title: `House effect: this pollster's implied 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus on the implied basis (n=${p.hfx.n})`
+      title: pubBasis ? `House effect: this pollster's 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus (n=${p.hfx.n})` : `House effect: this pollster's implied 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus on the implied basis (n=${p.hfx.n})`
     }, p.hfx.v > 0 ? "+" : "", p.hfx.v.toFixed(1)))), facet === "primary" && /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("td", {
       className: "num",
       style: {
@@ -18947,7 +19333,7 @@ function AllPollsView({
     onClick: clearAll
   }, "Clear filters")))))), /*#__PURE__*/React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll for its full breakdown \xB7 Dates are fieldwork windows (publication dates sit in the breakdown) \xB7 \u201CImplied 2PP\u201D reads each poll\u2019s primaries at the 2025 election\u2019s preference flows \u2013 one fixed table, so the column compares house to house; the wave\u2019s own published 2PP sits in its breakdown \xB7 The lead bar is that implied figure in margin form (the L/NP v ON and 3-cornered matchups are the pollsters\u2019 own published figures \u2013 the site prices no implied series for them) \xB7 \u201CPoll lean\u201D is the poll\u2019s implied 2PP minus the implied aggregate for that month \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t publish that measure \xB7 Search matches anything in a row \xB7 Click any column heading to sort.", " ", /*#__PURE__*/React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on implied 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll.", " ", /*#__PURE__*/React.createElement("strong", null, "n", /*#__PURE__*/React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, filed with the Australian Polling Council \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown."), /*#__PURE__*/React.createElement(VariancePanel, {
+  }, "Tap any poll for its full breakdown \xB7 Dates are fieldwork windows (publication dates sit in the breakdown) \xB7", pubBasis ? "“As published” lists each poll’s headline figures exactly as the pollster released them · The lead bar is the published figure in margin form" : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown · The lead bar is that implied figure in margin form", " ", "(the L/NP v ON and 3-cornered matchups are the pollsters\u2019 own published figures \u2013 the site prices no implied series for them) \xB7 \u201CPoll lean\u201D is the poll\u2019s ", pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate", " for that month \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t publish that measure \xB7 Search matches anything in a row \xB7 Click any column heading to sort \xB7 Click the \u201C", pubBasis ? "As published" : "Implied 2PP", "\u201D heading to switch bases.", " ", /*#__PURE__*/React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on ", pubBasis ? "published" : "implied", " 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll.", " ", /*#__PURE__*/React.createElement("strong", null, "n", /*#__PURE__*/React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, filed with the Australian Polling Council \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge / Accent and Fox & Hedgehog file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown."), /*#__PURE__*/React.createElement(VariancePanel, {
     key: facet,
     facet: facet,
     rangeId: range
@@ -19444,6 +19830,8 @@ Object.assign(window, {
   // shared cell renderers reused by the latest-polls table
   ArchSortTh,
   ArchImplied,
+  ArchPublished,
+  ArchTpp,
   ArchLead,
   ArchApprCell,
   ArchDirCell,
@@ -22227,7 +22615,10 @@ function SnapshotView({
     setBasis: setTppBasis
   }), /*#__PURE__*/React.createElement(PrimaryVotePanel, {
     rangeId: rangeId
-  }), /*#__PURE__*/React.createElement(PollsterTable, null), /*#__PURE__*/React.createElement(LeadershipSection, {
+  }), /*#__PURE__*/React.createElement(PollsterTable, {
+    tppBasis: tppBasis,
+    setTppBasis: setTppBasis
+  }), /*#__PURE__*/React.createElement(LeadershipSection, {
     rangeId: rangeId
   }), /*#__PURE__*/React.createElement(DirectionPanel, {
     rangeId: rangeId
@@ -22587,7 +22978,9 @@ function App() {
   }), tab === "cycles" && /*#__PURE__*/React.createElement(PastCyclesView, null), tab === "allpolls" && /*#__PURE__*/React.createElement(AllPollsView, {
     focus: focusPoll,
     onBack: focusPoll ? backFromPoll : null,
-    backLabel: focusPoll && focusPoll.back ? focusPoll.back.from : null
+    backLabel: focusPoll && focusPoll.back ? focusPoll.back.from : null,
+    tppBasis: tppBasis,
+    setTppBasis: setTppBasis
   }), tab === "info" && /*#__PURE__*/React.createElement(InfoView, {
     focus: focusTerm ? focusTerm.id : null,
     onBack: focusTerm ? backFromTerm : null,

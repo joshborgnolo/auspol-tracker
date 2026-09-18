@@ -1687,7 +1687,7 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
             matchup={tppMatchup} setMatchup={setTppMatchup}
             basis={tppBasis} setBasis={setTppBasis} />
       <PrimaryVotePanel rangeId={rangeId} />
-      <PollsterTable />
+      <PollsterTable tppBasis={tppBasis} setTppBasis={setTppBasis} />
       <LeadershipSection rangeId={rangeId} />
       <DirectionPanel rangeId={rangeId} />
       <NextPollsPanel />
@@ -1976,7 +1976,8 @@ function App() {
             )}
             {tab === "cycles" && <PastCyclesView />}
             {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
-              backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null} />}
+              backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null}
+              tppBasis={tppBasis} setTppBasis={setTppBasis} />}
             {tab === "info" && <InfoView focus={focusTerm ? focusTerm.id : null}
               onBack={focusTerm ? backFromTerm : null}
               backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}
