@@ -6398,8 +6398,14 @@ window.AP.nextPolls = npProject;
         .map((ch) => txt(ch)).filter(Boolean);
       return {
         label: parts.length ? parts.join(" ") : txt(i),
+        /* a .legend-swatch chip drawn as a dashed rule (.legend-chip.dashed
+           for a series dashed by basis, .residual for Others / Ind.) has a
+           transparent swatch with a dashed border-top – read it as the
+           dashed mark it is, not a square in whatever colour fell through */
         kind: /hl-line/.test(k) ? "line" : /hl-dashed/.test(k) ? "dashed"
-            : /hl-band/.test(k) ? "band" : /legend-swatch/.test(k) ? "square" : "dot",
+            : /hl-band/.test(k) ? "band"
+            : /legend-swatch/.test(k) ? (/\b(dashed|residual)\b/.test(i.className || "") ? "dashed" : "square")
+            : "dot",
         fill: cs2 ? (cs2.backgroundColor !== "rgba(0, 0, 0, 0)" ? cs2.backgroundColor
                                                                : cs2.borderTopColor) : "#888",
         /* a chip switched off is still on the page, so it is still in the
@@ -6576,6 +6582,12 @@ window.AP.nextPolls = npProject;
     };
     let legend = readLegend(target);
     if (!legend.length) legend = cycleLegend();
+    /* The Poll disagreement panel's chance-floor shading has no chip of its
+       own – the live page explains it in the sub, which the image keeps only
+       the first sentence of – so the copy names it in the legend, the way
+       the past-terms band is named on the cycles chart. */
+    if (target.classList.contains("ap-var"))
+      legend.push({ label: "Chance floor (shaded)", kind: "shade", fill: inkVar("--ink-faint"), alpha: 1 });
     /* the ± range rides inside .lead-tag now, so the meta tail drops it -
        keeping it here too would print the interval twice on the image. The
        tail mirrors the interval strip: method word, then the count's
@@ -6701,7 +6713,11 @@ window.AP.nextPolls = npProject;
         } else if (sub) {
           y += 32;
           c.font = "400 16px " + sans; c.fillStyle = T.ink3;
-          c.fillText(wrapText(c, sub, IW)[0] || sub, PAD, y);
+          /* one line: a sub that runs longer (the analysis panels carry a
+             paragraph) is cut at its first full stop rather than mid-clause */
+          const lines = wrapText(c, sub, IW);
+          const firstSentence = (sub.match(/^.*?[.!?](?=\s|$)/) || [sub])[0];
+          c.fillText(lines.length > 1 ? (wrapText(c, firstSentence, IW)[0] || firstSentence) : (lines[0] || sub), PAD, y);
           y += 8;
         } else { y += 8; }
 
@@ -6743,6 +6759,12 @@ window.AP.nextPolls = npProject;
             } else if (it.kind === "square") {
               c.fillStyle = it.fill;
               c.beginPath(); c.roundRect(lx + 3, my - 5, 11, 11, 2); c.fill();
+            } else if (it.kind === "shade") {
+              /* a shaded region: the area's own faint ink, at a weight a
+                 swatch can be seen at (the chart draws it at 0.14) */
+              c.fillStyle = it.fill; c.globalAlpha = it.alpha * 0.7;
+              c.beginPath(); c.roundRect(lx, my - 5, 18, 11, 2); c.fill();
+              c.globalAlpha = it.alpha;
             } else {
               c.fillStyle = it.fill;
               c.beginPath(); c.arc(lx + 5, my, 4.5, 0, 7); c.fill();
@@ -6887,7 +6909,14 @@ window.AP.nextPolls = npProject;
        whatever pickTarget returned: that walk stops at the nearest ancestor
        holding a heading or a legend, which differs by viewport, and testing it
        composed at one width and quietly captured at another. */
-    const card = host.closest && host.closest(".card");
+    /* The Poll disagreement panel (.ap-var) has the card's bones – h3
+       title, .card-sub, .legend-chip legend – without the .card class, and
+       the photograph it fell to stacked its legend over the in-panel toggle,
+       so it composes. Its sibling House lean (.ap-lean) does NOT: its legend
+       lives outside the panel and its chart carries a themed backdrop the
+       composer has no entry for, so composing it gave a bare, clipped card –
+       it keeps the capture. */
+    const card = host.closest && host.closest(".card, .ap-var");
     const png = (card && card.querySelector("svg.chart-svg"))
       ? composeCard(card).catch((e) => {
           console.warn("copy-chart: composed card failed, captured instead –", e && e.message || e);

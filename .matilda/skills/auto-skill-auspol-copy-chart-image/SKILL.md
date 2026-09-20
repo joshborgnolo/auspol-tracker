@@ -189,3 +189,28 @@ whatever `host.parentElement` happens to be, not a hardcoded selector.
   `assets/cycle-source.<hash>.json` if sibling-session gen-data WIP sits in
   the tree — check `git status --short -- assets/` before committing and
   ship the sidecar rename with `index.html` (see auspol-build-pipeline).
+
+## Poll disagreement panel composes (2026-09-20)
+
+`copyChart` finds the card with `host.closest(".card, .ap-var")` — the Poll
+disagreement `section.ap-var` has no `.card` class and used to fall to
+`rasterise()` (the DOM photograph), which stacked its legend chips over the
+2PP | Primaries toggle and the read tiles over each other. Now it composes:
+
+- `readLegend`: a `.legend-swatch` chip whose chip carries `.dashed` (a series
+  dashed by BASIS — the as-published 2PP lines) or `.residual` reads as kind
+  `dashed` with `fill` from `borderTopColor`, not a `square`.
+- The composer appends `{ label: "Chance floor (shaded)", kind: "shade",
+  fill: inkVar("--ink-faint") }` for `.ap-var` targets (new `shade` painter
+  branch: 18×11 roundRect at 0.7 alpha) — the shading's only live
+  attribution is the sub, which the image cuts.
+- Non-hero sub: when `wrapText` needs more than one line the image keeps the
+  FIRST SENTENCE (`/^.*?[.!?](?=\s|$)/`) instead of a mid-clause cut.
+- House lean (`.ap-lean`) was tried on the composer and REVERTED: its legend
+  lives outside the panel and its chart has a themed backdrop the composer
+  has no entry for — it keeps the capture. Composing it needs its own
+  legend builder (like `cycleLegend`) first.
+- Headless capture recipe: hook `HTMLCanvasElement.prototype.toBlob` in
+  `evaluateOnNewDocument` to stash `toDataURL()` for canvases ≥1000px wide,
+  stub `navigator.clipboard.write` to reject, no-op `HTMLAnchorElement.click`,
+  then click `#poll-disagreement .chart-copy-btn`.
