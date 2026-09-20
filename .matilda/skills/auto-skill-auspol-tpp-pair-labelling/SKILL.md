@@ -117,7 +117,7 @@ restore the run-in labels / mute the implied lines):
 - PollLedger: the After-preferences `PdSec` maps `tppLines` and relies on
   PdSec's own "Not published" fallback (the explicit `!tcs.length` line is
   gone). A second `<PdSec label={<button className="hi-term" …
-  openTerm("implied-2pp", "poll breakdown")>Implied 2PP</button>}>` renders
+  openTerm("implied-2pp", "poll breakdown")>After preferences (implied)</button>}>` renders
   when `r.alpImp != null || r.alpOnImp != null`; its lines get
   `prefixed={x.count > 1}` and `hero` ALWAYS — the display size lives on BOTH
   implied re-reads for every wave, and the After-preferences lines are body
@@ -138,7 +138,7 @@ restore the run-in labels / mute the implied lines):
 - template.html, right after `.pd-k`: `.pd-k .hi-term { text-transform:
   inherit; letter-spacing: inherit; }` — Chrome's UA sheet resets both on
   `<button>` and `.hi-term` restores only font/colour, so without it the
-  eyebrow printed as sentence-case "Implied 2PP".
+  eyebrow printed in sentence case.
 ## Verification
 
 After `node .build/newtracker/build.mjs` (validator runs inside, should print
@@ -159,7 +159,7 @@ After `node .build/newtracker/build.mjs` (validator runs inside, should print
   (b) remember babel escapes non-ASCII in helper bodies too if you copy them from the
   built file rather than the asset source.
 - Section wiring (2026-09-20 split): `grep -c 'impliedLines' index.html` → 3
-  (definition + call + a comment); `grep -o '"Implied 2PP"' index.html` present;
+  (definition + call + a comment); `grep -o '"After preferences (implied)"' index.html` present;
   old note literal "from these primaries under" and `pd-s-grp` both ABSENT.
 - Visual check without the Chrome extension: serve the tree
   (`python3 -m http.server 8761 --bind 127.0.0.1`) and drive

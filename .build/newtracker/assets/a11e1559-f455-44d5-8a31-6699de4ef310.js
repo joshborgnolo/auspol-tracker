@@ -2315,7 +2315,8 @@ function PollLedger({ r, dirSegments }) {
           from a figure the pollster published, so they take a section of
           their own rather than closing the one above – one flat list left a
           respondent-allocated pair indistinguishable from a computed one.
-          The eyebrow is the glossary word itself (the lines' notes then name
+          The eyebrow mirrors the section above – "(as published)" / "(implied)" –
+          and is itself the implied-2PP glossary link (the lines' notes then name
           only their flow basis). The display size lives HERE, on both
           re-reads: implied 2PP is the page's basis, the figure every row
           of the table shows, so it is the answer the panel was opened for
@@ -2326,7 +2327,7 @@ function PollLedger({ r, dirSegments }) {
       {(r.alpImp != null || r.alpOnImp != null) && (
         <PdSec label={
           <button type="button" className="hi-term"
-                  onClick={() => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")}>Implied 2PP</button>
+                  onClick={() => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")}>After preferences (implied)</button>
         }>
           {impliedLines(r).map((x, i) => (
             <TppLine key={"i" + i} c={x.c} prefixed={x.count > 1} note={x.note} hero />
