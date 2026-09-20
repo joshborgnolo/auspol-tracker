@@ -4714,7 +4714,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
               summary={[measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
             <div className="ap-pop-head"><span>Show the lead in</span></div>
             <div className="ap-poplist" role="radiogroup" aria-label="Lead column matchup">
-              {["lnp", "onp", "lnponp", "3cp"].map((m) => (
+              {/* the two Labor contests lead the list in the order of the
+                  rival ruling – the rival Labor is doing worst against
+                  first (DEFAULT_MEASURE, so the list opens on its own
+                  default), the other second – then the published-only
+                  matchups. Fixed ALP v L/NP first read as the Coalition
+                  being the contest even in months One Nation is. */}
+              {[DEFAULT_MEASURE === "onp" ? "onp" : "lnp", DEFAULT_MEASURE === "onp" ? "lnp" : "onp", "lnponp", "3cp"].map((m) => (
                 <PopRow key={m} radio on={measure === m} label={MEASURE_LAB[m]}
                         n={rows.filter((r) => archLeadInfo(r, m)).length} onClick={() => onMeasure(m)} />
               ))}

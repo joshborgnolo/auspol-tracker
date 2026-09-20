@@ -214,6 +214,8 @@ time of writing):
   is written only when the measure departs from it (`MEAS_BY_ID.lnp = "c"`,
   `MEAS_BY_URL.c/lnp = "lnp"`). The archive's measure is its OWN state (the
   Lead pop), not the hero's — it seeds from the ruling, it doesn't track pills.
+  The pop lists the two Labor contests in ruling order (the rival Labor is
+  doing worst against first), then L/NP v ON and 3-cornered (user, 2026-09-20).
 - Rows carry `leanLnp`/`leanOn`/`hfxLnp`/`hfxOn` (+`pubBasis`); the COLUMN
   `lean`/`hfx` is the measure's pick, null on `lnponp`/`3cp` (dash titled "No
   aggregate on this matchup…"). ON lean = `alpOnImp − D.synthOn[ym].a`

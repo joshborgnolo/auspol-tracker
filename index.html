@@ -19434,7 +19434,7 @@ function AllPollsView({
     className: "ap-poplist",
     role: "radiogroup",
     "aria-label": "Lead column matchup"
-  }, ["lnp", "onp", "lnponp", "3cp"].map(m => /*#__PURE__*/React.createElement(PopRow, {
+  }, [DEFAULT_MEASURE === "onp" ? "onp" : "lnp", DEFAULT_MEASURE === "onp" ? "lnp" : "onp", "lnponp", "3cp"].map(m => /*#__PURE__*/React.createElement(PopRow, {
     key: m,
     radio: true,
     on: measure === m,
