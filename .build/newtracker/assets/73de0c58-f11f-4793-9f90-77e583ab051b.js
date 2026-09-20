@@ -1735,7 +1735,8 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
             matchup={tppMatchup} setMatchup={setTppMatchup}
             basis={tppBasis} setBasis={setTppBasis} />
       <PrimaryVotePanel rangeId={rangeId} />
-      <PollsterTable tppBasis={tppBasis} setTppBasis={setTppBasis} />
+      <PollsterTable tppBasis={tppBasis} setTppBasis={setTppBasis}
+                     tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />
       <LeadershipSection rangeId={rangeId} />
       <DirectionPanel rangeId={rangeId} />
       <NextPollsPanel />

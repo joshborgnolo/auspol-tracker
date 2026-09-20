@@ -2783,21 +2783,34 @@ function ArchApprCell({ s, net, metric }) {
 // alpImp is absent under the same eligibility rule the implied estimator
 // uses (a full comparable primary set) – no figure, a dash with the reason,
 // never a silently different basis.
-function ArchImplied({ p }) {
-  if (p.alpImp == null) {
+// The cell follows the table's MATCHUP as well as its basis: on ALP v ON it
+// prints the same primaries through the site's ALP–ON flow set (alpOnImp),
+// the pairing's own implied reading, so a table opened on the rival Labor
+// is doing worst against shows that contest in every column, not just the
+// lead. Matchups the site prices no implied series for (L/NP v ON,
+// 3-cornered) fall back to the classic pair.
+function ArchImplied({ p, measure }) {
+  const on = measure === "onp";
+  const alp = on ? p.alpOnImp : p.alpImp;
+  if (alp == null) {
     return <span className="dash" title="No implied 2PP – this poll never filed a full primary set the flow table can read">—</span>;
   }
-  const lnp = +(100 - p.alpImp).toFixed(1);
+  const b = +(100 - alp).toFixed(1);
+  const bLab = on ? "ON" : "L/NP", bColor = on ? "var(--onp)" : "var(--lnp)";
   return (
-    <div className="apub" aria-label={`Implied 2PP at 2025-election preference flows: ALP ${p.alpImp.toFixed(1)}, L/NP ${lnp.toFixed(1)}`}
-         title="This poll's primaries at the 2025 election's preference flows – one fixed table for every house">
+    <div className="apub" aria-label={on
+           ? `Implied ALP v One Nation at the site's ALP–ON flow set: ALP ${alp.toFixed(1)}, ON ${b.toFixed(1)}`
+           : `Implied 2PP at 2025-election preference flows: ALP ${alp.toFixed(1)}, L/NP ${b.toFixed(1)}`}
+         title={on
+           ? "This poll's primaries at the site's ALP–ON flow set – one fixed table for every house"
+           : "This poll's primaries at the 2025 election's preference flows – one fixed table for every house"}>
       <span className="apub-seg" title="ALP, implied">
         <span className="apub-dot" style={{ background: "var(--alp)" }}></span>
-        {p.alpImp.toFixed(1)}
+        {alp.toFixed(1)}
       </span>
-      <span className="apub-seg" title="L/NP, implied">
-        <span className="apub-dot" style={{ background: "var(--lnp)" }}></span>
-        {lnp.toFixed(1)}
+      <span className="apub-seg" title={bLab + ", implied"}>
+        <span className="apub-dot" style={{ background: bColor }}></span>
+        {b.toFixed(1)}
       </span>
     </div>
   );
@@ -2810,9 +2823,13 @@ function ArchImplied({ p }) {
 // A poll with NO after-preferences figure published only its primaries – and
 // those are the record too, so they print here under a Primary flag rather
 // than leaving the cell a bare dash.
-function ArchPublished({ p }) {
+// On ALP v ON the cell leads with the house's own ALP v ON head-to-head
+// where it filed one; a wave without one shows what it DID publish, the
+// classic pair with its flags, rather than a bare dash.
+function ArchPublished({ p, measure }) {
   const { tppContests, tppFlag, primarySegs } = window;
-  const c0 = tppContests(p)[0];
+  const cs = tppContests(p);
+  const c0 = (measure === "onp" && cs.find((c) => c.kind === "alt")) || cs[0];
   if (!c0) {
     const pSegs = p.p ? primarySegs(p) : [];
     if (!pSegs.length) return <span className="dash" title="No voting-intention figures published with this poll">—</span>;
@@ -2845,8 +2862,8 @@ function ArchPublished({ p }) {
 
 // The 2PP column's basis switch renders one of these two – same cell slot,
 // same .apub ink, so flipping bases changes the figures and never the layout.
-function ArchTpp({ p, basis }) {
-  return basis === "resp" ? <ArchPublished p={p} /> : <ArchImplied p={p} />;
+function ArchTpp({ p, basis, measure }) {
+  return basis === "resp" ? <ArchPublished p={p} measure={measure} /> : <ArchImplied p={p} measure={measure} />;
 }
 
 // One lead-info helper drives the cell, the held-by filter and the sort, so
@@ -3033,11 +3050,27 @@ function ArchPollDetail({ p, onBack, backLabel }) {
     <span className="pd-meta-i" key="sample"><span className="pd-meta-k">Sample</span>
       <span className="pd-meta-v">{window.sampleValue(p)}</span></span>,
     /* signed to one decimal, with a true minus (U+2212) rather than a hyphen -
-       these read as figures, not as a range dash or a word break */
-    p.lean != null && <span className="pd-meta-i" key="lean"><span className="pd-meta-k">Poll lean</span>
-      <span className="pd-meta-v">{signed1(p.lean)} vs implied aggregate</span></span>,
-    p.hfx != null && <span className="pd-meta-i" key="hfx"><span className="pd-meta-k">House effect</span>
-      <span className="pd-meta-v">{signed1(p.hfx.v)} vs implied-basis consensus</span></span>,
+       these read as figures, not as a range dash or a word break. One clause
+       per contest the wave can be held against, in the 2PP agg. effect row's
+       shape ("+0.6 for ALP vs L/NP; −0.4 for ALP vs ON"): the rows used to
+       read the classic pair alone whatever the page was showing, and a
+       house can sit on the field for ALP v L/NP while two points off it on
+       ALP v ON. Basis follows the table – implied (the default) or the
+       pollsters' published figures – and the wording says which. */
+    (p.leanLnp != null || p.leanOn != null) && <span className="pd-meta-i" key="lean"><span className="pd-meta-k">Poll lean</span>
+      <span className="pd-meta-v">
+        {[p.leanLnp != null && <React.Fragment key="l">{signed1(p.leanLnp)} for ALP vs L/NP</React.Fragment>,
+          p.leanOn != null && <React.Fragment key="o">{signed1(p.leanOn)} for ALP vs ON</React.Fragment>]
+          .filter(Boolean).reduce((acc, x, i) => (i ? [...acc, "; ", x] : [x]), [])}
+        <span className="pd-s-note">, against the {p.pubBasis ? "published" : "implied"} aggregate that month</span>
+      </span></span>,
+    (p.hfxLnp != null || p.hfxOn != null) && <span className="pd-meta-i" key="hfx"><span className="pd-meta-k">House effect</span>
+      <span className="pd-meta-v">
+        {[p.hfxLnp != null && <React.Fragment key="l">{signed1(p.hfxLnp.v)} for ALP vs L/NP</React.Fragment>,
+          p.hfxOn != null && <React.Fragment key="o">{signed1(p.hfxOn.v)} for ALP vs ON</React.Fragment>]
+          .filter(Boolean).reduce((acc, x, i) => (i ? [...acc, "; ", x] : [x]), [])}
+        <span className="pd-s-note">, against the {p.pubBasis ? "published" : "implied"}-basis consensus</span>
+      </span></span>,
     /* the pollster's own pages, in the same grid so their values sit on
        the band's axis (builder shared with Latest polls) */
     ...(releaseMetaRows ? releaseMetaRows(p) : []),
@@ -4154,7 +4187,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      here, the short key winning if a hand-edited URL carries both; only
      the short keys and mask values are ever written. */
   const FACET_BY_URL = { p: "primary", l: "leadership", d: "direction", primary: "primary", leadership: "leadership", direction: "direction" };
-  const MEAS_BY_URL = { o: "onp", lo: "lnponp", "3": "3cp", onp: "onp", lnponp: "lnponp", "3cp": "3cp" };
+  const MEAS_BY_URL = { o: "onp", lo: "lnponp", "3": "3cp", c: "lnp", onp: "onp", lnponp: "lnponp", "3cp": "3cp", lnp: "lnp" };
+  /* The lead column opens on the rival Labor is doing WORST against – the
+     hero's own ruling (latest.rivalLead, deadbanded in gen-data so it
+     doesn't flip month to month) – not on the traditional pairing. A URL
+     names the matchup only when it departs from that default, so a shared
+     link keeps meaning what it meant if the ruling later moves. */
+  const DEFAULT_MEASURE = window.AP.measureOfMatchup((D.latest || {}).rivalLead);
   const LEAD_BY_URL = { a: "alp", l: "lnp", o: "onp", alp: "alp", lnp: "lnp", onp: "onp" };
   const urlInit = (() => {
     const p = new URLSearchParams(window.location.search);
@@ -4175,7 +4214,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         return (mask ? [...mask] : raw.split(",")).filter((t) => POLL_TAGS.some((pt) => pt.id === t));
       })(),
       lead: LEAD_BY_URL[get("l", "lead")] || "all",
-      measure: MEAS_BY_URL[get("v", "vs")] || "lnp",
+      measure: MEAS_BY_URL[get("v", "vs")] || DEFAULT_MEASURE,
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
       /* "explicit" means the reader (or a shared link) said something about
@@ -4290,6 +4329,13 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   (D.synth2pp || []).forEach((d) => { synthByYm[d.ym] = d.alp; });
   const aggByYm = {};
   (D.agg2pp || []).forEach((d) => { aggByYm[d.ym] = d.alp; });
+  /* the ALP-v-ON aggregates on the same two bases: the implied ALP–ON
+     monthly line (synthOn, the pairing's default basis) and the pooled
+     published head-to-heads (alt2pp.alp_on) */
+  const synthOnByYm = {};
+  (D.synthOn || []).forEach((d) => { synthOnByYm[d.ym] = d.a; });
+  const altOnByYm = {};
+  ((D.alt2pp || {}).alp_on || []).forEach((d) => { altOnByYm[d.ym] = d.a; });
 
   const rows = D.individualPolls.map((p) => {
     const [y, mo] = p.ym.split("-").map(Number);
@@ -4300,16 +4346,31 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
        published aggregate – normalised so undecided-inclusive pairs compare
        fairly with the aggregate. A wave with no figure on that basis has no
        lean at all. */
-    const lean = pubBasis
+    const leanLnp = pubBasis
       ? (p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null)
       : (p.alpImp != null && synthByYm[p.ym] != null ? +(p.alpImp - synthByYm[p.ym]).toFixed(1) : null);
+    /* the same lean on ALP v ON: the house's own head-to-head against the
+       pooled published ones, or its implied ALP–ON reading against the
+       implied ALP–ON line – a genuinely separate quantity, carried by the
+       One Nation primary rather than the Coalition's */
+    const leanOn = pubBasis
+      ? (p.tppAlt && altOnByYm[p.ym] != null ? +(p.tppAlt.alp - altOnByYm[p.ym]).toFixed(1) : null)
+      : (p.alpOnImp != null && synthOnByYm[p.ym] != null ? +(p.alpOnImp - synthOnByYm[p.ym]).toFixed(1) : null);
     /* house effect is the emitted all-history snapshot per pollster ON THE
        TABLE'S BASIS (gen-data runs the same estimator over tppRowsSynth as
        houseEffects.synth and over the published series as houseEffects.tpp –
        a house's implied bias is a different thing from its published-2PP
        lean and the two are never borrowed across), so the same value rides
-       on every row that pollster owns; null when unmeasured */
-    const hfx = (((D.houseEffects || {})[pubBasis ? "tpp" : "synth"] || {})[p.pollster]) || null;
+       on every row that pollster owns; null when unmeasured. ALP v ON has
+       the same two snapshots (synthOn / alp_on). */
+    const HE = D.houseEffects || {};
+    const hfxLnp = ((HE[pubBasis ? "tpp" : "synth"] || {})[p.pollster]) || null;
+    const hfxOn = ((HE[pubBasis ? "alp_on" : "synthOn"] || {})[p.pollster]) || null;
+    /* the Lean / House effect COLUMNS show the table's matchup; the
+       matchups with no aggregate to be held against (L/NP v ON,
+       3-cornered) show none. The breakdown prints both contests. */
+    const lean = measure === "onp" ? leanOn : measure === "lnp" ? leanLnp : null;
+    const hfx = measure === "onp" ? hfxOn : measure === "lnp" ? hfxLnp : null;
     // searchable haystack – everything a row knows, so the search box matches
     // fieldwork dates, samples, 2PP / primary / matchup figures, nets, flags
     const f1 = (v) => (v != null ? v.toFixed(1) : null);
@@ -4341,7 +4402,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     hayParts.push(...tags);   // so "fav", "ppm" etc. match in the search box too
     const hay = hayParts.join(" ").toLowerCase();
     return {
-      ...p, year: y, mo, fullDate, lean, hfx, tags,
+      ...p, year: y, mo, fullDate, lean, hfx, leanLnp, leanOn, hfxLnp, hfxOn, pubBasis, tags,
       hay: hay + " " + hay.replace(/–/g, "-"),   // hyphen typed in search matches the en dash
     };
   });
@@ -4462,7 +4523,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      without it the URL was normalised every render, and this effect also
      runs for the reader who typed a stale or partial query by hand. */
   const FACET_BY_ID = { primary: "p", leadership: "l", direction: "d" };  // facet → URL letter (inverse of the restore map)
-  const MEAS_BY_ID = { onp: "o", lnponp: "lo", "3cp": "3" };              // matchup → URL letter; "lnp" is the omitted default
+  const MEAS_BY_ID = { lnp: "c", onp: "o", lnponp: "lo", "3cp": "3" };    // matchup → URL letter; the page's default matchup is omitted
   const LEAD_BY_ID = { alp: "a", lnp: "l", onp: "o" };                    // holder → URL letter; "all" is the omitted default
   React.useEffect(() => {
     const OWNED = ["q", "w", "t", "h", "v", "l", "f", "s", "who", "when", "has", "vs", "lead", "view", "scope"];
@@ -4472,7 +4533,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     if (sel.size) p.set("w", archMask(URL_HOUSES, sel));
     if (range !== "all") p.set("t", range);
     if (tagSel.size) p.set("h", archMask(POLL_TAGS.map((t) => t.id), tagSel));
-    if (measure !== "lnp") p.set("v", MEAS_BY_ID[measure]);
+    if (measure !== DEFAULT_MEASURE) p.set("v", MEAS_BY_ID[measure]);
     if (lead !== "all") p.set("l", LEAD_BY_ID[lead]);
     if (facet !== "twopp") p.set("f", FACET_BY_ID[facet]);
     if (!scope && FACET_SCOPE[facet]) p.set("s", "0");
@@ -4819,23 +4880,27 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                   </td>
 
                   {facet === "twopp" && (<>
-                  <td className="ta-l apub-col hide-md"><ArchTpp p={p} basis={tppBasis} /></td>
+                  <td className="ta-l apub-col hide-md"><ArchTpp p={p} basis={tppBasis} measure={measure} /></td>
                   <td className="num"><ArchLead p={p} measure={measure} basis={tppBasis} /></td>
+                  {/* Lean and House effect are held against the MATCHUP's
+                      aggregate – a negative on ALP v ON is One Nation's ink,
+                      not the Coalition's – and a matchup with no aggregate
+                      shows a dash that says so */}
                   <td className="num hide-sm">
                     {p.lean == null
-                      ? <span className="dash" title={pubBasis ? "No published 2PP to compare with the aggregate" : "No implied 2PP this wave, so no lean against the implied aggregate"}>—</span>
-                      : <span className={"arch-lean " + (p.lean > 0.05 ? "alp" : p.lean < -0.05 ? "lnp" : "flat")}
-                              title={pubBasis ? "Published 2PP minus the aggregate that month" : "Implied 2PP minus the implied aggregate that month"}>
+                      ? <span className="dash" title={!["lnp", "onp"].includes(measure) ? "No aggregate on this matchup to hold the poll against"
+                            : pubBasis ? "No published figure on this matchup to compare with the aggregate" : "No implied figure this wave, so no lean against the implied aggregate"}>—</span>
+                      : <span className={"arch-lean " + (p.lean > 0.05 ? "alp" : p.lean < -0.05 ? (measure === "onp" ? "onp" : "lnp") : "flat")}
+                              title={(pubBasis ? "Published " : "Implied ") + MEASURE_LAB[measure] + (pubBasis ? " minus the aggregate that month" : " minus the implied aggregate that month")}>
                           {p.lean > 0 ? "+" : ""}{p.lean.toFixed(1)}
                         </span>}
                   </td>
                   <td className="num hide-sm">
                     {p.hfx == null
-                      ? <span className="dash" title={pubBasis ? "Too few published-basis polls to measure a house effect" : "Too few implied-basis polls to measure a house effect"}>—</span>
-                      : <span className={"arch-lean " + (p.hfx.v > 0.05 ? "alp" : p.hfx.v < -0.05 ? "lnp" : "flat")}
-                              title={pubBasis
-                                ? `House effect: this pollster's 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus (n=${p.hfx.n})`
-                                : `House effect: this pollster's implied 2PP sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : "to the Coalition"} against the cross-pollster consensus on the implied basis (n=${p.hfx.n})`}>
+                      ? <span className="dash" title={!["lnp", "onp"].includes(measure) ? "No cross-pollster consensus on this matchup to measure a house effect against"
+                            : pubBasis ? "Too few published-basis polls to measure a house effect" : "Too few implied-basis polls to measure a house effect"}>—</span>
+                      : <span className={"arch-lean " + (p.hfx.v > 0.05 ? "alp" : p.hfx.v < -0.05 ? (measure === "onp" ? "onp" : "lnp") : "flat")}
+                              title={`House effect: this pollster's ${pubBasis ? "" : "implied "}${MEASURE_LAB[measure]} sits ${p.hfx.v > 0 ? "+" : ""}${p.hfx.v.toFixed(1)} pts ${p.hfx.v >= 0 ? "to Labor" : measure === "onp" ? "to One Nation" : "to the Coalition"} against the cross-pollster consensus${pubBasis ? "" : " on the implied basis"} (n=${p.hfx.n})`}>
                           {p.hfx.v > 0 ? "+" : ""}{p.hfx.v.toFixed(1)}
                         </span>}
                   </td>

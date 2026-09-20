@@ -2735,6 +2735,11 @@ window.AUSPOL = (function () {
     alp_on: altAON.he.snapshot(Infinity),
     appr: Object.fromEntries(Object.entries(apprHE).map(([lk, h]) => [lk, h.snapshot(Infinity)])),
     synth: synthEffect.snapshot(Infinity),
+    /* the ALP-v-ON twin of synth: a house's lean on the implied ALP–ON
+       reading (the pairing's default basis), so the tables' Lean / House
+       effect columns and the breakdown's rows can follow that matchup
+       instead of reading the classic pair whatever the page is showing */
+    synthOn: synthOnEffect.snapshot(Infinity),
   })};
   const houseLean = ${JSON.stringify(houseLean)};
   /* Flow-drift residual tracker (gen-data §7c): each poll's published 2PP

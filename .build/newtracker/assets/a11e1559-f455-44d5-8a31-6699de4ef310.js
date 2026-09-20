@@ -2929,11 +2929,26 @@ function NextPollsPanel() {
   );
 }
 
-function PollsterTable({ tppBasis, setTppBasis }) {
+/* The hero's matchup ids and the tables' lead measures name the same
+   contests; this is the one bridge between the two vocabularies, so the
+   Latest table (here) and the archive (d1a1d215) can both follow the page's
+   matchup – and both open on latest.rivalLead, the rival Labor is doing
+   worst against. Unknown or missing → the classic pair. */
+window.AP.measureOfMatchup = (id) => ({ alp_lnp: "lnp", alp_on: "onp", lnp_on: "lnponp" })[id] || "lnp";
+const LEAD_LABEL = { lnp: "ALP v L/NP", onp: "ALP v ON", lnponp: "L/NP v ON" };
+
+function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   const { D } = window.AP;
   // ledger look shared with the All-polls archive – its cell renderers are
   // defined in the archive script and arrive on window once both assets load
   const { ArchTpp, ArchLead, ArchApprCell, archLeadInfo } = window;
+  /* the lead column follows the hero's matchup (the same App state the
+     Switch-2PP pills drive), so the table shows the contest the page is
+     showing – and the column head flips it, the way the 2PP head flips the
+     basis. The table was ALP v L/NP whatever the hero said, which read as
+     the Coalition being the contest even in months One Nation was. */
+  const measure = window.AP.measureOfMatchup(tppMatchup);
+  const flipMatchup = () => setTppMatchup && setTppMatchup(tppMatchup === "alp_on" ? "alp_lnp" : "alp_on");
   const [facet, setFacet] = useState("twopp");
   const [sort, setSort] = useState({ key: "pubSort", dir: -1 });
   const [open, setOpen] = useState(null);
@@ -2950,7 +2965,7 @@ function PollsterTable({ tppBasis, setTppBasis }) {
       case "pubSort": return r.pubSort;
       case "sample": return r.sample ?? -Infinity;
       case "alp": {
-        const li = archLeadInfo(r, "lnp", tppBasis);
+        const li = archLeadInfo(r, measure, tppBasis);
         return li ? li.m : -Infinity;
       }
       case "p.alp": return r.p.alp ?? -Infinity;
@@ -3049,7 +3064,31 @@ function PollsterTable({ tppBasis, setTppBasis }) {
                     <span className="th-basis-swap" aria-hidden="true">⇄</span>
                   </button>
                 </th>
-                <SortTh label="Lead · ALP v L/NP" short="Lead" sortKey="alp" sort={sort} onSort={onSort} />
+                {/* the lead head sorts like any other, and its matchup name is
+                    the MATCHUP switch: it names the contest the column (and
+                    the hero) is on and flips the page to the other Labor
+                    contest, the way the 2PP head flips the basis. The button
+                    swallows its click so a flip doesn't also re-sort. */}
+                {((active) => (
+                  <th scope="col" className={"num sortable" + (active ? " sorted" : "")}
+                      onClick={() => onSort("alp")} tabIndex={0}
+                      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onSort("alp"); } }}
+                      aria-sort={active ? (sort.dir < 0 ? "descending" : "ascending") : "none"}>
+                    <span className="th-in">
+                      <span className="lbl-l">Lead ·</span><span className="lbl-s">Lead</span>
+                      <button type="button" className="th-basis lbl-l"
+                              onClick={(e) => { e.stopPropagation(); flipMatchup(); }}
+                              onKeyDown={(e) => e.stopPropagation()}
+                              title={measure === "onp"
+                                ? "Labor's lead over One Nation on each poll – click to switch the page to ALP v L/NP"
+                                : "Labor's lead over the Coalition on each poll – click to switch the page to ALP v One Nation"}>
+                        {LEAD_LABEL[measure]}
+                        <span className="th-basis-swap" aria-hidden="true">⇄</span>
+                      </button>
+                      <span className="caret" aria-hidden="true">{active ? (sort.dir < 0 ? "▾" : "▴") : "⇅"}</span>
+                    </span>
+                  </th>
+                ))(sort.key === "alp")}
               </>)}
               {facet === "primary" && pOrder.map((id) => {
                 const c = PCOLS[id];
@@ -3105,12 +3144,12 @@ function PollsterTable({ tppBasis, setTppBasis }) {
                     <td className="num muted hide-md">{r.sample != null ? r.sample.toLocaleString() : "—"}</td>
 
                     {facet === "twopp" && (<>
-                      <td className="ta-l apub-col hide-md"><ArchTpp p={r} basis={tppBasis} /></td>
+                      <td className="ta-l apub-col hide-md"><ArchTpp p={r} basis={tppBasis} measure={measure} /></td>
                       {/* a poll with no after-prefs figure on the table's basis
                           still has something to say in this facet – the
                           fallback prints its ALP v L/NP primary margin,
                           flagged as primary */}
-                      <td className="num"><ArchLead p={r} measure="lnp" primaryFallback basis={tppBasis} /></td>
+                      <td className="num"><ArchLead p={r} measure={measure} primaryFallback basis={tppBasis} /></td>
                     </>)}
                     {facet === "primary" && pOrder.map((id) => (
                       <td key={id} className={"num" + (PCOLS[id].cls || "")} style={PCOLS[id].style}>
