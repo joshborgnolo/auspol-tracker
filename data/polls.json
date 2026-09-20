@@ -4569,6 +4569,23 @@
       "url": "https://www.capitalbrief.com/newsletter/exclusive-poll-voters-back-social-media-reform-fbd908f1-a09e-4d1e-9713-9c8c02dd0d31/",
       "releaseUrl": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf",
       "methodUrl": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf"
+    },
+    {
+      "date": "2026-09-17",
+      "published": "2026-09-20T21:03",
+      "dateStart": "2026-09-14",
+      "pollster": "Newspoll",
+      "client": "The Australian",
+      "sample": 1244,
+      "alp": 27,
+      "lnp": 19,
+      "grn": 13,
+      "onp": 30,
+      "ind": 11,
+      "oth": null,
+      "tpp_alp": null,
+      "tpp_lnp": null,
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455"
     }
   ],
   "ppm": [
@@ -5321,6 +5338,20 @@
         {
           "alb": 45,
           "opp": 33
+        }
+      ]
+    },
+    {
+      "date": "2026-09-17",
+      "firm": "Newspoll",
+      "alb": 44,
+      "opp": 24,
+      "oppName": "Taylor",
+      "han": 32,
+      "extra": [
+        {
+          "alb": 42,
+          "opp": 41
         }
       ]
     }
@@ -6969,6 +7000,24 @@
         "han": {
           "app": 32,
           "dis": 44
+        }
+      }
+    },
+    {
+      "date": "2026-09-17",
+      "firm": "Newspoll",
+      "alb": -27,
+      "opp": -15,
+      "oppName": "Taylor",
+      "han": -7,
+      "detail": {
+        "alb": {
+          "app": 35,
+          "dis": 62
+        },
+        "han": {
+          "app": 44,
+          "dis": 51
         }
       }
     }
