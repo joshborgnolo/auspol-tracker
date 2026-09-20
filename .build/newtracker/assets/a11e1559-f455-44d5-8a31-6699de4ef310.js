@@ -1527,8 +1527,11 @@ function tppHeading(cs) {
    where the release itself puts it. The COMPUTED implied readings – this
    poll's own primaries at the fixed 2025 table and at the ALP-v-ON
    first-principles set – close the section for every implied-eligible wave,
-   classic first (the page's default basis) then the ON reading; when the
-   wave printed no pair at all (cs empty), PollLedger still prints "Not
+   classic first (the page's default basis) then the ON reading. Each of them
+   carries grp "imp" so PollLedger can split the two systems with run-in
+   labels ("Published" / "implied 2PP") instead of one flat list that left a
+   published pair indistinguishable from a computed re-read; when the wave
+   printed no pair at all (cs empty), PollLedger still prints "Not
    published" ahead of them. Each implied reading carries its OWN change vs
    the pollster's last figure of that kind ("imp" for the computed classic,
    "impOn" for the ON re-read, "flows" for the house figure – an "imp" delta
@@ -1575,6 +1578,7 @@ function tppLines(cs, r) {
     } });
   }
   if (r.alpImp != null) out.push({
+    grp: "imp",
     c: {
       kind: "flows", lab: "2PP · ALP v L/NP", flag: null,
       segs: [
@@ -1583,11 +1587,11 @@ function tppLines(cs, r) {
                           delta: dImp ? { v: +(-dImp.v).toFixed(1), refDate: dImp.refDate } : null },
       ],
     },
+    /* the group label now says "implied 2PP" and carries its glossary link,
+       so this note names only the flow basis, exactly like the published
+       2025-flows alternative's note */
     note: (
-      <><button type="button" className="hi-term"
-                onClick={() => window.AP.openTerm &&
-                  window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
-        {" "}from these primaries under 2025-election{" "}
+      <>under 2025-election{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm &&
                   window.AP.openTerm("preference-flows", "poll breakdown")}>preference flows</button></>
@@ -1597,6 +1601,7 @@ function tppLines(cs, r) {
      ALP-v-ON first-principles set – second of the two computed bases, so
      the section closes published lines → classic implied → ON implied */
   if (r.alpOnImp != null) out.push({
+    grp: "imp",
     c: {
       kind: "flows", lab: "2PP · ALP v ON", flag: null,
       segs: [
@@ -1606,10 +1611,7 @@ function tppLines(cs, r) {
       ],
     },
     note: (
-      <><button type="button" className="hi-term"
-                onClick={() => window.AP.openTerm &&
-                  window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
-        {" "}from these primaries under the{" "}
+      <>under the{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm &&
                   window.AP.openTerm("fp-flows", "poll breakdown")}>first-principles flow set</button></>
@@ -2302,15 +2304,36 @@ function PollLedger({ r, dirSegments }) {
             implied line beneath it. The house's implied second pair (only
             Roy Morgan and RedBridge print one) remains spliced after the
             canonical pair inside tppLines. */}
-        {((tls) => (
-          <React.Fragment>
-            {!tcs.length && <p className="pd-absent">Not published</p>}
-            {tls.map((x, i) => (
-              <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt}
-                       hero={i === 0 && x.c.segs.filter((g) => g.value != null).length === 2} />
-            ))}
-          </React.Fragment>
-        ))(tppLines(tcs, r))}
+        {/* Two SYSTEMS share the section – what the house printed and the
+            page's implied re-reads – and one flat list blurred them, so each
+            implied entry (tppLines tags it grp "imp") runs under its own
+            run-in label. "Published" heads the house lines only when implied
+            ones follow them (a published-only section needs no delimiter);
+            "implied 2PP" heads the computed lines whenever they print and
+            doubles as their glossary link, so a line's own note needs to
+            name only its flow basis */}
+        {((tls) => {
+          const firstImp = tls.findIndex((x) => x.grp === "imp");
+          return (
+            <React.Fragment>
+              {firstImp > 0 && <p className="pd-s-grp">Published</p>}
+              {!tcs.length && <p className="pd-absent">Not published</p>}
+              {tls.map((x, i) => (
+                <React.Fragment key={"t" + i}>
+                  {i === firstImp && (
+                    <p className="pd-s-grp">
+                      <button type="button" className="hi-term"
+                              onClick={() => window.AP.openTerm &&
+                                window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
+                    </p>
+                  )}
+                  <TppLine c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt}
+                           hero={i === 0 && x.c.segs.filter((g) => g.value != null).length === 2} />
+                </React.Fragment>
+              ))}
+            </React.Fragment>
+          );
+        })(tppLines(tcs, r))}
       </PdSec>
 
       <PdSec label="Preferred PM">
