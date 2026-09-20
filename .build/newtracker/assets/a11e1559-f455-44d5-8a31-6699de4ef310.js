@@ -2318,8 +2318,10 @@ function PollLedger({ r, dirSegments }) {
           The eyebrow is the glossary word itself (the lines' notes then name
           only their flow basis). The display size stays with the house's
           pair; only a wave that printed no pair at all (Newspoll, Resolve,
-          DemosAU) lets its first re-read carry it, since that is then the
-          figure the row shows in the table. */}
+          DemosAU) lets its re-reads carry it – BOTH of them, since neither
+          is the pollster's answer with the other a supporting reading:
+          they are the same computation on two tables, and one at display
+          size over the other at body size ranked them for no reason. */}
       {(r.alpImp != null || r.alpOnImp != null) && (
         <PdSec label={
           <button type="button" className="hi-term"
@@ -2327,7 +2329,7 @@ function PollLedger({ r, dirSegments }) {
         }>
           {impliedLines(r).map((x, i) => (
             <TppLine key={"i" + i} c={x.c} prefixed={x.count > 1} note={x.note}
-                     hero={i === 0 && !tcs.length} />
+                     hero={!tcs.length} />
           ))}
         </PdSec>
       )}

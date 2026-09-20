@@ -119,9 +119,11 @@ restore the run-in labels / mute the implied lines):
   gone). A second `<PdSec label={<button className="hi-term" …
   openTerm("implied-2pp", "poll breakdown")>Implied 2PP</button>}>` renders
   when `r.alpImp != null || r.alpOnImp != null`; its lines get
-  `prefixed={x.count > 1}` and `hero={i === 0 && !tcs.length}` — the display
-  size stays with the house pair, and only a no-pair wave (Newspoll, Resolve,
-  DemosAU) lets its first re-read carry it (as before the split).
+  `prefixed={x.count > 1}` and `hero={!tcs.length}` — the display size stays
+  with the house pair; a no-pair wave (Newspoll, Resolve, DemosAU) gives it to
+  BOTH re-reads (user: the classic over the ON at body size was "bigger with
+  no good reason" — they are one computation on two tables, not an answer
+  plus a supporting reading).
 - Splitting was tried once before and rejected for a "hierarchy clash with the
   section eyebrows"; the run-in labels that replaced it were reverted too. The
   split is what the user picked on 2026-09-20 — leave it unless they say so.
