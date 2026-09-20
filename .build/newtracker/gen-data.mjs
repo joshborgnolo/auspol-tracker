@@ -673,7 +673,8 @@ const houseLean = Object.fromEntries([
    Series: `lnp` for a poll with a published classic pair; `imp` for every
    implied-eligible poll – a paired wave's primaries still pull the implied
    aggregate, which is the headline's default basis and is now reported
-   beside the published-pair move; and `onp` additionally wherever the wave
+   beside the published-pair move; `onimp`, the same leave-one-out on the
+   ALP-v-ON modelled-flow series; and `onp` additionally wherever the wave
    printed an ALP-v-ON head-to-head.
    Keys are absent (not null) wherever the poll has no row in that series. An
    empty 21-day window for the classic/implied nowcast emits nothing rather
@@ -683,6 +684,8 @@ const effByKey = (() => {
   const cur2pp = nowcastAdj(tppRows, houseEffect, ref);
   const curSynth = nowcastAdj(tppRowsSynth, synthEffect, ref);
   const synthKeys = new Set(tppRowsSynth.map((r) => r.key));
+  const curSynthOn = nowcastAdj(tppRowsSynthOn, synthOnEffect, ref);
+  const synthOnKeys = new Set(tppRowsSynthOn.map((r) => r.key));
   const inWin = (rows, key) => rows.some((r) => r.key === key
     && ddays(ref, r.mid) >= 0 && ddays(ref, r.mid) <= HL_WINDOW);
   const loo = (rows, he, key) => { const r = nowcastAdj(rows.filter((q) => q.key !== key), he, ref); return r ? r.v : null; };
@@ -720,6 +723,15 @@ const effByKey = (() => {
       if (lo != null) {
         eff.imp = { lo: r1(lo), hi: r1(curSynth.v), w: inWin(tppRowsSynth, key) ? 1 : 0 };
         if (!eff.imp.w) { const t = thenPair(tppRowsSynth, synthEffect, key, p.date); if (t) eff.imp.t = t; }
+      }
+    }
+    /* the ALP-v-ON pairing's implied series takes the same waves (impOk is
+       its gate too), so every wave above also moves THAT aggregate */
+    if (synthOnKeys.has(key) && curSynthOn) {
+      const lo = loo(tppRowsSynthOn, synthOnEffect, key);
+      if (lo != null) {
+        eff.onimp = { lo: r1(lo), hi: r1(curSynthOn.v), w: inWin(tppRowsSynthOn, key) ? 1 : 0 };
+        if (!eff.onimp.w) { const t = thenPair(tppRowsSynthOn, synthOnEffect, key, p.date); if (t) eff.onimp.t = t; }
       }
     }
     const ao = ALT_BY.get(key) && ALT_BY.get(key).ao;
@@ -1134,6 +1146,9 @@ const CHG_MEASURES = {
   // alpImp). The series the implied-basis "Since last wave" moves key to,
   // whether or not the poll printed a pair of its own
   imp:       (p, a, pm) => (impOk(p) ? r1(impliedAlp2pp(p)) : null),
+  // the same wave re-read under the ALP-v-ON first-principles flow set – the
+  // number the detail shows as alpOnImp; its own series per pollster
+  impOn:     (p, a, pm) => (impOk(p) ? r1(impliedOn(p)) : null),
   albNet:    (p, a, pm) => (a ? a.alb ?? null : null),
   taylorNet: (p, a, pm) => (a ? a.opp ?? null : null),
   hansonNet: (p, a, pm) => (a ? a.han ?? null : null),
