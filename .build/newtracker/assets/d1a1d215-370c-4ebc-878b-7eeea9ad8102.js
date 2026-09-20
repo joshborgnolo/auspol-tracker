@@ -3569,6 +3569,15 @@ function HouseLeanPanel({ rangeId }) {
     .sort((x, y) => (x === rivalFirst ? -1 : y === rivalFirst ? 1 : 0));
   const [measure, setMeasure] = useState(contestIds[0]);
   const [basis, setBasis] = useState("imp");
+  /* What the copy-as-image composer needs and cannot read off the page: the
+     houses live in a popover that is usually shut, and the measure and basis
+     are toggles. Published as window.AP_LEAN_BOARD the way PastCyclesView
+     publishes AP_CYC_BOARD – set after every render (the ref is filled below,
+     once the rows exist), cleared on unmount. Hooks sit ahead of the early
+     returns so their order never changes. */
+  const boardRef = React.useRef(null);
+  React.useEffect(() => { window.AP_LEAN_BOARD = boardRef.current; });
+  React.useEffect(() => () => { window.AP_LEAN_BOARD = null; }, []);
   const contest = LEAN_CONTESTS[measure] || null;
   const leanKey = contest ? contest[basis] : measure;
   const meta = contest
@@ -3620,6 +3629,12 @@ function HouseLeanPanel({ rangeId }) {
      names the biggest lean first. */
   const leaners = latest.filter((e) => Math.abs(e.v) >= LEAN_SURFACE)
     .sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
+  boardRef.current = {
+    title: "House lean · " + (contest ? contest.label + ", " + (basis === "imp" ? "implied" : "published")
+                                          : LEAN_MEASURES.find((m) => m.id === measure).label + " primary"),
+    items: latest.map((e) => ({ name: e.firm, color: e.color, value: leanStr(e.v), off: !!hidden[e.firm] })),
+    caption: meta.ground,
+  };
 
   return (
     <section className="ap-lean" id="house-lean">
@@ -3817,6 +3832,20 @@ function FlowLegend({ pooledId, pooled, houseRows, hidden, setHidden, sgn, kind 
   const total = houseRows.length;
   const pooledOn = !hidden[pooledId];
   const band = pooled && pooled.ci95 != null ? pooled.ci95 : null;
+  /* the copy composer's board for this panel (see HouseLeanPanel) – keyed by
+     the section id, since the classic and ALP-v-ON panels can both be up */
+  const sectionId = kind === "alp-on" ? "flow-drift-on" : "flow-drift";
+  React.useEffect(() => {
+    window.AP_FLOW_BOARD = Object.assign(window.AP_FLOW_BOARD || {}, { [sectionId]: {
+      title: "Preference-flow drift" + (kind === "alp-on" ? " · ALP v ON" : " · ALP v L/NP"),
+      pooled: { name: "Pooled, " + total + " houses",
+                value: band != null ? sgn(pooled.v) + " ± " + pooled.ci95.toFixed(1) + "pp" : "",
+                off: !pooledOn, interval: band != null },
+      items: houseRows.map((r) => ({ name: r.f, color: r.color,
+        value: r.latest == null ? "" : sgn(r.latest) + "pp", off: !!hidden[r.f] })),
+    } });
+  });
+  React.useEffect(() => () => { if (window.AP_FLOW_BOARD) delete window.AP_FLOW_BOARD[sectionId]; }, [sectionId]);
   const outliers = band == null ? []
     : houseRows.filter((r) => r.latest != null && Math.abs(r.latest) > band);
   const outSet = new Set(outliers.map((r) => r.f));

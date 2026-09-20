@@ -206,10 +206,27 @@ disagreement `section.ap-var` has no `.card` class and used to fall to
   attribution is the sub, which the image cuts.
 - Non-hero sub: when `wrapText` needs more than one line the image keeps the
   FIRST SENTENCE (`/^.*?[.!?](?=\s|$)/`) instead of a mid-clause cut.
-- House lean (`.ap-lean`) was tried on the composer and REVERTED: its legend
-  lives outside the panel and its chart has a themed backdrop the composer
-  has no entry for — it keeps the capture. Composing it needs its own
-  legend builder (like `cycleLegend`) first.
+- House lean (`.ap-lean`) and both Preference-flow drift panels (`.ap-flow`,
+  ids `flow-drift` / `flow-drift-on`) compose too (same day, second commit).
+  Their houses live in a SeriesBoard popover (not in the DOM when shut), so
+  each panel PUBLISHES A BOARD the composer rebuilds a legend from, the
+  AP_CYC_BOARD pattern: `window.AP_LEAN_BOARD = { title: "House lean · ALP v
+  ON, implied", items: [{name, color, value, off}], caption: meta.ground }`
+  (HouseLeanPanel: `boardRef` filled in render, a deps-less useEffect copies
+  it to window after every render, an `[]` effect clears it on unmount —
+  both hooks sit ABOVE the panel's early returns) and
+  `window.AP_FLOW_BOARD[sectionId] = { title, pooled: {name, value, off,
+  interval}, items }` (set in FlowLegend, keyed by section id since both
+  drift panels mount together). Composer: `board0` (read before the title so
+  it can override `titleBase` and `caption`), `boardLegend()` — pooled line
+  in `--ink` first, then a "95% interval (shaded)" `shade` entry while the
+  pooled line is on, then one `line` per house at its standing value, cleared
+  houses at 0.45 alpha; `solid()` resolves a `var(--…)` colour through
+  inkVar (house colours arrive concrete as oklch/hex). The drift caption is
+  the FIRST SENTENCE of `.ap-var-note` ("Above zero – the red ground – …").
+- Sub handling (all non-hero cards): `subLines` = the sub as is when it fits
+  one line, else its first sentence wrapped to ≤3 lines; `headBlock` grows
+  22px per extra line.
 - Headless capture recipe: hook `HTMLCanvasElement.prototype.toBlob` in
   `evaluateOnNewDocument` to stash `toDataURL()` for canvases ≥1000px wide,
   stub `navigator.clipboard.write` to reject, no-op `HTMLAnchorElement.click`,

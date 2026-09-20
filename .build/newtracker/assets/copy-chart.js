@@ -457,9 +457,23 @@
     }));
     /* Read before the legend, which needs the title to tell an opposition
        chart from a government one. */
-    const titleBase = txt(target.querySelector(".card-title, h2, h3")) || "auspol tracker";
+    /* a board names the measure the panel is set to ("House lean · ALP v ON,
+       implied"), which the h3 alone does not, and its caption is the
+       panel's own ground note */
+    const board0 = (target.classList.contains("ap-lean") && window.AP_LEAN_BOARD)
+                || (target.classList.contains("ap-flow") && (window.AP_FLOW_BOARD || {})[target.id]) || null;
+    const titleBase = (board0 && board0.title) || txt(target.querySelector(".card-title, h2, h3")) || "auspol tracker";
     const sub = txt(target.querySelector(".card-sub"));
-    const caption = txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
+    /* the drift panels' ground note opens with the sentence that reads the
+       chart's two colours ("Above zero – the red ground – …"); the image
+       carries that sentence and leaves the rest of the paragraph behind */
+    const noteLead = (() => {
+      if (!target.classList.contains("ap-flow")) return "";
+      const n = txt(target.querySelector(".ap-var-note"));
+      return (n.match(/^.*?[.!?](?=\s|$)/) || [n])[0];
+    })();
+    const caption = (board0 && board0.caption) || noteLead
+      || txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
 
     /* Which terms are on the board, in order, and which one is sitting. Two
        things below need it: the band's own legend entry ("Past terms
@@ -595,7 +609,30 @@
       }
       return entries;
     };
+    /* Lean and drift boards: a line per house at its standing value, the
+       drift's pooled line ahead of them with its interval as a shaded entry.
+       A house the reader has cleared is still listed, at the page's
+       switched-off weight, exactly as a cleared chip is. Colours come
+       concrete from the page (oklch / hex) except the pooled line's ink
+       token, resolved through the probe. */
+    const solid = (cl) => (/^var\(/.test(cl) ? inkVar(cl.slice(4, -1).trim()) : cl);
+    const boardLegend = () => {
+      const isLean = target.classList.contains("ap-lean");
+      const b = isLean ? window.AP_LEAN_BOARD : (window.AP_FLOW_BOARD || {})[target.id];
+      if (!b) return [];
+      const out = [];
+      if (b.pooled) {
+        out.push({ label: b.pooled.name + (b.pooled.value ? "  " + b.pooled.value : ""), kind: "line",
+                   fill: inkVar("--ink"), alpha: b.pooled.off ? 0.45 : 1 });
+        if (b.pooled.interval && !b.pooled.off)
+          out.push({ label: "95% interval (shaded)", kind: "shade", fill: inkVar("--ink-faint"), alpha: 1 });
+      }
+      b.items.forEach((i) => out.push({ label: i.name + (i.value ? "  " + i.value : ""), kind: "line",
+                                        fill: solid(i.color), alpha: i.off ? 0.45 : 1 }));
+      return out;
+    };
     let legend = readLegend(target);
+    if (!legend.length && board0) legend = boardLegend();
     if (!legend.length) legend = cycleLegend();
     /* The Poll disagreement panel's chance-floor shading has no chip of its
        own – the live page explains it in the sub, which the image keeps only
@@ -683,7 +720,18 @@
         });
         if (line.length) legLines.push(line);
 
-        const headBlock = hero ? 92 + 34 + 26 : (sub ? 40 : 8);
+        /* a sub that runs past one line (the analysis panels carry a
+           paragraph) keeps its FIRST SENTENCE, wrapped to at most three
+           lines, rather than a mid-clause cut */
+        m.font = "400 16px " + sans;
+        const subLines = (() => {
+          if (!sub) return [];
+          const all = wrapText(m, sub, IW);
+          if (all.length <= 1) return all;
+          const first = (sub.match(/^.*?[.!?](?=\s|$)/) || [sub])[0];
+          return wrapText(m, first, IW).slice(0, 3);
+        })();
+        const headBlock = hero ? 92 + 34 + 26 : (sub ? 40 + (subLines.length - 1) * 22 : 8);
         const H = 76 + headBlock + 30 + chartH + 34 + legLines.length * 26
                 + (capLines.length ? 8 + capLines.length * 22 : 0) + 56;
 
@@ -728,12 +776,8 @@
         } else if (sub) {
           y += 32;
           c.font = "400 16px " + sans; c.fillStyle = T.ink3;
-          /* one line: a sub that runs longer (the analysis panels carry a
-             paragraph) is cut at its first full stop rather than mid-clause */
-          const lines = wrapText(c, sub, IW);
-          const firstSentence = (sub.match(/^.*?[.!?](?=\s|$)/) || [sub])[0];
-          c.fillText(lines.length > 1 ? (wrapText(c, firstSentence, IW)[0] || firstSentence) : (lines[0] || sub), PAD, y);
-          y += 8;
+          subLines.forEach((ln, i) => c.fillText(ln, PAD, y + i * 22));
+          y += (subLines.length - 1) * 22 + 8;
         } else { y += 8; }
 
         y += 30;
@@ -924,14 +968,15 @@
        whatever pickTarget returned: that walk stops at the nearest ancestor
        holding a heading or a legend, which differs by viewport, and testing it
        composed at one width and quietly captured at another. */
-    /* The Poll disagreement panel (.ap-var) has the card's bones – h3
-       title, .card-sub, .legend-chip legend – without the .card class, and
-       the photograph it fell to stacked its legend over the in-panel toggle,
-       so it composes. Its sibling House lean (.ap-lean) does NOT: its legend
-       lives outside the panel and its chart carries a themed backdrop the
-       composer has no entry for, so composing it gave a bare, clipped card –
-       it keeps the capture. */
-    const card = host.closest && host.closest(".card, .ap-var");
+    /* The All-polls analysis panels – Poll disagreement (.ap-var), House
+       lean (.ap-lean), the two Preference-flow drift panels (.ap-flow) –
+       have the card's bones (h3 title, .card-sub, a chart) without the .card
+       class, and the photograph they fell to stacked their controls over
+       each other. They compose. Disagreement carries .legend-chip chips the
+       reader can see; lean and drift keep their houses in a popover, so
+       those panels publish a board (window.AP_LEAN_BOARD / AP_FLOW_BOARD)
+       the composer rebuilds a legend from – see boardLegend(). */
+    const card = host.closest && host.closest(".card, .ap-var, .ap-lean, .ap-flow");
     const png = (card && card.querySelector("svg.chart-svg"))
       ? composeCard(card).catch((e) => {
           console.warn("copy-chart: composed card failed, captured instead –", e && e.message || e);
