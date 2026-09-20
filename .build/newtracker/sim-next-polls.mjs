@@ -76,11 +76,15 @@ const dayFloor = (ms) => {
 // --- the shipped projection (assets/np-project.js), with the panel-side row
 // cap applied the way NextPollsPanel applies it (a11e1559 truncates rows)
 function project(cad, t0, nowMs) {
+  NOW = nowMs;
   window.AP.D = { ...D, pollCadence: cad };
   const { rows } = window.AP.nextPolls({ day: t0, mins: (nowMs - t0) / 60000 });
   rows.length = Math.min(rows.length, NP_MAX_ROWS);
   return rows;
 }
+// the clock the panel's inHours mirror reads (the shipped panel takes nowMs
+// from npProject's own return; scenarios set it here on every projection)
+let NOW = 0;
 
 // --- exact label rules shipped in a11e1559 (NextPollsPanel) ---
 const when = (n) => (n === -1 ? "yesterday"
@@ -88,11 +92,23 @@ const when = (n) => (n === -1 ? "yesterday"
   : n === 0 ? "today" : n === 1 ? "tomorrow" : `in ${n} days`);
 const ago = (n) => (n === 0 ? "earlier today"
   : n === 1 ? "yesterday" : `${n} days ago`);
+// a slot-day row with a measured/declared hour counts the wait itself under
+// 12h of runway ("in 5 hours", minutes in the last hour); untimed or further
+// out falls back to when(inDays), clock read off the projection's NOW
+const inHours = (r) => {
+  if (r.inDays !== 0 || r.releaseMins == null) return null;
+  const ms = r.release + r.releaseMins * 60000 - NOW;
+  if (ms <= 0 || Math.round(ms / 3600000) >= 12) return null;
+  const mins = Math.max(1, Math.round(ms / 60000));
+  if (mins < 60) return `in ${mins} min${mins === 1 ? "" : "s"}`;
+  const h = Math.round(mins / 60);
+  return `in ${h} hour${h === 1 ? "" : "s"}`;
+};
 const panelWhen = (r) => (r.loose
   ? (r.missed ? when(r.closesIn) : r.opensIn <= 0 ? "open now" : "opens " + when(r.opensIn))
   : r.overdue && !r.missed
     ? `${when(r.closesIn)} (or ${ago(-r.inDays)})`
-    : when(r.inDays) + (dayAlt(r) || ""));
+    : (inHours(r) || when(r.inDays)) + (dayAlt(r) || ""));
 const npFmt = (ms) => {
   const d = new Date(ms);
   return `${["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getUTCDay()].slice(0, 3)} ${d.getUTCDate()} ${D.monthName(d.getUTCMonth() + 1)}`;
@@ -190,7 +206,12 @@ function ticker(rows, t0, nowMs) {
         // "any moment now" opens at the measured release hour, not midnight -
         // an untimed house keeps its whole day (the projection's 24*60)
         const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
-        when = days === 0 ? (dueMs <= nowMs ? "any moment now" : "today")
+        // a measured/declared hour counts the wait itself under 12h of
+        // runway ("in 5 hours"); untimed or further out keeps "today"
+        const left = dueMs - nowMs;
+        when = days === 0 ? (dueMs <= nowMs ? "any moment now"
+             : r.releaseMins != null && Math.round(left / 3600000) < 12
+             ? "in " + tnUntil(left) : "today")
              : days === 1 ? "tomorrow"
              : days + " days";
       } else {
@@ -316,17 +337,21 @@ function eq(name, got, want) {
 }
 
 // S1b – Sun 13 Sep, 10am: Resolve's slot day itself, in the same cadSlip
-// world. The when-column's word for inDays 0 is "today", which - unlike "in
-// N days" - names no unit, so the late-alternative tail must spell its own
-// out: "today (or 7 days)", not "today (or 7)" (the day-count elision only
-// stands where the main phrase already carries "days"). Same at tomorrow's
-// distance on Sat 12 Sep.
+// world but with the house UNTIMED (releaseMins stripped) so the slot day
+// keeps its day-wording. The when-column's word for inDays 0 then is
+// "today", which - unlike "in N days" - names no unit, so the
+// late-alternative tail must spell its own out: "today (or 7 days)", not
+// "today (or 7)" (the day-count elision only stands where the main phrase
+// already carries "days"). Same at tomorrow's distance on Sat 12 Sep. The
+// TIMED slot day counts hours instead of naming it - S9 and S10 pin that.
 {
+  const cadUntimed = JSON.parse(JSON.stringify(cadSlip));
+  cadUntimed.find((c) => c.pollster === "Resolve").releaseMins = null;
   const { label, t0, nowMs } = scen("Sun 13 Sep", "2026-09-13", 600);
-  const rows = project(cadSlip, t0, nowMs);
+  const rows = project(cadUntimed, t0, nowMs);
   const rs = firm(rows, "Resolve");
-  eq("slot-day panel spells the tail's unit", rs && panelWhen(rs), "today (or 7 days)");
-  eq("slot-day tail itself", rs && dayAlt(rs), " (or 7 days)");
+  eq("untimed slot-day panel spells the tail's unit", rs && panelWhen(rs), "today (or 7 days)");
+  eq("untimed slot-day tail itself", rs && dayAlt(rs), " (or 7 days)");
 }
 {
   const { t0, nowMs } = scen("Sat 12 Sep", "2026-09-12", 600);
@@ -536,24 +561,85 @@ function eq(name, got, want) {
   eq("rolled past the horizon: DemosAU off the ticker", items.some((i) => i.firm === "DemosAU"), false);
 }
 
-// S9 – Mon 14 Sep, Roy Morgan's slot day, hour by hour. The window opens at
-// the house's measured hour (16:21, recent filings 4:18–5:00pm), not at
-// midnight: a 9am reader gets "today" and "any moment now" only starts once
-// the window does — the gate d1a1d215 hangs the phrase on (dueMs). (The
-// measured hour drifts wave to wave; keep the scenario on whatever slot the
-// projection is counting Morgan to.)
+// S9 – Mon 14 Sep, Roy Morgan's slot day, hour by hour, with the measured
+// hour PINNED to 5pm so the countdown's wording is exact (the real releaseMid
+// drifts wave to wave). The same hour that gates "any moment now" counts the
+// wait before it: 9am is eight hours out and says so, instead of the vaguer
+// "today"; "any moment now" still only starts once the window does — the gate
+// d1a1d215 hangs the phrase on (dueMs). (Keep the scenario on whatever slot
+// the projection is counting Morgan to.)
 {
+  const cad9 = JSON.parse(JSON.stringify(cad));
+  cad9.find((c) => c.pollster === "Roy Morgan").releaseMins = 1020;
   const am = scen("Mon 14 Sep 9am, window shut", "2026-09-14", 540);
-  const amItems = ticker(project(cad, am.t0, am.nowMs), am.t0, am.nowMs);
+  const amRows = project(cad9, am.t0, am.nowMs);
+  const amItems = ticker(amRows, am.t0, am.nowMs);
+  // read the panel label under the 9am clock before the 5pm projection
+  // re-anchors the sim's NOW
+  const amPanel = panelWhen(firm(amRows, "Roy Morgan"));
   const pm = scen("Mon 14 Sep 5pm, window open", "2026-09-14", 1020);
-  const pmRows = project(cad, pm.t0, pm.nowMs);
+  const pmRows = project(cad9, pm.t0, pm.nowMs);
   const pmItems = ticker(pmRows, pm.t0, pm.nowMs);
   console.log(`\n${am.label}:  ticker → ${fmtT(amItems)}`);
   console.log(`${pm.label}:  ticker → ${fmtT(pmItems)}`);
-  eq("9am on the slot day reads today", amItems.some((i) => i.firm === "Roy Morgan" && i.when === "today"), true);
+  eq("9am, 8h out, counts the wait", amItems.some((i) => i.firm === "Roy Morgan" && i.when === "in 8 hours"), true);
+  eq("9am panel counts it too", (amPanel || "").startsWith("in 8 hours"), true);
   eq("5pm: overdue, not missed", [firm(pmRows, "Roy Morgan") && firm(pmRows, "Roy Morgan").missed,
     !!(firm(pmRows, "Roy Morgan") && firm(pmRows, "Roy Morgan").overdue)], [false, true]);
   eq("window open reads any moment now", pmItems.some((i) => i.firm === "Roy Morgan" && i.when === "any moment now"), true);
+}
+
+// S10 – the hours countdown's edges, on a world with Resolve's release hour
+// pinned to 5pm (1020). Slot day, 7h out: "in 7 hours", and the panel's
+// one-sided tail keeps its spelled-out unit behind it. 20 minutes out the
+// label drops to "in 20 mins". Both stay inside the slot's own day: hours
+// never cross midnight (a 1am house the evening before still reads
+// "tomorrow"), and an untimed house is left on "today" all day.
+{
+  const cadT = JSON.parse(JSON.stringify(cad));
+  cadT.find((c) => c.pollster === "Resolve").releaseMins = 1020;
+  const rDate = new Date(firm(project(cadT, Date.parse("2026-09-10T00:00:00Z"),
+    Date.parse("2026-09-10T00:00:00Z")), "Resolve").release).toISOString().slice(0, 10);
+  {
+    const { t0, nowMs, label } = scen("slot day 10am, 7h out", rDate, 600);
+    const rows = project(cadT, t0, nowMs);
+    const items = ticker(rows, t0, nowMs);
+    console.log(`\n${label}:  ticker → ${fmtT(items)}`);
+    eq("7h out on the bar", items.some((i) => i.firm === "Resolve" && i.when === "in 7 hours"), true);
+    eq("panel counts it, tail keeps its unit", panelWhen(firm(rows, "Resolve")), "in 7 hours (or 7 days)");
+  }
+  {
+    const { t0, nowMs, label } = scen("slot day 4:40pm, 20 mins out", rDate, 1000);
+    const rows = project(cadT, t0, nowMs);
+    const items = ticker(rows, t0, nowMs);
+    console.log(`\n${label}:  ticker → ${fmtT(items)}`);
+    eq("last hour counts minutes", items.some((i) => i.firm === "Resolve" && i.when === "in 20 mins"), true);
+    eq("panel minutes match", panelWhen(firm(rows, "Resolve")), "in 20 mins (or 7 days)");
+  }
+  // the day before at 11pm an hour-scale wait is STILL the next day's: the
+  // countdown only opens on the slot day itself - pin Morgan to a 1am habit
+  // (2h away at 11pm) and the day wording must hold
+  const cadLate = JSON.parse(JSON.stringify(cad));
+  cadLate.find((c) => c.pollster === "Roy Morgan").releaseMins = 60;
+  const mDate = new Date(firm(project(cadLate, Date.parse("2026-09-10T00:00:00Z"),
+    Date.parse("2026-09-10T00:00:00Z")), "Roy Morgan").release).toISOString().slice(0, 10);
+  {
+    const { t0, nowMs } = scen("eve of the slot, 11pm", new Date(Date.parse(mDate) - DAY).toISOString().slice(0, 10), 1380);
+    const items = ticker(project(cadLate, t0, nowMs), t0, nowMs);
+    eq("2h across midnight still reads tomorrow", items.some((i) => i.firm === "Roy Morgan" && i.when === "tomorrow"), true);
+  }
+  // and a dated house with no hour to count to (releaseMins stripped) keeps
+  // "today" through its slot day
+  const cadNP = JSON.parse(JSON.stringify(cad));
+  cadNP.find((c) => c.pollster === "Newspoll").releaseMins = null;
+  const nDate = new Date(firm(project(cadNP, Date.parse("2026-09-10T00:00:00Z"),
+    Date.parse("2026-09-10T00:00:00Z")), "Newspoll").release).toISOString().slice(0, 10);
+  {
+    const { t0, nowMs, label } = scen("untimed house, slot day 10am", nDate, 600);
+    const items = ticker(project(cadNP, t0, nowMs), t0, nowMs);
+    console.log(`\n${label}:  ticker → ${fmtT(items)}`);
+    eq("untimed house keeps today", items.some((i) => i.firm === "Newspoll" && i.when === "today"), true);
+  }
 }
 
 console.log(fails ? `\n${fails} FAILED` : "\nall next-polls expectations held");

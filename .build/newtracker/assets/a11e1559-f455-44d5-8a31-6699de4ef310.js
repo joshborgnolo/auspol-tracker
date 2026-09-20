@@ -2542,7 +2542,7 @@ function NextPollsPanel() {
      reader was away - the one thing they were looking at. */
   const [open, setOpenState] = useState(npOpenRow);
   const setOpen = (v) => { npOpenRow = v; setOpenState(v); };
-  const { rows } = npProject();
+  const { rows, nowMs } = npProject();
   if (!rows.length) return null;
 
   /* Every date in here comes from Date.parse("YYYY-MM-DD"), which is UTC
@@ -2583,6 +2583,22 @@ function NextPollsPanel() {
      too: "in 6 days (or yesterday)". */
   const ago = (n) => (n === 0 ? "earlier today"
     : n === 1 ? "yesterday" : `${n} days ago`);
+  /* "Today" is the vaguest answer the column gives, and it is only vague
+     where the hour is unknown. A house with a measured (or declared) release
+     hour IS a moment today, so inside twelve hours of it the row counts the
+     wait itself – "in 5 hours", minutes in the last hour – the same moment
+     the date column already names. An untimed house has no hour to count to
+     and keeps "today"; twelve hours plus out, so does everyone else. Matches
+     the ticker's rule (d1a1d215) phrase for phrase. */
+  const inHours = (r) => {
+    if (r.inDays !== 0 || r.releaseMins == null) return null;
+    const ms = r.release + r.releaseMins * 60000 - nowMs;
+    if (ms <= 0 || Math.round(ms / 3600000) >= 12) return null;
+    const mins = Math.max(1, Math.round(ms / 60000));
+    if (mins < 60) return `in ${mins} min${mins === 1 ? "" : "s"}`;
+    const h = Math.round(mins / 60);
+    return `in ${h} hour${h === 1 ? "" : "s"}`;
+  };
   /* A one-sided schedule names its real alternative instead of mirroring it.
      A symmetric ± pretends the wave can arrive a week EARLY, and in the
      current record no weekday house ever has - every miss is a week late.
@@ -2732,7 +2748,7 @@ function NextPollsPanel() {
                    wide layout still sets it inline after it. */
                 : r.overdue && !r.missed
                   ? <>{when(r.closesIn)}<span className="np-when-or">{` (or ${ago(-r.inDays)})`}</span></>
-                  : <>{when(r.inDays)}{dayAlt(r) && <span className="np-when-or">{dayAlt(r)}</span>}</>}
+                  : <>{inHours(r) || when(r.inDays)}{dayAlt(r) && <span className="np-when-or">{dayAlt(r)}</span>}</>}
             </span>
             <span className="np-cadence">
               {cadenceLabel(r.cadence)}

@@ -12869,7 +12869,8 @@ function NextPollsPanel() {
     setOpenState(v);
   };
   const {
-    rows
+    rows,
+    nowMs
   } = npProject();
   if (!rows.length) return null;
 
@@ -12906,6 +12907,22 @@ function NextPollsPanel() {
      how far back the date itself fell, phrased so 0 and 1 read as English
      too: "in 6 days (or yesterday)". */
   const ago = n => n === 0 ? "earlier today" : n === 1 ? "yesterday" : `${n} days ago`;
+  /* "Today" is the vaguest answer the column gives, and it is only vague
+     where the hour is unknown. A house with a measured (or declared) release
+     hour IS a moment today, so inside twelve hours of it the row counts the
+     wait itself – "in 5 hours", minutes in the last hour – the same moment
+     the date column already names. An untimed house has no hour to count to
+     and keeps "today"; twelve hours plus out, so does everyone else. Matches
+     the ticker's rule (d1a1d215) phrase for phrase. */
+  const inHours = r => {
+    if (r.inDays !== 0 || r.releaseMins == null) return null;
+    const ms = r.release + r.releaseMins * 60000 - nowMs;
+    if (ms <= 0 || Math.round(ms / 3600000) >= 12) return null;
+    const mins = Math.max(1, Math.round(ms / 60000));
+    if (mins < 60) return `in ${mins} min${mins === 1 ? "" : "s"}`;
+    const h = Math.round(mins / 60);
+    return `in ${h} hour${h === 1 ? "" : "s"}`;
+  };
   /* A one-sided schedule names its real alternative instead of mirroring it.
      A symmetric ± pretends the wave can arrive a week EARLY, and in the
      current record no weekday house ever has - every miss is a week late.
@@ -13040,7 +13057,7 @@ function NextPollsPanel() {
        under the count (.np-when-or in template.html) while the
        wide layout still sets it inline after it. */ : r.overdue && !r.missed ? /*#__PURE__*/React.createElement(React.Fragment, null, when(r.closesIn), /*#__PURE__*/React.createElement("span", {
       className: "np-when-or"
-    }, ` (or ${ago(-r.inDays)})`)) : /*#__PURE__*/React.createElement(React.Fragment, null, when(r.inDays), dayAlt(r) && /*#__PURE__*/React.createElement("span", {
+    }, ` (or ${ago(-r.inDays)})`)) : /*#__PURE__*/React.createElement(React.Fragment, null, inHours(r) || when(r.inDays), dayAlt(r) && /*#__PURE__*/React.createElement("span", {
       className: "np-when-or"
     }, dayAlt(r)))), /*#__PURE__*/React.createElement("span", {
       className: "np-cadence"
@@ -13784,7 +13801,14 @@ function NextPollTicker({
          has no hour to open at, so it keeps its whole day (the projection's
          same 24*60 default): "today" throughout. */
       const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
-      when = days === 0 ? dueMs <= nowMs ? "any moment now" : "today" : days === 1 ? "tomorrow"
+      /* The same hour that lets the slot say "any moment now" lets the wait
+         before it count itself: a house with a measured (or declared) hour
+         and under twelve of them to go reads "in 5 hours" - minutes in the
+         last hour, both from tnUntil - instead of the vaguer "today". A
+         house nobody has timed has no hour to count to and keeps "today",
+         and twelve hours plus out the day is still the honest claim. */
+      const left = dueMs - nowMs;
+      when = days === 0 ? dueMs <= nowMs ? "any moment now" : r.releaseMins != null && Math.round(left / 3600000) < 12 ? "in " + tnUntil(left) : "today" : days === 1 ? "tomorrow"
       /* exact day counts past "tomorrow" - the panel's own phrasing
          ("in 12 days") - so the bar and the panel name the same slot
          the same way; tnUntil's week rounding ("2 weeks") made them

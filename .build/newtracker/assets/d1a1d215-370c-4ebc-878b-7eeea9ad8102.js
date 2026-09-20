@@ -249,7 +249,16 @@ function NextPollTicker({ showScore }) {
            has no hour to open at, so it keeps its whole day (the projection's
            same 24*60 default): "today" throughout. */
         const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
-        when = days === 0 ? (dueMs <= nowMs ? "any moment now" : "today")
+        /* The same hour that lets the slot say "any moment now" lets the wait
+           before it count itself: a house with a measured (or declared) hour
+           and under twelve of them to go reads "in 5 hours" - minutes in the
+           last hour, both from tnUntil - instead of the vaguer "today". A
+           house nobody has timed has no hour to count to and keeps "today",
+           and twelve hours plus out the day is still the honest claim. */
+        const left = dueMs - nowMs;
+        when = days === 0 ? (dueMs <= nowMs ? "any moment now"
+             : r.releaseMins != null && Math.round(left / 3600000) < 12
+             ? "in " + tnUntil(left) : "today")
              : days === 1 ? "tomorrow"
              /* exact day counts past "tomorrow" - the panel's own phrasing
                 ("in 12 days") - so the bar and the panel name the same slot
