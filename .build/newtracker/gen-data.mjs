@@ -2266,6 +2266,8 @@ const CAD_DEFAULT_LAG = 1;
    Monday in eleven of the last twelve. Judging it on all 39 hid the schedule
    it actually keeps. */
 const CAD_RECENT = 12;
+// timed releases needed before the hour span drops its single earliest and latest
+const CAD_TRIM_MIN = 8;
 /* How many recent releases the panel LISTS when a row is opened. Deliberately
    fewer than the window the estimate is taken over: five is what a reader will
    actually read down, and the row says how many intervals the median really
@@ -2504,6 +2506,17 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     ? Number(decl.time.split(":")[0]) * 60 + Number(decl.time.split(":")[1]) : null;
   const releaseDow = calMonth ? null : (decl && decl.dow != null ? decl.dow : dowHabit);
   const timed = ts.length >= 5;
+  /* The SPAN is taken with one sample trimmed off each end once there are
+     enough to spare. Newspoll files at 8pm ten times in twelve, 9pm twice, and
+     once - a real release, 19 Jan 2026 - at 7:11am on a Monday. Taken raw the
+     span is "7am-9pm", which is too wide to print, so the label fell back to
+     the median and called an evening house "8 pm" as if that were the whole
+     habit. Trimming one each side keeps a habit's genuine width (8-9pm) while
+     a single stray, early or late, waits out its window instead of setting
+     the span. The median (releaseMid/releaseMins) is left on the full set: it
+     is robust already, and it is the value the panel decides on. */
+  const tsSorted = ts.slice().sort((a, b) => a - b);
+  const tsSpan = tsSorted.length >= CAD_TRIM_MIN ? tsSorted.slice(1, -1) : tsSorted;
   pollCadence.push({
     pollster: firm,
     last,
@@ -2527,8 +2540,8 @@ for (const [firm, rows] of Object.entries(byHouse)) {
        of different kinds. Minutes past midnight, house local time - which is
        eastern, and is not converted for the reader's own zone because the
        release schedule is a fact about the publisher, not about the reader. */
-    releaseFrom: timed ? Math.min(...ts) : declMins,
-    releaseTo: timed ? Math.max(...ts) : declMins,
+    releaseFrom: timed ? Math.min(...tsSpan) : declMins,
+    releaseTo: timed ? Math.max(...tsSpan) : declMins,
     // the middle as well as the ends: one late release should not be allowed
     // to widen a house's stated hour into something it almost never does
     releaseMid: timed ? medianOf(ts) : declMins,

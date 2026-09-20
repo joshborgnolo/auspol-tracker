@@ -2537,10 +2537,14 @@ function pubStamp(published, opts) {
 /* A span is only worth printing while it IS the habit. YouGov has filed at 5am
    five times and 6am once, so "5-6 am" describes it. Essential has filed at 1am
    four times and 4:36am once, and "1-4:36 am" would let a single late morning
-   speak for a house that is otherwise punctual to the minute - so past an hour
-   and a half the usual time is stated instead, and the outlier is left to the
-   ± on the day. */
-const RELEASE_TIGHT_MINS = 90;
+   speak for a house that is otherwise punctual to the minute - so past two
+   hours the usual time is stated instead, and the outlier is left to the
+   ± on the day. Two hours rather than ninety minutes because gen-data now
+   trims one sample off each end of the span before it gets here, so what
+   arrives is the habit's own width: Newspoll's 7pm-9pm evening, once the
+   single 7:11am is trimmed, is a real two-hour span and should print as
+   one. */
+const RELEASE_TIGHT_MINS = 120;
 /* What the ± is allowed to say once a date has been pinned to a weekday.
    The spread is measured off the gaps between fieldwork-end dates, and quoting
    it in days after the snap describes a date that cannot happen: YouGov's
