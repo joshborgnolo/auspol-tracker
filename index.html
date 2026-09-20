@@ -1766,6 +1766,13 @@ body.dark .sens-band { opacity: 0.10; }
   align-self: center;
 }
 .legend-chip.residual .legend-name { color: var(--ink-3); font-weight: 500; }
+/* a series drawn dashed for its BASIS (the Poll disagreement panel's
+   as-published lines) keeps its party colour and full-weight label – only
+   the swatch echoes the stroke */
+.legend-chip.dashed .legend-swatch {
+  height: 0; border-radius: 0; background: transparent !important;
+  border-top: 2px dashed; align-self: center;
+}
 .legend-chip.residual .legend-val { color: var(--ink-3); font-weight: 600; }
 
 /* ---------- leadership section (shared selector + two panels) ---------- */
@@ -5417,10 +5424,21 @@ window.AP = (function () {
   const dayOf = (iso) => +new Date(iso) / 864e5;
   const metricOf = (p, id) => (p.appr && p.appr.metricBy && p.appr.metricBy[id]) || "approval";
 
+  /* Each Labor contest on BOTH bases. The published figure spreads what
+     each house prints – its own allocation, the habit herding lives in –
+     and so covers only the waves that publish a pair; the implied figure
+     (solid, the page's default basis) spreads every full-primary wave read
+     through one shared flow table, so it is the houses disagreeing about
+     the PRIMARIES, in 2PP units. A house can sit on the field on one and
+     off it on the other. */
   const DISCORD_MEASURES = [
-    { id: "tpp_alp",   facet: "twopp",      label: "ALP v L/NP", color: "var(--alp)",
+    { id: "tpp_alp_imp",   facet: "twopp", label: "ALP v L/NP (implied)",      color: "var(--alp)",
+      val: (p) => p.alpImp, share: (p) => p.alpImp },
+    { id: "tpp_alp",       facet: "twopp", label: "ALP v L/NP (as published)", color: "var(--alp)", dashed: true,
       val: (p) => p.alpN, share: (p) => p.alpN },
-    { id: "tpp_alpon", facet: "twopp",      label: "ALP v ON",   color: "var(--onp)",
+    { id: "tpp_alpon_imp", facet: "twopp", label: "ALP v ON (implied)",        color: "var(--onp)",
+      val: (p) => p.alpOnImp, share: (p) => p.alpOnImp },
+    { id: "tpp_alpon",     facet: "twopp", label: "ALP v ON (as published)",   color: "var(--onp)", dashed: true,
       val: (p) => (p.tppAlt ? p.tppAlt.alp : null), share: (p) => p.tppAlt.alp },
     { id: "p_alp",     facet: "primary",    label: "ALP",        color: "var(--alp)",
       val: (p) => p.p.alp, share: (p) => p.p.alp },
@@ -5428,6 +5446,8 @@ window.AP = (function () {
       val: (p) => p.p.lnp, share: (p) => p.p.lnp },
     { id: "p_onp",     facet: "primary",    label: "ON",         color: "var(--onp)",
       val: (p) => p.p.onp, share: (p) => p.p.onp },
+    { id: "p_grn",     facet: "primary",    label: "GRN",        color: "var(--grn)",
+      val: (p) => p.p.grn, share: (p) => p.p.grn },
     { id: "net_alb",   facet: "leadership", label: "Albanese",   color: "var(--alp)", net: true,
       val: (p) => p.appr.albNet, stratum: (p) => metricOf(p, "alb") },
     // the opposition slot is an OFFICE: Ley's and Taylor's readings are never
@@ -17535,15 +17555,18 @@ function VariancePanel({
   // a measure with no computable window anywhere (e.g. Hanson's net, polled
   // by too few houses at a time) is dropped rather than shown as a flat gap
   /* The two Labor contests list in the order the hero uses — the rival Labor
-     is doing worst against first (latest.rivalLead). A reader who has just
-     seen the headline open on ALP v ON should not meet a legend here leading
-     with the other one. Facets without a ranked pair are untouched. */
+     is doing worst against first (latest.rivalLead), each contest's implied
+     reading (the page's default basis) ahead of its published one. A reader
+     who has just seen the headline open on ALP v ON should not meet a legend
+     here leading with the other one. Facets without a ranked pair are
+     untouched. */
   const rivalFirst = D.latest && D.latest.rivalLead || "alp_lnp";
-  const RIVAL_FIRST_ID = {
-    alp_on: "tpp_alpon",
-    alp_lnp: "tpp_alp"
-  }[rivalFirst];
-  const rows = discordFacet(view).slice().sort((a, b) => a.id === RIVAL_FIRST_ID ? -1 : b.id === RIVAL_FIRST_ID ? 1 : 0).map(m => ({
+  const RIVAL_ORDER = rivalFirst === "alp_on" ? ["tpp_alpon_imp", "tpp_alpon", "tpp_alp_imp", "tpp_alp"] : ["tpp_alp_imp", "tpp_alp", "tpp_alpon_imp", "tpp_alpon"];
+  const rank = id => {
+    const i = RIVAL_ORDER.indexOf(id);
+    return i < 0 ? RIVAL_ORDER.length : i;
+  };
+  const rows = discordFacet(view).slice().sort((a, b) => rank(a.id) - rank(b.id)).map(m => ({
     m,
     pts: discord(m.id)
   })).filter(r => r.pts.some(d => d.sigma != null));
@@ -17558,6 +17581,7 @@ function VariancePanel({
     label: r.m.label,
     color: r.m.color,
     width: 3,
+    dashed: !!r.m.dashed,
     opacity: hidden[r.m.id] ? 0 : 1,
     points: r.pts.filter(d => d.sigma != null && inWin(d)).map(d => ({
       x: d.x,
@@ -17613,7 +17637,7 @@ function VariancePanel({
     className: "ap-var-title"
   }, "Poll disagreement"), /*#__PURE__*/React.createElement("p", {
     className: "card-sub"
-  }, "How far apart the polls sit, against the spread sampling error alone would produce. The shading is that chance floor \u2013 a line inside it means the houses are running tighter than random sampling permits. Measured across all ", D.individualPolls.length, " polls; the filters above don\u2019t narrow it.", view !== "leadership" && /*#__PURE__*/React.createElement(React.Fragment, null, " ", "The two-party lines spread each house\u2019s ", /*#__PURE__*/React.createElement("em", null, "published"), " ", "figure, not the implied one, and so cover only the waves that publish a 2PP: herding is a habit of what a house prints, and reading every house through one shared flow table would remove part of the very thing this panel is looking for."))), /*#__PURE__*/React.createElement("div", {
+  }, "How far apart the polls sit, against the spread sampling error alone would produce. The shading is that chance floor \u2013 a line inside it means the houses are running tighter than random sampling permits. Measured across all ", D.individualPolls.length, " polls; the filters above don\u2019t narrow it.", view !== "leadership" && /*#__PURE__*/React.createElement(React.Fragment, null, " ", "Each two-party contest is drawn on both bases. The", " ", /*#__PURE__*/React.createElement("em", null, "as published"), " line (dashed) spreads the figure each house prints \u2013 its own allocation, which is where herding lives \u2013 and so covers only the waves that publish a pair; the ", /*#__PURE__*/React.createElement("em", null, "implied"), " line spreads every full-primary wave read through one shared flow table, so it is the houses disagreeing about the primaries, in two-party units."))), /*#__PURE__*/React.createElement("div", {
     className: "legend"
   }, latest.map(({
     m,
@@ -17623,7 +17647,7 @@ function VariancePanel({
     return /*#__PURE__*/React.createElement("button", {
       key: m.id,
       type: "button",
-      className: "legend-chip" + (hidden[m.id] ? " off" : ""),
+      className: "legend-chip" + (hidden[m.id] ? " off" : "") + (m.dashed ? " dashed" : ""),
       "aria-pressed": !hidden[m.id],
       title: m.label + " – " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label.replace(/^./, ch => ch.toUpperCase()),
       onClick: () => setHidden(h => ({
@@ -17632,7 +17656,9 @@ function VariancePanel({
       }))
     }, /*#__PURE__*/React.createElement("span", {
       className: "legend-swatch",
-      style: {
+      style: m.dashed ? {
+        borderTopColor: m.color
+      } : {
         background: m.color
       }
     }), /*#__PURE__*/React.createElement("span", {

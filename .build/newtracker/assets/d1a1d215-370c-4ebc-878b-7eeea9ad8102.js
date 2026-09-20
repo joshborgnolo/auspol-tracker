@@ -3326,13 +3326,18 @@ function VariancePanel({ facet, rangeId }) {
   // a measure with no computable window anywhere (e.g. Hanson's net, polled
   // by too few houses at a time) is dropped rather than shown as a flat gap
   /* The two Labor contests list in the order the hero uses — the rival Labor
-     is doing worst against first (latest.rivalLead). A reader who has just
-     seen the headline open on ALP v ON should not meet a legend here leading
-     with the other one. Facets without a ranked pair are untouched. */
+     is doing worst against first (latest.rivalLead), each contest's implied
+     reading (the page's default basis) ahead of its published one. A reader
+     who has just seen the headline open on ALP v ON should not meet a legend
+     here leading with the other one. Facets without a ranked pair are
+     untouched. */
   const rivalFirst = (D.latest && D.latest.rivalLead) || "alp_lnp";
-  const RIVAL_FIRST_ID = { alp_on: "tpp_alpon", alp_lnp: "tpp_alp" }[rivalFirst];
+  const RIVAL_ORDER = rivalFirst === "alp_on"
+    ? ["tpp_alpon_imp", "tpp_alpon", "tpp_alp_imp", "tpp_alp"]
+    : ["tpp_alp_imp", "tpp_alp", "tpp_alpon_imp", "tpp_alpon"];
+  const rank = (id) => { const i = RIVAL_ORDER.indexOf(id); return i < 0 ? RIVAL_ORDER.length : i; };
   const rows = discordFacet(view).slice()
-    .sort((a, b) => (a.id === RIVAL_FIRST_ID ? -1 : b.id === RIVAL_FIRST_ID ? 1 : 0))
+    .sort((a, b) => rank(a.id) - rank(b.id))
     .map((m) => ({ m, pts: discord(m.id) }))
     .filter((r) => r.pts.some((d) => d.sigma != null));
   if (!rows.length) return null;
@@ -3343,7 +3348,7 @@ function VariancePanel({ facet, rangeId }) {
   const vis = shown.length ? shown : rows;      // never blank the chart entirely
 
   const chartSeries = rows.map((r) => ({
-    id: r.m.id, label: r.m.label, color: r.m.color, width: 3,
+    id: r.m.id, label: r.m.label, color: r.m.color, width: 3, dashed: !!r.m.dashed,
     opacity: hidden[r.m.id] ? 0 : 1,
     points: r.pts.filter((d) => d.sigma != null && inWin(d))
       .map((d) => ({ x: d.x, y: d.sigma, note: d.R.toFixed(2) + "×" })),
@@ -3383,10 +3388,11 @@ function VariancePanel({ facet, rangeId }) {
             The shading is that chance floor – a line inside it means the houses are running tighter
             than random sampling permits. Measured across all {D.individualPolls.length} polls; the filters
             above don’t narrow it.
-            {view !== "leadership" && <>{" "}The two-party lines spread each house’s <em>published</em>
-            {" "}figure, not the implied one, and so cover only the waves that publish a 2PP: herding is
-            a habit of what a house prints, and reading every house through one shared flow table would
-            remove part of the very thing this panel is looking for.</>}
+            {view !== "leadership" && <>{" "}Each two-party contest is drawn on both bases. The
+            {" "}<em>as published</em> line (dashed) spreads the figure each house prints – its own
+            allocation, which is where herding lives – and so covers only the waves that publish a pair;
+            the <em>implied</em> line spreads every full-primary wave read through one shared flow
+            table, so it is the houses disagreeing about the primaries, in two-party units.</>}
           </p>
         </div>
         <div className="legend">
@@ -3394,11 +3400,12 @@ function VariancePanel({ facet, rangeId }) {
             const read = discordRead(d.R);
             return (
               <button key={m.id} type="button"
-                      className={"legend-chip" + (hidden[m.id] ? " off" : "")}
+                      className={"legend-chip" + (hidden[m.id] ? " off" : "") + (m.dashed ? " dashed" : "")}
                       aria-pressed={!hidden[m.id]}
                       title={m.label + " – " + d.sigma.toFixed(2) + "pp spread vs a " + d.floor.toFixed(2) + "pp floor · " + read.label.replace(/^./, (ch) => ch.toUpperCase())}
                       onClick={() => setHidden((h) => ({ ...h, [m.id]: !h[m.id] }))}>
-                <span className="legend-swatch" style={{ background: m.color }}></span>
+                {/* a dashed series gets a dashed swatch, in its own colour */}
+                <span className="legend-swatch" style={m.dashed ? { borderTopColor: m.color } : { background: m.color }}></span>
                 <span className="legend-name">{m.label}</span>
                 <span className={"legend-val vr-" + read.id}>{d.R.toFixed(2)}×</span>
               </button>

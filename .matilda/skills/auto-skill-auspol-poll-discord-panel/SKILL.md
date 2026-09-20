@@ -1,6 +1,6 @@
 ---
 name: auspol-poll-discord-panel
-description: "auspol-tracker — the Poll disagreement (variance) panel end-to-end: discord engine in ed2260de (DISCORD_MEASURES facets twopp/primary/leadership, recency-weighted sigma vs sampling FLOOR, R ratio bands) + VariancePanel renderer in d1a1d215 mounted per archive facet. Primary trio ALP/L/NP/ON and both 2PP matchups ALREADY exist as measures — before 'adding' a disagreement measure, check DISCORD_MEASURES first."
+description: "auspol-tracker — the Poll disagreement (variance) panel end-to-end: discord engine in ed2260de (DISCORD_MEASURES facets twopp/primary/leadership, recency-weighted sigma vs sampling FLOOR, R ratio bands) + VariancePanel renderer in d1a1d215 mounted per archive facet. Primaries ALP/L/NP/ON/GRN and both 2PP matchups on BOTH bases (implied solid + as-published dashed, since 2026-09-20) ALREADY exist as measures — before 'adding' a disagreement measure, check DISCORD_MEASURES first."
 source: auto-skill
 extracted_at: '2026-09-03T06:00:09.740Z'
 ---
@@ -13,9 +13,18 @@ measured against the spread sampling error alone would produce. Two files.
 ## Engine — `.build/newtracker/assets/ed2260de-….js` (`:113-242`)
 
 - **`DISCORD_MEASURES`** (`~:147`) is THE catalogue, keyed by `facet`:
-  - `twopp`: `tpp_alp` (ALP v L/NP), `tpp_alpon` (ALP v ON, via `p.tppAlt.alp`)
-  - `primary`: `p_alp`, `p_lnp`, `p_onp` — **exactly ALP / Coalition / One Nation, no
-    Greens or OTH** (deliberate)
+  - `twopp` (2026-09-20, user: "show 2PP (as published) and 2PP (implied)"):
+    `tpp_alp_imp` (ALP v L/NP implied, `p.alpImp`), `tpp_alp` (as published,
+    `p.alpN`, `dashed: true`), `tpp_alpon_imp` (ALP v ON implied, `p.alpOnImp`),
+    `tpp_alpon` (as published via `p.tppAlt.alp`, dashed). Implied = the page's
+    default basis = SOLID; published = DASHED (the hero's own convention: implied
+    line, published compare-overlay). VariancePanel orders them `RIVAL_ORDER` —
+    rival contest first (latest.rivalLead), implied before published within a
+    contest — passes `dashed` through to TrendChart, and the legend chip gets
+    `.legend-chip.dashed` (template: swatch becomes a dashed rule in the series
+    colour via inline `borderTopColor`). Card-sub copy rewritten to explain both.
+  - `primary`: `p_alp`, `p_lnp`, `p_onp`, `p_grn` — Greens added 2026-09-20 on
+    request (was a deliberate trio; still no OTH)
   - `leadership`: `net_alb`, `net_opp`, `net_han` — net approval; each measure entry
     carries `id / label / color / val(p) / share(p)`, plus `net: true` and an optional
     `stratum(p)`.

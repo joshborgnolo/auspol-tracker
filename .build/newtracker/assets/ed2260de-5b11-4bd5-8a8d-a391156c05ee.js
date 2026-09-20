@@ -145,10 +145,21 @@ window.AP = (function () {
   const dayOf = (iso) => +new Date(iso) / 864e5;
   const metricOf = (p, id) => (p.appr && p.appr.metricBy && p.appr.metricBy[id]) || "approval";
 
+  /* Each Labor contest on BOTH bases. The published figure spreads what
+     each house prints – its own allocation, the habit herding lives in –
+     and so covers only the waves that publish a pair; the implied figure
+     (solid, the page's default basis) spreads every full-primary wave read
+     through one shared flow table, so it is the houses disagreeing about
+     the PRIMARIES, in 2PP units. A house can sit on the field on one and
+     off it on the other. */
   const DISCORD_MEASURES = [
-    { id: "tpp_alp",   facet: "twopp",      label: "ALP v L/NP", color: "var(--alp)",
+    { id: "tpp_alp_imp",   facet: "twopp", label: "ALP v L/NP (implied)",      color: "var(--alp)",
+      val: (p) => p.alpImp, share: (p) => p.alpImp },
+    { id: "tpp_alp",       facet: "twopp", label: "ALP v L/NP (as published)", color: "var(--alp)", dashed: true,
       val: (p) => p.alpN, share: (p) => p.alpN },
-    { id: "tpp_alpon", facet: "twopp",      label: "ALP v ON",   color: "var(--onp)",
+    { id: "tpp_alpon_imp", facet: "twopp", label: "ALP v ON (implied)",        color: "var(--onp)",
+      val: (p) => p.alpOnImp, share: (p) => p.alpOnImp },
+    { id: "tpp_alpon",     facet: "twopp", label: "ALP v ON (as published)",   color: "var(--onp)", dashed: true,
       val: (p) => (p.tppAlt ? p.tppAlt.alp : null), share: (p) => p.tppAlt.alp },
     { id: "p_alp",     facet: "primary",    label: "ALP",        color: "var(--alp)",
       val: (p) => p.p.alp, share: (p) => p.p.alp },
@@ -156,6 +167,8 @@ window.AP = (function () {
       val: (p) => p.p.lnp, share: (p) => p.p.lnp },
     { id: "p_onp",     facet: "primary",    label: "ON",         color: "var(--onp)",
       val: (p) => p.p.onp, share: (p) => p.p.onp },
+    { id: "p_grn",     facet: "primary",    label: "GRN",        color: "var(--grn)",
+      val: (p) => p.p.grn, share: (p) => p.p.grn },
     { id: "net_alb",   facet: "leadership", label: "Albanese",   color: "var(--alp)", net: true,
       val: (p) => p.appr.albNet, stratum: (p) => metricOf(p, "alb") },
     // the opposition slot is an OFFICE: Ley's and Taylor's readings are never

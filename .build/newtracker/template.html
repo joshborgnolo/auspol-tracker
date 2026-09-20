@@ -1674,6 +1674,13 @@ body.dark .sens-band { opacity: 0.10; }
   align-self: center;
 }
 .legend-chip.residual .legend-name { color: var(--ink-3); font-weight: 500; }
+/* a series drawn dashed for its BASIS (the Poll disagreement panel's
+   as-published lines) keeps its party colour and full-weight label – only
+   the swatch echoes the stroke */
+.legend-chip.dashed .legend-swatch {
+  height: 0; border-radius: 0; background: transparent !important;
+  border-top: 2px dashed; align-self: center;
+}
 .legend-chip.residual .legend-val { color: var(--ink-3); font-weight: 600; }
 
 /* ---------- leadership section (shared selector + two panels) ---------- */
