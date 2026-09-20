@@ -2615,19 +2615,6 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--pd-ink-2); margin: 0 0 11px;
 }
-/* The after-preferences section can hold two SYSTEMS of 2PP – the figures
-   the house printed (including its own 2025-flows re-read) and the page's
-   computed implied ones – and one undivided list blurred them. A run-in
-   label heads each system, a step beneath .pd-k: same small-caps register,
-   less tracking, quieter ink, so it groups the lines without starting a
-   new section. The implied label is itself the glossary link (the lines'
-   own notes are left to name just the flow basis). */
-.pd-s-grp {
-  font-size: var(--pd-eyebrow); font-weight: 600;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--ink-3, var(--pd-ink-2)); margin: 11px 0 4px;
-}
-.pd-sec > .pd-s-grp:first-of-type { margin-top: 0; }
 /* The vote-share section IS the poll's headline - it is the figure the row
    was opened for - so the head-to-head takes a display size and everything
    else in the panel arranges itself under it. Only the FIRST pair gets it
@@ -11672,11 +11659,8 @@ function tppHeading(cs) {
    where the release itself puts it. The COMPUTED implied readings – this
    poll's own primaries at the fixed 2025 table and at the ALP-v-ON
    first-principles set – close the section for every implied-eligible wave,
-   classic first (the page's default basis) then the ON reading. Each of them
-   carries grp "imp" so PollLedger can split the two systems with run-in
-   labels ("Published" / "implied 2PP") instead of one flat list that left a
-   published pair indistinguishable from a computed re-read; when the wave
-   printed no pair at all (cs empty), PollLedger still prints "Not
+   classic first (the page's default basis) then the ON reading; when the
+   wave printed no pair at all (cs empty), PollLedger still prints "Not
    published" ahead of them. Each implied reading carries its OWN change vs
    the pollster's last figure of that kind ("imp" for the computed classic,
    "impOn" for the ON re-read, "flows" for the house figure – an "imp" delta
@@ -11736,7 +11720,6 @@ function tppLines(cs, r) {
     });
   }
   if (r.alpImp != null) out.push({
-    grp: "imp",
     c: {
       kind: "flows",
       lab: "2PP · ALP v L/NP",
@@ -11756,10 +11739,11 @@ function tppLines(cs, r) {
         } : null
       }]
     },
-    /* the group label now says "implied 2PP" and carries its glossary link,
-       so this note names only the flow basis, exactly like the published
-       2025-flows alternative's note */
-    note: /*#__PURE__*/React.createElement(React.Fragment, null, "under 2025-election", " ", /*#__PURE__*/React.createElement("button", {
+    note: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+      type: "button",
+      className: "hi-term",
+      onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
+    }, "implied 2PP"), " ", "from these primaries under 2025-election", " ", /*#__PURE__*/React.createElement("button", {
       type: "button",
       className: "hi-term",
       onClick: () => window.AP.openTerm && window.AP.openTerm("preference-flows", "poll breakdown")
@@ -11769,7 +11753,6 @@ function tppLines(cs, r) {
      ALP-v-ON first-principles set – second of the two computed bases, so
      the section closes published lines → classic implied → ON implied */
   if (r.alpOnImp != null) out.push({
-    grp: "imp",
     c: {
       kind: "flows",
       lab: "2PP · ALP v ON",
@@ -11789,7 +11772,11 @@ function tppLines(cs, r) {
         } : null
       }]
     },
-    note: /*#__PURE__*/React.createElement(React.Fragment, null, "under the", " ", /*#__PURE__*/React.createElement("button", {
+    note: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
+      type: "button",
+      className: "hi-term",
+      onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
+    }, "implied 2PP"), " ", "from these primaries under the", " ", /*#__PURE__*/React.createElement("button", {
       type: "button",
       className: "hi-term",
       onClick: () => window.AP.openTerm && window.AP.openTerm("fp-flows", "poll breakdown")
@@ -12637,28 +12624,16 @@ function PollLedger({
   })))(segDelta(r.chg, "und"))), /*#__PURE__*/React.createElement(PdSec, {
     label: tppHeading(tcs),
     lead: true
-  }, (tls => {
-    const firstImp = tls.findIndex(x => x.grp === "imp");
-    return /*#__PURE__*/React.createElement(React.Fragment, null, firstImp > 0 && /*#__PURE__*/React.createElement("p", {
-      className: "pd-s-grp"
-    }, "Published"), !tcs.length && /*#__PURE__*/React.createElement("p", {
-      className: "pd-absent"
-    }, "Not published"), tls.map((x, i) => /*#__PURE__*/React.createElement(React.Fragment, {
-      key: "t" + i
-    }, i === firstImp && /*#__PURE__*/React.createElement("p", {
-      className: "pd-s-grp"
-    }, /*#__PURE__*/React.createElement("button", {
-      type: "button",
-      className: "hi-term",
-      onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
-    }, "implied 2PP")), /*#__PURE__*/React.createElement(TppLine, {
-      c: x.c,
-      prefixed: x.count > 1 && !x.alt,
-      note: x.note,
-      alt: x.alt,
-      hero: i === 0 && x.c.segs.filter(g => g.value != null).length === 2
-    }))));
-  })(tppLines(tcs, r))), /*#__PURE__*/React.createElement(PdSec, {
+  }, (tls => /*#__PURE__*/React.createElement(React.Fragment, null, !tcs.length && /*#__PURE__*/React.createElement("p", {
+    className: "pd-absent"
+  }, "Not published"), tls.map((x, i) => /*#__PURE__*/React.createElement(TppLine, {
+    key: "t" + i,
+    c: x.c,
+    prefixed: x.count > 1 && !x.alt,
+    note: x.note,
+    alt: x.alt,
+    hero: i === 0 && x.c.segs.filter(g => g.value != null).length === 2
+  }))))(tppLines(tcs, r))), /*#__PURE__*/React.createElement(PdSec, {
     label: "Preferred PM"
   }, ppms.map((c, i) => {
     const segs = ppmContestSegs(c, i === 0 ? r.chg : null);
