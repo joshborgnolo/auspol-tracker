@@ -18,7 +18,7 @@ poll.
   consensus property. Only the nowcast re-runs on rows minus one.
 - **The delta is current-window by definition**: a poll outside
   `HL_WINDOW` (21d before `LATEST_ISO`) moves nothing, so its line reads
-  `±0.0% · outside the 21-day window the aggregate covers` (a `vs
+  `+0.0% · outside the 21-day window the aggregate covers` (a `vs
   monthly-mean` note instead if `m` set). Do not "backdate" effects to a
   poll's own era — the line answers "what pull does this row have on the
   number shown today".
@@ -54,7 +54,7 @@ poll.
   `Effect on Labor's implied 2PP aggregate: ` ("implied" is a hi-term
   glossary link to `implied-2pp`) / `Effect on Labor's 2PP aggregate vs
   One Nation: `. Signed move renders like ChgParen, true minus U+2212,
-  `±0.0` for null; window note is a trailing clause, not a separate line.
+  `+0.0` for a nil pull (user 2026-09-20: was `±0.0`, read as a range); window note is a trailing clause, not a separate line.
 - CSS `.pd-s.pd-s-eff` in template.html CLONES the `.pd-s.pd-s-basis`
   block (caption, `var(--pd-ink-2)`, `var(--pd-body)`, bold figures at
   `var(--pd-fig)`, word-spacing 2px) — its rules sit directly after the
@@ -67,7 +67,7 @@ poll.
 Expands rows in both tables and asserts the rendered line texts against
 the page's own boot payloads (`AUSPOL.pollsterTable` /
 `AUSPOL.individualPolls`, never hardcoded figures). Current-window,
-ON-two-line, implied, archive-newest, and out-of-window (w=0: ±0.0 +
+ON-two-line, implied, archive-newest, and out-of-window (w=0: +0.0 +
 window note + x==y) cases. **Learned the hard way (3 false-fails):**
 row targeting must pass an ARRAY of strings AND-ed against row text —
 `effLines(scope, [pollster])` matches that house's NEWEST wave (YouGov's

@@ -2043,10 +2043,12 @@ function TppLine({ c, prefixed, note, hero, alt }) {
 function EffLines({ eff }) {
   if (!eff || (!eff.lnp && !eff.imp && !eff.onp && !eff.onimp)) return null;
   /* signed like Poll lean and House effect in the rows above (% dropped –
-     the row's verbs carry that it is points) */
+     the row's verbs carry that it is points). A nil pull prints "+0.0", not
+     "±0.0": the figure is a measured move that happened to round to
+     nothing, and the ± glyph read as a range or an uncertainty */
   const signed = (e) => {
     const d = Math.round((e.hi - e.lo) * 10) / 10;
-    return d === 0 ? "±0.0" : (d > 0 ? "+" : "−") + Math.abs(d).toFixed(1);
+    return (d < 0 ? "−" : "+") + Math.abs(d).toFixed(1);
   };
   /* an implied clause wears no tag: implied 2PP is the page's basis, the
      figure the table shows, so it is the default reading here as it is
@@ -2059,7 +2061,7 @@ function EffLines({ eff }) {
     eff.lnp && { e: eff.lnp, tag: eff.imp ? respTag : null },
   ].filter(Boolean);
   /* when every clause is out of window, the whole row is just the note –
-     its in-window wording, without the brackets and without the ±0.0s. A
+     its in-window wording, without the brackets and without the +0.0s. A
      mixed row keeps the note parenthesised on the out-of-window clause */
   const prim = tppClauses.length ? tppClauses[0].e : null;
   const shareOut = prim && tppClauses.every((c) => !c.e.w)
