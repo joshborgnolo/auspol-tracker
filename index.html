@@ -2615,6 +2615,11 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--pd-ink-2); margin: 0 0 11px;
 }
+/* A kicker that is itself a glossary word (the implied-2PP section's) is a
+   hi-term <button>, and the UA sheet sets text-transform: none and
+   letter-spacing: normal on buttons – the .hi-term reset restores font
+   and colour only – so the running-head voice is handed down explicitly */
+.pd-k .hi-term { text-transform: inherit; letter-spacing: inherit; }
 /* The vote-share section IS the poll's headline - it is the figure the row
    was opened for - so the head-to-head takes a display size and everything
    else in the panel arranges itself under it. Only the FIRST pair gets it
@@ -11651,26 +11656,21 @@ function tppHeading(cs) {
   if (cs.length === 1) return cs[0].kind === "3cp" ? "Three-cornered preferred" : "Two-party preferred";
   return "After preferences";
 }
-/* The detail section's line list: the contests tppContests builds, plus up
-   to two implied readings of ALP v L/NP and one implied reading of ALP v
-   ON. The HOUSE figure – Roy Morgan's and RedBridge's own release-published
-   implied pair at the 2025 flows – is spliced straight after the published
-   pair as its alternative ("or … under 2025-election preference flows"),
-   where the release itself puts it. The COMPUTED implied readings – this
-   poll's own primaries at the fixed 2025 table and at the ALP-v-ON
-   first-principles set – close the section for every implied-eligible wave,
-   classic first (the page's default basis) then the ON reading; when the
-   wave printed no pair at all (cs empty), PollLedger still prints "Not
-   published" ahead of them. Each implied reading carries its OWN change vs
-   the pollster's last figure of that kind ("imp" for the computed classic,
-   "impOn" for the ON re-read, "flows" for the house figure – an "imp" delta
-   falls back to "flows" when a wave has only the latter), the other side
-   moving opposite, exactly as the canonical pair uses "alp2pp". */
+/* The after-preferences section's line list: ONLY what the house printed –
+   the contests tppContests builds, plus the HOUSE figure where a release
+   carries one (Roy Morgan's and RedBridge's own implied pair at the 2025
+   flows), spliced straight after the published pair as its alternative
+   ("or … under 2025-election preference flows"), where the release itself
+   puts it. The page's COMPUTED re-reads of the same primaries are NOT in
+   this list: they are a different system from a figure the pollster
+   published, and one flat list left a respondent-allocated pair
+   indistinguishable from a re-read – impliedLines builds them for a section
+   of their own. The house figure carries its own change vs the pollster's
+   last figure of that kind ("flows"), the other side moving opposite,
+   exactly as the canonical pair uses "alp2pp". */
 function tppLines(cs, r) {
   const out = [];
   const dFlows = segDelta(r.chg, "flows");
-  const dImp = segDelta(r.chg, "imp") || segDelta(r.chg, "flows");
-  const dOnImp = segDelta(r.chg, "impOn");
   /* Essential's undecided never left the published pair, so the pair's own
      line names the share and its move; the first-preferences tail reports
      only shares that were set aside before the shares were reported. */
@@ -11719,6 +11719,25 @@ function tppLines(cs, r) {
       }
     });
   }
+  return out.map(x => ({
+    ...x,
+    count: out.length
+  }));
+}
+/* The implied section's line list: the page's own re-reads of this wave's
+   primaries – at the fixed 2025 table (the page's default basis) first,
+   then through the ALP-v-ON first-principles set – for every
+   implied-eligible wave. The section's own eyebrow says "implied 2PP" and
+   carries the glossary link, so each line's note names only its flow
+   basis, in the same words as the house figure's note above. Each reading
+   carries its OWN change vs the pollster's last figure of that kind ("imp"
+   for the classic, "impOn" for the ON re-read – an "imp" delta falls back
+   to "flows" when a wave has only the house figure), the other side
+   moving opposite. */
+function impliedLines(r) {
+  const out = [];
+  const dImp = segDelta(r.chg, "imp") || segDelta(r.chg, "flows");
+  const dOnImp = segDelta(r.chg, "impOn");
   if (r.alpImp != null) out.push({
     c: {
       kind: "flows",
@@ -11739,19 +11758,12 @@ function tppLines(cs, r) {
         } : null
       }]
     },
-    note: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
-      type: "button",
-      className: "hi-term",
-      onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
-    }, "implied 2PP"), " ", "from these primaries under 2025-election", " ", /*#__PURE__*/React.createElement("button", {
+    note: /*#__PURE__*/React.createElement(React.Fragment, null, "under 2025-election", " ", /*#__PURE__*/React.createElement("button", {
       type: "button",
       className: "hi-term",
       onClick: () => window.AP.openTerm && window.AP.openTerm("preference-flows", "poll breakdown")
     }, "preference flows"))
   });
-  /* the pairing's OWN implied reading: the same primaries through the
-     ALP-v-ON first-principles set – second of the two computed bases, so
-     the section closes published lines → classic implied → ON implied */
   if (r.alpOnImp != null) out.push({
     c: {
       kind: "flows",
@@ -11772,11 +11784,7 @@ function tppLines(cs, r) {
         } : null
       }]
     },
-    note: /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("button", {
-      type: "button",
-      className: "hi-term",
-      onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
-    }, "implied 2PP"), " ", "from these primaries under the", " ", /*#__PURE__*/React.createElement("button", {
+    note: /*#__PURE__*/React.createElement(React.Fragment, null, "under the", " ", /*#__PURE__*/React.createElement("button", {
       type: "button",
       className: "hi-term",
       onClick: () => window.AP.openTerm && window.AP.openTerm("fp-flows", "poll breakdown")
@@ -12624,16 +12632,26 @@ function PollLedger({
   })))(segDelta(r.chg, "und"))), /*#__PURE__*/React.createElement(PdSec, {
     label: tppHeading(tcs),
     lead: true
-  }, (tls => /*#__PURE__*/React.createElement(React.Fragment, null, !tcs.length && /*#__PURE__*/React.createElement("p", {
-    className: "pd-absent"
-  }, "Not published"), tls.map((x, i) => /*#__PURE__*/React.createElement(TppLine, {
+  }, tppLines(tcs, r).map((x, i) => /*#__PURE__*/React.createElement(TppLine, {
     key: "t" + i,
     c: x.c,
     prefixed: x.count > 1 && !x.alt,
     note: x.note,
     alt: x.alt,
     hero: i === 0 && x.c.segs.filter(g => g.value != null).length === 2
-  }))))(tppLines(tcs, r))), /*#__PURE__*/React.createElement(PdSec, {
+  }))), (r.alpImp != null || r.alpOnImp != null) && /*#__PURE__*/React.createElement(PdSec, {
+    label: /*#__PURE__*/React.createElement("button", {
+      type: "button",
+      className: "hi-term",
+      onClick: () => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")
+    }, "Implied 2PP")
+  }, impliedLines(r).map((x, i) => /*#__PURE__*/React.createElement(TppLine, {
+    key: "i" + i,
+    c: x.c,
+    prefixed: x.count > 1,
+    note: x.note,
+    hero: i === 0 && !tcs.length
+  }))), /*#__PURE__*/React.createElement(PdSec, {
     label: "Preferred PM"
   }, ppms.map((c, i) => {
     const segs = ppmContestSegs(c, i === 0 ? r.chg : null);

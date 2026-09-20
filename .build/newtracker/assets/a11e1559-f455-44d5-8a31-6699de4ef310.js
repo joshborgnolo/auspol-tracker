@@ -1519,26 +1519,21 @@ function tppHeading(cs) {
   if (cs.length === 1) return cs[0].kind === "3cp" ? "Three-cornered preferred" : "Two-party preferred";
   return "After preferences";
 }
-/* The detail section's line list: the contests tppContests builds, plus up
-   to two implied readings of ALP v L/NP and one implied reading of ALP v
-   ON. The HOUSE figure – Roy Morgan's and RedBridge's own release-published
-   implied pair at the 2025 flows – is spliced straight after the published
-   pair as its alternative ("or … under 2025-election preference flows"),
-   where the release itself puts it. The COMPUTED implied readings – this
-   poll's own primaries at the fixed 2025 table and at the ALP-v-ON
-   first-principles set – close the section for every implied-eligible wave,
-   classic first (the page's default basis) then the ON reading; when the
-   wave printed no pair at all (cs empty), PollLedger still prints "Not
-   published" ahead of them. Each implied reading carries its OWN change vs
-   the pollster's last figure of that kind ("imp" for the computed classic,
-   "impOn" for the ON re-read, "flows" for the house figure – an "imp" delta
-   falls back to "flows" when a wave has only the latter), the other side
-   moving opposite, exactly as the canonical pair uses "alp2pp". */
+/* The after-preferences section's line list: ONLY what the house printed –
+   the contests tppContests builds, plus the HOUSE figure where a release
+   carries one (Roy Morgan's and RedBridge's own implied pair at the 2025
+   flows), spliced straight after the published pair as its alternative
+   ("or … under 2025-election preference flows"), where the release itself
+   puts it. The page's COMPUTED re-reads of the same primaries are NOT in
+   this list: they are a different system from a figure the pollster
+   published, and one flat list left a respondent-allocated pair
+   indistinguishable from a re-read – impliedLines builds them for a section
+   of their own. The house figure carries its own change vs the pollster's
+   last figure of that kind ("flows"), the other side moving opposite,
+   exactly as the canonical pair uses "alp2pp". */
 function tppLines(cs, r) {
   const out = [];
   const dFlows = segDelta(r.chg, "flows");
-  const dImp = segDelta(r.chg, "imp") || segDelta(r.chg, "flows");
-  const dOnImp = segDelta(r.chg, "impOn");
   /* Essential's undecided never left the published pair, so the pair's own
      line names the share and its move; the first-preferences tail reports
      only shares that were set aside before the shares were reported. */
@@ -1574,6 +1569,22 @@ function tppLines(cs, r) {
       ],
     } });
   }
+  return out.map((x) => ({ ...x, count: out.length }));
+}
+/* The implied section's line list: the page's own re-reads of this wave's
+   primaries – at the fixed 2025 table (the page's default basis) first,
+   then through the ALP-v-ON first-principles set – for every
+   implied-eligible wave. The section's own eyebrow says "implied 2PP" and
+   carries the glossary link, so each line's note names only its flow
+   basis, in the same words as the house figure's note above. Each reading
+   carries its OWN change vs the pollster's last figure of that kind ("imp"
+   for the classic, "impOn" for the ON re-read – an "imp" delta falls back
+   to "flows" when a wave has only the house figure), the other side
+   moving opposite. */
+function impliedLines(r) {
+  const out = [];
+  const dImp = segDelta(r.chg, "imp") || segDelta(r.chg, "flows");
+  const dOnImp = segDelta(r.chg, "impOn");
   if (r.alpImp != null) out.push({
     c: {
       kind: "flows", lab: "2PP · ALP v L/NP", flag: null,
@@ -1584,18 +1595,12 @@ function tppLines(cs, r) {
       ],
     },
     note: (
-      <><button type="button" className="hi-term"
-                onClick={() => window.AP.openTerm &&
-                  window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
-        {" "}from these primaries under 2025-election{" "}
+      <>under 2025-election{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm &&
                   window.AP.openTerm("preference-flows", "poll breakdown")}>preference flows</button></>
     ),
   });
-  /* the pairing's OWN implied reading: the same primaries through the
-     ALP-v-ON first-principles set – second of the two computed bases, so
-     the section closes published lines → classic implied → ON implied */
   if (r.alpOnImp != null) out.push({
     c: {
       kind: "flows", lab: "2PP · ALP v ON", flag: null,
@@ -1606,10 +1611,7 @@ function tppLines(cs, r) {
       ],
     },
     note: (
-      <><button type="button" className="hi-term"
-                onClick={() => window.AP.openTerm &&
-                  window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
-        {" "}from these primaries under the{" "}
+      <>under the{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm &&
                   window.AP.openTerm("fp-flows", "poll breakdown")}>first-principles flow set</button></>
@@ -2297,21 +2299,39 @@ function PollLedger({ r, dirSegments }) {
         {/* the display size goes to the FIRST head-to-head only: a wave with
             three matchups has one answer and two supporting readings, and a
             three-cornered contest has too many figures to carry it */}
-        {/* the section CLOSES on the page's own implied pair; a wave that
-            printed no pair at all still gets "Not published" first, the
-            implied line beneath it. The house's implied second pair (only
-            Roy Morgan and RedBridge print one) remains spliced after the
+        {/* this section holds what the HOUSE printed and nothing else: the
+            page's own re-reads of the primaries go in the implied section
+            below, so a wave that printed no pair at all reads "Not
+            published" here (PdSec's fallback) rather than a computed pair
+            standing in for one. The house's implied second pair (only Roy
+            Morgan and RedBridge print one) remains spliced after the
             canonical pair inside tppLines. */}
-        {((tls) => (
-          <React.Fragment>
-            {!tcs.length && <p className="pd-absent">Not published</p>}
-            {tls.map((x, i) => (
-              <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt}
-                       hero={i === 0 && x.c.segs.filter((g) => g.value != null).length === 2} />
-            ))}
-          </React.Fragment>
-        ))(tppLines(tcs, r))}
+        {tppLines(tcs, r).map((x, i) => (
+          <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt}
+                   hero={i === 0 && x.c.segs.filter((g) => g.value != null).length === 2} />
+        ))}
       </PdSec>
+
+      {/* The page's re-reads of this wave's primaries are a different SYSTEM
+          from a figure the pollster published, so they take a section of
+          their own rather than closing the one above – one flat list left a
+          respondent-allocated pair indistinguishable from a computed one.
+          The eyebrow is the glossary word itself (the lines' notes then name
+          only their flow basis). The display size stays with the house's
+          pair; only a wave that printed no pair at all (Newspoll, Resolve,
+          DemosAU) lets its first re-read carry it, since that is then the
+          figure the row shows in the table. */}
+      {(r.alpImp != null || r.alpOnImp != null) && (
+        <PdSec label={
+          <button type="button" className="hi-term"
+                  onClick={() => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")}>Implied 2PP</button>
+        }>
+          {impliedLines(r).map((x, i) => (
+            <TppLine key={"i" + i} c={x.c} prefixed={x.count > 1} note={x.note}
+                     hero={i === 0 && !tcs.length} />
+          ))}
+        </PdSec>
+      )}
 
       <PdSec label="Preferred PM">
         {ppms.map((c, i) => {

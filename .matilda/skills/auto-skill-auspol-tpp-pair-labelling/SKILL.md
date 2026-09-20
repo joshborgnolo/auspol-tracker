@@ -1,6 +1,6 @@
 ---
 name: auspol-tpp-pair-labelling
-description: auspol-tracker — the 2025-flows 2PP pair renders as a FULL contest line spliced straight after the canonical pair via tppLines(cs,r) in a11e1559 (never a compact tail after the alt matchups); both lines get matchup prefixes + basis notes, the "respondent-allocated" note is keyed on contest kind + !derived — NEVER array index, because 3-cornered waves inject a DERIVED pair into tppContests.
+description: auspol-tracker — the 2025-flows 2PP pair renders as a FULL contest line spliced straight after the canonical pair via tppLines(cs,r) in a11e1559 (never a compact tail after the alt matchups); both lines get matchup prefixes + basis notes, the "respondent-allocated" note is keyed on contest kind + !derived — NEVER array index, because 3-cornered waves inject a DERIVED pair into tppContests. Since 2026-09-20 (after c004ce4's run-in labels were reverted in 1b964de) the page's COMPUTED implied re-reads live in their OWN "Implied 2PP" PdSec built by impliedLines(r) — tppLines(cs,r) holds only what the house printed — and PollLedger is window-exported so a11e1559 edits cover BOTH detail views.
 source: auto-skill
 extracted_at: '2026-08-31T07:41:32.853Z'
 ---
@@ -9,8 +9,12 @@ extracted_at: '2026-08-31T07:41:32.853Z'
 
 Shipped 2026-08-31 across three commits: `9f316a9` (pair labels), `9fea364` (RedBridge
 flows data), `dadf71d` (flows pair promoted from compact tail to a full adjacent line).
-Only the Latest-polls `PollDetail` (a11e1559) renders the flows pair — the archive's
-`ArchPollDetail` (d1a1d215) imports `tppContests` for flags/bars but has no flows line.
+
+> Update 2026-09-20: `PollLedger` (the whole ledger body — `tppLines`, `TppLine`, the
+> TPP `PdSec`) is now single-home in a11e1559 and window-exported; the archive's
+> d1a1d215 renders it via `window.PollLedger` (no duplicate renderer). One edit to
+> a11e1559 covers BOTH Latest and All-polls detail views. (The earlier claim that the
+> archive has no flows line predates the PollLedger share.)
 
 ## Where
 
@@ -93,6 +97,38 @@ would have mislabelled those waves. The correct predicate (now inside `tppLines`
   (hand-entered — that manual-ingest wave is invisible to extractor discovery; see
   the redbridge-accent-extraction skill's *Discovery gap* section).
 
+## Published vs implied: two sections (2026-09-20, supersedes c004ce4)
+
+User feedback on the five-line "After preferences" list ("this is messy —
+respondent-allocated + implied 2pp displayed without any delimitation"). First
+attempt c004ce4 kept ONE `PdSec` with `.pd-s-grp` run-in labels ("Published" /
+"implied 2PP") and was reverted nine minutes later (1b964de, no reason given).
+The user then chose the SPLIT when offered three options (two sections /
+restore the run-in labels / mute the implied lines):
+
+- `tppLines(cs, r)` now returns ONLY what the house printed: the tppContests
+  output plus the spliced `alt` house-figure line ("or … under 2025-election
+  preference flows"). No `grp` tags, no implied entries.
+- `impliedLines(r)` (new, right after tppLines) returns the computed classic
+  (`r.alpImp`, delta "imp" falling back to "flows") then the ON re-read
+  (`r.alpOnImp`, delta "impOn"), each with `count` for the prefix rule. Notes
+  name ONLY the flow basis (`under 2025-election preference flows` /
+  `under the first-principles flow set`).
+- PollLedger: the After-preferences `PdSec` maps `tppLines` and relies on
+  PdSec's own "Not published" fallback (the explicit `!tcs.length` line is
+  gone). A second `<PdSec label={<button className="hi-term" …
+  openTerm("implied-2pp", "poll breakdown")>Implied 2PP</button>}>` renders
+  when `r.alpImp != null || r.alpOnImp != null`; its lines get
+  `prefixed={x.count > 1}` and `hero={i === 0 && !tcs.length}` — the display
+  size stays with the house pair, and only a no-pair wave (Newspoll, Resolve,
+  DemosAU) lets its first re-read carry it (as before the split).
+- Splitting was tried once before and rejected for a "hierarchy clash with the
+  section eyebrows"; the run-in labels that replaced it were reverted too. The
+  split is what the user picked on 2026-09-20 — leave it unless they say so.
+- template.html, right after `.pd-k`: `.pd-k .hi-term { text-transform:
+  inherit; letter-spacing: inherit; }` — Chrome's UA sheet resets both on
+  `<button>` and `.hi-term` restores only font/colour, so without it the
+  eyebrow printed as sentence-case "Implied 2PP".
 ## Verification
 
 After `node .build/newtracker/build.mjs` (validator runs inside, should print
@@ -112,6 +148,23 @@ After `node .build/newtracker/build.mjs` (validator runs inside, should print
   (ISO date) — `day` repeats across waves (28 matched the MAY RedBridge wave first);
   (b) remember babel escapes non-ASCII in helper bodies too if you copy them from the
   built file rather than the asset source.
+- Section wiring (2026-09-20 split): `grep -c 'impliedLines' index.html` → 3
+  (definition + call + a comment); `grep -o '"Implied 2PP"' index.html` present;
+  old note literal "from these primaries under" and `pd-s-grp` both ABSENT.
+- Visual check without the Chrome extension: serve the tree
+  (`python3 -m http.server 8761 --bind 127.0.0.1`) and drive
+  `~/node_modules/puppeteer-core` against the Chrome.app binary (the
+  verify-copy-poll probe's recipe): click the Nth `.exp-btn`, wait for
+  `.poll-detail`, read its `innerText` and `element.screenshot()`.
+- COMPILED-CHILDREN TRAP: babel lowers JSX children to POSITIONAL args
+  (`React.createElement("p", { className: "pd-k" }, label)`), so regexes of
+  the `children:\s*"…"` shape match NOTHING even when a label is baked — grep
+  the bare string and eyeball the positional arg around each offset instead.
+- SHELL QUOTING: `node -e "…"` with mixed quotes is mangled by this shell
+  ("Expected ',', got ')'" errors) and out-of-workspace /tmp writes are blocked
+  by BOGAN mode — write verification scripts as `.build/tmp-*.mjs` inside the
+  repo and delete them after (untracked `.build/tmp-*` files from other
+  sessions exist; only remove your own).
 - Remember babel escapes non-ASCII to `\uXXXX` in the built file — grep ASCII
   fragments only (see the auspol-built-html-verification user skill).
 

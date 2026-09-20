@@ -2523,6 +2523,11 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
   letter-spacing: 0.14em; text-transform: uppercase;
   color: var(--pd-ink-2); margin: 0 0 11px;
 }
+/* A kicker that is itself a glossary word (the implied-2PP section's) is a
+   hi-term <button>, and the UA sheet sets text-transform: none and
+   letter-spacing: normal on buttons – the .hi-term reset restores font
+   and colour only – so the running-head voice is handed down explicitly */
+.pd-k .hi-term { text-transform: inherit; letter-spacing: inherit; }
 /* The vote-share section IS the poll's headline - it is the figure the row
    was opened for - so the head-to-head takes a display size and everything
    else in the panel arranges itself under it. Only the FIRST pair gets it
