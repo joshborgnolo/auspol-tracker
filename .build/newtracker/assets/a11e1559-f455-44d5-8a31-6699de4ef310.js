@@ -2026,8 +2026,8 @@ function TppLine({ c, prefixed, note, hero, alt }) {
 }
 
 /* The poll's own pull on the figures a reader watches, as one ordinary row
-   of the provenance band: "implied 2PP agg. effect   +0.2 for ALP vs L/NP;
-   +0.1 (respondent-allocated); −0.4 for ALP vs ON" - the party named
+   of the provenance band: "2PP agg. effect   +0.2 for ALP vs L/NP; +0.1
+   (respondent-allocated); −0.4 for ALP vs ON" - the party named
    the way every figure in the panel names it, not as "Labor" beside a
    column of ALP/L/NP/GRN/ON. One clause per aggregate the wave feeds: the
    implied 2PP wherever the wave's primaries support it – a paired wave's
@@ -2048,10 +2048,11 @@ function EffLines({ eff }) {
     const d = Math.round((e.hi - e.lo) * 10) / 10;
     return d === 0 ? "±0.0" : (d > 0 ? "+" : "−") + Math.abs(d).toFixed(1);
   };
-  /* the row's label already names the implied basis, so an implied clause
-     wears no tag; the tag is the published figure's - "(respondent-
-     allocated)" - and a clause only needs it while an implied clause of the
-     same pairing sits beside it */
+  /* an implied clause wears no tag: implied 2PP is the page's basis, the
+     figure the table shows, so it is the default reading here as it is
+     everywhere else in the panel. The tag is the published figure's -
+     "(respondent-allocated)" - and a clause only needs it while an implied
+     clause of the same pairing sits beside it */
   const respTag = <span className="pd-s-note"> (respondent-allocated)</span>;
   const tppClauses = [
     eff.imp && { e: eff.imp, tag: null },
@@ -2095,11 +2096,11 @@ function EffLines({ eff }) {
   ));
   return (
     <span className="pd-meta-i">
-      {/* the label names the implied basis when the row carries one; a wave
-          that feeds only published aggregates gets the bare label */}
+      {/* one label whatever the row carries: it lists implied AND published
+          clauses side by side, so naming a basis in the label would claim
+          the wrong thing for half of them */}
       <button type="button" className="pd-meta-k hi-term"
-              onClick={() => window.AP.openTerm && window.AP.openTerm("aggregate-effect", "poll breakdown")}>
-        {eff.imp || eff.onimp ? "implied 2PP agg. effect" : "2PP agg. effect"}</button>
+              onClick={() => window.AP.openTerm && window.AP.openTerm("aggregate-effect", "poll breakdown")}>2PP agg. effect</button>
       <span className="pd-meta-v">
         {shareOut ? (prim.t ? (
           <React.Fragment>
