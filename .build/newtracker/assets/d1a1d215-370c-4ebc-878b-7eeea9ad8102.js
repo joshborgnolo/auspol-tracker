@@ -2989,7 +2989,10 @@ function ArchLead({ p, measure, primaryFallback, basis }) {
 // appr). The archive row prints no client and no published DATE in any
 // column at any width, so the meta line owns both outright – left untagged,
 // never width-hidden.
-const signed1 = (v) => (v > 0 ? "+" : "") + v.toFixed(1).replace("-", "\u2212");
+/* a zero is signed "+0.0" like the 2PP agg. effect row beside it: these are
+   measured moves that rounded to nothing, and a bare 0.0 in a column of
+   signed figures looked like a different kind of number */
+const signed1 = (v) => { const d = Math.round(v * 10) / 10; return (d < 0 ? "\u2212" : "+") + Math.abs(d).toFixed(1); };
 function ArchPollDetail({ p, onBack, backLabel }) {
   const { PollLedger, pubStamp, releaseMetaRows, EffLines } = window;
   /* The archive stores the unsure share and its change; the Latest table
