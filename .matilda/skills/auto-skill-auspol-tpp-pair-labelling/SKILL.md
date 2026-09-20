@@ -119,14 +119,22 @@ restore the run-in labels / mute the implied lines):
   gone). A second `<PdSec label={<button className="hi-term" …
   openTerm("implied-2pp", "poll breakdown")>Implied 2PP</button>}>` renders
   when `r.alpImp != null || r.alpOnImp != null`; its lines get
-  `prefixed={x.count > 1}` and `hero={!tcs.length}` — the display size stays
-  with the house pair; a no-pair wave (Newspoll, Resolve, DemosAU) gives it to
-  BOTH re-reads (user: the classic over the ON at body size was "bigger with
-  no good reason" — they are one computation on two tables, not an answer
-  plus a supporting reading).
+  `prefixed={x.count > 1}` and `hero` ALWAYS — the display size lives on BOTH
+  implied re-reads for every wave, and the After-preferences lines are body
+  size (no `hero` prop at all). User, 2026-09-20, in two steps: first "the alp
+  v l/np is bigger than the alp v onp with no good reason" (one computation on
+  two tables, not an answer plus a supporting reading), then "both implied 2pps
+  should be big. the as-published after preferences should be body size" —
+  implied 2PP is the page's basis and the table's figure, so it is the answer
+  the panel was opened for whatever the house printed.
 - Splitting was tried once before and rejected for a "hierarchy clash with the
   section eyebrows"; the run-in labels that replaced it were reverted too. The
   split is what the user picked on 2026-09-20 — leave it unless they say so.
+- `tppHeading(cs)` now returns the constant `"After preferences (as published)"`
+  (user, 2026-09-20) — the old single-contest "Two-party preferred" /
+  "Three-cornered preferred" names are gone; the "(as published)" qualifier is
+  what separates the section from the implied one beneath it. `tppHeading(tcs)`
+  is still the call shape (it is window-exported).
 - template.html, right after `.pd-k`: `.pd-k .hi-term { text-transform:
   inherit; letter-spacing: inherit; }` — Chrome's UA sheet resets both on
   `<button>` and `.hi-term` restores only font/colour, so without it the

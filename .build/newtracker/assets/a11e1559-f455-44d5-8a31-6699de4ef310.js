@@ -1510,14 +1510,15 @@ function tppFlag(r) {
   const f = tppContests(r).map((c) => c.flag).filter(Boolean);
   return f.length ? f.join(" · ") : null;
 }
-/* Heading for the group – names the measure when there is exactly one, and
-   falls back to the CATEGORY otherwise. That matters most when there is
-   nothing to show: Newspoll, Resolve and DemosAU often publish no headline
-   2PP, and "Two-party preferred / No two-party figure published with this
-   poll" announced the very figure it was about to say was missing. */
+/* Heading for the published group. It names the CATEGORY, never the
+   measure – "Two-party preferred / Not published" once announced the very
+   figure it was about to say was missing, and a single pair's own labels
+   already say which matchup it is – and it says "as published" because the
+   implied section beneath it is the page's reading of the same wave: the
+   qualifier is what tells the two apart at a glance. (Takes the contest
+   list for the archive's call shape; the heading no longer varies on it.) */
 function tppHeading(cs) {
-  if (cs.length === 1) return cs[0].kind === "3cp" ? "Three-cornered preferred" : "Two-party preferred";
-  return "After preferences";
+  return "After preferences (as published)";
 }
 /* The after-preferences section's line list: ONLY what the house printed –
    the contests tppContests builds, plus the HOUSE figure where a release
@@ -2295,9 +2296,9 @@ function PollLedger({ r, dirSegments }) {
             is the same question with 2025's flows applied to these
             primaries, so it takes the main pair's exact format and sits
             straight after it, ahead of the ON head-to-heads */}
-        {/* the display size goes to the FIRST head-to-head only: a wave with
-            three matchups has one answer and two supporting readings, and a
-            three-cornered contest has too many figures to carry it */}
+        {/* body size throughout: the display size belongs to the implied
+            section below, the page's own basis, so the house's figures read
+            as the record of what was printed rather than the answer */}
         {/* this section holds what the HOUSE printed and nothing else: the
             page's own re-reads of the primaries go in the implied section
             below, so a wave that printed no pair at all reads "Not
@@ -2306,8 +2307,7 @@ function PollLedger({ r, dirSegments }) {
             Morgan and RedBridge print one) remains spliced after the
             canonical pair inside tppLines. */}
         {tppLines(tcs, r).map((x, i) => (
-          <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt}
-                   hero={i === 0 && x.c.segs.filter((g) => g.value != null).length === 2} />
+          <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt} />
         ))}
       </PdSec>
 
@@ -2316,20 +2316,20 @@ function PollLedger({ r, dirSegments }) {
           their own rather than closing the one above – one flat list left a
           respondent-allocated pair indistinguishable from a computed one.
           The eyebrow is the glossary word itself (the lines' notes then name
-          only their flow basis). The display size stays with the house's
-          pair; only a wave that printed no pair at all (Newspoll, Resolve,
-          DemosAU) lets its re-reads carry it – BOTH of them, since neither
-          is the pollster's answer with the other a supporting reading:
-          they are the same computation on two tables, and one at display
-          size over the other at body size ranked them for no reason. */}
+          only their flow basis). The display size lives HERE, on both
+          re-reads: implied 2PP is the page's basis, the figure every row
+          of the table shows, so it is the answer the panel was opened for
+          whatever the house printed – and the two re-reads are one
+          computation on two tables, not an answer with a supporting
+          reading, so one at display size over the other at body size
+          ranked them for no reason. */}
       {(r.alpImp != null || r.alpOnImp != null) && (
         <PdSec label={
           <button type="button" className="hi-term"
                   onClick={() => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")}>Implied 2PP</button>
         }>
           {impliedLines(r).map((x, i) => (
-            <TppLine key={"i" + i} c={x.c} prefixed={x.count > 1} note={x.note}
-                     hero={!tcs.length} />
+            <TppLine key={"i" + i} c={x.c} prefixed={x.count > 1} note={x.note} hero />
           ))}
         </PdSec>
       )}

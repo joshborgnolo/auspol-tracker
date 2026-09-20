@@ -11647,14 +11647,15 @@ function tppFlag(r) {
   const f = tppContests(r).map(c => c.flag).filter(Boolean);
   return f.length ? f.join(" · ") : null;
 }
-/* Heading for the group – names the measure when there is exactly one, and
-   falls back to the CATEGORY otherwise. That matters most when there is
-   nothing to show: Newspoll, Resolve and DemosAU often publish no headline
-   2PP, and "Two-party preferred / No two-party figure published with this
-   poll" announced the very figure it was about to say was missing. */
+/* Heading for the published group. It names the CATEGORY, never the
+   measure – "Two-party preferred / Not published" once announced the very
+   figure it was about to say was missing, and a single pair's own labels
+   already say which matchup it is – and it says "as published" because the
+   implied section beneath it is the page's reading of the same wave: the
+   qualifier is what tells the two apart at a glance. (Takes the contest
+   list for the archive's call shape; the heading no longer varies on it.) */
 function tppHeading(cs) {
-  if (cs.length === 1) return cs[0].kind === "3cp" ? "Three-cornered preferred" : "Two-party preferred";
-  return "After preferences";
+  return "After preferences (as published)";
 }
 /* The after-preferences section's line list: ONLY what the house printed –
    the contests tppContests builds, plus the HOUSE figure where a release
@@ -12630,8 +12631,7 @@ function PollLedger({
     c: x.c,
     prefixed: x.count > 1 && !x.alt,
     note: x.note,
-    alt: x.alt,
-    hero: i === 0 && x.c.segs.filter(g => g.value != null).length === 2
+    alt: x.alt
   }))), (r.alpImp != null || r.alpOnImp != null) && /*#__PURE__*/React.createElement(PdSec, {
     label: /*#__PURE__*/React.createElement("button", {
       type: "button",
@@ -12643,7 +12643,7 @@ function PollLedger({
     c: x.c,
     prefixed: x.count > 1,
     note: x.note,
-    hero: !tcs.length
+    hero: true
   }))), /*#__PURE__*/React.createElement(PdSec, {
     label: "Preferred PM"
   }, ppms.map((c, i) => {
