@@ -2025,8 +2025,8 @@ function TppLine({ c, prefixed, note, hero, alt }) {
 }
 
 /* The poll's own pull on the figures a reader watches, as one ordinary row
-   of the provenance band: "2PP agg. effect   +0.2 for ALP vs L/NP (implied
-   2PP); +0.1 (respondent-allocated); −0.4 for ALP vs ON" - the party named
+   of the provenance band: "implied 2PP agg. effect   +0.2 for ALP vs L/NP;
+   +0.1 (respondent-allocated); −0.4 for ALP vs ON" - the party named
    the way every figure in the panel names it, not as "Labor" beside a
    column of ALP/L/NP/GRN/ON. One clause per aggregate the wave feeds: the
    implied 2PP wherever the wave's primaries support it – a paired wave's
@@ -2047,18 +2047,14 @@ function EffLines({ eff }) {
     const d = Math.round((e.hi - e.lo) * 10) / 10;
     return d === 0 ? "±0.0" : (d > 0 ? "+" : "−") + Math.abs(d).toFixed(1);
   };
-  /* the implied word carries its glossary meaning wherever it prints */
-  const implied = (
-    <button type="button" className="hi-term"
-            onClick={() => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")}>implied 2PP</button>
-  );
-  /* the 2PP clauses in site order: implied (the default basis) before the
-     published pair, which only needs its "respondent-allocated" tag while
-     it sits beside an implied clause – unambiguous on its own */
-  const impliedTag = <span className="pd-s-note"> ({implied})</span>;
+  /* the row's label already names the implied basis, so an implied clause
+     wears no tag; the tag is the published figure's - "(respondent-
+     allocated)" - and a clause only needs it while an implied clause of the
+     same pairing sits beside it */
+  const respTag = <span className="pd-s-note"> (respondent-allocated)</span>;
   const tppClauses = [
-    eff.imp && { e: eff.imp, tag: impliedTag },
-    eff.lnp && { e: eff.lnp, tag: eff.imp ? <span className="pd-s-note"> (respondent-allocated)</span> : null },
+    eff.imp && { e: eff.imp, tag: null },
+    eff.lnp && { e: eff.lnp, tag: eff.imp ? respTag : null },
   ].filter(Boolean);
   /* when every clause is out of window, the whole row is just the note –
      its in-window wording, without the brackets and without the ±0.0s. A
@@ -2098,14 +2094,17 @@ function EffLines({ eff }) {
   ));
   return (
     <span className="pd-meta-i">
+      {/* the label names the implied basis when the row carries one; a wave
+          that feeds only published aggregates gets the bare label */}
       <button type="button" className="pd-meta-k hi-term"
-              onClick={() => window.AP.openTerm && window.AP.openTerm("aggregate-effect", "poll breakdown")}>2PP agg. effect</button>
+              onClick={() => window.AP.openTerm && window.AP.openTerm("aggregate-effect", "poll breakdown")}>
+        {eff.imp || eff.onimp ? "implied 2PP agg. effect" : "2PP agg. effect"}</button>
       <span className="pd-meta-v">
         {shareOut ? (prim.t ? (
           <React.Fragment>
             {tppList(true)}
-            {eff.onimp && eff.onimp.t && <React.Fragment>; {clause(asThen(eff.onimp), "ON", impliedTag)}</React.Fragment>}
-            {eff.onp && eff.onp.t && <React.Fragment>; {clause(asThen(eff.onp), "ON")}</React.Fragment>}
+            {eff.onimp && eff.onimp.t && <React.Fragment>; {clause(asThen(eff.onimp), "ON")}</React.Fragment>}
+            {eff.onp && eff.onp.t && <React.Fragment>; {clause(asThen(eff.onp), "ON", eff.onimp && eff.onimp.t ? respTag : null)}</React.Fragment>}
             <span className="pd-s-note">, when inside {winSpan(prim.m)}</span>
           </React.Fragment>
         ) : (
@@ -2113,8 +2112,8 @@ function EffLines({ eff }) {
         )) : (
           <React.Fragment>
             {tppList(false)}
-            {eff.onimp && <React.Fragment>; {clause(eff.onimp, "ON", impliedTag)}</React.Fragment>}
-            {eff.onp && <React.Fragment>; {clause(eff.onp, "ON")}</React.Fragment>}
+            {eff.onimp && <React.Fragment>; {clause(eff.onimp, "ON")}</React.Fragment>}
+            {eff.onp && <React.Fragment>; {clause(eff.onp, "ON", eff.onimp ? respTag : null)}</React.Fragment>}
           </React.Fragment>
         )}
       </span>
