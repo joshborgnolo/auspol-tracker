@@ -130,6 +130,9 @@ restore the run-in labels / mute the implied lines):
 - Splitting was tried once before and rejected for a "hierarchy clash with the
   section eyebrows"; the run-in labels that replaced it were reverted too. The
   split is what the user picked on 2026-09-20 — leave it unless they say so.
+- ORDER (user, 2026-09-20): the implied section renders ABOVE the published one
+  — First preferences → After preferences (implied) → After preferences (as
+  published) → Preferred PM. The `lead` prop moved with it (class only, no CSS).
 - `tppHeading(cs)` now returns the constant `"After preferences (as published)"`
   (user, 2026-09-20) — the old single-contest "Two-party preferred" /
   "Three-cornered preferred" names are gone; the "(as published)" qualifier is

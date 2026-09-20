@@ -2290,18 +2290,42 @@ function PollLedger({ r, dirSegments }) {
           ))(segDelta(r.chg, "und"))}
       </PdSec>
 
-      <PdSec label={tppHeading(tcs)} lead>
+      {/* The page's re-reads of this wave's primaries are a different SYSTEM
+          from a figure the pollster published, so they take a section of
+          their own – one flat list left a respondent-allocated pair
+          indistinguishable from a computed one – and it comes FIRST:
+          implied 2PP is the page's basis, the figure every row of the table
+          shows, so it is the answer the panel was opened for whatever the
+          house printed, and the display size lives here on both re-reads
+          (one computation on two tables, not an answer with a supporting
+          reading, so one at display size over the other at body size
+          ranked them for no reason). The eyebrow mirrors the published
+          section's – "(implied)" / "(as published)" – and is itself the
+          implied-2PP glossary link, so the lines' notes name only their
+          flow basis. */}
+      {(r.alpImp != null || r.alpOnImp != null) && (
+        <PdSec label={
+          <button type="button" className="hi-term"
+                  onClick={() => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")}>After preferences (implied)</button>
+        } lead>
+          {impliedLines(r).map((x, i) => (
+            <TppLine key={"i" + i} c={x.c} prefixed={x.count > 1} note={x.note} hero />
+          ))}
+        </PdSec>
+      )}
+
+      <PdSec label={tppHeading(tcs)}>
         {/* name the main pair's basis only when the flows second line joins
             it – a single pair needs no disambiguation. The flows line itself
             is the same question with 2025's flows applied to these
             primaries, so it takes the main pair's exact format and sits
             straight after it, ahead of the ON head-to-heads */}
         {/* body size throughout: the display size belongs to the implied
-            section below, the page's own basis, so the house's figures read
+            section above, the page's own basis, so the house's figures read
             as the record of what was printed rather than the answer */}
         {/* this section holds what the HOUSE printed and nothing else: the
-            page's own re-reads of the primaries go in the implied section
-            below, so a wave that printed no pair at all reads "Not
+            page's own re-reads of the primaries are the implied section
+            above, so a wave that printed no pair at all reads "Not
             published" here (PdSec's fallback) rather than a computed pair
             standing in for one. The house's implied second pair (only Roy
             Morgan and RedBridge print one) remains spliced after the
@@ -2310,30 +2334,6 @@ function PollLedger({ r, dirSegments }) {
           <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt} />
         ))}
       </PdSec>
-
-      {/* The page's re-reads of this wave's primaries are a different SYSTEM
-          from a figure the pollster published, so they take a section of
-          their own rather than closing the one above – one flat list left a
-          respondent-allocated pair indistinguishable from a computed one.
-          The eyebrow mirrors the section above – "(as published)" / "(implied)" –
-          and is itself the implied-2PP glossary link (the lines' notes then name
-          only their flow basis). The display size lives HERE, on both
-          re-reads: implied 2PP is the page's basis, the figure every row
-          of the table shows, so it is the answer the panel was opened for
-          whatever the house printed – and the two re-reads are one
-          computation on two tables, not an answer with a supporting
-          reading, so one at display size over the other at body size
-          ranked them for no reason. */}
-      {(r.alpImp != null || r.alpOnImp != null) && (
-        <PdSec label={
-          <button type="button" className="hi-term"
-                  onClick={() => window.AP.openTerm && window.AP.openTerm("implied-2pp", "poll breakdown")}>After preferences (implied)</button>
-        }>
-          {impliedLines(r).map((x, i) => (
-            <TppLine key={"i" + i} c={x.c} prefixed={x.count > 1} note={x.note} hero />
-          ))}
-        </PdSec>
-      )}
 
       <PdSec label="Preferred PM">
         {ppms.map((c, i) => {
