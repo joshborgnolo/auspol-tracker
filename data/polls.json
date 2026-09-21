@@ -4454,6 +4454,7 @@
       "pollster": "Essential",
       "client": "The Guardian",
       "sample": null,
+      "sampleEff": 645,
       "alp": 26,
       "lnp": 26,
       "grn": 13,
@@ -4464,6 +4465,7 @@
       "tpp_lnp": 50,
       "url": "https://www.theguardian.com/australia-news/2026/sep/02/guardian-essential-poll-one-nation-popularity-slips-albanese-records-lowest-approval-as-prime-minister-ntwnfb",
       "releaseUrl": "https://essentialreport.com.au/reports/01-september-2026",
+      "methodUrl": "https://essentialreport.com.au/wp-content/uploads/2026/09/Essential-Report-Disclosure-Statement-Full-Questionnaire.pdf",
       "assimilated": true
     },
     {

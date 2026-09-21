@@ -112,7 +112,7 @@ Statement randomisation
 
 
 
-Page 2 / 17
+Page 2 / 19
                                                                           Effective
   Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
                                                                           Sample
@@ -169,7 +169,7 @@ Page 2 / 17
 
 
 
-Page 3 / 17
+Page 3 / 19
                                                                           Effective
   Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
                                                                           Sample
@@ -219,7 +219,7 @@ Page 3 / 17
 
 
 
-Page 4 / 17
+Page 4 / 19
                                                                           Effective
   Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
                                                                           Sample
@@ -273,7 +273,7 @@ Page 4 / 17
 
 
 
-Page 5 / 17
+Page 5 / 19
                                                                           Effective
   Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
                                                                           Sample
@@ -329,7 +329,7 @@ Page 5 / 17
 
 
 
-Page 6 / 17
+Page 6 / 19
                                                                           Effective
   Publication   Fieldwork    Fieldwork   Target     Sample   Weighting                Margin
                                                                           Sample
@@ -376,10 +376,13 @@ Page 6 / 17
     28-Jul-26   22-Jul-26    27-Jul-26   National   1,060      76%          802       ±3.4%
 
 
+   01-Sep-26    26-Aug-26    31-Aug-26   National   1,017      63%          645       ±3.9%
 
 
-Page 7 / 17
-Questionnaire Content (22 July 2026)
+
+
+Page 7 / 19
+Questionnaire Content (26 August 2026)
 
 
 SCREENERS
@@ -437,7 +440,7 @@ D3.      In which one of the following areas do you live?
 
 
 
-Page 8 / 17
+Page 8 / 19
          8. South Australia other than Adelaide
          9. Perth
          10. Western Australia other than Perth
@@ -492,7 +495,7 @@ ASK IF Q41=1 or 2
 
 
 
-Page 9 / 17
+Page 9 / 19
 Q21.     If a federal election was held tomorrow, to which party would you give your first preference vote in
          the House of Representatives (Lower House)?
 
@@ -546,7 +549,7 @@ Q24.     Following your first preference vote, which of the following would you 
 
 
 
-Page 10 / 17
+Page 10 / 19
          1. Labor
          2. Liberal/National Coalition
          3. Unsure
@@ -596,7 +599,7 @@ Q17.     At the most recent Federal election (held on 3 May 2025), to which part
 
 
 
-Page 11 / 17
+Page 11 / 19
 AD HOC
 
 
@@ -651,7 +654,7 @@ OPEN ENDED
 
 
 
-Page 12 / 17
+Page 12 / 19
 ASK IF CODE 2 SELECTED AT E563
 
 
@@ -679,107 +682,221 @@ important.
          9. Immigration
          10. Defence and international relations
 
+E0. Are you currently a member or have you ever been a member of any of the following groups?
 
 
-E1029. How would you rate the performance of the Federal Government on the following issues?
-
-         a.    Very poor
-         b.    Quite poor
-         c.    Neither good, nor poor
-         d.    Quite good
-         e.    Very good
-         f.    Unsure
-
-         SINGLE RESPONSE PER STATEMENT. RANDOMISE STATEMENTS
-
-REPEAT CODE FRAME FROM E1096
+         a. Currently a member
+         b. Previously a member
+         c. Never been a member
 
 
-E1184. Still thinking about the Federal Government, how would you rate its performance in each of the
-following areas relating to health services in Australia?
+         SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS 1-9. CAROUSEL
+        DISPLAY
 
-         a.    Very poor
-         b.    Quite poor
-         c.    Neither good, nor poor
-         d.    Quite good
-         e.    Very good
-         f.    Unsure
 
-         1. Access to GPs offering Medicare bulk billing
-         2. Funding of public hospitals
+    1. Active member of a Church
+    2. Business/industry association
+    3. Environment group
+    4. Local community organisation (Lions, Rotary, etc)
+    5. Local Sporting clubs
+    6. Political party
+    7. Professional sporting clubs (AFL, NRL, etc.)
+    8. School council or parents group
+    9. Union
+    10. Other voluntary organisation
 
 
 
-Page 13 / 17
-         3.    Making medicines affordable
-         4.    Managing the NDIS to support people with disability
-         5.    Ensuring specialists’ fees are affordable
-         6.    Promoting a healthier society more broadly
-         7.    Getting emergency care in hospital / urgent care clinics
 
-E924. Using a scale of 0 to 10, where 0 means very unhealthy and 10 means very healthy, how would you
-rate each of the following?
+Page 13 / 19
+E274.     How important are unions for Australian working people today?
 
-         SINGLE RESPONSE. 0-10 SCALE. LABEL END POINTS “0 – Very unhealthy”, “10-Very
-         healthy”. INCLUDE “Unsure” OPTION ON RIGHT HAND SIDE.
 
-RANDOMISE
-     1. The health of the nation (Australians in general)
-     2. The health of your friends and family
-     3. Your own personal health
-
-E1185. In the past 12 months, was there a time when you or a family member in your household needed to
-see each of the following but did not because of the cost?
-
-CARROUSEL WITH FOLLOWING TILES. RANDOMISED.
-
-    1.   Dentist
-    2.   GP
-    3.   Medical specialist
-    4.   Allied health professional (e.g., physio)
-
-         1.    Yes
-         2.    No
-         3.    Unsure
-         4.    Prefer not to say
-
-E1186. Thinking about the future, how confident are you that Australia’s public health system will be able to
-provide you with the care you need, when you need it?
-
-         1.    Very confident
-         2.    Somewhat confident
-         3.    Not very confident
-         4.    Not at all confident
+         SINGLE RESPONSE
+         1.    Very important
+         2.    Quite important
+         3.    Not very important
+         4.    Not at all important
          5.    Unsure
 
-E1187. Data centres are large facilities that store and process the computing power needed for things like
-cloud storage, streaming and Artificial Intelligence (AI). To what extent would you support or oppose a new
-data centre being built in your local area?
 
-         1.    Strongly support
-         2.    Somewhat support
-         3.    Neither support nor oppose
-         4.    Somewhat oppose
-         5.    Strongly oppose
+
+E276.     Overall, would workers be better off or worse off if unions in Australia were stronger?
+
+
+         SINGLE RESPONSE
+         1.    A lot better off
+         2.    A little better off
+         3.    A little worse off
+         4.    A lot worse off
+         5.    Unsure / Makes no difference
+
+
+
+E1189. Do you agree or disagree with the following statements?
+
+
+    1.    Strongly disagree
+    2.    Somewhat disagree
+    3.    Somewhat agree
+    4.    Strongly agree
+    5.    Unsure
+
+
+          SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS. CAROUSEL DISPLAY
+
+
+    a.    I just don’t like joining groups
+    b.    I find it impossible to give my time to things outside of work and home
+    c.    I can’t commit to groups because if don’t work regular hours
+    d.    There are fewer people available to be part of local groups
+    e.    The decline in membership of organisations is not a positive development
+    f.    People just aren’t interested in joining things anymore
+
+
+
+E1190. To what extent do you agree or disagree with the following statements:
+
+
+    1. Workers under 18 should receive superannuation for every hour they work, just like adults
+    2. Australians should be able to access their superannuation to support their financial stability including
+       if they are under financial stress
+    3. Australians should be able to access their superannuation for a house deposit
+
+
+
+Page 14 / 19
+    4. Australians should only be able to access their superannuation at retirement
+    5. Australia should increase the mandatory superannuation contribution for employers to help make
+       workers more secure in retirement
+
+SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS. CAROUSEL DISPLAY
+    1.   Strongly disagree
+    2.   Somewhat disagree
+    3.   Somewhat agree
+    4.   Strongly agree
+    5.   Unsure
+
+
+
+E1191. Thinking about your working life over the next five years, to what extent are you concerned about the
+following?
+
+
+    1.   Not concerned at all
+    2.   Not that concerned
+    3.   Somewhat concerned
+    4.   Very concerned
+    5.   Unsure
+
+
+   SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS. CAROUSEL DISPLAY
+
+
+    a.   Wages not keeping up with the cost of living
+    b.   Housing affordability
+    c.   Job security
+    d.   Artificial intelligence and automation
+    e.   Workload and working hours
+    f.   Having enough superannuation for retirement
+    g.   Workplace safety
+    h.   Finding secure, well-paid work
+    i.   Workers' rights
+    j.   Job satisfaction
+
+
+E1192. How confident are you that current worker and union protections will safeguard jobs as employers
+introduce new AI technologies?
+
+
+    1.   Not confident at all
+    2.   Not that confident
+    3.   Somewhat confident
+    4.   Very confident
+    5.   Unsure
+
+
+
+E1193. To what extent do you agree or disagree with the following statements?
+
+
+
+Page 15 / 19
+         1.    Strongly disagree
+         2.    Somewhat disagree
+         3.    Somewhat agree
+         4.    Strongly agree
+         5.    Unsure
+
+
+   SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS. CAROUSEL DISPLAY
+
+    a) Employers should be required to consult their workers before introducing AI that will alter their jobs.
+    b) Australia should have regulation around how an employer can use AI to automate HR decisions
+       including hiring, firing and performance management
+    c) Australia should not place regulations on employers' use of AI because it will reduce innovation
+
+
+
+E1194. To what extent do you agree/ disagree with the following statement:
+
+
+I want more control over what comes up in my social media feeds
+
+
+    1.   Strongly disagree
+    2.   Somewhat disagree
+    3.   Neither agree nor disagree
+    4.   Somewhat agree
+    5.   Strongly agree
+    6.   Unsure
+
+
+E1195. Over the past few years, do you think violence against women in Australia has:
+
+
+         1.    Increased a lot
+         2.    Increased a little
+         3.    Stayed about the same
+         4.    Decreased a little
+         5.    Decreased a lot
          6.    Unsure
 
 
 
-Page 14 / 17
-E1188. If a data centre were to be built in your local area, which of the following, if any, would you be most
-concerned about? Please rank up to your top 3.
 
-RANK. RANDOMISE
+E1196. Have you seen or heard the term "the manosphere"?
 
-         1.    Its impact on local water supply
-         2.    Its impact on energy demand and electricity prices
-         3.    Noise
-         4.    Its impact on the value of your property
-         5.    Impact on the local environment and wildlife
-         6.    Increased traffic or disruption during the construction
-         7.    General concerns about the growth of AI
-         8.    Other (please specify)
-         9.    I would not have any particular concerns EXCLUSIVE OPTION
+
+         1. Yes, and I could explain what it means
+         2. Yes, but I'm not sure what it means
+         3. No, I haven't heard of it
+
+
+
+
+Page 16 / 19
+E1197. The term manosphere refers to online influencers and communities that promote traditional male
+roles, opposition to feminism and hostility towards women.
+
+To what extent do you agree / disagree with the following statements?
+
+
+      1.   Strongly disagree
+      2.   Somewhat disagree
+      3.   Neither agree nor disagree
+      4.   Somewhat agree
+      5.   Strongly agree
+      6.   Unsure
+
+
+   SINGLE RESPONSE FOR EACH OPTION. RANDOMISE STATEMENTS. CAROUSEL DISPLAY
+
+
+      a.   Online content like this is contributing to violence against women in Australia
+      b.   It's almost impossible for teenage boys in Australia to avoid seeing this kind of content online
+      c.   I am concerned about the influence this type of content is having on someone in my life
+      d.   The concern about online influencers and young men has been exaggerated
 
 
 
@@ -790,41 +907,40 @@ Thank you for your time so far, we only have a few more questions.
 
 
 ASK ALL
-D23.     In what year were you born?
+D23.       In what year were you born?
 
 
-         FOUR DIGIT TEXT BOX. RANGE BETWEEN 1920-2008
+           FOUR DIGIT TEXT BOX. RANGE BETWEEN 1920-2008
 
 
 
 
-D6.      What is the total of all wages/salaries, government benefits, pensions, allowances, and other income
-         that your household usually receives (GROSS – before tax and superannuation deductions)?
+D6.        What is the total of all wages/salaries, government benefits, pensions, allowances, and other income
+           that your household usually receives (GROSS – before tax and superannuation deductions)?
 
 
-         SINGLE RESPONSE
+           SINGLE RESPONSE
 
 
-         1. $3,500 or more per week ($182,000 or more per year)
-         2. $3,000-$3,499 per week ($156,000-$181,999 per year)
-         3. $2,500-$2,999 per week ($130,000-$155,999 per year)
-         4. $2,000-$2,499 per week ($104,000-$129,999 per year)
-         5. $1,500-$1,999 per week ($78,000-$103,999 per year)
-         6. $1,250-$1,499 per week ($65,000-$77,999 per year)
-         7. $1,000-$1,249 per week ($52,000-$64,999 per year)
-         8. $800-$999 per week ($41,600-$51,999 per year)
-         9. $600-$799 per week ($31,200-$41,599 per year)
-         10. $400-$599 per week ($20,800-$31,199 per year)
+           1.   $3,500 or more per week ($182,000 or more per year)
+           2.   $3,000-$3,499 per week ($156,000-$181,999 per year)
+           3.   $2,500-$2,999 per week ($130,000-$155,999 per year)
+           4.   $2,000-$2,499 per week ($104,000-$129,999 per year)
+           5.   $1,500-$1,999 per week ($78,000-$103,999 per year)
+           6.   $1,250-$1,499 per week ($65,000-$77,999 per year)
+           7.   $1,000-$1,249 per week ($52,000-$64,999 per year)
+           8.   $800-$999 per week ($41,600-$51,999 per year)
+           9.   $600-$799 per week ($31,200-$41,599 per year)
+
+
+
+Page 17 / 19
+         10. $400-$599 per week ($20,800-$31,199 per year)
          11. $300-$399 per week ($15,600-$20,799 per year)
          12. $200-$299 per week ($10,400-$15,599 per year)
          13. $1-$199 per week ($1-$10,399 per year)
          14. No income
-
-
-
-
-Page 15 / 17
-         15. Negative income
+         15. Negative income
          16. Prefer not to say
 
 
@@ -874,16 +990,15 @@ D22.     Which of the following best describes your current living situation?
 
 
 
-D25.     Are you currently paying off a mortgage/home loan?
+
+Page 18 / 19
+D25.     Are you currently paying off a mortgage/home loan?
 
 
          SINGLE RESPONSE
 
 
-
-
-Page 16 / 17
-         1. Yes
+         1. Yes
          2. No
 
 
@@ -925,5 +1040,5 @@ D21.     Which of the following applies to you?
 
 
 
-Page 17 / 17
+Page 19 / 19
 
