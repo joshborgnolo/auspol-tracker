@@ -748,9 +748,14 @@ for (const p of D.polls) {
   }
   if (p.sample == null) {
     const rebuilt = {};
-    for (const [k, v] of Object.entries(p)) { rebuilt[k] = v; if (k === "client") rebuilt.sample = want; }
+    for (const [k, v] of Object.entries(p)) {
+      /* skip the stale key: a "sample": null sitting after "client" would
+         copy over the splice's own value and silently erase the write */
+      if (k === "sample" || k === "samplePending") continue;
+      rebuilt[k] = v;
+      if (k === "client") rebuilt.sample = want;
+    }
     if (!("sample" in rebuilt)) rebuilt.sample = want;
-    delete rebuilt.samplePending;
     for (const k of Object.keys(p)) delete p[k];
     Object.assign(p, rebuilt);
     samples.push(`${p.date} ${p.pollster}: sample := ${want} (${cands[0].src})`);
@@ -778,6 +783,10 @@ if (stamped.length || methods.length || samples.length) {
   const txt = readFileSync(OUT, "utf8");
   const trailingNl = txt.endsWith("\n") ? "\n" : "";
   const next = JSON.stringify(D, null, 2) + trailingNl;
+  /* changed:true while emitting byte-identical content means a mutation
+     failed to land (a pass bug). Fail loudly instead of stalling the
+     updater on "nothing to commit". */
+  if (next === txt) statusAndExit({ ...out, guard: "no-op write" }, 2);
   writeFileSync(OUT + ".tmp", next);
   renameSync(OUT + ".tmp", OUT);
 }

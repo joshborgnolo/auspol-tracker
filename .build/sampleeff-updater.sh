@@ -74,8 +74,9 @@ fi
 
 git add data/polls.json .build/sampleeff-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
 # gen-data reweights from sampleEff where present, so the derived dataset and
-# every inlined script can move too
-git add assets/ >> "$LOG" 2>&1 || { log "FAIL git add assets"; exit 1; }
+# every inlined script can move too (the built assets/ and the compiled
+# sources under .build/newtracker/assets/)
+git add assets/ .build/newtracker/assets/ >> "$LOG" 2>&1 || { log "FAIL git add assets"; exit 1; }
 # Staging diagnostics: samples-pass writes were vanishing before commit while
 # the run log showed samples:1; pin down where the working tree stands here.
 log "pre-commit porcelain: $(git status --porcelain | head -20 | tr '\n' ';')"
@@ -85,7 +86,7 @@ if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! push_main "$MSG" data/polls.json .build/sampleeff-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json assets/; then
+if ! push_main "$MSG" data/polls.json .build/sampleeff-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json assets/ .build/newtracker/assets/; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"
