@@ -2624,7 +2624,7 @@ function PastCyclesView() {
     <div className="view view-cycles">
       <div className="view-intro">
         <p className="view-lede">
-          Every federal term since 1987, lined up on its election day so each government’s
+          Every federal term since 1972, lined up on its election day so each government’s
           run can be read off the same clock. The past terms stand together as a band –
           outer edge the middle 80% of them, darker half the middle 50%, dotted line their
           mean – drawn over the months each term was actually in office, and going fainter
