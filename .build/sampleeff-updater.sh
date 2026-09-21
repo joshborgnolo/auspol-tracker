@@ -47,6 +47,13 @@ case "$LAST_LINE" in
   *) log "FAIL extract (no SAMPLEEFF_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
 
+# Relay the extractor's per-item lines into the job log: stdout is captured
+# in EXTRACT_OUT, so in CI these are otherwise invisible and a samples-pass
+# write that fails to land leaves no trace.
+echo "$EXTRACT_OUT" | grep -E '^  (stamp|method|sample|ERROR|AMBIGUOUS)' | while IFS= read -r l; do
+  log "extract:$l"
+done
+
 if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   # Nothing new stamped: no rebuild, no commit. Rows still on the derived
   # convention stay there until the house's own statement shows up.
@@ -69,6 +76,10 @@ git add data/polls.json .build/sampleeff-src/ index.html feed.xml sitemap.xml ro
 # gen-data reweights from sampleEff where present, so the derived dataset and
 # every inlined script can move too
 git add assets/ >> "$LOG" 2>&1 || { log "FAIL git add assets"; exit 1; }
+# Staging diagnostics: samples-pass writes were vanishing before commit while
+# the run log showed samples:1; pin down where the working tree stands here.
+log "pre-commit porcelain: $(git status --porcelain | head -20 | tr '\n' ';')"
+log "staged: $(git diff --cached --stat | tail -8 | tr '\n' ';')"
 MSG="Update effective sample sizes $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
