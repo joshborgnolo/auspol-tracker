@@ -4453,7 +4453,7 @@
       "dateStart": "2026-08-26",
       "pollster": "Essential",
       "client": "The Guardian",
-      "sample": null,
+      "sample": 1017,
       "sampleEff": 645,
       "alp": 26,
       "lnp": 26,
