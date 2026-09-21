@@ -585,7 +585,7 @@ function eq(name, got, want) {
   const pmItems = ticker(pmRows, pm.t0, pm.nowMs);
   console.log(`\n${am.label}:  ticker → ${fmtT(amItems)}`);
   console.log(`${pm.label}:  ticker → ${fmtT(pmItems)}`);
-  eq("9am, 8h out, counts the wait", amItems.some((i) => i.firm === "Roy Morgan" && i.when === "in 8 hours"), true);
+  eq("9am, 8h out, counts the wait", amItems.some((i) => i.firm === "Roy Morgan" && i.when === "8 hours"), true);
   eq("9am panel counts it too", (amPanel || "").startsWith("in 8 hours"), true);
   eq("5pm: overdue, not missed", [firm(pmRows, "Roy Morgan") && firm(pmRows, "Roy Morgan").missed,
     !!(firm(pmRows, "Roy Morgan") && firm(pmRows, "Roy Morgan").overdue)], [false, true]);
@@ -593,11 +593,12 @@ function eq(name, got, want) {
 }
 
 // S10 – the hours countdown's edges, on a world with Resolve's release hour
-// pinned to 5pm (1020). Slot day, 7h out: "in 7 hours", and the panel's
-// one-sided tail keeps its spelled-out unit behind it. 20 minutes out the
-// label drops to "in 20 mins". Both stay inside the slot's own day: hours
-// never cross midnight (a 1am house the evening before still reads
-// "tomorrow"), and an untimed house is left on "today" all day.
+// pinned to 5pm (1020). Slot day, 7h out: the bar reads "7 hours" bare while
+// the panel keeps "in 7 hours", its one-sided tail keeping the spelled-out
+// unit behind it. 20 minutes out the bar's label drops to "20 mins". Both
+// stay inside the slot's own day: hours never cross midnight (a 1am house
+// the evening before still reads "tomorrow"), and an untimed house is left
+// on "today" all day.
 {
   const cadT = JSON.parse(JSON.stringify(cad));
   cadT.find((c) => c.pollster === "Resolve").releaseMins = 1020;
@@ -608,7 +609,7 @@ function eq(name, got, want) {
     const rows = project(cadT, t0, nowMs);
     const items = ticker(rows, t0, nowMs);
     console.log(`\n${label}:  ticker → ${fmtT(items)}`);
-    eq("7h out on the bar", items.some((i) => i.firm === "Resolve" && i.when === "in 7 hours"), true);
+    eq("7h out on the bar", items.some((i) => i.firm === "Resolve" && i.when === "7 hours"), true);
     eq("panel counts it, tail keeps its unit", panelWhen(firm(rows, "Resolve")), "in 7 hours (or 7 days)");
   }
   {
@@ -616,7 +617,7 @@ function eq(name, got, want) {
     const rows = project(cadT, t0, nowMs);
     const items = ticker(rows, t0, nowMs);
     console.log(`\n${label}:  ticker → ${fmtT(items)}`);
-    eq("last hour counts minutes", items.some((i) => i.firm === "Resolve" && i.when === "in 20 mins"), true);
+    eq("last hour counts minutes", items.some((i) => i.firm === "Resolve" && i.when === "20 mins"), true);
     eq("panel minutes match", panelWhen(firm(rows, "Resolve")), "in 20 mins (or 7 days)");
   }
   // the day before at 11pm an hour-scale wait is STILL the next day's: the
