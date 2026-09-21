@@ -775,15 +775,16 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   /* A phone column renders the wide desktop viewBox about 150px tall; the
      trend needs vertical room more than it needs a familiar aspect ratio. */
   const narrow = useNarrow();
-  const [morph, setMorph] = useState(null);        // { from, to, t }
+  const [morph, setMorph] = useState(null);        // { from, to, fromBasis, toBasis, fromDomain, t }
   const morphRaf = useRef(0);
-  /* Basis flips get the labels' glide without the line blend: the window
-     slides from whatever is on screen to the new basis's auto-fit, ticks
-     enumerated from the destination so their VALUES hold still (the matchup
-     morph's own trick) - only positions move. Lines/dots swap instantly,
-     as they always have. */
-  const [basisMorph, setBasisMorph] = useState(null); // { from: [lo, hi], t }
-  const basisRaf = useRef(0);
+  /* One morph state drives BOTH switchers: a matchup switch lerps between
+     two matchups' series at the current basis, a basis switch lerps between
+     the two bases' series of the SAME matchup (fromBasis -> toBasis, from/to
+     both the current matchup id, fromDomain seeded from whatever window is
+     on screen so interrupting a morph keeps the glide continuous). The
+     flipped-state invariant applies to the basis fields exactly as it does
+     to from/to: state has ALREADY flipped when the frames render, so every
+     from-scene read must name its basis explicitly. */
   /* The basis our two "real-question" contests are displayed on, owned in
      App and handed down: "imp" = implied preference flows (every poll's
      primaries through one fixed flow table; the site's DEFAULT on both
@@ -800,7 +801,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   const impOnOffered = D.synthOn && D.synthOn.length > 1 && !!D.latest.onImp;
   const impOnBasis = impOnOffered && basis === "imp" && matchup === "alp_on";
   const [showSynth, setShowSynth] = useState(false);
-  React.useEffect(() => () => { cancelAnimationFrame(morphRaf.current); cancelAnimationFrame(basisRaf.current); }, []);
+  React.useEffect(() => () => { cancelAnimationFrame(morphRaf.current); }, []);
   /* The month clause's caveat shows "the margin" until the note no longer
      fits beside the delta chip - then, and only then, it shortens to
      "margin". Measured, not breakpointed: the wrap point depends on the
@@ -847,8 +848,6 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
     const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (id === from || still || !MATCHUPS[from] || !MATCHUPS[id]) { setMorph(null); return; }
     cancelAnimationFrame(morphRaf.current);
-    setBasisMorph(null);                                   // a basis slide, if running, lands
-    cancelAnimationFrame(basisRaf.current);
     const t0 = performance.now();
     setMorph({ from, to: id, t: 0 });
     const step = (now) => {
@@ -859,30 +858,31 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
     };
     morphRaf.current = requestAnimationFrame(step);
   };
-  /* A basis flip shares the matchup morph's clock but animates ONLY the
-     window: the lines and dots belong to whichever series each basis
-     publishes and swap instantly (there is no canonical interpolation
-     between the pollsters' own aggregate and the implied series), while
-     the axis labels get the same glide the matchup morph gives them. The
-     slide's start is whatever window this render has on screen, so a flip
-     mid-matchup-morph continues smoothly from the interpolated window. */
+  /* A basis flip IS the matchup morph, confined to one matchup: the implied
+     and published lines reshape into each other point-for-point on the
+     shared month grid, the poll dots travel between the two readings of the
+     same fieldwork, and the window glides between the two auto-fits - the
+     labels keep their destination VALUES and only positions travel. The
+     morph carries both bases because the basis state has already flipped
+     when the frames render; fromDomain seeds from whatever window is on
+     screen, so a flip that interrupts a matchup morph continues smoothly
+     from the interpolated window. */
   const chooseBasis = () => {
-    const from = yDomain;
-    setBasis((basis || "imp") === "imp" ? "resp" : "imp");
-    setMorph(null);                                        // a matchup blend, if running, lands
-    cancelAnimationFrame(morphRaf.current);
+    const bFrom = basis || "imp", bTo = bFrom === "imp" ? "resp" : "imp";
+    const fromDomain = morph ? yDomain : null;
+    setBasis(bTo);
+    cancelAnimationFrame(morphRaf.current);                // a morph, if running, lands
     const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (still) { setBasisMorph(null); return; }
-    cancelAnimationFrame(basisRaf.current);
+    if (still) { setMorph(null); return; }
     const t0 = performance.now();
-    setBasisMorph({ from, t: 0 });
+    setMorph({ from: matchup, to: matchup, fromBasis: bFrom, toBasis: bTo, fromDomain, t: 0 });
     const step = (now) => {
       const raw = Math.min(1, (now - t0) / MORPH_MS);
-      if (raw >= 1) { setBasisMorph(null); return; }       // land on the real window
-      setBasisMorph({ from, t: MORPH_EASE(raw) });
-      basisRaf.current = requestAnimationFrame(step);
+      if (raw >= 1) { setMorph(null); return; }            // land on the real thing
+      setMorph({ from: matchup, to: matchup, fromBasis: bFrom, toBasis: bTo, fromDomain, t: MORPH_EASE(raw) });
+      morphRaf.current = requestAnimationFrame(step);
     };
-    basisRaf.current = requestAnimationFrame(step);
+    morphRaf.current = requestAnimationFrame(step);
   };
 
   /* The basis-COMPARISON switch has ONE home, beneath the chart legend, on
@@ -927,10 +927,14 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
      below takes iDataOf/iScatOf rather than the matchup's own entries.
      impData is computed whenever the basis is imp at all – NOT only while
      the classic contest is the one on screen – so a morph AWAY from it
-     still leaves on the implied line it was set in. */
-  const impData = impOffered && basis === "imp"
+     still leaves on the implied line it was set in. impDataFor(b) computes
+     the same view for a NAMED basis: a morph's from-scene reads pass
+     morph.fromBasis, because the state has already flipped to the
+     destination when every frame renders. */
+  const impDataFor = (b) => (impOffered && (b === undefined ? basis : b) === "imp")
     ? D.synth2pp.map((d) => ({ ym: d.ym, x: d.x, a: d.alp, b: d.lnp, ci95: d.ci95, k: d.k }))
     : null;
+  const impData = impDataFor();
   const impScatter = (p) => (p.alpImp == null ? null : [
     { y: p.alpImp, color: "var(--alp)", label: "ALP implied" },
     { y: +(100 - p.alpImp).toFixed(1), color: "var(--lnp)", label: "L/NP implied" },
@@ -942,22 +946,23 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
      matchup has already flipped when a morph AWAY from this contest renders,
      so a matchup-gated impOnData would vanish mid-morph - ptsOf/domainOf see
      the published series from frame zero and the y-window never travels. */
-  const impOnData = impOnOffered && basis === "imp"
+  const impOnDataFor = (b) => (impOnOffered && (b === undefined ? basis : b) === "imp")
     ? D.synthOn.map((d) => ({ ym: d.ym, x: d.x, a: d.a, b: d.b, ci95: d.ci95, k: d.k }))
     : null;
+  const impOnData = impOnDataFor();
   const impOnScatter = (p) => (p.alpOnImp == null ? null : [
     { y: p.alpOnImp, color: "var(--alp)", label: "ALP implied" },
     { y: +(100 - p.alpOnImp).toFixed(1), color: "var(--onp)", label: "ON implied" },
   ]);
-  const iDataOf = (id) => (
-    (id === "alp_lnp" && impData) ? impData :
-    (id === "alp_on" && impOnData) ? impOnData : MATCHUPS[id].data
-  );
-  const iScatOf = (id) => (
-    (id === "alp_lnp" && impData) ? impScatter :
-    (id === "alp_on" && impOnData) ? impOnScatter : MATCHUPS[id].scatter
-  );
-  const ptsOf = (id) => filterPts(iDataOf(id), xDomain[0]);
+  const iDataOf = (id, b) => {
+    const imp = (id === "alp_lnp" && impDataFor(b)) || (id === "alp_on" && impOnDataFor(b));
+    return imp || MATCHUPS[id].data;
+  };
+  const iScatOf = (id, b) => {
+    const imp = (id === "alp_lnp" && impDataFor(b)) || (id === "alp_on" && impOnDataFor(b));
+    return imp ? (id === "alp_on" ? impOnScatter : impScatter) : MATCHUPS[id].scatter;
+  };
+  const ptsOf = (id, b) => filterPts(iDataOf(id, b), xDomain[0]);
   const pts = ptsOf(matchup);
   /* Both matchups on ONE grid of months, each holding its own end value across
      the months the other one runs for - so the two paths carry the same shape
@@ -967,7 +972,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
      back out when you switch away. */
   const blend = (() => {
     if (!morph) return null;
-    const A = ptsOf(morph.from), B = ptsOf(morph.to);
+    // each scene is drawn on ITS basis: a matchup morph reads the current
+    // basis both ways (fromBasis undefined → same scene), a basis flip
+    // pins from/to to their own bases while from/to matchup ids coincide
+    const A = ptsOf(morph.from, morph.fromBasis), B = ptsOf(morph.to, morph.toBasis);
     if (!A.length || !B.length) return null;
     const t = morph.t, lerp = (p, q) => p + (q - p) * t;
     const index = (arr) => { const o = {}; arr.forEach((d) => (o[d.ym] = d)); return o; };
@@ -1032,10 +1040,10 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   // Driven by the active matchup's own accessor – a poll that didn't publish
   // THIS head-to-head is simply skipped, which is why the ON matchups show
   // fewer dots rather than none.
-  const cloudFor = (id) => (!showScatter ? [] : D.individualPolls
+  const cloudFor = (id, b) => (!showScatter ? [] : D.individualPolls
     .filter((p) => p.x >= xDomain[0] && p.x <= xDomain[1])
     .flatMap((p) => {
-      const pair = iScatOf(id)(p);
+      const pair = iScatOf(id, b)(p);
       // `side` 0 is the Labor-side reading and 1 the rival's – with the poll's
       // own identity, that is how a dot recognises itself in the other matchup
       return pair ? pair.map((s, side) => ({ x: p.x, y: s.y, color: s.color, label: s.label, meta: p, side })) : [];
@@ -1057,13 +1065,15 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   const morphClouds = React.useMemo(() => {
     if (!morph) return null;
     const key = (d) => d.meta.pollster + "|" + d.meta.released + "|" + d.side;
-    const A = cloudFor(morph.from), B = cloudFor(morph.to);
+    const A = cloudFor(morph.from, morph.fromBasis), B = cloudFor(morph.to, morph.toBasis);
     const ia = new Map(A.map((d) => [key(d), d])), ib = new Map(B.map((d) => [key(d), d]));
     const travel = [], leaving = [], arriving = [];
     ia.forEach((d, k) => (ib.has(k) ? travel.push([d, ib.get(k)]) : leaving.push(d)));
     ib.forEach((d, k) => { if (!ia.has(k)) arriving.push(d); });
     return { travel, leaving, arriving };
-  }, [morph ? morph.from : null, morph ? morph.to : null, rangeId, showScatter, basis]);
+  }, [morph ? morph.from : null, morph ? morph.to : null,
+      morph ? morph.fromBasis : null, morph ? morph.toBasis : null,
+      rangeId, showScatter, basis]);
 
   const scatter = morphClouds ? morphClouds.arriving : settledCloud;
   const scatterOut = morphClouds ? morphClouds.leaving : [];
@@ -1187,14 +1197,14 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   // vertical clip is the svg, not the domain, so a window fitted to the
   // lines alone would strand outlying polls outside the plot. The pad is a
   // live dot's radius in data units, so an extreme reading isn't shaved.
-  const domainOf = (id) => {
+  const domainOf = (id, b) => {
     const M = MATCHUPS[id], v = [];
-    iDataOf(id).forEach((d) => {
+    iDataOf(id, b).forEach((d) => {
       v.push(d.a, d.b);
       if (d.ci95 != null) v.push(d.a - d.ci95, d.a + d.ci95, d.b - d.ci95, d.b + d.ci95);
     });
     D.individualPolls.forEach((p) => {
-      const pair = iScatOf(id)(p);
+      const pair = iScatOf(id, b)(p);
       if (pair) pair.forEach((s) => v.push(s.y));
     });
     // whichever series the compare overlay draws rides the same window, or
@@ -1210,12 +1220,11 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   // ticks come from the TARGET window so their number holds still while the
   // window itself slides; today the Labor matchups share 40–60 and nothing moves
   const yDomain = blend
-    ? (() => { const f = domainOf(morph.from), t = morph.t;
+    ? (() => { // a basis morph carries the actual on-screen window, which a
+               // recomputed from-domain may no longer equal mid-window-phase
+               const f = morph.fromDomain || domainOf(morph.from, morph.fromBasis), t = morph.t;
                return [f[0] + (yTarget[0] - f[0]) * t, f[1] + (yTarget[1] - f[1]) * t]; })()
-    : basisMorph
-      ? (() => { const f = basisMorph.from, t = basisMorph.t;
-                 return [f[0] + (yTarget[0] - f[0]) * t, f[1] + (yTarget[1] - f[1]) * t]; })()
-      : yTarget;
+    : yTarget;
   const yTicks = [];
   for (let v = yTarget[0]; v <= yTarget[1]; v += 5) if (v > yTarget[0] && v < yTarget[1]) yTicks.push(v);
   const lead = +(latest.a - latest.b).toFixed(1);
