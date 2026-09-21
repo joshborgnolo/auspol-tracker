@@ -4588,6 +4588,29 @@
       "tpp_alp": null,
       "tpp_lnp": null,
       "url": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455"
+    },
+    {
+      "date": "2026-09-20",
+      "published": "2026-09-21T15:56",
+      "dateStart": "2026-09-14",
+      "pollster": "Roy Morgan",
+      "client": "—",
+      "sample": 1561,
+      "undecided": 1,
+      "alp": 25,
+      "lnp": 21.5,
+      "grn": 15.5,
+      "onp": 25.5,
+      "ind": 12.5,
+      "oth": null,
+      "tpp_alp": 53,
+      "tpp_lnp": 47,
+      "tpp_flows": 52,
+      "lnpSplit": {
+        "Lib": 19.5,
+        "Nat": 2
+      },
+      "url": "https://www.roymorgan.com/findings/10353-federal-voting-intention-september-21-2026"
     }
   ],
   "ppm": [
@@ -7439,6 +7462,12 @@
       "date": "2026-09-13",
       "firm": "Roy Morgan",
       "alpVsOnp_alp": 54.5,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-09-20",
+      "firm": "Roy Morgan",
+      "alpVsOnp_alp": 54,
       "lnpVsOnp_lnp": null
     }
   ],
