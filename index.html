@@ -14008,12 +14008,13 @@ function NextPollTicker({
       const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
       /* The same hour that lets the slot say "any moment now" lets the wait
          before it count itself: a house with a measured (or declared) hour
-         and under twelve of them to go reads "in 5 hours" - minutes in the
-         last hour, both from tnUntil - instead of the vaguer "today". A
-         house nobody has timed has no hour to count to and keeps "today",
-         and twelve hours plus out the day is still the honest claim. */
+         and under twelve of them to go reads "5 hours" - minutes in the
+         last hour, both from tnUntil, bare like the day counts beside it
+         ("2 days") - instead of the vaguer "today". A house nobody has
+         timed has no hour to count to and keeps "today", and twelve hours
+         plus out the day is still the honest claim. */
       const left = dueMs - nowMs;
-      when = days === 0 ? dueMs <= nowMs ? "any moment now" : r.releaseMins != null && Math.round(left / 3600000) < 12 ? "in " + tnUntil(left) : "today" : days === 1 ? "tomorrow"
+      when = days === 0 ? dueMs <= nowMs ? "any moment now" : r.releaseMins != null && Math.round(left / 3600000) < 12 ? tnUntil(left) : "today" : days === 1 ? "tomorrow"
       /* exact day counts past "tomorrow" - the panel's own phrasing
          ("in 12 days") - so the bar and the panel name the same slot
          the same way; tnUntil's week rounding ("2 weeks") made them

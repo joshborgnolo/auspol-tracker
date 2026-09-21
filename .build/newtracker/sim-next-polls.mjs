@@ -207,11 +207,12 @@ function ticker(rows, t0, nowMs) {
         // an untimed house keeps its whole day (the projection's 24*60)
         const dueMs = t.at + (r.releaseMins == null ? 24 * 60 : r.releaseMins) * 60000;
         // a measured/declared hour counts the wait itself under 12h of
-        // runway ("in 5 hours"); untimed or further out keeps "today"
+        // runway ("5 hours", bare like the day counts); untimed or further
+        // out keeps "today"
         const left = dueMs - nowMs;
         when = days === 0 ? (dueMs <= nowMs ? "any moment now"
              : r.releaseMins != null && Math.round(left / 3600000) < 12
-             ? "in " + tnUntil(left) : "today")
+             ? tnUntil(left) : "today")
              : days === 1 ? "tomorrow"
              : days + " days";
       } else {
