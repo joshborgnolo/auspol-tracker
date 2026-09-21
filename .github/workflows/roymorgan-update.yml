@@ -20,8 +20,8 @@ name: roymorgan-update
 
 on:
   schedule:
-    # Mon 16:05-17:45 AEST, every ~10 min (06:05-07:45 UTC) — release window
-    - cron: '5,15,25,35,45,55 6 * * 1'
+    # Mon 16:00-17:45 AEST, every ~10 min (06:00-07:45 UTC) — release window
+    - cron: '0,5,15,25,35,45,55 6 * * 1'
     - cron: '5,15,25,35,45 7 * * 1'
     # Mon evening follow-ups AEST (08:00, 12:30 UTC)
     - cron: '0 8 * * 1'
