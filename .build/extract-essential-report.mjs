@@ -71,13 +71,30 @@
 // publish date to its wave page link. The CSV has no room for URLs, so
 // .build/assimilate-essential-vi.mjs resolves a new tracker row's
 // `releaseUrl` against that index instead.
+//
+// PREFLIGHT (2026-09-22): the full crawl (~1,050 WordPress pages + every
+// Flourish chart, ~10 minutes, and 10 minutes holding the serialised
+// writers queue — what got np-score cancelled) runs only when there is a
+// reason to. The two REST listings the crawl starts from carry `modified`
+// for every report and question page; their (id, modified) pairs are
+// hashed into .build/essential-src/site-fingerprint.json (committed by the
+// wrapper). A run whose fingerprint matches the saved one SKIPS the crawl —
+// unless the newest report post is under RECENT_REPORT_DAYS old, because a
+// report page can be published before its Flourish charts carry the wave,
+// and `modified` on the post would not move when the chart data does.
+// --force always crawls. A skipped run still refreshes the report index
+// and reports latest_report_date, which the skip-confirm agent needs, and
+// says `crawl: "skipped"` in its status.
 import { mkdirSync, readFileSync, writeFileSync, renameSync, existsSync } from "node:fs";
+import { createHash } from "node:crypto";
 import vm from "node:vm";
 
 const argv = process.argv.slice(2);
 const CHECK = argv.includes("--check");
 const FORCE = argv.includes("--force");
 const OUT = "data/essential-report.csv";
+const FINGERPRINT = ".build/essential-src/site-fingerprint.json";
+const RECENT_REPORT_DAYS = 3; // always crawl this long after a new report post
 const FETCH_TIMEOUT_MS = 30_000;
 const FETCH_TRIES = 24;     // generous: sucuri throttles bursts, we wait it out
 const CONCURRENCY = 3;      // wordpress pages
@@ -362,9 +379,78 @@ function rowsFromChart(viz, card) {
   return rows;
 }
 
+/* Report index for the assimilator: publish date -> wave page link. A
+   companion of the CSV rather than a column in it (the CSV schema stays
+   byte-compatible with the Resolve one), written whenever the index drifts
+   rather than only when the CSV did — a renamed slug otherwise never lands.
+   Raw `modified` isn't in the index, so date+link pairs are the comparison;
+   that's all the assimilator consumes. Needs only the listing, so it runs
+   before the crawl decision. */
+function writeReportIndex(reports) {
+  const INDEX = ".build/essential-src/report-index.json";
+  const indexJson = JSON.stringify(
+    Object.fromEntries(
+      reports.map((r) => [r.date.slice(0, 10), r.link]).sort(([a], [b]) => a[0].localeCompare(b[0])),
+    ),
+    null, 2,
+  ) + "\n";
+  const indexChanged = !existsSync(INDEX) || readFileSync(INDEX, "utf8") !== indexJson;
+  if (CHECK) {
+    if (indexChanged) console.log(`--check: ${INDEX} would be updated`);
+  } else if (indexChanged) {
+    mkdirSync(".build/essential-src", { recursive: true });
+    writeFileSync(INDEX + ".tmp", indexJson);
+    renameSync(INDEX + ".tmp", INDEX);
+    console.log(`updated ${INDEX}: ${reports.length} reports`);
+  } else console.log(`no change: ${INDEX} unchanged (${reports.length} reports)`);
+}
+
+// Newest report post by publish date — the skip-confirm agent
+// (.build/essential-confirm-skip.mjs) reads this as positive evidence that
+// the index was fetched and holds no release newer than a skipped slot.
+function latestReportOf(reports) {
+  const latest = reports.reduce((a, r) => (a && Date.parse(a.date) > Date.parse(r.date) ? a : r), null);
+  return latest ? { date: latest.date, title: stripTags(latest.title?.rendered ?? latest.title ?? "") } : null;
+}
+
 try {
   const [reports, questions] = await Promise.all([listPosts("reports"), listPosts("questions")]);
   console.log(`site: ${reports.length} reports, ${questions.length} question pages`);
+  writeReportIndex(reports);
+  const latestReport = latestReportOf(reports);
+
+  // ---- preflight: is there any reason to crawl? -------------------------
+  const fingerprint = createHash("sha256").update(JSON.stringify({
+    reports: reports.map((r) => [r.id, r.modified]).sort((a, b) => a[0] - b[0]),
+    questions: questions.map((q) => [q.id, q.modified]).sort((a, b) => a[0] - b[0]),
+  })).digest("hex");
+  const saved = existsSync(FINGERPRINT) ? JSON.parse(readFileSync(FINGERPRINT, "utf8")) : null;
+  const latestAgeDays = latestReport ? (Date.now() - Date.parse(latestReport.date)) / 86400000 : Infinity;
+  const reason = FORCE ? "--force"
+    : !existsSync(OUT) ? "no CSV yet"
+    : !saved ? "no saved fingerprint"
+    : saved.fingerprint !== fingerprint ? "site listing changed (a post added or modified)"
+    : latestAgeDays <= RECENT_REPORT_DAYS ? `newest report is ${latestAgeDays.toFixed(1)}d old (release window)`
+    : null;
+  if (!reason) {
+    const existingCount = readFileSync(OUT, "utf8").trim().split("\n").length - 1;
+    console.log(`preflight: site listing unchanged since ${saved.at} and newest report ${latestAgeDays.toFixed(1)}d old — crawl skipped`);
+    console.log(`ESSENTIAL_STATUS ${JSON.stringify({
+      changed: false,
+      check: CHECK,
+      crawl: "skipped",
+      reports: reports.length,
+      question_pages: questions.length,
+      rows_kept: existingCount,
+      rows_total: existingCount,
+      new_dates: [],
+      fingerprint_at: saved.at,
+      latest_report_date: latestReport ? latestReport.date : null,
+      latest_report_title: latestReport ? latestReport.title : null,
+    })}`);
+    process.exit(0);
+  }
+  console.log(`preflight: crawling — ${reason}`);
 
   // Crawl report pages (card structure) and question pages (bare embeds).
   // Individual page failures are tolerated (logged + counted in the status);
@@ -453,43 +539,30 @@ try {
     console.log(`updated ${OUT}: kept ${existingRows.length} existing rows, added ${rowsOut.length}, wrote ${merged.length} total (${existingRows.length + rowsOut.length - merged.length} dupes)`);
   } else console.log(`no change: ${OUT} unchanged (${merged.length} rows)`);
 
-  // Report index for the assimilator: publish date -> wave page link. A
-  // companion of the CSV rather than a column in it (the CSV schema stays
-  // byte-compatible with the Resolve one), written whenever the index
-  // drifts rather than only when the CSV did — a renamed slug otherwise
-  // never lands. Raw `modified` isn't in the fetch fields, so date+link
-  // pairs are the comparison; that's all the assimilator consumes.
-  const INDEX = ".build/essential-src/report-index.json";
-  const indexJson = JSON.stringify(
-    Object.fromEntries(
-      reports.map((r) => [r.date.slice(0, 10), r.link]).sort(([a], [b]) => a[0].localeCompare(b[0])),
-    ),
-    null, 2,
-  ) + "\n";
-  const indexChanged = !existsSync(INDEX) || readFileSync(INDEX, "utf8") !== indexJson;
-  if (CHECK) {
-    if (indexChanged) console.log(`--check: ${INDEX} would be updated`);
-  } else if (indexChanged) {
-    mkdirSync(".build/essential-src", { recursive: true });
-    writeFileSync(INDEX + ".tmp", indexJson);
-    renameSync(INDEX + ".tmp", INDEX);
-    console.log(`updated ${INDEX}: ${reports.length} reports`);
-  } else console.log(`no change: ${INDEX} unchanged (${reports.length} reports)`);
-
   const dates = [...new Set(rowsOut.map(r => r.date).filter(d => /^\d{4}-\d{2}-\d{2}$/.test(d)))].sort();
   console.log(`datasets: ${new Set(rowsOut.map(r => r.dataset)).size} | charts: ${counters.charts} | empty sheets skipped: ${counters.emptySheets} | non-numeric cells skipped: ${counters.nonNumericCells}`);
   console.log(`date labels kept verbatim (unparseable): ${counters.verbatimDates.size ? [...counters.verbatimDates].slice(0, 20).join("; ") : "none"}`);
   console.log("fresh dates:", dates[0], "->", dates.at(-1));
 
-  // Newest report post by publish date — the skip-confirm agent
-  // (.build/essential-confirm-skip.mjs) reads this as positive evidence that
-  // the index was fetched and holds no release newer than a skipped slot.
-  const latest = reports.reduce((a, r) => (a && Date.parse(a.date) > Date.parse(r.date) ? a : r), null);
-  const latestReport = latest ? { date: latest.date, title: stripTags(latest.title?.rendered ?? latest.title ?? "") } : null;
+  // The crawl ran against this listing: remember it, so the next run can
+  // skip unless something on the site moves. Not on --check (never writes)
+  // and not after a run that lost pages — a partial crawl must not stamp
+  // the site as fully read.
+  if (!CHECK && !failedPages.length && !failedFlourishes.length) {
+    mkdirSync(".build/essential-src", { recursive: true });
+    const fpJson = JSON.stringify({ fingerprint, at: new Date().toISOString(), reports: reports.length, questions: questions.length, newest_report: latestReport?.date ?? null }, null, 2) + "\n";
+    if (!saved || saved.fingerprint !== fingerprint) {
+      writeFileSync(FINGERPRINT + ".tmp", fpJson);
+      renameSync(FINGERPRINT + ".tmp", FINGERPRINT);
+      console.log(`updated ${FINGERPRINT}`);
+    }
+  }
 
   console.log(`ESSENTIAL_STATUS ${JSON.stringify({
     changed: changed && !CHECK,
     check: CHECK,
+    crawl: "full",
+    crawl_reason: reason,
     reports: reports.length,
     question_pages: questions.length,
     failed_pages: failedPages.length,

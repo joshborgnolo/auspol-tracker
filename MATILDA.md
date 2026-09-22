@@ -36,7 +36,14 @@ a GENERATED build artifact — never hand-edit it.
   merges unshadowed rows into the page marked provisional; validate.mjs
   check 12 gates the array; the agent prunes a row once the house's real
   one lands. To keep a feed wave out, list its feed Id in
-  `.build/pollbludger-src/ignore.json` with a reason.
+  `.build/pollbludger-src/ignore.json` with a reason. The coverage doctor
+  knows about these rows: a witness-listed wave the fallback has on the
+  page is class 3 (green, warning + deduped ci-alert issue), not class 2.
+- `.build/extract-essential-report.mjs` runs a PREFLIGHT before its
+  ~10-minute crawl: the REST listings' (id, modified) pairs are hashed into
+  `.build/essential-src/site-fingerprint.json` (committed by the wrapper);
+  the crawl runs only when that moved, the newest report is under 3 days
+  old, or `--force`. A skipped run says `crawl: "skipped"` in its status.
 - `.github/workflows/agent-repair.yml` — the CENTRAL Matilda repair agent.
   Any watched workflow failing on main triggers it (workflow_run). Its gate
   job maps the workflow to a house prompt (`.build/*-repair-prompt.md`;

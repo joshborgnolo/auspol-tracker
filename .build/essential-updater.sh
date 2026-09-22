@@ -92,15 +92,31 @@ elif echo "$EXTRACT_OUT" | grep -q '^updated .*report-index\.json'; then
     # outside the curated horizon): nothing to rebuild, but commit the
     # refreshed index so the tree is clean for the next slot's pre-flight
     # and other machines get the provenance.
-    git add .build/essential-src/report-index.json
+    git add .build/essential-src/report-index.json .build/essential-src/site-fingerprint.json 2>/dev/null \
+      || git add .build/essential-src/report-index.json
     IDX_MSG="Refresh Essential report index $(date '+%Y-%m-%d')"
     if git commit -m "$IDX_MSG" >> "$LOG" 2>&1; then
-      push_main "$IDX_MSG" .build/essential-src/report-index.json \
+      push_main "$IDX_MSG" .build/essential-src/report-index.json .build/essential-src/site-fingerprint.json \
         || log "FAIL git push (commit kept locally)"
       log "OK committed + pushed: $IDX_MSG"
     else
       log "index commit produced nothing; carrying on"
     fi
+  fi
+fi
+
+# The crawl preflight's fingerprint (extract-essential-report.mjs) lives in
+# the repo: a fresh CI runner has no other memory of what it last read, so
+# a fingerprint that moved without any data change is committed on its own —
+# otherwise every following slot re-crawls the whole site for nothing.
+FP=.build/essential-src/site-fingerprint.json
+if [ "$DATA_CHANGED" = false ] && [ -f "$FP" ] && { ! git diff --quiet -- "$FP" || [ -n "$(git ls-files --others --exclude-standard "$FP")" ]; }; then
+  log "site fingerprint moved with no data change; committing it alone"
+  git add "$FP"
+  FP_MSG="Refresh Essential site fingerprint $(date '+%Y-%m-%d')"
+  if git commit -m "$FP_MSG" >> "$LOG" 2>&1; then
+    push_main "$FP_MSG" "$FP" || log "FAIL git push (commit kept locally)"
+    log "OK committed + pushed: $FP_MSG"
   fi
 fi
 

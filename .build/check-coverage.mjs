@@ -145,10 +145,17 @@ function parseWitness(text) {
     if (!house) continue;
     const isMrp = /\bMRP\b/.test(chunk);
 
-    // The fieldwork cell is the row's first header cell.
+    /* The fieldwork cell is the row's first cell that parses as a date.
+       It was a `!` header cell until Sep 2026, when the table's editors
+       made it a plain `|` cell with rowspan="2" (each poll now takes two
+       rows, the second carrying the flows-basis 2PP) — and for twelve days
+       this parsed zero waves and the watchdog reported "inconclusive",
+       which is green by design. So either cell kind is read, and the
+       count floor below is what turns the next such change into a class
+       that someone sees. */
     let date = null;
     for (const l of chunk.split("\n")) {
-      const c = l.match(/^!(.*)$/);
+      const c = l.match(/^[!|](?![-}])(.*)$/);
       if (!c) continue;
       const pipe = c[1].lastIndexOf("|");
       const d = endDate((pipe >= 0 ? c[1].slice(pipe + 1) : c[1]).trim(), year);
@@ -178,7 +185,7 @@ function cadence(dates) {
   return gaps[Math.floor(gaps.length / 2)];
 }
 
-const status = { checked: todayLocal(), witness: "wikipedia", missing: [], overdue: [], houses: {}, witness_waves: 0, error: null };
+const status = { checked: todayLocal(), witness: "wikipedia", missing: [], overdue: [], houses: {}, witness_waves: 0, fallback_rows: 0, error: null };
 
 try {
   const D = JSON.parse(readFileSync(OUT, "utf8"));
@@ -191,6 +198,20 @@ try {
     byHouse.get(p.pollster).push(p.date);
   }
   for (const [, v] of byHouse) v.sort();
+  /* Provisional rows the Poll Bludger fallback filed (D.fallbackPolls) —
+     the SITE carries these waves, the house's own extractor does not. They
+     never count as coverage here: a missing wave one of them covers is
+     still reported, marked `provisional: true`, so the doctor can say "the
+     page is whole, the pipeline is not" instead of either crying defect
+     every morning or going quiet about a broken extractor. */
+  const fallbackByHouse = new Map();
+  for (const f of D.fallbackPolls || []) {
+    if (!fallbackByHouse.has(f.pollster)) fallbackByHouse.set(f.pollster, []);
+    fallbackByHouse.get(f.pollster).push(f.date);
+  }
+  status.fallback_rows = (D.fallbackPolls || []).length;
+  const provisionallyCovered = (names, date) =>
+    names.some((h) => (fallbackByHouse.get(h) ?? []).some((d) => Math.abs(daysBetween(d, date)) <= DATE_SLACK_DAYS));
 
   // ---- cadence check (no network) ----------------------------------------
   for (const [house, dates] of [...byHouse].sort()) {
@@ -220,7 +241,8 @@ try {
     const tracked = names.flatMap((h) => byHouse.get(h) ?? []);
     if (!names.some((h) => byHouse.has(h))) continue; // house not tracked at all
     const near = tracked.some((d) => Math.abs(daysBetween(d, w.date)) <= DATE_SLACK_DAYS);
-    if (!near) status.missing.push({ date: w.date, house: names[0], wiki: w.wikiName, mrp: w.mrp });
+    if (!near) status.missing.push({ date: w.date, house: names[0], wiki: w.wikiName, mrp: w.mrp,
+      ...(provisionallyCovered(names, w.date) ? { provisional: true } : {}) });
   }
   status.missing.sort((a, b) => (a.date < b.date ? 1 : -1));
 
@@ -234,6 +256,7 @@ try {
       .map((w) => w.date).sort().pop() ?? null;
     o.witness_newer = newest;
     o.verdict = newest ? "missed" : "house quiet (witness agrees)";
+    if (newest && provisionallyCovered([o.house], newest)) o.provisional = true;
   }
 } catch (e) {
   status.error = e.message;
@@ -249,7 +272,7 @@ if (!JSON_ONLY && !QUIET) {
   } else {
     if (n) {
       console.log(`coverage: ${n} wave${n === 1 ? "" : "s"} on Wikipedia that polls.json does not have —`);
-      for (const m of status.missing.slice(0, 15)) console.log(`  ${m.date}  ${m.house}${m.mrp ? " (MRP)" : ""}`);
+      for (const m of status.missing.slice(0, 15)) console.log(`  ${m.date}  ${m.house}${m.mrp ? " (MRP)" : ""}${m.provisional ? "  (on the page provisionally, via the Poll Bludger fallback)" : ""}`);
       if (n > 15) console.log(`  … and ${n - 15} more`);
     }
     if (o) {

@@ -22,6 +22,17 @@
                           the only class that fires the Matilda repair job -
                           a repair agent gets evidence with dates on it,
                           never a vague "something is silent".
+     exit 3  provisional  the witness lists a wave we lack in polls[] — but
+                          the Poll Bludger fallback has filed it into
+                          fallbackPolls, so the PAGE carries it. The house's
+                          extractor is still broken, and a human should know
+                          (run summary, warning annotation, a deduped
+                          ci-alert issue), but a daily repair session for a
+                          wave the site already shows is the wrong spend:
+                          the workflow stays green. Class 2 keeps its claim
+                          on any wave the fallback has NOT covered, so the
+                          repair agent gets its first shot in the day or so
+                          before the fallback's grace elapses.
      exit 4  report-only  a house is past its own cadence and the witness
                           agrees it has published nothing yet - genuine
                           silence, unexplained by any confirmed absence.
@@ -88,19 +99,27 @@ const explanation = (house, last) => {
   return null;
 };
 
-// class 2 — witness-supported evidence of a missed wave
-const defects = [];
+// class 2 — witness-supported evidence of a missed wave (class 3 where the
+// fallback has already put the wave on the page)
+const defects = [], provisional = [];
 for (const m of st.missing || []) {
-  defects.push(`${m.date}  ${m.house}${m.mrp ? " (MRP)" : ""} — listed by the witness, not in polls.json`);
+  (m.provisional ? provisional : defects).push(`${m.date}  ${m.house}${m.mrp ? " (MRP)" : ""} — listed by the witness, not in polls.json${m.provisional ? "; on the page provisionally via the Poll Bludger fallback" : ""}`);
 }
 for (const o of st.overdue || []) {
-  if (o.witness_newer) defects.push(`${o.house}: ${o.days_since}d quiet (cadence ~${o.cadence_days}d) and the witness has a ${o.witness_newer} wave — missed, not quiet`);
+  if (o.witness_newer) (o.provisional ? provisional : defects).push(`${o.house}: ${o.days_since}d quiet (cadence ~${o.cadence_days}d) and the witness has a ${o.witness_newer} wave — missed, not quiet${o.provisional ? "; on the page provisionally via the Poll Bludger fallback" : ""}`);
 }
 if (defects.length) {
   console.log(`doctor class 2 (defect): ${defects.length} witness-supported gap(s) — repair fires:`);
   for (const d of defects) console.log("  " + d);
-  emit(2, { defects });
+  for (const p of provisional) console.log("  (provisionally covered) " + p);
+  emit(2, { defects, provisional });
   process.exit(2);
+}
+if (provisional.length) {
+  console.log(`doctor class 3 (provisional): ${provisional.length} wave(s) the house extractor missed are on the page via the fallback — a human should look, no repair fires:`);
+  for (const p of provisional) console.log("  " + p);
+  emit(3, { provisional });
+  process.exit(3);
 }
 
 // classes 4 / 0 — quiet houses: unjustified silence vs explained absence

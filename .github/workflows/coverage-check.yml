@@ -30,6 +30,9 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write   # class-3 (provisionally covered) ci-alert issues
     timeout-minutes: 10
     outputs:
       verdict: ${{ steps.doctor.outputs.verdict }}
@@ -57,8 +60,32 @@ jobs:
             } >> "$GITHUB_STEP_SUMMARY"
           fi
           # only class 2 (defect) goes red; 1 is inconclusive-is-not-an-alarm,
-          # 4 is report-only by design
+          # 4 is report-only by design, 3 (the fallback has the wave on the
+          # page; the house extractor is still broken) warns here and files
+          # an issue below instead of spending a repair session every morning
+          # class 1 is green by policy, but twelve green "inconclusive" days
+          # (Sep 2026: Wikipedia's table changed shape) is a blind watchdog —
+          # annotate so a streak shows in the Actions list
+          if [ "$CODE" -eq 1 ]; then
+            echo "::warning::coverage class 1 — the witness check was inconclusive; if this repeats daily the watchdog is blind (check-coverage.mjs parse)"
+          fi
+          if [ "$CODE" -eq 3 ]; then
+            echo "::warning::coverage class 3 — wave(s) on the page only via the Poll Bludger fallback; the house extractor needs a look (see the ci-alert issue)"
+            echo "$OUT" | grep -E '^  ' | head -n 20 > doctor-detail.txt || true
+          fi
           [ "$CODE" -ne 2 ]
+
+      - name: File a ci-alert issue for provisionally covered waves
+        if: steps.doctor.outputs.verdict == '3'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DETAIL="$(cat doctor-detail.txt 2>/dev/null || true)"
+          BODY="The coverage doctor found wave(s) the house's own extractor has not landed; the Poll Bludger fallback has them on the page provisionally (fallbackPolls). The extractor needs a look — the provisional row is replaced automatically once the real one lands. [workflow run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID})"
+          BODY="${BODY}"$'\n\n'"${DETAIL}"
+          bash .build/alert-issue.sh \
+            "Coverage: wave(s) on the page only via the Poll Bludger fallback" \
+            "$BODY" || echo "::warning::could not file the ci-alert issue"
 
   # Heartbeat — the "everything ran, nothing happened" detector the doctor
   # cannot provide. Two checks, both born of the 2026-09-05..07 lock outage:
