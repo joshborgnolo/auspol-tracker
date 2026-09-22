@@ -36,7 +36,10 @@ a GENERATED build artifact — never hand-edit it.
   merges unshadowed rows into the page marked provisional; validate.mjs
   check 12 gates the array; the agent prunes a row once the house's real
   one lands. To keep a feed wave out, list its feed Id in
-  `.build/pollbludger-src/ignore.json` with a reason. The coverage doctor
+  `.build/pollbludger-src/ignore.json` with a reason. It also files leader
+  SATISFACTION splits (`fallbackApproval`, from the feed's <leaders> table,
+  independent of the VI row — a cloud-landed YouGov row has none) for
+  non-favourability houses; never preferred-PM. The coverage doctor
   knows about these rows: a witness-listed wave the fallback has on the
   page is class 3 (green, warning + deduped ci-alert issue), not class 2.
 - `.build/extract-essential-report.mjs` runs a PREFLIGHT before its

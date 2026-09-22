@@ -101,6 +101,11 @@
       "description": "PROVISIONAL voting-intention rows filed by the Poll Bludger fallback agent (.build/extract-pollbludger.mjs) for waves a house's own extractor has not landed - mirrored from BludgerTrack's poll-data feed after the wave has sat there, missing from polls[], for a grace period. Same row shape as polls[] with three differences: no `published` (the feed carries no clock), `ind` holds the Independents/Other REMAINDER with `oth: null` (the feed carries no split), and a `provisional` stamp {source, feedId, feedDate, filed} records where the row came from. Never enters polls[]: every extractor dedupes against that array and never overwrites, so a fallback row there would block the real one. gen-data merges these into the page only where no polls[] row of the same house sits within a few days of the fieldwork end (labelled provisional in the views); the moment the house's extractor lands the real row the fallback is shadowed, and the agent prunes it on its next run. Absent (not empty) when nothing is provisional. Never hand-edit: to keep a feed wave out, list its feedId in .build/pollbludger-src/ignore.json with a reason.",
       "items": { "type": "object" }
     },
+    "fallbackApproval": {
+      "type": "array",
+      "description": "PROVISIONAL leader-satisfaction rows from the same Poll Bludger fallback agent: approval[] row shape (alb/opp nets with their {app,dis} splits, oppName from the opposition-leader era table, han null) plus the `provisional` stamp. Filed from the feed's <leaders> table for a wave that has no approval[] row of that firm within a few days - INDEPENDENTLY of the voting-intention row, because a house's own extractor can land the VI without its leadership (the cloud YouGov run has no Chrome for the News24 article). gen-data joins these to the wave's poll row (canonical or provisional) only while no canonical approval row exists, and the row's expanded view says the ratings are mirrored. Never for houses in metricRules.favFirms (the feed cannot tell satisfaction from favourability), and never preferred-PM (the feed pairs it differently from the tracker for Newspoll and DemosAU). Never hand-edit.",
+      "items": { "type": "object" }
+    },
     "ppm": {
       "type": "array",
       "description": "Preferred prime minister. alb vs opp is the main contest; han only in a genuine three-way.",

@@ -2217,10 +2217,12 @@ function releaseMetaRows(r) {
     <span className="pd-meta-i" key="prov">
       <span className="pd-meta-k">Source</span>
       <span className="pd-meta-v">
-        <a className="pd-release" href={r.url} target="_blank" rel="noopener noreferrer">
+        <a className="pd-release" href={r.provisionalUrl || r.url} target="_blank" rel="noopener noreferrer">
           {r.provisional}<span className="plink-mark" aria-hidden="true">↗</span>
         </a>
-        <span className="pd-s-note">{" (provisional – figures mirrored from its poll-data table until the pollster’s own release is captured)"}</span>
+        <span className="pd-s-note">{r.provisionalScope === "leaders"
+          ? " (provisional – the leader ratings are mirrored from its poll-data table until the pollster’s own release is captured; the voting figures are the house’s own)"
+          : " (provisional – figures mirrored from its poll-data table until the pollster’s own release is captured)"}</span>
       </span>
     </span>
   );
@@ -3152,7 +3154,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                           release is still uncaptured – the expanded row says
                           what that means */}
                       {r.provisional && <span className="pollster-mode provisional-tag"
-                                              title={"Provisional: mirrored from " + r.provisional + " until the pollster’s own release is captured"}>provisional</span>}
+                                              title={"Provisional: " + (r.provisionalScope === "leaders" ? "leader ratings" : "figures") + " mirrored from " + r.provisional + " until the pollster’s own release is captured"}>provisional</span>}
                     </td>
                     {/* The date the poll was PUBLISHED where the source says so.
                         Where it doesn't, this falls back to the last day of

@@ -17,6 +17,23 @@
 // that don't are waves the tracker deliberately omits (MRPs, one-off
 // commissioned polls). So it is good enough to file FROM, provisionally.
 //
+// LEADER SATISFACTION (2026-09-22): the feed's <leaders><table> carries,
+// per wave, the PM's and opposition leader's satisfied/dissatisfied shares
+// (pmSAT/pmDIS/olSAT/olDIS) — verified identical to the tracker's canon
+// approval splits for Newspoll, YouGov, Essential, Resolve and Roy Morgan.
+// Those are filed the same way, into D.fallbackApproval (approval[] row
+// shape + the provisional stamp), INDEPENDENTLY of the voting-intention
+// row: a house's own extractor can land the VI row without leadership
+// (the cloud YouGov run has no Chrome for the News24 article; a hand entry
+// may skip the splits), and the provisional splits stay on the page until
+// a canonical approval row for that wave arrives. Two exclusions: houses
+// whose primary leader metric is FAVOURABILITY (metricRules.favFirms —
+// the feed does not say which measure a house's SAT/DIS is), and
+// preferred-PM (pmPREF/olPREF), which the feed pairs differently from the
+// tracker for Newspoll and DemosAU (Albanese-v-Hanson where the tracker
+// keeps the opposition-leader contest) — a wrong pairing is worse than a
+// gap, so PPM is never filed.
+//
 // WHAT "PROVISIONAL" MEANS HERE
 // Rows filed by this script never enter D.polls. They live in their own
 // array, D.fallbackPolls, for two reasons:
@@ -109,6 +126,13 @@ const HOUSE = {
 };
 // houses whose HEADLINE 2PP is the respondent-allocated pair (README)
 const RA_HEADLINE = new Set(["Roy Morgan", "RedBridge/Accent"]);
+// the opposition-leader era table, identical to extract-news24 / extract-newspoll
+const OLS = [
+  { oppName: "Dutton", from: "2022-05-30", to: "2025-05-12" },
+  { oppName: "Ley", from: "2025-05-13", to: "2026-02-08" },
+  { oppName: "Taylor", from: "2026-02-09", to: null },
+];
+const olFor = (date) => OLS.find((o) => date >= o.from && (!o.to || date <= o.to))?.oppName ?? null;
 
 // ---- args ------------------------------------------------------------------
 const argv = process.argv.slice(2);
@@ -121,8 +145,8 @@ const GRACE = argOf("--grace-hours") != null ? Number(argOf("--grace-hours")) : 
 const DAY = 86400000;
 const days = (a, b) => Math.round((Date.parse(b) - Date.parse(a)) / DAY);
 const r1 = (x) => Math.round(x * 10) / 10;
-const status = { changed: false, source: null, stale: false, feedDate: null, points: 0,
-  filed: [], pruned: [], pending: [], skipped: [], notes: [], error: null };
+const status = { changed: false, source: null, stale: false, feedDate: null, points: 0, leaderPoints: 0,
+  filed: [], pruned: [], pending: [], skipped: [], filedApproval: [], prunedApproval: [], notes: [], error: null };
 const done = (code) => { console.log("PB_STATUS " + JSON.stringify(status)); process.exit(code); };
 
 // ---- fetch -------------------------------------------------------------------
@@ -185,6 +209,22 @@ function parseFeed(xml) {
     });
   }
   if (points.length < MIN_POINTS) throw new Error(`only ${points.length} national points (need ${MIN_POINTS}) — feed structure changed`);
+  // leader satisfaction: the pollster-attributed points under <leaders>
+  // (the chart points there carry no pollster and are trend values)
+  const li = xml.indexOf("<leaders"), le = xml.indexOf("</leaders>");
+  const leaders = [];
+  if (li >= 0 && le > li) {
+    for (const m of xml.slice(li, le).matchAll(/<point\s+([^>]*)>([\s\S]*?)<\/point>/g)) {
+      const attrs = Object.fromEntries([...m[1].matchAll(/(\w+)="([^"]*)"/g)].map((a) => [a[1], unesc(a[2])]));
+      if (!attrs.pollster || (attrs.scope && attrs.scope !== "NAT")) continue;
+      const vals = {};
+      for (const v of m[2].matchAll(/<(\w+)>([^<]*)<\/\1>/g)) vals[v[1]] = v[2].trim() === "" ? null : Number(v[2]);
+      leaders.push({ id: attrs.Id, pollster: attrs.pollster, end: dmy(attrs.end), start: dmy(attrs.start),
+        pmSat: vals.pmSAT ?? null, pmDis: vals.pmDIS ?? null, olSat: vals.olSAT ?? null, olDis: vals.olDIS ?? null });
+    }
+  }
+  status.leaderPoints = leaders.length;
+  points.leaders = leaders;
   const canary = points.find((p) => p.pollster === "Election" && p.end === "2025-05-03");
   if (!canary || canary.alp !== 34.6 || canary.lnp !== 31.8)
     throw new Error(`2025 election baseline point missing or wrong (${JSON.stringify(canary)}) — parse is off`);
@@ -287,7 +327,48 @@ for (const p of points) {
 }
 kept.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.pollster.localeCompare(b.pollster)));
 
-status.changed = status.filed.length > 0 || status.pruned.length > 0;
+// ---- leader satisfaction: file / prune independently of the VI row ---------------
+const favFirms = new Set((D.metricRules?.favFirms || []).map((f) => f.toLowerCase()));
+// gen-data's canonFirm: "RedBridge/Accent (MRP)" → "redbridge"
+const canonFirm = (firm) => (firm || "").replace(/\s*\(.*\)\s*$/, "").replace(/\s*\/.*$/, "").trim().toLowerCase();
+const canonAppr = D.approval || [];
+const nearAppr = (firm, end) => canonAppr.some((r) => r.firm === firm && Math.abs(days(r.date, end)) <= slackFor(firm));
+const fallbackAppr = Array.isArray(D.fallbackApproval) ? D.fallbackApproval : [];
+const keptAppr = [];
+for (const f of fallbackAppr) {
+  if (nearAppr(f.firm, f.date)) status.prunedApproval.push({ firm: f.firm, date: f.date, reason: "canonical approval row landed" });
+  else keptAppr.push(f);
+}
+for (const p of points.leaders) {
+  if (!p.end || p.end <= CYCLE_START || days(p.end, today) > RECENT_DAYS) continue;
+  const h = houseFor({ ...p, sample: null }, tracked);
+  if (h.skip) continue;
+  if (favFirms.has(canonFirm(h.house))) continue; // the feed cannot tell satisfaction from favourability
+  if (ignore[p.id]) continue;
+  const pm = p.pmSat != null && p.pmDis != null && p.pmSat >= 0 && p.pmDis >= 0 && p.pmSat + p.pmDis <= 100;
+  const ol = p.olSat != null && p.olDis != null && p.olSat >= 0 && p.olDis >= 0 && p.olSat + p.olDis <= 100;
+  if (!pm && !ol) continue;
+  if (nearAppr(h.house, p.end)) continue;
+  if (keptAppr.some((f) => f.provisional?.feedId === p.id || (f.firm === h.house && Math.abs(days(f.date, p.end)) <= slackFor(h.house)))) continue;
+  const key = "L" + p.id;
+  const first = seen[key]?.firstSeen || NOW.toISOString();
+  seenNow[key] = { firstSeen: first, pollster: p.pollster, end: p.end, kind: "approval" };
+  const hours = (NOW - Date.parse(first)) / 3600000;
+  if (hours < GRACE) { status.pending.push({ id: p.id, pollster: h.house, end: p.end, kind: "approval", hoursSeen: r1(hours) }); continue; }
+  keptAppr.push({
+    date: p.end, firm: h.house,
+    alb: pm ? p.pmSat - p.pmDis : null,
+    opp: ol ? p.olSat - p.olDis : null,
+    oppName: ol ? olFor(p.end) : null,
+    han: null,
+    detail: { ...(pm ? { alb: { app: p.pmSat, dis: p.pmDis } } : {}), ...(ol ? { opp: { app: p.olSat, dis: p.olDis } } : {}) },
+    provisional: { source: "Poll Bludger", feedId: p.id, feedDate: status.feedDate, filed: NOW.toISOString().slice(0, 16) + "Z" },
+  });
+  status.filedApproval.push({ firm: h.house, date: p.end, feedId: p.id });
+}
+keptAppr.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.firm.localeCompare(b.firm)));
+
+status.changed = status.filed.length > 0 || status.pruned.length > 0 || status.filedApproval.length > 0 || status.prunedApproval.length > 0;
 if (APPLY) {
   mkdirSync(SRC_DIR, { recursive: true });
   // the ledger forgets waves the tracker now covers, so it cannot grow
@@ -296,6 +377,7 @@ if (APPLY) {
   if (status.changed) {
     const next = { ...D };
     if (kept.length) next.fallbackPolls = kept; else delete next.fallbackPolls;
+    if (keptAppr.length) next.fallbackApproval = keptAppr; else delete next.fallbackApproval;
     writeJsonAtomic(OUT, next);
   }
 }

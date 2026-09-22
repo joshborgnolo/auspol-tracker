@@ -12651,7 +12651,7 @@ function releaseMetaRows(r) {
     className: "pd-meta-v"
   }, /*#__PURE__*/React.createElement("a", {
     className: "pd-release",
-    href: r.url,
+    href: r.provisionalUrl || r.url,
     target: "_blank",
     rel: "noopener noreferrer"
   }, r.provisional, /*#__PURE__*/React.createElement("span", {
@@ -12659,7 +12659,7 @@ function releaseMetaRows(r) {
     "aria-hidden": "true"
   }, "\u2197")), /*#__PURE__*/React.createElement("span", {
     className: "pd-s-note"
-  }, " (provisional – figures mirrored from its poll-data table until the pollster’s own release is captured)"))));
+  }, r.provisionalScope === "leaders" ? " (provisional – the leader ratings are mirrored from its poll-data table until the pollster’s own release is captured; the voting figures are the house’s own)" : " (provisional – figures mirrored from its poll-data table until the pollster’s own release is captured)"))));
   if (r.releaseUrl) relRows.push(/*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     key: "rel"
@@ -13639,7 +13639,7 @@ function PollsterTable({
       url: r.methodUrl
     }), r.provisional && /*#__PURE__*/React.createElement("span", {
       className: "pollster-mode provisional-tag",
-      title: "Provisional: mirrored from " + r.provisional + " until the pollster’s own release is captured"
+      title: "Provisional: " + (r.provisionalScope === "leaders" ? "leader ratings" : "figures") + " mirrored from " + r.provisional + " until the pollster’s own release is captured"
     }, "provisional")), /*#__PURE__*/React.createElement("td", {
       className: "ta-l"
     }, /*#__PURE__*/React.createElement("span", {

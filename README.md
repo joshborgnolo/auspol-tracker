@@ -74,6 +74,10 @@ new and worth looking at.
   (`oth: null`). The page merges such a row only while no `polls[]` row of
   that house sits within a few days of it, and labels it provisional; the
   house's real row replaces it automatically. Never hand-edit the array.
+  Leader satisfaction works the same way through `fallbackApproval`
+  (`approval[]` shape), filed on its own whenever a wave has voting figures
+  but no approval row — so a cloud-landed YouGov wave still shows its
+  ratings until the laptop's Chrome run lands the real ones.
 - Leadership rows must key to **fieldwork end**, matching their poll. An
   unexplained "leadership-only" row in the build output usually means a date has
   drifted off its poll, not that the firm skipped voting intention.

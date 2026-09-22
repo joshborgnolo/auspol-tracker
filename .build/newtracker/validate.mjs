@@ -548,6 +548,30 @@ export function validate(D) {
     if (p.isElection) fail("fallback-shape", "an election row cannot be provisional");
   });
 
+  /* 13. fallbackApproval – provisional leader-satisfaction rows from the
+     same fallback: approval[] shape, nets equal to the splits, a known
+     firm, the provenance stamp. No overlap check, for the reason check 12
+     gives. */
+  const fa = D.fallbackApproval;
+  if (fa !== undefined && !Array.isArray(fa))
+    errors.push({ type: "fallback-shape", poll: "fallbackApproval", detail: "not an array" });
+  (Array.isArray(fa) ? fa : []).forEach((r, i) => {
+    const where = `fallbackApproval #${i} ${r.date} · ${r.firm}`;
+    const fail = (t, d) => errors.push({ type: t, poll: where, detail: d });
+    if (!KNOWN_POLLSTERS.has(r.firm)) fail("pollster", `unknown firm label ${JSON.stringify(r.firm)}`);
+    if (!ISO_DAY.test(r.date || "")) fail("date-format", `date "${r.date}" is not YYYY-MM-DD`);
+    for (const k of ["alb", "opp"]) {
+      const sp = r.detail?.[k];
+      if (r[k] == null && !sp) continue;
+      if (!sp || sp.app == null || sp.dis == null) { fail("approval-split", `${k} net without a split`); continue; }
+      if (sp.app < 0 || sp.dis < 0 || sp.app + sp.dis > 100) fail("range", `${k} split ${sp.app}/${sp.dis}`);
+      if (r[k] !== sp.app - sp.dis) fail("approval-net", `${k} net ${r[k]} ≠ ${sp.app} − ${sp.dis}`);
+    }
+    if (r.alb == null && r.opp == null) fail("approval-split", "neither leader rated");
+    if (r.opp != null && !r.oppName) fail("approval-split", "opp net without oppName");
+    if (r.provisional?.source !== "Poll Bludger" || !r.provisional?.feedId) fail("provenance", "missing provisional {source, feedId} stamp");
+  });
+
   return { errors, exempted, orphans: [...new Set(orphans)] };
 }
 

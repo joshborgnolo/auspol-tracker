@@ -59,7 +59,7 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   exit 0
 fi
 
-FILED="$(echo "$LAST_LINE" | sed 's/^PB_STATUS //' | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);const f=j.filed.map(x=>"filed "+x.pollster+" "+x.date),p=j.pruned.map(x=>"pruned "+x.pollster+" "+x.date);console.log([...f,...p].join("; "))})')"
+FILED="$(echo "$LAST_LINE" | sed 's/^PB_STATUS //' | node -e 'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>{const j=JSON.parse(s);const f=j.filed.map(x=>"filed "+x.pollster+" "+x.date),p=j.pruned.map(x=>"pruned "+x.pollster+" "+x.date),fa=(j.filedApproval||[]).map(x=>"filed ratings "+x.firm+" "+x.date),pa=(j.prunedApproval||[]).map(x=>"pruned ratings "+x.firm+" "+x.date);console.log([...f,...p,...fa,...pa].join("; "))})')"
 log "fallback change: $FILED; running validate/build/commit/push"
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"

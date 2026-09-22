@@ -93,7 +93,33 @@ const mergedPolls = (() => {
 })();
 const POLLS = mergedPolls.filter((p) => !p.isElection);
 const ppm = D.ppm;
-const appr = D.approval.map((r) => ({ ...r, splits: r.detail ?? null }));
+/* Leader satisfaction the fallback filed (D.fallbackApproval) joins the
+   approval rows on the same terms as fallbackPolls above, but on its own:
+   a house's canonical VI row can land without its leadership (the cloud
+   YouGov run has no Chrome for the News24 article), and the provisional
+   splits then stay until a canonical approval row for that wave arrives.
+   PROVISIONAL_APPR remembers which poll rows drew their ratings from here,
+   so the row can say so even when its VI is the house's own. */
+const PROVISIONAL_APPR = new Set();
+const mergedAppr = (() => {
+  const fb = Array.isArray(D.fallbackApproval) ? D.fallbackApproval : [];
+  if (!fb.length) return D.approval;
+  const dayGap = (a, b) => Math.abs(Math.round((Date.parse(a) - Date.parse(b)) / 86400000));
+  const live = fb.filter((f) => !D.approval.some((a) => a.firm === f.firm && dayGap(a.date, f.date) <= (FALLBACK_HOUSE_SLACK[f.firm] ?? FALLBACK_SLACK)));
+  if (!live.length) return D.approval;
+  console.log(`fallbackApproval: ${live.length} provisional leader-rating row(s) merged (${fb.length - live.length} shadowed) →`,
+    live.map((f) => `${f.firm} ${f.date}`).join(", "));
+  // key the ratings to the poll row they belong to, canonical or provisional,
+  // so buildAppr's exact (date|firm) join finds them
+  const rows = live.map((f) => {
+    const poll = mergedPolls.find((p) => p.pollster === f.firm && dayGap(p.date, f.date) <= (FALLBACK_HOUSE_SLACK[f.firm] ?? FALLBACK_SLACK));
+    const date = poll ? poll.date : f.date;
+    PROVISIONAL_APPR.add(date + "|" + f.firm);
+    return { ...f, date };
+  });
+  return [...D.approval, ...rows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+})();
+const appr = mergedAppr.map((r) => ({ ...r, splits: r.detail ?? null }));
 const cyclePolls = D.cyclePolls;
 const cycleAppr = D.cycleApproval;
 
@@ -1325,7 +1351,9 @@ const individualPolls = POLLS.map((p) => {
        fallback agent because the house's own extractor had not landed the
        wave (see mergedPolls above). The view names the source and says the
        figures are second-hand; the row leaves when the real one arrives. */
-    ...(p.provisional ? { provisional: p.provisional.source || "Poll Bludger" } : {}),
+    ...(p.provisional ? { provisional: p.provisional.source || "Poll Bludger" }
+      : PROVISIONAL_APPR.has(p.date + "|" + p.pollster)
+        ? { provisional: "Poll Bludger", provisionalScope: "leaders", provisionalUrl: "https://www.pollbludger.net/fed2028/bludgertrack/polldata.htm" } : {}),
     // right-track / wrong-track, where this poll asked it
     ...(DIR_BY.has(p.date + "|" + p.pollster) ? { dir: DIR_BY.get(p.date + "|" + p.pollster) } : {}),
     // seat projections – MRPs only. Carried verbatim; their change basis is the

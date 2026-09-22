@@ -47,19 +47,34 @@ const waves = [
   // a broken 2PP pair (does not sum) → row filed, pair dropped
   pt(1605, "DemosAU", "10/09/2026", "14/09/2026", 1583, { ALP: 28, LNC: 20, GRN: 13, PHON: 26, ALPra: 60, LNCra: 45 }),
 ];
-const feed = (extra = "") => `<root date="2026-09-21 01:01:55+00:00"><leaders></leaders><federal><table>${election}${filler.join("")}${stateNoise}${waves.join("")}${extra}</table></federal></root>`;
+// leader satisfaction: Newspoll (VI missing too), YouGov (VI present, approval
+// missing — the cloud-landed shape), Resolve (both present), RedBridge (a
+// favourability house — never filed), a DemosAU point with only PPM (ignored)
+const lp = (id, pollster, start, end, v) => `<point Id="${id}" start="${start}" end="${end}" median="${end}" pollster="${pollster}" mode="Online" scope="NAT" sample="1500">` +
+  ["pmSAT", "pmDIS", "olSAT", "olDIS", "pmPREF", "olPREF"].map((k) => (v[k] == null ? `<${k} />` : `<${k}>${v[k]}</${k}>`)).join("") + "</point>";
+const leaders = `<leaders><charts><point Id="1" date="07/16/2025" week="12"><pmNET>0</pmNET></point></charts><table>` +
+  lp(74, "Newspoll", "14/09/2026", "17/09/2026", { pmSAT: 35, pmDIS: 62, olSAT: 35, olDIS: 50, pmPREF: 42, olPREF: 41 }) +
+  lp(71, "YouGov", "01/09/2026", "09/09/2026", { pmSAT: 36, pmDIS: 59, olSAT: 36, olDIS: 48, pmPREF: 43, olPREF: 39 }) +
+  lp(72, "Resolve Strategic", "06/09/2026", "12/09/2026", { pmSAT: 34, pmDIS: 53, olSAT: 39, olDIS: 30 }) +
+  lp(75, "RedBridge Group", "01/09/2026", "05/09/2026", { pmSAT: 40, pmDIS: 50, olSAT: 30, olDIS: 40 }) +
+  lp(73, "DemosAU", "10/09/2026", "14/09/2026", { pmPREF: 39, olPREF: 35 }) +
+  `</table></leaders>`;
+const feed = (extra = "") => `<root date="2026-09-21 01:01:55+00:00">${leaders}<federal><table>${election}${filler.join("")}${stateNoise}${waves.join("")}${extra}</table></federal></root>`;
 writeFileSync(XML, feed());
 
 // ---- scratch dataset ------------------------------------------------------------
 const poll = (pollster, date, client, extra = {}) => ({ date, dateStart: date, pollster, client, sample: 1000, alp: 30, lnp: 30, grn: 12, onp: 15, ind: 8, oth: 5, tpp_alp: 51, tpp_lnp: 49, ...extra });
 const base = {
+  metricRules: { favFirms: ["redbridge", "demosau", "freshwater", "spectre strategy"], overrides: {} },
   pollsterRules: { "Roy Morgan": {}, Newspoll: {}, Resolve: {}, Essential: {}, "RedBridge/Accent": {}, YouGov: {}, DemosAU: {}, "Fox & Hedgehog": {}, Freshwater: {} },
   polls: [
     poll("Roy Morgan", "2026-09-06", "—"), poll("Newspoll", "2026-08-27", "The Australian"), poll("Resolve", "2026-09-14", "SMH"),
     poll("Essential", "2026-09-11", "The Guardian"), poll("RedBridge/Accent", "2026-08-30", "AFR"), poll("YouGov", "2026-09-09", "News24"),
     poll("DemosAU", "2026-08-24", "Capital Brief"),
   ].sort((a, b) => (a.date < b.date ? -1 : 1)), // validate demands date order
-  ppm: [], approval: [], cyclePolls: {}, cycleApproval: {},
+  ppm: [],
+  approval: [{ date: "2026-09-12", firm: "Resolve", alb: -19, opp: 9, oppName: "Taylor", han: null, detail: { alb: { app: 34, dis: 53 }, opp: { app: 39, dis: 30 } } }],
+  cyclePolls: {}, cycleApproval: {},
 };
 writeFileSync(POLLS, JSON.stringify(base, null, 2));
 mkdirSync(SRC, { recursive: true });
@@ -80,7 +95,8 @@ let r = run(["--apply", "--now", NOW1]);
 assert.equal(r.code, 0);
 assert.equal(r.status.changed, false);
 assert.deepEqual(r.status.filed, []);
-assert.deepEqual(r.status.pending.map((p) => p.pollster).sort(), ["DemosAU", "Newspoll", "Roy Morgan"], JSON.stringify(r.status.pending));
+assert.deepEqual(r.status.pending.filter((p) => p.kind !== "approval").map((p) => p.pollster).sort(), ["DemosAU", "Newspoll", "Roy Morgan"], JSON.stringify(r.status.pending));
+assert.deepEqual(r.status.pending.filter((p) => p.kind === "approval").map((p) => p.pollster).sort(), ["Newspoll", "YouGov"], "approval pending: favourability house and PPM-only point excluded");
 const whys = r.status.skipped.map((s) => s.why);
 assert.ok(whys.some((w) => /MRP-sized/.test(w)), "MRP skip " + whys);
 assert.ok(whys.some((w) => /unmapped house "EMRS"/.test(w)), "unmapped skip");
@@ -108,6 +124,18 @@ assert.equal(dm.tpp_alp, null, "non-summing pair dropped");
 assert.ok(r.status.notes.some((n) => /does not sum/.test(n)));
 assert.ok(D.fallbackPolls.every((f, i, a) => i === 0 || a[i - 1].date <= f.date), "sorted");
 assert.deepEqual(validate(D).errors, [], "validate accepts the filed rows");
+// leader satisfaction: Newspoll (no VI, no approval) and YouGov (VI present,
+// approval missing) filed; Resolve covered; RedBridge a favourability house;
+// DemosAU PPM-only — never filed
+assert.deepEqual(r.status.filedApproval.map((f) => f.firm + " " + f.date).sort(), ["Newspoll 2026-09-17", "YouGov 2026-09-09"], JSON.stringify(r.status.filedApproval));
+const npA = D.fallbackApproval.find((f) => f.firm === "Newspoll");
+assert.deepEqual({ alb: npA.alb, opp: npA.opp, oppName: npA.oppName, han: npA.han, detail: npA.detail },
+  { alb: -27, opp: -15, oppName: "Taylor", han: null, detail: { alb: { app: 35, dis: 62 }, opp: { app: 35, dis: 50 } } });
+assert.equal(npA.provisional.feedId, "74");
+assert.ok(!D.fallbackApproval.some((f) => f.firm === "RedBridge/Accent"), "favourability house never filed");
+assert.ok(!D.fallbackApproval.some((f) => f.firm === "DemosAU"), "PPM-only point never filed");
+assert.ok(!D.fallbackApproval.some((f) => f.firm === "Resolve"), "covered wave not filed");
+assert.ok(!("ppm" in npA) && D.fallbackPolls.every((p) => !("ppm" in p)), "preferred-PM never filed");
 
 // ---- run 3: idempotent ----------------------------------------------------------
 r = run(["--apply", "--now", NOW2]);
@@ -121,6 +149,17 @@ writeFileSync(POLLS, JSON.stringify(D, null, 2));
 r = run(["--apply", "--now", "2026-09-23T02:00:00Z"]);
 assert.equal(r.status.changed, true);
 assert.deepEqual(r.status.pruned.map((p) => p.pollster), ["Newspoll"]);
+// the VI row landing does NOT prune the provisional ratings — those wait for
+// a canonical approval row
+assert.deepEqual(r.status.prunedApproval, []);
+assert.ok(data().fallbackApproval.some((f) => f.firm === "Newspoll"), "ratings survive a VI-only canonical landing");
+D = data();
+D.approval.push({ date: "2026-09-17", firm: "Newspoll", alb: -27, opp: -15, oppName: "Taylor", han: -7, detail: { alb: { app: 35, dis: 62 } } });
+writeFileSync(POLLS, JSON.stringify(D, null, 2));
+r = run(["--apply", "--now", "2026-09-23T03:00:00Z"]);
+assert.deepEqual(r.status.prunedApproval.map((p) => p.firm), ["Newspoll"]);
+assert.deepEqual(data().fallbackApproval.map((f) => f.firm), ["YouGov"]);
+assert.deepEqual(validate(data()).errors, []);
 assert.deepEqual(data().fallbackPolls.map((f) => f.pollster).sort(), ["DemosAU", "Roy Morgan"]);
 const seen = JSON.parse(readFileSync(path.join(SRC, "seen.json"), "utf8"));
 assert.ok(!Object.values(seen).some((s) => s.pollster === "Newspoll"), "ledger forgets a covered wave");
