@@ -27,6 +27,16 @@ a GENERATED build artifact — never hand-edit it.
   every updater completes and weekly for the DST offset, pushing under the
   `SCHEDULE_TUNER_TOKEN` PAT (GITHUB_TOKEN can't touch workflow files).
   Never hand-edit inside the markers — change the recipe in the script.
+- `.build/extract-pollbludger.mjs` + `pollbludger-updater.sh` +
+  `pollbludger-fallback.yml` — the LAST-RESORT poll agent. Reads
+  BludgerTrack's poll-data feed (pollbludger.net …/xml/current.xml) four
+  times a day and files any wave missing from `polls[]` for 18h+ as a
+  PROVISIONAL row in `data/polls.json`'s `fallbackPolls` array — never into
+  `polls[]` (extractors dedupe against it and never overwrite). gen-data
+  merges unshadowed rows into the page marked provisional; validate.mjs
+  check 12 gates the array; the agent prunes a row once the house's real
+  one lands. To keep a feed wave out, list its feed Id in
+  `.build/pollbludger-src/ignore.json` with a reason.
 - `.github/workflows/agent-repair.yml` — the CENTRAL Matilda repair agent.
   Any watched workflow failing on main triggers it (workflow_run). Its gate
   job maps the workflow to a house prompt (`.build/*-repair-prompt.md`;

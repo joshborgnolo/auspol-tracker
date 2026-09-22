@@ -516,6 +516,38 @@ export function validate(D) {
     .filter((r) => !pollKeys.has(r.date + "|" + r.firm))
     .map((r) => `${r.date} · ${r.firm}`);
 
+  /* 12. fallbackPolls – provisional rows the Poll Bludger fallback filed
+     (.build/extract-pollbludger.mjs) for waves the house's own extractor
+     missed. gen-data merges them into the page only where no canonical row
+     sits within a few days, so they get the shape checks a poll row gets
+     (ISO dates, ranges, Σ ≈ 100 − undecided, a tracked house, the
+     provenance stamp) but NOT a no-overlap check: a canonical row landing
+     beside one is the intended handover, and the fallback agent prunes the
+     shadowed row on its next run – the house's wrapper must not fail
+     validate in between. */
+  const fb = D.fallbackPolls;
+  if (fb !== undefined && !Array.isArray(fb))
+    errors.push({ type: "fallback-shape", poll: "fallbackPolls", detail: "not an array" });
+  let prevFb = null;
+  (Array.isArray(fb) ? fb : []).forEach((p, i) => {
+    const where = `fallbackPolls #${i} ${p.date} · ${p.pollster}`;
+    const fail = (t, d) => errors.push({ type: t, poll: where, detail: d });
+    if (!KNOWN_POLLSTERS.has(p.pollster)) fail("pollster", `unknown pollster label ${JSON.stringify(p.pollster)}`);
+    for (const k of ["date", "dateStart"]) if (!ISO_DAY.test(p[k] || "")) fail("date-format", `${k} "${p[k]}" is not YYYY-MM-DD`);
+    if (p.dateStart > p.date) fail("date-order", `dateStart ${p.dateStart} after date ${p.date}`);
+    if (prevFb && p.date < prevFb) fail("date-order", `precedes previous entry (${prevFb})`);
+    prevFb = p.date;
+    for (const [k, lo, hi] of RANGES) { const v = p[k]; if (v != null && (v < lo || v > hi)) fail("range", `${k} = ${v} (bounds ${lo}–${hi})`); }
+    if (!CORE.every((k) => p[k] != null)) fail("primaries", "a core primary is missing");
+    else {
+      const sum = ALL.reduce((a, k) => a + n0(p[k]), 0) + n0(p.undecided);
+      if (Math.abs(sum - 100) > 1) fail("primary-sum", `Σ shares + undecided = ${sum.toFixed(1)} (expected ~100)`);
+    }
+    if ((p.tpp_alp == null) !== (p.tpp_lnp == null)) fail("tpp", "half a 2PP pair");
+    if (p.provisional?.source !== "Poll Bludger" || !p.provisional?.feedId) fail("provenance", "missing provisional {source, feedId} stamp");
+    if (p.isElection) fail("fallback-shape", "an election row cannot be provisional");
+  });
+
   return { errors, exempted, orphans: [...new Set(orphans)] };
 }
 

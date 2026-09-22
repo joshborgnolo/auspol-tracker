@@ -14,3 +14,7 @@ node_modules/
 # under it belongs in a data/site commit except the curated skills.
 .matilda/*
 !.matilda/skills/
+
+# Poll Bludger fallback: the cached feed is 600KB and refetched each run;
+# seen.json (the first-seen grace ledger) beside it IS committed.
+.build/pollbludger-src/current.xml

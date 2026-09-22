@@ -2090,6 +2090,8 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    date nobody recorded. Dashed, so the column doesn't pass it off as the
    thing its heading promises. */
 .released-pill.est { font-weight: 600; color: var(--ink-3); border-style: dashed; background: none; }
+/* a provisional (Poll Bludger-mirrored) wave – see releaseMetaRows */
+.provisional-tag { display: inline-block; margin-left: .35em; padding: 0 .4em; border: 1px dashed var(--ink-3); border-radius: 3px; color: var(--ink-3); font-size: .78em; letter-spacing: .02em; text-transform: uppercase; }
 .poll-table .muted { color: var(--ink-3); }
 .poll-table .num { font-weight: 600; font-variant-numeric: tabular-nums; }
 
@@ -12634,6 +12636,30 @@ function sampleValue(x) {
    mid-sentence after "and", so it stays lower case. */
 function releaseMetaRows(r) {
   const relRows = [];
+  /* A PROVISIONAL row: the house's own extractor had not landed this wave,
+     so the fallback agent filed it from Poll Bludger's poll-data feed
+     (gen-data's mergedPolls). Second-hand figures – no release clock, the
+     Independents/Other remainder combined – and it is replaced, not kept,
+     when the house's release is captured. Said first, before the links,
+     because it changes how every other value in the band should be read. */
+  if (r.provisional) relRows.push(/*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-i",
+    key: "prov"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-k"
+  }, "Source"), /*#__PURE__*/React.createElement("span", {
+    className: "pd-meta-v"
+  }, /*#__PURE__*/React.createElement("a", {
+    className: "pd-release",
+    href: r.url,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, r.provisional, /*#__PURE__*/React.createElement("span", {
+    className: "plink-mark",
+    "aria-hidden": "true"
+  }, "\u2197")), /*#__PURE__*/React.createElement("span", {
+    className: "pd-s-note"
+  }, " (provisional – figures mirrored from its poll-data table until the pollster’s own release is captured)"))));
   if (r.releaseUrl) relRows.push(/*#__PURE__*/React.createElement("span", {
     className: "pd-meta-i",
     key: "rel"
@@ -13611,7 +13637,10 @@ function PollsterTable({
       className: "pollster-mode"
     }, r.client), /*#__PURE__*/React.createElement(MethodLink, {
       url: r.methodUrl
-    })), /*#__PURE__*/React.createElement("td", {
+    }), r.provisional && /*#__PURE__*/React.createElement("span", {
+      className: "pollster-mode provisional-tag",
+      title: "Provisional: mirrored from " + r.provisional + " until the pollster’s own release is captured"
+    }, "provisional")), /*#__PURE__*/React.createElement("td", {
       className: "ta-l"
     }, /*#__PURE__*/React.createElement("span", {
       className: "released-pill" + (r.publishedLabel ? "" : " est"),

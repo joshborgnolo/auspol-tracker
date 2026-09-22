@@ -62,7 +62,36 @@ const CYCLE_SOURCE_ASSET = path.join(HERE, "assets", "cycle-source.json");
    now a frozen historical artefact and nothing reads it. */
 const ELECTIONS = D.elections;
 const EVENTS = D.events;
-const POLLS = D.polls.filter((p) => !p.isElection);
+/* ---- provisional rows ---------------------------------------------------
+   D.fallbackPolls holds waves the Poll Bludger fallback
+   (.build/extract-pollbludger.mjs) filed because the house's own extractor
+   had not: second-hand figures, no release clock, no ind/oth split. They
+   join the page ONLY where no canonical row of the same house sits within
+   FALLBACK_SLACK days of their fieldwork end - the moment the house's
+   extractor lands the real row, the fallback is shadowed here and pruned by
+   the fallback agent's next run. Kept out of D.polls because every extractor
+   dedupes against that array and never overwrites; merged HERE because this
+   is the one door every view, aggregate and projection reads through. Each
+   merged row carries `provisional` so the views can say so. */
+const FALLBACK_SLACK = 3;
+const FALLBACK_HOUSE_SLACK = { Essential: 7 }; // the feed keys Essential by report date
+const FALLBACK_HOUSES = { "RedBridge/Accent": ["RedBridge/Accent", "Redbridge"], "Roy Morgan": ["Roy Morgan", "Roy Morgan (SMS)"] };
+const mergedPolls = (() => {
+  const fb = Array.isArray(D.fallbackPolls) ? D.fallbackPolls : [];
+  if (!fb.length) return D.polls;
+  const dayGap = (a, b) => Math.abs(Math.round((Date.parse(a) - Date.parse(b)) / 86400000));
+  const live = fb.filter((f) => {
+    const names = FALLBACK_HOUSES[f.pollster] || [f.pollster];
+    const slack = FALLBACK_HOUSE_SLACK[f.pollster] ?? FALLBACK_SLACK;
+    return !D.polls.some((p) => names.includes(p.pollster) && dayGap(p.date, f.date) <= slack);
+  });
+  if (!live.length) return D.polls;
+  console.log(`fallbackPolls: ${live.length} provisional row(s) merged (${fb.length - live.length} shadowed by canonical rows) →`,
+    live.map((f) => `${f.pollster} ${f.date}`).join(", "));
+  // stable date order, as validate.mjs demands of D.polls itself
+  return [...D.polls, ...live].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+})();
+const POLLS = mergedPolls.filter((p) => !p.isElection);
 const ppm = D.ppm;
 const appr = D.approval.map((r) => ({ ...r, splits: r.detail ?? null }));
 const cyclePolls = D.cyclePolls;
@@ -1292,6 +1321,11 @@ const individualPolls = POLLS.map((p) => {
     ...(p.releaseUrl && RELEASE_HUB.has(p.pollster) ? { releaseHub: RELEASE_HUB.get(p.pollster) } : {}),
     // the wave's APC methodology statement (YouGov/Newspoll only)
     ...(p.methodUrl ? { methodUrl: p.methodUrl } : {}),
+    /* a PROVISIONAL row: filed from Poll Bludger's poll-data feed by the
+       fallback agent because the house's own extractor had not landed the
+       wave (see mergedPolls above). The view names the source and says the
+       figures are second-hand; the row leaves when the real one arrives. */
+    ...(p.provisional ? { provisional: p.provisional.source || "Poll Bludger" } : {}),
     // right-track / wrong-track, where this poll asked it
     ...(DIR_BY.has(p.date + "|" + p.pollster) ? { dir: DIR_BY.get(p.date + "|" + p.pollster) } : {}),
     // seat projections – MRPs only. Carried verbatim; their change basis is the

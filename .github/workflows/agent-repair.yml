@@ -29,6 +29,7 @@ on:
       - newspoll-update
       - sampleeff-update
       - roymorgan-update
+      - pollbludger-fallback
       - coverage-check
       - citation-check
       - prediction-refresh
@@ -95,6 +96,7 @@ jobs:
             newspoll-update)    HP=.build/newspoll-repair-prompt.md ;;
             sampleeff-update)   HP=.build/sampleeff-repair-prompt.md ;;
             roymorgan-update)   HP=.build/roymorgan-repair-prompt.md ;;
+            pollbludger-fallback) HP=.build/pollbludger-repair-prompt.md ;;
             coverage-check)     HP=.build/coverage-doctor-repair-prompt.md ;;
             prediction-refresh) HP=.build/prediction-repair-prompt.md ;;
             *)                  HP="" ;;

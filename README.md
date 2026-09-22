@@ -66,6 +66,14 @@ new and worth looking at.
   `pollsterRules.Essential.releaseHub`; gen-data stamps it onto every
   Essential wave beside `releaseUrl`, and the expanded poll shows both
   addresses under the one "Pollster's release" pointer.
+- **Provisional rows.** When a house's own extractor has not landed a wave
+  within 18 hours of it appearing on Poll Bludger's poll-data feed, the
+  fallback agent (`.build/extract-pollbludger.mjs`) files it into
+  `fallbackPolls` — a separate array, same row shape, with a `provisional`
+  stamp, no `published` clock, and the Independents/Other remainder in `ind`
+  (`oth: null`). The page merges such a row only while no `polls[]` row of
+  that house sits within a few days of it, and labels it provisional; the
+  house's real row replaces it automatically. Never hand-edit the array.
 - Leadership rows must key to **fieldwork end**, matching their poll. An
   unexplained "leadership-only" row in the build output usually means a date has
   drifted off its poll, not that the firm skipped voting intention.

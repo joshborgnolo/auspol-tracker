@@ -2207,6 +2207,23 @@ function sampleValue(x) {
    mid-sentence after "and", so it stays lower case. */
 function releaseMetaRows(r) {
   const relRows = [];
+  /* A PROVISIONAL row: the house's own extractor had not landed this wave,
+     so the fallback agent filed it from Poll Bludger's poll-data feed
+     (gen-data's mergedPolls). Second-hand figures – no release clock, the
+     Independents/Other remainder combined – and it is replaced, not kept,
+     when the house's release is captured. Said first, before the links,
+     because it changes how every other value in the band should be read. */
+  if (r.provisional) relRows.push(
+    <span className="pd-meta-i" key="prov">
+      <span className="pd-meta-k">Source</span>
+      <span className="pd-meta-v">
+        <a className="pd-release" href={r.url} target="_blank" rel="noopener noreferrer">
+          {r.provisional}<span className="plink-mark" aria-hidden="true">↗</span>
+        </a>
+        <span className="pd-s-note">{" (provisional – figures mirrored from its poll-data table until the pollster’s own release is captured)"}</span>
+      </span>
+    </span>
+  );
   if (r.releaseUrl) relRows.push(
     <span className="pd-meta-i" key="rel">
       <span className="pd-meta-k">Pollster’s release</span>
@@ -3131,6 +3148,11 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                       <PollsterName name={r.pollster} url={r.url} />
                       <span className="pollster-mode">{r.client}</span>
                       <MethodLink url={r.methodUrl} />
+                      {/* filed from Poll Bludger's feed while the house's own
+                          release is still uncaptured – the expanded row says
+                          what that means */}
+                      {r.provisional && <span className="pollster-mode provisional-tag"
+                                              title={"Provisional: mirrored from " + r.provisional + " until the pollster’s own release is captured"}>provisional</span>}
                     </td>
                     {/* The date the poll was PUBLISHED where the source says so.
                         Where it doesn't, this falls back to the last day of
