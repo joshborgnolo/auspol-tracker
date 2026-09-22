@@ -4611,6 +4611,7 @@
       "pollster": "Newspoll",
       "client": "The Australian",
       "sample": 1244,
+      "sampleEff": 998,
       "alp": 27,
       "lnp": 19,
       "grn": 13,
@@ -4619,7 +4620,8 @@
       "oth": null,
       "tpp_alp": null,
       "tpp_lnp": null,
-      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455"
+      "url": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455",
+      "methodUrl": "https://pyxispolling.com/api.php/images/document/28195281/NewspollMethodologyStatement21September2026byPyxis-bToKYVD66G-g0e4tmAkQNA.pdf"
     },
     {
       "date": "2026-09-20",
