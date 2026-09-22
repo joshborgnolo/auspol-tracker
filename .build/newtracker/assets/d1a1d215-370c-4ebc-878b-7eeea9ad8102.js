@@ -681,6 +681,87 @@ function cycMonthOf(eDate, m) {
    whitelist pins the event to those chart measures alone. */
 const cycEventMonth = (iso, eDate) => (Date.parse(iso) - Date.parse(eDate)) / 86400000 / MS_MONTH_C;
 const CYC_EVENTS = {
+  /* Pre-1987 terms: the leadership handovers the Morgan Gallup lines splice
+     on (CYC_META in gen-data), dated to the day the party room decided or
+     the office changed hands. Two handovers fall in the fortnight after an
+     election and are listed the way 2001's Beazley → Crean and 2016's
+     Shorten → Albanese are: at the start of the term they open, and at the
+     tail of the term whose line they end. */
+  1972: [
+    {
+      date: "1972-12-20", short: "McMahon → Snedden",
+      label: "Snedden replaces McMahon as opposition leader",
+      desc: "Billy Snedden defeats Nigel Bowen 30–29 for the Liberal leadership after William McMahon stands down following the 1972 election defeat, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+  ],
+  1974: [
+    {
+      date: "1975-03-21", short: "Snedden → Fraser",
+      label: "Fraser replaces Snedden as opposition leader",
+      desc: "Malcolm Fraser defeats Billy Snedden 37–27 in a Liberal leadership spill, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+    {
+      date: "1975-11-11", short: "The Dismissal",
+      label: "Kerr dismisses Whitlam; Fraser caretaker prime minister",
+      desc: "Governor-General Sir John Kerr dismisses the Whitlam government after the Senate blocks supply and commissions Malcolm Fraser as caretaker prime minister pending the 13 December election; Whitlam leads the opposition through the campaign.",
+      major: true,
+    },
+  ],
+  1975: [
+    {
+      date: "1977-12-22", short: "Whitlam → Hayden",
+      label: "Hayden replaces Whitlam as opposition leader",
+      desc: "Bill Hayden defeats Lionel Bowen 36–28 for the Labor leadership after Gough Whitlam resigns following the 1977 election defeat, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+  ],
+  1977: [
+    {
+      date: "1977-12-22", short: "Whitlam → Hayden",
+      label: "Hayden replaces Whitlam as opposition leader",
+      desc: "Bill Hayden defeats Lionel Bowen 36–28 for the Labor leadership after Gough Whitlam resigns following the 1977 election defeat, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+  ],
+  1980: [
+    {
+      date: "1982-04-08", short: "Peacock challenges Fraser",
+      label: "Peacock mounts a leadership challenge",
+      desc: "Andrew Peacock, having resigned from cabinet a year earlier, challenges Malcolm Fraser for the Liberal leadership and loses the ballot 54 votes to 27.",
+      major: true,
+    },
+    {
+      date: "1983-02-03", short: "Hayden → Hawke",
+      label: "Hawke replaces Hayden as opposition leader",
+      desc: "Bill Hayden resigns the Labor leadership and Bob Hawke is elected unopposed as his replacement on the morning Malcolm Fraser calls the March 1983 election.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+  ],
+  1983: [
+    {
+      date: "1983-03-11", short: "Fraser → Peacock",
+      label: "Peacock replaces Fraser as opposition leader",
+      desc: "Andrew Peacock defeats John Howard 36–20 for the Liberal leadership after Malcolm Fraser resigns following the 1983 election defeat, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+  ],
+  1984: [
+    {
+      date: "1985-09-05", short: "Peacock → Howard",
+      label: "Howard replaces Peacock as opposition leader",
+      desc: "Andrew Peacock resigns the Liberal leadership after the party room refuses to remove John Howard as his deputy; Howard is elected leader 57 votes to 6, becoming opposition leader.",
+      major: true,
+      metrics: ["oppnet"],
+    },
+  ],
   1987: [
     {
       date: "1989-05-09", short: "Howard → Peacock",
