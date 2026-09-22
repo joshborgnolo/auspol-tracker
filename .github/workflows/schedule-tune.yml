@@ -83,6 +83,9 @@ jobs:
 
       - name: Regenerate the schedule blocks
         id: tune
+        # explicit bash → pipefail, so the tuner's exit 2 (a workflow file
+        # without markers) fails the step instead of vanishing behind tee
+        shell: bash
         run: |
           node .build/tune-schedules.mjs --apply | tee tune.log
           if git diff --quiet -- .github/workflows; then
