@@ -46,6 +46,13 @@ on:
   schedule:
     - cron: '0 20 * * 6' # Sun 06:00 AEST / 07:00 AEDT — after the DST switch hour
   workflow_dispatch:
+    inputs:
+      probe_token:
+        description: 'Only check that SCHEDULE_TUNER_TOKEN can read this repo (no tuning)'
+        required: false
+        default: 'false'
+        type: choice
+        options: ['false', 'true']
 
 # Pushes to main → serialise with the other writers (see roymorgan-update.yml).
 concurrency:
@@ -81,7 +88,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Probe the tuner token
+        if: inputs.probe_token == 'true'
+        env:
+          TUNER_TOKEN: ${{ secrets.SCHEDULE_TUNER_TOKEN }}
+        run: |
+          if [ -z "$TUNER_TOKEN" ]; then echo "::error::SCHEDULE_TUNER_TOKEN is not set"; exit 1; fi
+          if GH_TOKEN="$TUNER_TOKEN" gh api "repos/$GITHUB_REPOSITORY" --jq '"token can read " + .full_name'; then
+            echo "SCHEDULE_TUNER_TOKEN reads $GITHUB_REPOSITORY — the push path will work if it also has Workflows: write"
+          else
+            echo "::error::SCHEDULE_TUNER_TOKEN cannot read $GITHUB_REPOSITORY — regenerate the fine-grained PAT with this repository selected and Contents + Workflows read/write"
+            exit 1
+          fi
+
       - name: Regenerate the schedule blocks
+        if: inputs.probe_token != 'true'
         id: tune
         # explicit bash → pipefail, so the tuner's exit 2 (a workflow file
         # without markers) fails the step instead of vanishing behind tee
