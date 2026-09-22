@@ -1,0 +1,25 @@
+{
+  "source": "wikipedia",
+  "title": "Opinion_polling_for_the_next_Australian_federal_election",
+  "url": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
+  "published": null,
+  "fieldwork": {
+    "date": "2026-09-21",
+    "dateStart": "2026-09-15",
+    "sample": 1500
+  },
+  "vi": {
+    "alp": 26,
+    "lnp": 21,
+    "grn": 14,
+    "onp": 27,
+    "ind": 6,
+    "oth": 6,
+    "tpp_alp": 52,
+    "tpp_lnp": 48
+  },
+  "satisfaction": null,
+  "ppm": null,
+  "altTpp": null,
+  "infogram": null
+}
