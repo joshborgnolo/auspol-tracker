@@ -20,6 +20,13 @@ a GENERATED build artifact — never hand-edit it.
   standalone, and `poll-agent.yml` (reusable) driven by the eight house
   caller workflows; `coverage-check.yml` is the gap watchdog whose failure
   emails a missing-poll alert. Local launchd jobs mirror these as backup.
+  The cron block between `# tune-schedules:begin/end` in each caller is
+  GENERATED: `.build/tune-schedules.mjs` measures every house's weekday and
+  release hours from the `published` clock times in polls.json and rewrites
+  it (`--apply`; `--check` for drift); `schedule-tune.yml` runs it after
+  every updater completes and weekly for the DST offset, pushing under the
+  `SCHEDULE_TUNER_TOKEN` PAT (GITHUB_TOKEN can't touch workflow files).
+  Never hand-edit inside the markers — change the recipe in the script.
 - `.github/workflows/agent-repair.yml` — the CENTRAL Matilda repair agent.
   Any watched workflow failing on main triggers it (workflow_run). Its gate
   job maps the workflow to a house prompt (`.build/*-repair-prompt.md`;

@@ -1,0 +1,134 @@
+# Schedule tuner — keeps the poll updaters' cron windows on the houses' own
+# release habit. Runs .build/tune-schedules.mjs, which re-measures each
+# house's weekday and release hours from the `published` clock times in
+# data/polls.json and regenerates the cron block between the tune-schedules
+# markers in every caller workflow; a changed block is committed straight to
+# main, so the next release window is already where the last release said it
+# would be.
+#
+# Three triggers for three ways the answer changes:
+#   * workflow_run of every updater — a wave that landed carries a fresh
+#     `published`, and the updaters push with GITHUB_TOKEN, whose pushes never
+#     fire `on: push` (the same reason agent-repair.yml listens this way).
+#     Most completions are no-op sweeps; the tuner is deterministic on the
+#     data, so those runs are a checkout and a 15-second no-op.
+#   * push to main touching data/polls.json — a hand-entered row
+#   * weekly — cron is UTC and the habit is eastern; the offset moves at
+#     each DST change, and the block records the offset it was generated with
+#
+# Pushing a change to a workflow file needs the `workflow` scope, which the
+# default GITHUB_TOKEN never has — so the commit goes out under the
+# SCHEDULE_TUNER_TOKEN secret (a fine-grained PAT for this repo: Contents
+# read/write + Workflows read/write). Without it the run still measures and
+# prints the block it would have written, and FAILS when that block differs
+# from what is committed: the failure email is the message, and the summary
+# carries the one-line fix (`node .build/tune-schedules.mjs --apply`). Not in
+# agent-repair's watch list on purpose — .github/ is a forbidden path for the
+# repair agent, and a secret is a human's job.
+
+name: schedule-tune
+
+on:
+  workflow_run:
+    workflows:
+      - roymorgan-update
+      - resolve-update
+      - essential-update
+      - redbridge-update
+      - newspoll-update
+      - demosau-update
+      - spectre-update
+      - foxhedgehog-update
+    types: [completed]
+  push:
+    branches: [main]
+    paths: ['data/polls.json']
+  schedule:
+    - cron: '0 20 * * 6' # Sun 06:00 AEST / 07:00 AEDT — after the DST switch hour
+  workflow_dispatch:
+
+# Pushes to main → serialise with the other writers (see roymorgan-update.yml).
+concurrency:
+  group: main-writers
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tune:
+    # a failed updater run has no new data to tune from; agent-repair owns it
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+        with:
+          # workflow_run checks out the default branch's head, which already
+          # holds whatever the triggering updater pushed; pin the ref anyway
+          ref: main
+          # the PAT when it exists (its push is what may touch .github/), else
+          # the default token, whose push will be refused and reported below
+          token: ${{ secrets.SCHEDULE_TUNER_TOKEN || github.token }}
+
+      - name: Pin Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        with:
+          node-version-file: .nvmrc
+
+      - name: Configure git identity
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Regenerate the schedule blocks
+        id: tune
+        run: |
+          node .build/tune-schedules.mjs --apply | tee tune.log
+          if git diff --quiet -- .github/workflows; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "schedules already match the recorded release times; nothing to commit"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git --no-pager diff --stat -- .github/workflows
+          fi
+
+      - name: Commit and push the tuned schedules
+        if: steps.tune.outputs.changed == 'true'
+        env:
+          HAS_TOKEN: ${{ secrets.SCHEDULE_TUNER_TOKEN != '' }}
+          TRIGGER: ${{ github.event_name }}
+        run: |
+          {
+            echo "### Schedule blocks regenerated"
+            echo '```diff'
+            git --no-pager diff -- .github/workflows | head -n 300
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$HAS_TOKEN" != "true" ]; then
+            {
+              echo
+              echo "**Not pushed:** the SCHEDULE_TUNER_TOKEN secret is not set, and GITHUB_TOKEN cannot modify workflow files."
+              echo "Either add the secret (fine-grained PAT: Contents + Workflows, read/write, this repo) or apply locally:"
+              echo '```'
+              echo 'node .build/tune-schedules.mjs --apply && git add .github/workflows && git commit -m "Tune poll-agent schedules from recorded release times" && git push'
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+            echo "::error::schedule blocks are stale and SCHEDULE_TUNER_TOKEN is not set; see the run summary"
+            exit 1
+          fi
+          git add .github/workflows
+          git commit -m "Tune poll-agent schedules from recorded release times" \
+            -m "Generated by .build/tune-schedules.mjs (schedule-tune.yml, $TRIGGER)."
+          # one rebase retry, as every writer does (ci-main-writer-races)
+          if ! git push origin HEAD:main; then
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Show what the tuner measured
+        if: always()
+        run: |
+          echo "::group::tune-schedules.mjs output"
+          cat tune.log 2>/dev/null || true
+          echo "::endgroup::"
