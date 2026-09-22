@@ -242,7 +242,7 @@ function buildFavicon() {
     if (i < 0) throw new Error("favicon: " + name + " not found in dataset");
     return JSON.parse(src.slice(i + name.length + 9, src.indexOf("\n", i)).replace(/;$/, ""));
   };
-  const agg2pp = grab("agg2pp"), alt2pp = grab("alt2pp"), L = grab("latest");
+  const L = grab("latest"), S = grab("synthLatest"), alt = grab("altLatest");
 
   // --- graduations: latest primary aggregate, tallest first (as on the page) ---
   const lp = L.primary;
@@ -252,12 +252,19 @@ function buildFavicon() {
   const MIN_H = 5, MAX_H = 10.5;
   glyph.forEach((p) => { p.h = gmax === gmin ? MAX_H : MIN_H + ((p.v - gmin) / (gmax - gmin)) * (MAX_H - MIN_H); });
 
-  // --- needle: 2PP against Labor's strongest challenger ---
-  const g2 = agg2pp[agg2pp.length - 1];
-  const gon = alt2pp.alp_on && alt2pp.alp_on[alt2pp.alp_on.length - 1];
-  const cands = [{ id: "lnp", lab: g2.alp, opp: g2.lnp }];
-  if (gon) cands.push({ id: "onp", lab: gon.a, opp: gon.b });
-  const top = cands.slice().sort((x, y) => y.opp - x.opp)[0];
+  /* --- needle: 2PP against Labor's rival, AS THE MASTHEAD RULES IT ---
+     The rival is gen-data's rivalLead - the deadband walk over the implied
+     series that decides which contest the hero leads with - and the margin
+     is read on the same basis the hero prints: implied (synthLatest / onImp)
+     where it exists, the published pair otherwise. This used to pick
+     whichever challenger had the larger PUBLISHED 2PP share, with no
+     deadband: on 2026-09-21 that still said Coalition (48.0 v 46.4) while
+     the page, on the implied basis, had already moved to One Nation, so the
+     tab icon argued with the masthead beside it. */
+  const rival = L.rivalLead === "alp_on" && (L.onImp?.a != null || alt?.alp_on?.a != null) ? "onp" : "lnp";
+  const top = rival === "onp"
+    ? (L.onImp?.a != null ? { id: "onp", lab: L.onImp.a, opp: L.onImp.b } : { id: "onp", lab: alt.alp_on.a, opp: alt.alp_on.b })
+    : (S && S.alp != null ? { id: "lnp", lab: S.alp, opp: S.lnp } : { id: "lnp", lab: L.alp2pp, opp: L.lnp2pp });
   const margin = top.lab - top.opp;
   const needleDeg = -Math.max(-1, Math.min(1, margin / 12)) * 34;
   const needleHex = margin >= 0 ? PARTY_HEX.alp : PARTY_HEX[top.id];
