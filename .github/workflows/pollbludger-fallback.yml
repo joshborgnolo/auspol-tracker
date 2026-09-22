@@ -16,7 +16,7 @@ name: pollbludger-fallback
 
 on:
   schedule:
-    - cron: '30 2,8,14,20 * * *' # 12:30 / 18:30 / 00:30 / 06:30 AEST
+    - cron: '35 2,8,14,20 * * *' # 12:35 / 18:35 / 00:35 / 06:35 AEST (off Resolve's Sunday comb)
   workflow_dispatch:
     inputs:
       simulate_failure:

@@ -54,7 +54,7 @@
      POLLS_JSON=<path>  read another dataset (tests); WORKFLOWS_DIR likewise.
      TUNE_NOW=<ISO instant>  pin the clock (tests: the offset and the header). */
 
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 // ---- policy ---------------------------------------------------------------
@@ -85,24 +85,36 @@ const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
    the catch-all; `mode` picks the window shape (see header); `step` widens
    the comb for an extractor whose run is expensive; `chaseOutliers: false`
    ends the comb at the trimmed-latest release instead of reaching past the
-   single latest one. */
+   single latest one; `phase` shifts every weekday slot by that many minutes.
+
+   WHY PHASES: every writer shares one GitHub concurrency group
+   (main-writers), and GitHub keeps at most ONE job waiting in a group — a
+   third arrival CANCELS the older waiting one ("Canceling since a higher
+   priority waiting request for main-writers exists"). Two houses combing
+   the same evening on the same minutes therefore throw runs away, and
+   nothing red says so. So workflows that share a weekday sit on different
+   minutes, the daily sweeps are spread, and the audit below refuses to
+   write a schedule in which three writers share a minute. */
 const TARGETS = [
-  { workflow: "roymorgan-update.yml", houses: ["Roy Morgan"], mode: "dense", sweep: "06:00" },
-  { workflow: "resolve-update.yml", houses: ["Resolve"], mode: "dense", sweep: "07:00" },
+  { workflow: "roymorgan-update.yml", houses: ["Roy Morgan"], mode: "dense", sweep: "06:00", phase: 0 },
+  { workflow: "resolve-update.yml", houses: ["Resolve"], mode: "dense", sweep: "07:00", phase: 0 },
   // each run is a ~10-minute full crawl of essentialreport.com.au and the
   // writers queue is serialised, so the comb is coarse and stops at the
-  // habitual hour; the hourly follow-ups cover the occasional late file
-  { workflow: "essential-update.yml", houses: ["Essential"], mode: "dense", sweep: "07:10",
-    step: 30, chaseOutliers: false },
-  { workflow: "redbridge-update.yml", houses: ["RedBridge/Accent"], mode: "dense", sweep: "07:15",
+  // habitual hour; the hourly follow-ups cover the occasional late file.
+  // Its daily sweep sits AFTER the morning cluster: a 10-minute holder of
+  // the writers queue in the middle of it is what got np-score cancelled.
+  { workflow: "essential-update.yml", houses: ["Essential"], mode: "dense", sweep: "07:45",
+    step: 30, chaseOutliers: false, phase: 0 },
+  // shares its Sunday evening with Resolve: phased 5 min off Resolve's comb
+  { workflow: "redbridge-update.yml", houses: ["RedBridge/Accent"], mode: "dense", sweep: "07:20",
     // evening PDF drops — the standing second daily check
-    extraDaily: ["18:15"] },
+    extraDaily: ["18:15"], phase: 5 },
   // secondary coverage lags the Sunday-evening embargo by hours to days
-  { workflow: "newspoll-update.yml", houses: ["Newspoll"], mode: "sparse", sweep: "06:00" },
+  { workflow: "newspoll-update.yml", houses: ["Newspoll"], mode: "sparse", sweep: "06:10", phase: 2 },
   // The Infogram watchdog: DETECTS a wave from the anonymous slug at the
   // embargo itself (a 10-second job), so it combs the habitual hour itself
   // — figures land through the extractor, not here.
-  { workflow: "newspoll-watch.yml", houses: ["Newspoll"], mode: "watch" },
+  { workflow: "newspoll-watch.yml", houses: ["Newspoll"], mode: "watch", phase: 4 },
   // the daily 07:05 sweep stays hand-authored in the file (the run gate
   // names its cron string), so the tuner adds the bracketing checks only
   { workflow: "demosau-update.yml", houses: ["DemosAU"], mode: "dense" },
@@ -238,30 +250,34 @@ function layout(target, m) {
   }
 
   const d = m.dow, next = (d + 1) % 7;
+  const ph = target.phase || 0;
+  const add0 = add;
+  // every weekday slot from here on carries the workflow's phase
+  const addP = (dow, mins, label) => add0(dow, mins + ph, label);
   if (target.mode === "watch") {
     // a detector, not an extractor: a 10-second job, so it can afford to sit
     // on the embargo itself and re-check every 20 min until just past the
     // latest habitual hour — nothing after that, the daily catch-all covers it
-    for (let t = m.from; t <= m.to + 30; t += 20) add(d, t, "watch: the habitual hour, every 20 min");
+    for (let t = m.from; t <= m.to + 30; t += 20) addP(d, t, "watch: the habitual hour, every 20 min");
     return { slots, notes };
   }
   let lastSlot = start;
   if (target.mode === "dense") {
     let step = target.step || DENSE_STEP;
     while ((end - start) / step + 1 > DENSE_MAX) step += 5;
-    for (let t = start; t <= end; t += step) { add(d, t, `release window, every ${step} min`); lastSlot = t; }
+    for (let t = start; t <= end; t += step) { addP(d, t, `release window, every ${step} min`); lastSlot = t; }
   } else {
-    add(d, start, "release window (sparse: the extractor lags the release)");
-    for (const off of SPARSE_OFFSETS) { lastSlot = ceilTo(end + off, DENSE_STEP); add(d, lastSlot, "release window (sparse: the extractor lags the release)"); }
+    addP(d, start, "release window (sparse: the extractor lags the release)");
+    for (const off of SPARSE_OFFSETS) { lastSlot = ceilTo(end + off, DENSE_STEP); addP(d, lastSlot, "release window (sparse: the extractor lags the release)"); }
   }
   // follow-ups on the hour from the last comb slot, then the evening backstop
   const firstHour = ceilTo(lastSlot + 1, 60);
-  for (let i = 0; i < FOLLOW_HOURS; i++) add(d, firstHour + i * 60, "follow-up");
+  for (let i = 0; i < FOLLOW_HOURS; i++) addP(d, firstHour + i * 60, "follow-up");
   const late = toMins(LATE_BACKSTOP);
-  if (late > firstHour + (FOLLOW_HOURS - 1) * 60) add(d, late, "late backstop");
+  if (late > firstHour + (FOLLOW_HOURS - 1) * 60) addP(d, late, "late backstop");
   // next day
-  add(next, toMins(target.sweep || "06:00"), "next-day");
-  add(next, toMins(NEXT_DAY_EVENING), "next-day");
+  addP(next, toMins(target.sweep || "06:00"), "next-day");
+  addP(next, toMins(NEXT_DAY_EVENING), "next-day");
   return { slots, notes };
 }
 
@@ -356,27 +372,59 @@ function splice(text, blockLines) {
   return [...lines.slice(0, b), ...body, ...lines.slice(e + 1)].join("\n");
 }
 
+// ---- collision audit -------------------------------------------------------------
+/* Every `- cron:` line in every writer workflow (a caller of poll-agent.yml
+   or a member of the main-writers group), expanded to (utc weekday, hour,
+   minute) keys. Returns the minutes three or more writers share — the ones
+   GitHub will cancel a run on — and, for information, the pairs. */
+function expandCron(expr) {
+  const [mi, hr, , , dw] = expr.trim().split(/\s+/);
+  const list = (f, max) => (f === "*" ? [...Array(max).keys()] : f.split(",").flatMap((x) => {
+    const r = /^(\d+)-(\d+)$/.exec(x); return r ? Array.from({ length: +r[2] - +r[1] + 1 }, (_, k) => +r[1] + k) : [+x]; }));
+  const keys = [];
+  for (const d of list(dw, 7)) for (const h of list(hr, 24)) for (const m of list(mi, 60)) keys.push(`${d % 7}|${h}|${m}`);
+  return keys;
+}
+export function auditCollisions(workflowsDir, overrides = {}) {
+  const byKey = new Map();
+  for (const f of readdirSync(workflowsDir).filter((x) => x.endsWith(".yml")).sort()) {
+    const text = overrides[f] ?? readFileSync(join(workflowsDir, f), "utf8");
+    if (!/group: main-writers|poll-agent\.yml/.test(text)) continue;
+    for (const m of text.matchAll(/^\s*- cron: '([^']+)'/gm))
+      for (const k of expandCron(m[1])) (byKey.get(k) || byKey.set(k, new Set()).get(k)).add(f);
+  }
+  const fmt = (k, ws) => { const [d, h, mi] = k.split("|").map(Number); return `${DOW[d]} ${String(h).padStart(2, "0")}:${String(mi).padStart(2, "0")} UTC — ${[...ws].join(", ")}`; };
+  const triples = [], pairs = [];
+  for (const [k, ws] of byKey) { if (ws.size >= 3) triples.push(fmt(k, ws)); else if (ws.size === 2) pairs.push(fmt(k, ws)); }
+  return { triples: triples.sort(), pairs: pairs.sort() };
+}
+
 // ---- main ----------------------------------------------------------------------
 export function tune({ data, workflowsDir, now, apply = false }) {
   const results = [];
+  const proposed = {};
   for (const t of TARGETS) {
     const path = join(workflowsDir, t.workflow);
     const { lines, notes, measured } = blockFor(t, data, now);
     let status = "missing";
-    let before = null;
+    let before = null, after = null;
     if (existsSync(path)) {
       before = readFileSync(path, "utf8");
-      const after = splice(before, lines);
+      after = splice(before, lines);
       if (after == null) status = "no-markers";
       else if (after === before) status = "current";
-      else {
-        status = "stale";
-        if (apply) { writeFileSync(path, after); status = "updated"; }
-      }
+      else status = "stale";
+      if (after != null) proposed[t.workflow] = after;
     }
-    results.push({ target: t, path, lines, notes, measured, status });
+    results.push({ target: t, path, lines, notes, measured, status, after });
   }
-  return results;
+  // the schedule as it WOULD be — nothing is written while three writers
+  // share a minute anywhere in it (hand-authored slots included)
+  const audit = auditCollisions(workflowsDir, proposed);
+  if (apply && !audit.triples.length) {
+    for (const r of results) if (r.status === "stale") { writeFileSync(r.path, r.after); r.status = "updated"; }
+  }
+  return Object.assign(results, { audit });
 }
 
 const isMain = process.argv[1] && import.meta.url.endsWith(process.argv[1].replace(/^.*[\\/]/, "/"));
@@ -395,8 +443,14 @@ if (isMain) {
     if (r.status === "stale") stale++;
     if (r.status === "missing" || r.status === "no-markers") broken++;
   }
+  const { triples, pairs } = results.audit;
+  console.log(`\n== writers sharing a minute (main-writers keeps ONE job waiting; a third cancels it)`);
+  for (const t of triples) console.log(`   COLLISION ${t}`);
+  for (const p of pairs) console.log(`   pair      ${p}`);
+  if (!triples.length && !pairs.length) console.log("   none");
   const summary = results.map((r) => `${r.target.workflow}=${r.status}`).join(" ");
-  console.log(`\nTUNE_STATUS ${JSON.stringify({ stale, broken, apply, check, offsetMinutes: easternOffsetMinutes(now), results: summary })}`);
+  console.log(`\nTUNE_STATUS ${JSON.stringify({ stale, broken, apply, check, collisions: triples.length, offsetMinutes: easternOffsetMinutes(now), results: summary })}`);
   if (broken) { console.error("workflow files without tune-schedules markers — add them before running the tuner"); process.exit(2); }
+  if (triples.length) { console.error(`refusing: ${triples.length} minute(s) with three or more writers scheduled — move a hand-authored slot or a phase`); process.exit(3); }
   if (check && stale) process.exit(1);
 }

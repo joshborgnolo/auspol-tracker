@@ -44,7 +44,7 @@ on:
     branches: [main]
     paths: ['data/polls.json']
   schedule:
-    - cron: '0 20 * * 6' # Sun 06:00 AEST / 07:00 AEDT — after the DST switch hour
+    - cron: '10 20 * * 6' # Sun 06:10 AEST / 07:10 AEDT — after the DST switch hour, off the 06:00 sweeps
   workflow_dispatch:
     inputs:
       probe_token:

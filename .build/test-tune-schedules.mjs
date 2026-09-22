@@ -51,14 +51,16 @@ const dir = mkdtempSync(path.join(tmpdir(), "tune-"));
 const files = ["roymorgan-update.yml", "resolve-update.yml", "essential-update.yml",
   "redbridge-update.yml", "newspoll-update.yml", "newspoll-watch.yml", "demosau-update.yml",
   "spectre-update.yml", "foxhedgehog-update.yml"];
-for (const f of files) {
+// each file keeps one hand-authored slot on a minute of its own (nine
+// writers on one minute would trip the collision audit, rightly)
+files.forEach((f, i) => {
   writeFileSync(path.join(dir, f), [
     "name: x", "on:", "  schedule:",
     "    # tune-schedules:begin", "    # tune-schedules:end",
-    "    - cron: '2 19 * * *' # hand-authored, must survive",
-    "  workflow_dispatch:", "",
+    `    - cron: '${2 + i} 19 * * *' # hand-authored, must survive`,
+    "  workflow_dispatch:", "jobs:", "  run:", "    uses: ./.github/workflows/poll-agent.yml", "",
   ].join("\n"));
-}
+});
 
 const crons = (text) => [...text.matchAll(/- cron: '([^']+)'\s*# (.*)/g)].map((m) => ({ cron: m[1], note: m[2] }));
 
@@ -89,13 +91,13 @@ assert.ok(!rmCrons.some((c) => c.cron === "0 20 * * 2"), "next-day morning folds
 
 // Newspoll: measured Sunday habit, sparse mode, the Monday stray ignored
 const np = crons(readFileSync(path.join(dir, "newspoll-update.yml"), "utf8"));
-assert.ok(np.some((c) => c.cron === "50 9 * * 0" && /sparse/.test(c.note)), "sparse start 19:50 Sun " + JSON.stringify(np));
+assert.ok(np.some((c) => c.cron === "52 9 * * 0" && /sparse/.test(c.note)), "sparse start 19:52 Sun (phase 2) " + JSON.stringify(np));
 assert.ok(!np.some((c) => /every 10 min/.test(c.note)), "no comb in sparse mode");
 assert.ok(readFileSync(path.join(dir, "newspoll-update.yml"), "utf8").includes("Sun habit (8/9 recent dated releases)"));
 // the watchdog combs the habitual hour itself: 20:00–21:30 every 20 min
 const nw = crons(readFileSync(path.join(dir, "newspoll-watch.yml"), "utf8"));
-assert.ok(nw.some((c) => c.cron === "0,20,40 10 * * 0"), "watch comb 20:00–20:40 " + JSON.stringify(nw));
-assert.ok(nw.some((c) => c.cron === "0,20 11 * * 0"), "watch comb 21:00–21:20");
+assert.ok(nw.some((c) => c.cron === "4,24,44 10 * * 0"), "watch comb 20:04–20:44 (phase 4) " + JSON.stringify(nw));
+assert.ok(nw.some((c) => c.cron === "4,24 11 * * 0"), "watch comb 21:04–21:24");
 
 // DemosAU: no weekday → trimmed daily bracket (05:00–08:51 once the midnight
 // and 20:30 strays are set aside): 04:50, 08:30 (median floor), 10:00
@@ -105,12 +107,12 @@ assert.deepEqual(dm.filter((c) => /no weekday/.test(c.note)).map((c) => c.cron),
 
 // stopped: sweep only
 const fh = crons(readFileSync(path.join(dir, "foxhedgehog-update.yml"), "utf8"));
-assert.deepEqual(fh.map((c) => c.cron), ["35 20 * * *", "2 19 * * *"], JSON.stringify(fh));
+assert.deepEqual(fh.map((c) => c.cron), ["35 20 * * *", "10 19 * * *"], JSON.stringify(fh));
 assert.ok(readFileSync(path.join(dir, "foxhedgehog-update.yml"), "utf8").includes("declared stopped"));
 
 // a house with too few releases to measure: sweep only, no crash
 const sp = crons(readFileSync(path.join(dir, "spectre-update.yml"), "utf8"));
-assert.deepEqual(sp.map((c) => c.cron), ["50 20 * * *", "2 19 * * *"], JSON.stringify(sp));
+assert.deepEqual(sp.map((c) => c.cron), ["50 20 * * *", "9 19 * * *"], JSON.stringify(sp));
 
 // idempotent: a second apply is a no-op, --check would pass
 res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: false });
@@ -125,6 +127,19 @@ assert.ok(crons(rmDst).some((c) => c.cron === "40,50 4 * * 1" && /Mon 15:40–15
 // and a slot that crosses UTC midnight moves to the previous weekday: the
 // daily sweep at 06:00 eastern is 19:00 UTC the day before — daily stays daily
 assert.ok(crons(rmDst).some((c) => c.cron === "0 19 * * *" && /daily 06:00/.test(c.note)));
+
+// ---- the collision audit: phases keep shared weekdays apart, triples refuse ----
+res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: true });
+assert.deepEqual(res.audit.triples, [], "no minute with three writers");
+// a hand-authored slot on top of two tuned ones → a triple → nothing written
+const rb = readFileSync(path.join(dir, "redbridge-update.yml"), "utf8");
+writeFileSync(path.join(dir, "redbridge-update.yml"), rb.replace("  workflow_dispatch:", "    - cron: '0 9 * * 1' # hand-authored on Roy Morgan + Resolve's next-day slot\n  workflow_dispatch:"));
+writeFileSync(path.join(dir, "zzz-writer.yml"), "name: z\non:\n  schedule:\n    - cron: '0 9 * * 1'\nconcurrency:\n  group: main-writers\n");
+res = tune({ data, workflowsDir: dir, now: new Date("2027-01-12T00:00:00Z"), apply: true });
+assert.ok(res.audit.triples.length >= 1 && /Mon 09:00 UTC/.test(res.audit.triples[0]), JSON.stringify(res.audit));
+assert.ok(res.every((r) => r.status !== "updated"), "a collision blocks every write");
+writeFileSync(path.join(dir, "zzz-writer.yml"), "name: z\non:\n  workflow_dispatch:\n");
+writeFileSync(path.join(dir, "redbridge-update.yml"), rb);
 
 // ---- a file without markers is reported, not silently skipped ----------------
 writeFileSync(path.join(dir, "spectre-update.yml"), "name: x\non:\n  schedule:\n    - cron: '1 1 * * *'\n");
