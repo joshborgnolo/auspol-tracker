@@ -169,6 +169,25 @@ other pages' `<nav class="tabs">`.
   waves into `cyclePolls`; a wave whose Greens share was never published stays
   a transcript rather than gaining an invented one, which is why 18 of the 21
   are in the tracker and 3 are on the page only. The third writes the page.
+- **The Bulletin's Morgan Gallup Poll (leader ratings, 1973–1984)** – the
+  pre-1987 terms' approval lines. The column printed fortnightly trend
+  tables of PM and opposition-leader approve/disapprove, and the NLA
+  digitised The Bulletin through 1984 as a Trove magazine. The pipeline:
+
+  ```
+  node .build/harvest-bulletin-gallup.mjs        # Trove magazine search → issue OCR (scratch)
+  node .build/extract-bulletin-gallup.mjs        # tables → data/bulletin-leader-approval.csv
+  node .build/assimilate-bulletin-gallup.mjs --apply   # → cycleApproval.1972…1983 (+ Newspoll for 1984)
+  ```
+
+  Each wave is majority-voted across the three to six issues that reprinted
+  it (`printings`/`agreeing`/`disputed` columns say so per row), and the
+  series checks out against the Canberra Times readings mined independently
+  from Trove (35 of 47 comparable figures exact, 39 within a point). Dates:
+  the last printed fieldwork day; a month-only label is the 15th
+  (`date_basis`). Better-PM was not asked in that era, so `pmPpm`/`oppPpm`
+  stay null there. The 1984 term's back half comes from Newspoll's own
+  archive, as the 1987 term does.
 - **Trove** – every newspaper article in the National Library's Trove archive
   matching "poll", harvested through the site's own search API. The crawler
   lives in `.build/harvest-trove.mjs` (its header documents the endpoint, the

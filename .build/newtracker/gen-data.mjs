@@ -2008,8 +2008,13 @@ const CYC_META = [
      official result, same as every row below. */
   { year: 1972, gov: "alp", opp: "lnp", pm: "Whitlam", lead: "Whitlam", oppLead: "McMahon → Snedden", eDate: "1972-12-02", ePrim: 49.6, eTpp: 52.7, src: 1974, appr: 1972,
     oppSpl: { iso: "1972-12-20", names: ["McMahon", "Snedden"] } },
-  { year: 1974, gov: "alp", opp: "lnp", pm: "Whitlam", lead: "Whitlam", oppLead: "Snedden → Fraser", eDate: "1974-05-18", ePrim: 49.3, eTpp: 51.7, src: 1975, appr: 1974,
-    oppSpl: { iso: "1975-03-21", names: ["Snedden", "Fraser"] } },
+  /* The dismissal: Fraser was caretaker PM from 11 Nov 1975 to the 13 Dec
+     election, with Whitlam leading the opposition — and the Morgan Gallup
+     column rated them in those roles for those five weeks. Both offices
+     split on the day, so the last month's readings sit on the right lines. */
+  { year: 1974, gov: "alp", opp: "lnp", pm: "Whitlam → Fraser", lead: "Whitlam", oppLead: "Snedden → Fraser → Whitlam", eDate: "1974-05-18", ePrim: 49.3, eTpp: 51.7, src: 1975, appr: 1974,
+    pmSpl: { iso: "1975-11-11", names: ["Whitlam", "Fraser"] },
+    oppSpl: { isos: ["1975-03-21", "1975-11-11"], names: ["Snedden", "Fraser", "Whitlam"] } },
   /* Whitlam led the opposition for the whole 1975 term; Hayden replaced him
      on 22 Dec 1977, twelve days into the NEXT term — so the handover sits on
      the 1977 row, the way McMahon → Snedden (1972) and Shorten → Albanese

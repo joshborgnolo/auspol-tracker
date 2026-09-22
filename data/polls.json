@@ -42988,13 +42988,2668 @@
     ]
   },
   "cycleApproval": {
-    "1972": [],
-    "1974": [],
-    "1975": [],
-    "1977": [],
-    "1980": [],
-    "1983": [],
-    "1984": [],
+    "1972": [
+      {
+        "date": "1973-06-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 13,
+        "oppNet": 7,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1973-07-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 13,
+        "oppNet": 3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1973-08-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 12,
+        "oppNet": -2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1973-09-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 12,
+        "oppNet": -10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1973-10-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 0,
+        "oppNet": -13,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1973-11-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 10,
+        "oppNet": -15,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1973-12-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 4,
+        "oppNet": 10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-01-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 9,
+        "oppNet": -14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-02-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 2,
+        "oppNet": -11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-03-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 8,
+        "oppNet": -10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-04-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 12,
+        "oppNet": -21,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-05-07",
+        "firm": "Morgan Gallup",
+        "pmNet": 17,
+        "oppNet": -16,
+        "pmPpm": null,
+        "oppPpm": null
+      }
+    ],
+    "1974": [
+      {
+        "date": "1974-05-24",
+        "firm": "Morgan Gallup",
+        "pmNet": 29,
+        "oppNet": 1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-06-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 16,
+        "oppNet": -6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-07-15",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": -6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-07-24",
+        "firm": "Morgan Gallup",
+        "pmNet": 5,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-08-07",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": -4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-08-15",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": -5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-09-07",
+        "firm": "Morgan Gallup",
+        "pmNet": 3,
+        "oppNet": -13,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-09-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -6,
+        "oppNet": -14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-11-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -20,
+        "oppNet": -15,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1974-12-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -18,
+        "oppNet": -20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-01-15",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": -15,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-02-08",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": -18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-02-22",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": -28,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-03-22",
+        "firm": "Morgan Gallup",
+        "pmNet": 4,
+        "oppNet": 7,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-04-05",
+        "firm": "Morgan Gallup",
+        "pmNet": 0,
+        "oppNet": 22,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-04-19",
+        "firm": "Morgan Gallup",
+        "pmNet": 2,
+        "oppNet": 26,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-05-03",
+        "firm": "Morgan Gallup",
+        "pmNet": -3,
+        "oppNet": 25,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-06-14",
+        "firm": "Morgan Gallup",
+        "pmNet": -14,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-06-28",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": 20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-07-06",
+        "firm": "Morgan Gallup",
+        "pmNet": -34,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-07-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -30,
+        "oppNet": 23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-08-02",
+        "firm": "Morgan Gallup",
+        "pmNet": -25,
+        "oppNet": 27,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-08-16",
+        "firm": "Morgan Gallup",
+        "pmNet": -30,
+        "oppNet": 31,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-08-30",
+        "firm": "Morgan Gallup",
+        "pmNet": -22,
+        "oppNet": 27,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-09-13",
+        "firm": "Morgan Gallup",
+        "pmNet": -26,
+        "oppNet": 25,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-09-27",
+        "firm": "Morgan Gallup",
+        "pmNet": -25,
+        "oppNet": 25,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-10-11",
+        "firm": "Morgan Gallup",
+        "pmNet": -20,
+        "oppNet": 12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-11-29",
+        "firm": "Morgan Gallup",
+        "pmNet": -2,
+        "oppNet": -14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1975-12-06",
+        "firm": "Morgan Gallup",
+        "pmNet": -2,
+        "oppNet": -16,
+        "pmPpm": null,
+        "oppPpm": null
+      }
+    ],
+    "1975": [
+      {
+        "date": "1975-12-13",
+        "firm": "Morgan Gallup",
+        "pmNet": -5,
+        "oppNet": -18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-01-17",
+        "firm": "Morgan Gallup",
+        "pmNet": 33,
+        "oppNet": 5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-02-04",
+        "firm": "Morgan Gallup",
+        "pmNet": 28,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-02-07",
+        "firm": "Morgan Gallup",
+        "pmNet": 21,
+        "oppNet": 12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-02-21",
+        "firm": "Morgan Gallup",
+        "pmNet": 17,
+        "oppNet": -1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-03-06",
+        "firm": "Morgan Gallup",
+        "pmNet": 15,
+        "oppNet": -11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-03-20",
+        "firm": "Morgan Gallup",
+        "pmNet": 20,
+        "oppNet": -8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-03-29",
+        "firm": "Morgan Gallup",
+        "pmNet": 20,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-04-03",
+        "firm": "Morgan Gallup",
+        "pmNet": 22,
+        "oppNet": -7,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-04-17",
+        "firm": "Morgan Gallup",
+        "pmNet": 25,
+        "oppNet": -2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-05-01",
+        "firm": "Morgan Gallup",
+        "pmNet": 18,
+        "oppNet": 5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-05-15",
+        "firm": "Morgan Gallup",
+        "pmNet": 11,
+        "oppNet": -5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-05-29",
+        "firm": "Morgan Gallup",
+        "pmNet": 16,
+        "oppNet": -12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-06-12",
+        "firm": "Morgan Gallup",
+        "pmNet": 9,
+        "oppNet": -12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-06-26",
+        "firm": "Morgan Gallup",
+        "pmNet": 13,
+        "oppNet": -6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-07-10",
+        "firm": "Morgan Gallup",
+        "pmNet": 11,
+        "oppNet": -10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-07-24",
+        "firm": "Morgan Gallup",
+        "pmNet": 4,
+        "oppNet": -14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-08-07",
+        "firm": "Morgan Gallup",
+        "pmNet": 4,
+        "oppNet": -11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-08-12",
+        "firm": "Morgan Gallup",
+        "pmNet": -9,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-08-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -25,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-08-21",
+        "firm": "Morgan Gallup",
+        "pmNet": 11,
+        "oppNet": -5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-09-04",
+        "firm": "Morgan Gallup",
+        "pmNet": 10,
+        "oppNet": -9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-09-18",
+        "firm": "Morgan Gallup",
+        "pmNet": 13,
+        "oppNet": -3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-10-02",
+        "firm": "Morgan Gallup",
+        "pmNet": 9,
+        "oppNet": -4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-10-16",
+        "firm": "Morgan Gallup",
+        "pmNet": 8,
+        "oppNet": -4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-10-28",
+        "firm": "Morgan Gallup",
+        "pmNet": -16,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-10-30",
+        "firm": "Morgan Gallup",
+        "pmNet": 8,
+        "oppNet": -8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-11-11",
+        "firm": "Morgan Gallup",
+        "pmNet": -14,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-11-13",
+        "firm": "Morgan Gallup",
+        "pmNet": 9,
+        "oppNet": -1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-11-25",
+        "firm": "Morgan Gallup",
+        "pmNet": -5,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-11-27",
+        "firm": "Morgan Gallup",
+        "pmNet": 5,
+        "oppNet": -8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-12-09",
+        "firm": "Morgan Gallup",
+        "pmNet": -18,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-12-11",
+        "firm": "Morgan Gallup",
+        "pmNet": -3,
+        "oppNet": -3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-12-13",
+        "firm": "Morgan Gallup",
+        "pmNet": -5,
+        "oppNet": -18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1976-12-18",
+        "firm": "Morgan Gallup",
+        "pmNet": -13,
+        "oppNet": -7,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-01-22",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": -6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-01-24",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": -6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-02-05",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": -2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-02-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": 6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-03-05",
+        "firm": "Morgan Gallup",
+        "pmNet": -6,
+        "oppNet": -13,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-03-06",
+        "firm": "Morgan Gallup",
+        "pmNet": -6,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-03-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": -17,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-04-02",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": -16,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-04-16",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": -12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-04-30",
+        "firm": "Morgan Gallup",
+        "pmNet": -6,
+        "oppNet": -4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-05-14",
+        "firm": "Morgan Gallup",
+        "pmNet": -8,
+        "oppNet": -9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-05-28",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": -6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-06-11",
+        "firm": "Morgan Gallup",
+        "pmNet": -5,
+        "oppNet": 0,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-06-25",
+        "firm": "Morgan Gallup",
+        "pmNet": -9,
+        "oppNet": -3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-07-09",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": -5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-07-23",
+        "firm": "Morgan Gallup",
+        "pmNet": -12,
+        "oppNet": -3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-08-06",
+        "firm": "Morgan Gallup",
+        "pmNet": -10,
+        "oppNet": 0,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-08-13",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": -5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-08-20",
+        "firm": "Morgan Gallup",
+        "pmNet": -8,
+        "oppNet": -2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-08-27",
+        "firm": "Morgan Gallup",
+        "pmNet": -6,
+        "oppNet": -1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-09-10",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": -6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-09-24",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": -6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-10-08",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": -9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-10-22",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": -5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-10-29",
+        "firm": "Morgan Gallup",
+        "pmNet": -3,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-10-30",
+        "firm": "Morgan Gallup",
+        "pmNet": -3,
+        "oppNet": -10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-11-06",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": -20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-11-13",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": -14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-11-15",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": -14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-11-20",
+        "firm": "Morgan Gallup",
+        "pmNet": -8,
+        "oppNet": -3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-11-27",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": -14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1977-12-04",
+        "firm": "Morgan Gallup",
+        "pmNet": 2,
+        "oppNet": -11,
+        "pmPpm": null,
+        "oppPpm": null
+      }
+    ],
+    "1977": [
+      {
+        "date": "1978-01-14",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-01-21",
+        "firm": "Morgan Gallup",
+        "pmNet": 12,
+        "oppNet": 23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-02-04",
+        "firm": "Morgan Gallup",
+        "pmNet": 28,
+        "oppNet": 22,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-02-18",
+        "firm": "Morgan Gallup",
+        "pmNet": 19,
+        "oppNet": 27,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-02-26",
+        "firm": "Morgan Gallup",
+        "pmNet": 9,
+        "oppNet": 27,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-03-11",
+        "firm": "Morgan Gallup",
+        "pmNet": 10,
+        "oppNet": 27,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-04-08",
+        "firm": "Morgan Gallup",
+        "pmNet": 5,
+        "oppNet": 31,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-04-22",
+        "firm": "Morgan Gallup",
+        "pmNet": 13,
+        "oppNet": 28,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-05-06",
+        "firm": "Morgan Gallup",
+        "pmNet": 15,
+        "oppNet": 24,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-05-20",
+        "firm": "Morgan Gallup",
+        "pmNet": 16,
+        "oppNet": 31,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-06-03",
+        "firm": "Morgan Gallup",
+        "pmNet": 6,
+        "oppNet": 24,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-06-17",
+        "firm": "Morgan Gallup",
+        "pmNet": 6,
+        "oppNet": 27,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-07-01",
+        "firm": "Morgan Gallup",
+        "pmNet": 0,
+        "oppNet": 24,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-07-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -6,
+        "oppNet": 27,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-08-12",
+        "firm": "Morgan Gallup",
+        "pmNet": -9,
+        "oppNet": 26,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-08-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -25,
+        "oppNet": 37,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-09-02",
+        "firm": "Morgan Gallup",
+        "pmNet": -25,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-09-16",
+        "firm": "Morgan Gallup",
+        "pmNet": -20,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-09-30",
+        "firm": "Morgan Gallup",
+        "pmNet": -19,
+        "oppNet": 22,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-10-14",
+        "firm": "Morgan Gallup",
+        "pmNet": -15,
+        "oppNet": 24,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-10-28",
+        "firm": "Morgan Gallup",
+        "pmNet": -16,
+        "oppNet": 21,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-11-11",
+        "firm": "Morgan Gallup",
+        "pmNet": -14,
+        "oppNet": 20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-11-25",
+        "firm": "Morgan Gallup",
+        "pmNet": -5,
+        "oppNet": 17,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1978-12-09",
+        "firm": "Morgan Gallup",
+        "pmNet": -18,
+        "oppNet": 19,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-01-20",
+        "firm": "Morgan Gallup",
+        "pmNet": -13,
+        "oppNet": 16,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-02-03",
+        "firm": "Morgan Gallup",
+        "pmNet": -6,
+        "oppNet": 18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-02-04",
+        "firm": "Morgan Gallup",
+        "pmNet": 28,
+        "oppNet": 22,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-02-17",
+        "firm": "Morgan Gallup",
+        "pmNet": -12,
+        "oppNet": 17,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-03-03",
+        "firm": "Morgan Gallup",
+        "pmNet": -15,
+        "oppNet": 20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-03-17",
+        "firm": "Morgan Gallup",
+        "pmNet": -21,
+        "oppNet": 18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-04-14",
+        "firm": "Morgan Gallup",
+        "pmNet": -12,
+        "oppNet": 20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-04-28",
+        "firm": "Morgan Gallup",
+        "pmNet": -13,
+        "oppNet": 16,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-05-12",
+        "firm": "Morgan Gallup",
+        "pmNet": -15,
+        "oppNet": 15,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-05-26",
+        "firm": "Morgan Gallup",
+        "pmNet": -23,
+        "oppNet": 16,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-06-09",
+        "firm": "Morgan Gallup",
+        "pmNet": -24,
+        "oppNet": 18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-06-23",
+        "firm": "Morgan Gallup",
+        "pmNet": -31,
+        "oppNet": 11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-07-07",
+        "firm": "Morgan Gallup",
+        "pmNet": -29,
+        "oppNet": 14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-07-21",
+        "firm": "Morgan Gallup",
+        "pmNet": -28,
+        "oppNet": 18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-08-04",
+        "firm": "Morgan Gallup",
+        "pmNet": -26,
+        "oppNet": 22,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-08-18",
+        "firm": "Morgan Gallup",
+        "pmNet": -27,
+        "oppNet": 19,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-08-26",
+        "firm": "Morgan Gallup",
+        "pmNet": -22,
+        "oppNet": 18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-09-08",
+        "firm": "Morgan Gallup",
+        "pmNet": -21,
+        "oppNet": 14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-09-22",
+        "firm": "Morgan Gallup",
+        "pmNet": -16,
+        "oppNet": 14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-10-06",
+        "firm": "Morgan Gallup",
+        "pmNet": -12,
+        "oppNet": 16,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-10-20",
+        "firm": "Morgan Gallup",
+        "pmNet": -22,
+        "oppNet": 12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-11-03",
+        "firm": "Morgan Gallup",
+        "pmNet": -15,
+        "oppNet": 14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-11-17",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-12-01",
+        "firm": "Morgan Gallup",
+        "pmNet": -16,
+        "oppNet": 11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1979-12-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": 12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-01-09",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-01-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -2,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-02-02",
+        "firm": "Morgan Gallup",
+        "pmNet": -1,
+        "oppNet": 10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-02-03",
+        "firm": "Morgan Gallup",
+        "pmNet": -1,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-02-16",
+        "firm": "Morgan Gallup",
+        "pmNet": -3,
+        "oppNet": 3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-03-01",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": 4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-03-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": 2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-03-29",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": 4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-04-12",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": 2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-04-26",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": -1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-05-10",
+        "firm": "Morgan Gallup",
+        "pmNet": -1,
+        "oppNet": 2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-05-24",
+        "firm": "Morgan Gallup",
+        "pmNet": 0,
+        "oppNet": 3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-06-07",
+        "firm": "Morgan Gallup",
+        "pmNet": -1,
+        "oppNet": 2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-06-21",
+        "firm": "Morgan Gallup",
+        "pmNet": -5,
+        "oppNet": 1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-07-05",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": 0,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-07-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -13,
+        "oppNet": -1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-08-02",
+        "firm": "Morgan Gallup",
+        "pmNet": -16,
+        "oppNet": 3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-08-16",
+        "firm": "Morgan Gallup",
+        "pmNet": -6,
+        "oppNet": 4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-08-30",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": 3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-09-13",
+        "firm": "Morgan Gallup",
+        "pmNet": -5,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-10-05",
+        "firm": "Morgan Gallup",
+        "pmNet": -8,
+        "oppNet": 19,
+        "pmPpm": null,
+        "oppPpm": null
+      }
+    ],
+    "1980": [
+      {
+        "date": "1980-10-18",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": 29,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-11-01",
+        "firm": "Morgan Gallup",
+        "pmNet": 3,
+        "oppNet": 31,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-11-29",
+        "firm": "Morgan Gallup",
+        "pmNet": 7,
+        "oppNet": 27,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1980-12-13",
+        "firm": "Morgan Gallup",
+        "pmNet": 3,
+        "oppNet": 24,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-01-17",
+        "firm": "Morgan Gallup",
+        "pmNet": -2,
+        "oppNet": 18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-01-31",
+        "firm": "Morgan Gallup",
+        "pmNet": 6,
+        "oppNet": 25,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-02-14",
+        "firm": "Morgan Gallup",
+        "pmNet": 5,
+        "oppNet": 16,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-02-28",
+        "firm": "Morgan Gallup",
+        "pmNet": 3,
+        "oppNet": 14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-03-14",
+        "firm": "Morgan Gallup",
+        "pmNet": 6,
+        "oppNet": 14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-03-28",
+        "firm": "Morgan Gallup",
+        "pmNet": 3,
+        "oppNet": 12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-04-11",
+        "firm": "Morgan Gallup",
+        "pmNet": 9,
+        "oppNet": 18,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-04-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -18,
+        "oppNet": 11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-04-26",
+        "firm": "Morgan Gallup",
+        "pmNet": -9,
+        "oppNet": 11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-05-03",
+        "firm": "Morgan Gallup",
+        "pmNet": -17,
+        "oppNet": 7,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-05-10",
+        "firm": "Morgan Gallup",
+        "pmNet": -32,
+        "oppNet": 5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-05-23",
+        "firm": "Morgan Gallup",
+        "pmNet": -25,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-06-06",
+        "firm": "Morgan Gallup",
+        "pmNet": -26,
+        "oppNet": 6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-06-20",
+        "firm": "Morgan Gallup",
+        "pmNet": -24,
+        "oppNet": 5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-07-04",
+        "firm": "Morgan Gallup",
+        "pmNet": -20,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-07-18",
+        "firm": "Morgan Gallup",
+        "pmNet": -19,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-08-01",
+        "firm": "Morgan Gallup",
+        "pmNet": -15,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-08-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -22,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-08-29",
+        "firm": "Morgan Gallup",
+        "pmNet": -19,
+        "oppNet": 4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-09-12",
+        "firm": "Morgan Gallup",
+        "pmNet": -25,
+        "oppNet": 13,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-09-26",
+        "firm": "Morgan Gallup",
+        "pmNet": -17,
+        "oppNet": 13,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-10-10",
+        "firm": "Morgan Gallup",
+        "pmNet": -15,
+        "oppNet": 10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-10-24",
+        "firm": "Morgan Gallup",
+        "pmNet": -12,
+        "oppNet": 10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-11-07",
+        "firm": "Morgan Gallup",
+        "pmNet": -6,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-11-21",
+        "firm": "Morgan Gallup",
+        "pmNet": -8,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-12-05",
+        "firm": "Morgan Gallup",
+        "pmNet": -6,
+        "oppNet": 5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1981-12-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -5,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-01-16",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": 11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-01-30",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": 10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-02-13",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-02-27",
+        "firm": "Morgan Gallup",
+        "pmNet": -19,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-03-13",
+        "firm": "Morgan Gallup",
+        "pmNet": -18,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-03-27",
+        "firm": "Morgan Gallup",
+        "pmNet": -21,
+        "oppNet": 10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-04-10",
+        "firm": "Morgan Gallup",
+        "pmNet": -19,
+        "oppNet": 7,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-04-24",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": 11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-05-08",
+        "firm": "Morgan Gallup",
+        "pmNet": -9,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-05-22",
+        "firm": "Morgan Gallup",
+        "pmNet": -9,
+        "oppNet": 3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-06-05",
+        "firm": "Morgan Gallup",
+        "pmNet": -5,
+        "oppNet": 12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-06-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -3,
+        "oppNet": 5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-06-20",
+        "firm": "Morgan Gallup",
+        "pmNet": -3,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-07-03",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": 2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-07-11",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-07-17",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-07-18",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 21,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-07-31",
+        "firm": "Morgan Gallup",
+        "pmNet": -5,
+        "oppNet": 25,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-08-14",
+        "firm": "Morgan Gallup",
+        "pmNet": -11,
+        "oppNet": 21,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-08-28",
+        "firm": "Morgan Gallup",
+        "pmNet": -9,
+        "oppNet": 16,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-09-11",
+        "firm": "Morgan Gallup",
+        "pmNet": -13,
+        "oppNet": 20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-09-19",
+        "firm": "Morgan Gallup",
+        "pmNet": -9,
+        "oppNet": 13,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-09-26",
+        "firm": "Morgan Gallup",
+        "pmNet": -21,
+        "oppNet": 6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-10-09",
+        "firm": "Morgan Gallup",
+        "pmNet": -4,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-10-23",
+        "firm": "Morgan Gallup",
+        "pmNet": -14,
+        "oppNet": 8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-11-06",
+        "firm": "Morgan Gallup",
+        "pmNet": -9,
+        "oppNet": 6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-11-20",
+        "firm": "Morgan Gallup",
+        "pmNet": -12,
+        "oppNet": 5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-12-04",
+        "firm": "Morgan Gallup",
+        "pmNet": -20,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1982-12-18",
+        "firm": "Morgan Gallup",
+        "pmNet": -13,
+        "oppNet": -1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-01-15",
+        "firm": "Morgan Gallup",
+        "pmNet": -7,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-01-29",
+        "firm": "Morgan Gallup",
+        "pmNet": -8,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-02-06",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 29,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-02-13",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 28,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-02-20",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 32,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-02-27",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 34,
+        "pmPpm": null,
+        "oppPpm": null
+      }
+    ],
+    "1983": [
+      {
+        "date": "1983-03-05",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 31,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-03-19",
+        "firm": "Morgan Gallup",
+        "pmNet": 43,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-03-20",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 27,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-04-02",
+        "firm": "Morgan Gallup",
+        "pmNet": 48,
+        "oppNet": 29,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-04-16",
+        "firm": "Morgan Gallup",
+        "pmNet": 55,
+        "oppNet": 33,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-04-30",
+        "firm": "Morgan Gallup",
+        "pmNet": 58,
+        "oppNet": 29,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-05-14",
+        "firm": "Morgan Gallup",
+        "pmNet": 53,
+        "oppNet": 34,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-05-22",
+        "firm": "Morgan Gallup",
+        "pmNet": 39,
+        "oppNet": 23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-06-04",
+        "firm": "Morgan Gallup",
+        "pmNet": 35,
+        "oppNet": 23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-06-18",
+        "firm": "Morgan Gallup",
+        "pmNet": 35,
+        "oppNet": 23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-07-02",
+        "firm": "Morgan Gallup",
+        "pmNet": 37,
+        "oppNet": 21,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-07-16",
+        "firm": "Morgan Gallup",
+        "pmNet": 36,
+        "oppNet": 23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-07-24",
+        "firm": "Morgan Gallup",
+        "pmNet": 32,
+        "oppNet": 13,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-07-31",
+        "firm": "Morgan Gallup",
+        "pmNet": 22,
+        "oppNet": 13,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-08-13",
+        "firm": "Morgan Gallup",
+        "pmNet": 32,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-08-14",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-08-21",
+        "firm": "Morgan Gallup",
+        "pmNet": 31,
+        "oppNet": 3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-08-28",
+        "firm": "Morgan Gallup",
+        "pmNet": 32,
+        "oppNet": 6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-09-10",
+        "firm": "Morgan Gallup",
+        "pmNet": 43,
+        "oppNet": 14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-09-24",
+        "firm": "Morgan Gallup",
+        "pmNet": 42,
+        "oppNet": 19,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-10-08",
+        "firm": "Morgan Gallup",
+        "pmNet": 52,
+        "oppNet": 20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-10-22",
+        "firm": "Morgan Gallup",
+        "pmNet": 46,
+        "oppNet": 10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-11-05",
+        "firm": "Morgan Gallup",
+        "pmNet": 46,
+        "oppNet": 3,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-11-19",
+        "firm": "Morgan Gallup",
+        "pmNet": 44,
+        "oppNet": 5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-12-03",
+        "firm": "Morgan Gallup",
+        "pmNet": 41,
+        "oppNet": 4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1983-12-17",
+        "firm": "Morgan Gallup",
+        "pmNet": 46,
+        "oppNet": 5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-01-14",
+        "firm": "Morgan Gallup",
+        "pmNet": 58,
+        "oppNet": 7,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-01-28",
+        "firm": "Morgan Gallup",
+        "pmNet": 56,
+        "oppNet": -1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-02-11",
+        "firm": "Morgan Gallup",
+        "pmNet": 58,
+        "oppNet": 1,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-02-25",
+        "firm": "Morgan Gallup",
+        "pmNet": 52,
+        "oppNet": -2,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-03-10",
+        "firm": "Morgan Gallup",
+        "pmNet": 58,
+        "oppNet": -4,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-03-24",
+        "firm": "Morgan Gallup",
+        "pmNet": 58,
+        "oppNet": -9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-04-07",
+        "firm": "Morgan Gallup",
+        "pmNet": 60,
+        "oppNet": -12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-04-17",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": -12,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-04-21",
+        "firm": "Morgan Gallup",
+        "pmNet": 59,
+        "oppNet": -6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-05-05",
+        "firm": "Morgan Gallup",
+        "pmNet": 54,
+        "oppNet": -10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-05-19",
+        "firm": "Morgan Gallup",
+        "pmNet": 54,
+        "oppNet": -5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-06-02",
+        "firm": "Morgan Gallup",
+        "pmNet": 48,
+        "oppNet": -6,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-06-16",
+        "firm": "Morgan Gallup",
+        "pmNet": 50,
+        "oppNet": -14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-06-30",
+        "firm": "Morgan Gallup",
+        "pmNet": 47,
+        "oppNet": -10,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-07-14",
+        "firm": "Morgan Gallup",
+        "pmNet": 53,
+        "oppNet": -8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-07-28",
+        "firm": "Morgan Gallup",
+        "pmNet": 48,
+        "oppNet": -5,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-08-11",
+        "firm": "Morgan Gallup",
+        "pmNet": 47,
+        "oppNet": -8,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-08-25",
+        "firm": "Morgan Gallup",
+        "pmNet": 49,
+        "oppNet": -9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-09-08",
+        "firm": "Morgan Gallup",
+        "pmNet": 46,
+        "oppNet": -14,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-09-16",
+        "firm": "Morgan Gallup",
+        "pmNet": 44,
+        "oppNet": -33,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-09-23",
+        "firm": "Morgan Gallup",
+        "pmNet": 45,
+        "oppNet": -36,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-09-30",
+        "firm": "Morgan Gallup",
+        "pmNet": 49,
+        "oppNet": -42,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-10-06",
+        "firm": "Morgan Gallup",
+        "pmNet": null,
+        "oppNet": -47,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-10-07",
+        "firm": "Morgan Gallup",
+        "pmNet": 46,
+        "oppNet": -47,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-10-12",
+        "firm": "Morgan Gallup",
+        "pmNet": 46,
+        "oppNet": null,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-10-14",
+        "firm": "Morgan Gallup",
+        "pmNet": 48,
+        "oppNet": -47,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-10-21",
+        "firm": "Morgan Gallup",
+        "pmNet": 46,
+        "oppNet": -39,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-10-28",
+        "firm": "Morgan Gallup",
+        "pmNet": 46,
+        "oppNet": -37,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-11-04",
+        "firm": "Morgan Gallup",
+        "pmNet": 45,
+        "oppNet": -33,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-11-11",
+        "firm": "Morgan Gallup",
+        "pmNet": 52,
+        "oppNet": -28,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-11-18",
+        "firm": "Morgan Gallup",
+        "pmNet": 43,
+        "oppNet": -24,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1984-11-25",
+        "firm": "Morgan Gallup",
+        "pmNet": 43,
+        "oppNet": -13,
+        "pmPpm": null,
+        "oppPpm": null
+      }
+    ],
+    "1984": [
+      {
+        "date": "1985-11-17",
+        "firm": "Newspoll",
+        "pmNet": 21,
+        "oppNet": 9,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1985-12-01",
+        "firm": "Newspoll",
+        "pmNet": 21,
+        "oppNet": -16,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1985-12-15",
+        "firm": "Newspoll",
+        "pmNet": 30,
+        "oppNet": -20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-01-26",
+        "firm": "Newspoll",
+        "pmNet": 30,
+        "oppNet": -15,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-02-23",
+        "firm": "Newspoll",
+        "pmNet": 17,
+        "oppNet": -25,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-03-23",
+        "firm": "Newspoll",
+        "pmNet": 14,
+        "oppNet": -33,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-04-20",
+        "firm": "Newspoll",
+        "pmNet": 28,
+        "oppNet": -20,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-05-18",
+        "firm": "Newspoll",
+        "pmNet": 14,
+        "oppNet": -19,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-06-22",
+        "firm": "Newspoll",
+        "pmNet": 7,
+        "oppNet": -23,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-07-20",
+        "firm": "Newspoll",
+        "pmNet": -1,
+        "oppNet": -22,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-08-24",
+        "firm": "Newspoll",
+        "pmNet": 7,
+        "oppNet": -11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-09-21",
+        "firm": "Newspoll",
+        "pmNet": -8,
+        "oppNet": -11,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-10-19",
+        "firm": "Newspoll",
+        "pmNet": -5,
+        "oppNet": -24,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-11-16",
+        "firm": "Newspoll",
+        "pmNet": -4,
+        "oppNet": -29,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1986-12-14",
+        "firm": "Newspoll",
+        "pmNet": -8,
+        "oppNet": -24,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-02-08",
+        "firm": "Newspoll",
+        "pmNet": 2,
+        "oppNet": -34,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-03-01",
+        "firm": "Newspoll",
+        "pmNet": -4,
+        "oppNet": -34,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-03-15",
+        "firm": "Newspoll",
+        "pmNet": -4,
+        "oppNet": -32,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-03-29",
+        "firm": "Newspoll",
+        "pmNet": 0,
+        "oppNet": -30,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-04-12",
+        "firm": "Newspoll",
+        "pmNet": 6,
+        "oppNet": -30,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-05-03",
+        "firm": "Newspoll",
+        "pmNet": 6,
+        "oppNet": -27,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-05-17",
+        "firm": "Newspoll",
+        "pmNet": 18,
+        "oppNet": -25,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-06-07",
+        "firm": "Newspoll",
+        "pmNet": 12,
+        "oppNet": -28,
+        "pmPpm": 62,
+        "oppPpm": 22
+      },
+      {
+        "date": "1987-06-14",
+        "firm": "Newspoll",
+        "pmNet": 17,
+        "oppNet": -25,
+        "pmPpm": null,
+        "oppPpm": null
+      },
+      {
+        "date": "1987-06-21",
+        "firm": "Newspoll",
+        "pmNet": 11,
+        "oppNet": -29,
+        "pmPpm": 62,
+        "oppPpm": 22
+      },
+      {
+        "date": "1987-06-28",
+        "firm": "Newspoll",
+        "pmNet": 11,
+        "oppNet": -22,
+        "pmPpm": 57,
+        "oppPpm": 25
+      },
+      {
+        "date": "1987-07-05",
+        "firm": "Newspoll",
+        "pmNet": 9,
+        "oppNet": -21,
+        "pmPpm": 59,
+        "oppPpm": 26
+      },
+      {
+        "date": "1987-07-08",
+        "firm": "Newspoll",
+        "pmNet": 12,
+        "oppNet": -17,
+        "pmPpm": 59,
+        "oppPpm": 27
+      },
+      {
+        "date": "1987-07-09",
+        "firm": "Newspoll",
+        "pmNet": 10,
+        "oppNet": -12,
+        "pmPpm": 57,
+        "oppPpm": 29
+      }
+    ],
     "1987": [
       {
         "date": "1987-08-23",
