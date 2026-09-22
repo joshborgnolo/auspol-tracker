@@ -27,6 +27,7 @@ on:
       - spectre-update
       - foxhedgehog-update
       - newspoll-update
+      - news24-update
       - sampleeff-update
       - roymorgan-update
       - pollbludger-fallback
@@ -94,6 +95,7 @@ jobs:
             spectre-update)     HP=.build/spectre-repair-prompt.md ;;
             foxhedgehog-update) HP=.build/foxhedgehog-repair-prompt.md ;;
             newspoll-update)    HP=.build/newspoll-repair-prompt.md ;;
+            news24-update)      HP=.build/news24-repair-prompt.md ;;
             sampleeff-update)   HP=.build/sampleeff-repair-prompt.md ;;
             roymorgan-update)   HP=.build/roymorgan-repair-prompt.md ;;
             pollbludger-fallback) HP=.build/pollbludger-repair-prompt.md ;;

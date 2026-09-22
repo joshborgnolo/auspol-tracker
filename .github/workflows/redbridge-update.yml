@@ -20,7 +20,6 @@ on:
     - cron: '5 11 * * 0'               # Sun 21:05 — follow-up
     - cron: '5 12 * * 0'               # Sun 22:05 — follow-up
     - cron: '5 13 * * 0'               # Sun 23:05 — follow-up
-    - cron: '25 21 * * 0'              # Mon 07:25 — next-day
     - cron: '5 9 * * 1'                # Mon 19:05 — next-day
     # tune-schedules:end
   workflow_dispatch:

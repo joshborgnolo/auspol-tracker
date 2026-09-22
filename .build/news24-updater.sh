@@ -44,7 +44,18 @@ else
   exit 1
 fi
 
-EXTRACT_OUT="$(NEWSIE_CHROME=1 node .build/extract-news24.mjs 2>&1)"
+# Under GitHub Actions there is no user Chrome to drive (chrome-article.mjs
+# needs the laptop's logged-in profile), so the Chrome leg is left off there
+# and the extractor takes its YouGov-release + Wikipedia path — a News24-only
+# wave lands as a VI row with `published` empty, which the next local run
+# with Chrome UPGRADES in place (see the header). The two schedulers coexist
+# exactly as for every other house: freshness_sync above skips a slot whose
+# base moved.
+if [ -n "${GITHUB_ACTIONS:-}" ]; then
+  EXTRACT_OUT="$(node .build/extract-news24.mjs 2>&1)"
+else
+  EXTRACT_OUT="$(NEWSIE_CHROME=1 node .build/extract-news24.mjs 2>&1)"
+fi
 CODE=$?
 LAST_LINE="$(echo "$EXTRACT_OUT" | tail -1)"
 if [ $CODE -ne 0 ]; then

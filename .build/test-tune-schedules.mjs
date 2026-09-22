@@ -49,7 +49,7 @@ const data = {
 // ---- scratch workflow files ------------------------------------------------
 const dir = mkdtempSync(path.join(tmpdir(), "tune-"));
 const files = ["roymorgan-update.yml", "resolve-update.yml", "essential-update.yml",
-  "redbridge-update.yml", "newspoll-update.yml", "newspoll-watch.yml", "demosau-update.yml",
+  "redbridge-update.yml", "newspoll-update.yml", "newspoll-watch.yml", "news24-update.yml", "demosau-update.yml",
   "spectre-update.yml", "foxhedgehog-update.yml"];
 // each file keeps one hand-authored slot on a minute of its own (nine
 // writers on one minute would trip the collision audit, rightly)
@@ -107,12 +107,12 @@ assert.deepEqual(dm.filter((c) => /no weekday/.test(c.note)).map((c) => c.cron),
 
 // stopped: sweep only
 const fh = crons(readFileSync(path.join(dir, "foxhedgehog-update.yml"), "utf8"));
-assert.deepEqual(fh.map((c) => c.cron), ["35 20 * * *", "10 19 * * *"], JSON.stringify(fh));
+assert.deepEqual(fh.map((c) => c.cron), ["35 20 * * *", "11 19 * * *"], JSON.stringify(fh));
 assert.ok(readFileSync(path.join(dir, "foxhedgehog-update.yml"), "utf8").includes("declared stopped"));
 
 // a house with too few releases to measure: sweep only, no crash
 const sp = crons(readFileSync(path.join(dir, "spectre-update.yml"), "utf8"));
-assert.deepEqual(sp.map((c) => c.cron), ["50 20 * * *", "9 19 * * *"], JSON.stringify(sp));
+assert.deepEqual(sp.map((c) => c.cron), ["50 20 * * *", "10 19 * * *"], JSON.stringify(sp));
 
 // idempotent: a second apply is a no-op, --check would pass
 res = tune({ data, workflowsDir: dir, now: new Date("2026-09-22T00:00:00Z"), apply: false });

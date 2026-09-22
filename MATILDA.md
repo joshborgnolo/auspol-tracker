@@ -44,6 +44,16 @@ a GENERATED build artifact — never hand-edit it.
   `.build/essential-src/site-fingerprint.json` (committed by the wrapper);
   the crawl runs only when that moved, the newest report is under 3 days
   old, or `--force`. A skipped run says `crawl: "skipped"` in its status.
+- Wikipedia's federal polling table is read by TWO scripts — `check-coverage`
+  (dates only) and `extract-news24` (YouGov's News24-only waves). Its layout
+  changed on 2026-09-11 (rowspan data-cell dates; IND+OTH merged into one
+  "Others" cell split by an {{efn}} footnote) and both went silently blind
+  for twelve days. Both now read either layout, pinned by
+  `test-coverage.mjs` and `test-news24-wiki.mjs`; a future change is fixed
+  in the parser AND pinned with a new fixture form.
+- `news24-update.yml` (2026-09-22) runs the YouGov updater in the cloud —
+  Chrome leg off under GITHUB_ACTIONS; the launchd job with Chrome upgrades
+  News24-only rows in place later.
 - `.github/workflows/agent-repair.yml` — the CENTRAL Matilda repair agent.
   Any watched workflow failing on main triggers it (workflow_run). Its gate
   job maps the workflow to a house prompt (`.build/*-repair-prompt.md`;

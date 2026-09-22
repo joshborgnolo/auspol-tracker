@@ -671,9 +671,35 @@ function wikiCells(chunk) {
 const near100 = (sum) => Math.abs(sum - 100) <= 2.5;
 const WIKI_PCT = /^'{0,3}(\d{1,2}(?:\.\d{1,2})?)%'{0,3}$/;
 
-// The Coalition shares one colspan=3 cell in this series (form A); tolerate
-// pollsters' lib/lnp/nat triple (form B) in case the table layout shifts.
-function wikiPrims(tokens) {
+/* The Others cell's footnote, where the table carries one: since Sep 2026
+   Wikipedia prints ONE "Others" column and moves the split into an efn —
+   "7% [[Independent politicians in Australia|Independent]], 2% [[Community
+   Strong Australia]] and 5% Other". Tracker convention for this series is
+   ind = Independents, oth = everything else (CSA + Other), so the footnote
+   is read off the RAW chunk before wikiCells strips templates. */
+function wikiOthersSplit(chunk) {
+  const efn = chunk.match(/\{\{efn\|[^{}]*?(\d{1,2}(?:\.\d)?)%\s*(?:\[\[[^\]]*Independent[^\]]*\]\]|Independents?)[^{}]*\}\}/i);
+  if (!efn) return null;
+  const body = efn[0];
+  const ind = parseFloat(efn[1]);
+  let oth = 0, any = false;
+  for (const m of body.matchAll(/(\d{1,2}(?:\.\d)?)%\s*(?:\[\[Community Strong Australia[^\]]*\]\]|CSA\b|Others?\b)/gi)) { oth += parseFloat(m[1]); any = true; }
+  return any ? { ind, oth: Math.round(oth * 10) / 10 } : { ind, oth: null };
+}
+
+// The Coalition shares one colspan cell in this series (form A: six
+// primary cells, IND and OTH separate — the layout until Sep 2026); tolerate
+// pollsters' lib/lnp/nat triple (form B); and since Sep 2026 form C: FIVE
+// cells with IND+OTH merged into "Others", split by footnote (wikiOthersSplit).
+function wikiPrims(tokens, split = null) {
+  if (tokens.length >= 5) {
+    const p = tokens.slice(0, 5);
+    if (p.every((v) => v != null) && near100(p.reduce((a, b) => a + b, 0))) {
+      const others = p[4];
+      const ok = split && split.ind != null && split.oth != null && Math.abs(split.ind + split.oth - others) <= 0.6;
+      return { alp: p[0], lnp: p[1], grn: p[2], onp: p[3], ind: ok ? split.ind : null, oth: ok ? split.oth : others, used: 5 };
+    }
+  }
   if (tokens.length >= 6) {
     const p = tokens.slice(0, 6);
     if (p.every((v) => v != null) && near100(p.reduce((a, b) => a + b, 0)))
@@ -691,7 +717,7 @@ function wikiPrims(tokens) {
   return null;
 }
 
-function waveFromCells(cells) {
+function waveFromCells(cells, split = null) {
   const si = cells.findIndex((c) => !c.hdr && /^\d[\d,]{2,}$/.test(c.content));
   if (si < 0) return { fail: "no sample cell" };
   const sample = +cells[si].content.replace(/,/g, "");
@@ -703,7 +729,7 @@ function waveFromCells(cells) {
     else return { fail: `unexpected cell "${c.content.slice(0, 40)}"` };
     if (tokens.length >= 11) break;
   }
-  const prims = wikiPrims(tokens);
+  const prims = wikiPrims(tokens, split);
   if (!prims) return { fail: `primaries don't sum ~100 [${tokens.join(",")}]` };
   const [ta, tb] = tokens.slice(prims.used, prims.used + 2);
   const tpp = ta != null && tb != null && Math.abs(ta + tb - 100) <= 2
@@ -732,10 +758,12 @@ function parseWikiYouGov(text) {
     const clientTxt = `${cm?.[1] ?? ""} ${um?.[1] ?? ""}`;
     const client = /australia[ -]?institute/i.test(clientTxt) ? "Australia Inst." : "News24";
     const cells = wikiCells(chunk);
-    const dd = cells.find((c) => c.hdr && parseWikiDate(c.content, year));
+    // the fieldwork cell was a `!` header cell until Sep 2026 and is a
+    // rowspan data cell since — either kind, first one that parses
+    const dd = cells.find((c) => parseWikiDate(c.content, year));
     if (!dd) { unparsed.push("no parseable date cell"); continue; }
     const fw = parseWikiDate(dd.content, year);
-    const w = waveFromCells(cells);
+    const w = waveFromCells(cells, wikiOthersSplit(chunk));
     if (w.fail) { unparsed.push(`${fw.date}: ${w.fail}`); continue; }
     out.push({ ...fw, sample: w.sample, url, client, vi: w.vi });
   }
@@ -756,6 +784,9 @@ function parseWikiYouGov(text) {
 }
 
 // --------------------------------------------------------------- entry
+// N24_LIB=1: import the parsers (tests) without running the extraction.
+export { parseWikiYouGov, wikiOthersSplit, waveFromCells, wikiCells };
+if (!process.env.N24_LIB) {
 const status = { changed: false, check: CHECK, added: [], skipped_existing: [], candidates: [], releaseFilled: [] };
 
 if (NEWS24_OF) { // dev oracle: parse one News24 article, print the record, exit
@@ -1042,3 +1073,4 @@ try {
   console.log("N24_STATUS " + JSON.stringify(status));
   process.exit(1);
 }
+} // N24_LIB

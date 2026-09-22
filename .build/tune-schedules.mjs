@@ -115,6 +115,8 @@ const TARGETS = [
   // embargo itself (a 10-second job), so it combs the habitual hour itself
   // — figures land through the extractor, not here.
   { workflow: "newspoll-watch.yml", houses: ["Newspoll"], mode: "watch", phase: 4 },
+  // fortnightly Wednesday ~05:00; Essential's Wednesday comb ends by ~02:00
+  { workflow: "news24-update.yml", houses: ["YouGov"], mode: "dense", sweep: "06:20", phase: 3 },
   // the daily 07:05 sweep stays hand-authored in the file (the run gate
   // names its cron string), so the tuner adds the bracketing checks only
   { workflow: "demosau-update.yml", houses: ["DemosAU"], mode: "dense" },
@@ -275,8 +277,9 @@ function layout(target, m) {
   for (let i = 0; i < FOLLOW_HOURS; i++) addP(d, firstHour + i * 60, "follow-up");
   const late = toMins(LATE_BACKSTOP);
   if (late > firstHour + (FOLLOW_HOURS - 1) * 60) addP(d, late, "late backstop");
-  // next day
-  addP(next, toMins(target.sweep || "06:00"), "next-day");
+  // next day — the morning check is the daily sweep's own minute (unphased,
+  // so it folds into it), the evening one carries the phase
+  add0(next, toMins(target.sweep || "06:00"), "next-day");
   addP(next, toMins(NEXT_DAY_EVENING), "next-day");
   return { slots, notes };
 }
