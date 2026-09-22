@@ -1126,12 +1126,44 @@
       "unsure": 14.5
     },
     {
+      "date": "2026-08-30",
+      "dateStart": "2026-08-24",
+      "pollster": "Roy Morgan",
+      "right": 28,
+      "wrong": 59,
+      "unsure": 13
+    },
+    {
       "date": "2026-08-31",
       "dateStart": "2026-08-26",
       "pollster": "Essential",
       "right": 23,
       "wrong": 59,
       "unsure": 19
+    },
+    {
+      "date": "2026-09-06",
+      "dateStart": "2026-08-31",
+      "pollster": "Roy Morgan",
+      "right": 24,
+      "wrong": 62,
+      "unsure": 14
+    },
+    {
+      "date": "2026-09-13",
+      "dateStart": "2026-09-07",
+      "pollster": "Roy Morgan",
+      "right": 23,
+      "wrong": 64,
+      "unsure": 13
+    },
+    {
+      "date": "2026-09-20",
+      "dateStart": "2026-09-14",
+      "pollster": "Roy Morgan",
+      "right": 21,
+      "wrong": 65,
+      "unsure": 14
     }
   ],
   "polls": [

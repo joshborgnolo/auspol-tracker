@@ -2281,6 +2281,25 @@ function PollLedger({ r, dirSegments }) {
   const ppms = ppmContests(r);
   const appr = r.appr || {};
   const noAppr = appr.albNet == null && appr.taylorNet == null && appr.hansonNet == null;
+  const tppRefs = tppLines(tcs, r);
+  /* Consecutive unpublished sections collapse into one under a joined
+     heading ("Preferred PM, Leader ratings") carrying a single "Not
+     published" – the same verdict repeated under two headings in a row
+     reads as padding, not information. Entry meaning: null = published
+     (the section renders its own heading), "swallowed" = the absence
+     above already covers this one, otherwise the joined heading this
+     section opens. */
+  const absLabels = [
+    { label: tppHeading(tcs), absent: tppRefs.length === 0 },
+    { label: "Preferred PM", absent: ppms.length === 0 },
+    { label: apprHeading(appr), absent: noAppr },
+  ].map((s, i, all) => {
+    if (!s.absent) return null;
+    if (i > 0 && all[i - 1].absent) return "swallowed";
+    let label = s.label;
+    for (let j = i + 1; j < all.length && all[j].absent; j++) label += ", " + all[j].label;
+    return label;
+  });
   return (
     <div className="pd-simple">
 
@@ -2336,7 +2355,8 @@ function PollLedger({ r, dirSegments }) {
         </PdSec>
       )}
 
-      <PdSec label={tppHeading(tcs)}>
+      {absLabels[0] !== "swallowed" && (
+      <PdSec label={absLabels[0] ?? tppHeading(tcs)}>
         {/* name the main pair's basis only when the flows second line joins
             it – a single pair needs no disambiguation. The flows line itself
             is the same question with 2025's flows applied to these
@@ -2352,12 +2372,14 @@ function PollLedger({ r, dirSegments }) {
             standing in for one. The house's implied second pair (only Roy
             Morgan and RedBridge print one) remains spliced after the
             canonical pair inside tppLines. */}
-        {tppLines(tcs, r).map((x, i) => (
+        {tppRefs.map((x, i) => (
           <TppLine key={"t" + i} c={x.c} prefixed={x.count > 1 && !x.alt} note={x.note} alt={x.alt} />
         ))}
       </PdSec>
+      )}
 
-      <PdSec label="Preferred PM">
+      {absLabels[1] !== "swallowed" && (
+      <PdSec label={absLabels[1] ?? "Preferred PM"}>
         {ppms.map((c, i) => {
           const segs = ppmContestSegs(c, i === 0 ? r.chg : null);
           const cand = segs.filter((x) => !x.resid);
@@ -2391,12 +2413,15 @@ function PollLedger({ r, dirSegments }) {
           );
         })}
       </PdSec>
+      )}
 
-      <PdSec label={apprHeading(appr)}>
+      {absLabels[2] !== "swallowed" && (
+      <PdSec label={absLabels[2] ?? apprHeading(appr)}>
         {!noAppr && ["alb", "taylor", "hanson"].map((id) => (
           <ApprLine key={id} id={id} appr={appr} chg={r.chg} />
         ))}
       </PdSec>
+      )}
 
       {/* the same head-to-head shape as the vote share, so it takes the same
           treatment one scale down (`mid`) rather than body figures */}

@@ -56,6 +56,14 @@
 //     …" and "Roy Morgan estimates …"). Filed as an altTpp record {date,
 //     firm, alpVsOnp_alp, lnpVsOnp_lnp:null}, never a polls-row field;
 //     absent anchors before that wave are NOT a warning.
+//   - national direction: "going in the right/wrong direction" shares.
+//     Filed as a `direction` row {date, dateStart, pollster, right, wrong,
+//     unsure} keyed on the wave date like the poll row — the per-poll
+//     breakdown (PollLedger "National direction") and the monthly direction
+//     line both hang off that key. `unsure` is not printed in the prose: it
+//     is the remainder to 100. Like the altTpp pair, the row is filed even
+//     when the wave's polls row already exists, so a wave missed on its
+//     original run self-heals while its release is still in the feed.
 //   - fieldwork period "conducted from Month D – Month D, YYYY", sample
 //     "cross-section of N electors", and (when present) the "can't say" share,
 //     which is undecided BESIDE the primaries, not inside them.
@@ -252,6 +260,25 @@ function parseRelease(post) {
     else onpPairMissing = true;
   }
 
+  /* National direction — "going in the right/wrong direction", printed as
+     two adjacent sentences: a wrong-direction figure ("A large majority of
+     Australians, N%, say the country is 'going in the wrong direction'", or
+     the headed "Large majority of N% … of electors say Australia is 'going
+     in the wrong direction'") then "Only M% … say the country is 'going in
+     the right direction'." The prose also carries gender and party-supporter
+     splits of the same phrase — those never match the anchors below, which
+     demand the figure lead straight into "say (Australia|the country) is"
+     (wrong) or an "Only M% say" lead (right). Change parentheticals are
+     stripped by normaliseLead first, as with the primaries. */
+  let dirRight = null, dirWrong = null, dirPairMissing = false;
+  if (/in the wrong direction'/i.test(t)) {
+    const norm = normaliseLead(t);
+    const wm = norm.match(/([\d.]+)\s*%[\s,]*(?:of electors[\s,]*)?say (?:Australia|the country) is '(?:going|heading) in the wrong direction'/i);
+    const rm = norm.match(/\bOnly\s+([\d.]+)\s*%\s*say (?:Australia|the country) is '(?:going|heading) in the right direction'/i);
+    if (wm && rm) { dirWrong = parseFloat(wm[1]); dirRight = parseFloat(rm[1]); }
+    else dirPairMissing = true;
+  }
+
   // CMS post datetime (UTC) → Australia/Melbourne local, "YYYY-MM-DDTHH:MM"
   let published = null;
   const pd = post.date;
@@ -270,7 +297,7 @@ function parseRelease(post) {
   return {
     date, dateStart, published, alp, lnp, grn, onp, ind, undecided, lib, nat,
     tpp_alp, tpp_lnp, tpp_flows, tpp_flows_lnp, flowsPairMissing, flowsMonthly,
-    tpp_onp, tpp_onp_onp, onpPairMissing,
+    tpp_onp, tpp_onp_onp, onpPairMissing, dirRight, dirWrong, dirPairMissing,
     sample: sampleM ? +sampleM[1].replace(/,/g, "") : null,
     missing,
   };
@@ -313,6 +340,12 @@ function guardRelease(r, slug, releaseDate) {
     check(`onp 2pp Σ=${r.tpp_onp + r.tpp_onp_onp} ~100`, Math.abs(r.tpp_onp + r.tpp_onp_onp - 100) <= 1.0);
     check(`onp alp=${r.tpp_onp} in 40–65`, r.tpp_onp >= 40 && r.tpp_onp <= 65);
   }
+  if (r.dirRight != null && r.dirWrong != null) {
+    // Live range to date: right 19.5–43, wrong 41.5–64 (2025-06 onward)
+    check(`dir right=${r.dirRight} in 10–60`, r.dirRight >= 10 && r.dirRight <= 60);
+    check(`dir wrong=${r.dirWrong} in 25–95`, r.dirWrong >= 25 && r.dirWrong <= 95);
+    check(`dir Σ=${r.dirRight + r.dirWrong} in 40–100`, r.dirRight + r.dirWrong >= 40 && r.dirRight + r.dirWrong <= 100);
+  }
   if (r.undecided != null) check(`undecided=${r.undecided} in 0–25`, r.undecided > 0 && r.undecided <= 25);
   if (r.sample != null) check(`sample=${r.sample} in 500–10000`, r.sample >= 500 && r.sample <= 10000);
   return errs.map((e) => `${slug}: ${e}`);
@@ -325,6 +358,7 @@ try {
   const D = JSON.parse(orig);
   const rmDates = new Set(D.polls.filter((p) => p.pollster === "Roy Morgan").map((p) => p.date));
   const altBy = new Set((D.altTpp || []).map((a) => a.date + "|" + a.firm));
+  const dirBy = new Set((D.direction || []).map((x) => x.date + "|" + x.pollster));
 
   const feedPosts = [];
   let pagesFetched = 0;
@@ -365,6 +399,7 @@ try {
   const guardFails = [];
   const sources = [];
   const altAdds = [];
+  const dirAdds = [];
   for (const c of candidates) {
     let post;
     try {
@@ -382,19 +417,28 @@ try {
     if (r.flowsPairMissing) status.warnings.push(`${c.slug}: "allocated based on how Australians voted" anchor present but no flows pair parsed`);
     if (r.flowsMonthly) status.warnings.push(`${c.slug}: flows pair is for the month, not this wave — tpp_flows left absent`);
     if (r.onpPairMissing) status.warnings.push(`${c.slug}: "between the ALP and One Nation" anchor present but no ALP-v-ON pair parsed`);
+    if (r.dirPairMissing) status.warnings.push(`${c.slug}: "in the wrong direction" anchor present but no direction pair parsed`);
     const rd = post.findings?.releaseDate?.split("/").reverse().join("-"); // "24/08/2026" → 2026-08-24
     const rdOk = rd && /^\d{4}-\d{2}-\d{2}$/.test(rd) ? rd : null;
     const existed = !!(r.date && rmDates.has(r.date));
     const errs = guardRelease(r, c.slug, rdOk);
-    // For a wave already recorded in polls[], only its altTpp contribution is
-    // still live — guard just that pair; poll-field guards belong to the
-    // row's original run (historic rows predate some checks).
-    guardFails.push(...(existed ? errs.filter((e) => /\bonp (?:2pp Σ|alp=)/.test(e)) : errs));
+    // For a wave already recorded in polls[], only its altTpp and direction
+    // contributions are still live — guard just those; poll-field guards
+    // belong to the row's original run (historic rows predate some checks).
+    guardFails.push(...(existed ? errs.filter((e) => /\bonp (?:2pp Σ|alp=)|\bdir /.test(e)) : errs));
     if (r.tpp_onp != null && r.date) {
       const k = r.date + "|Roy Morgan";
       if (!altBy.has(k) && !altAdds.some((a) => a.date + "|" + a.firm === k)) {
         altAdds.push({ date: r.date, firm: "Roy Morgan", alpVsOnp_alp: r.tpp_onp, lnpVsOnp_lnp: null });
         if (existed) status.alt_healed = [...(status.alt_healed || []), r.date];
+      }
+    }
+    if (r.dirRight != null && r.date) {
+      const k = r.date + "|Roy Morgan";
+      if (!dirBy.has(k) && !dirAdds.some((a) => a.date + "|" + a.pollster === k)) {
+        const unsure = Math.round((100 - r.dirRight - r.dirWrong) * 2) / 2;
+        dirAdds.push({ date: r.date, dateStart: r.dateStart, pollster: "Roy Morgan", right: r.dirRight, wrong: r.dirWrong, unsure });
+        if (existed) status.dir_healed = [...(status.dir_healed || []), r.date];
       }
     }
     if (existed) { status.skipped_existing.push(r.date); continue; }
@@ -424,13 +468,17 @@ try {
     process.exit(2);
   }
 
-  if (newRows.length || altAdds.length) {
+  if (newRows.length || altAdds.length || dirAdds.length) {
     if (newRows.length) {
       D.polls = [...D.polls, ...newRows].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
     }
     if (altAdds.length) {
       D.altTpp = [...(D.altTpp || []), ...altAdds].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
       console.log(`altTpp: +${altAdds.length} Roy Morgan ALP-v-One-Nation pair(s): ${altAdds.map((a) => a.date).join(", ")}`);
+    }
+    if (dirAdds.length) {
+      D.direction = [...(D.direction || []), ...dirAdds].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+      console.log(`direction: +${dirAdds.length} Roy Morgan national-direction row(s): ${dirAdds.map((a) => a.date).join(", ")}`);
     }
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
     const next = JSON.stringify(D, null, 2) + trailingNl;
