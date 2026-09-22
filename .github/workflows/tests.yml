@@ -23,6 +23,13 @@ on:
       - "data/**"
       - ".github/workflows/**"
       - "package*.json"
+  # The updaters push with GITHUB_TOKEN, and those pushes never fire `push`
+  # — so until Sep 2026 the suite only ran on a human's push, and a data
+  # commit that broke the estimator's parity gate went untested for as
+  # long as no human pushed. A daily run bounds that to a day. Read-only,
+  # outside the writers queue, at a quiet hour.
+  schedule:
+    - cron: '30 15 * * *' # 01:30 AEST daily
   workflow_dispatch:
 
 # Read-only: never races the main-writers group and needs no write perms.
