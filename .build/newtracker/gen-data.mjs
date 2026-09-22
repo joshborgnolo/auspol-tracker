@@ -2010,11 +2010,17 @@ const CYC_META = [
     oppSpl: { iso: "1972-12-20", names: ["McMahon", "Snedden"] } },
   { year: 1974, gov: "alp", opp: "lnp", pm: "Whitlam", lead: "Whitlam", oppLead: "Snedden → Fraser", eDate: "1974-05-18", ePrim: 49.3, eTpp: 51.7, src: 1975, appr: 1974,
     oppSpl: { iso: "1975-03-21", names: ["Snedden", "Fraser"] } },
-  { year: 1975, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Whitlam → Hayden", eDate: "1975-12-13", ePrim: 53.1, eTpp: 55.7, src: 1977, appr: 1975,
-    oppSpl: { iso: "1977-02-10", names: ["Whitlam", "Hayden"] } },
-  { year: 1977, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Hayden", eDate: "1977-12-10", ePrim: 48.1, eTpp: 54.6, src: 1980, appr: 1977 },
+  /* Whitlam led the opposition for the whole 1975 term; Hayden replaced him
+     on 22 Dec 1977, twelve days into the NEXT term — so the handover sits on
+     the 1977 row, the way McMahon → Snedden (1972) and Shorten → Albanese
+     (2019) do. It used to sit here dated 1977-02-10, a date nothing
+     happened on. */
+  { year: 1975, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Whitlam", eDate: "1975-12-13", ePrim: 53.1, eTpp: 55.7, src: 1977, appr: 1975 },
+  { year: 1977, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Whitlam → Hayden", eDate: "1977-12-10", ePrim: 48.1, eTpp: 54.6, src: 1980, appr: 1977,
+    oppSpl: { iso: "1977-12-22", names: ["Whitlam", "Hayden"] } },
+  // Hawke took the leadership on 3 Feb 1983, the morning Fraser called the election
   { year: 1980, gov: "lnp", opp: "alp", pm: "Fraser", lead: "Fraser", oppLead: "Hayden → Hawke", eDate: "1980-10-18", ePrim: 46.4, eTpp: 50.4, src: 1983, appr: 1980,
-    oppSpl: { iso: "1983-02-08", names: ["Hayden", "Hawke"] } },
+    oppSpl: { iso: "1983-02-03", names: ["Hayden", "Hawke"] } },
   { year: 1983, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Fraser → Peacock", eDate: "1983-03-05", ePrim: 49.5, eTpp: 53.2, src: 1984, appr: 1983,
     oppSpl: { iso: "1983-03-11", names: ["Fraser", "Peacock"] } },
   { year: 1984, gov: "alp", opp: "lnp", pm: "Hawke", lead: "Hawke", oppLead: "Peacock → Howard", eDate: "1984-12-01", ePrim: 47.6, eTpp: 51.8, src: 1987, appr: 1984,
