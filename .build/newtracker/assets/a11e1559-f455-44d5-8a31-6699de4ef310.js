@@ -1593,9 +1593,12 @@ function OnSourcesPanel({ rangeId }) {
    bands and, beside them, the generations two houses ask by. One party at a
    time, One Nation first. Under each set's bars, a chart of how much higher
    or lower each group's vote is than all voters', in PERCENT, month by month
-   (gen-data's monthly lines over that month's primaries), each poll's own
-   figure against its own all-voters figure a dot, all voters the dashed zero
-   line; the bars' swatches are its legend.
+   (gen-data's monthly lines over that month's primaries) inside its 95%
+   interval, each poll's own figure against its own all-voters figure a dot,
+   all voters the dashed zero line; the bars' swatches are its legend. The
+   bands are what make it readable: a group's month rests on a few hundred
+   respondents, and in 2025 on one poll, so most wiggles sit inside their
+   own margin – where bands overlap, those groups can't be told apart.
    Not the levels: every group's line is the month's primaries plus its gap,
    so they redrew the national trend once per group. Not the gap in points
    either: One Nation grew 3.5-fold over the chart, and a group giving it
@@ -1643,8 +1646,11 @@ function DemographicsPanel({ rangeId = "all" }) {
     </div>
   );
   /* One set's chart: each group's monthly figure for the chosen party as a
-     percent above or below that month's all-voters figure, and each poll's
-     group figure against its own all-voters figure (grp.t). */
+     percent above or below that month's all-voters figure, its 95% interval
+     (the month's margin in points, after the shares in each monthly row, over
+     the same all-voters figure – that figure's own margin, a tenth the size,
+     is left out), and each poll's group figure against its own all-voters
+     figure (grp.t). */
   const rel = (g, a) => 100 * (g / a - 1);
   const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
@@ -1654,7 +1660,8 @@ function DemographicsPanel({ rangeId = "all" }) {
     const lines = st.groups.map((g, i) => ({ g, color: demoRamp(color, n, i),
       pts: (g.monthly || []).filter((m) => allAt.has(m[0]))
         .filter((m) => allAt.get(m[0]) > 0)
-        .map((m) => ({ ym: m[0], x: D.mx(m[0]), v: +rel(m[1 + ki], allAt.get(m[0])).toFixed(1) })) }))
+        .map((m) => ({ ym: m[0], x: D.mx(m[0]), v: +rel(m[1 + ki], allAt.get(m[0])).toFixed(1),
+                       ci: m[1 + T.order.length + ki] != null ? 100 * m[1 + T.order.length + ki] / allAt.get(m[0]) : null })) }))
       .filter((l) => l.pts.length);
     if (!lines.length) return null;
     // the houses asked from Feb 2026 (Resolve's age and gender from mid-2025),
@@ -1671,9 +1678,21 @@ function DemographicsPanel({ rangeId = "all" }) {
       return sum > 0 && p.grp.t[gpi] > 0
         ? { x: p.x, y: +rel(100 * v[gpi] / sum, p.grp.t[gpi]).toFixed(1), color: l.color, label: l.g.label, meta: p } : null;
     }).filter(Boolean));
-    const vals = drawn.flatMap((l) => l.pts.map((d) => d.v)).concat(allPts.map((d) => d.v), dots.map((d) => d.y));
+    // a share can't fall below zero, so neither can a band's floor fall below −100%
+    const areas = drawn.map((l) => ({ id: "ci-" + l.g.label, color: l.color, className: "ci-band", edge: false,
+      smooth: true, points: l.pts.filter((d) => d.ci != null)
+        .map((d) => ({ x: d.x, y0: Math.max(-100, d.v - d.ci), y1: d.v + d.ci })) }))
+      .filter((a) => a.points.length >= 2);
+    // the domain covers the bands too, or the widest months would run off the plot
+    const vals = drawn.flatMap((l) => l.pts.map((d) => d.v)).concat(allPts.map((d) => d.v), dots.map((d) => d.y),
+      areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
+    /* the finest step that keeps to six gridlines, and never a floor under
+       −100%: no group can sit more than 100% below all voters */
     const span = Math.max(...vals) - Math.min(...vals);
-    const { domain, ticks } = fitDomain(vals, span > 240 ? 100 : span > 120 ? 50 : span > 60 ? 20 : 10, 0);
+    const step = [10, 20, 25, 50, 100].find((st) => span / st <= 6) || 200;
+    const fit = fitDomain(vals, step, 0);
+    const domain = [Math.max(-100, fit.domain[0]), fit.domain[1]];
+    const ticks = fit.ticks.filter((t) => t > domain[0]);
     const signed = (v) => (Math.round(v) > 0 ? "+" : Math.round(v) < 0 ? "\u2212" : "") + Math.abs(Math.round(v));
     const by = st.label ? st.label.replace(/^By /, "") : tab.label.toLowerCase();
     return (
@@ -1689,6 +1708,7 @@ function DemographicsPanel({ rangeId = "all" }) {
           xTicks={buildXTicks(xDomain[0], xDomain[1])}
           series={[{ id: "all", label: "All voters", color: "var(--ink-3)", dashed: true, points: series(allPts, "v") },
                    ...drawn.map((l) => ({ id: l.g.label, label: l.g.label, color: l.color, points: series(l.pts, "v") }))]}
+          areas={areas}
           spine={series(allPts, "v")}
           scatter={dots} pollFacet="primary"
           tooltipTitle={(i) => window.AP.monthLabelFull(allPts[i].ym)}
@@ -1698,7 +1718,8 @@ function DemographicsPanel({ rangeId = "all" }) {
             sub: `How much higher or lower ${name}’s vote is in each group than among all voters, by ${by} · the latest figures pool the last ${T.window} of polls`,
             legend: [{ label: `All voters  ${all.toFixed(1)}%`, color: "var(--ink-3)", kind: "dashed" },
                      ...st.groups.map((g, i) => ({ label: `${g.label}  ${signed(rel(g.v[party], all))}%`,
-                                                   color: demoRamp(color, n, i), kind: "line" }))],
+                                                   color: demoRamp(color, n, i), kind: "line" })),
+                     ...(areas.length ? [{ label: "95% interval (shaded)", color: "var(--ink-faint)", kind: "shade" }] : [])],
           }}
         />
       </div>
@@ -1742,12 +1763,12 @@ function DemographicsPanel({ rangeId = "all" }) {
         last {T.window} of polls, newer and larger polls counting for more as in every figure here, and
         added to the site’s current figure for all voters. ± is the 95% margin. The charts show how
         much higher or lower the party’s vote is in each group than among all voters, in percent,
-        month by month – built the way the site’s other monthly lines are, with each poll as a dot.
+        month by month – built the way the site’s other monthly lines are, with each poll as a dot
+        and each line’s 95% interval shaded. Where two groups’ shading overlaps, the polls can’t
+        tell them apart that month.
         −38% means the party’s vote in that group is 38% lower than among all voters, not 38
         points. Measured this way a party’s growth doesn’t read as a widening divide, so a flat
-        line means the group moved with everyone else. Where a party’s vote is small, as One
-        Nation’s was in 2025, a point or two is a large percentage, so those months and single
-        polls jump around. Groups pool only where
+        line means the group moved with everyone else. Groups pool only where
         pollsters cut them the same way
         {tab.id === "age" ? " – YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : ""}.{" "}
         <button type="button" className="hi-term"

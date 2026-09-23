@@ -2152,13 +2152,17 @@ const demographics = (() => {
       if (DEMO_KEYS.some((k) => !est[k])) return null;
       const raw = Object.fromEntries(DEMO_KEYS.map((k) => [k, Math.max(0, est[k].v)]));
       const t = DEMO_KEYS.reduce((a, k) => a + raw[k], 0);
-      // [ym, …shares in DEMO_KEYS order], months the group was polled in
+      /* [ym, …shares in DEMO_KEYS order, …each share's 95% margin in the same
+         order], months the group was polled in. The margin is monthWithSe's,
+         the interval every monthly line on the site is drawn with – a month
+         resting on one poll shows its sampling floor – scaled as its share
+         is. The panel draws it as the band around the group's line. */
       const monthly = MONTHS.map((ym) => {
         const m = DEMO_KEYS.map((k) => monthWithSe(rowsM[key(k)] || [], null, ym));
         if (m.some((e) => !e)) return null;
         const mv = m.map((e) => Math.max(0, e.v)), mt = mv.reduce((a, b) => a + b, 0);
         const T = total(allByYm.get(ym));
-        return [ym, ...mv.map((v) => r1(T * v / mt))];
+        return [ym, ...mv.map((v) => r1(T * v / mt)), ...m.map((e) => r1(1.96 * e.se * T / mt))];
       }).filter(Boolean);
       return {
         label: group,

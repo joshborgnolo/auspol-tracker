@@ -669,7 +669,7 @@
       return out;
     };
     let legend = own && own.legend
-      ? own.legend.map((l) => ({ label: l.label, kind: l.kind === "dashed" ? "dashed" : "line",
+      ? own.legend.map((l) => ({ label: l.label, kind: l.kind === "dashed" || l.kind === "shade" ? l.kind : "line",
                                  fill: paint(l.color), alpha: 1 }))
       : readLegend(target);
     if (!legend.length && board0) legend = boardLegend();

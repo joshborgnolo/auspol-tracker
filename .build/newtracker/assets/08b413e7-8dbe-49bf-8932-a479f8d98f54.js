@@ -106,7 +106,7 @@ function straightPath(pts, sx, sy) {
  *           window, which an interval belonging to ONE line needs for the same
  *           reason the line does.
  *  yTickFmt: (t) => string  a y-axis label (default: the tick, then `unit`)
- *  copy:    { title?, sub?, legend: [{label, color, kind: "line"|"dashed"}] }
+ *  copy:    { title?, sub?, legend: [{label, color, kind: "line"|"dashed"|"shade"}] }
  *           what the copy-as-image button (copy-chart.js) draws for THIS
  *           chart, for a panel with no legend chips of its own or with more
  *           than one chart in its card; rides on the host as data-copy

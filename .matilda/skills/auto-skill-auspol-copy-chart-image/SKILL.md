@@ -241,3 +241,11 @@ disagreement `section.ap-var` has no `.card` class and used to fall to
 ## Button placement (d27fbe3, 24 Sep 2026)
 
 The live copy button sits in a reserved 30px strip BELOW the plot, right-aligned (`.chart:has(> .chart-copy-btn) { padding-bottom: 30px }`, button `right: 0; bottom: 0`). Never put it back over the plot: the bottom-right corner is where every time axis puts its newest label, and the old overlay covered it on 2/19 charts at laptop width and 19/19 on a phone. Uses `:has` rather than a JS class because React owns `.chart`'s className. Overlap audit recipe: for each `.chart-copy-btn`, intersect its rect with every `svg text` rect in its host, on each tab at 1440/1280/768/390.
+
+## A chart's own copy: title, sub, legend (979ed52, 24 Sep 2026)
+
+`readLegend` only finds `.hl-item` / `.legend-chip`, so a panel whose key is something else (the One Nation sources readings, the vote-by-group bars) copied with NO legend. And `composeCard` used to take the card's FIRST `svg.chart-svg`, so on a card holding two charts (vote by group, Age tab: bands + generations) the second button copied the first chart. Now:
+- TrendChart takes `copy={{ title?, sub?, legend: [{ label, color, kind: "line"|"dashed"|"shade" }] }}` and puts it on the host as `data-copy` (JSON). `ownCopy(host)` reads it; it overrides the card's title/sub/legend for that chart only. Colours can be any CSS (`var()`, `color-mix()`): `paint()` resolves them through a probe span.
+- `composeCard(card, host)` composes the CLICKED chart's svg.
+- Use it for any new panel without legend chips, or with more than one chart per card. A shaded interval gets a `{ kind: "shade", color: "var(--ink-faint)", label: "95% interval (shaded)" }` entry.
+- Check recipe: `.matilda/probe/demo-gap-copy.mjs` (gitignored; `OUT=dir W=390 DARK=1`) opens `/#snapshot`, clicks every copy button on both panels across the Age/Gender/Education tabs, and saves the composed PNGs. `ROOT` needs `decodeURIComponent`: the repo path has a space.
