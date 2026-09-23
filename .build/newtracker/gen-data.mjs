@@ -39,6 +39,7 @@ const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf
    deff-backtest.mjs, so the estimator and the gate can never disagree
    about what a house is called. */
 import { HOUSE_RENAMES } from "./house-renames.mjs";
+import { DEMO_TABS, DEMO_SETS, DEMO_SHARE, harmonize } from "./demo-groups.mjs";
 for (const [key, field] of [["polls", "pollster"], ["ppm", "firm"], ["approval", "firm"],
                             ["altTpp", "firm"], ["ppmHeadToHead", "firm"], ["direction", "pollster"]]) {
   if (!Array.isArray(D[key])) continue;
@@ -186,6 +187,8 @@ const meanOf = (rows, f) => { const v = rows.map(f).filter((x) => x != null); re
 
 const ELECTION = ELECTIONS.e2025;                       // 3 May 2025 baseline
 const LATEST_ISO = POLLS.reduce((m, p) => (p.date > m ? p.date : m), "0000");
+/* the instant every current figure is read at: the newest poll's fieldwork end */
+const refNow = new Date(LATEST_ISO).getTime();
 /* The last poll's PUBLICATION date, which is what the header stamp means by
    "last poll" - a reader wants to know when the newest number became public,
    not when its fieldwork closed, and the two are a day or three apart for
@@ -261,6 +264,21 @@ const HL_WINDOW = 21, HL_HALF = 7, HL_TAPER = 14;
    the §8b show-working tables - one formula, one home. */
 const taperW = (d) => (d <= HL_TAPER ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - HL_TAPER) / (HL_WINDOW - HL_TAPER))));
 const recencyW = (d) => Math.exp(-LN2 * d / HL_HALF) * taperW(d);
+/* The two windows every current figure is read through. HEADLINE_K is the
+   2PP's own. SPARSE_K doubles its window, half-life and taper for a measure
+   polled about once a week or less – preferred PM, the One Nation split, the
+   vote by group – where three weeks often holds one poll and sometimes none
+   (the vote by group's 18–34 band, Apr–Sep 2026: no poll in the three weeks
+   before 18 days of 176; in the six weeks before, none empty), so the same
+   estimator still rests on several polls. Same shape, same taper; only the
+   time scale differs. */
+const HEADLINE_K = { window: HL_WINDOW, weight: recencyW, label: "three weeks" };
+const SPARSE_WINDOW = 2 * HL_WINDOW, SPARSE_HALF = 2 * HL_HALF, SPARSE_TAPER = 2 * HL_TAPER;
+const SPARSE_K = {
+  window: SPARSE_WINDOW, label: "six weeks",
+  weight: (d) => Math.exp(-LN2 * d / SPARSE_HALF)
+    * (d <= SPARSE_TAPER ? 1 : 0.5 * (1 + Math.cos(Math.PI * (d - SPARSE_TAPER) / (SPARSE_WINDOW - SPARSE_TAPER)))),
+};
 const tppRows = POLLS.filter((p) => p.tpp_alp != null).map((p) => ({ ym: ymOf(p.date), mid: midMs(p), x: share2pp(p), n: rowN(p), firm: p.pollster, key: p.date + "|" + p.pollster }));
 /* Implied 2PP eligibility: a poll's primaries can only be read through the
    flow table when it files a full primary set with no documented anomaly
@@ -446,14 +464,17 @@ function weightedWithSe(pts) {                 // pts: [{ w, x, n }]
 /* The window's weighted points, split out so an estimate can be taken
    UNROUNDED (the five-party primary check totals the debiased shares before
    any r1 touches them). nowcastAdj stays the rounded public face. */
-function nowcastPts(rows, he, ref) {
+/* k: the window (HEADLINE_K unless the measure is sparse). A row's base
+   weight is its sample, or `w0` where a measure weights houses equally (the
+   leader nets); n still sizes its sampling-error floor either way. */
+function nowcastPts(rows, he, ref, k = HEADLINE_K) {
   const pts = [];
   const waves = new Map();                    // firm -> wave count inside the window
   for (const a of rows) {
     const d = ddays(ref, a.mid);
-    if (d < 0 || d > HL_WINDOW) continue;
+    if (d < 0 || d > k.window) continue;
     waves.set(a.firm, (waves.get(a.firm) || 0) + 1);
-    pts.push({ w: a.n * recencyW(d), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
+    pts.push({ w: (a.w0 ?? a.n) * k.weight(d), x: a.x - heV(he, a.firm, ref), n: a.n, firm: a.firm, ...(a.pq != null ? { pq: a.pq } : {}) });
   }
   /* A house with m waves in the window has not measured the electorate m
      independent times - same method, same house-effect residue - so its
@@ -467,6 +488,23 @@ function nowcastPts(rows, he, ref) {
 function nowcastAdj(rows, he, ref) {
   const r = weightedWithSe(nowcastPts(rows, he, ref));
   return r && { v: r1(r.v), n: r.n, se: r2(r.se), nEff: r1(r.nEff), ci95: r1(1.96 * r.se) };
+}
+/* A panel's current reading, built as the headline is: the nowcast at the
+   newest poll, the same a month earlier, and whether the move clears both
+   readings' margins (two independent windows, root-sum-square – the
+   headline's own rule). Null when the window holds no poll. */
+function currentReading(rows, he, k = HEADLINE_K, ref = refNow) {
+  const at = (t) => weightedWithSe(nowcastPts(rows, he, t, k));
+  const now = at(ref);
+  if (!now) return null;
+  const out = { v: r1(now.v), se: r2(now.se), ci95: r1(1.96 * now.se), n: now.n, nEff: r1(now.nEff) };
+  const prev = at(ref - 30 * 86400000);
+  if (prev) {
+    const seChg = Math.sqrt(now.se ** 2 + prev.se ** 2);
+    Object.assign(out, { prev: r1(prev.v), chg: r1(now.v - prev.v), changeCi95: r1(1.96 * seChg),
+                         changeSig: Math.abs(now.v - prev.v) > 1.96 * seChg });
+  }
+  return out;
 }
 /* The same estimate for ONE calendar month, weighted by sample size only.
    This is what the trend line is drawn from, so it is also what the shaded
@@ -855,6 +893,33 @@ const prefShare = (p, k) => {
   return den > 0 && p[k] != null ? (p[k] / den) * 100 : null;
 };
 
+/* Sampling variance of ONE net reading, in points². A net is a DIFFERENCE of
+   two proportions drawn from the same sample, so it does not carry p(1−p):
+     Var(a − d) = (a + d − (a−d)²) / n,  i.e. pq = 100·(app+dis) − net²
+   which is why this cannot reuse the share floor the 2PP and the primaries
+   use – on a −19 net with a 36/57 split it is roughly twice as wide.
+   Where the house published no split we assume no don't-knows, the widest
+   that floor can be: an interval too generous is the smaller sin. */
+const netPq = (net, sp) => {
+  const sum = (sp && sp.app != null && sp.dis != null) ? sp.app + sp.dis : 100;
+  return Math.max(0, 100 * sum - net * net);
+};
+/* Preferred PM's monthly means get the monthly construction every vote
+   series gets – sample-weighted, a house's repeat waves in the month counted
+   as sqrt(m) – but no house adjustment (the note in leaderMonths below says
+   why). They were plain means, which let a house that asked twice in a month
+   count twice. */
+const ppmN = (r) => rowN(POLL_BY_KEY.get(r.date + "|" + r.firm));
+const wMeanOf = (rows, f) => {
+  const pts = rows.map((r) => ({ r, v: f(r) })).filter((d) => d.v != null);
+  if (!pts.length) return null;
+  const waves = new Map();
+  for (const d of pts) waves.set(d.r.firm, (waves.get(d.r.firm) || 0) + 1);
+  let sw = 0, swx = 0;
+  for (const d of pts) { const w = ppmN(d.r) / Math.sqrt(waves.get(d.r.firm)); sw += w; swx += w * d.v; }
+  return swx / sw;
+};
+
 const leaderMonths = MONTHS.map((ym) => {
   const pp = ppm.filter((p) => ymOf(p.date) === ym);
   // a three-way prompt is a different question, never averaged with a two-way
@@ -872,17 +937,6 @@ const leaderMonths = MONTHS.map((ym) => {
   if (!pp.length && !rows.length && !ppH.length) return null;
   // approval and favourability are different questions – routed PER LEADER by
   // that leader's metric at the firm, never pooled into one mean
-  /* Sampling variance of ONE net reading, in points². A net is a DIFFERENCE of
-     two proportions drawn from the same sample, so it does not carry p(1−p):
-       Var(a − d) = (a + d − (a−d)²) / n,  i.e. pq = 100·(app+dis) − net²
-     which is why this cannot reuse the share floor the 2PP and the primaries
-     use – on a −19 net with a 36/57 split it is roughly twice as wide.
-     Where the house published no split we assume no don't-knows, the widest
-     that floor can be: an interval too generous is the smaller sin. */
-  const netPq = (net, sp) => {
-    const sum = (sp && sp.app != null && sp.dis != null) ? sp.app + sp.dis : 100;
-    return Math.max(0, 100 * sum - net * net);
-  };
   const apprN = (p) => rowN(POLL_BY_KEY.get(p.date + "|" + p.firm));
   const split = (prop, lk, pool = rows) => {
     const ap = [], fv = [];
@@ -943,35 +997,82 @@ const leaderMonths = MONTHS.map((ym) => {
        rather than opinion, and about 2pp of the cycle's apparent decline is
        the same artefact. Two-way runs the whole cycle (54 polls, all 14
        months); three-way is recent and partial (15 polls, 7 months). */
-    alb_pref: rnd(meanOf(pp2, (p) => p.alb)),
+    alb_pref: rnd(wMeanOf(pp2, (p) => p.alb)),
     /* ley_* / taylor_*: the one opposition series keyed by who was asked. A
        pre-handover month carries ley_* only, a month since carries taylor_*,
        and Feb 2026 – where both were measured – carries both, so neither
        person's line borrows the other's readings. */
-    ley_pref: rnd(meanOf(pp2L, (p) => p.opp)), taylor_pref: rnd(meanOf(pp2T, (p) => p.opp)),
+    ley_pref: rnd(wMeanOf(pp2L, (p) => p.opp)), taylor_pref: rnd(wMeanOf(pp2T, (p) => p.opp)),
     hanson_pref: null,
-    alb_prefN: rnd(meanOf(pp2, (p) => prefShare(p, "alb"))),
-    ley_prefN: rnd(meanOf(pp2L, (p) => prefShare(p, "opp"))),
-    taylor_prefN: rnd(meanOf(pp2T, (p) => prefShare(p, "opp"))),
+    alb_prefN: rnd(wMeanOf(pp2, (p) => prefShare(p, "alb"))),
+    ley_prefN: rnd(wMeanOf(pp2L, (p) => prefShare(p, "opp"))),
+    taylor_prefN: rnd(wMeanOf(pp2T, (p) => prefShare(p, "opp"))),
     hanson_prefN: null,
-    alb_pref3: rnd(meanOf(pp3, (p) => p.alb)),
-    ley_pref3: rnd(meanOf(pp3L, (p) => p.opp)), taylor_pref3: rnd(meanOf(pp3T, (p) => p.opp)),
-    hanson_pref3: rnd(meanOf(pp3, (p) => p.han)),
-    alb_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "alb"))),
-    ley_prefN3: rnd(meanOf(pp3L, (p) => prefShare(p, "opp"))),
-    taylor_prefN3: rnd(meanOf(pp3T, (p) => prefShare(p, "opp"))),
-    hanson_prefN3: rnd(meanOf(pp3, (p) => prefShare(p, "han"))),
+    alb_pref3: rnd(wMeanOf(pp3, (p) => p.alb)),
+    ley_pref3: rnd(wMeanOf(pp3L, (p) => p.opp)), taylor_pref3: rnd(wMeanOf(pp3T, (p) => p.opp)),
+    hanson_pref3: rnd(wMeanOf(pp3, (p) => p.han)),
+    alb_prefN3: rnd(wMeanOf(pp3, (p) => prefShare(p, "alb"))),
+    ley_prefN3: rnd(wMeanOf(pp3L, (p) => prefShare(p, "opp"))),
+    taylor_prefN3: rnd(wMeanOf(pp3T, (p) => prefShare(p, "opp"))),
+    hanson_prefN3: rnd(wMeanOf(pp3, (p) => prefShare(p, "han"))),
     /* Albanese v Hanson, head to head. Not a slice of either line above: it is
        asked as its own contest, Albanese runs ~7pp higher against Hanson than
        against the opposition leader, and only some houses ask it (11 polls,
        Apr 2026 on), so it is a third series rather than a filter on the first. */
-    alb_prefH: rnd(meanOf(ppH, (r) => r.alb)), hanson_prefH: rnd(meanOf(ppH, (r) => r.han)), taylor_prefH: null, ley_prefH: null,
+    alb_prefH: rnd(wMeanOf(ppH, (r) => r.alb)), hanson_prefH: rnd(wMeanOf(ppH, (r) => r.han)), taylor_prefH: null, ley_prefH: null,
     alb_net: A.net, ley_net: OL.net, taylor_net: OT.net, hanson_net: H.net,
     alb_fav: A.fav, ley_fav: OL.fav, taylor_fav: OT.fav, hanson_fav: H.fav,
     alb_netCi: A.netCi, ley_netCi: OL.netCi, taylor_netCi: OT.netCi, hanson_netCi: H.netCi,
     alb_favCi: A.favCi, ley_favCi: OL.favCi, taylor_favCi: OT.favCi, hanson_favCi: H.favCi,
   };
 }).filter(Boolean);
+
+/* ---- 4b. leaders' current readings ----------------------------------------
+   What each leader readout quotes – built as the headline is
+   (currentReading), not the last calendar month, which early in a month is
+   one or two houses. Nets: debiased on the same stratified house effects as
+   the monthly lines and, as there, houses weighted equally; Albanese's and
+   Taylor's approval on the headline's three-week window, the thinner
+   measures on six weeks. Preferred PM: the six-week window (a handful of houses
+   ask each format), sample-weighted, not house-adjusted (see leaderMonths).
+   The opposition slot reads Taylor's era only – the office's holder now.
+   Keyed as the monthly series are (alb_net, taylor_pref3…); integers, as the
+   monthly readings are. A key with no poll in its window is absent, and the
+   panel falls back to the latest monthly reading. */
+const leaderNow = (() => {
+  const out = {};
+  const put = (key, r) => { if (r) out[key] = { ...r, v: rnd(r.v), prev: r.prev != null ? rnd(r.prev) : null }; };
+  const taylorEra = (p) => eraOf(p.date) === "taylor";
+  for (const [prop, lk, id, pool] of [["alb", "alb", "alb", appr], ["opp", "opp", "taylor", appr.filter(taylorEra)], ["han", "han", "hanson", appr]]) {
+    for (const metric of ["net", "fav"]) {
+      const rows = [];
+      for (const p of pool) {
+        const n = rowN(POLL_BY_KEY.get(p.date + "|" + p.firm)), mid = midMs({ date: p.date });
+        const own = metricOf(p.firm, lk, p.date) === "fav" ? "fav" : "net";
+        if (p[prop] != null && own === metric) rows.push({ firm: p.firm, mid, x: p[prop], n, w0: 1, pq: netPq(p[prop], p.splits ? p.splits[lk] : null) });
+        // a firm that published both measures lends its second reading to the other line, as the monthly lines do
+        const alt = p.splits && p.splits.fav ? p.splits.fav[lk] : null;
+        if (metric === "fav" && alt != null && own !== "fav") rows.push({ firm: p.firm, mid, x: alt, n, w0: 1, pq: netPq(alt, null) });
+      }
+      // approval of the two majors' leaders is asked by four or five houses
+      // every three weeks; favourability, and Hanson's approval, by two or so
+      // (Apr–Sep 2026: a single house in the three weeks before 40 of 176
+      // days), so those read the six-week window
+      put(id + "_" + metric, currentReading(rows, apprHE[lk], metric === "net" && id !== "hanson" ? HEADLINE_K : SPARSE_K));
+    }
+  }
+  const ppRows = (pool, f) => pool.map((p) => ({ firm: p.firm, mid: midMs({ date: p.date }), x: f(p), n: ppmN(p) }))
+    .filter((r) => r.x != null);
+  const pp2 = ppm.filter((p) => p.han == null), pp3 = ppm.filter((p) => p.han != null);
+  const sets = {
+    alb_pref: ppRows(pp2, (p) => p.alb), taylor_pref: ppRows(pp2.filter(taylorEra), (p) => p.opp),
+    alb_pref3: ppRows(pp3, (p) => p.alb), taylor_pref3: ppRows(pp3.filter(taylorEra), (p) => p.opp),
+    hanson_pref3: ppRows(pp3, (p) => p.han),
+    alb_prefH: ppRows(D.ppmHeadToHead, (r) => r.alb), hanson_prefH: ppRows(D.ppmHeadToHead, (r) => r.han),
+  };
+  for (const [key, rows] of Object.entries(sets)) put(key, currentReading(rows, null, SPARSE_K));
+  return out;
+})();
 
 /* A card's house credit-list names only houses still ASKING the question:
    anyone with a reading in the six months before the series' own newest.
@@ -1084,6 +1185,30 @@ const direction = dirRight.map((m) => {
            rightCi: rSe ? r1(1.96 * rSe.se) : null,
            wrongCi: wSe ? r1(1.96 * wSe.se) : null };
 }).filter(Boolean);
+
+/* The panel's current reading: the headline construction – three-week
+   window, house-adjusted – not the last calendar month, which early in a
+   month is one Roy Morgan wave. Right and wrong are each their own nowcast,
+   unsure the remainder, as in the monthly rows. The net's change is tested
+   on its own series with its own house effects (never borrowed between
+   measures): a net is a difference of two proportions, with the net's
+   sampling variance, not a share's. */
+const dirNetRows = DIR.filter((d) => d.right != null && d.wrong != null).map((d) => ({
+  mid: midMs(d), x: d.right - d.wrong, n: dirSample(d), firm: d.pollster,
+  pq: Math.max(0, 100 * (d.right + d.wrong) - (d.right - d.wrong) ** 2),
+}));
+const directionNow = (() => {
+  const r = currentReading(dirRightRows, dirHe.right), w = currentReading(dirWrongRows, dirHe.wrong);
+  const net = currentReading(dirNetRows, houseEffectsFor(dirNetRows));
+  if (!r || !w) return null;
+  const out = { right: r.v, wrong: w.v, unsure: r1(100 - r.v - w.v), net: r1(r.v - w.v),
+                rightCi: r.ci95, wrongCi: w.ci95, n: Math.max(r.n, w.n) };
+  if (r.prev != null && w.prev != null) {
+    out.chg = r1((r.v - w.v) - (r.prev - w.prev));
+    if (net && net.changeCi95 != null) { out.changeCi95 = net.changeCi95; out.changeSig = Math.abs(out.chg) > net.changeCi95; }
+  }
+  return out;
+})();
 
 /* ---- per-poll leadership / alt builders -------------------------------- */
 const oppKey = (name) => (name === "Ley" ? "ley" : "taylor");
@@ -1366,91 +1491,99 @@ const onSourceWaves = (() => {
     };
   }).filter(Boolean).sort((a, b) => a.x - b.x);
 })();
+/* The lines and the readings pool the RATES, not each wave's split. Each
+   2025 group's share now voting One Nation (and the share of its own 2025
+   voters it kept) is its own series, averaged as the site averages
+   everything else: the monthly construction for the lines (sample-weighted,
+   a house's repeat waves as sqrt(m)), the six-week nowcast for the readings
+   (two houses publish, about one poll a week between them). The split is
+   then worked out from the pooled rates. Pooling each wave's split instead
+   would weight a poll's Greens-voter figure as heavily as its Coalition-
+   voter figure, when it rests on a third as many respondents – so each rate
+   carries the sample its group is: the poll's n times the group's 2025 share.
+   No house adjustment: two houses give no consensus to measure a lean
+   against, the rule every thin series here follows. Each reading's margin
+   comes from the rates' margins through the split (groups are separate
+   respondents, so independent). */
+const ON_GAIN_KEYS = ["lnp", "alp", "grn", "oth"];
+const onRateRows = (() => {
+  const out = { lnp: [], alp: [], grn: [], oth: [], onp: [] };
+  if (!onSourceWaves.length) return out;
+  const W = VOTE_SWITCHING.weights2025;
+  const share2025 = { lnp: W.lnp, alp: W.alp, grn: W.grn, oth: W.ind + W.oth, onp: W.onp };
+  for (const w of onSourceWaves) {
+    const p = POLL_BY_KEY.get(w.date + "|" + w.pollster);
+    const n = rowN(p || { sample: w.sample }), mid = midMs(p || { dateStart: w.dateStart, date: w.date });
+    for (const k of Object.keys(out)) {
+      const x = k === "onp" ? w.keptPct : w.toOn[k];
+      if (x != null) out[k].push({ ym: ymOf(w.date), mid, x, n: n * share2025[k] / 100, firm: w.pollster });
+    }
+  }
+  return out;
+})();
+// the split from pooled rates: est[k] = { v: % of group k now One Nation, se }
+function onSplit(est) {
+  if (ON_GAIN_KEYS.some((k) => !est[k])) return null;
+  const W = VOTE_SWITCHING.weights2025;
+  const share2025 = { lnp: W.lnp, alp: W.alp, grn: W.grn, oth: W.ind + W.oth };
+  const pts = {}, vr = {};
+  for (const k of ON_GAIN_KEYS) {
+    pts[k] = share2025[k] * est[k].v / 100;
+    vr[k] = (share2025[k] / 100) ** 2 * est[k].se ** 2;
+  }
+  const drawn = ON_GAIN_KEYS.reduce((t, k) => t + pts[k], 0);
+  if (!(drawn > 0)) return null;
+  const share = {}, se = {};
+  for (const k of ON_GAIN_KEYS) {
+    const sg = pts[k] / drawn;
+    share[k] = 100 * sg;
+    se[k] = (100 / drawn) * Math.sqrt((1 - sg) ** 2 * vr[k] + sg ** 2 * ON_GAIN_KEYS.filter((h) => h !== k).reduce((t, h) => t + vr[h], 0));
+  }
+  return { share, se, pts, drawn };
+}
+const onSplitAt = (ref) => onSplit(Object.fromEntries(ON_GAIN_KEYS.map((k) => [k, weightedWithSe(nowcastPts(onRateRows[k], null, ref, SPARSE_K))])));
+const onMonthly = MONTHS.map((ym) => {
+  const est = Object.fromEntries(ON_GAIN_KEYS.map((k) => [k, monthWithSe(onRateRows[k], null, ym)]));
+  const sp = onSplit(est);
+  return sp && { ym, x: mx(ym), sp, k: onSourceWaves.filter((w) => w.ym === ym).length };
+}).filter(Boolean);
+const onNow = onSplitAt(refNow), onPrev = onSplitAt(refNow - 30 * 86400000);
 const onSources = onSourceWaves.length ? {
   series: ON_SOURCE_GROUPS.map((g) => {
     const polls = onSourceWaves.map((w) => ({
       x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date,
       sample: w.sample ?? null, v: w.share[g.id], pts: w.pts[g.id],
     }));
-    const monthly = MONTHS.map((ym) => {
-      const m = polls.filter((d) => d.ym === ym);
-      if (!m.length) return null;
-      let sw = 0, swx = 0;
-      for (const r of m) { const n = rowN(r); sw += n; swx += n * r.v; }
-      return { ym, x: mx(ym), v: r1(swx / sw), k: m.length };
-    }).filter(Boolean);
-    const last = polls[polls.length - 1];
-    const prev = [...polls].reverse().find((d) => d.pollster === last.pollster && d.x < last.x);
-    return { ...g, polls, monthly, n: polls.length,
-      latest: { v: last.v, firm: last.pollster, released: last.released, field: last.dateLabel,
-                chg: prev ? r1(last.v - prev.v) : null, refDate: prev ? prev.released : null } };
+    const monthly = onMonthly.map((m) => ({ ym: m.ym, x: m.x, v: r1(m.sp.share[g.id]), k: m.k }));
+    let now = null;
+    if (onNow) {
+      now = { v: r1(onNow.share[g.id]), ci95: r1(1.96 * onNow.se[g.id]), pts: r1(onNow.pts[g.id]) };
+      if (onPrev) {
+        const seChg = Math.sqrt(onNow.se[g.id] ** 2 + onPrev.se[g.id] ** 2);
+        Object.assign(now, { prev: r1(onPrev.share[g.id]), chg: r1(onNow.share[g.id] - onPrev.share[g.id]),
+                             changeCi95: r1(1.96 * seChg),
+                             changeSig: Math.abs(onNow.share[g.id] - onPrev.share[g.id]) > 1.96 * seChg });
+      }
+    }
+    return { ...g, polls, monthly, n: polls.length, now };
   }),
+  // the readings' window: how many waves it held, and whose
+  now: onNow ? { drawn: r1(onNow.drawn), window: SPARSE_K.label,
+                 n: weightedWithSe(nowcastPts(onRateRows.lnp, null, refNow, SPARSE_K))?.n ?? 0,
+                 houses: [...new Set(onRateRows.lnp.filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; }).map((r) => r.firm))] } : null,
   waves: onSourceWaves.map(({ x, ym, ...w }) => w),
   houses: creditHouses(onSourceWaves, (w) => w.pollster, (w) => Date.parse(w.date)),
   weights: VOTE_SWITCHING.weights2025,
 } : null;
 
-/* ---- 5c. the vote by age, gender and education ---------------------------
-   From data/demographics.json (.build/demographics.mjs): each house's latest
-   breakdown, per tab, exactly as the house groups it – the age bands differ
-   (Resolve and DemosAU 18–34/35–54/55+, YouGov 18–34/35–49/50+), and a house
-   that groups by generation instead (RedBridge; YouGov in part of 2026) shows
-   its generations under Age. Each group's shares are rescaled to 100 across
-   the five party keys, as the site does with every primary set. Beside the
-   groups rides the house's all-voters figure for the same wave – its own
-   table's total where the table has one, else the wave's published primary –
-   so a group reads against its own poll, not against another house. */
+/* ---- 5c. the vote by age, gender and education: the tables ---------------
+   data/demographics.json (.build/demographics.mjs) – each house's groups, per
+   wave, as published. The figures built from them are §7g: they anchor on
+   the current primaries (§7e), so they are assembled after those. */
 const DEMOGRAPHICS = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demographics.json"), "utf8")); }
   catch { return null; }
 })();
-const DEMO_HOUSES = ["Resolve", "DemosAU", "YouGov", "RedBridge/Accent"];
-const DEMO_TABS = [
-  { id: "age", label: "Age", dims: ["age", "generation"] },
-  { id: "gender", label: "Gender", dims: ["gender"] },
-  { id: "education", label: "Education", dims: ["education"] },
-];
-const DEMO_KEYS = ["alp", "lnp", "onp", "grn", "oth"];
-const demoNorm = (s) => {
-  const t = DEMO_KEYS.reduce((a, k) => a + (+s[k] || 0), 0);
-  return t > 0 ? Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(100 * (+s[k] || 0) / t)])) : null;
-};
-const demoTotal = (w) => {
-  if (w.total && Object.keys(w.total).length) return demoNorm(w.total);
-  // the wave's published primary; Resolve's series dates sit a day or so off
-  // its polls.json row, so the nearest Resolve row within four days
-  const ms = Date.parse(w.date);
-  const p = POLLS.filter((q) => q.pollster === w.pollster && Math.abs(Date.parse(q.date) - ms) <= 4 * 86400000)
-    .sort((a, b) => Math.abs(Date.parse(a.date) - ms) - Math.abs(Date.parse(b.date) - ms))[0];
-  if (!p || p.alp == null) return null;
-  return demoNorm({ alp: p.alp, lnp: p.lnp, onp: p.onp ?? 0, grn: p.grn ?? 0, oth: (p.ind ?? 0) + (p.oth ?? 0) });
-};
-const demographics = Array.isArray(DEMOGRAPHICS?.waves) && DEMOGRAPHICS.waves.length ? {
-  tabs: DEMO_TABS.map((tab) => ({
-    id: tab.id, label: tab.label,
-    blocks: DEMO_HOUSES.map((house) => {
-      // the house's latest wave carrying any of the tab's groupings; on a tie
-      // of dates the first grouping (age before generation) wins
-      let best = null;
-      for (const w of DEMOGRAPHICS.waves) {
-        if (w.pollster !== house) continue;
-        const dim = tab.dims.find((d) => w.dims?.[d] && Object.keys(w.dims[d]).length);
-        if (dim && (!best || w.date > best.w.date)) best = { w, dim };
-      }
-      if (!best) return null;
-      const { w, dim } = best;
-      const groups = Object.entries(w.dims[dim]).map(([label, s]) => ({ label, shares: demoNorm(s) })).filter((g) => g.shares);
-      return {
-        pollster: house === "RedBridge/Accent" ? "RedBridge" : house, date: w.date,
-        // fieldwork span where the wave has one; Resolve's series carry a date only
-        dateLabel: w.dateStart ? fwLabel(w.dateStart, w.date)
-          : (([, m, d]) => `${+d} ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m - 1]}`)(w.date.split("-")),
-        source: w.source || null, grouping: dim, groups, total: demoTotal(w),
-        read: w.read,
-      };
-    }).filter(Boolean),
-  })).filter((t) => t.blocks.length),
-} : null;
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
 const individualPolls = POLLS.map((p) => {
@@ -1601,7 +1734,6 @@ const headlineTpp = (ref) => {
   const r = nowcastAdj(tppRows, houseEffect, ref);
   return r ? { alp: r.v, n: r.n, se: r.se, nEff: r.nEff, ci95: r.ci95 } : null;
 };
-const refNow = new Date(LATEST_ISO).getTime();
 const hlNow = headlineTpp(refNow) || { alp: agg2pp[agg2pp.length - 1].alp, n: 0 };
 const hl1mo = headlineTpp(refNow - 30 * 86400000);
 
@@ -1882,6 +2014,91 @@ const primaryNowAt = (ref) => {
 };
 const primaryNow = primaryNowAt(refNow);
 
+/* ---- 7g. the vote by age, gender and education -----------------------------
+   One figure per group and party, built as the headline is. Each poll says
+   how far a group sits from that poll's own all-voters figure – One Nation
+   ten points lower among 18–34s, say. Those gaps are pooled over the six-week
+   window (recency- and sample-weighted, a house's repeat waves as sqrt(m);
+   about one poll a week per group, so the headline's three weeks would often
+   hold one poll or none) and added to the current primaries (§7e). Measuring
+   each poll against its own total removes its house lean exactly – a
+   group-level house effect could never be estimated from four houses – and
+   puts every group on the level of the figures the site quotes. Groups pool
+   only where the houses cut the population the same way (demo-groups.mjs).
+   A group's five shares are rescaled to 100, as every primary set is. */
+const DEMO_KEYS = ["alp", "lnp", "onp", "grn", "oth"];
+const demoNorm = (s) => {
+  const t = DEMO_KEYS.reduce((a, k) => a + (+s[k] || 0), 0);
+  return t > 0 ? Object.fromEntries(DEMO_KEYS.map((k) => [k, 100 * (+s[k] || 0) / t])) : null;
+};
+// the wave's poll row: its own date, or – Resolve's series date sits a day or
+// so off its polls.json row – the nearest row of that house within four days
+const demoPollOf = (w) => {
+  const ms = Date.parse(w.date);
+  return POLLS.filter((q) => q.pollster === w.pollster && Math.abs(Date.parse(q.date) - ms) <= 4 * 86400000)
+    .sort((a, b) => Math.abs(Date.parse(a.date) - ms) - Math.abs(Date.parse(b.date) - ms))[0] || null;
+};
+// its all-voters figure: the table's own where it prints one, else the published primaries
+const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm(w.total)
+  : p && p.alp != null ? demoNorm({ alp: p.alp, lnp: p.lnp, onp: p.onp ?? 0, grn: p.grn ?? 0, oth: (p.ind ?? 0) + (p.oth ?? 0) }) : null);
+const demographics = (() => {
+  const waves = Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [];
+  if (!waves.length || !primaryNow) return null;
+  const ALL = demoNorm(primaryNow);
+  const rows = {};                                // "set|group|party" -> nowcast rows
+  const inWindow = [];                            // the waves the window holds, for the credits
+  for (const w of waves) {
+    const p = demoPollOf(w), tot = demoTotalOf(w, p);
+    if (!tot) continue;
+    const mid = midMs(p || w), n = rowN(p || { sample: w.sample });
+    const h = harmonize(w);
+    let used = false;
+    for (const set of DEMO_SETS) for (const group of set.groups) {
+      const g = h[set.id] && h[set.id][group] && demoNorm(h[set.id][group]);
+      if (!g) continue;
+      used = true;
+      for (const k of DEMO_KEYS)
+        (rows[set.id + "|" + group + "|" + k] ||= []).push({ mid, x: ALL[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster });
+    }
+    const d = ddays(refNow, mid);
+    if (used && d >= 0 && d <= SPARSE_K.window) inWindow.push({ w, p, d });
+  }
+  const housesIn = (rs) => [...new Set(rs.filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; }).map((r) => r.firm))];
+  const sets = DEMO_SETS.map((set) => {
+    const groups = set.groups.map((group) => {
+      const key = (k) => set.id + "|" + group + "|" + k;
+      const est = Object.fromEntries(DEMO_KEYS.map((k) => [k, weightedWithSe(nowcastPts(rows[key(k)] || [], null, refNow, SPARSE_K))]));
+      if (DEMO_KEYS.some((k) => !est[k])) return null;
+      const raw = Object.fromEntries(DEMO_KEYS.map((k) => [k, Math.max(0, est[k].v)]));
+      const t = DEMO_KEYS.reduce((a, k) => a + raw[k], 0);
+      return {
+        label: group,
+        v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(100 * raw[k] / t)])),
+        ci: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(1.96 * est[k].se)])),
+        n: est.alp.n, houses: housesIn(rows[key("alp")] || []),
+      };
+    }).filter(Boolean);
+    return { tab: set.tab, id: set.id, label: set.label, groups,
+             houses: [...new Set(groups.flatMap((g) => g.houses))] };
+  }).filter((s) => s.groups.length);
+  const tabs = DEMO_TABS.map((t) => ({ ...t, sets: sets.filter((s) => s.tab === t.id).map(({ tab, ...s }) => s) }))
+    .filter((t) => t.sets.length);
+  if (!tabs.length) return null;
+  inWindow.sort((a, b) => a.d - b.d);
+  return {
+    all: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL[k])])),
+    window: SPARSE_K.label, tabs,
+    houses: creditHouses(inWindow, (r) => r.w.pollster, (r) => Date.parse(r.w.date)),
+    // the polls the window holds, newest first (the Info entry's working)
+    polls: inWindow.map(({ w, p }) => ({
+      pollster: w.pollster === "RedBridge/Accent" ? "RedBridge" : w.pollster,
+      dateLabel: p ? fwLabel(p.dateStart, p.date) : fwLabel(w.dateStart, w.date),
+      source: w.source || null,
+      sets: DEMO_SETS.filter((s) => { const h = harmonize(w)[s.id]; return h && Object.keys(h).length; }).map((s) => s.id),
+    })),
+  };
+})();
+
 /* ---- 7f. ALP–ON current figure: primaries through the first-principles
    flow set ---------------------------------------------------------------
    No election count of an ALP-v-ON pairing exists, and by mid-2026 the
@@ -2145,10 +2362,27 @@ const events = EVENTS.map((e) => ({
 /* ---- 10. historical cycles, aligned to each winning election ----------- */
 const MS_MONTH = 365.25 / 12;
 const monthsSince = (iso, eDate) => (new Date(iso) - new Date(eDate)) / 86400000 / MS_MONTH;
+/* A month's value is the site's monthly construction: a house's repeat
+   readings in the month count as sqrt(m), and each weighs its sample (`n`,
+   where the archive has one – mostly it has none, so houses weigh the same)
+   or `w0` (the leader nets weight houses equally, as the live panel does).
+   Readings arrive already debiased where the measure is (debiasTerm).
+   Points without a firm – the sitting term's monthly aggregates, built this
+   way already – average as they are. */
+function monthOfReadings(b) {
+  const waves = new Map();
+  for (const p of b) if (p.firm) waves.set(p.firm, (waves.get(p.firm) || 0) + 1);
+  let sw = 0, swx = 0;
+  for (const p of b) {
+    const w = (p.w0 ?? p.n ?? 1) / Math.sqrt(p.firm ? waves.get(p.firm) : 1);
+    sw += w; swx += w * p.v;
+  }
+  return swx / sw;
+}
 function cycleSeries(points, base, cap = 36) {
   const known = {}, buckets = {};
-  for (const { m, v } of points) { if (v == null) continue; const k = Math.round(m); if (k < 0 || k > cap) continue; (buckets[k] ||= []).push(v); }
-  for (const k of Object.keys(buckets)) known[k] = mean(buckets[k]);
+  for (const p of points) { if (p.v == null) continue; const k = Math.round(p.m); if (k < 0 || k > cap) continue; (buckets[k] ||= []).push(p); }
+  for (const k of Object.keys(buckets)) known[k] = monthOfReadings(buckets[k]);
   if (base != null) known[0] = base;
   const maxM = Math.min(cap, Math.max(...Object.keys(known).map(Number)));
   const idxs = []; for (let i = 0; i <= maxM; i++) idxs.push(i);
@@ -2287,13 +2521,13 @@ function ppmErasFor(c, points, cap) {
    question stay null, and the chart simply spans the gap. */
 function sparseSeries(points, months, cap) {
   const b = {};
-  for (const { m, v } of points) {
-    if (v == null) continue;
-    const k = Math.round(m);
+  for (const p of points) {
+    if (p.v == null) continue;
+    const k = Math.round(p.m);
     if (k < 0 || k > cap) continue;
-    (b[k] ||= []).push(v);
+    (b[k] ||= []).push(p);
   }
-  return months.map((m) => (b[m] ? r1(mean(b[m])) : null));
+  return months.map((m) => (b[m] ? r1(monthOfReadings(b[m])) : null));
 }
 /* ---- how the final polls did, cycle by cycle --------------------------
    The page's own caveat is that no aggregate can measure error shared across
@@ -2416,6 +2650,21 @@ function rivalEras(pts, c, cap) {
   return segs.map((s, i) => ({ name: c.lead + " " + RIVAL_NAME[s.who], rival: s.who, from: i ? s.from : null,
                                ...cycleSeries(s.pts, i === 0 ? c.eTpp : null, cap) }));
 }
+/* Each term's readings debiased as the site's live series are: house effects
+   measured within the term against its own consensus (houseEffectsFor – a
+   lean belongs to a house at a time, so it is never carried across terms),
+   each reading corrected by its house's lean as of its date. Until Newspoll
+   joined it in August 1987 Morgan polled alone, so there is no consensus to
+   measure against and nothing moves. The election rows some archives end on are results, not a
+   house, so they never enter the estimate. `strat` keeps a measure's people
+   apart (a leader net's era), as the live panel does. */
+const debiasTerm = (pts, strat) => {
+  const he = houseEffectsFor(pts.filter((p) => p.v != null && p.firm && p.firm !== "Election")
+    .map((p) => ({ firm: p.firm, mid: p.t, x: p.v, n: p.n || 1200, ...(strat ? { strat: strat(p) } : {}) })));
+  return pts.map((p) => (p.v == null || !p.firm ? p : { ...p, v: p.v - heV(he, p.firm, p.t) }));
+};
+const eraIndex = (spl) => (p) => splIsos(spl).filter((b) => b <= p.iso).length;
+
 const CYCLE_DEFS = CYC_META.map((c) => {
   let primPts, tppPts, netPts, oppPts, hanPts, oppPrimPts, onpPts, ppmPts;
   if (c.current) {
@@ -2444,34 +2693,37 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     // approval-metric readings only – the historical cycle series are
     // approve−disapprove, so favourability rows would contaminate them
     const apprOnly = appr.filter((a) => metricOf(a.firm, "alb") !== "fav");   // PM approval only, not favourability
-    netPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.alb, iso: a.date }));
-    oppPts = apprOnly.map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.opp, iso: a.date }));
-    // current-term ppm readings are the live ppm table's per-wave margin
-    ppmPts = ppm.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p.alb - p.opp, iso: p.date }));
+    const leaderPt = (a, v) => ({ m: monthsSince(a.date, c.eDate), v, iso: a.date, firm: a.firm, t: Date.parse(a.date), w0: 1 });
+    netPts = debiasTerm(apprOnly.map((a) => leaderPt(a, a.alb)));
+    oppPts = debiasTerm(apprOnly.map((a) => leaderPt(a, a.opp)), (p) => eraOf(p.iso));
+    // current-term ppm readings are the live ppm table's per-wave margin –
+    // sample-weighted, never house-adjusted, as the live panel is
+    ppmPts = ppm.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p.alb - p.opp, iso: p.date, firm: p.firm, t: Date.parse(p.date), n: ppmN(p) }));
     // Hanson's metric is filtered per row and per DATE – Resolve rated her on
     // likeability until the 6-11 Jul 2026 wave and on performance after it, so
     // an unbounded firm test would put favourability on an approval line.
-    hanPts = appr.filter((a) => metricOf(a.firm, "han", a.date) !== "fav")
-                 .map((a) => ({ m: monthsSince(a.date, c.eDate), v: a.han }));
+    hanPts = debiasTerm(appr.filter((a) => metricOf(a.firm, "han", a.date) !== "fav").map((a) => leaderPt(a, a.han)));
   } else {
     const ps = cyclePolls[c.src], as = cycleAppr[c.appr];
-    primPts = ps.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p[c.gov] }));
-    tppPts = ps.map((p) => ({ m: monthsSince(p.date, c.eDate), v: cycleTppImp(p, c) }));
-    oppPrimPts = ps.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p[c.opp] }));
-    onpPts = ps.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p.onp }));
+    const pollPt = (p, v) => ({ m: monthsSince(p.date, c.eDate), v, iso: p.date, firm: p.firm, t: Date.parse(p.date) });
+    primPts = debiasTerm(ps.map((p) => pollPt(p, p[c.gov])));
+    tppPts = debiasTerm(ps.map((p) => pollPt(p, cycleTppImp(p, c))));
+    oppPrimPts = debiasTerm(ps.map((p) => pollPt(p, p[c.opp])));
+    onpPts = debiasTerm(ps.map((p) => pollPt(p, p.onp)));
     // same rule as the current cycle: these lines are approve−disapprove, so a
     // favourability net never enters them. Historical rows may name the metric
     // in a 5th element; otherwise the firm decides. Matters most for the 2022
     // cycle, where Freshwater and RedBridge report favourability.
     const apprRows = as.filter((r) => (r.metric || metricOf(r.firm, "alb")) !== "fav");
-    netPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.pmNet, iso: r.date }));
-    oppPts = apprRows.map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.oppNet, iso: r.date }));
+    const netPt = (r, v) => ({ m: monthsSince(r.date, c.eDate), v, iso: r.date, firm: r.firm, t: Date.parse(r.date), w0: 1 });
+    netPts = debiasTerm(apprRows.map((r) => netPt(r, r.pmNet)), eraIndex(c.pmSpl));
+    oppPts = debiasTerm(apprRows.map((r) => netPt(r, r.oppNet)), eraIndex(c.oppSpl));
     // preferred-PM rides the same approval waves: margin per wave, PM minus
     // opponent. Pairing-neutral number, so it filters ALL rows, not the
     // favourability-safe apprRows – Freshwater reports approval as
     // favourability but its ppm readings stand independently
     ppmPts = as.filter((r) => r.pmPpm != null && r.oppPpm != null)
-      .map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.pmPpm - r.oppPpm, iso: r.date }));
+      .map((r) => ({ m: monthsSince(r.date, c.eDate), v: r.pmPpm - r.oppPpm, iso: r.date, firm: r.firm, t: Date.parse(r.date) }));
     // no past cycle rated Hanson: cycleApproval carries pmNet and oppNet only
     hanPts = [];
   }
@@ -3112,9 +3364,12 @@ window.AUSPOL = (function () {
      group's part of what One Nation drew from outside its own 2025 vote,
      from DemosAU's and YouGov's vote-switching tables. */
   const onSources = ${JSON.stringify(onSources)};
-  /* The vote by age, gender and education (§5c): per tab, each house's latest
-     breakdown as it groups it, shares rescaled to 100, with its all-voters
-     figure for the same wave. */
+  /* Current readings (gen-data currentReading): the leaders' nets and
+     preferred PM, and the national direction – nowcasts, as the headline. */
+  const leaderNow = ${JSON.stringify(leaderNow)};
+  const directionNow = ${JSON.stringify(directionNow)};
+  /* The vote by age, gender and education (§7g): per tab, each common group's
+     pooled figure per party, with its margin, beside the current primaries. */
   const demographics = ${JSON.stringify(demographics)};
   const accuracy = ${JSON.stringify(accuracy)};
   const individualPolls = ${JSON.stringify(individualPolls)};
@@ -3193,7 +3448,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, onSources, demographics, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, directionNow, leaderNow, undecided, onSources, demographics, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved

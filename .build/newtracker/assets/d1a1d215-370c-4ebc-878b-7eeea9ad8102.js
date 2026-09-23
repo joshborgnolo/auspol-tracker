@@ -2958,7 +2958,10 @@ function PastCyclesView() {
         The individual polls behind the plotted series are downloadable above
         {hidden.size > 0 && ", the file leaving the hidden terms out just as the charts do"}.{" "}
         Past cycles run the full ~3-year term to the next election; the current cycle stops at the
-        latest reading. Where the band runs faint, fewer than three-quarters of the terms on the
+        latest reading. Every term’s months are averaged as the current term’s are: a pollster with
+        several polls in a month counts for the square root of their number, and from 1987, when
+        Newspoll joined Morgan, each poll is first corrected for its pollster’s lean within that
+        term. Where the band runs faint, fewer than three-quarters of the terms on the
         board were in office that month – the oldest terms open before any house asked about
         approval, and only the longest parliaments reach three years – and the readout on its
         mean names the headcount, and how many of them were polled rather than interpolated,
@@ -5577,6 +5580,26 @@ function infoTerms(D) {
         published. DemosAU’s voters who can’t recall a 2025 vote are the rest of its gap.</p>
     </div>
   ) : null;
+  /* The vote by group: the polls its six-week window holds, newest first. */
+  const DEMO = D.demographics;
+  const DEMO_SET_NAME = { age: "age", generation: "generation", gender: "gender", education: "education" };
+  const demoWork = DEMO && DEMO.polls && DEMO.polls.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work">
+        <thead><tr><th>Poll</th><th>Fieldwork</th><th>Groups</th></tr></thead>
+        <tbody>
+          {DEMO.polls.map((p) => (
+            <tr key={p.pollster + p.dateLabel}>
+              <td>{p.pollster}</td><td>{p.dateLabel}</td><td>{p.sets.map((id) => DEMO_SET_NAME[id] || id).join(", ")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="info-work-note">The polls in the six-week window, newest first. A poll’s weight
+        is its sample, halving every 14 days and fading out by day 42; a pollster with several polls
+        in the window counts for the square root of their number.</p>
+    </div>
+  ) : null;
   const pc = (v) => (v == null ? "–" : (100 * v).toFixed(1));
   const lefWork = lefT.length ? (
     <div className="info-work-wrap">
@@ -5629,11 +5652,18 @@ function infoTerms(D) {
         publishes primaries counts.{SL ? <> Today that is {SL.alp.toFixed(1)}–{SL.lnp.toFixed(1)} to
         Labor.</> : null} The pollsters’ own published figures go through the same machinery for
         the version the chart switches to: {L.alp2pp.toFixed(1)}–{L.lnp2pp.toFixed(1)}.</span>
-        <span className="info-p">The monthly trend line uses the same method without the recency
-        weighting, and so do the leader ratings and national direction. Preferred prime minister
-        and the undecided share are plain
-        {" "}{xref("monthly-average", "weighted aggregate", "monthly averages")}: their differences
-        between pollsters come from the questions asked, not from a lean to correct.</span>
+        <span className="info-p">The monthly trend lines use the same method without the recency
+        weighting: the vote, the leader ratings, national direction, and every past term on Past
+        cycles. The current figure beside each panel is built as the headline is: a leader’s
+        rating, preferred prime minister, national direction, where One Nation’s new voters came
+        from, and the vote by age, gender and education. Measures polled about once a week or less
+        use a six-week window instead: favourability, Hanson’s approval, preferred prime minister,
+        the One Nation split and the vote by group. There a poll’s weight halves every 14 days,
+        counts in full for four weeks and fades out by day 42.</span>
+        <span className="info-p">Preferred prime minister gets no house adjustment, and the
+        undecided share is each pollster’s own reading: their differences between pollsters come
+        from the questions asked, not from a lean to correct. See
+        {" "}{xref("monthly-average", "weighted aggregate", "monthly averages")}.</span>
         {working(<>
           <span className="info-p">The headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window,
           where xᵢ is a poll’s figure minus its house effect and wᵢ = nᵢ × 2^(−d/7) × t(d) ÷ √m.</span>
@@ -5906,7 +5936,9 @@ function infoTerms(D) {
         <span className="info-p"><b>Limits.</b> People misremember how they voted, and memory tends
         to drift toward how they feel now, which can blur the very switching being measured. Each
         2025 group is only a few hundred respondents in any one poll, so a single poll’s split can
-        move several points; the monthly line averages them. Voters who can’t recall a 2025 vote,
+        move several points. The figures pool each group’s share over the last six weeks of polls,
+        as the headline pools polls, and work the split out from the pooled shares; the lines do
+        the same month by month. Voters who can’t recall a 2025 vote,
         or didn’t vote, are left out. Other parties and independents are counted together, because
         DemosAU doesn’t separate them.</span>
         <span className="info-p"><b>Sources.</b> YouGov’s figures are its own published tables,
@@ -5919,26 +5951,32 @@ function infoTerms(D) {
         and YouGov’s 15%.</span>
         {working(onsWork)}</>) },
       { id: "vote-by-group", term: "Breakdowns by group", body: (
-        <>How each group – men and women, age groups, education levels – says it will vote,
-        from the tables pollsters publish with their polls. The panel “The vote by age, gender and
-        education” shows each pollster’s latest.
-        <span className="info-p"><b>Each pollster’s own groups.</b> They don’t cut the population
-        the same way. Resolve and DemosAU use 18–34, 35–54 and 55+; YouGov uses 18–34, 35–49 and
-        50+; RedBridge groups by generation. So the pollsters sit side by side and are never
-        averaged together.</span>
-        <span className="info-p"><b>Reading a gap.</b> Each group is a slice of one poll, often 300
-        to 500 people, so one group’s figure carries an error of about 5 points either way. A
-        difference several pollsters show is the signal; a few points in a single poll may be
-        noise.</span>
+        <>How each group – men and women, age groups, education levels – says it will vote, from
+        the tables pollsters publish with their polls. The panel “The vote by age, gender and
+        education” pools them into one figure per group.
+        <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
+        that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Those gaps
+        are pooled over the last six weeks of polls, weighted as the headline’s polls are, so newer
+        and larger polls count for more. They are then added to the site’s current figure for all
+        voters. Measuring each poll against its own total removes its pollster’s lean, and puts
+        every group on the same level as the headline.</span>
+        <span className="info-p"><b>Which pollsters count where.</b> Groups pool only where the
+        pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov and
+        RedBridge. 18–34: Resolve, DemosAU and YouGov. 35–54 and 55+: Resolve and DemosAU, since
+        YouGov’s bands are 35–49 and 50+. Generations: YouGov and RedBridge. Education, on three
+        levels: DemosAU, YouGov and RedBridge, with RedBridge’s two school rows combined in
+        proportion to its own group sizes.</span>
+        <span className="info-p"><b>Reading a gap.</b> Each figure carries its 95% margin, usually
+        2 to 5 points. A pooled figure moves less than any one poll’s, but a gap smaller than the
+        margins either side may still be noise.</span>
+        <span className="info-p"><b>A check.</b> Every table is checked before it’s used: each
+        group must add up to 100, give or take rounding, and an all-voters column must match the
+        poll’s published vote.</span>
         <span className="info-p"><b>Sources.</b> Resolve’s monthly age and gender series (its
         Political Monitor interactive), YouGov’s published crosstabs, RedBridge’s report tables,
         and DemosAU’s report charts, measured from the chart in each report because small bars
-        carry no label. Each group’s shares are rescaled to 100 across the five party groups, and
-        “All voters” is the same poll’s overall figure, so each group reads against its own
-        poll.</span>
-        <span className="info-p"><b>A check.</b> Every table is checked before it’s shown: each
-        group must add up to 100, give or take rounding, and an all-voters column must match the
-        poll’s published vote.</span></>) },
+        carry no label.</span>
+        {working(demoWork)}</>) },
     ] },
     { id: "g-leaders", title: "Leaders", entries: [
       { id: "approval", term: "Approval", body: (
@@ -5959,14 +5997,16 @@ function infoTerms(D) {
       { id: "net-approval", term: "Net approval", body: (
         <>Approve minus disapprove for a party leader, or favourable minus unfavourable where a
         pollster asks about favourability. Pollsters ask irregularly and word the questions
-        differently. The lines are monthly aggregates, weighted and adjusted for house effects the
-        same way as the vote figures – see
+        differently. The lines are monthly aggregates, adjusted for house effects the same way as
+        the vote figures, with each pollster counting equally. The figure beside each leader is
+        the current reading, built as the headline is – see
         {" "}{xref("weighted-aggregate", "net approval", "Weighted aggregate")}.</>) },
       { id: "preferred-pm", term: "Preferred prime minister", body: (
         <>Who voters say would make the better prime minister, head to head or three-way where a
         pollster offers it. Pollsters leave different shares uncommitted, so their levels can’t be
-        compared directly; the gaps and trends can. These lines are plain monthly averages, with
-        no adjustment for house effects.</>) },
+        compared directly; the gaps and trends can. The lines are monthly averages weighted by
+        sample size, with no adjustment for house effects. The figure beside each leader pools the
+        last six weeks of polls, newer ones counting for more.</>) },
     ] },
   ];
 

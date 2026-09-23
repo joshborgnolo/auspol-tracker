@@ -122,10 +122,26 @@ function lastReadings(rows, key) {
   const last = nn[nn.length - 1], prev = nn[nn.length - 2];
   return { v: last[key], ym: last.ym, prev: prev ? prev[key] : null, prevYm: prev ? prev.ym : null };
 }
+/* A leader readout's figure: the current reading gen-data builds the way it
+   builds the headline (leaderNow – recency-weighted, house-adjusted where the
+   measure allows) wherever its window holds a poll; else the latest monthly
+   reading, with its month tag. */
+function leaderReading(rows, key) {
+  const N = window.AP.D.leaderNow && window.AP.D.leaderNow[key];
+  if (N) return { v: N.v, ym: null, prev: N.prev, prevYm: null, now: N };
+  return lastReadings(rows, key);
+}
+// the change on a current reading, spelled out as the hero's is
+function nowDeltaTitle(now) {
+  if (!now || now.chg == null) return undefined;
+  return "Change on a month ago – the same estimate, built the same way, 30 days earlier"
+       + (now.changeSig === false ? " (within the margin)" : "");
+}
 // what a snapshot-panel delta is measured against, spelled out – these compare
 // monthly AGGREGATE readings, unlike the archive's ChgTag which compares a
 // single pollster with its own previous poll
 function readoutDeltaTitle(r) {
+  if (r && r.now) return nowDeltaTitle(r.now);
   if (!r || r.prevYm == null) return undefined;
   return "Change since " + window.AP.monthLabelFull(r.prevYm)
        + " – this leader's previous published monthly reading across all pollsters,"
@@ -559,7 +575,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         mk: id === "alb" && pr.id === "ah" ? "alb-h2h" : id,
       })));
   const rows = rowsFor(fmt);
-  rows.forEach((r) => { r.read = lastReadings(D.leaderMonths, r.L.id + r.suf); });
+  rows.forEach((r) => { r.read = leaderReading(D.leaderMonths, r.L.id + r.suf); });
   /* Same fixed order as the approval readout - see leaderOrder. It used to
      descend by preference after the PM, which put Hanson second here while she
      sat third over there on identical people, and moved her between the two
@@ -996,7 +1012,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
   const pts = filterPts(D.leaderMonths, xDomain[0]);
   const latestYm = D.leaderMonths[D.leaderMonths.length - 1].ym;
   const reads = {};
-  leaders.forEach((L) => { reads[L.id] = lastReadings(D.leaderMonths, L.id + suf); });
+  leaders.forEach((L) => { reads[L.id] = leaderReading(D.leaderMonths, L.id + suf); });
   const ordered = [...leaders].sort((a, b) => byLeaderOrder(leaderOrder(D))(a.party, b.party));
   const Roll = window.RollNum;
   // Published readings behind the lines, for the ACTIVE metric only. A net is a
@@ -1253,9 +1269,12 @@ function DirectionPanel({ rangeId }) {
   }
   const xDomain = rangeDomain(rangeId);
   const pts = filterPts(D.direction, xDomain[0]);
-  const latest = D.direction[D.direction.length - 1];
+  /* The readout is the current reading (gen-data directionNow – built as the
+     headline is); the chart keeps its monthly means. */
+  const now = D.directionNow;
+  const latest = now || D.direction[D.direction.length - 1];
   const prev = D.direction[D.direction.length - 2];
-  const netDelta = prev ? latest.net - prev.net : null;
+  const netDelta = now ? (now.chg ?? null) : prev ? latest.net - prev.net : null;
 
   // y-window fitted to the data – a fixed one clipped the real range the
   // moment wrong-track climbed past 60
@@ -1302,7 +1321,7 @@ function DirectionPanel({ rangeId }) {
           <span className={"dir-net-val " + (latest.net >= 0 ? "pos" : "neg")}>
             {latest.net > 0 ? "+" : ""}{latest.net}
           </span>
-          {netDelta != null && <Delta value={netDelta} suffix="" small />}
+          {netDelta != null && <Delta value={netDelta} suffix="" small title={now ? nowDeltaTitle(now) : "Change on the previous month"} />}
         </div>
       </div>
 
@@ -1484,11 +1503,14 @@ function OnSourcesPanel({ rangeId }) {
   const yTicks = [];
   for (let v = 10; v < hi; v += 10) yTicks.push(v);
   const spine = drawn.reduce((a, d) => (d.pts.length > a.length ? d.pts : a), []);
-  /* The readings are the latest MONTH, not the latest poll: one wave's split
-     rests on a few hundred respondents per group and swings by several
-     points; the month pools every wave in it. */
+  /* The readings are the current reading (gen-data: each group's rate pooled
+     over six weeks as the headline pools polls, then split), not the latest
+     poll or calendar month – one wave's split rests on a few hundred
+     respondents per group, and early in a month the month is one wave. The
+     latest month stands in only if the window holds no poll. */
   const monthOf = (ym) => D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
   const reads = S.series.map((sr) => {
+    if (sr.now) return { sr, v: sr.now.v, now: sr.now, chg: sr.now.chg ?? null };
     const m = sr.monthly, last = m[m.length - 1], prev = m[m.length - 2];
     return { sr, v: last.v, ym: last.ym, chg: prev ? +(last.v - prev.v).toFixed(1) : null };
   });
@@ -1504,18 +1526,19 @@ function OnSourcesPanel({ rangeId }) {
         </div>
       </div>
       <p className="ons-lead">
-        In {monthOf(a.ym)}, {Math.round(a.v)}% of One Nation’s gain came from people who voted for
-        the Coalition in 2025, and {Math.round(b.v)}% from Labor voters.
+        {a.now ? "Across the latest polls" : "In " + monthOf(a.ym)}, {Math.round(a.v)}% of One Nation’s gain
+        came from people who voted for the Coalition in 2025, and {Math.round(b.v)}% from Labor voters.
       </p>
       <div className="und-reads">
-        {reads.map(({ sr, v, chg }) => (
+        {reads.map(({ sr, v, chg, now }) => (
           <div className="und-read" key={sr.id}>
             <span className="und-swatch" style={{ background: sr.color }} aria-hidden="true"></span>
             <div className="und-read-body">
               <div className="und-read-top">
                 <span className="und-read-lab">{sr.label}</span>
                 <span className="und-read-v">{Math.round(v)}<span className="pct">%</span></span>
-                {chg != null && <Delta value={chg} neutral small title="Change on the previous month" />}
+                {now && now.ci95 != null && <span className="read-ci" title="95% margin">±{Math.max(1, Math.round(now.ci95))}</span>}
+                {chg != null && <Delta value={chg} neutral small title={now ? nowDeltaTitle(now) : "Change on the previous month"} />}
               </div>
               <p className="und-read-note">{sr.note}</p>
             </div>
@@ -1536,7 +1559,8 @@ function OnSourcesPanel({ rangeId }) {
         fmt={(v) => v.toFixed(1)}
       />
       <p className="table-hint">
-        Each dot is one poll’s split; the lines are monthly averages. A group’s part is the share of
+        Each dot is one poll’s split and the lines are monthly averages; the figures above pool the
+        last {S.now ? S.now.window : "six weeks"} of polls, newer ones counting for more. A group’s part is the share of
         its 2025 voters now backing One Nation, weighted by that group’s share of the 2025 vote – so
         38% of Coalition voters counts for far more than 38% of a small party’s. Voters who can’t
         recall a 2025 vote are left out, and so are One Nation’s own 2025 voters, who are what it
@@ -1550,32 +1574,37 @@ function OnSourcesPanel({ rangeId }) {
 }
 
 // ---- The vote by age, gender and education ------------------------------
-/* Each pollster's latest breakdown, exactly as it groups voters (gen-data
-   §5c, data/demographics.json) – side by side, never averaged, because the
-   age bands differ between houses. One party at a time, One Nation first:
-   a bar per group, with the same poll's all-voters figure to read against. */
+/* One figure per group and party (gen-data §7g): each poll's gap between a
+   group and its own all-voters figure, pooled over six weeks the way the
+   headline pools polls, added to the site's current primaries. Groups pool
+   only where pollsters cut the population the same way, so Age shows its
+   bands and, beside them, the generations two houses ask by. One party at a
+   time, One Nation first. */
 const DEMO_PARTIES = [
   { id: "onp", label: "One Nation" }, { id: "alp", label: "Labor" },
   { id: "lnp", label: "Coalition" }, { id: "grn", label: "Greens" },
 ];
+const demoHouse = (h) => (h === "RedBridge/Accent" ? "RedBridge" : h);
 function DemographicsPanel() {
   const { D } = window.AP;
   const T = D.demographics;
   const [tabId, setTab] = useState("age");
   const [party, setParty] = useState("onp");
-  if (!T || !T.tabs.length) return null;
+  if (!T || !T.tabs || !T.tabs.length) return null;
   const tab = T.tabs.find((t) => t.id === tabId) || T.tabs[0];
   const color = D.PARTIES[party].color;
   const name = D.PARTIES[party].name;
-  const vals = tab.blocks.flatMap((b) => b.groups.map((g) => g.shares[party]).concat(b.total ? [b.total[party]] : []));
+  const all = T.all[party];
+  const vals = tab.sets.flatMap((st) => st.groups.map((g) => g.v[party])).concat([all]);
   const top = Math.max(10, Math.ceil((Math.max(...vals) + 2) / 10) * 10);
-  const row = (label, v, all) => (
-    <div className={"demo-row" + (all ? " all" : "")} key={label}>
+  const row = (label, v, ci, isAll, title) => (
+    <div className={"demo-row" + (isAll ? " all" : "")} key={label} title={title}>
       <span className="demo-lab">{label}</span>
       <span className="demo-track" aria-hidden="true">
-        <span className="demo-fill" style={{ width: (100 * v / top) + "%", background: all ? "var(--ink-3)" : color }}></span>
+        <span className="demo-fill" style={{ width: (100 * v / top) + "%", background: isAll ? "var(--ink-3)" : color }}></span>
       </span>
       <span className="demo-v">{Math.round(v)}<span className="pct">%</span></span>
+      <span className="demo-ci">{ci != null ? "±" + Math.max(1, Math.round(ci)) : ""}</span>
     </div>
   );
   return (
@@ -1584,7 +1613,7 @@ function DemographicsPanel() {
         <div>
           <h2 className="card-title">The vote by age, gender and education</h2>
           <p className="card-sub">
-            {name}’s share of each group’s first-preference vote, in each pollster’s latest poll · {houseList(tab.blocks.map((b) => b.pollster))}
+            {name}’s share of each group’s first-preference vote, pooled from the last {T.window} of polls · {houseList(T.houses.map(demoHouse))}
           </p>
         </div>
       </div>
@@ -1594,25 +1623,26 @@ function DemographicsPanel() {
         <Segmented options={DEMO_PARTIES} value={party} onChange={setParty} size="sm" ariaLabel="Party" />
       </div>
       <div className="demo-grid">
-        {tab.blocks.map((b) => (
-          <div className="demo-house" key={b.pollster}>
-            <div className="demo-house-head">
-              {b.source
-                ? <a className="demo-house-name" href={b.source} target="_blank" rel="noopener noreferrer">{b.pollster}</a>
-                : <span className="demo-house-name">{b.pollster}</span>}
-              <span className="demo-house-when">{b.dateLabel}{b.grouping === "generation" ? " · by generation" : ""}</span>
-            </div>
-            {b.total && row("All voters", b.total[party], true)}
-            {b.groups.map((g) => row(g.label, g.shares[party]))}
+        {tab.sets.map((st) => (
+          <div className="demo-house" key={st.id}>
+            {tab.sets.length > 1 && (
+              <div className="demo-house-head">
+                <span className="demo-house-name">{st.label}</span>
+                <span className="demo-house-when">{houseList(st.houses.map(demoHouse))}</span>
+              </div>
+            )}
+            {row("All voters", all, null, true, "The site’s current figure for all voters – the headline’s own estimate")}
+            {st.groups.map((g) => row(g.label, g.v[party], g.ci[party], false,
+              `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"} · ${houseList(g.houses.map(demoHouse))} · ±${Math.max(1, Math.round(g.ci[party]))} is the 95% margin`))}
           </div>
         ))}
       </div>
       <p className="table-hint">
-        Each pollster’s own groups, from its latest poll that asked
-        {tab.id === "age" ? " – the age bands differ, and RedBridge groups by generation, so they sit side by side rather than being averaged"
-          : tab.id === "education" ? " – the education levels differ, so they sit side by side rather than being averaged" : ""}.
-        {" "}A group is a slice of one poll, often a few hundred people, so a gap of a few points can
-        be noise; the same pattern across pollsters is the signal.{" "}
+        Each poll says how far a group sits from its own overall figure. Those gaps are pooled over the
+        last {T.window} of polls, newer and larger polls counting for more as in every figure here, and
+        added to the site’s current figure for all voters. ± is the 95% margin. Groups pool only where
+        pollsters cut them the same way
+        {tab.id === "age" ? " – YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : ""}.{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender and education")}>
           Where the figures come from</button>

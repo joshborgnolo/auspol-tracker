@@ -12,6 +12,7 @@ import {
   switchingOf, ygGroup, youGovDims, demosLabel, redbridgeTable, resolveWaves,
   sharesProblem, dimsProblem, totalProblem,
 } from "./crosstab-parse.mjs";
+import { harmonize, DEMO_SETS, DEMO_SHARE } from "./newtracker/demo-groups.mjs";
 
 const polls = JSON.parse(readFileSync(path.join(ROOT, "data", "polls.json"), "utf8")).polls;
 const poll = (house, date) => polls.find((p) => p.pollster === house && p.date === date);
@@ -122,4 +123,34 @@ assert.equal(dimsProblem({}), "no groups");
 assert.equal(totalProblem({ alp: 30, onp: 29 }, { alp: 31, onp: 28 }), null, "a point of rounding passes");
 assert.match(totalProblem({ alp: 30, onp: 26 }, { alp: 30, onp: 28 }), /onp total 26/);
 
-console.log("PASS: crosstab readers – YouGov crosstab, RedBridge tables (three layouts), Resolve series, the gate");
+// ---- the common groups the vote-by-group figures pool (newtracker/demo-groups.mjs) ----------
+const sh = (alp, lnp, onp, grn, oth) => ({ alp, lnp, onp, grn, oth });
+// YouGov: 18–34 joins; 35–49 and 50+ are other people and don't; the Silent generation doesn't
+const yg = harmonize({ pollster: "YouGov", dims: {
+  gender: { Men: sh(30, 20, 30, 10, 10), Women: sh(30, 20, 26, 14, 10) },
+  age: { "18–34": sh(30, 12, 15, 26, 17), "35–49": sh(32, 19, 26, 13, 10), "50+": sh(27, 27, 33, 4, 9) },
+  generation: { "Gen Z": sh(33, 12, 12, 27, 16), Boomers: sh(28, 30, 30, 4, 8), Silent: sh(25, 40, 25, 2, 8) },
+  education: { "Year 12 or less": sh(26, 18, 34, 12, 10), "TAFE or college": sh(22, 17, 34, 10, 17), University: sh(30, 20, 20, 14, 16) },
+} });
+assert.deepEqual(Object.keys(yg.age), ["18–34"], "YouGov joins the age bands only at 18–34");
+assert.deepEqual(Object.keys(yg.generation), ["Gen Z", "Boomers"], "the Silent generation has no common group");
+assert.deepEqual(yg.education["TAFE or trade"], sh(22, 17, 34, 10, 17), "TAFE or college is TAFE or trade");
+assert.deepEqual(Object.keys(yg.education), ["Year 12 or less", "TAFE or trade", "University"]);
+// DemosAU: its bands match Resolve's; School and TAFE map across; a segment it left off is 0
+const dm = harmonize({ pollster: "DemosAU", dims: {
+  age: { "18–34": sh(31, 14, 16, 25, 14), "35–54": sh(28, 21, 27, 13, 11), "55+": sh(22, 26, 33, 6, 13) },
+  education: { School: { alp: 26, lnp: 19, onp: 35, oth: 20 }, TAFE: sh(24, 20, 34, 11, 11), University: sh(30, 25, 18, 15, 12) },
+} });
+assert.deepEqual(Object.keys(dm.age), ["18–34", "35–54", "55+"]);
+assert.deepEqual(dm.education["Year 12 or less"], sh(26, 19, 35, 0, 20), "School is Year 12 or less; a missing segment is 0");
+// RedBridge: its two school rows merge 39:61
+const rbH = harmonize({ pollster: "RedBridge/Accent", dims: {
+  education: { "Below Year 12": sh(27, 25, 41, 3, 4), "Year 12": sh(28, 22, 17, 26, 7), "TAFE or trade": sh(26, 19, 37, 6, 12), University: sh(36, 26, 18, 13, 7) },
+} });
+const merged = rbH.education["Year 12 or less"];
+for (const [k, want] of Object.entries({ alp: 27.61, lnp: 23.17, onp: 26.36, grn: 17.03, oth: 5.83 }))
+  assert.ok(Math.abs(merged[k] - want) < 0.01, `RedBridge school rows merge 39:61 (${k} ${merged[k]})`);
+// every common group has a population share for its sampling-error floor
+for (const set of DEMO_SETS) for (const g of set.groups) assert.ok(DEMO_SHARE[g] > 0 && DEMO_SHARE[g] < 1, `share for ${g}`);
+
+console.log("PASS: crosstab readers – YouGov crosstab, RedBridge tables (three layouts), Resolve series, the gate, the common groups");
