@@ -1745,18 +1745,20 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       /* Boundary company. A bare gap from the mean hides the shape of the
          crowd behind it: 23 points below a floor of −30 is company, 23
          below a floor of −5 is a record. When the current reading ranks
-         among the first four of either end of the pooled set, say whose
+         among the first five of either end of the pooled set, say whose
          company it is keeping, named and valued on the chart's own basis.
-         The crowd must be deep enough for thirds to mean anything – with
-         four peers "third lowest" is "second highest" wearing its other
-         hat, so the gate is five, and a straddled median says nothing at
-         all. Equal values flatter nobody: they simply do not rank. */
+         The crowd must be deep enough for a boundary rank to mean
+         anything – five pooled peers at the least, fewer fellows beyond
+         than within, so a four-name company fires only for a reading
+         pinned to the edge of a double-figure field. A straddled median
+         says nothing at all, and equal values flatter nobody: they
+         simply do not rank. */
       const cand = peerRow.vals || [];
       if (cand.length >= 5) {
         const below = cand.filter((p) => p.v < curVal);
         const above = cand.filter((p) => p.v > curVal);
-        const side = below.length <= 3 && below.length < above.length ? "low"
-          : above.length <= 3 && above.length < below.length ? "high" : null;
+        const side = below.length <= 4 && below.length < above.length ? "low"
+          : above.length <= 4 && above.length < below.length ? "high" : null;
         if (side) {
           /* A name can recur across terms (Hawke carried three, Howard
              four); qualify the repeats with their year, or two different

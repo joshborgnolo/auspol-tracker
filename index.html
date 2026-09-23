@@ -39302,7 +39302,7 @@ function CycleChart({
       if (cand.length >= 5) {
         const below = cand.filter(p => p.v < curVal);
         const above = cand.filter(p => p.v > curVal);
-        const side = below.length <= 3 && below.length < above.length ? "low" : above.length <= 3 && above.length < below.length ? "high" : null;
+        const side = below.length <= 4 && below.length < above.length ? "low" : above.length <= 4 && above.length < below.length ? "high" : null;
         if (side) {
           const counts = {};
           for (const p of cand) counts[p.who] = (counts[p.who] || 0) + 1;
