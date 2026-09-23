@@ -88,8 +88,17 @@ const JSX = [
 ];
 
 const Babel = require("./vendor/babel-standalone.js");
+/* Comments are for the source, not the visitor. The modules are written as
+   long-form notes and shipping them verbatim cost ~170KB of the ~480KB the
+   page took over the wire, gzipped. Babel reprints without them (licence
+   banners kept); the plain scripts go through the same printer with no preset.
+   Nothing reads a comment back out of index.html – check-site compares bytes
+   against the committed build, and that is rebuilt by this same file. */
+const BABEL_OUT = { compact: false, babelrc: false, configFile: false,
+  shouldPrintComment: (c) => /@license|@preserve/.test(c) };
 const transpile = (code, name) =>
-  Babel.transform(code, { presets: [["react", { runtime: "classic" }]], filename: name, compact: false }).code;
+  Babel.transform(code, { ...BABEL_OUT, presets: [["react", { runtime: "classic" }]], filename: name }).code;
+const stripJs = (code, name) => Babel.transform(code, { ...BABEL_OUT, filename: name }).code;
 
 /* An inline <script> ends at the first literal "</script", wherever it appears
    – including inside a JS string. Escaping the slash is inert in JS. */
@@ -685,7 +694,7 @@ parts.push(`<script>window.AP_CYCLE_SRC=${JSON.stringify("assets/" + cycleSrcNam
 for (const f of ["react.production.min.js", "react-dom.production.min.js"])
   parts.push(`<script>${inlineJs(fs.readFileSync(path.join(HERE, "vendor", f), "utf8"))}</script>`);
 for (const f of PLAIN)
-  parts.push(`<script>${inlineJs(fs.readFileSync(A(f), "utf8"))}</script>`);
+  parts.push(`<script>${inlineJs(stripJs(fs.readFileSync(A(f), "utf8"), f))}</script>`);
 for (const f of JSX)
   parts.push(`<script>${inlineJs(transpile(fs.readFileSync(A(f), "utf8"), f))}</script>`);
 
@@ -694,6 +703,11 @@ for (const f of JSX)
    </script> in the file, which silently depended on every script tag being
    uuid-named and on none of them being the last tag for any other reason. */
 if (!html.includes("<!--SCRIPTS-->")) throw new Error("SCRIPTS marker not found in template");
+/* Same for the stylesheets (~50KB gzipped of comments). Done before the
+   scripts go in, so the <style> match can only see the template's own blocks.
+   The template carries no "/*" inside a quoted CSS string. */
+html = html.replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/g, (_, open, css, close) =>
+  open + css.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\n[ \t]*(?=\n)/g, "").replace(/\n{2,}/g, "\n") + close);
 html = html.replace("<!--SCRIPTS-->", parts.join("\n  "));
 
 writeAtomic(OUT, html);
