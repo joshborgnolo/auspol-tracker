@@ -1741,7 +1741,17 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
         : M.key === "oppnet" ? "opposition leader"
         : M.key === "ppmm" ? "prime minister"
         : isOpp ? "opposition" : "government";
-      insight = { d: Math.abs(d), better, mNow, subjLabel, peerNoun, rank: null };
+      /* The sentence claims a gap or a rank; bracket the raw reading straight
+         after the subject so the reader never has to solve back for it.
+         Formatted on the chart's own basis: a share keeps its decimal,
+         a net read stays integral, and the sign appears exactly when the
+         basis is signed (net measures, or anything in change-since mode) –
+         a figure that rounds to zero takes no sign, same rule the rank
+         peers' labels follow. */
+      const curMag = M.unit ? Math.abs(curVal).toFixed(1) : String(Math.round(Math.abs(curVal)));
+      const curSign = (chg || !M.unit) && parseFloat(curMag) !== 0 ? (curVal < 0 ? "−" : "+") : "";
+      insight = { d: Math.abs(d), better, mNow, subjLabel, peerNoun, rank: null,
+        curFmt: curSign + curMag + M.unit };
       /* Boundary company. A bare gap from the mean hides the shape of the
          crowd behind it: 23 points below a floor of −30 is company, 23
          below a floor of −5 is a record. When the current reading ranks
@@ -1877,7 +1887,8 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
           </>;
           if (level) return (
             <p className="cycle-insight">
-              {cycMonthLabel(insight.mNow)}, {insight.subjLabel} is{" "}
+              {cycMonthLabel(insight.mNow)}, {insight.subjLabel}{" "}
+              ({insight.curFmt}) is{" "}
               <span className="ci-delta level">in line with</span>{" "}
               the average {insight.peerNoun} at this point.{rankJsx}
             </p>
@@ -1888,7 +1899,8 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
              get "x%" free from M.unit. */
           return (
             <p className="cycle-insight">
-              {cycMonthLabel(insight.mNow)}, {insight.subjLabel} sits{" "}
+              {cycMonthLabel(insight.mNow)}, {insight.subjLabel}{" "}
+              ({insight.curFmt}) sits{" "}
               <span className={"ci-delta " + (insight.better ? "pos" : "neg")}>
                 {shown}{M.unit || (parseFloat(shown) === 1 ? " point" : " points")}
               </span>{" "}

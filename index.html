@@ -39290,13 +39290,16 @@ function CycleChart({
       const subjParty = M.key === "net" || M.key === "oppnet" || M.key === "ppmm" ? null : isOpp ? cur.opp : cur.gov;
       const subjLabel = M.key === "net" ? sitting(cur.pm) : M.key === "oppnet" ? sitting(cur.oppLead) : M.key === "ppmm" ? sitting(cur.pm) : (subjParty === "lnp" ? "the " : "") + D.PARTIES[subjParty].name;
       const peerNoun = M.key === "net" ? "prime minister" : M.key === "oppnet" ? "opposition leader" : M.key === "ppmm" ? "prime minister" : isOpp ? "opposition" : "government";
+      const curMag = M.unit ? Math.abs(curVal).toFixed(1) : String(Math.round(Math.abs(curVal)));
+      const curSign = (chg || !M.unit) && parseFloat(curMag) !== 0 ? curVal < 0 ? "−" : "+" : "";
       insight = {
         d: Math.abs(d),
         better,
         mNow,
         subjLabel,
         peerNoun,
-        rank: null
+        rank: null,
+        curFmt: curSign + curMag + M.unit
       };
       const cand = peerRow.vals || [];
       if (cand.length >= 5) {
@@ -39384,12 +39387,12 @@ function CycleChart({
     }, r.label))), insight.rank.tail);
     if (level) return React.createElement("p", {
       className: "cycle-insight"
-    }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " is", " ", React.createElement("span", {
+    }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " ", "(", insight.curFmt, ") is", " ", React.createElement("span", {
       className: "ci-delta level"
     }, "in line with"), " ", "the average ", insight.peerNoun, " at this point.", rankJsx);
     return React.createElement("p", {
       className: "cycle-insight"
-    }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " sits", " ", React.createElement("span", {
+    }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " ", "(", insight.curFmt, ") sits", " ", React.createElement("span", {
       className: "ci-delta " + (insight.better ? "pos" : "neg")
     }, shown, M.unit || (parseFloat(shown) === 1 ? " point" : " points")), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.", rankJsx);
   })()), (stripCycles.length > 0 || hanYears || onpYears) && React.createElement("div", {
