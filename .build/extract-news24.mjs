@@ -395,7 +395,11 @@ function parseNews24Article(html, url) {
 function mergeNews24Wave(w, n) {
   if (!n) return { wave: w, news24: null, problems: [] };
   const problems = [];
-  if (!n.date || n.date !== w.date) problems.push(`News24 date ${n.date ?? "missing"} != Wikipedia ${w.date}`);
+  // A missing News-side window is absence, not disagreement: News24 dropped
+  // its fieldwork methodology sentence in Sep 2026, so n.date is null on
+  // new-format articles. Defer to the wave's (Wikipedia/Infogram
+  // corroborated) dates; only a conflicting News-side window blocks.
+  if (n.date && n.date !== w.date) problems.push(`News24 date ${n.date} != Wikipedia ${w.date}`);
   if (n.dateStart && w.dateStart && n.dateStart !== w.dateStart)
     problems.push(`News24 dateStart ${n.dateStart} != Wikipedia ${w.dateStart}`);
   if (!n.published) problems.push("missing News24 published timestamp");

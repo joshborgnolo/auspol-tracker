@@ -1,0 +1,107 @@
+{
+  "source": "news24+wikipedia",
+  "title": "Opinion_polling_for_the_next_Australian_federal_election",
+  "url": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
+  "published": "2026-09-23T05:00",
+  "fieldwork": {
+    "date": "2026-09-21",
+    "dateStart": "2026-09-15",
+    "sample": 1500
+  },
+  "vi": {
+    "alp": 26,
+    "lnp": 21,
+    "grn": 14,
+    "onp": 27,
+    "ind": 6,
+    "oth": 6,
+    "tpp_alp": 52,
+    "tpp_lnp": 48
+  },
+  "satisfaction": {
+    "pmApp": 33,
+    "pmDis": 62,
+    "pmNet": -29,
+    "oppApp": 36,
+    "oppDis": 48,
+    "oppNet": -12
+  },
+  "ppm": {
+    "alb": 41,
+    "opp": 37,
+    "albVsHanson": 50,
+    "hanson": 38
+  },
+  "altTpp": {
+    "alpVsOnp_alp": 55,
+    "alpVsOnp_onp": 45
+  },
+  "infogram": {
+    "via": "chrome",
+    "ids": [
+      "_/jE8kcJ2BxzceMMdE2D6Z",
+      "_/XdWD62anjLF6u5scKfkU",
+      "_/hSUHdXrQnUHV5wzp5XNi",
+      "_/hAyshEPwaSz67Xwl9Pag",
+      "_/tj1rZrTFhNSAcJhlZut4",
+      "_/RqmesO8hrn8BrNbeCuc0"
+    ],
+    "kinds": [
+      "horserace",
+      "crosstab",
+      "unmodelled",
+      "tpp",
+      "ppm",
+      "approvals"
+    ],
+    "window": {
+      "start": "2026-09-15",
+      "end": "2026-09-21"
+    },
+    "vi": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 27,
+      "grn": 14,
+      "ind": 6,
+      "oth": 6
+    },
+    "tpp": {
+      "tpp_alp": 52,
+      "tpp_lnp": 48
+    },
+    "altTpp": {
+      "alpVsOnp_alp": 55,
+      "alpVsOnp_onp": 45
+    },
+    "approval": {
+      "alb": {
+        "app": 33,
+        "dis": 62,
+        "unc": 5
+      },
+      "opp": {
+        "app": 36,
+        "dis": 48,
+        "unc": 16
+      },
+      "oppName": "taylor"
+    },
+    "ppm": [
+      {
+        "alb": 50,
+        "dk": 12,
+        "opp": 38,
+        "oppRaw": "Pauline Hanson",
+        "table": "ppm"
+      },
+      {
+        "alb": 41,
+        "dk": 22,
+        "opp": 37,
+        "oppRaw": "Angus Taylor",
+        "table": "ppm"
+      }
+    ]
+  }
+}

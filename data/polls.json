@@ -4660,7 +4660,8 @@
       "oth": 6,
       "tpp_alp": 52,
       "tpp_lnp": 48,
-      "url": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209"
+      "url": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
+      "published": "2026-09-23T05:00"
     }
   ],
   "ppm": [
@@ -5429,6 +5430,15 @@
           "opp": 41
         }
       ]
+    },
+    {
+      "date": "2026-09-21",
+      "firm": "YouGov",
+      "alb": 41,
+      "opp": 37,
+      "oppName": "Taylor",
+      "han": null,
+      "extra": null
     }
   ],
   "approval": [
@@ -7095,6 +7105,24 @@
           "dis": 51
         }
       }
+    },
+    {
+      "date": "2026-09-21",
+      "firm": "YouGov",
+      "alb": -29,
+      "opp": -12,
+      "oppName": "Taylor",
+      "han": null,
+      "detail": {
+        "alb": {
+          "app": 33,
+          "dis": 62
+        },
+        "opp": {
+          "app": 36,
+          "dis": 48
+        }
+      }
     }
   ],
   "ppmHeadToHead": [
@@ -7193,6 +7221,12 @@
       "firm": "YouGov",
       "alb": 51,
       "han": 40
+    },
+    {
+      "date": "2026-09-21",
+      "firm": "YouGov",
+      "alb": 50,
+      "han": 38
     }
   ],
   "altTpp": [
@@ -7518,6 +7552,12 @@
       "date": "2026-09-20",
       "firm": "Roy Morgan",
       "alpVsOnp_alp": 54,
+      "lnpVsOnp_lnp": null
+    },
+    {
+      "date": "2026-09-21",
+      "firm": "YouGov",
+      "alpVsOnp_alp": 55,
       "lnpVsOnp_lnp": null
     }
   ],
