@@ -185,9 +185,12 @@ function Delta({ value, suffix = "", goodUp = true, neutral, small, title, roll,
   const figure = `${up ? "+" : ""}${value.toFixed(1)}`;
   const Roll = window.RollNum;
   return (
-    <span className={"delta " + cls + (small ? " delta-sm" : "")} title={title}>
+    <span className={"delta " + cls + (small ? " delta-sm" : "")} title={flat && roll ? "No change" + (title ? " · " + title : "") : title}>
       <span className="delta-arrow">{arrow}</span>
-      {flat ? "no change"
+      {/* in a readout row a flat move prints as a figure like its
+          neighbours: "no change" was twice their width and, on a phone, broke
+          the preferred-PM row onto two lines while the row beneath held one */}
+      {flat ? (roll ? "0.0" : "no change")
         : roll && Roll ? <><Roll value={figure} spinIn={spinIn} />{suffix}</>
         : figure + suffix}
     </span>
@@ -3592,7 +3595,6 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
                     <td className="ta-l pollster-cell">
                       <PollsterName name={r.pollster} url={r.url} />
                       <span className="pollster-mode">{r.client}</span>
-                      <MethodLink url={r.methodUrl} />
                       {/* filed from Poll Bludger's feed while the house's own
                           release is still uncaptured – the expanded row says
                           what that means */}
@@ -3658,8 +3660,8 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
           return (<>
             Tap any poll to see its full breakdown · {act} a column heading to sort · “—” means the pollster didn’t ask that question.
             {tppBasis === "resp"
-              ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar is the published figure in margin form."
-              : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar is that figure in margin form."}
+              ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar draws the published margin out from a tie line at its centre."
+              : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar draws that margin out from a tie line at its centre."}
             <span className="hint-wide">{tppBasis === "resp"
               ? ` ${act} the “As published” heading to switch back to implied.`
               : ` ${act} the “Implied 2PP” heading to switch to the pollsters’ own published figures.`}</span>

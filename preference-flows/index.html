@@ -140,12 +140,14 @@ body {
    their own — without one they render in the browser's blue, and there is no
    blue anywhere else on this page. A tinted underline rather than a colour
    alone: these sit inside running prose and must not shout over it. */
+/* Sep 2026: ink with an underline, as links are on the tracker itself - the
+   teal made this the one page whose links were a different colour. */
 main p a, main li a, main td a, main caption a {
-  color: var(--accent); text-decoration: none;
-  border-bottom: 1px solid color-mix(in oklch, var(--accent) 34%, transparent);
+  color: var(--ink-2); text-decoration: none;
+  border-bottom: 1px solid color-mix(in oklch, var(--ink-2) 34%, transparent);
 }
 main p a:hover, main li a:hover, main td a:hover, main caption a:hover,
-main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--accent); }
+main p a:focus-visible, main li a:focus-visible { color: var(--ink); border-bottom-color: var(--ink); }
 /* The footer list keeps the quiet .ss-note ink and earns its underline
    outright — a citation nobody can see is the problem this set out to fix. */
 .ss-src { margin: 8px 0 0; padding: 0 0 0 18px; list-style: disc; }
@@ -537,6 +539,6 @@ Labor&ndash;One Nation two-party &asymp; 63.4 &ndash; 36.6   (band &plusmn;1.6)<
   <p class="ss-note">Companion to the &ldquo;?&rdquo; beside the two-party basis switch on the main page.</p>
   <p class="ss-note">This page belongs to <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live tracker has the current figures, charts and every poll.</p>
 </main>
-<a class="ss-back" href="/">&larr; Back to the tracker</a>
+<a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 </body>
 </html>

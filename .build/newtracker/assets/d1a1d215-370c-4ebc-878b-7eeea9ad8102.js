@@ -525,7 +525,9 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                       className={"tab" + (active === t.id ? " active" : "")
                                  + (t.pinHide ? " tab-pinhide" : "")}
                       onClick={() => onChange(t.id)}>
-                <span className="tab-label">{t.label}</span>
+                <span className="tab-label">{t.short
+                  ? <><span className="tab-label-long">{t.label}</span><span className="tab-label-short" aria-hidden="true">{t.short}</span></>
+                  : t.label}</span>
                 {t.note != null && <span className="tab-note">{t.note}</span>}
               </button>
             ))}
@@ -645,11 +647,18 @@ function cycDomain(cycles, M, chg) {
   const ref = chg ? 0 : M.refAbs;
   let lo = Math.min(...vals), hi = Math.max(...vals);
   if (ref != null) { lo = Math.min(lo, ref); hi = Math.max(hi, ref); }
-  const step = M.step;
-  const d0 = Math.floor((lo - step * 0.3) / step) * step;
-  const d1 = Math.ceil((hi + step * 0.3) / step) * step;
-  const ticks = [];
-  for (let v = d0 + step; v < d1 - 1e-9; v += step) ticks.push(v);
+  /* The measure's step, doubled until the axis carries seven labels or
+     fewer: the opposition primary, which reaches down to One Nation's 6%,
+     printed thirteen at 5-point steps */
+  let step = M.step, d0, d1, ticks;
+  for (;;) {
+    d0 = Math.floor((lo - step * 0.3) / step) * step;
+    d1 = Math.ceil((hi + step * 0.3) / step) * step;
+    ticks = [];
+    for (let v = d0 + step; v < d1 - 1e-9; v += step) ticks.push(v);
+    if (ticks.length <= 7) break;
+    step *= 2;
+  }
   return { domain: [d0, d1], ticks };
 }
 
@@ -2683,6 +2692,13 @@ function AccuracyPanel() {
         <span className="acc-scale-c">Result</span>
         <span className="acc-scale-r" style={{ color: "var(--alp)" }}>Labor overstated →</span>
       </div>
+      {/* the gridlines' values, which the rows never said: a reader could see
+          a miss was "past the tick" without knowing the tick was 2.5 points */}
+      <div className="acc-axis" aria-hidden="true">
+        {[-SPAN / 2, SPAN / 2].map((t) => (
+          <span key={t} style={{ left: pct(t) + "%" }}>{t > 0 ? "+" : "−"}{Math.abs(t)} pts</span>
+        ))}
+      </div>
 
       <div className={"acc-rows" + (spread ? " acc-spread-on" : "")} ref={rowsRef}>
         {[
@@ -3093,9 +3109,17 @@ function PastCyclesView() {
   return (
     <div className="view view-cycles">
       <div className="view-intro">
+        {/* The point in one sentence; the reading instructions fold. All of it
+            ran fourteen lines on a phone, and the first chart started ~850px
+            down, below the fold, under a paragraph of how-to. */}
         <p className="view-lede">
           Every federal term since 1972, lined up on its election day so each government’s
-          run can be read off the same clock. The past terms stand together as a band –
+          run can be read off the same clock.
+        </p>
+        <details className="view-how">
+          <summary>How to read these charts</summary>
+          <p className="view-lede">
+          The past terms stand together as a band –
           outer edge the middle 80% of them, darker half the middle 50%, dotted line their
           mean – drawn over the months each term was actually in office, and going fainter
           where fewer of them were.{" "}
@@ -3113,7 +3137,8 @@ function PastCyclesView() {
           take terms off the board, or to cut the board to the governments that were
           returned or turned out at their next election. Leave three or fewer terms on
           the board to see the individual polls under each line.
-        </p>
+          </p>
+        </details>
         {srcFailed && (
           <p className="cyc-src-note">
             The individual polls behind the past terms didn’t load – the monthly
@@ -3466,12 +3491,19 @@ function ArchLead({ p, measure, primaryFallback, basis }) {
   return (
     <div className="arch-appr"
          title={`${li.lab} leads by ${Math.abs(li.m).toFixed(1)}${li.note}`}>
+      {/* who leads is SAID, not left to the colour: "ALP +2.8", "ON +0.4" */}
       <span className="netv" style={{ color: inkOf(li.color) }}>
-        {li.m > 0 ? "+" : ""}{li.m.toFixed(1)}
+        <span className="lead-who">{li.lab}</span>{" "}+{Math.abs(li.m).toFixed(1)}
         {li.primary && <>{" "}<span className="facet-flag">primary</span></>}
       </span>
-      <div className="arch-appr-bar" aria-hidden="true">
-        {li.segs.map((s, i) => <span key={i} style={{ width: s.v + "%", background: s.color }}></span>)}
+      {/* The margin drawn out from a centre tie line, the first-named party to
+          the left: the old bar split 52px by the two shares, so +0.8 and +9.8
+          were the same picture. Full half-width is an 8-point lead - the
+          span where polls actually disagree; anything wider pins. */}
+      <div className="lead-bar" aria-hidden="true">
+        <span className="lead-bar-fill" style={{ background: li.color,
+          width: Math.min(50, Math.abs(li.m) * 6.25) + "%",
+          [li.m >= 0 ? "right" : "left"]: "50%" }}></span>
       </div>
     </div>
   );
@@ -5019,6 +5051,16 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     return b.x - a.x;
   });
 
+  /* The table shows a page at a time. At ~90px a row, all 163 made a
+     19,600px page and buried the diagnostics under it. Any change to what is
+     listed or how starts again from the first page; a row being asked for
+     (a chart dot, an open breakdown) always makes the cut. */
+  const PAGE = 40;
+  const [limit, setLimit] = useState(PAGE);
+  React.useEffect(() => { setLimit(PAGE); }, [ql, sel, lead, range, tagSel, scope, facet, sort.key, sort.dir, measure]);
+  const openIdx = open ? sorted.findIndex((p) => p.pollster + "|" + p.released === open) : -1;
+  const shownRows = sorted.slice(0, Math.max(limit, openIdx + 1));
+
   const total = rows.length;
   const clearAll = () => {
     setQ(""); setSel(new Set()); setLead("all"); setMeasure(DEFAULT_MEASURE); setRange("all");
@@ -5197,9 +5239,9 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         </span>
       </div>
 
-      {/* Below 1000px the 2PP column - whose heading is the basis switch -
-          is .hide-md, which left phones no way to change basis at all. This
-          copy of the switch shows only there (CSS). */}
+      {/* The basis as a visible control. The 2PP column's heading also
+          switches it, but that was the only way in - a hidden affordance on
+          desktop, and on phones (where the column is .hide-md) no way at all. */}
       {facet === "twopp" && (
         <div className="ap-basis-narrow">
           <span className="ap-ctl-group">
@@ -5401,7 +5443,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
             </tr>
           </thead>
           <tbody ref={bodyRef}>
-            {sorted.map((p, i) => {
+            {shownRows.map((p, i) => {
               const alpLead = p.alp >= 50;
               /* Identity, not position: this used to carry the row's index,
                  so re-sorting the table silently closed whatever was open -
@@ -5422,10 +5464,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                   </td>
                   <td className="ta-l pollster-cell">
                     <PollsterName name={p.pollster} url={p.url} />
-                    {/* the publisher, as the Latest-polls table shows it -
-                        above MethodLink, matching that table's cell order */}
+                    {/* the publisher, as the Latest-polls table shows it; the
+                        APC statement link lives in the breakdown, where the
+                        release links are - a third line in every row cost
+                        the archive a screen of height per 20 polls */}
                     <span className="pollster-mode">{p.client}</span>
-                    <MethodLink url={p.methodUrl} />
                     {p.tags.length > 0 && (
                       <span className="poll-tags" aria-label={"Contains " + p.tags.map((id) => POLL_TAG_META[id].label).join(", ")}>
                         {p.tags.map((id) => (
@@ -5519,12 +5562,23 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
           </tbody>
         </table>
       </div>
+      {shownRows.length < sorted.length && (
+        <div className="ap-more">
+          <button type="button" className="ap-jump" onClick={() => setLimit((n) => n + PAGE)}>
+            Show {Math.min(PAGE, sorted.length - shownRows.length)} more
+          </button>
+          <button type="button" className="ap-more-all" onClick={() => setLimit(sorted.length)}>
+            Show all {sorted.length}
+          </button>
+          <span className="ap-more-n">{shownRows.length} of {sorted.length} shown</span>
+        </div>
+      )}
       <p className="table-hint">
         Tap any poll for its full breakdown · Dates are fieldwork windows (publication dates sit in the
         breakdown) ·
         {pubBasis
-          ? "“As published” lists each poll’s headline figures exactly as the pollster released them · The lead bar is the published figure in margin form"
-          : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown · The lead bar is that implied figure in margin form"}
+          ? "“As published” lists each poll’s headline figures exactly as the pollster released them · The lead bar draws the published margin out from a tie line at its centre"
+          : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown · The lead bar draws that implied margin out from a tie line at its centre"}
         {" "}(the L/NP v ON and 3-cornered matchups are the
         pollsters’ own published figures – the site prices no implied series for them) · “Poll lean” is
         the poll’s {pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate"} for that month · “—” means the pollster didn’t
@@ -6357,7 +6411,8 @@ function infoTerms(D) {
       Nor does the site project seats – see
       {" "}{xref("two-party-to-seats", "is this a forecast", "What would these numbers mean in seats")}.</>) },
     { id: "how-wrong-are-the-polls", q: "How wrong have the polls been at past elections?", a: acc ? (
-      <>The How the final polls did panel in Past cycles scores each pollster’s last two-party
+      <>The{" "}<button type="button" className="hi-term"
+        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls did</button>{" "}panel in Past cycles scores each pollster’s last two-party
       figure in the {acc.windowDays} days before polling day against the result. Across {accSpan},
       the final polls missed by {acc.meanAbs} points on average, and by
       {" "}{Math.abs(acc.worstCycle.err)} at worst, in {acc.worstCycle.year}.
@@ -6365,7 +6420,8 @@ function infoTerms(D) {
       {" "}{accShared.absErr}.</> : null} An error every pollster shares is one no aggregate can
       see, which is why the {xref("interval", "how wrong are the polls", "95% interval")} never
       claims to cover it.</>) : (
-      <>The How the final polls did panel in Past cycles scores each pollster’s last two-party
+      <>The{" "}<button type="button" className="hi-term"
+        onClick={() => window.AP.gotoFinalPolls && window.AP.gotoFinalPolls()}>How the final polls did</button>{" "}panel in Past cycles scores each pollster’s last two-party
       figure of the campaign against the result, election by election, house by house.</>) },
     { id: "two-party-to-seats", q: "What would these numbers mean in seats?", a: (
       <>The site doesn’t turn them into seats, on purpose. Converting a national two-party figure
@@ -6488,6 +6544,44 @@ function InfoView({ focus, onBack, backLabel }) {
   );
 }
 
-Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView,
+/* A definition where the word is. Tapping an underlined term used to carry
+   the reader off to the Info tab mid-page (with a button to come back); for
+   most terms the answer is two sentences, so the entry now opens over the
+   page, and the full Info page is one step further for whoever wants it. */
+function TermPop({ id, onClose, onMore }) {
+  const { D } = window.AP;
+  const { groups, faqs } = React.useMemo(() => infoTerms(D), []);
+  const key = INFO_ALIAS[id] || id;
+  const hit = faqs.find((f) => f.id === key)
+    || groups.flatMap((g) => g.entries).find((t) => t.id === key);
+  const boxRef = React.useRef(null);
+  React.useEffect(() => {
+    const prev = document.activeElement;
+    boxRef.current && boxRef.current.focus();
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    document.addEventListener("keydown", onKey);
+    return () => { document.removeEventListener("keydown", onKey); prev && prev.focus && prev.focus(); };
+  }, [id]);
+  // an id the glossary doesn't carry: fall back to the Info page trip
+  React.useEffect(() => { if (!hit) onMore(); }, [hit]);
+  if (!hit) return null;
+  const head = hit.q || hit.term;
+  return ReactDOM.createPortal(
+    <div className="term-pop-scrim" onClick={onClose}>
+      <div className="term-pop" role="dialog" aria-modal="true" aria-label={head}
+           tabIndex={-1} ref={boxRef} onClick={(e) => e.stopPropagation()}>
+        <div className="term-pop-head">
+          <h2 className="term-pop-t">{head}</h2>
+          <button type="button" className="term-pop-x" onClick={onClose} aria-label="Close">×</button>
+        </div>
+        <div className="term-pop-body info-term">{hit.a || hit.body}</div>
+        <button type="button" className="term-pop-more" onClick={onMore}>
+          Read it in Info, with the rest of the glossary →
+        </button>
+      </div>
+    </div>, document.body);
+}
+
+Object.assign(window, { Tabs, PastCyclesView, AllPollsView, InfoView, TermPop,
   // shared cell renderers reused by the latest-polls table
   ArchSortTh, ArchImplied, ArchPublished, ArchTpp, ArchLead, ArchApprCell, ArchDirCell, archLeadInfo });

@@ -700,13 +700,16 @@ function HeroGauge({ a, ci, color, aName, bName, sepRef }) {
   const overA = dev + ci > HG_DOM;
   const overB = dev - ci < -HG_DOM;
   const lo = (a - ci).toFixed(1), hi = (a + ci).toFixed(1);
+  const say = `${aName} ${a.toFixed(1)} per cent two-party preferred, 95% interval ${lo} to ${hi}. `
+    + `A tie is 50. ${(a - ci > 50 || a + ci < 50)
+         ? "The interval does not include a tie."
+         : "The interval includes a tie."}`;
   return (
-    <div className="hero-gauge" role="img" ref={wrapRef}
+    /* title as well as aria-label: the track is unlabelled by design, so a
+       sighted reader pointing at it gets the same sentence a screen reader does */
+    <div className="hero-gauge" role="img" ref={wrapRef} title={say.replace(" per cent", "%")}
          style={box ? { width: box.w + "px", marginLeft: box.ml + "px", maxWidth: "none" } : undefined}
-         aria-label={`${aName} ${a.toFixed(1)} per cent two-party preferred, 95% interval ${lo} to ${hi}. `
-                     + `A tie is 50. ${(a - ci > 50 || a + ci < 50)
-                          ? "The interval does not include a tie."
-                          : "The interval includes a tie."}`}>
+         aria-label={say}>
       <div className="hg-track">
         {[-6, -4, -2, 2, 4, 6].map((t) => (
           <span key={t} className="hg-grad" style={{ left: pos(t) + "%" }} />
@@ -1736,7 +1739,9 @@ let chromeSettled = false;
 
 const TABS = [
   { id: "snapshot", label: "Snapshot" },
-  { id: "cycles", label: "Past cycles" },
+  /* short: the docked phone bar's label, which buys the room to keep Info
+     and to name the parties beside the docked score */
+  { id: "cycles", label: "Past cycles", short: "Cycles" },
   { id: "allpolls", label: "All polls" },
   /* pinHide: the docked 2PP score takes this end of the bar once the bar
      pins AND the hero 2PP has scrolled off (.show-score), and on a phone
@@ -1760,9 +1765,12 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
       <PrimaryVotePanel rangeId={rangeId} />
       <PollsterTable tppBasis={tppBasis} setTppBasis={setTppBasis}
                      tppMatchup={tppMatchup} setTppMatchup={setTppMatchup} />
+      {/* when the next ones land, straight after the latest ones - it sat
+          between National direction and the vote-by-group analysis, a
+          schedule in the middle of the reading */}
+      <NextPollsPanel />
       <LeadershipSection rangeId={rangeId} />
       <DirectionPanel rangeId={rangeId} />
-      <NextPollsPanel />
       {/* who votes for whom by age, gender and education */}
       <DemographicsPanel rangeId={rangeId} />
       {/* who One Nation's surge is made of */}
@@ -1870,6 +1878,7 @@ function App() {
   const [tab, setTab] = useState(readHash);
   const [focusPoll, setFocusPoll] = useState(null);   // the poll a chart dot sent us to
   const [focusTerm, setFocusTerm] = useState(null);   // the glossary entry a link sent us to
+  const [termPop, setTermPop] = useState(null);       // a definition open over the page
   React.useEffect(() => {
     const fn = () => setTab(readHash());
     window.addEventListener("hashchange", fn);
@@ -1922,12 +1931,21 @@ function App() {
        that explains a word it just used - the hero's method label is the first
        - and `from` names the place being left in the words the return button
        will use, so the way back can say where it goes rather than guessing. */
-    window.AP.openTerm = (id, from) => {
+    const openTermPage = (id, from) => {
       if (!id) return;
+      setTermPop(null);
       setFocusTerm({ id, back: { tab: readHash(), y: window.scrollY, from: from || "where you were" } });
       setTab("info");
       if (readHash() !== "info") window.location.hash = "info";
     };
+    /* Away from Info a term opens in place (TermPop); on Info itself it is a
+       cross-reference, and the page scroll it has always been is right. */
+    window.AP.openTerm = (id, from) => {
+      if (!id) return;
+      if (readHash() === "info") openTermPage(id, from);
+      else setTermPop({ id, from });
+    };
+    window.AP.openTermPage = openTermPage;
     /* The navbar "Next" label jumps straight to the NextPollsPanel on the
        snapshot. Same-tab scrolls happen in place; a cross-tab trip has to
        wait for the snapshot view to mount, so the scroll is parked for the
@@ -1938,8 +1956,22 @@ function App() {
       setTab("snapshot");
       window.location.hash = "snapshot";
     };
-    return () => { delete window.AP.openPoll; delete window.AP.openTerm;
-                   delete window.AP.gotoNextPolls; };
+    /* Info's "How the final polls did" mention, as a real link: to Past
+       cycles, then down to the panel once the view (and its lazily fetched
+       source rows) has mounted it. */
+    window.AP.gotoFinalPolls = () => {
+      setTab("cycles");
+      if (readHash() !== "cycles") window.location.hash = "cycles";
+      let tries = 0;
+      const seek = () => {
+        const el = document.getElementById("final-polls");
+        if (el) { el.scrollIntoView({ block: "start" }); return; }
+        if (++tries < 40) setTimeout(seek, 75);
+      };
+      setTimeout(seek, 0);
+    };
+    return () => { delete window.AP.openPoll; delete window.AP.openTerm; delete window.AP.openTermPage;
+                   delete window.AP.gotoNextPolls; delete window.AP.gotoFinalPolls; };
   }, []);
   /* The return trip puts the reader back on the pixel they left from. The
      scroll is handed to a layout effect rather than to requestAnimationFrame:
@@ -2065,6 +2097,8 @@ function App() {
             {tab === "allpolls" && <AllPollsView focus={focusPoll} onBack={focusPoll ? backFromPoll : null}
               backLabel={focusPoll && focusPoll.back ? focusPoll.back.from : null}
               tppBasis={tppBasis} setTppBasis={setTppBasis} />}
+            {termPop && <TermPop id={termPop.id} onClose={() => setTermPop(null)}
+              onMore={() => window.AP.openTermPage(termPop.id, termPop.from)} />}
             {tab === "info" && <InfoView focus={focusTerm ? focusTerm.id : null}
               onBack={focusTerm ? backFromTerm : null}
               backLabel={focusTerm && focusTerm.back ? focusTerm.back.from : null} />}

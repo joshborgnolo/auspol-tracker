@@ -133,7 +133,11 @@ select:focus, input[type="search"]:focus {
   appearance: none; border: 0; background: transparent; color: var(--ink-3);
   font: inherit; font-weight: 600; font-size: 13px; padding: 8px 14px; cursor: pointer;
 }
-.seg button.active { background: var(--ink); color: var(--bg); }
+/* the tracker's segmented control: the chosen cell raised on the well, not
+   filled black - one control, one look, on every page */
+.seg { padding: 3px; gap: 2px; box-shadow: inset 0 1px 2px color-mix(in oklch, var(--ink) 12%, transparent); }
+.seg button { border-radius: 999px; }
+.seg button.active { background: var(--bg); color: var(--ink); box-shadow: 0 1px 2px color-mix(in oklch, var(--ink) 18%, transparent); }
 .seg button:not(.active):hover { color: var(--ink); }
 
 /* ---- chart card ---- */
@@ -549,7 +553,9 @@ document.addEventListener("DOMContentLoaded", function () {
         fill: cur.measure === "swing" ? COLORS.Labor : nodeColor(n, val),
         stroke: n.nc ? cssVar("--panel") || "#fff" : "none", "stroke-width": n.nc ? 1.6 : 0 }, svg);
       if (n.nc && cur.measure === "margin") {
-        var dag = el("text", { x: xs[i] + 9, y: Y(val) - 8, "font-size": 13, fill: n.color }, svg);
+        /* beside the dot, level with it: up and right it sat on the value
+           label's last digit ("+7.2†" read as one garbled figure) */
+        var dag = el("text", { x: xs[i] + 8, y: Y(val) + 4.5, "font-size": 13, fill: n.color }, svg);
         dag.textContent = "†";
       }
     });
