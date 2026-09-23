@@ -1749,16 +1749,13 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
       <LeadershipSection rangeId={rangeId} />
       <DirectionPanel rangeId={rangeId} />
       <NextPollsPanel />
-      {/* the one panel below the what's-next list: it answers a question
-          about the electorate's mood rather than its party choice, so it
-          keeps company with direction - just the far side of the release
-          schedule */}
-      <UndecidedPanel rangeId={rangeId} />
-      {/* who One Nation's surge is made of – read off the same electorate
-          the undecided panel above describes */}
-      <OnSourcesPanel rangeId={rangeId} />
-      {/* and who votes for whom by age, gender and education */}
+      {/* who votes for whom by age, gender and education */}
       <DemographicsPanel />
+      {/* who One Nation's surge is made of */}
+      <OnSourcesPanel rangeId={rangeId} />
+      {/* closes the page: the electorate's mood rather than its party
+          choice - how many can't say who they would vote for */}
+      <UndecidedPanel rangeId={rangeId} />
     </>
   );
 }
