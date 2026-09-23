@@ -490,53 +490,6 @@
   },
   {
    "pollster": "Resolve",
-   "date": "2026-02-12",
-   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
-   "read": "published series",
-   "dims": {
-    "age": {
-     "18–34": {
-      "lnp": 16.16,
-      "alp": 35.47,
-      "grn": 21.04,
-      "onp": 12.78,
-      "oth": 14.55
-     },
-     "35–54": {
-      "lnp": 21.45,
-      "alp": 32.83,
-      "grn": 12.23,
-      "onp": 24.2,
-      "oth": 9.29
-     },
-     "55+": {
-      "lnp": 22.53,
-      "alp": 25.82,
-      "grn": 4.39,
-      "onp": 33.88,
-      "oth": 13.37
-     }
-    },
-    "gender": {
-     "Men": {
-      "lnp": 21,
-      "alp": 31.82,
-      "grn": 10.38,
-      "onp": 24.27,
-      "oth": 12.53
-     },
-     "Women": {
-      "lnp": 19.75,
-      "alp": 30.04,
-      "grn": 13.06,
-      "onp": 24.99,
-      "oth": 12.16
-     }
-    }
-   }
-  },
-  {
-   "pollster": "Resolve",
    "date": "2026-02-14",
    "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
    "read": "published series",

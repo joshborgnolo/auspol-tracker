@@ -1455,6 +1455,22 @@ const VOTE_SWITCHING = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-switching.json"), "utf8")); }
   catch { return null; }
 })();
+/* Each wave's rates – % of each 2025 group now voting One Nation, and of One
+   Nation's own 2025 voters still with it – keyed onto its poll for the
+   archive's CSV export. YouGov's independents and other parties fold at their
+   2025 weights, as the panel folds them. A group the wave didn't print is
+   null, so a partial table still exports what it has. */
+const VS_BY_POLL = new Map();
+if (Array.isArray(VOTE_SWITCHING?.waves) && VOTE_SWITCHING.weights2025) {
+  const W = VOTE_SWITCHING.weights2025;
+  for (const w of VOTE_SWITCHING.waves) {
+    const on = (g) => (w.rows && w.rows[g] ? (w.rows[g].onp ?? 0) : null);
+    const oth = w.rows && w.rows.ind
+      ? (on("ind") == null || on("oth") == null ? null : r1((W.ind * on("ind") + W.oth * on("oth")) / (W.ind + W.oth)))
+      : on("oth");
+    VS_BY_POLL.set(w.date + "|" + w.pollster, { lnp: on("lnp"), alp: on("alp"), grn: on("grn"), oth, onp: on("onp") });
+  }
+}
 const ON_SOURCE_GROUPS = [
   { id: "lnp", label: "Coalition voters", color: "var(--lnp)", note: "voted Liberal or National in 2025" },
   { id: "alp", label: "Labor voters", color: "var(--alp)", note: "voted Labor in 2025" },
@@ -1586,6 +1602,32 @@ const DEMOGRAPHICS = (() => {
   try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demographics.json"), "utf8")); }
   catch { return null; }
 })();
+// the wave's poll row: its own date, or – Resolve's series date sits a day or
+// so off its polls.json row – the nearest row of that house within four days
+const demoPollOf = (w) => {
+  const ms = Date.parse(w.date);
+  return POLLS.filter((q) => q.pollster === w.pollster && Math.abs(Date.parse(q.date) - ms) <= 4 * 86400000)
+    .sort((a, b) => Math.abs(Date.parse(a.date) - ms) - Math.abs(Date.parse(b.date) - ms))[0] || null;
+};
+/* Each wave's figures for the common groups – exactly what §7g pools – keyed
+   onto its poll row, so the archive's CSV export carries them. `v` follows
+   DEMO_GROUPS (null where the poll didn't ask), each [alp, lnp, grn, onp,
+   oth] as published (RedBridge's two school rows merged, as the pooling
+   merges them); `r` is how the figures were read. */
+const DEMO_GROUPS = DEMO_SETS.flatMap((st) => st.groups);
+const DEMO_BY_POLL = new Map();
+for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) {
+  const p = demoPollOf(w);
+  if (!p) continue;
+  const h = harmonize(w);
+  const v = DEMO_GROUPS.map((g) => {
+    const st = DEMO_SETS.find((x) => x.groups.includes(g));
+    const sh = h[st.id] && h[st.id][g];
+    return sh ? ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(sh[k])) : null;
+  });
+  while (v.length && v[v.length - 1] == null) v.pop();
+  if (v.some(Boolean)) DEMO_BY_POLL.set(p.date + "|" + p.pollster, { r: w.read, v });
+}
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
 const individualPolls = POLLS.map((p) => {
@@ -1660,6 +1702,9 @@ const individualPolls = POLLS.map((p) => {
     // last ELECTION, not the pollster's previous poll, so it travels with the
     // data rather than being inferred by the views.
     ...(p.seats ? { seats: p.seats } : {}),
+    // the vote by group and the vote-switching rates, for the CSV export
+    ...(DEMO_BY_POLL.has(p.date + "|" + p.pollster) ? { grp: DEMO_BY_POLL.get(p.date + "|" + p.pollster) } : {}),
+    ...(VS_BY_POLL.has(p.date + "|" + p.pollster) ? { sw: VS_BY_POLL.get(p.date + "|" + p.pollster) } : {}),
   };
 }).sort((a, b) => a.x - b.x || a.released.localeCompare(b.released));
 
@@ -2032,13 +2077,6 @@ const DEMO_KEYS = ["alp", "lnp", "onp", "grn", "oth"];
 const demoNorm = (s) => {
   const t = DEMO_KEYS.reduce((a, k) => a + (+s[k] || 0), 0);
   return t > 0 ? Object.fromEntries(DEMO_KEYS.map((k) => [k, 100 * (+s[k] || 0) / t])) : null;
-};
-// the wave's poll row: its own date, or – Resolve's series date sits a day or
-// so off its polls.json row – the nearest row of that house within four days
-const demoPollOf = (w) => {
-  const ms = Date.parse(w.date);
-  return POLLS.filter((q) => q.pollster === w.pollster && Math.abs(Date.parse(q.date) - ms) <= 4 * 86400000)
-    .sort((a, b) => Math.abs(Date.parse(a.date) - ms) - Math.abs(Date.parse(b.date) - ms))[0] || null;
 };
 // its all-voters figure: the table's own where it prints one, else the published primaries
 const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm(w.total)
@@ -3373,6 +3411,8 @@ window.AUSPOL = (function () {
   /* The vote by age, gender and education (§7g): per tab, each common group's
      pooled figure per party, with its margin, beside the current primaries. */
   const demographics = ${JSON.stringify(demographics)};
+  // the common groups, in the order a poll row's grp.v follows (the export's columns)
+  const demoGroups = ${JSON.stringify(DEMO_GROUPS)};
   const accuracy = ${JSON.stringify(accuracy)};
   const individualPolls = ${JSON.stringify(individualPolls)};
   const pollsterTable = ${JSON.stringify(pollsterTable)};
@@ -3450,7 +3490,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, directionNow, leaderNow, undecided, onSources, demographics, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, directionNow, leaderNow, undecided, onSources, demographics, demoGroups, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved

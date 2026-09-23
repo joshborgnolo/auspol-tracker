@@ -156,6 +156,12 @@ export function redbridgeTable(txt) {
 const RS_PARTY = { ALP: "alp", LNP: "lnp", GRN: "grn", ONP: "onp", IND: "oth", OTH: "oth" };
 const RS_GROUP = { "age-18-34": ["age", "18–34"], "age-35-54": ["age", "35–54"], "age-55+": ["age", "55+"],
                    Male: ["gender", "Men"], Female: ["gender", "Women"] };
+/* Points in the series that are not polls. 12 Feb 2026 is the Ley scenario:
+   that month's wave also asked how people would vote were Ley still leader,
+   and the interactive plots the answer as a point of its own two days before
+   the real wave (14 Feb). extract-resolve-rpm.mjs moves the same point out
+   of its primary vote ("defect 5"); this does the same. */
+const RESOLVE_SCENARIO_DATES = new Set(["2026-02-12"]);
 export function resolveWaves(q) {
   const byDate = new Map();
   const iso = (d) => { const [dd, mm, yy] = d.split("/"); return `${yy}-${mm}-${dd}`; };
@@ -167,7 +173,7 @@ export function resolveWaves(q) {
       if (!grp) continue;                          // e.g. a stray "QLD" key in the gender list
       for (const t of g.timeseries || []) {
         const date = iso(t.date);
-        if (date < TERM_START) continue;
+        if (date < TERM_START || RESOLVE_SCENARIO_DATES.has(date)) continue;
         const w = byDate.get(date) || { dims: {} };
         const sh = ((w.dims[grp[0]] ||= {})[grp[1]] ||= {});
         sh[p] = Math.round(((sh[p] || 0) + decodeUx(t.value)) * 100) / 100;

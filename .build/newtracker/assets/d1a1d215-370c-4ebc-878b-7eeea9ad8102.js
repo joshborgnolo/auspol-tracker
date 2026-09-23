@@ -4894,6 +4894,19 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     ["Direction unsure", (p) => (p.dir ? p.dir.unsure : "")],
     ["Direction net", (p) => (p.dir ? p.dir.net : "")],
     ["Contains", (p) => p.tags.join(" ")],
+    // Appended, so the columns above keep their places. The vote by group:
+    // each poll's first preferences for the common groups, exactly as the
+    // pooled figures use them (gen-data DEMO_BY_POLL) – and how they were read
+    ["Groups read from", (p) => (p.grp ? p.grp.r : "")],
+    ...(D.demoGroups || []).flatMap((g, gi) => ["ALP", "L/NP", "GRN", "ON", "OTH"].map((lab, k) =>
+      [g + " " + lab, (p) => { const v = p.grp && p.grp.v[gi]; return v ? v[k] : ""; }])),
+    // where One Nation's new voters came from: % of each 2025 group now voting
+    // One Nation, and of its own 2025 voters still with it
+    ["2025 L/NP now ON", (p) => (p.sw && p.sw.lnp != null ? p.sw.lnp : "")],
+    ["2025 ALP now ON", (p) => (p.sw && p.sw.alp != null ? p.sw.alp : "")],
+    ["2025 GRN now ON", (p) => (p.sw && p.sw.grn != null ? p.sw.grn : "")],
+    ["2025 OTH now ON", (p) => (p.sw && p.sw.oth != null ? p.sw.oth : "")],
+    ["2025 ON still ON", (p) => (p.sw && p.sw.onp != null ? p.sw.onp : "")],
   ];
   const exportCsv = () => downloadCsv(
     `auspol-tracker-polls-${D.latest.updatedISO}.csv`,
@@ -5948,7 +5961,7 @@ function infoTerms(D) {
         Labor’s 2025 voters now back One Nation (
         <a className="fb-link" href="https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455"
            target="_blank" rel="noopener noreferrer">The Australian</a>), close to DemosAU’s 14%
-        and YouGov’s 15%.</span>
+        and YouGov’s 15%. Each poll’s figures are in the All polls export.</span>
         {working(onsWork)}</>) },
       { id: "vote-by-group", term: "Breakdowns by group", body: (
         <>How each group – men and women, age groups, education levels – says it will vote, from
@@ -5975,7 +5988,7 @@ function infoTerms(D) {
         <span className="info-p"><b>Sources.</b> Resolve’s monthly age and gender series (its
         Political Monitor interactive), YouGov’s published crosstabs, RedBridge’s report tables,
         and DemosAU’s report charts, measured from the chart in each report because small bars
-        carry no label.</span>
+        carry no label. Each poll’s figures for these groups are in the All polls export.</span>
         {working(demoWork)}</>) },
     ] },
     { id: "g-leaders", title: "Leaders", entries: [

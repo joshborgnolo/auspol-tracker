@@ -107,6 +107,9 @@ assert.equal(rw.length, 1, "months before the term are dropped");
 assert.equal(rw[0].date, "2026-09-14");
 assert.deepEqual(rw[0].dims, { age: { "18–34": { alp: 28.5, oth: 10.25 } }, gender: { Men: { alp: 27 } } },
   "IND and OTH fold into oth; the stray QLD key and undecided are ignored");
+// the Feb 2026 Ley scenario is a point in the series, not a poll
+const scen = resolveWaves({ answers: [{ answer: "ALP", age: [], gender: [{ key: "Male", timeseries: series([["12/02/2026", 31], ["14/02/2026", 33]]) }] }] });
+assert.deepEqual(scen.map((w) => w.date), ["2026-02-14"], "the 12 Feb 2026 Ley scenario is dropped");
 
 // ---- DemosAU chart labels -------------------------------------------------------------
 assert.equal(demosLabel("gender", "Males"), "Men");
