@@ -1790,17 +1790,21 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
           /* Every name the sentence mentions is a way INTO the term it
              names: the sentence keeps its prose form, but the names are
              buttons wired like a click on the term's legend chip, so the
-             reader who learns "only Whitlam sits lower" can see Whitlam's
+             reader who learns "only Whitlam sat lower" can see Whitlam's
              line drawn at once. Rank therefore travels structured – lead,
              the formatted refs, tail – and the render interleaves the
              commas and the "and" between the buttons. */
           const refsOf = (ps) => ps.map((p) => ({ yr: p.yr, label: fmtPeer(p) }));
+          /* The company this sentence names is readings from past terms,
+             so it runs past tense – "Only … sat lower", "were Gillard and
+             Albanese" – while the lead sentence keeps the present ("sits N
+             below"): the sitting term's gap is the live fact. */
           insight.rank = near.length
             ? { lead: "Only ", refs: refsOf(near),
-                tail: " " + (near.length > 1 ? "sit" : "sits") + " " +
+                tail: " sat " +
                       (side === "low" ? "lower" : "higher") + " at this point." }
             : { lead: "The second and third " + (side === "low" ? "lowest" : "highest") +
-                      " at this point are ",
+                      " at this point were ",
                 refs: refsOf(side === "low" ? cand.slice(0, 2) : cand.slice(-2).reverse()),
                 tail: "." };
         }

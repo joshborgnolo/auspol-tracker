@@ -39323,9 +39323,9 @@ function CycleChart({
           insight.rank = near.length ? {
             lead: "Only ",
             refs: refsOf(near),
-            tail: " " + (near.length > 1 ? "sit" : "sits") + " " + (side === "low" ? "lower" : "higher") + " at this point."
+            tail: " sat " + (side === "low" ? "lower" : "higher") + " at this point."
           } : {
-            lead: "The second and third " + (side === "low" ? "lowest" : "highest") + " at this point are ",
+            lead: "The second and third " + (side === "low" ? "lowest" : "highest") + " at this point were ",
             refs: refsOf(side === "low" ? cand.slice(0, 2) : cand.slice(-2).reverse()),
             tail: "."
           };
