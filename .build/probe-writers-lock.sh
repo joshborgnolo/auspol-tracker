@@ -33,6 +33,8 @@ trap 'rm -f "$PROBE_LOG"' EXIT
 # subshell and this probe reports success precisely in the failure case.
 LOG="$PROBE_LOG"
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') $*" >> "$PROBE_LOG"; }
+# The probe asks "could a wrapper take it NOW?" — never wait on a holder.
+SLOT_LOCK_WAIT=0
 . "$REPO/.build/git-push-main.sh" || exit 2
 
 # acquire_slot_lock exit()s even on refusal, so run it in a subshell; the

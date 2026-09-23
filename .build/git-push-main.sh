@@ -86,7 +86,8 @@ push_main() {
 # the working file. mkdir is atomic, so it is the mutex; a pid file inside
 # lets a later slot reap the lock of a wrapper that died mid-run.
 #
-# Usage: acquire_slot_lock   — takes the lock or exits 0 (slot skipped).
+# Usage: acquire_slot_lock   — takes the lock (waiting up to SLOT_LOCK_WAIT
+# for a live holder) or exits 0 (slot skipped).
 # The lock releases itself via an EXIT trap.
 #
 # SLOT_LOCK_MAX_AGE is the staleness ceiling: a live pid is NOT proof of a
@@ -96,33 +97,64 @@ push_main() {
 # numbers recycle, and kill -0 cannot tell a wedged wrapper from an
 # innocent process that inherited the number.
 SLOT_LOCK_MAX_AGE=2700 # 45 min — the longest legitimate wrapper run is well under this
+# SLOT_LOCK_WAIT: how long to wait for a LIVE holder before skipping. Several
+# plists share morning slots, and skipping on first contact dropped real
+# slots (2026-09-23 06:12: Roy Morgan and Resolve both skipped behind one
+# holder). Waiting costs nothing — the waiter's freshness_sync runs after the
+# holder's push. The lock probe sets 0 so it answers instantly.
+SLOT_LOCK_WAIT="${SLOT_LOCK_WAIT:-900}"
+SLOT_LOCK_POLL="${SLOT_LOCK_POLL:-20}"
 SLOT_LOCK_DIR=""
 acquire_slot_lock() {
   SLOT_LOCK_DIR="$REPO/.build/locks/writers.lock"
-  if [ -d "$SLOT_LOCK_DIR" ]; then
-    local oldpid=""
-    [ -f "$SLOT_LOCK_DIR/pid" ] && oldpid="$(cat "$SLOT_LOCK_DIR/pid" 2>/dev/null)"
-    if [ -n "$oldpid" ] && kill -0 "$oldpid" 2>/dev/null; then
-      local lock_mtime lock_age=999999
-      lock_mtime="$(stat -f %m "$SLOT_LOCK_DIR" 2>/dev/null || stat -c %Y "$SLOT_LOCK_DIR" 2>/dev/null)"
-      [ -n "$lock_mtime" ] && lock_age=$(( $(date +%s) - lock_mtime ))
-      if [ "$lock_age" -lt "$SLOT_LOCK_MAX_AGE" ]; then
-        log "another wrapper holds the writers lock (pid $oldpid); skipping slot"
-        exit 0
-      fi
-      log "WARN writers lock held $(( lock_age / 60 ))min by live pid $oldpid (> $(( SLOT_LOCK_MAX_AGE / 60 ))min ceiling) — treating as wedged and breaking"
-    else
-      log "reaping stale writers lock (pid ${oldpid:-unknown} no longer running)"
-    fi
-    rm -rf "$SLOT_LOCK_DIR"
-  fi
   # The locks parent is gitignored, so it never exists in a fresh checkout —
   # create it explicitly or the atomic mkdir below fails at every slot.
   mkdir -p "$(dirname "$SLOT_LOCK_DIR")" 2>/dev/null || true
-  if ! mkdir "$SLOT_LOCK_DIR" 2>/dev/null; then
+  local waited=0 oldpid lock_mtime lock_age
+  while :; do
+    if [ -d "$SLOT_LOCK_DIR" ]; then
+      oldpid=""
+      [ -f "$SLOT_LOCK_DIR/pid" ] && oldpid="$(cat "$SLOT_LOCK_DIR/pid" 2>/dev/null)"
+      lock_age=999999
+      lock_mtime="$(stat -f %m "$SLOT_LOCK_DIR" 2>/dev/null || stat -c %Y "$SLOT_LOCK_DIR" 2>/dev/null)"
+      [ -n "$lock_mtime" ] && lock_age=$(( $(date +%s) - lock_mtime ))
+      # A holder mkdirs, then writes its pid: a pidless dir seconds old is
+      # a live holder mid-acquire, not a stale lock to reap.
+      if [ -z "$oldpid" ] && [ "$lock_age" -lt 10 ] && [ "$waited" -lt "$SLOT_LOCK_WAIT" ]; then
+        sleep 1; waited=$(( waited + 1 ))
+        continue
+      fi
+      if [ -n "$oldpid" ] && kill -0 "$oldpid" 2>/dev/null; then
+        if [ "$lock_age" -lt "$SLOT_LOCK_MAX_AGE" ]; then
+          if [ "$waited" -lt "$SLOT_LOCK_WAIT" ]; then
+            [ "$waited" -eq 0 ] && log "writers lock held by pid $oldpid; waiting up to ${SLOT_LOCK_WAIT}s"
+            sleep "$SLOT_LOCK_POLL"; waited=$(( waited + SLOT_LOCK_POLL ))
+            continue
+          fi
+          log "another wrapper holds the writers lock (pid $oldpid); skipping slot"
+          exit 0
+        fi
+        log "WARN writers lock held $(( lock_age / 60 ))min by live pid $oldpid (> $(( SLOT_LOCK_MAX_AGE / 60 ))min ceiling) — treating as wedged and breaking"
+      else
+        log "reaping stale writers lock (pid ${oldpid:-unknown} no longer running)"
+      fi
+      rm -rf "$SLOT_LOCK_DIR"
+    fi
+    if mkdir "$SLOT_LOCK_DIR" 2>/dev/null; then
+      break
+    fi
+    # A sibling won the mkdir race between our check and our mkdir: its lock
+    # dir now exists, so go round and wait on it. No dir at all means the
+    # mkdir itself is broken — the 2026-09-05..07 outage signature the lock
+    # probe greps for — so fail fast with that exact line.
+    if [ -d "$SLOT_LOCK_DIR" ] && [ "$waited" -lt "$SLOT_LOCK_WAIT" ]; then
+      sleep 1; waited=$(( waited + 1 ))
+      continue
+    fi
     log "writers lock lost to a concurrent wrapper; skipping slot"
     exit 0
-  fi
+  done
+  [ "$waited" -gt 0 ] && log "writers lock acquired after waiting ${waited}s"
   echo $$ > "$SLOT_LOCK_DIR/pid"
   trap 'rm -rf "$SLOT_LOCK_DIR"' EXIT
 }
@@ -217,6 +249,12 @@ GEN_DATASET=".build/newtracker/assets/9f09dca2-bd46-49a8-8ae1-51847608cf92.js .b
 stage_dataset() {
   # shellcheck disable=SC2086 # two fixed paths, split on purpose
   git add $GEN_DATASET >> "$LOG" 2>&1 || true
+  # build.mjs names cycle-source and the webfonts by content hash and sweeps
+  # the old names; the wrappers' explicit add lists name neither, so a build
+  # that renamed one would commit an index.html pointing at an unstaged
+  # file. Stage assets/ whole (adds, renames and deletions) — the wrappers
+  # only get here on a clean tree, so nothing foreign rides along.
+  git add assets/ >> "$LOG" 2>&1 || true
 }
 
 # ---------------------------------------------------------------------------
