@@ -3290,6 +3290,10 @@ function NextPollsPanel() {
                   {r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`}
                   {(r.declared || []).length > 0 &&
                     ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`}
+                  {/* the slot this rhythm names falls in the summer break, so
+                      the row is the resumption window instead (npInSummer) */}
+                  {r.summer &&
+                    ` That puts the next one in the summer break. No federal poll has been published between 23 December and 8 January, and last summer the pollsters came back anywhere from 9 January to 1 February, so that range is the window.`}
                 </p>
               </div>
             )}

@@ -52,6 +52,25 @@ function easternNow() {
   }
 }
 
+/* THE SUMMER BREAK. Nobody publishes federal voting intention between
+   Christmas and the second week of January: across the 22 summers since
+   2004/05 in the record, at most one poll per summer closed fieldwork
+   between 22 Dec and 5 Jan, and in 2025/26 not one house published between
+   23 Dec and 8 Jan. Where the houses come BACK is not a rhythm - last
+   summer Roy Morgan on 12 Jan, Resolve 18 Jan, Newspoll 19 Jan, YouGov
+   27 Jan, Essential 28 Jan, RedBridge 1 Feb. So a dated slot that falls in
+   the dead zone is not a date at all: it becomes the resumption window, 9
+   Jan to 1 Feb, as a loose row (every window consumer already reads that
+   shape - see the calendar-month path), and the walk stops there. The
+   walk-forward backtest had slots touching Dec/Jan hitting 3 of 8.
+   Month-day strings, eastern calendar dates. */
+const NP_SUMMER_DEAD = ["12-23", "01-08"];   // no federal release inside, inclusive
+const NP_SUMMER_BACK = ["01-09", "02-01"];   // the span last summer's houses resumed across
+function npInSummer(ms) {
+  const md = new Date(ms).toISOString().slice(5, 10);
+  return md >= NP_SUMMER_DEAD[0] || md <= NP_SUMMER_DEAD[1];
+}
+
 /* A MONTH-END rhythm (RedBridge/Accent for the AFR): one wave a month, out
    on the house's weekday nearest the month's last day - Sun 1 Mar, 29 Mar,
    3 May, 31 May, 28 Jun, 2 Aug, 30 Aug 2026, every 2026 release. Measured
@@ -229,6 +248,28 @@ function npProject(nowOverride) {
        weeks out is how a quarterly house went unmentioned on the panel for
        most of the year. The horizon's job ends at slot two. */
     for (let i = 0; (i === 0 || reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))))) && i < 12; i++) {
+      /* a slot in the summer break: the house's next claim is the
+         resumption window (NP_SUMMER_BACK of the January after), shaped as
+         a loose row; a further slot there is not projected at all */
+      if (npInSummer(release)) {
+        if (i === 0) {
+          const d = new Date(release);
+          const y = d.getUTCFullYear() + (d.getUTCMonth() === 11 ? 1 : 0);
+          const at = (md) => Date.UTC(y, +md.slice(0, 2) - 1, +md.slice(3, 5));
+          const open = at(NP_SUMMER_BACK[0]), close = at(NP_SUMMER_BACK[1]);
+          const half = (close - open) / 2 / DAY_MS;
+          const missed = close < t0;
+          rows.push({
+            ...c, field, release: (open + close) / 2, ahead: 0,
+            loose: true, summer: true, overdue: missed, missed,
+            spread: half, winHalf: half, slotEarly: null, slotLate: null, rolled: false,
+            inDays: Math.round(((open + close) / 2 - t0) / DAY_MS),
+            opensIn: Math.round((open - t0) / DAY_MS),
+            closesIn: Math.round((close - t0) / DAY_MS),
+          });
+        }
+        break;
+      }
       const overdue = due(release) <= nowMs;
       /* Each further wave is one more interval of drift, so the window widens
          as sqrt(waves) – the second Essential is a looser bet than the first.

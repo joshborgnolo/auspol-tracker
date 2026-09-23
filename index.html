@@ -34617,6 +34617,12 @@ function easternNow() {
     };
   }
 }
+const NP_SUMMER_DEAD = ["12-23", "01-08"];
+const NP_SUMMER_BACK = ["01-09", "02-01"];
+function npInSummer(ms) {
+  const md = new Date(ms).toISOString().slice(5, 10);
+  return md >= NP_SUMMER_DEAD[0] || md <= NP_SUMMER_DEAD[1];
+}
 function npMonthEndSlot(fromMs, dow) {
   const d = new Date(fromMs);
   const y = d.getUTCFullYear(),
@@ -34713,6 +34719,36 @@ function npProject(nowOverride) {
     }
     const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
     for (let i = 0; (i === 0 || reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))))) && i < 12; i++) {
+      if (npInSummer(release)) {
+        if (i === 0) {
+          const d = new Date(release);
+          const y = d.getUTCFullYear() + (d.getUTCMonth() === 11 ? 1 : 0);
+          const at = md => Date.UTC(y, +md.slice(0, 2) - 1, +md.slice(3, 5));
+          const open = at(NP_SUMMER_BACK[0]),
+            close = at(NP_SUMMER_BACK[1]);
+          const half = (close - open) / 2 / DAY_MS;
+          const missed = close < t0;
+          rows.push({
+            ...c,
+            field,
+            release: (open + close) / 2,
+            ahead: 0,
+            loose: true,
+            summer: true,
+            overdue: missed,
+            missed,
+            spread: half,
+            winHalf: half,
+            slotEarly: null,
+            slotLate: null,
+            rolled: false,
+            inDays: Math.round(((open + close) / 2 - t0) / DAY_MS),
+            opensIn: Math.round((open - t0) / DAY_MS),
+            closesIn: Math.round((close - t0) / DAY_MS)
+          });
+        }
+        break;
+      }
       const overdue = due(release) <= nowMs;
       const sp = Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)));
       const winHalf = spreadDays(c, sp);
@@ -40707,7 +40743,7 @@ function NextPollsPanel() {
       title: x.since ? `Since the previous ${r.basis === "published" ? "publication" : "fieldwork end"}, ${fmtDay(x.since)}` : undefined
     }, x.gap != null ? `${x.gap} days` : "")))), React.createElement("p", {
       className: "npd-foot"
-    }, "Median ", r.cadence, " days between", " ", r.basis === "published" ? "publications" : "fieldwork ends", " across the last ", r.gapsUsed, " intervals", r.monthEnd ? "" : r.spreadEarly != null && r.spreadEarly !== r.spreadLate ? `, –${r.spreadEarly}/+${r.spreadLate} days` : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : "", ".", r.basis !== "published" && React.createElement(React.Fragment, null, " ", "Plus", " ", r.lagMeasured ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases` : "the field’s one-day publication lag", "."), r.releaseDow != null && !r.monthEnd && ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`, r.monthEnd && ` Projected onto the ${WD[r.releaseDow]} nearest the month’s last day${hour ? `, when it files at ${zoned(hour, r.release)}` : ""} – the day it has published on in ${r.monthEndKept} of its last ${r.monthEndN} releases.`, r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`, (r.declared || []).length > 0 && ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`)));
+    }, "Median ", r.cadence, " days between", " ", r.basis === "published" ? "publications" : "fieldwork ends", " across the last ", r.gapsUsed, " intervals", r.monthEnd ? "" : r.spreadEarly != null && r.spreadEarly !== r.spreadLate ? `, –${r.spreadEarly}/+${r.spreadLate} days` : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : "", ".", r.basis !== "published" && React.createElement(React.Fragment, null, " ", "Plus", " ", r.lagMeasured ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases` : "the field’s one-day publication lag", "."), r.releaseDow != null && !r.monthEnd && ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`, r.monthEnd && ` Projected onto the ${WD[r.releaseDow]} nearest the month’s last day${hour ? `, when it files at ${zoned(hour, r.release)}` : ""} – the day it has published on in ${r.monthEndKept} of its last ${r.monthEndN} releases.`, r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`, (r.declared || []).length > 0 && ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`, r.summer && ` That puts the next one in the summer break. No federal poll has been published between 23 December and 8 January, and last summer the pollsters came back anywhere from 9 January to 1 February, so that range is the window.`)));
   })));
 }
 window.AP.measureOfMatchup = id => ({

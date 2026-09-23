@@ -702,5 +702,24 @@ function eq(name, got, want) {
     [rb.spreadEarly, rb.spreadLate]);
 }
 
+// S13 – the SUMMER BREAK: a dated slot inside 23 Dec – 8 Jan is no date at
+// all; the row becomes the resumption window (9 Jan – 1 Feb), loose-shaped,
+// and the walk projects nothing further into the break.
+{
+  const cadS = JSON.parse(JSON.stringify(cad));
+  cadS.find((c) => c.pollster === "Newspoll").last = "2026-12-06";   // +21 → Sun 27 Dec
+  const { t0, nowMs, label } = scen("Thu 10 Dec, a slot in the break", "2026-12-10", 600);
+  const rows = project(cadS, t0, nowMs);
+  const np = rows.filter((r) => r.pollster === "Newspoll");
+  console.log(`\n${label}:  Newspoll → ${np.map((r) => `${npFmt(r.release)} ±${r.winHalf}${r.summer ? " (summer)" : ""}`).join(", ")}`);
+  eq("a slot in the break becomes one summer window", np.length === 1 && np[0].summer && np[0].loose, true);
+  eq("the window is the resumption span", np[0] && [np[0].opensIn, np[0].closesIn], [30, 53]);
+  // a weekly house walks up to the break and stops there
+  const rm = rows.filter((r) => r.pollster === "Roy Morgan").map((r) => new Date(r.release).toISOString().slice(0, 10));
+  eq("no dated slot is projected inside the break", rm.some((d) => d.slice(5) >= "12-23" || d.slice(5) <= "01-08"), false);
+  // outside the break nothing changes
+  eq("a slot clear of the break stays dated", firm(project(cad, t0, nowMs), "Newspoll")?.summer, undefined);
+}
+
 console.log(fails ? `\n${fails} FAILED` : "\nall next-polls expectations held");
 process.exit(fails ? 1 : 0);

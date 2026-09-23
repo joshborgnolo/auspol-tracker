@@ -123,7 +123,7 @@ function tuplesOf(rows, ts, syd) {
       ts,
       syd,
       pollster: r.pollster,
-      kind: r.calMonth ? "calMonth" : r.loose ? "loose" : "dated",
+      kind: r.calMonth ? "calMonth" : r.summer ? "summer" : r.loose ? "loose" : "dated",
       anchor: r.last,
       release: iso(r.release),
       open: iso(r.release - (r.winHalf || 0) * DAY),
