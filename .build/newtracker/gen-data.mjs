@@ -2072,7 +2072,12 @@ const primaryNow = primaryNowAt(refNow);
    group-level house effect could never be estimated from four houses – and
    puts every group on the level of the figures the site quotes. Groups pool
    only where the houses cut the population the same way (demo-groups.mjs).
-   A group's five shares are rescaled to 100, as every primary set is. */
+   A group's five shares are rescaled to 100, as every primary set is.
+   The panel's charts carry each group's MONTHLY line too, built as every
+   monthly line here is (monthWithSe: sample-weighted, repeat waves as
+   sqrt(m)), each month's pooled gaps added to that month's aggregate
+   primaries – so a group's line sits against the all-voters line the way its
+   current figure sits against the current primaries. */
 const DEMO_KEYS = ["alp", "lnp", "onp", "grn", "oth"];
 const demoNorm = (s) => {
   const t = DEMO_KEYS.reduce((a, k) => a + (+s[k] || 0), 0);
@@ -2085,7 +2090,10 @@ const demographics = (() => {
   const waves = Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [];
   if (!waves.length || !primaryNow) return null;
   const ALL = demoNorm(primaryNow);
+  // each month's aggregate primaries, rescaled to the five keys (the monthly anchor)
+  const allByYm = new Map(aggPrimary.filter((d) => !d.election).map((d) => [d.ym, demoNorm(d)]));
   const rows = {};                                // "set|group|party" -> nowcast rows
+  const rowsM = {};                               // … -> monthly rows, anchored on each month's primaries
   const inWindow = [];                            // the waves the window holds, for the credits
   for (const w of waves) {
     const p = demoPollOf(w), tot = demoTotalOf(w, p);
@@ -2097,8 +2105,11 @@ const demographics = (() => {
       const g = h[set.id] && h[set.id][group] && demoNorm(h[set.id][group]);
       if (!g) continue;
       used = true;
-      for (const k of DEMO_KEYS)
+      const ym = ymOf(p ? p.date : w.date), M = allByYm.get(ym);
+      for (const k of DEMO_KEYS) {
         (rows[set.id + "|" + group + "|" + k] ||= []).push({ mid, x: ALL[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster });
+        if (M) (rowsM[set.id + "|" + group + "|" + k] ||= []).push({ ym, mid, x: M[k] + (g[k] - tot[k]), n: n * DEMO_SHARE[group], firm: w.pollster });
+      }
     }
     const d = ddays(refNow, mid);
     if (used && d >= 0 && d <= SPARSE_K.window) inWindow.push({ w, p, d });
@@ -2111,11 +2122,18 @@ const demographics = (() => {
       if (DEMO_KEYS.some((k) => !est[k])) return null;
       const raw = Object.fromEntries(DEMO_KEYS.map((k) => [k, Math.max(0, est[k].v)]));
       const t = DEMO_KEYS.reduce((a, k) => a + raw[k], 0);
+      // [ym, …shares in DEMO_KEYS order], months the group was polled in
+      const monthly = MONTHS.map((ym) => {
+        const m = DEMO_KEYS.map((k) => monthWithSe(rowsM[key(k)] || [], null, ym));
+        if (m.some((e) => !e)) return null;
+        const mv = m.map((e) => Math.max(0, e.v)), mt = mv.reduce((a, b) => a + b, 0);
+        return [ym, ...mv.map((v) => r1(100 * v / mt))];
+      }).filter(Boolean);
       return {
         label: group,
         v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(100 * raw[k] / t)])),
         ci: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(1.96 * est[k].se)])),
-        n: est.alp.n, houses: housesIn(rows[key("alp")] || []),
+        n: est.alp.n, houses: housesIn(rows[key("alp")] || []), monthly,
       };
     }).filter(Boolean);
     return { tab: set.tab, id: set.id, label: set.label, groups,
@@ -2127,6 +2145,9 @@ const demographics = (() => {
   inWindow.sort((a, b) => a.d - b.d);
   return {
     all: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL[k])])),
+    // the monthly lines' party order, and the all-voters line they sit against
+    order: DEMO_KEYS,
+    allMonthly: [...allByYm.entries()].map(([ym, a]) => [ym, ...DEMO_KEYS.map((k) => r1(a[k]))]),
     window: SPARSE_K.label, tabs,
     houses: creditHouses(inWindow, (r) => r.w.pollster, (r) => Date.parse(r.w.date)),
     // the polls the window holds, newest first (the Info entry's working)

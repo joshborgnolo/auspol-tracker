@@ -1750,7 +1750,7 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
       <DirectionPanel rangeId={rangeId} />
       <NextPollsPanel />
       {/* who votes for whom by age, gender and education */}
-      <DemographicsPanel />
+      <DemographicsPanel rangeId={rangeId} />
       {/* who One Nation's surge is made of */}
       <OnSourcesPanel rangeId={rangeId} />
       {/* closes the page: the electorate's mood rather than its party

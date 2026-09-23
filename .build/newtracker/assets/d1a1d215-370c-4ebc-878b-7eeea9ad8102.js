@@ -5972,7 +5972,9 @@ function infoTerms(D) {
         are pooled over the last six weeks of polls, weighted as the headline’s polls are, so newer
         and larger polls count for more. They are then added to the site’s current figure for all
         voters. Measuring each poll against its own total removes its pollster’s lean, and puts
-        every group on the same level as the headline.</span>
+        every group on the same level as the headline. The charts under the figures follow each
+        group month by month, built the same way: each month’s pooled gaps are added to that
+        month’s figure for all voters, as every monthly line on the site is built.</span>
         <span className="info-p"><b>Which pollsters count where.</b> Groups pool only where the
         pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov and
         RedBridge. 18–34: Resolve, DemosAU and YouGov. 35–54 and 55+: Resolve and DemosAU, since
