@@ -39514,6 +39514,7 @@ function DemographicsPanel({
   }, "%")), React.createElement("span", {
     className: "demo-ci"
   }, ci != null ? "± " + ci.toFixed(1) : ""));
+  const rel = (g, a) => 100 * (g / a - 1);
   const ki = T.order.indexOf(party),
     gpi = DEMO_GRP_PARTY.indexOf(party);
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
@@ -39523,10 +39524,10 @@ function DemographicsPanel({
     const lines = st.groups.map((g, i) => ({
       g,
       color: demoRamp(color, n, i),
-      pts: (g.monthly || []).filter(m => allAt.has(m[0])).map(m => ({
+      pts: (g.monthly || []).filter(m => allAt.has(m[0])).filter(m => allAt.get(m[0]) > 0).map(m => ({
         ym: m[0],
         x: D.mx(m[0]),
-        v: +(m[1 + ki] - allAt.get(m[0])).toFixed(1)
+        v: +rel(m[1 + ki], allAt.get(m[0])).toFixed(1)
       }))
     })).filter(l => l.pts.length);
     if (!lines.length) return null;
@@ -39545,9 +39546,9 @@ function DemographicsPanel({
     const dots = D.individualPolls.filter(p => p.grp && p.grp.t && inX(p.x)).flatMap(p => drawn.map(l => {
       const v = p.grp.v[D.demoGroups.indexOf(l.g.label)];
       const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
-      return sum > 0 ? {
+      return sum > 0 && p.grp.t[gpi] > 0 ? {
         x: p.x,
-        y: +(100 * v[gpi] / sum - p.grp.t[gpi]).toFixed(1),
+        y: +rel(100 * v[gpi] / sum, p.grp.t[gpi]).toFixed(1),
         color: l.color,
         label: l.g.label,
         meta: p
@@ -39558,21 +39559,21 @@ function DemographicsPanel({
     const {
       domain,
       ticks
-    } = fitDomain(vals, span > 30 ? 10 : 5, 0);
-    const signed = v => (v > 0 ? "+" : v < 0 ? "\u2212" : "") + Math.abs(v).toFixed(1);
+    } = fitDomain(vals, span > 240 ? 100 : span > 120 ? 50 : span > 60 ? 20 : 10, 0);
+    const signed = v => (Math.round(v) > 0 ? "+" : Math.round(v) < 0 ? "\u2212" : "") + Math.abs(Math.round(v));
     const by = st.label ? st.label.replace(/^By /, "") : tab.label.toLowerCase();
     return React.createElement("div", {
       className: "demo-chart"
     }, React.createElement("p", {
       className: "demo-chart-lab"
-    }, "Points above or below all voters, month by month"), React.createElement(TrendChart, {
+    }, "How much higher or lower than among all voters (%), month by month"), React.createElement(TrendChart, {
       key: "demo-" + st.id,
       height: narrow ? 560 : 500,
       xDomain: xDomain,
       yDomain: domain,
       yTicks: ticks,
-      unit: " pts",
-      yTickFmt: t => t > 0 ? "+" + t : t < 0 ? "\u2212" + -t : "0",
+      unit: "%",
+      yTickFmt: t => t > 0 ? "+" + t + "%" : t < 0 ? "\u2212" + -t + "%" : "0",
       pad: {
         l: narrow ? 92 : 76,
         r: 60,
@@ -39597,15 +39598,15 @@ function DemographicsPanel({
       pollFacet: "primary",
       tooltipTitle: i => window.AP.monthLabelFull(allPts[i].ym),
       fmt: signed,
-      ariaLabel: `${name} by ${by}: each group's points above or below all voters, month by month`,
+      ariaLabel: `${name} by ${by}: how much higher or lower each group's vote is than all voters', in percent, month by month`,
       copy: {
-        sub: `${name}’s vote in each group, points above or below all voters, by ${by} · the latest figures pool the last ${T.window} of polls`,
+        sub: `How much higher or lower ${name}’s vote is in each group than among all voters, by ${by} · the latest figures pool the last ${T.window} of polls`,
         legend: [{
           label: `All voters  ${all.toFixed(1)}%`,
           color: "var(--ink-3)",
           kind: "dashed"
         }, ...st.groups.map((g, i) => ({
-          label: `${g.label}  ${signed(g.v[party] - all)}`,
+          label: `${g.label}  ${signed(rel(g.v[party], all))}%`,
           color: demoRamp(color, n, i),
           kind: "line"
         }))]
@@ -39650,7 +39651,7 @@ function DemographicsPanel({
     className: "demo-house-when"
   }, houseList(st.houses.map(demoHouse)))), row("All voters", all, null, true, "The site’s current figure for all voters – the headline’s own estimate", "dash"), st.groups.map((g, i) => row(g.label, g.v[party], g.ci[party], false, `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"} · ${houseList(g.houses.map(demoHouse))} · ± ${g.ci[party].toFixed(1)} is the 95% margin`, demoRamp(color, st.groups.length, i))), chartFor(st)))), React.createElement("p", {
     className: "table-hint"
-  }, "Each poll says how far a group sits from its own overall figure. Those gaps are pooled over the last ", T.window, " of polls, newer and larger polls counting for more as in every figure here, and added to the site\u2019s current figure for all voters. \xB1 is the 95% margin. The charts follow each group\u2019s gap from all voters month by month, built the way the site\u2019s other monthly lines are, with each poll\u2019s own gap as a dot. Above the dashed zero line, the party does better in that group than overall. The national rise and fall is taken out, so a flat line means the group moved with everyone else. Groups pool only where pollsters cut them the same way", tab.id === "age" ? " – YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : "", ".", " ", React.createElement("button", {
+  }, "Each poll says how far a group sits from its own overall figure. Those gaps are pooled over the last ", T.window, " of polls, newer and larger polls counting for more as in every figure here, and added to the site\u2019s current figure for all voters. \xB1 is the 95% margin. The charts show how much higher or lower the party\u2019s vote is in each group than among all voters, in percent, month by month \u2013 built the way the site\u2019s other monthly lines are, with each poll as a dot. \u221238% means the party\u2019s vote in that group is 38% lower than among all voters, not 38 points. Measured this way a party\u2019s growth doesn\u2019t read as a widening divide, so a flat line means the group moved with everyone else. Where a party\u2019s vote is small, as One Nation\u2019s was in 2025, a point or two is a large percentage, so those months and single polls jump around. Groups pool only where pollsters cut them the same way", tab.id === "age" ? " – YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : "", ".", " ", React.createElement("button", {
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender and education")
