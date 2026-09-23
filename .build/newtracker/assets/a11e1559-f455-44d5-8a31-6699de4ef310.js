@@ -2026,8 +2026,8 @@ function TppLine({ c, prefixed, note, hero, alt }) {
 }
 
 /* The poll's own pull on the figures a reader watches, as one ordinary row
-   of the provenance band: "2PP agg. effect   +0.2 for ALP vs L/NP; +0.1
-   (respondent-allocated); −0.4 for ALP vs ON" - the party named
+   of the provenance band: "2PP agg. effect   +0.2 for ALP vs L/NP; −0.4 for
+   ALP vs ON. Respondent-allocated: +0.1 for ALP vs L/NP" - the party named
    the way every figure in the panel names it, not as "Labor" beside a
    column of ALP/L/NP/GRN/ON. One clause per aggregate the wave feeds: the
    implied 2PP wherever the wave's primaries support it – a paired wave's
@@ -2050,22 +2050,21 @@ function EffLines({ eff }) {
     const d = Math.round((e.hi - e.lo) * 10) / 10;
     return (d < 0 ? "−" : "+") + Math.abs(d).toFixed(1);
   };
-  /* an implied clause wears no tag: implied 2PP is the page's basis, the
-     figure the table shows, so it is the default reading here as it is
-     everywhere else in the panel. The tag is the published figure's -
-     "(respondent-allocated)" - and a clause only needs it while an implied
-     clause of the same pairing sits beside it */
-  const respTag = <span className="pd-s-note"> (respondent-allocated)</span>;
-  const tppClauses = [
-    eff.imp && { e: eff.imp, tag: null },
-    eff.lnp && { e: eff.lnp, tag: eff.imp ? respTag : null },
-  ].filter(Boolean);
+  /* an implied figure carries no marker: implied 2PP is the page's basis,
+     the figure the table shows, so it is the default reading here as it is
+     everywhere else in the panel. The wave's published figures group behind
+     one "Respondent-allocated:" lead-in at the end of the line instead of
+     each dragging its own "(respondent-allocated)" tag around the pairing
+     it repeats; one joins that group only while an implied figure of the
+     same pairing holds its slot in the default group - published alone on
+     its pairing, a figure just IS that pairing's clause and wears no
+     label */
   /* when every clause is out of window, the whole row is just the note –
      its in-window wording, without the brackets and without the +0.0s. A
      mixed row keeps the note parenthesised on the out-of-window clause */
-  const prim = tppClauses.length ? tppClauses[0].e : null;
-  const shareOut = prim && tppClauses.every((c) => !c.e.w)
-    && (!eff.onimp || !eff.onimp.w) && (!eff.onp || !eff.onp.w);
+  const prim = eff.imp || eff.lnp || null;
+  const shareOut = prim && [eff.imp, eff.lnp, eff.onimp, eff.onp]
+    .filter(Boolean).every((e) => !e.w);
   /* A wave that has fallen out of the window still DID something on the day
      it landed, and "None." threw that away. gen-data re-runs the same
      leave-one-out at the poll's own publication day and files it as `t`, so
@@ -2081,21 +2080,53 @@ function EffLines({ eff }) {
      parenthesised after the clause it qualifies, where a full stop would
      read as the end of the sentence it sits inside. */
   const winSpan = (m) => `the aggregate\u2019s ${m ? "month" : "21-day window"}`;
-  const clause = (e, who, tag) => (
+  const clause = (e, who) => (
     <React.Fragment>
-      {signed(e)} for ALP vs {who}{tag}
+      {signed(e)} for ALP vs {who}
       {!e.w && <span className="pd-s-note"> (outside {winSpan(e.m)})</span>}
     </React.Fragment>
   );
-  /* the w/t fan-out held in ONE list so the two tenses below can't serve
+  /* the w/t fan-out held in ONE pass so the two tenses below can't serve
      different clause sets; `t` is per-clause because the implied and
      classic runs answer each wave's own-day pull independently */
-  const tppList = (then) => tppClauses.map((c, i) => (
-    <React.Fragment key={i}>
+  const groups = (then) => {
+    const pick = (e) => (e && (!then || e.t) ? (then ? asThen(e) : e) : null);
+    /* the default group states each pairing exactly once - its implied
+       figure where the wave's primaries support one, else the published
+       one; the respondent group is only the published figures whose implied
+       counterpart already sits in the default group */
+    const def = [
+      [pick(eff.imp) || pick(eff.lnp), "L/NP"],
+      [pick(eff.onimp) || pick(eff.onp), "ON"],
+    ].filter(([e]) => e);
+    const resp = [
+      [eff.imp && eff.lnp ? pick(eff.lnp) : null, "L/NP"],
+      [eff.onimp && eff.onp ? pick(eff.onp) : null, "ON"],
+    ].filter(([e]) => e);
+    return { def, resp };
+  };
+  const list = (grp) => grp.map(([e, who], i) => (
+    <React.Fragment key={who}>
       {i > 0 && <React.Fragment>; </React.Fragment>}
-      {clause(then && c.e.t ? asThen(c.e) : c.e, "L/NP", c.tag)}
+      {clause(e, who)}
     </React.Fragment>
   ));
+  /* the two bases as two sentences: a full stop closes the default group's
+     list rather than a semicolon claiming the published moves are more
+     clauses of the same kind; the shared lead-in then names them once, in
+     the tag's note styling */
+  const byBasis = (then) => {
+    const g = groups(then);
+    return (
+      <React.Fragment>
+        {list(g.def)}
+        {g.resp.length > 0 && (
+          <React.Fragment>. <span className="pd-s-note">Respondent-allocated: </span>{list(g.resp)}
+          </React.Fragment>
+        )}
+      </React.Fragment>
+    );
+  };
   return (
     <span className="pd-meta-i">
       {/* one label whatever the row carries: it lists implied AND published
@@ -2106,18 +2137,14 @@ function EffLines({ eff }) {
       <span className="pd-meta-v">
         {shareOut ? (prim.t ? (
           <React.Fragment>
-            {tppList(true)}
-            {eff.onimp && eff.onimp.t && <React.Fragment>; {clause(asThen(eff.onimp), "ON")}</React.Fragment>}
-            {eff.onp && eff.onp.t && <React.Fragment>; {clause(asThen(eff.onp), "ON", eff.onimp && eff.onimp.t ? respTag : null)}</React.Fragment>}
+            {byBasis(true)}
             <span className="pd-s-note">, when inside {winSpan(prim.m)}</span>
           </React.Fragment>
         ) : (
           <span className="pd-s-note">None. Outside {winSpan(prim.m)}</span>
         )) : (
           <React.Fragment>
-            {tppList(false)}
-            {eff.onimp && <React.Fragment>; {clause(eff.onimp, "ON")}</React.Fragment>}
-            {eff.onp && <React.Fragment>; {clause(eff.onp, "ON", eff.onimp ? respTag : null)}</React.Fragment>}
+            {byBasis(false)}
           </React.Fragment>
         )}
       </span>

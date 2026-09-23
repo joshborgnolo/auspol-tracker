@@ -1,6 +1,6 @@
 ---
 name: auspol-poll-aggregate-effect
-description: auspol-tracker — the per-poll "2PP effect" provenance-band row (gen-data `eff` payload, EffLines; line shipped d10c376 → meta-band parenthetical 77dd1f3 → plain meta row 0ebf814): gen-data effByKey leave-one-out (house effects NOT re-estimated; out-of-window = `eff.t` on-publication-day pull "…, when inside …" or bare "None."; ±4pt build throw), ONE shared component in a11e1559 (window-exported, consumed by both renderers) as an ordinary .pd-meta-i closing the meta band, eff spread in BOTH emitters (individualPolls + pollsterTable). Row LABEL is the bare "2PP agg. effect" ALWAYS (4f422e2, 2026-09-20 — b3f7452's "implied 2PP agg. effect" was reverted the same night: the row lists implied AND published clauses, so a basis in the label claimed the wrong thing for half of them); per-clause "(implied 2PP)" hi-term tags REMOVED b3f7452 and stay removed — an untagged clause IS the implied one, the page's default basis; "(respondent-allocated)" respTag prints only on a published clause sitting beside an implied one (incl. onp-vs-onimp disambiguation); eff.onimp first-principles implied ALP-v-ON added 9f1f912. Probe lesson: expand-row matching takes [pollster, field] as an ARRAY — pollster-only matching silently expands that house's NEWEST wave.
+description: auspol-tracker — the per-poll "2PP effect" provenance-band row (gen-data `eff` payload, EffLines; line shipped d10c376 → meta-band parenthetical 77dd1f3 → plain meta row 0ebf814): gen-data effByKey leave-one-out (house effects NOT re-estimated; out-of-window = `eff.t` on-publication-day pull "…, when inside …" or bare "None."; ±4pt build throw), ONE shared component in a11e1559 (window-exported, consumed by both renderers) as an ordinary .pd-meta-i closing the meta band, eff spread in BOTH emitters (individualPolls + pollsterTable). Row LABEL is the bare "2PP agg. effect" ALWAYS (4f422e2, 2026-09-20 — b3f7452's "implied 2PP agg. effect" was reverted the same night: the row lists implied AND published clauses, so a basis in the label claimed the wrong thing for half of them); per-clause "(implied 2PP)" hi-term tags REMOVED b3f7452 and stay removed — an untagged clause IS the implied one, the page's default basis; published resp-allocated clauses sit behind ONE shared ". Respondent-allocated: " lead-in span after the semicolon-joined default clauses (grouping shipped 2026-09-22, replacing the per-clause "(respondent-allocated)" respTag — the default group states each pairing exactly once: implied figure preferred, published only when no implied exists; the resp group holds a published clause ONLY when its implied counterpart is already in the default group); eff.onimp first-principles implied ALP-v-ON added 9f1f912. Probe lesson: expand-row matching takes [pollster, field] as an ARRAY — pollster-only matching silently expands that house's NEWEST wave.
 source: auto-skill
 extracted_at: '2026-09-04T00:45:00.000Z'
 ---
@@ -55,6 +55,15 @@ poll.
   glossary link to `implied-2pp`) / `Effect on Labor's 2PP aggregate vs
   One Nation: `. Signed move renders like ChgParen, true minus U+2212,
   `+0.0` for a nil pull (user 2026-09-20: was `±0.0`, read as a range); window note is a trailing clause, not a separate line.
+- Clause grouping (2026-09-22, user-directed): `groups()` builds
+  `def` = each pairing ONCE (implied branch preferred, else published,
+  unlabelled), `resp` = published branch ONLY where its implied
+  counterpart already sits in `def`; `byBasis()` renders
+  `list(def)` joined `"; "`, then `". Respondent-allocated: "` (the
+  lead-in is a `pd-s-note` span) + `list(resp)` when resp is non-empty.
+  Pairing order L/NP then ON. The per-clause respTag machinery is gone
+  — do not reintroduce a published-alone case as labelled (it renders
+  unlabelled in `def`).
 - CSS `.pd-s.pd-s-eff` in template.html CLONES the `.pd-s.pd-s-basis`
   block (caption, `var(--pd-ink-2)`, `var(--pd-body)`, bold figures at
   `var(--pd-fig)`, word-spacing 2px) — its rules sit directly after the
