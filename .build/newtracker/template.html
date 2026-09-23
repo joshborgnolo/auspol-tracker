@@ -2097,18 +2097,19 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 /* Sits at the end of the detail's own meta line - so it needs no space of its
    own, lands inside the panel's tint rather than on a pale band above it, and
    aligns with the panel's content instead of with the table cell behind it. */
-/* ---- Info: the glossary, then the FAQ -----------------------------------
+/* ---- Info: About, then Questions, then the Glossary by topic -------------
    One paragraph per term, the term bolded and its definition running straight
    on from it. A printed glossary's shape rather than a table's, because these
    are sentences and not fields - and a measure narrower than the page, because
-   they are read rather than scanned. The FAQ below reuses the same typography
+   they are read rather than scanned. The questions reuse the same typography
    with the question carrying the bold. */
 .info { max-width: 66ch; }
 /* on a laptop the glossary and the FAQ each run in two balanced columns,
    printed-glossary fashion; the per-column measure lands back near 66ch */
 @media (min-width: 1100px) {
   .info { max-width: none; columns: 2; column-gap: 48px; }
-  .info > .info-h { column-span: all; }
+  .info > .info-h, .info > .info-index, .info > .info-about { column-span: all; }
+  .info > .info-about { columns: 2; column-gap: 48px; }
   .info .info-term { break-inside: avoid; }
   /* A chart-bearing entry spans BOTH columns. Inside a fragmented term,
      WebKit reports a nonsense getBoundingClientRect for the box (the
@@ -2128,6 +2129,31 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .info-term { margin: 0 0 20px; font-size: 15px; line-height: 1.62;
   color: var(--ink-2); text-wrap: pretty; }
 .info-t { color: var(--ink); font-weight: 700; }
+/* the entry name is a real h3/h4 for assistive tech, set run-in like the old
+   <strong> so the definition still runs straight on from it */
+.info-term .info-t { display: inline; font: inherit; font-weight: 700; margin: 0;
+  letter-spacing: normal; }
+/* the page index: one quiet row of jump buttons above About */
+.info-index { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 22px;
+  font-size: 13px; }
+.info-index button { background: none; border: 0; padding: 0; cursor: pointer;
+  color: var(--ink-3); font: inherit; text-decoration: underline;
+  text-decoration-color: var(--line-2); text-underline-offset: 3px; }
+.info-index button:hover { color: var(--ink); text-decoration-color: currentColor; }
+/* About reads as the page's opening, in the glossary's typography */
+.info-about-p { margin: 0 0 12px; font-size: 15px; line-height: 1.62;
+  color: var(--ink-2); text-wrap: pretty; }
+.info-about { margin-bottom: 8px; }
+/* a topic title inside the glossary: smaller than the section titles */
+.info-group { font-family: var(--serif); font-size: 17px; font-weight: 600;
+  color: var(--ink); margin: 26px 0 12px; break-after: avoid; }
+.info-group:first-of-type { margin-top: 4px; }
+/* the formula fold under a definition */
+.info-working { margin: 9px 0 0; }
+.info-working > summary { cursor: pointer; font-size: 13px; color: var(--ink-3);
+  width: max-content; }
+.info-working > summary:hover { color: var(--ink); }
+.info-working[open] > summary { margin-bottom: 2px; }
 /* a worked-example paragraph INSIDE one entry, set off under its definition
    (Weighted aggregate's primary/2PP walkthroughs); display:block so it rides
    the term's own typography untouched */

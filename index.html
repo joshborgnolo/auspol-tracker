@@ -1374,7 +1374,8 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .info { max-width: 66ch; }
 @media (min-width: 1100px) {
   .info { max-width: none; columns: 2; column-gap: 48px; }
-  .info > .info-h { column-span: all; }
+  .info > .info-h, .info > .info-index, .info > .info-about { column-span: all; }
+  .info > .info-about { columns: 2; column-gap: 48px; }
   .info .info-term { break-inside: avoid; }
   .info .info-term:has(.info-chart) { column-span: all; }
 }
@@ -1384,6 +1385,25 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .info-term { margin: 0 0 20px; font-size: 15px; line-height: 1.62;
   color: var(--ink-2); text-wrap: pretty; }
 .info-t { color: var(--ink); font-weight: 700; }
+.info-term .info-t { display: inline; font: inherit; font-weight: 700; margin: 0;
+  letter-spacing: normal; }
+.info-index { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0 0 22px;
+  font-size: 13px; }
+.info-index button { background: none; border: 0; padding: 0; cursor: pointer;
+  color: var(--ink-3); font: inherit; text-decoration: underline;
+  text-decoration-color: var(--line-2); text-underline-offset: 3px; }
+.info-index button:hover { color: var(--ink); text-decoration-color: currentColor; }
+.info-about-p { margin: 0 0 12px; font-size: 15px; line-height: 1.62;
+  color: var(--ink-2); text-wrap: pretty; }
+.info-about { margin-bottom: 8px; }
+.info-group { font-family: var(--serif); font-size: 17px; font-weight: 600;
+  color: var(--ink); margin: 26px 0 12px; break-after: avoid; }
+.info-group:first-of-type { margin-top: 4px; }
+.info-working { margin: 9px 0 0; }
+.info-working > summary { cursor: pointer; font-size: 13px; color: var(--ink-3);
+  width: max-content; }
+.info-working > summary:hover { color: var(--ink); }
+.info-working[open] > summary { margin-bottom: 2px; }
 .info-p { display: block; margin: 7px 0 0; }
 .info-term.lit {
   border-left: 2px solid var(--accent);
@@ -43096,203 +43116,289 @@ function infoTerms(D) {
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm(to, from)
   }, label);
-  const list = [{
-    id: "approval",
-    term: "Approval",
-    body: React.createElement(React.Fragment, null, "A verdict on the job: approve minus disapprove for a leader\u2019s performance. Essential asks, \u201CDo you approve or disapprove of the job Anthony Albanese is doing as Prime Minister?\u201D. YouGov and Newspoll ask, \u201CAre you satisfied or dissatisfied with the way Anthony Albanese is doing his job as Prime Minister?\u201D. Resolve asks, \u201CHow would you rate Angus Taylor\u2019s performance as opposition leader in recent weeks?\u201D.", " ", xref("favourability", "approval", "Favourability"), " is a different question \u2013 about the person, not the job \u2013 asked by the houses that ask it instead. The numbers it feeds are what ", xref("net-approval", "approval", "net approval"), " records.")
+  const working = children => React.createElement("details", {
+    className: "info-working"
+  }, React.createElement("summary", null, "Show the working"), children);
+  const eff = React.createElement(React.Fragment, null, "n", React.createElement("sub", null, "eff"));
+  const groups = [{
+    id: "g-headline",
+    title: "The headline and how it is built",
+    entries: [{
+      id: "weighted-aggregate",
+      term: "Weighted aggregate",
+      body: React.createElement(React.Fragment, null, "How the headline is built. It averages the recent polls, giving more weight to newer and larger ones, after removing each pollster\u2019s known lean \u2013 its", " ", xref("house-effect", "weighted aggregate", "house effect"), ".", React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Recency."), " A poll\u2019s weight halves every seven days. It counts in full for two weeks, then fades smoothly to nothing by day 21, when it leaves the window."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Size."), " Larger samples count for more. Where a pollster files an ", xref("effective-sample", "weighted aggregate", "effective sample"), " with the Australian Polling Council, that figure is used; otherwise the raw sample, capped at 3,000."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Repeat polls."), " A pollster that publishes several times in the window counts for the square root of its number of polls, so three weekly Roy Morgan polls count as 1.7, not 3."), React.createElement("span", {
+        className: "info-p"
+      }, "The headline two-party figure runs each poll\u2019s primary votes through the fixed 2025 preference table \u2013 the", " ", xref("implied-2pp", "weighted aggregate", "implied 2PP"), " \u2013 so every poll that publishes primaries counts.", SL ? React.createElement(React.Fragment, null, " Today that is ", SL.alp.toFixed(1), "\u2013", SL.lnp.toFixed(1), " to Labor.") : null, " The pollsters\u2019 own published figures go through the same machinery for the version the chart switches to: ", L.alp2pp.toFixed(1), "\u2013", L.lnp2pp.toFixed(1), "."), React.createElement("span", {
+        className: "info-p"
+      }, "The monthly trend line uses the same method without the recency weighting, and so do the leader ratings and national direction. Preferred prime minister and the undecided share are plain", " ", xref("monthly-average", "weighted aggregate", "monthly averages"), ": their differences between pollsters come from the questions asked, not from a lean to correct."), working(React.createElement(React.Fragment, null, React.createElement("span", {
+        className: "info-p"
+      }, "The headline is \u03A3w\u1D62x\u1D62 \xF7 \u03A3w\u1D62 over the polls in the 21-day window, where x\u1D62 is a poll\u2019s figure minus its house effect and w\u1D62 = n\u1D62 \xD7 2^(\u2212d/7) \xD7 t(d) \xF7 \u221Am."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "n\u1D62"), " is the poll\u2019s sample: its published effective sample \xD7 1.6 (the design factor) where the pollster files one \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog do \u2013 otherwise its raw sample capped at 3,000, or 1,200 if no sample is given. ", React.createElement("b", null, "d"), " is the poll\u2019s age in days, counted from its fieldwork midpoint. ", React.createElement("b", null, "t(d)"), " is 1 up to day 14, then a half-cosine taper to 0 at day 21. ", React.createElement("b", null, "m"), " is the number of polls that pollster has in the window. The window\u2019s effective sample is (\u03A3w\u1D62)\xB2 \xF7 \u03A3w\u1D62\xB2. If the window is empty, the last monthly point stands in."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Worked example: the Labor primary."), " Each party\u2019s primary is estimated the same way. The five are rescaled only if their total sits more than half a point from the plain-average total, so a real shortfall from undecided voters is kept."), primWork, React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Worked example: the published 2PP."), " A pair published with undecided voters still inside it is rebased to 100 first. A pollster that publishes no pair adds no row."), tppWork)))
+    }, {
+      id: "house-effect",
+      term: "House effect",
+      body: React.createElement(React.Fragment, null, "A pollster\u2019s consistent lean relative to the others. Each of its polls is compared with other pollsters\u2019 polls taken around the same time, and those gaps are pooled with a 90-day half-life, so the lean tracks the pollster\u2019s current methods. While the evidence is thin, it is shrunk toward zero. It is measured separately for each figure: a pollster that leans to Labor on the two-party figure need not lean the same way on a primary vote. The aggregate subtracts it before averaging.")
+    }, {
+      id: "house-lean",
+      term: "House lean",
+      body: React.createElement(React.Fragment, null, "A pollster\u2019s ", xref("house-effect", "house lean", "house effect"), " traced month by month, so a change of method or ownership shows where it happened instead of being smeared across its history. The aggregate always subtracts the house effect as it stood at the time of each figure.")
+    }, {
+      id: "poll-lean",
+      term: "Poll lean",
+      body: React.createElement(React.Fragment, null, "How far one poll sits from the aggregate for the month it was taken. It describes that poll, not the pollster: sampling luck alone can put a single poll off the pace. A pollster whose polls lean the same way again and again is showing its", " ", xref("house-effect", "poll lean", "house effect"), ". Poll lean is sortable in the All polls table and shown in each poll\u2019s breakdown.")
+    }, {
+      id: "aggregate-effect",
+      term: "Aggregate effect",
+      body: React.createElement(React.Fragment, null, "How much one poll moves the headline. The poll\u2019s breakdown recalculates the", " ", xref("weighted-aggregate", "aggregate effect", "weighted aggregate"), " without it and shows the difference: \u201C+0.1 for ALP\u201D means today\u2019s two-party figure is a tenth of a point higher because this poll is in the window. A poll older than 21 days moves nothing now, and says so, with what it was worth on the day it was published where that can still be worked out. One line appears for each figure the poll feeds: the published two-party figure, the ", xref("implied-2pp", "aggregate effect", "implied 2PP"), " (which a poll with no published pair still feeds through its primaries), and Labor v One Nation where the poll asked it. House effects are left as measured, since they belong to the pollster, not the poll; only the average is recalculated.")
+    }, {
+      id: "monthly-average",
+      term: "Monthly average",
+      body: React.createElement(React.Fragment, null, "What a contest gets when too few pollsters ask it to measure their", " ", xref("house-effect", "monthly average", "house effects"), ": a plain average of the month\u2019s polls, with no adjustments. The hero says which kind it is showing, so an unadjusted average is never mistaken for the more precise one.")
+    }]
   }, {
-    id: "favourability",
-    term: "Favourability",
-    body: React.createElement(React.Fragment, null, "A verdict on the person: positive minus negative, for the houses that ask favour rather than job performance. RedBridge/Accent asks \u201CDo you have a favourable or unfavourable view of the following?\u201D, DemosAU asks \u201CQ. What is your opinion of the following people?\u201D with positive, neutral and negative on offer, and Freshwater its own form of it. Not interchangeable with ", xref("approval", "favourability", "approval"), " \u2013 a leader can be approved of for the job and disliked as a person, or the reverse \u2013 so the two measures sit in separate panels rather than one averaged line. ", " ", "The ", xref("net-approval", "favourability", "net approval"), " lines join each house\u2019s own readings without pretending they measure the same thing.")
+    id: "g-uncertainty",
+    title: "Uncertainty",
+    entries: [{
+      id: "interval",
+      term: "95% interval",
+      body: React.createElement(React.Fragment, null, "How far the headline could plausibly be off. Today that\u2019s \xB1", hl.ci.toFixed(1), " points on each party\u2019s share, and \xB1", (2 * hl.ci).toFixed(1), " on the lead. The lead is a gap between two shares, so anything that moves one share moves the gap twice as far.", React.createElement("span", {
+        className: "info-p"
+      }, "The interval takes the larger of two measures: how much the polls in the window disagree, and how much chance alone would scatter them if they all agreed. So it widens when the pollsters split, and never claims more precision than their samples allow."), React.createElement("span", {
+        className: "info-p"
+      }, "Unfortunately, it can\u2019t see an error every poll shares. When the whole industry leans one way", accShared ? React.createElement(React.Fragment, null, ", as all ", accShared.n, " houses did in ", accShared.year) : null, ", the interval has no way to know. A move smaller than the interval is reported as within it, not as a change."), working(React.createElement(React.Fragment, null, React.createElement("span", {
+        className: "info-p"
+      }, "1.96 \xD7 the larger of two standard errors, both taken on the weights w\u1D62 of the ", xref("weighted-aggregate", "95% interval", "weighted aggregate"), "."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Spread:"), " \u221A(\u03A3w\u1D62(x\u1D62 \u2212 x\u0304)\xB2 \xF7 \u03A3w\u1D62 \xF7 (nEff \u2212 1)). This is the polls\u2019 scatter around their weighted mean x\u0304, where nEff is the", " ", xref("effective-sample", "95% interval", "effective sample"), "."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Sampling floor:"), " \u221A(\u03A3w\u1D62\xB2 \xD7 1.6 \xD7 p\u0302(1\u2212p\u0302) \xF7 n\u1D62) \xF7 \u03A3w\u1D62. Here p\u0302 is the aggregate\u2019s own share, and 1.6 is the design effect of a weighted panel."))))
+    }, {
+      id: "margin-of-error",
+      term: "Margin of error",
+      body: React.createElement(React.Fragment, null, "How far a single poll can miss purely because it surveyed a sample rather than everyone. A thousand respondents carry about \xB13 points at 95% confidence. The error shrinks only with the square root of the sample, so four times the interviews halves it. It covers chance and nothing else: skewed samples, turnout assumptions and a pollster\u2019s methods sit outside it. Pooling several polls narrows the chance part, which is why the headline\u2019s", " ", xref("interval", "margin of error", "95% interval"), " (\xB1", hl.ci.toFixed(1), " today) is tighter than one poll\u2019s \xB13. The part every pollster shares doesn\u2019t shrink at all.")
+    }, {
+      id: "effective-sample",
+      term: "Effective sample",
+      body: React.createElement(React.Fragment, null, "How many polls the window is really worth once weighting is counted: today, ", hl.nEff, " of the ", hl.n, " in it. Older polls, smaller samples and repeat polls from one pollster all pull it below the raw count. The ", xref("interval", "effective sample", "95% interval"), " is computed from it.", React.createElement("span", {
+        className: "info-p"
+      }, "A single poll has its own version, shown as ", eff, " beside its sample: the effective sample its pollster files in its", " ", xref("apc-statement", "effective sample", "APC statement"), ", which says what that one sample is worth after weighting."))
+    }, {
+      id: "poll-disagreement",
+      term: "Poll disagreement",
+      body: React.createElement(React.Fragment, null, "The panel that asks whether the pollsters disagree more than chance explains. No two polls match even when opinion hasn\u2019t moved, because each surveys a different sample. The panel compares the spread the pollsters actually show with the spread their sample sizes alone would produce \u2013 the chance floor \u2013 and gives one of four verdicts:", React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Herded"), " (under 0.80\xD7): closer together than independent samples can be, which suggests pollsters are adjusting towards each other."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Chance-consistent"), " (0.80\u20131.20\xD7): as close as sampling allows. This is what healthy polling looks like, not a sign the pollsters have compared notes."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Mild divergence"), " (1.20\u20131.60\xD7): a little further apart than chance explains, so something real sits on top of it, such as different weighting, different voters reached, or opinion moving at different speeds."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Real disagreement"), " (1.60\xD7 or more): the gap can\u2019t be chance. The pollsters aren\u2019t measuring one number with different luck."))
+    }]
   }, {
-    id: "interval",
-    term: "95% interval",
-    body: React.createElement(React.Fragment, null, "The uncertainty carried beside the headline: the greater of the spread among the polls in the window and their ", xref("margin-of-error", "95% interval", "sampling error"), " \u2013 \xB1", hl.ci.toFixed(1), " points on a share, so \xB1", (2 * hl.ci).toFixed(1), " beside the lead it sits with, since the lead moves twice as far as either share \u2013 on ", hl.n, " polls across ", L.method.windowDays, " ", "days. Full formula: it is 1.96 \xD7 the greater of two standard errors taken on exactly the weights w\u1D62 the ", xref("weighted-aggregate", "95% interval", "weighted aggregate"), " is built from. The spread term is \u221A(\u03A3w\u1D62(x\u1D62 \u2212 x\u0304)\xB2 \xF7 \u03A3w\u1D62 \xF7 (nEff \u2212 1)) \u2013 the window\u2019s polls scattered around their own weighted mean x\u0304, divided down by the ", xref("effective-sample", "95% interval", "effective sample"), " nEff less one. The sampling-error floor is \u221A(\u03A3 w\u1D62\xB2 \xD7 1.6 \xD7 p\u0302(1\u2212p\u0302) \xF7 n\u1D62) \xF7 \u03A3w\u1D62 \u2013 what sampling luck alone would still cost a window where every house agreed exactly, with p\u0302 the aggregate\u2019s own share and 1.6 the design effect of a weighted national panel rather than a simple random sample. The greater of the two terms binds, so the interval prices disagreement among the houses when they show it and never promises better than chance itself when they don\u2019t. It cannot cover error the whole industry shares, because an aggregate has no way to see a lean every poll inside it carries. Movement smaller than the interval is marked as such rather than reported as a change.")
+    id: "g-2pp",
+    title: "Two-party preferred and preferences",
+    entries: [{
+      id: "two-party-preferred",
+      term: "Two-party preferred",
+      body: React.createElement(React.Fragment, null, "Each party\u2019s share after every other candidate\u2019s preferences have been distributed between the final two. It\u2019s the figure that decides seats. The hero shows Labor against the Coalition and the other head-to-heads pollsters publish. Both Labor contests lead with the ", xref("implied-2pp", "two-party preferred", "implied figure"), ", with the pollsters\u2019 own published figures a switch away. A contest no fixed table covers, such as the Coalition against One Nation, is shown as published.")
+    }, {
+      id: "primary-vote",
+      term: "Primary vote",
+      body: React.createElement(React.Fragment, null, "The share of voters who put a party first, before any preferences are distributed. Polls that publish no two-party figure still feed this series, the implied 2PP and the leader ratings.")
+    }, {
+      id: "implied-2pp",
+      term: "Implied 2PP",
+      body: React.createElement(React.Fragment, null, "The site\u2019s main two-party figure, and the one on the hero, the share card and the summary. It takes each poll\u2019s primary votes and distributes the minor parties\u2019 shares using one fixed ", xref("preference-flows", "implied 2PP", "preference table"), ": the flows counted at the 2025 election. Every pollster allocates preferences its own way, so using one table for all of them means the figure moves when voters do, not when the mix of pollsters changes. It also lets every poll that publishes primaries count.", React.createElement("span", {
+        className: "info-p"
+      }, "A switch under the two-party heading shows the pollsters\u2019 own published figures instead. Neither is the true 2PP.", D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? React.createElement(React.Fragment, null, " Today the implied figure reads ", D.synthLatest.alp.toFixed(1), " against the published", " ", L.alp2pp.toFixed(1), ": a gap, not a verdict. With One Nation on ", onp, "% of the primary vote, five points of doubt about where its preferences go moves the two-party figure", " ", (prim.onp * 0.05).toFixed(1), " points either way.") : null), L.onImp ? React.createElement("span", {
+        className: "info-p"
+      }, "Labor v One Nation uses a different table, the", " ", xref("fp-flows", "implied 2PP", "first-principles flow set"), ", because no election has ever counted that pairing: ", L.onImp.a.toFixed(1), " to Labor,", " ", L.onImp.b.toFixed(1), " to One Nation, \xB1", L.onImp.band.toFixed(1), ".") : null)
+    }, {
+      id: "preference-flows",
+      term: "Preference flows",
+      body: React.createElement(React.Fragment, null, "How minor-party votes split between the final two candidates once preferences are distributed. The ", xref("implied-2pp", "preference flows", "implied 2PP"), " uses the flows counted at the 2025 election", " ", "(", React.createElement("a", {
+        href: "https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm",
+        target: "_blank",
+        rel: "noopener noreferrer"
+      }, "Greens 88.2%, One Nation 25.5% and all others 54.6% to Labor"), ").", React.createElement("span", {
+        className: "info-chart"
+      }, React.createElement(FlowChart, null)), "Party-by-party flows exist only from 1996, when full preference data was first published; One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses a different table, the ", xref("fp-flows", "preference flows", "first-principles flow set"), ", because no election has counted that pairing.")
+    }, {
+      id: "fp-flows",
+      term: "First-principles flow set",
+      body: React.createElement(React.Fragment, null, "The preference table behind the Labor v One Nation figure. The site built it, because no election has ever counted a Labor v One Nation contest to take flows from. Three settings do all the work: Coalition voters give 31.5% to Labor (\xB12.5), Greens 89% (\xB13) and everyone else 53% (\xB13). The rest go to One Nation.", L.onImp && prim ? React.createElement("span", {
+        className: "info-p"
+      }, "On today\u2019s primaries: Labor\u2019s ", prim.alp.toFixed(1), ", plus 31.5% of the Coalition\u2019s ", prim.lnp.toFixed(1), ", 89% of the Greens\u2019", " ", prim.grn.toFixed(1), " and 53% of the others\u2019 ", prim.oth.toFixed(1), ", gives", " ", L.onImp.a.toFixed(1), " to Labor and ", L.onImp.b.toFixed(1), " to One Nation. The \xB1", L.onImp.band.toFixed(1), " adds up the three settings\u2019 ranges. It measures doubt about the table, not sampling chance.") : null, React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Where the numbers come from."), " They\u2019re built from the counted ballots that do exist: the AEC\u2019s 2025 Senate ballot data, re-checked against the 2026 lower-house contests where One Nation made the final two and preferences were counted \u2013 the SA state election and the Secret Harbour by-election. The table stays fixed between such counts and is never fitted to current polls. The pollsters\u2019 own Labor v One Nation figures rely on respondents saying where their preferences would go, with no count to check them against. They stay on the chart as a cross-check."))
+    }, {
+      id: "undecided",
+      term: "Undecided",
+      body: React.createElement(React.Fragment, null, "Voters who won\u2019t name a party: the \u201Ccan\u2019t say\u201D share. It\u2019s shown beside the soft vote, people who name a party but say their choice isn\u2019t firm. They\u2019re different questions, so they\u2019re kept as separate lines.", React.createElement("span", {
+        className: "info-p"
+      }, "Pollsters also treat undecided voters differently, and each poll\u2019s breakdown says which way:"), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Set aside"), " (Roy Morgan, DemosAU): removed before party shares are calculated, so the primaries sum to 100."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Inside the pair"), " (Essential): left inside the published two-party figure, which then sums to less than 100."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Not firm"), " (Resolve): not undecided at all, but decided voters who say they might still change their mind."))
+    }]
   }, {
-    id: "effective-sample",
-    term: "Effective sample",
-    body: React.createElement(React.Fragment, null, "How many polls the window is really worth once weighting is applied \u2013 currently", " ", hl.nEff, " of the ", hl.n, " in it. Recency, sample size and the square-root discount on repeat waves all pull it below the raw count, and it is what the ", xref("interval", "effective sample", "95% interval"), " is computed against.", " ", "A single poll carries its own version of the same idea, written n", React.createElement("sub", null, "eff"), " beside its sample in the poll breakdown: the effective sample its pollster files with the ", " ", xref("apc-statement", "effective sample", "Australian Polling Council"), ", describing what that one sample is worth rather than what the window is.")
+    id: "g-pollsters",
+    title: "Pollsters and their polls",
+    entries: [{
+      id: "house",
+      term: "House",
+      body: React.createElement(React.Fragment, null, "A polling company: Newspoll, YouGov, Resolve and the rest. The industry calls them houses. A single poll release is often called a wave.")
+    }, {
+      id: "apc-statement",
+      term: "APC statement",
+      body: React.createElement(React.Fragment, null, "The methodology statement a pollster files with the Australian Polling Council, the industry body. Members publish one for each poll, covering fieldwork dates and method, the raw sample, the effective sample (what that sample is worth after weighting), the weighting used and the question order.", React.createElement("span", {
+        className: "info-p"
+      }, "A poll\u2019s breakdown links its statement where there is one, and reads both sample figures off it. The effective sample, scaled back up by the 1.6 design factor, sets the poll\u2019s weight in the", " ", xref("weighted-aggregate", "APC statement", "weighted aggregate"), ". Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them. Where a pollster files none, the breakdown shows the raw sample alone and the ", eff, " column shows a dash: the site doesn\u2019t invent a figure the pollster never published."))
+    }, {
+      id: "mrp",
+      term: "MRP",
+      body: React.createElement(React.Fragment, null, "Multilevel regression and post-stratification: a model that estimates each seat separately instead of applying one national swing everywhere. Seat figures appear on this site only where a pollster built such a model and published the results. The MRP tag in the archive marks those polls.")
+    }, {
+      id: "next-polls",
+      term: "Next polls",
+      body: React.createElement(React.Fragment, null, "When each pollster is likely to publish next, forecast from its own track record. The dates are merely estimates.", React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "The date."), " It is the house\u2019s last release plus the median of its last eight gaps between releases, nudged by up to three days onto the weekday it usually publishes. Gaps are measured between publication dates where the record has them, since publication is what\u2019s being forecast."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "The \xB1."), " It is half the spread of those gaps, leaving out the longest and shortest, and it widens for releases further out. For a house that always publishes on the same weekday, it moves in whole weeks. If the forecast lands at the early edge of the house\u2019s record, only a later day is named as the alternative: \u201C(or Wed 7 Oct)\u201D."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Times."), " A publishing hour appears once a house has been timed often enough. It is given in the publisher\u2019s own time zone (AEDT in summer, AEST otherwise), and \u201Ctoday\u201D means today in Sydney."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Late polls."), " When a date passes with no poll, the row stays and keeps counting. It turns red once the whole window has passed, and leaves only when the poll itself is added. The countdown in the tab bar works the same way. A house too irregular for a date gets a window instead. Roy Morgan\u2019s stated schedule is taken at its word, even though it doesn\u2019t always keep it. Houses that stop publishing are removed by hand."), React.createElement("span", {
+        className: "info-p"
+      }, "Open a row to see the house\u2019s five most recent releases and its release page, so you can check the forecast against its record."))
+    }]
   }, {
-    id: "apc-statement",
-    term: "APC statement",
-    body: React.createElement(React.Fragment, null, "The methodology disclosure a pollster files with the Australian Polling Council, the industry body whose members publish a standard statement per wave: fieldwork dates and mode, the raw sample, the ", " ", xref("effective-sample", "apc-statement", "effective sample"), " that sample is worth after weighting, and the weighting scheme and question order behind the figures. A wave\u2019s poll breakdown links its statement where one is on record and reads its two published sample figures off it \u2013 the raw count and the effective one. The effective sample, scaled back up by the 1.6 design factor, is that wave\u2019s n\u1D62 in the", " ", xref("weighted-aggregate", "apc-statement", "weighted aggregate"), ". Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them; where a house files none, the poll breakdown carries its raw sample alone and the archive\u2019s n", React.createElement("sub", null, "eff"), " column dashes \u2013 a precision figure the pollster never published is not this site\u2019s to invent.")
-  }, {
-    id: "house-effect",
-    term: "House effect",
-    body: React.createElement(React.Fragment, null, "A pollster\u2019s own lean against the consensus of the houses polling around it, pooled from its polls with a 90-day half-life so recent polls count for more \u2013 the lean tracks a house\u2019s current method rather than averaging it with its history \u2013 and shrunk toward zero while the evidence is thin. The aggregates subtract it, read as of the time each figure describes. It is measured separately for every measure \u2013 a firm that leans one way on the classic two-party is not assumed to lean the same way on a primary share or on an ALP-v-One Nation head-to-head \u2013 and it is a property of the pollster, not of any single poll.")
-  }, {
-    id: "poll-lean",
-    term: "Poll lean",
-    body: React.createElement(React.Fragment, null, "How far one published poll sits from the consensus around it: the poll\u2019s own figure minus the weighted aggregate for the month it was taken. It is a property of this one poll, not of the pollster \u2013 sampling luck alone can land a survey off the consensus, so a single lean carries little weight; a house leaning the same way over and over is showing ", xref("house-effect", "poll-lean", "its house effect"), ". Poll lean is sortable in the All polls archive and printed in each poll\u2019s breakdown.")
-  }, {
-    id: "house-lean",
-    term: "House lean",
-    body: React.createElement(React.Fragment, null, "A pollster\u2019s ", xref("house-effect", "house-lean", "house effect"), " read month by month instead of only as it stands now, so a change of method or hands shows up where it happened rather than smeared across the house\u2019s history. Estimated per measure \u2013 a firm can walk one way on two-party and another on a primary share \u2013 and the aggregates still subtract the as-of-date value; the trace is the same estimator re-read at each month.")
-  }, {
-    id: "chance-consistent",
-    term: "Chance-consistent",
-    body: React.createElement(React.Fragment, null, "The Poll disagreement panel\u2019s verdict when the houses agree as well as polling lets them. Even on an unmoved electorate no two surveys match, because each is a sample: a scatter of", " ", xref("margin-of-error", "chance-consistent", "sampling error"), " around the truth is expected. The panel sets the spread the houses actually show against the spread sampling error alone predicts \u2013 the chance floor, built from each poll\u2019s own sample size \u2013 and a ratio between 0.80\xD7 and 1.20\xD7 reads chance-consistent. Tighter than 0.80\xD7 and the polls are huddled closer than independent sampling can explain \u2013 herding; wider than 1.20\xD7 and they begin to ", xref("mild-divergence", "chance-consistent", "diverge"), ". It is the ordinary state of healthy polling, not evidence the houses have compared notes.")
-  }, {
-    id: "mild-divergence",
-    term: "Mild divergence",
-    body: React.createElement(React.Fragment, null, "A little further apart than chance can explain. On the Poll disagreement panel the ratio of the houses\u2019 actual spread to the chance floor has passed 1.20\xD7 without reaching 1.60\xD7: sampling scatter alone no longer covers the gap, so something real sits on top of it \u2013 houses weighting differently, reaching different voters, or genuinely moving at different speeds. The excess stays modest; past 1.60\xD7 the panel drops the hedge and calls it", " ", xref("real-disagreement", "mild-divergence", "real disagreement"), ". Below 1.20\xD7 the same ratio reads ", " ", xref("chance-consistent", "mild-divergence", "chance-consistent"), " \u2013 the spread chance\u2019s own making.")
-  }, {
-    id: "real-disagreement",
-    term: "Real disagreement",
-    body: React.createElement(React.Fragment, null, "The Poll disagreement panel\u2019s verdict when the houses disagree further than polling lets them. The chance floor already prices the scatter of independent samples \u2013 each survey missing by its own ", xref("margin-of-error", "real-disagreement", "sampling error"), " \u2013 so when the houses\u2019 actual spread reaches 1.60\xD7 that floor, the excess can no longer be chance. What remains is structural: houses weighting differently, reaching different voters, or carrying ", xref("house-effect", "real-disagreement", "house effects"), " too strong to cancel out. Below 1.60\xD7 the reading hedges as ", xref("mild-divergence", "real-disagreement", "mild divergence"), "; past it, the polls are not measuring one number with different luck.")
-  }, {
-    id: "implied-2pp",
-    term: "Implied 2PP",
-    body: React.createElement(React.Fragment, null, "The site\u2019s default two-party figure: what the same polls\u2019 own primary votes add up to under one fixed ", xref("preference-flows", "implied 2PP", "preference-flow table"), ". It leads the hero, the share card and the summary, because one fixed table answers every poll the same way \u2013 the published figures let each house answer it differently, so the aggregate moves when the mix of houses moves, not only when voters do. The switch under the two-party heading returns the chart to the pollsters\u2019 own respondent-allocated figures, dots and all. Neither is the true 2PP;", D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? React.createElement(React.Fragment, null, " today the fixed table reads ", D.synthLatest.alp.toFixed(1), " against the pollsters\u2019 own", " ", L.alp2pp.toFixed(1), " \u2013 a gap, not a verdict. At One Nation\u2019s current ", onp, "% primary, five points of doubt about their flow rate is ", (prim.onp * 0.05).toFixed(1), " points of two-party either way.") : null, L.onImp ? React.createElement(React.Fragment, null, " Labor v One Nation stands on this basis for a harder reason: no election count of that pairing exists to discipline the houses\u2019 uncoordinated allocations, so the figure is the current primaries run through a ", xref("fp-flows", "implied 2PP", "first-principles flow set"), " \u2013 ", L.onImp.a.toFixed(1), " to Labor,", " ", L.onImp.b.toFixed(1), " to One Nation, \xB1", L.onImp.band.toFixed(1), " on the set\u2019s own range, not a sampling interval. The houses\u2019 published head-to-heads stay on the chart as corroboration.") : null)
-  }, {
-    id: "individual-poll",
-    term: "Individual poll",
-    body: React.createElement(React.Fragment, null, "One published poll, drawn as a single dot. The lines through them are monthly aggregates, shaded with the 95% interval around them; where two bands meet, that month\u2019s lead is inside its own ", xref("margin-of-error", "individual poll", "margin of error"), ". The FAQ below asks", " ", xref("dots-past-the-line", "individual poll", "why the newest dots can sit past the line’s end"), ". A \u201C\u2014\u201D in any table means the pollster did not ask that question.")
-  }, {
-    id: "margin-of-error",
-    term: "Margin of error",
-    body: React.createElement(React.Fragment, null, "How far a poll can miss by because it asked a sample rather than the whole country. A thousand respondents on their own carry about \xB13 points of sampling error at 95% confidence, and the figure shrinks only with the square root of the sample \u2013 four times the interviews buys half the error. It prices chance and nothing else: skewed samples, turnout guesses and house choices sit outside it. Beside the headline the same idea is carried across", " ", hl.n, " polls at once as the ", xref("interval", "margin of error", "95% interval"), " ", "\u2013 \xB1", hl.ci.toFixed(1), " points on each share, shown at \xB1", (2 * hl.ci).toFixed(1), " beside the lead itself. Pooling that many surveys is what brings the band in narrower than one poll\u2019s own \xB13: the chance part of the error shrinks with the square root of the combined sample, while the part every house shares alike does not shrink at all.")
-  }, {
-    id: "monthly-average",
-    term: "Monthly average",
-    body: React.createElement(React.Fragment, null, "What a matchup gets when too few houses ask it for ", xref("house-effect", "monthly average", "house effects"), " to be estimable: a plain mean of the month\u2019s polls, adjusted for nothing. The hero says which of the two it is showing, because a matchup that switched silently from an adjusted aggregate to a bare average would read as the more precise of the two.")
-  }, {
-    id: "mrp",
-    term: "MRP",
-    body: React.createElement(React.Fragment, null, "Multilevel regression and post-stratification \u2013 a model that estimates each seat separately rather than applying one national swing to all of them. Seat figures appear on this site only where a pollster modelled them seat by seat and published the result, which is what the MRP tag in the archive marks.")
-  }, {
-    id: "net-approval",
-    term: "Net approval",
-    body: React.createElement(React.Fragment, null, "Approve minus disapprove for a party leader \u2013 favourable minus unfavourable where a house words it as favourability. The two are separate questions \u2013 see ", xref("approval", "net approval", "Approval"), " and", " ", xref("favourability", "net approval", "Favourability"), " \u2013 asked irregularly and worded differently from house to house. The lines drawn are monthly aggregates, weighted and house-adjusted the same way the vote series are \u2013 see", " ", xref("weighted-aggregate", "net approval", "Weighted aggregate"), ".")
-  }, {
-    id: "next-polls",
-    term: "Next polls",
-    body: React.createElement(React.Fragment, null, "When each house is likely to publish next, forecast from its own record. Its next date is its last release plus the median of its last eight gaps between releases, nudged no more than three days onto the weekday the house keeps. Where recent releases carry publication dates in an unbroken run, the gaps measured are those between them, not the fieldwork dates \u2013 the steadier clock, and the thing actually being forecast. The \xB1 is half the spread of the gaps with the longest and shortest set aside, widening for waves further out, and in whole weeks for a house pinned to a weekday, the only step its date can take. A projected date will not always sit in the middle of the house's record \u2013 if it lands on the record's near edge, only a later filing day gets named as the alternative: \u201C(or Wed 7 Oct)\u201D, never an early day the house has not filed on.", " ", "A filing hour appears where a house has been timed often enough, always on the publisher\u2019s own clock (AEDT through summer, AEST otherwise), and \u201Ctoday\u201D is Sydney\u2019s; weekday and hour are read off recent releases, a schedule being a current fact about a house. A house too variable for a date gets the window its record supports, and a schedule stated but not kept \u2013 Roy Morgan\u2019s \u2013 is taken as stated. A projection is a moment, not a guess: a date that passes unpublished holds its row and counts on to the far edge of its window, reading as missed, in red, only once that has passed too, and it leaves the list only when the real release is added \u2013 never on a date guessed in its place. The countdown in the tab bar marks the same thing the same way: an unrecorded wave leads it, red, counting the days it is late. Opening a row shows the house\u2019s five most recent releases and its own release page, so the forecast can be checked against the record it came from. Houses that have stopped publishing are removed by hand rather than read out of their silence. These are estimates, not announced dates.")
-  }, {
-    id: "polling-error",
-    term: "Polling error",
-    body: acc ? React.createElement(React.Fragment, null, "How far the final polls have missed. Across ", accSpan, ", they missed the two-party result by ", acc.meanAbs, " points on average, and by ", Math.abs(acc.worstCycle.err), " at worst, in", " ", acc.worstCycle.year, ".", accShared ? React.createElement(React.Fragment, null, " When the houses miss together \u2013 all ", accShared.n, " on the same side by", " ", accShared.absErr, " in ", accShared.year, " \u2013 the lean is one an aggregate cannot see about itself; it shows only after the count.") : null, " ", "Past cycles carries the full record, house by house.") : React.createElement(React.Fragment, null, "How far the final polls have missed at past elections. Past cycles carries the record, house by house.")
-  }, {
-    id: "fp-flows",
-    term: "First-principles flow set",
-    body: React.createElement(React.Fragment, null, "The fixed preference table that turns the current primaries into the Labor v One Nation figure \u2013 the set behind the \u201CUsing implied preference flows\u201D figure on the Labor v One Nation view. It is computed for this site; no pollster or commission publishes it. Three cells do all the work: Coalition voters 31.5% to Labor (\xB12.5), Greens 89% (\xB13), everyone else 53% (\xB13) \u2013 the remainders, 68.5%, 11% and 47%, land with One Nation.", L.onImp && prim ? React.createElement(React.Fragment, null, " On today\u2019s primaries that is ", prim.alp.toFixed(1), " Labor plus 31.5% of", " ", prim.lnp.toFixed(1), " Coalition, 89% of ", prim.grn.toFixed(1), " Greens and 53% of ", prim.oth.toFixed(1), " others, against One Nation\u2019s own", " ", prim.onp.toFixed(1), " and the remainders \u2013 reading", " ", L.onImp.a.toFixed(1), " to Labor, ", L.onImp.b.toFixed(1), " to One Nation, \xB1", L.onImp.band.toFixed(1), ". The \xB1 stacks the three cells\u2019 own ranges outright: doubt about the table, not chance in a sample.") : null, " ", "No election has ever counted a Labor v One Nation finish, so the cells cannot be anchored to an election night the way", " ", xref("preference-flows", "first principles", "the 2025 table"), " disciplines Labor v Coalition. They are built from the two counted-ballot records that do exist: the AEC\u2019s 2025 Senate ballot counts, re-anchored on the 2026 lower-house contests where One Nation made the final two and preferences were actually counted \u2013 the SA state election and the Secret Harbour by-election. The set is frozen between those counts and re-anchored when a new one lands; what it never is is fitted to the polls of the day. The industry\u2019s alternative is respondent allocation \u2013 what voters say they would do with a second choice, with no count to anchor it \u2013 which is the basis of the houses\u2019 published head-to-heads, and why they stay on the chart as corroboration while the quoted figure runs on counted ballots.")
-  }, {
-    id: "preference-flows",
-    term: "Preference flows",
-    body: React.createElement(React.Fragment, null, "How minor-party ballots split between the two final candidates. The", " ", xref("implied-2pp", "preference flows", "implied 2PP"), " the headline leads with uses the flows as they actually ran at the 2025 election", " ", "(", React.createElement("a", {
-      href: "https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm",
-      target: "_blank",
-      rel: "noopener noreferrer"
-    }, "Greens 88.2%, One Nation 25.5%, all others 54.6% to Labor"), "), every formal ballot redistributed Labor v Coalition.", React.createElement("span", {
-      className: "info-chart"
-    }, React.createElement(FlowChart, null)), "The Labor v One Nation figure runs on a different fixed table, derived at first principles rather than from an election night \u2013 the", " ", xref("fp-flows", "preference flows", "first-principles flow set"), ". Full preference distribution data was first published for the 1996 election, so party-by-party flows don't exist before then; One Nation's line is broken across the parliaments it barely contested.")
-  }, {
-    id: "preferred-pm",
-    term: "Preferred prime minister",
-    body: React.createElement(React.Fragment, null, "Who voters name as the better prime minister \u2013 head to head, or as a three-way where a house offers one. Houses leave different shares uncommitted, so the published levels aren\u2019t comparable across houses; the gaps and the trend are. House effects are not removed from these lines \u2013 see ", xref("weighted-aggregate", "preferred-pm", "Weighted aggregate"), ".")
-  }, {
-    id: "primary-vote",
-    term: "Primary vote",
-    body: React.createElement(React.Fragment, null, "First-preference share \u2013 who voters put 1 beside, before any preferences are distributed. Houses that publish no two-party figure still feed this series and the leadership ones.")
-  }, {
-    id: "seat-projection",
-    term: "Seat projection",
-    body: React.createElement(React.Fragment, null, "Not carried here, deliberately. Turning a national two-party figure into a seat count assumes a uniform swing, and with One Nation near ", onp, "% of the primary vote that assumption fails in exactly the seats that would decide the election: a large minor party wins seats where its vote is concentrated and none where it is not, and no national number knows the difference.")
-  }, {
-    id: "sources",
-    term: "Sources",
-    body: React.createElement(React.Fragment, null, "Every national voting-intention poll published since the May 2025 federal election, from these ", Object.keys(houseCounts).length, " houses, most polls first: ", sources, ". A house\u2019s MRP or SMS releases count under its own name. Field dates and sample sizes are listed per poll in the archive.")
-  }, {
-    id: "two-party-preferred",
-    term: "Two-party preferred",
-    body: React.createElement(React.Fragment, null, "The share each of two parties holds once every other candidate\u2019s preferences have been distributed \u2013 the number that decides a seat. The hero carries Labor against the Coalition and the other head-to-heads the houses publish. Both Labor contests lead on the", " ", xref("implied-2pp", "two-party preferred", "implied basis"), " \u2013 every poll\u2019s primaries run through one fixed preference table \u2013 with the pollsters\u2019 own published figures a switch away; a head-to-head no fixed table covers, like the Coalition against One Nation, is quoted as published.")
-  }, {
-    id: "undecided",
-    term: "Undecided",
-    body: React.createElement(React.Fragment, null, "Electors who won\u2019t name a party \u2013 the \u201Ccan\u2019t say\u201D share \u2013 shown beside the soft share who name one but won\u2019t call their choice firm. They are different questions with different wordings, so the panel keeps them as separate lines rather than one averaged measure. Where the undecided sit differs by house too, and a poll\u2019s breakdown says which: \u201Cset aside\u201D (Roy Morgan, DemosAU) takes the can\u2019t-say share out of the base before the party shares are computed, so the primaries sum to 100; \u201Cinside the pair\u201D (Essential) leaves them inside the published two-party pair, which then sums to under 100; and \u201Cnot firm\u201D (Resolve) is not undecided at all \u2013 a share of the decided, who named a party but might still move.")
-  }, {
-    id: "weighted-aggregate",
-    term: "Weighted aggregate",
-    body: React.createElement(React.Fragment, null, "The headline method. Recent and larger polls count for more, and each pollster\u2019s figure is adjusted for its own ", xref("house-effect", "weighted aggregate", "house effect"), ". Where one house publishes more than once in a window or a calendar month \u2013 Roy Morgan polls weekly \u2013 its repeat waves count for the square root of their number, so three weekly waves count as 1.7, not 3.", " ", "Full formula: the headline is \u03A3w\u1D62x\u1D62 \xF7 \u03A3w\u1D62 over the polls in the 21-day window, where x\u1D62 is a poll\u2019s house-adjusted figure and its weight w\u1D62 = n\u1D62 \xD7 2^(\u2212d/7) \xD7 t(d) \xF7 \u221Am \u2013 n\u1D62 the poll\u2019s sample on the estimator\u2019s scale: its published effective sample where the house files one (Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog, via their Australian Polling Council methodology statements), grossed back up by the shared 1.6 design factor, else its raw sample capped at 3,000 \u2013 1,200 where no sample is filed at all. n\u1D62 also sets the sampling-error floor under the whole window, so the same published figure improves both. d is the poll\u2019s age in days (halving every seven) and t(d) a half-cosine edge that holds full weight to day 14 then eases smoothly to zero on day 21 \u2013 a wave leaving the window drifts out instead of stepping out \u2013 and m its house\u2019s wave count in the window. The effective sample behind it is (\u03A3w\u1D62)\xB2 \xF7 \u03A3w\u1D62\xB2, and the monthly trend points run the same formula with the recency term dropped. The leaders\u2019 ratings and national direction are built the same way monthly; preferred prime minister and the undecided share stay as plain ", xref("monthly-average", "weighted aggregate", "monthly averages"), " \u2013 their houses\u2019 differences live in the questions asked, not in a lean to correct.", React.createElement("span", {
-      className: "info-p"
-    }, "The current Labor primary is that same construction, run per party. Each wave whose fieldwork midpoint falls inside the 21-day window contributes its published Labor share \u2013 minus the house\u2019s lean on the ALP primary specifically, read at the reference day \u2013 weighted by sample and recency alike; a house in the field twice counts for \u221A2, not 2. Only once all five parties are estimated is the sum checked, and the five stand unrescaled unless the debiased total sits more than half a point from the plain-average total \u2013 a real undecided-driven shortfall is kept, not ironed out. As it stands, that is ", prim.alp.toFixed(1), " for Labor."), primWork, React.createElement("span", {
-      className: "info-p"
-    }, "The headline two-party figure is the same nowcast run over the", " ", xref("implied-2pp", "weighted aggregate", "implied 2PP"), ": each wave whose fieldwork midpoint falls inside the 21-day window has its primaries run through the fixed 2025 flow table, so every house that publishes primaries adds a row, adjusted for its lean on that implied figure.", SL ? React.createElement(React.Fragment, null, " As of the latest poll, that is ", SL.alp.toFixed(1), " to Labor,", " ", SL.lnp.toFixed(1), " to the Coalition.") : null, " The pollsters\u2019 own published pairs go through the identical machinery to give the published figure the chart switches to \u2013 a pair printed with undecided still inside it is rebased to 100 first, a house that publishes no pair adds no row, and an empty window falls back to the last monthly point rather than vanishing. That published calculation is the one worked below:", " ", L.alp2pp.toFixed(1), " to Labor, ", L.lnp2pp.toFixed(1), " to the Coalition."), tppWork)
-  }, {
-    id: "aggregate-effect",
-    term: "Aggregate effect",
-    body: React.createElement(React.Fragment, null, "A poll\u2019s own pull on the figure a reader watches. The poll breakdown recomputes the", " ", xref("weighted-aggregate", "aggregate effect", "weighted aggregate"), " without this one poll and prints the difference as a signed move: \u201C+0.1 for ALP\u201D is a tenth of a point of today\u2019s two-party that exists only while this wave sits in the window. It is a pull on today\u2019s number, not a verdict on the poll \u2013 a wave older than the 21-day window moves nothing now and says so, with what it was worth on its own publication day where that can still be estimated. One clause prints per aggregate the wave feeds: the published two-party; the ", " ", xref("implied-2pp", "aggregate effect", "implied two-party"), " for a wave that published no pair, whose primaries still move that estimate; and Labor against One Nation where the wave asked it. The leans stand as measured \u2013 a", " ", xref("house-effect", "aggregate effect", "house effect"), " is a property of the pollster, not the poll, so only the nowcast itself is re-run on the remaining waves.")
+    id: "g-leaders",
+    title: "Leaders",
+    entries: [{
+      id: "approval",
+      term: "Approval",
+      body: React.createElement(React.Fragment, null, "A rating of how a leader is doing the job: approve minus disapprove. Essential asks, \u201CDo you approve or disapprove of the job Anthony Albanese is doing as Prime Minister?\u201D YouGov and Newspoll ask, \u201CAre you satisfied or dissatisfied with the way Anthony Albanese is doing his job as Prime Minister?\u201D Resolve asks, \u201CHow would you rate Angus Taylor\u2019s performance as opposition leader in recent weeks?\u201D", " ", xref("favourability", "approval", "Favourability"), " is a different question, about the person rather than the job.")
+    }, {
+      id: "favourability",
+      term: "Favourability",
+      body: React.createElement(React.Fragment, null, "A rating of the leader as a person: positive minus negative. RedBridge/Accent asks, \u201CDo you have a favourable or unfavourable view of the following?\u201D DemosAU asks, \u201CWhat is your opinion of the following people?\u201D, offering positive, neutral and negative. Freshwater asks its own version. A leader can be approved of for the job and disliked as a person, or the reverse, so ", xref("approval", "favourability", "approval"), " and favourability are shown in separate panels, never averaged together.")
+    }, {
+      id: "net-approval",
+      term: "Net approval",
+      body: React.createElement(React.Fragment, null, "Approve minus disapprove for a party leader, or favourable minus unfavourable where a pollster asks about favourability. Pollsters ask irregularly and word the questions differently. The lines are monthly aggregates, weighted and adjusted for house effects the same way as the vote figures \u2013 see", " ", xref("weighted-aggregate", "net approval", "Weighted aggregate"), ".")
+    }, {
+      id: "preferred-pm",
+      term: "Preferred prime minister",
+      body: React.createElement(React.Fragment, null, "Who voters say would make the better prime minister, head to head or three-way where a pollster offers it. Pollsters leave different shares uncommitted, so their levels can\u2019t be compared directly; the gaps and trends can. These lines are plain monthly averages, with no adjustment for house effects.")
+    }]
   }];
   const faqs = [{
     id: "what-am-i-looking-at",
     q: "What exactly am I looking at in the main chart?",
-    a: React.createElement(React.Fragment, null, "One ", xref("individual-poll", "what am i looking at", "published poll"), " per dot, each drawn at its own fieldwork midpoint. Beneath them runs one trend point per calendar month \u2013 every poll closed inside the month, pooled, house-corrected and sample-weighted \u2013 shaded with the ", xref("interval", "what am i looking at", "95% interval"), " around it; where the two bands overlap, the polls cannot separate the parties that month. The headline figure up top keeps its own clock: it is the 21-day nowcast described under", " ", xref("weighted-aggregate", "what am i looking at", "Weighted aggregate"), ", re-run with every poll published, so it can move before the monthly ink catches up.")
-  }, {
-    id: "dots-past-the-line",
-    q: "Why do the newest poll dots sit past the end of the line?",
-    a: React.createElement(React.Fragment, null, "Because the two markings keep different clocks. Each dot is one ", xref("individual-poll", "dots past the line", "individual poll"), " drawn at its own fieldwork midpoint, so a wave finishing on the 30th lands late in its month. The line has no points for individual polls at all: it prints one point per calendar month \u2013 pooling every poll whose fieldwork closed inside that month, house-corrected and sample-weighted exactly as the ", xref("weighted-aggregate", "dots past the line", "weighted aggregate"), " does, its recency decay dropped \u2013 and that point is drawn at the month\u2019s midpoint, because a month is read at its centre. The rightmost point is therefore always the current month, pinned at its centre; after mid-month the newest dots must sit to its right even though they are already inside the very estimate it marks. The line steps forward the moment the first poll closes in a new month \u2013 the point appears at the new month\u2019s midpoint in the same build \u2013 so in the meantime, up to half a month of dots can run ahead of it. That is lag in the ink, not in the estimate: the headline figure is never read off this line but from the 21-day nowcast, which moves with every poll published.")
-  }, {
-    id: "newest-poll-not-headline",
-    q: "The newest poll doesn’t match the headline. Which one is wrong?",
-    a: React.createElement(React.Fragment, null, "Usually neither \u2013 they are different objects. The poll is one house\u2019s reading of one week, and chance alone can carry it off the country by its own", " ", xref("margin-of-error", "newest poll not headline", "margin of error"), ". The headline never repeats a single poll: it pools every house polling lately, weights each wave by recency and sample, and first takes out the lean it has measured for the house \u2013 its", " ", xref("house-effect", "newest poll not headline", "house effect"), ". One survey moves that estimate by its weight, not by its news value; exactly how much the latest wave pulled the figure today shows as a signed move in its", " ", xref("aggregate-effect", "newest poll not headline", "poll breakdown"), ".")
-  }, {
-    id: "headline-moved-no-poll",
-    q: "Why did the headline move when no new poll came out?",
-    a: React.createElement(React.Fragment, null, "Time itself re-cuts it. Every poll\u2019s weight halves with each seven days of age, so between releases the fresh waves steadily take over from the stale ones and the average re-settles towards the newest readings; a poll that ages past 21 days leaves the window altogether, changing the pooled set in a single step. The estimate is re-run against the calendar at each build of the site, so quiet days can still move the number \u2013 by weights decaying, never by the figure being smoothed towards anything.")
-  }, {
-    id: "lead-interval-double",
-    q: "Why is the ± beside the lead twice the ± beside each share?",
-    a: React.createElement(React.Fragment, null, "Because the lead is a difference, not a share. Anything that moves a party\u2019s share \u2013 sampling luck included \u2013 moves the gap between the parties twice as far, and the uncertainty scales the same way: \xB1", (2 * hl.ci).toFixed(1), " beside the lead against \xB1", hl.ci.toFixed(1), " on each share today. Both come off the one", " ", xref("interval", "lead interval double", "95% interval"), " computed over the polls in the window.")
-  }, {
-    id: "primaries-not-100",
-    q: "Why don’t the primary votes add up to 100?",
-    a: React.createElement(React.Fragment, null, "Deliberately, where the shortfall is real. Some houses keep voters who won\u2019t name a party inside their published shares rather than setting them aside \u2013 each poll\u2019s breakdown says which basis it published on \u2013 so the parties can sum below 100 by exactly the uncommitted share, a signal about the electorate the aggregate keeps rather than rescales away. Where the ", xref("undecided", "primaries not 100", "undecided"), " share was set aside before the parties were counted, the primaries sum to 100 as expected.")
-  }, {
-    id: "essential-pair-not-100",
-    q: "One house’s two-party pair adds up to less than 100. Is it rescaled before it enters the average?",
-    a: React.createElement(React.Fragment, null, "Before, and only the pair. Essential leaves the electors who won\u2019t nominate a side inside its published two-party figure, so that pair falls short of 100 by exactly the ", xref("undecided", "essential pair not 100", "undecided"), " share after preferences. Pooling it raw against a house whose pair does sum to 100 would set a share of everyone against a share of the decided, and hand one house a standing lean that is arithmetic rather than opinion \u2013 so every poll enters the ", xref("weighted-aggregate", "essential pair not 100", "weighted aggregate"), " as its Labor share of the two, rescaled as the row is built, before any house correction or weighting is applied. That is not a rule about one pollster: each row goes through the same arithmetic, and on a pair already summing to 100 it changes nothing. Note the contrast with the primaries above, where the shortfall is kept rather than rescaled away. Nothing has to be comparable between houses to read a primary share; the pair is pooled across them, so it does. The shortfall is not discarded either \u2013 it is kept as that house\u2019s own undecided line, beside the pair rather than inside it. What the rescaling costs is worth knowing: it splits the undecided in proportion, which is no claim that they would break that way, only that a pair on its own gives no basis to break them any other way.")
-  }, {
-    id: "why-2pp-headline",
-    q: "Why does the headline lead with two-party preferred and not the primary vote?",
-    a: React.createElement(React.Fragment, null, "Because seats are decided on the final pair. Preferences distribute until one candidate holds a majority, so the question who is ahead is a", " ", xref("two-party-preferred", "why 2pp headline", "two-party preferred"), " question, and first preferences alone cannot answer it \u2013 with One Nation near ", onp, "% of the primary vote the two views of the race are genuinely far apart. The primaries are tracked just as closely, with their own weighted, house-corrected series in the panels below; but the headline answers the election\u2019s own question.")
-  }, {
-    id: "poll-without-2pp",
-    q: "What happens to a poll that publishes no two-party figure?",
-    a: React.createElement(React.Fragment, null, "It still counts. Its primaries run through the same fixed", " ", xref("preference-flows", "poll without 2pp", "preference-flow table"), " as every other poll\u2019s, so it feeds the ", xref("implied-2pp", "poll without 2pp", "implied 2PP"), " ", "the headline leads with, as well as the primary-vote series and, where it asked, the leadership panels. What it cannot join is the pollsters\u2019 own published two-party series: there is no pair to add, and the site will not invent one the house never printed.")
-  }, {
-    id: "polls-disagree",
-    q: "Two new polls say different things. Which of them is right?",
-    a: React.createElement(React.Fragment, null, "Usually both are doing their jobs. Each is one sample, so two honest polls of an unmoved electorate are expected to differ; the question is whether they differ by more than luck allows. The Poll disagreement panel answers exactly that \u2013 weighing the spread the houses actually show against the scatter sampling error predicts, and reading", " ", xref("chance-consistent", "polls disagree", "chance-consistent"), " while the two match. Where a gap is method rather than luck \u2013 one house tilting the same way wave after wave \u2013 it shows as a ", xref("house-effect", "polls disagree", "house effect"), ", which the aggregate measures and removes rather than splitting the difference.")
-  }, {
-    id: "is-this-a-forecast",
-    q: "Is the headline a prediction of the election result?",
-    a: acc ? React.createElement(React.Fragment, null, "No. Everything here describes where opinion stands now, from polls already published; nothing projects them forward through a campaign. And measurement at one moment is not destiny at another: across ", accSpan, ", the final polls still missed the two-party result by ", acc.meanAbs, " points on average \u2013 see", " ", xref("polling-error", "is this a forecast", "the error record"), ". The site calls its own figures estimates only, and carries no seat projection for the same reason.") : React.createElement(React.Fragment, null, "No. Everything here describes where opinion stands now, from polls already published; nothing projects them forward through a campaign. The site calls its own figures estimates only.")
-  }, {
-    id: "two-party-to-seats",
-    q: "What would these numbers mean in seats?",
-    a: React.createElement(React.Fragment, null, "Nothing this site will pretend to. Turning a national two-party figure into a seat count assumes the swing runs the same everywhere, and with One Nation near ", onp, "% of the primary vote that assumption fails in exactly the seats that would decide the election: a large minor party wins where its vote bunches and nowhere else, and no national number can see the difference. ", " ", xref("seat-projection", "two party to seats", "Seat projection"), " lays out the geometry; polls that actually modelled the seats one by one carry the", " ", xref("mrp", "two party to seats", "MRP"), " tag in the archive.")
-  }, {
-    id: "how-wrong-are-the-polls",
-    q: "How wrong have the polls been at past elections?",
-    a: acc ? React.createElement(React.Fragment, null, "Scored election by election on the How the final polls did panel in Past cycles: each house\u2019s last two-party figure of the ", acc.windowDays, " days before polling day, set against the result. Across ", accSpan, ", the average miss is ", acc.meanAbs, " points; the worst,", " ", acc.worstCycle.year, ", missed by ", Math.abs(acc.worstCycle.err), ".", accShared ? React.createElement(React.Fragment, null, " In ", accShared.year, " all ", accShared.n, " houses missed on the same side, by", " ", accShared.absErr, ". A lean every house shares is error an aggregate cannot see about itself, and the reason the ", xref("interval", "how wrong are the polls", "95% interval"), " ", "never claims to cover it.") : null) : React.createElement(React.Fragment, null, "The How the final polls did panel in Past cycles scores each house\u2019s last two-party figure of the campaign against the result, election by election, house by house.")
-  }, {
-    id: "next-poll-when",
-    q: "How does the site know when the next poll is coming?",
-    a: React.createElement(React.Fragment, null, "It doesn\u2019t \u2013 it forecasts from the record. Each house\u2019s next date is the median gap between its recent releases, nudged only onto the weekday the house keeps, and the \xB1 widens with how ragged that record has been. A date that passes unpublished holds its row and counts on, red, until the real wave lands; nothing in the list is an announced date, only a house\u2019s own habits read back to it. ", " ", xref("next-polls", "next poll when", "Next polls"), " ", "lays out the method.")
-  }, {
-    id: "poll-i-saw-not-here",
-    q: "I saw a poll in the news that isn’t here. Where is it?",
-    a: React.createElement(React.Fragment, null, "Most likely in the archive. The Latest polls table keeps one row per active house \u2013 its newest wave \u2013 so an earlier poll from the same firm leaves that table the moment a newer one lands. Nothing is lost: the All polls archive holds every wave of the term, and Past cycles the previous ones. If a published wave is missing from the archive too, that is a genuine error \u2013 the report link lives in the footer, one click from anywhere on the page.")
+    a: React.createElement(React.Fragment, null, "Each dot is one published poll, placed at the midpoint of its fieldwork. The line is one point per calendar month, pooling that month\u2019s polls, adjusted for house effects and weighted by sample size, with the ", xref("interval", "what am i looking at", "95% interval"), " ", "shaded around it. Where the two parties\u2019 bands overlap, the polls can\u2019t separate them that month. A dash (\u2014) in any table means the pollster didn\u2019t ask that question. The headline figure at the top is calculated separately, over the last 21 days \u2013 see", " ", xref("weighted-aggregate", "what am i looking at", "Weighted aggregate"), " \u2013 so it can move before the monthly line catches up.")
   }, {
     id: "where-does-data-come-from",
     q: "Where do the numbers come from?",
-    a: React.createElement(React.Fragment, null, "From the pollsters, not from here: every published national voting-intention poll since the May 2025 federal election, from ", " ", sources, ". Each wave is filed in the archive with its field dates, sample and methodology link, and its Australian Polling Council", " ", xref("apc-statement", "where does data come from", "statement"), " where one exists \u2013 the ", xref("sources", "where does data come from", "Sources"), " entry has the list. The site polls no one itself; it aggregates what those houses publish, and shows its working.")
+    a: React.createElement(React.Fragment, null, "From the pollsters. The site runs no polls of its own. It includes every national voting-intention poll published since the May 2025 federal election, from these", " ", Object.keys(houseCounts).length, " houses, most polls first: ", sources, ". A pollster\u2019s MRP or SMS polls count under its own name. Each poll is filed in the archive with its fieldwork dates, sample size, a link to the pollster\u2019s release and, where one exists, its", " ", xref("apc-statement", "where does data come from", "APC statement"), ".")
+  }, {
+    id: "dots-past-the-line",
+    q: "Why do the newest poll dots sit past the end of the line?",
+    a: React.createElement(React.Fragment, null, "Because the line has only one point per month, drawn at the middle of the month. Each dot sits at its own fieldwork midpoint, so after mid-month the newest dots land to the right of the line\u2019s last point, even though they\u2019re already counted in it. When the first poll of a new month closes, the line gains a point at that month\u2019s midpoint; until then, up to half a month of dots can run ahead of it. That\u2019s lag in the ink, not in the estimate: the headline comes from the 21-day", " ", xref("weighted-aggregate", "dots past the line", "weighted aggregate"), ", which moves with every poll.")
+  }, {
+    id: "newest-poll-not-headline",
+    q: "The newest poll doesn’t match the headline. Which one is wrong?",
+    a: React.createElement(React.Fragment, null, "Usually neither. A poll is one pollster\u2019s reading of one week, and chance alone can put it off by its ", xref("margin-of-error", "newest poll not headline", "margin of error"), ". The headline pools every recent poll, weights each by recency and sample size, and first removes each pollster\u2019s ", xref("house-effect", "newest poll not headline", "house effect"), ". One poll moves it by its weight, not its news value. Each poll\u2019s breakdown shows exactly how much it moved today\u2019s figure \u2013 its", " ", xref("aggregate-effect", "newest poll not headline", "aggregate effect"), ".")
+  }, {
+    id: "headline-moved-no-poll",
+    q: "Why did the headline move when no new poll came out?",
+    a: React.createElement(React.Fragment, null, "Because polls age. A poll\u2019s weight halves every seven days, so between releases the newest polls steadily take over from older ones, and a poll leaves the average altogether after 21 days. The figure is recalculated every time the site rebuilds, so it can move on a quiet day \u2013 but only because weights change, never because it\u2019s being smoothed towards anything.")
+  }, {
+    id: "polls-disagree",
+    q: "Two new polls say different things. Which of them is right?",
+    a: React.createElement(React.Fragment, null, "Usually both are doing their job. Each is a sample, so two honest polls of an unchanged electorate will differ. The question is whether they differ by more than luck allows, and the ", xref("poll-disagreement", "polls disagree", "Poll disagreement"), " panel answers it. A gap that comes from method rather than luck \u2013 one pollster leaning the same way poll after poll \u2013 shows up as a ", xref("house-effect", "polls disagree", "house effect"), ", which the aggregate measures and removes instead of splitting the difference.")
+  }, {
+    id: "why-2pp-headline",
+    q: "Why does the headline lead with two-party preferred and not the primary vote?",
+    a: React.createElement(React.Fragment, null, "Because seats are decided between the final two candidates. Preferences are distributed until one candidate has a majority, so \u201Cwho\u2019s ahead\u201D is a", " ", xref("two-party-preferred", "why 2pp headline", "two-party"), " question that first preferences alone can\u2019t answer. With One Nation near ", onp, "% of the primary vote, the two views of the race are far apart. The primary votes get their own weighted, adjusted series in the panels below.")
+  }, {
+    id: "poll-without-2pp",
+    q: "What happens to a poll that publishes no two-party figure?",
+    a: React.createElement(React.Fragment, null, "It still counts. Its primary votes run through the same fixed", " ", xref("preference-flows", "poll without 2pp", "preference table"), " as every other poll\u2019s, so it feeds the ", xref("implied-2pp", "poll without 2pp", "implied 2PP"), " the headline leads with, as well as the primary vote series and, where it asked, the leader panels. It can\u2019t join the pollsters\u2019 own published two-party series, because there\u2019s no figure to add, and the site won\u2019t invent one.")
+  }, {
+    id: "primaries-not-100",
+    q: "Why don’t the primary votes add up to 100?",
+    a: React.createElement(React.Fragment, null, "Sometimes on purpose. Some pollsters keep voters who won\u2019t name a party inside their published shares instead of setting them aside, so the parties add up to less than 100 by exactly that ", xref("undecided", "primaries not 100", "undecided"), " share. The aggregate keeps that shortfall, because it says something real about the electorate. Where the undecided were set aside first, the primaries add up to 100. Each poll\u2019s breakdown says which approach it used.")
+  }, {
+    id: "essential-pair-not-100",
+    q: "One pollster’s two-party figures add up to less than 100. Are they rescaled?",
+    a: React.createElement(React.Fragment, null, "Yes, before they\u2019re averaged. Essential leaves", " ", xref("undecided", "essential pair not 100", "undecided"), " voters inside its published two-party figures, so the pair falls short of 100 by that share. Averaging it as published against pairs that do add to 100 would mix a share of everyone with a share of the decided, and give Essential a false lean. So every poll enters the", " ", xref("weighted-aggregate", "essential pair not 100", "weighted aggregate"), " as Labor\u2019s share of the two, which changes nothing for pairs that already add to 100.", React.createElement("span", {
+      className: "info-p"
+    }, "That differs from the primaries, where the shortfall is kept: a primary share can be read on its own, but the two-party pair is pooled across pollsters, so it has to be comparable. The shortfall isn\u2019t thrown away either; it\u2019s kept as Essential\u2019s own undecided line. Rescaling splits the undecided in proportion. That isn\u2019t a claim they\u2019d break that way, only that a pair on its own gives no basis for splitting them any other way."))
+  }, {
+    id: "is-this-a-forecast",
+    q: "Is the headline a prediction of the election result?",
+    a: React.createElement(React.Fragment, null, "No. Everything here describes where opinion stands now, from polls already published. Nothing projects it forward through a campaign, and final polls have missed on the day before", acc ? React.createElement(React.Fragment, null, ": by ", acc.meanAbs, " points on average") : null, " \u2013 see", " ", xref("how-wrong-are-the-polls", "is this a forecast", "How wrong have the polls been"), ". Nor does the site project seats \u2013 see", " ", xref("two-party-to-seats", "is this a forecast", "What would these numbers mean in seats"), ".")
+  }, {
+    id: "how-wrong-are-the-polls",
+    q: "How wrong have the polls been at past elections?",
+    a: acc ? React.createElement(React.Fragment, null, "The How the final polls did panel in Past cycles scores each pollster\u2019s last two-party figure in the ", acc.windowDays, " days before polling day against the result. Across ", accSpan, ", the final polls missed by ", acc.meanAbs, " points on average, and by", " ", Math.abs(acc.worstCycle.err), " at worst, in ", acc.worstCycle.year, ".", accShared ? React.createElement(React.Fragment, null, " In ", accShared.year, " all ", accShared.n, " houses missed on the same side, by", " ", accShared.absErr, ".") : null, " An error every pollster shares is one no aggregate can see, which is why the ", xref("interval", "how wrong are the polls", "95% interval"), " never claims to cover it.") : React.createElement(React.Fragment, null, "The How the final polls did panel in Past cycles scores each pollster\u2019s last two-party figure of the campaign against the result, election by election, house by house.")
+  }, {
+    id: "two-party-to-seats",
+    q: "What would these numbers mean in seats?",
+    a: React.createElement(React.Fragment, null, "The site doesn\u2019t turn them into seats, on purpose. Converting a national two-party figure into seats assumes the swing is the same everywhere. With One Nation near ", onp, "% of the primary vote, that assumption fails in exactly the seats that would decide the election: a large minor party wins where its vote is concentrated and nowhere else, and a national figure can\u2019t see where that is. Where a pollster modelled seats one by one, its poll carries the ", xref("mrp", "two party to seats", "MRP"), " tag in the archive.")
+  }, {
+    id: "next-poll-when",
+    q: "How does the site know when the next poll is coming?",
+    a: React.createElement(React.Fragment, null, "It doesn\u2019t know; it forecasts. Each pollster\u2019s next date comes from the gaps between its recent releases. If a date passes with no poll, the row stays and counts the days until the poll arrives. ", xref("next-polls", "next poll when", "Next polls"), " explains the method.")
+  }, {
+    id: "poll-i-saw-not-here",
+    q: "I saw a poll in the news that isn’t here. Where is it?",
+    a: React.createElement(React.Fragment, null, "Most likely in the archive. The Latest polls table shows only each active pollster\u2019s newest poll, so an earlier one leaves that table as soon as a newer one lands. The All polls archive keeps every poll this term, and Past cycles the ones before. If a published poll is missing from the archive too, that\u2019s an error: please", " ", React.createElement("a", {
+      className: "fb-link",
+      href: "/feedback/"
+    }, "report it"), ".")
   }];
+  const about = React.createElement(React.Fragment, null, React.createElement("p", {
+    className: "info-about-p"
+  }, "auspol tracker is an unofficial aggregate of Australian federal voting-intention polls. It runs no polls of its own: it collects what the pollsters publish, adjusts for each pollster\u2019s known lean, and shows its working. Every figure is an estimate."), React.createElement("p", {
+    className: "info-about-p"
+  }, React.createElement("b", null, "Updates."), " New polls are added as they are released, most by automated checks that run through the week, and every figure is rebuilt when one lands."), React.createElement("p", {
+    className: "info-about-p"
+  }, React.createElement("b", null, "Following along."), " The ", React.createElement("a", {
+    className: "fb-link",
+    href: "feed.xml"
+  }, "RSS feed"), " lists each new poll as it is added, with a link to the pollster\u2019s own release."), React.createElement("p", {
+    className: "info-about-p"
+  }, React.createElement("b", null, "Errors."), " Spot a wrong number or a missing poll?", " ", React.createElement("a", {
+    className: "fb-link",
+    href: "/feedback/"
+  }, "Let me know"), "."), React.createElement("p", {
+    className: "info-about-p"
+  }, React.createElement("b", null, "Archives."), " Older federal polling archives are kept", " ", React.createElement("a", {
+    className: "fb-link",
+    href: "https://auspoltracker.com/archives"
+  }, "here"), " for safekeeping."));
   return {
-    terms: list.sort((a, b) => a.term.localeCompare(b.term, "en", {
-      numeric: true
-    })),
-    faqs
+    groups,
+    faqs,
+    about
   };
 }
 function InfoBack({
@@ -43316,6 +43422,16 @@ function InfoBack({
     d: "M19 12H5M11 18l-6-6 6-6"
   })), "Back to ", backLabel || "where you were");
 }
+const INFO_ALIAS = {
+  "individual-poll": "what-am-i-looking-at",
+  "polling-error": "how-wrong-are-the-polls",
+  "seat-projection": "two-party-to-seats",
+  "sources": "where-does-data-come-from",
+  "lead-interval-double": "interval",
+  "chance-consistent": "poll-disagreement",
+  "mild-divergence": "poll-disagreement",
+  "real-disagreement": "poll-disagreement"
+};
 function InfoView({
   focus,
   onBack,
@@ -43325,42 +43441,67 @@ function InfoView({
     D
   } = window.AP;
   const {
-    terms,
-    faqs
+    groups,
+    faqs,
+    about
   } = infoTerms(D);
+  const target = focus ? INFO_ALIAS[focus] || focus : null;
   React.useLayoutEffect(() => {
-    if (!focus) return;
-    const el = document.getElementById("term-" + focus);
+    if (!target) return;
+    const el = document.getElementById("term-" + target);
     if (el) el.scrollIntoView({
       block: "center",
       behavior: "auto"
     });
-  }, [focus]);
+  }, [target]);
+  const jump = id => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({
+      block: "start",
+      behavior: "smooth"
+    });
+  };
+  const entry = (id, head, body, H) => React.createElement("div", {
+    key: id,
+    id: "term-" + id,
+    className: "info-term" + (target === id ? " lit" : "")
+  }, React.createElement(H, {
+    className: "info-t"
+  }, head), " ", body, target === id && onBack && React.createElement(InfoBack, {
+    onBack: onBack,
+    backLabel: backLabel
+  }));
   return React.createElement("section", {
     className: "card info"
-  }, React.createElement("h2", {
+  }, React.createElement("nav", {
+    className: "info-index",
+    "aria-label": "On this page"
+  }, React.createElement("button", {
+    type: "button",
+    onClick: () => jump("info-about")
+  }, "About"), React.createElement("button", {
+    type: "button",
+    onClick: () => jump("info-faq")
+  }, "Questions"), groups.map(g => React.createElement("button", {
+    key: g.id,
+    type: "button",
+    onClick: () => jump(g.id)
+  }, g.title))), React.createElement("h2", {
+    id: "info-about",
     className: "card-title info-h"
-  }, "Glossary"), terms.map(t => React.createElement("div", {
-    key: t.id,
-    id: "term-" + t.id,
-    className: "info-term" + (focus === t.id ? " lit" : "")
-  }, React.createElement("strong", {
-    className: "info-t"
-  }, t.term, "."), " ", t.body, focus === t.id && onBack && React.createElement(InfoBack, {
-    onBack: onBack,
-    backLabel: backLabel
-  }))), React.createElement("h2", {
+  }, "About"), React.createElement("div", {
+    className: "info-about"
+  }, about), React.createElement("h2", {
+    id: "info-faq",
     className: "card-title info-h info-h-faq"
-  }, "FAQ"), faqs.map(f => React.createElement("div", {
-    key: f.id,
-    id: "term-" + f.id,
-    className: "info-term" + (focus === f.id ? " lit" : "")
-  }, React.createElement("strong", {
-    className: "info-t"
-  }, f.q), " ", f.a, focus === f.id && onBack && React.createElement(InfoBack, {
-    onBack: onBack,
-    backLabel: backLabel
-  }))));
+  }, "Questions"), faqs.map(f => entry(f.id, f.q, f.a, "h3")), React.createElement("h2", {
+    className: "card-title info-h info-h-faq"
+  }, "Glossary"), groups.map(g => React.createElement(React.Fragment, {
+    key: g.id
+  }, React.createElement("h3", {
+    id: g.id,
+    className: "info-group"
+  }, g.title), g.entries.map(t => entry(t.id, t.term + ".", t.body, "h4")))));
 }
 Object.assign(window, {
   Tabs,
