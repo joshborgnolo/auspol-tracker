@@ -1754,6 +1754,9 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
           keeps company with direction - just the far side of the release
           schedule */}
       <UndecidedPanel rangeId={rangeId} />
+      {/* who One Nation's surge is made of – read off the same electorate
+          the undecided panel above describes */}
+      <OnSourcesPanel rangeId={rangeId} />
     </>
   );
 }

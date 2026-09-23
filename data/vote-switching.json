@@ -1,0 +1,1508 @@
+{
+ "_about": "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's oth includes independents), dnr (didn't remember / didn't vote – DemosAU only).",
+ "weights2025": {
+  "alp": 34.56,
+  "lnp": 31.82,
+  "grn": 12.2,
+  "onp": 6.4,
+  "ind": 7.27,
+  "oth": 7.74,
+  "source": "AEC 2025 federal election, first preferences (event 31496; independents split from other minor parties)"
+ },
+ "waves": [
+  {
+   "pollster": "YouGov",
+   "date": "2026-02-10",
+   "dateStart": "2026-02-03",
+   "sample": 1561,
+   "article": "https://www.skynews.com.au/australia-news/politics/one-nation-secures-34-per-cent-primary-vote-among-workingclass-voters-above-both-labor-and-coalition-in-sky-news-pulse/news-story/62b6a2606bfeb7c099e3d7a5d570576b",
+   "onp": 28,
+   "source": "https://e.infogram.com/_/ZmzvfoQcPMj4PREkMRoQ",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 67,
+     "lnp": 7,
+     "onp": 15,
+     "grn": 5,
+     "ind": 2,
+     "oth": 4
+    },
+    "lnp": {
+     "alp": 10,
+     "lnp": 46,
+     "onp": 38,
+     "grn": 3,
+     "ind": 2,
+     "oth": 1
+    },
+    "grn": {
+     "alp": 12,
+     "lnp": 5,
+     "onp": 11,
+     "grn": 64,
+     "ind": 2,
+     "oth": 6
+    },
+    "onp": {
+     "alp": 1,
+     "lnp": 4,
+     "onp": 93,
+     "grn": 1,
+     "ind": 1,
+     "oth": 0
+    },
+    "ind": {
+     "alp": 16,
+     "lnp": 3,
+     "onp": 21,
+     "grn": 7,
+     "ind": 51,
+     "oth": 2
+    },
+    "oth": {
+     "alp": 8,
+     "lnp": 10,
+     "onp": 27,
+     "grn": 10,
+     "ind": 0,
+     "oth": 45
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 19,
+    "onp": 28,
+    "grn": 12,
+    "ind": 5,
+    "oth": 6
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-02-20",
+   "dateStart": "2026-02-16",
+   "sample": 1551,
+   "article": "https://www.capitalbrief.com/article/one-nation-closes-in-on-labors-primary-vote-as-its-poll-surge-continues-224ffb9c-517c-4ac9-9bd5-ac3a8ca6b836/",
+   "onp": 28,
+   "source": "https://demosau.com/wp-content/uploads/2026/02/DemosAU-Federal-Poll-Feb-2026.pdf",
+   "page": 9,
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 77,
+     "onp": 12,
+     "lnp": 3,
+     "grn": 5,
+     "oth": 3
+    },
+    "lnp": {
+     "alp": 4,
+     "onp": 35,
+     "lnp": 59,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 5,
+     "onp": 15,
+     "grn": 79,
+     "oth": 1
+    },
+    "onp": {
+     "alp": 1,
+     "onp": 97,
+     "lnp": 2
+    },
+    "oth": {
+     "alp": 7,
+     "onp": 28,
+     "lnp": 7,
+     "grn": 1,
+     "oth": 57
+    },
+    "dnr": {
+     "alp": 17,
+     "onp": 40,
+     "lnp": 6,
+     "grn": 13,
+     "oth": 24
+    }
+   },
+   "fit": 0.03
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-02-24",
+   "dateStart": "2026-02-17",
+   "sample": 1500,
+   "article": "https://www.skynews.com.au/australia-news/politics/bandaid-on-a-bullet-wound-angus-taylor-halts-coalition-decline-after-taking-over-from-sussan-ley-sky-news-pulse-reveals/news-story/9068187eed61dcd301a5ef5f54a6d8bd",
+   "onp": 24,
+   "source": "https://e.infogram.com/_/ihQUqVtPBNqqg4cvnJMI",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 73,
+     "lnp": 7,
+     "onp": 12,
+     "grn": 5,
+     "ind": 2,
+     "oth": 1
+    },
+    "lnp": {
+     "alp": 5,
+     "lnp": 63,
+     "onp": 29,
+     "grn": 1,
+     "ind": 1,
+     "oth": 1
+    },
+    "grn": {
+     "alp": 5,
+     "lnp": 0,
+     "onp": 10,
+     "grn": 80,
+     "ind": 2,
+     "oth": 3
+    },
+    "onp": {
+     "alp": 2,
+     "lnp": 0,
+     "onp": 95,
+     "grn": 2,
+     "ind": 0,
+     "oth": 1
+    },
+    "ind": {
+     "alp": 10,
+     "lnp": 1,
+     "onp": 21,
+     "grn": 3,
+     "ind": 65,
+     "oth": 0
+    },
+    "oth": {
+     "alp": 11,
+     "lnp": 0,
+     "onp": 26,
+     "grn": 1,
+     "ind": 1,
+     "oth": 61
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 22,
+    "onp": 24,
+    "grn": 13,
+    "ind": 6,
+    "oth": 6
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-03-10",
+   "dateStart": "2026-03-03",
+   "sample": 1425,
+   "article": "https://www.skynews.com.au/australia-news/politics/coalition-vote-collapses-to-historic-low-under-angus-taylor-in-latest-sky-news-pulse-yougov-poll/news-story/a7219b0adb90d87b9b1b9c2e75824a7c",
+   "onp": 26,
+   "source": "https://e.infogram.com/_/pb7kijCuicNCIZB3PVwM",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 76,
+     "lnp": 5,
+     "onp": 10,
+     "grn": 6,
+     "ind": 1,
+     "oth": 2
+    },
+    "lnp": {
+     "alp": 5,
+     "lnp": 55,
+     "onp": 36,
+     "grn": 0,
+     "ind": 2,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 8,
+     "lnp": 1,
+     "onp": 8,
+     "grn": 80,
+     "ind": 1,
+     "oth": 2
+    },
+    "onp": {
+     "alp": 2,
+     "lnp": 2,
+     "onp": 89,
+     "grn": 3,
+     "ind": 1,
+     "oth": 3
+    },
+    "ind": {
+     "alp": 3,
+     "lnp": 5,
+     "onp": 25,
+     "grn": 5,
+     "ind": 59,
+     "oth": 3
+    },
+    "oth": {
+     "alp": 9,
+     "lnp": 2,
+     "onp": 26,
+     "grn": 6,
+     "ind": 0,
+     "oth": 57
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 19,
+    "onp": 26,
+    "grn": 13,
+    "ind": 5,
+    "oth": 7
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-03-24",
+   "dateStart": "2026-03-17",
+   "sample": 1501,
+   "article": "https://www.skynews.com.au/australia-news/politics/pauline-hansons-one-nation-surges-against-labor-in-latest-sky-news-pulse-poll/news-story/6582c87b585bc0554347f6cf870a9bb8",
+   "onp": 27,
+   "source": "https://e.infogram.com/_/oLs7Ez236QuKo9b8951m",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 76,
+     "lnp": 5,
+     "onp": 11,
+     "grn": 5,
+     "ind": 2,
+     "oth": 1
+    },
+    "lnp": {
+     "alp": 5,
+     "lnp": 51,
+     "onp": 41,
+     "grn": 0,
+     "ind": 0,
+     "oth": 3
+    },
+    "grn": {
+     "alp": 6,
+     "lnp": 0,
+     "onp": 5,
+     "grn": 85,
+     "ind": 1,
+     "oth": 3
+    },
+    "onp": {
+     "alp": 2,
+     "lnp": 3,
+     "onp": 94,
+     "grn": 0,
+     "ind": 0,
+     "oth": 1
+    },
+    "ind": {
+     "alp": 12,
+     "lnp": 6,
+     "onp": 15,
+     "grn": 3,
+     "ind": 60,
+     "oth": 4
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 19,
+    "onp": 27,
+    "grn": 13,
+    "ind": 6,
+    "oth": 6
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-04-07",
+   "dateStart": "2026-03-31",
+   "sample": 1502,
+   "article": "https://www.skynews.com.au/australia-news/politics/coalition-locked-in-third-place-behind-labor-and-one-nation-for-sixth-consecutive-poll-sky-news-yougov-pulse/news-story/c8b3eb9a2e8d80c8e1af656f19694212",
+   "onp": 25,
+   "source": "https://e.infogram.com/_/5PSbKtbHyzvhiC0xbRSl",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 76,
+     "lnp": 4,
+     "onp": 10,
+     "grn": 6,
+     "ind": 2,
+     "oth": 2
+    },
+    "lnp": {
+     "alp": 4,
+     "lnp": 54,
+     "onp": 37,
+     "grn": 1,
+     "ind": 2,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 7,
+     "lnp": 5,
+     "onp": 5,
+     "grn": 80,
+     "ind": 1,
+     "oth": 2
+    },
+    "onp": {
+     "alp": 0,
+     "lnp": 4,
+     "onp": 95,
+     "grn": 0,
+     "ind": 0,
+     "oth": 1
+    },
+    "ind": {
+     "alp": 10,
+     "lnp": 5,
+     "onp": 16,
+     "grn": 2,
+     "ind": 66,
+     "oth": 1
+    },
+    "oth": {
+     "alp": 5,
+     "lnp": 11,
+     "onp": 34,
+     "grn": 2,
+     "ind": 1,
+     "oth": 47
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 20,
+    "onp": 25,
+    "grn": 13,
+    "ind": 6,
+    "oth": 7
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-04-14",
+   "dateStart": "2026-04-09",
+   "sample": 1439,
+   "article": "https://www.capitalbrief.com/article/one-nation-draws-level-with-labor-as-voters-blame-immigration-for-housing-crisis-706653c7-d05f-4c10-9a62-5dde8f2a69cc/",
+   "onp": 26,
+   "source": "https://demosau.com/wp-content/uploads/2026/04/DemosAU-Fed-Poll-April-2026.pdf",
+   "page": 12,
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 74,
+     "onp": 14,
+     "lnp": 6,
+     "grn": 3,
+     "oth": 3
+    },
+    "lnp": {
+     "alp": 3,
+     "onp": 32,
+     "lnp": 63,
+     "oth": 2
+    },
+    "grn": {
+     "onp": 7,
+     "lnp": 1,
+     "grn": 91,
+     "oth": 1
+    },
+    "onp": {
+     "alp": 1,
+     "onp": 96,
+     "lnp": 3
+    },
+    "oth": {
+     "alp": 1,
+     "onp": 28,
+     "lnp": 5,
+     "oth": 66
+    },
+    "dnr": {
+     "alp": 6,
+     "onp": 27,
+     "lnp": 18,
+     "grn": 25,
+     "oth": 24
+    }
+   },
+   "fit": 0.03
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-04-21",
+   "dateStart": "2026-04-14",
+   "sample": 1501,
+   "article": "https://www.skynews.com.au/australia-news/politics/pauline-hansons-one-nation-draws-level-with-labor-on-27-per-cent-primary-vote-for-first-time-in-sky-news-pulse-history/news-story/cbc88f47eac6ff1b3b8aa563dfe305e2",
+   "onp": 27,
+   "source": "https://e.infogram.com/_/GM5wSTEgnFLWxZ5bKCB4",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 72,
+     "lnp": 6,
+     "onp": 11,
+     "grn": 5,
+     "ind": 2,
+     "oth": 4
+    },
+    "lnp": {
+     "alp": 5,
+     "lnp": 52,
+     "onp": 39,
+     "grn": 1,
+     "ind": 1,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 6,
+     "lnp": 4,
+     "onp": 7,
+     "grn": 78,
+     "ind": 1,
+     "oth": 4
+    },
+    "onp": {
+     "alp": 2,
+     "lnp": 1,
+     "onp": 94,
+     "grn": 1,
+     "ind": 0,
+     "oth": 2
+    },
+    "ind": {
+     "alp": 9,
+     "lnp": 4,
+     "onp": 20,
+     "grn": 7,
+     "ind": 59,
+     "oth": 1
+    },
+    "oth": {
+     "alp": 4,
+     "lnp": 16,
+     "onp": 28,
+     "grn": 3,
+     "ind": 5,
+     "oth": 44
+    }
+   },
+   "total": {
+    "alp": 27,
+    "lnp": 20,
+    "onp": 27,
+    "grn": 14,
+    "ind": 5,
+    "oth": 7
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-05-05",
+   "dateStart": "2026-04-28",
+   "sample": 1500,
+   "article": "https://www.skynews.com.au/australia-news/politics/coalition-languishing-behind-one-nation-and-labor-for-eight-consecutive-polls-sky-news-pulse-reveals/news-story/136b0b32b0a647328a35440659262b73",
+   "onp": 24,
+   "source": "https://e.infogram.com/_/xlAzTHMulISJRy1rkc2C",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 77,
+     "lnp": 5,
+     "onp": 8,
+     "grn": 5,
+     "ind": 2,
+     "oth": 3
+    },
+    "lnp": {
+     "alp": 5,
+     "lnp": 58,
+     "onp": 33,
+     "grn": 1,
+     "ind": 1,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 3,
+     "lnp": 1,
+     "onp": 4,
+     "grn": 86,
+     "ind": 4,
+     "oth": 3
+    },
+    "onp": {
+     "alp": 1,
+     "lnp": 3,
+     "onp": 91,
+     "grn": 3,
+     "ind": 0,
+     "oth": 2
+    },
+    "ind": {
+     "alp": 20,
+     "lnp": 3,
+     "onp": 11,
+     "grn": 6,
+     "ind": 59,
+     "oth": 0
+    },
+    "oth": {
+     "alp": 0,
+     "lnp": 5,
+     "onp": 35,
+     "grn": 11,
+     "ind": 1,
+     "oth": 47
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 21,
+    "onp": 24,
+    "grn": 14,
+    "ind": 5,
+    "oth": 6
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-05-19",
+   "dateStart": "2026-05-12",
+   "sample": 1504,
+   "article": "https://www.skynews.com.au/australia-news/politics/labors-primary-vote-plummets-amid-backlash-to-anthony-albaneses-budget-broken-promises/news-story/85b0175fa0db4e02b85f4161771cdefd",
+   "onp": 25,
+   "source": "https://e.infogram.com/_/rpPgjmCBFb9tgpiTDMJW",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 70,
+     "lnp": 7,
+     "onp": 13,
+     "grn": 7,
+     "ind": 1,
+     "oth": 2
+    },
+    "lnp": {
+     "alp": 3,
+     "lnp": 57,
+     "onp": 34,
+     "grn": 2,
+     "ind": 1,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 10,
+     "lnp": 3,
+     "onp": 7,
+     "grn": 76,
+     "ind": 0,
+     "oth": 3
+    },
+    "onp": {
+     "alp": 1,
+     "lnp": 5,
+     "onp": 91,
+     "grn": 2,
+     "ind": 0,
+     "oth": 1
+    },
+    "ind": {
+     "alp": 10,
+     "lnp": 10,
+     "onp": 12,
+     "grn": 6,
+     "ind": 62,
+     "oth": 0
+    },
+    "oth": {
+     "alp": 7,
+     "lnp": 9,
+     "onp": 20,
+     "grn": 4,
+     "ind": 1,
+     "oth": 59
+    }
+   },
+   "total": {
+    "alp": 28,
+    "lnp": 23,
+    "onp": 25,
+    "grn": 13,
+    "ind": 5,
+    "oth": 6
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-05-20",
+   "dateStart": "2026-05-15",
+   "sample": 1502,
+   "article": "https://www.capitalbrief.com/article/labors-budget-backlash-begins-as-one-nation-continues-its-rise-f730690e-86cf-4231-8d1f-f6bf23d1d8a0/",
+   "onp": 28,
+   "source": "https://demosau.com/wp-content/uploads/2026/05/DemosAU-Fed-Poll-May-2026-FINAL.pdf",
+   "page": 13,
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 71,
+     "onp": 17,
+     "lnp": 7,
+     "grn": 3,
+     "oth": 2
+    },
+    "lnp": {
+     "alp": 3,
+     "onp": 37,
+     "lnp": 60
+    },
+    "grn": {
+     "alp": 5,
+     "onp": 5,
+     "lnp": 1,
+     "grn": 86,
+     "oth": 3
+    },
+    "onp": {
+     "alp": 1,
+     "onp": 98,
+     "lnp": 1
+    },
+    "oth": {
+     "alp": 1,
+     "onp": 25,
+     "lnp": 9,
+     "grn": 6,
+     "oth": 59
+    },
+    "dnr": {
+     "alp": 20,
+     "onp": 39,
+     "lnp": 16,
+     "grn": 18,
+     "oth": 7
+    }
+   },
+   "fit": 0.03
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-06-02",
+   "dateStart": "2026-05-26",
+   "sample": 1471,
+   "article": "https://www.skynews.com.au/australia-news/politics/one-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling/news-story/0fe9ddf8797b5e529436557d7ce63897",
+   "onp": 29,
+   "source": "https://e.infogram.com/_/zSPbFJ7s5bfliWLjxj21",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 71,
+     "lnp": 7,
+     "onp": 14,
+     "grn": 4,
+     "ind": 2,
+     "oth": 3
+    },
+    "lnp": {
+     "alp": 2,
+     "lnp": 51,
+     "onp": 44,
+     "grn": 0,
+     "ind": 1,
+     "oth": 1
+    },
+    "grn": {
+     "alp": 8,
+     "lnp": 1,
+     "onp": 9,
+     "grn": 75,
+     "ind": 4,
+     "oth": 3
+    },
+    "onp": {
+     "alp": 2,
+     "lnp": 5,
+     "onp": 89,
+     "grn": 1,
+     "ind": 1,
+     "oth": 2
+    },
+    "ind": {
+     "alp": 17,
+     "lnp": 3,
+     "onp": 12,
+     "grn": 9,
+     "ind": 58,
+     "oth": 0
+    },
+    "oth": {
+     "alp": 3,
+     "lnp": 6,
+     "onp": 36,
+     "grn": 5,
+     "ind": 0,
+     "oth": 49
+    }
+   },
+   "total": {
+    "alp": 26,
+    "lnp": 20,
+    "onp": 29,
+    "grn": 13,
+    "ind": 6,
+    "oth": 6
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-06-18",
+   "dateStart": "2026-06-16",
+   "sample": 1497,
+   "article": "https://demosau.com/news/one-nation-lead-grows-as-l-np-primary-sinks-to-18/",
+   "onp": 30,
+   "source": "https://demosau.com/wp-content/uploads/2026/06/Capital-BriefDemosAU-Federal-Poll-June-2026-FINAL.pdf",
+   "page": 12,
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 71,
+     "onp": 16,
+     "lnp": 6,
+     "grn": 3,
+     "oth": 4
+    },
+    "lnp": {
+     "alp": 3,
+     "onp": 43,
+     "lnp": 51,
+     "grn": 1,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 5,
+     "onp": 6,
+     "lnp": 1,
+     "grn": 85,
+     "oth": 3
+    },
+    "onp": {
+     "alp": 3,
+     "onp": 94,
+     "grn": 1,
+     "oth": 2
+    },
+    "oth": {
+     "alp": 5,
+     "onp": 23,
+     "lnp": 3,
+     "grn": 2,
+     "oth": 67
+    },
+    "dnr": {
+     "alp": 16,
+     "onp": 51,
+     "lnp": 6,
+     "grn": 18,
+     "oth": 9
+    }
+   },
+   "fit": 0.03
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-06-30",
+   "dateStart": "2026-06-23",
+   "sample": 1502,
+   "article": "https://www.skynews.com.au/australia-news/politics/one-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense/news-story/3ecdbeb123199de72a7c12b4fb9efbd2",
+   "onp": 30,
+   "source": "https://e.infogram.com/_/adAygP6VBs84ueM4jN4C",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 72,
+     "lnp": 6,
+     "onp": 15,
+     "grn": 4,
+     "ind": 2,
+     "oth": 1
+    },
+    "lnp": {
+     "alp": 4,
+     "lnp": 45,
+     "onp": 46,
+     "grn": 1,
+     "ind": 3,
+     "oth": 1
+    },
+    "grn": {
+     "alp": 7,
+     "lnp": 2,
+     "onp": 3,
+     "grn": 82,
+     "ind": 1,
+     "oth": 4
+    },
+    "onp": {
+     "alp": 2,
+     "lnp": 2,
+     "onp": 94,
+     "grn": 0,
+     "ind": 1,
+     "oth": 1
+    },
+    "ind": {
+     "alp": 19,
+     "lnp": 1,
+     "onp": 20,
+     "grn": 6,
+     "ind": 53,
+     "oth": 1
+    },
+    "oth": {
+     "alp": 14,
+     "lnp": 4,
+     "onp": 32,
+     "grn": 1,
+     "ind": 6,
+     "oth": 43
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 17,
+    "onp": 30,
+    "grn": 13,
+    "ind": 6,
+    "oth": 5
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-07-08",
+   "dateStart": "2026-07-03",
+   "sample": 2694,
+   "article": "https://www.capitalbrief.com/newsletter/pauline-hansons-agenda-takes-a-hit-in-new-poll-701d8498-f9f1-43f6-ab7c-dd8d236dfa78/",
+   "onp": 29,
+   "source": "https://demosau.com/wp-content/uploads/2026/07/Capital-BriefDemosAU-Federal-Poll-July-2026.pdf",
+   "page": 14,
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 70,
+     "onp": 16,
+     "lnp": 6,
+     "grn": 5,
+     "oth": 3
+    },
+    "lnp": {
+     "alp": 3,
+     "onp": 37,
+     "lnp": 57,
+     "grn": 1,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 4,
+     "onp": 6,
+     "lnp": 3,
+     "grn": 85,
+     "oth": 2
+    },
+    "onp": {
+     "onp": 98,
+     "lnp": 1,
+     "oth": 1
+    },
+    "oth": {
+     "alp": 5,
+     "onp": 24,
+     "lnp": 7,
+     "grn": 7,
+     "oth": 57
+    },
+    "dnr": {
+     "alp": 18,
+     "onp": 45,
+     "lnp": 13,
+     "grn": 15,
+     "oth": 9
+    }
+   },
+   "fit": 0.03
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-07-14",
+   "dateStart": "2026-07-07",
+   "sample": 1468,
+   "article": "https://www.skynews.com.au/australia-news/politics/pauline-hansons-monoculture-call-sees-one-nation-support-slide-as-labor-regains-poll-lead-in-sky-news-pulse/news-story/ff02004ef7e9634e18b54b227fba984b",
+   "onp": 26,
+   "source": "https://e.infogram.com/_/pL018pKKkRErkzkegdv6",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 68,
+     "lnp": 6,
+     "onp": 15,
+     "grn": 5,
+     "ind": 4,
+     "oth": 2,
+     "community-strong": 1
+    },
+    "lnp": {
+     "alp": 6,
+     "lnp": 54,
+     "onp": 38,
+     "grn": 0,
+     "ind": 1,
+     "oth": 1,
+     "community-strong": 0
+    },
+    "grn": {
+     "alp": 9,
+     "lnp": 5,
+     "onp": 3,
+     "grn": 75,
+     "ind": 4,
+     "oth": 1,
+     "community-strong": 3
+    },
+    "onp": {
+     "alp": 3,
+     "lnp": 0,
+     "onp": 91,
+     "grn": 0,
+     "ind": 1,
+     "oth": 3,
+     "community-strong": 2
+    },
+    "ind": {
+     "alp": 14,
+     "lnp": 6,
+     "onp": 9,
+     "grn": 2,
+     "ind": 57,
+     "oth": 5,
+     "community-strong": 7
+    },
+    "oth": {
+     "alp": 5,
+     "lnp": 1,
+     "onp": 29,
+     "grn": 3,
+     "ind": 3,
+     "oth": 58,
+     "community-strong": 1
+    }
+   },
+   "total": {
+    "alp": 28,
+    "lnp": 20,
+    "onp": 26,
+    "grn": 12,
+    "ind": 6,
+    "oth": 6,
+    "community-strong": 2
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-07-28",
+   "dateStart": "2026-07-21",
+   "sample": 1519,
+   "article": "https://www.news24.com.au/politics/australian-politics/labor-on-lowest-majoritywinning-vote-since-federation-as-voters-turn-on-major-parties-news24-pulse/news-story/30abb89ce081815670d1a05c4517f90e",
+   "onp": 25,
+   "source": "https://e.infogram.com/_/cEkYPVrn9ybfCGXAflmL",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 72,
+     "lnp": 7,
+     "onp": 11,
+     "grn": 6,
+     "community-strong": 1,
+     "ind": 2,
+     "oth": 1
+    },
+    "lnp": {
+     "alp": 3,
+     "lnp": 56,
+     "onp": 38,
+     "grn": 0,
+     "community-strong": 1,
+     "ind": 1,
+     "oth": 2
+    },
+    "grn": {
+     "alp": 10,
+     "lnp": 3,
+     "onp": 3,
+     "grn": 81,
+     "community-strong": 1,
+     "ind": 1,
+     "oth": 1
+    },
+    "onp": {
+     "alp": 2,
+     "lnp": 1,
+     "onp": 89,
+     "grn": 4,
+     "community-strong": 0,
+     "ind": 3,
+     "oth": 1
+    },
+    "ind": {
+     "alp": 6,
+     "lnp": 8,
+     "onp": 14,
+     "grn": 3,
+     "community-strong": 8,
+     "ind": 59,
+     "oth": 2
+    },
+    "oth": {
+     "alp": 13,
+     "lnp": 10,
+     "onp": 26,
+     "grn": 2,
+     "community-strong": 0,
+     "ind": 3,
+     "oth": 46
+    }
+   },
+   "total": {
+    "alp": 28,
+    "lnp": 22,
+    "onp": 25,
+    "grn": 13,
+    "community-strong": 1,
+    "ind": 6,
+    "oth": 5
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-08-10",
+   "dateStart": "2026-08-04",
+   "sample": 1511,
+   "article": "https://www.news24.com.au/politics/australian-politics/coalition-and-one-nation-face-vote-consolidation-battle-to-oust-albanese-as-formal-alliance-ruled-out/news-story/647c039e1efc5027e63a509879724195",
+   "onp": 24,
+   "source": "https://e.infogram.com/_/bfCWmJWwJrLP0zgZOSEt",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 73,
+     "lnp": 6,
+     "onp": 11,
+     "grn": 5,
+     "ind": 2,
+     "oth": 2,
+     "community-strong": 1
+    },
+    "lnp": {
+     "alp": 4,
+     "lnp": 57,
+     "onp": 36,
+     "grn": 0,
+     "ind": 1,
+     "oth": 2,
+     "community-strong": 0
+    },
+    "grn": {
+     "alp": 9,
+     "lnp": 0,
+     "onp": 6,
+     "grn": 76,
+     "ind": 5,
+     "oth": 1,
+     "community-strong": 3
+    },
+    "onp": {
+     "alp": 1,
+     "lnp": 6,
+     "onp": 90,
+     "grn": 1,
+     "ind": 0,
+     "oth": 1,
+     "community-strong": 1
+    },
+    "ind": {
+     "alp": 7,
+     "lnp": 3,
+     "onp": 15,
+     "grn": 7,
+     "ind": 51,
+     "oth": 5,
+     "community-strong": 12
+    },
+    "oth": {
+     "alp": 4,
+     "lnp": 9,
+     "onp": 19,
+     "grn": 1,
+     "ind": 0,
+     "oth": 62,
+     "community-strong": 5
+    }
+   },
+   "total": {
+    "alp": 28,
+    "lnp": 22,
+    "onp": 24,
+    "grn": 12,
+    "ind": 5,
+    "oth": 7,
+    "community-strong": 2
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-08-20",
+   "dateStart": "2026-08-18",
+   "sample": 1562,
+   "article": "https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/",
+   "onp": 24,
+   "source": "https://demosau.com/wp-content/uploads/2026/08/Capital-BriefDemosAU-Federal-Poll-August-2026.pdf",
+   "page": 11,
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 74,
+     "grn": 3,
+     "oth": 2,
+     "onp": 15,
+     "lnp": 6
+    },
+    "lnp": {
+     "alp": 1,
+     "oth": 1,
+     "onp": 31,
+     "lnp": 67
+    },
+    "grn": {
+     "alp": 6,
+     "grn": 83,
+     "oth": 5,
+     "onp": 4,
+     "lnp": 2
+    },
+    "onp": {
+     "alp": 2,
+     "oth": 1,
+     "onp": 96,
+     "lnp": 1
+    },
+    "oth": {
+     "alp": 3,
+     "grn": 5,
+     "oth": 72,
+     "onp": 9,
+     "lnp": 11
+    },
+    "dnr": {
+     "alp": 17,
+     "grn": 10,
+     "oth": 18,
+     "onp": 40,
+     "lnp": 15
+    }
+   },
+   "fit": 0.46
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-08-24",
+   "dateStart": "2026-08-18",
+   "sample": 1510,
+   "article": "https://www.news24.com.au/politics/australian-politics/one-nation-trails-labor-by-three-points-following-a-difficult-parliamentary-fortnight-for-albanese/news-story/d04bde51f5545775296ce13f7e15515e",
+   "onp": 26,
+   "source": "https://e.infogram.com/_/YM46DvOTftyx9pNzV67y",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 71,
+     "lnp": 8,
+     "onp": 11,
+     "grn": 4,
+     "ind": 3,
+     "oth": 2,
+     "community-strong": 1
+    },
+    "lnp": {
+     "alp": 4,
+     "lnp": 56,
+     "onp": 35,
+     "grn": 2,
+     "ind": 0,
+     "oth": 2,
+     "community-strong": 1
+    },
+    "grn": {
+     "alp": 11,
+     "lnp": 2,
+     "onp": 2,
+     "grn": 76,
+     "ind": 3,
+     "oth": 4,
+     "community-strong": 2
+    },
+    "onp": {
+     "alp": 2,
+     "lnp": 4,
+     "onp": 90,
+     "grn": 1,
+     "ind": 0,
+     "oth": 2,
+     "community-strong": 0
+    },
+    "ind": {
+     "alp": 9,
+     "lnp": 4,
+     "onp": 21,
+     "grn": 1,
+     "ind": 53,
+     "oth": 1,
+     "community-strong": 11
+    },
+    "oth": {
+     "alp": 3,
+     "lnp": 4,
+     "onp": 52,
+     "grn": 1,
+     "ind": 0,
+     "oth": 39,
+     "community-strong": 1
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 21,
+    "onp": 26,
+    "grn": 12,
+    "ind": 5,
+    "oth": 5,
+    "community-strong": 2
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-09-08",
+   "dateStart": "2026-09-01",
+   "sample": 1504,
+   "article": "https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0",
+   "onp": 30,
+   "source": "https://e.infogram.com/_/tffIGyctHfK10P86g4Pb",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 68,
+     "lnp": 6,
+     "onp": 13,
+     "grn": 6,
+     "ind": 4,
+     "oth": 2,
+     "community-strong": 1
+    },
+    "lnp": {
+     "alp": 2,
+     "lnp": 49,
+     "onp": 47,
+     "grn": 0,
+     "ind": 1,
+     "oth": 1,
+     "community-strong": 0
+    },
+    "grn": {
+     "alp": 12,
+     "lnp": 2,
+     "onp": 3,
+     "grn": 73,
+     "ind": 8,
+     "oth": 2,
+     "community-strong": 0
+    },
+    "onp": {
+     "alp": 2,
+     "lnp": 1,
+     "onp": 94,
+     "grn": 0,
+     "ind": 0,
+     "oth": 3,
+     "community-strong": 0
+    },
+    "ind": {
+     "alp": 11,
+     "lnp": 2,
+     "onp": 13,
+     "grn": 3,
+     "ind": 54,
+     "oth": 1,
+     "community-strong": 16
+    },
+    "oth": {
+     "alp": 2,
+     "lnp": 4,
+     "onp": 34,
+     "grn": 2,
+     "ind": 3,
+     "oth": 50,
+     "community-strong": 5
+    }
+   },
+   "total": {
+    "alp": 26,
+    "lnp": 18,
+    "onp": 30,
+    "grn": 12,
+    "ind": 7,
+    "oth": 5,
+    "community-strong": 2
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-09-14",
+   "dateStart": "2026-09-10",
+   "sample": 1583,
+   "article": "https://www.capitalbrief.com/newsletter/exclusive-poll-voters-back-social-media-reform-fbd908f1-a09e-4d1e-9713-9c8c02dd0d31/",
+   "onp": 26,
+   "source": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf",
+   "page": 14,
+   "read": "measured from the chart",
+   "rows": {
+    "alp": {
+     "alp": 68,
+     "grn": 6,
+     "oth": 4,
+     "lnp": 8,
+     "onp": 14
+    },
+    "lnp": {
+     "alp": 8,
+     "grn": 2,
+     "oth": 3,
+     "lnp": 52,
+     "onp": 35
+    },
+    "grn": {
+     "alp": 12,
+     "grn": 79,
+     "lnp": 4,
+     "onp": 5
+    },
+    "onp": {
+     "alp": 1,
+     "oth": 2,
+     "lnp": 1,
+     "onp": 96
+    },
+    "oth": {
+     "alp": 4,
+     "grn": 3,
+     "oth": 71,
+     "lnp": 6,
+     "onp": 16
+    },
+    "dnr": {
+     "alp": 19,
+     "grn": 10,
+     "oth": 23,
+     "lnp": 11,
+     "onp": 37
+    }
+   },
+   "fit": 0.07
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-09-21",
+   "dateStart": "2026-09-15",
+   "sample": 1500,
+   "article": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
+   "onp": 27,
+   "source": "https://e.infogram.com/_/XdWD62anjLF6u5scKfkU",
+   "read": "published table",
+   "rows": {
+    "alp": {
+     "alp": 65,
+     "lnp": 9,
+     "onp": 15,
+     "grn": 6,
+     "ind": 3,
+     "oth": 1,
+     "community-strong": 1
+    },
+    "lnp": {
+     "alp": 6,
+     "lnp": 52,
+     "onp": 38,
+     "grn": 1,
+     "ind": 1,
+     "oth": 2,
+     "community-strong": 0
+    },
+    "grn": {
+     "alp": 8,
+     "lnp": 2,
+     "onp": 2,
+     "grn": 80,
+     "ind": 2,
+     "oth": 3,
+     "community-strong": 3
+    },
+    "onp": {
+     "alp": 3,
+     "lnp": 2,
+     "onp": 92,
+     "grn": 0,
+     "ind": 0,
+     "oth": 3,
+     "community-strong": 0
+    },
+    "ind": {
+     "alp": 9,
+     "lnp": 5,
+     "onp": 19,
+     "grn": 5,
+     "ind": 57,
+     "oth": 1,
+     "community-strong": 4
+    },
+    "oth": {
+     "alp": 5,
+     "lnp": 9,
+     "onp": 27,
+     "grn": 6,
+     "ind": 4,
+     "oth": 43,
+     "community-strong": 6
+    }
+   },
+   "total": {
+    "alp": 26,
+    "lnp": 21,
+    "onp": 27,
+    "grn": 14,
+    "ind": 6,
+    "oth": 5,
+    "community-strong": 1
+   }
+  }
+ ]
+}

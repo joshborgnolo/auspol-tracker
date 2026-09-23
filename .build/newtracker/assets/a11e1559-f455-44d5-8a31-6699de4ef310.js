@@ -159,10 +159,12 @@ function fitDomain(vals, step, include) {
    RollNum is defined by the header script, which loads after this one -
    resolved at render, and guarded so a reordering degrades to a plain figure
    rather than a blank panel. */
-function Delta({ value, suffix = "", goodUp = true, small, title, roll, spinIn }) {
+function Delta({ value, suffix = "", goodUp = true, neutral, small, title, roll, spinIn }) {
   if (value == null) return null;
   const up = value > 0, flat = Math.abs(value) < 0.05;
-  const cls = flat ? "flat" : (up === goodUp ? "up" : "down");
+  // neutral: a move that is news but neither good nor bad (where One Nation's
+  // voters came from) keeps its arrow and figure in the flat grey
+  const cls = flat || neutral ? "flat" : (up === goodUp ? "up" : "down");
   const arrow = flat ? "→" : up ? "▲" : "▼";
   const figure = `${up ? "+" : ""}${value.toFixed(1)}`;
   const Roll = window.RollNum;
@@ -1449,6 +1451,99 @@ function UndecidedPanel({ rangeId }) {
         applied. Only the first is left out of the shares elsewhere on this
         page, so a rising line means the share is being read off a smaller
         pool of decided voters, not that support has moved.
+      </p>
+    </section>
+  );
+}
+
+// ---- Where are One Nation voters coming from ---------------------------
+/* One Nation's gain since the 2025 election, split by how the voters it
+   gained voted in 2025 – from the vote-switching tables DemosAU and YouGov
+   publish (gen-data §5b, data/vote-switching.json). Same furniture as the
+   undecided panel: a reading per group, monthly lines, one dot per poll. */
+function OnSourcesPanel({ rangeId }) {
+  const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
+  const narrow = useNarrow();
+  const S = D.onSources;
+  if (!S || !S.series.length) return null;
+  /* The houses began publishing these tables in February 2026, so the chart
+     starts at its first month rather than at the 2025 election the other
+     panels open on – on the full range that would leave most of it empty. */
+  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+  const firstX = Math.min(...S.series.map((sr) => (sr.monthly[0] || { x: Infinity }).x));
+  const xDomain = [Math.max(rangeLo, firstX - 0.06), rangeHi];
+  const drawn = S.series.map((sr) => {
+    const pts = filterPts(sr.monthly, xDomain[0]);
+    const dots = sr.polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1])
+      .map((d) => ({ x: d.x, y: d.v, color: sr.color, label: sr.label, meta: d }));
+    return { sr, pts, dots };
+  }).filter((d) => d.pts.length >= 1);
+  if (!drawn.length) return null;
+  const vals = drawn.flatMap((d) => d.pts.map((p) => p.v).concat(d.dots.map((p) => p.y)));
+  const hi = Math.ceil((Math.max(...vals) + 3) / 10) * 10;
+  const yTicks = [];
+  for (let v = 10; v < hi; v += 10) yTicks.push(v);
+  const spine = drawn.reduce((a, d) => (d.pts.length > a.length ? d.pts : a), []);
+  /* The readings are the latest MONTH, not the latest poll: one wave's split
+     rests on a few hundred respondents per group and swings by several
+     points; the month pools every wave in it. */
+  const monthOf = (ym) => D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
+  const reads = S.series.map((sr) => {
+    const m = sr.monthly, last = m[m.length - 1], prev = m[m.length - 2];
+    return { sr, v: last.v, ym: last.ym, chg: prev ? +(last.v - prev.v).toFixed(1) : null };
+  });
+  const [a, b] = reads;
+  return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">Where are One Nation voters coming from</h2>
+          <p className="card-sub">
+            Share of One Nation’s gain since the 2025 election, by how those voters voted in 2025 · {houseList(S.houses)}
+          </p>
+        </div>
+      </div>
+      <p className="ons-lead">
+        In {monthOf(a.ym)}, {Math.round(a.v)}% of One Nation’s gain came from people who voted for
+        the Coalition in 2025, and {Math.round(b.v)}% from Labor voters.
+      </p>
+      <div className="und-reads">
+        {reads.map(({ sr, v, chg }) => (
+          <div className="und-read" key={sr.id}>
+            <span className="und-swatch" style={{ background: sr.color }} aria-hidden="true"></span>
+            <div className="und-read-body">
+              <div className="und-read-top">
+                <span className="und-read-lab">{sr.label}</span>
+                <span className="und-read-v">{Math.round(v)}<span className="pct">%</span></span>
+                {chg != null && <Delta value={chg} neutral small title="Change on the previous month" />}
+              </div>
+              <p className="und-read-note">{sr.note}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      <TrendChart
+        key="ons"
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[0, hi]}
+        yTicks={yTicks} unit="%" axisFont={narrow ? 28 : 20}
+        // two-digit shares ("60%") at the phone's 28px axis need the room
+        pad={{ l: narrow ? 84 : 58, r: 22, t: 16, b: 42 }}
+        xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: d.sr.color, points: series(d.pts, "v") }))}
+        spine={series(spine, "v")}
+        scatter={drawn.flatMap((d) => d.dots)} pollFacet="twopp"
+        tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}
+        fmt={(v) => v.toFixed(1)}
+      />
+      <p className="table-hint">
+        Each dot is one poll’s split; the lines are monthly averages. A group’s part is the share of
+        its 2025 voters now backing One Nation, weighted by that group’s share of the 2025 vote – so
+        38% of Coalition voters counts for far more than 38% of a small party’s. Voters who can’t
+        recall a 2025 vote are left out, and so are One Nation’s own 2025 voters, who are what it
+        kept rather than gained.{" "}
+        <button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where are One Nation voters coming from")}>
+          How it’s worked out</button>
       </p>
     </section>
   );
@@ -3290,7 +3385,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   );
 }
 
-Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, PollsterTable, NextPollsPanel,
+Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, OnSourcesPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
   PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows, EffLines, sampleValue,

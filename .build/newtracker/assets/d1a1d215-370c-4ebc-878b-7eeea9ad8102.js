@@ -5548,6 +5548,35 @@ function infoTerms(D) {
     const [yy, mm] = w[i].ym.split("-").map(Number);
     return D.monthNameFull ? D.monthNameFull(mm) + " " + yy : w[i].ym;
   })();
+  /* Vote switching (the One Nation sources panel): the latest YouGov wave
+     for the worked example, and every wave for the working table. */
+  const ONS = D.onSources;
+  const onsWaves = ONS ? ONS.waves : [];
+  const onsYg = [...onsWaves].reverse().find((w) => w.pollster === "YouGov") || null;
+  const onsWork = onsWaves.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work">
+        <thead><tr><th>Poll</th><th>Fieldwork</th><th>Coalition</th><th>Labor</th><th>Greens</th>
+          <th>Others</th><th>Kept</th><th>Drawn</th><th>Table</th><th>Published</th></tr></thead>
+        <tbody>
+          {onsWaves.map((w) => (
+            <tr key={w.pollster + w.date}>
+              <td>{w.pollster}</td><td>{w.date}</td>
+              <td>{w.toOn.lnp}</td><td>{w.toOn.alp}</td><td>{w.toOn.grn}</td><td>{w.toOn.oth}</td>
+              <td>{w.keptPct}</td><td>{w.drawn.toFixed(1)}</td><td>{w.implied.toFixed(1)}</td><td>{w.onp ?? "–"}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="info-work-note">Coalition to Kept: per cent of each 2025 group now voting One
+        Nation (Kept is One Nation’s own 2025 voters). Drawn: the points of the national vote One
+        Nation has taken from the other groups, at their 2025 weights (Coalition {ONS.weights.lnp},
+        Labor {ONS.weights.alp}, Greens {ONS.weights.grn}, others and independents
+        {" "}{(ONS.weights.oth + ONS.weights.ind).toFixed(2)}, One Nation {ONS.weights.onp}). Table:
+        drawn plus kept – what the poll’s own table adds up to – beside the One Nation vote it
+        published. DemosAU’s voters who can’t recall a 2025 vote are the rest of its gap.</p>
+    </div>
+  ) : null;
   const pc = (v) => (v == null ? "–" : (100 * v).toFixed(1));
   const lefWork = lefT.length ? (
     <div className="info-work-wrap">
@@ -5860,6 +5889,35 @@ function infoTerms(D) {
         hand.</span>
         <span className="info-p">Open a row to see the house’s five most recent releases and its
         release page, so you can check the forecast against its record.</span></>) },
+    ] },
+    { id: "g-who", title: "Who votes for whom", entries: [
+      { id: "vote-switching", term: "Vote switching", body: (
+        <>How people who voted for each party in 2025 say they would vote now. DemosAU and
+        YouGov both publish it, as a table with a row for each 2025 vote, and it’s what the panel
+        “Where are One Nation voters coming from” is built from.
+        <span className="info-p"><b>How the split is worked out.</b> For each 2025 group, the share
+        now backing One Nation is multiplied by that group’s share of the 2025 vote. That gives the
+        points of the national vote One Nation has drawn from the group, and each group’s part of
+        the total is the share the panel shows.{onsYg ? <> In YouGov’s latest poll, {onsYg.toOn.lnp}%
+        of Coalition voters backing One Nation is worth {onsYg.pts.lnp.toFixed(1)} points, and
+        {" "}{onsYg.toOn.alp}% of Labor voters is worth {onsYg.pts.alp.toFixed(1)}.</> : null}</span>
+        <span className="info-p"><b>A check.</b> Add the 2025 One Nation voters it kept, and every
+        poll’s table rebuilds its published One Nation vote to within about a point.</span>
+        <span className="info-p"><b>Limits.</b> People misremember how they voted, and memory tends
+        to drift toward how they feel now, which can blur the very switching being measured. Each
+        2025 group is only a few hundred respondents in any one poll, so a single poll’s split can
+        move several points; the monthly line averages them. Voters who can’t recall a 2025 vote,
+        or didn’t vote, are left out. Other parties and independents are counted together, because
+        DemosAU doesn’t separate them.</span>
+        <span className="info-p"><b>Sources.</b> YouGov’s figures are its own published tables,
+        from Sky News Pulse until July 2026 and News24 Pulse since. DemosAU prints its table only
+        as a chart, so its figures are measured from the chart in each report, and match every
+        label the chart prints. Newspoll publishes only Labor’s row: its September poll found 15% of
+        Labor’s 2025 voters now back One Nation (
+        <a className="fb-link" href="https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455"
+           target="_blank" rel="noopener noreferrer">The Australian</a>), close to DemosAU’s 14%
+        and YouGov’s 15%.</span>
+        {working(onsWork)}</>) },
     ] },
     { id: "g-leaders", title: "Leaders", entries: [
       { id: "approval", term: "Approval", body: (

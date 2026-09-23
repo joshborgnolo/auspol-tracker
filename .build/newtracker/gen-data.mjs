@@ -1304,6 +1304,92 @@ const undecided = undecidedSeries.length ? {
   houses: creditHouses(undecidedRows, (r) => r.p.pollster, (r) => Date.parse(r.p.date)),
 } : null;
 
+/* ---- 5b. where One Nation's gains came from ------------------------------
+   From the vote-switching tables DemosAU and YouGov publish (built into
+   data/vote-switching.json by .build/vote-switching.mjs): each 2025-vote
+   group's share now voting One Nation. Weighted by that group's share of the
+   2025 formal vote, that is how many points of the national vote One Nation
+   has drawn from it; each group's part of the total drawn from everyone who
+   did NOT vote One Nation in 2025 is the share plotted – "of One Nation's
+   gain, x% came from Coalition voters".
+   - Weights are the 2025 result, not each sample's own recalled vote: the
+     question is about the electorate, and both houses weight to 2025 vote.
+   - Other parties and independents are one group: DemosAU never splits them,
+     so YouGov's two rows are combined at their own weights to match.
+   - Voters who can't recall a 2025 vote, or didn't cast one, are left out of
+     the split: only DemosAU shows them, and neither house says how many there
+     are. So are One Nation's own 2025 voters – they are what it kept, not
+     what it gained.
+   - A wave missing a group (YouGov 24 Mar 2026 printed no "other" column)
+     can't be split, and is skipped.
+   - DemosAU's table stores only segments that round above zero, so a group
+     row with no One Nation cell is a 0. */
+const VOTE_SWITCHING = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "vote-switching.json"), "utf8")); }
+  catch { return null; }
+})();
+const ON_SOURCE_GROUPS = [
+  { id: "lnp", label: "Coalition voters", color: "var(--lnp)", note: "voted Liberal or National in 2025" },
+  { id: "alp", label: "Labor voters", color: "var(--alp)", note: "voted Labor in 2025" },
+  { id: "oth", label: "Other voters", color: "var(--oth)", note: "voted for another party or an independent in 2025" },
+  { id: "grn", label: "Greens voters", color: "var(--grn)", note: "voted Greens in 2025" },
+];
+const onSourceWaves = (() => {
+  if (!VOTE_SWITCHING) return [];
+  const W = VOTE_SWITCHING.weights2025;
+  return VOTE_SWITCHING.waves.map((w) => {
+    const toOn = (g) => (w.rows[g] ? (w.rows[g].onp ?? 0) : null);
+    const gain = {
+      lnp: toOn("lnp") == null ? null : W.lnp * toOn("lnp") / 100,
+      alp: toOn("alp") == null ? null : W.alp * toOn("alp") / 100,
+      grn: toOn("grn") == null ? null : W.grn * toOn("grn") / 100,
+      oth: w.rows.ind
+        ? (toOn("ind") == null || toOn("oth") == null ? null : (W.ind * toOn("ind") + W.oth * toOn("oth")) / 100)
+        : (toOn("oth") == null ? null : (W.ind + W.oth) * toOn("oth") / 100),
+    };
+    if (Object.values(gain).some((v) => v == null) || toOn("onp") == null) return null;
+    const drawn = Object.values(gain).reduce((s, v) => s + v, 0);
+    const kept = W.onp * toOn("onp") / 100;
+    return {
+      pollster: w.pollster, date: w.date, dateStart: w.dateStart, sample: w.sample, source: w.source,
+      read: w.read, x: dx(w.date), ym: ymOf(w.date),
+      share: Object.fromEntries(Object.entries(gain).map(([k, v]) => [k, r1(100 * v / drawn)])),
+      pts: Object.fromEntries(Object.entries(gain).map(([k, v]) => [k, r1(v)])),
+      drawn: r1(drawn), kept: r1(kept), keptPct: toOn("onp"),
+      // % of each 2025 group now voting One Nation (YouGov's independents and
+      // other parties folded at their own 2025 weights, to match DemosAU)
+      toOn: { lnp: toOn("lnp"), alp: toOn("alp"), grn: toOn("grn"),
+              oth: w.rows.ind ? r1((W.ind * toOn("ind") + W.oth * toOn("oth")) / (W.ind + W.oth)) : toOn("oth") },
+      // what the table itself adds up to (gains + kept; DemosAU's non-recall
+      // group excluded) beside the wave's published One Nation primary
+      implied: r1(drawn + kept), onp: w.onp,
+    };
+  }).filter(Boolean).sort((a, b) => a.x - b.x);
+})();
+const onSources = onSourceWaves.length ? {
+  series: ON_SOURCE_GROUPS.map((g) => {
+    const polls = onSourceWaves.map((w) => ({
+      x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date,
+      sample: w.sample ?? null, v: w.share[g.id], pts: w.pts[g.id],
+    }));
+    const monthly = MONTHS.map((ym) => {
+      const m = polls.filter((d) => d.ym === ym);
+      if (!m.length) return null;
+      let sw = 0, swx = 0;
+      for (const r of m) { const n = rowN(r); sw += n; swx += n * r.v; }
+      return { ym, x: mx(ym), v: r1(swx / sw), k: m.length };
+    }).filter(Boolean);
+    const last = polls[polls.length - 1];
+    const prev = [...polls].reverse().find((d) => d.pollster === last.pollster && d.x < last.x);
+    return { ...g, polls, monthly, n: polls.length,
+      latest: { v: last.v, firm: last.pollster, released: last.released, field: last.dateLabel,
+                chg: prev ? r1(last.v - prev.v) : null, refDate: prev ? prev.released : null } };
+  }),
+  waves: onSourceWaves.map(({ x, ym, ...w }) => w),
+  houses: creditHouses(onSourceWaves, (w) => w.pollster, (w) => Date.parse(w.date)),
+  weights: VOTE_SWITCHING.weights2025,
+} : null;
+
 /* ---- 6. individual polls (full archive) -------------------------------- */
 const individualPolls = POLLS.map((p) => {
   const ym = ymOf(p.date), day = dayOf(p.date);
@@ -2960,6 +3046,10 @@ window.AUSPOL = (function () {
   const directionPolls = ${JSON.stringify(directionPolls)};
   const directionAvailable = ${direction.length > 0};
   const undecided = ${JSON.stringify(undecided)};
+  /* Where One Nation's gains came from (§5b): per wave, each 2025-vote
+     group's part of what One Nation drew from outside its own 2025 vote,
+     from DemosAU's and YouGov's vote-switching tables. */
+  const onSources = ${JSON.stringify(onSources)};
   const accuracy = ${JSON.stringify(accuracy)};
   const individualPolls = ${JSON.stringify(individualPolls)};
   const pollsterTable = ${JSON.stringify(pollsterTable)};
@@ -3037,7 +3127,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, onSources, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
