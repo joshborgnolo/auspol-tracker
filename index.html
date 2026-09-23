@@ -38151,6 +38151,18 @@ function fitDomain(vals, step, include) {
     ticks
   };
 }
+function HowTo({
+  label = "How to read this chart",
+  cls = "table-hint",
+  paras
+}) {
+  return React.createElement("details", {
+    className: "view-how hint-how"
+  }, React.createElement("summary", null, label), paras.filter(Boolean).map((p, i) => React.createElement("p", {
+    key: i,
+    className: cls
+  }, p)));
+}
 function Delta({
   value,
   suffix = "",
@@ -39424,7 +39436,9 @@ function UndecidedPanel({
     fmt: v => v.toFixed(1)
   }), React.createElement("p", {
     className: "table-hint"
-  }, "Each dot is one published reading; the lines are monthly averages, and the figure beside each question pools the last six weeks of polls, newer and larger ones counting for more. The questions are never averaged together \u2013 one counts people who can\u2019t name a party, the other people who won\u2019t pick a side once preferences are applied. Only the first is left out of the shares elsewhere on this page, so a rising line means the share is being read off a smaller pool of decided voters, not that support has moved."));
+  }, "Each dot is one published reading; the lines are monthly averages, and the figure beside each question pools the last six weeks of polls."), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Newer and larger polls count for more in the figure beside each question."), React.createElement(React.Fragment, null, "The questions are never averaged together \u2013 one counts people who can\u2019t name a party, the other people who won\u2019t pick a side once preferences are applied. Only the first is left out of the shares elsewhere on this page, so a rising line means the share is being read off a smaller pool of decided voters, not that support has moved.")]
+  }));
 }
 function OnSourcesPanel({
   rangeId
@@ -39569,11 +39583,13 @@ function OnSourcesPanel({
     }
   }), React.createElement("p", {
     className: "table-hint"
-  }, "Each dot is one poll\u2019s split and the lines are monthly averages; the figures above pool the last ", S.now ? S.now.window : "six weeks", " of polls, newer ones counting for more. A group\u2019s part is the share of its 2025 voters now backing One Nation, weighted by that group\u2019s share of the 2025 vote \u2013 so 38% of Coalition voters counts for far more than 38% of a small party\u2019s. Voters who can\u2019t recall a 2025 vote are left out, and so are One Nation\u2019s own 2025 voters, who are what it kept rather than gained.", " ", React.createElement("button", {
+  }, "Each dot is one poll\u2019s split and the lines are monthly averages; the figures above pool the last ", S.now ? S.now.window : "six weeks", " of polls.", " ", React.createElement("button", {
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")
-  }, "How it\u2019s worked out")));
+  }, "How it\u2019s worked out")), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Newer polls count for more in the figures above."), React.createElement(React.Fragment, null, "A group\u2019s part is the share of its 2025 voters now backing One Nation, weighted by that group\u2019s share of the 2025 vote \u2013 so 38% of Coalition voters counts for far more than 38% of a small party\u2019s."), React.createElement(React.Fragment, null, "Voters who can\u2019t recall a 2025 vote are left out, and so are One Nation\u2019s own 2025 voters, who are what it kept rather than gained.")]
+  }));
 }
 const DEMO_PARTIES = [{
   id: "onp",
@@ -41502,6 +41518,7 @@ Object.assign(window, {
   Segmented,
   TextToggle,
   Delta,
+  HowTo,
   SortTh,
   fitDomain,
   PrimaryVotePanel,
@@ -44922,7 +44939,10 @@ function VariancePanel({
     }, d.R.toFixed(2), "\xD7 the ", d.floor.toFixed(2), "pp floor", d.excess > 0.05 && React.createElement(React.Fragment, null, " \xB7 ", d.excess.toFixed(2), "pp unexplained")));
   })), React.createElement("p", {
     className: "table-hint ap-var-note"
-  }, "Spread is the recency-weighted standard deviation of each poll\u2019s distance from a local trend, in ", unitNote, " \u2013 recency-weighted only, because weighting by sample size would mute exactly the small divergent polls being measured. The floor is what a design effect of ", window.AP.DISC.DEFF, " and each poll\u2019s own sample size predict. Their ratio reads: under 0.80\xD7 herded \xB7 Around 1\xD7 as close as sampling allows \xB7 Over 1.20\xD7 genuinely apart.", view === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."));
+  }, "The ratio of spread to floor reads: under 0.80\xD7 herded \xB7 around 1\xD7 as close as sampling allows \xB7 over 1.20\xD7 genuinely apart."), React.createElement(HowTo, {
+    cls: "table-hint ap-var-note",
+    paras: [React.createElement(React.Fragment, null, "Spread is the recency-weighted standard deviation of each poll\u2019s distance from a local trend, in ", unitNote, " \u2013 recency-weighted only, because weighting by sample size would mute exactly the small divergent polls being measured."), React.createElement(React.Fragment, null, "The floor is what a design effect of ", window.AP.DISC.DEFF, " and each poll\u2019s own sample size predict."), view === "leadership" && React.createElement(React.Fragment, null, "Leadership residuals are pooled within each leader-era and metric, so the Ley \u2192 Taylor handover and the approval/favourability mix aren\u2019t counted as pollsters disagreeing.")]
+  }));
 }
 const HOUSE_LEAN_COLOURS = {
   "DemosAU": "oklch(0.63 0.145 90)",
@@ -45214,7 +45234,10 @@ function HouseLeanPanel({
     fmt: v => (v > 0 ? "+" : "") + v.toFixed(1)
   }), React.createElement("p", {
     className: "table-hint ap-var-note"
-  }, meta.ground + " ", "Each point reads the lean as of that month, with the 90-day half-life on the evidence, so a house\u2019s current method outranks its history; the All-polls table\u2019s House-effect column instead pools each pollster\u2019s whole history into one standing figure, which is why its numbers won\u2019t match the right-hand edge here."));
+  }, meta.ground), React.createElement(HowTo, {
+    cls: "table-hint ap-var-note",
+    paras: [React.createElement(React.Fragment, null, "Each point reads the lean as of that month, with the 90-day half-life on the evidence, so a house\u2019s current method outranks its history."), React.createElement(React.Fragment, null, "The All-polls table\u2019s House-effect column instead pools each pollster\u2019s whole history into one standing figure, which is why its numbers won\u2019t match the right-hand edge here.")]
+  }));
 }
 function SeriesBoard({
   id,
@@ -45548,7 +45571,10 @@ function FlowDriftPanel({
     fmt: v => v === 0 ? "" : sgn(v)
   }), React.createElement("p", {
     className: "table-hint ap-var-note"
-  }, "Above zero \u2013 the red ground \u2013 the published 2PPs are running friendlier to Labor than the frozen table reads their own primaries; below it, friendlier to the Coalition. Each house\u2019s gap against the table is centred on its own polls in the ", fd.meta.baseDays, " days after the election \u2013 the one moment the electorate\u2019s actual flows are counted, and a house\u2019s fixed allocation habits absorbed into the zero", lateFirms.length > 0 && React.createElement(React.Fragment, null, " \u2013 ", lateFirms.join(", "), " began polling later and anchor on", " ", "their own first waves instead, so their lines read only the drift since they started"), ". The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. A wave that publishes no two-party figure carries no gap, so a house that reports a 2PP only irregularly reads through a thinner line \u2013 and the whole panel is a diagnostic read on published figures: it corrects no other number on this page."));
+  }, "Above zero \u2013 the red ground \u2013 the published 2PPs are running friendlier to Labor than the frozen table reads their own primaries; below it, friendlier to the Coalition."), React.createElement(HowTo, {
+    cls: "table-hint ap-var-note",
+    paras: [React.createElement(React.Fragment, null, "Each house\u2019s gap against the table is centred on its own polls in the ", fd.meta.baseDays, " days after the election \u2013 the one moment the electorate\u2019s actual flows are counted, and a house\u2019s fixed allocation habits absorbed into the zero", lateFirms.length > 0 && React.createElement(React.Fragment, null, " \u2013 ", lateFirms.join(", "), " began polling later and anchor on", " ", "their own first waves instead, so their lines read only the drift since they started"), "."), React.createElement(React.Fragment, null, "The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. A wave that publishes no two-party figure carries no gap, so a house that reports a 2PP only irregularly reads through a thinner line."), React.createElement(React.Fragment, null, "The whole panel is a diagnostic read on published figures: it corrects no other number on this page.")]
+  }));
 }
 function FlowDriftOnPanel({
   rangeId
@@ -45694,7 +45720,10 @@ function FlowDriftOnPanel({
     fmt: v => v === 0 ? "" : sgn(v)
   }), React.createElement("p", {
     className: "table-hint ap-var-note"
-  }, "Above zero \u2013 the red ground \u2013 the published head-to-heads are running friendlier to Labor than the frozen table reads their own primaries; below it, friendlier to One Nation. Each house\u2019s gap against the table is centred on its own first waves \u2013 the classic pairing on the panel above can be read at the election, but no count of this pairing exists, so the chart speaks only about drift since each house began. The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. A wave that publishes no head-to-head carries no gap, and the whole panel is a diagnostic read on published figures: it corrects no other number on this page."));
+  }, "Above zero \u2013 the red ground \u2013 the published head-to-heads are running friendlier to Labor than the frozen table reads their own primaries; below it, friendlier to One Nation."), React.createElement(HowTo, {
+    cls: "table-hint ap-var-note",
+    paras: [React.createElement(React.Fragment, null, "Each house\u2019s gap against the table is centred on its own first waves \u2013 the classic pairing on the panel above can be read at the election, but no count of this pairing exists, so the chart speaks only about drift since each house began."), React.createElement(React.Fragment, null, "The pooled line and its band are the cross-house aggregate with the same sample weighting as the aggregates above. A wave that publishes no head-to-head carries no gap."), React.createElement(React.Fragment, null, "The whole panel is a diagnostic read on published figures: it corrects no other number on this page.")]
+  }));
 }
 function AllPollsView({
   focus,
@@ -49602,7 +49631,10 @@ function Hero({
     className: "hi-term",
     title: "Why the newest dots can sit past the line\u2019s end",
     onClick: () => window.AP.openTerm && window.AP.openTerm("dots-past-the-line", "two-party preferred")
-  }, "smoothed average"), impBasis ? " of those implied figures" : " across all pollsters", ",", " ", "shaded with the interval around it. Where the two bands overlap, the lead is inside its own margin of error \u2013 the polls cannot separate the parties that month.") : impOnBasis ? "Each dot is one poll’s primaries re-allocated at the site’s fixed ALP–ON flow set; " + "the line is a smoothed average of those implied figures, shaded with the flow " + "table’s own range. No election has counted this pairing, so the set is calibrated " + "from preference counts, not anchored to a result." : `Each dot is one pollster’s published ${m.label} head-to-head` + (adjusted ? ", adjusted for each house’s lean on this matchup as the headline two-party is." : ", averaged monthly – too few houses ask it to weight or correct.") + (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : ""))), (matchup === "alp_lnp" && impOffered || m.altKey === "alp_on" && impOnOffered) && compareToggle());
+  }, "smoothed average"), impBasis ? " of those implied figures." : " across all pollsters.") : impOnBasis ? "Each dot is one poll’s primaries re-allocated at the site’s fixed ALP–ON flow set; the line is a smoothed average of those implied figures." : `Each dot is one pollster’s published ${m.label} head-to-head` + (adjusted ? ", adjusted for each house’s lean on this matchup as the headline two-party is." : ", averaged monthly – too few houses ask it to weight or correct.") + (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : "")), (m.real || impOnBasis) && React.createElement(HowTo, {
+    cls: "hero-caption",
+    paras: m.real ? [React.createElement(React.Fragment, null, "The shading is the interval around the line. Where the two bands overlap, the lead is inside its own margin of error \u2013 the polls cannot separate the parties that month.")] : [React.createElement(React.Fragment, null, "The shading is the flow table\u2019s own range. No election has counted this pairing, so the set is calibrated from preference counts, not anchored to a result.")]
+  })), (matchup === "alp_lnp" && impOffered || m.altKey === "alp_on" && impOnOffered) && compareToggle());
 }
 function MethodNote({
   onInfo

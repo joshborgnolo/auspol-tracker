@@ -3975,13 +3975,16 @@ function VariancePanel({ facet, rangeId }) {
       </div>
 
       <p className="table-hint ap-var-note">
-        Spread is the recency-weighted standard deviation of each poll’s distance from a local trend,
-        in {unitNote} – recency-weighted only, because weighting by sample size would mute exactly the
-        small divergent polls being measured. The floor is what a design effect of {window.AP.DISC.DEFF} and
-        each poll’s own sample size predict. Their ratio reads: under 0.80× herded · Around 1× as close as
-        sampling allows · Over 1.20× genuinely apart.
-        {view === "leadership" && " Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing."}
+        The ratio of spread to floor reads: under 0.80× herded · around 1× as close as sampling
+        allows · over 1.20× genuinely apart.
       </p>
+      <HowTo cls="table-hint ap-var-note" paras={[
+        <>Spread is the recency-weighted standard deviation of each poll’s distance from a local trend,
+        in {unitNote} – recency-weighted only, because weighting by sample size would mute exactly the
+        small divergent polls being measured.</>,
+        <>The floor is what a design effect of {window.AP.DISC.DEFF} and each poll’s own sample size predict.</>,
+        view === "leadership" && <>Leadership residuals are pooled within each leader-era and metric, so the Ley → Taylor handover and the approval/favourability mix aren’t counted as pollsters disagreeing.</>,
+      ]} />
     </section>
   );
 }
@@ -4238,13 +4241,13 @@ function HouseLeanPanel({ rangeId }) {
         fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(1)}
       />
 
-      <p className="table-hint ap-var-note">
-        {meta.ground + " "}Each
-        point reads the lean as of that month, with the 90-day half-life on the evidence, so a
-        house’s current method outranks its history; the All-polls table’s House-effect column
-        instead pools each pollster’s whole history into one standing figure, which is why its
-        numbers won’t match the right-hand edge here.
-      </p>
+      <p className="table-hint ap-var-note">{meta.ground}</p>
+      <HowTo cls="table-hint ap-var-note" paras={[
+        <>Each point reads the lean as of that month, with the 90-day half-life on the evidence, so a
+        house’s current method outranks its history.</>,
+        <>The All-polls table’s House-effect column instead pools each pollster’s whole history into
+        one standing figure, which is why its numbers won’t match the right-hand edge here.</>,
+      ]} />
     </section>
   );
 }
@@ -4516,17 +4519,20 @@ function FlowDriftPanel({ rangeId }) {
           split, and carries no such error. gen-data's fitter went with it. */}
       <p className="table-hint ap-var-note">
         Above zero – the red ground – the published 2PPs are running friendlier to Labor than the
-        frozen table reads their own primaries; below it, friendlier to the Coalition. Each house’s
-        gap against the table is centred on its own polls in the {fd.meta.baseDays} days after the
-        election – the one moment the electorate’s actual flows are counted, and a house’s fixed
-        allocation habits absorbed into the zero
-        {lateFirms.length > 0 && <> – {lateFirms.join(", ")} began polling later and anchor on
-          {" "}their own first waves instead, so their lines read only the drift since they started</>}.
-        The pooled line and its band are the cross-house aggregate with the same sample weighting
-        as the aggregates above. A wave that publishes no two-party figure carries no gap, so a
-        house that reports a 2PP only irregularly reads through a thinner line – and the whole
-        panel is a diagnostic read on published figures: it corrects no other number on this page.
+        frozen table reads their own primaries; below it, friendlier to the Coalition.
       </p>
+      <HowTo cls="table-hint ap-var-note" paras={[
+        <>Each house’s gap against the table is centred on its own polls in the {fd.meta.baseDays} days
+        after the election – the one moment the electorate’s actual flows are counted, and a house’s
+        fixed allocation habits absorbed into the zero
+        {lateFirms.length > 0 && <> – {lateFirms.join(", ")} began polling later and anchor on
+          {" "}their own first waves instead, so their lines read only the drift since they started</>}.</>,
+        <>The pooled line and its band are the cross-house aggregate with the same sample weighting
+        as the aggregates above. A wave that publishes no two-party figure carries no gap, so a
+        house that reports a 2PP only irregularly reads through a thinner line.</>,
+        <>The whole panel is a diagnostic read on published figures: it corrects no other number on
+        this page.</>,
+      ]} />
     </section>
   );
 }
@@ -4650,14 +4656,17 @@ function FlowDriftOnPanel({ rangeId }) {
       <p className="table-hint ap-var-note">
         Above zero – the red ground – the published head-to-heads are running friendlier to
         Labor than the frozen table reads their own primaries; below it, friendlier to One
-        Nation. Each house’s gap against the table is centred on its own first waves – the
-        classic pairing on the panel above can be read at the election, but no count of this
-        pairing exists, so the chart speaks only about drift since each house began. The pooled
-        line and its band are the cross-house aggregate with the same sample weighting as the
-        aggregates above. A wave that publishes no head-to-head carries no gap, and the whole
-        panel is a diagnostic read on published figures: it corrects no other number on this
-        page.
+        Nation.
       </p>
+      <HowTo cls="table-hint ap-var-note" paras={[
+        <>Each house’s gap against the table is centred on its own first waves – the classic
+        pairing on the panel above can be read at the election, but no count of this pairing
+        exists, so the chart speaks only about drift since each house began.</>,
+        <>The pooled line and its band are the cross-house aggregate with the same sample weighting
+        as the aggregates above. A wave that publishes no head-to-head carries no gap.</>,
+        <>The whole panel is a diagnostic read on published figures: it corrects no other number on
+        this page.</>,
+      ]} />
     </section>
   );
 }

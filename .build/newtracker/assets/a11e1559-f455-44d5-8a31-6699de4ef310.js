@@ -175,6 +175,19 @@ function fitDomain(vals, step, include) {
    RollNum is defined by the header script, which loads after this one -
    resolved at render, and guarded so a reordering degrades to a plain figure
    rather than a blank panel. */
+/* The one fold for a chart's reading notes: the gist stays in view above it,
+   and the method, caveats and edge cases wait behind "How to read this chart"
+   (as Past cycles' intro and the vote-by-group notes do). Children are the
+   folded paragraphs; `cls` is the note class they're set in. */
+function HowTo({ label = "How to read this chart", cls = "table-hint", paras }) {
+  return (
+    <details className="view-how hint-how">
+      <summary>{label}</summary>
+      {paras.filter(Boolean).map((p, i) => <p key={i} className={cls}>{p}</p>)}
+    </details>
+  );
+}
+
 function Delta({ value, suffix = "", goodUp = true, neutral, small, title, roll, spinIn }) {
   if (value == null) return null;
   const up = value > 0, flat = Math.abs(value) < 0.05;
@@ -1491,13 +1504,16 @@ function UndecidedPanel({ rangeId }) {
       />
       <p className="table-hint">
         Each dot is one published reading; the lines are monthly averages, and
-        the figure beside each question pools the last six weeks of polls, newer
-        and larger ones counting for more. The questions are never averaged together – one counts people who can’t name
+        the figure beside each question pools the last six weeks of polls.
+      </p>
+      <HowTo paras={[
+        <>Newer and larger polls count for more in the figure beside each question.</>,
+        <>The questions are never averaged together – one counts people who can’t name
         a party, the other people who won’t pick a side once preferences are
         applied. Only the first is left out of the shares elsewhere on this
         page, so a rising line means the share is being read off a smaller
-        pool of decided voters, not that support has moved.
-      </p>
+        pool of decided voters, not that support has moved.</>,
+      ]} />
     </section>
   );
 }
@@ -1592,15 +1608,19 @@ function OnSourcesPanel({ rangeId }) {
       />
       <p className="table-hint">
         Each dot is one poll’s split and the lines are monthly averages; the figures above pool the
-        last {S.now ? S.now.window : "six weeks"} of polls, newer ones counting for more. A group’s part is the share of
-        its 2025 voters now backing One Nation, weighted by that group’s share of the 2025 vote – so
-        38% of Coalition voters counts for far more than 38% of a small party’s. Voters who can’t
-        recall a 2025 vote are left out, and so are One Nation’s own 2025 voters, who are what it
-        kept rather than gained.{" "}
+        last {S.now ? S.now.window : "six weeks"} of polls.{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")}>
           How it’s worked out</button>
       </p>
+      <HowTo paras={[
+        <>Newer polls count for more in the figures above.</>,
+        <>A group’s part is the share of its 2025 voters now backing One Nation, weighted by that
+        group’s share of the 2025 vote – so 38% of Coalition voters counts for far more than 38% of
+        a small party’s.</>,
+        <>Voters who can’t recall a 2025 vote are left out, and so are One Nation’s own 2025
+        voters, who are what it kept rather than gained.</>,
+      ]} />
     </section>
   );
 }
@@ -3687,7 +3707,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   );
 }
 
-Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, OnSourcesPanel, DemographicsPanel, PollsterTable, NextPollsPanel,
+Object.assign(window, { Segmented, TextToggle, Delta, HowTo, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, OnSourcesPanel, DemographicsPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
   PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows, EffLines, sampleValue,

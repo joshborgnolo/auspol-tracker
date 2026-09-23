@@ -1619,6 +1619,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
             </span>
           )}
         </div>
+        {/* the gist under the chart; the shading and what an overlap means
+            fold behind the same "How to read this chart" as every panel */}
         <p className="hero-caption">
           {m.real
             ? (<>{impBasis
@@ -1629,21 +1631,20 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
                        onClick={() => window.AP.openTerm &&
                          window.AP.openTerm("dots-past-the-line", "two-party preferred")}>
                  smoothed average</button>
-               {impBasis ? " of those implied figures" : " across all pollsters"},
-               {" "}shaded with the interval around it. Where the two
-               bands overlap, the lead is inside its own margin of error – the polls cannot
-               separate the parties that month.</>)
+               {impBasis ? " of those implied figures." : " across all pollsters."}</>)
             : impOnBasis
-              ? ("Each dot is one poll’s primaries re-allocated at the site’s fixed ALP–ON flow set; " +
-                 "the line is a smoothed average of those implied figures, shaded with the flow " +
-                 "table’s own range. No election has counted this pairing, so the set is calibrated " +
-                 "from preference counts, not anchored to a result.")
+              ? "Each dot is one poll’s primaries re-allocated at the site’s fixed ALP–ON flow set; the line is a smoothed average of those implied figures."
               : `Each dot is one pollster’s published ${m.label} head-to-head` +
               (adjusted
                 ? ", adjusted for each house’s lean on this matchup as the headline two-party is."
                 : ", averaged monthly – too few houses ask it to weight or correct.") +
               (scatterPolls ? ` ${scatterPolls} poll${scatterPolls === 1 ? "" : "s"} so far.` : "")}
         </p>
+        {(m.real || impOnBasis) && <HowTo cls="hero-caption" paras={m.real
+          ? [<>The shading is the interval around the line. Where the two bands overlap, the lead
+             is inside its own margin of error – the polls cannot separate the parties that month.</>]
+          : [<>The shading is the flow table’s own range. No election has counted this pairing, so
+             the set is calibrated from preference counts, not anchored to a result.</>]} />}
       </div>
       {/* the compare switch's ONE home - under the chart legend, next to the
           lines it annotates, at every width */}
