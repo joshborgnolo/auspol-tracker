@@ -1692,9 +1692,8 @@ function MethodNote({ onInfo }) {
           <p className="fb-lede">
             {onInfo && (
               <>
-                See{" "}
-                <button type="button" className="hi-term" onClick={onInfo}>Info</button>
-                {" "}for more info.{" "}
+                How the figures are built is in{" "}
+                <button type="button" className="hi-term" onClick={onInfo}>Info</button>.{" "}
               </>
             )}
             Spot an error, a missing poll, or have any other feedback? Please{" "}

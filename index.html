@@ -1648,6 +1648,7 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .und-read-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .und-read-lab { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
 .und-read-v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
+.und-read-stale { font-family: var(--sans); font-size: 12px; color: var(--ink-3); }
 .und-read-note { margin: 1px 0 0; font-size: 11.5px; color: var(--ink-3); }
 .pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13.5px; }
 .pd-sec .pd-absent {
@@ -2239,6 +2240,8 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
   display: flex; justify-content: space-between; align-items: flex-start;
   gap: 18px; flex-wrap: wrap; margin-bottom: 18px;
 }
+.ap-basis-narrow { display: none; }
+@media (max-width: 1000px) { .ap-basis-narrow { display: block; margin: 0 0 12px; } }
 .ap-head-side { display: inline-flex; align-items: center; gap: 14px; }
 .ap-head-side .ap-count { display: none; }
 @media (max-width: 560px) {
@@ -2477,6 +2480,10 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 .np-when { font-family: var(--sans); font-size: 13px; color: var(--ink-2); white-space: nowrap; }
 .np-cadence { font-family: var(--sans); font-size: 12.5px; color: var(--ink-3); }
 .np-missed { color: var(--mood-neg); }
+@media (max-width: 400px) {
+  .np-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .np-date { white-space: normal; }
+}
 @media (max-width: 720px) {
   .np-row { grid-template-columns: 1fr auto; row-gap: 3px; padding: 10px; }
   .np-firm { grid-column: 1; }
@@ -2586,6 +2593,8 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   padding-top: 20px; padding-bottom: 10px;
   box-shadow: 0 1px 0 var(--line);
 }
+.hint-narrow { display: none; }
+@media (max-width: 1000px) { .hint-wide { display: none; } .hint-narrow { display: inline; } }
 .poll-table.archive .lbl-s { display: none; }
 @media (max-width: 1000px) {
   .poll-table.archive .hide-md { display: none; }
@@ -10185,6 +10194,17 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "field": "14–20 Sep",
         "chg": -5.5,
         "refDate": "2026-09-13"
+      },
+      "now": {
+        "v": 4.4,
+        "se": 1.05,
+        "ci95": 2.1,
+        "n": 8,
+        "nEff": 5.2,
+        "prev": 5.6,
+        "chg": -1.2,
+        "changeCi95": 2.4,
+        "changeSig": false
       }
     }, {
       "id": "tpp",
@@ -10288,6 +10308,17 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "field": "26–31 Aug",
         "chg": 0,
         "refDate": "2026-07-27"
+      },
+      "now": {
+        "v": 5,
+        "se": 0.86,
+        "ci95": 1.7,
+        "n": 1,
+        "nEff": 1,
+        "prev": 5,
+        "chg": 0,
+        "changeCi95": 2.3,
+        "changeSig": false
       }
     }, {
       "id": "soft",
@@ -10512,6 +10543,13 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "field": "12 Sep",
         "chg": -1,
         "refDate": "2026-07-11"
+      },
+      "now": {
+        "v": 26,
+        "se": 1.17,
+        "ci95": 2.3,
+        "n": 1,
+        "nEff": 1
       }
     }],
     "n": 63,
@@ -12706,7 +12744,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "err": -1.3
       }],
       "n": 1,
-      "sameSide": true,
+      "sameSide": false,
       "worst": 1.3
     }, {
       "year": 1975,
@@ -12722,7 +12760,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "err": -2.5
       }],
       "n": 1,
-      "sameSide": true,
+      "sameSide": false,
       "worst": 2.5
     }, {
       "year": 1980,
@@ -12738,7 +12776,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "err": 1.4
       }],
       "n": 1,
-      "sameSide": true,
+      "sameSide": false,
       "worst": 1.4
     }, {
       "year": 1983,
@@ -12754,7 +12792,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "err": 0.6
       }],
       "n": 1,
-      "sameSide": true,
+      "sameSide": false,
       "worst": 0.6
     }, {
       "year": 1984,
@@ -12770,7 +12808,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "err": 3.2
       }],
       "n": 1,
-      "sameSide": true,
+      "sameSide": false,
       "worst": 3.2
     }, {
       "year": 1987,
@@ -12786,7 +12824,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "err": 2.6
       }],
       "n": 1,
-      "sameSide": true,
+      "sameSide": false,
       "worst": 2.6
     }, {
       "year": 1993,
@@ -13567,7 +13605,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "err": 3.2
       }],
       "n": 1,
-      "sameSide": true,
+      "sameSide": false,
       "worst": 3.2
     }
   };
@@ -38688,7 +38726,7 @@ function PreferredPMPanel({
     className: "card-title"
   }, "Preferred prime minister"), React.createElement("p", {
     className: "card-sub"
-  }, three ? "“Who would make the better PM?”, asked as a three-way including Hanson" : "“Who would make the better PM?”, asked head to head – in both of the contests pollsters run", three ? " · As published: houses leave 16–50% uncommitted, so levels aren’t comparable across houses – the gaps and the trend are" : " · As published: uncommitted runs from none (Newspoll) to half the sample, so levels aren’t comparable across houses – the tinted gaps are")), React.createElement("div", {
+  }, three ? "“Who would make the better PM?”, asked as a three-way including Hanson" : "“Who would make the better PM?”, asked head to head – in both of the contests pollsters run", three ? " · As published: houses leave 16–50% uncommitted, so levels aren’t comparable across houses, but the gaps and the trend are." : " · As published: uncommitted runs from none (Newspoll) to half the sample, so levels aren’t comparable across houses, but the tinted gaps are.")), React.createElement("div", {
     className: "card-head-tools"
   }, !lockFmt && React.createElement(TextToggle, {
     caps: true,
@@ -39261,13 +39299,16 @@ function UndecidedPanel({
     className: "und-read-lab"
   }, sr.label), React.createElement("span", {
     className: "und-read-v"
-  }, sr.latest.v, React.createElement("span", {
+  }, (sr.now ? sr.now.v : sr.latest.v).toFixed(1), React.createElement("span", {
     className: "pct"
-  }, "%")), sr.latest.chg != null && React.createElement(Delta, {
-    value: sr.latest.chg,
+  }, "%")), sr.now ? sr.now.chg != null && React.createElement(Delta, {
+    value: sr.now.chg,
     goodUp: false,
-    small: true
-  })), React.createElement("p", {
+    small: true,
+    title: "vs a month ago" + (sr.now.changeSig === false ? " – within the margin" : "")
+  }) : React.createElement("span", {
+    className: "und-read-stale"
+  }, "last reading, ", sr.latest.field)), React.createElement("p", {
     className: "und-read-note"
   }, sr.note, " \xB7 ", houseList(sr.houses)))))), React.createElement(TrendChart, {
     key: "und",
@@ -39299,7 +39340,7 @@ function UndecidedPanel({
     fmt: v => v.toFixed(1)
   }), React.createElement("p", {
     className: "table-hint"
-  }, "Each dot is one published reading; the lines are monthly averages. The two are never averaged together \u2013 one counts people who can\u2019t name a party, the other people who won\u2019t pick a side once preferences are applied. Only the first is left out of the shares elsewhere on this page, so a rising line means the share is being read off a smaller pool of decided voters, not that support has moved."));
+  }, "Each dot is one published reading; the lines are monthly averages, and the figure beside each question pools the last six weeks of polls, newer and larger ones counting for more. The questions are never averaged together \u2013 one counts people who can\u2019t name a party, the other people who won\u2019t pick a side once preferences are applied. Only the first is left out of the shares elsewhere on this page, so a rising line means the share is being read off a smaller pool of decided voters, not that support has moved."));
 }
 function OnSourcesPanel({
   rangeId
@@ -41317,7 +41358,14 @@ function PollsterTable({
     }))));
   })))), React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll to see its full breakdown \xB7 Click a column heading to sort \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t ask that question.", tppBasis === "resp" ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar is the published figure in margin form. Click the “As published” heading to switch back to implied." : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar is that figure in margin form. Click the “Implied 2PP” heading to switch to the pollsters’ own published figures.", " ", React.createElement("strong", null, "Published"), " is the day the poll was released, taken from the source each row links to.", " ", "Each house\u2019s systematic lean \u2013 its house effect \u2013 sits beside poll lean in the All polls archive."));
+  }, (() => {
+    const act = typeof CANT_HOVER !== "undefined" && CANT_HOVER ? "Tap" : "Click";
+    return React.createElement(React.Fragment, null, "Tap any poll to see its full breakdown \xB7 ", act, " a column heading to sort \xB7 \u201C\u2014\u201D means the pollster didn\u2019t ask that question.", tppBasis === "resp" ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar is the published figure in margin form." : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar is that figure in margin form.", React.createElement("span", {
+      className: "hint-wide"
+    }, tppBasis === "resp" ? ` ${act} the “As published” heading to switch back to implied.` : ` ${act} the “Implied 2PP” heading to switch to the pollsters’ own published figures.`), React.createElement("span", {
+      className: "hint-narrow"
+    }, tppBasis === "resp" ? " The switch above the headline figure flips back to implied." : " The switch above the headline figure flips to the pollsters’ own published figures."));
+  })(), " ", React.createElement("strong", null, "Published"), " is the day the poll was released, taken from the source each row links to.", " ", "Each house\u2019s systematic lean \u2013 its house effect \u2013 sits beside poll lean in the All polls archive."));
 }
 Object.assign(window, {
   Segmented,
@@ -42971,7 +43019,8 @@ function CycleChart({
     showOutcome: showOutcome,
     outcomeShown: outcomeShown,
     shapes: shapes,
-    banded: banded
+    banded: banded,
+    hasData: hasData
   }), hanCtl && React.createElement("label", {
     className: "pg-check cyc-han" + (showHan ? " on" : ""),
     title: "Pauline Hanson, on the same approve-minus-disapprove basis. " + "Rated in the current term only, from " + hanFrom + " – no past cycle asked about her, " + "and favourability ratings are left out, so the line is short."
@@ -43006,7 +43055,7 @@ function CycleChart({
       className: "cycle-insight"
     }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " ", "(", insight.curFmt, ") sits", " ", React.createElement("span", {
       className: "ci-delta " + (insight.better ? "pos" : "neg")
-    }, shown, M.unit || (parseFloat(shown) === 1 ? " point" : " points")), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.", rankJsx);
+    }, shown, parseFloat(shown) === 1 ? " point" : " points"), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.", rankJsx);
   })()), (stripCycles.length > 0 || hanYears || onpYears) && React.createElement("div", {
     className: "cyc-drawn"
   }, React.createElement("span", {
@@ -43097,14 +43146,18 @@ function CycleLegend({
   showOutcome,
   outcomeShown,
   shapes,
-  banded
+  banded,
+  hasData
 }) {
   const [pop, setPop] = useState(null);
   const total = cycles.length;
   const onBoard = total - hidden.size;
   const cur = cycles.find(c => c.current);
   const drawnN = banded ? lifted.size + (cur && !hidden.has(cur.year) ? 1 : 0) : onBoard;
-  const summary = (hidden.size ? onBoard + " of " + total + " terms" : lifted.size ? total + " terms" : total + " terms since " + cycles[0].year) + (lifted.size ? " · " + drawnN + " drawn" : "");
+  const summary = (hidden.size ? onBoard + " of " + total + " terms" : lifted.size ? total + " terms" : (() => {
+    const withData = hasData ? cycles.filter(c => c.current || hasData(c)) : cycles;
+    return withData.length + " terms since " + withData[0].year;
+  })()) + (lifted.size ? " · " + drawnN + " drawn" : "");
   const OUTCOME_NOTE = " at the election that ended it. The sitting term has not" + " faced its election, so it is in neither set.";
   const QUICK = [{
     id: "all",
@@ -43337,7 +43390,9 @@ function AccuracyPanel() {
     }).length;
   }, 0);
   const col = err => err > 0 ? "var(--alp)" : "var(--lnp)";
-  const oneSided = A.cycles.filter(c => c.sameSide);
+  const oneSided = [...A.cycles].filter(c => c.sameSide).sort((a, b) => a.year - b.year);
+  const numWord = n => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] ?? String(n);
+  const listJoin = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
   const TIP_W = 184;
   const sgn = v => (v > 0 ? "+" : "") + v.toFixed(1);
   const lean = err => err > 0 ? "Labor overstated" : err < 0 ? "Labor understated" : "Exactly on the result";
@@ -43374,7 +43429,7 @@ function AccuracyPanel() {
     className: "dir-net-label"
   }, "Average miss"), React.createElement("span", {
     className: "dir-net-val"
-  }, A.meanAbs, React.createElement("span", {
+  }, A.meanAbs.toFixed(1), React.createElement("span", {
     className: "pct"
   }, " pts")))), stacked > 0 && React.createElement("div", {
     className: "acc-tools"
@@ -43561,7 +43616,7 @@ function AccuracyPanel() {
     }, "All one way")));
   })))), React.createElement("p", {
     className: "table-hint"
-  }, "Big dots are the average of that election\u2019s final polls \u2013 where only one house was in the field, its own figure stands alone; small dots are the individual houses \u2013 ", CANT_HOVER ? "tap" : "hover", " one for its figure.", stacked > 0 && React.createElement(React.Fragment, null, " ", stacked, " of them missed by exactly the same amount as another house, so they are drawn on top of each other \u2013 ", React.createElement("strong", null, "Separate overlapping dots"), " steps those into their own lanes without moving any of them along the scale."), " Exit polls are excluded, and a house that publishes an undecided-inclusive pair is normalised first, so its arithmetic isn\u2019t scored as a miss.", bothWays && React.createElement(React.Fragment, null, " The two elections where every house missed the same way, ", oneSided.map(c => c.year).join(" and "), ",", " ", "missed in ", React.createElement("strong", null, "opposite directions"), " \u2013 so this is not a standing lean that today\u2019s figures could be corrected for. It is the size of the error, not its direction, that carries.")), React.createElement("div", {
+  }, "Big dots are the average of that election\u2019s final polls \u2013 where only one house was in the field, its own figure stands alone; small dots are the individual houses \u2013 ", CANT_HOVER ? "tap" : "hover", " one for its figure.", stacked > 0 && React.createElement(React.Fragment, null, " ", stacked, " of them missed by exactly the same amount as another house, so they are drawn on top of each other \u2013 ", React.createElement("strong", null, "Separate overlapping dots"), " steps those into their own lanes without moving any of them along the scale."), " Exit polls are excluded, and a house that publishes an undecided-inclusive pair is normalised first, so its arithmetic isn\u2019t scored as a miss.", bothWays && React.createElement(React.Fragment, null, " Of the ", numWord(oneSided.length), " elections where every house missed the same way (", listJoin(oneSided.map(c => c.year)), "), ", numWord(oneSided.filter(c => c.err > 0).length), " overstated Labor and ", numWord(oneSided.filter(c => c.err < 0).length), " understated it. They missed in ", React.createElement("strong", null, "opposite directions"), ", so this is not a standing lean that today\u2019s figures could be corrected for. It is the size of the error, not its direction, that carries.")), React.createElement("div", {
     className: "acc-firms"
   }, React.createElement("div", {
     className: "acc-firms-h"
@@ -43575,7 +43630,7 @@ function AccuracyPanel() {
   }, f.firm), React.createElement("span", {
     className: "acc-firm-v",
     title: "Average size of the miss, ignoring direction"
-  }, f.meanAbs, React.createElement("span", {
+  }, f.meanAbs.toFixed(1), React.createElement("span", {
     className: "pct"
   }, " pts")), React.createElement("span", {
     className: "acc-firm-c"
@@ -46075,7 +46130,25 @@ function AllPollsView({
     className: "ap-facet"
   }), React.createElement("span", {
     className: "ap-jumps-count"
-  }, React.createElement("strong", null, sorted.length), sorted.length !== total ? " of " + total : "", " ", sorted.length === 1 ? "poll" : "polls")), React.createElement("div", {
+  }, React.createElement("strong", null, sorted.length), sorted.length !== total ? " of " + total : "", " ", sorted.length === 1 ? "poll" : "polls")), facet === "twopp" && React.createElement("div", {
+    className: "ap-basis-narrow"
+  }, React.createElement("span", {
+    className: "ap-ctl-group"
+  }, React.createElement("span", {
+    className: "ap-ctl-lab"
+  }, "Basis"), React.createElement(TextToggle, {
+    value: tppBasis,
+    onChange: setTppBasis,
+    options: [{
+      id: "imp",
+      label: "implied"
+    }, {
+      id: "resp",
+      label: "published"
+    }],
+    ariaLabel: "Two-party basis",
+    caps: true
+  }))), React.createElement("div", {
     className: "ap-bar"
   }, React.createElement("div", {
     className: "ap-search"
@@ -46534,7 +46607,11 @@ function AllPollsView({
     onClick: clearAll
   }, "Clear filters")))))), React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll for its full breakdown \xB7 Dates are fieldwork windows (publication dates sit in the breakdown) \xB7", pubBasis ? "“As published” lists each poll’s headline figures exactly as the pollster released them · The lead bar is the published figure in margin form" : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown · The lead bar is that implied figure in margin form", " ", "(the L/NP v ON and 3-cornered matchups are the pollsters\u2019 own published figures \u2013 the site prices no implied series for them) \xB7 \u201CPoll lean\u201D is the poll\u2019s ", pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate", " for that month \xB7 \u201C\u2014\u201D Means the pollster didn\u2019t publish that measure \xB7 Search matches anything in a row \xB7 Click any column heading to sort \xB7 Click the \u201C", pubBasis ? "As published" : "Implied 2PP", "\u201D heading to switch bases.", " ", React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on ", pubBasis ? "published" : "implied", " 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll.", " ", React.createElement("strong", null, "n", React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, filed with the Australian Polling Council \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown."), React.createElement(VariancePanel, {
+  }, "Tap any poll for its full breakdown \xB7 Dates are fieldwork windows (publication dates sit in the breakdown) \xB7", pubBasis ? "“As published” lists each poll’s headline figures exactly as the pollster released them · The lead bar is the published figure in margin form" : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown · The lead bar is that implied figure in margin form", " ", "(the L/NP v ON and 3-cornered matchups are the pollsters\u2019 own published figures \u2013 the site prices no implied series for them) \xB7 \u201CPoll lean\u201D is the poll\u2019s ", pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate", " for that month \xB7 \u201C\u2014\u201D means the pollster didn\u2019t publish that measure \xB7 Search matches anything in a row \xB7 ", CANT_HOVER ? "Tap" : "Click", " any column heading to sort", React.createElement("span", {
+    className: "hint-wide"
+  }, " \xB7 ", CANT_HOVER ? "Tap" : "Click", " the \u201C", pubBasis ? "As published" : "Implied 2PP", "\u201D heading to switch bases"), React.createElement("span", {
+    className: "hint-narrow"
+  }, " \xB7 The Basis switch above the table changes bases"), ".", " ", React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on ", pubBasis ? "published" : "implied", " 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll.", " ", React.createElement("strong", null, "n", React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, filed with the Australian Polling Council \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown."), React.createElement(VariancePanel, {
     key: facet,
     facet: facet,
     rangeId: range
@@ -47026,7 +47103,7 @@ function infoTerms(D) {
   }, {
     id: "dots-past-the-line",
     q: "Why do the newest poll dots sit past the end of the line?",
-    a: React.createElement(React.Fragment, null, "Because the line has only one point per month, drawn at the middle of the month. Each dot sits at its own fieldwork midpoint, so after mid-month the newest dots land to the right of the line\u2019s last point, even though they\u2019re already counted in it. When the first poll of a new month closes, the line gains a point at that month\u2019s midpoint; until then, up to half a month of dots can run ahead of it. That\u2019s lag in the ink, not in the estimate: the headline comes from the 21-day", " ", xref("weighted-aggregate", "dots past the line", "weighted aggregate"), ", which moves with every poll.")
+    a: React.createElement(React.Fragment, null, "Because the line has only one point per month, drawn at the middle of the month. Each dot sits at its own fieldwork midpoint, so after mid-month the newest dots land to the right of the line\u2019s last point, even though they\u2019re already counted in it. When the first poll of a new month closes, the line gains a point at that month\u2019s midpoint; until then, up to half a month of dots can run ahead of it. Only the drawing lags, not the estimate: the headline comes from the 21-day", " ", xref("weighted-aggregate", "dots past the line", "weighted aggregate"), ", which moves with every poll.")
   }, {
     id: "newest-poll-not-headline",
     q: "The newest poll doesn’t match the headline. Which one is wrong?",
@@ -49281,11 +49358,11 @@ function MethodNote({
     className: "colo-ways"
   }, React.createElement("p", {
     className: "fb-lede"
-  }, onInfo && React.createElement(React.Fragment, null, "See", " ", React.createElement("button", {
+  }, onInfo && React.createElement(React.Fragment, null, "How the figures are built is in", " ", React.createElement("button", {
     type: "button",
     className: "hi-term",
     onClick: onInfo
-  }, "Info"), " ", "for more info.", " "), "Spot an error, a missing poll, or have any other feedback? Please", " ", React.createElement("a", {
+  }, "Info"), ".", " "), "Spot an error, a missing poll, or have any other feedback? Please", " ", React.createElement("a", {
     className: "fb-link",
     href: "/feedback/"
   }, "let me know"), "."), React.createElement("p", {

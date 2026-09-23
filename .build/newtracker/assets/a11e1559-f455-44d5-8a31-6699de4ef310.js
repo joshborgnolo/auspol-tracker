@@ -896,8 +896,8 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
             {three ? "“Who would make the better PM?”, asked as a three-way including Hanson"
                    : "“Who would make the better PM?”, asked head to head – in both of the contests pollsters run"}
             {three
-              ? " · As published: houses leave 16–50% uncommitted, so levels aren’t comparable across houses – the gaps and the trend are"
-              : " · As published: uncommitted runs from none (Newspoll) to half the sample, so levels aren’t comparable across houses – the tinted gaps are"}
+              ? " · As published: houses leave 16–50% uncommitted, so levels aren’t comparable across houses, but the gaps and the trend are."
+              : " · As published: uncommitted runs from none (Newspoll) to half the sample, so levels aren’t comparable across houses, but the tinted gaps are."}
           </p>
         </div>
         <div className="card-head-tools">
@@ -1448,10 +1448,16 @@ function UndecidedPanel({ rangeId }) {
             <div className="und-read-body">
               <div className="und-read-top">
                 <span className="und-read-lab">{sr.label}</span>
-                <span className="und-read-v">{sr.latest.v}<span className="pct">%</span></span>
+                {/* the six-week average, as every sparse figure here is
+                    built; a question no house has asked for six weeks falls
+                    back to its last reading and says so */}
+                <span className="und-read-v">{(sr.now ? sr.now.v : sr.latest.v).toFixed(1)}<span className="pct">%</span></span>
                 {/* rising undecided is not good news for anyone – neither arrow
                     is coloured as a gain */}
-                {sr.latest.chg != null && <Delta value={sr.latest.chg} goodUp={false} small />}
+                {sr.now
+                  ? sr.now.chg != null && <Delta value={sr.now.chg} goodUp={false} small
+                      title={"vs a month ago" + (sr.now.changeSig === false ? " – within the margin" : "")} />
+                  : <span className="und-read-stale">last reading, {sr.latest.field}</span>}
               </div>
               <p className="und-read-note">{sr.note} · {houseList(sr.houses)}</p>
             </div>
@@ -1472,8 +1478,9 @@ function UndecidedPanel({ rangeId }) {
         fmt={(v) => v.toFixed(1)}
       />
       <p className="table-hint">
-        Each dot is one published reading; the lines are monthly averages.
-        The two are never averaged together – one counts people who can’t name
+        Each dot is one published reading; the lines are monthly averages, and
+        the figure beside each question pools the last six weeks of polls, newer
+        and larger ones counting for more. The questions are never averaged together – one counts people who can’t name
         a party, the other people who won’t pick a side once preferences are
         applied. Only the first is left out of the shares elsewhere on this
         page, so a rising line means the share is being read off a smaller
@@ -3615,10 +3622,22 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
         </table>
       </div>
       <p className="table-hint">
-        Tap any poll to see its full breakdown · Click a column heading to sort · “—” Means the pollster didn’t ask that question.
-        {tppBasis === "resp"
-          ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar is the published figure in margin form. Click the “As published” heading to switch back to implied."
-          : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar is that figure in margin form. Click the “Implied 2PP” heading to switch to the pollsters’ own published figures."}
+        {/* The basis switch is the 2PP column's heading, and that column is
+            .hide-md: below 1000px the sentence points at the hero's own
+            toggle instead of a heading the reader can't see. */}
+        {(() => { const act = typeof CANT_HOVER !== "undefined" && CANT_HOVER ? "Tap" : "Click";
+          return (<>
+            Tap any poll to see its full breakdown · {act} a column heading to sort · “—” means the pollster didn’t ask that question.
+            {tppBasis === "resp"
+              ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar is the published figure in margin form."
+              : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar is that figure in margin form."}
+            <span className="hint-wide">{tppBasis === "resp"
+              ? ` ${act} the “As published” heading to switch back to implied.`
+              : ` ${act} the “Implied 2PP” heading to switch to the pollsters’ own published figures.`}</span>
+            <span className="hint-narrow">{tppBasis === "resp"
+              ? " The switch above the headline figure flips back to implied."
+              : " The switch above the headline figure flips to the pollsters’ own published figures."}</span>
+          </>); })()}
         {" "}<strong>Published</strong> is the day the poll was released, taken from the source each row links to.
         {" "}Each house’s systematic lean – its house effect – sits beside poll lean in the All polls archive.
       </p>

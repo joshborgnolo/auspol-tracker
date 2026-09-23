@@ -1431,6 +1431,14 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
   const last = polls[polls.length - 1];
   const prev = [...polls].reverse().find((d) => d.pollster === last.pollster && d.x < last.x);
   const vals = polls.map((d) => d.v);
+  /* The figure the tile quotes, built as the headline is: the six-week
+     nowcast (a sparse measure – two houses at most per question), and the
+     same a month earlier. It used to be the newest single poll, which put
+     one DemosAU wave's "1%" beside a line sitting near 4.5. No house
+     adjustment: each house's undecided share is its own question's answer,
+     not a lean on a shared one. Null when the window holds no poll. */
+  const now = currentReading(rs.map(({ p, u }) => ({ mid: midMs(p), x: u.v, n: rowN(p), firm: p.pollster })),
+                             null, SPARSE_K);
   return {
     id: b.id, label: b.label, note: b.note, dashed: b.dashed, dash: b.dash,
     houses: creditHouses(polls, (d) => d.pollster, (d) => Date.parse(d.released)),
@@ -1438,6 +1446,7 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
     lo: Math.min(...vals), hi: Math.max(...vals),
     latest: { v: last.v, firm: last.pollster, released: last.released, field: last.dateLabel,
               chg: prev ? r1(last.v - prev.v) : null, refDate: prev ? prev.released : null },
+    now,
   };
 }).filter(Boolean);
 const undecided = undecidedSeries.length ? {
@@ -2697,8 +2706,10 @@ const accuracyCycles = CYC_META.filter((c) => !c.current && c.src).map((c) => {
     mean: r1(meanPoll), err: r1(err), absErr: r1(Math.abs(err)),
     houses, n: houses.length,
     // did they all miss the same way? one-sided error is the signature of a
-    // problem in the industry rather than noise in a house
-    sameSide: raw.every((h) => h.errRaw > 0) || raw.every((h) => h.errRaw < 0),
+    // problem in the industry rather than noise in a house. It takes two
+    // houses to agree: a lone house always "misses one way", which flagged
+    // every single-poll election of the 1970s and 80s as an industry failure
+    sameSide: raw.length >= 2 && (raw.every((h) => h.errRaw > 0) || raw.every((h) => h.errRaw < 0)),
     worst: r1(Math.max(...houses.map((h) => Math.abs(h.err)))),
   };
 }).filter(Boolean);

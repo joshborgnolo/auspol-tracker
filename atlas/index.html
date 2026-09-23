@@ -309,7 +309,7 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   /* geometry: 1000-wide canvas so the CSS can scale it; height set per draw */
-  var W = 1000, MARGIN = { t: 26, r: 16, b: 40, l: 46 };
+  var W = 1000, MARGIN = { t: 26, r: 40, b: 40, l: 46 };  /* r: room for the last year and its value label, which centre on the edge */
   var svg = document.getElementById("chart");
   var tt = document.getElementById("tt");
 
@@ -386,7 +386,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var legendEl = document.getElementById("legend");
     var ncNote = document.getElementById("nc-note");
 
-    titleEl.textContent = (isState ? d.state : (d.former ? d.short + " (fmr " + d.former + ")" : d.short)) + " · EP";
+    titleEl.textContent = (isState ? d.state : (d.former ? d.short + " (fmr " + d.former + ")" : d.short));
     whereEl.textContent = isState
       ? "Two-party-preferred, " + d.series[0].y + "–" + d.series[d.series.length - 1].y + " · " + (cur.measure === "margin" ? "margin (pp)" : "swing (pp)")
       : (d.former ? d.state + " · fmr " + d.former : d.state) + " · " + (cur.measure === "margin" ? "margin (pp)" : "swing (pp)");
@@ -480,7 +480,7 @@ document.addEventListener("DOMContentLoaded", function () {
     years.forEach(function (r, i) {
       var t = el("text", { x: xs[i], y: H - MARGIN.b + 24, "text-anchor": "middle",
         "font-size": 12, fill: ink3 }, svg);
-      t.textContent = r.y + "EP";
+      t.textContent = r.y;
     });
 
     /* positive (Labor/challenger) shading, margin mode only. Segments split

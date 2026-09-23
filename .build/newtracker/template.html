@@ -2647,6 +2647,7 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .und-read-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
 .und-read-lab { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
 .und-read-v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
+.und-read-stale { font-family: var(--sans); font-size: 12px; color: var(--ink-3); }
 .und-read-note { margin: 1px 0 0; font-size: 11.5px; color: var(--ink-3); }
 
 .pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13.5px; }
@@ -3740,6 +3741,8 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 }
 /* On a phone the facet tally rides up beside the view switch, where it reads
    as part of the heading; wider screens keep it down at the bar's end. */
+.ap-basis-narrow { display: none; }
+@media (max-width: 1000px) { .ap-basis-narrow { display: block; margin: 0 0 12px; } }
 .ap-head-side { display: inline-flex; align-items: center; gap: 14px; }
 .ap-head-side .ap-count { display: none; }
 @media (max-width: 560px) {
@@ -4092,6 +4095,13 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 .np-when { font-family: var(--sans); font-size: 13px; color: var(--ink-2); white-space: nowrap; }
 .np-cadence { font-family: var(--sans); font-size: 12.5px; color: var(--ink-3); }
 .np-missed { color: var(--mood-neg); }
+/* 320px phones: a nowrap date ("Wed 30 Sep, 1 am AEST (or Wed 7 Oct)")
+   beside the count pushed the row 24px past the screen. Let the date fold,
+   and let its track shrink below its content. */
+@media (max-width: 400px) {
+  .np-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .np-date { white-space: normal; }
+}
 @media (max-width: 720px) {
   .np-row { grid-template-columns: 1fr auto; row-gap: 3px; padding: 10px; }
   .np-firm { grid-column: 1; }
@@ -4266,6 +4276,10 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   padding-top: 20px; padding-bottom: 10px;
   box-shadow: 0 1px 0 var(--line);
 }
+/* table hints that name a column heading: .hint-wide points at the heading,
+   .hint-narrow at the control that survives when .hide-md drops the column */
+.hint-narrow { display: none; }
+@media (max-width: 1000px) { .hint-wide { display: none; } .hint-narrow { display: inline; } }
 /* header short-labels: full text by default, compact at narrow widths */
 .poll-table.archive .lbl-s { display: none; }
 

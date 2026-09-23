@@ -2083,7 +2083,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
           <CycleLegend cycles={cycles} hidden={hidden} lifted={lifted} hi={hi} setHi={setHi}
                        chipClick={chipClick} toggle={toggle} showAll={showAll} hideAll={hideAll}
                        showOutcome={showOutcome} outcomeShown={outcomeShown} shapes={shapes}
-                       banded={banded} />
+                       banded={banded} hasData={hasData} />
           {hanCtl && (
             <label className={"pg-check cyc-han" + (showHan ? " on" : "")}
                    title={"Pauline Hanson, on the same approve-minus-disapprove basis. " +
@@ -2107,7 +2107,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
         </div>
         {insight && (() => {
           /* Prose, not a table cell: a gap of exactly nine points reads as
-             "9%", not "9.0%", and the sign is dropped because the
+             "9 points", not "9.0 points", and the sign is dropped because the
              "above"/"below" that follows already carries the direction
              (M.fmt keeps its decimal for the chart's tooltips). */
           const shown = M.fmt(insight.d).replace(/^[+−-]/, "").replace(/\.0+$/, "");
@@ -2145,16 +2145,17 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
               the average {insight.peerNoun} at this point.{rankJsx}
             </p>
           );
-          /* Net-approval measures carry no axis unit (CYC_METRICS unit:""),
-             so the sentence has to supply its own word – "points" for net
-             gaps, "point" singularised for a one-point gap. Share measures
-             get "x%" free from M.unit. */
+          /* The gap between two shares is a difference in POINTS, never a
+             percent: Labor on 26.8% against an average of 41.3% sits 14.5
+             points below it, not 14.5% below (that would be 6 points). So
+             every measure takes the word, shares and net ratings alike –
+             "point" singularised for a one-point gap. */
           return (
             <p className="cycle-insight">
               {cycMonthLabel(insight.mNow)}, {insight.subjLabel}{" "}
               ({insight.curFmt}) sits{" "}
               <span className={"ci-delta " + (insight.better ? "pos" : "neg")}>
-                {shown}{M.unit || (parseFloat(shown) === 1 ? " point" : " points")}
+                {shown}{parseFloat(shown) === 1 ? " point" : " points"}
               </span>{" "}
               {insight.better ? "above" : "below"} the average {insight.peerNoun} at this point.{rankJsx}
             </p>
@@ -2268,7 +2269,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
    chart) and draws its rule in the colour the line is actually in. One shared
    row of prime ministers above six charts could do neither. */
 function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, showAll, hideAll,
-                      showOutcome, outcomeShown, shapes, banded }) {
+                      showOutcome, outcomeShown, shapes, banded, hasData }) {
   const [pop, setPop] = useState(null);
   /* `hi` is cleared by PastCyclesView, not here: there are six of these
      strips, and a per-strip dismiss meant a tap inside one fired the other
@@ -2292,7 +2293,13 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
      because a control that is doing something should say what. */
   const summary = (hidden.size ? onBoard + " of " + total + " terms"
                    : lifted.size ? total + " terms"
-                   : total + " terms since " + cycles[0].year)
+                   : (() => {
+                       /* terms that hold this measure: preferred PM starts in
+                          1984, and "21 terms since 1972" above a subtitle
+                          saying "since 1984" contradicted it */
+                       const withData = hasData ? cycles.filter((c) => c.current || hasData(c)) : cycles;
+                       return withData.length + " terms since " + withData[0].year;
+                     })())
                   + (lifted.size ? " · " + drawnN + " drawn" : "");
 
   /* The board cut by what each government did at its own election - the
@@ -2610,7 +2617,9 @@ function AccuracyPanel() {
     }).length;
   }, 0);
   const col = (err) => (err > 0 ? "var(--alp)" : "var(--lnp)");
-  const oneSided = A.cycles.filter((c) => c.sameSide);
+  const oneSided = [...A.cycles].filter((c) => c.sameSide).sort((a, b) => a.year - b.year);
+  const numWord = (n) => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] ?? String(n);
+  const listJoin = (a) => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
 
   const TIP_W = 184;                                // matches .acc-tip's width
   const sgn = (v) => (v > 0 ? "+" : "") + v.toFixed(1);
@@ -2650,7 +2659,7 @@ function AccuracyPanel() {
         </div>
         <div className="dir-net">
           <span className="dir-net-label">Average miss</span>
-          <span className="dir-net-val">{A.meanAbs}<span className="pct"> pts</span></span>
+          <span className="dir-net-val">{A.meanAbs.toFixed(1)}<span className="pct"> pts</span></span>
         </div>
       </div>
 
@@ -2790,8 +2799,10 @@ function AccuracyPanel() {
         house that publishes an undecided-inclusive pair is normalised first, so its arithmetic
         isn’t scored as a miss.
         {bothWays && (
-          <> The two elections where every house missed the same way, {oneSided.map((c) => c.year).join(" and ")},
-          {" "}missed in <strong>opposite directions</strong> – so this is not a standing lean that
+          <> Of the {numWord(oneSided.length)} elections where every house missed the same way
+          ({listJoin(oneSided.map((c) => c.year))}), {numWord(oneSided.filter((c) => c.err > 0).length)} overstated
+          Labor and {numWord(oneSided.filter((c) => c.err < 0).length)} understated it. They missed
+          in <strong>opposite directions</strong>, so this is not a standing lean that
           today’s figures could be corrected for. It is the size of the error, not its direction,
           that carries.</>
         )}
@@ -2804,7 +2815,7 @@ function AccuracyPanel() {
             <div className="acc-firm" key={f.firm}>
               <span className="acc-firm-n">{f.firm}</span>
               <span className="acc-firm-v" title="Average size of the miss, ignoring direction">
-                {f.meanAbs}<span className="pct"> pts</span>
+                {f.meanAbs.toFixed(1)}<span className="pct"> pts</span>
               </span>
               <span className="acc-firm-c">{f.n} elections</span>
             </div>
@@ -5174,6 +5185,20 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         </span>
       </div>
 
+      {/* Below 1000px the 2PP column - whose heading is the basis switch -
+          is .hide-md, which left phones no way to change basis at all. This
+          copy of the switch shows only there (CSS). */}
+      {facet === "twopp" && (
+        <div className="ap-basis-narrow">
+          <span className="ap-ctl-group">
+            <span className="ap-ctl-lab">Basis</span>
+            <TextToggle value={tppBasis} onChange={setTppBasis}
+                        options={[{ id: "imp", label: "implied" }, { id: "resp", label: "published" }]}
+                        ariaLabel="Two-party basis" caps />
+          </span>
+        </div>
+      )}
+
       <div className="ap-bar">
         <div className="ap-search">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
@@ -5490,10 +5515,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
           : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown · The lead bar is that implied figure in margin form"}
         {" "}(the L/NP v ON and 3-cornered matchups are the
         pollsters’ own published figures – the site prices no implied series for them) · “Poll lean” is
-        the poll’s {pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate"} for that month · “—” Means the pollster didn’t
+        the poll’s {pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate"} for that month · “—” means the pollster didn’t
         publish that measure · Search matches
-        anything in a row · Click any column heading to sort · Click the “{pubBasis ? "As published" : "Implied 2PP"}”
-        heading to switch bases.{" "}
+        anything in a row · {CANT_HOVER ? "Tap" : "Click"} any column heading to sort
+        <span className="hint-wide"> · {CANT_HOVER ? "Tap" : "Click"} the “{pubBasis ? "As published" : "Implied 2PP"}”
+        heading to switch bases</span><span className="hint-narrow"> · The Basis switch above the table changes bases</span>.{" "}
         <strong>House effect</strong> is how far a pollster systematically sits from the cross-house consensus
         on {pubBasis ? "published" : "implied"} 2PP – pooled from its polls with a 90-day half-life, so its recent methods count for more, and
         shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure’s
@@ -6251,7 +6277,7 @@ function infoTerms(D) {
       sits at its own fieldwork midpoint, so after mid-month the newest dots land to the right of
       the line’s last point, even though they’re already counted in it. When the first poll of a
       new month closes, the line gains a point at that month’s midpoint; until then, up to half a
-      month of dots can run ahead of it. That’s lag in the ink, not in the estimate: the headline
+      month of dots can run ahead of it. Only the drawing lags, not the estimate: the headline
       comes from the 21-day
       {" "}{xref("weighted-aggregate", "dots past the line", "weighted aggregate")}, which moves
       with every poll.</>) },
