@@ -861,7 +861,9 @@ for (const [k, eff] of effByKey) {
    a leader not polled that month carries null. The panels filter nulls, so
    lines connect real readings instead of inventing a monthly path across
    the source data's gaps (e.g. Jan–Mar 2026). */
-const rnd = (v) => (v == null ? null : Math.round(v));
+// aggregates carry one decimal, as every other figure the site quotes does;
+// null-safe, since a leader not polled that month is null, not zero
+const r1n = (v) => (v == null ? null : r1(v));
 /* House effects on leader NET ratings. Estimated within strata – a firm's
    neighbours must share its metric (approval vs favourability are different
    questions) and, for the opposition slot, its leader era (Ley and Taylor are
@@ -963,7 +965,7 @@ const leaderMonths = MONTHS.map((ym) => {
       for (const p of arr) waves.set(p.firm, (waves.get(p.firm) || 0) + 1);
       for (const p of arr) p.w /= Math.sqrt(waves.get(p.firm));
       const r = weightedWithSe(arr);
-      return { v: rnd(r.v), ci: r1(1.96 * r.se) };
+      return { v: r1n(r.v), ci: r1(1.96 * r.se) };
     };
     const a = est(ap), f = est(fv);
     return { net: a.v, fav: f.v, netCi: a.ci, favCi: f.ci };
@@ -997,29 +999,29 @@ const leaderMonths = MONTHS.map((ym) => {
        rather than opinion, and about 2pp of the cycle's apparent decline is
        the same artefact. Two-way runs the whole cycle (54 polls, all 14
        months); three-way is recent and partial (15 polls, 7 months). */
-    alb_pref: rnd(wMeanOf(pp2, (p) => p.alb)),
+    alb_pref: r1n(wMeanOf(pp2, (p) => p.alb)),
     /* ley_* / taylor_*: the one opposition series keyed by who was asked. A
        pre-handover month carries ley_* only, a month since carries taylor_*,
        and Feb 2026 – where both were measured – carries both, so neither
        person's line borrows the other's readings. */
-    ley_pref: rnd(wMeanOf(pp2L, (p) => p.opp)), taylor_pref: rnd(wMeanOf(pp2T, (p) => p.opp)),
+    ley_pref: r1n(wMeanOf(pp2L, (p) => p.opp)), taylor_pref: r1n(wMeanOf(pp2T, (p) => p.opp)),
     hanson_pref: null,
-    alb_prefN: rnd(wMeanOf(pp2, (p) => prefShare(p, "alb"))),
-    ley_prefN: rnd(wMeanOf(pp2L, (p) => prefShare(p, "opp"))),
-    taylor_prefN: rnd(wMeanOf(pp2T, (p) => prefShare(p, "opp"))),
+    alb_prefN: r1n(wMeanOf(pp2, (p) => prefShare(p, "alb"))),
+    ley_prefN: r1n(wMeanOf(pp2L, (p) => prefShare(p, "opp"))),
+    taylor_prefN: r1n(wMeanOf(pp2T, (p) => prefShare(p, "opp"))),
     hanson_prefN: null,
-    alb_pref3: rnd(wMeanOf(pp3, (p) => p.alb)),
-    ley_pref3: rnd(wMeanOf(pp3L, (p) => p.opp)), taylor_pref3: rnd(wMeanOf(pp3T, (p) => p.opp)),
-    hanson_pref3: rnd(wMeanOf(pp3, (p) => p.han)),
-    alb_prefN3: rnd(wMeanOf(pp3, (p) => prefShare(p, "alb"))),
-    ley_prefN3: rnd(wMeanOf(pp3L, (p) => prefShare(p, "opp"))),
-    taylor_prefN3: rnd(wMeanOf(pp3T, (p) => prefShare(p, "opp"))),
-    hanson_prefN3: rnd(wMeanOf(pp3, (p) => prefShare(p, "han"))),
+    alb_pref3: r1n(wMeanOf(pp3, (p) => p.alb)),
+    ley_pref3: r1n(wMeanOf(pp3L, (p) => p.opp)), taylor_pref3: r1n(wMeanOf(pp3T, (p) => p.opp)),
+    hanson_pref3: r1n(wMeanOf(pp3, (p) => p.han)),
+    alb_prefN3: r1n(wMeanOf(pp3, (p) => prefShare(p, "alb"))),
+    ley_prefN3: r1n(wMeanOf(pp3L, (p) => prefShare(p, "opp"))),
+    taylor_prefN3: r1n(wMeanOf(pp3T, (p) => prefShare(p, "opp"))),
+    hanson_prefN3: r1n(wMeanOf(pp3, (p) => prefShare(p, "han"))),
     /* Albanese v Hanson, head to head. Not a slice of either line above: it is
        asked as its own contest, Albanese runs ~7pp higher against Hanson than
        against the opposition leader, and only some houses ask it (11 polls,
        Apr 2026 on), so it is a third series rather than a filter on the first. */
-    alb_prefH: rnd(wMeanOf(ppH, (r) => r.alb)), hanson_prefH: rnd(wMeanOf(ppH, (r) => r.han)), taylor_prefH: null, ley_prefH: null,
+    alb_prefH: r1n(wMeanOf(ppH, (r) => r.alb)), hanson_prefH: r1n(wMeanOf(ppH, (r) => r.han)), taylor_prefH: null, ley_prefH: null,
     alb_net: A.net, ley_net: OL.net, taylor_net: OT.net, hanson_net: H.net,
     alb_fav: A.fav, ley_fav: OL.fav, taylor_fav: OT.fav, hanson_fav: H.fav,
     alb_netCi: A.netCi, ley_netCi: OL.netCi, taylor_netCi: OT.netCi, hanson_netCi: H.netCi,
@@ -1041,7 +1043,7 @@ const leaderMonths = MONTHS.map((ym) => {
    panel falls back to the latest monthly reading. */
 const leaderNow = (() => {
   const out = {};
-  const put = (key, r) => { if (r) out[key] = { ...r, v: rnd(r.v), prev: r.prev != null ? rnd(r.prev) : null }; };
+  const put = (key, r) => { if (r) out[key] = { ...r, v: r1n(r.v), prev: r.prev != null ? r1n(r.prev) : null }; };
   const taylorEra = (p) => eraOf(p.date) === "taylor";
   for (const [prop, lk, id, pool] of [["alb", "alb", "alb", appr], ["opp", "opp", "taylor", appr.filter(taylorEra)], ["han", "han", "hanson", appr]]) {
     for (const metric of ["net", "fav"]) {

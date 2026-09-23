@@ -856,7 +856,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         <div className="leader-vals">
           <div className="leader-name">{r.L.short}{tag && <span className="stale-tag" title={"Latest published reading · " + tag}> {tag}</span>}</div>
           <div className="leader-num">
-            {rd ? (Roll ? <Roll value={String(rd.v)} /> : rd.v) : "—"}
+            {rd ? (Roll ? <Roll value={rd.v.toFixed(1)} /> : rd.v.toFixed(1)) : "—"}
             {rd && <span className="pct">%</span>}
           </div>
         </div>
@@ -865,16 +865,24 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
     );
   });
 
-  /* The lead, taken from the last month BOTH names were asked in that contest
-     – which is not always the latest month, since the head-to-head is asked by
+  /* The lead: the gap between the two tiles' current readings where both
+     have one, else the last month BOTH names were asked in that contest –
+     which is not always the latest month, since the head-to-head is asked by
      fewer houses. Stating it is the point of showing two contests at once. */
   const leadOf = (pr) => {
+    const gap = (a, b) => {
+      const d = +Math.abs(a - b).toFixed(1);
+      const who = byId[a > b ? pr.ids[0] : pr.ids[1]];
+      return { m: d.toFixed(1), name: who.short, color: inkOf(who.color), level: d === 0 };
+    };
+    // the two tiles' own figures where both are current readings, so the
+    // lead is the gap the reader can see
+    const [ra, rb] = pr.ids.map((id) => leaderReading(D.leaderMonths, id + pr.suf));
+    if (ra && rb && ra.now && rb.now) return gap(ra.v, rb.v);
     for (let i = D.leaderMonths.length - 1; i >= 0; i--) {
       const m = D.leaderMonths[i], a = m[pr.ids[0] + pr.suf], b = m[pr.ids[1] + pr.suf];
       if (a == null || b == null) continue;
-      const d = Math.round(Math.abs(a - b));
-      const who = byId[a > b ? pr.ids[0] : pr.ids[1]];
-      return { m: d, name: who.short, color: inkOf(who.color), level: d === 0 };
+      return gap(a, b);
     }
     return null;
   };
@@ -968,7 +976,7 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
         scatterMove={cross ? cross.scatterMove : []}
         fade={morph ? morph.t : 1}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
-        fmt={(v) => v.toFixed(0)}
+        fmt={(v) => v.toFixed(1)}
       />
     </section>
   );
@@ -1163,8 +1171,8 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
                 {net == null
                   ? <span className="net dash">—</span>
                   : <span className={"net " + (net >= 0 ? "pos" : "neg")}>
-                      {Roll ? <Roll value={(net > 0 ? "+" : "") + net} />
-                            : <>{net > 0 ? "+" : ""}{net}</>}
+                      {Roll ? <Roll value={(net > 0 ? "+" : "") + net.toFixed(1)} />
+                            : <>{net > 0 ? "+" : ""}{net.toFixed(1)}</>}
                     </span>}
                 {/* same movement indicator the preferred-PM readout carries –
                     a net that moved is as much news as a share that moved */}
@@ -1225,7 +1233,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
         scatterMove={cross ? cross.scatterMove : []}
         fade={morph ? morph.t : 1}
         tooltipTitle={(i) => window.AP.monthLabelFull(pts[i].ym)}
-        fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(0)}
+        fmt={(v) => (v > 0 ? "+" : "") + v.toFixed(1)}
       />
     </section>
   );
@@ -1526,8 +1534,8 @@ function OnSourcesPanel({ rangeId }) {
         </div>
       </div>
       <p className="ons-lead">
-        {a.now ? "Across the latest polls" : "In " + monthOf(a.ym)}, {Math.round(a.v)}% of One Nation’s gain
-        came from people who voted for the Coalition in 2025, and {Math.round(b.v)}% from Labor voters.
+        {a.now ? "Across the latest polls" : "In " + monthOf(a.ym)}, {a.v.toFixed(1)}% of One Nation’s gain
+        came from people who voted for the Coalition in 2025, and {b.v.toFixed(1)}% from Labor voters.
       </p>
       <div className="und-reads">
         {reads.map(({ sr, v, chg, now }) => (
@@ -1536,8 +1544,8 @@ function OnSourcesPanel({ rangeId }) {
             <div className="und-read-body">
               <div className="und-read-top">
                 <span className="und-read-lab">{sr.label}</span>
-                <span className="und-read-v">{Math.round(v)}<span className="pct">%</span></span>
-                {now && now.ci95 != null && <span className="read-ci" title="95% margin">±{Math.max(1, Math.round(now.ci95))}</span>}
+                <span className="und-read-v">{v.toFixed(1)}<span className="pct">%</span></span>
+                {now && now.ci95 != null && <span className="read-ci" title="95% margin">± {now.ci95.toFixed(1)}</span>}
                 {chg != null && <Delta value={chg} neutral small title={now ? nowDeltaTitle(now) : "Change on the previous month"} />}
               </div>
               <p className="und-read-note">{sr.note}</p>
@@ -1603,8 +1611,8 @@ function DemographicsPanel() {
       <span className="demo-track" aria-hidden="true">
         <span className="demo-fill" style={{ width: (100 * v / top) + "%", background: isAll ? "var(--ink-3)" : color }}></span>
       </span>
-      <span className="demo-v">{Math.round(v)}<span className="pct">%</span></span>
-      <span className="demo-ci">{ci != null ? "±" + Math.max(1, Math.round(ci)) : ""}</span>
+      <span className="demo-v">{v.toFixed(1)}<span className="pct">%</span></span>
+      <span className="demo-ci">{ci != null ? "± " + ci.toFixed(1) : ""}</span>
     </div>
   );
   return (
@@ -1633,7 +1641,7 @@ function DemographicsPanel() {
             )}
             {row("All voters", all, null, true, "The site’s current figure for all voters – the headline’s own estimate")}
             {st.groups.map((g) => row(g.label, g.v[party], g.ci[party], false,
-              `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"} · ${houseList(g.houses.map(demoHouse))} · ±${Math.max(1, Math.round(g.ci[party]))} is the 95% margin`))}
+              `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"} · ${houseList(g.houses.map(demoHouse))} · ± ${g.ci[party].toFixed(1)} is the 95% margin`))}
           </div>
         ))}
       </div>
