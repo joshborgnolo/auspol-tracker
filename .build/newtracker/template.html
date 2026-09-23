@@ -4161,6 +4161,11 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   border-top: 1px solid var(--line);
   padding: 24px 0 0; margin: 30px 0 0;
 }
+/* Its houses-board bar sat 2px off the measure/basis row (ap-var-ctl's
+   chart-hugging top margin) — two rows of control chrome stacking into one
+   crowded strip. The disagreement panel's own ctl row stands 12px below its
+   head; give the lean panel's board the same separation. */
+.ap-lean .ap-var-ctl { margin-top: 12px; }
 /* …but the chart's GROUND carries the party colours the lines refuse: on the
    2PP the half above zero is Labor's, the half below the Coalition's; on a
    primary the tint above zero is that party's own, the half below a neutral
