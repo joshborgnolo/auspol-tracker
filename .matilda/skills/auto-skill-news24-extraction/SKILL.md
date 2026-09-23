@@ -361,6 +361,47 @@ altTpp/ppmHeadToHead, and the horserace Σ guards excluded the two known-bad
 columns as notes. Remember the key split when stripping: polls → `pollster`,
 the derived sections → `firm`.
 
+## Merge guard: a missing News-side window defers, it does not block (2026-09-23, c0b108d)
+
+News24's Sep 2026 article format dropped the fieldwork methodology
+sentence ENTIRELY — the 2026-09-21 wave's article contains zero of
+`conducted online between`, `survey of N voters`, or any sample figure
+(verify with a grep on the saved Chrome capture before blaming the
+regex). `news24Window()` now returns `{date:null, dateStart:null}` on
+current articles; `news24Published()` still parses the byline fine.
+
+The merge (`mergeNews24Wave`, extract-news24.mjs:395) compared News-side
+vs Wikipedia wave dates with `if (!n.date || n.date !== w.date)` — a
+NULL News-side date was read as a disagreement and pushed a blocking
+problem, which silently defeated the in-place upgrade leg
+(`if (canUpgrade && !n24) continue`): the wiki-only 2026-09-21 row never
+got `published` or the four derived sections, and the run ended
+`changed:false` with the reason visible only in
+`status.news24.problems` ("News24 date missing != Wikipedia …").
+
+Principle now applied: in a merge of corroborating sources, ABSENCE IS
+NOT DISAGREEMENT. A missing News-side window defers to the wave's
+(Wikipedia + Infogram-corroborated) dates; only a genuinely conflicting
+News-side window blocks. The same merge already treated null
+dateStart/sample/VI components exactly this way, and the merged wave
+never sourced its dates from n.date anyway — the null arm was pure
+guard, guarding nothing.
+
+The stacked failure that produced the wiki-only row in the first place:
+the 06:55 launchd run's Chrome fetch returned nothing ("News24
+fetch/parse failed" in `status.news24.skipped`), so Wikipedia landed a
+VI-only row (by design), then the designed-for self-heal (next Chrome
+run upgrades in place) tripped on the format gap. When triaging a
+wiki-only News24 row, check BOTH layers — the fetch
+(`status.news24.attempted`/`skipped`) and the merge problems list — not
+just whether Chrome ran.
+
+Fixed-run signature to expect: `enriched:[date]`, `upgraded:[date]`,
+`infogram.<date>` ids 6 with kinds
+horserace/crosstab/unmodelled/tpp/ppm/approvals, zero merge problems; the
+row gains the byline `published` plus ppm / approval / altTpp /
+ppmHeadToHead in one run.
+
 ## The automation contract (same as siblings; see resolve-monitor-extraction)
 
 Exit 0 ok / 1 fetch-parse / 2 guard trip; last stdout line `N24_STATUS {json}` with
