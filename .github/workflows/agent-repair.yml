@@ -29,6 +29,7 @@ on:
       - newspoll-update
       - news24-update
       - sampleeff-update
+      - crosstabs-update
       - roymorgan-update
       - pollbludger-fallback
       - coverage-check
@@ -97,6 +98,7 @@ jobs:
             newspoll-update)    HP=.build/newspoll-repair-prompt.md ;;
             news24-update)      HP=.build/news24-repair-prompt.md ;;
             sampleeff-update)   HP=.build/sampleeff-repair-prompt.md ;;
+            crosstabs-update)   HP=.build/crosstabs-repair-prompt.md ;;
             roymorgan-update)   HP=.build/roymorgan-repair-prompt.md ;;
             pollbludger-fallback) HP=.build/pollbludger-repair-prompt.md ;;
             coverage-check)     HP=.build/coverage-doctor-repair-prompt.md ;;

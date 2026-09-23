@@ -1,6 +1,6 @@
 #!/bin/bash
 # Scheduled YouGov "Public Data" / News24 fortnightly poll update: extract ->
-# if polls.json changed -> validate -> render-card -> build -> commit -> push. Installed via
+# if polls.json changed -> crosstabs -> validate -> render-card -> build -> commit -> push. Installed via
 # launchd (plist copied to ~/Library/LaunchAgents/local.auspol.news24.plist
 # from the copy in this directory). Every step logs one line to
 # .build/logs/news24.log; any failure exits non-zero before any commit,
@@ -73,15 +73,10 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
 fi
 
 log "new YouGov/News24 wave(s) detected; running validate/build/commit/push"
-# Vote switching (the One Nation sources panel): the new wave's table joins
-# data/vote-switching.json in this same commit, before the build so the page
-# carries it. Non-fatal: a wave whose table can't be read yet stays pending
-# in the script and is picked up by a later run; the VI update never waits.
-if VS_OUT="$(node .build/vote-switching.mjs 2>&1)"; then
-  log "$(echo "$VS_OUT" | tail -1)"
-else
-  log "WARN vote-switching did not finish: $(echo "$VS_OUT" | tail -1)"
-fi
+# The wave's crosstabs join data/vote-switching.json and
+# data/demographics.json in this same commit (non-fatal; see
+# refresh_crosstabs in git-push-main.sh).
+refresh_crosstabs vote-switching demographics
 if ! node .build/newtracker/validate.mjs >> "$LOG" 2>&1; then
   log "FAIL validate (errors above); no commit made"
   exit 1
@@ -93,13 +88,13 @@ if ! refresh_site; then
   exit 1
 fi
 
-git add data/polls.json data/vote-switching.json .build/news24-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
+git add data/polls.json data/vote-switching.json data/demographics.json .build/news24-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
 MSG="Update YouGov News24 Pulse data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! push_main "$MSG" data/polls.json data/vote-switching.json .build/news24-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
+if ! push_main "$MSG" data/polls.json data/vote-switching.json data/demographics.json .build/news24-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

@@ -58,6 +58,7 @@ push_main() {
     fi
     # build.mjs rewrites hashed asset layers; catch renames/deletions too
     git add assets/ >> "$LOG" 2>&1 || true
+    stage_dataset
   fi
   if ! git add "$@" >> "$LOG" 2>&1; then
     log "FAIL git add after rebase"
@@ -198,5 +199,56 @@ refresh_site() {
   if ! node .build/newtracker/build.mjs >> "$LOG" 2>&1; then
     log "FAIL build (card restamp)"; return 1
   fi
+  stage_dataset
   return 0
+}
+
+# ---------------------------------------------------------------------------
+# stage_dataset — gen-data's two outputs are tracked, and every build
+# rewrites them. A commit that carries the rebuilt index.html has to carry
+# them too, or it leaves them modified in the working tree. A CI runner
+# never notices; the laptop's next launchd slot finds the tree dirty and
+# refuses to run, and so does every slot after it, until some unrelated
+# commit happens to carry the files (2026-09-23: the 06:55 News24 commit
+# left the dataset behind and the 12:00 slot refused). refresh_site and
+# push_main's rebuild stage them; a wrapper that runs build.mjs itself calls
+# this before committing.
+GEN_DATASET=".build/newtracker/assets/9f09dca2-bd46-49a8-8ae1-51847608cf92.js .build/newtracker/assets/cycle-source.json"
+stage_dataset() {
+  # shellcheck disable=SC2086 # two fixed paths, split on purpose
+  git add $GEN_DATASET >> "$LOG" 2>&1 || true
+}
+
+# ---------------------------------------------------------------------------
+# refresh_crosstabs — the Snapshot's crosstab panels ride along with a data
+# update. .build/vote-switching.mjs ("Where One Nation's new voters came
+# from") and .build/demographics.mjs ("The vote by age, gender and
+# education") read the new wave's tables into data/vote-switching.json and
+# data/demographics.json; call this before refresh_site so the page carries
+# them, and stage those files with the rest.
+#
+# Non-fatal by design: a table that can't be read yet stays pending in the
+# script and is retried by later runs and by the weekly crosstabs-update,
+# whose wrapper (not this) fails once a wave has been pending too long. A
+# VI update never waits on a crosstab. Each pending wave's reason goes to
+# the log, then the script's status line.
+#
+# Usage: refresh_crosstabs vote-switching demographics
+refresh_crosstabs() {
+  local b out
+  for b in "$@"; do
+    if out="$(node ".build/$b.mjs" 2>&1)"; then
+      echo "$out" | grep '^pending ' | while IFS= read -r l; do log "$b: $l"; done
+      log "$(echo "$out" | tail -1)"
+    else
+      log "WARN $b did not finish: $(node_error "$out")"
+    fi
+  done
+  return 0
+}
+
+# The line worth logging from a node script that failed: the error it threw
+# (Node prints the stack, then its own version, last), else its last line.
+node_error() {
+  printf '%s\n' "$1" | grep -m1 -E '^([A-Za-z]*Error|Error)\b' || printf '%s\n' "$1" | tail -1
 }
