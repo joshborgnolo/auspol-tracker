@@ -69,6 +69,9 @@
     "YouGov (MRP)": {
       "site": "https://www.news24.com.au/politics/australian-politics"
     },
+    "Spectre Strategy": {
+      "site": "https://www.spectrestrategy.com/blog-3-1"
+    },
     "Fox & Hedgehog": {
       "stopped": true,
       "note": "Four waves, last 26 May 2026, silent since. Flagged by hand so its slot does not sit red on Next expected polls indefinitely; unflag if it resumes."

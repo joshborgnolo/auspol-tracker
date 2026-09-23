@@ -61,7 +61,7 @@ window.AP = { D };
 eval(readFileSync(new URL("./assets/np-project.js", import.meta.url), "utf8"));
 
 const DAY = 86400000;
-const NP_MAX_ROWS = 12;
+const NP_MAX_ROWS = 14;
 
 // a Sydney calendar day + minutes past midnight – the app's own frame, so a
 // scenario is written in wall-clock terms with no timezone arithmetic
@@ -320,12 +320,14 @@ function eq(name, got, want) {
   // caps (a weekly house appears once, not twice inside the same week).
   // DemosAU's window doesn't open until the 9th, so it is OFF the bar here
   // now (window houses are bar-visible only while open) - a dated-house
-  // ticket from Essential on down. YouGov sits out too, its own 21 Sep wave
-  // pushing the next slot past the horizon (re-anchored 2026-09-23 when that
-  // wave landed).
+  // ticket from Essential on down, with YouGov and Spectre's standing slots
+  // at the tail: the horizon bounds further slots, never the first, and both
+  // houses' next slots sit past 28 days (YouGov re-anchored 2026-09-23 when
+  // its 21 Sep wave landed; Spectre's 139-day cadence is ~twenty weeks out).
   eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
     [["Essential", "tomorrow"], ["Resolve", "12 days"], ["Roy Morgan", "13 days"],
-     ["Newspoll", "19 days"], ["RedBridge/Accent", "26 days"]]);
+     ["Newspoll", "19 days"], ["RedBridge/Accent", "26 days"], ["YouGov", "36 days"],
+     ["Spectre Strategy", "82 days"]]);
   {
     const da = firm(rows, "DemosAU");
     eq("DemosAU's window opens on the measured 9th, not the 1st", da && panelWhen(da), "opens in 8 days");
@@ -508,7 +510,8 @@ function eq(name, got, want) {
   eq("ticker order: most overdue first, dated houses only", items.map((i) => [i.firm, i.when]),
     [["Essential", "38 days overdue"], ["Resolve", "27 days overdue"],
      ["Roy Morgan", "26 days overdue"], ["Newspoll", "20 days overdue"],
-     ["RedBridge/Accent", "13 days overdue"], ["YouGov", "3 days overdue"]]);
+     ["RedBridge/Accent", "13 days overdue"], ["YouGov", "3 days overdue"],
+     ["Spectre Strategy", "43 days"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("a missed window leaves the bar entirely", daItems, []);
 }
@@ -550,10 +553,10 @@ function eq(name, got, want) {
 }
 
 // S8c – Mon 5 Oct with BOTH September and October confirmed absent: the slot
-// rolls to November, whose open (9 Nov) sits past the 28-day horizon, so the
-// house simply leaves the roll until the horizon catches up with it - a real
-// property of the dated houses' skip roll too (a rolled slot past the horizon
-// was never rendered), not a new failure mode.
+// rolls to November, whose open (9 Nov) sits past the 28-day horizon. A
+// rolled slot is still the house's one standing claim, so it keeps its panel
+// seat counting to the far-off range; on the bar the window-open-only rule
+// is untouched, so nothing shows there until 9 Nov.
 {
   const cad2 = JSON.parse(JSON.stringify(cad));
   cad2.find((c) => c.pollster === "DemosAU").skippedMonths = ["2026-09", "2026-10"];
@@ -561,8 +564,30 @@ function eq(name, got, want) {
   const rows = project(cad2, t0, nowMs);
   const items = ticker(rows, t0, nowMs);
   console.log(`\n${label}:  ticker → ${fmtT(items)}`);
-  eq("rolled past the horizon: DemosAU off the panel", firm(rows, "DemosAU"), undefined);
+  const da = firm(rows, "DemosAU");
+  eq("rolled past the horizon: panel keeps the standing window", da && panelWhen(da), "opens in 35 days");
   eq("rolled past the horizon: DemosAU off the ticker", items.some((i) => i.firm === "DemosAU"), false);
+}
+
+// S8d – Wed 23 Sep, against the SHIPPED cadence table exactly as built (no
+// re-anchoring): the horizon bounds only FURTHER slots. Spectre Strategy's
+// 139-day cadence puts its next slot ~eleven weeks out, and that one slot
+// still stands - on the panel as Thu 10 Dec ± 18 days counting from 78, on
+// the bar as a maybe-hedged countdown to the window's open 60 days away -
+// while the weekly house's walk still stops where the horizon says.
+{
+  const { t0, nowMs, label } = scen("Wed 23 Sep, the slow house stands", "2026-09-23", 600);
+  const rows = project(D.pollCadence, t0, nowMs);
+  const items = ticker(rows, t0, nowMs);
+  console.log(`\n${label}:  ticker → ${fmtT(items)}`);
+  const sp = firm(rows, "Spectre Strategy");
+  eq("the slow house holds its standing slot", sp && npFmt(sp.release), "Thu 10 Dec");
+  eq("panel counts it plainly", sp && panelWhen(sp), "in 78 days");
+  eq("the window claim is the measured spread", sp && spreadLabel(sp), " ± 18 days");
+  eq("one standing slot - no further slots this far out", rows.filter((r) => r.pollster === "Spectre Strategy").length, 1);
+  eq("on the bar as a hedged countdown", items.filter((i) => i.firm === "Spectre Strategy").map((i) => [i.when, i.maybe]),
+    [["60 days", true]]);
+  eq("the horizon still bounds the weekly house's further slots", rows.filter((r) => r.pollster === "Roy Morgan").length, 4);
 }
 
 // S9 – Mon 14 Sep, Roy Morgan's slot day, hour by hour, with the measured

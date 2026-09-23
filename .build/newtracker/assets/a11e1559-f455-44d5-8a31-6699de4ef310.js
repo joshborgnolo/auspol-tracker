@@ -2542,12 +2542,15 @@ function PollDetail({ r }) {
    here; re-declaring any of them is a parse error for this whole script. */
 const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 /* The most rows one horizon can produce with the current field: four weekly
-   Roy Morgans, two fortnightly YouGovs, one appearance each for the six
-   houses on a monthly-or-looser rhythm. A cap BELOW that spent the field's
-   last row rather than the busiest house's fourth – RedBridge's one monthly
-   slot was being cut while Roy Morgan's fourth weekly one kept its place.
-   If a house joins or leaves, this number moves with it. */
-const NP_MAX_ROWS = 12;
+   Roy Morgans, two fortnightly YouGovs, and one standing slot each for the
+   six houses on a monthly-or-looser rhythm (every house holds its next slot
+   whatever the horizon – see np-project.js) – twelve on an ordinary day,
+   plus slack for the weeks a 21- or 28-day house's NEXT slot also lands
+   inside the horizon. A cap BELOW that spends the field's last row rather
+   than the busiest house's fourth – RedBridge's one monthly slot was being
+   cut while Roy Morgan's fourth weekly one kept its place. If a house joins
+   or leaves, this number moves with it. */
+const NP_MAX_ROWS = 14;
 /* The hour a house files: "5 am", "5:30 am", and a span as "5-6 am" rather
    than "5 am-6 am" when both ends share a meridiem. Colon, not the full stop
    this used to print - a time is written 4:30 here. House local time, which

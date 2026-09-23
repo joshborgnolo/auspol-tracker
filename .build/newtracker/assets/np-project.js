@@ -22,7 +22,7 @@
    isn't removed until the data for it is.
    ==================================================================== */
 const DAY_MS = 86400000;
-const NP_HORIZON_DAYS = 28;   // one month of schedule
+const NP_HORIZON_DAYS = 28;   // how far out a house's 2nd, 3rd… slots reach
 /* A house nobody has timed keeps its whole day: with no hour recorded there is
    no moment to say has passed, so the row stays "today" until today is over
    rather than being rolled off the list by an hour we invented for it. */
@@ -85,8 +85,12 @@ function npProject(nowOverride) {
 
   /* A four-week horizon rather than a fixed count: it answers "what lands this
      month" and sizes itself to how busy the field actually is. A weekly house
-     appears four times, a monthly one once – which is the honest shape of the
-     schedule, not a repetition bug. */
+     appears four times inside it, a monthly one once – which is the honest
+     shape of the schedule, not a repetition bug. The horizon bounds how many
+     FURTHER slots of the walk show, never the first: every house holds one
+     standing next slot no matter how far out it sits (Spectre Strategy's is
+     ~twenty weeks away for most of the year), because a panel that stays
+     silent on a slow house only pretends not to know when it lands next. */
   const rows = [];
   const horizon = t0 + NP_HORIZON_DAYS * DAY_MS;
   cad.forEach((c) => {
@@ -121,19 +125,18 @@ function npProject(nowOverride) {
       const calSpread = (close - open) / 2 / DAY_MS;
       const release = (open + close) / 2;
       const missed = close < t0;
-      /* earns its place when the window opens inside the horizon, like any
-         loose house - but a MOOT slot keeps its seat until a release moves
-         the anchor, the same hold-the-slot rule everything else obeys */
-      if (open <= horizon || missed) {
-        rows.push({
-          ...c, field: open, release, missed, ahead: 0,
-          overdue: missed,
-          spread: calSpread, winHalf: calSpread,
-          inDays: Math.round((release - t0) / DAY_MS),
-          opensIn: Math.round((open - t0) / DAY_MS),
-          closesIn: Math.round((close - t0) / DAY_MS),
-        });
-      }
+      /* The next window is the house's standing claim and holds its seat
+         whatever the horizon - the dated walk's i === 0 rule below - and a
+         MOOT slot keeps its seat until a release moves the anchor, the
+         hold-the-slot rule everything else obeys */
+      rows.push({
+        ...c, field: open, release, missed, ahead: 0,
+        overdue: missed,
+        spread: calSpread, winHalf: calSpread,
+        inDays: Math.round((release - t0) / DAY_MS),
+        opensIn: Math.round((open - t0) / DAY_MS),
+        closesIn: Math.round((close - t0) / DAY_MS),
+      });
       return;
     }
     /* A house that keeps a weekday is projected onto it. Interval alone put
@@ -190,7 +193,11 @@ function npProject(nowOverride) {
        out and its window opens in 13, so testing the centre would hide a house
        that may well file next week. */
     const reaches = (rel, sp) => (c.loose ? rel - sp * DAY_MS : rel) <= horizon;
-    for (let i = 0; reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1)))) && i < 12; i++) {
+    /* i === 0 rides past the horizon on purpose: the next slot is the house's
+       one standing claim, and dropping it because it sits more than four
+       weeks out is how a quarterly house went unmentioned on the panel for
+       most of the year. The horizon's job ends at slot two. */
+    for (let i = 0; (i === 0 || reaches(release, Math.max(1, Math.round(c.spread * Math.sqrt(i + 1))))) && i < 12; i++) {
       const overdue = due(release) <= nowMs;
       /* Each further wave is one more interval of drift, so the window widens
          as sqrt(waves) – the second Essential is a looser bet than the first.
