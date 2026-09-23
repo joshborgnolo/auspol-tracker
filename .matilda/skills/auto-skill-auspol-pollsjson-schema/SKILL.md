@@ -6,7 +6,11 @@ description: auspol-tracker — data/polls.json array schemas bite probes that
   `polls` silently returns EMPTY and reads as "house stopped publishing".
   Also the date semantics (date = fieldwork END, published can lag days), the
   All-polls display rule (rows = VI-measuring polls only; leadership rides in
-  the expanded detail keyed same date+firm), and the current-era
+  the expanded detail keyed same date+firm), the polls[] `sumNote`/`tppSumNote`
+  anomaly fields (validate.mjs excuse; a sumNote row is gated out of gen-data's
+  impOk and shows "&mdash;" for implied 2PP in the archive &mdash; the note is
+  never rendered on-page), the archive's yearless DD&ndash;DD Mon date column
+  that makes a year-old wave paste as current, and the current-era
   "I can't see poll X in All polls" verification ladder.
 source: auto-skill
 extracted_at: '2026-09-04T01:43:34.977Z'
@@ -44,6 +48,20 @@ June **2025** for a **2026-06-25** wave.
   head-to-head (parsed from report Table 1's "Labor vs. One Nation"
   sub-block; 5 waves carry it). Never synthesise or round-trip-fill absent
   waves — gen-data §7d's FLOW_ON term mean reads only the published set.
+- Optional `sumNote` / `tppSumNote` on a polls[] row: DOCUMENTED sum
+  anomalies. `sumNote` = the printed primaries legitimately stray from
+  Σ100 — worked example (YouGov "Public Data" wave, field 25–30 Sep
+  **2025**, client "—", sample 1329/eff 880): the printed OTH of 14%
+  includes 7% undecided, so the primaries sum to 107; the note says so
+  verbatim ("Faithful to the release."). validate.mjs check 8 excuses the
+  row via `excuse("primary-sum", …, p.sumNote)` (~:76); `tppSumNote` does
+  the same for tpp_alp+tpp_lnp≠100 (~:88). CASCADE into the site: a
+  sumNote row fails gen-data's `impOk(p)` (~gen-data.mjs:271 — full
+  primary set AND no sumNote), so the bundle emits no `alpImp`/`alpOnImp`
+  and the All-polls row renders "—" in the implied cells while its
+  PUBLISHED 2PP still shows. The note text itself is data-only — no
+  renderer surfaces it anywhere on the page, so the dash is unexplained
+  to readers and arrives as "why no implied 2pp for …" questions.
 - `direction` → also **`pollster`** (gen-data.mjs ~l.824 `d.pollster`).
 - `ppm`, `approval`, `ppmHeadToHead` → **`firm`**, shape
   `{date, firm, alb, opp, oppName, han, …}`; approval detail nests
@@ -76,6 +94,17 @@ June **2025** for a **2026-06-25** wave.
 - So a "22–25 June" user citation maps to `date: <YEAR>-06-25`, and a June
   article about it can mean `published` in late June. Also check the YEAR
   the user means — the whole in-session confusion was 2025 vs 2026.
+- YEARLESS-DISPLAY TRAP (worked 2026-09-23, the "25–30 Sep" hunt): the
+  All-polls archive's date column renders `DD–DD Mon` with NO YEAR, so a
+  year-old wave pastes out of the page exactly like a current or upcoming
+  one (the Sep-**2025** YouGov sumNote wave read as a future-dated oddity
+  on 23 Sep 2026 and was initially mis-triaged as a Next-expected-polls
+  projection). When a user-pasted row can't be matched by date in
+  polls.json, locate it in the BUILT data bundle by a unique number
+  instead: the bundle stores display strings (`field:"25–30 Sep"`, en
+  dash), so ISO-date greps like `2026-09-25` miss entirely, while
+  `"sample":1329` survives minification verbatim and finds the row (then
+  read its `ym`/`released` for the true year).
 
 ## 3. What the All-polls archive actually renders
 

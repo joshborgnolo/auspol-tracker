@@ -1,8 +1,8 @@
 ---
 name: roymorgan-release-extraction
-description: Extract new Roy Morgan federal-voting-intention releases from the live roymorgan.com/findings Next.js feed into data/polls.json — __NEXT_DATA__ data flow (no HTML scraping), candidate filtering by topic+slug, prose-lead normalisation parser, guard suite, sorted-insert row contract (.build/extract-roymorgan.mjs, GitHub Actions since 84509d1); includes the ALP-v-One-Nation head-to-head research (anchor, sentence shapes, verified series) for its altTpp extension.
+description: Extract new Roy Morgan federal-voting-intention releases from the live roymorgan.com/findings Next.js feed into data/polls.json — __NEXT_DATA__ data flow (no HTML scraping), candidate filtering by topic+slug, prose-lead normalisation parser, guard suite, sorted-insert row contract (.build/extract-roymorgan.mjs, GitHub Actions since 84509d1); includes the ALP-v-One-Nation head-to-head research (anchor, sentence shapes, verified series) for its altTpp extension, plus the national-direction (right/wrong track) series into polls.json's `direction` array with the same self-heal pattern.
 source: auto-skill
-extracted_at: '2026-08-31T10:41:58.795Z'
+extracted_at: '2026-09-23T00:00:00.000Z'
 ---
 
 # Roy Morgan live-release extraction (findings feed → polls.json)
@@ -158,6 +158,45 @@ Verified in the built asset after landing: 08-30 carries `tppAlt {alp:55.5, onp:
 `altAlpOn ▲2.5` (ref 08-23); 05-24 carries `altAlpOn **−0.5**` — NOT the `▲0.5` this note
 originally predicted. The delta refs the PREVIOUS wave's value (05-17 = 54 → 53.5 = −0.5),
 so check the ref wave before hand-predicting a delta's sign.
+
+## The fourth series: national direction (SHIPPED 2026-09-23, commit 4db4a16)
+
+Every weekly release carries an "Only N% say … 'going in the right direction'" sentence and an
+"N% … say … 'going in the wrong direction'" sentence (change parentheticals present — strip via
+the existing `normaliseLead()` before regexing, same trap as altTpp). The extractor files it to
+`data/polls.json`'s `direction` array — rows
+`{date, dateStart, pollster:"Roy Morgan", right, wrong, unsure}` in that key order, values on
+the whole/half-point grid, `unsure = Math.round((100 − right − wrong) * 2) / 2` (validate.mjs
+tolerates ±1 on the Σ≈100). User reported 2026-09-23 that direction had simply STALLED at
+2026-08-23: the parser never existed (not a feed change). Four missed waves backfilled by
+re-running the extractor after the parser change — the self-heal covered them all from the
+live feed (`dir_healed: [09-20, 09-13, 09-06, 08-30]`, values 28/59, 24/62, 23/64, 21/65).
+
+Shipped machinery mirrors altTpp almost mechanically:
+
+- parse in `parseRelease()` as `dirRight/dirWrong`; anchor-heard-but-numbers-missing →
+  `dirPairMissing` warning.
+- guards `right 10–60`, `wrong 25–95`, `Σ 40–100` (live series 2026: right 19.5–43,
+  wrong 41.5–64).
+- `dirAdds` collection with existence-keyed de-dupe `date|pollster` against BOTH `D.direction`
+  and the in-run adds; waves whose poll row already exists (`skipped_existing`) still heal —
+  `status.dir_healed` records the dates.
+- **guard filter extended**: for existed waves only live checks labelled `onp 2pp Σ|alp=` or
+  `dir ` run (never re-run the full historic suite — era-drifted rows would block healing).
+- write gate `newRows.length || altAdds.length || dirAdds.length`; `D.direction` merged and
+  date-sorted before write.
+- **display needs zero renderer work**: gen-data §5 builds `DIR_BY` on `date|pollster` and both
+  row emitters (`individualPolls` ~:1358 archive + `pollsterTable` ~:1427 latest) attach `dir`;
+  PollLedger's "National direction" PdSec renders whenever `r.dir` is present (Latest and
+  archive detail share ONE PollLedger). Verify in the built bundle that the healed dates carry
+  `dir` — the probe recipe and its four traps (minified consts, `released` key, bracket-depth
+  parse) live in the auspol-bundle-data-probe skill.
+
+**Root-cause lesson for "optional series stalled" reports**: direction had ALSO stalled for
+Essential/Spectre (at 2026-08-31) for an unrelated environmental reason — the launchd updater
+wrappers all refused their slots on a dirty tracked tree (a compiled asset left dirty by an
+earlier session) from ~Sep 12. CI-side extractors were green the whole time. Check BOTH causes
+before concluding any one extractor broke; see poll-agent-no-show-triage.
 
 ## Verification recipe that caught the bugs
 

@@ -32,6 +32,14 @@ the shared-repo dirty tree all week. The wave appeared on the next manual run im
    this repo: `working tree dirty ... refusing to write & commit on a dirty base` (sibling Matilda
    sessions keep the tree dirty; by design), `writers lock lost to a concurrent wrapper`, stale-lock
    reaping lines. The launchd job being quiet is usually etiquette, not death.
+   **Multi-house, multi-week silence upgrades this from etiquette to root cause** (worked
+   2026-09-23): Essential AND Spectre optional series (national direction) both stalled at
+   2026-08-31 while every CI extractor stayed green. The blocker was one dirty TRACKED build
+   artifact — a compiled `assets/9f09dca2-*.js` bundle left modified by an earlier session —
+   and since every launchd wrapper refuses a dirty tracked base, ONE stray modification muted
+   the whole local tier for ~11 days. When several launchd-backed houses go quiet together,
+   `git status` FIRST: commit the artifact properly (or revert orphan dirt) and the tier
+   resumes on its next slots. Do not mistreat it as per-house extractor breakage.
 5. **Environmental hazards**: `df -h .` — a 100%-full disk kills launchd writes and surfaces as
    bizarre git errors (see below). Do this before assuming logic bugs.
 

@@ -22,13 +22,21 @@ side and leads with the implied one:
 
 ## Layer map (edit any copy/behaviour in all its homes)
 
-- `gen-data.mjs` — hoisted `impOk(p)` eligibility predicate (~:210, full
-  primary set + no sumNote) shared by `tppRowsSynth` and per-poll emission;
-  `individualPolls` emits `alpImp: r1(impliedAlp2pp(p))` (~:1169) ONLY where
+- `gen-data.mjs` — hoisted `impOk(p)` eligibility predicate (~:271, full
+  primary set {alp,lnp,grn,onp} + no sumNote) shared by `tppRowsSynth` and
+  per-poll emission (~:1331 and ~:1410, both row emitters);
+  `individualPolls` emits `alpImp: r1(impliedAlp2pp(p))` ONLY where
   impOk — so the two dot clouds are genuinely different point sets, not a
-  re-render of the same polls. `synthChg` (~:1286) adds implied
-  month-on-month significance (changeSe/changeCi95/changeSig, two
-  independent 21d windows RSS) merged into `synthLatest`.
+  re-render of the same polls. Worked user-question 2026-09-23 ("why no
+  implied 2pp for YouGov … 25–30 Sep"): that's the Sep-**2025** YouGov
+  "Public Data" wave whose sumNote (OTH 14% incl. 7% undecided, Σ107)
+  gates it out — archive implied cells show "—", published 2PP still
+  renders, and the sumNote text itself appears NOWHERE on-page, so the
+  dash is unexplained to readers (see auspol-pollsjson-schema; the
+  archive's yearless DD–DD Mon date column is why it read as current).
+  `synthChg` (~:1286) adds implied month-on-month significance
+  (changeSe/changeCi95/changeSig, two independent 21d windows RSS)
+  merged into `synthLatest`.
 - gen-data ALP–ON emit (0365ba4) — `synthOn` (monthly implied ALP–ON
   points), `latest.onImp` = {a, b, band, flows, n, aPrev}, and per-poll
   `alpOnImp`. ALP–ON flow constants FP_ON={lnp:0.315, grn:0.89, oth:0.53}
