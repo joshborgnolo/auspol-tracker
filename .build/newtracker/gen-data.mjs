@@ -1076,6 +1076,15 @@ const leaderNow = (() => {
   return out;
 })();
 
+/* The preferred-PM margin now – PM minus opponent, every format, as Past
+   cycles draws it – for the sitting term's latest point there (§10).
+   Taylor's era; sample-weighted, never house-adjusted, the six-week window,
+   as the preferred-PM readings are. A margin is a difference of two shares,
+   so it carries a net's sampling variance. */
+const ppmMarginNow = currentReading(ppm.filter((p) => p.alb != null && p.opp != null && eraOf(p.date) === "taylor")
+  .map((p) => ({ firm: p.firm, mid: midMs({ date: p.date }), x: p.alb - p.opp, n: ppmN(p),
+                 pq: Math.max(0, 100 * (p.alb + p.opp) - (p.alb - p.opp) ** 2) })), null, SPARSE_K);
+
 /* A card's house credit-list names only houses still ASKING the question:
    anyone with a reading in the six months before the series' own newest.
    Deriving rather than writing names into copy isn't enough on its own -
@@ -2716,9 +2725,9 @@ function rivalEras(pts, c, cap) {
    lean belongs to a house at a time, so it is never carried across terms),
    each reading corrected by its house's lean as of its date. Until Newspoll
    joined it in August 1987 Morgan polled alone, so there is no consensus to
-   measure against and nothing moves. The election rows some archives end on are results, not a
-   house, so they never enter the estimate. `strat` keeps a measure's people
-   apart (a leader net's era), as the live panel does. */
+   measure against and nothing moves. The election rows some archives end on
+   are results, not a house, so they never enter the estimate. `strat` keeps
+   a measure's people apart (a leader net's era), as the live panel does. */
 const debiasTerm = (pts, strat) => {
   const he = houseEffectsFor(pts.filter((p) => p.v != null && p.firm && p.firm !== "Election")
     .map((p) => ({ firm: p.firm, mid: p.t, x: p.v, n: p.n || 1200, ...(strat ? { strat: strat(p) } : {}) })));
@@ -2837,6 +2846,54 @@ const CYCLE_DEFS = CYC_META.map((c) => {
     ppmPair: ppmPts.length ? ppmPairName(c, ppmPts[0].iso) : null,
   };
 });
+
+/* The sitting term's latest point is the figure the site quotes now, not the
+   current month so far: early in a month that month rests on a poll or two,
+   the weakness that moved the headline itself to the nowcast (§7e). The 2PP
+   is the hero's own – the implied figure against the rival it names (§7b,
+   §7f) – the primaries are §7e's, the leader lines the current readings
+   (§4b). Every other point, and every past term's, is a whole month's; this
+   is the one the page's sentence ("16 months in, …") compares. The era run
+   that ends there ends on the same figure. */
+{
+  const cur = CYCLE_DEFS.find((c) => c.current);
+  if (cur && cur.months.length) {
+    const i = cur.months.length - 1, m = cur.months[i];
+    const now = {
+      tpp: rivalLead === "alp_on" ? (onImp ? onImp.a : null) : (synthNow ? synthNow.alp : null),
+      primary: primaryNow ? primaryNow[cur.gov] : null, oppr: primaryNow ? primaryNow[cur.opp] : null,
+      onp: primaryNow ? primaryNow.onp : null,
+      net: leaderNow.alb_net ? leaderNow.alb_net.v : null, oppnet: leaderNow.taylor_net ? leaderNow.taylor_net.v : null,
+      han: leaderNow.hanson_net ? leaderNow.hanson_net.v : null, ppmm: ppmMarginNow ? ppmMarginNow.v : null,
+    };
+    /* Era runs are bucketed poll by poll, so a reading from the last days of
+       a month can land one month past the term's latest (months since the
+       election round up): no run draws past it, and the last run ends on the
+       same current figure as the line it belongs to. A split that trimming
+       leaves with one run is no split, as eraSeries rules. */
+    const endRuns = (key, v) => {
+      const eras = cur[key];
+      if (!eras) return;
+      for (const e of eras) {
+        const cut = e.months.findIndex((x) => x > m);
+        if (cut >= 0) { e.months = e.months.slice(0, cut); e.vals = e.vals.slice(0, cut); if (e.obs) e.obs = e.obs.slice(0, cut); }
+      }
+      const kept = eras.filter((e) => e.vals.some((x) => x != null));
+      const e = kept[kept.length - 1], j = e ? e.months.indexOf(m) : -1;
+      if (j >= 0 && v != null) { e.vals[j] = r1(v); if (e.obs) e.obs[j] = true; }
+      cur[key] = kept.length > 1 ? kept : null;
+    };
+    for (const [k, v] of Object.entries(now)) {
+      if (v == null || !Number.isFinite(v) || !cur[k]) continue;
+      cur[k][i] = r1(v);
+      if (cur.obs[k]) cur.obs[k][i] = true;
+    }
+    endRuns("tppEras", now.tpp);
+    endRuns("oppEras", now.oppnet);
+    endRuns("netEras", now.net);
+    endRuns("ppmEras", now.ppmm);
+  }
+}
 
 /* ---- publication cadence, for "next expected polls" ---------------------
    Two quantities per house, both measured rather than assumed:

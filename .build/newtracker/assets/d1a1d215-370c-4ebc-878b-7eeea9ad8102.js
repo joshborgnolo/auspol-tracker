@@ -2957,8 +2957,9 @@ function PastCyclesView() {
       <p className="cyc-foot">
         The individual polls behind the plotted series are downloadable above
         {hidden.size > 0 && ", the file leaving the hidden terms out just as the charts do"}.{" "}
-        Past cycles run the full ~3-year term to the next election; the current cycle stops at the
-        latest reading. Every term’s months are averaged as the current term’s are: a pollster with
+        Past cycles run the full ~3-year term to the next election. The current term stops at the
+        latest poll, and its last point is the figure the site quotes now, as in the headline,
+        rather than the month so far. Every term’s months are averaged as the current term’s are: a pollster with
         several polls in a month counts for the square root of their number, and from 1987, when
         Newspoll joined Morgan, each poll is first corrected for its pollster’s lean within that
         term. Where the band runs faint, fewer than three-quarters of the terms on the
