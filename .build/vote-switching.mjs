@@ -1,7 +1,7 @@
 /* vote-switching.mjs – builds data/vote-switching.json: for each poll wave
    that publishes it, how voters in each 2025-vote group say they would vote
-   now (the rows of a vote-switching table). The Snapshot panel "Where are One
-   Nation voters coming from" and its Info entry are drawn from this file.
+   now (the rows of a vote-switching table). The Snapshot panel "Where One
+   Nation's new voters came from" and its Info entry are drawn from this file.
 
    Runs itself: the News24 and DemosAU updaters call it after every new wave
    (non-fatal), and it finds the waves the file doesn't hold yet –

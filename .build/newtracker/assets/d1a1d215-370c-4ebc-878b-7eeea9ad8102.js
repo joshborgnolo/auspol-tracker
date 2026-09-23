@@ -5894,7 +5894,7 @@ function infoTerms(D) {
       { id: "vote-switching", term: "Vote switching", body: (
         <>How people who voted for each party in 2025 say they would vote now. DemosAU and
         YouGov both publish it, as a table with a row for each 2025 vote, and it’s what the panel
-        “Where are One Nation voters coming from” is built from.
+        “Where One Nation’s new voters came from” is built from.
         <span className="info-p"><b>How the split is worked out.</b> For each 2025 group, the share
         now backing One Nation is multiplied by that group’s share of the 2025 vote. That gives the
         points of the national vote One Nation has drawn from the group, and each group’s part of

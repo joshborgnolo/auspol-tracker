@@ -38265,7 +38265,7 @@ function OnSourcesPanel({
     className: "card-head"
   }, React.createElement("div", null, React.createElement("h2", {
     className: "card-title"
-  }, "Where are One Nation voters coming from"), React.createElement("p", {
+  }, "Where One Nation\u2019s new voters came from"), React.createElement("p", {
     className: "card-sub"
   }, "Share of One Nation\u2019s gain since the 2025 election, by how those voters voted in 2025 \xB7 ", houseList(S.houses)))), React.createElement("p", {
     className: "ons-lead"
@@ -38332,7 +38332,7 @@ function OnSourcesPanel({
   }, "Each dot is one poll\u2019s split; the lines are monthly averages. A group\u2019s part is the share of its 2025 voters now backing One Nation, weighted by that group\u2019s share of the 2025 vote \u2013 so 38% of Coalition voters counts for far more than 38% of a small party\u2019s. Voters who can\u2019t recall a 2025 vote are left out, and so are One Nation\u2019s own 2025 voters, who are what it kept rather than gained.", " ", React.createElement("button", {
     type: "button",
     className: "hi-term",
-    onClick: () => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where are One Nation voters coming from")
+    onClick: () => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")
   }, "How it\u2019s worked out")));
 }
 const PARTY_C = {
@@ -45410,7 +45410,7 @@ function infoTerms(D) {
     entries: [{
       id: "vote-switching",
       term: "Vote switching",
-      body: React.createElement(React.Fragment, null, "How people who voted for each party in 2025 say they would vote now. DemosAU and YouGov both publish it, as a table with a row for each 2025 vote, and it\u2019s what the panel \u201CWhere are One Nation voters coming from\u201D is built from.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "How people who voted for each party in 2025 say they would vote now. DemosAU and YouGov both publish it, as a table with a row for each 2025 vote, and it\u2019s what the panel \u201CWhere One Nation\u2019s new voters came from\u201D is built from.", React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "How the split is worked out."), " For each 2025 group, the share now backing One Nation is multiplied by that group\u2019s share of the 2025 vote. That gives the points of the national vote One Nation has drawn from the group, and each group\u2019s part of the total is the share the panel shows.", onsYg ? React.createElement(React.Fragment, null, " In YouGov\u2019s latest poll, ", onsYg.toOn.lnp, "% of Coalition voters backing One Nation is worth ", onsYg.pts.lnp.toFixed(1), " points, and", " ", onsYg.toOn.alp, "% of Labor voters is worth ", onsYg.pts.alp.toFixed(1), ".") : null), React.createElement("span", {
         className: "info-p"

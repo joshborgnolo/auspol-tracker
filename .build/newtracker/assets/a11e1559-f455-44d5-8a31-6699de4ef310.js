@@ -1456,7 +1456,7 @@ function UndecidedPanel({ rangeId }) {
   );
 }
 
-// ---- Where are One Nation voters coming from ---------------------------
+// ---- Where One Nation’s new voters came from ---------------------------
 /* One Nation's gain since the 2025 election, split by how the voters it
    gained voted in 2025 – from the vote-switching tables DemosAU and YouGov
    publish (gen-data §5b, data/vote-switching.json). Same furniture as the
@@ -1497,7 +1497,7 @@ function OnSourcesPanel({ rangeId }) {
     <section className="card">
       <div className="card-head">
         <div>
-          <h2 className="card-title">Where are One Nation voters coming from</h2>
+          <h2 className="card-title">Where One Nation’s new voters came from</h2>
           <p className="card-sub">
             Share of One Nation’s gain since the 2025 election, by how those voters voted in 2025 · {houseList(S.houses)}
           </p>
@@ -1542,7 +1542,7 @@ function OnSourcesPanel({ rangeId }) {
         recall a 2025 vote are left out, and so are One Nation’s own 2025 voters, who are what it
         kept rather than gained.{" "}
         <button type="button" className="hi-term"
-                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where are One Nation voters coming from")}>
+                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")}>
           How it’s worked out</button>
       </p>
     </section>
