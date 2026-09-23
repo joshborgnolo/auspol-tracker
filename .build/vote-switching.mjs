@@ -21,11 +21,9 @@
    KNOWN_SKIP below – each entry checked by hand – marks a wave as having no
    table. A wave still pending STALE_DAYS after its fieldwork closed is
    listed as `stale`, and the weekly run fails on it so a person (or
-   agent-repair) looks. Neither house published the table before February
-   2026.
-     Newspoll – no table. The Australian's report of a wave says in prose
-                where Labor's and the Coalition's 2025 voters now stand;
-                those rows are entered by hand in QUOTED below.
+   agent-repair) looks. Newspoll publishes only Labor's row (retention and
+   where its losses went), which cannot place One Nation's gains, so it isn't
+   read. Neither house published the table before February 2026.
 
    Weights: each group's share of the 2025 formal vote (AEC event 31496, the
    TPP flow file cached in .build/aec-flow-src/tpp-2025.txt: first
@@ -55,21 +53,6 @@ const WEIGHTS_2025 = { alp: 34.56, lnp: 31.82, grn: 12.20, onp: 6.40, ind: 7.27,
 const KNOWN_SKIP = {
   "YouGov|2026-03-19": "an Australia Institute poll – no 2025-vote crosstab published",
   "YouGov|2026-06-16": "the wave's article carries no 2025-vote table",
-};
-
-/* Rows a poll's report states in prose, entered by hand with the words they
-   come from. A row holds only the cells the report gives. Newspoll's give
-   Labor's and the Coalition's 2025 voters, which count toward those two
-   groups' rates (gen-data §5b); with no Greens or others row, a wave like
-   this can't be split on its own. Its dates, sample, article and One Nation
-   vote come from its polls.json row. */
-const QUOTED = {
-  "Newspoll|2026-09-17": {
-    quote: "Based on voter recollections of who they supported at the last election and who they support now, the ALP has retained a little under two-thirds of its vote since the 2025 poll. Of those lost, about 15 per cent have gone to One Nation, 9 per cent to the Coalition, 6 per cent to the Greens and 5 per cent to others. The Coalition, which suffered its worst result at last year’s election, has retained about 53 per cent of its low vote, with 39 per cent switching to One Nation.",
-    // the losses (15 + 9 + 6 + 5) are shares of all Labor's 2025 voters, so it kept
-    // the other 65 – "a little under two-thirds"; "others" includes independents
-    rows: { alp: { alp: 65, onp: 15, lnp: 9, grn: 6, oth: 5 }, lnp: { lnp: 53, onp: 39 } },
-  },
 };
 
 // ---- assemble -----------------------------------------------------------------
@@ -121,13 +104,6 @@ try {
 } finally {
   fs.rmSync(tmp, { recursive: true, force: true });
 }
-for (const [k, q] of Object.entries(QUOTED)) {
-  const p = polls.find((x) => x.pollster + "|" + x.date === k);
-  if (!p) { pend(k, "quoted rows, but polls.json holds no such poll – fix the QUOTED key"); continue; }
-  push({ pollster: p.pollster, date: p.date, dateStart: p.dateStart ?? null, sample: p.sample ?? null,
-         article: p.url ?? null, onp: p.onp ?? null, source: p.url ?? null,
-         read: "quoted in the article", quote: q.quote, rows: q.rows });
-}
 waves.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.pollster.localeCompare(b.pollster)));
 skipped.sort((a, b) => (a.date < b.date ? -1 : 1));
 
@@ -137,7 +113,7 @@ const onFile = new Set(waves.map(key)), skippedKeys = new Set(skipped.map(key));
 const stale = candidates.filter((p) => daysAgo(p.date) > STALE_DAYS && !onFile.has(key(p)) && !skippedKeys.has(key(p))).map(key);
 
 const doc = {
-  _about: "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's and Newspoll's oth include independents), dnr (didn't remember / didn't vote – DemosAU only). A wave read \"quoted in the article\" (Newspoll) holds only the rows and cells its report states, with the words in `quote`. `skipped` lists waves checked by hand and found to carry no usable table.",
+  _about: "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's oth includes independents), dnr (didn't remember / didn't vote – DemosAU only). `skipped` lists waves checked by hand and found to carry no usable table.",
   weights2025: WEIGHTS_2025,
   waves,
   skipped,

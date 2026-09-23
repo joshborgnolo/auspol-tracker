@@ -1,5 +1,5 @@
 {
- "_about": "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's and Newspoll's oth include independents), dnr (didn't remember / didn't vote – DemosAU only). A wave read \"quoted in the article\" (Newspoll) holds only the rows and cells its report states, with the words in `quote`. `skipped` lists waves checked by hand and found to carry no usable table.",
+ "_about": "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's oth includes independents), dnr (didn't remember / didn't vote – DemosAU only). `skipped` lists waves checked by hand and found to carry no usable table.",
  "weights2025": {
   "alp": 34.56,
   "lnp": 31.82,
@@ -1428,30 +1428,6 @@
     }
    },
    "fit": 0.06
-  },
-  {
-   "pollster": "Newspoll",
-   "date": "2026-09-17",
-   "dateStart": "2026-09-14",
-   "sample": 1244,
-   "article": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455",
-   "onp": 30,
-   "source": "https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455",
-   "read": "quoted in the article",
-   "quote": "Based on voter recollections of who they supported at the last election and who they support now, the ALP has retained a little under two-thirds of its vote since the 2025 poll. Of those lost, about 15 per cent have gone to One Nation, 9 per cent to the Coalition, 6 per cent to the Greens and 5 per cent to others. The Coalition, which suffered its worst result at last year’s election, has retained about 53 per cent of its low vote, with 39 per cent switching to One Nation.",
-   "rows": {
-    "alp": {
-     "alp": 65,
-     "onp": 15,
-     "lnp": 9,
-     "grn": 6,
-     "oth": 5
-    },
-    "lnp": {
-     "lnp": 53,
-     "onp": 39
-    }
-   }
   },
   {
    "pollster": "YouGov",
