@@ -474,6 +474,29 @@
     })();
     const caption = (board0 && board0.caption) || noteLead
       || txt(target.querySelector(".hero-caption, .chart-note, .card-note"));
+    /* The past-cycles insight sentence ("16 months in, the Coalition
+       (21.0%) sits 21.4% below the average opposition at this point. ...")
+       sits between a cycles card's controls and its chart, and it is the
+       card's reading of the chart - the image carries it in the same place,
+       under the subtitle. Read off the live node as styled runs, so the
+       gap keeps the colour the page gives it (.ci-delta pos/neg/level).
+       Only where the page is showing one. */
+    const insightRuns = (() => {
+      const el = target.querySelector(".cycle-insight");
+      if (!el || !el.getClientRects().length) return null;
+      const runs = [];
+      const walk = (n) => {
+        if (n.nodeType === 3) { if (n.nodeValue) runs.push({ t: n.nodeValue, ink: T.ink2, bold: false }); return; }
+        if (n.nodeType !== 1) return;
+        if (n.classList.contains("ci-delta")) {
+          runs.push({ t: n.textContent, ink: getComputedStyle(n).color, bold: true });
+          return;
+        }
+        n.childNodes.forEach(walk);
+      };
+      el.childNodes.forEach(walk);
+      return runs.some((r) => r.t.trim()) ? runs : null;
+    })();
 
     /* Which terms are on the board, in order, and which one is sitting. Two
        things below need it: the band's own legend entry ("Past terms
@@ -731,8 +754,53 @@
           const first = (sub.match(/^.*?[.!?](?=\s|$)/) || [sub])[0];
           return wrapText(m, first, IW).slice(0, 3);
         })();
+        /* The title was one fillText at 40px and never measured, so a long
+           span ran off the card's right edge (past cycles: "Government
+           two-party preferred, 1972\u201374, 1975\u201380, 1983\u201393, ..." with
+           six terms on the board). Measured like everything else: over the
+           width, it breaks at its natural seam - the chart's name on one
+           line, the span on the next - and only word-wraps when either half
+           is still too wide; past two lines it steps down to 32px. */
+        const titleFit = (px) => {
+          m.font = "600 " + px + "px " + serif;
+          if (m.measureText(title).width <= IW) return [title];
+          const head = titleBase + (cycSpan ? "," : "");
+          if (span && m.measureText(head).width <= IW && m.measureText(span).width <= IW)
+            return [head, span];
+          return wrapText(m, title, IW);
+        };
+        let TITLE_PX = 40;
+        let titleLines = titleFit(TITLE_PX);
+        if (titleLines.length > 2) { TITLE_PX = 32; titleLines = titleFit(TITLE_PX); }
+        const TITLE_LH = Math.round(TITLE_PX * 1.2);
+        const titleExtra = (titleLines.length - 1) * TITLE_LH;
+        /* the insight sentence, word-wrapped across its styled runs: each
+           word keeps its run's ink and weight, measured in that weight */
+        const INS_PX = 17, INS_LH = 25;
+        const insFont = (bold) => (bold ? "700 " : "400 ") + INS_PX + "px " + sans;
+        const insLines = (() => {
+          if (!insightRuns) return [];
+          const lines = [];
+          let cur = [], used = 0;
+          insightRuns.forEach((r) => {
+            r.t.replace(/\s+/g, " ").split(/(\s)/).forEach((tok) => {
+              if (!tok) return;
+              m.font = insFont(r.bold);
+              const w = m.measureText(tok).width;
+              if (tok === " ") { if (cur.length) { cur.push({ ...r, t: tok, w }); used += w; } return; }
+              if (used + w > IW && cur.length) {
+                while (cur.length && cur[cur.length - 1].t === " ") used -= cur.pop().w;
+                lines.push(cur); cur = []; used = 0;
+              }
+              cur.push({ ...r, t: tok, w }); used += w;
+            });
+          });
+          if (cur.length) lines.push(cur);
+          return lines;
+        })();
+        const insBlock = insLines.length ? 14 + insLines.length * INS_LH : 0;
         const headBlock = hero ? 92 + 34 + 26 : (sub ? 40 + (subLines.length - 1) * 22 : 8);
-        const H = 76 + headBlock + 30 + chartH + 34 + legLines.length * 26
+        const H = 76 + titleExtra + headBlock + insBlock + 30 + chartH + 34 + legLines.length * 26
                 + (capLines.length ? 8 + capLines.length * 22 : 0) + 56;
 
         const cv = document.createElement("canvas");
@@ -743,8 +811,9 @@
         c.textBaseline = "alphabetic";
 
         let y = 76;
-        c.fillStyle = T.ink; c.font = "600 40px " + serif;
-        c.fillText(title, PAD, y);
+        c.fillStyle = T.ink; c.font = "600 " + TITLE_PX + "px " + serif;
+        titleLines.forEach((ln, i) => c.fillText(ln, PAD, y + i * TITLE_LH));
+        y += titleExtra;
 
         if (hero) {
           y += 92;
@@ -779,6 +848,18 @@
           subLines.forEach((ln, i) => c.fillText(ln, PAD, y + i * 22));
           y += (subLines.length - 1) * 22 + 8;
         } else { y += 8; }
+
+        if (insLines.length) {
+          y += 14;
+          insLines.forEach((ln) => {
+            y += INS_LH;
+            let x = PAD;
+            ln.forEach((tk) => {
+              c.font = insFont(tk.bold); c.fillStyle = tk.ink;
+              c.fillText(tk.t, x, y - 6); x += tk.w;
+            });
+          });
+        }
 
         y += 30;
         c.drawImage(img, PAD, y, IW, chartH);
