@@ -3086,7 +3086,19 @@ for (const p of POLLS) {
    publication date are collapsed to the last of them: a house's interval is
    the gap between the things it PUBLISHED. */
 const byHouse = {};
+/* A PROVISIONAL row (Poll Bludger fallback: second-hand, no `published`)
+   stays out of the rhythm's measurement - left in, its missing date broke
+   the unbroken published tail and flipped the house onto fieldwork gaps
+   for as long as it was live, re-measuring the window (RedBridge ±1 week
+   → an exact day, Spectre ±18 → ±2). It still MOVES THE ANCHOR, though:
+   the page shows the wave, so the projection must not call its slot
+   overdue. The newest one per house is kept aside for that. */
+const provLast = {};
 for (const p of POLLS) {
+  if (p.provisional) {
+    if (!provLast[p.pollster] || p.date > provLast[p.pollster].date) provLast[p.pollster] = p;
+    continue;
+  }
   const r = (byHouse[p.pollster] ||= []);
   const pub = (p.published || "").slice(0, 10) || null;
   /* the clock rides along with the date, because the panel now SHOWS the
@@ -3139,7 +3151,17 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     } else fused.push(gaps[i]);
   }
   const slotGaps = fused.slice(-8);
-  const last = seq[seq.length - 1];
+  let last = seq[seq.length - 1];
+  /* a provisional wave newer than the record anchors the next slot: on the
+     published basis at its fieldwork end plus the house's measured lag (its
+     publication was never recorded), else at the fieldwork end itself */
+  const prov = provLast[firm];
+  const lastProvisional = !!prov && prov.date > rows[rows.length - 1].date;
+  if (lastProvisional) {
+    const pls = lagSamples[firm] || [];
+    const plag = basis === "published" ? (pls.length ? Math.round(medianOf(pls)) : CAD_DEFAULT_LAG) : 0;
+    last = new Date(Date.parse(prov.date) + plag * 86400000).toISOString().slice(0, 10);
+  }
   /* The only way OFF the projection: declared stopped by hand. Silence on
      its own no longer removes a house – an unrecorded release holds its
      slot until it is recorded (see CAD_MAX_REL_SPREAD above). */
@@ -3299,6 +3321,8 @@ for (const [firm, rows] of Object.entries(byHouse)) {
   pollCadence.push({
     pollster: firm,
     last,
+    // the anchor is a provisional wave's ESTIMATED publication, not a record
+    ...(lastProvisional ? { lastProvisional: true } : {}),
     cadence,
     loose: !dated,
     spread,

@@ -112,6 +112,10 @@ function tuplesOf(rows, ts, syd) {
   const out = {};
   for (const r of rows) {
     if (r.ahead !== 0 || out[r.pollster]) continue;
+    /* anchored on a provisional wave's estimated publication: not a bet
+       worth logging - the house's real row replaces it within a day, and
+       the tuple it then yields is the one the ledger can resolve */
+    if (r.lastProvisional) continue;
     /* loose rows key their own window differently (release is the window's
        midpoint), but [release-winHalf, release+winHalf] recovers open/close
        for every form - dated, loose, calMonth - so one shape serves all. */
