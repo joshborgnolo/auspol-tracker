@@ -40917,7 +40917,7 @@ function VariancePanel({
   } = window.AP;
   const narrow = useNarrow();
   const [hidden, setHidden] = useState({});
-  const [view, setView] = useState(facet);
+  const [view, setView] = useState(facet === "twopp" ? "primary" : facet);
   const rivalFirst = D.latest && D.latest.rivalLead || "alp_lnp";
   const RIVAL_ORDER = rivalFirst === "alp_on" ? ["tpp_alpon_imp", "tpp_alpon", "tpp_alp_imp", "tpp_alp"] : ["tpp_alp_imp", "tpp_alp", "tpp_alpon_imp", "tpp_alpon"];
   const rank = id => {
@@ -40988,7 +40988,7 @@ function VariancePanel({
     className: "ap-var-title"
   }, "Poll disagreement"), React.createElement("p", {
     className: "card-sub"
-  }, "How far apart the polls sit, against the spread sampling error alone would produce. The shading is that chance floor \u2013 a line inside it means the houses are running tighter than random sampling permits. Measured across all ", D.individualPolls.length, " polls; the filters above don\u2019t narrow it.", view !== "leadership" && React.createElement(React.Fragment, null, " ", "Each two-party contest is drawn on both bases. The", " ", React.createElement("em", null, "as published"), " line (dashed) spreads the figure each house prints \u2013 its own allocation, which is where herding lives \u2013 and so covers only the waves that publish a pair; the ", React.createElement("em", null, "implied"), " line spreads every full-primary wave read through one shared flow table, so it is the houses disagreeing about the primaries, in two-party units."))), React.createElement("div", {
+  }, "How far apart the polls sit, against the spread sampling error alone would produce. The shading is that chance floor \u2013 a line inside it means the houses are running tighter than random sampling permits. Measured across all ", D.individualPolls.length, " polls; the filters above don\u2019t narrow it.", view === "twopp" && React.createElement(React.Fragment, null, " ", "Each two-party contest is drawn on both bases. The", " ", React.createElement("em", null, "as published"), " line (dashed) spreads the figure each house prints \u2013 its own allocation, which is where herding lives \u2013 and so covers only the waves that publish a pair; the ", React.createElement("em", null, "implied"), " line spreads every full-primary wave read through one shared flow table, so it is the houses disagreeing about the primaries, in two-party units."))), React.createElement("div", {
     className: "legend"
   }, latest.map(({
     m,

@@ -52,11 +52,13 @@ measured against the spread sampling error alone would produce. Two files.
 ## Renderer — `VariancePanel` in `d1a1d215-….js` (`:2540-2673`)
 
 - Signature `<VariancePanel facet={facet} rangeId={range} />`, mounted for EVERY
-  archive facet at `:3529` — the panel *follows the page's facet tabs* (design
-  principle in its header comment: "the measures on screen are the ones the table
-  below is showing"). No in-panel measure toggle as of 2026-09-03 (one was DESIGNED
-  that day — 2PP | Primaries TextToggle defaulting to the facet — but not shipped;
-  measure data needed nothing, it's pure UI state + `key={facet}` remount).
+  archive facet and remounted per facet (`key={facet}`). Default view is
+  **primaries on BOTH voting facets** (2026-09-23 user request —
+  `useState(facet === "twopp" ? "primary" : facet)`: the poll table above it
+  already defaults to the 2PP, so seeding the 2PP view charted the same set
+  twice). The in-panel TextToggle (`VAR_VOTE_VIEWS`, 2PP | Primaries) flips the
+  voting views; the card-sub's both-bases explainer is scoped to
+  `view === "twopp"` so it only shows while those series are drawn.
 - Measures with zero computable months (e.g. Hanson net — too few houses at once)
   are dropped, never drawn flat. Hidden chips set series `opacity: 0`, not removal.
 - **ONE shared chance-floor area**, averaged across visible measures (close enough

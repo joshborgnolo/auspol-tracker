@@ -3505,9 +3505,11 @@ function PopRow({ on, radio, label, note, n, onClick }) {
 
 // ====================================================================
 // VariancePanel – how far apart the polls sit, against the spread that
-// sampling error alone would produce.  The page facet seeds the measure
-// set, and on the voting facets an in-panel 2PP | Primaries toggle flips
-// between them (leadership keeps its own set, untoggled).
+// sampling error alone would produce.  Primaries are the default measure
+// set even on the 2PP facet (the poll table below defaults to the 2PP, so
+// the panel opens on the set a reader can't see in it); the in-panel
+// 2PP | Primaries toggle flips between them (leadership keeps its own
+// set, untoggled).
 //
 // Deliberately computed over EVERY poll in the archive, never the
 // filtered subset: "how much do pollsters disagree" is a property of the
@@ -3522,9 +3524,11 @@ function VariancePanel({ facet, rangeId }) {
   const { D, discord, discordFacet, discordRead, rangeDomain, buildXTicks, monthLabelFull } = window.AP;
   const narrow = useNarrow();
   const [hidden, setHidden] = useState({});
-  // the page facet seeds the view (the parent remounts this panel per facet,
-  // so a facet switch re-syncs); the in-panel toggle flips the voting views
-  const [view, setView] = useState(facet);
+  // primaries lead even on the 2PP facet – the poll table below already
+  // defaults to the 2PP, so defaulting the panel to it too would chart the
+  // same set a reader just scrolled past (the parent remounts this panel
+  // per facet, so a facet switch re-seeds); the in-panel toggle flips back
+  const [view, setView] = useState(facet === "twopp" ? "primary" : facet);
 
   // a measure with no computable window anywhere (e.g. Hanson's net, polled
   // by too few houses at a time) is dropped rather than shown as a flat gap
@@ -3591,7 +3595,7 @@ function VariancePanel({ facet, rangeId }) {
             The shading is that chance floor – a line inside it means the houses are running tighter
             than random sampling permits. Measured across all {D.individualPolls.length} polls; the filters
             above don’t narrow it.
-            {view !== "leadership" && <>{" "}Each two-party contest is drawn on both bases. The
+            {view === "twopp" && <>{" "}Each two-party contest is drawn on both bases. The
             {" "}<em>as published</em> line (dashed) spreads the figure each house prints – its own
             allocation, which is where herding lives – and so covers only the waves that publish a pair;
             the <em>implied</em> line spreads every full-primary wave read through one shared flow
