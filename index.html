@@ -42170,9 +42170,11 @@ function AllPollsView({
   ((D.alt2pp || {}).alp_on || []).forEach(d => {
     altOnByYm[d.ym] = d.a;
   });
+  const NOW_YEAR = new Date().getFullYear();
   const rows = D.individualPolls.map(p => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
+    const fieldLabel = y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
     const tags = pollTagIds(p);
     const leanLnp = pubBasis ? p.alpN != null && aggByYm[p.ym] != null ? +(p.alpN - aggByYm[p.ym]).toFixed(1) : null : p.alpImp != null && synthByYm[p.ym] != null ? +(p.alpImp - synthByYm[p.ym]).toFixed(1) : null;
     const leanOn = pubBasis ? p.tppAlt && altOnByYm[p.ym] != null ? +(p.tppAlt.alp - altOnByYm[p.ym]).toFixed(1) : null : p.alpOnImp != null && synthOnByYm[p.ym] != null ? +(p.alpOnImp - synthOnByYm[p.ym]).toFixed(1) : null;
@@ -42203,6 +42205,7 @@ function AllPollsView({
       year: y,
       mo,
       fullDate,
+      fieldLabel,
       lean,
       hfx,
       leanLnp,
@@ -42831,7 +42834,7 @@ function AllPollsView({
       title: POLL_TAG_META[id].title
     }, POLL_TAG_META[id].label)))), React.createElement("td", {
       className: "ta-l muted"
-    }, p.field), React.createElement("td", {
+    }, p.fieldLabel), React.createElement("td", {
       className: "num muted hide-md"
     }, p.sample != null ? p.sample.toLocaleString() : "—"), React.createElement("td", {
       className: "num hide-md"

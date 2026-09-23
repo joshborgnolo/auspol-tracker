@@ -4580,9 +4580,15 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const altOnByYm = {};
   ((D.alt2pp || {}).alp_on || []).forEach((d) => { altOnByYm[d.ym] = d.a; });
 
+  /* the fieldwork label carries no year (gen-data's fwLabel is a day–month
+     range), so a row from a previous year can read as this year's – an old
+     "25–30 Sep" looks like next week. Rows outside the current calendar
+     year get a two-digit suffix ("… ’25"); current-year rows stay clean. */
+  const NOW_YEAR = new Date().getFullYear();
   const rows = D.individualPolls.map((p) => {
     const [y, mo] = p.ym.split("-").map(Number);
     const fullDate = `${p.day} ${D.monthName(mo)} ${String(y).slice(2)}`;
+    const fieldLabel = y === NOW_YEAR ? p.field : `${p.field} ’${String(y).slice(2)}`;
     const tags = pollTagIds(p);
     /* poll lean follows the basis: the implied 2PP minus the month's implied
        aggregate, or the NORMALISED published share (alpN) minus the month's
@@ -4645,7 +4651,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     hayParts.push(...tags);   // so "fav", "ppm" etc. match in the search box too
     const hay = hayParts.join(" ").toLowerCase();
     return {
-      ...p, year: y, mo, fullDate, lean, hfx, leanLnp, leanOn, hfxLnp, hfxOn, pubBasis, tags,
+      ...p, year: y, mo, fullDate, fieldLabel, lean, hfx, leanLnp, leanOn, hfxLnp, hfxOn, pubBasis, tags,
       hay: hay + " " + hay.replace(/–/g, "-"),   // hyphen typed in search matches the en dash
     };
   });
@@ -5118,7 +5124,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
                       </span>
                     )}
                   </td>
-                  <td className="ta-l muted">{p.field}</td>
+                  <td className="ta-l muted">{p.fieldLabel}</td>
                   <td className="num muted hide-md">{p.sample != null ? p.sample.toLocaleString() : "—"}</td>
                   {/* only ever a house-filed figure - a dash means the pollster
                       published no effective sample, not that there is no n */}
