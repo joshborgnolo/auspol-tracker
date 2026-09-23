@@ -2123,7 +2123,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
     <div className={"cyc-legend" + (banded ? " banded" : "")}
          onMouseLeave={() => setHi(null)}>
       <div className="cyc-legend-bar">
-        <FilterPop id="board" label="Cycles" summary={summary} open={pop} setOpen={setPop}
+        <FilterPop id="board" label="Cycles" summary={summary} open={pop} setOpen={setPop} inline
                    on={hidden.size > 0 || lifted.size > 0}>
           <div className="ap-pop-head">
             <span>On the board</span>
@@ -3506,13 +3506,21 @@ function pollTagIds(p) {
    the roll its chips used to show by existing), so it says outright whether
    the reader has actually done anything; a button that looked pressed in
    from the first paint would be saying the same word for both. */
-function FilterPop({ id, label, summary, on, open, setOpen, children }) {
+/* `inline` opens the panel IN THE FLOW, below the whole bar it sits in,
+   instead of floating over what follows. The past-cycles board is the case:
+   what follows is the very chart it filters, and a floating board ~450px
+   deep hid that chart entirely - so every click drew or dropped a line the
+   reader could not see, and the row-hover highlight lit a chart under the
+   panel. In the flow the chart moves down and stays in view. Because opening
+   it shifts the page, a click elsewhere does not close it: the page would
+   jump out from under the pointer mid-click. The button and Escape do. */
+function FilterPop({ id, label, summary, on, open, setOpen, inline, children }) {
   const box = useRef(null), panel = useRef(null);
   const isOpen = open === id;
   const [flip, setFlip] = useState(false);
   React.useEffect(() => {
     if (!isOpen) { setFlip(false); return; }
-    const onDown = (e) => { if (box.current && !box.current.contains(e.target)) setOpen(null); };
+    const onDown = (e) => { if (!inline && box.current && !box.current.contains(e.target)) setOpen(null); };
     const onKey = (e) => {
       if (e.key !== "Escape") return;
       e.stopPropagation();
@@ -3527,26 +3535,31 @@ function FilterPop({ id, label, summary, on, open, setOpen, children }) {
   // a panel that would hang off the right edge hangs off its button's right
   // edge instead – measured, because which button that is depends on the width
   React.useLayoutEffect(() => {
-    if (!isOpen || !panel.current) return;
+    if (inline || !isOpen || !panel.current) return;
     const r = panel.current.getBoundingClientRect();
     if (r.right > window.innerWidth - 8) setFlip(true);
   }, [isOpen]);
-  return (
-    <div className="ap-pop" ref={box}>
-      <button type="button" className={"ap-popbtn" + ((on == null ? !!summary : on) ? " on" : "")
-                                       + (isOpen ? " open" : "")}
-              aria-expanded={isOpen} aria-haspopup="true"
-              onClick={() => setOpen(isOpen ? null : id)}>
-        <span className="ap-popbtn-lab">{label}</span>
-        {summary && <span className="ap-popbtn-val">{summary}</span>}
-        <svg className="ap-caret" viewBox="0 0 24 24" width="11" height="11" fill="none"
-             stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M6 9l6 6 6-6" />
-        </svg>
-      </button>
-      {isOpen && <div className={"ap-panel" + (flip ? " flip" : "")} ref={panel} role="group" aria-label={label}>{children}</div>}
-    </div>
+  const panelEl = isOpen && (
+    <div className={"ap-panel" + (inline ? " ap-panel-inline" : flip ? " flip" : "")}
+         ref={panel} role="group" aria-label={label}>{children}</div>
   );
+  const button = (
+    <button type="button" className={"ap-popbtn" + ((on == null ? !!summary : on) ? " on" : "")
+                                     + (isOpen ? " open" : "")}
+            aria-expanded={isOpen} aria-haspopup={inline ? undefined : "true"}
+            onClick={() => setOpen(isOpen ? null : id)}>
+      <span className="ap-popbtn-lab">{label}</span>
+      {summary && <span className="ap-popbtn-val">{summary}</span>}
+      <svg className="ap-caret" viewBox="0 0 24 24" width="11" height="11" fill="none"
+           stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </button>
+  );
+  // inline: the panel is the bar's sibling item, so it can take the bar's
+  // full width on a line of its own (.ap-panel-inline)
+  if (inline) return <><div className="ap-pop" ref={box}>{button}</div>{panelEl}</>;
+  return <div className="ap-pop" ref={box}>{button}{panelEl}</div>;
 }
 /* One option row, whether it behaves as a checkbox (pollsters, data types) or
    a radio (time). The count is what makes the panel worth opening: it is

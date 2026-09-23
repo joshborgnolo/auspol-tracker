@@ -212,6 +212,23 @@ function TrendChart(props) {
      to the panel – see the note there. */
   const tipRef = useRef(null);
   const [tipW, setTipW] = useState(0);
+  /* A guide readout lists every line drawn, and Past cycles can draw
+     twenty-one: taller than the whole plot on a phone, so it ran on over the
+     next card, where its see-through glass left both its rows and the text
+     under them unreadable. Two answers, measured rather than guessed, since
+     the rows and the room both vary:
+       cols  – the rows go into two columns, top half then bottom half, when
+               the readout overruns the plot and two of them fit across it.
+               Decided from the ONE-column layout and kept while the row count
+               and the plot width hold, so it cannot flip back and forth as
+               the readout's own shape changes under it. A column is as wide
+               as the widest plain row; a row carrying a note (the mean, with
+               its headcount) wraps inside it instead of setting the width.
+       spill – whatever still runs past the plot goes opaque: over the plot
+               the glass lets the lines through, past it there is only other
+               text, and the readout has to be the thing on top. */
+  const [tipLay, setTipLay] = useState({ n: 0, cw: 0, w: 0 });
+  const [tipSpill, setTipSpill] = useState(false);
   /* LAYOUT effect, not a plain one: it runs before the browser paints, so the
      corrected left lands in the same frame the readout appears in. Measured on
      every render and written back only when it actually moves, so a readout
@@ -219,9 +236,24 @@ function TrendChart(props) {
      readout keeps the last width rather than resetting to a guess, since the
      next one to open on this chart carries the same rows. */
   React.useLayoutEffect(() => {
-    if (!tipRef.current) return;
-    const w = tipRef.current.offsetWidth;
+    const el = tipRef.current;
+    if (!el) return;
+    const w = el.offsetWidth;
     setTipW((prev) => (Math.abs(prev - w) > 0.5 ? w : prev));
+    const plotH = ref.current ? ref.current.offsetHeight : 0;
+    // the readout hangs 10px under its top (.tip's translate); a dot readout
+    // hangs above its point instead, inside the plot
+    const over = el.offsetTop + 10 + el.offsetHeight > plotH;
+    setTipSpill(over && !el.classList.contains("tip-dot"));
+    const rows = [...el.querySelectorAll(".tip-row")];
+    if (!el.classList.contains("tip-guide") || (rows.length === tipLay.n && cw === tipLay.cw)) return;
+    let colW = 0;
+    for (const r of rows) {
+      if (r.querySelector(".tip-note")) continue;
+      colW = Math.max(colW, [...r.children].reduce((a, k) => a + k.offsetWidth, 0) + 7 * (r.children.length - 1));
+    }
+    const colsW = 2 * colW + 18 + (rows.length ? w - rows[0].offsetWidth : 0);
+    setTipLay({ n: rows.length, cw, w: over && rows.length >= 8 && colsW <= cw - 8 ? Math.ceil(colsW) : 0 });
   });
   const clipId = "clip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const plotId = clipId + "p";      // the plot area itself, which never travels
@@ -554,6 +586,7 @@ function TrendChart(props) {
      fallback only, and the next row nobody has thought of yet is contained
      without anyone having to remember this line. A panel somehow wider than
      its chart clamps to dead centre, which is the least-bad place for it. */
+  const tipCols = !!(tip && !evt && !dot && tipLay.w && tip.rows.length === tipLay.n && cw === tipLay.cw);
   if (tip) {
     const assumed = Math.min(evt ? 240 : 156, cw);
     const tipMax = Math.min(tipW || assumed, cw);
@@ -1116,18 +1149,31 @@ function TrendChart(props) {
       </svg>
 
       {tip && (
-        <div ref={tipRef} className={"tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide")}
-             style={{ left: tip.left + "%", top: tip.top + "%" }}>
+        <div ref={tipRef} className={"tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide")
+                                     + (tipCols ? " tip-cols" : "") + (tipSpill ? " tip-spill" : "")}
+             style={{ left: tip.left + "%", top: tip.top + "%", width: tipCols ? tipLay.w : undefined }}>
           {tip.title && <div className="tip-title">{tip.title}</div>}
           {tip.date && <div className="tip-date">{tip.date}</div>}
-          {tip.rows.map((r, i) => (
-            <div className="tip-row" key={i}>
-              {r.color && <span className="tip-swatch" style={{ background: r.color }}></span>}
-              <span className="tip-label">{r.label}</span>
-              {r.note && <span className="tip-note">{r.note}</span>}
-              <span className="tip-val">{r.value}</span>
-            </div>
-          ))}
+          {(() => {
+            const row = (r, i) => (
+              <div className="tip-row" key={i}>
+                {r.color && <span className="tip-swatch" style={{ background: r.color }}></span>}
+                <span className="tip-label">{r.label}</span>
+                {r.note && <span className="tip-note">{r.note}</span>}
+                <span className="tip-val">{r.value}</span>
+              </div>
+            );
+            if (!tipCols) return tip.rows.map(row);
+            // two stacks, not a grid: a wrapped row in one must not open a
+            // gap in the other
+            const half = Math.ceil(tip.rows.length / 2);
+            return (
+              <div className="tip-rows">
+                <div className="tip-col">{tip.rows.slice(0, half).map(row)}</div>
+                <div className="tip-col">{tip.rows.slice(half).map((r, i) => row(r, half + i))}</div>
+              </div>
+            );
+          })()}
           {tip.desc && <div className="tip-desc">{tip.desc}</div>}
           {tip.sub && <div className="tip-sub">{tip.sub}</div>}
           {tip.hint && <div className="tip-hint">{tip.hint}</div>}

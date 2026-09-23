@@ -1056,6 +1056,17 @@ body.dark .sens-band { opacity: 0.10; }
   }
 }
 .tip.tip-dot { transform: translate(-50%, calc(-100% - 14px)); }
+.tip-cols .tip-rows { display: flex; align-items: flex-start; gap: 18px; }
+.tip-cols .tip-col { flex: 1 1 0; min-width: 0; }
+.tip-cols .tip-row { display: grid; grid-template-columns: 9px minmax(0, 1fr) auto; column-gap: 7px; }
+.tip-cols .tip-swatch { grid-area: 1 / 1; }
+.tip-cols .tip-label { grid-area: 1 / 2; white-space: normal; line-height: 1.25; }
+.tip-cols .tip-val { grid-area: 1 / 3; }
+.tip-cols .tip-note { grid-area: 2 / 2 / 3 / 4; }
+.tip.tip-spill, .tip.tip-guide.tip-spill {
+  background: var(--surface); border-color: var(--line);
+}
+.chart:has(> .tip-spill) { z-index: 6; }
 .tip-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.01em; white-space: nowrap; }
 .tip-row { display: flex; align-items: center; gap: 7px; font-size: 12.5px; padding: 1px 0; white-space: nowrap; }
 .tip-swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
@@ -1992,7 +2003,11 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 @media (max-width: 1000px) { .cyc-export { display: none; } }
 .cyc-legend { margin: 20px 0 10px; }
 .cyc-legend-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
-.cyc-legend .ap-panel { width: min(660px, calc(100vw - 28px)); max-width: none; }
+.cyc-legend .ap-panel-inline {
+  position: static; order: 1; flex: 1 0 100%;
+  width: auto; min-width: 0; max-width: none;
+  box-shadow: none; background: var(--surface-2); border-color: var(--line);
+}
 .cyc-legend .ap-pop-head, .sb-legend .ap-pop-head { flex-wrap: wrap; }
 .pop-quick { display: flex; align-items: baseline; gap: 13px; margin-left: auto; }
 .pop-quick-opt {
@@ -33637,10 +33652,33 @@ function TrendChart(props) {
   const ref = useRef(null);
   const tipRef = useRef(null);
   const [tipW, setTipW] = useState(0);
+  const [tipLay, setTipLay] = useState({
+    n: 0,
+    cw: 0,
+    w: 0
+  });
+  const [tipSpill, setTipSpill] = useState(false);
   React.useLayoutEffect(() => {
-    if (!tipRef.current) return;
-    const w = tipRef.current.offsetWidth;
+    const el = tipRef.current;
+    if (!el) return;
+    const w = el.offsetWidth;
     setTipW(prev => Math.abs(prev - w) > 0.5 ? w : prev);
+    const plotH = ref.current ? ref.current.offsetHeight : 0;
+    const over = el.offsetTop + 10 + el.offsetHeight > plotH;
+    setTipSpill(over && !el.classList.contains("tip-dot"));
+    const rows = [...el.querySelectorAll(".tip-row")];
+    if (!el.classList.contains("tip-guide") || rows.length === tipLay.n && cw === tipLay.cw) return;
+    let colW = 0;
+    for (const r of rows) {
+      if (r.querySelector(".tip-note")) continue;
+      colW = Math.max(colW, [...r.children].reduce((a, k) => a + k.offsetWidth, 0) + 7 * (r.children.length - 1));
+    }
+    const colsW = 2 * colW + 18 + (rows.length ? w - rows[0].offsetWidth : 0);
+    setTipLay({
+      n: rows.length,
+      cw,
+      w: over && rows.length >= 8 && colsW <= cw - 8 ? Math.ceil(colsW) : 0
+    });
   });
   const clipId = "clip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const plotId = clipId + "p";
@@ -33951,6 +33989,7 @@ function TrendChart(props) {
       })()
     };
   }
+  const tipCols = !!(tip && !evt && !dot && tipLay.w && tip.rows.length === tipLay.n && cw === tipLay.cw);
   if (tip) {
     const assumed = Math.min(evt ? 240 : 156, cw);
     const tipMax = Math.min(tipW || assumed, cw);
@@ -34480,30 +34519,42 @@ function TrendChart(props) {
     fill: r.labelColor || "var(--ink-3)"
   }, r.label))), tip && React.createElement("div", {
     ref: tipRef,
-    className: "tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide"),
+    className: "tip " + (evt ? "tip-evt" : dot ? "tip-dot" : "tip-guide") + (tipCols ? " tip-cols" : "") + (tipSpill ? " tip-spill" : ""),
     style: {
       left: tip.left + "%",
-      top: tip.top + "%"
+      top: tip.top + "%",
+      width: tipCols ? tipLay.w : undefined
     }
   }, tip.title && React.createElement("div", {
     className: "tip-title"
   }, tip.title), tip.date && React.createElement("div", {
     className: "tip-date"
-  }, tip.date), tip.rows.map((r, i) => React.createElement("div", {
-    className: "tip-row",
-    key: i
-  }, r.color && React.createElement("span", {
-    className: "tip-swatch",
-    style: {
-      background: r.color
-    }
-  }), React.createElement("span", {
-    className: "tip-label"
-  }, r.label), r.note && React.createElement("span", {
-    className: "tip-note"
-  }, r.note), React.createElement("span", {
-    className: "tip-val"
-  }, r.value))), tip.desc && React.createElement("div", {
+  }, tip.date), (() => {
+    const row = (r, i) => React.createElement("div", {
+      className: "tip-row",
+      key: i
+    }, r.color && React.createElement("span", {
+      className: "tip-swatch",
+      style: {
+        background: r.color
+      }
+    }), React.createElement("span", {
+      className: "tip-label"
+    }, r.label), r.note && React.createElement("span", {
+      className: "tip-note"
+    }, r.note), React.createElement("span", {
+      className: "tip-val"
+    }, r.value));
+    if (!tipCols) return tip.rows.map(row);
+    const half = Math.ceil(tip.rows.length / 2);
+    return React.createElement("div", {
+      className: "tip-rows"
+    }, React.createElement("div", {
+      className: "tip-col"
+    }, tip.rows.slice(0, half).map(row)), React.createElement("div", {
+      className: "tip-col"
+    }, tip.rows.slice(half).map((r, i) => row(r, half + i))));
+  })(), tip.desc && React.createElement("div", {
     className: "tip-desc"
   }, tip.desc), tip.sub && React.createElement("div", {
     className: "tip-sub"
@@ -39782,6 +39833,7 @@ function CycleLegend({
     summary: summary,
     open: pop,
     setOpen: setPop,
+    inline: true,
     on: hidden.size > 0 || lifted.size > 0
   }, React.createElement("div", {
     className: "ap-pop-head"
@@ -41065,6 +41117,7 @@ function FilterPop({
   on,
   open,
   setOpen,
+  inline,
   children
 }) {
   const box = useRef(null),
@@ -41077,7 +41130,7 @@ function FilterPop({
       return;
     }
     const onDown = e => {
-      if (box.current && !box.current.contains(e.target)) setOpen(null);
+      if (!inline && box.current && !box.current.contains(e.target)) setOpen(null);
     };
     const onKey = e => {
       if (e.key !== "Escape") return;
@@ -41094,18 +41147,21 @@ function FilterPop({
     };
   }, [isOpen]);
   React.useLayoutEffect(() => {
-    if (!isOpen || !panel.current) return;
+    if (inline || !isOpen || !panel.current) return;
     const r = panel.current.getBoundingClientRect();
     if (r.right > window.innerWidth - 8) setFlip(true);
   }, [isOpen]);
-  return React.createElement("div", {
-    className: "ap-pop",
-    ref: box
-  }, React.createElement("button", {
+  const panelEl = isOpen && React.createElement("div", {
+    className: "ap-panel" + (inline ? " ap-panel-inline" : flip ? " flip" : ""),
+    ref: panel,
+    role: "group",
+    "aria-label": label
+  }, children);
+  const button = React.createElement("button", {
     type: "button",
     className: "ap-popbtn" + ((on == null ? !!summary : on) ? " on" : "") + (isOpen ? " open" : ""),
     "aria-expanded": isOpen,
-    "aria-haspopup": "true",
+    "aria-haspopup": inline ? undefined : "true",
     onClick: () => setOpen(isOpen ? null : id)
   }, React.createElement("span", {
     className: "ap-popbtn-lab"
@@ -41124,12 +41180,15 @@ function FilterPop({
     "aria-hidden": "true"
   }, React.createElement("path", {
     d: "M6 9l6 6 6-6"
-  }))), isOpen && React.createElement("div", {
-    className: "ap-panel" + (flip ? " flip" : ""),
-    ref: panel,
-    role: "group",
-    "aria-label": label
-  }, children));
+  })));
+  if (inline) return React.createElement(React.Fragment, null, React.createElement("div", {
+    className: "ap-pop",
+    ref: box
+  }, button), panelEl);
+  return React.createElement("div", {
+    className: "ap-pop",
+    ref: box
+  }, button, panelEl);
 }
 function PopRow({
   on,
