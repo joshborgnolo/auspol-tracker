@@ -5630,7 +5630,7 @@ function infoTerms(D) {
         counted at the 2025 election
         {" "}(<a href="https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm"
         target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5% and all others
-        54.6% to Labor</a>).
+        54.5% to Labor</a>).
         <span className="info-chart"><FlowChart /></span>
         Party-by-party flows exist only from 1996, when full preference data was first published;
         One Nation’s line breaks where it barely stood candidates. Labor v One Nation uses a

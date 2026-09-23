@@ -253,86 +253,86 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
 <body>
 <main class="frame-wrap">
   <h1>The two-party figure, two ways</h1>
-  <p class="ss-sub">Above the chart, one small sentence says where the site&rsquo;s two-party number comes from &mdash; &ldquo;Using implied preference flows&rdquo;, or &ldquo;Using respondent-allocated preferences only&rdquo;. The &ldquo;?&rdquo; beside it leads here. This page is the whole story: what each version is, why the implied one is the default, where its fixed preference flows were measured &mdash; including the Labor&ndash;One Nation flows that no election has ever counted &mdash; and how polls become the headline number.</p>
+  <p class="ss-sub">Above the chart, one line says where the site&rsquo;s two-party figure comes from: &ldquo;Using implied preference flows&rdquo; or &ldquo;Using respondent-allocated preferences only&rdquo;. This page explains both: what each one is, why implied is the default, where its preference flows come from (including the Labor&ndash;One Nation flows no election has ever counted), and how polls become the headline figure.</p>
 
   <div class="breath">
-    <strong>In one breath</strong>
-    A two-party figure simulates the final count, and pollsters cannot observe preferences directly. Each house solves that its own way and publishes the result &mdash; that is the <em>published</em> figure, and asking respondents is its dominant method. This site also re-allocates every poll&rsquo;s primary votes through one frozen flow table, the 2025 election&rsquo;s own count &mdash; that is the <em>implied</em> figure, and the default, because its movements come only from how people say they will vote, never from a change of allocation method. Both stay on the page, a click apart.
+    <strong>In short</strong>
+    Pollsters can&rsquo;t observe preferences directly, so a two-party figure has to estimate how the final count would go. Each pollster does that its own way and publishes the result: that&rsquo;s the <em>published</em> figure, usually built by asking respondents. This site also runs every poll&rsquo;s primary votes through one fixed table, the flows counted at the 2025 election: that&rsquo;s the <em>implied</em> figure. It&rsquo;s the default because it moves only when voting intentions move, never because a pollster changed its method. Both are on the page, one click apart.
   </div>
 
   <ul class="toc">
     <li><a href="#why">Why a two-party figure needs preferences at all</a></li>
     <li><a href="#two-ways">Two ways to the final count</a> <span>&mdash; ask, or assume</span></li>
     <li><a href="#why-implied">Why implied is the default</a></li>
-    <li><a href="#classic">The classic table: Labor v Coalition</a> <span>&mdash; the 2025 election&rsquo;s counted flows, and one poll worked line by line</span></li>
-    <li><a href="#one-nation">The Labor v One Nation table</a> <span>&mdash; three flows that do not officially exist</span></li>
-    <li><a href="#how-found">How the Labor&ndash;One Nation table was found</a> <span>&mdash; the Senate anchor, the corrections, and what is kept as a check</span></li>
+    <li><a href="#classic">The classic table: Labor v Coalition</a> <span>&mdash; the 2025 election&rsquo;s counted flows, and one poll worked through</span></li>
+    <li><a href="#one-nation">The Labor v One Nation table</a> <span>&mdash; three flows that don&rsquo;t officially exist</span></li>
+    <li><a href="#how-found">How the Labor&ndash;One Nation table was built</a> <span>&mdash; the Senate anchor, the corrections, and the checks</span></li>
     <li><a href="#by-state">State by state, as the Senate counted it</a></li>
     <li><a href="#counts-2026">The counts that actually happened, 2026</a> <span>&mdash; South Australia and Secret Harbour, and what they moved</span></li>
     <li><a href="#back-cast">What the table would have meant in 2025</a></li>
-    <li><a href="#estimator">From polls to the headline number</a> <span>&mdash; the weighted aggregate, the monthly average, and the two kinds of uncertainty</span></li>
+    <li><a href="#estimator">From polls to the headline figure</a> <span>&mdash; the weighted aggregate, the monthly average, and two kinds of uncertainty</span></li>
     <li><a href="#wrong">Where each basis can go wrong</a></li>
   </ul>
 
   <h2 id="why">Why a two-party figure needs preferences at all</h2>
-  <p>Australia votes by numbering candidates. When the count eliminates the last-placed candidate, every ballot moves onward to whoever its voter ranked next, and the count repeats until one candidate remains. The two-party preferred figure applies that same arithmetic nationally: of every formal vote, what share would end with Labor and what share with the Coalition once all the others&rsquo; preferences have arrived where they are going.</p>
-  <p>A poll can measure the first half of that directly &mdash; the primary vote, what people write as their number one. What it cannot measure directly is the second half: where each minor-party and independent vote finishes. Roughly a third of the vote today is cast for someone other than Labor or the Coalition, so the redistribution <em>is</em> the two-party figure. There are only two ways to fill that gap, and the site&rsquo;s basis switch is the choice between them.</p>
+  <p>Australians vote by numbering candidates. When the last-placed candidate is excluded, each of their ballots moves to the voter&rsquo;s next choice, and the count repeats until two candidates remain. The two-party preferred figure applies that arithmetic nationally: once every other candidate&rsquo;s preferences are distributed, what share of the vote ends with Labor, and what share with the Coalition?</p>
+  <p>A poll measures the first step directly: the primary vote, who people put first. It can&rsquo;t directly measure the second: where each minor-party and independent vote ends up. At the 2025 election a third of voters put someone other than Labor or the Coalition first; in 2026 polls it&rsquo;s more than half. So the redistribution largely <em>is</em> the two-party figure. There are two ways to estimate it, and the basis switch chooses between them.</p>
 
   <h2 id="two-ways">Two ways to the final count</h2>
-  <p><strong>Ask.</strong> The pollster asks voters where their preferences would go &mdash; or in some houses&rsquo; methods, works out an allocation from the sample &mdash; and publishes the result. This is the figure each house ships as its headline two-party, and it is what the toggle calls <em>respondent-allocated</em>: for the big established houses (Roy Morgan, Newspoll and others), the answer genuinely comes out of the questionnaire. Different houses still blend in different ingredients &mdash; some ask outright, some lean partly on how preferences flowed at the last election &mdash; so &ldquo;published&rdquo; is the honest umbrella word and the one this page uses.</p>
-  <p><strong>Assume.</strong> The alternative never asks anyone. Take the flow table that an actual election count measured &mdash; at the 2025 election, 88.2 per cent of Greens preferences ended with Labor, and so on &mdash; and apply it, unchanged, to every poll&rsquo;s primary votes. The assumption is pinned, inspectable and identical for every house; the resulting figure can only move when the primaries themselves move. That is the <em>implied</em> figure, and a poll joins it whenever it publishes a full primary set whose columns add up &mdash; a poll missing a party column, or with a documented anomaly in its sums, stays out.</p>
+  <p><strong>Ask.</strong> The pollster asks respondents where their preferences would go, or in some methods works out an allocation from the sample, and publishes the result. That&rsquo;s each pollster&rsquo;s headline two-party figure, and what the toggle calls <em>respondent-allocated</em>. For the big established pollsters, such as Roy Morgan and Newspoll, the answer genuinely comes from the questionnaire. Others blend in different ingredients, some leaning partly on how preferences flowed at the last election, so this page uses the broader word <em>published</em>.</p>
+  <p><strong>Assume.</strong> The alternative asks no one. Take the flows an actual election count measured (at the 2025 election, 88.2% of Greens preferences ended with Labor, and so on) and apply them, unchanged, to every poll&rsquo;s primary votes. The assumption is fixed, open to inspection and the same for every pollster, so the result moves only when the primaries do. That&rsquo;s the <em>implied</em> figure. A poll joins it whenever it publishes a full set of primaries that adds up; one missing a party, or with a documented error in its sums, stays out.</p>
   <div class="pred-twrap">
     <table class="pred-table tight">
-      <caption>The two bases at a glance &mdash; what the &ldquo;?&rdquo; you clicked is switching between.</caption>
+      <caption>The two bases at a glance.</caption>
       <thead>
         <tr>
           <th class="l" scope="col">&nbsp;</th>
           <th scope="col">Published (respondent-allocated)</th>
-          <th scope="col">Implied at a fixed flow table</th>
+          <th scope="col">Implied from a fixed flow table</th>
         </tr>
       </thead>
       <tbody>
-        <tr><td class="l">What it reads</td><td>Each house&rsquo;s own published two-party figure</td><td>Every poll&rsquo;s primaries, through one frozen table</td></tr>
-        <tr><td class="l">Polls it draws on</td><td>Only waves that publish a 2PP</td><td>Every wave with a full primary set &mdash; more polls</td></tr>
-        <tr><td class="l">What moves it</td><td>The voters&rsquo; mood <em>and</em> the shifting mix of house methods</td><td>The voters&rsquo; mood alone &mdash; the table cannot drift</td></tr>
-        <tr><td class="l">What is constant between houses</td><td>Nothing &mdash; allocation methods differ and change</td><td>The table, one real election&rsquo;s counted behaviour</td></tr>
-        <tr><td class="l">What it can see that the other cannot</td><td>Real preference drift, as soon as houses measure it</td><td>A level free of allocation-method noise</td></tr>
+        <tr><td class="l">What it reads</td><td>Each pollster&rsquo;s own published two-party figure</td><td>Every poll&rsquo;s primaries, through one fixed table</td></tr>
+        <tr><td class="l">Polls it uses</td><td>Only polls that publish a 2PP</td><td>Every poll with a full set of primaries: more polls</td></tr>
+        <tr><td class="l">What moves it</td><td>Voters&rsquo; intentions <em>and</em> the changing mix of pollster methods</td><td>Voters&rsquo; intentions alone: the table can&rsquo;t drift</td></tr>
+        <tr><td class="l">What&rsquo;s the same for every pollster</td><td>Nothing: allocation methods differ and change</td><td>The table, one real election&rsquo;s counted behaviour</td></tr>
+        <tr><td class="l">What it can see that the other can&rsquo;t</td><td>A real change in preferences, as soon as pollsters measure it</td><td>A level free of allocation-method noise</td></tr>
       </tbody>
     </table>
   </div>
-  <p class="pred-tnote">One house straddles the line transparently: Roy Morgan publishes <em>both</em> bases every week &mdash; a respondent-allocated two-party and a figure on 2025-election flows. The site files Morgan&rsquo;s respondent figure as the published one and keeps its election-flows figure for the drift watch described below. The &ldquo;Compare&rdquo; switch under the chart does a similar thing for any house: it overlays the other basis&rsquo;s line without switching your view, so the two can be read against each other at every point in the term.</p>
+  <p class="pred-tnote">Roy Morgan publishes both every week: a respondent-allocated two-party figure and one on 2025-election flows. The site treats the respondent figure as Morgan&rsquo;s published one, and uses its election-flows figure as a check in the drift chart described below. The &ldquo;Compare&rdquo; checkbox under the chart overlays the other basis on whichever one you&rsquo;re viewing, so the two can be read against each other across the whole term.</p>
 
   <h2 id="why-implied">Why implied is the default</h2>
-  <p>The implied basis became the site&rsquo;s default two-party figure on 18 September 2026 &mdash; the hero, the table aggregates and the share card all quote it, and the toggle&rsquo;s implied side labels itself &ldquo;(default)&rdquo;. Five reasons, in declining order of importance:</p>
+  <p>The implied figure became the default on 18 September 2026. The hero, the table aggregates and the share card all quote it, and the toggle marks it &ldquo;(default)&rdquo;. Five reasons, most important first:</p>
   <ul class="pred-feats">
     <li>
       <strong>Movement means mood</strong>
-      A trend in published two-party figures mixes two things: how voters&rsquo; intentions are changing, and how the <em>methods</em> that allocate preferences are changing &mdash; a new house enters the mix, an old one revises its assumptions, an allocation regime shifts. The implied figure has only the first ingredient, because its allocation was frozen on election night. When it moves, primaries moved.
+      A trend in published figures mixes two things: changes in how people intend to vote, and changes in how preferences are allocated, as pollsters enter, revise their assumptions or change method. The implied figure has only the first, because its allocation was fixed on election night. When it moves, the primaries moved.
     </li>
     <li>
       <strong>It has the track record</strong>
-      This is not a new idea, and its record is long. Kevin Bonham&rsquo;s <a href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html" target="_blank" rel="noopener noreferrer">track record of last-election preferences</a> holds the method to account at every federal election since 1983: applying the previous election&rsquo;s flows to the final primary votes missed the actual two-party result by an average of 0.3 points, with only 1990 and 2013 out by as much as a point (Labor beating the projection both times). Respondent allocation has the worse history &mdash; in 2004 pollsters expected 69&ndash;74 per cent of minor-party preferences to reach Labor and 61 arrived, turning published 50&ndash;50 polls into a 52.7 Coalition win &mdash; and Bonham&rsquo;s arithmetic says matching the frozen table&rsquo;s accuracy by asking would take about 15,000 minor-party respondents per election. The method&rsquo;s misses are real but rare, and they look like 2019 (flows shifted 0.8 points to the Coalition) and 2022 (a point back to Labor): level errors that show up on election night, which is exactly what the drift tracker below is there to catch early.
+      The idea isn&rsquo;t new, and its record is long. Kevin Bonham&rsquo;s <a href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html" target="_blank" rel="noopener noreferrer">track record of last-election preferences</a> tests it at every federal election since 1983: applying the previous election&rsquo;s flows to the final primary votes missed the actual two-party result by 0.3 points on average, and by a point or more only in 1990 and 2013 (Labor beat the projection both times). Asking has the worse history. In 2004 pollsters expected 69&ndash;74% of minor-party preferences to reach Labor; 61% did, and polls showing 50&ndash;50 became a 52.7 Coalition win. By Bonham&rsquo;s arithmetic, matching the fixed table&rsquo;s accuracy by asking would take about 15,000 minor-party respondents per election. The method does miss sometimes, as in 2019 (flows shifted 0.8 points to the Coalition) and 2022 (a point back to Labor). Those are level errors that surface on election night, and the drift chart described below exists to catch them early.
     </li>
     <li>
       <strong>More polls feed it</strong>
-      The implied series only needs primary votes, which every poll publishes; the published series needs a two-party figure, which not every poll publishes. As this page is written (September 2026), the classic pairing&rsquo;s three-week estimation window holds nine polls on the implied basis against six on the published &mdash; and for Labor v One Nation it is nine against five. A denser window means a steadier estimate.
+      The implied figure needs only primary votes, which every poll publishes. The published figure needs a two-party number, which not every poll gives. In mid-September 2026 the three-week window for Labor v Coalition held 8 polls on the implied basis and 5 on the published. More polls make a steadier estimate.
     </li>
     <li>
       <strong>One assumption, stated in full</strong>
-      Quoting levels across a dozen houses means quoting a dozen private compromises. The implied figure&rsquo;s entire assumption is printed on this page &mdash; one table of flow shares, measured on 15 million ballots &mdash; and every house faces the identical arithmetic. Comparability wave-to-wave and house-to-house is bought with a single, named choice.
+      Quoting published figures across a dozen pollsters means quoting a dozen private compromises. The implied figure&rsquo;s entire assumption is printed on this page: one table of flows, measured on 15 million ballots and applied identically to every pollster.
     </li>
     <li>
-      <strong>The level must come from somewhere honest</strong>
-      Any figure needs an anchor: something real that pins today&rsquo;s estimate to a measured level. The published basis finds its anchor inside each house&rsquo;s method. The implied basis uses the only national measurement of the thing itself &mdash; the 2025 count.
+      <strong>An honest anchor</strong>
+      Every figure has to be pinned to something real. The published figure&rsquo;s anchor is inside each pollster&rsquo;s method. The implied figure&rsquo;s is the only national measurement of the thing itself: the 2025 count.
     </li>
   </ul>
-  <p>What the published basis still buys: a frozen table cannot notice that how-to-vote cards have changed or that a party&rsquo;s supporters have drifted, but a pollster who asks can. The published series therefore stays complete beside the implied one &mdash; every house, every wave &mdash; and it is the basis that gets to say &ldquo;yes&rdquo; first if real preference behaviour ever moves far from the table. It has also done its job before: at the 2025 election the published last-election-flows figures matched the count closely, and the table the implied basis runs is exactly that tradition &mdash; an election&rsquo;s own flows, re-used.</p>
+  <p>What the published figure still offers: a fixed table can&rsquo;t notice that how-to-vote cards have changed or that a party&rsquo;s supporters have shifted, but a pollster who asks can. So the published series stays complete beside the implied one, every pollster and every poll, and it would be first to show a real change in preference behaviour. At the 2025 election, the pollsters&rsquo; last-election-flows figures matched the count closely, and that&rsquo;s the same method the implied figure uses.</p>
 
   <h2 id="classic">The classic table: Labor v Coalition</h2>
-  <p>For the traditional pairing the implied figure needs no estimates of its own: the Electoral Commission counted the entire answer at the election. Its <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTppFlowByPartyDownload-31496.csv" target="_blank" rel="noopener noreferrer">2025 TPP preference-flow release</a> redistributes every formal ballot in all 150 divisions Labor v Coalition, and three line items carry what the site needs:</p>
+  <p>For Labor v Coalition the implied figure needs no estimates of its own: the Electoral Commission counted the whole answer. Its <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTppFlowByPartyDownload-31496.csv" target="_blank" rel="noopener noreferrer">2025 two-party preference flow release</a> distributes every formal ballot in all 150 divisions between Labor and the Coalition, and three lines give the site what it needs:</p>
   <div class="pred-twrap">
     <table class="pred-table">
-      <caption>The 2025 election&rsquo;s counted preferences, TPP cut (AEC event 31496) &mdash; the share of each group&rsquo;s votes that would end with Labor, with the ballots behind it.</caption>
+      <caption>Counted preferences at the 2025 election, two-party cut (AEC event 31496): the share of each group&rsquo;s votes that ended with Labor, and the ballots behind it.</caption>
       <thead>
         <tr>
           <th class="l" scope="col">Voters</th>
@@ -348,22 +348,14 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
       </tbody>
     </table>
   </div>
-  <p class="pred-tnote">The Commission publishes the same election&rsquo;s flows two other ways &mdash; a web table that includes ballots terminating at third parties (Greens 79.9 to Labor), and a <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByPartyDownload-31496.csv" target="_blank" rel="noopener noreferrer">TCP download</a> that collapses every destination to the two majors (86.8/27.1/48.5). One line of that release belongs to a case the formula would otherwise miss. In a
-    <strong>three-cornered contest</strong> both Coalition partners run against Labor, so one of
-    them is excluded first and its preferences distribute &mdash; and most, but not all, stay
-    inside the Coalition. The count: 11,176 Liberal ballots transferred, 12.47&thinsp;% of them
-    to Labor; 51,243 National, 18.97&thinsp;% to Labor. That is 11,117 ballots, or
-    <strong>0.072 points</strong> of national two-party, that a Labor-v-Coalition formula hands to
-    the Coalition and the ballots did not. The site adds it back as a flat constant, which is the
-    only honest shape for it: the leak depends on how many seats are three-cornered, and a
-    national poll&rsquo;s primary votes cannot know that. Kevin Bonham&rsquo;s aggregate carries
-    the same term at 0.07.</p>
-  <p>The site ships the TPP cut because it measures what the site is simulating &mdash; every formal ballot ending with Labor or the Coalition &mdash; and because it simply performs better: it tracks Roy Morgan&rsquo;s own published 2025-flows 2PP twice as closely as the alternatives, and it won the constants review of 29 August 2026 on average house bias. Anchored at the election, the implied series reproduces the official 55.2&ndash;44.8 result by construction &mdash; a consistency check built into the arithmetic, not a forecast claim.</p>
+  <p class="pred-tnote">The Commission publishes the same election&rsquo;s flows two other ways: a web table that includes ballots ending with third parties (Greens 79.9% to Labor), and a <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByPartyDownload-31496.csv" target="_blank" rel="noopener noreferrer">two-candidate download</a> that collapses every destination to the two majors (86.8 / 27.1 / 48.5).</p>
+  <p><strong>Three-cornered contests.</strong> Where both Coalition parties run against Labor, one is excluded first and its preferences are distributed. Most stay in the Coalition, but not all: of 11,176 Liberal ballots transferred, 12.47% went to Labor, and of 51,243 National ballots, 18.97%. That&rsquo;s 11,117 ballots, or <strong>0.072 points</strong> of the national two-party figure, that a Labor v Coalition formula gives to the Coalition when the ballots didn&rsquo;t. The site adds it back as a flat constant. That&rsquo;s the only honest shape for it, because the leak depends on how many seats are three-cornered, which a national poll can&rsquo;t know. Kevin Bonham&rsquo;s aggregate uses the same term, at 0.07.</p>
+  <p>The site uses the two-party cut because it measures exactly what the site simulates, every formal ballot ending with Labor or the Coalition, and because it performs better: it tracks Roy Morgan&rsquo;s own published 2025-flows figure twice as closely as the alternatives, and it won the site&rsquo;s constants review of 29 August 2026 on average pollster bias. Applied to the election&rsquo;s own primaries, it reproduces the official 55.2&ndash;44.8 result by construction. That&rsquo;s a built-in consistency check, not a forecasting claim.</p>
 
-  <p>The implied figure for any poll is then one line of arithmetic per row &mdash; Labor&rsquo;s primary, plus each minor group&rsquo;s primary times its flow, plus one flat term for the seats where the Coalition preferences against itself:</p>
+  <p>For any poll, the implied figure is one line of arithmetic: Labor&rsquo;s primary, plus each minor group&rsquo;s primary times its flow, plus the small three-cornered term.</p>
   <div class="pred-twrap">
     <table class="pred-table">
-      <caption>Worked line by line &mdash; Roy Morgan, 24 August 2025. The same respondents that week produced both answers: the house asked and published 56.5; the table implies 55.1. The gap is allocation arithmetic, and nothing else.</caption>
+      <caption>Worked example: Roy Morgan, 24 August 2025. The same respondents produced both figures: Morgan published 56.5, and the table implies 55.1. The difference is allocation alone.</caption>
       <thead>
         <tr>
           <th class="l" scope="col">Voters</th>
@@ -383,15 +375,15 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
       </tbody>
     </table>
   </div>
-  <p>One cell deserves a name of its own, because it does the most work today: the share of <em>One Nation</em> preferences Labor gains. At a One Nation primary near 27, every point in that conversion is worth roughly a quarter-point of two-party. The site&rsquo;s implied line carries a narrow sensitivity bracket for exactly that cell &mdash; the implied figure recomputed with the 2022 election&rsquo;s One Nation conversion beside the 2025 one &mdash; so the price of that single assumption is always visible on the chart.</p>
+  <p>One cell matters most today: the share of <em>One Nation</em> preferences that reach Labor. With One Nation near 27% of the primary vote, each point of that flow is worth about a quarter of a point of two-party. So the chart shades a narrow sensitivity bracket around the implied line: the same figure recalculated with the One Nation flow from the 2022 election. The price of that one assumption is always in view.</p>
 
-  <h2 id="one-nation">The Labor v One Nation table: three flows that do not officially exist</h2>
-  <p>When pollsters began asking, late in 2025, how Labor would fare against One Nation head-to-head, the question landed on a gap in the official record. One Nation made the final two-candidate count in only two of 150 electorates in 2025 &mdash; Hunter against Labor, Maranoa against the LNP &mdash; so no national flow between Labor and One Nation has ever been counted, and every house publishing the pairing has had to invent its own allocation. The levels those private inventions produce disagree with each other; there is no count to discipline them. For this pairing, more than any other, one frozen and inspectable assumption outranks an industry of private ones. The site&rsquo;s implied Labor v One Nation figure runs on three measured-then-calibrated flows:</p>
+  <h2 id="one-nation">The Labor v One Nation table: three flows that don&rsquo;t officially exist</h2>
+  <p>When pollsters began asking, late in 2025, how Labor would fare against One Nation head to head, they hit a gap in the official record. One Nation made the final two in only two of 150 seats in 2025 (Hunter against Labor, Maranoa against the LNP), so no national Labor v One Nation flow has ever been counted, and every pollster publishing the pairing has had to devise its own allocation. Their results disagree, and there&rsquo;s no count to settle it. For this pairing above all, one fixed assumption that anyone can inspect beats a dozen private ones. The site&rsquo;s implied Labor v One Nation figure uses three flows, measured and then calibrated:</p>
 
   <figure class="pred-fig" role="img" aria-label="Site estimate of Coalition preferences flowing to One Nation against Labor: 68.5 per cent, inside a band of 66 to 71 per cent.">
     <div class="pred-fam">Coalition voters</div>
     <div class="pred-num">68.5%</div>
-    <div class="pred-cap">of Coalition preferences would run to One Nation</div>
+    <div class="pred-cap">of Coalition preferences would go to One Nation</div>
     <div class="pred-band" aria-hidden="true">
       <div class="pred-ci" style="left:66.0%;width:5.0%"></div>
       <div class="pred-med" style="left:68.5%"></div>
@@ -401,13 +393,13 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
       <span>50</span>
       <span>100 &middot; every ballot to One Nation</span>
     </div>
-    <figcaption class="pred-note">The 2025 Senate ballot record &mdash; a direct count of how every Coalition voter ranked the Labor and One Nation groups &mdash; reads 74.7 to One Nation. But the pairing has since run for real twice: South Australia&rsquo;s whole-state count in March 2026 ran 66.1 to One Nation, and the Secret Harbour by-election in August counted 70.2. The cell now anchors between those counts at 68.5, with a band wide enough to straddle both and still touch the Senate anchor.</figcaption>
+    <figcaption class="pred-note">The 2025 Senate ballots, a direct record of how every Coalition voter ranked Labor against One Nation, read 74.7% to One Nation. But the pairing has since been counted for real twice: South Australia&rsquo;s statewide count in March 2026 ran 66.1% to One Nation, and the Secret Harbour by-election in August 70.2%. The setting now sits between those two counts, at 68.5%, with a band wide enough to cover both.</figcaption>
   </figure>
 
   <figure class="pred-fig" role="img" aria-label="Site estimate of Greens preferences flowing to One Nation against Labor: 11 per cent, inside a band of 8 to 14 per cent.">
     <div class="pred-fam">Greens voters</div>
     <div class="pred-num">11%</div>
-    <div class="pred-cap">of Greens preferences would run to One Nation</div>
+    <div class="pred-cap">of Greens preferences would go to One Nation</div>
     <div class="pred-band" aria-hidden="true">
       <div class="pred-ci" style="left:8.0%;width:6.0%"></div>
       <div class="pred-med" style="left:11.0%"></div>
@@ -417,13 +409,13 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
       <span>50</span>
       <span>100 &middot; every ballot to One Nation</span>
     </div>
-    <figcaption class="pred-note">The Senate record says only 4.4 &mdash; but both real 2026 counts put House Greens voters higher: 10.0 at Secret Harbour, 15.2 in South Australia (worth about 12.9 nationally once that state&rsquo;s measured Greens softness is removed). The cell centres on the two real counts, and its band is the widest of the three. This remains the least settled number on the page.</figcaption>
+    <figcaption class="pred-note">The Senate record says only 4.4%, but both real 2026 counts put Greens voters higher: 10.0% at Secret Harbour and 15.2% in South Australia (about 12.9% nationally, once that state&rsquo;s measured Greens softness is allowed for). The setting sits between the two real counts, and its band is the widest of the three. It&rsquo;s the least settled number on this page.</figcaption>
   </figure>
 
   <figure class="pred-fig" role="img" aria-label="Site estimate of other voters’ preferences flowing to One Nation against Labor: 47 per cent, inside a band of 44 to 50 per cent.">
     <div class="pred-fam">All other voters</div>
     <div class="pred-num">47%</div>
-    <div class="pred-cap">of everyone else&rsquo;s preferences would run to One Nation</div>
+    <div class="pred-cap">of everyone else&rsquo;s preferences would go to One Nation</div>
     <div class="pred-band" aria-hidden="true">
       <div class="pred-ci" style="left:44.0%;width:6.0%"></div>
       <div class="pred-med" style="left:47.0%"></div>
@@ -433,30 +425,30 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
       <span>50</span>
       <span>100 &middot; every ballot to One Nation</span>
     </div>
-    <figcaption class="pred-note">The Senate record is 50.9, trimmed 4 points because nearly half the House &ldquo;others&rdquo; pool is independents &mdash; a mix the Senate&rsquo;s party-ticket pool lacks, and a pool that ran measurably more Labor-leaning than the Senate&rsquo;s in 2025. South Australia&rsquo;s 2026 count of independents then landed 44.1 to One Nation, inside the band: the one cell the first real test confirmed rather than moved.</figcaption>
+    <figcaption class="pred-note">The Senate record is 50.9%, trimmed by 4 points because nearly half the House &ldquo;others&rdquo; vote goes to independents, who are missing from the Senate&rsquo;s party-ticket pool and leaned more to Labor in 2025. South Australia&rsquo;s 2026 count of independents then landed at 44.1% to One Nation, inside the band: the one setting the first real test confirmed rather than moved.</figcaption>
   </figure>
 
-  <h2 id="how-found">How the Labor&ndash;One Nation table was found</h2>
+  <h2 id="how-found">How the Labor&ndash;One Nation table was built</h2>
   <ul class="pred-feats">
     <li>
-      <strong>Step one &mdash; anchor on 7.4 million Senate ballots</strong>
-      No 2025 House count had to measure Labor against One Nation, but every Senate ballot did something equivalent: each voter&rsquo;s numbered list of parties records which group, Labor&rsquo;s or One Nation&rsquo;s, they ranked earlier. Counting that on the <a href="https://results.aec.gov.au/31496/Website/SenateDownloadsMenu-31496-Csv.htm" target="_blank" rel="noopener noreferrer">2025 Senate formal-preferences release</a> gives the anchor: among Coalition ballots 74.7 per cent put One Nation earlier, among Greens 4.4, among all other parties 50.9 &mdash; 7.43 million ranked ballots in all. No model, no weighting: a count.
+      <strong>Step one: anchor on 7.4 million Senate ballots</strong>
+      No 2025 House count had to compare Labor with One Nation, but every Senate ballot did the equivalent: each voter&rsquo;s numbered list of parties shows which of the two they ranked higher. Counting that in the <a href="https://results.aec.gov.au/31496/Website/SenateDownloadsMenu-31496-Csv.htm" target="_blank" rel="noopener noreferrer">2025 Senate formal-preferences release</a> gives the anchor: 74.7% of Coalition ballots put One Nation ahead of Labor, as did 4.4% of Greens ballots and 50.9% of all others, across 7.43 million ranked ballots. No model and no weighting: a count.
     </li>
     <li>
-      <strong>Step two &mdash; move the anchor to the House, then to reality</strong>
-      The Senate count is corrected for the two chambers&rsquo; known differences (the ACT ran no One Nation Senate group; the &ldquo;others&rdquo; pool is 48 per cent independents in the House but party tickets in the Senate). Then the pairing&rsquo;s own 2026 counts take over: South Australia in March, Secret Harbour in August. Where the real counts and the corrected anchor disagree, the table follows the counts &mdash; the Coalition cell moved from a Senate-anchored 72 down to 68.5 on 11 September 2026 precisely because two full counts of real ballots both said the Senate read ran high.
+      <strong>Step two: adjust for the House, then follow real counts</strong>
+      The Senate figures are corrected for the two chambers&rsquo; known differences: the ACT had no One Nation Senate group, and the House &ldquo;others&rdquo; pool is 48% independents where the Senate&rsquo;s is party tickets. Then the pairing&rsquo;s own 2026 counts take over: South Australia in March, Secret Harbour in August. Where real counts and the corrected anchor disagree, the table follows the counts. That&rsquo;s why the Coalition setting moved from a Senate-based 72% to 68.5% on 11 September 2026: two full counts of real ballots both said the Senate figure ran high.
     </li>
     <li>
-      <strong>Step three &mdash; cross-check, but never blend</strong>
-      Hunter&rsquo;s <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv" target="_blank" rel="noopener noreferrer">actual 2025 count</a> (82.9 Coalition to One Nation), <a href="https://kevinbonham.blogspot.com/2026/01/why-hunter-2025-cant-be-used-to-do-last.html" target="_blank" rel="noopener noreferrer">Kevin Bonham&rsquo;s independent reconstruction</a> (~72), and the Farrer by-election&rsquo;s flows against an independent stay as checks the numbers must survive, not ingredients. Hunter&rsquo;s count was taken in One Nation&rsquo;s strongest seat; blending heartland numbers into a national estimate is the one error the construction is built to avoid.
+      <strong>Step three: cross-check, but never blend</strong>
+      Hunter&rsquo;s <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv" target="_blank" rel="noopener noreferrer">actual 2025 count</a> (82.9% of Coalition preferences to One Nation), <a href="https://kevinbonham.blogspot.com/2026/01/why-hunter-2025-cant-be-used-to-do-last.html" target="_blank" rel="noopener noreferrer">Kevin Bonham&rsquo;s independent reconstruction</a> (about 72%) and the Farrer by-election&rsquo;s flows against an independent are kept as checks the numbers must pass, not as inputs. Hunter was counted in One Nation&rsquo;s strongest seat, and mixing heartland numbers into a national estimate is the one error the method is built to avoid.
     </li>
   </ul>
 
   <h2 id="by-state">State by state, as the Senate counted it</h2>
-  <p>The anchor read, for every state with a One Nation group on the 2025 ballot. The shipped figures are national, but a state-level application should start from these.</p>
+  <p>The Senate anchor for every state with a One Nation group on the 2025 ballot. The site&rsquo;s figures are national, but anyone applying them to a single state should start here.</p>
   <div class="pred-twrap">
     <table class="pred-table">
-      <caption>Share of each group&rsquo;s 2025 Senate preferences ranking One Nation before Labor, per cent (of ballots that ranked either group; a ballot naming only one counts for it).</caption>
+      <caption>Share of each group&rsquo;s 2025 Senate ballots ranking One Nation ahead of Labor, per cent (of ballots that ranked either party; a ballot naming only one counts for it).</caption>
       <thead>
         <tr>
           <th class="l" scope="col">State</th>
@@ -477,10 +469,10 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
       </tbody>
     </table>
   </div>
-  <p class="pred-tnote">The ACT had no One Nation Senate group in 2025. Two contrasts stand out: Tasmania&rsquo;s Coalition ballots lean least to One Nation of any state &mdash; 63.2, against 78.2 in New South Wales &mdash; and the Northern Territory&rsquo;s two-party history made that count untypical on several measures.</p>
+  <p class="pred-tnote">The ACT had no One Nation Senate group in 2025. Two contrasts stand out: Tasmania&rsquo;s Coalition voters leaned least to One Nation of any state (63.2%, against 78.2% in New South Wales), and the Northern Territory&rsquo;s count was unusual on several measures.</p>
 
   <h2 id="counts-2026">The counts that actually happened, 2026</h2>
-  <p>The pairing stopped being hypothetical the year after the election. South Australia voted in March 2026 and <a href="https://kevinbonham.blogspot.com/2026/04/the-amazing-2026-south-australian.html" target="_blank" rel="noopener noreferrer">the Labor&ndash;One Nation count ran statewide</a>; in August the <a href="https://www.elections.wa.gov.au/2026-secret-harbour-election-results" target="_blank" rel="noopener noreferrer">Secret Harbour by-election</a> in Western Australia produced <a href="https://antonygreen.com.au/preference-flows-at-the-secret-harbour-by-election/" target="_blank" rel="noopener noreferrer">another full count</a> &mdash; and One Nation won, its first state lower-house seat there. Both counts ran under the same how-to-vote regime as the 2025 federal election: One Nation carded above Labor nearly everywhere, so the calibration transfers like-for-like &mdash; and a future decision to put Labor first would move everything (Queensland&rsquo;s 2019 count prices such a card flip at about eleven points).</p>
+  <p>The pairing stopped being hypothetical in 2026. South Australia voted in March, and <a href="https://kevinbonham.blogspot.com/2026/04/the-amazing-2026-south-australian.html" target="_blank" rel="noopener noreferrer">the Labor&ndash;One Nation count ran statewide</a>. In August, the <a href="https://www.elections.wa.gov.au/2026-secret-harbour-election-results" target="_blank" rel="noopener noreferrer">Secret Harbour by-election</a> in Western Australia produced <a href="https://antonygreen.com.au/preference-flows-at-the-secret-harbour-by-election/" target="_blank" rel="noopener noreferrer">another full count</a>, and One Nation won, taking its first lower-house seat in that state. Both counts ran under the same how-to-vote cards as the 2025 federal election, with One Nation placed above Labor nearly everywhere, so the calibration carries over like for like. If parties started putting Labor first, everything would move: Queensland&rsquo;s 2019 count puts the effect of such a switch at about eleven points.</p>
   <div class="pred-twrap">
     <table class="pred-table">
       <caption>The real Labor&ndash;One Nation counts: share of each excluded group&rsquo;s preferences reaching Labor, per cent.</caption>
@@ -498,52 +490,53 @@ main p a:focus-visible, main li a:focus-visible { border-bottom-color: var(--acc
       </tbody>
     </table>
   </div>
-  <p><strong>The reconciliation.</strong> Read against their own states&rsquo; Senate anchors, both real Coalition counts came in low &mdash; South Australia 66.1 to One Nation against 70.6 (&minus;4.5); Secret Harbour 70.2 against 73.5 (&minus;3.3). An early construction kept the corrected Senate anchor with a partial discount (72 to One Nation); the shipped figure accepts what the two full counts say and anchors between them at 68.5 to One Nation (31.5 to Labor), band 66&ndash;71 to straddle both counts and the anchor&rsquo;s edge. The two Greens counts, 10.0 and 15.2 to One Nation, centre on 11. And South Australia&rsquo;s independent count &mdash; 44.1 to One Nation &mdash; landed inside the others band, which is left unchanged at 47. South Australia also ran the reciprocal count: against the Liberals, its One Nation preferences went 27.2 to Labor (the 2025 federal figure: 25.5), and its statewide Labor&ndash;One Nation &ldquo;shadow two-party&rdquo; came to 58.2 &mdash; all but identical to its real Labor&ndash;Liberal 57.9.</p>
-  <p><strong>Kept as checks, not ingredients.</strong> Hunter&rsquo;s <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv" target="_blank" rel="noopener noreferrer">2025 count</a> (82.9 &middot; 12.6 &middot; 59.8 to One Nation) is the only 2025 federal electorate where voters actually made this choice &mdash; in One Nation&rsquo;s strongest seat, where its run-off share ran at 25.7 per cent against 14.6 statewide; every number there is heartland, not nation. Bonham&rsquo;s January 2026 reconstruction of the same Senate data (~72 &middot; ~9 &middot; ~45) is the independent pair of eyes the anchor is checked against. Farrer&rsquo;s May 2026 by-election measured a different final pairing &mdash; One Nation against an independent &mdash; and its 59.0 Liberal-to-One-Nation flow belongs to that question, not this one. Maranoa tells the matching side-story: in One Nation&rsquo;s other heartland seat, 35 per cent of Greens and 68 per cent of other preferences still found One Nation &mdash; far above any national figure, exactly as a second heartland seat would predict.</p>
+  <p><strong>The reconciliation.</strong> Against their own states&rsquo; Senate anchors, both real Coalition counts came in low: South Australia 66.1% to One Nation against 70.6% (&minus;4.5), Secret Harbour 70.2% against 73.5% (&minus;3.3). An early version kept the corrected Senate figure with a partial discount (72% to One Nation). The current table accepts what the two full counts say and sits between them at 68.5% to One Nation (31.5% to Labor), with a band of 66&ndash;71%. The two Greens counts, 10.0% and 15.2% to One Nation, centre on 11%. South Australia&rsquo;s independent count, 44.1% to One Nation, landed inside the others band, which stays at 47%.</p>
+  <p>South Australia also ran the reverse count: against the Liberals, One Nation preferences went 27.2% to Labor (25.5% federally in 2025). And its statewide Labor v One Nation &ldquo;shadow two-party&rdquo; came to 58.2, almost identical to its real Labor v Liberal 57.9.</p>
+  <p><strong>Kept as checks, not inputs.</strong> Hunter&rsquo;s <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv" target="_blank" rel="noopener noreferrer">2025 count</a> (82.9 &middot; 12.6 &middot; 59.8 to One Nation) is the only 2025 federal seat where voters actually made this choice, and it was One Nation&rsquo;s strongest seat: its share there was 25.7%, against 14.6% statewide. Every number from it is heartland, not national. Bonham&rsquo;s January 2026 reconstruction of the same Senate data (about 72 &middot; 9 &middot; 45) is the independent check on the anchor. Farrer&rsquo;s May 2026 by-election measured a different pairing, One Nation against an independent, so its 59.0% Liberal-to-One Nation flow answers a different question. Maranoa tells the same story from the other side: in One Nation&rsquo;s other heartland seat, 35% of Greens and 68% of other preferences still reached One Nation, far above any national figure, just as a second heartland seat would predict.</p>
 
   <h2 id="back-cast">What the table would have meant in 2025</h2>
-  <p>Apply the shipped cells to the actual 2025 first preferences &mdash; Labor 34.6, Coalition 31.8, Greens 12.2, One Nation 6.4, others 15.0 &mdash; and the recorded 55.2&ndash;44.8 Labor&ndash;Coalition result becomes a Labor&ndash;One Nation figure of about 63&ndash;37, with the band&rsquo;s honest range roughly 62&ndash;65:</p>
+  <p>Apply the current table to the actual 2025 first preferences (Labor 34.6, Coalition 31.8, Greens 12.2, One Nation 6.4, others 15.0) and the recorded 55.2&ndash;44.8 Labor v Coalition result becomes a Labor v One Nation figure of about 63&ndash;37, with a range of roughly 62&ndash;65:</p>
   <div class="pred-code">ALP  34.6 + .315&times;31.8 + .89&times;12.2 + .53&times;15.0  =  63.4
 ON    6.4 + .685&times;31.8 + .11&times;12.2 + .47&times;15.0  =  36.6
 Labor&ndash;One Nation two-party &asymp; 63.4 &ndash; 36.6   (band &plusmn;1.6)</div>
-  <p>That is arithmetic on 2025 votes, not a forecast: One Nation has spent 2026 polling at several times its 2025 vote, and what preferences do at those primary levels is precisely what the 2026 counts are the first answers to. The same exercise is re-run live on the site every week: the implied Labor v One Nation figure is the current polls&rsquo; primaries read through this table.</p>
+  <p>That&rsquo;s arithmetic on 2025 votes, not a forecast. One Nation has polled at several times its 2025 vote through 2026, and the 2026 counts are the first evidence of what preferences do at those levels. The site runs the same sum on every new poll: the implied Labor v One Nation figure is the current polls&rsquo; primaries read through this table.</p>
 
-  <h2 id="estimator">From polls to the headline number</h2>
-  <p>Whichever basis you are looking at, the headline is built from individual polls the same way, and the sentence under the figure &mdash; &ldquo;Weighted aggregate (9 polls over 21 days as at 14 Sep; 95% interval)&rdquo; &mdash; is its provenance:</p>
+  <h2 id="estimator">From polls to the headline figure</h2>
+  <p>Whichever basis you&rsquo;re viewing, the headline is built from individual polls the same way, and the line under the figure, such as &ldquo;Weighted aggregate (9 polls over 21 days as at 14 Sep; 95% interval)&rdquo;, says how:</p>
   <ul class="pred-feats">
     <li>
       <strong>The weighted aggregate</strong>
-      Each poll in the trailing three weeks is weighted by its sample size, by recency (a poll&rsquo;s weight halves every seven days, fading smoothly to zero at the window&rsquo;s edge), and against the house&rsquo;s own measured lean &mdash; each firm&rsquo;s habit of running a little above or below the cross-house consensus is estimated and removed before pooling. When too few polls are in the window the label says &ldquo;Monthly average&rdquo; and the figure carries a &ldquo;limited data&rdquo; tag instead: the plain, unweighted reading of the month&rsquo;s polls.
+      Each poll from the past three weeks is weighted by sample size and by recency (its weight halves every seven days and fades smoothly to zero at the window&rsquo;s edge), after removing its pollster&rsquo;s measured lean: each pollster&rsquo;s habit of running a little above or below the others is estimated and subtracted first. Where too few pollsters ask a contest for those leans to be measured, the label says &ldquo;Monthly average&rdquo; instead, the figure is a plain average of the month&rsquo;s polls, and a &ldquo;Limited data&rdquo; tag appears.
     </li>
     <li>
-      <strong>The interval is a share, doubled on the lead line</strong>
-      The &ldquo;95% interval&rdquo; attached to a two-party figure is measured on one party&rsquo;s share. The line that reads &ldquo;Labor leads by 3.0 &plusmn;&thinsp;2&thinsp;pts&rdquo; doubles it, because a lead is the difference of two shares and a difference carries squared error of its own. If the gap between the parties is smaller than that doubled figure, the site says &ldquo;within the margin&rdquo; beside the arrow rather than implying a meaningful move.
+      <strong>The &plusmn; on the lead is double the &plusmn; on each share</strong>
+      The 95% interval on a two-party figure is measured on one party&rsquo;s share. The lead line, as in &ldquo;Labor leads by 3.0 &plusmn;&thinsp;2&thinsp;pts&rdquo;, doubles it: the two shares add to 100, so any error that raises one lowers the other by the same amount, and the gap between them moves twice as far. Beside the arrow showing the change since a month ago, &ldquo;within the margin&rdquo; appears when that change is smaller than its own interval, so it isn&rsquo;t a finding.
     </li>
     <li>
-      <strong>&hellip;except &ldquo;flows range&rdquo;, which is something else entirely</strong>
-      Under Labor v One Nation the interval is the flow table&rsquo;s own band &mdash; the &plusmn;2.5/&plusmn;3/&plusmn;3 above &mdash; read through today&rsquo;s primaries, not a sampling interval at all. It answers &ldquo;how far would this figure move if the table&rsquo;s best cells were at either edge of their band?&rdquo;. It is deliberately never called a 95% interval: that phrase belongs to procedures a real count can check, and this pairing has no count.
+      <strong>&hellip;except &ldquo;flows range&rdquo;, which is something else</strong>
+      On Labor v One Nation the &plusmn; is the flow table&rsquo;s own band (&plusmn;2.5 / &plusmn;3 / &plusmn;3, above) applied to today&rsquo;s primaries, not a sampling interval. It answers: how far would the figure move if each setting sat at the edge of its band? It&rsquo;s never called a 95% interval, because that term belongs to measurements a real count can check, and this pairing has none.
     </li>
   </ul>
-  <p>Two diagnostics watch the implied basis itself. The sensitivity bracket on the classic line reprices the One Nation conversion cell at the last two counted elections. And the preference-flow drift tracker holds each poll&rsquo;s published figure against what its primaries imply under the frozen table, pooling the gap house-adjusted across the term &mdash; that is the tripwire that would announce the 2025 table going stale. A frozen table cannot track real preference drift; it was never asked to. Its failure mode is a level error the drift panel measures out loud, not a phantom movement it silently invents.</p>
+  <p>Two checks watch the implied figure itself. The sensitivity bracket on the Labor v Coalition line re-prices the One Nation flow at the last two counted elections. And the preference-flow drift chart compares each poll&rsquo;s published figure with what its primaries imply under the fixed table, pooling the gaps across the term after adjusting for each pollster&rsquo;s lean. That&rsquo;s the alarm that would show the 2025 table going stale. A fixed table can&rsquo;t track real changes in preferences, and isn&rsquo;t meant to. When it fails, it fails as a level error the drift chart measures openly, not as a phantom movement it quietly invents.</p>
 
   <h2 id="wrong">Where each basis can go wrong</h2>
-  <p><strong>The implied figure adds no information about preferences.</strong> Same primaries, same table, same answer &mdash; always. It cannot discover that One Nation supporters have changed their second choices, only assume they have not. Election night, not the flow table, remains the final examiner.</p>
-  <p><strong>Time is the frozen table&rsquo;s enemy.</strong> The 2025 count was a measurement of 2025. As the term ages, the implied level can drift from the truth while looking perfectly behaved &mdash; which is exactly why the published series sits one click away and the drift tracker runs permanently.</p>
-  <p><strong>The Labor&ndash;One Nation cells rest on thin real evidence.</strong> A state election, a by-election and one heartland federal seat are the entire lower-house record of that pairing to date &mdash; none at a neutral national scene. The Senate anchor is huge but a different chamber with a different &ldquo;others&rdquo; pool, where a tenth to a fifth of ballots stop at one group and drop out of the comparison entirely. The how-to-vote card regime is baked into every measured number, and cards can change.</p>
-  <p><strong>Nor is published a pure read.</strong> Houses allocate preferences differently, methods change mid-term, and a few allocate by last-election flow themselves &mdash; which is this site&rsquo;s implied basis, privately applied and unlabelled. Treat &ldquo;respondent-allocated&rdquo; as &ldquo;what the houses ship&rdquo;, read the implied basis for movement, and keep both on the table.</p>
+  <p><strong>The implied figure adds no information about preferences.</strong> Same primaries, same table, same answer, every time. It can&rsquo;t discover that One Nation voters have changed their second choices; it can only assume they haven&rsquo;t. Election night, not the table, is the final test.</p>
+  <p><strong>Time works against a fixed table.</strong> The 2025 count measured 2025. As the term goes on, the implied figure can drift from the truth while looking perfectly steady. That&rsquo;s why the published series is one click away and the drift chart runs permanently.</p>
+  <p><strong>The Labor v One Nation settings rest on thin evidence.</strong> A state election, a by-election and one heartland federal seat are the whole lower-house record of that pairing so far, and none is a neutral national contest. The Senate anchor is huge, but it&rsquo;s a different chamber with a different &ldquo;others&rdquo; pool, where a tenth to a fifth of ballots run out before reaching either party and drop out of the comparison. And every measured number reflects today&rsquo;s how-to-vote cards, which can change.</p>
+  <p><strong>The published figure isn&rsquo;t a pure reading either.</strong> Pollsters allocate preferences differently, change methods mid-term, and a few allocate by last-election flows themselves, which is this site&rsquo;s implied method, applied privately and unlabelled. Read &ldquo;respondent-allocated&rdquo; as &ldquo;what the pollsters publish&rdquo;, read the implied figure for movement, and keep both in view.</p>
 
-  <p class="ss-note">Site constants as at 18 September 2026. Every count below is linked, because the argument of this page is that its one assumption can be chased to a real tally and the houses&rsquo; cannot.</p>
+  <p class="ss-note">Site constants as at 18 September 2026. Every count is linked below, because this page&rsquo;s argument is that its one assumption can be traced to a real count, and the pollsters&rsquo; can&rsquo;t.</p>
   <ul class="ss-src">
-    <li><strong>Classic table</strong> &mdash; <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTppFlowByPartyDownload-31496.csv" target="_blank" rel="noopener noreferrer">AEC 2025 TPP flow of preferences by party</a> (<a href="https://results.aec.gov.au/31496/Website/Default.htm" target="_blank" rel="noopener noreferrer">event 31496</a>), every formal ballot in 150 divisions redistributed Labor v Coalition. The alternative cuts named above: <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByPartyDownload-31496.csv" target="_blank" rel="noopener noreferrer">TCP flow by party</a>.</li>
+    <li><strong>Classic table</strong> &mdash; <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTppFlowByPartyDownload-31496.csv" target="_blank" rel="noopener noreferrer">AEC 2025 TPP flow of preferences by party</a> (<a href="https://results.aec.gov.au/31496/Website/Default.htm" target="_blank" rel="noopener noreferrer">event 31496</a>), every formal ballot in 150 divisions distributed between Labor and the Coalition. The alternative cut named above: <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByPartyDownload-31496.csv" target="_blank" rel="noopener noreferrer">TCP flow by party</a>.</li>
     <li><strong>Labor&ndash;One Nation anchor</strong> &mdash; <a href="https://results.aec.gov.au/31496/Website/SenateDownloadsMenu-31496-Csv.htm" target="_blank" rel="noopener noreferrer">AEC 2025 Senate formal-preferences release</a> (7.43 million ranked above-the-line ballots), then chamber corrections.</li>
     <li><strong>Calibration</strong> &mdash; the 2026 South Australian statewide count, via <a href="https://kevinbonham.blogspot.com/2026/04/the-amazing-2026-south-australian.html" target="_blank" rel="noopener noreferrer">Kevin Bonham&rsquo;s recomputation of the ECSA ballot record</a>; the 2026 Secret Harbour count, via <a href="https://antonygreen.com.au/preference-flows-at-the-secret-harbour-by-election/" target="_blank" rel="noopener noreferrer">Antony Green&rsquo;s read of the WAEC distribution</a> and the <a href="https://www.elections.wa.gov.au/2026-secret-harbour-election-results" target="_blank" rel="noopener noreferrer">WAEC result</a>.</li>
-    <li><strong>Cross-checks, never ingredients</strong> &mdash; <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv" target="_blank" rel="noopener noreferrer">AEC TCP flow by division</a> (Hunter, Maranoa), the Farrer by-election flow release, and <a href="https://kevinbonham.blogspot.com/2026/01/why-hunter-2025-cant-be-used-to-do-last.html" target="_blank" rel="noopener noreferrer">Kevin Bonham&rsquo;s January 2026 reconstruction</a>.</li>
-    <li><strong>Track record of last-election flows</strong> &mdash; <a href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html" target="_blank" rel="noopener noreferrer">Kevin Bonham, <em>Wonk Central: The Track Record Of Last-Election Preferences</em></a> (September 2015, updated through 2022), the election-by-election audit the &ldquo;Why implied is the default&rdquo; section cites.</li>
+    <li><strong>Cross-checks, never inputs</strong> &mdash; <a href="https://results.aec.gov.au/31496/Website/Downloads/HouseTcpFlowByDivisionDownload-31496.csv" target="_blank" rel="noopener noreferrer">AEC TCP flow by division</a> (Hunter, Maranoa), the Farrer by-election flow release, and <a href="https://kevinbonham.blogspot.com/2026/01/why-hunter-2025-cant-be-used-to-do-last.html" target="_blank" rel="noopener noreferrer">Kevin Bonham&rsquo;s January 2026 reconstruction</a>.</li>
+    <li><strong>Track record of last-election flows</strong> &mdash; <a href="https://kevinbonham.blogspot.com/2015/09/wonk-central-track-record-of-last.html" target="_blank" rel="noopener noreferrer">Kevin Bonham, <em>Wonk Central: The Track Record Of Last-Election Preferences</em></a> (September 2015, updated through 2022), the election-by-election record cited under &ldquo;Why implied is the default&rdquo;.</li>
     <li><strong>Estimator and interval conventions</strong> &mdash; the site&rsquo;s own aggregation engine.</li>
   </ul>
-  <p class="ss-note">Companion explainer to the &ldquo;?&rdquo; beside the two-party basis switch on the main page.</p>
-  <p class="ss-note">This is a satellite page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
+  <p class="ss-note">Companion to the &ldquo;?&rdquo; beside the two-party basis switch on the main page.</p>
+  <p class="ss-note">This page belongs to <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live tracker has the current figures, charts and every poll.</p>
 </main>
-<a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
+<a class="ss-back" href="/">&larr; Back to the tracker</a>
 </body>
 </html>
