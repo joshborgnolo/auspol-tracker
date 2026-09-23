@@ -231,3 +231,9 @@ disagreement `section.ap-var` has no `.card` class and used to fall to
   `evaluateOnNewDocument` to stash `toDataURL()` for canvases ≥1000px wide,
   stub `navigator.clipboard.write` to reject, no-op `HTMLAnchorElement.click`,
   then click `#poll-disagreement .chart-copy-btn`.
+
+## Title wrapping and the past-cycles insight sentence (7fa4e97, 24 Sep 2026)
+
+- The composed title is MEASURED (`titleFit` in composeCardInner): over `IW` it breaks at the seam — `titleBase` (+"," for a cycles span) on line 1, `span` on line 2 — word-wraps only if either half is still too wide, and drops `TITLE_PX` 40→32 past two lines. `titleExtra` feeds `H` and advances `y`; any new head element must add its height to `H` the same way (the canvas is sized before the first stroke).
+- A past-cycles card's `.cycle-insight` sentence is drawn under the subtitle, above the chart (where the page shows it), only when the node is rendered (`getClientRects().length`). It's read as styled runs from the live DOM: `.ci-delta` spans keep their computed colour and bold; other text is `T.ink2`. The runs are wrapped per word in the run's own weight (`insLines`, 17px / 25px leading), and `insBlock` feeds `H`.
+- Headless check recipe: serve the repo, stub `ClipboardItem` + `navigator.clipboard.write` in `evaluateOnNewDocument` to capture the blob, open `/#cycles`, open the "Cycles" popover (`.cyc-legend-bar button`), click `.pop-quick-opt` "Returned" for the longest span, then click `.view-cycles .chart-copy-btn` [i]. Card 2 (Opposition primary) carries an insight.
