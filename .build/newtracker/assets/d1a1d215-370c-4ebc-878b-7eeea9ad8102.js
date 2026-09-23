@@ -1232,6 +1232,33 @@ function cycHolders(c, M) {
     .split(/\s*\u2192\s*/).join("\u2013");
 }
 
+/* The name one term contributes at one month of this chart, for the
+   boundary sentence that says who the current term stands beside. It keys
+   off the SAME side of the chart the insight sentence's subject came
+   from: the office-holder on the leader charts and the vote charts alike
+   (era-aware across mid-term handovers, so the 1990 term answers "Hawke"
+   in April and "Keating" from December), and the PM side of the pair on
+   preferred PM. A term with no era list answers its only holder. */
+function cycHolderAt(c, M, m) {
+  const eras = M.key === "ppmm" ? (c.raw.ppmEras || null)
+    : (c.raw[M.leader === "opp" ? "oppEras" : "netEras"] || null);
+  if (eras && eras.length) {
+    let pick = eras[0];
+    for (const e of eras) {
+      if (e.from && cycEventMonth(e.from, c.eDate) <= m) pick = e;
+    }
+    let nm = String(pick.name);
+    if (M.key === "ppmm") nm = nm.split(" v ")[0];
+    return sitting(nm);
+  }
+  if (M.key === "ppmm") {
+    const pair = c.raw.ppmPair ? String(c.raw.ppmPair)
+      : sitting(String(c.pm)) + " v " + sitting(String(c.oppLead));
+    return sitting(pair.split(" v ")[0]);
+  }
+  return sitting(String(M.leader === "opp" ? c.oppLead : c.pm));
+}
+
 function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, chipClick, toggle,
                      showAll, hideAll, showOutcome, showHan, setHan, showOnp, setOnp, shapes,
                      outcomeShown }) {
@@ -1461,7 +1488,8 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       return toMonthly(c.raw.months, c.raw[M.key], c.span).map((p, m) => {
         if (p.y == null) return null;
         const i = c.raw.months.indexOf(m);
-        return { v: chg ? +(p.y - base).toFixed(2) : p.y, obs: !flags || i < 0 || !!flags[i] };
+        return { v: chg ? +(p.y - base).toFixed(2) : p.y, obs: !flags || i < 0 || !!flags[i],
+                 who: cycHolderAt(c, M, m), yr: c.year };
       });
     });
     for (let m = 0; m < CYC_SPINE.length; m++) {
@@ -1470,16 +1498,20 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       for (let k = 0; k < pooled.length; k++) {
         const p = pooled[k][m];
         if (!p) continue;
-        vs.push(p.v);
+        vs.push(p);
         if (p.obs) polled++;
       }
       if (!vs.length) continue;
-      vs.sort((a, b) => a - b);
+      vs.sort((a, b) => a.v - b.v);
+      const nums = vs.map((p) => p.v);
+      /* vals travels with the row so the insight sentence can name the
+         terms at either end of the crowd, not just where its middle sat */
       rows.push({
         m, n: vs.length, polled,
-        mean: +(vs.reduce((s, v) => s + v, 0) / vs.length).toFixed(2),
-        p10: +pctOf(vs, 0.1).toFixed(2), p90: +pctOf(vs, 0.9).toFixed(2),
-        q1: +pctOf(vs, 0.25).toFixed(2), q3: +pctOf(vs, 0.75).toFixed(2),
+        mean: +(nums.reduce((s, v) => s + v, 0) / nums.length).toFixed(2),
+        p10: +pctOf(nums, 0.1).toFixed(2), p90: +pctOf(nums, 0.9).toFixed(2),
+        q1: +pctOf(nums, 0.25).toFixed(2), q3: +pctOf(nums, 0.75).toFixed(2),
+        vals: vs.map((p) => ({ v: p.v, who: p.who, yr: p.yr })),
       });
     }
     return rows;
@@ -1709,7 +1741,53 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
         : M.key === "oppnet" ? "opposition leader"
         : M.key === "ppmm" ? "prime minister"
         : isOpp ? "opposition" : "government";
-      insight = { d: Math.abs(d), better, mNow, subjLabel, peerNoun };
+      insight = { d: Math.abs(d), better, mNow, subjLabel, peerNoun, rank: null };
+      /* Boundary company. A bare gap from the mean hides the shape of the
+         crowd behind it: 23 points below a floor of −30 is company, 23
+         below a floor of −5 is a record. When the current reading ranks
+         among the first three of either end of the pooled set, say whose
+         company it is keeping, named and valued on the chart's own basis.
+         The crowd must be deep enough for thirds to mean anything – with
+         four peers "third lowest" is "second highest" wearing its other
+         hat, so the gate is five, and a straddled median says nothing at
+         all. Equal values flatter nobody: they simply do not rank. */
+      const cand = peerRow.vals || [];
+      if (cand.length >= 5) {
+        const below = cand.filter((p) => p.v < curVal);
+        const above = cand.filter((p) => p.v > curVal);
+        const side = below.length <= 2 && below.length < above.length ? "low"
+          : above.length <= 2 && above.length < below.length ? "high" : null;
+        if (side) {
+          /* A name can recur across terms (Hawke carried three, Howard
+             four); qualify the repeats with their year, or two different
+             terms would pretend to be one person at the boundary. */
+          const counts = {};
+          for (const p of cand) counts[p.who] = (counts[p.who] || 0) + 1;
+          const fmtPeer = (p) => {
+            const r = Math.round(p.v);
+            /* Signed measures (net, preferred-PM lead) and every change-
+               since figure need their sign; an absolute share does not –
+               "Gillard (+34%)" would read as a change number. */
+            const sgn = chg || !M.unit;
+            const val = (sgn && r > 0 ? "+" : sgn && r < 0 ? "\u2212" : "") +
+              Math.abs(r) + (M.unit || "");
+            return counts[p.who] > 1 ? p.who + " (" + p.yr + ", " + val + ")"
+              : p.who + " (" + val + ")";
+          };
+          const near = side === "low" ? below : above.slice().reverse();
+          if (!near.length) {
+            /* the reading IS the boundary: name the two just in from it */
+            const nxt = side === "low" ? cand.slice(0, 2)
+              : cand.slice(-2).reverse();
+            insight.rank = "The second and third " + (side === "low" ? "lowest" : "highest") +
+              " at this point are " + nxt.map(fmtPeer).join(" and ") + ".";
+          } else {
+            insight.rank = "Only " + near.map(fmtPeer).join(" and ") + " " +
+              (near.length > 1 ? "sit" : "sits") + " " +
+              (side === "low" ? "lower" : "higher") + " at this point.";
+          }
+        }
+      }
     }
   }
 
@@ -1774,7 +1852,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
             <p className="cycle-insight">
               {cycMonthLabel(insight.mNow)}, {insight.subjLabel} is{" "}
               <span className="ci-delta level">in line with</span>{" "}
-              the average {insight.peerNoun} at this point.
+              the average {insight.peerNoun} at this point.{insight.rank ? <> {insight.rank}</> : null}
             </p>
           );
           /* Net-approval measures carry no axis unit (CYC_METRICS unit:""),
@@ -1787,7 +1865,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
               <span className={"ci-delta " + (insight.better ? "pos" : "neg")}>
                 {shown}{M.unit || (parseFloat(shown) === 1 ? " point" : " points")}
               </span>{" "}
-              {insight.better ? "above" : "below"} the average {insight.peerNoun} at this point.
+              {insight.better ? "above" : "below"} the average {insight.peerNoun} at this point.{insight.rank ? <> {insight.rank}</> : null}
             </p>
           );
         })()}
@@ -4378,7 +4456,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      leadership columns rather than on 2PP. */
   React.useEffect(() => {
     if (!focus) return;
-    setScope(false); setQ(""); setSel(new Set()); setLead("all"); setMeasure("lnp");
+    setScope(false); setQ(""); setSel(new Set()); setLead("all"); setMeasure(DEFAULT_MEASURE);
     setRange("all"); setTagSel(new Set());
     if (focus.facet) setFacet(focus.facet);
     setOpen(focus.key);
@@ -4402,7 +4480,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     // still open – where the poll is listed again.
     // the matchup/ahead pair describes the 2PP lead column – it is hidden
     // outside that facet, so its filter must not keep biting invisibly
-    if (f !== "twopp") { setLead("all"); setMeasure("lnp"); }
+    if (f !== "twopp") { setLead("all"); setMeasure(DEFAULT_MEASURE); }
   };
 
   const jumpTo = (id) => {
@@ -4606,7 +4684,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
 
   const total = rows.length;
   const clearAll = () => {
-    setQ(""); setSel(new Set()); setLead("all"); setMeasure("lnp"); setRange("all");
+    setQ(""); setSel(new Set()); setLead("all"); setMeasure(DEFAULT_MEASURE); setRange("all");
     setTagSel(new Set()); setScope(false); setPop(null);
   };
   // Boolean(): the chain ends on a Set size, so with no filters this was the
@@ -4829,7 +4907,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         {facet === "twopp" && (
           <div className="ap-2line">
             <FilterPop id="lead" label="Lead" open={pop} setOpen={setPop}
-              summary={[measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
+              summary={[measure !== DEFAULT_MEASURE ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
             <div className="ap-pop-head"><span>Show the lead in</span></div>
             <div className="ap-poplist" role="radiogroup" aria-label="Lead column matchup">
               {/* the two Labor contests lead the list in the order of the

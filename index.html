@@ -38911,6 +38911,23 @@ function cycHolders(c, M) {
   }
   return String(M.leader === "opp" ? c.oppLead : c.pm).split(/\s*\u2192\s*/).join("\u2013");
 }
+function cycHolderAt(c, M, m) {
+  const eras = M.key === "ppmm" ? c.raw.ppmEras || null : c.raw[M.leader === "opp" ? "oppEras" : "netEras"] || null;
+  if (eras && eras.length) {
+    let pick = eras[0];
+    for (const e of eras) {
+      if (e.from && cycEventMonth(e.from, c.eDate) <= m) pick = e;
+    }
+    let nm = String(pick.name);
+    if (M.key === "ppmm") nm = nm.split(" v ")[0];
+    return sitting(nm);
+  }
+  if (M.key === "ppmm") {
+    const pair = c.raw.ppmPair ? String(c.raw.ppmPair) : sitting(String(c.pm)) + " v " + sitting(String(c.oppLead));
+    return sitting(pair.split(" v ")[0]);
+  }
+  return sitting(String(M.leader === "opp" ? c.oppLead : c.pm));
+}
 function CycleChart({
   metric,
   cycles,
@@ -39062,7 +39079,9 @@ function CycleChart({
         const i = c.raw.months.indexOf(m);
         return {
           v: chg ? +(p.y - base).toFixed(2) : p.y,
-          obs: !flags || i < 0 || !!flags[i]
+          obs: !flags || i < 0 || !!flags[i],
+          who: cycHolderAt(c, M, m),
+          yr: c.year
         };
       });
     });
@@ -39072,20 +39091,26 @@ function CycleChart({
       for (let k = 0; k < pooled.length; k++) {
         const p = pooled[k][m];
         if (!p) continue;
-        vs.push(p.v);
+        vs.push(p);
         if (p.obs) polled++;
       }
       if (!vs.length) continue;
-      vs.sort((a, b) => a - b);
+      vs.sort((a, b) => a.v - b.v);
+      const nums = vs.map(p => p.v);
       rows.push({
         m,
         n: vs.length,
         polled,
-        mean: +(vs.reduce((s, v) => s + v, 0) / vs.length).toFixed(2),
-        p10: +pctOf(vs, 0.1).toFixed(2),
-        p90: +pctOf(vs, 0.9).toFixed(2),
-        q1: +pctOf(vs, 0.25).toFixed(2),
-        q3: +pctOf(vs, 0.75).toFixed(2)
+        mean: +(nums.reduce((s, v) => s + v, 0) / nums.length).toFixed(2),
+        p10: +pctOf(nums, 0.1).toFixed(2),
+        p90: +pctOf(nums, 0.9).toFixed(2),
+        q1: +pctOf(nums, 0.25).toFixed(2),
+        q3: +pctOf(nums, 0.75).toFixed(2),
+        vals: vs.map(p => ({
+          v: p.v,
+          who: p.who,
+          yr: p.yr
+        }))
       });
     }
     return rows;
@@ -39263,8 +39288,32 @@ function CycleChart({
         better,
         mNow,
         subjLabel,
-        peerNoun
+        peerNoun,
+        rank: null
       };
+      const cand = peerRow.vals || [];
+      if (cand.length >= 5) {
+        const below = cand.filter(p => p.v < curVal);
+        const above = cand.filter(p => p.v > curVal);
+        const side = below.length <= 2 && below.length < above.length ? "low" : above.length <= 2 && above.length < below.length ? "high" : null;
+        if (side) {
+          const counts = {};
+          for (const p of cand) counts[p.who] = (counts[p.who] || 0) + 1;
+          const fmtPeer = p => {
+            const r = Math.round(p.v);
+            const sgn = chg || !M.unit;
+            const val = (sgn && r > 0 ? "+" : sgn && r < 0 ? "\u2212" : "") + Math.abs(r) + (M.unit || "");
+            return counts[p.who] > 1 ? p.who + " (" + p.yr + ", " + val + ")" : p.who + " (" + val + ")";
+          };
+          const near = side === "low" ? below : above.slice().reverse();
+          if (!near.length) {
+            const nxt = side === "low" ? cand.slice(0, 2) : cand.slice(-2).reverse();
+            insight.rank = "The second and third " + (side === "low" ? "lowest" : "highest") + " at this point are " + nxt.map(fmtPeer).join(" and ") + ".";
+          } else {
+            insight.rank = "Only " + near.map(fmtPeer).join(" and ") + " " + (near.length > 1 ? "sit" : "sits") + " " + (side === "low" ? "lower" : "higher") + " at this point.";
+          }
+        }
+      }
     }
   }
   return React.createElement("section", {
@@ -39315,12 +39364,12 @@ function CycleChart({
       className: "cycle-insight"
     }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " is", " ", React.createElement("span", {
       className: "ci-delta level"
-    }, "in line with"), " ", "the average ", insight.peerNoun, " at this point.");
+    }, "in line with"), " ", "the average ", insight.peerNoun, " at this point.", insight.rank ? React.createElement(React.Fragment, null, " ", insight.rank) : null);
     return React.createElement("p", {
       className: "cycle-insight"
     }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " sits", " ", React.createElement("span", {
       className: "ci-delta " + (insight.better ? "pos" : "neg")
-    }, shown, M.unit || (parseFloat(shown) === 1 ? " point" : " points")), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.");
+    }, shown, M.unit || (parseFloat(shown) === 1 ? " point" : " points")), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.", insight.rank ? React.createElement(React.Fragment, null, " ", insight.rank) : null);
   })()), (stripCycles.length > 0 || hanYears || onpYears) && React.createElement("div", {
     className: "cyc-drawn"
   }, React.createElement("span", {
