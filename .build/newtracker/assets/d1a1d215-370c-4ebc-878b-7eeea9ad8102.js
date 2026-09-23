@@ -1632,6 +1632,11 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
   /* Same reason as shownKey: `lifted` is a Set the panel replaces wholesale on
      every toggle, so the memo needs the years, not the identity. */
   const liftKey = [...lifted].sort((a, b) => a - b).join(",");
+  /* The past terms' dots come from the lazily fetched cycle-source file, and
+     PastCyclesView redraws when it lands – but a redraw alone re-reads this
+     memo's cached, pre-load answer. Keying on how many terms the file holds
+     makes its arrival a change the memo can see. */
+  const srcTerms = Object.keys(D.cycleSource || {}).length;
   const scatter = React.useMemo(() => (!dotsOn ? [] : shown.flatMap((c) => {
     const base = cycBase(c, M.key);
     const leadName = M.key === "ppmm" ? c.raw.ppmPair : (isOpp ? c.oppLead : c.lead);
@@ -1654,7 +1659,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
         label: n ? (solo ? n : c.year + " · " + n) : label, meta: p.meta, op: dim ? 0.3 : 1,
       };
     });
-  })), [dotsOn, shownKey, M.key, isOpp, chg, hi, liftKey]);
+  })), [dotsOn, shownKey, M.key, isOpp, chg, hi, liftKey, srcTerms]);
   /* Hanson – one line, not one per cycle. She has been rated for part of the
      current term and in no term before it, so there is no past-cycle
      counterpart to draw and nothing to align her against. Points come straight
