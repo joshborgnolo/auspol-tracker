@@ -36998,7 +36998,7 @@ function EffLines({
     type: "button",
     className: "pd-meta-k hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("aggregate-effect", "poll breakdown")
-  }, "2PP agg. effect"), React.createElement("span", {
+  }, "2PP aggregate effect"), React.createElement("span", {
     className: "pd-meta-v"
   }, shareOut ? prim.t ? React.createElement(React.Fragment, null, byBasis(true), React.createElement("span", {
     className: "pd-s-note"
@@ -41965,7 +41965,7 @@ function AllPollsView({
     setQ("");
     setSel(new Set());
     setLead("all");
-    setMeasure("lnp");
+    setMeasure(DEFAULT_MEASURE);
     setRange("all");
     setTagSel(new Set());
     if (focus.facet) setFacet(focus.facet);
@@ -42000,7 +42000,7 @@ function AllPollsView({
     setScope(defaultScopeFor(f));
     if (f !== "twopp") {
       setLead("all");
-      setMeasure("lnp");
+      setMeasure(DEFAULT_MEASURE);
     }
   };
   const jumpTo = id => {
@@ -42193,7 +42193,7 @@ function AllPollsView({
     setQ("");
     setSel(new Set());
     setLead("all");
-    setMeasure("lnp");
+    setMeasure(DEFAULT_MEASURE);
     setRange("all");
     setTagSel(new Set());
     setScope(false);
@@ -42477,7 +42477,7 @@ function AllPollsView({
     label: "Lead",
     open: pop,
     setOpen: setPop,
-    summary: [measure !== "lnp" ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null
+    summary: [measure !== DEFAULT_MEASURE ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null
   }, React.createElement("div", {
     className: "ap-pop-head"
   }, React.createElement("span", null, "Show the lead in")), React.createElement("div", {

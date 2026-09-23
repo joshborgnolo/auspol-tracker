@@ -2026,7 +2026,7 @@ function TppLine({ c, prefixed, note, hero, alt }) {
 }
 
 /* The poll's own pull on the figures a reader watches, as one ordinary row
-   of the provenance band: "2PP agg. effect   +0.2 for ALP vs L/NP; −0.4 for
+   of the provenance band: "2PP aggregate effect   +0.2 for ALP vs L/NP; −0.4 for
    ALP vs ON. Respondent-allocated: +0.1 for ALP vs L/NP" - the party named
    the way every figure in the panel names it, not as "Labor" beside a
    column of ALP/L/NP/GRN/ON. One clause per aggregate the wave feeds: the
@@ -2133,7 +2133,7 @@ function EffLines({ eff }) {
           clauses side by side, so naming a basis in the label would claim
           the wrong thing for half of them */}
       <button type="button" className="pd-meta-k hi-term"
-              onClick={() => window.AP.openTerm && window.AP.openTerm("aggregate-effect", "poll breakdown")}>2PP agg. effect</button>
+              onClick={() => window.AP.openTerm && window.AP.openTerm("aggregate-effect", "poll breakdown")}>2PP aggregate effect</button>
       <span className="pd-meta-v">
         {shareOut ? (prim.t ? (
           <React.Fragment>
