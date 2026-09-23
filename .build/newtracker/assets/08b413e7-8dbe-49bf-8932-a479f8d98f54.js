@@ -992,7 +992,12 @@ function TrendChart(props) {
                  mark values for Greens/One Nation/Others fail the text
                  threshold on paper (see the -text tokens in the template) */
               return { text: s.endLabel, x: sx(last.x) + 7 / scale, ideal: sy(last.y), y: sy(last.y),
-                       color: inkOf(s.color), op: s.endLabelOpacity != null ? s.endLabelOpacity : 1 };
+                       /* a colour with no text-weight variant (the house-lean
+                          palette) is pulled a third of the way to ink, or a
+                          light teal label sits under 3:1 on paper */
+                       color: /var\(--(alp|lnp|grn|onp|oth|mood-pos|mood-neg|ink[-\w]*)\)/.test(s.color)
+                         ? inkOf(s.color) : "color-mix(in oklch, " + s.color + " 62%, var(--ink))",
+                       op: s.endLabelOpacity != null ? s.endLabelOpacity : 1 };
             })
             .sort((a, b) => a.y - b.y);
           if (!labs.length) return null;
