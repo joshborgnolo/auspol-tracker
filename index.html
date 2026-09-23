@@ -18,12 +18,12 @@
        survives into reader mode. The descriptive phrasing still reaches
        every surface that has room for it – meta description for search
        snippets. -->
-  <title>auspol tracker – Australian federal opinion polling</title>
+  <title>auspol tracker – Australian federal election polling average</title>
   <meta name="color-scheme" content="light dark">
-  <meta property="og:title" content="auspol tracker – Australian federal opinion polling">
-  <meta name="description" content="Aggregated opinion polling for the next Australian federal election, set against the last twenty. Labor leads the Coalition 51.6–48.4 two-party preferred on implied preference flows (±1.2) – updated 21 September 2026 from 163 published polls across 12 polling houses.">
+  <meta property="og:title" content="auspol tracker – Australian federal election polling average">
+  <meta name="description" content="auspol tracker averages every published Australian federal opinion poll. As of 21 September 2026, Labor leads the Coalition 51.6–48.4 two-party preferred on implied preference flows (±1.2), from 163 polls by 12 pollsters. Primary votes, every poll, and the last twenty elections for comparison.">
   <meta property="og:type" content="website">
-  <meta property="og:description" content="Aggregated opinion polling for the next Australian federal election, set against the last twenty. Labor leads the Coalition 51.6–48.4 two-party preferred on implied preference flows (±1.2) – updated 21 September 2026 from 163 published polls across 12 polling houses.">
+  <meta property="og:description" content="auspol tracker averages every published Australian federal opinion poll. As of 21 September 2026, Labor leads the Coalition 51.6–48.4 two-party preferred on implied preference flows (±1.2), from 163 polls by 12 pollsters. Primary votes, every poll, and the last twenty elections for comparison.">
   <meta property="og:site_name" content="auspoltracker.com">
   <meta property="og:locale" content="en_AU">
   <meta property="og:url" content="https://auspoltracker.com/">
@@ -43,7 +43,7 @@
   <link rel="preload" href="assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/sourceserif4-latin.2a24bad4.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"Aggregated opinion polling for the next Australian federal election, set against the last twenty. Labor leads the Coalition 51.6–48.4 two-party preferred on implied preference flows (±1.2) – updated 21 September 2026 from 163 published polls across 12 polling houses.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"auspol tracker averages every published Australian federal opinion poll. As of 21 September 2026, Labor leads the Coalition 51.6–48.4 two-party preferred on implied preference flows (±1.2), from 163 polls by 12 pollsters. Primary votes, every poll, and the last twenty elections for comparison.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
   <style>
 @font-face {
   font-family: 'Crimson Text';
@@ -2908,7 +2908,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
       <h2>Sources</h2>
       <p>Roy Morgan, YouGov, Newspoll, Resolve, RedBridge/Accent, Essential, DemosAU, Freshwater, Spectre Strategy, Fox &amp; Hedgehog, DemosAU (MRP), Wolf &amp; Smith, YouGov (MRP), RedBridge/Accent (MRP), Roy Morgan (SMS), Agenda C Synesis. Field dates and sample sizes are listed per poll in the archive.</p>
 
-      <p class="ss-note">auspol tracker is an unofficial aggregate of published federal opinion polling.
+      <p class="ss-note" data-nosnippet>auspol tracker is an unofficial aggregate of published federal opinion polling.
         Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
         sound, and informative, but they are, in the end, estimates only. Federal polling archives
         I&#8217;ve located are stored <a href="https://auspoltracker.com/archives">here</a> for
@@ -49160,7 +49160,8 @@ function MethodNote({
   }, React.createElement("div", {
     className: "colophon"
   }, React.createElement("div", {
-    className: "colo-about"
+    className: "colo-about",
+    "data-nosnippet": ""
   }, React.createElement("p", {
     className: "colo-lede"
   }, "auspol tracker is an unofficial aggregate of published federal opinion polling."), React.createElement("p", {

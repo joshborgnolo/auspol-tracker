@@ -1674,7 +1674,7 @@ function MethodNote({ onInfo }) {
             does not claim. Right: every way out of the page. Each column is a
             statement over its own quieter footnote, which is why they balance
             at four lines apiece without either being padded to fit. */}
-        <div className="colo-about">
+        <div className="colo-about" data-nosnippet="">
           <p className="colo-lede">
             auspol tracker is an unofficial aggregate of published federal opinion polling.
           </p>

@@ -575,7 +575,7 @@ function buildStaticSummary() {
       <h2>Sources</h2>
       <p>${esc(sources)}. Field dates and sample sizes are listed per poll in the archive.</p>
 
-      <p class="ss-note">auspol tracker is an unofficial aggregate of published federal opinion polling.
+      <p class="ss-note" data-nosnippet>auspol tracker is an unofficial aggregate of published federal opinion polling.
         Best efforts are made to make the aggregate figures transparent, trustworthy, statistically
         sound, and informative, but they are, in the end, estimates only. Federal polling archives
         I&#8217;ve located are stored <a href="https://auspoltracker.com/archives">here</a> for
@@ -657,13 +657,17 @@ const cl = grabLatest();
 const cardAlt = `auspol tracker: Labor ${cl.alp2pp.toFixed(1)}, Coalition ${cl.lnp2pp.toFixed(1)} `
   + `two-party preferred${basisClause(cl)}, ±${cl.alp2ppCi95.toFixed(1)} points, updated ${cl.updated}, `
   + `with the trend since the 2025 election`;
-/* SERP + social description: the tagline phrasing leads, then the race and
-   provenance. Figures and their date share a sentence, so a stale cached
-   snippet stays self-dating. Reuses the same numbers as the card alt and
-   the summary below. */
-const metaDesc = `Aggregated opinion polling for the next Australian federal election, `
-  + `set against the last ${pastCycleWord()}. ${raceLine(cl)} two-party preferred${basisClause(cl)} (±${cl.alp2ppCi95}) `
-  + `– updated ${cl.updated} from ${cl.pollsTracked} published polls across ${cl.housesTracked} polling houses.`;
+/* SERP + social description. It opens with the site's name because Google
+   rewrites a snippet that doesn't match the query: on a search for "auspol
+   tracker" it skipped the old tagline-first description and quoted the
+   footer disclaimer, the one page line that began with the name. The date
+   leads the race sentence so a stale cached snippet stays self-dating even
+   after Google truncates it (~160 characters). Reuses the same numbers as
+   the card alt and the summary below. */
+const metaDesc = `auspol tracker averages every published Australian federal opinion poll. `
+  + `As of ${cl.updated}, ${raceLine(cl).replace(/^The /, "the ")} two-party preferred${basisClause(cl)} (±${cl.alp2ppCi95}), `
+  + `from ${cl.pollsTracked} polls by ${cl.housesTracked} pollsters. `
+  + `Primary votes, every poll, and the last ${pastCycleWord()} elections for comparison.`;
 
 /* Structured data. With no Wikipedia entry, Google's knowledge of the site
    (and its "About this result" source panel) is auto-derived from crawled
