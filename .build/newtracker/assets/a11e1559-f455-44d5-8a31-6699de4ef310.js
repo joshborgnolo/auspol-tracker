@@ -1797,23 +1797,34 @@ function DemographicsPanel({ rangeId = "all" }) {
           </div>
         ))}
       </div>
+      {/* The gist stays in view; the reading instructions fold, as the
+          Past cycles intro's do - all of it ran eight lines under the charts. */}
       <p className="table-hint">
-        Each poll says how far a group sits from its own overall figure. Those gaps are pooled over the
-        last {T.window} of polls, newer and larger polls counting for more as in every figure here, and
-        added to the site’s current figure for all voters. ± is the 95% margin. The charts show how
-        much higher or lower the party’s vote is in each group than among all voters, in percent,
-        month by month – built the way the site’s other monthly lines are, with each poll as a dot
-        and each line’s 95% interval shaded. Where two groups’ shading overlaps, the polls can’t
-        tell them apart that month.
-        −38% means the party’s vote in that group is 38% lower than among all voters, not 38
-        points. Measured this way a party’s growth doesn’t read as a widening divide, so a flat
-        line means the group moved with everyone else. Groups pool only where
-        pollsters cut them the same way
-        {tab.id === "age" ? " – YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : ""}.{" "}
+        The figures pool the last {T.window} of polls. Each chart shows how much higher or lower
+        the party’s vote is in each group than among all voters, month by month.{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender and education")}>
           Where the figures come from</button>
       </p>
+      <details className="view-how hint-how">
+        <summary>How to read these charts</summary>
+        <p className="table-hint">
+          Each poll says how far a group sits from its own overall figure. Those gaps are pooled,
+          newer and larger polls counting for more as in every figure here, and added to the site’s
+          current figure for all voters. ± is the 95% margin.
+        </p>
+        <p className="table-hint">
+          The charts are built the way the site’s other monthly lines are: each poll is a dot and
+          each line’s 95% interval is shaded. Where two groups’ shading overlaps, the polls can’t
+          tell them apart that month. −38% means the party’s vote in that group is 38% lower than
+          among all voters, not 38 points. Measured this way a party’s growth doesn’t read as a
+          widening divide, so a flat line means the group moved with everyone else.
+        </p>
+        <p className="table-hint">
+          Groups pool only where pollsters cut them the same way
+          {tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : ""}.
+        </p>
+      </details>
     </section>
   );
 }

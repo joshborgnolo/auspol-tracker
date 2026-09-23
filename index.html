@@ -2049,6 +2049,8 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   .term-pop { width: 100%; border-radius: 14px 14px 0 0; max-height: 80vh; padding-bottom: calc(16px + env(safe-area-inset-bottom)); }
 }
 .view-how { margin: 0 0 16px; }
+.hint-how { margin: 8px 2px 0; }
+.hint-how > .table-hint { margin-top: 8px; }
 .view-how > summary { cursor: pointer; width: fit-content; font: 600 13px var(--sans); color: var(--ink-2); padding: 4px 0; }
 .view-how > summary:hover { color: var(--ink); }
 .view-how[open] > summary { margin-bottom: 8px; }
@@ -39833,11 +39835,19 @@ function DemographicsPanel({
     className: "demo-house-when"
   }, houseList(st.houses.map(demoHouse)))), row("All voters", all, null, true, "The site’s current figure for all voters – the headline’s own estimate", "dash"), st.groups.map((g, i) => row(g.label, g.v[party], g.ci[party], false, `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"} · ${houseList(g.houses.map(demoHouse))} · ± ${g.ci[party].toFixed(1)} is the 95% margin`, demoRamp(color, st.groups.length, i))), chartFor(st)))), React.createElement("p", {
     className: "table-hint"
-  }, "Each poll says how far a group sits from its own overall figure. Those gaps are pooled over the last ", T.window, " of polls, newer and larger polls counting for more as in every figure here, and added to the site\u2019s current figure for all voters. \xB1 is the 95% margin. The charts show how much higher or lower the party\u2019s vote is in each group than among all voters, in percent, month by month \u2013 built the way the site\u2019s other monthly lines are, with each poll as a dot and each line\u2019s 95% interval shaded. Where two groups\u2019 shading overlaps, the polls can\u2019t tell them apart that month. \u221238% means the party\u2019s vote in that group is 38% lower than among all voters, not 38 points. Measured this way a party\u2019s growth doesn\u2019t read as a widening divide, so a flat line means the group moved with everyone else. Groups pool only where pollsters cut them the same way", tab.id === "age" ? " – YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : "", ".", " ", React.createElement("button", {
+  }, "The figures pool the last ", T.window, " of polls. Each chart shows how much higher or lower the party\u2019s vote is in each group than among all voters, month by month.", " ", React.createElement("button", {
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender and education")
-  }, "Where the figures come from")));
+  }, "Where the figures come from")), React.createElement("details", {
+    className: "view-how hint-how"
+  }, React.createElement("summary", null, "How to read these charts"), React.createElement("p", {
+    className: "table-hint"
+  }, "Each poll says how far a group sits from its own overall figure. Those gaps are pooled, newer and larger polls counting for more as in every figure here, and added to the site\u2019s current figure for all voters. \xB1 is the 95% margin."), React.createElement("p", {
+    className: "table-hint"
+  }, "The charts are built the way the site\u2019s other monthly lines are: each poll is a dot and each line\u2019s 95% interval is shaded. Where two groups\u2019 shading overlaps, the polls can\u2019t tell them apart that month. \u221238% means the party\u2019s vote in that group is 38% lower than among all voters, not 38 points. Measured this way a party\u2019s growth doesn\u2019t read as a widening divide, so a flat line means the group moved with everyone else."), React.createElement("p", {
+    className: "table-hint"
+  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : "", ".")));
 }
 const PARTY_C = {
   alp: "var(--alp)",
