@@ -13,7 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
-import { impliedAlp2pp, FLOW, FLOW_TABLE } from "./flows.mjs";
+import { impliedAlp2pp, FLOW, FLOW_TABLE, FLOW_LEF, impliedLefAlp2pp } from "./flows.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -973,6 +973,26 @@ const leaderMonths = MONTHS.map((ym) => {
   };
 }).filter(Boolean);
 
+/* A card's house credit-list names only houses still ASKING the question:
+   anyone with a reading in the six months before the series' own newest.
+   Deriving rather than writing names into copy isn't enough on its own -
+   scoped to the chart's whole span, the derivation kept crediting Freshwater
+   on the direction panel long after it stopped asking it (its last reading
+   is Oct 2025; it polled voting intention into May 2026). Ordering is
+   most-readings-first inside the window, ties alphabetical. */
+const CURRENT_HOUSE_MS = 183 * 86400000;
+const creditHouses = (items, firmOf, xOf) => {
+  if (!items.length) return [];
+  const newest = Math.max(...items.map(xOf));
+  const n = {};
+  for (const it of items) {
+    if (newest - xOf(it) > CURRENT_HOUSE_MS) continue;
+    const f = firmOf(it);
+    n[f] = (f in n) ? n[f] + 1 : 1;
+  }
+  return Object.keys(n).sort((a, b) => n[b] - n[a] || a.localeCompare(b));
+};
+
 /* ---- 5. national direction – right track / wrong track ------------------
    Given the SAME treatment as the 2PP and the primaries: sample-weighted,
    house-effect-adjusted monthly means. The houses asking this question are
@@ -995,16 +1015,13 @@ const dirRows = (field) => DIR.filter((d) => d[field] != null).map((d) => ({
 const dirHe = { right: houseEffectsFor(dirRows("right")), wrong: houseEffectsFor(dirRows("wrong")) };
 // Who actually asks this question, most-active first – derived rather than
 // written into the copy, so the panel can't claim a house that has stopped
-// polling it (or miss one that has started). Scoped to the months the chart
-// covers, for the same reason.
+// polling it (or miss one that has started). Recency-scoped via creditHouses:
+// chart-span alone still credited Freshwater eleven months after its last
+// reading.
 const MONTH_SET = new Set(MONTHS);
-const dirHouseCount = {};
-for (const d of DIR) {
-  if (!MONTH_SET.has(ymOf(d.date))) continue;
-  dirHouseCount[d.pollster] = (dirHouseCount[d.pollster] || 0) + 1;
-}
-const directionHouses = Object.keys(dirHouseCount)
-  .sort((a, b) => dirHouseCount[b] - dirHouseCount[a] || a.localeCompare(b));
+const directionHouses = creditHouses(
+  DIR.filter((d) => MONTH_SET.has(ymOf(d.date))),
+  (d) => d.pollster, (d) => Date.parse(d.date));
 // Every published reading behind the monthly line, for the panel's scatter.
 // Taken from the direction series rather than from the poll rows, because a
 // few waves asked this question without publishing voting intention and so
@@ -1274,7 +1291,7 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
   const vals = polls.map((d) => d.v);
   return {
     id: b.id, label: b.label, note: b.note, dashed: b.dashed, dash: b.dash,
-    houses: [...new Set(polls.map((d) => d.pollster))],
+    houses: creditHouses(polls, (d) => d.pollster, (d) => Date.parse(d.released)),
     polls, monthly, n: polls.length,
     lo: Math.min(...vals), hi: Math.max(...vals),
     latest: { v: last.v, firm: last.pollster, released: last.released, field: last.dateLabel,
@@ -1284,7 +1301,7 @@ const undecidedSeries = UNDECIDED_BASES.map((b) => {
 const undecided = undecidedSeries.length ? {
   series: undecidedSeries,
   n: undecidedRows.length,
-  houses: [...new Set(undecidedRows.map((r) => r.p.pollster))],
+  houses: creditHouses(undecidedRows, (r) => r.p.pollster, (r) => Date.parse(r.p.date)),
 } : null;
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
@@ -1798,18 +1815,24 @@ const fmtDate = (iso) => { const [y, m, d] = iso.split("-").map(Number); return 
    pure function of the data and every build reproduces it: one switch across
    this term, in June 2026, instead of three. */
 const RIVAL_DEADBAND = 1.0;
-const rivalLead = (() => {
+/* The walk is kept month by month, not just its end: Past cycles draws the
+   sitting term's 2PP against whichever rival held the spot in each month, so
+   that line and the hero can never disagree about who Labor was facing. */
+const rivalWalk = (() => {
   const onBy = Object.fromEntries(agg2ppSynthOn.map((d) => [d.ym, d]));
   let who = "alp_lnp";
-  for (const d of agg2ppSynth) {
+  return agg2ppSynth.map((d) => {
     const o = onBy[d.ym];
-    if (!o || d.alp == null || o.a == null) continue;
-    const gap = (100 - o.a) - (100 - d.alp);       // One Nation's share minus the Coalition's
-    if (gap > RIVAL_DEADBAND) who = "alp_on";
-    else if (gap < -RIVAL_DEADBAND) who = "alp_lnp";
-  }
-  return who;
+    if (o && d.alp != null && o.a != null) {
+      const gap = (100 - o.a) - (100 - d.alp);     // One Nation's share minus the Coalition's
+      if (gap > RIVAL_DEADBAND) who = "alp_on";
+      else if (gap < -RIVAL_DEADBAND) who = "alp_lnp";
+    }
+    return { ym: d.ym, who };
+  });
 })();
+const rivalLead = rivalWalk.length ? rivalWalk[rivalWalk.length - 1].who : "alp_lnp";
+const rivalByYm = Object.fromEntries(rivalWalk.map((r) => [r.ym, r.who]));
 
 /* The primary-vote facet's column order, shared by the Latest and All-polls
    tables. Highest aggregate sits leftmost – but the ALP/ON/LNP primaries have
@@ -2212,11 +2235,56 @@ const accuracy = accuracyCycles.length ? (() => {
   };
 })() : null;
 
+/* ---- the past terms' 2PP, on the implied basis ----------------------------
+   Every term's line reads its polls the way the sitting term's implied 2PP
+   does: primaries through ONE flow table, the one counted at the election
+   that opened the term (FLOW_LEF in flows.mjs – last-election flows, the
+   only table anyone inside the term could have used). So a line moves when
+   voting intentions moved, never because the houses' allocation methods
+   changed, and every term back to 1987 is on the same footing as today's.
+   The 1972–84 Morgan rows already carry this figure (tppEra, FLOW_ERAS).
+   The election row is the count itself and stays so. The houses' own
+   published 2PPs are untouched in the data and still score the final polls
+   (accuracyCycles), because there the question is what the pollsters said. */
+const cycleTppImp = (p, c) => {
+  const pub = p["tpp_" + c.gov] ?? null;
+  if (p.firm === "Election" || p.tppEra != null) return pub;
+  const t = FLOW_LEF[c.year];
+  if (!t) return pub;
+  const a = impliedLefAlp2pp(t, p);
+  if (a == null) return null;
+  return r2(c.gov === "alp" ? a : 100 - a);
+};
+/* The sitting term's contest eras: one run per stretch of months against the
+   same rival, named for it. Null while the term has only ever had one. */
+const RIVAL_NAME = { alp_lnp: "v Coalition", alp_on: "v One Nation" };
+function rivalEras(pts, c, cap) {
+  const segs = [];
+  for (const p of pts) {
+    if (!segs.length || segs[segs.length - 1].who !== p.who) segs.push({ who: p.who, from: p.iso, pts: [] });
+    segs[segs.length - 1].pts.push(p);
+  }
+  if (segs.length < 2) return null;
+  return segs.map((s, i) => ({ name: c.lead + " " + RIVAL_NAME[s.who], rival: s.who, from: i ? s.from : null,
+                               ...cycleSeries(s.pts, i === 0 ? c.eTpp : null, cap) }));
+}
 const CYCLE_DEFS = CYC_META.map((c) => {
   let primPts, tppPts, netPts, oppPts, hanPts, oppPrimPts, onpPts, ppmPts;
   if (c.current) {
     primPts = aggPrimary.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.alp }));
-    tppPts = agg2pp.map((d) => ({ m: monthsSince(d.ym + "-15", c.eDate), v: d.alp }));
+    /* The sitting term is drawn on the site's default basis, the implied 2PP,
+       and against the rival the hero's own ruling names in each month
+       (rivalWalk): Labor v Coalition until One Nation took the spot, Labor v
+       One Nation after. Every past term had one rival throughout – the other
+       party of government – so only this line can change contest, and it
+       carries its eras (tppEras below) so the chart can mark where it did.
+       The election row is the count, which is month 0's base either way. */
+    const onBy = Object.fromEntries(agg2ppSynthOn.map((d) => [d.ym, d]));
+    tppPts = agg2ppSynth.filter((d) => !d.election).map((d) => {
+      const who = rivalByYm[d.ym] === "alp_on" && onBy[d.ym] ? "alp_on" : "alp_lnp";
+      return { m: monthsSince(d.ym + "-15", c.eDate), v: who === "alp_on" ? onBy[d.ym].a : d.alp,
+               who, iso: d.ym + "-01" };
+    });
     /* The opposition chart reads the SAME term from the other side of the
        ballot box: same polls, same months, the losing party's column. Anchors
        come from the election that started the term (ELECTIONS carries every
@@ -2240,7 +2308,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
   } else {
     const ps = cyclePolls[c.src], as = cycleAppr[c.appr];
     primPts = ps.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p[c.gov] }));
-    tppPts = ps.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p["tpp_" + c.gov] }));
+    tppPts = ps.map((p) => ({ m: monthsSince(p.date, c.eDate), v: cycleTppImp(p, c) }));
     oppPrimPts = ps.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p[c.opp] }));
     onpPts = ps.map((p) => ({ m: monthsSince(p.date, c.eDate), v: p.onp }));
     // same rule as the current cycle: these lines are approve−disapprove, so a
@@ -2301,6 +2369,7 @@ const CYCLE_DEFS = CYC_META.map((c) => {
            oppr: oppr.obs, onp: alignObs(onp), ppmm: alignObs(ppmm) },
     han: sparseSeries(hanPts, months, cap),
     netEras: eraSeries(netPts, c.pmSpl, cap), oppEras: eraSeries(oppPts, c.oppSpl, cap),
+    tppEras: c.current ? rivalEras(tppPts, c, cap) : null,
     ppmEras: ppmErasFor(c, ppmPts, cap),
     // pairing name for the single-line legend when the pairing never
     // changed inside the measured window (e.g. "Albanese v Dutton")
@@ -2753,6 +2822,14 @@ for (const c of CYC_META) {
       alp: p.alp ?? null, lnp: p.lnp ?? null, grn: p.grn ?? null,
       onp: p.onp ?? null, oth: p.oth ?? null,
       tpp_alp: p.tpp_alp ?? null, tpp_lnp: p.tpp_lnp ?? null,
+      // the figure the term's line is built from (cycleTppImp): each wave's
+      // primaries at the opening election's flows; the house's own published
+      // pair rides beside it for the download
+      ...(() => {
+        if (p.firm === "Election") return {};
+        const alp = cycleTppImp(p, { ...c, gov: "alp" });
+        return alp == null ? {} : { imp_alp: r1(alp) };        // Coalition side is 100 − this
+      })(),
     })),
     approval: (cycleAppr[c.appr] || []).map((r) => ({
       date: r.date, firm: r.firm, m: mo(r.date),
@@ -2833,6 +2910,18 @@ window.AUSPOL = (function () {
      meaningful beside the implied line; the hero draws it with the
      basis comparison. */
   const flowSens = ${JSON.stringify(synthBand)};
+  /* The rival ruling month by month (§8's rivalWalk): which contest Labor
+     was losing worst in each month, deadbanded. Past cycles draws the
+     sitting term's 2PP – line and dots – against this month's rival. */
+  const rivalWalk = ${JSON.stringify(rivalWalk)};
+  /* The flow tables Past cycles reads each term through (flows.mjs FLOW_LEF,
+     plus the sitting term's FLOW), for Info's show-the-working table: ALP
+     shares per bucket, the one lumped flow where no split was published, and
+     each table's miss on the next election's primaries (bt, ALP points). */
+  const lefTables = ${JSON.stringify([
+    ...Object.entries(FLOW_LEF).map(([y, t]) => ({ year: +y, grn: t.grn ?? null, onp: t.onp ?? null, oth: t.oth ?? null, minor: t.minor ?? null, bt: t.bt })),
+    { year: 2025, grn: FLOW.grn, onp: FLOW.onp, oth: FLOW.oth, minor: null, bt: null },
+  ])};
   // which measures carry a house-effect adjustment (drives the method labels)
   const adjusted = ${JSON.stringify({ tpp: true, primary: true, alp_on: altAON.adjusted, lnp_on: altLON.adjusted, ppm: false, appr: true, synth: synthEffect.estimable })};
   /* Per-measure house effects, {firm: {v, n}} – snapshots read at t=Infinity,
@@ -2942,12 +3031,13 @@ window.AUSPOL = (function () {
     raw: { tpp: c.tpp, primary: c.primary, net: c.net, oppnet: c.oppnet, han: c.han, months: c.months, obs: c.obs,
            oppr: c.oppr, onp: c.onp, ppmm: c.ppmm,
            ...(c.netEras ? { netEras: c.netEras } : {}), ...(c.oppEras ? { oppEras: c.oppEras } : {}),
-           ...(c.ppmEras ? { ppmEras: c.ppmEras } : {}), ...(c.ppmPair ? { ppmPair: c.ppmPair } : {}) },
+           ...(c.ppmEras ? { ppmEras: c.ppmEras } : {}), ...(c.ppmPair ? { ppmPair: c.ppmPair } : {}),
+           ...(c.tppEras ? { tppEras: c.tppEras } : {}) },
   }));
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
@@ -2970,6 +3060,8 @@ console.log("cycle leader splits:", CYCLE_DEFS.map((c) => {
   if (c.oppEras) parts.push("opp: " + c.oppEras.map((e) => `${e.name} m${e.months[0]}–${e.months[e.months.length - 1]}`).join(" | "));
   return parts.length ? `${c.year}(${parts.join("; ")})` : null;
 }).filter(Boolean).join(" "));
+console.log("cycle 2PP contests:", CYCLE_DEFS.filter((c) => c.tppEras).map((c) => `${c.year}: ` +
+  c.tppEras.map((e) => `${e.name} m${e.months.find((m, i) => e.vals[i] != null)}–${e.months[e.months.length - 1]}`).join(" | ")).join(" ") || "one rival throughout");
 console.log("MONTHS:", MONTHS.length, MONTHS[0], "→", MONTHS[MONTHS.length - 1]);
 console.log("agg2pp:", agg2pp.length, "pts | first:", agg2pp[0], "| last:", agg2pp[agg2pp.length - 1]);
 console.log("synth2pp:", agg2ppSynth.length, "pts | anchor(implied):", agg2ppSynth[0].alp, "vs count 55.2 | last:", agg2ppSynth[agg2ppSynth.length - 1]);
