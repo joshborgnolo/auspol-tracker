@@ -116,7 +116,7 @@ function straightPath(pts, sx, sy) {
  * ------------------------------------------------------------------ */
 function TrendChart(props) {
   const {
-    height = 360, xDomain, yDomain, pad = { l: 46, r: 20, t: 18, b: 34 },
+    height = 360, xDomain, yDomain, pad: padProp = { l: 46, r: 20, t: 18, b: 34 },
     series: seriesProp = [], scatter: scatterProp = [], yTicks = [], xTicks = [], refLines = [],
     bands = [], areas = [], fmt = (v) => v.toFixed(1), unit = "", tooltipTitle: tooltipTitleProp,
     onHoverIndex, spine: spineProp, axisFont = 15, events = [], extraRows: extraRowsProp, ariaLabel,
@@ -208,11 +208,38 @@ function TrendChart(props) {
   const tooltipTitle = drawn.tooltipTitle, extraRows = drawn.extraRows;
   React.useEffect(() => { if (!travelling.current) prev.current = fresh; });
 
+  const ref = useRef(null);
+  // axis text in real on-screen px – normalise by measured width so every
+  // chart's labels match regardless of column width / responsive stacking
+  const [cw, setCw] = useState(VB.W);
+  React.useEffect(() => {
+    if (!ref.current) return;
+    const el = ref.current;
+    const update = () => setCw(el.getBoundingClientRect().width || VB.W);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  /* Direct end-of-line labels need room past the last point, and it has to
+     be found in SCREEN px: the viewBox is a fixed width, so a phone's label
+     costs three times the plot units a laptop's does. The right pad grows to
+     the longest label rather than every caller guessing a number. */
+  const pad = (() => {
+    /* only labels that finish at the right edge need it - a past term's
+       year label ends mid-plot, where there is room already */
+    const edge = xDomain[1] - 0.05 * (xDomain[1] - xDomain[0]);
+    const labs = seriesProp.filter((s) => s.endLabel && s.opacity !== 0 && s.points.length
+      && s.points[s.points.length - 1].x >= edge).map((s) => s.endLabel);
+    if (!labs.length) return padProp;
+    const px = Math.max(...labs.map((t) => [...t].reduce((n, ch) =>
+      n + (ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : 0.72), 0))) * 10.5 * 0.95 + 12;
+    return { ...padProp, r: Math.max(padProp.r, px / (cw / VB.W)) };
+  })();
   const { sx, sy, W, H } = makeScales({ height, xDomain: win, yDomain, pad });
   const [hover, setHover] = useState(null);     // {index, clientX}
   const [dot, setDot] = useState(null);         // hovered scatter point
   const [evt, setEvt] = useState(null);         // hovered key event {e, x, y}
-  const ref = useRef(null);
   /* The readout's own width, measured off the page. The clamp below needs it,
      and every attempt to name it in advance has gone stale as rows were added
      to the panel – see the note there. */
@@ -233,18 +260,6 @@ function TrendChart(props) {
   const plotId = clipId + "p";      // the plot area itself, which never travels
   const wipeId = clipId + "w";      // + the series id, for a line being erased
 
-  // axis text in real on-screen px – normalise by measured width so every
-  // chart's labels match regardless of column width / responsive stacking
-  const [cw, setCw] = useState(VB.W);
-  React.useEffect(() => {
-    if (!ref.current) return;
-    const el = ref.current;
-    const update = () => setCw(el.getBoundingClientRect().width || VB.W);
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
   const scale = cw / W;                 // px per user-unit
   const axisUnits = 11 / scale;         // → ~11px on screen, every chart
   const refUnits = 10.5 / scale;
@@ -841,9 +856,23 @@ function TrendChart(props) {
           <line key={"r" + i} x1={pad.l} x2={W - pad.r} y1={sy(r.y)} y2={sy(r.y)}
                 className="refline" stroke={r.color || "currentColor"} />
         ))}
-        {/* x ticks */}
-        {xTicks.map((t, i) => (
-          <text key={"x" + i} x={sx(t.x)} y={H - 10} className="axis-label x" style={{ fontSize: axisUnits }} textAnchor="middle">{t.label}</text>
+        {/* x ticks – thinned until neighbours clear each other on SCREEN: a
+            phone kept every second month and still ran "Nov Jan ’26 Mar"
+            into one another. Year-bearing labels win a thinning; the rest
+            keep their spacing from them. */}
+        {(() => {
+          if (xTicks.length < 3) return xTicks;
+          const pxOf = (t) => [...t.label].length * 6.3 + 10;           // ~11px sans, plus air
+          const fits = (ts) => ts.every((t, i) => i === 0
+            || (sx(t.x) - sx(ts[i - 1].x)) * scale >= (pxOf(t) + pxOf(ts[i - 1])) / 2);
+          let ts = xTicks;
+          for (let k = 2; !fits(ts) && k <= 6; k++) {
+            const anchor = Math.max(0, xTicks.findIndex((t) => /’/.test(t.label) && t !== xTicks[0]));
+            ts = xTicks.filter((_, i) => (i - anchor) % k === 0);
+          }
+          return ts;
+        })().map((t, i) => (
+          <text key={"x" + t.x} x={sx(t.x)} y={H - 10} className="axis-label x" style={{ fontSize: axisUnits }} textAnchor="middle">{t.label}</text>
         ))}
         {/* Key events – geometry from evPlaced above; this only draws it. */}
         {evPlaced.map((p, i) => {

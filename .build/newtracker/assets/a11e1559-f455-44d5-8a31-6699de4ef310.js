@@ -229,6 +229,10 @@ function PrimaryVotePanel({ rangeId }) {
     width: p.id === "oth" ? 2 : 3,
     dashed: p.id === "oth",
     opacity: hidden[p.id] ? 0 : 1,
+    /* named at the line's end: Labor, One Nation and the Coalition finish
+       within a few points of each other, and red/orange alone does not
+       separate them for a colour-blind reader */
+    endLabel: p.short,
   }));
 
   // The published readings behind each line. This chart needs them MORE than
@@ -964,6 +968,10 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           id: d.era ? d.r.mk + "-" + d.era : d.r.mk,
           label: d.era === "ley" ? "Ley" : d.r.label, color: d.r.L.color, dashed: d.r.dashed,
           endCap: d.era === "ley" ? false : undefined,
+          /* named at the end, once per leader: the dashed Albanese (his
+             head-to-head with Hanson) would only repeat the solid one's name */
+          endLabel: d.era === "ley" || (d.r.dashed && drawRows.some((o) => o !== d && !o.r.dashed && o.r.L.short === d.r.L.short))
+            ? undefined : (d.r.L.short || d.r.L.name || d.r.label),
           /* The three-way is seven months against the two-way's fourteen, so
              every line here retreats by a different amount – each needs its own
              window or the shorter ones arrive at full length and snap. */
@@ -1220,6 +1228,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
             id: d.era ? L.id + "-" + d.era : L.id,
             label: (d.era === "ley" ? "Ley" : L.short) + " net", color: L.color,
             endCap: d.era === "ley" ? false : undefined,
+            endLabel: d.era === "ley" ? undefined : L.short,
             /* Hanson has nine months of favourability against five of
                approval, so her line has to shorten while the other two barely
                move. Each carries its own window for that reason. */
@@ -1356,8 +1365,8 @@ function DirectionPanel({ rangeId }) {
         pad={{ l: 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={[
-          { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right") },
-          { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong") },
+          { id: "right", label: "Right direction", color: "var(--mood-pos)", points: series(pts, "right"), endLabel: "Right" },
+          { id: "wrong", label: "Wrong track", color: "var(--mood-neg)", points: series(pts, "wrong"), endLabel: "Wrong" },
         ]}
         spine={series(pts, "right")}
         areas={dirAreas}
@@ -1567,7 +1576,8 @@ function OnSourcesPanel({ rangeId }) {
         // two-digit shares ("60%") at the phone's 28px axis need the room
         pad={{ l: narrow ? 84 : 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
-        series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: d.sr.color, points: series(d.pts, "v") }))}
+        series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: d.sr.color, points: series(d.pts, "v"),
+                                    endLabel: d.sr.short || d.sr.label.replace(/ voters$/, "") }))}
         spine={series(spine, "v")}
         scatter={drawn.flatMap((d) => d.dots)} pollFacet="twopp"
         tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}
@@ -1661,7 +1671,7 @@ function DemographicsPanel({ rangeId = "all" }) {
   const rel = (g, a) => 100 * (g / a - 1);
   const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
-  const chartFor = (st) => {
+  const build = (st, firstXShared) => {
     const n = st.groups.length;
     const allAt = new Map(T.allMonthly.map((m) => [m[0], m[1 + ki]]));
     const lines = st.groups.map((g, i) => ({ g, color: demoRamp(color, n, i),
@@ -1673,7 +1683,7 @@ function DemographicsPanel({ rangeId = "all" }) {
     if (!lines.length) return null;
     // the houses asked from Feb 2026 (Resolve's age and gender from mid-2025),
     // so a set's chart opens at its first month, as the One Nation panel does
-    const firstX = Math.min(...lines.map((l) => l.pts[0].x));
+    const firstX = firstXShared != null ? firstXShared : Math.min(...lines.map((l) => l.pts[0].x));
     const xDomain = [Math.max(rangeLo, firstX - 0.06), rangeHi];
     const inX = (x) => x >= xDomain[0] && x <= xDomain[1];
     const allPts = filterPts(T.allMonthly.map((m) => ({ ym: m[0], x: D.mx(m[0]), v: 0 }))
@@ -1693,13 +1703,30 @@ function DemographicsPanel({ rangeId = "all" }) {
     // the domain covers the bands too, or the widest months would run off the plot
     const vals = drawn.flatMap((l) => l.pts.map((d) => d.v)).concat(allPts.map((d) => d.v), dots.map((d) => d.y),
       areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
-    /* the finest step that keeps to six gridlines, and never a floor under
-       −100%: no group can sit more than 100% below all voters */
-    const span = Math.max(...vals) - Math.min(...vals);
+    return { st, n, lines, firstX, xDomain, allPts, drawn, dots, areas, vals };
+  };
+  /* The sets on a tab sit side by side (by age | by generation), so they
+     share a time axis and a scale: two charts starting in different months
+     with different gridlines invited a comparison neither could support. */
+  const builtFirst = tab.sets.map((st) => build(st, null)).filter(Boolean);
+  const sharedFirstX = builtFirst.length ? Math.min(...builtFirst.map((b) => b.firstX)) : null;
+  const built = new Map(tab.sets.map((st) => [st.id, build(st, sharedFirstX)]));
+  const sharedVals = [...built.values()].filter(Boolean).flatMap((b) => b.vals);
+  /* the finest step that keeps to six gridlines, and never a floor under
+     −100%: no group can sit more than 100% below all voters */
+  const sharedAxis = (() => {
+    if (!sharedVals.length) return null;
+    const span = Math.max(...sharedVals) - Math.min(...sharedVals);
     const step = [10, 20, 25, 50, 100].find((st) => span / st <= 6) || 200;
-    const fit = fitDomain(vals, step, 0);
+    const fit = fitDomain(sharedVals, step, 0);
     const domain = [Math.max(-100, fit.domain[0]), fit.domain[1]];
-    const ticks = fit.ticks.filter((t) => t > domain[0]);
+    return { domain, ticks: fit.ticks.filter((t) => t > domain[0]) };
+  })();
+  const chartFor = (st0) => {
+    const b = built.get(st0.id);
+    if (!b || !sharedAxis) return null;
+    const { st, n, xDomain, allPts, drawn, dots, areas } = b;
+    const { domain, ticks } = sharedAxis;
     const signed = (v) => (Math.round(v) > 0 ? "+" : Math.round(v) < 0 ? "\u2212" : "") + Math.abs(Math.round(v));
     const by = st.label ? st.label.replace(/^By /, "") : tab.label.toLowerCase();
     return (
@@ -1714,7 +1741,9 @@ function DemographicsPanel({ rangeId = "all" }) {
           pad={{ l: narrow ? 92 : 76, r: 60, t: 16, b: narrow ? 66 : 56 }}
           xTicks={buildXTicks(xDomain[0], xDomain[1])}
           series={[{ id: "all", label: "All voters", color: "var(--ink-3)", dashed: true, points: series(allPts, "v") },
-                   ...drawn.map((l) => ({ id: l.g.label, label: l.g.label, color: l.color, points: series(l.pts, "v") }))]}
+                   ...drawn.map((l) => ({ id: l.g.label, label: l.g.label, color: l.color, points: series(l.pts, "v"),
+                                          /* three shades of one party colour: the name at the line's end is what tells them apart */
+                                          endLabel: l.g.label }))]}
           areas={areas}
           spine={series(allPts, "v")}
           scatter={dots} pollFacet="primary"

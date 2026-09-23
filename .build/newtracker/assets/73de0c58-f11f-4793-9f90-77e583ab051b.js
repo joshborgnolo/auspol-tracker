@@ -311,6 +311,10 @@ function Header({ isDark, onToggleTheme }) {
      the app is hidden the dot hides with it, so the way back is a pill
      portaled onto <body> - createPortal, not a second mount point. */
   const [staticView, setStaticView] = useState(false);
+  /* the colophon's "plain text version" link opens the same view; the
+     freshness dot used to be its only door - a 7px target, and on phones a
+     click-only span inside an aria-hidden block */
+  useEffect(() => { window.AP.openStatic = () => setStaticView(true); }, []);
   useEffect(() => {
     document.body.classList.toggle("ss-view", staticView);
     /* mount marks the article inert so nothing inside it can take focus or a
@@ -337,11 +341,16 @@ function Header({ isDark, onToggleTheme }) {
     <header className="site-head">
       <div className="brand">
         <h1 className="wordmark stacked">
+          {/* The button takes its NAME from the wordmark and describes its
+              action separately. An aria-label here used to replace the
+              wordmark, so the page's h1 was announced as "Wind the dial
+              back: replay the term…" and the site's name was never read. */}
           <button className="wm-glyph" onClick={openStory}
                   title="Wind the dial back through the term"
-                  aria-label="Wind the dial back: replay the term on the masthead dial">
+                  aria-describedby="wm-action">
             <span className="wm-textcol">
               <span className="wm-name" ref={wmName}>auspol</span>
+              <span className="sr-only"> </span>
               <span className="wm-track" ref={wmTrack}>tracker</span>
             </span>
             {/* 57px sizes the ink to 74% of the wordmark's height, the
@@ -352,11 +361,12 @@ function Header({ isDark, onToggleTheme }) {
             <GlyphDial className="wm-dial" svgRef={glyphRef} width="57" height="39.7" />
           </button>
           <span className="wm-sr">– Australian federal polling</span>
+          <span id="wm-action" hidden>Replays the term on the masthead dial</span>
         </h1>
         <p className="tagline">Aggregated opinion polling for the next Australian <br className="tagline-br"></br>federal election, set against the last {pastWord}.</p>
         <div className="head-meta-compact" aria-hidden="true">
           <span className={"fresh-dot fresh-toggle " + fresh.state}
-                onClick={() => setStaticView(true)}></span>
+                onClick={() => setStaticView(true)}></span>{" "}
           Updated {D.latest.published} · {D.latest.pollsTracked} polls
         </div>
       </div>
@@ -366,7 +376,7 @@ function Header({ isDark, onToggleTheme }) {
             <span className="meta-k">Last poll</span>
             <span className="meta-v">
               <button type="button" className={"fresh-dot fresh-toggle " + fresh.state}
-                      onClick={() => setStaticView(true)}
+                      onClick={() => setStaticView(true)} tabIndex={-1}
                       aria-label="Read this page as a plain, static article"
                       title="Read this page as a plain, static article"></button>
               {D.latest.published}
@@ -1091,8 +1101,8 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
   // really noise. Where the series is too thin to weight, plot the readings
   // only and let the reader see the scatter for what it is.
   const heroSeries = !adjusted ? [] : [
-    { id: "a", label: m.a.name, color: colA, points: series(drawPts, "a"), width: 3.6 },
-    { id: "b", label: m.b.name, color: colB, points: series(drawPts, "b"), width: 3.6 },
+    { id: "a", label: m.a.name, color: colA, points: series(drawPts, "a"), width: 3.6, endLabel: m.a.abbr },
+    { id: "b", label: m.b.name, color: colB, points: series(drawPts, "b"), width: 3.6, endLabel: m.b.abbr },
   ];
   /* The compare overlay is the OTHER basis: by default (implied) the dashed
      line is the published-basis aggregate, gen-data's agg2pp; on the
@@ -1706,6 +1716,11 @@ function MethodNote({ onInfo }) {
             </a>{" "}
             for safekeeping and convenience.
           </p>
+          <p className="colo-arch">
+            <button type="button" className="hi-term colo-plain"
+                    onClick={() => window.AP.openStatic && window.AP.openStatic()}>Read this page as plain text</button>
+            {" "}– every figure and the method, without charts.
+          </p>
         </div>
       </div>
     </footer>
@@ -2021,9 +2036,17 @@ function App() {
 
   return (
     <div className="page">
+      {/* Twelve tab stops (masthead, theme, the next-poll links, the docked
+          score) sit ahead of the content. Not an href="#…": the hash is the
+          tab router, so the link moves focus itself. */}
+      <a className="skip-link" href="#" onClick={(e) => {
+        e.preventDefault();
+        const m = document.getElementById("main-content");
+        if (m) { m.focus({ preventScroll: true }); m.scrollIntoView({ block: "start" }); }
+      }}>Skip to content</a>
       <Header isDark={isDark} onToggleTheme={cycleTheme} />
       <Tabs tabs={TABS} active={tab} onChange={goTab} tppMatchup={tppMatchup} tppBasis={tppBasis} />
-      <main className="content">
+      <main className="content" id="main-content" tabIndex={-1}>
         {/* The panel the tab strip points at. There was no role="tabpanel" on
             the page at all, so aria-controls had no target and a screen reader
             that moved to the "tab panel" landed nowhere. tabIndex=0 makes the

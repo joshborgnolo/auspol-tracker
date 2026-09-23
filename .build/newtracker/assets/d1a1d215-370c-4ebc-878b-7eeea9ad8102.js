@@ -3828,7 +3828,7 @@ function VariancePanel({ facet, rangeId }) {
 
   const chartSeries = rows.map((r) => ({
     id: r.m.id, label: r.m.label, color: r.m.color, width: 3, dashed: !!r.m.dashed,
-    opacity: hidden[r.m.id] ? 0 : 1,
+    opacity: hidden[r.m.id] ? 0 : 1, endLabel: r.m.label,
     points: r.pts.filter((d) => d.sigma != null && inWin(d))
       .map((d) => ({ x: d.x, y: d.sigma, note: d.R.toFixed(2) + "×" })),
   })).filter((s) => s.points.length > 1);
@@ -4084,9 +4084,21 @@ function HouseLeanPanel({ rangeId }) {
     return { firm, color: houseLeanColour(firm), all, pts: all.filter(inWin) };
   });
 
+  /* Eleven houses in near-neighbour hues were a tangle nobody could read by
+     colour. With more than four on the chart, the houses leaning furthest
+     stay at full strength and carry their names at the line's end; the rest
+     recede to context. Four or fewer (a reader's own pick) are all named. */
+  const shownN = rows.filter((r) => !hidden[r.firm]).length;
+  /* past the first gridline, or failing three of those, the three furthest
+     out - a quiet month still names its edges rather than fading every line */
+  const byLean = rows.filter((r) => !hidden[r.firm])
+    .sort((a, b) => Math.abs(b.all[b.all.length - 1].y) - Math.abs(a.all[a.all.length - 1].y));
+  const named = new Set(byLean.filter((r, i) => i < 3 || Math.abs(r.all[r.all.length - 1].y) >= LEAN_SURFACE).map((r) => r.firm));
+  const standsOut = (r) => named.has(r.firm);
   const chartSeries = rows.map((r) => ({
     id: r.firm, label: r.firm, color: r.color, width: 3,
-    opacity: hidden[r.firm] ? 0 : 1,
+    opacity: hidden[r.firm] ? 0 : (shownN > 4 && !standsOut(r) ? 0.35 : 1),
+    endLabel: shownN <= 4 || standsOut(r) ? r.firm : undefined,
     points: r.pts,
   })).filter((s) => s.points.length > 1);
   if (!chartSeries.length) return null;

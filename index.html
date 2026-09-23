@@ -143,7 +143,7 @@
   --accent: oklch(0.50 0.070 205);
   --chart-bg: var(--surface);
   --mood-pos: oklch(0.52 0.085 200);
-  --mood-neg: oklch(0.505 0.092 36);
+  --mood-neg: oklch(0.44 0.045 50);
   --chg-up:   oklch(0.505 0.110 152);
   --chg-down: oklch(0.510 0.140 25);
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
@@ -193,7 +193,7 @@ body.dark {
   --oth-text: var(--oth);
   --accent: oklch(0.70 0.080 205);
   --mood-pos: oklch(0.70 0.105 200);
-  --mood-neg: oklch(0.685 0.105 38);
+  --mood-neg: oklch(0.62 0.045 45);
   --chg-up:   oklch(0.735 0.135 152);
   --chg-down: oklch(0.700 0.145 25);
   --shadow: 0 1px 2px oklch(0 0 0 / 0.30), 0 8px 28px oklch(0 0 0 / 0.40);
@@ -663,6 +663,16 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
   top: 50%; transform: translateY(-50%);
   height: 44px;
 }
+.hb-q, .info-index button { position: relative; }
+.hb-q::after, .info-index button::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: max(100%, 44px); height: 44px; transform: translate(-50%, -50%);
+}
+a.pollster-link, a.pollster-method, a.np-link, a.tn-link { position: relative; }
+a.pollster-link::after, a.pollster-method::after, a.np-link::after, a.tn-link::after {
+  content: ""; position: absolute; left: 0; right: 0; top: 50%;
+  height: max(100%, 24px); transform: translateY(-50%);
+}
 .ap-search-x::after {
   content: ""; position: absolute; left: -4px; right: -4px;
   top: 50%; transform: translateY(-50%); height: 36px;
@@ -913,8 +923,8 @@ body.dark .ci-band { opacity: 0.22; }
 body.dark .sens-band { opacity: 0.10; }
 .hl-band { width: 18px; height: 11px; border-radius: 2px;
   background: linear-gradient(to bottom,
-    color-mix(in oklch, var(--alp) 13%, transparent) 0 55%,
-    color-mix(in oklch, var(--lnp) 13%, transparent) 45% 100%); }
+    color-mix(in oklch, var(--alp) 26%, transparent) 0 55%,
+    color-mix(in oklch, var(--lnp) 26%, transparent) 45% 100%); }
 .hl-band-sens { width: 18px; height: 11px; border-radius: 2px;
   background: color-mix(in oklch, var(--alp) 10%, transparent); }
 @media (max-width: 640px) {
@@ -1124,7 +1134,10 @@ body.dark .sens-band { opacity: 0.10; }
   font-family: var(--sans); transition: all .15s ease; white-space: nowrap;
 }
 .legend-chip:hover { border-color: var(--ink-faint); }
-.legend-chip.off { opacity: 0.4; }
+.legend-chip.off { background: transparent; border-style: dashed; }
+.legend-chip.off:not(.residual) .legend-swatch { background: transparent !important; box-shadow: inset 0 0 0 1.5px var(--ink-3); }
+.legend-chip.off .legend-name { color: var(--ink-3); }
+.legend-chip.off .delta { opacity: 0.8; }
 .legend-swatch { width: 9px; height: 9px; border-radius: 2px; }
 .legend-name { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
 .legend-val { font-size: 12.5px; font-weight: 700; color: var(--ink); }
@@ -1217,8 +1230,8 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 .appr-top .leader-name { font-size: 13.5px; }
 .net { margin-left: auto; font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums;
   transition: color .32s cubic-bezier(.4, .1, .25, 1); }
-.net.pos { color: var(--grn-text); }
-.net.neg { color: var(--alp-text); }
+.net.pos { color: var(--mood-pos); }
+.net.neg { color: var(--mood-neg); }
 .fav-mark {
   font-size: 8px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--ink-3); vertical-align: super; margin-left: 3px; cursor: help;
@@ -1787,6 +1800,13 @@ button.acc-spread[aria-pressed="true"] {
 }
 .disclaimer { margin: 13px 0 0; font-size: 11.5px; line-height: 1.65; color: var(--ink-3); }
 .colo-arch { margin: 20px 0 0; font-size: 12.5px; line-height: 1.65; color: var(--ink-3); }
+.colo-arch + .colo-arch { margin-top: 6px; }
+.colo-plain { font-size: inherit; }
+.skip-link { position: absolute; left: 12px; top: -60px; z-index: 1000; padding: 8px 14px;
+  border-radius: 999px; background: var(--ink); color: var(--bg); font: 600 14px/1 var(--sans);
+  text-decoration: none; }
+.skip-link:focus { top: 12px; }
+main.content:focus { outline: none; }
 a.colo-link { color: var(--ink-2); text-decoration: none; }
 a.colo-link:hover, a.colo-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 a.colo-link:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
@@ -1910,7 +1930,7 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
   .tn-item.tn-park { position: absolute; visibility: hidden; }
 }
 .tn-lab { font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
-  color: var(--ink-faint); }
+  color: var(--ink-3); }
 button.tn-jump { appearance: none; background: none; border: 0; margin: 0; padding: 0;
   font: inherit; letter-spacing: inherit; color: inherit; cursor: pointer }
 button.tn-jump:hover, button.tn-jump:focus-visible { text-decoration: underline;
@@ -1925,7 +1945,7 @@ a.tn-link { color: inherit; text-decoration: none; cursor: pointer; }
 a.tn-link:hover, a.tn-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 a.tn-link:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
 a.tn-link:hover .plink-mark, a.tn-link:focus-visible .plink-mark { color: var(--ink-2); }
-.tn-maybe { color: var(--ink-faint); }
+.tn-maybe { color: var(--ink-3); }
 .tabs-sentinel { height: 0; margin: 0; padding: 0; pointer-events: none; }
 .tabs {
   position: relative;
@@ -2054,7 +2074,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 .cyc-main:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .cyc-x {
   border: 0; background: none; cursor: pointer; font-family: var(--sans);
-  font-size: 14px; font-weight: 500; line-height: 1; color: var(--ink-faint);
+  font-size: 14px; font-weight: 500; line-height: 1; color: var(--ink-3);
   padding: 8px 9px 8px 4px; border-radius: 0 8px 8px 0; flex: none;
   transition: color .15s ease;
 }
@@ -2149,7 +2169,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 }
 .cyc-drawn-label {
   font-family: var(--sans); font-size: 11px; font-weight: 600;
-  letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-faint); margin-right: 2px;
+  letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin-right: 2px;
 }
 .cyc-drawn-item {
   display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
@@ -2165,7 +2185,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 .cyc-drawn-x {
   width: 17px; height: 17px; border: 0; border-radius: 50%; padding: 0; cursor: pointer;
   display: inline-flex; align-items: center; justify-content: center;
-  background: none; color: var(--ink-faint);
+  background: none; color: var(--ink-3);
   font-family: var(--sans); font-size: 13px; line-height: 1;
 }
 .cyc-drawn-x:hover { color: var(--ink); background: color-mix(in oklch, var(--ink) 12%, transparent); }
@@ -2451,7 +2471,7 @@ a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--
 }
 .npd-list .npd-row + .npd-row { border-top: 1px solid var(--line-2); }
 .npd-cols { padding: 6px 0 3px; font-size: 10px; font-weight: 700;
-  color: var(--ink-faint); }
+  color: var(--ink-3); }
 .npd-cols span:last-child { margin-left: auto; }
 .npd-field { color: var(--ink-2); }
 button.npd-field-link {
@@ -2470,7 +2490,7 @@ a.npd-pub-link { text-decoration: none; cursor: pointer; }
 a.npd-pub-link:hover, a.npd-pub-link:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 a.npd-pub-link:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
 a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { color: var(--ink-2); }
-.npd-pub.none { color: var(--ink-faint); font-weight: 500; }
+.npd-pub.none { color: var(--ink-3); font-weight: 500; }
 .npd-gap { margin-left: auto; color: var(--ink-3); white-space: nowrap; }
 .npd-foot { margin: 8px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ink-3); max-width: 62ch; }
 @media (prefers-reduced-motion: reduce) { .np-detail { animation: none; } }
@@ -2520,7 +2540,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 }
 .ap-ctl-lab {
   font-family: var(--sans); font-size: 10.5px; font-weight: 700;
-  letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-faint);
+  letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3);
 }
 .legend-val.vr-herded { color: var(--accent); }
 .legend-val.vr-chance { color: var(--ink-3); }
@@ -36330,7 +36350,7 @@ function TrendChart(props) {
     height = 360,
     xDomain,
     yDomain,
-    pad = {
+    pad: padProp = {
       l: 46,
       r: 20,
       t: 18,
@@ -36421,6 +36441,27 @@ function TrendChart(props) {
   React.useEffect(() => {
     if (!travelling.current) prev.current = fresh;
   });
+  const ref = useRef(null);
+  const [cw, setCw] = useState(VB.W);
+  React.useEffect(() => {
+    if (!ref.current) return;
+    const el = ref.current;
+    const update = () => setCw(el.getBoundingClientRect().width || VB.W);
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const pad = (() => {
+    const edge = xDomain[1] - 0.05 * (xDomain[1] - xDomain[0]);
+    const labs = seriesProp.filter(s => s.endLabel && s.opacity !== 0 && s.points.length && s.points[s.points.length - 1].x >= edge).map(s => s.endLabel);
+    if (!labs.length) return padProp;
+    const px = Math.max(...labs.map(t => [...t].reduce((n, ch) => n + (ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : 0.72), 0))) * 10.5 * 0.95 + 12;
+    return {
+      ...padProp,
+      r: Math.max(padProp.r, px / (cw / VB.W))
+    };
+  })();
   const {
     sx,
     sy,
@@ -36435,7 +36476,6 @@ function TrendChart(props) {
   const [hover, setHover] = useState(null);
   const [dot, setDot] = useState(null);
   const [evt, setEvt] = useState(null);
-  const ref = useRef(null);
   const tipRef = useRef(null);
   const [tipW, setTipW] = useState(0);
   React.useLayoutEffect(() => {
@@ -36446,16 +36486,6 @@ function TrendChart(props) {
   const clipId = "clip" + React.useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const plotId = clipId + "p";
   const wipeId = clipId + "w";
-  const [cw, setCw] = useState(VB.W);
-  React.useEffect(() => {
-    if (!ref.current) return;
-    const el = ref.current;
-    const update = () => setCw(el.getBoundingClientRect().width || VB.W);
-    update();
-    const ro = new ResizeObserver(update);
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
   const scale = cw / W;
   const axisUnits = 11 / scale;
   const refUnits = 10.5 / scale;
@@ -37022,8 +37052,18 @@ function TrendChart(props) {
     y2: sy(r.y),
     className: "refline",
     stroke: r.color || "currentColor"
-  })), xTicks.map((t, i) => React.createElement("text", {
-    key: "x" + i,
+  })), (() => {
+    if (xTicks.length < 3) return xTicks;
+    const pxOf = t => [...t.label].length * 6.3 + 10;
+    const fits = ts => ts.every((t, i) => i === 0 || (sx(t.x) - sx(ts[i - 1].x)) * scale >= (pxOf(t) + pxOf(ts[i - 1])) / 2);
+    let ts = xTicks;
+    for (let k = 2; !fits(ts) && k <= 6; k++) {
+      const anchor = Math.max(0, xTicks.findIndex(t => /’/.test(t.label) && t !== xTicks[0]));
+      ts = xTicks.filter((_, i) => (i - anchor) % k === 0);
+    }
+    return ts;
+  })().map((t, i) => React.createElement("text", {
+    key: "x" + t.x,
     x: sx(t.x),
     y: H - 10,
     className: "axis-label x",
@@ -38140,7 +38180,8 @@ function PrimaryVotePanel({
     points: series(pts, p.id),
     width: p.id === "oth" ? 2 : 3,
     dashed: p.id === "oth",
-    opacity: hidden[p.id] ? 0 : 1
+    opacity: hidden[p.id] ? 0 : 1,
+    endLabel: p.short
   }));
   const primaryScatter = D.individualPolls.filter(p => p.x >= xDomain[0] && p.x <= xDomain[1]).flatMap(p => parts.filter(party => !hidden[party.id] && p.p && p.p[party.id] != null).map(party => ({
     x: p.x,
@@ -38793,6 +38834,7 @@ function PreferredPMPanel({
       color: d.r.L.color,
       dashed: d.r.dashed,
       endCap: d.era === "ley" ? false : undefined,
+      endLabel: d.era === "ley" || d.r.dashed && drawRows.some(o => o !== d && !o.r.dashed && o.r.L.short === d.r.L.short) ? undefined : d.r.L.short || d.r.L.name || d.r.label,
       clipX: d.clip,
       opacity: d.opacity,
       wipe: d.wipe,
@@ -39039,6 +39081,7 @@ function ApprovalPanel({
       label: (d.era === "ley" ? "Ley" : L.short) + " net",
       color: L.color,
       endCap: d.era === "ley" ? false : undefined,
+      endLabel: d.era === "ley" ? undefined : L.short,
       clipX: d.clip,
       points: d.rows.map(r => ({
         x: r.x,
@@ -39217,12 +39260,14 @@ function DirectionPanel({
       id: "right",
       label: "Right direction",
       color: "var(--mood-pos)",
-      points: series(pts, "right")
+      points: series(pts, "right"),
+      endLabel: "Right"
     }, {
       id: "wrong",
       label: "Wrong track",
       color: "var(--mood-neg)",
-      points: series(pts, "wrong")
+      points: series(pts, "wrong"),
+      endLabel: "Wrong"
     }],
     spine: series(pts, "right"),
     areas: dirAreas,
@@ -39465,7 +39510,8 @@ function OnSourcesPanel({
       id: d.sr.id,
       label: d.sr.label,
       color: d.sr.color,
-      points: series(d.pts, "v")
+      points: series(d.pts, "v"),
+      endLabel: d.sr.short || d.sr.label.replace(/ voters$/, "")
     })),
     spine: series(spine, "v"),
     scatter: drawn.flatMap(d => d.dots),
@@ -39559,7 +39605,7 @@ function DemographicsPanel({
   const ki = T.order.indexOf(party),
     gpi = DEMO_GRP_PARTY.indexOf(party);
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
-  const chartFor = st => {
+  const build = (st, firstXShared) => {
     const n = st.groups.length;
     const allAt = new Map(T.allMonthly.map(m => [m[0], m[1 + ki]]));
     const lines = st.groups.map((g, i) => ({
@@ -39573,7 +39619,7 @@ function DemographicsPanel({
       }))
     })).filter(l => l.pts.length);
     if (!lines.length) return null;
-    const firstX = Math.min(...lines.map(l => l.pts[0].x));
+    const firstX = firstXShared != null ? firstXShared : Math.min(...lines.map(l => l.pts[0].x));
     const xDomain = [Math.max(rangeLo, firstX - 0.06), rangeHi];
     const inX = x => x >= xDomain[0] && x <= xDomain[1];
     const allPts = filterPts(T.allMonthly.map(m => ({
@@ -39609,11 +39655,50 @@ function DemographicsPanel({
       }))
     })).filter(a => a.points.length >= 2);
     const vals = drawn.flatMap(l => l.pts.map(d => d.v)).concat(allPts.map(d => d.v), dots.map(d => d.y), areas.flatMap(a => a.points.flatMap(d => [d.y0, d.y1])));
-    const span = Math.max(...vals) - Math.min(...vals);
+    return {
+      st,
+      n,
+      lines,
+      firstX,
+      xDomain,
+      allPts,
+      drawn,
+      dots,
+      areas,
+      vals
+    };
+  };
+  const builtFirst = tab.sets.map(st => build(st, null)).filter(Boolean);
+  const sharedFirstX = builtFirst.length ? Math.min(...builtFirst.map(b => b.firstX)) : null;
+  const built = new Map(tab.sets.map(st => [st.id, build(st, sharedFirstX)]));
+  const sharedVals = [...built.values()].filter(Boolean).flatMap(b => b.vals);
+  const sharedAxis = (() => {
+    if (!sharedVals.length) return null;
+    const span = Math.max(...sharedVals) - Math.min(...sharedVals);
     const step = [10, 20, 25, 50, 100].find(st => span / st <= 6) || 200;
-    const fit = fitDomain(vals, step, 0);
+    const fit = fitDomain(sharedVals, step, 0);
     const domain = [Math.max(-100, fit.domain[0]), fit.domain[1]];
-    const ticks = fit.ticks.filter(t => t > domain[0]);
+    return {
+      domain,
+      ticks: fit.ticks.filter(t => t > domain[0])
+    };
+  })();
+  const chartFor = st0 => {
+    const b = built.get(st0.id);
+    if (!b || !sharedAxis) return null;
+    const {
+      st,
+      n,
+      xDomain,
+      allPts,
+      drawn,
+      dots,
+      areas
+    } = b;
+    const {
+      domain,
+      ticks
+    } = sharedAxis;
     const signed = v => (Math.round(v) > 0 ? "+" : Math.round(v) < 0 ? "\u2212" : "") + Math.abs(Math.round(v));
     const by = st.label ? st.label.replace(/^By /, "") : tab.label.toLowerCase();
     return React.createElement("div", {
@@ -39645,7 +39730,8 @@ function DemographicsPanel({
         id: l.g.label,
         label: l.g.label,
         color: l.color,
-        points: series(l.pts, "v")
+        points: series(l.pts, "v"),
+        endLabel: l.g.label
       }))],
       areas: areas,
       spine: series(allPts, "v"),
@@ -44613,6 +44699,7 @@ function VariancePanel({
     width: 3,
     dashed: !!r.m.dashed,
     opacity: hidden[r.m.id] ? 0 : 1,
+    endLabel: r.m.label,
     points: r.pts.filter(d => d.sigma != null && inWin(d)).map(d => ({
       x: d.x,
       y: d.sigma,
@@ -44904,12 +44991,17 @@ function HouseLeanPanel({
       pts: all.filter(inWin)
     };
   });
+  const shownN = rows.filter(r => !hidden[r.firm]).length;
+  const byLean = rows.filter(r => !hidden[r.firm]).sort((a, b) => Math.abs(b.all[b.all.length - 1].y) - Math.abs(a.all[a.all.length - 1].y));
+  const named = new Set(byLean.filter((r, i) => i < 3 || Math.abs(r.all[r.all.length - 1].y) >= LEAN_SURFACE).map(r => r.firm));
+  const standsOut = r => named.has(r.firm);
   const chartSeries = rows.map(r => ({
     id: r.firm,
     label: r.firm,
     color: r.color,
     width: 3,
-    opacity: hidden[r.firm] ? 0 : 1,
+    opacity: hidden[r.firm] ? 0 : shownN > 4 && !standsOut(r) ? 0.35 : 1,
+    endLabel: shownN <= 4 || standsOut(r) ? r.firm : undefined,
     points: r.pts
   })).filter(s => s.points.length > 1);
   if (!chartSeries.length) return null;
@@ -48159,6 +48251,9 @@ function Header({
   };
   const [staticView, setStaticView] = useState(false);
   useEffect(() => {
+    window.AP.openStatic = () => setStaticView(true);
+  }, []);
+  useEffect(() => {
     document.body.classList.toggle("ss-view", staticView);
     const ss = document.querySelector(".static-summary");
     if (ss) ss.inert = !staticView;
@@ -48180,13 +48275,15 @@ function Header({
     className: "wm-glyph",
     onClick: openStory,
     title: "Wind the dial back through the term",
-    "aria-label": "Wind the dial back: replay the term on the masthead dial"
+    "aria-describedby": "wm-action"
   }, React.createElement("span", {
     className: "wm-textcol"
   }, React.createElement("span", {
     className: "wm-name",
     ref: wmName
   }, "auspol"), React.createElement("span", {
+    className: "sr-only"
+  }, " "), React.createElement("span", {
     className: "wm-track",
     ref: wmTrack
   }, "tracker")), React.createElement(GlyphDial, {
@@ -48196,7 +48293,10 @@ function Header({
     height: "39.7"
   })), React.createElement("span", {
     className: "wm-sr"
-  }, "\u2013 Australian federal polling")), React.createElement("p", {
+  }, "\u2013 Australian federal polling"), React.createElement("span", {
+    id: "wm-action",
+    hidden: true
+  }, "Replays the term on the masthead dial")), React.createElement("p", {
     className: "tagline"
   }, "Aggregated opinion polling for the next Australian ", React.createElement("br", {
     className: "tagline-br"
@@ -48206,7 +48306,7 @@ function Header({
   }, React.createElement("span", {
     className: "fresh-dot fresh-toggle " + fresh.state,
     onClick: () => setStaticView(true)
-  }), "Updated ", D.latest.published, " \xB7 ", D.latest.pollsTracked, " polls")), React.createElement("div", {
+  }), " ", "Updated ", D.latest.published, " \xB7 ", D.latest.pollsTracked, " polls")), React.createElement("div", {
     className: "head-right"
   }, React.createElement("div", {
     className: "head-meta"
@@ -48220,6 +48320,7 @@ function Header({
     type: "button",
     className: "fresh-dot fresh-toggle " + fresh.state,
     onClick: () => setStaticView(true),
+    tabIndex: -1,
     "aria-label": "Read this page as a plain, static article",
     title: "Read this page as a plain, static article"
   }), D.latest.published, React.createElement("span", {
@@ -48939,13 +49040,15 @@ function Hero({
     label: m.a.name,
     color: colA,
     points: series(drawPts, "a"),
-    width: 3.6
+    width: 3.6,
+    endLabel: m.a.abbr
   }, {
     id: "b",
     label: m.b.name,
     color: colB,
     points: series(drawPts, "b"),
-    width: 3.6
+    width: 3.6,
+    endLabel: m.b.abbr
   }];
   const cmpSeries = m.altKey === "alp_on" ? impOnBasis ? MATCHUPS.alp_on.data : D.synthOn : impBasis ? D.agg2pp : D.synth2pp;
   const cmpLabel = m.altKey === "alp_on" ? impOnBasis ? "Respondent-allocated ALP" : "Implied ALP (first-principles flows)" : impBasis ? "Respondent-allocated ALP" : "Implied ALP (fixed 2025 flows)";
@@ -49373,7 +49476,13 @@ function MethodNote({
   }, "here", React.createElement("span", {
     className: "plink-mark",
     "aria-hidden": "true"
-  }, "\u2197")), " ", "for safekeeping and convenience."))));
+  }, "\u2197")), " ", "for safekeeping and convenience."), React.createElement("p", {
+    className: "colo-arch"
+  }, React.createElement("button", {
+    type: "button",
+    className: "hi-term colo-plain",
+    onClick: () => window.AP.openStatic && window.AP.openStatic()
+  }, "Read this page as plain text"), " ", "\u2013 every figure and the method, without charts."))));
 }
 let chromeSettled = false;
 const TABS = [{
@@ -49648,7 +49757,22 @@ function App() {
   const cycleTheme = () => setTweak("theme", isDark ? "light" : "dark");
   return React.createElement("div", {
     className: "page"
-  }, React.createElement(Header, {
+  }, React.createElement("a", {
+    className: "skip-link",
+    href: "#",
+    onClick: e => {
+      e.preventDefault();
+      const m = document.getElementById("main-content");
+      if (m) {
+        m.focus({
+          preventScroll: true
+        });
+        m.scrollIntoView({
+          block: "start"
+        });
+      }
+    }
+  }, "Skip to content"), React.createElement(Header, {
     isDark: isDark,
     onToggleTheme: cycleTheme
   }), React.createElement(Tabs, {
@@ -49658,7 +49782,9 @@ function App() {
     tppMatchup: tppMatchup,
     tppBasis: tppBasis
   }), React.createElement("main", {
-    className: "content"
+    className: "content",
+    id: "main-content",
+    tabIndex: -1
   }, React.createElement("div", {
     className: "view-enter content",
     key: tab,
