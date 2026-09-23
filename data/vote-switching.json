@@ -1,5 +1,5 @@
 {
- "_about": "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's oth includes independents), dnr (didn't remember / didn't vote – DemosAU only).",
+ "_about": "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's oth includes independents), dnr (didn't remember / didn't vote – DemosAU only). `skipped` lists waves checked and found to carry no usable table.",
  "weights2025": {
   "alp": 34.56,
   "lnp": 31.82,
@@ -1503,6 +1503,18 @@
     "oth": 5,
     "community-strong": 1
    }
+  }
+ ],
+ "skipped": [
+  {
+   "pollster": "YouGov",
+   "date": "2026-03-19",
+   "reason": "an Australia Institute poll – no 2025-vote crosstab published"
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-06-16",
+   "reason": "the wave's article carries no 2025-vote table"
   }
  ]
 }
