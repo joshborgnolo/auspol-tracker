@@ -45387,7 +45387,7 @@ function Hero({
     type: "button",
     className: "hi-range hi-term",
     title: unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means",
-    onClick: () => window.AP.openTerm && window.AP.openTerm(unc.flows ? "preference-flows" : "margin-of-error", "two-party preferred")
+    onClick: () => window.AP.openTerm && window.AP.openTerm(unc.flows ? "fp-flows" : "margin-of-error", "two-party preferred")
   }, "\xB1 ", (2 * unc.ci95).toFixed(1), " pts")) : " pts", leadSwing != null && React.createElement(React.Fragment, null, ", " + (leadSwing >= 0 ? "+" : "−"), React.createElement(RollNum, {
     value: Math.abs(leadSwing).toFixed(1),
     spinIn: true
@@ -45424,7 +45424,7 @@ function Hero({
     type: "button",
     className: "hi-note hi-term",
     title: unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means",
-    onClick: () => window.AP.openTerm && window.AP.openTerm(unc.flows ? "preference-flows" : "margin-of-error", "two-party preferred")
+    onClick: () => window.AP.openTerm && window.AP.openTerm(unc.flows ? "fp-flows" : "margin-of-error", "two-party preferred")
   }, unc.flows ? "flows range" : "95% interval"), ")"), !adjusted && React.createElement("span", {
     className: "eyebrow-warn"
   }, "Limited data"))), React.createElement("div", {

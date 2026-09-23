@@ -1412,7 +1412,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
                   <button type="button" className="hi-range hi-term"
                           title={unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means"}
                           onClick={() => window.AP.openTerm &&
-                            window.AP.openTerm(unc.flows ? "preference-flows" : "margin-of-error",
+                            window.AP.openTerm(unc.flows ? "fp-flows" : "margin-of-error",
                                                "two-party preferred")}>
                     ± {(2 * unc.ci95).toFixed(1)} pts
                   </button>
@@ -1488,7 +1488,7 @@ function Hero({ rangeId, setRangeId, showScatter = true, matchup, setMatchup, ba
                 <button type="button" className="hi-note hi-term"
                         title={unc.flows ? "How far the flow table's own range moves this pairing" : "What a margin of error means"}
                         onClick={() => window.AP.openTerm &&
-                          window.AP.openTerm(unc.flows ? "preference-flows" : "margin-of-error",
+                          window.AP.openTerm(unc.flows ? "fp-flows" : "margin-of-error",
                                              "two-party preferred")}>
                   {unc.flows ? "flows range" : "95% interval"}
                 </button>)
