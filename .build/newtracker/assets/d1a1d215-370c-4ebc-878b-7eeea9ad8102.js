@@ -566,14 +566,19 @@ const CYC_METRICS = [
   { key: "tpp", title: "Government two-party preferred", sub: "Governing-party 2PP",
     unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: 50, refAbsLabel: "50 – tie",
-    note: <>Two bases sit on this chart, and neither is a choice the site made freely.
-      Before 1990 no pollster published a national two-party figure, so the seven terms from
-      1972 to 1984 are <strong>implied</strong> — their primaries read through that election’s
-      own preference flows — and the 1987 term is absent entirely, because its polls were
-      filed without the Democrats split that method needs. Every term from 1990 on is the
-      two-party figure the houses <strong>published</strong>. The sitting term is drawn
-      published too, so that it is compared with its predecessors on their own terms; that is
-      why this line sits a little above the implied figure the headline quotes.</> },
+    /* One basis for every term, the site's default: each poll's primaries at
+       the flows counted at the election that opened its term (FLOW_LEF /
+       FLOW_ERAS). The sitting term follows the hero's rival ruling month by
+       month and draws each contest as its own run (tppEras). */
+    note: <>Every line is the <strong>implied</strong> two-party figure: each poll’s primary
+      votes read through the preferences counted at the election that opened its term –
+      {" "}<button type="button" className="hi-term"
+        onClick={() => window.AP.openTerm && window.AP.openTerm("last-election-flows", "Past cycles")}>last-election
+        flows</button>, the only table anyone could have used at the time. So a line moves when
+      voting intentions move, not when pollsters change how they allocate preferences, and every
+      term back to 1972 is on the same footing as today’s. The sitting term follows the rival
+      Labor is doing worst against, as the headline does, and marks where that changed. How the
+      final polls did, below, still scores what the pollsters published.</> },
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
     unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: null },
@@ -1042,6 +1047,15 @@ function cycDotDate(iso) {
   return d + " " + window.AP.D.monthName(m) + " " + y;
 }
 
+/* Which rival the sitting term's 2PP is read against in a given month – the
+   hero's deadbanded ruling, walked month by month in gen-data. A month before
+   the walk starts (or an older payload without it) is Labor v Coalition. */
+function rivalOfMonth(D, ym) {
+  let who = "alp_lnp";
+  for (const r of D.rivalWalk || []) { if (r.ym > ym) break; who = r.who; }
+  return who;
+}
+
 function cycleReadings(c, M, D) {
   const out = [];
   const key = M.key, isOpp = M.leader === "opp";
@@ -1052,7 +1066,13 @@ function cycleReadings(c, M, D) {
       let y = null;
       if (key === "primary") y = p.p ? p.p[c.gov] : null;
       else if (key === "oppr") y = p.p ? p.p[c.opp] : null;
-      else if (key === "tpp") y = p[c.gov];
+      /* the dot is what the line is made of: the wave's implied 2PP against
+         the rival the ruling names for its month (D.rivalWalk) */
+      else if (key === "tpp") {
+        const on = rivalOfMonth(D, p.ym) === "alp_on";
+        const a = on ? p.alpOnImp : p.alpImp;
+        y = a == null ? null : (c.gov === "alp" ? a : +(100 - a).toFixed(1));
+      }
       else if (key === "net") y = (mb.alb || "approval") === "fav" ? null : (p.appr ? p.appr.albNet : null);
       else if (key === "oppnet") y = (mb.taylor || "approval") === "fav" ? null : (p.appr ? p.appr.taylorNet : null);
       /* the ppm line's margin, from the wave's MAIN pairing (sets[0] is
@@ -1074,12 +1094,16 @@ function cycleReadings(c, M, D) {
   const src = (D.cycleSource || {})[c.year];
   if (!src) return out;
   if (key === "primary" || key === "oppr" || key === "tpp") {
-    const f = key === "tpp" ? "tpp_" + c.gov
+    // 2PP dots read the implied figure the line is built from (imp_alp,
+    // gen-data's cycleTppImp; the Coalition's is 100 minus it); the house's
+    // published pair is in the download
+    const f = key === "tpp" ? "imp_alp"
             : key === "oppr" ? c.opp
             : c.gov;
     for (const p of src.polls) {
       if (p[f] == null || p.firm === "Election" || !inCycleRange(p.m)) continue;
-      out.push({ x: p.m, y: p[f], iso: p.date, meta: { pollster: p.firm, dateLabel: cycDotDate(p.date) } });
+      const y = key === "tpp" && c.gov !== "alp" ? +(100 - p[f]).toFixed(1) : p[f];
+      out.push({ x: p.m, y, iso: p.date, meta: { pollster: p.firm, dateLabel: cycDotDate(p.date) } });
     }
   } else if (key === "ppmm") {
     // margin per wave, PM minus opponent. Pairing-neutral, so the
@@ -1347,10 +1371,27 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
      no calendar, so the suffix vanishes there the way the events do. */
   const tipCycle = solo
     || (banded && pastForward.length === 1 ? pastForward[0] : null);
+  /* The sitting term's 2PP changes contest where the rival ruling did
+     (tppEras): the break in its line is a new question, not a fall, so the
+     month it happens carries a marker that says which rival the line follows
+     from there. */
+  const contestEvents = eventCycle && eventCycle.current && M.key === "tpp" && eventCycle.raw.tppEras
+    ? eventCycle.raw.tppEras.filter((e) => e.from).map((e) => {
+        const rival = e.rival === "alp_on" ? "One Nation" : "the Coalition";
+        return {
+          date: e.from, short: "Now " + (e.rival === "alp_on" ? "v One Nation" : "v Coalition"),
+          label: "Labor’s strongest rival becomes " + rival,
+          desc: "From here the line is Labor’s implied two-party vote against " + rival
+            + ", the rival it is doing worst against – the same ruling the headline follows.",
+          major: true, x: cycEventMonth(e.from, eventCycle.eDate),
+        };
+      })
+    : [];
   const cycleEvents = eventCycle
     ? (CYC_EVENTS[eventCycle.year] || [])
         .filter((e) => !e.metrics || e.metrics.includes(M.key))
         .map((e) => ({ ...e, x: cycEventMonth(e.date, eventCycle.eDate) }))
+        .concat(contestEvents)
     : [];
   /* Six cards caption what the fan behind the singled-out line is made
      of. The lead-in names the measure – the approval charts say it in
@@ -1400,7 +1441,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
        answers to its own name, so the handover month lists both readings
        rather than letting one office row average two people. The pooled
        series still carries terms that never changed leaders. */
-    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || null;
+    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || (M.key === "tpp" && c.raw.tppEras) || null;
     const seriesIn = eras
       ? eras.map((e) => ({ name: e.name, months: e.months, vals: e.vals, obs: e.obs }))
       : [{ name: null, months: c.raw.months, vals: c.raw[M.key], obs: (c.raw.obs || {})[M.key] }];
@@ -1597,7 +1638,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
     const label = solo ? leadName : c.year + " · " + leadName;
     // a term that changed holders names the holder at the dot's own date,
     // matching the per-person runs drawn under it
-    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || null;
+    const eras = (M.key === "net" && c.raw.netEras) || (M.key === "oppnet" && c.raw.oppEras) || (M.key === "ppmm" && c.raw.ppmEras) || (M.key === "tpp" && c.raw.tppEras) || null;
     const nameAt = (iso) => {
       if (!eras || !iso) return null;
       let n = eras[0].name;
@@ -1750,8 +1791,13 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
          peers' labels follow. */
       const curMag = M.unit ? Math.abs(curVal).toFixed(1) : String(Math.round(Math.abs(curVal)));
       const curSign = (chg || !M.unit) && parseFloat(curMag) !== 0 ? (curVal < 0 ? "−" : "+") : "";
+      /* A 2PP that has changed contest names the rival it is now against –
+         every past term's figure is against the other party of government,
+         so only an unusual rival needs saying. */
+      const tppEraNow = M.key === "tpp" && cur.raw.tppEras ? cur.raw.tppEras[cur.raw.tppEras.length - 1] : null;
+      const rivalNote = tppEraNow && tppEraNow.rival === "alp_on" ? " against One Nation" : "";
       insight = { d: Math.abs(d), better, mNow, subjLabel, peerNoun, rank: null,
-        curFmt: curSign + curMag + M.unit };
+        curFmt: curSign + curMag + M.unit + rivalNote };
       /* Boundary company. A bare gap from the mean hides the shape of the
          crowd behind it: 23 points below a floor of −30 is company, 23
          below a floor of −5 is a record. When the current reading ranks
@@ -2201,6 +2247,9 @@ function cycleSourceRows(cycles, D) {
     "primary_alp", "primary_lnp", "primary_grn", "primary_onp", "primary_oth",
     "tpp_alp", "tpp_lnp", "pm_net", "opp_leader_net", "hanson_net", "leader_metric",
     "pm_preferred", "opp_leader_preferred",
+    // the figure the 2PP chart draws: primaries at the opening election's
+    // flows, against the contest named (the sitting term follows its rival)
+    "implied_tpp_alp", "implied_tpp_contest",
   ]];
   /* Preferred PM is its own series rather than two more columns on the
      leader-rating row: it is a different question, asked of the same wave,
@@ -2222,7 +2271,7 @@ function cycleSourceRows(cycles, D) {
     src.polls.forEach((p) => rows.push([
       year, "voting_intention", p.date, p.m, p.firm,
       p.alp, p.lnp, p.grn, p.onp, p.oth, p.tpp_alp, p.tpp_lnp, null, null, null, null,
-      null, null,
+      null, null, p.imp_alp ?? null, p.imp_alp != null ? "ALP v L/NP" : null,
     ]));
     src.approval.forEach((a) => {
       if (a.pmNet != null || a.oppNet != null) rows.push([
@@ -2244,9 +2293,11 @@ function cycleSourceRows(cycles, D) {
     const eDate = Date.parse(cur.eDate);
     const mo = (iso) => Math.round(((Date.parse(iso) - eDate) / 86400000 / 30.436875) * 10) / 10;
     D.individualPolls.forEach((p) => {
+      const onRival = rivalOfMonth(D, p.ym) === "alp_on";
+      const imp = onRival ? p.alpOnImp : p.alpImp;
       rows.push([cur.year, "voting_intention", p.released, mo(p.released), p.pollster,
         p.p.alp, p.p.lnp, p.p.grn, p.p.onp, p.p.oth, p.alp, p.lnp, null, null, null, null,
-        null, null]);
+        null, null, imp ?? null, imp != null ? (onRival ? "ALP v ON" : "ALP v L/NP") : null]);
       /* The MAIN contest only. A wave may also publish a two-way where the
          headline is three-way, and those are separate measures that would be
          nonsense stacked in one column - they stay in the payload for the
@@ -2268,6 +2319,10 @@ function cycleSourceRows(cycles, D) {
           apprMetricLabel(a), null, null]);
     });
   }
+  // rows that carry no 2PP (ratings, preferred PM) end short of the implied
+  // columns; pad them so every row has the header's width
+  const width = rows[0].length;
+  rows.forEach((r) => { while (r.length < width) r.push(null); });
   return rows.slice(0, 1).concat(
     rows.slice(1).sort((x, y) => (x[0] - y[0]) || String(x[2]).localeCompare(String(y[2]))));
 }
@@ -5455,6 +5510,65 @@ function infoTerms(D) {
     <details className="info-working"><summary>Show the working</summary>{children}</details>);
   const eff = <>n<sub>eff</sub></>;
 
+  /* Last-election flows: the tables Past cycles reads each term through
+     (D.lefTables), the month the sitting term's rival changed (D.rivalWalk),
+     and each table's miss on the next election's primaries. Pre-1996 tables
+     are one lumped minor-party flow, since nothing finer was published. */
+  const lefT = (D.lefTables || []).slice().sort((a, b) => a.year - b.year);
+  const lefMiss = lefT.map((t, i) => (t.bt == null || !lefT[i + 1] ? null : { at: lefT[i + 1].year, bt: t.bt }))
+    .filter(Boolean);
+  const lefMean = lefMiss.length ? lefMiss.reduce((s, m) => s + Math.abs(m.bt), 0) / lefMiss.length : null;
+  const lefBig = lefMiss.slice().sort((a, b) => Math.abs(b.bt) - Math.abs(a.bt)).slice(0, 3);
+  /* "2013 and 2022, when Labor did 1.0 points better than projected, and
+     2019, when it did 0.8 worse" – the misses grouped by direction, each
+     group naming its years and the size (or range) of its miss. */
+  const lefBigText = (() => {
+    const yrs = (a) => a.map((m) => m.at).sort((x, y) => x - y)
+      .reduce((s, y, i, arr) => s + (i ? (i === arr.length - 1 ? " and " : ", ") : "") + y, "");
+    const size = (a) => {
+      const v = a.map((m) => Math.abs(m.bt).toFixed(1)).sort();
+      return (v[0] === v[v.length - 1] ? v[0] : v[0] + "–" + v[v.length - 1]) + " points";
+    };
+    const better = lefBig.filter((m) => m.bt < 0), worse = lefBig.filter((m) => m.bt > 0);
+    const parts = [];
+    if (better.length) parts.push(yrs(better) + ", when Labor did " + size(better) + " better than projected");
+    if (worse.length) parts.push(yrs(worse) + ", when " + (better.length ? "it" : "Labor") + " did "
+      + (better.length ? size(worse).replace(" points", "") : size(worse)) + " worse" + (better.length ? "" : " than projected"));
+    return parts.join(", and ");
+  })();
+  const onSince = (() => {
+    const w = D.rivalWalk || [];
+    const i = w.findIndex((r, k) => r.who === "alp_on" && (k === 0 || w[k - 1].who !== "alp_on"));
+    if (i < 0) return null;
+    const [yy, mm] = w[i].ym.split("-").map(Number);
+    return D.monthNameFull ? D.monthNameFull(mm) + " " + yy : w[i].ym;
+  })();
+  const pc = (v) => (v == null ? "–" : (100 * v).toFixed(1));
+  const lefWork = lefT.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work">
+        <thead><tr><th>Election</th><th>Greens</th><th>One Nation</th><th>Others</th><th>Miss next time</th></tr></thead>
+        <tbody>
+          {lefT.map((t, i) => (
+            <tr key={t.year}>
+              <td>{t.year}</td>
+              {t.minor != null
+                ? <td colSpan="3">{pc(t.minor)} (all minor parties)</td>
+                : <><td>{pc(t.grn)}</td><td>{pc(t.onp)}</td><td>{pc(t.oth)}</td></>}
+              <td>{t.bt == null || !lefT[i + 1] ? "–" : (t.bt > 0 ? "+" : "−") + Math.abs(t.bt).toFixed(2) + " at " + lefT[i + 1].year}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="info-work-note">Per cent of each group’s preferences reaching Labor against the
+        Coalition. The miss is the table applied to the next election’s actual primary votes, minus
+        that election’s official 2PP, in points for Labor. A party a table never counted (One Nation
+        in 1996) is read at that table’s “others” flow; a poll that doesn’t list a party separately
+        reads it at the election’s own mix; and a poll whose shares don’t total 100 is rescaled to
+        100 first. The 1972–84 terms use flows calibrated to each election’s official result.</p>
+    </div>
+  ) : null;
+
   /* Glossary, grouped by what the reader is trying to understand rather than
      alphabetised: a family of terms (the three disagreement verdicts, the
      three preference tables) reads best side by side. Within a group the
@@ -5629,7 +5743,10 @@ function infoTerms(D) {
           {" "}{xref("fp-flows", "implied 2PP", "first-principles flow set")}, because no election
           has ever counted that pairing: {L.onImp.a.toFixed(1)} to Labor,
           {" "}{L.onImp.b.toFixed(1)} to One Nation, ±{L.onImp.band.toFixed(1)}.</span>
-        ) : null}</>) },
+        ) : null}
+        <span className="info-p">Past cycles reads every earlier term the same way, each through
+        the flows of the election that opened it – see
+        {" "}{xref("last-election-flows", "implied 2PP", "Last-election flows")}.</span></>) },
       { id: "preference-flows", term: "Preference flows", body: (
         <>How minor-party votes split between the final two candidates once preferences are
         distributed. The {xref("implied-2pp", "preference flows", "implied 2PP")} uses the flows
@@ -5642,6 +5759,25 @@ function infoTerms(D) {
         One Nation’s line breaks where it barely stood candidates. Labor v One Nation uses a
         different table, the {xref("fp-flows", "preference flows", "first-principles flow set")},
         because no election has counted that pairing.</>) },
+      { id: "last-election-flows", term: "Last-election flows", body: (
+        <>The flow table a term’s implied 2PP is read through: the preferences counted at the
+        election that opened the term. It’s the only table anyone inside the term could have used,
+        and it’s how Past cycles draws every term’s two-party line, so each one sits on the same
+        footing as today’s {xref("implied-2pp", "last-election flows", "implied 2PP")}.
+        <span className="info-p"><b>Where the tables come from.</b> From 2004, the AEC’s count of
+        every ballot between Labor and the Coalition, in every seat. For 1996–2001, the AEC’s
+        official statistics, counted in the nine seats in ten where the final two were Labor and the
+        Coalition. No flows by party were published before 1996, so each earlier table is the
+        single minor-party flow the official result implies.</span>
+        {lefMean != null ? (
+          <span className="info-p"><b>How well it works.</b> Applied to the next election’s actual
+          primary votes, each table misses the official 2PP by {lefMean.toFixed(1)} points on
+          average. The biggest misses were {lefBigText}.</span>
+        ) : null}
+        <span className="info-p"><b>The sitting term</b> follows the rival Labor is doing worst
+        against, as the headline does{onSince ? <>: the Coalition until {onSince}, One Nation
+        since</> : null}. The chart marks the change.</span>
+        {working(lefWork)}</>) },
       { id: "fp-flows", term: "First-principles flow set", body: (
         <>The preference table behind the Labor v One Nation figure. The site built it, because
         no election has ever counted a Labor v One Nation contest to take flows from. Three

@@ -1,0 +1,130 @@
+2016 Federal Election House of Representatives Two Party Preferred Flow of Preferences By State By Party [Event:20499 Phase:FinalResults Generated:2017-05-11T17:36:06 Cycle:a45ea4bc-bff6-48cb-94c5-1bbaae0c7c0d Created:2017-05-11T17:29:15 Environment:PROD Site:CANBERRA Server:TALLYROOM Version:10.5.84.43192]
+StateAb	PartyAb	PartyNm	Liberal/National Coalition Transfer Votes	Liberal/National Coalition Transfer Percentage	Australian Labor Party Transfer Votes	Australian Labor Party Transfer Percentage
+NSW	NP	The Nationals	4859	76.63	1482	23.37
+NSW	GRN	The Greens	73295	18.76	317442	81.24
+NSW	CDP	Christian Democratic Party	124262	73.11	45704	26.89
+NSW	ON	One Nation	11796	42.83	15746	57.17
+NSW	DLP	DLP - Democratic Labour Party	481	49.69	487	50.31
+NSW	BTA	Bullet Train For Australia	1061	46.80	1206	53.20
+NSW	AFN	Australia First Party (NSW) Incorporated	1271	44.36	1594	55.64
+NSW	RUA	Rise Up Australia Party	390	38.73	617	61.27
+NSW	CEC	Citizens Electoral Council	1309	46.93	1480	53.07
+NSW	ASXP	Australian Sex Party	632	26.44	1758	73.56
+NSW	NCP	Non-Custodial Parents Party	1392	38.00	2271	62.00
+NSW	SPP	Sustainable Australia	312	51.49	294	48.51
+NSW	SAL	Socialist Alliance	71	14.20	429	85.80
+NSW	FUT	Science Party	5136	34.27	9852	65.73
+NSW	AJP	Animal Justice Party	7859	37.98	12836	62.02
+NSW	AAPP	Australian Antipaedophile Party	889	58.22	638	41.78
+NSW	CYC	Australian Cyclists Party	111	24.13	349	75.87
+NSW	ADVP	Australian Defence Veterans Party	769	53.11	679	46.89
+NSW	ALA	Australian Liberty Alliance	7871	68.60	3602	31.40
+NSW	CM	CountryMinded	667	49.89	670	50.11
+NSW	DHJP	Derryn Hinch's Justice Party	1571	49.87	1579	50.13
+NSW	DRF	Drug Law Reform	1394	31.54	3026	68.46
+NSW	FFP	Family First	6301	53.74	5424	46.26
+NSW	LDP	Liberal Democrats (LDP)	15107	74.67	5124	25.33
+NSW	MAP	Mature Australia Party	862	48.35	921	51.65
+NSW	XEN	Nick Xenophon Team	6586	40.95	9498	59.05
+NSW	SOL	Online Direct Democracy	2402	41.56	3378	58.44
+NSW	PIR	Pirate Party	486	38.57	774	61.43
+NSW	REP	Renewable Energy Party	176	32.77	361	67.23
+NSW	ASP	Shooters, Fishers and Farmers	1653	46.56	1897	53.44
+NSW	SMK	Smokers Rights Party	506	37.68	837	62.32
+NSW	SEP	Socialist Equality Party	433	32.98	880	67.02
+NSW	TAP	The Arts Party	1064	33.90	2075	66.10
+NSW	IND	Independent	79893	46.50	91902	53.50
+NSW	NAFD	Non Affiliated	1276	59.96	852	40.04
+NSW		First Preferences	1840964	53.32	1611549	46.68
+VIC	LP	Liberal	26091	92.54	2103	7.46
+VIC	NP	The Nationals	20547	79.49	5302	20.51
+VIC	GRN	The Greens	75257	16.66	376443	83.34
+VIC	ASXP	Australian Sex Party	3239	31.47	7054	68.53
+VIC	FFP	Family First	26145	58.59	18478	41.41
+VIC	RUA	Rise Up Australia Party	21758	54.97	17821	45.03
+VIC	AUC	Australian Christians	6117	68.32	2836	31.68
+VIC	LDP	Liberal Democrats (LDP)	9387	72.17	3619	27.83
+VIC	CYA	Australian Country Party	4333	61.61	2700	38.39
+VIC	AJP	Animal Justice Party	24348	37.49	40592	62.51
+VIC	BTA	Bullet Train For Australia	459	40.33	679	59.67
+VIC	SAL	Socialist Alliance	402	22.98	1347	77.02
+VIC	CEC	Citizens Electoral Council	1202	61.89	740	38.11
+VIC	AFN	Australia First Party (NSW) Incorporated	1482	45.85	1750	54.15
+VIC	CYC	Australian Cyclists Party	193	50.00	193	50.00
+VIC	AEQ	Australian Equality Party (Marriage)	1338	40.59	1958	59.41
+VIC	AUP	Australian Progressives	133	47.16	149	52.84
+VIC	DHJP	Derryn Hinch's Justice Party	6705	48.82	7030	51.18
+VIC	DRF	Drug Law Reform	4559	39.77	6905	60.23
+VIC	XEN	Nick Xenophon Team	929	46.29	1078	53.71
+VIC	REP	Renewable Energy Party	1488	41.67	2083	58.33
+VIC	ASP	Shooters, Fishers and Farmers	648	49.05	673	50.95
+VIC	SEP	Socialist Equality Party	116	39.32	179	60.68
+VIC	TAP	The Arts Party	197	36.35	345	63.65
+VIC	VEP	Voluntary Euthanasia Party	420	43.17	553	56.83
+VIC	IND	Independent	36896	39.41	56714	60.59
+VIC		First Preferences	1382890	53.05	1224051	46.95
+QLD	PUP	Palmer United Party	117	37.14	198	62.86
+QLD	KAP	Katter's Australian Party	38656	53.04	34223	46.96
+QLD	GRN	The Greens	46970	19.91	188917	80.09
+QLD	FFP	Family First	62353	59.99	41580	40.01
+QLD	RUA	Rise Up Australia Party	2844	63.34	1646	36.66
+QLD	ON	One Nation	76531	51.89	70947	48.11
+QLD	DLP	DLP - Democratic Labour Party	456	29.12	1110	70.88
+QLD	ADVP	Australian Defence Veterans Party	1425	48.94	1487	51.06
+QLD	ALA	Australian Liberty Alliance	8423	68.37	3897	31.63
+QLD	CRNT	Consumer Rights & No-Tolls	879	42.88	1171	57.12
+QLD	CM	CountryMinded	1419	66.28	722	33.72
+QLD	DRF	Drug Law Reform	1423	31.86	3043	68.14
+QLD	GLT	Glenn Lazarus Team	3873	38.37	6221	61.63
+QLD	LDP	Liberal Democrats (LDP)	16888	65.80	8777	34.20
+QLD	MAP	Mature Australia Party	417	46.23	485	53.77
+QLD	XEN	Nick Xenophon Team	4747	43.03	6285	56.97
+QLD	SOL	Online Direct Democracy	463	43.60	599	56.40
+QLD	TAP	The Arts Party	528	35.99	939	64.01
+QLD	IND	Independent	22532	44.73	27845	55.27
+QLD	NAFD	Non Affiliated	350	42.17	480	57.83
+QLD		First Preferences	1153736	58.29	825627	41.71
+WA	NP	The Nationals	30977	77.13	9183	22.87
+WA	GRN	The Greens	34180	21.17	127263	78.83
+WA	AUC	Australian Christians	25069	73.31	9128	26.69
+WA	RUA	Rise Up Australia Party	9865	47.29	10994	52.71
+WA	SAL	Socialist Alliance	475	33.83	929	66.17
+WA	ALA	Australian Liberty Alliance	1000	64.77	544	35.23
+WA	LDP	Liberal Democrats (LDP)	1704	67.46	822	32.54
+WA	MAP	Mature Australia Party	1749	54.61	1454	45.39
+WA	SOL	Online Direct Democracy	521	40.08	779	59.92
+WA	ODR	Outdoor Recreation Party (Stop The Greens)	1354	57.01	1021	42.99
+WA	ASP	Shooters, Fishers and Farmers	2850	47.33	3172	52.67
+WA	IND	Independent	10148	58.39	7233	41.61
+WA		First Preferences	611605	58.48	434318	41.52
+SA	GRN	The Greens	10067	15.58	54538	84.42
+SA	FFP	Family First	25396	62.03	15545	37.97
+SA	AJP	Animal Justice Party	2997	33.75	5884	66.25
+SA	CDP	Christian Democratic Party	970	56.56	745	43.44
+SA	LDP	Liberal Democrats (LDP)	1584	72.73	594	27.27
+SA	XEN	Nick Xenophon Team	87302	39.47	133908	60.53
+SA	IND	Independent	3248	41.98	4489	58.02
+SA		First Preferences	365155	52.66	328314	47.34
+TAS	GRN	The Greens	4289	12.51	30002	87.49
+TAS	DLP	DLP - Democratic Labour Party	195	30.85	437	69.15
+TAS	ARF	Australian Recreational Fishers	4161	36.97	7093	63.03
+TAS	CDP	Christian Democratic Party	4231	66.68	2114	33.32
+TAS	LDP	Liberal Democrats (LDP)	857	62.10	523	37.90
+TAS	REP	Renewable Energy Party	1458	32.16	3076	67.84
+TAS	TAP	The Arts Party	640	38.25	1033	61.75
+TAS	IND	Independent	8306	28.28	21066	71.72
+TAS		First Preferences	118956	48.33	127186	51.67
+ACT	GRN	The Greens	4424	11.60	33705	88.40
+ACT	BTA	Bullet Train For Australia	4602	43.12	6071	56.88
+ACT	IND	Independent	1881	39.96	2826	60.04
+ACT		First Preferences	87346	43.84	111887	56.16
+NT	GRN	The Greens	1781	20.11	7077	79.89
+NT	CEC	Citizens Electoral Council	204	45.95	240	54.05
+NT	RUA	Rise Up Australia Party	1382	55.66	1101	44.34
+NT	IND	Independent	2230	38.90	3503	61.10
+NT	AFN	Australia First Party (NSW) Incorporated	408	51.13	390	48.87
+NT	HMP	HEMP	431	37.71	712	62.29
+NT	LDP	Liberal Democrats (LDP)	931	73.02	344	26.98
+NT	SOL	Online Direct Democracy	131	35.50	238	64.50
+NT	ASP	Shooters, Fishers and Farmers	1939	42.30	2645	57.70
+NT		First Preferences	32409	45.15	39364	54.85

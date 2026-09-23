@@ -117,3 +117,82 @@ export const impliedEraAlp2pp = (era, p) => {
     + n0(era.dlp) * n0(p.dlp)
     + era.oth * n0(p.oth);
 };
+
+/* FLOW_LEF – one flow table per election from 1987 to 2022, so every past
+   term's two-party line on Past cycles is read the way the current term's
+   implied 2PP is: each poll's primaries through the flows counted at the
+   election that OPENED the term (last-election flows – the only table an
+   observer inside the term could have used, and the method Kevin Bonham's
+   Wonk Central track record audits). The 2025 table is FLOW above; the
+   1972–84 terms keep FLOW_ERAS. Derived by .build/aec-flow-history.py from
+   the AEC's own counts, cached in .build/aec-flow-src/:
+     2004–2022  AEC two-party-preferred flow by state by party – every formal
+                ballot in every seat redistributed ALP v Coalition (the TPP
+                cut FLOW ships for 2025).
+     1996–2001  AEC official election statistics, "Two Candidate Preferred
+                Preference Flow Result", classic seats only (final two ALP v
+                a Coalition party: 142, 144 and 136 seats) – counted flows
+                over nine seats in ten, since no all-seat TPP cut exists.
+     1987–1993  no flow by party was published before 1996, so the table is
+                the single lumped minor-party flow the official result
+                implies: (ALP 2PP − ALP primary) ÷ (100 − ALP − Coalition).
+   Buckets are the poll columns they are applied to: grn every Greens party,
+   onp One Nation, oth every other non-major ballot (independents in). share
+   is the election's own national primary for each bucket – the weights for
+   a poll that folds a bucket into its oth column. anchor is what the table
+   leaves between the election's own primaries and its official 2PP (the
+   three-cornered leak in the TPP cut, like FLOW_3CNR; non-classic seats in
+   the classic cut); added back so month 0 of every term is the count.
+   Right-edge backtest – each table on the NEXT election's primaries against
+   its official 2PP, ALP points (the LEF error Bonham tabulates): 1990 −0.44,
+   1993 +0.13, 1996 +0.81, 1998 +0.06, 2001 −0.14, 2004 +0.38, 2007 +0.02,
+   2010 +0.31, 2013 −1.04, 2016 −0.23, 2019 +0.83, 2022 −0.97, 2025 −0.38;
+   mean |error| 0.44. The signs and sizes of the big misses – Labor beating
+   the projection in 1990, 2013 and 2022, the 0.8 shift to the Coalition in
+   2019 – are the ones Bonham documents. */
+export const FLOW_LEF = Object.freeze({
+  1987: { minor: 0.5882, anchor: 0, bt: -0.44 },
+  1990: { minor: 0.6140, anchor: 0, bt: 0.13 },
+  1993: { minor: 0.6019, anchor: 0, bt: 0.81 },
+  1996: { grn: 0.6710, oth: 0.5092, anchor: 0.209, bt: 0.06, share: { grn: 1.74, onp: 0, oth: 12.27 } },
+  1998: { grn: 0.7328, onp: 0.4634, oth: 0.5534, anchor: -0.027, bt: -0.14, share: { grn: 2.14, onp: 8.43, oth: 9.82 } },
+  2001: { grn: 0.7463, onp: 0.4415, oth: 0.5761, anchor: -0.083, bt: 0.38, share: { grn: 4.96, onp: 4.34, oth: 9.85 } },
+  2004: { grn: 0.8079, onp: 0.4360, oth: 0.4429, anchor: 0.069, bt: 0.02, share: { grn: 7.19, onp: 1.19, oth: 7.28 } },
+  2007: { grn: 0.7969, onp: 0.4700, oth: 0.4453, anchor: 0.111, bt: 0.31, share: { grn: 7.79, onp: 0.26, oth: 6.46 } },
+  2010: { grn: 0.7884, onp: 0.4521, oth: 0.4162, anchor: 0.090, bt: -1.04, share: { grn: 11.76, onp: 0.22, oth: 6.42 } },
+  2013: { grn: 0.8303, onp: 0.4490, oth: 0.4671, anchor: 0.144, bt: -0.23, share: { grn: 8.65, onp: 0.17, oth: 12.25 } },
+  2016: { grn: 0.8194, onp: 0.4953, oth: 0.4922, anchor: 0.133, bt: 0.83, share: { grn: 10.23, onp: 1.29, oth: 11.70 } },
+  2019: { grn: 0.8221, onp: 0.3478, oth: 0.4607, anchor: 0.099, bt: -0.97, share: { grn: 10.40, onp: 3.08, oth: 11.74 } },
+  2022: { grn: 0.8566, onp: 0.3570, oth: 0.5002, anchor: 0.031, bt: -0.38, share: { grn: 12.25, onp: 4.96, oth: 14.50 } },
+});
+
+/* Implied ALP 2PP of a past poll row under its term's FLOW_LEF table.
+   - A primary set that doesn't total 100 (±2) is rescaled to 100 first:
+     every such set in the cycle history carries a declared basis
+     (cyclePollBases – undecided left out without a rebase, or an era table
+     whose minor columns overlap), and proportional rescaling is the one
+     reading that privileges no column, as the undecided-inclusive 2PP pair
+     is rebased elsewhere on the site.
+   - A lumped table reads every non-major point at its one flow.
+   - Otherwise each itemised column reads at its own flow; the oth column
+     carries whatever the poll did not itemise, at the election's own
+     share-weighted mix of those buckets; and a party the opening count
+     never met (One Nation in the 1996 table) reads at that count's 'others'
+     flow – what an observer inside the term would have had to assume. */
+export const impliedLefAlp2pp = (t, p) => {
+  if (!t || p.alp == null || p.lnp == null) return null;
+  const COLS = ["alp", "lnp", "grn", "onp", "oth"];
+  const sum = COLS.reduce((s, k) => s + (p[k] ?? 0), 0);
+  const k = p.oth != null && Math.abs(sum - 100) > 2 ? 100 / sum : 1;
+  const v = (c) => (p[c] == null ? null : p[c] * k);
+  const alp = v("alp"), lnp = v("lnp");
+  const anchor = t.anchor || 0;
+  if (t.minor != null) return alp + t.minor * (100 - alp - lnp) + anchor;
+  const grn = v("grn"), onp = v("onp");
+  const oth = p.oth != null ? v("oth") : Math.max(0, 100 - alp - lnp - (grn ?? 0) - (onp ?? 0));
+  const f = (b) => (t[b] != null && t.share[b] >= 0.05 ? t[b] : t.oth);
+  const folded = ["oth", ...(grn == null ? ["grn"] : []), ...(onp == null ? ["onp"] : [])];
+  const w = folded.reduce((s, b) => s + t.share[b], 0);
+  const fOth = w ? folded.reduce((s, b) => s + f(b) * t.share[b], 0) / w : t.oth;
+  return alp + (grn != null ? f("grn") * grn : 0) + (onp != null ? f("onp") * onp : 0) + fOth * oth + anchor;
+};

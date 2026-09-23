@@ -1,0 +1,93 @@
+2025 Federal Election House of Representatives Two Party Preferred Flow of Preferences By State By Party [Event:31496 Phase:FinalResults Generated:2025-06-16T10:39:06 Cycle:194a421d-c559-4a18-a78a-90c7cf2acb4e Created:2025-06-16T10:36:42 Environment:PROD Site:CANBERRA Server:Internal Version:10.11.386.0]
+StateAb	PartyAb	PartyNm	Australian Labor Party Transfer Votes	Australian Labor Party Transfer Percentage	Liberal/National Coalition Transfer Votes	Liberal/National Coalition Transfer Percentage
+NSW	IND	Independent	298935	64.26	166253	35.74
+NSW	ON	Pauline Hanson's One Nation	74419	25.78	214257	74.22
+NSW	GRN	The Greens	463146	87.34	67156	12.66
+NSW	CYA	Trumpet of Patriots	31620	35.99	56226	64.01
+NSW	FFP	Family First Party Australia	22857	35.82	40961	64.18
+NSW	LTP	Libertarian Party	14978	28.74	37146	71.26
+NSW	HMP	Legalise Cannabis Australia	25603	57.20	19161	42.80
+NSW	ASP	Shooters, Fishers and Farmers Party	9547	40.61	13964	59.39
+NSW	CEC	Australian Citizens Party	3069	49.08	3184	50.92
+NSW	AJP	Animal Justice Party	6462	64.22	3600	35.78
+NSW	SOPA	FUSION | Planet Rescue | Whistleblower Protection | Innovation	3225	73.40	1169	26.60
+NSW	IMO	Health Environment Accountability Rights Transparency (HEART)	1205	30.77	2711	69.23
+NSW	GRPF	Gerard Rennick People First	1011	18.58	4431	81.42
+NSW	SAL	Socialist Alliance	3323	82.42	709	17.58
+NSW	AUD	Australian Democrats	467	67.88	221	32.12
+NSW	IAP	Indigenous - Aboriginal Party of Australia	1990	63.84	1127	36.16
+NSW	NAFD	Non Affiliated	540	60.81	348	39.19
+NSW		First Preferences	1686994	52.75	1511236	47.25
+VIC	LP	Liberal	1394	12.47	9782	87.53
+VIC	GRN	The Greens	493964	89.70	56695	10.30
+VIC	IND	Independent	214790	70.38	90394	29.62
+VIC	ON	Pauline Hanson's One Nation	58631	25.00	175851	75.00
+VIC	FFP	Family First Party Australia	33015	36.85	56569	63.15
+VIC	CYA	Trumpet of Patriots	17101	33.88	33370	66.12
+VIC	LTP	Libertarian Party	5982	24.18	18762	75.82
+VIC	HMP	Legalise Cannabis Australia	36965	65.87	19149	34.13
+VIC	CEC	Australian Citizens Party	4515	61.49	2828	38.51
+VIC	SOPA	FUSION | Planet Rescue | Whistleblower Protection | Innovation	3736	76.73	1133	23.27
+VIC	VNS	Victorian Socialists	20775	87.84	2877	12.16
+VIC	AJP	Animal Justice Party	4593	70.14	1955	29.86
+VIC	GRPF	Gerard Rennick People First	1538	25.72	4441	74.28
+VIC	SAL	Socialist Alliance	10513	87.48	1504	12.52
+VIC	NAFD	Non Affiliated	317	65.09	170	34.91
+VIC		First Preferences	1375995	51.54	1293760	48.46
+QLD	GRN	The Greens	322918	87.20	47395	12.80
+QLD	KAP	Katter's Australian Party (KAP)	19406	37.48	32369	62.52
+QLD	FFP	Family First Party Australia	26649	31.89	56911	68.11
+QLD	ON	Pauline Hanson's One Nation	62082	25.13	184989	74.87
+QLD	CYA	Trumpet of Patriots	38050	36.84	65237	63.16
+QLD	GRPF	Gerard Rennick People First	13365	22.10	47106	77.90
+QLD	HMP	Legalise Cannabis Australia	12404	65.59	6506	34.41
+QLD	LTP	Libertarian Party	1958	29.64	4648	70.36
+QLD	AJP	Animal Justice Party	3860	62.10	2356	37.90
+QLD	CEC	Australian Citizens Party	1774	69.05	795	30.95
+QLD	SOPA	FUSION | Planet Rescue | Whistleblower Protection | Innovation	1580	75.17	522	24.83
+QLD	SAL	Socialist Alliance	733	44.86	901	55.14
+QLD	IND	Independent	74936	63.39	43285	36.61
+QLD	NAFD	Non Affiliated	943	65.71	492	34.29
+QLD		First Preferences	975848	47.02	1099623	52.98
+WA	NP	The Nationals	7391	16.05	38671	83.95
+WA	IND	Independent	63129	71.75	24858	28.25
+WA	ON	Pauline Hanson's One Nation	28859	23.73	92771	76.27
+WA	GRN	The Greens	166761	87.13	24628	12.87
+WA	HMP	Legalise Cannabis Australia	38681	58.13	27866	41.87
+WA	AUC	Australian Christians	7745	24.69	23620	75.31
+WA	CYA	Trumpet of Patriots	2664	28.33	6740	71.67
+WA	CEC	Australian Citizens Party	959	47.57	1057	52.43
+WA	IAP	Indigenous - Aboriginal Party of Australia	1276	68.16	596	31.84
+WA	SAL	Socialist Alliance	775	79.90	195	20.10
+WA	GAP	The Great Australian Party	608	40.29	901	59.71
+WA	NAFD	Non Affiliated	4892	46.05	5731	53.95
+WA		First Preferences	568895	55.39	458187	44.61
+SA	NP	The Nationals	2332	45.01	2849	54.99
+SA	XEN	Centre Alliance	22724	60.67	14729	39.33
+SA	ON	Pauline Hanson's One Nation	20186	28.98	49464	71.02
+SA	GRN	The Greens	133767	88.05	18148	11.95
+SA	CYA	Trumpet of Patriots	13868	38.75	21925	61.25
+SA	FFP	Family First Party Australia	10311	35.20	18982	64.80
+SA	AJP	Animal Justice Party	7454	66.39	3774	33.61
+SA	SOPA	FUSION | Planet Rescue | Whistleblower Protection | Innovation	2122	70.52	887	29.48
+SA	IND	Independent	23746	62.39	14317	37.61
+SA		First Preferences	433738	57.78	316915	42.22
+TAS	IND	Independent	47956	72.76	17951	27.24
+TAS	ON	Pauline Hanson's One Nation	7248	32.74	14892	67.26
+TAS	GRN	The Greens	36658	89.78	4175	10.22
+TAS	CYA	Trumpet of Patriots	3851	41.52	5424	58.48
+TAS	CEC	Australian Citizens Party	625	51.06	599	48.94
+TAS	ASP	Shooters, Fishers and Farmers Party	1851	53.54	1606	46.46
+TAS		First Preferences	134435	59.90	89988	40.10
+ACT	GRN	The Greens	40857	93.38	2896	6.62
+ACT	AJP	Animal Justice Party	944	75.04	314	24.96
+ACT	FFP	Family First Party Australia	2999	40.39	4427	59.61
+ACT	IMO	Health Environment Accountability Rights Transparency (HEART)	396	32.41	826	67.59
+ACT	IND	Independent	27321	73.23	9986	26.77
+ACT		First Preferences	138110	69.19	61489	30.81
+NT	CEC	Australian Citizens Party	642	47.03	723	52.97
+NT	ON	Pauline Hanson's One Nation	1492	18.27	6673	81.73
+NT	GRN	The Greens	8780	81.20	2033	18.80
+NT	IAP	Indigenous - Aboriginal Party of Australia	957	72.67	360	27.33
+NT	IND	Independent	5383	65.69	2811	34.31
+NT		First Preferences	40123	52.86	35785	47.14

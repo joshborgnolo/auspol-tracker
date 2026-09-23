@@ -1,0 +1,110 @@
+2019 Federal Election House of Representatives Two Party Preferred Flow of Preferences By State By Party [Event:24310 Phase:FinalResults Generated:2019-07-30T11:10:55 Cycle:02109509-c159-4199-88f6-389818be8a1c Created:2019-07-26T10:57:31 Environment:PROD Site:CANBERRA Server:TALLYROOM Version:10.7.17.56581]
+StateAb	PartyAb	PartyNm	Liberal/National Coalition Transfer Votes	Liberal/National Coalition Transfer Percentage	Australian Labor Party Transfer Votes	Australian Labor Party Transfer Percentage
+NSW	NP	The Nationals	17276	84.85	3085	15.15
+NSW	GRN	The Greens	70459	17.83	324779	82.17
+NSW	UAPP	United Australia Party	99450	64.80	54027	35.20
+NSW	CDP	Christian Democratic Party	72575	74.43	24938	25.57
+NSW	SPP	Sustainable Australia	12549	45.80	14850	54.20
+NSW	AJP	Animal Justice Party	12039	40.16	17942	59.84
+NSW	ON	Pauline Hanson's One Nation	37527	63.11	21937	36.89
+NSW	FACN	FRASER ANNING'S CONSERVATIVE NATIONAL PARTY	5294	69.17	2360	30.83
+NSW	FUT	Science Party	3376	31.29	7415	68.71
+NSW	LDP	Liberal Democrats (LDP)	15724	81.51	3567	18.49
+NSW	SEP	Socialist Equality Party	523	37.65	866	62.35
+NSW	AFN	Australia First Party (NSW) Incorporated	801	58.38	571	41.62
+NSW	ABFA	Australian Better Families	1328	64.09	744	35.91
+NSW	AWP	Australian Workers Party	984	58.71	692	41.29
+NSW	IMO	Involuntary Medication Objectors (Vaccination/Fluoride) Party	429	36.39	750	63.61
+NSW	NCP	Non-Custodial Parents Party	622	51.28	591	48.72
+NSW	ASP	Shooters, Fishers and Farmers	9971	55.00	8158	45.00
+NSW	GAP	The Great Australian Party	525	48.34	561	51.66
+NSW	IND	Independent	78124	37.24	131639	62.76
+NSW		First Preferences	1910065	54.91	1568223	45.09
+VIC	LP	Liberal	15808	89.49	1857	10.51
+VIC	NP	The Nationals	8461	88.71	1077	11.29
+VIC	GRN	The Greens	69037	15.72	370132	84.28
+VIC	UAPP	United Australia Party	85930	63.85	48651	36.15
+VIC	AJP	Animal Justice Party	14761	35.71	26572	64.29
+VIC	RUA	Rise Up Australia Party	6570	60.99	4202	39.01
+VIC	DHJP	Derryn Hinch's Justice Party	12393	46.24	14410	53.76
+VIC	FACN	FRASER ANNING'S CONSERVATIVE NATIONAL PARTY	8317	72.30	3187	27.70
+VIC	SPP	Sustainable Australia	3150	46.26	3659	53.74
+VIC	DLP	DLP - Democratic Labour Party	4709	41.32	6688	58.68
+VIC	ON	Pauline Hanson's One Nation	22641	64.36	12536	35.64
+VIC	REAS	Reason Australia	2776	31.21	6119	68.79
+VIC	VNS	Victorian Socialists	1546	12.41	10907	87.59
+VIC	CEC	Citizens Electoral Council	863	26.42	2404	73.58
+VIC	ASP	Shooters, Fishers and Farmers	8041	64.93	4343	35.07
+VIC	GAP	The Great Australian Party	1226	49.90	1231	50.10
+VIC	AFN	Australia First Party (NSW) Incorporated	2387	58.30	1707	41.70
+VIC	FUT	Science Party	221	44.47	276	55.53
+VIC	SEP	Socialist Equality Party	314	38.15	509	61.85
+VIC	IND	Independent	63802	44.29	80241	55.71
+VIC	NAFD	Non Affiliated	330	29.49	789	70.51
+VIC		First Preferences	1398339	50.66	1361913	49.34
+QLD	FACN	FRASER ANNING'S CONSERVATIVE NATIONAL PARTY	36383	73.38	13198	26.62
+QLD	GRN	The Greens	59786	20.47	232273	79.53
+QLD	UAPP	United Australia Party	68414	68.88	30915	31.12
+QLD	ON	Pauline Hanson's One Nation	168578	67.22	82201	32.78
+QLD	KAP	Katter's Australian Party (KAP)	46754	67.04	22982	32.96
+QLD	AJP	Animal Justice Party	5583	44.38	6996	55.62
+QLD	LDP	Liberal Democrats (LDP)	8827	68.77	4008	31.23
+QLD	DLP	DLP - Democratic Labour Party	2562	37.18	4328	62.82
+QLD	SAL	Socialist Alliance	365	25.05	1092	74.95
+QLD	SPP	Sustainable Australia	690	48.94	720	51.06
+QLD	AFN	Australia First Party (NSW) Incorporated	510	47.71	559	52.29
+QLD	AUP	Australian Progressives	423	43.83	542	56.17
+QLD	LAOL	Love Australia or Leave	852	54.48	712	45.52
+QLD	SEP	Socialist Equality Party	221	33.79	433	66.21
+QLD	IND	Independent	16548	46.10	19346	53.90
+QLD	NAFD	Non Affiliated	364	35.55	660	64.45
+QLD		First Preferences	1236401	62.09	754792	37.91
+WA	NP	The Nationals	16560	82.74	3455	17.26
+WA	ON	Pauline Hanson's One Nation	46767	62.79	27711	37.21
+WA	GRN	The Greens	32998	20.26	129878	79.74
+WA	UAPP	United Australia Party	18826	66.08	9662	33.92
+WA	WAP	WESTERN AUSTRALIA PARTY	12390	48.98	12908	51.02
+WA	AUC	Australian Christians	19229	80.79	4573	19.21
+WA	ASP	Shooters, Fishers and Farmers	6486	59.15	4480	40.85
+WA	FACN	FRASER ANNING'S CONSERVATIVE NATIONAL PARTY	2474	69.20	1101	30.80
+WA	AJP	Animal Justice Party	472	36.20	832	63.80
+WA	AFN	Australia First Party (NSW) Incorporated	132	52.59	119	47.41
+WA	FUT	Science Party	508	38.22	821	61.78
+WA	SAL	Socialist Alliance	130	13.13	860	86.87
+WA	GAP	The Great Australian Party	515	58.32	368	41.68
+WA	FLUX	VOTEFLUX.ORG | Upgrade Democracy!	278	46.18	324	53.82
+WA	IND	Independent	7101	46.19	8274	53.81
+WA		First Preferences	613915	59.51	417727	40.49
+SA	NP	The Nationals	1977	70.71	819	29.29
+SA	XEN	Centre Alliance	15438	32.90	31493	67.10
+SA	AJP	Animal Justice Party	11346	38.06	18465	61.94
+SA	GRN	The Greens	20729	20.12	82307	79.88
+SA	UAPP	United Australia Party	29601	64.34	16406	35.66
+SA	FACN	FRASER ANNING'S CONSERVATIVE NATIONAL PARTY	1668	57.12	1252	42.88
+SA	AUD	Australian Democrats	631	30.95	1408	69.05
+SA	AUP	Australian Progressives	179	31.68	386	68.32
+SA	CPP	Child Protection Party	553	45.37	666	54.63
+SA	ON	Pauline Hanson's One Nation	5245	58.34	3745	41.66
+SA	RUA	Rise Up Australia Party	353	58.54	250	41.46
+SA	IND	Independent	5813	44.65	7206	55.35
+SA		First Preferences	435217	53.42	379495	46.58
+TAS	NP	The Nationals	10048	72.71	3771	27.29
+TAS	GRN	The Greens	4171	11.84	31058	88.16
+TAS	UAPP	United Australia Party	9548	56.60	7320	43.40
+TAS	FACN	FRASER ANNING'S CONSERVATIVE NATIONAL PARTY	1301	66.07	668	33.93
+TAS	ON	Pauline Hanson's One Nation	5291	54.55	4408	45.45
+TAS	AJP	Animal Justice Party	623	37.37	1044	62.63
+TAS	IND	Independent	15668	34.67	29522	65.33
+TAS		First Preferences	106596	47.68	116955	52.32
+ACT	AUP	Australian Progressives	1941	31.16	4288	68.84
+ACT	GRN	The Greens	4565	10.19	40239	89.81
+ACT	UAPP	United Australia Party	4597	64.59	2520	35.41
+ACT	LDP	Liberal Democrats (LDP)	2225	87.60	315	12.40
+ACT	GAP	The Great Australian Party	576	62.00	353	38.00
+ACT	IND	Independent	4882	41.57	6863	58.43
+ACT		First Preferences	83311	43.25	109300	56.75
+NT	RUA	Rise Up Australia Party	1558	58.64	1099	41.36
+NT	GRN	The Greens	2085	19.83	8427	80.17
+NT	UAPP	United Australia Party	2047	69.39	903	30.61
+NT	IND	Independent	2888	60.08	1919	39.92
+NT		First Preferences	38837	47.02	43755	52.98

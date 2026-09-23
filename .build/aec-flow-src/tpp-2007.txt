@@ -1,0 +1,85 @@
+2007 Federal Election House of Representatives Two Party Preferred Flow of Preferences By State By Party [Event:13745 Phase:FinalResults Generated:2008-09-03T12:44:27 Cycle:349e38e7-5eda-4bc7-a4a0-805bff59620f Created:2008-08-13T17:22:12 Environment:TEST Site:Primary Server:TST-VTR04 Version:4.8.0.0]
+StateAb	PartyAb	PartyNm	Liberal/National Coalition Transfer Votes	Liberal/National Coalition Transfer Percentage	Australian Labor Party Transfer Votes	Australian Labor Party Transfer Percentage
+NSW	GRN	The Greens	61515	19.22	258516	80.78
+NSW	ON	One Nation	4902	58.18	3524	41.82
+NSW	CDP	CDP Christian Party	53504	68.68	24399	31.32
+NSW	DEM	Democrats	3883	34.96	7223	65.04
+NSW	FFP	Family First	17893	50.45	17576	49.55
+NSW	CEC	Citizens Electoral Council	5162	57.07	3883	42.93
+NSW	CCC	Climate Change Coalition	4131	43.62	5339	56.38
+NSW	CCE	Conservatives for Climate and Environment Incorporated	956	46.09	1118	53.91
+NSW	LDP	Liberty and Democracy Party	2994	61.03	1912	38.97
+NSW	NCP	Non-Custodial Parents Party	388	48.81	407	51.19
+NSW	SAL	Socialist Alliance	1812	45.64	2158	54.36
+NSW	SEP	Socialist Equality Party	1541	44.86	1894	55.14
+NSW	FPY	The Fishing Party	472	43.99	601	56.01
+NSW	IND	Independent	75514	56.18	58910	43.82
+NSW	NAFD	Non Affiliated	297	42.73	398	57.27
+NSW		First Preferences	1645493	47.88	1791171	52.12
+VIC	GRN	The Greens	44299	17.11	214555	82.89
+VIC	FFP	Family First	61411	64.19	34258	35.81
+VIC	DEM	Democrats	15073	38.83	23741	61.17
+VIC	CEC	Citizens Electoral Council	4389	50.70	4267	49.30
+VIC	ON	One Nation	216	49.88	217	50.12
+VIC	SAL	Socialist Alliance	1093	47.73	1197	52.27
+VIC	DLP	DLP - Democratic Labor Party	1893	31.46	4125	68.54
+VIC	CDP	CDP Christian Party	804	66.39	407	33.61
+VIC	LDP	Liberty and Democracy Party	1717	52.35	1563	47.65
+VIC	SEP	Socialist Equality Party	234	33.86	457	66.14
+VIC	WWW	What Women Want (Australia)	1063	58.25	762	41.75
+VIC	IND	Independent	14021	44.31	17624	55.69
+VIC	NAFD	Non Affiliated	160	29.68	379	70.32
+VIC		First Preferences	1302851	47.91	1416252	52.09
+QLD	LP	Liberal	23299	85.45	3967	14.55
+QLD	NP	The Nationals	15355	80.69	3674	19.31
+QLD	GRN	The Greens	33073	24.69	100865	75.31
+QLD	FFP	Family First	34555	63.92	19503	36.08
+QLD	ON	One Nation	4730	54.88	3889	45.12
+QLD	DEM	Democrats	8615	38.41	13812	61.59
+QLD	CEC	Citizens Electoral Council	1843	50.25	1825	49.75
+QLD	SAL	Socialist Alliance	394	33.56	780	66.44
+QLD	CDP	CDP Christian Party	513	68.13	240	31.87
+QLD	LDP	Liberty and Democracy Party	1678	47.52	1853	52.48
+QLD	FPY	The Fishing Party	521	51.58	489	48.42
+QLD	IND	Independent	42713	60.10	28355	39.90
+QLD		First Preferences	1011647	49.78	1020665	50.22
+WA	GRN	The Greens	25385	24.15	79721	75.85
+WA	ON	One Nation	6725	49.71	6804	50.29
+WA	CDP	CDP Christian Party	18014	72.53	6824	27.47
+WA	NP	The Nationals	10897	80.96	2562	19.04
+WA	CEC	Citizens Electoral Council	1226	39.36	1889	60.64
+WA	FFP	Family First	7951	55.93	6264	44.07
+WA	SAL	Socialist Alliance	263	23.05	878	76.95
+WA	LDP	Liberty and Democracy Party	1360	49.82	1370	50.18
+WA	SEP	Socialist Equality Party	44	28.03	113	71.97
+WA	WWW	What Women Want (Australia)	219	37.12	371	62.88
+WA	IND	Independent	9762	48.93	10188	51.07
+WA		First Preferences	545365	55.72	433342	44.28
+SA	GRN	The Greens	15598	22.72	53042	77.28
+SA	FFP	Family First	22856	57.10	17175	42.90
+SA	DEM	Democrats	5117	34.21	9840	65.79
+SA	ON	One Nation	730	44.43	913	55.57
+SA	NP	The Nationals	8828	71.08	3592	28.92
+SA	CCE	Conservatives for Climate and Environment Incorporated	461	39.57	704	60.43
+SA	LDP	Liberty and Democracy Party	636	38.85	1001	61.15
+SA	WWW	What Women Want (Australia)	563	38.69	892	61.31
+SA	IND	Independent	2924	42.11	4020	57.89
+SA		First Preferences	412621	49.16	426639	50.84
+TAS	GRN	The Greens	9516	21.68	34377	78.32
+TAS	FFP	Family First	4132	56.17	3224	43.83
+TAS	CEC	Citizens Electoral Council	647	34.86	1209	65.14
+TAS	SAL	Socialist Alliance	215	25.03	644	74.97
+TAS	LDP	Liberty and Democracy Party	230	37.95	376	62.05
+TAS	IND	Independent	3365	46.64	3850	53.36
+TAS		First Preferences	124280	47.19	139077	52.81
+ACT	DEM	Democrats	1040	41.45	1469	58.55
+ACT	GRN	The Greens	5274	17.92	24150	82.08
+ACT	SAL	Socialist Alliance	95	17.63	444	82.37
+ACT	CEC	Citizens Electoral Council	595	45.95	700	54.05
+ACT	IND	Independent	537	42.12	738	57.88
+ACT		First Preferences	74295	39.41	114244	60.59
+NT	GRN	The Greens	1914	24.22	5989	75.78
+NT	CEC	Citizens Electoral Council	114	46.53	131	53.47
+NT	LDP	Liberty and Democracy Party	205	57.26	153	42.74
+NT	IND	Independent	1264	48.34	1351	51.66
+NT		First Preferences	40298	46.27	46794	53.73
