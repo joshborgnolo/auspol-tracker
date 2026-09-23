@@ -351,7 +351,7 @@ async function loadWave(slug, links, notes) {
   else {
     const { buf } = await fetchPdf(links.report);
     reportTxt = pdfToText(buf, `${slug}-report`);
-    writeFileSync(reportPath, reportTxt);
+    if (!CHECK) writeFileSync(reportPath, reportTxt);
   }
 
   let methodTxt = null;
@@ -365,7 +365,7 @@ async function loadWave(slug, links, notes) {
     else {
       const { buf } = await fetchPdf(methodTarget);
       methodTxt = pdfToText(buf, `${slug}-method`);
-      writeFileSync(methodPath, methodTxt);
+      if (!CHECK) writeFileSync(methodPath, methodTxt);
     }
   }
 
@@ -392,8 +392,15 @@ async function loadWave(slug, links, notes) {
     }
   }
 
-  writeFileSync(linkPath, JSON.stringify({ report: links.report, method: links.method ?? null,
-    combined: links.combined, cachedAt: new Date().toISOString() }) + "\n");
+  // Rewrite the link record only when the article's link set moved.
+  // Restamping cachedAt on every run left the committed caches modified
+  // after each no-change run (the wrapper commits only on a new wave),
+  // and a dirty tree makes every laptop wrapper refuse its slot.
+  const linksMoved = prev?.report !== links.report || (prev?.method ?? null) !== (links.method ?? null)
+    || prev?.combined !== links.combined;
+  if (!CHECK && linksMoved)
+    writeFileSync(linkPath, JSON.stringify({ report: links.report, method: links.method ?? null,
+      combined: links.combined, cachedAt: new Date().toISOString() }) + "\n");
   return w;
 }
 

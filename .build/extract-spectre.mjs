@@ -416,9 +416,14 @@ try {
       else {
         const buf = await fetchPdf(pdfUrl);
         reportTxt = pdfToText(buf, `${slug}-report`);
-        writeFileSync(txtPath, reportTxt);
+        if (!CHECK) writeFileSync(txtPath, reportTxt);
       }
-      writeFileSync(linkPath, JSON.stringify({ pdf: pdfUrl, cachedAt: new Date().toISOString() }) + "\n");
+      // Rewrite the link record only when the PDF behind the wave moved.
+      // Restamping cachedAt on every run left the committed caches modified
+      // after each no-change run (the wrapper commits only on a new wave),
+      // and a dirty tree makes every laptop wrapper refuse its slot.
+      if (!CHECK && prev?.pdf !== pdfUrl)
+        writeFileSync(linkPath, JSON.stringify({ pdf: pdfUrl, cachedAt: new Date().toISOString() }) + "\n");
 
       const w = parseReport(reportTxt, slug, D);
       w.url = item.link;
