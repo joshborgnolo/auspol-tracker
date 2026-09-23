@@ -128,16 +128,12 @@ const FONTS = [
   { file: "crimsontext-italic-400-latin.woff2", family: "Crimson Text", style: "italic", weight: "400" },
   { file: "crimsontext-italic-600-latin.woff2", family: "Crimson Text", style: "italic", weight: "600" },
   { file: "crimsontext-italic-700-latin.woff2", family: "Crimson Text", style: "italic", weight: "700" },
-  /* Source Serif 4 sets the tab labels and the navbar's docked 2PP score
-     (--heads in template.html) - one variable cut (wght 200-900 + an
-     optical-size axis the browser steers by font-size). Preloaded - it
-     paints above the fold. */
-  { file: "sourceserif4-latin.woff2",           family: "Source Serif 4", style: "normal", weight: "200 900", preload: true },
+  /* Source Serif 4 retired Sep 2026: the tab labels and docked score set in
+     Crimson Text, the page's one serif. The source subset stays in fonts/. */
   { file: "ibmplexsans-latin.woff2",            family: "IBM Plex Sans", style: "normal", weight: "300 700", preload: true },
-  /* Source Sans 3 has two callers: the .wordmark lockup, which keeps its
-     pre-swap face, and the whole expanded poll breakdown (--panel), which
-     needs 400/500/600/700 - all inside this one variable cut. Neither paints
-     the first screen, so no preload. */
+  /* Source Sans 3 has one caller: the .wordmark lockup. It paints the first
+     screen, but the stack falls back to system sans in the moment before it
+     lands, which is cheaper than a preload. */
   { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800" },
   /* Archivo is retired: the expanded poll breakdown was its only consumer and
      that panel is now set in Source Sans 3 throughout. The source subset stays

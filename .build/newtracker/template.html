@@ -108,12 +108,12 @@
   /* every text face is a self-hosted latin subset (FONTS in build.mjs) */
   --serif: "Crimson Text", Georgia, "Times New Roman", serif;
   --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
-  /* the expanded poll breakdown is set entirely in Source Sans 3 - one
-     variable cut already shipped for the wordmark, covering 400/500/600/700.
-     It replaced Archivo (--figures), whose only consumer was this panel. */
-  --panel: "Source Sans 3", var(--sans);
-  /* tab labels: Source Serif 4, not --serif */
-  --heads: "Source Serif 4", var(--serif);
+  /* Two text families, one serif and one sans. The expanded poll breakdown
+     (Source Sans 3) and the tab labels (Source Serif 4) each set a third and
+     fourth face beside the page's own, a visible change of voice mid-page;
+     both now resolve to the page's families. */
+  --panel: var(--sans);
+  --heads: var(--serif);
 
   --radius: 14px;
   --shadow: 0 1px 2px oklch(0.4 0.02 60 / 0.05), 0 6px 20px oklch(0.4 0.02 60 / 0.05);
@@ -252,12 +252,12 @@ body {
   letter-spacing: -0.01em; margin: 0 0 6px;
 }
 .static-summary h2 {
-  font-family: var(--serif); font-size: 20px; font-weight: 600;
+  font-family: var(--serif); font-size: 19px; font-weight: 600;
   margin: 28px 0 8px; padding-top: 14px; border-top: 1px solid var(--line);
 }
 .ss-sub { margin: 0 0 4px; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
 .ss-lead { font-size: 22px; margin: 0 0 8px; font-variant-numeric: tabular-nums; }
-.static-summary p { font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
+.static-summary p { font-size: 14px; line-height: 1.6; color: var(--ink-2); }
 /* a table, not a flex list: reader engines keep a table's columns but
    throw flexbox away, which would leave one space between party and share. */
 .ss-primary { border-collapse: collapse; width: 100%; max-width: 320px; font-size: 15px; }
@@ -270,12 +270,12 @@ body {
 .ss-primary td + td, .ss-primary thead th + th { padding-left: 14px; }
 .ss-primary thead th { font-size: 13px; color: var(--ink-3); text-align: right; font-weight: 400; }
 .ss-primary thead th:first-child { text-align: left; font-weight: 600; }
-.ss-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.ss-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 /* the table's label is a paragraph, not a <caption>: reader engines render a
    caption inside their own table chrome with an odd indent, while a plain
    paragraph above the table inherits their body-text rhythm. The p wins over
    .static-summary p via the extra class. */
-.static-summary p.ss-cap { margin: 0 0 8px; font-size: 12.5px; color: var(--ink-3); }
+.static-summary p.ss-cap { margin: 0 0 8px; font-size: 13px; color: var(--ink-3); }
 .ss-table th, .ss-table td {
   text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line-2);
   font-variant-numeric: tabular-nums;
@@ -289,7 +289,7 @@ body {
    gets a scroll box; the page keeps its width. No sticky thead here, so
    overflow-x:auto is safe (unlike the live tables' .ap-wrap). */
 .ss-tblwrap { overflow-x: auto; }
-.ss-note { margin-top: 20px; font-size: 12.5px; color: var(--ink-3); }
+.ss-note { margin-top: 20px; font-size: 13px; color: var(--ink-3); }
 .ss-note a { color: var(--ink-2); }
 .ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 .boot-noscript {
@@ -321,12 +321,11 @@ body {
   border-bottom: 1px solid var(--line);
 }
 .wordmark {
-  /* the one place the pre-swap stack survives: body text moved to IBM Plex
-     Sans, but the lockup keeps its Myriad / Source Sans 3 pairing (Source
-     Sans 3 stays shipped for this one caller, standing in where Myriad
-     isn't installed). The .wm-name/.wm-track spans set no family, so this
-     inherits into both words and the stacked variant. */
-  font-family: "Myriad Pro", "Myriad Web Pro", "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* the lockup's own face, Source Sans 3, shipped for this one caller. Myriad
+     Pro used to lead the stack, so a machine with Adobe fonts installed drew
+     a different wordmark from every reader's. The .wm-name/.wm-track spans
+     set no family, so this inherits into both words and the stacked variant. */
+  font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
   display: inline-flex; align-items: center; gap: 3px;
   font-weight: 800; font-size: 30px; letter-spacing: -0.025em; line-height: 1;
   margin: 0;
@@ -370,7 +369,7 @@ body.js.ss-view #root { display: none; }
   border: 1px solid var(--line); border-radius: 8px;
   text-align: center; color: var(--ink-2);
 }
-.view-error p { margin: 0 0 14px; font-size: 14.5px; line-height: 1.55; }
+.view-error p { margin: 0 0 14px; font-size: 14px; line-height: 1.55; }
 .view-error-retry {
   font: inherit; font-size: 13px; padding: 8px 14px;
   border: 1px solid var(--line); border-radius: 999px;
@@ -466,7 +465,7 @@ body.js.ss-view #root { display: none; }
 .dl-close {
   position: absolute; top: 10px; right: 12px; width: 30px; height: 30px;
   border: 0; background: none; color: var(--ink-3); cursor: pointer;
-  font: 400 24px/1 var(--sans); border-radius: 8px;
+  font: 400 26px/1 var(--sans); border-radius: 8px;
 }
 .dl-close:hover { color: var(--ink); background: var(--surface-2); }
 
@@ -527,11 +526,11 @@ body.dark .dl-needle-lit { opacity: 0.4; }
 
 .dl-cap { text-align: center; }
 .dl-month {
-  font-family: var(--serif, var(--sans)); font-size: 25px; font-weight: 500; color: var(--ink);
+  font-family: var(--serif, var(--sans)); font-size: 26px; font-weight: 400; color: var(--ink);
   letter-spacing: -0.01em; display: flex; align-items: baseline; justify-content: center; gap: 9px;
 }
 .dl-tag {
-  font-family: var(--sans); font-size: 9.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 11px; font-weight: 700;
   color: var(--ink-3); border: 1px solid var(--line);
   border-radius: 999px; padding: 2px 7px;
 }
@@ -719,10 +718,10 @@ body.dark .dl-bloom { opacity: 1; }
 }
 
 .dl-foot { display: flex; align-items: flex-end; gap: 16px; }
-.dl-legend { flex: 1; font-size: 11.5px; line-height: 1.5; color: var(--ink-3); }
+.dl-legend { flex: 1; font-size: 12px; line-height: 1.5; color: var(--ink-3); }
 .dl-replay {
   flex: none; border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
-  padding: 6px 14px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  padding: 6px 14px; font-family: var(--sans); font-size: 13px; font-weight: 600;
   color: var(--ink-2); cursor: pointer;
 }
 .dl-replay:hover:not(:disabled) { color: var(--ink); border-color: var(--ink-3); }
@@ -731,7 +730,7 @@ body.dark .dl-bloom { opacity: 1; }
 @media (max-width: 560px) {
   .dl-shell { padding: 26px 18px 18px; }
   .dl-svg { width: 96%; }
-  .dl-month { font-size: 21px; }
+  .dl-month { font-size: 22px; }
   .dl-foot { flex-direction: column; align-items: stretch; gap: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -961,7 +960,7 @@ a.pollster-link::after, a.pollster-method::after, a.np-link::after, a.tn-link::a
   display: flex; justify-content: space-between; align-items: flex-start;
   gap: 18px; flex-wrap: wrap; margin-bottom: 14px;
 }
-.card-title { font-family: var(--serif); font-weight: 540; font-size: 22px; margin: 0; letter-spacing: -0.01em; color: var(--ink); line-height: 1.15; }
+.card-title { font-family: var(--serif); font-weight: 600; font-size: 22px; margin: 0; letter-spacing: -0.01em; color: var(--ink); line-height: 1.15; }
 .card-sub { margin: 3px 0 0; font-size: 13px; color: var(--ink-3); text-wrap: pretty; }
 
 /* ---------- segmented control ---------- */
@@ -1351,7 +1350,7 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    ~360px, with the Individual-poll entry nudged left so the 95% interval
    label clears the row's end */
 .hero-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; }
-.hl-item { display: inline-flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-3); font-weight: 500; white-space: nowrap; }
+.hl-item { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); font-weight: 500; white-space: nowrap; }
 .hl-line { width: 18px; height: 3px; border-radius: 2px; }
 /* dashed swatch for a computed (not measured) overlay line – the fixed-flow
    implied-2PP diagnostic's legend entry */
@@ -1387,7 +1386,7 @@ body.dark .sens-band { opacity: 0.10; }
    wrap still catches it. */
 @media (max-width: 640px) {
   .hero-legend { column-gap: 10px; row-gap: 4px; }
-  .hl-item { font-size: 11.5px; gap: 5px; }
+  .hl-item { font-size: 12px; gap: 5px; }
   .hl-line, .hl-dashed { width: 15px; }
   .hl-band, .hl-band-sens { width: 15px; }
   .hl-dot { width: 8px; height: 8px; }
@@ -1396,7 +1395,7 @@ body.dark .sens-band { opacity: 0.10; }
 /* "limited data" caveat inside the hero eyebrow – same size, quieter weight,
    so it reads as a qualifier on the method rather than a separate label */
 .eyebrow-warn { color: var(--ink-3); font-weight: 600; }
-.hero-caption { margin: 0; font-size: 12.5px; color: var(--ink-3); }
+.hero-caption { margin: 0; font-size: 13px; color: var(--ink-3); }
 
 /* the contests that are not on the chart, each carrying its own figure. A
    button, not a tab: pressing one makes it the headline and morphs the chart.
@@ -1407,17 +1406,17 @@ body.dark .sens-band { opacity: 0.10; }
    column's right edge. On a phone the ≤560px block orders it first in the
    wrap row. */
 .hero-alt { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
-.ha-lab { font-size: 10.5px; font-weight: 700;
+.ha-lab { font-size: 11px; font-weight: 700;
   color: var(--ink-3); }
 .ha-chip { display: inline-flex; align-items: baseline; gap: 8px; cursor: pointer;
   background: none; border: 1px solid var(--line); border-radius: 999px; padding: 4px 11px;
   font: inherit; color: var(--ink-2); transition: border-color 120ms ease, background 120ms ease; }
 .ha-chip:hover { border-color: var(--line-2); background: var(--surface-2, transparent); }
-.ha-vs { font-size: 11.5px; font-weight: 600; }
+.ha-vs { font-size: 12px; font-weight: 600; }
 .ha-fig { font-family: var(--serif); font-size: 16px; font-weight: 600;
   font-variant-numeric: tabular-nums; }
 .ha-dash { color: var(--ink-3); margin: 0 3px; }
-.ha-ci { font-size: 10.5px; color: var(--ink-3); }
+.ha-ci { font-size: 11px; color: var(--ink-3); }
 
 /* ---------- delta ---------- */
 .delta { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 700; white-space: nowrap; }
@@ -1555,7 +1554,7 @@ body.dark .sens-band { opacity: 0.10; }
   pointer-events: none;
   transition: transform .15s cubic-bezier(.3,.7,.3,1), opacity .14s ease;
 }
-.axis-label { font-family: var(--sans); fill: var(--ink-3); font-size: 13.5px; transition: fill .35s ease; }
+.axis-label { font-family: var(--sans); fill: var(--ink-3); font-size: 13px; transition: fill .35s ease; }
 .axis-label.y { text-anchor: end; font-weight: 500; }
 .axis-label.x { font-weight: 500; }
 .scatter-dot { transition: r .12s ease, opacity .12s ease, fill .35s ease; cursor: pointer; }
@@ -1593,7 +1592,7 @@ body.dark .sens-band { opacity: 0.10; }
 }
 .tip.tip-dot { transform: translate(-50%, calc(-100% - 14px)); }
 .tip-title { font-size: 12px; font-weight: 700; color: var(--ink); margin-bottom: 6px; letter-spacing: -0.01em; white-space: nowrap; }
-.tip-row { display: flex; align-items: center; gap: 7px; font-size: 12.5px; padding: 1px 0; white-space: nowrap; }
+.tip-row { display: flex; align-items: center; gap: 7px; font-size: 13px; padding: 1px 0; white-space: nowrap; }
 .tip-swatch { width: 9px; height: 9px; border-radius: 2px; flex: none; }
 .tip-label { color: var(--ink-3); }
 .tip-val { margin-left: auto; font-weight: 700; color: var(--ink); padding-left: 10px; }
@@ -1658,7 +1657,7 @@ body.dark .sens-band { opacity: 0.10; }
   .tabs.pinned:not(.show-score) .tab-glyph { opacity: 1; transform: none; }
 }
 .ts-eyebrow {
-  font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
   color: var(--ink-3); margin-right: 2px;
 }
 .ts-party { display: inline-flex; align-items: baseline; gap: 5px; }
@@ -1666,12 +1665,11 @@ body.dark .sens-band { opacity: 0.10; }
   font-size: 10.5px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
   color: var(--ink-3);
 }
-/* --heads (Source Serif 4) pairs the docked score with the bar's tab labels;
-   the wght 200-900 variable cut interpolates the 560 below exactly and
-   tabular-nums actually lands - Crimson's static set face-matched 560 to 600
-   and ignored tnum outright. */
+/* --heads pairs the docked score with the bar's tab labels and, since the
+   serif consolidation, with the hero it docks from: all three are Crimson
+   Text now, which ships 400/600/700 only, so the weight says 600. */
 .ts-num {
-  font-family: var(--heads, var(--serif)); font-weight: 560; font-size: 16px; line-height: 1;
+  font-family: var(--heads, var(--serif)); font-weight: 600; font-size: 16px; line-height: 1;
   letter-spacing: -0.01em; font-variant-numeric: tabular-nums;
 }
 .ts-sep { width: 1.5px; height: 13px; background: var(--line-2); align-self: center; flex: none; position: relative; top: 1px; }
@@ -1679,7 +1677,7 @@ body.dark .sens-band { opacity: 0.10; }
 @media (max-width: 640px) {
   .ts-eyebrow { display: none; }
   .tab-score { gap: 7px; }
-  .ts-num { font-size: 15.5px; }
+  .ts-num { font-size: 15px; }
 }
 @media (max-width: 400px) {
   .ts-abbr { display: none; }
@@ -1702,8 +1700,8 @@ body.dark .sens-band { opacity: 0.10; }
 .legend-chip.off .legend-name { color: var(--ink-3); }
 .legend-chip.off .delta { opacity: 0.8; }
 .legend-swatch { width: 9px; height: 9px; border-radius: 2px; }
-.legend-name { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
-.legend-val { font-size: 12.5px; font-weight: 700; color: var(--ink); }
+.legend-name { font-size: 13px; font-weight: 600; color: var(--ink-2); }
+.legend-val { font-size: 13px; font-weight: 700; color: var(--ink); }
 .legend-chip.off .legend-val { color: var(--ink-3); }
 
 /* residual aggregate ("Others / Ind.") – not a party. Its swatch becomes a
@@ -1735,20 +1733,22 @@ body.dark .sens-band { opacity: 0.10; }
    (Primary vote / National direction), so it reads as the PARENT of the two
    cards below rather than a smaller sibling. */
 .section-h {
-  font-family: var(--serif); font-weight: 540; font-size: 22px;
+  font-family: var(--serif); font-weight: 600; font-size: 22px;
   letter-spacing: -0.01em; color: var(--ink); margin: 0; line-height: 1.15;
 }
-body.editorial .section-h { font-size: 30px; font-weight: 500; letter-spacing: -0.018em; }
+body.editorial .section-h { font-size: 30px; font-weight: 400; letter-spacing: -0.018em; }
+/* set like every other note on the page: small italic serif was the
+   hardest-reading combination here, on the page's longest single line */
 .leadership-note {
-  margin: 6px 0 0; font-size: 12.5px; color: var(--ink-3);
-  font-family: var(--serif); font-style: italic;
+  margin: 6px 0 0; font-size: 13px; line-height: 1.6; color: var(--ink-3);
+  font-family: var(--sans);
 }
-.leadership-note strong { font-style: normal; font-weight: 700; color: var(--ink-2); }
+.leadership-note strong { font-weight: 600; color: var(--ink-2); }
 .leadership .two-col { margin-top: 20px; }
 /* the two panel titles SETTLE DOWN a level below the section header – clearly
    subheadings, not peers of "Leadership". Out-specifies the editorial bump. */
 .leadership .card-title,
-body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; letter-spacing: -0.012em; white-space: nowrap; }
+body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; letter-spacing: -0.012em; white-space: nowrap; }
 
 /* Preferred PM shows two contests at once: one line each, the pair of tiles
    doing the naming and the row doing the grouping. The rule at the head of the
@@ -1891,7 +1891,7 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 
 .approval-readout { display: flex; flex-direction: column; gap: 11px; margin-bottom: 12px; }
 .appr-top { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
-.appr-top .leader-name { font-size: 13.5px; }
+.appr-top .leader-name { font-size: 13px; }
 .net { margin-left: auto; font-weight: 800; font-size: 15px; font-variant-numeric: tabular-nums;
   /* Approval and favourability are the same three people answering a
      different question, so the toggle is a rearrangement and the figure rolls
@@ -1907,13 +1907,13 @@ body.editorial .leadership .card-title { font-size: 20px; font-weight: 560; lett
 /* favourability marker – flags nets that are positive−negative, a different
    question from approval and not directly comparable */
 .fav-mark {
-  font-size: 8px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+  font-size: 10px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
   color: var(--ink-3); vertical-align: super; margin-left: 3px; cursor: help;
 }
 /* change indicator vs the pollster's previous poll – neutral ink, direction by
    the ▲/▼ glyph (no good/bad colour). Sits quietly after the figure. */
 .chg {
-  margin-left: 5px; font-size: 10.5px; font-weight: 700; color: var(--ink-3);
+  margin-left: 5px; font-size: 11px; font-weight: 700; color: var(--ink-3);
   font-variant-numeric: tabular-nums; white-space: nowrap; cursor: help;
   letter-spacing: -0.01em;
 }
@@ -2016,7 +2016,7 @@ a.pollster-link:hover .plink-mark, a.pollster-link:focus-visible .plink-mark { c
    as type by their TEXT, and light up solid ink only when their filter is on */
 .poll-tags { display: flex; flex-wrap: wrap; gap: 3px; margin-top: 4px; }
 .ptag {
-  font-family: var(--sans); font-size: 9px; font-weight: 800; letter-spacing: 0.04em;
+  font-family: var(--sans); font-size: 10.5px; font-weight: 800; letter-spacing: 0.04em;
   text-transform: uppercase; padding: 1px 4px; border-radius: 3px; line-height: 1.5;
   background: var(--surface-2); color: var(--ink-3); white-space: nowrap;
   border: 1px solid var(--line-2);
@@ -2034,7 +2034,7 @@ a.pollster-method:hover, a.pollster-method:focus-visible { text-decoration: unde
 a.pollster-method:focus-visible { outline: 2px solid var(--accent, currentColor); outline-offset: 2px; border-radius: 2px; }
 a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark { color: var(--ink-2); }
 .released-pill {
-  display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
+  display: inline-block; font-size: 13px; font-weight: 700; color: var(--ink-2);
   background: var(--surface-2); border: 1px solid var(--line); border-radius: 999px;
   padding: 2px 9px; white-space: nowrap; font-variant-numeric: tabular-nums;
 }
@@ -2100,7 +2100,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .sbar-seg { min-width: 2px; }
 .share-keys {
   display: flex; flex-wrap: wrap; gap: 4px 11px;
-  font-size: 11.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+  font-size: 12px; color: var(--ink-2); font-variant-numeric: tabular-nums;
 }
 .skey { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
 .skey.muted { color: var(--ink-3); }
@@ -2108,10 +2108,10 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .skey-lab { color: inherit; }
 .skey-val { font-weight: 700; color: var(--ink); }
 .skey.muted .skey-val { color: var(--ink-3); }
-.share-compact .share-keys { font-size: 12.5px; gap: 4px 10px; }
+.share-compact .share-keys { font-size: 13px; gap: 4px 10px; }
 
 .facet-flag {
-  display: inline-block; font-size: 9.5px; font-weight: 700;
+  display: inline-block; font-size: 11px; font-weight: 700;
   color: var(--ink-3);
   border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px;
   white-space: nowrap;
@@ -2205,7 +2205,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    styled - their sizes lived inside the viewBox and shrank with it. */
 .info-chart { display: block; margin: 14px 0 12px; }
 .info-chart .fc-unit {
-  display: block; font-size: 11.5px; font-weight: 500; color: var(--ink-3);
+  display: block; font-size: 12px; font-weight: 500; color: var(--ink-3);
   margin-bottom: 2px;
 }
 .info-chart .fc-legend { margin-top: 9px; }
@@ -2213,16 +2213,16 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
    rows, sized down from the glossary's reading measure and keyed numerically
    so the Σ line at the foot closes the arithmetic story the paragraphs tell */
 .info-work-wrap { margin: 10px 0 4px; overflow-x: auto; }
-.info-work { border-collapse: collapse; font-size: 12.5px; line-height: 1.55;
+.info-work { border-collapse: collapse; font-size: 13px; line-height: 1.55;
   font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--ink-2); }
-.info-work th { font-size: 10.5px; font-weight: 600; color: var(--ink-3);
+.info-work th { font-size: 11px; font-weight: 600; color: var(--ink-3);
   text-align: right; padding: 0 7px 3px; border-bottom: 1px solid var(--line-2); }
 .info-work td { text-align: right; padding: 1px 7px; }
 .info-work th:nth-child(-n+2), .info-work td:nth-child(-n+2) { text-align: left; }
 .info-work th:first-child, .info-work td:first-child { padding-left: 0; }
 .info-work tr.info-work-sum td { border-top: 1px solid var(--line-2);
   padding-top: 4px; color: var(--ink); font-weight: 600; text-align: left; }
-.info-work-note { margin: 5px 0 0; font-size: 12.5px; color: var(--ink-3); }
+.info-work-note { margin: 5px 0 0; font-size: 13px; color: var(--ink-3); }
 
 .back-to-chart {
   display: inline-flex; align-items: center; gap: 6px;
@@ -2239,7 +2239,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 /* but the report button is not a peer of the way back - it exists for the
    reader who already doubts a figure, not as a call to action - so it wears
    the pill shape at a lower voice */
-.pd-report { font-size: 11.5px; font-weight: 500; color: var(--ink-3); padding: 4px 11px 4px 9px; }
+.pd-report { font-size: 12px; font-weight: 500; color: var(--ink-3); padding: 4px 11px 4px 9px; }
 .pd-report:hover { color: var(--ink); }
 /* The band's split: the poll's provenance is a label/value LIST that keeps
    its own narrow column on the left (see .pd-meta-items), and the controls
@@ -2633,7 +2633,7 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 .demo-grid { display: grid; gap: 18px 30px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   margin: 0 2px 6px; }
 .demo-house-head { display: flex; align-items: baseline; gap: 8px; margin: 0 0 6px; flex-wrap: wrap; }
-.demo-house-name { font-size: 13.5px; font-weight: 650; color: var(--ink); text-decoration: none; }
+.demo-house-name { font-size: 13px; font-weight: 650; color: var(--ink); text-decoration: none; }
 a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px; }
 .demo-house-when { font-size: 12px; color: var(--ink-3); }
 .demo-house { max-width: 460px; }
@@ -2645,7 +2645,7 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-fill { display: block; height: 100%; border-radius: 3px; }
 .demo-v { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
 .demo-row.all .demo-v { color: var(--ink-3); font-weight: 500; }
-.demo-ci, .read-ci { font-size: 11.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.demo-ci, .read-ci { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
 .demo-sw { display: inline-block; width: 12px; height: 3px; border-radius: 2px; margin-right: 6px;
   vertical-align: middle; }
 .demo-sw.dash { background: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 7px); }
@@ -2670,12 +2670,12 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
   var(--ink-2) 0 2px, transparent 2px 7px); }
 .und-read-body { min-width: 0; }
 .und-read-top { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
-.und-read-lab { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.und-read-lab { font-size: 13px; font-weight: 600; color: var(--ink-2); }
 .und-read-v { font-family: var(--serif); font-size: 22px; font-weight: 600; color: var(--ink); }
 .und-read-stale { font-family: var(--sans); font-size: 12px; color: var(--ink-3); }
-.und-read-note { margin: 1px 0 0; font-size: 11.5px; color: var(--ink-3); }
+.und-read-note { margin: 1px 0 0; font-size: 12px; color: var(--ink-3); }
 
-.pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13.5px; }
+.pd-absent { font-family: var(--serif); font-style: italic; color: var(--ink-3); font-size: 13px; }
 /* inside the breakdown an absent section reads as just another plain line –
    the serif italic is for empty states elsewhere (eg National direction) –
    and at the body's own size, because "Not published" is an answer to the
@@ -2688,7 +2688,11 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 /* a fieldwork end standing in for a publication date nobody recorded, marked
    the dashed way the Latest-polls pill marks the same substitution */
 .pd-est { border-bottom: 1px dashed var(--line-2); color: var(--ink-3); }
-.table-hint { margin: 12px 2px 0; font-size: 12px; color: var(--ink-3); }
+.table-hint { margin: 12px 2px 0; font-size: 13px; line-height: 1.6; color: var(--ink-3); }
+/* Notes and captions run to a reading measure, not the card's width: at
+   1440px they ran 150-220 characters a line. */
+.table-hint, .hero-caption, .leadership-note, .cycle-basis, .cyc-foot,
+.npd-foot, .ap-var-note { max-width: 68ch; }
 
 /* ---------- how the final polls did (past cycles) ---------- */
 /* A row per election on one shared scale, so eighteen elections' worth of error can
@@ -2732,7 +2736,7 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .acc-spread {
   display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid var(--line); background: var(--surface); border-radius: 999px;
-  padding: 5px 12px 5px 9px; font-family: var(--sans); font-size: 11.5px; font-weight: 600;
+  padding: 5px 12px 5px 9px; font-family: var(--sans); font-size: 12px; font-weight: 600;
   color: var(--ink-2); cursor: pointer; white-space: nowrap;
   /* named rather than shorthand: the shared control rule sets
      transition-property earlier in the file, and a `transition:` here would
@@ -2780,7 +2784,7 @@ button.acc-spread[aria-pressed="true"] {
   font-variant-numeric: tabular-nums; }
 .acc-note { font-size: 11px; color: var(--ink-3); display: flex; gap: 6px; align-items: baseline;
   justify-content: flex-end; flex-wrap: wrap; }
-.acc-flag { font-weight: 700; font-size: 9.5px;
+.acc-flag { font-weight: 700; font-size: 11px;
   color: var(--ink-2); border: 1px solid var(--line-2); border-radius: 3px; padding: 1px 4px; }
 .acc-firms { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--line); }
 .acc-firms-h { font-size: 11px; font-weight: 700;
@@ -2791,7 +2795,7 @@ button.acc-spread[aria-pressed="true"] {
 .acc-firms-grid { display: grid; gap: 8px 18px;
   grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); }
 .acc-firm { display: flex; flex-direction: column; gap: 1px; }
-.acc-firm-n { font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+.acc-firm-n { font-size: 13px; font-weight: 600; color: var(--ink-2); }
 .acc-firm-v { font-family: var(--serif); font-size: 17px; color: var(--ink);
   font-variant-numeric: tabular-nums; }
 .acc-firm-c { font-size: 11px; color: var(--ink-3); }
@@ -2918,17 +2922,17 @@ button.acc-spread[aria-pressed="true"] {
    what it is. Balanced rather than ragged - at this measure it sets in one
    line or two, and the two-line break should not leave a single word. */
 .colo-lede {
-  margin: 0; font-family: var(--serif); font-size: 16.5px; line-height: 1.45;
+  margin: 0; font-family: var(--serif); font-size: 17px; line-height: 1.45;
   color: var(--ink-2); text-wrap: balance;
 }
 /* the caveat is the footnote to the claim directly above it, so it sits in
    that claim's column at that claim's left edge - not stretched across the
    full 1144px, which is where a centred box of it used to end up */
-.disclaimer { margin: 13px 0 0; font-size: 11.5px; line-height: 1.65; color: var(--ink-3); }
+.disclaimer { margin: 13px 0 0; font-size: 12px; line-height: 1.65; color: var(--ink-3); }
 
 /* the archive is the quieter of the two doors, and is the footnote shape on
    this side of the rule - same step down as .disclaimer takes on the other */
-.colo-arch { margin: 20px 0 0; font-size: 12.5px; line-height: 1.65; color: var(--ink-3); }
+.colo-arch { margin: 20px 0 0; font-size: 13px; line-height: 1.65; color: var(--ink-3); }
 .colo-arch + .colo-arch { margin-top: 6px; }
 .colo-plain { font-size: inherit; }
 /* skip link: off-screen until focused, then a pill over the masthead */
@@ -2954,7 +2958,7 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
    The linked phrase sits INSIDE the sentence rather than beside it: the
    offer and the way to take it up are one thought, and a pill parked at the
    end of the paragraph read as a second one competing with it. */
-.fb-lede { margin: 0; font-size: 13.5px; line-height: 1.6; color: var(--ink-2); }
+.fb-lede { margin: 0; font-size: 13px; line-height: 1.6; color: var(--ink-2); }
 /* the same treatment as a text link on /feedback/, where .fb-link was the
    trigger of the old footer's own form - it loses nothing by being an
    anchor here: a border-bottom and the bold weight is the whole gesture */
@@ -2984,7 +2988,7 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
 }
 @media (max-width: 900px) {
   .head-meta { gap: 12px; }
-  .ro-num { font-size: 52px; }
+  .ro-num { font-size: 54px; }
   /* Never one row of six small targets: at this width the toggles' home is
      the chartbar row above the chart (laptop arrangement) or still the
      strip, and either way real touch padding is the point - this is exactly
@@ -3007,7 +3011,7 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
   /* …and surface a single compact freshness line in its place */
   .head-meta-compact {
     display: flex; align-items: center; gap: 8px;
-    margin: 9px 0 0; font-size: 12.5px; color: var(--ink-3);
+    margin: 9px 0 0; font-size: 13px; color: var(--ink-3);
     font-variant-numeric: tabular-nums;
   }
   .head-meta-compact .fresh-dot { margin-right: 0; width: 6px; height: 6px; top: 0; }
@@ -3125,7 +3129,7 @@ body.editorial .hero { border-top: 0; padding-top: 10px; }
 body.editorial .info { border-top: 0; padding-top: 10px; }
 
 /* bigger, more authoritative serif section headings */
-body.editorial .card-title { font-size: 30px; font-weight: 500; letter-spacing: -0.018em; }
+body.editorial .card-title { font-size: 30px; font-weight: 400; letter-spacing: -0.018em; }
 body.editorial .card-sub { font-size: 14px; margin-top: 5px; }
 body.editorial .card-head { margin-bottom: 22px; }
 
@@ -3168,7 +3172,7 @@ body.editorial .poll-table tbody tr:hover { background: var(--surface-2); }
 body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; padding-top: 30px; }
 
 .tweak-note {
-  margin: -2px 0 4px; font-size: 11.5px; line-height: 1.45;
+  margin: -2px 0 4px; font-size: 12px; line-height: 1.45;
   color: var(--ink-3); font-family: var(--sans);
 }
 
@@ -3235,7 +3239,7 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
      number of items on the bar is whatever fits, decided live. */
   .tn-item.tn-park { position: absolute; visibility: hidden; }
 }
-.tn-lab { font-size: 10px; font-weight: 700; letter-spacing: 0.08em;
+.tn-lab { font-size: 11px; font-weight: 700; letter-spacing: 0.08em;
   color: var(--ink-3); }
 /* the label is also the jump down to the full panel on the snapshot - keep
    the label's quiet look, except the pointer and an underline on invite */
@@ -3359,7 +3363,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 @media (max-width: 640px) {
   .tabs { margin: -18px -4px 18px; }
   .tab { padding-block: 9px; }
-  .tab-label { font-size: 14.5px; line-height: 18px; }
+  .tab-label { font-size: 14px; line-height: 18px; }
   body.editorial .tab-label { font-size: 16px; line-height: 19.5px; }
   .tabs-set { gap: 14px; }
   .tabs.pinned .tabs-set { transform: scale(0.879); }
@@ -3383,7 +3387,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 /* Quiet note for when the per-poll cycle source would not land: the monthly
    lines survive, only the dots are missing, so the tone is a footnote rather
    than an alert. Retry is a bare link-styled button, reloaded in place. */
-.cyc-src-note { margin: 2px 0 12px; font-size: 12.5px; color: var(--ink-3); font-family: var(--sans); }
+.cyc-src-note { margin: 2px 0 12px; font-size: 13px; color: var(--ink-3); font-family: var(--sans); }
 .cyc-src-note button {
   font: inherit; color: var(--accent); background: none; border: 0; padding: 0;
   cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
@@ -3520,7 +3524,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   clip-path: polygon(50% 2%, 100% 96%, 0 96%); }
 .cyc-row .cyc-swatch.sw-diamond { border-radius: 0; width: 12px; height: 12px;
   clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
-.cyc-row .cyc-year { font-size: 13.5px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
+.cyc-row .cyc-year { font-size: 13px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 /* The name is the one part of a row that can outrun its column – "Turnbull–
    Morrison" in a narrow panel – so it is the part that gives way. It only ever
    has to at widths where the grid is already down to one column. */
@@ -3562,7 +3566,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
 .flow-readout-ci { font-size: 19px; font-weight: 500; color: var(--ink-3); }
 .flow-readout-u { font-family: var(--sans); font-size: 13px; font-weight: 600; color: var(--ink-3); margin-left: 4px; }
 .flow-readout-lab {
-  font-family: var(--sans); font-size: 12.5px; font-weight: 500; color: var(--ink-3);
+  font-family: var(--sans); font-size: 13px; font-weight: 500; color: var(--ink-3);
   line-height: 1.45; max-width: 46ch;
 }
 .flow-readout-lab strong { color: var(--ink-2); font-weight: 700; }
@@ -3587,7 +3591,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 /* Why this row is on the surface as well as in the list. */
 .sb-row-note { font-size: 11px; font-weight: 600; color: var(--mood-neg); white-space: nowrap; }
-.sb-row-val { margin-left: auto; font-size: 12.5px; font-weight: 700; color: var(--ink-2);
+.sb-row-val { margin-left: auto; font-size: 13px; font-weight: 700; color: var(--ink-2);
   font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* Off the chart: the row goes quiet, and its mark hollows out rather than
    vanishing — the colour is how you find it again. */
@@ -3600,7 +3604,7 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
   border: 1px solid color-mix(in oklch, var(--fl) 45%, var(--line));
   background: color-mix(in oklch, var(--fl) 9%, var(--surface));
   border-radius: 999px; padding: 5px 11px; cursor: pointer;
-  font-family: var(--sans); font-size: 12.5px; color: var(--ink-2);
+  font-family: var(--sans); font-size: 13px; color: var(--ink-2);
   transition: opacity .15s ease, border-color .15s ease;
 }
 .sb-out:hover { border-color: var(--fl); }
@@ -3669,10 +3673,10 @@ body.editorial .tab-label { font-family: var(--heads, var(--serif)); font-weight
    which the board panel made unnecessary.) */
 @media (max-width: 620px) {
   .cyc-drawn-label { display: none; }
-  .cyc-drawn-item { font-size: 11.5px; padding: 3px 4px 3px 8px; }
+  .cyc-drawn-item { font-size: 12px; padding: 3px 4px 3px 8px; }
 }
 .cyc-now {
-  font-size: 10px; font-weight: 800;
+  font-size: 11px; font-weight: 800;
   color: var(--cyc-text, var(--cyc)); border: 1px solid color-mix(in oklch, var(--cyc) 40%, var(--line));
   border-radius: 4px; padding: 1px 5px;
   /* Its own ground, not the chip's. The chip tints its background 8% toward
@@ -3749,7 +3753,7 @@ body.dark .cyc-band.hi.thin { opacity: 0.13; }
 .cycle-head { align-items: baseline; }
 .cycle-head > div { flex: 1 1 26ch; min-width: 0; }
 .cycle-insight {
-  font-family: var(--serif); font-size: 16.5px; font-weight: 600; line-height: 1.4;
+  font-family: var(--serif); font-size: 17px; font-weight: 600; line-height: 1.4;
   letter-spacing: -0.005em; color: var(--ink);
   max-width: 34ch; text-align: right; margin: 0; text-wrap: pretty;
 }
@@ -3760,7 +3764,7 @@ body.dark .cyc-band.hi.thin { opacity: 0.13; }
    the mood colours – emphasised, because it is still the finding */
 .ci-delta.level { color: var(--ink); }
 .cyc-foot {
-  margin: 22px 0 0; font-size: 12.5px; line-height: 1.6; color: var(--ink-3);
+  margin: 22px 0 0; font-size: 13px; line-height: 1.6; color: var(--ink-3);
   font-family: var(--sans); max-width: 70ch; text-wrap: pretty;
 }
 /* in editorial mode the cycle charts divide like snapshot panels; first one
@@ -3808,7 +3812,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-jump {
   display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
-  padding: 5px 13px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  padding: 5px 13px; font-family: var(--sans); font-size: 13px; font-weight: 600;
   color: var(--ink-2); cursor: pointer; white-space: nowrap; align-self: center;
   transition: color .15s ease, border-color .15s ease, background-color .15s ease;
 }
@@ -3853,7 +3857,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-search input:focus { outline: none; border-color: var(--accent); }
 .ap-search-x {
   position: absolute; right: 8px; border: 0; background: none; cursor: pointer;
-  font-size: 18px; line-height: 1; color: var(--ink-3); padding: 2px 4px;
+  font-size: 19px; line-height: 1; color: var(--ink-3); padding: 2px 4px;
 }
 .ap-search-x:hover { color: var(--ink); }
 
@@ -3907,13 +3911,13 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-panel.flip { left: auto; right: 0; }
 .ap-pop-head {
   display: flex; align-items: baseline; gap: 10px; padding: 6px 9px 7px;
-  font-family: var(--sans); font-size: 10.5px; font-weight: 700;
+  font-family: var(--sans); font-size: 11px; font-weight: 700;
   color: var(--ink-3);
 }
 .ap-pop-head .ap-clear { margin-left: auto; font-size: 12px; }
 .ap-pop-head.bordered { border-top: 1px solid var(--line-2); margin-top: 6px; padding-top: 12px; }
 .ap-poplist { max-height: 270px; overflow-y: auto; display: flex; flex-direction: column; }
-.ap-pop-foot { margin: 7px 9px 3px; font-size: 11.5px; line-height: 1.4; color: var(--ink-3); }
+.ap-pop-foot { margin: 7px 9px 3px; font-size: 12px; line-height: 1.4; color: var(--ink-3); }
 
 .ap-check {
   display: flex; align-items: center; gap: 9px; width: 100%; text-align: left;
@@ -3982,7 +3986,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .ap-pill {
   display: inline-flex; align-items: center; gap: 3px;
   border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
-  padding: 4px 5px 4px 11px; font-family: var(--sans); font-size: 12.5px;
+  padding: 4px 5px 4px 11px; font-family: var(--sans); font-size: 13px;
   font-weight: 600; color: var(--ink-2);
   /* A filter the reader put here is an object they placed: it sits proud of
      the page, lit on its crown, with its lower edge in shadow. */
@@ -4013,14 +4017,14 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 
 .ap-clear {
   border: 0; background: none; cursor: pointer; font-family: var(--sans);
-  font-size: 12.5px; font-weight: 600; color: var(--accent); padding: 0;
+  font-size: 13px; font-weight: 600; color: var(--accent); padding: 0;
 }
 .ap-clear:hover { text-decoration: underline; }
 /* CSV export – desktop only (hidden ≤1000px below) */
 .ap-export {
   margin-left: auto; display: inline-flex; align-items: center; gap: 6px;
   border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px;
-  padding: 5px 13px; font-family: var(--sans); font-size: 12.5px; font-weight: 600;
+  padding: 5px 13px; font-family: var(--sans); font-size: 13px; font-weight: 600;
   color: var(--ink-2); cursor: pointer; white-space: nowrap; align-self: center;
   transition: color .15s ease, border-color .15s ease, background-color .15s ease;
 }
@@ -4053,7 +4057,7 @@ body.editorial .cyc-charts .cycle-card:first-child { border-top: 0; padding-top:
 .np-item.open { background: var(--surface-2); }
 .np-row { cursor: pointer; }
 .np-row:hover .exp-btn { color: var(--ink-2); }
-.np-firm { font-family: var(--sans); font-size: 14.5px; font-weight: 700; color: var(--ink);
+.np-firm { font-family: var(--sans); font-size: 14px; font-weight: 700; color: var(--ink);
   display: flex; align-items: baseline; gap: 4px; min-width: 0; }
 /* the chevron sits on the text baseline of the name beside it, not on the
    middle of a flex line that a 44px hit area would otherwise stretch */
@@ -4089,11 +4093,11 @@ a.np-link:hover .plink-mark, a.np-link:focus-visible .plink-mark { color: var(--
 .npd-row {
   display: grid; grid-template-columns: minmax(96px, 0.8fr) minmax(150px, 1.4fr) 4.5rem;
   gap: 12px; align-items: baseline; padding: 5px 0;
-  font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums;
+  font-size: 13px; color: var(--ink-2); font-variant-numeric: tabular-nums;
 }
 .npd-list .npd-row + .npd-row { border-top: 1px solid var(--line-2); }
 /* the column heads: the quietest thing in the panel, since they are read once */
-.npd-cols { padding: 6px 0 3px; font-size: 10px; font-weight: 700;
+.npd-cols { padding: 6px 0 3px; font-size: 11px; font-weight: 700;
   color: var(--ink-3); }
 .npd-cols span:last-child { margin-left: auto; }
 /* the fieldwork end is what the interval beside it is measured between, so it
@@ -4119,14 +4123,14 @@ a.npd-pub-link:focus-visible { outline: 2px solid var(--accent, currentColor); o
 a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { color: var(--ink-2); }
 .npd-pub.none { color: var(--ink-3); font-weight: 500; }
 .npd-gap { margin-left: auto; color: var(--ink-3); white-space: nowrap; }
-.npd-foot { margin: 8px 0 0; font-size: 11.5px; line-height: 1.5; color: var(--ink-3); max-width: 62ch; }
+.npd-foot { margin: 8px 0 0; font-size: 12px; line-height: 1.5; color: var(--ink-3); max-width: 62ch; }
 @media (prefers-reduced-motion: reduce) { .np-detail { animation: none; } }
-.np-date { font-family: var(--sans); font-size: 14.5px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.np-date { font-family: var(--sans); font-size: 14px; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
 /* the hour reads as part of the date, one step quieter than it */
 .np-time { color: var(--ink-2); }
-.np-pm { color: var(--ink-3); font-size: 12.5px; font-weight: 500; }
+.np-pm { color: var(--ink-3); font-size: 13px; font-weight: 500; }
 .np-when { font-family: var(--sans); font-size: 13px; color: var(--ink-2); white-space: nowrap; }
-.np-cadence { font-family: var(--sans); font-size: 12.5px; color: var(--ink-3); }
+.np-cadence { font-family: var(--sans); font-size: 13px; color: var(--ink-3); }
 .np-missed { color: var(--mood-neg); }
 /* 320px phones: a nowrap date ("Wed 30 Sep, 1 am AEST (or Wed 7 Oct)")
    beside the count pushed the row 24px past the screen. Let the date fold,
@@ -4177,7 +4181,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 }
 .ap-var-head .card-sub { max-width: 52ch; }
 .ap-var-title {
-  font-family: var(--serif); font-weight: 540; font-size: 17px; margin: 0;
+  font-family: var(--serif); font-weight: 600; font-size: 17px; margin: 0;
   letter-spacing: -0.01em; color: var(--ink); line-height: 1.2;
 }
 /* The measure toggle steers the chart below it, so it parks on its own row
@@ -4219,11 +4223,11 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 }
 .vr-tile.off { opacity: 0.35; }
 .vr-name {
-  font-size: 11.5px; font-weight: 700;
+  font-size: 12px; font-weight: 700;
   grid-column: 1 / -1;
 }
 .vr-sigma {
-  font-family: var(--serif); font-size: 24px; font-weight: 540; color: var(--ink);
+  font-family: var(--serif); font-size: 26px; font-weight: 600; color: var(--ink);
   font-variant-numeric: tabular-nums; letter-spacing: -0.02em;
 }
 .vr-sigma em { font-style: normal; font-size: 13px; color: var(--ink-3); margin-left: 1px; }
@@ -4246,7 +4250,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 .vr-pill.vr-mild   { color: var(--ink-2);    background: color-mix(in oklch, var(--ink) 9%, transparent); }
 .vr-pill.vr-wide   { color: var(--mood-neg); background: color-mix(in oklch, var(--mood-neg) 11%, transparent); }
 .vr-sub {
-  grid-column: 1 / -1; font-size: 11.5px; color: var(--ink-3);
+  grid-column: 1 / -1; font-size: 12px; color: var(--ink-3);
   font-variant-numeric: tabular-nums;
 }
 .ap-var-note { margin-top: 14px; }
@@ -4256,7 +4260,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
 }
 @media (max-width: 700px) {
   .ap-var-read { gap: 14px 20px; }
-  .vr-sigma { font-size: 21px; }
+  .vr-sigma { font-size: 22px; }
 }
 
 /* ---------- House lean panel ---------- */
@@ -4325,7 +4329,7 @@ a.npd-pub-link:hover .plink-mark, a.npd-pub-link:focus-visible .plink-mark { col
   .poll-table.archive .hide-md { display: none; }
   .poll-table.archive .lbl-l { display: none; }
   .poll-table.archive .lbl-s { display: inline; }
-  .poll-table.archive { font-size: 13.5px; }
+  .poll-table.archive { font-size: 13px; }
   .ap-export { display: none; }   /* CSV export is a big-screen affordance */
   .poll-table.archive th, .poll-table.archive td { padding-left: 6px; padding-right: 6px; }
   .poll-table.archive .pollster-cell { white-space: normal; }
@@ -4357,7 +4361,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
    bar ink (65 near-identical 53/47 bars carry nothing) */
 .apub {
   display: inline-flex; align-items: center; gap: 12px;
-  font-variant-numeric: tabular-nums; font-size: 14.5px; font-weight: 600; color: var(--ink);
+  font-variant-numeric: tabular-nums; font-size: 14px; font-weight: 600; color: var(--ink);
 }
 .apub-seg { display: inline-flex; align-items: center; gap: 5px; }
 .apub-dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
@@ -4382,7 +4386,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
 @media (max-width: 760px) {
   .tabs-inner { gap: 22px; }
   .cycle-insight { display: none; }
-  .view-lede { font-size: 15.5px; }
+  .view-lede { font-size: 15px; }
 }
 
 /* ============================================================
@@ -4532,7 +4536,7 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   /* …and the cells close up the last pixel of padding and a half-point of
      numeral size each, the smallest coins left on the table */
   .poll-table.archive th, .poll-table.archive td { padding-left: 3px; padding-right: 3px; }
-  .poll-table.archive .num { font-size: 11.5px; }
+  .poll-table.archive .num { font-size: 12px; }
 }
 
 @media (max-width: 480px) {
@@ -4556,9 +4560,9 @@ body.editorial .card .poll-table.archive thead th { background: var(--bg); }
   /* the pollster is a cell like any other at phone width: the name steps
      off its display size, and the client line under it, both into the
      table's own scale */
-  .poll-table.archive .pollster-name { font-size: 13.5px; }
+  .poll-table.archive .pollster-name { font-size: 13px; }
   .poll-table.archive .pollster-mode { font-size: 11px; }
-  .poll-table.archive .pollster-method { font-size: 10px; }
+  .poll-table.archive .pollster-method { font-size: 11px; }
 }
 
 /* tile band – a seismograph tide closing the page: thirty horizontal

@@ -226,15 +226,20 @@ function TrendChart(props) {
      costs three times the plot units a laptop's does. The right pad grows to
      the longest label rather than every caller guessing a number. */
   const pad = (() => {
-    /* only labels that finish at the right edge need it - a past term's
-       year label ends mid-plot, where there is room already */
-    const edge = xDomain[1] - 0.05 * (xDomain[1] - xDomain[0]);
-    const labs = seriesProp.filter((s) => s.endLabel && s.opacity !== 0 && s.points.length
-      && s.points[s.points.length - 1].x >= edge).map((s) => s.endLabel);
-    if (!labs.length) return padProp;
-    const px = Math.max(...labs.map((t) => [...t].reduce((n, ch) =>
-      n + (ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : 0.72), 0))) * 10.5 * 0.95 + 12;
-    return { ...padProp, r: Math.max(padProp.r, px / (cw / VB.W)) };
+    /* A label needs the room its text is wider than the plot left after its
+       line's last point: a line ending at the right edge needs all of it,
+       one ending a month short needs less, a past term's year mid-plot none. */
+    const k = cw / VB.W;                               // px per unit
+    const innerPx = (VB.W - padProp.l - padProp.r) * k;
+    const need = seriesProp.filter((s) => s.endLabel && s.opacity !== 0 && s.points.length).map((s) => {
+      const f = (s.points[s.points.length - 1].x - xDomain[0]) / (xDomain[1] - xDomain[0]);
+      const txt = [...s.endLabel].reduce((n, ch) => n + (ch >= "0" && ch <= "9" ? 0.55 : ch === " " ? 0.3 : 0.72), 0)
+        * 10.5 * 0.95 + 12;
+      return txt - Math.max(0, 1 - f) * innerPx;
+    });
+    if (!need.length) return padProp;
+    const px = Math.max(0, ...need);
+    return px <= padProp.r * k ? padProp : { ...padProp, r: px / k };
   })();
   const { sx, sy, W, H } = makeScales({ height, xDomain: win, yDomain, pad });
   const [hover, setHover] = useState(null);     // {index, clientX}
@@ -684,7 +689,7 @@ function TrendChart(props) {
     const evs = events
       .filter((e) => e.x >= win[0] && e.x <= win[1])
       .sort((a, b) => a.x - b.x);
-    const fsz = refUnits * 0.92;
+    const fsz = refUnits;          // 10.5px on screen: the type floor for words
     const ROWS = 3;
     const ROW_H = refUnits * 1.4;
     const LEAD = refUnits * 0.55;   // shortest elbow, line to text
