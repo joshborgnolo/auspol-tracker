@@ -551,6 +551,9 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
 // ====================================================================
 // PAST CYCLES – every term aligned to its election day
 // ====================================================================
+/* Signed measures (leader nets, the preferred-PM lead) to one decimal, as
+   every aggregate on the site is; a figure that rounds to zero takes no sign. */
+const fmtSigned1 = (v) => { const r = +v.toFixed(1); return (r > 0 ? "+" : "") + r.toFixed(1); };
 // y-windows are fitted to the real data per metric+mode (see cycDomain) –
 // fixed windows clip real history (e.g. net approval spans −44…+41)
 const CYC_METRICS = [
@@ -601,15 +604,15 @@ const CYC_METRICS = [
      labelled for that. */
   { key: "ppmm", title: "Preferred prime minister",
     sub: "PM’s lead on the preferred-PM question",
-    unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
+    unit: "", fmt: fmtSigned1,
     step: 10, refAbs: 0, refAbsLabel: "even", chgRefLabel: "First reading" },
   /* The tap-to-define "net approval" link is composed into the card title at
      render time – keeping it in the string here would leave it as dead text. */
   { key: "net", title: "Prime minister net approval", sub: "Sitting prime minister",
-    unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
+    unit: "", fmt: fmtSigned1,
     step: 20, refAbs: 0, refAbsLabel: "even" },
   { key: "oppnet", title: "Opposition leader net approval", sub: "Sitting opposition leader",
-    leader: "opp", unit: "", fmt: (v) => (v > 0 ? "+" : "") + Math.round(v),
+    leader: "opp", unit: "", fmt: fmtSigned1,
     step: 10, refAbs: 0, refAbsLabel: "even", han: true },
 ];
 
@@ -1789,12 +1792,11 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
         : isOpp ? "opposition" : "government";
       /* The sentence claims a gap or a rank; bracket the raw reading straight
          after the subject so the reader never has to solve back for it.
-         Formatted on the chart's own basis: a share keeps its decimal,
-         a net read stays integral, and the sign appears exactly when the
-         basis is signed (net measures, or anything in change-since mode) –
-         a figure that rounds to zero takes no sign, same rule the rank
-         peers' labels follow. */
-      const curMag = M.unit ? Math.abs(curVal).toFixed(1) : String(Math.round(Math.abs(curVal)));
+         One decimal, shares and nets alike, as every aggregate on the site
+         is, and the sign appears exactly when the basis is signed (net
+         measures, or anything in change-since mode) – a figure that rounds to
+         zero takes no sign, same rule the rank peers' labels follow. */
+      const curMag = Math.abs(curVal).toFixed(1);
       const curSign = (chg || !M.unit) && parseFloat(curMag) !== 0 ? (curVal < 0 ? "−" : "+") : "";
       /* A 2PP that has changed contest names the rival it is now against –
          every past term's figure is against the other party of government,
@@ -1827,13 +1829,13 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
           const counts = {};
           for (const p of cand) counts[p.who] = (counts[p.who] || 0) + 1;
           const fmtPeer = (p) => {
-            const r = Math.round(p.v);
+            const r = +p.v.toFixed(1);
             /* Signed measures (net, preferred-PM lead) and every change-
                since figure need their sign; an absolute share does not –
                "Gillard (+34%)" would read as a change number. */
             const sgn = chg || !M.unit;
             const val = (sgn && r > 0 ? "+" : sgn && r < 0 ? "\u2212" : "") +
-              Math.abs(r) + (M.unit || "");
+              Math.abs(r).toFixed(1) + (M.unit || "");
             return counts[p.who] > 1 ? p.who + " (" + p.yr + ", " + val + ")"
               : p.who + " (" + val + ")";
           };

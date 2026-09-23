@@ -41478,6 +41478,10 @@ function Tabs({
     tppBasis: tppBasis
   }))));
 }
+const fmtSigned1 = v => {
+  const r = +v.toFixed(1);
+  return (r > 0 ? "+" : "") + r.toFixed(1);
+};
 const CYC_METRICS = [{
   key: "tpp",
   title: "Government two-party preferred",
@@ -41515,7 +41519,7 @@ const CYC_METRICS = [{
   title: "Preferred prime minister",
   sub: "PM’s lead on the preferred-PM question",
   unit: "",
-  fmt: v => (v > 0 ? "+" : "") + Math.round(v),
+  fmt: fmtSigned1,
   step: 10,
   refAbs: 0,
   refAbsLabel: "even",
@@ -41525,7 +41529,7 @@ const CYC_METRICS = [{
   title: "Prime minister net approval",
   sub: "Sitting prime minister",
   unit: "",
-  fmt: v => (v > 0 ? "+" : "") + Math.round(v),
+  fmt: fmtSigned1,
   step: 20,
   refAbs: 0,
   refAbsLabel: "even"
@@ -41535,7 +41539,7 @@ const CYC_METRICS = [{
   sub: "Sitting opposition leader",
   leader: "opp",
   unit: "",
-  fmt: v => (v > 0 ? "+" : "") + Math.round(v),
+  fmt: fmtSigned1,
   step: 10,
   refAbs: 0,
   refAbsLabel: "even",
@@ -42461,7 +42465,7 @@ function CycleChart({
       const subjParty = M.key === "net" || M.key === "oppnet" || M.key === "ppmm" ? null : isOpp ? cur.opp : cur.gov;
       const subjLabel = M.key === "net" ? sitting(cur.pm) : M.key === "oppnet" ? sitting(cur.oppLead) : M.key === "ppmm" ? sitting(cur.pm) : (subjParty === "lnp" ? "the " : "") + D.PARTIES[subjParty].name;
       const peerNoun = M.key === "net" ? "prime minister" : M.key === "oppnet" ? "opposition leader" : M.key === "ppmm" ? "prime minister" : isOpp ? "opposition" : "government";
-      const curMag = M.unit ? Math.abs(curVal).toFixed(1) : String(Math.round(Math.abs(curVal)));
+      const curMag = Math.abs(curVal).toFixed(1);
       const curSign = (chg || !M.unit) && parseFloat(curMag) !== 0 ? curVal < 0 ? "−" : "+" : "";
       const tppEraNow = M.key === "tpp" && cur.raw.tppEras ? cur.raw.tppEras[cur.raw.tppEras.length - 1] : null;
       const rivalNote = tppEraNow && tppEraNow.rival === "alp_on" ? " against One Nation" : "";
@@ -42483,9 +42487,9 @@ function CycleChart({
           const counts = {};
           for (const p of cand) counts[p.who] = (counts[p.who] || 0) + 1;
           const fmtPeer = p => {
-            const r = Math.round(p.v);
+            const r = +p.v.toFixed(1);
             const sgn = chg || !M.unit;
-            const val = (sgn && r > 0 ? "+" : sgn && r < 0 ? "\u2212" : "") + Math.abs(r) + (M.unit || "");
+            const val = (sgn && r > 0 ? "+" : sgn && r < 0 ? "\u2212" : "") + Math.abs(r).toFixed(1) + (M.unit || "");
             return counts[p.who] > 1 ? p.who + " (" + p.yr + ", " + val + ")" : p.who + " (" + val + ")";
           };
           const near = side === "low" ? below : above.slice().reverse();
