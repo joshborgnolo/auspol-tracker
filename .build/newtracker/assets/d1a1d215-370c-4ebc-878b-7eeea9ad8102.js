@@ -1745,7 +1745,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       /* Boundary company. A bare gap from the mean hides the shape of the
          crowd behind it: 23 points below a floor of −30 is company, 23
          below a floor of −5 is a record. When the current reading ranks
-         among the first three of either end of the pooled set, say whose
+         among the first four of either end of the pooled set, say whose
          company it is keeping, named and valued on the chart's own basis.
          The crowd must be deep enough for thirds to mean anything – with
          four peers "third lowest" is "second highest" wearing its other
@@ -1755,8 +1755,8 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
       if (cand.length >= 5) {
         const below = cand.filter((p) => p.v < curVal);
         const above = cand.filter((p) => p.v > curVal);
-        const side = below.length <= 2 && below.length < above.length ? "low"
-          : above.length <= 2 && above.length < below.length ? "high" : null;
+        const side = below.length <= 3 && below.length < above.length ? "low"
+          : above.length <= 3 && above.length < below.length ? "high" : null;
         if (side) {
           /* A name can recur across terms (Hawke carried three, Howard
              four); qualify the repeats with their year, or two different
@@ -1775,17 +1775,22 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
               : p.who + " (" + val + ")";
           };
           const near = side === "low" ? below : above.slice().reverse();
-          if (!near.length) {
-            /* the reading IS the boundary: name the two just in from it */
-            const nxt = side === "low" ? cand.slice(0, 2)
-              : cand.slice(-2).reverse();
-            insight.rank = "The second and third " + (side === "low" ? "lowest" : "highest") +
-              " at this point are " + nxt.map(fmtPeer).join(" and ") + ".";
-          } else {
-            insight.rank = "Only " + near.map(fmtPeer).join(" and ") + " " +
-              (near.length > 1 ? "sit" : "sits") + " " +
-              (side === "low" ? "lower" : "higher") + " at this point.";
-          }
+          /* Every name the sentence mentions is a way INTO the term it
+             names: the sentence keeps its prose form, but the names are
+             buttons wired like a click on the term's legend chip, so the
+             reader who learns "only Whitlam sits lower" can see Whitlam's
+             line drawn at once. Rank therefore travels structured – lead,
+             the formatted refs, tail – and the render interleaves the
+             commas and the "and" between the buttons. */
+          const refsOf = (ps) => ps.map((p) => ({ yr: p.yr, label: fmtPeer(p) }));
+          insight.rank = near.length
+            ? { lead: "Only ", refs: refsOf(near),
+                tail: " " + (near.length > 1 ? "sit" : "sits") + " " +
+                      (side === "low" ? "lower" : "higher") + " at this point." }
+            : { lead: "The second and third " + (side === "low" ? "lowest" : "highest") +
+                      " at this point are ",
+                refs: refsOf(side === "low" ? cand.slice(0, 2) : cand.slice(-2).reverse()),
+                tail: "." };
         }
       }
     }
@@ -1848,11 +1853,31 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
              on d, because rounding is what the reader sees – 0.4 points prints
              as 0, and "in line with" is what 0.4 points means. */
           const level = parseFloat(shown) === 0;
+          /* The rank tail's names are clickable terms: same click the
+             chip would take – a hidden term comes back onto the board, a
+             boarded one is lifted out of the band as its own line. The
+             button resets to the sentence's type, so the sentence keeps
+             one typography and only the faint mention underline marks the
+             affordance. */
+          const rankJsx = insight.rank && <>
+            {" "}{insight.rank.lead}
+            {insight.rank.refs.map((r, i, a) => (
+              <React.Fragment key={r.yr}>
+                {i > 0 && (i === a.length - 1 ? " and " : ", ")}
+                <button type="button" className="ci-peer"
+                        title={hidden.has(r.yr)
+                          ? "Put the " + r.yr + " term back on the chart"
+                          : "Draw the " + r.yr + " term's own line"}
+                        onClick={() => chipClick(r.yr)}>{r.label}</button>
+              </React.Fragment>
+            ))}
+            {insight.rank.tail}
+          </>;
           if (level) return (
             <p className="cycle-insight">
               {cycMonthLabel(insight.mNow)}, {insight.subjLabel} is{" "}
               <span className="ci-delta level">in line with</span>{" "}
-              the average {insight.peerNoun} at this point.{insight.rank ? <> {insight.rank}</> : null}
+              the average {insight.peerNoun} at this point.{rankJsx}
             </p>
           );
           /* Net-approval measures carry no axis unit (CYC_METRICS unit:""),
@@ -1865,7 +1890,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
               <span className={"ci-delta " + (insight.better ? "pos" : "neg")}>
                 {shown}{M.unit || (parseFloat(shown) === 1 ? " point" : " points")}
               </span>{" "}
-              {insight.better ? "above" : "below"} the average {insight.peerNoun} at this point.{insight.rank ? <> {insight.rank}</> : null}
+              {insight.better ? "above" : "below"} the average {insight.peerNoun} at this point.{rankJsx}
             </p>
           );
         })()}

@@ -876,6 +876,13 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   text-decoration-thickness: 1px;
 }
 .hi-term:hover { color: var(--ink); text-decoration-color: currentColor; }
+.ci-peer {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0;
+  cursor: pointer; text-decoration: underline dotted;
+  text-decoration-color: var(--ink-3); text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.ci-peer:hover { color: var(--ink); text-decoration-color: currentColor; }
 .hero-interval .hi-method { font-size: var(--hi-fs, 12px); color: var(--ink-3); }
 .hi-range { font-size: 14px; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hi-note, .hi-count { font-size: var(--hi-fs, 12px); color: var(--ink-3); white-space: nowrap; }
@@ -39295,7 +39302,7 @@ function CycleChart({
       if (cand.length >= 5) {
         const below = cand.filter(p => p.v < curVal);
         const above = cand.filter(p => p.v > curVal);
-        const side = below.length <= 2 && below.length < above.length ? "low" : above.length <= 2 && above.length < below.length ? "high" : null;
+        const side = below.length <= 3 && below.length < above.length ? "low" : above.length <= 3 && above.length < below.length ? "high" : null;
         if (side) {
           const counts = {};
           for (const p of cand) counts[p.who] = (counts[p.who] || 0) + 1;
@@ -39306,12 +39313,19 @@ function CycleChart({
             return counts[p.who] > 1 ? p.who + " (" + p.yr + ", " + val + ")" : p.who + " (" + val + ")";
           };
           const near = side === "low" ? below : above.slice().reverse();
-          if (!near.length) {
-            const nxt = side === "low" ? cand.slice(0, 2) : cand.slice(-2).reverse();
-            insight.rank = "The second and third " + (side === "low" ? "lowest" : "highest") + " at this point are " + nxt.map(fmtPeer).join(" and ") + ".";
-          } else {
-            insight.rank = "Only " + near.map(fmtPeer).join(" and ") + " " + (near.length > 1 ? "sit" : "sits") + " " + (side === "low" ? "lower" : "higher") + " at this point.";
-          }
+          const refsOf = ps => ps.map(p => ({
+            yr: p.yr,
+            label: fmtPeer(p)
+          }));
+          insight.rank = near.length ? {
+            lead: "Only ",
+            refs: refsOf(near),
+            tail: " " + (near.length > 1 ? "sit" : "sits") + " " + (side === "low" ? "lower" : "higher") + " at this point."
+          } : {
+            lead: "The second and third " + (side === "low" ? "lowest" : "highest") + " at this point are ",
+            refs: refsOf(side === "low" ? cand.slice(0, 2) : cand.slice(-2).reverse()),
+            tail: "."
+          };
         }
       }
     }
@@ -39360,16 +39374,24 @@ function CycleChart({
   }), "One Nation this term")), insight && (() => {
     const shown = M.fmt(insight.d).replace(/^[+−-]/, "").replace(/\.0+$/, "");
     const level = parseFloat(shown) === 0;
+    const rankJsx = insight.rank && React.createElement(React.Fragment, null, " ", insight.rank.lead, insight.rank.refs.map((r, i, a) => React.createElement(React.Fragment, {
+      key: r.yr
+    }, i > 0 && (i === a.length - 1 ? " and " : ", "), React.createElement("button", {
+      type: "button",
+      className: "ci-peer",
+      title: hidden.has(r.yr) ? "Put the " + r.yr + " term back on the chart" : "Draw the " + r.yr + " term's own line",
+      onClick: () => chipClick(r.yr)
+    }, r.label))), insight.rank.tail);
     if (level) return React.createElement("p", {
       className: "cycle-insight"
     }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " is", " ", React.createElement("span", {
       className: "ci-delta level"
-    }, "in line with"), " ", "the average ", insight.peerNoun, " at this point.", insight.rank ? React.createElement(React.Fragment, null, " ", insight.rank) : null);
+    }, "in line with"), " ", "the average ", insight.peerNoun, " at this point.", rankJsx);
     return React.createElement("p", {
       className: "cycle-insight"
     }, cycMonthLabel(insight.mNow), ", ", insight.subjLabel, " sits", " ", React.createElement("span", {
       className: "ci-delta " + (insight.better ? "pos" : "neg")
-    }, shown, M.unit || (parseFloat(shown) === 1 ? " point" : " points")), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.", insight.rank ? React.createElement(React.Fragment, null, " ", insight.rank) : null);
+    }, shown, M.unit || (parseFloat(shown) === 1 ? " point" : " points")), " ", insight.better ? "above" : "below", " the average ", insight.peerNoun, " at this point.", rankJsx);
   })()), (stripCycles.length > 0 || hanYears || onpYears) && React.createElement("div", {
     className: "cyc-drawn"
   }, React.createElement("span", {

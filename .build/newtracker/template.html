@@ -1260,6 +1260,18 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   text-decoration-thickness: 1px;
 }
 .hi-term:hover { color: var(--ink); text-decoration-color: currentColor; }
+/* The past-cycles insight's peer names are term mentions with the same job
+   as a legend-chip click (board it, then lift its line), not glossary terms
+   – so the .hi-term reset fleshes them out, and the mention underline stays
+   on rather than fading in only under the pointer: an affordance the reader
+   has to hover to discover is one they never will. */
+.ci-peer {
+  font: inherit; color: inherit; background: none; border: 0; padding: 0;
+  cursor: pointer; text-decoration: underline dotted;
+  text-decoration-color: var(--ink-3); text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.ci-peer:hover { color: var(--ink); text-decoration-color: currentColor; }
 /* The button-sizing lives past .hi-term, not before it: on a <button> the
    term reset's `font: inherit` lands at the same specificity as any sibling
    sizing rule, so a size set ABOVE it (as .hi-method's once was) is rewritten
