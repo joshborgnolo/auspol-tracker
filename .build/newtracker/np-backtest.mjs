@@ -11,33 +11,22 @@
    Same claim, same window, same hit rule as np-score (published inside
    [release - winHalf, release + winHalf]).
 
-   As-of rules – what the replay may know on the morning after `prev`:
-     - polls rows published on or before `prev` (fieldwork end standing in
-       where a row records no publication date);
-     - pollsterRules.skippedSlots dated on or before `prev`, and
-       skippedMonths for months before `prev`'s month (both are confirmed
-       the morning after the slot passes);
-     - no provisional fallback rows.
-   What it cannot rewind: the CODE and constants are today's, and the
-   hand-declared pollsterRules (release, stopped) are today's. That is the
-   point for tuning – it answers "how would the current rules have done" –
-   but it flatters rules fitted to the same record, so read a change's
-   DELTA, not its absolute rate.
-
-   Isolation: gen-data reads GEN_DATA_POLLS and writes into GEN_DATA_OUT, a
-   temp directory; the working tree's polls.json and assets are never
-   touched, so this is safe beside running updaters.
+   The as-of rules and the isolation live in np-replay.mjs, shared with
+   np-score's reconstruction of missed bets. What a replay cannot rewind:
+   the CODE and constants are today's, and the hand-declared pollsterRules
+   (release, stopped) are today's. That is the point for tuning - it
+   answers "how would the current rules have done" - but it flatters rules
+   fitted to the same record, so read a change's DELTA, not its absolute
+   rate.
 
    Usage:  node .build/newtracker/np-backtest.mjs [--n 14] [--house "Newspoll"] [--json]
    ~0.3s per replayed release. Informational: exits 0 unless it cannot run.
    ==================================================================== */
 
-import { execFileSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import vm from "node:vm";
+import { cleanup, replayAsOf, runProjection } from "./np-replay.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
@@ -50,28 +39,9 @@ const ONLY = argOf("--house");
 const JSON_OUT = argv.includes("--json");
 
 const SRC = readFileSync(path.join(ROOT, "data", "polls.json"), "utf8");
-const PROJECT = readFileSync(path.join(HERE, "assets", "np-project.js"), "utf8");
-const TMP = mkdtempSync(path.join(tmpdir(), "np-backtest-"));
-const POLLS_TMP = path.join(TMP, "polls.json");
-
-/* gen-data on a dataset, then the shipped projection on its output, in a
-   fresh vm context each time so no replay leaks into the next */
-function run(D, now) {
-  writeFileSync(POLLS_TMP, JSON.stringify(D));
-  execFileSync(process.execPath, [path.join(HERE, "gen-data.mjs")], {
-    env: { ...process.env, GEN_DATA_POLLS: POLLS_TMP, GEN_DATA_OUT: TMP },
-    stdio: "ignore",
-  });
-  const ctx = { window: {} };
-  vm.createContext(ctx);
-  vm.runInContext(readFileSync(path.join(TMP, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js"), "utf8"), ctx);
-  ctx.window.AP = { D: ctx.window.AUSPOL };
-  vm.runInContext(PROJECT, ctx);
-  return { cad: ctx.window.AUSPOL.pollCadence || [], rows: now ? ctx.window.AP.nextPolls(now).rows : [] };
-}
 
 /* houses: every one the current record projects */
-const houses = run(JSON.parse(SRC), null).cad.map((c) => c.pollster)
+const houses = runProjection(JSON.parse(SRC), null).cad.map((c) => c.pollster)
   .filter((h) => !ONLY || h === ONLY);
 
 const results = [];
@@ -82,16 +52,8 @@ for (const house of houses) {
     .map((p) => p.published.slice(0, 10)))].sort();
   for (let k = Math.max(1, pubs.length - N); k < pubs.length; k++) {
     const prev = pubs[k - 1], actual = pubs[k];
-    const D = JSON.parse(SRC);
-    D.polls = D.polls.filter((p) => ((p.published || "").slice(0, 10) || p.date) <= prev);
-    D.fallbackPolls = [];
-    D.fallbackApproval = [];
-    for (const r of Object.values(D.pollsterRules || {})) {
-      if (r.skippedSlots) r.skippedSlots = r.skippedSlots.filter((d) => d <= prev);
-      if (r.skippedMonths) r.skippedMonths = r.skippedMonths.filter((m) => m < prev.slice(0, 7));
-    }
     let out;
-    try { out = run(D, { day: Date.parse(prev) + DAY, mins: 6 * 60 }); }
+    try { out = replayAsOf(SRC, prev); }
     catch (e) { results.push({ house, prev, actual, skip: "gen-data failed on the as-of data" }); continue; }
     const row = out.rows.find((r) => r.pollster === house && r.ahead === 0);
     if (!row) { results.push({ house, prev, actual, skip: "not on the projection yet" }); continue; }
@@ -104,7 +66,7 @@ for (const house of houses) {
     });
   }
 }
-rmSync(TMP, { recursive: true, force: true });
+cleanup();
 
 if (JSON_OUT) { console.log(JSON.stringify(results, null, 1)); process.exit(0); }
 
