@@ -17,7 +17,11 @@ import { impliedAlp2pp, FLOW, FLOW_TABLE, FLOW_LEF, impliedLefAlp2pp } from "./f
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..", "..");
-const D = JSON.parse(fs.readFileSync(path.join(ROOT, "data", "polls.json"), "utf8"));
+/* Test seams for .build/newtracker/np-backtest.mjs, which replays the
+   dataset as it stood at past dates: GEN_DATA_POLLS reads another polls.json
+   and GEN_DATA_OUT writes the two assets into another directory, so a replay
+   never touches the shared working tree's files. Unset in every real build. */
+const D = JSON.parse(fs.readFileSync(process.env.GEN_DATA_POLLS || path.join(ROOT, "data", "polls.json"), "utf8"));
 
 /* ---- one house, one name ----------------------------------------------
    A pollster that changes its letterhead is still the same pollster. Left
@@ -54,8 +58,9 @@ for (const [from, to] of Object.entries(HOUSE_RENAMES)) {
   D.pollsterRules[to] = { ...r, ...(D.pollsterRules[to] || {}) };
   delete D.pollsterRules[from];
 }
-const DATA_ASSET = path.join(HERE, "assets", "9f09dca2-bd46-49a8-8ae1-51847608cf92.js");
-const CYCLE_SOURCE_ASSET = path.join(HERE, "assets", "cycle-source.json");
+const OUT_DIR = process.env.GEN_DATA_OUT || path.join(HERE, "assets");
+const DATA_ASSET = path.join(OUT_DIR, "9f09dca2-bd46-49a8-8ae1-51847608cf92.js");
+const CYCLE_SOURCE_ASSET = path.join(OUT_DIR, "cycle-source.json");
 
 /* ---- canonical dataset ------------------------------------------------
    data/polls.json is the single source of truth. It used to be scraped out of
@@ -3002,8 +3007,21 @@ const CAD_MAX_REL_SPREAD = 0.30;
    gap would own: DemosAU took six months off between its first two federal
    waves, and untrimmed that one 184-day gap alone made its window wider than
    its own interval and dropped it off the panel. Set aside one value at each
-   end and its remaining six gaps run 20 to 53 days, which is the house. */
+   end and its remaining six gaps run 20 to 53 days, which is the house.
+
+   But only a FREAK is set aside - an end gap more than half an interval off
+   the cadence (CAD_TRIM_FREAK). The trim used to drop both ends
+   unconditionally, and for a weekday house the single most extreme gap is
+   usually its one week-late slip: Newspoll's 21,28,21,21,21,21,21,21 lost
+   the 28, read ±0, and the panel claimed an exact Sunday with no
+   alternative. The walk-forward backtest (.build/newtracker/np-backtest.mjs,
+   last 14 releases per house) had exact-day claims hitting 25 of 30 - 11 of
+   16 outside Roy Morgan, the misses a week off. Trimming only freaks took it
+   from 61/77 to 66/77 with the dates unchanged (exact-day claims 18/19):
+   the week slip the record shows is now the "or the Sunday after" the row
+   names. DemosAU's 184-day gap is still a freak. */
 const CAD_SPREAD_TRIM = 4;     // gaps needed before an end value can be spared
+const CAD_TRIM_FREAK = 0.5;    // an end is spared only this far (x cadence) off the cadence
 /* …and beyond THIS there is no rhythm to state at all: a window wider than
    three quarters of the interval says only "some time in the next couple of
    cycles", which is not worth a reader's attention. Between the two, a house
@@ -3129,11 +3147,14 @@ for (const [firm, rows] of Object.entries(byHouse)) {
   const dowTop = Object.entries(dowTally).sort((a, b) => b[1] - a[1])[0];
   const dowHabit = ds.length >= CAD_DOW_MIN && dowTop && dowTop[1] / ds.length >= CAD_DOW_SHARE
     ? Number(dowTop[0]) : null;
-  /* Half the range of the recent slot gaps, least and greatest set aside -
-     see CAD_SPREAD_TRIM. Floored at a day: even Roy Morgan's perfect 7-day
-     cadence still moves a day either side on publication. */
+  /* Half the range of the recent slot gaps, a freak least or greatest set
+     aside - see CAD_SPREAD_TRIM. Floored at a day: even Roy Morgan's perfect
+     7-day cadence still moves a day either side on publication. */
   const trimmed = [...slotGaps].sort((a, b) => a - b);
-  if (trimmed.length >= CAD_SPREAD_TRIM) { trimmed.pop(); trimmed.shift(); }
+  if (trimmed.length >= CAD_SPREAD_TRIM) {
+    if (trimmed[trimmed.length - 1] > cadence * (1 + CAD_TRIM_FREAK)) trimmed.pop();
+    if (trimmed[0] < cadence * (1 - CAD_TRIM_FREAK)) trimmed.shift();
+  }
   const spread = Math.max(1, Math.round((trimmed[trimmed.length - 1] - trimmed[0]) / 2));
   /* The misses don't fall equally either side of the interval. A house slips
      a wave LATE far more readily than it brings one forward, and in the
