@@ -672,5 +672,35 @@ function eq(name, got, want) {
   }
 }
 
+// S12 – the MONTH-END rhythm (pollsterRules.release.monthEnd, RedBridge/
+// Accent): the slot is the house's weekday nearest the last day of the month
+// after the one its last release belonged to, stepped month-end to month-end
+// – not last + median interval, which drifts against the calendar. The rule
+// itself (npMonthEndSlot, the one function page, gen-data and this sim all
+// run) is pinned on the 2026 record it was declared from, then the walk.
+{
+  const slot = (from) => new Date(window.AP.npMonthEndSlot(Date.parse(from), 0)).toISOString().slice(0, 10);
+  eq("month-end rule reproduces every 2026 RedBridge release",
+    ["2026-02-01", "2026-03-01", "2026-03-29", "2026-05-03", "2026-05-31", "2026-06-28", "2026-08-02"].map(slot),
+    ["2026-03-01", "2026-03-29", "2026-05-03", "2026-05-31", "2026-06-28", "2026-08-02", "2026-08-30"]);
+  eq("a release just past a month-end belongs to that month-end", slot("2026-03-01"), "2026-03-29");
+  eq("nearest in whole days: Sat 31 Oct → Sun 1 Nov, not Sun 25 Oct", slot("2026-09-27"), "2026-11-01");
+  const rb = cad.find((c) => c.pollster === "RedBridge/Accent");
+  eq("RedBridge ships the month-end rule", !!(rb && rb.monthEnd), true);
+  const { t0, nowMs, label } = scen("Thu 24 Sep, month-end house", "2026-09-24", 600);
+  const rows = project(cad, t0, nowMs).filter((r) => r.pollster === "RedBridge/Accent");
+  console.log(`\n${label}:  RedBridge → ${rows.map((r) => npFmt(r.release)).join(", ")}`);
+  eq("next slot is the Sunday nearest 30 Sep", rows[0] && npFmt(rows[0].release), "Sun 27 Sep");
+  // a moved anchor steps a month-end, not 28 days: the slot after a 27 Sep
+  // release is Sun 1 Nov (35 days on), where the interval says Sun 25 Oct
+  const cadMoved = JSON.parse(JSON.stringify(cad));
+  cadMoved.find((c) => c.pollster === "RedBridge/Accent").last = "2026-09-27";
+  const moved = scen("Mon 28 Sep, month-end house recorded", "2026-09-28", 600);
+  const mRow = project(cadMoved, moved.t0, moved.nowMs).find((r) => r.pollster === "RedBridge/Accent");
+  eq("after a 27 Sep release the slot steps to Sun 1 Nov", mRow && npFmt(mRow.release), "Sun 1 Nov");
+  eq("a month-end slot names no weekday-snap shift", mRow && [mRow.slotEarly, mRow.slotLate],
+    [rb.spreadEarly, rb.spreadLate]);
+}
+
 console.log(fails ? `\n${fails} FAILED` : "\nall next-polls expectations held");
 process.exit(fails ? 1 : 0);

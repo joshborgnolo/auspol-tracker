@@ -52,6 +52,31 @@ function easternNow() {
   }
 }
 
+/* A MONTH-END rhythm (RedBridge/Accent for the AFR): one wave a month, out
+   on the house's weekday nearest the month's last day - Sun 1 Mar, 29 Mar,
+   3 May, 31 May, 28 Jun, 2 Aug, 30 Aug 2026, every 2026 release. Measured
+   as an interval it is 28 or 35 days and a weekly-snapped ±, which drifts
+   against the calendar; stated as the rule it has been exact. Declared in
+   pollsterRules (release.monthEnd); the rule's own record is measured by
+   gen-data, which runs THIS function (so the two cannot drift apart).
+
+   From a release at `fromMs`, the slot is the `dow` nearest the last day of
+   the month AFTER the month-end that release belonged to (the month-end
+   nearest it: 1 Mar belongs to February's). Nearest in whole days, so the
+   distances are 3 and 4 and never tie. UTC-midnight day stamps in and out,
+   the frame everything here compares in. */
+function npMonthEndSlot(fromMs, dow) {
+  const d = new Date(fromMs);
+  const y = d.getUTCFullYear(), m = d.getUTCMonth();
+  const endPrev = Date.UTC(y, m, 0), endThis = Date.UTC(y, m + 1, 0);
+  const base = new Date(fromMs - endPrev < endThis - fromMs ? endPrev : endThis);
+  const target = Date.UTC(base.getUTCFullYear(), base.getUTCMonth() + 2, 0);
+  let k = dow - new Date(target).getUTCDay();
+  if (k > 3) k -= 7;
+  if (k < -3) k += 7;
+  return target + k * DAY_MS;
+}
+
 /* The window a row counts with must be the one its ± claims, and for a
    weekday house that is whole weeks, not days. Essential's gaps scatter
    ±4 days, but no Sunday or Friday filing can come of that – the only
@@ -169,8 +194,13 @@ function npProject(nowOverride) {
        supports, left where it is and marked overdue – it leaves the list only
        once a new release moves `c.last` past it, at which point this slot is
        what got confirmed and the row after it is the fresh guess. */
-    let field = Date.parse(c.last) + c.cadence * DAY_MS;
-    let release = relOf(field);
+    /* a month-end house steps month-end to month-end, not by interval:
+       its slot IS the release day, so field and release coincide (and the
+       slot-relative tails below need no weekday-snap shift) */
+    const monthEnd = !!c.monthEnd && c.releaseDow != null;
+    const stepFrom = (rel) => npMonthEndSlot(rel, c.releaseDow);
+    let field = monthEnd ? stepFrom(Date.parse(c.last)) : Date.parse(c.last) + c.cadence * DAY_MS;
+    let release = monthEnd ? field : relOf(field);
     /* A slot named in `skipped` was confirmed absent at the publisher by the
        house's agent, the morning after it passed - so it is not an open bet
        and not overdue, it just isn't coming. Roll to the house's next
@@ -184,6 +214,7 @@ function npProject(nowOverride) {
       const isoDay = (ms) => new Date(ms).toISOString().slice(0, 10);
       while ((c.skipped || []).includes(isoDay(release))) {
         rolled = true;
+        if (monthEnd) { field = release = stepFrom(release); continue; }
         field += (c.releaseDow != null ? 7 : c.cadence) * DAY_MS;
         release = relOf(field);
       }
@@ -247,6 +278,7 @@ function npProject(nowOverride) {
       // an overdue slot isn't a base to project the next one from – that
       // would stack a guess on a slot nothing has confirmed yet
       if (overdue || c.loose) break;   // loose: one window per house, same reason
+      if (monthEnd) { field = release = stepFrom(release); continue; }
       field += c.cadence * DAY_MS;
       release = dayFloor(snap(field + c.lag * DAY_MS));
     }
@@ -269,3 +301,4 @@ function npProject(nowOverride) {
   return { rows, t0, nowMs };
 }
 window.AP.nextPolls = npProject;
+window.AP.npMonthEndSlot = npMonthEndSlot;

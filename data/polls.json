@@ -58,7 +58,11 @@
       "site": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html"
     },
     "RedBridge/Accent": {
-      "site": "https://www.afr.com/topic/redbridge-accent-poll-6ikd"
+      "site": "https://www.afr.com/topic/redbridge-accent-poll-6ikd",
+      "release": {
+        "monthEnd": true,
+        "note": "One wave a month, published on the Sunday nearest the month’s last day: every 2026 release (1 Mar, 29 Mar, 3 May, 31 May, 28 Jun, 2 Aug, 30 Aug). As an interval that is 28 or 35 days and drifts against the calendar; as the rule it has been exact. The weekday is measured (Sunday habit); the rule’s own precision is measured from its record."
+      }
     },
     "RedBridge/Accent (MRP)": {
       "site": "https://www.afr.com/topic/redbridge-accent-poll-6ikd"

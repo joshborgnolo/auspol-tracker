@@ -33666,9 +33666,9 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "last": "2026-08-30",
     "cadence": 28,
     "loose": false,
-    "spread": 4,
+    "spread": 1,
     "spreadEarly": 0,
-    "spreadLate": 7,
+    "spreadLate": 0,
     "basis": "published",
     "lag": 0,
     "lagMeasured": 0,
@@ -33680,7 +33680,10 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "releaseMins": 1080,
     "releaseDow": 0,
     "releaseDowN": 10,
-    "declared": [],
+    "declared": ["month-end rhythm"],
+    "monthEnd": true,
+    "monthEndKept": 7,
+    "monthEndN": 8,
     "waves": 15,
     "site": "https://www.afr.com/topic/redbridge-accent-poll-6ikd",
     "skipped": [],
@@ -34614,6 +34617,19 @@ function easternNow() {
     };
   }
 }
+function npMonthEndSlot(fromMs, dow) {
+  const d = new Date(fromMs);
+  const y = d.getUTCFullYear(),
+    m = d.getUTCMonth();
+  const endPrev = Date.UTC(y, m, 0),
+    endThis = Date.UTC(y, m + 1, 0);
+  const base = new Date(fromMs - endPrev < endThis - fromMs ? endPrev : endThis);
+  const target = Date.UTC(base.getUTCFullYear(), base.getUTCMonth() + 2, 0);
+  let k = dow - new Date(target).getUTCDay();
+  if (k > 3) k -= 7;
+  if (k < -3) k += 7;
+  return target + k * DAY_MS;
+}
 function spreadDays(c, sp) {
   return c.releaseDow != null && !c.loose ? 7 * Math.floor((sp + 3) / 7) : sp;
 }
@@ -34678,13 +34694,19 @@ function npProject(nowOverride) {
     };
     const due = rel => rel + (c.releaseMins == null ? NP_UNTIMED_MINS : c.releaseMins) * 60000;
     const relOf = f => dayFloor(snap(f + c.lag * DAY_MS));
-    let field = Date.parse(c.last) + c.cadence * DAY_MS;
-    let release = relOf(field);
+    const monthEnd = !!c.monthEnd && c.releaseDow != null;
+    const stepFrom = rel => npMonthEndSlot(rel, c.releaseDow);
+    let field = monthEnd ? stepFrom(Date.parse(c.last)) : Date.parse(c.last) + c.cadence * DAY_MS;
+    let release = monthEnd ? field : relOf(field);
     let rolled = false;
     {
       const isoDay = ms => new Date(ms).toISOString().slice(0, 10);
       while ((c.skipped || []).includes(isoDay(release))) {
         rolled = true;
+        if (monthEnd) {
+          field = release = stepFrom(release);
+          continue;
+        }
         field += (c.releaseDow != null ? 7 : c.cadence) * DAY_MS;
         release = relOf(field);
       }
@@ -34712,6 +34734,10 @@ function npProject(nowOverride) {
         missed: overdue && release + winHalf * DAY_MS < t0
       });
       if (overdue || c.loose) break;
+      if (monthEnd) {
+        field = release = stepFrom(release);
+        continue;
+      }
       field += c.cadence * DAY_MS;
       release = dayFloor(snap(field + c.lag * DAY_MS));
     }
@@ -34724,7 +34750,8 @@ function npProject(nowOverride) {
     nowMs
   };
 }
-window.AP.nextPolls = npProject;</script>
+window.AP.nextPolls = npProject;
+window.AP.npMonthEndSlot = npMonthEndSlot;</script>
   <script>(() => {
   "use strict";
 
@@ -40680,7 +40707,7 @@ function NextPollsPanel() {
       title: x.since ? `Since the previous ${r.basis === "published" ? "publication" : "fieldwork end"}, ${fmtDay(x.since)}` : undefined
     }, x.gap != null ? `${x.gap} days` : "")))), React.createElement("p", {
       className: "npd-foot"
-    }, "Median ", r.cadence, " days between", " ", r.basis === "published" ? "publications" : "fieldwork ends", " across the last ", r.gapsUsed, " intervals", r.spreadEarly != null && r.spreadEarly !== r.spreadLate ? `, –${r.spreadEarly}/+${r.spreadLate} days` : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : "", ".", r.basis !== "published" && React.createElement(React.Fragment, null, " ", "Plus", " ", r.lagMeasured ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases` : "the field’s one-day publication lag", "."), r.releaseDow != null && ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`, r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`, (r.declared || []).length > 0 && ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`)));
+    }, "Median ", r.cadence, " days between", " ", r.basis === "published" ? "publications" : "fieldwork ends", " across the last ", r.gapsUsed, " intervals", r.monthEnd ? "" : r.spreadEarly != null && r.spreadEarly !== r.spreadLate ? `, –${r.spreadEarly}/+${r.spreadLate} days` : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : "", ".", r.basis !== "published" && React.createElement(React.Fragment, null, " ", "Plus", " ", r.lagMeasured ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases` : "the field’s one-day publication lag", "."), r.releaseDow != null && !r.monthEnd && ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`, r.monthEnd && ` Projected onto the ${WD[r.releaseDow]} nearest the month’s last day${hour ? `, when it files at ${zoned(hour, r.release)}` : ""} – the day it has published on in ${r.monthEndKept} of its last ${r.monthEndN} releases.`, r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`, (r.declared || []).length > 0 && ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`)));
   })));
 }
 window.AP.measureOfMatchup = id => ({

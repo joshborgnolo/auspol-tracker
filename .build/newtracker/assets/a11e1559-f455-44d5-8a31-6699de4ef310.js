@@ -3264,7 +3264,10 @@ function NextPollsPanel() {
                   Median {r.cadence} days between{" "}
                   {r.basis === "published" ? "publications" : "fieldwork ends"} across the
                   last {r.gapsUsed} intervals
-                  {r.spreadEarly != null && r.spreadEarly !== r.spreadLate
+                  {/* a month-end house's ± belongs to the month-end rule, not
+                      to the median, and is told with the rule below */}
+                  {r.monthEnd ? ""
+                    : r.spreadEarly != null && r.spreadEarly !== r.spreadLate
                     ? `, –${r.spreadEarly}/+${r.spreadLate} days`
                     : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : ""}.
                   {/* a publication-based projection steps from one publication
@@ -3278,8 +3281,12 @@ function NextPollsPanel() {
                       only some houses have either. Run together they made a
                       house with no weekday - DemosAU - read as though its
                       publication lag happened at 6:52 in the morning. */}
-                  {r.releaseDow != null &&
+                  {r.releaseDow != null && !r.monthEnd &&
                     ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`}
+                  {/* the month-end rule steps month-end to month-end, so the
+                      interval above is context, not the projection */}
+                  {r.monthEnd &&
+                    ` Projected onto the ${WD[r.releaseDow]} nearest the month’s last day${hour ? `, when it files at ${zoned(hour, r.release)}` : ""} – the day it has published on in ${r.monthEndKept} of its last ${r.monthEndN} releases.`}
                   {r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`}
                   {(r.declared || []).length > 0 &&
                     ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`}

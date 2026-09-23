@@ -12,6 +12,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import vm from "node:vm";
 import { writeAtomic } from "../atomic-write.mjs";
 import { impliedAlp2pp, FLOW, FLOW_TABLE, FLOW_LEF, impliedLefAlp2pp } from "./flows.mjs";
 
@@ -2942,6 +2943,17 @@ const CYCLE_DEFS = CYC_META.map((c) => {
    it is recorded. A house that has broken its own pattern is not "expected"
    and is left out rather than given a made-up date. */
 const CAD_DEFAULT_LAG = 1;
+/* npMonthEndSlot, taken from the SHIPPED np-project.js (a classic browser
+   script, so run in a vm rather than imported): the month-end rule's record
+   below is measured with the same function the page projects with. */
+const CAD_ME_BREAK = 14;       // days off the month-end slot that mean another month-end, not a slip
+const CAD_ME_MAX_BREAKS = 2;   // of the last eight, before the rule is judged not to hold
+const NP_MONTH_END_SLOT = (() => {
+  const ctx = { window: { AP: {} } };
+  vm.createContext(ctx);
+  vm.runInContext(fs.readFileSync(path.join(HERE, "assets", "np-project.js"), "utf8"), ctx);
+  return ctx.window.AP.npMonthEndSlot;
+})();
 /* The weekday, the hour and the spread are all read off a RECENT window, not
    the whole record - the same eight-wave window the cadence itself uses, plus
    a little slack so a house does not lose its habit to one sample. A house's
@@ -3155,7 +3167,7 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     if (trimmed[trimmed.length - 1] > cadence * (1 + CAD_TRIM_FREAK)) trimmed.pop();
     if (trimmed[0] < cadence * (1 - CAD_TRIM_FREAK)) trimmed.shift();
   }
-  const spread = Math.max(1, Math.round((trimmed[trimmed.length - 1] - trimmed[0]) / 2));
+  let spread = Math.max(1, Math.round((trimmed[trimmed.length - 1] - trimmed[0]) / 2));
   /* The misses don't fall equally either side of the interval. A house slips
      a wave LATE far more readily than it brings one forward, and in the
      current record literally so: every weekday house's off-median intervals
@@ -3163,8 +3175,8 @@ for (const [firm, rows] of Object.entries(byHouse)) {
      sides are booked separately too - the panel can then state "or the
      Sunday after" instead of pretending an early Sunday has any precedent.
      NOT floored like spread: a zero is exactly the signal being carried. */
-  const spreadEarly = Math.max(0, cadence - trimmed[0]);
-  const spreadLate = Math.max(0, trimmed[trimmed.length - 1] - cadence);
+  let spreadEarly = Math.max(0, cadence - trimmed[0]);
+  let spreadLate = Math.max(0, trimmed[trimmed.length - 1] - cadence);
   /* Tight enough to name a DAY, or only a window?
 
      This used to be one test with one outcome: fail it and the house vanished
@@ -3195,6 +3207,49 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     const ds = seq.map((d) => Number(d.slice(8, 10)));
     return [Math.min(...ds), Math.max(...ds)];
   })();
+  /* A MONTH-END rhythm (RedBridge/Accent): the house's weekday nearest each
+     month's last day - see npMonthEndSlot in np-project.js, run here
+     through NP_MONTH_END_SLOT so the rule measured is the rule projected.
+     Declared (release.monthEnd), but its precision is MEASURED: the rule is
+     replayed along the published sequence, each release against the slot
+     the one before it named, and the ± comes from those misses. A miss of
+     two weeks or more (CAD_ME_BREAK) is not imprecision in the rule but a
+     wave belonging to another month-end altogether - a summer break, the
+     house's pre-2026 schedule - so breaks are set aside from the ±, and more
+     than CAD_ME_MAX_BREAKS of them in the last eight means the rule is not
+     holding and the interval projection stands in. It also needs the
+     published basis and a weekday to aim at. */
+  const meDow = decl && decl.dow != null ? decl.dow : dowHabit;
+  let monthEnd = !!decl?.monthEnd && !calMonth && basis === "published" && meDow != null;
+  let monthEndKept = null, monthEndN = null;
+  if (monthEnd) {
+    /* Each release against the slot its anchor named - where the anchor is
+       the last release that KEPT the rhythm. A release that falls short of
+       the slot while the next one lands on it exactly is an extra inside the
+       slot (the Australia Institute wave of 18 Feb 2026, filed between the
+       1 Feb and 1 Mar monthlies): skipped, anchor kept - the same repair the
+       interval gaps get from the fusion above. */
+    const off = (d, anchor) =>
+      Math.round((Date.parse(d) - NP_MONTH_END_SLOT(Date.parse(anchor), meDow)) / 86400000);
+    const all = [];
+    let anchor = seq[0];
+    for (let i = 1; i < seq.length; i++) {
+      const r = off(seq[i], anchor);
+      if (r < 0 && i + 1 < seq.length && off(seq[i + 1], anchor) === 0) continue;
+      all.push(r);
+      anchor = seq[i];
+    }
+    const res = all.slice(-8);
+    const kept = res.filter((r) => Math.abs(r) < CAD_ME_BREAK).sort((a, b) => a - b);
+    if (res.length - kept.length > CAD_ME_MAX_BREAKS || kept.length < CAD_SPREAD_TRIM) monthEnd = false;
+    else {
+      monthEndKept = res.filter((r) => r === 0).length;
+      monthEndN = res.length;
+      spread = Math.max(1, Math.round((kept[kept.length - 1] - kept[0]) / 2));
+      spreadEarly = Math.max(0, -kept[0]);
+      spreadLate = Math.max(0, kept[kept.length - 1]);
+    }
+  }
   const rel = spread / cadence;
   const dated = rel <= CAD_MAX_REL_SPREAD && !calMonth;
   if (!dated && !calMonth && rel > CAD_LOOSE_MAX_REL_SPREAD) continue;
@@ -3283,7 +3338,11 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     releaseDowN: releaseDow == null ? 0 : (decl && decl.dow != null ? 0 : dowTop[1]),
     // which parts of this are stated rather than measured, so the panel can say so
     declared: decl ? [decl.dow != null && "day", declMins != null && !timed && "hour",
-      calMonth && "calendar-month rhythm"].filter(Boolean) : [],
+      calMonth && "calendar-month rhythm", monthEnd && "month-end rhythm"].filter(Boolean) : [],
+    /* the month-end rule and how many of the last monthEndN releases it
+       named exactly - the panel's foot says so instead of quoting a median
+       interval the projection no longer steps by */
+    ...(monthEnd ? { monthEnd: true, monthEndKept, monthEndN } : {}),
     /* The month itself is the projection, not a median ± spread: npProject's
        window is the measured day-of-month range (calDays) of the month
        after the last wave, with the bare 1st-to-last month as its fallback. */
