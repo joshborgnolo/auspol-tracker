@@ -1624,11 +1624,23 @@ const demoPollOf = (w) => {
   return POLLS.filter((q) => q.pollster === w.pollster && Math.abs(Date.parse(q.date) - ms) <= 4 * 86400000)
     .sort((a, b) => Math.abs(Date.parse(a.date) - ms) - Math.abs(Date.parse(b.date) - ms))[0] || null;
 };
+/* A table's shares taken to 100 (DEMO_KEYS order: §7g's), and a wave's own
+   all-voters figure: the table's where it prints one, else the published
+   primaries. */
+const DEMO_KEYS = ["alp", "lnp", "onp", "grn", "oth"];
+const demoNorm = (s) => {
+  const t = DEMO_KEYS.reduce((a, k) => a + (+s[k] || 0), 0);
+  return t > 0 ? Object.fromEntries(DEMO_KEYS.map((k) => [k, 100 * (+s[k] || 0) / t])) : null;
+};
+const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm(w.total)
+  : p && p.alp != null ? demoNorm({ alp: p.alp, lnp: p.lnp, onp: p.onp ?? 0, grn: p.grn ?? 0, oth: (p.ind ?? 0) + (p.oth ?? 0) }) : null);
 /* Each wave's figures for the common groups – exactly what §7g pools – keyed
    onto its poll row, so the archive's CSV export carries them. `v` follows
    DEMO_GROUPS (null where the poll didn't ask), each [alp, lnp, grn, onp,
    oth] as published (RedBridge's two school rows merged, as the pooling
-   merges them); `r` is how the figures were read. */
+   merges them); `r` is how the figures were read; `t` is the wave's own
+   all-voters figure in the same order, taken to 100, so the panel can plot
+   each poll's gap from it as §7g pools it. */
 const DEMO_GROUPS = DEMO_SETS.flatMap((st) => st.groups);
 const DEMO_BY_POLL = new Map();
 for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) {
@@ -1641,7 +1653,9 @@ for (const w of (Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [])) 
     return sh ? ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(sh[k])) : null;
   });
   while (v.length && v[v.length - 1] == null) v.pop();
-  if (v.some(Boolean)) DEMO_BY_POLL.set(p.date + "|" + p.pollster, { r: w.read, v });
+  const tot = demoTotalOf(w, p);
+  if (v.some(Boolean)) DEMO_BY_POLL.set(p.date + "|" + p.pollster,
+    { r: w.read, v, ...(tot ? { t: ["alp", "lnp", "grn", "onp", "oth"].map((k) => r1(tot[k])) } : {}) });
 }
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
@@ -2100,14 +2114,6 @@ const primaryNow = primaryNowAt(refNow);
    total are both taken to 100 first), so each group sums to its anchor's
    total; a group is rescaled only when a share is clamped at zero, and then
    to that total. */
-const DEMO_KEYS = ["alp", "lnp", "onp", "grn", "oth"];
-const demoNorm = (s) => {
-  const t = DEMO_KEYS.reduce((a, k) => a + (+s[k] || 0), 0);
-  return t > 0 ? Object.fromEntries(DEMO_KEYS.map((k) => [k, 100 * (+s[k] || 0) / t])) : null;
-};
-// its all-voters figure: the table's own where it prints one, else the published primaries
-const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm(w.total)
-  : p && p.alp != null ? demoNorm({ alp: p.alp, lnp: p.lnp, onp: p.onp ?? 0, grn: p.grn ?? 0, oth: (p.ind ?? 0) + (p.oth ?? 0) }) : null);
 const demographics = (() => {
   const waves = Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [];
   if (!waves.length || !primaryNow) return null;

@@ -1565,6 +1565,10 @@ function OnSourcesPanel({ rangeId }) {
         scatter={drawn.flatMap((d) => d.dots)} pollFacet="twopp"
         tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}
         fmt={(v) => v.toFixed(1)}
+        // the readings above are this chart's key on the page; the image
+        // carries them as its legend, with the figure each one shows
+        copy={{ legend: reads.filter((r) => drawn.some((d) => d.sr.id === r.sr.id))
+          .map(({ sr, v }) => ({ label: `${sr.label}  ${v.toFixed(1)}%`, color: sr.color, kind: "line" })) }}
       />
       <p className="table-hint">
         Each dot is one poll’s split and the lines are monthly averages; the figures above pool the
@@ -1587,10 +1591,13 @@ function OnSourcesPanel({ rangeId }) {
    headline pools polls, added to the site's current primaries. Groups pool
    only where pollsters cut the population the same way, so Age shows its
    bands and, beside them, the generations two houses ask by. One party at a
-   time, One Nation first. Under each set's bars, a chart of the same groups
-   month by month (gen-data's monthly construction, anchored on each month's
-   primaries), each poll's own figure a dot, all voters the dashed line; the
-   bars' swatches are its legend. */
+   time, One Nation first. Under each set's bars, a chart of each group's GAP
+   from all voters month by month (gen-data's monthly lines less that month's
+   primaries), each poll's own gap a dot, all voters the dashed zero line; the
+   bars' swatches are its legend. The levels would mostly redraw the national
+   trend once per group – every group's line is the month's primaries plus
+   its gap – so the gap is what a group adds, and a flat line says the group
+   moved with everyone else. */
 const DEMO_PARTIES = [
   { id: "onp", label: "One Nation" }, { id: "alp", label: "Labor" },
   { id: "lnp", label: "Coalition" }, { id: "grn", label: "Greens" },
@@ -1631,14 +1638,17 @@ function DemographicsPanel({ rangeId = "all" }) {
       <span className="demo-ci">{ci != null ? "± " + ci.toFixed(1) : ""}</span>
     </div>
   );
-  /* One set's chart: its groups' monthly lines for the chosen party, the
-     all-voters line, and each poll's own figure for each group. */
+  /* One set's chart: its groups' monthly gaps from all voters for the chosen
+     party, and each poll's gap from its own all-voters figure (grp.t) – the
+     gap gen-data pools. */
   const ki = T.order.indexOf(party), gpi = DEMO_GRP_PARTY.indexOf(party);
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
   const chartFor = (st) => {
     const n = st.groups.length;
+    const allAt = new Map(T.allMonthly.map((m) => [m[0], m[1 + ki]]));
     const lines = st.groups.map((g, i) => ({ g, color: demoRamp(color, n, i),
-      pts: (g.monthly || []).map((m) => ({ ym: m[0], x: D.mx(m[0]), v: m[1 + ki] })) }))
+      pts: (g.monthly || []).filter((m) => allAt.has(m[0]))
+        .map((m) => ({ ym: m[0], x: D.mx(m[0]), v: +(m[1 + ki] - allAt.get(m[0])).toFixed(1) })) }))
       .filter((l) => l.pts.length);
     if (!lines.length) return null;
     // the houses asked from Feb 2026 (Resolve's age and gender from mid-2025),
@@ -1646,22 +1656,27 @@ function DemographicsPanel({ rangeId = "all" }) {
     const firstX = Math.min(...lines.map((l) => l.pts[0].x));
     const xDomain = [Math.max(rangeLo, firstX - 0.06), rangeHi];
     const inX = (x) => x >= xDomain[0] && x <= xDomain[1];
-    const allPts = filterPts(T.allMonthly.map((m) => ({ ym: m[0], x: D.mx(m[0]), v: m[1 + ki] }))
+    const allPts = filterPts(T.allMonthly.map((m) => ({ ym: m[0], x: D.mx(m[0]), v: 0 }))
       .filter((d) => d.x >= firstX), xDomain[0]);
     const drawn = lines.map((l) => ({ ...l, pts: filterPts(l.pts, xDomain[0]) }));
-    const dots = D.individualPolls.filter((p) => p.grp && inX(p.x)).flatMap((p) => drawn.map((l) => {
+    const dots = D.individualPolls.filter((p) => p.grp && p.grp.t && inX(p.x)).flatMap((p) => drawn.map((l) => {
       const v = p.grp.v[D.demoGroups.indexOf(l.g.label)];
-      return v ? { x: p.x, y: v[gpi], color: l.color, label: l.g.label, meta: p } : null;
+      const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
+      return sum > 0 ? { x: p.x, y: +(100 * v[gpi] / sum - p.grp.t[gpi]).toFixed(1), color: l.color, label: l.g.label, meta: p } : null;
     }).filter(Boolean));
     const vals = drawn.flatMap((l) => l.pts.map((d) => d.v)).concat(allPts.map((d) => d.v), dots.map((d) => d.y));
     const span = Math.max(...vals) - Math.min(...vals);
     const { domain, ticks } = fitDomain(vals, span > 30 ? 10 : 5, 0);
+    const signed = (v) => (v > 0 ? "+" : v < 0 ? "\u2212" : "") + Math.abs(v).toFixed(1);
+    const by = st.label ? st.label.replace(/^By /, "") : tab.label.toLowerCase();
     return (
       <div className="demo-chart">
+        <p className="demo-chart-lab">Points above or below all voters, month by month</p>
         <TrendChart
           key={"demo-" + st.id}
           height={narrow ? 560 : 500} xDomain={xDomain} yDomain={domain}
-          yTicks={ticks} unit="%"
+          yTicks={ticks} unit=" pts"
+          yTickFmt={(t) => (t > 0 ? "+" + t : t < 0 ? "\u2212" + -t : "0")}
           // the right margin keeps the last month's label clear of the copy button
           pad={{ l: narrow ? 92 : 76, r: 60, t: 16, b: narrow ? 66 : 56 }}
           xTicks={buildXTicks(xDomain[0], xDomain[1])}
@@ -1670,8 +1685,14 @@ function DemographicsPanel({ rangeId = "all" }) {
           spine={series(allPts, "v")}
           scatter={dots} pollFacet="primary"
           tooltipTitle={(i) => window.AP.monthLabelFull(allPts[i].ym)}
-          fmt={(v) => v.toFixed(1)}
-          ariaLabel={`${name} by ${st.label ? st.label.replace(/^By /, "") : tab.label.toLowerCase()}, month by month`}
+          fmt={signed}
+          ariaLabel={`${name} by ${by}: each group's points above or below all voters, month by month`}
+          copy={{
+            sub: `${name}’s vote in each group, points above or below all voters, by ${by} · the latest figures pool the last ${T.window} of polls`,
+            legend: [{ label: `All voters  ${all.toFixed(1)}%`, color: "var(--ink-3)", kind: "dashed" },
+                     ...st.groups.map((g, i) => ({ label: `${g.label}  ${signed(g.v[party] - all)}`,
+                                                   color: demoRamp(color, n, i), kind: "line" }))],
+          }}
         />
       </div>
     );
@@ -1713,8 +1734,10 @@ function DemographicsPanel({ rangeId = "all" }) {
         Each poll says how far a group sits from its own overall figure. Those gaps are pooled over the
         last {T.window} of polls, newer and larger polls counting for more as in every figure here, and
         added to the site’s current figure for all voters. ± is the 95% margin. The charts follow
-        each group month by month, built the way the site’s other monthly lines are, with each
-        poll’s own figure as a dot and all voters as the dashed line. Groups pool only where
+        each group’s gap from all voters month by month, built the way the site’s other monthly
+        lines are, with each poll’s own gap as a dot. Above the dashed zero line, the party does
+        better in that group than overall. The national rise and fall is taken out, so a flat
+        line means the group moved with everyone else. Groups pool only where
         pollsters cut them the same way
         {tab.id === "age" ? " – YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : ""}.{" "}
         <button type="button" className="hi-term"

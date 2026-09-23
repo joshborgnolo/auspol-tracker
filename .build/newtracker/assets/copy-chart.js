@@ -382,14 +382,15 @@
   const col = (el, prop) => (el ? getComputedStyle(el)[prop || "color"] : null);
   /* Resolved through a probe rather than read as a raw token, because a canvas
      fillStyle wants a resolved colour - the same trick make-card.js uses. */
-  const inkVar = (name) => {
+  const paint = (css) => {
     const el = document.createElement("span");
-    el.style.color = "var(" + name + ")";
+    el.style.color = css;
     document.body.appendChild(el);
     const v = getComputedStyle(el).color;
     el.remove();
     return v;
   };
+  const inkVar = (name) => paint("var(" + name + ")");
 
   /* Every chart card has the same bones - a title, a subtitle or a readout,
      the chart, a legend, sometimes a caption - so one composer draws them all
@@ -429,15 +430,27 @@
       };
     });
 
-  const composeCard = async (target) => {
-    const svgEl = target.querySelector("svg.chart-svg");
+  /* A chart can say what its copy shows (TrendChart's `copy` prop, carried as
+     data-copy on its host): a title, a sub and a legend of its own. Panels
+     whose key is not a row of chips - the One Nation readings, the vote-by-
+     group bars - and cards holding more than one chart use it, so the image
+     names every line it draws and describes the chart that was clicked, not
+     the card's first. */
+  const ownCopy = (host) => {
+    const raw = host && host.getAttribute && host.getAttribute("data-copy");
+    if (!raw) return null;
+    try { return JSON.parse(raw); } catch (e) { return null; }
+  };
+
+  const composeCard = async (target, host) => {
+    const svgEl = (host && host.querySelector("svg.chart-svg")) || target.querySelector("svg.chart-svg");
     if (!svgEl) throw new Error("no chart to compose");
     const restore = await widenForCopy(svgEl);
-    try { return await composeCardInner(target, svgEl); }
+    try { return await composeCardInner(target, svgEl, ownCopy(host)); }
     finally { restore(); }
   };
 
-  const composeCardInner = (target, svgEl) => new Promise((resolve, reject) => {
+  const composeCardInner = (target, svgEl, own) => new Promise((resolve, reject) => {
     /* Taken from the theme's own tokens, not from whichever element happened
        to be on screen. ink2 used to come from .lead-tag, which exists only in
        the hero - so on every other card col() fell through to its "#000"
@@ -462,8 +475,9 @@
        panel's own ground note */
     const board0 = (target.classList.contains("ap-lean") && window.AP_LEAN_BOARD)
                 || (target.classList.contains("ap-flow") && (window.AP_FLOW_BOARD || {})[target.id]) || null;
-    const titleBase = (board0 && board0.title) || txt(target.querySelector(".card-title, h2, h3")) || "auspol tracker";
-    const sub = txt(target.querySelector(".card-sub"));
+    const titleBase = (own && own.title) || (board0 && board0.title)
+      || txt(target.querySelector(".card-title, h2, h3")) || "auspol tracker";
+    const sub = own && own.sub != null ? own.sub : txt(target.querySelector(".card-sub"));
     /* the drift panels' ground note opens with the sentence that reads the
        chart's two colours ("Above zero – the red ground – …"); the image
        carries that sentence and leaves the rest of the paragraph behind */
@@ -654,7 +668,10 @@
                                         fill: solid(i.color), alpha: i.off ? 0.45 : 1 }));
       return out;
     };
-    let legend = readLegend(target);
+    let legend = own && own.legend
+      ? own.legend.map((l) => ({ label: l.label, kind: l.kind === "dashed" ? "dashed" : "line",
+                                 fill: paint(l.color), alpha: 1 }))
+      : readLegend(target);
     if (!legend.length && board0) legend = boardLegend();
     if (!legend.length) legend = cycleLegend();
     /* The Poll disagreement panel's chance-floor shading has no chip of its
@@ -1059,7 +1076,7 @@
        the composer rebuilds a legend from – see boardLegend(). */
     const card = host.closest && host.closest(".card, .ap-var, .ap-lean, .ap-flow");
     const png = (card && card.querySelector("svg.chart-svg"))
-      ? composeCard(card).catch((e) => {
+      ? composeCard(card, host).catch((e) => {
           console.warn("copy-chart: composed card failed, captured instead –", e && e.message || e);
           return rasterise(target, host);
         })

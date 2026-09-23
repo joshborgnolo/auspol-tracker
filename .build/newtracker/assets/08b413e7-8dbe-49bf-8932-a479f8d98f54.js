@@ -105,6 +105,11 @@ function straightPath(pts, sx, sy) {
  *           on the fill so CSS can theme it; `clipX` is its own travelling
  *           window, which an interval belonging to ONE line needs for the same
  *           reason the line does.
+ *  yTickFmt: (t) => string  a y-axis label (default: the tick, then `unit`)
+ *  copy:    { title?, sub?, legend: [{label, color, kind: "line"|"dashed"}] }
+ *           what the copy-as-image button (copy-chart.js) draws for THIS
+ *           chart, for a panel with no legend chips of its own or with more
+ *           than one chart in its card; rides on the host as data-copy
  *  extraRows: (i) => [{label,value,color?}]  rows appended to the tooltip
  *           below the series rows; a point may also carry `note` for a
  *           secondary value shown beside its own row
@@ -115,6 +120,7 @@ function TrendChart(props) {
     series: seriesProp = [], scatter: scatterProp = [], yTicks = [], xTicks = [], refLines = [],
     bands = [], areas = [], fmt = (v) => v.toFixed(1), unit = "", tooltipTitle: tooltipTitleProp,
     onHoverIndex, spine: spineProp, axisFont = 15, events = [], extraRows: extraRowsProp, ariaLabel,
+    yTickFmt, copy,
     /* A chart can be mid-MORPH between two versions of itself (the hero's
        matchup switch). `scatterOut` is the cloud on its way out and `fade` how
        far the crossfade has run; `clipX` is the x window the lines are allowed
@@ -714,7 +720,7 @@ function TrendChart(props) {
   })();
 
   return (
-    <div className="chart" ref={ref}>
+    <div className="chart" ref={ref} data-copy={copy ? JSON.stringify(copy) : undefined}>
       <svg viewBox={`0 0 ${W} ${H}`} className="chart-svg"
            onPointerMove={onPointerMove} onPointerDown={onPointerDown}
            onPointerUp={onPointerUp} onPointerCancel={onPointerCancel}
@@ -826,7 +832,7 @@ function TrendChart(props) {
           <g key={"y" + t}>
             <line x1={pad.l} x2={W - pad.r} y1={sy(t)} y2={sy(t)} className="grid" />
             {yLabelled.has(t) && (
-              <text x={pad.l - 10} y={sy(t)} className="axis-label y" style={{ fontSize: axisUnits }} dominantBaseline="middle">{t}{unit}</text>
+              <text x={pad.l - 10} y={sy(t)} className="axis-label y" style={{ fontSize: axisUnits }} dominantBaseline="middle">{yTickFmt ? yTickFmt(t) : t + unit}</text>
             )}
           </g>
         ))}
