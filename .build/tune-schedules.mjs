@@ -102,7 +102,9 @@ const TARGETS = [
   // writers queue is serialised, so the comb is coarse and stops at the
   // habitual hour; the hourly follow-ups cover the occasional late file.
   // Its daily sweep sits AFTER the morning cluster: a 10-minute holder of
-  // the writers queue in the middle of it is what got np-score cancelled.
+  // the writers queue in the middle of it got np-score cancelled (np-score
+  // has since left main-writers for its own group; the spacing still helps
+  // the updaters themselves).
   { workflow: "essential-update.yml", houses: ["Essential"], mode: "dense", sweep: "07:45",
     step: 30, chaseOutliers: false, phase: 0 },
   // shares its Sunday evening with Resolve: phased 5 min off Resolve's comb

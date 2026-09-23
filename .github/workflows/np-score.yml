@@ -13,9 +13,15 @@ on:
     - cron: '15 21 * * *' # 07:15 AEST daily
   workflow_dispatch:
 
-# Pushes to main → serialise with the other writers (see roymorgan-update.yml).
+# Its OWN group, not main-writers. A concurrency group holds one running job
+# and ONE pending one — a newer pending run cancels the older — and GitHub
+# fires this cron late (~23:00Z), right when the 09:00 AEST updater slots
+# queue on main-writers: 12 of 14 runs to 2026-09-22 were cancelled before
+# starting, and every missed day lost that day's bets from the ledger. It
+# needs no lock: it writes only the two calibration files (no other writer
+# touches them) and pushes through push_main's rebase retry.
 concurrency:
-  group: main-writers
+  group: np-score
   cancel-in-progress: false
 
 jobs:
@@ -38,10 +44,18 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      # The bets come from the built data asset, which is committed — and a
+      # commit can land polls.json without it (2026-09-23 06:55: a YouGov
+      # wave sat in polls.json while the committed asset still projected the
+      # slot it filled). Regenerate it from the polls.json being scored
+      # against, so claims and resolutions read the same data; then put the
+      # tracked files back, since this job commits only the ledger.
       - name: Log the live tuples, then resolve the ledger
         run: |
+          node .build/newtracker/gen-data.mjs > /dev/null
           node .build/newtracker/np-score.mjs
           node .build/newtracker/np-score.mjs --report
+          git checkout -- .build/newtracker/assets/
 
       - name: Commit whatever moved
         run: |
