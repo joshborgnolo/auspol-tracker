@@ -1420,10 +1420,17 @@ body.dark .sens-band { opacity: 0.10; }
    inset, because overflow:visible would push an offset ring under the card edge. */
 .chart-svg { width: 100%; height: auto; display: block; overflow: visible; touch-action: pan-y; }
 .chart-svg:focus-visible { outline: 2.5px solid var(--accent); outline-offset: -3px; border-radius: 4px; }
-/* copy-as-image shortcut, bottom-right of every chart: quiet until hovered,
-   and it sits on --chart-bg so it reads as part of the chart's own canvas */
+/* copy-as-image shortcut, in its own strip BELOW every chart, right-aligned:
+   quiet until hovered, on --chart-bg so it reads as part of the chart's own
+   canvas. It used to sit over the plot's bottom-right corner - exactly where
+   every time axis puts its newest label - and covered it: "Sep" on Preferred
+   PM and Leader net approval at laptop widths, the last label on 12 of 19
+   charts at 768px and on all 19 on a phone. The strip is reserved by the
+   button's own presence (:has, not a class copy-chart.js adds - React owns
+   .chart's className and would drop one on re-render). */
+.chart:has(> .chart-copy-btn) { padding-bottom: 30px; }
 .chart-copy-btn {
-  position: absolute; right: 2px; bottom: 2px; z-index: 3;
+  position: absolute; right: 0; bottom: 0; z-index: 3;
   display: inline-flex; align-items: center; justify-content: center;
   width: 28px; height: 28px; padding: 0; border-radius: 6px;
   background: var(--chart-bg); border: 1px solid transparent;
