@@ -4947,16 +4947,18 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
 
         {/* The lead column is a 2PP idea, so its controls live and die with
             that view – and they are one button, because choosing the matchup
-            and filtering by who holds it are the same thought. The button and
+            and filtering by who holds it are the same thought. It is named
+            Contest, not Lead, because the matchup it picks sets the 2PP the
+            table shows as well as the lead column. The button and
             the view's "With a 2PP" scope pill share the ap-2line wrapper,
-            which unfolds into the bar's flex row at every width: the lead
+            which unfolds into the bar's flex row at every width: the Contest
             toggle lands right after Contains, even on a phone. */}
         {facet === "twopp" && (
           <div className="ap-2line">
-            <FilterPop id="lead" label="Lead" open={pop} setOpen={setPop}
+            <FilterPop id="lead" label="Contest" open={pop} setOpen={setPop}
               summary={[measure !== DEFAULT_MEASURE ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null}>
-            <div className="ap-pop-head"><span>Show the lead in</span></div>
-            <div className="ap-poplist" role="radiogroup" aria-label="Lead column matchup">
+            <div className="ap-pop-head"><span>Two-party contest</span></div>
+            <div className="ap-poplist" role="radiogroup" aria-label="Two-party contest">
               {/* the two Labor contests lead the list in the order of the
                   rival ruling – the rival Labor is doing worst against
                   first (DEFAULT_MEASURE, so the list opens on its own
@@ -5355,7 +5357,19 @@ function infoTerms(D) {
   const L = D.latest, prim = D.latest.primary;
   const counts = {};
   D.individualPolls.forEach((p) => { counts[p.pollster] = (counts[p.pollster] || 0) + 1; });
-  const sources = Object.keys(counts).sort((a, b) => counts[b] - counts[a]).join(", ");
+  /* One name per house, as the hero counts them (housesTracked): a house's
+     MRP or SMS release is the same pollster, not another source. */
+  const baseHouse = (h) => h.replace(/ \((MRP|SMS)\)$/, "");
+  const houseCounts = {};
+  Object.keys(counts).forEach((h) => { houseCounts[baseHouse(h)] = (houseCounts[baseHouse(h)] || 0) + counts[h]; });
+  const sources = Object.keys(houseCounts).sort((a, b) => houseCounts[b] - houseCounts[a]).join(", ");
+  /* The 2PP the hero leads with is the implied one (tppBasis defaults to
+     "imp"), so every figure quoted "beside the headline" is read off that
+     nowcast; the published one stands in only if the implied window is empty. */
+  const SL = D.synthLatest;
+  const hl = SL && SL.ci95 != null
+    ? { ci: SL.ci95, n: SL.n, nEff: SL.nEff }
+    : { ci: L.alp2ppCi95 ?? 0, n: L.method.nPolls, nEff: L.alp2ppNEff };
   /* Show-your-working tables (weighted-aggregate entry). Every row is the
      estimator's own, emitted beside the headline it builds, so the Σ line at
      the foot of each table reproduces the figure the hero prints. */
@@ -5403,7 +5417,7 @@ function infoTerms(D) {
             </tr>
           ))}
           <tr className="info-work-sum"><td colSpan="11">
-            Σwᵢ = {F(swT.sw)} · Σwᵢxᵢ = {F(swT.swx)} · the headline is {F(swT.swx)} ÷ {F(swT.sw)} = {F(swT.mean)}
+            Σwᵢ = {F(swT.sw)} · Σwᵢxᵢ = {F(swT.swx)} · the published figure is {F(swT.swx)} ÷ {F(swT.sw)} = {F(swT.mean)}
             {" "}→ {swT.v.toFixed(1)}, from the {swT.k} polls in the window.
           </td></tr>
         </tbody>
@@ -5412,6 +5426,18 @@ function infoTerms(D) {
   ) : null;
   const onp = Math.round(prim.onp);
   const acc = D.accuracy;
+  /* The error record scores only elections with a final poll on file, so it
+     names the ones it skips rather than let "from 1974 to 2025" read as all
+     of them. And its example of a shared miss must have more than one house
+     in it: a lone poll is "all on one side" by default and shows nothing. */
+  const accFirst = acc && acc.cycles[0].year, accLast = acc && acc.cycles[acc.cycles.length - 1].year;
+  const accGaps = acc ? (D.cycles || []).map((c) => c.year)
+    .filter((y) => y >= accFirst && y <= accLast && !acc.cycles.some((c) => c.year === y)) : [];
+  const accSpan = acc ? (
+    <>the {acc.cycles.length} elections from {accFirst} to {accLast} with final polls on
+    record{accGaps.length ? <> (none survive for {accGaps.join(" or ")})</> : null}</>) : null;
+  const accShared = acc ? acc.cycles.filter((c) => c.n >= 2 && c.sameSide)
+    .sort((a, b) => b.absErr - a.absErr)[0] : null;
   /* Term-to-term links: the same hi-term tap-to-define treatment the hero
      gets, only here the "back" label names the entry the reader came from. */
   const xref = (to, from, label) => (
@@ -5440,9 +5466,9 @@ function infoTerms(D) {
     { id: "interval", term: "95% interval", body: (
       <>The uncertainty carried beside the headline: the greater of the spread among the polls in
       the window and their {xref("margin-of-error", "95% interval", "sampling error")} – ±
-      {(L.alp2ppCi95 ?? 0).toFixed(1)} points on a share, so ±
-      {(2 * (L.alp2ppCi95 ?? 0)).toFixed(1)} beside the lead it sits with, since the lead moves
-      twice as far as either share – on {L.method.nPolls} polls across {L.method.windowDays}{" "}
+      {hl.ci.toFixed(1)} points on a share, so ±
+      {(2 * hl.ci).toFixed(1)} beside the lead it sits with, since the lead moves
+      twice as far as either share – on {hl.n} polls across {L.method.windowDays}{" "}
       days. Full formula: it is 1.96 × the greater of two standard errors taken on exactly the
       weights wᵢ the {xref("weighted-aggregate", "95% interval", "weighted aggregate")} is built
       from. The spread term is √(Σwᵢ(xᵢ − x̄)² ÷ Σwᵢ ÷ (nEff − 1)) – the window’s polls scattered
@@ -5458,7 +5484,7 @@ function infoTerms(D) {
       change.</>) },
     { id: "effective-sample", term: "Effective sample", body: (
       <>How many polls the window is really worth once weighting is applied – currently
-      {" "}{L.alp2ppNEff} of the {L.method.nPolls} in it. Recency, sample size and the square-root
+      {" "}{hl.nEff} of the {hl.n} in it. Recency, sample size and the square-root
       discount on repeat waves all pull it below the raw count, and it is what
       the {xref("interval", "effective sample", "95% interval")} is computed against.
       {" "}A single poll carries its own version of the same idea, written
@@ -5473,7 +5499,8 @@ function infoTerms(D) {
       "effective sample")} that sample is worth after weighting, and the weighting scheme and
       question order behind the figures. A wave’s poll breakdown links its statement where one
       is on record and reads its two published sample figures off it – the raw count and the
-      effective one, the latter serving as that wave’s nᵢ in the
+      effective one. The effective sample, scaled back up by the 1.6 design factor, is that
+      wave’s nᵢ in the
       {" "}{xref("weighted-aggregate", "apc-statement", "weighted aggregate")}. Newspoll, YouGov,
       Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them; where a house files none, the poll
       breakdown carries its raw sample alone and the archive’s n<sub>eff</sub> column dashes –
@@ -5564,9 +5591,9 @@ function infoTerms(D) {
       and the figure shrinks only with the square root of the sample – four times the interviews
       buys half the error. It prices chance and nothing else: skewed samples, turnout guesses and
       house choices sit outside it. Beside the headline the same idea is carried across
-      {" "}{L.method.nPolls} polls at once as the {xref("interval", "margin of error", "95% interval")}{" "}
-      – ±{(L.alp2ppCi95 ?? 0).toFixed(1)} points on each share, shown at ±
-      {(2 * (L.alp2ppCi95 ?? 0)).toFixed(1)} beside the lead itself. Pooling that many surveys is
+      {" "}{hl.n} polls at once as the {xref("interval", "margin of error", "95% interval")}{" "}
+      – ±{hl.ci.toFixed(1)} points on each share, shown at ±
+      {(2 * hl.ci).toFixed(1)} beside the lead itself. Pooling that many surveys is
       what brings the band in narrower than one poll’s own ±3: the chance part of the error
       shrinks with the square root of the combined sample, while the part every house shares
       alike does not shrink at all.</>) },
@@ -5590,8 +5617,9 @@ function infoTerms(D) {
       house-adjusted the same way the vote series are – see
       {" "}{xref("weighted-aggregate", "net approval", "Weighted aggregate")}.</>) },
     { id: "next-polls", term: "Next polls", body: (
-      <>When each house is likely to publish next, forecast from its own record. Its dates are the
-      median gap between its last eight releases, nudged no more than three days onto the weekday
+      <>When each house is likely to publish next, forecast from its own record. Its next date is
+      its last release plus the median of its last eight gaps between releases, nudged no more
+      than three days onto the weekday
       the house keeps. Where recent releases carry publication dates in an unbroken run, the gaps
       measured are those between them, not the fieldwork dates – the steadier clock, and the thing
       actually being forecast. The ± is half the spread of the gaps with the longest and shortest
@@ -5613,12 +5641,13 @@ function infoTerms(D) {
       it came from. Houses that have stopped publishing are removed by hand rather than read out
       of their silence. These are estimates, not announced dates.</>) },
     { id: "polling-error", term: "Polling error", body: acc ? (
-      <>How far the final polls have missed. Across the {acc.cycles.length} elections from
-      {" "}{acc.cycles[0].year} to {acc.cycles[acc.cycles.length - 1].year} they missed the
-      two-party result by {acc.meanAbs} points on average – at {acc.worstCycle.year} by
-      {" "}{Math.abs(acc.worstCycle.err)}, with every house on the same side of it. This is the
-      error an aggregate cannot see about itself, measured after the fact. Past cycles carries the
-      full record, house by house.</>) : (
+      <>How far the final polls have missed. Across {accSpan}, they missed the two-party result
+      by {acc.meanAbs} points on average, and by {Math.abs(acc.worstCycle.err)} at worst, in
+      {" "}{acc.worstCycle.year}.
+      {accShared ? <> When the houses miss together – all {accShared.n} on the same side by
+      {" "}{accShared.absErr} in {accShared.year} – the lean is one an aggregate cannot see about
+      itself; it shows only after the count.</> : null}
+      {" "}Past cycles carries the full record, house by house.</>) : (
       <>How far the final polls have missed at past elections. Past cycles carries the record,
       house by house.</>) },
     { id: "fp-flows", term: "First-principles flow set", body: (
@@ -5638,7 +5667,7 @@ function infoTerms(D) {
         One Nation, ±{L.onImp.band.toFixed(1)}. The ± stacks the three cells’ own
         ranges outright: doubt about the table, not chance in a sample.</>
       ) : null}
-      No election has ever counted a Labor v One Nation finish, so the cells
+      {" "}No election has ever counted a Labor v One Nation finish, so the cells
       cannot be anchored to an election night the way
       {" "}{xref("preference-flows", "first principles", "the 2025 table")} disciplines
       Labor v Coalition. They are built from the two counted-ballot records that
@@ -5654,7 +5683,7 @@ function infoTerms(D) {
       ballots.</>) },
     { id: "preference-flows", term: "Preference flows", body: (
       <>How minor-party ballots split between the two final candidates. The
-      {" "}{xref("implied-2pp", "preference flows", "implied-2PP diagnostic")} uses the flows as
+      {" "}{xref("implied-2pp", "preference flows", "implied 2PP")} the headline leads with uses the flows as
       they actually ran at the 2025 election
       {" "}(<a href="https://results.aec.gov.au/31496/Website/HouseStateTppFlow-31496-NAT.htm"
       target="_blank" rel="noopener noreferrer">Greens 88.2%, One Nation 25.5%, all others 54.6% to
@@ -5681,15 +5710,18 @@ function infoTerms(D) {
       where its vote is concentrated and none where it is not, and no national number knows the
       difference.</>) },
     { id: "sources", term: "Sources", body: (
-      <>Every national voting-intention poll published since the May 2025 federal election, from:
-      {" "}{sources}. Field dates and sample sizes are listed per poll in the archive.</>) },
+      <>Every national voting-intention poll published since the May 2025 federal election, from
+      these {Object.keys(houseCounts).length} houses, most polls first: {sources}. A house’s MRP
+      or SMS releases count under its own name. Field dates and sample sizes are listed per poll
+      in the archive.</>) },
     { id: "two-party-preferred", term: "Two-party preferred", body: (
       <>The share each of two parties holds once every other candidate’s preferences have been
-      distributed – the number that decides a seat. The headline contest is Labor against the
-      Coalition; the hero can be switched to the other head-to-heads. One of those is not
-      quoted as published: Labor v One Nation reads on the {xref("implied-2pp",
-      "two-party preferred", "implied basis")} instead, because no election has yet counted
-      that pair to check the houses’ own allocations against.</>) },
+      distributed – the number that decides a seat. The hero carries Labor against the Coalition
+      and the other head-to-heads the houses publish. Both Labor contests lead on the
+      {" "}{xref("implied-2pp", "two-party preferred", "implied basis")} – every poll’s primaries
+      run through one fixed preference table – with the pollsters’ own published figures a
+      switch away; a head-to-head no fixed table covers, like the Coalition against One Nation,
+      is quoted as published.</>) },
     { id: "undecided", term: "Undecided", body: (
       <>Electors who won’t name a party – the “can’t say” share – shown beside the soft share who
       name one but won’t call their choice firm. They are different questions with different
@@ -5729,16 +5761,17 @@ function infoTerms(D) {
       point from the plain-average total – a real undecided-driven shortfall is kept, not ironed
       out. As it stands, that is {prim.alp.toFixed(1)} for Labor.</span>
       {primWork}
-      <span className="info-p">The two-party-preferred is the same nowcast at the headline, over the rows the
-      measure admits: waves whose fieldwork midpoint falls inside the 21-day window ending at the
-      newest poll, each contributing its published Labor share of the pair – a pair printed with
-      undecided still inside it is rebased to 100 first – adjusted for the house’s lean on the
-      2PP as of the reference day. A house that publishes no two-party adds no row; running its
-      primaries through one fixed flow table stays in the
-      {" "}{xref("implied-2pp", "weighted aggregate", "implied 2PP")} diagnostic, never the
-      headline, and an empty window falls back to the last monthly point rather than vanishing.
-      As of the latest poll, that is {L.alp2pp.toFixed(1)} to Labor,
-      {" "}{L.lnp2pp.toFixed(1)} to the Coalition.</span>
+      <span className="info-p">The headline two-party figure is the same nowcast run over the
+      {" "}{xref("implied-2pp", "weighted aggregate", "implied 2PP")}: each wave whose fieldwork
+      midpoint falls inside the 21-day window has its primaries run through the fixed 2025 flow
+      table, so every house that publishes primaries adds a row, adjusted for its lean on that
+      implied figure.{SL ? <> As of the latest poll, that is {SL.alp.toFixed(1)} to Labor,
+      {" "}{SL.lnp.toFixed(1)} to the Coalition.</> : null} The pollsters’ own published pairs go
+      through the identical machinery to give the published figure the chart switches to – a
+      pair printed with undecided still inside it is rebased to 100 first, a house that
+      publishes no pair adds no row, and an empty window falls back to the last monthly point
+      rather than vanishing. That published calculation is the one worked below:
+      {" "}{L.alp2pp.toFixed(1)} to Labor, {L.lnp2pp.toFixed(1)} to the Coalition.</span>
       {tppWork}</>) },
     { id: "aggregate-effect", term: "Aggregate effect", body: (
       <>A poll’s own pull on the figure a reader watches. The poll breakdown recomputes the
@@ -5804,8 +5837,8 @@ function infoTerms(D) {
     { id: "lead-interval-double", q: "Why is the ± beside the lead twice the ± beside each share?", a: (
       <>Because the lead is a difference, not a share. Anything that moves a party’s share –
       sampling luck included – moves the gap between the parties twice as far, and the uncertainty
-      scales the same way: ±{(2 * (L.alp2ppCi95 ?? 0)).toFixed(1)} beside the lead against
-      ±{(L.alp2ppCi95 ?? 0).toFixed(1)} on each share today. Both come off the one
+      scales the same way: ±{(2 * hl.ci).toFixed(1)} beside the lead against
+      ±{hl.ci.toFixed(1)} on each share today. Both come off the one
       {" "}{xref("interval", "lead interval double", "95% interval")} computed over the polls in
       the window.</>) },
     { id: "primaries-not-100", q: "Why don’t the primary votes add up to 100?", a: (
@@ -5841,13 +5874,12 @@ function infoTerms(D) {
       closely, with their own weighted, house-corrected series in the panels below; but the
       headline answers the election’s own question.</>) },
     { id: "poll-without-2pp", q: "What happens to a poll that publishes no two-party figure?", a: (
-      <>It is not discarded; it simply cannot vote in the pair. Its primary shares feed the
-      primary-vote series and its leadership readings the leadership panels, but the two-party
-      headline takes only published pairs – inventing one the house never printed would be the
-      site guessing where it has promised to add up. What those primaries would imply under one
-      fixed {xref("preference-flows", "poll without 2pp", "preference-flow table")} is kept as the
-      dashed {xref("implied-2pp", "poll without 2pp", "implied 2PP")} line – a diagnostic on
-      request, never the estimate.</>) },
+      <>It still counts. Its primaries run through the same fixed
+      {" "}{xref("preference-flows", "poll without 2pp", "preference-flow table")} as
+      every other poll’s, so it feeds the {xref("implied-2pp", "poll without 2pp", "implied 2PP")}
+      {" "}the headline leads with, as well as the primary-vote series and, where it asked, the
+      leadership panels. What it cannot join is the pollsters’ own published two-party series:
+      there is no pair to add, and the site will not invent one the house never printed.</>) },
     { id: "polls-disagree", q: "Two new polls say different things. Which of them is right?", a: (
       <>Usually both are doing their jobs. Each is one sample, so two honest polls of an unmoved
       electorate are expected to differ; the question is whether they differ by more than luck
@@ -5860,8 +5892,8 @@ function infoTerms(D) {
     { id: "is-this-a-forecast", q: "Is the headline a prediction of the election result?", a: acc ? (
       <>No. Everything here describes where opinion stands now, from polls already published;
       nothing projects them forward through a campaign. And measurement at one moment is not
-      destiny at another: across the {acc.cycles.length} elections scored on this site the final
-      polls still missed the two-party result by {acc.meanAbs} points on average – see
+      destiny at another: across {accSpan}, the final polls still missed the two-party result
+      by {acc.meanAbs} points on average – see
       {" "}{xref("polling-error", "is this a forecast", "the error record")}. The site calls its
       own figures estimates only, and carries no seat projection for the same reason.</>) : (
       <>No. Everything here describes where opinion stands now, from polls already published;
@@ -5878,12 +5910,12 @@ function infoTerms(D) {
     { id: "how-wrong-are-the-polls", q: "How wrong have the polls been at past elections?", a: acc ? (
       <>Scored election by election on the How the final polls did panel in Past cycles: each
       house’s last two-party figure of the {acc.windowDays} days before polling day, set against
-      the result. Across the {acc.cycles.length} elections from {acc.cycles[0].year} to
-      {" "}{acc.cycles[acc.cycles.length - 1].year} the average miss is {acc.meanAbs} points; the
-      worst, {acc.worstCycle.year}, missed by {Math.abs(acc.worstCycle.err)} with every house on
-      the same side of it. That shared lean is the error an aggregate cannot see about itself,
-      and the reason the {xref("interval", "how wrong are the polls", "95% interval")} never
-      claims to cover it.</>) : (
+      the result. Across {accSpan}, the average miss is {acc.meanAbs} points; the worst,
+      {" "}{acc.worstCycle.year}, missed by {Math.abs(acc.worstCycle.err)}.
+      {accShared ? <> In {accShared.year} all {accShared.n} houses missed on the same side, by
+      {" "}{accShared.absErr}. A lean every house shares is error an aggregate cannot see about
+      itself, and the reason the {xref("interval", "how wrong are the polls", "95% interval")}
+      {" "}never claims to cover it.</> : null}</>) : (
       <>The How the final polls did panel in Past cycles scores each house’s last two-party figure
       of the campaign against the result, election by election, house by house.</>) },
     { id: "next-poll-when", q: "How does the site know when the next poll is coming?", a: (
@@ -5892,14 +5924,14 @@ function infoTerms(D) {
       with how ragged that record has been. A date that passes unpublished holds its row and
       counts on, red, until the real wave lands; nothing in the list is an announced date, only a
       house’s own habits read back to it. {" "}{xref("next-polls", "next poll when", "Next polls")}
-      lays out the method.</>) },
+      {" "}lays out the method.</>) },
     { id: "poll-i-saw-not-here", q: "I saw a poll in the news that isn’t here. Where is it?", a: (
-      <>Most likely one row down. The Latest polls table keeps one row per active house – its
-      newest wave – so an earlier poll from the same firm rolls out of that card the moment a
-      newer one lands. Nothing is lost: the All polls archive holds every wave of the term, and
-      Past cycles the previous ones. If a published current wave is missing outright rather than
-      rolled down a card, that is a genuine error – the report link lives in the footer, one click
-      from anywhere on the page.</>) },
+      <>Most likely in the archive. The Latest polls table keeps one row per active house – its
+      newest wave – so an earlier poll from the same firm leaves that table the moment a newer
+      one lands. Nothing is lost: the All polls archive holds every wave of the term, and Past
+      cycles the previous ones. If a published wave is missing from the archive too, that is a
+      genuine error – the report link lives in the footer, one click from anywhere on the
+      page.</>) },
     { id: "where-does-data-come-from", q: "Where do the numbers come from?", a: (
       <>From the pollsters, not from here: every published national voting-intention poll since
       the May 2025 federal election, from {" "}{sources}. Each wave is filed in the archive with
