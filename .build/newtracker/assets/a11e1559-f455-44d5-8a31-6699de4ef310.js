@@ -1486,8 +1486,11 @@ function UndecidedPanel({ rangeId }) {
 // ---- Where One Nation’s new voters came from ---------------------------
 /* One Nation's gain since the 2025 election, split by how the voters it
    gained voted in 2025 – from the vote-switching tables DemosAU and YouGov
-   publish (gen-data §5b, data/vote-switching.json). Same furniture as the
-   undecided panel: a reading per group, monthly lines, one dot per poll. */
+   publish, and the rows Newspoll's reports quote (gen-data §5b,
+   data/vote-switching.json). Same furniture as the undecided panel: a
+   reading per group, monthly lines, one dot per poll that can be split. A
+   house whose polls give only some rows (Newspoll) counts toward those
+   groups but has no dot, and the hint says so. */
 function OnSourcesPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
@@ -1517,6 +1520,12 @@ function OnSourcesPanel({ rangeId }) {
      respondents per group, and early in a month the month is one wave. The
      latest month stands in only if the window holds no poll. */
   const monthOf = (ym) => D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
+  // houses credited but never dotted: their polls give only some rows
+  const GROUP_NAME = { alp: "Labor", lnp: "Coalition", grn: "Greens", oth: "others" };
+  const rowsOnly = S.houses.filter((h) => !S.waves.some((w) => w.pollster === h)).map((h) => {
+    const w = [...(S.partial || [])].reverse().find((x) => x.pollster === h);
+    return w && ` ${h} gives only its ${houseList(Object.keys(GROUP_NAME).filter((k) => w.toOn[k] != null).map((k) => GROUP_NAME[k]))} rows, so it counts toward those but has no dot.`;
+  }).filter(Boolean).join("");
   const reads = S.series.map((sr) => {
     if (sr.now) return { sr, v: sr.now.v, now: sr.now, chg: sr.now.chg ?? null };
     const m = sr.monthly, last = m[m.length - 1], prev = m[m.length - 2];
@@ -1568,7 +1577,7 @@ function OnSourcesPanel({ rangeId }) {
       />
       <p className="table-hint">
         Each dot is one poll’s split and the lines are monthly averages; the figures above pool the
-        last {S.now ? S.now.window : "six weeks"} of polls, newer ones counting for more. A group’s part is the share of
+        last {S.now ? S.now.window : "six weeks"} of polls, newer ones counting for more.{rowsOnly} A group’s part is the share of
         its 2025 voters now backing One Nation, weighted by that group’s share of the 2025 vote – so
         38% of Coalition voters counts for far more than 38% of a small party’s. Voters who can’t
         recall a 2025 vote are left out, and so are One Nation’s own 2025 voters, who are what it

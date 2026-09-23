@@ -1447,9 +1447,10 @@ const undecided = undecidedSeries.length ? {
 } : null;
 
 /* ---- 5b. where One Nation's gains came from ------------------------------
-   From the vote-switching tables DemosAU and YouGov publish (built into
-   data/vote-switching.json by .build/vote-switching.mjs): each 2025-vote
-   group's share now voting One Nation. Weighted by that group's share of the
+   From the vote-switching tables DemosAU and YouGov publish, and the rows
+   Newspoll's reports quote (built into data/vote-switching.json by
+   .build/vote-switching.mjs): each 2025-vote group's share now voting One
+   Nation. Weighted by that group's share of the
    2025 formal vote, that is how many points of the national vote One Nation
    has drawn from it; each group's part of the total drawn from everyone who
    did NOT vote One Nation in 2025 is the share plotted – "of One Nation's
@@ -1462,8 +1463,10 @@ const undecided = undecidedSeries.length ? {
      the split: only DemosAU shows them, and neither house says how many there
      are. So are One Nation's own 2025 voters – they are what it kept, not
      what it gained.
-   - A wave missing a group (YouGov 24 Mar 2026 printed no "other" column)
-     can't be split, and is skipped.
+   - A wave missing a group can't be split, so it has no split of its own,
+     but the groups it did print count toward their rates (below): Newspoll
+     quotes only its Labor and Coalition rows, and YouGov 24 Mar 2026 printed
+     no "other" column.
    - DemosAU's table stores only segments that round above zero, so a group
      row with no One Nation cell is a 0. */
 const VOTE_SWITCHING = (() => {
@@ -1534,23 +1537,25 @@ const onSourceWaves = (() => {
    would weight a poll's Greens-voter figure as heavily as its Coalition-
    voter figure, when it rests on a third as many respondents – so each rate
    carries the sample its group is: the poll's n times the group's 2025 share.
-   No house adjustment: two houses give no consensus to measure a lean
-   against, the rule every thin series here follows. Each reading's margin
-   comes from the rates' margins through the split (groups are separate
-   respondents, so independent). */
+   Because the rates pool, not the splits, every wave counts toward each
+   group it printed, whether or not it printed the rest – as §7g pools each
+   age band from whichever houses ask it.
+   No house adjustment: three houses, one of them a few quoted rows, give no
+   consensus to measure a lean against, the rule every thin series here
+   follows. Each reading's margin comes from the rates' margins through the
+   split (groups are separate respondents, so independent). */
 const ON_GAIN_KEYS = ["lnp", "alp", "grn", "oth"];
 const onRateRows = (() => {
   const out = { lnp: [], alp: [], grn: [], oth: [], onp: [] };
-  if (!onSourceWaves.length) return out;
+  if (!VS_BY_POLL.size) return out;
   const W = VOTE_SWITCHING.weights2025;
   const share2025 = { lnp: W.lnp, alp: W.alp, grn: W.grn, oth: W.ind + W.oth, onp: W.onp };
-  for (const w of onSourceWaves) {
+  for (const w of VOTE_SWITCHING.waves) {
+    const rate = VS_BY_POLL.get(w.date + "|" + w.pollster);   // null where the wave didn't print the group
     const p = POLL_BY_KEY.get(w.date + "|" + w.pollster);
     const n = rowN(p || { sample: w.sample }), mid = midMs(p || { dateStart: w.dateStart, date: w.date });
-    for (const k of Object.keys(out)) {
-      const x = k === "onp" ? w.keptPct : w.toOn[k];
-      if (x != null) out[k].push({ ym: ymOf(w.date), mid, x, n: n * share2025[k] / 100, firm: w.pollster });
-    }
+    for (const k of Object.keys(out))
+      if (rate[k] != null) out[k].push({ ym: ymOf(w.date), mid, x: rate[k], n: n * share2025[k] / 100, firm: w.pollster });
   }
   return out;
 })();
@@ -1600,12 +1605,23 @@ const onSources = onSourceWaves.length ? {
     }
     return { ...g, polls, monthly, n: polls.length, now };
   }),
-  // the readings' window: how many waves it held, and whose
-  now: onNow ? { drawn: r1(onNow.drawn), window: SPARSE_K.label,
-                 n: weightedWithSe(nowcastPts(onRateRows.lnp, null, refNow, SPARSE_K))?.n ?? 0,
-                 houses: [...new Set(onRateRows.lnp.filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; }).map((r) => r.firm))] } : null,
+  // the readings' window: how many waves it held, and whose (any group's rows)
+  now: onNow ? (() => {
+    const inWin = ON_GAIN_KEYS.flatMap((k) => onRateRows[k])
+      .filter((r) => { const d = ddays(refNow, r.mid); return d >= 0 && d <= SPARSE_K.window; });
+    return { drawn: r1(onNow.drawn), window: SPARSE_K.label,
+             n: new Set(inWin.map((r) => r.firm + "|" + r.mid)).size, houses: [...new Set(inWin.map((r) => r.firm))] };
+  })() : null,
   waves: onSourceWaves.map(({ x, ym, ...w }) => w),
-  houses: creditHouses(onSourceWaves, (w) => w.pollster, (w) => Date.parse(w.date)),
+  // the waves that printed only some groups: no split, just the rates they printed
+  partial: VOTE_SWITCHING.waves.filter((v) => !onSourceWaves.some((w) => w.pollster === v.pollster && w.date === v.date))
+    .map((v) => {
+      const r = VS_BY_POLL.get(v.date + "|" + v.pollster);
+      return { pollster: v.pollster, date: v.date, dateStart: v.dateStart, sample: v.sample, source: v.source, read: v.read,
+               toOn: { lnp: r.lnp, alp: r.alp, grn: r.grn, oth: r.oth }, keptPct: r.onp, onp: v.onp };
+    }),
+  // credited: every house whose rates count, split or not
+  houses: creditHouses(VOTE_SWITCHING.waves, (w) => w.pollster, (w) => Date.parse(w.date)),
   weights: VOTE_SWITCHING.weights2025,
 } : null;
 
@@ -3604,7 +3620,8 @@ window.AUSPOL = (function () {
   const undecided = ${JSON.stringify(undecided)};
   /* Where One Nation's gains came from (§5b): per wave, each 2025-vote
      group's part of what One Nation drew from outside its own 2025 vote,
-     from DemosAU's and YouGov's vote-switching tables. */
+     from DemosAU's and YouGov's vote-switching tables and the rows
+     Newspoll's reports quote. */
   const onSources = ${JSON.stringify(onSources)};
   /* Current readings (gen-data currentReading): the leaders' nets and
      preferred PM, and the national direction – nowcasts, as the headline. */

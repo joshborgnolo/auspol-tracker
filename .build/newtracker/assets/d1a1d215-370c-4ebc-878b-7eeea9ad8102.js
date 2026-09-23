@@ -5763,21 +5763,30 @@ function infoTerms(D) {
     return D.monthNameFull ? D.monthNameFull(mm) + " " + yy : w[i].ym;
   })();
   /* Vote switching (the One Nation sources panel): the latest YouGov wave
-     for the worked example, and every wave for the working table. */
+     for the worked example, the latest Newspoll for its quoted rows, and
+     every wave for the working table – those that printed only some groups
+     (ONS.partial) with a dash where they printed none. */
   const ONS = D.onSources;
   const onsWaves = ONS ? ONS.waves : [];
   const onsYg = [...onsWaves].reverse().find((w) => w.pollster === "YouGov") || null;
+  const onsNp = ONS && ONS.partial ? [...ONS.partial].reverse().find((w) => w.pollster === "Newspoll") || null : null;
+  const onsNpSaid = onsNp ? [onsNp.toOn.alp != null && `${onsNp.toOn.alp}% of Labor’s 2025 voters`,
+                             onsNp.toOn.lnp != null && `${onsNp.toOn.lnp}% of Coalition voters`].filter(Boolean) : [];
+  const onsRows = onsWaves.concat(ONS && ONS.partial ? ONS.partial : [])
+    .sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.pollster.localeCompare(b.pollster)));
+  const orDash = (v) => (v == null ? "–" : v);
   const onsWork = onsWaves.length ? (
     <div className="info-work-wrap">
       <table className="info-work">
         <thead><tr><th>Poll</th><th>Fieldwork</th><th>Coalition</th><th>Labor</th><th>Greens</th>
           <th>Others</th><th>Kept</th><th>Drawn</th><th>Table</th><th>Published</th></tr></thead>
         <tbody>
-          {onsWaves.map((w) => (
+          {onsRows.map((w) => (
             <tr key={w.pollster + w.date}>
               <td>{w.pollster}</td><td>{w.date}</td>
-              <td>{w.toOn.lnp}</td><td>{w.toOn.alp}</td><td>{w.toOn.grn}</td><td>{w.toOn.oth}</td>
-              <td>{w.keptPct}</td><td>{w.drawn.toFixed(1)}</td><td>{w.implied.toFixed(1)}</td><td>{w.onp ?? "–"}</td>
+              <td>{orDash(w.toOn.lnp)}</td><td>{orDash(w.toOn.alp)}</td><td>{orDash(w.toOn.grn)}</td><td>{orDash(w.toOn.oth)}</td>
+              <td>{orDash(w.keptPct)}</td><td>{w.drawn == null ? "–" : w.drawn.toFixed(1)}</td>
+              <td>{w.implied == null ? "–" : w.implied.toFixed(1)}</td><td>{orDash(w.onp)}</td>
             </tr>
           ))}
         </tbody>
@@ -5788,7 +5797,8 @@ function infoTerms(D) {
         Labor {ONS.weights.alp}, Greens {ONS.weights.grn}, others and independents
         {" "}{(ONS.weights.oth + ONS.weights.ind).toFixed(2)}, One Nation {ONS.weights.onp}). Table:
         drawn plus kept – what the poll’s own table adds up to – beside the One Nation vote it
-        published. DemosAU’s voters who can’t recall a 2025 vote are the rest of its gap.</p>
+        published. DemosAU’s voters who can’t recall a 2025 vote are the rest of its gap. A dash
+        is a group the poll didn’t give: it counts toward the groups it did, but can’t be split.</p>
     </div>
   ) : null;
   /* The vote by group: the polls its six-week window holds, newest first. */
@@ -6134,8 +6144,9 @@ function infoTerms(D) {
     { id: "g-who", title: "Who votes for whom", entries: [
       { id: "vote-switching", term: "Vote switching", body: (
         <>How people who voted for each party in 2025 say they would vote now. DemosAU and
-        YouGov both publish it, as a table with a row for each 2025 vote, and it’s what the panel
-        “Where One Nation’s new voters came from” is built from.
+        YouGov both publish it, as a table with a row for each 2025 vote. Newspoll’s reports give
+        two of the rows, Labor’s and the Coalition’s. The panel “Where One Nation’s new voters came
+        from” is built from all three.
         <span className="info-p"><b>How the split is worked out.</b> For each 2025 group, the share
         now backing One Nation is multiplied by that group’s share of the 2025 vote. That gives the
         points of the national vote One Nation has drawn from the group, and each group’s part of
@@ -6155,11 +6166,14 @@ function infoTerms(D) {
         <span className="info-p"><b>Sources.</b> YouGov’s figures are its own published tables,
         from Sky News Pulse until July 2026 and News24 Pulse since. DemosAU prints its table only
         as a chart, so its figures are measured from the chart in each report, and match every
-        label the chart prints. Newspoll publishes only Labor’s row: its September poll found 15% of
-        Labor’s 2025 voters now back One Nation (
-        <a className="fb-link" href="https://www.theaustralian.com.au/nation/politics/newspoll-support-for-labor-anthony-albanese-crashes/news-story/1a430c02f4dea76c3cc8d92e3b83e455"
-           target="_blank" rel="noopener noreferrer">The Australian</a>), close to DemosAU’s 14%
-        and YouGov’s 15%. Each poll’s figures are in the All polls export.</span>
+        label the chart prints.{onsNpSaid.length ? <> Newspoll prints no table, but The Australian’s
+        report of each poll says where Labor’s and the Coalition’s 2025 voters have gone. In the
+        {" "}{D.monthNameFull(+onsNp.date.slice(5, 7))} poll, {onsNpSaid.join(" and ")} had moved to
+        One Nation (<a className="fb-link" href={onsNp.source} target="_blank"
+        rel="noopener noreferrer">The Australian</a>). The panel pools them with the other polls’
+        figures for those groups. The poll gives no other rows, so it can’t be split on its own
+        and has no dot.</> : null}
+        {" "}Each poll’s figures are in the All polls export.</span>
         {working(onsWork)}</>) },
       { id: "vote-by-group", term: "Breakdowns by group", body: (
         <>How each group – men and women, age groups, education levels – says it will vote, from
