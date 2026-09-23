@@ -322,8 +322,8 @@ function buildFavicon() {
    so the card's stamp check and its alt text quote the same numbers the page
    does rather than a second, drifting copy. The headline basis is IMPLIED
    (synthLatest) where it exists - the pollsters' own respondent-allocated
-   figures ride along in .pub for the comparison sentence; every static
-   surface below quotes the implied figure, labelled as such. */
+   figures ride along in .pub for the static article's own pair (its ss-lead
+   states both, labelled). */
 const headlineView = (L, S) => (S && S.alp != null)
   ? { ...L,
       alp2pp: S.alp, lnp2pp: S.lnp, alp2ppCi95: S.ci95, alp2ppNEff: S.nEff,
@@ -447,8 +447,8 @@ function buildStaticSummary() {
           <th scope="row">${esc(r.pollster)}</th>
           <td>${esc(r.field)}</td>
           <td>${r.sample ? r.sample.toLocaleString("en-AU") : "&#8211;"}</td>
-          <td>${r.alp2pp != null ? r.alp2pp.toFixed(1) + "%" : "&#8211;"}</td>
-          <td>${r.lnp2pp != null ? r.lnp2pp.toFixed(1) + "%" : "&#8211;"}</td>
+          <td>${r.alpImp != null ? r.alpImp.toFixed(1) + "%" : "&#8211;"}</td>
+          <td>${r.alpImp != null ? (100 - r.alpImp).toFixed(1) + "%" : "&#8211;"}</td>
         </tr>`).join("");
 
   /* A table, not a flex list: reader engines honour table columns but drop
@@ -470,7 +470,9 @@ function buildStaticSummary() {
         ${L.pollsTracked} published polls across ${L.housesTracked} polling houses. Next election due ${esc(L.nextElectionDue[0].toLowerCase() + L.nextElectionDue.slice(1))}.</p>
 
       <h2>Two-party preferred</h2>
-      <p class="ss-lead"><b>Labor ${L.alp2pp.toFixed(1)}%</b> &#183; <b>Coalition ${L.lnp2pp.toFixed(1)}%</b></p>
+      <p class="ss-lead"><b>Labor ${L.alp2pp.toFixed(1)}%</b> &#183; <b>Coalition ${L.lnp2pp.toFixed(1)}%</b>${L.basis === "imp" ? `
+        on implied preference flows &#8212; the pollsters&#8217; own respondent-allocated
+        figures read <b>Labor ${L.pub.alp2pp.toFixed(1)}%</b> &#183; <b>Coalition ${L.pub.lnp2pp.toFixed(1)}%</b>` : ""}</p>
       <p>${who} leads by ${Math.abs(lead).toFixed(1)} points
         (&#177;${(2 * L.alp2ppCi95).toFixed(1)} on the lead)${L.basis === "imp" ? `
         on implied preference flows &#8211; every poll&#8217;s primary votes
@@ -497,7 +499,10 @@ function buildStaticSummary() {
       </table>
 
       <h2>Latest polls</h2>
-      <p class="ss-cap" id="ss-polls-cap">Most recent published national polls</p>
+      <p class="ss-cap" id="ss-polls-cap">Most recent published national polls &#8211; the two-party
+        figures read each poll&#8217;s primaries at the 2025 election&#8217;s preference flows, so the
+        table compares house to house on one fixed allocation; each wave&#8217;s own respondent-allocated
+        figure sits in its breakdown on the archive.</p>
       <div class="ss-tblwrap">
       <table class="ss-table" aria-labelledby="ss-polls-cap">
         <thead><tr><th scope="col">Pollster</th><th scope="col">Fieldwork</th><th scope="col">Sample</th><th scope="col">ALP 2PP</th><th scope="col">L/NP 2PP</th></tr></thead>
