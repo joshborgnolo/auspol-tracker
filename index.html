@@ -1609,6 +1609,21 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 .poll-detail .pd-s-hero .chg { font-size: var(--pd-hero-note); }
 .pd-sec-mid .pd-s > .pd-grp > b { font-size: var(--pd-mid); line-height: 1; }
 .pd-vs { font-size: 0.85em; font-weight: 400; color: var(--pd-ink-2); padding: 0 var(--pd-vs-pad); }
+.demo-ctl { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 2px 2px 16px; }
+.demo-grid { display: grid; gap: 18px 30px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  margin: 0 2px 6px; }
+.demo-house-head { display: flex; align-items: baseline; gap: 8px; margin: 0 0 6px; flex-wrap: wrap; }
+.demo-house-name { font-size: 13.5px; font-weight: 650; color: var(--ink); text-decoration: none; }
+a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px; }
+.demo-house-when { font-size: 12px; color: var(--ink-3); }
+.demo-row { display: grid; grid-template-columns: minmax(92px, 118px) 1fr 40px; align-items: center;
+  gap: 8px; margin: 5px 0; font-size: 13px; }
+.demo-lab { color: var(--ink-2); line-height: 1.25; }
+.demo-row.all .demo-lab { color: var(--ink-3); }
+.demo-track { height: 10px; border-radius: 3px; background: var(--line-2); overflow: hidden; }
+.demo-fill { display: block; height: 100%; border-radius: 3px; }
+.demo-v { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
+.demo-row.all .demo-v { color: var(--ink-3); font-weight: 500; }
 .ons-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
   text-wrap: pretty; }
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
@@ -12182,6 +12197,465 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "oth": 7.74,
       "source": "AEC 2025 federal election, first preferences (event 31496; independents split from other minor parties)"
     }
+  };
+  const demographics = {
+    "tabs": [{
+      "id": "age",
+      "label": "Age",
+      "blocks": [{
+        "pollster": "Resolve",
+        "date": "2026-09-13",
+        "dateLabel": "13 Sep",
+        "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+        "grouping": "age",
+        "groups": [{
+          "label": "18–34",
+          "shares": {
+            "alp": 30.9,
+            "lnp": 17.9,
+            "onp": 17.2,
+            "grn": 23.8,
+            "oth": 10.2
+          }
+        }, {
+          "label": "35–54",
+          "shares": {
+            "alp": 32.1,
+            "lnp": 23.5,
+            "onp": 24.4,
+            "grn": 11.3,
+            "oth": 8.7
+          }
+        }, {
+          "label": "55+",
+          "shares": {
+            "alp": 22.9,
+            "lnp": 28.9,
+            "onp": 35.5,
+            "grn": 2.9,
+            "oth": 9.8
+          }
+        }],
+        "total": {
+          "alp": 28.3,
+          "lnp": 24.2,
+          "onp": 27.3,
+          "grn": 11.1,
+          "oth": 9.1
+        },
+        "read": "published series"
+      }, {
+        "pollster": "DemosAU",
+        "date": "2026-09-14",
+        "dateLabel": "10–14 Sep",
+        "source": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf",
+        "grouping": "age",
+        "groups": [{
+          "label": "18–34",
+          "shares": {
+            "alp": 38,
+            "lnp": 15,
+            "onp": 16,
+            "grn": 22,
+            "oth": 9
+          }
+        }, {
+          "label": "35–54",
+          "shares": {
+            "alp": 26,
+            "lnp": 21,
+            "onp": 27,
+            "grn": 13,
+            "oth": 13
+          }
+        }, {
+          "label": "55+",
+          "shares": {
+            "alp": 23,
+            "lnp": 23,
+            "onp": 31,
+            "grn": 7,
+            "oth": 16
+          }
+        }],
+        "total": {
+          "alp": 28,
+          "lnp": 20,
+          "onp": 26,
+          "grn": 13,
+          "oth": 13
+        },
+        "read": "measured from the charts"
+      }, {
+        "pollster": "YouGov",
+        "date": "2026-09-21",
+        "dateLabel": "15–21 Sep",
+        "source": "https://e.infogram.com/_/XdWD62anjLF6u5scKfkU",
+        "grouping": "age",
+        "groups": [{
+          "label": "18–34",
+          "shares": {
+            "alp": 25,
+            "lnp": 11,
+            "onp": 18,
+            "grn": 27,
+            "oth": 19
+          }
+        }, {
+          "label": "35–49",
+          "shares": {
+            "alp": 24,
+            "lnp": 19,
+            "onp": 28,
+            "grn": 16,
+            "oth": 13
+          }
+        }, {
+          "label": "50+",
+          "shares": {
+            "alp": 27,
+            "lnp": 27,
+            "onp": 31,
+            "grn": 5,
+            "oth": 10
+          }
+        }],
+        "total": {
+          "alp": 26,
+          "lnp": 21,
+          "onp": 27,
+          "grn": 14,
+          "oth": 12
+        },
+        "read": "published table"
+      }, {
+        "pollster": "RedBridge",
+        "date": "2026-08-28",
+        "dateLabel": "24–28 Aug",
+        "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
+        "grouping": "generation",
+        "groups": [{
+          "label": "Gen Z",
+          "shares": {
+            "alp": 31,
+            "lnp": 12,
+            "onp": 16,
+            "grn": 32,
+            "oth": 9
+          }
+        }, {
+          "label": "Millennials",
+          "shares": {
+            "alp": 27,
+            "lnp": 19,
+            "onp": 32,
+            "grn": 14,
+            "oth": 8
+          }
+        }, {
+          "label": "Gen X",
+          "shares": {
+            "alp": 29,
+            "lnp": 21,
+            "onp": 34,
+            "grn": 7,
+            "oth": 9
+          }
+        }, {
+          "label": "Boomers",
+          "shares": {
+            "alp": 29,
+            "lnp": 32,
+            "onp": 28,
+            "grn": 2,
+            "oth": 9
+          }
+        }],
+        "total": {
+          "alp": 29,
+          "lnp": 22,
+          "onp": 28,
+          "grn": 12,
+          "oth": 9
+        },
+        "read": "published table"
+      }]
+    }, {
+      "id": "gender",
+      "label": "Gender",
+      "blocks": [{
+        "pollster": "Resolve",
+        "date": "2026-09-13",
+        "dateLabel": "13 Sep",
+        "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+        "grouping": "gender",
+        "groups": [{
+          "label": "Men",
+          "shares": {
+            "alp": 29.5,
+            "lnp": 23.6,
+            "onp": 27.7,
+            "grn": 10,
+            "oth": 9.2
+          }
+        }, {
+          "label": "Women",
+          "shares": {
+            "alp": 27.1,
+            "lnp": 24.2,
+            "onp": 25.4,
+            "grn": 13.4,
+            "oth": 9.9
+          }
+        }],
+        "total": {
+          "alp": 28.3,
+          "lnp": 24.2,
+          "onp": 27.3,
+          "grn": 11.1,
+          "oth": 9.1
+        },
+        "read": "published series"
+      }, {
+        "pollster": "DemosAU",
+        "date": "2026-09-14",
+        "dateLabel": "10–14 Sep",
+        "source": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf",
+        "grouping": "gender",
+        "groups": [{
+          "label": "Men",
+          "shares": {
+            "alp": 28,
+            "lnp": 21,
+            "onp": 26,
+            "grn": 12,
+            "oth": 13
+          }
+        }, {
+          "label": "Women",
+          "shares": {
+            "alp": 27,
+            "lnp": 20,
+            "onp": 25,
+            "grn": 14,
+            "oth": 14
+          }
+        }],
+        "total": {
+          "alp": 28,
+          "lnp": 20,
+          "onp": 26,
+          "grn": 13,
+          "oth": 13
+        },
+        "read": "measured from the charts"
+      }, {
+        "pollster": "YouGov",
+        "date": "2026-09-21",
+        "dateLabel": "15–21 Sep",
+        "source": "https://e.infogram.com/_/XdWD62anjLF6u5scKfkU",
+        "grouping": "gender",
+        "groups": [{
+          "label": "Men",
+          "shares": {
+            "alp": 23,
+            "lnp": 21,
+            "onp": 29,
+            "grn": 12,
+            "oth": 15
+          }
+        }, {
+          "label": "Women",
+          "shares": {
+            "alp": 28,
+            "lnp": 21,
+            "onp": 25,
+            "grn": 15,
+            "oth": 11
+          }
+        }],
+        "total": {
+          "alp": 26,
+          "lnp": 21,
+          "onp": 27,
+          "grn": 14,
+          "oth": 12
+        },
+        "read": "published table"
+      }, {
+        "pollster": "RedBridge",
+        "date": "2026-08-28",
+        "dateLabel": "24–28 Aug",
+        "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
+        "grouping": "gender",
+        "groups": [{
+          "label": "Women",
+          "shares": {
+            "alp": 28,
+            "lnp": 20,
+            "onp": 29,
+            "grn": 14,
+            "oth": 9
+          }
+        }, {
+          "label": "Men",
+          "shares": {
+            "alp": 30,
+            "lnp": 24,
+            "onp": 28,
+            "grn": 9,
+            "oth": 9
+          }
+        }],
+        "total": {
+          "alp": 29,
+          "lnp": 22,
+          "onp": 28,
+          "grn": 12,
+          "oth": 9
+        },
+        "read": "published table"
+      }]
+    }, {
+      "id": "education",
+      "label": "Education",
+      "blocks": [{
+        "pollster": "DemosAU",
+        "date": "2026-09-14",
+        "dateLabel": "10–14 Sep",
+        "source": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf",
+        "grouping": "education",
+        "groups": [{
+          "label": "School",
+          "shares": {
+            "alp": 29,
+            "lnp": 17,
+            "onp": 25,
+            "grn": 13,
+            "oth": 16
+          }
+        }, {
+          "label": "TAFE",
+          "shares": {
+            "alp": 24,
+            "lnp": 20,
+            "onp": 34,
+            "grn": 11,
+            "oth": 11
+          }
+        }, {
+          "label": "University",
+          "shares": {
+            "alp": 30,
+            "lnp": 25,
+            "onp": 17,
+            "grn": 15,
+            "oth": 13
+          }
+        }],
+        "total": {
+          "alp": 28,
+          "lnp": 20,
+          "onp": 26,
+          "grn": 13,
+          "oth": 13
+        },
+        "read": "measured from the charts"
+      }, {
+        "pollster": "YouGov",
+        "date": "2026-09-21",
+        "dateLabel": "15–21 Sep",
+        "source": "https://e.infogram.com/_/XdWD62anjLF6u5scKfkU",
+        "grouping": "education",
+        "groups": [{
+          "label": "Year 12 or less",
+          "shares": {
+            "alp": 22,
+            "lnp": 21,
+            "onp": 30,
+            "grn": 16,
+            "oth": 11
+          }
+        }, {
+          "label": "TAFE or college",
+          "shares": {
+            "alp": 26.7,
+            "lnp": 16.8,
+            "onp": 30.7,
+            "grn": 9.9,
+            "oth": 15.8
+          }
+        }, {
+          "label": "University",
+          "shares": {
+            "alp": 30.3,
+            "lnp": 26.3,
+            "onp": 17.2,
+            "grn": 14.1,
+            "oth": 12.1
+          }
+        }],
+        "total": {
+          "alp": 26,
+          "lnp": 21,
+          "onp": 27,
+          "grn": 14,
+          "oth": 12
+        },
+        "read": "published table"
+      }, {
+        "pollster": "RedBridge",
+        "date": "2026-08-28",
+        "dateLabel": "24–28 Aug",
+        "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
+        "grouping": "education",
+        "groups": [{
+          "label": "Below Year 12",
+          "shares": {
+            "alp": 27,
+            "lnp": 25,
+            "onp": 41,
+            "grn": 3,
+            "oth": 4
+          }
+        }, {
+          "label": "Year 12",
+          "shares": {
+            "alp": 28,
+            "lnp": 22,
+            "onp": 17,
+            "grn": 26,
+            "oth": 7
+          }
+        }, {
+          "label": "TAFE or trade",
+          "shares": {
+            "alp": 26,
+            "lnp": 19,
+            "onp": 37,
+            "grn": 6,
+            "oth": 12
+          }
+        }, {
+          "label": "University",
+          "shares": {
+            "alp": 36,
+            "lnp": 26,
+            "onp": 18,
+            "grn": 13,
+            "oth": 7
+          }
+        }],
+        "total": {
+          "alp": 29,
+          "lnp": 22,
+          "onp": 28,
+          "grn": 12,
+          "oth": 9
+        },
+        "read": "published table"
+      }]
+    }]
   };
   const accuracy = {
     "windowDays": 14,
@@ -33243,6 +33717,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     directionPolls,
     undecided,
     onSources,
+    demographics,
     accuracy,
     individualPolls,
     pollsterTable,
@@ -38335,6 +38810,100 @@ function OnSourcesPanel({
     onClick: () => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")
   }, "How it\u2019s worked out")));
 }
+const DEMO_PARTIES = [{
+  id: "onp",
+  label: "One Nation"
+}, {
+  id: "alp",
+  label: "Labor"
+}, {
+  id: "lnp",
+  label: "Coalition"
+}, {
+  id: "grn",
+  label: "Greens"
+}];
+function DemographicsPanel() {
+  const {
+    D
+  } = window.AP;
+  const T = D.demographics;
+  const [tabId, setTab] = useState("age");
+  const [party, setParty] = useState("onp");
+  if (!T || !T.tabs.length) return null;
+  const tab = T.tabs.find(t => t.id === tabId) || T.tabs[0];
+  const color = D.PARTIES[party].color;
+  const name = D.PARTIES[party].name;
+  const vals = tab.blocks.flatMap(b => b.groups.map(g => g.shares[party]).concat(b.total ? [b.total[party]] : []));
+  const top = Math.max(10, Math.ceil((Math.max(...vals) + 2) / 10) * 10);
+  const row = (label, v, all) => React.createElement("div", {
+    className: "demo-row" + (all ? " all" : ""),
+    key: label
+  }, React.createElement("span", {
+    className: "demo-lab"
+  }, label), React.createElement("span", {
+    className: "demo-track",
+    "aria-hidden": "true"
+  }, React.createElement("span", {
+    className: "demo-fill",
+    style: {
+      width: 100 * v / top + "%",
+      background: all ? "var(--ink-3)" : color
+    }
+  })), React.createElement("span", {
+    className: "demo-v"
+  }, Math.round(v), React.createElement("span", {
+    className: "pct"
+  }, "%")));
+  return React.createElement("section", {
+    className: "card"
+  }, React.createElement("div", {
+    className: "card-head"
+  }, React.createElement("div", null, React.createElement("h2", {
+    className: "card-title"
+  }, "The vote by age, gender and education"), React.createElement("p", {
+    className: "card-sub"
+  }, name, "\u2019s share of each group\u2019s first-preference vote, in each pollster\u2019s latest poll \xB7 ", houseList(tab.blocks.map(b => b.pollster))))), React.createElement("div", {
+    className: "demo-ctl"
+  }, React.createElement(Segmented, {
+    options: T.tabs.map(t => ({
+      id: t.id,
+      label: t.label
+    })),
+    value: tab.id,
+    onChange: setTab,
+    size: "sm",
+    ariaLabel: "Group voters by"
+  }), React.createElement(Segmented, {
+    options: DEMO_PARTIES,
+    value: party,
+    onChange: setParty,
+    size: "sm",
+    ariaLabel: "Party"
+  })), React.createElement("div", {
+    className: "demo-grid"
+  }, tab.blocks.map(b => React.createElement("div", {
+    className: "demo-house",
+    key: b.pollster
+  }, React.createElement("div", {
+    className: "demo-house-head"
+  }, b.source ? React.createElement("a", {
+    className: "demo-house-name",
+    href: b.source,
+    target: "_blank",
+    rel: "noopener noreferrer"
+  }, b.pollster) : React.createElement("span", {
+    className: "demo-house-name"
+  }, b.pollster), React.createElement("span", {
+    className: "demo-house-when"
+  }, b.dateLabel, b.grouping === "generation" ? " · by generation" : "")), b.total && row("All voters", b.total[party], true), b.groups.map(g => row(g.label, g.shares[party]))))), React.createElement("p", {
+    className: "table-hint"
+  }, "Each pollster\u2019s own groups, from its latest poll that asked", tab.id === "age" ? " – the age bands differ, and RedBridge groups by generation, so they sit side by side rather than being averaged" : tab.id === "education" ? " – the education levels differ, so they sit side by side rather than being averaged" : "", ".", " ", "A group is a slice of one poll, often a few hundred people, so a gap of a few points can be noise; the same pattern across pollsters is the signal.", " ", React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    onClick: () => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender and education")
+  }, "Where the figures come from")));
+}
 const PARTY_C = {
   alp: "var(--alp)",
   lnp: "var(--lnp)",
@@ -39991,6 +40560,7 @@ Object.assign(window, {
   DirectionPanel,
   UndecidedPanel,
   OnSourcesPanel,
+  DemographicsPanel,
   PollsterTable,
   NextPollsPanel,
   ShareBar,
@@ -45424,6 +45994,18 @@ function infoTerms(D) {
         target: "_blank",
         rel: "noopener noreferrer"
       }, "The Australian"), "), close to DemosAU\u2019s 14% and YouGov\u2019s 15%."), working(onsWork))
+    }, {
+      id: "vote-by-group",
+      term: "Breakdowns by group",
+      body: React.createElement(React.Fragment, null, "How each group \u2013 men and women, age groups, education levels \u2013 says it will vote, from the tables pollsters publish with their polls. The panel \u201CThe vote by age, gender and education\u201D shows each pollster\u2019s latest.", React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Each pollster\u2019s own groups."), " They don\u2019t cut the population the same way. Resolve and DemosAU use 18\u201334, 35\u201354 and 55+; YouGov uses 18\u201334, 35\u201349 and 50+; RedBridge groups by generation. So the pollsters sit side by side and are never averaged together."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Reading a gap."), " Each group is a slice of one poll, often 300 to 500 people, so one group\u2019s figure carries an error of about 5 points either way. A difference several pollsters show is the signal; a few points in a single poll may be noise."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Sources."), " Resolve\u2019s monthly age and gender series (its Political Monitor interactive), YouGov\u2019s published crosstabs, RedBridge\u2019s report tables, and DemosAU\u2019s report charts, measured from the chart in each report because small bars carry no label. Each group\u2019s shares are rescaled to 100 across the five party groups, and \u201CAll voters\u201D is the same poll\u2019s overall figure, so each group reads against its own poll."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "A check."), " Every table is checked before it\u2019s shown: each group must add up to 100, give or take rounding, and an all-voters column must match the poll\u2019s published vote."))
     }]
   }, {
     id: "g-leaders",
@@ -47777,7 +48359,7 @@ function SnapshotView({
     rangeId: rangeId
   }), React.createElement(OnSourcesPanel, {
     rangeId: rangeId
-  }));
+  }), React.createElement(DemographicsPanel, null));
 }
 class ViewBoundary extends React.Component {
   constructor(props) {

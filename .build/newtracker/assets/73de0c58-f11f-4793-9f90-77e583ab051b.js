@@ -1757,6 +1757,8 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
       {/* who One Nation's surge is made of – read off the same electorate
           the undecided panel above describes */}
       <OnSourcesPanel rangeId={rangeId} />
+      {/* and who votes for whom by age, gender and education */}
+      <DemographicsPanel />
     </>
   );
 }

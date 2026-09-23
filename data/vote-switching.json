@@ -1,5 +1,5 @@
 {
- "_about": "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's oth includes independents), dnr (didn't remember / didn't vote – DemosAU only). `skipped` lists waves checked and found to carry no usable table.",
+ "_about": "How voters in each 2025-vote group say they would vote now, per poll wave (rows[2025 group][current vote], % of that group). Built by .build/vote-switching.mjs – see its header for sources and method. Keys: alp, lnp, grn, onp, ind (independents), oth (other parties; DemosAU's oth includes independents), dnr (didn't remember / didn't vote – DemosAU only). `skipped` lists waves checked by hand and found to carry no usable table.",
  "weights2025": {
   "alp": 34.56,
   "lnp": 31.82,
@@ -128,7 +128,7 @@
      "oth": 24
     }
    },
-   "fit": 0.03
+   "fit": 0.12
   },
   {
    "pollster": "YouGov",
@@ -443,7 +443,7 @@
      "oth": 24
     }
    },
-   "fit": 0.03
+   "fit": 0.07
   },
   {
    "pollster": "YouGov",
@@ -699,7 +699,7 @@
      "oth": 7
     }
    },
-   "fit": 0.03
+   "fit": 0.06
   },
   {
    "pollster": "YouGov",
@@ -822,7 +822,7 @@
      "oth": 9
     }
    },
-   "fit": 0.03
+   "fit": 0.07
   },
   {
    "pollster": "YouGov",
@@ -944,7 +944,7 @@
      "oth": 9
     }
    },
-   "fit": 0.03
+   "fit": 0.06
   },
   {
    "pollster": "YouGov",
@@ -1223,7 +1223,7 @@
      "lnp": 15
     }
    },
-   "fit": 0.46
+   "fit": 0.12
   },
   {
    "pollster": "YouGov",
@@ -1427,7 +1427,7 @@
      "onp": 37
     }
    },
-   "fit": 0.07
+   "fit": 0.06
   },
   {
    "pollster": "YouGov",

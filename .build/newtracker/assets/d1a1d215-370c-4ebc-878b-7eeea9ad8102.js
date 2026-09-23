@@ -5918,6 +5918,27 @@ function infoTerms(D) {
            target="_blank" rel="noopener noreferrer">The Australian</a>), close to DemosAU’s 14%
         and YouGov’s 15%.</span>
         {working(onsWork)}</>) },
+      { id: "vote-by-group", term: "Breakdowns by group", body: (
+        <>How each group – men and women, age groups, education levels – says it will vote,
+        from the tables pollsters publish with their polls. The panel “The vote by age, gender and
+        education” shows each pollster’s latest.
+        <span className="info-p"><b>Each pollster’s own groups.</b> They don’t cut the population
+        the same way. Resolve and DemosAU use 18–34, 35–54 and 55+; YouGov uses 18–34, 35–49 and
+        50+; RedBridge groups by generation. So the pollsters sit side by side and are never
+        averaged together.</span>
+        <span className="info-p"><b>Reading a gap.</b> Each group is a slice of one poll, often 300
+        to 500 people, so one group’s figure carries an error of about 5 points either way. A
+        difference several pollsters show is the signal; a few points in a single poll may be
+        noise.</span>
+        <span className="info-p"><b>Sources.</b> Resolve’s monthly age and gender series (its
+        Political Monitor interactive), YouGov’s published crosstabs, RedBridge’s report tables,
+        and DemosAU’s report charts, measured from the chart in each report because small bars
+        carry no label. Each group’s shares are rescaled to 100 across the five party groups, and
+        “All voters” is the same poll’s overall figure, so each group reads against its own
+        poll.</span>
+        <span className="info-p"><b>A check.</b> Every table is checked before it’s shown: each
+        group must add up to 100, give or take rounding, and an all-voters column must match the
+        poll’s published vote.</span></>) },
     ] },
     { id: "g-leaders", title: "Leaders", entries: [
       { id: "approval", term: "Approval", body: (

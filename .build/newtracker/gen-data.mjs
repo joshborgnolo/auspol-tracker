@@ -1335,10 +1335,10 @@ const ON_SOURCE_GROUPS = [
   { id: "grn", label: "Greens voters", color: "var(--grn)", note: "voted Greens in 2025" },
 ];
 const onSourceWaves = (() => {
-  if (!VOTE_SWITCHING) return [];
+  if (!Array.isArray(VOTE_SWITCHING?.waves) || !VOTE_SWITCHING.weights2025) return [];
   const W = VOTE_SWITCHING.weights2025;
   return VOTE_SWITCHING.waves.map((w) => {
-    const toOn = (g) => (w.rows[g] ? (w.rows[g].onp ?? 0) : null);
+    const toOn = (g) => (w.rows?.[g] ? (w.rows[g].onp ?? 0) : null);
     const gain = {
       lnp: toOn("lnp") == null ? null : W.lnp * toOn("lnp") / 100,
       alp: toOn("alp") == null ? null : W.alp * toOn("alp") / 100,
@@ -1388,6 +1388,68 @@ const onSources = onSourceWaves.length ? {
   waves: onSourceWaves.map(({ x, ym, ...w }) => w),
   houses: creditHouses(onSourceWaves, (w) => w.pollster, (w) => Date.parse(w.date)),
   weights: VOTE_SWITCHING.weights2025,
+} : null;
+
+/* ---- 5c. the vote by age, gender and education ---------------------------
+   From data/demographics.json (.build/demographics.mjs): each house's latest
+   breakdown, per tab, exactly as the house groups it – the age bands differ
+   (Resolve and DemosAU 18–34/35–54/55+, YouGov 18–34/35–49/50+), and a house
+   that groups by generation instead (RedBridge; YouGov in part of 2026) shows
+   its generations under Age. Each group's shares are rescaled to 100 across
+   the five party keys, as the site does with every primary set. Beside the
+   groups rides the house's all-voters figure for the same wave – its own
+   table's total where the table has one, else the wave's published primary –
+   so a group reads against its own poll, not against another house. */
+const DEMOGRAPHICS = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "demographics.json"), "utf8")); }
+  catch { return null; }
+})();
+const DEMO_HOUSES = ["Resolve", "DemosAU", "YouGov", "RedBridge/Accent"];
+const DEMO_TABS = [
+  { id: "age", label: "Age", dims: ["age", "generation"] },
+  { id: "gender", label: "Gender", dims: ["gender"] },
+  { id: "education", label: "Education", dims: ["education"] },
+];
+const DEMO_KEYS = ["alp", "lnp", "onp", "grn", "oth"];
+const demoNorm = (s) => {
+  const t = DEMO_KEYS.reduce((a, k) => a + (+s[k] || 0), 0);
+  return t > 0 ? Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(100 * (+s[k] || 0) / t)])) : null;
+};
+const demoTotal = (w) => {
+  if (w.total && Object.keys(w.total).length) return demoNorm(w.total);
+  // the wave's published primary; Resolve's series dates sit a day or so off
+  // its polls.json row, so the nearest Resolve row within four days
+  const ms = Date.parse(w.date);
+  const p = POLLS.filter((q) => q.pollster === w.pollster && Math.abs(Date.parse(q.date) - ms) <= 4 * 86400000)
+    .sort((a, b) => Math.abs(Date.parse(a.date) - ms) - Math.abs(Date.parse(b.date) - ms))[0];
+  if (!p || p.alp == null) return null;
+  return demoNorm({ alp: p.alp, lnp: p.lnp, onp: p.onp ?? 0, grn: p.grn ?? 0, oth: (p.ind ?? 0) + (p.oth ?? 0) });
+};
+const demographics = Array.isArray(DEMOGRAPHICS?.waves) && DEMOGRAPHICS.waves.length ? {
+  tabs: DEMO_TABS.map((tab) => ({
+    id: tab.id, label: tab.label,
+    blocks: DEMO_HOUSES.map((house) => {
+      // the house's latest wave carrying any of the tab's groupings; on a tie
+      // of dates the first grouping (age before generation) wins
+      let best = null;
+      for (const w of DEMOGRAPHICS.waves) {
+        if (w.pollster !== house) continue;
+        const dim = tab.dims.find((d) => w.dims?.[d] && Object.keys(w.dims[d]).length);
+        if (dim && (!best || w.date > best.w.date)) best = { w, dim };
+      }
+      if (!best) return null;
+      const { w, dim } = best;
+      const groups = Object.entries(w.dims[dim]).map(([label, s]) => ({ label, shares: demoNorm(s) })).filter((g) => g.shares);
+      return {
+        pollster: house === "RedBridge/Accent" ? "RedBridge" : house, date: w.date,
+        // fieldwork span where the wave has one; Resolve's series carry a date only
+        dateLabel: w.dateStart ? fwLabel(w.dateStart, w.date)
+          : (([, m, d]) => `${+d} ${["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][+m - 1]}`)(w.date.split("-")),
+        source: w.source || null, grouping: dim, groups, total: demoTotal(w),
+        read: w.read,
+      };
+    }).filter(Boolean),
+  })).filter((t) => t.blocks.length),
 } : null;
 
 /* ---- 6. individual polls (full archive) -------------------------------- */
@@ -3050,6 +3112,10 @@ window.AUSPOL = (function () {
      group's part of what One Nation drew from outside its own 2025 vote,
      from DemosAU's and YouGov's vote-switching tables. */
   const onSources = ${JSON.stringify(onSources)};
+  /* The vote by age, gender and education (§5c): per tab, each house's latest
+     breakdown as it groups it, shares rescaled to 100, with its all-voters
+     figure for the same wave. */
+  const demographics = ${JSON.stringify(demographics)};
   const accuracy = ${JSON.stringify(accuracy)};
   const individualPolls = ${JSON.stringify(individualPolls)};
   const pollsterTable = ${JSON.stringify(pollsterTable)};
@@ -3127,7 +3193,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, onSources, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionPolls, undecided, onSources, demographics, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved

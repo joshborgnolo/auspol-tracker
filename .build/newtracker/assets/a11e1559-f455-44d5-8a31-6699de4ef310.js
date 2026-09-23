@@ -1549,6 +1549,78 @@ function OnSourcesPanel({ rangeId }) {
   );
 }
 
+// ---- The vote by age, gender and education ------------------------------
+/* Each pollster's latest breakdown, exactly as it groups voters (gen-data
+   §5c, data/demographics.json) – side by side, never averaged, because the
+   age bands differ between houses. One party at a time, One Nation first:
+   a bar per group, with the same poll's all-voters figure to read against. */
+const DEMO_PARTIES = [
+  { id: "onp", label: "One Nation" }, { id: "alp", label: "Labor" },
+  { id: "lnp", label: "Coalition" }, { id: "grn", label: "Greens" },
+];
+function DemographicsPanel() {
+  const { D } = window.AP;
+  const T = D.demographics;
+  const [tabId, setTab] = useState("age");
+  const [party, setParty] = useState("onp");
+  if (!T || !T.tabs.length) return null;
+  const tab = T.tabs.find((t) => t.id === tabId) || T.tabs[0];
+  const color = D.PARTIES[party].color;
+  const name = D.PARTIES[party].name;
+  const vals = tab.blocks.flatMap((b) => b.groups.map((g) => g.shares[party]).concat(b.total ? [b.total[party]] : []));
+  const top = Math.max(10, Math.ceil((Math.max(...vals) + 2) / 10) * 10);
+  const row = (label, v, all) => (
+    <div className={"demo-row" + (all ? " all" : "")} key={label}>
+      <span className="demo-lab">{label}</span>
+      <span className="demo-track" aria-hidden="true">
+        <span className="demo-fill" style={{ width: (100 * v / top) + "%", background: all ? "var(--ink-3)" : color }}></span>
+      </span>
+      <span className="demo-v">{Math.round(v)}<span className="pct">%</span></span>
+    </div>
+  );
+  return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">The vote by age, gender and education</h2>
+          <p className="card-sub">
+            {name}’s share of each group’s first-preference vote, in each pollster’s latest poll · {houseList(tab.blocks.map((b) => b.pollster))}
+          </p>
+        </div>
+      </div>
+      <div className="demo-ctl">
+        <Segmented options={T.tabs.map((t) => ({ id: t.id, label: t.label }))} value={tab.id} onChange={setTab}
+                   size="sm" ariaLabel="Group voters by" />
+        <Segmented options={DEMO_PARTIES} value={party} onChange={setParty} size="sm" ariaLabel="Party" />
+      </div>
+      <div className="demo-grid">
+        {tab.blocks.map((b) => (
+          <div className="demo-house" key={b.pollster}>
+            <div className="demo-house-head">
+              {b.source
+                ? <a className="demo-house-name" href={b.source} target="_blank" rel="noopener noreferrer">{b.pollster}</a>
+                : <span className="demo-house-name">{b.pollster}</span>}
+              <span className="demo-house-when">{b.dateLabel}{b.grouping === "generation" ? " · by generation" : ""}</span>
+            </div>
+            {b.total && row("All voters", b.total[party], true)}
+            {b.groups.map((g) => row(g.label, g.shares[party]))}
+          </div>
+        ))}
+      </div>
+      <p className="table-hint">
+        Each pollster’s own groups, from its latest poll that asked
+        {tab.id === "age" ? " – the age bands differ, and RedBridge groups by generation, so they sit side by side rather than being averaged"
+          : tab.id === "education" ? " – the education levels differ, so they sit side by side rather than being averaged" : ""}.
+        {" "}A group is a slice of one poll, often a few hundred people, so a gap of a few points can
+        be noise; the same pattern across pollsters is the signal.{" "}
+        <button type="button" className="hi-term"
+                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender and education")}>
+          Where the figures come from</button>
+      </p>
+    </section>
+  );
+}
+
 // ---- Latest polls – faceted, ragged-tolerant ledger ----------------
 const PARTY_C = {
   alp: "var(--alp)", lnp: "var(--lnp)", grn: "var(--grn)",
@@ -3385,7 +3457,7 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
   );
 }
 
-Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, OnSourcesPanel, PollsterTable, NextPollsPanel,
+Object.assign(window, { Segmented, TextToggle, Delta, SortTh, fitDomain, PrimaryVotePanel, PreferredPMPanel, ApprovalPanel, DirectionPanel, UndecidedPanel, OnSourcesPanel, DemographicsPanel, PollsterTable, NextPollsPanel,
   // shared facet/render helpers reused by the All-polls archive table
   ShareBar, NetVal, FavMark, ChgTag, apprHeading, SeatProjection, tppContests, tppFlag, tppHeading, primarySegs, dirSegs, ppmContests, ppmMatch, ppmContestSegs, ppmLabel, ppmKind, ppmFlag, LEADER_META, PPM_ORDER, PARTY_C,
   PollLedger, PdSec, TppLine, ApprLine, ChgParen, releaseMetaRows, EffLines, sampleValue,

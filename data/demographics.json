@@ -1,0 +1,3820 @@
+{
+ "_about": "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+ "waves": [
+  {
+   "pollster": "Resolve",
+   "date": "2025-05-03",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 21,
+      "alp": 38,
+      "grn": 26,
+      "onp": 4,
+      "oth": 11
+     },
+     "35–54": {
+      "lnp": 29,
+      "alp": 35,
+      "grn": 9,
+      "onp": 7,
+      "oth": 18
+     },
+     "55+": {
+      "lnp": 40,
+      "alp": 32,
+      "grn": 3,
+      "onp": 7,
+      "oth": 17
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 32,
+      "alp": 37,
+      "grn": 9,
+      "onp": 7,
+      "oth": 16
+     },
+     "Women": {
+      "lnp": 31,
+      "alp": 32,
+      "grn": 14,
+      "onp": 6,
+      "oth": 14
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2025-07-18",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 17.91,
+      "alp": 36.6,
+      "grn": 28.13,
+      "onp": 5.48,
+      "oth": 11.87
+     },
+     "35–54": {
+      "lnp": 26.06,
+      "alp": 37.2,
+      "grn": 12.08,
+      "onp": 8.53,
+      "oth": 16.13
+     },
+     "55+": {
+      "lnp": 37.54,
+      "alp": 31.46,
+      "grn": 4.18,
+      "onp": 8.64,
+      "oth": 18.18
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 30.83,
+      "alp": 33.56,
+      "grn": 10.67,
+      "onp": 9.02,
+      "oth": 15.93
+     },
+     "Women": {
+      "lnp": 27.03,
+      "alp": 36.17,
+      "grn": 13.55,
+      "onp": 6.97,
+      "oth": 16.27
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2025-08-17",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 24.37,
+      "alp": 38.6,
+      "grn": 21.66,
+      "onp": 5.87,
+      "oth": 9.5
+     },
+     "35–54": {
+      "lnp": 23.82,
+      "alp": 39.79,
+      "grn": 11.29,
+      "onp": 10.08,
+      "oth": 15.02
+     },
+     "55+": {
+      "lnp": 36.14,
+      "alp": 33.64,
+      "grn": 4.1,
+      "onp": 11.27,
+      "oth": 14.84
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 32.18,
+      "alp": 35.97,
+      "grn": 9.61,
+      "onp": 9.94,
+      "oth": 12.3
+     },
+     "Women": {
+      "lnp": 25.31,
+      "alp": 38.18,
+      "grn": 13.39,
+      "onp": 8.73,
+      "oth": 14.38
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2025-09-14",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 18.28,
+      "alp": 40.46,
+      "grn": 21.75,
+      "onp": 10.62,
+      "oth": 8.89
+     },
+     "35–54": {
+      "lnp": 23.95,
+      "alp": 34,
+      "grn": 10.2,
+      "onp": 12.83,
+      "oth": 19.02
+     },
+     "55+": {
+      "lnp": 36.54,
+      "alp": 31.65,
+      "grn": 3.96,
+      "onp": 12.41,
+      "oth": 15.44
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 27.33,
+      "alp": 38.68,
+      "grn": 8.9,
+      "onp": 11.52,
+      "oth": 13.57
+     },
+     "Women": {
+      "lnp": 26.88,
+      "alp": 31.27,
+      "grn": 13.25,
+      "onp": 12.57,
+      "oth": 16.01
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2025-10-12",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 20.44,
+      "alp": 38.55,
+      "grn": 19.81,
+      "onp": 8.7,
+      "oth": 12.49
+     },
+     "35–54": {
+      "lnp": 25.86,
+      "alp": 35.13,
+      "grn": 11.9,
+      "onp": 12.66,
+      "oth": 14.45
+     },
+     "55+": {
+      "lnp": 35.82,
+      "alp": 28.55,
+      "grn": 3.37,
+      "onp": 14.17,
+      "oth": 18.09
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 30.29,
+      "alp": 35.21,
+      "grn": 9.11,
+      "onp": 10.12,
+      "oth": 15.26
+     },
+     "Women": {
+      "lnp": 26.22,
+      "alp": 31.92,
+      "grn": 12.39,
+      "onp": 14.1,
+      "oth": 15.36
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2025-11-09",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 20.78,
+      "alp": 38.63,
+      "grn": 18.34,
+      "onp": 6.95,
+      "oth": 15.31
+     },
+     "35–54": {
+      "lnp": 25.11,
+      "alp": 34.8,
+      "grn": 10.91,
+      "onp": 14.79,
+      "oth": 14.39
+     },
+     "55+": {
+      "lnp": 39.12,
+      "alp": 27.66,
+      "grn": 7.2,
+      "onp": 14.28,
+      "oth": 11.73
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 31.52,
+      "alp": 34.2,
+      "grn": 11.12,
+      "onp": 11.14,
+      "oth": 12.02
+     },
+     "Women": {
+      "lnp": 27.14,
+      "alp": 32.16,
+      "grn": 12.01,
+      "onp": 13.55,
+      "oth": 15.14
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2025-12-07",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 21.4,
+      "alp": 36.99,
+      "grn": 22.64,
+      "onp": 8.19,
+      "oth": 10.78
+     },
+     "35–54": {
+      "lnp": 21.71,
+      "alp": 40.69,
+      "grn": 10.06,
+      "onp": 12.62,
+      "oth": 14.91
+     },
+     "55+": {
+      "lnp": 32.39,
+      "alp": 29.44,
+      "grn": 4.04,
+      "onp": 19.06,
+      "oth": 15.07
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 27.87,
+      "alp": 39.39,
+      "grn": 6.7,
+      "onp": 12.33,
+      "oth": 13.71
+     },
+     "Women": {
+      "lnp": 23.63,
+      "alp": 31.45,
+      "grn": 15.64,
+      "onp": 15.35,
+      "oth": 13.94
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2025-12-20",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 21.97,
+      "alp": 32.26,
+      "grn": 21.37,
+      "onp": 10.77,
+      "oth": 13.63
+     },
+     "35–54": {
+      "lnp": 21.96,
+      "alp": 35.2,
+      "grn": 11.39,
+      "onp": 15.41,
+      "oth": 16.05
+     },
+     "55+": {
+      "lnp": 37.81,
+      "alp": 29.15,
+      "grn": 4.62,
+      "onp": 19.81,
+      "oth": 8.6
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 27.81,
+      "alp": 36.03,
+      "grn": 11.29,
+      "onp": 14.31,
+      "oth": 10.56
+     },
+     "Women": {
+      "lnp": 28.38,
+      "alp": 28.23,
+      "grn": 11.8,
+      "onp": 17.26,
+      "oth": 14.33
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-01-17",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 22.09,
+      "alp": 36.3,
+      "grn": 23.41,
+      "onp": 8.47,
+      "oth": 9.74
+     },
+     "35–54": {
+      "lnp": 24.74,
+      "alp": 29.89,
+      "grn": 7.14,
+      "onp": 20.87,
+      "oth": 17.37
+     },
+     "55+": {
+      "lnp": 35.66,
+      "alp": 25.18,
+      "grn": 4.07,
+      "onp": 22.05,
+      "oth": 13.03
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 28.93,
+      "alp": 32.07,
+      "grn": 9.33,
+      "onp": 17.67,
+      "oth": 12
+     },
+     "Women": {
+      "lnp": 27.37,
+      "alp": 27.74,
+      "grn": 11.57,
+      "onp": 18.12,
+      "oth": 15.19
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-02-10",
+   "dateStart": "2026-02-03",
+   "sample": 1561,
+   "article": "https://www.skynews.com.au/australia-news/politics/one-nation-secures-34-per-cent-primary-vote-among-workingclass-voters-above-both-labor-and-coalition-in-sky-news-pulse/news-story/62b6a2606bfeb7c099e3d7a5d570576b",
+   "source": "https://e.infogram.com/_/ZmzvfoQcPMj4PREkMRoQ",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 31,
+      "lnp": 20,
+      "onp": 29,
+      "grn": 9,
+      "oth": 11
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 18,
+      "onp": 27,
+      "grn": 15,
+      "oth": 11
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 36,
+      "lnp": 11,
+      "onp": 14,
+      "grn": 28,
+      "oth": 10
+     },
+     "35–49": {
+      "alp": 32,
+      "lnp": 17,
+      "onp": 25,
+      "grn": 13,
+      "oth": 12
+     },
+     "50–64": {
+      "alp": 27,
+      "lnp": 21,
+      "onp": 36,
+      "grn": 5,
+      "oth": 11
+     },
+     "65+": {
+      "alp": 24,
+      "lnp": 27,
+      "onp": 37,
+      "grn": 1,
+      "oth": 11
+     }
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 19,
+    "onp": 28,
+    "grn": 12,
+    "oth": 11
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-02-12",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 16.16,
+      "alp": 35.47,
+      "grn": 21.04,
+      "onp": 12.78,
+      "oth": 14.55
+     },
+     "35–54": {
+      "lnp": 21.45,
+      "alp": 32.83,
+      "grn": 12.23,
+      "onp": 24.2,
+      "oth": 9.29
+     },
+     "55+": {
+      "lnp": 22.53,
+      "alp": 25.82,
+      "grn": 4.39,
+      "onp": 33.88,
+      "oth": 13.37
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 21,
+      "alp": 31.82,
+      "grn": 10.38,
+      "onp": 24.27,
+      "oth": 12.53
+     },
+     "Women": {
+      "lnp": 19.75,
+      "alp": 30.04,
+      "grn": 13.06,
+      "onp": 24.99,
+      "oth": 12.16
+     }
+    }
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-02-14",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 17.61,
+      "alp": 36.71,
+      "grn": 19.08,
+      "onp": 13.58,
+      "oth": 13.03
+     },
+     "35–54": {
+      "lnp": 22.93,
+      "alp": 32.38,
+      "grn": 10.33,
+      "onp": 23.93,
+      "oth": 10.43
+     },
+     "55+": {
+      "lnp": 25.99,
+      "alp": 27.44,
+      "grn": 4.56,
+      "onp": 29.79,
+      "oth": 12.23
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 22.42,
+      "alp": 33.94,
+      "grn": 8.64,
+      "onp": 22.64,
+      "oth": 12.36
+     },
+     "Women": {
+      "lnp": 22.62,
+      "alp": 29.76,
+      "grn": 12.71,
+      "onp": 23.54,
+      "oth": 11.37
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-02-24",
+   "dateStart": "2026-02-17",
+   "sample": 1500,
+   "article": "https://www.skynews.com.au/australia-news/politics/bandaid-on-a-bullet-wound-angus-taylor-halts-coalition-decline-after-taking-over-from-sussan-ley-sky-news-pulse-reveals/news-story/9068187eed61dcd301a5ef5f54a6d8bd",
+   "source": "https://e.infogram.com/_/ihQUqVtPBNqqg4cvnJMI",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 32,
+      "lnp": 23,
+      "onp": 26,
+      "grn": 9,
+      "oth": 10
+     },
+     "Women": {
+      "alp": 26,
+      "lnp": 22,
+      "onp": 22,
+      "grn": 16,
+      "oth": 14
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 35,
+      "lnp": 14,
+      "onp": 11,
+      "grn": 29,
+      "oth": 11
+     },
+     "35–49": {
+      "alp": 30,
+      "lnp": 21,
+      "onp": 23,
+      "grn": 14,
+      "oth": 13
+     },
+     "50–64": {
+      "alp": 27,
+      "lnp": 23,
+      "onp": 30,
+      "grn": 6,
+      "oth": 14
+     },
+     "65+": {
+      "alp": 24,
+      "lnp": 33,
+      "onp": 32,
+      "grn": 2,
+      "oth": 10
+     }
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 22,
+    "onp": 24,
+    "grn": 13,
+    "oth": 12
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-02-27",
+   "dateStart": "2026-02-23",
+   "sample": 1006,
+   "article": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
+   "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll",
+   "read": "published table",
+   "dims": {
+    "softness": {
+     "Solid": {
+      "alp": 31,
+      "lnp": 17,
+      "onp": 34,
+      "grn": 11,
+      "oth": 7
+     },
+     "Soft": {
+      "alp": 32,
+      "lnp": 22,
+      "onp": 24,
+      "grn": 12,
+      "oth": 10
+     },
+     "Very soft": {
+      "alp": 33,
+      "lnp": 17,
+      "onp": 24,
+      "grn": 12,
+      "oth": 14
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 30,
+      "lnp": 16,
+      "onp": 12,
+      "grn": 32,
+      "oth": 10
+     },
+     "Millennials": {
+      "alp": 30,
+      "lnp": 19,
+      "onp": 29,
+      "grn": 14,
+      "oth": 8
+     },
+     "Gen X": {
+      "alp": 34,
+      "lnp": 14,
+      "onp": 35,
+      "grn": 7,
+      "oth": 10
+     },
+     "Boomers": {
+      "alp": 32,
+      "lnp": 25,
+      "onp": 33,
+      "grn": 2,
+      "oth": 8
+     }
+    },
+    "gender": {
+     "Women": {
+      "alp": 30,
+      "lnp": 19,
+      "onp": 28,
+      "grn": 12,
+      "oth": 11
+     },
+     "Men": {
+      "alp": 33,
+      "lnp": 21,
+      "onp": 29,
+      "grn": 11,
+      "oth": 6
+     }
+    },
+    "location": {
+     "Inner Metropolitan": {
+      "alp": 41,
+      "lnp": 20,
+      "onp": 16,
+      "grn": 14,
+      "oth": 9
+     },
+     "Outer Metropolitan": {
+      "alp": 32,
+      "lnp": 16,
+      "onp": 28,
+      "grn": 14,
+      "oth": 10
+     },
+     "Provincial": {
+      "alp": 32,
+      "lnp": 22,
+      "onp": 34,
+      "grn": 5,
+      "oth": 7
+     },
+     "Rural": {
+      "alp": 22,
+      "lnp": 20,
+      "onp": 39,
+      "grn": 11,
+      "oth": 8
+     }
+    },
+    "education": {
+     "Below Year 12": {
+      "alp": 27,
+      "lnp": 17,
+      "onp": 44,
+      "grn": 5,
+      "oth": 7
+     },
+     "Year 12": {
+      "alp": 25,
+      "lnp": 24,
+      "onp": 25,
+      "grn": 19,
+      "oth": 7
+     },
+     "TAFE or trade": {
+      "alp": 29,
+      "lnp": 18,
+      "onp": 33,
+      "grn": 9,
+      "oth": 11
+     },
+     "University": {
+      "alp": 42,
+      "lnp": 19,
+      "onp": 17,
+      "grn": 14,
+      "oth": 8
+     }
+    },
+    "housing": {
+     "Owned outright": {
+      "alp": 31,
+      "lnp": 24,
+      "onp": 32,
+      "grn": 6,
+      "oth": 7
+     },
+     "Owned with a mortgage": {
+      "alp": 35,
+      "lnp": 20,
+      "onp": 28,
+      "grn": 10,
+      "oth": 7
+     },
+     "Renting and other": {
+      "alp": 29,
+      "lnp": 11,
+      "onp": 24,
+      "grn": 21,
+      "oth": 15
+     }
+    }
+   },
+   "total": {
+    "alp": 32,
+    "lnp": 19,
+    "onp": 28,
+    "grn": 12,
+    "oth": 9
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-03-10",
+   "dateStart": "2026-03-03",
+   "sample": 1425,
+   "article": "https://www.skynews.com.au/australia-news/politics/coalition-vote-collapses-to-historic-low-under-angus-taylor-in-latest-sky-news-pulse-yougov-poll/news-story/a7219b0adb90d87b9b1b9c2e75824a7c",
+   "source": "https://e.infogram.com/_/pb7kijCuicNCIZB3PVwM",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 29,
+      "lnp": 20,
+      "onp": 28,
+      "grn": 13,
+      "oth": 9
+     },
+     "Women": {
+      "alp": 31,
+      "lnp": 19,
+      "onp": 23,
+      "grn": 13,
+      "oth": 14
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 31,
+      "lnp": 13,
+      "onp": 15,
+      "grn": 30,
+      "oth": 11
+     },
+     "35–49": {
+      "alp": 31,
+      "lnp": 17,
+      "onp": 25,
+      "grn": 12,
+      "oth": 15
+     },
+     "50–64": {
+      "alp": 27,
+      "lnp": 21,
+      "onp": 35,
+      "grn": 5,
+      "oth": 12
+     },
+     "65+": {
+      "alp": 32,
+      "lnp": 30,
+      "onp": 27,
+      "grn": 2,
+      "oth": 10
+     }
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 19,
+    "onp": 26,
+    "grn": 13,
+    "oth": 12
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-03-15",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 12.71,
+      "alp": 35.27,
+      "grn": 21.75,
+      "onp": 16.69,
+      "oth": 13.59
+     },
+     "35–54": {
+      "lnp": 19.09,
+      "alp": 27.32,
+      "grn": 13.35,
+      "onp": 24.91,
+      "oth": 15.33
+     },
+     "55+": {
+      "lnp": 30.13,
+      "alp": 26.89,
+      "grn": 4.43,
+      "onp": 28.13,
+      "oth": 10.42
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 24.01,
+      "alp": 30.12,
+      "grn": 9.88,
+      "onp": 25.38,
+      "oth": 10.6
+     },
+     "Women": {
+      "lnp": 19.16,
+      "alp": 28.67,
+      "grn": 14.58,
+      "onp": 22.38,
+      "oth": 15.2
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-03-24",
+   "dateStart": "2026-03-17",
+   "sample": 1501,
+   "article": "https://www.skynews.com.au/australia-news/politics/pauline-hansons-one-nation-surges-against-labor-in-latest-sky-news-pulse-poll/news-story/6582c87b585bc0554347f6cf870a9bb8",
+   "source": "https://e.infogram.com/_/oLs7Ez236QuKo9b8951m",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 30,
+      "lnp": 19,
+      "onp": 31,
+      "grn": 9,
+      "oth": 12
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 19,
+      "onp": 24,
+      "grn": 17,
+      "oth": 11
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 32,
+      "lnp": 10,
+      "onp": 10,
+      "grn": 32,
+      "oth": 16
+     },
+     "Millennials": {
+      "alp": 28,
+      "lnp": 14,
+      "onp": 30,
+      "grn": 17,
+      "oth": 11
+     },
+     "Gen X": {
+      "alp": 27,
+      "lnp": 20,
+      "onp": 32,
+      "grn": 7,
+      "oth": 13
+     },
+     "Boomers": {
+      "alp": 32,
+      "lnp": 27,
+      "onp": 30,
+      "grn": 3,
+      "oth": 7
+     },
+     "Silent": {
+      "alp": 16,
+      "lnp": 38,
+      "onp": 33,
+      "grn": 5,
+      "oth": 8
+     }
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 19,
+    "onp": 27,
+    "grn": 13,
+    "oth": 12
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-04-07",
+   "dateStart": "2026-03-31",
+   "sample": 1502,
+   "article": "https://www.skynews.com.au/australia-news/politics/coalition-locked-in-third-place-behind-labor-and-one-nation-for-sixth-consecutive-poll-sky-news-yougov-pulse/news-story/c8b3eb9a2e8d80c8e1af656f19694212",
+   "source": "https://e.infogram.com/_/5PSbKtbHyzvhiC0xbRSl",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 32,
+      "lnp": 21,
+      "onp": 25,
+      "grn": 10,
+      "oth": 12
+     },
+     "Women": {
+      "alp": 27,
+      "lnp": 19,
+      "onp": 25,
+      "grn": 16,
+      "oth": 13
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 28,
+      "lnp": 10,
+      "onp": 13,
+      "grn": 34,
+      "oth": 14
+     },
+     "Millennials": {
+      "alp": 33,
+      "lnp": 14,
+      "onp": 26,
+      "grn": 14,
+      "oth": 13
+     },
+     "Gen X": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 30,
+      "grn": 8,
+      "oth": 14
+     },
+     "Boomers": {
+      "alp": 30,
+      "lnp": 30,
+      "onp": 27,
+      "grn": 4,
+      "oth": 10
+     },
+     "Silent": {
+      "alp": 46,
+      "lnp": 36,
+      "onp": 17,
+      "grn": 0,
+      "oth": 0
+     }
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 20,
+    "onp": 25,
+    "grn": 13,
+    "oth": 13
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-04-14",
+   "dateStart": "2026-04-09",
+   "sample": 1439,
+   "article": "https://www.capitalbrief.com/article/one-nation-draws-level-with-labor-as-voters-blame-immigration-for-housing-crisis-706653c7-d05f-4c10-9a62-5dde8f2a69cc/",
+   "source": "https://demosau.com/wp-content/uploads/2026/04/DemosAU-Fed-Poll-April-2026.pdf",
+   "read": "measured from the charts",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 28,
+      "onp": 24,
+      "lnp": 23,
+      "grn": 11,
+      "oth": 14
+     },
+     "Women": {
+      "alp": 25,
+      "onp": 28,
+      "lnp": 22,
+      "grn": 15,
+      "oth": 10
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 24,
+      "onp": 20,
+      "lnp": 18,
+      "grn": 28,
+      "oth": 10
+     },
+     "35–54": {
+      "alp": 26,
+      "onp": 26,
+      "lnp": 20,
+      "grn": 13,
+      "oth": 15
+     },
+     "55+": {
+      "alp": 28,
+      "onp": 29,
+      "lnp": 27,
+      "grn": 5,
+      "oth": 11
+     }
+    },
+    "education": {
+     "School": {
+      "alp": 26,
+      "onp": 31,
+      "lnp": 22,
+      "grn": 10,
+      "oth": 11
+     },
+     "TAFE": {
+      "alp": 24,
+      "onp": 28,
+      "lnp": 23,
+      "grn": 13,
+      "oth": 12
+     },
+     "University": {
+      "alp": 29,
+      "onp": 18,
+      "lnp": 24,
+      "grn": 17,
+      "oth": 12
+     }
+    }
+   },
+   "fit": 0.04
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-04-18",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 20.55,
+      "alp": 32.87,
+      "grn": 25.51,
+      "onp": 13.41,
+      "oth": 7.66
+     },
+     "35–54": {
+      "lnp": 19.68,
+      "alp": 39.42,
+      "grn": 11.15,
+      "onp": 19.03,
+      "oth": 10.71
+     },
+     "55+": {
+      "lnp": 28.16,
+      "alp": 24.28,
+      "grn": 3.65,
+      "onp": 31.97,
+      "oth": 11.93
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 24.98,
+      "alp": 33.36,
+      "grn": 9.92,
+      "onp": 22.63,
+      "oth": 9.1
+     },
+     "Women": {
+      "lnp": 21.47,
+      "alp": 30.2,
+      "grn": 14.68,
+      "onp": 22.18,
+      "oth": 11.47
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-04-21",
+   "dateStart": "2026-04-14",
+   "sample": 1501,
+   "article": "https://www.skynews.com.au/australia-news/politics/pauline-hansons-one-nation-draws-level-with-labor-on-27-per-cent-primary-vote-for-first-time-in-sky-news-pulse-history/news-story/cbc88f47eac6ff1b3b8aa563dfe305e2",
+   "source": "https://e.infogram.com/_/GM5wSTEgnFLWxZ5bKCB4",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 28,
+      "lnp": 20,
+      "onp": 29,
+      "grn": 10,
+      "oth": 13
+     },
+     "Women": {
+      "alp": 27,
+      "lnp": 21,
+      "onp": 26,
+      "grn": 15,
+      "oth": 11
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 27,
+      "lnp": 11,
+      "onp": 11,
+      "grn": 32,
+      "oth": 19
+     },
+     "Millennials": {
+      "alp": 30,
+      "lnp": 15,
+      "onp": 27,
+      "grn": 16,
+      "oth": 12
+     },
+     "Gen X": {
+      "alp": 25,
+      "lnp": 20,
+      "onp": 34,
+      "grn": 10,
+      "oth": 11
+     },
+     "Boomers": {
+      "alp": 28,
+      "lnp": 30,
+      "onp": 32,
+      "grn": 3,
+      "oth": 7
+     },
+     "Silent": {
+      "alp": 15,
+      "lnp": 42,
+      "onp": 29,
+      "grn": 9,
+      "oth": 5
+     }
+    }
+   },
+   "total": {
+    "alp": 27,
+    "lnp": 20,
+    "onp": 27,
+    "grn": 14,
+    "oth": 12
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-04-30",
+   "dateStart": "2026-04-24",
+   "sample": 1014,
+   "article": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
+   "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll",
+   "read": "published table",
+   "dims": {
+    "softness": {
+     "Solid": {
+      "alp": 32,
+      "lnp": 21,
+      "onp": 31,
+      "grn": 12,
+      "oth": 4
+     },
+     "Soft": {
+      "alp": 31,
+      "lnp": 21,
+      "onp": 22,
+      "grn": 15,
+      "oth": 11
+     },
+     "Very soft": {
+      "alp": 28,
+      "lnp": 26,
+      "onp": 26,
+      "grn": 9,
+      "oth": 11
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 26,
+      "lnp": 11,
+      "onp": 15,
+      "grn": 37,
+      "oth": 11
+     },
+     "Millennials": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 23,
+      "grn": 18,
+      "oth": 9
+     },
+     "Gen X": {
+      "alp": 31,
+      "lnp": 21,
+      "onp": 36,
+      "grn": 7,
+      "oth": 5
+     },
+     "Boomers": {
+      "alp": 34,
+      "lnp": 28,
+      "onp": 30,
+      "grn": 2,
+      "oth": 6
+     }
+    },
+    "gender": {
+     "Women": {
+      "alp": 27,
+      "lnp": 22,
+      "onp": 28,
+      "grn": 17,
+      "oth": 6
+     },
+     "Men": {
+      "alp": 35,
+      "lnp": 22,
+      "onp": 26,
+      "grn": 9,
+      "oth": 8
+     }
+    },
+    "location": {
+     "Inner Metropolitan": {
+      "alp": 36,
+      "lnp": 21,
+      "onp": 21,
+      "grn": 15,
+      "oth": 7
+     },
+     "Outer Metropolitan": {
+      "alp": 32,
+      "lnp": 22,
+      "onp": 25,
+      "grn": 14,
+      "oth": 7
+     },
+     "Provincial": {
+      "alp": 28,
+      "lnp": 21,
+      "onp": 32,
+      "grn": 15,
+      "oth": 4
+     },
+     "Rural": {
+      "alp": 26,
+      "lnp": 24,
+      "onp": 33,
+      "grn": 8,
+      "oth": 9
+     }
+    },
+    "education": {
+     "Below Year 12": {
+      "alp": 30,
+      "lnp": 29,
+      "onp": 32,
+      "grn": 4,
+      "oth": 5
+     },
+     "Year 12": {
+      "alp": 30,
+      "lnp": 17,
+      "onp": 25,
+      "grn": 22,
+      "oth": 6
+     },
+     "TAFE or trade": {
+      "alp": 27,
+      "lnp": 21,
+      "onp": 35,
+      "grn": 11,
+      "oth": 6
+     },
+     "University": {
+      "alp": 38,
+      "lnp": 23,
+      "onp": 16,
+      "grn": 12,
+      "oth": 11
+     }
+    },
+    "housing": {
+     "Owned outright": {
+      "alp": 32,
+      "lnp": 28,
+      "onp": 30,
+      "grn": 4,
+      "oth": 6
+     },
+     "Owned with a mortgage": {
+      "alp": 32,
+      "lnp": 20,
+      "onp": 26,
+      "grn": 15,
+      "oth": 7
+     },
+     "Renting and other": {
+      "alp": 29,
+      "lnp": 16,
+      "onp": 24,
+      "grn": 22,
+      "oth": 9
+     }
+    }
+   },
+   "total": {
+    "alp": 31,
+    "lnp": 22,
+    "onp": 27,
+    "grn": 13,
+    "oth": 7
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-05-05",
+   "dateStart": "2026-04-28",
+   "sample": 1500,
+   "article": "https://www.skynews.com.au/australia-news/politics/coalition-languishing-behind-one-nation-and-labor-for-eight-consecutive-polls-sky-news-pulse-reveals/news-story/136b0b32b0a647328a35440659262b73",
+   "source": "https://e.infogram.com/_/xlAzTHMulISJRy1rkc2C",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 30,
+      "lnp": 21,
+      "onp": 26,
+      "grn": 13,
+      "oth": 10
+     },
+     "Women": {
+      "alp": 29,
+      "lnp": 21,
+      "onp": 22,
+      "grn": 16,
+      "oth": 12
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 31,
+      "lnp": 6,
+      "onp": 8,
+      "grn": 39,
+      "oth": 16
+     },
+     "Millennials": {
+      "alp": 27,
+      "lnp": 22,
+      "onp": 24,
+      "grn": 15,
+      "oth": 11
+     },
+     "Gen X": {
+      "alp": 32,
+      "lnp": 19,
+      "onp": 29,
+      "grn": 11,
+      "oth": 9
+     },
+     "Boomers": {
+      "alp": 30,
+      "lnp": 27,
+      "onp": 29,
+      "grn": 4,
+      "oth": 10
+     },
+     "Silent": {
+      "alp": 20,
+      "lnp": 54,
+      "onp": 20,
+      "grn": 3,
+      "oth": 2
+     }
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 21,
+    "onp": 24,
+    "grn": 14,
+    "oth": 11
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-05-17",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 17.97,
+      "alp": 31.46,
+      "grn": 20.99,
+      "onp": 16,
+      "oth": 13.58
+     },
+     "35–54": {
+      "lnp": 19.63,
+      "alp": 33.98,
+      "grn": 11.56,
+      "onp": 24.74,
+      "oth": 10.1
+     },
+     "55+": {
+      "lnp": 30.27,
+      "alp": 23.73,
+      "grn": 4.7,
+      "onp": 29.41,
+      "oth": 11.89
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 27.28,
+      "alp": 31.99,
+      "grn": 8.44,
+      "onp": 22.32,
+      "oth": 9.96
+     },
+     "Women": {
+      "lnp": 19.23,
+      "alp": 26.85,
+      "grn": 14.7,
+      "onp": 25.72,
+      "oth": 13.51
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-05-19",
+   "dateStart": "2026-05-12",
+   "sample": 1504,
+   "article": "https://www.skynews.com.au/australia-news/politics/labors-primary-vote-plummets-amid-backlash-to-anthony-albaneses-budget-broken-promises/news-story/85b0175fa0db4e02b85f4161771cdefd",
+   "source": "https://e.infogram.com/_/rpPgjmCBFb9tgpiTDMJW",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 29,
+      "lnp": 24,
+      "onp": 25,
+      "grn": 12,
+      "oth": 10
+     },
+     "Women": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 24,
+      "grn": 15,
+      "oth": 14
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 32,
+      "lnp": 10,
+      "onp": 12,
+      "grn": 29,
+      "oth": 17
+     },
+     "Millennials": {
+      "alp": 28,
+      "lnp": 24,
+      "onp": 19,
+      "grn": 17,
+      "oth": 12
+     },
+     "Gen X": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 32,
+      "grn": 11,
+      "oth": 9
+     },
+     "Boomers": {
+      "alp": 25,
+      "lnp": 30,
+      "onp": 30,
+      "grn": 4,
+      "oth": 11
+     },
+     "Silent": {
+      "alp": 23,
+      "lnp": 35,
+      "onp": 37,
+      "grn": 1,
+      "oth": 4
+     }
+    }
+   },
+   "total": {
+    "alp": 28,
+    "lnp": 23,
+    "onp": 25,
+    "grn": 13,
+    "oth": 11
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-05-20",
+   "dateStart": "2026-05-15",
+   "sample": 1502,
+   "article": "https://www.capitalbrief.com/article/labors-budget-backlash-begins-as-one-nation-continues-its-rise-f730690e-86cf-4231-8d1f-f6bf23d1d8a0/",
+   "source": "https://demosau.com/wp-content/uploads/2026/05/DemosAU-Fed-Poll-May-2026-FINAL.pdf",
+   "read": "measured from the charts",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 28,
+      "onp": 28,
+      "lnp": 22,
+      "grn": 11,
+      "oth": 11
+     },
+     "Women": {
+      "alp": 24,
+      "onp": 30,
+      "lnp": 24,
+      "grn": 14,
+      "oth": 8
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 30,
+      "onp": 16,
+      "lnp": 13,
+      "grn": 33,
+      "oth": 8
+     },
+     "35–54": {
+      "alp": 23,
+      "onp": 30,
+      "lnp": 22,
+      "grn": 10,
+      "oth": 15
+     },
+     "55+": {
+      "alp": 26,
+      "onp": 34,
+      "lnp": 29,
+      "grn": 4,
+      "oth": 7
+     }
+    },
+    "education": {
+     "School": {
+      "alp": 25,
+      "onp": 29,
+      "lnp": 22,
+      "grn": 13,
+      "oth": 11
+     },
+     "TAFE": {
+      "alp": 23,
+      "onp": 35,
+      "lnp": 19,
+      "grn": 12,
+      "oth": 11
+     },
+     "University": {
+      "alp": 31,
+      "onp": 21,
+      "lnp": 27,
+      "grn": 13,
+      "oth": 8
+     }
+    }
+   },
+   "fit": 0.03
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-05-28",
+   "dateStart": "2026-05-25",
+   "sample": 1005,
+   "article": "https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9",
+   "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll",
+   "read": "published table",
+   "dims": {
+    "softness": {
+     "Solid": {
+      "alp": 29,
+      "lnp": 20,
+      "onp": 33,
+      "grn": 13,
+      "oth": 5
+     },
+     "Soft": {
+      "alp": 26,
+      "lnp": 19,
+      "onp": 32,
+      "grn": 11,
+      "oth": 12
+     },
+     "Very soft": {
+      "alp": 34,
+      "lnp": 23,
+      "onp": 18,
+      "grn": 8,
+      "oth": 17
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 35,
+      "lnp": 18,
+      "onp": 10,
+      "grn": 27,
+      "oth": 10
+     },
+     "Millennials": {
+      "alp": 28,
+      "lnp": 16,
+      "onp": 30,
+      "grn": 18,
+      "oth": 8
+     },
+     "Gen X": {
+      "alp": 24,
+      "lnp": 17,
+      "onp": 43,
+      "grn": 10,
+      "oth": 6
+     },
+     "Boomers": {
+      "alp": 27,
+      "lnp": 25,
+      "onp": 35,
+      "grn": 2,
+      "oth": 11
+     }
+    },
+    "gender": {
+     "Women": {
+      "alp": 28,
+      "lnp": 20,
+      "onp": 28,
+      "grn": 14,
+      "oth": 10
+     },
+     "Men": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 35,
+      "grn": 10,
+      "oth": 8
+     }
+    },
+    "location": {
+     "Inner Metropolitan": {
+      "alp": 28,
+      "lnp": 23,
+      "onp": 23,
+      "grn": 14,
+      "oth": 12
+     },
+     "Outer Metropolitan": {
+      "alp": 31,
+      "lnp": 18,
+      "onp": 30,
+      "grn": 13,
+      "oth": 8
+     },
+     "Provincial": {
+      "alp": 23,
+      "lnp": 16,
+      "onp": 36,
+      "grn": 15,
+      "oth": 10
+     },
+     "Rural": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 40,
+      "grn": 7,
+      "oth": 6
+     }
+    },
+    "education": {
+     "Below Year 12": {
+      "alp": 15,
+      "lnp": 21,
+      "onp": 51,
+      "grn": 8,
+      "oth": 5
+     },
+     "Year 12": {
+      "alp": 35,
+      "lnp": 17,
+      "onp": 24,
+      "grn": 15,
+      "oth": 9
+     },
+     "TAFE or trade": {
+      "alp": 27,
+      "lnp": 18,
+      "onp": 39,
+      "grn": 8,
+      "oth": 8
+     },
+     "University": {
+      "alp": 30,
+      "lnp": 23,
+      "onp": 17,
+      "grn": 17,
+      "oth": 13
+     }
+    },
+    "housing": {
+     "Owned outright": {
+      "alp": 27,
+      "lnp": 24,
+      "onp": 35,
+      "grn": 4,
+      "oth": 10
+     },
+     "Owned with a mortgage": {
+      "alp": 28,
+      "lnp": 17,
+      "onp": 32,
+      "grn": 14,
+      "oth": 9
+     },
+     "Renting and other": {
+      "alp": 29,
+      "lnp": 17,
+      "onp": 25,
+      "grn": 20,
+      "oth": 9
+     }
+    }
+   },
+   "total": {
+    "alp": 28,
+    "lnp": 20,
+    "onp": 31,
+    "grn": 12,
+    "oth": 9
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-06-02",
+   "dateStart": "2026-05-26",
+   "sample": 1471,
+   "article": "https://www.skynews.com.au/australia-news/politics/one-nation-surge-shatters-labor-as-albanese-support-sinks-according-to-exclusive-new-polling/news-story/0fe9ddf8797b5e529436557d7ce63897",
+   "source": "https://e.infogram.com/_/zSPbFJ7s5bfliWLjxj21",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 27,
+      "grn": 10,
+      "oth": 12
+     },
+     "Women": {
+      "alp": 23,
+      "lnp": 20,
+      "onp": 32,
+      "grn": 15,
+      "oth": 11
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 28,
+      "lnp": 10,
+      "onp": 15,
+      "grn": 29,
+      "oth": 18
+     },
+     "35–49": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 28,
+      "grn": 11,
+      "oth": 11
+     },
+     "50+": {
+      "alp": 24,
+      "lnp": 25,
+      "onp": 38,
+      "grn": 5,
+      "oth": 8
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 29,
+      "lnp": 7,
+      "onp": 10,
+      "grn": 29,
+      "oth": 24
+     },
+     "Millennials": {
+      "alp": 28,
+      "lnp": 18,
+      "onp": 25,
+      "grn": 17,
+      "oth": 10
+     },
+     "Gen X": {
+      "alp": 24,
+      "lnp": 18,
+      "onp": 42,
+      "grn": 5,
+      "oth": 11
+     },
+     "Boomers": {
+      "alp": 25,
+      "lnp": 28,
+      "onp": 34,
+      "grn": 6,
+      "oth": 7
+     },
+     "Silent": {
+      "alp": 32,
+      "lnp": 49,
+      "onp": 18,
+      "grn": 0,
+      "oth": 0
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 23,
+      "lnp": 18,
+      "onp": 36,
+      "grn": 12,
+      "oth": 11
+     },
+     "TAFE or college": {
+      "alp": 25,
+      "lnp": 18,
+      "onp": 32,
+      "grn": 15,
+      "oth": 11
+     },
+     "University": {
+      "alp": 33,
+      "lnp": 24,
+      "onp": 18,
+      "grn": 13,
+      "oth": 12
+     }
+    }
+   },
+   "total": {
+    "alp": 26,
+    "lnp": 20,
+    "onp": 29,
+    "grn": 13,
+    "oth": 12
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-06-14",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 16.08,
+      "alp": 30.91,
+      "grn": 24.56,
+      "onp": 21.95,
+      "oth": 6.5
+     },
+     "35–54": {
+      "lnp": 14.98,
+      "alp": 31.69,
+      "grn": 11.3,
+      "onp": 26.89,
+      "oth": 15.14
+     },
+     "55+": {
+      "lnp": 28.48,
+      "alp": 21.71,
+      "grn": 3.64,
+      "onp": 35.14,
+      "oth": 11.03
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 25.14,
+      "alp": 31.44,
+      "grn": 8.34,
+      "onp": 24.99,
+      "oth": 10.09
+     },
+     "Women": {
+      "lnp": 15.92,
+      "alp": 24.09,
+      "grn": 15.7,
+      "onp": 32.12,
+      "oth": 12.17
+     }
+    }
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-06-18",
+   "dateStart": "2026-06-16",
+   "sample": 1497,
+   "article": "https://demosau.com/news/one-nation-lead-grows-as-l-np-primary-sinks-to-18/",
+   "source": "https://demosau.com/wp-content/uploads/2026/06/Capital-BriefDemosAU-Federal-Poll-June-2026-FINAL.pdf",
+   "read": "measured from the charts",
+   "dims": {
+    "gender": {
+     "Men": {
+      "onp": 29,
+      "alp": 32,
+      "lnp": 18,
+      "grn": 11,
+      "oth": 10
+     },
+     "Women": {
+      "onp": 32,
+      "alp": 21,
+      "lnp": 19,
+      "grn": 14,
+      "oth": 14
+     }
+    },
+    "age": {
+     "18–34": {
+      "onp": 22,
+      "alp": 29,
+      "lnp": 12,
+      "grn": 29,
+      "oth": 8
+     },
+     "35–54": {
+      "onp": 31,
+      "alp": 28,
+      "lnp": 18,
+      "grn": 11,
+      "oth": 12
+     },
+     "55+": {
+      "onp": 35,
+      "alp": 24,
+      "lnp": 22,
+      "grn": 5,
+      "oth": 14
+     }
+    },
+    "education": {
+     "School": {
+      "onp": 33,
+      "alp": 25,
+      "lnp": 18,
+      "grn": 13,
+      "oth": 11
+     },
+     "TAFE": {
+      "onp": 33,
+      "alp": 24,
+      "lnp": 15,
+      "grn": 11,
+      "oth": 17
+     },
+     "University": {
+      "onp": 24,
+      "alp": 31,
+      "lnp": 23,
+      "grn": 14,
+      "oth": 8
+     }
+    }
+   },
+   "fit": 0.03
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-06-26",
+   "dateStart": "2026-06-22",
+   "sample": 1006,
+   "article": "https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9",
+   "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll",
+   "read": "published table",
+   "dims": {
+    "softness": {
+     "Solid": {
+      "alp": 29,
+      "lnp": 18,
+      "onp": 32,
+      "grn": 13,
+      "oth": 8
+     },
+     "Soft": {
+      "alp": 32,
+      "lnp": 16,
+      "onp": 28,
+      "grn": 15,
+      "oth": 9
+     },
+     "Very soft": {
+      "alp": 32,
+      "lnp": 21,
+      "onp": 23,
+      "grn": 10,
+      "oth": 14
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 28,
+      "lnp": 8,
+      "onp": 18,
+      "grn": 37,
+      "oth": 9
+     },
+     "Millennials": {
+      "alp": 35,
+      "lnp": 16,
+      "onp": 27,
+      "grn": 15,
+      "oth": 7
+     },
+     "Gen X": {
+      "alp": 24,
+      "lnp": 22,
+      "onp": 38,
+      "grn": 7,
+      "oth": 9
+     },
+     "Boomers": {
+      "alp": 32,
+      "lnp": 22,
+      "onp": 31,
+      "grn": 5,
+      "oth": 10
+     }
+    },
+    "gender": {
+     "Women": {
+      "alp": 27,
+      "lnp": 20,
+      "onp": 25,
+      "grn": 18,
+      "oth": 10
+     },
+     "Men": {
+      "alp": 34,
+      "lnp": 16,
+      "onp": 33,
+      "grn": 9,
+      "oth": 8
+     }
+    },
+    "location": {
+     "Inner Metropolitan": {
+      "alp": 38,
+      "lnp": 17,
+      "onp": 22,
+      "grn": 13,
+      "oth": 10
+     },
+     "Outer Metropolitan": {
+      "alp": 31,
+      "lnp": 17,
+      "onp": 30,
+      "grn": 17,
+      "oth": 5
+     },
+     "Provincial": {
+      "alp": 34,
+      "lnp": 19,
+      "onp": 35,
+      "grn": 8,
+      "oth": 4
+     },
+     "Rural": {
+      "alp": 19,
+      "lnp": 18,
+      "onp": 33,
+      "grn": 15,
+      "oth": 15
+     }
+    },
+    "education": {
+     "Below Year 12": {
+      "alp": 16,
+      "lnp": 25,
+      "onp": 41,
+      "grn": 9,
+      "oth": 9
+     },
+     "Year 12": {
+      "alp": 28,
+      "lnp": 16,
+      "onp": 28,
+      "grn": 21,
+      "oth": 7
+     },
+     "TAFE or trade": {
+      "alp": 31,
+      "lnp": 16,
+      "onp": 33,
+      "grn": 11,
+      "oth": 9
+     },
+     "University": {
+      "alp": 38,
+      "lnp": 18,
+      "onp": 19,
+      "grn": 15,
+      "oth": 10
+     }
+    },
+    "housing": {
+     "Owned outright": {
+      "alp": 30,
+      "lnp": 25,
+      "onp": 30,
+      "grn": 7,
+      "oth": 8
+     },
+     "Owned with a mortgage": {
+      "alp": 32,
+      "lnp": 17,
+      "onp": 32,
+      "grn": 12,
+      "oth": 7
+     },
+     "Renting and other": {
+      "alp": 29,
+      "lnp": 9,
+      "onp": 24,
+      "grn": 26,
+      "oth": 12
+     }
+    }
+   },
+   "total": {
+    "alp": 30,
+    "lnp": 18,
+    "onp": 29,
+    "grn": 14,
+    "oth": 9
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-06-30",
+   "dateStart": "2026-06-23",
+   "sample": 1502,
+   "article": "https://www.skynews.com.au/australia-news/politics/one-nation-records-historic-result-in-latest-poll-since-hansons-monoculture-call-despite-albanese-rejecting-it-as-nonsense/news-story/3ecdbeb123199de72a7c12b4fb9efbd2",
+   "source": "https://e.infogram.com/_/adAygP6VBs84ueM4jN4C",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 31,
+      "lnp": 19,
+      "onp": 32,
+      "grn": 8,
+      "oth": 10
+     },
+     "Women": {
+      "alp": 28,
+      "lnp": 15,
+      "onp": 29,
+      "grn": 17,
+      "oth": 11
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 35,
+      "lnp": 13,
+      "onp": 18,
+      "grn": 26,
+      "oth": 9
+     },
+     "35–49": {
+      "alp": 29,
+      "lnp": 17,
+      "onp": 29,
+      "grn": 14,
+      "oth": 11
+     },
+     "50+": {
+      "alp": 27,
+      "lnp": 20,
+      "onp": 38,
+      "grn": 5,
+      "oth": 11
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 35,
+      "lnp": 12,
+      "onp": 10,
+      "grn": 31,
+      "oth": 12
+     },
+     "Millennials": {
+      "alp": 31,
+      "lnp": 13,
+      "onp": 29,
+      "grn": 18,
+      "oth": 9
+     },
+     "Gen X": {
+      "alp": 27,
+      "lnp": 20,
+      "onp": 35,
+      "grn": 6,
+      "oth": 11
+     },
+     "Boomers": {
+      "alp": 26,
+      "lnp": 20,
+      "onp": 39,
+      "grn": 4,
+      "oth": 10
+     },
+     "Silent": {
+      "alp": 33,
+      "lnp": 25,
+      "onp": 29,
+      "grn": 7,
+      "oth": 6
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 26,
+      "lnp": 17,
+      "onp": 35,
+      "grn": 12,
+      "oth": 10
+     },
+     "TAFE or college": {
+      "alp": 28,
+      "lnp": 13,
+      "onp": 36,
+      "grn": 11,
+      "oth": 12
+     },
+     "University": {
+      "alp": 35,
+      "lnp": 21,
+      "onp": 18,
+      "grn": 16,
+      "oth": 10
+     }
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 17,
+    "onp": 30,
+    "grn": 13,
+    "oth": 11
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-07-08",
+   "dateStart": "2026-07-03",
+   "sample": 2694,
+   "article": "https://www.capitalbrief.com/newsletter/pauline-hansons-agenda-takes-a-hit-in-new-poll-701d8498-f9f1-43f6-ab7c-dd8d236dfa78/",
+   "source": "https://demosau.com/wp-content/uploads/2026/07/Capital-BriefDemosAU-Federal-Poll-July-2026.pdf",
+   "read": "measured from the charts",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 27,
+      "onp": 30,
+      "lnp": 21,
+      "grn": 11,
+      "oth": 11
+     },
+     "Women": {
+      "alp": 24,
+      "onp": 28,
+      "lnp": 22,
+      "grn": 16,
+      "oth": 10
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 28,
+      "onp": 21,
+      "lnp": 13,
+      "grn": 29,
+      "oth": 9
+     },
+     "35–54": {
+      "alp": 26,
+      "onp": 32,
+      "lnp": 18,
+      "grn": 14,
+      "oth": 10
+     },
+     "55+": {
+      "alp": 25,
+      "onp": 31,
+      "lnp": 28,
+      "grn": 5,
+      "oth": 11
+     }
+    },
+    "education": {
+     "School": {
+      "alp": 25,
+      "onp": 30,
+      "lnp": 24,
+      "grn": 10,
+      "oth": 11
+     },
+     "TAFE": {
+      "alp": 22,
+      "onp": 35,
+      "lnp": 19,
+      "grn": 14,
+      "oth": 10
+     },
+     "University": {
+      "alp": 31,
+      "onp": 21,
+      "lnp": 19,
+      "grn": 19,
+      "oth": 10
+     }
+    }
+   },
+   "fit": 0.05
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-07-12",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 22.88,
+      "alp": 29.37,
+      "grn": 21.22,
+      "onp": 18.07,
+      "oth": 8.45
+     },
+     "35–54": {
+      "lnp": 19.32,
+      "alp": 32.05,
+      "grn": 10.81,
+      "onp": 27,
+      "oth": 10.82
+     },
+     "55+": {
+      "lnp": 26.68,
+      "alp": 24.47,
+      "grn": 4.92,
+      "onp": 31.56,
+      "oth": 12.38
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 24.04,
+      "alp": 29.92,
+      "grn": 8.43,
+      "onp": 26.98,
+      "oth": 10.64
+     },
+     "Women": {
+      "lnp": 22.27,
+      "alp": 26.93,
+      "grn": 14.47,
+      "onp": 25.48,
+      "oth": 10.85
+     }
+    }
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-07-14",
+   "dateStart": "2026-07-07",
+   "sample": 1468,
+   "article": "https://www.skynews.com.au/australia-news/politics/pauline-hansons-monoculture-call-sees-one-nation-support-slide-as-labor-regains-poll-lead-in-sky-news-pulse/news-story/ff02004ef7e9634e18b54b227fba984b",
+   "source": "https://e.infogram.com/_/pL018pKKkRErkzkegdv6",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 31,
+      "lnp": 19,
+      "onp": 29,
+      "grn": 8,
+      "oth": 13
+     },
+     "Women": {
+      "alp": 26,
+      "lnp": 20,
+      "onp": 24,
+      "grn": 16,
+      "oth": 14
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 27,
+      "lnp": 12,
+      "onp": 17,
+      "grn": 28,
+      "oth": 17
+     },
+     "35–49": {
+      "alp": 31,
+      "lnp": 19,
+      "onp": 25,
+      "grn": 12,
+      "oth": 14
+     },
+     "50+": {
+      "alp": 27,
+      "lnp": 25,
+      "onp": 32,
+      "grn": 4,
+      "oth": 12
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 24,
+      "lnp": 9,
+      "onp": 14,
+      "grn": 35,
+      "oth": 18
+     },
+     "Millennials": {
+      "alp": 29,
+      "lnp": 17,
+      "onp": 25,
+      "grn": 13,
+      "oth": 15
+     },
+     "Gen X": {
+      "alp": 28,
+      "lnp": 21,
+      "onp": 30,
+      "grn": 6,
+      "oth": 15
+     },
+     "Boomers": {
+      "alp": 30,
+      "lnp": 27,
+      "onp": 30,
+      "grn": 3,
+      "oth": 10
+     },
+     "Silent": {
+      "alp": 17,
+      "lnp": 29,
+      "onp": 46,
+      "grn": 6,
+      "oth": 2
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 26,
+      "lnp": 20,
+      "onp": 30,
+      "grn": 12,
+      "oth": 12
+     },
+     "TAFE or college": {
+      "alp": 24,
+      "lnp": 17,
+      "onp": 30,
+      "grn": 12,
+      "oth": 17
+     },
+     "University": {
+      "alp": 35,
+      "lnp": 23,
+      "onp": 17,
+      "grn": 13,
+      "oth": 12
+     }
+    }
+   },
+   "total": {
+    "alp": 28,
+    "lnp": 20,
+    "onp": 26,
+    "grn": 12,
+    "oth": 14
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-07-28",
+   "dateStart": "2026-07-21",
+   "sample": 1519,
+   "article": "https://www.news24.com.au/politics/australian-politics/labor-on-lowest-majoritywinning-vote-since-federation-as-voters-turn-on-major-parties-news24-pulse/news-story/30abb89ce081815670d1a05c4517f90e",
+   "source": "https://e.infogram.com/_/cEkYPVrn9ybfCGXAflmL",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 29,
+      "lnp": 24,
+      "onp": 28,
+      "grn": 10,
+      "oth": 9
+     },
+     "Women": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 23,
+      "grn": 15,
+      "oth": 14
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 31,
+      "lnp": 13,
+      "onp": 15,
+      "grn": 31,
+      "oth": 10
+     },
+     "35–49": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 25,
+      "grn": 10,
+      "oth": 15
+     },
+     "50+": {
+      "alp": 26,
+      "lnp": 27,
+      "onp": 31,
+      "grn": 5,
+      "oth": 11
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 31,
+      "lnp": 12,
+      "onp": 11,
+      "grn": 35,
+      "oth": 11
+     },
+     "Millennials": {
+      "alp": 30,
+      "lnp": 18,
+      "onp": 26,
+      "grn": 14,
+      "oth": 12
+     },
+     "Gen X": {
+      "alp": 27,
+      "lnp": 26,
+      "onp": 26,
+      "grn": 9,
+      "oth": 13
+     },
+     "Boomers": {
+      "alp": 29,
+      "lnp": 24,
+      "onp": 31,
+      "grn": 3,
+      "oth": 13
+     },
+     "Silent": {
+      "alp": 8,
+      "lnp": 47,
+      "onp": 37,
+      "grn": 1,
+      "oth": 8
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 24,
+      "lnp": 23,
+      "onp": 32,
+      "grn": 11,
+      "oth": 10
+     },
+     "TAFE or college": {
+      "alp": 30,
+      "lnp": 19,
+      "onp": 28,
+      "grn": 12,
+      "oth": 11
+     },
+     "University": {
+      "alp": 33,
+      "lnp": 22,
+      "onp": 14,
+      "grn": 16,
+      "oth": 14
+     }
+    }
+   },
+   "total": {
+    "alp": 28,
+    "lnp": 22,
+    "onp": 25,
+    "grn": 13,
+    "oth": 12
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-07-30",
+   "dateStart": "2026-07-27",
+   "sample": 1001,
+   "article": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6",
+   "source": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-july-2026-federal-poll",
+   "read": "published table",
+   "dims": {
+    "softness": {
+     "Solid": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 37,
+      "grn": 8,
+      "oth": 5
+     },
+     "Soft": {
+      "alp": 28,
+      "lnp": 23,
+      "onp": 27,
+      "grn": 13,
+      "oth": 9
+     },
+     "Very soft": {
+      "alp": 31,
+      "lnp": 21,
+      "onp": 16,
+      "grn": 11,
+      "oth": 21
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 26,
+      "lnp": 16,
+      "onp": 21,
+      "grn": 27,
+      "oth": 10
+     },
+     "Millennials": {
+      "alp": 30,
+      "lnp": 22,
+      "onp": 29,
+      "grn": 12,
+      "oth": 7
+     },
+     "Gen X": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 35,
+      "grn": 7,
+      "oth": 11
+     },
+     "Boomers": {
+      "alp": 30,
+      "lnp": 26,
+      "onp": 35,
+      "grn": 3,
+      "oth": 6
+     }
+    },
+    "gender": {
+     "Women": {
+      "alp": 29,
+      "lnp": 21,
+      "onp": 29,
+      "grn": 13,
+      "oth": 8
+     },
+     "Men": {
+      "alp": 29,
+      "lnp": 22,
+      "onp": 33,
+      "grn": 8,
+      "oth": 8
+     }
+    },
+    "location": {
+     "Inner Metropolitan": {
+      "alp": 35,
+      "lnp": 23,
+      "onp": 21,
+      "grn": 12,
+      "oth": 9
+     },
+     "Outer Metropolitan": {
+      "alp": 27,
+      "lnp": 23,
+      "onp": 34,
+      "grn": 12,
+      "oth": 4
+     },
+     "Provincial": {
+      "alp": 30,
+      "lnp": 18,
+      "onp": 32,
+      "grn": 10,
+      "oth": 10
+     },
+     "Rural": {
+      "alp": 24,
+      "lnp": 20,
+      "onp": 39,
+      "grn": 6,
+      "oth": 11
+     }
+    },
+    "education": {
+     "Below Year 12": {
+      "alp": 21,
+      "lnp": 26,
+      "onp": 44,
+      "grn": 4,
+      "oth": 5
+     },
+     "Year 12": {
+      "alp": 28,
+      "lnp": 22,
+      "onp": 31,
+      "grn": 12,
+      "oth": 7
+     },
+     "TAFE or trade": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 35,
+      "grn": 9,
+      "oth": 9
+     },
+     "University": {
+      "alp": 35,
+      "lnp": 23,
+      "onp": 20,
+      "grn": 13,
+      "oth": 9
+     }
+    },
+    "housing": {
+     "Owned outright": {
+      "alp": 29,
+      "lnp": 25,
+      "onp": 35,
+      "grn": 5,
+      "oth": 6
+     },
+     "Owned with a mortgage": {
+      "alp": 29,
+      "lnp": 22,
+      "onp": 31,
+      "grn": 11,
+      "oth": 7
+     },
+     "Renting and other": {
+      "alp": 29,
+      "lnp": 17,
+      "onp": 27,
+      "grn": 16,
+      "oth": 11
+     }
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 22,
+    "onp": 31,
+    "grn": 10,
+    "oth": 8
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-08-10",
+   "dateStart": "2026-08-04",
+   "sample": 1511,
+   "article": "https://www.news24.com.au/politics/australian-politics/coalition-and-one-nation-face-vote-consolidation-battle-to-oust-albanese-as-formal-alliance-ruled-out/news-story/647c039e1efc5027e63a509879724195",
+   "source": "https://e.infogram.com/_/bfCWmJWwJrLP0zgZOSEt",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 29,
+      "lnp": 22,
+      "onp": 25,
+      "grn": 11,
+      "oth": 12
+     },
+     "Women": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 24,
+      "grn": 13,
+      "oth": 16
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 31,
+      "lnp": 16,
+      "onp": 11,
+      "grn": 25,
+      "oth": 17
+     },
+     "35–49": {
+      "alp": 28,
+      "lnp": 16,
+      "onp": 28,
+      "grn": 13,
+      "oth": 14
+     },
+     "50+": {
+      "alp": 26,
+      "lnp": 27,
+      "onp": 30,
+      "grn": 5,
+      "oth": 11
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 32,
+      "lnp": 14,
+      "onp": 7,
+      "grn": 25,
+      "oth": 22
+     },
+     "Millennials": {
+      "alp": 29,
+      "lnp": 17,
+      "onp": 21,
+      "grn": 18,
+      "oth": 15
+     },
+     "Gen X": {
+      "alp": 29,
+      "lnp": 19,
+      "onp": 31,
+      "grn": 8,
+      "oth": 13
+     },
+     "Boomers": {
+      "alp": 25,
+      "lnp": 30,
+      "onp": 31,
+      "grn": 3,
+      "oth": 11
+     },
+     "Silent": {
+      "alp": 21,
+      "lnp": 53,
+      "onp": 22,
+      "grn": 0,
+      "oth": 4
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 28,
+      "lnp": 21,
+      "onp": 27,
+      "grn": 10,
+      "oth": 14
+     },
+     "TAFE or college": {
+      "alp": 24,
+      "lnp": 19,
+      "onp": 29,
+      "grn": 12,
+      "oth": 16
+     },
+     "University": {
+      "alp": 31,
+      "lnp": 25,
+      "onp": 16,
+      "grn": 15,
+      "oth": 13
+     }
+    }
+   },
+   "total": {
+    "alp": 28,
+    "lnp": 22,
+    "onp": 24,
+    "grn": 12,
+    "oth": 14
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-08-16",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 20.69,
+      "alp": 31.21,
+      "grn": 27.62,
+      "onp": 12.15,
+      "oth": 8.34
+     },
+     "35–54": {
+      "lnp": 21.56,
+      "alp": 29.02,
+      "grn": 9.83,
+      "onp": 29.34,
+      "oth": 10.24
+     },
+     "55+": {
+      "lnp": 26.33,
+      "alp": 25.37,
+      "grn": 3.76,
+      "onp": 32.39,
+      "oth": 12.16
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 23.54,
+      "alp": 29.54,
+      "grn": 11.34,
+      "onp": 25.12,
+      "oth": 10.46
+     },
+     "Women": {
+      "lnp": 22.86,
+      "alp": 26.87,
+      "grn": 13.36,
+      "onp": 26.43,
+      "oth": 10.48
+     }
+    }
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-08-20",
+   "dateStart": "2026-08-18",
+   "sample": 1562,
+   "article": "https://www.capitalbrief.com/newsletter/hanson-support-plunges-in-new-poll-7ec0e908-55c4-434a-bd91-97190dcf30ff/",
+   "source": "https://demosau.com/wp-content/uploads/2026/08/Capital-BriefDemosAU-Federal-Poll-August-2026.pdf",
+   "read": "measured from the charts",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 26,
+      "grn": 9,
+      "oth": 13,
+      "onp": 26,
+      "lnp": 26
+     },
+     "Women": {
+      "alp": 27,
+      "grn": 15,
+      "oth": 12,
+      "onp": 22,
+      "lnp": 24
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 30,
+      "grn": 26,
+      "oth": 8,
+      "onp": 19,
+      "lnp": 17
+     },
+     "35–54": {
+      "alp": 27,
+      "grn": 13,
+      "oth": 14,
+      "onp": 24,
+      "lnp": 22
+     },
+     "55+": {
+      "alp": 24,
+      "grn": 2,
+      "oth": 15,
+      "onp": 27,
+      "lnp": 32
+     }
+    },
+    "education": {
+     "School": {
+      "alp": 26,
+      "grn": 11,
+      "oth": 13,
+      "onp": 25,
+      "lnp": 25
+     },
+     "TAFE": {
+      "alp": 24,
+      "grn": 11,
+      "oth": 15,
+      "onp": 31,
+      "lnp": 19
+     },
+     "University": {
+      "alp": 29,
+      "grn": 14,
+      "oth": 11,
+      "onp": 15,
+      "lnp": 31
+     }
+    }
+   },
+   "fit": 0.04
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-08-24",
+   "dateStart": "2026-08-18",
+   "sample": 1510,
+   "article": "https://www.news24.com.au/politics/australian-politics/one-nation-trails-labor-by-three-points-following-a-difficult-parliamentary-fortnight-for-albanese/news-story/d04bde51f5545775296ce13f7e15515e",
+   "source": "https://e.infogram.com/_/YM46DvOTftyx9pNzV67y",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 32,
+      "lnp": 23,
+      "onp": 24,
+      "grn": 10,
+      "oth": 10
+     },
+     "Women": {
+      "alp": 25,
+      "lnp": 19,
+      "onp": 29,
+      "grn": 13,
+      "oth": 13
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 30,
+      "lnp": 12,
+      "onp": 15,
+      "grn": 26,
+      "oth": 17
+     },
+     "35–49": {
+      "alp": 32,
+      "lnp": 19,
+      "onp": 26,
+      "grn": 13,
+      "oth": 10
+     },
+     "50+": {
+      "alp": 27,
+      "lnp": 27,
+      "onp": 33,
+      "grn": 4,
+      "oth": 10
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 33,
+      "lnp": 12,
+      "onp": 12,
+      "grn": 27,
+      "oth": 15
+     },
+     "Millennials": {
+      "alp": 27,
+      "lnp": 16,
+      "onp": 24,
+      "grn": 19,
+      "oth": 14
+     },
+     "Gen X": {
+      "alp": 28,
+      "lnp": 21,
+      "onp": 32,
+      "grn": 6,
+      "oth": 12
+     },
+     "Boomers": {
+      "alp": 29,
+      "lnp": 29,
+      "onp": 31,
+      "grn": 2,
+      "oth": 9
+     },
+     "Silent": {
+      "alp": 20,
+      "lnp": 44,
+      "onp": 27,
+      "grn": 3,
+      "oth": 5
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 27,
+      "lnp": 19,
+      "onp": 34,
+      "grn": 9,
+      "oth": 11
+     },
+     "TAFE or college": {
+      "alp": 27,
+      "lnp": 21,
+      "onp": 29,
+      "grn": 11,
+      "oth": 11
+     },
+     "University": {
+      "alp": 32,
+      "lnp": 24,
+      "onp": 14,
+      "grn": 16,
+      "oth": 14
+     }
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 21,
+    "onp": 26,
+    "grn": 12,
+    "oth": 12
+   }
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-08-28",
+   "dateStart": "2026-08-24",
+   "sample": 1006,
+   "article": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
+   "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
+   "read": "published table",
+   "dims": {
+    "softness": {
+     "Solid": {
+      "alp": 30,
+      "lnp": 22,
+      "onp": 33,
+      "grn": 10,
+      "oth": 5
+     },
+     "Soft": {
+      "alp": 30,
+      "lnp": 22,
+      "onp": 24,
+      "grn": 14,
+      "oth": 10
+     },
+     "Very soft": {
+      "alp": 22,
+      "lnp": 25,
+      "onp": 24,
+      "grn": 9,
+      "oth": 20
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 31,
+      "lnp": 12,
+      "onp": 16,
+      "grn": 32,
+      "oth": 9
+     },
+     "Millennials": {
+      "alp": 27,
+      "lnp": 19,
+      "onp": 32,
+      "grn": 14,
+      "oth": 8
+     },
+     "Gen X": {
+      "alp": 29,
+      "lnp": 21,
+      "onp": 34,
+      "grn": 7,
+      "oth": 9
+     },
+     "Boomers": {
+      "alp": 29,
+      "lnp": 32,
+      "onp": 28,
+      "grn": 2,
+      "oth": 9
+     }
+    },
+    "gender": {
+     "Women": {
+      "alp": 28,
+      "lnp": 20,
+      "onp": 29,
+      "grn": 14,
+      "oth": 9
+     },
+     "Men": {
+      "alp": 30,
+      "lnp": 24,
+      "onp": 28,
+      "grn": 9,
+      "oth": 9
+     }
+    },
+    "location": {
+     "Inner Metropolitan": {
+      "alp": 30,
+      "lnp": 27,
+      "onp": 21,
+      "grn": 13,
+      "oth": 9
+     },
+     "Outer Metropolitan": {
+      "alp": 37,
+      "lnp": 18,
+      "onp": 27,
+      "grn": 14,
+      "oth": 4
+     },
+     "Provincial": {
+      "alp": 25,
+      "lnp": 29,
+      "onp": 24,
+      "grn": 12,
+      "oth": 10
+     },
+     "Rural": {
+      "alp": 22,
+      "lnp": 17,
+      "onp": 41,
+      "grn": 8,
+      "oth": 12
+     }
+    },
+    "education": {
+     "Below Year 12": {
+      "alp": 27,
+      "lnp": 25,
+      "onp": 41,
+      "grn": 3,
+      "oth": 4
+     },
+     "Year 12": {
+      "alp": 28,
+      "lnp": 22,
+      "onp": 17,
+      "grn": 26,
+      "oth": 7
+     },
+     "TAFE or trade": {
+      "alp": 26,
+      "lnp": 19,
+      "onp": 37,
+      "grn": 6,
+      "oth": 12
+     },
+     "University": {
+      "alp": 36,
+      "lnp": 26,
+      "onp": 18,
+      "grn": 13,
+      "oth": 7
+     }
+    },
+    "housing": {
+     "Owned outright": {
+      "alp": 30,
+      "lnp": 29,
+      "onp": 29,
+      "grn": 5,
+      "oth": 7
+     },
+     "Owned with a mortgage": {
+      "alp": 29,
+      "lnp": 18,
+      "onp": 33,
+      "grn": 11,
+      "oth": 9
+     },
+     "Renting and other": {
+      "alp": 29,
+      "lnp": 19,
+      "onp": 21,
+      "grn": 21,
+      "oth": 10
+     }
+    }
+   },
+   "total": {
+    "alp": 29,
+    "lnp": 22,
+    "onp": 28,
+    "grn": 12,
+    "oth": 9
+   }
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-09-08",
+   "dateStart": "2026-09-01",
+   "sample": 1504,
+   "article": "https://www.news24.com.au/politics/australian-politics/pauline-hansons-one-nation-surges-to-top-of-pulse-as-labor-plunges-to-record-low/news-story/334ce8596f4b51edb853c103514385a0",
+   "source": "https://e.infogram.com/_/tffIGyctHfK10P86g4Pb",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 26,
+      "lnp": 20,
+      "onp": 32,
+      "grn": 9,
+      "oth": 13
+     },
+     "Women": {
+      "alp": 26,
+      "lnp": 17,
+      "onp": 28,
+      "grn": 14,
+      "oth": 15
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 26,
+      "lnp": 11,
+      "onp": 16,
+      "grn": 27,
+      "oth": 20
+     },
+     "35–49": {
+      "alp": 32,
+      "lnp": 17,
+      "onp": 29,
+      "grn": 10,
+      "oth": 12
+     },
+     "50+": {
+      "alp": 24,
+      "lnp": 23,
+      "onp": 38,
+      "grn": 5,
+      "oth": 11
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 29,
+      "lnp": 12,
+      "onp": 9,
+      "grn": 31,
+      "oth": 19
+     },
+     "Millennials": {
+      "alp": 28,
+      "lnp": 15,
+      "onp": 26,
+      "grn": 14,
+      "oth": 17
+     },
+     "Gen X": {
+      "alp": 29,
+      "lnp": 18,
+      "onp": 35,
+      "grn": 7,
+      "oth": 11
+     },
+     "Boomers": {
+      "alp": 23,
+      "lnp": 25,
+      "onp": 37,
+      "grn": 4,
+      "oth": 11
+     },
+     "Silent": {
+      "alp": 13,
+      "lnp": 19,
+      "onp": 54,
+      "grn": 3,
+      "oth": 11
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 26,
+      "lnp": 18,
+      "onp": 34,
+      "grn": 12,
+      "oth": 10
+     },
+     "TAFE or college": {
+      "alp": 22,
+      "lnp": 17,
+      "onp": 34,
+      "grn": 10,
+      "oth": 17
+     },
+     "University": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 20,
+      "grn": 14,
+      "oth": 17
+     }
+    }
+   },
+   "total": {
+    "alp": 26,
+    "lnp": 18,
+    "onp": 30,
+    "grn": 12,
+    "oth": 14
+   }
+  },
+  {
+   "pollster": "Resolve",
+   "date": "2026-09-13",
+   "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
+   "read": "published series",
+   "dims": {
+    "age": {
+     "18–34": {
+      "lnp": 17.88,
+      "alp": 30.91,
+      "grn": 23.83,
+      "onp": 17.21,
+      "oth": 10.17
+     },
+     "35–54": {
+      "lnp": 23.48,
+      "alp": 32.07,
+      "grn": 11.34,
+      "onp": 24.37,
+      "oth": 8.75
+     },
+     "55+": {
+      "lnp": 28.86,
+      "alp": 22.89,
+      "grn": 2.92,
+      "onp": 35.52,
+      "oth": 9.81
+     }
+    },
+    "gender": {
+     "Men": {
+      "lnp": 23.55,
+      "alp": 29.51,
+      "grn": 10,
+      "onp": 27.7,
+      "oth": 9.24
+     },
+     "Women": {
+      "lnp": 24.24,
+      "alp": 27.11,
+      "grn": 13.42,
+      "onp": 25.38,
+      "oth": 9.86
+     }
+    }
+   }
+  },
+  {
+   "pollster": "DemosAU",
+   "date": "2026-09-14",
+   "dateStart": "2026-09-10",
+   "sample": 1583,
+   "article": "https://www.capitalbrief.com/newsletter/exclusive-poll-voters-back-social-media-reform-fbd908f1-a09e-4d1e-9713-9c8c02dd0d31/",
+   "source": "https://demosau.com/wp-content/uploads/2026/09/Capital-BriefDemosAU-Federal-Poll-September-2026.pdf",
+   "read": "measured from the charts",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 28,
+      "grn": 12,
+      "oth": 13,
+      "lnp": 21,
+      "onp": 26
+     },
+     "Women": {
+      "alp": 27,
+      "grn": 14,
+      "oth": 14,
+      "lnp": 20,
+      "onp": 25
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 38,
+      "grn": 22,
+      "oth": 9,
+      "lnp": 15,
+      "onp": 16
+     },
+     "35–54": {
+      "alp": 26,
+      "grn": 13,
+      "oth": 13,
+      "lnp": 21,
+      "onp": 27
+     },
+     "55+": {
+      "alp": 23,
+      "grn": 7,
+      "oth": 16,
+      "lnp": 23,
+      "onp": 31
+     }
+    },
+    "education": {
+     "School": {
+      "alp": 29,
+      "grn": 13,
+      "oth": 16,
+      "lnp": 17,
+      "onp": 25
+     },
+     "TAFE": {
+      "alp": 24,
+      "grn": 11,
+      "oth": 11,
+      "lnp": 20,
+      "onp": 34
+     },
+     "University": {
+      "alp": 30,
+      "grn": 15,
+      "oth": 13,
+      "lnp": 25,
+      "onp": 17
+     }
+    }
+   },
+   "fit": 0.04
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-09-21",
+   "dateStart": "2026-09-15",
+   "sample": 1500,
+   "article": "https://www.news24.com.au/politics/australian-politics/one-nation-holds-the-lead-over-labor-as-hanson-captures-millennial-and-gen-x-voters/news-story/40e134f4ad5a17de499da9548ee56209",
+   "source": "https://e.infogram.com/_/XdWD62anjLF6u5scKfkU",
+   "read": "published table",
+   "dims": {
+    "gender": {
+     "Men": {
+      "alp": 23,
+      "lnp": 21,
+      "onp": 29,
+      "grn": 12,
+      "oth": 15
+     },
+     "Women": {
+      "alp": 28,
+      "lnp": 21,
+      "onp": 25,
+      "grn": 15,
+      "oth": 11
+     }
+    },
+    "age": {
+     "18–34": {
+      "alp": 25,
+      "lnp": 11,
+      "onp": 18,
+      "grn": 27,
+      "oth": 19
+     },
+     "35–49": {
+      "alp": 24,
+      "lnp": 19,
+      "onp": 28,
+      "grn": 16,
+      "oth": 13
+     },
+     "50+": {
+      "alp": 27,
+      "lnp": 27,
+      "onp": 31,
+      "grn": 5,
+      "oth": 10
+     }
+    },
+    "generation": {
+     "Gen Z": {
+      "alp": 22,
+      "lnp": 12,
+      "onp": 11,
+      "grn": 36,
+      "oth": 19
+     },
+     "Millennials": {
+      "alp": 26,
+      "lnp": 16,
+      "onp": 28,
+      "grn": 15,
+      "oth": 15
+     },
+     "Gen X": {
+      "alp": 23,
+      "lnp": 22,
+      "onp": 34,
+      "grn": 10,
+      "oth": 11
+     },
+     "Boomers": {
+      "alp": 31,
+      "lnp": 26,
+      "onp": 29,
+      "grn": 4,
+      "oth": 10
+     },
+     "Silent": {
+      "alp": 20,
+      "lnp": 48,
+      "onp": 22,
+      "grn": 4,
+      "oth": 5
+     }
+    },
+    "education": {
+     "Year 12 or less": {
+      "alp": 22,
+      "lnp": 21,
+      "onp": 30,
+      "grn": 16,
+      "oth": 11
+     },
+     "TAFE or college": {
+      "alp": 27,
+      "lnp": 17,
+      "onp": 31,
+      "grn": 10,
+      "oth": 16
+     },
+     "University": {
+      "alp": 30,
+      "lnp": 26,
+      "onp": 17,
+      "grn": 14,
+      "oth": 12
+     }
+    }
+   },
+   "total": {
+    "alp": 26,
+    "lnp": 21,
+    "onp": 27,
+    "grn": 14,
+    "oth": 12
+   }
+  }
+ ],
+ "skipped": [
+  {
+   "pollster": "DemosAU",
+   "date": "2026-02-20",
+   "reason": "the February report predates the Gender, Age and Education charts (an older layout)"
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-03-19",
+   "reason": "an Australia Institute poll – no crosstab published"
+  },
+  {
+   "pollster": "RedBridge/Accent",
+   "date": "2026-03-27",
+   "reason": "filed from the AFR article – Accent's March report was never cached"
+  },
+  {
+   "pollster": "YouGov",
+   "date": "2026-06-16",
+   "reason": "the wave's article carries no crosstab"
+  }
+ ]
+}
