@@ -665,6 +665,30 @@ const metaDesc = `Aggregated opinion polling for the next Australian federal ele
   + `set against the last ${pastCycleWord()}. ${raceLine(cl)} two-party preferred${basisClause(cl)} (±${cl.alp2ppCi95}) `
   + `– updated ${cl.updated} from ${cl.pollsTracked} published polls across ${cl.housesTracked} polling houses.`;
 
+/* Structured data. With no Wikipedia entry, Google's knowledge of the site
+   (and its "About this result" source panel) is auto-derived from crawled
+   text; schema.org markup is the one channel that states the facts directly.
+   WebSite + its publisher Organization reuses metaDesc so the declared
+   description can never drift from the one crawlers see. "<" is escaped the
+   JSON way so a stray "</" in the copy can't end the script early. */
+const websiteJsonLd = `<script type="application/ld+json">${
+  JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "auspol tracker",
+    alternateName: "auspoltracker.com",
+    url: SITE_URL,
+    description: metaDesc,
+    inLanguage: "en-AU",
+    publisher: {
+      "@type": "Organization",
+      name: "auspol tracker",
+      url: SITE_URL,
+      ...(favPng ? { logo: `${SITE_URL}assets/favicon-192.png` } : {}),
+    },
+  }).replace(/</g, "\\u003c")
+}</script>`;
+
 /* og:site_name must NOT equal the masthead h1 text: Safari Reader skips any
    title candidate whose text equals og:site_name when og:title exists (its
    site-name de-dup), so "auspol tracker" here disqualified the h1 and let
@@ -690,7 +714,8 @@ html = html.replace(OG_ANCHOR,
   <link rel="alternate" type="application/rss+xml" title="auspol tracker – new polls" href="${SITE_URL}feed.xml">
   ${favPng ? `<link rel="icon" type="image/png" sizes="192x192" href="${SITE_URL}assets/favicon-192.png">
   ` : ""}<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,${favicon}">
-  ${fontLinks.join("\n  ")}`);
+  ${fontLinks.join("\n  ")}
+  ${websiteJsonLd}`);
 
 /* ---- 5. inline every script ------------------------------------------- */
 const parts = [];

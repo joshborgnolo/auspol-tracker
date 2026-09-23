@@ -43,6 +43,7 @@
   <link rel="preload" href="assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/sourceserif4-latin.2a24bad4.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"auspol tracker","alternateName":"auspoltracker.com","url":"https://auspoltracker.com/","description":"Aggregated opinion polling for the next Australian federal election, set against the last twenty. Labor leads the Coalition 51.6–48.4 two-party preferred on implied preference flows (±1.2) – updated 21 September 2026 from 163 published polls across 12 polling houses.","inLanguage":"en-AU","publisher":{"@type":"Organization","name":"auspol tracker","url":"https://auspoltracker.com/","logo":"https://auspoltracker.com/assets/favicon-192.png"}}</script>
   <style>
 @font-face {
   font-family: 'Crimson Text';
@@ -39428,6 +39429,7 @@ function CycleChart({
   const dotsOn = !!shapes && shown.length > 0 && shown.length <= CYC_DOT_MAX;
   const shownKey = shown.map(c => c.year).join(",");
   const liftKey = [...lifted].sort((a, b) => a - b).join(",");
+  const srcTerms = Object.keys(D.cycleSource || {}).length;
   const scatter = React.useMemo(() => !dotsOn ? [] : shown.flatMap(c => {
     const base = cycBase(c, M.key);
     const leadName = M.key === "ppmm" ? c.raw.ppmPair : isOpp ? c.oppLead : c.lead;
@@ -39452,7 +39454,7 @@ function CycleChart({
         op: dim ? 0.3 : 1
       };
     });
-  }), [dotsOn, shownKey, M.key, isOpp, chg, hi, liftKey]);
+  }), [dotsOn, shownKey, M.key, isOpp, chg, hi, liftKey, srcTerms]);
   if (hanCtl && showHan) {
     const hBase = cycBase(hanCycle, "han");
     const pts = hanCycle.raw.months.map((m, i) => ({
