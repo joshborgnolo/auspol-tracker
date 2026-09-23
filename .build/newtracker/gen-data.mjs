@@ -2081,12 +2081,19 @@ const primaryNow = primaryNowAt(refNow);
    group-level house effect could never be estimated from four houses – and
    puts every group on the level of the figures the site quotes. Groups pool
    only where the houses cut the population the same way (demo-groups.mjs).
-   A group's five shares are rescaled to 100, as every primary set is.
    The panel's charts carry each group's MONTHLY line too, built as every
    monthly line here is (monthWithSe: sample-weighted, repeat waves as
    sqrt(m)), each month's pooled gaps added to that month's aggregate
    primaries – so a group's line sits against the all-voters line the way its
-   current figure sits against the current primaries. */
+   current figure sits against the current primaries.
+   The anchor is the quoted set exactly as quoted, never rescaled to 100. §7e
+   and aggPrimary deliberately leave a set short of 100 (99.7, say) unless
+   the house adjustment drifts, and rescaling it here read +0.1 on the
+   biggest parties: an all-voters row billed as the headline's own figure
+   that didn't match the hero. A poll's gaps sum to zero (its group and its
+   total are both taken to 100 first), so each group sums to its anchor's
+   total; a group is rescaled only when a share is clamped at zero, and then
+   to that total. */
 const DEMO_KEYS = ["alp", "lnp", "onp", "grn", "oth"];
 const demoNorm = (s) => {
   const t = DEMO_KEYS.reduce((a, k) => a + (+s[k] || 0), 0);
@@ -2098,9 +2105,11 @@ const demoTotalOf = (w, p) => (w.total && Object.keys(w.total).length ? demoNorm
 const demographics = (() => {
   const waves = Array.isArray(DEMOGRAPHICS?.waves) ? DEMOGRAPHICS.waves : [];
   if (!waves.length || !primaryNow) return null;
-  const ALL = demoNorm(primaryNow);
-  // each month's aggregate primaries, rescaled to the five keys (the monthly anchor)
-  const allByYm = new Map(aggPrimary.filter((d) => !d.election).map((d) => [d.ym, demoNorm(d)]));
+  const pick = (s) => Object.fromEntries(DEMO_KEYS.map((k) => [k, s[k]]));
+  const total = (s) => DEMO_KEYS.reduce((a, k) => a + s[k], 0);
+  const ALL = pick(primaryNow), ALL_T = total(ALL);
+  // each month's aggregate primaries as the primary chart draws them (the monthly anchor)
+  const allByYm = new Map(aggPrimary.filter((d) => !d.election).map((d) => [d.ym, pick(d)]));
   const rows = {};                                // "set|group|party" -> nowcast rows
   const rowsM = {};                               // … -> monthly rows, anchored on each month's primaries
   const inWindow = [];                            // the waves the window holds, for the credits
@@ -2136,11 +2145,12 @@ const demographics = (() => {
         const m = DEMO_KEYS.map((k) => monthWithSe(rowsM[key(k)] || [], null, ym));
         if (m.some((e) => !e)) return null;
         const mv = m.map((e) => Math.max(0, e.v)), mt = mv.reduce((a, b) => a + b, 0);
-        return [ym, ...mv.map((v) => r1(100 * v / mt))];
+        const T = total(allByYm.get(ym));
+        return [ym, ...mv.map((v) => r1(T * v / mt))];
       }).filter(Boolean);
       return {
         label: group,
-        v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(100 * raw[k] / t)])),
+        v: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(ALL_T * raw[k] / t)])),
         ci: Object.fromEntries(DEMO_KEYS.map((k) => [k, r1(1.96 * est[k].se)])),
         n: est.alp.n, houses: housesIn(rows[key("alp")] || []), monthly,
       };
@@ -2168,6 +2178,16 @@ const demographics = (() => {
     })),
   };
 })();
+/* The all-voters row and dashed line ARE the quoted figures – the panel bills
+   them as the headline's own – so a rescale creeping back in fails the build
+   instead of shipping a second current figure beside the hero's. */
+if (demographics) {
+  const aggBy = new Map(aggPrimary.map((d) => [d.ym, d]));
+  const off = [["now", demographics.all, primaryNow],
+    ...demographics.allMonthly.map(([ym, ...v]) => [ym, Object.fromEntries(DEMO_KEYS.map((k, i) => [k, v[i]])), aggBy.get(ym)])]
+    .filter(([, a, q]) => DEMO_KEYS.some((k) => a[k] !== q[k]));
+  if (off.length) throw new Error(`vote-by-group all voters != the quoted primaries at ${off.map(([w]) => w).join(", ")} – the panel would contradict the hero and the primary chart`);
+}
 
 /* ---- 7f. ALP–ON current figure: primaries through the first-principles
    flow set ---------------------------------------------------------------
