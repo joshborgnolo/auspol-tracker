@@ -488,6 +488,19 @@ function buildStaticSummary() {
         one house inside a window or a calendar month count for the square root of their number,
         so three weekly waves count as 1.7, not 3.</p>
 
+      ${/* The ALP v ON implied nowcast (latest.onImp, null when thin) – the
+           second contest the page headlines, so the article carries it too.
+           Its ± stacks the flow table's own ranges, not sampling error, and
+           its basis is the first-principles set, not the 2025 flows – the
+           sentence has to say both, since the classic pair above is. */
+      L.onImp ? `<p>Against One Nation the implied reading is
+        <b>Labor ${L.onImp.a.toFixed(1)}%</b> &#183; <b>One Nation ${L.onImp.b.toFixed(1)}%</b>
+        (&#177;${L.onImp.band.toFixed(1)} on the flow table, not the sample). No election
+        night has ever counted a Labor v One Nation finish, so that figure runs on the
+        site&#8217;s own first-principles preference set rather than the 2025
+        election&#8217;s flows; the pollsters&#8217; few printed head-to-heads sit beside
+        it on the live chart.</p>` : ""}
+
       <h2>Primary vote</h2>
       <table class="ss-primary">
         <thead>

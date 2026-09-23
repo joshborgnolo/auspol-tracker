@@ -2733,6 +2733,14 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
         one house inside a window or a calendar month count for the square root of their number,
         so three weekly waves count as 1.7, not 3.</p>
 
+      <p>Against One Nation the implied reading is
+        <b>Labor 51.2%</b> &#183; <b>One Nation 48.8%</b>
+        (&#177;1.3 on the flow table, not the sample). No election
+        night has ever counted a Labor v One Nation finish, so that figure runs on the
+        site&#8217;s own first-principles preference set rather than the 2025
+        election&#8217;s flows; the pollsters&#8217; few printed head-to-heads sit beside
+        it on the live chart.</p>
+
       <h2>Primary vote</h2>
       <table class="ss-primary">
         <thead>
@@ -42553,16 +42561,16 @@ function AllPollsView({
     className: "ap-2line"
   }, React.createElement(FilterPop, {
     id: "lead",
-    label: "Lead",
+    label: "Contest",
     open: pop,
     setOpen: setPop,
     summary: [measure !== DEFAULT_MEASURE ? MEASURE_LAB[measure] : null, lead !== "all" ? HOLDER_LAB[lead] + " ahead" : null].filter(Boolean).join(" · ") || null
   }, React.createElement("div", {
     className: "ap-pop-head"
-  }, React.createElement("span", null, "Show the lead in")), React.createElement("div", {
+  }, React.createElement("span", null, "Two-party contest")), React.createElement("div", {
     className: "ap-poplist",
     role: "radiogroup",
-    "aria-label": "Lead column matchup"
+    "aria-label": "Two-party contest"
   }, [DEFAULT_MEASURE === "onp" ? "onp" : "lnp", DEFAULT_MEASURE === "onp" ? "lnp" : "onp", "lnponp", "3cp"].map(m => React.createElement(PopRow, {
     key: m,
     radio: true,
