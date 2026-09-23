@@ -2578,16 +2578,21 @@ function pubStamp(published, opts) {
   const cl = /T(\d{2}):(\d{2})/.exec(published);
   return cl ? `${date}, ${zoned(clockLabel(+cl[1] * 60 + +cl[2]), Date.parse(iso))}` : date;
 }
-/* A span is only worth printing while it IS the habit. YouGov has filed at 5am
-   five times and 6am once, so "5-6 am" describes it. Essential has filed at 1am
-   four times and 4:36am once, and "1-4:36 am" would let a single late morning
-   speak for a house that is otherwise punctual to the minute - so past two
-   hours the usual time is stated instead, and the outlier is left to the
-   ± on the day. Two hours rather than ninety minutes because gen-data now
-   trims one sample off each end of the span before it gets here, so what
-   arrives is the habit's own width: Newspoll's 7pm-9pm evening, once the
-   single 7:11am is trimmed, is a real two-hour span and should print as
-   one. */
+/* A span is only worth printing while the recorded times really do run
+   across it. YouGov has filed at 5am and 6am and never between, so a "5-6
+   am" band claims filings that have not happened; gen-data ships the exact
+   filing times (releaseVals) when the record boils down to two or three
+   anchors each observed at least twice, and the honest join is "or". Only
+   where the times genuinely scatter inside the gap (Roy Morgan's
+   afternoons) are there no anchors and the span itself prints. Essential
+   has filed at 1am nine times and 4:36am once, and "1-4:36 am" would let a
+   single late morning speak for a house that is otherwise punctual to the
+   minute - so past two hours the usual time is stated instead, and the
+   outlier is left to the ± on the day. Two hours rather than ninety
+   minutes because gen-data now trims one sample off each end of the span
+   before it gets here, so what arrives is the habit's own width:
+   Newspoll's 7pm-9pm evening, once the single 7:11am is trimmed, is a real
+   two-hour span and should print as one. */
 const RELEASE_TIGHT_MINS = 120;
 /* What the ± is allowed to say once a date has been pinned to a weekday.
    The spread is measured off the gaps between fieldwork-end dates, and quoting
@@ -2608,9 +2613,20 @@ function spreadLabel(r) {
   const weeks = Math.floor((r.spread + 3) / 7);
   return weeks === 0 ? "" : ` ± ${weeks} week${weeks === 1 ? "" : "s"}`;
 }
-function releaseLabel(from, to, mid) {
+function releaseLabel(from, to, mid, vals) {
   if (from == null || to == null) return null;
   if (from === to) return clockLabel(from);
+  /* "5 or 6 am", not "5–6 am": when every filing on record lands on one of
+     two exact times, a dash between them claims the ones in between, and
+     none have happened. The anchors are gen-data's clusters of the same
+     observed samples the span is measured over, so this wins over both the
+     span and the median the moment gen-data vouches for them. */
+  if (vals && vals.length >= 2) {
+    const ps = vals.map(clockParts);
+    return ps.every((p) => p.ap === ps[0].ap)
+      ? `${ps.slice(0, -1).map((p) => p.num).join(", ")} or ${ps[ps.length - 1].num} ${ps[0].ap}`
+      : vals.slice(0, -1).map(clockLabel).join(", ") + ` or ${clockLabel(vals[vals.length - 1])}`;
+  }
   if (to - from > RELEASE_TIGHT_MINS) return clockLabel(Math.round(mid != null ? mid : (from + to) / 2));
   /* "5–6 am", not "5 am–6 am": one meridiem serves a span inside it, and the
      dash is the tight unspaced one every other range on the page uses. */
@@ -2785,7 +2801,7 @@ function NextPollsPanel() {
         {rows.map((r) => {
           const key = r.pollster + "-" + r.release;
           const isOpen = open === key;
-          const hour = releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid);
+          const hour = releaseLabel(r.releaseFrom, r.releaseTo, r.releaseMid, r.releaseVals);
           const recent = r.recent || [];
           /* The two columns of an overdue row whose window is still open must
              answer with the SAME day. The when column counts to the window's

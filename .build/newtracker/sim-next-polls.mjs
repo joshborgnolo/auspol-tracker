@@ -320,11 +320,12 @@ function eq(name, got, want) {
   // caps (a weekly house appears once, not twice inside the same week).
   // DemosAU's window doesn't open until the 9th, so it is OFF the bar here
   // now (window houses are bar-visible only while open) - a dated-house
-  // ticket from Essential on down.
+  // ticket from Essential on down. YouGov sits out too, its own 21 Sep wave
+  // pushing the next slot past the horizon (re-anchored 2026-09-23 when that
+  // wave landed).
   eq("ticker is the full house roll, nearest slot each", items.map((i) => [i.firm, i.when]),
     [["Essential", "tomorrow"], ["Resolve", "12 days"], ["Roy Morgan", "13 days"],
-     ["Newspoll", "19 days"], ["YouGov", "22 days"],
-     ["RedBridge/Accent", "26 days"]]);
+     ["Newspoll", "19 days"], ["RedBridge/Accent", "26 days"]]);
   {
     const da = firm(rows, "DemosAU");
     eq("DemosAU's window opens on the measured 9th, not the 1st", da && panelWhen(da), "opens in 8 days");
@@ -507,7 +508,7 @@ function eq(name, got, want) {
   eq("ticker order: most overdue first, dated houses only", items.map((i) => [i.firm, i.when]),
     [["Essential", "38 days overdue"], ["Resolve", "27 days overdue"],
      ["Roy Morgan", "26 days overdue"], ["Newspoll", "20 days overdue"],
-     ["YouGov", "17 days overdue"], ["RedBridge/Accent", "13 days overdue"]]);
+     ["RedBridge/Accent", "13 days overdue"], ["YouGov", "3 days overdue"]]);
   const daItems = ticker(rows.filter((r) => r.pollster === "DemosAU"), t0, nowMs);
   eq("a missed window leaves the bar entirely", daItems, []);
 }

@@ -2590,6 +2590,29 @@ for (const [firm, rows] of Object.entries(byHouse)) {
      is robust already, and it is the value the panel decides on. */
   const tsSorted = ts.slice().sort((a, b) => a - b);
   const tsSpan = tsSorted.length >= CAD_TRIM_MIN ? tsSorted.slice(1, -1) : tsSorted;
+  /* A scheduled house files AT a clock time, so its recorded times form a
+     few tight clusters, not a spread: YouGov is 5am twelve times and 6am
+     twice and never once between them, which the label must be able to say
+     as "5 or 6 am" instead of a 5-6am span that claims filings that have
+     never happened. An anchor has to be SEEN twice - a single observation
+     at an exact time is a sample of a scattered habit (Roy Morgan's
+     afternoons), not evidence of a scheduled one; Resolve's near-6pm blog
+     stamps cluster the same way as jitter around one anchor, not as
+     several, and are likewise excluded from the discrete form. A paragraph
+     break at more than four minutes between neighbours splits a cluster;
+     centres ship rounded to five minutes, the filing precision a scheduled
+     release actually keeps. The label, not this row, decides whether the
+     anchors displace the span. */
+  const RELEASE_ANCHOR_GAP = 4;
+  const clusters = [];
+  for (const m of tsSpan) {
+    const lastC = clusters[clusters.length - 1];
+    if (lastC && m - lastC[lastC.length - 1] <= RELEASE_ANCHOR_GAP) lastC.push(m);
+    else clusters.push([m]);
+  }
+  const releaseVals = clusters.length >= 2 && clusters.length <= 3 && clusters.every((c) => c.length >= 2)
+    ? clusters.map((c) => Math.round(c.reduce((a, b) => a + b, 0) / c.length / 5) * 5)
+    : null;
   pollCadence.push({
     pollster: firm,
     last,
@@ -2608,17 +2631,21 @@ for (const [firm, rows] of Object.entries(byHouse)) {
     /* What time of day the house actually files, where enough releases have
        been timed to call it a habit - same five-sample gate the lag uses, for
        the same reason. Reported as the observed SPAN rather than an average:
-       YouGov has filed at 5am five times and 6am once, and "5-6am" is the
-       precise statement about that while "5am" and "5.10am" are both fictions
-       of different kinds. Minutes past midnight, house local time - which is
-       eastern, and is not converted for the reader's own zone because the
-       release schedule is a fact about the publisher, not about the reader. */
+       YouGov has filed at 5am and 6am and never between, and the span's
+       bounds are the honest shape only where the times really do run across
+       it (Roy Morgan); where they cluster on exact anchors, releaseVals
+       carries those and the label says "5 or 6 am" instead. Minutes past
+       midnight, house local time - which is eastern, and is not converted
+       for the reader's own zone because the release schedule is a fact about
+       the publisher, not about the reader. */
     releaseFrom: timed ? Math.min(...tsSpan) : declMins,
     releaseTo: timed ? Math.max(...tsSpan) : declMins,
     // the middle as well as the ends: one late release should not be allowed
     // to widen a house's stated hour into something it almost never does
     releaseMid: timed ? medianOf(ts) : declMins,
     releaseTimed: timed ? ts.length : 0,
+    // 2-3 exact filing times, each observed at least twice, else null
+    releaseVals: timed ? releaseVals : null,
     /* The one clock reading the panel decides ON, as opposed to the ones it
        prints: minutes past midnight, eastern, of the moment a wave is expected
        to be out. Null where the house has never been timed, and the panel then
