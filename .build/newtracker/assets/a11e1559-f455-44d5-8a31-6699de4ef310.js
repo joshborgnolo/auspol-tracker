@@ -1541,21 +1541,31 @@ function UndecidedPanel({ rangeId }) {
 /* One Nation's gain since the 2025 election, split by how the voters it
    gained voted in 2025 – from the vote-switching tables DemosAU and YouGov
    publish (gen-data §5b, data/vote-switching.json). Same furniture as the
-   undecided panel: a reading per group, monthly lines, one dot per poll. */
+   undecided panel: a reading per group, monthly lines, one dot per poll.
+   A second view reads the same tables the other way: the share of each
+   party's 2025 voters now backing One Nation (sr.rate), the rates the split
+   is worked out from. The two can rank parties differently: a party with a
+   big 2025 vote gives a large part of the gain while losing only a small
+   share of its own voters. */
+const ONS_VIEWS = [{ id: "gain", label: "Of One Nation’s gain" }, { id: "rate", label: "Of each party’s voters" }];
 function OnSourcesPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
+  const [view, setView] = useState("gain");
   const S = D.onSources;
   if (!S || !S.series.length) return null;
   /* The houses began publishing these tables in February 2026, so the chart
      starts at its first month rather than at the 2025 election the other
      panels open on – on the full range that would leave most of it empty. */
   const [rangeLo, rangeHi] = rangeDomain(rangeId);
-  const firstX = Math.min(...S.series.map((sr) => (sr.monthly[0] || { x: Infinity }).x));
+  // the view's figures for a group: its part of the gain, or its own rate
+  const rated = view === "rate" && S.series.every((sr) => sr.rate);
+  const src = (sr) => (rated ? sr.rate : sr);
+  const firstX = Math.min(...S.series.map((sr) => (src(sr).monthly[0] || { x: Infinity }).x));
   const xDomain = [Math.max(rangeLo, firstX - 0.06), rangeHi];
   const drawn = S.series.map((sr) => {
-    const pts = filterPts(sr.monthly, xDomain[0]);
-    const dots = sr.polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1])
+    const pts = filterPts(src(sr).monthly, xDomain[0]);
+    const dots = src(sr).polls.filter((d) => d.x >= xDomain[0] && d.x <= xDomain[1])
       .map((d) => ({ x: d.x, y: d.v, color: sr.color, label: sr.label, meta: d }));
     return { sr, pts, dots };
   }).filter((d) => d.pts.length >= 1);
@@ -1572,8 +1582,9 @@ function OnSourcesPanel({ rangeId }) {
      latest month stands in only if the window holds no poll. */
   const monthOf = (ym) => D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
   const reads = S.series.map((sr) => {
-    if (sr.now) return { sr, v: sr.now.v, now: sr.now, chg: sr.now.chg ?? null };
-    const m = sr.monthly, last = m[m.length - 1], prev = m[m.length - 2];
+    const now = src(sr).now;
+    if (now) return { sr, v: now.v, now, chg: now.chg ?? null };
+    const m = src(sr).monthly, last = m[m.length - 1], prev = m[m.length - 2];
     return { sr, v: last.v, ym: last.ym, chg: prev ? +(last.v - prev.v).toFixed(1) : null };
   });
   const [a, b] = reads;
@@ -1583,13 +1594,22 @@ function OnSourcesPanel({ rangeId }) {
         <div>
           <h2 className="card-title">Where One Nation’s new voters came from</h2>
           <p className="card-sub">
-            Share of One Nation’s gain since the 2025 election, by how those voters voted in 2025 · {houseList(S.houses)}
+            {rated ? "Share of each party’s 2025 voters now backing One Nation"
+              : "Share of One Nation’s gain since the 2025 election, by how those voters voted in 2025"} · {houseList(S.houses)}
           </p>
         </div>
       </div>
+      {S.series.every((sr) => sr.rate) && (
+        <div className="ons-ctl">
+          <Segmented options={ONS_VIEWS} value={view} onChange={setView} size="sm" ariaLabel="Figures as a share" />
+        </div>
+      )}
       <p className="ons-lead">
-        {a.now ? "Across the latest polls" : "In " + monthOf(a.ym)}, {a.v.toFixed(1)}% of One Nation’s gain
-        came from people who voted for the Coalition in 2025, and {b.v.toFixed(1)}% from Labor voters.
+        {a.now ? "Across the latest polls" : "In " + monthOf(a.ym)}, {rated
+          ? <>{a.v.toFixed(1)}% of people who voted for the Coalition in 2025 now back One Nation, as
+              do {b.v.toFixed(1)}% of Labor voters.</>
+          : <>{a.v.toFixed(1)}% of One Nation’s gain came from people who voted for the Coalition in 2025,
+              and {b.v.toFixed(1)}% from Labor voters.</>}
       </p>
       <div className="und-reads">
         {reads.map(({ sr, v, chg, now }) => (
@@ -1626,17 +1646,18 @@ function OnSourcesPanel({ rangeId }) {
           .map(({ sr, v }) => ({ label: `${sr.label}  ${v.toFixed(1)}%`, color: sr.color, kind: "line" })) }}
       />
       <p className="table-hint">
-        Each dot is one poll’s split and the lines are monthly averages; the figures above pool the
-        last {S.now ? S.now.window : "six weeks"} of polls.{" "}
+        Each dot is one poll’s {rated ? "figure" : "split"} and the lines are monthly averages; the
+        figures above pool the last {S.now ? S.now.window : "six weeks"} of polls.{" "}
         <button type="button" className="hi-term"
                 onClick={() => window.AP.openTerm && window.AP.openTerm("vote-switching", "Where One Nation’s new voters came from")}>
           How it’s worked out</button>
       </p>
       <HowTo paras={[
         <>Newer polls count for more in the figures above.</>,
-        <>A group’s part is the share of its 2025 voters now backing One Nation, weighted by that
-        group’s share of the 2025 vote – so 38% of Coalition voters counts for far more than 38% of
-        a small party’s.</>,
+        <>The two views come from the same tables. “Of each party’s voters” is the share of each
+        party’s 2025 voters now backing One Nation. Weighted by that party’s share of the 2025 vote,
+        it becomes the party’s part of One Nation’s gain, so 38% of Coalition voters counts for far
+        more than 38% of a small party’s.</>,
         <>Voters who can’t recall a 2025 vote are left out, and so are One Nation’s own 2025
         voters, who are what it kept rather than gained.</>,
       ]} />

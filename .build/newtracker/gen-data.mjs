@@ -1609,7 +1609,22 @@ const onSources = onSourceWaves.length ? {
                              changeSig: Math.abs(onNow.share[g.id] - onPrev.share[g.id]) > 1.96 * seChg });
       }
     }
-    return { ...g, polls, monthly, n: polls.length, now };
+    /* The panel's other view: the rates themselves - the share of this
+       group's 2025 voters now backing One Nation - before any split. The
+       reading is built as every current reading is (six-week window, change
+       on 30 days earlier), the line month by month, a dot per poll. */
+    const rate = {
+      now: currentReading(onRateRows[g.id], null, SPARSE_K),
+      monthly: MONTHS.map((ym) => {
+        const m = monthWithSe(onRateRows[g.id], null, ym);
+        return m && { ym, x: mx(ym), v: r1(m.v), k: m.n };
+      }).filter(Boolean),
+      polls: onSourceWaves.filter((w) => w.toOn[g.id] != null).map((w) => ({
+        x: w.x, ym: w.ym, pollster: w.pollster, dateLabel: fwLabel(w.dateStart, w.date), released: w.date,
+        sample: w.sample ?? null, v: w.toOn[g.id],
+      })),
+    };
+    return { ...g, polls, monthly, n: polls.length, now, rate };
   }),
   // the readings' window: how many waves it held, and whose
   now: onNow ? { drawn: r1(onNow.drawn), window: SPARSE_K.label,

@@ -6290,7 +6290,9 @@ function infoTerms(D) {
         points of the national vote One Nation has drawn from the group, and each group’s part of
         the total is the share the panel shows.{onsYg ? <> In YouGov’s latest poll, {onsYg.toOn.lnp}%
         of Coalition voters backing One Nation is worth {onsYg.pts.lnp.toFixed(1)} points, and
-        {" "}{onsYg.toOn.alp}% of Labor voters is worth {onsYg.pts.alp.toFixed(1)}.</> : null}</span>
+        {" "}{onsYg.toOn.alp}% of Labor voters is worth {onsYg.pts.alp.toFixed(1)}.</> : null} The
+        panel’s other view shows the shares themselves: how much of each party’s 2025 vote One
+        Nation has taken.</span>
         <span className="info-p"><b>A check.</b> Add the 2025 One Nation voters it kept, and every
         poll’s table rebuilds its published One Nation vote to within about a point.</span>
         <span className="info-p"><b>Limits.</b> People misremember how they voted, and memory tends
