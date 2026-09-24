@@ -1685,9 +1685,13 @@ const demoRamp = (color, n, i) => (n < 2 ? color
    chosen party. Two groups differ significantly when their gap exceeds the
    gap's own 95% margin, √(±a² + ±b²): the groups are separate respondents,
    so their errors add in quadrature. Overlapping ± bars alone would miss
-   gaps that are real. Ordered sets (ages, generations) whose every step is
-   significant, one way, read as a trend; otherwise the sentence names the
-   group that stands apart from all the others (the one further from its
+   gaps that are real. With three or four groups the sentence picks from
+   three to six gaps, which unadjusted would find a difference that isn't
+   there one time in five to eight, so Holm's correction raises the bar, as
+   the chart's sentence does: the smallest p against .05/m, the next against
+   .05/(m − 1), and so on. Ordered sets (ages, generations) whose every step
+   is significant, one way, read as a trend; otherwise the sentence names
+   the group that stands apart from all the others (the one further from its
    nearest neighbour, if both ends do), or failing that the widest
    significant gap. */
 const DEMO_WHO = {
@@ -1719,6 +1723,11 @@ const DEMO_SET_WORDS = {
   language: { all: "voters who speak only English at home and those who don’t", others: null, step: null },
 };
 const DEMO_VOTE_FOR = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "a minor party or independent" };
+// P(|Z| > z) for a standard normal (Abramowitz & Stegun 7.1.26, error under 1.5e-7)
+function zTail(z) {
+  const x = Math.abs(z) / Math.SQRT2, t = 1 / (1 + 0.3275911 * x);
+  return t * (0.254829592 + t * (-0.284496736 + t * (1.421413741 + t * (-1.453152027 + t * 1.061405429)))) * Math.exp(-x * x);
+}
 function demoVerdict(st, party) {
   const gs = st.groups.filter((g) => g.v[party] != null && g.ci[party] != null);
   if (gs.length < 2) return null;
@@ -1726,11 +1735,19 @@ function demoVerdict(st, party) {
   const who = (g) => DEMO_WHO[g.label] || g.label;
   const Who = (g) => { const s = who(g); return s[0].toUpperCase() + s.slice(1); };
   const vote = "to vote for " + DEMO_VOTE_FOR[party];
+  // every gap against its own margin: z = gap / √(se_a² + se_b²), each ± being 1.96 se
+  const gaps = gs.flatMap((a, i) => gs.slice(i + 1).map((b) => {
+    const m = Math.hypot(a.ci[party], b.ci[party]);
+    return { a, b, p: m > 0 ? zTail(1.96 * (a.v[party] - b.v[party]) / m) : 1 };
+  }));
+  const sig = new Set();
+  for (const [i, g] of [...gaps].sort((x, y) => x.p - y.p).entries()) {
+    if (g.p >= 0.05 / (gaps.length - i)) break;
+    sig.add(g);
+  }
   // +1 if a is significantly above b, −1 if below, 0 if the polls can't tell
-  const cmp = (a, b) => {
-    const d = a.v[party] - b.v[party];
-    return Math.abs(d) > Math.hypot(a.ci[party], b.ci[party]) ? Math.sign(d) : 0;
-  };
+  const cmp = (a, b) => (sig.has(gaps.find((g) => (g.a === a && g.b === b) || (g.a === b && g.b === a)))
+    ? Math.sign(a.v[party] - b.v[party]) : 0);
   const pairs = gs.flatMap((a, i) => gs.slice(i + 1).map((b) => [a, b, cmp(a, b)])).filter((p) => p[2]);
   if (!pairs.length) return `There is no significant difference between ${words.all}.`;
   if (gs.length === 2) {
@@ -1739,7 +1756,7 @@ function demoVerdict(st, party) {
   }
   if (words.step && gs.length === st.groups.length) {
     const steps = gs.slice(1).map((g, i) => cmp(g, gs[i]));
-    if (steps.every((s) => s === steps[0])) return `Support for ${DEMO_VOTE_FOR[party]} ${steps[0] > 0 ? "rises" : "falls"} significantly ${words.step}.`;
+    if (steps[0] !== 0 && steps.every((s) => s === steps[0])) return `Support for ${DEMO_VOTE_FOR[party]} ${steps[0] > 0 ? "rises" : "falls"} significantly ${words.step}.`;
   }
   const byV = [...gs].sort((a, b) => b.v[party] - a.v[party]);
   const top = byV[0], bot = byV[byV.length - 1];
@@ -2035,15 +2052,16 @@ function DemographicsPanel({ rangeId = "all" }) {
           the 95% margin.
         </p>
         <p className="table-hint">
-          The sentence under the bars says whether the groups really differ. A difference is
-          significant when the gap between two groups is larger than its own 95% margin, which
-          combines both groups’ ± figures.
+          The sentence under the bars says whether the groups really differ. Two groups differ
+          significantly when the gap between them is larger than its own 95% margin, which
+          combines both groups’ ± figures. With three or four groups there are several gaps to
+          test at once, so each has to clear a higher bar.
         </p>
         <p className="table-hint">
           The sentence under each chart says whether any group has moved towards or away from the
           party, relative to all voters, over the period shown. It compares each pollster only with
-          itself, so a pollster joining or leaving can’t pass for a change. Because three or four
-          groups are tested at once, each has to clear a higher bar to count as significant.
+          itself, so a pollster joining or leaving can’t pass for a change. The same higher bar
+          applies when three or four groups are tested at once.
         </p>
         <p className="table-hint">
           The charts are built the way the site’s other monthly lines are: each poll is a dot and
