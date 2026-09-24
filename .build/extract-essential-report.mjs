@@ -97,6 +97,12 @@ const FINGERPRINT = ".build/essential-src/site-fingerprint.json";
 const RECENT_REPORT_DAYS = 3; // always crawl this long after a new report post
 const FETCH_TIMEOUT_MS = 30_000;
 const FETCH_TRIES = 24;     // generous: sucuri throttles bursts, we wait it out
+// ...but a 403/429 that outlasts this is a wall, not a burst throttle. On
+// 15–18 Sep 2026 the site refused GitHub's runners outright and every run
+// spent ~18 minutes (24 tries, 4s × attempt) before failing; five minutes
+// still rides out a burst (11 retries) and the failure — "HTTP 403" —
+// reads as transient to classify-failure.mjs, so the next slot retries.
+const REFUSED_GIVE_UP_MS = 5 * 60_000;
 const CONCURRENCY = 3;      // wordpress pages
 const PAGE_MIN_GAP_MS = 350; // per-worker gap between wordpress page fetches
 const FLOURISH_CONCURRENCY = 8; // flourish cdn reads
@@ -151,6 +157,7 @@ async function sucuriSolve(body, u) {
 const retryable = (msg) => !/HTTP (4(?!03|29)\d\d)/.test(msg); // 4xx other than 403/429 is fatal
 
 async function getText(u) {
+  const started = Date.now();
   for (let attempt = 1, sucuriTries = 0; ; attempt++) {
     try {
       const res = await fetch(u, {
@@ -162,6 +169,11 @@ async function getText(u) {
         // so a fresh challenge gets solved next pass, and wait longer.
         sucuriCookie = ""; sucuriSolving = null;
         if (attempt >= FETCH_TRIES) throw new Error(`HTTP ${res.status}`);
+        if (Date.now() - started + 4000 * attempt > REFUSED_GIVE_UP_MS) {
+          const e = new Error(`HTTP ${res.status} (still refused after ${Math.round((Date.now() - started) / 1000)}s)`);
+          e.giveUp = true; // past the catch below without another retry
+          throw e;
+        }
         await new Promise((r) => setTimeout(r, 4000 * attempt));
         continue;
       }
@@ -178,7 +190,7 @@ async function getText(u) {
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return { text, headers: res.headers };
     } catch (err) {
-      if (attempt >= FETCH_TRIES || !retryable(err.message)) throw new Error(`fetch ${u} failed after ${attempt} tries: ${err.message}`);
+      if (attempt >= FETCH_TRIES || err.giveUp || !retryable(err.message)) throw new Error(`fetch ${u} failed after ${attempt} tries: ${err.message}`);
       await new Promise((r) => setTimeout(r, 1500 * attempt));
     }
   }
