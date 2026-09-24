@@ -1876,9 +1876,13 @@ function DemographicsPanel({ rangeId = "all" }) {
                    size="sm" ariaLabel="Group voters by" />
         <Segmented options={DEMO_PARTIES} value={party} onChange={setParty} size="sm" ariaLabel="Party" />
       </div>
-      <div className="demo-grid">
+      {/* A tab with one set (gender, education) has the width the age tab
+          spends on its second set, so its chart takes that column instead of
+          sitting under the bars beside an empty half of the card. */}
+      <div className={"demo-grid" + (tab.sets.length === 1 ? " solo" : "")}>
         {tab.sets.map((st) => (
           <div className="demo-house" key={st.id}>
+            <div className="demo-bars">
             {tab.sets.length > 1 && (
               <div className="demo-house-head">
                 <span className="demo-house-name">{st.label}</span>
@@ -1890,6 +1894,7 @@ function DemographicsPanel({ rangeId = "all" }) {
               `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"} · ${houseList(g.houses.map(demoHouse))} · ± ${g.ci[party].toFixed(1)} is the 95% margin`,
               demoRamp(color, st.groups.length, i)))}
             {(() => { const t = demoVerdict(st, party); return t && <p className="demo-verdict">{t}</p>; })()}
+            </div>
             {chartFor(st)}
           </div>
         ))}

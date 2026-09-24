@@ -2627,13 +2627,23 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
    per group scaled to the tab's top value, the all-voters row in ink, each
    figure's margin after it (.read-ci: the same margin on other readouts) */
 .demo-ctl { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 2px 2px 16px; }
-.demo-grid { display: grid; gap: 18px 30px; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+.demo-grid { display: grid; gap: 18px 30px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
   margin: 0 2px 6px; }
 .demo-house-head { display: flex; align-items: baseline; gap: 8px; margin: 0 0 6px; flex-wrap: wrap; }
 .demo-house-name { font-size: 13px; font-weight: 650; color: var(--ink); text-decoration: none; }
 a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px; }
 .demo-house-when { font-size: 12px; color: var(--ink-3); }
-.demo-house { max-width: 460px; }
+/* Every tab lays out on the one grid, so switching tabs never moves the bars.
+   Two sets (age | generation): a column each, bars over chart, the charts
+   held level by a subgrid - they share a scale to be compared side by side,
+   and a set with more groups or a longer verdict no longer pushes its chart
+   down. One set (gender, education): its bars and its chart take the two
+   columns themselves, rather than stacking beside an empty half of the card.
+   Columns stack below 400px: narrower, a chart's plot shrinks to a strip
+   and a stacked, full-width one reads better. */
+.demo-grid:not(.solo) .demo-house { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
+.demo-grid.solo .demo-house { display: contents; }
+.demo-grid.solo .demo-chart { margin-top: 0; }
 .demo-row { display: grid; grid-template-columns: minmax(92px, 118px) 1fr 46px 36px; align-items: center;
   gap: 8px; margin: 5px 0; font-size: 13px; }
 .demo-lab { color: var(--ink-2); line-height: 1.25; }
