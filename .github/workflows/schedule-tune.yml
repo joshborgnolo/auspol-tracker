@@ -39,6 +39,7 @@ on:
       - demosau-update
       - spectre-update
       - foxhedgehog-update
+      - news24-update
     types: [completed]
   push:
     branches: [main]
@@ -54,22 +55,26 @@ on:
         type: choice
         options: ['false', 'true']
 
-# Pushes to main → serialise with the other writers (see roymorgan-update.yml).
+# Its own group: it fires after EVERY updater completion, and in the old
+# shared writers group each of those queued behind whatever was running —
+# where GitHub's one-pending rule let it cancel a real updater run. It only
+# touches workflow files and the clock's table, and its push rebases.
 concurrency:
-  group: main-writers
+  group: schedule-tune
   cancel-in-progress: false
 
 permissions:
   contents: write
+  issues: write # the weekly token-expiry alert
 
 jobs:
   tune:
     # a failed updater run has no new data to tune from; agent-repair owns it
     if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           # workflow_run checks out the default branch's head, which already
           # holds whatever the triggering updater pushed; pin the ref anyway.
@@ -79,7 +84,7 @@ jobs:
           ref: main
 
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
 
@@ -101,6 +106,30 @@ jobs:
             exit 1
           fi
 
+      # A fine-grained PAT lasts a year at most, and nothing said it was
+      # running out until the tuner's pushes started failing. Weekly (and on
+      # a probe), read the expiry GitHub reports for it; three weeks ahead,
+      # warn and file a ci-alert issue.
+      - name: Check the tuner token's expiry
+        if: github.event_name == 'schedule' || inputs.probe_token == 'true'
+        env:
+          TUNER_TOKEN: ${{ secrets.SCHEDULE_TUNER_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -z "$TUNER_TOKEN" ]; then echo "SCHEDULE_TUNER_TOKEN is not set; nothing to check"; exit 0; fi
+          exp="$(GH_TOKEN="$TUNER_TOKEN" gh api -i "repos/$GITHUB_REPOSITORY" 2>/dev/null | tr -d '\r' \
+            | sed -n 's/^[Gg]ithub-[Aa]uthentication-[Tt]oken-[Ee]xpiration: //p' | head -n 1)"
+          if [ -z "$exp" ]; then echo "the token reports no expiry"; exit 0; fi
+          # shellcheck disable=SC2016 # $1:$2 is the JS replacement pattern, not shell
+          days="$(node -e 'const s=process.argv[1].replace(/ UTC$/,"Z").replace(/ ([+-]\d{2})(\d{2})$/,"$1:$2").replace(" ","T"); console.log(Math.floor((Date.parse(s)-Date.now())/86400000))' "$exp")"
+          echo "SCHEDULE_TUNER_TOKEN expires $exp ($days days)"
+          if [ "$days" -le 21 ]; then
+            echo "::warning::SCHEDULE_TUNER_TOKEN expires in $days days ($exp)"
+            bash .build/alert-issue.sh \
+              "Schedule tuner token expires soon" \
+              "SCHEDULE_TUNER_TOKEN, the fine-grained PAT schedule-tune.yml pushes workflow files with, expires $exp ($days days). Regenerate it (this repository only; Contents + Workflows: read and write) and update the secret." || true
+          fi
+
       - name: Regenerate the schedule blocks
         if: inputs.probe_token != 'true'
         id: tune
@@ -109,12 +138,12 @@ jobs:
         shell: bash
         run: |
           node .build/tune-schedules.mjs --apply | tee tune.log
-          if git diff --quiet -- .github/workflows; then
+          if git diff --quiet -- .github/workflows .build/dispatch-clock/schedule.json; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "schedules already match the recorded release times; nothing to commit"
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
-            git --no-pager diff --stat -- .github/workflows
+            git --no-pager diff --stat -- .github/workflows .build/dispatch-clock/schedule.json
           fi
 
       - name: Commit and push the tuned schedules
@@ -127,7 +156,7 @@ jobs:
           {
             echo "### Schedule blocks regenerated"
             echo '```diff'
-            git --no-pager diff -- .github/workflows | head -n 300
+            git --no-pager diff -- .github/workflows .build/dispatch-clock/schedule.json | head -n 300
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           if [ "$HAS_TOKEN" != "true" ]; then
@@ -154,7 +183,7 @@ jobs:
             echo "::error::SCHEDULE_TUNER_TOKEN cannot read $GITHUB_REPOSITORY — check the PAT's repository access and permissions"
             exit 1
           fi
-          git add .github/workflows
+          git add .github/workflows .build/dispatch-clock/schedule.json
           git commit -m "Tune poll-agent schedules from recorded release times" \
             -m "Generated by .build/tune-schedules.mjs (schedule-tune.yml, $TRIGGER)."
           # The push goes out under the PAT. http.extraheader is a

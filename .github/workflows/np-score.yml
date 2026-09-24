@@ -13,28 +13,28 @@ on:
     - cron: '15 21 * * *' # 07:15 AEST daily
   workflow_dispatch:
 
-# Its OWN group, not main-writers. A concurrency group holds one running job
-# and ONE pending one — a newer pending run cancels the older — and GitHub
-# fires this cron late (~23:00Z), right when the 09:00 AEST updater slots
-# queue on main-writers: 12 of 14 runs to 2026-09-22 were cancelled before
-# starting, and every missed day lost that day's bets from the ledger. It
-# needs no lock: it writes only the two calibration files (no other writer
-# touches them) and pushes through push_main's rebase retry.
+# Its OWN group. A concurrency group holds one running job and ONE pending
+# one — a newer pending run cancels the older — and in the old shared
+# main-writers group 12 of 14 runs to 2026-09-22 were cancelled before
+# starting, each losing that day's bets from the ledger (every writer has
+# since left that group). It needs no lock: it writes only the two
+# calibration files (no other writer touches them) and pushes through
+# push_main's rebase retry.
 concurrency:
   group: np-score
   cancel-in-progress: false
 
 jobs:
   score:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
           cache: npm

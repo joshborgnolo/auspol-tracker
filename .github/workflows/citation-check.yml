@@ -21,22 +21,23 @@ on:
     - cron: '37 21 * * 0' # 07:37 AEST Mondays
   workflow_dispatch:
 
-# Pushes to main → serialise with the other writers (see roymorgan-update.yml).
+# Its own group: it commits only data/link-health.json, which nothing else
+# writes, and push_main's rebase resolves a race with another writer.
 concurrency:
-  group: main-writers
+  group: citation-check
   cancel-in-progress: false
 
 jobs:
   sweep:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 25
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
           cache: npm

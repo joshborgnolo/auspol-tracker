@@ -3,7 +3,7 @@
   "private": true,
   "description": "Single-file Australian federal polling tracker. Exists to pin puppeteer-core (share-card redraw) and give CI one Node version; the toolchain itself is plain node.",
   "scripts": {
-    "test": "node .build/newtracker/validate.mjs && node .build/newtracker/build.mjs && node .build/test-citation-check.mjs && node .build/test-site-check.mjs && node .build/test-infogram.mjs && node .build/test-news24-infogram.mjs && node .build/test-redbridge.mjs && node .build/test-crosstabs.mjs && node .build/test-tune-schedules.mjs && node .build/test-pollbludger.mjs && node .build/test-coverage.mjs && node .build/test-news24-wiki.mjs && node .build/newtracker/test-np-score.mjs && node .build/newtracker/test-primary-order.mjs && node .build/newtracker/sim-next-polls.mjs && node .build/newtracker/sim-oppr-labels.mjs && node .build/newtracker/deff-backtest.mjs"
+    "test": "node .build/newtracker/validate.mjs && node .build/newtracker/build.mjs && node .build/test-citation-check.mjs && node .build/test-site-check.mjs && node .build/test-infogram.mjs && node .build/test-news24-infogram.mjs && node .build/test-redbridge.mjs && node .build/test-crosstabs.mjs && node .build/test-tune-schedules.mjs && node .build/test-push-main.mjs && node .build/test-classify-failure.mjs && node .build/test-dispatch-clock.mjs && node .build/test-workflows.mjs && node .build/test-pollbludger.mjs && node .build/test-coverage.mjs && node .build/test-news24-wiki.mjs && node .build/newtracker/test-np-score.mjs && node .build/newtracker/test-primary-order.mjs && node .build/newtracker/sim-next-polls.mjs && node .build/newtracker/sim-oppr-labels.mjs && node .build/newtracker/deff-backtest.mjs"
   },
   "devDependencies": {
     "puppeteer-core": "25.10.0"

@@ -1,0 +1,21 @@
+# Keeps the SHA-pinned actions in .github/workflows current: a pin nobody
+# bumps rots into deprecation warnings and, eventually, a forced migration
+# (Node 20 actions in Sep 2026). Dependabot opens a PR per update with the
+# new SHA and version comment; review it like any workflow change.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
+    ignore:
+      # checkout v6+ persists the job token in a separate file instead of
+      # .git/config. agent-repair.yml's repair job and newspoll-watch.yml's
+      # filer strip the credential from .git/config before an agent runs,
+      # and schedule-tune.yml drops it before pushing under its PAT. Rework
+      # those three steps before accepting a major bump here.
+      - dependency-name: actions/checkout
+        update-types: ["version-update:semver-major"]

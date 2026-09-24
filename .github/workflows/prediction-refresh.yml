@@ -26,11 +26,11 @@ on:
         type: choice
         options: ['false', 'true']
 
-# Every push-capable workflow shares one concurrency group so two writers
-# can never be mid-flight against main at the same time. Serialised, not
-# cancelled: a queued run still gets its slot.
+# Its own group: writers no longer queue behind one another (the shared
+# main-writers group's one-pending rule cancelled real runs); push_main in
+# prediction-refresh.sh resolves a race with another writer itself.
 concurrency:
-  group: main-writers
+  group: prediction-refresh
   cancel-in-progress: false
 
 permissions:
@@ -38,15 +38,15 @@ permissions:
 
 jobs:
   update:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 (pinned 2026-09-05)
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
         with:
           fetch-depth: 0 # model scripts read git show origin/main:...
 
       - name: Pin Node
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4 (pinned 2026-09-05)
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6.5.0
         with:
           node-version-file: .nvmrc
           cache: npm
