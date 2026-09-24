@@ -135,11 +135,6 @@ const FONTS = [
      screen, but the stack falls back to system sans in the moment before it
      lands, which is cheaper than a preload. */
   { file: "sourcesans3-latin.woff2",            family: "Source Sans 3", style: "normal", weight: "400 800" },
-  /* The Tally skin's one family (body.tally): Archivo's variable cut, width
-     62-125% as well as weight, so condensed tally-board figures, expanded
-     caps labels and running text all come from one file. SIL OFL, from
-     Google Fonts. Never preloaded - the classic skin never asks for it. */
-  { file: "archivo-var-latin.woff2",            family: "Archivo", style: "normal", weight: "100 900", stretch: "62% 125%" },
   /* Archivo is retired: the expanded poll breakdown was its only consumer and
      that panel is now set in Source Sans 3 throughout. The source subset stays
      in fonts/ so re-registering it is a one-line change. */
@@ -164,8 +159,7 @@ const faceCss = FONTS.map((f) => {
   return `@font-face {
   font-family: '${f.family}';
   font-style: ${f.style};
-  font-weight: ${f.weight};${f.stretch ? `
-  font-stretch: ${f.stretch};` : ""}
+  font-weight: ${f.weight};
   font-display: swap;
   src: url("${href}") format('woff2');
   unicode-range: ${LATIN};

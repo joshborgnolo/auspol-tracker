@@ -165,7 +165,7 @@ function GlyphDial({ className, svgRef, width, height }) {
 }
 window.GlyphDial = GlyphDial;   // the tab bar's placeholder instance (views.jsx)
 
-function Header({ isDark, onToggleTheme, skin, onSkin }) {
+function Header({ isDark, onToggleTheme }) {
   const { D } = window.AP;
   const fresh = freshness(D.latest.publishedISO);
 
@@ -415,27 +415,6 @@ function Header({ isDark, onToggleTheme, skin, onSkin }) {
             </svg>
           </button>
         </div>
-        {/* The skin: the same page in two dresses. The classic cell is "Aa"
-            in the classic serif; the Tally Room cell is its emblem, a ballot
-            square marked 1 - drawn, not set, so a reader who never picks the
-            skin never downloads its typeface. */}
-        {onSkin && (
-          <div className="theme-seg skin-seg segmented" role="group" aria-label="Skin">
-            <button type="button" className={"seg-btn theme-cell skin-cell skin-cell-classic" + (skin !== "tally" ? " active" : "")}
-                    aria-pressed={skin !== "tally"} aria-label="Classic skin" title="Classic skin"
-                    onClick={() => onSkin("classic")}>
-              <span aria-hidden="true">Aa</span>
-            </button>
-            <button type="button" className={"seg-btn theme-cell skin-cell skin-cell-tally" + (skin === "tally" ? " active" : "")}
-                    aria-pressed={skin === "tally"} aria-label="Tally Room skin" title="Tally Room skin"
-                    onClick={() => onSkin("tally")}>
-              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                <rect x="3.5" y="3.5" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2"></rect>
-                <path d="M10.2 8.6 13 7v10" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="square"></path>
-              </svg>
-            </button>
-          </div>
-        )}
       </div>
       {story && <DialStory originRect={story.rect}
         onClose={() => { setStory(null); requestAnimationFrame(() => {
@@ -1864,8 +1843,7 @@ function App() {
     "layout": "editorial",
     "theme": "auto",
     "accent": "warm",
-    "showScatter": true,
-    "skin": "classic"
+    "showScatter": true
   }/*EDITMODE-END*/;
   const [t, setTweak] = useTweaks(TWEAK_DEFAULTS);
   const [rangeId, setRangeId] = useState("all");
@@ -2056,10 +2034,7 @@ function App() {
      longer scales with how much is on screen. Where the API is missing, or the
      reader asked for less motion, the theme simply flips – a clean cut reads
      as intent, a janky fade reads as a bug. */
-  /* the skin is the fourth switch on the same appearance: "tally" is the
-     Tally Room skin (body.tally), crossfaded like a theme flip */
-  const want = { editorial: t.layout === "editorial", cool: t.accent === "cool", dark: isDark,
-                 tally: t.skin === "tally" };
+  const want = { editorial: t.layout === "editorial", cool: t.accent === "cool", dark: isDark };
   const applyChrome = () => {
     for (const c in want) document.body.classList.toggle(c, want[c]);
   };
@@ -2088,15 +2063,7 @@ function App() {
       if (vt.ready && vt.ready.catch) vt.ready.catch(() => {});
       if (vt.finished && vt.finished.catch) vt.finished.catch(() => {});
     }
-  }, [t.layout, t.accent, isDark, t.skin]);
-  /* ?skin=tally (or =classic) in a shared link picks the skin and keeps it */
-  React.useEffect(() => {
-    try {
-      const q = new URLSearchParams(window.location.search).get("skin");
-      if (q === "tally" || q === "classic") setTweak("skin", q);
-    } catch (e) { /* no URL API: the stored choice stands */ }
-  }, []);
-  const setSkin = (v) => setTweak("skin", v);
+  }, [t.layout, t.accent, isDark]);
 
   const cycleTheme = () => setTweak("theme", isDark ? "light" : "dark");
 
@@ -2110,7 +2077,7 @@ function App() {
         const m = document.getElementById("main-content");
         if (m) { m.focus({ preventScroll: true }); m.scrollIntoView({ block: "start" }); }
       }}>Skip to content</a>
-      <Header isDark={isDark} onToggleTheme={cycleTheme} skin={t.skin} onSkin={setSkin} />
+      <Header isDark={isDark} onToggleTheme={cycleTheme} />
       <Tabs tabs={TABS} active={tab} onChange={goTab} tppMatchup={tppMatchup} tppBasis={tppBasis} />
       <main className="content" id="main-content" tabIndex={-1}>
         {/* The panel the tab strip points at. There was no role="tabpanel" on
