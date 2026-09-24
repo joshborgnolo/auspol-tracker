@@ -2640,10 +2640,24 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
    down. One set (gender, education): its bars and its chart take the two
    columns themselves, rather than stacking beside an empty half of the card.
    Columns stack below 400px: narrower, a chart's plot shrinks to a strip
-   and a stacked, full-width one reads better. */
+   and a stacked, full-width one reads better. The notes follow the charts. */
 .demo-grid:not(.solo) .demo-house { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
+.demo-grid:not(.solo) .demo-notes { grid-column: 1 / -1; }
 .demo-grid.solo .demo-house { display: contents; }
 .demo-grid.solo .demo-chart { margin-top: 0; }
+.demo-notes > .table-hint:first-child { margin-top: 0; }
+/* One set, two columns: bars, verdict, and notes down the left, the chart
+   spanning the right. The chart is the taller column, so its surplus goes to
+   the notes' row (1fr) and the notes stay tucked under the verdict. Keyed to
+   the panel's own width (the same 2 × 400px + gap the age tab splits at),
+   not the viewport's. */
+.demo-body { container-type: inline-size; }
+@container (min-width: 830px) {
+  .demo-grid.solo { grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr; }
+  .demo-grid.solo .demo-bars { grid-area: 1 / 1; }
+  .demo-grid.solo .demo-chart { grid-area: 1 / 2 / 3 / 3; }
+  .demo-grid.solo .demo-notes { grid-area: 2 / 1; align-self: start; padding-top: 6px; }
+}
 .demo-row { display: grid; grid-template-columns: minmax(92px, 118px) 1fr 46px 36px; align-items: center;
   gap: 8px; margin: 5px 0; font-size: 13px; }
 .demo-lab { color: var(--ink-2); line-height: 1.25; }
@@ -2660,7 +2674,7 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-verdict { margin: 8px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 .demo-chart { margin: 12px 0 4px; }
 /* the chart plots gaps, not the bars' shares – said above it, in the bars' label voice */
-.demo-chart-lab { margin: 0 0 4px; font-size: 12px; color: var(--ink-3); }
+.demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
 .read-ci { margin-left: 2px; }
 /* Where One Nation’s new voters came from: one plain sentence above the
    readings, in the panel copy's own voice (the readings reuse .und-*) */

@@ -1812,14 +1812,19 @@ function DemographicsPanel({ rangeId = "all" }) {
   const built = new Map(tab.sets.map((st) => [st.id, build(st, sharedFirstX)]));
   const sharedVals = [...built.values()].filter(Boolean).flatMap((b) => b.vals);
   /* the finest step that keeps to six gridlines, and never a floor under
-     −100%: no group can sit more than 100% below all voters */
+     −100%: no group can sit more than 100% below all voters. The domain ends
+     on the first gridline past the data (a tenth of a step clear), and both
+     end gridlines are labelled: fitDomain's 40% pad plus unlabelled edges
+     could leave nearly a whole empty step above and below the lines. */
   const sharedAxis = (() => {
     if (!sharedVals.length) return null;
-    const span = Math.max(...sharedVals) - Math.min(...sharedVals);
-    const step = [10, 20, 25, 50, 100].find((st) => span / st <= 6) || 200;
-    const fit = fitDomain(sharedVals, step, 0);
-    const domain = [Math.max(-100, fit.domain[0]), fit.domain[1]];
-    return { domain, ticks: fit.ticks.filter((t) => t > domain[0]) };
+    const lo = Math.min(0, ...sharedVals), hi = Math.max(0, ...sharedVals);
+    const step = [10, 20, 25, 50, 100].find((st) => (hi - lo) / st <= 6) || 200;
+    const d0 = Math.max(-100, Math.floor((lo - step * 0.1) / step) * step);
+    const d1 = Math.ceil((hi + step * 0.1) / step) * step;
+    const ticks = [];
+    for (let v = d0; v <= d1 + 1e-9; v += step) ticks.push(v);
+    return { domain: [d0, d1], ticks };
   })();
   const chartFor = (st0) => {
     const b = built.get(st0.id);
@@ -1877,8 +1882,11 @@ function DemographicsPanel({ rangeId = "all" }) {
         <Segmented options={DEMO_PARTIES} value={party} onChange={setParty} size="sm" ariaLabel="Party" />
       </div>
       {/* A tab with one set (gender, education) has the width the age tab
-          spends on its second set, so its chart takes that column instead of
-          sitting under the bars beside an empty half of the card. */}
+          spends on its second set, so its chart takes that column, and the
+          notes sit under the bars they explain rather than below the chart.
+          The notes are one element on every tab, so an open "How to read"
+          stays open across a tab switch. */}
+      <div className="demo-body">
       <div className={"demo-grid" + (tab.sets.length === 1 ? " solo" : "")}>
         {tab.sets.map((st) => (
           <div className="demo-house" key={st.id}>
@@ -1898,9 +1906,9 @@ function DemographicsPanel({ rangeId = "all" }) {
             {chartFor(st)}
           </div>
         ))}
-      </div>
       {/* The gist stays in view; the reading instructions fold, as the
           Past cycles intro's do - all of it ran eight lines under the charts. */}
+      <div className="demo-notes">
       <p className="table-hint">
         The figures pool the last {T.window} of polls. Each chart shows how much higher or lower
         the party’s vote is in each group than among all voters, month by month.{" "}
@@ -1935,6 +1943,9 @@ function DemographicsPanel({ rangeId = "all" }) {
           {tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : ""}.
         </p>
       </details>
+      </div>
+      </div>
+      </div>
     </section>
   );
 }

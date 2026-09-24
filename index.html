@@ -1616,8 +1616,17 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px; }
 .demo-house-when { font-size: 12px; color: var(--ink-3); }
 .demo-grid:not(.solo) .demo-house { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
+.demo-grid:not(.solo) .demo-notes { grid-column: 1 / -1; }
 .demo-grid.solo .demo-house { display: contents; }
 .demo-grid.solo .demo-chart { margin-top: 0; }
+.demo-notes > .table-hint:first-child { margin-top: 0; }
+.demo-body { container-type: inline-size; }
+@container (min-width: 830px) {
+  .demo-grid.solo { grid-template-columns: 1fr 1fr; grid-template-rows: auto 1fr; }
+  .demo-grid.solo .demo-bars { grid-area: 1 / 1; }
+  .demo-grid.solo .demo-chart { grid-area: 1 / 2 / 3 / 3; }
+  .demo-grid.solo .demo-notes { grid-area: 2 / 1; align-self: start; padding-top: 6px; }
+}
 .demo-row { display: grid; grid-template-columns: minmax(92px, 118px) 1fr 46px 36px; align-items: center;
   gap: 8px; margin: 5px 0; font-size: 13px; }
 .demo-lab { color: var(--ink-2); line-height: 1.25; }
@@ -1632,7 +1641,7 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-sw.dash { background: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 7px); }
 .demo-verdict { margin: 8px 0 0; font-size: 13px; line-height: 1.45; color: var(--ink-2); }
 .demo-chart { margin: 12px 0 4px; }
-.demo-chart-lab { margin: 0 0 4px; font-size: 12px; color: var(--ink-3); }
+.demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
 .read-ci { margin-left: 2px; }
 .ons-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
   text-wrap: pretty; }
@@ -39825,13 +39834,16 @@ function DemographicsPanel({
   const sharedVals = [...built.values()].filter(Boolean).flatMap(b => b.vals);
   const sharedAxis = (() => {
     if (!sharedVals.length) return null;
-    const span = Math.max(...sharedVals) - Math.min(...sharedVals);
-    const step = [10, 20, 25, 50, 100].find(st => span / st <= 6) || 200;
-    const fit = fitDomain(sharedVals, step, 0);
-    const domain = [Math.max(-100, fit.domain[0]), fit.domain[1]];
+    const lo = Math.min(0, ...sharedVals),
+      hi = Math.max(0, ...sharedVals);
+    const step = [10, 20, 25, 50, 100].find(st => (hi - lo) / st <= 6) || 200;
+    const d0 = Math.max(-100, Math.floor((lo - step * 0.1) / step) * step);
+    const d1 = Math.ceil((hi + step * 0.1) / step) * step;
+    const ticks = [];
+    for (let v = d0; v <= d1 + 1e-9; v += step) ticks.push(v);
     return {
-      domain,
-      ticks: fit.ticks.filter(t => t > domain[0])
+      domain: [d0, d1],
+      ticks
     };
   })();
   const chartFor = st0 => {
@@ -39935,6 +39947,8 @@ function DemographicsPanel({
     size: "sm",
     ariaLabel: "Party"
   })), React.createElement("div", {
+    className: "demo-body"
+  }, React.createElement("div", {
     className: "demo-grid" + (tab.sets.length === 1 ? " solo" : "")
   }, tab.sets.map(st => React.createElement("div", {
     className: "demo-house",
@@ -39952,7 +39966,9 @@ function DemographicsPanel({
     return t && React.createElement("p", {
       className: "demo-verdict"
     }, t);
-  })()), chartFor(st)))), React.createElement("p", {
+  })()), chartFor(st))), React.createElement("div", {
+    className: "demo-notes"
+  }, React.createElement("p", {
     className: "table-hint"
   }, "The figures pool the last ", T.window, " of polls. Each chart shows how much higher or lower the party\u2019s vote is in each group than among all voters, month by month.", " ", React.createElement("button", {
     type: "button",
@@ -39968,7 +39984,7 @@ function DemographicsPanel({
     className: "table-hint"
   }, "The charts are built the way the site\u2019s other monthly lines are: each poll is a dot and each line\u2019s 95% interval is shaded. Where two groups\u2019 shading overlaps, the polls can\u2019t tell them apart that month. \u221238% means the party\u2019s vote in that group is 38% lower than among all voters, not 38 points. Measured this way a party\u2019s growth doesn\u2019t read as a widening divide, so a flat line means the group moved with everyone else."), React.createElement("p", {
     className: "table-hint"
-  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : "", ".")));
+  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : "", "."))))));
 }
 const PARTY_C = {
   alp: "var(--alp)",
