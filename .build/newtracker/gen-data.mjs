@@ -1110,6 +1110,25 @@ const creditHouses = (items, firmOf, xOf) => {
   }
   return Object.keys(n).sort((a, b) => n[b] - n[a] || a.localeCompare(b));
 };
+/* The caption list is WIDER than the active count: a house with a declared
+   stop (pollsterRules.stopped) still contributed readings to the series and
+   a reader meeting its dots needs the name – but it must sit LAST and be
+   labelled "(inactive)", so the list never claims a live roster. A declared
+   stop caps the recency window too: whatever the six-month rule would say
+   (a stopped house often sits inside it on a series it feeds), a stopped
+   house is inactive. The active houses and ordering are otherwise exactly
+   creditHouses'; an optional `display` canonicalises house-announcement
+   sub-brands to the name the site uses. */
+const STOPPED_HOUSES = new Map(
+  Object.entries(D.pollsterRules || {}).filter(([, r]) => r && r.stopped));
+const creditHousesWithStopped = (items, firmOf, xOf, display = (f) => f) => {
+  const active = creditHouses(items, firmOf, xOf).filter((f) => !STOPPED_HOUSES.has(f));
+  const stopped = [...new Set(items.map(firmOf))]
+    .filter((f) => !active.includes(f) && STOPPED_HOUSES.has(f))
+    .sort((a, b) => a.localeCompare(b))
+    .map((f) => `${display(f)} (inactive)`);
+  return [...active.map(display), ...stopped];
+};
 
 /* ---- 5. national direction – right track / wrong track ------------------
    Given the SAME treatment as the 2PP and the primaries: sample-weighted,
@@ -1140,6 +1159,19 @@ const MONTH_SET = new Set(MONTHS);
 const directionHouses = creditHouses(
   DIR.filter((d) => MONTH_SET.has(ymOf(d.date))),
   (d) => d.pollster, (d) => Date.parse(d.date));
+// The caption's name-list takes the same houses plus any STOPPED contributors,
+// listed last as "Name (inactive)" – directionHouses stays the active count
+// for the How-to-read line ("Only N houses ask this question").
+const directionHousesAll = creditHousesWithStopped(
+  DIR.filter((d) => MONTH_SET.has(ymOf(d.date))),
+  (d) => d.pollster, (d) => Date.parse(d.date));
+// The favourability houses present in the approval series (favFirms are the
+// ones asking positive/negative, not approve/disapprove): the approval
+// card's fav-mode subtitle names them. Same treatment – current houses in
+// creditHouses order, any stopped house last as "Name (inactive)".
+const favHouses = creditHousesWithStopped(
+  appr.filter((r) => FAV_FIRMS.has(canonFirm(r.firm))),
+  (r) => r.firm, (r) => Date.parse(r.date));
 // Every published reading behind the monthly line, for the panel's scatter.
 // Taken from the direction series rather than from the poll rows, because a
 // few waves asked this question without publishing voting intention and so
@@ -3639,6 +3671,14 @@ window.AUSPOL = (function () {
   const direction = ${JSON.stringify(direction)};
   const directionHouseEffects = ${JSON.stringify({ right: dirHe.right.snapshot(Infinity), wrong: dirHe.wrong.snapshot(Infinity) })};
   const directionHouses = ${JSON.stringify(directionHouses)};
+  /* name-list for the direction card's caption: the active houses plus any
+     STOPPED contributor, listed last, labelled "(inactive)". Keep counting
+     active houses off directionHouses (the How-to-read line). */
+  const directionHousesAll = ${JSON.stringify(directionHousesAll)};
+  /* the net-FAVOURABILITY houses in the approval series, active first, a
+     stopped house last as "Name (inactive)" – the approval card's fav-mode
+     subtitle names them, so it can't drop a house that started (Spectre) */
+  const favHouses = ${JSON.stringify(favHouses)};
   const directionPolls = ${JSON.stringify(directionPolls)};
   const directionAvailable = ${direction.length > 0};
   const undecided = ${JSON.stringify(undecided)};

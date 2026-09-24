@@ -1156,7 +1156,7 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
                      title="What the favourability question asks"
                      onClick={() => window.AP.openTerm &&
                        window.AP.openTerm("favourability", "Leader net favourability")}>Positive minus negative</button>
-                   {" – the person, not the job · RedBridge/Accent, DemosAU, and Freshwater ask favourability, not approval"}</>)}
+                   {" – the person, not the job · "}{houseList(D.favHouses)}{" ask favourability, not approval"}</>)}
           </p>
         </div>
         <div className="card-head-tools">
@@ -1296,7 +1296,7 @@ function plainShare(v) {
 function DirectionPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
-  const asked = houseList(D.directionHouses);
+  const asked = houseList(D.directionHousesAll || D.directionHouses);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   // no right-track / wrong-track series in the dataset yet – keep the panel
   // as an honest empty state so the question has a home when it's polled

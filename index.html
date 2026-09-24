@@ -9113,6 +9113,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     }
   };
   const directionHouses = ["Roy Morgan", "Essential", "Spectre Strategy"];
+  const directionHousesAll = ["Roy Morgan", "Essential", "Spectre Strategy", "Freshwater (inactive)"];
+  const favHouses = ["DemosAU", "RedBridge/Accent", "Spectre Strategy", "Freshwater (inactive)"];
   const directionPolls = [{
     "x": 2025.3561643835617,
     "ym": "2025-05",
@@ -40251,7 +40253,7 @@ function ApprovalPanel({
     className: "hi-term",
     title: "What the favourability question asks",
     onClick: () => window.AP.openTerm && window.AP.openTerm("favourability", "Leader net favourability")
-  }, "Positive minus negative"), " – the person, not the job · RedBridge/Accent, DemosAU, and Freshwater ask favourability, not approval"))), React.createElement("div", {
+  }, "Positive minus negative"), " – the person, not the job · ", houseList(D.favHouses), " ask favourability, not approval"))), React.createElement("div", {
     className: "card-head-tools"
   }, !lockMetric && React.createElement(TextToggle, {
     caps: true,
@@ -40390,7 +40392,7 @@ function DirectionPanel({
     series
   } = window.AP;
   const narrow = useNarrow();
-  const asked = houseList(D.directionHouses);
+  const asked = houseList(D.directionHousesAll || D.directionHouses);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   if (!D.direction.length) {
     return React.createElement("section", {
