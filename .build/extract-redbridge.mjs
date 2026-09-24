@@ -69,6 +69,11 @@
 //     Figure 5. The extractor recomputes detail consistently from the table;
 //     verification therefore reports Jul-2026 detail as a mismatch note but
 //     never overwrites it.
+//   - Table N "Vote softness by current first preference vote intention":
+//     solid / soft / very soft shares of all voters and of each party's
+//     voters (see parseFirmness). The wave's own row feeds `firmness`; the
+//     history rows back-filled older waves once
+//     (.build/assimilate-redbridge-firmness.mjs).
 //   - Table N "Preferred Prime Minister, by demographic characteristics":
 //     header names give the opposition leader (column between "Albanese" and
 //     "Pauline Hanson" — Angus Taylor in the current era); the "All voters"
@@ -424,7 +429,7 @@ function parseTable2(txt) {
   const uniq = rows.filter((r) => (seen.has(r.label) ? false : (seen.add(r.label), true)));
   const w = uniq[0];
   const { label, year, month, ...vals } = w;
-  return { wave: { label, year, month, ...vals }, rowCount: uniq.length };
+  return { wave: { label, year, month, ...vals }, rowCount: uniq.length, rows: uniq };
 }
 
 // Table 1 "Federal two-party vote intention, by party of first preference":
@@ -568,6 +573,40 @@ function parsePpm(txt) {
   return { ppm: { alb: +am[1], opp: +am[2], han: +am[3] }, oppName };
 }
 
+// Table N "Vote softness by current first preference vote intention": for
+// each party, the share of its voters who are solid (certain), soft (may
+// change) or very soft (undecided until prompted, or will probably change).
+// Two print eras:
+//   wide (Mar 2026 report on): one row per wave, `Mon YYYY` + 18 cells –
+//     ALL VOTERS, LABOR, COALITION, ONE NATION, GREENS, OTHER PARTIES, each
+//     Solid / Soft / V. soft – history back to Nov 2024, newest first
+//   stacked (Jan–Feb 2026): a block per party with the Coalition split into
+//     Liberal / LNP / National and no combined row – not read, because the
+//     parts cannot be recombined without their weights
+// Returns every wave row as { label, year, month, firmness } with
+// firmness = { all, alp, lnp, onp, grn, oth } → [solid, soft, verySoft].
+const FIRM_KEYS = ["all", "alp", "lnp", "onp", "grn", "oth"];
+function parseFirmness(txt) {
+  const sec = sliceBetween(txt, /Table \d+: Vote softness by current first preference vote intention/i,
+    /\n\s*(?:Table|Figure) \d+:/, /\n\s*Name recognition and favourability/i);
+  if (!sec) return { error: "vote-softness table not found" };
+  if (!/ALL VOTERS\s+LABOR\s+COALITION\s+ONE NATION\s+GREENS\s+OTHER PARTIES/.test(sec.replace(/\s+/g, " ")))
+    return { error: "vote-softness table is not the wide six-group layout" };
+  const re = /^\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sept?|Oct|Nov|Dec) (\d{4})((?:\s+\d+){18})\s*$/gm;
+  const rows = [];
+  let m;
+  while ((m = re.exec(sec))) {
+    const cells = m[3].trim().split(/\s+/).map(Number);
+    const firmness = Object.fromEntries(FIRM_KEYS.map((k, i) => [k, cells.slice(3 * i, 3 * i + 3)]));
+    // each group's three shares are whole percentages of one base
+    const off = FIRM_KEYS.find((k) => Math.abs(firmness[k][0] + firmness[k][1] + firmness[k][2] - 100) > 2);
+    if (off) return { error: `vote-softness ${m[1]} ${m[2]} ${off} sums to ${firmness[off].reduce((a, v) => a + v, 0)}` };
+    rows.push({ label: `${m[1]} ${m[2]}`, year: +m[2], month: MON_ABBR[m[1]], firmness });
+  }
+  if (!rows.length) return { error: "no wave rows parsed under the vote-softness table" };
+  return { rows };
+}
+
 // ---------------------------------------------------------------- pdf → wave
 function parsePdf(txt, slug, notes) {
   const out = { slug };
@@ -623,6 +662,14 @@ function parsePdf(txt, slug, notes) {
       out.dateStart = iso(y1, fw.m1, fw.d1);
       out.date = iso(y2, fw.m2, fw.d2);
     }
+  }
+
+  const fm = parseFirmness(txt);
+  if (fm.error) out.firmnessError = fm.error;
+  else {
+    const own = fm.rows.find((r) => r.label === out.label);
+    if (own) out.firmness = own.firmness;
+    else out.firmnessError = `no vote-softness row for the wave (${out.label})`;
   }
 
   const pp = parsePpm(txt);
@@ -761,6 +808,7 @@ if (process.env.RB_LIB !== "1") try {
   const filledRelease = [];
   const filledSplit = [];
   const filledSplitOn = [];
+  const filledFirm = [];
 
   for (const c of candidates) {
     const cachePath = `${SRC_DIR}/${c.slug}.json`;
@@ -778,6 +826,12 @@ if (process.env.RB_LIB !== "1") try {
         const txt = readFileSync(`${SRC_DIR}/${c.slug}.txt`, "utf8");
         const t1on = parseTable1On(txt, parseCoalitionComponents(txt));
         if (t1on.tppSplitOn) w.tppSplitOn = t1on.tppSplitOn; else w.table1OnError = t1on.error;
+        writeFileSync(cachePath, JSON.stringify(w, null, 2) + "\n");
+      }
+      if (w.firmness == null && w.firmnessError == null && existsSync(`${SRC_DIR}/${c.slug}.txt`)) {
+        const fm = parseFirmness(readFileSync(`${SRC_DIR}/${c.slug}.txt`, "utf8"));
+        const own = fm.rows && fm.rows.find((r) => r.label === w.label);
+        if (own) w.firmness = own.firmness; else w.firmnessError = fm.error || `no vote-softness row for the wave (${w.label})`;
         writeFileSync(cachePath, JSON.stringify(w, null, 2) + "\n");
       }
     } else {
@@ -867,6 +921,20 @@ if (process.env.RB_LIB !== "1") try {
         }
       }
 
+      // and for the wave's own vote-softness row
+      if (matchPoll.firmness && w.firmness && JSON.stringify(matchPoll.firmness) !== JSON.stringify(w.firmness))
+        diffs.push(`firmness: pdf=${JSON.stringify(w.firmness)} vs file=${JSON.stringify(matchPoll.firmness)}`);
+      if (!matchPoll.firmness && w.firmness) {
+        if (CHECK) diffs.push(`firmness: file lacks the PDF's vote-softness row`);
+        else {
+          const es = Object.entries(matchPoll), at = Object.keys(matchPoll).indexOf("url");
+          es.splice(at < 0 ? es.length : at, 0, ["firmness", w.firmness]);
+          for (const k of Object.keys(matchPoll)) delete matchPoll[k];
+          Object.assign(matchPoll, Object.fromEntries(es));
+          filledFirm.push(matchPoll.date);
+        }
+      }
+
       status.verified.push({ date: matchPoll.date, slug: c.slug, ok: diffs.length === 0 });
       if (diffs.length) status.mismatches.push({ date: matchPoll.date, slug: c.slug, diffs });
       continue;
@@ -902,6 +970,7 @@ if (process.env.RB_LIB !== "1") try {
         ...(w.tppHist != null ? { tpp_flows: w.tppHist } : {}),
         ...(w.tppSplit != null ? { tpp_split: w.tppSplit } : {}),
         ...(w.tppSplitOn != null ? { tpp_split_on: w.tppSplitOn } : {}),
+        ...(w.firmness != null ? { firmness: w.firmness } : {}),
         url: w.afrUrl || w.pdfUrl,
         releaseUrl: c.url,
       }),
@@ -930,7 +999,8 @@ if (process.env.RB_LIB !== "1") try {
   if (filledRelease.length) status.releaseFilled = filledRelease;
   if (filledSplit.length) status.splitFilled = filledSplit;
   if (filledSplitOn.length) status.splitOnFilled = filledSplitOn;
-  if (hasNew || filledRelease.length || filledSplit.length || filledSplitOn.length) {
+  if (filledFirm.length) status.firmnessFilled = filledFirm;
+  if (hasNew || filledRelease.length || filledSplit.length || filledSplitOn.length || filledFirm.length) {
     const trailingNl = orig.endsWith("\n") ? "\n" : "";
     // hand-entered rows keep tpp3 on one line; stringify must not expand them
     const next =
@@ -954,4 +1024,4 @@ if (process.env.RB_LIB !== "1") try {
 
 // parser exports for .build/test-redbridge.mjs (RB_LIB=1 import skips the
 // main block above)
-export { parsePdf, parseTable1On, parseCoalitionComponents, parseTable2, parseTable5, parsePpm, sliceBetween, guardNewWave };
+export { parsePdf, parseFirmness, parseTable1On, parseCoalitionComponents, parseTable2, parseTable5, parsePpm, sliceBetween, guardNewWave };

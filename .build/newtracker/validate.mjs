@@ -128,6 +128,21 @@ export function validate(D) {
         for (const [k, v] of [["lnp", tso[0]], ["grn", tso[1]], ["oth", tso[2]]])
           if (!(v >= 1 && v <= 99)) fail("spliton-range", `tpp_split_on.${k} = ${v}`);
     }
+    // 2b1c. firmness – RedBridge/Accent's vote-softness table: for all voters
+    //      and each party's voters, [solid, soft, very soft] as whole
+    //      percentages of one base. All six groups or none, each triple
+    //      summing to ~100 (a stray cell is a misparse).
+    if (p.firmness != null) {
+      if (p.pollster !== "RedBridge/Accent")
+        fail("firm-pollster", `firmness on a row for ${p.pollster}`);
+      for (const k of ["all", "alp", "lnp", "onp", "grn", "oth"]) {
+        const t = p.firmness[k];
+        if (!Array.isArray(t) || t.length !== 3 || t.some((v) => !(v >= 0 && v <= 100)))
+          fail("firm-shape", `firmness.${k} = ${JSON.stringify(t)}`);
+        else if (Math.abs(t[0] + t[1] + t[2] - 100) > 2)
+          fail("firm-sum", `firmness.${k} sums to ${t[0] + t[1] + t[2]}`);
+      }
+    }
     // 2b2. tpp3 (Fox & Hedgehog's three-cornered preferred) carries all
     //      three slices or none, each in bounds, and the trio sums ~100 –
     //      the same sum discipline as the 2PP pair.

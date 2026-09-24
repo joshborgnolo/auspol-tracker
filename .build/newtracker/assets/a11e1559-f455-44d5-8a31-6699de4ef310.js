@@ -1498,8 +1498,30 @@ function DirectionPanel({ rangeId }) {
 function UndecidedPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
+  const [view, setView] = useState("all");
   const U = D.undecided;
   if (!U || !U.series.length) return null;
+  const F = D.firmness;
+  const byParty = view === "party" && F;
+  const ctl = F && (
+    <div className="ons-ctl">
+      <Segmented options={UND_VIEWS} value={view} onChange={setView} size="sm" ariaLabel="Undecided among" />
+    </div>
+  );
+  if (byParty) return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">Undecided</h2>
+          <p className="card-sub">
+            Share of each party’s voters certain of their vote · {houseList(F.houses.map(demoHouse))}
+          </p>
+        </div>
+      </div>
+      {ctl}
+      <FirmnessView F={F} rangeId={rangeId} />
+    </section>
+  );
   const xDomain = rangeDomain(rangeId);
   /* Not a party colour: --ink-2 is the one neutral legible in both themes,
      which is what a line meaning "none of the above" wants. The two questions
@@ -1561,6 +1583,7 @@ function UndecidedPanel({ rangeId }) {
           </p>
         </div>
       </div>
+      {ctl}
       {/* One tile per question, because they ARE different questions and the
           panel would otherwise imply a single measure with two sources. */}
       <div className="und-reads">
@@ -1613,6 +1636,124 @@ function UndecidedPanel({ rangeId }) {
         pool of decided voters, not that support has moved.</>,
       ]} />
     </section>
+  );
+}
+
+/* The Undecided panel's second view: how firm each party's vote is, from
+   RedBridge's vote-softness table (gen-data §5c2). "Certain" is RedBridge's
+   "solid": named a party at the first ask and certain they will vote that
+   way. The readings pool the house's last three waves, the lines every run of
+   three; the dots are its waves. Two sentences, each carrying the leads' highlighter only when it
+   reports a significant difference: which party's voters are the most
+   certain, and (under the chart) which party's share has moved most since
+   the term's first waves. A gap is significant when it exceeds the combined
+   95% margin, √(a² + b²) of the two ± figures. */
+const UND_VIEWS = [{ id: "all", label: "All voters" }, { id: "party", label: "By party" }];
+const FIRM_ORDER = ["onp", "alp", "lnp", "grn", "oth"];
+const firmWho = (k) => (k === "oth" ? "voters for independents and minor parties" : window.AP.D.PARTIES[k].name + " voters");
+const firmApart = (a, b) => Math.abs(a.v - b.v) > Math.hypot(a.ci95, b.ci95);
+const firmSaid = (cls, t, sig) => <p className={cls}>{sig ? <mark>{t}</mark> : t}</p>;
+function FirmnessView({ F, rangeId }) {
+  const { D, rangeDomain, buildXTicks } = window.AP;
+  const narrow = useNarrow();
+  const xDomain = rangeDomain(rangeId);
+  const parties = FIRM_ORDER.filter((k) => F.now[k]).sort((a, b) => F.now[b].v - F.now[a].v);
+  const cap = (s) => s[0].toUpperCase() + s.slice(1);
+
+  const lead = (() => {
+    const [top, next] = parties;
+    const t = F.now[top];
+    if (parties.slice(1).every((k) => firmApart(t, F.now[k]) && t.v > F.now[k].v))
+      return [`${cap(firmWho(top))} are significantly more likely than any other party’s voters to be certain of their vote: ${Math.round(t.v)}%, against ${Math.round(F.now[next].v)}% of ${firmWho(next)}.`, true];
+    return [`${cap(firmWho(top))} are the most likely to be certain of their vote, at ${Math.round(t.v)}%, but not by more than the margin over ${firmWho(next)}.`, false];
+  })();
+
+  const shift = (() => {
+    const moved = parties.map((k) => ({ k, d: F.now[k].v - F.base[k].v }))
+      .filter(({ k }) => firmApart(F.now[k], F.base[k]))
+      .sort((a, b) => Math.abs(b.d) - Math.abs(a.d));
+    if (!moved.length)
+      return ["No party’s share of voters certain of their vote has changed significantly since the months after the 2025 election.", false];
+    const { k, d } = moved[0];
+    return [`Since the months after the 2025 election, the share of ${firmWho(k)} certain of their vote has ${d < 0 ? "fallen" : "risen"} significantly, from ${Math.round(F.base[k].v)}% to ${Math.round(F.now[k].v)}%.`, true];
+  })();
+
+  /* The lines pool each wave with the two before it, weighted as the
+     figures above are, so a line moves on what three months say rather than
+     on one wave's few hundred respondents; the dots are the waves. */
+  const rolled = F.waves.map((w, i) => {
+    const ws = F.waves.slice(Math.max(0, i - F.pool + 1), i + 1);
+    const r = { x: w.x };
+    for (const k of parties) {
+      const n = ws.reduce((a, v) => a + v.n[k], 0);
+      r[k] = ws.reduce((a, v) => a + v.n[k] * v.solid[k], 0) / n;
+    }
+    return r;
+  });
+  const inX = (w) => w.x >= xDomain[0] && w.x <= xDomain[1];
+  const waves = F.waves.filter(inX), lines = rolled.filter(inX);
+  if (waves.length < 2) return firmSaid("und-lead", lead[0], lead[1]);
+  const vals = waves.flatMap((w) => parties.map((k) => w.solid[k]));
+  const lo = Math.max(0, Math.floor((Math.min(...vals) - 3) / 10) * 10);
+  const hi = Math.min(100, Math.ceil((Math.max(...vals) + 3) / 10) * 10);
+  const yTicks = [];
+  for (let v = lo + 10; v < hi; v += 10) yTicks.push(v);
+  const pts = (k) => lines.map((w) => ({ x: w.x, y: w[k] }));
+  const dots = waves.flatMap((w) => parties.map((k) => ({ x: w.x, y: w.solid[k], color: D.PARTIES[k].color,
+                                                          label: D.PARTIES[k].name, meta: w })));
+
+  return (
+    <>
+      {firmSaid("und-lead", lead[0], lead[1])}
+      <div className="und-reads">
+        {[...parties, "all"].map((k) => {
+          const r = F.now[k];
+          return (
+            <div className="und-read" key={k}>
+              <span className="und-swatch" style={{ background: k === "all" ? "var(--ink-3)" : D.PARTIES[k].color }} aria-hidden="true"></span>
+              <div className="und-read-body">
+                <div className="und-read-top">
+                  <span className="und-read-lab">{k === "all" ? "All voters" : D.PARTIES[k].name}</span>
+                  <span className="und-read-v">{r.v.toFixed(1)}<span className="pct">%</span></span>
+                  <span className="read-ci" title="95% margin">± {r.ci95.toFixed(1)}</span>
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <TrendChart
+        key="firm"
+        height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}
+        yTicks={yTicks} unit="%" axisFont={narrow ? 28 : 20}
+        pad={{ l: narrow ? 84 : 58, r: 22, t: 16, b: 42 }}
+        xTicks={buildXTicks(xDomain[0], xDomain[1])}
+        series={parties.map((k) => ({ id: k, label: D.PARTIES[k].name, color: D.PARTIES[k].color,
+                                      width: k === "oth" ? 2 : 3, dashed: k === "oth",
+                                      points: pts(k), endLabel: D.PARTIES[k].short }))}
+        spine={pts(parties[0])}
+        scatter={dots} pollFacet="twopp"
+        tooltipTitle={(i) => waves[i] && waves[i].dateLabel}
+        fmt={(v) => v.toFixed(0)}
+        copy={{ sub: `Share of each party’s voters certain of their vote, wave by wave · ${houseList(F.houses.map(demoHouse))}`,
+                legend: parties.map((k) => ({ label: `${D.PARTIES[k].name}  ${F.now[k].v.toFixed(1)}%`, color: D.PARTIES[k].color, kind: "line" })) }}
+      />
+      {firmSaid("demo-verdict", shift[0], shift[1])}
+      <p className="table-hint">
+        Each dot is one RedBridge wave; the lines and the figures above pool three waves at a
+        time, the figures its latest three ({F.now.from} to {F.now.to}).
+      </p>
+      <HowTo paras={[
+        <>Certain voters are RedBridge’s “solid” voters: they named a party when first asked and are
+        certain they will vote that way. The rest are soft – they may change their vote – or very
+        soft: they named a party only when pressed, or say they will probably change.</>,
+        <>Each wave counts in proportion to how many of a party’s voters it asked, so the figure
+        for a small party rests on a few hundred people and carries a wider margin. Two figures
+        differ significantly when the gap between them is larger than their two margins combined.</>,
+        <>This is a different question from Resolve’s “how firm are you” in the All voters view,
+        which is why the shares there are lower.</>,
+      ]} />
+    </>
   );
 }
 

@@ -1489,6 +1489,50 @@ const undecided = undecidedSeries.length ? {
   houses: creditHouses(undecidedRows, (r) => r.p.pollster, (r) => Date.parse(r.p.date)),
 } : null;
 
+/* ---- 5c2. how firm each party's vote is ------------------------------------
+   RedBridge/Accent's vote-softness table (polls.json `firmness`): for all
+   voters and each party's voters, the share who are solid (certain they will
+   vote that way), soft (may change) and very soft (undecided until prompted,
+   or will probably change). The panel quotes the solid share – "certain of
+   their vote" – per party.
+   One house, monthly, so like the undecided lines this is that house's own
+   series, not an aggregate. The current figure pools its last FIRM_POOL
+   waves, each weighted by the party's effective respondents in it (the
+   wave's effective sample times the party's primary), because one wave's
+   One Nation or Greens cell rests on a hundred to three hundred people. The
+   95% margin is binomial on that pooled base. The "Other" group is the row's
+   independents and minor parties (RedBridge files them all under `ind`). */
+const FIRM_POOL = 3;
+const FIRM_PARTIES = ["alp", "lnp", "onp", "grn", "oth"];
+const firmRows = POLLS.filter((p) => p.firmness).sort((a, b) => (a.date < b.date ? -1 : 1));
+const firmShare = (p, k) => (k === "oth" ? (p.ind ?? 0) + (p.oth ?? 0) : p[k]);
+const firmWaves = firmRows.map((p) => {
+  const eff = rowN(p) / HL_DEFF;
+  return {
+    x: dx(p.date), ym: ymOf(p.date), released: p.date, dateLabel: fwLabel(p.dateStart, p.date),
+    pollster: p.pollster, sample: p.sample ?? null,
+    solid: Object.fromEntries(["all", ...FIRM_PARTIES].map((k) => [k, p.firmness[k][0]])),
+    n: Object.fromEntries([["all", Math.round(eff)], ...FIRM_PARTIES.map((k) => [k, Math.round(eff * firmShare(p, k) / 100)])]),
+  };
+});
+const firmPooled = (ws) => Object.fromEntries(["all", ...FIRM_PARTIES].map((k) => {
+  let sn = 0, snv = 0;
+  for (const w of ws) { sn += w.n[k]; snv += w.n[k] * w.solid[k]; }
+  const v = snv / sn, q = v / 100;
+  return [k, { v: r1(v), ci95: r1(196 * Math.sqrt(q * (1 - q) / sn)), n: Math.round(sn) }];
+}));
+const firmness = firmWaves.length >= FIRM_POOL ? (() => {
+  const pool = firmWaves.slice(-FIRM_POOL);
+  return {
+    houses: creditHouses(firmWaves, (w) => w.pollster, (w) => Date.parse(w.released)),
+    waves: firmWaves,
+    pool: FIRM_POOL,
+    now: { from: pool[0].dateLabel, to: pool[pool.length - 1].dateLabel, ...firmPooled(pool) },
+    // the term's first waves, pooled the same way, for the change sentence
+    base: { from: firmWaves[0].dateLabel, to: firmWaves[FIRM_POOL - 1].dateLabel, ...firmPooled(firmWaves.slice(0, FIRM_POOL)) },
+  };
+})() : null;
+
 /* ---- 5b. where One Nation's gains came from ------------------------------
    From the vote-switching tables DemosAU and YouGov publish (built into
    data/vote-switching.json by .build/vote-switching.mjs): each 2025-vote
@@ -3682,6 +3726,9 @@ window.AUSPOL = (function () {
   const directionPolls = ${JSON.stringify(directionPolls)};
   const directionAvailable = ${direction.length > 0};
   const undecided = ${JSON.stringify(undecided)};
+  /* How firm each party's vote is (§5c2): RedBridge's vote-softness table,
+     the share of each party's voters certain of their vote. */
+  const firmness = ${JSON.stringify(firmness)};
   /* Where One Nation's gains came from (§5b): per wave, each 2025-vote
      group's part of what One Nation drew from outside its own 2025 vote,
      from DemosAU's and YouGov's vote-switching tables. */
@@ -3772,7 +3819,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, favHouses, directionPolls, directionNow, leaderNow, undecided, onSources, demographics, demoGroups, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, favHouses, directionPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoGroups, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved

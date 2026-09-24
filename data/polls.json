@@ -1259,6 +1259,38 @@
       "oth": null,
       "tpp_alp": 55.5,
       "tpp_lnp": 44.5,
+      "firmness": {
+        "all": [
+          54,
+          38,
+          8
+        ],
+        "alp": [
+          54,
+          38,
+          8
+        ],
+        "lnp": [
+          62,
+          31,
+          7
+        ],
+        "onp": [
+          52,
+          40,
+          8
+        ],
+        "grn": [
+          46,
+          47,
+          7
+        ],
+        "oth": [
+          41,
+          42,
+          17
+        ]
+      },
       "url": "https://www.afr.com/politics/federal/youthquake-coalition-deserted-by-younger-voters-20250701-p5mbja"
     },
     {
@@ -1441,6 +1473,38 @@
       "oth": null,
       "tpp_alp": 53.5,
       "tpp_lnp": 46.5,
+      "firmness": {
+        "all": [
+          52,
+          37,
+          11
+        ],
+        "alp": [
+          52,
+          39,
+          9
+        ],
+        "lnp": [
+          60,
+          28,
+          12
+        ],
+        "onp": [
+          54,
+          37,
+          9
+        ],
+        "grn": [
+          49,
+          42,
+          9
+        ],
+        "oth": [
+          36,
+          48,
+          16
+        ]
+      },
       "url": "https://www.afr.com/politics/federal/liberal-party-risks-permanent-opposition-without-youth-vote-20250911-p5mueg"
     },
     {
@@ -1573,6 +1637,38 @@
       "oth": null,
       "tpp_alp": 54,
       "tpp_lnp": 46,
+      "firmness": {
+        "all": [
+          50,
+          41,
+          9
+        ],
+        "alp": [
+          51,
+          40,
+          9
+        ],
+        "lnp": [
+          56,
+          35,
+          9
+        ],
+        "onp": [
+          49,
+          45,
+          6
+        ],
+        "grn": [
+          44,
+          49,
+          7
+        ],
+        "oth": [
+          36,
+          45,
+          19
+        ]
+      },
       "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_bfa36468f2104c90ba79a9bc66da0ab5.pdf",
       "releaseUrl": "https://www.accent-research.com/projects/federal-political-snapshot---october-2025",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_bfa36468f2104c90ba79a9bc66da0ab5.pdf"
@@ -1780,6 +1876,38 @@
       "oth": null,
       "tpp_alp": 56,
       "tpp_lnp": 44,
+      "firmness": {
+        "all": [
+          48,
+          43,
+          9
+        ],
+        "alp": [
+          48,
+          45,
+          7
+        ],
+        "lnp": [
+          53,
+          35,
+          12
+        ],
+        "onp": [
+          54,
+          39,
+          7
+        ],
+        "grn": [
+          48,
+          45,
+          7
+        ],
+        "oth": [
+          28,
+          59,
+          13
+        ]
+      },
       "url": "https://www.afr.com/politics/federal/one-nation-closing-in-on-coalition-as-ley-s-rating-hits-record-low-20251116-p5nfq2"
     },
     {
@@ -1963,6 +2091,38 @@
       "oth": null,
       "tpp_alp": 56,
       "tpp_lnp": 44,
+      "firmness": {
+        "all": [
+          46,
+          45,
+          9
+        ],
+        "alp": [
+          46,
+          47,
+          7
+        ],
+        "lnp": [
+          48,
+          42,
+          10
+        ],
+        "onp": [
+          54,
+          39,
+          7
+        ],
+        "grn": [
+          42,
+          47,
+          11
+        ],
+        "oth": [
+          38,
+          46,
+          16
+        ]
+      },
       "url": "https://www.afr.com/politics/federal/labor-loses-skin-over-expenses-scandal-but-keeps-strong-poll-lead-20251214-p5nnhe",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_4df02b5e2ec545b3b4faf83f1d87c7eb.pdf"
@@ -2264,6 +2424,38 @@
         "Lib": 13,
         "LNP": 4,
         "Nat": 2
+      },
+      "firmness": {
+        "all": [
+          48,
+          41,
+          11
+        ],
+        "alp": [
+          49,
+          42,
+          9
+        ],
+        "lnp": [
+          40,
+          45,
+          15
+        ],
+        "onp": [
+          56,
+          37,
+          7
+        ],
+        "grn": [
+          45,
+          44,
+          11
+        ],
+        "oth": [
+          41,
+          43,
+          16
+        ]
       },
       "url": "https://www.afr.com/politics/federal/libs-nats-in-freefall-while-hanson-surges-poll-20260201-p5nylo",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-january-2026-federal-poll",
@@ -2588,6 +2780,38 @@
         "grn": 89,
         "oth": 68
       },
+      "firmness": {
+        "all": [
+          46,
+          42,
+          12
+        ],
+        "alp": [
+          45,
+          43,
+          12
+        ],
+        "lnp": [
+          42,
+          48,
+          10
+        ],
+        "onp": [
+          54,
+          36,
+          10
+        ],
+        "grn": [
+          44,
+          44,
+          12
+        ],
+        "oth": [
+          35,
+          47,
+          18
+        ]
+      },
       "url": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-february-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf"
@@ -2891,6 +3115,38 @@
       "oth": null,
       "tpp_alp": 53,
       "tpp_lnp": 47,
+      "firmness": {
+        "all": [
+          46,
+          43,
+          11
+        ],
+        "alp": [
+          48,
+          41,
+          11
+        ],
+        "lnp": [
+          43,
+          45,
+          12
+        ],
+        "onp": [
+          59,
+          34,
+          7
+        ],
+        "grn": [
+          34,
+          56,
+          10
+        ],
+        "oth": [
+          26,
+          52,
+          22
+        ]
+      },
       "url": "https://www.afr.com/politics/federal/one-nation-nears-labor-as-coalition-vote-hits-record-low-20260329-p5zjmk"
     },
     {
@@ -3183,6 +3439,38 @@
         "lnp": 31,
         "grn": 92,
         "oth": 66
+      },
+      "firmness": {
+        "all": [
+          52,
+          39,
+          9
+        ],
+        "alp": [
+          53,
+          39,
+          8
+        ],
+        "lnp": [
+          50,
+          39,
+          11
+        ],
+        "onp": [
+          59,
+          32,
+          9
+        ],
+        "grn": [
+          48,
+          46,
+          6
+        ],
+        "oth": [
+          26,
+          60,
+          14
+        ]
       },
       "url": "https://www.afr.com/politics/federal/pm-arrests-popularity-decline-one-nation-plateaus-poll-20260501-p5zsuy",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-april-2026-federal-poll",
@@ -3596,6 +3884,38 @@
         "grn": 92,
         "oth": 67
       },
+      "firmness": {
+        "all": [
+          49,
+          41,
+          10
+        ],
+        "alp": [
+          49,
+          38,
+          13
+        ],
+        "lnp": [
+          49,
+          39,
+          12
+        ],
+        "onp": [
+          52,
+          42,
+          6
+        ],
+        "grn": [
+          54,
+          39,
+          7
+        ],
+        "oth": [
+          28,
+          52,
+          20
+        ]
+      },
       "url": "https://www.afr.com/politics/federal/one-nation-surges-ahead-of-labor-as-budget-flops-poll-20260531-p602d9",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-may-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_c99eef2ffb4242f3b2d0da6311abf61e.pdf"
@@ -3820,6 +4140,38 @@
         "grn": 85,
         "onp": 21,
         "oth": 62
+      },
+      "firmness": {
+        "all": [
+          49,
+          41,
+          10
+        ],
+        "alp": [
+          47,
+          43,
+          10
+        ],
+        "lnp": [
+          51,
+          37,
+          12
+        ],
+        "onp": [
+          53,
+          39,
+          8
+        ],
+        "grn": [
+          47,
+          46,
+          7
+        ],
+        "oth": [
+          44,
+          40,
+          16
+        ]
       },
       "url": "https://www.afr.com/politics/federal/hanson-takes-a-hit-as-labor-claws-back-the-lead-poll-20260628-p60ao9",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-june-2026-federal-poll",
@@ -4194,6 +4546,38 @@
         "grn": 91,
         "oth": 61
       },
+      "firmness": {
+        "all": [
+          49,
+          42,
+          9
+        ],
+        "alp": [
+          51,
+          40,
+          9
+        ],
+        "lnp": [
+          47,
+          44,
+          9
+        ],
+        "onp": [
+          59,
+          36,
+          5
+        ],
+        "grn": [
+          39,
+          52,
+          9
+        ],
+        "oth": [
+          32,
+          46,
+          22
+        ]
+      },
       "url": "https://www.afr.com/politics/federal/arm-wrestle-one-nation-retakes-lead-over-labor-in-latest-poll-20260802-p60kn6",
       "releaseUrl": "https://www.accent-research.com/projects/afr%2C-redbridge-group-and-accent-research-july-2026-federal-poll",
       "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_e09c2025b9df424e98b0f2737e7ae4ca.pdf"
@@ -4458,6 +4842,38 @@
         "lnp": 32,
         "grn": 90,
         "oth": 59
+      },
+      "firmness": {
+        "all": [
+          48,
+          43,
+          9
+        ],
+        "alp": [
+          49,
+          44,
+          7
+        ],
+        "lnp": [
+          47,
+          43,
+          10
+        ],
+        "onp": [
+          56,
+          37,
+          7
+        ],
+        "grn": [
+          40,
+          53,
+          7
+        ],
+        "oth": [
+          32,
+          49,
+          19
+        ]
       },
       "url": "https://www.afr.com/politics/federal/cost-of-living-still-king-for-voters-but-immigration-debt-on-the-rise-20260830-p60srn",
       "releaseUrl": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
