@@ -14,9 +14,10 @@
 # (.build/newspoll-file-missing-prompt.md) — the LLM last resort, never part
 # of the deterministic chain it stands in for.
 #
-# PR-gated (2026-09-05): the filing agent works a repair/ branch with no git
-# credentials; the workflow pushes the branch and opens the PR. Nothing the
-# agent files reaches main or the site until a human merges it.
+# Review-gated (2026-09-05): the filing agent works a repair/ branch with no
+# git credentials; the workflow pushes the branch and files a ci-alert issue
+# with the link to open the PR (Actions may not open PRs in this repo).
+# Nothing the agent files reaches main or the site until a human merges it.
 
 name: newspoll-watch
 
@@ -94,8 +95,7 @@ jobs:
       cancel-in-progress: false
     permissions:
       contents: write        # push the repair branch (and only the branch)
-      pull-requests: write   # open the PR
-      issues: write          # circuit-breaker alert issues + labels
+      issues: write          # the review request + circuit-breaker alerts
       actions: read          # the breaker counts earlier file-missing jobs
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0 (the branch step below strips the persisted credential; v6+ moves it)
@@ -164,7 +164,12 @@ jobs:
           fi
           matilda -p "$(cat .build/newspoll-file-missing-prompt.md)" --yolo --output-format text --max-wall-time 25m --max-tool-calls 80
 
-      - name: Push the repair branch and open a PR
+      # This repo does not let GitHub Actions open pull requests (Settings →
+      # Actions → "Allow GitHub Actions to create and approve pull requests"
+      # is off), so `gh pr create` here could only ever fail after the push.
+      # The branch goes up, and a ci-alert issue carries the one-click link
+      # to open the PR as a human — which is the review this gate exists for.
+      - name: Push the repair branch and ask for a review
         if: steps.breaker.outputs.allowed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
@@ -172,19 +177,16 @@ jobs:
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
           if ! git log --oneline origin/main..HEAD | grep -q .; then
-            echo "the agent left no commits; nothing to PR (its report is in the log above)"
+            echo "the agent left no commits; nothing to review (its report is in the log above)"
             exit 0
           fi
           git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x:%s' "$GH_TOKEN" | base64 -w0)" \
             push origin "HEAD:${BRANCH}"
-          gh label create repair-agent --force --description "Opened by a repair agent; human review required" --color 0E8A16 || true
-          printf '%s\n\n%s\n\n%s\n' \
-            "Automated filing of the unlanded Newspoll wave the watch job escalated — [run](${RUN_URL})." \
-            "**Review before merging.** Nothing here has touched main or the live site; merging deploys it." \
+          COMPARE="https://github.com/${GITHUB_REPOSITORY}/compare/main...${BRANCH}?expand=1"
+          BODY="$(printf '%s\n\n%s\n\n%s\n\n%s\n' \
+            "The filing agent pushed \`${BRANCH}\` for the unlanded Newspoll wave the watch job escalated — [run](${RUN_URL})." \
+            "**[Open the pull request](${COMPARE})** to review it. Nothing here has touched main or the live site; merging deploys it." \
             "Expected shape of an honest filing: one polls.json Newspoll row with a source URL whose figures match the row, plus the built artifacts from the normal validate+build path. No workflow or permissions changes. Reject anything else." \
-            > "$RUNNER_TEMP/pr-body.md"
-          gh pr create \
-            --label repair-agent \
-            --title "Repair: newspoll-file pipeline (run ${GITHUB_RUN_ID})" \
-            --body-file "$RUNNER_TEMP/pr-body.md"
-          gh pr view --json url --jq .url | tee -a "$GITHUB_STEP_SUMMARY"
+            "Delete the branch once it is merged or rejected.")"
+          bash .build/alert-issue.sh "Newspoll filing ready for review" "$BODY"
+          echo "review link: $COMPARE" | tee -a "$GITHUB_STEP_SUMMARY"
