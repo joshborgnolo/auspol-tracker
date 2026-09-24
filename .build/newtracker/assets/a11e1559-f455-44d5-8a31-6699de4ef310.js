@@ -1956,7 +1956,12 @@ function DemographicsPanel({ rangeId = "all" }) {
     const by = st.label ? st.label.replace(/^By /, "") : tab.label.toLowerCase();
     return (
       <div className="demo-chart">
-        <p className="demo-chart-lab">How much higher or lower than among all voters (%), month by month</p>
+        {/* on a phone the charts stack apart from their bars, so with two sets
+            each chart names its own, as the bars' header does */}
+        <p className="demo-chart-lab">
+          {tab.sets.length > 1 && <span className="demo-chart-set">{st.label}</span>}
+          How much higher or lower than among all voters (%), month by month
+        </p>
         <TrendChart
           key={"demo-" + st.id}
           height={narrow ? 560 : 500} xDomain={xDomain} yDomain={domain}
@@ -2013,9 +2018,12 @@ function DemographicsPanel({ rangeId = "all" }) {
           stays open across a tab switch. */}
       <div className="demo-body">
       <div className={"demo-grid" + (tab.sets.length === 1 ? " solo" : "")}>
+        {/* Every set's bars, then every set's chart. Two columns put the bars
+            side by side over the charts, level by construction; one column (a
+            phone) reads bars, bars, chart, chart, since the bars say more - the
+            charts mostly show no significant change. */}
         {tab.sets.map((st) => (
-          <div className="demo-house" key={st.id}>
-            <div className="demo-bars">
+            <div className="demo-bars" key={st.id}>
             {tab.sets.length > 1 && (
               <div className="demo-house-head">
                 <span className="demo-house-name">{st.label}</span>
@@ -2028,8 +2036,12 @@ function DemographicsPanel({ rangeId = "all" }) {
               demoRamp(color, st.groups.length, i)))}
             {(() => { const t = demoVerdict(st, party); return t && <p className="demo-verdict">{t}</p>; })()}
             </div>
-            {chartFor(st)}
-          </div>
+        ))}
+        {/* an empty slot keeps a set with no chart from pulling the other set's chart under the wrong bars */}
+        {tab.sets.map((st) => (
+          <React.Fragment key={st.id + "-chart"}>
+            {chartFor(st) || (tab.sets.length > 1 ? <div className="demo-chart" /> : null)}
+          </React.Fragment>
         ))}
       {/* The gist stays in view; the reading instructions fold, as the
           Past cycles intro's do - all of it ran eight lines under the charts. */}

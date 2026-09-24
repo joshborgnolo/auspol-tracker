@@ -2634,17 +2634,16 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px; }
 .demo-house-when { font-size: 12px; color: var(--ink-3); }
 /* Every tab lays out on the one grid, so switching tabs never moves the bars.
-   Two sets (age | generation): a column each, bars over chart, the charts
-   held level by a subgrid - they share a scale to be compared side by side,
-   and a set with more groups or a longer verdict no longer pushes its chart
-   down. One set (gender, education): its bars and its chart take the two
-   columns themselves, rather than stacking beside an empty half of the card.
+   The panel renders every set's bars, then every set's chart, as grid items.
+   Two sets (age | generation): the bars fill the first row and the charts the
+   second, so the charts sit level - they share a scale to be compared side
+   by side - however many groups or verdict lines each set has. One set
+   (gender, education): its bars and its chart take the two columns
+   themselves, rather than stacking beside an empty half of the card.
    Columns stack below 400px: narrower, a chart's plot shrinks to a strip
-   and a stacked, full-width one reads better. The notes follow the charts. */
-.demo-grid:not(.solo) .demo-house { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
+   and a stacked, full-width one reads better. Stacked, two sets read bars,
+   bars, chart, chart, and the notes follow the charts. */
 .demo-grid:not(.solo) .demo-notes { grid-column: 1 / -1; }
-.demo-grid.solo .demo-house { display: contents; }
-.demo-grid.solo .demo-chart { margin-top: 0; }
 .demo-notes > .table-hint:first-child { margin-top: 0; }
 /* One set, two columns: bars, verdict, and notes down the left, the chart
    spanning the right. The chart is the taller column, so its surplus goes to
@@ -2677,9 +2676,10 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
    close to the axis as the bars' sentence does to the bars; the right
    padding keeps the text clear of the button */
 .demo-chart > .demo-verdict { margin-top: -22px; padding-right: 40px; }
-.demo-chart { margin: 12px 0 4px; }
+.demo-chart { margin: 0 0 4px; }
 /* the chart plots gaps, not the bars' shares – said above it, in the bars' label voice */
 .demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
+.demo-chart-set { font-size: 13px; font-weight: 650; color: var(--ink); margin-right: 8px; }
 .read-ci { margin-left: 2px; }
 /* Where One Nation’s new voters came from: one plain sentence above the
    readings, in the panel copy's own voice (the readings reuse .und-*) */

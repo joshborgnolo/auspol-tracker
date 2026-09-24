@@ -1615,10 +1615,7 @@ a.pd-release:hover .plink-mark, a.pd-release:focus-visible .plink-mark { color: 
 .demo-house-name { font-size: 13px; font-weight: 650; color: var(--ink); text-decoration: none; }
 a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px; }
 .demo-house-when { font-size: 12px; color: var(--ink-3); }
-.demo-grid:not(.solo) .demo-house { display: grid; grid-row: span 2; grid-template-rows: subgrid; row-gap: 0; }
 .demo-grid:not(.solo) .demo-notes { grid-column: 1 / -1; }
-.demo-grid.solo .demo-house { display: contents; }
-.demo-grid.solo .demo-chart { margin-top: 0; }
 .demo-notes > .table-hint:first-child { margin-top: 0; }
 .demo-body { container-type: inline-size; }
 @container (min-width: 830px) {
@@ -1641,8 +1638,9 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-sw.dash { background: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 7px); }
 .demo-verdict { margin: 14px 0 0; font-size: 13px; font-weight: 600; line-height: 1.45; color: var(--ink-2); }
 .demo-chart > .demo-verdict { margin-top: -22px; padding-right: 40px; }
-.demo-chart { margin: 12px 0 4px; }
+.demo-chart { margin: 0 0 4px; }
 .demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
+.demo-chart-set { font-size: 13px; font-weight: 650; color: var(--ink); margin-right: 8px; }
 .read-ci { margin-left: 2px; }
 .ons-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
   text-wrap: pretty; }
@@ -40287,7 +40285,9 @@ function DemographicsPanel({
       className: "demo-chart"
     }, React.createElement("p", {
       className: "demo-chart-lab"
-    }, "How much higher or lower than among all voters (%), month by month"), React.createElement(TrendChart, {
+    }, tab.sets.length > 1 && React.createElement("span", {
+      className: "demo-chart-set"
+    }, st.label), "How much higher or lower than among all voters (%), month by month"), React.createElement(TrendChart, {
       key: "demo-" + st.id,
       height: narrow ? 560 : 500,
       xDomain: xDomain,
@@ -40375,10 +40375,8 @@ function DemographicsPanel({
   }, React.createElement("div", {
     className: "demo-grid" + (tab.sets.length === 1 ? " solo" : "")
   }, tab.sets.map(st => React.createElement("div", {
-    className: "demo-house",
+    className: "demo-bars",
     key: st.id
-  }, React.createElement("div", {
-    className: "demo-bars"
   }, tab.sets.length > 1 && React.createElement("div", {
     className: "demo-house-head"
   }, React.createElement("span", {
@@ -40390,7 +40388,11 @@ function DemographicsPanel({
     return t && React.createElement("p", {
       className: "demo-verdict"
     }, t);
-  })()), chartFor(st))), React.createElement("div", {
+  })())), tab.sets.map(st => React.createElement(React.Fragment, {
+    key: st.id + "-chart"
+  }, chartFor(st) || (tab.sets.length > 1 ? React.createElement("div", {
+    className: "demo-chart"
+  }) : null))), React.createElement("div", {
     className: "demo-notes"
   }, React.createElement("p", {
     className: "table-hint"
