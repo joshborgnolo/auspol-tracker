@@ -1883,6 +1883,11 @@ function demoVerdict(st, party) {
     .sort((p, q) => (q[0].v[party] - q[1].v[party]) - (p[0].v[party] - p[1].v[party]))[0];
   return `${Who(a)} are significantly more likely than ${who(b)} ${vote}.`;
 }
+/* A verdict that finds something carries the leads' highlighter; one that
+   finds nothing ("no significant difference", "hasn’t changed significantly",
+   "aren’t enough polls") stays plain, so the marks point at the findings. */
+const demoSaid = (t) => t && <p className="demo-verdict">
+  {/significant/.test(t) && !/\bno\b|n’t/.test(t) ? <mark>{t}</mark> : t}</p>;
 /* The sentence under a set's chart: has any group moved towards or away
    from the party, relative to all voters, over the period on screen? The
    lines pool every pollster, and who asks changes over the term (Resolve
@@ -2105,7 +2110,7 @@ function DemographicsPanel({ rangeId = "all" }) {
         />
         {(() => {
           const t = demoTrendVerdict(D, st, party, (x) => x >= xDomain[0] && x <= xDomain[1]);
-          return t && <p className="demo-verdict">{t}</p>;
+          return demoSaid(t);
         })()}
       </div>
     );
@@ -2149,7 +2154,7 @@ function DemographicsPanel({ rangeId = "all" }) {
             {st.groups.map((g, i) => row(g.label, g.v[party], g.ci[party], false,
               `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"} · ${houseList(g.houses.map(demoHouse))} · ± ${g.ci[party].toFixed(1)} is the 95% margin`,
               demoRamp(color, st.groups.length, i)))}
-            {(() => { const t = demoVerdict(st, party); return t && <p className="demo-verdict">{t}</p>; })()}
+            {demoSaid(demoVerdict(st, party))}
             </div>
         ))}
         {/* an empty slot keeps a set with no chart from pulling the other set's chart under the wrong bars */}
