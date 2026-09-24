@@ -1364,8 +1364,7 @@ function DirectionPanel({ rangeId }) {
       <div className="card-head">
         <div>
           <h2 className="card-title">National direction</h2>
-          {/* the question mark ends the quoted sentence, so the reading follows with no full stop */}
-          <p className="card-sub">{question} {plainShare(latest.wrong)} Australians think we’re on the wrong track{asked ? " · " + asked : ""}</p>
+          <p className="card-sub">{question}{asked ? " · " + asked : ""}</p>
         </div>
         <div className="dir-net">
           <span className="dir-net-label">Net</span>
@@ -1375,6 +1374,8 @@ function DirectionPanel({ rangeId }) {
           {netDelta != null && <Delta value={netDelta} suffix="" small title={now ? nowDeltaTitle(now) : "Change on the previous month"} />}
         </div>
       </div>
+      {/* the reading in words, in the lead voice the One Nation panel opens with */}
+      <p className="dir-lead">{plainShare(latest.wrong)} Australians think we’re on the wrong track.</p>
 
       <div className="dir-readout">
         <div className="dir-side">

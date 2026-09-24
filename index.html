@@ -1645,7 +1645,7 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
 .demo-chart-set { font-size: 13px; font-weight: 650; color: var(--ink); margin-right: 8px; }
 .read-ci { margin-left: 2px; }
-.ons-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
+.ons-lead, .dir-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
   text-wrap: pretty; }
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
@@ -39537,7 +39537,7 @@ function DirectionPanel({
     className: "card-title"
   }, "National direction"), React.createElement("p", {
     className: "card-sub"
-  }, question, " ", plainShare(latest.wrong), " Australians think we\u2019re on the wrong track", asked ? " · " + asked : "")), React.createElement("div", {
+  }, question, asked ? " · " + asked : "")), React.createElement("div", {
     className: "dir-net"
   }, React.createElement("span", {
     className: "dir-net-label"
@@ -39548,7 +39548,9 @@ function DirectionPanel({
     suffix: "",
     small: true,
     title: now ? nowDeltaTitle(now) : "Change on the previous month"
-  }))), React.createElement("div", {
+  }))), React.createElement("p", {
+    className: "dir-lead"
+  }, plainShare(latest.wrong), " Australians think we\u2019re on the wrong track."), React.createElement("div", {
     className: "dir-readout"
   }, React.createElement("div", {
     className: "dir-side"
