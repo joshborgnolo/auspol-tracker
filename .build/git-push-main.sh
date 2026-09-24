@@ -217,6 +217,16 @@ acquire_slot_lock() {
   [ "$waited" -gt 0 ] && log "writers lock acquired after waiting ${waited}s"
   echo $$ > "$SLOT_LOCK_DIR/pid"
   trap 'rm -rf "$SLOT_LOCK_DIR"' EXIT
+  # The laptop's launchd jobs run in a clone nobody edits (run.sh sets
+  # AUSPOL_RUNNER_CLONE=1; see .build/install-launchd.sh). A dirty tree
+  # there can only be the leftovers of a run that died mid-write — a lid
+  # closed mid-crawl — and the wrappers' dirty-tree guard would then refuse
+  # every later slot. Discard them, under the lock so no live run is
+  # touched. Never in a checkout people work in: there the guard stands.
+  if [ "${AUSPOL_RUNNER_CLONE:-}" = "1" ] && ! { git diff --quiet && git diff --cached --quiet; }; then
+    log "runner clone: discarding an interrupted run's uncommitted leftovers"
+    git reset -q --hard HEAD >> "$LOG" 2>&1 || true
+  fi
 }
 
 # ---------------------------------------------------------------------------

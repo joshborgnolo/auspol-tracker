@@ -12,6 +12,8 @@
      C  the same row twice        the rebase leaves nothing; success, no push
      D  the race lost twice       "FAIL push race", exit 1 (classified transient)
      E  AUSPOL_PR_GATE=1          commit stays local
+     F  AUSPOL_RUNNER_CLONE=1     the laptop's clone drops an interrupted run's
+                                  leftovers under the lock instead of refusing
 
    Run: node .build/test-push-main.mjs */
 import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, copyFileSync, existsSync } from "node:fs";
@@ -183,5 +185,16 @@ assert.equal(r.code, 0, "E exits 0\n" + r.log);
 assert.match(r.log, /commit left local/, "E left the commit local");
 git(one, "fetch", "-q", "origin");
 assert.equal(git(one, "rev-parse", "origin/main"), tipBefore, "E: origin untouched");
+
+// ---- F: the laptop's runner clone heals an interrupted run's leftovers ------------
+// (acquire_slot_lock, under the lock, only when AUSPOL_RUNNER_CLONE=1)
+git(one, "reset", "-q", "--hard", "origin/main");
+writeFileSync(path.join(one, "data/other.json"), readFileSync(path.join(one, "data/other.json"), "utf8").replace("seed-other", "half-written"));
+r = run(one, "data/polls.json", "f1", { AUSPOL_RUNNER_CLONE: "1" });
+assert.equal(r.code, 0, "F exits 0\n" + r.log + r.stderr);
+assert.match(r.log, /runner clone: discarding an interrupted run's uncommitted leftovers/, "F healed\n" + r.log);
+fetchBoth();
+assert.doesNotMatch(originFile("data/other.json"), /half-written/, "F: the leftover never reached origin");
+assert.match(originFile("data/polls.json"), /"f1"/, "F: the run itself landed");
 
 console.log("test-push-main: ok");
