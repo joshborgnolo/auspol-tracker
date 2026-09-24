@@ -330,12 +330,14 @@ function PrimaryVotePanel({ rangeId }) {
       />
       <p className="table-hint">
         Each dot is one published poll’s first-preference figure; the lines are
-        monthly averages, weighted by sample and adjusted for each house’s lean.
-        Each chip carries a party’s current share and its change since the 2025
-        election, where every line here begins. Use the chips to isolate one
-        party – on its own its line draws with the 95% interval around
-        it{solo ? ", shaded here" : ""}.
+        monthly averages. Use the chips to isolate one party.
       </p>
+      <HowTo paras={[
+        <>The lines are weighted by sample and adjusted for each house’s lean.</>,
+        <>Each chip carries a party’s current share and its change since the 2025 election, where
+        every line here begins. A party on its own draws with the 95% interval around its
+        line{solo ? ", shaded here" : ""}.</>,
+      ]} />
     </section>
   );
 }
@@ -1397,11 +1399,14 @@ function DirectionPanel({ rangeId }) {
         fmt={dirFmt}
       />
       <p className="table-hint">
-        Each dot is one published reading; the lines are monthly averages
-        adjusted for house effects, shaded with their 95% intervals. Only {asked ? D.directionHouses.length : 0} houses ask
-        this question, so some months rest on a single poll – the dots show which,
-        and the shading shows what that costs in confidence.
+        Each dot is one published reading; the lines are monthly averages, shaded with their
+        95% intervals.
       </p>
+      <HowTo paras={[
+        <>The lines are adjusted for house effects. Only {asked ? D.directionHouses.length : 0} houses
+        ask this question, so some months rest on a single poll – the dots show which, and the
+        shading shows what that costs in confidence.</>,
+      ]} />
     </section>
   );
 }
@@ -3683,26 +3688,30 @@ function PollsterTable({ tppBasis, setTppBasis, tppMatchup, setTppMatchup }) {
           </tbody>
         </table>
       </div>
-      <p className="table-hint">
-        {/* The basis switch is the 2PP column's heading, and that column is
-            .hide-md: below 1000px the sentence points at the hero's own
-            toggle instead of a heading the reader can't see. */}
-        {(() => { const act = typeof CANT_HOVER !== "undefined" && CANT_HOVER ? "Tap" : "Click";
-          return (<>
-            Tap any poll to see its full breakdown · {act} a column heading to sort · “—” means the pollster didn’t ask that question.
-            {tppBasis === "resp"
-              ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar draws the published margin out from a tie line at its centre."
-              : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar draws that margin out from a tie line at its centre."}
+      {(() => { const act = typeof CANT_HOVER !== "undefined" && CANT_HOVER ? "Tap" : "Click";
+        return (<>
+          <p className="table-hint">
+            Tap any poll to see its full breakdown · {act} a column heading to sort.
+          </p>
+          {/* The basis switch is the 2PP column's heading, and that column is
+              .hide-md: below 1000px the sentence points at the hero's own
+              toggle instead of a heading the reader can't see. */}
+          <HowTo label="How to read this table" paras={[
+            <>“—” means the pollster didn’t ask that question.</>,
+            <>{tppBasis === "resp"
+              ? "“As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar draws the published margin out from a tie line at its centre."
+              : "“Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar draws that margin out from a tie line at its centre."}
             <span className="hint-wide">{tppBasis === "resp"
               ? ` ${act} the “As published” heading to switch back to implied.`
               : ` ${act} the “Implied 2PP” heading to switch to the pollsters’ own published figures.`}</span>
             <span className="hint-narrow">{tppBasis === "resp"
               ? " The switch above the headline figure flips back to implied."
-              : " The switch above the headline figure flips to the pollsters’ own published figures."}</span>
-          </>); })()}
-        {" "}<strong>Published</strong> is the day the poll was released, taken from the source each row links to.
-        {" "}Each house’s systematic lean – its house effect – sits beside poll lean in the All polls archive.
-      </p>
+              : " The switch above the headline figure flips to the pollsters’ own published figures."}</span></>,
+            <><strong>Published</strong> is the day the poll was released, taken from the source each
+            row links to. Each house’s systematic lean – its house effect – sits beside poll lean in
+            the All polls archive.</>,
+          ]} />
+        </>); })()}
     </section>
   );
 }

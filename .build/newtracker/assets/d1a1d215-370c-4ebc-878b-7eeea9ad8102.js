@@ -2804,16 +2804,8 @@ function AccuracyPanel() {
       </div>
 
       <p className="table-hint">
-        Big dots are the average of that election’s final polls – where only one house
-        was in the field, its own figure stands alone; small dots are the individual
-        houses – {CANT_HOVER ? "tap" : "hover"} one for its figure.
-        {stacked > 0 && (
-          <> {stacked} of them missed by exactly the same amount as another house, so they are
-          drawn on top of each other – <strong>Separate overlapping dots</strong> steps those into
-          their own lanes without moving any of them along the scale.</>
-        )} Exit polls are excluded, and a
-        house that publishes an undecided-inclusive pair is normalised first, so its arithmetic
-        isn’t scored as a miss.
+        Big dots are each election’s average final poll; small dots are the individual houses
+        – {CANT_HOVER ? "tap" : "hover"} one for its figure.
         {bothWays && (
           <> Of the {numWord(oneSided.length)} elections where every house missed the same way
           ({listJoin(oneSided.map((c) => c.year))}), {numWord(oneSided.filter((c) => c.err > 0).length)} overstated
@@ -2823,6 +2815,14 @@ function AccuracyPanel() {
           that carries.</>
         )}
       </p>
+      <HowTo paras={[
+        <>Where only one house was in the field, its own figure stands alone.</>,
+        stacked > 0 && <>{stacked} dots missed by exactly the same amount as another house, so they
+        are drawn on top of each other – <strong>Separate overlapping dots</strong> steps those into
+        their own lanes without moving any of them along the scale.</>,
+        <>Exit polls are excluded, and a house that publishes an undecided-inclusive pair is
+        normalised first, so its arithmetic isn’t scored as a miss.</>,
+      ]} />
 
       <div className="acc-firms">
         <div className="acc-firms-h">By house, where there is more than one election to judge on</div>
@@ -3187,7 +3187,11 @@ function PastCyclesView() {
 
       <AccuracyPanel />
 
-      <p className="cyc-foot">
+      {/* the tab's method notes, folded like every chart's: the download
+          pointer stays in view, the construction waits behind the toggle */}
+      <details className="view-how hint-how">
+        <summary>How these charts are built</summary>
+        <p className="cyc-foot">
         The individual polls behind the plotted series are downloadable above
         {hidden.size > 0 && ", the file leaving the hidden terms out just as the charts do"}.{" "}
         Past cycles run the full ~3-year term to the next election. The current term stops at the
@@ -3217,7 +3221,8 @@ function PastCyclesView() {
         {mode === "chg"
           ? "Lines show movement relative to each party’s own election result."
           : "Approval lines splice the sitting prime minister – and opposition leader – where a term changed leaders mid-stream."}
-      </p>
+        </p>
+      </details>
     </div>
   );
 }
@@ -5583,26 +5588,29 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         </div>
       )}
       <p className="table-hint">
-        Tap any poll for its full breakdown · Dates are fieldwork windows (publication dates sit in the
-        breakdown) ·
-        {pubBasis
-          ? "“As published” lists each poll’s headline figures exactly as the pollster released them · The lead bar draws the published margin out from a tie line at its centre"
-          : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown · The lead bar draws that implied margin out from a tie line at its centre"}
-        {" "}(the L/NP v ON and 3-cornered matchups are the
-        pollsters’ own published figures – the site prices no implied series for them) · “Poll lean” is
-        the poll’s {pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate"} for that month · “—” means the pollster didn’t
-        publish that measure · Search matches
-        anything in a row · {CANT_HOVER ? "Tap" : "Click"} any column heading to sort
-        <span className="hint-wide"> · {CANT_HOVER ? "Tap" : "Click"} the “{pubBasis ? "As published" : "Implied 2PP"}”
-        heading to switch bases</span><span className="hint-narrow"> · The Basis switch above the table changes bases</span>.{" "}
-        <strong>House effect</strong> is how far a pollster systematically sits from the cross-house consensus
-        on {pubBasis ? "published" : "implied"} 2PP – pooled from its polls with a 90-day half-life, so its recent methods count for more, and
-        shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure’s
-        own time, and it is a property of the pollster, not of this one poll.
-        {" "}<strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, filed with the
-        Australian Polling Council – Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog
-        file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown.
+        Tap any poll for its full breakdown · Search matches anything in a row ·{" "}
+        {CANT_HOVER ? "Tap" : "Click"} any column heading to sort.
       </p>
+      <HowTo label="How to read this table" paras={[
+        <>Dates are fieldwork windows; publication dates sit in the breakdown. “—” means the
+        pollster didn’t publish that measure.</>,
+        <>{pubBasis
+          ? "“As published” lists each poll’s headline figures exactly as the pollster released them. The lead bar draws the published margin out from a tie line at its centre"
+          : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown. The lead bar draws that implied margin out from a tie line at its centre"}
+        {" "}(the L/NP v ON and 3-cornered matchups are the pollsters’ own published figures – the
+        site prices no implied series for them).
+        <span className="hint-wide"> {CANT_HOVER ? "Tap" : "Click"} the “{pubBasis ? "As published" : "Implied 2PP"}”
+        heading to switch bases.</span><span className="hint-narrow"> The Basis switch above the table changes bases.</span></>,
+        <><strong>Poll lean</strong> is the poll’s {pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate"} for
+        that month. <strong>House effect</strong> is how far a pollster systematically sits from the
+        cross-house consensus on {pubBasis ? "published" : "implied"} 2PP – pooled from its polls with a
+        90-day half-life, so its recent methods count for more, and shrunk toward zero while it has
+        published few. The aggregates subtract it, read as of each figure’s own time, and it is a
+        property of the pollster, not of this one poll.</>,
+        <><strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, filed with the
+        Australian Polling Council – Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog
+        file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown.</>,
+      ]} />
 
       <VariancePanel key={facet} facet={facet} rangeId={range} />
 

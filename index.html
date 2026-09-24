@@ -38316,7 +38316,9 @@ function PrimaryVotePanel({
     fmt: v => v.toFixed(1)
   }), React.createElement("p", {
     className: "table-hint"
-  }, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages, weighted by sample and adjusted for each house\u2019s lean. Each chip carries a party\u2019s current share and its change since the 2025 election, where every line here begins. Use the chips to isolate one party \u2013 on its own its line draws with the 95% interval around it", solo ? ", shaded here" : "", "."));
+  }, "Each dot is one published poll\u2019s first-preference figure; the lines are monthly averages. Use the chips to isolate one party."), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "The lines are weighted by sample and adjusted for each house\u2019s lean."), React.createElement(React.Fragment, null, "Each chip carries a party\u2019s current share and its change since the 2025 election, where every line here begins. A party on its own draws with the 95% interval around its line", solo ? ", shaded here" : "", ".")]
+  }));
 }
 const eventOn = iso => (window.AP.D.events || []).find(e => e.date === iso) || null;
 const majorEvents = () => (window.AP.D.events || []).filter(e => e.major);
@@ -39329,7 +39331,9 @@ function DirectionPanel({
     fmt: dirFmt
   }), React.createElement("p", {
     className: "table-hint"
-  }, "Each dot is one published reading; the lines are monthly averages adjusted for house effects, shaded with their 95% intervals. Only ", asked ? D.directionHouses.length : 0, " houses ask this question, so some months rest on a single poll \u2013 the dots show which, and the shading shows what that costs in confidence."));
+  }, "Each dot is one published reading; the lines are monthly averages, shaded with their 95% intervals."), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "The lines are adjusted for house effects. Only ", asked ? D.directionHouses.length : 0, " houses ask this question, so some months rest on a single poll \u2013 the dots show which, and the shading shows what that costs in confidence.")]
+  }));
 }
 function UndecidedPanel({
   rangeId
@@ -41503,16 +41507,19 @@ function PollsterTable({
     }, React.createElement(PollDetail, {
       r: r
     }))));
-  })))), React.createElement("p", {
-    className: "table-hint"
-  }, (() => {
+  })))), (() => {
     const act = typeof CANT_HOVER !== "undefined" && CANT_HOVER ? "Tap" : "Click";
-    return React.createElement(React.Fragment, null, "Tap any poll to see its full breakdown \xB7 ", act, " a column heading to sort \xB7 \u201C\u2014\u201D means the pollster didn\u2019t ask that question.", tppBasis === "resp" ? " “As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar draws the published margin out from a tie line at its centre." : " “Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar draws that margin out from a tie line at its centre.", React.createElement("span", {
-      className: "hint-wide"
-    }, tppBasis === "resp" ? ` ${act} the “As published” heading to switch back to implied.` : ` ${act} the “Implied 2PP” heading to switch to the pollsters’ own published figures.`), React.createElement("span", {
-      className: "hint-narrow"
-    }, tppBasis === "resp" ? " The switch above the headline figure flips back to implied." : " The switch above the headline figure flips to the pollsters’ own published figures."));
-  })(), " ", React.createElement("strong", null, "Published"), " is the day the poll was released, taken from the source each row links to.", " ", "Each house\u2019s systematic lean \u2013 its house effect \u2013 sits beside poll lean in the All polls archive."));
+    return React.createElement(React.Fragment, null, React.createElement("p", {
+      className: "table-hint"
+    }, "Tap any poll to see its full breakdown \xB7 ", act, " a column heading to sort."), React.createElement(HowTo, {
+      label: "How to read this table",
+      paras: [React.createElement(React.Fragment, null, "\u201C\u2014\u201D means the pollster didn\u2019t ask that question."), React.createElement(React.Fragment, null, tppBasis === "resp" ? "“As published” lists each poll’s headline figures exactly as the pollster released them, and the lead bar draws the published margin out from a tie line at its centre." : "“Implied 2PP” reads the poll’s primaries at the 2025 election’s preference flows, and the lead bar draws that margin out from a tie line at its centre.", React.createElement("span", {
+        className: "hint-wide"
+      }, tppBasis === "resp" ? ` ${act} the “As published” heading to switch back to implied.` : ` ${act} the “Implied 2PP” heading to switch to the pollsters’ own published figures.`), React.createElement("span", {
+        className: "hint-narrow"
+      }, tppBasis === "resp" ? " The switch above the headline figure flips back to implied." : " The switch above the headline figure flips to the pollsters’ own published figures.")), React.createElement(React.Fragment, null, React.createElement("strong", null, "Published"), " is the day the poll was released, taken from the source each row links to. Each house\u2019s systematic lean \u2013 its house effect \u2013 sits beside poll lean in the All polls archive.")]
+    }));
+  })());
 }
 Object.assign(window, {
   Segmented,
@@ -43784,7 +43791,9 @@ function AccuracyPanel() {
     }, "All one way")));
   })))), React.createElement("p", {
     className: "table-hint"
-  }, "Big dots are the average of that election\u2019s final polls \u2013 where only one house was in the field, its own figure stands alone; small dots are the individual houses \u2013 ", CANT_HOVER ? "tap" : "hover", " one for its figure.", stacked > 0 && React.createElement(React.Fragment, null, " ", stacked, " of them missed by exactly the same amount as another house, so they are drawn on top of each other \u2013 ", React.createElement("strong", null, "Separate overlapping dots"), " steps those into their own lanes without moving any of them along the scale."), " Exit polls are excluded, and a house that publishes an undecided-inclusive pair is normalised first, so its arithmetic isn\u2019t scored as a miss.", bothWays && React.createElement(React.Fragment, null, " Of the ", numWord(oneSided.length), " elections where every house missed the same way (", listJoin(oneSided.map(c => c.year)), "), ", numWord(oneSided.filter(c => c.err > 0).length), " overstated Labor and ", numWord(oneSided.filter(c => c.err < 0).length), " understated it. They missed in ", React.createElement("strong", null, "opposite directions"), ", so this is not a standing lean that today\u2019s figures could be corrected for. It is the size of the error, not its direction, that carries.")), React.createElement("div", {
+  }, "Big dots are each election\u2019s average final poll; small dots are the individual houses \u2013 ", CANT_HOVER ? "tap" : "hover", " one for its figure.", bothWays && React.createElement(React.Fragment, null, " Of the ", numWord(oneSided.length), " elections where every house missed the same way (", listJoin(oneSided.map(c => c.year)), "), ", numWord(oneSided.filter(c => c.err > 0).length), " overstated Labor and ", numWord(oneSided.filter(c => c.err < 0).length), " understated it. They missed in ", React.createElement("strong", null, "opposite directions"), ", so this is not a standing lean that today\u2019s figures could be corrected for. It is the size of the error, not its direction, that carries.")), React.createElement(HowTo, {
+    paras: [React.createElement(React.Fragment, null, "Where only one house was in the field, its own figure stands alone."), stacked > 0 && React.createElement(React.Fragment, null, stacked, " dots missed by exactly the same amount as another house, so they are drawn on top of each other \u2013 ", React.createElement("strong", null, "Separate overlapping dots"), " steps those into their own lanes without moving any of them along the scale."), React.createElement(React.Fragment, null, "Exit polls are excluded, and a house that publishes an undecided-inclusive pair is normalised first, so its arithmetic isn\u2019t scored as a miss.")]
+  }), React.createElement("div", {
     className: "acc-firms"
   }, React.createElement("div", {
     className: "acc-firms-h"
@@ -44050,9 +44059,11 @@ function PastCyclesView() {
     setOnp: setShowOnp,
     shapes: shapes,
     outcomeShown: outcomeShown
-  }))), React.createElement(AccuracyPanel, null), React.createElement("p", {
+  }))), React.createElement(AccuracyPanel, null), React.createElement("details", {
+    className: "view-how hint-how"
+  }, React.createElement("summary", null, "How these charts are built"), React.createElement("p", {
     className: "cyc-foot"
-  }, "The individual polls behind the plotted series are downloadable above", hidden.size > 0 && ", the file leaving the hidden terms out just as the charts do", ".", " ", "Past cycles run the full ~3-year term to the next election. The current term stops at the latest poll, and its last point is the figure the site quotes now, as in the headline, rather than the month so far. Every term\u2019s months are averaged as the current term\u2019s are: a pollster with several polls in a month counts for the square root of their number, and from 1987, when Newspoll joined Morgan, each poll is first corrected for its pollster\u2019s lean within that term. Where the band runs faint, fewer than three-quarters of the terms on the board were in office that month \u2013 the oldest terms open before any house asked about approval, and only the longest parliaments reach three years \u2013 and the readout on its mean names the headcount, and how many of them were polled rather than interpolated, month by month.", " ", showHan && React.createElement("span", null, "Hanson is drawn on the opposition chart from ", "“", "approve minus disapprove", "”", " readings only, which is why her line is short: most houses rate her on favourability, a different question that is never blended into these lines, and no past cycle asked about her at all.", " "), showOnp && React.createElement("span", null, "The One Nation line tracks the party\u2019s first-preference vote over the current term only; past cycles are left undrawn.", " "), mode === "chg" ? "Lines show movement relative to each party’s own election result." : "Approval lines splice the sitting prime minister – and opposition leader – where a term changed leaders mid-stream."));
+  }, "The individual polls behind the plotted series are downloadable above", hidden.size > 0 && ", the file leaving the hidden terms out just as the charts do", ".", " ", "Past cycles run the full ~3-year term to the next election. The current term stops at the latest poll, and its last point is the figure the site quotes now, as in the headline, rather than the month so far. Every term\u2019s months are averaged as the current term\u2019s are: a pollster with several polls in a month counts for the square root of their number, and from 1987, when Newspoll joined Morgan, each poll is first corrected for its pollster\u2019s lean within that term. Where the band runs faint, fewer than three-quarters of the terms on the board were in office that month \u2013 the oldest terms open before any house asked about approval, and only the longest parliaments reach three years \u2013 and the readout on its mean names the headcount, and how many of them were polled rather than interpolated, month by month.", " ", showHan && React.createElement("span", null, "Hanson is drawn on the opposition chart from ", "“", "approve minus disapprove", "”", " readings only, which is why her line is short: most houses rate her on favourability, a different question that is never blended into these lines, and no past cycle asked about her at all.", " "), showOnp && React.createElement("span", null, "The One Nation line tracks the party\u2019s first-preference vote over the current term only; past cycles are left undrawn.", " "), mode === "chg" ? "Lines show movement relative to each party’s own election result." : "Approval lines splice the sitting prime minister – and opposition leader – where a term changed leaders mid-stream.")));
 }
 const ArchSortTh = window.SortTh;
 function ArchDirCell({
@@ -46817,11 +46828,14 @@ function AllPollsView({
     className: "ap-more-n"
   }, shownRows.length, " of ", sorted.length, " shown")), React.createElement("p", {
     className: "table-hint"
-  }, "Tap any poll for its full breakdown \xB7 Dates are fieldwork windows (publication dates sit in the breakdown) \xB7", pubBasis ? "“As published” lists each poll’s headline figures exactly as the pollster released them · The lead bar draws the published margin out from a tie line at its centre" : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown · The lead bar draws that implied margin out from a tie line at its centre", " ", "(the L/NP v ON and 3-cornered matchups are the pollsters\u2019 own published figures \u2013 the site prices no implied series for them) \xB7 \u201CPoll lean\u201D is the poll\u2019s ", pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate", " for that month \xB7 \u201C\u2014\u201D means the pollster didn\u2019t publish that measure \xB7 Search matches anything in a row \xB7 ", CANT_HOVER ? "Tap" : "Click", " any column heading to sort", React.createElement("span", {
-    className: "hint-wide"
-  }, " \xB7 ", CANT_HOVER ? "Tap" : "Click", " the \u201C", pubBasis ? "As published" : "Implied 2PP", "\u201D heading to switch bases"), React.createElement("span", {
-    className: "hint-narrow"
-  }, " \xB7 The Basis switch above the table changes bases"), ".", " ", React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on ", pubBasis ? "published" : "implied", " 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll.", " ", React.createElement("strong", null, "n", React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, filed with the Australian Polling Council \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown."), React.createElement(VariancePanel, {
+  }, "Tap any poll for its full breakdown \xB7 Search matches anything in a row \xB7", " ", CANT_HOVER ? "Tap" : "Click", " any column heading to sort."), React.createElement(HowTo, {
+    label: "How to read this table",
+    paras: [React.createElement(React.Fragment, null, "Dates are fieldwork windows; publication dates sit in the breakdown. \u201C\u2014\u201D means the pollster didn\u2019t publish that measure."), React.createElement(React.Fragment, null, pubBasis ? "“As published” lists each poll’s headline figures exactly as the pollster released them. The lead bar draws the published margin out from a tie line at its centre" : "“Implied 2PP” reads each poll’s primaries at the 2025 election’s preference flows – one fixed table, so the column compares house to house; the wave’s own published 2PP sits in its breakdown. The lead bar draws that implied margin out from a tie line at its centre", " ", "(the L/NP v ON and 3-cornered matchups are the pollsters\u2019 own published figures \u2013 the site prices no implied series for them).", React.createElement("span", {
+      className: "hint-wide"
+    }, " ", CANT_HOVER ? "Tap" : "Click", " the \u201C", pubBasis ? "As published" : "Implied 2PP", "\u201D heading to switch bases."), React.createElement("span", {
+      className: "hint-narrow"
+    }, " The Basis switch above the table changes bases.")), React.createElement(React.Fragment, null, React.createElement("strong", null, "Poll lean"), " is the poll\u2019s ", pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate", " for that month. ", React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on ", pubBasis ? "published" : "implied", " 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll."), React.createElement(React.Fragment, null, React.createElement("strong", null, "n", React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, filed with the Australian Polling Council \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown.")]
+  }), React.createElement(VariancePanel, {
     key: facet,
     facet: facet,
     rangeId: range
