@@ -1772,7 +1772,7 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
       <NextPollsPanel />
       <LeadershipSection rangeId={rangeId} />
       <DirectionPanel rangeId={rangeId} />
-      {/* who votes for whom by age, gender and education */}
+      {/* who votes for whom: age, gender, education, place, and home */}
       <DemographicsPanel rangeId={rangeId} />
       {/* who One Nation's surge is made of */}
       <OnSourcesPanel rangeId={rangeId} />

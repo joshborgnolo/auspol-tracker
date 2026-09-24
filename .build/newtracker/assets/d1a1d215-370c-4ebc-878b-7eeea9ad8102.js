@@ -5934,7 +5934,8 @@ function infoTerms(D) {
   ) : null;
   /* The vote by group: the polls its six-week window holds, newest first. */
   const DEMO = D.demographics;
-  const DEMO_SET_NAME = { age: "age", generation: "generation", gender: "gender", education: "education" };
+  const DEMO_SET_NAME = { age: "age", generation: "generation", gender: "gender", education: "education",
+    state: "state", location: "location", housing: "housing", language: "language at home" };
   const demoWork = DEMO && DEMO.polls && DEMO.polls.length ? (
     <div className="info-work-wrap">
       <table className="info-work">
@@ -6008,7 +6009,7 @@ function infoTerms(D) {
         weighting: the vote, the leader ratings, national direction, and every past term on Past
         cycles. The current figure beside each panel is built as the headline is: a leader’s
         rating, preferred prime minister, national direction, where One Nation’s new voters came
-        from, and the vote by age, gender, and education. Measures polled about once a week or less
+        from, and who votes for whom. Measures polled about once a week or less
         use a six-week window instead: favourability, Hanson’s approval, preferred prime minister,
         the One Nation split, and the vote by group. There a poll’s weight halves every 14 days,
         counts in full for four weeks, and fades out by day 42.</span>
@@ -6304,9 +6305,10 @@ function infoTerms(D) {
         and YouGov’s 15%. Each poll’s figures are in the All polls export.</span>
         {working(onsWork)}</>) },
       { id: "vote-by-group", term: "Breakdowns by group", body: (
-        <>How each group – men and women, age groups, education levels – says it will vote, from
-        the tables pollsters publish with their polls. The panel “The vote by age, gender, and
-        education” pools them into one figure per group.
+        <>How each group – men and women, age groups, education levels, states, where people live,
+        whether they own or rent, and the language they speak at home – says it will vote, from the
+        tables pollsters publish with their polls. The panel “Who votes for whom” pools them into
+        one figure per group.
         <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
         that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Those gaps
         are pooled over the last six weeks of polls, weighted as the headline’s polls are, so newer
@@ -6314,20 +6316,26 @@ function infoTerms(D) {
         voters. Measuring each poll against its own total removes its pollster’s lean, and puts
         every group on the same level as the headline. The charts under the figures follow each
         group month by month, built the same way: each month’s pooled gaps are added to that
-        month’s figure for all voters, as every monthly line on the site is built.</span>
+        month’s figure for all voters, as every monthly line on the site is built. They show each
+        group as a percentage above or below all voters.</span>
         <span className="info-p"><b>Which pollsters count where.</b> Groups pool only where the
         pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov, and
         RedBridge. 18–34: Resolve, DemosAU, and YouGov. 35–54 and 55+: Resolve and DemosAU, since
         YouGov’s bands are 35–49 and 50+. Generations: YouGov and RedBridge. Education, on three
         levels: DemosAU, YouGov, and RedBridge, with RedBridge’s two school rows combined in
-        proportion to its own group sizes.</span>
+        proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA,
+        WA, and ACT/NT/Tas columns are combined into the rest of Australia at their shares of the
+        2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and
+        DemosAU for the two metropolitan ones, since its third combines provincial and rural
+        voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its
+        renters include others who don’t own. Language at home: YouGov and DemosAU.</span>
         <span className="info-p"><b>Reading a gap.</b> Each figure carries its 95% margin, usually
         2 to 5 points. A pooled figure moves less than any one poll’s, but a gap smaller than the
         margins either side may still be noise.</span>
         <span className="info-p"><b>A check.</b> Every table is checked before it’s used: each
         group must add up to 100, give or take rounding, and an all-voters column must match the
         poll’s published vote.</span>
-        <span className="info-p"><b>Sources.</b> Resolve’s monthly age and gender series (its
+        <span className="info-p"><b>Sources.</b> Resolve’s monthly age, gender, and state series (its
         Political Monitor interactive), YouGov’s published crosstabs, RedBridge’s report tables,
         and DemosAU’s report charts, measured from the chart in each report because small bars
         carry no label. Each poll’s figures for these groups are in the All polls export.</span>

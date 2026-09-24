@@ -1,6 +1,6 @@
 ---
 name: auspol-vote-by-group-all-voters-anchor
-description: auspol-tracker — The vote by age, gender and education anchors on the QUOTED primaries verbatim (§7g, gen-data.mjs); never rescale the anchor to 100. History: until 9cd65cd the panel ran primaryNow / each month's aggPrimary through demoNorm (rescale to 100), so its All-voters row and dashed monthly line read +0.1 above the hero and the primary chart on the biggest parties. That was the RESCALE (the quoted sets sum to ~99.7 by design), not double rounding. A build guard now throws on any drift. Includes the window.AUSPOL node probe for payload questions.
+description: auspol-tracker — The vote-by-group panel ("Who votes for whom", formerly "The vote by age, gender and education") anchors on the QUOTED primaries verbatim (§7g, gen-data.mjs); never rescale the anchor to 100. History: until 9cd65cd the panel ran primaryNow / each month's aggPrimary through demoNorm (rescale to 100), so its All-voters row and dashed monthly line read +0.1 above the hero and the primary chart on the biggest parties. That was the RESCALE (the quoted sets sum to ~99.7 by design), not double rounding. A build guard now throws on any drift. Includes the window.AUSPOL node probe for payload questions.
 source: auto-skill
 ---
 

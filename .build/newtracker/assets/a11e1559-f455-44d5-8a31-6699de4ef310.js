@@ -1646,12 +1646,13 @@ function OnSourcesPanel({ rangeId }) {
   );
 }
 
-// ---- The vote by age, gender and education ------------------------------
+// ---- Who votes for whom: the vote by group -----------------------------------
 /* One figure per group and party (gen-data §7g): each poll's gap between a
    group and its own all-voters figure, pooled over six weeks the way the
    headline pools polls, added to the site's current primaries. Groups pool
    only where pollsters cut the population the same way, so Age shows its
-   bands and, beside them, the generations two houses ask by. One party at a
+   bands and, beside them, the generations two houses ask by; Place shows
+   states beside location, Home housing beside language at home. One party at a
    time, One Nation first. Under each set's bars, a chart of how much higher
    or lower each group's vote is than all voters', in PERCENT, month by month
    (gen-data's monthly lines over that month's primaries) inside its 95%
@@ -1695,6 +1696,12 @@ const DEMO_WHO = {
   Men: "men", Women: "women",
   "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "voters with a TAFE or trade qualification",
   University: "university graduates",
+  NSW: "voters in NSW", Vic: "voters in Victoria", Qld: "voters in Queensland",
+  "Rest of Australia": "voters in SA, WA, Tasmania, and the territories",
+  "Inner metro": "voters in the inner suburbs", "Outer metro": "voters in the outer suburbs",
+  Provincial: "voters in provincial towns and cities", Rural: "rural voters",
+  "Own outright": "voters who own their home outright", Mortgage: "voters with a mortgage", Renting: "renters",
+  "English only": "voters who speak only English at home", "Other language": "voters who speak another language at home",
 };
 /* Per set: `all` names the groups together, `others` the rest of them beside
    one group, `step` the trend phrase for an ordered set (null where the
@@ -1705,6 +1712,11 @@ const DEMO_SET_WORDS = {
   generation: { all: "generations", others: "any other generation", step: "with each older generation", one: "generation" },
   gender: { all: "men and women", others: null, step: null },
   education: { all: "levels of education", others: "voters with other levels of education", step: null, one: "education group" },
+  state: { all: "the states", others: "voters in other states", step: null, one: "state" },
+  // inner suburbs, outer suburbs, provincial, rural: each further from a capital
+  location: { all: "the city and the country", others: "voters in other areas", step: "with each step further from the city", one: "area" },
+  housing: { all: "owners and renters", others: "other voters", step: null, one: "group" },
+  language: { all: "voters who speak only English at home and those who don’t", others: null, step: null },
 };
 const DEMO_VOTE_FOR = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "a minor party or independent" };
 function demoVerdict(st, party) {
@@ -1964,7 +1976,7 @@ function DemographicsPanel({ rangeId = "all" }) {
     <section className="card">
       <div className="card-head">
         <div>
-          <h2 className="card-title">The vote by age, gender, and education</h2>
+          <h2 className="card-title">Who votes for whom</h2>
           <p className="card-sub">
             {name}’s share of each group’s first-preference vote, pooled from the last {T.window} of polls · {houseList(T.houses.map(demoHouse))}
           </p>
@@ -2007,7 +2019,7 @@ function DemographicsPanel({ rangeId = "all" }) {
         The figures pool the last {T.window} of polls. Each chart shows how much higher or lower
         the party’s vote is in each group than among all voters, month by month.{" "}
         <button type="button" className="hi-term"
-                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender, and education")}>
+                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "Who votes for whom")}>
           Where the figures come from</button>
       </p>
       <details className="view-how hint-how">
@@ -2040,7 +2052,10 @@ function DemographicsPanel({ rangeId = "all" }) {
         </p>
         <p className="table-hint">
           Groups pool only where pollsters cut them the same way
-          {tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : ""}.
+          {tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34"
+            : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the rest of Australia at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups"
+            : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups"
+            : ""}.
         </p>
       </details>
       </div>

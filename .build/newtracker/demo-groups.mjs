@@ -37,6 +37,8 @@ export const DEMO_TABS = [
   { id: "age", label: "Age" },
   { id: "gender", label: "Gender" },
   { id: "education", label: "Education" },
+  { id: "place", label: "Place" },
+  { id: "home", label: "Home" },
 ];
 export const DEMO_SETS = [
   { tab: "age", id: "age", label: "By age", groups: ["18–34", "35–54", "55+"] },
