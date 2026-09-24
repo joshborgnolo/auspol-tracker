@@ -1372,7 +1372,7 @@ function DirectionPanel({ rangeId }) {
         </div>
       </div>
       {/* the reading in words, in the lead voice the One Nation panel opens with */}
-      <p className="dir-lead">{plainShare(latest.wrong)} Australians think we’re on the wrong track.</p>
+      <p className="dir-lead"><b>{plainShare(latest.wrong)} Australians believe we’re on the wrong track.</b></p>
 
       <div className="dir-readout">
         <div className="dir-side">
