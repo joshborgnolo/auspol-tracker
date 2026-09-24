@@ -833,6 +833,10 @@ button.fresh-dot:focus-visible { outline: 2px solid var(--mood-pos); outline-off
 }
 .theme-seg .theme-cell:not(.active):active svg { transform: translateY(0.5px); }
 
+/* the skin switch sits beside the theme switch, the same rocker */
+.skin-cell-classic span { font: 600 16px/16px var(--serif); display: block; width: 16px; text-align: center; letter-spacing: -0.02em; }
+.skin-cell svg { display: block; }
+.head-right .skin-seg { margin-left: -8px; }
 /* ---------- accessibility: keyboard focus ---------- */
 /* single shared focus ring for every interactive control. mouse/touch users
    never see it (:focus-visible); keyboard users always get a clear path. */
@@ -1343,6 +1347,8 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    ~360px, with the Individual-poll entry nudged left so the 95% interval
    label clears the row's end */
 .hero-legend { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+/* the reading fold takes its own row under the legend and caption */
+.hero-foot > .hint-how { flex: 1 0 100%; margin-top: 2px; }
 .hl-item { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--ink-3); font-weight: 500; white-space: nowrap; }
 .hl-line { width: 18px; height: 3px; border-radius: 2px; }
 /* dashed swatch for a computed (not measured) overlay line – the fixed-flow
@@ -3029,6 +3035,7 @@ a.colo-link:hover .plink-mark, a.colo-link:focus-visible .plink-mark { color: va
      absolutely pinned) so it can't add phantom column-gap above the rule */
   .head-right { display: contents; }
   .theme-seg { position: absolute; top: 0; right: 0; }
+  .head-right .skin-seg { margin-left: 0; top: 46px; }
   /* The desktop pair is heraldic: it mirrors around the rule, so Labor reads
      outward to the left and the Coalition outward to the right. What a phone
      cannot take is the STACK - "Labor 52.0" over "48.0 Coalition" put the two
@@ -4699,10 +4706,287 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
   .tile-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
 }
 
+
+/* ======================================================================
+   SKIN: TALLY ROOM (body.tally) – opt-in, from the Aa | ☐1 switch in the
+   header or ?skin=tally. The classic skin above is untouched by all of it.
+
+   The page dressed in the paperwork of an Australian election rather than
+   a newspaper's: the House of Representatives ballot (pale green stock,
+   black boxes numbered in order of preference) and the National Tally Room
+   in Canberra, where election nights were counted up on walls of ruled
+   cells in tall, condensed figures.
+
+   So: one family, Archivo, used at three widths – condensed for figures
+   (the tally board), expanded for labels (the form), normal for reading.
+   Everything is square. Controls are ruled boxes that fill black when
+   marked. Every section is numbered in a ballot square, 1, 2, 3 ... down
+   the page, as a preference is. The ground is ballot green by day and the
+   tally board's green-black by night; party colours are flat print inks.
+   ====================================================================== */
+body.tally {
+  --bg:        oklch(0.962 0.020 152);
+  --surface:   oklch(0.988 0.006 150);
+  --surface-2: oklch(0.945 0.024 152);
+  --ink:       oklch(0.215 0.020 162);
+  --ink-2:     oklch(0.350 0.020 162);
+  --ink-3:     oklch(0.465 0.020 160);
+  --ink-faint: oklch(0.690 0.020 158);
+  --line:      oklch(0.800 0.026 155);
+  --line-2:    oklch(0.875 0.024 153);
+
+  --alp: oklch(0.545 0.190 27);
+  --lnp: oklch(0.460 0.135 258);
+  --grn: oklch(0.520 0.130 145);
+  --onp: oklch(0.690 0.165 62);
+  --oth: oklch(0.600 0.020 150);
+  --alp-text: var(--alp);
+  --lnp-text: var(--lnp);
+  --grn-text: oklch(0.480 0.130 145);
+  --onp-text: oklch(0.520 0.150 58);
+  --oth-text: oklch(0.480 0.020 150);
+  --mood-pos: oklch(0.480 0.090 205);
+  --mood-neg: oklch(0.440 0.050 50);
+
+  --serif: "Archivo", "Arial Narrow", system-ui, sans-serif;
+  --sans:  "Archivo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --heads: "Archivo", system-ui, sans-serif;
+  --panel: "Archivo", system-ui, sans-serif;
+
+  --t-rule: 2px solid var(--ink);          /* the form's printed rule */
+  --shadow: none; --tip-shadow: none;
+  --glass-bg: var(--surface); --glass-border: var(--ink); --glass-blur: none;
+  --chart-bg: var(--bg);
+  font-stretch: 100%;
+  font-feature-settings: "tnum" 1;
+}
+body.tally.dark {
+  --bg:        oklch(0.195 0.022 162);
+  --surface:   oklch(0.230 0.024 162);
+  --surface-2: oklch(0.262 0.026 162);
+  --ink:       oklch(0.955 0.012 150);
+  --ink-2:     oklch(0.840 0.014 152);
+  --ink-3:     oklch(0.720 0.016 154);
+  --ink-faint: oklch(0.560 0.018 156);
+  --line:      oklch(0.380 0.026 160);
+  --line-2:    oklch(0.315 0.024 160);
+  --alp: oklch(0.680 0.180 28);
+  --lnp: oklch(0.700 0.130 255);
+  --grn: oklch(0.760 0.150 145);
+  --onp: oklch(0.790 0.150 66);
+  --oth: oklch(0.720 0.020 150);
+  --alp-text: var(--alp); --lnp-text: var(--lnp); --grn-text: var(--grn);
+  --onp-text: var(--onp); --oth-text: var(--oth);
+  --mood-pos: oklch(0.740 0.100 200);
+  --mood-neg: oklch(0.720 0.060 50);
+}
+/* every class-level override of the ground (editorial, cool) loses to the skin */
+body.tally.editorial, body.tally.cool { --bg: oklch(0.962 0.020 152); }
+body.tally.dark.editorial, body.tally.dark.cool { --bg: oklch(0.195 0.022 162); }
+
+/* ---- the page ---- */
+html:has(body.tally) { background: oklch(0.962 0.020 152); }
+html:has(body.tally.dark) { background: oklch(0.195 0.022 162); }
+/* the form's heading bar: a heavy rule across the top of the page */
+body.tally::before { content: ""; position: fixed; inset: 0 0 auto 0; height: 6px;
+  background: var(--ink); z-index: 60; }
+body.tally, body.tally * { border-radius: 0 !important; }
+body.tally * { box-shadow: none !important; text-shadow: none !important; }
+body.tally ::selection { background: var(--ink); color: var(--bg); }
+
+/* ---- type: one family, three widths ---- */
+/* reading */
+body.tally p, body.tally li { font-stretch: 100%; }
+/* the form: labels in wide caps */
+body.tally .meta-k, body.tally .ts-eyebrow, body.tally .ts-abbr, body.tally .cyc-drawn-label,
+body.tally .ap-ctl-lab, body.tally .npd-cols, body.tally .acc-firms-h, body.tally .acc-group-h,
+body.tally .poll-table th, body.tally .hb-toggle, body.tally .tn-lab, body.tally .demo-chart-lab,
+body.tally .hero-alt .ha-lab, body.tally .pd-sec-h, body.tally .fav-mark, body.tally .ptag,
+body.tally .acc-flag, body.tally .lead-who, body.tally .view-how > summary {
+  font-family: var(--sans); font-stretch: 125%; text-transform: uppercase;
+  letter-spacing: 0.05em; font-weight: 650;
+}
+body.tally .meta-k, body.tally .poll-table th { font-size: 11px; }
+body.tally .view-how > summary { font-size: 11.5px; }
+/* the tally board: every standing figure condensed and heavy */
+body.tally .ro-num, body.tally .leader-num, body.tally .und-read-v, body.tally .legend-val,
+body.tally .ts-num, body.tally .dir-net-val, body.tally .flow-readout-v, body.tally .acc-firm-v,
+body.tally .acc-year, body.tally .net, body.tally .netv, body.tally .demo-v, body.tally .ha-chip,
+body.tally .released-pill, body.tally .onsrc-v, body.tally .acc-err, body.tally .meta-v,
+body.tally .np-date, body.tally .ci-delta, body.tally .vr-v, body.tally .dir-big {
+  font-family: var(--sans); font-stretch: 68%; font-weight: 800; letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+}
+body.tally .ro-num { font-size: 104px; line-height: 0.82; letter-spacing: -0.01em; }
+body.tally .ro-name { font-stretch: 125%; text-transform: uppercase; font-size: 13px;
+  letter-spacing: 0.06em; font-weight: 700; }
+body.tally .leader-num { font-size: clamp(30px, 12cqi, 40px); }
+body.tally .ts-num { font-size: 20px; }
+body.tally .meta-v { font-size: 17px; font-weight: 750; }
+
+/* ---- the masthead ---- */
+body.tally .wordmark { font-family: var(--sans); }
+/* the two words are NOT justified to one width here (the classic lockup's
+   inline letter-spacing is overridden): wide and heavy over tall and light,
+   the form's two voices, left-aligned */
+body.tally .wm-name { font-stretch: 125%; font-weight: 900; letter-spacing: -0.02em !important; font-size: 29px; }
+body.tally .wordmark.stacked .wm-track { font-stretch: 62%; font-weight: 300; font-size: 33px;
+  letter-spacing: 0.01em !important; color: var(--ink-2); }
+body.tally .tagline { font-family: var(--sans); font-size: 14px; font-stretch: 100%; color: var(--ink-2); }
+body.tally .site-head { border-bottom: var(--t-rule); padding-top: 14px; }
+
+/* ---- section numbering: a ballot square before every section title ---- */
+body.tally main { counter-reset: tally-sec; }
+body.tally h2.card-title {
+  font-family: var(--sans); font-stretch: 118%; font-weight: 780; font-size: 27px;
+  letter-spacing: -0.025em; line-height: 1.1;
+  display: flex; align-items: flex-start; gap: 14px;
+}
+body.tally h2.card-title::before {
+  counter-increment: tally-sec; content: counter(tally-sec);
+  flex: none; display: inline-flex; align-items: center; justify-content: center;
+  width: 1.3em; height: 1.3em; margin-top: -0.1em;
+  border: 2.5px solid currentColor; font-stretch: 68%; font-weight: 800;
+  font-size: 0.82em; letter-spacing: 0; font-variant-numeric: tabular-nums;
+}
+body.tally .info h2.card-title::before, body.tally h2.info-h::before { display: none; }
+body.tally h3.card-title, body.tally .ap-var-title, body.tally .info-group {
+  font-family: var(--sans); font-stretch: 112%; font-weight: 750; letter-spacing: -0.015em;
+}
+body.tally .card-sub { font-size: 14.5px; color: var(--ink-2); }
+/* sections part on the printed rule, not a hairline */
+body.tally.editorial .card { border-top: var(--t-rule); }
+body.tally.editorial .hero { border-top: 0; }
+
+/* ---- the tabs: ruled boxes, the marked one filled ---- */
+body.tally .tabs-inner { border-bottom: var(--t-rule); gap: 0 !important; }
+body.tally .tab { padding: 11px 12px 10px; border-right: 1px solid var(--line); }
+body.tally .tab:first-child { padding-left: 2px; }
+body.tally .tab::after { display: none; }
+body.tally .tab-label, body.tally.editorial .tab-label {
+  font-family: var(--sans); font-stretch: 118%; text-transform: uppercase;
+  font-size: 12.5px; font-weight: 700; letter-spacing: 0.04em; line-height: 16px;
+}
+body.tally .tab.active { color: var(--bg); background: var(--ink); padding-left: 12px; }
+body.tally .tab.active:first-child { padding-left: 12px; }
+body.tally .tabs.pinned { border-bottom: 0; }
+
+/* ---- controls: boxes that fill black when marked ---- */
+body.tally .segmented, body.tally .theme-seg.segmented {
+  background: transparent; padding: 0; border: 1.5px solid var(--ink); gap: 0;
+}
+body.tally .seg-btn, body.tally .theme-seg .theme-cell,
+body.tally .theme-seg .theme-cell:not(.active) {
+  background: transparent; color: var(--ink); border: 0;
+  font-stretch: 112%; font-weight: 650;
+}
+body.tally .seg-btn + .seg-btn { border-left: 1.5px solid var(--ink) !important; }
+body.tally .seg-btn.active, body.tally .theme-seg .theme-cell.active {
+  background: var(--ink); color: var(--bg);
+}
+body.tally .theme-seg .theme-cell:first-child { border-right: 0; }
+/* text toggles: a marked box beside each option instead of an underline */
+body.tally .tt-opt { border-bottom: 0; font-stretch: 112%; font-weight: 600; color: var(--ink-2);
+  display: inline-flex; align-items: center; gap: 6px; }
+body.tally .tt-opt::before { content: ""; width: 10px; height: 10px; flex: none;
+  border: 1.5px solid currentColor; }
+body.tally .tt-opt.active { color: var(--ink); font-weight: 750; border-bottom: 0; }
+body.tally .tt-opt.active::before { background: currentColor; }
+/* pills and chips */
+body.tally .legend-chip, body.tally .ha-chip, body.tally .ap-popbtn, body.tally .ap-jump,
+body.tally .acc-spread, body.tally .dl-replay, body.tally .cyc-drawn-item, body.tally .sb-out,
+body.tally .vr-pill, body.tally .ss-back, body.tally .back-to-chart, body.tally .ap-search input,
+body.tally .ap-search {
+  background: transparent; border: 1.5px solid var(--ink); color: var(--ink);
+}
+body.tally .legend-chip.off { border-style: dashed; border-color: var(--ink-3); }
+body.tally .ap-popbtn.open, body.tally .ap-popbtn.on, body.tally .acc-spread[aria-pressed="true"] {
+  background: var(--ink); color: var(--bg);
+}
+body.tally .ptag { background: transparent; border: 1px solid var(--line); color: var(--ink-2); }
+body.tally .legend-swatch, body.tally .ro-dot, body.tally .leader-dot, body.tally .sb-swatch,
+body.tally .demo-sw { border-radius: 0 !important; }
+body.tally .pg-check input { accent-color: var(--ink); }
+
+/* ---- the hero ---- */
+body.tally .hero-title { font-stretch: 125%; }
+body.tally .ro-sep { width: 3px; background: var(--ink); height: 78px; }
+body.tally .hg-track { background: transparent; border: 1.5px solid var(--ink); height: 12px; }
+body.tally .hg-span { top: 2px; height: 5px; }
+body.tally .hg-tie { background: var(--ink); width: 2px; }
+body.tally .hg-grad { background: var(--ink-3); }
+
+/* ---- tables: the ruled ledger ---- */
+body.tally .poll-table.archive thead th, body.tally.editorial .card .poll-table.archive thead th {
+  background: var(--bg); border-bottom: var(--t-rule); color: var(--ink);
+}
+body.tally .poll-table td { border-bottom-color: var(--line); }
+body.tally .pollster-name { font-stretch: 100%; font-weight: 750; }
+body.tally .np-item:nth-child(odd) { background: transparent; }
+body.tally .np-item { border-bottom: 1px solid var(--line); }
+body.tally .np-list, body.tally .np-items { border-top: var(--t-rule); }
+
+/* ---- floating readouts: a slip of paper with a printed edge ---- */
+body.tally .tip, body.tally .acc-tip, body.tally .ap-pop, body.tally .term-pop {
+  background: var(--surface); border: 1.5px solid var(--ink);
+  -webkit-backdrop-filter: none; backdrop-filter: none;
+}
+body.tally .term-pop-t { font-family: var(--sans); font-stretch: 112%; font-weight: 780; }
+body.tally .term-pop-scrim { background: oklch(0.2 0.02 160 / 0.28); }
+
+/* ---- links ---- */
+body.tally .hi-term { text-decoration-thickness: 1.5px; text-underline-offset: 3px; }
+
+/* ---- charts: the board's own lettering ---- */
+body.tally .axis-label { font-family: var(--sans); font-stretch: 80%; font-weight: 600; }
+body.tally .evt-label { font-family: var(--sans); font-stretch: 90%; font-weight: 650; }
+body.tally .end-label { font-family: var(--sans); font-stretch: 90%; font-weight: 800; }
+
+/* ---- the footer: a row of empty ballot squares instead of the tide ---- */
+body.tally .colo-lede { font-family: var(--sans); font-stretch: 112%; font-weight: 700; }
+body.tally .tile-band {
+  height: 150px; background:
+    linear-gradient(to bottom, var(--bg), transparent 70%),
+    repeating-linear-gradient(to right, transparent 0 34px, var(--ink) 34px 36px, transparent 36px 52px),
+    repeating-linear-gradient(to bottom, transparent 0 34px, var(--ink) 34px 36px, transparent 36px 52px);
+  opacity: 0.16;
+}
+body.tally .tile-band::before { display: none; }
+body.tally.dark .tile-band { opacity: 0.22; }
+
+body.tally .acc-flag { font-stretch: 100%; white-space: nowrap; font-size: 9.5px; }
+/* ---- phones ---- */
+@media (max-width: 640px) {
+  body.tally .ro-num { font-size: 78px; }
+  body.tally .tab { padding: 10px 8px 9px; }
+  body.tally .tab:first-child, body.tally .tab.active:first-child { padding-left: 8px; }
+  body.tally .tab-label, body.tally.editorial .tab-label { font-size: 11px; font-stretch: 100%; letter-spacing: 0.03em; }
+  body.tally h2.card-title { font-size: 23px; gap: 11px; font-stretch: 108%; }
+  body.tally .wm-name { font-size: 26px; }
+  body.tally .wordmark.stacked .wm-track { font-size: 29px; }
+  /* the ruled tab boxes are wider than the classic labels: with the score
+     docked, Info yields on every phone width, and the boxes close up */
+  body.tally .tabs.show-score .tab-pinhide { display: none; }
+  body.tally .tabs.pinned .tab { padding-inline: 6px; border-right: 0; }
+}
+@media (max-width: 380px) {
+  body.tally .ro-num { font-size: 66px; }
+  body.tally .tabs:not(.pinned) .tab-label-long { display: none; }
+  body.tally .tabs:not(.pinned) .tab-label-short { display: inline; }
+  body.tally .tab { padding: 10px 6px 9px; }
+  body.tally .tab-label, body.tally.editorial .tab-label { font-size: 10.5px; letter-spacing: 0.02em; }
+}
+/* the skin switch itself, in either skin: the tally cell's emblem stays square */
+body.tally .skin-cell-classic span { font-family: "Crimson Text", Georgia, serif; font-stretch: 100%; }
+
 </style>
   
 </head>
 <body>
+  <!-- the Tally Room skin, applied before first paint so a reader who chose
+       it never sees the classic skin flash in while the app loads (the app's
+       own chrome effect takes over from here) -->
+  <script>try{var q=new URLSearchParams(location.search).get("skin"),t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null");if((q||(t&&t.skin))==="tally")document.body.classList.add("tally")}catch(e){}</script>
   <!-- build.mjs replaces this marker with the article version of the page:
        every headline figure and the methodology, as real text, for a crawler,
        a link-preview scraper, reader mode, assistive tech, or a reader whose
