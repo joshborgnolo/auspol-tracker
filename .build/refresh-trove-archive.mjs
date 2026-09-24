@@ -22,6 +22,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { applyShell, shellOptsFor } from "./site-shell.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
@@ -264,14 +265,6 @@ body {
   padding: 8px 12px 10px; margin-bottom: -1px; border-bottom: 2px solid transparent; text-decoration: none; }
 .tab:hover { color: var(--ink); }
 .tab.active { color: var(--ink); border-bottom-color: var(--ink); }
-.ss-back {
-  position: fixed; right: 18px; bottom: 18px; z-index: 300;
-  display: inline-block; padding: 10px 16px; border-radius: 999px;
-  border: 1px solid var(--line); background: var(--bg); color: var(--ink);
-  font-size: 13px; font-weight: 600; text-decoration: none; cursor: pointer;
-  box-shadow: 0 3px 16px oklch(0 0 0 / 0.16);
-}
-.ss-back:hover { border-color: var(--ink-3); }
 .frame-wrap { flex: 1; display: flex; flex-direction: column; max-width: var(--maxw); width: 100%;
   margin: 0 auto; padding: 40px calc(28px + env(safe-area-inset-right, 0px)) calc(64px + env(safe-area-inset-bottom, 0px)) calc(28px + env(safe-area-inset-left, 0px)); }
 .frame-wrap h1 { font-family: var(--serif); font-size: 34px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 6px; }
@@ -355,15 +348,14 @@ node .build/refresh-trove-archive.mjs  # this page + the two CSVs</pre>
   <h2>Known limits</h2>
   <p class="body-copy">The corpus is everything Trove's search matches for the token <code>poll</code> in the newspaper category — that includes polling booths and opinion polls alike, which is the triage the two smaller subsets do. OCR is machine-read and corrected by volunteers; titles from the 1800s especially keep stray misreadings. The gazette tail after 1995 is government printing, not news. And the corpus is a snapshot: the National Library keeps scanning, so a re-run will find more, never less.</p>
 
-  <p class="ss-note">This is a satellite archive page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>
-<a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 </body>
 </html>
 `;
 
 fs.mkdirSync(path.dirname(OUT_PAGE), { recursive: true });
-fs.writeFileSync(OUT_PAGE, page);
+// the site's shared header and footer (site-shell.mjs), as every satellite carries them
+fs.writeFileSync(OUT_PAGE, applyShell(page, shellOptsFor(path.relative(ROOT, OUT_PAGE))));
 console.log(`read ${files.length} month files, ${fmt(total)} articles`);
 console.log(`wrote data/trove-mentions-monthly.csv (${Object.keys(monthly).length} months)`);
 console.log(`wrote data/trove-poll-articles.csv (${pollRows.length} poll reports)`);

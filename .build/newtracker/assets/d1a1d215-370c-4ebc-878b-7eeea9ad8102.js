@@ -510,7 +510,8 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                       + (pinned && heroGone ? " show-score" : "")}
            aria-label="Views">
         <div className="tabs-inner">
-          <div className="tabs-set" role="tablist" aria-label="Views"
+          <div className="tabs-set">
+          <div className="tabs-list" role="tablist" aria-label="Views"
                onKeyDown={onTabKeyDown}>
             {tabs.map((t) => (
               <button key={t.id} role="tab" aria-selected={active === t.id}
@@ -531,6 +532,17 @@ function Tabs({ tabs, active, onChange, tppMatchup, tppBasis }) {
                 {t.note != null && <span className="tab-note">{t.note}</span>}
               </button>
             ))}
+          </div>
+          {/* The poll archives are a page, not a view, so they are a link set
+              as a tab beside the views – a link can't sit inside a tablist –
+              and the bar reads as the site's one navigation: the archive and
+              other satellite pages carry this same bar (.build/site-shell.mjs).
+              It rides the pin's condense with the set; on a phone it yields
+              once the score docks, and below 365px, where five tabs will not
+              fit (the colophon links the archives too). */}
+          <a className="tab tab-link" href="/archives/">
+            <span className="tab-label">Archives</span>
+          </a>
           </div>
           {/* the ticker's fit budget is keyed to the SEAT, and the seat is
               show-score's (score docked => centred), not the pin's - a bare
@@ -6169,7 +6181,10 @@ function infoTerms(D) {
         ) : null}
         <span className="info-p">Past cycles reads every earlier term the same way, each through
         the flows of the election that opened it – see
-        {" "}{xref("last-election-flows", "implied 2PP", "Last-election flows")}.</span></>) },
+        {" "}{xref("last-election-flows", "implied 2PP", "Last-election flows")}.</span>
+        <span className="info-p">Both tables, where their numbers come from, and how polls become
+        the headline figure are set out line by line in
+        {" "}<a href="/preference-flows/">The two-party figure, two ways</a>.</span></>) },
       { id: "preference-flows", term: "Preference flows", body: (
         <>How minor-party votes split between the final two candidates once preferences are
         distributed. The {xref("implied-2pp", "preference flows", "implied 2PP")} uses the flows
@@ -6181,7 +6196,8 @@ function infoTerms(D) {
         Party-by-party flows exist only from 1996, when full preference data was first published;
         One Nation’s line breaks where it barely stood candidates. Labor v One Nation uses a
         different table, the {xref("fp-flows", "preference flows", "first-principles flow set")},
-        because no election has counted that pairing.</>) },
+        because no election has counted that pairing. The full working, table by table, is in
+        {" "}<a href="/preference-flows/">The two-party figure, two ways</a>.</>) },
       { id: "last-election-flows", term: "Last-election flows", body: (
         <>The flow table a term’s implied 2PP is read through: the preferences counted at the
         election that opened the term. It’s the only table anyone inside the term could have used,

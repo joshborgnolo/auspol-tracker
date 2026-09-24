@@ -3271,6 +3271,18 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
 @media (max-width: 380px) {
   .tabs.show-score .tab-pinhide { display: none; }
 }
+/* The views' tablist sits inside the set, spaced as the set spaces its items,
+   so the archives link beside it (a page, not a view) lines up as a fifth tab.
+   On a phone it yields to the docked score, and below 365px the row of five
+   (332px) cannot fit at all – the colophon links the archives too. */
+.tabs-list { display: flex; gap: inherit; align-items: flex-end; }
+.tab-link { text-decoration: none; }
+@media (max-width: 640px) {
+  .tabs.show-score .tab-link { display: none; }
+}
+@media (max-width: 365px) {
+  .tabs .tab-link { display: none; }   /* .tabs: outranks .tab's display, set further down */
+}
 .tab-label-short { display: none; }
 @media (max-width: 420px) {
   .tabs.show-score .tab-label-long { display: none; }

@@ -1,11 +1,70 @@
 ---
 name: auspol-satellite-page-branding
-description: auspol-tracker — standalone satellite pages (the /archives/ trio newspoll / acnielsen / morgan, hand- or generator-maintained OUTSIDE .build/newtracker; /newspoll-archive/ is a redirect stub; auspol-polling.html). Current /archives/ recipe (post user-correction, 2026-09-03): FULL static-article chrome — NO masthead lockup, NO glyph dial, NO tagline, NO wordmark. Page opens with a Crimson Text h1 + ss-sub paragraph in the static summary's 680px column (Morgan 1200px for tables), Crimson 400/600 + IBM Plex Sans faces only, serif h2 sections, ss-note footer, fixed .ss-back "← Back to the interactive tracker" pill. Copy the RENDERED values not the source rules: .static-summary p outranks .ss-sub/.ss-note on the live page, so sub+note actually run 14.5px/1.6 ink-2 (declared source says 15px/1.55 and 12.5px ink-3 — probe-caught). THE PALETTE TRAP: body.editorial is default, --bg is oklch(0.975 0.009 80) light / oklch(0.205 0.010 65) dark. Theme via @media prefers-color-scheme :root mirror. Verify with .matilda/verify-archive-static/probe.mjs (compares computed styles vs the live no-JS static summary in BOTH schemes + woff2 request log; also asserts each page's favicon link is /assets/favicon.svg). Favicon: every satellite links /assets/favicon.svg, which build.mjs re-writes each build from the LIVE masthead-glyph SVG — never re-freeze a data-URI icon in. For archival assets, MIRROR them into the repo rather than hotlinking.
+description: auspol-tracker — pages outside the main build (/preference-flows/, /prediction/, /atlas/, /feedback/, the /archives/* five; redirect stubs aside). CURRENT RECIPE (user request, 2026-09-24): every satellite carries the SITE SHELL from .build/site-shell.mjs – masthead (wordmark + /assets/favicon.svg dial), the main tab bar (Snapshot/Past cycles/All polls/Info + Archives), the colour-theme switch (shares localStorage auspol.tweaks with the main page), the live 2PP (/assets/auspol-now.json), the main colophon and tide band – written between <!--shell:…--> markers by node .build/site-shell.mjs and by every satellite generator (applyShell before write). build.mjs publishes assets/site-shell.css|js, auspol-now.json and tile-art(-dark).svg each build and warns on drift; npm test fails on it (test-site-shell.mjs). /prediction/ and /atlas/ carry the shell but must stay UNLINKED (user: 'they're not very good'). The 2026-09-03 no-masthead/no-glyph/.ss-back recipe below is SUPERSEDED. Still true: sitemap ARCHIVE_STAMP trap, the archives' own tab strip homes, favicon link, font hashes, curly apostrophes.
 source: auto-skill
 extracted_at: '2026-09-03T00:00:00.000Z'
 ---
 
 # auspol-tracker: standalone satellite pages + brand reproduction
+
+## CURRENT (2026-09-24): the site shell – every satellite joins the site
+
+The user found the satellites "very separate, which makes the site seem less
+well-executed", and asked for every suggestion made to fix it, except that
+**/prediction/ and /atlas/ stay orphaned** ("they're not very good"): they carry
+the shell, but no page, tab or footer links to them (pinned by
+.build/test-site-shell.mjs, which also scans the built index.html). This
+supersedes the 2026-09-03 "no masthead, no glyph" recipe further down.
+
+**One module, `.build/site-shell.mjs`**, owns it all:
+- `SHELL_PAGES` – the nine pages and their options (`tab: "archives"` underlines
+  Archives; `page: "feedback" | "archives"` drops the colophon's self-reference).
+  Adding a satellite = one entry here; `applyShell` inserts the markers itself.
+- `applyShell(html, opts)` – idempotent. Writes `<!--shell:head-->` (link to
+  /assets/site-shell.css, the inline pre-paint theme script, and `:root.sh-dark`
+  copies of the page's own dark rules), `<!--shell:header-->` (skip link,
+  masthead, theme switch, tab bar, 2PP slot) and `<!--shell:footer-->` (colophon,
+  tide band, /assets/site-shell.js). It also scopes the page's own
+  `@media (prefers-color-scheme: dark)` rules to `:root:not(.sh-light)`, strips
+  the retired `.ss-back` pill (markup, rules, comment) and the "This is a
+  satellite … page of auspol tracker" notes (keeping any extra sentences, e.g.
+  the atlas's AEC note), and ids the page's `<main>` for the skip link.
+- `shellCss()` / `shellJs()` – published by build.mjs to assets/ every build
+  (the updaters' stage_dataset commits assets/ whole), so styling or script
+  changes reach every page with no page edit. Header/footer MARKUP changes need
+  `node .build/site-shell.mjs` + committing the pages: build.mjs only WARNS on
+  drift, because the build must never rewrite satellites (the updaters' commit
+  lists name none of them – a rewritten page would leave the tree dirty).
+- Generators call it before writing: refresh-prediction (daily in CI),
+  refresh-morgan-archive, refresh-galaxy-archive, refresh-trove-archive. Their
+  templates no longer contain the pill or the satellite note.
+
+**Theme**: the main page stores `{theme, accent, …}` in localStorage
+`auspol.tweaks`; the pre-paint script maps theme light|dark → `sh-light|sh-dark`
+and accent cool → `sh-cool` on `<html>`. "auto" leaves each page's media queries
+in charge. The header switch writes the same key (merging), so a choice made on
+any page holds everywhere – verified both ways (.matilda/probe/shell-theme.mjs).
+
+**Live 2PP**: build.mjs's favicon code already decides the masthead dial's
+contest (rivalLead, implied basis); it now returns it as `fav.score` and writes
+/assets/auspol-now.json `{rival, a, b, basis}` – the pinned bar's own figure.
+
+**Main page**: an Archives link sits beside the views' tablist inside `.tabs-set`
+(d1a1d215 Tabs; a link can't live inside role=tablist, so the list is now
+`.tabs-list` with `gap: inherit`), condensing with the set; hidden on a phone
+once the score docks and below 365px (the five-tab row is 332px). The Info
+glossary's implied-2PP and preference-flows entries link /preference-flows/.
+
+**Labels**: small `sh-kicker` labels above three titles – Methods
+(preference-flows), Forecast (prediction; also in refresh-prediction's template),
+Atlas.
+
+**Verify**: `node .build/site-shell.mjs --check`, `node .build/test-site-shell.mjs`,
+and the probes in .matilda/probe/ (satellite-shots.mjs [OUT, W, DARK, PAGES],
+shell-theme.mjs, shell-tabs-width.mjs, main-archives-tab.mjs). Serve the repo
+over HTTP (file:// breaks the /assets/ paths).
+
+## HISTORY: the 2026-09-03 recipe (SUPERSEDED by the site shell above)
 
 ## Which pages are standalone (NOT the newtracker build)
 

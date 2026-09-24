@@ -1933,6 +1933,14 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
 @media (max-width: 380px) {
   .tabs.show-score .tab-pinhide { display: none; }
 }
+.tabs-list { display: flex; gap: inherit; align-items: flex-end; }
+.tab-link { text-decoration: none; }
+@media (max-width: 640px) {
+  .tabs.show-score .tab-link { display: none; }
+}
+@media (max-width: 365px) {
+  .tabs .tab-link { display: none; }   
+}
 .tab-label-short { display: none; }
 @media (max-width: 420px) {
   .tabs.show-score .tab-label-long { display: none; }
@@ -43469,7 +43477,9 @@ function Tabs({
   }, React.createElement("div", {
     className: "tabs-inner"
   }, React.createElement("div", {
-    className: "tabs-set",
+    className: "tabs-set"
+  }, React.createElement("div", {
+    className: "tabs-list",
     role: "tablist",
     "aria-label": "Views",
     onKeyDown: onTabKeyDown
@@ -43495,7 +43505,12 @@ function Tabs({
     "aria-hidden": "true"
   }, t.short)) : t.label), t.note != null && React.createElement("span", {
     className: "tab-note"
-  }, t.note)))), React.createElement(NextPollTicker, {
+  }, t.note)))), React.createElement("a", {
+    className: "tab tab-link",
+    href: "/archives/"
+  }, React.createElement("span", {
+    className: "tab-label"
+  }, "Archives"))), React.createElement(NextPollTicker, {
     showScore: pinned && heroGone
   }), React.createElement(GlyphDial, {
     className: "tab-glyph",
@@ -48785,7 +48800,11 @@ function infoTerms(D) {
         className: "info-p"
       }, "Labor v One Nation uses a different table, the", " ", xref("fp-flows", "implied 2PP", "first-principles flow set"), ", because no election has ever counted that pairing: ", L.onImp.a.toFixed(1), " to Labor,", " ", L.onImp.b.toFixed(1), " to One Nation, \xB1", L.onImp.band.toFixed(1), ".") : null, React.createElement("span", {
         className: "info-p"
-      }, "Past cycles reads every earlier term the same way, each through the flows of the election that opened it \u2013 see", " ", xref("last-election-flows", "implied 2PP", "Last-election flows"), "."))
+      }, "Past cycles reads every earlier term the same way, each through the flows of the election that opened it \u2013 see", " ", xref("last-election-flows", "implied 2PP", "Last-election flows"), "."), React.createElement("span", {
+        className: "info-p"
+      }, "Both tables, where their numbers come from, and how polls become the headline figure are set out line by line in", " ", React.createElement("a", {
+        href: "/preference-flows/"
+      }, "The two-party figure, two ways"), "."))
     }, {
       id: "preference-flows",
       term: "Preference flows",
@@ -48795,7 +48814,9 @@ function infoTerms(D) {
         rel: "noopener noreferrer"
       }, "Greens 88.2%, One Nation 25.5% and all others 54.5% to Labor"), ").", React.createElement("span", {
         className: "info-chart"
-      }, React.createElement(FlowChart, null)), "Party-by-party flows exist only from 1996, when full preference data was first published; One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses a different table, the ", xref("fp-flows", "preference flows", "first-principles flow set"), ", because no election has counted that pairing.")
+      }, React.createElement(FlowChart, null)), "Party-by-party flows exist only from 1996, when full preference data was first published; One Nation\u2019s line breaks where it barely stood candidates. Labor v One Nation uses a different table, the ", xref("fp-flows", "preference flows", "first-principles flow set"), ", because no election has counted that pairing. The full working, table by table, is in", " ", React.createElement("a", {
+        href: "/preference-flows/"
+      }, "The two-party figure, two ways"), ".")
     }, {
       id: "last-election-flows",
       term: "Last-election flows",

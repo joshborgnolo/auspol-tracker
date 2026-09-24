@@ -31,6 +31,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { applyShell, shellOptsFor } from "./site-shell.mjs";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(HERE, "..");
@@ -205,7 +206,7 @@ function renderPage(sections, fetchedIso) {
      into data/roymorgan/*.csv and rendered here table-for-table, mirroring
      the way roymorgan.com stores them. Chrome is the main site's
      static-article view (its no-JS static summary): Crimson Text headings
-     over IBM Plex Sans body, ss-note footer and fixed .ss-back pill home. -->
+     over IBM Plex Sans body, the site's shared header and footer (.build/site-shell.mjs). -->
 <meta name="description" content="The Morgan Poll record — Roy Morgan's two-party-preferred and primary voting intention tables, including the long-term trends back to 1901, transcribed verbatim from roymorgan.com.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
@@ -305,17 +306,6 @@ body {
 .tab:hover { color: var(--ink); }
 .tab.active { color: var(--ink); border-bottom-color: var(--ink); }
 
-/* ------- back to the interactive tracker (the static page's .ss-back pill) */
-.ss-back {
-  position: fixed; right: 18px; bottom: 18px; z-index: 300;
-  display: inline-block;
-  padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
-  background: var(--bg); color: var(--ink); font-size: 13px;
-  font-weight: 600; text-decoration: none; cursor: pointer;
-  box-shadow: 0 3px 16px oklch(0 0 0 / 0.16);
-}
-.ss-back:hover { border-color: var(--ink-3); }
-
 /* ------- body: the static summary's type rhythm (verbatim tables stay wide) --- */
 .frame-wrap {
   flex: 1; display: flex; flex-direction: column;
@@ -393,9 +383,7 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
   <p class="credit">The Morgan Poll series, transcribed table-for-table from Roy Morgan's four published vote-intention tables (two-party-preferred and primary, current series and the long-term trends back to 1901) and mirrored here as CSV — each table links its own file below. Sourced from <a href="https://www.roymorgan.com/morgan-poll">roymorgan.com/morgan-poll</a> — snapshot refreshed ${esc(fetched)}. Cells are reproduced as printed, including Roy Morgan's own "&lt;0.5" minors floor and "##" markers (no two-party-preferred figure, pre-preferential-voting era).</p>
 ${secHtml}
 
-  <p class="ss-note">This is a satellite archive page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>
-<a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 </body>
 </html>
 `;
@@ -423,5 +411,6 @@ for (const page of PAGES) {
   sections.push({ ...page, rows: rowsList });
 }
 fs.mkdirSync(path.dirname(OUT_PAGE), { recursive: true });
-fs.writeFileSync(OUT_PAGE, renderPage(sections, fetchedIso));
+// the site's shared header and footer (site-shell.mjs), as every satellite carries them
+fs.writeFileSync(OUT_PAGE, applyShell(renderPage(sections, fetchedIso), shellOptsFor(path.relative(ROOT, OUT_PAGE))));
 console.log(`  wrote ${path.relative(ROOT, OUT_PAGE)}`);

@@ -12,7 +12,7 @@ extracted_at: '2026-09-05T12:15:21.588Z'
 - `atlas/index.html` — hand-maintained satellite page (OUTSIDE .build/newtracker, like the
   /archives/ trio; see auto-skill-auspol-satellite-page-branding). Vanilla JS IIFE +
   hand-rolled SVG, no framework. Crimson Text 400/600 + IBM Plex Sans @font-face, oklch
-  palette, `.tabs` strip (Atlas active; five archive links inactive), `.ss-back` pill.
+  palette, `.tabs` strip (Atlas active; five archive links inactive), and since 2026-09-24 the site shell (masthead, main tabs, colophon: .build/site-shell.mjs) in place of the old `.ss-back` pill – the atlas stays UNLINKED from every other page, at the user's request.
 - `atlas/atlas-data.js` — **GENERATED, do not hand-edit** (`window.ATLAS_DATA = {…}`,
   ~170 KB). Rebuild: `node .build/refresh-atlas-data.mjs`.
 - `atlas/data/*.csv` — canonical AEC inputs, kept verbatim for provenance:

@@ -21,6 +21,7 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { writeAtomic } from "../atomic-write.mjs";
 import { validate } from "./validate.mjs";
+import { shellCss, shellJs, shellDrift } from "../site-shell.mjs";
 
 const require = createRequire(import.meta.url);
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -311,7 +312,9 @@ function buildFavicon() {
   const vb = [ ((x0 + x1) / 2 - side / 2).toFixed(2), ((y0 + y1) / 2 - side / 2).toFixed(2),
                side.toFixed(2), side.toFixed(2) ].join(" ");
   return { svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${vb}'>${parts.join("")}</svg>`,
-           note: `${glyph.map((p) => p.id + " " + p.v.toFixed(1)).join(", ")} · needle ${needleDeg.toFixed(1)}deg vs ${top.id}` };
+           note: `${glyph.map((p) => p.id + " " + p.v.toFixed(1)).join(", ")} · needle ${needleDeg.toFixed(1)}deg vs ${top.id}`,
+           // the dial's contest and figures: the satellites' header docks the same pair
+           score: { rival: top.id, a: +top.lab.toFixed(1), b: +top.opp.toFixed(1), basis: (rival === "onp" ? L.onImp?.a != null : S && S.alp != null) ? "imp" : "resp" } };
 }
 
 /* Pull the derived headline straight out of the dataset gen-data just wrote,
@@ -377,6 +380,32 @@ console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches 
    masthead's current glyph. Stable unhashed name - the satellites' <link> is
    the point; a content hash would orphan them. */
 writeAtomic(path.join(ROOT, "assets", "favicon.svg"), fav.svg + "\n");
+
+/* The shared chrome of the pages outside this build (.build/site-shell.mjs):
+   its stylesheet and script, the live figure its header docks, and the tide
+   band's two drawings, as files beside the favicon – under assets/, which
+   every updater commits, so the satellites follow each build without being
+   rewritten (a page the build rewrote would leave the tree dirty: the
+   updaters' commit lists name no satellite). The figure is the favicon
+   dial's own contest and basis, which are the main page's. The band's
+   drawings are lifted out of this template's --tile-art data URIs, so the
+   satellites close on exactly the main page's tide. */
+writeAtomic(path.join(ROOT, "assets", "site-shell.css"), shellCss());
+writeAtomic(path.join(ROOT, "assets", "site-shell.js"), shellJs());
+writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify(fav.score) + "\n");
+for (const [token, file] of [["--tile-art", "tile-art.svg"], ["--tile-art-dark", "tile-art-dark.svg"]]) {
+  const m = html.match(new RegExp(token + ':\\s*url\\("data:image\\/svg\\+xml,([^"]+)"\\)'));
+  if (m) writeAtomic(path.join(ROOT, "assets", file), decodeURIComponent(m[1]) + "\n");
+  else console.warn(`  site shell: ${token} not found in the template – the satellites' tide band keeps its last drawing`);
+}
+/* A satellite whose shell is out of step – the header or footer markup
+   changed here, or a page was edited by hand around it – is a warning, not
+   a failure: the page still works, and the fix is one command a person
+   commits (the build must not rewrite satellites itself, see above). */
+{
+  const drift = shellDrift();
+  if (drift.length) console.warn(`  site shell out of step on ${drift.join(", ")} – run node .build/site-shell.mjs and commit the pages`);
+}
 const favicon = encodeURIComponent(fav.svg);
 
 /* The raster copy Google Search needs, rasterised by render-favicon.mjs and

@@ -22,6 +22,7 @@
 import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, renameSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
+import { applyShell, shellOptsFor } from "./site-shell.mjs";
 
 // ---------- cadence + term constants -------------------------------------
 const ELECTION_DATE = "2025-05-03";       // Albanese-2025 term start
@@ -408,17 +409,6 @@ body {
   min-height: 100dvh;
 }
 
-/* ------- back to the interactive tracker (the static page's .ss-back pill) */
-.ss-back {
-  position: fixed; right: 18px; bottom: 18px; z-index: 300;
-  display: inline-block;
-  padding: 10px 16px; border-radius: 999px; border: 1px solid var(--line);
-  background: var(--bg); color: var(--ink); font-size: 13px;
-  font-weight: 600; text-decoration: none; cursor: pointer;
-  box-shadow: 0 3px 16px oklch(0 0 0 / 0.16);
-}
-.ss-back:hover { border-color: var(--ink-3); }
-
 /* ------- article: the static summary's column + type rhythm ------- */
 .frame-wrap {
   flex: 1; display: flex; flex-direction: column;
@@ -536,6 +526,7 @@ body {
 </head>
 <body>
 <main class="frame-wrap">
+  <p class="sh-kicker">Forecast</p>
   <h1>Will this government be re-elected?</h1>
   <p class="ss-sub" data-slot="sub">${S.sub}</p>
 
@@ -640,10 +631,8 @@ body {
   <p>The cross-check. A deliberately different construction — one ridge logistic per term on first-sixteen-month features — <span data-slot="ridgeCell2">${S.ridgeCell2}</span> Its best-calibrated variant, adding leadership-spill and minority-government flags, reaches 74 per cent leave-one-term-out accuracy with AUC 0.81 and Brier 0.153; adding election-quarter unemployment lands in the same place. On nineteen terms the estimator is not the constraint — a diagonal LDA nearly ties the ridge and k-nearest-neighbours collapses — and no capacity beyond logistic earns its keep: adjacent accuracies are statistically indistinguishable (the base model’s 68 per cent carries a 95% Wilson interval of roughly [46%, 85%]).</p>
   <p>To reproduce: from the repo root, <code>node .build/analysis/reelect-snapshot-hazard.mjs</code> (the headline — its snapshot age defaults to the canonical 16.2 months and moves via <code>--age=N.N</code>), <code>node .build/analysis/reelect-term-ridge.mjs</code> (the cross-check), plus <code>reelect-15mo-levels.mjs</code> and <code>reelect-15mo-declines.mjs</code> (the composites). Both models emit machine-readable results with <code>--json</code>; this page is regenerated from them by <code>.build/refresh-prediction.mjs</code> on a daily due gate, and each refresh is one dated, selectable record above. The analysis scripts read poll data straight from origin/main, so they are immune to working-tree state; the canonical numbers live in <code>.build/analysis/README.md</code>. The analysis’s own closing caution stands: this is historical signature analysis, not a forecast.</p>
 
-  <p class="ss-note">This is a satellite analysis page of <a href="/">auspol tracker</a>, an unofficial aggregate of published federal opinion polling. The live, interactive tracker carries the current aggregates, charts and per-poll archive.</p>
 </main>
 ${pageJs}
-<a class="ss-back" href="/">&larr; Back to the interactive tracker</a>
 </body>
 </html>
 `;
@@ -667,7 +656,8 @@ const put = (file, content) => {
   }
 };
 put(HISTORY_FILE, JSON.stringify(hist, null, 2) + "\n");
-put(PAGE, html);
+// the site's shared header and footer (.build/site-shell.mjs), as every satellite carries them
+put(PAGE, applyShell(html, shellOptsFor(PAGE)));
 
 // The sitemap's prediction/ route reads PREDICTION_STAMP from build.mjs —
 // keep it honest each refresh rather than touching generated sitemap.xml
