@@ -2601,7 +2601,7 @@ function ApprLine({ id, appr, chg }) {
 }
 
 /* "n = 1,510, n_eff = 1,053" – the sample the pollster reported and, where it
-   files one with the Australian Polling Council, what that sample is worth
+   published one in its APC methodology statement, what that sample is worth
    after its own weighting. Shared by both tables so the two bands cannot
    drift. n_eff is set as a true subscript rather than borrowed from the
    Unicode subscript block, which has no "f". */

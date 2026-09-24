@@ -1686,8 +1686,8 @@ const individualPolls = POLLS.map((p) => {
     // the commissioning publisher, exactly as the Latest-polls table shows
     // it – "Self-published" where the wave reported under no client
     client: p.client && p.client !== "—" ? p.client : "Self-published",
-    /* the house's own published effective n, where one was filed with the
-       Australian Polling Council. Houses that file none get no field at all
+    /* the house's own published effective n, where one was published in the
+       house's APC methodology statement. Houses that publish none get no field at all
        and a "—" in the views; the estimator's derived weighting n is
        internal to rowN() and is never surfaced per-poll. */
     ...(p.sampleEff != null ? { sampleEff: p.sampleEff } : {}),

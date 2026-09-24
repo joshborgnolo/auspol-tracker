@@ -5440,10 +5440,11 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
               <ArchSortTh label="Fieldwork" short="Field" k="date" sort={sort} onSort={onSort} className="ta-l" />
               <ArchSortTh label="Sample" k="sample" sort={sort} onSort={onSort} className="hide-md" />
               {/* the house's own published effective n - only where the
-                  pollster filed one with the APC (Resolve, Roy Morgan et al.
-                  file none and dash). Sparse column, so not sortable. */}
+                  pollster published one in its APC methodology statement
+                  (Resolve, Roy Morgan et al. publish none and dash). Sparse
+                  column, so not sortable. */}
               <th scope="col" className="hide-md"
-                  title="Effective sample, where the pollster filed one with the Australian Polling Council">n<sub>eff</sub></th>
+                  title="Effective sample, where the pollster published one in its Australian Polling Council methodology statement">n<sub>eff</sub></th>
 
               {facet === "twopp" && (<>
                 {/* the 2PP column head is the basis switch – names the ACTIVE
@@ -5637,9 +5638,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         90-day half-life, so its recent methods count for more, and shrunk toward zero while it has
         published few. The aggregates subtract it, read as of each figure’s own time, and it is a
         property of the pollster, not of this one poll.</>,
-        <><strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, filed with the
-        Australian Polling Council – Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog
-        file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown.</>,
+        <><strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, from its
+        Australian Polling Council methodology statement – Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent
+        and Fox & Hedgehog publish one; Resolve and Roy Morgan publish none, so a dash there means
+        unpublished, not unknown.</>,
       ]} />
 
       <VariancePanel key={facet} facet={facet} rangeId={range} />
@@ -5990,9 +5992,9 @@ function infoTerms(D) {
         counts in full for two weeks, then fades smoothly to nothing by day 21, when it leaves
         the window.</span>
         <span className="info-p"><b>Size.</b> Larger samples count for more. Where a pollster
-        files an {xref("effective-sample", "weighted aggregate", "effective sample")} with the
-        Australian Polling Council, that figure is used; otherwise the raw sample, capped at
-        3,000.</span>
+        publishes an {xref("effective-sample", "weighted aggregate", "effective sample")} in its
+        Australian Polling Council methodology statement, that figure is used; otherwise the raw
+        sample, capped at 3,000.</span>
         <span className="info-p"><b>Repeat polls.</b> A pollster that publishes several times in
         the window counts for the square root of its number of polls, so three weekly Roy Morgan
         polls count as 1.7, not 3.</span>
@@ -6018,7 +6020,7 @@ function infoTerms(D) {
           <span className="info-p">The headline is Σwᵢxᵢ ÷ Σwᵢ over the polls in the 21-day window,
           where xᵢ is a poll’s figure minus its house effect and wᵢ = nᵢ × 2^(−d/7) × t(d) ÷ √m.</span>
           <span className="info-p"><b>nᵢ</b> is the poll’s sample: its published effective sample
-          × 1.6 (the design factor) where the pollster files one – Newspoll, YouGov, Essential,
+          × 1.6 (the design factor) where the pollster publishes one – Newspoll, YouGov, Essential,
           DemosAU, RedBridge/Accent and Fox & Hedgehog do – otherwise its raw sample capped at
           3,000, or 1,200 if no sample is given. <b>d</b> is the poll’s age in days, counted from
           its fieldwork midpoint. <b>t(d)</b> is 1 up to day 14, then a half-cosine taper to 0 at
@@ -6106,7 +6108,7 @@ function infoTerms(D) {
         it below the raw count. The {xref("interval", "effective sample", "95% interval")} is
         computed from it.
         <span className="info-p">A single poll has its own version, shown as {eff} beside its
-        sample: the effective sample its pollster files in its
+        sample: the effective sample its pollster publishes in its
         {" "}{xref("apc-statement", "effective sample", "APC statement")}, which says what that one
         sample is worth after weighting.</span></>) },
       { id: "poll-disagreement", term: "Poll disagreement", body: (
@@ -6230,17 +6232,18 @@ function infoTerms(D) {
         <>A polling company: Newspoll, YouGov, Resolve and the rest. The industry calls them
         houses. A single poll release is often called a wave.</>) },
       { id: "apc-statement", term: "APC statement", body: (
-        <>The methodology statement a pollster files with the Australian Polling Council, the
-        industry body. Members publish one for each poll, covering fieldwork dates and method, the
-        raw sample, the effective sample (what that sample is worth after weighting), the
-        weighting used and the question order.
+        <>The methodology statement a pollster publishes under the Australian Polling Council’s
+        Code of Conduct. The council sets the disclosure standard; the statement itself is the
+        pollster’s own publication – nothing is lodged with the council. Members publish one for
+        each poll, covering fieldwork dates and method, the raw sample, the effective sample
+        (what that sample is worth after weighting), the weighting used and the question order.
         <span className="info-p">A poll’s breakdown links its statement where there is one, and
         reads both sample figures off it. The effective sample, scaled back up by the 1.6 design
         factor, sets the poll’s weight in the
         {" "}{xref("weighted-aggregate", "APC statement", "weighted aggregate")}. Newspoll, YouGov,
-        Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them. Where a pollster files
-        none, the breakdown shows the raw sample alone and the {eff} column shows a dash: the site
-        doesn’t invent a figure the pollster never published.</span></>) },
+        Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog publish one. Where a pollster
+        publishes none, the breakdown shows the raw sample alone and the {eff} column shows a
+        dash: the site doesn’t invent a figure the pollster never published.</span></>) },
       { id: "mrp", term: "MRP", body: (
         <>Multilevel regression and post-stratification: a model that estimates each seat
         separately instead of applying one national swing everywhere. Seat figures appear on this

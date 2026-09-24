@@ -2929,8 +2929,8 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
         minister and the undecided share stay as plain averages, the differences there being a
         matter of question wording rather than lean. Houses that publish no two-party
         figure feed the primary-vote and leadership series only. Each poll&#8217;s weight rests on
-        its published effective sample where the house files one &#8211; Newspoll, YouGov, Essential,
-        DemosAU, RedBridge/Accent and Fox &amp; Hedgehog do, via their Australian Polling Council
+        its published effective sample where the house publishes one &#8211; Newspoll, YouGov, Essential,
+        DemosAU, RedBridge/Accent and Fox &amp; Hedgehog do, in their Australian Polling Council
         methodology statements &#8211; and on its raw sample otherwise.</p>
       <p>The headline carries a 95% interval &#8211; the greater of the spread among polls in the
         window and their sampling error &#8211; currently about &#177;1.2 points
@@ -46584,7 +46584,7 @@ function AllPollsView({
   }), React.createElement("th", {
     scope: "col",
     className: "hide-md",
-    title: "Effective sample, where the pollster filed one with the Australian Polling Council"
+    title: "Effective sample, where the pollster published one in its Australian Polling Council methodology statement"
   }, "n", React.createElement("sub", null, "eff")), facet === "twopp" && React.createElement(React.Fragment, null, React.createElement("th", {
     scope: "col",
     className: "ta-l apub-col hide-md"
@@ -46847,7 +46847,7 @@ function AllPollsView({
       className: "hint-wide"
     }, " ", CANT_HOVER ? "Tap" : "Click", " the \u201C", pubBasis ? "As published" : "Implied 2PP", "\u201D heading to switch bases."), React.createElement("span", {
       className: "hint-narrow"
-    }, " The Basis switch above the table changes bases.")), React.createElement(React.Fragment, null, React.createElement("strong", null, "Poll lean"), " is the poll\u2019s ", pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate", " for that month. ", React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on ", pubBasis ? "published" : "implied", " 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll."), React.createElement(React.Fragment, null, React.createElement("strong", null, "n", React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, filed with the Australian Polling Council \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them; Resolve and Roy Morgan file none, so a dash there means unpublished, not unknown.")]
+    }, " The Basis switch above the table changes bases.")), React.createElement(React.Fragment, null, React.createElement("strong", null, "Poll lean"), " is the poll\u2019s ", pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate", " for that month. ", React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on ", pubBasis ? "published" : "implied", " 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll."), React.createElement(React.Fragment, null, React.createElement("strong", null, "n", React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, from its Australian Polling Council methodology statement \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog publish one; Resolve and Roy Morgan publish none, so a dash there means unpublished, not unknown.")]
   }), React.createElement(VariancePanel, {
     key: facet,
     facet: facet,
@@ -47101,7 +47101,7 @@ function infoTerms(D) {
         className: "info-p"
       }, React.createElement("b", null, "Recency."), " A poll\u2019s weight halves every seven days. It counts in full for two weeks, then fades smoothly to nothing by day 21, when it leaves the window."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Size."), " Larger samples count for more. Where a pollster files an ", xref("effective-sample", "weighted aggregate", "effective sample"), " with the Australian Polling Council, that figure is used; otherwise the raw sample, capped at 3,000."), React.createElement("span", {
+      }, React.createElement("b", null, "Size."), " Larger samples count for more. Where a pollster publishes an ", xref("effective-sample", "weighted aggregate", "effective sample"), " in its Australian Polling Council methodology statement, that figure is used; otherwise the raw sample, capped at 3,000."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Repeat polls."), " A pollster that publishes several times in the window counts for the square root of its number of polls, so three weekly Roy Morgan polls count as 1.7, not 3."), React.createElement("span", {
         className: "info-p"
@@ -47113,7 +47113,7 @@ function infoTerms(D) {
         className: "info-p"
       }, "The headline is \u03A3w\u1D62x\u1D62 \xF7 \u03A3w\u1D62 over the polls in the 21-day window, where x\u1D62 is a poll\u2019s figure minus its house effect and w\u1D62 = n\u1D62 \xD7 2^(\u2212d/7) \xD7 t(d) \xF7 \u221Am."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "n\u1D62"), " is the poll\u2019s sample: its published effective sample \xD7 1.6 (the design factor) where the pollster files one \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog do \u2013 otherwise its raw sample capped at 3,000, or 1,200 if no sample is given. ", React.createElement("b", null, "d"), " is the poll\u2019s age in days, counted from its fieldwork midpoint. ", React.createElement("b", null, "t(d)"), " is 1 up to day 14, then a half-cosine taper to 0 at day 21. ", React.createElement("b", null, "m"), " is the number of polls that pollster has in the window. The window\u2019s effective sample is (\u03A3w\u1D62)\xB2 \xF7 \u03A3w\u1D62\xB2. If the window is empty, the last monthly point stands in."), React.createElement("span", {
+      }, React.createElement("b", null, "n\u1D62"), " is the poll\u2019s sample: its published effective sample \xD7 1.6 (the design factor) where the pollster publishes one \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog do \u2013 otherwise its raw sample capped at 3,000, or 1,200 if no sample is given. ", React.createElement("b", null, "d"), " is the poll\u2019s age in days, counted from its fieldwork midpoint. ", React.createElement("b", null, "t(d)"), " is 1 up to day 14, then a half-cosine taper to 0 at day 21. ", React.createElement("b", null, "m"), " is the number of polls that pollster has in the window. The window\u2019s effective sample is (\u03A3w\u1D62)\xB2 \xF7 \u03A3w\u1D62\xB2. If the window is empty, the last monthly point stands in."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Worked example: the Labor primary."), " Each party\u2019s primary is estimated the same way. The five are rescaled only if their total sits more than half a point from the plain-average total, so a real shortfall from undecided voters is kept."), primWork, React.createElement("span", {
         className: "info-p"
@@ -47165,7 +47165,7 @@ function infoTerms(D) {
       term: "Effective sample",
       body: React.createElement(React.Fragment, null, "How many polls the window is really worth once weighting is counted: today, ", hl.nEff, " of the ", hl.n, " in it. Older polls, smaller samples and repeat polls from one pollster all pull it below the raw count. The ", xref("interval", "effective sample", "95% interval"), " is computed from it.", React.createElement("span", {
         className: "info-p"
-      }, "A single poll has its own version, shown as ", eff, " beside its sample: the effective sample its pollster files in its", " ", xref("apc-statement", "effective sample", "APC statement"), ", which says what that one sample is worth after weighting."))
+      }, "A single poll has its own version, shown as ", eff, " beside its sample: the effective sample its pollster publishes in its", " ", xref("apc-statement", "effective sample", "APC statement"), ", which says what that one sample is worth after weighting."))
     }, {
       id: "poll-disagreement",
       term: "Poll disagreement",
@@ -47251,9 +47251,9 @@ function infoTerms(D) {
     }, {
       id: "apc-statement",
       term: "APC statement",
-      body: React.createElement(React.Fragment, null, "The methodology statement a pollster files with the Australian Polling Council, the industry body. Members publish one for each poll, covering fieldwork dates and method, the raw sample, the effective sample (what that sample is worth after weighting), the weighting used and the question order.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "The methodology statement a pollster publishes under the Australian Polling Council\u2019s Code of Conduct. The council sets the disclosure standard; the statement itself is the pollster\u2019s own publication \u2013 nothing is lodged with the council. Members publish one for each poll, covering fieldwork dates and method, the raw sample, the effective sample (what that sample is worth after weighting), the weighting used and the question order.", React.createElement("span", {
         className: "info-p"
-      }, "A poll\u2019s breakdown links its statement where there is one, and reads both sample figures off it. The effective sample, scaled back up by the 1.6 design factor, sets the poll\u2019s weight in the", " ", xref("weighted-aggregate", "APC statement", "weighted aggregate"), ". Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog file them. Where a pollster files none, the breakdown shows the raw sample alone and the ", eff, " column shows a dash: the site doesn\u2019t invent a figure the pollster never published."))
+      }, "A poll\u2019s breakdown links its statement where there is one, and reads both sample figures off it. The effective sample, scaled back up by the 1.6 design factor, sets the poll\u2019s weight in the", " ", xref("weighted-aggregate", "APC statement", "weighted aggregate"), ". Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog publish one. Where a pollster publishes none, the breakdown shows the raw sample alone and the ", eff, " column shows a dash: the site doesn\u2019t invent a figure the pollster never published."))
     }, {
       id: "mrp",
       term: "MRP",
