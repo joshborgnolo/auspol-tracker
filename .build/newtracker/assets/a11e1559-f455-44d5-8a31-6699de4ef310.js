@@ -1275,19 +1275,32 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
 // misstate it. Axis ticks land on whole numbers, so they stay clean.
 const dirFmt = (v) => (v % 1 ? v.toFixed(1) : v.toFixed(0));
 
-function houseList(names, max = 4) {
+function houseList(names, max = 4, oxford = false) {
   if (!names || !names.length) return "";
   if (names.length > max) return names.slice(0, max).join(", ") + " and others";
   if (names.length === 1) return names[0];
-  return names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
+  return names.slice(0, -1).join(", ") + (oxford && names.length > 2 ? ", and " : " and ") + names[names.length - 1];
+}
+
+/* A share as the nearest plain fraction a reader would say aloud: 62.5 →
+   "More than three in five", 58.9 → "Almost three in five", 66.4 → "Almost
+   two in three". Within half a point of the fraction it's "About". */
+const PLAIN_FRACTIONS = [[1, 5], [1, 4], [1, 3], [2, 5], [1, 2], [3, 5], [2, 3], [7, 10], [3, 4], [4, 5], [9, 10]];
+const NUM_WORDS = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+function plainShare(v) {
+  const [a, b] = PLAIN_FRACTIONS.reduce((best, f) =>
+    (Math.abs(v - 100 * f[0] / f[1]) < Math.abs(v - 100 * best[0] / best[1]) ? f : best));
+  const d = v - 100 * a / b;
+  const lead = Math.abs(d) < 0.5 ? "About" : d < 0 ? "Almost" : "More than";
+  return lead + " " + (a === 1 && b === 2 ? "half of" : NUM_WORDS[a] + " in " + NUM_WORDS[b]);
 }
 
 // ---- National direction (right track / wrong track) -----------------
 function DirectionPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
-  const asked = houseList(D.directionHouses);
-  const question = "“Is the country heading in the right direction, or on the wrong track?”";
+  const asked = houseList(D.directionHouses, 4, true);
+  const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   // no right-track / wrong-track series in the dataset yet – keep the panel
   // as an honest empty state so the question has a home when it's polled
   if (!D.direction.length) {
@@ -1351,7 +1364,8 @@ function DirectionPanel({ rangeId }) {
       <div className="card-head">
         <div>
           <h2 className="card-title">National direction</h2>
-          <p className="card-sub">{question}{asked ? " · " + asked : ""}</p>
+          {/* the question mark ends the quoted sentence, so the reading follows with no full stop */}
+          <p className="card-sub">{question} {plainShare(latest.wrong)} Australians think we’re on the wrong track{asked ? " · " + asked : ""}</p>
         </div>
         <div className="dir-net">
           <span className="dir-net-label">Net</span>
