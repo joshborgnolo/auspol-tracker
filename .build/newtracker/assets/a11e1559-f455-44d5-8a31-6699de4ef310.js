@@ -1666,6 +1666,61 @@ const DEMO_GRP_PARTY = ["alp", "lnp", "grn", "onp", "oth"];
    education) read in order, and every line still says which party. */
 const demoRamp = (color, n, i) => (n < 2 ? color
   : `color-mix(in oklch, ${color} ${Math.round(100 - (i * 60) / (n - 1))}%, var(--ink))`);
+/* One sentence under a set's bars saying whether its groups differ for the
+   chosen party. Two groups differ significantly when their gap exceeds the
+   gap's own 95% margin, √(±a² + ±b²): the groups are separate respondents,
+   so their errors add in quadrature. Overlapping ± bars alone would miss
+   gaps that are real. Ordered sets (ages, generations) whose every step is
+   significant, one way, read as a trend; otherwise the sentence names the
+   group that stands apart from all the others (the one further from its
+   nearest neighbour, if both ends do), or failing that the widest
+   significant gap. */
+const DEMO_WHO = {
+  "18–34": "voters aged 18–34", "35–54": "voters aged 35–54", "55+": "voters aged 55 and over",
+  "Gen Z": "Gen Z voters", Millennials: "Millennials", "Gen X": "Gen X voters", Boomers: "Boomers",
+  Men: "men", Women: "women",
+  "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "voters with a TAFE or trade qualification",
+  University: "university graduates",
+};
+const DEMO_SET_WORDS = {
+  age: { all: "age groups", others: "any other age group", step: "age group" },
+  generation: { all: "generations", others: "any other generation", step: "generation" },
+  gender: { all: "men and women", others: null, step: null },
+  education: { all: "levels of education", others: "voters with other levels of education", step: null },
+};
+const DEMO_VOTE_FOR = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "a minor party or independent" };
+function demoVerdict(st, party) {
+  const gs = st.groups.filter((g) => g.v[party] != null && g.ci[party] != null);
+  if (gs.length < 2) return null;
+  const words = DEMO_SET_WORDS[st.id] || { all: "these groups", others: "any other group", step: null };
+  const who = (g) => DEMO_WHO[g.label] || g.label;
+  const Who = (g) => { const s = who(g); return s[0].toUpperCase() + s.slice(1); };
+  const vote = "to vote for " + DEMO_VOTE_FOR[party];
+  // +1 if a is significantly above b, −1 if below, 0 if the polls can't tell
+  const cmp = (a, b) => {
+    const d = a.v[party] - b.v[party];
+    return Math.abs(d) > Math.hypot(a.ci[party], b.ci[party]) ? Math.sign(d) : 0;
+  };
+  const pairs = gs.flatMap((a, i) => gs.slice(i + 1).map((b) => [a, b, cmp(a, b)])).filter((p) => p[2]);
+  if (!pairs.length) return `There is no significant difference between ${words.all}.`;
+  if (gs.length === 2) {
+    const [a, b] = gs[0].v[party] > gs[1].v[party] ? gs : [gs[1], gs[0]];
+    return `${Who(a)} are significantly more likely than ${who(b)} ${vote}.`;
+  }
+  if (words.step && gs.length === st.groups.length) {
+    const steps = gs.slice(1).map((g, i) => cmp(g, gs[i]));
+    if (steps.every((s) => s === steps[0])) return `Support for ${DEMO_VOTE_FOR[party]} ${steps[0] > 0 ? "rises" : "falls"} significantly with each older ${words.step}.`;
+  }
+  const byV = [...gs].sort((a, b) => b.v[party] - a.v[party]);
+  const top = byV[0], bot = byV[byV.length - 1];
+  const topApart = byV.slice(1).every((g) => cmp(top, g) > 0), botApart = byV.slice(0, -1).every((g) => cmp(bot, g) < 0);
+  const topGap = top.v[party] - byV[1].v[party], botGap = byV[byV.length - 2].v[party] - bot.v[party];
+  if (topApart && (!botApart || topGap >= botGap)) return `${Who(top)} are significantly more likely than ${words.others} ${vote}.`;
+  if (botApart) return `${Who(bot)} are significantly less likely than ${words.others} ${vote}.`;
+  const [a, b] = pairs.map(([x, y, s]) => (s > 0 ? [x, y] : [y, x]))
+    .sort((p, q) => (q[0].v[party] - q[1].v[party]) - (p[0].v[party] - p[1].v[party]))[0];
+  return `${Who(a)} are significantly more likely than ${who(b)} ${vote}.`;
+}
 function DemographicsPanel({ rangeId = "all" }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
@@ -1820,6 +1875,7 @@ function DemographicsPanel({ rangeId = "all" }) {
             {st.groups.map((g, i) => row(g.label, g.v[party], g.ci[party], false,
               `Pooled from ${g.n} poll${g.n === 1 ? "" : "s"} · ${houseList(g.houses.map(demoHouse))} · ± ${g.ci[party].toFixed(1)} is the 95% margin`,
               demoRamp(color, st.groups.length, i)))}
+            {(() => { const t = demoVerdict(st, party); return t && <p className="demo-verdict">{t}</p>; })()}
             {chartFor(st)}
           </div>
         ))}
@@ -1842,6 +1898,11 @@ function DemographicsPanel({ rangeId = "all" }) {
           its own overall figure. Those gaps are pooled, newer and larger polls counting for more
           as in every figure here, and added to the site’s current figure for all voters. ± is
           the 95% margin.
+        </p>
+        <p className="table-hint">
+          The sentence under the bars says whether the groups really differ. A difference is
+          significant when the gap between two groups is larger than its own 95% margin, which
+          combines both groups’ ± figures.
         </p>
         <p className="table-hint">
           The charts are built the way the site’s other monthly lines are: each poll is a dot and
