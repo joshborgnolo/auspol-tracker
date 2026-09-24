@@ -1605,11 +1605,13 @@ function OnSourcesPanel({ rangeId }) {
         </div>
       )}
       <p className="ons-lead">
-        {a.now ? "Across the latest polls" : "In " + monthOf(a.ym)}, {rated
-          ? <>{a.v.toFixed(1)}% of people who voted for the Coalition in 2025 now back One Nation, as
-              do {b.v.toFixed(1)}% of Labor voters.</>
-          : <>{a.v.toFixed(1)}% of One Nation’s gain came from people who voted for the Coalition in 2025,
-              and {b.v.toFixed(1)}% from Labor voters.</>}
+        <b>
+          {a.now ? "Across the latest polls" : "In " + monthOf(a.ym)}, {rated
+            ? <>{a.v.toFixed(1)}% of people who voted for the Coalition in 2025 now back One Nation, as
+                do {b.v.toFixed(1)}% of Labor voters.</>
+            : <>{a.v.toFixed(1)}% of One Nation’s gain came from people who voted for the Coalition in 2025,
+                and {b.v.toFixed(1)}% from Labor voters.</>}
+        </b>
       </p>
       <div className="und-reads">
         {reads.map(({ sr, v, chg, now }) => (
