@@ -1817,7 +1817,9 @@ function demoTrendVerdict(D, st, party, inX) {
       return ga == null || gb == null ? null : ga - gb;
     }));
     if (!fit) return `There aren’t enough polls since ${when} to tell whether the gap between ${who(a)} and ${who(b)} has changed.`;
-    if (fit.p >= 0.05) return `The gap between ${who(a)} and ${who(b)} in support for ${P} hasn’t changed significantly since ${when}.`;
+    // no party named, as the bars' "no significant difference between men and women":
+    // with it, the language pair ran to thirty words
+    if (fit.p >= 0.05) return `The gap between ${who(a)} and ${who(b)} hasn’t changed significantly since ${when}.`;
     const [towards, from] = fit.b > 0 ? [a, b] : [b, a];
     return `Since ${when}, ${who(towards)} have moved significantly towards ${P} relative to ${who(from)}.`;
   }
