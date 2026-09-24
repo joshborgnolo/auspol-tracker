@@ -315,6 +315,17 @@ function Header({ isDark, onToggleTheme }) {
      freshness dot used to be its only door - a 7px target, and on phones a
      click-only span inside an aria-hidden block */
   useEffect(() => { window.AP.openStatic = () => setStaticView(true); }, []);
+  /* A satellite page's lockup links here: /#story opens the dial's story
+     exactly as the masthead's own click would. The hash comes off the
+     address straight away (no extra history entry) so the address reads
+     clean and the nav's own hash grammar never sees it. Checked on mount
+     only - the links all live off this page, so every arrival is one. */
+  useEffect(() => {
+    if (window.location.hash === "#story") {
+      openStory();
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
+  }, []);
   useEffect(() => {
     document.body.classList.toggle("ss-view", staticView);
     /* mount marks the article inert so nothing inside it can take focus or a

@@ -6,7 +6,13 @@
   src: url("/assets/fonts/sourcesans3-latin.ac057a55.woff2") format("woff2");
 }
 :root {
-  --sh-alp: oklch(0.55 0.150 27); --sh-lnp: oklch(0.50 0.095 250); --sh-onp: oklch(0.52 0.130 58);
+  /* the main page's party tokens, lifted verbatim from its template
+     (shell-copy:tokens), so this page's dial uses the site's own colours */
+  /* .build/site-shell.mjs ships these to the satellites */
+  --alp: oklch(0.55 0.150 27);   /* Labor red    */
+  --lnp: oklch(0.50 0.095 250);  /* Coalition blue */
+  --grn: oklch(0.60 0.120 150);  /* Greens       */
+  --onp: oklch(0.66 0.130 58);   /* One Nation orange */
   --sh-surface: oklch(0.992 0.004 85);
   --sh-sw-plate: color-mix(in oklch, var(--ink) 5%, var(--sh-surface)); --sh-sw-cap: var(--sh-surface);
   --sh-sw-well: color-mix(in oklch, var(--ink) 13%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, var(--ink) 18%, transparent);
@@ -15,7 +21,10 @@
   --sh-art: url("/assets/tile-art.svg");
 }
 @media (prefers-color-scheme: dark) { :root:not(.sh-light) {
-  --sh-alp: oklch(0.660 0.165 28); --sh-lnp: oklch(0.680 0.130 252); --sh-onp: oklch(0.760 0.135 64);
+    --alp: oklch(0.660 0.165 28);
+    --lnp: oklch(0.680 0.130 252);
+    --grn: oklch(0.720 0.135 152);
+    --onp: oklch(0.760 0.135 64);
   --sh-surface: oklch(0.252 0.011 66);
   --sh-sw-plate: color-mix(in oklch, black 22%, var(--sh-surface)); --sh-sw-cap: color-mix(in oklch, white 7%, var(--sh-surface));
   --sh-sw-well: color-mix(in oklch, black 44%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, black 58%, transparent);
@@ -24,7 +33,10 @@
   --sh-art: url("/assets/tile-art-dark.svg");
 } }
 :root.sh-dark {
-  --sh-alp: oklch(0.660 0.165 28); --sh-lnp: oklch(0.680 0.130 252); --sh-onp: oklch(0.760 0.135 64);
+    --alp: oklch(0.660 0.165 28);
+    --lnp: oklch(0.680 0.130 252);
+    --grn: oklch(0.720 0.135 152);
+    --onp: oklch(0.760 0.135 64);
   --sh-surface: oklch(0.252 0.011 66);
   --sh-sw-plate: color-mix(in oklch, black 22%, var(--sh-surface)); --sh-sw-cap: color-mix(in oklch, white 7%, var(--sh-surface));
   --sh-sw-well: color-mix(in oklch, black 44%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, black 58%, transparent);
@@ -50,21 +62,102 @@
 }
 .sh-skip:focus { top: 12px; }
 
-/* masthead: brand left, the switch right (.site-head) */
+/* masthead: the lockup left, the switch right (.site-head). The lockup is
+   the main page's own rules, lifted verbatim from its template (shell-copy
+   markers) – one definition for both. */
 .sh-head {
-  display: flex; justify-content: space-between; align-items: center; gap: 28px; flex-wrap: wrap;
-  padding-bottom: 16px; border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap;
+  padding-bottom: 16px; margin-bottom: 26px; border-bottom: 1px solid var(--line);
 }
-.sh-brand {
-  display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink);
+/* the masthead lockup: .build/site-shell.mjs ships
+   the blocks inside the shell-copy markers to the satellites, so a change
+   here is a change there */
+.wordmark {
+  /* the lockup's own face, Source Sans 3, shipped for this one caller. Myriad
+     Pro used to lead the stack, so a machine with Adobe fonts installed drew
+     a different wordmark from every reader's. The .wm-name/.wm-track spans
+     set no family, so this inherits into both words and the stacked variant. */
   font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
-  border-radius: 8px; padding: 3px; margin: -3px;
+  display: inline-flex; align-items: center; gap: 3px;
+  font-weight: 800; font-size: 30px; letter-spacing: -0.025em; line-height: 1;
+  margin: 0;
 }
-.sh-brand:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
-.sh-words { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1px; }
-.sh-name { font-weight: 800; font-size: 30px; letter-spacing: -0.025em; line-height: 0.95; color: var(--ink); }
-.sh-track { font-weight: 400; font-size: 30px; letter-spacing: -0.03em; line-height: 0.95; color: var(--ink-3); }
-.sh-glyph { display: block; width: 54px; height: 54px; margin: -7px 0; }
+.wm-sr, .sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+.wordmark.stacked { flex-direction: row; align-items: center; }
+/* Both words at ONE size, told apart by weight alone. At 30px `auspol` at 800
+   measures 93.6px and `tracker` at 400 measures 95px, so the block squares
+   itself off on its own - no tracking, no size step, no indent to force it.
+   The old second line bought that same width with 0.46em of letter-spacing,
+   which is enough air to stop the word reading as a word; and the 0.23em
+   indent it needed to re-centre pushed the T 2.8px right of the a, so the
+   lockup had no shared left edge. Weight contrast also survives what the old
+   grey/black split did not: small sizes, greyscale, and dark, where --ink-3
+   on a dark ground reads as switched off rather than as secondary. */
+.wm-textcol { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1px; }
+.wm-name {
+  display: inline-flex; font-weight: 800; font-size: 30px;
+  letter-spacing: -0.025em; line-height: 0.95; color: var(--ink);
+}
+.wordmark.stacked .wm-track {
+  align-self: flex-start; margin-left: 0; padding-bottom: 0;
+  display: inline-block; text-indent: 0;
+  font-size: 30px; font-weight: 400; letter-spacing: -0.03em;
+  text-transform: none; line-height: 0.95; color: var(--ink-3);
+}
+.wm-track {
+  align-self: flex-end; margin-left: 9px; padding-bottom: 3px;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.34em;
+  text-transform: uppercase; color: var(--ink-3);
+}
+/* glyph = one dial: live primary-vote columns as radial graduations on a
+   two-tone 2PP swing arc, needle from the shared pivot */
+.wm-glyph {
+  display: inline-flex; align-items: center; margin-left: 0; align-self: center;
+  /* No vertical nudge, and none needed: once the viewBox bounds what is
+     actually drawn, centring the box centres the INK - 0.05px off the
+     wordmark's own ink centre. The old translateY was compensating for a
+     viewBox with all its slack on one side. The dial's own foot cannot help
+     here: standing it on either visible baseline throws it 10px clear of the
+     block at one end or 2.5px past it at the other, and the midpoint between
+     them is a construction line nobody can see. */
+  background: none; border: 0; padding: 3px; margin: -3px; cursor: pointer;
+  text-decoration: none;   /* the satellites wear the same rule on an <a> */
+  /* The words live inside this button - the whole lockup is the way into the
+     replay - so it has to carry the wordmark's typography onward to them
+     rather than fall back to the button UA face. */
+  font: inherit; letter-spacing: inherit; text-align: left; color: inherit;
+  /* 12px, not 7: the dial's nearest ink is the tallest graduation's tip,
+     which reaches to within 0.9px of the box edge, so the clear space a
+     reader sees is the gap plus almost nothing. 12px puts it at 12.9px - a
+     third of the mark's own height, and it opens to 25px beside the letters
+     themselves. */
+  gap: 12px;
+  /* A hover scale is a surface responding to a pointer, not a mass with
+     momentum, so it decelerates rather than overshooting - the old curve
+     sprang past 1.06 and settled back, which reads as a toy. The needle keeps
+     its overshoot deliberately (see .wm-needle-g): a real gauge needle does
+     swing past and settle, and that one IS a mass. */
+  border-radius: 8px; transition: transform .28s cubic-bezier(.22, 1, .36, 1), background-color .2s ease;
+}
+.wm-glyph:hover { background: color-mix(in oklch, var(--ink) 6%, transparent); transform: scale(1.06); }
+.wm-glyph:active { transform: scale(0.97); }
+.wm-glyph:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
+/* the stand-in the page first paints, swapped for the live inline dial the
+   moment auspol-now.json lands – same box the masthead's svg takes */
+.wm-dial-img { display: block; overflow: visible; }
+@media (prefers-reduced-motion: reduce) { .wm-glyph, .wm-glyph:hover, .wm-glyph:active { transition: none; transform: none; } }
+.wordmark.stacked .wm-glyph { align-self: center; }
+.wm-dial { display: block; overflow: visible; }
+.wm-arc { fill: none; stroke-width: 1.4; opacity: 0.5; }
+.wm-pivot { fill: var(--ink-3); }
+.wm-needle-g { transition: transform .75s cubic-bezier(.34,1.3,.5,1); }
+/* settles alongside the needle; no overshoot, since a graduation running past
+   its own value and back reads as an error rather than as momentum */
+.wm-bar { transition: stroke-dasharray .75s cubic-bezier(.22,.9,.24,1); }
+@media (prefers-reduced-motion: reduce) { .wm-needle-g, .wm-bar { transition: none; } }
 
 /* the colour switch (.theme-seg): a light switch, the pressed half is the theme */
 .sh-theme {
@@ -164,7 +257,4 @@
   .sh-ways { padding-left: 0; padding-top: 16px; border-top: 1px solid var(--line); }
   .sh-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
 }
-/* the archives yield first where five tabs will not fit – the row is 332px,
-   so below a 365px screen (the footer links them too) */
-@media (max-width: 365px) { .sh-tab-arch { display: none; } }
 @media (prefers-reduced-motion: reduce) { .sh-tab, .sh-tab::after, .sh-cell { transition: none; } }

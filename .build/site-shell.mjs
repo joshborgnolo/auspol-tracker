@@ -1,8 +1,20 @@
 /* site-shell.mjs – the chrome every page outside the main build shares with
    the main page, so a reader moving between them never feels they have left
-   the site: the masthead, the tab bar (the main page's four views, then the
-   poll archives), the colour-theme switch, the live two-party figure, and
-   the main page's colophon and tide band.
+   the site: the masthead, the tab bar (the main page's four views), the
+   colour-theme switch, the live two-party figure, and the main page's
+   colophon and tide band.
+
+   The masthead is not a copy of the main page's lockup: it IS the lockup.
+   Its rules live between shell-copy markers in newtracker/template.html and
+   shellCss() lifts them verbatim; its dial is the same instrument build.mjs
+   decides the favicon's contest with, shipped per-build as
+   /assets/masthead-dial.svg (the no-JS stand-in) and as a spec in
+   auspol-now.json that site-shell.js draws inline (so the mark follows the
+   page's theme); clicking it does what the main page's does – replays the
+   term – by landing on /#story, which the main page opens its dial story
+   for. The navbar carries only the views: the archives and the other
+   satellites are linked from the colophon and their own strips, not the tab
+   bar (the user, 2026-09-24).
 
    Before this the satellites opened on a bare article with no masthead or
    way round the site, and left by a floating "Back to the interactive
@@ -52,33 +64,34 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 export const ROOT = path.resolve(HERE, "..");
 
-/* Every page that carries the shell, and its options: `tab` the tab it sits
-   under (underlined, aria-current), `page` for the colophon's two
-   self-references (the feedback page doesn't invite feedback on itself; an
-   archive page doesn't point at the archives). The two redirect stubs
-   (archives/index.html, newspoll-archive/index.html) redirect before paint
-   and carry nothing. */
+/* Every page that carries the shell, and its options: `tab` the view it
+   sits under of the four (underlined, aria-current – none takes one today,
+   the satellites each being a page of their own in the colophon), `page`
+   for the colophon's two self-references (the feedback page doesn't invite
+   feedback on itself; an archive page doesn't point at the archives). The
+   two redirect stubs (archives/index.html, newspoll-archive/index.html)
+   redirect before paint and carry nothing. */
 export const SHELL_PAGES = [
   { file: "preference-flows/index.html" },
   { file: "prediction/index.html" },                        // written by .build/refresh-prediction.mjs
   { file: "atlas/index.html" },
   { file: "feedback/index.html", page: "feedback" },
-  { file: "archives/newspoll/index.html", tab: "archives", page: "archives" },
-  { file: "archives/acnielsen/index.html", tab: "archives", page: "archives" },
-  { file: "archives/morgan/index.html", tab: "archives", page: "archives" },   // refresh-morgan-archive.mjs
-  { file: "archives/galaxy/index.html", tab: "archives", page: "archives" },   // refresh-galaxy-archive.mjs
-  { file: "archives/trove/index.html", tab: "archives", page: "archives" },    // refresh-trove-archive.mjs
+  { file: "archives/newspoll/index.html", page: "archives" },
+  { file: "archives/acnielsen/index.html", page: "archives" },
+  { file: "archives/morgan/index.html", page: "archives" },   // refresh-morgan-archive.mjs
+  { file: "archives/galaxy/index.html", page: "archives" },   // refresh-galaxy-archive.mjs
+  { file: "archives/trove/index.html", page: "archives" },    // refresh-trove-archive.mjs
 ];
 export const shellOptsFor = (file) => SHELL_PAGES.find((p) => p.file === file) || {};
 
-/* The main page's tabs (73de0c58…js TABS, reached by their hash) and then
-   the archives, which the main page's own tab bar now carries too. */
+/* The main page's tabs (73de0c58…js TABS, reached by their hash) – the
+   views, and nothing else: the archives and the other satellites keep out
+   of it here, exactly as they do on the main page. */
 const TABS = [
   { id: "snapshot", label: "Snapshot", href: "/#snapshot" },
   { id: "cycles", label: "Past cycles", href: "/#cycles" },
   { id: "allpolls", label: "All polls", href: "/#allpolls" },
   { id: "info", label: "Info", href: "/#info" },
-  { id: "archives", label: "Archives", href: "/archives/", cls: " sh-tab-arch" },
 ];
 
 const SUN = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg>';
@@ -88,13 +101,26 @@ const MOON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke
 export function shellHeader({ tab } = {}) {
   const tabs = TABS.map((t) => `<a class="sh-tab${t.cls || ""}${t.id === tab ? " active" : ""}" href="${t.href}"`
     + `${t.id === tab ? ' aria-current="page"' : ""}>${t.label}</a>`).join("\n      ");
+  /* The lockup is the main page's masthead worn on an <a> instead of a
+     <button>: same classes, same hidden spans (extracted shell-copy:brand
+     rules style all of it), and it goes where the masthead's click goes –
+     the dial, replayed, on /#story. The <img> is the per-build static dial
+     the page paints before site-shell.js swaps in the live inline one. */
   return `<a class="sh-skip" href="#sh-content">Skip to content</a>
 <div class="sh-frame sh-top">
   <header class="sh-head">
-    <a class="sh-brand" href="/" aria-label="auspol tracker – home">
-      <span class="sh-words" aria-hidden="true"><span class="sh-name">auspol</span><span class="sh-track">tracker</span></span>
-      <img class="sh-glyph" src="/assets/favicon.svg" alt="" width="54" height="54">
-    </a>
+    <div class="wordmark stacked">
+      <a class="wm-glyph" href="/#story" title="Wind the dial back through the term" aria-describedby="wm-action">
+        <span class="wm-textcol">
+          <span class="wm-name">auspol</span>
+          <span class="sr-only"> </span>
+          <span class="wm-track">tracker</span>
+        </span>
+        <img class="wm-dial-img" src="/assets/masthead-dial.svg" alt="" width="57" height="39.7">
+      </a>
+      <span class="wm-sr">– Australian federal polling</span>
+      <span id="wm-action" hidden>Replays the term on the masthead dial</span>
+    </div>
     <div class="sh-theme" role="group" aria-label="Colour theme">
       <button type="button" class="sh-cell" data-theme="light" aria-pressed="false" aria-label="Light mode" title="Light mode">${SUN}</button><button type="button" class="sh-cell" data-theme="dark" aria-pressed="false" aria-label="Dark mode" title="Dark mode">${MOON}</button>
     </div>
@@ -211,6 +237,18 @@ const fontUrl = (prefix) => {
   return f ? `/assets/fonts/${f}` : null;
 };
 
+/* Every shell-copy:<name> block in newtracker/template.html, verbatim and in
+   document order – the masthead's styling has ONE home (the main page's
+   template) and reaches every satellite from here. A missing or renamed
+   marker fails the build loudly rather than shipping a naked lockup. */
+export const shellCopy = (name) => {
+  const src = fs.readFileSync(path.join(ROOT, ".build", "newtracker", "template.html"), "utf8");
+  const parts = [...src.matchAll(new RegExp("/\\* shell-copy:" + name + " \\*/([\\s\\S]*?)/\\* /shell-copy \\*/", "g"))]
+    .map((m) => m[1].trim());
+  if (!parts.length) throw new Error("newtracker/template.html lost its shell-copy:" + name + " markers");
+  return parts.join("\n");
+};
+
 /* The main page's measurements (template.html .page, .site-head, .wordmark,
    .tab, .tab-score, .theme-seg, .method/.colophon, .tile-band), re-set on
    sh- classes so nothing collides with a page's own. Page colours come from
@@ -219,7 +257,8 @@ const fontUrl = (prefix) => {
    colours and the switch's plate – is defined here, in both themes. */
 export function shellCss() {
   const ss3 = fontUrl("sourcesans3-");
-  const DARK_TOKENS = `--sh-alp: oklch(0.660 0.165 28); --sh-lnp: oklch(0.680 0.130 252); --sh-onp: oklch(0.760 0.135 64);
+  const TOKENS = shellCopy("tokens"), TOKENS_DARK = shellCopy("tokens-dark");
+  const DARK_TOKENS = `${TOKENS_DARK.replace(/^/gm, "  ")}
   --sh-surface: oklch(0.252 0.011 66);
   --sh-sw-plate: color-mix(in oklch, black 22%, var(--sh-surface)); --sh-sw-cap: color-mix(in oklch, white 7%, var(--sh-surface));
   --sh-sw-well: color-mix(in oklch, black 44%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, black 58%, transparent);
@@ -234,7 +273,9 @@ ${ss3 ? `@font-face {
   src: url("${ss3}") format("woff2");
 }
 ` : ""}:root {
-  --sh-alp: oklch(0.55 0.150 27); --sh-lnp: oklch(0.50 0.095 250); --sh-onp: oklch(0.52 0.130 58);
+  /* the main page's party tokens, lifted verbatim from its template
+     (shell-copy:tokens), so this page's dial uses the site's own colours */
+  ${TOKENS}
   --sh-surface: oklch(0.992 0.004 85);
   --sh-sw-plate: color-mix(in oklch, var(--ink) 5%, var(--sh-surface)); --sh-sw-cap: var(--sh-surface);
   --sh-sw-well: color-mix(in oklch, var(--ink) 13%, var(--sh-surface)); --sh-sw-pivot: color-mix(in oklch, var(--ink) 18%, transparent);
@@ -266,21 +307,18 @@ ${ss3 ? `@font-face {
 }
 .sh-skip:focus { top: 12px; }
 
-/* masthead: brand left, the switch right (.site-head) */
+/* masthead: the lockup left, the switch right (.site-head). The lockup is
+   the main page's own rules, lifted verbatim from its template (shell-copy
+   markers) – one definition for both. */
 .sh-head {
-  display: flex; justify-content: space-between; align-items: center; gap: 28px; flex-wrap: wrap;
-  padding-bottom: 16px; border-bottom: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 28px; flex-wrap: wrap;
+  padding-bottom: 16px; margin-bottom: 26px; border-bottom: 1px solid var(--line);
 }
-.sh-brand {
-  display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: var(--ink);
-  font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
-  border-radius: 8px; padding: 3px; margin: -3px;
-}
-.sh-brand:focus-visible { outline: 2px solid var(--accent, var(--ink-3)); outline-offset: 2px; }
-.sh-words { display: inline-flex; flex-direction: column; align-items: flex-start; gap: 1px; }
-.sh-name { font-weight: 800; font-size: 30px; letter-spacing: -0.025em; line-height: 0.95; color: var(--ink); }
-.sh-track { font-weight: 400; font-size: 30px; letter-spacing: -0.03em; line-height: 0.95; color: var(--ink-3); }
-.sh-glyph { display: block; width: 54px; height: 54px; margin: -7px 0; }
+${shellCopy("brand")}
+/* the stand-in the page first paints, swapped for the live inline dial the
+   moment auspol-now.json lands – same box the masthead's svg takes */
+.wm-dial-img { display: block; overflow: visible; }
+${shellCopy("dial")}
 
 /* the colour switch (.theme-seg): a light switch, the pressed half is the theme */
 .sh-theme {
@@ -380,9 +418,6 @@ ${ss3 ? `@font-face {
   .sh-ways { padding-left: 0; padding-top: 16px; border-top: 1px solid var(--line); }
   .sh-band { height: 190px; margin-top: 8px; background-size: auto 320px; }
 }
-/* the archives yield first where five tabs will not fit – the row is 332px,
-   so below a 365px screen (the footer links them too) */
-@media (max-width: 365px) { .sh-tab-arch { display: none; } }
 @media (prefers-reduced-motion: reduce) { .sh-tab, .sh-tab::after, .sh-cell { transition: none; } }
 `;
 }
@@ -420,18 +455,92 @@ export function shellJs() {
   if (mq) (mq.addEventListener ? mq.addEventListener("change", paint) : mq.addListener(paint));
   paint();
 
-  // the live figure: the contest the main page leads with, on its default basis
+  /* The lockup squares itself off only while the two words happen to MEASURE
+     the same, and at 30px Source Sans 3 sets 'tracker' about 3px short of
+     'auspol'. The shortfall is measured and closed, not guessed – the main
+     page's Header braces its own copy of this same routine, so both lockups
+     square off identically off whatever face actually rendered. The trailing
+     letter-spacing unit comes back off BOTH measurements first: it widens
+     the box by one unit more than it widens the ink. */
+  var wn = document.querySelector(".wm-name"), wt = document.querySelector(".wm-track");
+  if (wn && wt) {
+    var ink = function (el) {
+      var ls = parseFloat(getComputedStyle(el).letterSpacing);
+      return el.getBoundingClientRect().width - (isNaN(ls) ? 0 : ls);
+    };
+    var align = function () {
+      wn.style.letterSpacing = ""; wt.style.letterSpacing = "";
+      var wide = ink(wn) >= ink(wt) ? wn : wt, narrow = wide === wn ? wt : wn;
+      var gaps = narrow.textContent.length - 1;
+      if (gaps < 1) return;
+      var base = parseFloat(getComputedStyle(narrow).letterSpacing);
+      narrow.style.letterSpacing = (((isNaN(base) ? 0 : base) + (ink(wide) - ink(narrow)) / gaps)).toFixed(3) + "px";
+    };
+    align();
+    if (document.fonts) document.fonts.ready.then(align);
+  }
+
+  // the live figure and dial: what the main page leads with, off one file
+  if (!window.fetch) return;
   var score = document.querySelector(".sh-score");
-  if (!score || !window.fetch) return;
   fetch("/assets/auspol-now.json", { cache: "no-cache" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (n) {
-    if (!n || n.a == null || n.b == null) return;
-    score.querySelector(".sh-num-a").textContent = n.a.toFixed(1);
-    score.querySelector(".sh-num-a").style.color = "var(--sh-alp)";
-    score.querySelector(".sh-num-b").textContent = n.b.toFixed(1);
-    score.querySelector(".sh-num-b").style.color = n.rival === "onp" ? "var(--sh-onp)" : "var(--sh-lnp)";
-    score.querySelector(".sh-abbr-b").textContent = n.rival === "onp" ? "ON" : "L/NP";
-    score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to Snapshot";
-    score.hidden = false;
+    if (!n) return;
+    if (score && n.a != null && n.b != null) {
+      score.querySelector(".sh-num-a").textContent = n.a.toFixed(1);
+      score.querySelector(".sh-num-a").style.color = "var(--alp)";
+      score.querySelector(".sh-num-b").textContent = n.b.toFixed(1);
+      score.querySelector(".sh-num-b").style.color = n.rival === "onp" ? "var(--onp)" : "var(--lnp)";
+      score.querySelector(".sh-abbr-b").textContent = n.rival === "onp" ? "ON" : "L/NP";
+      score.title = "The latest two-party preferred, Labor v " + (n.rival === "onp" ? "One Nation" : "the Coalition") + " – go to Snapshot";
+      score.hidden = false;
+    }
+    /* The <img> stand-in steps aside for an inline svg drawn from the spec,
+       strokes as var()s so the sheet's own theme rules colour it – the
+       masthead's dial, live, not a picture of it. The settle replays too:
+       needle in from vertical, graduations growing to their shares (unless
+       the reader prefers reduced motion). */
+    var img = document.querySelector(".wm-dial-img"), d = n.dial;
+    if (!img || !d || !document.createElementNS) return;
+    var NS = "http://www.w3.org/2000/svg";
+    var el = function (tag, attrs) {
+      var e = document.createElementNS(NS, tag);
+      for (var k in attrs) e.setAttribute(k, attrs[k]);
+      return e;
+    };
+    var rivalColor = "var(--" + d.right + ")";
+    var svg = el("svg", { "class": "wm-dial", viewBox: d.vp, width: 57, height: 39.7, "aria-hidden": "true" });
+    svg.appendChild(el("path", { d: d.arcL, "class": "wm-arc", fill: "none", stroke: "var(--alp)" }));
+    svg.appendChild(el("path", { d: d.arcR, "class": "wm-arc", fill: "none", stroke: rivalColor }));
+    var RM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var bars = [];
+    for (var bi = 0; bi < d.bars.length; bi++) {
+      var b = d.bars[bi];
+      var line = el("line", { "class": "wm-bar", x1: b.x1, y1: b.y1, x2: b.x2, y2: b.y2,
+        stroke: "var(--" + b.id + ")", "stroke-width": 3.4, "stroke-linecap": "butt",
+        "stroke-dasharray": (RM ? b.h : d.settle) + " " + d.max });
+      svg.appendChild(line);
+      bars.push(line);
+    }
+    var needleRotate = el("g", { "class": "wm-needle-g", transform: "rotate(" + (RM ? d.nd : 0) + ")" });
+    needleRotate.appendChild(el("line", { "class": "wm-needle", x1: 0, y1: 0, x2: 0, y2: -8.6,
+      stroke: "var(--" + d.leader + ")", "stroke-width": 1.7, "stroke-linecap": "round" }));
+    needleRotate.appendChild(el("circle", { "class": "wm-needle-tip", cx: 0, cy: -8.6, r: 1.9, fill: "var(--" + d.leader + ")" }));
+    var needleWrap = el("g", { transform: "translate(" + d.cx + ", " + d.cy + ")" });
+    needleWrap.appendChild(needleRotate);
+    svg.appendChild(needleWrap);
+    svg.appendChild(el("circle", { "class": "wm-pivot", cx: d.cx, cy: d.cy, r: 1.7 }));
+    img.replaceWith(svg);
+    if (!RM) {
+      /* first paint must carry the settle state before the goal posts land,
+         or there is nothing to animate between */
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          needleRotate.setAttribute("transform", "rotate(" + d.nd + ")");
+          for (var i = 0; i < bars.length; i++)
+            bars[i].setAttribute("stroke-dasharray", d.bars[i].h + " " + d.max);
+        });
+      });
+    }
   }).catch(function () {});
 })();
 `;

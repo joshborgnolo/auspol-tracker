@@ -21,7 +21,6 @@ for (const p of SHELL_PAGES) {
   assert.ok(/<main id="sh-content"/.test(html), `${p.file}: the skip link has its target`);
   assert.equal((html.match(/an unofficial aggregate of published federal opinion polling/g) || []).length, 1,
     `${p.file}: the strap-line once, in the colophon`);
-  assert.equal(/class="sh-tab sh-tab-arch active"/.test(html), p.tab === "archives", `${p.file}: Archives underlined only on the archives`);
 }
 
 // ---- the markup's variants ----------------------------------------------------------
@@ -29,7 +28,7 @@ assert.ok(!/href="\/feedback\/"/.test(shellFooter({ page: "feedback" })), "the f
 assert.ok(/href="\/feedback\/"/.test(shellFooter({})), "every other page does");
 assert.ok(!/stored <a href="\/archives\/">here<\/a>/.test(shellFooter({ page: "archives" })), "an archive page doesn't point at the archives");
 assert.ok(/estimates only\./.test(shellFooter({})), "the disclaimer rides the colophon");
-assert.equal((shellHeader({}).match(/class="sh-tab[" ]/g) || []).length, 5, "the four views and the archives");
+assert.equal((shellHeader({}).match(/class="sh-tab[" ]/g) || []).length, 4, "the four views, and nothing else");
 
 // ---- the unlisted pages stay unlisted ----------------------------------------------------
 // a link a reader can follow: an <a href> in a page, an href: prop in the main page's
@@ -66,8 +65,8 @@ p { margin: 0; }
 </body>
 </html>
 `;
-const once = applyShell(page, { tab: "archives", page: "archives" });
-assert.equal(applyShell(once, { tab: "archives", page: "archives" }), once, "idempotent");
+const once = applyShell(page, { page: "archives" });
+assert.equal(applyShell(once, { page: "archives" }), once, "idempotent");
 assert.ok(!/ss-back/.test(once), "the pill, its rules and its comment are gone");
 assert.ok(!/satellite archive page/.test(once), "the satellite note is gone");
 assert.ok(/<p class="ss-note">Figures are computed from AEC results\.<\/p>/.test(once), "a note with more in it keeps the rest");

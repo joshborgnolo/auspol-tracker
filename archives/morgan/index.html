@@ -185,10 +185,18 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
 <a class="sh-skip" href="#sh-content">Skip to content</a>
 <div class="sh-frame sh-top">
   <header class="sh-head">
-    <a class="sh-brand" href="/" aria-label="auspol tracker – home">
-      <span class="sh-words" aria-hidden="true"><span class="sh-name">auspol</span><span class="sh-track">tracker</span></span>
-      <img class="sh-glyph" src="/assets/favicon.svg" alt="" width="54" height="54">
-    </a>
+    <div class="wordmark stacked">
+      <a class="wm-glyph" href="/#story" title="Wind the dial back through the term" aria-describedby="wm-action">
+        <span class="wm-textcol">
+          <span class="wm-name">auspol</span>
+          <span class="sr-only"> </span>
+          <span class="wm-track">tracker</span>
+        </span>
+        <img class="wm-dial-img" src="/assets/masthead-dial.svg" alt="" width="57" height="39.7">
+      </a>
+      <span class="wm-sr">– Australian federal polling</span>
+      <span id="wm-action" hidden>Replays the term on the masthead dial</span>
+    </div>
     <div class="sh-theme" role="group" aria-label="Colour theme">
       <button type="button" class="sh-cell" data-theme="light" aria-pressed="false" aria-label="Light mode" title="Light mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"></circle><path d="M12 2.2v2.4M12 19.4v2.4M2.2 12h2.4M19.4 12h2.4M4.9 4.9l1.7 1.7M17.4 17.4l1.7 1.7M19.1 4.9l-1.7 1.7M6.6 17.4l-1.7 1.7"></path></svg></button><button type="button" class="sh-cell" data-theme="dark" aria-pressed="false" aria-label="Dark mode" title="Dark mode"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 14.2A8.2 8.2 0 0 1 9.8 3.5a8.2 8.2 0 1 0 10.7 10.7Z"></path></svg></button>
     </div>
@@ -199,7 +207,6 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
       <a class="sh-tab" href="/#cycles">Past cycles</a>
       <a class="sh-tab" href="/#allpolls">All polls</a>
       <a class="sh-tab" href="/#info">Info</a>
-      <a class="sh-tab sh-tab-arch active" href="/archives/" aria-current="page">Archives</a>
     </div>
     <a class="sh-score" href="/#snapshot" hidden title="The latest two-party preferred – go to Snapshot"><span class="sh-eyebrow">2PP</span><span class="sh-party"><span class="sh-abbr sh-abbr-a">ALP</span><span class="sh-num sh-num-a"></span></span><span class="sh-sep" aria-hidden="true"></span><span class="sh-party"><span class="sh-num sh-num-b"></span><span class="sh-abbr sh-abbr-b"></span></span></a>
   </nav>

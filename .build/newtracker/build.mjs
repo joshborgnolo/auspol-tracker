@@ -311,8 +311,34 @@ function buildFavicon() {
   const side = Math.max(x1 - x0, y1 - y0);
   const vb = [ ((x0 + x1) / 2 - side / 2).toFixed(2), ((y0 + y1) / 2 - side / 2).toFixed(2),
                side.toFixed(2), side.toFixed(2) ].join(" ");
+  /* --- the same instrument again at masthead weight, for the satellites ---
+     /assets/masthead-dial.svg is the no-JS stand-in their lockup shows; the
+     spec below (written into auspol-now.json) is what site-shell.js draws
+     their live inline dial from – strokes as var()s off the same geometry,
+     so a satellite's glyph IS the masthead's, not a copy of it. */
+  const SETTLE_H = (MIN_H + MAX_H) / 2;
+  const mBars = glyph.map((p, i) => {
+    const a = BAR_ANGLES[i], s = polar(a, GC.r + 2), e = polar(a, GC.r + 2 + MAX_H);
+    return { id: p.id, x1: s.x, y1: s.y, x2: e.x, y2: e.y, h: +p.h.toFixed(2) };
+  });
+  const mArcL = arc(-90, 0), mArcR = arc(0, 90);
+  const leader = margin >= 0 ? "alp" : top.id;
+  const mastheadSpec = { vp: "0.58 0.07 38.39 26.73", cx: GC.cx, cy: GC.cy,
+                         arcL: mArcL, arcR: mArcR, right: top.id, leader,
+                         settle: SETTLE_H, max: MAX_H, nd: +needleDeg.toFixed(2), bars: mBars };
+  const INK3 = oklchHex(0.52, 0.010, 58);
+  const mastheadSvg = `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${mastheadSpec.vp}'>`
+    + `<path d='${mArcL}' fill='none' stroke='${PARTY_HEX.alp}' stroke-width='1.4' opacity='0.5'/>`
+    + `<path d='${mArcR}' fill='none' stroke='${PARTY_HEX[top.id]}' stroke-width='1.4' opacity='0.5'/>`
+    + mBars.map((b) => `<line x1='${b.x1}' y1='${b.y1}' x2='${b.x2}' y2='${b.y2}' stroke='${PARTY_HEX[b.id]}' stroke-width='3.4' stroke-linecap='butt' stroke-dasharray='${b.h} ${MAX_H}'/>`).join("")
+    + `<g transform='translate(${GC.cx}, ${GC.cy})'><g transform='rotate(${mastheadSpec.nd})'>`
+    + `<line x1='0' y1='0' x2='0' y2='-8.6' stroke='${PARTY_HEX[leader]}' stroke-width='1.7' stroke-linecap='round'/>`
+    + `<circle cx='0' cy='-8.6' r='1.9' fill='${PARTY_HEX[leader]}'/></g></g>`
+    + `<circle cx='${GC.cx}' cy='${GC.cy}' r='1.7' fill='${INK3}'/></svg>`;
+
   return { svg: `<svg xmlns='http://www.w3.org/2000/svg' viewBox='${vb}'>${parts.join("")}</svg>`,
            note: `${glyph.map((p) => p.id + " " + p.v.toFixed(1)).join(", ")} · needle ${needleDeg.toFixed(1)}deg vs ${top.id}`,
+           masthead: { spec: mastheadSpec, svg: mastheadSvg },
            // the dial's contest and figures: the satellites' header docks the same pair
            score: { rival: top.id, a: +top.lab.toFixed(1), b: +top.opp.toFixed(1), basis: (rival === "onp" ? L.onImp?.a != null : S && S.alp != null) ? "imp" : "resp" } };
 }
@@ -380,19 +406,23 @@ console.log(`  theme-color: ${THEME_LIGHT} light · ${THEME_DARK} dark (matches 
    masthead's current glyph. Stable unhashed name - the satellites' <link> is
    the point; a content hash would orphan them. */
 writeAtomic(path.join(ROOT, "assets", "favicon.svg"), fav.svg + "\n");
+/* The satellites' lockup glyph: the masthead dial itself at its own weight,
+   as a static stand-in for before JS draws the live one (the spec rides
+   auspol-now.json just below). Same unhashed-name contract as the favicon. */
+writeAtomic(path.join(ROOT, "assets", "masthead-dial.svg"), fav.masthead.svg + "\n");
 
 /* The shared chrome of the pages outside this build (.build/site-shell.mjs):
-   its stylesheet and script, the live figure its header docks, and the tide
-   band's two drawings, as files beside the favicon – under assets/, which
-   every updater commits, so the satellites follow each build without being
-   rewritten (a page the build rewrote would leave the tree dirty: the
-   updaters' commit lists name no satellite). The figure is the favicon
-   dial's own contest and basis, which are the main page's. The band's
-   drawings are lifted out of this template's --tile-art data URIs, so the
-   satellites close on exactly the main page's tide. */
+   its stylesheet and script, the live figure its header docks, the dial the
+   lockup draws, and the tide band's two drawings, as files beside the
+   favicon – under assets/, which every updater commits, so the satellites
+   follow each build without being rewritten (a page the build rewrote would
+   leave the tree dirty: the updaters' commit lists name no satellite). The
+   figure is the favicon dial's own contest and basis, which are the main
+   page's. The band's drawings are lifted out of this template's --tile-art
+   data URIs, so the satellites close on exactly the main page's tide. */
 writeAtomic(path.join(ROOT, "assets", "site-shell.css"), shellCss());
 writeAtomic(path.join(ROOT, "assets", "site-shell.js"), shellJs());
-writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify(fav.score) + "\n");
+writeAtomic(path.join(ROOT, "assets", "auspol-now.json"), JSON.stringify({ ...fav.score, dial: fav.masthead.spec }) + "\n");
 for (const [token, file] of [["--tile-art", "tile-art.svg"], ["--tile-art-dark", "tile-art-dark.svg"]]) {
   const m = html.match(new RegExp(token + ':\\s*url\\("data:image\\/svg\\+xml,([^"]+)"\\)'));
   if (m) writeAtomic(path.join(ROOT, "assets", file), decodeURIComponent(m[1]) + "\n");

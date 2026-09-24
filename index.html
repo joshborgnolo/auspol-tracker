@@ -331,6 +331,7 @@ body.js.ss-view #root { display: none; }
 .wm-glyph {
   display: inline-flex; align-items: center; margin-left: 0; align-self: center;
   background: none; border: 0; padding: 3px; margin: -3px; cursor: pointer;
+  text-decoration: none;   
   font: inherit; letter-spacing: inherit; text-align: left; color: inherit;
   gap: 12px;
   border-radius: 8px; transition: transform .28s cubic-bezier(.22, 1, .36, 1), background-color .2s ease;
@@ -557,8 +558,8 @@ body.dark .dl-bloom { opacity: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .dl-backdrop { animation: none; }
-  .wm-glyph, .wm-glyph:hover, .wm-glyph:active { transition: none; transform: none; }
 }
+@media (prefers-reduced-motion: reduce) { .wm-glyph, .wm-glyph:hover, .wm-glyph:active { transition: none; transform: none; } }
 .wordmark.stacked .wm-glyph { align-self: center; }
 .wm-dial { display: block; overflow: visible; }
 .wm-arc { fill: none; stroke-width: 1.4; opacity: 0.5; }
@@ -1939,13 +1940,6 @@ body.editorial .method { border-top: 2px solid var(--ink-3); margin-top: 8px; pa
   .tabs.show-score .tab-pinhide { display: none; }
 }
 .tabs-list { display: flex; gap: inherit; align-items: flex-end; }
-.tab-link { text-decoration: none; }
-@media (max-width: 640px) {
-  .tabs.show-score .tab-link { display: none; }
-}
-@media (max-width: 365px) {
-  .tabs .tab-link { display: none; }   
-}
 .tab-label-short { display: none; }
 @media (max-width: 420px) {
   .tabs.show-score .tab-label-long { display: none; }
@@ -13970,6 +13964,72 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         }],
         "houses": ["DemosAU", "YouGov"]
       }]
+    }, {
+      "id": "softness",
+      "label": "Softness",
+      "sets": [{
+        "id": "softness",
+        "label": null,
+        "groups": [{
+          "label": "Solid",
+          "v": {
+            "alp": 27.8,
+            "lnp": 21.2,
+            "onp": 32.3,
+            "grn": 11.2,
+            "oth": 7.2
+          },
+          "ci": {
+            "alp": 4.5,
+            "lnp": 4.1,
+            "onp": 4.7,
+            "grn": 3.2,
+            "oth": 2.6
+          },
+          "n": 1,
+          "houses": ["RedBridge/Accent"],
+          "monthly": [["2026-02", 29.8, 19.4, 31.5, 10.8, 8.6, 4.7, 4.1, 4.8, 3.2, 2.9], ["2026-04", 30.9, 21.3, 28.6, 11.6, 7.6, 4.7, 4.2, 4.6, 3.3, 2.7], ["2026-05", 30.1, 21.6, 28.8, 12.7, 6.8, 4.6, 4.1, 4.5, 3.3, 2.5], ["2026-06", 27.6, 19, 32.1, 11.6, 9.7, 4.6, 4.1, 4.8, 3.3, 3.1], ["2026-07", 28.9, 19.5, 33.4, 10.5, 7.4, 4.4, 3.9, 4.6, 3, 2.6], ["2026-08", 28.9, 22.2, 31.1, 10.7, 7, 4.6, 4.2, 4.7, 3.1, 2.6]]
+        }, {
+          "label": "Soft",
+          "v": {
+            "alp": 27.8,
+            "lnp": 21.2,
+            "onp": 23.3,
+            "grn": 15.2,
+            "oth": 12.2
+          },
+          "ci": {
+            "alp": 4.7,
+            "lnp": 4.2,
+            "onp": 4.4,
+            "grn": 3.7,
+            "oth": 3.4
+          },
+          "n": 1,
+          "houses": ["RedBridge/Accent"],
+          "monthly": [["2026-02", 30.8, 24.4, 21.5, 11.8, 11.6, 4.9, 4.6, 4.4, 3.5, 3.4], ["2026-04", 29.9, 21.3, 19.6, 14.6, 14.6, 4.9, 4.3, 4.2, 3.8, 3.8], ["2026-05", 27.1, 20.6, 27.8, 10.7, 13.8, 4.6, 4.2, 4.6, 3.2, 3.6], ["2026-06", 30.6, 17, 28.1, 13.6, 10.7, 4.9, 4, 4.8, 3.7, 3.3], ["2026-07", 26.9, 22.5, 23.4, 15.5, 11.4, 4.5, 4.2, 4.3, 3.7, 3.2], ["2026-08", 28.9, 22.2, 22.1, 14.7, 12, 4.7, 4.3, 4.3, 3.7, 3.4]]
+        }, {
+          "label": "Very soft",
+          "v": {
+            "alp": 19.8,
+            "lnp": 24.2,
+            "onp": 23.3,
+            "grn": 10.2,
+            "oth": 22.2
+          },
+          "ci": {
+            "alp": 9.2,
+            "lnp": 9.8,
+            "onp": 9.7,
+            "grn": 7,
+            "oth": 9.6
+          },
+          "n": 1,
+          "houses": ["RedBridge/Accent"],
+          "monthly": [["2026-02", 31.8, 19.4, 21.5, 11.8, 15.6, 11, 9.4, 9.7, 7.6, 8.6], ["2026-04", 26.9, 26.3, 23.6, 8.6, 14.6, 10.4, 10.3, 10, 6.6, 8.3], ["2026-05", 35.1, 24.6, 13.8, 7.7, 18.8, 10.9, 9.9, 7.9, 6.1, 8.9], ["2026-06", 30.6, 22, 23.1, 8.6, 15.7, 10.9, 9.8, 10, 6.6, 8.6], ["2026-07", 29.9, 20.5, 12.4, 13.5, 23.4, 10.2, 9, 7.4, 7.6, 9.4], ["2026-08", 20.9, 25.2, 22.1, 9.7, 22, 9.3, 10, 9.5, 6.8, 9.5]]
+        }],
+        "houses": ["RedBridge/Accent"]
+      }]
     }],
     "houses": ["YouGov", "DemosAU", "Resolve", "RedBridge/Accent"],
     "polls": [{
@@ -13996,7 +14056,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "pollster": "RedBridge",
       "dateLabel": "24–28 Aug",
       "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
-      "sets": ["generation", "gender", "education", "location", "housing"]
+      "sets": ["generation", "gender", "education", "location", "housing", "softness"]
     }, {
       "pollster": "YouGov",
       "dateLabel": "18–24 Aug",
@@ -14014,7 +14074,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "sets": ["age", "gender", "state"]
     }]
   };
-  const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "Rest of Australia", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language"];
+  const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "Rest of Australia", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language", "Solid", "Soft", "Very soft"];
   const accuracy = {
     "windowDays": 14,
     "cycles": [{
@@ -21837,7 +21897,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_50fedc6a824243918bd9f1b3552cc5c0.pdf",
     "grp": {
       "r": "published table",
-      "v": [null, null, null, [30, 16, 32, 12, 10], [30, 19, 14, 29, 8], [34, 14, 7, 35, 10], [32, 25, 2, 33, 8], [33, 21, 11, 29, 6], [30, 19, 12, 28, 11], [25.8, 21.3, 13.5, 32.4, 7], [29, 18, 9, 33, 11], [42, 19, 14, 17, 8], null, null, null, null, [41, 20, 14, 16, 9], [32, 16, 14, 28, 10], [32, 22, 5, 34, 7], [22, 20, 11, 39, 8], [31, 24, 6, 32, 7], [35, 20, 10, 28, 7]],
+      "v": [null, null, null, [30, 16, 32, 12, 10], [30, 19, 14, 29, 8], [34, 14, 7, 35, 10], [32, 25, 2, 33, 8], [33, 21, 11, 29, 6], [30, 19, 12, 28, 11], [25.8, 21.3, 13.5, 32.4, 7], [29, 18, 9, 33, 11], [42, 19, 14, 17, 8], null, null, null, null, [41, 20, 14, 16, 9], [32, 16, 14, 28, 10], [32, 22, 5, 34, 7], [22, 20, 11, 39, 8], [31, 24, 6, 32, 7], [35, 20, 10, 28, 7], null, null, null, [31, 17, 11, 34, 7], [32, 22, 12, 24, 10], [33, 17, 12, 24, 14]],
       "t": [32, 19, 12, 28, 9]
     }
   }, {
@@ -24920,7 +24980,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_61030f1f0f4d4ba49b6c3a10f141c992.pdf",
     "grp": {
       "r": "published table",
-      "v": [null, null, null, [26, 11, 37, 15, 11], [30, 20, 18, 23, 9], [31, 21, 7, 36, 5], [34, 28, 2, 30, 6], [35, 22, 9, 26, 8], [27, 22, 17, 28, 6], [30, 21.7, 15, 27.7, 5.6], [27, 21, 11, 35, 6], [38, 23, 12, 16, 11], null, null, null, null, [36, 21, 15, 21, 7], [32, 22, 14, 25, 7], [28, 21, 15, 32, 4], [26, 24, 8, 33, 9], [32, 28, 4, 30, 6], [32, 20, 15, 26, 7]],
+      "v": [null, null, null, [26, 11, 37, 15, 11], [30, 20, 18, 23, 9], [31, 21, 7, 36, 5], [34, 28, 2, 30, 6], [35, 22, 9, 26, 8], [27, 22, 17, 28, 6], [30, 21.7, 15, 27.7, 5.6], [27, 21, 11, 35, 6], [38, 23, 12, 16, 11], null, null, null, null, [36, 21, 15, 21, 7], [32, 22, 14, 25, 7], [28, 21, 15, 32, 4], [26, 24, 8, 33, 9], [32, 28, 4, 30, 6], [32, 20, 15, 26, 7], null, null, null, [32, 21, 12, 31, 4], [31, 21, 15, 22, 11], [28, 26, 9, 26, 11]],
       "t": [31, 22, 13, 27, 7]
     }
   }, {
@@ -26912,7 +26972,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_c99eef2ffb4242f3b2d0da6311abf61e.pdf",
     "grp": {
       "r": "published table",
-      "v": [null, null, null, [35, 18, 27, 10, 10], [28, 16, 18, 30, 8], [24, 17, 10, 43, 6], [27, 25, 2, 35, 11], [28, 19, 10, 35, 8], [28, 20, 14, 28, 10], [27.2, 18.6, 12.3, 34.5, 7.4], [27, 18, 8, 39, 8], [30, 23, 17, 17, 13], null, null, null, null, [28, 23, 14, 23, 12], [31, 18, 13, 30, 8], [23, 16, 15, 36, 10], [28, 19, 7, 40, 6], [27, 24, 4, 35, 10], [28, 17, 14, 32, 9]],
+      "v": [null, null, null, [35, 18, 27, 10, 10], [28, 16, 18, 30, 8], [24, 17, 10, 43, 6], [27, 25, 2, 35, 11], [28, 19, 10, 35, 8], [28, 20, 14, 28, 10], [27.2, 18.6, 12.3, 34.5, 7.4], [27, 18, 8, 39, 8], [30, 23, 17, 17, 13], null, null, null, null, [28, 23, 14, 23, 12], [31, 18, 13, 30, 8], [23, 16, 15, 36, 10], [28, 19, 7, 40, 6], [27, 24, 4, 35, 10], [28, 17, 14, 32, 9], null, null, null, [29, 20, 13, 33, 5], [26, 19, 11, 32, 12], [34, 23, 8, 18, 17]],
       "t": [28, 20, 12, 31, 9]
     }
   }, {
@@ -28224,7 +28284,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_0fe4f080e2cd4654906be0f94268f9b2.pdf",
     "grp": {
       "r": "published table",
-      "v": [null, null, null, [28, 8, 37, 18, 9], [35, 16, 15, 27, 7], [24, 22, 7, 38, 9], [32, 22, 5, 31, 10], [34, 16, 9, 33, 8], [27, 20, 18, 25, 10], [23.3, 19.5, 16.3, 33.1, 7.8], [31, 16, 11, 33, 9], [38, 18, 15, 19, 10], null, null, null, null, [38, 17, 13, 22, 10], [31, 17, 17, 30, 5], [34, 19, 8, 35, 4], [19, 18, 15, 33, 15], [30, 25, 7, 30, 8], [32, 17, 12, 32, 7]],
+      "v": [null, null, null, [28, 8, 37, 18, 9], [35, 16, 15, 27, 7], [24, 22, 7, 38, 9], [32, 22, 5, 31, 10], [34, 16, 9, 33, 8], [27, 20, 18, 25, 10], [23.3, 19.5, 16.3, 33.1, 7.8], [31, 16, 11, 33, 9], [38, 18, 15, 19, 10], null, null, null, null, [38, 17, 13, 22, 10], [31, 17, 17, 30, 5], [34, 19, 8, 35, 4], [19, 18, 15, 33, 15], [30, 25, 7, 30, 8], [32, 17, 12, 32, 7], null, null, null, [29, 18, 13, 32, 8], [32, 16, 15, 28, 9], [32, 21, 10, 23, 14]],
       "t": [30, 18, 14, 29, 9]
     }
   }, {
@@ -30196,7 +30256,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_e09c2025b9df424e98b0f2737e7ae4ca.pdf",
     "grp": {
       "r": "published table",
-      "v": [null, null, null, [26, 16, 27, 21, 10], [30, 22, 12, 29, 7], [28, 19, 7, 35, 11], [30, 26, 3, 35, 6], [29, 22, 8, 33, 8], [29, 21, 13, 29, 8], [25.3, 23.6, 8.9, 36.1, 6.2], [28, 19, 9, 35, 9], [35, 23, 13, 20, 9], null, null, null, null, [35, 23, 12, 21, 9], [27, 23, 12, 34, 4], [30, 18, 10, 32, 10], [24, 20, 6, 39, 11], [29, 25, 5, 35, 6], [29, 22, 11, 31, 7]],
+      "v": [null, null, null, [26, 16, 27, 21, 10], [30, 22, 12, 29, 7], [28, 19, 7, 35, 11], [30, 26, 3, 35, 6], [29, 22, 8, 33, 8], [29, 21, 13, 29, 8], [25.3, 23.6, 8.9, 36.1, 6.2], [28, 19, 9, 35, 9], [35, 23, 13, 20, 9], null, null, null, null, [35, 23, 12, 21, 9], [27, 23, 12, 34, 4], [30, 18, 10, 32, 10], [24, 20, 6, 39, 11], [29, 25, 5, 35, 6], [29, 22, 11, 31, 7], null, null, null, [30, 20, 8, 37, 5], [28, 23, 13, 27, 9], [31, 21, 11, 16, 21]],
       "t": [29, 22, 10, 31, 8]
     }
   }, {
@@ -31603,7 +31663,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "methodUrl": "https://6b72024e-077a-44e2-88f5-dc1a0ed81099.usrfiles.com/ugd/b86980_cab524c6cbb54cdc80cfeed7d9863703.pdf",
     "grp": {
       "r": "published table",
-      "v": [null, null, null, [31, 12, 32, 16, 9], [27, 19, 14, 32, 8], [29, 21, 7, 34, 9], [29, 32, 2, 28, 9], [30, 24, 9, 28, 9], [28, 20, 14, 29, 9], [27.6, 23.2, 17, 26.4, 5.8], [26, 19, 6, 37, 12], [36, 26, 13, 18, 7], null, null, null, null, [30, 27, 13, 21, 9], [37, 18, 14, 27, 4], [25, 29, 12, 24, 10], [22, 17, 8, 41, 12], [30, 29, 5, 29, 7], [29, 18, 11, 33, 9]],
+      "v": [null, null, null, [31, 12, 32, 16, 9], [27, 19, 14, 32, 8], [29, 21, 7, 34, 9], [29, 32, 2, 28, 9], [30, 24, 9, 28, 9], [28, 20, 14, 29, 9], [27.6, 23.2, 17, 26.4, 5.8], [26, 19, 6, 37, 12], [36, 26, 13, 18, 7], null, null, null, null, [30, 27, 13, 21, 9], [37, 18, 14, 27, 4], [25, 29, 12, 24, 10], [22, 17, 8, 41, 12], [30, 29, 5, 29, 7], [29, 18, 11, 33, 9], null, null, null, [30, 22, 10, 33, 5], [30, 22, 14, 24, 10], [22, 25, 9, 24, 20]],
       "t": [29, 22, 12, 28, 9]
     }
   }, {
@@ -40971,7 +41031,10 @@ const DEMO_WHO = {
   Mortgage: "voters with a mortgage",
   Renting: "renters",
   "English only": "voters who speak only English at home",
-  "Other language": "voters who speak another language at home"
+  "Other language": "voters who speak another language at home",
+  Solid: "voters certain of their choice",
+  Soft: "voters who say they might change it",
+  "Very soft": "voters still wavering after naming one"
 };
 const DEMO_SET_WORDS = {
   age: {
@@ -41019,6 +41082,12 @@ const DEMO_SET_WORDS = {
     all: "voters who speak only English at home and those who don’t",
     others: null,
     step: null
+  },
+  softness: {
+    all: "voters by how certain of their choice they say they are",
+    others: "voters at other levels of certainty",
+    step: "as certainty in the choice falls",
+    one: "group"
   }
 };
 const DEMO_VOTE_FOR = {
@@ -41451,7 +41520,7 @@ function DemographicsPanel({
     className: "table-hint"
   }, "The charts are built the way the site\u2019s other monthly lines are: each poll is a dot and each line\u2019s 95% interval is shaded. Where two groups\u2019 shading overlaps, the polls can\u2019t tell them apart that month. \u221238% means the party\u2019s vote in that group is 38% lower than among all voters, not 38 points. Measured this way a party\u2019s growth doesn\u2019t read as a widening divide, so a flat line means the group moved with everyone else."), React.createElement("p", {
     className: "table-hint"
-  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the rest of Australia at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups" : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups" : "", "."))))));
+  }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34." : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the rest of Australia at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups." : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups." : tab.id === "softness" ? ". Softness is RedBridge’s own question, which no other house asks, so this tab rests on one pollster: a solid voter is certain of the choice they named, a soft voter says they may change it, and a very soft one named it only when pressed, or says they will probably change it." : "."))))));
 }
 const PARTY_C = {
   alp: "var(--alp)",
@@ -43506,12 +43575,7 @@ function Tabs({
     "aria-hidden": "true"
   }, t.short)) : t.label), t.note != null && React.createElement("span", {
     className: "tab-note"
-  }, t.note)))), React.createElement("a", {
-    className: "tab tab-link",
-    href: "/archives/"
-  }, React.createElement("span", {
-    className: "tab-label"
-  }, "Archives"))), React.createElement(NextPollTicker, {
+  }, t.note))))), React.createElement(NextPollTicker, {
     showScore: pinned && heroGone
   }), React.createElement(GlyphDial, {
     className: "tab-glyph",
@@ -48904,11 +48968,11 @@ function infoTerms(D) {
     }, {
       id: "vote-by-group",
       term: "Breakdowns by group",
-      body: React.createElement(React.Fragment, null, "How each group \u2013 men and women, age groups, education levels, states, where people live, whether they own or rent, and the language they speak at home \u2013 says it will vote, from the tables pollsters publish with their polls. The panel \u201CWho votes for whom\u201D pools them into one figure per group.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "How each group \u2013 men and women, age groups, education levels, states, where people live, whether they own or rent, the language they speak at home, and how certain of their choice they are \u2013 says it will vote, from the tables pollsters publish with their polls. The panel \u201CWho votes for whom\u201D pools them into one figure per group.", React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "How it\u2019s built."), " Each poll says how far a group sits from that poll\u2019s own overall figure: One Nation ten points lower among 18\u201334s, say. Those gaps are pooled over the last six weeks of polls, weighted as the headline\u2019s polls are, so newer and larger polls count for more. They are then added to the site\u2019s current figure for all voters. Measuring each poll against its own total removes its pollster\u2019s lean, and puts every group on the same level as the headline. The charts under the figures follow each group month by month, built the same way: each month\u2019s pooled gaps are added to that month\u2019s figure for all voters, as every monthly line on the site is built. They show each group as a percentage above or below all voters."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Which pollsters count where."), " Groups pool only where the pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov, and RedBridge. 18\u201334: Resolve, DemosAU, and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+. Generations: YouGov and RedBridge. Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the rest of Australia at their shares of the 2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and DemosAU for the two metropolitan ones, since its third combines provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its renters include others who don\u2019t own. Language at home: YouGov and DemosAU."), React.createElement("span", {
+      }, React.createElement("b", null, "Which pollsters count where."), " Groups pool only where the pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov, and RedBridge. 18\u201334: Resolve, DemosAU, and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+. Generations: YouGov and RedBridge. Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes. States: Resolve and, since June 2026, YouGov, whose SA, WA, and ACT/NT/Tas columns are combined into the rest of Australia at their shares of the 2025 vote. Where people live: YouGov and RedBridge, which draw the same four areas, and DemosAU for the two metropolitan ones, since its third combines provincial and rural voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its renters include others who don\u2019t own. Language at home: YouGov and DemosAU. Softness of the vote \u2013 certain of the choice, may change it, or only named it when pressed (or says they will probably change it) \u2013 is RedBridge\u2019s own question, asked by no other pollster."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Reading a gap."), " Each figure carries its 95% margin, usually 2 to 5 points. It is the ", xref("interval", "breakdowns by group", "95% interval"), " taken over the group\u2019s pooled gaps, with each poll\u2019s sample for the group estimated as the poll\u2019s sample times the group\u2019s share of adults: 18\u201334s are about 28%."), React.createElement("span", {
         className: "info-p"
@@ -50088,6 +50152,12 @@ function Header({
   const [staticView, setStaticView] = useState(false);
   useEffect(() => {
     window.AP.openStatic = () => setStaticView(true);
+  }, []);
+  useEffect(() => {
+    if (window.location.hash === "#story") {
+      openStory();
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+    }
   }, []);
   useEffect(() => {
     document.body.classList.toggle("ss-view", staticView);
