@@ -1,5 +1,5 @@
 {
- "_about": "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+ "_about": "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
  "waves": [
   {
    "pollster": "Resolve",
@@ -44,6 +44,36 @@
       "grn": 14,
       "onp": 6,
       "oth": 14
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 32,
+      "alp": 35,
+      "grn": 11,
+      "onp": 6,
+      "oth": 16
+     },
+     "Vic": {
+      "lnp": 28,
+      "alp": 34,
+      "grn": 14,
+      "onp": 6,
+      "oth": 18
+     },
+     "Qld": {
+      "lnp": 35,
+      "alp": 31,
+      "grn": 12,
+      "onp": 8,
+      "oth": 14
+     },
+     "Rest of Australia": {
+      "lnp": 29,
+      "alp": 35,
+      "grn": 12,
+      "onp": 5,
+      "oth": 15
      }
     }
    }
@@ -92,6 +122,36 @@
       "onp": 6.97,
       "oth": 16.27
      }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 31.34,
+      "alp": 35.92,
+      "grn": 11.33,
+      "onp": 7.94,
+      "oth": 13.47
+     },
+     "Vic": {
+      "lnp": 27.77,
+      "alp": 37.68,
+      "grn": 12.65,
+      "onp": 7.66,
+      "oth": 14.25
+     },
+     "Qld": {
+      "lnp": 30.61,
+      "alp": 31.33,
+      "grn": 11.06,
+      "onp": 10.32,
+      "oth": 16.68
+     },
+     "Rest of Australia": {
+      "lnp": 25.35,
+      "alp": 33.13,
+      "grn": 13.55,
+      "onp": 6.46,
+      "oth": 21.51
+     }
     }
    }
   },
@@ -138,6 +198,36 @@
       "grn": 13.39,
       "onp": 8.73,
       "oth": 14.38
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 28.83,
+      "alp": 37.15,
+      "grn": 12.7,
+      "onp": 11.72,
+      "oth": 9.6
+     },
+     "Vic": {
+      "lnp": 30.45,
+      "alp": 36.06,
+      "grn": 11.73,
+      "onp": 6.47,
+      "oth": 15.27
+     },
+     "Qld": {
+      "lnp": 28.81,
+      "alp": 39.07,
+      "grn": 10.26,
+      "onp": 8.59,
+      "oth": 13.25
+     },
+     "Rest of Australia": {
+      "lnp": 26.29,
+      "alp": 36.54,
+      "grn": 10.73,
+      "onp": 9.78,
+      "oth": 16.65
      }
     }
    }
@@ -186,6 +276,36 @@
       "onp": 12.57,
       "oth": 16.01
      }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 28.32,
+      "alp": 33.74,
+      "grn": 8.52,
+      "onp": 15.59,
+      "oth": 13.84
+     },
+     "Vic": {
+      "lnp": 30.04,
+      "alp": 31.64,
+      "grn": 14.63,
+      "onp": 8.66,
+      "oth": 15.03
+     },
+     "Qld": {
+      "lnp": 27.39,
+      "alp": 36.99,
+      "grn": 9.7,
+      "onp": 12.04,
+      "oth": 13.88
+     },
+     "Rest of Australia": {
+      "lnp": 21.58,
+      "alp": 38.79,
+      "grn": 11.95,
+      "onp": 10.88,
+      "oth": 16.79
+     }
     }
    }
   },
@@ -232,6 +352,36 @@
       "grn": 12.39,
       "onp": 14.1,
       "oth": 15.36
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 29.47,
+      "alp": 35.01,
+      "grn": 9.43,
+      "onp": 13.86,
+      "oth": 12.24
+     },
+     "Vic": {
+      "lnp": 28.52,
+      "alp": 33.4,
+      "grn": 11.81,
+      "onp": 10.43,
+      "oth": 15.84
+     },
+     "Qld": {
+      "lnp": 22.88,
+      "alp": 34.68,
+      "grn": 13.12,
+      "onp": 12.69,
+      "oth": 16.62
+     },
+     "Rest of Australia": {
+      "lnp": 30.7,
+      "alp": 30.49,
+      "grn": 9.51,
+      "onp": 11.23,
+      "oth": 18.08
      }
     }
    }
@@ -280,6 +430,36 @@
       "onp": 13.55,
       "oth": 15.14
      }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 30.97,
+      "alp": 34.26,
+      "grn": 11.48,
+      "onp": 12.78,
+      "oth": 10.51
+     },
+     "Vic": {
+      "lnp": 28.73,
+      "alp": 32.85,
+      "grn": 12.5,
+      "onp": 11.98,
+      "oth": 13.95
+     },
+     "Qld": {
+      "lnp": 26.25,
+      "alp": 34.68,
+      "grn": 14.22,
+      "onp": 11.29,
+      "oth": 13.57
+     },
+     "Rest of Australia": {
+      "lnp": 30.06,
+      "alp": 30.59,
+      "grn": 8.38,
+      "onp": 13.24,
+      "oth": 17.72
+     }
     }
    }
   },
@@ -326,6 +506,36 @@
       "grn": 15.64,
       "onp": 15.35,
       "oth": 13.94
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 25.5,
+      "alp": 34.62,
+      "grn": 10.66,
+      "onp": 16.8,
+      "oth": 12.42
+     },
+     "Vic": {
+      "lnp": 31.23,
+      "alp": 31.03,
+      "grn": 11.03,
+      "onp": 11.44,
+      "oth": 15.28
+     },
+     "Qld": {
+      "lnp": 25.99,
+      "alp": 36.28,
+      "grn": 11.7,
+      "onp": 10.87,
+      "oth": 15.16
+     },
+     "Rest of Australia": {
+      "lnp": 18.87,
+      "alp": 41.08,
+      "grn": 11.95,
+      "onp": 15.16,
+      "oth": 12.94
      }
     }
    }
@@ -374,6 +584,36 @@
       "onp": 17.26,
       "oth": 14.33
      }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 28.54,
+      "alp": 30.56,
+      "grn": 8.8,
+      "onp": 19.58,
+      "oth": 12.52
+     },
+     "Vic": {
+      "lnp": 30.43,
+      "alp": 30.49,
+      "grn": 11.93,
+      "onp": 14.65,
+      "oth": 12.49
+     },
+     "Qld": {
+      "lnp": 26.47,
+      "alp": 33.52,
+      "grn": 13.98,
+      "onp": 14.4,
+      "oth": 11.64
+     },
+     "Rest of Australia": {
+      "lnp": 26.28,
+      "alp": 34.5,
+      "grn": 12.71,
+      "onp": 13.34,
+      "oth": 13.17
+     }
     }
    }
   },
@@ -420,6 +660,36 @@
       "grn": 11.57,
       "onp": 18.12,
       "oth": 15.19
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 26.32,
+      "alp": 30.65,
+      "grn": 11.9,
+      "onp": 19.65,
+      "oth": 11.47
+     },
+     "Vic": {
+      "lnp": 32.6,
+      "alp": 26.14,
+      "grn": 12.84,
+      "onp": 16.56,
+      "oth": 11.87
+     },
+     "Qld": {
+      "lnp": 29.64,
+      "alp": 27.79,
+      "grn": 9.71,
+      "onp": 18.97,
+      "oth": 13.89
+     },
+     "Rest of Australia": {
+      "lnp": 24.4,
+      "alp": 34.81,
+      "grn": 6.37,
+      "onp": 15.94,
+      "oth": 18.48
      }
     }
    }
@@ -478,6 +748,36 @@
       "grn": 1,
       "oth": 11
      }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 35,
+      "lnp": 21,
+      "onp": 16,
+      "grn": 17,
+      "oth": 11
+     },
+     "Outer metro": {
+      "alp": 29,
+      "lnp": 18,
+      "onp": 30,
+      "grn": 13,
+      "oth": 10
+     },
+     "Provincial": {
+      "alp": 35,
+      "lnp": 16,
+      "onp": 30,
+      "grn": 8,
+      "oth": 12
+     },
+     "Rural": {
+      "alp": 21,
+      "lnp": 19,
+      "onp": 40,
+      "grn": 7,
+      "oth": 13
+     }
     }
    },
    "total": {
@@ -531,6 +831,36 @@
       "grn": 12.71,
       "onp": 23.54,
       "oth": 11.37
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 20.68,
+      "alp": 31.67,
+      "grn": 11.14,
+      "onp": 24.38,
+      "oth": 12.14
+     },
+     "Vic": {
+      "lnp": 21.24,
+      "alp": 29.17,
+      "grn": 11.95,
+      "onp": 25.07,
+      "oth": 12.57
+     },
+     "Qld": {
+      "lnp": 24.83,
+      "alp": 30.1,
+      "grn": 11.71,
+      "onp": 22.66,
+      "oth": 10.71
+     },
+     "Rest of Australia": {
+      "lnp": 24.53,
+      "alp": 36.54,
+      "grn": 7.87,
+      "onp": 19.43,
+      "oth": 11.63
      }
     }
    }
@@ -588,6 +918,36 @@
       "onp": 32,
       "grn": 2,
       "oth": 10
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 34,
+      "lnp": 23,
+      "onp": 17,
+      "grn": 14,
+      "oth": 11
+     },
+     "Outer metro": {
+      "alp": 31,
+      "lnp": 19,
+      "onp": 25,
+      "grn": 11,
+      "oth": 13
+     },
+     "Provincial": {
+      "alp": 22,
+      "lnp": 27,
+      "onp": 28,
+      "grn": 14,
+      "oth": 8
+     },
+     "Rural": {
+      "alp": 23,
+      "lnp": 23,
+      "onp": 28,
+      "grn": 13,
+      "oth": 13
      }
     }
    },
@@ -678,14 +1038,14 @@
      }
     },
     "location": {
-     "Inner Metropolitan": {
+     "Inner metro": {
       "alp": 41,
       "lnp": 20,
       "onp": 16,
       "grn": 14,
       "oth": 9
      },
-     "Outer Metropolitan": {
+     "Outer metro": {
       "alp": 32,
       "lnp": 16,
       "onp": 28,
@@ -738,14 +1098,14 @@
      }
     },
     "housing": {
-     "Owned outright": {
+     "Own outright": {
       "alp": 31,
       "lnp": 24,
       "onp": 32,
       "grn": 6,
       "oth": 7
      },
-     "Owned with a mortgage": {
+     "Mortgage": {
       "alp": 35,
       "lnp": 20,
       "onp": 28,
@@ -823,6 +1183,36 @@
       "grn": 2,
       "oth": 10
      }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 39,
+      "lnp": 17,
+      "onp": 18,
+      "grn": 15,
+      "oth": 10
+     },
+     "Outer metro": {
+      "alp": 29,
+      "lnp": 22,
+      "onp": 26,
+      "grn": 13,
+      "oth": 10
+     },
+     "Provincial": {
+      "alp": 30,
+      "lnp": 19,
+      "onp": 27,
+      "grn": 12,
+      "oth": 13
+     },
+     "Rural": {
+      "alp": 20,
+      "lnp": 21,
+      "onp": 33,
+      "grn": 10,
+      "oth": 17
+     }
     }
    },
    "total": {
@@ -876,6 +1266,36 @@
       "grn": 14.58,
       "onp": 22.38,
       "oth": 15.2
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 20.33,
+      "alp": 27.62,
+      "grn": 10.49,
+      "onp": 29.12,
+      "oth": 12.44
+     },
+     "Vic": {
+      "lnp": 22.08,
+      "alp": 31.19,
+      "grn": 14.79,
+      "onp": 21.28,
+      "oth": 10.65
+     },
+     "Qld": {
+      "lnp": 24.04,
+      "alp": 29.18,
+      "grn": 11.76,
+      "onp": 23.56,
+      "oth": 11.46
+     },
+     "Rest of Australia": {
+      "lnp": 20.29,
+      "alp": 29.98,
+      "grn": 12.47,
+      "onp": 19.33,
+      "oth": 17.94
      }
     }
    }
@@ -940,6 +1360,59 @@
       "onp": 33,
       "grn": 5,
       "oth": 8
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 34,
+      "lnp": 20,
+      "onp": 17,
+      "grn": 18,
+      "oth": 11
+     },
+     "Outer metro": {
+      "alp": 31,
+      "lnp": 19,
+      "onp": 28,
+      "grn": 13,
+      "oth": 9
+     },
+     "Provincial": {
+      "alp": 29,
+      "lnp": 19,
+      "onp": 32,
+      "grn": 9,
+      "oth": 11
+     },
+     "Rural": {
+      "alp": 21,
+      "lnp": 18,
+      "onp": 36,
+      "grn": 10,
+      "oth": 15
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 28,
+      "lnp": 32,
+      "onp": 29,
+      "grn": 3,
+      "oth": 8
+     },
+     "Mortgage": {
+      "alp": 28,
+      "lnp": 18,
+      "onp": 33,
+      "grn": 12,
+      "oth": 8
+     },
+     "Renting": {
+      "alp": 26,
+      "lnp": 11,
+      "onp": 27,
+      "grn": 19,
+      "oth": 17
      }
     }
    },
@@ -1011,6 +1484,59 @@
       "onp": 17,
       "grn": 0,
       "oth": 0
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 36,
+      "lnp": 20,
+      "onp": 19,
+      "grn": 15,
+      "oth": 11
+     },
+     "Outer metro": {
+      "alp": 28,
+      "lnp": 22,
+      "onp": 26,
+      "grn": 13,
+      "oth": 11
+     },
+     "Provincial": {
+      "alp": 25,
+      "lnp": 19,
+      "onp": 33,
+      "grn": 15,
+      "oth": 8
+     },
+     "Rural": {
+      "alp": 28,
+      "lnp": 19,
+      "onp": 26,
+      "grn": 8,
+      "oth": 19
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 30,
+      "lnp": 29,
+      "onp": 23,
+      "grn": 5,
+      "oth": 13
+     },
+     "Mortgage": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 31,
+      "grn": 11,
+      "oth": 11
+     },
+     "Renting": {
+      "alp": 35,
+      "lnp": 15,
+      "onp": 21,
+      "grn": 17,
+      "oth": 12
      }
     }
    },
@@ -1092,6 +1618,52 @@
       "grn": 17,
       "oth": 12
      }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 33,
+      "onp": 14,
+      "lnp": 25,
+      "grn": 16,
+      "oth": 12
+     },
+     "Outer metro": {
+      "alp": 25,
+      "onp": 26,
+      "lnp": 25,
+      "grn": 11,
+      "oth": 13
+     },
+     "Regional or rural": {
+      "alp": 21,
+      "onp": 40,
+      "lnp": 17,
+      "grn": 12,
+      "oth": 10
+     }
+    },
+    "housing": {
+     "Renting": {
+      "alp": 27,
+      "onp": 29,
+      "lnp": 16,
+      "grn": 17,
+      "oth": 11
+     },
+     "Mortgage": {
+      "alp": 26,
+      "onp": 25,
+      "lnp": 23,
+      "grn": 12,
+      "oth": 14
+     },
+     "Own outright": {
+      "alp": 26,
+      "onp": 25,
+      "lnp": 29,
+      "grn": 9,
+      "oth": 11
+     }
     }
    },
    "fit": 0.04
@@ -1139,6 +1711,36 @@
       "grn": 14.68,
       "onp": 22.18,
       "oth": 11.47
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 23.48,
+      "alp": 33.75,
+      "grn": 9.92,
+      "onp": 22.11,
+      "oth": 10.74
+     },
+     "Vic": {
+      "lnp": 24.79,
+      "alp": 27.75,
+      "grn": 13.94,
+      "onp": 22.24,
+      "oth": 11.28
+     },
+     "Qld": {
+      "lnp": 22.99,
+      "alp": 28.7,
+      "grn": 12.91,
+      "onp": 23.05,
+      "oth": 12.35
+     },
+     "Rest of Australia": {
+      "lnp": 21.11,
+      "alp": 36.11,
+      "grn": 13.53,
+      "onp": 22.42,
+      "oth": 6.83
      }
     }
    }
@@ -1203,6 +1805,59 @@
       "onp": 29,
       "grn": 9,
       "oth": 5
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 31,
+      "lnp": 18,
+      "onp": 21,
+      "grn": 17,
+      "oth": 13
+     },
+     "Outer metro": {
+      "alp": 27,
+      "lnp": 21,
+      "onp": 29,
+      "grn": 13,
+      "oth": 10
+     },
+     "Provincial": {
+      "alp": 31,
+      "lnp": 19,
+      "onp": 26,
+      "grn": 14,
+      "oth": 10
+     },
+     "Rural": {
+      "alp": 20,
+      "lnp": 24,
+      "onp": 35,
+      "grn": 8,
+      "oth": 13
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 28,
+      "lnp": 29,
+      "onp": 30,
+      "grn": 5,
+      "oth": 8
+     },
+     "Mortgage": {
+      "alp": 27,
+      "lnp": 21,
+      "onp": 30,
+      "grn": 10,
+      "oth": 12
+     },
+     "Renting": {
+      "alp": 27,
+      "lnp": 15,
+      "onp": 25,
+      "grn": 21,
+      "oth": 12
      }
     }
    },
@@ -1293,14 +1948,14 @@
      }
     },
     "location": {
-     "Inner Metropolitan": {
+     "Inner metro": {
       "alp": 36,
       "lnp": 21,
       "onp": 21,
       "grn": 15,
       "oth": 7
      },
-     "Outer Metropolitan": {
+     "Outer metro": {
       "alp": 32,
       "lnp": 22,
       "onp": 25,
@@ -1353,14 +2008,14 @@
      }
     },
     "housing": {
-     "Owned outright": {
+     "Own outright": {
       "alp": 32,
       "lnp": 28,
       "onp": 30,
       "grn": 4,
       "oth": 6
      },
-     "Owned with a mortgage": {
+     "Mortgage": {
       "alp": 32,
       "lnp": 20,
       "onp": 26,
@@ -1445,6 +2100,59 @@
       "grn": 3,
       "oth": 2
      }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 29,
+      "lnp": 18,
+      "onp": 17,
+      "grn": 24,
+      "oth": 12
+     },
+     "Outer metro": {
+      "alp": 32,
+      "lnp": 21,
+      "onp": 25,
+      "grn": 11,
+      "oth": 11
+     },
+     "Provincial": {
+      "alp": 35,
+      "lnp": 23,
+      "onp": 23,
+      "grn": 11,
+      "oth": 8
+     },
+     "Rural": {
+      "alp": 24,
+      "lnp": 23,
+      "onp": 31,
+      "grn": 9,
+      "oth": 13
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 29,
+      "lnp": 30,
+      "onp": 25,
+      "grn": 5,
+      "oth": 11
+     },
+     "Mortgage": {
+      "alp": 33,
+      "lnp": 19,
+      "onp": 25,
+      "grn": 13,
+      "oth": 10
+     },
+     "Renting": {
+      "alp": 29,
+      "lnp": 14,
+      "onp": 25,
+      "grn": 20,
+      "oth": 12
+     }
     }
    },
    "total": {
@@ -1498,6 +2206,36 @@
       "grn": 14.7,
       "onp": 25.72,
       "oth": 13.51
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 25.54,
+      "alp": 27.53,
+      "grn": 13.18,
+      "onp": 24.63,
+      "oth": 9.13
+     },
+     "Vic": {
+      "lnp": 22.9,
+      "alp": 28.58,
+      "grn": 13,
+      "onp": 22.49,
+      "oth": 13.03
+     },
+     "Qld": {
+      "lnp": 24.51,
+      "alp": 29.68,
+      "grn": 7.9,
+      "onp": 25.71,
+      "oth": 12.19
+     },
+     "Rest of Australia": {
+      "lnp": 18.83,
+      "alp": 32.8,
+      "grn": 11.09,
+      "onp": 23.46,
+      "oth": 13.81
      }
     }
    }
@@ -1562,6 +2300,59 @@
       "onp": 37,
       "grn": 1,
       "oth": 4
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 32,
+      "lnp": 21,
+      "onp": 22,
+      "grn": 16,
+      "oth": 9
+     },
+     "Outer metro": {
+      "alp": 28,
+      "lnp": 23,
+      "onp": 27,
+      "grn": 12,
+      "oth": 10
+     },
+     "Provincial": {
+      "alp": 28,
+      "lnp": 23,
+      "onp": 25,
+      "grn": 12,
+      "oth": 12
+     },
+     "Rural": {
+      "alp": 21,
+      "lnp": 24,
+      "onp": 25,
+      "grn": 12,
+      "oth": 18
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 27,
+      "lnp": 30,
+      "onp": 29,
+      "grn": 5,
+      "oth": 9
+     },
+     "Mortgage": {
+      "alp": 28,
+      "lnp": 27,
+      "onp": 23,
+      "grn": 11,
+      "oth": 11
+     },
+     "Renting": {
+      "alp": 27,
+      "lnp": 9,
+      "onp": 26,
+      "grn": 23,
+      "oth": 16
      }
     }
    },
@@ -1643,9 +2434,71 @@
       "grn": 13,
       "oth": 8
      }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 31,
+      "onp": 18,
+      "lnp": 24,
+      "grn": 18,
+      "oth": 9
+     },
+     "Outer metro": {
+      "alp": 27,
+      "onp": 29,
+      "lnp": 22,
+      "grn": 13,
+      "oth": 9
+     },
+     "Regional or rural": {
+      "alp": 17,
+      "onp": 38,
+      "lnp": 23,
+      "grn": 9,
+      "oth": 13
+     }
+    },
+    "housing": {
+     "Renting": {
+      "alp": 29,
+      "onp": 26,
+      "lnp": 15,
+      "grn": 17,
+      "oth": 13
+     },
+     "Mortgage": {
+      "alp": 28,
+      "onp": 27,
+      "lnp": 24,
+      "grn": 14,
+      "oth": 7
+     },
+     "Own outright": {
+      "alp": 21,
+      "onp": 33,
+      "lnp": 29,
+      "grn": 7,
+      "oth": 10
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 23,
+      "onp": 31,
+      "lnp": 23,
+      "grn": 12,
+      "oth": 11
+     },
+     "Other language": {
+      "alp": 39,
+      "onp": 18,
+      "lnp": 24,
+      "grn": 14,
+      "oth": 5
+     }
     }
    },
-   "fit": 0.03
+   "fit": 0.32
   },
   {
    "pollster": "RedBridge/Accent",
@@ -1726,14 +2579,14 @@
      }
     },
     "location": {
-     "Inner Metropolitan": {
+     "Inner metro": {
       "alp": 28,
       "lnp": 23,
       "onp": 23,
       "grn": 14,
       "oth": 12
      },
-     "Outer Metropolitan": {
+     "Outer metro": {
       "alp": 31,
       "lnp": 18,
       "onp": 30,
@@ -1786,14 +2639,14 @@
      }
     },
     "housing": {
-     "Owned outright": {
+     "Own outright": {
       "alp": 27,
       "lnp": 24,
       "onp": 35,
       "grn": 4,
       "oth": 10
      },
-     "Owned with a mortgage": {
+     "Mortgage": {
       "alp": 28,
       "lnp": 17,
       "onp": 32,
@@ -1902,6 +2755,80 @@
       "oth": 0
      }
     },
+    "state": {
+     "NSW": {
+      "alp": 26,
+      "lnp": 19,
+      "onp": 28,
+      "grn": 13,
+      "oth": 14
+     },
+     "Vic": {
+      "alp": 23,
+      "lnp": 24,
+      "onp": 32,
+      "grn": 11,
+      "oth": 10
+     },
+     "Qld": {
+      "alp": 24,
+      "lnp": 19,
+      "onp": 31,
+      "grn": 14,
+      "oth": 12
+     },
+     "SA": {
+      "alp": 30,
+      "lnp": 12,
+      "onp": 31,
+      "grn": 21,
+      "oth": 6
+     },
+     "WA": {
+      "alp": 32,
+      "lnp": 21,
+      "onp": 23,
+      "grn": 13,
+      "oth": 11
+     },
+     "ACT/NT/Tas": {
+      "alp": 39,
+      "lnp": 17,
+      "onp": 29,
+      "grn": 5,
+      "oth": 11
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 31,
+      "lnp": 21,
+      "onp": 24,
+      "grn": 16,
+      "oth": 9
+     },
+     "Outer metro": {
+      "alp": 28,
+      "lnp": 21,
+      "onp": 30,
+      "grn": 9,
+      "oth": 13
+     },
+     "Provincial": {
+      "alp": 33,
+      "lnp": 10,
+      "onp": 30,
+      "grn": 17,
+      "oth": 10
+     },
+     "Rural": {
+      "alp": 15,
+      "lnp": 23,
+      "onp": 36,
+      "grn": 13,
+      "oth": 14
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 23,
@@ -1923,6 +2850,45 @@
       "onp": 18,
       "grn": 13,
       "oth": 12
+     }
+    },
+    "language": {
+     "Other language": {
+      "alp": 33,
+      "lnp": 18,
+      "onp": 27,
+      "grn": 9,
+      "oth": 13
+     },
+     "English only": {
+      "alp": 26,
+      "lnp": 20,
+      "onp": 30,
+      "grn": 14,
+      "oth": 11
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 24,
+      "lnp": 31,
+      "onp": 31,
+      "grn": 7,
+      "oth": 7
+     },
+     "Mortgage": {
+      "alp": 26,
+      "lnp": 19,
+      "onp": 33,
+      "grn": 10,
+      "oth": 13
+     },
+     "Renting": {
+      "alp": 27,
+      "lnp": 13,
+      "onp": 32,
+      "grn": 18,
+      "oth": 10
      }
     }
    },
@@ -1977,6 +2943,36 @@
       "grn": 15.7,
       "onp": 32.12,
       "oth": 12.17
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 20.61,
+      "alp": 27.69,
+      "grn": 11.89,
+      "onp": 30.36,
+      "oth": 9.44
+     },
+     "Vic": {
+      "lnp": 22.51,
+      "alp": 24.39,
+      "grn": 11.15,
+      "onp": 29.11,
+      "oth": 12.84
+     },
+     "Qld": {
+      "lnp": 20.2,
+      "alp": 26.11,
+      "grn": 12.07,
+      "onp": 30.97,
+      "oth": 10.64
+     },
+     "Rest of Australia": {
+      "lnp": 17.94,
+      "alp": 32.84,
+      "grn": 13.54,
+      "onp": 23.5,
+      "oth": 12.18
      }
     }
    }
@@ -2051,9 +3047,71 @@
       "grn": 14,
       "oth": 8
      }
+    },
+    "location": {
+     "Inner metro": {
+      "onp": 19,
+      "alp": 34,
+      "lnp": 19,
+      "grn": 17,
+      "oth": 11
+     },
+     "Outer metro": {
+      "onp": 32,
+      "alp": 25,
+      "lnp": 19,
+      "grn": 13,
+      "oth": 11
+     },
+     "Regional or rural": {
+      "onp": 42,
+      "alp": 20,
+      "lnp": 15,
+      "grn": 8,
+      "oth": 15
+     }
+    },
+    "housing": {
+     "Renting": {
+      "onp": 29,
+      "alp": 29,
+      "lnp": 12,
+      "grn": 18,
+      "oth": 12
+     },
+     "Mortgage": {
+      "onp": 33,
+      "alp": 26,
+      "lnp": 17,
+      "grn": 13,
+      "oth": 11
+     },
+     "Own outright": {
+      "onp": 29,
+      "alp": 25,
+      "lnp": 25,
+      "grn": 8,
+      "oth": 13
+     }
+    },
+    "language": {
+     "English only": {
+      "onp": 33,
+      "alp": 25,
+      "lnp": 18,
+      "grn": 11,
+      "oth": 13
+     },
+     "Other language": {
+      "onp": 21,
+      "alp": 35,
+      "lnp": 16,
+      "grn": 21,
+      "oth": 7
+     }
     }
    },
-   "fit": 0.03
+   "fit": 0.47
   },
   {
    "pollster": "RedBridge/Accent",
@@ -2134,14 +3192,14 @@
      }
     },
     "location": {
-     "Inner Metropolitan": {
+     "Inner metro": {
       "alp": 38,
       "lnp": 17,
       "onp": 22,
       "grn": 13,
       "oth": 10
      },
-     "Outer Metropolitan": {
+     "Outer metro": {
       "alp": 31,
       "lnp": 17,
       "onp": 30,
@@ -2194,14 +3252,14 @@
      }
     },
     "housing": {
-     "Owned outright": {
+     "Own outright": {
       "alp": 30,
       "lnp": 25,
       "onp": 30,
       "grn": 7,
       "oth": 8
      },
-     "Owned with a mortgage": {
+     "Mortgage": {
       "alp": 32,
       "lnp": 17,
       "onp": 32,
@@ -2310,6 +3368,80 @@
       "oth": 6
      }
     },
+    "state": {
+     "NSW": {
+      "alp": 30,
+      "lnp": 15,
+      "onp": 32,
+      "grn": 13,
+      "oth": 9
+     },
+     "Vic": {
+      "alp": 27,
+      "lnp": 19,
+      "onp": 27,
+      "grn": 13,
+      "oth": 15
+     },
+     "Qld": {
+      "alp": 30,
+      "lnp": 16,
+      "onp": 33,
+      "grn": 12,
+      "oth": 9
+     },
+     "SA": {
+      "alp": 32,
+      "lnp": 12,
+      "onp": 36,
+      "grn": 12,
+      "oth": 8
+     },
+     "WA": {
+      "alp": 33,
+      "lnp": 21,
+      "onp": 29,
+      "grn": 9,
+      "oth": 9
+     },
+     "ACT/NT/Tas": {
+      "alp": 24,
+      "lnp": 26,
+      "onp": 13,
+      "grn": 21,
+      "oth": 16
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 32,
+      "lnp": 19,
+      "onp": 21,
+      "grn": 17,
+      "oth": 11
+     },
+     "Outer metro": {
+      "alp": 33,
+      "lnp": 16,
+      "onp": 31,
+      "grn": 11,
+      "oth": 9
+     },
+     "Provincial": {
+      "alp": 33,
+      "lnp": 16,
+      "onp": 31,
+      "grn": 13,
+      "oth": 7
+     },
+     "Rural": {
+      "alp": 18,
+      "lnp": 18,
+      "onp": 40,
+      "grn": 10,
+      "oth": 14
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 26,
@@ -2331,6 +3463,45 @@
       "onp": 18,
       "grn": 16,
       "oth": 10
+     }
+    },
+    "language": {
+     "Other language": {
+      "alp": 34,
+      "lnp": 16,
+      "onp": 24,
+      "grn": 12,
+      "oth": 14
+     },
+     "English only": {
+      "alp": 29,
+      "lnp": 17,
+      "onp": 31,
+      "grn": 13,
+      "oth": 10
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 27,
+      "lnp": 21,
+      "onp": 37,
+      "grn": 6,
+      "oth": 9
+     },
+     "Mortgage": {
+      "alp": 33,
+      "lnp": 19,
+      "onp": 31,
+      "grn": 9,
+      "oth": 7
+     },
+     "Renting": {
+      "alp": 29,
+      "lnp": 10,
+      "onp": 27,
+      "grn": 18,
+      "oth": 16
      }
     }
    },
@@ -2412,9 +3583,71 @@
       "grn": 19,
       "oth": 10
      }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 31,
+      "onp": 21,
+      "lnp": 24,
+      "grn": 16,
+      "oth": 8
+     },
+     "Outer metro": {
+      "alp": 27,
+      "onp": 28,
+      "lnp": 21,
+      "grn": 15,
+      "oth": 9
+     },
+     "Regional or rural": {
+      "alp": 18,
+      "onp": 39,
+      "lnp": 19,
+      "grn": 10,
+      "oth": 14
+     }
+    },
+    "housing": {
+     "Renting": {
+      "alp": 28,
+      "onp": 30,
+      "lnp": 14,
+      "grn": 17,
+      "oth": 11
+     },
+     "Mortgage": {
+      "alp": 26,
+      "onp": 29,
+      "lnp": 19,
+      "grn": 16,
+      "oth": 10
+     },
+     "Own outright": {
+      "alp": 24,
+      "onp": 28,
+      "lnp": 31,
+      "grn": 7,
+      "oth": 10
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 24,
+      "onp": 31,
+      "lnp": 22,
+      "grn": 12,
+      "oth": 11
+     },
+     "Other language": {
+      "alp": 37,
+      "onp": 19,
+      "lnp": 19,
+      "grn": 19,
+      "oth": 6
+     }
     }
    },
-   "fit": 0.05
+   "fit": 0.29
   },
   {
    "pollster": "Resolve",
@@ -2459,6 +3692,36 @@
       "grn": 14.47,
       "onp": 25.48,
       "oth": 10.85
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 23.09,
+      "alp": 26.93,
+      "grn": 9.96,
+      "onp": 30.93,
+      "oth": 9.08
+     },
+     "Vic": {
+      "lnp": 24.93,
+      "alp": 26.57,
+      "grn": 13.35,
+      "onp": 24.37,
+      "oth": 10.78
+     },
+     "Qld": {
+      "lnp": 23.82,
+      "alp": 25.55,
+      "grn": 10.94,
+      "onp": 25.63,
+      "oth": 14.06
+     },
+     "Rest of Australia": {
+      "lnp": 20.51,
+      "alp": 35.23,
+      "grn": 12.13,
+      "onp": 21.95,
+      "oth": 10.19
      }
     }
    }
@@ -2548,6 +3811,80 @@
       "oth": 2
      }
     },
+    "state": {
+     "NSW": {
+      "alp": 26,
+      "lnp": 20,
+      "onp": 27,
+      "grn": 11,
+      "oth": 16
+     },
+     "Vic": {
+      "alp": 30,
+      "lnp": 22,
+      "onp": 25,
+      "grn": 10,
+      "oth": 13
+     },
+     "Qld": {
+      "alp": 27,
+      "lnp": 23,
+      "onp": 27,
+      "grn": 10,
+      "oth": 14
+     },
+     "SA": {
+      "alp": 32,
+      "lnp": 8,
+      "onp": 28,
+      "grn": 20,
+      "oth": 12
+     },
+     "WA": {
+      "alp": 30,
+      "lnp": 16,
+      "onp": 29,
+      "grn": 15,
+      "oth": 10
+     },
+     "ACT/NT/Tas": {
+      "alp": 25,
+      "lnp": 23,
+      "onp": 15,
+      "grn": 16,
+      "oth": 22
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 32,
+      "lnp": 20,
+      "onp": 19,
+      "grn": 16,
+      "oth": 12
+     },
+     "Outer metro": {
+      "alp": 29,
+      "lnp": 19,
+      "onp": 27,
+      "grn": 11,
+      "oth": 15
+     },
+     "Provincial": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 30,
+      "grn": 6,
+      "oth": 17
+     },
+     "Rural": {
+      "alp": 22,
+      "lnp": 21,
+      "onp": 32,
+      "grn": 11,
+      "oth": 14
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 26,
@@ -2569,6 +3906,45 @@
       "onp": 17,
       "grn": 13,
       "oth": 12
+     }
+    },
+    "language": {
+     "Other language": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 18,
+      "grn": 16,
+      "oth": 16
+     },
+     "English only": {
+      "alp": 28,
+      "lnp": 20,
+      "onp": 28,
+      "grn": 11,
+      "oth": 14
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 27,
+      "lnp": 30,
+      "onp": 28,
+      "grn": 4,
+      "oth": 10
+     },
+     "Mortgage": {
+      "alp": 29,
+      "lnp": 22,
+      "onp": 30,
+      "grn": 6,
+      "oth": 13
+     },
+     "Renting": {
+      "alp": 30,
+      "lnp": 10,
+      "onp": 24,
+      "grn": 19,
+      "oth": 17
      }
     }
    },
@@ -2665,6 +4041,80 @@
       "oth": 8
      }
     },
+    "state": {
+     "NSW": {
+      "alp": 29,
+      "lnp": 24,
+      "onp": 22,
+      "grn": 11,
+      "oth": 14
+     },
+     "Vic": {
+      "alp": 26,
+      "lnp": 28,
+      "onp": 20,
+      "grn": 16,
+      "oth": 10
+     },
+     "Qld": {
+      "alp": 27,
+      "lnp": 16,
+      "onp": 34,
+      "grn": 12,
+      "oth": 11
+     },
+     "SA": {
+      "alp": 39,
+      "lnp": 11,
+      "onp": 28,
+      "grn": 13,
+      "oth": 9
+     },
+     "WA": {
+      "alp": 24,
+      "lnp": 21,
+      "onp": 32,
+      "grn": 12,
+      "oth": 11
+     },
+     "ACT/NT/Tas": {
+      "alp": 37,
+      "lnp": 14,
+      "onp": 15,
+      "grn": 17,
+      "oth": 18
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 33,
+      "lnp": 23,
+      "onp": 16,
+      "grn": 16,
+      "oth": 12
+     },
+     "Outer metro": {
+      "alp": 32,
+      "lnp": 20,
+      "onp": 27,
+      "grn": 13,
+      "oth": 8
+     },
+     "Provincial": {
+      "alp": 25,
+      "lnp": 22,
+      "onp": 28,
+      "grn": 14,
+      "oth": 11
+     },
+     "Rural": {
+      "alp": 20,
+      "lnp": 21,
+      "onp": 35,
+      "grn": 7,
+      "oth": 18
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 24,
@@ -2686,6 +4136,45 @@
       "onp": 14,
       "grn": 16,
       "oth": 14
+     }
+    },
+    "language": {
+     "Other language": {
+      "alp": 35,
+      "lnp": 20,
+      "onp": 12,
+      "grn": 20,
+      "oth": 13
+     },
+     "English only": {
+      "alp": 27,
+      "lnp": 22,
+      "onp": 28,
+      "grn": 12,
+      "oth": 11
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 26,
+      "lnp": 25,
+      "onp": 30,
+      "grn": 5,
+      "oth": 13
+     },
+     "Mortgage": {
+      "alp": 31,
+      "lnp": 25,
+      "onp": 24,
+      "grn": 11,
+      "oth": 9
+     },
+     "Renting": {
+      "alp": 32,
+      "lnp": 11,
+      "onp": 25,
+      "grn": 16,
+      "oth": 16
      }
     }
    },
@@ -2776,14 +4265,14 @@
      }
     },
     "location": {
-     "Inner Metropolitan": {
+     "Inner metro": {
       "alp": 35,
       "lnp": 23,
       "onp": 21,
       "grn": 12,
       "oth": 9
      },
-     "Outer Metropolitan": {
+     "Outer metro": {
       "alp": 27,
       "lnp": 23,
       "onp": 34,
@@ -2836,14 +4325,14 @@
      }
     },
     "housing": {
-     "Owned outright": {
+     "Own outright": {
       "alp": 29,
       "lnp": 25,
       "onp": 35,
       "grn": 5,
       "oth": 6
      },
-     "Owned with a mortgage": {
+     "Mortgage": {
       "alp": 29,
       "lnp": 22,
       "onp": 31,
@@ -2952,6 +4441,80 @@
       "oth": 4
      }
     },
+    "state": {
+     "NSW": {
+      "alp": 24,
+      "lnp": 24,
+      "onp": 24,
+      "grn": 13,
+      "oth": 15
+     },
+     "Vic": {
+      "alp": 30,
+      "lnp": 22,
+      "onp": 21,
+      "grn": 12,
+      "oth": 15
+     },
+     "Qld": {
+      "alp": 23,
+      "lnp": 19,
+      "onp": 29,
+      "grn": 12,
+      "oth": 17
+     },
+     "SA": {
+      "alp": 44,
+      "lnp": 20,
+      "onp": 26,
+      "grn": 6,
+      "oth": 4
+     },
+     "WA": {
+      "alp": 28,
+      "lnp": 21,
+      "onp": 25,
+      "grn": 15,
+      "oth": 11
+     },
+     "ACT/NT/Tas": {
+      "alp": 33,
+      "lnp": 18,
+      "onp": 24,
+      "grn": 10,
+      "oth": 15
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 34,
+      "lnp": 24,
+      "onp": 18,
+      "grn": 14,
+      "oth": 9
+     },
+     "Outer metro": {
+      "alp": 29,
+      "lnp": 20,
+      "onp": 24,
+      "grn": 12,
+      "oth": 15
+     },
+     "Provincial": {
+      "alp": 25,
+      "lnp": 26,
+      "onp": 30,
+      "grn": 9,
+      "oth": 10
+     },
+     "Rural": {
+      "alp": 19,
+      "lnp": 18,
+      "onp": 31,
+      "grn": 12,
+      "oth": 20
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 28,
@@ -2973,6 +4536,45 @@
       "onp": 16,
       "grn": 15,
       "oth": 13
+     }
+    },
+    "language": {
+     "Other language": {
+      "alp": 32,
+      "lnp": 22,
+      "onp": 13,
+      "grn": 16,
+      "oth": 18
+     },
+     "English only": {
+      "alp": 27,
+      "lnp": 22,
+      "onp": 27,
+      "grn": 11,
+      "oth": 13
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 26,
+      "lnp": 35,
+      "onp": 25,
+      "grn": 3,
+      "oth": 11
+     },
+     "Mortgage": {
+      "alp": 32,
+      "lnp": 20,
+      "onp": 28,
+      "grn": 11,
+      "oth": 10
+     },
+     "Renting": {
+      "alp": 27,
+      "lnp": 9,
+      "onp": 27,
+      "grn": 16,
+      "oth": 21
      }
     }
    },
@@ -3027,6 +4629,36 @@
       "grn": 13.36,
       "onp": 26.43,
       "oth": 10.48
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 19.94,
+      "alp": 30.32,
+      "grn": 13.27,
+      "onp": 25.66,
+      "oth": 10.81
+     },
+     "Vic": {
+      "lnp": 27.73,
+      "alp": 23.99,
+      "grn": 12.95,
+      "onp": 23.44,
+      "oth": 11.89
+     },
+     "Qld": {
+      "lnp": 21.88,
+      "alp": 30.66,
+      "grn": 8.5,
+      "onp": 32.48,
+      "oth": 6.49
+     },
+     "Rest of Australia": {
+      "lnp": 23.9,
+      "alp": 27.7,
+      "grn": 13.85,
+      "onp": 22.62,
+      "oth": 11.93
      }
     }
    }
@@ -3101,9 +4733,71 @@
       "onp": 15,
       "lnp": 31
      }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 31,
+      "grn": 13,
+      "oth": 9,
+      "onp": 20,
+      "lnp": 27
+     },
+     "Outer metro": {
+      "alp": 27,
+      "grn": 12,
+      "oth": 15,
+      "onp": 21,
+      "lnp": 25
+     },
+     "Regional or rural": {
+      "alp": 20,
+      "grn": 10,
+      "oth": 15,
+      "onp": 34,
+      "lnp": 21
+     }
+    },
+    "housing": {
+     "Renting": {
+      "alp": 27,
+      "grn": 18,
+      "oth": 13,
+      "onp": 27,
+      "lnp": 15
+     },
+     "Mortgage": {
+      "alp": 29,
+      "grn": 12,
+      "oth": 12,
+      "onp": 19,
+      "lnp": 28
+     },
+     "Own outright": {
+      "alp": 23,
+      "grn": 6,
+      "oth": 14,
+      "onp": 27,
+      "lnp": 30
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 24,
+      "grn": 11,
+      "oth": 15,
+      "onp": 25,
+      "lnp": 25
+     },
+     "Other language": {
+      "alp": 36,
+      "grn": 15,
+      "oth": 6,
+      "onp": 18,
+      "lnp": 25
+     }
     }
    },
-   "fit": 0.04
+   "fit": 0.26
   },
   {
    "pollster": "YouGov",
@@ -3190,6 +4884,80 @@
       "oth": 5
      }
     },
+    "state": {
+     "NSW": {
+      "alp": 29,
+      "lnp": 19,
+      "onp": 26,
+      "grn": 12,
+      "oth": 15
+     },
+     "Vic": {
+      "alp": 24,
+      "lnp": 24,
+      "onp": 21,
+      "grn": 15,
+      "oth": 16
+     },
+     "Qld": {
+      "alp": 27,
+      "lnp": 22,
+      "onp": 34,
+      "grn": 10,
+      "oth": 7
+     },
+     "SA": {
+      "alp": 34,
+      "lnp": 14,
+      "onp": 40,
+      "grn": 6,
+      "oth": 6
+     },
+     "WA": {
+      "alp": 37,
+      "lnp": 21,
+      "onp": 21,
+      "grn": 13,
+      "oth": 8
+     },
+     "ACT/NT/Tas": {
+      "alp": 36,
+      "lnp": 21,
+      "onp": 21,
+      "grn": 8,
+      "oth": 14
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 36,
+      "lnp": 24,
+      "onp": 15,
+      "grn": 12,
+      "oth": 13
+     },
+     "Outer metro": {
+      "alp": 29,
+      "lnp": 22,
+      "onp": 27,
+      "grn": 10,
+      "oth": 11
+     },
+     "Provincial": {
+      "alp": 31,
+      "lnp": 13,
+      "onp": 34,
+      "grn": 15,
+      "oth": 8
+     },
+     "Rural": {
+      "alp": 18,
+      "lnp": 21,
+      "onp": 35,
+      "grn": 12,
+      "oth": 15
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 27,
@@ -3211,6 +4979,45 @@
       "onp": 14,
       "grn": 16,
       "oth": 14
+     }
+    },
+    "language": {
+     "Other language": {
+      "alp": 34,
+      "lnp": 22,
+      "onp": 22,
+      "grn": 15,
+      "oth": 8
+     },
+     "English only": {
+      "alp": 28,
+      "lnp": 21,
+      "onp": 27,
+      "grn": 11,
+      "oth": 14
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 25,
+      "lnp": 34,
+      "onp": 26,
+      "grn": 4,
+      "oth": 11
+     },
+     "Mortgage": {
+      "alp": 32,
+      "lnp": 20,
+      "onp": 30,
+      "grn": 9,
+      "oth": 9
+     },
+     "Renting": {
+      "alp": 29,
+      "lnp": 8,
+      "onp": 27,
+      "grn": 21,
+      "oth": 16
      }
     }
    },
@@ -3301,14 +5108,14 @@
      }
     },
     "location": {
-     "Inner Metropolitan": {
+     "Inner metro": {
       "alp": 30,
       "lnp": 27,
       "onp": 21,
       "grn": 13,
       "oth": 9
      },
-     "Outer Metropolitan": {
+     "Outer metro": {
       "alp": 37,
       "lnp": 18,
       "onp": 27,
@@ -3361,14 +5168,14 @@
      }
     },
     "housing": {
-     "Owned outright": {
+     "Own outright": {
       "alp": 30,
       "lnp": 29,
       "onp": 29,
       "grn": 5,
       "oth": 7
      },
-     "Owned with a mortgage": {
+     "Mortgage": {
       "alp": 29,
       "lnp": 18,
       "onp": 33,
@@ -3477,6 +5284,80 @@
       "oth": 11
      }
     },
+    "state": {
+     "NSW": {
+      "alp": 22,
+      "lnp": 18,
+      "onp": 32,
+      "grn": 12,
+      "oth": 16
+     },
+     "Vic": {
+      "alp": 29,
+      "lnp": 18,
+      "onp": 25,
+      "grn": 13,
+      "oth": 14
+     },
+     "Qld": {
+      "alp": 24,
+      "lnp": 15,
+      "onp": 38,
+      "grn": 11,
+      "oth": 12
+     },
+     "SA": {
+      "alp": 34,
+      "lnp": 18,
+      "onp": 25,
+      "grn": 11,
+      "oth": 12
+     },
+     "WA": {
+      "alp": 30,
+      "lnp": 21,
+      "onp": 28,
+      "grn": 9,
+      "oth": 12
+     },
+     "ACT/NT/Tas": {
+      "alp": 32,
+      "lnp": 29,
+      "onp": 15,
+      "grn": 13,
+      "oth": 11
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 33,
+      "lnp": 21,
+      "onp": 20,
+      "grn": 13,
+      "oth": 14
+     },
+     "Outer metro": {
+      "alp": 28,
+      "lnp": 15,
+      "onp": 29,
+      "grn": 10,
+      "oth": 17
+     },
+     "Provincial": {
+      "alp": 29,
+      "lnp": 15,
+      "onp": 34,
+      "grn": 16,
+      "oth": 7
+     },
+     "Rural": {
+      "alp": 13,
+      "lnp": 21,
+      "onp": 41,
+      "grn": 11,
+      "oth": 13
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 26,
@@ -3497,6 +5378,45 @@
       "lnp": 20,
       "onp": 20,
       "grn": 14,
+      "oth": 17
+     }
+    },
+    "language": {
+     "Other language": {
+      "alp": 26,
+      "lnp": 21,
+      "onp": 24,
+      "grn": 14,
+      "oth": 15
+     },
+     "English only": {
+      "alp": 26,
+      "lnp": 18,
+      "onp": 31,
+      "grn": 11,
+      "oth": 14
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 21,
+      "lnp": 25,
+      "onp": 34,
+      "grn": 6,
+      "oth": 14
+     },
+     "Mortgage": {
+      "alp": 30,
+      "lnp": 20,
+      "onp": 30,
+      "grn": 8,
+      "oth": 11
+     },
+     "Renting": {
+      "alp": 27,
+      "lnp": 10,
+      "onp": 31,
+      "grn": 15,
       "oth": 17
      }
     }
@@ -3552,6 +5472,36 @@
       "grn": 13.42,
       "onp": 25.38,
       "oth": 9.86
+     }
+    },
+    "state": {
+     "NSW": {
+      "lnp": 22.21,
+      "alp": 27.04,
+      "grn": 9.92,
+      "onp": 29.6,
+      "oth": 11.22
+     },
+     "Vic": {
+      "lnp": 26.47,
+      "alp": 27.44,
+      "grn": 11.34,
+      "onp": 23.64,
+      "oth": 11.12
+     },
+     "Qld": {
+      "lnp": 23.45,
+      "alp": 27.34,
+      "grn": 12.21,
+      "onp": 28.23,
+      "oth": 8.77
+     },
+     "Rest of Australia": {
+      "lnp": 23.81,
+      "alp": 31.92,
+      "grn": 14.43,
+      "onp": 23.79,
+      "oth": 6.05
      }
     }
    }
@@ -3626,9 +5576,71 @@
       "lnp": 25,
       "onp": 17
      }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 32,
+      "grn": 13,
+      "oth": 9,
+      "lnp": 28,
+      "onp": 18
+     },
+     "Outer metro": {
+      "alp": 28,
+      "grn": 15,
+      "oth": 13,
+      "lnp": 17,
+      "onp": 27
+     },
+     "Regional or rural": {
+      "alp": 23,
+      "grn": 8,
+      "oth": 19,
+      "lnp": 16,
+      "onp": 34
+     }
+    },
+    "housing": {
+     "Renting": {
+      "alp": 31,
+      "grn": 16,
+      "oth": 14,
+      "lnp": 13,
+      "onp": 26
+     },
+     "Mortgage": {
+      "alp": 28,
+      "grn": 13,
+      "oth": 10,
+      "lnp": 23,
+      "onp": 26
+     },
+     "Own outright": {
+      "alp": 24,
+      "grn": 10,
+      "oth": 16,
+      "lnp": 25,
+      "onp": 25
+     }
+    },
+    "language": {
+     "English only": {
+      "alp": 25,
+      "grn": 13,
+      "oth": 14,
+      "lnp": 21,
+      "onp": 27
+     },
+     "Other language": {
+      "alp": 38,
+      "grn": 14,
+      "oth": 12,
+      "lnp": 18,
+      "onp": 18
+     }
     }
    },
-   "fit": 0.04
+   "fit": 0.06
   },
   {
    "pollster": "YouGov",
@@ -3715,6 +5727,80 @@
       "oth": 5
      }
     },
+    "state": {
+     "NSW": {
+      "alp": 24,
+      "lnp": 21,
+      "onp": 26,
+      "grn": 13,
+      "oth": 16
+     },
+     "Vic": {
+      "alp": 25,
+      "lnp": 22,
+      "onp": 26,
+      "grn": 18,
+      "oth": 9
+     },
+     "Qld": {
+      "alp": 24,
+      "lnp": 20,
+      "onp": 31,
+      "grn": 12,
+      "oth": 13
+     },
+     "SA": {
+      "alp": 25,
+      "lnp": 16,
+      "onp": 29,
+      "grn": 16,
+      "oth": 14
+     },
+     "WA": {
+      "alp": 32,
+      "lnp": 21,
+      "onp": 30,
+      "grn": 7,
+      "oth": 10
+     },
+     "ACT/NT/Tas": {
+      "alp": 38,
+      "lnp": 24,
+      "onp": 12,
+      "grn": 15,
+      "oth": 11
+     }
+    },
+    "location": {
+     "Inner metro": {
+      "alp": 29,
+      "lnp": 24,
+      "onp": 17,
+      "grn": 19,
+      "oth": 11
+     },
+     "Outer metro": {
+      "alp": 26,
+      "lnp": 17,
+      "onp": 29,
+      "grn": 14,
+      "oth": 14
+     },
+     "Provincial": {
+      "alp": 33,
+      "lnp": 22,
+      "onp": 28,
+      "grn": 11,
+      "oth": 6
+     },
+     "Rural": {
+      "alp": 15,
+      "lnp": 21,
+      "onp": 36,
+      "grn": 9,
+      "oth": 19
+     }
+    },
     "education": {
      "Year 12 or less": {
       "alp": 22,
@@ -3736,6 +5822,45 @@
       "onp": 17,
       "grn": 14,
       "oth": 12
+     }
+    },
+    "language": {
+     "Other language": {
+      "alp": 28,
+      "lnp": 16,
+      "onp": 18,
+      "grn": 21,
+      "oth": 17
+     },
+     "English only": {
+      "alp": 25,
+      "lnp": 22,
+      "onp": 28,
+      "grn": 13,
+      "oth": 12
+     }
+    },
+    "housing": {
+     "Own outright": {
+      "alp": 27,
+      "lnp": 32,
+      "onp": 25,
+      "grn": 5,
+      "oth": 11
+     },
+     "Mortgage": {
+      "alp": 27,
+      "lnp": 22,
+      "onp": 33,
+      "grn": 8,
+      "oth": 10
+     },
+     "Renting": {
+      "alp": 24,
+      "lnp": 10,
+      "onp": 30,
+      "grn": 21,
+      "oth": 15
      }
     }
    },

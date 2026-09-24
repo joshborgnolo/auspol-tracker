@@ -276,7 +276,7 @@ refresh_crosstabs() {
   local b out
   for b in "$@"; do
     if out="$(node ".build/$b.mjs" 2>&1)"; then
-      echo "$out" | grep '^pending ' | while IFS= read -r l; do log "$b: $l"; done
+      echo "$out" | grep '^\(pending\|dropped\) ' | while IFS= read -r l; do log "$b: $l"; done
       log "$(echo "$out" | tail -1)"
     else
       log "WARN $b did not finish: $(node_error "$out")"

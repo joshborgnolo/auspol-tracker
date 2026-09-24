@@ -163,7 +163,7 @@ export async function resolveData() {
   const q = (d.sections || []).find((s) => s.id === "Q5");
   if (!q) throw new Error("Resolve data.json has no Q5 (primary vote) section");
   for (const a of q.answers || [])
-    for (const g of [...(a.age || []), ...(a.gender || [])])
+    for (const g of [...(a.age || []), ...(a.gender || []), ...(a.states || [])])
       for (const t of g.timeseries || [])
         if (!XOR_VALUE.test(String(t.value))) throw new Error(`Resolve value "${t.value}" isn't xor-shaped – the obfuscation changed`);
   return q;

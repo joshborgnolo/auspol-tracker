@@ -11,13 +11,19 @@ and pushes `HEAD:main` itself after your session ends.
 - `.build/crosstabs-updater.sh` runs `.build/vote-switching.mjs` (writes
   `data/vote-switching.json`, the Snapshot panel "Where One Nation's new
   voters came from") and `.build/demographics.mjs` (writes
-  `data/demographics.json`, "The vote by age, gender and education"). Their
-  headers document every source. Each prints `pending <wave>: <reason>`
-  lines and a final `VS_STATUS` / `DEMO_STATUS {...}` line.
-- The wrapper fails for one of two reasons, both named in the log:
+  `data/demographics.json`, the vote-by-group panel: gender, age,
+  generation, education, state, location, housing and language at home).
+  Their headers document every source. Each prints `pending <wave>:
+  <reason>` lines and a final `VS_STATUS` / `DEMO_STATUS {...}` line;
+  demographics.mjs also prints `dropped <house|dim|group|date> …` lines.
+- The wrapper fails for one of three reasons, all named in the log:
   1. **did not finish** – a script threw; the stack trace is in the log.
   2. **stale** – a wave has stayed pending more than STALE_DAYS after its
      fieldwork closed. The `pending` line for that wave gives the reason.
+  3. **dropped** – a house's newest wave on file is missing a group it
+     printed in two waves running (`house|dim|group|date of the first wave
+     without it`). Every table still passed the gate: a column or chart the
+     reader no longer recognises, or a house that stopped printing it.
 - Shared code: `.build/crosstab-sources.mjs` (where each house's tables are
   fetched), `.build/crosstab-parse.mjs` (the pure parsers and the gate every
   table passes: shares summing to about 100, and the all-voters column
@@ -50,8 +56,28 @@ and pushes `HEAD:main` itself after your session ends.
 - Resolve (a `Resolve:` pending line): the interactive's data.json changed;
   mirror `extract-resolve-rpm.mjs`, whose decoding this reuses.
 
-Re-run the two scripts until neither lists a stale wave, run
-`node .build/test-crosstabs.mjs`, then `bash .build/crosstabs-updater.sh`.
+## Reading a dropped group
+
+Open the house's source for the named wave and look for the group:
+- YouGov: the crosstab's column headers (`youGovCrosstab`); the reader is
+  `ygGroup` in `.build/crosstab-parse.mjs`, which knows every header style
+  YouGov has used for a group (e.g. "Region: Rural" and "Rural", "Housing:
+  Renter" and "Renting home").
+- DemosAU: the chart headings in the report (`pdftotext -layout`); the
+  charts read are `DEMOS_DIM` (a new heading also belongs in `HEADINGS` in
+  `.build/demosau-charts.mjs`), labels via `demosLabel`.
+- RedBridge: the section titles of Table 3 in the cached report text
+  (`RB_SECTIONS`, `rbLabel`).
+- Resolve: the `age`, `gender` and `states` series keys in data.json
+  (`RS_GROUP`).
+If the group is there under a new name, teach the reader the name and pin
+it in `.build/test-crosstabs.mjs` – that is the whole fix. If the house has
+verifiably stopped printing it, add a `KNOWN_DROP` entry in
+`.build/demographics.mjs` under the exact key from the log, with the
+evidence in its reason.
+
+Re-run the two scripts until neither lists a stale wave or a dropped group,
+run `node .build/test-crosstabs.mjs`, then `bash .build/crosstabs-updater.sh`.
 
 ## Hard rules
 
@@ -61,7 +87,10 @@ Re-run the two scripts until neither lists a stale wave, run
 - NEVER hand-edit `data/vote-switching.json` or `data/demographics.json`;
   only the scripts write them.
 - NEVER loosen the gate: `SUM_TOLERANCE`, the one-point all-voters check,
-  `FIT_LIMIT`, or the stale alarm (`STALE_DAYS`).
+  `FIT_LIMIT`, the stale alarm (`STALE_DAYS`), or the dropped-group check.
+- `KNOWN_DROP` is only for a group verified to be gone from the house's own
+  publication, with the evidence in its reason – never for one the reader
+  merely fails to find.
 - `KNOWN_SKIP` (in whichever script lists the wave) is only for a wave
   verified to carry no table, with the evidence in its reason – never for a
   source that is merely unreachable from CI.

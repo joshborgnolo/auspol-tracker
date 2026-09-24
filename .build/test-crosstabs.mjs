@@ -49,9 +49,31 @@ const HEADERS = {
   "Gen Z": ["generation", "Gen Z"], Boomer: ["generation", "Boomers"], "Silent Generation": ["generation", "Silent"], // 24 Mar
   "Up to Year 12 education": ["education", "Year 12 or less"], "TAFE/College education": ["education", "TAFE or college"],
   "Tertiary Education": ["education", "University"],
-  "Household income 100-149k": null, "Income: <100k": null, "Voted Labor in 2025": null, "Region: Rural": null, NSW: null,
+  "Region: Inner metro": ["location", "Inner metro"], "Region:  Provincial": ["location", "Provincial"],     // Feb–May
+  "Region: Rural": ["location", "Rural"],
+  "Inner Metropolitan": ["location", "Inner metro"], "Outer Metropolitan": ["location", "Outer metro"],    // Mar on
+  Provincial: ["location", "Provincial"], Rural: ["location", "Rural"],
+  NSW: ["state", "NSW"], VIC: ["state", "Vic"], QLD: ["state", "Qld"], SA: ["state", "SA"], WA: ["state", "WA"],
+  "ACT/NT/TAS": ["state", "ACT/NT/Tas"],                                                                  // Jun on
+  "Own outright": ["housing", "Own outright"], Mortgage: ["housing", "Mortgage"], Rent: ["housing", "Renting"], // 24 Mar
+  "Housing: Own outright": ["housing", "Own outright"], "Housing: Mortgage-holder": ["housing", "Mortgage"],
+  "Housing: Renter": ["housing", "Renting"],                                                              // Apr–May
+  "Own home outright": ["housing", "Own outright"], "Mortgaging home": ["housing", "Mortgage"],
+  "Renting home": ["housing", "Renting"],                                                                 // Jun on
+  "Only English spoken at home": ["language", "English only"], "Other language spoken at home": ["language", "Other language"],
+  // not read: income (its brackets never settled beside another house's), the 2025 vote (the
+  // One Nation panel's), parental status ("parent" is not "rent"), employment and class
+  "Household income 100-149k": null, "Income: <100k": null, "Income less than $100k": null, "Voted Labor in 2025": null,
+  "No, I am neither a parent or guardian": null, "Parental Status: Yes, children <18": null,
+  "Full time": null, Retired: null, "Class: Working class": null,
 };
 for (const [h, want] of Object.entries(HEADERS)) assert.deepEqual(ygGroup(h), want, `header "${h}"`);
+// the 24 Aug wave's place, housing and language columns
+assert.deepEqual(d.dims.state.Qld, { alp: 27, lnp: 22, onp: 34, grn: 10, oth: 7 });
+assert.deepEqual(Object.keys(d.dims.state), ["NSW", "Vic", "Qld", "SA", "WA", "ACT/NT/Tas"]);
+assert.deepEqual(d.dims.location.Rural, { alp: 18, lnp: 21, onp: 35, grn: 12, oth: 15 });
+assert.deepEqual(d.dims.housing.Renting, { alp: 29, lnp: 8, onp: 27, grn: 21, oth: 16 });
+assert.deepEqual(d.dims.language["Other language"], { alp: 34, lnp: 22, onp: 22, grn: 15, oth: 8 });
 
 // ---- RedBridge: the first-preference table, read by its own column header ---------------
 const RB_DIR = path.join(ROOT, ".build", "redbridge-src");
@@ -75,6 +97,9 @@ const aug = rb("august");
 assert.deepEqual(aug.columns, ["alp", "lnp", "onp", "grn", "oth"]);
 assert.deepEqual(aug.dims.gender.Women, { alp: 28, lnp: 20, onp: 29, grn: 14, oth: 9 });
 assert.deepEqual(Object.keys(aug.dims), ["softness", "generation", "gender", "location", "education", "housing"]);
+assert.deepEqual(Object.keys(aug.dims.location), ["Inner metro", "Outer metro", "Provincial", "Rural"], "location labels tidied to YouGov's");
+assert.deepEqual(aug.dims.location.Rural, { alp: 22, lnp: 17, onp: 41, grn: 8, oth: 12 });
+assert.deepEqual(Object.keys(aug.dims.housing), ["Own outright", "Mortgage", "Renting and other"], "Renting and other keeps its name");
 for (const [month, date] of [["february", "2026-02-27"], ["april", "2026-04-30"], ["may", "2026-05-28"],
                              ["june", "2026-06-26"], ["july", "2026-07-30"], ["august", "2026-08-28"]]) {
   const tb = rb(month);
@@ -97,7 +122,9 @@ const enc = (v) => { const [i, f] = String(v).split("."); return (Number(i) ^ 12
 const series = (pairs) => pairs.map(([date, v]) => ({ date, value: enc(v) }));
 const q = { answers: [
   { answer: "ALP", age: [{ key: "age-18-34", timeseries: series([["12/04/2025", 40], ["14/09/2026", 28.5]]) }],
-    gender: [{ key: "Male", timeseries: series([["14/09/2026", 27]]) }, { key: "QLD", timeseries: series([["14/09/2026", 99]]) }] },
+    gender: [{ key: "Male", timeseries: series([["14/09/2026", 27]]) }, { key: "QLD", timeseries: series([["14/09/2026", 99]]) }],
+    states: [{ key: "National", timeseries: series([["14/09/2026", 27.5]]) }, { key: "Qld", timeseries: series([["14/09/2026", 24.25]]) },
+             { key: "Rest of Australia", timeseries: series([["14/09/2026", 31]]) }] },
   { answer: "IND", age: [{ key: "age-18-34", timeseries: series([["14/09/2026", 6]]) }], gender: [] },
   { answer: "OTH", age: [{ key: "age-18-34", timeseries: series([["14/09/2026", 4.25]]) }], gender: [] },
   { answer: "UND", age: [{ key: "age-18-34", timeseries: series([["14/09/2026", 9]]) }], gender: [] },
@@ -105,8 +132,9 @@ const q = { answers: [
 const rw = resolveWaves(q);
 assert.equal(rw.length, 1, "months before the term are dropped");
 assert.equal(rw[0].date, "2026-09-14");
-assert.deepEqual(rw[0].dims, { age: { "18–34": { alp: 28.5, oth: 10.25 } }, gender: { Men: { alp: 27 } } },
-  "IND and OTH fold into oth; the stray QLD key and undecided are ignored");
+assert.deepEqual(rw[0].dims, { age: { "18–34": { alp: 28.5, oth: 10.25 } }, gender: { Men: { alp: 27 } },
+  state: { Qld: { alp: 24.25 }, "Rest of Australia": { alp: 31 } } },
+  "IND and OTH fold into oth; the stray QLD key, National and undecided are ignored");
 // the Feb 2026 Ley scenario is a point in the series, not a poll
 const scen = resolveWaves({ answers: [{ answer: "ALP", age: [], gender: [{ key: "Male", timeseries: series([["12/02/2026", 31], ["14/02/2026", 33]]) }] }] });
 assert.deepEqual(scen.map((w) => w.date), ["2026-02-14"], "the 12 Feb 2026 Ley scenario is dropped");
@@ -116,6 +144,15 @@ assert.equal(demosLabel("gender", "Males"), "Men");
 assert.equal(demosLabel("gender", "Females"), "Women");
 assert.equal(demosLabel("age", "18-34"), "18–34");
 assert.equal(demosLabel("education", "TAFE / Trade"), "TAFE");
+assert.equal(demosLabel("location", "Inner Metro"), "Inner metro");
+assert.equal(demosLabel("location", "Regional/Rural"), "Regional or rural");
+assert.equal(demosLabel("housing", "Home Owner"), "Own outright", "Apr–Jul 2026's third bar, beside Renter and Mortgage Holder");
+assert.equal(demosLabel("housing", "Own Home Outright"), "Own outright");
+assert.equal(demosLabel("housing", "Mortgage holder"), "Mortgage");
+assert.equal(demosLabel("housing", "Renter"), "Renting");
+assert.equal(demosLabel("language", "English"), "English only");
+assert.equal(demosLabel("language", "LOTE"), "Other language");
+assert.equal(demosLabel("language", "Other language at home"), "Other language");
 
 // ---- the gate --------------------------------------------------------------------------
 assert.equal(sharesProblem({ Men: { alp: 50, lnp: 48 } }), null, "rounding passes");
@@ -153,7 +190,41 @@ const rbH = harmonize({ pollster: "RedBridge/Accent", dims: {
 const merged = rbH.education["Year 12 or less"];
 for (const [k, want] of Object.entries({ alp: 27.61, lnp: 23.17, onp: 26.36, grn: 17.03, oth: 5.83 }))
   assert.ok(Math.abs(merged[k] - want) < 0.01, `RedBridge school rows merge 39:61 (${k} ${merged[k]})`);
+// YouGov's SA, WA and ACT/NT/Tas are Rest of Australia at their 2025 vote shares; all three or none
+const ygPlace = harmonize({ pollster: "YouGov", dims: {
+  state: { NSW: sh(29, 19, 26, 12, 15), SA: sh(34, 14, 40, 6, 6), WA: sh(37, 21, 21, 13, 8), "ACT/NT/Tas": sh(36, 21, 21, 8, 14) },
+  location: { "Inner metro": sh(36, 24, 15, 12, 13), Rural: sh(18, 21, 35, 12, 15) },
+  housing: { Renting: sh(29, 8, 27, 21, 16) }, language: { "English only": sh(28, 21, 27, 11, 14) },
+} });
+const rest = ygPlace.state["Rest of Australia"];
+for (const [k, want] of Object.entries({ alp: 35.809, lnp: 18.732, onp: 27.156, grn: 9.637, oth: 8.666 }))
+  assert.ok(Math.abs(rest[k] - want) < 0.01, `YouGov's three smaller regions merge at 2025 vote shares (${k} ${rest[k]})`);
+assert.deepEqual(Object.keys(ygPlace.state), ["NSW", "Rest of Australia"]);
+assert.equal(harmonize({ dims: { state: { SA: sh(34, 14, 40, 6, 6), WA: sh(37, 21, 21, 13, 8) } } }).state, undefined,
+  "a wave missing one of the three smaller regions doesn't join at Rest of Australia");
+assert.deepEqual(Object.keys(ygPlace.location), ["Inner metro", "Rural"]);
+assert.deepEqual(ygPlace.housing.Renting, sh(29, 8, 27, 21, 16));
+// DemosAU's Regional or rural is two common groups at once, and joins at neither
+const dmPlace = harmonize({ pollster: "DemosAU", dims: {
+  location: { "Inner metro": sh(32, 28, 18, 13, 9), "Outer metro": sh(28, 17, 27, 15, 13), "Regional or rural": sh(23, 16, 34, 8, 19) },
+  housing: { "Own outright": sh(24, 25, 25, 10, 16), Mortgage: sh(28, 23, 26, 13, 10), Renting: sh(31, 13, 26, 16, 14) },
+  language: { "English only": sh(25, 21, 27, 13, 14), "Other language": sh(38, 18, 18, 14, 12) },
+} });
+assert.deepEqual(Object.keys(dmPlace.location), ["Inner metro", "Outer metro"], "Regional or rural joins nowhere");
+assert.deepEqual(Object.keys(dmPlace.housing), ["Own outright", "Mortgage", "Renting"]);
+assert.deepEqual(Object.keys(dmPlace.language), ["English only", "Other language"]);
+// RedBridge's Renting and other is wider than renters: it joins only at the owner groups
+const rbPlace = harmonize({ pollster: "RedBridge/Accent", dims: {
+  location: { "Inner metro": sh(30, 27, 21, 13, 9), "Outer metro": sh(37, 18, 27, 14, 4), Provincial: sh(25, 29, 24, 12, 10), Rural: sh(22, 17, 41, 8, 12) },
+  housing: { "Own outright": sh(30, 29, 29, 5, 7), Mortgage: sh(29, 18, 33, 11, 9), "Renting and other": sh(29, 19, 21, 21, 10) },
+} });
+assert.deepEqual(Object.keys(rbPlace.location), ["Inner metro", "Outer metro", "Provincial", "Rural"]);
+assert.deepEqual(Object.keys(rbPlace.housing), ["Own outright", "Mortgage"], "Renting and other joins nowhere");
+// Resolve's four states join as they are
+assert.deepEqual(Object.keys(harmonize({ pollster: "Resolve", dims: { state: {
+  NSW: sh(28, 25, 29, 12, 6), Vic: sh(30, 24, 23, 15, 8), Qld: sh(24, 25, 28, 10, 13), "Rest of Australia": sh(31, 24, 24, 11, 10) } } }).state),
+  ["NSW", "Vic", "Qld", "Rest of Australia"]);
 // every common group has a population share for its sampling-error floor
 for (const set of DEMO_SETS) for (const g of set.groups) assert.ok(DEMO_SHARE[g] > 0 && DEMO_SHARE[g] < 1, `share for ${g}`);
 
-console.log("PASS: crosstab readers – YouGov crosstab, RedBridge tables (three layouts), Resolve series, the gate, the common groups");
+console.log("PASS: crosstab readers – YouGov crosstab, RedBridge tables (three layouts), Resolve series, DemosAU labels, the gate, the common groups (place and home too)");

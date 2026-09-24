@@ -11,8 +11,11 @@
 # for anything that stays unread: a wave still pending STALE_DAYS after its
 # fieldwork closed (listed as `stale` in the scripts' status lines) fails
 # the run – after committing whatever did land – so the failure email and
-# agent-repair (.build/crosstabs-repair-prompt.md) take it from there. A
-# script that doesn't finish fails the run the same way.
+# agent-repair (.build/crosstabs-repair-prompt.md) take it from there. So
+# does a group demographics.mjs lists as `dropped` (a house's newest wave
+# missing a group it printed two waves running: a renamed column or chart
+# the reader no longer finds, or a house that stopped). A script that
+# doesn't finish fails the run the same way.
 #
 # Every step logs one line to .build/logs/crosstabs.log.
 set -uo pipefail
@@ -42,11 +45,12 @@ fi
 CHANGED=false
 UNFINISHED=""
 STALE=""
+DROPPED=""
 for b in vote-switching demographics; do
   OUT="$(node ".build/$b.mjs" 2>&1)"
   CODE=$?
   LAST="$(echo "$OUT" | tail -1)"
-  echo "$OUT" | grep '^pending ' | while IFS= read -r l; do log "$b: $l"; done
+  echo "$OUT" | grep '^\(pending\|dropped\) ' | while IFS= read -r l; do log "$b: $l"; done
   case "$LAST" in
     VS_STATUS*|DEMO_STATUS*) ;;
     *) [ $CODE -eq 0 ] && CODE=1 ;;
@@ -60,6 +64,8 @@ for b in vote-switching demographics; do
   if echo "$LAST" | grep -q '"changed":true'; then CHANGED=true; fi
   S="$(echo "$LAST" | sed -n 's/.*"stale":\[\([^]]*\)\].*/\1/p')"
   if [ -n "$S" ]; then STALE="$STALE $b: $S"; fi
+  D="$(echo "$LAST" | sed -n 's/.*"dropped":\[\([^]]*\)\].*/\1/p')"
+  if [ -n "$D" ]; then DROPPED="$DROPPED $b: $D"; fi
 done
 
 if $CHANGED; then
@@ -94,6 +100,11 @@ fi
 if [ -n "$STALE" ]; then
   log "FAIL stale – waves still unread long after fieldwork closed:$STALE (reasons in the pending lines above)"
   echo "::error::crosstab tables still unread:$STALE"
+  exit 1
+fi
+if [ -n "$DROPPED" ]; then
+  log "FAIL dropped – groups missing from a house's newest wave:$DROPPED (fix the reader, or record a real stop in KNOWN_DROP)"
+  echo "::error::crosstab groups dropped:$DROPPED"
   exit 1
 fi
 exit 0

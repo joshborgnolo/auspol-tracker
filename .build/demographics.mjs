@@ -1,25 +1,31 @@
 /* demographics.mjs – builds data/demographics.json: first-preference vote by
-   gender, age (or generation) and education, per poll wave, as each pollster
-   groups it. The Snapshot panel "The vote by age, gender and education" and
-   its Info entry are drawn from this file.
+   gender, age (or generation), education, state, location, housing and
+   language at home, per poll wave, as each pollster groups it. The
+   Snapshot's vote-by-group panel and its Info entry are drawn from this file.
 
    Runs itself: the YouGov/News24, DemosAU, RedBridge and Resolve updaters
    call it after every new wave (non-fatal), and the weekly crosstabs-update
    workflow (.build/crosstabs-updater.sh) runs it too; it finds what the file
    doesn't hold yet.
      YouGov    – the crosstab chart of each Pulse wave (.build/crosstab-
-                 sources.mjs): gender, age bands, generations, education –
-                 whichever columns that wave carries (they changed over 2026).
-     DemosAU   – the Gender, Age and Education charts in the wave's report
+                 sources.mjs): gender, age bands, generations, education,
+                 location (Feb 2026 on), housing (Mar on), state and language
+                 (Jun on) – whichever columns that wave carries (they changed
+                 over 2026). Its income, employment, parental-status and class
+                 columns are not read.
+     DemosAU   – the Gender, Age, Education, Location and Housing Tenure
+                 charts (and Language Status from May) in the wave's report
                  PDF, measured from the rendered bars (.build/demosau-charts
                  .mjs); from the April 2026 report (earlier reports used
-                 another layout without them).
+                 another layout without them). Its Income chart is not read.
      RedBridge – the "First preference vote intention" table in the report
                  text extract-redbridge.mjs caches (.build/redbridge-src/),
-                 from February 2026 (earlier reports printed it as figures).
-     Resolve   – the SMH Political Monitor interactive's age and gender
-                 series, every month of the term, rebuilt each run from one
-                 fetch (values decoded as extract-resolve-rpm.mjs does).
+                 from February 2026 (earlier reports printed it as figures):
+                 generation, gender, location, education, home ownership and
+                 vote softness.
+     Resolve   – the SMH Political Monitor interactive's age, gender and
+                 state series, every month of the term, rebuilt each run from
+                 one fetch (values decoded as extract-resolve-rpm.mjs does).
    Groups are kept exactly as each house draws them – the age bands differ
    (Resolve and DemosAU 18–34/35–54/55+, YouGov 18–34/35–49/50+, RedBridge by
    generation) – with labels only tidied. Party keys alp/lnp/onp/grn/oth;
@@ -36,9 +42,18 @@
    pending STALE_DAYS after its fieldwork closed is listed as `stale`, and
    the weekly run fails on it so a person (or agent-repair) looks.
 
+   A group can also vanish while every wave reads cleanly: a house renames a
+   column or moves a chart under a new heading, the reader stops finding it,
+   and the tables go on passing the gate without it. So a group a house
+   printed in two waves running that is missing from its newest wave on file
+   is listed as `dropped`, and the weekly run fails on that too – until the
+   reader learns the new name, or KNOWN_DROP records (checked by hand) that
+   the house really stopped, keyed to the first wave without it so a later
+   drop alarms again.
+
    Usage: node .build/demographics.mjs [--refresh]
      --refresh  re-read every wave, not just the new ones
-   Last line: DEMO_STATUS {"changed":…,"added":[…],"pending":[…],"stale":[…],"skipped":[…]} */
+   Last line: DEMO_STATUS {"changed":…,"added":[…],"pending":[…],"stale":[…],"dropped":[…],"skipped":[…]} */
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -57,6 +72,13 @@ const KNOWN_SKIP = {
   "YouGov|2026-03-19": "an Australia Institute poll – no crosstab published",
   "YouGov|2026-06-16": "the wave's article carries no crosstab",
   "RedBridge/Accent|2026-03-27": "filed from the AFR article – Accent's March report was never cached",
+};
+
+/* Groups a house really stopped printing, checked by hand: "house|dim|group|
+   date of the first wave without it" → why. See `dropped` in the header. */
+const KNOWN_DROP = {
+  "YouGov|age|50–64|2026-03-24": "YouGov printed 50–64 and 65+ only in Feb–Mar 2026; from 24 Mar it cut by generation instead, and from Jun its oldest band is 50+",
+  "YouGov|age|65+|2026-03-24": "YouGov printed 50–64 and 65+ only in Feb–Mar 2026; from 24 Mar it cut by generation instead, and from Jun its oldest band is 50+",
 };
 
 function redbridgeCache(date) {
@@ -112,7 +134,7 @@ try {
           const dim = DEMOS_DIM[name];
           dims[dim] = Object.fromEntries(Object.entries(c.rows).map(([label, sh]) => [demosLabel(dim, label), sh]));
         }
-        bad ||= Object.keys(dims).length ? dimsProblem(dims) : "no Gender, Age or Education chart found in the report";
+        bad ||= Object.keys(dims).length ? dimsProblem(dims) : "no breakdown chart (Gender, Age, Education, …) found in the report";
         if (bad) { pend(k, bad); continue; }
         push({ ...base, source: rep.url, read: "measured from the charts", dims, fit });
         console.log(`${k}: ${Object.keys(dims).join(", ")} (fit ${fit})`);
@@ -137,7 +159,7 @@ try {
       const bad = dimsProblem(w.dims);
       if (bad) throw new Error(`the ${w.date} series didn't read cleanly – ${bad}`);
     }
-    if (!rs.length) throw new Error("the interactive carried no age or gender series for this term");
+    if (!rs.length) throw new Error("the interactive carried no age, gender or state series for this term");
     for (const w of rs) push(w);
   } catch (e) {
     pending.push(`Resolve: ${String(e.message || e).slice(0, 160)}`);
@@ -157,8 +179,27 @@ const stale = polls.filter((p) => HOUSES.includes(p.pollster) && p.date >= FIRST
   && !(p.pollster === "Resolve" && waves.some((w) => w.pollster === "Resolve" && Math.abs(daysAgo(w.date) - daysAgo(p.date)) <= RESOLVE_MATCH_DAYS)))
   .map(key);
 
+// dropped: a group printed in two waves running, missing from the house's
+// newest wave on file (see the header), unless KNOWN_DROP records it
+const dropped = [];
+for (const house of HOUSES) {
+  const hw = waves.filter((w) => w.pollster === house);
+  const newest = hw[hw.length - 1];
+  if (!newest) continue;
+  const has = (w, dim, g) => !!(w.dims && w.dims[dim] && w.dims[dim][g]);
+  const seen = new Set(hw.flatMap((w) => Object.entries(w.dims || {}).flatMap(([dim, gs]) => Object.keys(gs).map((g) => dim + "|" + g))));
+  for (const dg of seen) {
+    const [dim, g] = dg.split("|");
+    if (has(newest, dim, g)) continue;
+    const last = hw.map((w) => has(w, dim, g)).lastIndexOf(true);
+    if (last < 1 || !has(hw[last - 1], dim, g)) continue;   // a one-off, never a series
+    const k = `${house}|${dim}|${g}|${hw[last + 1].date}`;
+    if (!KNOWN_DROP[k]) dropped.push(k);
+  }
+}
+
 const doc = {
-  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
+  _about: "First-preference vote by group, per poll wave, as each pollster groups it: dims[gender|age|generation|education|state|location|housing|language|…][group][party] (% of that group). Party keys alp, lnp, onp, grn, oth (independents and all smaller parties). Built by .build/demographics.mjs – see its header for sources. `skipped` lists waves checked by hand and found to carry no breakdowns.",
   waves,
   skipped,
 };
@@ -166,7 +207,8 @@ const next = JSON.stringify(doc, null, 1) + "\n";
 const changed = !fs.existsSync(OUT) || fs.readFileSync(OUT, "utf8") !== next;
 if (changed) { fs.writeFileSync(OUT + ".tmp", next); fs.renameSync(OUT + ".tmp", OUT); }
 for (const m of pending) console.log("pending", m);
+for (const k of dropped) console.log("dropped", k, "– missing from the newest wave; fix the reader, or record it in KNOWN_DROP once checked");
 const rsAdded = added.filter((k) => k.startsWith("Resolve|")).length;
 console.log("DEMO_STATUS " + JSON.stringify({ changed,
   added: added.filter((k) => !k.startsWith("Resolve|")).concat(rsAdded ? [`Resolve (${rsAdded} months)`] : []),
-  pending: pending.map((m) => m.split(":")[0]), stale, skipped: skipped.map(key) }));
+  pending: pending.map((m) => m.split(":")[0]), stale, dropped, skipped: skipped.map(key) }));

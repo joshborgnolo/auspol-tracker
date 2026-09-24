@@ -1620,7 +1620,7 @@ const onSources = onSourceWaves.length ? {
   weights: VOTE_SWITCHING.weights2025,
 } : null;
 
-/* ---- 5c. the vote by age, gender and education: the tables ---------------
+/* ---- 5c. the vote by group: the tables ---------------------------------------
    data/demographics.json (.build/demographics.mjs) – each house's groups, per
    wave, as published. The figures built from them are §7g: they anchor on
    the current primaries (§7e), so they are assembled after those. */
@@ -2101,7 +2101,7 @@ const primaryNowAt = (ref) => {
 };
 const primaryNow = primaryNowAt(refNow);
 
-/* ---- 7g. the vote by age, gender and education -----------------------------
+/* ---- 7g. the vote by group (age, gender, education, place, home) -------------
    One figure per group and party, built as the headline is. Each poll says
    how far a group sits from that poll's own all-voters figure – One Nation
    ten points lower among 18–34s, say. Those gaps are pooled over the six-week
@@ -2201,7 +2201,9 @@ const demographics = (() => {
       pollster: w.pollster === "RedBridge/Accent" ? "RedBridge" : w.pollster,
       dateLabel: p ? fwLabel(p.dateStart, p.date) : fwLabel(w.dateStart, w.date),
       source: w.source || null,
-      sets: DEMO_SETS.filter((s) => { const h = harmonize(w)[s.id]; return h && Object.keys(h).length; }).map((s) => s.id),
+      // the groups it feeds on the panel: a set without a tab on the page is left out
+      sets: DEMO_SETS.filter((s) => { const h = harmonize(w)[s.id]; return h && Object.keys(h).length && tabs.some((t) => t.id === s.tab); })
+        .map((s) => s.id),
     })),
   };
 })();
@@ -3633,7 +3635,7 @@ window.AUSPOL = (function () {
      preferred PM, and the national direction – nowcasts, as the headline. */
   const leaderNow = ${JSON.stringify(leaderNow)};
   const directionNow = ${JSON.stringify(directionNow)};
-  /* The vote by age, gender and education (§7g): per tab, each common group's
+  /* The vote by group (§7g): per tab, each common group's
      pooled figure per party, with its margin, beside the current primaries. */
   const demographics = ${JSON.stringify(demographics)};
   // the common groups, in the order a poll row's grp.v follows (the export's columns)

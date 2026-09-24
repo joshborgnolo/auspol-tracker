@@ -65,6 +65,20 @@ export function ygGroup(h) {
   if (/up to year 12/i.test(s)) return ["education", "Year 12 or less"];
   if (/tafe|college/i.test(s)) return ["education", "TAFE or college"];
   if (/tertiary|university/i.test(s)) return ["education", "University"];
+  // where they live: "Region: Inner metro" (Feb–May 2026), "Inner Metropolitan" (Mar on)
+  if ((m = s.match(/^(?:region:\s*)?(inner|outer) metro(?:politan)?$/i))) return ["location", /^i/i.test(m[1]) ? "Inner metro" : "Outer metro"];
+  if (/^(?:region:\s*)?provincial$/i.test(s)) return ["location", "Provincial"];
+  if (/^(?:region:\s*)?rural$/i.test(s)) return ["location", "Rural"];
+  // state (Jun 2026 on): the three big states, then SA, WA and the rest together
+  if ((m = s.match(/^(NSW|VIC|QLD|SA|WA)$/i))) return ["state", { NSW: "NSW", VIC: "Vic", QLD: "Qld", SA: "SA", WA: "WA" }[m[1].toUpperCase()]];
+  if (/^ACT\s*\/\s*NT\s*\/\s*TAS$/i.test(s)) return ["state", "ACT/NT/Tas"];
+  // housing: "Own outright" (24 Mar), "Housing: Own outright" (Apr–May), "Own home outright" (Jun on)
+  if (/^(?:housing:\s*)?own(?: home)? outright$/i.test(s)) return ["housing", "Own outright"];
+  if (/^(?:housing:\s*)?(?:mortgage(?:-holder)?|mortgaging home)$/i.test(s)) return ["housing", "Mortgage"];
+  if (/^(?:housing:\s*)?(?:rent|renter|renting home)$/i.test(s)) return ["housing", "Renting"];
+  // language spoken at home (Jun on)
+  if (/^only english spoken at home$/i.test(s)) return ["language", "English only"];
+  if (/^other language spoken at home$/i.test(s)) return ["language", "Other language"];
   return null;
 }
 export function youGovDims(t) {
@@ -83,13 +97,25 @@ export function youGovDims(t) {
   return { dims, total };
 }
 
-// ---- DemosAU: the Gender / Age / Education charts ---------------------------------
-export const DEMOS_DIM = { Gender: "gender", Age: "age", Education: "education" };
+// ---- DemosAU: the Gender / Age / Education / Location / Housing / Language charts ----
+/* Location and Housing Tenure from the April 2026 report, Language Status
+   from May; a report without one of them just has no such group. */
+export const DEMOS_DIM = { Gender: "gender", Age: "age", Education: "education",
+  Location: "location", "Housing Tenure": "housing", "Language Status": "language" };
 export function demosLabel(dim, label) {
   const s = label.replace(/\s+/g, " ").trim();
   if (dim === "gender") return /^fem/i.test(s) ? "Women" : /^male/i.test(s) ? "Men" : s;
   if (dim === "age") return s.replace(/(\d)\s*-\s*(\d)/, "$1–$2");
   if (dim === "education") return /^school/i.test(s) ? "School" : /^tafe/i.test(s) ? "TAFE" : /^univ/i.test(s) ? "University" : s;
+  // "Regional/Rural" is provincial and rural voters together
+  if (dim === "location") return /^inner/i.test(s) ? "Inner metro" : /^outer/i.test(s) ? "Outer metro"
+    : /regional|rural/i.test(s) ? "Regional or rural" : s;
+  // the third bar was "Home Owner" (Apr–Jul 2026) beside Renter and Mortgage
+  // Holder, then "Own Home Outright": the same people, relabelled
+  if (dim === "housing") return /^rent/i.test(s) ? "Renting" : /mortgage/i.test(s) ? "Mortgage"
+    : /outright|^home owner$/i.test(s) ? "Own outright" : s;
+  // "English" / "English Only" / "English only"; "LOTE" / "Other Language at Home"
+  if (dim === "language") return /^english/i.test(s) ? "English only" : /^lote$|other language/i.test(s) ? "Other language" : s;
   return s;
 }
 
@@ -101,6 +127,9 @@ function rbLabel(dim, label) {
   if (dim === "generation") return { "Gen-Z": "Gen Z", "Gen-X": "Gen X", "Baby Boomers": "Boomers" }[s] || s;
   if (dim === "education") return { "Less than year 12": "Below Year 12", "Year 12 or equivalent": "Year 12",
     "TAFE, trade or vocational": "TAFE or trade", "University degree": "University" }[s] || s;
+  if (dim === "location") return { "Inner Metropolitan": "Inner metro", "Outer Metropolitan": "Outer metro" }[s] || s;
+  // "Renting and other" keeps its name: it is wider than renters
+  if (dim === "housing") return { "Owned outright": "Own outright", "Owned with a mortgage": "Mortgage" }[s] || s;
   return s;
 }
 /* The party columns, read off the table's own header: the first line under
@@ -152,10 +181,15 @@ export function redbridgeTable(txt) {
   }
   return Object.keys(dims).length ? { dims, total, columns: cols } : null;
 }
-// ---- Resolve: the age and gender series, every month of the term ------------------
+// ---- Resolve: the age, gender and state series, every month of the term -----------
 const RS_PARTY = { ALP: "alp", LNP: "lnp", GRN: "grn", ONP: "onp", IND: "oth", OTH: "oth" };
+/* The interactive's `states` series are NSW, Vic, Qld and Rest of Australia
+   beside National (the whole poll, not a group). They move month to month
+   the way a single wave's subsample does, not like a two-month pool. */
 const RS_GROUP = { "age-18-34": ["age", "18–34"], "age-35-54": ["age", "35–54"], "age-55+": ["age", "55+"],
-                   Male: ["gender", "Men"], Female: ["gender", "Women"] };
+                   Male: ["gender", "Men"], Female: ["gender", "Women"],
+                   NSW: ["state", "NSW"], Vic: ["state", "Vic"], Qld: ["state", "Qld"],
+                   "Rest of Australia": ["state", "Rest of Australia"] };
 /* Points in the series that are not polls. 12 Feb 2026 is the Ley scenario:
    that month's wave also asked how people would vote were Ley still leader,
    and the interactive plots the answer as a point of its own two days before
@@ -168,9 +202,9 @@ export function resolveWaves(q) {
   for (const a of q.answers || []) {
     const p = RS_PARTY[a.answer];
     if (!p) continue;
-    for (const g of [...(a.age || []), ...(a.gender || [])]) {
+    for (const g of [...(a.age || []), ...(a.gender || []), ...(a.states || [])]) {
       const grp = RS_GROUP[g.key];
-      if (!grp) continue;                          // e.g. a stray "QLD" key in the gender list
+      if (!grp) continue;                          // National; a stray "QLD" key in the gender list
       for (const t of g.timeseries || []) {
         const date = iso(t.date);
         if (date < TERM_START || RESOLVE_SCENARIO_DATES.has(date)) continue;
