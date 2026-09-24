@@ -1696,11 +1696,15 @@ const DEMO_WHO = {
   "Year 12 or less": "voters with Year 12 or less", "TAFE or trade": "voters with a TAFE or trade qualification",
   University: "university graduates",
 };
+/* Per set: `all` names the groups together, `others` the rest of them beside
+   one group, `step` the trend phrase for an ordered set (null where the
+   groups have no order), and `one` a single group, for the chart's
+   sentence. */
 const DEMO_SET_WORDS = {
-  age: { all: "age groups", others: "any other age group", step: "age group" },
-  generation: { all: "generations", others: "any other generation", step: "generation" },
+  age: { all: "age groups", others: "any other age group", step: "with each older age group", one: "age group" },
+  generation: { all: "generations", others: "any other generation", step: "with each older generation", one: "generation" },
   gender: { all: "men and women", others: null, step: null },
-  education: { all: "levels of education", others: "voters with other levels of education", step: null },
+  education: { all: "levels of education", others: "voters with other levels of education", step: null, one: "education group" },
 };
 const DEMO_VOTE_FOR = { alp: "Labor", lnp: "the Coalition", grn: "the Greens", onp: "One Nation", oth: "a minor party or independent" };
 function demoVerdict(st, party) {
@@ -1723,7 +1727,7 @@ function demoVerdict(st, party) {
   }
   if (words.step && gs.length === st.groups.length) {
     const steps = gs.slice(1).map((g, i) => cmp(g, gs[i]));
-    if (steps.every((s) => s === steps[0])) return `Support for ${DEMO_VOTE_FOR[party]} ${steps[0] > 0 ? "rises" : "falls"} significantly with each older ${words.step}.`;
+    if (steps.every((s) => s === steps[0])) return `Support for ${DEMO_VOTE_FOR[party]} ${steps[0] > 0 ? "rises" : "falls"} significantly ${words.step}.`;
   }
   const byV = [...gs].sort((a, b) => b.v[party] - a.v[party]);
   const top = byV[0], bot = byV[byV.length - 1];
@@ -1734,6 +1738,92 @@ function demoVerdict(st, party) {
   const [a, b] = pairs.map(([x, y, s]) => (s > 0 ? [x, y] : [y, x]))
     .sort((p, q) => (q[0].v[party] - q[1].v[party]) - (p[0].v[party] - p[1].v[party]))[0];
   return `${Who(a)} are significantly more likely than ${who(b)} ${vote}.`;
+}
+/* The sentence under a set's chart: has any group moved towards or away
+   from the party, relative to all voters, over the period on screen? The
+   lines pool every pollster, and who asks changes over the term (Resolve
+   alone until February 2026, then YouGov, RedBridge and DemosAU), so a line
+   can move only because a pollster joined. The test compares each pollster
+   with itself: a straight line through a group's gap to all voters (the
+   chart's dots), a level for each pollster and one shared slope, each poll
+   weighted by its sample, and the scatter about the line measured from the
+   polls rather than assumed. The slope is significant when its t-test
+   clears 95%. With three or four groups tested at once, Holm's correction
+   keeps one of them from clearing it by chance. Two groups (men, women) are
+   a single test: the gap between them. */
+// P(|T| > t) for Student's t on whole degrees of freedom, exact (Abramowitz & Stegun 26.7.3–4)
+function tTail(t, df) {
+  const th = Math.atan(Math.abs(t) / Math.sqrt(df)), c2 = Math.cos(th) ** 2;
+  let term = 1, sum = 1;
+  if (df % 2) {
+    for (let k = 1; k <= (df - 3) / 2; k++) sum += (term *= (2 * k) / (2 * k + 1) * c2);
+    return 1 - (2 / Math.PI) * (th + (df > 1 ? Math.sin(th) * Math.cos(th) * sum : 0));
+  }
+  for (let k = 1; k <= (df - 2) / 2; k++) sum += (term *= (2 * k - 1) / (2 * k) * c2);
+  return 1 - Math.sin(th) * sum;
+}
+// the slope (per year) through points { h: pollster, t, y, w }, each pollster its own level
+function withinHouseSlope(pts) {
+  const byHouse = new Map();
+  for (const p of pts) (byHouse.get(p.h) || byHouse.set(p.h, []).get(p.h)).push(p);
+  const dm = [];
+  let houses = 0;
+  for (const ps of byHouse.values()) {
+    if (ps.length < 2) continue;                  // one poll says nothing about its house's trend
+    houses++;
+    const W = ps.reduce((a, p) => a + p.w, 0);
+    const tb = ps.reduce((a, p) => a + p.w * p.t, 0) / W, yb = ps.reduce((a, p) => a + p.w * p.y, 0) / W;
+    for (const p of ps) dm.push({ w: p.w, dt: p.t - tb, dy: p.y - yb });
+  }
+  const df = dm.length - houses - 1;
+  const sxx = dm.reduce((a, p) => a + p.w * p.dt * p.dt, 0);
+  if (df < 3 || !(sxx > 0)) return null;
+  const b = dm.reduce((a, p) => a + p.w * p.dt * p.dy, 0) / sxx;
+  const se = Math.sqrt(dm.reduce((a, p) => a + p.w * (p.dy - b * p.dt) ** 2, 0) / df / sxx);
+  return { b, p: se > 0 ? tTail(b / se, df) : 1 };
+}
+function demoTrendVerdict(D, st, party, inX) {
+  const gpi = DEMO_GRP_PARTY.indexOf(party);
+  const words = DEMO_SET_WORDS[st.id] || {};
+  const who = (g) => DEMO_WHO[g.label] || g.label;
+  const P = DEMO_VOTE_FOR[party];
+  const polls = D.individualPolls.filter((p) => p.grp && p.grp.t && p.grp.t[gpi] > 0 && inX(p.x));
+  const gapOf = (p, g) => {                       // as the chart's dots draw it
+    const v = p.grp.v[D.demoGroups.indexOf(g.label)];
+    const sum = v ? v.reduce((a, b) => a + b, 0) : 0;
+    return sum > 0 ? 100 * ((100 * v[gpi] / sum) / p.grp.t[gpi] - 1) : null;
+  };
+  const points = (y) => polls.map((p) => ({ h: p.pollster, t: p.x, w: p.sample || 1000, y: y(p) }))
+    .filter((d) => d.y != null && isFinite(d.y));
+  const asked = polls.find((p) => st.groups.some((g) => gapOf(p, g) != null));
+  if (!asked) return null;
+  const when = D.monthNameFull(+asked.ym.slice(5)) + " " + asked.ym.slice(0, 4);
+  if (st.groups.length === 2) {
+    const [a, b] = st.groups;
+    const fit = withinHouseSlope(points((p) => {
+      const ga = gapOf(p, a), gb = gapOf(p, b);
+      return ga == null || gb == null ? null : ga - gb;
+    }));
+    if (!fit) return `There aren’t enough polls since ${when} to tell whether the gap between ${who(a)} and ${who(b)} has changed.`;
+    if (fit.p >= 0.05) return `The gap between ${who(a)} and ${who(b)} in support for ${P} hasn’t changed significantly since ${when}.`;
+    const [towards, from] = fit.b > 0 ? [a, b] : [b, a];
+    return `Since ${when}, ${who(towards)} have moved significantly towards ${P} relative to ${who(from)}.`;
+  }
+  const one = words.one || "group";
+  const fits = st.groups.map((g) => ({ g, fit: withinHouseSlope(points((p) => gapOf(p, g))) })).filter((f) => f.fit);
+  if (!fits.length) return `There aren’t enough polls since ${when} to tell whether any ${one} has moved relative to all voters.`;
+  // Holm: the smallest p against .05/m, the next against .05/(m − 1), and so on, stopping at the first miss
+  const sig = [];
+  for (const [i, f] of [...fits].sort((x, y) => x.fit.p - y.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (fits.length - i)) break;
+    sig.push(f);
+  }
+  if (!sig.length) return `Since ${when}, no ${one} has moved significantly towards or away from ${P} relative to all voters.`;
+  const names = (fs) => houseList(fs.map((f) => who(f.g)), Infinity);
+  const towards = sig.filter((f) => f.fit.b > 0), away = sig.filter((f) => f.fit.b < 0);
+  const [first, then] = away.length >= towards.length ? [[away, "away from"], [towards, "towards"]] : [[towards, "towards"], [away, "away from"]];
+  return `Since ${when}, ${names(first[0])} have moved significantly ${first[1]} ${P} relative to all voters` +
+    (then[0].length ? `, and ${names(then[0])} ${then[1]} it.` : ".");
 }
 function DemographicsPanel({ rangeId = "all" }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
@@ -1862,6 +1952,10 @@ function DemographicsPanel({ rangeId = "all" }) {
                      ...(areas.length ? [{ label: "95% interval (shaded)", color: "var(--ink-faint)", kind: "shade" }] : [])],
           }}
         />
+        {(() => {
+          const t = demoTrendVerdict(D, st, party, (x) => x >= xDomain[0] && x <= xDomain[1]);
+          return t && <p className="demo-verdict">{t}</p>;
+        })()}
       </div>
     );
   };
@@ -1930,6 +2024,12 @@ function DemographicsPanel({ rangeId = "all" }) {
           The sentence under the bars says whether the groups really differ. A difference is
           significant when the gap between two groups is larger than its own 95% margin, which
           combines both groups’ ± figures.
+        </p>
+        <p className="table-hint">
+          The sentence under each chart says whether any group has moved towards or away from the
+          party, relative to all voters, over the period shown. It compares each pollster only with
+          itself, so a pollster joining or leaving can’t pass for a change. Because three or four
+          groups are tested at once, each has to clear a higher bar to count as significant.
         </p>
         <p className="table-hint">
           The charts are built the way the site’s other monthly lines are: each poll is a dot and

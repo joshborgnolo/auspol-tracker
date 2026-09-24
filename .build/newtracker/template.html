@@ -2672,6 +2672,11 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-sw.dash { background: repeating-linear-gradient(90deg, var(--ink-3) 0 4px, transparent 4px 7px); }
 /* the bars' verdict: whether the groups differ beyond the polls' margins */
 .demo-verdict { margin: 14px 0 0; font-size: 13px; font-weight: 600; line-height: 1.45; color: var(--ink-2); }
+/* under a chart, the sentence shares the strip the chart keeps for its copy
+   button (30px, bottom right) instead of starting below it, so it sits as
+   close to the axis as the bars' sentence does to the bars; the right
+   padding keeps the text clear of the button */
+.demo-chart > .demo-verdict { margin-top: -22px; padding-right: 40px; }
 .demo-chart { margin: 12px 0 4px; }
 /* the chart plots gaps, not the bars' shares – said above it, in the bars' label voice */
 .demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
