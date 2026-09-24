@@ -2220,6 +2220,13 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .info-work tr.info-work-sum td { border-top: 1px solid var(--line-2);
   padding-top: 4px; color: var(--ink); font-weight: 600; text-align: left; }
 .info-work-note { margin: 5px 0 0; font-size: 13px; color: var(--ink-3); max-width: 64ch; }
+/* A working table whose last column is a list, not a figure (the vote by
+   group's groups): it reads left-aligned and wraps, each row's cells top-
+   aligned with a little air between rows, where the numeric tables stay on
+   one line and right-aligned. Unwrapped, the list ran the table off a phone. */
+.info-work-list td, .info-work-list th { vertical-align: top; }
+.info-work-list td:last-child, .info-work-list th:last-child { text-align: left; white-space: normal; padding-right: 0; }
+.info-work-list td { padding-bottom: 5px; }
 
 .back-to-chart {
   display: inline-flex; align-items: center; gap: 6px;

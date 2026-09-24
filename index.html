@@ -1427,6 +1427,9 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .info-work tr.info-work-sum td { border-top: 1px solid var(--line-2);
   padding-top: 4px; color: var(--ink); font-weight: 600; text-align: left; }
 .info-work-note { margin: 5px 0 0; font-size: 13px; color: var(--ink-3); max-width: 64ch; }
+.info-work-list td, .info-work-list th { vertical-align: top; }
+.info-work-list td:last-child, .info-work-list th:last-child { text-align: left; white-space: normal; padding-right: 0; }
+.info-work-list td { padding-bottom: 5px; }
 .back-to-chart {
   display: inline-flex; align-items: center; gap: 6px;
   align-self: center; flex: none;
@@ -47621,13 +47624,18 @@ function infoTerms(D) {
     housing: "housing",
     language: "language at home"
   };
+  const demoSets = ids => {
+    const n = ids.map(id => DEMO_SET_NAME[id] || id);
+    const s = n.length < 3 ? n.join(" and ") : n.slice(0, -1).join(", ") + ", and " + n[n.length - 1];
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
   const demoWork = DEMO && DEMO.polls && DEMO.polls.length ? React.createElement("div", {
     className: "info-work-wrap"
   }, React.createElement("table", {
-    className: "info-work"
+    className: "info-work info-work-list"
   }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Poll"), React.createElement("th", null, "Fieldwork"), React.createElement("th", null, "Groups"))), React.createElement("tbody", null, DEMO.polls.map(p => React.createElement("tr", {
     key: p.pollster + p.dateLabel
-  }, React.createElement("td", null, p.pollster), React.createElement("td", null, p.dateLabel), React.createElement("td", null, p.sets.map(id => DEMO_SET_NAME[id] || id).join(", ")))))), React.createElement("p", {
+  }, React.createElement("td", null, p.pollster), React.createElement("td", null, p.dateLabel), React.createElement("td", null, demoSets(p.sets)))))), React.createElement("p", {
     className: "info-work-note"
   }, "The polls in the six-week window, newest first. A poll\u2019s weight is its sample, halving every 14 days and fading out by day 42; a pollster with several polls in the window counts for the square root of their number.")) : null;
   const pc = v => v == null ? "–" : (100 * v).toFixed(1);

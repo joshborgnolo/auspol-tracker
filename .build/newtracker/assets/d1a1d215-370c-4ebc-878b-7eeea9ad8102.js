@@ -5936,14 +5936,20 @@ function infoTerms(D) {
   const DEMO = D.demographics;
   const DEMO_SET_NAME = { age: "age", generation: "generation", gender: "gender", education: "education",
     state: "state", location: "location", housing: "housing", language: "language at home" };
+  // "Age, gender, and state": a list in sentence case, with the Oxford comma
+  const demoSets = (ids) => {
+    const n = ids.map((id) => DEMO_SET_NAME[id] || id);
+    const s = n.length < 3 ? n.join(" and ") : n.slice(0, -1).join(", ") + ", and " + n[n.length - 1];
+    return s.charAt(0).toUpperCase() + s.slice(1);
+  };
   const demoWork = DEMO && DEMO.polls && DEMO.polls.length ? (
     <div className="info-work-wrap">
-      <table className="info-work">
+      <table className="info-work info-work-list">
         <thead><tr><th>Poll</th><th>Fieldwork</th><th>Groups</th></tr></thead>
         <tbody>
           {DEMO.polls.map((p) => (
             <tr key={p.pollster + p.dateLabel}>
-              <td>{p.pollster}</td><td>{p.dateLabel}</td><td>{p.sets.map((id) => DEMO_SET_NAME[id] || id).join(", ")}</td>
+              <td>{p.pollster}</td><td>{p.dateLabel}</td><td>{demoSets(p.sets)}</td>
             </tr>
           ))}
         </tbody>
