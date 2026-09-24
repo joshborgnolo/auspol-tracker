@@ -272,9 +272,15 @@ function TrendChart(props) {
   // shared x spine for guide-line hover (monthly)
   const spinePts = spine || (series[0] ? series[0].points : []);
 
-  // client px -> viewBox units
+  // client px -> viewBox units. Measured off the SVG, not the .chart wrapper:
+  // once a chart earns a copy button the wrapper takes padding-bottom:30px,
+  // and mapping y through the taller box swung every pick ~7% under the
+  // pointer. A dense cloud still caught SOME dot and looked fine; a sparse
+  // one (Undecided) put dozens of dots past MOUSE_PICK_PX of anywhere a
+  // reader could point - always the lowest-running series first, which is
+  // the newest readings on that panel.
   const toVB = (e) => {
-    const rect = ref.current.getBoundingClientRect();
+    const rect = ref.current.querySelector("svg").getBoundingClientRect();
     return {
       x: ((e.clientX - rect.left) / rect.width) * W,
       y: ((e.clientY - rect.top) / rect.height) * H,

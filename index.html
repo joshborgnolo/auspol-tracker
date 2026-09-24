@@ -37738,7 +37738,7 @@ function TrendChart(props) {
   const refUnits = 10.5 / scale;
   const spinePts = spine || (series[0] ? series[0].points : []);
   const toVB = e => {
-    const rect = ref.current.getBoundingClientRect();
+    const rect = ref.current.querySelector("svg").getBoundingClientRect();
     return {
       x: (e.clientX - rect.left) / rect.width * W,
       y: (e.clientY - rect.top) / rect.height * H,
