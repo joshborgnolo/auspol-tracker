@@ -1836,9 +1836,12 @@ function DemographicsPanel({ rangeId = "all" }) {
       <details className="view-how hint-how">
         <summary>How to read these charts</summary>
         <p className="table-hint">
-          Each poll says how far a group sits from its own overall figure. Those gaps are pooled,
-          newer and larger polls counting for more as in every figure here, and added to the site’s
-          current figure for all voters. ± is the 95% margin.
+          A bar is that group’s share of the first-preference vote: 17.1% beside 18–34 means
+          17.1% of people aged 18–34 name the party as their first preference – the same as the
+          all-voters bar, read among that group alone. Each poll says how far a group sits from
+          its own overall figure. Those gaps are pooled, newer and larger polls counting for more
+          as in every figure here, and added to the site’s current figure for all voters. ± is
+          the 95% margin.
         </p>
         <p className="table-hint">
           The charts are built the way the site’s other monthly lines are: each poll is a dot and
