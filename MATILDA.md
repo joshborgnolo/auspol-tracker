@@ -16,17 +16,42 @@ a GENERATED build artifact — never hand-edit it.
     `CHROME` env)
 - `data/polls.json` — canonical poll rows (never hand-edit; extractors write it)
 - `.build/extract-*.mjs` + `.build/*-updater.sh` — pollster extractors and
-  their scheduled pipelines. GitHub Actions runs them: `roymorgan-update.yml`
-  standalone, and `poll-agent.yml` (reusable) driven by the eight house
-  caller workflows; `coverage-check.yml` is the gap watchdog whose failure
-  emails a missing-poll alert. Local launchd jobs mirror these as backup.
-  The cron block between `# tune-schedules:begin/end` in each caller is
-  GENERATED: `.build/tune-schedules.mjs` measures every house's weekday and
-  release hours from the `published` clock times in polls.json and rewrites
-  it (`--apply`; `--check` for drift); `schedule-tune.yml` runs it after
-  every updater completes and weekly for the DST offset, pushing under the
-  `SCHEDULE_TUNER_TOKEN` PAT (GITHUB_TOKEN can't touch workflow files).
-  Never hand-edit inside the markers — change the recipe in the script.
+  their scheduled pipelines. GitHub Actions runs them: `poll-agent.yml`
+  (reusable) driven by the twelve house caller workflows, Roy Morgan's
+  included; `coverage-check.yml` is the gap watchdog whose failure emails a
+  missing-poll alert. Local launchd jobs mirror these as backup.
+  - Writers queue PER HOUSE (`writers-<house>`), never in one shared group:
+    GitHub keeps one pending run per group and cancels the rest, which cost
+    29 runs in Sep 2026 under the old `main-writers` group. Cross-house push
+    races are `push_main`'s job (`.build/git-push-main.sh`): the rebase
+    rebuilds generated files instead of merging them, and a data conflict
+    re-runs the wrapper once. `test-push-main.mjs` races two clones through
+    it. Every writer — new ones included — pushes through `push_main`.
+  - A run that fails because the pollster was down or walled, or that lost
+    a push race twice, ends GREEN with a warning (`.build/classify-failure.mjs`);
+    `.build/transient-streak.sh` turns it red only after 12h of that, and
+    only then does agent-repair see it. Callers grant `actions: read` for the
+    streak check — the caller's `permissions:` is the ceiling for
+    poll-agent's job (`test-workflows.mjs` pins it).
+  - The cron block between `# tune-schedules:begin/end` in each caller is
+    GENERATED: `.build/tune-schedules.mjs` measures every house's weekday
+    and release hours from the `published` clock times in polls.json and
+    rewrites it (`--apply`; `--check` for drift); `schedule-tune.yml` runs
+    it after every updater completes and weekly for the DST offset, pushing
+    under the `SCHEDULE_TUNER_TOKEN` PAT (GITHUB_TOKEN can't touch workflow
+    files; the weekly run warns three weeks before it expires). Never
+    hand-edit inside the markers — change the recipe in the script.
+  - GitHub's cron ran those blocks 2–5h late at the median in Sep 2026. The
+    tuner also writes `.build/dispatch-clock/schedule.json` (the same slots,
+    Sydney wall-clock), which the Cloudflare Worker in `.build/dispatch-clock/`
+    turns into on-time `workflow_dispatch` runs once deployed (README
+    there); the cron blocks stay as the backup.
+  - The launchd jobs run in their own clone,
+    `~/Library/Application Support/auspol-agents/repo` — never in this
+    checkout, whose edits made them refuse 51 of ~148 slots in Sep 2026. Its
+    `.build/logs` links here. `bash .build/install-launchd.sh` installs or
+    updates the clone, run.sh (tracked as `.build/launchd/run.sh`), the
+    shims and the plists; `--check` reports drift.
 - `.build/extract-pollbludger.mjs` + `pollbludger-updater.sh` +
   `pollbludger-fallback.yml` — the LAST-RESORT poll agent. Reads
   BludgerTrack's poll-data feed (pollbludger.net …/xml/current.xml) four
@@ -58,18 +83,28 @@ a GENERATED build artifact — never hand-edit it.
   Chrome leg off under GITHUB_ACTIONS; the launchd job with Chrome upgrades
   News24-only rows in place later.
 - `.github/workflows/agent-repair.yml` — the CENTRAL Matilda repair agent.
-  Any watched workflow failing on main triggers it (workflow_run). Its gate
-  job maps the workflow to a house prompt (`.build/*-repair-prompt.md`;
-  generic `.build/agent-repair-prompt.md` fallback), and the repair job runs
-  headless Matilda on a credential-free checkout. Repairs land STRAIGHT ON
-  `main`: a deterministic post-gate (recorded base commit, forbidden-path
-  blocklist, syntax checks, validate.mjs) pushes `HEAD:main` itself —
-  `main-writers` serialised, one rebase retry. `.build/repair-gate.sh` is
-  the circuit breaker (3 sessions/workflow/24h, matched on the
-  `agent-repair: <wf>` run-name); `.build/alert-issue.sh` files deduped
-  ci-alert issues when the gate blocks. Per-workflow PR-gated repair jobs
-  are gone — this repo blocks Actions from opening PRs, so they never
-  landed.
+  A watched workflow failing on main triggers it (workflow_run); tests,
+  site-check, newspoll-watch, citation-check and schedule-tune are
+  deliberately unwatched. Three jobs:
+  - `gate` maps the workflow to a house prompt (`.build/*-repair-prompt.md`;
+    generic `.build/agent-repair-prompt.md` fallback), skips failures that
+    are not repair work (coverage-check's heartbeat), and runs the circuit
+    breaker `.build/repair-gate.sh` — 3 agent SESSIONS per workflow per 24h,
+    counted from runs whose `repair` job actually ran (it used to count the
+    ~150 skipped runs a day and stayed shut).
+  - `repair` runs headless Matilda with a read-only token and no git
+    credentials, and hands its commits over as a git bundle artifact.
+  - `publish`, on a fresh runner, applies the gate — forbidden paths
+    (`.github/`, manifests, CNAME, the clock, the laptop installer, and the
+    repair machinery itself), syntax checks, validate.mjs — then discards
+    every generated file the commits carry, rebuilds the site from the
+    repaired sources, and pushes through `push_main` (scripts taken from
+    main, not the agent's tree). `.build/alert-issue.sh` files deduped
+    ci-alert issues when it blocks; `.build/resolve-alerts.sh`
+    (coverage-check's daily `alerts` job) closes them once the workflow has
+    run green since. This repo blocks Actions from opening PRs, so nothing
+    here — nor newspoll-watch's filer, which pushes a `repair/` branch and
+    files a review-request issue — can open one.
 - Pre-1987 past-cycle leadership lines come from The Bulletin's Morgan
   Gallup column (harvest → extract → assimilate scripts named
   `*-bulletin-gallup.mjs`; CSV `data/bulletin-leader-approval.csv`; rows

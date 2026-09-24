@@ -30,8 +30,12 @@ rules — the filer is a separate contract, not an exception carved into theirs.
    `needs: watch` + `if: always()`. Gate step re-runs the watchdog itself and parses
    the last `NP_WATCH` line; only `fired===true && escalate===true` installs pinned
    `matilda@0.21.4` and runs the filer (25m wall / 80 tool calls, same as repair jobs;
-   `MATILDA_API_KEY` unset → warns and exits 0). Joins the `main-writers` concurrency
-   group (job level); the read-only `watch` job stays OUT of it.
+   `MATILDA_API_KEY` unset → warns and exits 0). Since 2026-09-25 the gate is its own
+   `escalation` job and `file-missing` runs only when it says escalate, in its own
+   `newspoll-file` group (it pushes a branch, never main). This repo does not let Actions
+   open PRs, so the filer pushes `repair/newspoll-file-<run>` and files a ci-alert issue
+   ("Newspoll filing ready for review") carrying the compare link to open the PR by hand;
+   its breaker is `repair-gate.sh newspoll-file newspoll-watch.yml file-missing`.
 3. **Contract — `.build/newspoll-file-missing-prompt.md`.** Structured like
    coverage-doctor's prompt. Filing threshold (ALL FOUR or file nothing): canon still
    lacks the wave ±3 d; rung A still publishes it (`state:"release"`); ≥1 INDEPENDENT
@@ -103,7 +107,7 @@ territory already.
 
 - `auto-skill-newspoll-extraction` — the extractor, rung A/B spec, the watchdog's
   original detect-only contract, canonical row conventions the filer must mirror.
-- `auto-skill-ci-main-writer-races` — the main-writers group + push_main system
+- `auto-skill-ci-main-writer-races` — per-workflow queues + the push_main system
   (the filer's prompt-driven push is the CI-agent analogue; pin sites list).
 - `auto-skill-auspol-foxhedgehog-hand-entry` — the only other hand-written data path;
   its validate→build→commit pipeline for hand edits is what the prompt mirrors.

@@ -7,6 +7,16 @@ extracted_at: '2026-09-21T01:51:57.864Z'
 
 # Circuit-breaker ci-alert triage (worked: tests breaker, 2026-09-21)
 
+> **2026-09-25 — most of the staleness is fixed at the source.** The breaker counted every
+> SKIPPED agent-repair run as a session (agent-repair fires on every completion of every
+> watched workflow), so `tests` sat at 19 and DemosAU at 4 — permanently tripped, and the
+> "three sessions" alerts named sessions that never ran (issue #1's five comments). It now
+> counts runs whose `repair` job actually ran. `tests`, `site-check`, `newspoll-watch` and
+> `citation-check` are no longer watched at all. And coverage-check's daily `alerts` job
+> (`.build/resolve-alerts.sh`) closes a "Repair circuit breaker: <wf>" / "Repair gate
+> blocked: <wf>" issue by itself once `<wf>` has run green since the issue's last update.
+> An alert that is still open is therefore probably live — the checks below still apply.
+
 The ware look: a github-actions[bot] issue titled "Repair circuit breaker: <workflow>" —
 "Three agent-repair sessions in 24h and <workflow> is still failing — failed run. No further
 agent sessions this window; this needs a human." (filed by `.build/alert-issue.sh`, label
