@@ -235,6 +235,25 @@ function PrimaryVotePanel({ rangeId }) {
     { id: "oth", ...D.PARTIES.oth },
   ].sort((a, b) => latest[b.id] - latest[a.id]);
   const pts = filterPts(D.aggPrimary, xDomain[0]);
+  /* The one-sentence lead, as on the direction and undecided panels: the top
+     of the primary vote says what kind of contest this is, and the
+     Coalition's distance from it is the other half of the story since May
+     2025. Composed from the live aggregate so the sentence turns over with
+     the numbers. */
+  const pvLead = (() => {
+    const a = parts[0], b = parts[1];
+    const lnp = parts.find((p) => p.id === "lnp");
+    if (!a || !b || !lnp) return null;
+    const gap = latest[a.id] - latest[b.id];
+    let s = gap < 2
+      ? a.name + " and " + b.name + " are neck and neck in first-preference support"
+      : a.name + " leads first-preference support on " + latest[a.id].toFixed(1) + "%, "
+        + gap.toFixed(1) + " points clear of " + b.name;
+    const lnpBehind = latest[b.id] - latest.lnp;
+    if (lnp.id !== a.id && lnp.id !== b.id && lnpBehind > 2)
+      s += ", and the " + lnp.name + " has been left behind on " + latest.lnp.toFixed(1) + "%";
+    return s + ".";
+  })();
   // every party stays mounted; hiding a chip fades its line via opacity so
   // legend toggles feel continuous instead of popping
   const chartSeries = parts.map((p) => ({
@@ -280,7 +299,6 @@ function PrimaryVotePanel({ rangeId }) {
       <div className="card-head">
         <div>
           <h2 className="card-title">Primary vote</h2>
-          <p className="card-sub">First-preference support, poll aggregate</p>
         </div>
         <div className="legend">
           {parts.map((p) => {
@@ -309,6 +327,7 @@ function PrimaryVotePanel({ rangeId }) {
           })}
         </div>
       </div>
+      {pvLead && <p className="pv-lead"><b>{pvLead}</b></p>}
       <TrendChart
         key="pv"
         height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[0, 40]}
@@ -411,15 +430,43 @@ function LeadershipSection({ rangeId }) {
      question rather than of who you feel like looking at. The panel states
      that itself now. */
   const leaders = D.LEADERS;
+  /* The section's one-sentence lead, in the same voice as the direction and
+     undecided panels: the two-way preferred-PM gap against the net ratings,
+     composed from the live readings so the sentence turns over with the
+     numbers. Returns null rather than guess if a reading is missing. */
+  const ldLead = (() => {
+    const byId = {};
+    leaders.forEach((L) => { byId[L.id] = L; });
+    const pm = byId.alb, op = byId.taylor, hn = byId.hanson;
+    if (!pm || !op || !hn) return null;
+    const pmP = leaderReading(D.leaderMonths, "alb_pref");
+    const opP = leaderReading(D.leaderMonths, "taylor_pref");
+    const nets = [pm, op, hn].map((L) => ({ L, r: leaderReading(D.leaderMonths, L.id + "_net") }));
+    if (!pmP || !opP || nets.some((n) => !n.r)) return null;
+    const r0 = Math.round;
+    const ahead = pmP.v - opP.v >= 0;
+    const ppmPart = (ahead ? pm.short : op.short) + " leads " + (ahead ? op.short : pm.short)
+      + " " + r0(Math.max(pmP.v, opP.v)) + "–" + r0(Math.min(pmP.v, opP.v))
+      + " as preferred prime minister";
+    const neg = nets.filter((n) => n.r.v < 0);
+    if (neg.length === nets.length) {
+      const worst = neg.reduce((a, b) => (a.r.v < b.r.v ? a : b));
+      return ppmPart + ", yet all three leaders are rated net-negative – "
+        + (worst.L.id === "alb" ? "the PM" : worst.L.short) + " most deeply, on " + r0(worst.r.v) + ".";
+    }
+    if (!neg.length) return ppmPart + ", and all three carry net-positive ratings.";
+    return ppmPart + ", and on approval only "
+      + nets.filter((n) => n.r.v >= 0).map((n) => n.L.short).join(" and ")
+      + " rate" + (nets.length - neg.length === 1 ? "s" : "") + " net-positive.";
+  })();
   return (
     <section className="leadership">
       <div className="leadership-head">
         <h2 className="section-h">Leadership</h2>
       </div>
-      <p className="leadership-note">
-        The Coalition line splices leaders – <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.
-      </p>
+      {ldLead && <p className="ld-lead"><b>{ldLead}</b></p>}
       <HowTo label="How to read these charts" cls="leadership-note" paras={[
+        <>The Coalition line splices leaders – <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.</>,
         <>The approval and favourability points are monthly aggregates, weighted and house-adjusted
         the way the vote series are; the preferred-PM lines join published readings as they came,
         unadjusted.</>,
@@ -1473,6 +1520,26 @@ function UndecidedPanel({ rangeId }) {
   for (let v = lo + step; v < hi; v += step) yTicks.push(v);
   const spine = drawn[0].pts;
 
+  /* one plain sentence above the readings, as on the direction and One Nation
+     panels: the live figure of the headline question against the monthly mean
+     nearest the 2025 election (the last at or before the election month, or
+     the first term reading if the series only started after it). Inside a
+     point either way it reads "fairly constant"; beyond it the sentence says
+     which way, and by how much. */
+  const termLead = (() => {
+    const sr = U.series.find((s) => s.id === "first") || U.series[0];
+    if (!sr || sr.monthly.length < 2) return null;
+    if (!sr.monthly.some((m) => m.ym > "2025-05")) return null;
+    const base = sr.monthly.filter((m) => m.ym <= "2025-05").pop() || sr.monthly[0];
+    const nowV = sr.now ? sr.now.v : sr.latest.v;
+    const d = nowV - base.v;
+    if (Math.abs(d) < 1)
+      return "The share of undecided and uncommitted has remained fairly constant since the 2025 election.";
+    return "The share of undecided and uncommitted voters has " + (d > 0 ? "risen" : "fallen")
+      + " since the 2025 election, from " + base.v.toFixed(1) + "% in "
+      + window.AP.monthLabelFull(base.ym) + " to " + nowV.toFixed(1) + "% now.";
+  })();
+
   return (
     <section className="card">
       <div className="card-head">
@@ -1508,6 +1575,7 @@ function UndecidedPanel({ rangeId }) {
           </div>
         ))}
       </div>
+      {termLead && <p className="und-lead"><b>{termLead}</b></p>}
       <TrendChart
         key="und"
         height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}

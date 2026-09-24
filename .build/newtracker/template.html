@@ -2688,11 +2688,14 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
 .demo-chart-set { font-size: 13px; font-weight: 650; color: var(--ink); margin-right: 8px; }
 .read-ci { margin-left: 2px; }
-/* Where One Nation’s new voters came from, and National direction: one plain
-   sentence above the readings, in the panel copy's own voice (the One Nation
-   readings reuse .und-*) */
-.ons-lead, .dir-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
+/* Where One Nation’s new voters came from, National direction, Undecided, the
+   Leadership section, and the Primary-vote panel: one plain sentence above
+   the readings, in the panel copy's own voice (the One Nation readings
+   reuse .und-*) */
+.ons-lead, .dir-lead, .und-lead, .ld-lead, .pv-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
   text-wrap: pretty; }
+/* more air before the right/wrong readout bar than the shared 12px allows */
+.dir-lead { margin-bottom: 22px; }
 /* the One Nation panel's two views, under its heading as the vote-by-group
    panel's controls sit under theirs */
 .ons-ctl { margin: 0 2px 14px; }

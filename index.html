@@ -1645,8 +1645,9 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
 .demo-chart-set { font-size: 13px; font-weight: 650; color: var(--ink); margin-right: 8px; }
 .read-ci { margin-left: 2px; }
-.ons-lead, .dir-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
+.ons-lead, .dir-lead, .und-lead, .ld-lead, .pv-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
   text-wrap: pretty; }
+.dir-lead { margin-bottom: 22px; }
 .ons-ctl { margin: 0 2px 14px; }
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
@@ -39434,6 +39435,17 @@ function PrimaryVotePanel({
     ...D.PARTIES.oth
   }].sort((a, b) => latest[b.id] - latest[a.id]);
   const pts = filterPts(D.aggPrimary, xDomain[0]);
+  const pvLead = (() => {
+    const a = parts[0],
+      b = parts[1];
+    const lnp = parts.find(p => p.id === "lnp");
+    if (!a || !b || !lnp) return null;
+    const gap = latest[a.id] - latest[b.id];
+    let s = gap < 2 ? a.name + " and " + b.name + " are neck and neck in first-preference support" : a.name + " leads first-preference support on " + latest[a.id].toFixed(1) + "%, " + gap.toFixed(1) + " points clear of " + b.name;
+    const lnpBehind = latest[b.id] - latest.lnp;
+    if (lnp.id !== a.id && lnp.id !== b.id && lnpBehind > 2) s += ", and the " + lnp.name + " has been left behind on " + latest.lnp.toFixed(1) + "%";
+    return s + ".";
+  })();
   const chartSeries = parts.map(p => ({
     id: p.id,
     label: p.name,
@@ -39472,9 +39484,7 @@ function PrimaryVotePanel({
     className: "card-head"
   }, React.createElement("div", null, React.createElement("h2", {
     className: "card-title"
-  }, "Primary vote"), React.createElement("p", {
-    className: "card-sub"
-  }, "First-preference support, poll aggregate")), React.createElement("div", {
+  }, "Primary vote")), React.createElement("div", {
     className: "legend"
   }, parts.map(p => {
     const was = base && base[p.id] != null ? base[p.id] : null;
@@ -39501,7 +39511,9 @@ function PrimaryVotePanel({
       value: latest[p.id] - was,
       small: true
     }));
-  }))), React.createElement(TrendChart, {
+  }))), pvLead && React.createElement("p", {
+    className: "pv-lead"
+  }, React.createElement("b", null, pvLead)), React.createElement(TrendChart, {
     key: "pv",
     height: narrow ? 460 : 340,
     xDomain: xDomain,
@@ -39602,18 +39614,45 @@ function LeadershipSection({
   } = window.AP;
   const [view, setView] = useState("pair");
   const leaders = D.LEADERS;
+  const ldLead = (() => {
+    const byId = {};
+    leaders.forEach(L => {
+      byId[L.id] = L;
+    });
+    const pm = byId.alb,
+      op = byId.taylor,
+      hn = byId.hanson;
+    if (!pm || !op || !hn) return null;
+    const pmP = leaderReading(D.leaderMonths, "alb_pref");
+    const opP = leaderReading(D.leaderMonths, "taylor_pref");
+    const nets = [pm, op, hn].map(L => ({
+      L,
+      r: leaderReading(D.leaderMonths, L.id + "_net")
+    }));
+    if (!pmP || !opP || nets.some(n => !n.r)) return null;
+    const r0 = Math.round;
+    const ahead = pmP.v - opP.v >= 0;
+    const ppmPart = (ahead ? pm.short : op.short) + " leads " + (ahead ? op.short : pm.short) + " " + r0(Math.max(pmP.v, opP.v)) + "–" + r0(Math.min(pmP.v, opP.v)) + " as preferred prime minister";
+    const neg = nets.filter(n => n.r.v < 0);
+    if (neg.length === nets.length) {
+      const worst = neg.reduce((a, b) => a.r.v < b.r.v ? a : b);
+      return ppmPart + ", yet all three leaders are rated net-negative – " + (worst.L.id === "alb" ? "the PM" : worst.L.short) + " most deeply, on " + r0(worst.r.v) + ".";
+    }
+    if (!neg.length) return ppmPart + ", and all three carry net-positive ratings.";
+    return ppmPart + ", and on approval only " + nets.filter(n => n.r.v >= 0).map(n => n.L.short).join(" and ") + " rate" + (nets.length - neg.length === 1 ? "s" : "") + " net-positive.";
+  })();
   return React.createElement("section", {
     className: "leadership"
   }, React.createElement("div", {
     className: "leadership-head"
   }, React.createElement("h2", {
     className: "section-h"
-  }, "Leadership")), React.createElement("p", {
-    className: "leadership-note"
-  }, "The Coalition line splices leaders \u2013 ", React.createElement("strong", null, "Ley"), " to February 2026, ", React.createElement("strong", null, "Taylor"), " since."), React.createElement(HowTo, {
+  }, "Leadership")), ldLead && React.createElement("p", {
+    className: "ld-lead"
+  }, React.createElement("b", null, ldLead)), React.createElement(HowTo, {
     label: "How to read these charts",
     cls: "leadership-note",
-    paras: [React.createElement(React.Fragment, null, "The approval and favourability points are monthly aggregates, weighted and house-adjusted the way the vote series are; the preferred-PM lines join published readings as they came, unadjusted."), React.createElement(React.Fragment, null, "Preferred PM is put to voters as two separate two-way contests \u2013 against the opposition leader, and against Hanson head to head \u2013 so both are drawn, as published. In the two-way houses leave anywhere from nothing (Newspoll) to half the sample uncommitted, and the three-way 16\u201350%, so a level isn\u2019t comparable across houses \u2013 but the gap between the two lines, and the trend in each, are.")]
+    paras: [React.createElement(React.Fragment, null, "The Coalition line splices leaders \u2013 ", React.createElement("strong", null, "Ley"), " to February 2026, ", React.createElement("strong", null, "Taylor"), " since."), React.createElement(React.Fragment, null, "The approval and favourability points are monthly aggregates, weighted and house-adjusted the way the vote series are; the preferred-PM lines join published readings as they came, unadjusted."), React.createElement(React.Fragment, null, "Preferred PM is put to voters as two separate two-way contests \u2013 against the opposition leader, and against Hanson head to head \u2013 so both are drawn, as published. In the two-way houses leave anywhere from nothing (Newspoll) to half the sample uncommitted, and the three-way 16\u201350%, so a level isn\u2019t comparable across houses \u2013 but the gap between the two lines, and the trend in each, are.")]
   }), React.createElement("div", {
     className: "two-col lead-grid lg-" + view
   }, view === "both" ? React.createElement(ApprovalPanel, {
@@ -40599,6 +40638,16 @@ function UndecidedPanel({
   const yTicks = [];
   for (let v = lo + step; v < hi; v += step) yTicks.push(v);
   const spine = drawn[0].pts;
+  const termLead = (() => {
+    const sr = U.series.find(s => s.id === "first") || U.series[0];
+    if (!sr || sr.monthly.length < 2) return null;
+    if (!sr.monthly.some(m => m.ym > "2025-05")) return null;
+    const base = sr.monthly.filter(m => m.ym <= "2025-05").pop() || sr.monthly[0];
+    const nowV = sr.now ? sr.now.v : sr.latest.v;
+    const d = nowV - base.v;
+    if (Math.abs(d) < 1) return "The share of undecided and uncommitted has remained fairly constant since the 2025 election.";
+    return "The share of undecided and uncommitted voters has " + (d > 0 ? "risen" : "fallen") + " since the 2025 election, from " + base.v.toFixed(1) + "% in " + window.AP.monthLabelFull(base.ym) + " to " + nowV.toFixed(1) + "% now.";
+  })();
   return React.createElement("section", {
     className: "card"
   }, React.createElement("div", {
@@ -40634,7 +40683,9 @@ function UndecidedPanel({
     className: "und-read-stale"
   }, "last reading, ", sr.latest.field)), React.createElement("p", {
     className: "und-read-note"
-  }, sr.note, " \xB7 ", houseList(sr.houses)))))), React.createElement(TrendChart, {
+  }, sr.note, " \xB7 ", houseList(sr.houses)))))), termLead && React.createElement("p", {
+    className: "und-lead"
+  }, React.createElement("b", null, termLead)), React.createElement(TrendChart, {
     key: "und",
     height: narrow ? 460 : 340,
     xDomain: xDomain,
