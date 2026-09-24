@@ -421,12 +421,14 @@ function LeadershipSection({ rangeId }) {
       </div>
       <p className="leadership-note">
         The Coalition line splices leaders – <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.
-        The approval and favourability points are monthly aggregates, weighted and house-adjusted
-        the way the vote series are; the preferred-PM lines join published readings as they came,
-        unadjusted.
-        Preferred PM is put to voters as two separate two-way contests – against the opposition
-        leader, and against Hanson head to head – so both are drawn, the head-to-head dashed.
       </p>
+      <HowTo label="How to read these charts" cls="leadership-note" paras={[
+        <>The approval and favourability points are monthly aggregates, weighted and house-adjusted
+        the way the vote series are; the preferred-PM lines join published readings as they came,
+        unadjusted.</>,
+        <>Preferred PM is put to voters as two separate two-way contests – against the opposition
+        leader, and against Hanson head to head – so both are drawn, the head-to-head dashed.</>,
+      ]} />
       {/* Both children stay mounted while a column collapses to 0fr, so the
           grid can animate rather than the panel popping out of existence.
           `both` swaps the left child for a second net-rating panel.

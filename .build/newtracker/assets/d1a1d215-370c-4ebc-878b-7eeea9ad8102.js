@@ -575,15 +575,20 @@ const CYC_METRICS = [
        the flows counted at the election that opened its term (FLOW_LEF /
        FLOW_ERAS). The sitting term follows the hero's rival ruling month by
        month and draws each contest as its own run (tppEras). */
+    /* the gist stays under the chart; the why folds (noteMore, HowTo) */
     note: <>Every line is the <strong>implied</strong> two-party figure: each poll’s primary
       votes read through the preferences counted at the election that opened its term –
       {" "}<button type="button" className="hi-term"
         onClick={() => window.AP.openTerm && window.AP.openTerm("last-election-flows", "Past cycles")}>last-election
-        flows</button>, the only table anyone could have used at the time. So a line moves when
-      voting intentions move, not when pollsters change how they allocate preferences, and every
-      term back to 1972 is on the same footing as today’s. The sitting term follows the rival
-      Labor is doing worst against, as the headline does, and marks where that changed. How the
-      final polls did, below, still scores what the pollsters published.</> },
+        flows</button>.</>,
+    noteMore: [
+      <>That is the only table anyone could have used at the time. So a line moves when voting
+      intentions move, not when pollsters change how they allocate preferences, and every term
+      back to 1972 is on the same footing as today’s.</>,
+      <>The sitting term follows the rival Labor is doing worst against, as the headline does, and
+      marks where that changed. How the final polls did, below, still scores what the pollsters
+      published.</>,
+    ] },
   { key: "primary", title: "Government primary vote", sub: "First-preference support for the governing party",
     unit: "%", fmt: (v) => v.toFixed(1),
     step: 5, refAbs: null },
@@ -2253,6 +2258,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
           figure from the rest, and why the sitting line is drawn on the basis
           the headline does NOT quote. */}
       {M.note && <p className="cycle-basis">{M.note}</p>}
+      {M.noteMore && <HowTo cls="cycle-basis" paras={M.noteMore} />}
     </section>
   );
 }

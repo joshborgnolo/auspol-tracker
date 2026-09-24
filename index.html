@@ -38400,7 +38400,11 @@ function LeadershipSection({
     className: "section-h"
   }, "Leadership")), React.createElement("p", {
     className: "leadership-note"
-  }, "The Coalition line splices leaders \u2013 ", React.createElement("strong", null, "Ley"), " to February 2026, ", React.createElement("strong", null, "Taylor"), " since. The approval and favourability points are monthly aggregates, weighted and house-adjusted the way the vote series are; the preferred-PM lines join published readings as they came, unadjusted. Preferred PM is put to voters as two separate two-way contests \u2013 against the opposition leader, and against Hanson head to head \u2013 so both are drawn, the head-to-head dashed."), React.createElement("div", {
+  }, "The Coalition line splices leaders \u2013 ", React.createElement("strong", null, "Ley"), " to February 2026, ", React.createElement("strong", null, "Taylor"), " since."), React.createElement(HowTo, {
+    label: "How to read these charts",
+    cls: "leadership-note",
+    paras: [React.createElement(React.Fragment, null, "The approval and favourability points are monthly aggregates, weighted and house-adjusted the way the vote series are; the preferred-PM lines join published readings as they came, unadjusted."), React.createElement(React.Fragment, null, "Preferred PM is put to voters as two separate two-way contests \u2013 against the opposition leader, and against Hanson head to head \u2013 so both are drawn, the head-to-head dashed.")]
+  }), React.createElement("div", {
     className: "two-col lead-grid lg-" + view
   }, view === "both" ? React.createElement(ApprovalPanel, {
     key: "appr-net",
@@ -41949,7 +41953,8 @@ const CYC_METRICS = [{
     type: "button",
     className: "hi-term",
     onClick: () => window.AP.openTerm && window.AP.openTerm("last-election-flows", "Past cycles")
-  }, "last-election flows"), ", the only table anyone could have used at the time. So a line moves when voting intentions move, not when pollsters change how they allocate preferences, and every term back to 1972 is on the same footing as today\u2019s. The sitting term follows the rival Labor is doing worst against, as the headline does, and marks where that changed. How the final polls did, below, still scores what the pollsters published.")
+  }, "last-election flows"), "."),
+  noteMore: [React.createElement(React.Fragment, null, "That is the only table anyone could have used at the time. So a line moves when voting intentions move, not when pollsters change how they allocate preferences, and every term back to 1972 is on the same footing as today\u2019s."), React.createElement(React.Fragment, null, "The sitting term follows the rival Labor is doing worst against, as the headline does, and marks where that changed. How the final polls did, below, still scores what the pollsters published.")]
 }, {
   key: "primary",
   title: "Government primary vote",
@@ -43298,7 +43303,10 @@ function CycleChart({
     }, "Trove newspaper archive"), ".");
   })(), M.note && React.createElement("p", {
     className: "cycle-basis"
-  }, M.note));
+  }, M.note), M.noteMore && React.createElement(HowTo, {
+    cls: "cycle-basis",
+    paras: M.noteMore
+  }));
 }
 function CycleLegend({
   cycles,
