@@ -251,7 +251,7 @@ function PrimaryVotePanel({ rangeId }) {
         + gap.toFixed(1) + " points clear of " + b.name;
     const lnpBehind = latest[b.id] - latest.lnp;
     if (lnp.id !== a.id && lnp.id !== b.id && lnpBehind > 2)
-      s += ", and the " + lnp.name + " has been left behind on " + latest.lnp.toFixed(1) + "%";
+      s += ", while the " + lnp.name + " has been left behind on " + latest.lnp.toFixed(1) + "%";
     return s + ".";
   })();
   // every party stays mounted; hiding a chip fades its line via opacity so
@@ -327,7 +327,7 @@ function PrimaryVotePanel({ rangeId }) {
           })}
         </div>
       </div>
-      {pvLead && <p className="pv-lead"><b>{pvLead}</b></p>}
+      {pvLead && <p className="pv-lead">{pvLead}</p>}
       <TrendChart
         key="pv"
         height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[0, 40]}
@@ -464,7 +464,7 @@ function LeadershipSection({ rangeId }) {
       <div className="leadership-head">
         <h2 className="section-h">Leadership</h2>
       </div>
-      {ldLead && <p className="ld-lead"><b>{ldLead}</b></p>}
+      {ldLead && <p className="ld-lead">{ldLead}</p>}
       <HowTo label="How to read these charts" cls="leadership-note" paras={[
         <>The Coalition line splices leaders – <strong>Ley</strong> to February 2026, <strong>Taylor</strong> since.</>,
         <>The approval and favourability points are monthly aggregates, weighted and house-adjusted
@@ -1419,7 +1419,7 @@ function DirectionPanel({ rangeId }) {
         </div>
       </div>
       {/* the reading in words, in the lead voice the One Nation panel opens with */}
-      <p className="dir-lead"><b>{plainShare(latest.wrong)} Australians believe we’re on the wrong track.</b></p>
+      <p className="dir-lead">{plainShare(latest.wrong)} Australians believe we’re on the wrong track.</p>
 
       <div className="dir-readout">
         <div className="dir-side">
@@ -1575,7 +1575,7 @@ function UndecidedPanel({ rangeId }) {
           </div>
         ))}
       </div>
-      {termLead && <p className="und-lead"><b>{termLead}</b></p>}
+      {termLead && <p className="und-lead">{termLead}</p>}
       <TrendChart
         key="und"
         height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}
@@ -1673,13 +1673,11 @@ function OnSourcesPanel({ rangeId }) {
         </div>
       )}
       <p className="ons-lead">
-        <b>
-          {a.now ? "Across the latest polls" : "In " + monthOf(a.ym)}, {rated
-            ? <>{a.v.toFixed(1)}% of people who voted for the Coalition in 2025 now back One Nation, as
-                do {b.v.toFixed(1)}% of Labor voters.</>
-            : <>{a.v.toFixed(1)}% of One Nation’s gain came from people who voted for the Coalition in 2025,
-                and {b.v.toFixed(1)}% from Labor voters.</>}
-        </b>
+        {a.now ? "Across the latest polls" : "In " + monthOf(a.ym)}, {rated
+          ? <>{a.v.toFixed(1)}% of people who voted for the Coalition in 2025 now back One Nation, as
+              do {b.v.toFixed(1)}% of Labor voters.</>
+          : <>{a.v.toFixed(1)}% of One Nation’s gain came from people who voted for the Coalition in 2025,
+              and {b.v.toFixed(1)}% from Labor voters.</>}
       </p>
       <div className="und-reads">
         {reads.map(({ sr, v, chg, now }) => (

@@ -1645,8 +1645,9 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
 .demo-chart-set { font-size: 13px; font-weight: 650; color: var(--ink); margin-right: 8px; }
 .read-ci { margin-left: 2px; }
-.ons-lead, .dir-lead, .und-lead, .ld-lead, .pv-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
+.ons-lead, .dir-lead, .und-lead, .ld-lead, .pv-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: #000;
   text-wrap: pretty; }
+body.dark .ons-lead, body.dark .dir-lead, body.dark .und-lead, body.dark .ld-lead, body.dark .pv-lead { color: var(--ink-2); }
 .dir-lead { margin-bottom: 22px; }
 .ons-ctl { margin: 0 2px 14px; }
 .und-reads { display: grid; gap: 10px 26px; margin: 2px 2px 14px;
@@ -39443,7 +39444,7 @@ function PrimaryVotePanel({
     const gap = latest[a.id] - latest[b.id];
     let s = gap < 2 ? a.name + " and " + b.name + " are neck and neck in first-preference support" : a.name + " leads first-preference support on " + latest[a.id].toFixed(1) + "%, " + gap.toFixed(1) + " points clear of " + b.name;
     const lnpBehind = latest[b.id] - latest.lnp;
-    if (lnp.id !== a.id && lnp.id !== b.id && lnpBehind > 2) s += ", and the " + lnp.name + " has been left behind on " + latest.lnp.toFixed(1) + "%";
+    if (lnp.id !== a.id && lnp.id !== b.id && lnpBehind > 2) s += ", while the " + lnp.name + " has been left behind on " + latest.lnp.toFixed(1) + "%";
     return s + ".";
   })();
   const chartSeries = parts.map(p => ({
@@ -39513,7 +39514,7 @@ function PrimaryVotePanel({
     }));
   }))), pvLead && React.createElement("p", {
     className: "pv-lead"
-  }, React.createElement("b", null, pvLead)), React.createElement(TrendChart, {
+  }, pvLead), React.createElement(TrendChart, {
     key: "pv",
     height: narrow ? 460 : 340,
     xDomain: xDomain,
@@ -39649,7 +39650,7 @@ function LeadershipSection({
     className: "section-h"
   }, "Leadership")), ldLead && React.createElement("p", {
     className: "ld-lead"
-  }, React.createElement("b", null, ldLead)), React.createElement(HowTo, {
+  }, ldLead), React.createElement(HowTo, {
     label: "How to read these charts",
     cls: "leadership-note",
     paras: [React.createElement(React.Fragment, null, "The Coalition line splices leaders \u2013 ", React.createElement("strong", null, "Ley"), " to February 2026, ", React.createElement("strong", null, "Taylor"), " since."), React.createElement(React.Fragment, null, "The approval and favourability points are monthly aggregates, weighted and house-adjusted the way the vote series are; the preferred-PM lines join published readings as they came, unadjusted."), React.createElement(React.Fragment, null, "Preferred PM is put to voters as two separate two-way contests \u2013 against the opposition leader, and against Hanson head to head \u2013 so both are drawn, as published. In the two-way houses leave anywhere from nothing (Newspoll) to half the sample uncommitted, and the three-way 16\u201350%, so a level isn\u2019t comparable across houses \u2013 but the gap between the two lines, and the trend in each, are.")]
@@ -40516,7 +40517,7 @@ function DirectionPanel({
     title: now ? nowDeltaTitle(now) : "Change on the previous month"
   }))), React.createElement("p", {
     className: "dir-lead"
-  }, React.createElement("b", null, plainShare(latest.wrong), " Australians believe we\u2019re on the wrong track.")), React.createElement("div", {
+  }, plainShare(latest.wrong), " Australians believe we\u2019re on the wrong track."), React.createElement("div", {
     className: "dir-readout"
   }, React.createElement("div", {
     className: "dir-side"
@@ -40685,7 +40686,7 @@ function UndecidedPanel({
     className: "und-read-note"
   }, sr.note, " \xB7 ", houseList(sr.houses)))))), termLead && React.createElement("p", {
     className: "und-lead"
-  }, React.createElement("b", null, termLead)), React.createElement(TrendChart, {
+  }, termLead), React.createElement(TrendChart, {
     key: "und",
     height: narrow ? 460 : 340,
     xDomain: xDomain,
@@ -40806,7 +40807,7 @@ function OnSourcesPanel({
     ariaLabel: "Figures as a share"
   })), React.createElement("p", {
     className: "ons-lead"
-  }, React.createElement("b", null, a.now ? "Across the latest polls" : "In " + monthOf(a.ym), ", ", rated ? React.createElement(React.Fragment, null, a.v.toFixed(1), "% of people who voted for the Coalition in 2025 now back One Nation, as do ", b.v.toFixed(1), "% of Labor voters.") : React.createElement(React.Fragment, null, a.v.toFixed(1), "% of One Nation\u2019s gain came from people who voted for the Coalition in 2025, and ", b.v.toFixed(1), "% from Labor voters."))), React.createElement("div", {
+  }, a.now ? "Across the latest polls" : "In " + monthOf(a.ym), ", ", rated ? React.createElement(React.Fragment, null, a.v.toFixed(1), "% of people who voted for the Coalition in 2025 now back One Nation, as do ", b.v.toFixed(1), "% of Labor voters.") : React.createElement(React.Fragment, null, a.v.toFixed(1), "% of One Nation\u2019s gain came from people who voted for the Coalition in 2025, and ", b.v.toFixed(1), "% from Labor voters.")), React.createElement("div", {
     className: "und-reads"
   }, reads.map(({
     sr,

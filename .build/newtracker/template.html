@@ -2692,8 +2692,10 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
    Leadership section, and the Primary-vote panel: one plain sentence above
    the readings, in the panel copy's own voice (the One Nation readings
    reuse .und-*) */
-.ons-lead, .dir-lead, .und-lead, .ld-lead, .pv-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2);
+.ons-lead, .dir-lead, .und-lead, .ld-lead, .pv-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: #000;
   text-wrap: pretty; }
+/* pure black would vanish on the dark ground — dark mode keeps the grey ink */
+body.dark .ons-lead, body.dark .dir-lead, body.dark .und-lead, body.dark .ld-lead, body.dark .pv-lead { color: var(--ink-2); }
 /* more air before the right/wrong readout bar than the shared 12px allows */
 .dir-lead { margin-bottom: 22px; }
 /* the One Nation panel's two views, under its heading as the vote-by-group
