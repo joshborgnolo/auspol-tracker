@@ -214,10 +214,7 @@ function Delta({ value, suffix = "", goodUp = true, neutral, small, title, roll,
 function PrimaryVotePanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const [xDomain] = [rangeDomain(rangeId)];
-  /* Others/Ind. ships hidden: it's a residual aggregate, not a party, and
-     with the majors' three-way contest crowded it went from context to
-     crossings. One chip-tap brings it back. */
-  const [hidden, setHidden] = useState({ oth: true });
+  const [hidden, setHidden] = useState({});
   const narrow = useNarrow();
   const latest = D.latest.primary;
   /* The 2025 result, which is where every line on this chart starts: the month

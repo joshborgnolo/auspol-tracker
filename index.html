@@ -38484,9 +38484,7 @@ function PrimaryVotePanel({
     series
   } = window.AP;
   const [xDomain] = [rangeDomain(rangeId)];
-  const [hidden, setHidden] = useState({
-    oth: true
-  });
+  const [hidden, setHidden] = useState({});
   const narrow = useNarrow();
   const latest = D.latest.primary;
   const base = D.aggPrimary.find(d => d.election) || null;
