@@ -424,7 +424,10 @@ function LeadershipSection({ rangeId }) {
         the way the vote series are; the preferred-PM lines join published readings as they came,
         unadjusted.</>,
         <>Preferred PM is put to voters as two separate two-way contests – against the opposition
-        leader, and against Hanson head to head – so both are drawn, the head-to-head dashed.</>,
+        leader, and against Hanson head to head – so both are drawn, as published. In the two-way
+        houses leave anywhere from nothing (Newspoll) to half the sample uncommitted, and the
+        three-way 16–50%, so a level isn’t comparable across houses – but the gap between the two
+        lines, and the trend in each, are.</>,
       ]} />
       {/* Both children stay mounted while a column collapses to 0fr, so the
           grid can animate rather than the panel popping out of existence.
@@ -916,9 +919,6 @@ function PreferredPMPanel({ rangeId, leaders: allLeaders, chrome, fmt: fmtProp, 
           <p className="card-sub">
             {three ? "“Who would make the better PM?”, asked as a three-way including Hanson"
                    : "“Who would make the better PM?”, asked head to head – in both of the contests pollsters run"}
-            {three
-              ? " · As published: houses leave 16–50% uncommitted, so levels aren’t comparable across houses, but the gaps and the trend are."
-              : " · As published: uncommitted runs from none (Newspoll) to half the sample, so levels aren’t comparable across houses, but the tinted gaps are."}
           </p>
         </div>
         <div className="card-head-tools">
