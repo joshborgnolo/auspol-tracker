@@ -6330,8 +6330,42 @@ function infoTerms(D) {
         voters. Owning or renting: YouGov and DemosAU, and RedBridge for owners only, since its
         renters include others who don’t own. Language at home: YouGov and DemosAU.</span>
         <span className="info-p"><b>Reading a gap.</b> Each figure carries its 95% margin, usually
-        2 to 5 points. A pooled figure moves less than any one poll’s, but a gap smaller than the
-        margins either side may still be noise.</span>
+        2 to 5 points. It is the {xref("interval", "breakdowns by group", "95% interval")} taken
+        over the group’s pooled gaps, with each poll’s sample for the group estimated as the poll’s
+        sample times the group’s share of adults: 18–34s are about 28%.</span>
+        <span className="info-p"><b>What “significantly” means.</b> The sentences under the figures
+        and the charts call a difference or a change significant only when chance is an unlikely
+        explanation for it. If the groups really voted alike, or hadn’t really moved, a gap as large
+        as the one measured would turn up less than one time in twenty.</span>
+        <span className="info-p"><b>Differences between groups.</b> Two groups differ significantly
+        when the gap between them is larger than its own margin. That margin combines both groups’
+        margins. Because the groups are different people, their errors partly offset, so margins of
+        1.3 and 1.2 points combine to 1.8, not 2.5. With three or four groups there are three to six
+        gaps to choose from, and testing that many at one in twenty would find a difference that
+        isn’t there far more often than that. So the bar rises with the number of gaps. With six,
+        the clearest gap must be one chance would produce less than one time in 120, the next one
+        time in 100, then 80, and so on, stopping at the first that falls short. The sentence then
+        reports what passes: no difference, a steady rise or fall across ordered groups such as age
+        (only when every step passes), one group apart from all the others, or failing those, the
+        largest gap that passes.</span>
+        <span className="info-p"><b>Changes over time.</b> The sentence under each chart asks whether
+        any group has moved towards or away from the party, relative to all voters, over the period
+        on screen. The monthly lines can’t answer that by themselves. Resolve asked alone until
+        February 2026, then YouGov, RedBridge, and DemosAU joined, and pollsters read some groups
+        differently, so a line can move just because a new pollster arrived. The test compares each
+        pollster only with itself. It fits a straight line through every poll’s gap for the group,
+        giving each pollster its own level and all of them one shared slope, with larger polls
+        counting for more. How far the polls scatter around that line is measured from the polls
+        themselves rather than assumed. The slope counts as a change when chance would produce one
+        that steep less than one time in twenty, and the same rising bar applies across three or
+        four groups. Men and women, and the two language groups, are a single test of the gap
+        between them.</span>
+        <span className="info-p"><b>Limits.</b> One in twenty is a convention, and a result near the
+        line can flip with a single new poll. The margins can’t see pollsters defining or weighting
+        a group differently, though the test over time sidesteps that by comparing each pollster
+        with itself. It looks for steady change, so a rise and a fall within the period cancel out.
+        And each sentence allows only for its own tests: across every tab, party, and period, about
+        one chart sentence in twenty could report a change that isn’t there.</span>
         <span className="info-p"><b>A check.</b> Every table is checked before it’s used: each
         group must add up to 100, give or take rounding, and an all-voters column must match the
         poll’s published vote.</span>
@@ -6339,7 +6373,25 @@ function infoTerms(D) {
         Political Monitor interactive), YouGov’s published crosstabs, RedBridge’s report tables,
         and DemosAU’s report charts, measured from the chart in each report because small bars
         carry no label. Each poll’s figures for these groups are in the All polls export.</span>
-        {working(demoWork)}</>) },
+        {working(<>
+          <span className="info-p"><b>Gap between two groups:</b> z = 1.96 × (a − b) ÷ √(±a² + ±b²),
+          where a and b are the groups’ figures and ±a and ±b their 95% margins. p is the chance of
+          a z at least that far from zero under the normal curve. p &lt; 0.05 is the same as the gap
+          exceeding √(±a² + ±b²).</span>
+          <span className="info-p"><b>Several groups:</b> Holm’s method. With m gaps, sort their p
+          from smallest. The kth smallest passes if p &lt; 0.05 ÷ (m − k + 1) and every smaller one
+          passed.</span>
+          <span className="info-p"><b>Change over time:</b> for poll i from pollster h,
+          yᵢ = αₕ + βtᵢ + εᵢ, fitted by least squares weighted by each poll’s sample nᵢ. Here yᵢ is
+          the group’s gap to the poll’s all-voters figure, in percent, and tᵢ is the fieldwork date,
+          in years. With t̄ₕ and ȳₕ the pollster’s own weighted means,
+          β = Σnᵢ(tᵢ − t̄ₕ)(yᵢ − ȳₕ) ÷ Σnᵢ(tᵢ − t̄ₕ)². Its standard error is
+          √(s² ÷ Σnᵢ(tᵢ − t̄ₕ)²), where s² is the weighted sum of squared residuals ÷ (N − H − 1),
+          for N polls from the H pollsters with at least two. β gets a t-test on N − H − 1 degrees
+          of freedom; with fewer than three, the sentence says there aren’t enough polls. For two
+          groups, yᵢ is the gap between them.</span>
+          {demoWork}
+        </>)}</>) },
     ] },
     { id: "g-leaders", title: "Leaders", entries: [
       { id: "approval", term: "Approval", body: (
