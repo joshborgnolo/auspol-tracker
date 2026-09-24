@@ -118,7 +118,8 @@ jobs:
           code=0
           bash "$WRAPPER" || code=$?
           [ "$code" -eq 0 ] && exit 0
-          verdict="$(node .build/classify-failure.mjs --exit "$code" --since "$since")"
+          # a classifier that breaks must not mask the wrapper's own exit code
+          verdict="$(node .build/classify-failure.mjs --exit "$code" --since "$since" || true)"
           echo "$verdict"
           case "$verdict" in
             *'"class":"transient"'*)
