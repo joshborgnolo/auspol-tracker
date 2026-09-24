@@ -1128,7 +1128,7 @@ const CYC_EVENTS = {
     {
       date: "2018-07-28", short: "Super Saturday by-elections",
       label: "Super Saturday by-elections return every incumbent",
-      desc: "Five federal by-elections return every incumbent – Labor holds Braddon, Fremantle, Longman and Perth, and Centre Alliance holds Mayo, with the Coalition winning none.",
+      desc: "Five federal by-elections return every incumbent – Labor holds Braddon, Fremantle, Longman, and Perth, and Centre Alliance holds Mayo, with the Coalition winning none.",
       major: true,
     },
     {
@@ -2141,7 +2141,7 @@ function CycleChart({ metric, cycles, mode, hidden, hi, setHi, lifted, unlift, c
             {" "}{insight.rank.lead}
             {insight.rank.refs.map((r, i, a) => (
               <React.Fragment key={r.yr}>
-                {i > 0 && (i === a.length - 1 ? " and " : ", ")}
+                {i > 0 && (i === a.length - 1 ? (a.length > 2 ? ", and " : " and ") : ", ")}
                 <button type="button" className="ci-peer"
                         title={hidden.has(r.yr)
                           ? "Put the " + r.yr + " term back on the chart"
@@ -2330,7 +2330,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
   const QUICK = [
     { id: "all", label: "All", run: showAll, title: "Every term on the board" },
     { id: "none", label: "None", run: hideAll,
-      title: "Clear the board – no term left in the band, the mean or the download" },
+      title: "Clear the board – no term left in the band, the mean, or the download" },
     { id: "returned", label: "Returned", run: () => showOutcome("returned"),
       title: "Only terms whose government was returned" + OUTCOME_NOTE },
     { id: "ousted", label: "Ousted", run: () => showOutcome("ousted"),
@@ -2403,7 +2403,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
                   </button>
                   <button type="button" className="cyc-x"
                           title={off ? "Put " + c.year + " back on the board"
-                                     : "Take " + c.year + " off the board – out of the band, the mean and the download"}
+                                     : "Take " + c.year + " off the board – out of the band, the mean, and the download"}
                           aria-label={off ? "Put " + label + " back on the board"
                                           : "Take " + label + " off the board"}
                           onClick={() => toggle(c.year)}>{off ? "+" : "×"}</button>
@@ -2417,7 +2417,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
           <p className="ap-pop-foot">
             Click a term to draw its own line over the band, and again to put it
             back. The × takes it off the board altogether – out of the band, the
-            mean and the download.
+            mean, and the download.
           </p>
         </FilterPop>
         {/* A caption, not a control: the band is derived from the board, so it
@@ -2433,7 +2433,7 @@ function CycleLegend({ cycles, hidden, lifted, hi, setHi, chipClick, toggle, sho
               <rect className="cyc-band hi" x="4" y="2.5" width="22" height="7" fill="var(--cyc-fill)" />
               <line x1="4" y1="6" x2="26" y2="6" stroke="var(--ink-2)" strokeWidth="1.9" strokeDasharray="2 3.4" opacity="0.85" />
             </svg>
-            <span>Past terms: mean of the set, middle half and middle 80%</span>
+            <span>Past terms: mean of the set, middle half, and middle 80%</span>
           </div>
         )}
       </div>
@@ -2634,7 +2634,7 @@ function AccuracyPanel() {
   const col = (err) => (err > 0 ? "var(--alp)" : "var(--lnp)");
   const oneSided = [...A.cycles].filter((c) => c.sameSide).sort((a, b) => a.year - b.year);
   const numWord = (n) => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] ?? String(n);
-  const listJoin = (a) => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+  const listJoin = (a) => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + (a.length > 2 ? ", and " : " and ") + a[a.length - 1];
 
   const TIP_W = 184;                                // matches .acc-tip's width
   const sgn = (v) => (v > 0 ? "+" : "") + v.toFixed(1);
@@ -3670,7 +3670,7 @@ function ArchPollDetail({ p, onBack, backLabel }) {
 const POLL_TAGS = [
   { id: "2pp",   label: "2PP",   title: "Two-party preferred – one matchup (ALP v L/NP)" },
   { id: "2x2pp", label: "2×2PP", title: "Two 2PP matchups – e.g. ALP v L/NP and ALP v ON" },
-  { id: "3x2pp", label: "3×2PP", title: "Three 2PP matchups – ALP v L/NP, ALP v ON and L/NP v ON" },
+  { id: "3x2pp", label: "3×2PP", title: "Three 2PP matchups – ALP v L/NP, ALP v ON, and L/NP v ON" },
   { id: "3pp",   label: "3PP",   title: "Three-way party-preferred – ALP / L/NP / ON in one distribution" },
   { id: "ppm",   label: "PPM",   title: "Preferred prime minister" },
   { id: "aprv",  label: "Aprv",  title: "Leader approval (approve − disapprove)" },
@@ -5639,7 +5639,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         published few. The aggregates subtract it, read as of each figure’s own time, and it is a
         property of the pollster, not of this one poll.</>,
         <><strong>n<sub>eff</sub></strong> is the pollster’s own published effective sample, from its
-        Australian Polling Council methodology statement – Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent
+        Australian Polling Council methodology statement – Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent,
         and Fox & Hedgehog publish one; Resolve and Roy Morgan publish none, so a dash there means
         unpublished, not unknown.</>,
       ]} />
@@ -5884,7 +5884,7 @@ function infoTerms(D) {
      group naming its years and the size (or range) of its miss. */
   const lefBigText = (() => {
     const yrs = (a) => a.map((m) => m.at).sort((x, y) => x - y)
-      .reduce((s, y, i, arr) => s + (i ? (i === arr.length - 1 ? " and " : ", ") : "") + y, "");
+      .reduce((s, y, i, arr) => s + (i ? (i === arr.length - 1 ? (arr.length > 2 ? ", and " : " and ") : ", ") : "") + y, "");
     const size = (a) => {
       const v = a.map((m) => Math.abs(m.bt).toFixed(1)).sort();
       return (v[0] === v[v.length - 1] ? v[0] : v[0] + "–" + v[v.length - 1]) + " points";
@@ -6008,10 +6008,10 @@ function infoTerms(D) {
         weighting: the vote, the leader ratings, national direction, and every past term on Past
         cycles. The current figure beside each panel is built as the headline is: a leader’s
         rating, preferred prime minister, national direction, where One Nation’s new voters came
-        from, and the vote by age, gender and education. Measures polled about once a week or less
+        from, and the vote by age, gender, and education. Measures polled about once a week or less
         use a six-week window instead: favourability, Hanson’s approval, preferred prime minister,
-        the One Nation split and the vote by group. There a poll’s weight halves every 14 days,
-        counts in full for four weeks and fades out by day 42.</span>
+        the One Nation split, and the vote by group. There a poll’s weight halves every 14 days,
+        counts in full for four weeks, and fades out by day 42.</span>
         <span className="info-p">Preferred prime minister gets no house adjustment, and the
         undecided share is each pollster’s own reading: their differences between pollsters come
         from the questions asked, not from a lean to correct. See
@@ -6021,7 +6021,7 @@ function infoTerms(D) {
           where xᵢ is a poll’s figure minus its house effect and wᵢ = nᵢ × 2^(−d/7) × t(d) ÷ √m.</span>
           <span className="info-p"><b>nᵢ</b> is the poll’s sample: its published effective sample
           × 1.6 (the design factor) where the pollster publishes one – Newspoll, YouGov, Essential,
-          DemosAU, RedBridge/Accent and Fox & Hedgehog do – otherwise its raw sample capped at
+          DemosAU, RedBridge/Accent, and Fox & Hedgehog do – otherwise its raw sample capped at
           3,000, or 1,200 if no sample is given. <b>d</b> is the poll’s age in days, counted from
           its fieldwork midpoint. <b>t(d)</b> is 1 up to day 14, then a half-cosine taper to 0 at
           day 21. <b>m</b> is the number of polls that pollster has in the window. The window’s
@@ -6098,13 +6098,13 @@ function infoTerms(D) {
         <>How far a single poll can miss purely because it surveyed a sample rather than everyone.
         A thousand respondents carry about ±3 points at 95% confidence. The error shrinks only
         with the square root of the sample, so four times the interviews halves it. It covers
-        chance and nothing else: skewed samples, turnout assumptions and a pollster’s methods sit
+        chance and nothing else: skewed samples, turnout assumptions, and a pollster’s methods sit
         outside it. Pooling several polls narrows the chance part, which is why the headline’s
         {" "}{xref("interval", "margin of error", "95% interval")} (±{hl.ci.toFixed(1)} today) is
         tighter than one poll’s ±3. The part every pollster shares doesn’t shrink at all.</>) },
       { id: "effective-sample", term: "Effective sample", body: (
         <>How many polls the window is really worth once weighting is counted: today, {hl.nEff} of
-        the {hl.n} in it. Older polls, smaller samples and repeat polls from one pollster all pull
+        the {hl.n} in it. Older polls, smaller samples, and repeat polls from one pollster all pull
         it below the raw count. The {xref("interval", "effective sample", "95% interval")} is
         computed from it.
         <span className="info-p">A single poll has its own version, shown as {eff} beside its
@@ -6137,10 +6137,10 @@ function infoTerms(D) {
         Coalition against One Nation, is shown as published.</>) },
       { id: "primary-vote", term: "Primary vote", body: (
         <>The share of voters who put a party first, before any preferences are distributed.
-        Polls that publish no two-party figure still feed this series, the implied 2PP and the
+        Polls that publish no two-party figure still feed this series, the implied 2PP, and the
         leader ratings.</>) },
       { id: "implied-2pp", term: "Implied 2PP", body: (
-        <>The site’s main two-party figure, and the one on the hero, the share card and the
+        <>The site’s main two-party figure, and the one on the hero, the share card, and the
         summary. It takes each poll’s primary votes and distributes the minor parties’ shares
         using one fixed {xref("preference-flows", "implied 2PP", "preference table")}: the flows
         counted at the 2025 election. Every pollster allocates preferences its own way, so using
@@ -6229,19 +6229,19 @@ function infoTerms(D) {
     ] },
     { id: "g-pollsters", title: "Pollsters and their polls", entries: [
       { id: "house", term: "House", body: (
-        <>A polling company: Newspoll, YouGov, Resolve and the rest. The industry calls them
+        <>A polling company: Newspoll, YouGov, Resolve, and the rest. The industry calls them
         houses. A single poll release is often called a wave.</>) },
       { id: "apc-statement", term: "APC statement", body: (
         <>The methodology statement a pollster publishes under the Australian Polling Council’s
         Code of Conduct. The council sets the disclosure standard; the statement itself is the
         pollster’s own publication – nothing is lodged with the council. Members publish one for
         each poll, covering fieldwork dates and method, the raw sample, the effective sample
-        (what that sample is worth after weighting), the weighting used and the question order.
+        (what that sample is worth after weighting), the weighting used, and the question order.
         <span className="info-p">A poll’s breakdown links its statement where there is one, and
         reads both sample figures off it. The effective sample, scaled back up by the 1.6 design
         factor, sets the poll’s weight in the
         {" "}{xref("weighted-aggregate", "APC statement", "weighted aggregate")}. Newspoll, YouGov,
-        Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog publish one. Where a pollster
+        Essential, DemosAU, RedBridge/Accent, and Fox & Hedgehog publish one. Where a pollster
         publishes none, the breakdown shows the raw sample alone and the {eff} column shows a
         dash: the site doesn’t invent a figure the pollster never published.</span></>) },
       { id: "mrp", term: "MRP", body: (
@@ -6305,7 +6305,7 @@ function infoTerms(D) {
         {working(onsWork)}</>) },
       { id: "vote-by-group", term: "Breakdowns by group", body: (
         <>How each group – men and women, age groups, education levels – says it will vote, from
-        the tables pollsters publish with their polls. The panel “The vote by age, gender and
+        the tables pollsters publish with their polls. The panel “The vote by age, gender, and
         education” pools them into one figure per group.
         <span className="info-p"><b>How it’s built.</b> Each poll says how far a group sits from
         that poll’s own overall figure: One Nation ten points lower among 18–34s, say. Those gaps
@@ -6316,10 +6316,10 @@ function infoTerms(D) {
         group month by month, built the same way: each month’s pooled gaps are added to that
         month’s figure for all voters, as every monthly line on the site is built.</span>
         <span className="info-p"><b>Which pollsters count where.</b> Groups pool only where the
-        pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov and
-        RedBridge. 18–34: Resolve, DemosAU and YouGov. 35–54 and 55+: Resolve and DemosAU, since
+        pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov, and
+        RedBridge. 18–34: Resolve, DemosAU, and YouGov. 35–54 and 55+: Resolve and DemosAU, since
         YouGov’s bands are 35–49 and 50+. Generations: YouGov and RedBridge. Education, on three
-        levels: DemosAU, YouGov and RedBridge, with RedBridge’s two school rows combined in
+        levels: DemosAU, YouGov, and RedBridge, with RedBridge’s two school rows combined in
         proportion to its own group sizes.</span>
         <span className="info-p"><b>Reading a gap.</b> Each figure carries its 95% margin, usually
         2 to 5 points. A pooled figure moves less than any one poll’s, but a gap smaller than the
@@ -6345,7 +6345,7 @@ function infoTerms(D) {
       { id: "favourability", term: "Favourability", body: (
         <>A rating of the leader as a person: positive minus negative. RedBridge/Accent asks,
         “Do you have a favourable or unfavourable view of the following?” DemosAU asks, “What is
-        your opinion of the following people?”, offering positive, neutral and negative.
+        your opinion of the following people?”, offering positive, neutral, and negative.
         Freshwater asks its own version. A leader can be approved of for the job and disliked as
         a person, or the reverse, so {xref("approval", "favourability", "approval")} and
         favourability are shown in separate panels, never averaged together.</>) },
@@ -6374,7 +6374,7 @@ function infoTerms(D) {
   const faqs = [
     { id: "what-am-i-looking-at", q: "What exactly am I looking at in the main chart?", a: (
       <>Each dot is one published poll, placed at the midpoint of its fieldwork. The line is one
-      point per calendar month, pooling that month’s polls, adjusted for house effects and
+      point per calendar month, pooling that month’s polls, adjusted for house effects, and
       weighted by sample size, with the {xref("interval", "what am i looking at", "95% interval")}
       {" "}shaded around it. Where the two parties’ bands overlap, the polls can’t separate them
       that month. A dash (—) in any table means the pollster didn’t ask that question. The

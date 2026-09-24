@@ -535,7 +535,7 @@ function buildStaticSummary() {
         matter of question wording rather than lean. Houses that publish no two-party
         figure feed the primary-vote and leadership series only. Each poll&#8217;s weight rests on
         its published effective sample where the house publishes one &#8211; Newspoll, YouGov, Essential,
-        DemosAU, RedBridge/Accent and Fox &amp; Hedgehog do, in their Australian Polling Council
+        DemosAU, RedBridge/Accent, and Fox &amp; Hedgehog do, in their Australian Polling Council
         methodology statements &#8211; and on its raw sample otherwise.</p>
       <p>The headline carries a 95% interval &#8211; the greater of the spread among polls in the
         window and their sampling error &#8211; currently about &#177;${L.alp2ppCi95.toFixed(1)} points

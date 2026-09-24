@@ -634,7 +634,7 @@
                 ? String(run[run.length - 1]).slice(2) : run[run.length - 1]);
           const lo = svgEl.querySelector(".cyc-band.lo"), hiB = svgEl.querySelector(".cyc-band.hi");
           entries.push({
-            label: "Past terms (" + spans.map(spanFmt).join(", ") + "): mean of the set, middle half and middle 80%",
+            label: "Past terms (" + spans.map(spanFmt).join(", ") + "): mean of the set, middle half, and middle 80%",
             kind: "cycband",
             fill: inkVar("--cyc-fill"),
             lo: lo ? parseFloat(getComputedStyle(lo).opacity) || 0.09 : 0.09,

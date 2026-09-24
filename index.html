@@ -2931,7 +2931,7 @@ body.dark .tile-band { background-image: var(--tile-art-dark); }
         matter of question wording rather than lean. Houses that publish no two-party
         figure feed the primary-vote and leadership series only. Each poll&#8217;s weight rests on
         its published effective sample where the house publishes one &#8211; Newspoll, YouGov, Essential,
-        DemosAU, RedBridge/Accent and Fox &amp; Hedgehog do, in their Australian Polling Council
+        DemosAU, RedBridge/Accent, and Fox &amp; Hedgehog do, in their Australian Polling Council
         methodology statements &#8211; and on its raw sample otherwise.</p>
       <p>The headline carries a 95% interval &#8211; the greater of the spread among polls in the
         window and their sampling error &#8211; currently about &#177;1.2 points
@@ -35302,7 +35302,7 @@ window.AP.npMonthEndSlot = npMonthEndSlot;</script>
           const lo = svgEl.querySelector(".cyc-band.lo"),
             hiB = svgEl.querySelector(".cyc-band.hi");
           entries.push({
-            label: "Past terms (" + spans.map(spanFmt).join(", ") + "): mean of the set, middle half and middle 80%",
+            label: "Past terms (" + spans.map(spanFmt).join(", ") + "): mean of the set, middle half, and middle 80%",
             kind: "cycband",
             fill: inkVar("--cyc-fill"),
             lo: lo ? parseFloat(getComputedStyle(lo).opacity) || 0.09 : 0.09,
@@ -39035,12 +39035,12 @@ function ApprovalPanel({
     className: "hi-term",
     title: "What the approval question asks",
     onClick: () => window.AP.openTerm && window.AP.openTerm("approval", "Leader net approval")
-  }, "Approve minus disapprove"), " – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential and others") : React.createElement(React.Fragment, null, React.createElement("button", {
+  }, "Approve minus disapprove"), " – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential, and others") : React.createElement(React.Fragment, null, React.createElement("button", {
     type: "button",
     className: "hi-term",
     title: "What the favourability question asks",
     onClick: () => window.AP.openTerm && window.AP.openTerm("favourability", "Leader net favourability")
-  }, "Positive minus negative"), " – the person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"))), React.createElement("div", {
+  }, "Positive minus negative"), " – the person, not the job · RedBridge/Accent, DemosAU, and Freshwater ask favourability, not approval"))), React.createElement("div", {
     className: "card-head-tools"
   }, !lockMetric && React.createElement(TextToggle, {
     caps: true,
@@ -39154,11 +39154,11 @@ function ApprovalPanel({
   }));
 }
 const dirFmt = v => v % 1 ? v.toFixed(1) : v.toFixed(0);
-function houseList(names, max = 4, oxford = false) {
+function houseList(names, max = 4) {
   if (!names || !names.length) return "";
-  if (names.length > max) return names.slice(0, max).join(", ") + " and others";
+  if (names.length > max) return names.slice(0, max).join(", ") + ", and others";
   if (names.length === 1) return names[0];
-  return names.slice(0, -1).join(", ") + (oxford && names.length > 2 ? ", and " : " and ") + names[names.length - 1];
+  return names.slice(0, -1).join(", ") + (names.length > 2 ? ", and " : " and ") + names[names.length - 1];
 }
 const PLAIN_FRACTIONS = [[1, 5], [1, 4], [1, 3], [2, 5], [1, 2], [3, 5], [2, 3], [7, 10], [3, 4], [4, 5], [9, 10]];
 const NUM_WORDS = ["", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
@@ -39179,7 +39179,7 @@ function DirectionPanel({
     series
   } = window.AP;
   const narrow = useNarrow();
-  const asked = houseList(D.directionHouses, 4, true);
+  const asked = houseList(D.directionHouses);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   if (!D.direction.length) {
     return React.createElement("section", {
@@ -39913,7 +39913,7 @@ function DemographicsPanel({
     className: "card-head"
   }, React.createElement("div", null, React.createElement("h2", {
     className: "card-title"
-  }, "The vote by age, gender and education"), React.createElement("p", {
+  }, "The vote by age, gender, and education"), React.createElement("p", {
     className: "card-sub"
   }, name, "\u2019s share of each group\u2019s first-preference vote, pooled from the last ", T.window, " of polls \xB7 ", houseList(T.houses.map(demoHouse))))), React.createElement("div", {
     className: "demo-ctl"
@@ -39953,7 +39953,7 @@ function DemographicsPanel({
   }, "The figures pool the last ", T.window, " of polls. Each chart shows how much higher or lower the party\u2019s vote is in each group than among all voters, month by month.", " ", React.createElement("button", {
     type: "button",
     className: "hi-term",
-    onClick: () => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender and education")
+    onClick: () => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender, and education")
   }, "Where the figures come from")), React.createElement("details", {
     className: "view-how hint-how"
   }, React.createElement("summary", null, "How to read these charts"), React.createElement("p", {
@@ -41244,7 +41244,7 @@ function NextPollsPanel() {
       title: x.since ? `Since the previous ${r.basis === "published" ? "publication" : "fieldwork end"}, ${fmtDay(x.since)}` : undefined
     }, x.gap != null ? `${x.gap} days` : "")))), React.createElement("p", {
       className: "npd-foot"
-    }, "Median ", r.cadence, " days between", " ", r.basis === "published" ? "publications" : "fieldwork ends", " across the last ", r.gapsUsed, " intervals", r.monthEnd ? "" : r.spreadEarly != null && r.spreadEarly !== r.spreadLate ? `, –${r.spreadEarly}/+${r.spreadLate} days` : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : "", ".", r.basis !== "published" && React.createElement(React.Fragment, null, " ", "Plus", " ", r.lagMeasured ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases` : "the field’s one-day publication lag", "."), r.releaseDow != null && !r.monthEnd && ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`, r.monthEnd && ` Projected onto the ${WD[r.releaseDow]} nearest the month’s last day${hour ? `, when it files at ${zoned(hour, r.release)}` : ""} – the day it has published on in ${r.monthEndKept} of its last ${r.monthEndN} releases.`, r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`, (r.declared || []).length > 0 && ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`, r.summer && ` That puts the next one in the summer break. No federal poll has been published between 23 December and 8 January, and last summer the pollsters came back anywhere from 9 January to 1 February, so that range is the window.`)));
+    }, "Median ", r.cadence, " days between", " ", r.basis === "published" ? "publications" : "fieldwork ends", " across the last ", r.gapsUsed, " intervals", r.monthEnd ? "" : r.spreadEarly != null && r.spreadEarly !== r.spreadLate ? `, –${r.spreadEarly}/+${r.spreadLate} days` : r.spread ? `, ± ${r.spread} day${r.spread === 1 ? "" : "s"}` : "", ".", r.basis !== "published" && React.createElement(React.Fragment, null, " ", "Plus", " ", r.lagMeasured ? `a ${r.lag}-day publication lag measured off ${r.lagMeasured} releases` : "the field’s one-day publication lag", "."), r.releaseDow != null && !r.monthEnd && ` Nudged onto ${WD[r.releaseDow]}${hour ? `, when it files at ${zoned(hour, r.release)}` : ""}.`, r.monthEnd && ` Projected onto the ${WD[r.releaseDow]} nearest the month’s last day${hour ? `, when it files at ${zoned(hour, r.release)}` : ""} – the day it has published on in ${r.monthEndKept} of its last ${r.monthEndN} releases.`, r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`, (r.declared || []).length > 0 && ` The ${houseList(r.declared, Infinity)} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`, r.summer && ` That puts the next one in the summer break. No federal poll has been published between 23 December and 8 January, and last summer the pollsters came back anywhere from 9 January to 1 February, so that range is the window.`)));
   })));
 }
 window.AP.measureOfMatchup = id => ({
@@ -42559,7 +42559,7 @@ const CYC_EVENTS = {
     date: "2018-07-28",
     short: "Super Saturday by-elections",
     label: "Super Saturday by-elections return every incumbent",
-    desc: "Five federal by-elections return every incumbent – Labor holds Braddon, Fremantle, Longman and Perth, and Centre Alliance holds Mayo, with the Coalition winning none.",
+    desc: "Five federal by-elections return every incumbent – Labor holds Braddon, Fremantle, Longman, and Perth, and Centre Alliance holds Mayo, with the Coalition winning none.",
     major: true
   }, {
     date: "2018-08-21",
@@ -43305,7 +43305,7 @@ function CycleChart({
     const level = parseFloat(shown) === 0;
     const rankJsx = insight.rank && React.createElement(React.Fragment, null, " ", insight.rank.lead, insight.rank.refs.map((r, i, a) => React.createElement(React.Fragment, {
       key: r.yr
-    }, i > 0 && (i === a.length - 1 ? " and " : ", "), React.createElement("button", {
+    }, i > 0 && (i === a.length - 1 ? a.length > 2 ? ", and " : " and " : ", "), React.createElement("button", {
       type: "button",
       className: "ci-peer",
       title: hidden.has(r.yr) ? "Put the " + r.yr + " term back on the chart" : "Draw the " + r.yr + " term's own line",
@@ -43436,7 +43436,7 @@ function CycleLegend({
     id: "none",
     label: "None",
     run: hideAll,
-    title: "Clear the board – no term left in the band, the mean or the download"
+    title: "Clear the board – no term left in the band, the mean, or the download"
   }, {
     id: "returned",
     label: "Returned",
@@ -43510,14 +43510,14 @@ function CycleLegend({
       }, "Now")), React.createElement("button", {
         type: "button",
         className: "cyc-x",
-        title: off ? "Put " + c.year + " back on the board" : "Take " + c.year + " off the board – out of the band, the mean and the download",
+        title: off ? "Put " + c.year + " back on the board" : "Take " + c.year + " off the board – out of the band, the mean, and the download",
         "aria-label": off ? "Put " + label + " back on the board" : "Take " + label + " off the board",
         onClick: () => toggle(c.year)
       }, off ? "+" : "×"))
     );
   })), React.createElement("p", {
     className: "ap-pop-foot"
-  }, "Click a term to draw its own line over the band, and again to put it back. The \xD7 takes it off the board altogether \u2013 out of the band, the mean and the download.")), banded && React.createElement("div", {
+  }, "Click a term to draw its own line over the band, and again to put it back. The \xD7 takes it off the board altogether \u2013 out of the band, the mean, and the download.")), banded && React.createElement("div", {
     className: "cyc-band-note",
     "aria-hidden": "true"
   }, React.createElement("svg", {
@@ -43546,7 +43546,7 @@ function CycleLegend({
     strokeWidth: "1.9",
     strokeDasharray: "2 3.4",
     opacity: "0.85"
-  })), React.createElement("span", null, "Past terms: mean of the set, middle half and middle 80%"))));
+  })), React.createElement("span", null, "Past terms: mean of the set, middle half, and middle 80%"))));
 }
 function apprMetricLabel(a) {
   const by = a.metricBy || {};
@@ -43660,7 +43660,7 @@ function AccuracyPanel() {
   const col = err => err > 0 ? "var(--alp)" : "var(--lnp)";
   const oneSided = [...A.cycles].filter(c => c.sameSide).sort((a, b) => a.year - b.year);
   const numWord = n => ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"][n] ?? String(n);
-  const listJoin = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + " and " + a[a.length - 1];
+  const listJoin = a => a.length < 2 ? a.join("") : a.slice(0, -1).join(", ") + (a.length > 2 ? ", and " : " and ") + a[a.length - 1];
   const TIP_W = 184;
   const sgn = v => (v > 0 ? "+" : "") + v.toFixed(1);
   const lean = err => err > 0 ? "Labor overstated" : err < 0 ? "Labor understated" : "Exactly on the result";
@@ -44688,7 +44688,7 @@ const POLL_TAGS = [{
 }, {
   id: "3x2pp",
   label: "3×2PP",
-  title: "Three 2PP matchups – ALP v L/NP, ALP v ON and L/NP v ON"
+  title: "Three 2PP matchups – ALP v L/NP, ALP v ON, and L/NP v ON"
 }, {
   id: "3pp",
   label: "3PP",
@@ -46946,7 +46946,7 @@ function AllPollsView({
       className: "hint-wide"
     }, " ", CANT_HOVER ? "Tap" : "Click", " the \u201C", pubBasis ? "As published" : "Implied 2PP", "\u201D heading to switch bases."), React.createElement("span", {
       className: "hint-narrow"
-    }, " The Basis switch above the table changes bases.")), React.createElement(React.Fragment, null, React.createElement("strong", null, "Poll lean"), " is the poll\u2019s ", pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate", " for that month. ", React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on ", pubBasis ? "published" : "implied", " 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll."), React.createElement(React.Fragment, null, React.createElement("strong", null, "n", React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, from its Australian Polling Council methodology statement \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog publish one; Resolve and Roy Morgan publish none, so a dash there means unpublished, not unknown.")]
+    }, " The Basis switch above the table changes bases.")), React.createElement(React.Fragment, null, React.createElement("strong", null, "Poll lean"), " is the poll\u2019s ", pubBasis ? "published 2PP minus the aggregate" : "implied 2PP minus the implied aggregate", " for that month. ", React.createElement("strong", null, "House effect"), " is how far a pollster systematically sits from the cross-house consensus on ", pubBasis ? "published" : "implied", " 2PP \u2013 pooled from its polls with a 90-day half-life, so its recent methods count for more, and shrunk toward zero while it has published few. The aggregates subtract it, read as of each figure\u2019s own time, and it is a property of the pollster, not of this one poll."), React.createElement(React.Fragment, null, React.createElement("strong", null, "n", React.createElement("sub", null, "eff")), " is the pollster\u2019s own published effective sample, from its Australian Polling Council methodology statement \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent, and Fox & Hedgehog publish one; Resolve and Roy Morgan publish none, so a dash there means unpublished, not unknown.")]
   }), React.createElement(VariancePanel, {
     key: facet,
     facet: facet,
@@ -47131,7 +47131,7 @@ function infoTerms(D) {
   const lefMean = lefMiss.length ? lefMiss.reduce((s, m) => s + Math.abs(m.bt), 0) / lefMiss.length : null;
   const lefBig = lefMiss.slice().sort((a, b) => Math.abs(b.bt) - Math.abs(a.bt)).slice(0, 3);
   const lefBigText = (() => {
-    const yrs = a => a.map(m => m.at).sort((x, y) => x - y).reduce((s, y, i, arr) => s + (i ? i === arr.length - 1 ? " and " : ", " : "") + y, "");
+    const yrs = a => a.map(m => m.at).sort((x, y) => x - y).reduce((s, y, i, arr) => s + (i ? i === arr.length - 1 ? arr.length > 2 ? ", and " : " and " : ", " : "") + y, "");
     const size = a => {
       const v = a.map(m => Math.abs(m.bt).toFixed(1)).sort();
       return (v[0] === v[v.length - 1] ? v[0] : v[0] + "–" + v[v.length - 1]) + " points";
@@ -47206,13 +47206,13 @@ function infoTerms(D) {
         className: "info-p"
       }, "The headline two-party figure runs each poll\u2019s primary votes through the fixed 2025 preference table \u2013 the", " ", xref("implied-2pp", "weighted aggregate", "implied 2PP"), " \u2013 so every poll that publishes primaries counts.", SL ? React.createElement(React.Fragment, null, " Today that is ", SL.alp.toFixed(1), "\u2013", SL.lnp.toFixed(1), " to Labor.") : null, " The pollsters\u2019 own published figures go through the same machinery for the version the chart switches to: ", L.alp2pp.toFixed(1), "\u2013", L.lnp2pp.toFixed(1), "."), React.createElement("span", {
         className: "info-p"
-      }, "The monthly trend lines use the same method without the recency weighting: the vote, the leader ratings, national direction, and every past term on Past cycles. The current figure beside each panel is built as the headline is: a leader\u2019s rating, preferred prime minister, national direction, where One Nation\u2019s new voters came from, and the vote by age, gender and education. Measures polled about once a week or less use a six-week window instead: favourability, Hanson\u2019s approval, preferred prime minister, the One Nation split and the vote by group. There a poll\u2019s weight halves every 14 days, counts in full for four weeks and fades out by day 42."), React.createElement("span", {
+      }, "The monthly trend lines use the same method without the recency weighting: the vote, the leader ratings, national direction, and every past term on Past cycles. The current figure beside each panel is built as the headline is: a leader\u2019s rating, preferred prime minister, national direction, where One Nation\u2019s new voters came from, and the vote by age, gender, and education. Measures polled about once a week or less use a six-week window instead: favourability, Hanson\u2019s approval, preferred prime minister, the One Nation split, and the vote by group. There a poll\u2019s weight halves every 14 days, counts in full for four weeks, and fades out by day 42."), React.createElement("span", {
         className: "info-p"
       }, "Preferred prime minister gets no house adjustment, and the undecided share is each pollster\u2019s own reading: their differences between pollsters come from the questions asked, not from a lean to correct. See", " ", xref("monthly-average", "weighted aggregate", "monthly averages"), "."), working(React.createElement(React.Fragment, null, React.createElement("span", {
         className: "info-p"
       }, "The headline is \u03A3w\u1D62x\u1D62 \xF7 \u03A3w\u1D62 over the polls in the 21-day window, where x\u1D62 is a poll\u2019s figure minus its house effect and w\u1D62 = n\u1D62 \xD7 2^(\u2212d/7) \xD7 t(d) \xF7 \u221Am."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "n\u1D62"), " is the poll\u2019s sample: its published effective sample \xD7 1.6 (the design factor) where the pollster publishes one \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog do \u2013 otherwise its raw sample capped at 3,000, or 1,200 if no sample is given. ", React.createElement("b", null, "d"), " is the poll\u2019s age in days, counted from its fieldwork midpoint. ", React.createElement("b", null, "t(d)"), " is 1 up to day 14, then a half-cosine taper to 0 at day 21. ", React.createElement("b", null, "m"), " is the number of polls that pollster has in the window. The window\u2019s effective sample is (\u03A3w\u1D62)\xB2 \xF7 \u03A3w\u1D62\xB2. If the window is empty, the last monthly point stands in."), React.createElement("span", {
+      }, React.createElement("b", null, "n\u1D62"), " is the poll\u2019s sample: its published effective sample \xD7 1.6 (the design factor) where the pollster publishes one \u2013 Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent, and Fox & Hedgehog do \u2013 otherwise its raw sample capped at 3,000, or 1,200 if no sample is given. ", React.createElement("b", null, "d"), " is the poll\u2019s age in days, counted from its fieldwork midpoint. ", React.createElement("b", null, "t(d)"), " is 1 up to day 14, then a half-cosine taper to 0 at day 21. ", React.createElement("b", null, "m"), " is the number of polls that pollster has in the window. The window\u2019s effective sample is (\u03A3w\u1D62)\xB2 \xF7 \u03A3w\u1D62\xB2. If the window is empty, the last monthly point stands in."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Worked example: the Labor primary."), " Each party\u2019s primary is estimated the same way. The five are rescaled only if their total sits more than half a point from the plain-average total, so a real shortfall from undecided voters is kept."), primWork, React.createElement("span", {
         className: "info-p"
@@ -47258,11 +47258,11 @@ function infoTerms(D) {
     }, {
       id: "margin-of-error",
       term: "Margin of error",
-      body: React.createElement(React.Fragment, null, "How far a single poll can miss purely because it surveyed a sample rather than everyone. A thousand respondents carry about \xB13 points at 95% confidence. The error shrinks only with the square root of the sample, so four times the interviews halves it. It covers chance and nothing else: skewed samples, turnout assumptions and a pollster\u2019s methods sit outside it. Pooling several polls narrows the chance part, which is why the headline\u2019s", " ", xref("interval", "margin of error", "95% interval"), " (\xB1", hl.ci.toFixed(1), " today) is tighter than one poll\u2019s \xB13. The part every pollster shares doesn\u2019t shrink at all.")
+      body: React.createElement(React.Fragment, null, "How far a single poll can miss purely because it surveyed a sample rather than everyone. A thousand respondents carry about \xB13 points at 95% confidence. The error shrinks only with the square root of the sample, so four times the interviews halves it. It covers chance and nothing else: skewed samples, turnout assumptions, and a pollster\u2019s methods sit outside it. Pooling several polls narrows the chance part, which is why the headline\u2019s", " ", xref("interval", "margin of error", "95% interval"), " (\xB1", hl.ci.toFixed(1), " today) is tighter than one poll\u2019s \xB13. The part every pollster shares doesn\u2019t shrink at all.")
     }, {
       id: "effective-sample",
       term: "Effective sample",
-      body: React.createElement(React.Fragment, null, "How many polls the window is really worth once weighting is counted: today, ", hl.nEff, " of the ", hl.n, " in it. Older polls, smaller samples and repeat polls from one pollster all pull it below the raw count. The ", xref("interval", "effective sample", "95% interval"), " is computed from it.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "How many polls the window is really worth once weighting is counted: today, ", hl.nEff, " of the ", hl.n, " in it. Older polls, smaller samples, and repeat polls from one pollster all pull it below the raw count. The ", xref("interval", "effective sample", "95% interval"), " is computed from it.", React.createElement("span", {
         className: "info-p"
       }, "A single poll has its own version, shown as ", eff, " beside its sample: the effective sample its pollster publishes in its", " ", xref("apc-statement", "effective sample", "APC statement"), ", which says what that one sample is worth after weighting."))
     }, {
@@ -47288,11 +47288,11 @@ function infoTerms(D) {
     }, {
       id: "primary-vote",
       term: "Primary vote",
-      body: React.createElement(React.Fragment, null, "The share of voters who put a party first, before any preferences are distributed. Polls that publish no two-party figure still feed this series, the implied 2PP and the leader ratings.")
+      body: React.createElement(React.Fragment, null, "The share of voters who put a party first, before any preferences are distributed. Polls that publish no two-party figure still feed this series, the implied 2PP, and the leader ratings.")
     }, {
       id: "implied-2pp",
       term: "Implied 2PP",
-      body: React.createElement(React.Fragment, null, "The site\u2019s main two-party figure, and the one on the hero, the share card and the summary. It takes each poll\u2019s primary votes and distributes the minor parties\u2019 shares using one fixed ", xref("preference-flows", "implied 2PP", "preference table"), ": the flows counted at the 2025 election. Every pollster allocates preferences its own way, so using one table for all of them means the figure moves when voters do, not when the mix of pollsters changes. It also lets every poll that publishes primaries count.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "The site\u2019s main two-party figure, and the one on the hero, the share card, and the summary. It takes each poll\u2019s primary votes and distributes the minor parties\u2019 shares using one fixed ", xref("preference-flows", "implied 2PP", "preference table"), ": the flows counted at the 2025 election. Every pollster allocates preferences its own way, so using one table for all of them means the figure moves when voters do, not when the mix of pollsters changes. It also lets every poll that publishes primaries count.", React.createElement("span", {
         className: "info-p"
       }, "A switch under the two-party heading shows the pollsters\u2019 own published figures instead. Neither is the true 2PP.", D.synthLatest && D.synth2pp && D.synth2pp.length > 1 ? React.createElement(React.Fragment, null, " Today the implied figure reads ", D.synthLatest.alp.toFixed(1), " against the published", " ", L.alp2pp.toFixed(1), ": a gap, not a verdict. With One Nation on ", onp, "% of the primary vote, five points of doubt about where its preferences go moves the two-party figure", " ", (prim.onp * 0.05).toFixed(1), " points either way.") : null), L.onImp ? React.createElement("span", {
         className: "info-p"
@@ -47346,13 +47346,13 @@ function infoTerms(D) {
     entries: [{
       id: "house",
       term: "House",
-      body: React.createElement(React.Fragment, null, "A polling company: Newspoll, YouGov, Resolve and the rest. The industry calls them houses. A single poll release is often called a wave.")
+      body: React.createElement(React.Fragment, null, "A polling company: Newspoll, YouGov, Resolve, and the rest. The industry calls them houses. A single poll release is often called a wave.")
     }, {
       id: "apc-statement",
       term: "APC statement",
-      body: React.createElement(React.Fragment, null, "The methodology statement a pollster publishes under the Australian Polling Council\u2019s Code of Conduct. The council sets the disclosure standard; the statement itself is the pollster\u2019s own publication \u2013 nothing is lodged with the council. Members publish one for each poll, covering fieldwork dates and method, the raw sample, the effective sample (what that sample is worth after weighting), the weighting used and the question order.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "The methodology statement a pollster publishes under the Australian Polling Council\u2019s Code of Conduct. The council sets the disclosure standard; the statement itself is the pollster\u2019s own publication \u2013 nothing is lodged with the council. Members publish one for each poll, covering fieldwork dates and method, the raw sample, the effective sample (what that sample is worth after weighting), the weighting used, and the question order.", React.createElement("span", {
         className: "info-p"
-      }, "A poll\u2019s breakdown links its statement where there is one, and reads both sample figures off it. The effective sample, scaled back up by the 1.6 design factor, sets the poll\u2019s weight in the", " ", xref("weighted-aggregate", "APC statement", "weighted aggregate"), ". Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent and Fox & Hedgehog publish one. Where a pollster publishes none, the breakdown shows the raw sample alone and the ", eff, " column shows a dash: the site doesn\u2019t invent a figure the pollster never published."))
+      }, "A poll\u2019s breakdown links its statement where there is one, and reads both sample figures off it. The effective sample, scaled back up by the 1.6 design factor, sets the poll\u2019s weight in the", " ", xref("weighted-aggregate", "APC statement", "weighted aggregate"), ". Newspoll, YouGov, Essential, DemosAU, RedBridge/Accent, and Fox & Hedgehog publish one. Where a pollster publishes none, the breakdown shows the raw sample alone and the ", eff, " column shows a dash: the site doesn\u2019t invent a figure the pollster never published."))
     }, {
       id: "mrp",
       term: "MRP",
@@ -47395,11 +47395,11 @@ function infoTerms(D) {
     }, {
       id: "vote-by-group",
       term: "Breakdowns by group",
-      body: React.createElement(React.Fragment, null, "How each group \u2013 men and women, age groups, education levels \u2013 says it will vote, from the tables pollsters publish with their polls. The panel \u201CThe vote by age, gender and education\u201D pools them into one figure per group.", React.createElement("span", {
+      body: React.createElement(React.Fragment, null, "How each group \u2013 men and women, age groups, education levels \u2013 says it will vote, from the tables pollsters publish with their polls. The panel \u201CThe vote by age, gender, and education\u201D pools them into one figure per group.", React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "How it\u2019s built."), " Each poll says how far a group sits from that poll\u2019s own overall figure: One Nation ten points lower among 18\u201334s, say. Those gaps are pooled over the last six weeks of polls, weighted as the headline\u2019s polls are, so newer and larger polls count for more. They are then added to the site\u2019s current figure for all voters. Measuring each poll against its own total removes its pollster\u2019s lean, and puts every group on the same level as the headline. The charts under the figures follow each group month by month, built the same way: each month\u2019s pooled gaps are added to that month\u2019s figure for all voters, as every monthly line on the site is built."), React.createElement("span", {
         className: "info-p"
-      }, React.createElement("b", null, "Which pollsters count where."), " Groups pool only where the pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov and RedBridge. 18\u201334: Resolve, DemosAU and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+. Generations: YouGov and RedBridge. Education, on three levels: DemosAU, YouGov and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes."), React.createElement("span", {
+      }, React.createElement("b", null, "Which pollsters count where."), " Groups pool only where the pollsters cut the population the same way. Men and women: Resolve, DemosAU, YouGov, and RedBridge. 18\u201334: Resolve, DemosAU, and YouGov. 35\u201354 and 55+: Resolve and DemosAU, since YouGov\u2019s bands are 35\u201349 and 50+. Generations: YouGov and RedBridge. Education, on three levels: DemosAU, YouGov, and RedBridge, with RedBridge\u2019s two school rows combined in proportion to its own group sizes."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Reading a gap."), " Each figure carries its 95% margin, usually 2 to 5 points. A pooled figure moves less than any one poll\u2019s, but a gap smaller than the margins either side may still be noise."), React.createElement("span", {
         className: "info-p"
@@ -47417,7 +47417,7 @@ function infoTerms(D) {
     }, {
       id: "favourability",
       term: "Favourability",
-      body: React.createElement(React.Fragment, null, "A rating of the leader as a person: positive minus negative. RedBridge/Accent asks, \u201CDo you have a favourable or unfavourable view of the following?\u201D DemosAU asks, \u201CWhat is your opinion of the following people?\u201D, offering positive, neutral and negative. Freshwater asks its own version. A leader can be approved of for the job and disliked as a person, or the reverse, so ", xref("approval", "favourability", "approval"), " and favourability are shown in separate panels, never averaged together.")
+      body: React.createElement(React.Fragment, null, "A rating of the leader as a person: positive minus negative. RedBridge/Accent asks, \u201CDo you have a favourable or unfavourable view of the following?\u201D DemosAU asks, \u201CWhat is your opinion of the following people?\u201D, offering positive, neutral, and negative. Freshwater asks its own version. A leader can be approved of for the job and disliked as a person, or the reverse, so ", xref("approval", "favourability", "approval"), " and favourability are shown in separate panels, never averaged together.")
     }, {
       id: "net-approval",
       term: "Net approval",
@@ -47431,7 +47431,7 @@ function infoTerms(D) {
   const faqs = [{
     id: "what-am-i-looking-at",
     q: "What exactly am I looking at in the main chart?",
-    a: React.createElement(React.Fragment, null, "Each dot is one published poll, placed at the midpoint of its fieldwork. The line is one point per calendar month, pooling that month\u2019s polls, adjusted for house effects and weighted by sample size, with the ", xref("interval", "what am i looking at", "95% interval"), " ", "shaded around it. Where the two parties\u2019 bands overlap, the polls can\u2019t separate them that month. A dash (\u2014) in any table means the pollster didn\u2019t ask that question. The headline figure at the top is calculated separately, over the last 21 days \u2013 see", " ", xref("weighted-aggregate", "what am i looking at", "Weighted aggregate"), " \u2013 so it can move before the monthly line catches up.")
+    a: React.createElement(React.Fragment, null, "Each dot is one published poll, placed at the midpoint of its fieldwork. The line is one point per calendar month, pooling that month\u2019s polls, adjusted for house effects, and weighted by sample size, with the ", xref("interval", "what am i looking at", "95% interval"), " ", "shaded around it. Where the two parties\u2019 bands overlap, the polls can\u2019t separate them that month. A dash (\u2014) in any table means the pollster didn\u2019t ask that question. The headline figure at the top is calculated separately, over the last 21 days \u2013 see", " ", xref("weighted-aggregate", "what am i looking at", "Weighted aggregate"), " \u2013 so it can move before the monthly line catches up.")
   }, {
     id: "where-does-data-come-from",
     q: "Where do the numbers come from?",

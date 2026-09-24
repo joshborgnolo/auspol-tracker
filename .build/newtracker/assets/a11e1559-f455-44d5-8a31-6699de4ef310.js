@@ -1154,12 +1154,12 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
                      title="What the approval question asks"
                      onClick={() => window.AP.openTerm &&
                        window.AP.openTerm("approval", "Leader net approval")}>Approve minus disapprove</button>
-                   {" – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential and others"}</>)
+                   {" – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential, and others"}</>)
               : (<><button type="button" className="hi-term"
                      title="What the favourability question asks"
                      onClick={() => window.AP.openTerm &&
                        window.AP.openTerm("favourability", "Leader net favourability")}>Positive minus negative</button>
-                   {" – the person, not the job · RedBridge/Accent, DemosAU and Freshwater ask favourability, not approval"}</>)}
+                   {" – the person, not the job · RedBridge/Accent, DemosAU, and Freshwater ask favourability, not approval"}</>)}
           </p>
         </div>
         <div className="card-head-tools">
@@ -1275,11 +1275,11 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
 // misstate it. Axis ticks land on whole numbers, so they stay clean.
 const dirFmt = (v) => (v % 1 ? v.toFixed(1) : v.toFixed(0));
 
-function houseList(names, max = 4, oxford = false) {
+function houseList(names, max = 4) {
   if (!names || !names.length) return "";
-  if (names.length > max) return names.slice(0, max).join(", ") + " and others";
+  if (names.length > max) return names.slice(0, max).join(", ") + ", and others";
   if (names.length === 1) return names[0];
-  return names.slice(0, -1).join(", ") + (oxford && names.length > 2 ? ", and " : " and ") + names[names.length - 1];
+  return names.slice(0, -1).join(", ") + (names.length > 2 ? ", and " : " and ") + names[names.length - 1];
 }
 
 /* A share as the nearest plain fraction a reader would say aloud: 62.5 →
@@ -1299,7 +1299,7 @@ function plainShare(v) {
 function DirectionPanel({ rangeId }) {
   const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
   const narrow = useNarrow();
-  const asked = houseList(D.directionHouses, 4, true);
+  const asked = houseList(D.directionHouses);
   const question = "‘Is the country heading in the right direction, or on the wrong track?’";
   // no right-track / wrong-track series in the dataset yet – keep the panel
   // as an honest empty state so the question has a home when it's polled
@@ -1865,7 +1865,7 @@ function DemographicsPanel({ rangeId = "all" }) {
     <section className="card">
       <div className="card-head">
         <div>
-          <h2 className="card-title">The vote by age, gender and education</h2>
+          <h2 className="card-title">The vote by age, gender, and education</h2>
           <p className="card-sub">
             {name}’s share of each group’s first-preference vote, pooled from the last {T.window} of polls · {houseList(T.houses.map(demoHouse))}
           </p>
@@ -1900,7 +1900,7 @@ function DemographicsPanel({ rangeId = "all" }) {
         The figures pool the last {T.window} of polls. Each chart shows how much higher or lower
         the party’s vote is in each group than among all voters, month by month.{" "}
         <button type="button" className="hi-term"
-                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender and education")}>
+                onClick={() => window.AP.openTerm && window.AP.openTerm("vote-by-group", "The vote by age, gender, and education")}>
           Where the figures come from</button>
       </p>
       <details className="view-how hint-how">
@@ -3498,7 +3498,7 @@ function NextPollsPanel() {
                     ` Projected onto the ${WD[r.releaseDow]} nearest the month’s last day${hour ? `, when it files at ${zoned(hour, r.release)}` : ""} – the day it has published on in ${r.monthEndKept} of its last ${r.monthEndN} releases.`}
                   {r.releaseDow == null && hour && ` It files at ${zoned(hour, r.release)}.`}
                   {(r.declared || []).length > 0 &&
-                    ` The ${r.declared.join(" and ")} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`}
+                    ` The ${houseList(r.declared, Infinity)} ${r.declared.length > 1 ? "are" : "is"} stated from ${r.pollster}’s own schedule rather than measured.`}
                   {/* the slot this rhythm names falls in the summer break, so
                       the row is the resumption window instead (npInSummer) */}
                   {r.summer &&
