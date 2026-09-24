@@ -1338,6 +1338,17 @@ function plainShare(v) {
   const lead = Math.abs(d) < 0.5 ? "About" : d < 0 ? "Almost" : "More than";
   return lead + " " + (a === 1 && b === 2 ? "half of" : NUM_WORDS[a] + " in " + NUM_WORDS[b]);
 }
+/* A ratio as a reader would say it, to the nearest half: 2.52 → "about two
+   and a half times", 2.1 → "about twice". No finer: a ratio of two pooled
+   figures is rarely known closer than that (the Coalition-to-Labor ratio
+   under the One Nation panel carried a 95% range of about 2.1 to 3.1 when
+   it read 2.5). */
+function timesWords(r) {
+  const h = Math.round(r * 2) / 2;
+  if (h >= 11) return "about " + Math.round(r) + " times";
+  if (h === 2) return "about twice";
+  return "about " + NUM_WORDS[Math.floor(h)] + (h % 1 ? " and a half" : "") + " times";
+}
 
 // ---- National direction (right track / wrong track) -----------------
 function DirectionPanel({ rangeId }) {
@@ -1656,6 +1667,29 @@ function OnSourcesPanel({ rangeId }) {
     return { sr, v: last.v, ym: last.ym, chg: prev ? +(last.v - prev.v).toFixed(1) : null };
   });
   const [a, b] = reads;
+  /* The lead is the comparison the tables make plainest, the Coalition
+     against Labor: how many times as many voters one has lost to One Nation
+     as the other (the gain view), or how many times as likely its 2025
+     voters are to have switched (the rates) - each view its own ratio, the
+     Coalition's smaller 2025 vote making its rate ratio the larger. The
+     figures themselves are the readings just below. */
+  const onsLead = (() => {
+    const when = a.now ? "Across the latest polls" : "In " + monthOf(a.ym);
+    if (!(a.v > 0 && b.v > 0)) return `${when}, ${a.v.toFixed(1)}% against ${b.v.toFixed(1)}%.`;
+    const lnpMore = a.v >= b.v, x = lnpMore ? a.v / b.v : b.v / a.v;
+    if (rated) {
+      const [more, less] = lnpMore ? ["people who voted for the Coalition in 2025", "Labor voters"]
+        : ["people who voted Labor in 2025", "Coalition voters"];
+      return x < 1.25
+        ? `${when}, people who voted for the Coalition or Labor in 2025 ${a.now ? "are" : "were"} about as likely as each other to now back One Nation.`
+        : `${when}, ${more} ${a.now ? "are" : "were"} ${timesWords(x)} as likely as ${less} to now back One Nation.`;
+    }
+    const [more, less] = lnpMore ? ["the Coalition", "Labor"] : ["Labor", "the Coalition"];
+    const has = a.now ? "has" : "had";
+    return x < 1.25
+      ? `${when}, the Coalition and Labor ${a.now ? "have" : "had"} lost about as many voters to One Nation as each other since the 2025 election.`
+      : `${when}, ${more} ${has} lost ${timesWords(x)} as many voters to One Nation as ${less} ${has} since the 2025 election.`;
+  })();
   return (
     <section className="card">
       <div className="card-head">
@@ -1672,13 +1706,7 @@ function OnSourcesPanel({ rangeId }) {
           <Segmented options={ONS_VIEWS} value={view} onChange={setView} size="sm" ariaLabel="Figures as a share" />
         </div>
       )}
-      <p className="ons-lead">
-        <mark>{a.now ? "Across the latest polls" : "In " + monthOf(a.ym)}, {rated
-          ? <>{a.v.toFixed(1)}% of people who voted for the Coalition in 2025 now back One Nation, as
-              do {b.v.toFixed(1)}% of Labor voters.</>
-          : <>{a.v.toFixed(1)}% of One Nation’s gain came from people who voted for the Coalition in 2025,
-              and {b.v.toFixed(1)}% from Labor voters.</>}</mark>
-      </p>
+      <p className="ons-lead"><mark>{onsLead}</mark></p>
       <div className="und-reads">
         {reads.map(({ sr, v, chg, now }) => (
           <div className="und-read" key={sr.id}>

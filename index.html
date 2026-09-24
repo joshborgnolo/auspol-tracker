@@ -40431,6 +40431,12 @@ function plainShare(v) {
   const lead = Math.abs(d) < 0.5 ? "About" : d < 0 ? "Almost" : "More than";
   return lead + " " + (a === 1 && b === 2 ? "half of" : NUM_WORDS[a] + " in " + NUM_WORDS[b]);
 }
+function timesWords(r) {
+  const h = Math.round(r * 2) / 2;
+  if (h >= 11) return "about " + Math.round(r) + " times";
+  if (h === 2) return "about twice";
+  return "about " + NUM_WORDS[Math.floor(h)] + (h % 1 ? " and a half" : "") + " times";
+}
 function DirectionPanel({
   rangeId
 }) {
@@ -40797,6 +40803,19 @@ function OnSourcesPanel({
     };
   });
   const [a, b] = reads;
+  const onsLead = (() => {
+    const when = a.now ? "Across the latest polls" : "In " + monthOf(a.ym);
+    if (!(a.v > 0 && b.v > 0)) return `${when}, ${a.v.toFixed(1)}% against ${b.v.toFixed(1)}%.`;
+    const lnpMore = a.v >= b.v,
+      x = lnpMore ? a.v / b.v : b.v / a.v;
+    if (rated) {
+      const [more, less] = lnpMore ? ["people who voted for the Coalition in 2025", "Labor voters"] : ["people who voted Labor in 2025", "Coalition voters"];
+      return x < 1.25 ? `${when}, people who voted for the Coalition or Labor in 2025 ${a.now ? "are" : "were"} about as likely as each other to now back One Nation.` : `${when}, ${more} ${a.now ? "are" : "were"} ${timesWords(x)} as likely as ${less} to now back One Nation.`;
+    }
+    const [more, less] = lnpMore ? ["the Coalition", "Labor"] : ["Labor", "the Coalition"];
+    const has = a.now ? "has" : "had";
+    return x < 1.25 ? `${when}, the Coalition and Labor ${a.now ? "have" : "had"} lost about as many voters to One Nation as each other since the 2025 election.` : `${when}, ${more} ${has} lost ${timesWords(x)} as many voters to One Nation as ${less} ${has} since the 2025 election.`;
+  })();
   return React.createElement("section", {
     className: "card"
   }, React.createElement("div", {
@@ -40815,7 +40834,7 @@ function OnSourcesPanel({
     ariaLabel: "Figures as a share"
   })), React.createElement("p", {
     className: "ons-lead"
-  }, React.createElement("mark", null, a.now ? "Across the latest polls" : "In " + monthOf(a.ym), ", ", rated ? React.createElement(React.Fragment, null, a.v.toFixed(1), "% of people who voted for the Coalition in 2025 now back One Nation, as do ", b.v.toFixed(1), "% of Labor voters.") : React.createElement(React.Fragment, null, a.v.toFixed(1), "% of One Nation\u2019s gain came from people who voted for the Coalition in 2025, and ", b.v.toFixed(1), "% from Labor voters."))), React.createElement("div", {
+  }, React.createElement("mark", null, onsLead)), React.createElement("div", {
     className: "und-reads"
   }, reads.map(({
     sr,
