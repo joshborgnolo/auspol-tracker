@@ -6,19 +6,17 @@
        reach into and the band above it stayed flat. With it the layout viewport
        covers the whole screen and every inset below is honoured. -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <!-- Full descriptive title again (og:title shares it). It WAS "auspol
-       tracker" alone: Safari centre-crops tab titles when the strip is
-       crowded, trimming from the front, so at 43 characters the tab read
-       "tracker – Australian federal polling". That crop is accepted now,
-       because the exact match with the static-summary <h1> had a worse cost:
-       Safari Reader discards a heading whose text equals document.title, so
-       it promoted the article's first <h2> ("Two-party preferred") to the
-       Reader title. With the h1 a strict prefix of document.title instead
-       of equal to it, the h1 stays a candidate and the proper masthead
-       survives into reader mode. The descriptive phrasing still reaches
-       every surface that has room for it – meta description for search
-       snippets. -->
-  <title>auspol tracker – Australian federal election polling average</title>
+  <!-- The TAB title is short and name-first; the long descriptive one is
+       og:title's (link previews have the room). Safari centre-crops tab
+       titles when the strip is crowded: at 59 characters ("…federal
+       election polling average", Sep 2026 SEO change) the tab read
+       "election polling av…" and lost the name entirely. At 33 the name
+       survives any sensible tab width.
+       Not "auspol tracker" alone: Safari Reader discards a heading whose
+       text equals document.title, and promoted "Two-party preferred" to the
+       Reader title. The h1 must stay a strict PREFIX of the title, which
+       this is. Search reads the keywords from the meta description. -->
+  <title>auspol tracker – Australian polls</title>
   <meta name="color-scheme" content="light dark">
   <meta property="og:title" content="auspol tracker – Australian federal election polling average">
   <meta name="description" content="auspol tracker averages every published Australian federal opinion poll. As of 21 September 2026, Labor leads the Coalition 51.6–48.4 two-party preferred on implied preference flows (±1.2), from 163 polls by 12 pollsters. Primary votes, every poll, and the last twenty elections for comparison.">
