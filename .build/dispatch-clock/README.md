@@ -38,14 +38,19 @@ runs are late again, and nothing else breaks.
    - Permissions: **Actions: Read and write**. Nothing else is needed;
      Metadata: read is added automatically.
    - Expiry: up to a year. Note the date, because nothing checks this token.
-2. From this directory:
+2. In Terminal (quote the path: it has a space in it), run these one at a
+   time:
 
    ```sh
-   npx wrangler login                    # a free Cloudflare account is enough
-   npx wrangler secret put GITHUB_TOKEN  # paste the token
-   npx wrangler deploy
+   cd "/Users/joshuaborgnolo/auspol tracker/.build/dispatch-clock"
+   npx wrangler login                    # opens the browser: log in (a free account is enough), Allow
+   npx wrangler deploy                   # creates the Worker; say yes if it offers a workers.dev subdomain
+   npx wrangler secret put GITHUB_TOKEN  # type GITHUB_TOKEN as written: it is the secret's NAME
    ```
 
+   The last command then asks `Enter a secret value:`. Paste the token
+   there. Nothing shows as you paste. Press Enter. Never put the token on the
+   command line itself, where your shell history keeps it.
 3. Check it:
    - Open the `*.workers.dev` URL `wrangler deploy` prints. `next` should
      list the coming slots.

@@ -18,3 +18,7 @@ node_modules/
 # Poll Bludger fallback: the cached feed is 600KB and refetched each run;
 # seen.json (the first-seen grace ledger) beside it IS committed.
 .build/pollbludger-src/current.xml
+
+# wrangler's local build/state dir, left beside the dispatch-clock Worker by
+# `npx wrangler deploy` (see .build/dispatch-clock/README.md)
+.wrangler/
