@@ -45780,7 +45780,17 @@ function AllPollsView({
       label: "With a direction reading"
     }
   };
-  const defaultScopeFor = f => !FACET_SCOPE[f] ? false : f === "twopp" ? pubBasis : true;
+  const CONTEST_SCOPE = {
+    lnponp: {
+      has: p => !!p.tppAlt2,
+      label: "With an L/NP v ON 2PP"
+    },
+    "3cp": {
+      has: p => !!p.tpp3,
+      label: "With a 3-cornered figure"
+    }
+  };
+  const defaultScopeFor = (f, m) => !FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true;
   const FACETS = [{
     id: "twopp",
     label: "2PP"
@@ -45870,6 +45880,7 @@ function AllPollsView({
     };
     const view = FACET_BY_URL[get("f", "view")] || "twopp";
     const sExplicit = get("s", "scope") != null;
+    const meas = MEAS_BY_URL[get("v", "vs")] || DEFAULT_MEASURE;
     return {
       q: get("q") || "",
       who: (() => {
@@ -45883,10 +45894,10 @@ function AllPollsView({
         return (mask ? [...mask] : raw.split(",")).filter(t => POLL_TAGS.some(pt => pt.id === t));
       })(),
       lead: LEAD_BY_URL[get("l", "lead")] || "all",
-      measure: MEAS_BY_URL[get("v", "vs")] || DEFAULT_MEASURE,
+      measure: meas,
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
-      scope: sExplicit ? get("s") !== "0" && get("s", "scope") !== "off" : defaultScopeFor(view),
+      scope: sExplicit ? get("s") !== "0" && get("s", "scope") !== "off" : defaultScopeFor(view, meas),
       scopeExplicit: sExplicit
     };
   })();
@@ -45910,8 +45921,8 @@ function AllPollsView({
   const [pop, setPop] = useState(null);
   const [scope, setScope] = useState(urlInit.scope);
   React.useEffect(() => {
-    if (!scopeSet) setScope(defaultScopeFor(facet));
-  }, [pubBasis, facet, scopeSet]);
+    if (!scopeSet) setScope(defaultScopeFor(facet, measure));
+  }, [pubBasis, facet, measure, scopeSet]);
   React.useEffect(() => {
     if (!focus) return;
     setScope(false);
@@ -45950,7 +45961,7 @@ function AllPollsView({
     });
     setPop(null);
     setScopeSet(false);
-    setScope(defaultScopeFor(f));
+    setScope(defaultScopeFor(f, f === "twopp" ? measure : DEFAULT_MEASURE));
     if (f !== "twopp") {
       setLead("all");
       setMeasure(DEFAULT_MEASURE);
@@ -46068,7 +46079,7 @@ function AllPollsView({
   const latestX = D.mx(D.MONTHS[D.MONTHS.length - 1]);
   const x0 = range === "all" ? -Infinity : latestX - Number(range) / 12 - 0.06;
   const ql = q.trim().toLowerCase();
-  const scoping = scope && FACET_SCOPE[facet];
+  const scoping = scope && (facet === "twopp" && CONTEST_SCOPE[measure] || FACET_SCOPE[facet]);
   const TESTS = [["who", p => !sel.size || sel.has(baseHouse(p.pollster))], ["has", p => !tagSel.size || [...tagSel].every(tg => p.tags.includes(tg))], ["lead", p => {
     if (lead === "all") return true;
     const li = archLeadInfo(p, measure, tppBasis);

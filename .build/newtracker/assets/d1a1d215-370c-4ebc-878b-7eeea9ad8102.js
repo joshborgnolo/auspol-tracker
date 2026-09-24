@@ -4719,10 +4719,25 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     leadership: { has: (p) => window.ppmContests(p).length > 0 || (p.appr && (p.appr.albNet != null || p.appr.taylorNet != null || p.appr.hansonNet != null)), label: "With leadership numbers" },
     direction: { has: (p) => !!p.dir, label: "With a direction reading" },
   };
+  /* The two published-only matchups are measured by almost no wave – five
+     waves print an L/NP v ON figure, four a three-cornered one – so
+     picking either from the Contest control would line up ~160 rows of
+     dashes around the handful the reader asked for. The matchup scopes the
+     table itself the moment it is picked, armed by default and shown as
+     the same removable auto-pill. While it is up it REPLACES the facet
+     scope (a wave carrying the matchup passes the twopp scope by
+     construction – its `|| p.tppAlt2 || p.tpp3` clause), and it only ever
+     engages on the 2PP facet – the Contest control exists nowhere else. */
+  const CONTEST_SCOPE = {
+    lnponp: { has: (p) => !!p.tppAlt2, label: "With an L/NP v ON 2PP" },
+    "3cp": { has: (p) => !!p.tpp3, label: "With a 3-cornered figure" },
+  };
   /* The scope a facet ARMS ITSELF with. Facets with nothing to scope get
-     false; the 2PP facet follows the basis (see the note on twopp above);
+     false; the 2PP facet follows the basis (see the note on twopp above)
+     unless the matchup is a published-only one, which always self-arms;
      everything else keeps the long-standing "on". */
-  const defaultScopeFor = (f) => (!FACET_SCOPE[f] ? false : f === "twopp" ? pubBasis : true);
+  const defaultScopeFor = (f, m) =>
+    (!FACET_SCOPE[f] ? false : f === "twopp" ? Boolean(CONTEST_SCOPE[m]) || pubBasis : true);
 
   const FACETS = [
     { id: "twopp", label: "2PP" },
@@ -4780,6 +4795,9 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
     const get = (...keys) => { for (const k of keys) { const v = p.get(k); if (v != null) return v; } return null; };
     const view = FACET_BY_URL[get("f", "view")] || "twopp";
     const sExplicit = get("s", "scope") != null;
+    /* the matchup is lifted out ahead of the literal so the scope seed can
+       see it – a published-only matchup self-arms its contest scope */
+    const meas = MEAS_BY_URL[get("v", "vs")] || DEFAULT_MEASURE;
     return {
       q: get("q") || "",
       who: (() => {
@@ -4793,7 +4811,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
         return (mask ? [...mask] : raw.split(",")).filter((t) => POLL_TAGS.some((pt) => pt.id === t));
       })(),
       lead: LEAD_BY_URL[get("l", "lead")] || "all",
-      measure: MEAS_BY_URL[get("v", "vs")] || DEFAULT_MEASURE,
+      measure: meas,
       range: ["12", "6", "3"].includes(get("t", "when")) ? get("t", "when") : "all",
       facet: view,
       /* "explicit" means the reader (or a shared link) said something about
@@ -4801,7 +4819,7 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
          the basis moves. */
       scope: sExplicit
         ? (get("s") !== "0" && get("s", "scope") !== "off")
-        : defaultScopeFor(view),
+        : defaultScopeFor(view, meas),
       scopeExplicit: sExplicit,
     };
   })();
@@ -4829,8 +4847,8 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      itself – as a visible, removable pill, not a hidden default. */
   const [scope, setScope] = useState(urlInit.scope);
   React.useEffect(() => {
-    if (!scopeSet) setScope(defaultScopeFor(facet));
-  }, [pubBasis, facet, scopeSet]);
+    if (!scopeSet) setScope(defaultScopeFor(facet, measure));
+  }, [pubBasis, facet, measure, scopeSet]);
 
   /* Arriving from a dot on a chart. The filters ride in the URL now, so they
      survive the remount this trip causes - and any of them could hide the
@@ -4856,7 +4874,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
   const onMeasure = (mv) => { setMeasure(mv); setLead("all"); };
   const onFacet = (f) => {
     setFacet(f); setSort({ key: "date", dir: -1 }); setPop(null);
-    setScopeSet(false); setScope(defaultScopeFor(f));
+    // the matchup survives the hop only if the 2PP facet is where we land –
+    // every other facet resets it below – so seed the scope from the
+    // matchup that will actually be in force
+    setScopeSet(false); setScope(defaultScopeFor(f, f === "twopp" ? measure : DEFAULT_MEASURE));
     // the expanded row STAYS expanded: `open` keys the poll itself, and the
     // detail panel shows every measure whatever the facet. If the new facet's
     // scope hides that poll it simply isn't rendered, and it resurfaces –
@@ -5006,7 +5027,10 @@ function AllPollsView({ focus, onBack, backLabel, tppBasis, setTppBasis }) {
      panels can ask the question the numbers beside each option answer: how
      many polls would this leave, given everything else already set. That means
      counting with exactly one predicate lifted out – `without(f)`. */
-  const scoping = scope && FACET_SCOPE[facet];
+  /* A published-only matchup stands in for its facet's scope while it is
+     picked (CONTEST_SCOPE notes why), so the pill reads "With an
+     L/NP v ON 2PP" rather than the everything-but-nothing "With a 2PP". */
+  const scoping = scope && ((facet === "twopp" && CONTEST_SCOPE[measure]) || FACET_SCOPE[facet]);
   const TESTS = [
     ["who", (p) => !sel.size || sel.has(baseHouse(p.pollster))],
     // a row must contain EVERY selected data type (AND)
