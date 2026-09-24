@@ -143,6 +143,15 @@ export function validate(D) {
           fail("firm-sum", `firmness.${k} sums to ${t[0] + t[1] + t[2]}`);
       }
     }
+    // 2b1d. softAge – Resolve's "not firm" share by age band, the three
+    //      bands or none, each a percentage.
+    if (p.softAge != null) {
+      if (p.pollster !== "Resolve")
+        fail("softage-pollster", `softAge on a row for ${p.pollster}`);
+      for (const k of ["18-34", "35-54", "55+"])
+        if (!(p.softAge[k] >= 0 && p.softAge[k] <= 100))
+          fail("softage-shape", `softAge.${k} = ${p.softAge[k]}`);
+    }
     // 2b2. tpp3 (Fox & Hedgehog's three-cornered preferred) carries all
     //      three slices or none, each in bounds, and the trio sums ~100 –
     //      the same sum discipline as the 2PP pair.

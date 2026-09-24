@@ -1,7 +1,8 @@
 // Add Resolve Political Monitor waves from data/resolve-political-monitor.csv
 // to the Resolve rows in data/polls.json — three sections:
 //
-//   VI       primary_vote / National -> polls   (with vote_firmness TOTAL SOFT as `soft`)
+//   VI       primary_vote / National -> polls   (with vote_firmness TOTAL SOFT as `soft`,
+//            and by age band as `softAge`)
 //   ppm      preferred_pm / National  -> ppm    (leader-name answers; see below)
 //   approval pm_performance + opp_leader_performance / National -> approval
 //
@@ -102,6 +103,16 @@ const firmness = [...nat("vote_firmness").entries()]
   .flatMap(([date, a]) => a["TOTAL SOFT"] == null ? [] : [{ date, v: a["TOTAL SOFT"] }])
   .sort((a, b) => a.date < b.date ? -1 : 1);
 
+// the same question's TOTAL SOFT by age band, per wave date
+const AGE_KEYS = { "age-18-34": "18-34", "age-35-54": "35-54", "age-55+": "55+" };
+const softByAge = new Map();
+for (const r of rows) {
+  if (r.dataset !== "vote_firmness" || r.dimension !== "age" || r.answer !== "TOTAL SOFT" || !AGE_KEYS[r.key] || r.value == null) continue;
+  if (!softByAge.has(r.date)) softByAge.set(r.date, {});
+  softByAge.get(r.date)[AGE_KEYS[r.key]] = Math.round(r.value);
+}
+const ageOf = (wave) => { const a = softByAge.get(wave); return a && Object.keys(a).length === 3 ? a : null; };
+
 const r0 = (x) => (x == null ? null : Math.round(x));
 const iso = (ms) => new Date(ms).toISOString().slice(0, 10);
 const days = (a, b) => Math.abs(Date.parse(a) - Date.parse(b)) / DAY;
@@ -166,6 +177,7 @@ const report = { vi: { added: [], skipped: null }, ppm: { added: [], skipped: nu
       tpp_alp: null,
       tpp_lnp: null,
       ...(soft ? { soft: r0(soft.v) } : {}),
+      ...(soft && ageOf(soft.date) ? { softAge: ageOf(soft.date) } : {}),
       assimilated: true,
     };
     const figDup = existing.find((p) => days(p.date, row.date) <= 10 && sameFigures(p, row));

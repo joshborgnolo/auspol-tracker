@@ -1573,6 +1573,26 @@ function UndecidedPanel({ rangeId }) {
       + window.AP.monthLabelFull(base.ym) + " to " + nowV.toFixed(1) + "% now.";
   })();
 
+  /* One sentence under the chart on firmness by age, from Resolve's "how
+     firm are you" by age band (gen-data: pooled over its last three waves).
+     Highlighted when it reports a significant difference: firmness rising
+     band by band, or one band apart from both others; otherwise it says the
+     bands can't be told apart. Same test as the By party view. */
+  const ageSaid = (() => {
+    const A = U.softAge;
+    if (!A) return null;
+    const B = A.bands, who = { "18-34": "voters aged 18–34", "35-54": "those aged 35–54", "55+": "those 55 and over" };
+    const pct = (k) => Math.round(B[k].v) + "%";
+    const [y, m, o] = ["18-34", "35-54", "55+"];
+    if (B[y].v > B[m].v && B[m].v > B[o].v && firmApart(B[y], B[m]) && firmApart(B[m], B[o]))
+      return [`Firmness rises significantly with age: ${pct(y)} of voters aged 18–34 aren’t firm in their vote, against ${pct(m)} of those aged 35–54 and ${pct(o)} of those 55 and over.`, true];
+    const bySoft = [y, m, o].sort((a, b) => B[a].v - B[b].v);
+    const [f, ...rest] = bySoft;
+    if (rest.every((k) => firmApart(B[f], B[k])))
+      return [`${who[f][0].toUpperCase() + who[f].slice(1)} are significantly the firmest: ${pct(f)} aren’t firm in their vote, against ${pct(rest[0])} of ${who[rest[0]]} and ${pct(rest[1])} of ${who[rest[1]]}.`, true];
+    return ["Resolve finds no significant difference in how firm voters are between age groups.", false];
+  })();
+
   return (
     <section className="card">
       <div className="card-head">
@@ -1614,7 +1634,8 @@ function UndecidedPanel({ rangeId }) {
         key="und"
         height={narrow ? 460 : 340} xDomain={xDomain} yDomain={[lo, hi]}
         yTicks={yTicks} unit="%" axisFont={narrow ? 28 : 20}
-        pad={{ l: 58, r: 22, t: 16, b: 42 }}
+        // two-digit shares ("20%") at the phone's 28px axis need the room
+        pad={{ l: narrow ? 84 : 58, r: 22, t: 16, b: 42 }}
         xTicks={buildXTicks(xDomain[0], xDomain[1])}
         series={drawn.map((d) => ({ id: d.sr.id, label: d.sr.label, color: COL,
                                     dashed: d.sr.dashed, dash: d.sr.dash, points: series(d.pts, "v") }))}
@@ -1623,9 +1644,11 @@ function UndecidedPanel({ rangeId }) {
         tooltipTitle={(i) => window.AP.monthLabelFull(spine[i].ym)}
         fmt={(v) => v.toFixed(1)}
       />
+      {ageSaid && firmSaid("demo-verdict", ageSaid[0], ageSaid[1])}
       <p className="table-hint">
         Each dot is one published reading; the lines are monthly averages, and
         the figure beside each question pools the last six weeks of polls.
+        {U.softAge && <> The sentence on age pools {U.softAge.house}’s last three waves, {U.softAge.from} to {U.softAge.to}.</>}
       </p>
       <HowTo paras={[
         <>Newer and larger polls count for more in the figure beside each question.</>,

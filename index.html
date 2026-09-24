@@ -10535,6 +10535,15 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "v": 27,
         "basis": "soft"
       }, {
+        "x": 2026.6191780821919,
+        "ym": "2026-08",
+        "pollster": "Resolve",
+        "dateLabel": "9–15 Aug",
+        "released": "2026-08-15",
+        "sample": 2256,
+        "v": 27,
+        "basis": "soft"
+      }, {
         "x": 2026.695890410959,
         "ym": "2026-09",
         "pollster": "Resolve",
@@ -10610,12 +10619,17 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "v": 27,
         "k": 1
       }, {
+        "ym": "2026-08",
+        "x": 2026.625,
+        "v": 27,
+        "k": 1
+      }, {
         "ym": "2026-09",
         "x": 2026.7083333333333,
         "v": 26,
         "k": 1
       }],
-      "n": 15,
+      "n": 16,
       "lo": 23,
       "hi": 29,
       "latest": {
@@ -10624,17 +10638,43 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "released": "2026-09-12",
         "field": "12 Sep",
         "chg": -1,
-        "refDate": "2026-07-11"
+        "refDate": "2026-08-15"
       },
       "now": {
         "v": 26,
-        "se": 1.17,
+        "se": 1.16,
         "ci95": 2.3,
-        "n": 1,
-        "nEff": 1
+        "n": 2,
+        "nEff": 1,
+        "prev": 27,
+        "chg": -1,
+        "changeCi95": 3.2,
+        "changeSig": false
       }
     }],
-    "n": 63,
+    "softAge": {
+      "house": "Resolve",
+      "from": "6–11 Jul",
+      "to": "12 Sep",
+      "bands": {
+        "18-34": {
+          "v": 33.3,
+          "ci95": 2.6,
+          "n": 1246
+        },
+        "35-54": {
+          "v": 28.7,
+          "ci95": 2.4,
+          "n": 1411
+        },
+        "55+": {
+          "v": 19.7,
+          "ci95": 2,
+          "n": 1567
+        }
+      }
+    },
+    "n": 64,
     "houses": ["Roy Morgan", "Essential", "Resolve", "DemosAU"]
   };
   const firmness = {
@@ -31065,6 +31105,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     "sample": 2256,
     "client": "SMH / Age",
     "published": "2026-08-16T17:59",
+    "undecided": 27,
+    "undecidedBasis": "soft",
     "eff": {
       "imp": {
         "lo": 51.6,
@@ -31147,6 +31189,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "pGrn": 0,
         "pOnp": 0,
         "pOth": 0,
+        "und": 0,
         "imp": 0,
         "impOn": 0,
         "albNet": -2,
@@ -31162,6 +31205,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "pGrn": "2026-07-11",
         "pOnp": "2026-07-11",
         "pOth": "2026-07-11",
+        "und": "2026-07-11",
         "imp": "2026-07-11",
         "impOn": "2026-07-11",
         "albNet": "2026-07-11",
@@ -32524,7 +32568,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "pGrn": "2026-08-15",
         "pOnp": "2026-08-15",
         "pOth": "2026-08-15",
-        "und": "2026-07-11",
+        "und": "2026-08-15",
         "imp": "2026-08-15",
         "impOn": "2026-08-15",
         "albNet": "2026-08-15",
@@ -33587,7 +33631,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
         "pGrn": "2026-08-15",
         "pOnp": "2026-08-15",
         "pOth": "2026-08-15",
-        "und": "2026-07-11",
+        "und": "2026-08-15",
         "imp": "2026-08-15",
         "impOn": "2026-08-15",
         "albNet": "2026-08-15",
@@ -41067,6 +41111,23 @@ function UndecidedPanel({
     if (Math.abs(d) < 1) return "The share of undecided and uncommitted has remained fairly constant since the 2025 election.";
     return "The share of undecided and uncommitted voters has " + (d > 0 ? "risen" : "fallen") + " since the 2025 election, from " + base.v.toFixed(1) + "% in " + window.AP.monthLabelFull(base.ym) + " to " + nowV.toFixed(1) + "% now.";
   })();
+  const ageSaid = (() => {
+    const A = U.softAge;
+    if (!A) return null;
+    const B = A.bands,
+      who = {
+        "18-34": "voters aged 18–34",
+        "35-54": "those aged 35–54",
+        "55+": "those 55 and over"
+      };
+    const pct = k => Math.round(B[k].v) + "%";
+    const [y, m, o] = ["18-34", "35-54", "55+"];
+    if (B[y].v > B[m].v && B[m].v > B[o].v && firmApart(B[y], B[m]) && firmApart(B[m], B[o])) return [`Firmness rises significantly with age: ${pct(y)} of voters aged 18–34 aren’t firm in their vote, against ${pct(m)} of those aged 35–54 and ${pct(o)} of those 55 and over.`, true];
+    const bySoft = [y, m, o].sort((a, b) => B[a].v - B[b].v);
+    const [f, ...rest] = bySoft;
+    if (rest.every(k => firmApart(B[f], B[k]))) return [`${who[f][0].toUpperCase() + who[f].slice(1)} are significantly the firmest: ${pct(f)} aren’t firm in their vote, against ${pct(rest[0])} of ${who[rest[0]]} and ${pct(rest[1])} of ${who[rest[1]]}.`, true];
+    return ["Resolve finds no significant difference in how firm voters are between age groups.", false];
+  })();
   return React.createElement("section", {
     className: "card"
   }, React.createElement("div", {
@@ -41113,7 +41174,7 @@ function UndecidedPanel({
     unit: "%",
     axisFont: narrow ? 28 : 20,
     pad: {
-      l: 58,
+      l: narrow ? 84 : 58,
       r: 22,
       t: 16,
       b: 42
@@ -41132,9 +41193,9 @@ function UndecidedPanel({
     pollFacet: "twopp",
     tooltipTitle: i => window.AP.monthLabelFull(spine[i].ym),
     fmt: v => v.toFixed(1)
-  }), React.createElement("p", {
+  }), ageSaid && firmSaid("demo-verdict", ageSaid[0], ageSaid[1]), React.createElement("p", {
     className: "table-hint"
-  }, "Each dot is one published reading; the lines are monthly averages, and the figure beside each question pools the last six weeks of polls."), React.createElement(HowTo, {
+  }, "Each dot is one published reading; the lines are monthly averages, and the figure beside each question pools the last six weeks of polls.", U.softAge && React.createElement(React.Fragment, null, " The sentence on age pools ", U.softAge.house, "\u2019s last three waves, ", U.softAge.from, " to ", U.softAge.to, ".")), React.createElement(HowTo, {
     paras: [React.createElement(React.Fragment, null, "Newer and larger polls count for more in the figure beside each question."), React.createElement(React.Fragment, null, "The questions are never averaged together \u2013 one counts people who can\u2019t name a party, the other people who won\u2019t pick a side once preferences are applied. Only the first is left out of the shares elsewhere on this page, so a rising line means the share is being read off a smaller pool of decided voters, not that support has moved.")]
   }));
 }
