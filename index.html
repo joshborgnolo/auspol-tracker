@@ -703,6 +703,7 @@ a.pollster-link::after, a.pollster-method::after, a.np-link::after, a.tn-link::a
 }
 .card-title { font-family: var(--serif); font-weight: 600; font-size: 22px; margin: 0; letter-spacing: -0.01em; color: var(--ink); line-height: 1.15; }
 .card-sub { margin: 3px 0 0; font-size: 13px; color: var(--ink-3); text-wrap: pretty; }
+.card-houses { font-style: italic; }
 .segmented {
   display: inline-flex; gap: 3px; padding: 3px;
   background: var(--surface-2); border: 1px solid var(--line);
@@ -42309,12 +42310,16 @@ function ApprovalPanel({
     className: "hi-term",
     title: "What the approval question asks",
     onClick: () => window.AP.openTerm && window.AP.openTerm("approval", "Leader net approval")
-  }, "Approve minus disapprove"), " – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential, and others") : React.createElement(React.Fragment, null, React.createElement("button", {
+  }, "Approve minus disapprove"), React.createElement(Houses, {
+    after: " \u2013 a verdict on the job they\u2019re doing"
+  }, "Newspoll, YouGov, Resolve, Essential, and others")) : React.createElement(React.Fragment, null, React.createElement("button", {
     type: "button",
     className: "hi-term",
     title: "What the favourability question asks",
     onClick: () => window.AP.openTerm && window.AP.openTerm("favourability", "Leader net favourability")
-  }, "Positive minus negative"), " – the person, not the job · ", houseList(D.favHouses), " ask favourability, not approval"))), React.createElement("div", {
+  }, "Positive minus negative"), React.createElement(Houses, {
+    after: " \u2013 the person, not the job"
+  }, houseList(D.favHouses), " ask favourability, not approval")))), React.createElement("div", {
     className: "card-head-tools"
   }, !lockMetric && React.createElement(TextToggle, {
     caps: true,
@@ -42428,6 +42433,15 @@ function ApprovalPanel({
   }));
 }
 const dirFmt = v => v % 1 ? v.toFixed(1) : v.toFixed(0);
+const endsSentence = t => /[.?!][’”'"]?$/.test(t);
+function Houses({
+  after,
+  children
+}) {
+  return React.createElement(React.Fragment, null, after, after == null ? "" : endsSentence(after) ? " " : ". ", React.createElement("em", {
+    className: "card-houses"
+  }, children, "."));
+}
 function houseList(names, max = 4) {
   if (!names || !names.length) return "";
   if (names.length > max) return names.slice(0, max).join(", ") + ", and others";
@@ -42536,7 +42550,9 @@ function DirectionPanel({
     className: "card-title"
   }, "National direction"), React.createElement("p", {
     className: "card-sub"
-  }, question, asked ? " · " + asked : ""))), React.createElement(Story, {
+  }, asked ? React.createElement(Houses, {
+    after: question
+  }, asked) : question))), React.createElement(Story, {
     head: head,
     dek: dek
   }), React.createElement("div", {
@@ -42669,13 +42685,17 @@ function UndecidedPanel({
     ariaLabel: "Undecided among"
   }));
   const extra = view === "party" && F ? {
-    sub: React.createElement(React.Fragment, null, "Share of each party\u2019s voters certain of their vote \xB7 ", houseList(F.houses.map(demoHouse))),
+    sub: React.createElement(Houses, {
+      after: "Share of each party\u2019s voters certain of their vote"
+    }, houseList(F.houses.map(demoHouse))),
     body: React.createElement(FirmnessView, {
       F: F,
       rangeId: rangeId
     })
   } : view === "age" && A ? {
-    sub: React.createElement(React.Fragment, null, "Share of each age group not firm in its vote \xB7 ", houseList(A.houses)),
+    sub: React.createElement(Houses, {
+      after: "Share of each age group not firm in its vote"
+    }, houseList(A.houses)),
     body: React.createElement(AgeFirmView, {
       A: A,
       rangeId: rangeId
@@ -42737,7 +42757,9 @@ function UndecidedPanel({
     className: "card-title"
   }, "Undecided"), React.createElement("p", {
     className: "card-sub"
-  }, "Electors who won\u2019t name a choice, or won\u2019t call theirs firm \xB7 ", houseList(U.houses)))), ctl, React.createElement(Story, {
+  }, React.createElement(Houses, {
+    after: "Electors who won\u2019t name a choice, or won\u2019t call theirs firm"
+  }, houseList(U.houses))))), ctl, React.createElement(Story, {
     head: termLead && termHead,
     dek: termLead
   }), React.createElement("div", {
@@ -42767,7 +42789,9 @@ function UndecidedPanel({
     className: "und-read-stale"
   }, "last reading, ", sr.latest.field)), React.createElement("p", {
     className: "und-read-note"
-  }, sr.note, " \xB7 ", houseList(sr.houses)))))), React.createElement(TrendChart, {
+  }, React.createElement(Houses, {
+    after: sr.note[0].toUpperCase() + sr.note.slice(1)
+  }, houseList(sr.houses))))))), React.createElement(TrendChart, {
     key: "und",
     height: narrow ? 460 : 340,
     xDomain: xDomain,
@@ -43199,7 +43223,9 @@ function OnSourcesPanel({
     className: "card-title"
   }, "Where One Nation\u2019s new voters came from"), React.createElement("p", {
     className: "card-sub"
-  }, rated ? "Share of each party’s 2025 voters now backing One Nation" : "Share of One Nation’s gain since the 2025 election, by how those voters voted in 2025", " \xB7 ", houseList(S.houses)))), S.series.every(sr => sr.rate) && React.createElement("div", {
+  }, rated ? "Share of each party’s 2025 voters now backing One Nation" : "Share of One Nation’s gain since the 2025 election, by how those voters voted in 2025", ". ", React.createElement("em", {
+    className: "card-houses"
+  }, houseList(S.houses), ".")))), S.series.every(sr => sr.rate) && React.createElement("div", {
     className: "ons-ctl"
   }, React.createElement(Segmented, {
     options: ONS_VIEWS,
@@ -43758,7 +43784,9 @@ function DemographicsPanel({
     className: "card-title"
   }, "Who votes for whom"), React.createElement("p", {
     className: "card-sub"
-  }, name, "\u2019s share of each group\u2019s first-preference vote, pooled from the last ", T.window, " of polls \xB7 ", houseList(T.houses.map(demoHouse))))), React.createElement("div", {
+  }, React.createElement(Houses, {
+    after: `${name}’s share of each group’s first-preference vote, pooled from the last ${T.window} of polls`
+  }, houseList(T.houses.map(demoHouse)))))), React.createElement("div", {
     className: "demo-ctl"
   }, React.createElement(Segmented, {
     options: T.tabs.map(t => ({
@@ -44154,7 +44182,11 @@ function IssuesPanel({
     className: "card-title"
   }, "The issues"), React.createElement("p", {
     className: "card-sub"
-  }, view === "trust" ? React.createElement(React.Fragment, null, "What voters say matters most, and which party they think is best on it \xB7 pooled from the last ", I.window, " of polls \xB7 ", houseList(I.houses)) : React.createElement(React.Fragment, null, "Each group\u2019s share putting an issue in its top three \xB7 ", G ? `${G.house}, its polls in the last ${G.window}` : "no poll in the window")))), React.createElement("div", {
+  }, view === "trust" ? React.createElement(Houses, {
+    after: `What voters say matters most, and which party they think is best on it, pooled from the last ${I.window} of polls`
+  }, houseList(I.houses)) : G ? React.createElement(Houses, {
+    after: "Each group\u2019s share putting an issue in its top three"
+  }, G.house, ", its polls in the last ", G.window) : React.createElement(React.Fragment, null, "Each group\u2019s share putting an issue in its top three \u2013 no poll in the window")))), React.createElement("div", {
     className: "demo-ctl"
   }, React.createElement(Segmented, {
     options: [{

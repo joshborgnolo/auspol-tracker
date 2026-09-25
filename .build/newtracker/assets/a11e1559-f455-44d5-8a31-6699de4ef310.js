@@ -1221,12 +1221,12 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
                      title="What the approval question asks"
                      onClick={() => window.AP.openTerm &&
                        window.AP.openTerm("approval", "Leader net approval")}>Approve minus disapprove</button>
-                   {" – a verdict on the job they’re doing · Newspoll, YouGov, Resolve, Essential, and others"}</>)
+                   <Houses after=" – a verdict on the job they’re doing">Newspoll, YouGov, Resolve, Essential, and others</Houses></>)
               : (<><button type="button" className="hi-term"
                      title="What the favourability question asks"
                      onClick={() => window.AP.openTerm &&
                        window.AP.openTerm("favourability", "Leader net favourability")}>Positive minus negative</button>
-                   {" – the person, not the job · "}{houseList(D.favHouses)}{" ask favourability, not approval"}</>)}
+                   <Houses after=" – the person, not the job">{houseList(D.favHouses)} ask favourability, not approval</Houses></>)}
           </p>
         </div>
         <div className="card-head-tools">
@@ -1341,6 +1341,14 @@ function ApprovalPanel({ rangeId, leaders, chrome, metric: metricProp, lockMetri
 // also writes the tooltip – rounding an individual poll's 61.5 to 62 would
 // misstate it. Axis ticks land on whole numbers, so they stay clean.
 const dirFmt = (v) => (v % 1 ? v.toFixed(1) : v.toFixed(0));
+
+/* A subtitle's pollster list, set as a sentence of its own in italics after
+   the description it credits: the description takes a full stop, unless it
+   already ends one (a quoted question), and so does the list. */
+const endsSentence = (t) => /[.?!][’”'"]?$/.test(t);
+function Houses({ after, children }) {
+  return <>{after}{after == null ? "" : endsSentence(after) ? " " : ". "}<em className="card-houses">{children}.</em></>;
+}
 
 function houseList(names, max = 4) {
   if (!names || !names.length) return "";
@@ -1459,7 +1467,7 @@ function DirectionPanel({ rangeId }) {
       <div className="card-head">
         <div>
           <h2 className="card-title">National direction</h2>
-          <p className="card-sub">{question}{asked ? " · " + asked : ""}</p>
+          <p className="card-sub">{asked ? <Houses after={question}>{asked}</Houses> : question}</p>
         </div>
       </div>
       <Story head={head} dek={dek} />
@@ -1551,10 +1559,10 @@ function UndecidedPanel({ rangeId }) {
     </div>
   );
   const extra = view === "party" && F ? {
-    sub: <>Share of each party’s voters certain of their vote · {houseList(F.houses.map(demoHouse))}</>,
+    sub: <Houses after="Share of each party’s voters certain of their vote">{houseList(F.houses.map(demoHouse))}</Houses>,
     body: <FirmnessView F={F} rangeId={rangeId} />,
   } : view === "age" && A ? {
-    sub: <>Share of each age group not firm in its vote · {houseList(A.houses)}</>,
+    sub: <Houses after="Share of each age group not firm in its vote">{houseList(A.houses)}</Houses>,
     body: <AgeFirmView A={A} rangeId={rangeId} />,
   } : null;
   if (extra) return (
@@ -1630,7 +1638,7 @@ function UndecidedPanel({ rangeId }) {
         <div>
           <h2 className="card-title">Undecided</h2>
           <p className="card-sub">
-            Electors who won’t name a choice, or won’t call theirs firm · {houseList(U.houses)}
+            <Houses after="Electors who won’t name a choice, or won’t call theirs firm">{houseList(U.houses)}</Houses>
           </p>
         </div>
       </div>
@@ -1656,7 +1664,7 @@ function UndecidedPanel({ rangeId }) {
                       title={"vs a month ago" + (sr.now.changeSig === false ? " – within the margin" : "")} />
                   : <span className="und-read-stale">last reading, {sr.latest.field}</span>}
               </div>
-              <p className="und-read-note">{sr.note} · {houseList(sr.houses)}</p>
+              <p className="und-read-note"><Houses after={sr.note[0].toUpperCase() + sr.note.slice(1)}>{houseList(sr.houses)}</Houses></p>
             </div>
           </div>
         ))}
@@ -2015,7 +2023,7 @@ function OnSourcesPanel({ rangeId }) {
           <h2 className="card-title">Where One Nation’s new voters came from</h2>
           <p className="card-sub">
             {rated ? "Share of each party’s 2025 voters now backing One Nation"
-              : "Share of One Nation’s gain since the 2025 election, by how those voters voted in 2025"} · {houseList(S.houses)}
+              : "Share of One Nation’s gain since the 2025 election, by how those voters voted in 2025"}. <em className="card-houses">{houseList(S.houses)}.</em>
           </p>
         </div>
       </div>
@@ -2438,7 +2446,7 @@ function DemographicsPanel({ rangeId = "all" }) {
         <div>
           <h2 className="card-title">Who votes for whom</h2>
           <p className="card-sub">
-            {name}’s share of each group’s first-preference vote, pooled from the last {T.window} of polls · {houseList(T.houses.map(demoHouse))}
+            <Houses after={`${name}’s share of each group’s first-preference vote, pooled from the last ${T.window} of polls`}>{houseList(T.houses.map(demoHouse))}</Houses>
           </p>
         </div>
       </div>
@@ -2758,8 +2766,9 @@ function IssuesPanel({ rangeId = "all" }) {
           <h2 className="card-title">The issues</h2>
           <p className="card-sub">
             {view === "trust"
-              ? <>What voters say matters most, and which party they think is best on it · pooled from the last {I.window} of polls · {houseList(I.houses)}</>
-              : <>Each group’s share putting an issue in its top three · {G ? `${G.house}, its polls in the last ${G.window}` : "no poll in the window"}</>}
+              ? <Houses after={`What voters say matters most, and which party they think is best on it, pooled from the last ${I.window} of polls`}>{houseList(I.houses)}</Houses>
+              : G ? <Houses after="Each group’s share putting an issue in its top three">{G.house}, its polls in the last {G.window}</Houses>
+                : <>Each group’s share putting an issue in its top three – no poll in the window</>}
           </p>
         </div>
       </div>
