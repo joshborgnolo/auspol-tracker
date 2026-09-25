@@ -134,11 +134,8 @@ data/polls.schema.json   field documentation
   assets/cycle-source.json  past-cycle source rows (generated; see Payload)
   fonts/                 subsetted woff2, emitted to assets/fonts at build time
   vendor/                react production + babel (BUILD TIME ONLY, never shipped)
-lib/                     chart.js + plugins – used ONLY by auspol-polling.html
 archives/<house>/        satellite archive pages (generated or hand-maintained;
                          outside the newtracker pipeline – see Poll archives)
-auspol-polling.html      frozen predecessor. Not rebuilt; carries noindex and an
-                         on-page banner so it can't be mistaken for the live page.
 ```
 
 ### Poll archives
