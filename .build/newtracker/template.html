@@ -1052,8 +1052,8 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
    the segments cover their track completely and would bury it. Over the top
    is also the truer place for it: light falling into a real channel lands on
    whatever the channel is holding, not just on the empty ends. */
-.sbar, .appr-netbar, .dir-bar { position: relative; }
-.sbar::after, .appr-netbar::after, .dir-bar::after {
+.sbar, .appr-netbar, .dir-bar, .demo-track { position: relative; }
+.sbar::after, .appr-netbar::after, .dir-bar::after, .demo-track::after {
   content: ""; position: absolute; inset: 0; border-radius: inherit;
   /* A channel reads by its EDGES, not by a haze. The first pass was a single
      soft inset at 15%, which is invisible the moment a saturated segment sits
@@ -1066,8 +1066,25 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
               inset 0 0 0 1px var(--well-rim);        /* the walls */
   pointer-events: none;
 }
-.sbar, .appr-netbar, .dir-bar {
+.sbar, .appr-netbar, .dir-bar, .demo-track, .lead-bar, .arch-appr-bar {
   box-shadow: 0 1px 0 var(--well-sill);
+  /* one well for every bar on the page (the hero gauge's own token) - they
+     were four different greys, one of them all but invisible on paper */
+  background-color: var(--hg-well);
+}
+/* The table-scale bars are 4px: the full channel above would fill them with
+   shadow, so they keep only its cut and its walls - the same well, one size
+   down. */
+.lead-bar::before, .arch-appr-bar::before {
+  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 1;
+  box-shadow: inset 0 1px 0 var(--well-edge), inset 0 0 0 0.5px var(--well-rim);
+}
+.arch-appr-bar { position: relative; }
+/* A zero or tie line is CUT into a bar's case, never painted over it: a dark
+   cut with a lit lip on its right, the page's one light direction - the
+   hero gauge's tie, reused. */
+.bar-cut, .anb-mid, .lead-bar::after {
+  background: var(--hg-tie-cut) !important; box-shadow: 1px 0 0 var(--hg-lip);
 }
 
 /* ---------- text toggle (editorial control) ---------- */
@@ -1931,10 +1948,10 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
 
 /* diverging net bar – the live source publishes nets only (no approve /
    disapprove split), so the snapshot readout shows net vs the "even" midline */
-.appr-netbar { position: relative; height: 8px; border-radius: 4px; background: var(--surface-2); overflow: hidden; }
+.appr-netbar { position: relative; height: 8px; border-radius: 4px; overflow: hidden; }
 /* the zero line every bar hangs from - drawn in ink so a bar's length reads
    as distance from even without the figure */
-.anb-mid { position: absolute; left: calc(50% - 1px); top: 0; bottom: 0; width: 2px; background: var(--ink-2); z-index: 1; }
+.anb-mid { position: absolute; left: calc(50% - 0.5px); top: 0; bottom: 0; width: 1px; z-index: 2; }
 /* Reshapes rather than redraws, on the shared curve at the shared duration -
    the same move the chart lines make when the question changes. Width only:
    a bar that crosses zero swaps which side of the midline it hangs from, and
@@ -1957,17 +1974,18 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
 .arch-appr { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 3px; }
 .arch-appr-bar {
   display: flex; height: 4px; width: 52px; border-radius: 2px; overflow: hidden;
-  background: var(--surface-2);
 }
 /* the lead margin: a tie line at the centre, the lead drawn out from it */
-.lead-bar { position: relative; height: 4px; width: 52px; border-radius: 2px; background: var(--line); }
+.lead-bar { position: relative; height: 4px; width: 52px; border-radius: 2px; }
 .lead-bar::after { content: ""; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px;
-  background: var(--ink-3); }
+  margin-left: -0.5px; z-index: 2; }
 .lead-bar-fill { position: absolute; top: 0; bottom: 0; border-radius: 2px; }
 .lead-who { font-size: 0.8em; font-weight: 700; letter-spacing: 0.02em; margin-right: 1px; }
-.arch-appr-app { background: oklch(0.62 0.10 150 / 0.85); }
+/* approve / disapprove in the mood pair, as every net on the page is: the
+   green and red here were the Greens' and Labor's hues */
+.arch-appr-app { background: var(--mood-pos); opacity: 0.85; }
 .arch-appr-dk  { background: transparent; }
-.arch-appr-dis { background: oklch(0.60 0.13 28 / 0.75); }
+.arch-appr-dis { background: var(--mood-neg); opacity: 0.85; }
 /* national direction reuses the approval bar's geometry, but takes the mood
    tokens so it reads as the same measure as the panel above the table */
 .arch-dir-right { background: var(--mood-pos); opacity: 0.85; }
@@ -1987,7 +2005,7 @@ body.editorial .leadership .card-title { font-size: 19px; font-weight: 600; lett
 .dir-k { font-size: 13px; font-weight: 700; white-space: nowrap; }
 .dir-v { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; color: var(--ink); font-variant-numeric: tabular-nums; }
 .dir-v .pct { font-size: 15px; font-weight: 700; color: var(--ink-3); margin-left: 1px; }
-.dir-bar { flex: 1; min-width: 60px; display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--line-2); align-self: center; }
+.dir-bar { flex: 1; min-width: 60px; display: flex; height: 14px; border-radius: 7px; overflow: hidden; align-self: center; }
 .dir-pos { background: var(--mood-pos); }
 .dir-neg { background: var(--mood-neg); }
 .dir-uns { background: transparent; }
@@ -2111,8 +2129,7 @@ a.pollster-method:hover .plink-mark, a.pollster-method:focus-visible .plink-mark
 .poll-table td.share-col { vertical-align: middle; }
 .share { display: flex; flex-direction: column; gap: 6px; align-items: stretch; }
 .sbar {
-  display: flex; height: 8px; border-radius: 5px; overflow: hidden;
-  background: var(--line-2); gap: 1.5px;
+  display: flex; height: 8px; border-radius: 4px; overflow: hidden; gap: 1.5px;
 }
 .sbar-seg { min-width: 2px; }
 .share-keys {
@@ -2683,8 +2700,8 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
   gap: 8px; margin: 5px 0; font-size: 13px; }
 .demo-lab { color: var(--ink-2); line-height: 1.25; }
 .demo-row.all .demo-lab { color: var(--ink-3); }
-.demo-track { height: 10px; border-radius: 3px; background: var(--line-2); overflow: hidden; }
-.demo-fill { display: block; height: 100%; border-radius: 3px; }
+.demo-track { height: 10px; border-radius: 5px; overflow: hidden; }
+.demo-fill { display: block; height: 100%; border-radius: 5px; }
 .demo-v { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
 .demo-row.all .demo-v { color: var(--ink-3); font-weight: 500; }
 .demo-ci, .read-ci { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
