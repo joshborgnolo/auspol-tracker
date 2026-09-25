@@ -120,9 +120,9 @@ export function demosLabel(dim, label) {
 }
 
 // ---- RedBridge: the first-preference table in the cached report text ---------------
-const RB_SECTIONS = { "Vote softness": "softness", Generation: "generation", Gender: "gender", Location: "location",
+export const RB_SECTIONS = { "Vote softness": "softness", Generation: "generation", Gender: "gender", Location: "location",
                       Education: "education", "Home ownership": "housing" };
-function rbLabel(dim, label) {
+export function rbLabel(dim, label) {
   const s = label.replace(/\s+/g, " ").trim();
   if (dim === "generation") return { "Gen-Z": "Gen Z", "Gen-X": "Gen X", "Baby Boomers": "Boomers" }[s] || s;
   if (dim === "education") return { "Less than year 12": "Below Year 12", "Year 12 or equivalent": "Year 12",

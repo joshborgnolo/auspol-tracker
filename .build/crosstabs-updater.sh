@@ -1,6 +1,6 @@
 #!/bin/bash
-# Weekly crosstabs catch-up: vote-switching.mjs + demographics.mjs -> if
-# either file changed -> validate -> render-card -> build -> commit -> push.
+# Weekly crosstabs catch-up: vote-switching.mjs + demographics.mjs + issues.mjs
+# -> if any file changed -> validate -> render-card -> build -> commit -> push.
 # Run in CI by crosstabs-update.yml.
 #
 # Every YouGov/News24, DemosAU, RedBridge and Resolve update already reads
@@ -46,13 +46,14 @@ CHANGED=false
 UNFINISHED=""
 STALE=""
 DROPPED=""
-for b in vote-switching demographics; do
+UNKNOWN=""
+for b in vote-switching demographics issues; do
   OUT="$(node ".build/$b.mjs" 2>&1)"
   CODE=$?
   LAST="$(echo "$OUT" | tail -1)"
   echo "$OUT" | grep '^\(pending\|dropped\) ' | while IFS= read -r l; do log "$b: $l"; done
   case "$LAST" in
-    VS_STATUS*|DEMO_STATUS*) ;;
+    VS_STATUS*|DEMO_STATUS*|ISSUES_STATUS*) ;;
     *) [ $CODE -eq 0 ] && CODE=1 ;;
   esac
   if [ $CODE -ne 0 ]; then
@@ -66,6 +67,9 @@ for b in vote-switching demographics; do
   if [ -n "$S" ]; then STALE="$STALE $b: $S"; fi
   D="$(echo "$LAST" | sed -n 's/.*"dropped":\[\([^]]*\)\].*/\1/p')"
   if [ -n "$D" ]; then DROPPED="$DROPPED $b: $D"; fi
+  # an issue label no reader maps is left out of the figures: someone maps it
+  U="$(echo "$LAST" | sed -n 's/.*"unknown":\[\([^]]*\)\].*/\1/p')"
+  if [ -n "$U" ]; then UNKNOWN="$UNKNOWN $b: $U"; fi
 done
 
 if $CHANGED; then
@@ -80,13 +84,13 @@ if $CHANGED; then
     log "FAIL build; no commit made"
     exit 1
   fi
-  git add data/vote-switching.json data/demographics.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
+  git add data/vote-switching.json data/demographics.json data/issues.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
   MSG="Update crosstab tables $(date '+%Y-%m-%d')"
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
     log "FAIL git commit"
     exit 1
   fi
-  if ! push_main "$MSG" data/vote-switching.json data/demographics.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
+  if ! push_main "$MSG" data/vote-switching.json data/demographics.json data/issues.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
     exit 1
   fi
   log "OK committed + pushed: $MSG"
@@ -100,6 +104,11 @@ fi
 if [ -n "$STALE" ]; then
   log "FAIL stale – waves still unread long after fieldwork closed:$STALE (reasons in the pending lines above)"
   echo "::error::crosstab tables still unread:$STALE"
+  exit 1
+fi
+if [ -n "$UNKNOWN" ]; then
+  log "FAIL unknown issue labels – left out of the figures until issues-parse.mjs maps them:$UNKNOWN"
+  echo "::error::issue labels not mapped:$UNKNOWN"
   exit 1
 fi
 if [ -n "$DROPPED" ]; then
