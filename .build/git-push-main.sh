@@ -25,7 +25,8 @@
 #      .build/classify-failure.mjs treats as transient, not as a defect.
 #
 # Source AFTER the wrapper defines REPO, LOG and log(). Usage:
-#   push_main <commit-message> <file> [<file>...]
+#   push_main <commit-message> <file> [<file>...]   (a wrapper's FILES array:
+#   its own paths + "${SITE_FILES[@]}", defined below)
 # where <file>... is exactly the set the commit was staged from; the amend
 # path re-stages it so regenerated artifacts land in the same commit. A list
 # naming any generated file (index.html, assets/…) is the signal that the
@@ -268,6 +269,20 @@ freshness_sync() {
   log "WARN local main diverged from origin/main (kept commits conflict); skipping slot"
   return 1
 }
+
+# ---------------------------------------------------------------------------
+# SITE_FILES — what refresh_site (below) writes that a data commit carries:
+# the wrappers' `git add` and push_main lists are "<the house's own files>
+# + ${SITE_FILES[@]}". One list beside the function that writes the files,
+# instead of the same ten paths twice in each of eleven wrappers: when the
+# favicon PNG joined the build (2026-09-19) its three files had to be added
+# to all twenty-two copies by hand. stage_dataset also stages assets/ whole
+# (hashed fonts and cycle-source rename themselves), so a file under assets/
+# can't be left behind even if it's missing here.
+# shellcheck disable=SC2034 # read by the wrappers that source this file
+SITE_FILES=(index.html feed.xml sitemap.xml robots.txt
+  assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json
+  assets/favicon.svg assets/favicon-192.png assets/favicon-192.json)
 
 # ---------------------------------------------------------------------------
 # refresh_site — the shared validate-then-write half of every data wrapper:

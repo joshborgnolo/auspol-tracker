@@ -77,7 +77,7 @@ fi
 # Stamp + record date for the commit message
 AS_OF="$(node -p 'JSON.parse(require("fs").readFileSync("data/prediction-history.json","utf8")).records.slice(-1)[0].asOf')"
 
-FILES=(data/prediction-history.json prediction/index.html .build/newtracker/build.mjs sitemap.xml index.html feed.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json)
+FILES=(data/prediction-history.json prediction/index.html .build/newtracker/build.mjs "${SITE_FILES[@]}")
 git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 if git diff --cached --quiet; then
  log "nothing staged after refresh; no commit"

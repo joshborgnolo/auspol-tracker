@@ -26,7 +26,9 @@ a GENERATED build artifact — never hand-edit it.
     races are `push_main`'s job (`.build/git-push-main.sh`): the rebase
     rebuilds generated files instead of merging them, and a data conflict
     re-runs the wrapper once. `test-push-main.mjs` races two clones through
-    it. Every writer — new ones included — pushes through `push_main`.
+    it. Every writer — new ones included — pushes through `push_main`, and
+    commits the generated files by the shared `SITE_FILES` list defined
+    beside `refresh_site` (add a new generated file there, once).
   - A run that fails because the pollster was down or walled, or that lost
     a push race twice, ends GREEN with a warning (`.build/classify-failure.mjs`);
     `.build/transient-streak.sh` turns it red only after 12h of that, and

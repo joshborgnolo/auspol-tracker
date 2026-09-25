@@ -96,9 +96,11 @@ elif echo "$EXTRACT_OUT" | grep -q '^updated .*report-index\.json'; then
       || git add .build/essential-src/report-index.json
     IDX_MSG="Refresh Essential report index $(date '+%Y-%m-%d')"
     if git commit -m "$IDX_MSG" >> "$LOG" 2>&1; then
-      push_main "$IDX_MSG" .build/essential-src/report-index.json .build/essential-src/site-fingerprint.json \
-        || log "FAIL git push (commit kept locally)"
-      log "OK committed + pushed: $IDX_MSG"
+      if push_main "$IDX_MSG" .build/essential-src/report-index.json .build/essential-src/site-fingerprint.json; then
+        log "OK committed + pushed: $IDX_MSG"
+      else
+        log "FAIL git push (commit kept locally)"
+      fi
     else
       log "index commit produced nothing; carrying on"
     fi
@@ -115,8 +117,11 @@ if [ "$DATA_CHANGED" = false ] && [ -f "$FP" ] && { ! git diff --quiet -- "$FP" 
   git add "$FP"
   FP_MSG="Refresh Essential site fingerprint $(date '+%Y-%m-%d')"
   if git commit -m "$FP_MSG" >> "$LOG" 2>&1; then
-    push_main "$FP_MSG" "$FP" || log "FAIL git push (commit kept locally)"
-    log "OK committed + pushed: $FP_MSG"
+    if push_main "$FP_MSG" "$FP"; then
+      log "OK committed + pushed: $FP_MSG"
+    else
+      log "FAIL git push (commit kept locally)"
+    fi
   fi
 fi
 
@@ -153,9 +158,11 @@ if [ "$DATA_CHANGED" = false ]; then
       log "FAIL git commit after skip-confirm; no commit made"
       exit 1
     fi
-    push_main "$MSG" data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt \
-      || log "FAIL git push (commit kept locally)"
-    log "OK committed + pushed: $MSG"
+    if push_main "$MSG" data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt; then
+      log "OK committed + pushed: $MSG"
+    else
+      log "FAIL git push (commit kept locally)"
+    fi
   elif [ $CONFIRM -ne 0 ]; then
     log "skip-confirm refused (see above); human review needed"
   fi
@@ -176,13 +183,13 @@ fi
 # essential-src has no tracked files (the extractor writes the CSV directly);
 # add it only if this run produced snapshots, so a fresh checkout doesn't fail
 # the add with "pathspec did not match".
-git add data/essential-report.csv data/polls.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
+ESS_FILES=(data/essential-report.csv data/polls.json "${SITE_FILES[@]}")
+git add "${ESS_FILES[@]}" || { log "FAIL git add"; exit 1; }
 [ -d .build/essential-src ] && git add .build/essential-src/ || true
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-ESS_FILES=(data/essential-report.csv data/polls.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json)
 [ -d .build/essential-src ] && ESS_FILES+=(.build/essential-src/)
 if ! push_main "$MSG" "${ESS_FILES[@]}"; then
   exit 1

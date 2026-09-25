@@ -43,7 +43,7 @@ case "$LAST_LINE" in
   *) log "FAIL extract (no PB_STATUS line): $LAST_LINE"; exit 1 ;;
 esac
 
-SITE_FILES="data/polls.json .build/pollbludger-src/seen.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json"
+FILES=(data/polls.json .build/pollbludger-src/seen.json "${SITE_FILES[@]}")
 
 if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
   # nothing filed or pruned — but the grace ledger may have gained a wave
@@ -69,13 +69,13 @@ if ! refresh_site; then
   log "FAIL build; no commit made"
   exit 1
 fi
-git add $SITE_FILES || { log "FAIL git add"; exit 1; }
+git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 MSG="Poll Bludger fallback: $FILED"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! push_main "$MSG" $SITE_FILES; then
+if ! push_main "$MSG" "${FILES[@]}"; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"

@@ -46,11 +46,13 @@ home-screen icon). `<head>` links PNG first (Google takes it), SVG data-URI seco
   prediction-refresh). Order is now: build → render-card → **render-favicon** → restamp
   build. Both renders are best-effort (log `WARN` + `::warning::`, never block a data
   commit over a preview asset).
-- **All 10 `.build/*-updater.sh` wrappers + `prediction-refresh.sh`** stage the trio
-  `assets/favicon.svg assets/favicon-192.png assets/favicon-192.json` in BOTH places:
-  the explicit `git add` list AND the `push_main` / `*_FILES` array (the rebase-amend path
-  re-stages from that list). sampleeff-updater also has its blanket `git add assets/` —
-  keep the explicit trio anyway. demosau/essential early "confirm-skip" blocks use
+- **Every data wrapper + `prediction-refresh.sh`** stages the trio
+  `assets/favicon.svg assets/favicon-192.png assets/favicon-192.json` through the shared
+  `SITE_FILES` array in `.build/git-push-main.sh` (since 2026-09-25; before that the
+  trio was hand-copied into both the `git add` list and the `push_main` list of eleven
+  wrappers). Each wrapper's `FILES=(<own paths> "${SITE_FILES[@]}")` feeds both the add
+  and push_main (whose rebase-amend path re-stages from it). A new generated file goes
+  into `SITE_FILES` once. demosau/essential early "confirm-skip" blocks use
   `git add ... assets/` so they pick the trio up wholesale; that's fine (cosmetic cases).
 - **build.mjs stale-stamp warning** (~:379-397): after the `FAV_PNG` absent-warn, if the
   PNG exists it reads the stamp and warns `favicon PNG: drawn from an older glyph` on

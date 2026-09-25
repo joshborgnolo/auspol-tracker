@@ -84,13 +84,14 @@ if $CHANGED; then
     log "FAIL build; no commit made"
     exit 1
   fi
-  git add data/vote-switching.json data/demographics.json data/issues.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
+  FILES=(data/vote-switching.json data/demographics.json data/issues.json "${SITE_FILES[@]}")
+  git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
   MSG="Update crosstab tables $(date '+%Y-%m-%d')"
   if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
     log "FAIL git commit"
     exit 1
   fi
-  if ! push_main "$MSG" data/vote-switching.json data/demographics.json data/issues.json index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
+  if ! push_main "$MSG" "${FILES[@]}"; then
     exit 1
   fi
   log "OK committed + pushed: $MSG"

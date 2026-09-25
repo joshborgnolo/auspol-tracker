@@ -85,9 +85,11 @@ if ! echo "$LAST_LINE" | grep -q '"changed":true'; then
       log "FAIL git commit after skip-confirm; no commit made"
       exit 1
     fi
-    push_main "$MSG" data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt \
-      || log "FAIL git push (commit kept locally)"
-    log "OK committed + pushed: $MSG"
+    if push_main "$MSG" data/polls.json index.html assets/ feed.xml sitemap.xml robots.txt; then
+      log "OK committed + pushed: $MSG"
+    else
+      log "FAIL git push (commit kept locally)"
+    fi
   elif [ $CONFIRM -ne 0 ]; then
     log "skip-confirm refused (see above); human review needed"
   fi
@@ -110,13 +112,14 @@ if ! refresh_site; then
   exit 1
 fi
 
-git add data/polls.json data/vote-switching.json data/demographics.json .build/demosau-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json || { log "FAIL git add"; exit 1; }
+FILES=(data/polls.json data/vote-switching.json data/demographics.json .build/demosau-src/ "${SITE_FILES[@]}")
+git add "${FILES[@]}" || { log "FAIL git add"; exit 1; }
 MSG="Update DemosAU poll data $(date '+%Y-%m-%d')"
 if ! git commit -m "$MSG" >> "$LOG" 2>&1; then
   log "FAIL git commit"
   exit 1
 fi
-if ! push_main "$MSG" data/polls.json data/vote-switching.json data/demographics.json .build/demosau-src/ index.html feed.xml sitemap.xml robots.txt assets/auspol-card.png assets/auspol-card.json assets/auspol-latest.json assets/favicon.svg assets/favicon-192.png assets/favicon-192.json; then
+if ! push_main "$MSG" "${FILES[@]}"; then
   exit 1
 fi
 log "OK committed + pushed: $MSG"
