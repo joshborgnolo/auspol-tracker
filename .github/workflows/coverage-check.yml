@@ -3,7 +3,10 @@
 #
 #   class 0  clean            → green
 #   class 1  monitoring-outage → GREEN (the watchdog's standing rule:
-#             inconclusive is not an alarm), noted in the run summary
+#             inconclusive is not an alarm), noted in the run summary —
+#             until it has lasted 40h: then the `blind` job goes red
+#             (email, no repair agent), because in Sep 2026 a reshaped
+#             Wikipedia table read as inconclusive for twelve green days
 #   class 2  defect           → the job fails (email) AND the central
 #             agent-repair workflow fires — only class backed by witness
 #             evidence of a missed wave
@@ -86,6 +89,34 @@ jobs:
           bash .build/alert-issue.sh \
             "Coverage: wave(s) on the page only via the Poll Bludger fallback" \
             "$BODY" || echo "::warning::could not file the ci-alert issue"
+
+  # A blind watchdog. Class 1 is not an alarm, but an unbroken run of it is
+  # a parser or a witness that stopped working (Sep 2026: Wikipedia's table
+  # changed shape and check-coverage read it as inconclusive for twelve
+  # days, all green). transient-streak.sh turns the third straight
+  # inconclusive day red. Its own job so that red is an email, not repair
+  # work: agent-repair's gate hands only a failed check or thinness job to
+  # an agent, whose prompt is for missed waves, not the parser.
+  blind:
+    needs: check
+    if: always() && needs.check.outputs.verdict == '1'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: read # this workflow's earlier runs
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      # Its name is load-bearing: the streak is counted from earlier runs
+      # in which this step ran green.
+      - name: Note an inconclusive verdict
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STREAK_KIND: inconclusive
+          STREAK_RAN: '^Run the coverage doctor$'
+          STREAK_MIN: '2'
+          STREAK_HOURS: '40'
+        run: bash .build/transient-streak.sh
 
   # Heartbeat — the "everything ran, nothing happened" detector the doctor
   # cannot provide. Two checks, both born of the 2026-09-05..07 lock outage:

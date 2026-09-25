@@ -8,12 +8,19 @@
    environmental state served from here, one spawn of the real script
    against it, one SITE_STATUS line parsed off stdout:
 
-     happy            all five files match, two hashed assets resolve -> 0
+     happy            every served file matches (the root four and the
+                      sitemap's satellite page), all assets resolve -> 0
      index mismatch   live bytes differ -> 2, firstDiffAt is the real offset
      feed mismatch    index matches, feed.xml doesn't -> 2 naming the file
+     satellite        a sitemap page's bytes differ -> 2 naming the page
      missing asset    html matches but a referenced asset 404s -> 2 naming it
+     shared asset     the satellites' shell asset 404s -> 2 naming it
+     unlisted page    the sitemap names a page the commit lacks -> 2 (the
+                      2026-09-06..25 blind spot: a missing file crashed the
+                      checker, and the crash read as inconclusive, green)
      unreachable      nothing on the port -> 1 locally and on workflow_run,
                       but 2 on the scheduled backstop (nothing is deploying)
+     http 404         the same split for a wrong answer (a Pages 404 page)
      grace flip       Pages-mid-deploy: wrong bytes twice, then right -> 0
      dirty tree       uncommitted served file outside CI -> refuse with 1
      ahead of origin  committed but unpushed outside CI -> refuse with 1
@@ -22,9 +29,9 @@
    ==================================================================== */
 
 import { createServer } from "node:http";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { execFile, execFileSync } from "node:child_process";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
@@ -45,10 +52,15 @@ const INDEX = `<!doctype html><html><head><link rel="preload" href="assets/somef
 const SITE = {
   "index.html": INDEX,
   "feed.xml": "<?xml version=\"1.0\"?><rss><channel/></rss>",
-  "sitemap.xml": "<?xml version=\"1.0\"?><urlset/>",
+  "sitemap.xml": "<?xml version=\"1.0\"?><urlset>" +
+    "<url><loc>https://auspoltracker.com/</loc></url>" +
+    "<url><loc>https://auspoltracker.com/archives/house/</loc></url></urlset>",
   "robots.txt": "User-agent: *\nAllow: /\n",
-  "auspol-polling.html": "<!doctype html><html><body>legacy</body></html>",
+  // a satellite: the shared shell, named root-absolute as the real ones do
+  "archives/house/index.html": "<!doctype html><html><head><link rel=\"stylesheet\" href=\"/assets/site-shell.css\">" +
+    "</head><body>archive</body></html>",
   "assets/somefont-a1b2c3.woff2": Buffer.from("woff2-font-bytes"),
+  "assets/site-shell.css": Buffer.from(".shell{}"),
   "assets/cycle-source.fbdfeeb3.json": Buffer.from("{\"cycles\":[]}"),
   "assets/auspol-card.png": Buffer.from("png-bytes"),
 };
@@ -72,8 +84,11 @@ const wholeSite = (over = {}) => (path) =>
 function rootWith(over = {}) {
   const dir = mkdtempSync(join(tmpdir(), "site-check-root-"));
   const files = { ...SITE, ...over };
-  for (const f of ["index.html", "feed.xml", "sitemap.xml", "robots.txt", "auspol-polling.html"])
+  for (const f of ["index.html", "feed.xml", "sitemap.xml", "robots.txt", "archives/house/index.html"]) {
+    if (files[f] == null) continue; // a case that leaves a file out of the commit
+    mkdirSync(dirname(join(dir, f)), { recursive: true });
     writeFileSync(join(dir, f), files[f]);
+  }
   return dir;
 }
 
@@ -116,9 +131,10 @@ const close = (server, ...dirs) => server.close(() => dirs.forEach((d) => rmSync
   const root = rootWith();
   const r = await run(url, root);
   ok("happy: exit 0", r.code === 0, r.stdout + r.stderr);
-  ok("happy: verdict 0, 3 assets checked, no failures", r.status?.verdict === 0 &&
-    r.status?.assets?.checked === 3 && r.status?.assets?.failed?.length === 0,
+  ok("happy: verdict 0, 4 assets checked (the satellite's shell too), no failures", r.status?.verdict === 0 &&
+    r.status?.assets?.checked === 4 && r.status?.assets?.failed?.length === 0,
     JSON.stringify(r.status));
+  ok("happy: the sitemap's satellite page was compared", /archives\/house\/index\.html ok/.test(r.stdout), r.stdout);
   ok("happy: byte counts agree", r.status?.liveBytes === INDEX.length && r.status?.localBytes === INDEX.length);
   close(server, root);
 }
@@ -166,6 +182,41 @@ const close = (server, ...dirs) => server.close(() => dirs.forEach((d) => rmSync
   close(server, root);
 }
 
+/* --- a satellite page from the sitemap is stale: class 2 naming it ------ */
+{
+  const { server, url } = await serve(wholeSite({ "archives/house/index.html": Buffer.from("<html>older archive</html>") }));
+  const root = rootWith();
+  const r = await run(url, root, { SITE_CHECK_GRACE_MS: "1800" });
+  ok("satellite mismatch: exit 2 naming the page", r.code === 2 && r.status?.file === "archives/house/index.html",
+    r.stdout + r.stderr);
+  close(server, root);
+}
+
+/* --- the shell asset every satellite loads is gone: class 2 naming it --- */
+{
+  const router = wholeSite();
+  const { server, url } = await serve((path, req) =>
+    path === "assets/site-shell.css" ? null : router(path, req));
+  const root = rootWith();
+  const r = await run(url, root, { SITE_CHECK_GRACE_MS: "1800" });
+  ok("shared asset missing: exit 2 naming assets/site-shell.css", r.code === 2 &&
+    r.status?.assets?.failed?.includes("assets/site-shell.css"), JSON.stringify(r.status));
+  close(server, root);
+}
+
+/* --- the sitemap names a page this commit doesn't carry: class 2, not a
+       crash filed as inconclusive (which is how auspol-polling.html's
+       deletion blinded the watchdog from 2026-09-06 to 09-25) ------------- */
+{
+  const { server, url } = await serve(wholeSite());
+  const root = rootWith({ "archives/house/index.html": null });
+  const r = await run(url, root);
+  ok("unlisted page: exit 2", r.code === 2, r.stdout + r.stderr);
+  ok("unlisted page: names the file and why", r.status?.file === "archives/house/index.html" &&
+    r.status?.reason === "served file missing from the commit", JSON.stringify(r.status));
+  close(server, root);
+}
+
 /* --- unreachable, local/ad-hoc run: class 1 (a deploy may be in flight) - */
 {
   const { server, url } = await serve(() => null);
@@ -197,6 +248,19 @@ const close = (server, ...dirs) => server.close(() => dirs.forEach((d) => rmSync
   ok("unreachable (schedule): verdict 2, reason unreachable", r.status?.verdict === 2 &&
     r.status?.reason === "unreachable", JSON.stringify(r.status));
   rmSync(root, { recursive: true, force: true });
+}
+
+/* --- a wrong answer: inconclusive on a deploy, a defect on the backstop - */
+{
+  // a Pages 404 (site unpublished, domain detached) arrives as text/html
+  const { server, url } = await serve((path) => (path === "index.html" ? [404, "<html>404</html>"] : null));
+  const root = rootWith();
+  const onDeploy = await run(url, root, { GITHUB_EVENT_NAME: "workflow_run" });
+  ok("http 404 (workflow_run): exit 1", onDeploy.code === 1, onDeploy.stdout + onDeploy.stderr);
+  const backstop = await run(url, root, { GITHUB_EVENT_NAME: "schedule" });
+  ok("http 404 (schedule): exit 2, reason http 404", backstop.code === 2 &&
+    backstop.status?.reason === "http 404", JSON.stringify(backstop.status));
+  close(server, root);
 }
 
 /* --- nonexistent host, local: DNS failure is also class 1 --------------- */

@@ -30,7 +30,12 @@ a GENERATED build artifact — never hand-edit it.
   - A run that fails because the pollster was down or walled, or that lost
     a push race twice, ends GREEN with a warning (`.build/classify-failure.mjs`);
     `.build/transient-streak.sh` turns it red only after 12h of that, and
-    only then does agent-repair see it. Callers grant `actions: read` for the
+    only then does agent-repair see it. The watchdogs use the same script
+    for their "inconclusive" verdicts (`STREAK_KIND=inconclusive`): a
+    site-check class 1 that lasts 12h, or a coverage class 1 on a third
+    straight day (coverage-check's `blind` job — an email, not repair
+    work), goes red. Both watchdogs sat green and blind for 12–19 days in
+    Sep 2026. Callers grant `actions: read` for the
     streak check — the caller's `permissions:` is the ceiling for
     poll-agent's job (`test-workflows.mjs` pins it).
   - The cron block between `# tune-schedules:begin/end` in each caller is

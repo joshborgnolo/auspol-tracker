@@ -16,9 +16,9 @@
 
    Exit classes (coverage-doctor.mjs conventions, not check-coverage's):
 
-     0  deployed bytes == committed bytes for all five served files, and
-        every assets/… reference in the deployed html resolves (200,
-        non-empty).
+     0  deployed bytes == committed bytes for every served file (the root
+        four plus each page in the committed sitemap), and every assets/…
+        reference in the deployed pages resolves (200, non-empty).
      1  INCONCLUSIVE — the site could not be reached, DNS/TLS failed, the
         response was not html (except on the scheduled backstop — see
         class 2), or the local tree is dirty or ahead of origin/main and
@@ -26,10 +26,12 @@
         broken build while a deploy may be in flight; a watchdog that
         cries wolf gets muted.
      2  DEFECT — content mismatch after the grace window, a referenced
-        asset missing, or (on the scheduled daily backstop only) the site
-        unreachable: nothing is deploying then, so DNS/TLS/reachability
-        failure no longer has a benign explanation. CI fails the job on
-        this class only.
+        asset missing, a sitemap page missing from the commit, or (on the
+        scheduled daily backstop only) the site unreachable: nothing is
+        deploying then, so DNS/TLS/reachability failure no longer has a
+        benign explanation. Also the checker's own crash: a watchdog that
+        cannot run is broken, not unsure. CI fails the job on this class
+        only.
 
    Pages is asynchronous: a push to main deploys ~20–30 s later. On the
    workflow_run path (pinned to the deployed commit) a hash mismatch is
@@ -75,7 +77,27 @@ const ROOT = process.env.SITE_CHECK_ROOT ||
   fileURLToPath(new URL("../", import.meta.url));
 const BASE = (process.env.SITE_CHECK_URL || "https://auspoltracker.com/")
   .replace(/\/+$/, "") + "/";
-const FILES = ["index.html", "feed.xml", "sitemap.xml", "robots.txt", "auspol-polling.html"];
+/* What is served: the four files build.mjs writes at the root, then every
+   page the committed sitemap lists (the archives and the other satellites).
+   The satellites load the main page's shell — assets/site-shell.css and .js,
+   the masthead dial — so one missing shared asset breaks all of them while
+   index.html still looks fine. The page list comes from the sitemap because
+   the hand-kept list it replaced still named auspol-polling.html after that
+   page was deleted on 2026-09-06: every run for 19 days crashed on the
+   missing file, and the crash was reported as inconclusive, which is green. */
+const ROOT_FILES = ["index.html", "feed.xml", "sitemap.xml", "robots.txt"];
+function sitemapPages() {
+  let xml;
+  try { xml = readFileSync(join(ROOT, "sitemap.xml"), "utf8"); } catch { return []; } // main() reports the missing file
+  const pages = [];
+  for (const m of xml.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)) {
+    let path;
+    try { path = decodeURIComponent(new URL(m[1]).pathname); } catch { continue; }
+    pages.push(path.replace(/^\/+/, "") + (path.endsWith("/") ? "index.html" : ""));
+  }
+  return pages;
+}
+const FILES = [...new Set([...ROOT_FILES, ...sitemapPages()])];
 const EVENT = process.env.GITHUB_EVENT_NAME || "local";
 const GRACE_MS = Number(process.env.SITE_CHECK_GRACE_MS) ||
   (EVENT === "workflow_run" ? 5 * 60_000 : 30_000);
@@ -180,7 +202,16 @@ async function main() {
   console.log(`site-check: ${BASE} vs ${ROOT} (${FILES.length} files, grace ${GRACE_MS / 1000}s)`);
   dirtyGuard();
   aheadGuard();
-  for (const f of FILES) locals[f] = readFileSync(join(ROOT, f));
+  for (const f of FILES) {
+    try {
+      locals[f] = readFileSync(join(ROOT, f));
+    } catch (e) {
+      // a root file the build always writes, or a page the sitemap promises,
+      // absent from the commit Pages built: the build broke, not the network
+      console.log(`site-check: ${f} is served by this commit's site but missing from the checkout (${e.code || e.message})`);
+      emit(2, { file: f, reason: "served file missing from the commit" });
+    }
+  }
 
   /* 1 — reachable */
   let first;
@@ -191,19 +222,24 @@ async function main() {
       (UNREACHABLE_CLASS === 2 ? " — scheduled backstop: nothing is deploying, this is an outage" : ""));
     emit(UNREACHABLE_CLASS, { reason: "unreachable", error: e.message });
   }
+  /* A wrong answer is judged like no answer: inconclusive while a deploy may
+     be in flight, a defect on the backstop — a Pages 404 page (the site
+     unpublished, the domain detached) is served as text/html, and it used
+     to read as inconclusive every day. */
+  const backstop = UNREACHABLE_CLASS === 2 ? " — scheduled backstop: nothing is deploying, the site is broken" : " — inconclusive, not a defect";
   if (first.status !== 200) {
-    console.log(`site-check: HTTP ${first.status} — inconclusive, not a defect`);
-    emit(1, { reason: `http ${first.status}` });
+    console.log(`site-check: HTTP ${first.status}${backstop}`);
+    emit(UNREACHABLE_CLASS, { reason: `http ${first.status}` });
   }
   if (!/text\/html/i.test(first.type) || !first.buf.length) {
-    console.log(`site-check: bad response (type "${first.type}", ${first.buf.length} bytes) — inconclusive`);
-    emit(1, { reason: "not html" });
+    console.log(`site-check: bad response (type "${first.type}", ${first.buf.length} bytes)${backstop}`);
+    emit(UNREACHABLE_CLASS, { reason: "not html" });
   }
   lives["index.html"] = first.buf;
   console.log(`site-check: reachable, ${first.buf.length} bytes`);
 
   /* 2+4 — freshness/integrity of every served file, with one shared grace
-     window (Pages is asynchronous; a deploy finishing applies to all five) */
+     window (Pages is asynchronous; a deploy finishing applies to all of them) */
   const pending = new Set(FILES);
   const deadline = Date.now() + GRACE_MS;
   let attempt = 0;
@@ -254,18 +290,24 @@ async function main() {
      a source comment that merely MENTIONS "assets/np-project.js (the plain
      layer…)", and a bare regex once extracted that and phoned home a 404 on
      a file that is inlined by design. Found live, 2026-09-01, on this
-     checker's first run against production. */
-  const html = lives["index.html"].toString("utf8");
+     checker's first run against production.
+
+     Every deployed page is read, not only index.html: the satellites name
+     the shared shell as "/assets/…", and all of the site's assets live in
+     the root assets/ directory, so each reference resolves from the root. */
   const assets = new Set();
   // an optional ?query rides along (the og card's reference is cache-busted
   // "?v=date", and the reference as deployed is what must resolve)
   const REF = "assets\\/[\\w./-]+(?:\\?[^\\s\"'<>()\\]]*)?";
-  for (const re of [
-    new RegExp(`["'\`]([^"'\`\\n]{0,400}?${REF})["'\`]`, "g"), // quoted strings (attrs, JS literals)
-    new RegExp(`url\\(\\s*["']?([^'"\\)\\s]*?${REF})["']?\\s*\\)`, "g"), // css url()
-  ]) {
-    let m;
-    while ((m = re.exec(html))) assets.add(m[1].slice(m[1].lastIndexOf("assets/")));
+  for (const f of FILES.filter((x) => x.endsWith(".html"))) {
+    const html = lives[f].toString("utf8");
+    for (const re of [
+      new RegExp(`["'\`]([^"'\`\\n]{0,400}?${REF})["'\`]`, "g"), // quoted strings (attrs, JS literals)
+      new RegExp(`url\\(\\s*["']?([^'"\\)\\s]*?${REF})["']?\\s*\\)`, "g"), // css url()
+    ]) {
+      let m;
+      while ((m = re.exec(html))) assets.add(m[1].slice(m[1].lastIndexOf("assets/")));
+    }
   }
   const assetList = [...assets].sort();
   for (const a of assetList) {
@@ -290,7 +332,11 @@ async function main() {
   emit(0);
 }
 
+/* A crash is the checker's own defect, never "inconclusive": every network
+   failure above is caught and classified where it happens, so what reaches
+   here is a bug or a broken checkout. Until 2026-09-25 this was class 1, and
+   a missing file kept the watchdog crashing, and green, for 19 days. */
 main().catch((e) => {
-  console.error("site-check: internal error: " + (e && e.message ? e.message : e));
-  emit(1, { reason: "internal error", error: e && e.message ? e.message : String(e) });
+  console.error("site-check: internal error — the checker itself is broken: " + (e && e.message ? e.message : e));
+  emit(2, { reason: "internal error", error: e && e.message ? e.message : String(e) });
 });

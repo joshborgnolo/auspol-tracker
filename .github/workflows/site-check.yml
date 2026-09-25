@@ -2,13 +2,19 @@
 # auspoltracker.com (spec: .build/site-check-spec.md) and classifies:
 #
 #   class 0  deployed bytes == committed bytes, assets resolve → green
-#   class 1  inconclusive (host unreachable while a deploy may be in
-#             flight, Pages still building, bad response) → GREEN;
-#             inconclusive is not an alarm
+#   class 1  inconclusive (host unreachable or answering wrong while a
+#             deploy may be in flight) → GREEN, once: a run of them that
+#             lasts 12h goes red (.build/transient-streak.sh). This
+#             watchdog crashed on every run for 19 days (6–25 Sep 2026) and
+#             the crash read as inconclusive, so nobody knew it was blind.
 #   class 2  defect (content mismatch after the grace window, a
-#             referenced asset missing, or — on the scheduled backstop,
-#             where nothing is deploying — the site unreachable) → the
-#             job fails (email)
+#             referenced asset missing, a served file missing from the
+#             commit, the checker's own crash, or — on the scheduled
+#             backstop, where nothing is deploying — the site unreachable
+#             or answering wrong) → the job fails (email)
+#
+# "Served" is the root four files plus every page the committed sitemap
+# lists: the satellites share the main page's shell assets.
 #
 # Two triggers for two failures:
 #   * workflow_run of "pages-build-deployment" — checks the commit the
@@ -35,6 +41,7 @@ concurrency:
 # read-only: compares deployed bytes to committed bytes, touches nothing
 permissions:
   contents: read
+  actions: read # the inconclusive-streak check reads this workflow's earlier runs
 
 jobs:
   check:
@@ -78,5 +85,19 @@ jobs:
               echo '```'
             } >> "$GITHUB_STEP_SUMMARY"
           fi
-          # only class 2 (defect) goes red; class 1 is inconclusive-is-not-an-alarm
+          # only class 2 (defect) goes red here; class 1 is judged below
           [ "$CODE" -ne 2 ]
+
+      # Its name is load-bearing: transient-streak.sh finds the earlier
+      # inconclusive runs by this step having run green. Many deploys a day,
+      # so it walks further back than the updaters' check does.
+      - name: Note an inconclusive verdict
+        if: steps.check.outputs.verdict == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          STREAK_KIND: inconclusive
+          STREAK_RAN: '^Run the site check$'
+          STREAK_MIN: '3'
+          STREAK_HOURS: '12'
+          STREAK_MAX_RUNS: '60'
+        run: bash .build/transient-streak.sh
