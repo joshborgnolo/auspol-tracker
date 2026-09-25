@@ -9,13 +9,13 @@
      Not part of the .build/newtracker pipeline — hand-maintained. Chrome is
      the main site's static-article view (its no-JS static summary): the same
      680px column, Crimson Text headings over IBM Plex Sans body, the site's shared header and footer (.build/site-shell.mjs). -->
-<meta name="description" content="The historical AC Nielsen federal poll record — annual PDF compilations of voting intention, leadership approval and preferred PM, 1996–2012, preserved from au.acnielsen.com via the Internet Archive.">
+<meta name="description" content="AC Nielsen's federal polls for The Age and The Sydney Morning Herald, 1996 to 2012: yearly PDFs of voting intention, leader approval, and preferred prime minister, kept via the Internet Archive.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="auspol tracker">
 <meta property="og:title" content="AC Nielsen poll archive · auspol tracker">
-<meta property="og:description" content="The historical AC Nielsen federal poll record, 1996–2012, preserved from au.acnielsen.com via the Internet Archive.">
+<meta property="og:description" content="AC Nielsen's federal polls for The Age and The Sydney Morning Herald, 1996 to 2012.">
 <meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://auspoltracker.com/archives/acnielsen/">
 <link rel="icon" href="/assets/favicon.svg">
@@ -132,6 +132,9 @@ body {
   font-size: 14.5px; line-height: 1.6; color: var(--ink-2); margin-top: 16px; margin-bottom: 12px;
 }
 .credit a { color: inherit; }
+/* the AGB McNair section's paragraphs carry no class: give them the
+   column's paragraph rhythm, or they run together */
+.frame-wrap > p:not([class]) { margin: 0 0 12px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
 .ss-note { margin-top: 20px; font-size: 14.5px; line-height: 1.6; color: var(--ink-2); }
 .ss-note a { color: var(--ink-2); }
 .ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
@@ -218,14 +221,14 @@ body {
 </nav>
 <main id="sh-content" class="frame-wrap">
   <h1>AC Nielsen poll archive</h1>
-  <p class="ss-sub">The historical AC Nielsen federal poll record, for safekeeping — as published with The Age and The Sydney Morning Herald, 1996–2012, as at the latest aggregate (ALP 51.1 · Coalition 48.9, 31 August 2026).</p>
+  <p class="ss-sub">AC Nielsen&rsquo;s federal polls for The Age and The Sydney Morning Herald, 1996 to 2012.</p>
 
-  <p class="credit">The AC Nielsen federal poll — annual PDF compilations of voting intention, leadership approval and preferred PM, preserved from au.acnielsen.com via the Internet Archive and mirrored here. No polls were conducted in 2002. Sourced from <a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/news/200512.shtml">web.archive.org/web/20060627052718/http://au.acnielsen.com/news/200512.shtml</a> (the 1996–2006 set) and later snapshots of au.acnielsen.com (2007–2012, plus the September 2008 federal vote table).</p>
+  <p class="credit">AC Nielsen published each year&rsquo;s federal polls as a PDF: voting intention, leader approval, and preferred prime minister. Its website is long gone, so the copies below come from the Internet Archive: a <a href="https://web.archive.org/web/20060627052718/http://au.acnielsen.com/news/200512.shtml">2006 capture</a> of au.acnielsen.com for 1996 to 2006, and later captures for 2007 to 2012 and the September 2008 federal vote table. AC Nielsen ran no federal polls in 2002.</p>
 
 <!--AGB-MENTIONS-->
   <h2>Before 1996: AGB McNair</h2>
-  <p>Fairfax&rsquo;s national poll before 1996 was conducted by AGB McNair — the face-to-face precursor of AC Nielsen. Kevin Bonham&rsquo;s <a href="https://kevinbonham.blogspot.com/2018/03/the-keating-aggregation-1990-1993.html">Keating aggregation (1990&ndash;1993)</a> streams it alongside Newspoll and Morgan from January 1992. AC Nielsen took over the Fairfax contract in 1996 and switched the series to telephone, so no Nielsen-branded federal poll exists before that year — which is why the archive starts at 1996.</p>
-  <p>The 71 contemporary newspaper reports below (1990&ndash;1995) were located by scanning the full text of the repo&rsquo;s Trove harvest — every poll-naming newspaper article, 1803&ndash;2025 — for the AGB McNair house name. All 71 are from The Canberra Times, the only Fairfax-stable masthead Trove digitised into the 1990s (The Age and the SMH are not in the corpus; their AGB McNair reports are only accessible via those papers&rsquo; own archives). Rows with quoted excerpts: <a href="/data/agb-mcnair-mentions.csv">agb-mcnair-mentions.csv</a>; vote figures parsed from those same articles: <a href="/data/agb-mcnair-figures.csv">agb-mcnair-figures.csv</a>. Irving Saulwick&rsquo;s &ldquo;Age poll&rdquo; (Saulwick Research) is the sibling Victorian series; it is catalogued under &ldquo;Saulwick&rdquo; in the same harvest — see the <a href="/archives/trove/">Trove newspaper archive</a>.</p>
+  <p>Before 1996, Fairfax&rsquo;s national poll was run by AGB McNair, face to face. AC Nielsen took over the contract in 1996 and moved the poll to the telephone, so there is no AC Nielsen federal poll before then, and this archive starts in 1996. Kevin Bonham&rsquo;s <a href="https://kevinbonham.blogspot.com/2018/03/the-keating-aggregation-1990-1993.html">Keating aggregation (1990&ndash;1993)</a> includes AGB McNair alongside Newspoll and Morgan from January 1992.</p>
+  <p>The 71 newspaper reports below (1990&ndash;1995) turned up in a search of the site&rsquo;s <a href="/archives/trove/">Trove archive</a>, every newspaper article that mentions a poll, for the AGB McNair name. All 71 are from The Canberra Times, the only paper carrying the poll that Trove has digitised into the 1990s. The Age&rsquo;s and The Sydney Morning Herald&rsquo;s reports are only in those papers&rsquo; own archives. The reports, with quoted excerpts, are in <a href="/data/agb-mcnair-mentions.csv">agb-mcnair-mentions.csv</a>, and the vote figures read from them in <a href="/data/agb-mcnair-figures.csv">agb-mcnair-figures.csv</a>. Irving Saulwick&rsquo;s &ldquo;Age poll&rdquo;, the sibling Victorian series, is listed under &ldquo;Saulwick&rdquo; in the Trove archive.</p>
   <ul class="archive-list">
     <li><a href="https://trove.nla.gov.au/newspaper/article/131180529">1990-02-21 — And now for the first test</a><span class="note">AGB McNair</span></li>
     <li><a href="https://trove.nla.gov.au/newspaper/article/132379816">1992-05-16 — Opinions on flag are unchanged POLL WATCH</a><span class="note">AGB McNair</span></li>
@@ -322,7 +325,7 @@ body {
     <li><a href="/data/acnielsen/ACNielsenPoll1997.pdf">AC Nielsen Poll 1997</a><span class="note">PDF</span></li>
     <li><a href="/data/acnielsen/ACNielsenPoll1996.pdf">AC Nielsen Poll 1996</a><span class="note">PDF</span></li>
   </ul>
-  <p class="ss-note">The same series transcribed to data: <a href="/data/acnielsen-polls.csv">acnielsen-polls.csv</a> (1996–2012).</p>
+  <p class="ss-note">The same polls as data: <a href="/data/acnielsen-polls.csv">acnielsen-polls.csv</a> (1996 to 2012).</p>
 </main>
 <!--shell:footer-->
 <div class="sh-frame">

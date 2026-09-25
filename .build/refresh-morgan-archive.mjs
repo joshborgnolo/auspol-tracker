@@ -207,13 +207,13 @@ function renderPage(sections, fetchedIso) {
      the way roymorgan.com stores them. Chrome is the main site's
      static-article view (its no-JS static summary): Crimson Text headings
      over IBM Plex Sans body, the site's shared header and footer (.build/site-shell.mjs). -->
-<meta name="description" content="The Morgan Poll record — Roy Morgan's two-party-preferred and primary voting intention tables, including the long-term trends back to 1901, transcribed verbatim from roymorgan.com.">
+<meta name="description" content="Roy Morgan's two-party preferred and primary vote tables, including the long-term trends back to 1901, copied cell for cell from roymorgan.com.">
 <meta name="theme-color" content="#faf6f0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1612" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="auspol tracker">
 <meta property="og:title" content="Morgan Poll archive · auspol tracker">
-<meta property="og:description" content="Roy Morgan's published vote-intention tables, transcribed table-for-table from roymorgan.com.">
+<meta property="og:description" content="Roy Morgan's published voting-intention tables, copied from roymorgan.com.">
 <meta name="twitter:card" content="summary">
 <link rel="canonical" href="https://auspoltracker.com/archives/morgan/">
 <link rel="icon" href="/assets/favicon.svg">
@@ -378,9 +378,9 @@ table.rm tr.span.note td { font-weight: 400; font-style: italic; color: var(--in
 </nav>
 <main class="frame-wrap">
   <h1>Morgan Poll archive</h1>
-  <p class="ss-sub">The Morgan Poll record, for safekeeping — Roy Morgan's published vote-intention tables, mirrored verbatim, as at the latest aggregate (ALP 51.1 · Coalition 48.9, 31 August 2026).</p>
+  <p class="ss-sub">Roy Morgan's published voting-intention tables, copied here as they appear on its site.</p>
 
-  <p class="credit">The Morgan Poll series, transcribed table-for-table from Roy Morgan's four published vote-intention tables (two-party-preferred and primary, current series and the long-term trends back to 1901) and mirrored here as CSV — each table links its own file below. Sourced from <a href="https://www.roymorgan.com/morgan-poll">roymorgan.com/morgan-poll</a> — snapshot refreshed ${esc(fetched)}. Cells are reproduced as printed, including Roy Morgan's own "&lt;0.5" minors floor and "##" markers (no two-party-preferred figure, pre-preferential-voting era).</p>
+  <p class="credit">Roy Morgan publishes four voting-intention tables: two-party preferred and primary vote, each as a current series and as a long-term trend back to 1901. They are copied below cell for cell, and each table links its own CSV file. Source: <a href="https://www.roymorgan.com/morgan-poll">roymorgan.com/morgan-poll</a>, last copied ${esc(fetched)}. Roy Morgan's own markings are kept: "&lt;0.5" for a minor party under half a per cent, and "##" for elections before preferential voting, which have no two-party figure.</p>
 ${secHtml}
 
 </main>
