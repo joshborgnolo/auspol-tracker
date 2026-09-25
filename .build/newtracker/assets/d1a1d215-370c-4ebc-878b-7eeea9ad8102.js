@@ -6440,7 +6440,7 @@ function infoTerms(D) {
       <p className="info-about-p"><b>Errors.</b> Spot a wrong number or a missing poll?
       {" "}<a className="fb-link" href="/feedback/">Let me know</a>.</p>
       <p className="info-about-p"><b>Archives.</b> Older federal polling archives are kept
-      {" "}<a className="fb-link" href="https://auspoltracker.com/archives">here</a> for safekeeping.</p>
+      {" "}<a className="fb-link" href="/archives/newspoll/">here</a> for safekeeping.</p>
     </>
   );
   return { groups, faqs, about };

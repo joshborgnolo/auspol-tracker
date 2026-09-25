@@ -345,6 +345,11 @@ a.sh-tn-link:hover, a.sh-tn-link:focus-visible { text-decoration: underline; tex
   max-width: calc(692px + 56px); margin-left: max(0px, calc((100% - 1200px) / 2)); margin-right: auto;
 }
 .frame-wrap { padding-top: 0; }
+/* The Morgan and Trove archives run to ~30,000 table elements; laid out
+   whole, that cost a phone-class CPU 350–550ms before the page settled.
+   A table off screen now skips layout and paint until it nears the
+   viewport, and remembers its real height once seen (auto). */
+.frame-wrap .rm-scroll { content-visibility: auto; contain-intrinsic-size: auto 900px; }
 /* the page's headings in the main page's editorial voice: a view's title is
    30px regular Crimson (.card-title under body.editorial), not 34px bold,
    and a section head keeps that weight a step down */

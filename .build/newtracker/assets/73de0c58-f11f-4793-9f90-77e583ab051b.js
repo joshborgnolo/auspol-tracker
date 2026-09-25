@@ -1731,7 +1731,7 @@ function MethodNote({ onInfo }) {
           </p>
           <p className="colo-arch">
             Federal polling archives I’ve located are stored{" "}
-            <a className="colo-link" href="https://auspoltracker.com/archives">
+            <a className="colo-link" href="/archives/newspoll/">
               here<span className="plink-mark" aria-hidden="true">↗</span>
             </a>{" "}
             for safekeeping and convenience.

@@ -139,6 +139,9 @@ body {
   display: flex;
 }
 iframe { flex: 1; width: 100%; border: 0; display: block; }
+.frame-holder { position: relative; }
+.frame-wait { position: absolute; top: 18px; left: 20px; margin: 0; font-size: 13px; color: #7a7470; }
+.frame-holder.loaded .frame-wait { display: none; }
 /* Dark mode: the chart is Infogram's page, not ours, so it can't take the
    site's colours. Its frame is inverted instead, and the hue turned back
    round, so the white card goes dark and the party colours stay close to
@@ -151,7 +154,12 @@ iframe { flex: 1; width: 100%; border: 0; display: block; }
 .ss-note a { color: var(--ink-2); }
 .ss-note a:hover, .ss-note a:focus-visible { text-decoration: underline; text-underline-offset: 2px; }
 </style>
+<link rel="preconnect" href="https://e.infogram.com">
 <!--shell:head-->
+<link rel="preload" href="/assets/fonts/ibmplexsans-latin.056e4e24.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/crimsontext-400-latin.aac0df38.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/crimsontext-600-latin.94af2060.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/sourcesans3-latin.ac057a55.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site-shell.css">
 <script>(function(){var c=document.documentElement.classList;c.add("sh-js");try{var t=JSON.parse(localStorage.getItem("auspol.tweaks")||"null")||{};if(t.theme==="light"||t.theme==="dark")c.add("sh-"+t.theme);if(t.accent==="cool")c.add("sh-cool")}catch(e){}})();</script>
 <style>
@@ -225,13 +233,27 @@ iframe { flex: 1; width: 100%; border: 0; display: block; }
   <p class="ss-sub">Newspoll&rsquo;s federal record, poll by poll, in the <a href="https://e.infogram.com/federal-newspoll-archive-1gv4m7ejjndop18?src=embed">Federal Newspoll Archive</a>: an interactive chart published on Infogram and shown here as it appears there.</p>
 
   <h2>The archive</h2>
-  <div class="frame-holder">
-    <iframe
-      src="https://e.infogram.com/federal-newspoll-archive-1gv4m7ejjndop18?src=embed"
-      title="Federal Newspoll Archive — historical Newspoll polling results (Infogram)"
-      allow="fullscreen"
-      loading="lazy"></iframe>
+  <!-- The chart is Infogram's page, which takes 1-2 seconds to load its own
+       code. Framed in the markup, it held the whole page "loading" until it
+       finished; it is framed once the page has loaded instead, behind a note,
+       with the connection to Infogram opened early (see <head>). -->
+  <div class="frame-holder" id="np-frame">
+    <p class="frame-wait">Loading the chart from Infogram&hellip;</p>
+    <noscript><iframe src="https://e.infogram.com/federal-newspoll-archive-1gv4m7ejjndop18?src=embed" title="Federal Newspoll Archive — historical Newspoll polling results (Infogram)" allow="fullscreen"></iframe></noscript>
   </div>
+  <script>
+  (function () {
+    var add = function () {
+      var holder = document.getElementById("np-frame"), f = document.createElement("iframe");
+      f.src = "https://e.infogram.com/federal-newspoll-archive-1gv4m7ejjndop18?src=embed";
+      f.title = "Federal Newspoll Archive — historical Newspoll polling results (Infogram)";
+      f.setAttribute("allow", "fullscreen");
+      f.addEventListener("load", function () { holder.classList.add("loaded"); });
+      holder.appendChild(f);
+    };
+    if (document.readyState === "complete") add(); else window.addEventListener("load", add);
+  })();
+  </script>
 
 </main>
 <!--shell:footer-->

@@ -166,7 +166,7 @@ export function shellFooter({ page } = {}) {
     ? `How the figures are built is in <a href="/#info">Info</a>.`
     : `How the figures are built is in <a href="/#info">Info</a>. Spot an error, a missing poll, or have any other feedback? Please <a class="sh-fb-link" href="/feedback/">let me know</a>.`;
   const arch = page === "archives" ? ""
-    : `\n        <p class="sh-arch">Federal polling archives I’ve located are stored <a href="/archives/">here</a> for safekeeping and convenience.</p>`;
+    : `\n        <p class="sh-arch">Federal polling archives I’ve located are stored <a href="/archives/newspoll/">here</a> for safekeeping and convenience.</p>`;
   return `<div class="sh-frame">
   <footer class="sh-foot">
     <div class="sh-colo">
@@ -234,6 +234,16 @@ const BACK_PILL_CSS = /^[ \t]*\.ss-back[^{\n]*\{[^}]*\}[ \t]*\n(?:[ \t]*\n)?/gm;
 const BACK_PILL_NOTE = /^[ \t]*\/\* -+ back to the interactive tracker \(the static page's \.ss-back pill\) \*\/[ \t]*\n/gm;
 const SAT_NOTE = /([ \t]*)<p class="ss-note">(?:This is (?:a satellite (?:archive |analysis )?page|the feedback page)|This page belongs to) (?:of |to )?<a href="\/">auspol tracker<\/a>, an unofficial aggregate of published federal opinion polling\.(?: The live(?:, interactive)? tracker (?:carries|has) the current [^<.]*\.)?\s*([^<]*(?:<(?!\/p>)[^<]*)*)<\/p>\n?/g;
 
+/* The four faces every satellite paints above the fold – the lockup's Source
+   Sans 3, the tabs' and titles' Crimson Text at 400 and 600, and the body's
+   IBM Plex Sans – requested with the page rather than once the stylesheets
+   that name them have been read (measured: 110–270ms late on every page).
+   The hashed names change only when a font does, and the shell's drift check
+   catches that. */
+const fontPreloads = () => ["ibmplexsans-", "crimsontext-400-", "crimsontext-600-", "sourcesans3-"]
+  .map(fontUrl).filter(Boolean)
+  .map((u) => `<link rel="preload" href="${u}" as="font" type="font/woff2" crossorigin>\n`).join("");
+
 /* The whole page with its shell current. Idempotent: applying it to its own
    output changes nothing, which is what --check and build.mjs test. */
 export function applyShell(html, opts = {}) {
@@ -241,7 +251,7 @@ export function applyShell(html, opts = {}) {
     .replace(SAT_NOTE, (all, ind, rest) => (rest.trim() ? `${ind}<p class="ss-note">${rest.trim()}</p>\n` : ""));
   const scoped = scopeDarkRules(h.replace(new RegExp("\\n?" + REGION("head").source), ""));
   h = scoped.html;
-  const head = region("head", `<link rel="stylesheet" href="/assets/site-shell.css">\n${EARLY}`
+  const head = region("head", fontPreloads() + `<link rel="stylesheet" href="/assets/site-shell.css">\n${EARLY}`
     + (scoped.rules.length ? `\n<style>\n/* this page's dark-mode rules, for a reader who chose dark on a light device */\n${darkCopies(scoped.rules)}\n</style>` : ""));
   h = h.replace(/\n?<\/head>/, "\n" + head + "\n</head>");
   const header = region("header", shellHeader(opts)), footer = region("footer", shellFooter(opts));
@@ -528,6 +538,11 @@ a.sh-tn-link:hover, a.sh-tn-link:focus-visible { text-decoration: underline; tex
   max-width: calc(692px + 56px); margin-left: max(0px, calc((100% - 1200px) / 2)); margin-right: auto;
 }
 .frame-wrap { padding-top: 0; }
+/* The Morgan and Trove archives run to ~30,000 table elements; laid out
+   whole, that cost a phone-class CPU 350–550ms before the page settled.
+   A table off screen now skips layout and paint until it nears the
+   viewport, and remembers its real height once seen (auto). */
+.frame-wrap .rm-scroll { content-visibility: auto; contain-intrinsic-size: auto 900px; }
 /* the page's headings in the main page's editorial voice: a view's title is
    30px regular Crimson (.card-title under body.editorial), not 34px bold,
    and a section head keeps that weight a step down */
