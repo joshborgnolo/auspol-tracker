@@ -2689,6 +2689,93 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
 .demo-chart-set { font-size: 13px; font-weight: 650; color: var(--ink); margin-right: 8px; }
 .read-ci { margin-left: 2px; }
+/* The issues. Who's trusted: a row per issue – how many put it in their top
+   three, then who they think is best on it, then the verdict – beside the
+   chosen issue's chart, with the notes under the chart they share with the
+   rows. What matters to whom: a table, a figure and a thin bar per cell,
+   with its sentences beside it. Both key off the panel's own width. */
+.iss-body { container-type: inline-size; }
+.iss-lead { margin: 0 2px 14px; font-size: 15px; line-height: 1.55; color: #000; text-wrap: pretty; }
+body.dark .iss-lead { color: var(--ink-2); }
+.iss-grid { display: grid; gap: 18px 30px; grid-template-columns: minmax(0, 1fr); margin: 0 2px 6px; }
+.iss-head, .iss-row { display: grid; align-items: center; gap: 4px 12px;
+  grid-template-columns: minmax(96px, 1.05fr) minmax(96px, 0.95fr) minmax(190px, 1.7fr) minmax(112px, 0.8fr); }
+.iss-head { font-size: 11px; line-height: 1.3; color: var(--ink-3); margin: 0 0 4px; padding: 0 8px; }
+.iss-row { padding: 8px; margin: 0 0 2px; border-radius: 8px; cursor: pointer; font-size: 13px;
+  -webkit-tap-highlight-color: transparent; }
+.iss-row:hover { background: color-mix(in oklch, var(--ink) 4%, var(--bg)); }
+.iss-row.sel { background: color-mix(in oklch, var(--ink) 7%, var(--bg)); box-shadow: inset 3px 0 0 var(--ink-3); }
+.iss-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.iss-lab { color: var(--ink); font-weight: 600; line-height: 1.25; }
+.iss-imp { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.iss-imp-track { flex: 1; min-width: 36px; }
+.iss-imp-v { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); min-width: 32px; text-align: right; }
+.iss-imp-v .pct { font-size: 11px; font-weight: 500; color: var(--ink-3); margin-left: 1px; }
+.iss-own { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.iss-sbar { flex: 1; min-width: 60px; height: 10px; border-radius: 5px; }
+/* each party's figure beside the bar: its dot, its number – the legend above names the dots */
+.iss-nums { display: flex; flex: none; gap: 0 8px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.iss-nums .skey-val { min-width: 15px; text-align: right; }
+.iss-head .iss-own { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.iss-legend { display: inline-flex; flex-wrap: wrap; gap: 2px 10px; color: var(--ink-2); }
+.iss-legend-solo { display: none; margin: 0 8px 6px; font-size: 12px; color: var(--ink-3); }
+.iss-verdict { display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 1.3; color: var(--ink-3);
+  white-space: nowrap; }
+.iss-verdict.lead { color: var(--ink); font-weight: 650; }
+.iss-na { font-size: 12px; color: var(--ink-3); }
+.iss-mini { display: none; }
+.iss-grn { margin: 8px 8px 0; }
+.iss-chart > .demo-verdict { margin-top: -22px; padding-right: 40px; }
+/* wide: the rows down the left, the chart and then its notes down the right.
+   The rows need about 640px to keep each on one line, the chart about 420,
+   so the split waits for the room; narrower, rows then chart, full width. */
+@container (min-width: 1080px) {
+  .iss-grid:not(.whom) { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .iss-grid:not(.whom) .iss-rows { grid-area: 1 / 1 / 3 / 2; }
+  .iss-grid:not(.whom) .iss-chart { grid-area: 1 / 2; }
+  .iss-grid:not(.whom) .iss-notes { grid-area: 2 / 2; align-self: start; }
+}
+@container (min-width: 900px) {
+  .iss-grid.whom { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .iss-grid.whom .iss-table-wrap { grid-area: 1 / 1 / 3 / 2; }
+  .iss-grid.whom .iss-said { grid-area: 1 / 2; }
+  .iss-grid.whom .iss-notes { grid-area: 2 / 2; align-self: start; }
+}
+/* a phone: each row stacks – the issue and its verdict, then the two bars,
+   each naming itself since the column heads are gone */
+@container (max-width: 560px) {
+  .iss-head { display: none; }
+  .iss-row { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px;
+    grid-template-areas: "lab verdict" "imp imp" "own own"; padding: 10px 8px; }
+  .iss-row .iss-lab { grid-area: lab; }
+  .iss-row .iss-verdict { grid-area: verdict; justify-content: flex-end; text-align: right; }
+  .iss-row .iss-imp { grid-area: imp; }
+  .iss-row .iss-own { grid-area: own; }
+  .iss-mini { display: block; flex: none; width: 76px; font-size: 11px; color: var(--ink-3); }
+  .iss-imp, .iss-own { gap: 8px; }
+  .iss-legend-solo { display: flex; align-items: center; gap: 2px 10px; }
+}
+.iss-table-wrap { min-width: 0; }
+.iss-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 13px; }
+.iss-table th, .iss-table td { padding: 6px 3px; text-align: center; }
+.iss-table thead th { font-size: 11px; font-weight: 600; line-height: 1.2; color: var(--ink-3); vertical-align: bottom; }
+.iss-table thead th:first-child { width: 32%; }
+.iss-table tbody th { text-align: left; font-size: 12.5px; font-weight: 500; line-height: 1.25; color: var(--ink-2); }
+.iss-table tr.all th, .iss-table tr.all td { border-bottom: 1px solid var(--line-2); }
+.iss-table tr.all th { color: var(--ink-3); }
+.iss-cell { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; }
+.iss-cell-v { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
+.iss-cell.all .iss-cell-v { font-weight: 500; color: var(--ink-3); }
+.iss-cell-bar { display: block; width: 100%; max-width: 44px; height: 4px; border-radius: 2px;
+  background: var(--bar-track); overflow: hidden; }
+.iss-cell-bar > span { display: block; height: 100%; border-radius: 2px; background: var(--ink-3); }
+.iss-said > .demo-verdict:first-child { margin-top: 0; }
+/* too narrow for six heads side by side: they turn to read upwards */
+@container (max-width: 520px) {
+  .iss-table thead th:not(:first-child) span { writing-mode: vertical-rl; transform: rotate(180deg);
+    display: inline-block; max-height: 104px; text-align: left; }
+  .iss-table tbody th { font-size: 12px; }
+}
 /* Where One Nation’s new voters came from, National direction, Undecided, the
    Leadership section, and the Primary-vote panel: one plain sentence above
    the readings, in the panel copy's own voice (the One Nation readings
@@ -2704,7 +2791,7 @@ body.dark .ons-lead, body.dark .dir-lead, body.dark .und-lead, body.dark .ld-lea
    edges and streaks the ink lengthwise. The caps are whole pixels: em widths
    left the tiles overlapping by a pixel, which the translucent ink showed as
    a seam. */
-.ons-lead mark, .dir-lead mark, .und-lead mark, .ld-lead mark, .pv-lead mark, .demo-verdict mark {
+.ons-lead mark, .dir-lead mark, .und-lead mark, .ld-lead mark, .pv-lead mark, .iss-lead mark, .demo-verdict mark {
   --hl-l: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%23f5d24e' stop-opacity='.95'/><stop offset='.55' stop-color='%23fee891' stop-opacity='.85'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M12 3.4V17.6C8 17.7 4.6 18.2 2.1 17.9C1 14.6 0.9 8.6 2.2 4.6C3.4 3.8 6.2 3.5 12 3.4Z'/></g></svg>");
   --hl-b: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter></defs><g filter='url(%23f)'><path fill='%23fee891' fill-opacity='.85' d='M-6 3.4C22 2.8 50 3.5 76 2.7S110 2.2 126 2.4V16.7C98 17.3 70 16.5 44 17.4S12 17.7 -6 17.6Z'/></g></svg>");
   --hl-r: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='1' x2='0'><stop offset='0' stop-color='%23f5d24e' stop-opacity='.95'/><stop offset='.55' stop-color='%23fee891' stop-opacity='.85'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M-4 2.5C1 2.4 3.6 2.5 5.3 3.1C6.4 7 6.5 12.4 5.6 16.6C3.9 17 1 16.8 -4 16.8Z'/></g></svg>");
@@ -2713,7 +2800,7 @@ body.dark .ons-lead, body.dark .dir-lead, body.dark .und-lead, body.dark .ld-lea
               var(--hl-r) right top / 8px 100% no-repeat,
               var(--hl-b) 8px 0 / calc(100% - 16px) 100% no-repeat;
   -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-body.dark .ons-lead mark, body.dark .dir-lead mark, body.dark .und-lead mark, body.dark .ld-lead mark, body.dark .pv-lead mark, body.dark .demo-verdict mark {
+body.dark .ons-lead mark, body.dark .dir-lead mark, body.dark .und-lead mark, body.dark .ld-lead mark, body.dark .pv-lead mark, body.dark .iss-lead mark, body.dark .demo-verdict mark {
   --hl-l: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%23f0c93c' stop-opacity='.5'/><stop offset='.55' stop-color='%23e3bd45' stop-opacity='.34'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M12 3.4V17.6C8 17.7 4.6 18.2 2.1 17.9C1 14.6 0.9 8.6 2.2 4.6C3.4 3.8 6.2 3.5 12 3.4Z'/></g></svg>");
   --hl-b: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter></defs><g filter='url(%23f)'><path fill='%23e3bd45' fill-opacity='.34' d='M-6 3.4C22 2.8 50 3.5 76 2.7S110 2.2 126 2.4V16.7C98 17.3 70 16.5 44 17.4S12 17.7 -6 17.6Z'/></g></svg>");
   --hl-r: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='1' x2='0'><stop offset='0' stop-color='%23f0c93c' stop-opacity='.5'/><stop offset='.55' stop-color='%23e3bd45' stop-opacity='.34'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M-4 2.5C1 2.4 3.6 2.5 5.3 3.1C6.4 7 6.5 12.4 5.6 16.6C3.9 17 1 16.8 -4 16.8Z'/></g></svg>"); }

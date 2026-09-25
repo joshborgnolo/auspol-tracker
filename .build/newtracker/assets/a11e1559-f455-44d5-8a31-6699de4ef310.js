@@ -2483,6 +2483,397 @@ function DemographicsPanel({ rangeId = "all" }) {
   );
 }
 
+// ---- The issues: what matters, and who voters trust with it ----------------
+/* Two views of the one question. "Who's trusted": for each issue, how many
+   voters put it in their top three (RedBridge – the one pollster that asks
+   this monthly and publishes the figures) beside who they think is best on
+   it: Labor, the Coalition and One Nation as shares of the voters who named
+   one of those three, pooled across Resolve, RedBridge and YouGov (gen-data
+   §7h: the three houses offer different options, and those three are the
+   part every question shares). A row picks the issue the chart follows
+   month by month. "What matters to whom": RedBridge's top three by group. */
+const ISS_PARTY = { alp: "Labor", lnp: "the Coalition", onp: "One Nation" };
+const ISS_PARTY_CAP = { alp: "Labor", lnp: "Coalition", onp: "One Nation" };
+// the group table's column heads: a word or two
+const ISS_SHORT = { col: "Cost of living", housing: "Housing", health: "Health", economy: "Economy",
+  immigration: "Immigration", climate: "Climate", crime: "Crime", security: "Security" };
+// an issue inside a sentence
+const ISS_PHRASE = { col: "the cost of living", housing: "housing", health: "health",
+  economy: "economic management", immigration: "immigration", climate: "climate change",
+  crime: "crime", security: "national security" };
+const ISS_WHO = {
+  Labor: "Labor voters", Coalition: "Coalition voters", Liberal: "Liberal voters",
+  "Nationals, LNP and CLP": "Nationals, LNP and CLP voters", "One Nation": "One Nation voters",
+  Greens: "Greens voters", Others: "voters for other parties and independents", Undecided: "undecided voters",
+  "Below Year 12": "voters who left school before Year 12", "Year 12": "voters who finished Year 12",
+  "Renting and other": "renters and others",
+};
+const ISS_SET_WORDS = {
+  vote: { all: "voters of different parties", others: "any other group of voters" },
+  generation: DEMO_SET_WORDS.generation, gender: DEMO_SET_WORDS.gender, location: DEMO_SET_WORDS.location,
+  housing: { all: "owners and renters", others: "other voters" }, education: DEMO_SET_WORDS.education,
+};
+const issWho = (g) => ISS_WHO[g] || DEMO_WHO[g] || g;
+const issCap = (s) => s[0].toUpperCase() + s.slice(1);
+/* One sentence per issue on the group view, or null when no gap between two
+   groups clears its margin: the same test as the vote-by-group bars (each
+   gap against √(±a² + ±b²), Holm's correction across the set's gaps), the
+   group that stands apart named if there is one, else the widest gap. */
+function issGroupVerdict(tab, k) {
+  const gs = tab.groups.map((g) => ({ g, c: tab.cells[g] && tab.cells[g][k] })).filter((x) => x.c && x.c.ci != null);
+  if (gs.length < 2) return null;
+  const gaps = gs.flatMap((a, i) => gs.slice(i + 1).map((b) => {
+    const m = Math.hypot(a.c.ci, b.c.ci);
+    return { a, b, p: m > 0 ? zTail(1.96 * (a.c.v - b.c.v) / m) : 1 };
+  }));
+  const sig = new Set();
+  for (const [i, g] of [...gaps].sort((x, y) => x.p - y.p).entries()) {
+    if (g.p >= 0.05 / (gaps.length - i)) break;
+    sig.add(g);
+  }
+  if (!sig.size) return null;
+  const words = ISS_SET_WORDS[tab.id] || { all: "these groups", others: "any other group" };
+  const cmp = (a, b) => {
+    const g = gaps.find((x) => (x.a === a && x.b === b) || (x.a === b && x.b === a));
+    return sig.has(g) ? Math.sign(a.c.v - b.c.v) : 0;
+  };
+  const what = `to put ${ISS_PHRASE[k] || k} in their top three`;
+  const pct = (x) => Math.round(x.c.v) + "%";
+  const byV = [...gs].sort((a, b) => b.c.v - a.c.v);
+  const top = byV[0], bot = byV[byV.length - 1];
+  if (gs.length === 2) return { gap: top.c.v - bot.c.v,
+    text: `${issCap(issWho(top.g))} are significantly more likely than ${issWho(bot.g)} ${what} (${pct(top)} against ${pct(bot)}).` };
+  const topApart = byV.slice(1).every((x) => cmp(top, x) > 0), botApart = byV.slice(0, -1).every((x) => cmp(bot, x) < 0);
+  const topGap = top.c.v - byV[1].c.v, botGap = byV[byV.length - 2].c.v - bot.c.v;
+  if (topApart && (!botApart || topGap >= botGap)) return { gap: topGap,
+    text: `${issCap(issWho(top.g))} are significantly more likely than ${words.others} ${what} (${pct(top)}).` };
+  if (botApart) return { gap: botGap,
+    text: `${issCap(issWho(bot.g))} are significantly less likely than ${words.others} ${what} (${pct(bot)}).` };
+  const [a, b] = gaps.filter((g) => sig.has(g)).map((g) => (g.a.c.v > g.b.c.v ? [g.a, g.b] : [g.b, g.a]))
+    .sort((p, q) => (q[0].c.v - q[1].c.v) - (p[0].c.v - p[1].c.v))[0];
+  return { gap: a.c.v - b.c.v,
+    text: `${issCap(issWho(a.g))} are significantly more likely than ${issWho(b.g)} ${what} (${pct(a)} against ${pct(b)}).` };
+}
+/* The sentence under the chart: has any party gained or lost ground on the
+   issue over the period on screen? Each pollster is compared only with
+   itself (withinHouseSlope: a level per pollster, one shared slope, larger
+   polls counting for more), since Resolve joined the three-way question
+   only in July 2026 and a line can move just because it arrived. Holm across
+   the three parties. */
+function issTrendVerdict(D, it, dots) {
+  if (!dots.length) return null;
+  const ym = dots[0].date.slice(0, 7);
+  const when = D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
+  const what = ISS_PHRASE[it.id] || it.label.toLowerCase();
+  const fits = D.issues.parties.map((q) => ({ q, fit: withinHouseSlope(dots.map((d) =>
+    ({ h: d.pollster, t: d.x, w: d.n, y: d.s[q] }))) })).filter((f) => f.fit);
+  if (!fits.length) return `There aren’t enough polls since ${when} to tell whether any party has gained ground on ${what}.`;
+  const sig = [];
+  for (const [i, f] of [...fits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (fits.length - i)) break;
+    sig.push(f);
+  }
+  if (!sig.length) return `No party’s share on ${what} has changed significantly since ${when}.`;
+  const up = sig.filter((f) => f.fit.b > 0).map((f) => ISS_PARTY[f.q]);
+  const down = sig.filter((f) => f.fit.b < 0).map((f) => ISS_PARTY[f.q]);
+  const has = (xs) => (xs.length > 1 ? "have" : "has");
+  return `Since ${when}, ` + [
+    up.length ? `${houseList(up, Infinity)} ${has(up)} gained ground significantly on ${what}` : null,
+    down.length ? `${houseList(down, Infinity)} ${has(down)} lost ground significantly` : null,
+  ].filter(Boolean).join(", and ") + ".";
+}
+function IssuesPanel({ rangeId = "all" }) {
+  const { D, rangeDomain, filterPts, buildXTicks, series } = window.AP;
+  const narrow = useNarrow();
+  /* the chart's box: beside the rows it gets their height, full width it is
+     a main panel's 360 (a phone asks for a taller box, as every chart here
+     does). 1136px of viewport is the 1080px of panel the CSS splits at –
+     the panel runs the viewport's width less 56px, capped at 1144. */
+  const beside = useNarrow("(min-width: 1136px)");
+  const I = D.issues;
+  const [view, setView] = useState("trust");
+  const [selId, setSel] = useState(null);
+  const [gsetId, setGset] = useState("vote");
+  if (!I || !I.list || !I.list.length) return null;
+  const P = I.parties;
+  const list = I.list;
+  const it = list.find((x) => x.id === selId) || list[0];
+  const top = list[0];
+  const pName = (q) => D.PARTIES[q].name;
+  const pColor = (q) => D.PARTIES[q].color;
+  const openInfo = () => window.AP.openTerm && window.AP.openTerm("issues", "The issues");
+
+  // ---- who's trusted: the rows
+  const rowVerdict = (x) => !x.own ? null : x.own.leadSig
+    ? { text: `${ISS_PARTY_CAP[x.own.lead]} ahead`, color: pColor(x.own.lead),
+        title: `${issCap(ISS_PARTY[x.own.lead])} leads ${ISS_PARTY[x.own.runner]} by ${x.own.gap.toFixed(1)} points (95% margin ± ${x.own.gapCi.toFixed(1)})` }
+    : { text: "No clear lead", color: null,
+        title: `${issCap(ISS_PARTY[x.own.lead])} and ${ISS_PARTY[x.own.runner]} are ${x.own.gap.toFixed(1)} points apart, inside the 95% margin of ± ${x.own.gapCi.toFixed(1)}` };
+  const pick = (id) => setSel(id);
+  const onRowKey = (e, id) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(id); } };
+  const issueRow = (x) => {
+    const v = rowVerdict(x), sel = x.id === it.id;
+    return (
+      <div key={x.id} className={"iss-row" + (sel ? " sel" : "")} role="button" tabIndex={0} aria-pressed={sel}
+           onClick={() => pick(x.id)} onKeyDown={(e) => onRowKey(e, x.id)}
+           aria-label={`${x.label}: ${x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked"}; ` +
+             (x.own ? P.map((q) => `${pName(q)} ${Math.round(x.own.v[q])}`).join(", ") + "; " + v.text : "no three-way figures")}>
+        <span className="iss-lab">{x.label}</span>
+        <span className="iss-imp" title={x.imp ? `${Math.round(x.imp.v)}% put it in their top three, ${x.imp.r1 != null ? Math.round(x.imp.r1) + "% first" : ""} (± ${x.imp.ci.toFixed(1)})` : ""}>
+          {/* the column heads hide on a phone, so each cell names itself there */}
+          <span className="iss-mini" aria-hidden="true">In top three</span>
+          {x.imp ? <>
+            <span className="demo-track iss-imp-track" aria-hidden="true"><span className="demo-fill" style={{ width: x.imp.v + "%", background: "var(--ink-3)" }}></span></span>
+            <span className="iss-imp-v">{Math.round(x.imp.v)}<span className="pct">%</span></span>
+          </> : <span className="iss-na">not asked</span>}
+        </span>
+        <span className="iss-own">
+          <span className="iss-mini" aria-hidden="true">Best on it</span>
+          {x.own ? <>
+            <span className="sbar iss-sbar" aria-hidden="true">
+              {P.map((q) => <span key={q} className="sbar-seg" style={{ width: x.own.v[q] + "%", background: pColor(q) }}></span>)}
+            </span>
+            <span className="iss-nums" aria-hidden="true">
+              {P.map((q) => (
+                <span key={q} className="skey"><span className="skey-dot" style={{ background: pColor(q) }}></span>
+                  <span className="skey-val">{Math.round(x.own.v[q])}</span></span>
+              ))}
+            </span>
+          </> : <span className="iss-na">not asked with all three parties</span>}
+        </span>
+        <span className={"iss-verdict" + (v && v.color ? " lead" : "")} title={v ? v.title : ""}>
+          {v && v.color && <span className="skey-dot" style={{ background: v.color }} aria-hidden="true"></span>}
+          {v ? v.text : ""}
+        </span>
+      </div>
+    );
+  };
+
+  // ---- who's trusted: the chart for the chosen issue
+  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+  const monthPts = (it.monthly || []).map((m) => ({ ym: m[0], x: D.mx(m[0]),
+    ...Object.fromEntries(P.map((q, i) => [q, m[1 + i]])),
+    ...Object.fromEntries(P.map((q, i) => ["ci_" + q, m[1 + P.length + i]])) }));
+  const chart = (() => {
+    if (monthPts.length < 1) return null;
+    // the question was first asked in December 2025, so the chart opens there, as the vote-by-group charts do
+    const xDomain = [Math.max(rangeLo, monthPts[0].x - 0.06), rangeHi];
+    const inX = (x) => x >= xDomain[0] && x <= xDomain[1];
+    const pts = filterPts(monthPts, xDomain[0]);
+    const byRow = new Map(D.individualPolls.map((p) => [p.pollster + "|" + p.released, p]));
+    const dots = (it.dots || []).filter((d) => inX(d[0])).map((d) => {
+      const meta = byRow.get(d[1] + "|" + d[2]) || { pollster: demoHouse(d[1]), released: d[2] };
+      return { x: d[0], pollster: d[1], date: d[2], n: meta.sample || 1000, meta,
+               s: Object.fromEntries(P.map((q, i) => [q, d[3 + i]])) };
+    });
+    const scatter = dots.flatMap((d) => P.map((q) => ({ x: d.x, y: d.s[q], color: pColor(q), label: pName(q), meta: d.meta })));
+    const areas = P.map((q) => ({ id: "ci-" + q, color: pColor(q), className: "ci-band", edge: false, smooth: true,
+      points: pts.filter((d) => d["ci_" + q] != null).map((d) => ({ x: d.x, y0: d[q] - d["ci_" + q], y1: d[q] + d["ci_" + q] })) }))
+      .filter((a) => a.points.length >= 2);
+    const vals = pts.flatMap((d) => P.map((q) => d[q])).concat(scatter.map((d) => d.y),
+      areas.flatMap((a) => a.points.flatMap((d) => [d.y0, d.y1])));
+    if (!vals.length) return null;
+    /* the first gridline past the data at each end (a tenth of a step clear),
+       both labelled, as the vote-by-group charts do: fitDomain's padding left
+       most of an empty step above the lines */
+    const lo = Math.min(...vals), hi = Math.max(...vals), step = 10;
+    const d0 = Math.max(0, Math.floor((lo - step * 0.1) / step) * step), d1 = Math.ceil((hi + step * 0.1) / step) * step;
+    const ticks = [];
+    for (let v = d0; v <= d1 + 1e-9; v += step) ticks.push(v);
+    return { xDomain, pts, dots, scatter, areas, domain: [d0, d1], ticks };
+  })();
+
+  // ---- what matters to whom
+  const G = I.groups;
+  const gtab = G && (G.tabs.find((t) => t.id === gsetId) || G.tabs[0]);
+  const impOf = (k) => { const x = list.find((i) => i.id === k); return x && x.imp ? x.imp : null; };
+  const gVerdicts = gtab ? gtab.issues.map((k) => issGroupVerdict(gtab, k)).filter(Boolean)
+    .sort((a, b) => b.gap - a.gap).slice(0, 3) : [];
+
+  const lead = top.imp && top.own && (
+    <p className="iss-lead">
+      <mark>{plainShare(top.imp.v)} voters put {ISS_PHRASE[top.id]} among their three most important issues</mark>
+      {top.own.leadSig ? `, and more of them trust ${ISS_PARTY[top.own.lead]} with it than either of the others.`
+        : ", and no party is clearly more trusted with it than the others."}
+    </p>
+  );
+
+  return (
+    <section className="card">
+      <div className="card-head">
+        <div>
+          <h2 className="card-title">The issues</h2>
+          <p className="card-sub">
+            {view === "trust"
+              ? <>What voters say matters most, and which party they think is best on it · pooled from the last {I.window} of polls · {houseList(I.houses)}</>
+              : <>Each group’s share putting an issue in its top three · {G ? `${G.house}, its polls in the last ${G.window}` : "no poll in the window"}</>}
+          </p>
+        </div>
+      </div>
+      <div className="demo-ctl">
+        <Segmented options={[{ id: "trust", label: "Who’s trusted" }, { id: "whom", label: "What matters to whom" }]}
+                   value={view} onChange={setView} size="sm" ariaLabel="View" />
+        {view === "whom" && G && (
+          <Segmented options={G.tabs.map((t) => ({ id: t.id, label: t.label }))} value={gtab.id} onChange={setGset}
+                     size="sm" ariaLabel="Group voters by" />
+        )}
+      </div>
+      {view === "trust" ? (
+        <div className="iss-body">
+          {lead}
+          <div className="iss-grid">
+            <div className="iss-rows">
+              <div className="iss-head" aria-hidden="true">
+                <span className="iss-lab"></span>
+                <span className="iss-imp">In voters’ top three</span>
+                <span className="iss-own">Best on it
+                  <span className="iss-legend">{P.map((q) => (
+                    <span key={q} className="skey"><span className="skey-dot" style={{ background: pColor(q) }}></span>
+                      <span className="skey-lab">{ISS_PARTY_CAP[q]}</span></span>
+                  ))}</span>
+                </span>
+                <span className="iss-verdict"></span>
+              </div>
+              {/* on a phone the header is gone, so the legend stands on its own above the rows */}
+              <p className="iss-legend iss-legend-solo" aria-hidden="true">Best on it:{" "}
+                {P.map((q) => (
+                  <span key={q} className="skey"><span className="skey-dot" style={{ background: pColor(q) }}></span>
+                    <span className="skey-lab">{ISS_PARTY_CAP[q]}</span></span>
+                ))}
+              </p>
+              {list.map(issueRow)}
+              {list.filter((x) => x.grnTop).map((x) => (
+                <p key={"grn-" + x.id} className="table-hint iss-grn">
+                  RedBridge also offers the Greens, who come first on {ISS_PHRASE[x.id]} ({x.grnTop.grn}%).
+                </p>
+              ))}
+            </div>
+            {chart && (
+              <div className="iss-chart demo-chart">
+                <p className="demo-chart-lab">
+                  <span className="demo-chart-set">{it.label}</span>
+                  Who voters think is best, month by month (%, of those naming Labor, the Coalition or One Nation)
+                </p>
+                <TrendChart
+                  key={"iss-" + it.id}
+                  height={narrow ? 560 : beside ? 460 : 360} xDomain={chart.xDomain} yDomain={chart.domain}
+                  yTicks={chart.ticks} unit="%"
+                  pad={{ l: narrow ? 70 : 56, r: 60, t: 16, b: narrow ? 66 : 56 }}
+                  xTicks={buildXTicks(chart.xDomain[0], chart.xDomain[1])}
+                  series={P.map((q) => ({ id: q, label: pName(q), color: pColor(q), points: series(chart.pts, q), endLabel: ISS_PARTY_CAP[q] }))}
+                  areas={chart.areas}
+                  spine={series(chart.pts, P[0])}
+                  scatter={chart.scatter} pollFacet="primary"
+                  tooltipTitle={(i) => window.AP.monthLabelFull(chart.pts[i].ym)}
+                  fmt={(v) => Math.round(v) + ""}
+                  ariaLabel={`${it.label}: the share of voters naming Labor, the Coalition or One Nation who think each is best on it, month by month`}
+                  copy={{
+                    sub: `${it.label}: who voters think is best, of those naming Labor, the Coalition or One Nation · pooled from ${houseList((it.own && it.own.houses) || I.houses)}`,
+                    legend: [...P.map((q) => ({ label: `${pName(q)}  ${it.own ? Math.round(it.own.v[q]) + "%" : ""}`, color: pColor(q), kind: "line" })),
+                             ...(chart.areas.length ? [{ label: "95% interval (shaded)", color: "var(--ink-faint)", kind: "shade" }] : [])],
+                  }}
+                />
+                {demoSaid(issTrendVerdict(D, it, chart.dots))}
+              </div>
+            )}
+            <div className="demo-notes iss-notes">
+              <p className="table-hint">
+                The figures pool the last {I.window} of polls. Pick an issue to follow it in the chart.{" "}
+                <button type="button" className="hi-term" onClick={openInfo}>Where the figures come from</button>
+              </p>
+              <details className="view-how hint-how">
+                <summary>How to read these figures</summary>
+                <p className="table-hint">
+                  The grey bar is how many voters put the issue among the three most important to their vote:
+                  75% beside the cost of living means three in four rank it first, second or third. RedBridge
+                  asks this every month, and it is the only pollster that publishes the figures, so this bar is
+                  RedBridge’s alone.
+                </p>
+                <p className="table-hint">
+                  The coloured bar splits the voters who named Labor, the Coalition or One Nation as best on the
+                  issue. Pollsters also offer other answers – the Greens, someone else, all about equal, don’t
+                  know – and each offers a different set, so only these three can be pooled. Resolve, RedBridge and
+                  YouGov count wherever they ask the issue.
+                </p>
+                <p className="table-hint">
+                  “Ahead” means the leading party’s margin over the next is larger than that margin’s own 95%
+                  range; “No clear lead” means the polls can’t separate them. In the chart each dot is one poll
+                  and each line’s 95% interval is shaded.
+                </p>
+              </details>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="iss-body">
+          {gtab ? (
+            <div className="iss-grid whom">
+              <div className="iss-table-wrap">
+                <table className="iss-table">
+                  <caption className="sr-only">Share of each group putting each issue in its top three, %</caption>
+                  <thead>
+                    <tr>
+                      <th scope="col"><span className="sr-only">Group</span></th>
+                      {gtab.issues.map((k) => <th scope="col" key={k}><span>{ISS_SHORT[k] || I.labels[k]}</span></th>)}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr className="all">
+                      <th scope="row">All voters</th>
+                      {gtab.issues.map((k) => {
+                        const x = impOf(k);
+                        return <td key={k}>{x ? <IssCell v={x.v} ci={x.ci} all /> : "–"}</td>;
+                      })}
+                    </tr>
+                    {gtab.groups.map((g) => (
+                      <tr key={g}>
+                        <th scope="row">{g}</th>
+                        {gtab.issues.map((k) => {
+                          const c = gtab.cells[g] && gtab.cells[g][k];
+                          return <td key={k}>{c ? <IssCell v={c.v} ci={c.ci} /> : "–"}</td>;
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="iss-said">
+                {gVerdicts.length ? gVerdicts.map((v, i) => <React.Fragment key={i}>{demoSaid(v.text)}</React.Fragment>)
+                  : demoSaid(`No two ${gtab.id === "vote" ? "groups of voters" : "groups"} differ significantly on any of these issues.`)}
+              </div>
+              <div className="demo-notes iss-notes">
+                <p className="table-hint">
+                  Each figure is the share of that group putting the issue among its three most important. Only
+                  RedBridge publishes these by group, so they rest on its polls in the last {G.window}.{" "}
+                  <button type="button" className="hi-term" onClick={openInfo}>Where the figures come from</button>
+                </p>
+                <details className="view-how hint-how">
+                  <summary>How to read these figures</summary>
+                  <p className="table-hint">
+                    The sentences name the clearest differences. Two groups differ significantly when the gap
+                    between them is larger than its own 95% margin, which combines both groups’ margins; with
+                    several groups the bar rises for each extra gap tested, as on the vote-by-group panel. A
+                    group’s margin is usually 5 to 7 points, since a group is a slice of one poll. Hover or tap a
+                    figure for its margin.
+                  </p>
+                </details>
+              </div>
+            </div>
+          ) : <p className="table-hint">No poll in the last {I.window} published these figures by group.</p>}
+        </div>
+      )}
+    </section>
+  );
+}
+function IssCell({ v, ci, all }) {
+  return (
+    <span className={"iss-cell" + (all ? " all" : "")} title={ci != null ? `± ${ci.toFixed(1)} is the 95% margin` : ""}>
+      <span className="iss-cell-v">{Math.round(v)}</span>
+      <span className="iss-cell-bar" aria-hidden="true"><span style={{ width: Math.max(0, Math.min(100, v)) + "%" }}></span></span>
+    </span>
+  );
+}
+
 // ---- Latest polls – faceted, ragged-tolerant ledger ----------------
 const PARTY_C = {
   alp: "var(--alp)", lnp: "var(--lnp)", grn: "var(--grn)",

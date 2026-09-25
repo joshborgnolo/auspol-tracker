@@ -1633,10 +1633,85 @@ a.demo-house-name:hover { text-decoration: underline; text-underline-offset: 3px
 .demo-chart-lab { margin: 0 0 10px; font-size: 12px; color: var(--ink-3); }
 .demo-chart-set { font-size: 13px; font-weight: 650; color: var(--ink); margin-right: 8px; }
 .read-ci { margin-left: 2px; }
+.iss-body { container-type: inline-size; }
+.iss-lead { margin: 0 2px 14px; font-size: 15px; line-height: 1.55; color: #000; text-wrap: pretty; }
+body.dark .iss-lead { color: var(--ink-2); }
+.iss-grid { display: grid; gap: 18px 30px; grid-template-columns: minmax(0, 1fr); margin: 0 2px 6px; }
+.iss-head, .iss-row { display: grid; align-items: center; gap: 4px 12px;
+  grid-template-columns: minmax(96px, 1.05fr) minmax(96px, 0.95fr) minmax(190px, 1.7fr) minmax(112px, 0.8fr); }
+.iss-head { font-size: 11px; line-height: 1.3; color: var(--ink-3); margin: 0 0 4px; padding: 0 8px; }
+.iss-row { padding: 8px; margin: 0 0 2px; border-radius: 8px; cursor: pointer; font-size: 13px;
+  -webkit-tap-highlight-color: transparent; }
+.iss-row:hover { background: color-mix(in oklch, var(--ink) 4%, var(--bg)); }
+.iss-row.sel { background: color-mix(in oklch, var(--ink) 7%, var(--bg)); box-shadow: inset 3px 0 0 var(--ink-3); }
+.iss-row:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.iss-lab { color: var(--ink); font-weight: 600; line-height: 1.25; }
+.iss-imp { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.iss-imp-track { flex: 1; min-width: 36px; }
+.iss-imp-v { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); min-width: 32px; text-align: right; }
+.iss-imp-v .pct { font-size: 11px; font-weight: 500; color: var(--ink-3); margin-left: 1px; }
+.iss-own { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.iss-sbar { flex: 1; min-width: 60px; height: 10px; border-radius: 5px; }
+.iss-nums { display: flex; flex: none; gap: 0 8px; font-size: 12px; font-variant-numeric: tabular-nums; }
+.iss-nums .skey-val { min-width: 15px; text-align: right; }
+.iss-head .iss-own { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.iss-legend { display: inline-flex; flex-wrap: wrap; gap: 2px 10px; color: var(--ink-2); }
+.iss-legend-solo { display: none; margin: 0 8px 6px; font-size: 12px; color: var(--ink-3); }
+.iss-verdict { display: flex; align-items: center; gap: 6px; font-size: 12px; line-height: 1.3; color: var(--ink-3);
+  white-space: nowrap; }
+.iss-verdict.lead { color: var(--ink); font-weight: 650; }
+.iss-na { font-size: 12px; color: var(--ink-3); }
+.iss-mini { display: none; }
+.iss-grn { margin: 8px 8px 0; }
+.iss-chart > .demo-verdict { margin-top: -22px; padding-right: 40px; }
+@container (min-width: 1080px) {
+  .iss-grid:not(.whom) { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .iss-grid:not(.whom) .iss-rows { grid-area: 1 / 1 / 3 / 2; }
+  .iss-grid:not(.whom) .iss-chart { grid-area: 1 / 2; }
+  .iss-grid:not(.whom) .iss-notes { grid-area: 2 / 2; align-self: start; }
+}
+@container (min-width: 900px) {
+  .iss-grid.whom { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); grid-template-rows: auto 1fr; }
+  .iss-grid.whom .iss-table-wrap { grid-area: 1 / 1 / 3 / 2; }
+  .iss-grid.whom .iss-said { grid-area: 1 / 2; }
+  .iss-grid.whom .iss-notes { grid-area: 2 / 2; align-self: start; }
+}
+@container (max-width: 560px) {
+  .iss-head { display: none; }
+  .iss-row { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px;
+    grid-template-areas: "lab verdict" "imp imp" "own own"; padding: 10px 8px; }
+  .iss-row .iss-lab { grid-area: lab; }
+  .iss-row .iss-verdict { grid-area: verdict; justify-content: flex-end; text-align: right; }
+  .iss-row .iss-imp { grid-area: imp; }
+  .iss-row .iss-own { grid-area: own; }
+  .iss-mini { display: block; flex: none; width: 76px; font-size: 11px; color: var(--ink-3); }
+  .iss-imp, .iss-own { gap: 8px; }
+  .iss-legend-solo { display: flex; align-items: center; gap: 2px 10px; }
+}
+.iss-table-wrap { min-width: 0; }
+.iss-table { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 13px; }
+.iss-table th, .iss-table td { padding: 6px 3px; text-align: center; }
+.iss-table thead th { font-size: 11px; font-weight: 600; line-height: 1.2; color: var(--ink-3); vertical-align: bottom; }
+.iss-table thead th:first-child { width: 32%; }
+.iss-table tbody th { text-align: left; font-size: 12.5px; font-weight: 500; line-height: 1.25; color: var(--ink-2); }
+.iss-table tr.all th, .iss-table tr.all td { border-bottom: 1px solid var(--line-2); }
+.iss-table tr.all th { color: var(--ink-3); }
+.iss-cell { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; width: 100%; }
+.iss-cell-v { font-variant-numeric: tabular-nums; font-weight: 600; color: var(--ink); }
+.iss-cell.all .iss-cell-v { font-weight: 500; color: var(--ink-3); }
+.iss-cell-bar { display: block; width: 100%; max-width: 44px; height: 4px; border-radius: 2px;
+  background: var(--bar-track); overflow: hidden; }
+.iss-cell-bar > span { display: block; height: 100%; border-radius: 2px; background: var(--ink-3); }
+.iss-said > .demo-verdict:first-child { margin-top: 0; }
+@container (max-width: 520px) {
+  .iss-table thead th:not(:first-child) span { writing-mode: vertical-rl; transform: rotate(180deg);
+    display: inline-block; max-height: 104px; text-align: left; }
+  .iss-table tbody th { font-size: 12px; }
+}
 .ons-lead, .dir-lead, .und-lead, .ld-lead, .pv-lead { margin: 0 2px 12px; font-size: 15px; line-height: 1.55; color: #000;
   text-wrap: pretty; }
 body.dark .ons-lead, body.dark .dir-lead, body.dark .und-lead, body.dark .ld-lead, body.dark .pv-lead { color: var(--ink-2); }
-.ons-lead mark, .dir-lead mark, .und-lead mark, .ld-lead mark, .pv-lead mark, .demo-verdict mark {
+.ons-lead mark, .dir-lead mark, .und-lead mark, .ld-lead mark, .pv-lead mark, .iss-lead mark, .demo-verdict mark {
   --hl-l: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%23f5d24e' stop-opacity='.95'/><stop offset='.55' stop-color='%23fee891' stop-opacity='.85'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M12 3.4V17.6C8 17.7 4.6 18.2 2.1 17.9C1 14.6 0.9 8.6 2.2 4.6C3.4 3.8 6.2 3.5 12 3.4Z'/></g></svg>");
   --hl-b: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter></defs><g filter='url(%23f)'><path fill='%23fee891' fill-opacity='.85' d='M-6 3.4C22 2.8 50 3.5 76 2.7S110 2.2 126 2.4V16.7C98 17.3 70 16.5 44 17.4S12 17.7 -6 17.6Z'/></g></svg>");
   --hl-r: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='1' x2='0'><stop offset='0' stop-color='%23f5d24e' stop-opacity='.95'/><stop offset='.55' stop-color='%23fee891' stop-opacity='.85'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M-4 2.5C1 2.4 3.6 2.5 5.3 3.1C6.4 7 6.5 12.4 5.6 16.6C3.9 17 1 16.8 -4 16.8Z'/></g></svg>");
@@ -1645,7 +1720,7 @@ body.dark .ons-lead, body.dark .dir-lead, body.dark .und-lead, body.dark .ld-lea
               var(--hl-r) right top / 8px 100% no-repeat,
               var(--hl-b) 8px 0 / calc(100% - 16px) 100% no-repeat;
   -webkit-box-decoration-break: clone; box-decoration-break: clone; }
-body.dark .ons-lead mark, body.dark .dir-lead mark, body.dark .und-lead mark, body.dark .ld-lead mark, body.dark .pv-lead mark, body.dark .demo-verdict mark {
+body.dark .ons-lead mark, body.dark .dir-lead mark, body.dark .und-lead mark, body.dark .ld-lead mark, body.dark .pv-lead mark, body.dark .iss-lead mark, body.dark .demo-verdict mark {
   --hl-l: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='0' x2='1'><stop offset='0' stop-color='%23f0c93c' stop-opacity='.5'/><stop offset='.55' stop-color='%23e3bd45' stop-opacity='.34'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M12 3.4V17.6C8 17.7 4.6 18.2 2.1 17.9C1 14.6 0.9 8.6 2.2 4.6C3.4 3.8 6.2 3.5 12 3.4Z'/></g></svg>");
   --hl-b: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter></defs><g filter='url(%23f)'><path fill='%23e3bd45' fill-opacity='.34' d='M-6 3.4C22 2.8 50 3.5 76 2.7S110 2.2 126 2.4V16.7C98 17.3 70 16.5 44 17.4S12 17.7 -6 17.6Z'/></g></svg>");
   --hl-r: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 20' preserveAspectRatio='none'><defs><filter id='f' x='-10%' y='-30%' width='120%' height='160%' color-interpolation-filters='sRGB'><feTurbulence type='fractalNoise' baseFrequency='0.05 0.16' numOctaves='2' seed='4' result='t'/><feDisplacementMap in='SourceGraphic' in2='t' scale='1.6' xChannelSelector='R' yChannelSelector='G' result='d'/><feTurbulence type='fractalNoise' baseFrequency='0.02 0.5' seed='11' result='s'/><feColorMatrix in='s' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 -0.55 1.22'/><feComposite in='d' operator='in'/></filter><linearGradient id='g' x1='1' x2='0'><stop offset='0' stop-color='%23f0c93c' stop-opacity='.5'/><stop offset='.55' stop-color='%23e3bd45' stop-opacity='.34'/></linearGradient></defs><g filter='url(%23f)'><path fill='url(%23g)' d='M-4 2.5C1 2.4 3.6 2.5 5.3 3.1C6.4 7 6.5 12.4 5.6 16.6C3.9 17 1 16.8 -4 16.8Z'/></g></svg>"); }
@@ -14699,6 +14774,1063 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
       "source": "https://www.smh.com.au/national/resolve-political-monitor-20210322-p57cvx.html",
       "sets": ["age", "gender", "state"]
     }]
+  };
+  const issues = {
+    "window": "six weeks",
+    "parties": ["alp", "lnp", "onp"],
+    "list": [{
+      "id": "col",
+      "label": "Cost of living",
+      "imp": {
+        "v": 75,
+        "ci": 3,
+        "r1": 44,
+        "chg": 2,
+        "changeSig": false
+      },
+      "own": {
+        "v": {
+          "alp": 33.8,
+          "lnp": 32.1,
+          "onp": 34
+        },
+        "ci": {
+          "alp": 5.2,
+          "lnp": 2.2,
+          "onp": 3.2
+        },
+        "chg": {
+          "alp": -0.7,
+          "lnp": 1.3,
+          "onp": -0.6
+        },
+        "chgSig": {
+          "alp": false,
+          "lnp": false,
+          "onp": false
+        },
+        "n": 4,
+        "lead": "onp",
+        "runner": "alp",
+        "gap": 0.2,
+        "gapCi": 8.3,
+        "leadSig": false,
+        "houses": ["Resolve", "YouGov", "RedBridge"]
+      },
+      "monthly": [["2025-12", 47.5, 31.1, 21.3, 4.5, 4.2, 3.7], ["2026-01", 39, 32.2, 28.8, 4.5, 4.3, 4.1], ["2026-02", 38.3, 35, 26.7, 4.5, 4.4, 4.1], ["2026-03", 37.1, 32.3, 30.6, 4.8, 4.6, 4.6], ["2026-04", 38.3, 33.3, 28.3, 4.4, 4.3, 4.1], ["2026-05", 35, 31.7, 33.3, 4.2, 4.1, 4.2], ["2026-06", 40.7, 28.8, 30.5, 4.5, 4.2, 4.3], ["2026-07", 33.9, 33.3, 32.8, 2.4, 2.3, 2.3], ["2026-08", 35.2, 30.6, 34.3, 3.6, 1.9, 3.6], ["2026-09", 31.5, 33.2, 35.3, 3, 3, 3.1]],
+      "dots": [[2025.95, "RedBridge/Accent", "2025-12-12", 47.5, 31.1, 21.3], [2026.08, "RedBridge/Accent", "2026-01-29", 39, 32.2, 28.8], [2026.16, "RedBridge/Accent", "2026-02-27", 38.3, 35, 26.7], [2026.23, "RedBridge/Accent", "2026-03-27", 37.1, 32.3, 30.6], [2026.33, "RedBridge/Accent", "2026-04-30", 38.3, 33.3, 28.3], [2026.4, "RedBridge/Accent", "2026-05-28", 35, 31.7, 33.3], [2026.48, "RedBridge/Accent", "2026-06-26", 40.7, 28.8, 30.5], [2026.52, "Resolve", "2026-07-11", 33.3, 33.3, 33.4], [2026.58, "RedBridge/Accent", "2026-07-30", 34.9, 33.3, 31.7], [2026.62, "Resolve", "2026-08-15", 32.6, 30.7, 36.8], [2026.64, "YouGov", "2026-08-24", 36.4, 30.3, 33.3], [2026.65, "RedBridge/Accent", "2026-08-28", 38.5, 30.8, 30.8], [2026.7, "Resolve", "2026-09-12", 31.5, 33.2, 35.3]]
+    }, {
+      "id": "health",
+      "label": "Health",
+      "imp": {
+        "v": 37,
+        "ci": 3.3,
+        "r1": 8,
+        "chg": 1,
+        "changeSig": false
+      },
+      "own": {
+        "v": {
+          "alp": 43.2,
+          "lnp": 29.4,
+          "onp": 27.4
+        },
+        "ci": {
+          "alp": 4.5,
+          "lnp": 2,
+          "onp": 5.3
+        },
+        "chg": {
+          "alp": 1.8,
+          "lnp": -0.4,
+          "onp": -1.3
+        },
+        "chgSig": {
+          "alp": false,
+          "lnp": false,
+          "onp": false
+        },
+        "n": 4,
+        "lead": "alp",
+        "runner": "lnp",
+        "gap": 13.9,
+        "gapCi": 4.3,
+        "leadSig": true,
+        "houses": ["Resolve", "YouGov", "RedBridge"]
+      },
+      "monthly": [["2025-12", 57.1, 28.6, 14.3, 4.4, 4, 3.1], ["2026-01", 47.5, 32.8, 19.7, 4.5, 4.2, 3.6], ["2026-02", 47.5, 31.1, 21.3, 4.5, 4.2, 3.7], ["2026-03", 48.4, 29, 22.6, 5, 4.5, 4.2], ["2026-04", 47.5, 30.5, 22, 4.6, 4.2, 3.8], ["2026-05", 45.8, 32.2, 22, 4.5, 4.2, 3.7], ["2026-06", 51.7, 25.9, 22.4, 4.7, 4.1, 3.9], ["2026-07", 40.5, 30.4, 29.1, 2.4, 3, 4.6], ["2026-08", 42.4, 30.1, 27.5, 6, 2.4, 5.2], ["2026-09", 41.4, 29.4, 29.2, 3.1, 2.9, 2.9]],
+      "dots": [[2025.95, "RedBridge/Accent", "2025-12-12", 57.1, 28.6, 14.3], [2026.08, "RedBridge/Accent", "2026-01-29", 47.5, 32.8, 19.7], [2026.16, "RedBridge/Accent", "2026-02-27", 47.5, 31.1, 21.3], [2026.23, "RedBridge/Accent", "2026-03-27", 48.4, 29, 22.6], [2026.33, "RedBridge/Accent", "2026-04-30", 47.5, 30.5, 22], [2026.4, "RedBridge/Accent", "2026-05-28", 45.8, 32.2, 22], [2026.48, "RedBridge/Accent", "2026-06-26", 51.7, 25.9, 22.4], [2026.52, "Resolve", "2026-07-11", 40, 29.3, 30.7], [2026.58, "RedBridge/Accent", "2026-07-30", 41.5, 32.3, 26.2], [2026.62, "Resolve", "2026-08-15", 38, 31.4, 30.6], [2026.64, "YouGov", "2026-08-24", 44.6, 27.7, 27.7], [2026.65, "RedBridge/Accent", "2026-08-28", 47.7, 30.8, 21.5], [2026.7, "Resolve", "2026-09-12", 41.4, 29.4, 29.2]]
+    }, {
+      "id": "housing",
+      "label": "Housing",
+      "imp": {
+        "v": 33,
+        "ci": 3.2,
+        "r1": 8,
+        "chg": -2,
+        "changeSig": false
+      },
+      "own": {
+        "v": {
+          "alp": 37,
+          "lnp": 28.2,
+          "onp": 34.8
+        },
+        "ci": {
+          "alp": 2.2,
+          "lnp": 2.9,
+          "onp": 3.5
+        },
+        "chg": {
+          "alp": 1.5,
+          "lnp": -1.9,
+          "onp": 0.4
+        },
+        "chgSig": {
+          "alp": false,
+          "lnp": false,
+          "onp": false
+        },
+        "n": 4,
+        "lead": "alp",
+        "runner": "onp",
+        "gap": 2.2,
+        "gapCi": 4.2,
+        "leadSig": false,
+        "houses": ["Resolve", "YouGov", "RedBridge"]
+      },
+      "monthly": [["2025-12", 43.6, 34.5, 21.8, 4.7, 4.5, 3.9], ["2026-01", 42.6, 27.8, 29.6, 4.7, 4.3, 4.4], ["2026-02", 40, 32.7, 27.3, 4.7, 4.5, 4.3], ["2026-03", 37.5, 28.6, 33.9, 5.1, 4.7, 5], ["2026-04", 37.7, 32.1, 30.2, 4.7, 4.5, 4.4], ["2026-05", 38.6, 29.8, 31.6, 4.4, 4.2, 4.2], ["2026-06", 40.4, 26.9, 32.7, 4.8, 4.4, 4.6], ["2026-07", 37.1, 30.9, 32, 2.4, 2.3, 2.3], ["2026-08", 35.6, 30.3, 34.1, 2.9, 2, 2.7], ["2026-09", 36.8, 27, 36.2, 3.1, 2.8, 3.1]],
+      "dots": [[2025.95, "RedBridge/Accent", "2025-12-12", 43.6, 34.5, 21.8], [2026.08, "RedBridge/Accent", "2026-01-29", 42.6, 27.8, 29.6], [2026.16, "RedBridge/Accent", "2026-02-27", 40, 32.7, 27.3], [2026.23, "RedBridge/Accent", "2026-03-27", 37.5, 28.6, 33.9], [2026.33, "RedBridge/Accent", "2026-04-30", 37.7, 32.1, 30.2], [2026.4, "RedBridge/Accent", "2026-05-28", 38.6, 29.8, 31.6], [2026.48, "RedBridge/Accent", "2026-06-26", 40.4, 26.9, 32.7], [2026.52, "Resolve", "2026-07-11", 37.1, 30.2, 32.7], [2026.58, "RedBridge/Accent", "2026-07-30", 37.3, 32.2, 30.5], [2026.62, "Resolve", "2026-08-15", 33.4, 30.7, 35.8], [2026.64, "YouGov", "2026-08-24", 37.1, 29, 33.9], [2026.65, "RedBridge/Accent", "2026-08-28", 37.7, 31.1, 31.1], [2026.7, "Resolve", "2026-09-12", 36.8, 27, 36.2]]
+    }, {
+      "id": "immigration",
+      "label": "Immigration",
+      "imp": {
+        "v": 29,
+        "ci": 3.1,
+        "r1": 10,
+        "chg": 1,
+        "changeSig": false
+      },
+      "own": {
+        "v": {
+          "alp": 28.9,
+          "lnp": 21.4,
+          "onp": 49.7
+        },
+        "ci": {
+          "alp": 2.6,
+          "lnp": 2.2,
+          "onp": 3.7
+        },
+        "chg": {
+          "alp": -0.5,
+          "lnp": 0.3,
+          "onp": 0.2
+        },
+        "chgSig": {
+          "alp": false,
+          "lnp": false,
+          "onp": false
+        },
+        "n": 4,
+        "lead": "onp",
+        "runner": "alp",
+        "gap": 20.8,
+        "gapCi": 5.9,
+        "leadSig": true,
+        "houses": ["Resolve", "YouGov", "RedBridge"]
+      },
+      "monthly": [["2025-12", 29.9, 28.4, 41.8, 3.9, 3.9, 4.2], ["2026-01", 23.9, 25.4, 50.7, 3.7, 3.7, 4.3], ["2026-02", 22.9, 22.9, 54.3, 3.6, 3.6, 4.2], ["2026-03", 26, 19.2, 54.8, 4, 3.6, 4.6], ["2026-04", 25.4, 25.4, 49.3, 3.6, 3.6, 4.2], ["2026-05", 22.5, 21.1, 56.3, 3.4, 3.3, 4], ["2026-06", 26.9, 20.9, 52.2, 3.8, 3.5, 4.3], ["2026-07", 27.9, 23.8, 48.3, 7.9, 2, 9.2], ["2026-08", 29.2, 21.1, 49.7, 2.6, 2.3, 3.8], ["2026-09", 29.5, 22.4, 48.2, 2.8, 2.5, 3]],
+      "dots": [[2025.95, "RedBridge/Accent", "2025-12-12", 29.9, 28.4, 41.8], [2026.08, "RedBridge/Accent", "2026-01-29", 23.9, 25.4, 50.7], [2026.16, "RedBridge/Accent", "2026-02-27", 22.9, 22.9, 54.3], [2026.23, "RedBridge/Accent", "2026-03-27", 26, 19.2, 54.8], [2026.33, "RedBridge/Accent", "2026-04-30", 25.4, 25.4, 49.3], [2026.4, "RedBridge/Accent", "2026-05-28", 22.5, 21.1, 56.3], [2026.48, "RedBridge/Accent", "2026-06-26", 26.9, 20.9, 52.2], [2026.52, "Resolve", "2026-07-11", 30.7, 24.3, 44.9], [2026.58, "RedBridge/Accent", "2026-07-30", 23, 23, 54.1], [2026.62, "Resolve", "2026-08-15", 30.3, 22.8, 46.9], [2026.64, "YouGov", "2026-08-24", 30.1, 19.2, 50.7], [2026.65, "RedBridge/Accent", "2026-08-28", 26, 20.5, 53.4], [2026.7, "Resolve", "2026-09-12", 29.5, 22.4, 48.2]]
+    }, {
+      "id": "crime",
+      "label": "Crime",
+      "imp": {
+        "v": 27,
+        "ci": 3.1,
+        "r1": 7,
+        "chg": -2,
+        "changeSig": false
+      },
+      "own": {
+        "v": {
+          "alp": 31.1,
+          "lnp": 30.2,
+          "onp": 38.7
+        },
+        "ci": {
+          "alp": 2.4,
+          "lnp": 3,
+          "onp": 2.5
+        },
+        "chg": {
+          "alp": 2,
+          "lnp": -2.9,
+          "onp": 0.9
+        },
+        "chgSig": {
+          "alp": false,
+          "lnp": false,
+          "onp": false
+        },
+        "n": 3,
+        "lead": "onp",
+        "runner": "alp",
+        "gap": 7.5,
+        "gapCi": 4.2,
+        "leadSig": true,
+        "houses": ["Resolve", "RedBridge"]
+      },
+      "monthly": [["2026-03", 33.9, 27.4, 38.7, 4.7, 4.4, 4.8], ["2026-04", 31.7, 33.3, 35, 4.2, 4.3, 4.3], ["2026-05", 31.1, 29.5, 39.3, 4.1, 4, 4.3], ["2026-06", 33.9, 30.5, 35.6, 4.4, 4.3, 4.4], ["2026-07", 30, 32.7, 37.2, 3.7, 4.2, 2.4], ["2026-08", 30, 32.4, 37.6, 2.3, 2.4, 2.4], ["2026-09", 31.3, 29.5, 39.2, 2.9, 2.8, 3]],
+      "dots": [[2026.23, "RedBridge/Accent", "2026-03-27", 33.9, 27.4, 38.7], [2026.33, "RedBridge/Accent", "2026-04-30", 31.7, 33.3, 35], [2026.4, "RedBridge/Accent", "2026-05-28", 31.1, 29.5, 39.3], [2026.48, "RedBridge/Accent", "2026-06-26", 33.9, 30.5, 35.6], [2026.52, "Resolve", "2026-07-11", 31.3, 31.3, 37.4], [2026.58, "RedBridge/Accent", "2026-07-30", 27.7, 35.4, 36.9], [2026.62, "Resolve", "2026-08-15", 29.5, 32.4, 38], [2026.65, "RedBridge/Accent", "2026-08-28", 30.8, 32.3, 36.9], [2026.7, "Resolve", "2026-09-12", 31.3, 29.5, 39.2]]
+    }, {
+      "id": "economy",
+      "label": "Economic management",
+      "imp": {
+        "v": 14,
+        "ci": 2.4,
+        "r1": 4,
+        "chg": -4,
+        "changeSig": true
+      },
+      "own": {
+        "v": {
+          "alp": 33.6,
+          "lnp": 39.7,
+          "onp": 26.7
+        },
+        "ci": {
+          "alp": 3.1,
+          "lnp": 3.4,
+          "onp": 6.1
+        },
+        "chg": {
+          "alp": -2.1,
+          "lnp": 1.4,
+          "onp": 0.7
+        },
+        "chgSig": {
+          "alp": false,
+          "lnp": false,
+          "onp": false
+        },
+        "n": 4,
+        "lead": "lnp",
+        "runner": "alp",
+        "gap": 6.1,
+        "gapCi": 3.7,
+        "leadSig": true,
+        "houses": ["Resolve", "YouGov", "RedBridge"]
+      },
+      "monthly": [["2026-03", 37.3, 40.3, 22.4, 4.6, 4.7, 4], ["2026-04", 37.3, 41.8, 20.9, 4.2, 4.2, 3.5], ["2026-05", 34.4, 43.8, 21.9, 4.1, 4.3, 3.5], ["2026-06", 40, 38.3, 21.7, 4.5, 4.5, 3.8], ["2026-07", 34.7, 39.6, 25.7, 2.3, 4.9, 3.5], ["2026-08", 36, 38.6, 25.5, 2, 4.9, 4.6], ["2026-09", 32.2, 38.4, 29.4, 2.9, 3, 2.8]],
+      "dots": [[2026.23, "RedBridge/Accent", "2026-03-27", 37.3, 40.3, 22.4], [2026.33, "RedBridge/Accent", "2026-04-30", 37.3, 41.8, 20.9], [2026.4, "RedBridge/Accent", "2026-05-28", 34.4, 43.8, 21.9], [2026.48, "RedBridge/Accent", "2026-06-26", 40, 38.3, 21.7], [2026.52, "Resolve", "2026-07-11", 35.2, 37.9, 26.9], [2026.58, "RedBridge/Accent", "2026-07-30", 33.8, 42.6, 23.5], [2026.62, "Resolve", "2026-08-15", 36.3, 35, 28.7], [2026.64, "YouGov", "2026-08-24", 35.7, 40, 24.3], [2026.65, "RedBridge/Accent", "2026-08-28", 35.8, 43.3, 20.9], [2026.7, "Resolve", "2026-09-12", 32.2, 38.4, 29.4]]
+    }, {
+      "id": "climate",
+      "label": "Climate change",
+      "imp": {
+        "v": 12,
+        "ci": 2.2,
+        "r1": 4,
+        "chg": -1,
+        "changeSig": false
+      },
+      "own": {
+        "v": {
+          "alp": 39.7,
+          "lnp": 26.2,
+          "onp": 34.1
+        },
+        "ci": {
+          "alp": 2.5,
+          "lnp": 3,
+          "onp": 2.4
+        },
+        "chg": {
+          "alp": 0.9,
+          "lnp": 0.1,
+          "onp": -1
+        },
+        "chgSig": {
+          "alp": false,
+          "lnp": false,
+          "onp": false
+        },
+        "n": 4,
+        "lead": "alp",
+        "runner": "onp",
+        "gap": 5.5,
+        "gapCi": 4.3,
+        "leadSig": true,
+        "houses": ["Resolve", "YouGov", "RedBridge"]
+      },
+      "monthly": [["2025-12", 50, 27.5, 22.5, 5.6, 5, 4.6], ["2026-01", 43.2, 27, 29.7, 5.7, 5.1, 5.3], ["2026-02", 47.1, 23.5, 29.4, 6.1, 5.2, 5.5], ["2026-03", 43.9, 24.4, 31.7, 6.1, 5.3, 5.7], ["2026-04", 45.9, 24.3, 29.7, 5.8, 5, 5.3], ["2026-05", 40, 27.5, 32.5, 5.3, 4.8, 5.1], ["2026-06", 41.7, 25, 33.3, 5.8, 5.1, 5.6], ["2026-07", 41.1, 27.2, 31.7, 2.7, 2.4, 2.6], ["2026-08", 39.2, 25.7, 35.1, 2.3, 2.4, 2.3], ["2026-09", 39.4, 27.2, 33.4, 3.3, 3, 3.1]],
+      "dots": [[2025.95, "RedBridge/Accent", "2025-12-12", 50, 27.5, 22.5], [2026.08, "RedBridge/Accent", "2026-01-29", 43.2, 27, 29.7], [2026.16, "RedBridge/Accent", "2026-02-27", 47.1, 23.5, 29.4], [2026.23, "RedBridge/Accent", "2026-03-27", 43.9, 24.4, 31.7], [2026.33, "RedBridge/Accent", "2026-04-30", 45.9, 24.3, 29.7], [2026.4, "RedBridge/Accent", "2026-05-28", 40, 27.5, 32.5], [2026.48, "RedBridge/Accent", "2026-06-26", 41.7, 25, 33.3], [2026.52, "Resolve", "2026-07-11", 41.3, 27.6, 31.1], [2026.58, "RedBridge/Accent", "2026-07-30", 40.5, 26.2, 33.3], [2026.62, "Resolve", "2026-08-15", 38.5, 27.1, 34.4], [2026.64, "YouGov", "2026-08-24", 38.6, 25, 36.4], [2026.65, "RedBridge/Accent", "2026-08-28", 41.9, 23.3, 34.9], [2026.7, "Resolve", "2026-09-12", 39.4, 27.2, 33.4]],
+      "grnTop": {
+        "house": "RedBridge",
+        "grn": 26,
+        "date": "2026-08-28"
+      }
+    }, {
+      "id": "security",
+      "label": "National security",
+      "imp": {
+        "v": 9,
+        "ci": 2,
+        "r1": 2,
+        "chg": -2,
+        "changeSig": false
+      },
+      "own": {
+        "v": {
+          "alp": 34.1,
+          "lnp": 34.7,
+          "onp": 31.2
+        },
+        "ci": {
+          "alp": 2.2,
+          "lnp": 4.1,
+          "onp": 4.1
+        },
+        "chg": {
+          "alp": -0.5,
+          "lnp": 0.3,
+          "onp": 0.2
+        },
+        "chgSig": {
+          "alp": false,
+          "lnp": false,
+          "onp": false
+        },
+        "n": 4,
+        "lead": "lnp",
+        "runner": "alp",
+        "gap": 0.6,
+        "gapCi": 5.1,
+        "leadSig": false,
+        "houses": ["Resolve", "YouGov", "RedBridge"]
+      },
+      "monthly": [["2025-12", 44.4, 36.5, 19, 4.4, 4.3, 3.5], ["2026-01", 33.3, 36.5, 30.2, 4.2, 4.3, 4.1], ["2026-02", 35.9, 35.9, 28.1, 4.3, 4.3, 4], ["2026-03", 38.5, 29.2, 32.3, 4.7, 4.4, 4.5], ["2026-04", 36.9, 33.8, 29.2, 4.2, 4.1, 4], ["2026-05", 33.3, 34.9, 31.7, 4.1, 4.1, 4], ["2026-06", 39.1, 29.7, 31.3, 4.3, 4, 4.1], ["2026-07", 33.5, 34.9, 31.6, 2.3, 2.3, 2.3], ["2026-08", 34.1, 35.7, 30.2, 2.6, 3.1, 2.8], ["2026-09", 33.6, 33.5, 33, 2.9, 2.9, 2.9]],
+      "dots": [[2025.95, "RedBridge/Accent", "2025-12-12", 44.4, 36.5, 19], [2026.08, "RedBridge/Accent", "2026-01-29", 33.3, 36.5, 30.2], [2026.16, "RedBridge/Accent", "2026-02-27", 35.9, 35.9, 28.1], [2026.23, "RedBridge/Accent", "2026-03-27", 38.5, 29.2, 32.3], [2026.33, "RedBridge/Accent", "2026-04-30", 36.9, 33.8, 29.2], [2026.4, "RedBridge/Accent", "2026-05-28", 33.3, 34.9, 31.7], [2026.48, "RedBridge/Accent", "2026-06-26", 39.1, 29.7, 31.3], [2026.52, "Resolve", "2026-07-11", 33.9, 35.2, 30.9], [2026.58, "RedBridge/Accent", "2026-07-30", 32.8, 34.3, 32.8], [2026.62, "Resolve", "2026-08-15", 32.6, 35.2, 32.2], [2026.64, "YouGov", "2026-08-24", 36.6, 33.8, 29.6], [2026.65, "RedBridge/Accent", "2026-08-28", 33.3, 39.4, 27.3], [2026.7, "Resolve", "2026-09-12", 33.6, 33.5, 33]]
+    }],
+    "labels": {
+      "col": "Cost of living",
+      "housing": "Housing",
+      "health": "Health",
+      "economy": "Economic management",
+      "immigration": "Immigration",
+      "climate": "Climate change",
+      "crime": "Crime",
+      "security": "National security",
+      "tax": "Tax",
+      "debt": "Government debt",
+      "energy": "Energy",
+      "education": "Education",
+      "environment": "The environment",
+      "transport": "Transport",
+      "jobs": "Jobs and wages",
+      "welfare": "Welfare",
+      "ir": "Industrial relations",
+      "finances": "Managing the finances",
+      "foreign": "Foreign affairs",
+      "indigenous": "Indigenous affairs",
+      "disasters": "Natural disasters",
+      "inequality": "Inequality",
+      "pensions": "Pensions and older Australians"
+    },
+    "houses": ["Resolve", "RedBridge", "YouGov"],
+    "polls": [{
+      "pollster": "Resolve",
+      "dateLabel": "12 Sep",
+      "source": "https://www.smh.com.au/politics/federal/debt-fears-grip-voters-as-albanese-s-approval-rating-slides-20260913-p60wv8.html",
+      "options": ["alp", "lnp", "onp", "oth", "unsure"]
+    }, {
+      "pollster": "RedBridge",
+      "dateLabel": "24–28 Aug",
+      "source": "https://www.accent-research.com/projects/afr-redbridge-group-and-accent-research-august-2026-federal-poll",
+      "options": ["alp", "lnp", "onp", "grn", "equal", "none", "unsure"]
+    }, {
+      "pollster": "YouGov",
+      "dateLabel": "18–24 Aug",
+      "source": "https://e.infogram.com/_/TBlBtAE3k0f4YBE6MIpF",
+      "options": ["alp", "lnp", "onp", "grn", "unsure"]
+    }, {
+      "pollster": "Resolve",
+      "dateLabel": "9–15 Aug",
+      "source": "https://www.smh.com.au/politics/federal/labor-marked-down-on-migration-as-delayed-visa-shake-up-approaches-20260816-p60oq7.html",
+      "options": ["alp", "lnp", "onp", "oth", "unsure"]
+    }],
+    "groups": {
+      "tabs": [{
+        "id": "vote",
+        "label": "Vote",
+        "groups": ["Labor", "Liberal", "Nationals, LNP and CLP", "One Nation", "Greens", "Others", "Undecided"],
+        "issues": ["col", "health", "housing", "immigration", "crime", "economy"],
+        "cells": {
+          "Labor": {
+            "col": {
+              "v": 74,
+              "ci": 5.9
+            },
+            "health": {
+              "v": 51,
+              "ci": 6.7
+            },
+            "housing": {
+              "v": 38,
+              "ci": 6.5
+            },
+            "immigration": {
+              "v": 11,
+              "ci": 4.2
+            },
+            "crime": {
+              "v": 23,
+              "ci": 5.6
+            },
+            "economy": {
+              "v": 11,
+              "ci": 4.2
+            }
+          },
+          "Liberal": {
+            "col": {
+              "v": 67,
+              "ci": 8.9
+            },
+            "health": {
+              "v": 32,
+              "ci": 8.9
+            },
+            "housing": {
+              "v": 27,
+              "ci": 8.4
+            },
+            "immigration": {
+              "v": 33,
+              "ci": 8.9
+            },
+            "crime": {
+              "v": 30,
+              "ci": 8.7
+            },
+            "economy": {
+              "v": 22,
+              "ci": 7.9
+            }
+          },
+          "Nationals, LNP and CLP": {
+            "col": {
+              "v": 79,
+              "ci": 10.6
+            },
+            "health": {
+              "v": 41,
+              "ci": 12.7
+            },
+            "housing": {
+              "v": 18,
+              "ci": 10
+            },
+            "immigration": {
+              "v": 28,
+              "ci": 11.6
+            },
+            "crime": {
+              "v": 27,
+              "ci": 11.5
+            },
+            "economy": {
+              "v": 23,
+              "ci": 10.9
+            }
+          },
+          "One Nation": {
+            "col": {
+              "v": 74,
+              "ci": 6
+            },
+            "health": {
+              "v": 24,
+              "ci": 5.8
+            },
+            "housing": {
+              "v": 25,
+              "ci": 5.9
+            },
+            "immigration": {
+              "v": 63,
+              "ci": 6.6
+            },
+            "crime": {
+              "v": 35,
+              "ci": 6.5
+            },
+            "economy": {
+              "v": 15,
+              "ci": 4.9
+            }
+          },
+          "Greens": {
+            "col": {
+              "v": 85,
+              "ci": 7.4
+            },
+            "health": {
+              "v": 38,
+              "ci": 10.1
+            },
+            "housing": {
+              "v": 55,
+              "ci": 10.3
+            },
+            "immigration": {
+              "v": 4,
+              "ci": 4.1
+            },
+            "crime": {
+              "v": 15,
+              "ci": 7.4
+            },
+            "economy": {
+              "v": 3,
+              "ci": 3.5
+            }
+          },
+          "Others": {
+            "col": {
+              "v": 80,
+              "ci": 9.6
+            },
+            "health": {
+              "v": 34,
+              "ci": 11.4
+            },
+            "housing": {
+              "v": 28,
+              "ci": 10.8
+            },
+            "immigration": {
+              "v": 19,
+              "ci": 9.4
+            },
+            "crime": {
+              "v": 23,
+              "ci": 10.1
+            },
+            "economy": {
+              "v": 18,
+              "ci": 9.2
+            }
+          },
+          "Undecided": {
+            "col": {
+              "v": 78,
+              "ci": 10.1
+            },
+            "health": {
+              "v": 46,
+              "ci": 12.2
+            },
+            "housing": {
+              "v": 37,
+              "ci": 11.8
+            },
+            "immigration": {
+              "v": 20,
+              "ci": 9.8
+            },
+            "crime": {
+              "v": 37,
+              "ci": 11.8
+            },
+            "economy": {
+              "v": 12,
+              "ci": 7.9
+            }
+          }
+        }
+      }, {
+        "id": "generation",
+        "label": "Age",
+        "groups": ["Gen Z", "Millennials", "Gen X", "Boomers"],
+        "issues": ["col", "health", "housing", "immigration", "crime", "economy"],
+        "cells": {
+          "Gen Z": {
+            "col": {
+              "v": 83,
+              "ci": 5.9
+            },
+            "health": {
+              "v": 30,
+              "ci": 7.2
+            },
+            "housing": {
+              "v": 58,
+              "ci": 7.8
+            },
+            "immigration": {
+              "v": 18,
+              "ci": 6.1
+            },
+            "crime": {
+              "v": 17,
+              "ci": 5.9
+            },
+            "economy": {
+              "v": 8,
+              "ci": 4.3
+            }
+          },
+          "Millennials": {
+            "col": {
+              "v": 83,
+              "ci": 4.9
+            },
+            "health": {
+              "v": 37,
+              "ci": 6.3
+            },
+            "housing": {
+              "v": 39,
+              "ci": 6.4
+            },
+            "immigration": {
+              "v": 23,
+              "ci": 5.5
+            },
+            "crime": {
+              "v": 27,
+              "ci": 5.8
+            },
+            "economy": {
+              "v": 10,
+              "ci": 3.9
+            }
+          },
+          "Gen X": {
+            "col": {
+              "v": 81,
+              "ci": 5.4
+            },
+            "health": {
+              "v": 39,
+              "ci": 6.7
+            },
+            "housing": {
+              "v": 27,
+              "ci": 6.1
+            },
+            "immigration": {
+              "v": 32,
+              "ci": 6.4
+            },
+            "crime": {
+              "v": 34,
+              "ci": 6.5
+            },
+            "economy": {
+              "v": 16,
+              "ci": 5.1
+            }
+          },
+          "Boomers": {
+            "col": {
+              "v": 61,
+              "ci": 6.4
+            },
+            "health": {
+              "v": 41,
+              "ci": 6.4
+            },
+            "housing": {
+              "v": 17,
+              "ci": 4.9
+            },
+            "immigration": {
+              "v": 38,
+              "ci": 6.3
+            },
+            "crime": {
+              "v": 30,
+              "ci": 6
+            },
+            "economy": {
+              "v": 19,
+              "ci": 5.1
+            }
+          }
+        }
+      }, {
+        "id": "gender",
+        "label": "Gender",
+        "groups": ["Women", "Men"],
+        "issues": ["col", "health", "housing", "immigration", "crime", "economy"],
+        "cells": {
+          "Women": {
+            "col": {
+              "v": 78,
+              "ci": 4
+            },
+            "health": {
+              "v": 43,
+              "ci": 4.8
+            },
+            "housing": {
+              "v": 35,
+              "ci": 4.6
+            },
+            "immigration": {
+              "v": 25,
+              "ci": 4.2
+            },
+            "crime": {
+              "v": 32,
+              "ci": 4.5
+            },
+            "economy": {
+              "v": 11,
+              "ci": 3
+            }
+          },
+          "Men": {
+            "col": {
+              "v": 72,
+              "ci": 4.4
+            },
+            "health": {
+              "v": 32,
+              "ci": 4.6
+            },
+            "housing": {
+              "v": 30,
+              "ci": 4.5
+            },
+            "immigration": {
+              "v": 34,
+              "ci": 4.7
+            },
+            "crime": {
+              "v": 23,
+              "ci": 4.1
+            },
+            "economy": {
+              "v": 17,
+              "ci": 3.7
+            }
+          }
+        }
+      }, {
+        "id": "location",
+        "label": "Place",
+        "groups": ["Inner metro", "Outer metro", "Provincial", "Rural"],
+        "issues": ["col", "health", "housing", "immigration", "crime", "economy"],
+        "cells": {
+          "Inner metro": {
+            "col": {
+              "v": 68,
+              "ci": 5.9
+            },
+            "health": {
+              "v": 36,
+              "ci": 6
+            },
+            "housing": {
+              "v": 34,
+              "ci": 6
+            },
+            "immigration": {
+              "v": 26,
+              "ci": 5.5
+            },
+            "crime": {
+              "v": 23,
+              "ci": 5.3
+            },
+            "economy": {
+              "v": 21,
+              "ci": 5.1
+            }
+          },
+          "Outer metro": {
+            "col": {
+              "v": 78,
+              "ci": 5
+            },
+            "health": {
+              "v": 34,
+              "ci": 5.7
+            },
+            "housing": {
+              "v": 33,
+              "ci": 5.6
+            },
+            "immigration": {
+              "v": 32,
+              "ci": 5.6
+            },
+            "crime": {
+              "v": 30,
+              "ci": 5.5
+            },
+            "economy": {
+              "v": 11,
+              "ci": 3.8
+            }
+          },
+          "Provincial": {
+            "col": {
+              "v": 81,
+              "ci": 6.8
+            },
+            "health": {
+              "v": 40,
+              "ci": 8.4
+            },
+            "housing": {
+              "v": 31,
+              "ci": 8
+            },
+            "immigration": {
+              "v": 30,
+              "ci": 7.9
+            },
+            "crime": {
+              "v": 31,
+              "ci": 8
+            },
+            "economy": {
+              "v": 11,
+              "ci": 5.4
+            }
+          },
+          "Rural": {
+            "col": {
+              "v": 78,
+              "ci": 6.2
+            },
+            "health": {
+              "v": 41,
+              "ci": 7.4
+            },
+            "housing": {
+              "v": 32,
+              "ci": 7
+            },
+            "immigration": {
+              "v": 30,
+              "ci": 6.9
+            },
+            "crime": {
+              "v": 29,
+              "ci": 6.8
+            },
+            "economy": {
+              "v": 12,
+              "ci": 4.9
+            }
+          }
+        }
+      }, {
+        "id": "housing",
+        "label": "Home",
+        "groups": ["Own outright", "Mortgage", "Renting and other"],
+        "issues": ["col", "health", "housing", "immigration", "crime", "economy"],
+        "cells": {
+          "Own outright": {
+            "col": {
+              "v": 63,
+              "ci": 5.9
+            },
+            "health": {
+              "v": 39,
+              "ci": 5.9
+            },
+            "housing": {
+              "v": 22,
+              "ci": 5
+            },
+            "immigration": {
+              "v": 32,
+              "ci": 5.7
+            },
+            "crime": {
+              "v": 30,
+              "ci": 5.6
+            },
+            "economy": {
+              "v": 17,
+              "ci": 4.6
+            }
+          },
+          "Mortgage": {
+            "col": {
+              "v": 82,
+              "ci": 4.4
+            },
+            "health": {
+              "v": 37,
+              "ci": 5.5
+            },
+            "housing": {
+              "v": 27,
+              "ci": 5.1
+            },
+            "immigration": {
+              "v": 32,
+              "ci": 5.4
+            },
+            "crime": {
+              "v": 27,
+              "ci": 5.1
+            },
+            "economy": {
+              "v": 16,
+              "ci": 4.2
+            }
+          },
+          "Renting and other": {
+            "col": {
+              "v": 82,
+              "ci": 4.7
+            },
+            "health": {
+              "v": 37,
+              "ci": 5.9
+            },
+            "housing": {
+              "v": 52,
+              "ci": 6.1
+            },
+            "immigration": {
+              "v": 22,
+              "ci": 5
+            },
+            "crime": {
+              "v": 25,
+              "ci": 5.3
+            },
+            "economy": {
+              "v": 8,
+              "ci": 3.3
+            }
+          }
+        }
+      }, {
+        "id": "education",
+        "label": "Education",
+        "groups": ["Below Year 12", "Year 12", "TAFE or trade", "University"],
+        "issues": ["col", "health", "housing", "immigration", "crime", "economy"],
+        "cells": {
+          "Below Year 12": {
+            "col": {
+              "v": 69,
+              "ci": 8.1
+            },
+            "health": {
+              "v": 40,
+              "ci": 8.6
+            },
+            "housing": {
+              "v": 29,
+              "ci": 7.9
+            },
+            "immigration": {
+              "v": 38,
+              "ci": 8.5
+            },
+            "crime": {
+              "v": 39,
+              "ci": 8.5
+            },
+            "economy": {
+              "v": 10,
+              "ci": 5.2
+            }
+          },
+          "Year 12": {
+            "col": {
+              "v": 82,
+              "ci": 5.4
+            },
+            "health": {
+              "v": 34,
+              "ci": 6.6
+            },
+            "housing": {
+              "v": 43,
+              "ci": 6.9
+            },
+            "immigration": {
+              "v": 24,
+              "ci": 6
+            },
+            "crime": {
+              "v": 22,
+              "ci": 5.8
+            },
+            "economy": {
+              "v": 9,
+              "ci": 4
+            }
+          },
+          "TAFE or trade": {
+            "col": {
+              "v": 74,
+              "ci": 5.4
+            },
+            "health": {
+              "v": 39,
+              "ci": 6
+            },
+            "housing": {
+              "v": 29,
+              "ci": 5.6
+            },
+            "immigration": {
+              "v": 33,
+              "ci": 5.8
+            },
+            "crime": {
+              "v": 28,
+              "ci": 5.6
+            },
+            "economy": {
+              "v": 13,
+              "ci": 4.2
+            }
+          },
+          "University": {
+            "col": {
+              "v": 75,
+              "ci": 5.5
+            },
+            "health": {
+              "v": 37,
+              "ci": 6.2
+            },
+            "housing": {
+              "v": 32,
+              "ci": 6
+            },
+            "immigration": {
+              "v": 23,
+              "ci": 5.4
+            },
+            "crime": {
+              "v": 25,
+              "ci": 5.5
+            },
+            "economy": {
+              "v": 21,
+              "ci": 5.2
+            }
+          }
+        }
+      }],
+      "house": "RedBridge",
+      "newest": "2026-08-28",
+      "window": "six weeks"
+    }
   };
   const demoGroups = ["18–34", "35–54", "55+", "Gen Z", "Millennials", "Gen X", "Boomers", "Men", "Women", "Year 12 or less", "TAFE or trade", "University", "NSW", "Vic", "Qld", "Rest of Australia", "Inner metro", "Outer metro", "Provincial", "Rural", "Own outright", "Mortgage", "Renting", "English only", "Other language"];
   const accuracy = {
@@ -36156,6 +37288,7 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
     onSources,
     demographics,
     demoGroups,
+    issues,
     accuracy,
     individualPolls,
     pollsterTable,
@@ -42561,6 +43694,556 @@ function DemographicsPanel({
   }, "The charts are built the way the site\u2019s other monthly lines are: each poll is a dot and each line\u2019s 95% interval is shaded. Where two groups\u2019 shading overlaps, the polls can\u2019t tell them apart that month. \u221238% means the party\u2019s vote in that group is 38% lower than among all voters, not 38 points. Measured this way a party\u2019s growth doesn\u2019t read as a widening divide, so a flat line means the group moved with everyone else."), React.createElement("p", {
     className: "table-hint"
   }, "Groups pool only where pollsters cut them the same way", tab.id === "age" ? ": YouGov’s 35–49 and 50+ bands aren’t 35–54 and 55+, so it joins only at 18–34" : tab.id === "place" ? ": YouGov’s SA, WA, and ACT/NT/Tas are combined into the rest of Australia at their shares of the 2025 vote, and DemosAU’s Regional/Rural holds provincial and rural voters together, so it joins only at the two suburban groups" : tab.id === "home" ? ": RedBridge’s Renting and other is wider than renters, so it joins only at the two owner groups" : "", "."))))));
+}
+const ISS_PARTY = {
+  alp: "Labor",
+  lnp: "the Coalition",
+  onp: "One Nation"
+};
+const ISS_PARTY_CAP = {
+  alp: "Labor",
+  lnp: "Coalition",
+  onp: "One Nation"
+};
+const ISS_SHORT = {
+  col: "Cost of living",
+  housing: "Housing",
+  health: "Health",
+  economy: "Economy",
+  immigration: "Immigration",
+  climate: "Climate",
+  crime: "Crime",
+  security: "Security"
+};
+const ISS_PHRASE = {
+  col: "the cost of living",
+  housing: "housing",
+  health: "health",
+  economy: "economic management",
+  immigration: "immigration",
+  climate: "climate change",
+  crime: "crime",
+  security: "national security"
+};
+const ISS_WHO = {
+  Labor: "Labor voters",
+  Coalition: "Coalition voters",
+  Liberal: "Liberal voters",
+  "Nationals, LNP and CLP": "Nationals, LNP and CLP voters",
+  "One Nation": "One Nation voters",
+  Greens: "Greens voters",
+  Others: "voters for other parties and independents",
+  Undecided: "undecided voters",
+  "Below Year 12": "voters who left school before Year 12",
+  "Year 12": "voters who finished Year 12",
+  "Renting and other": "renters and others"
+};
+const ISS_SET_WORDS = {
+  vote: {
+    all: "voters of different parties",
+    others: "any other group of voters"
+  },
+  generation: DEMO_SET_WORDS.generation,
+  gender: DEMO_SET_WORDS.gender,
+  location: DEMO_SET_WORDS.location,
+  housing: {
+    all: "owners and renters",
+    others: "other voters"
+  },
+  education: DEMO_SET_WORDS.education
+};
+const issWho = g => ISS_WHO[g] || DEMO_WHO[g] || g;
+const issCap = s => s[0].toUpperCase() + s.slice(1);
+function issGroupVerdict(tab, k) {
+  const gs = tab.groups.map(g => ({
+    g,
+    c: tab.cells[g] && tab.cells[g][k]
+  })).filter(x => x.c && x.c.ci != null);
+  if (gs.length < 2) return null;
+  const gaps = gs.flatMap((a, i) => gs.slice(i + 1).map(b => {
+    const m = Math.hypot(a.c.ci, b.c.ci);
+    return {
+      a,
+      b,
+      p: m > 0 ? zTail(1.96 * (a.c.v - b.c.v) / m) : 1
+    };
+  }));
+  const sig = new Set();
+  for (const [i, g] of [...gaps].sort((x, y) => x.p - y.p).entries()) {
+    if (g.p >= 0.05 / (gaps.length - i)) break;
+    sig.add(g);
+  }
+  if (!sig.size) return null;
+  const words = ISS_SET_WORDS[tab.id] || {
+    all: "these groups",
+    others: "any other group"
+  };
+  const cmp = (a, b) => {
+    const g = gaps.find(x => x.a === a && x.b === b || x.a === b && x.b === a);
+    return sig.has(g) ? Math.sign(a.c.v - b.c.v) : 0;
+  };
+  const what = `to put ${ISS_PHRASE[k] || k} in their top three`;
+  const pct = x => Math.round(x.c.v) + "%";
+  const byV = [...gs].sort((a, b) => b.c.v - a.c.v);
+  const top = byV[0],
+    bot = byV[byV.length - 1];
+  if (gs.length === 2) return {
+    gap: top.c.v - bot.c.v,
+    text: `${issCap(issWho(top.g))} are significantly more likely than ${issWho(bot.g)} ${what} (${pct(top)} against ${pct(bot)}).`
+  };
+  const topApart = byV.slice(1).every(x => cmp(top, x) > 0),
+    botApart = byV.slice(0, -1).every(x => cmp(bot, x) < 0);
+  const topGap = top.c.v - byV[1].c.v,
+    botGap = byV[byV.length - 2].c.v - bot.c.v;
+  if (topApart && (!botApart || topGap >= botGap)) return {
+    gap: topGap,
+    text: `${issCap(issWho(top.g))} are significantly more likely than ${words.others} ${what} (${pct(top)}).`
+  };
+  if (botApart) return {
+    gap: botGap,
+    text: `${issCap(issWho(bot.g))} are significantly less likely than ${words.others} ${what} (${pct(bot)}).`
+  };
+  const [a, b] = gaps.filter(g => sig.has(g)).map(g => g.a.c.v > g.b.c.v ? [g.a, g.b] : [g.b, g.a]).sort((p, q) => q[0].c.v - q[1].c.v - (p[0].c.v - p[1].c.v))[0];
+  return {
+    gap: a.c.v - b.c.v,
+    text: `${issCap(issWho(a.g))} are significantly more likely than ${issWho(b.g)} ${what} (${pct(a)} against ${pct(b)}).`
+  };
+}
+function issTrendVerdict(D, it, dots) {
+  if (!dots.length) return null;
+  const ym = dots[0].date.slice(0, 7);
+  const when = D.monthNameFull(+ym.slice(5)) + " " + ym.slice(0, 4);
+  const what = ISS_PHRASE[it.id] || it.label.toLowerCase();
+  const fits = D.issues.parties.map(q => ({
+    q,
+    fit: withinHouseSlope(dots.map(d => ({
+      h: d.pollster,
+      t: d.x,
+      w: d.n,
+      y: d.s[q]
+    })))
+  })).filter(f => f.fit);
+  if (!fits.length) return `There aren’t enough polls since ${when} to tell whether any party has gained ground on ${what}.`;
+  const sig = [];
+  for (const [i, f] of [...fits].sort((a, b) => a.fit.p - b.fit.p).entries()) {
+    if (f.fit.p >= 0.05 / (fits.length - i)) break;
+    sig.push(f);
+  }
+  if (!sig.length) return `No party’s share on ${what} has changed significantly since ${when}.`;
+  const up = sig.filter(f => f.fit.b > 0).map(f => ISS_PARTY[f.q]);
+  const down = sig.filter(f => f.fit.b < 0).map(f => ISS_PARTY[f.q]);
+  const has = xs => xs.length > 1 ? "have" : "has";
+  return `Since ${when}, ` + [up.length ? `${houseList(up, Infinity)} ${has(up)} gained ground significantly on ${what}` : null, down.length ? `${houseList(down, Infinity)} ${has(down)} lost ground significantly` : null].filter(Boolean).join(", and ") + ".";
+}
+function IssuesPanel({
+  rangeId = "all"
+}) {
+  const {
+    D,
+    rangeDomain,
+    filterPts,
+    buildXTicks,
+    series
+  } = window.AP;
+  const narrow = useNarrow();
+  const beside = useNarrow("(min-width: 1136px)");
+  const I = D.issues;
+  const [view, setView] = useState("trust");
+  const [selId, setSel] = useState(null);
+  const [gsetId, setGset] = useState("vote");
+  if (!I || !I.list || !I.list.length) return null;
+  const P = I.parties;
+  const list = I.list;
+  const it = list.find(x => x.id === selId) || list[0];
+  const top = list[0];
+  const pName = q => D.PARTIES[q].name;
+  const pColor = q => D.PARTIES[q].color;
+  const openInfo = () => window.AP.openTerm && window.AP.openTerm("issues", "The issues");
+  const rowVerdict = x => !x.own ? null : x.own.leadSig ? {
+    text: `${ISS_PARTY_CAP[x.own.lead]} ahead`,
+    color: pColor(x.own.lead),
+    title: `${issCap(ISS_PARTY[x.own.lead])} leads ${ISS_PARTY[x.own.runner]} by ${x.own.gap.toFixed(1)} points (95% margin ± ${x.own.gapCi.toFixed(1)})`
+  } : {
+    text: "No clear lead",
+    color: null,
+    title: `${issCap(ISS_PARTY[x.own.lead])} and ${ISS_PARTY[x.own.runner]} are ${x.own.gap.toFixed(1)} points apart, inside the 95% margin of ± ${x.own.gapCi.toFixed(1)}`
+  };
+  const pick = id => setSel(id);
+  const onRowKey = (e, id) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      pick(id);
+    }
+  };
+  const issueRow = x => {
+    const v = rowVerdict(x),
+      sel = x.id === it.id;
+    return React.createElement("div", {
+      key: x.id,
+      className: "iss-row" + (sel ? " sel" : ""),
+      role: "button",
+      tabIndex: 0,
+      "aria-pressed": sel,
+      onClick: () => pick(x.id),
+      onKeyDown: e => onRowKey(e, x.id),
+      "aria-label": `${x.label}: ${x.imp ? Math.round(x.imp.v) + "% put it in their top three" : "not asked"}; ` + (x.own ? P.map(q => `${pName(q)} ${Math.round(x.own.v[q])}`).join(", ") + "; " + v.text : "no three-way figures")
+    }, React.createElement("span", {
+      className: "iss-lab"
+    }, x.label), React.createElement("span", {
+      className: "iss-imp",
+      title: x.imp ? `${Math.round(x.imp.v)}% put it in their top three, ${x.imp.r1 != null ? Math.round(x.imp.r1) + "% first" : ""} (± ${x.imp.ci.toFixed(1)})` : ""
+    }, React.createElement("span", {
+      className: "iss-mini",
+      "aria-hidden": "true"
+    }, "In top three"), x.imp ? React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "demo-track iss-imp-track",
+      "aria-hidden": "true"
+    }, React.createElement("span", {
+      className: "demo-fill",
+      style: {
+        width: x.imp.v + "%",
+        background: "var(--ink-3)"
+      }
+    })), React.createElement("span", {
+      className: "iss-imp-v"
+    }, Math.round(x.imp.v), React.createElement("span", {
+      className: "pct"
+    }, "%"))) : React.createElement("span", {
+      className: "iss-na"
+    }, "not asked")), React.createElement("span", {
+      className: "iss-own"
+    }, React.createElement("span", {
+      className: "iss-mini",
+      "aria-hidden": "true"
+    }, "Best on it"), x.own ? React.createElement(React.Fragment, null, React.createElement("span", {
+      className: "sbar iss-sbar",
+      "aria-hidden": "true"
+    }, P.map(q => React.createElement("span", {
+      key: q,
+      className: "sbar-seg",
+      style: {
+        width: x.own.v[q] + "%",
+        background: pColor(q)
+      }
+    }))), React.createElement("span", {
+      className: "iss-nums",
+      "aria-hidden": "true"
+    }, P.map(q => React.createElement("span", {
+      key: q,
+      className: "skey"
+    }, React.createElement("span", {
+      className: "skey-dot",
+      style: {
+        background: pColor(q)
+      }
+    }), React.createElement("span", {
+      className: "skey-val"
+    }, Math.round(x.own.v[q])))))) : React.createElement("span", {
+      className: "iss-na"
+    }, "not asked with all three parties")), React.createElement("span", {
+      className: "iss-verdict" + (v && v.color ? " lead" : ""),
+      title: v ? v.title : ""
+    }, v && v.color && React.createElement("span", {
+      className: "skey-dot",
+      style: {
+        background: v.color
+      },
+      "aria-hidden": "true"
+    }), v ? v.text : ""));
+  };
+  const [rangeLo, rangeHi] = rangeDomain(rangeId);
+  const monthPts = (it.monthly || []).map(m => ({
+    ym: m[0],
+    x: D.mx(m[0]),
+    ...Object.fromEntries(P.map((q, i) => [q, m[1 + i]])),
+    ...Object.fromEntries(P.map((q, i) => ["ci_" + q, m[1 + P.length + i]]))
+  }));
+  const chart = (() => {
+    if (monthPts.length < 1) return null;
+    const xDomain = [Math.max(rangeLo, monthPts[0].x - 0.06), rangeHi];
+    const inX = x => x >= xDomain[0] && x <= xDomain[1];
+    const pts = filterPts(monthPts, xDomain[0]);
+    const byRow = new Map(D.individualPolls.map(p => [p.pollster + "|" + p.released, p]));
+    const dots = (it.dots || []).filter(d => inX(d[0])).map(d => {
+      const meta = byRow.get(d[1] + "|" + d[2]) || {
+        pollster: demoHouse(d[1]),
+        released: d[2]
+      };
+      return {
+        x: d[0],
+        pollster: d[1],
+        date: d[2],
+        n: meta.sample || 1000,
+        meta,
+        s: Object.fromEntries(P.map((q, i) => [q, d[3 + i]]))
+      };
+    });
+    const scatter = dots.flatMap(d => P.map(q => ({
+      x: d.x,
+      y: d.s[q],
+      color: pColor(q),
+      label: pName(q),
+      meta: d.meta
+    })));
+    const areas = P.map(q => ({
+      id: "ci-" + q,
+      color: pColor(q),
+      className: "ci-band",
+      edge: false,
+      smooth: true,
+      points: pts.filter(d => d["ci_" + q] != null).map(d => ({
+        x: d.x,
+        y0: d[q] - d["ci_" + q],
+        y1: d[q] + d["ci_" + q]
+      }))
+    })).filter(a => a.points.length >= 2);
+    const vals = pts.flatMap(d => P.map(q => d[q])).concat(scatter.map(d => d.y), areas.flatMap(a => a.points.flatMap(d => [d.y0, d.y1])));
+    if (!vals.length) return null;
+    const lo = Math.min(...vals),
+      hi = Math.max(...vals),
+      step = 10;
+    const d0 = Math.max(0, Math.floor((lo - step * 0.1) / step) * step),
+      d1 = Math.ceil((hi + step * 0.1) / step) * step;
+    const ticks = [];
+    for (let v = d0; v <= d1 + 1e-9; v += step) ticks.push(v);
+    return {
+      xDomain,
+      pts,
+      dots,
+      scatter,
+      areas,
+      domain: [d0, d1],
+      ticks
+    };
+  })();
+  const G = I.groups;
+  const gtab = G && (G.tabs.find(t => t.id === gsetId) || G.tabs[0]);
+  const impOf = k => {
+    const x = list.find(i => i.id === k);
+    return x && x.imp ? x.imp : null;
+  };
+  const gVerdicts = gtab ? gtab.issues.map(k => issGroupVerdict(gtab, k)).filter(Boolean).sort((a, b) => b.gap - a.gap).slice(0, 3) : [];
+  const lead = top.imp && top.own && React.createElement("p", {
+    className: "iss-lead"
+  }, React.createElement("mark", null, plainShare(top.imp.v), " voters put ", ISS_PHRASE[top.id], " among their three most important issues"), top.own.leadSig ? `, and more of them trust ${ISS_PARTY[top.own.lead]} with it than either of the others.` : ", and no party is clearly more trusted with it than the others.");
+  return React.createElement("section", {
+    className: "card"
+  }, React.createElement("div", {
+    className: "card-head"
+  }, React.createElement("div", null, React.createElement("h2", {
+    className: "card-title"
+  }, "The issues"), React.createElement("p", {
+    className: "card-sub"
+  }, view === "trust" ? React.createElement(React.Fragment, null, "What voters say matters most, and which party they think is best on it \xB7 pooled from the last ", I.window, " of polls \xB7 ", houseList(I.houses)) : React.createElement(React.Fragment, null, "Each group\u2019s share putting an issue in its top three \xB7 ", G ? `${G.house}, its polls in the last ${G.window}` : "no poll in the window")))), React.createElement("div", {
+    className: "demo-ctl"
+  }, React.createElement(Segmented, {
+    options: [{
+      id: "trust",
+      label: "Who’s trusted"
+    }, {
+      id: "whom",
+      label: "What matters to whom"
+    }],
+    value: view,
+    onChange: setView,
+    size: "sm",
+    ariaLabel: "View"
+  }), view === "whom" && G && React.createElement(Segmented, {
+    options: G.tabs.map(t => ({
+      id: t.id,
+      label: t.label
+    })),
+    value: gtab.id,
+    onChange: setGset,
+    size: "sm",
+    ariaLabel: "Group voters by"
+  })), view === "trust" ? React.createElement("div", {
+    className: "iss-body"
+  }, lead, React.createElement("div", {
+    className: "iss-grid"
+  }, React.createElement("div", {
+    className: "iss-rows"
+  }, React.createElement("div", {
+    className: "iss-head",
+    "aria-hidden": "true"
+  }, React.createElement("span", {
+    className: "iss-lab"
+  }), React.createElement("span", {
+    className: "iss-imp"
+  }, "In voters\u2019 top three"), React.createElement("span", {
+    className: "iss-own"
+  }, "Best on it", React.createElement("span", {
+    className: "iss-legend"
+  }, P.map(q => React.createElement("span", {
+    key: q,
+    className: "skey"
+  }, React.createElement("span", {
+    className: "skey-dot",
+    style: {
+      background: pColor(q)
+    }
+  }), React.createElement("span", {
+    className: "skey-lab"
+  }, ISS_PARTY_CAP[q]))))), React.createElement("span", {
+    className: "iss-verdict"
+  })), React.createElement("p", {
+    className: "iss-legend iss-legend-solo",
+    "aria-hidden": "true"
+  }, "Best on it:", " ", P.map(q => React.createElement("span", {
+    key: q,
+    className: "skey"
+  }, React.createElement("span", {
+    className: "skey-dot",
+    style: {
+      background: pColor(q)
+    }
+  }), React.createElement("span", {
+    className: "skey-lab"
+  }, ISS_PARTY_CAP[q])))), list.map(issueRow), list.filter(x => x.grnTop).map(x => React.createElement("p", {
+    key: "grn-" + x.id,
+    className: "table-hint iss-grn"
+  }, "RedBridge also offers the Greens, who come first on ", ISS_PHRASE[x.id], " (", x.grnTop.grn, "%)."))), chart && React.createElement("div", {
+    className: "iss-chart demo-chart"
+  }, React.createElement("p", {
+    className: "demo-chart-lab"
+  }, React.createElement("span", {
+    className: "demo-chart-set"
+  }, it.label), "Who voters think is best, month by month (%, of those naming Labor, the Coalition or One Nation)"), React.createElement(TrendChart, {
+    key: "iss-" + it.id,
+    height: narrow ? 560 : beside ? 460 : 360,
+    xDomain: chart.xDomain,
+    yDomain: chart.domain,
+    yTicks: chart.ticks,
+    unit: "%",
+    pad: {
+      l: narrow ? 70 : 56,
+      r: 60,
+      t: 16,
+      b: narrow ? 66 : 56
+    },
+    xTicks: buildXTicks(chart.xDomain[0], chart.xDomain[1]),
+    series: P.map(q => ({
+      id: q,
+      label: pName(q),
+      color: pColor(q),
+      points: series(chart.pts, q),
+      endLabel: ISS_PARTY_CAP[q]
+    })),
+    areas: chart.areas,
+    spine: series(chart.pts, P[0]),
+    scatter: chart.scatter,
+    pollFacet: "primary",
+    tooltipTitle: i => window.AP.monthLabelFull(chart.pts[i].ym),
+    fmt: v => Math.round(v) + "",
+    ariaLabel: `${it.label}: the share of voters naming Labor, the Coalition or One Nation who think each is best on it, month by month`,
+    copy: {
+      sub: `${it.label}: who voters think is best, of those naming Labor, the Coalition or One Nation · pooled from ${houseList(it.own && it.own.houses || I.houses)}`,
+      legend: [...P.map(q => ({
+        label: `${pName(q)}  ${it.own ? Math.round(it.own.v[q]) + "%" : ""}`,
+        color: pColor(q),
+        kind: "line"
+      })), ...(chart.areas.length ? [{
+        label: "95% interval (shaded)",
+        color: "var(--ink-faint)",
+        kind: "shade"
+      }] : [])]
+    }
+  }), demoSaid(issTrendVerdict(D, it, chart.dots))), React.createElement("div", {
+    className: "demo-notes iss-notes"
+  }, React.createElement("p", {
+    className: "table-hint"
+  }, "The figures pool the last ", I.window, " of polls. Pick an issue to follow it in the chart.", " ", React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    onClick: openInfo
+  }, "Where the figures come from")), React.createElement("details", {
+    className: "view-how hint-how"
+  }, React.createElement("summary", null, "How to read these figures"), React.createElement("p", {
+    className: "table-hint"
+  }, "The grey bar is how many voters put the issue among the three most important to their vote: 75% beside the cost of living means three in four rank it first, second or third. RedBridge asks this every month, and it is the only pollster that publishes the figures, so this bar is RedBridge\u2019s alone."), React.createElement("p", {
+    className: "table-hint"
+  }, "The coloured bar splits the voters who named Labor, the Coalition or One Nation as best on the issue. Pollsters also offer other answers \u2013 the Greens, someone else, all about equal, don\u2019t know \u2013 and each offers a different set, so only these three can be pooled. Resolve, RedBridge and YouGov count wherever they ask the issue."), React.createElement("p", {
+    className: "table-hint"
+  }, "\u201CAhead\u201D means the leading party\u2019s margin over the next is larger than that margin\u2019s own 95% range; \u201CNo clear lead\u201D means the polls can\u2019t separate them. In the chart each dot is one poll and each line\u2019s 95% interval is shaded."))))) : React.createElement("div", {
+    className: "iss-body"
+  }, gtab ? React.createElement("div", {
+    className: "iss-grid whom"
+  }, React.createElement("div", {
+    className: "iss-table-wrap"
+  }, React.createElement("table", {
+    className: "iss-table"
+  }, React.createElement("caption", {
+    className: "sr-only"
+  }, "Share of each group putting each issue in its top three, %"), React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", {
+    scope: "col"
+  }, React.createElement("span", {
+    className: "sr-only"
+  }, "Group")), gtab.issues.map(k => React.createElement("th", {
+    scope: "col",
+    key: k
+  }, React.createElement("span", null, ISS_SHORT[k] || I.labels[k]))))), React.createElement("tbody", null, React.createElement("tr", {
+    className: "all"
+  }, React.createElement("th", {
+    scope: "row"
+  }, "All voters"), gtab.issues.map(k => {
+    const x = impOf(k);
+    return React.createElement("td", {
+      key: k
+    }, x ? React.createElement(IssCell, {
+      v: x.v,
+      ci: x.ci,
+      all: true
+    }) : "–");
+  })), gtab.groups.map(g => React.createElement("tr", {
+    key: g
+  }, React.createElement("th", {
+    scope: "row"
+  }, g), gtab.issues.map(k => {
+    const c = gtab.cells[g] && gtab.cells[g][k];
+    return React.createElement("td", {
+      key: k
+    }, c ? React.createElement(IssCell, {
+      v: c.v,
+      ci: c.ci
+    }) : "–");
+  })))))), React.createElement("div", {
+    className: "iss-said"
+  }, gVerdicts.length ? gVerdicts.map((v, i) => React.createElement(React.Fragment, {
+    key: i
+  }, demoSaid(v.text))) : demoSaid(`No two ${gtab.id === "vote" ? "groups of voters" : "groups"} differ significantly on any of these issues.`)), React.createElement("div", {
+    className: "demo-notes iss-notes"
+  }, React.createElement("p", {
+    className: "table-hint"
+  }, "Each figure is the share of that group putting the issue among its three most important. Only RedBridge publishes these by group, so they rest on its polls in the last ", G.window, ".", " ", React.createElement("button", {
+    type: "button",
+    className: "hi-term",
+    onClick: openInfo
+  }, "Where the figures come from")), React.createElement("details", {
+    className: "view-how hint-how"
+  }, React.createElement("summary", null, "How to read these figures"), React.createElement("p", {
+    className: "table-hint"
+  }, "The sentences name the clearest differences. Two groups differ significantly when the gap between them is larger than its own 95% margin, which combines both groups\u2019 margins; with several groups the bar rises for each extra gap tested, as on the vote-by-group panel. A group\u2019s margin is usually 5 to 7 points, since a group is a slice of one poll. Hover or tap a figure for its margin.")))) : React.createElement("p", {
+    className: "table-hint"
+  }, "No poll in the last ", I.window, " published these figures by group.")));
+}
+function IssCell({
+  v,
+  ci,
+  all
+}) {
+  return React.createElement("span", {
+    className: "iss-cell" + (all ? " all" : ""),
+    title: ci != null ? `± ${ci.toFixed(1)} is the 95% margin` : ""
+  }, React.createElement("span", {
+    className: "iss-cell-v"
+  }, Math.round(v)), React.createElement("span", {
+    className: "iss-cell-bar",
+    "aria-hidden": "true"
+  }, React.createElement("span", {
+    style: {
+      width: Math.max(0, Math.min(100, v)) + "%"
+    }
+  })));
 }
 const PARTY_C = {
   alp: "var(--alp)",
@@ -49706,6 +51389,29 @@ function infoTerms(D) {
   }, React.createElement("td", null, p.pollster), React.createElement("td", null, p.dateLabel), React.createElement("td", null, demoSets(p.sets)))))), React.createElement("p", {
     className: "info-work-note"
   }, "The polls in the six-week window, newest first. A poll\u2019s weight is its sample, halving every 14 days and fading out by day 42; a pollster with several polls in the window counts for the square root of their number.")) : null;
+  const ISS = D.issues;
+  const ISS_OPT = {
+    alp: "Labor",
+    lnp: "the Coalition",
+    onp: "One Nation",
+    grn: "the Greens",
+    oth: "someone else",
+    equal: "all about equal",
+    none: "none of these",
+    unsure: "not sure"
+  };
+  const issWork = ISS && ISS.polls && ISS.polls.length ? React.createElement("div", {
+    className: "info-work-wrap"
+  }, React.createElement("table", {
+    className: "info-work info-work-list"
+  }, React.createElement("thead", null, React.createElement("tr", null, React.createElement("th", null, "Poll"), React.createElement("th", null, "Fieldwork"), React.createElement("th", null, "Answers offered"))), React.createElement("tbody", null, ISS.polls.map(p => React.createElement("tr", {
+    key: p.pollster + p.dateLabel
+  }, React.createElement("td", null, p.pollster), React.createElement("td", null, p.dateLabel), React.createElement("td", null, (p.options || []).map(o => o === "unsure" ? {
+    Resolve: "undecided",
+    YouGov: "don’t know"
+  }[p.pollster] || "not sure" : ISS_OPT[o] || o).join(", ")))))), React.createElement("p", {
+    className: "info-work-note"
+  }, "The polls in the six-week window, newest first. A poll\u2019s weight is its sample, halving every 14 days and fading out by day 42; a pollster with several polls in the window counts for the square root of their number.")) : null;
   const pc = v => v == null ? "–" : (100 * v).toFixed(1);
   const lefWork = lefT.length ? React.createElement("div", {
     className: "info-work-wrap"
@@ -49954,6 +51660,34 @@ function infoTerms(D) {
       }, React.createElement("b", null, "Several groups:"), " Holm\u2019s method. With m gaps, sort their p from smallest. The kth smallest passes if p < 0.05 \xF7 (m \u2212 k + 1) and every smaller one passed."), React.createElement("span", {
         className: "info-p"
       }, React.createElement("b", null, "Change over time:"), " for poll i from pollster h, y\u1D62 = \u03B1\u2095 + \u03B2t\u1D62 + \u03B5\u1D62, fitted by least squares weighted by each poll\u2019s sample n\u1D62. Here y\u1D62 is the group\u2019s gap to the poll\u2019s all-voters figure, in percent, and t\u1D62 is the fieldwork date, in years. With t\u0304\u2095 and \u0233\u2095 the pollster\u2019s own weighted means, \u03B2 = \u03A3n\u1D62(t\u1D62 \u2212 t\u0304\u2095)(y\u1D62 \u2212 \u0233\u2095) \xF7 \u03A3n\u1D62(t\u1D62 \u2212 t\u0304\u2095)\xB2. Its standard error is \u221A(s\xB2 \xF7 \u03A3n\u1D62(t\u1D62 \u2212 t\u0304\u2095)\xB2), where s\xB2 is the weighted sum of squared residuals \xF7 (N \u2212 H \u2212 1), for N polls from the H pollsters with at least two. \u03B2 gets a t-test on N \u2212 H \u2212 1 degrees of freedom; with fewer than three, the sentence says there aren\u2019t enough polls. For two groups, y\u1D62 is the gap between them."), demoWork)))
+    }, {
+      id: "issues",
+      term: "Issues",
+      body: React.createElement(React.Fragment, null, "Two questions pollsters ask about the issues: which ones matter most to how people will vote, and which party they think would handle each one best. The panel \u201CThe issues\u201D turns them into one figure per issue.", React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "What matters."), " RedBridge asks every month, \u201CIf a federal election were held today, which of the following issues would be most important to you when deciding who will receive your vote? Please rank your top 3.\u201D It lists 14 issues. The panel shows the share of voters putting each issue first, second or third. DemosAU and Spectre ask their own versions \u2013 DemosAU leaves the answer open, Spectre allows up to three of 17 \u2013 so their figures can\u2019t be combined with RedBridge\u2019s, and the panel leaves them out."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Who\u2019s best."), " Three pollsters ask which party would handle an issue best, each in its own words. Resolve asks every month, \u201CWhich party do you think would perform best in each of these areas?\u201D RedBridge asks every month, \u201CWhich of the following do you believe is best able to deal with\u2026\u201D YouGov asked in August 2026, \u201CWhich party is best at handling\u2026\u201D Each offers different answers. Resolve offers the Liberals, Labor, One Nation (since July 2026), someone else, and undecided. RedBridge offers Labor, the Liberals, the Nationals, the Greens, One Nation, all about equal, none of these, and not sure. YouGov offers Labor, the Coalition, One Nation, the Greens, and don\u2019t know."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "How it\u2019s built."), " The part every question shares is the choice between Labor, the Coalition and One Nation. So each poll is read as those three parties\u2019 shares of the voters who named one of them: 25, 20 and 20 of all voters become 38, 31 and 31. Those shares are pooled over the last six weeks of polls, weighted as the headline\u2019s polls are, so newer and larger polls count for more. Only two pollsters ask regularly, too few to measure each one\u2019s lean, so no lean is removed. RedBridge\u2019s share putting an issue in their top three is built the same way, from RedBridge alone. The panel shows the eight issues at least two of the three pollsters ask: the cost of living, housing, health, economic management, immigration, climate change, crime, and national security. Pollsters word them a little differently \u2013 RedBridge\u2019s \u201Cthe rate of immigration\u201D is Resolve\u2019s \u201Cimmigration and refugees\u201D \u2013 and each counts as the same issue."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "What\u2019s left out."), " The Greens, whom Resolve doesn\u2019t offer, and every answer that names no party. Together they are about a quarter to a third of voters on most issues, and more than half on climate change with RedBridge and YouGov, where many choose the Greens. RedBridge puts the Greens first on climate change, and the panel says so beside its rows."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Ahead, or no clear lead."), " A party is ahead on an issue when its lead over the next party is larger than that lead\u2019s own 95% margin. The lead and its margin are worked out together, because both shares come from the same voters: when one rises, the other tends to fall."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Changes over time."), " The sentence under the chart asks whether any party has gained or lost ground on the issue over the period shown. Resolve joined the three-party question only in July 2026, so a line can move just because it arrived. The test compares each pollster only with itself, as on the vote-by-group charts, and the bar rises for testing three parties at once."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "By group."), " RedBridge publishes a table for each of its main issues giving each group\u2019s share putting it in their top three: by vote, generation, gender, where people live, home ownership, and education. A group\u2019s margin comes from its share of the poll, so One Nation voters, about a quarter of RedBridge\u2019s sample, carry margins of about 6 points. The sentences under the table use the same test as the", " ", xref("vote-by-group", "issues", "breakdowns by group"), "."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Limits."), " Unfortunately, only RedBridge publishes figures for what matters, so nothing checks its readings against another pollster\u2019s. And the three-party shares can\u2019t show a party gaining ground among voters who had named no one."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "A check."), " Every table is checked before it\u2019s used. A salience row\u2019s three ranks must add up to its top-three share, and every best-party row must add up to 100, give or take rounding. RedBridge prints each month twice, in its own report and again in the next, and the two must agree."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Sources."), " RedBridge\u2019s monthly reports with Accent Research (accent-research.com), Resolve\u2019s Political Monitor interactive (The Sydney Morning Herald), and YouGov\u2019s News24 Pulse charts."), working(React.createElement(React.Fragment, null, React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Three-party share:"), " for each party p, s = 100 \xD7 p \xF7 (Labor + Coalition + One Nation), from the poll\u2019s published shares."), React.createElement("span", {
+        className: "info-p"
+      }, React.createElement("b", null, "Lead:"), " the leader\u2019s share minus the next party\u2019s, pooled like the shares. As a difference of two shares of one sample, its sampling variance is (a + b \u2212 (a \u2212 b)\xB2) \xF7 n, where a and b are the two shares as fractions."), issWork)))
     }]
   }, {
     id: "g-leaders",
@@ -52418,6 +54152,8 @@ function SnapshotView({
   }), React.createElement(DemographicsPanel, {
     rangeId: rangeId
   }), React.createElement(OnSourcesPanel, {
+    rangeId: rangeId
+  }), React.createElement(IssuesPanel, {
     rangeId: rangeId
   }), React.createElement(UndecidedPanel, {
     rangeId: rangeId

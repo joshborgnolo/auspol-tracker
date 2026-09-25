@@ -5794,6 +5794,31 @@ function infoTerms(D) {
         in the window counts for the square root of their number.</p>
     </div>
   ) : null;
+  /* The issues panel's working: the polls its six-week window holds, and
+     which answers each offered (the three-party shares drop the rest). */
+  const ISS = D.issues;
+  const ISS_OPT = { alp: "Labor", lnp: "the Coalition", onp: "One Nation", grn: "the Greens", oth: "someone else",
+                    equal: "all about equal", none: "none of these", unsure: "not sure" };
+  const issWork = ISS && ISS.polls && ISS.polls.length ? (
+    <div className="info-work-wrap">
+      <table className="info-work info-work-list">
+        <thead><tr><th>Poll</th><th>Fieldwork</th><th>Answers offered</th></tr></thead>
+        <tbody>
+          {ISS.polls.map((p) => (
+            <tr key={p.pollster + p.dateLabel}>
+              <td>{p.pollster}</td><td>{p.dateLabel}</td>
+              <td>{(p.options || []).map((o) => (o === "unsure"
+                ? ({ Resolve: "undecided", YouGov: "don’t know" }[p.pollster] || "not sure")
+                : ISS_OPT[o] || o)).join(", ")}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <p className="info-work-note">The polls in the six-week window, newest first. A poll’s weight
+        is its sample, halving every 14 days and fading out by day 42; a pollster with several polls
+        in the window counts for the square root of their number.</p>
+    </div>
+  ) : null;
   const pc = (v) => (v == null ? "–" : (100 * v).toFixed(1));
   const lefWork = lefT.length ? (
     <div className="info-work-wrap">
@@ -6242,6 +6267,73 @@ function infoTerms(D) {
           of freedom; with fewer than three, the sentence says there aren’t enough polls. For two
           groups, yᵢ is the gap between them.</span>
           {demoWork}
+        </>)}</>) },
+      { id: "issues", term: "Issues", body: (
+        <>Two questions pollsters ask about the issues: which ones matter most to how people will
+        vote, and which party they think would handle each one best. The panel “The issues” turns
+        them into one figure per issue.
+        <span className="info-p"><b>What matters.</b> RedBridge asks every month, “If a federal
+        election were held today, which of the following issues would be most important to you when
+        deciding who will receive your vote? Please rank your top 3.” It lists 14 issues. The panel
+        shows the share of voters putting each issue first, second or third. DemosAU and Spectre ask
+        their own versions – DemosAU leaves the answer open, Spectre allows up to three of 17 – so
+        their figures can’t be combined with RedBridge’s, and the panel leaves them out.</span>
+        <span className="info-p"><b>Who’s best.</b> Three pollsters ask which party would handle an
+        issue best, each in its own words. Resolve asks every month, “Which party do you think would
+        perform best in each of these areas?” RedBridge asks every month, “Which of the following do
+        you believe is best able to deal with…” YouGov asked in August 2026, “Which party is best at
+        handling…” Each offers different answers. Resolve offers the Liberals, Labor, One Nation
+        (since July 2026), someone else, and undecided. RedBridge offers Labor, the Liberals, the
+        Nationals, the Greens, One Nation, all about equal, none of these, and not sure. YouGov offers
+        Labor, the Coalition, One Nation, the Greens, and don’t know.</span>
+        <span className="info-p"><b>How it’s built.</b> The part every question shares is the choice
+        between Labor, the Coalition and One Nation. So each poll is read as those three parties’
+        shares of the voters who named one of them: 25, 20 and 20 of all voters become 38, 31 and 31.
+        Those shares are pooled over the last six weeks of polls, weighted as the headline’s polls
+        are, so newer and larger polls count for more. Only two pollsters ask regularly, too few to
+        measure each one’s lean, so no lean is removed. RedBridge’s share putting an issue in their
+        top three is built the same way, from RedBridge alone. The panel shows the eight issues at
+        least two of the three pollsters ask: the cost of living, housing, health, economic
+        management, immigration, climate change, crime, and national security. Pollsters word them a
+        little differently – RedBridge’s “the rate of immigration” is Resolve’s “immigration and
+        refugees” – and each counts as the same issue.</span>
+        <span className="info-p"><b>What’s left out.</b> The Greens, whom Resolve doesn’t offer, and
+        every answer that names no party. Together they are about a quarter to a third of voters on
+        most issues, and more than half on climate change with RedBridge and YouGov, where many
+        choose the Greens. RedBridge puts the Greens first on climate change, and the panel says so
+        beside its rows.</span>
+        <span className="info-p"><b>Ahead, or no clear lead.</b> A party is ahead on an issue when its
+        lead over the next party is larger than that lead’s own 95% margin. The lead and its margin
+        are worked out together, because both shares come from the same voters: when one rises, the
+        other tends to fall.</span>
+        <span className="info-p"><b>Changes over time.</b> The sentence under the chart asks whether
+        any party has gained or lost ground on the issue over the period shown. Resolve joined the
+        three-party question only in July 2026, so a line can move just because it arrived. The test
+        compares each pollster only with itself, as on the vote-by-group charts, and the bar rises
+        for testing three parties at once.</span>
+        <span className="info-p"><b>By group.</b> RedBridge publishes a table for each of its main
+        issues giving each group’s share putting it in their top three: by vote, generation, gender,
+        where people live, home ownership, and education. A group’s margin comes from its share of the
+        poll, so One Nation voters, about a quarter of RedBridge’s sample, carry margins of about 6
+        points. The sentences under the table use the same test as the{" "}
+        {xref("vote-by-group", "issues", "breakdowns by group")}.</span>
+        <span className="info-p"><b>Limits.</b> Unfortunately, only RedBridge publishes figures for
+        what matters, so nothing checks its readings against another pollster’s. And the three-party
+        shares can’t show a party gaining ground among voters who had named no one.</span>
+        <span className="info-p"><b>A check.</b> Every table is checked before it’s used. A
+        salience row’s three ranks must add up to its top-three share, and every best-party row must
+        add up to 100, give or take rounding. RedBridge prints each month twice, in its own report and
+        again in the next, and the two must agree.</span>
+        <span className="info-p"><b>Sources.</b> RedBridge’s monthly reports with Accent Research
+        (accent-research.com), Resolve’s Political Monitor interactive (The Sydney Morning Herald),
+        and YouGov’s News24 Pulse charts.</span>
+        {working(<>
+          <span className="info-p"><b>Three-party share:</b> for each party p, s = 100 × p ÷
+          (Labor + Coalition + One Nation), from the poll’s published shares.</span>
+          <span className="info-p"><b>Lead:</b> the leader’s share minus the next party’s, pooled like
+          the shares. As a difference of two shares of one sample, its sampling variance is
+          (a + b − (a − b)²) ÷ n, where a and b are the two shares as fractions.</span>
+          {issWork}
         </>)}</>) },
     ] },
     { id: "g-leaders", title: "Leaders", entries: [

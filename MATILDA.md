@@ -105,6 +105,23 @@ a GENERATED build artifact — never hand-edit it.
     run green since. This repo blocks Actions from opening PRs, so nothing
     here — nor newspoll-watch's filer, which pushes a `repair/` branch and
     files a review-request issue — can open one.
+- The Snapshot's "The issues" panel (before Undecided): what voters say
+  matters and which party they think is best on each issue.
+  `.build/issues.mjs` (readers in `issues-parse.mjs`, pinned by
+  `test-issues.mjs`) writes `data/issues.json` from RedBridge's report text
+  (salience "rank your top 3" of 14, summary tables from April 2026 which
+  also reprint the month before; earlier months from each issue's table by
+  group; best party on 6–9 issues), Resolve's `party_attributes` rows in
+  `data/resolve-political-monitor.csv` (monthly since 2021; One Nation an
+  option from July 2026 – that month's rows count it twice and the reader
+  subtracts it) and YouGov's occasional News24 Pulse "best at handling"
+  chart. gen-data §7h pools ownership only as Labor/Coalition/One Nation
+  shares of those naming one of the three (the one part every house's
+  question shares), six-week window, no house effect (not estimable from
+  two regular houses); salience and salience-by-group are RedBridge alone.
+  The RedBridge, Resolve and News24 updaters run it (refresh_crosstabs),
+  and the weekly crosstabs run fails on a stale wave or an unmapped label.
+  See the auspol-issues-panel skill.
 - Pre-1987 past-cycle leadership lines come from The Bulletin's Morgan
   Gallup column (harvest → extract → assimilate scripts named
   `*-bulletin-gallup.mjs`; CSV `data/bulletin-leader-approval.csv`; rows

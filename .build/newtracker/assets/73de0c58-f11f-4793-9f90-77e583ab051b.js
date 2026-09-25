@@ -1792,6 +1792,10 @@ function SnapshotView({ rangeId, setRangeId, showScatter, tppMatchup, setTppMatc
       <DemographicsPanel rangeId={rangeId} />
       {/* who One Nation's surge is made of */}
       <OnSourcesPanel rangeId={rangeId} />
+      {/* what voters say matters, and which party they trust with it -
+          the reasons behind the vote, before the page turns to those who
+          haven't settled on one */}
+      <IssuesPanel rangeId={rangeId} />
       {/* closes the page: the electorate's mood rather than its party
           choice - how many can't say who they would vote for */}
       <UndecidedPanel rangeId={rangeId} />

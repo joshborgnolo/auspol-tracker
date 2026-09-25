@@ -2342,6 +2342,204 @@ if (demographics) {
   if (off.length) throw new Error(`vote-by-group all voters != the quoted primaries at ${off.map(([w]) => w).join(", ")} – the panel would contradict the hero and the primary chart`);
 }
 
+/* ---- 7h. the issues: what matters, and who is trusted with it --------------
+   data/issues.json (.build/issues.mjs) – each house's issue questions, per
+   wave, as published. Three figures come out of it, each built as the
+   headline is (the six-week window: a house or two asks each month, so the
+   headline's three weeks would often hold one poll or none).
+   Who is best on each issue (ownership). Resolve, RedBridge and YouGov each
+   ask which party is best on an issue, but offer different options: Resolve
+   no Greens and, until July 2026, no One Nation; RedBridge "all about
+   equal" and the Liberals and Nationals apart; YouGov a single don't-know.
+   The part every current question shares is the choice between Labor, the
+   Coalition and One Nation, so each wave is read as those three's shares of
+   the voters who named one of them, and only those waves pool – the
+   questions match there and nowhere else. Pooled in the six-week window
+   (sample- and recency-weighted, a house's repeat waves as sqrt(m)); a
+   house effect can't be measured from two regular houses, so none is
+   applied, as for every measure where it isn't estimable. Eight issues all
+   three (or both regular) houses ask; `leadSig` says whether the leader's
+   margin over the runner-up clears its own 95% margin, the difference of
+   two shares of one sample carrying its own variance, as the leader nets do.
+   What matters (salience): RedBridge's share putting each issue in their top
+   three of 14, the one monthly salience question with figures – the same
+   window, one house. And by group: its table for each issue by vote,
+   generation, gender, place, education and home, the group's sample taken
+   as the poll's times the group's rough share of voters (only its sampling
+   floor depends on that share). */
+const ISSUES_FILE = (() => {
+  try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data", "issues.json"), "utf8")); }
+  catch { return null; }
+})();
+const ISSUE_SHARED = ["col", "housing", "health", "economy", "immigration", "climate", "crime", "security"];
+const OWN3 = ["alp", "lnp", "onp"];
+const ISSUE_GROUP_SETS = [
+  { id: "vote", label: "Vote" }, { id: "generation", label: "Age" }, { id: "gender", label: "Gender" },
+  { id: "location", label: "Place" }, { id: "housing", label: "Home" }, { id: "education", label: "Education" },
+];
+/* Each group's rough share of a poll's respondents: it sizes that group's
+   sampling-error floor and nothing else. Vote groups from the poll's own
+   primaries, less the eight per cent RedBridge reports can't or won't say
+   (its "Undecided / will not vote"); its Liberal and Nationals-side voters
+   split the Coalition about 65:35, their 2025 shares of the Coalition vote. */
+const issueGroupShare = (set, g, p) => {
+  if (set === "vote") {
+    const d = 0.92, lnp = (p && p.lnp) || 0;
+    return { Labor: (p?.alp || 0) / 100 * d, Coalition: lnp / 100 * d, Liberal: 0.65 * lnp / 100 * d,
+             "Nationals, LNP and CLP": 0.35 * lnp / 100 * d, "One Nation": (p?.onp || 0) / 100 * d,
+             Greens: (p?.grn || 0) / 100 * d, Others: (((p?.ind || 0) + (p?.oth || 0)) / 100) * d, Undecided: 0.08 }[g] || null;
+  }
+  if (set === "education") return { "Below Year 12": 0.156, "Year 12": 0.244, "TAFE or trade": 0.31, University: 0.29 }[g] || null;
+  if (set === "housing") return { "Own outright": 0.32, Mortgage: 0.36, "Renting and other": 0.32 }[g] || null;
+  return DEMO_SHARE[g] || null;
+};
+const issues = (() => {
+  const F = ISSUES_FILE;
+  if (!F || !Array.isArray(F.ownership) || !Array.isArray(F.salience)) return null;
+  const pollOf = (w) => POLLS.find((q) => q.pollster === w.pollster && q.date === w.date) || null;
+  const inWin = (mid) => { const d = ddays(refNow, mid); return d >= 0 && d <= SPARSE_K.window; };
+  // ---- who is best: three-way rows per issue and party
+  const own = {};                                // issue → { alp: rows, lnp: rows, onp: rows, lead pairs }
+  const dots = {};                               // issue → [[x, pollster, date, alp, lnp, onp]]
+  const grnTop = {};                             // issue → the newest in-window reading a Greens-offering house has the Greens first in
+  const wavesIn = [];
+  for (const w of F.ownership) {
+    const p = pollOf(w) || { date: w.date, dateStart: w.dateStart, sample: w.sample, sampleEff: w.sampleEff };
+    const mid = midMs(p), n0 = rowN(p), firm = w.pollster;
+    let used = false;
+    for (const k of ISSUE_SHARED) {
+      const sh = w.issues[k];
+      if (!sh || sh.onp == null || sh.alp == null || sh.lnp == null) continue;   // not the three-way question
+      const named = sh.alp + sh.lnp + sh.onp;
+      if (!(named > 0)) continue;
+      used = true;
+      const n = n0 * named / 100, ym = ymOf(w.date);
+      const s3 = Object.fromEntries(OWN3.map((q) => [q, 100 * sh[q] / named]));
+      const o = (own[k] ||= { alp: [], lnp: [], onp: [] });
+      for (const q of OWN3) o[q].push({ ym, mid, x: s3[q], n, firm, s3 });
+      // [x, pollster, fieldwork end, …three-way shares]: the chart's dots, each one its poll's archive row
+      (dots[k] ||= []).push([r2(dx(w.date)), firm, w.date, ...OWN3.map((q) => r1(s3[q]))]);
+      if (sh.grn != null && inWin(mid) && sh.grn > Math.max(sh.alp, sh.lnp, sh.onp)
+          && (!grnTop[k] || grnTop[k].date < w.date))
+        grnTop[k] = { house: firm === "RedBridge/Accent" ? "RedBridge" : firm, grn: sh.grn, date: w.date };
+    }
+    if (used && inWin(mid)) wavesIn.push({ w, p, d: ddays(refNow, mid) });
+  }
+  const lead = (rows, a, b) => {
+    /* the leader's margin over the runner-up, as its own measure: a
+       difference of two shares of one sample, variance (pa + pb − (pa − pb)²)/n */
+    const diff = rows.alp.map((r) => {
+      const pa = r.s3[a] / 100, pb = r.s3[b] / 100;
+      return { mid: r.mid, x: r.s3[a] - r.s3[b], n: r.n, firm: r.firm, pq: Math.max(0, 1e4 * (pa + pb - (pa - pb) ** 2)) };
+    });
+    return weightedWithSe(nowcastPts(diff, null, refNow, SPARSE_K));
+  };
+  // ---- what matters: RedBridge's top three, all voters
+  const salRows = {}, salR1 = {};
+  for (const w of F.salience) {
+    const p = pollOf(w) || { date: w.date, sample: w.sample, sampleEff: w.sampleEff };
+    for (const [k, v] of Object.entries(w.issues)) {
+      const base = { ym: ymOf(w.date), mid: midMs(p), n: rowN(p), firm: w.pollster };
+      (salRows[k] ||= []).push({ ...base, x: v.top3 });
+      (salR1[k] ||= []).push({ ...base, x: v.r1 });
+    }
+  }
+  const salNow = (k) => {
+    const r = salRows[k] && currentReading(salRows[k], null, SPARSE_K);
+    if (!r) return null;
+    const r1v = currentReading(salR1[k], null, SPARSE_K);
+    return { v: r.v, ci: r.ci95, r1: r1v ? r1v.v : null,
+             ...(r.chg != null ? { chg: r.chg, changeSig: r.changeSig } : {}) };
+  };
+  const list = ISSUE_SHARED.map((k) => {
+    const o = own[k];
+    let ownNow = null;
+    if (o) {
+      const est = Object.fromEntries(OWN3.map((q) => [q, currentReading(o[q], null, SPARSE_K)]));
+      if (OWN3.every((q) => est[q])) {
+        const order = [...OWN3].sort((a, b) => est[b].v - est[a].v);
+        const L = lead(o, order[0], order[1]);
+        ownNow = {
+          v: Object.fromEntries(OWN3.map((q) => [q, est[q].v])),
+          ci: Object.fromEntries(OWN3.map((q) => [q, est[q].ci95])),
+          chg: Object.fromEntries(OWN3.map((q) => [q, est[q].chg ?? null])),
+          chgSig: Object.fromEntries(OWN3.map((q) => [q, !!est[q].changeSig])),
+          n: est.alp.n, lead: order[0], runner: order[1],
+          gap: L ? r1(L.v) : null, gapCi: L ? r1(1.96 * L.se) : null, leadSig: !!(L && L.v > 1.96 * L.se),
+          houses: [...new Set(o.alp.filter((r) => inWin(r.mid)).map((r) => r.firm === "RedBridge/Accent" ? "RedBridge" : r.firm))],
+        };
+      }
+    }
+    /* [ym, alp, lnp, onp, ±alp, ±lnp, ±onp] – the monthly line, pooled as
+       every monthly line here is (monthWithSe), from the first month the
+       three-way question was asked */
+    const monthly = o ? MONTHS.map((ym) => {
+      const m = OWN3.map((q) => monthWithSe(o[q], null, ym));
+      return m.every(Boolean) ? [ym, ...m.map((e) => r1(e.v)), ...m.map((e) => r1(1.96 * e.se))] : null;
+    }).filter(Boolean) : [];
+    return { id: k, label: F.issues[k], imp: salNow(k), own: ownNow, monthly,
+             dots: (dots[k] || []).sort((a, b) => a[0] - b[0]), ...(grnTop[k] ? { grnTop: grnTop[k] } : {}) };
+  }).filter((it) => it.own || it.imp);
+  if (!list.length) return null;
+  // ordered by how many voters put the issue in their top three
+  list.sort((a, b) => (b.imp?.v ?? -1) - (a.imp?.v ?? -1));
+  // ---- what matters to whom: RedBridge's tables by group
+  const gRows = {};                              // set|group|issue → rows
+  let gHouse = null, gNewest = null;
+  for (const w of F.salienceGroups || []) {
+    const p = pollOf(w);
+    const mid = midMs(p || w), n0 = rowN(p || { sample: w.sample, sampleEff: w.sampleEff });
+    for (const [k, dims] of Object.entries(w.issues)) for (const [set, gs] of Object.entries(dims)) {
+      if (!ISSUE_GROUP_SETS.some((s) => s.id === set)) continue;
+      for (const [g, v] of Object.entries(gs)) {
+        const share = issueGroupShare(set, g, p);
+        if (!share) continue;
+        (gRows[set + "|" + g + "|" + k] ||= []).push({ mid, x: v.r1 + v.r2 + v.r3, n: n0 * share, firm: w.pollster, date: w.date });
+      }
+    }
+    if (inWin(mid)) { gHouse = w.pollster; if (!gNewest || w.date > gNewest) gNewest = w.date; }
+  }
+  const groupTabs = ISSUE_GROUP_SETS.map((s) => {
+    const keys = Object.keys(gRows).filter((key) => key.startsWith(s.id + "|"));
+    // the groups and issues the window holds, in the order the house prints them
+    const inw = keys.filter((key) => gRows[key].some((r) => inWin(r.mid)));
+    // the newest in-window wave's own printed order first, then anything older
+    const newestW = (F.salienceGroups || []).filter((w) => inWin(midMs(pollOf(w) || w)))
+      .sort((a, b) => (a.date < b.date ? 1 : -1))[0];
+    const printed = newestW ? Object.keys(Object.values(newestW.issues)[0]?.[s.id] || {}) : [];
+    const seenNow = new Set(inw.map((key) => key.split("|")[1]));
+    const groupsSeen = [...new Set([...printed.filter((g) => seenNow.has(g)), ...seenNow])];
+    const issuesSeen = list.map((it) => it.id).filter((k) => inw.some((key) => key.endsWith("|" + k)))
+      .concat([...new Set(inw.map((key) => key.split("|")[2]))].filter((k) => !ISSUE_SHARED.includes(k)));
+    if (!groupsSeen.length || !issuesSeen.length) return null;
+    const cells = Object.fromEntries(groupsSeen.map((g) => [g, Object.fromEntries(issuesSeen.map((k) => {
+      const e = gRows[s.id + "|" + g + "|" + k] && weightedWithSe(nowcastPts(gRows[s.id + "|" + g + "|" + k], null, refNow, SPARSE_K));
+      return [k, e ? { v: r1(e.v), ci: r1(1.96 * e.se) } : null];
+    }))]));
+    return { id: s.id, label: s.label, groups: groupsSeen, issues: issuesSeen, cells };
+  }).filter(Boolean);
+  wavesIn.sort((a, b) => a.d - b.d);
+  return {
+    window: SPARSE_K.label, parties: OWN3, list, labels: F.issues,
+    houses: creditHouses(wavesIn, (r) => r.w.pollster === "RedBridge/Accent" ? "RedBridge" : r.w.pollster, (r) => Date.parse(r.w.date)),
+    // the polls the window holds, newest first (the Info entry's working)
+    polls: wavesIn.map(({ w, p }) => ({
+      pollster: w.pollster === "RedBridge/Accent" ? "RedBridge" : w.pollster,
+      dateLabel: fwLabel(p.dateStart, p.date), source: w.source || null,
+      options: w.options || null,
+    })),
+    groups: groupTabs.length ? { tabs: groupTabs, house: gHouse === "RedBridge/Accent" ? "RedBridge" : gHouse,
+                                 newest: gNewest, window: SPARSE_K.label } : null,
+  };
+})();
+if (issues) {
+  // three-way shares are shares of one whole: a pooled set that doesn't make 100 is a bug
+  for (const it of issues.list) if (it.own) {
+    const t = OWN3.reduce((a, q) => a + it.own.v[q], 0);
+    if (Math.abs(t - 100) > 0.3) throw new Error(`issues: ${it.id} three-way shares sum to ${t}`);
+  }
+}
+
 /* ---- 7f. ALP–ON current figure: primaries through the first-principles
    flow set ---------------------------------------------------------------
    No election count of an ALP-v-ON pairing exists, and by mid-2026 the
@@ -3773,6 +3971,10 @@ window.AUSPOL = (function () {
   /* The vote by group (§7g): per tab, each common group's
      pooled figure per party, with its margin, beside the current primaries. */
   const demographics = ${JSON.stringify(demographics)};
+  /* The issues (§7h): per issue, who voters think is best (three-way,
+     pooled) and how many put it in their top three, plus the top three by
+     group. */
+  const issues = ${JSON.stringify(issues)};
   // the common groups, in the order a poll row's grp.v follows (the export's columns)
   const demoGroups = ${JSON.stringify(DEMO_GROUPS)};
   const accuracy = ${JSON.stringify(accuracy)};
@@ -3852,7 +4054,7 @@ window.AUSPOL = (function () {
 
   return {
     PARTIES, MONTHS, mx, monthName, monthNameFull,
-    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, favHouses, directionPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoGroups, accuracy,
+    agg2pp, aggPrimary, LEADERS, leaderMonths, alt2pp, altLatest, synth2pp, synthLatest, synthOn, flowSens, rivalWalk, lefTables, adjusted, houseEffects, houseLean, flowDrift, flowDriftOn, direction, directionAvailable, directionHouseEffects, directionHouses, directionHousesAll, favHouses, directionPolls, directionNow, leaderNow, undecided, firmness, onSources, demographics, demoGroups, issues, accuracy,
     individualPolls, pollsterTable, latest, cycles, events, showWorking,
     // a getter, so existing callers keep reading D.cycleSource unchanged –
     // empty until loadCycleSource() has resolved
