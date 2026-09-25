@@ -49,8 +49,13 @@ a GENERATED build artifact — never hand-edit it.
   - GitHub's cron ran those blocks 2–5h late at the median in Sep 2026. The
     tuner also writes `.build/dispatch-clock/schedule.json` (the same slots,
     Sydney wall-clock), which the Cloudflare Worker in `.build/dispatch-clock/`
-    turns into on-time `workflow_dispatch` runs once deployed (README
-    there); the cron blocks stay as the backup.
+    turns into on-time `workflow_dispatch` runs — live since 2026-09-24
+    (README there). The cron blocks stay as the backup, and
+    `.build/dispatch-clock/served.mjs` keeps both honest: poll-agent's
+    `clock` job skips a cron run's update when the clock already served
+    every slot of its cron line (any doubt runs it), and coverage-check's
+    heartbeat job goes red when under half the clock's slots in 24h were
+    dispatched (its token is a PAT that will expire).
   - The launchd jobs run in their own clone,
     `~/Library/Application Support/auspol-agents/repo` — never in this
     checkout, whose edits made them refuse 51 of ~148 slots in Sep 2026. Its

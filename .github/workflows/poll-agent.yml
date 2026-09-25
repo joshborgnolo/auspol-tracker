@@ -24,6 +24,12 @@
 # The wrappers are idempotent no-ops when there's nothing new upstream, so
 # dense schedules are safe. All wrappers fast-forward to origin/main first, so
 # the laptop's launchd copies of the same jobs can stay installed as backups.
+#
+# The dispatch clock (.build/dispatch-clock/, live since 2026-09-24) starts
+# each tuned slot on the minute; the caller's cron block fires the same slot
+# again when GitHub gets round to it, 2–5h later. The `clock` job lets that
+# backup run's update go ahead only when the clock did not already serve its
+# slot (.build/dispatch-clock/served.mjs; any doubt runs it).
 
 name: poll-agent (reusable)
 
@@ -50,7 +56,38 @@ on:
         default: 'false'
 
 jobs:
+  # Only a cron-triggered run can be a backup. A slot the clock started (and
+  # that ran or went green) is a duplicate: a second fetch of the pollster's
+  # site for nothing — Essential walled GitHub's runners for four days in Sep
+  # 2026 — and a second run in every list. Slots the clock never carries
+  # (Essential's skip-confirm, DemosAU's hourly gate), a failed dispatched
+  # run, a cron line on last week's UTC offset, or an API error: all run.
+  clock:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    permissions:
+      contents: read
+      actions: read # this workflow's dispatched runs
+    outputs:
+      served: ${{ steps.gate.outputs.served }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          sparse-checkout: .build/dispatch-clock
+      # the image's own node: served.mjs has no dependencies
+      - name: Did the dispatch clock already serve this slot?
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CRON: ${{ github.event.schedule }}
+        run: node .build/dispatch-clock/served.mjs backup
+
   update:
+    needs: clock
+    # Runs unless the clock job positively found the slot served: a skipped
+    # clock job (any trigger but cron) and a failed one both run it.
+    if: ${{ !cancelled() && needs.clock.outputs.served != 'true' }}
     # Pinned, not ubuntu-latest: the label moves to Ubuntu 26 from
     # 2026-10-19, and these jobs lean on the image's apt, poppler and
     # /usr/bin/google-chrome. Move deliberately, all workflows at once.

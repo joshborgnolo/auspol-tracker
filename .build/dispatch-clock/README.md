@@ -14,7 +14,23 @@ A `workflow_dispatch` starts a run within seconds, so this Worker sends one
 at each slot.
 
 The workflows keep their cron blocks as the backup. If the Worker stops,
-runs are late again, and nothing else breaks.
+runs are late again, and nothing else breaks. Deployed 2026-09-24; every
+slot since has started within a minute.
+
+Two checks read the clock's work back out of GitHub's run list
+(`served.mjs`, pinned by `.build/test-dispatch-clock.mjs`):
+
+- **The backup skips itself.** A cron-triggered run of a house workflow
+  first asks whether the clock already started every slot of the cron line
+  that fired it, in the last day, and whether those runs are going or went
+  green (poll-agent.yml's `clock` job). If so, its update is skipped: the
+  second run would only fetch the pollster's site again. A slot the clock
+  never carries, a failed dispatched run, a cron line still on last week's
+  UTC offset or any API error means the update runs.
+- **The heartbeat.** coverage-check.yml's heartbeat job counts the table's
+  slots in the last 24h that got a dispatched run. Under 90% warns; under
+  half fails the job, which emails. The likeliest cause is the token below
+  expiring.
 
 ## How it works
 
@@ -37,7 +53,8 @@ runs are late again, and nothing else breaks.
    - Repository access: *Only select repositories* → `auspol-tracker`
    - Permissions: **Actions: Read and write**. Nothing else is needed;
      Metadata: read is added automatically.
-   - Expiry: up to a year. Note the date, because nothing checks this token.
+   - Expiry: up to a year. Note the date. Nothing reads it in advance; the
+     heartbeat goes red within a day of the token failing.
 2. In Terminal (quote the path: it has a space in it), run these one at a
    time:
 
@@ -65,7 +82,8 @@ runs are late again, and nothing else breaks.
   10 minutes (raw.githubusercontent.com and the edge both cache for about 5).
 - To pause the clock: `npx wrangler triggers deploy --crons ""`, or delete
   the Worker. The GitHub cron backup carries on either way.
-- Once the clock has proven itself over a few release weeks, the cron
-  blocks could shrink to their daily sweeps. That would also retire
-  `SCHEDULE_TUNER_TOKEN`, which exists only so the tuner can rewrite
-  workflow files.
+- The cron blocks no longer need thinning: while the clock works, their
+  runs skip themselves in seconds, and when it stops they are the backup
+  again with no one having to notice first. Shrinking them to the daily
+  sweeps would retire `SCHEDULE_TUNER_TOKEN` (it exists only so the tuner
+  can rewrite workflow files), at the cost of that automatic fallback.

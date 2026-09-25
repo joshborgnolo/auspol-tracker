@@ -6,9 +6,10 @@
       moves to Ubuntu 26 from 2026-10-19.
    2. every third-party action is pinned to a full commit SHA.
    3. the reusable-workflow permissions CEILING: every caller of
-      poll-agent.yml grants at least what poll-agent's job asks for. A
-      one-sided widening makes every caller an invalid workflow at its next
-      trigger (0c3a2ba, 2026-09-06: all eight pipelines, "Startup failure").
+      poll-agent.yml grants at least what each of poll-agent's jobs asks
+      for. A one-sided widening makes every caller an invalid workflow at
+      its next trigger (0c3a2ba, 2026-09-06: all eight pipelines, "Startup
+      failure").
    4. agent-repair's watch list and schedule-tune's trigger list name real
       workflows, and every updater with a tuned cron block retriggers the
       tuner when it lands a wave (news24-update was missing until
@@ -35,17 +36,23 @@ for (const f of files) {
 
 // ---- 3: the permissions ceiling ----------------------------------------------------
 const LEVEL = { none: 0, read: 1, write: 2 };
-// a `permissions:` mapping whose key line sits at `indent` spaces
-function permsAt(t, indent) {
+// every `permissions:` mapping whose key line sits at `indent` spaces
+function permsAll(t, indent) {
   const pad = " ".repeat(indent);
-  const m = new RegExp(`^${pad}permissions:[ \\t]*(\\{\\})?[ \\t]*(?:#.*)?\\n((?:${pad}  [a-z-]+:.*\\n)*)`, "m").exec(t);
-  if (!m) return null;
-  if (m[1]) return {};
-  return Object.fromEntries([...m[2].matchAll(/^\s+([a-z-]+):\s*([a-z]+)/gm)].map((x) => [x[1], x[2]]));
+  const re = new RegExp(`^${pad}permissions:[ \\t]*(\\{\\})?[ \\t]*(?:#.*)?\\n((?:${pad}  [a-z-]+:.*\\n)*)`, "gm");
+  return [...t.matchAll(re)].map((m) => m[1] ? {} :
+    Object.fromEntries([...m[2].matchAll(/^\s+([a-z-]+):\s*([a-z]+)/gm)].map((x) => [x[1], x[2]])));
 }
+const permsAt = (t, indent) => permsAll(t, indent)[0] ?? null;
 const agent = text["poll-agent.yml"];
-const asked = permsAt(agent, 4); // jobs.update.permissions
-assert.ok(asked && Object.keys(asked).length, "poll-agent.yml's update job declares its permissions");
+// every job in poll-agent.yml (the backup gate `clock`, then `update`) —
+// the ceiling applies to each; take the widest ask per scope
+const asked = {};
+for (const job of permsAll(agent, 4))
+  for (const [scope, level] of Object.entries(job))
+    if ((LEVEL[level] ?? 0) > (LEVEL[asked[scope]] ?? -1)) asked[scope] = level;
+assert.ok(asked.contents === "write", "poll-agent.yml's update job declares contents: write");
+assert.ok(permsAll(agent, 4).length >= 2, "poll-agent.yml's jobs each declare their permissions");
 const callers = files.filter((f) => /^\s+uses: \.\/\.github\/workflows\/poll-agent\.yml/m.test(text[f]));
 assert.ok(callers.length >= 12, `every house calls poll-agent.yml (found ${callers.length})`);
 for (const f of callers) {
