@@ -2361,6 +2361,9 @@ if (demographics) {
    three (or both regular) houses ask; `leadSig` says whether the leader's
    margin over the runner-up clears its own 95% margin, the difference of
    two shares of one sample carrying its own variance, as the leader nets do.
+   Where it doesn't, `pairSig` says whether the runner-up's margin over the
+   third clears ITS margin: two parties the polls can't separate, both
+   clearly ahead of the one left behind.
    What matters (salience): RedBridge's share putting each issue in their top
    three of 14, the one monthly salience question with figures – the same
    window, one house. And by group: its table for each issue by vote,
@@ -2459,13 +2462,16 @@ const issues = (() => {
       if (OWN3.every((q) => est[q])) {
         const order = [...OWN3].sort((a, b) => est[b].v - est[a].v);
         const L = lead(o, order[0], order[1]);
+        const leadSig = !!(L && L.v > 1.96 * L.se);
+        const L2 = leadSig ? null : lead(o, order[1], order[2]);
         ownNow = {
           v: Object.fromEntries(OWN3.map((q) => [q, est[q].v])),
           ci: Object.fromEntries(OWN3.map((q) => [q, est[q].ci95])),
           chg: Object.fromEntries(OWN3.map((q) => [q, est[q].chg ?? null])),
           chgSig: Object.fromEntries(OWN3.map((q) => [q, !!est[q].changeSig])),
-          n: est.alp.n, lead: order[0], runner: order[1],
-          gap: L ? r1(L.v) : null, gapCi: L ? r1(1.96 * L.se) : null, leadSig: !!(L && L.v > 1.96 * L.se),
+          n: est.alp.n, lead: order[0], runner: order[1], third: order[2],
+          gap: L ? r1(L.v) : null, gapCi: L ? r1(1.96 * L.se) : null, leadSig,
+          ...(L2 ? { gap2: r1(L2.v), gap2Ci: r1(1.96 * L2.se), pairSig: L2.v > 1.96 * L2.se } : {}),
           houses: [...new Set(o.alp.filter((r) => inWin(r.mid)).map((r) => r.firm === "RedBridge/Accent" ? "RedBridge" : r.firm))],
         };
       }
