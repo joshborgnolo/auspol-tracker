@@ -594,11 +594,6 @@ body {
      so the one glyph serves every checkbox and each keeps its own colour. */
   --tick-glyph: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'%3E%3Cpath d='M3 7.2 5.8 10 11 4.2' fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   --btn-edge:  color-mix(in oklch, var(--ink) 8%, transparent);
-  --well-cut:    color-mix(in oklch, var(--ink) 20%, transparent);
-  --well-edge:   color-mix(in oklch, var(--ink) 24%, transparent);
-  --well-rim:    color-mix(in oklch, var(--ink) 9%, transparent);
-  --well-bounce: color-mix(in oklch, white 45%, transparent);
-  --well-sill: color-mix(in oklch, white 85%, transparent);
   /* the theme rocker: faceplate, the half standing proud, the half pushed in */
   --sw-plate: color-mix(in oklch, var(--ink) 5%, var(--surface));
   --sw-cap:   var(--surface);
@@ -625,11 +620,6 @@ body.dark {
   --btn-shade: oklch(0 0 0 / 0.44);
   --btn-press: color-mix(in oklch, black 48%, transparent);
   --btn-edge:  color-mix(in oklch, black 40%, transparent);
-  --well-cut:    color-mix(in oklch, black 50%, transparent);
-  --well-edge:   color-mix(in oklch, black 58%, transparent);
-  --well-rim:    color-mix(in oklch, black 34%, transparent);
-  --well-bounce: color-mix(in oklch, white 14%, transparent);
-  --well-sill: color-mix(in oklch, white 10%, transparent);
   --sw-plate: color-mix(in oklch, black 22%, var(--surface));
   --sw-cap:   color-mix(in oklch, white 7%, var(--surface));
   --sw-well:  color-mix(in oklch, black 44%, var(--surface));
@@ -1043,49 +1033,26 @@ button.ap-popbtn, button.dl-replay, button.acc-spread {
   border-bottom-color: var(--btn-edge);
 }
 
-/* ---------- bars are channels ---------------------------------------------
-   Every bar on the site is already the hero gauge's anatomy under another
-   name: a track that is CHROME holding segments that are READINGS. So they
-   all get the same milling, and not one encoding is touched.
-
-   Drawn on an overlay rather than as the track's own inset shadow, because
-   the segments cover their track completely and would bury it. Over the top
-   is also the truer place for it: light falling into a real channel lands on
-   whatever the channel is holding, not just on the empty ends. */
-.sbar, .appr-netbar, .dir-bar, .demo-track { position: relative; }
-.sbar::after, .appr-netbar::after, .dir-bar::after, .demo-track::after {
-  content: ""; position: absolute; inset: 0; border-radius: inherit;
-  /* A channel reads by its EDGES, not by a haze. The first pass was a single
-     soft inset at 15%, which is invisible the moment a saturated segment sits
-     under it - the whole bar is covered, so there is no bare track anywhere
-     for a diffuse shadow to darken. What registers over colour is a hard top
-     cut, walls down both sides, and the light coming back off the far lip. */
-  box-shadow: inset 0 1px 0 var(--well-edge),         /* the cut itself */
-              inset 0 2.5px 3px -1px var(--well-cut), /* its falloff */
-              inset 0 -1px 0 var(--well-bounce),      /* light off the floor's lip */
-              inset 0 0 0 1px var(--well-rim);        /* the walls */
-  pointer-events: none;
-}
+/* ---------- bars are printed ---------------------------------------------
+   Data bars are ink on the page, flat: one tint for every track, colour for
+   the reading, and a fine printed rule wherever a bar has a zero or a tie.
+   They were milled channels for a while (inset cut, walls, a lit sill), which
+   put a machined material beside a page of paper, serif and highlighter, and
+   shaded the top of every fill - on a mark whose only job is its length.
+   Depth stays where it means something: the hero gauge, which is an
+   instrument, and the theme rocker, which is a switch. */
 .sbar, .appr-netbar, .dir-bar, .demo-track, .lead-bar, .arch-appr-bar {
-  box-shadow: 0 1px 0 var(--well-sill);
-  /* one well for every bar on the page (the hero gauge's own token) - they
-     were four different greys, one of them all but invisible on paper */
-  background-color: var(--hg-well);
+  position: relative; background-color: var(--bar-track);
 }
-/* The table-scale bars are 4px: the full channel above would fill them with
-   shadow, so they keep only its cut and its walls - the same well, one size
-   down. */
-.lead-bar::before, .arch-appr-bar::before {
-  content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 1;
-  box-shadow: inset 0 1px 0 var(--well-edge), inset 0 0 0 0.5px var(--well-rim);
-}
-.arch-appr-bar { position: relative; }
-/* A zero or tie line is CUT into a bar's case, never painted over it: a dark
-   cut with a lit lip on its right, the page's one light direction - the
-   hero gauge's tie, reused. */
-.bar-cut, .anb-mid, .lead-bar::after {
-  background: var(--hg-tie-cut) !important; box-shadow: 1px 0 0 var(--hg-lip);
-}
+body { --bar-track: color-mix(in oklch, var(--ink) 8%, var(--bg)); }
+/* a bar that hangs from zero is square where it meets the zero line and
+   round only at its free end */
+.anb-pos { border-radius: 0 4px 4px 0 !important; }
+.anb-neg { border-radius: 4px 0 0 4px !important; }
+.lead-bar-fill.from-l { border-radius: 0 2px 2px 0; }
+.lead-bar-fill.from-r { border-radius: 2px 0 0 2px; }
+/* the zero / tie: a hairline in ink, printed across the bar */
+.anb-mid, .lead-bar::after { background: var(--ink-2) !important; }
 
 /* ---------- text toggle (editorial control) ---------- */
 .text-toggle { display: inline-flex; align-items: baseline; gap: 11px; }

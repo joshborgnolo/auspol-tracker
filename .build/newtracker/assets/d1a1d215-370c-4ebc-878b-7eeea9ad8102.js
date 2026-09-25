@@ -3347,7 +3347,7 @@ function ArchLead({ p, measure, primaryFallback, basis }) {
           were the same picture. Full half-width is an 8-point lead - the
           span where polls actually disagree; anything wider pins. */}
       <div className="lead-bar" aria-hidden="true">
-        <span className="lead-bar-fill" style={{ background: li.color,
+        <span className={"lead-bar-fill " + (li.m >= 0 ? "from-r" : "from-l")} style={{ background: li.color,
           width: Math.min(50, Math.abs(li.m) * 6.25) + "%",
           [li.m >= 0 ? "right" : "left"]: "50%" }}></span>
       </div>
