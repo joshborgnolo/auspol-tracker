@@ -80,6 +80,7 @@ export const SHELL_PAGES = [
   { file: "archives/acnielsen/index.html", page: "archives" },
   { file: "archives/morgan/index.html", page: "archives" },   // refresh-morgan-archive.mjs
   { file: "archives/galaxy/index.html", page: "archives" },   // refresh-galaxy-archive.mjs
+  { file: "archives/aeforecasts/index.html", page: "archives" }, // refresh-aeforecasts-archive.mjs
   { file: "archives/trove/index.html", page: "archives" },    // refresh-trove-archive.mjs
 ];
 export const shellOptsFor = (file) => SHELL_PAGES.find((p) => p.file === file) || {};

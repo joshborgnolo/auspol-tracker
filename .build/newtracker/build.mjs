@@ -938,6 +938,10 @@ const sitemapXml = `<?xml version="1.0" encoding="UTF-8"?>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
   <url>
+    <loc>${SITE_URL}archives/aeforecasts/</loc>
+    <lastmod>${ARCHIVE_STAMP}</lastmod>
+  </url>
+  <url>
     <loc>${SITE_URL}archives/trove/</loc>
     <lastmod>${ARCHIVE_STAMP}</lastmod>
   </url>
